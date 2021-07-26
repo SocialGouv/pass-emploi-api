@@ -1,2 +1,7 @@
 pass-emploi-venv/
 .idea/
+pass_emploi_api.egg-info/
+repositories/__pycache__/
+datasources/__pycache__/
+models/__pycache__/
+dist/
