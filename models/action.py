@@ -4,8 +4,15 @@ from models.jeune import Jeune
 
 
 class Action:
-    id: str
-    content: str
-    isDone: bool
-    creationDate: datetime
-    jeune: Jeune
+
+    def __init__(self,
+                 id: int,
+                 content: str,
+                 is_done: bool,
+                 creation_date: datetime,
+                 jeune: Jeune):
+        self.id = id
+        self.content = content
+        self.isDone = is_done
+        self.creationDate = creation_date
+        self.jeune = jeune
