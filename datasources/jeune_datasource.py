@@ -3,7 +3,7 @@ from typing import List
 from models.jeune import Jeune
 
 
-class JeuneDatasource():
+class JeuneDatasource:
     jeunes: List[Jeune]
 
     def exists(self, jeune_id: str):
