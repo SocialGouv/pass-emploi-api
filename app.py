@@ -1,10 +1,8 @@
-from typing import List
-
 from flask import Flask
 
 from datasources.action_datasource import ActionDatasource
 from datasources.jeune_datasource import JeuneDatasource
-from models.action import Action
+from json_model.json_transformer import to_json
 from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
 from use_cases.home_use_case import HomeUseCase
@@ -26,21 +24,7 @@ def hello_world():
 @app.route('/jeunes/<jeune_id>/home', methods=['GET'])
 def get_home(jeune_id: str):
     home = home_use_case.get_home(jeune_id)
-    actions_list = list(map(lambda x: JsonAction(x).__dict__, home.actions))
-    return JsonHome(actions_list).__dict__
-
-
-class JsonHome:
-    def __init__(self, actions: List[dict]):
-        self.actions = actions
-
-
-class JsonAction:
-    def __init__(self, action: Action):
-        self.id = action.id
-        self.content = action.content
-        self.isDone = action.isDone
-        self.creationDate = action.creationDate
+    return to_json(home)
 
 
 if __name__ == '__main__':
