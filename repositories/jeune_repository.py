@@ -9,11 +9,11 @@ class JeuneRepository:
         self.jeuneDatasource = jeune_datasource
         self.actionRepository = action_repository
 
-    def initialize_jeune_if_required(self, jeune_id: str):
+    def create_jeune_if_required(self, jeune_id: str):
         if not self.jeuneDatasource.exists(jeune_id):
             jeune = Jeune(jeune_id)
             self.jeuneDatasource.create_jeune(jeune)
-            self.actionRepository.create_actions(jeune)
+            self.actionRepository.create_actions(jeune)   #Refacto: remove to home use case
 
     def get_jeune(self, jeune_id: str):
         return self.jeuneDatasource.get(jeune_id)

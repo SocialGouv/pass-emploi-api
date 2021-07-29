@@ -9,7 +9,10 @@ class HomeUseCase:
         self.action_repository = action_repository
 
     def get_home(self, jeune_id: str):
-        self.jeune_repository.initialize_jeune_if_required(jeune_id)
+        self.jeune_repository.create_jeune_if_required(jeune_id)
         jeune = self.jeune_repository.get_jeune(jeune_id)
         actions = self.action_repository.get_actions(jeune)
         return Home(actions)
+
+    def set_home_action(self, action_id: str):
+        self.action_repository.set_action_status(action_id)

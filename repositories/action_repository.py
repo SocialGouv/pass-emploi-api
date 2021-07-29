@@ -19,7 +19,12 @@ class ActionRepository:
         for i in range(5):
             action = Action(random.randint(0, 10000000), random.choice(generic_actions_content), False,
                             datetime.utcnow(), jeune)
-            self.actionDatasource.save(action)
+            self.actionDatasource.add(action)
 
     def get_actions(self, jeune: Jeune):
         return self.actionDatasource.get_actions(jeune)
+
+    def set_action_status(self, action_id: str):
+        for action in self.actionDatasource.actions:
+            if action.id == int(action_id):
+                action.isDone = not action.isDone

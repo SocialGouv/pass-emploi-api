@@ -24,7 +24,13 @@ def hello_world():
 @app.route('/jeunes/<jeune_id>/home', methods=['GET'])
 def get_home(jeune_id: str):
     home = home_use_case.get_home(jeune_id)
-    return to_json(home)
+    return to_json(home), 200
+
+
+@app.route('/actions/<action_id>/home', methods=['PUT'])
+def put_home_action(action_id: str):
+    home_use_case.set_home_action(action_id)
+    return '', 200
 
 
 if __name__ == '__main__':
