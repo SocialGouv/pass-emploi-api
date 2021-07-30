@@ -27,7 +27,7 @@ class ActionRepository:
     def get_actions(self, jeune: Jeune):
         return self.actionDatasource.get_actions(jeune)
 
-    def set_action_status(self, action_id: str):
+    def set_action_status(self, action_id: int):
         for action in self.actionDatasource.actions:
-            if action.id == int(action_id):
+            if action.id == action_id:
                 action.isDone = not action.isDone

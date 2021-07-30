@@ -27,9 +27,9 @@ def get_home(jeune_id: str):
     return to_json(home), 200
 
 
-@app.route('/actions/<action_id>/home', methods=['PUT'])
+@app.route('/actions/<action_id>', methods=['PUT'])
 def put_home_action(action_id: str):
-    home_use_case.set_home_action(action_id)
+    home_use_case.set_home_action(int(action_id))
     return '', 200
 
 
