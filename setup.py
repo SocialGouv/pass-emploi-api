@@ -5,6 +5,7 @@ setup(name='pass-emploi-api',
       description='Pass Emploi API',
       url='https://github.com/SocialGouv/pass-emploi-api',
       install_requires=[
-          'flask'
+          'flask',
+          'pytest'
       ],
       zip_safe=False)
