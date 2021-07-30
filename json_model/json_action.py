@@ -7,3 +7,4 @@ class JsonAction:
         self.content = action.content
         self.isDone = action.isDone
         self.creationDate = action.creationDate
+        self.lastUpdate = action.lastUpdate

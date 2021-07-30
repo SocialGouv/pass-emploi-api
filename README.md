@@ -9,4 +9,4 @@
 # Ouvrir un poste de dev sur le net
 1. L'app tourne en local sur le port <PORT> => vérifier avec http://localhost:<PORT>
 2. Lancer / configurer ngrok https://ngrok.com/download
-3. `$ ./ngrok http <PORT>` => ex : https://e648dfa0639d.ngrok.io
+3. `$ ngrok http <PORT>` => ex : https://e648dfa0639d.ngrok.io
