@@ -9,9 +9,9 @@ generic_actions_content = ["Mettre à jour mon CV", "Créer une lettre de motiva
                            "Mettre mon CV en ligne", "Apprendre l'anglais avec Jason Statham", "Changer de prénom",
                            "Suivre une formation", "Prendre contact avec un employeur pour un stage",
                            "Assister à l’atelier CV à la Mission Locale de Paris, site Soleil.",
-                           "Assister à au moins 4 ateliers proposés par Pôle Emploi ou la Mission locale.",
+                           "Assister à au moins 4 ateliers proposés par Pôle Emploi ou  Mission locale.",
                            "Effectuer un stage d’au moins 2 jours dans le domaine qui me plaît.",
-                           "Discuter avec 3 anciens jeunes suivis par",
+                           "Discuter avec 3 anciens jeunes suivis par Pôle Emploi ou  Mission locale",
                            ]
 
 
