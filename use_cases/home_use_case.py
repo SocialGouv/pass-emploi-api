@@ -12,7 +12,7 @@ class HomeUseCase:
         self.jeune_repository.create_jeune_if_required(jeune_id)
         jeune = self.jeune_repository.get_jeune(jeune_id)
         actions = self.action_repository.get_actions(jeune)
-        return Home(actions)
+        return Home(actions, jeune.conseiller)
 
     def set_home_action(self, action_id: int):
         self.action_repository.set_action_status(action_id)

@@ -2,17 +2,19 @@ from datetime import datetime
 
 from json_model.json_transformer import to_json
 from models.action import Action
+from models.conseiller import Conseiller
 from models.home import Home
 from models.jeune import Jeune
 
 
 def test_to_json():
     # Given
-    jeune = Jeune("ID_JEUNE")
+    conseiller = Conseiller('1', 'Nils', 'Tavernier')
+    jeune = Jeune("ID_JEUNE", conseiller)
     home = Home([
-        Action(1, "Suivre une formation", False, datetime(2020, 1, 30), jeune),
-        Action(2, "Faire son CV", True, datetime(2021, 10, 2), jeune),
-    ])
+        Action(1, "Suivre une formation", False, datetime(2020, 1, 30), datetime(2021, 10, 2),  jeune),
+        Action(2, "Faire son CV", True, datetime(2021, 10, 2), datetime(2021, 10, 2), jeune),
+    ], conseiller)
 
     # When
     json_home = to_json(home)

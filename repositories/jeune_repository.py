@@ -1,4 +1,5 @@
 from datasources.jeune_datasource import JeuneDatasource
+from models.conseiller import Conseiller
 from models.jeune import Jeune
 from repositories.action_repository import ActionRepository
 
@@ -11,7 +12,8 @@ class JeuneRepository:
 
     def create_jeune_if_required(self, jeune_id: str):
         if not self.jeuneDatasource.exists(jeune_id):
-            jeune = Jeune(jeune_id)
+            conseiller = Conseiller('1', 'Nils', 'Tavernier')
+            jeune = Jeune(jeune_id, conseiller)
             self.jeuneDatasource.create_jeune(jeune)
             self.actionRepository.create_actions(jeune)   #Refacto: remove to home use case
 
