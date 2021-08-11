@@ -1,3 +1,4 @@
+from firebase_chat import initialise_chat
 from datasources.jeune_datasource import JeuneDatasource
 from models.conseiller import Conseiller
 from models.jeune import Jeune
@@ -14,6 +15,7 @@ class JeuneRepository:
         if not self.jeuneDatasource.exists(jeune_id):
             conseiller = Conseiller('1', 'Nils', 'Tavernier')
             jeune = Jeune(jeune_id, conseiller)
+            initialise_chat(jeune.id, conseiller.id)
             self.jeuneDatasource.create_jeune(jeune)
             self.actionRepository.create_actions(jeune)   #Refacto: remove to home use case
 

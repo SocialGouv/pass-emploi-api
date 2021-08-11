@@ -7,3 +7,5 @@ models/__pycache__/
 json_model/__pycache__/
 use_cases/__pycache__/
 dist/
+tests/__pycache__/
+__pycache__/
