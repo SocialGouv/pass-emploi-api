@@ -2,6 +2,7 @@ from flask import Flask
 
 from datasources.action_datasource import ActionDatasource
 from datasources.jeune_datasource import JeuneDatasource
+from firebase.firebase_chat import FirebaseChat
 from json_model.json_transformer import to_json
 from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
@@ -10,7 +11,7 @@ from use_cases.home_use_case import HomeUseCase
 action_datasource = ActionDatasource()
 jeune_datasource = JeuneDatasource()
 action_repository = ActionRepository(action_datasource)
-jeune_repository = JeuneRepository(jeune_datasource, action_repository)
+jeune_repository = JeuneRepository(jeune_datasource, action_repository, FirebaseChat())
 home_use_case = HomeUseCase(jeune_repository, action_repository)
 
 app = Flask(__name__)

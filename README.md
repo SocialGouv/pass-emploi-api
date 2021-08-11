@@ -15,4 +15,4 @@
 1. Aller sur la page Firebase du projet Pass Emploi > Paramètres du Projet > Comptes de service
 2. Générer une clé privée
 3. Utiliser le fichier qui stocke cette clé dans le code du chat `firebase_chat` 
-NB: Attention à commiter ou rajouter cette clé dans le répertoire git ou la partager de manière non sécurisée
+NB: Attention: Ne jamais commiter ou rajouter cette clé dans le répertoire git, ni la partager de manière non sécurisée
