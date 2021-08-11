@@ -30,7 +30,7 @@ def get_home(jeune_id: str):
 
 @app.route('/actions/<action_id>', methods=['PUT'])
 def put_home_action(action_id: str):
-    home_use_case.set_home_action(int(action_id))
+    home_use_case.change_action_status(int(action_id))
     return '', 200
 
 
