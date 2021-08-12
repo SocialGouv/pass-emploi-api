@@ -38,7 +38,7 @@ def put_action_jeune(action_id: str):
     return '', 200
 
 # TODO renommer les endpoints
-@app.route('/actions/<jeune_id>', methods=['POST'])
+@app.route('/actions/jeune/<jeune_id>/web', methods=['POST'])
 def post_action(jeune_id: str):
     test = {'id': 1, 'content': 'blabla', 'isDone': False, 'creationDate': datetime.now(),
             'lastUpdate': datetime.now()}
@@ -46,13 +46,13 @@ def post_action(jeune_id: str):
     return to_json(home_conseiller), 201
 
 
-@app.route('/actions/<action_id>/conseiller', methods=['PUT'])
+@app.route('/actions/<action_id>/web', methods=['PUT'])
 def put_action_conseiller(action_id: str):
     home_conseiller_use_case.change_action_status(int(action_id))
     return '', 200
 
 
-@app.route('/jeunes/<jeune_id>/conseiller', methods=['GET'])
+@app.route('/jeunes/<jeune_id>/actions/web', methods=['GET'])
 def get_home_conseiller(jeune_id: str):
     home_conseiller = home_conseiller_use_case.get_jeune_actions(jeune_id)
     return to_json(home_conseiller), 200
