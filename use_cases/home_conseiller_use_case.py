@@ -9,6 +9,7 @@ class HomeConseillerUseCase:
         self.actionRepository = action_repository
         self.jeuneRepository = jeune_repository
 
+    # TODO refacto remove this action from use_case
     def post_action_for_jeune(self, json_action: dict, jeune_id: str):
         jeune = self.jeuneRepository.get_jeune(jeune_id)
         action = Action(json_action['id'], json_action['content'],

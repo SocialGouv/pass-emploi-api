@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from flask import Flask
+from flask import Flask, request
 
 from datasources.action_datasource import ActionDatasource
 from datasources.jeune_datasource import JeuneDatasource
@@ -40,9 +38,8 @@ def put_action_jeune(action_id: str):
 # TODO renommer les endpoints
 @app.route('/actions/jeune/<jeune_id>/web', methods=['POST'])
 def post_action(jeune_id: str):
-    test = {'id': 1, 'content': 'blabla', 'isDone': False, 'creationDate': datetime.now(),
-            'lastUpdate': datetime.now()}
-    home_conseiller = home_conseiller_use_case.post_action_for_jeune(test, jeune_id)
+    action_data = request.json
+    home_conseiller = home_conseiller_use_case.post_action_for_jeune(action_data, jeune_id)
     return to_json(home_conseiller), 201
 
 
