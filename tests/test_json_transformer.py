@@ -10,7 +10,7 @@ from models.jeune import Jeune
 def test_to_json():
     # Given
     conseiller = Conseiller('1', 'Nils', 'Tavernier')
-    jeune = Jeune("ID_JEUNE", conseiller)
+    jeune = Jeune("ID_JEUNE", 'Kevin', 'DeBruyne', conseiller)
     home = Home([
         Action(1, "Suivre une formation", False, datetime(2020, 1, 30), datetime(2021, 10, 2),  jeune),
         Action(2, "Faire son CV", True, datetime(2021, 10, 2), datetime(2021, 10, 2), jeune),
