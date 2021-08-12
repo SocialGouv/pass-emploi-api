@@ -11,6 +11,9 @@ class ActionRepository:
     def __init__(self, action_datasource: ActionDatasource):
         self.actionDatasource = action_datasource
 
+    def add_action(self, action: Action):
+        self.actionDatasource.add_action(action)
+
     def create_actions(self, jeune: Jeune):
         self.actionDatasource.create_actions(jeune)
 

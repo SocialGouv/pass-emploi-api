@@ -17,6 +17,9 @@ generic_actions_content = ["Mettre à jour mon CV", "Créer une lettre de motiva
 class ActionDatasource:
     actions = []
 
+    def add_action(self, action: Action):
+        self.actions.append(action)
+
     def create_actions(self, jeune: Jeune):
         random_actions_content = generic_actions_content.copy()
         for i in range(5):
