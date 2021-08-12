@@ -6,7 +6,7 @@ setup(name='pass-emploi-api',
       url='https://github.com/SocialGouv/pass-emploi-api',
       install_requires=[
           'flask',
+          'firebase-admin',
           'pytest',
-          'firebase_admin'
       ],
       zip_safe=False)
