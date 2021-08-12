@@ -8,15 +8,15 @@ from firebase.firebase_chat import FirebaseChat
 from json_model.json_transformer import to_json
 from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
-from use_cases.conseiller_home import ConseillerHome
-from use_cases.home_use_case import HomeUseCase
+from use_cases.home_conseiller import HomeConseiller
+from use_cases.home_jeune import HomeJeune
 
 action_datasource = ActionDatasource()
 jeune_datasource = JeuneDatasource()
 action_repository = ActionRepository(action_datasource)
 jeune_repository = JeuneRepository(jeune_datasource, action_repository, FirebaseChat())
-home_use_case = HomeUseCase(jeune_repository, action_repository)
-conseiller_home = ConseillerHome(jeune_repository, action_repository)
+home_jeune = HomeJeune(jeune_repository, action_repository)
+conseiller_home = HomeConseiller(jeune_repository, action_repository)
 
 app = Flask(__name__)
 
@@ -28,16 +28,16 @@ def hello_world():
 
 @app.route('/jeunes/<jeune_id>/home', methods=['GET'])
 def get_home(jeune_id: str):
-    home = home_use_case.get_home(jeune_id)
+    home = home_jeune.get_home(jeune_id)
     return to_json(home), 200
 
 
 @app.route('/actions/<action_id>', methods=['PUT'])
 def put_home_action(action_id: str):
-    home_use_case.change_action_status(int(action_id))
+    home_jeune.change_action_status(int(action_id))
     return '', 200
 
-# dans les actions: pousser jeune_id au lieur de tout le jeune
+
 # put -> pas besoin de l'id du jeune
 # get -> des actions yes, jeune ?
 # trier les actions par ordre

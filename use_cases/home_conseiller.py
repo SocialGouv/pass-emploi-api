@@ -4,7 +4,7 @@ from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
 
 
-class ConseillerHome:
+class HomeConseiller:
     def __init__(self, jeune_repository: JeuneRepository, action_repository: ActionRepository):
         self.actionRepository = action_repository
         self.jeuneRepository = jeune_repository
@@ -15,3 +15,6 @@ class ConseillerHome:
                         json_action['lastUpdate'], jeune)
         self.actionRepository.add_action(action)
         return Home([action], jeune.conseiller)
+
+    def change_action_status(self, action_id: int):
+        self.actionRepository.set_action_status(action_id)
