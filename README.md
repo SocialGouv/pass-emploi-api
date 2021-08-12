@@ -10,3 +10,10 @@
 1. L'app tourne en local sur le port <PORT> => vérifier avec http://localhost:<PORT>
 2. Lancer / configurer ngrok https://ngrok.com/download
 3. `$ ngrok http <PORT>` => ex : https://e648dfa0639d.ngrok.io
+
+# Utiliser le chat de Firebase 
+1. Aller sur la page Firebase du projet Pass Emploi > Paramètres du Projet > Comptes de service
+2. Générer une clé privée
+3. Nommer le fichier `pass_emploi_secret_key.json`, et le déplace dans le répertoire `firebase`. NB: Ce fichier est dans
+   le .gitignore, mais garder attention à ne pas ajouter cette clé dans le répertoire git, ni la partager de manière non
+   sécurisée.

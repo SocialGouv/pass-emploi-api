@@ -14,5 +14,5 @@ class HomeUseCase:
         actions = self.action_repository.get_actions(jeune)
         return Home(actions, jeune.conseiller)
 
-    def set_home_action(self, action_id: int):
+    def change_action_status(self, action_id: int):
         self.action_repository.set_action_status(action_id)
