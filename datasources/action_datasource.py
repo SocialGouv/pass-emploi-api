@@ -24,7 +24,7 @@ class ActionDatasource:
         random_actions_content = generic_actions_content.copy()
         for i in range(5):
             random_action_content = random.choice(random_actions_content)
-            action = Action(random.randint(0, 10000000), random_action_content, False,
+            action = Action(random.randint(0, 10000000), random_action_content, '', False,
                             datetime.utcnow(), datetime.utcnow(), jeune)
             random_actions_content.remove(random_action_content)
             self.actions.append(action)

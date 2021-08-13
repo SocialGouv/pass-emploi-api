@@ -9,9 +9,9 @@ class ActionRepository:
         self.actionDatasource = action_datasource
 
     def add_action(self, json_action: dict, jeune: Jeune):
-        new_action = Action(json_action['id'], json_action['content'],
-                        json_action['isDone'], json_action['creationDate'],
-                        json_action['lastUpdate'], jeune)
+        new_action = Action(json_action['id'], json_action['content'], json_action['comment'],
+                            json_action['isDone'], json_action['creationDate'],
+                            json_action['lastUpdate'], jeune)
         self.actionDatasource.add_action(new_action)
 
     def create_actions(self, jeune: Jeune):
