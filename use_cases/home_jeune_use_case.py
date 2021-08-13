@@ -15,4 +15,4 @@ class HomeJeuneUseCase:
         return HomeJeune(actions, jeune.conseiller)
 
     def change_action_status(self, action_id: int):
-        self.actionRepository.set_action_status(action_id)
+        self.actionRepository.update_action(action_id)

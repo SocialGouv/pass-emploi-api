@@ -32,7 +32,7 @@ class ActionDatasource:
     def get_actions(self, jeune: Jeune):
         return [action for action in self.actions if action.jeune == jeune]
 
-    def set_action_status(self, action_id: int):
+    def update_action(self, action_id: int):
         for action in self.actions:
             if action.id == action_id:
                 action.isDone = not action.isDone

@@ -39,8 +39,8 @@ def put_action_jeune(action_id: str):
 @app.route('/actions/jeune/<jeune_id>/web', methods=['POST'])
 def post_action(jeune_id: str):
     action_data = request.json
-    home_conseiller = home_conseiller_use_case.post_action_for_jeune(action_data, jeune_id)
-    return to_json(home_conseiller), 201
+    home_conseiller_use_case.post_action_for_jeune(action_data, jeune_id)
+    return '', 201
 
 
 @app.route('/actions/<action_id>/web', methods=['PUT'])
