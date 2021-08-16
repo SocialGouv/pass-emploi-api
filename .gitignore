@@ -7,6 +7,7 @@ models/__pycache__/
 json_model/__pycache__/
 use_cases/__pycache__/
 dist/
+build/
 tests/__pycache__/
 __pycache__/
 firebase/pass_emploi_secret_key.json
