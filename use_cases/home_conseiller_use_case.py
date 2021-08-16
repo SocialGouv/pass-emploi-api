@@ -12,8 +12,8 @@ class HomeConseillerUseCase:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
         self.actionRepository.add_action(json_action, jeune)
 
-    def change_action_status(self, action_id: int):
-        self.actionRepository.update_action(action_id)
+    def change_action_status(self, action_id: str, action_status: bool):
+        self.actionRepository.update_action(action_id, action_status)
 
     def get_jeune_actions(self, jeune_id: str):
         self.jeuneRepository.create_jeune_if_required(jeune_id)

@@ -24,7 +24,7 @@ class ActionDatasource:
         random_actions_content = generic_actions_content.copy()
         for i in range(5):
             random_action_content = random.choice(random_actions_content)
-            action = Action(random.randint(0, 10000000), random_action_content, '', False,
+            action = Action(str(random.randint(0, 10000000)), random_action_content, '', False,
                             datetime.utcnow(), datetime.utcnow(), jeune)
             random_actions_content.remove(random_action_content)
             self.actions.append(action)
@@ -32,8 +32,8 @@ class ActionDatasource:
     def get_actions(self, jeune: Jeune):
         return [action for action in self.actions if action.jeune == jeune]
 
-    def update_action(self, action_id: int):
+    def update_action(self, action_id: str, action_status: bool):
         for action in self.actions:
             if action.id == action_id:
-                action.isDone = not action.isDone
+                action.isDone = action_status
                 action.lastUpdate = datetime.utcnow()

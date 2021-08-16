@@ -6,7 +6,7 @@ from models.jeune import Jeune
 class Action:
 
     def __init__(self,
-                 id: int,
+                 id: str,
                  content: str,
                  comment: str,
                  is_done: bool,

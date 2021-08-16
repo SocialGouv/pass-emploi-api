@@ -13,11 +13,9 @@ from flask_cors import cross_origin
 action_datasource = ActionDatasource()
 jeune_datasource = JeuneDatasource()
 action_repository = ActionRepository(action_datasource)
-jeune_repository = JeuneRepository(
-    jeune_datasource, action_repository, FirebaseChat())
+jeune_repository = JeuneRepository(jeune_datasource, action_repository, FirebaseChat())
 home_jeune_use_case = HomeJeuneUseCase(jeune_repository, action_repository)
-home_conseiller_use_case = HomeConseillerUseCase(
-    jeune_repository, action_repository)
+home_conseiller_use_case = HomeConseillerUseCase(jeune_repository, action_repository)
 
 app = Flask(__name__)
 
@@ -32,18 +30,16 @@ def get_home_jeune(jeune_id: str):
     home_jeune = home_jeune_use_case.get_home(jeune_id)
     return to_json(home_jeune), 200
 
-# TODO  trier les actions par ordre
 
-
-@app.route('/actions/<action_id>', methods=['PUT'])
+@app.route('/actions/<action_id>', methods=['PATCH'])
 def put_action_jeune(action_id: str):
-    home_jeune_use_case.change_action_status(int(action_id))
+    action_status = request.json.get('isDone')
+    home_jeune_use_case.change_action_status(action_id, action_status)
     return '', 200
 
-# TODO renommer les endpoints
 
-
-@app.route('/actions/jeune/<jeune_id>/web', methods=['POST'])
+# TODO: rajouter le status de l'action du PUT
+@app.route('/conseiller/jeunes/<jeune_id>/action', methods=['POST'])
 @cross_origin()
 def post_action(jeune_id: str):
     action_data = request.json
@@ -51,13 +47,14 @@ def post_action(jeune_id: str):
     return '', 201
 
 
-@app.route('/actions/<action_id>/web', methods=['PUT'])
+@app.route('/conseiller/actions/<action_id>', methods=['PATCH'])
 def put_action_conseiller(action_id: str):
-    home_conseiller_use_case.change_action_status(int(action_id))
+    action_status = request.json.get('isDone')
+    home_conseiller_use_case.change_action_status(action_id, action_status)
     return '', 200
 
 
-@app.route('/jeunes/<jeune_id>/actions/web', methods=['GET'])
+@app.route('/conseiller/jeunes/<jeune_id>/actions', methods=['GET'])
 def get_home_conseiller(jeune_id: str):
     home_conseiller = home_conseiller_use_case.get_jeune_actions(jeune_id)
     return to_json(home_conseiller), 200

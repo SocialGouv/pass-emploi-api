@@ -20,5 +20,5 @@ class ActionRepository:
     def get_actions(self, jeune: Jeune):
         return self.actionDatasource.get_actions(jeune)
 
-    def update_action(self, action_id: int):
-        self.actionDatasource.update_action(action_id)
+    def update_action(self, action_id: str, action_status: bool):
+        self.actionDatasource.update_action(action_id, action_status)
