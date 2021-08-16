@@ -8,13 +8,16 @@ from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
 from use_cases.home_conseiller_use_case import HomeConseillerUseCase
 from use_cases.home_jeune_use_case import HomeJeuneUseCase
+from flask_cors import cross_origin
 
 action_datasource = ActionDatasource()
 jeune_datasource = JeuneDatasource()
 action_repository = ActionRepository(action_datasource)
-jeune_repository = JeuneRepository(jeune_datasource, action_repository, FirebaseChat())
+jeune_repository = JeuneRepository(
+    jeune_datasource, action_repository, FirebaseChat())
 home_jeune_use_case = HomeJeuneUseCase(jeune_repository, action_repository)
-home_conseiller_use_case = HomeConseillerUseCase(jeune_repository, action_repository)
+home_conseiller_use_case = HomeConseillerUseCase(
+    jeune_repository, action_repository)
 
 app = Flask(__name__)
 
@@ -30,13 +33,18 @@ def get_home_jeune(jeune_id: str):
     return to_json(home_jeune), 200
 
 # TODO  trier les actions par ordre
+
+
 @app.route('/actions/<action_id>', methods=['PUT'])
 def put_action_jeune(action_id: str):
     home_jeune_use_case.change_action_status(int(action_id))
     return '', 200
 
 # TODO renommer les endpoints
+
+
 @app.route('/actions/jeune/<jeune_id>/web', methods=['POST'])
+@cross_origin()
 def post_action(jeune_id: str):
     action_data = request.json
     home_conseiller_use_case.post_action_for_jeune(action_data, jeune_id)
