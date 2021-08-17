@@ -32,4 +32,5 @@ class JeuneRepository:
     def create_jeune(self, jeune_data: dict):
         conseiller = Conseiller('1', 'Nils', 'Tavernier')
         jeune = Jeune(jeune_data['id'], jeune_data['firstName'], jeune_data['lastName'], conseiller)
+        self.firebaseChat.initialise_chat_if_required(jeune.id, conseiller.id)
         return self.jeuneDatasource.create_jeune(jeune)
