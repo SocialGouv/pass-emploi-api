@@ -28,3 +28,8 @@ class JeuneRepository:
 
     def get_jeune(self, jeune_id: str):
         return self.jeuneDatasource.get(jeune_id)
+
+    def create_jeune(self, jeune_data: dict):
+        conseiller = Conseiller('1', 'Nils', 'Tavernier')
+        jeune = Jeune(jeune_data['id'], jeune_data['firstName'], jeune_data['lastName'], conseiller)
+        return self.jeuneDatasource.create_jeune(jeune)

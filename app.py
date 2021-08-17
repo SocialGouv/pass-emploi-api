@@ -10,6 +10,7 @@ from repositories.jeune_repository import JeuneRepository
 from use_cases.action_use_case import ActionUseCase
 from use_cases.home_conseiller_use_case import HomeConseillerUseCase
 from use_cases.home_jeune_use_case import HomeJeuneUseCase
+from use_cases.jeune_use_case import JeuneUseCase
 
 action_datasource = ActionDatasource()
 jeune_datasource = JeuneDatasource()
@@ -17,6 +18,7 @@ action_repository = ActionRepository(action_datasource)
 jeune_repository = JeuneRepository(
     jeune_datasource, action_repository, FirebaseChat())
 action_use_case = ActionUseCase(action_repository)
+jeune_use_case = JeuneUseCase(jeune_repository)
 home_jeune_use_case = HomeJeuneUseCase(jeune_repository, action_repository)
 home_conseiller_use_case = HomeConseillerUseCase(
     jeune_repository, action_repository)
@@ -41,6 +43,13 @@ def patch_action(action_id: str):
     action_status = request.json.get('isDone')
     action_use_case.change_action_status(action_id, action_status)
     return '', 200
+
+
+@app.route('/jeunes', methods=['POST'])
+def post_jeune():
+    jeune_data = request.json
+    jeune_use_case.create_jeune(jeune_data)
+    return '', 201
 
 
 @app.route('/conseiller/jeunes/<jeune_id>/action', methods=['POST'])
