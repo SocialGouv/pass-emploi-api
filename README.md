@@ -17,3 +17,7 @@
 3. Nommer le fichier `pass_emploi_secret_key.json`, et le déplace dans le répertoire `firebase`. NB: Ce fichier est dans
    le .gitignore, mais garder attention à ne pas ajouter cette clé dans le répertoire git, ni la partager de manière non
    sécurisée.
+
+# Lancer l'application dans un contexte de développement
+Par défaut l'application tourne dans un contexte de prod, pour la lancer en mode développement il faut aller au fichier
+app.py à la racine et mettre `debug=True` dans la dernière ligne qui lance l'application.

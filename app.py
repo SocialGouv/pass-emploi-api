@@ -31,7 +31,7 @@ def hello_world():
 
 @app.route('/jeunes/<jeune_id>/home', methods=['GET'])
 def get_home_jeune(jeune_id: str):
-    home_jeune = home_jeune_use_case.get_home(jeune_id)
+    home_jeune = home_jeune_use_case.get_mocked_home(jeune_id) if app.debug else home_jeune_use_case.get_home(jeune_id)
     return to_json(home_jeune), 200
 
 
@@ -59,9 +59,10 @@ def post_action(jeune_id: str):
 
 @app.route('/conseiller/jeunes/<jeune_id>/actions', methods=['GET'])
 def get_home_conseiller(jeune_id: str):
-    home_conseiller = home_conseiller_use_case.get_jeune_actions(jeune_id)
+    home_conseiller = home_conseiller_use_case.get_mocked_jeune_actions(
+        jeune_id) if app.debug else home_conseiller_use_case.get_jeune_actions(jeune_id)
     return to_json(home_conseiller), 200
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=False)
