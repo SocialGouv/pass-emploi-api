@@ -14,10 +14,12 @@ from use_cases.home_jeune_use_case import HomeJeuneUseCase
 action_datasource = ActionDatasource()
 jeune_datasource = JeuneDatasource()
 action_repository = ActionRepository(action_datasource)
-jeune_repository = JeuneRepository(jeune_datasource, action_repository, FirebaseChat())
+jeune_repository = JeuneRepository(
+    jeune_datasource, action_repository, FirebaseChat())
 action_use_case = ActionUseCase(action_repository)
 home_jeune_use_case = HomeJeuneUseCase(jeune_repository, action_repository)
-home_conseiller_use_case = HomeConseillerUseCase(jeune_repository, action_repository)
+home_conseiller_use_case = HomeConseillerUseCase(
+    jeune_repository, action_repository)
 
 app = Flask(__name__)
 
@@ -34,6 +36,7 @@ def get_home_jeune(jeune_id: str):
 
 
 @app.route('/actions/<action_id>', methods=['PATCH'])
+@cross_origin()
 def patch_action(action_id: str):
     action_status = request.json.get('isDone')
     action_use_case.change_action_status(action_id, action_status)
