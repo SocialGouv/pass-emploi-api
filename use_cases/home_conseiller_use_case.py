@@ -18,7 +18,7 @@ class HomeConseillerUseCase:
         return HomeConseiller(actions, jeune)
 
     def get_mocked_jeune_actions(self, jeune_id: str):
-        self.jeuneRepository.create_jeune_if_required(jeune_id)
+        self.jeuneRepository.create_mocked_jeune(jeune_id)
         jeune = self.jeuneRepository.get_jeune(jeune_id)
         actions = self.actionRepository.get_actions(jeune)
         return HomeConseiller(actions, jeune)

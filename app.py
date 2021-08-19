@@ -52,7 +52,7 @@ def patch_action(action_id: str):
 def post_jeune():
     create_jeune_request = CreateJeuneRequest(request.json['id'], request.json['firstName'], request.json['lastName'])
     if app.debug:
-        jeune_use_case.create_jeune_with_default_actions(create_jeune_request)
+        jeune_use_case.create_jeune_with_default_actions_and_rendezvous(create_jeune_request)
     else:
         jeune_use_case.create_jeune(create_jeune_request)
     return '', 201

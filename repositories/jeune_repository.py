@@ -19,7 +19,7 @@ class JeuneRepository:
         self.actionRepository = action_repository
         self.firebaseChat = firebase_chat
 
-    def create_jeune_if_required(self, jeune_id: str):
+    def create_mocked_jeune(self, jeune_id: str):
         if not self.jeuneDatasource.exists(jeune_id):
             conseiller = Conseiller('1', 'Nils', 'Tavernier')
             jeune = Jeune(jeune_id, random.choice(first_names), random.choice(last_names), conseiller)
