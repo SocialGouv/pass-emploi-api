@@ -8,5 +8,8 @@ class RendezvousRepository:
     def __init__(self, rendezvous_datasource: RendezvousDatasource):
         self.rendezvousDatasource = rendezvous_datasource
 
-    def get_rendez_vous(self, jeune: Jeune, conseiller: Conseiller):
+    def get_rendezvous(self, jeune: Jeune, conseiller: Conseiller):
         return self.rendezvousDatasource.get_rendezvous(jeune, conseiller)
+
+    def create_rendezvous(self, jeune: Jeune, conseiller: Conseiller):
+        return self.rendezvousDatasource.create_rendezvous(jeune, conseiller)

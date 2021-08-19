@@ -18,11 +18,14 @@ class RendezvousDatasource:
     rendezvous = []
 
     def get_rendezvous(self, jeune: Jeune, conseiller: Conseiller):
+        return [rv for rv in self.rendezvous if rv.jeune == jeune and rv.conseiller == conseiller]
+
+    def create_rendezvous(self, jeune: Jeune, conseiller: Conseiller):
         random_actions_content = generic_actions_content.copy()
         for i in range(5):
             random_action_content = random.choice(random_actions_content)
             rendezvous = Rendezvous(str(random.randint(0, 10000000)), random_action_content,
-                                    datetime.utcnow(), timedelta(minutes=60), jeune, conseiller, 'Par tel')
+                                    datetime.utcnow(), timedelta(minutes=60), jeune, conseiller, 'Par téléphone')
             random_actions_content.remove(random_action_content)
             self.rendezvous.append(rendezvous)
         return self.rendezvous
