@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from models.home_jeune import HomeJeune
 from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
@@ -18,5 +20,6 @@ class HomeJeuneUseCase:
     def get_home(self, jeune_id: str):
         jeune = self.jeuneRepository.get_jeune(jeune_id)
         actions = self.actionRepository.get_actions(jeune)
-        rendez_vous = self.rendezvousRepository.get_rendezvous(jeune, jeune.conseiller)
+        rendezvous_limit_date = datetime.utcnow()
+        rendez_vous = self.rendezvousRepository.get_rendezvous(jeune, jeune.conseiller, rendezvous_limit_date)
         return HomeJeune(actions, jeune.conseiller, rendez_vous)

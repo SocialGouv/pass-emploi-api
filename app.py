@@ -20,9 +20,9 @@ jeune_datasource = JeuneDatasource()
 rendezvous_datasource = RendezvousDatasource()
 action_repository = ActionRepository(action_datasource)
 jeune_repository = JeuneRepository(jeune_datasource, action_repository, FirebaseChat())
-action_use_case = ActionUseCase(action_repository)
-jeune_use_case = JeuneUseCase(jeune_repository, action_repository)
 rendezvous_repository = RendezvousRepository(rendezvous_datasource)
+action_use_case = ActionUseCase(action_repository)
+jeune_use_case = JeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
 home_jeune_use_case = HomeJeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
 home_conseiller_use_case = HomeConseillerUseCase(jeune_repository, action_repository)
 
@@ -34,7 +34,6 @@ def hello_world():
     return 'Pass Emploi version bêta!'
 
 
-#filtrer par les rdv pas encore passés:
 @app.route('/jeunes/<jeune_id>/home', methods=['GET'])
 def get_home_jeune(jeune_id: str):
     home_jeune = home_jeune_use_case.get_home(jeune_id)

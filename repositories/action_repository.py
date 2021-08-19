@@ -1,4 +1,4 @@
-from random import random
+import random
 
 from datasources.action_datasource import ActionDatasource
 from models.action import Action

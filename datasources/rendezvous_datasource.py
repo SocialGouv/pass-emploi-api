@@ -17,8 +17,10 @@ generic_actions_content = ["Atelier préparation CV",
 class RendezvousDatasource:
     rendezvous = []
 
-    def get_rendezvous(self, jeune: Jeune, conseiller: Conseiller):
-        return [rv for rv in self.rendezvous if rv.jeune == jeune and rv.conseiller == conseiller]
+    def get_rendezvous(self, jeune: Jeune, conseiller: Conseiller, rendezvous_limit_date: datetime):
+        return [rv for rv in self.rendezvous if rv.jeune == jeune
+                and rv.conseiller == conseiller
+                and rv.date >= rendezvous_limit_date]
 
     def create_rendezvous(self, jeune: Jeune, conseiller: Conseiller):
         random_actions_content = generic_actions_content.copy()
