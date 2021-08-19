@@ -1,3 +1,5 @@
+from random import random
+
 from datasources.action_datasource import ActionDatasource
 from models.action import Action
 from models.jeune import Jeune
@@ -9,7 +11,7 @@ class ActionRepository:
         self.actionDatasource = action_datasource
 
     def add_action(self, json_action: dict, jeune: Jeune):
-        new_action = Action(json_action['id'], json_action['content'], json_action['comment'],
+        new_action = Action(str(random.randint(0, 10000000)), json_action['content'], json_action['comment'],
                             json_action['isDone'], json_action['creationDate'],
                             json_action['lastUpdate'], jeune)
         self.actionDatasource.add_action(new_action)
