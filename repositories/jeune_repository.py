@@ -22,9 +22,13 @@ class JeuneRepository:
         if not self.jeuneDatasource.exists(jeune_id):
             conseiller = Conseiller('1', 'Nils', 'Tavernier')
             jeune = Jeune(jeune_id, random.choice(first_names), random.choice(last_names), conseiller)
-            self.firebaseChat.initialise_chat_if_required(jeune.id, conseiller.id)
             self.jeuneDatasource.create_jeune(jeune)
-            self.actionRepository.create_actions(jeune)  # Refacto: remove to home use case
 
     def get_jeune(self, jeune_id: str):
         return self.jeuneDatasource.get(jeune_id)
+
+    def create_jeune(self, jeune_data: dict):
+        conseiller = Conseiller('1', 'Nils', 'Tavernier')
+        jeune = Jeune(jeune_data['id'], jeune_data['firstName'], jeune_data['lastName'], conseiller)
+        self.firebaseChat.initialise_chat_if_required(jeune.id, conseiller.id)
+        return self.jeuneDatasource.create_jeune(jeune)

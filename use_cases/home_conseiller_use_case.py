@@ -13,6 +13,11 @@ class HomeConseillerUseCase:
         self.actionRepository.add_action(json_action, jeune)
 
     def get_jeune_actions(self, jeune_id: str):
+        jeune = self.jeuneRepository.get_jeune(jeune_id)
+        actions = self.actionRepository.get_actions(jeune)
+        return HomeConseiller(actions, jeune)
+
+    def get_mocked_jeune_actions(self,jeune_id: str):
         self.jeuneRepository.create_jeune_if_required(jeune_id)
         jeune = self.jeuneRepository.get_jeune(jeune_id)
         actions = self.actionRepository.get_actions(jeune)
