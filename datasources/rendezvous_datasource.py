@@ -25,7 +25,7 @@ class RendezvousDatasource:
         for i in range(5):
             random_action_content = random.choice(random_actions_content)
             rendezvous = Rendezvous(str(random.randint(0, 10000000)), random_action_content,
-                                    datetime.utcnow(), timedelta(minutes=60), jeune, conseiller, 'Par téléphone')
+                                    datetime(2022, 12, 12), timedelta(minutes=60), jeune, conseiller, 'Par tel')
             random_actions_content.remove(random_action_content)
             self.rendezvous.append(rendezvous)
         return self.rendezvous
