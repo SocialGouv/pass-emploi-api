@@ -30,7 +30,7 @@ class ActionDatasource:
             self.actions.append(action)
 
     def get_actions(self, jeune: Jeune):
-        return [action for action in self.actions if action.jeune == jeune]
+        return list(filter(lambda action: action.jeune.id == jeune.id, self.actions))
 
     def update_action(self, action_id: str, action_status: bool):
         for action in self.actions:

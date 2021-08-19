@@ -18,7 +18,7 @@ jeune_datasource = JeuneDatasource()
 action_repository = ActionRepository(action_datasource)
 jeune_repository = JeuneRepository(jeune_datasource, action_repository, FirebaseChat())
 action_use_case = ActionUseCase(action_repository)
-jeune_use_case = JeuneUseCase(jeune_repository)
+jeune_use_case = JeuneUseCase(jeune_repository, action_repository)
 home_jeune_use_case = HomeJeuneUseCase(jeune_repository, action_repository)
 home_conseiller_use_case = HomeConseillerUseCase(jeune_repository, action_repository)
 
@@ -32,7 +32,7 @@ def hello_world():
 
 @app.route('/jeunes/<jeune_id>/home', methods=['GET'])
 def get_home_jeune(jeune_id: str):
-    home_jeune = home_jeune_use_case.get_mocked_home(jeune_id) if app.debug else home_jeune_use_case.get_home(jeune_id)
+    home_jeune = home_jeune_use_case.get_home(jeune_id)
     return to_json(home_jeune), 200
 
 
@@ -46,8 +46,11 @@ def patch_action(action_id: str):
 
 @app.route('/jeunes', methods=['POST'])
 def post_jeune():
-    jeune_data = request.json
-    jeune_use_case.create_jeune(CreateJeuneRequest(jeune_data['id'], jeune_data['firstName'], jeune_data['lastName']))
+    create_jeune_request = CreateJeuneRequest(request.json['id'], request.json['firstName'], request.json['lastName'])
+    if app.debug:
+        jeune_use_case.create_jeune_with_default_actions(create_jeune_request)
+    else:
+        jeune_use_case.create_jeune(create_jeune_request)
     return '', 201
 
 
@@ -67,4 +70,4 @@ def get_home_conseiller(jeune_id: str):
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)

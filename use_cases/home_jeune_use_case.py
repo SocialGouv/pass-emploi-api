@@ -16,9 +16,3 @@ class HomeJeuneUseCase:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
         actions = self.actionRepository.get_actions(jeune)
         return HomeJeune(actions, jeune.conseiller)
-
-    def get_mocked_home(self, jeune_id: str):
-        jeune = self.jeuneRepository.get_jeune(jeune_id)
-        self.actionRepository.create_actions(jeune)
-        actions = self.actionRepository.get_actions(jeune)
-        return HomeJeune(actions, jeune.conseiller)

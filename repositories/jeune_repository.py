@@ -32,4 +32,5 @@ class JeuneRepository:
         conseiller = Conseiller('1', 'Nils', 'Tavernier')
         jeune = Jeune(request.id, request.firstName, request.lastName, conseiller)
         self.firebaseChat.initialise_chat_if_required(jeune.id, conseiller.id)
-        return self.jeuneDatasource.create_jeune(jeune)
+        self.jeuneDatasource.create_jeune(jeune)
+        return jeune
