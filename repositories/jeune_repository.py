@@ -1,10 +1,11 @@
 import random
 
-from firebase.firebase_chat import FirebaseChat
 from datasources.jeune_datasource import JeuneDatasource
+from firebase.firebase_chat import FirebaseChat
 from models.conseiller import Conseiller
 from models.jeune import Jeune
 from repositories.action_repository import ActionRepository
+from use_cases.create_jeune_request import CreateJeuneRequest
 
 first_names = ('Kenji', 'Kevin', 'Léa', 'Marie', 'Lucie', 'Jean', 'Michel')
 last_names = ('DeBruyne', 'Dupont', 'Curie', 'Seydoux', 'Durand', 'Petit')
@@ -27,8 +28,8 @@ class JeuneRepository:
     def get_jeune(self, jeune_id: str):
         return self.jeuneDatasource.get(jeune_id)
 
-    def create_jeune(self, jeune_data: dict):
+    def create_jeune(self, request: CreateJeuneRequest):
         conseiller = Conseiller('1', 'Nils', 'Tavernier')
-        jeune = Jeune(jeune_data['id'], jeune_data['firstName'], jeune_data['lastName'], conseiller)
+        jeune = Jeune(request.id, request.firstName, request.lastName, conseiller)
         self.firebaseChat.initialise_chat_if_required(jeune.id, conseiller.id)
         return self.jeuneDatasource.create_jeune(jeune)
