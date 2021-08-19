@@ -34,6 +34,7 @@ def hello_world():
     return 'Pass Emploi version bêta!'
 
 
+#filtrer par les rdv pas encore passés:
 @app.route('/jeunes/<jeune_id>/home', methods=['GET'])
 def get_home_jeune(jeune_id: str):
     home_jeune = home_jeune_use_case.get_home(jeune_id)
