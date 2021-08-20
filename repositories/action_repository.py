@@ -1,4 +1,5 @@
 import random
+from datetime import datetime
 
 from datasources.action_datasource import ActionDatasource
 from models.action import Action
@@ -12,8 +13,8 @@ class ActionRepository:
 
     def add_action(self, json_action: dict, jeune: Jeune):
         new_action = Action(str(random.randint(0, 10000000)), json_action['content'], json_action['comment'],
-                            json_action['isDone'], json_action['creationDate'],
-                            json_action['lastUpdate'], jeune)
+                            json_action['isDone'], datetime.utcnow(),
+                            datetime.utcnow(), jeune)
         self.actionDatasource.add_action(new_action)
 
     def create_actions(self, jeune: Jeune):
