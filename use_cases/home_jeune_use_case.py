@@ -19,7 +19,10 @@ class HomeJeuneUseCase:
 
     def get_home(self, jeune_id: str):
         jeune = self.jeuneRepository.get_jeune(jeune_id)
-        actions = self.actionRepository.get_actions(jeune)
-        rendezvous_limit_date = datetime.utcnow()
-        rendez_vous = self.rendezvousRepository.get_rendezvous(jeune, jeune.conseiller, rendezvous_limit_date)
-        return HomeJeune(actions, jeune.conseiller, rendez_vous)
+        if jeune is not None:
+            actions = self.actionRepository.get_actions(jeune)
+            rendezvous_limit_date = datetime.utcnow()
+            rendez_vous = self.rendezvousRepository.get_rendezvous(jeune, jeune.conseiller, rendezvous_limit_date)
+            return HomeJeune(actions, jeune.conseiller, rendez_vous)
+        else:
+            return None

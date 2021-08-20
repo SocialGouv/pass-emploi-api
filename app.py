@@ -1,10 +1,11 @@
-from flask import Flask, request
+from flask import Flask, request, abort, jsonify
 from flask_cors import cross_origin
 
 from datasources.action_datasource import ActionDatasource
 from datasources.jeune_datasource import JeuneDatasource
 from datasources.rendezvous_datasource import RendezvousDatasource
 from firebase.firebase_chat import FirebaseChat
+from json_model.json_action import JsonAction
 from json_model.json_transformer import to_json
 from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
@@ -21,7 +22,7 @@ rendezvous_datasource = RendezvousDatasource()
 action_repository = ActionRepository(action_datasource)
 jeune_repository = JeuneRepository(jeune_datasource, action_repository, FirebaseChat())
 rendezvous_repository = RendezvousRepository(rendezvous_datasource)
-action_use_case = ActionUseCase(action_repository)
+action_use_case = ActionUseCase(jeune_repository, action_repository)
 jeune_use_case = JeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
 home_jeune_use_case = HomeJeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
 home_conseiller_use_case = HomeConseillerUseCase(jeune_repository, action_repository)
@@ -37,8 +38,17 @@ def hello_world():
 @app.route('/jeunes/<jeune_id>/home', methods=['GET'])
 def get_home_jeune(jeune_id: str):
     home_jeune = home_jeune_use_case.get_home(jeune_id)
-    return to_json(home_jeune), 200
+    if home_jeune is not None:
+        return to_json(home_jeune), 200
+    else:
+        abort(404)
 
+
+@app.route('/jeunes/<jeune_id>/actions', methods=['GET'])
+def get_actions_jeune(jeune_id: str):
+    actions = action_use_case.get_actions(jeune_id)
+    json_actions = list(map(lambda x: JsonAction(x).__dict__, actions))
+    return jsonify(json_actions), 200
 
 @app.route('/actions/<action_id>', methods=['PATCH'])
 @cross_origin()
