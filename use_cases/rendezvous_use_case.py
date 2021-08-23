@@ -17,11 +17,11 @@ class RendezvousUseCase:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
         return self.rendezvousRepository.get_jeune_rendezvous(jeune, rendezvous_limit_date=datetime.utcnow())
 
-    def get_conseiller_rendezvous(self, conseiller_id: str):
+    def get_conseiller_rendezvous(self):
         conseiller = Conseiller('1', 'Nils', 'Tavernier')
         return self.rendezvousRepository.get_conseiller_rendezvous(conseiller, rendezvous_limit_date=datetime.utcnow())
 
-    def post_rendezvous(self, request: CreateRendezvousRequest):
+    def create_rendezvous(self, request: CreateRendezvousRequest):
         jeune = self.jeuneRepository.get_jeune(request.jeuneId)
         rendezvous = Rendezvous(str(random.randint(0, 10000000)), request.comment, request.date, request.duration,
                                 jeune,

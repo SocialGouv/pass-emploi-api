@@ -73,7 +73,7 @@ def post_jeune():
 @cross_origin()
 def post_action(jeune_id: str):
     action_data = request.json
-    home_conseiller_use_case.post_action_for_jeune(action_data, jeune_id)
+    home_conseiller_use_case.create_action(action_data, jeune_id)
     return '', 201
 
 
