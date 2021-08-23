@@ -17,8 +17,8 @@ class ActionRepository:
                             datetime.utcnow(), jeune)
         self.actionDatasource.add_action(new_action)
 
-    def create_actions(self, jeune: Jeune):
-        self.actionDatasource.create_actions(jeune)
+    def create_mocked_actions(self, jeune: Jeune):
+        self.actionDatasource.create_mocked_actions(jeune)
 
     def get_actions(self, jeune: Jeune):
         return self.actionDatasource.get_actions(jeune)

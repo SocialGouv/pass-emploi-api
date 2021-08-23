@@ -50,6 +50,7 @@ def get_actions_jeune(jeune_id: str):
     json_actions = list(map(lambda x: JsonAction(x).__dict__, actions))
     return jsonify(json_actions), 200
 
+
 @app.route('/actions/<action_id>', methods=['PATCH'])
 @cross_origin()
 def patch_action(action_id: str):

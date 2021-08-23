@@ -20,7 +20,7 @@ class ActionDatasource:
     def add_action(self, action: Action):
         self.actions.append(action)
 
-    def create_actions(self, jeune: Jeune):
+    def create_mocked_actions(self, jeune: Jeune):
         random_actions_content = generic_actions_content.copy()
         for i in range(5):
             random_action_content = random.choice(random_actions_content)

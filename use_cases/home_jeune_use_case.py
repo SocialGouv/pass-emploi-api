@@ -21,7 +21,7 @@ class HomeJeuneUseCase:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
         if jeune is not None:
             actions = self.actionRepository.get_actions(jeune)
-            rendezvous = self.rendezvousRepository.get_rendezvous(jeune, jeune.conseiller, datetime.utcnow())
+            rendezvous = self.rendezvousRepository.get_jeune_rendezvous(jeune, datetime.utcnow())
             return HomeJeune(get_most_recent_todo_actions(actions), jeune.conseiller, rendezvous)
         else:
             return None
