@@ -68,7 +68,7 @@ def post_jeune():
     return '', 201
 
 
-@app.route('/conseiller/jeunes/<jeune_id>/action', methods=['POST'])
+@app.route('/jeunes/<jeune_id>/action', methods=['POST'])
 @cross_origin()
 def post_action(jeune_id: str):
     action_data = request.json
