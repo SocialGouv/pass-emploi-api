@@ -1,5 +1,5 @@
 from datetime import datetime
-from random import random
+import random
 
 from models.action import Action
 from models.home_conseiller import HomeConseiller

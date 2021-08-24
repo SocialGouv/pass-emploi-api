@@ -11,6 +11,7 @@ from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
 from repositories.rendezvous_repository import RendezvousRepository
 from use_cases.action_use_case import ActionUseCase
+from use_cases.create_action_request import CreateActionRequest
 from use_cases.create_jeune_request import CreateJeuneRequest
 from use_cases.create_rendezvous_request import CreateRendezvousRequest
 from use_cases.home_conseiller_use_case import HomeConseillerUseCase
@@ -75,8 +76,8 @@ def post_jeune():
 @app.route('/jeunes/<jeune_id>/action', methods=['POST'])
 @cross_origin()
 def post_action(jeune_id: str):
-    action_data = request.json
-    home_conseiller_use_case.create_action(action_data, jeune_id)
+    create_action_request = CreateActionRequest(request.json['comment'], request.json['content'], request.json['isDone'])
+    home_conseiller_use_case.create_action(create_action_request, jeune_id)
     return '', 201
 
 
