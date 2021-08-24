@@ -6,6 +6,7 @@ from datasources.jeune_datasource import JeuneDatasource
 from datasources.rendezvous_datasource import RendezvousDatasource
 from firebase.firebase_chat import FirebaseChat
 from json_model.json_action import JsonAction
+from json_model.json_rendezvous import JsonRendezvous
 from json_model.json_transformer import to_json
 from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
@@ -76,7 +77,8 @@ def post_jeune():
 @app.route('/jeunes/<jeune_id>/action', methods=['POST'])
 @cross_origin()
 def post_action(jeune_id: str):
-    create_action_request = CreateActionRequest(request.json['comment'], request.json['content'], request.json['isDone'])
+    create_action_request = CreateActionRequest(request.json['comment'], request.json['content'],
+                                                request.json['isDone'])
     home_conseiller_use_case.create_action(create_action_request, jeune_id)
     return '', 201
 
@@ -89,6 +91,13 @@ def post_rendezvous():
                                                         request.json['modality'])
     rendezvous_use_case.create_rendezvous(create_rendezvous_request)
     return '', 201
+
+
+@app.route('/conseiller/rendezvous', methods=['GET'])
+def get_rendezvous():
+    rendezvous = rendezvous_use_case.get_conseiller_rendezvous()
+    json_rendez_vous = list(map(lambda x: JsonRendezvous(x).__dict__, rendezvous))
+    return jsonify(json_rendez_vous), 200
 
 
 @app.route('/conseiller/jeunes/<jeune_id>/actions', methods=['GET'])

@@ -18,10 +18,13 @@ class RendezvousDatasource:
     rendezvous = []
 
     def get_jeune_rendezvous(self, jeune: Jeune, rendezvous_limit_date: datetime):
-        return [rv for rv in self.rendezvous if rv.jeune == jeune and rv.date >= rendezvous_limit_date]
+        return [rv for rv in self.rendezvous if rv.jeune.id == jeune.id and rv.date >= rendezvous_limit_date]
 
     def get_conseiller_rendezvous(self, conseiller: Conseiller, rendezvous_limit_date: datetime):
-        return [rv for rv in self.rendezvous if rv.conseiller == conseiller and rv.date >= rendezvous_limit_date]
+        rendezvous = [rv for rv in self.rendezvous if rv.conseiller.id == conseiller.id
+                      and rv.date >= rendezvous_limit_date]
+        rendezvous.sort(key=lambda rdv: rdv.date)
+        return rendezvous
 
     def create_mocked_rendezvous(self, jeune: Jeune, conseiller: Conseiller):
         random_actions_content = generic_actions_content.copy()

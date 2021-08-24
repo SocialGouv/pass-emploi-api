@@ -8,3 +8,4 @@ class JsonRendezvous:
         self.date = rendezvous.date
         self.duration = str(rendezvous.duration)
         self.modality = rendezvous.modality
+        self.jeuneId = rendezvous.jeune.id

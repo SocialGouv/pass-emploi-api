@@ -24,7 +24,7 @@ class RendezvousUseCase:
     def create_rendezvous(self, request: CreateRendezvousRequest):
         jeune = self.jeuneRepository.get_jeune(request.jeuneId)
         rendezvous = Rendezvous(str(random.randint(0, 10000000)), request.comment,
-                                datetime.strptime(request.date, "%a, %d %b %Y %H:%M:%S GMT"),
+                                datetime.strptime(request.date, "%a, %d %b %Y %H:%M:%S %Z"),
                                 request.duration, jeune, jeune.conseiller, request.modality)
 
         self.rendezvousRepository.add_rendezvous(rendezvous)
