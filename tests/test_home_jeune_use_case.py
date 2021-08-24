@@ -52,6 +52,6 @@ class TestHomeJeuneUseCase:
 def get_home_use_case(jeune, actions, action_repository, jeune_repository, rendezvous_repository):
     jeune_repository.get_jeune = MagicMock(side_effect=(lambda value: jeune if value == "1" else None))
     action_repository.get_actions = MagicMock(side_effect=(lambda value: actions if value == jeune else [Action]))
-    rendezvous_repository.get_rendezvous = MagicMock(return_value=[Rendezvous])
+    rendezvous_repository.get_jeune_rendezvous = MagicMock(return_value=[Rendezvous])
     use_case = HomeJeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
     return use_case

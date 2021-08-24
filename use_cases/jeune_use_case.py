@@ -15,5 +15,5 @@ class JeuneUseCase:
 
     def create_jeune_with_default_actions_and_rendezvous(self, request: CreateJeuneRequest):
         jeune = self.create_jeune(request)
-        self.actionRepository.create_actions(jeune)
-        self.rendezvousRepository.create_rendezvous(jeune, jeune.conseiller)
+        self.actionRepository.create_mocked_actions(jeune)
+        self.rendezvousRepository.create_mocked_rendezvous(jeune, jeune.conseiller)
