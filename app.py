@@ -12,9 +12,11 @@ from repositories.jeune_repository import JeuneRepository
 from repositories.rendezvous_repository import RendezvousRepository
 from use_cases.action_use_case import ActionUseCase
 from use_cases.create_jeune_request import CreateJeuneRequest
+from use_cases.create_rendezvous_request import CreateRendezvousRequest
 from use_cases.home_conseiller_use_case import HomeConseillerUseCase
 from use_cases.home_jeune_use_case import HomeJeuneUseCase
 from use_cases.jeune_use_case import JeuneUseCase
+from use_cases.rendezvous_use_case import RendezvousUseCase
 
 action_datasource = ActionDatasource()
 jeune_datasource = JeuneDatasource()
@@ -24,6 +26,7 @@ jeune_repository = JeuneRepository(jeune_datasource, action_repository, Firebase
 rendezvous_repository = RendezvousRepository(rendezvous_datasource)
 action_use_case = ActionUseCase(jeune_repository, action_repository)
 jeune_use_case = JeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
+rendezvous_use_case = RendezvousUseCase(jeune_repository, rendezvous_repository)
 home_jeune_use_case = HomeJeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
 home_conseiller_use_case = HomeConseillerUseCase(jeune_repository, action_repository)
 
@@ -74,6 +77,16 @@ def post_jeune():
 def post_action(jeune_id: str):
     action_data = request.json
     home_conseiller_use_case.create_action(action_data, jeune_id)
+    return '', 201
+
+
+@app.route('/rendezvous', methods=['POST'])
+@cross_origin()
+def post_rendezvous():
+    create_rendezvous_request = CreateRendezvousRequest(request.json['comment'], request.json['date'],
+                                                        request.json['duration'], request.json['jeuneId'],
+                                                        request.json['modality'])
+    rendezvous_use_case.create_rendezvous(create_rendezvous_request)
     return '', 201
 
 
