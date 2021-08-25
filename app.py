@@ -54,8 +54,8 @@ with app.app_context():
 
 
 @app.route('/')
-def hello_world():
-    return 'Pass Emploi version bêta!'
+def health_check():
+    return 'Pass Emploi version bêta! '
 
 
 @app.route('/jeunes/<jeune_id>/home', methods=['GET'])
