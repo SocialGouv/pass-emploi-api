@@ -16,3 +16,5 @@ class JeuneDatasource:
                 return jeune
         return None
 
+    def get_jeunes_list(self):
+        return self.jeunes

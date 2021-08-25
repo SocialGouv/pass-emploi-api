@@ -9,12 +9,15 @@ from datasources.jeune_datasource import JeuneDatasource
 from datasources.rendezvous_datasource import RendezvousDatasource
 from firebase.firebase_chat import FirebaseChat
 from json_model.json_action import JsonAction
+from json_model.json_jeune import JsonJeune
 from json_model.json_rendezvous import JsonRendezvous
 from json_model.json_transformer import to_json
 from repositories.action_repository import ActionRepository
+from repositories.conseiller_repository import ConseillerRepository
 from repositories.jeune_repository import JeuneRepository
 from repositories.rendezvous_repository import RendezvousRepository
 from use_cases.action_use_case import ActionUseCase
+from use_cases.conseiller_use_case import ConseillerUseCase
 from use_cases.create_action_request import CreateActionRequest
 from use_cases.create_jeune_request import CreateJeuneRequest
 from use_cases.create_rendezvous_request import CreateRendezvousRequest
@@ -41,7 +44,9 @@ with app.app_context():
     jeune_repository = JeuneRepository(jeune_datasource, action_repository, firebase_chat)
     rendezvous_repository = RendezvousRepository(rendezvous_datasource)
     action_use_case = ActionUseCase(jeune_repository, action_repository)
+    conseiller_repository = ConseillerRepository(jeune_datasource)
 
+    conseiller_use_case = ConseillerUseCase(conseiller_repository)
     jeune_use_case = JeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
     rendezvous_use_case = RendezvousUseCase(jeune_repository, rendezvous_repository)
     home_jeune_use_case = HomeJeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
@@ -118,6 +123,19 @@ def get_home_conseiller(jeune_id: str):
     home_conseiller = home_conseiller_use_case.get_mocked_jeune_actions(
         jeune_id) if app.debug else home_conseiller_use_case.get_jeune_actions(jeune_id)
     return to_json(home_conseiller), 200
+
+
+@app.route('/conseiller/jeunes', methods=['GET'])
+def get_jeunes():
+    jeunes = conseiller_use_case.get_jeunes()
+    json_jeunes = list(map(lambda x: JsonJeune(x).__dict__, jeunes))
+    return jsonify(json_jeunes), 200
+
+
+with app.app_context():
+    load_dotenv(dotenv_path='./.env')
+    environment = os.environ.get('ENV')
+    debug_mode = True if environment == 'development' else False
 
 
 if __name__ == '__main__':
