@@ -1,3 +1,4 @@
+from models.conseiller import Conseiller
 from models.jeune import Jeune
 
 
@@ -16,5 +17,5 @@ class JeuneDatasource:
                 return jeune
         return None
 
-    def get_jeunes_list(self):
-        return self.jeunes
+    def get_jeunes_list(self, conseiller: Conseiller):
+        return [jeune for jeune in self.jeunes if jeune.conseiller.id == conseiller.id]

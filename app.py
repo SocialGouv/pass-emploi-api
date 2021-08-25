@@ -132,11 +132,5 @@ def get_jeunes():
     return jsonify(json_jeunes), 200
 
 
-with app.app_context():
-    load_dotenv(dotenv_path='./.env')
-    environment = os.environ.get('ENV')
-    debug_mode = True if environment == 'development' else False
-
-
 if __name__ == '__main__':
     app.run(debug=debug_mode)
