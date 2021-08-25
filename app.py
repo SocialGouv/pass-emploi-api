@@ -1,10 +1,12 @@
+import os
+
+from dotenv import load_dotenv
 from flask import Flask, request, abort, jsonify
 from flask_cors import cross_origin
 
 from datasources.action_datasource import ActionDatasource
 from datasources.jeune_datasource import JeuneDatasource
 from datasources.rendezvous_datasource import RendezvousDatasource
-from firebase.firebase_chat import FirebaseChat
 from json_model.json_action import JsonAction
 from json_model.json_rendezvous import JsonRendezvous
 from json_model.json_transformer import to_json
@@ -24,7 +26,7 @@ action_datasource = ActionDatasource()
 jeune_datasource = JeuneDatasource()
 rendezvous_datasource = RendezvousDatasource()
 action_repository = ActionRepository(action_datasource)
-jeune_repository = JeuneRepository(jeune_datasource, action_repository, FirebaseChat())
+jeune_repository = JeuneRepository(jeune_datasource, action_repository)
 rendezvous_repository = RendezvousRepository(rendezvous_datasource)
 action_use_case = ActionUseCase(jeune_repository, action_repository)
 jeune_use_case = JeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
@@ -107,5 +109,11 @@ def get_home_conseiller(jeune_id: str):
     return to_json(home_conseiller), 200
 
 
+with app.app_context():
+    load_dotenv(dotenv_path='./.env')
+    environment = os.environ.get('ENV')
+    debug_mode = True if environment == 'development' else False
+
+
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=debug_mode)
