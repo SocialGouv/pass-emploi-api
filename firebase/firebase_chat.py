@@ -1,9 +1,13 @@
+import json
+import os
+
 import firebase_admin
 from firebase_admin import credentials, firestore
 
 
 def initialise_chat_if_required(jeune_id, conseiller_id):
-    cred = credentials.Certificate("./firebase/pass_emploi_secret_key.json")
+    firebase_secret_key = json.loads(os.environ.get('FIREBASE_SECRET_KEY'))
+    cred = credentials.Certificate(firebase_secret_key)
     app = firebase_admin.initialize_app(cred)
     client = firestore.client(app)
 
