@@ -39,7 +39,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    return 'Pass Emploi staging : version bêta!'
+    return 'Pass Emploi version bêta!'
 
 
 @app.route('/jeunes/<jeune_id>/home', methods=['GET'])
