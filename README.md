@@ -26,6 +26,7 @@ les suivantes :
 `FIREBASE_SECRET_KEY` = `clé privée: voir dans la section suivante comment la récupérer`
 
 NB: Ce fichier est bien dans le .gitignore, mais garder attention à ne pas le rajouter car il contient des clés privées.
+Il faut bien mettre la clé dans une seule ligne pour qu'elle puisse être correctement parsée.
 
 # Utiliser le chat de Firebase 
 1. Aller sur la page Firebase du projet Pass Emploi > Paramètres du Projet > Comptes de service

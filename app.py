@@ -41,21 +41,16 @@ with app.app_context():
     rendezvous_datasource = RendezvousDatasource()
     action_repository = ActionRepository(action_datasource)
 
-    jeune_repository = JeuneRepository(
-        jeune_datasource, action_repository, firebase_chat)
+    jeune_repository = JeuneRepository(jeune_datasource, action_repository, firebase_chat)
     rendezvous_repository = RendezvousRepository(rendezvous_datasource)
     action_use_case = ActionUseCase(jeune_repository, action_repository)
     conseiller_repository = ConseillerRepository(jeune_datasource)
 
     conseiller_use_case = ConseillerUseCase(conseiller_repository)
-    jeune_use_case = JeuneUseCase(
-        jeune_repository, action_repository, rendezvous_repository)
-    rendezvous_use_case = RendezvousUseCase(
-        jeune_repository, rendezvous_repository)
-    home_jeune_use_case = HomeJeuneUseCase(
-        jeune_repository, action_repository, rendezvous_repository)
-    home_conseiller_use_case = HomeConseillerUseCase(
-        jeune_repository, action_repository)
+    jeune_use_case = JeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
+    rendezvous_use_case = RendezvousUseCase(jeune_repository, rendezvous_repository)
+    home_jeune_use_case = HomeJeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
+    home_conseiller_use_case = HomeConseillerUseCase(jeune_repository, action_repository)
 
 
 @app.route('/')
@@ -92,8 +87,7 @@ def post_jeune():
     create_jeune_request = CreateJeuneRequest(
         request.json['id'], request.json['firstName'], request.json['lastName'])
     if app.debug:
-        jeune_use_case.create_jeune_with_default_actions_and_rendezvous(
-            create_jeune_request)
+        jeune_use_case.create_jeune_with_default_actions_and_rendezvous(create_jeune_request)
     else:
         jeune_use_case.create_jeune(create_jeune_request)
     return '', 201
@@ -121,15 +115,14 @@ def post_rendezvous():
 @app.route('/conseiller/rendezvous', methods=['GET'])
 def get_rendezvous():
     rendezvous = rendezvous_use_case.get_conseiller_rendezvous()
-    json_rendez_vous = list(
-        map(lambda x: JsonRendezvous(x).__dict__, rendezvous))
+    json_rendez_vous = list(map(lambda x: JsonRendezvous(x).__dict__, rendezvous))
     return jsonify(json_rendez_vous), 200
 
 
 @app.route('/conseiller/jeunes/<jeune_id>/actions', methods=['GET'])
 def get_home_conseiller(jeune_id: str):
-    home_conseiller = home_conseiller_use_case.get_mocked_jeune_actions(
-        jeune_id) if app.debug else home_conseiller_use_case.get_jeune_actions(jeune_id)
+    home_conseiller = home_conseiller_use_case.get_mocked_jeune_actions(jeune_id) if app.debug \
+        else home_conseiller_use_case.get_jeune_actions(jeune_id)
     return to_json(home_conseiller), 200
 
 
