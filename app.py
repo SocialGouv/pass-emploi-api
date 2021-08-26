@@ -33,8 +33,7 @@ with app.app_context():
     load_dotenv(dotenv_path='./.env')
     environment = os.environ.get('ENV')
     debug_mode = True if environment == 'development' else False
-    print('---------------------')
-    print('+++++++++++++++++++++')
+
     firebase_chat = FirebaseChat()
 
     action_datasource = ActionDatasource()
