@@ -33,25 +33,25 @@ with app.app_context():
     load_dotenv(dotenv_path='./.env')
     environment = os.environ.get('ENV')
     debug_mode = True if environment == 'development' else False
-
+    print('---------------------')
+    print('+++++++++++++++++++++')
     firebase_chat = FirebaseChat()
 
+    action_datasource = ActionDatasource()
+    jeune_datasource = JeuneDatasource()
+    rendezvous_datasource = RendezvousDatasource()
+    action_repository = ActionRepository(action_datasource)
 
-action_datasource = ActionDatasource()
-jeune_datasource = JeuneDatasource()
-rendezvous_datasource = RendezvousDatasource()
-action_repository = ActionRepository(action_datasource)
+    jeune_repository = JeuneRepository(jeune_datasource, action_repository, firebase_chat)
+    rendezvous_repository = RendezvousRepository(rendezvous_datasource)
+    action_use_case = ActionUseCase(jeune_repository, action_repository)
+    conseiller_repository = ConseillerRepository(jeune_datasource)
 
-jeune_repository = JeuneRepository(jeune_datasource, action_repository, firebase_chat)
-rendezvous_repository = RendezvousRepository(rendezvous_datasource)
-action_use_case = ActionUseCase(jeune_repository, action_repository)
-conseiller_repository = ConseillerRepository(jeune_datasource)
-
-conseiller_use_case = ConseillerUseCase(conseiller_repository)
-jeune_use_case = JeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
-rendezvous_use_case = RendezvousUseCase(jeune_repository, rendezvous_repository)
-home_jeune_use_case = HomeJeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
-home_conseiller_use_case = HomeConseillerUseCase(jeune_repository, action_repository)
+    conseiller_use_case = ConseillerUseCase(conseiller_repository)
+    jeune_use_case = JeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
+    rendezvous_use_case = RendezvousUseCase(jeune_repository, rendezvous_repository)
+    home_jeune_use_case = HomeJeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
+    home_conseiller_use_case = HomeConseillerUseCase(jeune_repository, action_repository)
 
 
 @app.route('/')
