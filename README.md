@@ -33,3 +33,12 @@ Il faut bien mettre la clé dans une seule ligne pour qu'elle puisse être corre
 2. Générer une clé privée
 3. Rajouter cette clé dans le fichier `.env` dans la variable `FIREBASE_SECRET_KEY`. NB: Faire attention à bien in-liner
 la clé afin qu'elle puisse être parsée et lue.
+
+# Lancer les tests 
+Pour lancer tous les tests on peut soit utiliser l'IDE, soit exécuter la commande suivante à la racine du projet:
+
+`pytest tests`
+
+Pour lancer un test en particulier, on peut soit utiliser l'IDE soit exécuter la commande suivante à la racine du projet
+
+`pytest tests/test_quon_veut_lancer`
