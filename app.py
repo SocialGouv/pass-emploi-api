@@ -84,8 +84,10 @@ def patch_action(action_id: str):
 
 @app.route('/jeunes', methods=['POST'])
 def post_jeune():
-    create_jeune_request = CreateJeuneRequest(
-        request.json['id'], request.json['firstName'], request.json['lastName'])
+    test = CreateJeuneRequest('1', 'haha', 'ara')
+    print(test.firstName, test.lastName)
+
+    create_jeune_request = CreateJeuneRequest(request.json['id'], request.json['firstName'], request.json['lastName'])
     if app.debug:
         jeune_use_case.create_jeune_with_default_actions_and_rendezvous(create_jeune_request)
     else:
