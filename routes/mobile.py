@@ -1,8 +1,7 @@
-from flask import request, abort, jsonify, Blueprint
+from flask import request, abort, Blueprint
 from flask_cors import cross_origin
 
-from initialize_app import home_jeune_use_case, action_use_case, jeune_use_case, home_conseiller_use_case, IS_DEV
-from json_model.json_action import JsonAction
+from initialize_app import home_jeune_use_case, jeune_use_case, home_conseiller_use_case, IS_DEV
 from json_model.json_transformer import to_json
 from use_cases.create_action_request import CreateActionRequest
 from use_cases.create_jeune_request import CreateJeuneRequest
@@ -17,21 +16,6 @@ def get_home_jeune(jeune_id: str):
         return to_json(home_jeune), 200
     else:
         abort(404)
-
-
-@mobile.route('/jeunes/<jeune_id>/actions', methods=['GET'])
-def get_actions_jeune(jeune_id: str):
-    actions = action_use_case.get_actions(jeune_id)
-    json_actions = list(map(lambda x: JsonAction(x).__dict__, actions))
-    return jsonify(json_actions), 200
-
-
-@mobile.route('/actions/<action_id>', methods=['PATCH'])
-@cross_origin()
-def patch_action(action_id: str):
-    action_status = request.json.get('isDone')
-    action_use_case.change_action_status(action_id, action_status)
-    return '', 200
 
 
 @mobile.route('/jeunes', methods=['POST'])

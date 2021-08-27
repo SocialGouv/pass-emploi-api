@@ -1,8 +1,7 @@
 from flask import request, jsonify, Blueprint
 from flask_cors import cross_origin
 
-from initialize_app import action_use_case, home_conseiller_use_case, rendezvous_use_case, conseiller_use_case, IS_DEV
-from json_model.json_action import JsonAction
+from initialize_app import home_conseiller_use_case, rendezvous_use_case, conseiller_use_case, IS_DEV
 from json_model.json_jeune import JsonJeune
 from json_model.json_rendezvous import JsonRendezvous
 from json_model.json_transformer import to_json
@@ -10,23 +9,6 @@ from use_cases.create_action_request import CreateActionRequest
 from use_cases.create_rendezvous_request import CreateRendezvousRequest
 
 web = Blueprint('web', __name__)
-
-DEBUG_MODE = ''
-
-
-@web.route('/jeunes/<jeune_id>/actions', methods=['GET'])
-def get_actions_jeune(jeune_id: str):
-    actions = action_use_case.get_actions(jeune_id)
-    json_actions = list(map(lambda x: JsonAction(x).__dict__, actions))
-    return jsonify(json_actions), 200
-
-
-@web.route('/actions/<action_id>', methods=['PATCH'])
-@cross_origin()
-def patch_action(action_id: str):
-    action_status = request.json.get('isDone')
-    action_use_case.change_action_status(action_id, action_status)
-    return '', 200
 
 
 @web.route('/jeunes/<jeune_id>/action', methods=['POST'])
