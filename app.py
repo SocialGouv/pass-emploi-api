@@ -14,4 +14,6 @@ def health_check():
 
 
 if __name__ == '__main__':
+    environment = "development" if IS_DEV else "production"
+    print("Lauching backend in" + environment + "environment")
     app.run(debug=IS_DEV)
