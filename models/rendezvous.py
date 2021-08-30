@@ -8,6 +8,8 @@ class Rendezvous:
 
     def __init__(self,
                  id: str,
+                 title: str,
+                 subtitle: str,
                  comment: str,
                  date: datetime,
                  duration: timedelta,
@@ -16,6 +18,8 @@ class Rendezvous:
                  modality: str,
                  ):
         self.id = id
+        self.title = title
+        self.subtitle = subtitle
         self.comment = comment
         self.date = date
         self.duration = duration

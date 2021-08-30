@@ -30,8 +30,9 @@ class RendezvousDatasource:
         random_actions_content = generic_actions_content.copy()
         for i in range(5):
             random_action_content = random.choice(random_actions_content)
-            rendezvous = Rendezvous(str(random.randint(0, 10000000)), random_action_content,
-                                    datetime(2022, 12, 12), timedelta(minutes=60), jeune, conseiller, 'Par tel')
+            rendezvous = Rendezvous(str(random.randint(0, 10000000)), random_action_content, 'Rendez-vous conseiller',
+                                    'avec ' + conseiller.firstName, datetime(2022, 12, 12), timedelta(minutes=60),
+                                    jeune, conseiller, 'Par tel')
             random_actions_content.remove(random_action_content)
             self.rendezvous.append(rendezvous)
         return self.rendezvous

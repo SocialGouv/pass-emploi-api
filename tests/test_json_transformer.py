@@ -17,10 +17,10 @@ def test_to_json():
         Action('2', "Faire son CV", 'commentaire2', True, datetime(2021, 10, 2), datetime(2021, 10, 2), jeune),
     ]
     rendezvous = [
-        Rendezvous('1', 'Suivi des actions', datetime(2020, 2, 1, 16), timedelta(minutes=60), jeune, conseiller,
-                   'Par tel'),
-        Rendezvous('2', 'Atelier préparation CV', datetime(2020, 2, 8, 8), timedelta(minutes=30), jeune, conseiller,
-                   'En visio')
+        Rendezvous('1', 'Rendez-vous conseiller', 'avec Nils', 'Suivi des actions', datetime(2020, 2, 1, 16),
+                   timedelta(minutes=60), jeune, conseiller, 'Par tel'),
+        Rendezvous('2', 'Rendez-vous conseiller', 'avec Nils', 'Atelier préparation CV', datetime(2020, 2, 8, 8),
+                   timedelta(minutes=30), jeune, conseiller, 'En visio')
     ]
     home = HomeJeune(actions, conseiller, rendezvous)
 
@@ -41,12 +41,16 @@ def test_to_json():
     assert json_home['actions'][1]["creationDate"] == datetime(2021, 10, 2)
 
     assert json_home['rendezvous'][0]["id"] == "1"
+    assert json_home['rendezvous'][0]["title"] == "Rendez-vous conseiller"
+    assert json_home['rendezvous'][0]["subtitle"] == "avec Nils"
     assert json_home['rendezvous'][0]["comment"] == "Suivi des actions"
     assert json_home['rendezvous'][0]["date"] == datetime(2020, 2, 1, 16)
     assert json_home['rendezvous'][0]["duration"] == '1:00:00'
     assert json_home['rendezvous'][0]["modality"] == 'Par tel'
 
     assert json_home['rendezvous'][1]["id"] == "2"
+    assert json_home['rendezvous'][1]["title"] == "Rendez-vous conseiller"
+    assert json_home['rendezvous'][1]["subtitle"] == "avec Nils"
     assert json_home['rendezvous'][1]["comment"] == "Atelier préparation CV"
     assert json_home['rendezvous'][1]["date"] == datetime(2020, 2, 8, 8)
     assert json_home['rendezvous'][1]["duration"] == '0:30:00'

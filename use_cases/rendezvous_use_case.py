@@ -1,5 +1,5 @@
-from datetime import datetime
 import random
+from datetime import datetime
 
 from models.conseiller import Conseiller
 from models.rendezvous import Rendezvous
@@ -23,7 +23,8 @@ class RendezvousUseCase:
 
     def create_rendezvous(self, request: CreateRendezvousRequest):
         jeune = self.jeuneRepository.get_jeune(request.jeuneId)
-        rendezvous = Rendezvous(str(random.randint(0, 10000000)), request.comment,
+        # TODO: fix request duration type
+        rendezvous = Rendezvous(str(random.randint(0, 10000000)), request.title, request.subtitle, request.comment,
                                 datetime.strptime(request.date, "%a, %d %b %Y %H:%M:%S %Z"),
                                 request.duration, jeune, jeune.conseiller, request.modality)
 
