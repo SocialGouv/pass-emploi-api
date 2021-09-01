@@ -22,7 +22,7 @@ def test_to_json():
         Rendezvous('2', 'Rendez-vous conseiller', 'avec Nils', 'Atelier préparation CV', datetime(2020, 2, 8, 8),
                    timedelta(minutes=30), jeune, conseiller, 'En visio')
     ]
-    home = HomeJeune(actions, conseiller, rendezvous)
+    home = HomeJeune(actions, 3, conseiller, rendezvous)
 
     # When
     json_home = to_json(home)
@@ -39,6 +39,8 @@ def test_to_json():
     assert json_home['actions'][1]["comment"] == "commentaire2"
     assert json_home['actions'][1]["isDone"]
     assert json_home['actions'][1]["creationDate"] == datetime(2021, 10, 2)
+
+    assert json_home['doneActionsCount'] == 3
 
     assert json_home['rendezvous'][0]["id"] == "1"
     assert json_home['rendezvous'][0]["title"] == "Rendez-vous conseiller"
