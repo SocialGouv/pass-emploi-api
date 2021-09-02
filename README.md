@@ -47,8 +47,8 @@ les variables d'environnement nécessaires à l'application. Les variables d'env
 les suivantes :
 
 ```
-ENV = developement
-FIREBASE_SECRET_KEY = clé privée: voir dans la section suivante comment la récupérer
+ENV=development
+FIREBASE_SECRET_KEY=clé privée: voir dans la section suivante comment la récupérer
 ```
 
 NB: Ce fichier est bien dans le .gitignore, mais garder attention à ne pas le rajouter car il contient des clés privées.

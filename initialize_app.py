@@ -1,13 +1,14 @@
 import os
 
+from alembic import command
 from alembic.config import Config
 from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-from alembic import command
 from datasources.action_datasource import ActionDatasource
-from datasources.jeune_datasource import JeuneDatasource
+from datasources.conseiller_database_datasource import ConseillerDatabaseDatasource
+from datasources.jeune_database_datasource import JeuneDatabaseDatasource
 from datasources.rendezvous_datasource import RendezvousDatasource
 from firebase.firebase_chat import FirebaseChat
 from repositories.action_repository import ActionRepository
@@ -39,14 +40,16 @@ with app.app_context():
     firebase_chat = FirebaseChat()
 
     action_datasource = ActionDatasource()
-    jeune_datasource = JeuneDatasource()
+    jeune_database_datasource = JeuneDatabaseDatasource(db)
     rendezvous_datasource = RendezvousDatasource()
     action_repository = ActionRepository(action_datasource)
+    conseiller_database_datasource = ConseillerDatabaseDatasource(db)
 
-    jeune_repository = JeuneRepository(jeune_datasource, action_repository, firebase_chat)
+    conseiller_repository = ConseillerRepository(conseiller_database_datasource, jeune_database_datasource)
+    jeune_repository = JeuneRepository(jeune_database_datasource, conseiller_repository, action_repository,
+                                       firebase_chat)
     rendezvous_repository = RendezvousRepository(rendezvous_datasource)
     action_use_case = ActionUseCase(jeune_repository, action_repository)
-    conseiller_repository = ConseillerRepository(jeune_datasource)
 
     conseiller_use_case = ConseillerUseCase(conseiller_repository)
     jeune_use_case = JeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
