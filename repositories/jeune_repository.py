@@ -5,6 +5,7 @@ from firebase.firebase_chat import FirebaseChat
 from models.jeune import Jeune
 from repositories.action_repository import ActionRepository
 from repositories.conseiller_repository import ConseillerRepository
+from sql_model.sql_jeune import SqlJeune
 from use_cases.create_jeune_request import CreateJeuneRequest
 
 first_names = ('Kenji', 'Kevin', 'Léa', 'Marie', 'Lucie', 'Jean', 'Michel')
@@ -23,7 +24,6 @@ class JeuneRepository:
     def create_mocked_jeune(self, jeune_id: str):
         if not self.jeuneDatasource.exists(jeune_id):
             conseiller = self.conseillerRepository.get_random_conseiller()
-            from sql_model.sql_jeune import SqlJeune
             sql_jeune = SqlJeune(id=jeune_id, firstName=random.choice(first_names), lastName=random.choice(last_names),
                                  conseillerId=conseiller.id)
             self.jeuneDatasource.create_jeune(sql_jeune)
@@ -33,7 +33,6 @@ class JeuneRepository:
 
     def create_jeune(self, request: CreateJeuneRequest):
         conseiller = self.conseillerRepository.get_random_conseiller()
-        from sql_model.sql_jeune import SqlJeune
         sql_jeune = SqlJeune(id=request.id, firstName=request.firstName, lastName=request.lastName,
                              conseillerId=conseiller.id)
         self.firebaseChat.initialise_chat_if_required(sql_jeune.id, conseiller.id)

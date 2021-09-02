@@ -1,7 +1,8 @@
 from flask import request, jsonify, Blueprint
 from flask_cors import cross_origin
 
-from initialize_app import home_conseiller_use_case, rendezvous_use_case, conseiller_use_case, IS_DEV
+from initialize_app import IS_DEV
+from initialize_use_cases import home_conseiller_use_case, rendezvous_use_case, conseiller_use_case
 from json_model.json_jeune import JsonJeune
 from json_model.json_rendezvous import JsonRendezvous
 from json_model.json_transformer import to_json

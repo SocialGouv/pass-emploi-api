@@ -1,7 +1,7 @@
 from flask import jsonify, Blueprint, request
 from flask_cors import cross_origin
 
-from initialize_app import action_use_case
+from initialize_use_cases import action_use_case
 from json_model.json_action import JsonAction
 
 common_routes = Blueprint('common_routes', __name__)

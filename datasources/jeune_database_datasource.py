@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 
 from models.jeune import Jeune
+from sql_model.sql_jeune import SqlJeune
 
 
 class JeuneDatabaseDatasource:
@@ -9,7 +10,6 @@ class JeuneDatabaseDatasource:
         self.db = db
 
     def exists(self, jeune_id: str):
-        from sql_model.sql_jeune import SqlJeune
         return SqlJeune.query.filter_by(id=jeune_id).first() is not None
 
     def create_jeune(self, sql_jeune: Jeune):
@@ -17,9 +17,7 @@ class JeuneDatabaseDatasource:
         self.db.session.commit()
 
     def get(self, jeune_id: str):
-        from sql_model.sql_jeune import SqlJeune
         return SqlJeune.query.filter_by(id=jeune_id).first()
 
     def get_jeunes_list(self, conseiller_id: int):
-        from sql_model.sql_jeune import SqlJeune
         return SqlJeune.query.filter_by(conseiller_id=conseiller_id).all()

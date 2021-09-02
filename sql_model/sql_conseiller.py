@@ -1,4 +1,4 @@
-from initialize_app import db
+from initialize_db import db
 
 
 class SqlConseiller(db.Model):

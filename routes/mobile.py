@@ -1,7 +1,8 @@
 from flask import request, abort, Blueprint
 from flask_cors import cross_origin
 
-from initialize_app import home_jeune_use_case, jeune_use_case, home_conseiller_use_case, IS_DEV
+from initialize_app import IS_DEV
+from initialize_use_cases import home_jeune_use_case, jeune_use_case, home_conseiller_use_case
 from json_model.json_transformer import to_json
 from use_cases.create_action_request import CreateActionRequest
 from use_cases.create_jeune_request import CreateJeuneRequest
