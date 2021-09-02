@@ -1,8 +1,11 @@
 import os
 
+from alembic.config import Config
 from dotenv import load_dotenv
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
+from alembic import command
 from datasources.action_datasource import ActionDatasource
 from datasources.jeune_datasource import JeuneDatasource
 from datasources.rendezvous_datasource import RendezvousDatasource
@@ -24,6 +27,14 @@ with app.app_context():
     load_dotenv(dotenv_path='./.env')
     environment = os.environ.get('ENV')
     IS_DEV = environment == 'development'
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    db = SQLAlchemy(app)
+
+    alembic_cfg = Config('alembic.ini')
+    alembic_cfg.set_main_option("sqlalchemy.url", app.config['SQLALCHEMY_DATABASE_URI'])
+    command.upgrade(alembic_cfg, 'head')
 
     firebase_chat = FirebaseChat()
 
