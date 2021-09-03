@@ -4,8 +4,8 @@ from json_model.json_home_conseiller import JsonHomeConseiller
 from json_model.json_home_jeune import JsonHomeJeune
 from json_model.json_jeune import JsonJeune
 from json_model.json_rendezvous import JsonRendezvous
-from models.home_conseiller import HomeConseiller
-from models.home_jeune import HomeJeune
+from model.home_conseiller import HomeConseiller
+from model.home_jeune import HomeJeune
 
 
 def to_json(home):

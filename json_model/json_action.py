@@ -1,4 +1,4 @@
-from models.action import Action
+from model.action import Action
 
 
 class JsonAction:

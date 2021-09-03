@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 
-from models.jeune import Jeune
+from model.jeune import Jeune
 from sql_model.sql_jeune import SqlJeune
 
 

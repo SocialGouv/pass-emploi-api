@@ -1,4 +1,4 @@
-from models.conseiller import Conseiller
+from model.conseiller import Conseiller
 from repositories.conseiller_repository import ConseillerRepository
 
 

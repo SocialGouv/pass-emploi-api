@@ -1,9 +1,9 @@
 import random
 from datetime import datetime, timedelta
 
-from models.conseiller import Conseiller
-from models.jeune import Jeune
-from models.rendezvous import Rendezvous
+from model.conseiller import Conseiller
+from model.jeune import Jeune
+from model.rendezvous import Rendezvous
 
 generic_comments = ["Atelier préparation CV",
                     "Atelier recherche formation",

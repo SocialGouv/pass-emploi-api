@@ -1,4 +1,4 @@
-from models.rendezvous import Rendezvous
+from model.rendezvous import Rendezvous
 
 
 class JsonRendezvous:

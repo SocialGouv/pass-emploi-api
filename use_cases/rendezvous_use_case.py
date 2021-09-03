@@ -1,8 +1,8 @@
 import random
 from datetime import datetime
 
-from models.conseiller import Conseiller
-from models.rendezvous import Rendezvous
+from model.conseiller import Conseiller
+from model.rendezvous import Rendezvous
 from repositories.jeune_repository import JeuneRepository
 from repositories.rendezvous_repository import RendezvousRepository
 from use_cases.create_rendezvous_request import CreateRendezvousRequest

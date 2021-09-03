@@ -1,8 +1,8 @@
 import random
 from datetime import datetime
 
-from models.action import Action
-from models.jeune import Jeune
+from model.action import Action
+from model.jeune import Jeune
 
 generic_actions_content = ["Mettre à jour mon CV", "Créer une lettre de motivation", "M'inscrire au permis de conduire",
                            "Mettre mon CV en ligne", "Apprendre l'anglais avec Jason Statham", "Changer de prénom",

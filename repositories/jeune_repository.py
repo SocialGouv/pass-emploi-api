@@ -2,8 +2,8 @@ import random
 
 from datasources.jeune_database_datasource import JeuneDatabaseDatasource
 from firebase.firebase_chat import FirebaseChat
-from models.conseiller import Conseiller
-from models.jeune import Jeune
+from model.conseiller import Conseiller
+from model.jeune import Jeune
 from repositories.action_repository import ActionRepository
 from repositories.conseiller_repository import ConseillerRepository
 from sql_model.sql_jeune import SqlJeune

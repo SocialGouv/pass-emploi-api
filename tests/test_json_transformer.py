@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
 
 from json_model.json_transformer import to_json
-from models.action import Action
-from models.conseiller import Conseiller
-from models.home_jeune import HomeJeune
-from models.jeune import Jeune
-from models.rendezvous import Rendezvous
+from model.action import Action
+from model.conseiller import Conseiller
+from model.home_jeune import HomeJeune
+from model.jeune import Jeune
+from model.rendezvous import Rendezvous
 
 
 def test_to_json():

@@ -1,6 +1,6 @@
 from datasources.action_datasource import ActionDatasource
-from models.action import Action
-from models.jeune import Jeune
+from model.action import Action
+from model.jeune import Jeune
 
 
 class ActionRepository:

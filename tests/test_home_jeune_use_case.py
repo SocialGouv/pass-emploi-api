@@ -2,10 +2,10 @@ from datetime import datetime
 from unittest import mock
 from unittest.mock import MagicMock
 
-from models.action import Action
-from models.conseiller import Conseiller
-from models.jeune import Jeune
-from models.rendezvous import Rendezvous
+from model.action import Action
+from model.conseiller import Conseiller
+from model.jeune import Jeune
+from model.rendezvous import Rendezvous
 from use_cases.home_jeune_use_case import HomeJeuneUseCase
 
 

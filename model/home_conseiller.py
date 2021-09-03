@@ -1,7 +1,7 @@
 from typing import List
 
-from models.action import Action
-from models.jeune import Jeune
+from model.action import Action
+from model.jeune import Jeune
 
 
 class HomeConseiller:

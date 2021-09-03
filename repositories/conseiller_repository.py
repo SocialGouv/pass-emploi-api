@@ -1,7 +1,7 @@
 from datasources.conseiller_database_datasource import ConseillerDatabaseDatasource
 from datasources.jeune_database_datasource import JeuneDatabaseDatasource
-from models.conseiller import Conseiller
-from models.jeune import Jeune
+from model.conseiller import Conseiller
+from model.jeune import Jeune
 
 
 class ConseillerRepository:

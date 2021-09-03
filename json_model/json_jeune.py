@@ -1,4 +1,4 @@
-from models.jeune import Jeune
+from model.jeune import Jeune
 
 
 class JsonJeune:

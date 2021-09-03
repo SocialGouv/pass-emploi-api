@@ -1,9 +1,9 @@
 from datetime import datetime
 
 from datasources.rendezvous_datasource import RendezvousDatasource
-from models.conseiller import Conseiller
-from models.jeune import Jeune
-from models.rendezvous import Rendezvous
+from model.conseiller import Conseiller
+from model.jeune import Jeune
+from model.rendezvous import Rendezvous
 
 
 class RendezvousRepository:

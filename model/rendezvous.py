@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
-from models.conseiller import Conseiller
-from models.jeune import Jeune
+from model.conseiller import Conseiller
+from model.jeune import Jeune
 
 
 class Rendezvous:

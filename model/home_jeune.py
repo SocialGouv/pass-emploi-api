@@ -1,8 +1,8 @@
 from typing import List
 
-from models.action import Action
-from models.conseiller import Conseiller
-from models.rendezvous import Rendezvous
+from model.action import Action
+from model.conseiller import Conseiller
+from model.rendezvous import Rendezvous
 
 
 class HomeJeune:

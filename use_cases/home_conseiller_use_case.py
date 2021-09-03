@@ -1,8 +1,8 @@
-from datetime import datetime
 import random
+from datetime import datetime
 
-from models.action import Action
-from models.home_conseiller import HomeConseiller
+from model.action import Action
+from model.home_conseiller import HomeConseiller
 from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
 from use_cases.create_action_request import CreateActionRequest
