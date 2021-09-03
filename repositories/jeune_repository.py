@@ -2,6 +2,7 @@ import random
 
 from datasources.jeune_database_datasource import JeuneDatabaseDatasource
 from firebase.firebase_chat import FirebaseChat
+from models.conseiller import Conseiller
 from models.jeune import Jeune
 from repositories.action_repository import ActionRepository
 from repositories.conseiller_repository import ConseillerRepository
@@ -29,7 +30,10 @@ class JeuneRepository:
             self.jeuneDatasource.create_jeune(sql_jeune)
 
     def get_jeune(self, jeune_id: str):
-        return self.jeuneDatasource.get(jeune_id)
+        sql_jeune = self.jeuneDatasource.get(jeune_id)
+        return Jeune(sql_jeune.id, sql_jeune.firstName, sql_jeune.lastName,
+                     Conseiller(str(sql_jeune.conseiller.id), sql_jeune.conseiller.firstName,
+                                sql_jeune.conseiller.lastName))
 
     def create_jeune(self, request: CreateJeuneRequest):
         conseiller = self.conseillerRepository.get_random_conseiller()
