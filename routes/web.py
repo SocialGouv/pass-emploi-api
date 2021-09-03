@@ -35,8 +35,7 @@ def post_rendezvous():
 @web.route('/conseiller/rendezvous', methods=['GET'])
 def get_rendezvous():
     rendezvous = rendezvous_use_case.get_conseiller_rendezvous()
-    json_rendez_vous = list(
-        map(lambda x: JsonRendezvous(x).__dict__, rendezvous))
+    json_rendez_vous = list(map(lambda x: JsonRendezvous(x).__dict__, rendezvous))
     return jsonify(json_rendez_vous), 200
 
 

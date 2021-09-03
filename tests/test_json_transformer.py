@@ -17,10 +17,28 @@ def test_to_json():
         Action('2', "Faire son CV", 'commentaire2', True, datetime(2021, 10, 2), datetime(2021, 10, 2), jeune),
     ]
     rendezvous = [
-        Rendezvous('1', 'Rendez-vous conseiller', 'avec Nils', 'Suivi des actions', datetime(2020, 2, 1, 16),
-                   timedelta(minutes=60), jeune, conseiller, 'Par tel'),
-        Rendezvous('2', 'Rendez-vous conseiller', 'avec Nils', 'Atelier préparation CV', datetime(2020, 2, 8, 8),
-                   timedelta(minutes=30), jeune, conseiller, 'En visio')
+        Rendezvous(
+            '1',
+            'Rendez-vous conseiller',
+            'avec Nils',
+            'Suivi des actions',
+            'Par tel',
+            datetime(2020, 2, 1, 16),
+            timedelta(minutes=60),
+            jeune,
+            conseiller
+        ),
+        Rendezvous(
+            '2',
+            'Rendez-vous conseiller',
+            'avec Nils',
+            'Atelier préparation CV',
+            'En visio',
+            datetime(2020, 2, 8, 8),
+            timedelta(minutes=30),
+            jeune,
+            conseiller
+        )
     ]
     home = HomeJeune(actions, 3, conseiller, rendezvous)
 

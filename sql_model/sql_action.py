@@ -9,5 +9,5 @@ class SqlAction(db.Model):
     isDone = db.Column(db.BOOLEAN, name='is_done')
     creationDate = db.Column(db.DATE, name='creation_date')
     lastUpdate = db.Column(db.DATE, name='last_update')
-    jeuneId = db.Column(db.Integer, db.ForeignKey('jeune.id'), name='jeune_id')
-    jeune = db.relationship('SqlJeune', backref=db.backref('jeune', lazy=False))
+    jeuneId = db.Column(db.String(255), db.ForeignKey('jeune.id'), name='jeune_id')
+    jeune = db.relationship('SqlJeune', backref=db.backref('action_jeune', lazy=False))

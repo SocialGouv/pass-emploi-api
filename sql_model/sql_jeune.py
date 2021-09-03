@@ -7,4 +7,4 @@ class SqlJeune(db.Model):
     firstName = db.Column(db.String(255), name='first_name')
     lastName = db.Column(db.String(255), name='last_name')
     conseillerId = db.Column(db.Integer, db.ForeignKey('conseiller.id'), name='conseiller_id')
-    conseiller = db.relationship('SqlConseiller', backref=db.backref('conseiller', lazy=False))
+    conseiller = db.relationship('SqlConseiller', backref=db.backref('jeune_conseiller', lazy=False))

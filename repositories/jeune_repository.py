@@ -15,8 +15,13 @@ last_names = ('DeBruyne', 'Dupont', 'Curie', 'Seydoux', 'Durand', 'Petit')
 
 class JeuneRepository:
 
-    def __init__(self, jeune_datasource: JeuneDatabaseDatasource, conseiller_repository: ConseillerRepository,
-                 action_repository: ActionRepository, firebase_chat: FirebaseChat):
+    def __init__(
+            self,
+            jeune_datasource: JeuneDatabaseDatasource,
+            conseiller_repository: ConseillerRepository,
+            action_repository: ActionRepository,
+            firebase_chat: FirebaseChat
+    ):
         self.jeuneDatasource = jeune_datasource
         self.conseillerRepository = conseiller_repository
         self.actionRepository = action_repository
@@ -25,17 +30,26 @@ class JeuneRepository:
     def create_mocked_jeune(self, jeune_id: str) -> None:
         if not self.jeuneDatasource.exists(jeune_id):
             conseiller = self.conseillerRepository.get_random_conseiller()
-            sql_jeune = SqlJeune(id=jeune_id, firstName=random.choice(first_names), lastName=random.choice(last_names),
-                                 conseillerId=conseiller.id)
+            sql_jeune = SqlJeune(
+                id=jeune_id,
+                firstName=random.choice(first_names),
+                lastName=random.choice(last_names),
+                conseillerId=conseiller.id
+            )
             self.jeuneDatasource.create_jeune(sql_jeune)
 
     def get_jeune(self, jeune_id: str) -> Jeune:
-        return to_jeune(self.jeuneDatasource.get(jeune_id))
+        sql_jeune = self.jeuneDatasource.get(jeune_id)
+        return to_jeune(sql_jeune) if sql_jeune is not None else None
 
     def create_jeune(self, request: CreateJeuneRequest) -> Jeune:
         conseiller = self.conseillerRepository.get_random_conseiller()
-        sql_jeune = SqlJeune(id=request.id, firstName=request.firstName, lastName=request.lastName,
-                             conseillerId=conseiller.id)
+        sql_jeune = SqlJeune(
+            id=request.id,
+            firstName=request.firstName,
+            lastName=request.lastName,
+            conseillerId=conseiller.id
+        )
         self.firebaseChat.initialise_chat_if_required(sql_jeune.id, conseiller.id)
         self.jeuneDatasource.create_jeune(sql_jeune)
         return Jeune(request.id, request.firstName, request.lastName, conseiller)
