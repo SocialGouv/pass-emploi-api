@@ -36,7 +36,7 @@ def upgrade():
         'action',
         sa.Column('id', sa.BigInteger(), autoincrement=True, primary_key=True),
         sa.Column('content', sa.String(1024), nullable=False),
-        sa.Column('comment', sa.String(2048), nullable=False),
+        sa.Column('comment', sa.String(2048), nullable=True),
         sa.Column('is_done', sa.BOOLEAN, nullable=False),
         sa.Column('creation_date', sa.DATE, nullable=False),
         sa.Column('last_update', sa.DATE, nullable=False),

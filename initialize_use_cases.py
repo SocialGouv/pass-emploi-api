@@ -1,4 +1,4 @@
-from datasources.action_datasource import ActionDatasource
+from datasources.action_database_datasource import ActionDatabaseDatasource
 from datasources.conseiller_database_datasource import ConseillerDatabaseDatasource
 from datasources.jeune_database_datasource import JeuneDatabaseDatasource
 from datasources.rendezvous_datasource import RendezvousDatasource
@@ -17,10 +17,10 @@ from use_cases.rendezvous_use_case import RendezvousUseCase
 
 firebase_chat = FirebaseChat()
 
-action_datasource = ActionDatasource()
+action_database_datasource = ActionDatabaseDatasource(db)
 jeune_database_datasource = JeuneDatabaseDatasource(db)
 rendezvous_datasource = RendezvousDatasource()
-action_repository = ActionRepository(action_datasource)
+action_repository = ActionRepository(action_database_datasource)
 conseiller_database_datasource = ConseillerDatabaseDatasource()
 
 conseiller_repository = ConseillerRepository(conseiller_database_datasource, jeune_database_datasource)
