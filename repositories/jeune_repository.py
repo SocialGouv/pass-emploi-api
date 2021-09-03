@@ -2,11 +2,11 @@ import random
 
 from datasources.jeune_database_datasource import JeuneDatabaseDatasource
 from firebase.firebase_chat import FirebaseChat
-from model.conseiller import Conseiller
 from model.jeune import Jeune
 from repositories.action_repository import ActionRepository
 from repositories.conseiller_repository import ConseillerRepository
 from sql_model.sql_jeune import SqlJeune
+from transformers.jeune_transformer import to_jeune
 from use_cases.create_jeune_request import CreateJeuneRequest
 
 first_names = ('Kenji', 'Kevin', 'Léa', 'Marie', 'Lucie', 'Jean', 'Michel')
@@ -22,20 +22,17 @@ class JeuneRepository:
         self.actionRepository = action_repository
         self.firebaseChat = firebase_chat
 
-    def create_mocked_jeune(self, jeune_id: str):
+    def create_mocked_jeune(self, jeune_id: str) -> None:
         if not self.jeuneDatasource.exists(jeune_id):
             conseiller = self.conseillerRepository.get_random_conseiller()
             sql_jeune = SqlJeune(id=jeune_id, firstName=random.choice(first_names), lastName=random.choice(last_names),
                                  conseillerId=conseiller.id)
             self.jeuneDatasource.create_jeune(sql_jeune)
 
-    def get_jeune(self, jeune_id: str):
-        sql_jeune = self.jeuneDatasource.get(jeune_id)
-        return Jeune(sql_jeune.id, sql_jeune.firstName, sql_jeune.lastName,
-                     Conseiller(str(sql_jeune.conseiller.id), sql_jeune.conseiller.firstName,
-                                sql_jeune.conseiller.lastName))
+    def get_jeune(self, jeune_id: str) -> Jeune:
+        return to_jeune(self.jeuneDatasource.get(jeune_id))
 
-    def create_jeune(self, request: CreateJeuneRequest):
+    def create_jeune(self, request: CreateJeuneRequest) -> Jeune:
         conseiller = self.conseillerRepository.get_random_conseiller()
         sql_jeune = SqlJeune(id=request.id, firstName=request.firstName, lastName=request.lastName,
                              conseillerId=conseiller.id)
