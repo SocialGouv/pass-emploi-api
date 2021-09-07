@@ -4,7 +4,9 @@ from routes.common_routes import common_routes
 from routes.mobile import mobile
 from routes.web import web
 
+app.logger.warn('Running migrations...')
 run_migrations()
+app.logger.warn('Running migrations done')
 app.register_blueprint(web)
 app.register_blueprint(mobile)
 app.register_blueprint(common_routes)
