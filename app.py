@@ -1,6 +1,6 @@
 from logging.config import dictConfig
 
-from initialize_app import app, IS_DEV
+from initialize_app import app
 from initialize_db import run_migrations
 from routes.common_routes import common_routes
 from routes.mobile import mobile
@@ -25,4 +25,7 @@ def health_check():
 
 
 if __name__ == '__main__':
-    app.run(debug=IS_DEV)
+    # app.run(debug=IS_DEV)
+    from waitress import serve
+
+    serve(app)
