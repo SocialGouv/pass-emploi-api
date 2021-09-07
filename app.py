@@ -1,19 +1,11 @@
-from logging.config import dictConfig
+from waitress import serve
 
-from initialize_app import app
+from initialize_app import app, IS_DEV
 from initialize_db import run_migrations
 from routes.common_routes import common_routes
 from routes.mobile import mobile
 from routes.web import web
 
-dictConfig(
-    {
-        'version': 1,
-        'root': {'level': 'DEBUG'}
-    }
-)
-run_migrations()
-app.logger.info('>>>>>> AFTER run_migrations()')
 app.register_blueprint(web)
 app.register_blueprint(mobile)
 app.register_blueprint(common_routes)
@@ -24,8 +16,15 @@ def health_check():
     return 'Pass Emploi version bêta.'
 
 
-if __name__ == '__main__':
-    # app.run(debug=IS_DEV)
-    from waitress import serve
+@app.before_first_request
+def initialize():
+    app.logger.info('Running migrations…')
+    run_migrations()
+    app.logger.info('Running migrations done')
 
-    serve(app)
+
+if __name__ == '__main__':
+    if IS_DEV:
+        app.run(debug=True, use_reloader=False)
+    else:
+        serve(app)

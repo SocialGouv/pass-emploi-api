@@ -14,6 +14,4 @@ db = SQLAlchemy(app)
 def run_migrations() -> None:
     alembic_cfg = Config('alembic.ini')
     alembic_cfg.set_main_option("sqlalchemy.url", app.config['SQLALCHEMY_DATABASE_URI'])
-    app.logger.info('>>>>>> BEFORE command.upgrade(alembic_cfg, head)')
     command.upgrade(alembic_cfg, 'head')
-    app.logger.info('>>>>>> AFTER command.upgrade(alembic_cfg, head)')
