@@ -12,6 +12,8 @@ db = SQLAlchemy(app)
 
 
 def run_migrations() -> None:
+    alembic_file_exists = os.path.isfile('alembic.ini')
+    app.logger.info('alembic.ini exists ? %s', alembic_file_exists)
     alembic_cfg = Config('alembic.ini')
     alembic_cfg.set_main_option("sqlalchemy.url", app.config['SQLALCHEMY_DATABASE_URI'])
     command.upgrade(alembic_cfg, 'head')
