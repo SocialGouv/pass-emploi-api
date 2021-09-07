@@ -9,7 +9,7 @@ from routes.web import web
 dictConfig(
     {
         'version': 1,
-        'root': {'level': 'INFO'}
+        'root': {'level': 'DEBUG'}
     }
 )
 run_migrations()
