@@ -18,6 +18,7 @@ fileConfig(config.config_file_name, disable_existing_loggers=False)
 # target_metadata = mymodel.Base.metadata
 target_metadata = None
 
+
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
