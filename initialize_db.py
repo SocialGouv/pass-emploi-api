@@ -12,10 +12,9 @@ db = SQLAlchemy(app)
 
 
 def run_migrations() -> None:
-    alembic_file_exists = os.path.isfile('alembic.ini')
-    alembic_folder_exists = os.path.isfile('alembic/versions/32e3405cae19_initial.py')
-    app.logger.info('alembic.ini exists ? %s', alembic_file_exists)
-    app.logger.info('alembic folder exists ? %s', alembic_folder_exists)
     alembic_cfg = Config('alembic.ini')
-    alembic_cfg.set_main_option("sqlalchemy.url", app.config['SQLALCHEMY_DATABASE_URI'])
+    alembic_cfg.set_main_option(
+        "sqlalchemy.url",
+        app.config['SQLALCHEMY_DATABASE_URI'].replace('postgres://', 'postgresql://')
+    )
     command.upgrade(alembic_cfg, 'head')

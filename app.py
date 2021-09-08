@@ -18,9 +18,7 @@ def health_check():
 
 @app.before_first_request
 def initialize():
-    app.logger.info('Running migrations…')
     run_migrations()
-    app.logger.info('Running migrations done')
 
 
 if __name__ == '__main__':
