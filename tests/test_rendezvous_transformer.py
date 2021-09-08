@@ -50,7 +50,17 @@ def test_to_sql_rendezvous():
     duration = timedelta(minutes=60)
     conseiller = Conseiller('1', 'Nils', 'Tavernier')
     jeune = Jeune('2', 'Kendji', 'Girac', conseiller)
-    rendezvous = Rendezvous('3', 'title', 'subtitle', 'comment', 'modality', date, duration, jeune, conseiller)
+    rendezvous = Rendezvous(
+        id='3',
+        title='title',
+        subtitle='subtitle',
+        comment='comment',
+        modality='modality',
+        date=date,
+        duration=duration,
+        jeune=jeune,
+        conseiller=conseiller
+    )
 
     # When
     sql_rendezvous = to_sql_rendezvous(rendezvous)

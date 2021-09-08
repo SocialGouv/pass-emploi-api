@@ -21,10 +21,10 @@ class TestHomeJeuneUseCase:
     ):
         # Given
         jeune = Jeune("1", "F", "L", Conseiller("A", "F", "L"))
-        action1 = Action("1", "Content1", "Comment1", False, datetime(2020, 5, 17), datetime(2020, 5, 20), jeune)
-        action2 = Action("2", "Content2", "Comment2", False, datetime(2020, 5, 17), datetime(2020, 5, 21), jeune)
-        action3 = Action("3", "Content3", "Comment3", False, datetime(2020, 5, 17), datetime(2020, 5, 19), jeune)
-        action4 = Action("4", "Content4", "Comment3", True, datetime(2020, 5, 17), datetime(2020, 5, 17), jeune)
+        action1 = Action("Content1", "Comment1", False, datetime(2020, 5, 17), datetime(2020, 5, 20), jeune)
+        action2 = Action("Content2", "Comment2", False, datetime(2020, 5, 17), datetime(2020, 5, 21), jeune)
+        action3 = Action("Content3", "Comment3", False, datetime(2020, 5, 17), datetime(2020, 5, 19), jeune)
+        action4 = Action("Content4", "Comment3", True, datetime(2020, 5, 17), datetime(2020, 5, 17), jeune)
         actions = [action1, action2, action3, action4]
         use_case = get_home_use_case(jeune, actions, action_repository, jeune_repository, rendezvous_repository)
 
@@ -42,8 +42,8 @@ class TestHomeJeuneUseCase:
     ):
         # Given
         jeune = Jeune("1", "F", "L", Conseiller("A", "F", "L"))
-        action1 = Action("1", "Content1", "Comment1", True, datetime(2020, 5, 17), datetime(2020, 5, 20), jeune)
-        action2 = Action("2", "Content2", "Comment2", False, datetime(2020, 5, 17), datetime(2020, 5, 21), jeune)
+        action1 = Action("Content1", "Comment1", True, datetime(2020, 5, 17), datetime(2020, 5, 20), jeune)
+        action2 = Action("Content2", "Comment2", False, datetime(2020, 5, 17), datetime(2020, 5, 21), jeune)
         actions = [action1, action2]
         use_case = get_home_use_case(jeune, actions, action_repository, jeune_repository, rendezvous_repository)
 

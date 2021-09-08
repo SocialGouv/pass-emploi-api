@@ -5,13 +5,13 @@ from transformers.jeune_transformer import to_jeune
 
 def to_action(sql_action: SqlAction) -> Action:
     return Action(
-        str(sql_action.id),
-        sql_action.content,
-        sql_action.comment,
-        sql_action.isDone,
-        sql_action.creationDate,
-        sql_action.lastUpdate,
-        to_jeune(sql_action.jeune)
+        id=str(sql_action.id),
+        content=sql_action.content,
+        comment=sql_action.comment,
+        is_done=sql_action.isDone,
+        creation_date=sql_action.creationDate,
+        last_update=sql_action.lastUpdate,
+        jeune=to_jeune(sql_action.jeune)
     )
 
 

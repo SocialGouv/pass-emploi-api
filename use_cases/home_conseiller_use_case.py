@@ -1,4 +1,3 @@
-import random
 from datetime import datetime
 
 from model.action import Action
@@ -17,13 +16,12 @@ class HomeConseillerUseCase:
     def create_action(self, request: CreateActionRequest, jeune_id: str):
         jeune = self.jeuneRepository.get_jeune(jeune_id)
         action = Action(
-            str(random.randint(0, 10000000)),
-            request.content,
-            request.comment,
-            request.isDone,
-            datetime.utcnow(),
-            datetime.utcnow(),
-            jeune
+            content=request.content,
+            comment=request.comment,
+            is_done=request.isDone,
+            creation_date=datetime.utcnow(),
+            last_update=datetime.utcnow(),
+            jeune=jeune
         )
         self.actionRepository.add_action(action)
 

@@ -6,15 +6,15 @@ from transformers.jeune_transformer import to_jeune
 
 def to_rendezvous(sql_rendezvous: SqlRendezvous) -> Rendezvous:
     return Rendezvous(
-        str(sql_rendezvous.id),
-        sql_rendezvous.title,
-        sql_rendezvous.subtitle,
-        sql_rendezvous.comment,
-        sql_rendezvous.modality,
-        sql_rendezvous.date,
-        sql_rendezvous.duration,
-        to_jeune(sql_rendezvous.jeune),
-        to_conseiller(sql_rendezvous.conseiller),
+        id=str(sql_rendezvous.id),
+        title=sql_rendezvous.title,
+        subtitle=sql_rendezvous.subtitle,
+        comment=sql_rendezvous.comment,
+        modality=sql_rendezvous.modality,
+        date=sql_rendezvous.date,
+        duration=sql_rendezvous.duration,
+        jeune=to_jeune(sql_rendezvous.jeune),
+        conseiller=to_conseiller(sql_rendezvous.conseiller),
     )
 
 

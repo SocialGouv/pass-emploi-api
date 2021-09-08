@@ -8,13 +8,13 @@ class Action:
 
     def __init__(
             self,
-            id: str,
             content: str,
             comment: Optional[str],
             is_done: bool,
             creation_date: datetime,
             last_update: datetime,
-            jeune: Jeune
+            jeune: Jeune,
+            id: Optional[str] = None
     ):
         self.id = id
         self.content = content

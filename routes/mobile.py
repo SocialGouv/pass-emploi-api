@@ -21,7 +21,11 @@ def get_home_jeune(jeune_id: str):
 
 @mobile.route('/jeunes', methods=['POST'])
 def post_jeune():
-    create_jeune_request = CreateJeuneRequest(request.json['id'], request.json['firstName'], request.json['lastName'])
+    create_jeune_request = CreateJeuneRequest(
+        request.json['id'],
+        request.json['firstName'],
+        request.json['lastName']
+    )
     if IS_DEV:
         jeune_use_case.create_jeune_with_default_actions_and_rendezvous(create_jeune_request)
     else:

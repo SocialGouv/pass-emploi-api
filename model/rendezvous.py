@@ -9,7 +9,6 @@ class Rendezvous:
 
     def __init__(
             self,
-            id: str,
             title: str,
             subtitle: Optional[str],
             comment: Optional[str],
@@ -17,7 +16,8 @@ class Rendezvous:
             date: datetime,
             duration: timedelta,
             jeune: Jeune,
-            conseiller: Conseiller
+            conseiller: Conseiller,
+            id: Optional[str] = None
     ):
         self.id = id
         self.title = title

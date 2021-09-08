@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from model.rendezvous import Rendezvous
 from repositories.conseiller_repository import ConseillerRepository
@@ -28,15 +28,19 @@ class RendezvousUseCase:
 
     def create_rendezvous(self, request: CreateRendezvousRequest) -> None:
         jeune = self.jeuneRepository.get_jeune(request.jeuneId)
+        duration_as_datetime = datetime.strptime(request.duration, "%H:%M:%S")
         rendezvous = Rendezvous(
-            'id',  # TODO: remove obligation to set useless ID here
-            request.title,
-            request.subtitle,
-            request.comment,
-            request.modality,
-            datetime.strptime(request.date, "%a, %d %b %Y %H:%M:%S %Z"),
-            request.duration,  # TODO: fix request duration type
-            jeune,
-            jeune.conseiller
+            title=request.title,
+            subtitle=request.subtitle,
+            comment=request.comment,
+            modality=request.modality,
+            date=datetime.strptime(request.date, "%a, %d %b %Y %H:%M:%S %Z"),
+            duration=timedelta(
+                hours=duration_as_datetime.hour,
+                minutes=duration_as_datetime.minute,
+                seconds=duration_as_datetime.second
+            ),
+            jeune=jeune,
+            conseiller=jeune.conseiller
         )
         self.rendezvousRepository.add_rendezvous(rendezvous)

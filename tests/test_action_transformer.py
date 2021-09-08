@@ -49,7 +49,7 @@ def test_to_sql_action():
     last_update = datetime.utcnow()
     conseiller = Conseiller('1', 'Nils', 'Tavernier')
     jeune = Jeune('2', 'Kendji', 'Girac', conseiller)
-    action = Action('3', 'content', 'comment', True, creation_date, last_update, jeune)
+    action = Action('content', 'comment', True, creation_date, last_update, jeune)
 
     # When
     sql_action = to_sql_action(action)
