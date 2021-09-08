@@ -20,4 +20,4 @@ class JeuneDatabaseDatasource:
         return SqlJeune.query.filter_by(id=jeune_id).first()
 
     def get_jeunes_list(self, conseiller_id: int):
-        return SqlJeune.query.filter_by(conseiller_id=conseiller_id).all()
+        return SqlJeune.query.filter_by(conseillerId=conseiller_id).all()

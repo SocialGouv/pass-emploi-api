@@ -1,4 +1,3 @@
-from model.conseiller import Conseiller
 from repositories.conseiller_repository import ConseillerRepository
 
 
@@ -8,5 +7,5 @@ class ConseillerUseCase:
         self.conseillerRepository = conseiller_repository
 
     def get_jeunes(self):
-        conseiller = Conseiller('1', 'Nils', 'Tavernier')
+        conseiller = self.conseillerRepository.get_random_conseiller()
         return self.conseillerRepository.get_jeunes(conseiller)
