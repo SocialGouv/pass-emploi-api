@@ -1,18 +1,21 @@
 from datetime import datetime
+from typing import Optional
 
 from model.jeune import Jeune
 
 
 class Action:
 
-    def __init__(self,
-                 id: str,
-                 content: str,
-                 comment: str,
-                 is_done: bool,
-                 creation_date: datetime,
-                 last_update: datetime,
-                 jeune: Jeune):
+    def __init__(
+            self,
+            id: str,
+            content: str,
+            comment: Optional[str],
+            is_done: bool,
+            creation_date: datetime,
+            last_update: datetime,
+            jeune: Jeune
+    ):
         self.id = id
         self.content = content
         self.comment = comment

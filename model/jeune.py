@@ -8,4 +8,3 @@ class Jeune:
         self.firstName = first_name
         self.lastName = last_name
         self.conseiller = conseiller
-        self.number = ''

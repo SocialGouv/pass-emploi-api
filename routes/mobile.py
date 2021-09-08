@@ -32,7 +32,10 @@ def post_jeune():
 @mobile.route('/jeunes/<jeune_id>/action', methods=['POST'])
 @cross_origin()
 def post_action(jeune_id: str):
-    create_action_request = CreateActionRequest(request.json['comment'], request.json['content'],
-                                                request.json['isDone'])
+    create_action_request = CreateActionRequest(
+        request.json['comment'],
+        request.json['content'],
+        request.json['isDone']
+    )
     home_conseiller_use_case.create_action(create_action_request, jeune_id)
     return '', 201

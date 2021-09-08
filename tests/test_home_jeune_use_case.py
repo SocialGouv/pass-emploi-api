@@ -14,9 +14,11 @@ from use_cases.home_jeune_use_case import HomeJeuneUseCase
 @mock.patch('repositories.rendezvous_repository.RendezvousRepository')
 class TestHomeJeuneUseCase:
 
-    def test_get_home_when_multiple_actions_should_only_return_two_most_recent_todo_ones(self, jeune_repository,
-                                                                                         action_repository,
-                                                                                         rendezvous_repository):
+    def test_get_home_when_multiple_actions_should_only_return_two_most_recent_todo_ones(
+            self, jeune_repository,
+            action_repository,
+            rendezvous_repository
+    ):
         # Given
         jeune = Jeune("1", "F", "L", Conseiller("A", "F", "L"))
         action1 = Action("1", "Content1", "Comment1", False, datetime(2020, 5, 17), datetime(2020, 5, 20), jeune)
@@ -33,9 +35,11 @@ class TestHomeJeuneUseCase:
         assert home.actions == [action2, action1]
         assert home.doneActionsCount == 1
 
-    def test_get_home_when_less_than_two_actions_should_only_return_all_todo_ones(self, jeune_repository,
-                                                                                  action_repository,
-                                                                                  rendezvous_repository):
+    def test_get_home_when_less_than_two_actions_should_only_return_all_todo_ones(
+            self, jeune_repository,
+            action_repository,
+            rendezvous_repository
+    ):
         # Given
         jeune = Jeune("1", "F", "L", Conseiller("A", "F", "L"))
         action1 = Action("1", "Content1", "Comment1", True, datetime(2020, 5, 17), datetime(2020, 5, 20), jeune)

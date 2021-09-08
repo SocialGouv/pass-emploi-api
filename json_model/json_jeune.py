@@ -7,4 +7,3 @@ class JsonJeune:
         self.id = jeune.id
         self.firstName = jeune.firstName
         self.lastName = jeune.lastName
-        self.number = jeune.number

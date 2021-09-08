@@ -7,8 +7,13 @@ from repositories.rendezvous_repository import RendezvousRepository
 
 
 class HomeJeuneUseCase:
-    def __init__(self, jeune_repository: JeuneRepository, action_repository: ActionRepository,
-                 rendezvous_repository: RendezvousRepository):
+
+    def __init__(
+            self,
+            jeune_repository: JeuneRepository,
+            action_repository: ActionRepository,
+            rendezvous_repository: RendezvousRepository
+    ):
         self.jeuneRepository = jeune_repository
         self.actionRepository = action_repository
         self.rendezvousRepository = rendezvous_repository
@@ -18,8 +23,12 @@ class HomeJeuneUseCase:
         if jeune is not None:
             actions = self.actionRepository.get_actions(jeune)
             rendezvous = self.rendezvousRepository.get_jeune_rendezvous(jeune, datetime.utcnow())
-            return HomeJeune(get_most_recent_todo_actions(actions), get_done_actions_count(actions), jeune.conseiller,
-                             rendezvous)
+            return HomeJeune(
+                get_most_recent_todo_actions(actions),
+                get_done_actions_count(actions),
+                jeune.conseiller,
+                rendezvous
+            )
         else:
             return None
 

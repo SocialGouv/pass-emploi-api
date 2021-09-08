@@ -7,6 +7,7 @@ from transformers.jeune_transformer import to_jeune
 
 
 class ConseillerRepository:
+
     def __init__(self, conseiller_datasource: ConseillerDatabaseDatasource, jeune_datasource: JeuneDatabaseDatasource):
         self.conseillerDatasource = conseiller_datasource
         self.jeuneDatasource = jeune_datasource

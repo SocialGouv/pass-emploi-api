@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Optional
 
 from model.conseiller import Conseiller
 from model.jeune import Jeune
@@ -10,9 +11,9 @@ class Rendezvous:
             self,
             id: str,
             title: str,
-            subtitle: str,
-            comment: str,
-            modality: str,
+            subtitle: Optional[str],
+            comment: Optional[str],
+            modality: Optional[str],
             date: datetime,
             duration: timedelta,
             jeune: Jeune,

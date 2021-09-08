@@ -15,8 +15,15 @@ def test_to_action():
     last_update = datetime.utcnow()
     sql_conseiller = SqlConseiller(id=1, firstName='Nils', lastName='Tavernier')
     sql_jeune = SqlJeune(id='2', firstName='Kendji', lastName='Girac', conseiller=sql_conseiller)
-    sql_action = SqlAction(id=3, content='content', comment='comment', isDone=True, creationDate=creation_date,
-                           lastUpdate=last_update, jeune=sql_jeune)
+    sql_action = SqlAction(
+        id=3,
+        content='content',
+        comment='comment',
+        isDone=True,
+        creationDate=creation_date,
+        lastUpdate=last_update,
+        jeune=sql_jeune
+    )
 
     # When
     action = to_action(sql_action)
