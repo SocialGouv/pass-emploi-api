@@ -1,6 +1,5 @@
 import logging
 import os
-import sys
 
 from dotenv import load_dotenv
 from flask import Flask
@@ -9,6 +8,7 @@ app = Flask(__name__)
 
 
 def set_log_level() -> None:
+    app.logger.setLevel(logging.DEBUG)
     # log_level = os.environ.get('LOG_LEVEL')
     # dictConfig(
     #     {
@@ -16,16 +16,14 @@ def set_log_level() -> None:
     #         'root': {'level': 'INFO' if log_level is None else log_level}
     #     }
     # )
-    app.logger.setLevel(logging.DEBUG)
-    del app.logger.handlers[:]
-
-    handler = logging.StreamHandler(stream=sys.stdout)
-    handler.setLevel(logging.DEBUG)
-    handler.formatter = logging.Formatter(
-        fmt=u"%(asctime)s level=%(levelname)s %(message)s",
-        datefmt="%Y-%m-%dT%H:%M:%SZ",
-    )
-    app.logger.addHandler(handler)
+    # del app.logger.handlers[:]
+    # handler = logging.StreamHandler(stream=sys.stdout)
+    # handler.setLevel(logging.DEBUG)
+    # handler.formatter = logging.Formatter(
+    #     fmt=u"%(asctime)s level=%(levelname)s %(message)s",
+    #     datefmt="%Y-%m-%dT%H:%M:%SZ",
+    # )
+    # app.logger.addHandler(handler)
 
 
 with app.app_context():
