@@ -1,4 +1,4 @@
-from models.conseiller import Conseiller
+from model.conseiller import Conseiller
 
 
 class Jeune:
@@ -8,4 +8,3 @@ class Jeune:
         self.firstName = first_name
         self.lastName = last_name
         self.conseiller = conseiller
-        self.number = ''

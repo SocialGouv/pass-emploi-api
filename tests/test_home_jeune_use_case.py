@@ -2,10 +2,10 @@ from datetime import datetime
 from unittest import mock
 from unittest.mock import MagicMock
 
-from models.action import Action
-from models.conseiller import Conseiller
-from models.jeune import Jeune
-from models.rendezvous import Rendezvous
+from model.action import Action
+from model.conseiller import Conseiller
+from model.jeune import Jeune
+from model.rendezvous import Rendezvous
 from use_cases.home_jeune_use_case import HomeJeuneUseCase
 
 
@@ -14,15 +14,17 @@ from use_cases.home_jeune_use_case import HomeJeuneUseCase
 @mock.patch('repositories.rendezvous_repository.RendezvousRepository')
 class TestHomeJeuneUseCase:
 
-    def test_get_home_when_multiple_actions_should_only_return_two_most_recent_todo_ones(self, jeune_repository,
-                                                                                         action_repository,
-                                                                                         rendezvous_repository):
+    def test_get_home_when_multiple_actions_should_only_return_two_most_recent_todo_ones(
+            self, jeune_repository,
+            action_repository,
+            rendezvous_repository
+    ):
         # Given
         jeune = Jeune("1", "F", "L", Conseiller("A", "F", "L"))
-        action1 = Action("1", "Content1", "Comment1", False, datetime(2020, 5, 17), datetime(2020, 5, 20), jeune)
-        action2 = Action("2", "Content2", "Comment2", False, datetime(2020, 5, 17), datetime(2020, 5, 21), jeune)
-        action3 = Action("3", "Content3", "Comment3", False, datetime(2020, 5, 17), datetime(2020, 5, 19), jeune)
-        action4 = Action("4", "Content4", "Comment3", True, datetime(2020, 5, 17), datetime(2020, 5, 17), jeune)
+        action1 = Action("Content1", "Comment1", False, datetime(2020, 5, 17), datetime(2020, 5, 20), jeune)
+        action2 = Action("Content2", "Comment2", False, datetime(2020, 5, 17), datetime(2020, 5, 21), jeune)
+        action3 = Action("Content3", "Comment3", False, datetime(2020, 5, 17), datetime(2020, 5, 19), jeune)
+        action4 = Action("Content4", "Comment3", True, datetime(2020, 5, 17), datetime(2020, 5, 17), jeune)
         actions = [action1, action2, action3, action4]
         use_case = get_home_use_case(jeune, actions, action_repository, jeune_repository, rendezvous_repository)
 
@@ -33,13 +35,15 @@ class TestHomeJeuneUseCase:
         assert home.actions == [action2, action1]
         assert home.doneActionsCount == 1
 
-    def test_get_home_when_less_than_two_actions_should_only_return_all_todo_ones(self, jeune_repository,
-                                                                                  action_repository,
-                                                                                  rendezvous_repository):
+    def test_get_home_when_less_than_two_actions_should_only_return_all_todo_ones(
+            self, jeune_repository,
+            action_repository,
+            rendezvous_repository
+    ):
         # Given
         jeune = Jeune("1", "F", "L", Conseiller("A", "F", "L"))
-        action1 = Action("1", "Content1", "Comment1", True, datetime(2020, 5, 17), datetime(2020, 5, 20), jeune)
-        action2 = Action("2", "Content2", "Comment2", False, datetime(2020, 5, 17), datetime(2020, 5, 21), jeune)
+        action1 = Action("Content1", "Comment1", True, datetime(2020, 5, 17), datetime(2020, 5, 20), jeune)
+        action2 = Action("Content2", "Comment2", False, datetime(2020, 5, 17), datetime(2020, 5, 21), jeune)
         actions = [action1, action2]
         use_case = get_home_use_case(jeune, actions, action_repository, jeune_repository, rendezvous_repository)
 

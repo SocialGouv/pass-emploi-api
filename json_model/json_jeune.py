@@ -1,4 +1,4 @@
-from models.jeune import Jeune
+from model.jeune import Jeune
 
 
 class JsonJeune:
@@ -7,4 +7,3 @@ class JsonJeune:
         self.id = jeune.id
         self.firstName = jeune.firstName
         self.lastName = jeune.lastName
-        self.number = jeune.number

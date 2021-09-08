@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
 
 from json_model.json_transformer import to_json
-from models.action import Action
-from models.conseiller import Conseiller
-from models.home_jeune import HomeJeune
-from models.jeune import Jeune
-from models.rendezvous import Rendezvous
+from model.action import Action
+from model.conseiller import Conseiller
+from model.home_jeune import HomeJeune
+from model.jeune import Jeune
+from model.rendezvous import Rendezvous
 
 
 def test_to_json():
@@ -13,14 +13,48 @@ def test_to_json():
     conseiller = Conseiller('1', 'Nils', 'Tavernier')
     jeune = Jeune("ID_JEUNE", 'Kevin', 'DeBruyne', conseiller)
     actions = [
-        Action('1', "Suivre une formation", 'commentaire1', False, datetime(2020, 1, 30), datetime(2021, 10, 2), jeune),
-        Action('2', "Faire son CV", 'commentaire2', True, datetime(2021, 10, 2), datetime(2021, 10, 2), jeune),
+        Action(
+            id='1',
+            content="Suivre une formation",
+            comment='commentaire1',
+            is_done=False,
+            creation_date=datetime(2020, 1, 30),
+            last_update=datetime(2021, 10, 2),
+            jeune=jeune,
+        ),
+        Action(
+            id='2',
+            content="Faire son CV",
+            comment='commentaire2',
+            is_done=True,
+            creation_date=datetime(2021, 10, 2),
+            last_update=datetime(2021, 10, 2),
+            jeune=jeune,
+        ),
     ]
     rendezvous = [
-        Rendezvous('1', 'Rendez-vous conseiller', 'avec Nils', 'Suivi des actions', datetime(2020, 2, 1, 16),
-                   timedelta(minutes=60), jeune, conseiller, 'Par tel'),
-        Rendezvous('2', 'Rendez-vous conseiller', 'avec Nils', 'Atelier préparation CV', datetime(2020, 2, 8, 8),
-                   timedelta(minutes=30), jeune, conseiller, 'En visio')
+        Rendezvous(
+            id='1',
+            title='Rendez-vous conseiller',
+            subtitle='avec Nils',
+            comment='Suivi des actions',
+            modality='Par tel',
+            date=datetime(2020, 2, 1, 16),
+            duration=timedelta(minutes=60),
+            jeune=jeune,
+            conseiller=conseiller,
+        ),
+        Rendezvous(
+            id='2',
+            title='Rendez-vous conseiller',
+            subtitle='avec Nils',
+            comment='Atelier préparation CV',
+            modality='En visio',
+            date=datetime(2020, 2, 8, 8),
+            duration=timedelta(minutes=30),
+            jeune=jeune,
+            conseiller=conseiller,
+        )
     ]
     home = HomeJeune(actions, 3, conseiller, rendezvous)
 

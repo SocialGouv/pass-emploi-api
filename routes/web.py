@@ -1,7 +1,8 @@
 from flask import request, jsonify, Blueprint
 from flask_cors import cross_origin
 
-from initialize_app import home_conseiller_use_case, rendezvous_use_case, conseiller_use_case, IS_DEV
+from initialize_app import IS_DEV
+from initialize_use_cases import home_conseiller_use_case, rendezvous_use_case, conseiller_use_case
 from json_model.json_jeune import JsonJeune
 from json_model.json_rendezvous import JsonRendezvous
 from json_model.json_transformer import to_json
@@ -14,8 +15,11 @@ web = Blueprint('web', __name__)
 @web.route('/jeunes/<jeune_id>/action', methods=['POST'])
 @cross_origin()
 def post_action(jeune_id: str):
-    create_action_request = CreateActionRequest(request.json['comment'], request.json['content'],
-                                                request.json['isDone'])
+    create_action_request = CreateActionRequest(
+        request.json['comment'],
+        request.json['content'],
+        request.json['isDone']
+    )
     home_conseiller_use_case.create_action(create_action_request, jeune_id)
     return '', 201
 
@@ -23,10 +27,15 @@ def post_action(jeune_id: str):
 @web.route('/rendezvous', methods=['POST'])
 @cross_origin()
 def post_rendezvous():
-    create_rendezvous_request = CreateRendezvousRequest(request.json['title'], request.json['subtitle'],
-                                                        request.json['comment'], request.json['date'],
-                                                        request.json['duration'], request.json['jeuneId'],
-                                                        request.json['modality'])
+    create_rendezvous_request = CreateRendezvousRequest(
+        request.json['title'],
+        request.json['subtitle'],
+        request.json['comment'],
+        request.json['date'],
+        request.json['duration'],
+        request.json['jeuneId'],
+        request.json['modality']
+    )
     rendezvous_use_case.create_rendezvous(create_rendezvous_request)
     return '', 201
 
@@ -34,8 +43,7 @@ def post_rendezvous():
 @web.route('/conseiller/rendezvous', methods=['GET'])
 def get_rendezvous():
     rendezvous = rendezvous_use_case.get_conseiller_rendezvous()
-    json_rendez_vous = list(
-        map(lambda x: JsonRendezvous(x).__dict__, rendezvous))
+    json_rendez_vous = list(map(lambda x: JsonRendezvous(x).__dict__, rendezvous))
     return jsonify(json_rendez_vous), 200
 
 

@@ -1,21 +1,22 @@
-from datasources.action_datasource import ActionDatasource
-from models.action import Action
-from models.jeune import Jeune
+from datasources.action_database_datasource import ActionDatabaseDatasource
+from model.action import Action
+from model.jeune import Jeune
+from transformers.action_transformer import to_sql_action, to_action
 
 
 class ActionRepository:
 
-    def __init__(self, action_datasource: ActionDatasource):
+    def __init__(self, action_datasource: ActionDatabaseDatasource):
         self.actionDatasource = action_datasource
 
-    def add_action(self, action: Action):
-        self.actionDatasource.add_action(action)
+    def add_action(self, action: Action) -> None:
+        self.actionDatasource.add_action(to_sql_action(action))
 
-    def create_mocked_actions(self, jeune: Jeune):
-        self.actionDatasource.create_mocked_actions(jeune)
+    def create_mocked_actions(self, jeune: Jeune) -> None:
+        self.actionDatasource.create_mocked_actions(jeune.id)
 
-    def get_actions(self, jeune: Jeune):
-        return self.actionDatasource.get_actions(jeune)
+    def get_actions(self, jeune: Jeune) -> [Action]:
+        return list(map(lambda a: to_action(a), self.actionDatasource.get_actions(jeune.id)))
 
-    def update_action(self, action_id: str, action_status: bool):
+    def update_action(self, action_id: str, action_status: bool) -> None:
         self.actionDatasource.update_action(action_id, action_status)

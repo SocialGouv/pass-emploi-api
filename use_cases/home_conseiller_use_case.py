@@ -1,24 +1,28 @@
 from datetime import datetime
-import random
 
-from models.action import Action
-from models.home_conseiller import HomeConseiller
+from model.action import Action
+from model.home_conseiller import HomeConseiller
 from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
 from use_cases.create_action_request import CreateActionRequest
 
 
 class HomeConseillerUseCase:
+
     def __init__(self, jeune_repository: JeuneRepository, action_repository: ActionRepository):
         self.actionRepository = action_repository
         self.jeuneRepository = jeune_repository
 
     def create_action(self, request: CreateActionRequest, jeune_id: str):
         jeune = self.jeuneRepository.get_jeune(jeune_id)
-        action = Action(str(random.randint(0, 10000000)), request.content, request.comment, request.isDone,
-                        datetime.utcnow(),
-                        datetime.utcnow(),
-                        jeune)
+        action = Action(
+            content=request.content,
+            comment=request.comment,
+            is_done=request.isDone,
+            creation_date=datetime.utcnow(),
+            last_update=datetime.utcnow(),
+            jeune=jeune
+        )
         self.actionRepository.add_action(action)
 
     def get_jeune_actions(self, jeune_id: str):
