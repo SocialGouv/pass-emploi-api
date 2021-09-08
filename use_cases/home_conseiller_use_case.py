@@ -9,16 +9,22 @@ from use_cases.create_action_request import CreateActionRequest
 
 
 class HomeConseillerUseCase:
+
     def __init__(self, jeune_repository: JeuneRepository, action_repository: ActionRepository):
         self.actionRepository = action_repository
         self.jeuneRepository = jeune_repository
 
     def create_action(self, request: CreateActionRequest, jeune_id: str):
         jeune = self.jeuneRepository.get_jeune(jeune_id)
-        action = Action(str(random.randint(0, 10000000)), request.content, request.comment, request.isDone,
-                        datetime.utcnow(),
-                        datetime.utcnow(),
-                        jeune)
+        action = Action(
+            str(random.randint(0, 10000000)),
+            request.content,
+            request.comment,
+            request.isDone,
+            datetime.utcnow(),
+            datetime.utcnow(),
+            jeune
+        )
         self.actionRepository.add_action(action)
 
     def get_jeune_actions(self, jeune_id: str):
