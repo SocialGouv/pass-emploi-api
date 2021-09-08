@@ -38,8 +38,8 @@ def upgrade():
         sa.Column('content', sa.String(1024), nullable=False),
         sa.Column('comment', sa.String(2048), nullable=True),
         sa.Column('is_done', sa.BOOLEAN, nullable=False),
-        sa.Column('creation_date', sa.DATETIME, nullable=False),
-        sa.Column('last_update', sa.DATETIME, nullable=False),
+        sa.Column('creation_date', sa.TIMESTAMP, nullable=False),
+        sa.Column('last_update', sa.TIMESTAMP, nullable=False),
         sa.Column('jeune_id', sa.String(255), ForeignKey('jeune.id')),
     )
 
@@ -50,7 +50,7 @@ def upgrade():
         sa.Column('subtitle', sa.String(512), nullable=True),
         sa.Column('comment', sa.String(2048), nullable=True),
         sa.Column('modality', sa.String(2048), nullable=True),
-        sa.Column('date', sa.DATETIME, nullable=False),
+        sa.Column('date', sa.TIMESTAMP, nullable=False),
         sa.Column('duration', sa.Interval, nullable=False),
         sa.Column('jeune_id', sa.String(255), ForeignKey('jeune.id')),
         sa.Column('conseiller_id', sa.BigInteger(), ForeignKey('conseiller.id')),
