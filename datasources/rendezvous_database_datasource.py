@@ -42,9 +42,9 @@ class RendezvousDatabaseDatasource:
                 title='Rendez-vous conseiller',
                 subtitle='avec ' + conseiller.firstName,
                 comment=random_comment,
-                modality='Par tel',
+                modality=random.choice(['Par téléphone', 'À l\'agence']),
                 date=datetime(2022, 12, 12),
-                duration=timedelta(minutes=60),
+                duration=timedelta(minutes=random.choice([30, 60, 90, 120])),
                 jeuneId=jeune.id,
                 conseillerId=conseiller.id
             )
