@@ -10,7 +10,7 @@ def log_headers():
               + get_header_log_if_exists('X-Platform') \
               + get_header_log_if_exists('X-InstallationId') \
               + get_header_log_if_exists('X-CorrelationId')
-    app.logger.info(message.removesuffix(SEPARATOR))
+    app.logger.info(message)
 
 
 def get_header_log_if_exists(key) -> str:
