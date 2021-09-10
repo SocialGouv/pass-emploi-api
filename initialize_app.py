@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 with app.app_context():
     app.logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
+    app.logger.propagate = False
     load_dotenv(dotenv_path='./.env')
     environment = os.environ.get('ENV')
     IS_DEV = environment == 'development'

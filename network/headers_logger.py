@@ -1,0 +1,17 @@
+from flask import request
+
+from initialize_app import app
+
+SEPARATOR = ', '
+
+
+def log_headers():
+    message = get_header_log_if_exists('X-AppVersion') \
+              + get_header_log_if_exists('X-Platform') \
+              + get_header_log_if_exists('X-InstallationId') \
+              + get_header_log_if_exists('X-CorrelationId')
+    app.logger.info(message.removesuffix(SEPARATOR))
+
+
+def get_header_log_if_exists(key) -> str:
+    return key + ':' + request.headers.get(key) + SEPARATOR if request.headers.get(key) else ''
