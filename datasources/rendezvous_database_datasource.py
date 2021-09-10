@@ -27,10 +27,9 @@ class RendezvousDatabaseDatasource:
             .filter(SqlRendezvous.date >= rendezvous_limit_date) \
             .all()
 
-    def get_conseiller_rendezvous(self, conseiller_id: str, rendezvous_limit_date: datetime) -> [SqlRendezvous]:
+    def get_conseiller_rendezvous(self, conseiller_id: str) -> [SqlRendezvous]:
         return SqlRendezvous.query \
             .filter_by(conseillerId=int(conseiller_id)) \
-            .filter(SqlRendezvous.date >= rendezvous_limit_date) \
             .order_by(SqlRendezvous.date) \
             .all()
 

@@ -24,7 +24,7 @@ class RendezvousUseCase:
 
     def get_conseiller_rendezvous(self) -> [Rendezvous]:
         conseiller = self.conseillerRepository.get_random_conseiller()
-        return self.rendezvousRepository.get_conseiller_rendezvous(conseiller, rendezvous_limit_date=datetime.utcnow())
+        return self.rendezvousRepository.get_conseiller_rendezvous(conseiller)
 
     def create_rendezvous(self, request: CreateRendezvousRequest) -> None:
         jeune = self.jeuneRepository.get_jeune(request.jeuneId)

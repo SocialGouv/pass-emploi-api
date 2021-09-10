@@ -19,11 +19,11 @@ class RendezvousRepository:
             )
         )
 
-    def get_conseiller_rendezvous(self, conseiller: Conseiller, rendezvous_limit_date: datetime) -> [Rendezvous]:
+    def get_conseiller_rendezvous(self, conseiller: Conseiller) -> [Rendezvous]:
         return list(
             map(
                 lambda rdv: to_rendezvous(rdv),
-                self.rendezvousDatasource.get_conseiller_rendezvous(conseiller.id, rendezvous_limit_date)
+                self.rendezvousDatasource.get_conseiller_rendezvous(conseiller.id)
             )
         )
 
