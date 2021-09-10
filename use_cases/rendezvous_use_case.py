@@ -28,10 +28,11 @@ class RendezvousUseCase:
 
     def create_rendezvous(self, request: CreateRendezvousRequest) -> None:
         jeune = self.jeuneRepository.get_jeune(request.jeuneId)
+        conseiller = self.conseillerRepository.get_conseiller(request.conseillerId)
         duration_as_datetime = datetime.strptime(request.duration, "%H:%M:%S")
         rendezvous = Rendezvous(
-            title=request.title,
-            subtitle=request.subtitle,
+            title='Rendez-vous conseiller',
+            subtitle='avec ' + conseiller.firstName,
             comment=request.comment,
             modality=request.modality,
             date=datetime.strptime(request.date, "%a, %d %b %Y %H:%M:%S %Z"),
@@ -41,6 +42,6 @@ class RendezvousUseCase:
                 seconds=duration_as_datetime.second
             ),
             jeune=jeune,
-            conseiller=jeune.conseiller
+            conseiller=conseiller
         )
         self.rendezvousRepository.add_rendezvous(rendezvous)

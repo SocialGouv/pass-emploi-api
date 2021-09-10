@@ -24,17 +24,16 @@ def post_action(jeune_id: str):
     return '', 201
 
 
-@web.route('/rendezvous', methods=['POST'])
+@web.route('/conseillers/<conseiller_id>/rendezvous', methods=['POST'])
 @cross_origin()
-def post_rendezvous():
+def post_rendezvous(conseiller_id: str):
     create_rendezvous_request = CreateRendezvousRequest(
-        request.json['title'],
-        request.json['subtitle'],
         request.json['comment'],
         request.json['date'],
         request.json['duration'],
+        request.json['modality'],
         request.json['jeuneId'],
-        request.json['modality']
+        conseiller_id,
     )
     rendezvous_use_case.create_rendezvous(create_rendezvous_request)
     return '', 201
