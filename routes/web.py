@@ -4,12 +4,21 @@ from flask_cors import cross_origin
 from initialize_app import IS_DEV
 from initialize_use_cases import home_conseiller_use_case, rendezvous_use_case, conseiller_use_case
 from json_model.json_jeune import JsonJeune
+from json_model.json_jeune_actions_sum_up import JsonJeuneActionsSumUp
 from json_model.json_rendezvous import JsonRendezvous
 from json_model.json_transformer import to_json
 from use_cases.create_action_request import CreateActionRequest
 from use_cases.create_rendezvous_request import CreateRendezvousRequest
 
 web = Blueprint('web', __name__)
+
+
+@web.route('/conseillers/<conseiller_id>/actions', methods=['GET'])
+@cross_origin()
+def get_jeune_actions_sum_up(conseiller_id: str):
+    sum_ups = home_conseiller_use_case.get_jeune_actions_sum_up(conseiller_id)
+    json_sum_ups = list(map(lambda x: JsonJeuneActionsSumUp(x).__dict__, sum_ups))
+    return jsonify(json_sum_ups), 200
 
 
 @web.route('/jeunes/<jeune_id>/action', methods=['POST'])

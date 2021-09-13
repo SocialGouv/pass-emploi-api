@@ -18,8 +18,9 @@ generic_comments = [
 
 
 class RendezvousDatabaseDatasource:
-    def __init__(self, db: SQLAlchemy):
-        self.db = db
+
+    def __init__(self, database: SQLAlchemy):
+        self.db = database
 
     def get_jeune_rendezvous(self, jeune_id: str, rendezvous_limit_date: datetime) -> [SqlRendezvous]:
         return SqlRendezvous.query \
