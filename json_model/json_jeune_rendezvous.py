@@ -1,7 +1,7 @@
 from model.rendezvous import Rendezvous
 
 
-class JsonRendezvous:
+class JsonJeuneRendezvous:
     def __init__(self, rendezvous: Rendezvous):
         self.id = rendezvous.id
         self.title = rendezvous.title
