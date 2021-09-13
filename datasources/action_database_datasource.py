@@ -48,4 +48,5 @@ class ActionDatabaseDatasource:
         sql_action = SqlAction.query.filter_by(id=action_id).first()
         if sql_action is not None:
             sql_action.isDone = action_status
+            sql_action.lastUpdate = datetime.utcnow(),
             self.db.session.commit()
