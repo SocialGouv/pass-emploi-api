@@ -22,9 +22,12 @@ class RendezvousUseCase:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
         return self.rendezvousRepository.get_jeune_rendezvous(jeune, rendezvous_limit_date=datetime.utcnow())
 
-    def get_conseiller_rendezvous(self) -> [Rendezvous]:
+    def get_conseiller_rendezvous_deprecated(self) -> [Rendezvous]:
         conseiller = self.conseillerRepository.get_random_conseiller()
-        return self.rendezvousRepository.get_conseiller_rendezvous(conseiller)
+        return self.rendezvousRepository.get_conseiller_rendezvous_deprecated(conseiller)
+
+    def get_conseiller_rendezvous(self, conseiller_id: str) -> [Rendezvous]:
+        return self.rendezvousRepository.get_conseiller_rendezvous(conseiller_id)
 
     def create_rendezvous(self, request: CreateRendezvousRequest) -> None:
         jeune = self.jeuneRepository.get_jeune(request.jeuneId)

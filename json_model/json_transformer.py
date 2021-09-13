@@ -3,7 +3,7 @@ from json_model.json_conseiller import JsonConseiller
 from json_model.json_home_conseiller import JsonHomeConseiller
 from json_model.json_home_jeune import JsonHomeJeune
 from json_model.json_jeune import JsonJeune
-from json_model.json_rendezvous import JsonRendezvous
+from json_model.json_jeune_rendezvous import JsonJeuneRendezvous
 from model.home_conseiller import HomeConseiller
 from model.home_jeune import HomeJeune
 
@@ -11,7 +11,7 @@ from model.home_jeune import HomeJeune
 def to_json(home):
     if type(home) is HomeJeune:
         actions_list = list(map(lambda x: JsonAction(x).__dict__, home.actions))
-        rendezvous_list = list(map(lambda x: JsonRendezvous(x).__dict__, home.rendezvous))
+        rendezvous_list = list(map(lambda x: JsonJeuneRendezvous(x).__dict__, home.rendezvous))
         return JsonHomeJeune(
             actions_list,
             home.doneActionsCount,
