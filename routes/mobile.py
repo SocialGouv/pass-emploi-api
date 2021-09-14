@@ -1,7 +1,7 @@
 from flask import request, abort, Blueprint
 from flask_cors import cross_origin
 
-from initialize_app import IS_DEV
+from initialize_app import INSERT_MOCK_DATA
 from initialize_use_cases import home_jeune_use_case, jeune_use_case, home_conseiller_use_case
 from json_model.json_transformer import to_json
 from network.headers_logger import log_headers
@@ -29,7 +29,7 @@ def post_jeune():
         request.json['firstName'],
         request.json['lastName']
     )
-    if IS_DEV:
+    if INSERT_MOCK_DATA:
         jeune_use_case.create_jeune_with_default_actions_and_rendezvous(create_jeune_request)
     else:
         jeune_use_case.create_jeune(create_jeune_request)
