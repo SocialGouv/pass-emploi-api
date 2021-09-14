@@ -24,6 +24,23 @@ CREATE DATABASE passemploidbdev;
 exit
 ```
 
+## Accéder aux bases de données SCALINGO à distance
+
+1. Au préalable, il faut bien avoir installer le CLI Scalingo sur sa machine [https://cli.scalingo.com].
+2. Pour la base de staging, dans un terminal, lancer la commande
+   suivante : `$ scalingo -a pa-back-staging pgsql-console`
+3. Pour la base de prod, dans un terminal, lancer la commande suivante : `$ scalingo -a pa-back-prod pgsql-console`
+
+Pour purger les données, vous pouvez effectuer les commandes suivantes (en rajoutant un conseiller dans l'état actuelle
+de l'application) :
+
+```sql
+TRUNCATE TABLE jeune CASCADE;
+TRUNCATE TABLE conseiller CASCADE;
+INSERT INTO conseiller (id, first_name, last_name)
+VALUES (1, 'Nils', 'Willis');
+```
+
 ## Installation de l'outil pour les migrations de base
 
 1. `$ pip install alambic`
