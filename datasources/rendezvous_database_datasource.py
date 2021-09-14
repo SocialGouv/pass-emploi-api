@@ -18,8 +18,9 @@ generic_comments = [
 
 
 class RendezvousDatabaseDatasource:
-    def __init__(self, db: SQLAlchemy):
-        self.db = db
+
+    def __init__(self, database: SQLAlchemy):
+        self.db = database
 
     def get_jeune_rendezvous(self, jeune_id: str, rendezvous_limit_date: datetime) -> [SqlRendezvous]:
         return SqlRendezvous.query \
@@ -27,10 +28,9 @@ class RendezvousDatabaseDatasource:
             .filter(SqlRendezvous.date >= rendezvous_limit_date) \
             .all()
 
-    def get_conseiller_rendezvous(self, conseiller_id: str, rendezvous_limit_date: datetime) -> [SqlRendezvous]:
+    def get_conseiller_rendezvous(self, conseiller_id: str) -> [SqlRendezvous]:
         return SqlRendezvous.query \
             .filter_by(conseillerId=int(conseiller_id)) \
-            .filter(SqlRendezvous.date >= rendezvous_limit_date) \
             .order_by(SqlRendezvous.date) \
             .all()
 
@@ -42,9 +42,9 @@ class RendezvousDatabaseDatasource:
                 title='Rendez-vous conseiller',
                 subtitle='avec ' + conseiller.firstName,
                 comment=random_comment,
-                modality='Par tel',
+                modality=random.choice(['Par téléphone', 'À l\'agence']),
                 date=datetime(2022, 12, 12),
-                duration=timedelta(minutes=60),
+                duration=timedelta(minutes=random.choice([30, 60, 90, 120])),
                 jeuneId=jeune.id,
                 conseillerId=conseiller.id
             )

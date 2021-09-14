@@ -1,6 +1,6 @@
 from waitress import serve
 
-from initialize_app import app, IS_DEV
+from initialize_app import app, DEBUG
 from initialize_db import run_migrations
 from routes.common_routes import common_routes
 from routes.mobile import mobile
@@ -18,7 +18,7 @@ def health_check():
 
 
 if __name__ == '__main__':
-    if IS_DEV:
+    if DEBUG:
         app.run(debug=True, use_reloader=False)
     else:
         serve(app)

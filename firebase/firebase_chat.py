@@ -13,8 +13,10 @@ class FirebaseChat:
         app = firebase_admin.initialize_app(cred)
         self.client = firestore.client(app)
 
-    def initialise_chat_if_required(self, jeune_id, conseiller_id):
-        firebase_documents = self.client.collection('chat') \
+    def initialise_chat_if_required(self, jeune_id, conseiller_id) -> None:
+        firebase_env = os.environ.get('FIREBASE_ENVIRONMENT_PREFIX')
+        chat_collection_path = firebase_env + '-chat'
+        firebase_documents = self.client.collection(chat_collection_path) \
             .where('jeuneId', '==', jeune_id) \
             .where('conseillerId', '==', conseiller_id) \
             .get()
@@ -24,4 +26,4 @@ class FirebaseChat:
                 u'jeuneId': jeune_id,
                 u'conseillerId': conseiller_id,
             }
-            self.client.collection('chat').add(new_document)
+            self.client.collection(chat_collection_path).add(new_document)

@@ -15,7 +15,8 @@ from use_cases.home_jeune_use_case import HomeJeuneUseCase
 class TestHomeJeuneUseCase:
 
     def test_get_home_when_multiple_actions_should_only_return_two_most_recent_todo_ones(
-            self, jeune_repository,
+            self,
+            jeune_repository,
             action_repository,
             rendezvous_repository
     ):
@@ -36,7 +37,8 @@ class TestHomeJeuneUseCase:
         assert home.doneActionsCount == 1
 
     def test_get_home_when_less_than_two_actions_should_only_return_all_todo_ones(
-            self, jeune_repository,
+            self,
+            jeune_repository,
             action_repository,
             rendezvous_repository
     ):
