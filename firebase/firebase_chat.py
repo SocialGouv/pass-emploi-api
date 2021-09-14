@@ -15,7 +15,7 @@ class FirebaseChat:
 
     def initialise_chat_if_required(self, jeune_id, conseiller_id) -> None:
         firebase_env = os.environ.get('FIREBASE_ENVIRONMENT_PREFIX')
-        chat_collection_path = firebase_env + '/chat'
+        chat_collection_path = firebase_env + '-chat'
         firebase_documents = self.client.collection(chat_collection_path) \
             .where('jeuneId', '==', jeune_id) \
             .where('conseillerId', '==', conseiller_id) \
