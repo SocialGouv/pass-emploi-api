@@ -1,4 +1,4 @@
-from flask import request, jsonify, Blueprint
+from flask import abort, request, jsonify, Blueprint
 from flask_cors import cross_origin
 
 from initialize_app import INSERT_MOCK_DATA
@@ -75,3 +75,13 @@ def get_jeunes():
     jeunes = conseiller_use_case.get_jeunes()
     json_jeunes = list(map(lambda x: JsonJeune(x).__dict__, jeunes))
     return jsonify(json_jeunes), 200
+
+
+@web.route('/conseiller/<conseiller_id>/authentication', methods=['GET'])
+@cross_origin()
+def get_conseiller_informations(conseiller_id: str):
+    conseiller_informations = conseiller_use_case.get_conseiller_informations(conseiller_id)
+    if conseiller_informations.conseiller is not None:
+        return to_json(conseiller_informations), 200
+    else:
+        abort(401)
