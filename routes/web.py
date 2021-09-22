@@ -48,13 +48,6 @@ def post_rendezvous(conseiller_id: str):
     return '', 201
 
 
-@web.route('/conseiller/rendezvous', methods=['GET'])
-def get_rendezvous_deprecated():
-    rendezvous = rendezvous_use_case.get_conseiller_rendezvous_deprecated()
-    json_rendez_vous = list(map(lambda x: JsonJeuneRendezvous(x).__dict__, rendezvous))
-    return jsonify(json_rendez_vous), 200
-
-
 @web.route('/conseillers/<conseiller_id>/rendezvous', methods=['GET'])
 def get_rendezvous(conseiller_id: str):
     rendezvous = rendezvous_use_case.get_conseiller_rendezvous(conseiller_id)
@@ -69,16 +62,7 @@ def get_home_conseiller(jeune_id: str):
     return to_json(home_conseiller), 200
 
 
-@web.route('/conseiller/jeunes', methods=['GET'])
-@cross_origin()
-def get_jeunes():
-    jeunes = conseiller_use_case.get_jeunes()
-    json_jeunes = list(map(lambda x: JsonJeune(x).__dict__, jeunes))
-    return jsonify(json_jeunes), 200
-
-
-@web.route('/conseiller/<conseiller_id>/authentication', methods=['GET'])
-@cross_origin()
+@web.route('/conseillers/<conseiller_id>/signin', methods=['GET'])
 def get_conseiller_informations(conseiller_id: str):
     conseiller_informations = conseiller_use_case.get_conseiller_informations(conseiller_id)
     if conseiller_informations.conseiller is not None:

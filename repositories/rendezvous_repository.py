@@ -19,14 +19,6 @@ class RendezvousRepository:
             )
         )
 
-    def get_conseiller_rendezvous_deprecated(self, conseiller: Conseiller) -> [Rendezvous]:
-        return list(
-            map(
-                lambda rdv: to_rendezvous(rdv),
-                self.rendezvousDatasource.get_conseiller_rendezvous(conseiller.id)
-            )
-        )
-
     def get_conseiller_rendezvous(self, conseiller_id: str) -> [Rendezvous]:
         return list(
             map(
