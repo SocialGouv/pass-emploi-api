@@ -4,9 +4,7 @@ from flask_cors import cross_origin
 from initialize_app import INSERT_MOCK_DATA
 from initialize_use_cases import home_conseiller_use_case, rendezvous_use_case, conseiller_use_case
 from json_model.json_conseiller_rendezvous import JsonConseillerRendezvous
-from json_model.json_jeune import JsonJeune
 from json_model.json_jeune_actions_sum_up import JsonJeuneActionsSumUp
-from json_model.json_jeune_rendezvous import JsonJeuneRendezvous
 from json_model.json_transformer import to_json
 from use_cases.create_action_request import CreateActionRequest
 from use_cases.create_rendezvous_request import CreateRendezvousRequest

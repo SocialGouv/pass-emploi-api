@@ -1,12 +1,11 @@
 from flask import request, abort, Blueprint
 from flask_cors import cross_origin
 
-from initialize_app import INSERT_MOCK_DATA
 from initialize_use_cases import home_jeune_use_case, jeune_use_case, home_conseiller_use_case
+from json_model.json_jeune import JsonJeune
 from json_model.json_transformer import to_json
 from network.headers_logger import log_headers
 from use_cases.create_action_request import CreateActionRequest
-from use_cases.create_jeune_request import CreateJeuneRequest
 
 mobile = Blueprint('mobile', __name__)
 
@@ -21,19 +20,15 @@ def get_home_jeune(jeune_id: str):
         abort(404)
 
 
-@mobile.route('/jeunes', methods=['POST'])
-def post_jeune():
+@mobile.route('/jeunes/<jeune_id>/signin', methods=['POST'])
+def jeune_signin(jeune_id: str):
     log_headers()
-    create_jeune_request = CreateJeuneRequest(
-        request.json['id'],
-        request.json['firstName'],
-        request.json['lastName']
-    )
-    if INSERT_MOCK_DATA:
-        jeune_use_case.create_jeune_with_default_actions_and_rendezvous(create_jeune_request)
+    jeune = jeune_use_case.check_if_jeune_exists(jeune_id)
+    if jeune is not None:
+        jeune_use_case.initialise_chat_if_required(jeune_id)
+        return JsonJeune(jeune).__dict__, 200
     else:
-        jeune_use_case.create_jeune(create_jeune_request)
-    return '', 201
+        abort(401)
 
 
 @mobile.route('/jeunes/<jeune_id>/action', methods=['POST'])

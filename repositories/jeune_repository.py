@@ -42,6 +42,10 @@ class JeuneRepository:
         sql_jeune = self.jeuneDatasource.get(jeune_id)
         return to_jeune(sql_jeune) if sql_jeune is not None else None
 
+    def initialise_chat_if_required(self, jeune_id: str):
+        sql_jeune = self.jeuneDatasource.get(jeune_id)
+        self.firebaseChat.initialise_chat_if_required(sql_jeune.id, sql_jeune.conseillerId)
+
     def create_jeune(self, request: CreateJeuneRequest) -> Jeune:
         conseiller = self.conseillerRepository.get_random_conseiller()
         sql_jeune = SqlJeune(
