@@ -19,6 +19,3 @@ class ConseillerRepository:
     def get_conseiller(self, conseiller_id: str) -> Conseiller:
         sql_conseiller = self.conseillerDatasource.get(int(conseiller_id))
         return to_conseiller(sql_conseiller) if sql_conseiller is not None else None
-
-    def get_random_conseiller(self) -> Conseiller:
-        return to_conseiller(self.conseillerDatasource.get_random_conseiller())

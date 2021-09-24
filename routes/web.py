@@ -1,7 +1,6 @@
 from flask import abort, request, jsonify, Blueprint
 from flask_cors import cross_origin
 
-from initialize_app import INSERT_MOCK_DATA
 from initialize_use_cases import home_conseiller_use_case, rendezvous_use_case, conseiller_use_case
 from json_model.json_conseiller_rendezvous import JsonConseillerRendezvous
 from json_model.json_jeune_actions_sum_up import JsonJeuneActionsSumUp
@@ -55,8 +54,7 @@ def get_rendezvous(conseiller_id: str):
 
 @web.route('/conseiller/jeunes/<jeune_id>/actions', methods=['GET'])
 def get_home_conseiller(jeune_id: str):
-    home_conseiller = home_conseiller_use_case.get_mocked_jeune_actions(jeune_id) if INSERT_MOCK_DATA \
-        else home_conseiller_use_case.get_jeune_actions(jeune_id)
+    home_conseiller = home_conseiller_use_case.get_jeune_actions(jeune_id)
     return to_json(home_conseiller), 200
 
 

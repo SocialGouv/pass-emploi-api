@@ -10,6 +10,5 @@ with app.app_context():
     app.logger.propagate = False
     load_dotenv(dotenv_path='./.env')
     DEBUG = (os.getenv('DEBUG', 'False') == 'True')
-    INSERT_MOCK_DATA = (os.getenv('INSERT_MOCK_DATA', 'False') == 'True')
     if os.environ.get('SQLALCHEMY_DATABASE_URI') is None:
         app.logger.error('Warning: database URL is not set')

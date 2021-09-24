@@ -13,9 +13,6 @@ class ActionRepository:
     def add_action(self, action: Action) -> None:
         self.actionDatasource.add_action(to_sql_action(action))
 
-    def create_mocked_actions(self, jeune: Jeune) -> None:
-        self.actionDatasource.create_mocked_actions(jeune.id)
-
     def get_actions(self, jeune: Jeune) -> [Action]:
         return list(map(lambda a: to_action(a), self.actionDatasource.get_actions(jeune.id)))
 
