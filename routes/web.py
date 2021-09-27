@@ -58,7 +58,7 @@ def get_home_conseiller(jeune_id: str):
     return to_json(home_conseiller), 200
 
 
-@web.route('/conseillers/<conseiller_id>/signin', methods=['GET'])
+@web.route('/conseillers/<conseiller_id>/login', methods=['GET'])
 def get_conseiller_informations(conseiller_id: str):
     conseiller_informations = conseiller_use_case.get_conseiller_informations(conseiller_id)
     if conseiller_informations.conseiller is not None:

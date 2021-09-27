@@ -20,8 +20,8 @@ def get_home_jeune(jeune_id: str):
         abort(404)
 
 
-@mobile.route('/jeunes/<jeune_id>/signin', methods=['POST'])
-def jeune_signin(jeune_id: str):
+@mobile.route('/jeunes/<jeune_id>/login', methods=['POST'])
+def jeune_login(jeune_id: str):
     log_headers()
     jeune = jeune_use_case.check_if_jeune_exists(jeune_id)
     if jeune is not None:
