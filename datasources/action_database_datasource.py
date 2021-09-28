@@ -35,7 +35,8 @@ class ActionDatabaseDatasource:
             jeune.last_name as jeune_last_name,
             COUNT(CASE WHEN is_done = false AND jeune_id = jeune.id THEN 1 END) as todo_actions_count,
             COUNT(CASE WHEN is_done = true AND jeune_id = jeune.id THEN 1 END) as done_actions_count
-            FROM action RIGHT JOIN jeune ON action.jeune_id IN (SELECT id FROM jeune WHERE conseiller_id = %s)
+            FROM action RIGHT JOIN jeune ON action.jeune_id = jeune.id
+            WHERE conseiller_id = %s
             GROUP BY jeune.id
             ORDER BY jeune.last_name;
         """
