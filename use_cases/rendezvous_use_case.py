@@ -44,3 +44,6 @@ class RendezvousUseCase:
             conseiller=conseiller
         )
         self.rendezvousRepository.add_rendezvous(rendezvous)
+
+    def delete_rendezvous(self, rendezvous_id: str):
+        self.rendezvousRepository.delete_rendezvous(rendezvous_id)

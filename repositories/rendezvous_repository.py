@@ -28,3 +28,6 @@ class RendezvousRepository:
 
     def add_rendezvous(self, rendezvous: Rendezvous) -> None:
         self.rendezvousDatasource.add_rendezvous(to_sql_rendezvous(rendezvous))
+
+    def delete_rendezvous(self, rendezvous_id: str):
+        self.rendezvousDatasource.delete_rendezvous(rendezvous_id)

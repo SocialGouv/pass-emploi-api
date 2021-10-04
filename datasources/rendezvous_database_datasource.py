@@ -25,3 +25,7 @@ class RendezvousDatabaseDatasource:
     def add_rendezvous(self, sql_rendezvous: SqlRendezvous) -> None:
         self.db.session.add(sql_rendezvous)
         self.db.session.commit()
+
+    def delete_rendezvous(self, rendezvous_id: str):
+        SqlRendezvous.query.filter_by(id=int(rendezvous_id)).delete()
+        self.db.session.commit()
