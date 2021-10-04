@@ -45,6 +45,13 @@ def post_rendezvous(conseiller_id: str):
     return '', 201
 
 
+@web.route('/rendezvous/<rendezvous_id>', methods=['DELETE'])
+@cross_origin()
+def delete_rendezvous(rendezvous_id: str):
+    rendezvous_use_case.delete_rendezvous(rendezvous_id)
+    return '', 200
+
+
 @web.route('/conseillers/<conseiller_id>/rendezvous', methods=['GET'])
 def get_rendezvous(conseiller_id: str):
     rendezvous = rendezvous_use_case.get_conseiller_rendezvous(conseiller_id)
