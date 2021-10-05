@@ -14,7 +14,8 @@ def test_to_rendezvous():
     date = datetime.utcnow()
     duration = timedelta(minutes=60)
     sql_conseiller = SqlConseiller(id=1, firstName='Nils', lastName='Tavernier')
-    sql_jeune = SqlJeune(id='2', firstName='Kendji', lastName='Girac', conseiller=sql_conseiller)
+    sql_jeune = SqlJeune(id='2', firstName='Kendji', lastName='Girac', creationDate=datetime(2020, 5, 10),
+                         conseiller=sql_conseiller)
     sql_rendezvous = SqlRendezvous(
         id=4,
         title='title',
@@ -41,6 +42,7 @@ def test_to_rendezvous():
     assert rendezvous.jeune.id == '2'
     assert rendezvous.jeune.firstName == 'Kendji'
     assert rendezvous.jeune.lastName == 'Girac'
+    assert rendezvous.jeune.creationDate == datetime(2020, 5, 10)
     assert rendezvous.jeune.conseiller.id == '1'
     assert rendezvous.jeune.conseiller.firstName == 'Nils'
     assert rendezvous.jeune.conseiller.lastName == 'Tavernier'
@@ -51,7 +53,7 @@ def test_to_sql_rendezvous():
     date = datetime.utcnow()
     duration = timedelta(minutes=60)
     conseiller = Conseiller('1', 'Nils', 'Tavernier')
-    jeune = Jeune('2', 'Kendji', 'Girac', 'firebase_token', datetime.utcnow(), conseiller)
+    jeune = Jeune('2', 'Kendji', 'Girac', datetime(2020, 5, 10), 'firebase_token', datetime.utcnow(), conseiller)
     rendezvous = Rendezvous(
         id='3',
         title='title',

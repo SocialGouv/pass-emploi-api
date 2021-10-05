@@ -14,7 +14,8 @@ def test_to_action():
     creation_date = datetime.utcnow()
     last_update = datetime.utcnow()
     sql_conseiller = SqlConseiller(id=1, firstName='Nils', lastName='Tavernier')
-    sql_jeune = SqlJeune(id='2', firstName='Kendji', lastName='Girac', conseiller=sql_conseiller)
+    sql_jeune = SqlJeune(id='2', firstName='Kendji', lastName='Girac', creationDate=datetime(2020, 5, 10),
+                         conseiller=sql_conseiller)
     sql_action = SqlAction(
         id=3,
         content='content',
@@ -38,6 +39,7 @@ def test_to_action():
     assert action.jeune.id == '2'
     assert action.jeune.firstName == 'Kendji'
     assert action.jeune.lastName == 'Girac'
+    assert action.jeune.creationDate == datetime(2020, 5, 10)
     assert action.jeune.conseiller.id == '1'
     assert action.jeune.conseiller.firstName == 'Nils'
     assert action.jeune.conseiller.lastName == 'Tavernier'
@@ -48,7 +50,7 @@ def test_to_sql_action():
     creation_date = datetime.utcnow()
     last_update = datetime.utcnow()
     conseiller = Conseiller('1', 'Nils', 'Tavernier')
-    jeune = Jeune('2', 'Kendji', 'Girac', 'firebase_token', datetime.utcnow(), conseiller)
+    jeune = Jeune('2', 'Kendji', 'Girac', datetime(2020, 5, 10), 'firebase_token', datetime.utcnow(), conseiller)
     action = Action('content', 'comment', True, creation_date, last_update, jeune)
 
     # When
