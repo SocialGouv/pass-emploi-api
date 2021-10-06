@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask_sqlalchemy import SQLAlchemy
 
 from sql_model.sql_jeune import SqlJeune
@@ -16,3 +18,8 @@ class JeuneDatabaseDatasource:
 
     def get_jeunes_list(self, conseiller_id: int):
         return SqlJeune.query.filter_by(conseillerId=conseiller_id).all()
+
+    def update_firebase_notification_informations(self, jeune_id: str, registration_token: str):
+        SqlJeune.query.filter_by(id=jeune_id).update({"firebaseToken": registration_token,
+                                                      "tokenLastUpdate": datetime.utcnow()})
+        self.db.session.commit()

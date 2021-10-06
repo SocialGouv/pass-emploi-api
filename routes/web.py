@@ -27,6 +27,7 @@ def post_action(jeune_id: str):
         request.json['isDone']
     )
     home_conseiller_use_case.create_action(create_action_request, jeune_id)
+    home_conseiller_use_case.send_action_notification(jeune_id)
     return '', 201
 
 
@@ -72,3 +73,11 @@ def get_conseiller_informations(conseiller_id: str):
         return to_json(conseiller_informations), 200
     else:
         abort(401)
+
+
+@web.route('/conseillers/<conseiller_id>/jeunes/<jeune_id>/notify-message', methods=['POST'])
+@cross_origin()
+def notify_message(jeune_id: str, conseiller_id: str):
+    if home_conseiller_use_case.check_jeune_has_correct_conseiller(conseiller_id, jeune_id):
+        home_conseiller_use_case.send_message_notification(jeune_id)
+    return '', 201

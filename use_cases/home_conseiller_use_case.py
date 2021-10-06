@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from firebase.push_notification_messages import NEW_ACTION_NOTIFICATION_MESSAGE, NEW_MESSAGE_NOTIFICATION_MESSAGE
+from firebase.send_push_notifications import send_firebase_push_notifications
 from model.action import Action
 from model.home_conseiller import HomeConseiller
 from model.jeune_actions_sum_up import JeuneActionsSumUp
@@ -33,3 +35,17 @@ class HomeConseillerUseCase:
 
     def get_jeune_actions_sum_up(self, conseiller_id: str) -> [JeuneActionsSumUp]:
         return self.actionRepository.get_actions_sum_up_for_home_conseiller(conseiller_id)
+
+    def check_jeune_has_correct_conseiller(self, conseiller_id: str, jeune_id: str):
+        jeune = self.jeuneRepository.get_jeune(jeune_id)
+        return jeune is not None and jeune.conseiller.id == conseiller_id
+
+    def send_action_notification(self, jeune_id: str):
+        jeune = self.jeuneRepository.get_jeune(jeune_id)
+        registration_token = jeune.firebaseToken
+        send_firebase_push_notifications(registration_token, NEW_ACTION_NOTIFICATION_MESSAGE)
+
+    def send_message_notification(self, jeune_id: str):
+        jeune = self.jeuneRepository.get_jeune(jeune_id)
+        registration_token = jeune.firebaseToken
+        send_firebase_push_notifications(registration_token, NEW_MESSAGE_NOTIFICATION_MESSAGE)

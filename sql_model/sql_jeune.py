@@ -6,5 +6,7 @@ class SqlJeune(db.Model):
     id = db.Column(db.String(255), primary_key=True)
     firstName = db.Column(db.String(255), name='first_name')
     lastName = db.Column(db.String(255), name='last_name')
+    firebaseToken = db.Column(db.String(255), name='firebase_token', nullable=True)
+    tokenLastUpdate = db.Column(db.TIMESTAMP, name='token_last_update', nullable=True)
     conseillerId = db.Column(db.Integer, db.ForeignKey('conseiller.id'), name='conseiller_id')
     conseiller = db.relationship('SqlConseiller', backref=db.backref('jeune_conseiller', lazy=False))

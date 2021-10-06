@@ -42,3 +42,15 @@ def post_action(jeune_id: str):
     )
     home_conseiller_use_case.create_action(create_action_request, jeune_id)
     return '', 201
+
+
+@mobile.route('/jeunes/<jeune_id>/push-notification-token', methods=['PUT'])
+def put_notification_token(jeune_id: str):
+    log_headers()
+    registration_token = request.json['registration_token']
+    jeune = jeune_use_case.check_if_jeune_exists(jeune_id)
+    if jeune is not None:
+        jeune_use_case.update_firebase_notification_informations(jeune_id, registration_token)
+        return '', 200
+    else:
+        abort(401)

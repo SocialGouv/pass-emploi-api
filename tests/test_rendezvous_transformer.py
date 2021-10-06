@@ -49,7 +49,7 @@ def test_to_sql_rendezvous():
     date = datetime.utcnow()
     duration = timedelta(minutes=60)
     conseiller = Conseiller('1', 'Nils', 'Tavernier')
-    jeune = Jeune('2', 'Kendji', 'Girac', conseiller)
+    jeune = Jeune('2', 'Kendji', 'Girac', 'firebase_token', datetime.utcnow(), conseiller)
     rendezvous = Rendezvous(
         id='3',
         title='title',
