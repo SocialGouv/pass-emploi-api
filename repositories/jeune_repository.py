@@ -17,3 +17,6 @@ class JeuneRepository:
     def initialise_chat_if_required(self, jeune_id: str):
         sql_jeune = self.jeuneDatasource.get(jeune_id)
         self.firebaseChat.initialise_chat_if_required(sql_jeune.id, sql_jeune.conseillerId)
+
+    def update_firebase_notification_informations(self, jeune_id: str, registration_token: str):
+        self.jeuneDatasource.update_firebase_notification_informations(jeune_id, registration_token)

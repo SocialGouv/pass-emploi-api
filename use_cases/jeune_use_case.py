@@ -11,3 +11,6 @@ class JeuneUseCase:
 
     def initialise_chat_if_required(self, jeune_id: str):
         self.jeuneRepository.initialise_chat_if_required(jeune_id)
+
+    def update_firebase_notification_informations(self, jeune_id: str, registration_token: str):
+        self.jeuneRepository.update_firebase_notification_informations(jeune_id, registration_token)
