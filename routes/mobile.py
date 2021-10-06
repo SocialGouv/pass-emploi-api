@@ -47,7 +47,7 @@ def post_action(jeune_id: str):
 @mobile.route('/jeunes/<jeune_id>/push-notification-token', methods=['PUT'])
 def put_notification_token(jeune_id: str):
     log_headers()
-    registration_token = 'cocqlmSgQImFWqKti7KnGU:APA91bHPHDUgQ91T0r6zEtjehmb8qvXwgtxUiwM_v3Db1BW17_xXeyYeR5BxPyfwEknmGImQatkmQ5d3oY3tdXD6GldBR00iUkNi5FGYYUQCKDwnA78q5iAHEr9armz4pxraJKXp-NBN'
+    registration_token = request.json['registration_token']
     jeune = jeune_use_case.check_if_jeune_exists(jeune_id)
     if jeune is not None:
         jeune_use_case.update_firebase_notification_informations(jeune_id, registration_token)
