@@ -42,6 +42,7 @@ def post_rendezvous(conseiller_id: str):
         request.json['jeuneId'],
         conseiller_id,
     )
+    rendezvous_use_case.send_rendezvous_notification(request.json['jeuneId'])
     rendezvous_use_case.create_rendezvous(create_rendezvous_request)
     return '', 201
 
