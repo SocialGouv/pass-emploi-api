@@ -48,7 +48,7 @@ def test_to_sql_action():
     creation_date = datetime.utcnow()
     last_update = datetime.utcnow()
     conseiller = Conseiller('1', 'Nils', 'Tavernier')
-    jeune = Jeune('2', 'Kendji', 'Girac', conseiller)
+    jeune = Jeune('2', 'Kendji', 'Girac', 'firebase_token', datetime.utcnow(), conseiller)
     action = Action('content', 'comment', True, creation_date, last_update, jeune)
 
     # When
