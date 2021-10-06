@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 
+from firebase.push_notification_messages import NEW_RENDEZVOUS_NOTIFICATION_MESSAGE
+from firebase.send_push_notifications import send_firebase_push_notifications
 from model.rendezvous import Rendezvous
 from repositories.conseiller_repository import ConseillerRepository
 from repositories.jeune_repository import JeuneRepository
@@ -47,3 +49,8 @@ class RendezvousUseCase:
 
     def delete_rendezvous(self, rendezvous_id: str):
         self.rendezvousRepository.delete_rendezvous(rendezvous_id)
+
+    def send_rendezvous_notification(self, jeune_id: str):
+        jeune = self.jeuneRepository.get_jeune(jeune_id)
+        registration_token = jeune.firebaseToken
+        send_firebase_push_notifications(registration_token, NEW_RENDEZVOUS_NOTIFICATION_MESSAGE)

@@ -1,9 +1,7 @@
 from flask import abort, request, jsonify, Blueprint
 from flask_cors import cross_origin
 
-from firebase.push_notification_messages import NEW_ACTION_NOTIFICATION_MESSAGE
-from firebase.send_push_notifications import send_firebase_push_notifications
-from initialize_use_cases import home_conseiller_use_case, rendezvous_use_case, conseiller_use_case, jeune_use_case
+from initialize_use_cases import home_conseiller_use_case, rendezvous_use_case, conseiller_use_case
 from json_model.json_conseiller_rendezvous import JsonConseillerRendezvous
 from json_model.json_jeune_actions_sum_up import JsonJeuneActionsSumUp
 from json_model.json_transformer import to_json
@@ -29,8 +27,7 @@ def post_action(jeune_id: str):
         request.json['isDone']
     )
     home_conseiller_use_case.create_action(create_action_request, jeune_id)
-    registration_token = 'cKYt675vRNCDs6PFLtj1xB:APA91bHmvE_YwBAtkIfuJVRkSoPcZlxhFS5eyMNwOJb55FvCDPxHmef2DBC8zH9hyZJx1tRO6F1uZN0fXuq1kmsxhVtkETppvSXaHFx6hDzN14lfrkbvLWp9WSsO4bMhMk6F0zYIxA-b'
-    send_firebase_push_notifications(registration_token, NEW_ACTION_NOTIFICATION_MESSAGE)
+    home_conseiller_use_case.send_action_notification(jeune_id)
     return '', 201
 
 
@@ -81,5 +78,6 @@ def get_conseiller_informations(conseiller_id: str):
 @web.route('/conseillers/<conseiller_id>/jeunes/<jeune_id>/notify-message', methods=['POST'])
 @cross_origin()
 def notify_message(jeune_id: str, conseiller_id: str):
-    jeune_use_case.send_notification(jeune_id)
+    if home_conseiller_use_case.check_jeune_has_correct_conseiller(conseiller_id, jeune_id):
+        home_conseiller_use_case.send_message_notification(jeune_id)
     return '', 201
