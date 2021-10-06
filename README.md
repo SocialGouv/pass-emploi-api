@@ -24,6 +24,15 @@ CREATE DATABASE passemploidbdev;
 exit
 ```
 
+## Utilisation de la sandbox :
+
+Afin de pouvoir tester nos développements en local, on fait appel à un script qui permet de peupler la sandbox avec des 
+
+données à chaque lancement du backend. Le script enn question se trouve dans ``` sandbox/create_sandbox.py ``` . On peut
+ 
+l'alimenter si on a besoin d'autres données pour de nouveaux usecases.
+
+
 ## Accéder aux bases de données SCALINGO à distance
 
 1. Au préalable, il faut bien avoir installer le CLI Scalingo sur sa machine [https://cli.scalingo.com].

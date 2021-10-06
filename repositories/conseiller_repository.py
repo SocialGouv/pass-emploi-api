@@ -12,13 +12,10 @@ class ConseillerRepository:
         self.conseillerDatasource = conseiller_datasource
         self.jeuneDatasource = jeune_datasource
 
-    def get_jeunes(self, conseiller: Conseiller) -> [Jeune]:
-        sql_jeunes_list = self.jeuneDatasource.get_jeunes_list(int(conseiller.id))
+    def get_jeunes(self, conseiller_id: str) -> [Jeune]:
+        sql_jeunes_list = self.jeuneDatasource.get_jeunes_list(int(conseiller_id))
         return list(map(lambda sql_jeune: to_jeune(sql_jeune), sql_jeunes_list))
 
     def get_conseiller(self, conseiller_id: str) -> Conseiller:
         sql_conseiller = self.conseillerDatasource.get(int(conseiller_id))
         return to_conseiller(sql_conseiller) if sql_conseiller is not None else None
-
-    def get_random_conseiller(self) -> Conseiller:
-        return to_conseiller(self.conseillerDatasource.get_random_conseiller())

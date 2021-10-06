@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 
+from firebase.push_notification_messages import NEW_RENDEZVOUS_NOTIFICATION_MESSAGE
+from firebase.send_push_notifications import send_firebase_push_notifications
 from model.rendezvous import Rendezvous
 from repositories.conseiller_repository import ConseillerRepository
 from repositories.jeune_repository import JeuneRepository
@@ -21,10 +23,6 @@ class RendezvousUseCase:
     def get_jeune_rendezvous(self, jeune_id: str) -> [Rendezvous]:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
         return self.rendezvousRepository.get_jeune_rendezvous(jeune, rendezvous_limit_date=datetime.utcnow())
-
-    def get_conseiller_rendezvous_deprecated(self) -> [Rendezvous]:
-        conseiller = self.conseillerRepository.get_random_conseiller()
-        return self.rendezvousRepository.get_conseiller_rendezvous_deprecated(conseiller)
 
     def get_conseiller_rendezvous(self, conseiller_id: str) -> [Rendezvous]:
         return self.rendezvousRepository.get_conseiller_rendezvous(conseiller_id)
@@ -48,3 +46,11 @@ class RendezvousUseCase:
             conseiller=conseiller
         )
         self.rendezvousRepository.add_rendezvous(rendezvous)
+
+    def delete_rendezvous(self, rendezvous_id: str):
+        self.rendezvousRepository.delete_rendezvous(rendezvous_id)
+
+    def send_rendezvous_notification(self, jeune_id: str):
+        jeune = self.jeuneRepository.get_jeune(jeune_id)
+        registration_token = jeune.firebaseToken
+        send_firebase_push_notifications(registration_token, NEW_RENDEZVOUS_NOTIFICATION_MESSAGE)
