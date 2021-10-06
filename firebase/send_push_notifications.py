@@ -1,9 +1,9 @@
 from firebase_admin import messaging
 
 
-def send_firebase_push_notifications(registration_token: str, notification_data: dict):
+def send_firebase_push_notifications(registration_token: str, notification_message: str):
     message = messaging.Message(
-        data=notification_data,
+        notification=messaging.Notification(body=notification_message),
         token=registration_token,
     )
     response = messaging.send(message)

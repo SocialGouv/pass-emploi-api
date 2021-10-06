@@ -72,3 +72,4 @@ def get_conseiller_informations(conseiller_id: str):
         return to_json(conseiller_informations), 200
     else:
         abort(401)
+
