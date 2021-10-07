@@ -13,6 +13,7 @@ def to_rendezvous(sql_rendezvous: SqlRendezvous) -> Rendezvous:
         modality=sql_rendezvous.modality,
         date=sql_rendezvous.date,
         duration=sql_rendezvous.duration,
+        is_soft_deleted=sql_rendezvous.isSoftDeleted,
         jeune=to_jeune(sql_rendezvous.jeune),
         conseiller=to_conseiller(sql_rendezvous.conseiller),
     )
@@ -26,6 +27,7 @@ def to_sql_rendezvous(rendezvous: Rendezvous) -> SqlRendezvous:
         modality=rendezvous.modality,
         date=rendezvous.date,
         duration=rendezvous.duration,
+        isSoftDeleted=rendezvous.isSoftDeleted,
         jeuneId=rendezvous.jeune.id,
         conseillerId=rendezvous.conseiller.id,
     )

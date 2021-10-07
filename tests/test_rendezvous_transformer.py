@@ -22,6 +22,7 @@ def test_to_rendezvous():
         comment='comment',
         date=date,
         duration=duration,
+        isSoftDeleted=True,
         jeune=sql_jeune,
         conseiller=sql_conseiller
     )
@@ -36,6 +37,7 @@ def test_to_rendezvous():
     assert rendezvous.comment == 'comment'
     assert rendezvous.date == date
     assert rendezvous.duration == duration
+    assert rendezvous.isSoftDeleted
     assert rendezvous.jeune.id == '2'
     assert rendezvous.jeune.firstName == 'Kendji'
     assert rendezvous.jeune.lastName == 'Girac'
@@ -57,6 +59,7 @@ def test_to_sql_rendezvous():
         comment='comment',
         modality='modality',
         date=date,
+        is_soft_deleted=False,
         duration=duration,
         jeune=jeune,
         conseiller=conseiller

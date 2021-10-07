@@ -27,5 +27,5 @@ class RendezvousDatabaseDatasource:
         self.db.session.commit()
 
     def delete_rendezvous(self, rendezvous_id: str):
-        SqlRendezvous.query.filter_by(id=int(rendezvous_id)).delete()
+        SqlRendezvous.query.filter_by(id=int(rendezvous_id)).update({"isSoftDeleted": True})
         self.db.session.commit()

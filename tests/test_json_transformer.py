@@ -41,6 +41,7 @@ def test_to_json():
             modality='Par tel',
             date=datetime(2020, 2, 1, 16),
             duration=timedelta(minutes=60),
+            is_soft_deleted=False,
             jeune=jeune,
             conseiller=conseiller,
         ),
@@ -52,6 +53,7 @@ def test_to_json():
             modality='En visio',
             date=datetime(2020, 2, 8, 8),
             duration=timedelta(minutes=30),
+            is_soft_deleted=False,
             jeune=jeune,
             conseiller=conseiller,
         )

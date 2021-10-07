@@ -42,6 +42,7 @@ class RendezvousUseCase:
                 minutes=duration_as_datetime.minute,
                 seconds=duration_as_datetime.second
             ),
+            is_soft_deleted=False,
             jeune=jeune,
             conseiller=conseiller
         )
