@@ -18,11 +18,11 @@ class RendezvousRepository:
             )
         )
 
-    def get_conseiller_rendezvous(self, conseiller_id: str) -> [Rendezvous]:
+    def get_conseiller_rendezvous(self, conseiller_id: str, is_soft_deleted: bool) -> [Rendezvous]:
         return list(
             map(
                 lambda rdv: to_rendezvous(rdv),
-                self.rendezvousDatasource.get_conseiller_rendezvous(conseiller_id)
+                self.rendezvousDatasource.get_conseiller_rendezvous(conseiller_id, is_soft_deleted)
             )
         )
 

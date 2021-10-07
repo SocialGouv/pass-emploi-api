@@ -26,7 +26,7 @@ class RendezvousUseCase:
                                                               is_soft_deleted=False)
 
     def get_conseiller_rendezvous(self, conseiller_id: str) -> [Rendezvous]:
-        return self.rendezvousRepository.get_conseiller_rendezvous(conseiller_id)
+        return self.rendezvousRepository.get_conseiller_rendezvous(conseiller_id, is_soft_deleted=False)
 
     def create_rendezvous(self, request: CreateRendezvousRequest) -> None:
         jeune = self.jeuneRepository.get_jeune(request.jeuneId)
