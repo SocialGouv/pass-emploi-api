@@ -22,7 +22,7 @@ class TestRendezvousUseCase:
                                                                       mocked_rendezvous):
         # given
         conseiller = Conseiller("A", "F", "L")
-        jeune = Jeune("1", "F", "L", '', datetime.utcnow(), conseiller)
+        jeune = Jeune("1", "F", "L", datetime(2021, 1, 2), '', datetime.utcnow(), conseiller)
 
         jeune_repository.get_jeune = MagicMock(return_value=jeune)
         rendezvous_repository.get_jeune_rendezvous = MagicMock(return_value=[mocked_rendezvous])

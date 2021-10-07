@@ -8,6 +8,7 @@ def to_jeune(sql_jeune: SqlJeune) -> Jeune:
         sql_jeune.id,
         sql_jeune.firstName,
         sql_jeune.lastName,
+        sql_jeune.creationDate,
         sql_jeune.firebaseToken,
         sql_jeune.tokenLastUpdate,
         to_conseiller(sql_jeune.conseiller)
