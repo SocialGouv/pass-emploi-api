@@ -22,7 +22,8 @@ class RendezvousUseCase:
 
     def get_jeune_rendezvous(self, jeune_id: str) -> [Rendezvous]:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
-        return self.rendezvousRepository.get_jeune_rendezvous(jeune, rendezvous_limit_date=datetime.utcnow())
+        return self.rendezvousRepository.get_jeune_rendezvous(jeune, rendezvous_limit_date=datetime.utcnow(),
+                                                              is_soft_deleted=False)
 
     def get_conseiller_rendezvous(self, conseiller_id: str) -> [Rendezvous]:
         return self.rendezvousRepository.get_conseiller_rendezvous(conseiller_id)
