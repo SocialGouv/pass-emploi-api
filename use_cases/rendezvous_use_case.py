@@ -52,7 +52,16 @@ class RendezvousUseCase:
     def delete_rendezvous(self, rendezvous_id: str):
         self.rendezvousRepository.delete_rendezvous(rendezvous_id)
 
-    def send_rendezvous_notification(self, jeune_id: str):
+    def send_new_rendezvous_notification(self, jeune_id: str):
         jeune = self.jeuneRepository.get_jeune(jeune_id)
         registration_token = jeune.firebaseToken
         send_firebase_push_notifications(registration_token, NEW_RENDEZVOUS_NOTIFICATION_MESSAGE)
+
+    def send_rendezvous_is_deleted_notification(self, rendezvous_id: str):
+        rendezvous = self.rendezvousRepository.get_rendezvous(rendezvous_id)
+        registration_token = rendezvous.jeune.firebaseToken
+
+        notification_message = 'Votre rendez-vous du {:02d}/{:02d} à {:02d}:{:02d} est supprimé'.format(
+            rendezvous.date.day, rendezvous.date.month, rendezvous.date.hour, rendezvous.date.minute)
+
+        send_firebase_push_notifications(registration_token, notification_message)

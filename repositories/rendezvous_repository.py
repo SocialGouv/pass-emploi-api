@@ -10,6 +10,10 @@ class RendezvousRepository:
     def __init__(self, rendezvous_datasource: RendezvousDatabaseDatasource):
         self.rendezvousDatasource = rendezvous_datasource
 
+    def get_rendezvous(self, rendezvous_id: str) -> Rendezvous:
+        sql_rendezvous = self.rendezvousDatasource.get_rendezvous(rendezvous_id)
+        return to_rendezvous(sql_rendezvous)
+
     def get_jeune_rendezvous(self, jeune: Jeune, rendezvous_limit_date: datetime, is_soft_deleted: bool) -> [Rendezvous]:
         return list(
             map(
