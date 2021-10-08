@@ -42,7 +42,7 @@ def post_rendezvous(conseiller_id: str):
         request.json['jeuneId'],
         conseiller_id,
     )
-    rendezvous_use_case.send_rendezvous_notification(request.json['jeuneId'])
+    rendezvous_use_case.send_new_rendezvous_notification(request.json['jeuneId'])
     rendezvous_use_case.create_rendezvous(create_rendezvous_request)
     return '', 201
 
@@ -51,6 +51,7 @@ def post_rendezvous(conseiller_id: str):
 @cross_origin()
 def delete_rendezvous(rendezvous_id: str):
     rendezvous_use_case.delete_rendezvous(rendezvous_id)
+    rendezvous_use_case.send_rendezvous_is_deleted_notification(rendezvous_id)
     return '', 200
 
 

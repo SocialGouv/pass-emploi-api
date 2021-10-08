@@ -10,6 +10,9 @@ class RendezvousDatabaseDatasource:
     def __init__(self, database: SQLAlchemy):
         self.db = database
 
+    def get_rendezvous(self, rendezvous_id: str) -> SqlRendezvous:
+        return SqlRendezvous.query.filter_by(id=rendezvous_id).first()
+
     def get_jeune_rendezvous(self, jeune_id: str, rendezvous_limit_date: datetime, is_soft_deleted: bool) -> \
             [SqlRendezvous]:
         return SqlRendezvous.query \
