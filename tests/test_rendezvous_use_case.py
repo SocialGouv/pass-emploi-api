@@ -8,14 +8,12 @@ from freezegun.api import FakeDatetime
 from model.conseiller import Conseiller
 from model.jeune import Jeune
 from use_cases.rendezvous_use_case import RendezvousUseCase
-from firebase.send_push_notifications import send_firebase_push_notifications
 
 
 @mock.patch('repositories.jeune_repository.JeuneRepository')
 @mock.patch('repositories.conseiller_repository.ConseillerRepository')
 @mock.patch('repositories.rendezvous_repository.RendezvousRepository')
 @mock.patch('model.rendezvous.Rendezvous')
-@mock.patch('use_cases.rendezvous_use_case.send_firebase_push_notifications')
 @freeze_time('2021-01-02')
 class TestRendezvousUseCase:
     def test_get_jeune_rendezvous_returns_only_non_deleted_rendezvous(self, jeune_repository,
@@ -54,6 +52,7 @@ class TestRendezvousUseCase:
         assert rendezvous == [mocked_rendezvous]
         rendezvous_repository.get_conseiller_rendezvous.assert_called_with('A', is_soft_deleted=False)
 
+    @mock.patch('use_cases.rendezvous_use_case.send_firebase_push_notifications')
     def test_send_new_rendezvous_notification_should_not_send_notification_if_token_is_empty(self,
                                                                                              mocked_send_firebase_push_notifications,
                                                                                              mocked_rendezvous,
@@ -75,6 +74,7 @@ class TestRendezvousUseCase:
         # then
         mocked_send_firebase_push_notifications.assert_not_called()
 
+    @mock.patch('use_cases.rendezvous_use_case.send_firebase_push_notifications')
     def test_send_new_rendezvous_notification_should_not_throw_exceptions_if_firebase_crash(self,
                                                                                              mocked_send_firebase_push_notifications,
                                                                                              mocked_rendezvous,
