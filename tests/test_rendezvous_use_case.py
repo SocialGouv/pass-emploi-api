@@ -51,3 +51,49 @@ class TestRendezvousUseCase:
         # then
         assert rendezvous == [mocked_rendezvous]
         rendezvous_repository.get_conseiller_rendezvous.assert_called_with('A', is_soft_deleted=False)
+
+    @mock.patch('use_cases.rendezvous_use_case.send_firebase_push_notifications')
+    def test_send_new_rendezvous_notification_should_not_send_notification_if_token_is_empty(self,
+                                                                                             mocked_send_firebase_push_notifications,
+                                                                                             mocked_rendezvous,
+                                                                                             rendezvous_repository,
+                                                                                             conseiller_repository,
+                                                                                             jeune_repository):
+        # given
+        conseiller = Conseiller("A", "F", "L")
+        jeune = Jeune("1", "F", "L", datetime(2021, 1, 2), '', datetime.utcnow(), conseiller)
+
+        jeune_repository.get_jeune = MagicMock(return_value=jeune)
+        rendezvous_repository.get_jeune_rendezvous = MagicMock(return_value=[mocked_rendezvous])
+
+        use_case = RendezvousUseCase(jeune_repository, conseiller_repository, rendezvous_repository)
+
+        # when
+        use_case.send_new_rendezvous_notification(str(jeune.id))
+
+        # then
+        mocked_send_firebase_push_notifications.assert_not_called()
+
+    @mock.patch('use_cases.rendezvous_use_case.send_firebase_push_notifications')
+    def test_send_new_rendezvous_notification_should_not_throw_exceptions_if_firebase_crash(self,
+                                                                                             mocked_send_firebase_push_notifications,
+                                                                                             mocked_rendezvous,
+                                                                                             rendezvous_repository,
+                                                                                             conseiller_repository,
+                                                                                             jeune_repository):
+        # given
+        conseiller = Conseiller("A", "F", "L")
+        jeune = Jeune("1", "F", "L", datetime(2021, 1, 2), 'test', datetime.utcnow(), conseiller)
+
+        jeune_repository.get_jeune = MagicMock(return_value=jeune)
+        rendezvous_repository.get_jeune_rendezvous = MagicMock(return_value=[mocked_rendezvous])
+
+        mocked_send_firebase_push_notifications.side_effect = Exception
+
+        use_case = RendezvousUseCase(jeune_repository, conseiller_repository, rendezvous_repository)
+
+        # then
+        try:
+            use_case.send_new_rendezvous_notification(str(jeune.id))
+        except Exception:
+            assert False
