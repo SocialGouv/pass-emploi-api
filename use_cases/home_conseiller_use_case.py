@@ -43,7 +43,11 @@ class HomeConseillerUseCase:
     def send_action_notification(self, jeune_id: str):
         jeune = self.jeuneRepository.get_jeune(jeune_id)
         registration_token = jeune.firebaseToken
-        send_firebase_push_notifications(registration_token, NEW_ACTION_NOTIFICATION_MESSAGE)
+        if registration_token:
+            try:
+                send_firebase_push_notifications(registration_token, NEW_ACTION_NOTIFICATION_MESSAGE)
+            except Exception as e:
+                print(f'Token {registration_token}: {e} ')
 
     def send_message_notification(self, jeune_id: str):
         jeune = self.jeuneRepository.get_jeune(jeune_id)
