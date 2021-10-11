@@ -10,19 +10,23 @@ class RendezvousRepository:
     def __init__(self, rendezvous_datasource: RendezvousDatabaseDatasource):
         self.rendezvousDatasource = rendezvous_datasource
 
-    def get_jeune_rendezvous(self, jeune: Jeune, rendezvous_limit_date: datetime) -> [Rendezvous]:
+    def get_rendezvous(self, rendezvous_id: str) -> Rendezvous:
+        sql_rendezvous = self.rendezvousDatasource.get_rendezvous(rendezvous_id)
+        return to_rendezvous(sql_rendezvous)
+
+    def get_jeune_rendezvous(self, jeune: Jeune, rendezvous_limit_date: datetime, is_soft_deleted: bool) -> [Rendezvous]:
         return list(
             map(
                 lambda rdv: to_rendezvous(rdv),
-                self.rendezvousDatasource.get_jeune_rendezvous(jeune.id, rendezvous_limit_date)
+                self.rendezvousDatasource.get_jeune_rendezvous(jeune.id, rendezvous_limit_date, is_soft_deleted)
             )
         )
 
-    def get_conseiller_rendezvous(self, conseiller_id: str) -> [Rendezvous]:
+    def get_conseiller_rendezvous(self, conseiller_id: str, is_soft_deleted: bool) -> [Rendezvous]:
         return list(
             map(
                 lambda rdv: to_rendezvous(rdv),
-                self.rendezvousDatasource.get_conseiller_rendezvous(conseiller_id)
+                self.rendezvousDatasource.get_conseiller_rendezvous(conseiller_id, is_soft_deleted)
             )
         )
 

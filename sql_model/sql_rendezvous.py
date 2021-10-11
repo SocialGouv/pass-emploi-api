@@ -10,6 +10,7 @@ class SqlRendezvous(db.Model):
     modality = db.Column(db.String(2048), name='modality')
     date = db.Column(db.TIMESTAMP, name='date')
     duration = db.Column(db.Interval, name='duration')
+    isSoftDeleted = db.Column(db.Boolean, name='is_soft_deleted')
     jeuneId = db.Column(db.String(255), db.ForeignKey('jeune.id'), name='jeune_id')
     jeune = db.relationship('SqlJeune', backref=db.backref('rdv_jeune', lazy=False))
     conseillerId = db.Column(db.Integer, db.ForeignKey('conseiller.id'), name='conseiller_id')

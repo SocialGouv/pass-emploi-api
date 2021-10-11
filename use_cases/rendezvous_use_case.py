@@ -22,10 +22,11 @@ class RendezvousUseCase:
 
     def get_jeune_rendezvous(self, jeune_id: str) -> [Rendezvous]:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
-        return self.rendezvousRepository.get_jeune_rendezvous(jeune, rendezvous_limit_date=datetime.utcnow())
+        return self.rendezvousRepository.get_jeune_rendezvous(jeune, rendezvous_limit_date=datetime.utcnow(),
+                                                              is_soft_deleted=False)
 
     def get_conseiller_rendezvous(self, conseiller_id: str) -> [Rendezvous]:
-        return self.rendezvousRepository.get_conseiller_rendezvous(conseiller_id)
+        return self.rendezvousRepository.get_conseiller_rendezvous(conseiller_id, is_soft_deleted=False)
 
     def create_rendezvous(self, request: CreateRendezvousRequest) -> None:
         jeune = self.jeuneRepository.get_jeune(request.jeuneId)
@@ -42,6 +43,7 @@ class RendezvousUseCase:
                 minutes=duration_as_datetime.minute,
                 seconds=duration_as_datetime.second
             ),
+            is_soft_deleted=False,
             jeune=jeune,
             conseiller=conseiller
         )
@@ -50,7 +52,16 @@ class RendezvousUseCase:
     def delete_rendezvous(self, rendezvous_id: str):
         self.rendezvousRepository.delete_rendezvous(rendezvous_id)
 
-    def send_rendezvous_notification(self, jeune_id: str):
+    def send_new_rendezvous_notification(self, jeune_id: str):
         jeune = self.jeuneRepository.get_jeune(jeune_id)
         registration_token = jeune.firebaseToken
         send_firebase_push_notifications(registration_token, NEW_RENDEZVOUS_NOTIFICATION_MESSAGE)
+
+    def send_rendezvous_is_deleted_notification(self, rendezvous_id: str):
+        rendezvous = self.rendezvousRepository.get_rendezvous(rendezvous_id)
+        registration_token = rendezvous.jeune.firebaseToken
+
+        notification_message = 'Votre rendez-vous du {:02d}/{:02d} à {:02d}:{:02d} est supprimé'.format(
+            rendezvous.date.day, rendezvous.date.month, rendezvous.date.hour, rendezvous.date.minute)
+
+        send_firebase_push_notifications(registration_token, notification_message)

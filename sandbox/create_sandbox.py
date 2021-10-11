@@ -12,28 +12,28 @@ def create_sandbox() -> None:
             
             INSERT INTO rendezvous (id, title, subtitle, comment, modality, date, duration, jeune_id, conseiller_id)
                    VALUES ('1', 'Rendez-vous conseiller', 'avec Nils', 'Suivi des actions', 'Par téléphone', 
-                   '2021-09-24 10:00:00', '00:30:00', '1', '1');
+                   '2023-09-24 10:00:00', '00:30:00', '1', '1');
                    
             INSERT INTO rendezvous (id, title, subtitle, comment, modality, date, duration, jeune_id, conseiller_id)
                    VALUES ('2', 'Rendez-vous conseiller', 'avec Nils', 'Suivi des actions', 'Par téléphone', 
-                   '2021-09-25 10:00:00', '00:30:00', '1', '1');
+                   '2023-09-25 10:00:00', '00:30:00', '1', '1');
                    
             INSERT INTO rendezvous (id, title, subtitle, comment, modality, date, duration, jeune_id, conseiller_id)
                    VALUES ('3', 'Rendez-vous conseiller', 'avec Nils', 'Suivi des actions', 'Par téléphone', 
-                   '2021-09-26 10:00:00', '00:30:00', '1', '1');
+                   '2023-09-26 10:00:00', '00:30:00', '1', '1');
                    
             
             INSERT INTO action (id, content, comment, is_done, creation_date, last_update, jeune_id) VALUES
                     ('1', 'Suivre une formation', 'Consulter le catalogue des formations', 'false', 
-                    '2021-09-25 10:00:00', '2021-09-24 10:00:00', '1');
+                    '2023-09-25 10:00:00', '2023-09-24 10:00:00', '1');
                     
             INSERT INTO action (id, content, comment, is_done, creation_date, last_update, jeune_id) VALUES
                     ('2', 'Suivre une formation', 'Consulter le catalogue des formations', 'false', 
-                    '2021-09-25 10:00:00', '2021-09-24 10:00:00', '1');
+                    '2023-09-25 10:00:00', '2023-09-24 10:00:00', '1');
                     
             INSERT INTO action (id, content, comment, is_done, creation_date, last_update, jeune_id) VALUES
                     ('3', 'Suivre une formation', 'Consulter le catalogue des formations', 'false', 
-                    '2021-09-26 10:00:00', '2021-09-24 10:00:00', '1');              
+                    '2023-09-26 10:00:00', '2023-09-24 10:00:00', '1');              
         """
     db.engine.execute(query)
     db.session.commit()
