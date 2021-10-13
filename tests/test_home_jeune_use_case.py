@@ -21,11 +21,16 @@ class TestHomeJeuneUseCase:
             rendezvous_repository
     ):
         # Given
-        jeune = Jeune("1", "F", "L", datetime(2020, 5, 10), 'firebase_token', datetime.utcnow(), Conseiller("A", "F", "L"))
-        action1 = Action("Content1", "Comment1", False, datetime(2020, 5, 17), datetime(2020, 5, 20), jeune)
-        action2 = Action("Content2", "Comment2", False, datetime(2020, 5, 17), datetime(2020, 5, 21), jeune)
-        action3 = Action("Content3", "Comment3", False, datetime(2020, 5, 17), datetime(2020, 5, 19), jeune)
-        action4 = Action("Content4", "Comment3", True, datetime(2020, 5, 17), datetime(2020, 5, 17), jeune)
+        conseiller = Conseiller("A", "F", "L")
+        jeune = Jeune("1", "F", "L", datetime(2020, 5, 10), 'firebase_token', datetime.utcnow(), conseiller)
+        action1 = Action("Content1", "Comment1", False, True, datetime(2020, 5, 17), datetime(2020, 5, 20), jeune,
+                         conseiller)
+        action2 = Action("Content2", "Comment2", False, True, datetime(2020, 5, 17), datetime(2020, 5, 21), jeune,
+                         conseiller)
+        action3 = Action("Content3", "Comment3", False, True, datetime(2020, 5, 17), datetime(2020, 5, 19), jeune,
+                         conseiller)
+        action4 = Action("Content4", "Comment3", True, True, datetime(2020, 5, 17), datetime(2020, 5, 17), jeune,
+                         conseiller)
         actions = [action1, action2, action3, action4]
         use_case = get_home_use_case(jeune, actions, action_repository, jeune_repository, rendezvous_repository)
 
@@ -43,9 +48,12 @@ class TestHomeJeuneUseCase:
             rendezvous_repository
     ):
         # Given
-        jeune = Jeune("1", "F", "L", datetime(2020, 5, 10), 'firebase_token', datetime.utcnow(), Conseiller("A", "F", "L"))
-        action1 = Action("Content1", "Comment1", True, datetime(2020, 5, 17), datetime(2020, 5, 20), jeune)
-        action2 = Action("Content2", "Comment2", False, datetime(2020, 5, 17), datetime(2020, 5, 21), jeune)
+        conseiller = Conseiller("A", "F", "L")
+        jeune = Jeune("1", "F", "L", datetime(2020, 5, 10), 'firebase_token', datetime.utcnow(), conseiller)
+        action1 = Action("Content1", "Comment1", True, True, datetime(2020, 5, 17), datetime(2020, 5, 20), jeune,
+                         conseiller)
+        action2 = Action("Content2", "Comment2", False, True, datetime(2020, 5, 17), datetime(2020, 5, 21), jeune,
+                         conseiller)
         actions = [action1, action2]
         use_case = get_home_use_case(jeune, actions, action_repository, jeune_repository, rendezvous_repository)
 

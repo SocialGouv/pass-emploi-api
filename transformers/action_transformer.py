@@ -9,8 +9,11 @@ def to_action(sql_action: SqlAction) -> Action:
         content=sql_action.content,
         comment=sql_action.comment,
         is_done=sql_action.isDone,
+        is_visible_by_conseiller=sql_action.isVisibleByConseiller,
         creation_date=sql_action.creationDate,
+        limit_date=sql_action.limitDate,
         last_update=sql_action.lastUpdate,
+        status=sql_action.status,
         jeune=to_jeune(sql_action.jeune)
     )
 
@@ -20,7 +23,11 @@ def to_sql_action(action: Action) -> SqlAction:
         content=action.content,
         comment=action.comment,
         isDone=action.isDone,
+        isVisibleByConseiller=action.isVisibleByConseiller,
         creationDate=action.creationDate,
+        limitDate=action.limitDate,
         lastUpdate=action.lastUpdate,
-        jeuneId=action.jeune.id
+        status=action.status,
+        jeuneId=action.jeune.id,
+        conseillerId=action.conseiller.id
     )

@@ -11,7 +11,8 @@ from model.rendezvous import Rendezvous
 def test_to_json():
     # Given
     conseiller = Conseiller('1', 'Nils', 'Tavernier')
-    jeune = Jeune("ID_JEUNE", 'Kevin', 'DeBruyne', datetime(2020, 5, 10), 'firebase_token', datetime.utcnow(), conseiller)
+    jeune = Jeune("ID_JEUNE", 'Kevin', 'DeBruyne', datetime(2020, 5, 10), 'firebase_token', datetime.utcnow(),
+                  conseiller)
 
     actions = [
         Action(
@@ -19,18 +20,22 @@ def test_to_json():
             content="Suivre une formation",
             comment='commentaire1',
             is_done=False,
+            is_visible_by_conseiller=True,
             creation_date=datetime(2020, 1, 30),
             last_update=datetime(2021, 10, 2),
             jeune=jeune,
+            conseiller=conseiller
         ),
         Action(
             id='2',
             content="Faire son CV",
             comment='commentaire2',
             is_done=True,
+            is_visible_by_conseiller=False,
             creation_date=datetime(2021, 10, 2),
             last_update=datetime(2021, 10, 2),
             jeune=jeune,
+            conseiller=conseiller
         ),
     ]
     rendezvous = [

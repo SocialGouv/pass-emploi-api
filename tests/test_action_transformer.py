@@ -21,9 +21,11 @@ def test_to_action():
         content='content',
         comment='comment',
         isDone=True,
+        isVisibleByConseiller=False,
         creationDate=creation_date,
         lastUpdate=last_update,
-        jeune=sql_jeune
+        jeune=sql_jeune,
+        conseiller=sql_conseiller
     )
 
     # When
@@ -34,15 +36,16 @@ def test_to_action():
     assert action.content == 'content'
     assert action.comment == 'comment'
     assert action.isDone
+    assert not action.isVisibleByConseiller
     assert action.creationDate == creation_date
     assert action.lastUpdate == last_update
     assert action.jeune.id == '2'
     assert action.jeune.firstName == 'Kendji'
     assert action.jeune.lastName == 'Girac'
     assert action.jeune.creationDate == datetime(2020, 5, 10)
-    assert action.jeune.conseiller.id == '1'
-    assert action.jeune.conseiller.firstName == 'Nils'
-    assert action.jeune.conseiller.lastName == 'Tavernier'
+    assert action.conseiller.id == '1'
+    assert action.conseiller.firstName == 'Nils'
+    assert action.conseiller.lastName == 'Tavernier'
 
 
 def test_to_sql_action():
@@ -51,7 +54,7 @@ def test_to_sql_action():
     last_update = datetime.utcnow()
     conseiller = Conseiller('1', 'Nils', 'Tavernier')
     jeune = Jeune('2', 'Kendji', 'Girac', datetime(2020, 5, 10), 'firebase_token', datetime.utcnow(), conseiller)
-    action = Action('content', 'comment', True, creation_date, last_update, jeune)
+    action = Action('content', 'comment', True, True, creation_date, last_update, jeune, conseiller)
 
     # When
     sql_action = to_sql_action(action)
@@ -60,6 +63,8 @@ def test_to_sql_action():
     assert sql_action.content == 'content'
     assert sql_action.comment == 'comment'
     assert sql_action.isDone
+    assert sql_action.isVisibleByConseiller
     assert sql_action.creationDate == creation_date
     assert sql_action.lastUpdate == last_update
     assert sql_action.jeuneId == '2'
+    assert sql_action.conseillerId == '1'
