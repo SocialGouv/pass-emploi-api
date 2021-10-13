@@ -90,9 +90,9 @@ def notify_message(jeune_id: str, conseiller_id: str):
 @web.route('/conseillers/<conseiller_id>/jeune', methods=['POST'])
 @cross_origin()
 def create_jeune(conseiller_id: str):
-    create_jeune_request = CreateJeuneRequest(
-        request.json['firstName'],
-        request.json['lastName']
-    )
-    jeune = conseiller_use_case.create_jeune(create_jeune_request, conseiller_id)
-    return JsonJeune(jeune).__dict__, 201
+    create_jeune_request = CreateJeuneRequest(request.json['firstName'], request.json['lastName'])
+    if conseiller_use_case.check_if_jeune_already_exists(create_jeune_request):
+        abort(409)
+    else:
+        jeune = conseiller_use_case.create_jeune(create_jeune_request, conseiller_id)
+        return JsonJeune(jeune).__dict__, 201

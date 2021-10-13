@@ -10,8 +10,8 @@ class JeuneDatabaseDatasource:
     def __init__(self, database: SQLAlchemy):
         self.db = database
 
-    def exists(self, jeune_id: str):
-        return SqlJeune.query.filter_by(id=jeune_id).first() is not None
+    def exists(self, first_name: str, last_name):
+        return SqlJeune.query.filter_by(firstName=first_name, lastName=last_name).first() is not None
 
     def get(self, jeune_id: str):
         return SqlJeune.query.filter_by(id=jeune_id).first()

@@ -26,6 +26,9 @@ class JeuneRepository:
     def update_firebase_notification_informations(self, jeune_id: str, registration_token: str):
         self.jeuneDatasource.update_firebase_notification_informations(jeune_id, registration_token)
 
+    def check_if_jeune_already_exists(self, request: CreateJeuneRequest):
+        return self.jeuneDatasource.exists(request.firstName, request.lastName)
+
     def create_jeune(self, request: CreateJeuneRequest, conseiller_id: str):
         jeune_id = id_generator(id_length=5)
         sql_jeune = SqlJeune(

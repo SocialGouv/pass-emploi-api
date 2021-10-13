@@ -17,3 +17,6 @@ class ConseillerUseCase:
 
     def create_jeune(self, request: CreateJeuneRequest, conseiller_id: str):
         return self.jeuneRepository.create_jeune(request, conseiller_id)
+
+    def check_if_jeune_already_exists(self, request: CreateJeuneRequest):
+        return self.jeuneRepository.check_if_jeune_already_exists(request)
