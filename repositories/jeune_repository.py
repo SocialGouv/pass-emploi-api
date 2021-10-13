@@ -1,7 +1,11 @@
+from datetime import datetime
+
 from datasources.jeune_database_datasource import JeuneDatabaseDatasource
 from firebase.firebase_chat import FirebaseChat
 from model.jeune import Jeune
+from sql_model.sql_jeune import SqlJeune
 from transformers.jeune_transformer import to_jeune
+from use_cases.create_jeune_request import CreateJeuneRequest
 
 
 class JeuneRepository:
@@ -20,3 +24,14 @@ class JeuneRepository:
 
     def update_firebase_notification_informations(self, jeune_id: str, registration_token: str):
         self.jeuneDatasource.update_firebase_notification_informations(jeune_id, registration_token)
+
+    def create_jeune(self, request: CreateJeuneRequest, conseiller_id: str):
+        sql_jeune = SqlJeune(
+            id='random_id_to_generate',
+            firstName=request.firstName,
+            lastName=request.lastName,
+            creationDate=datetime.utcnow(),
+            conseillerId=conseiller_id
+        )
+        self.jeuneDatasource.create_jeune(sql_jeune)
+        return to_jeune(sql_jeune)
