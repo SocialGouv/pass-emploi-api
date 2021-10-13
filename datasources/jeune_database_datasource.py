@@ -19,6 +19,10 @@ class JeuneDatabaseDatasource:
     def get_jeunes_list(self, conseiller_id: int):
         return SqlJeune.query.filter_by(conseillerId=conseiller_id).order_by(SqlJeune.creationDate.desc()).all()
 
+    def create_jeune(self, sql_jeune: SqlJeune):
+        self.db.session.add(sql_jeune)
+        self.db.session.commit()
+
     def update_firebase_notification_informations(self, jeune_id: str, registration_token: str):
         SqlJeune.query.filter_by(id=jeune_id).update({"firebaseToken": registration_token,
                                                       "tokenLastUpdate": datetime.utcnow()})
