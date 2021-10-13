@@ -18,7 +18,7 @@ NB: Pour rajouter une nouvelle librairie pour le projet il suffit de la rajouter
 ```shell script
 docker run -d -p 5432:5432 --name PASSEMPLOI-POSTGRES -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=pass -e POSTGRES_DB=PASSEMPLOIDB postgres 
 docker exec -it PASSEMPLOI-POSTGRES bash
-psql -U postgres``
+psql -U postgres
 CREATE DATABASE passemploidbdev;
 \q
 exit
@@ -35,7 +35,7 @@ l'alimenter si on a besoin d'autres données pour de nouveaux usecases.
 
 ## Accéder aux bases de données SCALINGO à distance
 
-1. Au préalable, il faut bien avoir installer le CLI Scalingo sur sa machine [https://cli.scalingo.com].
+1. Au préalable, il faut bien avoir installer la [CLI Scalingo](https://cli.scalingo.com) sur sa machine.
 2. Pour la base de staging, dans un terminal, lancer la commande
    suivante : `$ scalingo -a pa-back-staging pgsql-console`
 3. Pour la base de prod, dans un terminal, lancer la commande suivante : `$ scalingo -a pa-back-prod pgsql-console`
@@ -52,13 +52,13 @@ VALUES (1, 'Nils', 'Willis');
 
 ## Installation de l'outil pour les migrations de base
 
-1. `$ pip install alambic`
+1. `$ pip install alembic`
 2. `$ source pass-emploi-venv/bin/activate`
 
 ## Ajouter une migration à la base
 
 1. `$ alembic revision -m "intitulé de la migration"`
-2. Insérer les éléments de la migration dans le fichier nouvellement créé dans le répertoire `alambic/versions`
+2. Insérer les éléments de la migration dans le fichier nouvellement créé dans le répertoire `alembic/versions`
 3. L'upgrade se fait directement au prochain lancement du backend
 
 # Ouvrir un poste de dev sur le net
@@ -85,7 +85,7 @@ NB: Ce fichier est bien dans le .gitignore, mais garder attention à ne pas le r
 
 Pour lancer tous les tests on peut soit utiliser l'IDE, soit exécuter la commande suivante à la racine du projet:
 
-`$ pytest tests`
+`$ python -m pytest tests`
 
 Pour lancer un test en particulier, on peut soit utiliser l'IDE soit exécuter la commande suivante à la racine du projet
 
