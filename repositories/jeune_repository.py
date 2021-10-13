@@ -6,6 +6,7 @@ from model.jeune import Jeune
 from sql_model.sql_jeune import SqlJeune
 from transformers.jeune_transformer import to_jeune
 from use_cases.create_jeune_request import CreateJeuneRequest
+from utils.id_generator import id_generator
 
 
 class JeuneRepository:
@@ -26,8 +27,9 @@ class JeuneRepository:
         self.jeuneDatasource.update_firebase_notification_informations(jeune_id, registration_token)
 
     def create_jeune(self, request: CreateJeuneRequest, conseiller_id: str):
+        jeune_id = id_generator(id_length=5)
         sql_jeune = SqlJeune(
-            id='random_id_to_generate',
+            id=jeune_id,
             firstName=request.firstName,
             lastName=request.lastName,
             creationDate=datetime.utcnow(),
