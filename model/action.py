@@ -34,7 +34,7 @@ class Action:
         self.jeune = jeune
         self.actionCreator = action_creator
 
-# test and fix tests
-# transformer and test
 # alembic migration
 # change routes and logic if needed
+# verify enum ( and in tests )
+# refacto and add tests if needed
