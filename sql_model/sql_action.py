@@ -12,8 +12,9 @@ class SqlAction(db.Model):
     creationDate = db.Column(db.TIMESTAMP, name='creation_date')
     limitDate = db.Column(db.TIMESTAMP, name='limit_date', nullable=True)
     lastUpdate = db.Column(db.TIMESTAMP, name='last_update')
-    status = db.Column(db.Enum(ActionStatus), name='status', default=ActionStatus.NOT_STARTED)
+    status = db.Column(db.Enum(ActionStatus, values_callable=lambda obj: [e.value for e in obj]), name='status',
+                       default=ActionStatus.NOT_STARTED.value)
     jeune = db.relationship('SqlJeune', backref=db.backref('action_jeune', lazy=False))
     jeuneId = db.Column(db.String(255), db.ForeignKey('jeune.id'), name='jeune_id')
     actionCreator = db.relationship('SqlActionCreator', backref=db.backref('action_action_creator', lazy=False))
-    actionCreatorId = db.Column(db.String(255), db.ForeignKey('action_creator.id'), name='action_creator_id')
+    actionCreatorId = db.Column(db.BigInteger(), db.ForeignKey('action_creator.id'), name='action_creator_id')

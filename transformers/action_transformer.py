@@ -29,7 +29,7 @@ def to_sql_action(action: Action) -> SqlAction:
         creationDate=action.creationDate,
         limitDate=action.limitDate,
         lastUpdate=action.lastUpdate,
-        status=action.status,
+        status=action.status.value,
         jeuneId=action.jeune.id,
         actionCreatorId=action.actionCreator.id
     )

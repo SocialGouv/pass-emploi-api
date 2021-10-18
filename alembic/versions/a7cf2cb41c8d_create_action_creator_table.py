@@ -20,7 +20,7 @@ depends_on = None
 def upgrade():
     op.create_table(
         'action_creator',
-        sa.Column('id', sa.String(255), primary_key=True),
+        sa.Column('id', sa.BigInteger(), autoincrement=True, primary_key=True),
         sa.Column('creator_id', sa.String(255), nullable=False),
     )
 

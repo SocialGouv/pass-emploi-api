@@ -16,7 +16,7 @@ def test_to_json():
     conseiller = Conseiller('1', 'Nils', 'Tavernier')
     jeune = Jeune("ID_JEUNE", 'Kevin', 'DeBruyne', datetime(2020, 5, 10), 'firebase_token', datetime.utcnow(),
                   conseiller)
-    action_creator = ActionCreator('3', '1', ActionCreatorType.CONSEILLER)
+    action_creator = ActionCreator('3', ActionCreatorType.CONSEILLER, 1)
 
     actions = [
         Action(

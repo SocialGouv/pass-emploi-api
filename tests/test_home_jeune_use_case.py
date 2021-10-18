@@ -28,7 +28,7 @@ class TestHomeJeuneUseCase:
         jeune = Jeune("1", "F", "L", datetime(2020, 5, 10), 'firebase_token', datetime.utcnow(), conseiller)
         status = ActionStatus.IN_PROGRESS
         creator_type = ActionCreatorType.CONSEILLER
-        action_creator = ActionCreator('1', '1', creator_type)
+        action_creator = ActionCreator('1', creator_type, 1)
 
         action1 = Action("Content1", "Comment1", False, True, datetime(2020, 5, 17), datetime(2020, 5, 30),
                          datetime(2020, 5, 20), status, jeune, action_creator)
@@ -63,7 +63,7 @@ class TestHomeJeuneUseCase:
         jeune = Jeune("1", "F", "L", datetime(2020, 5, 10), 'firebase_token', datetime.utcnow(), conseiller)
         status = ActionStatus.IN_PROGRESS
         creator_type = ActionCreatorType.CONSEILLER
-        action_creator = ActionCreator('1', '1', creator_type)
+        action_creator = ActionCreator('1', creator_type, 1)
 
         action1 = Action("Content1", "Comment1", True, True, datetime(2020, 5, 17), datetime(2020, 5, 30),
                          datetime(2020, 5, 20), status, jeune, action_creator)

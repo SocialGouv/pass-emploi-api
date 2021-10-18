@@ -21,7 +21,7 @@ def test_to_action():
     sql_conseiller = SqlConseiller(id=1, firstName='Nils', lastName='Tavernier')
     sql_jeune = SqlJeune(id='2', firstName='Kendji', lastName='Girac', creationDate=datetime(2020, 5, 10),
                          conseiller=sql_conseiller)
-    sql_action_cretor = SqlActionCreator(id='3', actionCreatorType='conseiller', creatorId='1')
+    sql_action_cretor = SqlActionCreator(id=3, actionCreatorType='conseiller', creatorId='1')
     sql_action = SqlAction(
         id=3,
         content='content',
@@ -55,7 +55,7 @@ def test_to_action():
     assert action.jeune.lastName == 'Girac'
     assert action.jeune.creationDate == datetime(2020, 5, 10)
 
-    assert action.actionCreator.id == '3'
+    assert action.actionCreator.id == 3
     assert action.actionCreator.creatorType == 'conseiller'
     assert action.actionCreator.creatorId == '1'
 
@@ -67,7 +67,7 @@ def test_to_sql_action():
     limit_date = creation_date + timedelta(days=10)
     status = ActionStatus.IN_PROGRESS
     creator_type = ActionCreatorType.JEUNE
-    action_creator = ActionCreator('3', '2', creator_type)
+    action_creator = ActionCreator('3', creator_type, 2)
 
     conseiller = Conseiller('1', 'Nils', 'Tavernier')
     jeune = Jeune('2', 'Kendji', 'Girac', datetime(2020, 5, 10), 'firebase_token', datetime.utcnow(), conseiller)
@@ -85,6 +85,6 @@ def test_to_sql_action():
     assert sql_action.creationDate == creation_date
     assert sql_action.limitDate == limit_date
     assert sql_action.lastUpdate == last_update
-    assert sql_action.status == status
+    assert sql_action.status == 'IN_PROGRESS'
     assert sql_action.jeuneId == jeune.id
     assert sql_action.actionCreatorId == action_creator.id

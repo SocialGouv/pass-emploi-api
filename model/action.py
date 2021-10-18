@@ -15,7 +15,7 @@ class Action:
             is_done: bool,
             is_visible_by_conseiller: bool,
             creation_date: datetime,
-            limit_date: datetime,
+            limit_date: Optional[datetime],
             last_update: datetime,
             status: ActionStatus,
             jeune: Jeune,
@@ -34,7 +34,5 @@ class Action:
         self.jeune = jeune
         self.actionCreator = action_creator
 
-# alembic migration
 # change routes and logic if needed
-# verify enum ( and in tests )
 # refacto and add tests if needed

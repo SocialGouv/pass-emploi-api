@@ -23,7 +23,7 @@ def upgrade():
     op.add_column('action', sa.Column('is_visible_by_conseiller', sa.BOOLEAN, nullable=False,
                                       server_default=expression.true()))
     op.add_column('action', sa.Column('limit_date', sa.TIMESTAMP, nullable=True))
-    op.add_column('action', sa.Column('action_creator_id', sa.String(255), ForeignKey('action_creator.id')))
+    op.add_column('action', sa.Column('action_creator_id', sa.BigInteger(), ForeignKey('action_creator.id')))
 
     status = postgresql.ENUM('NOT_STARTED', 'IN_PROGRESS', 'DONE', name='status')
     status.create(op.get_bind())
