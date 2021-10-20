@@ -33,6 +33,3 @@ class Action:
         self.status = status
         self.jeune = jeune
         self.actionCreator = action_creator
-
-# change routes and logic if needed
-# refacto and add tests if needed
