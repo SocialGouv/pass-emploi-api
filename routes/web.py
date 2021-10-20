@@ -3,9 +3,11 @@ from flask_cors import cross_origin
 
 from initialize_use_cases import home_conseiller_use_case, rendezvous_use_case, conseiller_use_case
 from json_model.json_conseiller_rendezvous import JsonConseillerRendezvous
+from json_model.json_jeune import JsonJeune
 from json_model.json_jeune_actions_sum_up import JsonJeuneActionsSumUp
 from json_model.json_transformer import to_json
 from use_cases.create_action_request import CreateActionRequest
+from use_cases.create_jeune_request import CreateJeuneRequest
 from use_cases.create_rendezvous_request import CreateRendezvousRequest
 
 web = Blueprint('web', __name__)
@@ -83,3 +85,14 @@ def notify_message(jeune_id: str, conseiller_id: str):
     if home_conseiller_use_case.check_jeune_has_correct_conseiller(conseiller_id, jeune_id):
         home_conseiller_use_case.send_message_notification(jeune_id)
     return '', 201
+
+
+@web.route('/conseillers/<conseiller_id>/jeune', methods=['POST'])
+@cross_origin()
+def create_jeune(conseiller_id: str):
+    create_jeune_request = CreateJeuneRequest(request.json['firstName'], request.json['lastName'])
+    if conseiller_use_case.check_if_jeune_already_exists(create_jeune_request):
+        abort(409)
+    else:
+        jeune = conseiller_use_case.create_jeune(create_jeune_request, conseiller_id)
+        return JsonJeune(jeune).__dict__, 201
