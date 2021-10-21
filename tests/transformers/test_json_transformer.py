@@ -2,6 +2,9 @@ from datetime import datetime, timedelta
 
 from json_model.json_transformer import to_json
 from model.action import Action
+from model.action_creator import ActionCreator
+from model.action_creator_type import ActionCreatorType
+from model.action_status import ActionStatus
 from model.conseiller import Conseiller
 from model.home_jeune import HomeJeune
 from model.jeune import Jeune
@@ -11,7 +14,9 @@ from model.rendezvous import Rendezvous
 def test_to_json():
     # Given
     conseiller = Conseiller('1', 'Nils', 'Tavernier')
-    jeune = Jeune("ID_JEUNE", 'Kevin', 'DeBruyne', datetime(2020, 5, 10), 'firebase_token', datetime.utcnow(), conseiller)
+    jeune = Jeune("ID_JEUNE", 'Kevin', 'DeBruyne', datetime(2020, 5, 10), 'firebase_token', datetime.utcnow(),
+                  conseiller)
+    action_creator = ActionCreator('3', ActionCreatorType.CONSEILLER, 1)
 
     actions = [
         Action(
@@ -19,18 +24,26 @@ def test_to_json():
             content="Suivre une formation",
             comment='commentaire1',
             is_done=False,
+            is_visible_by_conseiller=True,
             creation_date=datetime(2020, 1, 30),
+            limit_date=datetime(2021, 11, 1),
             last_update=datetime(2021, 10, 2),
+            status=ActionStatus.IN_PROGRESS,
             jeune=jeune,
+            action_creator=action_creator
         ),
         Action(
             id='2',
             content="Faire son CV",
             comment='commentaire2',
             is_done=True,
+            is_visible_by_conseiller=False,
             creation_date=datetime(2021, 10, 2),
+            limit_date=datetime(2021, 11, 1),
             last_update=datetime(2021, 10, 2),
+            status=ActionStatus.IN_PROGRESS,
             jeune=jeune,
+            action_creator=action_creator
         ),
     ]
     rendezvous = [

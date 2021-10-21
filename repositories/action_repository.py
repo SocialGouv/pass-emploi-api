@@ -2,6 +2,7 @@ from datasources.action_database_datasource import ActionDatabaseDatasource
 from model.action import Action
 from model.jeune import Jeune
 from model.jeune_actions_sum_up import JeuneActionsSumUp
+from transformers.action_creator_transformer import to_sql_action_creator
 from transformers.action_transformer import to_sql_action, to_action
 
 
@@ -11,7 +12,7 @@ class ActionRepository:
         self.actionDatasource = action_datasource
 
     def add_action(self, action: Action) -> None:
-        self.actionDatasource.add_action(to_sql_action(action))
+        self.actionDatasource.add_action(to_sql_action(action), to_sql_action_creator(action.actionCreator))
 
     def get_actions(self, jeune: Jeune) -> [Action]:
         return list(map(lambda a: to_action(a), self.actionDatasource.get_actions(jeune.id)))

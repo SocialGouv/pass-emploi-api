@@ -3,6 +3,9 @@ from datetime import datetime
 from firebase.push_notification_messages import NEW_ACTION_NOTIFICATION_MESSAGE, NEW_MESSAGE_NOTIFICATION_MESSAGE
 from firebase.send_push_notifications import send_firebase_push_notifications
 from model.action import Action
+from model.action_creator import ActionCreator
+from model.action_creator_type import ActionCreatorType
+from model.action_status import ActionStatus
 from model.home_conseiller import HomeConseiller
 from model.jeune_actions_sum_up import JeuneActionsSumUp
 from repositories.action_repository import ActionRepository
@@ -18,13 +21,22 @@ class HomeConseillerUseCase:
 
     def create_action(self, request: CreateActionRequest, jeune_id: str) -> None:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
+
+        action_creator = ActionCreator(
+            creator_id=jeune.conseiller.id,
+            action_creator_type=ActionCreatorType.CONSEILLER
+        )
         action = Action(
             content=request.content,
             comment=request.comment,
             is_done=request.isDone,
+            is_visible_by_conseiller=True,
             creation_date=datetime.utcnow(),
+            limit_date=None,
             last_update=datetime.utcnow(),
-            jeune=jeune
+            status=ActionStatus.NOT_STARTED,
+            jeune=jeune,
+            action_creator=action_creator
         )
         self.actionRepository.add_action(action)
 

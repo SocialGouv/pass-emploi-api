@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from initialize_db import db
 from model.jeune_actions_sum_up import JeuneActionsSumUp
 from sql_model.sql_action import SqlAction
+from sql_model.sql_action_creator import SqlActionCreator
 
 
 class ActionDatabaseDatasource:
@@ -12,7 +13,8 @@ class ActionDatabaseDatasource:
     def __init__(self, database: SQLAlchemy):
         self.db = database
 
-    def add_action(self, sql_action: SqlAction) -> None:
+    def add_action(self, sql_action: SqlAction, sql_action_creator: SqlActionCreator) -> None:
+        self.db.session.add(sql_action_creator)
         self.db.session.add(sql_action)
         self.db.session.commit()
 
