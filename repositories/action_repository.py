@@ -20,5 +20,8 @@ class ActionRepository:
     def get_actions_sum_up_for_home_conseiller(self, conseiller_id: str) -> [JeuneActionsSumUp]:
         return self.actionDatasource.get_actions_sum_up_for_home_conseiller(conseiller_id)
 
-    def update_action(self, action_id: str, action_status: bool) -> None:
+    def update_action(self, action_id: str, action_status: str) -> None:
         self.actionDatasource.update_action(action_id, action_status)
+
+    def update_action_deprecated(self, action_id: str, is_action_done: bool) -> None:
+        self.actionDatasource.update_action_deprecated(action_id, is_action_done)

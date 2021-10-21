@@ -20,6 +20,10 @@ def get_actions_jeune(jeune_id: str):
 @cross_origin()
 def patch_action(action_id: str):
     log_headers()
-    action_status = request.json.get('isDone')
-    action_use_case.change_action_status(action_id, action_status)
+    is_action_done = request.json.get('isDone')
+    action_status = request.json.get('status')
+    if is_action_done:
+        action_use_case.change_action_status_deprecated(action_id, is_action_done)
+    if action_status:
+        action_use_case.change_action_status(action_id, action_status)
     return '', 200

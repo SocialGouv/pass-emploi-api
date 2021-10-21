@@ -21,12 +21,13 @@ class ActionDatabaseDatasource:
     def get_actions(self, jeune_id: str) -> [SqlAction]:
         return SqlAction.query.filter_by(jeuneId=jeune_id).all()
 
-    def update_action(self, action_id: str, action_status: bool) -> None:
-        sql_action = SqlAction.query.filter_by(id=action_id).first()
-        if sql_action is not None:
-            sql_action.isDone = action_status
-            sql_action.lastUpdate = datetime.utcnow(),
-            self.db.session.commit()
+    def update_action(self, action_id: str, action_status: str) -> None:
+        SqlAction.query.filter_by(id=action_id).update({"status": action_status, "lastUpdate": datetime.utcnow()})
+        self.db.session.commit()
+
+    def update_action_deprecated(self, action_id: str, is_action_done: bool) -> None:
+        SqlAction.query.filter_by(id=action_id).update({"isDone": is_action_done, "lastUpdate": datetime.utcnow()})
+        self.db.session.commit()
 
     # noinspection SqlAggregates
     def get_actions_sum_up_for_home_conseiller(self, conseiller_id: str) -> [JeuneActionsSumUp]:
