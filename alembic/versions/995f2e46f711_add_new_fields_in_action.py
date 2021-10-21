@@ -25,10 +25,10 @@ def upgrade():
     op.add_column('action', sa.Column('limit_date', sa.TIMESTAMP, nullable=True))
     op.add_column('action', sa.Column('action_creator_id', sa.BigInteger(), ForeignKey('action_creator.id')))
 
-    status = postgresql.ENUM('NOT_STARTED', 'IN_PROGRESS', 'DONE', name='status')
+    status = postgresql.ENUM('not_started', 'in_progress', 'done', name='status')
     status.create(op.get_bind())
-    op.add_column('action', sa.Column('status', sa.Enum('NOT_STARTED', 'IN_PROGRESS', 'DONE', name='status'),
-                                      nullable=False, server_default='NOT_STARTED'))
+    op.add_column('action', sa.Column('status', sa.Enum('not_started', 'in_progress', 'done', name='status'),
+                                      nullable=False, server_default='not_started'))
 
 
 def downgrade():
@@ -36,5 +36,5 @@ def downgrade():
     op.drop_column('action', 'limit_date')
     op.drop_column('action', 'action_creator_id')
     op.drop_column('action', 'status')
-    status = postgresql.ENUM('NOT_STARTED', 'IN_PROGRESS', 'DONE', name='status')
+    status = postgresql.ENUM('not_started', 'in_progress', 'done', name='status')
     status.drop(op.get_bind())

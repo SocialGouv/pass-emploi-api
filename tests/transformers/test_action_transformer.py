@@ -31,7 +31,7 @@ def test_to_action():
         creationDate=creation_date,
         limitDate=limit_date,
         lastUpdate=last_update,
-        status='NOT_STARTED',
+        status='not_started',
         jeune=sql_jeune,
         actionCreator=sql_action_cretor
     )
@@ -48,7 +48,7 @@ def test_to_action():
     assert action.creationDate == creation_date
     assert action.limitDate == limit_date
     assert action.lastUpdate == last_update
-    assert action.status == 'NOT_STARTED'
+    assert action.status == 'not_started'
 
     assert action.jeune.id == '2'
     assert action.jeune.firstName == 'Kendji'
@@ -85,6 +85,6 @@ def test_to_sql_action():
     assert sql_action.creationDate == creation_date
     assert sql_action.limitDate == limit_date
     assert sql_action.lastUpdate == last_update
-    assert sql_action.status == 'IN_PROGRESS'
+    assert sql_action.status == 'in_progress'
     assert sql_action.jeuneId == jeune.id
     assert sql_action.actionCreatorId == action_creator.id

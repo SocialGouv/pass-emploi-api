@@ -20,8 +20,8 @@ def upgrade():
     op.execute('''
     BEGIN TRANSACTION;
     INSERT INTO action_creator ("creator_id", "action_creator_type") (SELECT id, 'conseiller' FROM conseiller);
-
-    UPDATE action SET action_creator_id = a.id  FROM action_creator a, jeune b WHERE CAST(a.creator_id AS bigint) = b.conseiller_id AND action_creator_id is null;
+    
+    UPDATE action SET action_creator_id = a.id  FROM action_creator a, jeune b WHERE CAST(a.creator_id AS bigint) = b.conseiller_id AND action_creator_id IS NULL;
     COMMIT;
     ''')
 
