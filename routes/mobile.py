@@ -35,7 +35,7 @@ def jeune_login(jeune_id: str):
 def post_action(jeune_id: str):
     log_headers()
 
-    if type(request.json['status']) is ActionStatus:
+    if request.json['status'] in [e.value for e in ActionStatus]:
         create_action_request = CreateActionRequest(
             request.json['comment'],
             request.json['content'],

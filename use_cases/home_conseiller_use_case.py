@@ -26,6 +26,7 @@ class HomeConseillerUseCase:
             creator_id=jeune.conseiller.id,
             action_creator_type=ActionCreatorType.CONSEILLER
         )
+
         action = Action(
             content=request.content,
             comment=request.comment,
@@ -34,7 +35,7 @@ class HomeConseillerUseCase:
             creation_date=datetime.utcnow(),
             limit_date=None,
             last_update=datetime.utcnow(),
-            status=request.status,
+            status=ActionStatus(request.status),
             jeune=jeune,
             action_creator=action_creator
         )

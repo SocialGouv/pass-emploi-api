@@ -41,7 +41,7 @@ class HomeJeuneUseCase:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
 
         action_creator = ActionCreator(
-            creator_id=jeune.id,
+            creator_id=str(jeune.id),
             action_creator_type=ActionCreatorType.JEUNE
         )
         action = Action(
@@ -52,7 +52,7 @@ class HomeJeuneUseCase:
             creation_date=datetime.utcnow(),
             limit_date=None,
             last_update=datetime.utcnow(),
-            status=request.status,
+            status=ActionStatus(request.status),
             jeune=jeune,
             action_creator=action_creator
         )
