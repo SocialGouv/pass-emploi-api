@@ -1,9 +1,9 @@
 from flask import request, abort, Blueprint
-from flask_cors import cross_origin
 
-from initialize_use_cases import home_jeune_use_case, jeune_use_case, home_conseiller_use_case
+from initialize_use_cases import home_jeune_use_case, jeune_use_case
 from json_model.json_jeune import JsonJeune
 from json_model.json_transformer import to_json
+from model.action_status import ActionStatus
 from network.headers_logger import log_headers
 from use_cases.create_action_request import CreateActionRequest
 
@@ -32,16 +32,19 @@ def jeune_login(jeune_id: str):
 
 
 @mobile.route('/jeunes/<jeune_id>/action', methods=['POST'])
-@cross_origin()
 def post_action(jeune_id: str):
     log_headers()
-    create_action_request = CreateActionRequest(
-        request.json['comment'],
-        request.json['content'],
-        request.json['isDone']
-    )
-    home_conseiller_use_case.create_action(create_action_request, jeune_id)
-    return '', 201
+
+    if request.json['status'] in [e.value for e in ActionStatus]:
+        create_action_request = CreateActionRequest(
+            request.json['comment'],
+            request.json['content'],
+            request.json['isDone'],
+            request.json['status']
+        )
+        home_jeune_use_case.create_action(create_action_request, jeune_id)
+        return '', 201
+    abort(400)
 
 
 @mobile.route('/jeunes/<jeune_id>/push-notification-token', methods=['PUT'])

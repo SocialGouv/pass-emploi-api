@@ -14,7 +14,11 @@ class ActionDatabaseDatasource:
         self.db = database
 
     def add_action(self, sql_action: SqlAction, sql_action_creator: SqlActionCreator) -> None:
-        self.db.session.add(sql_action_creator)
+        creator_exists = SqlActionCreator.query.filter_by(creatorId=sql_action_creator.creatorId,
+                                                          actionCreatorType=sql_action_creator.actionCreatorType)\
+                                                            .first() is None
+        if creator_exists:
+            self.db.session.add(sql_action_creator)
         self.db.session.add(sql_action)
         self.db.session.commit()
 

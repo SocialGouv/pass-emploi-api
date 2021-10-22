@@ -1,9 +1,14 @@
 from datetime import datetime
 
+from model.action import Action
+from model.action_creator import ActionCreator
+from model.action_creator_type import ActionCreatorType
+from model.action_status import ActionStatus
 from model.home_jeune import HomeJeune
 from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
 from repositories.rendezvous_repository import RendezvousRepository
+from use_cases.create_action_request import CreateActionRequest
 
 
 class HomeJeuneUseCase:
@@ -31,6 +36,27 @@ class HomeJeuneUseCase:
             )
         else:
             return None
+
+    def create_action(self, request: CreateActionRequest, jeune_id: str) -> None:
+        jeune = self.jeuneRepository.get_jeune(jeune_id)
+
+        action_creator = ActionCreator(
+            creator_id=str(jeune.id),
+            action_creator_type=ActionCreatorType.JEUNE
+        )
+        action = Action(
+            content=request.content,
+            comment=request.comment,
+            is_done=request.isDone,
+            is_visible_by_conseiller=True,
+            creation_date=datetime.utcnow(),
+            limit_date=None,
+            last_update=datetime.utcnow(),
+            status=ActionStatus(request.status),
+            jeune=jeune,
+            action_creator=action_creator
+        )
+        self.actionRepository.add_action(action)
 
 
 def get_most_recent_todo_actions(actions):
