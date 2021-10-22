@@ -41,7 +41,7 @@ def test_to_json():
             creation_date=datetime(2021, 10, 2),
             limit_date=datetime(2021, 11, 1),
             last_update=datetime(2021, 10, 2),
-            status=ActionStatus.IN_PROGRESS,
+            status=ActionStatus.NOT_STARTED,
             jeune=jeune,
             action_creator=action_creator
         ),
@@ -82,12 +82,18 @@ def test_to_json():
     assert json_home['actions'][0]["content"] == "Suivre une formation"
     assert json_home['actions'][0]["comment"] == "commentaire1"
     assert not json_home['actions'][0]["isDone"]
+    assert json_home['actions'][0]["status"] == "in_progress"
+    assert json_home['actions'][0]["creatorType"] == "conseiller"
+    assert json_home['actions'][0]["creator"] == "Nils Tavernier"
     assert json_home['actions'][0]["creationDate"] == datetime(2020, 1, 30)
 
     assert json_home['actions'][1]["id"] == '2'
     assert json_home['actions'][1]["content"] == "Faire son CV"
     assert json_home['actions'][1]["comment"] == "commentaire2"
     assert json_home['actions'][1]["isDone"]
+    assert json_home['actions'][1]["status"] == "not_started"
+    assert json_home['actions'][1]["creatorType"] == "conseiller"
+    assert json_home['actions'][1]["creator"] == "Nils Tavernier"
     assert json_home['actions'][1]["creationDate"] == datetime(2021, 10, 2)
 
     assert json_home['doneActionsCount'] == 3

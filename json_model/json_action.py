@@ -10,7 +10,7 @@ class JsonAction:
         self.isDone = action.isDone
         self.creationDate = action.creationDate
         self.lastUpdate = action.lastUpdate
-        self.status = action.status
+        self.status = action.status.value
         self.creatorType = action.actionCreator.creatorType
         self.creator = action.jeune.firstName + ' ' + action.jeune.lastName \
             if action.actionCreator.creatorType == ActionCreatorType.JEUNE\
