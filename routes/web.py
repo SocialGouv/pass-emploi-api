@@ -22,11 +22,10 @@ def get_jeune_actions_sum_up(conseiller_id: str):
 
 @web.route('/conseillers/<conseiller_id>/jeunes/<jeune_id>/action', methods=['POST'])
 @cross_origin()
-def post_action(jeune_id: str):
+def post_action(conseiller_id: str, jeune_id: str):
     create_action_request = CreateActionRequest(
         request.json['comment'],
-        request.json['content'],
-        request.json['isDone']
+        request.json['content']
     )
     home_conseiller_use_case.create_action(create_action_request, jeune_id)
     home_conseiller_use_case.send_action_notification(jeune_id)
