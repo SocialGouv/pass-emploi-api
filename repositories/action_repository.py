@@ -12,7 +12,9 @@ class ActionRepository:
         self.actionDatasource = action_datasource
 
     def add_action(self, action: Action) -> None:
-        self.actionDatasource.add_action(to_sql_action(action), to_sql_action_creator(action.actionCreator))
+        sql_action_creator = to_sql_action_creator(action.actionCreator)
+        sql_action = to_sql_action(action)
+        self.actionDatasource.add_action(sql_action, sql_action_creator)
 
     def get_actions(self, jeune: Jeune) -> [Action]:
         return list(map(lambda a: to_action(a), self.actionDatasource.get_actions(jeune.id)))

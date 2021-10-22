@@ -41,7 +41,7 @@ class HomeJeuneUseCase:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
 
         action_creator = ActionCreator(
-            creator_id=str(jeune.id),
+            creator_id=jeune.id,
             action_creator_type=ActionCreatorType.JEUNE
         )
         action = Action(
