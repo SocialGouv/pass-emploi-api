@@ -2,7 +2,7 @@ from datetime import datetime
 from unittest import mock
 from unittest.mock import MagicMock
 
-from freezegun.api import FakeDatetime
+from freezegun.api import FakeDatetime, freeze_time
 
 from model.action import Action
 from model.action_creator import ActionCreator
@@ -15,12 +15,18 @@ from use_cases.create_action_request import CreateActionRequest
 from use_cases.home_jeune_use_case import HomeJeuneUseCase
 
 
-@mock.patch('repositories.jeune_repository.JeuneRepository')
 @mock.patch('repositories.action_repository.ActionRepository')
+@mock.patch('repositories.jeune_repository.JeuneRepository')
 @mock.patch('repositories.rendezvous_repository.RendezvousRepository')
+@freeze_time('2021-10-19')
 class TestHomeJeuneUseCase:
 
-    def test_create_action_should_add_action_in_database(self, mocked_action_repository, mocked_jeune_repository):
+    def test_create_action_should_add_action_in_database(
+            self,
+            mocked_action_repository,
+            mocked_jeune_repository,
+            mocked_rendezvous_repository
+    ):
         # given
         mocked_jeune_id = "1"
         mocked_conseiller = Conseiller("A", "F", "L")
@@ -48,7 +54,7 @@ class TestHomeJeuneUseCase:
             None, FakeDatetime(2021, 10, 19), status, mocked_jeune, mocked_action_creator
         )
 
-        use_case = HomeJeuneUseCase(mocked_jeune_repository, mocked_action_repository)
+        use_case = HomeJeuneUseCase(mocked_jeune_repository, mocked_action_repository, mocked_rendezvous_repository)
 
         # when
         use_case.create_action(request=mocked_request, jeune_id=mocked_jeune_id)
@@ -70,9 +76,9 @@ class TestHomeJeuneUseCase:
 
     def test_get_home_when_multiple_actions_should_only_return_two_most_recent_todo_ones(
             self,
-            jeune_repository,
-            action_repository,
-            rendezvous_repository
+            mocked_action_repository,
+            mocked_jeune_repository,
+            mocked_rendezvous_repository
     ):
         # Given
         conseiller = Conseiller("A", "F", "L")
@@ -102,7 +108,13 @@ class TestHomeJeuneUseCase:
         )
 
         actions = [action1, action2, action3, action4]
-        use_case = get_home_use_case(jeune, actions, action_repository, jeune_repository, rendezvous_repository)
+        use_case = get_home_use_case(
+            jeune,
+            actions,
+            mocked_action_repository,
+            mocked_jeune_repository,
+            mocked_rendezvous_repository
+        )
 
         # When
         home = use_case.get_home("1")
@@ -113,9 +125,9 @@ class TestHomeJeuneUseCase:
 
     def test_get_home_when_less_than_two_actions_should_only_return_all_todo_ones(
             self,
-            jeune_repository,
-            action_repository,
-            rendezvous_repository
+            mocked_action_repository,
+            mocked_jeune_repository,
+            mocked_rendezvous_repository
     ):
         # Given
         conseiller = Conseiller("A", "F", "L")
@@ -133,7 +145,13 @@ class TestHomeJeuneUseCase:
             datetime(2020, 5, 21), status, jeune, action_creator
         )
         actions = [action1, action2]
-        use_case = get_home_use_case(jeune, actions, action_repository, jeune_repository, rendezvous_repository)
+        use_case = get_home_use_case(
+            jeune,
+            actions,
+            mocked_action_repository,
+            mocked_jeune_repository,
+            mocked_rendezvous_repository
+        )
 
         # When
         home = use_case.get_home("1")
