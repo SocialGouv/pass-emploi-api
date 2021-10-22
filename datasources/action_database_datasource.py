@@ -14,7 +14,6 @@ class ActionDatabaseDatasource:
         self.db = database
 
     def add_action(self, sql_action: SqlAction, sql_action_creator: SqlActionCreator) -> None:
-        # que fait add
         self.db.session.add(sql_action_creator)
         self.db.session.add(sql_action)
         self.db.session.commit()

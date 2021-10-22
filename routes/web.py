@@ -20,7 +20,7 @@ def get_jeune_actions_sum_up(conseiller_id: str):
     return jsonify(json_sum_ups), 200
 
 
-@web.route('/conseillers/<conseiller_id>/<jeune_id>/action', methods=['POST'])
+@web.route('/conseillers/<conseiller_id>/jeunes/<jeune_id>/action', methods=['POST'])
 @cross_origin()
 def post_action(jeune_id: str):
     create_action_request = CreateActionRequest(

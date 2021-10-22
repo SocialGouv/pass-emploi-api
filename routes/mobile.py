@@ -36,7 +36,8 @@ def post_action(jeune_id: str):
     create_action_request = CreateActionRequest(
         request.json['comment'],
         request.json['content'],
-        request.json['isDone']
+        request.json['isDone'],
+        request.json['status']
     )
     home_jeune_use_case.create_action(create_action_request, jeune_id)
     return '', 201

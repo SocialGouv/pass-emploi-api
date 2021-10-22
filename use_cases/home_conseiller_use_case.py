@@ -34,7 +34,7 @@ class HomeConseillerUseCase:
             creation_date=datetime.utcnow(),
             limit_date=None,
             last_update=datetime.utcnow(),
-            status=ActionStatus.NOT_STARTED,
+            status=request.status,
             jeune=jeune,
             action_creator=action_creator
         )

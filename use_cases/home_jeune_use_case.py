@@ -40,7 +40,6 @@ class HomeJeuneUseCase:
     def create_action(self, request: CreateActionRequest, jeune_id: str) -> None:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
 
-        # TODO : conversion Jeune() en modèle métier dans le usecase (chaque couche a ses reponsabilités)
         action_creator = ActionCreator(
             creator_id=jeune.id,
             action_creator_type=ActionCreatorType.JEUNE
@@ -53,7 +52,7 @@ class HomeJeuneUseCase:
             creation_date=datetime.utcnow(),
             limit_date=None,
             last_update=datetime.utcnow(),
-            status=ActionStatus.NOT_STARTED,
+            status=request.status,
             jeune=jeune,
             action_creator=action_creator
         )

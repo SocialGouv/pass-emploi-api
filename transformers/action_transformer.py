@@ -30,8 +30,6 @@ def to_sql_action(action: Action) -> SqlAction:
         limitDate=action.limitDate,
         lastUpdate=action.lastUpdate,
         status=action.status.value,
-        # pareil que le com suivant
         jeuneId=action.jeune.id,
-        # il est préférable d'envoyer en parametre actionCreator plutot qu'il soit un élément de action, comme ça on est sur qu'on a bien pris ça en compte en voyant les params passés
         actionCreatorId=action.actionCreator.id
     )
