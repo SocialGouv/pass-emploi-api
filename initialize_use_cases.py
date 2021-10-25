@@ -35,6 +35,6 @@ jeune_use_case = JeuneUseCase(jeune_repository)
 conseiller_use_case = ConseillerUseCase(conseiller_repository, jeune_repository)
 home_jeune_use_case = HomeJeuneUseCase(jeune_repository, action_repository, rendezvous_repository,
                                        action_creator_repository)
-home_conseiller_use_case = HomeConseillerUseCase(jeune_repository, action_repository)
+home_conseiller_use_case = HomeConseillerUseCase(jeune_repository, action_repository, action_creator_repository)
 action_use_case = ActionUseCase(jeune_repository, action_repository)
 rendezvous_use_case = RendezvousUseCase(jeune_repository, conseiller_repository, rendezvous_repository)

@@ -45,7 +45,6 @@ class HomeJeuneUseCase:
 
         self.actionCreatorRepository.add_action_creator(ActionCreator(creator_id=jeune.id,
                                                                       action_creator_type=ActionCreatorType.JEUNE))
-
         action_creator = self.actionCreatorRepository.get_action_creator(jeune.id, ActionCreatorType.JEUNE)
 
         action = Action(
