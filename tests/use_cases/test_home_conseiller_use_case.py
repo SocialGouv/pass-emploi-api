@@ -26,7 +26,7 @@ class TestHomeConseillerUseCase:
         mocked_jeune_repository.get_jeune = MagicMock(return_value=jeune)
         request = CreateActionRequest(comment='comment', content='content', is_done=False)
 
-        mocked_action_creator = ActionCreator(jeune.id, ActionCreatorType.JEUNE)
+        mocked_action_creator = ActionCreator(jeune.conseiller.id, ActionCreatorType.CONSEILLER)
         mocked_action_creator_repository.get_action_creator = MagicMock(return_value=mocked_action_creator)
 
         expected_action = Action(request.content, request.comment, request.isDone, True, FakeDatetime(2021, 10, 19),

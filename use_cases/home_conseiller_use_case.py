@@ -25,9 +25,9 @@ class HomeConseillerUseCase:
     def create_action(self, request: CreateActionRequest, jeune_id: str) -> None:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
 
-        self.actionCreatorRepository.add_action_creator(ActionCreator(creator_id=jeune.id,
-                                                                      action_creator_type=ActionCreatorType.JEUNE))
-        action_creator = self.actionCreatorRepository.get_action_creator(jeune.id, ActionCreatorType.JEUNE)
+        self.actionCreatorRepository.add_action_creator(ActionCreator(creator_id=jeune.conseiller.id,
+                                                                      action_creator_type=ActionCreatorType.CONSEILLER))
+        action_creator = self.actionCreatorRepository.get_action_creator(jeune.conseiller.id, ActionCreatorType.CONSEILLER)
 
         action = Action(
             content=request.content,
