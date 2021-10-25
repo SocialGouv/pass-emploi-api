@@ -25,5 +25,6 @@ def test_to_sql_action_creator():
     sql_action_creator = to_sql_action_creator(action_creator)
 
     # Then
+    assert sql_action_creator.id == 2
     assert sql_action_creator.creatorId == '3'
     assert sql_action_creator.actionCreatorType == 'conseiller'

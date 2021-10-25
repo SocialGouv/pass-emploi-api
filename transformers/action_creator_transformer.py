@@ -13,6 +13,7 @@ def to_action_creator(sql_action_creator: SqlActionCreator) -> ActionCreator:
 
 def to_sql_action_creator(action_creator: ActionCreator) -> SqlActionCreator:
     return SqlActionCreator(
+        id=action_creator.id,
         actionCreatorType=action_creator.creatorType,
         creatorId=action_creator.creatorId,
     )

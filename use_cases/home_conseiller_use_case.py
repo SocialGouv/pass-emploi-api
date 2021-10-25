@@ -8,6 +8,7 @@ from model.action_creator_type import ActionCreatorType
 from model.action_status import ActionStatus
 from model.home_conseiller import HomeConseiller
 from model.jeune_actions_sum_up import JeuneActionsSumUp
+from repositories.action_creator_repository import ActionCreatorRepository
 from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
 from use_cases.create_action_request import CreateActionRequest
@@ -15,17 +16,18 @@ from use_cases.create_action_request import CreateActionRequest
 
 class HomeConseillerUseCase:
 
-    def __init__(self, jeune_repository: JeuneRepository, action_repository: ActionRepository):
+    def __init__(self, jeune_repository: JeuneRepository, action_repository: ActionRepository,
+                 action_creator_repository: ActionCreatorRepository):
         self.jeuneRepository = jeune_repository
         self.actionRepository = action_repository
+        self.actionCreatorRepository = action_creator_repository
 
     def create_action(self, request: CreateActionRequest, jeune_id: str) -> None:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
 
-        action_creator = ActionCreator(
-            creator_id=jeune.conseiller.id,
-            action_creator_type=ActionCreatorType.CONSEILLER
-        )
+        self.actionCreatorRepository.add_action_creator(ActionCreator(creator_id=jeune.id,
+                                                                      action_creator_type=ActionCreatorType.JEUNE))
+        action_creator = self.actionCreatorRepository.get_action_creator(jeune.id, ActionCreatorType.JEUNE)
 
         action = Action(
             content=request.content,

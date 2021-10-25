@@ -5,6 +5,7 @@ from model.action_creator import ActionCreator
 from model.action_creator_type import ActionCreatorType
 from model.action_status import ActionStatus
 from model.home_jeune import HomeJeune
+from repositories.action_creator_repository import ActionCreatorRepository
 from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
 from repositories.rendezvous_repository import RendezvousRepository
@@ -17,11 +18,13 @@ class HomeJeuneUseCase:
             self,
             jeune_repository: JeuneRepository,
             action_repository: ActionRepository,
-            rendezvous_repository: RendezvousRepository
+            rendezvous_repository: RendezvousRepository,
+            action_creator_repository: ActionCreatorRepository
     ):
         self.jeuneRepository = jeune_repository
         self.actionRepository = action_repository
         self.rendezvousRepository = rendezvous_repository
+        self.actionCreatorRepository = action_creator_repository
 
     def get_home(self, jeune_id: str):
         jeune = self.jeuneRepository.get_jeune(jeune_id)
@@ -40,10 +43,10 @@ class HomeJeuneUseCase:
     def create_action(self, request: CreateActionRequest, jeune_id: str) -> None:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
 
-        action_creator = ActionCreator(
-            creator_id=str(jeune.id),
-            action_creator_type=ActionCreatorType.JEUNE
-        )
+        self.actionCreatorRepository.add_action_creator(ActionCreator(creator_id=jeune.id,
+                                                                      action_creator_type=ActionCreatorType.JEUNE))
+        action_creator = self.actionCreatorRepository.get_action_creator(jeune.id, ActionCreatorType.JEUNE)
+
         action = Action(
             content=request.content,
             comment=request.comment,
