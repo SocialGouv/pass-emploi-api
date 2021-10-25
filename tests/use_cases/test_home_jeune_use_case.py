@@ -18,14 +18,16 @@ from use_cases.home_jeune_use_case import HomeJeuneUseCase
 @mock.patch('repositories.action_repository.ActionRepository')
 @mock.patch('repositories.jeune_repository.JeuneRepository')
 @mock.patch('repositories.rendezvous_repository.RendezvousRepository')
+@mock.patch('repositories.action_creator_repository.ActionCreatorRepository')
 @freeze_time('2021-10-19')
 class TestHomeJeuneUseCase:
 
-    def test_create_action_should_add_action_in_database(
+    def test_create_action_should_add_action_and_action_creator_in_database(
             self,
             mocked_action_repository,
             mocked_jeune_repository,
-            mocked_rendezvous_repository
+            mocked_rendezvous_repository,
+            mocked_action_creator_repository
     ):
         # given
         mocked_jeune_id = "1"
@@ -49,20 +51,30 @@ class TestHomeJeuneUseCase:
         )
 
         mocked_action_creator = ActionCreator(mocked_jeune_id, ActionCreatorType.JEUNE)
+        mocked_action_creator_repository.get_action_creator = MagicMock(return_value=mocked_action_creator)
+
         expected_action = Action(
             mocked_request.content, mocked_request.comment, mocked_request.isDone, True, FakeDatetime(2021, 10, 19),
             None, FakeDatetime(2021, 10, 19), status, mocked_jeune, mocked_action_creator
         )
 
-        use_case = HomeJeuneUseCase(mocked_jeune_repository, mocked_action_repository, mocked_rendezvous_repository)
+        use_case = HomeJeuneUseCase(mocked_jeune_repository, mocked_action_repository, mocked_rendezvous_repository,
+                                    mocked_action_creator_repository)
 
         # when
         use_case.create_action(request=mocked_request, jeune_id=mocked_jeune_id)
 
         # then
         mocked_action_repository.add_action.assert_called_once()
+        mocked_action_creator_repository.add_action_creator.assert_called_once()
 
+        actual_action_creator = mocked_action_creator_repository.add_action_creator.call_args[0][0]
         actual_action = mocked_action_repository.add_action.call_args[0][0]
+
+        assert actual_action_creator.id == mocked_action_creator.id
+        assert actual_action_creator.creatorId == mocked_action_creator.creatorId
+        assert actual_action_creator.creatorType == mocked_action_creator.creatorType
+
         assert actual_action.content == expected_action.content
         assert actual_action.comment == expected_action.comment
         assert actual_action.isDone == expected_action.isDone
@@ -78,7 +90,8 @@ class TestHomeJeuneUseCase:
             self,
             mocked_action_repository,
             mocked_jeune_repository,
-            mocked_rendezvous_repository
+            mocked_rendezvous_repository,
+            mocked_action_creator_repository
     ):
         # Given
         conseiller = Conseiller("A", "F", "L")
@@ -113,7 +126,8 @@ class TestHomeJeuneUseCase:
             actions,
             mocked_action_repository,
             mocked_jeune_repository,
-            mocked_rendezvous_repository
+            mocked_rendezvous_repository,
+            mocked_action_creator_repository
         )
 
         # When
@@ -127,7 +141,8 @@ class TestHomeJeuneUseCase:
             self,
             mocked_action_repository,
             mocked_jeune_repository,
-            mocked_rendezvous_repository
+            mocked_rendezvous_repository,
+            mocked_action_creator_repository
     ):
         # Given
         conseiller = Conseiller("A", "F", "L")
@@ -150,7 +165,8 @@ class TestHomeJeuneUseCase:
             actions,
             mocked_action_repository,
             mocked_jeune_repository,
-            mocked_rendezvous_repository
+            mocked_rendezvous_repository,
+            mocked_action_creator_repository
         )
 
         # When
@@ -161,9 +177,10 @@ class TestHomeJeuneUseCase:
         assert home.doneActionsCount == 1
 
 
-def get_home_use_case(jeune, actions, action_repository, jeune_repository, rendezvous_repository):
+def get_home_use_case(jeune, actions, action_repository, jeune_repository, rendezvous_repository,
+                      action_creator_repository):
     jeune_repository.get_jeune = MagicMock(side_effect=(lambda value: jeune if value == "1" else None))
     action_repository.get_actions = MagicMock(side_effect=(lambda value: actions if value == jeune else [Action]))
     rendezvous_repository.get_jeune_rendezvous = MagicMock(return_value=[Rendezvous])
-    use_case = HomeJeuneUseCase(jeune_repository, action_repository, rendezvous_repository)
+    use_case = HomeJeuneUseCase(jeune_repository, action_repository, rendezvous_repository, action_creator_repository)
     return use_case
