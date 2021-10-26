@@ -1,10 +1,9 @@
 import os
 
-import requests as requests
+from get_token import get_token
+from infrastructure.services.utils.requests_session_base_url import SessionWithBaseUrl
 
-from infrastructure.services.pole_emploi.get_token import get_token
-
-API_URL = os.environ.get('POLE_EMPLOI_API_URL')
+API_BASE_URL = os.environ.get('POLE_EMPLOI_API_BASE_URL')
 
 
 def init_api():
@@ -14,7 +13,7 @@ def init_api():
         if not token:
             raise Exception('Bad token')
 
-        session = requests.Session()
+        session = SessionWithBaseUrl(API_BASE_URL)
         session.headers.update({'Authorization': f'Bearer {token}'})
 
         return session
