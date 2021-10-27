@@ -2,7 +2,7 @@ from datasources.action_database_datasource import ActionDatabaseDatasource
 from datasources.conseiller_database_datasource import ConseillerDatabaseDatasource
 from datasources.jeune_database_datasource import JeuneDatabaseDatasource
 from datasources.rendezvous_database_datasource import RendezvousDatabaseDatasource
-from firebase.firebase_chat import FirebaseChat
+from infrastructure.services.firebase.firebase_chat import FirebaseChat
 from initialize_db import db
 from repositories.action_repository import ActionRepository
 from repositories.conseiller_repository import ConseillerRepository

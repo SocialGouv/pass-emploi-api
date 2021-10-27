@@ -3,10 +3,9 @@ from waitress import serve
 from initialize_app import app, DEBUG
 from initialize_db import run_migrations
 from sandbox.create_sandbox import create_sandbox
-from routes.common_routes import common_routes
-from routes.mobile import mobile
-from routes.web import web
-
+from infrastructure.routes.common_routes import common_routes
+from infrastructure.routes.mobile import mobile
+from infrastructure.routes.web import web
 
 run_migrations()
 
