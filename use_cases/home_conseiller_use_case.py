@@ -1,7 +1,8 @@
 from datetime import datetime
 
-from firebase.push_notification_messages import NEW_ACTION_NOTIFICATION_MESSAGE, NEW_MESSAGE_NOTIFICATION_MESSAGE
-from firebase.send_push_notifications import send_firebase_push_notifications
+from infrastructure.services.firebase.push_notification_messages import NEW_ACTION_NOTIFICATION_MESSAGE, \
+    NEW_MESSAGE_NOTIFICATION_MESSAGE
+from infrastructure.services.firebase.send_push_notifications import send_firebase_push_notifications
 from model.action import Action
 from model.action_creator import ActionCreator
 from model.action_creator_type import ActionCreatorType
