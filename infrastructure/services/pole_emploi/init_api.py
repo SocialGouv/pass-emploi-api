@@ -1,6 +1,6 @@
 import os
 
-from get_token import get_token
+from infrastructure.services.pole_emploi.get_token import get_token
 from infrastructure.services.utils.requests_session_base_url import SessionWithBaseUrl
 
 API_BASE_URL = os.environ.get('POLE_EMPLOI_API_BASE_URL')

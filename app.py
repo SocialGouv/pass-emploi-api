@@ -6,6 +6,7 @@ from sandbox.create_sandbox import create_sandbox
 from infrastructure.routes.common_routes import common_routes
 from infrastructure.routes.mobile import mobile
 from infrastructure.routes.web import web
+from infrastructure.routes.offres_emploi import offres_emploi
 
 run_migrations()
 
@@ -15,6 +16,7 @@ if DEBUG:
 app.register_blueprint(web)
 app.register_blueprint(mobile)
 app.register_blueprint(common_routes)
+app.register_blueprint(offres_emploi)
 
 
 @app.route('/')
