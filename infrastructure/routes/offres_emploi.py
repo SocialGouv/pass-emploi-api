@@ -1,5 +1,6 @@
 from flask import Blueprint
 
+from infrastructure.routes.utils.to_json import to_json
 from initialize_use_cases import offres_emploi_use_case
 from network.headers_logger import log_headers
 
@@ -11,4 +12,4 @@ def get_offres_emploi():
     log_headers()
 
     res = offres_emploi_use_case.get_offres_emploi()
-    return res.to_json(), 200
+    return to_json(res), 200
