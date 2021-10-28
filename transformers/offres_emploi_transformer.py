@@ -6,4 +6,4 @@ def to_offres_emploi(offres_emploi_response: dict) -> [OffreEmploi]:
         return []
 
     results = offres_emploi_response['resultats']
-    return [OffreEmploi(offre['intitule'], offre['description']) for offre in results]
+    return [OffreEmploi(offre.get('intitule'), offre.get('description')) for offre in results]
