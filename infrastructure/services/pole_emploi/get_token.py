@@ -1,5 +1,5 @@
 import os
-import requests as requests
+import requests
 
 from infrastructure.services.cache.pole_emploi_token_cache import PoleEmploiTokenCache
 from infrastructure.services.utils.get_response_json import get_response_json
@@ -40,7 +40,6 @@ def get_token():
 
         cache.set(token)
         return token
-    # TODO : handle exception/pass
     except Exception as e:
         print(e)
         print('Pole Emploi API - Login Error')

@@ -10,16 +10,17 @@ class RedisClient:
     def __init__(self):
         self.client = redis.from_url(url, charset="utf-8", decode_responses=True)
 
-    def get(self, key: str) -> str:
+    def get(self, key: str):
         try:
             print(f'getting {key} from cache')
             return self.client.get(key)
         except Exception:
             return None
 
-    def set(self, key: str, value: str):
+    def set(self, key: str, value: str, expiry=None):
         try:
             print(f'setting {key} : {value} in cache')
-            return self.client.set(key, value)
+
+            return self.client.set(key, value, ex=expiry)
         except Exception:
             return None
