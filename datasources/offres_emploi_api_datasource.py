@@ -1,4 +1,5 @@
 from infrastructure.services.pole_emploi.init_api import init_api
+from infrastructure.services.utils.get_response_json import get_response_json
 
 
 class OffresEmploiAPIDatasource:
@@ -8,5 +9,5 @@ class OffresEmploiAPIDatasource:
 
     def get_offres_emploi(self):
         SUFFIX_URL = 'offresdemploi/v2/offres/search'
-        res = self.api.get(SUFFIX_URL).json()
-        return res
+        res = self.api.get(SUFFIX_URL)
+        return get_response_json(res)
