@@ -1,7 +1,6 @@
 from waitress import serve
 
-from config import DEBUG
-from initialize_app import app
+from initialize_app import app, DEBUG
 from initialize_db import run_migrations
 from initialize_routes import initialize_routes
 from sandbox.create_sandbox import create_sandbox

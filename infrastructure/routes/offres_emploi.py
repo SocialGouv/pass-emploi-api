@@ -1,4 +1,4 @@
-from flask import abort, Blueprint
+from flask import Blueprint
 
 from infrastructure.routes.utils.to_json import to_json
 from initialize_use_cases import offres_emploi_use_case
