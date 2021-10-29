@@ -9,8 +9,8 @@ OFFRES_EMPLOI_SUFFIX_URL = 'offresdemploi/v2/offres/search'
 class OffresEmploiAPIDatasource:
 
     def __init__(self, pole_emploi_api_initializer: PoleEmploiApiInitializer):
-        self.apiInitializer = pole_emploi_api_initializer
+        self.api = pole_emploi_api_initializer.init_api()
 
     def get_offres_emploi(self) -> Optional[dict]:
-        response = self.apiInitializer.init_api().get(OFFRES_EMPLOI_SUFFIX_URL)
+        response = self.api.get(OFFRES_EMPLOI_SUFFIX_URL)
         return get_response_json(response)
