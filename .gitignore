@@ -10,5 +10,5 @@ dist/
 build/
 tests/__pycache__/
 __pycache__/
-firebase/pass_emploi_secret_key.json
+infrastructure/services/firebase/pass_emploi_secret_key.json
 .env

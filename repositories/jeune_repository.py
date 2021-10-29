@@ -1,12 +1,12 @@
 from datetime import datetime
 
 from datasources.jeune_database_datasource import JeuneDatabaseDatasource
-from firebase.firebase_chat import FirebaseChat
+from infrastructure.services.firebase.firebase_chat import FirebaseChat
 from model.jeune import Jeune
 from sql_model.sql_jeune import SqlJeune
 from transformers.jeune_transformer import to_jeune
 from use_cases.create_jeune_request import CreateJeuneRequest
-from utils.id_generator import id_generator
+from repositories.utils.id_generator import id_generator
 
 
 class JeuneRepository:
