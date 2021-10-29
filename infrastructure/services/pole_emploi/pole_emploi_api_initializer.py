@@ -1,5 +1,6 @@
 import os
 
+from requests import Session
 from infrastructure.services.pole_emploi.pole_emploi_api_token_retriever import PoleEmploiAPITokenRetriever
 from infrastructure.services.utils.requests_session_base_url import SessionWithBaseUrl
 
@@ -10,7 +11,7 @@ class PoleEmploiApiInitializer:
     def __init__(self, token_retriever: PoleEmploiAPITokenRetriever):
         self.tokenRetriever = token_retriever
 
-    def init_api(self):
+    def init_api(self) -> Session:
         try:
             token = self.tokenRetriever.get_api_token()
 
