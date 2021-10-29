@@ -4,30 +4,43 @@ from datasources.conseiller_database_datasource import ConseillerDatabaseDatasou
 from datasources.jeune_database_datasource import JeuneDatabaseDatasource
 from datasources.offres_emploi_api_datasource import OffresEmploiAPIDatasource
 from datasources.rendezvous_database_datasource import RendezvousDatabaseDatasource
+from infrastructure.services.cache.pole_emploi_token_cache import PoleEmploiTokenCache
 from infrastructure.services.firebase.firebase_chat import FirebaseChat
+from infrastructure.services.pole_emploi.pole_emploi_api_initializer import PoleEmploiApiInitializer
+from infrastructure.services.pole_emploi.pole_emploi_api_token_network_retriever import \
+    PoleEmploiAPITokenNetworkRetriever
+from infrastructure.services.pole_emploi.pole_emploi_api_token_retriever_cache_decorator import \
+    PoleEmploiAPITokenRetrieverCacheDecorator
 from initialize_db import db
 from repositories.action_creator_repository import ActionCreatorRepository
 from repositories.action_repository import ActionRepository
 from repositories.conseiller_repository import ConseillerRepository
 from repositories.jeune_repository import JeuneRepository
-from repositories.rendezvous_repository import RendezvousRepository
 from repositories.offres_emploi_repository import OffresEmploiRepository
+from repositories.rendezvous_repository import RendezvousRepository
 from use_cases.action_use_case import ActionUseCase
 from use_cases.conseiller_use_case import ConseillerUseCase
 from use_cases.home_conseiller_use_case import HomeConseillerUseCase
 from use_cases.home_jeune_use_case import HomeJeuneUseCase
 from use_cases.jeune_use_case import JeuneUseCase
-from use_cases.rendezvous_use_case import RendezvousUseCase
 from use_cases.offres_emploi_use_case import OffresEmploiUseCase
+from use_cases.rendezvous_use_case import RendezvousUseCase
 
 firebase_chat = FirebaseChat()
+
+# noinspection PyTypeChecker
+pole_emploi_api_token_retriever = PoleEmploiAPITokenRetrieverCacheDecorator(
+    PoleEmploiAPITokenNetworkRetriever(),
+    PoleEmploiTokenCache()
+)
 
 action_database_datasource = ActionDatabaseDatasource(db)
 jeune_database_datasource = JeuneDatabaseDatasource(db)
 rendezvous_database_datasource = RendezvousDatabaseDatasource(db)
 conseiller_database_datasource = ConseillerDatabaseDatasource()
 action_creator_database_datasource = ActionCreatorDatabaseDatasource(db)
-offres_emploi_api_datasource = OffresEmploiAPIDatasource()
+# noinspection PyTypeChecker
+offres_emploi_api_datasource = OffresEmploiAPIDatasource(PoleEmploiApiInitializer(pole_emploi_api_token_retriever))
 
 action_repository = ActionRepository(action_database_datasource)
 conseiller_repository = ConseillerRepository(conseiller_database_datasource, jeune_database_datasource)
