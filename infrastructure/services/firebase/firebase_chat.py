@@ -4,14 +4,21 @@ import os
 import firebase_admin
 from firebase_admin import credentials, firestore
 
+SECRET_KEY = os.environ.get('FIREBASE_SECRET_KEY')
+
 
 class FirebaseChat:
 
     def __init__(self):
-        firebase_secret_key = json.loads(os.environ.get('FIREBASE_SECRET_KEY'))
-        cred = credentials.Certificate(firebase_secret_key)
-        app = firebase_admin.initialize_app(cred)
-        self.client = firestore.client(app)
+        client = None
+
+        if SECRET_KEY:
+            firebase_secret_key = json.loads(SECRET_KEY)
+            cred = credentials.Certificate(firebase_secret_key)
+            app = firebase_admin.initialize_app(cred)
+            client = firestore.client(app)
+
+        self.client = client
 
     def initialise_chat_if_required(self, jeune_id, conseiller_id) -> None:
         firebase_env = os.environ.get('FIREBASE_ENVIRONMENT_PREFIX')
