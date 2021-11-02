@@ -6,7 +6,7 @@ from datasources.offres_emploi_api_datasource import OffresEmploiAPIDatasource
 from datasources.rendezvous_database_datasource import RendezvousDatabaseDatasource
 from infrastructure.services.cache.pole_emploi_token_cache import PoleEmploiTokenCache
 from infrastructure.services.firebase.firebase_chat import FirebaseChat
-from infrastructure.services.pole_emploi.pole_emploi_api_initializer import PoleEmploiApiInitializer
+from infrastructure.services.pole_emploi.pole_emploi_api import PoleEmploiApi
 from infrastructure.services.pole_emploi.pole_emploi_api_token_network_retriever import \
     PoleEmploiAPITokenNetworkRetriever
 from infrastructure.services.pole_emploi.pole_emploi_api_token_retriever_cache_decorator import \
@@ -40,7 +40,7 @@ rendezvous_database_datasource = RendezvousDatabaseDatasource(db)
 conseiller_database_datasource = ConseillerDatabaseDatasource()
 action_creator_database_datasource = ActionCreatorDatabaseDatasource(db)
 # noinspection PyTypeChecker
-offres_emploi_api_datasource = OffresEmploiAPIDatasource(PoleEmploiApiInitializer(pole_emploi_api_token_retriever))
+offres_emploi_api_datasource = OffresEmploiAPIDatasource(PoleEmploiApi(pole_emploi_api_token_retriever))
 
 action_repository = ActionRepository(action_database_datasource)
 conseiller_repository = ConseillerRepository(conseiller_database_datasource, jeune_database_datasource)

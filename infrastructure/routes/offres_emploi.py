@@ -14,4 +14,4 @@ def get_offres_emploi():
     if res:
         return to_json(res), 200
 
-    abort(500)
+    abort(500, description="Pole Emploi API Error")
