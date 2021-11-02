@@ -7,11 +7,11 @@ TOKEN_EXPIRY = 1440
 
 
 class PoleEmploiTokenCache:
-    def __init__(self):
-        self.cache = RedisClient()
+    def __init__(self, client: RedisClient):
+        self.cache_client = client
 
     def get(self) -> Optional[str]:
-        return self.cache.get(KEY)
+        return self.cache_client.get(KEY)
 
     def set(self, value):
-        self.cache.set(KEY, value, TOKEN_EXPIRY)
+        self.cache_client.set(KEY, value, TOKEN_EXPIRY)

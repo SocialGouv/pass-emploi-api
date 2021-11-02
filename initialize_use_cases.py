@@ -5,6 +5,7 @@ from datasources.jeune_database_datasource import JeuneDatabaseDatasource
 from datasources.offres_emploi_api_datasource import OffresEmploiAPIDatasource
 from datasources.rendezvous_database_datasource import RendezvousDatabaseDatasource
 from infrastructure.services.cache.pole_emploi_token_cache import PoleEmploiTokenCache
+from infrastructure.services.cache.redis_client import RedisClient
 from infrastructure.services.firebase.firebase_chat import FirebaseChat
 from infrastructure.services.pole_emploi.pole_emploi_api import PoleEmploiApi
 from infrastructure.services.pole_emploi.pole_emploi_api_token_network_retriever import \
@@ -27,11 +28,9 @@ from use_cases.offres_emploi_use_case import OffresEmploiUseCase
 from use_cases.rendezvous_use_case import RendezvousUseCase
 
 firebase_chat = FirebaseChat()
-
-# noinspection PyTypeChecker
 pole_emploi_api_token_retriever = PoleEmploiAPITokenRetrieverCacheDecorator(
     PoleEmploiAPITokenNetworkRetriever(),
-    PoleEmploiTokenCache()
+    PoleEmploiTokenCache(RedisClient())
 )
 
 action_database_datasource = ActionDatabaseDatasource(db)
@@ -39,7 +38,6 @@ jeune_database_datasource = JeuneDatabaseDatasource(db)
 rendezvous_database_datasource = RendezvousDatabaseDatasource(db)
 conseiller_database_datasource = ConseillerDatabaseDatasource()
 action_creator_database_datasource = ActionCreatorDatabaseDatasource(db)
-# noinspection PyTypeChecker
 offres_emploi_api_datasource = OffresEmploiAPIDatasource(PoleEmploiApi(pole_emploi_api_token_retriever))
 
 action_repository = ActionRepository(action_database_datasource)
