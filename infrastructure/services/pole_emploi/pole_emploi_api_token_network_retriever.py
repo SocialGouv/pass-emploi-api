@@ -3,6 +3,7 @@ from typing import Optional
 
 import requests
 
+from infrastructure.services.pole_emploi.pole_emploi_api_token_retriever import PoleEmploiAPITokenRetriever
 from infrastructure.services.utils.get_response_json import get_response_json
 
 LOGIN_URL = os.environ.get('POLE_EMPLOI_LOGIN_URL')
@@ -11,7 +12,7 @@ CLIENT_SECRET = os.environ.get('POLE_EMPLOI_CLIENT_SECRET')
 SCOPE = os.environ.get('POLE_EMPLOI_SCOPE')
 
 
-class PoleEmploiAPITokenNetworkRetriever:
+class PoleEmploiAPITokenNetworkRetriever(PoleEmploiAPITokenRetriever):
 
     def get_api_token(self) -> Optional[str]:
         query_param = {

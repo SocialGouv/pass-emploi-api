@@ -8,6 +8,6 @@ class OffresEmploiRepository:
     def __init__(self, offres_emploi_datasource: OffresEmploiAPIDatasource):
         self.offresEmploiDataSource = offres_emploi_datasource
 
-    def get_offres_emploi(self) -> [OffreEmploi]:
+    def get_offres_emploi(self):
         offres_emploi_response = self.offresEmploiDataSource.get_offres_emploi()
         return to_offres_emploi(offres_emploi_response)
