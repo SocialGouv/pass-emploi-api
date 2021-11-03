@@ -12,17 +12,17 @@ class PoleEmploiApi:
     def __init__(self, token_retriever: PoleEmploiAPITokenRetriever):
         self.tokenRetriever = token_retriever
 
-    def get(self, SUFFIX_URL) -> Optional[Response]:
+    def get(self, suffix_url: str) -> Optional[Response]:
         try:
             api = init_api(self.tokenRetriever)
-            return api.get(SUFFIX_URL)
+            return api.get(suffix_url)
         except Exception as err:
             print(err)
             print('Pole Emploi API - GET error')
             return None
 
 
-def init_api(tokenRetriever) -> Session:
+def init_api(tokenRetriever: PoleEmploiAPITokenRetriever) -> Session:
     try:
         token = tokenRetriever.get_api_token()
 
