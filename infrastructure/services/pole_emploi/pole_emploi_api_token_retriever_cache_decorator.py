@@ -4,7 +4,7 @@ from infrastructure.services.cache.pole_emploi_token_cache import PoleEmploiToke
 from infrastructure.services.pole_emploi.pole_emploi_api_token_retriever import PoleEmploiAPITokenRetriever
 
 
-class PoleEmploiAPITokenRetrieverCacheDecorator:
+class PoleEmploiAPITokenRetrieverCacheDecorator(PoleEmploiAPITokenRetriever):
     def __init__(self, decorated: PoleEmploiAPITokenRetriever, cache: PoleEmploiTokenCache):
         self.decorated = decorated
         self.cache = cache
