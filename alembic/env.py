@@ -1,3 +1,4 @@
+import os
 from logging.config import fileConfig
 
 from alembic import context
@@ -56,8 +57,11 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
+    config_section = config.get_section(config.config_ini_section)
+    url = os.getenv("SQLALCHEMY_DATABASE_URI")
+    config_section["sqlalchemy.url"] = url
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
+        config_section,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
