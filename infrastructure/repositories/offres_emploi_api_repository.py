@@ -1,11 +1,12 @@
 from typing import Optional, List
 
-from datasources.offres_emploi_api_datasource import OffresEmploiAPIDatasource
-from model.offre_emploi import OffreEmploi
-from transformers.offres_emploi_transformer import to_offres_emploi
+from domain.offres_emploi.offre_emploi import OffreEmploi
+from domain.offres_emploi.offres_emploi_repository import OffresEmploiRepository
+from infrastructure.datasources.offres_emploi_api_datasource import OffresEmploiAPIDatasource
+from infrastructure.transformers.offres_emploi_transformer import to_offres_emploi
 
 
-class OffresEmploiRepository:
+class OffresEmploiAPIRepository(OffresEmploiRepository):
 
     def __init__(self, offres_emploi_datasource: OffresEmploiAPIDatasource):
         self.offresEmploiDataSource = offres_emploi_datasource

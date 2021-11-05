@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from model.offre_emploi import OffreEmploi
+from domain.offres_emploi.offre_emploi import OffreEmploi
 
 
 def to_offres_emploi(offres_emploi_response: dict) -> Optional[List[OffreEmploi]]:
