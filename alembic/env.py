@@ -58,8 +58,8 @@ def run_migrations_online():
 
     """
     config_section = config.get_section(config.config_ini_section)
-    url = os.getenv("SQLALCHEMY_DATABASE_URI")
-    config_section["sqlalchemy.url"] = url
+    database_url = os.getenv("SQLALCHEMY_DATABASE_URI")
+    config_section["sqlalchemy.url"] = database_url
     connectable = engine_from_config(
         config_section,
         prefix="sqlalchemy.",
