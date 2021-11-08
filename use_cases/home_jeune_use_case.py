@@ -6,9 +6,9 @@ from model.action_creator_type import ActionCreatorType
 from model.action_status import ActionStatus
 from model.home_jeune import HomeJeune
 from repositories.action_creator_repository import ActionCreatorRepository
-from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
 from repositories.rendezvous_repository import RendezvousRepository
+from src.application.repositories.actions_repository import ActionsRepository
 from use_cases.create_action_request import CreateActionRequest
 
 
@@ -17,7 +17,7 @@ class HomeJeuneUseCase:
     def __init__(
             self,
             jeune_repository: JeuneRepository,
-            action_repository: ActionRepository,
+            action_repository: ActionsRepository,
             rendezvous_repository: RendezvousRepository,
             action_creator_repository: ActionCreatorRepository
     ):

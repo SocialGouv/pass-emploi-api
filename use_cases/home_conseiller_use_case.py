@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from src.application.repositories.actions_repository import ActionsRepository
 from src.infrastructure.services.firebase.push_notification_messages import NEW_ACTION_NOTIFICATION_MESSAGE, \
     NEW_MESSAGE_NOTIFICATION_MESSAGE
 from src.infrastructure.services.firebase.send_push_notifications import send_firebase_push_notifications
@@ -10,7 +11,6 @@ from model.action_status import ActionStatus
 from model.home_conseiller import HomeConseiller
 from model.jeune_actions_sum_up import JeuneActionsSumUp
 from repositories.action_creator_repository import ActionCreatorRepository
-from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
 from use_cases.create_action_request import CreateActionRequest
 
@@ -18,7 +18,7 @@ from use_cases.create_action_request import CreateActionRequest
 class HomeConseillerUseCase:
 
     def __init__(
-            self, jeune_repository: JeuneRepository, action_repository: ActionRepository,
+            self, jeune_repository: JeuneRepository, action_repository: ActionsRepository,
             action_creator_repository: ActionCreatorRepository
             ):
         self.jeuneRepository = jeune_repository

@@ -15,7 +15,7 @@ from use_cases.create_action_request import CreateActionRequest
 from use_cases.home_jeune_use_case import HomeJeuneUseCase
 
 
-@mock.patch('repositories.action_repository.ActionRepository')
+@mock.patch('src.application.repositories.actions_repository.ActionsRepository')
 @mock.patch('repositories.jeune_repository.JeuneRepository')
 @mock.patch('repositories.rendezvous_repository.RendezvousRepository')
 @mock.patch('repositories.action_creator_repository.ActionCreatorRepository')
