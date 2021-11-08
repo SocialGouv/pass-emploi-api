@@ -1,11 +1,11 @@
 from unittest import mock
 from unittest.mock import MagicMock
 
-from use_cases.offres_emploi_use_case import OffresEmploiUseCase
+from application.use_cases.offres_emploi_use_case import OffresEmploiUseCase
 
 
-@mock.patch('repositories.offres_emploi_repository.OffresEmploiRepository')
-class TestRendezvousUseCase:
+@mock.patch('application.repositories.offres_emploi_repository.OffresEmploiRepository')
+class TestOffresEmploiUseCase:
     def test_get_offres_emploi_returns(
             self, mocked_offres_emploi_repository
     ):

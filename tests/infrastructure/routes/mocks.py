@@ -17,7 +17,7 @@ POLE_EMPLOI_API = {
             "romeLibelle": "Maintenance informatique et bureautique",
             "appellationlibelle": "Technicien(ne) d'assistance à la clientèle en informatique",
             "entreprise": {
-                "nom": "L'offre RH",
+                "nom": "Offre RH",
                 "description": "L'offre RH, Cabinet de Conseil en Recrutement est spécialisé dans le recrutement de profils Tertiaire, Ingénierie et Cadre.\n\nNotre client : Filiale d'un grand groupe, sa vocation est d'assurer l'installation et la maintenance des matériels informatiques et monétiques, pour des agences commerciales ainsi que pour leurs clients.\n\nEn développement depuis plus de 25 ans, l'entreprise comporte aujourd'hui plus de 750 salariés en constante formation.\n\nDans le c...",
                 "entrepriseAdaptee": False
             },
@@ -51,19 +51,6 @@ POLE_EMPLOI_API = {
         {
             "id": "4162319",
             "intitule": "Technicien support applicatif",
-            "description": "OFFRE2: \n description2",
-            "dateCreation": "2021-10-25T07:58:35.000Z",
-            "dateActualisation": "2021-10-25T07:58:35.000Z",
-            "lieuTravail": {
-                "libelle": "49 - Maine et Loire"
-            },
-            "romeCode": "I1401",
-            "romeLibelle": "Maintenance informatique et bureautique",
-            "appellationlibelle": "Technicien / Technicienne de maintenance en informatique",
-            "entreprise": {
-                "nom": "ITANCIA",
-                "entrepriseAdaptee": False
-            },
             "typeContrat": "CDI",
             "typeContratLibelle": "Contrat à durée indéterminée",
             "natureContrat": "Contrat travail",

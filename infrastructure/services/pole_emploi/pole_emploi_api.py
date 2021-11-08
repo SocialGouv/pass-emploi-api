@@ -19,7 +19,7 @@ class PoleEmploiApi:
 
             response = api.get(suffix_url, params=query_params or {})
 
-            return get_response_json(response, 'Pole Emploi API - GET')
+            return get_response_json(response, 'Pole Emploi API - GET error')
         except Exception as e:
             print(e)
             raise e

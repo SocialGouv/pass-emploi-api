@@ -13,7 +13,7 @@ def to_offres_emploi(offres_emploi_response: dict) -> List[OffreEmploi]:
     for offre in results:
         id = offre.get('id')
         titre = offre.get('intitule')
-        type_contrat = offre.get('intitule')
+        type_contrat = offre.get('typeContrat')
 
         entreprise = offre.get('entreprise')
         nom_entreprise = entreprise.get('nom') if entreprise else None
