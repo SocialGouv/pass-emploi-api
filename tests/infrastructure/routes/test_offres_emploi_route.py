@@ -14,9 +14,9 @@ def test_offres_emploi(mocked_offres_emploi, client):
     }
 
     response = client.get(f'{PASS_EMPLOI_DEV_URL}/offres-emploi')
+    
     assert response.status_code == 200
     mocked_offres_emploi.assert_called_once()
-    print(response.data)
     assert response.data == bytes(
         json.dumps(
             [

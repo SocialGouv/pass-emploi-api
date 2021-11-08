@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 from application.use_cases.offres_emploi_use_case import OffresEmploiUseCase
 
 
-@mock.patch('application.repositories.offres_emploi_repository.OffresEmploiRepository')
+@mock.patch('domain.offres_emploi.offres_emploi_repository.OffresEmploiRepository')
 class TestOffresEmploiUseCase:
     def test_get_offres_emploi_returns(
             self, mocked_offres_emploi_repository
@@ -16,8 +16,8 @@ class TestOffresEmploiUseCase:
         use_case = OffresEmploiUseCase(mocked_offres_emploi_repository)
 
         # when
-        offres_emploi = use_case.get_offres_emploi()
+        offres_emploi = use_case.get_offres_emploi(1, 50, None, None)
 
         # then
         assert offres_emploi == []
-        mocked_offres_emploi_repository.get_offres_emploi.assert_called_with()
+        mocked_offres_emploi_repository.get_offres_emploi.assert_called_with(1, 50, None, None)
