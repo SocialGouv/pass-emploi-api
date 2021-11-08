@@ -11,4 +11,4 @@ build/
 tests/__pycache__/
 __pycache__/
 infrastructure/services/firebase/pass_emploi_secret_key.json
-.env
+.environment

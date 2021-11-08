@@ -10,18 +10,15 @@
 6. Installer les librairies du projet : `$ pip install -r requirements.txt`
 7. Pour lancer le projet directement depuis l'IDE, il peut être nécessaire de spécifier le `working directory`:
    `Run > Edit Configurations > Working Directory: /pass-emploi-api`
+8. Configurer le script vers `pass-emploi-api/app.py`
+9. Ajouter une configuration qui pointe sur le docker-compose.yml et l'utiliser en before lunch du lancement du projet
 
 NB: Pour rajouter une nouvelle librairie pour le projet il suffit de la rajouter dans le fichier `requirements.txt`
 
-## Initialisation de la base avec docker :
+## Lancer les DB avec docker compose :
 
 ```shell script
-docker run -d -p 5432:5432 --name PASSEMPLOI-POSTGRES -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=pass -e POSTGRES_DB=PASSEMPLOIDB postgres 
-docker exec -it PASSEMPLOI-POSTGRES bash
-psql -U postgres
-CREATE DATABASE passemploidbdev;
-\q
-exit
+docker-compose up -d
 ```
 
 ## Utilisation de la sandbox :
@@ -69,8 +66,8 @@ VALUES (1, 'Nils', 'Willis');
 
 # Renseigner les variables d'environnement
 
-Pour renseigner les variables d'environnement nécessaires à l'application, il faut créer un fichier `.env` à la racine,
-où on les spécifie. Le fichier `.env.template` donne une idée des variables à renseigner.
+Pour renseigner les variables d'environnement nécessaires à l'application, il faut créer un fichier `.environment` à la racine,
+où on les spécifie. Le fichier `.environment.template` donne une idée des variables à renseigner.
 
 NB: Ce fichier est bien dans le .gitignore, mais garder attention à ne pas le rajouter car il contient des clés privées.
 
@@ -78,7 +75,7 @@ NB: Ce fichier est bien dans le .gitignore, mais garder attention à ne pas le r
 
 1. Aller sur la page Firebase du projet Pass Emploi > Paramètres du Projet > Comptes de service
 2. Générer une clé privée
-3. Rajouter cette clé dans le fichier `.env` dans la variable `FIREBASE_SECRET_KEY`. NB: Faire attention à bien in-liner
+3. Rajouter cette clé dans le fichier `.environment.template` dans la variable `FIREBASE_SECRET_KEY`. NB: Faire attention à bien in-liner
    la clé afin qu'elle puisse être parsée et lue.
 
 # Lancer les tests
