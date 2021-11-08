@@ -1,0 +1,38 @@
+---
+version: "3.7"
+
+volumes:
+  api-db-data:
+  cache-db-data:
+
+services:
+  PASSEMPLOI-POSTGRES:
+    image: postgres:14
+    command: ['-c', 'fsync=off']
+    tmpfs:
+      - /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: passemploidbdev
+    volumes:
+      - api-db-data:/var/lib/postgresql
+
+  cache-db:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - cache-db-data:/data
+    command: [ 'redis-server', '--appendonly yes' ]
+
+  redis-commander:
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:cache-db:6379
+    ports:
+      - "8901:8081"

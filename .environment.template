@@ -5,7 +5,7 @@ FIREBASE_SECRET_KEY=
 SQLALCHEMY_DATABASE_URI=postgresql://postgres:pass@localhost:5432/passemploidbdev
 
 ## REDIS
-REDIS_URL=your-redis-url
+REDIS_URL=redis://localhost:6379
 
 ### POLE EMPLOI
 POLE_EMPLOI_API_BASE_URL=https://api.emploi-store.fr/partenaire
