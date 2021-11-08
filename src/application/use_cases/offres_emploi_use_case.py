@@ -1,7 +1,7 @@
 from typing import Optional, List
 
-from domain.offres_emploi.offre_emploi import OffreEmploi
-from domain.offres_emploi.offres_emploi_repository import OffresEmploiRepository
+from src.domain.offres_emploi.offre_emploi import OffreEmploi
+from src.domain.offres_emploi.offres_emploi_repository import OffresEmploiRepository
 
 
 class OffresEmploiUseCase:

@@ -1,13 +1,13 @@
 from unittest.mock import patch, MagicMock
 
-from infrastructure.services.cache.pole_emploi_token_cache import PoleEmploiTokenCache
-from infrastructure.services.pole_emploi.pole_emploi_api_token_retriever import PoleEmploiAPITokenRetriever
-from infrastructure.services.pole_emploi.pole_emploi_api_token_retriever_cache_decorator import \
+from src.infrastructure.services.cache.pole_emploi_token_cache import PoleEmploiTokenCache
+from src.infrastructure.services.pole_emploi.pole_emploi_api_token_retriever import PoleEmploiAPITokenRetriever
+from src.infrastructure.services.pole_emploi.pole_emploi_api_token_retriever_cache_decorator import \
     PoleEmploiAPITokenRetrieverCacheDecorator
 
 
-@patch('infrastructure.services.pole_emploi.pole_emploi_api_token_retriever.PoleEmploiAPITokenRetriever')
-@patch('infrastructure.services.cache.pole_emploi_token_cache.PoleEmploiTokenCache')
+@patch('src.infrastructure.services.pole_emploi.pole_emploi_api_token_retriever.PoleEmploiAPITokenRetriever')
+@patch('src.infrastructure.services.cache.pole_emploi_token_cache.PoleEmploiTokenCache')
 class TestPoleEmploiAPITokenRetrieverCacheDecorator:
     def test_get_api_token_when_token_is_available_in_cache_should_return_it(
             self,

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, List
 
-from domain.offres_emploi.offre_emploi import OffreEmploi
+from src.domain.offres_emploi.offre_emploi import OffreEmploi
 
 
 class OffresEmploiRepository(ABC):

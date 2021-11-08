@@ -1,6 +1,6 @@
 from typing import List
 
-from domain.offres_emploi.offre_emploi import OffreEmploi
+from src.domain.offres_emploi.offre_emploi import OffreEmploi
 
 
 def to_offres_emploi(offres_emploi_response: dict) -> List[OffreEmploi]:

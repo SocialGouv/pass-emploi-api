@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from infrastructure.services.firebase.push_notification_messages import NEW_ACTION_NOTIFICATION_MESSAGE, \
+from src.infrastructure.services.firebase.push_notification_messages import NEW_ACTION_NOTIFICATION_MESSAGE, \
     NEW_MESSAGE_NOTIFICATION_MESSAGE
-from infrastructure.services.firebase.send_push_notifications import send_firebase_push_notifications
+from src.infrastructure.services.firebase.send_push_notifications import send_firebase_push_notifications
 from model.action import Action
 from model.action_creator import ActionCreator
 from model.action_creator_type import ActionCreatorType
@@ -17,8 +17,10 @@ from use_cases.create_action_request import CreateActionRequest
 
 class HomeConseillerUseCase:
 
-    def __init__(self, jeune_repository: JeuneRepository, action_repository: ActionRepository,
-                 action_creator_repository: ActionCreatorRepository):
+    def __init__(
+            self, jeune_repository: JeuneRepository, action_repository: ActionRepository,
+            action_creator_repository: ActionCreatorRepository
+            ):
         self.jeuneRepository = jeune_repository
         self.actionRepository = action_repository
         self.actionCreatorRepository = action_creator_repository
@@ -26,9 +28,16 @@ class HomeConseillerUseCase:
     def create_action(self, request: CreateActionRequest, jeune_id: str) -> None:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
 
-        self.actionCreatorRepository.add_action_creator(ActionCreator(creator_id=jeune.conseiller.id,
-                                                                      action_creator_type=ActionCreatorType.CONSEILLER))
-        action_creator = self.actionCreatorRepository.get_action_creator(jeune.conseiller.id, ActionCreatorType.CONSEILLER)
+        self.actionCreatorRepository.add_action_creator(
+            ActionCreator(
+                creator_id=jeune.conseiller.id,
+                action_creator_type=ActionCreatorType.CONSEILLER
+                )
+            )
+        action_creator = self.actionCreatorRepository.get_action_creator(
+            jeune.conseiller.id,
+            ActionCreatorType.CONSEILLER
+            )
 
         action = Action(
             content=request.content,

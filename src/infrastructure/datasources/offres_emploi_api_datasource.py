@@ -1,6 +1,6 @@
 from typing import Optional
 
-from infrastructure.services.pole_emploi.pole_emploi_api import PoleEmploiApi
+from src.infrastructure.services.pole_emploi.pole_emploi_api import PoleEmploiApi
 
 OFFRES_EMPLOI_SUFFIX_URL = 'offresdemploi/v2/offres/search'
 

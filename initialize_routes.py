@@ -1,9 +1,9 @@
 def initialize_routes(app):
-    from infrastructure.routes.common_routes import common_routes
-    from infrastructure.routes.mobile import mobile
-    from infrastructure.routes.offres_emploi import offres_emploi
-    from infrastructure.routes.web import web
-    from infrastructure.routes.health_check import health_check
+    from src.infrastructure.routes.common_routes import common_routes
+    from src.infrastructure.routes.mobile import mobile
+    from src.infrastructure.routes.offres_emploi import offres_emploi
+    from src.infrastructure.routes.web import web
+    from src.infrastructure.routes.health_check import health_check
 
     app.register_blueprint(health_check)
     app.register_blueprint(web)

@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
-from infrastructure.services.firebase.push_notification_messages import NEW_RENDEZVOUS_NOTIFICATION_MESSAGE
-from infrastructure.services.firebase.send_push_notifications import send_firebase_push_notifications
+from src.infrastructure.services.firebase.push_notification_messages import NEW_RENDEZVOUS_NOTIFICATION_MESSAGE
+from src.infrastructure.services.firebase.send_push_notifications import send_firebase_push_notifications
 from model.rendezvous import Rendezvous
 from repositories.conseiller_repository import ConseillerRepository
 from repositories.jeune_repository import JeuneRepository

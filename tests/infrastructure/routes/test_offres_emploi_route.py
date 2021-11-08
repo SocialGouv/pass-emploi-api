@@ -2,19 +2,15 @@ import json
 from unittest import mock
 
 from config import PASS_EMPLOI_DEV_URL
-from tests.infrastructure.routes.mocks import POLE_EMPLOI_API
+from tests.mocks.offres_emploi_mocks import POLE_EMPLOI_API
 
 
-@mock.patch('infrastructure.datasources.offres_emploi_api_datasource.PoleEmploiApi.get')
+@mock.patch('src.infrastructure.datasources.offres_emploi_api_datasource.PoleEmploiApi.get')
 def test_offres_emploi(mocked_offres_emploi, client):
-    mocked_resultats = POLE_EMPLOI_API['offres_emploi']
-
-    mocked_offres_emploi.return_value = {
-        "resultats": mocked_resultats
-    }
+    mocked_offres_emploi.return_value = POLE_EMPLOI_API['offres_emploi']
 
     response = client.get(f'{PASS_EMPLOI_DEV_URL}/offres-emploi')
-    
+
     assert response.status_code == 200
     mocked_offres_emploi.assert_called_once()
     assert response.data == bytes(

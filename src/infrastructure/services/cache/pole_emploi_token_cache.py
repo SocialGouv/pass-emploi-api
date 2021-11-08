@@ -1,6 +1,6 @@
 from typing import Optional
 
-from infrastructure.services.cache.redis_client import RedisClient
+from src.infrastructure.services.cache.redis_client import RedisClient
 
 KEY = 'pole_emploi_token'
 TOKEN_EXPIRY = 1440
