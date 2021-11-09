@@ -1,17 +1,13 @@
 # Initialiser le poste de dev
 
 1. Ouvrir le projet dans PyCharm
-2. Importer le formateur `pass_emploi_python_code_style.xml` à la racine du
+2. Importer le formateur `tools/pass_emploi_python_code_style.xml` à la racine du
    projet : `Preferences > Code style > Import scheme…`
-3. Créer l'environnement virtuel Python : `$ python3 -m venv pass-emploi-venv`
-4. Activer l'environnement : `$ source pass-emploi-venv/bin/activate`
-5. Configurer l'interprêteur Python dans PyCharm : Interpreter Settings > Show all > "+" et ajouter l'environnement que
+3. Lancer la configuration `install` ou le script `tools/install.sh`
+4. Configurer l'interprêteur Python dans PyCharm : Interpreter Settings > Show all > "+" et ajouter l'environnement que
    l'on vient de créer
-6. Installer les librairies du projet : `$ pip install -r requirements.txt`
-7. Pour lancer le projet directement depuis l'IDE, il peut être nécessaire de spécifier le `working directory`:
-   `Run > Edit Configurations > Working Directory: /pass-emploi-api`
-8. Configurer le script vers `pass-emploi-api/app.py`
-9. Ajouter une configuration qui pointe sur le docker-compose.yml et l'utiliser en before lunch du lancement du projet
+5. Pour démarrer l'API' directement depuis l'IDE, lancer la configuration `pass-emploi-api`  
+   Cette configuration installe les dépendances et démarre une db locale
 
 NB: Pour rajouter une nouvelle librairie pour le projet il suffit de la rajouter dans le fichier `requirements.txt`
 
