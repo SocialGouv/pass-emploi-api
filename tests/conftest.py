@@ -30,8 +30,13 @@ def clean_database(f: object) -> object:
     @wraps(f)
     def decorated_function(*args, **kwargs):
         db.session.remove()
-        db.drop_all()
-        db.create_all()
+        with db.engine.connect() as connection:
+            query = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type =" \
+                    " 'BASE TABLE' AND table_name NOT IN ('alembic_version');"
+            tables = connection.execute(query)
+            for table in tables:
+                query = f'''TRUNCATE TABLE {table[0]} CASCADE;'''
+                connection.execute(query)
         return f(*args, **kwargs)
     return decorated_function
 

@@ -4,7 +4,7 @@ FIREBASE_ENVIRONMENT_PREFIX=staging
 LOG_LEVEL=DEBUG
 FIREBASE_SECRET_KEY=
 SQLALCHEMY_DATABASE_URI=postgresql://postgres:pass@localhost:5432/passemploidbdev
-SQLALCHEMY_DATABASE_TEST_URI=
+SQLALCHEMY_DATABASE_TEST_URI=postgresql://test:test@localhost:55432/test
 
 ## REDIS
 REDIS_URL=redis://localhost:6379
