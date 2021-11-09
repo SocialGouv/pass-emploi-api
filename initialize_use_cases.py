@@ -1,30 +1,30 @@
+from src.application.use_cases.offres_emploi_use_case import OffresEmploiUseCase
 from datasources.action_creator_database_datasource import ActionCreatorDatabaseDatasource
 from datasources.action_database_datasource import ActionDatabaseDatasource
 from datasources.conseiller_database_datasource import ConseillerDatabaseDatasource
 from datasources.jeune_database_datasource import JeuneDatabaseDatasource
-from datasources.offres_emploi_api_datasource import OffresEmploiAPIDatasource
 from datasources.rendezvous_database_datasource import RendezvousDatabaseDatasource
-from infrastructure.services.cache.pole_emploi_token_cache import PoleEmploiTokenCache
-from infrastructure.services.cache.redis_client import RedisClient
-from infrastructure.services.firebase.firebase_chat import FirebaseChat
-from infrastructure.services.pole_emploi.pole_emploi_api import PoleEmploiApi
-from infrastructure.services.pole_emploi.pole_emploi_api_token_network_retriever import \
+from src.infrastructure.datasources.offres_emploi_api_datasource import OffresEmploiAPIDatasource
+from src.infrastructure.repositories.offres_emploi_api_repository import OffresEmploiAPIRepository
+from src.infrastructure.services.cache.pole_emploi_token_cache import PoleEmploiTokenCache
+from src.infrastructure.services.cache.redis_client import RedisClient
+from src.infrastructure.services.firebase.firebase_chat import FirebaseChat
+from src.infrastructure.services.pole_emploi.pole_emploi_api import PoleEmploiApi
+from src.infrastructure.services.pole_emploi.pole_emploi_api_token_network_retriever import \
     PoleEmploiAPITokenNetworkRetriever
-from infrastructure.services.pole_emploi.pole_emploi_api_token_retriever_cache_decorator import \
+from src.infrastructure.services.pole_emploi.pole_emploi_api_token_retriever_cache_decorator import \
     PoleEmploiAPITokenRetrieverCacheDecorator
 from initialize_db import db
 from repositories.action_creator_repository import ActionCreatorRepository
 from repositories.action_repository import ActionRepository
 from repositories.conseiller_repository import ConseillerRepository
 from repositories.jeune_repository import JeuneRepository
-from repositories.offres_emploi_repository import OffresEmploiRepository
 from repositories.rendezvous_repository import RendezvousRepository
 from use_cases.action_use_case import ActionUseCase
 from use_cases.conseiller_use_case import ConseillerUseCase
 from use_cases.home_conseiller_use_case import HomeConseillerUseCase
 from use_cases.home_jeune_use_case import HomeJeuneUseCase
 from use_cases.jeune_use_case import JeuneUseCase
-from use_cases.offres_emploi_use_case import OffresEmploiUseCase
 from use_cases.rendezvous_use_case import RendezvousUseCase
 
 firebase_chat = FirebaseChat()
@@ -45,7 +45,7 @@ conseiller_repository = ConseillerRepository(conseiller_database_datasource, jeu
 jeune_repository = JeuneRepository(jeune_database_datasource, firebase_chat)
 rendezvous_repository = RendezvousRepository(rendezvous_database_datasource)
 action_creator_repository = ActionCreatorRepository(action_creator_database_datasource)
-offres_emploi_repository = OffresEmploiRepository(offres_emploi_api_datasource)
+offres_emploi_api_repository = OffresEmploiAPIRepository(offres_emploi_api_datasource)
 
 jeune_use_case = JeuneUseCase(jeune_repository)
 conseiller_use_case = ConseillerUseCase(conseiller_repository, jeune_repository)
@@ -56,4 +56,4 @@ home_jeune_use_case = HomeJeuneUseCase(
 home_conseiller_use_case = HomeConseillerUseCase(jeune_repository, action_repository, action_creator_repository)
 action_use_case = ActionUseCase(jeune_repository, action_repository)
 rendezvous_use_case = RendezvousUseCase(jeune_repository, conseiller_repository, rendezvous_repository)
-offres_emploi_use_case = OffresEmploiUseCase(offres_emploi_repository)
+offres_emploi_use_case = OffresEmploiUseCase(offres_emploi_api_repository)

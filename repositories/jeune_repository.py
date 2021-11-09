@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from datasources.jeune_database_datasource import JeuneDatabaseDatasource
-from infrastructure.services.firebase.firebase_chat import FirebaseChat
+from src.infrastructure.services.firebase.firebase_chat import FirebaseChat
 from model.jeune import Jeune
 from sql_model.sql_jeune import SqlJeune
 from transformers.jeune_transformer import to_jeune
