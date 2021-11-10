@@ -51,7 +51,10 @@ def to_action_query_model(sql_action: Optional[SqlAction]) -> Optional[ActionQue
         last_update=sql_action.lastUpdate,
         status=sql_action.status.value,
         creator_type=sql_action.actionCreator.actionCreatorType.value,
-        creator=__parse_creator(sql_action)
+        creator=__parse_creator(sql_action),
+        jeune_id=sql_action.jeune.id,
+        jeune_firstname=sql_action.jeune.firstName,
+        jeune_lastname=sql_action.jeune.lastName
     )
 
 
