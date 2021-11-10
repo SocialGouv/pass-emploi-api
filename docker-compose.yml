@@ -12,7 +12,7 @@ services:
     tmpfs:
       - /var/lib/postgresql/data
     ports:
-      - "55432:5432"
+      - "54432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: pass
