@@ -23,8 +23,9 @@ def create_sandbox() -> None:
                    VALUES ('3', 'Rendez-vous conseiller', 'avec Nils', 'Suivi des actions', 'Par téléphone', 
                    '2023-09-26 10:00:00', '00:30:00', '1', '1');
                    
+            INSERT INTO action_creator (id, creator_id, action_creator_type) VALUES ('1', '1', 'conseiller');
             
-            INSERT INTO action_creator (id, creator_id, action_creator_type) VALUES ('1', '1', 'jeune');
+            INSERT INTO action_creator (id, creator_id, action_creator_type) VALUES ('2', '1', 'jeune');
                         
             INSERT INTO action (id, content, comment, is_done, creation_date, last_update, action_creator_id, jeune_id) VALUES
                     ('1', 'Suivre une formation', 'Consulter le catalogue des formations', 'false', 
@@ -36,7 +37,7 @@ def create_sandbox() -> None:
                     
             INSERT INTO action (id, content, comment, is_done, creation_date, last_update, action_creator_id, jeune_id) VALUES
                     ('3', 'Suivre une formation', 'Consulter le catalogue des formations', 'false', 
-                    '2023-09-26 10:00:00', '2023-09-24 10:00:00', '1', '1');              
+                    '2023-09-26 10:00:00', '2023-09-24 10:00:00', '2', '1');  
         """
     db.engine.execute(query)
     db.session.commit()

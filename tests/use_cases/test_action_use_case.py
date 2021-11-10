@@ -4,9 +4,9 @@ from use_cases.action_use_case import ActionUseCase
 
 
 @patch('repositories.jeune_repository.JeuneRepository')
-@patch('repositories.action_repository.ActionRepository')
+@patch('src.application.repositories.actions_repository.ActionsRepository')
 class TestActionUseCase:
-    def test_change_action_status_updates_action_given_correct_action_status(self, action_repository, jeune_repository):
+    def test_change_action_status_updates_action_given_correct_action_status(self, jeune_repository, action_repository):
         # given
         action_id = '1'
         action_status = 'in_progress'
@@ -20,9 +20,8 @@ class TestActionUseCase:
         action_repository.update_action.assert_called_with('1', 'in_progress')
 
     def test_change_action_status_should_not_update_action_when_action_status_is_incorrect(
-            self, action_repository,
-            jeune_repository
-            ):
+            self, action_repository, jeune_repository
+    ):
         # given
         action_id = '1'
         action_status = 'false_status'

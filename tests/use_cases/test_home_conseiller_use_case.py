@@ -14,11 +14,11 @@ from use_cases.home_conseiller_use_case import HomeConseillerUseCase
 
 
 @patch('repositories.jeune_repository.JeuneRepository')
-@patch('repositories.action_repository.ActionRepository')
+@patch('src.application.repositories.actions_repository.ActionsRepository')
 @patch('repositories.action_creator_repository.ActionCreatorRepository')
 @freeze_time('2021-10-19')
 class TestHomeConseillerUseCase:
-    def test_create_action_should_add_action_in_database(self, mocked_action_repository, mocked_jeune_repository,
+    def test_create_action_should_add_action_in_database(self, mocked_jeune_repository, mocked_action_repository,
                                                          mocked_action_creator_repository):
         # given
         conseiller = Conseiller("A", "F", "L")

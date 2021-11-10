@@ -1,6 +1,8 @@
 from datetime import datetime
+from typing import Optional
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm.exc import NoResultFound
 
 from initialize_db import db
 from model.jeune_actions_sum_up import JeuneActionsSumUp
@@ -43,6 +45,15 @@ class ActionDatabaseDatasource:
         """
         result = db.engine.execute(sql_query % conseiller_id)
         return list(map(lambda row: self.__to_jeune_actions_sum_up(row), result))
+
+    def get_action(self, id_action) -> Optional[SqlAction]:
+        try:
+            return SqlAction.query.filter_by(id=id_action).one()
+        except NoResultFound:
+            return None
+        except Exception as e:
+            print(e)
+            raise e
 
     def __to_jeune_actions_sum_up(self, row) -> JeuneActionsSumUp:
         return JeuneActionsSumUp(

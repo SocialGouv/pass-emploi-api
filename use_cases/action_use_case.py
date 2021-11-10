@@ -1,12 +1,12 @@
 from model.action_status import ActionStatus
-from repositories.action_repository import ActionRepository
 from repositories.jeune_repository import JeuneRepository
+from src.application.repositories.actions_repository import ActionsRepository
 
 
 class ActionUseCase:
-    def __init__(self, jeune_repository: JeuneRepository, action_repository: ActionRepository):
+    def __init__(self, jeune_repository: JeuneRepository, actions_repository: ActionsRepository):
         self.jeuneRepository = jeune_repository
-        self.actionRepository = action_repository
+        self.actionRepository = actions_repository
 
     def get_actions(self, jeune_id: str):
         jeune = self.jeuneRepository.get_jeune(jeune_id)

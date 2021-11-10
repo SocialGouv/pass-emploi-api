@@ -10,7 +10,7 @@ from sql_model.sql_action import SqlAction
 from sql_model.sql_action_creator import SqlActionCreator
 from sql_model.sql_conseiller import SqlConseiller
 from sql_model.sql_jeune import SqlJeune
-from transformers.action_transformer import to_action, to_sql_action
+from src.infrastructure.transformers.action_transformer import to_action, to_sql_action
 
 
 def test_to_action():

@@ -12,7 +12,7 @@ services:
     tmpfs:
       - /var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "55432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: pass
@@ -23,7 +23,7 @@ services:
   cache-db:
     image: redis:6-alpine
     ports:
-      - "6379:6379"
+      - "56379:6379"
     volumes:
       - cache-db-data:/data
     command: [ 'redis-server', '--appendonly yes' ]
