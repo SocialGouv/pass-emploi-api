@@ -21,7 +21,6 @@
     <option name="INPUT_FILE" value="" />
     <method v="2">
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="Dbs" run_configuration_type="docker-deploy" />
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="install" run_configuration_type="ShConfigurationType" />
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="wait_for_db" run_configuration_type="ShConfigurationType" />
     </method>
   </configuration>

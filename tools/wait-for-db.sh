@@ -17,3 +17,4 @@ until $(docker exec -i ${APIDB_NAME} psql --dbname passemploidbdev -U postgres -
   attempt_counter=$(($attempt_counter+1))
   sleep 1
 done
+echo "--db started--"
