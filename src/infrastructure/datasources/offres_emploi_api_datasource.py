@@ -2,7 +2,7 @@ from typing import Optional
 
 from src.infrastructure.services.pole_emploi.pole_emploi_api import PoleEmploiApi
 
-OFFRES_EMPLOI_SUFFIX_URL = 'offresdemploi/v2/offres/search'
+OFFRES_EMPLOI_SUFFIX_URL = 'offresdemploi/v2/offres'
 
 
 class OffresEmploiAPIDatasource:
@@ -20,7 +20,12 @@ class OffresEmploiAPIDatasource:
         if departement:
             query_params['departement'] = departement
 
-        return self.api.get(OFFRES_EMPLOI_SUFFIX_URL, query_params)
+        url = f'{OFFRES_EMPLOI_SUFFIX_URL}/search'
+        return self.api.get(url, query_params)
+
+    def get_offre_emploi(self, id_offre: str) -> dict:
+        url = f'{OFFRES_EMPLOI_SUFFIX_URL}/{id_offre}'
+        return self.api.get(url)
 
 
 def generate_query_param_range(page: int, limit: int):

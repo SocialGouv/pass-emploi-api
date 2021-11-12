@@ -5,12 +5,12 @@ from flask_cors import cross_origin
 
 from initialize_use_cases import get_detail_action_query_handler, action_use_case
 from json_model.json_action import JsonAction
-from network.headers_logger import log_headers
+from src.infrastructure.routes.utils.headers_logger import log_headers
 from src.application.queries.query_models.action_query_model import ActionQueryModel
 from src.application.queries.get_detail_action_query_handler import GetDetailActionQuery
 from src.infrastructure.routes.utils.error_helpers import generate_error_response, handle_exception
 
-actions = Blueprint('actions_routes', __name__)
+actions = Blueprint('actions', __name__)
 
 
 @actions.route('/actions/<id_action>', methods=['GET'])
