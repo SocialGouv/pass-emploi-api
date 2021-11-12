@@ -16,5 +16,6 @@ class OffresEmploiRepository(ABC):
     ) -> OffresEmploiQueryModel:
         raise NotImplementedError
 
+    @abstractmethod
     def get_offre_emploi_query_model(selfself, id_offre: str) -> Optional[OffreEmploiQueryModel]:
         raise NotImplementedError
