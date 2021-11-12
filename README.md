@@ -82,4 +82,8 @@ Pour lancer tous les tests on peut soit utiliser l'IDE, soit exécuter la comman
 
 Pour lancer un test en particulier, on peut soit utiliser l'IDE soit exécuter la commande suivante à la racine du projet
 
-`pytest tests/test_quon_veut_lancer`
+`ENV=test pytest tests/test_quon_veut_lancer`
+
+Pour pouvoir lancer les tests d'intégrations, il faut mettre à jour en local ( dans le fichier .env) la variable 
+
+d'environnement SQLALCHEMY_DATABASE_TEST_URI avec l'url de la DB de test ( qu'on peut récupérer sur Scalingo: pa-back-test ).

@@ -4,7 +4,7 @@ from typing import Optional
 import redis
 
 URL = os.environ.get('REDIS_URL')
-IS_ENABLED = URL and (URL is not '')
+IS_ENABLED = URL and (URL != '')
 
 
 class RedisClient:
