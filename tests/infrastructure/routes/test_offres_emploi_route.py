@@ -12,5 +12,4 @@ def test_offres_emploi(mocked_offres_emploi, client):
 
     assert response.status_code == 200
     mocked_offres_emploi.assert_called_once()
-
-    assert response.data == b'{"pagination":{"limit":50,"page":1},"results":[{"duree":"Temps plein","id":"4369834","localisation":{"codePostal":"51100","commune":"51454","nom":"51 - REIMS"},"nomEntreprise":"Offre RH","titre":"Technicien Informatique H/F","typeContrat":"CDD"},{"duree":null,"id":"4162319","localisation":null,"nomEntreprise":null,"titre":"Technicien support applicatif","typeContrat":"CDI"}]}\n'
+    assert response.data == b'{"pagination":{"limit":50,"page":1,"resultsSize":2},"results":[{"duree":"Temps plein","id":"4369834","localisation":{"codePostal":"51100","commune":"51454","nom":"51 - REIMS"},"nomEntreprise":"Offre RH","titre":"Technicien Informatique H/F","typeContrat":"CDD"},{"duree":null,"id":"4162319","localisation":null,"nomEntreprise":null,"titre":"Technicien support applicatif","typeContrat":"CDI"}]}\n'

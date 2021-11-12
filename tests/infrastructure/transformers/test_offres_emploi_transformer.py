@@ -15,7 +15,8 @@ class TestOffresEmploiTransformer:
 
         expected_pagination = {
             'page': mocked_page,
-            'limit': mocked_limit
+            'limit': mocked_limit,
+            'resultsSize': 2
         }
         expected_results = [
             {
@@ -52,7 +53,8 @@ class TestOffresEmploiTransformer:
 
         expected_pagination = {
             'page': mocked_page,
-            'limit': mocked_limit
+            'limit': mocked_limit,
+            'resultsSize': 0
         }
         expected_results = []
         expected_offres_emploi = OffresEmploiQueryModel(expected_pagination, expected_results)

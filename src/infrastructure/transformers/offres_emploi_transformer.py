@@ -7,7 +7,8 @@ from src.application.queries.query_models.offres_emploi_query_model import Offre
 def to_offres_emploi_query_model(page: int, limit: int, offres_emploi_response: dict) -> OffresEmploiQueryModel:
     pagination = {
         'page': page,
-        'limit': limit
+        'limit': limit,
+        'resultsSize': 0
     }
     offres_emploi = []
 
@@ -35,6 +36,7 @@ def to_offres_emploi_query_model(page: int, limit: int, offres_emploi_response: 
                 result
             )
 
+    pagination['resultsSize'] = len(offres_emploi)
     return OffresEmploiQueryModel(pagination, results=offres_emploi)
 
 
