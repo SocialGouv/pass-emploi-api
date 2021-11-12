@@ -9,7 +9,9 @@ from repositories.conseiller_repository import ConseillerRepository
 from repositories.jeune_repository import JeuneRepository
 from repositories.rendezvous_repository import RendezvousRepository
 from src.application.queries.get_detail_action_query_handler import GetDetailActionQueryHandler
-from src.application.use_cases.offres_emploi_use_case import OffresEmploiUseCase
+from src.application.queries.get_detail_offre_emploi_query_handler import GetDetailOffreEmploiQueryHandler
+
+from src.application.queries.get_liste_offres_emploi_query_handler import GetListeOffresEmploiQueryHandler
 from src.infrastructure.datasources.offres_emploi_api_datasource import OffresEmploiAPIDatasource
 from src.infrastructure.repositories.actions_db_repository import ActionsDbRepository
 from src.infrastructure.repositories.offres_emploi_api_repository import OffresEmploiAPIRepository
@@ -60,7 +62,8 @@ home_jeune_use_case = HomeJeuneUseCase(
 home_conseiller_use_case = HomeConseillerUseCase(jeune_repository, actions_db_repository, action_creator_repository)
 action_use_case = ActionUseCase(jeune_repository, actions_db_repository)
 rendezvous_use_case = RendezvousUseCase(jeune_repository, conseiller_repository, rendezvous_repository)
-offres_emploi_use_case = OffresEmploiUseCase(offres_emploi_api_repository)
 
 # Query handlers
 get_detail_action_query_handler = GetDetailActionQueryHandler(actions_db_repository)
+get_liste_offres_emploi_query_handler = GetListeOffresEmploiQueryHandler(offres_emploi_api_repository)
+get_detail_offre_emploi_query_handler = GetDetailOffreEmploiQueryHandler(offres_emploi_api_repository)

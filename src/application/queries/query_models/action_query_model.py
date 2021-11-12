@@ -15,8 +15,8 @@ class ActionQueryModel:
             creator_type: str,
             creator: str,
             jeune_id: str,
-            jeune_firstname: str,
-            jeune_lastname: str
+            jeune_first_name: str,
+            jeune_last_name: str
     ):
         self.id = id_action
         self.content = content
@@ -29,6 +29,6 @@ class ActionQueryModel:
         self.creator = creator
         self.jeune = {
             'id': jeune_id,
-            'fistname': jeune_firstname,
-            'lastname': jeune_lastname
+            'firstName': jeune_first_name,
+            'lastName': jeune_last_name
         }

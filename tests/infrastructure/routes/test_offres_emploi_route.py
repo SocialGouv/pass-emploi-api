@@ -1,4 +1,3 @@
-import json
 from unittest import mock
 
 from config import PASS_EMPLOI_DEV_URL
@@ -13,27 +12,4 @@ def test_offres_emploi(mocked_offres_emploi, client):
 
     assert response.status_code == 200
     mocked_offres_emploi.assert_called_once()
-    assert response.data == bytes(
-        json.dumps(
-            [
-                {
-                    "id": "4369834",
-                    "title": "Technicien Informatique H/F",
-                    "type_contrat": "CDD",
-                    "nom_entreprise": "Offre RH",
-                    "localisation": {
-                        "nom": "51 - REIMS",
-                        "code_postal": "51100",
-                        "commune": "51454"
-                    },
-                },
-                {
-                    "id": "4162319",
-                    "title": "Technicien support applicatif",
-                    "type_contrat": "CDI",
-                    "nom_entreprise": None,
-                    "localisation": None
-                }
-            ]
-        ), 'utf-8'
-    )
+    assert response.data == b'{"pagination":{"limit":50,"page":1,"resultsSize":2},"results":[{"duree":"Temps plein","id":"4369834","localisation":{"codePostal":"51100","commune":"51454","nom":"51 - REIMS"},"nomEntreprise":"Offre RH","titre":"Technicien Informatique H/F","typeContrat":"CDD"},{"duree":null,"id":"4162319","localisation":null,"nomEntreprise":null,"titre":"Technicien support applicatif","typeContrat":"CDI"}]}\n'
