@@ -22,11 +22,17 @@ class ActionDatabaseDatasource:
         return SqlAction.query.filter_by(jeuneId=jeune_id).all()
 
     def update_action(self, action_id: str, action_status: str) -> None:
-        SqlAction.query.filter_by(id=action_id).update({"status": action_status, "lastUpdate": datetime.utcnow()})
+        if action_status == "done":
+            SqlAction.query.filter_by(id=action_id).update({"status": action_status, "isDone": True, "lastUpdate": datetime.utcnow()})
+        else:
+            SqlAction.query.filter_by(id=action_id).update({"status": action_status, "isDone": False, "lastUpdate": datetime.utcnow()})
         self.db.session.commit()
 
     def update_action_deprecated(self, action_id: str, is_action_done: bool) -> None:
-        SqlAction.query.filter_by(id=action_id).update({"isDone": is_action_done, "lastUpdate": datetime.utcnow()})
+        if is_action_done:
+            SqlAction.query.filter_by(id=action_id).update({"isDone": is_action_done, "status": "done", "lastUpdate": datetime.utcnow()})
+        else:
+            SqlAction.query.filter_by(id=action_id).update({"isDone": is_action_done, "lastUpdate": datetime.utcnow()})
         self.db.session.commit()
 
     # noinspection SqlAggregates
