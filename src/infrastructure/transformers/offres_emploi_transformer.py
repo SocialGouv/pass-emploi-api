@@ -47,9 +47,9 @@ def to_offre_emploi_query_model(offre_emploi_response: dict) -> Optional[OffreEm
         return None
 
     contact_section = offre_emploi_response.get('contact')
-    contact_url = contact_section.get('urlPostulation')
+    contact_url = contact_section.get('urlPostulation') if contact_section else None
     origine_section = offre_emploi_response.get('origineOffre')
-    origine_url = origine_section.get('urlOrigine')
+    origine_url = origine_section.get('urlOrigine') if origine_section else None
 
     url_redirect = contact_url if contact_url else origine_url
 
