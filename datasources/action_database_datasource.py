@@ -42,8 +42,9 @@ class ActionDatabaseDatasource:
             jeune.id as jeune_id,
             jeune.first_name as jeune_first_name,
             jeune.last_name as jeune_last_name,
-            COUNT(CASE WHEN is_done = false AND jeune_id = jeune.id THEN 1 END) as todo_actions_count,
-            COUNT(CASE WHEN is_done = true AND jeune_id = jeune.id THEN 1 END) as done_actions_count
+            COUNT(CASE WHEN status = 'in_progress' AND jeune_id = jeune.id THEN 1 END) as in_progress_actions_count,
+            COUNT(CASE WHEN status = 'not_started' AND jeune_id = jeune.id THEN 1 END) as todo_actions_count,
+            COUNT(CASE WHEN status = 'done' AND jeune_id = jeune.id THEN 1 END) as done_actions_count
             FROM action RIGHT JOIN jeune ON action.jeune_id = jeune.id
             WHERE conseiller_id = %s
             GROUP BY jeune.id
@@ -66,6 +67,7 @@ class ActionDatabaseDatasource:
             row['jeune_id'],
             row['jeune_first_name'],
             row['jeune_last_name'],
+            row['in_progress_actions_count'],
             row['todo_actions_count'],
             row['done_actions_count']
         )

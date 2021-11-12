@@ -9,3 +9,4 @@ class JsonJeuneActionsSumUp:
         self.jeuneLastName = sum_up.jeuneLastName
         self.todoActionsCount = sum_up.todoActionsCount
         self.doneActionsCount = sum_up.doneActionsCount
+        self.inProgressActionsCount = sum_up.inProgressActionsCount
