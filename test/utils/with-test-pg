@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+# vi: ft=bash
+set -o errexit
+set -e
+
+CUSTOM_COMMAND=$*
+
+DOCKER_IMAGE=${DOCKER_IMAGE:-postgres:14-alpine}
+DOCKER_COMMAND="-c fsync=off"
+DOCKER_PORT=5432
+PGDATA=/var/lib/postgresql/data
+
+DEBUG_TEST_DB=""
+if (echo "$DEBUG" | grep 'test-db' >/dev/null) ; then
+  DEBUG_TEST_DB="yes"
+fi
+SKIP_AWAIT_PG_READY=${SKIP_AWAIT_PG_READY}
+
+ctrl_c (){
+  stop_image ${container_name}
+  exit $custom_command_return_code
+}
+
+start_image () {
+  NAME=$1
+  PORT=$(random_port)
+  docker run -d \
+    --name "${NAME}" \
+    --publish ${PORT}:${DOCKER_PORT} \
+    --tmpfs ${PGDATA} \
+    --env PGDTA=${PGDATA} \
+    --env POSTGRES_USER=test \
+    --env POSTGRES_PASSWORD=test \
+    --env POSTGRES_DB=test \
+    ${DOCKER_IMAGE} ${DOCKER_COMMAND} \
+    >&2
+  if test $? = 0 ; then
+    echo "postgres://test:test@localhost:${PORT}/test"
+  fi
+}
+
+run_custom_command () {
+  ${CUSTOM_COMMAND}
+}
+
+follow_logs () {
+  container_name=$1
+  docker logs -tf ${container_name} | while read line ; do
+    log '[test-db]' $line
+  done
+}
+
+stop_image () {
+  name=$1
+  docker rm -vf ${name}
+}
+
+wait_for_db () {
+  if [ ! -z "${SKIP_AWAIT_PG_READY}" ]
+  then
+    return 0
+  fi
+  name=$1
+  RUN_QUERY="docker exec -it ${name} psql -U test -h localhost -c"
+  while ! ${RUN_QUERY} 'SELECT 1;' >/dev/null ; do
+    sleep 0.3 # wait for 300ms before check again
+  done
+  echo "TEST DB RUNNING"
+}
+
+random_name () {
+  mktemp -uq test-db-XXXXXXXXXXXXX |  tr '[:upper:]' '[:lower:]'
+}
+
+random_port () {
+  # shuf -i 10000-50000 -n 1 # MacOS does not have shuf...
+  node -e 'console.log(Math.floor(Math.random()*40000 + 10000))'
+}
+
+log () {
+  SOFT='\033[0;33m'
+  NC='\033[0m'
+  echo -e >&2 "${SOFT}$*${NC}"
+}
+
+# MAIN
+trap ctrl_c INT
+container_name=$(random_name)
+log "starting DB container: ${name}"
+export DATABASE_URL=$(start_image ${container_name})
+if test -z "${DATABASE_URL}" ; then
+  exit 1
+fi
+if test -n "${DEBUG_TEST_DB}" ; then
+  follow_logs ${container_name} &
+fi
+log waiting for database to be ready...
+wait_for_db ${container_name}
+
+log "running command with env:"
+log "DATABASE_URL=${DATABASE_URL}"
+log ""
+log '>' ${CUSTOM_COMMAND}
+log ""
+log ""
+
+
+set +o errexit
+run_custom_command
+custom_command_return_code=$?
+set -o errexit
+
+log ""
+log "Command exited with errcode: ${custom_command_return_code}"
+log "stopping DB container"
+stop_image ${container_name}
+exit $custom_command_return_code
