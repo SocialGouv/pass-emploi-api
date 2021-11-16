@@ -1,26 +1,21 @@
 from waitress import serve
 
 from initialize_app import app, DEBUG
-from initialize_db import run_migrations
+from initialize_db import run_migrations, db
+from initialize_routes import initialize_routes
 from sandbox.create_sandbox import create_sandbox
-from routes.common_routes import common_routes
-from routes.mobile import mobile
-from routes.web import web
-
 
 run_migrations()
 
 if DEBUG:
     create_sandbox()
 
-app.register_blueprint(web)
-app.register_blueprint(mobile)
-app.register_blueprint(common_routes)
+initialize_routes(app)
 
 
-@app.route('/')
-def health_check():
-    return 'Pass Emploi version bêta.'
+@app.teardown_request
+def remove_db_session(exc):
+    db.session.remove()
 
 
 if __name__ == '__main__':

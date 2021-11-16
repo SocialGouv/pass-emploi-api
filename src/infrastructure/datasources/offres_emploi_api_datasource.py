@@ -1,0 +1,32 @@
+from typing import Optional
+
+from src.infrastructure.services.pole_emploi.pole_emploi_api import PoleEmploiApi
+
+OFFRES_EMPLOI_SUFFIX_URL = 'offresdemploi/v2/offres'
+
+
+class OffresEmploiAPIDatasource:
+
+    def __init__(self, pole_emploi_api: PoleEmploiApi):
+        self.api = pole_emploi_api
+
+    def get_offres_emploi(self, page: int, limit: int, search_term: Optional[str], departement: Optional[str]) -> dict:
+        query_params = {
+            'sort': 1,
+            'range': generate_query_param_range(page, limit)
+        }
+        if search_term:
+            query_params['motsCles'] = search_term
+        if departement:
+            query_params['departement'] = departement
+
+        url = f'{OFFRES_EMPLOI_SUFFIX_URL}/search'
+        return self.api.get(url, query_params)
+
+    def get_offre_emploi(self, id_offre: str) -> dict:
+        url = f'{OFFRES_EMPLOI_SUFFIX_URL}/{id_offre}'
+        return self.api.get(url)
+
+
+def generate_query_param_range(page: int, limit: int):
+    return f'{(page - 1) * limit}-{(page * limit) - 1}'

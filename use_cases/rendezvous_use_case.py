@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
-from firebase.push_notification_messages import NEW_RENDEZVOUS_NOTIFICATION_MESSAGE
-from firebase.send_push_notifications import send_firebase_push_notifications
+from src.infrastructure.services.firebase.push_notification_messages import NEW_RENDEZVOUS_NOTIFICATION_MESSAGE
+from src.infrastructure.services.firebase.send_push_notifications import send_firebase_push_notifications
 from model.rendezvous import Rendezvous
 from repositories.conseiller_repository import ConseillerRepository
 from repositories.jeune_repository import JeuneRepository
@@ -22,8 +22,10 @@ class RendezvousUseCase:
 
     def get_jeune_rendezvous(self, jeune_id: str) -> [Rendezvous]:
         jeune = self.jeuneRepository.get_jeune(jeune_id)
-        return self.rendezvousRepository.get_jeune_rendezvous(jeune, rendezvous_limit_date=datetime.utcnow(),
-                                                              is_soft_deleted=False)
+        return self.rendezvousRepository.get_jeune_rendezvous(
+            jeune, rendezvous_limit_date=datetime.utcnow(),
+            is_soft_deleted=False
+        )
 
     def get_conseiller_rendezvous(self, conseiller_id: str) -> [Rendezvous]:
         return self.rendezvousRepository.get_conseiller_rendezvous(conseiller_id, is_soft_deleted=False)
@@ -31,18 +33,13 @@ class RendezvousUseCase:
     def create_rendezvous(self, request: CreateRendezvousRequest) -> None:
         jeune = self.jeuneRepository.get_jeune(request.jeuneId)
         conseiller = self.conseillerRepository.get_conseiller(request.conseillerId)
-        duration_as_datetime = datetime.strptime(request.duration, "%H:%M:%S")
         rendezvous = Rendezvous(
             title='Rendez-vous conseiller',
             subtitle='avec ' + conseiller.firstName,
             comment=request.comment,
             modality=request.modality,
             date=datetime.strptime(request.date, "%a, %d %b %Y %H:%M:%S %Z"),
-            duration=timedelta(
-                hours=duration_as_datetime.hour,
-                minutes=duration_as_datetime.minute,
-                seconds=duration_as_datetime.second
-            ),
+            duration=timedelta(minutes=request.duration),
             is_soft_deleted=False,
             jeune=jeune,
             conseiller=conseiller
@@ -66,7 +63,8 @@ class RendezvousUseCase:
         registration_token = rendezvous.jeune.firebaseToken
 
         notification_message = 'Votre rendez-vous du {:02d}/{:02d} à {:02d}:{:02d} est supprimé'.format(
-            rendezvous.date.day, rendezvous.date.month, rendezvous.date.hour, rendezvous.date.minute)
+            rendezvous.date.day, rendezvous.date.month, rendezvous.date.hour, rendezvous.date.minute
+        )
 
         if registration_token:
             try:

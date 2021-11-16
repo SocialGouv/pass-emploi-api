@@ -1,27 +1,20 @@
 # Initialiser le poste de dev
 
 1. Ouvrir le projet dans PyCharm
-2. Importer le formateur `pass_emploi_python_code_style.xml` à la racine du
+2. Importer le formateur `tools/pass_emploi_python_code_style.xml` à la racine du
    projet : `Preferences > Code style > Import scheme…`
-3. Créer l'environnement virtuel Python : `$ python3 -m venv pass-emploi-venv`
-4. Activer l'environnement : `$ source pass-emploi-venv/bin/activate`
-5. Configurer l'interprêteur Python dans PyCharm : Interpreter Settings > Show all > "+" et ajouter l'environnement que
+3. Lancer la configuration `install` ou le script `tools/install.sh`
+4. Configurer l'interprêteur Python dans PyCharm : Interpreter Settings > Show all > "+" et ajouter l'environnement que
    l'on vient de créer
-6. Installer les librairies du projet : `$ pip install -r requirements.txt`
-7. Pour lancer le projet directement depuis l'IDE, il peut être nécessaire de spécifier le `working directory`:
-   `Run > Edit Configurations > Working Directory: /pass-emploi-api`
+5. Pour démarrer l'API' directement depuis l'IDE, lancer la configuration `pass-emploi-api`  
+   Cette configuration installe les dépendances et démarre une db locale
 
 NB: Pour rajouter une nouvelle librairie pour le projet il suffit de la rajouter dans le fichier `requirements.txt`
 
-## Initialisation de la base avec docker :
+## Lancer les DB avec docker compose :
 
 ```shell script
-docker run -d -p 5432:5432 --name PASSEMPLOI-POSTGRES -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=pass -e POSTGRES_DB=PASSEMPLOIDB postgres 
-docker exec -it PASSEMPLOI-POSTGRES bash
-psql -U postgres
-CREATE DATABASE passemploidbdev;
-\q
-exit
+docker-compose up -d
 ```
 
 ## Utilisation de la sandbox :
@@ -69,8 +62,8 @@ VALUES (1, 'Nils', 'Willis');
 
 # Renseigner les variables d'environnement
 
-Pour renseigner les variables d'environnement nécessaires à l'application, il faut créer un fichier `.env` à la racine,
-où on les spécifie. Le fichier `.env.template` donne une idée des variables à renseigner.
+Pour renseigner les variables d'environnement nécessaires à l'application, il faut créer un fichier `.environment` à la racine,
+où on les spécifie. Le fichier `.environment.template` donne une idée des variables à renseigner.
 
 NB: Ce fichier est bien dans le .gitignore, mais garder attention à ne pas le rajouter car il contient des clés privées.
 
@@ -78,7 +71,7 @@ NB: Ce fichier est bien dans le .gitignore, mais garder attention à ne pas le r
 
 1. Aller sur la page Firebase du projet Pass Emploi > Paramètres du Projet > Comptes de service
 2. Générer une clé privée
-3. Rajouter cette clé dans le fichier `.env` dans la variable `FIREBASE_SECRET_KEY`. NB: Faire attention à bien in-liner
+3. Rajouter cette clé dans le fichier `.environment.template` dans la variable `FIREBASE_SECRET_KEY`. NB: Faire attention à bien in-liner
    la clé afin qu'elle puisse être parsée et lue.
 
 # Lancer les tests
@@ -89,4 +82,8 @@ Pour lancer tous les tests on peut soit utiliser l'IDE, soit exécuter la comman
 
 Pour lancer un test en particulier, on peut soit utiliser l'IDE soit exécuter la commande suivante à la racine du projet
 
-`pytest tests/test_quon_veut_lancer`
+`ENV=test pytest tests/test_quon_veut_lancer`
+
+Pour pouvoir lancer les tests d'intégrations, il faut mettre à jour en local ( dans le fichier .env) la variable 
+
+d'environnement SQLALCHEMY_DATABASE_TEST_URI avec l'url de la DB de test ( qu'on peut récupérer sur Scalingo: pa-back-test ).
