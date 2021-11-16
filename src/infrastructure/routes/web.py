@@ -1,7 +1,8 @@
 from flask import abort, request, jsonify, Blueprint
 from flask_cors import cross_origin
 
-from initialize_use_cases import home_conseiller_use_case, rendezvous_use_case, conseiller_use_case
+from initialize_use_cases import home_conseiller_use_case, rendezvous_use_case, conseiller_use_case, action_use_case
+
 from json_model.json_conseiller_rendezvous import JsonConseillerRendezvous
 from json_model.json_jeune import JsonJeune
 from json_model.json_jeune_actions_sum_up import JsonJeuneActionsSumUp
@@ -16,7 +17,8 @@ web = Blueprint('web', __name__)
 @web.route('/conseillers/<conseiller_id>/actions', methods=['GET'])
 def get_jeune_actions_sum_up(conseiller_id: str):
     sum_ups = home_conseiller_use_case.get_jeune_actions_sum_up(conseiller_id)
-    json_sum_ups = list(map(lambda x: JsonJeuneActionsSumUp(x).__dict__, sum_ups))
+    json_sum_ups = list(
+        map(lambda x: JsonJeuneActionsSumUp(x).__dict__, sum_ups))
     return jsonify(json_sum_ups), 200
 
 
@@ -44,7 +46,8 @@ def post_rendezvous(conseiller_id: str):
         conseiller_id,
     )
     rendezvous_use_case.create_rendezvous(create_rendezvous_request)
-    rendezvous_use_case.send_new_rendezvous_notification(request.json['jeuneId'])
+    rendezvous_use_case.send_new_rendezvous_notification(
+        request.json['jeuneId'])
     return '', 201
 
 
@@ -59,7 +62,8 @@ def delete_rendezvous(rendezvous_id: str):
 @web.route('/conseillers/<conseiller_id>/rendezvous', methods=['GET'])
 def get_rendezvous(conseiller_id: str):
     rendezvous = rendezvous_use_case.get_conseiller_rendezvous(conseiller_id)
-    json_rendez_vous = list(map(lambda x: JsonConseillerRendezvous(x).__dict__, rendezvous))
+    json_rendez_vous = list(
+        map(lambda x: JsonConseillerRendezvous(x).__dict__, rendezvous))
     return jsonify(json_rendez_vous), 200
 
 
@@ -72,7 +76,8 @@ def get_home_conseiller(jeune_id: str):
 @web.route('/conseillers/<conseiller_id>/login', methods=['GET'])
 @cross_origin()
 def get_conseiller_informations(conseiller_id: str):
-    conseiller_informations = conseiller_use_case.get_conseiller_informations(conseiller_id)
+    conseiller_informations = conseiller_use_case.get_conseiller_informations(
+        conseiller_id)
     if conseiller_informations.conseiller is not None:
         return to_json(conseiller_informations), 200
     else:
@@ -90,9 +95,24 @@ def notify_message(jeune_id: str, conseiller_id: str):
 @web.route('/conseillers/<conseiller_id>/jeune', methods=['POST'])
 @cross_origin()
 def create_jeune(conseiller_id: str):
-    create_jeune_request = CreateJeuneRequest(request.json['firstName'], request.json['lastName'])
+    create_jeune_request = CreateJeuneRequest(
+        request.json['firstName'], request.json['lastName'])
     if conseiller_use_case.check_if_jeune_already_exists(create_jeune_request):
         abort(409)
     else:
-        jeune = conseiller_use_case.create_jeune(create_jeune_request, conseiller_id)
+        jeune = conseiller_use_case.create_jeune(
+            create_jeune_request, conseiller_id)
         return JsonJeune(jeune).__dict__, 201
+
+
+@web.route('/v1/actions/<action_id>', methods=['PATCH', 'PUT'])
+@cross_origin()
+def patch_action(action_id: str):
+    is_action_done = request.json.get('isDone')
+    action_status = request.json.get('status')
+    if is_action_done:
+        action_use_case.change_action_status_deprecated(
+            action_id, is_action_done)
+    if action_status:
+        action_use_case.change_action_status(action_id, action_status)
+    return '', 200
