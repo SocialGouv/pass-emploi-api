@@ -1,0 +1,87 @@
+import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Command } from '../../building-blocks/types/command'
+import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import {
+  failure,
+  isFailure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
+import { Action, ActionsRepositoryToken } from '../../domain/action'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import {
+  Notification,
+  NotificationRepositoryToken
+} from '../../domain/notification'
+
+export interface CreateActionCommand extends Command {
+  idJeune: Jeune.Id
+  contenu: string
+  idCreateur: Action.IdCreateur
+  typeCreateur: Action.TypeCreateur
+  statut?: Action.Statut
+  commentaire?: string
+}
+
+@Injectable()
+export class CreateActionCommandHandler
+  implements CommandHandler<CreateActionCommand, Result<string>>
+{
+  private logger
+
+  constructor(
+    @Inject(ActionsRepositoryToken)
+    private readonly actionRepository: Action.Repository,
+    @Inject(JeunesRepositoryToken)
+    private readonly jeuneRepository: Jeune.Repository,
+    @Inject(NotificationRepositoryToken)
+    private readonly notificationRepository: Notification.Repository,
+    private readonly actionFactory: Action.Factory
+  ) {
+    this.logger = new Logger('CreateActionCommandHandler')
+  }
+
+  async execute(command: CreateActionCommand): Promise<Result<string>> {
+    const jeune = await this.jeuneRepository.get(command.idJeune)
+    if (!jeune) {
+      return failure(new NonTrouveError('Jeune', command.idJeune))
+    }
+
+    const result = this.buildAction(command)
+    if (isFailure(result)) return result
+
+    const action = result.data
+    await this.actionRepository.save(action)
+
+    if (jeune.pushNotificationToken) {
+      await this.sendNotifcationNouvelleAction(
+        jeune.pushNotificationToken,
+        action
+      )
+    }
+
+    return success(action.id)
+  }
+
+  private buildAction(command: CreateActionCommand): Result<Action> {
+    return this.actionFactory.buildAction(
+      {
+        idJeune: command.idJeune,
+        contenu: command.contenu,
+        statut: command.statut,
+        commentaire: command.commentaire
+      },
+      { id: command.idCreateur, type: command.typeCreateur }
+    )
+  }
+
+  private async sendNotifcationNouvelleAction(
+    token: string,
+    action: Action
+  ): Promise<void> {
+    const notification = Notification.createNouvelleAction(token, action.id)
+    await this.notificationRepository.send(notification)
+    this.logger.log('Notification envoyée')
+  }
+}

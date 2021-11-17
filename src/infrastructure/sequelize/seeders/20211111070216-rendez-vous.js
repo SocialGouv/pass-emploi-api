@@ -1,0 +1,39 @@
+module.exports = {
+  async up (queryInterface) {
+    return queryInterface.bulkInsert('rendez_vous', [{
+      id: '89092e0a-1111-411b-ac32-4e8cb18498e3',
+      titre: 'Rendez-vous conseiller',
+      sous_titre: 'avec Nils',
+      commentaire: 'Suivi des actions',
+      modalite: 'Par téléphone',
+      date: '2023-09-24Z10:00:00.000',
+      duree: '30',
+      id_jeune: '1',
+      id_conseiller: '1'
+    }, {
+      id: '89092e0a-1111-411b-ac32-4e8cb18498e4',
+      titre: 'Rendez-vous conseiller',
+      sous_titre: 'avec Nils',
+      commentaire: 'Suivi des actions',
+      modalite: 'Par téléphone',
+      date: '2023-09-24Z10:00:00.000',
+      duree: '30',
+      id_jeune: '1',
+      id_conseiller: '1'
+    }, {
+      id: '89092e0a-1111-411b-ac32-4e8cb18498e5',
+      titre: 'Rendez-vous conseiller',
+      sous_titre: 'avec Nils',
+      commentaire: 'Suivi des actions',
+      modalite: 'Par téléphone',
+      date: '2023-09-24Z10:00:00.000',
+      duree: '30',
+      id_jeune: '1',
+      id_conseiller: '1'
+    }])
+  },
+
+  async down (queryInterface) {
+    await queryInterface.bulkDelete('rendez_vous', null, {})
+  }
+}

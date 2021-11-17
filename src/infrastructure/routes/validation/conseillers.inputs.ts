@@ -1,0 +1,33 @@
+import { ApiProperty } from '@nestjs/swagger'
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
+
+export class CreateActionPayload {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  content: string
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  comment: string | undefined
+}
+
+export class CreateActionAvecStatutPayload extends CreateActionPayload {
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  status: string | undefined
+}
+
+export class CreateJeunePayload {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  firstName: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  lastName: string
+}

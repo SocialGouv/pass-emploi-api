@@ -1,1 +1,2 @@
-web: gunicorn app:app
+web: bash .scalingo/web.sh
+postdeploy: bash .scalingo/post-deploy.sh
