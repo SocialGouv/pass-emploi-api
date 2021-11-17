@@ -18,6 +18,7 @@ import {
 } from '../../application/queries/get-conseiller-et-ses-jeunes.query.handler'
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
+import { DetailJeuneQueryModel } from '../../application/queries/query-models/jeunes.query-models'
 import { RendezVousQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
@@ -62,11 +63,16 @@ export class ConseillersController {
   async createJeune(
     @Param('idConseiller') idConseiller: string,
     @Body() createJeunePayload: CreateJeunePayload
-  ): Promise<void> {
-    await this.createJeuneCommandHandler.execute({
+  ): Promise<DetailJeuneQueryModel> {
+    const jeune = await this.createJeuneCommandHandler.execute({
       idConseiller,
       ...createJeunePayload
     })
+    return {
+      id: jeune.id,
+      firstName: jeune.firstName,
+      lastName: jeune.lastName
+    }
   }
 
   @Post('jeunes/:idJeune/action')
