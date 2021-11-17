@@ -87,6 +87,7 @@ export namespace Action {
   export interface Repository {
     save(action: Action): Promise<void>
     get(id: Action.Id): Promise<Action | undefined>
+    delete(id: Action.Id): Promise<void>
 
     getQueryModelById(id: string): Promise<ActionQueryModel | undefined>
     getQueryModelByJeuneId(id: string): Promise<ActionQueryModel[]>

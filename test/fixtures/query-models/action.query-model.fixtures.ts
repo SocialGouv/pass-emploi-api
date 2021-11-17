@@ -18,12 +18,12 @@ export const uneActionQueryModelFromDomain = (
     firstName: jeune.firstName,
     lastName: jeune.lastName
   },
-  creationDate: DateTime.fromJSDate(action.dateCreation).toFormat(
-    'EEE, d MMM yyyy HH:mm:ss z'
-  ),
-  lastUpdate: DateTime.fromJSDate(action.dateDerniereActualisation).toFormat(
-    'EEE, d MMM yyyy HH:mm:ss z'
-  ),
+  creationDate: DateTime.fromJSDate(action.dateCreation)
+    .toUTC()
+    .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
+  lastUpdate: DateTime.fromJSDate(action.dateDerniereActualisation)
+    .toUTC()
+    .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
   creator: 'John Doe',
   creatorType: Action.TypeCreateur.CONSEILLER
 })

@@ -25,4 +25,8 @@ export class ActionFakeRepository implements Action.Repository {
   getQueryModelByJeuneId(id: string): Promise<ActionQueryModel[]> {
     throw new Error(`Not implemented - Cannot getQueryModelByJeuneId ${id}`)
   }
+
+  delete(id: Action.Id): Promise<void> {
+    throw new Error(`Not implemented - Cannot delete ${id}`)
+  }
 }

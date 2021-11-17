@@ -10,6 +10,7 @@ import { TerminusModule } from '@nestjs/terminus'
 import { CreateActionCommandHandler } from './application/commands/create-action.command.handler'
 import { CreateJeuneCommandHandler } from './application/commands/create-jeune.command.handler'
 import { CreateRendezVousCommandHandler } from './application/commands/create-rendez-vous.command.handler'
+import { DeleteActionCommandHandler } from './application/commands/delete-action.command.handler'
 import { DeleteRendezVousCommandHandler } from './application/commands/delete-rendez-vous.command.handler'
 import { LoginJeuneCommandHandler } from './application/commands/login-jeune.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from './application/commands/send-notification-nouveau-message.command.handler'
@@ -125,7 +126,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateRendezVousCommandHandler,
     DeleteRendezVousCommandHandler,
     GetAllRendezVousConseillerQueryHandler,
-    SendNotificationNouveauMessageCommandHandler
+    SendNotificationNouveauMessageCommandHandler,
+    DeleteActionCommandHandler
   ]
 }
 

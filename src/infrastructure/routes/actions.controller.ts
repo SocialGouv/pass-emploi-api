@@ -1,14 +1,18 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   HttpException,
   HttpStatus,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
   Put
 } from '@nestjs/common'
+import { DeleteActionCommandHandler } from '../../application/commands/delete-action.command.handler'
 import {
   UpdateStatutActionCommand,
   UpdateStatutActionCommandHandler
@@ -27,7 +31,8 @@ import { UpdateStatutActionPayload } from './validation/actions.inputs'
 export class ActionsController {
   constructor(
     private readonly getDetailActionQueryHandler: GetDetailActionQueryHandler,
-    private readonly updateStatutActionCommandHandler: UpdateStatutActionCommandHandler
+    private readonly updateStatutActionCommandHandler: UpdateStatutActionCommandHandler,
+    private readonly deleteActionCommandHandler: DeleteActionCommandHandler
   ) {}
 
   @Get(':idAction')
@@ -60,6 +65,19 @@ export class ActionsController {
     @Body() updateStatutActionPayload: UpdateStatutActionPayload
   ): Promise<void> {
     await this.mettreAJourStatutAction(idAction, updateStatutActionPayload)
+  }
+
+  @Delete(':idAction')
+  @HttpCode(204)
+  async deleteAction(
+    @Param('idAction', new ParseUUIDPipe()) idAction: string
+  ): Promise<void> {
+    const result = await this.deleteActionCommandHandler.execute({
+      idAction
+    })
+    if (isFailure(result)) {
+      throw new NotFoundException(result.error)
+    }
   }
 
   private async mettreAJourStatutAction(

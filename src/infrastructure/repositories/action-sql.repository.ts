@@ -22,9 +22,22 @@ export class ActionSqlRepository implements Action.Repository {
     return ActionSqlRepository.actionFromSqlModel(sqlModel)
   }
 
+  async delete(idAction: string): Promise<void> {
+    await ActionSqlModel.destroy({
+      where: {
+        id: idAction
+      }
+    })
+  }
+
   async getQueryModelById(id: string): Promise<ActionQueryModel | undefined> {
     const actionSqlModel = await ActionSqlModel.findByPk(id, {
-      include: [{ model: JeuneSqlModel, required: true }]
+      include: [
+        {
+          model: JeuneSqlModel,
+          required: true
+        }
+      ]
     })
     if (!actionSqlModel) return undefined
 
@@ -36,7 +49,12 @@ export class ActionSqlRepository implements Action.Repository {
       where: {
         idJeune: id
       },
-      include: [{ model: JeuneSqlModel, required: true }]
+      include: [
+        {
+          model: JeuneSqlModel,
+          required: true
+        }
+      ]
     })
 
     const actions = []
