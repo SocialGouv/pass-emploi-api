@@ -24,6 +24,7 @@ import { GetDetailOffreEmploiQueryHandler } from './application/queries/get-deta
 import { GetHomeJeuneHandler } from './application/queries/get-home-jeune.query.handler'
 import { GetOffresEmploiQueryHandler } from './application/queries/get-offres-emploi.query.handler'
 import { GetAllRendezVousConseillerQueryHandler } from './application/queries/get-rendez-vous-conseiller.query.handler'
+import { GetAllRendezVousJeuneQueryHandler } from './application/queries/get-rendez-vous-jeune.query.handler'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from './application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
 import configuration from './config/configuration'
 import { Action, ActionsRepositoryToken } from './domain/action'
@@ -126,6 +127,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateRendezVousCommandHandler,
     DeleteRendezVousCommandHandler,
     GetAllRendezVousConseillerQueryHandler,
+    GetAllRendezVousJeuneQueryHandler,
     SendNotificationNouveauMessageCommandHandler,
     DeleteActionCommandHandler
   ]

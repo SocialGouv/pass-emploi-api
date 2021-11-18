@@ -32,6 +32,7 @@ export namespace RendezVous {
     getAllQueryModelsByConseiller(
       idConseiller: string
     ): Promise<RendezVousQueryModel[]>
+    getAllQueryModelsByJeune(idJeune: string): Promise<RendezVousQueryModel[]>
   }
 
   export function createRendezVousConseiller(

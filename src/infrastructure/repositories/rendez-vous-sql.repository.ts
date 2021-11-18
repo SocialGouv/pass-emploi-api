@@ -81,6 +81,22 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
 
     return allRendezVousSql.map(toRendezVousConseillerQueryModel)
   }
+
+  async getAllQueryModelsByJeune(
+    idJeune: string
+  ): Promise<RendezVousQueryModel[]> {
+    const allRendezVousSql = await RendezVousSqlModel.findAll({
+      include: [ConseillerSqlModel],
+      where: {
+        idJeune,
+        dateSuppression: {
+          [Op.is]: null
+        }
+      }
+    })
+
+    return allRendezVousSql.map(toRendezVousJeuneQueryModel)
+  }
 }
 
 function buildRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
@@ -105,6 +121,19 @@ function toRendezVousConseillerQueryModel(
     id: rendezVousSql.id,
     comment: rendezVousSql.commentaire ?? undefined,
     title: `${rendezVousSql.jeune.prenom} ${rendezVousSql.jeune.nom}`,
+    date: rendezVousSql.date,
+    modality: rendezVousSql.modalite,
+    duration: rendezVousSql.duree
+  }
+}
+
+function toRendezVousJeuneQueryModel(
+  rendezVousSql: RendezVousSqlModel
+): RendezVousQueryModel {
+  return {
+    id: rendezVousSql.id,
+    comment: rendezVousSql.commentaire ?? undefined,
+    title: `${rendezVousSql.conseiller.prenom} ${rendezVousSql.conseiller.nom}`,
     date: rendezVousSql.date,
     modality: rendezVousSql.modalite,
     duration: rendezVousSql.duree
