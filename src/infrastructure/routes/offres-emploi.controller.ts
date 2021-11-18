@@ -6,7 +6,10 @@ import {
   HttpStatus,
   HttpException
 } from '@nestjs/common'
-import { GetOffresEmploiQueryHandler } from '../../application/queries/get-offres-emploi.query.handler'
+import {
+  GetOffresEmploiQuery,
+  GetOffresEmploiQueryHandler
+} from '../../application/queries/get-offres-emploi.query.handler'
 import {
   GetDetailOffreEmploiQuery,
   GetDetailOffreEmploiQueryHandler
@@ -27,9 +30,13 @@ export class OffresEmploiController {
   @Get() getOffresEmploi(
     @Query() findOffresEmploiPayload: FindOffresEmploiPayload
   ): Promise<OffresEmploiQueryModel> {
-    return this.getOffresEmploiQueryHandler.execute({
-      ...findOffresEmploiPayload
-    })
+    const query: GetOffresEmploiQuery = {
+      page: findOffresEmploiPayload.page,
+      limit: findOffresEmploiPayload.limit,
+      departement: findOffresEmploiPayload.departement,
+      alternance: findOffresEmploiPayload.alternance === 'true'
+    }
+    return this.getOffresEmploiQueryHandler.execute(query)
   }
 
   @Get(':idOffreEmploi')
