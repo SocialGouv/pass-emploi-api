@@ -18,6 +18,7 @@ import {
 import { LoginJeuneCommandHandler } from '../../application/commands/login-jeune.command.handler'
 import { UpdateNotificationTokenCommandHandler } from '../../application/commands/update-notification-token.command.handler'
 import { GetActionsByJeuneQueryHandler } from '../../application/queries/get-actions-by-jeune.query.handler'
+import { GetAllRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler'
 import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
 import { ActionQueryModel } from '../../application/queries/query-models/action.query-model'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
@@ -27,6 +28,7 @@ import { JeuneHomeQueryModel } from '../../domain/jeune'
 import { CreateActionAvecStatutPayload } from './validation/conseillers.inputs'
 import { PutNotificationTokenInput } from './validation/jeunes.inputs'
 import StatutInvalide = Action.StatutInvalide
+import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
 
 @Controller('jeunes/:idJeune')
 export class JeunesController {
@@ -36,7 +38,8 @@ export class JeunesController {
     private readonly updateNotificationTokenCommandHandler: UpdateNotificationTokenCommandHandler,
     private readonly getHomeJeuneHandler: GetHomeJeuneHandler,
     private readonly getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
-    private readonly createActionCommandHandler: CreateActionCommandHandler
+    private readonly createActionCommandHandler: CreateActionCommandHandler,
+    private readonly getAllRendezVousJeuneQueryHandler: GetAllRendezVousJeuneQueryHandler
   ) {}
 
   @Get()
@@ -91,6 +94,13 @@ export class JeunesController {
     @Param('idJeune') idJeune: string
   ): Promise<ActionQueryModel[]> {
     return await this.getActionsByJeuneQueryHandler.execute({ idJeune })
+  }
+
+  @Get('rendezvous')
+  async getRendezVous(
+    @Param('idJeune') idJeune: string
+  ): Promise<RendezVousQueryModel[]> {
+    return await this.getAllRendezVousJeuneQueryHandler.execute({ idJeune })
   }
 
   @Post('action')
