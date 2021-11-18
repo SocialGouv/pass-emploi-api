@@ -36,28 +36,22 @@ export class OffresEmploiHttpRepository implements OffresEmploi.Repository {
   async findAll(
     page: number,
     limit: number,
+    alternance: boolean,
     query?: string,
-    departement?: string,
-    alternance?: boolean
+    departement?: string
   ): Promise<OffresEmploiQueryModel> {
     const params = new URLSearchParams()
     params.append('sort', '1')
     params.append('range', this.generateRange(page, limit))
 
-    let motsCles: string | undefined
-
-    if (alternance) {
-      motsCles = 'alternance'
-    }
     if (query) {
-      motsCles = motsCles ? `${motsCles}, ${query}` : query
+      params.append('motsCles', query)
     }
-    if (motsCles) {
-      params.append('motsCles', motsCles)
-    }
-
     if (departement) {
       params.append('departement', departement)
+    }
+    if (alternance) {
+      params.append('natureContrat', 'E2')
     }
 
     const token = await this.getToken()

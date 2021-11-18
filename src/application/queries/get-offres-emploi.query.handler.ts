@@ -15,7 +15,7 @@ export interface GetOffresEmploiQuery extends Query {
   limit?: number
   query?: string
   departement?: string
-  alternance?: boolean
+  alternance: boolean
 }
 
 @Injectable()
@@ -31,9 +31,9 @@ export class GetOffresEmploiQueryHandler
     return this.offresEmploiRepository.findAll(
       query.page || DEFAULT_PAGE,
       query.limit || DEFAULT_LIMIT,
+      query.alternance,
       query.query,
-      query.departement,
-      query.alternance
+      query.departement
     )
   }
 }
