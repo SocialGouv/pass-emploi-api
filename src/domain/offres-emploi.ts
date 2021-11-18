@@ -32,7 +32,7 @@ export namespace OffresEmploi {
       limit: number,
       query?: string,
       departement?: string,
-      alternance?: boolean
+      alternance?: string
     ): Promise<OffresEmploiQueryModel>
 
     getOffreEmploiQueryModelById(
