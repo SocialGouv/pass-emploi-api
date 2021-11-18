@@ -85,9 +85,10 @@ export class OffresEmploiHttpRepository implements OffresEmploi.Repository {
 
   async getToken(): Promise<string> {
     const TOKEN_EXPIRY_MINUTES = 24
+
     const isTokenExpired =
       this.inMemoryToken.tokenDate &&
-      this.inMemoryToken.tokenDate?.diffNow().as('minute') >
+      this.inMemoryToken.tokenDate.diffNow().as('minute') * -1 >
         TOKEN_EXPIRY_MINUTES
 
     if (!this.inMemoryToken.token || isTokenExpired) {
@@ -132,7 +133,7 @@ export class OffresEmploiHttpRepository implements OffresEmploi.Repository {
 
 export interface OffreEmploiDto {
   id: string
-  titre: string
+  intitule: string
   typeContrat: string
   dureeTravailLibelleConverti: string
   entreprise?: {

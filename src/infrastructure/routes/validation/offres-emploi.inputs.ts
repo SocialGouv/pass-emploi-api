@@ -1,32 +1,32 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiPropertyOptional } from '@nestjs/swagger'
 import { IsNotEmpty, IsString, IsNumber, IsOptional } from 'class-validator'
 
 export class FindOffresEmploiPayload {
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsNumber()
   @IsNotEmpty()
   @IsOptional()
   page?: number
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsNumber()
   @IsNotEmpty()
   @IsOptional()
   limit?: number
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsString()
   @IsNotEmpty()
   @IsOptional()
   q?: string
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsString()
   @IsNotEmpty()
   @IsOptional()
   departement?: string
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   alternance?: string
