@@ -52,6 +52,7 @@ import { RendezVousController } from './infrastructure/routes/rendez-vous.contro
 import { databaseProviders } from './infrastructure/sequelize/providers'
 import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
+import { PoleEmploiService } from './infrastructure/services/pole-emploi-service'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -75,6 +76,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     FirebaseClient,
     IdService,
     DateService,
+    PoleEmploiService,
     Action.Factory,
     {
       provide: ActionsRepositoryToken,
