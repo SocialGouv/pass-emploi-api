@@ -7,7 +7,7 @@ import { firstValueFrom } from 'rxjs'
 import { DateService } from '../../utils/date-service'
 
 @Injectable()
-export class PoleEmploiService {
+export class PoleEmploiClient {
   private inMemoryToken: {
     token: string | undefined
     tokenDate: DateTime | undefined
@@ -21,7 +21,7 @@ export class PoleEmploiService {
     private configService: ConfigService,
     private dateService: DateService
   ) {
-    this.logger = new Logger('PoleEmploiService')
+    this.logger = new Logger('PoleEmploiClient')
     this.inMemoryToken = { token: undefined, tokenDate: undefined }
     this.apiUrl = this.configService.get('poleEmploi').url
   }
@@ -71,7 +71,8 @@ export class PoleEmploiService {
     )
 
     const token = reponse.data.access_token
-    this.tokenExpiryInSeconds = reponse.data.expires_in
+    const SECONDS_BEFORE_EXPIRY = 30
+    this.tokenExpiryInSeconds = reponse.data.expires_in - SECONDS_BEFORE_EXPIRY
 
     this.logger.log(
       'An access token for Pole Emploi API has been retrieved successfully'

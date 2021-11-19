@@ -4,7 +4,7 @@ import {
   OffreEmploiQueryModel,
   OffresEmploiQueryModel
 } from '../../domain/offres-emploi'
-import { PoleEmploiService } from '../services/pole-emploi-service'
+import { PoleEmploiClient } from '../clients/pole-emploi-client'
 import {
   toOffresEmploiQueryModel,
   toOffreEmploiQueryModel
@@ -12,7 +12,7 @@ import {
 
 @Injectable()
 export class OffresEmploiHttpRepository implements OffresEmploi.Repository {
-  constructor(private poleEmploiService: PoleEmploiService) {}
+  constructor(private poleEmploiClient: PoleEmploiClient) {}
 
   async findAll(
     page: number,
@@ -35,7 +35,7 @@ export class OffresEmploiHttpRepository implements OffresEmploi.Repository {
       params.append('natureContrat', 'E2')
     }
 
-    const response = await this.poleEmploiService.get(
+    const response = await this.poleEmploiClient.get(
       'offresdemploi/v2/offres/search',
       params
     )
@@ -46,7 +46,7 @@ export class OffresEmploiHttpRepository implements OffresEmploi.Repository {
   async getOffreEmploiQueryModelById(
     idOffreEmploi: string
   ): Promise<OffreEmploiQueryModel | undefined> {
-    const response = await this.poleEmploiService.get(
+    const response = await this.poleEmploiClient.get(
       `offresdemploi/v2/offres/${idOffreEmploi}`
     )
 
