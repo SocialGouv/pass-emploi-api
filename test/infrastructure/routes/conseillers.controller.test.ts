@@ -9,7 +9,7 @@ import {
   stubClass
 } from '../../utils'
 
-describe.skip('ConseillersController', () => {
+describe('ConseillersController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
   let app: INestApplication
   before(async () => {

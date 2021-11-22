@@ -1,49 +1,85 @@
-## Description
+## Pré-requis
+- Node 16.13.0
+- Docker et docker-compose
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Configuration
 
-## Installation
+Créez un nouveau fichier à la racine du projet et nommez le `.environment`. Copiez ensuite le contenu du fichier `.environment.template` et collez le dans votre nouveau fichier.
 
-```bash
-$ npm install
-```
+Allez sur l'application scalingo et choississez `pa-back-staging > Environment > switch to bulk edit`. Copiez tout les variables nécessaires dans `.environment`
 
-## Running the app
+## Lancement
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
+Installez d'abord les dépendances:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+yarn
 ```
 
-## Support
+Ensuite, lancez le serveur de dev:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+yarn watch
+```
 
-## Stay in touch
+Voilà! Ouvrez [http://localhost:5000/documentation](http://localhost:5000/documentation) sur votre navigateur.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Tests
 
-## License
+Lancer les tests
 
-Nest is [MIT licensed](LICENSE).
+```bash
+yarn test
+```
+
+## Tests avec l'IDE
+
+Pour lancer les tests avec votre IDE favori, il est nécessaire de lancer d'abord une base de données via le docker-compose.
+```bash
+yarn start:db:test
+```
+
+Ensuite on il faut exporter la variable DATABASE_URL.
+```bash
+export DATABASE_URL=postgresql://test:test@localhost:56432/test
+```
+
+Enfin on peut lancer les tests avec le script ci (qui ne lance pas de DB)
+```bash
+yarn test:ci
+```
+
+## Lancer les seeds
+
+```bash
+yarn seed
+```
+
+***Pour ajouter des seeds, il faut aller dans le dossier src/infrastructure/sequelize/seeders***
+
+## Déploiement
+
+Nous utilisons actuellement Scalingo comme hébergeur sur l'application Web. Il existe deux environnements : Staging & Prod
+
+### Environnement de staging
+
+L'environnement de staging front correspond à l'application scalingo front `pa-back-staging`.
+
+Cette application est branchée sur la branche `develop` du repo.
+À chaque nouveau commit sur cette branche, un déploiement automatique sera lancé sur l'application.
+
+Il est également possible de déployer manuellement en allant sur `pa-back-staging > Deploy > Manual deployments > Trigger deployment`
+
+Les review apps sont activés sur cet environnement. Donc, à chaque nouvelle PR sur develop, une application temporaire au nom `pa-back-staging-pr[numéro de la PR sur github]` sera automatiquement créée. Cette application sera automatiquement détruite au merge de la PR.
+Pour plus d'informations sur les review apps, vous pouvez voir [la doc scalingo](https://doc.scalingo.com/platform/app/review-apps)
+
+### Environnement de prod
+
+L'environnement de prod front correspond à l'application scalingo back `pa-back-prod`.
+
+Cette application est branchée sur la branche `master` du repo.
+À chaque nouveau commit sur cette branche, un déploiement automatique sera lancé sur l'application.
+
+Il est également possible de déployer manuellement en allant sur `pa-back-prod > Deploy > Manual deployments > Trigger deployment`
+
+Les review apps ne sont pas activés sur la prod.

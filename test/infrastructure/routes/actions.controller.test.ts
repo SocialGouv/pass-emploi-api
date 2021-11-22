@@ -17,7 +17,7 @@ import {
 
 let getDetailActionQueryHandler: StubbedClass<GetDetailActionQueryHandler>
 let deleteActionCommandHandler: StubbedClass<DeleteActionCommandHandler>
-describe.skip('ActionsController', () => {
+describe('ActionsController', () => {
   getDetailActionQueryHandler = stubClass(GetDetailActionQueryHandler)
   deleteActionCommandHandler = stubClass(DeleteActionCommandHandler)
   let app: INestApplication

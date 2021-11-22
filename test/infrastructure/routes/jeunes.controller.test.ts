@@ -12,7 +12,7 @@ import {
 } from '../../utils'
 import StatutInvalide = Action.StatutInvalide
 
-describe.skip('JeunesController', () => {
+describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
   let app: INestApplication
   before(async () => {

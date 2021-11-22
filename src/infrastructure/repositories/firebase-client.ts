@@ -25,11 +25,9 @@ export class FirebaseClient {
   }
 
   private static getApp(firebase: string): admin.app.App {
-    return admin.apps.length > 0
-      ? admin.app()
-      : admin.initializeApp({
-          credential: admin.credential.cert(JSON.parse(firebase))
-        })
+    return admin.initializeApp({
+      credential: admin.credential.cert(JSON.parse(firebase))
+    })
   }
 
   async send(tokenMessage: TokenMessage): Promise<void> {
