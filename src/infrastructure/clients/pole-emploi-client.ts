@@ -12,7 +12,7 @@ export class PoleEmploiClient {
     token: string | undefined
     tokenDate: DateTime | undefined
   }
-  private tokenExpiryInSeconds: number
+  tokenExpiryInSeconds: number
   private readonly apiUrl: string
   private logger: Logger
 
