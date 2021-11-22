@@ -9,6 +9,9 @@ import {
   Post
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
+import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler'
+import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler'
+import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
 import { CreateActionCommandHandler } from '../../application/commands/create-action.command.handler'
 import { CreateJeuneCommandHandler } from '../../application/commands/create-jeune.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from '../../application/commands/send-notification-nouveau-message.command.handler'
@@ -29,7 +32,7 @@ import {
 export class ConseillersController {
   constructor(
     private readonly getDetailConseillerQueryHandler: GetDetailConseillerQueryHandler,
-    private readonly getConseillerJeunesQueryHandler: GetConseillerJeunesQueryHandler,
+    private readonly getJeunesByConseillerQueryHandler: GetJeunesByConseillerQueryHandler,
     private readonly getResumeActionsDesJeunesDuConseillerQueryHandler: GetResumeActionsDesJeunesDuConseillerQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly createJeuneCommandHandler: CreateJeuneCommandHandler,
@@ -41,8 +44,9 @@ export class ConseillersController {
   async getDetailConseiller(
     @Param('idConseiller') idConseiller: string
   ): Promise<DetailConseillerQueryModel> {
-    const query: GetDetailConseillerQuery = { idConseiller }
-    const queryModel = await this.getDetailConseillerQueryHandler.execute(query)
+    const queryModel = await this.getDetailConseillerQueryHandler.execute({
+      idConseiller
+    })
     if (queryModel) {
       return queryModel
     }
@@ -56,9 +60,8 @@ export class ConseillersController {
   @Get('jeunes')
   async getJeunes(
     @Param('idConseiller') idConseiller: string
-  ): Promise<ConseillerJeunesQueryModel> {
-    const query: GetConseillerJeunesQuery = { idConseiller }
-    return this.getConseillerJeunesQueryHandler.execute(query)
+  ): Promise<DetailJeuneQueryModel[]> {
+    return this.getJeunesByConseillerQueryHandler.execute({ idConseiller })
   }
 
   @Post('jeune')
@@ -73,7 +76,8 @@ export class ConseillersController {
     return {
       id: jeune.id,
       firstName: jeune.firstName,
-      lastName: jeune.lastName
+      lastName: jeune.lastName,
+      creationDate: jeune.creationDate.toString()
     }
   }
 
@@ -104,7 +108,7 @@ export class ConseillersController {
   }
 
   @Get('actions')
-  async getJeunesSumup(
+  async getActions(
     @Param('idConseiller') idConseiller: string
   ): Promise<ResumeActionsDuJeuneQueryModel[]> {
     return this.getResumeActionsDesJeunesDuConseillerQueryHandler.execute({
