@@ -49,6 +49,14 @@ Enfin on peut lancer les tests avec le script ci (qui ne lance pas de DB)
 yarn test:ci
 ```
 
+## Lancer les seeds
+
+```bash
+yarn seed
+```
+
+***Pour ajouter des seeds, il faut aller dans le dossier src/infrastructure/sequelize/seeders***
+
 ## Déploiement
 
 Nous utilisons actuellement Scalingo comme hébergeur sur l'application Web. Il existe deux environnements : Staging & Prod
