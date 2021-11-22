@@ -50,7 +50,11 @@ export class JeuneSqlRepository implements Jeune.Repository {
     const allJeunesSql = await JeuneSqlModel.findAll({
       where: {
         idConseiller
-      }
+      },
+      order: [
+        ['prenom', 'ASC'],
+        ['nom', 'ASC']
+      ]
     })
 
     return allJeunesSql.map(fromSqlToDetailJeuneQueryModel)
