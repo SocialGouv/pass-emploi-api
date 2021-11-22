@@ -9,6 +9,7 @@ import {
   Put
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
+import { ApiTags } from '@nestjs/swagger'
 import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler'
 import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
 import {
@@ -31,6 +32,7 @@ import StatutInvalide = Action.StatutInvalide
 import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
 
 @Controller('jeunes/:idJeune')
+@ApiTags('Jeunes')
 export class JeunesController {
   constructor(
     private readonly getDetailJeuneQueryHandler: GetDetailJeuneQueryHandler,
@@ -113,7 +115,8 @@ export class JeunesController {
       idJeune,
       idCreateur: idJeune,
       typeCreateur: Action.TypeCreateur.JEUNE,
-      commentaire: createActionPayload.comment
+      commentaire: createActionPayload.comment,
+      statut: createActionPayload.status
     }
     const result = await this.createActionCommandHandler.execute(command)
 

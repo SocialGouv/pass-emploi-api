@@ -8,11 +8,11 @@ import { DateService } from '../../utils/date-service'
 
 @Injectable()
 export class PoleEmploiClient {
-  private inMemoryToken: {
+  inMemoryToken: {
     token: string | undefined
     tokenDate: DateTime | undefined
   }
-  private tokenExpiryInSeconds: number
+  tokenExpiryInSeconds: number
   private readonly apiUrl: string
   private logger: Logger
 
@@ -36,7 +36,7 @@ export class PoleEmploiClient {
     )
   }
 
-  private async getToken(): Promise<string> {
+  async getToken(): Promise<string> {
     const isTokenExpired =
       this.inMemoryToken.tokenDate &&
       this.dateService.now().diff(this.inMemoryToken.tokenDate).as('second') >

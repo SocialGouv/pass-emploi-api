@@ -1,6 +1,6 @@
 import { HttpModule } from '@nestjs/axios'
 import { Provider, Type } from '@nestjs/common'
-import { ConfigModule } from '@nestjs/config'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TerminusModule } from '@nestjs/terminus'
 import { Test, TestingModuleBuilder } from '@nestjs/testing'
 import {
@@ -21,6 +21,19 @@ export function buildTestingModuleForHttpTesting(): TestingModuleBuilder {
     ],
     providers: stubProviders(),
     controllers: moduleMetadata.controllers
+  })
+}
+
+export const testConfig = (): ConfigService => {
+  return new ConfigService({
+    poleEmploi: {
+      url: 'https://api.emploi-store.fr/partenaire',
+      loginUrl:
+        'https://entreprise.pole-emploi.fr/connexion/oauth2/access_token',
+      clientId: 'pole-emploi-client-id',
+      clientSecret: 'pole-emploi-client-secret',
+      scope: 'pole-emploi-scope'
+    }
   })
 }
 
