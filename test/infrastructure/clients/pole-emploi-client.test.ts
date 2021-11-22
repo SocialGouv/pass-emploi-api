@@ -1,31 +1,19 @@
 import { HttpService } from '@nestjs/axios'
-import { ConfigService } from '@nestjs/config'
 import { expect } from 'chai'
 import { DateTime } from 'luxon'
 import * as nock from 'nock'
 import { PoleEmploiClient } from 'src/infrastructure/clients/pole-emploi-client'
 import { DateService } from 'src/utils/date-service'
 import { stubClass } from 'test/utils'
+import { testConfig } from '../../utils/module-for-testing'
 
 describe('PoleEmploiClient', () => {
-  const configService = {
-    get: (): unknown => {
-      return {
-        url: 'https://api.emploi-store.fr/partenaire',
-        loginUrl:
-          'https://entreprise.pole-emploi.fr/connexion/oauth2/access_token',
-        clientId: 'pole-emploi-client-id',
-        clientSecret: 'pole-emploi-client-secret',
-        scope: 'pole-emploi-scope'
-      }
-    }
-  } as unknown as ConfigService
-
   describe('getToken', () => {
     let poleEmploiClient: PoleEmploiClient
     const uneDatetimeDeMaintenant = DateTime.fromISO(
       '2020-04-06T12:00:00.000Z'
     ).toUTC()
+    const configService = testConfig()
 
     beforeEach(() => {
       const httpService = new HttpService()
