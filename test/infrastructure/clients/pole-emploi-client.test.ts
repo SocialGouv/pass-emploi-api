@@ -27,7 +27,32 @@ describe('PoleEmploiClient', () => {
         dateService
       )
     })
-    // it('retourne un nouveau token quand pas de token en mémoire', () => {})
+    it('retourne un nouveau token quand pas de token en mémoire', async () => {
+      // Given
+      poleEmploiClient.inMemoryToken = {
+        token: undefined,
+        tokenDate: undefined
+      }
+      nock('https://entreprise.pole-emploi.fr')
+        .post(
+          '/connexion/oauth2/access_token',
+          'grant_type=client_credentials&client_id=pole-emploi-client-id&client_secret=pole-emploi-client-secret&scope=pole-emploi-scope'
+        )
+        .query({
+          realm: '/partenaire'
+        })
+        .reply(201, {
+          access_token: 'un-premier-token',
+          expires_in: 1499
+        })
+        .isDone()
+
+      // When
+      const token = await poleEmploiClient.getToken()
+
+      // Then
+      expect(token).to.equal('un-premier-token')
+    })
 
     it('retourne un token quand token en mémoire expiré', async () => {
       // Given
