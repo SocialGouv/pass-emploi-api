@@ -13,10 +13,6 @@ import { ApiTags } from '@nestjs/swagger'
 import { CreateActionCommandHandler } from '../../application/commands/create-action.command.handler'
 import { CreateJeuneCommandHandler } from '../../application/commands/create-jeune.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from '../../application/commands/send-notification-nouveau-message.command.handler'
-import {
-  GetConseillerEtSesJeunesQuery,
-  GetConseillerEtSesJeunesQueryHandler
-} from '../../application/queries/get-conseiller-et-ses-jeunes.query.handler'
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
 import { DetailJeuneQueryModel } from '../../application/queries/query-models/jeunes.query-models'
@@ -27,7 +23,6 @@ import {
 } from '../../building-blocks/types/domain-error'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
-import { ConseillerEtSesJeunesQueryModel } from '../../domain/conseiller'
 import { ResumeActionsDuJeuneQueryModel } from '../../domain/jeune'
 import {
   CreateActionPayload,
@@ -38,7 +33,8 @@ import {
 @ApiTags('Conseillers')
 export class ConseillersController {
   constructor(
-    private readonly getConseillerEtSesJeunesQueryHandler: GetConseillerEtSesJeunesQueryHandler,
+    private readonly getDetailConseillerQueryHandler: GetDetailConseillerQueryHandler,
+    private readonly getConseillerJeunesQueryHandler: GetConseillerJeunesQueryHandler,
     private readonly getResumeActionsDesJeunesDuConseillerQueryHandler: GetResumeActionsDesJeunesDuConseillerQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly createJeuneCommandHandler: CreateJeuneCommandHandler,
@@ -46,14 +42,12 @@ export class ConseillersController {
     private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler
   ) {}
 
-  @Get('login')
-  async getConseillerEtSesJeunes(
+  @Get('')
+  async getDetailConseiller(
     @Param('idConseiller') idConseiller: string
-  ): Promise<ConseillerEtSesJeunesQueryModel> {
-    const query: GetConseillerEtSesJeunesQuery = { idConseiller }
-    const queryModel = await this.getConseillerEtSesJeunesQueryHandler.execute(
-      query
-    )
+  ): Promise<DetailConseillerQueryModel> {
+    const query: GetDetailConseillerQuery = { idConseiller }
+    const queryModel = await this.getDetailConseillerQueryHandler.execute(query)
     if (queryModel) {
       return queryModel
     }
@@ -62,6 +56,14 @@ export class ConseillersController {
       `Conseiller ${idConseiller} not found`,
       HttpStatus.NOT_FOUND
     )
+  }
+
+  @Get('jeunes')
+  async getJeunes(
+    @Param('idConseiller') idConseiller: string
+  ): Promise<ConseillerJeunesQueryModel> {
+    const query: GetConseillerJeunesQuery = { idConseiller }
+    return this.getConseillerJeunesQueryHandler.execute(query)
   }
 
   @Post('jeune')
