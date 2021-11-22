@@ -7,6 +7,7 @@ import {
   Param,
   Post
 } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import assert from 'assert'
 import { CreateRendezVousCommandHandler } from '../../application/commands/create-rendez-vous.command.handler'
 import { DeleteRendezVousCommandHandler } from '../../application/commands/delete-rendez-vous.command.handler'
@@ -22,6 +23,7 @@ import {
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
 
 @Controller()
+@ApiTags('Rendez-Vous')
 export class RendezVousController {
   constructor(
     private createRendezVousCommandHandler: CreateRendezVousCommandHandler,

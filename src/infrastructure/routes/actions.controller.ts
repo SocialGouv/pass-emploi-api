@@ -12,6 +12,7 @@ import {
   Patch,
   Put
 } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import { DeleteActionCommandHandler } from '../../application/commands/delete-action.command.handler'
 import {
   UpdateStatutActionCommand,
@@ -28,6 +29,7 @@ import { Action } from '../../domain/action'
 import { UpdateStatutActionPayload } from './validation/actions.inputs'
 
 @Controller('actions')
+@ApiTags('Actions')
 export class ActionsController {
   constructor(
     private readonly getDetailActionQueryHandler: GetDetailActionQueryHandler,

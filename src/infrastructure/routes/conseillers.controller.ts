@@ -9,6 +9,7 @@ import {
   Post
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
+import { ApiTags } from '@nestjs/swagger'
 import { CreateActionCommandHandler } from '../../application/commands/create-action.command.handler'
 import { CreateJeuneCommandHandler } from '../../application/commands/create-jeune.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from '../../application/commands/send-notification-nouveau-message.command.handler'
@@ -31,6 +32,7 @@ import {
 } from './validation/conseillers.inputs'
 
 @Controller('conseillers/:idConseiller')
+@ApiTags('Conseillers')
 export class ConseillersController {
   constructor(
     private readonly getConseillerEtSesJeunesQueryHandler: GetConseillerEtSesJeunesQueryHandler,

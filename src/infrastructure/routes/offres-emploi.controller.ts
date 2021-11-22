@@ -6,6 +6,7 @@ import {
   HttpStatus,
   HttpException
 } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import {
   GetOffresEmploiQuery,
   GetOffresEmploiQueryHandler
@@ -21,6 +22,7 @@ import {
 import { FindOffresEmploiPayload } from './validation/offres-emploi.inputs'
 
 @Controller('offres-emploi')
+@ApiTags("Offres d'emploi")
 export class OffresEmploiController {
   constructor(
     private readonly getOffresEmploiQueryHandler: GetOffresEmploiQueryHandler,
