@@ -44,6 +44,18 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return fromSqlToDetailJeuneQueryModel(jeuneSqlModel)
   }
 
+  async getAllQueryModelsByConseiller(
+    idConseiller: string
+  ): Promise<DetailJeuneQueryModel[]> {
+    const allJeunesSql = await JeuneSqlModel.findAll({
+      where: {
+        idConseiller
+      }
+    })
+
+    return allJeunesSql.map(fromSqlToDetailJeuneQueryModel)
+  }
+
   async save(jeune: Jeune): Promise<void> {
     await JeuneSqlModel.upsert({
       id: jeune.id,

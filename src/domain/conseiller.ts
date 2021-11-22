@@ -1,5 +1,5 @@
+import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
 import { Brand } from '../building-blocks/types/brand'
-import { Jeune } from './jeune'
 
 export interface Conseiller {
   id: Conseiller.Id
@@ -14,22 +14,8 @@ export namespace Conseiller {
 
   export interface Repository {
     get(id: Conseiller.Id): Promise<Conseiller>
-    getAvecJeunes(
+    getQueryModelById(
       id: Conseiller.Id
-    ): Promise<ConseillerEtSesJeunesQueryModel | undefined>
+    ): Promise<DetailConseillerQueryModel | undefined>
   }
-}
-
-export interface ConseillerEtSesJeunesQueryModel {
-  conseiller: {
-    id: Conseiller.Id
-    firstName: string
-    lastName: string
-  }
-  jeunes: Array<{
-    id: Jeune.Id
-    firstName: string
-    lastName: string
-    creationDate: string
-  }>
 }
