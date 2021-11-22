@@ -33,6 +33,7 @@ export class OffresEmploiController {
     const query: GetOffresEmploiQuery = {
       page: findOffresEmploiPayload.page,
       limit: findOffresEmploiPayload.limit,
+      query: findOffresEmploiPayload.q,
       departement: findOffresEmploiPayload.departement,
       alternance: findOffresEmploiPayload.alternance === 'true'
     }
