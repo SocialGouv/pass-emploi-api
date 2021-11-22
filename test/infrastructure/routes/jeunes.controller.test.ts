@@ -7,6 +7,7 @@ import { Action } from '../../../src/domain/action'
 import { CreateActionAvecStatutPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
 import {
   buildTestingModuleForHttpTesting,
+  expect,
   StubbedClass,
   stubClass
 } from '../../utils'
@@ -36,23 +37,36 @@ describe('JeunesController', () => {
       comment: 'Ceci est un commentaire',
       status: Action.Statut.EN_COURS
     }
-    it("renvoie l'id de l'action créée", () => {
+    it("renvoie l'id de l'action créée", async () => {
       // Given
       const idAction = 'a40a178e-9562-416f-ad9d-42dfbc663a8a'
       createActionCommandHandler.execute.resolves(success(idAction))
 
-      return request(app.getHttpServer())
+      // When
+      await request(app.getHttpServer())
         .post('/jeunes/ABCDE/action')
         .send(actionPayload)
+
+        // Then
         .expect(HttpStatus.CREATED)
         .expect({ id: idAction })
+      expect(createActionCommandHandler.execute).to.have.been.calledWithExactly(
+        {
+          idJeune: 'ABCDE',
+          contenu: "Ceci est un contenu d'action",
+          idCreateur: 'ABCDE',
+          typeCreateur: Action.TypeCreateur.JEUNE,
+          statut: Action.Statut.EN_COURS,
+          commentaire: 'Ceci est un commentaire'
+        }
+      )
     })
 
     it("renvoie une 404 (Not Found) quand le jeune n'existe pas", async () => {
       const echec = failure(new NonTrouveError('Jeune', 'ABCDE'))
       createActionCommandHandler.execute.resolves(echec)
 
-      return request(app.getHttpServer())
+      await request(app.getHttpServer())
         .post('/jeunes/ABCDE/action')
         .send(actionPayload)
         .expect(HttpStatus.NOT_FOUND)
@@ -66,7 +80,7 @@ describe('JeunesController', () => {
       const echec = failure(new StatutInvalide('whatever_status'))
       createActionCommandHandler.execute.resolves(echec)
 
-      return request(app.getHttpServer())
+      await request(app.getHttpServer())
         .post('/jeunes/ABCDE/action')
         .send(actionPayload)
         .expect(HttpStatus.BAD_REQUEST)

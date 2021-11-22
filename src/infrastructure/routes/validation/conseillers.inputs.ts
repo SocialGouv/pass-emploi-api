@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { Action } from '../../../domain/action'
 
 export class CreateActionPayload {
   @ApiProperty()
@@ -17,7 +18,7 @@ export class CreateActionAvecStatutPayload extends CreateActionPayload {
   @ApiProperty()
   @IsString()
   @IsOptional()
-  status: string | undefined
+  status: Action.Statut | undefined
 }
 
 export class CreateJeunePayload {

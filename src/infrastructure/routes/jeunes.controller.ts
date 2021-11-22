@@ -113,7 +113,8 @@ export class JeunesController {
       idJeune,
       idCreateur: idJeune,
       typeCreateur: Action.TypeCreateur.JEUNE,
-      commentaire: createActionPayload.comment
+      commentaire: createActionPayload.comment,
+      statut: createActionPayload.status
     }
     const result = await this.createActionCommandHandler.execute(command)
 
