@@ -8,25 +8,25 @@ import { stubClass } from 'test/utils'
 import { testConfig } from '../../utils/module-for-testing'
 
 describe('PoleEmploiClient', () => {
+  let poleEmploiClient: PoleEmploiClient
+  const uneDatetimeDeMaintenant = DateTime.fromISO(
+    '2020-04-06T12:00:00.000Z'
+  ).toUTC()
+  const configService = testConfig()
+
+  beforeEach(() => {
+    const httpService = new HttpService()
+
+    const dateService = stubClass(DateService)
+    dateService.now.returns(uneDatetimeDeMaintenant)
+
+    poleEmploiClient = new PoleEmploiClient(
+      httpService,
+      configService,
+      dateService
+    )
+  })
   describe('getToken', () => {
-    let poleEmploiClient: PoleEmploiClient
-    const uneDatetimeDeMaintenant = DateTime.fromISO(
-      '2020-04-06T12:00:00.000Z'
-    ).toUTC()
-    const configService = testConfig()
-
-    beforeEach(() => {
-      const httpService = new HttpService()
-
-      const dateService = stubClass(DateService)
-      dateService.now.returns(uneDatetimeDeMaintenant)
-
-      poleEmploiClient = new PoleEmploiClient(
-        httpService,
-        configService,
-        dateService
-      )
-    })
     it('retourne un nouveau token quand pas de token en mémoire', async () => {
       // Given
       poleEmploiClient.inMemoryToken = {
@@ -103,6 +103,32 @@ describe('PoleEmploiClient', () => {
 
       // Then
       expect(token).to.equal('un-token')
+    })
+  })
+  describe('get', () => {
+    it('fait un http get avec les bons paramètres', async () => {
+      // Given
+      const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+        minutes: 20
+      })
+      poleEmploiClient.inMemoryToken = {
+        token: 'test-token',
+        tokenDate: uneDatetimeDeMoinsDe25Minutes
+      }
+
+      nock('https://api.emploi-store.fr/partenaire')
+        .get('/offresdemploi/v2/offres/1')
+        .reply(200, {
+          resultats: []
+        })
+        .isDone()
+
+      // When
+      const response = await poleEmploiClient.get('offresdemploi/v2/offres/1')
+
+      // Then
+      expect(response.status).to.equal(200)
+      expect(response.data).to.deep.equal({ resultats: [] })
     })
   })
 })
