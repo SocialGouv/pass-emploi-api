@@ -27,7 +27,12 @@ export namespace Jeune {
       idConseiller: Conseiller.Id
     ): Promise<ResumeActionsDuJeuneQueryModel[]>
     getHomeQueryModel(idJeune: string): Promise<JeuneHomeQueryModel>
-    getQueryModelById(id: string): Promise<DetailJeuneQueryModel | undefined>
+    getQueryModelById(
+      idJeune: string
+    ): Promise<DetailJeuneQueryModel | undefined>
+    getAllQueryModelsByConseiller(
+      idConseiller: Conseiller.Id
+    ): Promise<DetailJeuneQueryModel[]>
   }
 
   export function updateToken(

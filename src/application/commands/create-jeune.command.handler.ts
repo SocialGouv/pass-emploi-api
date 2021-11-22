@@ -13,18 +13,19 @@ export interface CreateJeuneCommand extends Command {
 }
 
 @Injectable()
-export class CreateJeuneCommandHandler implements CommandHandler<CreateJeuneCommand, Jeune> {
-  constructor (
+export class CreateJeuneCommandHandler
+  implements CommandHandler<CreateJeuneCommand, Jeune>
+{
+  constructor(
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     private idService: IdService,
     private dateService: DateService
-  ) {
-  }
+  ) {}
 
-  async execute (command: CreateJeuneCommand): Promise<Jeune> {
+  async execute(command: CreateJeuneCommand): Promise<Jeune> {
     const jeune: Jeune = {
       id: this.idService.generate(),
       firstName: command.firstName,

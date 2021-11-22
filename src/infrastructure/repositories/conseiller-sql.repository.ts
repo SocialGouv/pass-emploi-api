@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common'
-import {
-  Conseiller,
-  ConseillerEtSesJeunesQueryModel
-} from '../../domain/conseiller'
+import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
+import { Conseiller } from '../../domain/conseiller'
 import { NotFound } from '../../domain/erreur'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
+import { fromSqlToDetailConseillerQueryModel } from './mappers/conseillers.mappers'
 
 @Injectable()
 export class ConseillerSqlRepository implements Conseiller.Repository {
@@ -29,26 +27,14 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
     })
   }
 
-  async getAvecJeunes(
+  async getQueryModelById(
     id: Conseiller.Id
-  ): Promise<ConseillerEtSesJeunesQueryModel | undefined> {
-    const conseillerSqlModel = await ConseillerSqlModel.findByPk(id, {
-      include: [{ model: JeuneSqlModel }]
-    })
-    if (!conseillerSqlModel) return undefined
-
-    return {
-      conseiller: {
-        id: conseillerSqlModel.id,
-        firstName: conseillerSqlModel.prenom,
-        lastName: conseillerSqlModel.nom
-      },
-      jeunes: conseillerSqlModel.jeunes.map(jeuneSqlModel => ({
-        id: jeuneSqlModel.id,
-        firstName: jeuneSqlModel.prenom,
-        lastName: jeuneSqlModel.nom,
-        creationDate: jeuneSqlModel.dateCreation.toISOString()
-      }))
+  ): Promise<DetailConseillerQueryModel | undefined> {
+    const conseillerSqlModel = await ConseillerSqlModel.findByPk(id)
+    if (!conseillerSqlModel) {
+      return undefined
     }
+
+    return fromSqlToDetailConseillerQueryModel(conseillerSqlModel)
   }
 }
