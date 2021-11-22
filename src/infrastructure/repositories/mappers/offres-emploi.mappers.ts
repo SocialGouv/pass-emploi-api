@@ -21,7 +21,7 @@ export function toOffresEmploiQueryModel(
       ? offresEmploiDto.resultats.map((result: OffreEmploiDto) => {
           return {
             id: result.id,
-            titre: result.titre,
+            titre: result.intitule,
             typeContrat: result.typeContrat,
             alternance: result.alternance,
             duree: result.dureeTravailLibelleConverti,
