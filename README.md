@@ -41,7 +41,7 @@ yarn start:db:test
 
 Ensuite on il faut exporter la variable DATABASE_URL.
 ```bash
-export DATABASE_URL=postgresql://test:test@localhost:56432/testdb
+export DATABASE_URL=postgresql://test:test@localhost:56432/test
 ```
 
 Enfin on peut lancer les tests avec le script ci (qui ne lance pas de DB)
