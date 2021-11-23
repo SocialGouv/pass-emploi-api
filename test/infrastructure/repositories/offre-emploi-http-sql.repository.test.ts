@@ -1,4 +1,3 @@
-import { OffreEmploiListItem } from '../../../src/domain/offres-emploi'
 import { PoleEmploiClient } from '../../../src/infrastructure/clients/pole-emploi-client'
 import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-emploi-http-sql.repository'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -7,6 +6,7 @@ import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeun
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { DatabaseForTesting, expect, stubClass } from '../../utils'
+import { uneOffreEmploiListItem } from '../../fixtures/offre-emploi.fixture'
 
 describe('OffresEmploiHttpSqlRepository', () => {
   DatabaseForTesting.prepare()
@@ -30,22 +30,11 @@ describe('OffresEmploiHttpSqlRepository', () => {
             idConseiller: 'ZIDANE'
           })
         )
-        const offreEmploi: OffreEmploiListItem = {
-          id: '123DXPM',
-          titre: 'Technicien / Technicienne en froid et climatisation',
-          typeContrat: 'MIS',
-          nomEntreprise: 'RH TT INTERIM',
-          duree: 'Temps plein',
-          localisation: {
-            nom: '77 - LOGNES',
-            codePostal: '77185',
-            commune: '77258'
-          },
-          alternance: false
-        }
-
         // When
-        await offresEmploiHttpSqlRepository.saveAsFavori('ABCDE', offreEmploi)
+        await offresEmploiHttpSqlRepository.saveAsFavori(
+          'ABCDE',
+          uneOffreEmploiListItem()
+        )
 
         // Then
         const offresEmplois = await FavoriOffreEmploiSqlModel.findAll()
