@@ -5,6 +5,7 @@ import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
+import { Chat, ChatsRepositoryToken } from '../../domain/chat'
 
 export interface CreateJeuneCommand extends Command {
   idConseiller: string
@@ -13,18 +14,21 @@ export interface CreateJeuneCommand extends Command {
 }
 
 @Injectable()
-export class CreateJeuneCommandHandler implements CommandHandler<CreateJeuneCommand, Jeune> {
-  constructor (
+export class CreateJeuneCommandHandler
+  implements CommandHandler<CreateJeuneCommand, Jeune>
+{
+  constructor(
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
+    @Inject(ChatsRepositoryToken)
+    private chatRepository: Chat.Repository,
     private idService: IdService,
     private dateService: DateService
-  ) {
-  }
+  ) {}
 
-  async execute (command: CreateJeuneCommand): Promise<Jeune> {
+  async execute(command: CreateJeuneCommand): Promise<Jeune> {
     const jeune: Jeune = {
       id: this.idService.generate(),
       firstName: command.firstName,
@@ -33,6 +37,10 @@ export class CreateJeuneCommandHandler implements CommandHandler<CreateJeuneComm
       conseiller: await this.conseillerRepository.get(command.idConseiller)
     }
     await this.jeuneRepository.save(jeune)
+    await this.chatRepository.initializeChatIfNotExists(
+      jeune.id,
+      jeune.conseiller.id
+    )
     return jeune
   }
 }
