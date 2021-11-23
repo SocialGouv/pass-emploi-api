@@ -23,12 +23,12 @@ export class JeuneSqlRepository implements Jeune.Repository {
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
   ) {}
 
-  async get(id: string): Promise<Jeune> {
+  async get(id: string): Promise<Jeune | undefined> {
     const jeuneSqlModel = await JeuneSqlModel.findByPk(id, {
       include: [ConseillerSqlModel]
     })
     if (!jeuneSqlModel) {
-      throw new NotFound(id, 'Jeune')
+      return undefined
     }
     return buildJeuneFromSql(jeuneSqlModel)
   }
