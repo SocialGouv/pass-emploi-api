@@ -55,6 +55,15 @@ yarn test:ci
 yarn seed
 ```
 
+## Créer une migration
+    npx sequelize-cli migration:generate --name nom-de-la-migration
+
+## Lancer les migrations
+    npx sequelize-cli db:migrate
+
+## Rollback la dernière migration
+    npx sequelize-cli db:migrate:undo
+
 ***Pour ajouter des seeds, il faut aller dans le dossier src/infrastructure/sequelize/seeders***
 
 ## Déploiement

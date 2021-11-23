@@ -2,16 +2,19 @@ import { Injectable } from '@nestjs/common'
 import {
   OffresEmploi,
   OffreEmploiQueryModel,
-  OffresEmploiQueryModel
+  OffresEmploiQueryModel,
+  OffreEmploiListItem
 } from '../../domain/offres-emploi'
 import { PoleEmploiClient } from '../clients/pole-emploi-client'
+import { FavoriOffreEmploiSqlModel } from '../sequelize/models/favori-offre-emploi.sql-model'
 import {
   toOffresEmploiQueryModel,
-  toOffreEmploiQueryModel
+  toOffreEmploiQueryModel,
+  toFavoriOffreEmploiSqlModel
 } from './mappers/offres-emploi.mappers'
 
 @Injectable()
-export class OffresEmploiHttpRepository implements OffresEmploi.Repository {
+export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
   constructor(private poleEmploiClient: PoleEmploiClient) {}
 
   async findAll(
@@ -59,6 +62,15 @@ export class OffresEmploiHttpRepository implements OffresEmploi.Repository {
 
   generateRange(page: number, limit: number): string {
     return `${(page - 1) * limit}-${page * limit - 1}`
+  }
+
+  async saveAsFavori(
+    idJeune: string,
+    offreEmploi: OffreEmploiListItem
+  ): Promise<void> {
+    await FavoriOffreEmploiSqlModel.upsert(
+      toFavoriOffreEmploiSqlModel(idJeune, offreEmploi)
+    )
   }
 }
 
