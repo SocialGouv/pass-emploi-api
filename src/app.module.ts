@@ -39,7 +39,7 @@ import { ConseillerSqlRepository } from './infrastructure/repositories/conseille
 import { FirebaseClient } from './infrastructure/repositories/firebase-client'
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune-sql.repository'
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
-import { OffresEmploiHttpRepository } from './infrastructure/repositories/offre-emploi-http.repository'
+import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre-emploi-http-sql.repository'
 import { RendezVousRepositorySql } from './infrastructure/repositories/rendez-vous-sql.repository'
 import { ActionsController } from './infrastructure/routes/actions.controller'
 import { ConseillersController } from './infrastructure/routes/conseillers.controller'
@@ -93,7 +93,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: OffresEmploiRepositoryToken,
-      useClass: OffresEmploiHttpRepository
+      useClass: OffresEmploiHttpSqlRepository
     },
     {
       provide: NotificationRepositoryToken,

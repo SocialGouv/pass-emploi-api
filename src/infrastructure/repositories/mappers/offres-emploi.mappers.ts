@@ -1,11 +1,13 @@
 import {
   OffresEmploiQueryModel,
-  OffreEmploiQueryModel
+  OffreEmploiQueryModel,
+  OffreEmploiListItem
 } from '../../../domain/offres-emploi'
+import { FavoriOffreEmploiSqlModel } from '../../sequelize/models/favori-offre-emploi.sql-model'
 import {
   OffresEmploiDto,
   OffreEmploiDto
-} from '../offre-emploi-http.repository'
+} from '../offre-emploi-http-sql.repository'
 
 export function toOffresEmploiQueryModel(
   page: number,
@@ -48,5 +50,24 @@ export function toOffreEmploiQueryModel(
       offreEmploiDto.contact?.urlPostulation ||
       offreEmploiDto.origineOffre?.urlOrigine,
     data: offreEmploiDto
+  }
+}
+
+export function toFavoriOffreEmploiSqlModel(
+  idJeune: string,
+  offreEmploi: OffreEmploiListItem
+): Partial<FavoriOffreEmploiSqlModel> {
+  return {
+    idJeune: idJeune,
+    idOffre: offreEmploi.id,
+    titre: offreEmploi.titre,
+    typeContrat: offreEmploi.typeContrat,
+    nomEntreprise: offreEmploi.nomEntreprise,
+    duree: offreEmploi.duree,
+    nomLocalisation: offreEmploi.localisation?.nom || null,
+    codePostalLocalisation: offreEmploi.localisation?.codePostal || null,
+    communeLocalisation: offreEmploi.localisation?.commune || null,
+    isAlternance:
+      offreEmploi.alternance !== null ? offreEmploi.alternance : null
   }
 }

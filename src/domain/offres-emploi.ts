@@ -4,13 +4,18 @@ export interface OffreEmploiQueryModel {
   urlRedirectPourPostulation: string | null
 }
 
-interface OffreEmploiListItem {
+export interface OffreEmploiListItem {
   id: string
   titre: string
   typeContrat: string
   nomEntreprise?: string
-  localisation?: unknown
+  localisation?: {
+    nom: string
+    codePostal: string
+    commune: string
+  }
   alternance?: boolean
+  duree?: string
 }
 
 interface Pagination {
@@ -38,5 +43,10 @@ export namespace OffresEmploi {
     getOffreEmploiQueryModelById(
       idOffreEmploi: string
     ): Promise<OffreEmploiQueryModel | undefined>
+
+    saveAsFavori(
+      idJeune: string,
+      offreEmploi: OffreEmploiListItem
+    ): Promise<void>
   }
 }
