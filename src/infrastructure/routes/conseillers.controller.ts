@@ -21,7 +21,10 @@ import { GetAllRendezVousConseillerQueryHandler } from '../../application/querie
 import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
 import { DetailJeuneQueryModel } from '../../application/queries/query-models/jeunes.query-models'
 import { RendezVousQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import {
+  JeuneNonLieAuConseillerError,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
 import { ConseillerEtSesJeunesQueryModel } from '../../domain/conseiller'
@@ -124,6 +127,19 @@ export class ConseillersController {
     @Param('idConseiller') idConseiller: string,
     @Param('idJeune') idJeune: string
   ): Promise<void> {
-    this.sendNotificationNouveauMessage.execute({ idConseiller, idJeune })
+    const result = await this.sendNotificationNouveauMessage.execute({
+      idConseiller,
+      idJeune
+    })
+    if (isFailure(result)) {
+      if (
+        result.error.code === NonTrouveError.CODE ||
+        result.error.code === JeuneNonLieAuConseillerError.CODE
+      ) {
+        throw new NotFoundException(result.error)
+      } else {
+        throw new RuntimeException()
+      }
+    }
   }
 }
