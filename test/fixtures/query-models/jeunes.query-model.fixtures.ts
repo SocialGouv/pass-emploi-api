@@ -1,4 +1,4 @@
-//import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
+import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
 import { ResumeActionsDuJeuneQueryModel } from '../../../src/domain/jeune'
 
 export function unResumeActionDUnJeune(
@@ -16,17 +16,15 @@ export function unResumeActionDUnJeune(
   return { ...defaults, ...args }
 }
 
-// export function listeDetailJeuneQueryModel(
-//   args: Partial<DetailJeuneQueryModel[]> = []
-// ): DetailJeuneQueryModel[] {
-//   const defaults: DetailJeuneQueryModel[] = [
-//     {
-//       id: 'ABCDE',
-//       firstName: 'John',
-//       lastName: 'Doe',
-//       creationDate: '2021-11-11T08:03:30.000Z'
-//     }
-//   ]
+export function listeDetailJeuneQueryModel(): DetailJeuneQueryModel[] {
+  const defaults: DetailJeuneQueryModel[] = [
+    {
+      id: 'ABCDE',
+      firstName: 'John',
+      lastName: 'Doe',
+      creationDate: '2021-11-11T08:03:30.000Z'
+    }
+  ]
 
-//   return { ...defaults, ...args }
-// }
+  return defaults
+}

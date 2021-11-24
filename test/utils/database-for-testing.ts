@@ -5,9 +5,11 @@ import { sqlModels } from '../../src/infrastructure/sequelize/models'
 export class DatabaseForTesting {
   sequelize!: Sequelize
 
-  constructor () {
-    // eslint-disable-next-line no-process-env,@typescript-eslint/no-non-null-assertion
-    const { host, port, database, user, password } = parse(process.env.DATABASE_URL!)
+  constructor() {
+    const { host, port, database, user, password } = parse(
+      // eslint-disable-next-line no-process-env,@typescript-eslint/no-non-null-assertion
+      process.env.DATABASE_URL!
+    )
     this.sequelize = new Sequelize({
       host: host as string,
       port: parseInt(port as string),
@@ -28,7 +30,7 @@ export class DatabaseForTesting {
     })
   }
 
-  static prepare (): DatabaseForTesting {
+  static prepare(): DatabaseForTesting {
     return new DatabaseForTesting()
   }
 }
