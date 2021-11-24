@@ -73,6 +73,23 @@ export function toFavoriOffreEmploiSqlModel(
   }
 }
 
+export function toOffreEmploiListItem(
+  favoriOffreEmploiSqlModel: FavoriOffreEmploiSqlModel
+): OffreEmploiListItem {
+  return {
+    id: favoriOffreEmploiSqlModel.idOffre,
+    alternance:
+      favoriOffreEmploiSqlModel.isAlternance === null
+        ? undefined
+        : favoriOffreEmploiSqlModel.isAlternance,
+    duree: favoriOffreEmploiSqlModel.duree,
+    localisation: buildLocalisation(favoriOffreEmploiSqlModel),
+    typeContrat: favoriOffreEmploiSqlModel.typeContrat,
+    nomEntreprise: favoriOffreEmploiSqlModel.nomEntreprise,
+    titre: favoriOffreEmploiSqlModel.titre
+  }
+}
+
 export function buildLocalisation(
   favoriOffreEmploiSqlModel: FavoriOffreEmploiSqlModel
 ): Localisation | undefined {

@@ -11,7 +11,7 @@ import {
   toOffresEmploiQueryModel,
   toOffreEmploiQueryModel,
   toFavoriOffreEmploiSqlModel,
-  buildLocalisation
+  toOffreEmploiListItem
 } from './mappers/offres-emploi.mappers'
 
 @Injectable()
@@ -78,16 +78,7 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
     if (!result) {
       return undefined
     }
-    return {
-      id: result.idOffre,
-      alternance:
-        result.isAlternance === null ? undefined : result.isAlternance,
-      duree: result.duree,
-      localisation: buildLocalisation(result),
-      typeContrat: result.typeContrat,
-      nomEntreprise: result.nomEntreprise,
-      titre: result.titre
-    }
+    return toOffreEmploiListItem(result)
   }
 
   async saveAsFavori(
