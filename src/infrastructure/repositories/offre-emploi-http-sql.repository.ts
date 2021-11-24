@@ -10,7 +10,8 @@ import { FavoriOffreEmploiSqlModel } from '../sequelize/models/favori-offre-empl
 import {
   toOffresEmploiQueryModel,
   toOffreEmploiQueryModel,
-  toFavoriOffreEmploiSqlModel
+  toFavoriOffreEmploiSqlModel,
+  buildLocalisation
 } from './mappers/offres-emploi.mappers'
 
 @Injectable()
@@ -62,6 +63,31 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
 
   generateRange(page: number, limit: number): string {
     return `${(page - 1) * limit}-${page * limit - 1}`
+  }
+
+  async getFavori(
+    idJeune: string,
+    idOffreEmploi: string
+  ): Promise<OffreEmploiListItem | undefined> {
+    const result = await FavoriOffreEmploiSqlModel.findOne({
+      where: {
+        idJeune: idJeune,
+        idOffre: idOffreEmploi
+      }
+    })
+    if (!result) {
+      return undefined
+    }
+    return {
+      id: result.idOffre,
+      alternance:
+        result.isAlternance === null ? undefined : result.isAlternance,
+      duree: result.duree,
+      localisation: buildLocalisation(result),
+      typeContrat: result.typeContrat,
+      nomEntreprise: result.nomEntreprise,
+      titre: result.titre
+    }
   }
 
   async saveAsFavori(

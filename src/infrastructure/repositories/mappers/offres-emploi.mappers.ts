@@ -1,7 +1,8 @@
 import {
   OffresEmploiQueryModel,
   OffreEmploiQueryModel,
-  OffreEmploiListItem
+  OffreEmploiListItem,
+  Localisation
 } from '../../../domain/offres-emploi'
 import { FavoriOffreEmploiSqlModel } from '../../sequelize/models/favori-offre-emploi.sql-model'
 import {
@@ -70,4 +71,21 @@ export function toFavoriOffreEmploiSqlModel(
     isAlternance:
       offreEmploi.alternance !== null ? offreEmploi.alternance : null
   }
+}
+
+export function buildLocalisation(
+  favoriOffreEmploiSqlModel: FavoriOffreEmploiSqlModel
+): Localisation | undefined {
+  if (
+    favoriOffreEmploiSqlModel.nomLocalisation &&
+    favoriOffreEmploiSqlModel.codePostalLocalisation &&
+    favoriOffreEmploiSqlModel.communeLocalisation
+  ) {
+    return {
+      nom: favoriOffreEmploiSqlModel.nomLocalisation,
+      codePostal: favoriOffreEmploiSqlModel.codePostalLocalisation,
+      commune: favoriOffreEmploiSqlModel.communeLocalisation
+    }
+  }
+  return undefined
 }

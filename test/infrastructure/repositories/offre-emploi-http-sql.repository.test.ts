@@ -1,3 +1,4 @@
+import { OffreEmploiListItem } from '../../../src/domain/offres-emploi'
 import { PoleEmploiClient } from '../../../src/infrastructure/clients/pole-emploi-client'
 import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-emploi-http-sql.repository'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -51,6 +52,47 @@ describe('OffresEmploiHttpSqlRepository', () => {
         expect(offresEmplois[0].codePostalLocalisation).to.equal('77185')
         expect(offresEmplois[0].communeLocalisation).to.equal('77258')
         expect(offresEmplois[0].isAlternance).to.equal(false)
+      })
+    })
+  })
+
+  describe('.getFavori', () => {
+    let offreEmploi: OffreEmploiListItem
+
+    beforeEach(async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseillerDto({ id: 'ZIDANE' }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: 'ABCDE',
+          idConseiller: 'ZIDANE'
+        })
+      )
+      offreEmploi = uneOffreEmploiListItem()
+      await offresEmploiHttpSqlRepository.saveAsFavori('ABCDE', offreEmploi)
+    })
+
+    describe("quand le favori n'existe pas", () => {
+      it('renvoie undefined', async () => {
+        // When
+        const favori = await offresEmploiHttpSqlRepository.getFavori(
+          'ABCDE',
+          'UN MAUVAIS ID'
+        )
+        // Then
+        expect(favori).to.equal(undefined)
+      })
+    })
+
+    describe('quand le favori existe', () => {
+      it("renvoie l'offre d'emploi", async () => {
+        // When
+        const favori = await offresEmploiHttpSqlRepository.getFavori(
+          'ABCDE',
+          offreEmploi.id
+        )
+        // Then
+        expect(favori).to.deep.equal(offreEmploi)
       })
     })
   })
