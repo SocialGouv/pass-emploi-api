@@ -12,7 +12,10 @@ import {
   OffresEmploi,
   OffresEmploiRepositoryToken
 } from '../../domain/offres-emploi'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import {
+  FavoriExisteDejaError,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 
 export interface AddFavoriOffreEmploiCommand extends Command {
@@ -33,10 +36,21 @@ export class AddFavoriOffreEmploiCommandHandler
 
   async execute(command: AddFavoriOffreEmploiCommand): Promise<Result> {
     const jeune = await this.jeuneRepository.get(command.idJeune)
-
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', command.idJeune))
     }
+
+    if (
+      await this.offresEmploiRepository.getFavori(
+        command.idJeune,
+        command.offreEmploi.id
+      )
+    ) {
+      return failure(
+        new FavoriExisteDejaError(command.idJeune, command.offreEmploi.id)
+      )
+    }
+
     await this.offresEmploiRepository.saveAsFavori(
       command.idJeune,
       command.offreEmploi

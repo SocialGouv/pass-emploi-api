@@ -13,6 +13,16 @@ export class NonTrouveError implements DomainError {
   }
 }
 
+export class FavoriExisteDejaError implements DomainError {
+  static CODE = 'EXISTE_DEJA'
+  readonly code: string = FavoriExisteDejaError.CODE
+  readonly message: string
+
+  constructor(idJeune: string, idOffre: string) {
+    this.message = `L'offre ${idOffre} est déjà dans les favoris de ${idJeune}`
+  }
+}
+
 export class JeuneNonLieAuConseillerError implements DomainError {
   static CODE = 'JEUNE_NON_LIE_AU_CONSEILLE'
   readonly code: string = JeuneNonLieAuConseillerError.CODE

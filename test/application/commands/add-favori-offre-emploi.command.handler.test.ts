@@ -10,7 +10,10 @@ import { uneOffreEmploiListItem } from '../../fixtures/offre-emploi.fixture'
 import { Jeune } from '../../../src/domain/jeune'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { failure } from '../../../src/building-blocks/types/result'
-import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import {
+  FavoriExisteDejaError,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
 
 describe('AddFavoriOffreEmploiCommandHandler', () => {
   describe('execute', () => {
@@ -18,11 +21,11 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
     let jeuneRepository: StubbedType<Jeune.Repository>
     let addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler
     const jeune = unJeune()
-    before(async () => {
+
+    beforeEach(async () => {
       const sandbox: SinonSandbox = createSandbox()
       offresEmploiRepository = stubInterface(sandbox)
       jeuneRepository = stubInterface(sandbox)
-      jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
       addFavoriOffreEmploiCommandHandler =
         new AddFavoriOffreEmploiCommandHandler(
           offresEmploiRepository,
@@ -32,10 +35,15 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
 
     it('sauvegarde un favori', async () => {
       // Given
+      const offreEmploi = uneOffreEmploiListItem()
       const command: AddFavoriOffreEmploiCommand = {
         idJeune: jeune.id,
-        offreEmploi: uneOffreEmploiListItem()
+        offreEmploi: offreEmploi
       }
+      jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
+      offresEmploiRepository.getFavori
+        .withArgs(jeune.id, offreEmploi.id)
+        .resolves(undefined)
 
       // When
       await addFavoriOffreEmploiCommandHandler.execute(command)
@@ -46,12 +54,14 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
         command.offreEmploi
       )
     })
-    it('renvoit une failure NonTrouveError quand le jeune n existe pas', async () => {
+
+    it('renvoie une failure NonTrouveError quand le jeune n existe pas', async () => {
       // Given
       const command: AddFavoriOffreEmploiCommand = {
         idJeune: 'FAUUX',
         offreEmploi: uneOffreEmploiListItem()
       }
+      jeuneRepository.get.withArgs('FAUUX').resolves(undefined)
 
       // When
       const result = await addFavoriOffreEmploiCommandHandler.execute(command)
@@ -59,6 +69,26 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
       // Then
       expect(result).to.deep.equal(
         failure(new NonTrouveError('Jeune', 'FAUUX'))
+      )
+    })
+    it('renvoie une failure ExisteDeja quand le jeune a déjà ce favori', async () => {
+      // Given
+      const offreEmploi = uneOffreEmploiListItem()
+      const command: AddFavoriOffreEmploiCommand = {
+        idJeune: jeune.id,
+        offreEmploi: offreEmploi
+      }
+      jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
+      offresEmploiRepository.getFavori
+        .withArgs(jeune.id, offreEmploi.id)
+        .resolves(offreEmploi)
+
+      // When
+      const result = await addFavoriOffreEmploiCommandHandler.execute(command)
+
+      // Then
+      expect(result).to.deep.equal(
+        failure(new FavoriExisteDejaError(jeune.id, offreEmploi.id))
       )
     })
   })
