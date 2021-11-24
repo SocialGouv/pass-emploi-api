@@ -39,7 +39,7 @@ import { ConseillerSqlRepository } from './infrastructure/repositories/conseille
 import { FirebaseClient } from './infrastructure/repositories/firebase-client'
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune-sql.repository'
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
-import { OffresEmploiHttpRepository } from './infrastructure/repositories/offre-emploi-http.repository'
+import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre-emploi-http-sql.repository'
 import { RendezVousRepositorySql } from './infrastructure/repositories/rendez-vous-sql.repository'
 import { ActionsController } from './infrastructure/routes/actions.controller'
 import { ConseillersController } from './infrastructure/routes/conseillers.controller'
@@ -54,6 +54,7 @@ import { IdService } from './utils/id-service'
 import { PoleEmploiClient } from './infrastructure/clients/pole-emploi-client'
 import { GetDetailConseillerQueryHandler } from './application/queries/get-detail-conseiller.query.handler'
 import { GetJeunesByConseillerQueryHandler } from './application/queries/get-jeunes-by-conseiller.query.handler'
+import { AddFavoriOffreEmploiCommandHandler } from './application/commands/add-favori-offre-emploi.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -93,7 +94,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: OffresEmploiRepositoryToken,
-      useClass: OffresEmploiHttpRepository
+      useClass: OffresEmploiHttpSqlRepository
     },
     {
       provide: NotificationRepositoryToken,
@@ -119,6 +120,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetActionsByJeuneQueryHandler,
     CreateActionCommandHandler,
     CreateJeuneCommandHandler,
+    AddFavoriOffreEmploiCommandHandler,
     GetHomeJeuneHandler,
     GetOffresEmploiQueryHandler,
     GetDetailOffreEmploiQueryHandler,
