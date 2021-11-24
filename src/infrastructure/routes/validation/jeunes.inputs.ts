@@ -1,12 +1,28 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsBoolean, IsNotEmpty, IsString } from 'class-validator'
-import { LocalisationPayload } from './conseillers.inputs'
 
 export class PutNotificationTokenInput {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   registration_token: string
+}
+
+export class LocalisationPayload {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  nom: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  codePostal: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  commune: string
 }
 
 export class AddFavoriPayload {
@@ -30,7 +46,6 @@ export class AddFavoriPayload {
   nomEntreprise?: string
 
   @ApiProperty()
-  @IsString()
   localisation?: LocalisationPayload
 
   @ApiProperty()
