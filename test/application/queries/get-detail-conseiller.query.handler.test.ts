@@ -34,6 +34,7 @@ describe('GetDetailConseillerQueryHandler', () => {
     }
     const conseillerEtSesJeunesQueryModel: DetailConseillerQueryModel =
       detailConseillerQueryModel()
+
     conseillersRepository.getQueryModelById
       .withArgs(idConseiller)
       .resolves(conseillerEtSesJeunesQueryModel)
