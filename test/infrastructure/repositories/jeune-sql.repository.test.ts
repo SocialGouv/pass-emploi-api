@@ -51,6 +51,9 @@ describe('JeuneSqlRepository', () => {
         // Then
         expect(jeune).to.equal(undefined)
       })
+    })
+  })
+
   describe('getAllQueryModelsByConseiller', () => {
     it("retourne les jeunes d'un conseiller", async () => {
       const idConseiller: Conseiller.Id = '1'
