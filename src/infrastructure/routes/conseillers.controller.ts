@@ -10,13 +10,12 @@ import {
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiTags } from '@nestjs/swagger'
+import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler'
+import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler'
+import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
 import { CreateActionCommandHandler } from '../../application/commands/create-action.command.handler'
 import { CreateJeuneCommandHandler } from '../../application/commands/create-jeune.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from '../../application/commands/send-notification-nouveau-message.command.handler'
-import {
-  GetConseillerEtSesJeunesQuery,
-  GetConseillerEtSesJeunesQueryHandler
-} from '../../application/queries/get-conseiller-et-ses-jeunes.query.handler'
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
 import { DetailJeuneQueryModel } from '../../application/queries/query-models/jeunes.query-models'
@@ -27,7 +26,6 @@ import {
 } from '../../building-blocks/types/domain-error'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
-import { ConseillerEtSesJeunesQueryModel } from '../../domain/conseiller'
 import { ResumeActionsDuJeuneQueryModel } from '../../domain/jeune'
 import {
   CreateActionPayload,
@@ -38,7 +36,8 @@ import {
 @ApiTags('Conseillers')
 export class ConseillersController {
   constructor(
-    private readonly getConseillerEtSesJeunesQueryHandler: GetConseillerEtSesJeunesQueryHandler,
+    private readonly getDetailConseillerQueryHandler: GetDetailConseillerQueryHandler,
+    private readonly getJeunesByConseillerQueryHandler: GetJeunesByConseillerQueryHandler,
     private readonly getResumeActionsDesJeunesDuConseillerQueryHandler: GetResumeActionsDesJeunesDuConseillerQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly createJeuneCommandHandler: CreateJeuneCommandHandler,
@@ -46,14 +45,13 @@ export class ConseillersController {
     private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler
   ) {}
 
-  @Get('login')
-  async getConseillerEtSesJeunes(
+  @Get('')
+  async getDetailConseiller(
     @Param('idConseiller') idConseiller: string
-  ): Promise<ConseillerEtSesJeunesQueryModel> {
-    const query: GetConseillerEtSesJeunesQuery = { idConseiller }
-    const queryModel = await this.getConseillerEtSesJeunesQueryHandler.execute(
-      query
-    )
+  ): Promise<DetailConseillerQueryModel> {
+    const queryModel = await this.getDetailConseillerQueryHandler.execute({
+      idConseiller
+    })
     if (queryModel) {
       return queryModel
     }
@@ -62,6 +60,13 @@ export class ConseillersController {
       `Conseiller ${idConseiller} not found`,
       HttpStatus.NOT_FOUND
     )
+  }
+
+  @Get('jeunes')
+  async getJeunes(
+    @Param('idConseiller') idConseiller: string
+  ): Promise<DetailJeuneQueryModel[]> {
+    return this.getJeunesByConseillerQueryHandler.execute({ idConseiller })
   }
 
   @Post('jeune')
@@ -76,7 +81,8 @@ export class ConseillersController {
     return {
       id: jeune.id,
       firstName: jeune.firstName,
-      lastName: jeune.lastName
+      lastName: jeune.lastName,
+      creationDate: jeune.creationDate.toString()
     }
   }
 
@@ -107,7 +113,7 @@ export class ConseillersController {
   }
 
   @Get('actions')
-  async getJeunesSumup(
+  async getActions(
     @Param('idConseiller') idConseiller: string
   ): Promise<ResumeActionsDuJeuneQueryModel[]> {
     return this.getResumeActionsDesJeunesDuConseillerQueryHandler.execute({

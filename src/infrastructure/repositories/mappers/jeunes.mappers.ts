@@ -1,12 +1,13 @@
 import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 
-export async function fromSqlToDetailJeuneQueryModel(
+export function fromSqlToDetailJeuneQueryModel(
   jeuneSqlModel: JeuneSqlModel
-): Promise<DetailJeuneQueryModel> {
+): DetailJeuneQueryModel {
   return {
     id: jeuneSqlModel.id,
     firstName: jeuneSqlModel.prenom,
-    lastName: jeuneSqlModel.nom
+    lastName: jeuneSqlModel.nom,
+    creationDate: jeuneSqlModel.dateCreation.toISOString()
   }
 }

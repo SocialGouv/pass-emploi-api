@@ -1,3 +1,4 @@
+import { Conseiller } from 'src/domain/conseiller'
 import { Action } from '../../../src/domain/action'
 import { Jeune } from '../../../src/domain/jeune'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
@@ -5,7 +6,10 @@ import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/act
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { unResumeActionDUnJeune } from '../../fixtures/query-models/jeunes.query-model.fixtures'
+import {
+  listeDetailJeuneQueryModel,
+  unResumeActionDUnJeune
+} from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
@@ -47,6 +51,28 @@ describe('JeuneSqlRepository', () => {
         // Then
         expect(jeune).to.equal(undefined)
       })
+    })
+  })
+
+  describe('getAllQueryModelsByConseiller', () => {
+    it("retourne les jeunes d'un conseiller", async () => {
+      const idConseiller: Conseiller.Id = '1'
+      await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
+      await JeuneSqlModel.creer(unJeuneDto({ idConseiller }))
+
+      const actual = await jeuneSqlRepository.getAllQueryModelsByConseiller(
+        idConseiller
+      )
+
+      expect(actual).to.deep.equal(listeDetailJeuneQueryModel())
+    })
+
+    it("retourne tableau vide quand le conseiller n'existe pas", async () => {
+      const actual = await jeuneSqlRepository.getAllQueryModelsByConseiller(
+        'id-inexistant'
+      )
+
+      expect(actual).to.deep.equal([])
     })
   })
 

@@ -17,7 +17,6 @@ import { SendNotificationNouveauMessageCommandHandler } from './application/comm
 import { UpdateNotificationTokenCommandHandler } from './application/commands/update-notification-token.command.handler'
 import { UpdateStatutActionCommandHandler } from './application/commands/update-statut-action.command.handler'
 import { GetActionsByJeuneQueryHandler } from './application/queries/get-actions-by-jeune.query.handler'
-import { GetConseillerEtSesJeunesQueryHandler } from './application/queries/get-conseiller-et-ses-jeunes.query.handler'
 import { GetDetailActionQueryHandler } from './application/queries/get-detail-action.query.handler'
 import { GetDetailJeuneQueryHandler } from './application/queries/get-detail-jeune.query.handler'
 import { GetDetailOffreEmploiQueryHandler } from './application/queries/get-detail-offre-emploi.query.handler'
@@ -53,6 +52,8 @@ import { databaseProviders } from './infrastructure/sequelize/providers'
 import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
 import { PoleEmploiClient } from './infrastructure/clients/pole-emploi-client'
+import { GetDetailConseillerQueryHandler } from './application/queries/get-detail-conseiller.query.handler'
+import { GetJeunesByConseillerQueryHandler } from './application/queries/get-jeunes-by-conseiller.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -121,7 +122,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetHomeJeuneHandler,
     GetOffresEmploiQueryHandler,
     GetDetailOffreEmploiQueryHandler,
-    GetConseillerEtSesJeunesQueryHandler,
+    GetDetailConseillerQueryHandler,
+    GetJeunesByConseillerQueryHandler,
     GetResumeActionsDesJeunesDuConseillerQueryHandler,
     LoginJeuneCommandHandler,
     UpdateNotificationTokenCommandHandler,

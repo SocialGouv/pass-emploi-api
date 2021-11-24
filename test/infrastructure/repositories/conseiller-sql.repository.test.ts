@@ -1,11 +1,9 @@
 import { Conseiller } from '../../../src/domain/conseiller'
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { unConseillerEtSesJeunesQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
+import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { expect } from '../../utils'
 import { DatabaseForTesting } from '../../utils'
 
@@ -30,32 +28,32 @@ describe('ConseillerSqlRepository', () => {
     })
   })
 
-  describe('getAvecJeunes', () => {
-    describe('Quand le conseiller existe', () => {
-      it('retourne les conseiller et ses jeunes', async () => {
-        // Given
-        const idConseiller: Conseiller.Id = '1'
-        await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
-        await JeuneSqlModel.creer(unJeuneDto({ idConseiller }))
+  describe('getQueryModelById', () => {
+    it('retourne les conseiller quand le conseiller existe', async () => {
+      const idConseiller: Conseiller.Id = '1'
+      await ConseillerSqlModel.creer(
+        unConseillerDto({ id: idConseiller, prenom: 'toto', nom: 'tata' })
+      )
 
-        // When
-        const actual = await conseillerSqlRepository.getAvecJeunes(idConseiller)
+      const actual = await conseillerSqlRepository.getQueryModelById(
+        idConseiller
+      )
 
-        // Then
-        expect(actual).to.deep.equal(unConseillerEtSesJeunesQueryModel())
-      })
+      expect(actual).to.deep.equal(
+        detailConseillerQueryModel({
+          id: idConseiller,
+          firstName: 'toto',
+          lastName: 'tata'
+        })
+      )
     })
 
-    describe("Quand le conseiller n'existe pas", () => {
-      it('retourne undefined', async () => {
-        // When
-        const actual = await conseillerSqlRepository.getAvecJeunes(
-          'id-inexistant'
-        )
+    it("retourne undefined quand le conseiller n'existe pas", async () => {
+      const actual = await conseillerSqlRepository.getQueryModelById(
+        'id-inexistant'
+      )
 
-        // Then
-        expect(actual).to.equal(undefined)
-      })
+      expect(actual).to.equal(undefined)
     })
   })
 })
