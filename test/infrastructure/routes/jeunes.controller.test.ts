@@ -1,10 +1,22 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
+import {
+  AddFavoriOffreEmploiCommand,
+  AddFavoriOffreEmploiCommandHandler
+} from '../../../src/application/commands/add-favori-offre-emploi.command.handler'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
-import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
-import { failure, success } from '../../../src/building-blocks/types/result'
+import {
+  FavoriExisteDejaError,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
+import {
+  emptySuccess,
+  failure,
+  success
+} from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action'
 import { CreateActionAvecStatutPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
+import { uneOffreEmploiListItem } from '../../fixtures/offre-emploi.fixture'
 import {
   buildTestingModuleForHttpTesting,
   expect,
@@ -12,15 +24,23 @@ import {
   stubClass
 } from '../../utils'
 import StatutInvalide = Action.StatutInvalide
+import { AddFavoriPayload } from '../../../src/infrastructure/routes/validation/jeunes.inputs'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
+  let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
   let app: INestApplication
+
   before(async () => {
     createActionCommandHandler = stubClass(CreateActionCommandHandler)
+    addFavoriOffreEmploiCommandHandler = stubClass(
+      AddFavoriOffreEmploiCommandHandler
+    )
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
       .useValue(createActionCommandHandler)
+      .overrideProvider(AddFavoriOffreEmploiCommandHandler)
+      .useValue(addFavoriOffreEmploiCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -88,6 +108,73 @@ describe('JeunesController', () => {
           message: echec.error.message,
           statusCode: HttpStatus.BAD_REQUEST
         })
+    })
+  })
+
+  describe('POST /jeunes/:idJeune/favori', () => {
+    const offreEmploi = uneOffreEmploiListItem()
+    const command: AddFavoriOffreEmploiCommand = {
+      idJeune: 'ABCDE',
+      offreEmploi: offreEmploi
+    }
+
+    const payload: AddFavoriPayload = {
+      idOffre: offreEmploi.id,
+      nomEntreprise: offreEmploi.nomEntreprise,
+      duree: offreEmploi.duree,
+      titre: offreEmploi.titre,
+      alternance: offreEmploi.alternance,
+      typeContrat: offreEmploi.typeContrat,
+      localisation: offreEmploi.localisation
+    }
+    it('crée un favori', async () => {
+      // Given
+      addFavoriOffreEmploiCommandHandler.execute
+        .withArgs(command)
+        .resolves(emptySuccess())
+
+      // When
+      await request(app.getHttpServer())
+        .post('/jeunes/ABCDE/favori')
+        .send(payload)
+
+        // Then
+        .expect(HttpStatus.CREATED)
+      expect(
+        addFavoriOffreEmploiCommandHandler.execute
+      ).to.have.been.calledWith(command)
+    })
+    it('renvoie une 404 (Not Found) quand le jeune n"existe pas', async () => {
+      // Given
+      addFavoriOffreEmploiCommandHandler.execute
+        .withArgs(command)
+        .resolves(failure(new NonTrouveError('Jeune', command.idJeune)))
+
+      // When
+      await request(app.getHttpServer())
+        .post('/jeunes/ABCDE/favori')
+        .send(payload)
+
+        // Then
+        .expect(HttpStatus.NOT_FOUND)
+    })
+    it('renvoie une 409 (Conflict) quand l"offre n"existe pas', async () => {
+      // Given
+      addFavoriOffreEmploiCommandHandler.execute
+        .withArgs(command)
+        .resolves(
+          failure(
+            new FavoriExisteDejaError(command.idJeune, command.offreEmploi.id)
+          )
+        )
+
+      // When
+      await request(app.getHttpServer())
+        .post('/jeunes/ABCDE/favori')
+        .send(payload)
+
+        // Then
+        .expect(HttpStatus.CONFLICT)
     })
   })
 })

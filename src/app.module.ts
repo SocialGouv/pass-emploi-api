@@ -54,6 +54,7 @@ import { IdService } from './utils/id-service'
 import { PoleEmploiClient } from './infrastructure/clients/pole-emploi-client'
 import { GetDetailConseillerQueryHandler } from './application/queries/get-detail-conseiller.query.handler'
 import { GetJeunesByConseillerQueryHandler } from './application/queries/get-jeunes-by-conseiller.query.handler'
+import { AddFavoriOffreEmploiCommandHandler } from './application/commands/add-favori-offre-emploi.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -119,6 +120,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetActionsByJeuneQueryHandler,
     CreateActionCommandHandler,
     CreateJeuneCommandHandler,
+    AddFavoriOffreEmploiCommandHandler,
     GetHomeJeuneHandler,
     GetOffresEmploiQueryHandler,
     GetDetailOffreEmploiQueryHandler,

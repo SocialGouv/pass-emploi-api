@@ -22,14 +22,24 @@ import { GetActionsByJeuneQueryHandler } from '../../application/queries/get-act
 import { GetAllRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler'
 import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
 import { ActionQueryModel } from '../../application/queries/query-models/action.query-model'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import {
+  FavoriExisteDejaError,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
 import { JeuneHomeQueryModel } from '../../domain/jeune'
 import { CreateActionAvecStatutPayload } from './validation/conseillers.inputs'
-import { PutNotificationTokenInput } from './validation/jeunes.inputs'
+import {
+  AddFavoriPayload,
+  PutNotificationTokenInput
+} from './validation/jeunes.inputs'
 import StatutInvalide = Action.StatutInvalide
 import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
+import {
+  AddFavoriOffreEmploiCommand,
+  AddFavoriOffreEmploiCommandHandler
+} from '../../application/commands/add-favori-offre-emploi.command.handler'
 
 @Controller('jeunes/:idJeune')
 @ApiTags('Jeunes')
@@ -41,7 +51,8 @@ export class JeunesController {
     private readonly getHomeJeuneHandler: GetHomeJeuneHandler,
     private readonly getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
-    private readonly getAllRendezVousJeuneQueryHandler: GetAllRendezVousJeuneQueryHandler
+    private readonly getAllRendezVousJeuneQueryHandler: GetAllRendezVousJeuneQueryHandler,
+    private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler
   ) {}
 
   @Get()
@@ -136,5 +147,37 @@ export class JeunesController {
     }
 
     throw new RuntimeException()
+  }
+
+  @Post('favori')
+  async postNouveauFavori(
+    @Param('idJeune') idJeune: string,
+    @Body() addFavoriPayload: AddFavoriPayload
+  ): Promise<void> {
+    const command: AddFavoriOffreEmploiCommand = {
+      idJeune,
+      offreEmploi: {
+        id: addFavoriPayload.idOffre,
+        nomEntreprise: addFavoriPayload.nomEntreprise,
+        duree: addFavoriPayload.duree,
+        titre: addFavoriPayload.titre,
+        alternance: addFavoriPayload.alternance,
+        typeContrat: addFavoriPayload.typeContrat,
+        localisation: addFavoriPayload.localisation
+      }
+    }
+    const result = await this.addFavoriOffreEmploiCommandHandler.execute(
+      command
+    )
+
+    if (isFailure(result)) {
+      if (result.error.code === NonTrouveError.CODE) {
+        throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
+      }
+      if (result.error.code === FavoriExisteDejaError.CODE) {
+        throw new HttpException(result.error.message, HttpStatus.CONFLICT)
+      }
+      throw new RuntimeException(result.error.message)
+    }
   }
 }

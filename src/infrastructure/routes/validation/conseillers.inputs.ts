@@ -2,6 +2,23 @@ import { ApiProperty } from '@nestjs/swagger'
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 import { Action } from '../../../domain/action'
 
+export class LocalisationPayload {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  nom: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  codePostal: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  commune: string
+}
+
 export class CreateActionPayload {
   @ApiProperty()
   @IsString()
