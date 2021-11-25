@@ -13,14 +13,14 @@ import {
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 
-export interface DeleteFavoriCommand extends Command {
+export interface DeleteFavoriOffreEmploiCommand extends Command {
   idOffreEmploi: string
   idJeune: string
 }
 
 @Injectable()
-export class DeleteFavoriCommandHandler
-  implements CommandHandler<DeleteFavoriCommand, Result>
+export class DeleteFavoriOffreEmploiCommandHandler
+  implements CommandHandler<DeleteFavoriOffreEmploiCommand, Result>
 {
   private logger: Logger
 
@@ -33,7 +33,7 @@ export class DeleteFavoriCommandHandler
     this.logger = new Logger('DeleteFavoriCommandHandler')
   }
 
-  async execute(command: DeleteFavoriCommand): Promise<Result> {
+  async execute(command: DeleteFavoriOffreEmploiCommand): Promise<Result> {
     const jeune = await this.jeuneRepository.get(command.idJeune)
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', command.idJeune))

@@ -46,9 +46,9 @@ import {
 } from '../../application/commands/add-favori-offre-emploi.command.handler'
 import StatutInvalide = Action.StatutInvalide
 import {
-  DeleteFavoriCommand,
-  DeleteFavoriCommandHandler
-} from '../../application/commands/delete-favori.command.handler'
+  DeleteFavoriOffreEmploiCommand,
+  DeleteFavoriOffreEmploiCommandHandler
+} from '../../application/commands/delete-favori-offre-emploi-command.handler'
 import {
   FavoriIdQueryModel,
   OffreEmploiResumeQueryModel
@@ -70,7 +70,7 @@ export class JeunesController {
     private readonly getFavorisIdsJeuneQueryHandler: GetFavorisIdsJeuneQueryHandler,
     private readonly getFavorisJeuneQueryHandler: GetFavorisJeuneQueryHandler,
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
-    private readonly deleteFavoriCommandHandler: DeleteFavoriCommandHandler
+    private readonly deleteFavoriCommandHandler: DeleteFavoriOffreEmploiCommandHandler
   ) {}
 
   @Get()
@@ -216,7 +216,7 @@ export class JeunesController {
     @Param('idJeune') idJeune: string,
     @Param('idOffreEmploi') idOffreEmploi: string
   ): Promise<void> {
-    const command: DeleteFavoriCommand = {
+    const command: DeleteFavoriOffreEmploiCommand = {
       idJeune,
       idOffreEmploi
     }

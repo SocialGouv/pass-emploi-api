@@ -26,15 +26,15 @@ import {
 import StatutInvalide = Action.StatutInvalide
 import { AddFavoriPayload } from '../../../src/infrastructure/routes/validation/jeunes.inputs'
 import {
-  DeleteFavoriCommand,
-  DeleteFavoriCommandHandler
-} from '../../../src/application/commands/delete-favori.command.handler'
+  DeleteFavoriOffreEmploiCommand,
+  DeleteFavoriOffreEmploiCommandHandler
+} from '../../../src/application/commands/delete-favori-offre-emploi-command.handler'
 import { unJeune } from '../../fixtures/jeune.fixture'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
   let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
-  let deleteFavoriCommandHandler: StubbedClass<DeleteFavoriCommandHandler>
+  let deleteFavoriOffreEmploiCommandHandler: StubbedClass<DeleteFavoriOffreEmploiCommandHandler>
   let app: INestApplication
 
   before(async () => {
@@ -42,14 +42,16 @@ describe('JeunesController', () => {
     addFavoriOffreEmploiCommandHandler = stubClass(
       AddFavoriOffreEmploiCommandHandler
     )
-    deleteFavoriCommandHandler = stubClass(DeleteFavoriCommandHandler)
+    deleteFavoriOffreEmploiCommandHandler = stubClass(
+      DeleteFavoriOffreEmploiCommandHandler
+    )
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
       .useValue(createActionCommandHandler)
       .overrideProvider(AddFavoriOffreEmploiCommandHandler)
       .useValue(addFavoriOffreEmploiCommandHandler)
-      .overrideProvider(DeleteFavoriCommandHandler)
-      .useValue(deleteFavoriCommandHandler)
+      .overrideProvider(DeleteFavoriOffreEmploiCommandHandler)
+      .useValue(deleteFavoriOffreEmploiCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -190,13 +192,13 @@ describe('JeunesController', () => {
   describe('DELETE /jeunes/:idJeune/favori/:idOffreEmploi', () => {
     const offreEmploi = uneOffreEmploiListItem()
     const jeune = unJeune()
-    const command: DeleteFavoriCommand = {
+    const command: DeleteFavoriOffreEmploiCommand = {
       idJeune: jeune.id,
       idOffreEmploi: offreEmploi.id
     }
     it('supprime le favori', async () => {
       //Given
-      deleteFavoriCommandHandler.execute
+      deleteFavoriOffreEmploiCommandHandler.execute
         .withArgs(command)
         .resolves(emptySuccess())
       //When
@@ -204,11 +206,13 @@ describe('JeunesController', () => {
         .delete(`/jeunes/${jeune.id}/favori/${offreEmploi.id}`)
         //Then
         .expect(HttpStatus.NO_CONTENT)
-      expect(deleteFavoriCommandHandler.execute).to.have.be.calledWith(command)
+      expect(
+        deleteFavoriOffreEmploiCommandHandler.execute
+      ).to.have.be.calledWith(command)
     })
     it('renvoie une 404(NOT FOUND) si le favori n"existe pas', async () => {
       //Given
-      deleteFavoriCommandHandler.execute
+      deleteFavoriOffreEmploiCommandHandler.execute
         .withArgs(command)
         .resolves(
           failure(new NonTrouveError('OffreEmploi', command.idOffreEmploi))
@@ -227,7 +231,7 @@ describe('JeunesController', () => {
     })
     it('renvoie une 404(NOT FOUND) si le jeune n"existe pas', async () => {
       //Given
-      deleteFavoriCommandHandler.execute
+      deleteFavoriOffreEmploiCommandHandler.execute
         .withArgs(command)
         .resolves(failure(new NonTrouveError('Jeune', command.idJeune)))
 

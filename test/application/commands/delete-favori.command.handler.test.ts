@@ -6,9 +6,9 @@ import { createSandbox, DatabaseForTesting, expect } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import {
-  DeleteFavoriCommand,
-  DeleteFavoriCommandHandler
-} from '../../../src/application/commands/delete-favori.command.handler'
+  DeleteFavoriOffreEmploiCommand,
+  DeleteFavoriOffreEmploiCommandHandler
+} from '../../../src/application/commands/delete-favori-offre-emploi-command.handler'
 import {
   emptySuccess,
   failure
@@ -18,11 +18,11 @@ import { Jeune } from '../../../src/domain/jeune'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 
-describe('DeleteFavoriCommandHandler', () => {
+describe('DeleteFavoriOffreEmploiCommandHandler', () => {
   DatabaseForTesting.prepare()
   let offresEmploiHttpSqlRepository: StubbedType<OffresEmploi.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
-  let deleteFavoriCommandHandler: DeleteFavoriCommandHandler
+  let deleteFavoriOffreEmploiCommandHandler: DeleteFavoriOffreEmploiCommandHandler
   let offreEmploi: OffreEmploiListItem
   const jeune = unJeune()
   beforeEach(async () => {
@@ -30,10 +30,11 @@ describe('DeleteFavoriCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     offresEmploiHttpSqlRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
-    deleteFavoriCommandHandler = new DeleteFavoriCommandHandler(
-      offresEmploiHttpSqlRepository,
-      jeuneRepository
-    )
+    deleteFavoriOffreEmploiCommandHandler =
+      new DeleteFavoriOffreEmploiCommandHandler(
+        offresEmploiHttpSqlRepository,
+        jeuneRepository
+      )
   })
   describe('execute', () => {
     describe('quand le favori existe', () => {
@@ -44,13 +45,15 @@ describe('DeleteFavoriCommandHandler', () => {
           .resolves(offreEmploi)
         jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
 
-        const command: DeleteFavoriCommand = {
+        const command: DeleteFavoriOffreEmploiCommand = {
           idOffreEmploi: offreEmploi.id,
           idJeune: jeune.id
         }
 
         // When
-        const result = await deleteFavoriCommandHandler.execute(command)
+        const result = await deleteFavoriOffreEmploiCommandHandler.execute(
+          command
+        )
         // Then
         expect(
           offresEmploiHttpSqlRepository.deleteFavori
@@ -66,13 +69,15 @@ describe('DeleteFavoriCommandHandler', () => {
           .resolves(undefined)
         jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
 
-        const command: DeleteFavoriCommand = {
+        const command: DeleteFavoriOffreEmploiCommand = {
           idOffreEmploi: offreEmploi.id,
           idJeune: jeune.id
         }
 
         // When
-        const result = await deleteFavoriCommandHandler.execute(command)
+        const result = await deleteFavoriOffreEmploiCommandHandler.execute(
+          command
+        )
         // Then
         expect(result).to.deep.equal(
           failure(new NonTrouveError('OffreEmploi', command.idOffreEmploi))
@@ -90,13 +95,15 @@ describe('DeleteFavoriCommandHandler', () => {
           .resolves(undefined)
         jeuneRepository.get.withArgs(jeune.id).resolves(undefined)
 
-        const command: DeleteFavoriCommand = {
+        const command: DeleteFavoriOffreEmploiCommand = {
           idOffreEmploi: offreEmploi.id,
           idJeune: jeune.id
         }
 
         // When
-        const result = await deleteFavoriCommandHandler.execute(command)
+        const result = await deleteFavoriOffreEmploiCommandHandler.execute(
+          command
+        )
         // Then
         expect(result).to.deep.equal(
           failure(new NonTrouveError('Jeune', command.idJeune))
