@@ -16,7 +16,7 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action'
 import { CreateActionAvecStatutPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
-import { uneOffreEmploiListItem } from '../../fixtures/offre-emploi.fixture'
+import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
 import {
   buildTestingModuleForHttpTesting,
   expect,
@@ -112,7 +112,7 @@ describe('JeunesController', () => {
   })
 
   describe('POST /jeunes/:idJeune/favori', () => {
-    const offreEmploi = uneOffreEmploiListItem()
+    const offreEmploi = uneOffreEmploi()
     const command: AddFavoriOffreEmploiCommand = {
       idJeune: 'ABCDE',
       offreEmploi: offreEmploi

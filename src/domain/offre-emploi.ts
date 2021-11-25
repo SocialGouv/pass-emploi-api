@@ -1,10 +1,12 @@
-export interface OffreEmploiQueryModel {
-  id: string
-  data: unknown
-  urlRedirectPourPostulation: string | null
-}
+import {
+  FavoriIdQueryModel,
+  OffreEmploiResumeQueryModel,
+  OffreEmploiQueryModel,
+  OffresEmploiQueryModel
+} from 'src/application/queries/query-models/offres-emploi.query-models'
+import { Jeune } from './jeune'
 
-export interface OffreEmploiListItem {
+export interface OffreEmploi {
   id: string
   titre: string
   typeContrat: string
@@ -18,16 +20,6 @@ export interface Localisation {
   nom: string
   codePostal: string
   commune: string
-}
-
-interface Pagination {
-  page: number
-  limit: number
-}
-
-export interface OffresEmploiQueryModel {
-  pagination: Pagination
-  results: OffreEmploiListItem[]
 }
 
 export const OffresEmploiRepositoryToken = 'OffresEmploi.Repository'
@@ -46,14 +38,17 @@ export namespace OffresEmploi {
       idOffreEmploi: string
     ): Promise<OffreEmploiQueryModel | undefined>
 
-    saveAsFavori(
-      idJeune: string,
-      offreEmploi: OffreEmploiListItem
-    ): Promise<void>
+    getFavorisIdsQueryModelsByJeune(id: Jeune.Id): Promise<FavoriIdQueryModel[]>
+
+    getFavorisQueryModelsByJeune(
+      id: Jeune.Id
+    ): Promise<OffreEmploiResumeQueryModel[]>
+
+    saveAsFavori(idJeune: string, offreEmploi: OffreEmploi): Promise<void>
 
     getFavori(
       idJeune: string,
       idOffreEmploi: string
-    ): Promise<OffreEmploiListItem | undefined>
+    ): Promise<OffreEmploi | undefined>
   }
 }

@@ -1,9 +1,10 @@
 import {
-  OffresEmploiQueryModel,
+  FavoriIdQueryModel,
   OffreEmploiQueryModel,
-  OffreEmploiListItem,
-  Localisation
-} from '../../../domain/offres-emploi'
+  OffreEmploiResumeQueryModel,
+  OffresEmploiQueryModel
+} from 'src/application/queries/query-models/offres-emploi.query-models'
+import { OffreEmploi, Localisation } from '../../../domain/offre-emploi'
 import { FavoriOffreEmploiSqlModel } from '../../sequelize/models/favori-offre-emploi.sql-model'
 import {
   OffresEmploiDto,
@@ -56,7 +57,7 @@ export function toOffreEmploiQueryModel(
 
 export function toFavoriOffreEmploiSqlModel(
   idJeune: string,
-  offreEmploi: OffreEmploiListItem
+  offreEmploi: OffreEmploi
 ): Partial<FavoriOffreEmploiSqlModel> {
   return {
     idJeune: idJeune,
@@ -73,9 +74,9 @@ export function toFavoriOffreEmploiSqlModel(
   }
 }
 
-export function toOffreEmploiListItem(
+export function toOffreEmploi(
   favoriOffreEmploiSqlModel: FavoriOffreEmploiSqlModel
-): OffreEmploiListItem {
+): OffreEmploi {
   return {
     id: favoriOffreEmploiSqlModel.idOffre,
     alternance:
@@ -105,4 +106,29 @@ export function buildLocalisation(
     }
   }
   return undefined
+}
+
+export function fromSqlToFavorisIdsQueryModels(
+  favorisIdsSql: FavoriOffreEmploiSqlModel[]
+): FavoriIdQueryModel[] {
+  return favorisIdsSql.map(favori => {
+    return { id: favori.idOffre }
+  })
+}
+
+export function fromSqlToFavorisQueryModels(
+  favorisSql: FavoriOffreEmploiSqlModel[]
+): OffreEmploiResumeQueryModel[] {
+  return favorisSql.map(favoriSql => {
+    return {
+      id: favoriSql.idOffre,
+      alternance:
+        favoriSql.isAlternance === null ? undefined : favoriSql.isAlternance,
+      duree: favoriSql.duree,
+      localisation: buildLocalisation(favoriSql),
+      typeContrat: favoriSql.typeContrat,
+      nomEntreprise: favoriSql.nomEntreprise,
+      titre: favoriSql.titre
+    }
+  })
 }

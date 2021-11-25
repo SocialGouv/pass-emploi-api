@@ -1,4 +1,4 @@
-import { OffreEmploiListItem } from '../../../src/domain/offres-emploi'
+import { OffreEmploi } from '../../../src/domain/offre-emploi'
 import { PoleEmploiClient } from '../../../src/infrastructure/clients/pole-emploi-client'
 import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-emploi-http-sql.repository'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -7,7 +7,7 @@ import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeun
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { DatabaseForTesting, expect, stubClass } from '../../utils'
-import { uneOffreEmploiListItem } from '../../fixtures/offre-emploi.fixture'
+import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
 
 describe('OffresEmploiHttpSqlRepository', () => {
   DatabaseForTesting.prepare()
@@ -34,7 +34,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
         // When
         await offresEmploiHttpSqlRepository.saveAsFavori(
           'ABCDE',
-          uneOffreEmploiListItem()
+          uneOffreEmploi()
         )
 
         // Then
@@ -57,7 +57,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
   })
 
   describe('.getFavori', () => {
-    let offreEmploi: OffreEmploiListItem
+    let offreEmploi: OffreEmploi
 
     beforeEach(async () => {
       // Given
@@ -68,7 +68,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
           idConseiller: 'ZIDANE'
         })
       )
-      offreEmploi = uneOffreEmploiListItem()
+      offreEmploi = uneOffreEmploi()
       await offresEmploiHttpSqlRepository.saveAsFavori('ABCDE', offreEmploi)
     })
 

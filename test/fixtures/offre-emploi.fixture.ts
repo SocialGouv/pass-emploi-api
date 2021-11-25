@@ -1,6 +1,6 @@
-import { OffreEmploiListItem } from '../../src/domain/offres-emploi'
+import { OffreEmploi } from '../../src/domain/offre-emploi'
 
-export const uneOffreEmploiListItem = (): OffreEmploiListItem => ({
+export const uneOffreEmploi = (): OffreEmploi => ({
   id: '123DXPM',
   titre: 'Technicien / Technicienne en froid et climatisation',
   typeContrat: 'MIS',

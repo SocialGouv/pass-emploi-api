@@ -6,7 +6,8 @@ import {
   HttpStatus,
   Param,
   Post,
-  Put
+  Put,
+  Query
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiTags } from '@nestjs/swagger'
@@ -21,7 +22,7 @@ import { UpdateNotificationTokenCommandHandler } from '../../application/command
 import { GetActionsByJeuneQueryHandler } from '../../application/queries/get-actions-by-jeune.query.handler'
 import { GetAllRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler'
 import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
-import { ActionQueryModel } from '../../application/queries/query-models/action.query-model'
+import { ActionQueryModel } from '../../application/queries/query-models/actions.query-model'
 import {
   FavoriExisteDejaError,
   NonTrouveError
@@ -32,14 +33,21 @@ import { JeuneHomeQueryModel } from '../../domain/jeune'
 import { CreateActionAvecStatutPayload } from './validation/conseillers.inputs'
 import {
   AddFavoriPayload,
+  GetFavorisPayload,
   PutNotificationTokenInput
 } from './validation/jeunes.inputs'
 import StatutInvalide = Action.StatutInvalide
-import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
+import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
 import {
   AddFavoriOffreEmploiCommand,
   AddFavoriOffreEmploiCommandHandler
 } from '../../application/commands/add-favori-offre-emploi.command.handler'
+import {
+  FavoriIdQueryModel,
+  OffreEmploiResumeQueryModel
+} from 'src/application/queries/query-models/offres-emploi.query-models'
+import { GetFavorisIdsJeuneQueryHandler } from 'src/application/queries/get-favoris-ids-jeune.query.handler'
+import { GetFavorisJeuneQueryHandler } from 'src/application/queries/get-favoris-jeune.query.handler'
 
 @Controller('jeunes/:idJeune')
 @ApiTags('Jeunes')
@@ -52,7 +60,9 @@ export class JeunesController {
     private readonly getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly getAllRendezVousJeuneQueryHandler: GetAllRendezVousJeuneQueryHandler,
-    private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler
+    private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
+    private readonly getFavorisIdsJeuneQueryHandler: GetFavorisIdsJeuneQueryHandler,
+    private readonly getFavorisJeuneQueryHandler: GetFavorisJeuneQueryHandler
   ) {}
 
   @Get()
@@ -147,6 +157,17 @@ export class JeunesController {
     }
 
     throw new RuntimeException()
+  }
+
+  @Get('favoris')
+  async getFavoris(
+    @Param('idJeune') idJeune: string,
+    @Query() getFavorisPayload: GetFavorisPayload
+  ): Promise<OffreEmploiResumeQueryModel[] | FavoriIdQueryModel[]> {
+    if (getFavorisPayload.detail === 'true') {
+      return await this.getFavorisJeuneQueryHandler.execute({ idJeune })
+    }
+    return await this.getFavorisIdsJeuneQueryHandler.execute({ idJeune })
   }
 
   @Post('favori')

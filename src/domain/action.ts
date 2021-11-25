@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { ActionQueryModel } from '../application/queries/query-models/action.query-model'
+import { ActionQueryModel } from '../application/queries/query-models/actions.query-model'
 import { Brand } from '../building-blocks/types/brand'
 import { DomainError } from '../building-blocks/types/domain-error'
 import {

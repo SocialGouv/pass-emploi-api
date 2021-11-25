@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { ActionQueryModel } from '../../application/queries/query-models/action.query-model'
+import { ActionQueryModel } from '../../application/queries/query-models/actions.query-model'
 import { Action } from '../../domain/action'
 import { ActionDto, ActionSqlModel } from '../sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'

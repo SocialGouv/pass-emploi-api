@@ -8,10 +8,10 @@ import {
 } from '../../building-blocks/types/result'
 
 import {
-  OffreEmploiListItem,
+  OffreEmploi,
   OffresEmploi,
   OffresEmploiRepositoryToken
-} from '../../domain/offres-emploi'
+} from '../../domain/offre-emploi'
 import {
   FavoriExisteDejaError,
   NonTrouveError
@@ -20,7 +20,7 @@ import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 
 export interface AddFavoriOffreEmploiCommand extends Command {
   idJeune: string
-  offreEmploi: OffreEmploiListItem
+  offreEmploi: OffreEmploi
 }
 
 @Injectable()

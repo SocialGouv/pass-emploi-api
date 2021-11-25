@@ -15,11 +15,11 @@ import {
   GetDetailOffreEmploiQuery,
   GetDetailOffreEmploiQueryHandler
 } from '../../application/queries/get-detail-offre-emploi.query.handler'
-import {
-  OffresEmploiQueryModel,
-  OffreEmploiQueryModel
-} from '../../domain/offres-emploi'
 import { FindOffresEmploiPayload } from './validation/offres-emploi.inputs'
+import {
+  OffreEmploiQueryModel,
+  OffresEmploiQueryModel
+} from 'src/application/queries/query-models/offres-emploi.query-models'
 
 @Controller('offres-emploi')
 @ApiTags("Offres d'emploi")

@@ -1,4 +1,4 @@
-import { ActionQueryModel } from '../../../../src/application/queries/query-models/action.query-model'
+import { ActionQueryModel } from '../../../../src/application/queries/query-models/actions.query-model'
 import { Action } from '../../../../src/domain/action'
 
 export class ActionFakeRepository implements Action.Repository {
