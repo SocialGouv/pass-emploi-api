@@ -1,17 +1,13 @@
 module.exports = {
   async up(queryInterface) {
-    return queryInterface.bulkInsert('conseiller', [
-      {
-        id: '1',
-        prenom: 'Nils',
-        nom: 'Tavernier'
-      },
-      {
-        id: '2',
-        prenom: 'Virginie',
-        nom: 'Renoux'
-      }
-    ])
+    for(let i = 0; i < 100; i++) {
+      await queryInterface.bulkInsert('conseiller', [
+        {
+          id: i,
+          prenom: 'Nils' + 1,
+          nom: 'Tavernier' + 1
+        }])
+    }
   },
 
   async down(queryInterface) {

@@ -1,42 +1,17 @@
 module.exports = {
   async up(queryInterface) {
-    return queryInterface.bulkInsert('jeune', [
-      {
-        id: '1',
-        prenom: 'Kenji',
-        nom: 'Lefameux',
-        id_conseiller: '1',
-        date_creation: '2021-09-24T10:00:00.000Z'
-      },
-      {
-        id: '2',
-        prenom: 'Téa',
-        nom: 'GIRARD',
-        id_conseiller: '1',
-        date_creation: '2021-11-24T10:00:00.000Z'
-      },
-      {
-        id: '3',
-        prenom: 'Isaure',
-        nom: 'KORN LE BARS',
-        id_conseiller: '1',
-        date_creation: '2021-11-24T10:00:00.000Z'
-      },
-      {
-        id: '4',
-        prenom: 'Théo',
-        nom: 'Usarch',
-        id_conseiller: '2',
-        date_creation: '2021-11-24T10:00:00.000Z'
-      },
-      {
-        id: '5',
-        prenom: 'Océane',
-        nom: 'DEPLAIX',
-        id_conseiller: '2',
-        date_creation: '2021-11-24T10:00:00.000Z'
+    for(let i = 0; i < 100; i++) {
+      for(let j = 0; j < 100; j++) {
+        await queryInterface.bulkInsert('jeune', [
+          {
+            id: j + i * 100,
+            prenom: 'Kenji' + j + i,
+            nom: 'Lefameux' + j + i,
+            id_conseiller: i,
+            date_creation: '2021-09-24T10:00:00.000Z'
+          }])
       }
-    ])
+    }
   },
 
   async down(queryInterface) {
