@@ -1,28 +1,71 @@
-import { Localisation } from 'src/domain/offre-emploi'
+import { ApiProperty } from '@nestjs/swagger'
 
-export interface OffreEmploiQueryModel {
+export class LocalisationQueryModel {
+  @ApiProperty()
+  nom: string
+
+  @ApiProperty()
+  codePostal: string
+
+  @ApiProperty()
+  commune: string
+}
+
+export class OffreEmploiQueryModel {
+  @ApiProperty()
   id: string
+
+  @ApiProperty()
   data: unknown
+
+  @ApiProperty({
+    type: String,
+    nullable: true
+  })
   urlRedirectPourPostulation: string | null
 }
 
-export interface OffreEmploiResumeQueryModel {
+export class OffreEmploiResumeQueryModel {
+  @ApiProperty()
   id: string
+
+  @ApiProperty()
   titre: string
+
+  @ApiProperty()
   typeContrat: string
+
+  @ApiProperty({ required: false })
   nomEntreprise?: string
-  localisation?: Localisation
+
+  @ApiProperty({ required: false })
+  localisation?: LocalisationQueryModel
+
+  @ApiProperty({ required: false })
   alternance?: boolean
+
+  @ApiProperty({ required: false })
   duree?: string
 }
 
-interface Pagination {
+class Pagination {
+  @ApiProperty()
   page: number
+
+  @ApiProperty()
   limit: number
 }
 
-export interface OffresEmploiQueryModel {
+export class OffresEmploiQueryModel {
+  @ApiProperty({
+    type: Pagination
+  })
   pagination: Pagination
+
+  @ApiProperty({
+    type: OffreEmploiResumeQueryModel,
+    isArray: true
+  })
   results: OffreEmploiResumeQueryModel[]
 }
 
