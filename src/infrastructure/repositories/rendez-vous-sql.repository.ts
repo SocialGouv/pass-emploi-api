@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { Op } from 'sequelize'
-import { RendezVousQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
+import {
+  RendezVousConseillerQueryModel,
+  RendezVousQueryModel
+} from '../../application/queries/query-models/rendez-vous.query-model'
 import { RendezVous } from '../../domain/rendez-vous'
 import { DateService } from '../../utils/date-service'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
@@ -68,18 +71,41 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
 
   async getAllQueryModelsByConseiller(
     idConseiller: string
-  ): Promise<RendezVousQueryModel[]> {
-    const allRendezVousSql = await RendezVousSqlModel.findAll({
+  ): Promise<RendezVousConseillerQueryModel> {
+    const maintenant = this.dateService.nowJs()
+
+    const rendezVousPasses = await RendezVousSqlModel.findAll({
       include: [JeuneSqlModel],
       where: {
         idConseiller,
+        date: {
+          [Op.lte]: maintenant
+        },
         dateSuppression: {
           [Op.is]: null
         }
-      }
+      },
+      order: [['date', 'DESC']]
     })
 
-    return allRendezVousSql.map(toRendezVousConseillerQueryModel)
+    const rendezVousFuturs = await RendezVousSqlModel.findAll({
+      include: [JeuneSqlModel],
+      where: {
+        idConseiller,
+        date: {
+          [Op.gte]: maintenant
+        },
+        dateSuppression: {
+          [Op.is]: null
+        }
+      },
+      order: [['date', 'ASC']]
+    })
+
+    return {
+      passes: rendezVousPasses.map(toRendezVousConseillerQueryModel),
+      futurs: rendezVousFuturs.map(toRendezVousConseillerQueryModel)
+    }
   }
 
   async getAllQueryModelsByJeune(

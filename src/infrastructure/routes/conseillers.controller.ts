@@ -19,7 +19,7 @@ import { SendNotificationNouveauMessageCommandHandler } from '../../application/
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
 import { DetailJeuneQueryModel } from '../../application/queries/query-models/jeunes.query-models'
-import { RendezVousQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
+import { RendezVousConseillerQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
 import {
   JeuneNonLieAuConseillerError,
   NonTrouveError
@@ -124,7 +124,7 @@ export class ConseillersController {
   @Get('rendezvous')
   async getRendezVous(
     @Param('idConseiller') idConseiller: string
-  ): Promise<RendezVousQueryModel[]> {
+  ): Promise<RendezVousConseillerQueryModel> {
     return this.getAllRendezVousConseillerQueryHandler.execute({ idConseiller })
   }
 

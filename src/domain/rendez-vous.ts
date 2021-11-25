@@ -1,4 +1,7 @@
-import { RendezVousQueryModel } from '../application/queries/query-models/rendez-vous.query-model'
+import {
+  RendezVousConseillerQueryModel,
+  RendezVousQueryModel
+} from '../application/queries/query-models/rendez-vous.query-model'
 import { IdService } from '../utils/id-service'
 import { Jeune } from './jeune'
 
@@ -31,7 +34,7 @@ export namespace RendezVous {
     delete(idRendezVous: string): Promise<void>
     getAllQueryModelsByConseiller(
       idConseiller: string
-    ): Promise<RendezVousQueryModel[]>
+    ): Promise<RendezVousConseillerQueryModel>
     getAllQueryModelsByJeune(idJeune: string): Promise<RendezVousQueryModel[]>
   }
 

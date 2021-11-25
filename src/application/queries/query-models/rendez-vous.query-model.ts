@@ -6,3 +6,8 @@ export interface RendezVousQueryModel {
   duration: number
   modality: string
 }
+
+export interface RendezVousConseillerQueryModel {
+  futurs: RendezVousQueryModel[]
+  passes: RendezVousQueryModel[]
+}

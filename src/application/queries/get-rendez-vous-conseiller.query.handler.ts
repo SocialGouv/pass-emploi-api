@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
-import { RendezVousQueryModel } from './query-models/rendez-vous.query-model'
+import { RendezVousConseillerQueryModel } from './query-models/rendez-vous.query-model'
 
 export interface GetAllRendezVousConseiller extends Query {
   idConseiller: string
@@ -10,7 +10,8 @@ export interface GetAllRendezVousConseiller extends Query {
 
 @Injectable()
 export class GetAllRendezVousConseillerQueryHandler
-  implements QueryHandler<GetAllRendezVousConseiller, RendezVousQueryModel[]>
+  implements
+    QueryHandler<GetAllRendezVousConseiller, RendezVousConseillerQueryModel>
 {
   constructor(
     @Inject(RendezVousRepositoryToken)
@@ -19,7 +20,7 @@ export class GetAllRendezVousConseillerQueryHandler
 
   async execute(
     query: GetAllRendezVousConseiller
-  ): Promise<RendezVousQueryModel[]> {
+  ): Promise<RendezVousConseillerQueryModel> {
     return this.rendezVousRepository.getAllQueryModelsByConseiller(
       query.idConseiller
     )
