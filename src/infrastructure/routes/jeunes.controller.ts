@@ -33,7 +33,7 @@ import { JeuneHomeQueryModel } from '../../domain/jeune'
 import { CreateActionAvecStatutPayload } from './validation/conseillers.inputs'
 import {
   AddFavoriPayload,
-  GetFavorisPayload,
+  GetFavorisQuery,
   PutNotificationTokenInput
 } from './validation/jeunes.inputs'
 import StatutInvalide = Action.StatutInvalide
@@ -162,9 +162,9 @@ export class JeunesController {
   @Get('favoris')
   async getFavoris(
     @Param('idJeune') idJeune: string,
-    @Query() getFavorisPayload: GetFavorisPayload
+    @Query() getFavorisQuery: GetFavorisQuery
   ): Promise<OffreEmploiResumeQueryModel[] | FavoriIdQueryModel[]> {
-    if (getFavorisPayload.detail === 'true') {
+    if (getFavorisQuery.detail === 'true') {
       return await this.getFavorisJeuneQueryHandler.execute({ idJeune })
     }
     return await this.getFavorisIdsJeuneQueryHandler.execute({ idJeune })

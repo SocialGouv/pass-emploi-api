@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { IsNotEmpty, IsString, IsOptional } from 'class-validator'
 
-export class FindOffresEmploiPayload {
+export class FindOffresEmploiQuery {
   @ApiPropertyOptional()
   @IsString()
   @IsNotEmpty()

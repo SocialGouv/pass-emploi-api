@@ -63,7 +63,7 @@ export class AddFavoriPayload {
   duree?: string
 }
 
-export class GetFavorisPayload {
+export class GetFavorisQuery {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
