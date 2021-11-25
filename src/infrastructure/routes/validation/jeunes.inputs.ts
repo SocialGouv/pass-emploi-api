@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator'
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 
 export class PutNotificationTokenInput {
   @ApiProperty()
@@ -43,16 +43,22 @@ export class AddFavoriPayload {
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
+  @IsNotEmpty()
   nomEntreprise?: string
 
   @ApiProperty()
+  @IsOptional()
   localisation?: LocalisationPayload
 
   @ApiProperty()
   @IsBoolean()
+  @IsOptional()
   alternance?: boolean
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
+  @IsNotEmpty()
   duree?: string
 }
