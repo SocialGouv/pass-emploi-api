@@ -25,10 +25,16 @@ import {
 } from '../../utils'
 import StatutInvalide = Action.StatutInvalide
 import { AddFavoriPayload } from '../../../src/infrastructure/routes/validation/jeunes.inputs'
+import {
+  DeleteFavoriCommand,
+  DeleteFavoriCommandHandler
+} from '../../../src/application/commands/delete-favori.command.handler'
+import { unJeune } from '../../fixtures/jeune.fixture'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
   let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
+  let deleteFavoriCommandHandler: StubbedClass<DeleteFavoriCommandHandler>
   let app: INestApplication
 
   before(async () => {
@@ -36,11 +42,14 @@ describe('JeunesController', () => {
     addFavoriOffreEmploiCommandHandler = stubClass(
       AddFavoriOffreEmploiCommandHandler
     )
+    deleteFavoriCommandHandler = stubClass(DeleteFavoriCommandHandler)
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
       .useValue(createActionCommandHandler)
       .overrideProvider(AddFavoriOffreEmploiCommandHandler)
       .useValue(addFavoriOffreEmploiCommandHandler)
+      .overrideProvider(DeleteFavoriCommandHandler)
+      .useValue(deleteFavoriCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -175,6 +184,63 @@ describe('JeunesController', () => {
 
         // Then
         .expect(HttpStatus.CONFLICT)
+    })
+  })
+
+  describe('DELETE /jeunes/:idJeune/favori/:idOffreEmploi', () => {
+    const offreEmploi = uneOffreEmploiListItem()
+    const jeune = unJeune()
+    const command: DeleteFavoriCommand = {
+      idJeune: jeune.id,
+      idOffreEmploi: offreEmploi.id
+    }
+    it('supprime le favori', async () => {
+      //Given
+      deleteFavoriCommandHandler.execute
+        .withArgs(command)
+        .resolves(emptySuccess())
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/${jeune.id}/favori/${offreEmploi.id}`)
+        //Then
+        .expect(HttpStatus.NO_CONTENT)
+      expect(deleteFavoriCommandHandler.execute).to.have.be.calledWith(command)
+    })
+    it('renvoie une 404(NOT FOUND) si le favori n"existe pas', async () => {
+      //Given
+      deleteFavoriCommandHandler.execute
+        .withArgs(command)
+        .resolves(
+          failure(new NonTrouveError('OffreEmploi', command.idOffreEmploi))
+        )
+
+      const expectedMessageJson = {
+        code: 'NON_TROUVE',
+        message: `OffreEmploi ${command.idOffreEmploi} non trouvé(e)`
+      }
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/${jeune.id}/favori/${offreEmploi.id}`)
+        //Then
+        .expect(HttpStatus.NOT_FOUND)
+        .expect(expectedMessageJson)
+    })
+    it('renvoie une 404(NOT FOUND) si le jeune n"existe pas', async () => {
+      //Given
+      deleteFavoriCommandHandler.execute
+        .withArgs(command)
+        .resolves(failure(new NonTrouveError('Jeune', command.idJeune)))
+
+      const expectedMessageJson = {
+        code: 'NON_TROUVE',
+        message: `Jeune ${command.idJeune} non trouvé(e)`
+      }
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/${jeune.id}/favori/${offreEmploi.id}`)
+        //Then
+        .expect(HttpStatus.NOT_FOUND)
+        .expect(expectedMessageJson)
     })
   })
 })

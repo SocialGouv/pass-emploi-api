@@ -1,9 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   HttpException,
   HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -36,12 +39,16 @@ import {
   GetFavorisQuery,
   PutNotificationTokenInput
 } from './validation/jeunes.inputs'
-import StatutInvalide = Action.StatutInvalide
 import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
 import {
   AddFavoriOffreEmploiCommand,
   AddFavoriOffreEmploiCommandHandler
 } from '../../application/commands/add-favori-offre-emploi.command.handler'
+import StatutInvalide = Action.StatutInvalide
+import {
+  DeleteFavoriCommand,
+  DeleteFavoriCommandHandler
+} from '../../application/commands/delete-favori.command.handler'
 import {
   FavoriIdQueryModel,
   OffreEmploiResumeQueryModel
@@ -60,9 +67,10 @@ export class JeunesController {
     private readonly getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly getAllRendezVousJeuneQueryHandler: GetAllRendezVousJeuneQueryHandler,
-    private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
     private readonly getFavorisIdsJeuneQueryHandler: GetFavorisIdsJeuneQueryHandler,
-    private readonly getFavorisJeuneQueryHandler: GetFavorisJeuneQueryHandler
+    private readonly getFavorisJeuneQueryHandler: GetFavorisJeuneQueryHandler,
+    private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
+    private readonly deleteFavoriCommandHandler: DeleteFavoriCommandHandler
   ) {}
 
   @Get()
@@ -199,6 +207,22 @@ export class JeunesController {
         throw new HttpException(result.error.message, HttpStatus.CONFLICT)
       }
       throw new RuntimeException(result.error.message)
+    }
+  }
+
+  @Delete('favori/:idOffreEmploi')
+  @HttpCode(204)
+  async deleteFavori(
+    @Param('idJeune') idJeune: string,
+    @Param('idOffreEmploi') idOffreEmploi: string
+  ): Promise<void> {
+    const command: DeleteFavoriCommand = {
+      idJeune,
+      idOffreEmploi
+    }
+    const result = await this.deleteFavoriCommandHandler.execute(command)
+    if (isFailure(result)) {
+      throw new NotFoundException(result.error)
     }
   }
 }
