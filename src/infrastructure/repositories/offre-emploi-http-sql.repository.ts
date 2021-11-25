@@ -113,6 +113,15 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
 
     return favorisSql.map(toOffreEmploi)
   }
+
+  async deleteFavori(idJeune: string, idOffreEmploi: string): Promise<void> {
+    await FavoriOffreEmploiSqlModel.destroy({
+      where: {
+        idOffre: idOffreEmploi,
+        idJeune
+      }
+    })
+  }
 }
 
 export interface OffreEmploiDto {
