@@ -118,7 +118,8 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
         dateSuppression: {
           [Op.is]: null
         }
-      }
+      },
+      order: [['date', 'ASC']]
     })
 
     return allRendezVousSql.map(toRendezVousJeuneQueryModel)
