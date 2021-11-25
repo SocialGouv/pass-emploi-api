@@ -7,8 +7,8 @@ import {
   Param,
   Post
 } from '@nestjs/common'
-import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiTags } from '@nestjs/swagger'
+import { strict as assert } from 'assert'
 import { CreateRendezVousCommandHandler } from '../../application/commands/create-rendez-vous.command.handler'
 import { DeleteRendezVousCommandHandler } from '../../application/commands/delete-rendez-vous.command.handler'
 import {
@@ -54,10 +54,8 @@ export class RendezVousController {
       }
     }
 
-    if (isSuccess(result)) {
-      return { id: result.data }
-    }
-    throw new RuntimeException()
+    assert(isSuccess(result))
+    return { id: result.data }
   }
 
   @Delete('rendezvous/:idRendezVous')
