@@ -161,4 +161,33 @@ describe('OffresEmploiHttpSqlRepository', () => {
       })
     })
   })
+
+  describe('.deleteFavori', () => {
+    let offreEmploi: OffreEmploi
+
+    beforeEach(async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseillerDto({ id: 'ZIDANE' }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: 'ABCDE',
+          idConseiller: 'ZIDANE'
+        })
+      )
+    })
+
+    it('supprime le favori', async () => {
+      // Given
+      offreEmploi = uneOffreEmploi()
+      await offresEmploiHttpSqlRepository.saveAsFavori('ABCDE', offreEmploi)
+      // When
+      await offresEmploiHttpSqlRepository.deleteFavori('ABCDE', offreEmploi.id)
+      // Then
+      const actual = await offresEmploiHttpSqlRepository.getFavori(
+        'ABCDE',
+        offreEmploi.id
+      )
+      expect(actual).to.equal(undefined)
+    })
+  })
 })

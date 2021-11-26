@@ -57,6 +57,7 @@ import { GetJeunesByConseillerQueryHandler } from './application/queries/get-jeu
 import { AddFavoriOffreEmploiCommandHandler } from './application/commands/add-favori-offre-emploi.command.handler'
 import { GetFavorisIdsJeuneQueryHandler } from './application/queries/get-favoris-ids-jeune.query.handler'
 import { GetFavorisJeuneQueryHandler } from './application/queries/get-favoris-jeune.query.handler'
+import { DeleteFavoriOffreEmploiCommandHandler } from './application/commands/delete-favori-offre-emploi-command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -123,6 +124,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateActionCommandHandler,
     CreateJeuneCommandHandler,
     AddFavoriOffreEmploiCommandHandler,
+    DeleteFavoriOffreEmploiCommandHandler,
     GetFavorisIdsJeuneQueryHandler,
     GetFavorisJeuneQueryHandler,
     GetHomeJeuneHandler,

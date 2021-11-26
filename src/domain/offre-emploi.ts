@@ -50,5 +50,7 @@ export namespace OffresEmploi {
       idJeune: string,
       idOffreEmploi: string
     ): Promise<OffreEmploi | undefined>
+
+    deleteFavori(idJeune: string, idOffreEmploi: string): Promise<void>
   }
 }

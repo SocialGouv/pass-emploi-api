@@ -7,6 +7,7 @@ import {
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
 import {
   FavoriExisteDejaError,
+  FavoriNonTrouveError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 import {
@@ -25,10 +26,16 @@ import {
 } from '../../utils'
 import StatutInvalide = Action.StatutInvalide
 import { AddFavoriPayload } from '../../../src/infrastructure/routes/validation/jeunes.inputs'
+import {
+  DeleteFavoriOffreEmploiCommand,
+  DeleteFavoriOffreEmploiCommandHandler
+} from '../../../src/application/commands/delete-favori-offre-emploi-command.handler'
+import { unJeune } from '../../fixtures/jeune.fixture'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
   let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
+  let deleteFavoriOffreEmploiCommandHandler: StubbedClass<DeleteFavoriOffreEmploiCommandHandler>
   let app: INestApplication
 
   before(async () => {
@@ -36,11 +43,16 @@ describe('JeunesController', () => {
     addFavoriOffreEmploiCommandHandler = stubClass(
       AddFavoriOffreEmploiCommandHandler
     )
+    deleteFavoriOffreEmploiCommandHandler = stubClass(
+      DeleteFavoriOffreEmploiCommandHandler
+    )
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
       .useValue(createActionCommandHandler)
       .overrideProvider(AddFavoriOffreEmploiCommandHandler)
       .useValue(addFavoriOffreEmploiCommandHandler)
+      .overrideProvider(DeleteFavoriOffreEmploiCommandHandler)
+      .useValue(deleteFavoriOffreEmploiCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -175,6 +187,67 @@ describe('JeunesController', () => {
 
         // Then
         .expect(HttpStatus.CONFLICT)
+    })
+  })
+
+  describe('DELETE /jeunes/:idJeune/favori/:idOffreEmploi', () => {
+    const offreEmploi = uneOffreEmploi()
+    const jeune = unJeune()
+    const command: DeleteFavoriOffreEmploiCommand = {
+      idJeune: jeune.id,
+      idOffreEmploi: offreEmploi.id
+    }
+    it('supprime le favori', async () => {
+      //Given
+      deleteFavoriOffreEmploiCommandHandler.execute
+        .withArgs(command)
+        .resolves(emptySuccess())
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/${jeune.id}/favori/${offreEmploi.id}`)
+        //Then
+        .expect(HttpStatus.NO_CONTENT)
+      expect(
+        deleteFavoriOffreEmploiCommandHandler.execute
+      ).to.have.be.calledWith(command)
+    })
+    it('renvoie une 404(NOT FOUND) si le favori n"existe pas', async () => {
+      //Given
+      deleteFavoriOffreEmploiCommandHandler.execute
+        .withArgs(command)
+        .resolves(
+          failure(
+            new FavoriNonTrouveError(command.idJeune, command.idOffreEmploi)
+          )
+        )
+
+      const expectedMessageJson = {
+        code: 'FAVORI_NON_TROUVE',
+        message: `Le Favori du jeune ${command.idJeune} correspondant à l'offre ${command.idOffreEmploi} n'existe pas`
+      }
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/${jeune.id}/favori/${offreEmploi.id}`)
+        //Then
+        .expect(HttpStatus.NOT_FOUND)
+        .expect(expectedMessageJson)
+    })
+    it('renvoie une 404(NOT FOUND) si le jeune n"existe pas', async () => {
+      //Given
+      deleteFavoriOffreEmploiCommandHandler.execute
+        .withArgs(command)
+        .resolves(failure(new NonTrouveError('Jeune', command.idJeune)))
+
+      const expectedMessageJson = {
+        code: 'NON_TROUVE',
+        message: `Jeune ${command.idJeune} non trouvé(e)`
+      }
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/${jeune.id}/favori/${offreEmploi.id}`)
+        //Then
+        .expect(HttpStatus.NOT_FOUND)
+        .expect(expectedMessageJson)
     })
   })
 })
