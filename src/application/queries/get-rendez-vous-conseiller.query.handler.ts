@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
-import { RendezVousConseillerQueryModel } from './query-models/rendez-vous.query-model'
+import { RendezVousConseillerQueryModel } from './query-models/rendez-vous.query-models'
 
 export interface GetAllRendezVousConseiller extends Query {
   idConseiller: string

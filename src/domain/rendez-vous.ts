@@ -1,7 +1,7 @@
 import {
   RendezVousConseillerQueryModel,
   RendezVousQueryModel
-} from '../application/queries/query-models/rendez-vous.query-model'
+} from '../application/queries/query-models/rendez-vous.query-models'
 import { IdService } from '../utils/id-service'
 import { Jeune } from './jeune'
 

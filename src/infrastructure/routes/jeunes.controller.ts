@@ -37,7 +37,7 @@ import {
   PutNotificationTokenInput
 } from './validation/jeunes.inputs'
 import StatutInvalide = Action.StatutInvalide
-import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
+import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-modelss'
 import {
   AddFavoriOffreEmploiCommand,
   AddFavoriOffreEmploiCommandHandler
