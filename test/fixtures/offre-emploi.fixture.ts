@@ -1,6 +1,7 @@
-import { OffreEmploiListItem } from '../../src/domain/offres-emploi'
+import { OffreEmploiResumeQueryModel } from 'src/application/queries/query-models/offres-emploi.query-models'
+import { OffreEmploi } from '../../src/domain/offre-emploi'
 
-export const uneOffreEmploiListItem = (): OffreEmploiListItem => ({
+export const uneOffreEmploi = (): OffreEmploi => ({
   id: '123DXPM',
   titre: 'Technicien / Technicienne en froid et climatisation',
   typeContrat: 'MIS',
@@ -13,3 +14,18 @@ export const uneOffreEmploiListItem = (): OffreEmploiListItem => ({
   },
   alternance: false
 })
+
+export const uneOffreEmploiResumeQueryModel =
+  (): OffreEmploiResumeQueryModel => ({
+    id: '123DXPM',
+    titre: 'Technicien / Technicienne en froid et climatisation',
+    typeContrat: 'MIS',
+    nomEntreprise: 'RH TT INTERIM',
+    duree: 'Temps plein',
+    localisation: {
+      nom: '77 - LOGNES',
+      codePostal: '77185',
+      commune: '77258'
+    },
+    alternance: false
+  })

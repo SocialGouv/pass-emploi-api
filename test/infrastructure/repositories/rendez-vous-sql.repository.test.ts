@@ -1,7 +1,7 @@
 import {
   RendezVousConseillerQueryModel,
   RendezVousQueryModel
-} from '../../../src/application/queries/query-models/rendez-vous.query-model'
+} from '../../../src/application/queries/query-models/rendez-vous.query-models'
 import { Jeune } from '../../../src/domain/jeune'
 import { RendezVousRepositorySql } from '../../../src/infrastructure/repositories/rendez-vous-sql.repository'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'

@@ -15,11 +15,11 @@ import {
   GetDetailOffreEmploiQuery,
   GetDetailOffreEmploiQueryHandler
 } from '../../application/queries/get-detail-offre-emploi.query.handler'
+import { FindOffresEmploiQuery } from './validation/offres-emploi.inputs'
 import {
-  OffresEmploiQueryModel,
-  OffreEmploiQueryModel
-} from '../../domain/offres-emploi'
-import { FindOffresEmploiPayload } from './validation/offres-emploi.inputs'
+  OffreEmploiQueryModel,
+  OffresEmploiQueryModel
+} from 'src/application/queries/query-models/offres-emploi.query-models'
 
 @Controller('offres-emploi')
 @ApiTags("Offres d'emploi")
@@ -30,18 +30,18 @@ export class OffresEmploiController {
   ) {}
 
   @Get() getOffresEmploi(
-    @Query() findOffresEmploiPayload: FindOffresEmploiPayload
+    @Query() findOffresEmploiQuery: FindOffresEmploiQuery
   ): Promise<OffresEmploiQueryModel> {
     const query: GetOffresEmploiQuery = {
-      page: findOffresEmploiPayload.page
-        ? parseInt(findOffresEmploiPayload.page)
+      page: findOffresEmploiQuery.page
+        ? parseInt(findOffresEmploiQuery.page)
         : undefined,
-      limit: findOffresEmploiPayload.limit
-        ? parseInt(findOffresEmploiPayload.limit)
+      limit: findOffresEmploiQuery.limit
+        ? parseInt(findOffresEmploiQuery.limit)
         : undefined,
-      query: findOffresEmploiPayload.q,
-      departement: findOffresEmploiPayload.departement,
-      alternance: findOffresEmploiPayload.alternance === 'true'
+      query: findOffresEmploiQuery.q,
+      departement: findOffresEmploiQuery.departement,
+      alternance: findOffresEmploiQuery.alternance === 'true'
     }
     return this.getOffresEmploiQueryHandler.execute(query)
   }

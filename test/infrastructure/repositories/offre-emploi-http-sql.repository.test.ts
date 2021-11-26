@@ -1,4 +1,4 @@
-import { OffreEmploiListItem } from '../../../src/domain/offres-emploi'
+import { OffreEmploi } from '../../../src/domain/offre-emploi'
 import { PoleEmploiClient } from '../../../src/infrastructure/clients/pole-emploi-client'
 import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-emploi-http-sql.repository'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -7,7 +7,10 @@ import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeun
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { DatabaseForTesting, expect, stubClass } from '../../utils'
-import { uneOffreEmploiListItem } from '../../fixtures/offre-emploi.fixture'
+import {
+  uneOffreEmploi,
+  uneOffreEmploiResumeQueryModel
+} from '../../fixtures/offre-emploi.fixture'
 
 describe('OffresEmploiHttpSqlRepository', () => {
   DatabaseForTesting.prepare()
@@ -34,7 +37,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
         // When
         await offresEmploiHttpSqlRepository.saveAsFavori(
           'ABCDE',
-          uneOffreEmploiListItem()
+          uneOffreEmploi()
         )
 
         // Then
@@ -57,7 +60,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
   })
 
   describe('.getFavori', () => {
-    let offreEmploi: OffreEmploiListItem
+    let offreEmploi: OffreEmploi
 
     beforeEach(async () => {
       // Given
@@ -68,7 +71,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
           idConseiller: 'ZIDANE'
         })
       )
-      offreEmploi = uneOffreEmploiListItem()
+      offreEmploi = uneOffreEmploi()
       await offresEmploiHttpSqlRepository.saveAsFavori('ABCDE', offreEmploi)
     })
 
@@ -93,6 +96,68 @@ describe('OffresEmploiHttpSqlRepository', () => {
         )
         // Then
         expect(favori).to.deep.equal(offreEmploi)
+      })
+    })
+  })
+
+  describe('.getFavorisIdsQueryModelsByJeune', () => {
+    let offreEmploi: OffreEmploi
+
+    beforeEach(async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseillerDto({ id: 'ZIDANE' }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: 'ABCDE',
+          idConseiller: 'ZIDANE'
+        })
+      )
+      offreEmploi = uneOffreEmploi()
+      await offresEmploiHttpSqlRepository.saveAsFavori('ABCDE', offreEmploi)
+    })
+
+    describe('quand le jeune a des favoris', () => {
+      it('renvoie liste des ids', async () => {
+        // When
+        const favorisIds =
+          await offresEmploiHttpSqlRepository.getFavorisIdsQueryModelsByJeune(
+            'ABCDE'
+          )
+
+        // Then
+        expect(favorisIds).to.deep.equal([{ id: '123DXPM' }])
+      })
+    })
+  })
+
+  describe('.getFavorisQueryModelsByJeune', () => {
+    let offreEmploi: OffreEmploi
+
+    beforeEach(async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseillerDto({ id: 'ZIDANE' }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: 'ABCDE',
+          idConseiller: 'ZIDANE'
+        })
+      )
+      offreEmploi = uneOffreEmploi()
+      await offresEmploiHttpSqlRepository.saveAsFavori('ABCDE', offreEmploi)
+    })
+
+    describe('quand le jeune a des favoris', () => {
+      it('renvoie liste des favoris', async () => {
+        const offreEmploiResumeQueryModel = uneOffreEmploiResumeQueryModel()
+
+        // When
+        const favoris =
+          await offresEmploiHttpSqlRepository.getFavorisQueryModelsByJeune(
+            'ABCDE'
+          )
+
+        // Then
+        expect(favoris).to.deep.equal([offreEmploiResumeQueryModel])
       })
     })
   })

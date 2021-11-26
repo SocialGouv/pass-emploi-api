@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common'
 import {
-  OffresEmploi,
+  FavoriIdQueryModel,
   OffreEmploiQueryModel,
-  OffresEmploiQueryModel,
-  OffreEmploiListItem
-} from '../../domain/offres-emploi'
+  OffreEmploiResumeQueryModel,
+  OffresEmploiQueryModel
+} from 'src/application/queries/query-models/offres-emploi.query-models'
+import { OffresEmploi, OffreEmploi } from '../../domain/offre-emploi'
 import { PoleEmploiClient } from '../clients/pole-emploi-client'
 import { FavoriOffreEmploiSqlModel } from '../sequelize/models/favori-offre-emploi.sql-model'
 import {
   toOffresEmploiQueryModel,
   toOffreEmploiQueryModel,
   toFavoriOffreEmploiSqlModel,
-  toOffreEmploiListItem
+  toOffreEmploi,
+  fromSqlToFavorisIdsQueryModels
 } from './mappers/offres-emploi.mappers'
 
 @Injectable()
@@ -68,7 +70,7 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
   async getFavori(
     idJeune: string,
     idOffreEmploi: string
-  ): Promise<OffreEmploiListItem | undefined> {
+  ): Promise<OffreEmploi | undefined> {
     const result = await FavoriOffreEmploiSqlModel.findOne({
       where: {
         idJeune: idJeune,
@@ -78,16 +80,38 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
     if (!result) {
       return undefined
     }
-    return toOffreEmploiListItem(result)
+    return toOffreEmploi(result)
   }
 
-  async saveAsFavori(
-    idJeune: string,
-    offreEmploi: OffreEmploiListItem
-  ): Promise<void> {
+  async saveAsFavori(idJeune: string, offreEmploi: OffreEmploi): Promise<void> {
     await FavoriOffreEmploiSqlModel.upsert(
       toFavoriOffreEmploiSqlModel(idJeune, offreEmploi)
     )
+  }
+
+  async getFavorisIdsQueryModelsByJeune(
+    idJeune: string
+  ): Promise<FavoriIdQueryModel[]> {
+    const favorisIdsSql = await FavoriOffreEmploiSqlModel.findAll({
+      attributes: ['idOffre'],
+      where: {
+        idJeune
+      }
+    })
+
+    return fromSqlToFavorisIdsQueryModels(favorisIdsSql)
+  }
+
+  async getFavorisQueryModelsByJeune(
+    idJeune: string
+  ): Promise<OffreEmploiResumeQueryModel[]> {
+    const favorisSql = await FavoriOffreEmploiSqlModel.findAll({
+      where: {
+        idJeune
+      }
+    })
+
+    return favorisSql.map(toOffreEmploi)
   }
 }
 

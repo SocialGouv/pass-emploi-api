@@ -4,7 +4,7 @@ import {
   GetDetailActionQuery,
   GetDetailActionQueryHandler
 } from '../../../src/application/queries/get-detail-action.query.handler'
-import { ActionQueryModel } from '../../../src/application/queries/query-models/action.query-model'
+import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
 import { Action } from '../../../src/domain/action'
 import { uneActionQueryModel } from '../../fixtures/query-models/action.query-model.fixtures'
 import { createSandbox, expect } from '../../utils'

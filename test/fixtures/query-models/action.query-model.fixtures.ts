@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { ActionQueryModel } from '../../../src/application/queries/query-models/action.query-model'
+import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
 import { Action } from '../../../src/domain/action'
 import { Jeune } from '../../../src/domain/jeune'
 import { uneAction } from '../action.fixture'

@@ -32,7 +32,7 @@ import { ConseillersRepositoryToken } from './domain/conseiller'
 import { JeunesRepositoryToken } from './domain/jeune'
 import { NotificationRepositoryToken } from './domain/notification'
 import { RendezVousRepositoryToken } from './domain/rendez-vous'
-import { OffresEmploiRepositoryToken } from './domain/offres-emploi'
+import { OffresEmploiRepositoryToken } from './domain/offre-emploi'
 import { ActionSqlRepository } from './infrastructure/repositories/action-sql.repository'
 import { ChatFirebaseRepository } from './infrastructure/repositories/chat-firebase.repository'
 import { ConseillerSqlRepository } from './infrastructure/repositories/conseiller-sql.repository'
@@ -55,6 +55,8 @@ import { PoleEmploiClient } from './infrastructure/clients/pole-emploi-client'
 import { GetDetailConseillerQueryHandler } from './application/queries/get-detail-conseiller.query.handler'
 import { GetJeunesByConseillerQueryHandler } from './application/queries/get-jeunes-by-conseiller.query.handler'
 import { AddFavoriOffreEmploiCommandHandler } from './application/commands/add-favori-offre-emploi.command.handler'
+import { GetFavorisIdsJeuneQueryHandler } from './application/queries/get-favoris-ids-jeune.query.handler'
+import { GetFavorisJeuneQueryHandler } from './application/queries/get-favoris-jeune.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -121,6 +123,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateActionCommandHandler,
     CreateJeuneCommandHandler,
     AddFavoriOffreEmploiCommandHandler,
+    GetFavorisIdsJeuneQueryHandler,
+    GetFavorisJeuneQueryHandler,
     GetHomeJeuneHandler,
     GetOffresEmploiQueryHandler,
     GetDetailOffreEmploiQueryHandler,

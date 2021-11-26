@@ -3,9 +3,9 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import {
   OffresEmploi,
-  OffreEmploiQueryModel,
   OffresEmploiRepositoryToken
-} from '../../domain/offres-emploi'
+} from '../../domain/offre-emploi'
+import { OffreEmploiQueryModel } from './query-models/offres-emploi.query-models'
 
 export interface GetDetailOffreEmploiQuery extends Query {
   idOffreEmploi: string

@@ -4,7 +4,7 @@ import { Op } from 'sequelize'
 import {
   RendezVousConseillerQueryModel,
   RendezVousQueryModel
-} from '../../application/queries/query-models/rendez-vous.query-model'
+} from '../../application/queries/query-models/rendez-vous.query-models'
 import { RendezVous } from '../../domain/rendez-vous'
 import { DateService } from '../../utils/date-service'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'

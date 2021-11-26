@@ -1,12 +1,12 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { createSandbox, expect } from '../../utils'
-import { OffresEmploi } from '../../../src/domain/offres-emploi'
+import { OffresEmploi } from '../../../src/domain/offre-emploi'
 import {
   AddFavoriOffreEmploiCommand,
   AddFavoriOffreEmploiCommandHandler
 } from '../../../src/application/commands/add-favori-offre-emploi.command.handler'
-import { uneOffreEmploiListItem } from '../../fixtures/offre-emploi.fixture'
+import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
 import { Jeune } from '../../../src/domain/jeune'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { failure } from '../../../src/building-blocks/types/result'
@@ -35,7 +35,7 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
 
     it('sauvegarde un favori', async () => {
       // Given
-      const offreEmploi = uneOffreEmploiListItem()
+      const offreEmploi = uneOffreEmploi()
       const command: AddFavoriOffreEmploiCommand = {
         idJeune: jeune.id,
         offreEmploi: offreEmploi
@@ -59,7 +59,7 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
       // Given
       const command: AddFavoriOffreEmploiCommand = {
         idJeune: 'FAUUX',
-        offreEmploi: uneOffreEmploiListItem()
+        offreEmploi: uneOffreEmploi()
       }
       jeuneRepository.get.withArgs('FAUUX').resolves(undefined)
 
@@ -73,7 +73,7 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
     })
     it('renvoie une failure ExisteDeja quand le jeune a déjà ce favori', async () => {
       // Given
-      const offreEmploi = uneOffreEmploiListItem()
+      const offreEmploi = uneOffreEmploi()
       const command: AddFavoriOffreEmploiCommand = {
         idJeune: jeune.id,
         offreEmploi: offreEmploi
