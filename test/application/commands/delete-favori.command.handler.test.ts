@@ -1,7 +1,3 @@
-import {
-  OffreEmploiListItem,
-  OffresEmploi
-} from '../../../src/domain/offres-emploi'
 import { createSandbox, DatabaseForTesting, expect } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
@@ -13,20 +9,21 @@ import {
   emptySuccess,
   failure
 } from '../../../src/building-blocks/types/result'
-import { uneOffreEmploiListItem } from '../../fixtures/offre-emploi.fixture'
+import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
 import { Jeune } from '../../../src/domain/jeune'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import { OffreEmploi, OffresEmploi } from '../../../src/domain/offre-emploi'
 
 describe('DeleteFavoriOffreEmploiCommandHandler', () => {
   DatabaseForTesting.prepare()
   let offresEmploiHttpSqlRepository: StubbedType<OffresEmploi.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let deleteFavoriOffreEmploiCommandHandler: DeleteFavoriOffreEmploiCommandHandler
-  let offreEmploi: OffreEmploiListItem
+  let offreEmploi: OffreEmploi
   const jeune = unJeune()
   beforeEach(async () => {
-    offreEmploi = uneOffreEmploiListItem()
+    offreEmploi = uneOffreEmploi()
     const sandbox: SinonSandbox = createSandbox()
     offresEmploiHttpSqlRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)

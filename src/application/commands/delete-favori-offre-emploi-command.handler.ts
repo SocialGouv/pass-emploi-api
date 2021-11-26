@@ -9,7 +9,7 @@ import {
 import {
   OffresEmploi,
   OffresEmploiRepositoryToken
-} from '../../domain/offres-emploi'
+} from '../../domain/offre-emploi'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 

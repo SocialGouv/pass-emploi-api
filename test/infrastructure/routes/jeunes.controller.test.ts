@@ -190,7 +190,7 @@ describe('JeunesController', () => {
   })
 
   describe('DELETE /jeunes/:idJeune/favori/:idOffreEmploi', () => {
-    const offreEmploi = uneOffreEmploiListItem()
+    const offreEmploi = uneOffreEmploi()
     const jeune = unJeune()
     const command: DeleteFavoriOffreEmploiCommand = {
       idJeune: jeune.id,
