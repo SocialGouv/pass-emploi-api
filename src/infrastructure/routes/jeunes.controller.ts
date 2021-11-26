@@ -48,7 +48,7 @@ import StatutInvalide = Action.StatutInvalide
 import {
   DeleteFavoriOffreEmploiCommand,
   DeleteFavoriOffreEmploiCommandHandler
-} from '../../application/commands/delete-favori-offre-emploi-command.handler'
+} from '../../application/commands/delete-favori-offre-emploi.command.handler'
 import {
   FavoriIdQueryModel,
   OffreEmploiResumeQueryModel
