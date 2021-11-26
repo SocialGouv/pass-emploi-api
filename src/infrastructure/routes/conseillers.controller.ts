@@ -9,7 +9,7 @@ import {
   Post
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler'
 import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler'
 import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
@@ -46,6 +46,9 @@ export class ConseillersController {
   ) {}
 
   @Get('')
+  @ApiResponse({
+    type: DetailConseillerQueryModel
+  })
   async getDetailConseiller(
     @Param('idConseiller') idConseiller: string
   ): Promise<DetailConseillerQueryModel> {
@@ -63,6 +66,10 @@ export class ConseillersController {
   }
 
   @Get('jeunes')
+  @ApiResponse({
+    type: DetailJeuneQueryModel,
+    isArray: true
+  })
   async getJeunes(
     @Param('idConseiller') idConseiller: string
   ): Promise<DetailJeuneQueryModel[]> {
@@ -70,6 +77,10 @@ export class ConseillersController {
   }
 
   @Post('jeune')
+  @ApiResponse({
+    type: DetailJeuneQueryModel,
+    isArray: true
+  })
   async createJeune(
     @Param('idConseiller') idConseiller: string,
     @Body() createJeunePayload: CreateJeunePayload
@@ -122,6 +133,9 @@ export class ConseillersController {
   }
 
   @Get('rendezvous')
+  @ApiResponse({
+    type: RendezVousConseillerQueryModel
+  })
   async getRendezVous(
     @Param('idConseiller') idConseiller: string
   ): Promise<RendezVousConseillerQueryModel> {

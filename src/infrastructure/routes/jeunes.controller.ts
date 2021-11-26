@@ -13,7 +13,7 @@ import {
   Query
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler'
 import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
 import {
@@ -74,6 +74,9 @@ export class JeunesController {
   ) {}
 
   @Get()
+  @ApiResponse({
+    type: DetailJeuneQueryModel
+  })
   async getDetailJeune(
     @Param('idJeune') idJeune: string
   ): Promise<DetailJeuneQueryModel | undefined> {
@@ -121,6 +124,10 @@ export class JeunesController {
   }
 
   @Get('actions')
+  @ApiResponse({
+    type: ActionQueryModel,
+    isArray: true
+  })
   async getActions(
     @Param('idJeune') idJeune: string
   ): Promise<ActionQueryModel[]> {
@@ -128,6 +135,10 @@ export class JeunesController {
   }
 
   @Get('rendezvous')
+  @ApiResponse({
+    type: RendezVousQueryModel,
+    isArray: true
+  })
   async getRendezVous(
     @Param('idJeune') idJeune: string
   ): Promise<RendezVousQueryModel[]> {

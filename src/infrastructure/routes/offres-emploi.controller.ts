@@ -6,7 +6,7 @@ import {
   HttpStatus,
   HttpException
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   GetOffresEmploiQuery,
   GetOffresEmploiQueryHandler
@@ -29,7 +29,11 @@ export class OffresEmploiController {
     private readonly getDetailOffreEmploiQueryHandler: GetDetailOffreEmploiQueryHandler
   ) {}
 
-  @Get() getOffresEmploi(
+  @Get()
+  @ApiResponse({
+    type: OffresEmploiQueryModel
+  })
+  getOffresEmploi(
     @Query() findOffresEmploiQuery: FindOffresEmploiQuery
   ): Promise<OffresEmploiQueryModel> {
     const query: GetOffresEmploiQuery = {
@@ -47,6 +51,9 @@ export class OffresEmploiController {
   }
 
   @Get(':idOffreEmploi')
+  @ApiResponse({
+    type: OffreEmploiQueryModel
+  })
   async getDetailOffreEmploi(
     @Param('idOffreEmploi') idOffreEmploi: string
   ): Promise<OffreEmploiQueryModel | undefined> {

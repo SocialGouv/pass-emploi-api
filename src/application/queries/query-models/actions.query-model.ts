@@ -1,17 +1,44 @@
+import { ApiProperty } from '@nestjs/swagger'
 import { Action } from '../../../domain/action'
 
-export interface ActionQueryModel {
+class JeuneActionQueryModel {
+  @ApiProperty()
   id: string
+
+  @ApiProperty()
+  firstName: string
+
+  @ApiProperty()
+  lastName: string
+}
+
+export class ActionQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
   content: string
+
+  @ApiProperty()
   comment: string
+
+  @ApiProperty()
   creationDate: string
+
+  @ApiProperty()
   lastUpdate: string
+
+  @ApiProperty()
   status: Action.Statut
+
+  @ApiProperty()
   creatorType: Action.TypeCreateur
+
+  @ApiProperty()
   creator: string
-  jeune?: {
-    id: string
-    firstName: string
-    lastName: string
-  }
+
+  @ApiProperty({
+    required: false
+  })
+  jeune?: JeuneActionQueryModel
 }

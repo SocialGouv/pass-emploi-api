@@ -12,7 +12,7 @@ import {
   Patch,
   Put
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import { DeleteActionCommandHandler } from '../../application/commands/delete-action.command.handler'
 import {
   UpdateStatutActionCommand,
@@ -38,6 +38,9 @@ export class ActionsController {
   ) {}
 
   @Get(':idAction')
+  @ApiResponse({
+    type: ActionQueryModel
+  })
   async getDetailAction(
     @Param('idAction', new ParseUUIDPipe()) idAction: string
   ): Promise<ActionQueryModel> {
