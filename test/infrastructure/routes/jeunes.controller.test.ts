@@ -7,6 +7,7 @@ import {
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
 import {
   FavoriExisteDejaError,
+  FavoriNonTrouveError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 import {
@@ -215,12 +216,14 @@ describe('JeunesController', () => {
       deleteFavoriOffreEmploiCommandHandler.execute
         .withArgs(command)
         .resolves(
-          failure(new NonTrouveError('OffreEmploi', command.idOffreEmploi))
+          failure(
+            new FavoriNonTrouveError(command.idJeune, command.idOffreEmploi)
+          )
         )
 
       const expectedMessageJson = {
-        code: 'NON_TROUVE',
-        message: `OffreEmploi ${command.idOffreEmploi} non trouvé(e)`
+        code: 'FAVORI_NON_TROUVE',
+        message: `Le Favori du jeune ${command.idJeune} correspondant à l'offre ${command.idOffreEmploi} n'existe pas`
       }
       //When
       await request(app.getHttpServer())

@@ -10,7 +10,10 @@ import {
   OffresEmploi,
   OffresEmploiRepositoryToken
 } from '../../domain/offre-emploi'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import {
+  FavoriNonTrouveError,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 
 export interface DeleteFavoriOffreEmploiCommand extends Command {
@@ -43,7 +46,9 @@ export class DeleteFavoriOffreEmploiCommandHandler
       command.idOffreEmploi
     )
     if (!favoriOffreEmploi) {
-      return failure(new NonTrouveError('OffreEmploi', command.idOffreEmploi))
+      return failure(
+        new FavoriNonTrouveError(command.idJeune, command.idOffreEmploi)
+      )
     }
     await this.offresEmploiRepository.deleteFavori(
       command.idJeune,

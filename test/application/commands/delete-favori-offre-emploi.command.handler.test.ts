@@ -12,7 +12,10 @@ import {
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
 import { Jeune } from '../../../src/domain/jeune'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import {
+  FavoriNonTrouveError,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
 import { OffreEmploi, OffresEmploi } from '../../../src/domain/offre-emploi'
 
 describe('DeleteFavoriOffreEmploiCommandHandler', () => {
@@ -77,7 +80,9 @@ describe('DeleteFavoriOffreEmploiCommandHandler', () => {
         )
         // Then
         expect(result).to.deep.equal(
-          failure(new NonTrouveError('OffreEmploi', command.idOffreEmploi))
+          failure(
+            new FavoriNonTrouveError(command.idJeune, command.idOffreEmploi)
+          )
         )
         expect(
           offresEmploiHttpSqlRepository.deleteFavori
