@@ -15,7 +15,10 @@ import {
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler'
-import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
+import {
+  DetailJeuneQueryModel,
+  JeuneHomeQueryModel
+} from 'src/application/queries/query-models/jeunes.query-models'
 import {
   CreateActionCommand,
   CreateActionCommandHandler
@@ -32,7 +35,6 @@ import {
 } from '../../building-blocks/types/domain-error'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
-import { JeuneHomeQueryModel } from '../../domain/jeune'
 import { CreateActionAvecStatutPayload } from './validation/conseillers.inputs'
 import {
   AddFavoriPayload,

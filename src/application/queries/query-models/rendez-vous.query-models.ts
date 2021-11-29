@@ -11,10 +11,10 @@ export class RendezVousQueryModel {
   comment?: string
 
   @ApiProperty()
-  date: Date
+  date: Date | string
 
   @ApiProperty()
-  duration: number
+  duration: number | string
 
   @ApiProperty()
   modality: string

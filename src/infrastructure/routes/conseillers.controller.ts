@@ -18,7 +18,10 @@ import { CreateJeuneCommandHandler } from '../../application/commands/create-jeu
 import { SendNotificationNouveauMessageCommandHandler } from '../../application/commands/send-notification-nouveau-message.command.handler'
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
-import { DetailJeuneQueryModel } from '../../application/queries/query-models/jeunes.query-models'
+import {
+  DetailJeuneQueryModel,
+  ResumeActionsDuJeuneQueryModel
+} from '../../application/queries/query-models/jeunes.query-models'
 import { RendezVousConseillerQueryModel } from '../../application/queries/query-models/rendez-vous.query-models'
 import {
   JeuneNonLieAuConseillerError,
@@ -26,7 +29,6 @@ import {
 } from '../../building-blocks/types/domain-error'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
-import { ResumeActionsDuJeuneQueryModel } from '../../domain/jeune'
 import {
   CreateActionPayload,
   CreateJeunePayload

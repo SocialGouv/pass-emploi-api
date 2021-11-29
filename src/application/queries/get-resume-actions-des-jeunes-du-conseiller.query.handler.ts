@@ -1,11 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import {
-  Jeune,
-  JeunesRepositoryToken,
-  ResumeActionsDuJeuneQueryModel
-} from '../../domain/jeune'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { ResumeActionsDuJeuneQueryModel } from './query-models/jeunes.query-models'
 
 export interface GetResumeActionsDesJeunesDuConseillerQuery extends Query {
   idConseiller: string

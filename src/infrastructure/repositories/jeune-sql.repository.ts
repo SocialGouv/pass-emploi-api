@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime, Duration } from 'luxon'
 import { Op, QueryTypes, Sequelize } from 'sequelize'
-import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
+import {
+  DetailJeuneQueryModel,
+  JeuneHomeQueryModel,
+  ResumeActionsDuJeuneQueryModel
+} from 'src/application/queries/query-models/jeunes.query-models'
 import { Action } from '../../domain/action'
 import { Conseiller } from '../../domain/conseiller'
 import { NotFound } from '../../domain/erreur'
-import {
-  Jeune,
-  JeuneHomeQueryModel,
-  ResumeActionsDuJeuneQueryModel
-} from '../../domain/jeune'
+import { Jeune } from '../../domain/jeune'
 import { ActionSqlModel } from '../sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'

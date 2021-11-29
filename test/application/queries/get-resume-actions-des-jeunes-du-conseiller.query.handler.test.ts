@@ -1,13 +1,11 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
+import { ResumeActionsDuJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
 import {
   GetResumeActionsDesJeunesDuConseillerQuery,
   GetResumeActionsDesJeunesDuConseillerQueryHandler
 } from '../../../src/application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
-import {
-  Jeune,
-  ResumeActionsDuJeuneQueryModel
-} from '../../../src/domain/jeune'
+import { Jeune } from '../../../src/domain/jeune'
 import { unResumeActionDUnJeune } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { createSandbox, expect } from '../../utils'
 
