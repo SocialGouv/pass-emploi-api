@@ -4,7 +4,7 @@ import { SinonSandbox } from 'sinon'
 import {
   DeleteFavoriOffreEmploiCommand,
   DeleteFavoriOffreEmploiCommandHandler
-} from '../../../src/application/commands/delete-favori-offre-emploi-command.handler'
+} from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
 import {
   emptySuccess,
   failure

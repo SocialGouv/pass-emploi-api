@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Chat } from '../../domain/chat'
-import { FirebaseClient } from './firebase-client'
+import { FirebaseClient } from '../clients/firebase-client'
 
 @Injectable()
 export class ChatFirebaseRepository implements Chat.Repository {

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { Jeune } from 'src/domain/jeune'
 
 export class DetailJeuneQueryModel {
   @ApiProperty()
@@ -10,6 +11,28 @@ export class DetailJeuneQueryModel {
   @ApiProperty()
   lastName: string
 
+  @ApiProperty({
+    required: false
+  })
+  creationDate?: string
+}
+
+export class ResumeActionsDuJeuneQueryModel {
   @ApiProperty()
-  creationDate: string
+  jeuneId: Jeune.Id
+
+  @ApiProperty()
+  jeuneFirstName: string
+
+  @ApiProperty()
+  jeuneLastName: string
+
+  @ApiProperty()
+  todoActionsCount: number
+
+  @ApiProperty()
+  doneActionsCount: number
+
+  @ApiProperty()
+  inProgressActionsCount: number
 }

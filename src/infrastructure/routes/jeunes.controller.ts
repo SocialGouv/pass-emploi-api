@@ -32,7 +32,6 @@ import {
 } from '../../building-blocks/types/domain-error'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
-import { JeuneHomeQueryModel } from '../../domain/jeune'
 import { CreateActionAvecStatutPayload } from './validation/conseillers.inputs'
 import {
   AddFavoriPayload,
@@ -48,13 +47,14 @@ import StatutInvalide = Action.StatutInvalide
 import {
   DeleteFavoriOffreEmploiCommand,
   DeleteFavoriOffreEmploiCommandHandler
-} from '../../application/commands/delete-favori-offre-emploi-command.handler'
+} from '../../application/commands/delete-favori-offre-emploi.command.handler'
 import {
   FavoriIdQueryModel,
   OffreEmploiResumeQueryModel
 } from 'src/application/queries/query-models/offres-emploi.query-models'
 import { GetFavorisIdsJeuneQueryHandler } from 'src/application/queries/get-favoris-ids-jeune.query.handler'
 import { GetFavorisJeuneQueryHandler } from 'src/application/queries/get-favoris-jeune.query.handler'
+import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 
 @Controller('jeunes/:idJeune')
 @ApiTags('Jeunes')

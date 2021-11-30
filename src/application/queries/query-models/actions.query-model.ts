@@ -1,16 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Action } from '../../../domain/action'
-
-class JeuneActionQueryModel {
-  @ApiProperty()
-  id: string
-
-  @ApiProperty()
-  firstName: string
-
-  @ApiProperty()
-  lastName: string
-}
+import { DetailJeuneQueryModel } from './jeunes.query-models'
 
 export class ActionQueryModel {
   @ApiProperty()
@@ -38,7 +28,8 @@ export class ActionQueryModel {
   creator: string
 
   @ApiProperty({
+    type: DetailJeuneQueryModel,
     required: false
   })
-  jeune?: JeuneActionQueryModel
+  jeune?: DetailJeuneQueryModel
 }

@@ -1,8 +1,11 @@
 import { DateTime } from 'luxon'
-import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
+import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
+import {
+  DetailJeuneQueryModel,
+  ResumeActionsDuJeuneQueryModel
+} from 'src/application/queries/query-models/jeunes.query-models'
 import { Brand } from '../building-blocks/types/brand'
 import { DateService } from '../utils/date-service'
-import { Action } from './action'
 import { Conseiller } from './conseiller'
 
 export const JeunesRepositoryToken = 'Jeune.Repository'
@@ -46,41 +49,4 @@ export namespace Jeune {
       tokenLastUpdate: dateService.now()
     }
   }
-}
-
-export interface JeuneHomeQueryModel {
-  actions: ActionQueryModel[]
-  doneActionsCount: number
-  conseiller: Conseiller
-  rendezvous: RendezVousQueryModel[]
-}
-
-interface ActionQueryModel {
-  id: string
-  content: string
-  comment: string
-  creationDate: string
-  lastUpdate: string
-  status: Action.Statut
-  creator: string
-  creatorType: Action.TypeCreateur
-}
-
-interface RendezVousQueryModel {
-  id: string
-  title: string
-  subtitle: string
-  comment: string
-  modality?: string
-  date: string
-  duration: string
-}
-
-export interface ResumeActionsDuJeuneQueryModel {
-  jeuneId: Jeune.Id
-  jeuneFirstName: string
-  jeuneLastName: string
-  todoActionsCount: number
-  doneActionsCount: number
-  inProgressActionsCount: number
 }

@@ -36,7 +36,7 @@ import { OffresEmploiRepositoryToken } from './domain/offre-emploi'
 import { ActionSqlRepository } from './infrastructure/repositories/action-sql.repository'
 import { ChatFirebaseRepository } from './infrastructure/repositories/chat-firebase.repository'
 import { ConseillerSqlRepository } from './infrastructure/repositories/conseiller-sql.repository'
-import { FirebaseClient } from './infrastructure/repositories/firebase-client'
+import { FirebaseClient } from './infrastructure/clients/firebase-client'
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune-sql.repository'
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
 import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre-emploi-http-sql.repository'
@@ -57,7 +57,7 @@ import { GetJeunesByConseillerQueryHandler } from './application/queries/get-jeu
 import { AddFavoriOffreEmploiCommandHandler } from './application/commands/add-favori-offre-emploi.command.handler'
 import { GetFavorisIdsJeuneQueryHandler } from './application/queries/get-favoris-ids-jeune.query.handler'
 import { GetFavorisJeuneQueryHandler } from './application/queries/get-favoris-jeune.query.handler'
-import { DeleteFavoriOffreEmploiCommandHandler } from './application/commands/delete-favori-offre-emploi-command.handler'
+import { DeleteFavoriOffreEmploiCommandHandler } from './application/commands/delete-favori-offre-emploi.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Notification } from '../../domain/notification'
-import { FirebaseClient } from './firebase-client'
+import { FirebaseClient } from '../clients/firebase-client'
 
 @Injectable()
 export class NotificationFirebaseRepository implements Notification.Repository {

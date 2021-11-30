@@ -29,7 +29,7 @@ import { AddFavoriPayload } from '../../../src/infrastructure/routes/validation/
 import {
   DeleteFavoriOffreEmploiCommand,
   DeleteFavoriOffreEmploiCommandHandler
-} from '../../../src/application/commands/delete-favori-offre-emploi-command.handler'
+} from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
 import { unJeune } from '../../fixtures/jeune.fixture'
 
 describe('JeunesController', () => {

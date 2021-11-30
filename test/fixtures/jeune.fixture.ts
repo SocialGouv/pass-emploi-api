@@ -12,3 +12,14 @@ export const unJeune = (
   conseiller,
   creationDate: uneDatetime
 })
+
+export const unJeuneSansPushNotificationToken = (
+  conseiller = unConseiller()
+): Required<Omit<Jeune, 'tokenLastUpdate'>> => ({
+  id: 'ABCDE',
+  lastName: 'Doe',
+  firstName: 'John',
+  pushNotificationToken: '',
+  conseiller,
+  creationDate: uneDatetime
+})

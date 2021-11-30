@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common'
-import { DateTime } from 'luxon'
 import { ActionQueryModel } from '../../application/queries/query-models/actions.query-model'
 import { Action } from '../../domain/action'
 import { ActionDto, ActionSqlModel } from '../sequelize/models/action.sql-model'
-import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { AsSql } from '../sequelize/types'
+import {
+  fromSqlToActionQueryModel,
+  fromSqlToActionQueryModelWithJeune
+} from './mappers/actions.mappers'
 
 @Injectable()
 export class ActionSqlRepository implements Action.Repository {
@@ -41,7 +43,7 @@ export class ActionSqlRepository implements Action.Repository {
     })
     if (!actionSqlModel) return undefined
 
-    return fromSqlToConseillerQueryModel(actionSqlModel)
+    return fromSqlToActionQueryModelWithJeune(actionSqlModel)
   }
 
   async getQueryModelByJeuneId(id: string): Promise<ActionQueryModel[]> {
@@ -59,7 +61,7 @@ export class ActionSqlRepository implements Action.Repository {
 
     const actions = []
     for (const actionSql of actionsSqlModel) {
-      actions.push(await fromSqlToJeuneQueryModel(actionSql))
+      actions.push(await fromSqlToActionQueryModel(actionSql))
     }
 
     return actions
@@ -94,52 +96,4 @@ export class ActionSqlRepository implements Action.Repository {
       dateLimite: null
     }
   }
-}
-
-async function fromSqlToConseillerQueryModel(
-  actionSqlModel: ActionSqlModel
-): Promise<ActionQueryModel> {
-  return {
-    ...(await fromSqlToJeuneQueryModel(actionSqlModel)),
-    jeune: {
-      id: actionSqlModel.jeune.id,
-      firstName: actionSqlModel.jeune.prenom,
-      lastName: actionSqlModel.jeune.nom
-    }
-  }
-}
-
-async function fromSqlToJeuneQueryModel(
-  actionSqlModel: ActionSqlModel
-): Promise<ActionQueryModel> {
-  return {
-    id: actionSqlModel.id,
-    comment: actionSqlModel.commentaire || '',
-    content: actionSqlModel.contenu,
-    creationDate: DateTime.fromJSDate(actionSqlModel.dateCreation)
-      .toUTC()
-      .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
-    creator: await parseNomCompletCreateur(actionSqlModel),
-    creatorType: actionSqlModel.typeCreateur,
-    lastUpdate: DateTime.fromJSDate(actionSqlModel.dateDerniereActualisation)
-      .toUTC()
-      .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
-    status: actionSqlModel.statut
-  }
-}
-
-async function parseNomCompletCreateur(
-  sqlModel: ActionSqlModel
-): Promise<string> {
-  if (sqlModel.typeCreateur === 'jeune') {
-    return `${sqlModel.jeune.prenom} ${sqlModel.jeune.nom}`
-  }
-
-  const conseillerSqlModel = await ConseillerSqlModel.findByPk(
-    sqlModel.idCreateur
-  )
-  if (!conseillerSqlModel) {
-    throw new Error(`Le créateur de l'action ${sqlModel.id} n'existe pas`)
-  }
-  return `${conseillerSqlModel.prenom} ${conseillerSqlModel.nom}`
 }

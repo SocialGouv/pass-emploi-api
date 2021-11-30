@@ -5,5 +5,5 @@
  * @see https://udidahan.com/2009/12/09/clarified-cqrs/
  */
 export interface CommandHandler<Command, T> {
-  execute (command: Command): Promise<T>
+  execute(command: Command): Promise<T>
 }

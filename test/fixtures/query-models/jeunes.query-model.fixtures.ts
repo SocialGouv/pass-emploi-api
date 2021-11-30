@@ -1,5 +1,7 @@
-import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
-import { ResumeActionsDuJeuneQueryModel } from '../../../src/domain/jeune'
+import {
+  DetailJeuneQueryModel,
+  ResumeActionsDuJeuneQueryModel
+} from 'src/application/queries/query-models/jeunes.query-models'
 
 export function unResumeActionDUnJeune(
   args: Partial<ResumeActionsDuJeuneQueryModel> = {}
