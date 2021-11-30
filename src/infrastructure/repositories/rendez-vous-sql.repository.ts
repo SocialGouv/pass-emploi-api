@@ -9,18 +9,19 @@ import { RendezVous } from '../../domain/rendez-vous'
 import { DateService } from '../../utils/date-service'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
+import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
 import {
-  RendezVousDto,
-  RendezVousSqlModel
-} from '../sequelize/models/rendez-vous.sql-model'
-import { AsSql } from '../sequelize/types'
+  toRendezVousDto,
+  fromSqlToRendezVousConseillerQueryModel,
+  fromSqlToRendezVousJeuneQueryModel
+} from './mappers/rendez-vous.mappers'
 
 @Injectable()
 export class RendezVousRepositorySql implements RendezVous.Repository {
   constructor(private dateService: DateService) {}
 
   async add(rendezVous: RendezVous): Promise<void> {
-    const rendezVousDto = buildRendezVousDto(rendezVous)
+    const rendezVousDto = toRendezVousDto(rendezVous)
     await RendezVousSqlModel.upsert(rendezVousDto)
   }
 
@@ -103,8 +104,8 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
     })
 
     return {
-      passes: rendezVousPasses.map(toRendezVousConseillerQueryModel),
-      futurs: rendezVousFuturs.map(toRendezVousConseillerQueryModel)
+      passes: rendezVousPasses.map(fromSqlToRendezVousConseillerQueryModel),
+      futurs: rendezVousFuturs.map(fromSqlToRendezVousConseillerQueryModel)
     }
   }
 
@@ -122,47 +123,6 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
       order: [['date', 'ASC']]
     })
 
-    return allRendezVousSql.map(toRendezVousJeuneQueryModel)
-  }
-}
-
-function buildRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
-  return {
-    id: rendezVous.id,
-    titre: rendezVous.titre,
-    sousTitre: rendezVous.sousTitre,
-    modalite: rendezVous.modalite,
-    duree: rendezVous.duree,
-    date: rendezVous.date,
-    commentaire: rendezVous.commentaire ?? null,
-    dateSuppression: null,
-    idConseiller: rendezVous.jeune.conseiller.id,
-    idJeune: rendezVous.jeune.id
-  }
-}
-
-function toRendezVousConseillerQueryModel(
-  rendezVousSql: RendezVousSqlModel
-): RendezVousQueryModel {
-  return {
-    id: rendezVousSql.id,
-    comment: rendezVousSql.commentaire ?? undefined,
-    title: `${rendezVousSql.jeune.prenom} ${rendezVousSql.jeune.nom}`,
-    date: rendezVousSql.date,
-    modality: rendezVousSql.modalite,
-    duration: rendezVousSql.duree
-  }
-}
-
-function toRendezVousJeuneQueryModel(
-  rendezVousSql: RendezVousSqlModel
-): RendezVousQueryModel {
-  return {
-    id: rendezVousSql.id,
-    comment: rendezVousSql.commentaire ?? undefined,
-    title: `${rendezVousSql.conseiller.prenom} ${rendezVousSql.conseiller.nom}`,
-    date: rendezVousSql.date,
-    modality: rendezVousSql.modalite,
-    duration: rendezVousSql.duree
+    return allRendezVousSql.map(fromSqlToRendezVousJeuneQueryModel)
   }
 }

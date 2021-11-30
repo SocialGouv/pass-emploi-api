@@ -1,5 +1,14 @@
-import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
+import { DateTime, Duration } from 'luxon'
+import {
+  DetailJeuneQueryModel,
+  JeuneHomeQueryModel,
+  ResumeActionsDuJeuneQueryModel
+} from 'src/application/queries/query-models/jeunes.query-models'
+import { Action } from 'src/domain/action'
+import { Jeune } from 'src/domain/jeune'
+import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
+import { ResumeActionsJeuneDto } from '../jeune-sql.repository'
 
 export function fromSqlToDetailJeuneQueryModel(
   jeuneSqlModel: JeuneSqlModel
@@ -9,5 +18,97 @@ export function fromSqlToDetailJeuneQueryModel(
     firstName: jeuneSqlModel.prenom,
     lastName: jeuneSqlModel.nom,
     creationDate: jeuneSqlModel.dateCreation.toISOString()
+  }
+}
+
+export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
+  function getTokenLastUpdate(
+    jeuneSqlModel: JeuneSqlModel
+  ): DateTime | undefined {
+    return jeuneSqlModel.dateDerniereActualisationToken
+      ? DateTime.fromJSDate(jeuneSqlModel.dateDerniereActualisationToken)
+      : undefined
+  }
+
+  return {
+    id: jeuneSqlModel.id,
+    firstName: jeuneSqlModel.prenom,
+    lastName: jeuneSqlModel.nom,
+    creationDate: DateTime.fromJSDate(jeuneSqlModel.dateCreation),
+    pushNotificationToken: jeuneSqlModel.pushNotificationToken ?? undefined,
+    tokenLastUpdate: getTokenLastUpdate(jeuneSqlModel),
+    conseiller: {
+      id: jeuneSqlModel.conseiller.id,
+      firstName: jeuneSqlModel.conseiller.prenom,
+      lastName: jeuneSqlModel.conseiller.nom
+    }
+  }
+}
+
+export function fromSqlToJeuneHomeQueryModel(
+  jeuneSqlModel: JeuneSqlModel
+): JeuneHomeQueryModel {
+  function toCreator(
+    actionSql: ActionSqlModel,
+    jeuneSqlModel: JeuneSqlModel
+  ): string {
+    if (actionSql.typeCreateur === Action.TypeCreateur.JEUNE) {
+      return `${jeuneSqlModel.prenom} ${jeuneSqlModel.nom}`
+    }
+    return `${jeuneSqlModel.conseiller.prenom} ${jeuneSqlModel.conseiller.nom}`
+  }
+
+  return {
+    conseiller: {
+      id: jeuneSqlModel.conseiller.id,
+      firstName: jeuneSqlModel.conseiller.prenom,
+      lastName: jeuneSqlModel.conseiller.nom
+    },
+    doneActionsCount: jeuneSqlModel.actions.filter(
+      actionsSql => actionsSql.statut === Action.Statut.TERMINEE
+    ).length,
+    actions: jeuneSqlModel.actions.map(actionSql => ({
+      id: actionSql.id,
+      creationDate: DateTime.fromJSDate(actionSql.dateCreation).toFormat(
+        'EEE, d MMM yyyy HH:mm:ss z'
+      ),
+      content: actionSql.contenu,
+      status: actionSql.statut,
+      comment: actionSql.commentaire,
+      isDone: actionSql.statut === Action.Statut.TERMINEE,
+      lastUpdate: DateTime.fromJSDate(
+        actionSql.dateDerniereActualisation
+      ).toFormat('EEE, d MMM yyyy HH:mm:ss z'),
+      creatorType: actionSql.typeCreateur,
+      creator: toCreator(actionSql, jeuneSqlModel)
+    })),
+    rendezvous: jeuneSqlModel.rendezVous.map(rendezVousSql => ({
+      id: rendezVousSql.id,
+      comment: rendezVousSql.commentaire ?? '',
+      date: DateTime.fromJSDate(rendezVousSql.date).toFormat(
+        'EEE, d MMM yyyy HH:mm:ss z'
+      ),
+      duration: Duration.fromObject({
+        minutes: rendezVousSql.duree
+      }).toFormat('h:mm:ss'),
+      modality: rendezVousSql.modalite ?? '',
+      title: rendezVousSql.titre,
+      subtitle: rendezVousSql.sousTitre
+    }))
+  }
+}
+
+export function toResumeActionsDuJeuneQueryModel(
+  resumeActionsJeuneDto: ResumeActionsJeuneDto
+): ResumeActionsDuJeuneQueryModel {
+  return {
+    jeuneId: resumeActionsJeuneDto.id_jeune,
+    jeuneFirstName: resumeActionsJeuneDto.prenom_jeune,
+    jeuneLastName: resumeActionsJeuneDto.nom_jeune,
+    todoActionsCount: parseInt(resumeActionsJeuneDto.todo_actions_count),
+    doneActionsCount: parseInt(resumeActionsJeuneDto.done_actions_count),
+    inProgressActionsCount: parseInt(
+      resumeActionsJeuneDto.in_progress_actions_count
+    )
   }
 }

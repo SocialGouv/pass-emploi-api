@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { DateTime, Duration } from 'luxon'
 import { Op, QueryTypes, Sequelize } from 'sequelize'
 import {
   DetailJeuneQueryModel,
@@ -15,7 +14,12 @@ import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
 import { SequelizeInjectionToken } from '../sequelize/providers'
-import { fromSqlToDetailJeuneQueryModel } from './mappers/jeunes.mappers'
+import {
+  fromSqlToDetailJeuneQueryModel,
+  fromSqlToJeune,
+  fromSqlToJeuneHomeQueryModel,
+  toResumeActionsDuJeuneQueryModel
+} from './mappers/jeunes.mappers'
 
 @Injectable()
 export class JeuneSqlRepository implements Jeune.Repository {
@@ -30,7 +34,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
     if (!jeuneSqlModel) {
       return undefined
     }
-    return buildJeuneFromSql(jeuneSqlModel)
+    return fromSqlToJeune(jeuneSqlModel)
   }
 
   async getQueryModelById(
@@ -99,44 +103,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
     if (!jeuneSqlModel) {
       throw new NotFound(idJeune, 'Jeune')
     }
-    return {
-      conseiller: {
-        id: jeuneSqlModel.conseiller.id,
-        firstName: jeuneSqlModel.conseiller.prenom,
-        lastName: jeuneSqlModel.conseiller.nom
-      },
-      doneActionsCount: jeuneSqlModel.actions.filter(
-        actionsSql => actionsSql.statut === Action.Statut.TERMINEE
-      ).length,
-      actions: jeuneSqlModel.actions.map(actionSql => ({
-        id: actionSql.id,
-        creationDate: DateTime.fromJSDate(actionSql.dateCreation).toFormat(
-          'EEE, d MMM yyyy HH:mm:ss z'
-        ),
-        content: actionSql.contenu,
-        status: actionSql.statut,
-        comment: actionSql.commentaire,
-        isDone: actionSql.statut === Action.Statut.TERMINEE,
-        lastUpdate: DateTime.fromJSDate(
-          actionSql.dateDerniereActualisation
-        ).toFormat('EEE, d MMM yyyy HH:mm:ss z'),
-        creatorType: actionSql.typeCreateur,
-        creator: toCreator(actionSql, jeuneSqlModel)
-      })),
-      rendezvous: jeuneSqlModel.rendezVous.map(rendezVousSql => ({
-        id: rendezVousSql.id,
-        comment: rendezVousSql.commentaire ?? '',
-        date: DateTime.fromJSDate(rendezVousSql.date).toFormat(
-          'EEE, d MMM yyyy HH:mm:ss z'
-        ),
-        duration: Duration.fromObject({
-          minutes: rendezVousSql.duree
-        }).toFormat('h:mm:ss'),
-        modality: rendezVousSql.modalite ?? '',
-        title: rendezVousSql.titre,
-        subtitle: rendezVousSql.sousTitre
-      }))
-    }
+    return fromSqlToJeuneHomeQueryModel(jeuneSqlModel)
   }
 
   async getResumeActionsDesJeunesDuConseiller(
@@ -163,56 +130,11 @@ export class JeuneSqlRepository implements Jeune.Repository {
         }
       )
 
-    return resumesActionsParJeune.map(
-      (resumeActionsJeuneDto: ResumeActionsJeuneDto) => ({
-        jeuneId: resumeActionsJeuneDto.id_jeune,
-        jeuneFirstName: resumeActionsJeuneDto.prenom_jeune,
-        jeuneLastName: resumeActionsJeuneDto.nom_jeune,
-        todoActionsCount: parseInt(resumeActionsJeuneDto.todo_actions_count),
-        doneActionsCount: parseInt(resumeActionsJeuneDto.done_actions_count),
-        inProgressActionsCount: parseInt(
-          resumeActionsJeuneDto.in_progress_actions_count
-        )
-      })
-    )
+    return resumesActionsParJeune.map(toResumeActionsDuJeuneQueryModel)
   }
 }
 
-function buildJeuneFromSql(jeuneSqlModel: JeuneSqlModel): Jeune {
-  return {
-    id: jeuneSqlModel.id,
-    firstName: jeuneSqlModel.prenom,
-    lastName: jeuneSqlModel.nom,
-    creationDate: DateTime.fromJSDate(jeuneSqlModel.dateCreation),
-    pushNotificationToken: jeuneSqlModel.pushNotificationToken ?? undefined,
-    tokenLastUpdate: getTokenLastUpdate(jeuneSqlModel),
-    conseiller: {
-      id: jeuneSqlModel.conseiller.id,
-      firstName: jeuneSqlModel.conseiller.prenom,
-      lastName: jeuneSqlModel.conseiller.nom
-    }
-  }
-}
-
-function getTokenLastUpdate(
-  jeuneSqlModel: JeuneSqlModel
-): DateTime | undefined {
-  return jeuneSqlModel.dateDerniereActualisationToken
-    ? DateTime.fromJSDate(jeuneSqlModel.dateDerniereActualisationToken)
-    : undefined
-}
-
-function toCreator(
-  actionSql: ActionSqlModel,
-  jeuneSqlModel: JeuneSqlModel
-): string {
-  if (actionSql.typeCreateur === Action.TypeCreateur.JEUNE) {
-    return `${jeuneSqlModel.prenom} ${jeuneSqlModel.nom}`
-  }
-  return `${jeuneSqlModel.conseiller.prenom} ${jeuneSqlModel.conseiller.nom}`
-}
-
-interface ResumeActionsJeuneDto {
+export interface ResumeActionsJeuneDto {
   id_jeune: string
   prenom_jeune: string
   nom_jeune: string
