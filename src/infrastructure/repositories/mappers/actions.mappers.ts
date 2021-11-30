@@ -4,7 +4,7 @@ import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-m
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import { fromSqlToDetailJeuneQueryModel } from './jeunes.mappers'
 
-export async function fromSqlToConseillerActionQueryModel(
+export async function fromSqlToActionQueryModelWithJeune(
   actionSqlModel: ActionSqlModel
 ): Promise<ActionQueryModel> {
   return {

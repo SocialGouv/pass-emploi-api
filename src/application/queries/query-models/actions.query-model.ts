@@ -28,7 +28,7 @@ export class ActionQueryModel {
   creator: string
 
   @ApiProperty({
-    type: () => DetailJeuneQueryModel,
+    type: DetailJeuneQueryModel,
     required: false
   })
   jeune?: DetailJeuneQueryModel

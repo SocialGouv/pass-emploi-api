@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger'
 
-export class RendezVousQueryModel {
+export interface RendezVousBaseQueryModel {
+  id: string
+  title: string
+  comment?: string
+  modality: string
+}
+
+export class RendezVousQueryModel implements RendezVousBaseQueryModel {
   @ApiProperty()
   id: string
 
@@ -11,13 +18,13 @@ export class RendezVousQueryModel {
   comment?: string
 
   @ApiProperty()
-  date: Date | string
-
-  @ApiProperty()
-  duration: number | string
-
-  @ApiProperty()
   modality: string
+
+  @ApiProperty()
+  date: Date
+
+  @ApiProperty()
+  duration: number
 }
 
 export class RendezVousConseillerQueryModel {

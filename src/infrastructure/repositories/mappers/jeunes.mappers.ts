@@ -1,7 +1,7 @@
 import { DateTime, Duration } from 'luxon'
+import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 import {
   DetailJeuneQueryModel,
-  JeuneHomeQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
 import { Action } from 'src/domain/action'

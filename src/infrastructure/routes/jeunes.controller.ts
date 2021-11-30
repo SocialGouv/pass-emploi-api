@@ -15,10 +15,7 @@ import {
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler'
-import {
-  DetailJeuneQueryModel,
-  JeuneHomeQueryModel
-} from 'src/application/queries/query-models/jeunes.query-models'
+import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
 import {
   CreateActionCommand,
   CreateActionCommandHandler
@@ -57,6 +54,7 @@ import {
 } from 'src/application/queries/query-models/offres-emploi.query-models'
 import { GetFavorisIdsJeuneQueryHandler } from 'src/application/queries/get-favoris-ids-jeune.query.handler'
 import { GetFavorisJeuneQueryHandler } from 'src/application/queries/get-favoris-jeune.query.handler'
+import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 
 @Controller('jeunes/:idJeune')
 @ApiTags('Jeunes')

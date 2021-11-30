@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Op, QueryTypes, Sequelize } from 'sequelize'
+import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 import {
   DetailJeuneQueryModel,
-  JeuneHomeQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
 import { Action } from '../../domain/action'

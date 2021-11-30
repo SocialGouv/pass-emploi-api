@@ -6,7 +6,7 @@ import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { AsSql } from '../sequelize/types'
 import {
   fromSqlToActionQueryModel,
-  fromSqlToConseillerActionQueryModel
+  fromSqlToActionQueryModelWithJeune
 } from './mappers/actions.mappers'
 
 @Injectable()
@@ -43,7 +43,7 @@ export class ActionSqlRepository implements Action.Repository {
     })
     if (!actionSqlModel) return undefined
 
-    return fromSqlToConseillerActionQueryModel(actionSqlModel)
+    return fromSqlToActionQueryModelWithJeune(actionSqlModel)
   }
 
   async getQueryModelByJeuneId(id: string): Promise<ActionQueryModel[]> {
