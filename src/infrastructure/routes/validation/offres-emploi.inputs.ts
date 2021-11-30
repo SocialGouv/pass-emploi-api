@@ -1,6 +1,11 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { IsNotEmpty, IsString, IsOptional } from 'class-validator'
+import { IsNotEmpty, IsString, IsOptional, IsEnum } from 'class-validator'
 
+enum Experience {
+  exp1 = '1',
+  exp2 = '2',
+  exp3 = '3'
+}
 export class FindOffresEmploiQuery {
   @ApiPropertyOptional()
   @IsString()
@@ -30,4 +35,9 @@ export class FindOffresEmploiQuery {
   @IsString()
   @IsOptional()
   alternance?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEnum(Experience, { each: true })
+  experience?: Experience[]
 }

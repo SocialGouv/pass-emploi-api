@@ -45,8 +45,11 @@ export class OffresEmploiController {
         : undefined,
       query: findOffresEmploiQuery.q,
       departement: findOffresEmploiQuery.departement,
-      alternance: findOffresEmploiQuery.alternance === 'true'
+      alternance: findOffresEmploiQuery.alternance === 'true',
+      experience: findOffresEmploiQuery.experience
     }
+    console.log(query.experience)
+
     return this.getOffresEmploiQueryHandler.execute(query)
   }
 
