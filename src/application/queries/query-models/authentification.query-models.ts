@@ -1,6 +1,6 @@
 import { Authentification } from '../../../domain/authentification'
 
-export interface UtilisateurQueryModel {
+export class UtilisateurQueryModel implements Authentification.Utilisateur {
   id: string
   prenom: string
   nom: string

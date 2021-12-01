@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
+import { Result, success } from '../../building-blocks/types/result'
 import {
-  Result, success
-} from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
-import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
+  Authentification,
+  AuthentificationRepositoryToken
+} from '../../domain/authentification'
 import { UtilisateurQueryModel } from '../queries/query-models/authentification.query-models'
 
 export interface UpdateUtilisateurCommand extends Command {
@@ -20,12 +20,16 @@ export interface UpdateUtilisateurCommand extends Command {
 @Injectable()
 export class UpdateUtilisateurCommandHandler {
   constructor(
-    @Inject(ConseillersRepositoryToken)
-    private readonly conseillerRepository: Conseiller.Repository
+    @Inject(AuthentificationRepositoryToken)
+    private readonly authentificationRepository: Authentification.Repository
   ) {}
 
-  async execute(_command: UpdateUtilisateurCommand): Promise<Result<UtilisateurQueryModel>> {
-    // @ts-ignore
-    return success(utilisateurQueryModel)
+  async execute(
+    command: UpdateUtilisateurCommand
+  ): Promise<Result<UtilisateurQueryModel>> {
+    const utilisateur = await this.authentificationRepository.get(
+      command.idUtilisateurAuth
+    )
+    return success(utilisateur)
   }
 }
