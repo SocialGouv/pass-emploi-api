@@ -16,6 +16,7 @@ import { LoginJeuneCommandHandler } from './application/commands/login-jeune.com
 import { SendNotificationNouveauMessageCommandHandler } from './application/commands/send-notification-nouveau-message.command.handler'
 import { UpdateNotificationTokenCommandHandler } from './application/commands/update-notification-token.command.handler'
 import { UpdateStatutActionCommandHandler } from './application/commands/update-statut-action.command.handler'
+import { UpdateUtilisateurCommandHandler } from './application/commands/update-utilisateur.command.handler'
 import { GetActionsByJeuneQueryHandler } from './application/queries/get-actions-by-jeune.query.handler'
 import { GetDetailActionQueryHandler } from './application/queries/get-detail-action.query.handler'
 import { GetDetailJeuneQueryHandler } from './application/queries/get-detail-jeune.query.handler'
@@ -42,6 +43,7 @@ import { NotificationFirebaseRepository } from './infrastructure/repositories/no
 import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre-emploi-http-sql.repository'
 import { RendezVousRepositorySql } from './infrastructure/repositories/rendez-vous-sql.repository'
 import { ActionsController } from './infrastructure/routes/actions.controller'
+import { AuthentificationController } from './infrastructure/routes/authentification.controller'
 import { ConseillersController } from './infrastructure/routes/conseillers.controller'
 import { HealthController } from './infrastructure/routes/health.controller'
 import { AppLoggerMiddleware } from './infrastructure/routes/http-logger'
@@ -74,7 +76,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     OffresEmploiController,
     ConseillersController,
     HealthController,
-    RendezVousController
+    RendezVousController,
+    AuthentificationController
   ],
   providers: [
     ...buildQueryCommandsProviders(),
@@ -141,7 +144,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetAllRendezVousConseillerQueryHandler,
     GetAllRendezVousJeuneQueryHandler,
     SendNotificationNouveauMessageCommandHandler,
-    DeleteActionCommandHandler
+    DeleteActionCommandHandler,
+    UpdateUtilisateurCommandHandler
   ]
 }
 

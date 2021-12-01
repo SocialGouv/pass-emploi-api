@@ -4,12 +4,17 @@ module.exports = {
       {
         id: '1',
         prenom: 'Nils',
-        nom: 'Tavernier'
+        nom: 'Tavernier',
+        email: 'nils.tavernier@passemploi.com',
+        structure: 'PASS_EMPLOI',
+        id_authentification: '1'
       },
       {
         id: '2',
         prenom: 'Virginie',
-        nom: 'Renoux'
+        nom: 'Renoux',
+        structure: 'PASS_EMPLOI',
+        id_authentification: '2'
       }
     ])
   },
