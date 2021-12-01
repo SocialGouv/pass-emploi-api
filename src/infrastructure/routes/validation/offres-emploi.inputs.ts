@@ -6,13 +6,28 @@ import {
   IsOptional,
   IsEnum,
   IsIn,
-  IsBoolean
+  IsBoolean,
+  IsNumber
 } from 'class-validator'
 
 enum Experience {
   exp1 = '1',
   exp2 = '2',
   exp3 = '3'
+}
+
+enum Contrat {
+  c1 = 'CDI',
+  c2 = 'CDD',
+  c3 = 'interim',
+  c4 = 'saisonnier',
+  c5 = 'autre'
+}
+
+enum Duree {
+  d1 = '1',
+  d2 = '2',
+  d3 = '3'
 }
 
 function transformStringToArray(params: TransformFnParams, key: string): [] {
@@ -29,18 +44,28 @@ function transformStringToBoolean(
   params.obj[key] = params.value === 'true'
   return params.obj[key]
 }
+
+function transformStringToInteger(
+  params: TransformFnParams,
+  key: string
+): boolean {
+  params.obj[key] = parseInt(params.value)
+  return params.obj[key] ? params.obj[key] : undefined
+}
 export class FindOffresEmploiQuery {
   @ApiPropertyOptional()
-  @IsString()
   @IsNotEmpty()
   @IsOptional()
-  page?: string
+  @IsNumber()
+  @Transform(params => transformStringToInteger(params, 'page'))
+  page?: number
 
   @ApiPropertyOptional()
-  @IsString()
   @IsNotEmpty()
   @IsOptional()
-  limit?: string
+  @IsNumber()
+  @Transform(params => transformStringToInteger(params, 'limit'))
+  limit?: number
 
   @ApiPropertyOptional()
   @IsString()
@@ -66,4 +91,22 @@ export class FindOffresEmploiQuery {
   @IsEnum(Experience, { each: true })
   @Transform(params => transformStringToArray(params, 'experience'))
   experience?: Experience[]
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEnum(Contrat, { each: true })
+  @Transform(params => transformStringToArray(params, 'contrat'))
+  contrat?: Contrat[]
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEnum(Duree, { each: true })
+  @Transform(params => transformStringToArray(params, 'duree'))
+  duree?: Duree[]
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Transform(params => transformStringToInteger(params, 'rayon'))
+  rayon?: number
 }

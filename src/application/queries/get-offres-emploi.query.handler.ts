@@ -17,6 +17,9 @@ export interface GetOffresEmploiQuery extends Query {
   departement?: string
   alternance?: boolean
   experience?: string[]
+  contrat?: string[]
+  duree?: string[]
+  rayon?: number
 }
 
 @Injectable()

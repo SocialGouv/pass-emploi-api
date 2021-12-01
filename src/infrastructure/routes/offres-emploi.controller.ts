@@ -37,16 +37,15 @@ export class OffresEmploiController {
     @Query() findOffresEmploiQuery: FindOffresEmploiQuery
   ): Promise<OffresEmploiQueryModel> {
     const query: GetOffresEmploiQuery = {
-      page: findOffresEmploiQuery.page
-        ? parseInt(findOffresEmploiQuery.page)
-        : undefined,
-      limit: findOffresEmploiQuery.limit
-        ? parseInt(findOffresEmploiQuery.limit)
-        : undefined,
+      page: findOffresEmploiQuery.page,
+      limit: findOffresEmploiQuery.limit,
       query: findOffresEmploiQuery.q,
       departement: findOffresEmploiQuery.departement,
       alternance: findOffresEmploiQuery.alternance,
-      experience: findOffresEmploiQuery.experience
+      experience: findOffresEmploiQuery.experience,
+      contrat: findOffresEmploiQuery.contrat,
+      duree: findOffresEmploiQuery.duree,
+      rayon: findOffresEmploiQuery.rayon
     }
 
     return this.getOffresEmploiQueryHandler.execute(query)
