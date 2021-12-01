@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { Transform, TransformFnParams } from 'class-transformer'
+import { Transform } from 'class-transformer'
 import {
   IsNotEmpty,
   IsString,
@@ -9,6 +9,11 @@ import {
   IsBoolean,
   IsNumber
 } from 'class-validator'
+import {
+  transformStringToInteger,
+  transformStringToBoolean,
+  transformStringToArray
+} from './utils/transformers'
 
 enum Experience {
   exp1 = '1',
@@ -28,29 +33,6 @@ enum Duree {
   d1 = '1',
   d2 = '2',
   d3 = '3'
-}
-
-function transformStringToArray(params: TransformFnParams, key: string): [] {
-  if (typeof params.value === 'string') {
-    params.obj[key] = [params.value]
-  }
-  return params.obj[key]
-}
-
-function transformStringToBoolean(
-  params: TransformFnParams,
-  key: string
-): boolean {
-  params.obj[key] = params.value === 'true'
-  return params.obj[key]
-}
-
-function transformStringToInteger(
-  params: TransformFnParams,
-  key: string
-): boolean {
-  params.obj[key] = parseInt(params.value)
-  return params.obj[key] ? params.obj[key] : undefined
 }
 export class FindOffresEmploiQuery {
   @ApiPropertyOptional()
