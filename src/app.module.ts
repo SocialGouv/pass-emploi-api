@@ -18,6 +18,7 @@ import { UpdateNotificationTokenCommandHandler } from './application/commands/up
 import { UpdateStatutActionCommandHandler } from './application/commands/update-statut-action.command.handler'
 import { UpdateUtilisateurCommandHandler } from './application/commands/update-utilisateur.command.handler'
 import { GetActionsByJeuneQueryHandler } from './application/queries/get-actions-by-jeune.query.handler'
+import { GetCommunesEtDepartementsQueryHandler } from './application/queries/get-communes-et-departements.query.handler'
 import { GetDetailActionQueryHandler } from './application/queries/get-detail-action.query.handler'
 import { GetDetailJeuneQueryHandler } from './application/queries/get-detail-jeune.query.handler'
 import { GetDetailOffreEmploiQueryHandler } from './application/queries/get-detail-offre-emploi.query.handler'
@@ -50,6 +51,7 @@ import { HealthController } from './infrastructure/routes/health.controller'
 import { AppLoggerMiddleware } from './infrastructure/routes/http-logger'
 import { JeunesController } from './infrastructure/routes/jeunes.controller'
 import { OffresEmploiController } from './infrastructure/routes/offres-emploi.controller'
+import { ReferentielsController } from './infrastructure/routes/referentiels.controller'
 import { RendezVousController } from './infrastructure/routes/rendez-vous.controller'
 import { databaseProviders } from './infrastructure/sequelize/providers'
 import { DateService } from './utils/date-service'
@@ -82,7 +84,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     ConseillersController,
     HealthController,
     RendezVousController,
-    AuthentificationController
+    AuthentificationController,
+    ReferentielsController
   ],
   providers: [
     ...buildQueryCommandsProviders(),
@@ -155,7 +158,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetAllRendezVousJeuneQueryHandler,
     SendNotificationNouveauMessageCommandHandler,
     DeleteActionCommandHandler,
-    UpdateUtilisateurCommandHandler
+    UpdateUtilisateurCommandHandler,
+    GetCommunesEtDepartementsQueryHandler
   ]
 }
 
