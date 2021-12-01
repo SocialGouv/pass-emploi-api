@@ -31,7 +31,10 @@ export namespace OffresEmploi {
       limit: number,
       alternance?: boolean,
       query?: string,
-      departement?: string
+      departement?: string,
+      experience?: string[],
+      duree?: string[],
+      contrat?: string[]
     ): Promise<OffresEmploiQueryModel>
 
     getOffreEmploiQueryModelById(
@@ -53,4 +56,12 @@ export namespace OffresEmploi {
 
     deleteFavori(idJeune: string, idOffreEmploi: string): Promise<void>
   }
+}
+
+export class ContratPoleEmploi {
+  CDI = ['CDI', 'DIN']
+  CDD = ['CDD']
+  interim = ['MIS']
+  saisonnier = ['SAI']
+  autre = ['CCE', 'FRA', 'LIB', 'REP', 'TTI']
 }

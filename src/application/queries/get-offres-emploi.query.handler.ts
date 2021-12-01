@@ -37,7 +37,10 @@ export class GetOffresEmploiQueryHandler
       query.limit || DEFAULT_LIMIT,
       query.alternance,
       query.query,
-      query.departement
+      query.departement,
+      query.experience,
+      query.duree,
+      query.contrat
     )
   }
 }

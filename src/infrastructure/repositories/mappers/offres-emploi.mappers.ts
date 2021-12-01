@@ -4,7 +4,11 @@ import {
   OffreEmploiResumeQueryModel,
   OffresEmploiQueryModel
 } from 'src/application/queries/query-models/offres-emploi.query-models'
-import { OffreEmploi, Localisation } from '../../../domain/offre-emploi'
+import {
+  OffreEmploi,
+  Localisation,
+  ContratPoleEmploi
+} from '../../../domain/offre-emploi'
 import { FavoriOffreEmploiSqlModel } from '../../sequelize/models/favori-offre-emploi.sql-model'
 import {
   OffresEmploiDto,
@@ -131,4 +135,29 @@ export function fromSqlToFavorisQueryModels(
       titre: favoriSql.titre
     }
   })
+}
+
+export function toPoleEmploiContrat(contratsList: string[]): string[] {
+  const contratPoleEmploi = new ContratPoleEmploi()
+  const poleEmploiContratsList = []
+  for (const contrat of contratsList) {
+    switch (contrat) {
+      case 'CDI':
+        poleEmploiContratsList.push(...contratPoleEmploi.CDI)
+        break
+      case 'CDD':
+        poleEmploiContratsList.push(...contratPoleEmploi.CDD)
+        break
+      case 'interim':
+        poleEmploiContratsList.push(...contratPoleEmploi.interim)
+        break
+      case 'saisonnier':
+        poleEmploiContratsList.push(...contratPoleEmploi.saisonnier)
+        break
+      case 'autre':
+        poleEmploiContratsList.push(...contratPoleEmploi.autre)
+        break
+    }
+  }
+  return poleEmploiContratsList
 }

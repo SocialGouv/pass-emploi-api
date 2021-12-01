@@ -30,9 +30,9 @@ enum Contrat {
 }
 
 enum Duree {
-  d1 = '1',
-  d2 = '2',
-  d3 = '3'
+  d1 = '0',
+  d2 = '1',
+  d3 = '2'
 }
 export class FindOffresEmploiQuery {
   @ApiPropertyOptional()
