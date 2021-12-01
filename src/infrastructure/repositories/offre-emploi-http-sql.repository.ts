@@ -23,7 +23,7 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
   async findAll(
     page: number,
     limit: number,
-    alternance: boolean,
+    alternance?: boolean,
     query?: string,
     departement?: string
   ): Promise<OffresEmploiQueryModel> {

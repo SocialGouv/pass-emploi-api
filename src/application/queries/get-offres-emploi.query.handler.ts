@@ -15,7 +15,7 @@ export interface GetOffresEmploiQuery extends Query {
   limit?: number
   query?: string
   departement?: string
-  alternance: boolean
+  alternance?: boolean
   experience?: string[]
 }
 

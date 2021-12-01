@@ -29,7 +29,7 @@ export namespace OffresEmploi {
     findAll(
       page: number,
       limit: number,
-      alternance: boolean,
+      alternance?: boolean,
       query?: string,
       departement?: string
     ): Promise<OffresEmploiQueryModel>
