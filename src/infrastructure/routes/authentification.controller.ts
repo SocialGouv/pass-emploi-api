@@ -1,6 +1,6 @@
 import { Body, Controller, NotFoundException, Param, Put } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   UpdateUtilisateurCommand,
   UpdateUtilisateurCommandHandler
@@ -18,6 +18,9 @@ export class AuthentificationController {
   ) {}
 
   @Put('auth/users/:idUtilisateurAuth')
+  @ApiResponse({
+    type: UtilisateurQueryModel
+  })
   async putUtilisateur(
     @Param('idUtilisateurAuth') idUtilisateurAuth: string,
     @Body() updateUserPayload: UpdateUserPayload

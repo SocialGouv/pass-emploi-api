@@ -1,8 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { NonTrouveError } from 'src/building-blocks/types/domain-error'
-import { IdService } from 'src/utils/id-service'
 import { Command } from '../../building-blocks/types/command'
-import { failure, Result, success } from '../../building-blocks/types/result'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import {
+  failure,
+  isFailure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import {
   Authentification,
   AuthentificationRepositoryToken
@@ -24,42 +28,40 @@ export class UpdateUtilisateurCommandHandler {
   constructor(
     @Inject(AuthentificationRepositoryToken)
     private readonly authentificationRepository: Authentification.Repository,
-    private idService: IdService
+    private authentificationFactory: Authentification.Factory
   ) {}
 
   async execute(
     command: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
+    const utilisateur = await this.authentificationRepository.get(
+      command.idUtilisateurAuth,
+      command.type
+    )
+
+    if (utilisateur) {
+      return success(utilisateur)
+    }
+
     if (
-      (command.structure === Authentification.Structure.PASS_EMPLOI ||
-        command.structure === Authentification.Structure.MILO) &&
+      command.structure === Authentification.Structure.MILO &&
       command.type === Authentification.Type.CONSEILLER
     ) {
-      const utilisateur = await this.authentificationRepository.get(
-        command.idUtilisateurAuth,
-        command.type
+      const result = this.authentificationFactory.buildConseillerMilo(
+        command.nom,
+        command.prenom,
+        command.email
       )
 
-      if (utilisateur) {
-        return success(utilisateur)
+      if (isFailure(result)) {
+        return result
       }
 
-      if (command.structure === Authentification.Structure.MILO) {
-        const utilisateur: Authentification.Utilisateur = {
-          id: this.idService.generate(),
-          prenom: command.prenom || '',
-          nom: command.nom || '',
-          email: command.email,
-          type: command.type,
-          structure: command.structure
-        }
-
-        await this.authentificationRepository.save(
-          utilisateur,
-          command.idUtilisateurAuth
-        )
-        return success(utilisateur)
-      }
+      await this.authentificationRepository.save(
+        result.data,
+        command.idUtilisateurAuth
+      )
+      return result
     }
 
     return failure(new NonTrouveError('Utilisateur', command.idUtilisateurAuth))

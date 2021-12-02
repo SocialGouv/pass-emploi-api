@@ -1,3 +1,8 @@
+import { Injectable } from '@nestjs/common'
+import { UtilisateurNonValide } from '../building-blocks/types/domain-error'
+import { failure, Result, success } from '../building-blocks/types/result'
+import { IdService } from '../utils/id-service'
+
 export const AuthentificationRepositoryToken = 'Authentification.Repository'
 
 export namespace Authentification {
@@ -20,11 +25,38 @@ export namespace Authentification {
     structure: Authentification.Structure
     type: Authentification.Type
   }
+
   export interface Repository {
     get(
       id: string,
       type: Authentification.Type
     ): Promise<Utilisateur | undefined>
+
     save(utilisateur: Utilisateur, idUtilisateurAuth: string): Promise<void>
+  }
+
+  @Injectable()
+  export class Factory {
+    constructor(private readonly idService: IdService) {}
+
+    buildConseillerMilo(
+      nom: string | undefined,
+      prenom: string | undefined,
+      email: string | undefined
+    ): Result<Utilisateur> {
+      if (!nom || !prenom || !email) {
+        return failure(new UtilisateurNonValide())
+      }
+
+      const utilisateur = {
+        id: this.idService.uuid(),
+        prenom: prenom,
+        nom: nom,
+        email: email,
+        type: Type.CONSEILLER,
+        structure: Structure.MILO
+      }
+      return success(utilisateur)
+    }
   }
 }

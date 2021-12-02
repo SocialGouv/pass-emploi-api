@@ -34,7 +34,7 @@ export class AuthentificationSqlRepository
     idUtilisateurAuth: string
   ): Promise<void> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      await ConseillerSqlModel.create(
+      await ConseillerSqlModel.creer(
         toSqlConseillerUtilisateur(utilisateur, idUtilisateurAuth)
       )
     }

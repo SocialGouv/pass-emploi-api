@@ -61,7 +61,10 @@ import { AddFavoriOffreEmploiCommandHandler } from './application/commands/add-f
 import { GetFavorisIdsJeuneQueryHandler } from './application/queries/get-favoris-ids-jeune.query.handler'
 import { GetFavorisJeuneQueryHandler } from './application/queries/get-favoris-jeune.query.handler'
 import { DeleteFavoriOffreEmploiCommandHandler } from './application/commands/delete-favori-offre-emploi.command.handler'
-import { AuthentificationRepositoryToken } from './domain/authentification'
+import {
+  Authentification,
+  AuthentificationRepositoryToken
+} from './domain/authentification'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -88,6 +91,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     DateService,
     PoleEmploiClient,
     Action.Factory,
+    Authentification.Factory,
     {
       provide: ActionsRepositoryToken,
       useClass: ActionSqlRepository
