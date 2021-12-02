@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
-import { fromConseillerSqlToUtilisateur } from './mappers/authentification.mappers'
+import {
+  fromConseillerSqlToUtilisateur,
+  toSqlConseillerUtilisateur
+} from './mappers/authentification.mappers'
 
 @Injectable()
 export class AuthentificationSqlRepository
@@ -24,5 +27,16 @@ export class AuthentificationSqlRepository
     }
 
     return undefined
+  }
+
+  async save(
+    utilisateur: Authentification.Utilisateur,
+    idUtilisateurAuth: string
+  ): Promise<void> {
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      await ConseillerSqlModel.create(
+        toSqlConseillerUtilisateur(utilisateur, idUtilisateurAuth)
+      )
+    }
   }
 }

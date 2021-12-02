@@ -6,6 +6,7 @@ import {
 } from 'src/application/commands/update-utilisateur.command.handler'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { Authentification } from 'src/domain/authentification'
+import { IdService } from 'src/utils/id-service'
 import { unUtilisateur } from 'test/fixtures/authentification.fixture'
 import { unUtilisateurQueryModel } from 'test/fixtures/query-models/authentification.query-model.fixtures'
 import { failure, isSuccess } from '../../../src/building-blocks/types/result'
@@ -18,13 +19,15 @@ describe('UpdateUtilisateurCommandHandler', () => {
   before(() => {
     const sandbox: SinonSandbox = createSandbox()
     authentificationRepository = stubInterface(sandbox)
+    const idService = new IdService()
 
     updateUtilisateurCommandHandler = new UpdateUtilisateurCommandHandler(
-      authentificationRepository
+      authentificationRepository,
+      idService
     )
   })
 
-  describe('execute', () => {
+  describe.only('execute', () => {
     describe('token venant du SSO PassE', async () => {
       describe('conseiller connu', async () => {
         it('retourne le conseiller', async () => {

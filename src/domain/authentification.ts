@@ -25,5 +25,6 @@ export namespace Authentification {
       id: string,
       type: Authentification.Type
     ): Promise<Utilisateur | undefined>
+    save(utilisateur: Utilisateur, idUtilisateurAuth: string): Promise<void>
   }
 }
