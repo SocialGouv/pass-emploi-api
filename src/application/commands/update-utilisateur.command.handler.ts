@@ -31,8 +31,9 @@ export class UpdateUtilisateurCommandHandler {
     command: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
     if (
-      command.structure === Authentification.Structure.PASS_EMPLOI ||
-      command.structure === Authentification.Structure.MILO
+      (command.structure === Authentification.Structure.PASS_EMPLOI ||
+        command.structure === Authentification.Structure.MILO) &&
+      command.type === Authentification.Type.CONSEILLER
     ) {
       const utilisateur = await this.authentificationRepository.get(
         command.idUtilisateurAuth,
@@ -43,10 +44,7 @@ export class UpdateUtilisateurCommandHandler {
         return success(utilisateur)
       }
 
-      if (
-        command.structure === Authentification.Structure.MILO &&
-        command.type === Authentification.Type.CONSEILLER
-      ) {
+      if (command.structure === Authentification.Structure.MILO) {
         const utilisateur: Authentification.Utilisateur = {
           id: this.idService.generate(),
           prenom: command.prenom || '',
