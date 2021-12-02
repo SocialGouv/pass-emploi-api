@@ -21,6 +21,9 @@ export namespace Authentification {
     type: Authentification.Type
   }
   export interface Repository {
-    get(id: string): Promise<Utilisateur>
+    get(
+      id: string,
+      type: Authentification.Type
+    ): Promise<Utilisateur | undefined>
   }
 }

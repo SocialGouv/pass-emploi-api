@@ -41,6 +41,7 @@ import { FirebaseClient } from './infrastructure/clients/firebase-client'
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune-sql.repository'
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
 import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre-emploi-http-sql.repository'
+import { AuthentificationSqlRepository } from './infrastructure/repositories/authentification-sql.repository'
 import { RendezVousRepositorySql } from './infrastructure/repositories/rendez-vous-sql.repository'
 import { ActionsController } from './infrastructure/routes/actions.controller'
 import { AuthentificationController } from './infrastructure/routes/authentification.controller'
@@ -60,6 +61,7 @@ import { AddFavoriOffreEmploiCommandHandler } from './application/commands/add-f
 import { GetFavorisIdsJeuneQueryHandler } from './application/queries/get-favoris-ids-jeune.query.handler'
 import { GetFavorisJeuneQueryHandler } from './application/queries/get-favoris-jeune.query.handler'
 import { DeleteFavoriOffreEmploiCommandHandler } from './application/commands/delete-favori-offre-emploi.command.handler'
+import { AuthentificationRepositoryToken } from './domain/authentification'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -113,6 +115,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: RendezVousRepositoryToken,
       useClass: RendezVousRepositorySql
+    },
+    {
+      provide: AuthentificationRepositoryToken,
+      useClass: AuthentificationSqlRepository
     },
     ...databaseProviders
   ],

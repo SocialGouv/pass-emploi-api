@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { Command } from '../../building-blocks/types/command'
-import { Result, success } from '../../building-blocks/types/result'
+import { failure, Result, success } from '../../building-blocks/types/result'
 import {
   Authentification,
   AuthentificationRepositoryToken
@@ -28,8 +29,16 @@ export class UpdateUtilisateurCommandHandler {
     command: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
     const utilisateur = await this.authentificationRepository.get(
-      command.idUtilisateurAuth
+      command.idUtilisateurAuth,
+      command.type
     )
+
+    if (!utilisateur) {
+      return failure(
+        new NonTrouveError('Utilisateur', command.idUtilisateurAuth)
+      )
+    }
+
     return success(utilisateur)
   }
 }
