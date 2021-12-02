@@ -16,6 +16,7 @@ import { LoginJeuneCommandHandler } from './application/commands/login-jeune.com
 import { SendNotificationNouveauMessageCommandHandler } from './application/commands/send-notification-nouveau-message.command.handler'
 import { UpdateNotificationTokenCommandHandler } from './application/commands/update-notification-token.command.handler'
 import { UpdateStatutActionCommandHandler } from './application/commands/update-statut-action.command.handler'
+import { UpdateUtilisateurCommandHandler } from './application/commands/update-utilisateur.command.handler'
 import { GetActionsByJeuneQueryHandler } from './application/queries/get-actions-by-jeune.query.handler'
 import { GetDetailActionQueryHandler } from './application/queries/get-detail-action.query.handler'
 import { GetDetailJeuneQueryHandler } from './application/queries/get-detail-jeune.query.handler'
@@ -40,8 +41,10 @@ import { FirebaseClient } from './infrastructure/clients/firebase-client'
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune-sql.repository'
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
 import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre-emploi-http-sql.repository'
+import { AuthentificationSqlRepository } from './infrastructure/repositories/authentification-sql.repository'
 import { RendezVousRepositorySql } from './infrastructure/repositories/rendez-vous-sql.repository'
 import { ActionsController } from './infrastructure/routes/actions.controller'
+import { AuthentificationController } from './infrastructure/routes/authentification.controller'
 import { ConseillersController } from './infrastructure/routes/conseillers.controller'
 import { HealthController } from './infrastructure/routes/health.controller'
 import { AppLoggerMiddleware } from './infrastructure/routes/http-logger'
@@ -58,6 +61,10 @@ import { AddFavoriOffreEmploiCommandHandler } from './application/commands/add-f
 import { GetFavorisIdsJeuneQueryHandler } from './application/queries/get-favoris-ids-jeune.query.handler'
 import { GetFavorisJeuneQueryHandler } from './application/queries/get-favoris-jeune.query.handler'
 import { DeleteFavoriOffreEmploiCommandHandler } from './application/commands/delete-favori-offre-emploi.command.handler'
+import {
+  Authentification,
+  AuthentificationRepositoryToken
+} from './domain/authentification'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -74,7 +81,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     OffresEmploiController,
     ConseillersController,
     HealthController,
-    RendezVousController
+    RendezVousController,
+    AuthentificationController
   ],
   providers: [
     ...buildQueryCommandsProviders(),
@@ -83,6 +91,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     DateService,
     PoleEmploiClient,
     Action.Factory,
+    Authentification.Factory,
     {
       provide: ActionsRepositoryToken,
       useClass: ActionSqlRepository
@@ -110,6 +119,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: RendezVousRepositoryToken,
       useClass: RendezVousRepositorySql
+    },
+    {
+      provide: AuthentificationRepositoryToken,
+      useClass: AuthentificationSqlRepository
     },
     ...databaseProviders
   ],
@@ -141,7 +154,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetAllRendezVousConseillerQueryHandler,
     GetAllRendezVousJeuneQueryHandler,
     SendNotificationNouveauMessageCommandHandler,
-    DeleteActionCommandHandler
+    DeleteActionCommandHandler,
+    UpdateUtilisateurCommandHandler
   ]
 }
 

@@ -42,3 +42,13 @@ export class JeuneNonLieAuConseillerError implements DomainError {
     this.message = `Le conseiller ${idConseiller} n'est pas lié au jeune ${idJeune}`
   }
 }
+
+export class UtilisateurNonValide implements DomainError {
+  static CODE = 'UTILISATEUR_NON_VALIDE'
+  readonly code: string = UtilisateurNonValide.CODE
+  readonly message: string
+
+  constructor() {
+    this.message = `Impossible de créer un utilisateur avec `
+  }
+}

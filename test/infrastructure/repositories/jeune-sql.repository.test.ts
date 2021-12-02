@@ -1,6 +1,5 @@
 import { Conseiller } from 'src/domain/conseiller'
 import { Action } from '../../../src/domain/action'
-import { Jeune } from '../../../src/domain/jeune'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -24,10 +23,9 @@ describe('JeuneSqlRepository', () => {
   })
 
   describe('get', () => {
-    let jeune: Jeune
     beforeEach(async () => {
       // Given
-      jeune = unJeune()
+      const jeune = unJeune()
       await ConseillerSqlModel.creer(
         unConseillerDto({ id: jeune.conseiller.id })
       )
@@ -39,7 +37,7 @@ describe('JeuneSqlRepository', () => {
         const jeune = await jeuneSqlRepository.get('ABCDE')
 
         // Then
-        expect(jeune).to.deep.equal(jeune)
+        expect(jeune).to.deep.equal(unJeune())
       })
     })
 
