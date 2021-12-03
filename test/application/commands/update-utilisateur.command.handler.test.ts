@@ -36,7 +36,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
     )
   })
 
-  describe('execute', () => {
+  describe.only('execute', () => {
     describe('conseiller venant du SSO PASS_EMPLOI', async () => {
       describe('conseiller connu', async () => {
         it('retourne le conseiller', async () => {
@@ -199,6 +199,163 @@ describe('UpdateUtilisateurCommandHandler', () => {
               expect(result.error.code).to.equal(UtilisateurMiloNonValide.CODE)
             }
           })
+        })
+      })
+    })
+
+    describe('jeune venant du SSO PASS_EMPLOI', async () => {
+      describe('jeune connu', async () => {
+        it('retourne le jeune', async () => {
+          // Given
+          const command: UpdateUtilisateurCommand = {
+            idUtilisateurAuth: 'nilstavernier',
+            type: Authentification.Type.JEUNE,
+            structure: Authentification.Structure.PASS_EMPLOI
+          }
+
+          const utilisateur = unUtilisateur()
+          authentificationRepository.get
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
+            .resolves(utilisateur)
+
+          // When
+          const result = await updateUtilisateurCommandHandler.execute(command)
+
+          // Then
+          expect(isSuccess(result)).equal(true)
+          if (isSuccess(result)) {
+            expect(result.data).to.deep.equal(unUtilisateurQueryModel())
+          }
+        })
+      })
+      describe('jeune inconnu', async () => {
+        it('retourne une erreur', async () => {
+          // Given
+          const command: UpdateUtilisateurCommand = {
+            idUtilisateurAuth: 'nilstavernier',
+            type: Authentification.Type.JEUNE,
+            structure: Authentification.Structure.PASS_EMPLOI
+          }
+
+          authentificationRepository.get
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
+            .resolves(undefined)
+
+          // When
+          const result = await updateUtilisateurCommandHandler.execute(command)
+
+          // Then
+          expect(result).to.deep.equal(
+            failure(
+              new NonTrouveError('Utilisateur', command.idUtilisateurAuth)
+            )
+          )
+        })
+      })
+    })
+
+    describe('jeune venant du SSO MILO', async () => {
+      describe('jeune connu par son sub', async () => {
+        it('retourne le jeune', async () => {
+          // Given
+          const command: UpdateUtilisateurCommand = {
+            idUtilisateurAuth: 'nilstavernier',
+            type: Authentification.Type.JEUNE,
+            structure: Authentification.Structure.MILO
+          }
+
+          const utilisateur = unUtilisateur()
+          authentificationRepository.get
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
+            .resolves(utilisateur)
+
+          // When
+          const result = await updateUtilisateurCommandHandler.execute(command)
+
+          // Then
+          expect(isSuccess(result)).equal(true)
+          if (isSuccess(result)) {
+            expect(result.data).to.deep.equal(unUtilisateurQueryModel())
+          }
+        })
+      })
+      describe('jeune connu par son email', async () => {
+        it('retourne le jeune et enregistre le sub', async () => {
+          // Given
+          const command: UpdateUtilisateurCommand = {
+            idUtilisateurAuth: 'nilstavernier',
+            email: 'abc@test.com',
+            type: Authentification.Type.JEUNE,
+            structure: Authentification.Structure.MILO
+          }
+
+          const utilisateur = unUtilisateur()
+          authentificationRepository.get
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
+            .resolves(undefined)
+          authentificationRepository.getJeuneMiloByEmail
+            .withArgs(command.email)
+            .resolves(utilisateur)
+          authentificationRepository.updateJeuneMilo
+            .withArgs(command.email, command.idUtilisateurAuth)
+            .resolves()
+
+          // When
+          const result = await updateUtilisateurCommandHandler.execute(command)
+
+          // Then
+          expect(isSuccess(result)).equal(true)
+          if (isSuccess(result)) {
+            expect(result.data).to.deep.equal(unUtilisateurQueryModel())
+          }
+        })
+      })
+      describe('jeune non connu par son email', async () => {
+        it('retourne une failure', async () => {
+          // Given
+          const command: UpdateUtilisateurCommand = {
+            idUtilisateurAuth: 'nilstavernier',
+            email: 'abc@test.com',
+            type: Authentification.Type.JEUNE,
+            structure: Authentification.Structure.MILO
+          }
+
+          authentificationRepository.get
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
+            .resolves(undefined)
+          authentificationRepository.getJeuneMiloByEmail
+            .withArgs(command.email)
+            .resolves(undefined)
+
+          // When
+          const result = await updateUtilisateurCommandHandler.execute(command)
+
+          // Then
+          expect(result).to.deep.equal(
+            failure(
+              new NonTrouveError('Utilisateur', command.idUtilisateurAuth)
+            )
+          )
         })
       })
     })
