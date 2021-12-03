@@ -22,19 +22,11 @@ export function fromSqlToDetailJeuneQueryModel(
 }
 
 export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
-  function getTokenLastUpdate(
-    jeuneSqlModel: JeuneSqlModel
-  ): DateTime | undefined {
-    return jeuneSqlModel.dateDerniereActualisationToken
-      ? DateTime.fromJSDate(jeuneSqlModel.dateDerniereActualisationToken)
-      : undefined
-  }
-
   return {
     id: jeuneSqlModel.id,
     firstName: jeuneSqlModel.prenom,
     lastName: jeuneSqlModel.nom,
-    creationDate: DateTime.fromJSDate(jeuneSqlModel.dateCreation),
+    creationDate: DateTime.fromJSDate(jeuneSqlModel.dateCreation).toUTC(),
     pushNotificationToken: jeuneSqlModel.pushNotificationToken ?? undefined,
     tokenLastUpdate: getTokenLastUpdate(jeuneSqlModel),
     conseiller: {
@@ -43,6 +35,14 @@ export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
       lastName: jeuneSqlModel.conseiller.nom
     }
   }
+}
+
+function getTokenLastUpdate(
+  jeuneSqlModel: JeuneSqlModel
+): DateTime | undefined {
+  return jeuneSqlModel.dateDerniereActualisationToken
+    ? DateTime.fromJSDate(jeuneSqlModel.dateDerniereActualisationToken).toUTC()
+    : undefined
 }
 
 export function fromSqlToJeuneHomeQueryModel(

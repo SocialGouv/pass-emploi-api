@@ -1,14 +1,17 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox, SinonSandbox } from 'sinon'
 import {
-  UpdateUtilisateurCommand,
-  UpdateUtilisateurCommandHandler
-} from 'src/application/commands/update-utilisateur.command.handler'
-import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+  NonTrouveError,
+  UtilisateurMiloNonValide
+} from 'src/building-blocks/types/domain-error'
 import { Authentification } from 'src/domain/authentification'
 import { IdService } from 'src/utils/id-service'
 import { unUtilisateur } from 'test/fixtures/authentification.fixture'
 import { unUtilisateurQueryModel } from 'test/fixtures/query-models/authentification.query-model.fixtures'
+import {
+  UpdateUtilisateurCommand,
+  UpdateUtilisateurCommandHandler
+} from '../../../src/application/commands/update-utilisateur.command.handler'
 import {
   failure,
   isFailure,
@@ -33,7 +36,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
     )
   })
 
-  describe.only('execute', () => {
+  describe('execute', () => {
     describe('conseiller venant du SSO PASS_EMPLOI', async () => {
       describe('conseiller connu', async () => {
         it('retourne le conseiller', async () => {
@@ -172,6 +175,9 @@ describe('UpdateUtilisateurCommandHandler', () => {
 
             // Then
             expect(isFailure(result)).equal(true)
+            if (isFailure(result)) {
+              expect(result.error.code).to.equal(UtilisateurMiloNonValide.CODE)
+            }
           })
         })
       })

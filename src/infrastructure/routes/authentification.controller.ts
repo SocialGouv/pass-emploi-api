@@ -1,4 +1,11 @@
-import { Body, Controller, NotFoundException, Param, Put } from '@nestjs/common'
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  NotFoundException,
+  Param,
+  Put
+} from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
@@ -6,7 +13,10 @@ import {
   UpdateUtilisateurCommandHandler
 } from '../../application/commands/update-utilisateur.command.handler'
 import { UtilisateurQueryModel } from '../../application/queries/query-models/authentification.query-models'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import {
+  NonTrouveError,
+  UtilisateurMiloNonValide
+} from '../../building-blocks/types/domain-error'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { UpdateUserPayload } from './validation/authentification.inputs'
 
@@ -35,8 +45,13 @@ export class AuthentificationController {
       return result.data
     }
 
-    if (isFailure(result) && result.error.code === NonTrouveError.CODE) {
-      throw new NotFoundException(result.error)
+    if (isFailure(result)) {
+      if (result.error.code === NonTrouveError.CODE) {
+        throw new NotFoundException(result.error)
+      }
+      if (result.error.code === UtilisateurMiloNonValide.CODE) {
+        throw new BadRequestException(result.error)
+      }
     }
 
     throw new RuntimeException()

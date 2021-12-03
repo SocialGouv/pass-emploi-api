@@ -1,9 +1,11 @@
 import { Conseiller } from 'src/domain/conseiller'
 import { Action } from '../../../src/domain/action'
+import { Jeune } from '../../../src/domain/jeune'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { uneDatetime } from '../../fixtures/date.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import {
   listeDetailJeuneQueryModel,
@@ -23,21 +25,33 @@ describe('JeuneSqlRepository', () => {
   })
 
   describe('get', () => {
+    let jeune: Jeune
+
     beforeEach(async () => {
       // Given
-      const jeune = unJeune()
+      jeune = { ...unJeune(), tokenLastUpdate: uneDatetime }
       await ConseillerSqlModel.creer(
-        unConseillerDto({ id: jeune.conseiller.id })
+        unConseillerDto({
+          id: jeune.conseiller.id,
+          prenom: jeune.conseiller.firstName,
+          nom: jeune.conseiller.lastName
+        })
       )
-      await JeuneSqlModel.creer(unJeuneDto({ ...jeune }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          dateCreation: jeune.creationDate.toJSDate(),
+          pushNotificationToken: 'unToken',
+          dateDerniereActualisationToken: uneDatetime.toJSDate()
+        })
+      )
     })
     describe('quand le jeune existe', () => {
       it('retourne le jeune', async () => {
         // When
-        const jeune = await jeuneSqlRepository.get('ABCDE')
+        const result = await jeuneSqlRepository.get('ABCDE')
 
         // Then
-        expect(jeune).to.deep.equal(unJeune())
+        expect(result).to.deep.equal(jeune)
       })
     })
 
@@ -79,16 +93,35 @@ describe('JeuneSqlRepository', () => {
       // Given
       const idConseiller = '1'
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
-      await JeuneSqlModel.creer(unJeuneDto({ id: 'ABCDE', idConseiller }))
-      await JeuneSqlModel.creer(unJeuneDto({ id: 'FGHIJ', idConseiller }))
-      await ActionSqlModel.creer(
-        uneActionDto({ idJeune: 'ABCDE', statut: Action.Statut.PAS_COMMENCEE })
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: 'ABCDE',
+          idConseiller
+        })
+      )
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: 'FGHIJ',
+          idConseiller
+        })
       )
       await ActionSqlModel.creer(
-        uneActionDto({ idJeune: 'ABCDE', statut: Action.Statut.EN_COURS })
+        uneActionDto({
+          idJeune: 'ABCDE',
+          statut: Action.Statut.PAS_COMMENCEE
+        })
       )
       await ActionSqlModel.creer(
-        uneActionDto({ idJeune: 'FGHIJ', statut: Action.Statut.TERMINEE })
+        uneActionDto({
+          idJeune: 'ABCDE',
+          statut: Action.Statut.EN_COURS
+        })
+      )
+      await ActionSqlModel.creer(
+        uneActionDto({
+          idJeune: 'FGHIJ',
+          statut: Action.Statut.TERMINEE
+        })
       )
 
       // When

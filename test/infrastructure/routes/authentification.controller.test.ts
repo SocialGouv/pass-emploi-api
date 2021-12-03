@@ -4,7 +4,10 @@ import {
   UpdateUtilisateurCommand,
   UpdateUtilisateurCommandHandler
 } from '../../../src/application/commands/update-utilisateur.command.handler'
-import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import {
+  NonTrouveError,
+  UtilisateurMiloNonValide
+} from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
 import { UpdateUserPayload } from '../../../src/infrastructure/routes/validation/authentification.inputs'
@@ -94,6 +97,29 @@ describe('AuthentificationController', () => {
         .put(`/auth/users/${command.idUtilisateurAuth}`)
         .send(body)
         .expect(HttpStatus.NOT_FOUND)
+    })
+
+    it('retourne 400 quand on veut créer un utilisateur Milo avec des champs manquants', async () => {
+      // Given
+      const body: UpdateUserPayload = {
+        type: Authentification.Type.CONSEILLER,
+        structure: Authentification.Structure.MILO
+      }
+
+      const command: UpdateUtilisateurCommand = {
+        ...body,
+        idUtilisateurAuth: 'nilstavernier'
+      }
+
+      updateUtilisateurCommandHandler.execute
+        .withArgs(command)
+        .resolves(failure(new UtilisateurMiloNonValide()))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .put(`/auth/users/${command.idUtilisateurAuth}`)
+        .send(body)
+        .expect(HttpStatus.BAD_REQUEST)
     })
   })
 })
