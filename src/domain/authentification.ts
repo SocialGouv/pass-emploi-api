@@ -29,9 +29,11 @@ export namespace Authentification {
   export interface Repository {
     get(
       id: string,
+      structure: Authentification.Structure,
       type: Authentification.Type
     ): Promise<Utilisateur | undefined>
-
+    getJeuneMiloByEmail(email: string): Promise<Utilisateur | undefined>
+    updateJeuneMilo(email: string, idUtilisateurAuth: string): Promise<void>
     save(utilisateur: Utilisateur, idUtilisateurAuth: string): Promise<void>
   }
 

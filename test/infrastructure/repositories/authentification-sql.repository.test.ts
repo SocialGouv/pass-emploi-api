@@ -4,6 +4,7 @@ import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models
 import { unUtilisateur } from '../../fixtures/authentification.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { DatabaseForTesting, expect } from '../../utils'
+import Structure = Authentification.Structure
 import Type = Authentification.Type
 
 describe('AuthentificationSqlRepository', () => {
@@ -29,6 +30,7 @@ describe('AuthentificationSqlRepository', () => {
         // When
         const utilisateur = await authentificationSqlRepository.get(
           'id-authentification-conseiller',
+          Structure.MILO,
           Type.CONSEILLER
         )
 
@@ -40,6 +42,7 @@ describe('AuthentificationSqlRepository', () => {
         // When
         const utilisateur = await authentificationSqlRepository.get(
           'plop',
+          Structure.MILO,
           Type.CONSEILLER
         )
 
@@ -61,6 +64,7 @@ describe('AuthentificationSqlRepository', () => {
         // Then
         const utilisateur = await authentificationSqlRepository.get(
           'id-authentification-conseiller',
+          Structure.MILO,
           Type.CONSEILLER
         )
         expect(utilisateur).to.deep.equal(unUtilisateur())

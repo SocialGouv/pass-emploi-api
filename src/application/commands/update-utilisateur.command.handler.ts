@@ -36,6 +36,7 @@ export class UpdateUtilisateurCommandHandler {
   ): Promise<Result<UtilisateurQueryModel>> {
     const utilisateur = await this.authentificationRepository.get(
       command.idUtilisateurAuth,
+      command.structure,
       command.type
     )
 
@@ -43,25 +44,42 @@ export class UpdateUtilisateurCommandHandler {
       return success(utilisateur)
     }
 
-    if (
-      command.structure === Authentification.Structure.MILO &&
-      command.type === Authentification.Type.CONSEILLER
-    ) {
-      const result = this.authentificationFactory.buildConseillerMilo(
-        command.nom,
-        command.prenom,
+    if (command.structure === Authentification.Structure.MILO) {
+      if (command.type === Authentification.Type.CONSEILLER) {
+        const conseillerMiloResult =
+          this.authentificationFactory.buildConseillerMilo(
+            command.nom,
+            command.prenom,
+            command.email
+          )
+
+        if (isFailure(conseillerMiloResult)) {
+          return conseillerMiloResult
+        }
+
+        await this.authentificationRepository.save(
+          conseillerMiloResult.data,
+          command.idUtilisateurAuth
+        )
+        return conseillerMiloResult
+      } else if (
+        command.type === Authentification.Type.JEUNE &&
         command.email
-      )
+      ) {
+        const jeuneMilo =
+          await this.authentificationRepository.getJeuneMiloByEmail(
+            command.email
+          )
 
-      if (isFailure(result)) {
-        return result
+        if (jeuneMilo) {
+          await this.authentificationRepository.updateJeuneMilo(
+            command.email,
+            command.idUtilisateurAuth
+          )
+
+          return success(jeuneMilo)
+        }
       }
-
-      await this.authentificationRepository.save(
-        result.data,
-        command.idUtilisateurAuth
-      )
-      return result
     }
 
     return failure(new NonTrouveError('Utilisateur', command.idUtilisateurAuth))

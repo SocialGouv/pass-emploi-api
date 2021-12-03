@@ -9,6 +9,7 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
+import { Authentification } from 'src/domain/authentification'
 import { AsSql } from '../types'
 import { ActionSqlModel } from './action.sql-model'
 import { ConseillerSqlModel } from './conseiller.sql-model'
@@ -39,6 +40,16 @@ export class JeuneDto extends Model {
   @AllowNull
   @Column({ field: 'date_derniere_actualisation_token', type: DataType.DATE })
   dateDerniereActualisationToken!: Date | null
+
+  @AllowNull
+  @Column({ field: 'email', type: DataType.STRING })
+  email: string | null
+
+  @Column({ field: 'structure', type: DataType.STRING })
+  structure: Authentification.Structure
+
+  @Column({ field: 'id_authentification', type: DataType.STRING })
+  idAuthentification: string
 }
 
 @Table({ timestamps: false, tableName: 'jeune' })

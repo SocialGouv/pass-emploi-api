@@ -49,7 +49,11 @@ describe('UpdateUtilisateurCommandHandler', () => {
 
           const utilisateur = unUtilisateur()
           authentificationRepository.get
-            .withArgs(command.idUtilisateurAuth, command.type)
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
             .resolves(utilisateur)
 
           // When
@@ -72,7 +76,11 @@ describe('UpdateUtilisateurCommandHandler', () => {
           }
 
           authentificationRepository.get
-            .withArgs(command.idUtilisateurAuth, command.type)
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
             .resolves(undefined)
 
           // When
@@ -100,7 +108,11 @@ describe('UpdateUtilisateurCommandHandler', () => {
 
           const utilisateur = unUtilisateur()
           authentificationRepository.get
-            .withArgs(command.idUtilisateurAuth, command.type)
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
             .resolves(utilisateur)
 
           // When
@@ -127,7 +139,11 @@ describe('UpdateUtilisateurCommandHandler', () => {
             }
 
             authentificationRepository.get
-              .withArgs(command.idUtilisateurAuth, command.type)
+              .withArgs(
+                command.idUtilisateurAuth,
+                command.structure,
+                command.type
+              )
               .resolves(undefined)
 
             const utilisateur: Authentification.Utilisateur = {
@@ -165,7 +181,11 @@ describe('UpdateUtilisateurCommandHandler', () => {
             }
 
             authentificationRepository.get
-              .withArgs(command.idUtilisateurAuth, command.type)
+              .withArgs(
+                command.idUtilisateurAuth,
+                command.structure,
+                command.type
+              )
               .resolves(undefined)
 
             // When
