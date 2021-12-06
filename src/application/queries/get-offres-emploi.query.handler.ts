@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import {
+  Contrat,
   OffresEmploi,
   OffresEmploiRepositoryToken
 } from '../../domain/offre-emploi'
@@ -17,7 +18,7 @@ export interface GetOffresEmploiQuery extends Query {
   departement?: string
   alternance?: boolean
   experience?: string[]
-  contrat?: string[]
+  contrat?: Contrat[]
   duree?: string[]
   rayon?: number
 }

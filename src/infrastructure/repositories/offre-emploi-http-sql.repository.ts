@@ -5,7 +5,7 @@ import {
   OffreEmploiResumeQueryModel,
   OffresEmploiQueryModel
 } from 'src/application/queries/query-models/offres-emploi.query-models'
-import { OffresEmploi, OffreEmploi } from '../../domain/offre-emploi'
+import { OffresEmploi, OffreEmploi, Contrat } from '../../domain/offre-emploi'
 import { PoleEmploiClient } from '../clients/pole-emploi-client'
 import { FavoriOffreEmploiSqlModel } from '../sequelize/models/favori-offre-emploi.sql-model'
 import {
@@ -29,7 +29,7 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
     departement?: string,
     experience?: string[],
     duree?: string[],
-    contrat?: string[]
+    contrat?: Contrat[]
   ): Promise<OffresEmploiQueryModel> {
     const params = new URLSearchParams()
     params.append('sort', '1')

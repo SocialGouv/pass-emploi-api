@@ -9,6 +9,7 @@ import {
   IsBoolean,
   IsNumber
 } from 'class-validator'
+import { Contrat } from 'src/domain/offre-emploi'
 import {
   transformStringToInteger,
   transformStringToBoolean,
@@ -19,14 +20,6 @@ enum Experience {
   exp1 = '1',
   exp2 = '2',
   exp3 = '3'
-}
-
-enum Contrat {
-  c1 = 'CDI',
-  c2 = 'CDD',
-  c3 = 'interim',
-  c4 = 'saisonnier',
-  c5 = 'autre'
 }
 
 enum Duree {

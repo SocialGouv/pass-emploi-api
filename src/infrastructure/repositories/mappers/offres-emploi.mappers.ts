@@ -7,7 +7,7 @@ import {
 import {
   OffreEmploi,
   Localisation,
-  ContratPoleEmploi
+  Contrat
 } from '../../../domain/offre-emploi'
 import { FavoriOffreEmploiSqlModel } from '../../sequelize/models/favori-offre-emploi.sql-model'
 import {
@@ -137,27 +137,14 @@ export function fromSqlToFavorisQueryModels(
   })
 }
 
-export function toPoleEmploiContrat(contratsList: string[]): string[] {
-  const contratPoleEmploi = new ContratPoleEmploi()
-  const poleEmploiContratsList = []
-  for (const contrat of contratsList) {
-    switch (contrat) {
-      case 'CDI':
-        poleEmploiContratsList.push(...contratPoleEmploi.CDI)
-        break
-      case 'CDD':
-        poleEmploiContratsList.push(...contratPoleEmploi.CDD)
-        break
-      case 'interim':
-        poleEmploiContratsList.push(...contratPoleEmploi.interim)
-        break
-      case 'saisonnier':
-        poleEmploiContratsList.push(...contratPoleEmploi.saisonnier)
-        break
-      case 'autre':
-        poleEmploiContratsList.push(...contratPoleEmploi.autre)
-        break
-    }
+export function toPoleEmploiContrat(contratsList: Contrat[]): string[] {
+  const contratPoleEmploi = {
+    CDI: 'CDI,DIN',
+    CDD: 'CDD',
+    interim: 'MIS',
+    saisonnier: 'SAI',
+    autre: 'CCE,FRA,LIB,REP,TTI'
   }
-  return poleEmploiContratsList
+
+  return contratsList.map((contrat: Contrat) => contratPoleEmploi[contrat])
 }
