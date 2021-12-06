@@ -1,4 +1,9 @@
-import { OffreEmploi, Contrat } from '../../../src/domain/offre-emploi'
+import {
+  Contrat,
+  Duree,
+  Experience,
+  OffreEmploi
+} from '../../../src/domain/offre-emploi'
 import { PoleEmploiClient } from '../../../src/infrastructure/clients/pole-emploi-client'
 import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-emploi-http-sql.repository'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -210,9 +215,9 @@ describe('OffresEmploiHttpSqlRepository', () => {
           true,
           'mots clés',
           '75',
-          ['2', '3'],
-          ['1'],
-          [Contrat.c1, Contrat.c5]
+          [Experience.entreUnEtTroisAns, Experience.plusDeTroisAns],
+          [Duree.tempsPlein],
+          [Contrat.cdi, Contrat.autre]
         )
         const expectedQueryParams = new URLSearchParams({
           sort: '1',
@@ -249,13 +254,13 @@ describe('OffresEmploiHttpSqlRepository', () => {
           undefined,
           undefined,
           undefined,
-          ['1,3'],
-          [Contrat.c2]
+          [Duree.nonPrecise, Duree.tempsPartiel],
+          [Contrat.cdd]
         )
         const expectedQueryParams = new URLSearchParams({
           sort: '1',
           range: '0-49',
-          dureeHebdo: '1,3',
+          dureeHebdo: '0,2',
           typeContrat: 'CDD'
         })
 

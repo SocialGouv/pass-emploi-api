@@ -32,8 +32,8 @@ export namespace OffresEmploi {
       alternance?: boolean,
       query?: string,
       departement?: string,
-      experience?: string[],
-      duree?: string[],
+      experience?: Experience[],
+      duree?: Duree[],
       contrat?: Contrat[]
     ): Promise<OffresEmploiQueryModel>
 
@@ -59,9 +59,21 @@ export namespace OffresEmploi {
 }
 
 export enum Contrat {
-  c1 = 'CDI',
-  c2 = 'CDD',
-  c3 = 'interim',
-  c4 = 'saisonnier',
-  c5 = 'autre'
+  cdi = 'CDI',
+  cdd = 'CDD',
+  interim = 'interim',
+  saisonnier = 'saisonnier',
+  autre = 'autre'
+}
+
+export enum Experience {
+  moinsdUnAn = '1',
+  entreUnEtTroisAns = '2',
+  plusDeTroisAns = '3'
+}
+
+export enum Duree {
+  nonPrecise = '0',
+  tempsPlein = '1',
+  tempsPartiel = '2'
 }

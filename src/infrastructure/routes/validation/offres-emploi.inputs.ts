@@ -9,24 +9,13 @@ import {
   IsBoolean,
   IsNumber
 } from 'class-validator'
-import { Contrat } from 'src/domain/offre-emploi'
+import { Contrat, Duree, Experience } from 'src/domain/offre-emploi'
 import {
   transformStringToInteger,
   transformStringToBoolean,
   transformStringToArray
 } from './utils/transformers'
 
-enum Experience {
-  exp1 = '1',
-  exp2 = '2',
-  exp3 = '3'
-}
-
-enum Duree {
-  d1 = '0',
-  d2 = '1',
-  d3 = '2'
-}
 export class FindOffresEmploiQuery {
   @ApiPropertyOptional()
   @IsNotEmpty()
@@ -61,19 +50,19 @@ export class FindOffresEmploiQuery {
   @Transform(params => transformStringToBoolean(params, 'alternance'))
   alternance?: boolean
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ enum: Experience })
   @IsOptional()
   @IsEnum(Experience, { each: true })
   @Transform(params => transformStringToArray(params, 'experience'))
   experience?: Experience[]
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ enum: Contrat })
   @IsOptional()
   @IsEnum(Contrat, { each: true })
   @Transform(params => transformStringToArray(params, 'contrat'))
   contrat?: Contrat[]
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ enum: Duree })
   @IsOptional()
   @IsEnum(Duree, { each: true })
   @Transform(params => transformStringToArray(params, 'duree'))

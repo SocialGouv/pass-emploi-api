@@ -3,6 +3,8 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import {
   Contrat,
+  Duree,
+  Experience,
   OffresEmploi,
   OffresEmploiRepositoryToken
 } from '../../domain/offre-emploi'
@@ -17,9 +19,9 @@ export interface GetOffresEmploiQuery extends Query {
   query?: string
   departement?: string
   alternance?: boolean
-  experience?: string[]
+  experience?: Experience[]
   contrat?: Contrat[]
-  duree?: string[]
+  duree?: Duree[]
   rayon?: number
 }
 
