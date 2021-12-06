@@ -1,5 +1,4 @@
 import {
-  AllowNull,
   BelongsTo,
   Column,
   DataType,
@@ -33,15 +32,12 @@ export class JeuneDto extends Model {
   @Column({ field: 'date_creation', type: DataType.DATE })
   dateCreation!: Date
 
-  @AllowNull
   @Column({ field: 'push_notification_token', type: DataType.STRING })
   pushNotificationToken!: string | null
 
-  @AllowNull
   @Column({ field: 'date_derniere_actualisation_token', type: DataType.DATE })
   dateDerniereActualisationToken!: Date | null
 
-  @AllowNull
   @Column({ field: 'email', type: DataType.STRING })
   email: string | null
 

@@ -313,7 +313,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             .withArgs(command.email)
             .resolves(utilisateur)
           authentificationRepository.updateJeuneMilo
-            .withArgs(command.email, command.idUtilisateurAuth)
+            .withArgs('id-jeune', command.idUtilisateurAuth)
             .resolves()
 
           // When

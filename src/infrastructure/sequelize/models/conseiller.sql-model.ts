@@ -1,5 +1,4 @@
 import {
-  AllowNull,
   Column,
   DataType,
   HasMany,
@@ -22,7 +21,6 @@ export class ConseillerDto extends Model {
   @Column({ field: 'prenom', type: DataType.STRING })
   prenom: string
 
-  @AllowNull
   @Column({ field: 'email', type: DataType.STRING })
   email: string | null
 

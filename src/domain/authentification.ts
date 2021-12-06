@@ -33,7 +33,7 @@ export namespace Authentification {
       type: Authentification.Type
     ): Promise<Utilisateur | undefined>
     getJeuneMiloByEmail(email: string): Promise<Utilisateur | undefined>
-    updateJeuneMilo(email: string, idUtilisateurAuth: string): Promise<void>
+    updateJeuneMilo(idJeune: string, idUtilisateurAuth: string): Promise<void>
     save(utilisateur: Utilisateur, idUtilisateurAuth: string): Promise<void>
   }
 

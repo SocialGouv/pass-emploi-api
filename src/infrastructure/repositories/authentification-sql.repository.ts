@@ -62,14 +62,12 @@ export class AuthentificationSqlRepository
   }
 
   async updateJeuneMilo(
-    email: string,
+    idJeune: string,
     idUtilisateurAuth: string
   ): Promise<void> {
     await JeuneSqlModel.update(
-      // TODO: la mise à jour de l'id auth se fait meme si il est deja présent
       { idAuthentification: idUtilisateurAuth },
-      // TODO: forcer email à unique ou utiliser id ici
-      { where: { email: email } }
+      { where: { id: idJeune } }
     )
   }
 

@@ -141,6 +141,7 @@ describe('AuthentificationSqlRepository', () => {
       )
       await JeuneSqlModel.creer(
         unJeuneDto({
+          id: 'id-jeune',
           email: 'john.doe@passemploi.com',
           structure: Authentification.Structure.MILO
         })
@@ -149,7 +150,7 @@ describe('AuthentificationSqlRepository', () => {
     it("met à jour l'utilisateur", async () => {
       // When
       await authentificationSqlRepository.updateJeuneMilo(
-        'john.doe@passemploi.com',
+        'id-jeune',
         'id-authentification-jeune'
       )
 
@@ -159,7 +160,11 @@ describe('AuthentificationSqlRepository', () => {
         Structure.MILO,
         Type.JEUNE
       )
-      expect(utilisateur).to.deep.equal(unUtilisateurJeune())
+      expect(utilisateur).to.deep.equal(
+        unUtilisateurJeune({
+          id: 'id-jeune'
+        })
+      )
     })
   })
 

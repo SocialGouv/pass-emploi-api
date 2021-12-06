@@ -73,7 +73,7 @@ export class UpdateUtilisateurCommandHandler {
 
         if (jeuneMilo) {
           await this.authentificationRepository.updateJeuneMilo(
-            command.email,
+            jeuneMilo.id,
             command.idUtilisateurAuth
           )
 

@@ -1,5 +1,4 @@
 import {
-  AllowNull,
   BelongsTo,
   Column,
   DataType,
@@ -34,7 +33,6 @@ export class RendezVousDto extends Model {
   @Column({ field: 'duree', type: DataType.INTEGER })
   duree!: number
 
-  @AllowNull
   @Column({ field: 'date_suppression', type: DataType.DATE })
   dateSuppression: Date | null
 
