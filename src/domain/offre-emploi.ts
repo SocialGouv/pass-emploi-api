@@ -29,9 +29,12 @@ export namespace OffresEmploi {
     findAll(
       page: number,
       limit: number,
-      alternance: boolean,
+      alternance?: boolean,
       query?: string,
-      departement?: string
+      departement?: string,
+      experience?: Experience[],
+      duree?: Duree[],
+      contrat?: Contrat[]
     ): Promise<OffresEmploiQueryModel>
 
     getOffreEmploiQueryModelById(
@@ -53,4 +56,24 @@ export namespace OffresEmploi {
 
     deleteFavori(idJeune: string, idOffreEmploi: string): Promise<void>
   }
+}
+
+export enum Contrat {
+  cdi = 'CDI',
+  cdd = 'CDD',
+  interim = 'interim',
+  saisonnier = 'saisonnier',
+  autre = 'autre'
+}
+
+export enum Experience {
+  moinsdUnAn = '1',
+  entreUnEtTroisAns = '2',
+  plusDeTroisAns = '3'
+}
+
+export enum Duree {
+  nonPrecise = '0',
+  tempsPlein = '1',
+  tempsPartiel = '2'
 }

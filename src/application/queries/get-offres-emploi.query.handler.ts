@@ -2,6 +2,9 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import {
+  Contrat,
+  Duree,
+  Experience,
   OffresEmploi,
   OffresEmploiRepositoryToken
 } from '../../domain/offre-emploi'
@@ -15,7 +18,11 @@ export interface GetOffresEmploiQuery extends Query {
   limit?: number
   query?: string
   departement?: string
-  alternance: boolean
+  alternance?: boolean
+  experience?: Experience[]
+  contrat?: Contrat[]
+  duree?: Duree[]
+  rayon?: number
 }
 
 @Injectable()
@@ -33,7 +40,10 @@ export class GetOffresEmploiQueryHandler
       query.limit || DEFAULT_LIMIT,
       query.alternance,
       query.query,
-      query.departement
+      query.departement,
+      query.experience,
+      query.duree,
+      query.contrat
     )
   }
 }

@@ -1,4 +1,9 @@
-import { OffreEmploi } from '../../../src/domain/offre-emploi'
+import {
+  Contrat,
+  Duree,
+  Experience,
+  OffreEmploi
+} from '../../../src/domain/offre-emploi'
 import { PoleEmploiClient } from '../../../src/infrastructure/clients/pole-emploi-client'
 import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-emploi-http-sql.repository'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -15,9 +20,9 @@ import {
 describe('OffresEmploiHttpSqlRepository', () => {
   DatabaseForTesting.prepare()
   let offresEmploiHttpSqlRepository: OffresEmploiHttpSqlRepository
+  const poleEmploiClient = stubClass(PoleEmploiClient)
 
   beforeEach(async () => {
-    const poleEmploiClient = stubClass(PoleEmploiClient)
     offresEmploiHttpSqlRepository = new OffresEmploiHttpSqlRepository(
       poleEmploiClient
     )
@@ -188,6 +193,83 @@ describe('OffresEmploiHttpSqlRepository', () => {
         offreEmploi.id
       )
       expect(actual).to.equal(undefined)
+    })
+  })
+
+  describe('.findAll', () => {
+    describe('fait appel à l"API de Pôle Emploi avec les bons paramètres', () => {
+      it('quand tous les query params sont fournis', async () => {
+        // Given
+        poleEmploiClient.get.resolves({
+          config: undefined,
+          headers: undefined,
+          request: undefined,
+          status: 0,
+          statusText: '',
+          data: []
+        })
+        // When
+        await offresEmploiHttpSqlRepository.findAll(
+          1,
+          50,
+          true,
+          'mots clés',
+          '75',
+          [Experience.entreUnEtTroisAns, Experience.plusDeTroisAns],
+          [Duree.tempsPlein],
+          [Contrat.cdi, Contrat.autre]
+        )
+        const expectedQueryParams = new URLSearchParams({
+          sort: '1',
+          range: '0-49',
+          motsCles: 'mots clés',
+          departement: '75',
+          natureContrat: 'E2',
+          experience: '2,3',
+          dureeHebdo: '1',
+          typeContrat: 'CDI,DIN,CCE,FRA,LIB,REP,TTI'
+        })
+
+        // Then
+        expect(poleEmploiClient.get).to.have.been.calledWith(
+          'offresdemploi/v2/offres/search',
+          expectedQueryParams
+        )
+      })
+      it('quand que quelques query params sont fournis', async () => {
+        // Given
+        poleEmploiClient.get.resolves({
+          config: undefined,
+          headers: undefined,
+          request: undefined,
+          status: 0,
+          statusText: '',
+          data: []
+        })
+        // When
+        await offresEmploiHttpSqlRepository.findAll(
+          1,
+          50,
+          false,
+          undefined,
+          undefined,
+          undefined,
+          [Duree.nonPrecise, Duree.tempsPartiel],
+          [Contrat.cdd]
+        )
+        const expectedQueryParams = new URLSearchParams({
+          sort: '1',
+          range: '0-49',
+          dureeHebdo: '0,2',
+          typeContrat: 'CDD'
+        })
+
+        // Then
+        expect(poleEmploiClient.get).to.have.been.calledWith(
+          'offresdemploi/v2/offres/search',
+          expectedQueryParams
+        )
+      })
     })
   })
 })

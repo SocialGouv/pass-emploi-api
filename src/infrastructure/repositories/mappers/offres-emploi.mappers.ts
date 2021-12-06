@@ -4,7 +4,11 @@ import {
   OffreEmploiResumeQueryModel,
   OffresEmploiQueryModel
 } from 'src/application/queries/query-models/offres-emploi.query-models'
-import { OffreEmploi, Localisation } from '../../../domain/offre-emploi'
+import {
+  OffreEmploi,
+  Localisation,
+  Contrat
+} from '../../../domain/offre-emploi'
 import { FavoriOffreEmploiSqlModel } from '../../sequelize/models/favori-offre-emploi.sql-model'
 import {
   OffresEmploiDto,
@@ -131,4 +135,16 @@ export function fromSqlToFavorisQueryModels(
       titre: favoriSql.titre
     }
   })
+}
+
+export function toPoleEmploiContrat(contratsList: Contrat[]): string[] {
+  const contratPoleEmploi = {
+    CDI: 'CDI,DIN',
+    CDD: 'CDD',
+    interim: 'MIS',
+    saisonnier: 'SAI',
+    autre: 'CCE,FRA,LIB,REP,TTI'
+  }
+
+  return contratsList.map((contrat: Contrat) => contratPoleEmploi[contrat])
 }
