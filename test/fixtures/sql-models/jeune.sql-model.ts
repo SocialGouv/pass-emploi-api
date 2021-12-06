@@ -13,7 +13,7 @@ export function unJeuneDto(
     dateCreation: new Date('2021-11-11T08:03:30.000Z'),
     pushNotificationToken: null,
     dateDerniereActualisationToken: null,
-    email: null,
+    email: 'john.doe@passemploi.com',
     structure: Authentification.Structure.PASS_EMPLOI,
     idAuthentification: ''
   }

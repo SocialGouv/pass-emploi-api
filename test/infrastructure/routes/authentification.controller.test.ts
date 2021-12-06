@@ -121,5 +121,29 @@ describe('AuthentificationController', () => {
         .send(body)
         .expect(HttpStatus.BAD_REQUEST)
     })
+
+    it('retourne 400 quand on veut créer un utilisateur avec un email invalide', async () => {
+      // Given
+      const body: UpdateUserPayload = {
+        email: 'plop',
+        type: Authentification.Type.CONSEILLER,
+        structure: Authentification.Structure.MILO
+      }
+
+      const command: UpdateUtilisateurCommand = {
+        ...body,
+        idUtilisateurAuth: 'nilstavernier'
+      }
+
+      updateUtilisateurCommandHandler.execute
+        .withArgs(command)
+        .resolves(failure(new UtilisateurMiloNonValide()))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .put(`/auth/users/${command.idUtilisateurAuth}`)
+        .send(body)
+        .expect(HttpStatus.BAD_REQUEST)
+    })
   })
 })

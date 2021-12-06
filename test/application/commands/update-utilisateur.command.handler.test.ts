@@ -6,7 +6,7 @@ import {
 } from 'src/building-blocks/types/domain-error'
 import { Authentification } from 'src/domain/authentification'
 import { IdService } from 'src/utils/id-service'
-import { unUtilisateur } from 'test/fixtures/authentification.fixture'
+import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unUtilisateurQueryModel } from 'test/fixtures/query-models/authentification.query-model.fixtures'
 import {
   UpdateUtilisateurCommand,
@@ -36,7 +36,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
     )
   })
 
-  describe.only('execute', () => {
+  describe('execute', () => {
     describe('conseiller venant du SSO PASS_EMPLOI', async () => {
       describe('conseiller connu', async () => {
         it('retourne le conseiller', async () => {
@@ -47,7 +47,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             structure: Authentification.Structure.PASS_EMPLOI
           }
 
-          const utilisateur = unUtilisateur()
+          const utilisateur = unUtilisateurConseiller()
           authentificationRepository.get
             .withArgs(
               command.idUtilisateurAuth,
@@ -106,7 +106,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             structure: Authentification.Structure.MILO
           }
 
-          const utilisateur = unUtilisateur()
+          const utilisateur = unUtilisateurConseiller()
           authentificationRepository.get
             .withArgs(
               command.idUtilisateurAuth,
@@ -213,7 +213,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             structure: Authentification.Structure.PASS_EMPLOI
           }
 
-          const utilisateur = unUtilisateur()
+          const utilisateur = unUtilisateurConseiller()
           authentificationRepository.get
             .withArgs(
               command.idUtilisateurAuth,
@@ -272,7 +272,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             structure: Authentification.Structure.MILO
           }
 
-          const utilisateur = unUtilisateur()
+          const utilisateur = unUtilisateurConseiller()
           authentificationRepository.get
             .withArgs(
               command.idUtilisateurAuth,
@@ -301,7 +301,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             structure: Authentification.Structure.MILO
           }
 
-          const utilisateur = unUtilisateur()
+          const utilisateur = unUtilisateurConseiller()
           authentificationRepository.get
             .withArgs(
               command.idUtilisateurAuth,

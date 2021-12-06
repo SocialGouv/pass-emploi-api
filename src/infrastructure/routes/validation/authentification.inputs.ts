@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEnum, IsOptional, IsString } from 'class-validator'
+import { IsEnum, IsOptional, IsString, IsEmail } from 'class-validator'
 import { Authentification } from '../../../domain/authentification'
 
 export class UpdateUserPayload {
@@ -16,6 +16,7 @@ export class UpdateUserPayload {
   @ApiProperty()
   @IsString()
   @IsOptional()
+  @IsEmail()
   email?: string
 
   @ApiProperty({ enum: Authentification.Type })
