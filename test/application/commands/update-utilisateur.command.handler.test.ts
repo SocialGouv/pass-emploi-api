@@ -6,7 +6,7 @@ import {
 } from 'src/building-blocks/types/domain-error'
 import { Authentification } from 'src/domain/authentification'
 import { IdService } from 'src/utils/id-service'
-import { unUtilisateur } from 'test/fixtures/authentification.fixture'
+import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { unUtilisateurQueryModel } from 'test/fixtures/query-models/authentification.query-model.fixtures'
 import {
   UpdateUtilisateurCommand,
@@ -47,9 +47,13 @@ describe('UpdateUtilisateurCommandHandler', () => {
             structure: Authentification.Structure.PASS_EMPLOI
           }
 
-          const utilisateur = unUtilisateur()
+          const utilisateur = unUtilisateurConseiller()
           authentificationRepository.get
-            .withArgs(command.idUtilisateurAuth, command.type)
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
             .resolves(utilisateur)
 
           // When
@@ -72,7 +76,11 @@ describe('UpdateUtilisateurCommandHandler', () => {
           }
 
           authentificationRepository.get
-            .withArgs(command.idUtilisateurAuth, command.type)
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
             .resolves(undefined)
 
           // When
@@ -98,9 +106,13 @@ describe('UpdateUtilisateurCommandHandler', () => {
             structure: Authentification.Structure.MILO
           }
 
-          const utilisateur = unUtilisateur()
+          const utilisateur = unUtilisateurConseiller()
           authentificationRepository.get
-            .withArgs(command.idUtilisateurAuth, command.type)
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
             .resolves(utilisateur)
 
           // When
@@ -127,7 +139,11 @@ describe('UpdateUtilisateurCommandHandler', () => {
             }
 
             authentificationRepository.get
-              .withArgs(command.idUtilisateurAuth, command.type)
+              .withArgs(
+                command.idUtilisateurAuth,
+                command.structure,
+                command.type
+              )
               .resolves(undefined)
 
             const utilisateur: Authentification.Utilisateur = {
@@ -165,7 +181,11 @@ describe('UpdateUtilisateurCommandHandler', () => {
             }
 
             authentificationRepository.get
-              .withArgs(command.idUtilisateurAuth, command.type)
+              .withArgs(
+                command.idUtilisateurAuth,
+                command.structure,
+                command.type
+              )
               .resolves(undefined)
 
             // When
@@ -179,6 +199,163 @@ describe('UpdateUtilisateurCommandHandler', () => {
               expect(result.error.code).to.equal(UtilisateurMiloNonValide.CODE)
             }
           })
+        })
+      })
+    })
+
+    describe('jeune venant du SSO PASS_EMPLOI', async () => {
+      describe('jeune connu', async () => {
+        it('retourne le jeune', async () => {
+          // Given
+          const command: UpdateUtilisateurCommand = {
+            idUtilisateurAuth: 'nilstavernier',
+            type: Authentification.Type.JEUNE,
+            structure: Authentification.Structure.PASS_EMPLOI
+          }
+
+          const utilisateur = unUtilisateurConseiller()
+          authentificationRepository.get
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
+            .resolves(utilisateur)
+
+          // When
+          const result = await updateUtilisateurCommandHandler.execute(command)
+
+          // Then
+          expect(isSuccess(result)).equal(true)
+          if (isSuccess(result)) {
+            expect(result.data).to.deep.equal(unUtilisateurQueryModel())
+          }
+        })
+      })
+      describe('jeune inconnu', async () => {
+        it('retourne une erreur', async () => {
+          // Given
+          const command: UpdateUtilisateurCommand = {
+            idUtilisateurAuth: 'nilstavernier',
+            type: Authentification.Type.JEUNE,
+            structure: Authentification.Structure.PASS_EMPLOI
+          }
+
+          authentificationRepository.get
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
+            .resolves(undefined)
+
+          // When
+          const result = await updateUtilisateurCommandHandler.execute(command)
+
+          // Then
+          expect(result).to.deep.equal(
+            failure(
+              new NonTrouveError('Utilisateur', command.idUtilisateurAuth)
+            )
+          )
+        })
+      })
+    })
+
+    describe('jeune venant du SSO MILO', async () => {
+      describe('jeune connu par son sub', async () => {
+        it('retourne le jeune', async () => {
+          // Given
+          const command: UpdateUtilisateurCommand = {
+            idUtilisateurAuth: 'nilstavernier',
+            type: Authentification.Type.JEUNE,
+            structure: Authentification.Structure.MILO
+          }
+
+          const utilisateur = unUtilisateurConseiller()
+          authentificationRepository.get
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
+            .resolves(utilisateur)
+
+          // When
+          const result = await updateUtilisateurCommandHandler.execute(command)
+
+          // Then
+          expect(isSuccess(result)).equal(true)
+          if (isSuccess(result)) {
+            expect(result.data).to.deep.equal(unUtilisateurQueryModel())
+          }
+        })
+      })
+      describe('jeune connu par son email', async () => {
+        it('retourne le jeune et enregistre le sub', async () => {
+          // Given
+          const command: UpdateUtilisateurCommand = {
+            idUtilisateurAuth: 'nilstavernier',
+            email: 'abc@test.com',
+            type: Authentification.Type.JEUNE,
+            structure: Authentification.Structure.MILO
+          }
+
+          const utilisateur = unUtilisateurConseiller()
+          authentificationRepository.get
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
+            .resolves(undefined)
+          authentificationRepository.getJeuneMiloByEmail
+            .withArgs(command.email)
+            .resolves(utilisateur)
+          authentificationRepository.updateJeuneMilo
+            .withArgs('id-jeune', command.idUtilisateurAuth)
+            .resolves()
+
+          // When
+          const result = await updateUtilisateurCommandHandler.execute(command)
+
+          // Then
+          expect(isSuccess(result)).equal(true)
+          if (isSuccess(result)) {
+            expect(result.data).to.deep.equal(unUtilisateurQueryModel())
+          }
+        })
+      })
+      describe('jeune non connu par son email', async () => {
+        it('retourne une failure', async () => {
+          // Given
+          const command: UpdateUtilisateurCommand = {
+            idUtilisateurAuth: 'nilstavernier',
+            email: 'abc@test.com',
+            type: Authentification.Type.JEUNE,
+            structure: Authentification.Structure.MILO
+          }
+
+          authentificationRepository.get
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
+            .resolves(undefined)
+          authentificationRepository.getJeuneMiloByEmail
+            .withArgs(command.email)
+            .resolves(undefined)
+
+          // When
+          const result = await updateUtilisateurCommandHandler.execute(command)
+
+          // Then
+          expect(result).to.deep.equal(
+            failure(
+              new NonTrouveError('Utilisateur', command.idUtilisateurAuth)
+            )
+          )
         })
       })
     })

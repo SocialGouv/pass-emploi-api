@@ -4,7 +4,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async transaction => {
       await queryInterface.addColumn(
-        'conseiller',
+        'jeune',
         'email',
         {
           type: Sequelize.STRING
@@ -12,7 +12,7 @@ module.exports = {
         { transaction }
       )
       await queryInterface.addColumn(
-        'conseiller',
+        'jeune',
         'structure',
         {
           type: Sequelize.STRING,
@@ -22,7 +22,7 @@ module.exports = {
         { transaction }
       )
       await queryInterface.addColumn(
-        'conseiller',
+        'jeune',
         'id_authentification',
         {
           type: Sequelize.STRING
@@ -34,11 +34,11 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async transaction => {
-      await queryInterface.removeColumn('conseiller', 'email', { transaction })
-      await queryInterface.removeColumn('conseiller', 'structure', {
+      await queryInterface.removeColumn('jeune', 'email', { transaction })
+      await queryInterface.removeColumn('jeune', 'structure', {
         transaction
       })
-      await queryInterface.removeColumn('conseiller', 'id_authentification', {
+      await queryInterface.removeColumn('jeune', 'id_authentification', {
         transaction
       })
     })

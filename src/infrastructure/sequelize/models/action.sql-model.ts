@@ -1,5 +1,4 @@
 import {
-  AllowNull,
   BelongsTo,
   Column,
   DataType,
@@ -45,7 +44,6 @@ export class ActionDto extends Model {
   @Column({ field: 'date_derniere_actualisation', type: DataType.DATE })
   dateDerniereActualisation!: Date
 
-  @AllowNull
   @Column({ field: 'date_limite', type: DataType.DATE })
   dateLimite!: Date | null
 }

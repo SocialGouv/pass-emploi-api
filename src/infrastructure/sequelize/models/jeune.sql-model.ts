@@ -1,5 +1,4 @@
 import {
-  AllowNull,
   BelongsTo,
   Column,
   DataType,
@@ -9,6 +8,7 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
+import { Authentification } from 'src/domain/authentification'
 import { AsSql } from '../types'
 import { ActionSqlModel } from './action.sql-model'
 import { ConseillerSqlModel } from './conseiller.sql-model'
@@ -32,13 +32,20 @@ export class JeuneDto extends Model {
   @Column({ field: 'date_creation', type: DataType.DATE })
   dateCreation!: Date
 
-  @AllowNull
   @Column({ field: 'push_notification_token', type: DataType.STRING })
   pushNotificationToken!: string | null
 
-  @AllowNull
   @Column({ field: 'date_derniere_actualisation_token', type: DataType.DATE })
   dateDerniereActualisationToken!: Date | null
+
+  @Column({ field: 'email', type: DataType.STRING })
+  email: string | null
+
+  @Column({ field: 'structure', type: DataType.STRING })
+  structure: Authentification.Structure
+
+  @Column({ field: 'id_authentification', type: DataType.STRING })
+  idAuthentification: string
 }
 
 @Table({ timestamps: false, tableName: 'jeune' })
