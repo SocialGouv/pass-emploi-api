@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { remove as enleveLesCaracteresSpeciaux } from 'remove-accents'
 import { QueryTypes, Sequelize } from 'sequelize'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
@@ -26,8 +27,11 @@ export class GetCommunesEtDepartementsQueryHandler
   async execute(
     query: GetCommunesEtDepartementsQuery
   ): Promise<CommunesEtDepartementsQueryModel[]> {
-    const departements = await this.findDepartements(query)
-    const communes = await this.findCommunes(query)
+    const sanitizedQuery: GetCommunesEtDepartementsQuery = {
+      recherche: enleveLesCaracteresSpeciaux(query.recherche)
+    }
+    const departements = await this.findDepartements(sanitizedQuery)
+    const communes = await this.findCommunes(sanitizedQuery)
     const resultats = departements.concat(communes)
 
     resultats.sort((a, b) => {

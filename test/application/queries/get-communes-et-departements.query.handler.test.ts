@@ -100,6 +100,23 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       //Then
       expect(result).to.have.lengthOf(1)
     })
+    it('ne prend pas en compte les accents', async () => {
+      //Given
+      const departement = unDepartementDto({ libelle: 'CRETEIL' })
+      await DepartementSqlModel.create(departement)
+      //When
+      const result = await getCommunesEtDepartementsQueryHandler.execute({
+        recherche: 'çréteîl'
+      })
+      //Then
+      expect(result).to.have.lengthOf(1)
+      expect(result[0]).to.be.deep.equal({
+        code: departement.code,
+        libelle: departement.libelle,
+        type: CommunesEtDepartementsQueryModel.Type.DEPARTEMENT,
+        score: 1
+      })
+    })
     describe('quand il a y a plus de 5 résultats', async () => {
       it('prend le top 5 par rapport au score de recherche', async () => {
         //Given
@@ -265,6 +282,24 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       })
       //Then
       expect(result).to.have.lengthOf(1)
+    })
+    it('ne prend pas en compte les accents', async () => {
+      //Given
+      const commune = uneCommuneDto({ libelle: 'CRETEIL' })
+      await CommuneSqlModel.create(commune)
+      //When
+      const result = await getCommunesEtDepartementsQueryHandler.execute({
+        recherche: 'çréteîl'
+      })
+      //Then
+      expect(result).to.have.lengthOf(1)
+      expect(result[0]).to.be.deep.equal({
+        code: commune.code,
+        libelle: commune.libelle,
+        codePostal: commune.codePostal,
+        type: CommunesEtDepartementsQueryModel.Type.COMMUNE,
+        score: 1
+      })
     })
     describe('quand il a y a plus de 5 résultats', async () => {
       it('fait un tri sur le libelle les plus long', async () => {

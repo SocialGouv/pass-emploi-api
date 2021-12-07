@@ -42,6 +42,7 @@
     "luxon": "2.1.1",
     "pg": "^8.7.1",
     "pg-connection-string": "^2.5.0",
+    "remove-accents": "^0.4.2",
     "rimraf": "^3.0.2",
     "rxjs": "7.4.0",
     "sequelize": "^6.9.0",
