@@ -43,7 +43,8 @@ export class GetOffresEmploiQueryHandler
       query.departement,
       query.experience,
       query.duree,
-      query.contrat
+      query.contrat,
+      query.rayon
     )
   }
 }

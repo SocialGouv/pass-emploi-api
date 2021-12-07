@@ -34,7 +34,8 @@ export namespace OffresEmploi {
       departement?: string,
       experience?: Experience[],
       duree?: Duree[],
-      contrat?: Contrat[]
+      contrat?: Contrat[],
+      rayon?: number
     ): Promise<OffresEmploiQueryModel>
 
     getOffreEmploiQueryModelById(
@@ -60,9 +61,7 @@ export namespace OffresEmploi {
 
 export enum Contrat {
   cdi = 'CDI',
-  cdd = 'CDD',
-  interim = 'interim',
-  saisonnier = 'saisonnier',
+  cdd = 'CDD-interim-saisonnier',
   autre = 'autre'
 }
 
@@ -73,7 +72,6 @@ export enum Experience {
 }
 
 export enum Duree {
-  nonPrecise = '0',
   tempsPlein = '1',
   tempsPartiel = '2'
 }
