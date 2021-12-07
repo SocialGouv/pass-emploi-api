@@ -10,7 +10,7 @@ module.exports = {
         date_derniere_actualisation: '2023-09-25Z10:00:00.000',
         id_jeune: '1',
         est_visible_par_conseiller: true,
-        id_createur: '1',
+        id_createur: '41',
         type_createur: 'conseiller'
       },
       {
@@ -22,7 +22,7 @@ module.exports = {
         date_derniere_actualisation: '2023-09-25Z10:00:00.000',
         id_jeune: '1',
         est_visible_par_conseiller: true,
-        id_createur: '1',
+        id_createur: '41',
         type_createur: 'conseiller'
       },
       {
@@ -46,7 +46,7 @@ module.exports = {
         date_derniere_actualisation: '2023-09-25Z10:00:00.000',
         id_jeune: '2',
         est_visible_par_conseiller: true,
-        id_createur: '1',
+        id_createur: '41',
         type_createur: 'conseiller'
       },
       {
@@ -70,7 +70,7 @@ module.exports = {
         date_derniere_actualisation: '2023-09-25Z10:00:00.000',
         id_jeune: '4',
         est_visible_par_conseiller: true,
-        id_createur: '2',
+        id_createur: '42',
         type_createur: 'conseiller'
       }
     ])
