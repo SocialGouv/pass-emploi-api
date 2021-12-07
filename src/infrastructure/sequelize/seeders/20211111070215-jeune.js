@@ -18,7 +18,7 @@ module.exports = {
         id_conseiller: '41',
         date_creation: '2021-11-24T10:00:00.000Z',
         email: 'tea.girard@passemploi.com',
-        structure: 'MILO',
+        structure: 'PASS_EMPLOI',
         id_authentification: '2'
       },
       {
@@ -47,7 +47,7 @@ module.exports = {
         nom: 'DEPLAIX',
         id_conseiller: '42',
         date_creation: '2021-11-24T10:00:00.000Z',
-        email: 'oceane.deplaix@passemploi.com',
+        email: 'jeune.milo.passemploi@gmail.com',
         structure: 'MILO'
       }
     ])
