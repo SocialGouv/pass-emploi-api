@@ -1,14 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger'
 
 export class LocalisationQueryModel {
-  @ApiProperty()
-  nom: string
+  @ApiProperty({ required: false })
+  nom?: string
 
-  @ApiProperty()
-  codePostal: string
+  @ApiProperty({ required: false })
+  codePostal?: string
 
-  @ApiProperty()
-  commune: string
+  @ApiProperty({ required: false })
+  commune?: string
 }
 
 export class OffreEmploiQueryModel {
