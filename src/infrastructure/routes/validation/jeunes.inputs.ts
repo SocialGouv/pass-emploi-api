@@ -17,12 +17,14 @@ export class LocalisationPayload {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  codePostal: string
+  @IsOptional()
+  codePostal?: string
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  commune: string
+  @IsOptional()
+  commune?: string
 }
 
 export class AddFavoriPayload {

@@ -18,8 +18,8 @@ export interface OffreEmploi {
 
 export interface Localisation {
   nom: string
-  codePostal: string
-  commune: string
+  codePostal?: string
+  commune?: string
 }
 
 export const OffresEmploiRepositoryToken = 'OffresEmploi.Repository'
