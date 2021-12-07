@@ -97,15 +97,12 @@ export function toOffreEmploi(
 
 export function buildLocalisation(
   favoriOffreEmploiSqlModel: FavoriOffreEmploiSqlModel
-): Localisation | undefined {
-  if (favoriOffreEmploiSqlModel.nomLocalisation) {
-    return {
-      nom: favoriOffreEmploiSqlModel.nomLocalisation,
-      codePostal: favoriOffreEmploiSqlModel.codePostalLocalisation || undefined,
-      commune: favoriOffreEmploiSqlModel.communeLocalisation || undefined
-    }
+): Localisation {
+  return {
+    nom: favoriOffreEmploiSqlModel.nomLocalisation || undefined,
+    codePostal: favoriOffreEmploiSqlModel.codePostalLocalisation || undefined,
+    commune: favoriOffreEmploiSqlModel.communeLocalisation || undefined
   }
-  return undefined
 }
 
 export function fromSqlToFavorisIdsQueryModels(

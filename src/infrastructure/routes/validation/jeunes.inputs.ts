@@ -12,7 +12,8 @@ export class LocalisationPayload {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  nom: string
+  @IsOptional()
+  nom?: string
 
   @ApiProperty()
   @IsString()

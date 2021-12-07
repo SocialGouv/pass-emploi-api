@@ -17,7 +17,7 @@ export interface OffreEmploi {
 }
 
 export interface Localisation {
-  nom: string
+  nom?: string
   codePostal?: string
   commune?: string
 }
