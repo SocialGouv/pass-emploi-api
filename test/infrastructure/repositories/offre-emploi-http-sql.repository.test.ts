@@ -217,7 +217,8 @@ describe('OffresEmploiHttpSqlRepository', () => {
           '75',
           [Experience.entreUnEtTroisAns, Experience.plusDeTroisAns],
           [Duree.tempsPlein],
-          [Contrat.cdi, Contrat.autre]
+          [Contrat.cdi, Contrat.autre],
+          15
         )
         const expectedQueryParams = new URLSearchParams({
           sort: '1',
@@ -227,7 +228,8 @@ describe('OffresEmploiHttpSqlRepository', () => {
           natureContrat: 'E2',
           experience: '2,3',
           dureeHebdo: '1',
-          typeContrat: 'CDI,DIN,CCE,FRA,LIB,REP,TTI'
+          typeContrat: 'CDI,DIN,CCE,FRA,LIB,REP,TTI',
+          distance: '15'
         })
 
         // Then
@@ -254,14 +256,14 @@ describe('OffresEmploiHttpSqlRepository', () => {
           undefined,
           undefined,
           undefined,
-          [Duree.nonPrecise, Duree.tempsPartiel],
+          [Duree.tempsPlein, Duree.tempsPartiel],
           [Contrat.cdd]
         )
         const expectedQueryParams = new URLSearchParams({
           sort: '1',
           range: '0-49',
-          dureeHebdo: '0,2',
-          typeContrat: 'CDD'
+          dureeHebdo: '1,2',
+          typeContrat: 'CDD,MIS,SAI,DDI'
         })
 
         // Then

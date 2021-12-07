@@ -133,9 +133,7 @@ export function fromSqlToFavorisQueryModels(
 export function toPoleEmploiContrat(contratsList: Contrat[]): string[] {
   const contratPoleEmploi = {
     CDI: 'CDI,DIN',
-    CDD: 'CDD',
-    interim: 'MIS',
-    saisonnier: 'SAI',
+    'CDD-interim-saisonnier': 'CDD,MIS,SAI,DDI',
     autre: 'CCE,FRA,LIB,REP,TTI'
   }
 

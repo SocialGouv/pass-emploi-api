@@ -35,7 +35,8 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
     departement?: string,
     experience?: Experience[],
     duree?: Duree[],
-    contrat?: Contrat[]
+    contrat?: Contrat[],
+    rayon?: number
   ): Promise<OffresEmploiQueryModel> {
     const params = new URLSearchParams()
     params.append('sort', '1')
@@ -61,6 +62,9 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
         'typeContrat',
         buildQueryParamFromArray(toPoleEmploiContrat(contrat))
       )
+    }
+    if (rayon) {
+      params.append('distance', rayon.toString())
     }
     const response = await this.poleEmploiClient.get(
       'offresdemploi/v2/offres/search',
