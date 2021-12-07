@@ -31,11 +31,14 @@ import {
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
 import { unJeune } from '../../fixtures/jeune.fixture'
+import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler'
+import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-models'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
   let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
   let deleteFavoriOffreEmploiCommandHandler: StubbedClass<DeleteFavoriOffreEmploiCommandHandler>
+  let getDetailJeuneQueryHandler: StubbedClass<GetDetailJeuneQueryHandler>
   let app: INestApplication
 
   before(async () => {
@@ -46,6 +49,7 @@ describe('JeunesController', () => {
     deleteFavoriOffreEmploiCommandHandler = stubClass(
       DeleteFavoriOffreEmploiCommandHandler
     )
+    getDetailJeuneQueryHandler = stubClass(GetDetailJeuneQueryHandler)
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
       .useValue(createActionCommandHandler)
@@ -53,6 +57,8 @@ describe('JeunesController', () => {
       .useValue(addFavoriOffreEmploiCommandHandler)
       .overrideProvider(DeleteFavoriOffreEmploiCommandHandler)
       .useValue(deleteFavoriOffreEmploiCommandHandler)
+      .overrideProvider(GetDetailJeuneQueryHandler)
+      .useValue(getDetailJeuneQueryHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -248,6 +254,48 @@ describe('JeunesController', () => {
         //Then
         .expect(HttpStatus.NOT_FOUND)
         .expect(expectedMessageJson)
+    })
+  })
+
+  describe('GET /jeunes/:idJeune', () => {
+    const idJeune = '1'
+    it('renvoit le jeune quand il existe', async () => {
+      // Given
+      const detailJeuneQueryModel: DetailJeuneQueryModel = {
+        id: idJeune,
+        firstName: 'Kenji',
+        lastName: 'Tavernier',
+        creationDate: 'une_date'
+      }
+      getDetailJeuneQueryHandler.execute.resolves(detailJeuneQueryModel)
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}`)
+
+        // Then
+        .expect(HttpStatus.OK)
+        .expect(detailJeuneQueryModel)
+      expect(getDetailJeuneQueryHandler.execute).to.have.been.calledWith({
+        idJeune
+      })
+    })
+    it('renvoit une 404 quand le jeune n"existe pas', async () => {
+      // Given
+      getDetailJeuneQueryHandler.execute.resolves(undefined)
+      const expectedResponseJson = {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `Jeune ${idJeune} not found`
+      }
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}`)
+
+        // Then
+        .expect(expectedResponseJson)
+      expect(getDetailJeuneQueryHandler.execute).to.have.been.calledWith({
+        idJeune
+      })
     })
   })
 })
