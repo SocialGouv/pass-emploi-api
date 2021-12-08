@@ -4,7 +4,8 @@ import {
   Controller,
   NotFoundException,
   Param,
-  Put
+  Put,
+  UseGuards
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -18,10 +19,12 @@ import {
   UtilisateurMiloNonValide
 } from '../../building-blocks/types/domain-error'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
-import { Public } from '../decorators/public.decorator'
+import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
+import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
 import { UpdateUserPayload } from './validation/authentification.inputs'
 
-@Public()
+@SkipOidcAuth()
+@UseGuards(ApiKeyAuthGuard)
 @Controller()
 @ApiTags('Authentification')
 export class AuthentificationController {

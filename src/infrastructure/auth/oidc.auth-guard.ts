@@ -10,6 +10,7 @@ import { Request } from 'express'
 import { JWTPayload } from 'jose'
 import { Authentification } from '../../domain/authentification'
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator'
+import { SKIP_OIDC_AUTH_KEY } from '../decorators/skip-oidc-auth.decorator'
 import { JwtService } from './jwt.service'
 
 @Injectable()
@@ -21,7 +22,7 @@ export class OidcAuthGuard implements CanActivate {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    if (this.isPublic(context)) {
+    if (this.isPublic(context) || this.isSkipOidcAuth(context)) {
       return true
     }
     return await this.checkJWT(context)
@@ -71,10 +72,16 @@ export class OidcAuthGuard implements CanActivate {
   }
 
   private isPublic(context: ExecutionContext): boolean {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+    return this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass()
     ])
-    return isPublic
+  }
+
+  private isSkipOidcAuth(context: ExecutionContext): boolean {
+    return this.reflector.getAllAndOverride<boolean>(SKIP_OIDC_AUTH_KEY, [
+      context.getHandler(),
+      context.getClass()
+    ])
   }
 }
