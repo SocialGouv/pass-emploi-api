@@ -50,19 +50,19 @@ export class FindOffresEmploiQuery {
   @Transform(params => transformStringToBoolean(params, 'alternance'))
   alternance?: boolean
 
-  @ApiPropertyOptional({ enum: Experience })
+  @ApiPropertyOptional({ enum: Experience, isArray: true })
   @IsOptional()
   @IsEnum(Experience, { each: true })
   @Transform(params => transformStringToArray(params, 'experience'))
   experience?: Experience[]
 
-  @ApiPropertyOptional({ enum: Contrat })
+  @ApiPropertyOptional({ enum: Contrat, isArray: true })
   @IsOptional()
   @IsEnum(Contrat, { each: true })
   @Transform(params => transformStringToArray(params, 'contrat'))
   contrat?: Contrat[]
 
-  @ApiPropertyOptional({ enum: Duree })
+  @ApiPropertyOptional({ enum: Duree, isArray: true })
   @IsOptional()
   @IsEnum(Duree, { each: true })
   @Transform(params => transformStringToArray(params, 'duree'))
