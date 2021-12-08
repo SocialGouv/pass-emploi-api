@@ -65,6 +65,7 @@ describe('AuthentificationController', () => {
       // When - Then
       const result = await request(app.getHttpServer())
         .put(`/auth/users/${command.idUtilisateurAuth}`)
+        .set({ 'X-API-KEY': 'ceci-est-une-api-key' })
         .send(body)
         .expect(HttpStatus.OK)
 
@@ -95,6 +96,7 @@ describe('AuthentificationController', () => {
       // When - Then
       await request(app.getHttpServer())
         .put(`/auth/users/${command.idUtilisateurAuth}`)
+        .set({ 'X-API-KEY': 'ceci-est-une-api-key' })
         .send(body)
         .expect(HttpStatus.NOT_FOUND)
     })
@@ -118,6 +120,7 @@ describe('AuthentificationController', () => {
       // When - Then
       await request(app.getHttpServer())
         .put(`/auth/users/${command.idUtilisateurAuth}`)
+        .set({ 'X-API-KEY': 'ceci-est-une-api-key' })
         .send(body)
         .expect(HttpStatus.BAD_REQUEST)
     })
@@ -142,8 +145,37 @@ describe('AuthentificationController', () => {
       // When - Then
       await request(app.getHttpServer())
         .put(`/auth/users/${command.idUtilisateurAuth}`)
+        .set({ 'X-API-KEY': 'ceci-est-une-api-key' })
         .send(body)
         .expect(HttpStatus.BAD_REQUEST)
+    })
+
+    describe('est sécurisée', () => {
+      it('retourne 401 API KEY non présente', async () => {
+        // When - Then
+        const result = await request(app.getHttpServer())
+          .put(`/auth/users/fake-id`)
+          .expect(HttpStatus.UNAUTHORIZED)
+
+        expect(result.body).to.deep.equal({
+          statusCode: 401,
+          message: "API KEY non présent dans le header 'X-API-KEY'",
+          error: 'Unauthorized'
+        })
+      })
+      it('retourne 401 API KEY non valide', async () => {
+        // When - Then
+        const result = await request(app.getHttpServer())
+          .put(`/auth/users/fake-id`)
+          .set({ 'X-API-KEY': 'ceci-est-une-api-key-invalide' })
+          .expect(HttpStatus.UNAUTHORIZED)
+
+        expect(result.body).to.deep.equal({
+          statusCode: 401,
+          message: 'API KEY non valide',
+          error: 'Unauthorized'
+        })
+      })
     })
   })
 })
