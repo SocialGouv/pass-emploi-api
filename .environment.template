@@ -7,3 +7,5 @@ POLE_EMPLOI_SCOPE=scope
 
 OIDC_ISSUER_URL=https://pa-auth-staging.osc-secnum-fr1.scalingo.io/auth/realms/pass-emploi
 
+API_KEY_KEYCLOAK=ceci-est-une-api-key
+

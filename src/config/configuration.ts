@@ -2,7 +2,9 @@
 import { parse } from 'pg-connection-string'
 
 export default () => {
-  const databaseUrl = process.env.DATABASE_URL || 'postgresql://passemploi:passemploi@localhost:55432/passemploidb'
+  const databaseUrl =
+    process.env.DATABASE_URL ||
+    'postgresql://passemploi:passemploi@localhost:55432/passemploidb'
   const { host, port, database, user, password } = parse(databaseUrl)
   return {
     port: process.env.PORT ? parseInt(process.env.PORT, 10) : 5000,
@@ -22,8 +24,12 @@ export default () => {
     logLevel: process.env.LOG_LEVEL,
     nodeEnv: process.env.NODE_ENV || 'production',
     poleEmploi: {
-      url: process.env.POLE_EMPLOI_API_BASE_URL ?? 'https://api.emploi-store.fr/partenaire',
-      loginUrl: process.env.POLE_EMPLOI_LOGIN_URL ?? 'https://entreprise.pole-emploi.fr/connexion/oauth2/access_token',
+      url:
+        process.env.POLE_EMPLOI_API_BASE_URL ??
+        'https://api.emploi-store.fr/partenaire',
+      loginUrl:
+        process.env.POLE_EMPLOI_LOGIN_URL ??
+        'https://entreprise.pole-emploi.fr/connexion/oauth2/access_token',
       clientId: process.env.POLE_EMPLOI_CLIENT_ID ?? '',
       clientSecret: process.env.POLE_EMPLOI_CLIENT_SECRET ?? '',
       scope: process.env.POLE_EMPLOI_SCOPE ?? ''
@@ -32,8 +38,11 @@ export default () => {
       environmentPrefix: process.env.FIREBASE_ENVIRONMENT_PREFIX ?? 'staging',
       key: process.env.FIREBASE_SECRET_KEY ?? ''
     },
-    oidc:{
-      issuerUrl: process.env.OIDC_ISSUER_URL ?? '',
+    oidc: {
+      issuerUrl: process.env.OIDC_ISSUER_URL ?? ''
+    },
+    apiKeys: {
+      keycloak: process.env.API_KEY_KEYCLOAK ?? 'ceci-est-une-api-key'
     }
   }
 }

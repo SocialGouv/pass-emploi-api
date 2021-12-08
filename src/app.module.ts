@@ -46,6 +46,7 @@ import { JeunesRepositoryToken } from './domain/jeune'
 import { NotificationRepositoryToken } from './domain/notification'
 import { OffresEmploiRepositoryToken } from './domain/offre-emploi'
 import { RendezVousRepositoryToken } from './domain/rendez-vous'
+import { ApiKeyAuthGuard } from './infrastructure/auth/api-key.auth-guard'
 import { JwtService } from './infrastructure/auth/jwt.service'
 import { OidcAuthGuard } from './infrastructure/auth/oidc.auth-guard'
 import { FirebaseClient } from './infrastructure/clients/firebase-client'
@@ -94,6 +95,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     ...buildQueryCommandsProviders(),
     FirebaseClient,
     OidcAuthGuard,
+    ApiKeyAuthGuard,
     JwtService,
     IdService,
     DateService,
