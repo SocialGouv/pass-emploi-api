@@ -40,6 +40,7 @@
     "class-validator": "0.13.1",
     "firebase-admin": "^10.0.0",
     "luxon": "2.1.1",
+    "openid-client": "^5.1.0",
     "pg": "^8.7.1",
     "pg-connection-string": "^2.5.0",
     "remove-accents": "^0.4.2",

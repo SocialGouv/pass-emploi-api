@@ -29,11 +29,13 @@ import {
 } from '../../building-blocks/types/domain-error'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
+import { Public } from '../decorators/public.decorator'
 import {
   CreateActionPayload,
   CreateJeunePayload
 } from './validation/conseillers.inputs'
 
+@Public()
 @Controller('conseillers/:idConseiller')
 @ApiTags('Conseillers')
 export class ConseillersController {
