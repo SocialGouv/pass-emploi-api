@@ -5,3 +5,5 @@ POLE_EMPLOI_CLIENT_ID=id
 POLE_EMPLOI_CLIENT_SECRET=secret
 POLE_EMPLOI_SCOPE=scope
 
+OIDC_ISSUER_URL=https://pa-auth-staging.osc-secnum-fr1.scalingo.io/auth/realms/pass-emploi
+

@@ -18,8 +18,10 @@ import {
   UtilisateurMiloNonValide
 } from '../../building-blocks/types/domain-error'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
+import { Public } from '../decorators/public.decorator'
 import { UpdateUserPayload } from './validation/authentification.inputs'
 
+@Public()
 @Controller()
 @ApiTags('Authentification')
 export class AuthentificationController {

@@ -20,7 +20,9 @@ import {
   OffreEmploiQueryModel,
   OffresEmploiQueryModel
 } from 'src/application/queries/query-models/offres-emploi.query-models'
+import { Public } from '../decorators/public.decorator'
 
+@Public()
 @Controller('offres-emploi')
 @ApiTags("Offres d'emploi")
 export class OffresEmploiController {

@@ -20,8 +20,10 @@ import {
   isSuccess,
   Result
 } from '../../building-blocks/types/result'
+import { Public } from '../decorators/public.decorator'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
 
+@Public()
 @Controller()
 @ApiTags('Rendez-Vous')
 export class RendezVousController {

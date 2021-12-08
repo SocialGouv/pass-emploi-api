@@ -55,7 +55,9 @@ import {
 import { GetFavorisIdsJeuneQueryHandler } from 'src/application/queries/get-favoris-ids-jeune.query.handler'
 import { GetFavorisJeuneQueryHandler } from 'src/application/queries/get-favoris-jeune.query.handler'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
+import { Public } from '../decorators/public.decorator'
 
+@Public()
 @Controller('jeunes/:idJeune')
 @ApiTags('Jeunes')
 export class JeunesController {

@@ -49,6 +49,7 @@ describe('ReferentielsController', () => {
       // When - Then
       return request(app.getHttpServer())
         .get('/referentiels/communes-et-departements')
+        .set('Authorization', 'Bearer ceci-est-un-jwt')
         .expect(HttpStatus.OK)
         .expect([
           {
