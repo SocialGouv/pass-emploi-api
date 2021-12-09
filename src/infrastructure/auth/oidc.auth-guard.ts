@@ -31,7 +31,7 @@ export class OidcAuthGuard implements CanActivate {
   private async checkJWT(context: ExecutionContext): Promise<boolean> {
     const req: Request = context.switchToHttp().getRequest()
     const authorization = req.header('Authorization')
-    const accessToken = authorization?.replace('Bearer ', '')
+    const accessToken = authorization?.replace(/bearer /gi, '')
     if (!accessToken) {
       throw new UnauthorizedException(
         `Access token non présent dans le header 'Authorization'`
