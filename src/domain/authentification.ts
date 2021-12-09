@@ -41,10 +41,11 @@ export namespace Authentification {
   export class Factory {
     constructor(private readonly idService: IdService) {}
 
-    buildConseillerMilo(
+    buildConseiller(
       nom: string | undefined,
       prenom: string | undefined,
-      email: string | undefined
+      email: string | undefined,
+      structure: Structure
     ): Result<Utilisateur> {
       if (!nom || !prenom || !email) {
         return failure(new UtilisateurMiloNonValide())
@@ -56,7 +57,7 @@ export namespace Authentification {
         nom: nom,
         email: email,
         type: Type.CONSEILLER,
-        structure: Structure.MILO
+        structure: structure
       }
       return success(utilisateur)
     }

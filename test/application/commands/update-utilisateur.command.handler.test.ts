@@ -96,7 +96,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
       })
     })
 
-    describe('conseiller venant du SSO MILO', async () => {
+    describe('conseiller venant du SSO MILO ou Pole Emploi', async () => {
       describe('conseiller connu', async () => {
         it('retourne le conseiller', async () => {
           // Given
@@ -262,7 +262,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
       })
     })
 
-    describe('jeune venant du SSO MILO', async () => {
+    describe('jeune venant du SSO MILO ou Pole Emploi', async () => {
       describe('jeune connu par son sub', async () => {
         it('retourne le jeune', async () => {
           // Given

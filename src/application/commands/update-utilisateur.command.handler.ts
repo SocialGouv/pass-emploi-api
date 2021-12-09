@@ -12,6 +12,7 @@ import {
   AuthentificationRepositoryToken
 } from '../../domain/authentification'
 import { UtilisateurQueryModel } from '../queries/query-models/authentification.query-models'
+import Structure = Authentification.Structure
 
 export interface UpdateUtilisateurCommand extends Command {
   idUtilisateurAuth: string
@@ -42,43 +43,40 @@ export class UpdateUtilisateurCommandHandler {
 
     if (utilisateur) {
       return success(utilisateur)
+    } else if (command.structure === Structure.PASS_EMPLOI) {
+      return failure(
+        new NonTrouveError('Utilisateur', command.idUtilisateurAuth)
+      )
     }
 
-    if (command.structure === Authentification.Structure.MILO) {
-      if (command.type === Authentification.Type.CONSEILLER) {
-        const conseillerMiloResult =
-          this.authentificationFactory.buildConseillerMilo(
-            command.nom,
-            command.prenom,
-            command.email
-          )
+    if (command.type === Authentification.Type.CONSEILLER) {
+      const conseillerSso = this.authentificationFactory.buildConseiller(
+        command.nom,
+        command.prenom,
+        command.email,
+        command.structure
+      )
 
-        if (isFailure(conseillerMiloResult)) {
-          return conseillerMiloResult
-        }
+      if (isFailure(conseillerSso)) {
+        return conseillerSso
+      }
 
-        await this.authentificationRepository.save(
-          conseillerMiloResult.data,
+      await this.authentificationRepository.save(
+        conseillerSso.data,
+        command.idUtilisateurAuth
+      )
+      return conseillerSso
+    } else if (command.type === Authentification.Type.JEUNE && command.email) {
+      const jeuneMilo =
+        await this.authentificationRepository.getJeuneMiloByEmail(command.email)
+
+      if (jeuneMilo) {
+        await this.authentificationRepository.updateJeuneMilo(
+          jeuneMilo.id,
           command.idUtilisateurAuth
         )
-        return conseillerMiloResult
-      } else if (
-        command.type === Authentification.Type.JEUNE &&
-        command.email
-      ) {
-        const jeuneMilo =
-          await this.authentificationRepository.getJeuneMiloByEmail(
-            command.email
-          )
 
-        if (jeuneMilo) {
-          await this.authentificationRepository.updateJeuneMilo(
-            jeuneMilo.id,
-            command.idUtilisateurAuth
-          )
-
-          return success(jeuneMilo)
-        }
+        return success(jeuneMilo)
       }
     }
 
