@@ -9,10 +9,10 @@ import {
   NotFoundException,
   Param,
   ParseUUIDPipe,
-  Patch,
   Put
 } from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Authentification } from 'src/domain/authentification'
 import { DeleteActionCommandHandler } from '../../application/commands/delete-action.command.handler'
 import {
   UpdateStatutActionCommand,
@@ -26,6 +26,7 @@ import { ActionQueryModel } from '../../application/queries/query-models/actions
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { isFailure } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
+import { Utilisateur } from '../decorators/authenticated.decorator'
 import { UpdateStatutActionPayload } from './validation/actions.inputs'
 
 @Controller('actions')
@@ -43,10 +44,14 @@ export class ActionsController {
     type: ActionQueryModel
   })
   async getDetailAction(
-    @Param('idAction', new ParseUUIDPipe()) idAction: string
+    @Param('idAction', new ParseUUIDPipe()) idAction: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<ActionQueryModel> {
     const query: GetDetailActionQuery = { idAction }
-    const queryModel = await this.getDetailActionQueryHandler.execute(query)
+    const queryModel = await this.getDetailActionQueryHandler.execute(
+      query,
+      utilisateur
+    )
     if (queryModel) {
       return queryModel
     }
@@ -60,35 +65,8 @@ export class ActionsController {
   @Put(':idAction')
   async updateStatutAction(
     @Param('idAction', new ParseUUIDPipe()) idAction: string,
-    @Body() updateStatutActionPayload: UpdateStatutActionPayload
-  ): Promise<void> {
-    await this.mettreAJourStatutAction(idAction, updateStatutActionPayload)
-  }
-
-  @Patch(':idAction')
-  async patchStatutAction(
-    @Param('idAction', new ParseUUIDPipe()) idAction: string,
-    @Body() updateStatutActionPayload: UpdateStatutActionPayload
-  ): Promise<void> {
-    await this.mettreAJourStatutAction(idAction, updateStatutActionPayload)
-  }
-
-  @Delete(':idAction')
-  @HttpCode(204)
-  async deleteAction(
-    @Param('idAction', new ParseUUIDPipe()) idAction: string
-  ): Promise<void> {
-    const result = await this.deleteActionCommandHandler.execute({
-      idAction
-    })
-    if (isFailure(result)) {
-      throw new NotFoundException(result.error)
-    }
-  }
-
-  private async mettreAJourStatutAction(
-    idAction: string,
-    updateStatutActionPayload: UpdateStatutActionPayload
+    @Body() updateStatutActionPayload: UpdateStatutActionPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const command: UpdateStatutActionCommand = {
       idAction,
@@ -97,7 +75,10 @@ export class ActionsController {
         : undefined,
       estTerminee: updateStatutActionPayload.isDone
     }
-    const result = await this.updateStatutActionCommandHandler.execute(command)
+    const result = await this.updateStatutActionCommandHandler.execute(
+      command,
+      utilisateur
+    )
 
     if (isFailure(result)) {
       if (result.error.code === NonTrouveError.CODE) {
@@ -107,6 +88,23 @@ export class ActionsController {
         )
       }
       throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  @Delete(':idAction')
+  @HttpCode(204)
+  async deleteAction(
+    @Param('idAction', new ParseUUIDPipe()) idAction: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.deleteActionCommandHandler.execute(
+      {
+        idAction
+      },
+      utilisateur
+    )
+    if (isFailure(result)) {
+      throw new NotFoundException(result.error)
     }
   }
 }

@@ -3,6 +3,12 @@ import { Module, ModuleMetadata, Provider } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
 import { TerminusModule } from '@nestjs/terminus'
+import { ActionAuthorizer } from './application/authorizers/authorize-action'
+import { ConseillerAuthorizer } from './application/authorizers/authorize-conseiller'
+import { ConseillerForJeuneAuthorizer } from './application/authorizers/authorize-conseiller-for-jeune'
+import { FavoriAuthorizer } from './application/authorizers/authorize-favori'
+import { JeuneAuthorizer } from './application/authorizers/authorize-jeune'
+import { RendezVousAuthorizer } from './application/authorizers/authorize-rendezvous'
 import { AddFavoriOffreEmploiCommandHandler } from './application/commands/add-favori-offre-emploi.command.handler'
 import { CreateActionCommandHandler } from './application/commands/create-action.command.handler'
 import { CreateJeuneCommandHandler } from './application/commands/create-jeune.command.handler'
@@ -10,7 +16,6 @@ import { CreateRendezVousCommandHandler } from './application/commands/create-re
 import { DeleteActionCommandHandler } from './application/commands/delete-action.command.handler'
 import { DeleteFavoriOffreEmploiCommandHandler } from './application/commands/delete-favori-offre-emploi.command.handler'
 import { DeleteRendezVousCommandHandler } from './application/commands/delete-rendez-vous.command.handler'
-import { LoginJeuneCommandHandler } from './application/commands/login-jeune.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from './application/commands/send-notification-nouveau-message.command.handler'
 import { UpdateNotificationTokenCommandHandler } from './application/commands/update-notification-token.command.handler'
 import { UpdateStatutActionCommandHandler } from './application/commands/update-statut-action.command.handler'
@@ -141,6 +146,12 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
 
 export function buildQueryCommandsProviders(): Provider[] {
   return [
+    ActionAuthorizer,
+    ConseillerAuthorizer,
+    FavoriAuthorizer,
+    JeuneAuthorizer,
+    ConseillerForJeuneAuthorizer,
+    RendezVousAuthorizer,
     GetDetailActionQueryHandler,
     GetDetailJeuneQueryHandler,
     GetActionsByJeuneQueryHandler,
@@ -156,7 +167,6 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDetailConseillerQueryHandler,
     GetJeunesByConseillerQueryHandler,
     GetResumeActionsDesJeunesDuConseillerQueryHandler,
-    LoginJeuneCommandHandler,
     UpdateNotificationTokenCommandHandler,
     UpdateStatutActionCommandHandler,
     CreateRendezVousCommandHandler,

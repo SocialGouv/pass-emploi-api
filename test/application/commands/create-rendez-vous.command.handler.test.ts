@@ -1,8 +1,11 @@
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import {
   createSandbox,
   DatabaseForTesting,
   expect,
-  StubbedClass
+  StubbedClass,
+  stubClass
 } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
@@ -27,10 +30,12 @@ describe('CreateRendezVousCommandHandler', () => {
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let notificationRepository: StubbedType<Notification.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
+  const conseillerAuthorizer = stubClass(ConseillerAuthorizer)
   let idService: StubbedClass<IdService>
   let createRendezVousCommandHandler: CreateRendezVousCommandHandler
   const jeune = unJeune()
   const rendezVous = unRendezVous(jeune)
+
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
     rendezVousRepository = stubInterface(sandbox)
@@ -41,10 +46,12 @@ describe('CreateRendezVousCommandHandler', () => {
       idService,
       rendezVousRepository,
       jeuneRepository,
-      notificationRepository
+      notificationRepository,
+      conseillerAuthorizer
     )
   })
-  describe('execute', () => {
+
+  describe('handle', () => {
     describe('quand le jeune n"existe pas', () => {
       it('renvoie une failure', async () => {
         // Given
@@ -59,7 +66,7 @@ describe('CreateRendezVousCommandHandler', () => {
         }
 
         // When
-        const result = await createRendezVousCommandHandler.execute(command)
+        const result = await createRendezVousCommandHandler.handle(command)
         // Then
         expect(rendezVousRepository.add).not.to.have.been.calledWith(
           rendezVous.id
@@ -89,7 +96,7 @@ describe('CreateRendezVousCommandHandler', () => {
         }
 
         // When
-        const result = await createRendezVousCommandHandler.execute(command)
+        const result = await createRendezVousCommandHandler.handle(command)
         // Then
         expect(rendezVousRepository.add).not.to.have.been.calledWith(
           rendezVous.id
@@ -129,7 +136,7 @@ describe('CreateRendezVousCommandHandler', () => {
             idService
           )
           // When
-          const result = await createRendezVousCommandHandler.execute(command)
+          const result = await createRendezVousCommandHandler.handle(command)
           // Then
           expect(result).to.deep.equal(success(expectedRendezvous.id))
           expect(rendezVousRepository.add).to.have.been.calledWith(
@@ -162,7 +169,7 @@ describe('CreateRendezVousCommandHandler', () => {
             idService
           )
           // When
-          const result = await createRendezVousCommandHandler.execute(command)
+          const result = await createRendezVousCommandHandler.handle(command)
           // Then
           expect(result).to.deep.equal(success(expectedRendezvous.id))
           expect(rendezVousRepository.add).to.have.been.calledWith(
@@ -176,6 +183,32 @@ describe('CreateRendezVousCommandHandler', () => {
           )
         })
       })
+    })
+  })
+
+  describe('authorize', () => {
+    it('authorise un conseiller', async () => {
+      // Given
+      const command: CreateRendezVousCommand = {
+        idJeune: jeune.id,
+        idConseiller: jeune.conseiller.id,
+        commentaire: rendezVous.commentaire,
+        date: rendezVous.date.toDateString(),
+        duree: rendezVous.duree,
+        modalite: 'tel'
+      }
+
+      const utilisateur = unUtilisateurConseiller()
+
+      // When
+      await createRendezVousCommandHandler.authorize(command, utilisateur)
+
+      // Then
+      expect(conseillerAuthorizer.authorize).to.have.been.calledWithExactly(
+        command.idConseiller,
+        utilisateur,
+        command.idJeune
+      )
     })
   })
 })

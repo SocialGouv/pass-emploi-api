@@ -24,7 +24,10 @@ import {
 import { Action } from '../../../src/domain/action'
 import { CreateActionAvecStatutPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
 import { AddFavoriPayload } from '../../../src/infrastructure/routes/validation/jeunes.inputs'
-import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
+import {
+  unHeaderAuthorization,
+  unUtilisateurDecode
+} from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
 import {
@@ -99,7 +102,8 @@ describe('JeunesController', () => {
           typeCreateur: Action.TypeCreateur.JEUNE,
           statut: Action.Statut.EN_COURS,
           commentaire: 'Ceci est un commentaire'
-        }
+        },
+        unUtilisateurDecode()
       )
     })
 
@@ -167,7 +171,7 @@ describe('JeunesController', () => {
         .expect(HttpStatus.CREATED)
       expect(
         addFavoriOffreEmploiCommandHandler.execute
-      ).to.have.been.calledWith(command)
+      ).to.have.been.calledWithExactly(command, unUtilisateurDecode())
     })
     it('renvoie une 404 (Not Found) quand le jeune n"existe pas', async () => {
       // Given
@@ -226,7 +230,7 @@ describe('JeunesController', () => {
         .expect(HttpStatus.NO_CONTENT)
       expect(
         deleteFavoriOffreEmploiCommandHandler.execute
-      ).to.have.be.calledWith(command)
+      ).to.have.be.calledWithExactly(command, unUtilisateurDecode())
     })
     it('renvoie une 404(NOT FOUND) si le favori n"existe pas', async () => {
       //Given
@@ -290,9 +294,12 @@ describe('JeunesController', () => {
         // Then
         .expect(HttpStatus.OK)
         .expect(detailJeuneQueryModel)
-      expect(getDetailJeuneQueryHandler.execute).to.have.been.calledWith({
-        idJeune
-      })
+      expect(getDetailJeuneQueryHandler.execute).to.have.been.calledWithExactly(
+        {
+          idJeune
+        },
+        unUtilisateurDecode()
+      )
     })
     it('renvoit une 404 quand le jeune n"existe pas', async () => {
       // Given
@@ -307,9 +314,12 @@ describe('JeunesController', () => {
         .set('authorization', unHeaderAuthorization())
         // Then
         .expect(expectedResponseJson)
-      expect(getDetailJeuneQueryHandler.execute).to.have.been.calledWith({
-        idJeune
-      })
+      expect(getDetailJeuneQueryHandler.execute).to.have.been.calledWithExactly(
+        {
+          idJeune
+        },
+        unUtilisateurDecode()
+      )
     })
     ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1')
   })

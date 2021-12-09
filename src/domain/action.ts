@@ -38,7 +38,6 @@ export class Action implements ActionData {
   readonly commentaire: string
   readonly dateCreation: Date
   readonly dateDerniereActualisation: Date
-  readonly idConseiller: Conseiller.Id
   readonly idJeune: Jeune.Id
   readonly idCreateur: Action.IdCreateur
   readonly typeCreateur: Action.TypeCreateur
@@ -87,6 +86,9 @@ export namespace Action {
   export interface Repository {
     save(action: Action): Promise<void>
     get(id: Action.Id): Promise<Action | undefined>
+    getConseillerEtJeune(
+      id: Action.Id
+    ): Promise<{ idConseiller: string; idJeune: string } | undefined>
     delete(id: Action.Id): Promise<void>
 
     getQueryModelById(id: string): Promise<ActionQueryModel | undefined>

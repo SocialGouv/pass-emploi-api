@@ -18,7 +18,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       //Given
       await DepartementSqlModel.create(unDepartementDto())
       //When
-      const result = await getCommunesEtDepartementsQueryHandler.execute({
+      const result = await getCommunesEtDepartementsQueryHandler.handle({
         recherche: 'improbable'
       })
       //Then
@@ -29,7 +29,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       const departement = unDepartementDto()
       await DepartementSqlModel.create(departement)
       //When
-      const result = await getCommunesEtDepartementsQueryHandler.execute({
+      const result = await getCommunesEtDepartementsQueryHandler.handle({
         recherche: 'abcd'
       })
       //Then

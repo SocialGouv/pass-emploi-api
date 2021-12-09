@@ -1,16 +1,15 @@
 import { Injectable } from '@nestjs/common'
 import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
 import { Conseiller } from '../../domain/conseiller'
-import { NotFound } from '../../domain/erreur'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { fromSqlToDetailConseillerQueryModel } from './mappers/conseillers.mappers'
 
 @Injectable()
 export class ConseillerSqlRepository implements Conseiller.Repository {
-  async get(id: string): Promise<Conseiller> {
+  async get(id: string): Promise<Conseiller | undefined> {
     const conseillerSqlModel = await ConseillerSqlModel.findByPk(id)
     if (!conseillerSqlModel) {
-      throw new NotFound(id, 'Conseiller')
+      return undefined
     }
     return {
       id: conseillerSqlModel.id,

@@ -9,11 +9,14 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { Action, ActionsRepositoryToken } from '../../domain/action'
+import { Authentification } from '../../domain/authentification'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import {
   Notification,
   NotificationRepositoryToken
 } from '../../domain/notification'
+import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 
 export interface CreateActionCommand extends Command {
   idJeune: Jeune.Id
@@ -25,9 +28,10 @@ export interface CreateActionCommand extends Command {
 }
 
 @Injectable()
-export class CreateActionCommandHandler
-  implements CommandHandler<CreateActionCommand, Result<string>>
-{
+export class CreateActionCommandHandler extends CommandHandler<
+  CreateActionCommand,
+  Result<string>
+> {
   private logger
 
   constructor(
@@ -37,12 +41,15 @@ export class CreateActionCommandHandler
     private readonly jeuneRepository: Jeune.Repository,
     @Inject(NotificationRepositoryToken)
     private readonly notificationRepository: Notification.Repository,
-    private readonly actionFactory: Action.Factory
+    private readonly actionFactory: Action.Factory,
+    private readonly jeuneAuthorizer: JeuneAuthorizer,
+    private readonly conseillerAuthorizer: ConseillerAuthorizer
   ) {
+    super()
     this.logger = new Logger('CreateActionCommandHandler')
   }
 
-  async execute(command: CreateActionCommand): Promise<Result<string>> {
+  async handle(command: CreateActionCommand): Promise<Result<string>> {
     const jeune = await this.jeuneRepository.get(command.idJeune)
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', command.idJeune))
@@ -62,6 +69,21 @@ export class CreateActionCommandHandler
     }
 
     return success(action.id)
+  }
+
+  async authorize(
+    command: CreateActionCommand,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    if (utilisateur.type === Authentification.Type.JEUNE) {
+      await this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
+    } else {
+      await this.conseillerAuthorizer.authorize(
+        command.idCreateur,
+        utilisateur,
+        command.idJeune
+      )
+    }
   }
 
   private buildAction(command: CreateActionCommand): Result<Action> {

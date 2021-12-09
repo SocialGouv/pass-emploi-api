@@ -6,6 +6,7 @@ import {
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import {
   Notification,
@@ -13,6 +14,7 @@ import {
 } from '../../domain/notification'
 import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
 import { IdService } from '../../utils/id-service'
+import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 
 export interface CreateRendezVousCommand extends Command {
   idJeune: string
@@ -24,19 +26,23 @@ export interface CreateRendezVousCommand extends Command {
 }
 
 @Injectable()
-export class CreateRendezVousCommandHandler
-  implements CommandHandler<CreateRendezVousCommand, Result<string>>
-{
+export class CreateRendezVousCommandHandler extends CommandHandler<
+  CreateRendezVousCommand,
+  Result<string>
+> {
   constructor(
     private idService: IdService,
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
     @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository
-  ) {}
+    private notificationRepository: Notification.Repository,
+    private conseillerAuthorizer: ConseillerAuthorizer
+  ) {
+    super()
+  }
 
-  async execute(command: CreateRendezVousCommand): Promise<Result<string>> {
+  async handle(command: CreateRendezVousCommand): Promise<Result<string>> {
     const jeune = await this.jeuneRepository.get(command.idJeune)
 
     if (!jeune) {
@@ -65,5 +71,16 @@ export class CreateRendezVousCommandHandler
     }
 
     return success(rendezVous.id)
+  }
+
+  async authorize(
+    command: CreateRendezVousCommand,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    await this.conseillerAuthorizer.authorize(
+      command.idConseiller,
+      utilisateur,
+      command.idJeune
+    )
   }
 }

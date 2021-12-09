@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
+import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import {
   emptySuccess,
@@ -8,6 +9,8 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Action, ActionsRepositoryToken } from '../../domain/action'
+import { Authentification } from '../../domain/authentification'
+import { ActionAuthorizer } from '../authorizers/authorize-action'
 
 export interface UpdateStatutActionCommand extends Command {
   idAction: Action.Id
@@ -16,13 +19,19 @@ export interface UpdateStatutActionCommand extends Command {
 }
 
 @Injectable()
-export class UpdateStatutActionCommandHandler {
+export class UpdateStatutActionCommandHandler extends CommandHandler<
+  UpdateStatutActionCommand,
+  Result
+> {
   constructor(
     @Inject(ActionsRepositoryToken)
-    private readonly actionRepository: Action.Repository
-  ) {}
+    private readonly actionRepository: Action.Repository,
+    private actionAuthorizer: ActionAuthorizer
+  ) {
+    super()
+  }
 
-  async execute(command: UpdateStatutActionCommand): Promise<Result> {
+  async handle(command: UpdateStatutActionCommand): Promise<Result> {
     const action = await this.actionRepository.get(command.idAction)
     if (!action) {
       return failure(new NonTrouveError('Action', command.idAction))
@@ -36,5 +45,12 @@ export class UpdateStatutActionCommandHandler {
 
     await this.actionRepository.save(action)
     return emptySuccess()
+  }
+
+  async authorize(
+    command: UpdateStatutActionCommand,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    await this.actionAuthorizer.authorize(command.idAction, utilisateur)
   }
 }

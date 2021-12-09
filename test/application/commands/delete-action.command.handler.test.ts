@@ -1,6 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { describe } from 'mocha'
 import { SinonSandbox } from 'sinon'
+import { ActionAuthorizer } from '../../../src/application/authorizers/authorize-action'
 import {
   DeleteActionCommand,
   DeleteActionCommandHandler
@@ -12,22 +13,28 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action'
 import { uneAction } from '../../fixtures/action.fixture'
-import { createSandbox, expect } from '../../utils'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('DeleteActionCommandHandler', () => {
-  describe('execute', () => {
-    let action: Action
-    let actionRepository: StubbedType<Action.Repository>
+  let action: Action
+  let actionRepository: StubbedType<Action.Repository>
+  let actionAuthorizer: StubbedClass<ActionAuthorizer>
+  let deleteActionCommandHandler: DeleteActionCommandHandler
 
-    let deleteActionCommandHandler: DeleteActionCommandHandler
-    beforeEach(async () => {
-      action = uneAction()
-      const sandbox: SinonSandbox = createSandbox()
-      actionRepository = stubInterface(sandbox)
-      deleteActionCommandHandler = new DeleteActionCommandHandler(
-        actionRepository
-      )
-    })
+  beforeEach(async () => {
+    action = uneAction()
+    const sandbox: SinonSandbox = createSandbox()
+    actionRepository = stubInterface(sandbox)
+    actionAuthorizer = stubClass(ActionAuthorizer)
+
+    deleteActionCommandHandler = new DeleteActionCommandHandler(
+      actionRepository,
+      actionAuthorizer
+    )
+  })
+
+  describe('handle', () => {
     describe("Quand l'action existe", () => {
       it("supprime l'action", async () => {
         // Given
@@ -37,7 +44,7 @@ describe('DeleteActionCommandHandler', () => {
         }
 
         // When
-        const result = await deleteActionCommandHandler.execute(command)
+        const result = await deleteActionCommandHandler.handle(command)
 
         // Then
         expect(result).to.deep.equal(emptySuccess())
@@ -53,7 +60,7 @@ describe('DeleteActionCommandHandler', () => {
         }
 
         // When
-        const result = await deleteActionCommandHandler.execute(command)
+        const result = await deleteActionCommandHandler.handle(command)
 
         // Then
         expect(result).to.deep.equal(
@@ -61,6 +68,26 @@ describe('DeleteActionCommandHandler', () => {
         )
         expect(actionRepository.delete).not.to.have.been.calledWith(action.id)
       })
+    })
+  })
+
+  describe('authorize', () => {
+    it('authorise un jeune ou conseiller sur une action', async () => {
+      // Given
+      const command: DeleteActionCommand = {
+        idAction: action.id
+      }
+
+      const utilisateur = unUtilisateurConseiller()
+
+      // When
+      await deleteActionCommandHandler.authorize(command, utilisateur)
+
+      // Then
+      expect(actionAuthorizer.authorize).to.have.been.calledWithExactly(
+        command.idAction,
+        utilisateur
+      )
     })
   })
 })

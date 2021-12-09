@@ -10,11 +10,13 @@ import {
   failure,
   Result
 } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import {
   Notification,
   NotificationRepositoryToken
 } from '../../domain/notification'
+import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 
 export interface SendNotificationNouveauMessageCommand extends Command {
   idJeune: string
@@ -22,21 +24,24 @@ export interface SendNotificationNouveauMessageCommand extends Command {
 }
 
 @Injectable()
-export class SendNotificationNouveauMessageCommandHandler
-  implements CommandHandler<SendNotificationNouveauMessageCommand, Result>
-{
+export class SendNotificationNouveauMessageCommandHandler extends CommandHandler<
+  SendNotificationNouveauMessageCommand,
+  Result
+> {
   private logger
 
   constructor(
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository
+    private notificationRepository: Notification.Repository,
+    private conseillerAuthorizer: ConseillerAuthorizer
   ) {
+    super()
     this.logger = new Logger('SendNotificationNouveauMessageCommandHandler')
   }
 
-  async execute(
+  async handle(
     command: SendNotificationNouveauMessageCommand
   ): Promise<Result> {
     const jeune = await this.jeuneRepository.get(command.idJeune)
@@ -59,5 +64,16 @@ export class SendNotificationNouveauMessageCommandHandler
       this.logger.log('Notification envoyée')
     }
     return emptySuccess()
+  }
+
+  async authorize(
+    command: SendNotificationNouveauMessageCommand,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    await this.conseillerAuthorizer.authorize(
+      command.idConseiller,
+      utilisateur,
+      command.idJeune
+    )
   }
 }
