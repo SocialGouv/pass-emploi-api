@@ -15,16 +15,32 @@ import {
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler'
+import { GetFavorisIdsJeuneQueryHandler } from 'src/application/queries/get-favoris-ids-jeune.query.handler'
+import { GetFavorisJeuneQueryHandler } from 'src/application/queries/get-favoris-jeune.query.handler'
+import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
+import {
+  FavoriIdQueryModel,
+  OffreEmploiResumeQueryModel
+} from 'src/application/queries/query-models/offres-emploi.query-models'
+import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
+import {
+  AddFavoriOffreEmploiCommand,
+  AddFavoriOffreEmploiCommandHandler
+} from '../../application/commands/add-favori-offre-emploi.command.handler'
 import {
   CreateActionCommand,
   CreateActionCommandHandler
 } from '../../application/commands/create-action.command.handler'
+import {
+  DeleteFavoriOffreEmploiCommand,
+  DeleteFavoriOffreEmploiCommandHandler
+} from '../../application/commands/delete-favori-offre-emploi.command.handler'
 import { LoginJeuneCommandHandler } from '../../application/commands/login-jeune.command.handler'
 import { UpdateNotificationTokenCommandHandler } from '../../application/commands/update-notification-token.command.handler'
 import { GetActionsByJeuneQueryHandler } from '../../application/queries/get-actions-by-jeune.query.handler'
-import { GetAllRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler'
 import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
+import { GetAllRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler'
 import { ActionQueryModel } from '../../application/queries/query-models/actions.query-model'
 import {
   FavoriExisteDejaError,
@@ -38,26 +54,8 @@ import {
   GetFavorisQuery,
   PutNotificationTokenInput
 } from './validation/jeunes.inputs'
-import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
-import {
-  AddFavoriOffreEmploiCommand,
-  AddFavoriOffreEmploiCommandHandler
-} from '../../application/commands/add-favori-offre-emploi.command.handler'
 import StatutInvalide = Action.StatutInvalide
-import {
-  DeleteFavoriOffreEmploiCommand,
-  DeleteFavoriOffreEmploiCommandHandler
-} from '../../application/commands/delete-favori-offre-emploi.command.handler'
-import {
-  FavoriIdQueryModel,
-  OffreEmploiResumeQueryModel
-} from 'src/application/queries/query-models/offres-emploi.query-models'
-import { GetFavorisIdsJeuneQueryHandler } from 'src/application/queries/get-favoris-ids-jeune.query.handler'
-import { GetFavorisJeuneQueryHandler } from 'src/application/queries/get-favoris-jeune.query.handler'
-import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
-import { Public } from '../decorators/public.decorator'
 
-@Public()
 @Controller('jeunes/:idJeune')
 @ApiTags('Jeunes')
 export class JeunesController {

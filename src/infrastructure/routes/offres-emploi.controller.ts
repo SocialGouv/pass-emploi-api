@@ -1,28 +1,26 @@
 import {
   Controller,
   Get,
-  Query,
-  Param,
+  HttpException,
   HttpStatus,
-  HttpException
+  Param,
+  Query
 } from '@nestjs/common'
 import { ApiResponse, ApiTags } from '@nestjs/swagger'
-import {
-  GetOffresEmploiQuery,
-  GetOffresEmploiQueryHandler
-} from '../../application/queries/get-offres-emploi.query.handler'
-import {
-  GetDetailOffreEmploiQuery,
-  GetDetailOffreEmploiQueryHandler
-} from '../../application/queries/get-detail-offre-emploi.query.handler'
-import { FindOffresEmploiQuery } from './validation/offres-emploi.inputs'
 import {
   OffreEmploiQueryModel,
   OffresEmploiQueryModel
 } from 'src/application/queries/query-models/offres-emploi.query-models'
-import { Public } from '../decorators/public.decorator'
+import {
+  GetDetailOffreEmploiQuery,
+  GetDetailOffreEmploiQueryHandler
+} from '../../application/queries/get-detail-offre-emploi.query.handler'
+import {
+  GetOffresEmploiQuery,
+  GetOffresEmploiQueryHandler
+} from '../../application/queries/get-offres-emploi.query.handler'
+import { FindOffresEmploiQuery } from './validation/offres-emploi.inputs'
 
-@Public()
 @Controller('offres-emploi')
 @ApiTags("Offres d'emploi")
 export class OffresEmploiController {

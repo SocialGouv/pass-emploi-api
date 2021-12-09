@@ -26,10 +26,8 @@ import { ActionQueryModel } from '../../application/queries/query-models/actions
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { isFailure } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
-import { Public } from '../decorators/public.decorator'
 import { UpdateStatutActionPayload } from './validation/actions.inputs'
 
-@Public()
 @Controller('actions')
 @ApiTags('Actions')
 export class ActionsController {
