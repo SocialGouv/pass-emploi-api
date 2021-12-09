@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -10,6 +11,7 @@ import {
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { CreateRendezVousCommandHandler } from 'src/application/commands/create-rendez-vous.command.handler'
 import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler'
 import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler'
 import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
@@ -27,12 +29,17 @@ import {
   JeuneNonLieAuConseillerError,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
-import { isFailure, isSuccess } from '../../building-blocks/types/result'
+import {
+  isFailure,
+  isSuccess,
+  Result
+} from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
 import {
   CreateActionPayload,
   CreateJeunePayload
 } from './validation/conseillers.inputs'
+import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
 
 @Controller('conseillers/:idConseiller')
 @ApiTags('Conseillers')
@@ -44,7 +51,8 @@ export class ConseillersController {
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly createJeuneCommandHandler: CreateJeuneCommandHandler,
     private readonly sendNotificationNouveauMessage: SendNotificationNouveauMessageCommandHandler,
-    private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler
+    private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler,
+    private createRendezVousCommandHandler: CreateRendezVousCommandHandler
   ) {}
 
   @Get('')
@@ -163,5 +171,35 @@ export class ConseillersController {
         throw new RuntimeException()
       }
     }
+  }
+
+  @Post('rendezvous')
+  async createRendezVous(
+    @Param('idConseiller') idConseiller: string,
+    @Body() createRendezVousPayload: CreateRendezVousPayload
+  ): Promise<{ id: string }> {
+    const result: Result<string> =
+      await this.createRendezVousCommandHandler.execute({
+        idJeune: createRendezVousPayload.jeuneId,
+        commentaire: createRendezVousPayload.comment,
+        date: createRendezVousPayload.date,
+        duree: createRendezVousPayload.duration,
+        idConseiller: idConseiller,
+        modalite: createRendezVousPayload.modality
+      })
+
+    if (isFailure(result)) {
+      switch (result.error.code) {
+        case JeuneNonLieAuConseillerError.CODE:
+          throw new BadRequestException(result.error)
+        case NonTrouveError.CODE:
+          throw new NotFoundException(result.error)
+      }
+    }
+
+    if (isSuccess(result)) {
+      return { id: result.data }
+    }
+    throw new RuntimeException()
   }
 }
