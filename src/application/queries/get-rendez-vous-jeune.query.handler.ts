@@ -9,15 +9,22 @@ export interface GetAllRendezVousJeune extends Query {
 }
 
 @Injectable()
-export class GetAllRendezVousJeuneQueryHandler
-  implements QueryHandler<GetAllRendezVousJeune, RendezVousQueryModel[]>
-{
+export class GetAllRendezVousJeuneQueryHandler extends QueryHandler<
+  GetAllRendezVousJeune,
+  RendezVousQueryModel[]
+> {
   constructor(
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository
-  ) {}
+  ) {
+    super()
+  }
 
-  async execute(query: GetAllRendezVousJeune): Promise<RendezVousQueryModel[]> {
+  async handle(query: GetAllRendezVousJeune): Promise<RendezVousQueryModel[]> {
     return this.rendezVousRepository.getAllQueryModelsByJeune(query.idJeune)
+  }
+  async authorize(query: GetAllRendezVousJeune): Promise<void> {
+    if (query) {
+    }
   }
 }

@@ -9,14 +9,21 @@ export interface GetHomeJeune extends Query {
 }
 
 @Injectable()
-export class GetHomeJeuneHandler
-  implements QueryHandler<GetHomeJeune, JeuneHomeQueryModel>
-{
+export class GetHomeJeuneHandler extends QueryHandler<
+  GetHomeJeune,
+  JeuneHomeQueryModel
+> {
   constructor(
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository
-  ) {}
+  ) {
+    super()
+  }
 
-  async execute(query: GetHomeJeune): Promise<JeuneHomeQueryModel> {
+  async handle(query: GetHomeJeune): Promise<JeuneHomeQueryModel> {
     return this.jeuneRepository.getHomeQueryModel(query.idJeune)
+  }
+  async authorize(query: GetHomeJeune): Promise<void> {
+    if (query) {
+    }
   }
 }

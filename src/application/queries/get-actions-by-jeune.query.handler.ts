@@ -9,15 +9,22 @@ export interface GetActionsByJeuneQuery extends Query {
 }
 
 @Injectable()
-export class GetActionsByJeuneQueryHandler
-  implements QueryHandler<GetActionsByJeuneQuery, ActionQueryModel[]>
-{
+export class GetActionsByJeuneQueryHandler extends QueryHandler<
+  GetActionsByJeuneQuery,
+  ActionQueryModel[]
+> {
   constructor(
     @Inject(ActionsRepositoryToken)
     private actionRepository: Action.Repository
-  ) {}
+  ) {
+    super()
+  }
 
-  async execute(query: GetActionsByJeuneQuery): Promise<ActionQueryModel[]> {
+  async handle(query: GetActionsByJeuneQuery): Promise<ActionQueryModel[]> {
     return this.actionRepository.getQueryModelByJeuneId(query.idJeune)
+  }
+  async authorize(query: GetActionsByJeuneQuery): Promise<void> {
+    if (query) {
+    }
   }
 }

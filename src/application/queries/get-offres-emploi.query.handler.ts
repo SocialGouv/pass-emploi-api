@@ -26,15 +26,18 @@ export interface GetOffresEmploiQuery extends Query {
 }
 
 @Injectable()
-export class GetOffresEmploiQueryHandler
-  implements QueryHandler<GetOffresEmploiQuery, OffresEmploiQueryModel>
-{
+export class GetOffresEmploiQueryHandler extends QueryHandler<
+  GetOffresEmploiQuery,
+  OffresEmploiQueryModel
+> {
   constructor(
     @Inject(OffresEmploiRepositoryToken)
     private offresEmploiRepository: OffresEmploi.Repository
-  ) {}
+  ) {
+    super()
+  }
 
-  async execute(query: GetOffresEmploiQuery): Promise<OffresEmploiQueryModel> {
+  async handle(query: GetOffresEmploiQuery): Promise<OffresEmploiQueryModel> {
     return this.offresEmploiRepository.findAll(
       query.page || DEFAULT_PAGE,
       query.limit || DEFAULT_LIMIT,
@@ -46,5 +49,9 @@ export class GetOffresEmploiQueryHandler
       query.contrat,
       query.rayon
     )
+  }
+  async authorize(query: GetOffresEmploiQuery): Promise<void> {
+    if (query) {
+    }
   }
 }

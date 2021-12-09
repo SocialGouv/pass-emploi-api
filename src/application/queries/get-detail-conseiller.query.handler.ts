@@ -9,21 +9,24 @@ export interface GetDetailConseillerQuery extends Query {
 }
 
 @Injectable()
-export class GetDetailConseillerQueryHandler
-  implements
-    QueryHandler<
-      GetDetailConseillerQuery,
-      DetailConseillerQueryModel | undefined
-    >
-{
+export class GetDetailConseillerQueryHandler extends QueryHandler<
+  GetDetailConseillerQuery,
+  DetailConseillerQueryModel | undefined
+> {
   constructor(
     @Inject(ConseillersRepositoryToken)
     private readonly conseillersRepository: Conseiller.Repository
-  ) {}
+  ) {
+    super()
+  }
 
-  execute(
+  handle(
     query: GetDetailConseillerQuery
   ): Promise<DetailConseillerQueryModel | undefined> {
     return this.conseillersRepository.getQueryModelById(query.idConseiller)
+  }
+  async authorize(query: GetDetailConseillerQuery): Promise<void> {
+    if (query) {
+    }
   }
 }

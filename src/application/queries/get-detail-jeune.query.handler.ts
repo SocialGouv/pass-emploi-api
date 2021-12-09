@@ -9,18 +9,24 @@ export interface GetDetailJeuneQuery extends Query {
 }
 
 @Injectable()
-export class GetDetailJeuneQueryHandler
-  implements
-    QueryHandler<GetDetailJeuneQuery, DetailJeuneQueryModel | undefined>
-{
+export class GetDetailJeuneQueryHandler extends QueryHandler<
+  GetDetailJeuneQuery,
+  DetailJeuneQueryModel | undefined
+> {
   constructor(
     @Inject(JeunesRepositoryToken)
     private jeunesRepository: Jeune.Repository
-  ) {}
+  ) {
+    super()
+  }
 
-  async execute(
+  async handle(
     query: GetDetailJeuneQuery
   ): Promise<DetailJeuneQueryModel | undefined> {
     return this.jeunesRepository.getQueryModelById(query.idJeune)
+  }
+  async authorize(query: GetDetailJeuneQuery): Promise<void> {
+    if (query) {
+    }
   }
 }

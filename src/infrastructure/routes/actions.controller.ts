@@ -13,6 +13,7 @@ import {
   Put
 } from '@nestjs/common'
 import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Authentification } from 'src/domain/authentification'
 import { DeleteActionCommandHandler } from '../../application/commands/delete-action.command.handler'
 import {
   UpdateStatutActionCommand,
@@ -26,6 +27,7 @@ import { ActionQueryModel } from '../../application/queries/query-models/actions
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { isFailure } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
+import { Utilisateur } from '../decorators/authenticated.decorator'
 import { UpdateStatutActionPayload } from './validation/actions.inputs'
 
 @Controller('actions')

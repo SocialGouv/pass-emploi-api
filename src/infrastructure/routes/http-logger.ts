@@ -18,7 +18,6 @@ export class AppLoggerMiddleware implements NestMiddleware {
           start.diffNow().as('millisecond') * -1
         }ms ${statusCode}`
       )
-      this.logger.debug('headers:', request.rawHeaders)
     })
 
     next()

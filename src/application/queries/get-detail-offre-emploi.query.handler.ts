@@ -12,19 +12,26 @@ export interface GetDetailOffreEmploiQuery extends Query {
 }
 
 @Injectable()
-export class GetDetailOffreEmploiQueryHandler
-  implements QueryHandler<GetDetailOffreEmploiQuery, OffreEmploiQueryModel>
-{
+export class GetDetailOffreEmploiQueryHandler extends QueryHandler<
+  GetDetailOffreEmploiQuery,
+  OffreEmploiQueryModel | undefined
+> {
   constructor(
     @Inject(OffresEmploiRepositoryToken)
     private offresEmploiRepository: OffresEmploi.Repository
-  ) {}
+  ) {
+    super()
+  }
 
-  async execute(
+  async handle(
     query: GetDetailOffreEmploiQuery
   ): Promise<OffreEmploiQueryModel | undefined> {
     return this.offresEmploiRepository.getOffreEmploiQueryModelById(
       query.idOffreEmploi
     )
+  }
+  async authorize(query: GetDetailOffreEmploiQuery): Promise<void> {
+    if (query) {
+    }
   }
 }

@@ -13,17 +13,24 @@ export interface GetFavorisJeuneQuery extends Query {
 }
 
 @Injectable()
-export class GetFavorisJeuneQueryHandler
-  implements QueryHandler<GetFavorisJeuneQuery, OffreEmploiResumeQueryModel[]>
-{
+export class GetFavorisJeuneQueryHandler extends QueryHandler<
+  GetFavorisJeuneQuery,
+  OffreEmploiResumeQueryModel[]
+> {
   constructor(
     @Inject(OffresEmploiRepositoryToken)
     private readonly offresEmploiRepository: OffresEmploi.Repository
-  ) {}
+  ) {
+    super()
+  }
 
-  execute(query: GetFavorisJeuneQuery): Promise<OffreEmploiResumeQueryModel[]> {
+  handle(query: GetFavorisJeuneQuery): Promise<OffreEmploiResumeQueryModel[]> {
     return this.offresEmploiRepository.getFavorisQueryModelsByJeune(
       query.idJeune
     )
+  }
+  async authorize(query: GetFavorisJeuneQuery): Promise<void> {
+    if (query) {
+    }
   }
 }

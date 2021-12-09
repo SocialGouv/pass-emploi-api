@@ -9,23 +9,28 @@ export interface GetResumeActionsDesJeunesDuConseillerQuery extends Query {
 }
 
 @Injectable()
-export class GetResumeActionsDesJeunesDuConseillerQueryHandler
-  implements
-    QueryHandler<
-      GetResumeActionsDesJeunesDuConseillerQuery,
-      ResumeActionsDuJeuneQueryModel[]
-    >
-{
+export class GetResumeActionsDesJeunesDuConseillerQueryHandler extends QueryHandler<
+  GetResumeActionsDesJeunesDuConseillerQuery,
+  ResumeActionsDuJeuneQueryModel[]
+> {
   constructor(
     @Inject(JeunesRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository
-  ) {}
+  ) {
+    super()
+  }
 
-  execute(
+  handle(
     query: GetResumeActionsDesJeunesDuConseillerQuery
   ): Promise<ResumeActionsDuJeuneQueryModel[]> {
     return this.jeuneRepository.getResumeActionsDesJeunesDuConseiller(
       query.idConseiller
     )
+  }
+  async authorize(
+    query: GetResumeActionsDesJeunesDuConseillerQuery
+  ): Promise<void> {
+    if (query) {
+    }
   }
 }

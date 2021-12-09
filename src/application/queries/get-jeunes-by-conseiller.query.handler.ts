@@ -10,17 +10,24 @@ export interface GetJeunesByConseillerQuery extends Query {
 }
 
 @Injectable()
-export class GetJeunesByConseillerQueryHandler
-  implements QueryHandler<GetJeunesByConseillerQuery, DetailJeuneQueryModel[]>
-{
+export class GetJeunesByConseillerQueryHandler extends QueryHandler<
+  GetJeunesByConseillerQuery,
+  DetailJeuneQueryModel[]
+> {
   constructor(
     @Inject(JeunesRepositoryToken)
     private readonly jeunesRepository: Jeune.Repository
-  ) {}
+  ) {
+    super()
+  }
 
-  execute(query: GetJeunesByConseillerQuery): Promise<DetailJeuneQueryModel[]> {
+  handle(query: GetJeunesByConseillerQuery): Promise<DetailJeuneQueryModel[]> {
     return this.jeunesRepository.getAllQueryModelsByConseiller(
       query.idConseiller
     )
+  }
+  async authorize(query: GetJeunesByConseillerQuery): Promise<void> {
+    if (query) {
+    }
   }
 }
