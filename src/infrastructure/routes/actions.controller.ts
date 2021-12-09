@@ -42,9 +42,10 @@ export class ActionsController {
     type: ActionQueryModel
   })
   async getDetailAction(
-    @Param('idAction', new ParseUUIDPipe()) idAction: string
+    @Param('idAction', new ParseUUIDPipe()) idAction: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<ActionQueryModel> {
-    const query: GetDetailActionQuery = { idAction }
+    const query: GetDetailActionQuery = { idAction, utilisateur }
     const queryModel = await this.getDetailActionQueryHandler.execute(query)
     if (queryModel) {
       return queryModel
