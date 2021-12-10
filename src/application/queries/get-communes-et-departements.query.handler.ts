@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { remove as enleveLesCaracteresSpeciaux } from 'remove-accents'
+import { remove as enleverLesAccents } from 'remove-accents'
 import { QueryTypes, Sequelize } from 'sequelize'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
@@ -10,6 +10,7 @@ import { CommunesEtDepartementsQueryModel } from './query-models/communes-et-dep
 
 export interface GetCommunesEtDepartementsQuery extends Query {
   recherche: string
+  villesOnly?: boolean
 }
 
 @Injectable()
@@ -26,15 +27,24 @@ export class GetCommunesEtDepartementsQueryHandler extends QueryHandler<
   async handle(
     query: GetCommunesEtDepartementsQuery
   ): Promise<CommunesEtDepartementsQueryModel[]> {
-    const sanitizedQuery: GetCommunesEtDepartementsQuery = {
-      recherche: enleveLesCaracteresSpeciaux(query.recherche)
+    const sanitizedRecherche = enleverLesAccents(query.recherche)
+    const resultats = await this.findCommunes(sanitizedRecherche)
+    if (!query.villesOnly) {
+      const departements = await this.findDepartements(sanitizedRecherche)
+      resultats.push(...departements)
     }
-    const departements = await this.findDepartements(sanitizedQuery)
-    const communes = await this.findCommunes(sanitizedQuery)
-    const resultats = departements.concat(communes)
 
     resultats.sort((a, b) => {
-      return a.score > b.score ? -1 : 1
+      if (a.score !== b.score) return b.score - a.score
+
+      if (
+        a.type === CommunesEtDepartementsQueryModel.Type.DEPARTEMENT &&
+        b.type === CommunesEtDepartementsQueryModel.Type.COMMUNE
+      ) {
+        return 1
+      }
+
+      return 0
     })
     resultats.splice(5, resultats.length)
 
@@ -48,7 +58,7 @@ export class GetCommunesEtDepartementsQueryHandler extends QueryHandler<
   }
 
   private async findDepartements(
-    query: GetCommunesEtDepartementsQuery
+    recherche: string
   ): Promise<CommunesEtDepartementsQueryModel[]> {
     const departements: DepartementSqlModel[] = await this.sequelize.query(
       `SELECT libelle, code, SIMILARITY(libelle, ?) AS "score"
@@ -56,7 +66,7 @@ export class GetCommunesEtDepartementsQueryHandler extends QueryHandler<
        WHERE libelle % ?
        ORDER BY "score" DESC LIMIT 5;`,
       {
-        replacements: [query.recherche, query.recherche],
+        replacements: [recherche, recherche],
         type: QueryTypes.SELECT
       }
     )
@@ -69,24 +79,28 @@ export class GetCommunesEtDepartementsQueryHandler extends QueryHandler<
   }
 
   private async findCommunes(
-    query: GetCommunesEtDepartementsQuery
+    recherche: string
   ): Promise<CommunesEtDepartementsQueryModel[]> {
     const communes: CommuneSqlModel[] = await this.sequelize.query(
-      `SELECT libelle, code, code_postal as "codePostal", SIMILARITY(libelle, ?) AS "score"
+      `SELECT libelle, code, code_postal as "codePostal", longitude, latitude, SIMILARITY(libelle, ?) AS "score"
        FROM "commune"
        WHERE libelle % ?
        ORDER BY "score" DESC LIMIT 5;`,
       {
-        replacements: [query.recherche, query.recherche],
+        replacements: [recherche, recherche],
         type: QueryTypes.SELECT
       }
     )
-    return communes.map(commune => ({
-      libelle: commune.libelle,
-      code: commune.code,
-      codePostal: commune.codePostal,
-      type: CommunesEtDepartementsQueryModel.Type.COMMUNE,
-      score: commune.score
-    }))
+    return communes.map(commune => {
+      return {
+        libelle: commune.libelle,
+        code: commune.code,
+        codePostal: commune.codePostal,
+        type: CommunesEtDepartementsQueryModel.Type.COMMUNE,
+        score: commune.score,
+        longitude: Number.parseFloat(commune.longitude),
+        latitude: Number.parseFloat(commune.latitude)
+      }
+    })
   }
 }

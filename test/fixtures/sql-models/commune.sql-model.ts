@@ -9,7 +9,9 @@ export function uneCommuneDto(
     code: '12345',
     libelle: 'abcde',
     codeDepartement: '123',
-    codePostal: '12345'
+    codePostal: '12345',
+    longitude: '-1.6774253445924194',
+    latitude: '48.110198435350306'
   }
   return { ...defaults, ...args }
 }

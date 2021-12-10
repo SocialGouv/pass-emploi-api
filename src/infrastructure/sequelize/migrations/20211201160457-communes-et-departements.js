@@ -50,7 +50,7 @@ module.exports = {
     await queryInterface.sequelize.transaction({isolationLevel: Sequelize.Transaction.SERIALIZABLE}, async (transaction) => {
       await queryInterface.dropTable('departement', {transaction})
       await queryInterface.dropTable('commune', {transaction})
-      await queryInterface.sequelize.query('DROP EXTENSION IF NOT EXISTS "pg_trgm";')
+      await queryInterface.sequelize.query('DROP EXTENSION IF EXISTS "pg_trgm";')
     })
   }
 };

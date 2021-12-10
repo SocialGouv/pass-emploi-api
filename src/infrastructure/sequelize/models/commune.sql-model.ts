@@ -22,6 +22,12 @@ export class CommuneDto extends Model {
 
   @Column({ field: 'code_departement', type: DataType.STRING })
   codeDepartement!: string
+
+  @Column({ field: 'longitude', type: DataType.DECIMAL(9, 6) })
+  longitude!: string
+
+  @Column({ field: 'latitude', type: DataType.DECIMAL(9, 6) })
+  latitude!: string
 }
 
 @Table({ timestamps: false, tableName: 'commune' })
