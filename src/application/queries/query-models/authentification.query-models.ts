@@ -24,3 +24,8 @@ export class UtilisateurQueryModel implements Authentification.Utilisateur {
   })
   type: Authentification.Type
 }
+
+export class FirebaseTokenQueryModel {
+  @ApiProperty()
+  token: string
+}
