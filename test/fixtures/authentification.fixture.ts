@@ -54,3 +54,5 @@ export const unJwtPayloadValide = (): JWTPayload => ({
   userId: 'bcd60403-5f10-4a16-a660-2099d79ebd66',
   email: 'conseiller.milo.passemploi@gmail.com'
 })
+
+export const unHeaderAuthorization = (): string => 'bearer coucou'

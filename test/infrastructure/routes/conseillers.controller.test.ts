@@ -12,11 +12,13 @@ import {
   success
 } from '../../../src/building-blocks/types/result'
 import { CreateActionPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
+import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
 import {
   buildTestingModuleForHttpTesting,
   StubbedClass,
   stubClass
 } from '../../utils'
+import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 
 describe('ConseillersController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -57,10 +59,16 @@ describe('ConseillersController', () => {
       // When - Then
       return request(app.getHttpServer())
         .post('/conseillers/1/jeunes/ABCDE/action')
+        .set('authorization', unHeaderAuthorization())
         .send(actionPayload)
         .expect(HttpStatus.CREATED)
         .expect({ id: idAction })
     })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'post',
+      '/conseillers/1/jeunes/ABCDE/action'
+    )
   })
 
   describe('POST /conseillers/:idConseiller/jeunes/:idJeune/notify-message', () => {
@@ -68,12 +76,16 @@ describe('ConseillersController', () => {
       it('renvoie void', () => {
         // Given
         sendNotificationNouveauMessage.execute
-          .withArgs({ idConseiller: '1', idJeune: 'ABCDE' })
+          .withArgs({
+            idConseiller: '1',
+            idJeune: 'ABCDE'
+          })
           .resolves(emptySuccess())
 
         // When - Then
         return request(app.getHttpServer())
           .post('/conseillers/1/jeunes/ABCDE/notify-message')
+          .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.CREATED)
       })
     })
@@ -83,12 +95,16 @@ describe('ConseillersController', () => {
         // Given
         const result = failure(new NonTrouveError('Jeune', 'ZIZOU'))
         sendNotificationNouveauMessage.execute
-          .withArgs({ idConseiller: '1', idJeune: 'ZIZOU' })
+          .withArgs({
+            idConseiller: '1',
+            idJeune: 'ZIZOU'
+          })
           .resolves(result)
 
         // When - Then
         return request(app.getHttpServer())
           .post('/conseillers/1/jeunes/ZIZOU/notify-message')
+          .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.NOT_FOUND)
       })
     })
@@ -100,14 +116,23 @@ describe('ConseillersController', () => {
           new JeuneNonLieAuConseillerError('JACQUET', 'ABCDE')
         )
         sendNotificationNouveauMessage.execute
-          .withArgs({ idConseiller: 'JACQUET', idJeune: 'ABCDE' })
+          .withArgs({
+            idConseiller: 'JACQUET',
+            idJeune: 'ABCDE'
+          })
           .resolves(result)
 
         // When - Then
         return request(app.getHttpServer())
           .post('/conseillers/JACQUET/jeunes/ABCDE/notify-message')
+          .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.NOT_FOUND)
       })
     })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'post',
+      '/conseillers/1/jeunes/ABCDE/notify-message'
+    )
   })
 })

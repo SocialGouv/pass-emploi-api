@@ -6,6 +6,12 @@ import {
 } from '../../../src/application/commands/add-favori-offre-emploi.command.handler'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
 import {
+  DeleteFavoriOffreEmploiCommand,
+  DeleteFavoriOffreEmploiCommandHandler
+} from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
+import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler'
+import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-models'
+import {
   FavoriExisteDejaError,
   FavoriNonTrouveError,
   NonTrouveError
@@ -17,6 +23,9 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action'
 import { CreateActionAvecStatutPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
+import { AddFavoriPayload } from '../../../src/infrastructure/routes/validation/jeunes.inputs'
+import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
 import {
   buildTestingModuleForHttpTesting,
@@ -24,15 +33,8 @@ import {
   StubbedClass,
   stubClass
 } from '../../utils'
+import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import StatutInvalide = Action.StatutInvalide
-import { AddFavoriPayload } from '../../../src/infrastructure/routes/validation/jeunes.inputs'
-import {
-  DeleteFavoriOffreEmploiCommand,
-  DeleteFavoriOffreEmploiCommandHandler
-} from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler'
-import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-models'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -83,6 +85,7 @@ describe('JeunesController', () => {
       // When
       await request(app.getHttpServer())
         .post('/jeunes/ABCDE/action')
+        .set('authorization', unHeaderAuthorization())
         .send(actionPayload)
 
         // Then
@@ -106,6 +109,7 @@ describe('JeunesController', () => {
 
       await request(app.getHttpServer())
         .post('/jeunes/ABCDE/action')
+        .set('authorization', unHeaderAuthorization())
         .send(actionPayload)
         .expect(HttpStatus.NOT_FOUND)
         .expect({
@@ -120,6 +124,7 @@ describe('JeunesController', () => {
 
       await request(app.getHttpServer())
         .post('/jeunes/ABCDE/action')
+        .set('authorization', unHeaderAuthorization())
         .send(actionPayload)
         .expect(HttpStatus.BAD_REQUEST)
         .expect({
@@ -127,6 +132,7 @@ describe('JeunesController', () => {
           statusCode: HttpStatus.BAD_REQUEST
         })
     })
+    ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/ABCDE/action')
   })
 
   describe('POST /jeunes/:idJeune/favori', () => {
@@ -154,6 +160,7 @@ describe('JeunesController', () => {
       // When
       await request(app.getHttpServer())
         .post('/jeunes/ABCDE/favori')
+        .set('authorization', unHeaderAuthorization())
         .send(payload)
 
         // Then
@@ -171,6 +178,7 @@ describe('JeunesController', () => {
       // When
       await request(app.getHttpServer())
         .post('/jeunes/ABCDE/favori')
+        .set('authorization', unHeaderAuthorization())
         .send(payload)
 
         // Then
@@ -189,11 +197,13 @@ describe('JeunesController', () => {
       // When
       await request(app.getHttpServer())
         .post('/jeunes/ABCDE/favori')
+        .set('authorization', unHeaderAuthorization())
         .send(payload)
 
         // Then
         .expect(HttpStatus.CONFLICT)
     })
+    ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/ABCDE/favori')
   })
 
   describe('DELETE /jeunes/:idJeune/favori/:idOffreEmploi', () => {
@@ -211,6 +221,7 @@ describe('JeunesController', () => {
       //When
       await request(app.getHttpServer())
         .delete(`/jeunes/${jeune.id}/favori/${offreEmploi.id}`)
+        .set('authorization', unHeaderAuthorization())
         //Then
         .expect(HttpStatus.NO_CONTENT)
       expect(
@@ -234,6 +245,7 @@ describe('JeunesController', () => {
       //When
       await request(app.getHttpServer())
         .delete(`/jeunes/${jeune.id}/favori/${offreEmploi.id}`)
+        .set('authorization', unHeaderAuthorization())
         //Then
         .expect(HttpStatus.NOT_FOUND)
         .expect(expectedMessageJson)
@@ -251,10 +263,12 @@ describe('JeunesController', () => {
       //When
       await request(app.getHttpServer())
         .delete(`/jeunes/${jeune.id}/favori/${offreEmploi.id}`)
+        .set('authorization', unHeaderAuthorization())
         //Then
         .expect(HttpStatus.NOT_FOUND)
         .expect(expectedMessageJson)
     })
+    ensureUserAuthenticationFailsIfInvalid('delete', '/jeunes/ABCDE/favori/123')
   })
 
   describe('GET /jeunes/:idJeune', () => {
@@ -272,7 +286,7 @@ describe('JeunesController', () => {
       // When
       await request(app.getHttpServer())
         .get(`/jeunes/${idJeune}`)
-
+        .set('authorization', unHeaderAuthorization())
         // Then
         .expect(HttpStatus.OK)
         .expect(detailJeuneQueryModel)
@@ -290,12 +304,13 @@ describe('JeunesController', () => {
       // When
       await request(app.getHttpServer())
         .get(`/jeunes/${idJeune}`)
-
+        .set('authorization', unHeaderAuthorization())
         // Then
         .expect(expectedResponseJson)
       expect(getDetailJeuneQueryHandler.execute).to.have.been.calledWith({
         idJeune
       })
     })
+    ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1')
   })
 })

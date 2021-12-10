@@ -18,6 +18,7 @@ import {
   StubbedClass,
   stubClass
 } from '../../utils'
+import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 
 let updateUtilisateurCommandHandler: StubbedClass<UpdateUtilisateurCommandHandler>
 
@@ -177,5 +178,8 @@ describe('AuthentificationController', () => {
         })
       })
     })
+  })
+  describe('POST auth/firebase/token', () => {
+    ensureUserAuthenticationFailsIfInvalid('post', '/auth/firebase/token')
   })
 })
