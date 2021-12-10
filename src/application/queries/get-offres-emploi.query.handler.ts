@@ -23,6 +23,7 @@ export interface GetOffresEmploiQuery extends Query {
   contrat?: Contrat[]
   duree?: Duree[]
   rayon?: number
+  commune?: string
 }
 
 @Injectable()
@@ -44,7 +45,8 @@ export class GetOffresEmploiQueryHandler
       query.experience,
       query.duree,
       query.contrat,
-      query.rayon
+      query.rayon,
+      query.commune
     )
   }
 }

@@ -46,7 +46,8 @@ export class OffresEmploiController {
       experience: findOffresEmploiQuery.experience,
       contrat: findOffresEmploiQuery.contrat,
       duree: findOffresEmploiQuery.duree,
-      rayon: findOffresEmploiQuery.rayon
+      rayon: findOffresEmploiQuery.rayon,
+      commune: findOffresEmploiQuery.commune
     }
 
     return this.getOffresEmploiQueryHandler.execute(query)

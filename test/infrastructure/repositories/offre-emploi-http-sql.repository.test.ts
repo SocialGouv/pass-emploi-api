@@ -257,13 +257,16 @@ describe('OffresEmploiHttpSqlRepository', () => {
           undefined,
           undefined,
           [Duree.tempsPlein, Duree.tempsPartiel],
-          [Contrat.cdd]
+          [Contrat.cdd],
+          undefined,
+          '75118'
         )
         const expectedQueryParams = new URLSearchParams({
           sort: '1',
           range: '0-49',
           dureeHebdo: '1,2',
-          typeContrat: 'CDD,MIS,SAI,DDI'
+          typeContrat: 'CDD,MIS,SAI,DDI',
+          commune: '75118'
         })
 
         // Then

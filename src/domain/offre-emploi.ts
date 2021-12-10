@@ -35,7 +35,8 @@ export namespace OffresEmploi {
       experience?: Experience[],
       duree?: Duree[],
       contrat?: Contrat[],
-      rayon?: number
+      rayon?: number,
+      commune?: string
     ): Promise<OffresEmploiQueryModel>
 
     getOffreEmploiQueryModelById(
