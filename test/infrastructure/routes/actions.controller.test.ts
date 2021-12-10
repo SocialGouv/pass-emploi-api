@@ -8,12 +8,14 @@ import {
   failure
 } from '../../../src/building-blocks/types/result'
 import { uneAction } from '../../fixtures/action.fixture'
+import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
 import { uneActionQueryModel } from '../../fixtures/query-models/action.query-model.fixtures'
 import {
   buildTestingModuleForHttpTesting,
   StubbedClass,
   stubClass
 } from '../../utils'
+import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 
 let getDetailActionQueryHandler: StubbedClass<GetDetailActionQueryHandler>
 let deleteActionCommandHandler: StubbedClass<DeleteActionCommandHandler>
@@ -63,6 +65,7 @@ describe('ActionsController', () => {
       }
       return request(app.getHttpServer())
         .get(`/actions/${idAction}`)
+        .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.OK)
         .expect(actionJson)
     })
@@ -74,8 +77,11 @@ describe('ActionsController', () => {
       // When - Then
       return request(app.getHttpServer())
         .get(`/actions/${idAction}`)
+        .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.NOT_FOUND)
     })
+
+    ensureUserAuthenticationFailsIfInvalid('get', '/actions/123')
   })
   describe('DELETE /actions/:idAction', () => {
     const idAction = '13c11b33-751c-4e1b-a49d-1b5a473ba159'
@@ -86,6 +92,7 @@ describe('ActionsController', () => {
       // When - Then
       return request(app.getHttpServer())
         .delete(`/actions/${idAction}`)
+        .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.NO_CONTENT)
     })
 
@@ -103,8 +110,11 @@ describe('ActionsController', () => {
       }
       return request(app.getHttpServer())
         .delete(`/actions/${idAction}`)
+        .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.NOT_FOUND)
         .expect(actionJson)
     })
+
+    ensureUserAuthenticationFailsIfInvalid('delete', '/actions/123')
   })
 })

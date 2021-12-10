@@ -1,6 +1,7 @@
 import { HttpModule } from '@nestjs/axios'
 import { Provider, Type } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
+import { APP_GUARD } from '@nestjs/core'
 import { TerminusModule } from '@nestjs/terminus'
 import { Test, TestingModuleBuilder } from '@nestjs/testing'
 import { messaging } from 'firebase-admin'
@@ -53,10 +54,13 @@ export const testConfig = (): ConfigService => {
 
 const stubProviders = (): Provider[] => {
   const providers: Provider[] = [
-    OidcAuthGuard,
     {
       provide: JwtService,
       useClass: FakeJwtService
+    },
+    {
+      provide: APP_GUARD,
+      useClass: OidcAuthGuard
     },
     {
       provide: FirebaseClient,
@@ -80,10 +84,19 @@ class FakeHandler {
   }
 }
 
-class FakeJwtService implements IJwtService {
+export class FakeJwtService implements IJwtService {
+  private valid: boolean
+
+  constructor(valid = true) {
+    this.valid = valid
+  }
+
   /* eslint-disable @typescript-eslint/no-unused-vars */
   async verifyTokenAndGetJwt(_token: string): Promise<JWTPayload> {
-    return unJwtPayloadValide()
+    if (this.valid) {
+      return unJwtPayloadValide()
+    }
+    throw new Error('JWT invalid')
   }
 }
 

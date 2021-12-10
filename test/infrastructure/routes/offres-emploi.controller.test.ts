@@ -1,5 +1,6 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
+import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
 import {
   buildTestingModuleForHttpTesting,
   expect,
@@ -18,6 +19,7 @@ import {
   GetDetailOffreEmploiQuery,
   GetDetailOffreEmploiQueryHandler
 } from '../../../src/application/queries/get-detail-offre-emploi.query.handler'
+import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 
 describe('OffresEmploiController', () => {
   let getOffresEmploiQueryHandler: StubbedClass<GetOffresEmploiQueryHandler>
@@ -85,6 +87,7 @@ describe('OffresEmploiController', () => {
       // When
       await request(app.getHttpServer())
         .get('/offres-emploi')
+        .set('authorization', unHeaderAuthorization())
         .query(findOffresEmploiQuery)
         // Then
         .expect(HttpStatus.OK)
@@ -93,6 +96,7 @@ describe('OffresEmploiController', () => {
         expectedQuery
       )
     })
+    ensureUserAuthenticationFailsIfInvalid('get', '/offres-emploi')
   })
   describe('GET /offres-emploi/:idOffreEmploi', () => {
     const query: GetDetailOffreEmploiQuery = {
@@ -114,6 +118,7 @@ describe('OffresEmploiController', () => {
       // When
       await request(app.getHttpServer())
         .get(`/offres-emploi/${query.idOffreEmploi}`)
+        .set('authorization', unHeaderAuthorization())
         // Then
         .expect(HttpStatus.OK)
         .expect(offreEmploiQueryModel)
@@ -131,8 +136,10 @@ describe('OffresEmploiController', () => {
       // When
       await request(app.getHttpServer())
         .get(`/offres-emploi/${query.idOffreEmploi}`)
+        .set('authorization', unHeaderAuthorization())
         // Then
         .expect(expectedResponseJson)
     })
+    ensureUserAuthenticationFailsIfInvalid('get', '/offres-emploi/123')
   })
 })
