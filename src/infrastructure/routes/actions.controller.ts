@@ -12,7 +12,7 @@ import {
   Patch,
   Put
 } from '@nestjs/common'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { DeleteActionCommandHandler } from '../../application/commands/delete-action.command.handler'
 import {
   UpdateStatutActionCommand,
@@ -29,6 +29,7 @@ import { Action } from '../../domain/action'
 import { UpdateStatutActionPayload } from './validation/actions.inputs'
 
 @Controller('actions')
+@ApiOAuth2([])
 @ApiTags('Actions')
 export class ActionsController {
   constructor(

@@ -23,6 +23,7 @@ export default () => {
     debug: process.env.DEBUG,
     logLevel: process.env.LOG_LEVEL,
     nodeEnv: process.env.NODE_ENV || 'production',
+    baseUrl: process.env.BASE_URL || 'http://localhost:5000',
     poleEmploi: {
       url:
         process.env.POLE_EMPLOI_API_BASE_URL ??

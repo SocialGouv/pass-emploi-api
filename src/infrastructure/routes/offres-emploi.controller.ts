@@ -6,7 +6,7 @@ import {
   Param,
   Query
 } from '@nestjs/common'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   OffreEmploiQueryModel,
   OffresEmploiQueryModel
@@ -22,6 +22,7 @@ import {
 import { FindOffresEmploiQuery } from './validation/offres-emploi.inputs'
 
 @Controller('offres-emploi')
+@ApiOAuth2([])
 @ApiTags("Offres d'emploi")
 export class OffresEmploiController {
   constructor(

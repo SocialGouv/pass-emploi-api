@@ -13,7 +13,7 @@ import {
   Query
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler'
 import { GetFavorisIdsJeuneQueryHandler } from 'src/application/queries/get-favoris-ids-jeune.query.handler'
 import { GetFavorisJeuneQueryHandler } from 'src/application/queries/get-favoris-jeune.query.handler'
@@ -57,6 +57,7 @@ import {
 import StatutInvalide = Action.StatutInvalide
 
 @Controller('jeunes/:idJeune')
+@ApiOAuth2([])
 @ApiTags('Jeunes')
 export class JeunesController {
   constructor(
