@@ -8,7 +8,7 @@ import {
   UseGuards
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger'
 import {
   UpdateUtilisateurCommand,
   UpdateUtilisateurCommandHandler
@@ -23,9 +23,10 @@ import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
 import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
 import { UpdateUserPayload } from './validation/authentification.inputs'
 
+@Controller()
 @SkipOidcAuth()
 @UseGuards(ApiKeyAuthGuard)
-@Controller()
+@ApiSecurity('api_key')
 @ApiTags('Authentification')
 export class AuthentificationController {
   constructor(

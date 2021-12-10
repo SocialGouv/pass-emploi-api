@@ -8,7 +8,7 @@ import {
   Post
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOAuth2, ApiTags } from '@nestjs/swagger'
 import { CreateRendezVousCommandHandler } from '../../application/commands/create-rendez-vous.command.handler'
 import { DeleteRendezVousCommandHandler } from '../../application/commands/delete-rendez-vous.command.handler'
 import {
@@ -23,6 +23,7 @@ import {
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
 
 @Controller()
+@ApiOAuth2([])
 @ApiTags('Rendez-Vous')
 export class RendezVousController {
   constructor(

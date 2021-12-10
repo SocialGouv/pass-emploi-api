@@ -9,7 +9,7 @@ import {
   Post
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler'
 import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler'
 import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
@@ -35,6 +35,7 @@ import {
 } from './validation/conseillers.inputs'
 
 @Controller('conseillers/:idConseiller')
+@ApiOAuth2([])
 @ApiTags('Conseillers')
 export class ConseillersController {
   constructor(
