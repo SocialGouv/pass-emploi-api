@@ -3,18 +3,25 @@ import { Provider, Type } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TerminusModule } from '@nestjs/terminus'
 import { Test, TestingModuleBuilder } from '@nestjs/testing'
+import { messaging } from 'firebase-admin'
 import { JWTPayload } from 'jose'
 import {
   buildModuleMetadata,
   buildQueryCommandsProviders
 } from '../../src/app.module'
 import configuration from '../../src/config/configuration'
+import { Authentification } from '../../src/domain/authentification'
 import {
   IJwtService,
   JwtService
 } from '../../src/infrastructure/auth/jwt.service'
 import { OidcAuthGuard } from '../../src/infrastructure/auth/oidc.auth-guard'
+import {
+  FirebaseClient,
+  IFirebaseClient
+} from '../../src/infrastructure/clients/firebase-client'
 import { unJwtPayloadValide } from '../fixtures/authentification.fixture'
+import TokenMessage = messaging.TokenMessage
 
 export function buildTestingModuleForHttpTesting(): TestingModuleBuilder {
   const moduleMetadata = buildModuleMetadata()
@@ -50,6 +57,10 @@ const stubProviders = (): Provider[] => {
     {
       provide: JwtService,
       useClass: FakeJwtService
+    },
+    {
+      provide: FirebaseClient,
+      useClass: FakeFirebaseClient
     }
   ]
   const queryCommandsProviders = buildQueryCommandsProviders().map(
@@ -73,5 +84,22 @@ class FakeJwtService implements IJwtService {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   async verifyTokenAndGetJwt(_token: string): Promise<JWTPayload> {
     return unJwtPayloadValide()
+  }
+}
+
+class FakeFirebaseClient implements IFirebaseClient {
+  getToken(_utilisateur: Authentification.Utilisateur): Promise<string> {
+    return Promise.resolve('un-token-firebase')
+  }
+
+  initializeChatIfNotExists(
+    _jeuneId: string,
+    _conseillerId: string
+  ): Promise<void> {
+    return Promise.resolve(undefined)
+  }
+
+  send(_tokenMessage: TokenMessage): Promise<void> {
+    return Promise.resolve(undefined)
   }
 }
