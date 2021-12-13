@@ -41,6 +41,7 @@ export class OidcAuthGuard implements CanActivate {
       const payload: JWTPayload = await this.jwtService.verifyTokenAndGetJwt(
         accessToken
       )
+      const utilisateur = this.buildUtilisateur(payload)
       /*
       ts-ignore accepté ici
       On ajoute un nouvel attribut à la request au runtime pour le mettre dans le context et pouvoir l'utiliser plus tard dans l'execution
@@ -51,8 +52,9 @@ export class OidcAuthGuard implements CanActivate {
       // @ts-ignore
       req.authenticated = {
         accesToken: payload,
-        utilisateur: this.buildUtilisateur(payload)
+        utilisateur
       }
+      this.logger.log(`${JSON.stringify(utilisateur)}`)
       return true
     } catch (error) {
       this.logger.error(error)

@@ -1,10 +1,5 @@
 import { HttpModule } from '@nestjs/axios'
-import {
-  MiddlewareConsumer,
-  Module,
-  ModuleMetadata,
-  Provider
-} from '@nestjs/common'
+import { Module, ModuleMetadata, Provider } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
 import { TerminusModule } from '@nestjs/terminus'
@@ -63,7 +58,6 @@ import { ActionsController } from './infrastructure/routes/actions.controller'
 import { AuthentificationController } from './infrastructure/routes/authentification.controller'
 import { ConseillersController } from './infrastructure/routes/conseillers.controller'
 import { HealthController } from './infrastructure/routes/health.controller'
-import { AppLoggerMiddleware } from './infrastructure/routes/http-logger'
 import { JeunesController } from './infrastructure/routes/jeunes.controller'
 import { OffresEmploiController } from './infrastructure/routes/offres-emploi.controller'
 import { ReferentielsController } from './infrastructure/routes/referentiels.controller'
@@ -71,6 +65,7 @@ import { RendezVousController } from './infrastructure/routes/rendez-vous.contro
 import { databaseProviders } from './infrastructure/sequelize/providers'
 import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
+import { configureLoggerModule } from './utils/logger.module'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -78,6 +73,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       envFilePath: '.environment',
       load: [configuration]
     }),
+    configureLoggerModule(),
     HttpModule,
     TerminusModule
   ],
@@ -175,8 +171,4 @@ export function buildQueryCommandsProviders(): Provider[] {
 }
 
 @Module(buildModuleMetadata())
-export class AppModule {
-  configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(AppLoggerMiddleware).forRoutes('*')
-  }
-}
+export class AppModule {}

@@ -8,6 +8,7 @@ import {
   SwaggerModule
 } from '@nestjs/swagger'
 import { SecuritySchemeObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface'
+import { Logger } from 'nestjs-pino'
 import { AppModule } from './app.module'
 
 function useSwagger(
@@ -50,9 +51,12 @@ function useSwagger(
 }
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule)
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    bufferLogs: true
+  })
   const appConfig = app.get<ConfigService>(ConfigService)
   const port = appConfig.get('port')
+  app.useLogger(app.get(Logger))
   useSwagger(appConfig, app)
   app.enableCors()
   app.useGlobalPipes(new ValidationPipe())
