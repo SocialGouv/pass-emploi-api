@@ -26,7 +26,7 @@
     "start:db:test": "docker-compose up -d testdb && ./test/utils/wait-for-db.sh && DATABASE_URL=postgresql://test:test@localhost:56432/test yarn migration",
     "test": "./test/utils/with-test-pg yarn test:ci",
     "test:ci": "yarn migration && nyc mocha 'test/**/*.test.ts' --exit --timeout 10000",
-    "watch": "yarn start:db && nest start --watch"
+    "watch": "yarn start:db && nest start --watch | npx pino-pretty"
   },
   "dependencies": {
     "@nestjs/axios": "0.0.3",
@@ -40,9 +40,11 @@
     "class-validator": "0.13.1",
     "firebase-admin": "^10.0.0",
     "luxon": "2.1.1",
+    "nestjs-pino": "^2.3.1",
     "openid-client": "^5.1.0",
     "pg": "^8.7.1",
     "pg-connection-string": "^2.5.0",
+    "pino-http": "^6.4.0",
     "remove-accents": "^0.4.2",
     "rimraf": "^3.0.2",
     "rxjs": "7.4.0",
