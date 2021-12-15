@@ -10,3 +10,7 @@ OIDC_ISSUER_URL=https://pa-auth-staging.osc-secnum-fr1.scalingo.io/auth/realms/p
 
 API_KEY_KEYCLOAK=ceci-est-une-api-key
 
+MILO_API_URL=
+MILO_DOSSIER_API_KEY=
+
+IN_MEMORY=

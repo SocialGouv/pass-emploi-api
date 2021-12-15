@@ -48,6 +48,10 @@ export const testConfig = (): ConfigService => {
       clientId: 'pole-emploi-client-id',
       clientSecret: 'pole-emploi-client-secret',
       scope: 'pole-emploi-scope'
+    },
+    milo: {
+      url: 'https://milo.com',
+      apiKeyRecupererDossier: 'apiKeyRecupererDossier'
     }
   })
 }

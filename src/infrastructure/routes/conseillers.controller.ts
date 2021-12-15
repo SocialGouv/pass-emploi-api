@@ -19,12 +19,14 @@ import { Authentification } from 'src/domain/authentification'
 import { CreateActionCommandHandler } from '../../application/commands/create-action.command.handler'
 import { CreateJeuneCommandHandler } from '../../application/commands/create-jeune.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from '../../application/commands/send-notification-nouveau-message.command.handler'
+import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
 import {
   DetailJeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from '../../application/queries/query-models/jeunes.query-models'
+import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
 import { RendezVousConseillerQueryModel } from '../../application/queries/query-models/rendez-vous.query-models'
 import {
   JeuneNonLieAuConseillerError,
@@ -43,7 +45,7 @@ import {
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
 
-@Controller('conseillers/:idConseiller')
+@Controller('conseillers')
 @ApiOAuth2([])
 @ApiTags('Conseillers')
 export class ConseillersController {
@@ -55,10 +57,11 @@ export class ConseillersController {
     private readonly createJeuneCommandHandler: CreateJeuneCommandHandler,
     private readonly sendNotificationNouveauMessage: SendNotificationNouveauMessageCommandHandler,
     private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler,
-    private createRendezVousCommandHandler: CreateRendezVousCommandHandler
+    private createRendezVousCommandHandler: CreateRendezVousCommandHandler,
+    private getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler
   ) {}
 
-  @Get('')
+  @Get(':idConseiller')
   @ApiResponse({
     type: DetailConseillerQueryModel
   })
@@ -82,7 +85,7 @@ export class ConseillersController {
     )
   }
 
-  @Get('jeunes')
+  @Get(':idConseiller/jeunes')
   @ApiResponse({
     type: DetailJeuneQueryModel,
     isArray: true
@@ -97,7 +100,7 @@ export class ConseillersController {
     )
   }
 
-  @Post('jeune')
+  @Post(':idConseiller/jeune')
   @ApiResponse({
     type: DetailJeuneQueryModel,
     isArray: true
@@ -122,7 +125,7 @@ export class ConseillersController {
     }
   }
 
-  @Post('jeunes/:idJeune/action')
+  @Post(':idConseiller/jeunes/:idJeune/action')
   async createAction(
     @Param('idConseiller') idConseiller: string,
     @Param('idJeune') idJeune: string,
@@ -152,7 +155,7 @@ export class ConseillersController {
     throw new RuntimeException()
   }
 
-  @Get('actions')
+  @Get(':idConseiller/actions')
   async getActions(
     @Param('idConseiller') idConseiller: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
@@ -165,7 +168,7 @@ export class ConseillersController {
     )
   }
 
-  @Get('rendezvous')
+  @Get(':idConseiller/rendezvous')
   @ApiResponse({
     type: RendezVousConseillerQueryModel
   })
@@ -179,7 +182,7 @@ export class ConseillersController {
     )
   }
 
-  @Post('jeunes/:idJeune/notify-message')
+  @Post(':idConseiller/jeunes/:idJeune/notify-message')
   async postNotification(
     @Param('idConseiller') idConseiller: string,
     @Param('idJeune') idJeune: string,
@@ -204,7 +207,7 @@ export class ConseillersController {
     }
   }
 
-  @Post('rendezvous')
+  @Post(':idConseiller/rendezvous')
   async createRendezVous(
     @Param('idConseiller') idConseiller: string,
     @Body() createRendezVousPayload: CreateRendezVousPayload,
@@ -236,5 +239,25 @@ export class ConseillersController {
       return { id: result.data }
     }
     throw new RuntimeException()
+  }
+
+  @Get('/milo/dossiers/:idDossier')
+  @ApiResponse({
+    type: DossierJeuneMiloQueryModel
+  })
+  async getDossierMilo(
+    @Param('idDossier') idDossier: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<DossierJeuneMiloQueryModel> {
+    const dossier = await this.getDossierMiloJeuneQueryHandler.execute(
+      { idDossier },
+      utilisateur
+    )
+
+    if (!dossier) {
+      throw new NotFoundException(`Le dossier ${idDossier} n'existe pas`)
+    }
+
+    return dossier
   }
 }

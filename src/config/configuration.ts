@@ -35,6 +35,10 @@ export default () => {
       clientSecret: process.env.POLE_EMPLOI_CLIENT_SECRET ?? '',
       scope: process.env.POLE_EMPLOI_SCOPE ?? ''
     },
+    milo: {
+      url: process.env.MILO_API_URL,
+      apiKeyRecupererDossier: process.env.MILO_DOSSIER_API_KEY
+    },
     firebase: {
       environmentPrefix: process.env.FIREBASE_ENVIRONMENT_PREFIX ?? 'staging',
       key: process.env.FIREBASE_SECRET_KEY ?? ''
