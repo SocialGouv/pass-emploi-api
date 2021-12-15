@@ -13,6 +13,9 @@ export class DossierJeuneMiloQueryModel {
   @ApiProperty()
   dateDeNaissance: string
 
+  @ApiProperty()
+  codePostal: string
+
   @ApiProperty({ required: false })
   email?: string
 }

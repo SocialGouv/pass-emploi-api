@@ -38,6 +38,7 @@ export class MiloHttpRepository implements Milo.Repository {
         prenom: dossierDto.data.prenom,
         nom: dossierDto.data.nomUsage,
         email: dossierDto.data.mail ?? undefined,
+        codePostal: dossierDto.data.adresse?.codePostal ?? '',
         dateDeNaissance: dossierDto.data.dateNaissance
       }
     } catch (e) {

@@ -32,6 +32,7 @@ describe('MiloHttpRepository', () => {
           id: '1',
           nom: 'PEREZ',
           prenom: 'Olivier',
+          codePostal: '65410',
           dateDeNaissance: '1997-05-08'
         })
       })

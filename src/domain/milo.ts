@@ -7,6 +7,7 @@ export namespace Milo {
     nom: string
     dateDeNaissance: string
     email?: string
+    codePostal: string
   }
 
   export interface Repository {

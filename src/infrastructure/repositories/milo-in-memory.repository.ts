@@ -19,12 +19,14 @@ const unDossierMiloAvecEmail = (): Milo.Dossier => ({
   nom: 'Dawson',
   prenom: 'Jack',
   dateDeNaissance: '1888-09-01',
-  email: 'jack.dawson@milo.com'
+  email: 'jack.dawson@milo.com',
+  codePostal: '91580'
 })
 
 const unDossierMiloSansEmail = (): Milo.Dossier => ({
   id: '2',
   nom: 'Dylan',
   prenom: 'Bob',
-  dateDeNaissance: '1941-05-24'
+  dateDeNaissance: '1941-05-24',
+  codePostal: '75008'
 })

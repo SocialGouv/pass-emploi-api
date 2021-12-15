@@ -2,7 +2,7 @@ export interface DossierMiloDto {
   idDossier: number
   idJeune: string
   numeroDE: string
-  adresse: {
+  adresse?: {
     numero: string
     libelleVoie: string
     complement: string
