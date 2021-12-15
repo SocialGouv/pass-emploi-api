@@ -8,13 +8,19 @@ export class CommunesEtDepartementsQueryModel {
   libelle: string
 
   @ApiProperty()
-  codePostal?: string
-
-  @ApiProperty()
   type: CommunesEtDepartementsQueryModel.Type
 
   @ApiProperty()
   score: number
+
+  @ApiProperty({ required: false })
+  codePostal?: string
+
+  @ApiProperty({ required: false })
+  longitude?: number
+
+  @ApiProperty({ required: false })
+  latitude?: number
 }
 
 export namespace CommunesEtDepartementsQueryModel {

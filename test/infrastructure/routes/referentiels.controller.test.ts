@@ -27,28 +27,30 @@ describe('ReferentielsController', () => {
     await app.close()
   })
 
-  describe('GET /referentiels/communes-et-departements', () => {
+  describe('GET /referentiels/communes-et-departements?recherche=abcde', () => {
     it('renvoie les communes et departements demandés', () => {
       // Given
-      getCommunesEtDepartementsQueryHandler.execute.resolves([
-        {
-          libelle: 'abcde',
-          code: '5',
-          codePostal: '78907',
-          type: CommunesEtDepartementsQueryModel.Type.COMMUNE,
-          score: 0.3
-        },
-        {
-          libelle: 'abcd',
-          code: '4',
-          type: CommunesEtDepartementsQueryModel.Type.DEPARTEMENT,
-          score: 0.2
-        }
-      ])
+      getCommunesEtDepartementsQueryHandler.execute
+        .withArgs({ recherche: 'abcde', villesOnly: false })
+        .resolves([
+          {
+            libelle: 'abcde',
+            code: '5',
+            codePostal: '78907',
+            type: CommunesEtDepartementsQueryModel.Type.COMMUNE,
+            score: 0.3
+          },
+          {
+            libelle: 'abcd',
+            code: '4',
+            type: CommunesEtDepartementsQueryModel.Type.DEPARTEMENT,
+            score: 0.2
+          }
+        ])
 
       // When - Then
       return request(app.getHttpServer())
-        .get('/referentiels/communes-et-departements')
+        .get('/referentiels/communes-et-departements?recherche=abcde')
         .set('Authorization', 'Bearer ceci-est-un-jwt')
         .expect(HttpStatus.OK)
         .expect([
@@ -64,6 +66,41 @@ describe('ReferentielsController', () => {
             libelle: 'abcd',
             score: 0.2,
             type: 'DEPARTEMENT'
+          }
+        ])
+    })
+
+    it('renvoie les communes seulement', () => {
+      // Given
+      getCommunesEtDepartementsQueryHandler.execute
+        .withArgs({
+          recherche: 'abcde',
+          villesOnly: true
+        })
+        .resolves([
+          {
+            libelle: 'abcde',
+            code: '5',
+            codePostal: '78907',
+            type: CommunesEtDepartementsQueryModel.Type.COMMUNE,
+            score: 0.3
+          }
+        ])
+
+      // When - Then
+      return request(app.getHttpServer())
+        .get(
+          '/referentiels/communes-et-departements?recherche=abcde&villesOnly=true'
+        )
+        .set('Authorization', 'Bearer ceci-est-un-jwt')
+        .expect(HttpStatus.OK)
+        .expect([
+          {
+            code: '5',
+            codePostal: '78907',
+            libelle: 'abcde',
+            score: 0.3,
+            type: 'COMMUNE'
           }
         ])
     })

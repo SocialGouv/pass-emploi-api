@@ -1,5 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   GetCommunesEtDepartementsQuery,
   GetCommunesEtDepartementsQueryHandler
@@ -20,10 +20,13 @@ export class ReferentielsController {
     type: CommunesEtDepartementsQueryModel,
     isArray: true
   })
+  @ApiQuery({ name: 'villesOnly', required: false, type: 'boolean' })
   async getCommunesEtDepartements(
-    @Query('recherche') recherche: string
+    @Query('recherche') recherche: string,
+    @Query('villesOnly') villesOnly: string
   ): Promise<CommunesEtDepartementsQueryModel[]> {
     const query: GetCommunesEtDepartementsQuery = { recherche }
+    query.villesOnly = villesOnly === 'true'
     return await this.getCommunesEtDepartementsQueryHandler.execute(query)
   }
 }

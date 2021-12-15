@@ -13,6 +13,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
     getCommunesEtDepartementsQueryHandler =
       new GetCommunesEtDepartementsQueryHandler(db.sequelize)
   })
+
   describe('Avec que des départements', () => {
     it('retourne un tableau vide quand la recherche ne match pas', async () => {
       //Given
@@ -24,6 +25,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       //Then
       expect(result).to.deep.equal([])
     })
+
     it('retourne un element qui match au bon format', async () => {
       //Given
       const departement = unDepartementDto()
@@ -41,6 +43,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
         score: 0.5714286
       })
     })
+
     it('limite à 5 le nombre de résultats', async () => {
       //Given
       const departements = [
@@ -83,6 +86,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       //Then
       expect(result).to.have.lengthOf(5)
     })
+
     it('ne prend pas en compte la casse', async () => {
       //Given
       const departements = [
@@ -100,6 +104,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       //Then
       expect(result).to.have.lengthOf(1)
     })
+
     it('ne prend pas en compte les accents', async () => {
       //Given
       const departement = unDepartementDto({ libelle: 'CRETEIL' })
@@ -117,6 +122,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
         score: 1
       })
     })
+
     describe('quand il a y a plus de 5 résultats', async () => {
       it('prend le top 5 par rapport au score de recherche', async () => {
         //Given
@@ -194,7 +200,54 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
         ])
       })
     })
+
+    describe('quand seulement les villes sont demandées', () => {
+      it('renvoie un tableau vide', async () => {
+        //Given
+        const departements = [
+          unDepartementDto({
+            id: '1',
+            code: '1',
+            libelle: '1'
+          }),
+          unDepartementDto({
+            id: '2',
+            code: '2',
+            libelle: '1'
+          }),
+          unDepartementDto({
+            id: '3',
+            code: '3',
+            libelle: '1'
+          }),
+          unDepartementDto({
+            id: '4',
+            code: '4',
+            libelle: '1'
+          }),
+          unDepartementDto({
+            id: '5',
+            code: '5',
+            libelle: '1'
+          }),
+          unDepartementDto({
+            id: '6',
+            code: '6',
+            libelle: '1'
+          })
+        ]
+        await DepartementSqlModel.bulkCreate(departements)
+        //When
+        const result = await getCommunesEtDepartementsQueryHandler.execute({
+          recherche: '1',
+          villesOnly: true
+        })
+        //Then
+        expect(result).to.deep.equal([])
+      })
+    })
   })
+
   describe('Avec que des communes', () => {
     it('retourne un tableau vide quand la recherche ne match pas', async () => {
       //Given
@@ -206,14 +259,17 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       //Then
       expect(result).to.deep.equal([])
     })
+
     it('retourne un element qui match au bon format', async () => {
       //Given
       const commune = uneCommuneDto()
       await CommuneSqlModel.create(commune)
+
       //When
       const result = await getCommunesEtDepartementsQueryHandler.execute({
         recherche: 'abcd'
       })
+
       //Then
       expect(result).to.have.lengthOf(1)
       expect(result[0]).to.be.deep.equal({
@@ -221,9 +277,12 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
         libelle: commune.libelle,
         codePostal: commune.codePostal,
         type: CommunesEtDepartementsQueryModel.Type.COMMUNE,
-        score: 0.5714286
+        score: 0.5714286,
+        longitude: -1.677425,
+        latitude: 48.110198
       })
     })
+
     it('limite à 5 le nombre de résultats', async () => {
       //Given
       const communes = [
@@ -266,6 +325,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       //Then
       expect(result).to.have.lengthOf(5)
     })
+
     it('ne prend pas en compte la casse', async () => {
       //Given
       const departements = [
@@ -283,6 +343,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       //Then
       expect(result).to.have.lengthOf(1)
     })
+
     it('ne prend pas en compte les accents', async () => {
       //Given
       const commune = uneCommuneDto({ libelle: 'CRETEIL' })
@@ -298,9 +359,12 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
         libelle: commune.libelle,
         codePostal: commune.codePostal,
         type: CommunesEtDepartementsQueryModel.Type.COMMUNE,
-        score: 1
+        score: 1,
+        longitude: -1.677425,
+        latitude: 48.110198
       })
     })
+
     describe('quand il a y a plus de 5 résultats', async () => {
       it('fait un tri sur le libelle les plus long', async () => {
         //Given
@@ -354,6 +418,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       })
     })
   })
+
   describe('Avec des communes et des départements', () => {
     it('retourne un tableau vide quand la recherche ne match pas', async () => {
       //Given
@@ -366,6 +431,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       //Then
       expect(result).to.deep.equal([])
     })
+
     it('retourne deux elements qui match au bon format', async () => {
       //Given
       const commune = uneCommuneDto()
@@ -391,10 +457,13 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
           code: '12345',
           codePostal: '12345',
           type: 'COMMUNE',
-          score: 0.5714286
+          score: 0.5714286,
+          longitude: -1.677425,
+          latitude: 48.110198
         }
       ])
     })
+
     it('limite à 5 le nombre de résultats', async () => {
       //Given
       const communes = [
@@ -470,6 +539,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       //Then
       expect(result).to.have.lengthOf(5)
     })
+
     it('ne prend pas en compte la casse', async () => {
       //Given
       const commune = uneCommuneDto({ libelle: 'aBcDe' })
@@ -484,8 +554,9 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       //Then
       expect(result).to.have.lengthOf(2)
     })
+
     describe('quand il a y a plus que 5 résultats', async () => {
-      it('fait un tri sur le libelle les plus long', async () => {
+      it('fait un tri sur le libelle le plus proche, puis priorise les communes', async () => {
         //Given
         const communes = [
           uneCommuneDto({
@@ -538,35 +609,103 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
         expect(result).to.have.deep.members([
           {
             libelle: 'a',
-            code: '7',
-            type: 'DEPARTEMENT',
-            score: 1
-          },
-          {
-            libelle: 'a',
             code: '1',
             type: 'COMMUNE',
             codePostal: '12345',
+            score: 1,
+            longitude: -1.677425,
+            latitude: 48.110198
+          },
+          {
+            libelle: 'a',
+            code: '7',
+            type: 'DEPARTEMENT',
             score: 1
-          },
-          {
-            libelle: 'a d',
-            code: '4',
-            type: 'DEPARTEMENT',
-            score: 0.5
-          },
-          {
-            libelle: 'a e',
-            code: '5',
-            type: 'DEPARTEMENT',
-            score: 0.5
           },
           {
             libelle: 'a b',
             code: '2',
             type: 'COMMUNE',
             codePostal: '12345',
+            score: 0.5,
+            longitude: -1.677425,
+            latitude: 48.110198
+          },
+          {
+            libelle: 'a c',
+            code: '3',
+            type: 'COMMUNE',
+            codePostal: '12345',
+            score: 0.5,
+            longitude: -1.677425,
+            latitude: 48.110198
+          },
+          {
+            libelle: 'a d',
+            code: '4',
+            type: 'DEPARTEMENT',
             score: 0.5
+          }
+        ])
+      })
+    })
+
+    describe('quand seulement les villes sont demandées', () => {
+      it('ne renvoie que les villes qui match la recherche', async () => {
+        //Given
+        const communes = [
+          uneCommuneDto({
+            id: '1',
+            code: '1',
+            libelle: '1'
+          }),
+          uneCommuneDto({
+            id: '2',
+            code: '2',
+            libelle: '1'
+          })
+        ]
+        await CommuneSqlModel.bulkCreate(communes)
+        const departements = [
+          unDepartementDto({
+            id: '1',
+            code: '1',
+            libelle: '1'
+          }),
+          unDepartementDto({
+            id: '2',
+            code: '2',
+            libelle: '1'
+          })
+        ]
+        await DepartementSqlModel.bulkCreate(departements)
+
+        //When
+        const result = await getCommunesEtDepartementsQueryHandler.execute({
+          recherche: '1',
+          villesOnly: true
+        })
+
+        //Then
+        expect(result).to.have.lengthOf(2)
+        expect(result).to.have.deep.members([
+          {
+            libelle: '1',
+            code: '1',
+            type: 'COMMUNE',
+            codePostal: '12345',
+            score: 1,
+            longitude: -1.677425,
+            latitude: 48.110198
+          },
+          {
+            libelle: '1',
+            code: '2',
+            type: 'COMMUNE',
+            codePostal: '12345',
+            score: 1,
+            longitude: -1.677425,
+            latitude: 48.110198
           }
         ])
       })
