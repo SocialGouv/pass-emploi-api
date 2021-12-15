@@ -6,6 +6,7 @@ import {
   failure,
   Result
 } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
 import {
   OffresEmploi,
   OffresEmploiRepositoryToken
@@ -15,6 +16,7 @@ import {
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { FavoriAuthorizer } from '../authorizers/authorize-favori'
 
 export interface DeleteFavoriOffreEmploiCommand extends Command {
   idOffreEmploi: string
@@ -22,21 +24,24 @@ export interface DeleteFavoriOffreEmploiCommand extends Command {
 }
 
 @Injectable()
-export class DeleteFavoriOffreEmploiCommandHandler
-  implements CommandHandler<DeleteFavoriOffreEmploiCommand, Result>
-{
+export class DeleteFavoriOffreEmploiCommandHandler extends CommandHandler<
+  DeleteFavoriOffreEmploiCommand,
+  Result
+> {
   private logger: Logger
 
   constructor(
     @Inject(OffresEmploiRepositoryToken)
     private readonly offresEmploiRepository: OffresEmploi.Repository,
     @Inject(JeunesRepositoryToken)
-    private readonly jeuneRepository: Jeune.Repository
+    private readonly jeuneRepository: Jeune.Repository,
+    private readonly favoriAuthorizer: FavoriAuthorizer
   ) {
+    super()
     this.logger = new Logger('DeleteFavoriCommandHandler')
   }
 
-  async execute(command: DeleteFavoriOffreEmploiCommand): Promise<Result> {
+  async handle(command: DeleteFavoriOffreEmploiCommand): Promise<Result> {
     const jeune = await this.jeuneRepository.get(command.idJeune)
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', command.idJeune))
@@ -58,5 +63,16 @@ export class DeleteFavoriOffreEmploiCommandHandler
       `L'offre ${command.idOffreEmploi} a été supprimée des favoris du jeune ${command.idJeune}`
     )
     return emptySuccess()
+  }
+
+  async authorize(
+    command: DeleteFavoriOffreEmploiCommand,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    await this.favoriAuthorizer.authorize(
+      command.idJeune,
+      command.idOffreEmploi,
+      utilisateur
+    )
   }
 }

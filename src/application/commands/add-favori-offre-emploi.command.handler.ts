@@ -6,6 +6,7 @@ import {
   failure,
   Result
 } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
 
 import {
   OffreEmploi,
@@ -17,6 +18,7 @@ import {
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 
 export interface AddFavoriOffreEmploiCommand extends Command {
   idJeune: string
@@ -24,17 +26,21 @@ export interface AddFavoriOffreEmploiCommand extends Command {
 }
 
 @Injectable()
-export class AddFavoriOffreEmploiCommandHandler
-  implements CommandHandler<AddFavoriOffreEmploiCommand, Result>
-{
+export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
+  AddFavoriOffreEmploiCommand,
+  Result
+> {
   constructor(
     @Inject(OffresEmploiRepositoryToken)
     private offresEmploiRepository: OffresEmploi.Repository,
     @Inject(JeunesRepositoryToken)
-    private jeuneRepository: Jeune.Repository
-  ) {}
+    private jeuneRepository: Jeune.Repository,
+    private jeuneAuthorizer: JeuneAuthorizer
+  ) {
+    super()
+  }
 
-  async execute(command: AddFavoriOffreEmploiCommand): Promise<Result> {
+  async handle(command: AddFavoriOffreEmploiCommand): Promise<Result> {
     const jeune = await this.jeuneRepository.get(command.idJeune)
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', command.idJeune))
@@ -56,5 +62,12 @@ export class AddFavoriOffreEmploiCommandHandler
       command.offreEmploi
     )
     return emptySuccess()
+  }
+
+  async authorize(
+    command: AddFavoriOffreEmploiCommand,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    await this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
   }
 }

@@ -7,28 +7,34 @@ import {
   failure,
   Result
 } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
 import {
   Notification,
   NotificationRepositoryToken
 } from '../../domain/notification'
 import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
+import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
 
 export interface DeleteRendezVousCommand extends Command {
   idRendezVous: string
 }
 
 @Injectable()
-export class DeleteRendezVousCommandHandler
-  implements CommandHandler<DeleteRendezVousCommand, Result>
-{
+export class DeleteRendezVousCommandHandler extends CommandHandler<
+  DeleteRendezVousCommand,
+  Result
+> {
   constructor(
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
     @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository
-  ) {}
+    private notificationRepository: Notification.Repository,
+    private rendezVousAuthorizer: RendezVousAuthorizer
+  ) {
+    super()
+  }
 
-  async execute(command: DeleteRendezVousCommand): Promise<Result> {
+  async handle(command: DeleteRendezVousCommand): Promise<Result> {
     const rendezVous = await this.rendezVousRepository.get(command.idRendezVous)
     if (!rendezVous) {
       return failure(new NonTrouveError('Rendez-Vous', command.idRendezVous))
@@ -42,5 +48,12 @@ export class DeleteRendezVousCommandHandler
       await this.notificationRepository.send(notification)
     }
     return emptySuccess()
+  }
+
+  async authorize(
+    command: DeleteRendezVousCommand,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    await this.rendezVousAuthorizer.authorize(command.idRendezVous, utilisateur)
   }
 }

@@ -111,6 +111,41 @@ describe('ActionSqlRepository', () => {
       })
     })
   })
+
+  describe('.getConseillerEtJeune(id)', () => {
+    it('récupère les id des conseillers et jeunes', async () => {
+      // Given
+      const idAction = 'c723bfa8-0ac4-4d29-b0b6-68bdb3dec21c'
+      const actionDto = uneActionDto({
+        id: idAction,
+        statut: Action.Statut.EN_COURS,
+        idJeune: jeune.id
+      })
+      await ActionSqlModel.creer(actionDto)
+
+      // When
+      const actual = await actionSqlRepository.getConseillerEtJeune(idAction)
+
+      // Then
+      expect(actual).to.deep.equal({
+        idConseiller: jeune.conseiller.id,
+        idJeune: jeune.id
+      })
+    })
+
+    describe("Quand l'action n'existe pas", () => {
+      it('renvoie undefined', async () => {
+        // When
+        const actual = await actionSqlRepository.get(
+          '184d8c6c-666c-4a33-88bd-ec44fb62f162'
+        )
+
+        // Then
+        expect(actual).to.equal(undefined)
+      })
+    })
+  })
+
   describe('.delete(id)', () => {
     it("supprime l'action", async () => {
       // Given

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -10,9 +11,11 @@ import {
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { CreateRendezVousCommandHandler } from 'src/application/commands/create-rendez-vous.command.handler'
 import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler'
 import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler'
 import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
+import { Authentification } from 'src/domain/authentification'
 import { CreateActionCommandHandler } from '../../application/commands/create-action.command.handler'
 import { CreateJeuneCommandHandler } from '../../application/commands/create-jeune.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from '../../application/commands/send-notification-nouveau-message.command.handler'
@@ -27,12 +30,18 @@ import {
   JeuneNonLieAuConseillerError,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
-import { isFailure, isSuccess } from '../../building-blocks/types/result'
+import {
+  isFailure,
+  isSuccess,
+  Result
+} from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
+import { Utilisateur } from '../decorators/authenticated.decorator'
 import {
   CreateActionPayload,
   CreateJeunePayload
 } from './validation/conseillers.inputs'
+import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
 
 @Controller('conseillers/:idConseiller')
 @ApiOAuth2([])
@@ -45,7 +54,8 @@ export class ConseillersController {
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly createJeuneCommandHandler: CreateJeuneCommandHandler,
     private readonly sendNotificationNouveauMessage: SendNotificationNouveauMessageCommandHandler,
-    private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler
+    private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler,
+    private createRendezVousCommandHandler: CreateRendezVousCommandHandler
   ) {}
 
   @Get('')
@@ -53,11 +63,15 @@ export class ConseillersController {
     type: DetailConseillerQueryModel
   })
   async getDetailConseiller(
-    @Param('idConseiller') idConseiller: string
+    @Param('idConseiller') idConseiller: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DetailConseillerQueryModel> {
-    const queryModel = await this.getDetailConseillerQueryHandler.execute({
-      idConseiller
-    })
+    const queryModel = await this.getDetailConseillerQueryHandler.execute(
+      {
+        idConseiller
+      },
+      utilisateur
+    )
     if (queryModel) {
       return queryModel
     }
@@ -74,9 +88,13 @@ export class ConseillersController {
     isArray: true
   })
   async getJeunes(
-    @Param('idConseiller') idConseiller: string
+    @Param('idConseiller') idConseiller: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DetailJeuneQueryModel[]> {
-    return this.getJeunesByConseillerQueryHandler.execute({ idConseiller })
+    return this.getJeunesByConseillerQueryHandler.execute(
+      { idConseiller },
+      utilisateur
+    )
   }
 
   @Post('jeune')
@@ -86,12 +104,16 @@ export class ConseillersController {
   })
   async createJeune(
     @Param('idConseiller') idConseiller: string,
-    @Body() createJeunePayload: CreateJeunePayload
+    @Body() createJeunePayload: CreateJeunePayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DetailJeuneQueryModel> {
-    const jeune = await this.createJeuneCommandHandler.execute({
-      idConseiller,
-      ...createJeunePayload
-    })
+    const jeune = await this.createJeuneCommandHandler.execute(
+      {
+        idConseiller,
+        ...createJeunePayload
+      },
+      utilisateur
+    )
     return {
       id: jeune.id,
       firstName: jeune.firstName,
@@ -104,15 +126,19 @@ export class ConseillersController {
   async createAction(
     @Param('idConseiller') idConseiller: string,
     @Param('idJeune') idJeune: string,
-    @Body() createActionPayload: CreateActionPayload
+    @Body() createActionPayload: CreateActionPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<{ id: Action.Id }> {
-    const result = await this.createActionCommandHandler.execute({
-      contenu: createActionPayload.content,
-      idJeune,
-      idCreateur: idConseiller,
-      typeCreateur: Action.TypeCreateur.CONSEILLER,
-      commentaire: createActionPayload.comment
-    })
+    const result = await this.createActionCommandHandler.execute(
+      {
+        contenu: createActionPayload.content,
+        idJeune,
+        idCreateur: idConseiller,
+        typeCreateur: Action.TypeCreateur.CONSEILLER,
+        commentaire: createActionPayload.comment
+      },
+      utilisateur
+    )
 
     if (isFailure(result) && result.error.code === NonTrouveError.CODE) {
       throw new NotFoundException(result.error)
@@ -128,11 +154,15 @@ export class ConseillersController {
 
   @Get('actions')
   async getActions(
-    @Param('idConseiller') idConseiller: string
+    @Param('idConseiller') idConseiller: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<ResumeActionsDuJeuneQueryModel[]> {
-    return this.getResumeActionsDesJeunesDuConseillerQueryHandler.execute({
-      idConseiller
-    })
+    return this.getResumeActionsDesJeunesDuConseillerQueryHandler.execute(
+      {
+        idConseiller
+      },
+      utilisateur
+    )
   }
 
   @Get('rendezvous')
@@ -140,20 +170,28 @@ export class ConseillersController {
     type: RendezVousConseillerQueryModel
   })
   async getRendezVous(
-    @Param('idConseiller') idConseiller: string
+    @Param('idConseiller') idConseiller: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<RendezVousConseillerQueryModel> {
-    return this.getAllRendezVousConseillerQueryHandler.execute({ idConseiller })
+    return this.getAllRendezVousConseillerQueryHandler.execute(
+      { idConseiller },
+      utilisateur
+    )
   }
 
   @Post('jeunes/:idJeune/notify-message')
   async postNotification(
     @Param('idConseiller') idConseiller: string,
-    @Param('idJeune') idJeune: string
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const result = await this.sendNotificationNouveauMessage.execute({
-      idConseiller,
-      idJeune
-    })
+    const result = await this.sendNotificationNouveauMessage.execute(
+      {
+        idConseiller,
+        idJeune
+      },
+      utilisateur
+    )
     if (isFailure(result)) {
       if (
         result.error.code === NonTrouveError.CODE ||
@@ -164,5 +202,39 @@ export class ConseillersController {
         throw new RuntimeException()
       }
     }
+  }
+
+  @Post('rendezvous')
+  async createRendezVous(
+    @Param('idConseiller') idConseiller: string,
+    @Body() createRendezVousPayload: CreateRendezVousPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<{ id: string }> {
+    const result: Result<string> =
+      await this.createRendezVousCommandHandler.execute(
+        {
+          idJeune: createRendezVousPayload.jeuneId,
+          commentaire: createRendezVousPayload.comment,
+          date: createRendezVousPayload.date,
+          duree: createRendezVousPayload.duration,
+          idConseiller: idConseiller,
+          modalite: createRendezVousPayload.modality
+        },
+        utilisateur
+      )
+
+    if (isFailure(result)) {
+      switch (result.error.code) {
+        case JeuneNonLieAuConseillerError.CODE:
+          throw new BadRequestException(result.error)
+        case NonTrouveError.CODE:
+          throw new NotFoundException(result.error)
+      }
+    }
+
+    if (isSuccess(result)) {
+      return { id: result.data }
+    }
+    throw new RuntimeException()
   }
 }

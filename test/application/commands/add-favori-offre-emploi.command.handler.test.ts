@@ -1,6 +1,9 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { createSandbox, expect } from '../../utils'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { Authentification } from '../../../src/domain/authentification'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { OffresEmploi } from '../../../src/domain/offre-emploi'
 import {
   AddFavoriOffreEmploiCommand,
@@ -14,25 +17,28 @@ import {
   FavoriExisteDejaError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
+import Utilisateur = Authentification.Utilisateur
 
 describe('AddFavoriOffreEmploiCommandHandler', () => {
-  describe('execute', () => {
-    let offresEmploiRepository: StubbedType<OffresEmploi.Repository>
-    let jeuneRepository: StubbedType<Jeune.Repository>
-    let addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler
-    const jeune = unJeune()
+  let offresEmploiRepository: StubbedType<OffresEmploi.Repository>
+  let jeuneRepository: StubbedType<Jeune.Repository>
+  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
+  let addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler
+  const jeune = unJeune()
 
-    beforeEach(async () => {
-      const sandbox: SinonSandbox = createSandbox()
-      offresEmploiRepository = stubInterface(sandbox)
-      jeuneRepository = stubInterface(sandbox)
-      addFavoriOffreEmploiCommandHandler =
-        new AddFavoriOffreEmploiCommandHandler(
-          offresEmploiRepository,
-          jeuneRepository
-        )
-    })
+  beforeEach(async () => {
+    const sandbox: SinonSandbox = createSandbox()
+    offresEmploiRepository = stubInterface(sandbox)
+    jeuneRepository = stubInterface(sandbox)
+    jeuneAuthorizer = stubClass(JeuneAuthorizer)
+    addFavoriOffreEmploiCommandHandler = new AddFavoriOffreEmploiCommandHandler(
+      offresEmploiRepository,
+      jeuneRepository,
+      jeuneAuthorizer
+    )
+  })
 
+  describe('handle', () => {
     it('sauvegarde un favori', async () => {
       // Given
       const offreEmploi = uneOffreEmploi()
@@ -46,7 +52,7 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
         .resolves(undefined)
 
       // When
-      await addFavoriOffreEmploiCommandHandler.execute(command)
+      await addFavoriOffreEmploiCommandHandler.handle(command)
 
       // Then
       expect(offresEmploiRepository.saveAsFavori).to.have.been.calledWith(
@@ -64,7 +70,7 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
       jeuneRepository.get.withArgs('FAUUX').resolves(undefined)
 
       // When
-      const result = await addFavoriOffreEmploiCommandHandler.execute(command)
+      const result = await addFavoriOffreEmploiCommandHandler.handle(command)
 
       // Then
       expect(result).to.deep.equal(
@@ -89,6 +95,26 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
       // Then
       expect(result).to.deep.equal(
         failure(new FavoriExisteDejaError(jeune.id, offreEmploi.id))
+      )
+    })
+  })
+
+  describe('authorize', () => {
+    it('authorize le jeune', async () => {
+      // Given
+      const command: AddFavoriOffreEmploiCommand = {
+        idJeune: 'idJeune',
+        offreEmploi: uneOffreEmploi()
+      }
+      const utilisateur: Utilisateur = unUtilisateurJeune()
+
+      // When
+      await addFavoriOffreEmploiCommandHandler.authorize(command, utilisateur)
+
+      // Then
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+        'idJeune',
+        utilisateur
       )
     })
   })

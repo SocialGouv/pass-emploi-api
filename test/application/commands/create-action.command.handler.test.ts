@@ -1,44 +1,57 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import {
   CreateActionCommand,
   CreateActionCommandHandler
 } from '../../../src/application/commands/create-action.command.handler'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action'
+import { Authentification } from '../../../src/domain/authentification'
 import { Jeune } from '../../../src/domain/jeune'
 import { Notification } from '../../../src/domain/notification'
 import { uneAction } from '../../fixtures/action.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { ActionFakeRepository } from '../../infrastructure/repositories/fakes/action-fake.repository'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('CreateActionCommandHandler', () => {
-  describe('execute', () => {
-    let action: Action
-    let jeune: Required<Omit<Jeune, 'tokenLastUpdate'>>
-    let actionRepository: Action.Repository
-    let notificationRepository: StubbedType<Notification.Repository>
-    let actionFactory: StubbedClass<Action.Factory>
-    let createActionCommandHandler: CreateActionCommandHandler
-    before(async () => {
-      action = uneAction()
-      jeune = unJeune()
-      const sandbox: SinonSandbox = createSandbox()
-      actionRepository = new ActionFakeRepository()
-      const jeuneRepository: StubbedType<Jeune.Repository> =
-        stubInterface(sandbox)
-      notificationRepository = stubInterface(sandbox)
-      jeuneRepository.get.withArgs(action.idJeune).resolves(jeune)
-      actionFactory = stubClass(Action.Factory)
-      createActionCommandHandler = new CreateActionCommandHandler(
-        actionRepository,
-        jeuneRepository,
-        notificationRepository,
-        actionFactory
-      )
-    })
+  let action: Action
+  let jeune: Required<Omit<Jeune, 'tokenLastUpdate'>>
+  let actionRepository: StubbedType<Action.Repository>
+  let notificationRepository: StubbedType<Notification.Repository>
+  let actionFactory: StubbedClass<Action.Factory>
+  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
+  let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
+  let createActionCommandHandler: CreateActionCommandHandler
 
+  beforeEach(async () => {
+    action = uneAction()
+    jeune = unJeune()
+    const sandbox: SinonSandbox = createSandbox()
+    actionRepository = stubInterface(sandbox)
+    const jeuneRepository: StubbedType<Jeune.Repository> =
+      stubInterface(sandbox)
+    notificationRepository = stubInterface(sandbox)
+    jeuneRepository.get.withArgs(action.idJeune).resolves(jeune)
+    actionFactory = stubClass(Action.Factory)
+    jeuneAuthorizer = stubClass(JeuneAuthorizer)
+    conseillerAuthorizer = stubClass(ConseillerAuthorizer)
+
+    createActionCommandHandler = new CreateActionCommandHandler(
+      actionRepository,
+      jeuneRepository,
+      notificationRepository,
+      actionFactory,
+      jeuneAuthorizer,
+      conseillerAuthorizer
+    )
+  })
+  describe('handle', () => {
     it('créée une action', async () => {
       // Given
       actionFactory.buildAction.returns(success(action))
@@ -52,11 +65,11 @@ describe('CreateActionCommandHandler', () => {
       }
 
       // When
-      const result = await createActionCommandHandler.execute(command)
+      const result = await createActionCommandHandler.handle(command)
 
       // Then
       expect(result).to.deep.equal(success(action.id))
-      expect(await actionRepository.get(action.id)).to.deep.equal(action)
+      expect(actionRepository.save).to.have.been.calledWithExactly(action)
       expect(notificationRepository.send).to.have.been.calledWith(
         Notification.createNouvelleAction(
           jeune.pushNotificationToken,
@@ -81,10 +94,63 @@ describe('CreateActionCommandHandler', () => {
         }
 
         // When
-        const result = await createActionCommandHandler.execute(command)
+        const result = await createActionCommandHandler.handle(command)
 
         // Then
         expect(result).to.deep.equal(echec)
+      })
+    })
+  })
+
+  describe('authorize', () => {
+    describe("quand c'est un jeune", () => {
+      it("autorise le jeune à créer l'action", async () => {
+        // Given
+        const command: CreateActionCommand = {
+          idJeune: action.idJeune,
+          contenu: action.contenu,
+          idCreateur: action.idCreateur,
+          typeCreateur: action.typeCreateur,
+          statut: action.statut,
+          commentaire: action.commentaire
+        }
+
+        const utilisateur: Authentification.Utilisateur = unUtilisateurJeune()
+
+        // When
+        await createActionCommandHandler.authorize(command, utilisateur)
+
+        // Then
+        expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+          action.idJeune,
+          utilisateur
+        )
+      })
+    })
+    describe("quand c'est un conseiller", () => {
+      it("autorise le conseiller à créer l'action", async () => {
+        // Given
+        const utilisateur: Authentification.Utilisateur =
+          unUtilisateurConseiller()
+
+        const command: CreateActionCommand = {
+          idJeune: action.idJeune,
+          contenu: action.contenu,
+          idCreateur: utilisateur.id,
+          typeCreateur: action.typeCreateur,
+          statut: action.statut,
+          commentaire: action.commentaire
+        }
+
+        // When
+        await createActionCommandHandler.authorize(command, utilisateur)
+
+        // Then
+        expect(conseillerAuthorizer.authorize).to.have.been.calledWithExactly(
+          action.idCreateur,
+          utilisateur,
+          action.idJeune
+        )
       })
     })
   })

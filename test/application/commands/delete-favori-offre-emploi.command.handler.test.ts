@@ -1,4 +1,12 @@
-import { createSandbox, DatabaseForTesting, expect } from '../../utils'
+import { FavoriAuthorizer } from '../../../src/application/authorizers/authorize-favori'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import {
+  createSandbox,
+  DatabaseForTesting,
+  expect,
+  StubbedClass,
+  stubClass
+} from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import {
@@ -22,21 +30,27 @@ describe('DeleteFavoriOffreEmploiCommandHandler', () => {
   DatabaseForTesting.prepare()
   let offresEmploiHttpSqlRepository: StubbedType<OffresEmploi.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
+  let favoriAuthorizer: StubbedClass<FavoriAuthorizer>
   let deleteFavoriOffreEmploiCommandHandler: DeleteFavoriOffreEmploiCommandHandler
   let offreEmploi: OffreEmploi
   const jeune = unJeune()
+
   beforeEach(async () => {
     offreEmploi = uneOffreEmploi()
     const sandbox: SinonSandbox = createSandbox()
     offresEmploiHttpSqlRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
+    favoriAuthorizer = stubClass(FavoriAuthorizer)
+
     deleteFavoriOffreEmploiCommandHandler =
       new DeleteFavoriOffreEmploiCommandHandler(
         offresEmploiHttpSqlRepository,
-        jeuneRepository
+        jeuneRepository,
+        favoriAuthorizer
       )
   })
-  describe('execute', () => {
+
+  describe('handle', () => {
     describe('quand le favori existe', () => {
       it('supprime le favori', async () => {
         // Given
@@ -51,7 +65,7 @@ describe('DeleteFavoriOffreEmploiCommandHandler', () => {
         }
 
         // When
-        const result = await deleteFavoriOffreEmploiCommandHandler.execute(
+        const result = await deleteFavoriOffreEmploiCommandHandler.handle(
           command
         )
         // Then
@@ -75,7 +89,7 @@ describe('DeleteFavoriOffreEmploiCommandHandler', () => {
         }
 
         // When
-        const result = await deleteFavoriOffreEmploiCommandHandler.execute(
+        const result = await deleteFavoriOffreEmploiCommandHandler.handle(
           command
         )
         // Then
@@ -103,7 +117,7 @@ describe('DeleteFavoriOffreEmploiCommandHandler', () => {
         }
 
         // When
-        const result = await deleteFavoriOffreEmploiCommandHandler.execute(
+        const result = await deleteFavoriOffreEmploiCommandHandler.handle(
           command
         )
         // Then
@@ -114,6 +128,31 @@ describe('DeleteFavoriOffreEmploiCommandHandler', () => {
           offresEmploiHttpSqlRepository.deleteFavori
         ).not.to.have.been.calledWith(jeune.id, offreEmploi.id)
       })
+    })
+  })
+
+  describe('authorize', () => {
+    it('autorise un jeune a supprimer son favori', async () => {
+      // Given
+      const command: DeleteFavoriOffreEmploiCommand = {
+        idOffreEmploi: offreEmploi.id,
+        idJeune: jeune.id
+      }
+
+      const utilisateur = unUtilisateurJeune()
+
+      // When
+      await deleteFavoriOffreEmploiCommandHandler.authorize(
+        command,
+        utilisateur
+      )
+
+      // Then
+      expect(favoriAuthorizer.authorize).to.have.been.calledWithExactly(
+        command.idJeune,
+        command.idOffreEmploi,
+        utilisateur
+      )
     })
   })
 })

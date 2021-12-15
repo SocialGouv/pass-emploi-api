@@ -13,18 +13,17 @@ export interface GetCommunesEtDepartementsQuery extends Query {
 }
 
 @Injectable()
-export class GetCommunesEtDepartementsQueryHandler
-  implements
-    QueryHandler<
-      GetCommunesEtDepartementsQuery,
-      CommunesEtDepartementsQueryModel[]
-    >
-{
+export class GetCommunesEtDepartementsQueryHandler extends QueryHandler<
+  GetCommunesEtDepartementsQuery,
+  CommunesEtDepartementsQueryModel[]
+> {
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
-  ) {}
+  ) {
+    super()
+  }
 
-  async execute(
+  async handle(
     query: GetCommunesEtDepartementsQuery
   ): Promise<CommunesEtDepartementsQueryModel[]> {
     const sanitizedQuery: GetCommunesEtDepartementsQuery = {
@@ -40,6 +39,12 @@ export class GetCommunesEtDepartementsQueryHandler
     resultats.splice(5, resultats.length)
 
     return resultats
+  }
+  async authorize(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _query: GetCommunesEtDepartementsQuery
+  ): Promise<void> {
+    return
   }
 
   private async findDepartements(

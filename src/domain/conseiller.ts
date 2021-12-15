@@ -13,7 +13,7 @@ export namespace Conseiller {
   export type Id = Brand<string, 'IdConseiller'>
 
   export interface Repository {
-    get(id: Conseiller.Id): Promise<Conseiller>
+    get(id: Conseiller.Id): Promise<Conseiller | undefined>
     getQueryModelById(
       id: Conseiller.Id
     ): Promise<DetailConseillerQueryModel | undefined>

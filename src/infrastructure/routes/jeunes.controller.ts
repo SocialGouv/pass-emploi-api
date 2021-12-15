@@ -36,7 +36,6 @@ import {
   DeleteFavoriOffreEmploiCommand,
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../application/commands/delete-favori-offre-emploi.command.handler'
-import { LoginJeuneCommandHandler } from '../../application/commands/login-jeune.command.handler'
 import { UpdateNotificationTokenCommandHandler } from '../../application/commands/update-notification-token.command.handler'
 import { GetActionsByJeuneQueryHandler } from '../../application/queries/get-actions-by-jeune.query.handler'
 import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
@@ -48,6 +47,8 @@ import {
 } from '../../building-blocks/types/domain-error'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
+import { Authentification } from '../../domain/authentification'
+import { Utilisateur } from '../decorators/authenticated.decorator'
 import { CreateActionAvecStatutPayload } from './validation/conseillers.inputs'
 import {
   AddFavoriPayload,
@@ -62,7 +63,6 @@ import StatutInvalide = Action.StatutInvalide
 export class JeunesController {
   constructor(
     private readonly getDetailJeuneQueryHandler: GetDetailJeuneQueryHandler,
-    private readonly loginJeuneCommandHandler: LoginJeuneCommandHandler,
     private readonly updateNotificationTokenCommandHandler: UpdateNotificationTokenCommandHandler,
     private readonly getHomeJeuneHandler: GetHomeJeuneHandler,
     private readonly getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
@@ -79,11 +79,15 @@ export class JeunesController {
     type: DetailJeuneQueryModel
   })
   async getDetailJeune(
-    @Param('idJeune') idJeune: string
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DetailJeuneQueryModel | undefined> {
-    const queryModel = await this.getDetailJeuneQueryHandler.execute({
-      idJeune
-    })
+    const queryModel = await this.getDetailJeuneQueryHandler.execute(
+      {
+        idJeune
+      },
+      utilisateur
+    )
     if (queryModel) {
       return queryModel
     }
@@ -91,37 +95,35 @@ export class JeunesController {
     throw new HttpException(`Jeune ${idJeune} not found`, HttpStatus.NOT_FOUND)
   }
 
-  @Post('login')
-  async login(
-    @Param('idJeune') idJeune: string
-  ): Promise<{ id: string; firstName: string; lastName: string }> {
-    const jeune = await this.loginJeuneCommandHandler.execute({ idJeune })
-    if (!jeune) {
-      throw new HttpException(`UNAUTHORIZED`, HttpStatus.UNAUTHORIZED)
-    }
-    return {
-      id: jeune.id,
-      firstName: jeune.firstName,
-      lastName: jeune.lastName
-    }
-  }
-
   @Put('push-notification-token')
   async updateNotificationToken(
     @Param('idJeune') idJeune: string,
-    @Body() putNotificationTokenInput: PutNotificationTokenInput
+    @Body() putNotificationTokenInput: PutNotificationTokenInput,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    await this.updateNotificationTokenCommandHandler.execute({
-      idJeune,
-      token: putNotificationTokenInput.registration_token
-    })
+    const result = await this.updateNotificationTokenCommandHandler.execute(
+      {
+        idJeune,
+        token: putNotificationTokenInput.registration_token
+      },
+      utilisateur
+    )
+
+    if (isFailure(result) && result.error.code === NonTrouveError.CODE) {
+      throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
+    }
+
+    if (!isSuccess(result)) {
+      throw new RuntimeException()
+    }
   }
 
   @Get('home')
   async getHome(
-    @Param('idJeune') idJeune: string
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<JeuneHomeQueryModel> {
-    return await this.getHomeJeuneHandler.execute({ idJeune })
+    return await this.getHomeJeuneHandler.execute({ idJeune }, utilisateur)
   }
 
   @Get('actions')
@@ -130,9 +132,13 @@ export class JeunesController {
     isArray: true
   })
   async getActions(
-    @Param('idJeune') idJeune: string
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<ActionQueryModel[]> {
-    return await this.getActionsByJeuneQueryHandler.execute({ idJeune })
+    return await this.getActionsByJeuneQueryHandler.execute(
+      { idJeune },
+      utilisateur
+    )
   }
 
   @Get('rendezvous')
@@ -141,15 +147,20 @@ export class JeunesController {
     isArray: true
   })
   async getRendezVous(
-    @Param('idJeune') idJeune: string
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<RendezVousQueryModel[]> {
-    return await this.getAllRendezVousJeuneQueryHandler.execute({ idJeune })
+    return await this.getAllRendezVousJeuneQueryHandler.execute(
+      { idJeune },
+      utilisateur
+    )
   }
 
   @Post('action')
   async postNouvelleAction(
     @Param('idJeune') idJeune: string,
-    @Body() createActionPayload: CreateActionAvecStatutPayload
+    @Body() createActionPayload: CreateActionAvecStatutPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<{ id: Action.Id }> {
     const command: CreateActionCommand = {
       contenu: createActionPayload.content,
@@ -159,7 +170,10 @@ export class JeunesController {
       commentaire: createActionPayload.comment,
       statut: createActionPayload.status
     }
-    const result = await this.createActionCommandHandler.execute(command)
+    const result = await this.createActionCommandHandler.execute(
+      command,
+      utilisateur
+    )
 
     if (isSuccess(result)) {
       return {
@@ -182,18 +196,26 @@ export class JeunesController {
   @Get('favoris')
   async getFavoris(
     @Param('idJeune') idJeune: string,
-    @Query() getFavorisQuery: GetFavorisQuery
+    @Query() getFavorisQuery: GetFavorisQuery,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffreEmploiResumeQueryModel[] | FavoriIdQueryModel[]> {
     if (getFavorisQuery.detail === 'true') {
-      return await this.getFavorisJeuneQueryHandler.execute({ idJeune })
+      return await this.getFavorisJeuneQueryHandler.execute(
+        { idJeune },
+        utilisateur
+      )
     }
-    return await this.getFavorisIdsJeuneQueryHandler.execute({ idJeune })
+    return await this.getFavorisIdsJeuneQueryHandler.execute(
+      { idJeune },
+      utilisateur
+    )
   }
 
   @Post('favori')
   async postNouveauFavori(
     @Param('idJeune') idJeune: string,
-    @Body() addFavoriPayload: AddFavoriPayload
+    @Body() addFavoriPayload: AddFavoriPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const command: AddFavoriOffreEmploiCommand = {
       idJeune,
@@ -208,7 +230,8 @@ export class JeunesController {
       }
     }
     const result = await this.addFavoriOffreEmploiCommandHandler.execute(
-      command
+      command,
+      utilisateur
     )
 
     if (isFailure(result)) {
@@ -226,13 +249,17 @@ export class JeunesController {
   @HttpCode(204)
   async deleteFavori(
     @Param('idJeune') idJeune: string,
-    @Param('idOffreEmploi') idOffreEmploi: string
+    @Param('idOffreEmploi') idOffreEmploi: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const command: DeleteFavoriOffreEmploiCommand = {
       idJeune,
       idOffreEmploi
     }
-    const result = await this.deleteFavoriCommandHandler.execute(command)
+    const result = await this.deleteFavoriCommandHandler.execute(
+      command,
+      utilisateur
+    )
     if (isFailure(result)) {
       throw new NotFoundException(result.error)
     }

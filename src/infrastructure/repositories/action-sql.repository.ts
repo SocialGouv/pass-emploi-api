@@ -20,8 +20,26 @@ export class ActionSqlRepository implements Action.Repository {
   async get(id: Action.Id): Promise<Action | undefined> {
     const sqlModel = await ActionSqlModel.findByPk(id)
     if (!sqlModel) return undefined
-
     return ActionSqlRepository.actionFromSqlModel(sqlModel)
+  }
+
+  async getConseillerEtJeune(
+    id: Action.Id
+  ): Promise<{ idConseiller: string; idJeune: string } | undefined> {
+    const sqlModel = await ActionSqlModel.findByPk(id, {
+      attributes: [],
+      include: [
+        {
+          model: JeuneSqlModel,
+          attributes: ['idConseiller', 'id']
+        }
+      ]
+    })
+    if (!sqlModel) return undefined
+    return {
+      idJeune: sqlModel.getDataValue('jeune').id,
+      idConseiller: sqlModel.getDataValue('jeune').idConseiller
+    }
   }
 
   async delete(idAction: string): Promise<void> {

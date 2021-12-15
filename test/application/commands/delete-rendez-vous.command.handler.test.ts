@@ -1,4 +1,12 @@
-import { createSandbox, DatabaseForTesting, expect } from '../../utils'
+import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import {
+  createSandbox,
+  DatabaseForTesting,
+  expect,
+  StubbedClass,
+  stubClass
+} from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import {
@@ -19,19 +27,25 @@ describe('DeleteRendezVousCommandHandler', () => {
   DatabaseForTesting.prepare()
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let notificationRepository: StubbedType<Notification.Repository>
+  let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
   let deleteRendezVousCommandHandler: DeleteRendezVousCommandHandler
   const jeune = unJeune()
   const rendezVous = unRendezVous(jeune)
+
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
     rendezVousRepository = stubInterface(sandbox)
     notificationRepository = stubInterface(sandbox)
+    rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
+
     deleteRendezVousCommandHandler = new DeleteRendezVousCommandHandler(
       rendezVousRepository,
-      notificationRepository
+      notificationRepository,
+      rendezVousAuthorizer
     )
   })
-  describe('execute', () => {
+
+  describe('handle', () => {
     describe('quand le rendez-vous existe', () => {
       describe('quand le jeune s"est déjà connecté au moins une fois sur l"application', () => {
         it('supprime le rendezvous et envoit une notification au jeune', async () => {
@@ -43,7 +57,8 @@ describe('DeleteRendezVousCommandHandler', () => {
           }
 
           // When
-          const result = await deleteRendezVousCommandHandler.execute(command)
+          const result = await deleteRendezVousCommandHandler.handle(command)
+
           // Then
           expect(rendezVousRepository.delete).to.have.been.calledWith(
             rendezVous.id
@@ -67,7 +82,7 @@ describe('DeleteRendezVousCommandHandler', () => {
           }
 
           // When
-          const result = await deleteRendezVousCommandHandler.execute(command)
+          const result = await deleteRendezVousCommandHandler.handle(command)
           // Then
           expect(rendezVousRepository.delete).to.have.been.calledWith(
             rendezVous.id
@@ -91,7 +106,7 @@ describe('DeleteRendezVousCommandHandler', () => {
         }
 
         // When
-        const result = await deleteRendezVousCommandHandler.execute(command)
+        const result = await deleteRendezVousCommandHandler.handle(command)
         // Then
         expect(rendezVousRepository.delete).not.to.have.been.calledWith(
           rendezVous.id
@@ -106,6 +121,26 @@ describe('DeleteRendezVousCommandHandler', () => {
           failure(new NonTrouveError('Rendez-Vous', command.idRendezVous))
         )
       })
+    })
+  })
+
+  describe('authorize', () => {
+    it('autorise un jeune ou un conseiller à supprimer un rdv', async () => {
+      // Given
+      const command: DeleteRendezVousCommand = {
+        idRendezVous: rendezVous.id
+      }
+
+      const utilisateur = unUtilisateurConseiller()
+
+      // When
+      await deleteRendezVousCommandHandler.authorize(command, utilisateur)
+
+      // Then
+      expect(rendezVousAuthorizer.authorize).to.have.been.calledWithExactly(
+        command.idRendezVous,
+        utilisateur
+      )
     })
   })
 })

@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
+import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import {
   failure,
@@ -12,7 +13,6 @@ import {
   AuthentificationRepositoryToken
 } from '../../domain/authentification'
 import { UtilisateurQueryModel } from '../queries/query-models/authentification.query-models'
-import Structure = Authentification.Structure
 
 export interface UpdateUtilisateurCommand extends Command {
   idUtilisateurAuth: string
@@ -25,14 +25,19 @@ export interface UpdateUtilisateurCommand extends Command {
 }
 
 @Injectable()
-export class UpdateUtilisateurCommandHandler {
+export class UpdateUtilisateurCommandHandler extends CommandHandler<
+  UpdateUtilisateurCommand,
+  Result<UtilisateurQueryModel>
+> {
   constructor(
     @Inject(AuthentificationRepositoryToken)
     private readonly authentificationRepository: Authentification.Repository,
     private authentificationFactory: Authentification.Factory
-  ) {}
+  ) {
+    super()
+  }
 
-  async execute(
+  async handle(
     command: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
     const utilisateur = await this.authentificationRepository.get(
@@ -43,7 +48,7 @@ export class UpdateUtilisateurCommandHandler {
 
     if (utilisateur) {
       return success(utilisateur)
-    } else if (command.structure === Structure.PASS_EMPLOI) {
+    } else if (command.structure === Authentification.Structure.PASS_EMPLOI) {
       return failure(
         new NonTrouveError('Utilisateur', command.idUtilisateurAuth)
       )
@@ -81,5 +86,12 @@ export class UpdateUtilisateurCommandHandler {
     }
 
     return failure(new NonTrouveError('Utilisateur', command.idUtilisateurAuth))
+  }
+
+  async authorize(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _command: UpdateUtilisateurCommand
+  ): Promise<void> {
+    return
   }
 }

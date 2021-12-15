@@ -8,25 +8,30 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Action, ActionsRepositoryToken } from '../../domain/action'
+import { Authentification } from '../../domain/authentification'
+import { ActionAuthorizer } from '../authorizers/authorize-action'
 
 export interface DeleteActionCommand extends Command {
   idAction: string
 }
 
 @Injectable()
-export class DeleteActionCommandHandler
-  implements CommandHandler<DeleteActionCommand, Result>
-{
+export class DeleteActionCommandHandler extends CommandHandler<
+  DeleteActionCommand,
+  Result
+> {
   private logger: Logger
 
   constructor(
     @Inject(ActionsRepositoryToken)
-    private readonly actionRepository: Action.Repository
+    private readonly actionRepository: Action.Repository,
+    private actionAuthorizer: ActionAuthorizer
   ) {
+    super()
     this.logger = new Logger('DeleteActionCommandHandler')
   }
 
-  async execute(command: DeleteActionCommand): Promise<Result> {
+  async handle(command: DeleteActionCommand): Promise<Result> {
     const action = await this.actionRepository.get(command.idAction)
     if (!action) {
       return failure(new NonTrouveError('Action', command.idAction))
@@ -34,5 +39,12 @@ export class DeleteActionCommandHandler
     await this.actionRepository.delete(command.idAction)
     this.logger.log(`L'action ${command.idAction} a été supprimée`)
     return emptySuccess()
+  }
+
+  async authorize(
+    command: DeleteActionCommand,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    await this.actionAuthorizer.authorize(command.idAction, utilisateur)
   }
 }

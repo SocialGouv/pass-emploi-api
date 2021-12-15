@@ -1,4 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
+import { Action } from 'src/domain/action'
 import * as request from 'supertest'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from '../../../src/application/commands/send-notification-nouveau-message.command.handler'
@@ -12,9 +13,13 @@ import {
   success
 } from '../../../src/building-blocks/types/result'
 import { CreateActionPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
-import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
+import {
+  unHeaderAuthorization,
+  unUtilisateurDecode
+} from '../../fixtures/authentification.fixture'
 import {
   buildTestingModuleForHttpTesting,
+  expect,
   StubbedClass,
   stubClass
 } from '../../utils'
@@ -47,7 +52,7 @@ describe('ConseillersController', () => {
   })
 
   describe('POST /conseillers/:idConseiller/jeunes/:idJeune/action', () => {
-    it("renvoie l'id de l'action créée", () => {
+    it("renvoie l'id de l'action créée", async () => {
       // Given
       const actionPayload: CreateActionPayload = {
         content: "Ceci est un contenu d'action",
@@ -57,12 +62,23 @@ describe('ConseillersController', () => {
       createActionCommandHandler.execute.resolves(success(idAction))
 
       // When - Then
-      return request(app.getHttpServer())
+      await request(app.getHttpServer())
         .post('/conseillers/1/jeunes/ABCDE/action')
         .set('authorization', unHeaderAuthorization())
         .send(actionPayload)
         .expect(HttpStatus.CREATED)
         .expect({ id: idAction })
+
+      expect(createActionCommandHandler.execute).to.have.been.calledWithExactly(
+        {
+          idJeune: 'ABCDE',
+          contenu: "Ceci est un contenu d'action",
+          idCreateur: '1',
+          typeCreateur: Action.TypeCreateur.CONSEILLER,
+          commentaire: 'Ceci est un commentaire'
+        },
+        unUtilisateurDecode()
+      )
     })
 
     ensureUserAuthenticationFailsIfInvalid(
@@ -73,7 +89,7 @@ describe('ConseillersController', () => {
 
   describe('POST /conseillers/:idConseiller/jeunes/:idJeune/notify-message', () => {
     describe('quand tout va bien', () => {
-      it('renvoie void', () => {
+      it('renvoie void', async () => {
         // Given
         sendNotificationNouveauMessage.execute
           .withArgs({
@@ -83,15 +99,25 @@ describe('ConseillersController', () => {
           .resolves(emptySuccess())
 
         // When - Then
-        return request(app.getHttpServer())
+        await request(app.getHttpServer())
           .post('/conseillers/1/jeunes/ABCDE/notify-message')
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.CREATED)
+
+        expect(
+          sendNotificationNouveauMessage.execute
+        ).to.have.been.calledWithExactly(
+          {
+            idJeune: 'ABCDE',
+            idConseiller: '1'
+          },
+          unUtilisateurDecode()
+        )
       })
     })
 
     describe("quand le jeune n'existe pas", () => {
-      it('renvoie 404', () => {
+      it('renvoie 404', async () => {
         // Given
         const result = failure(new NonTrouveError('Jeune', 'ZIZOU'))
         sendNotificationNouveauMessage.execute
@@ -102,7 +128,7 @@ describe('ConseillersController', () => {
           .resolves(result)
 
         // When - Then
-        return request(app.getHttpServer())
+        await request(app.getHttpServer())
           .post('/conseillers/1/jeunes/ZIZOU/notify-message')
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.NOT_FOUND)
@@ -110,7 +136,7 @@ describe('ConseillersController', () => {
     })
 
     describe("quand le conseiller n'est pas lié au jeune", () => {
-      it('renvoie 404', () => {
+      it('renvoie 404', async () => {
         // Given
         const result = failure(
           new JeuneNonLieAuConseillerError('JACQUET', 'ABCDE')
@@ -123,7 +149,7 @@ describe('ConseillersController', () => {
           .resolves(result)
 
         // When - Then
-        return request(app.getHttpServer())
+        await request(app.getHttpServer())
           .post('/conseillers/JACQUET/jeunes/ABCDE/notify-message')
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.NOT_FOUND)
