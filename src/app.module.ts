@@ -26,6 +26,7 @@ import { GetDetailActionQueryHandler } from './application/queries/get-detail-ac
 import { GetDetailConseillerQueryHandler } from './application/queries/get-detail-conseiller.query.handler'
 import { GetDetailJeuneQueryHandler } from './application/queries/get-detail-jeune.query.handler'
 import { GetDetailOffreEmploiQueryHandler } from './application/queries/get-detail-offre-emploi.query.handler'
+import { GetDossierMiloJeuneQueryHandler } from './application/queries/get-dossier-milo-jeune.query.handler'
 import { GetFavorisIdsJeuneQueryHandler } from './application/queries/get-favoris-ids-jeune.query.handler'
 import { GetFavorisJeuneQueryHandler } from './application/queries/get-favoris-jeune.query.handler'
 import { GetHomeJeuneHandler } from './application/queries/get-home-jeune.query.handler'
@@ -43,6 +44,7 @@ import {
 import { ChatsRepositoryToken } from './domain/chat'
 import { ConseillersRepositoryToken } from './domain/conseiller'
 import { JeunesRepositoryToken } from './domain/jeune'
+import { MiloRepositoryToken } from './domain/milo'
 import { NotificationRepositoryToken } from './domain/notification'
 import { OffresEmploiRepositoryToken } from './domain/offre-emploi'
 import { RendezVousRepositoryToken } from './domain/rendez-vous'
@@ -56,6 +58,8 @@ import { AuthentificationSqlRepository } from './infrastructure/repositories/aut
 import { ChatFirebaseRepository } from './infrastructure/repositories/chat-firebase.repository'
 import { ConseillerSqlRepository } from './infrastructure/repositories/conseiller-sql.repository'
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune-sql.repository'
+import { MiloHttpRepository } from './infrastructure/repositories/milo-http.repository'
+import { MiloInMemoryRepository } from './infrastructure/repositories/milo-in-memory.repository'
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
 import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre-emploi-http-sql.repository'
 import { RendezVousRepositorySql } from './infrastructure/repositories/rendez-vous-sql.repository'
@@ -139,6 +143,14 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       provide: AuthentificationRepositoryToken,
       useClass: AuthentificationSqlRepository
     },
+    {
+      provide: MiloRepositoryToken,
+      /* eslint-disable no-process-env */
+      useClass:
+        process.env.IN_MEMORY == 'true'
+          ? MiloInMemoryRepository
+          : MiloHttpRepository
+    },
     ...databaseProviders
   ],
   exports: [...databaseProviders]
@@ -176,7 +188,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     SendNotificationNouveauMessageCommandHandler,
     DeleteActionCommandHandler,
     UpdateUtilisateurCommandHandler,
-    GetCommunesEtDepartementsQueryHandler
+    GetCommunesEtDepartementsQueryHandler,
+    GetDossierMiloJeuneQueryHandler
   ]
 }
 
