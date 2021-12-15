@@ -1,4 +1,4 @@
-import { Authentification } from 'src/domain/authentification'
+import { Core } from '../../../src/domain/core'
 import { ConseillerDto } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 
@@ -10,7 +10,7 @@ export function unConseillerDto(
     prenom: 'Nils',
     nom: 'Tavernier',
     email: 'nils.tavernier@passemploi.com',
-    structure: Authentification.Structure.PASS_EMPLOI,
+    structure: Core.Structure.PASS_EMPLOI,
     idAuthentification: 'un-id'
   }
 

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { UtilisateurMiloNonValide } from '../building-blocks/types/domain-error'
 import { failure, Result, success } from '../building-blocks/types/result'
 import { IdService } from '../utils/id-service'
+import { Core } from './core'
 
 export const AuthentificationRepositoryToken = 'Authentification.Repository'
 
@@ -11,25 +12,19 @@ export namespace Authentification {
     CONSEILLER = 'CONSEILLER'
   }
 
-  export enum Structure {
-    PASS_EMPLOI = 'PASS_EMPLOI',
-    MILO = 'MILO',
-    POLE_EMPLOI = 'POLE_EMPLOI'
-  }
-
   export interface Utilisateur {
     id: string
     prenom: string
     nom: string
     email?: string
-    structure: Authentification.Structure
+    structure: Core.Structure
     type: Authentification.Type
   }
 
   export interface Repository {
     get(
       id: string,
-      structure: Authentification.Structure,
+      structure: Core.Structure,
       type: Authentification.Type
     ): Promise<Utilisateur | undefined>
     getJeuneMiloByEmail(email: string): Promise<Utilisateur | undefined>
@@ -45,7 +40,7 @@ export namespace Authentification {
       nom: string | undefined,
       prenom: string | undefined,
       email: string | undefined,
-      structure: Structure
+      structure: Core.Structure
     ): Result<Utilisateur> {
       if (!nom || !prenom || !email) {
         return failure(new UtilisateurMiloNonValide())

@@ -6,7 +6,7 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
-import { Authentification } from '../../../domain/authentification'
+import { Core } from '../../../domain/core'
 import { AsSql } from '../types'
 import { JeuneSqlModel } from './jeune.sql-model'
 
@@ -25,7 +25,7 @@ export class ConseillerDto extends Model {
   email: string | null
 
   @Column({ field: 'structure', type: DataType.STRING })
-  structure: Authentification.Structure
+  structure: Core.Structure
 
   @Column({ field: 'id_authentification', type: DataType.STRING })
   idAuthentification: string

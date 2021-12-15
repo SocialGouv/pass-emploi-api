@@ -51,7 +51,8 @@ export const testConfig = (): ConfigService => {
     },
     milo: {
       url: 'https://milo.com',
-      apiKeyRecupererDossier: 'apiKeyRecupererDossier'
+      apiKeyRecupererDossier: 'apiKeyRecupererDossier',
+      apiKeyCreerJeune: 'apiKeyCreerJeune'
     }
   })
 }

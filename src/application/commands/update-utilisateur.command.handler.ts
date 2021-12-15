@@ -12,6 +12,7 @@ import {
   Authentification,
   AuthentificationRepositoryToken
 } from '../../domain/authentification'
+import { Core } from '../../domain/core'
 import { UtilisateurQueryModel } from '../queries/query-models/authentification.query-models'
 
 export interface UpdateUtilisateurCommand extends Command {
@@ -20,7 +21,7 @@ export interface UpdateUtilisateurCommand extends Command {
   prenom?: string
   email?: string
   type: Authentification.Type
-  structure: Authentification.Structure
+  structure: Core.Structure
   federatedToken?: string
 }
 
@@ -48,7 +49,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
 
     if (utilisateur) {
       return success(utilisateur)
-    } else if (command.structure === Authentification.Structure.PASS_EMPLOI) {
+    } else if (command.structure === Core.Structure.PASS_EMPLOI) {
       return failure(
         new NonTrouveError('Utilisateur', command.idUtilisateurAuth)
       )

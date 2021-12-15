@@ -1,4 +1,10 @@
 import { Injectable } from '@nestjs/common'
+import { EmailMiloDejaUtilise } from '../../building-blocks/types/domain-error'
+import {
+  emptySuccess,
+  failure,
+  Result
+} from '../../building-blocks/types/result'
 import { Milo } from '../../domain/milo'
 
 @Injectable()
@@ -11,6 +17,17 @@ export class MiloInMemoryRepository implements Milo.Repository {
 
   async getDossier(idDossier: string): Promise<Milo.Dossier | undefined> {
     return this.dossiers.find(dossier => dossier.id === idDossier)
+  }
+
+  async creerJeune(idDossier: string, email: string): Promise<Result> {
+    switch (idDossier) {
+      case '1':
+        return emptySuccess()
+      case '3':
+        return failure(new EmailMiloDejaUtilise(email))
+      default:
+        return emptySuccess()
+    }
   }
 }
 

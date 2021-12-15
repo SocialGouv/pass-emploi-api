@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { Core } from '../../domain/core'
 import { Unauthorized } from '../../domain/erreur'
 import { Milo, MiloRepositoryToken } from '../../domain/milo'
 import { DossierJeuneMiloQueryModel } from './query-models/milo.query-model'
@@ -34,7 +35,7 @@ export class GetDossierMiloJeuneQueryHandler extends QueryHandler<
     if (
       !(
         utilisateur.type === Authentification.Type.CONSEILLER &&
-        utilisateur.structure === Authentification.Structure.MILO
+        utilisateur.structure === Core.Structure.MILO
       )
     ) {
       throw new Unauthorized('DossierMilo')

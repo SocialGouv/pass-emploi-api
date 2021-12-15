@@ -18,6 +18,7 @@ import { DetailConseillerQueryModel } from 'src/application/queries/query-models
 import { Authentification } from 'src/domain/authentification'
 import { CreateActionCommandHandler } from '../../application/commands/create-action.command.handler'
 import { CreateJeuneCommandHandler } from '../../application/commands/create-jeune.command.handler'
+import { CreerJeuneMiloCommandHandler } from '../../application/commands/creer-jeune-milo.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from '../../application/commands/send-notification-nouveau-message.command.handler'
 import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler'
@@ -29,6 +30,7 @@ import {
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
 import { RendezVousConseillerQueryModel } from '../../application/queries/query-models/rendez-vous.query-models'
 import {
+  EmailMiloDejaUtilise,
   JeuneNonLieAuConseillerError,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
@@ -41,7 +43,8 @@ import { Action } from '../../domain/action'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import {
   CreateActionPayload,
-  CreateJeunePayload
+  CreateJeunePayload,
+  CreerJeuneMiloPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
 
@@ -58,7 +61,8 @@ export class ConseillersController {
     private readonly sendNotificationNouveauMessage: SendNotificationNouveauMessageCommandHandler,
     private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler,
     private createRendezVousCommandHandler: CreateRendezVousCommandHandler,
-    private getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler
+    private getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler,
+    private creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
   ) {}
 
   @Get(':idConseiller')
@@ -259,5 +263,28 @@ export class ConseillersController {
     }
 
     return dossier
+  }
+
+  @Post('milo/jeunes')
+  async postJeuneMilo(
+    @Body() creerJeuneMiloPayload: CreerJeuneMiloPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<{ id: string }> {
+    const result = await this.creerJeuneMiloCommandHandler.execute(
+      creerJeuneMiloPayload,
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      switch (result.error.code) {
+        case EmailMiloDejaUtilise.CODE:
+          throw new BadRequestException(result.error)
+        case NonTrouveError.CODE:
+          throw new NotFoundException(result.error)
+      }
+      throw new RuntimeException(result.error.message)
+    }
+
+    return result.data
   }
 }

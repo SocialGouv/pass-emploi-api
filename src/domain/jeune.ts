@@ -7,6 +7,7 @@ import {
 import { Brand } from '../building-blocks/types/brand'
 import { DateService } from '../utils/date-service'
 import { Conseiller } from './conseiller'
+import { Core } from './core'
 
 export const JeunesRepositoryToken = 'Jeune.Repository'
 
@@ -16,6 +17,8 @@ export interface Jeune {
   lastName: string
   creationDate: DateTime
   conseiller: Conseiller
+  structure: Core.Structure
+  email?: string
   pushNotificationToken?: string
   tokenLastUpdate?: DateTime
 }

@@ -1,6 +1,7 @@
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { Authentification } from '../../../src/domain/authentification'
+import { Core } from '../../../src/domain/core'
 import { AuthentificationSqlRepository } from '../../../src/infrastructure/repositories/authentification-sql.repository'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import {
@@ -9,8 +10,6 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { DatabaseForTesting, expect } from '../../utils'
-import Structure = Authentification.Structure
-import Type = Authentification.Type
 
 describe('AuthentificationSqlRepository', () => {
   DatabaseForTesting.prepare()
@@ -26,13 +25,13 @@ describe('AuthentificationSqlRepository', () => {
       await ConseillerSqlModel.creer(
         unConseillerDto({
           idAuthentification: 'id-authentification-conseiller',
-          structure: Authentification.Structure.MILO
+          structure: Core.Structure.MILO
         })
       )
       await JeuneSqlModel.creer(
         unJeuneDto({
           idAuthentification: 'id-authentification-jeune',
-          structure: Authentification.Structure.MILO
+          structure: Core.Structure.MILO
         })
       )
     })
@@ -41,8 +40,8 @@ describe('AuthentificationSqlRepository', () => {
         // When
         const utilisateur = await authentificationSqlRepository.get(
           'id-authentification-conseiller',
-          Structure.MILO,
-          Type.CONSEILLER
+          Core.Structure.MILO,
+          Authentification.Type.CONSEILLER
         )
 
         // Then
@@ -53,8 +52,8 @@ describe('AuthentificationSqlRepository', () => {
         // When
         const utilisateur = await authentificationSqlRepository.get(
           'plop',
-          Structure.MILO,
-          Type.CONSEILLER
+          Core.Structure.MILO,
+          Authentification.Type.CONSEILLER
         )
 
         // Then
@@ -66,8 +65,8 @@ describe('AuthentificationSqlRepository', () => {
         // When
         const utilisateur = await authentificationSqlRepository.get(
           'id-authentification-jeune',
-          Structure.MILO,
-          Type.JEUNE
+          Core.Structure.MILO,
+          Authentification.Type.JEUNE
         )
 
         // Then
@@ -78,8 +77,8 @@ describe('AuthentificationSqlRepository', () => {
         // When
         const utilisateur = await authentificationSqlRepository.get(
           'plop',
-          Structure.MILO,
-          Type.JEUNE
+          Core.Structure.MILO,
+          Authentification.Type.JEUNE
         )
 
         // Then
@@ -94,14 +93,14 @@ describe('AuthentificationSqlRepository', () => {
       await ConseillerSqlModel.creer(
         unConseillerDto({
           idAuthentification: 'id-authentification-conseiller',
-          structure: Authentification.Structure.MILO
+          structure: Core.Structure.MILO
         })
       )
       await JeuneSqlModel.creer(
         unJeuneDto({
           idAuthentification: 'id-authentification-jeune',
-          email: 'john.doe@passemploi.com',
-          structure: Authentification.Structure.MILO
+          email: 'john.doe@plop.io',
+          structure: Core.Structure.MILO
         })
       )
     })
@@ -110,7 +109,7 @@ describe('AuthentificationSqlRepository', () => {
         // When
         const utilisateur =
           await authentificationSqlRepository.getJeuneMiloByEmail(
-            'john.doe@passemploi.com'
+            'john.doe@plop.io'
           )
 
         // Then
@@ -136,14 +135,14 @@ describe('AuthentificationSqlRepository', () => {
       await ConseillerSqlModel.creer(
         unConseillerDto({
           idAuthentification: 'id-authentification-conseiller',
-          structure: Authentification.Structure.MILO
+          structure: Core.Structure.MILO
         })
       )
       await JeuneSqlModel.creer(
         unJeuneDto({
           id: 'id-jeune',
-          email: 'john.doe@passemploi.com',
-          structure: Authentification.Structure.MILO
+          email: 'john.doe@plop.io',
+          structure: Core.Structure.MILO
         })
       )
     })
@@ -157,8 +156,8 @@ describe('AuthentificationSqlRepository', () => {
       // Then
       const utilisateur = await authentificationSqlRepository.get(
         'id-authentification-jeune',
-        Structure.MILO,
-        Type.JEUNE
+        Core.Structure.MILO,
+        Authentification.Type.JEUNE
       )
       expect(utilisateur).to.deep.equal(
         unUtilisateurJeune({
@@ -180,8 +179,8 @@ describe('AuthentificationSqlRepository', () => {
         // Then
         const utilisateur = await authentificationSqlRepository.get(
           'id-authentification-conseiller',
-          Structure.MILO,
-          Type.CONSEILLER
+          Core.Structure.MILO,
+          Authentification.Type.CONSEILLER
         )
         expect(utilisateur).to.deep.equal(unUtilisateurConseiller())
       })

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsEnum, IsOptional, IsString, IsEmail } from 'class-validator'
 import { Authentification } from '../../../domain/authentification'
+import { Core } from '../../../domain/core'
 
 export class UpdateUserPayload {
   @ApiProperty()
@@ -24,10 +25,10 @@ export class UpdateUserPayload {
   @IsEnum(Authentification.Type)
   type: Authentification.Type
 
-  @ApiProperty({ enum: Authentification.Structure })
+  @ApiProperty({ enum: Core.Structure })
   @IsString()
-  @IsEnum(Authentification.Structure)
-  structure: Authentification.Structure
+  @IsEnum(Core.Structure)
+  structure: Core.Structure
 
   @ApiProperty()
   @IsString()

@@ -13,6 +13,7 @@ import { AddFavoriOffreEmploiCommandHandler } from './application/commands/add-f
 import { CreateActionCommandHandler } from './application/commands/create-action.command.handler'
 import { CreateJeuneCommandHandler } from './application/commands/create-jeune.command.handler'
 import { CreateRendezVousCommandHandler } from './application/commands/create-rendez-vous.command.handler'
+import { CreerJeuneMiloCommandHandler } from './application/commands/creer-jeune-milo.command.handler'
 import { DeleteActionCommandHandler } from './application/commands/delete-action.command.handler'
 import { DeleteFavoriOffreEmploiCommandHandler } from './application/commands/delete-favori-offre-emploi.command.handler'
 import { DeleteRendezVousCommandHandler } from './application/commands/delete-rendez-vous.command.handler'
@@ -201,7 +202,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     DeleteActionCommandHandler,
     UpdateUtilisateurCommandHandler,
     GetCommunesEtDepartementsQueryHandler,
-    GetDossierMiloJeuneQueryHandler
+    GetDossierMiloJeuneQueryHandler,
+    CreerJeuneMiloCommandHandler
   ]
 }
 

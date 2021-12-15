@@ -1,3 +1,5 @@
+import { Result } from '../building-blocks/types/result'
+
 export const MiloRepositoryToken = 'Milo.Repository'
 
 export namespace Milo {
@@ -12,5 +14,6 @@ export namespace Milo {
 
   export interface Repository {
     getDossier(id: string): Promise<Dossier | undefined>
+    creerJeune(idDossier: string, email: string): Promise<Result>
   }
 }

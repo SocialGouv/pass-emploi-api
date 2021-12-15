@@ -8,6 +8,7 @@ import {
 } from '../../../src/application/commands/create-jeune.command.handler'
 import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller'
+import { Core } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune'
 import { DateService } from '../../../src/utils/date-service'
 import { IdService } from '../../../src/utils/id-service'
@@ -61,7 +62,8 @@ describe('CreateJeuneCommandHandler', () => {
         firstName: command.firstName,
         lastName: command.lastName,
         creationDate: date,
-        conseiller: conseiller
+        conseiller: conseiller,
+        structure: Core.Structure.PASS_EMPLOI
       })
       expect(chatRepository.initializeChatIfNotExists).to.have.been.calledWith(
         idNouveauJeune,

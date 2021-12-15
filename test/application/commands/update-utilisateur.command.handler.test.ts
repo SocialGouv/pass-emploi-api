@@ -17,6 +17,7 @@ import {
   isFailure,
   isSuccess
 } from '../../../src/building-blocks/types/result'
+import { Core } from '../../../src/domain/core'
 import { expect } from '../../utils'
 
 describe('UpdateUtilisateurCommandHandler', () => {
@@ -44,7 +45,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
           const command: UpdateUtilisateurCommand = {
             idUtilisateurAuth: 'nilstavernier',
             type: Authentification.Type.CONSEILLER,
-            structure: Authentification.Structure.PASS_EMPLOI
+            structure: Core.Structure.PASS_EMPLOI
           }
 
           const utilisateur = unUtilisateurConseiller()
@@ -72,7 +73,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
           const command: UpdateUtilisateurCommand = {
             idUtilisateurAuth: 'nilstavernier',
             type: Authentification.Type.CONSEILLER,
-            structure: Authentification.Structure.PASS_EMPLOI
+            structure: Core.Structure.PASS_EMPLOI
           }
 
           authentificationRepository.get
@@ -103,7 +104,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
           const command: UpdateUtilisateurCommand = {
             idUtilisateurAuth: 'nilstavernier',
             type: Authentification.Type.CONSEILLER,
-            structure: Authentification.Structure.MILO
+            structure: Core.Structure.MILO
           }
 
           const utilisateur = unUtilisateurConseiller()
@@ -135,7 +136,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
               type: Authentification.Type.CONSEILLER,
               email: 'nils.tavernier@passemploi.com',
               idUtilisateurAuth: 'nilstavernier',
-              structure: Authentification.Structure.MILO
+              structure: Core.Structure.MILO
             }
 
             authentificationRepository.get
@@ -177,7 +178,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             const command: UpdateUtilisateurCommand = {
               type: Authentification.Type.CONSEILLER,
               idUtilisateurAuth: 'nilstavernier',
-              structure: Authentification.Structure.MILO
+              structure: Core.Structure.MILO
             }
 
             authentificationRepository.get
@@ -210,7 +211,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
           const command: UpdateUtilisateurCommand = {
             idUtilisateurAuth: 'nilstavernier',
             type: Authentification.Type.JEUNE,
-            structure: Authentification.Structure.PASS_EMPLOI
+            structure: Core.Structure.PASS_EMPLOI
           }
 
           const utilisateur = unUtilisateurConseiller()
@@ -238,7 +239,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
           const command: UpdateUtilisateurCommand = {
             idUtilisateurAuth: 'nilstavernier',
             type: Authentification.Type.JEUNE,
-            structure: Authentification.Structure.PASS_EMPLOI
+            structure: Core.Structure.PASS_EMPLOI
           }
 
           authentificationRepository.get
@@ -269,7 +270,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
           const command: UpdateUtilisateurCommand = {
             idUtilisateurAuth: 'nilstavernier',
             type: Authentification.Type.JEUNE,
-            structure: Authentification.Structure.MILO
+            structure: Core.Structure.MILO
           }
 
           const utilisateur = unUtilisateurConseiller()
@@ -298,7 +299,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             idUtilisateurAuth: 'nilstavernier',
             email: 'abc@test.com',
             type: Authentification.Type.JEUNE,
-            structure: Authentification.Structure.MILO
+            structure: Core.Structure.MILO
           }
 
           const utilisateur = unUtilisateurConseiller()
@@ -333,7 +334,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             idUtilisateurAuth: 'nilstavernier',
             email: 'abc@test.com',
             type: Authentification.Type.JEUNE,
-            structure: Authentification.Structure.MILO
+            structure: Core.Structure.MILO
           }
 
           authentificationRepository.get

@@ -1,4 +1,4 @@
-import { Authentification } from 'src/domain/authentification'
+import { Core } from '../../../src/domain/core'
 import { JeuneDto } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 
@@ -13,8 +13,8 @@ export function unJeuneDto(
     dateCreation: new Date('2021-11-11T08:03:30.000Z'),
     pushNotificationToken: null,
     dateDerniereActualisationToken: null,
-    email: 'john.doe@passemploi.com',
-    structure: Authentification.Structure.PASS_EMPLOI,
+    email: 'john.doe@plop.io',
+    structure: Core.Structure.MILO,
     idAuthentification: ''
   }
 

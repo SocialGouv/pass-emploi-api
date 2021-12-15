@@ -54,6 +54,26 @@ export class UtilisateurMiloNonValide implements DomainError {
   }
 }
 
+export class EmailMiloDejaUtilise implements DomainError {
+  static CODE = 'EMAIL_MILO_DEJA_UTILISE'
+  readonly code: string = EmailMiloDejaUtilise.CODE
+  readonly message: string
+
+  constructor(email: string) {
+    this.message = `L'email ${email} est déjà associée à un jeune`
+  }
+}
+
+export class ErreurCreationMilo implements DomainError {
+  static CODE = 'ERREUR_CREATION_JEUNE_UTILISE'
+  readonly code: string = ErreurCreationMilo.CODE
+  readonly message: string
+
+  constructor(message: string) {
+    this.message = message
+  }
+}
+
 export class RechercheOffreInvalide implements DomainError {
   static CODE = 'RECHERCHE_OFFRE_INVALIDE'
   readonly code: string = RechercheOffreInvalide.CODE

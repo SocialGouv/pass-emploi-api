@@ -1,5 +1,6 @@
 import { JWTPayload } from 'jose'
 import { Authentification } from '../../src/domain/authentification'
+import { Core } from '../../src/domain/core'
 
 export const unUtilisateurConseiller = (
   args: Partial<Authentification.Utilisateur> = {}
@@ -10,7 +11,7 @@ export const unUtilisateurConseiller = (
     prenom: 'Nils',
     type: Authentification.Type.CONSEILLER,
     email: 'nils.tavernier@passemploi.com',
-    structure: Authentification.Structure.MILO
+    structure: Core.Structure.MILO
   }
 
   return { ...defaults, ...args }
@@ -24,8 +25,8 @@ export const unUtilisateurJeune = (
     nom: 'Doe',
     prenom: 'John',
     type: Authentification.Type.JEUNE,
-    email: 'john.doe@passemploi.com',
-    structure: Authentification.Structure.MILO
+    email: 'john.doe@plop.io',
+    structure: Core.Structure.MILO
   }
 
   return { ...defaults, ...args }
@@ -61,7 +62,7 @@ export const unUtilisateurDecode = (): Authentification.Utilisateur => ({
   nom: 'Durant',
   prenom: 'Albert',
   type: Authentification.Type.CONSEILLER,
-  structure: Authentification.Structure.MILO
+  structure: Core.Structure.MILO
 })
 
 export const unHeaderAuthorization = (): string => 'bearer coucou'
