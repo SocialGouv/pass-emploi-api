@@ -31,7 +31,12 @@ export class GetDossierMiloJeuneQueryHandler extends QueryHandler<
     _query: GetDossierMiloJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    if (utilisateur.type !== Authentification.Type.CONSEILLER) {
+    if (
+      !(
+        utilisateur.type === Authentification.Type.CONSEILLER &&
+        utilisateur.structure === Authentification.Structure.MILO
+      )
+    ) {
       throw new Unauthorized('DossierMilo')
     }
   }

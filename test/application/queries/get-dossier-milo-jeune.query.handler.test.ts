@@ -52,7 +52,7 @@ describe('GetDossierMiloJeuneQueryHandler', () => {
   })
 
   describe('authorize', () => {
-    it("valide quand c'est un conseiller", async () => {
+    it("valide quand c'est un conseiller MILO", async () => {
       // Given
       const utilisateur = unUtilisateurConseiller()
 
