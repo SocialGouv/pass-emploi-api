@@ -5,17 +5,18 @@ import {
   OffresImmersion,
   OffresImmersionRepositoryToken
 } from '../../domain/offre-immersion'
-import { OffresImmersionQueryModel } from './query-models/offres-immersion.query-models'
+import { OffreImmersionQueryModel } from './query-models/offres-immersion.query-models'
 
 export interface GetOffresImmersionQuery extends Query {
-  metier?: string
-  ville?: string
+  rome: string
+  lat: number
+  lon: number
 }
 
 @Injectable()
 export class GetOffresImmersionQueryHandler extends QueryHandler<
   GetOffresImmersionQuery,
-  OffresImmersionQueryModel
+  OffreImmersionQueryModel[]
 > {
   constructor(
     @Inject(OffresImmersionRepositoryToken)
@@ -26,8 +27,12 @@ export class GetOffresImmersionQueryHandler extends QueryHandler<
 
   async handle(
     query: GetOffresImmersionQuery
-  ): Promise<OffresImmersionQueryModel> {
-    return this.offresImmersionRepository.findAll(query.metier, query.ville)
+  ): Promise<OffreImmersionQueryModel[]> {
+    return this.offresImmersionRepository.findAll(
+      query.rome,
+      query.lat,
+      query.lon
+    )
   }
   async authorize(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

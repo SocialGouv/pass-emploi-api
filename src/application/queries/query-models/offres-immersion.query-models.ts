@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 
-export class OffresImmersionQueryModel {
+export class OffreImmersionQueryModel {
   @ApiProperty()
   id: string
   @ApiProperty()

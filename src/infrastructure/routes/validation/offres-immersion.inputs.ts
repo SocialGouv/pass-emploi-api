@@ -1,16 +1,23 @@
-import { ApiPropertyOptional } from '@nestjs/swagger'
-import { IsNotEmpty, IsString, IsOptional } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
+import { Transform } from 'class-transformer'
+import { IsNotEmpty, IsString, IsNumber } from 'class-validator'
+import { transformStringToFloat } from './utils/transformers'
 
 export class FindOffresImmersionQuery {
-  @ApiPropertyOptional()
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  @IsOptional()
-  metier?: string
+  rome: string
 
-  @ApiPropertyOptional()
-  @IsString()
+  @ApiProperty()
+  @IsNumber()
   @IsNotEmpty()
-  @IsOptional()
-  ville?: string
+  @Transform(params => transformStringToFloat(params, 'lat'))
+  lat: number
+
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  @Transform(params => transformStringToFloat(params, 'lon'))
+  lon: number
 }

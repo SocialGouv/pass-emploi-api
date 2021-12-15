@@ -39,6 +39,11 @@ export default () => {
       url: process.env.MILO_API_URL,
       apiKeyRecupererDossier: process.env.MILO_DOSSIER_API_KEY
     },
+    immersion: {
+      url:
+        process.env.IMMERSION_API_URL ??
+        'https://immersion-facile.beta.gouv.fr/api'
+    },
     firebase: {
       environmentPrefix: process.env.FIREBASE_ENVIRONMENT_PREFIX ?? 'staging',
       key: process.env.FIREBASE_SECRET_KEY ?? ''

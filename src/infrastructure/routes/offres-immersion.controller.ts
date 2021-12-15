@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { OffresImmersionQueryModel } from 'src/application/queries/query-models/offres-immersion.query-models'
+import { OffreImmersionQueryModel } from 'src/application/queries/query-models/offres-immersion.query-models'
 import {
   GetOffresImmersionQuery,
   GetOffresImmersionQueryHandler
@@ -17,14 +17,16 @@ export class OffresImmersionController {
 
   @Get()
   @ApiResponse({
-    type: OffresImmersionQueryModel
+    type: OffreImmersionQueryModel,
+    isArray: true
   })
   getOffresImmersion(
     @Query() findOffresImmersionQuery: FindOffresImmersionQuery
-  ): Promise<OffresImmersionQueryModel> {
+  ): Promise<OffreImmersionQueryModel[]> {
     const query: GetOffresImmersionQuery = {
-      metier: findOffresImmersionQuery.metier,
-      ville: findOffresImmersionQuery.ville
+      rome: findOffresImmersionQuery.rome,
+      lat: findOffresImmersionQuery.lat,
+      lon: findOffresImmersionQuery.lon
     }
 
     return this.getOffresImmersionQueryHandler.execute(query)
