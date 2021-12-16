@@ -7,6 +7,6 @@ export class NotificationFirebaseRepository implements Notification.Repository {
   constructor(private firebaseClient: FirebaseClient) {}
 
   async send(message: Notification.Message): Promise<void> {
-    await this.firebaseClient.send(message)
+    this.firebaseClient.send(message)
   }
 }
