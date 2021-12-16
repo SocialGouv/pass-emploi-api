@@ -1,3 +1,6 @@
+import { initializeAPMAgent } from './infrastructure/monitoring/apm.init'
+initializeAPMAgent()
+
 import { ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'

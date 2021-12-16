@@ -1,8 +1,10 @@
 import { DynamicModule } from '@nestjs/common'
 import { Request } from 'express'
 import { LoggerModule } from 'nestjs-pino'
+import { MixinFn } from 'pino'
 import { ReqId } from 'pino-http'
 import * as uuid from 'uuid'
+import { getInstance } from '../infrastructure/monitoring/apm.init'
 
 export const configureLoggerModule = (): DynamicModule =>
   LoggerModule.forRoot({
@@ -10,6 +12,12 @@ export const configureLoggerModule = (): DynamicModule =>
     // @ts-ignore
     pinoHttp: [
       {
+        mixin: (): (() => MixinFn) => {
+          const currentTraceIds = getInstance().currentTraceIds
+          /* eslint-disable @typescript-eslint/ban-ts-comment */
+          // @ts-ignore
+          return Object.keys(currentTraceIds).length ? {} : { currentTraceIds }
+        },
         formatters: {
           level(label): object {
             return { level: label }
