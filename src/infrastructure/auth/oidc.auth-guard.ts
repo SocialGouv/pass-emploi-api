@@ -9,6 +9,7 @@ import { Reflector } from '@nestjs/core'
 import { Request } from 'express'
 import { JWTPayload } from 'jose'
 import { Authentification } from '../../domain/authentification'
+import { Core } from '../../domain/core'
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator'
 import { SKIP_OIDC_AUTH_KEY } from '../decorators/skip-oidc-auth.decorator'
 import { JwtService } from './jwt.service'
@@ -69,7 +70,7 @@ export class OidcAuthGuard implements CanActivate {
       nom: payload.family_name as string,
       prenom: payload.given_name as string,
       type: payload.userType as Authentification.Type,
-      structure: payload.userStructure as Authentification.Structure
+      structure: payload.userStructure as Core.Structure
     }
   }
 

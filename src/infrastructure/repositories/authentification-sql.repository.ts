@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
+import { Core } from '../../domain/core'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import {
@@ -14,7 +15,7 @@ export class AuthentificationSqlRepository
 {
   async get(
     idUtilisateurAuth: string,
-    structure: Authentification.Structure,
+    structure: Core.Structure,
     type: Authentification.Type
   ): Promise<Authentification.Utilisateur | undefined> {
     if (type === Authentification.Type.CONSEILLER) {
@@ -50,7 +51,7 @@ export class AuthentificationSqlRepository
     const jeuneSqlModel = await JeuneSqlModel.findOne({
       where: {
         email: email,
-        structure: Authentification.Structure.MILO
+        structure: Core.Structure.MILO
       }
     })
 

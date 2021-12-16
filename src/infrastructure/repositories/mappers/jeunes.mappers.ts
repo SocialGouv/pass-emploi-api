@@ -33,7 +33,9 @@ export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
       id: jeuneSqlModel.conseiller.id,
       firstName: jeuneSqlModel.conseiller.prenom,
       lastName: jeuneSqlModel.conseiller.nom
-    }
+    },
+    structure: jeuneSqlModel.structure,
+    email: jeuneSqlModel.email ?? undefined
   }
 }
 

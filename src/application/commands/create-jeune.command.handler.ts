@@ -3,6 +3,7 @@ import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { Authentification } from '../../domain/authentification'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
+import { Core } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
@@ -46,7 +47,8 @@ export class CreateJeuneCommandHandler extends CommandHandler<
       firstName: command.firstName,
       lastName: command.lastName,
       creationDate: this.dateService.now(),
-      conseiller
+      conseiller,
+      structure: Core.Structure.PASS_EMPLOI
     }
     await this.jeuneRepository.save(jeune)
     await this.chatRepository.initializeChatIfNotExists(

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Authentification } from '../../../domain/authentification'
+import { Core } from '../../../domain/core'
 
 export class UtilisateurQueryModel implements Authentification.Utilisateur {
   @ApiProperty()
@@ -15,9 +16,9 @@ export class UtilisateurQueryModel implements Authentification.Utilisateur {
   email?: string
 
   @ApiProperty({
-    enum: Authentification.Structure
+    enum: Core.Structure
   })
-  structure: Authentification.Structure
+  structure: Core.Structure
 
   @ApiProperty({
     enum: Authentification.Type

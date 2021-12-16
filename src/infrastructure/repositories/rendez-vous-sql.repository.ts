@@ -65,7 +65,8 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
           id: rendezVousSql.conseiller.id,
           firstName: rendezVousSql.conseiller.prenom,
           lastName: rendezVousSql.conseiller.nom
-        }
+        },
+        structure: rendezVousSql.jeune.structure
       }
     }
   }

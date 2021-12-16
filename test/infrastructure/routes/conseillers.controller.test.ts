@@ -2,9 +2,14 @@ import { HttpStatus, INestApplication } from '@nestjs/common'
 import { Action } from 'src/domain/action'
 import * as request from 'supertest'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
+import {
+  CreerJeuneMiloCommand,
+  CreerJeuneMiloCommandHandler
+} from '../../../src/application/commands/creer-jeune-milo.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from '../../../src/application/commands/send-notification-nouveau-message.command.handler'
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
 import {
+  ErreurHttpMilo,
   JeuneNonLieAuConseillerError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
@@ -31,6 +36,7 @@ describe('ConseillersController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
   let sendNotificationNouveauMessage: StubbedClass<SendNotificationNouveauMessageCommandHandler>
   let getDossierMiloJeuneQueryHandler: StubbedClass<GetDossierMiloJeuneQueryHandler>
+  let creerJeuneMiloCommandHandler: StubbedClass<CreerJeuneMiloCommandHandler>
   let app: INestApplication
 
   before(async () => {
@@ -39,6 +45,7 @@ describe('ConseillersController', () => {
       SendNotificationNouveauMessageCommandHandler
     )
     getDossierMiloJeuneQueryHandler = stubClass(GetDossierMiloJeuneQueryHandler)
+    creerJeuneMiloCommandHandler = stubClass(CreerJeuneMiloCommandHandler)
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
@@ -47,6 +54,8 @@ describe('ConseillersController', () => {
       .useValue(sendNotificationNouveauMessage)
       .overrideProvider(GetDossierMiloJeuneQueryHandler)
       .useValue(getDossierMiloJeuneQueryHandler)
+      .overrideProvider(CreerJeuneMiloCommandHandler)
+      .useValue(creerJeuneMiloCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -174,7 +183,7 @@ describe('ConseillersController', () => {
         // Given
         getDossierMiloJeuneQueryHandler.execute
           .withArgs({ idDossier: '1' }, unUtilisateurDecode())
-          .resolves(unDossierMilo())
+          .resolves(success(unDossierMilo()))
 
         // When - Then
         await request(app.getHttpServer())
@@ -191,13 +200,61 @@ describe('ConseillersController', () => {
         // Given
         getDossierMiloJeuneQueryHandler.execute
           .withArgs({ idDossier: '2' }, unUtilisateurDecode())
-          .resolves(undefined)
+          .resolves(failure(new ErreurHttpMilo('Pas trouvé', 404)))
 
         // When - Then
         await request(app.getHttpServer())
           .get('/conseillers/milo/dossiers/2')
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.NOT_FOUND)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers/milo/dossiers/2'
+    )
+  })
+
+  describe('POST /conseillers/milo/jeunes', () => {
+    describe('quand le jeune est nouveau', () => {
+      it('renvoie 201', async () => {
+        // Given
+        const command: CreerJeuneMiloCommand = {
+          idDossier: 'idDossier',
+          nom: 'nom',
+          prenom: 'prenom',
+          email: 'email',
+          idConseiller: 'idConseiller'
+        }
+
+        creerJeuneMiloCommandHandler.execute
+          .withArgs(command, unUtilisateurDecode())
+          .resolves(success({ id: 'idJeune' }))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/conseillers/milo/jeunes')
+          .send(command)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.CREATED)
+          .expect({ id: 'idJeune' })
+      })
+    })
+
+    describe('quand le jeune est déjà chez nous', () => {
+      it('renvoie 400', async () => {
+        // Given
+        // Given
+        creerJeuneMiloCommandHandler.execute.resolves(
+          failure(new ErreurHttpMilo('email pas bon', 400))
+        )
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/conseillers/milo/jeunes')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
       })
     })
 

@@ -33,3 +33,30 @@ export class CreateJeunePayload {
   @IsNotEmpty()
   lastName: string
 }
+
+export class CreerJeuneMiloPayload {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  idDossier: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  nom: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  prenom: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  email: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  idConseiller: string
+}

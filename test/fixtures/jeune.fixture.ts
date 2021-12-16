@@ -1,3 +1,4 @@
+import { Core } from '../../src/domain/core'
 import { Jeune } from '../../src/domain/jeune'
 import { unConseiller } from './conseiller.fixture'
 import { uneDatetime } from './date.fixture'
@@ -10,7 +11,9 @@ export const unJeune = (
   firstName: 'John',
   pushNotificationToken: 'unToken',
   conseiller,
-  creationDate: uneDatetime
+  creationDate: uneDatetime,
+  email: 'john.doe@plop.io',
+  structure: Core.Structure.MILO
 })
 
 export const unJeuneSansPushNotificationToken = (
@@ -21,5 +24,7 @@ export const unJeuneSansPushNotificationToken = (
   firstName: 'John',
   pushNotificationToken: '',
   conseiller,
-  creationDate: uneDatetime
+  creationDate: uneDatetime,
+  email: 'john.doe@plop.io',
+  structure: Core.Structure.MILO
 })

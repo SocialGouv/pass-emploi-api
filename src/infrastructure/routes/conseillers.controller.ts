@@ -2,12 +2,14 @@ import {
   BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpException,
   HttpStatus,
   NotFoundException,
   Param,
-  Post
+  Post,
+  UnauthorizedException
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -18,6 +20,7 @@ import { DetailConseillerQueryModel } from 'src/application/queries/query-models
 import { Authentification } from 'src/domain/authentification'
 import { CreateActionCommandHandler } from '../../application/commands/create-action.command.handler'
 import { CreateJeuneCommandHandler } from '../../application/commands/create-jeune.command.handler'
+import { CreerJeuneMiloCommandHandler } from '../../application/commands/creer-jeune-milo.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from '../../application/commands/send-notification-nouveau-message.command.handler'
 import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler'
@@ -29,10 +32,12 @@ import {
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
 import { RendezVousConseillerQueryModel } from '../../application/queries/query-models/rendez-vous.query-models'
 import {
+  ErreurHttpMilo,
   JeuneNonLieAuConseillerError,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import {
+  Failure,
   isFailure,
   isSuccess,
   Result
@@ -41,7 +46,8 @@ import { Action } from '../../domain/action'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import {
   CreateActionPayload,
-  CreateJeunePayload
+  CreateJeunePayload,
+  CreerJeuneMiloPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
 
@@ -58,7 +64,8 @@ export class ConseillersController {
     private readonly sendNotificationNouveauMessage: SendNotificationNouveauMessageCommandHandler,
     private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler,
     private createRendezVousCommandHandler: CreateRendezVousCommandHandler,
-    private getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler
+    private getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler,
+    private creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
   ) {}
 
   @Get(':idConseiller')
@@ -249,15 +256,51 @@ export class ConseillersController {
     @Param('idDossier') idDossier: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DossierJeuneMiloQueryModel> {
-    const dossier = await this.getDossierMiloJeuneQueryHandler.execute(
+    const result = await this.getDossierMiloJeuneQueryHandler.execute(
       { idDossier },
       utilisateur
     )
 
-    if (!dossier) {
-      throw new NotFoundException(`Le dossier ${idDossier} n'existe pas`)
+    if (isFailure(result)) {
+      if (result.error.code === ErreurHttpMilo.CODE) {
+        transmettreLesErreursHttpMilo(result)
+      }
+      throw new RuntimeException(result.error.message)
     }
 
-    return dossier
+    return result.data
+  }
+
+  @Post('milo/jeunes')
+  async postJeuneMilo(
+    @Body() creerJeuneMiloPayload: CreerJeuneMiloPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<{ id: string }> {
+    const result = await this.creerJeuneMiloCommandHandler.execute(
+      creerJeuneMiloPayload,
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      if (result.error.code === ErreurHttpMilo.CODE) {
+        transmettreLesErreursHttpMilo(result)
+      }
+      throw new RuntimeException(result.error.message)
+    }
+
+    return result.data
+  }
+}
+
+function transmettreLesErreursHttpMilo(result: Failure): void {
+  switch ((result.error as ErreurHttpMilo).statusCode) {
+    case 401:
+      throw new UnauthorizedException(result.error.message)
+    case 403:
+      throw new ForbiddenException(result.error.message)
+    case 404:
+      throw new NotFoundException(result.error.message)
+    default:
+      throw new BadRequestException(result.error.message)
   }
 }

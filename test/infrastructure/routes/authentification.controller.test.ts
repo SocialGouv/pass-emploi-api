@@ -10,6 +10,7 @@ import {
 } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
+import { Core } from '../../../src/domain/core'
 import { UpdateUserPayload } from '../../../src/infrastructure/routes/validation/authentification.inputs'
 import { unUtilisateurQueryModel } from '../../fixtures/query-models/authentification.query-model.fixtures'
 import {
@@ -50,7 +51,7 @@ describe('AuthentificationController', () => {
         prenom: 'Nils',
         type: Authentification.Type.CONSEILLER,
         email: 'nils.tavernier@passemploi.com',
-        structure: Authentification.Structure.MILO,
+        structure: Core.Structure.MILO,
         federatedToken: 'le-token-milo'
       }
 
@@ -80,7 +81,7 @@ describe('AuthentificationController', () => {
         prenom: 'Nils',
         type: Authentification.Type.CONSEILLER,
         email: 'nils.tavernier@passemploi.com',
-        structure: Authentification.Structure.PASS_EMPLOI
+        structure: Core.Structure.PASS_EMPLOI
       }
 
       const command: UpdateUtilisateurCommand = {
@@ -106,7 +107,7 @@ describe('AuthentificationController', () => {
       // Given
       const body: UpdateUserPayload = {
         type: Authentification.Type.CONSEILLER,
-        structure: Authentification.Structure.MILO
+        structure: Core.Structure.MILO
       }
 
       const command: UpdateUtilisateurCommand = {
@@ -131,7 +132,7 @@ describe('AuthentificationController', () => {
       const body: UpdateUserPayload = {
         email: 'plop',
         type: Authentification.Type.CONSEILLER,
-        structure: Authentification.Structure.MILO
+        structure: Core.Structure.MILO
       }
 
       const command: UpdateUtilisateurCommand = {
