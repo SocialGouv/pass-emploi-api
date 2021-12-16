@@ -32,6 +32,7 @@ import { GetFavorisJeuneQueryHandler } from './application/queries/get-favoris-j
 import { GetHomeJeuneHandler } from './application/queries/get-home-jeune.query.handler'
 import { GetJeunesByConseillerQueryHandler } from './application/queries/get-jeunes-by-conseiller.query.handler'
 import { GetOffresEmploiQueryHandler } from './application/queries/get-offres-emploi.query.handler'
+import { GetOffresImmersionQueryHandler } from './application/queries/get-offres-immersion.query.handler'
 import { GetAllRendezVousConseillerQueryHandler } from './application/queries/get-rendez-vous-conseiller.query.handler'
 import { GetAllRendezVousJeuneQueryHandler } from './application/queries/get-rendez-vous-jeune.query.handler'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from './application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
@@ -47,12 +48,14 @@ import { JeunesRepositoryToken } from './domain/jeune'
 import { MiloRepositoryToken } from './domain/milo'
 import { NotificationRepositoryToken } from './domain/notification'
 import { OffresEmploiRepositoryToken } from './domain/offre-emploi'
+import { OffresImmersionRepositoryToken } from './domain/offre-immersion'
 import { RendezVousRepositoryToken } from './domain/rendez-vous'
 import { ApiKeyAuthGuard } from './infrastructure/auth/api-key.auth-guard'
 import { JwtService } from './infrastructure/auth/jwt.service'
 import { OidcAuthGuard } from './infrastructure/auth/oidc.auth-guard'
 import { FirebaseClient } from './infrastructure/clients/firebase-client'
 import { PoleEmploiClient } from './infrastructure/clients/pole-emploi-client'
+import { ImmersionClient } from './infrastructure/clients/immersion-client'
 import { ActionSqlRepository } from './infrastructure/repositories/action-sql.repository'
 import { AuthentificationSqlRepository } from './infrastructure/repositories/authentification-sql.repository'
 import { ChatFirebaseRepository } from './infrastructure/repositories/chat-firebase.repository'
@@ -62,6 +65,7 @@ import { MiloHttpRepository } from './infrastructure/repositories/milo-http.repo
 import { MiloInMemoryRepository } from './infrastructure/repositories/milo-in-memory.repository'
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
 import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre-emploi-http-sql.repository'
+import { OffresImmersionHttpRepository } from './infrastructure/repositories/offre-immersion-http.repository'
 import { RendezVousRepositorySql } from './infrastructure/repositories/rendez-vous-sql.repository'
 import { ActionsController } from './infrastructure/routes/actions.controller'
 import { AuthentificationController } from './infrastructure/routes/authentification.controller'
@@ -75,6 +79,7 @@ import { databaseProviders } from './infrastructure/sequelize/providers'
 import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
 import { configureLoggerModule } from './utils/logger.module'
+import { OffresImmersionController } from './infrastructure/routes/offres-immersion.controller'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -90,6 +95,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     ActionsController,
     JeunesController,
     OffresEmploiController,
+    OffresImmersionController,
     ConseillersController,
     HealthController,
     RendezVousController,
@@ -105,6 +111,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     IdService,
     DateService,
     PoleEmploiClient,
+    ImmersionClient,
     Action.Factory,
     Authentification.Factory,
     {
@@ -151,6 +158,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
           ? MiloInMemoryRepository
           : MiloHttpRepository
     },
+    {
+      provide: OffresImmersionRepositoryToken,
+      useClass: OffresImmersionHttpRepository
+    },
     ...databaseProviders
   ],
   exports: [...databaseProviders]
@@ -175,6 +186,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetFavorisJeuneQueryHandler,
     GetHomeJeuneHandler,
     GetOffresEmploiQueryHandler,
+    GetOffresImmersionQueryHandler,
     GetDetailOffreEmploiQueryHandler,
     GetDetailConseillerQueryHandler,
     GetJeunesByConseillerQueryHandler,
