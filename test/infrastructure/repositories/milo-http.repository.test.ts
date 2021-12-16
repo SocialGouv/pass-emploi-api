@@ -1,10 +1,11 @@
 import { HttpService } from '@nestjs/axios'
 import { expect } from 'chai'
 import * as nock from 'nock'
-import { EmailMiloDejaUtilise } from '../../../src/building-blocks/types/domain-error'
+import { ErreurHttpMilo } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
-  failure
+  failure,
+  success
 } from '../../../src/building-blocks/types/result'
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository'
 import { DossierMiloDto } from '../../../src/infrastructure/repositories/dto/milo.dto'
@@ -43,27 +44,36 @@ describe('MiloHttpRepository', () => {
         const dossier = await miloHttpRepository.getDossier('1')
 
         // Then
-        expect(dossier).to.deep.equal({
-          email: 'pass.emploi.contact@gmail.com',
-          id: '1',
-          nom: 'PEREZ',
-          prenom: 'Olivier',
-          codePostal: '65410',
-          dateDeNaissance: '1997-05-08'
-        })
+        expect(dossier).to.deep.equal(
+          success({
+            email: 'pass.emploi.contact@gmail.com',
+            id: '1',
+            nom: 'PEREZ',
+            prenom: 'Olivier',
+            codePostal: '65410',
+            dateDeNaissance: '1997-05-08'
+          })
+        )
       })
     })
 
-    describe("quand le dossier n'existe pas", () => {
-      it('renvoie undefined', async () => {
+    describe('quand il y a une erreur 4XX', () => {
+      it("renvoie l'erreur", async () => {
         // Given
-        nock('https://milo.com').get('/dossiers/1').reply(404).isDone()
+        nock('https://milo.com')
+          .get('/dossiers/1')
+          .reply(404, {
+            message: 'un message'
+          })
+          .isDone()
 
         // When
         const dossier = await miloHttpRepository.getDossier('1')
 
         // Then
-        expect(dossier).to.deep.equal(undefined)
+        expect(dossier).to.deep.equal(
+          failure(new ErreurHttpMilo('un message', 404))
+        )
       })
     })
   })
@@ -109,7 +119,8 @@ describe('MiloHttpRepository', () => {
             nock('https://milo.com')
               .post('/compte-jeune/1')
               .reply(400, {
-                code: 'SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT'
+                code: 'SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT',
+                message: 'le mail est pas bon john'
               })
               .isDone()
 
@@ -121,7 +132,7 @@ describe('MiloHttpRepository', () => {
 
             // Then
             expect(dossier).to.deep.equal(
-              failure(new EmailMiloDejaUtilise(jeune.email))
+              failure(new ErreurHttpMilo('le mail est pas bon john', 400))
             )
           })
         })

@@ -2,12 +2,14 @@ import {
   BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpException,
   HttpStatus,
   NotFoundException,
   Param,
-  Post
+  Post,
+  UnauthorizedException
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -30,11 +32,12 @@ import {
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
 import { RendezVousConseillerQueryModel } from '../../application/queries/query-models/rendez-vous.query-models'
 import {
-  EmailMiloDejaUtilise,
+  ErreurHttpMilo,
   JeuneNonLieAuConseillerError,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import {
+  Failure,
   isFailure,
   isSuccess,
   Result
@@ -253,16 +256,19 @@ export class ConseillersController {
     @Param('idDossier') idDossier: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DossierJeuneMiloQueryModel> {
-    const dossier = await this.getDossierMiloJeuneQueryHandler.execute(
+    const result = await this.getDossierMiloJeuneQueryHandler.execute(
       { idDossier },
       utilisateur
     )
 
-    if (!dossier) {
-      throw new NotFoundException(`Le dossier ${idDossier} n'existe pas`)
+    if (isFailure(result)) {
+      if (result.error.code === ErreurHttpMilo.CODE) {
+        transmettreLesErreursHttpMilo(result)
+      }
+      throw new RuntimeException(result.error.message)
     }
 
-    return dossier
+    return result.data
   }
 
   @Post('milo/jeunes')
@@ -276,15 +282,25 @@ export class ConseillersController {
     )
 
     if (isFailure(result)) {
-      switch (result.error.code) {
-        case EmailMiloDejaUtilise.CODE:
-          throw new BadRequestException(result.error)
-        case NonTrouveError.CODE:
-          throw new NotFoundException(result.error)
+      if (result.error.code === ErreurHttpMilo.CODE) {
+        transmettreLesErreursHttpMilo(result)
       }
       throw new RuntimeException(result.error.message)
     }
 
     return result.data
+  }
+}
+
+function transmettreLesErreursHttpMilo(result: Failure): void {
+  switch ((result.error as ErreurHttpMilo).statusCode) {
+    case 401:
+      throw new UnauthorizedException(result.error.message)
+    case 403:
+      throw new ForbiddenException(result.error.message)
+    case 404:
+      throw new NotFoundException(result.error.message)
+    default:
+      throw new BadRequestException(result.error.message)
   }
 }

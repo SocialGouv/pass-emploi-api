@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { Result } from '../../building-blocks/types/result'
 import { Core } from '../../domain/core'
 import { Unauthorized } from '../../domain/erreur'
 import { Milo, MiloRepositoryToken } from '../../domain/milo'
@@ -14,7 +15,7 @@ export interface GetDossierMiloJeuneQuery extends Query {
 @Injectable()
 export class GetDossierMiloJeuneQueryHandler extends QueryHandler<
   GetDossierMiloJeuneQuery,
-  DossierJeuneMiloQueryModel | undefined
+  Result<DossierJeuneMiloQueryModel>
 > {
   constructor(
     @Inject(MiloRepositoryToken)
@@ -25,7 +26,7 @@ export class GetDossierMiloJeuneQueryHandler extends QueryHandler<
 
   async handle(
     query: GetDossierMiloJeuneQuery
-  ): Promise<DossierJeuneMiloQueryModel | undefined> {
+  ): Promise<Result<DossierJeuneMiloQueryModel>> {
     return this.miloRepository.getDossier(query.idDossier)
   }
   async authorize(

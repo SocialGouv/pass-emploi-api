@@ -57,7 +57,7 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     }
 
     const jeune: Jeune = {
-      id: this.idService.generate(),
+      id: this.idService.uuid(),
       firstName: command.prenom,
       lastName: command.nom,
       creationDate: this.dateService.now(),

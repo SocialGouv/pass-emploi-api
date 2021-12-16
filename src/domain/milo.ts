@@ -13,7 +13,7 @@ export namespace Milo {
   }
 
   export interface Repository {
-    getDossier(id: string): Promise<Dossier | undefined>
+    getDossier(id: string): Promise<Result<Dossier>>
     creerJeune(idDossier: string, email: string): Promise<Result>
   }
 }

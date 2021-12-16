@@ -9,7 +9,7 @@ import {
 import { SendNotificationNouveauMessageCommandHandler } from '../../../src/application/commands/send-notification-nouveau-message.command.handler'
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
 import {
-  EmailMiloDejaUtilise,
+  ErreurHttpMilo,
   JeuneNonLieAuConseillerError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
@@ -183,7 +183,7 @@ describe('ConseillersController', () => {
         // Given
         getDossierMiloJeuneQueryHandler.execute
           .withArgs({ idDossier: '1' }, unUtilisateurDecode())
-          .resolves(unDossierMilo())
+          .resolves(success(unDossierMilo()))
 
         // When - Then
         await request(app.getHttpServer())
@@ -200,7 +200,7 @@ describe('ConseillersController', () => {
         // Given
         getDossierMiloJeuneQueryHandler.execute
           .withArgs({ idDossier: '2' }, unUtilisateurDecode())
-          .resolves(undefined)
+          .resolves(failure(new ErreurHttpMilo('Pas trouvé', 404)))
 
         // When - Then
         await request(app.getHttpServer())
@@ -247,7 +247,7 @@ describe('ConseillersController', () => {
         // Given
         // Given
         creerJeuneMiloCommandHandler.execute.resolves(
-          failure(new EmailMiloDejaUtilise('email'))
+          failure(new ErreurHttpMilo('email pas bon', 400))
         )
 
         // When - Then

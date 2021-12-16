@@ -7,7 +7,7 @@ import {
   CreerJeuneMiloCommand,
   CreerJeuneMiloCommandHandler
 } from '../../../src/application/commands/creer-jeune-milo.command.handler'
-import { EmailMiloDejaUtilise } from '../../../src/building-blocks/types/domain-error'
+import { ErreurHttpMilo } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -45,7 +45,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     const dateService = stubClass(DateService)
     const idService = stubClass(IdService)
-    idService.generate.returns(idNouveauJeune)
+    idService.uuid.returns(idNouveauJeune)
     dateService.now.returns(date)
     creerJeuneMiloCommandHandler = new CreerJeuneMiloCommandHandler(
       idService,
@@ -105,7 +105,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
             email: 'email',
             idConseiller: 'idConseiller'
           }
-          const echec = failure(new EmailMiloDejaUtilise(command.email))
+          const echec = failure(new ErreurHttpMilo(command.email, 400))
           miloRepository.creerJeune.resolves(echec)
 
           // When
