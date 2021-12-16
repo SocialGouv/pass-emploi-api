@@ -15,9 +15,9 @@ export class ImmersionClient {
     this.apiUrl = this.configService.get('immersion').url
   }
 
-  async post(suffixUrl: string, payload?: unknown): Promise<AxiosResponse> {
+  async post<T>(suffixUrl: string, payload?: unknown): Promise<AxiosResponse> {
     return await firstValueFrom(
-      this.httpService.post(`${this.apiUrl}/${suffixUrl}`, payload)
+      this.httpService.post<T>(`${this.apiUrl}/${suffixUrl}`, payload)
     )
   }
 }

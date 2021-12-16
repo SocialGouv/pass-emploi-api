@@ -53,3 +53,13 @@ export class UtilisateurMiloNonValide implements DomainError {
       'Il faut renseigner un nom, prenom et email pour créer un utilisateur Milo'
   }
 }
+
+export class RechercheOffreInvalide implements DomainError {
+  static CODE = 'RECHERCHE_OFFRE_INVALIDE'
+  readonly code: string = RechercheOffreInvalide.CODE
+  readonly message: string
+
+  constructor(message: string) {
+    this.message = message
+  }
+}

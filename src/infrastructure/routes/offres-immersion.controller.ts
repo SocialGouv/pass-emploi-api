@@ -1,11 +1,14 @@
-import { Controller, Get, Query } from '@nestjs/common'
+import { BadRequestException, Controller, Get, Query } from '@nestjs/common'
+import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { OffreImmersionQueryModel } from 'src/application/queries/query-models/offres-immersion.query-models'
 import {
   GetOffresImmersionQuery,
   GetOffresImmersionQueryHandler
 } from '../../application/queries/get-offres-immersion.query.handler'
-import { FindOffresImmersionQuery } from './validation/offres-immersion.inputs'
+import { RechercheOffreInvalide } from '../../building-blocks/types/domain-error'
+import { isSuccess } from '../../building-blocks/types/result'
+import { GetOffresImmersionQueryParams } from './validation/offres-immersion.inputs'
 
 @Controller('offres-immersion')
 @ApiOAuth2([])
@@ -20,15 +23,25 @@ export class OffresImmersionController {
     type: OffreImmersionQueryModel,
     isArray: true
   })
-  getOffresImmersion(
-    @Query() findOffresImmersionQuery: FindOffresImmersionQuery
+  async getOffresImmersion(
+    @Query() getOffresImmersionQueryParams: GetOffresImmersionQueryParams
   ): Promise<OffreImmersionQueryModel[]> {
     const query: GetOffresImmersionQuery = {
-      rome: findOffresImmersionQuery.rome,
-      lat: findOffresImmersionQuery.lat,
-      lon: findOffresImmersionQuery.lon
+      rome: getOffresImmersionQueryParams.rome,
+      lat: getOffresImmersionQueryParams.lat,
+      lon: getOffresImmersionQueryParams.lon
     }
 
-    return this.getOffresImmersionQueryHandler.execute(query)
+    const result = await this.getOffresImmersionQueryHandler.execute(query)
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+
+    if (result.error.code === RechercheOffreInvalide.CODE) {
+      throw new BadRequestException(result.error.message)
+    }
+
+    throw new RuntimeException(result.error.message)
   }
 }

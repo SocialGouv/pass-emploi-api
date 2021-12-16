@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { Result } from '../../building-blocks/types/result'
 import {
   OffresImmersion,
   OffresImmersionRepositoryToken
@@ -16,7 +17,7 @@ export interface GetOffresImmersionQuery extends Query {
 @Injectable()
 export class GetOffresImmersionQueryHandler extends QueryHandler<
   GetOffresImmersionQuery,
-  OffreImmersionQueryModel[]
+  Result<OffreImmersionQueryModel[]>
 > {
   constructor(
     @Inject(OffresImmersionRepositoryToken)
@@ -27,7 +28,7 @@ export class GetOffresImmersionQueryHandler extends QueryHandler<
 
   async handle(
     query: GetOffresImmersionQuery
-  ): Promise<OffreImmersionQueryModel[]> {
+  ): Promise<Result<OffreImmersionQueryModel[]>> {
     return this.offresImmersionRepository.findAll(
       query.rome,
       query.lat,

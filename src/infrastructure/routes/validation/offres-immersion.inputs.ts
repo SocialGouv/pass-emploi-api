@@ -3,7 +3,7 @@ import { Transform } from 'class-transformer'
 import { IsNotEmpty, IsString, IsNumber } from 'class-validator'
 import { transformStringToFloat } from './utils/transformers'
 
-export class FindOffresImmersionQuery {
+export class GetOffresImmersionQueryParams {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()

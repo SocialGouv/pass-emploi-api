@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { OffreImmersionQueryModel } from 'src/application/queries/query-models/offres-immersion.query-models'
+import { RechercheOffreInvalide } from '../../building-blocks/types/domain-error'
+import { failure, Result, success } from '../../building-blocks/types/result'
 import { OffresImmersion } from '../../domain/offre-immersion'
 import { ImmersionClient } from '../clients/immersion-client'
 
@@ -13,23 +15,36 @@ export class OffresImmersionHttpRepository
     rome: string,
     lat: number,
     lon: number
-  ): Promise<OffreImmersionQueryModel[]> {
+  ): Promise<Result<OffreImmersionQueryModel[]>> {
     const payload = {
       rome,
-      location: { lat, lon },
+      location: {
+        lat,
+        lon
+      },
       distance_km: 10
     }
 
-    const response = await this.immpersionClient.post(
-      'search-immersion',
-      payload
-    )
+    try {
+      const response = await this.immpersionClient.post<OffreImmpersionDto>(
+        'search-immersion',
+        payload
+      )
 
-    return response.data.map(toOffreImmersionQueryModel)
+      return success(response.data.map(toOffreImmersionQueryModel))
+    } catch (e) {
+      if (e.response.status === 400) {
+        const message = e.response.data.errors
+          .map((error: { message: string }) => error.message)
+          .join(' - ')
+        return failure(new RechercheOffreInvalide(message))
+      }
+      throw e
+    }
   }
 }
 
-interface OffreImmpersionDto {
+export interface OffreImmpersionDto {
   id: string
   rome: string
   romeLabel: string
