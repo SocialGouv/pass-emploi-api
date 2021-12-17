@@ -26,7 +26,8 @@ export class FavoriAuthorizer {
     if (
       favori &&
       utilisateur &&
-      utilisateur.type === Authentification.Type.JEUNE
+      utilisateur.type === Authentification.Type.JEUNE &&
+      utilisateur.id === idJeune
     ) {
       return
     }

@@ -13,7 +13,7 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action'
 import { uneAction } from '../../fixtures/action.fixture'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('DeleteActionCommandHandler', () => {
@@ -78,7 +78,7 @@ describe('DeleteActionCommandHandler', () => {
         idAction: action.id
       }
 
-      const utilisateur = unUtilisateurConseiller()
+      const utilisateur = unUtilisateurJeune()
 
       // When
       await deleteActionCommandHandler.authorize(command, utilisateur)
