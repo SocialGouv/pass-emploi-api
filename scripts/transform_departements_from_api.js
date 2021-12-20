@@ -1,12 +1,25 @@
-var departements = require('../src/infrastructure/sequelize/seeders/data/departement_from_api.json')
-const depatementsRef = departements.map(departement => ({
-  code: departement.code,
-  libelle: departement.libelle
-}))
-const fs = require('fs')
+import { remove as enleverLesAccents } from 'remove-accents'
+import { readFile, writeFile } from 'fs/promises'
 
-fs.writeFile(
-  './src/infrastructure/sequelize/seeders/data/departements.json',
+let departements = []
+try {
+    departements = await readFile(
+        '../src/infrastructure/sequelize/seeders/data/departement_from_api.json'
+    )
+} catch (err) {
+    console.error(err)
+    process.exit()
+}
+
+const depatementsRef = JSON.parse(departements).map(departement => {
+    return {
+        code: departement.code,
+        libelle: enleverLesAccents(departement.libelle)   
+    }
+})
+
+writeFile(
+  '../src/infrastructure/sequelize/seeders/data/departements.json',
   JSON.stringify(depatementsRef),
   err => {
     if (err) {

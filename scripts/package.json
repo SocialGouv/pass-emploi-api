@@ -5,12 +5,15 @@
   "main": "create_users.js",
   "type": "module",
   "scripts": {
-    "populate:local": "node create_users.js"
+    "populate:local": "node create_users.js",
+    "generate:departements": "node transform_departements_from_api.js",
+    "generate:communes": "node transform_communes_from_api.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "node-fetch": "^3.1.0",
-    "pg": "^8.7.1"
+    "pg": "^8.7.1",
+    "remove-accents": "^0.4.2"
   }
 }

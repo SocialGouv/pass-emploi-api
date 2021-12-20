@@ -35,16 +35,7 @@ export class GetCommunesEtDepartementsQueryHandler extends QueryHandler<
     }
 
     resultats.sort((a, b) => {
-      if (a.score !== b.score) return b.score - a.score
-
-      if (
-        a.type === CommunesEtDepartementsQueryModel.Type.DEPARTEMENT &&
-        b.type === CommunesEtDepartementsQueryModel.Type.COMMUNE
-      ) {
-        return 1
-      }
-
-      return 0
+      return a.score > b.score ? -1 : 1
     })
     resultats.splice(5, resultats.length)
 

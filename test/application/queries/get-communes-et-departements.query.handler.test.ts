@@ -556,7 +556,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
     })
 
     describe('quand il a y a plus que 5 résultats', async () => {
-      it('fait un tri sur le libelle le plus proche, puis priorise les communes', async () => {
+      it('fait un tri sur le libelle le plus proche', async () => {
         //Given
         const communes = [
           uneCommuneDto({
