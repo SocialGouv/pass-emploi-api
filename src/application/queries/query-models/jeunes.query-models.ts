@@ -15,6 +15,11 @@ export class DetailJeuneQueryModel {
     required: false
   })
   creationDate?: string
+
+  @ApiProperty({
+    required: false
+  })
+  authenticationId?: string | null
 }
 
 export class ResumeActionsDuJeuneQueryModel {

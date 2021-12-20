@@ -17,7 +17,8 @@ export const uneActionQueryModelFromDomain = (
     id: action.idJeune,
     firstName: jeune.firstName,
     lastName: jeune.lastName,
-    creationDate: jeune.creationDate.toString()
+    creationDate: jeune.creationDate.toString(),
+    authenticationId: null
   },
   creationDate: DateTime.fromJSDate(action.dateCreation)
     .toUTC()
