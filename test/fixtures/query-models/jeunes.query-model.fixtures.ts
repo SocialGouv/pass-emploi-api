@@ -25,7 +25,7 @@ export function listeDetailJeuneQueryModel(): DetailJeuneQueryModel[] {
       firstName: 'John',
       lastName: 'Doe',
       creationDate: '2021-11-11T08:03:30.000Z',
-      authenticationId: ''
+      isActivated: true
     }
   ]
 
