@@ -11,10 +11,11 @@ export class DetailJeuneQueryModel {
   @ApiProperty()
   lastName: string
 
-  @ApiProperty({
-    required: false
-  })
-  creationDate?: string
+  @ApiProperty()
+  creationDate: string
+
+  @ApiProperty()
+  isActivated: boolean
 }
 
 export class ResumeActionsDuJeuneQueryModel {

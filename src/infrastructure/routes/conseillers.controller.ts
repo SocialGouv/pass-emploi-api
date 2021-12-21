@@ -128,7 +128,8 @@ export class ConseillersController {
       id: jeune.id,
       firstName: jeune.firstName,
       lastName: jeune.lastName,
-      creationDate: jeune.creationDate.toString()
+      creationDate: jeune.creationDate.toString(),
+      isActivated: false
     }
   }
 

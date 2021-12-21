@@ -283,7 +283,8 @@ describe('JeunesController', () => {
         id: idJeune,
         firstName: 'Kenji',
         lastName: 'Tavernier',
-        creationDate: 'une_date'
+        creationDate: 'une_date',
+        isActivated: true
       }
       getDetailJeuneQueryHandler.execute.resolves(detailJeuneQueryModel)
 

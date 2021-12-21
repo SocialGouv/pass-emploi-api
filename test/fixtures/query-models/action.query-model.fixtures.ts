@@ -17,7 +17,8 @@ export const uneActionQueryModelFromDomain = (
     id: action.idJeune,
     firstName: jeune.firstName,
     lastName: jeune.lastName,
-    creationDate: jeune.creationDate.toString()
+    creationDate: jeune.creationDate.toString(),
+    isActivated: false
   },
   creationDate: DateTime.fromJSDate(action.dateCreation)
     .toUTC()
@@ -42,7 +43,9 @@ export function uneActionQueryModel(
     jeune: {
       id: '1',
       firstName: 'Damien',
-      lastName: 'Saez'
+      lastName: 'Saez',
+      creationDate: '2021-11-10T08:03:30.000Z',
+      isActivated: true
     },
     creatorType: Action.TypeCreateur.CONSEILLER,
     creator: 'Nils Tavernier'
