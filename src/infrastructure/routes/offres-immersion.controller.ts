@@ -1,7 +1,17 @@
-import { BadRequestException, Controller, Get, Query } from '@nestjs/common'
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Query
+} from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { OffreImmersionQueryModel } from 'src/application/queries/query-models/offres-immersion.query-models'
+import {
+  DetailOffreImmersionQueryModel,
+  OffreImmersionQueryModel
+} from 'src/application/queries/query-models/offres-immersion.query-models'
 import {
   GetOffresImmersionQuery,
   GetOffresImmersionQueryHandler
@@ -9,12 +19,18 @@ import {
 import { RechercheOffreInvalide } from '../../building-blocks/types/domain-error'
 import { isSuccess } from '../../building-blocks/types/result'
 import { GetOffresImmersionQueryParams } from './validation/offres-immersion.inputs'
+import {
+  OffresImmersion,
+  OffresImmersionRepositoryToken
+} from '../../domain/offre-immersion'
 
 @Controller('offres-immersion')
 @ApiOAuth2([])
 @ApiTags("Offres d'immersion")
 export class OffresImmersionController {
   constructor(
+    @Inject(OffresImmersionRepositoryToken)
+    private offresEmploiRepository: OffresImmersion.Repository,
     private readonly getOffresImmersionQueryHandler: GetOffresImmersionQueryHandler
   ) {}
 
@@ -43,5 +59,16 @@ export class OffresImmersionController {
     }
 
     throw new RuntimeException(result.error.message)
+  }
+
+  @Get(':idOffreImmersion')
+  @ApiResponse({
+    type: DetailOffreImmersionQueryModel,
+    isArray: true
+  })
+  async getDetailOffreImmersion(
+    @Param('idOffreImmersion') idOffreImmersion: string
+  ): Promise<DetailOffreImmersionQueryModel | undefined> {
+    return await this.offresEmploiRepository.get(idOffreImmersion)
   }
 }

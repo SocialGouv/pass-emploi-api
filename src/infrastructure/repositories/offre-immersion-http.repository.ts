@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common'
-import { OffreImmersionQueryModel } from 'src/application/queries/query-models/offres-immersion.query-models'
+import {
+  ContactImmersionQueryModel,
+  DetailOffreImmersionQueryModel,
+  OffreImmersionQueryModel
+} from 'src/application/queries/query-models/offres-immersion.query-models'
 import { RechercheOffreInvalide } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { OffresImmersion } from '../../domain/offre-immersion'
@@ -9,7 +13,7 @@ import { ImmersionClient } from '../clients/immersion-client'
 export class OffresImmersionHttpRepository
   implements OffresImmersion.Repository
 {
-  constructor(private immpersionClient: ImmersionClient) {}
+  constructor(private immersionClient: ImmersionClient) {}
 
   async findAll(
     rome: string,
@@ -26,12 +30,12 @@ export class OffresImmersionHttpRepository
     }
 
     try {
-      const response = await this.immpersionClient.post<OffreImmpersionDto>(
+      const response = await this.immersionClient.post<OffreImmpersionDto[]>(
         'search-immersion',
         payload
       )
 
-      return success(response.data.map(toOffreImmersionQueryModel))
+      return success(response.map(toOffreImmersionQueryModel))
     } catch (e) {
       if (e.response.status === 400) {
         const message = e.response.data.errors
@@ -41,6 +45,14 @@ export class OffresImmersionHttpRepository
       }
       throw e
     }
+  }
+  async get(
+    idOffreImmersion: string
+  ): Promise<DetailOffreImmersionQueryModel | undefined> {
+    const response = await this.immersionClient.get<OffreImmpersionDto>(
+      `/get-immersion-by-id/${idOffreImmersion}`
+    )
+    return toDetailOffreImmersionQueryModel(response)
   }
 }
 
@@ -53,7 +65,7 @@ export interface OffreImmpersionDto {
   siret: string
   name: string
   voluntaryToImmersion: boolean
-  location: { lat: number; lon: number }
+  location?: { lat: number; lon: number }
   address: string
   city: string
   distance_m?: number
@@ -81,4 +93,49 @@ function toOffreImmersionQueryModel(
     secteurActivite: offresImmersionDto.nafLabel,
     ville: offresImmersionDto.city
   }
+}
+
+function toDetailOffreImmersionQueryModel(
+  offreImmpersionDto: OffreImmpersionDto
+): DetailOffreImmersionQueryModel {
+  return {
+    id: offreImmpersionDto.id,
+    metier: offreImmpersionDto.romeLabel,
+    nomEtablissement: offreImmpersionDto.name,
+    secteurActivite: offreImmpersionDto.nafLabel,
+    ville: offreImmpersionDto.city,
+    adresse: offreImmpersionDto.address,
+    estVolontaire: offreImmpersionDto.voluntaryToImmersion,
+    localisation: {
+      latitude: offreImmpersionDto.location?.lat ?? 0,
+      longitude: offreImmpersionDto.location?.lon ?? 1
+    },
+    contact: buildContact(offreImmpersionDto)
+  }
+}
+
+function buildContact(
+  offreImmpersionDto: OffreImmpersionDto
+): ContactImmersionQueryModel | undefined {
+  if (!offreImmpersionDto.contactDetails) {
+    return undefined
+  }
+  return {
+    id: offreImmpersionDto.contactDetails.id,
+    nom: offreImmpersionDto.contactDetails.firstName,
+    prenom: offreImmpersionDto.contactDetails.lastName,
+    telephone: offreImmpersionDto.contactDetails.phone,
+    email: offreImmpersionDto.contactDetails.email,
+    role: offreImmpersionDto.contactDetails.role,
+    modeDeContact: offreImmpersionDto.contactMode
+      ? fromContactMode[offreImmpersionDto.contactMode]
+      : undefined
+  }
+}
+
+const fromContactMode = {
+  UNKNOWN: OffresImmersion.MethodeDeContact.INCONNU,
+  EMAIL: OffresImmersion.MethodeDeContact.EMAIL,
+  PHONE: OffresImmersion.MethodeDeContact.TELEPHONE,
+  IN_PERSON: OffresImmersion.MethodeDeContact.PRESENTIEL
 }

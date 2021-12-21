@@ -43,7 +43,8 @@ export default () => {
     immersion: {
       url:
         process.env.IMMERSION_API_URL ??
-        'https://immersion-facile.beta.gouv.fr/api'
+        'https://immersion-facile.beta.gouv.fr/api',
+      apiKey: process.env.IMMERSION_API_KEY ?? ''
     },
     firebase: {
       environmentPrefix: process.env.FIREBASE_ENVIRONMENT_PREFIX ?? 'staging',
