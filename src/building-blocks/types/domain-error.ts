@@ -64,6 +64,16 @@ export class RechercheOffreInvalide implements DomainError {
   }
 }
 
+export class RechercheDetailOffreInvalide implements DomainError {
+  static CODE = 'RECHERCHE_DETAIL_OFFRE_INVALIDE'
+  readonly code: string = RechercheDetailOffreInvalide.CODE
+  readonly message: string
+
+  constructor(message: string) {
+    this.message = message
+  }
+}
+
 export class ErreurHttpMilo implements DomainError {
   static CODE = 'ERREUR_HTTP_MILO'
   readonly code: string = ErreurHttpMilo.CODE

@@ -81,6 +81,7 @@ import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
 import { configureLoggerModule } from './utils/logger.module'
 import { OffresImmersionController } from './infrastructure/routes/offres-immersion.controller'
+import { GetDetailOffreImmersionQueryHandler } from './application/queries/get-detail-offre-immersion.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -188,6 +189,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetHomeJeuneHandler,
     GetOffresEmploiQueryHandler,
     GetOffresImmersionQueryHandler,
+    GetDetailOffreImmersionQueryHandler,
     GetDetailOffreEmploiQueryHandler,
     GetDetailConseillerQueryHandler,
     GetJeunesByConseillerQueryHandler,

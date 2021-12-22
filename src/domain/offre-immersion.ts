@@ -16,7 +16,7 @@ export namespace OffresImmersion {
 
     get(
       idOffreImmersion: string
-    ): Promise<DetailOffreImmersionQueryModel | undefined>
+    ): Promise<Result<DetailOffreImmersionQueryModel>>
   }
 
   export enum MethodeDeContact {

@@ -2,9 +2,13 @@ import { Injectable } from '@nestjs/common'
 import {
   ContactImmersionQueryModel,
   DetailOffreImmersionQueryModel,
+  LocalisationQueryModel,
   OffreImmersionQueryModel
 } from 'src/application/queries/query-models/offres-immersion.query-models'
-import { RechercheOffreInvalide } from '../../building-blocks/types/domain-error'
+import {
+  RechercheDetailOffreInvalide,
+  RechercheOffreInvalide
+} from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { OffresImmersion } from '../../domain/offre-immersion'
 import { ImmersionClient } from '../clients/immersion-client'
@@ -30,12 +34,12 @@ export class OffresImmersionHttpRepository
     }
 
     try {
-      const response = await this.immersionClient.post<OffreImmpersionDto[]>(
+      const response = await this.immersionClient.post(
         'search-immersion',
         payload
       )
 
-      return success(response.map(toOffreImmersionQueryModel))
+      return success(response.data.map(toOffreImmersionQueryModel))
     } catch (e) {
       if (e.response.status === 400) {
         const message = e.response.data.errors
@@ -48,11 +52,21 @@ export class OffresImmersionHttpRepository
   }
   async get(
     idOffreImmersion: string
-  ): Promise<DetailOffreImmersionQueryModel | undefined> {
-    const response = await this.immersionClient.get<OffreImmpersionDto>(
-      `/get-immersion-by-id/${idOffreImmersion}`
-    )
-    return toDetailOffreImmersionQueryModel(response)
+  ): Promise<Result<DetailOffreImmersionQueryModel>> {
+    try {
+      const response = await this.immersionClient.get(
+        `/get-immersion-by-id/${idOffreImmersion}`
+      )
+      return success(toDetailOffreImmersionQueryModel(response.data))
+    } catch (e) {
+      if (e.response.status === 404) {
+        const message = e.response.data.errors
+          .map((error: { message: string }) => error.message)
+          .join(' - ')
+        return failure(new RechercheDetailOffreInvalide(message))
+      }
+      throw e
+    }
   }
 }
 
@@ -106,11 +120,20 @@ function toDetailOffreImmersionQueryModel(
     ville: offreImmpersionDto.city,
     adresse: offreImmpersionDto.address,
     estVolontaire: offreImmpersionDto.voluntaryToImmersion,
-    localisation: {
-      latitude: offreImmpersionDto.location?.lat ?? 0,
-      longitude: offreImmpersionDto.location?.lon ?? 1
-    },
+    localisation: buildLocalisation(offreImmpersionDto),
     contact: buildContact(offreImmpersionDto)
+  }
+}
+
+function buildLocalisation(
+  offreImmpersionDto: OffreImmpersionDto
+): LocalisationQueryModel | undefined {
+  if (!offreImmpersionDto.location) {
+    return undefined
+  }
+  return {
+    latitude: offreImmpersionDto.location.lat,
+    longitude: offreImmpersionDto.location.lon
   }
 }
 

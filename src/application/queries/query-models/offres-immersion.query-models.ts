@@ -18,6 +18,13 @@ export class ContactImmersionQueryModel {
   modeDeContact?: OffresImmersion.MethodeDeContact
 }
 
+export class LocalisationQueryModel {
+  @ApiProperty()
+  latitude: number
+  @ApiProperty()
+  longitude: number
+}
+
 export class OffreImmersionQueryModel {
   @ApiProperty()
   id: string
@@ -36,11 +43,10 @@ export class DetailOffreImmersionQueryModel extends OffreImmersionQueryModel {
   estVolontaire: boolean
   @ApiProperty()
   adresse: string
-  @ApiProperty()
-  localisation: {
-    latitude: number
-    longitude: number
-  }
+  @ApiProperty({
+    required: false
+  })
+  localisation?: LocalisationQueryModel
   @ApiProperty({
     required: false
   })
