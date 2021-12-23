@@ -7,6 +7,7 @@ import {
 } from 'src/application/queries/query-models/offres-immersion.query-models'
 import {
   RechercheDetailOffreInvalide,
+  RechercheDetailOffreNonTrouve,
   RechercheOffreInvalide
 } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
@@ -60,12 +61,10 @@ export class OffresImmersionHttpRepository
       return success(toDetailOffreImmersionQueryModel(response.data))
     } catch (e) {
       if (e.response.status === 404) {
-        const message = e.response.data.errors
-          .map((error: { message: string }) => error.message)
-          .join(' - ')
-        return failure(new RechercheDetailOffreInvalide(message))
+        const message = `Offre d'immersion ${idOffreImmersion} not found`
+        return failure(new RechercheDetailOffreNonTrouve(message))
       }
-      throw e
+      return failure(new RechercheDetailOffreInvalide(e.response.data.errors))
     }
   }
 }

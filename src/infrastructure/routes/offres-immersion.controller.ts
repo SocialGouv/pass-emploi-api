@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Controller,
   Get,
+  NotFoundException,
   Param,
   Query
 } from '@nestjs/common'
@@ -17,6 +18,7 @@ import {
 } from '../../application/queries/get-offres-immersion.query.handler'
 import {
   RechercheDetailOffreInvalide,
+  RechercheDetailOffreNonTrouve,
   RechercheOffreInvalide
 } from '../../building-blocks/types/domain-error'
 import { isSuccess } from '../../building-blocks/types/result'
@@ -78,7 +80,9 @@ export class OffresImmersionController {
       return result.data
     }
 
-    if (result.error.code === RechercheDetailOffreInvalide.CODE) {
+    if (result.error.code === RechercheDetailOffreNonTrouve.CODE) {
+      throw new NotFoundException(result.error.message)
+    } else if (result.error.code === RechercheDetailOffreInvalide.CODE) {
       throw new BadRequestException(result.error.message)
     }
 
