@@ -63,6 +63,7 @@ async function bootstrap(): Promise<void> {
   useSwagger(appConfig, app)
   app.enableCors()
   app.useGlobalPipes(new ValidationPipe())
+  app.disable('x-powered-by')
   await app.listen(port)
 }
 
