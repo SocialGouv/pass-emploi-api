@@ -10,3 +10,12 @@ export const unUtilisateurQueryModel = (): UtilisateurQueryModel => ({
   email: 'nils.tavernier@passemploi.com',
   structure: Core.Structure.MILO
 })
+
+export const unUtilisateurSansEmailQueryModel = (): UtilisateurQueryModel => ({
+  id: '1',
+  nom: 'Tavernier',
+  prenom: 'Nils',
+  type: Authentification.Type.CONSEILLER,
+  email: undefined,
+  structure: Core.Structure.MILO
+})

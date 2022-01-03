@@ -6,7 +6,7 @@ import {
 } from '../../../src/application/commands/update-utilisateur.command.handler'
 import {
   NonTrouveError,
-  UtilisateurMiloNonValide
+  ConseillerNonValide
 } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
@@ -117,7 +117,7 @@ describe('AuthentificationController', () => {
 
       updateUtilisateurCommandHandler.execute
         .withArgs(command)
-        .resolves(failure(new UtilisateurMiloNonValide()))
+        .resolves(failure(new ConseillerNonValide()))
 
       // When - Then
       await request(app.getHttpServer())
@@ -142,7 +142,7 @@ describe('AuthentificationController', () => {
 
       updateUtilisateurCommandHandler.execute
         .withArgs(command)
-        .resolves(failure(new UtilisateurMiloNonValide()))
+        .resolves(failure(new ConseillerNonValide()))
 
       // When - Then
       await request(app.getHttpServer())
