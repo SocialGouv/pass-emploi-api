@@ -12,6 +12,12 @@ export const configureLoggerModule = (): DynamicModule =>
     // @ts-ignore
     pinoHttp: [
       {
+        autoLogging: { ignorePaths: ['/health'] },
+        redact: [
+          'req.headers.authorization',
+          'req.headers.cookie',
+          'req.headers["x-api-key"]'
+        ],
         mixin: (): (() => MixinFn) => {
           const currentTraceIds = getInstance().currentTraceIds
           /* eslint-disable @typescript-eslint/ban-ts-comment */
