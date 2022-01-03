@@ -1,6 +1,8 @@
 import { parse } from 'pg-connection-string'
 import { Sequelize } from 'sequelize-typescript'
 import { sqlModels } from '../../src/infrastructure/sequelize/models'
+import { createClient } from 'redis'
+import { testConfig } from './module-for-testing'
 
 export class DatabaseForTesting {
   sequelize!: Sequelize
@@ -8,7 +10,7 @@ export class DatabaseForTesting {
   constructor() {
     const { host, port, database, user, password } = parse(
       // eslint-disable-next-line no-process-env,@typescript-eslint/no-non-null-assertion
-      process.env.DATABASE_URL!
+      process.env.DATABASE_URL || 'postgresql://test:test@localhost:56432/test'
     )
     this.sequelize = new Sequelize({
       host: host as string,
@@ -21,8 +23,15 @@ export class DatabaseForTesting {
     })
     this.sequelize.addModels(sqlModels)
 
+    const redisUrl = testConfig().get('redis').url
+    const redisClient = createClient({
+      url: redisUrl
+    })
     beforeEach(async () => {
       await this.sequelize.truncate({ cascade: true })
+      await redisClient.connect()
+      await redisClient.flushAll()
+      await redisClient.disconnect()
     })
 
     after(async () => {

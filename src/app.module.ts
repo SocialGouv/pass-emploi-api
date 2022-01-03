@@ -1,3 +1,4 @@
+/* eslint-disable no-process-env */
 import { HttpModule } from '@nestjs/axios'
 import { Module, ModuleMetadata, Provider } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
@@ -37,6 +38,7 @@ import { GetOffresImmersionQueryHandler } from './application/queries/get-offres
 import { GetAllRendezVousConseillerQueryHandler } from './application/queries/get-rendez-vous-conseiller.query.handler'
 import { GetAllRendezVousJeuneQueryHandler } from './application/queries/get-rendez-vous-jeune.query.handler'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from './application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
+import { WorkerService } from './application/worker.service'
 import configuration from './config/configuration'
 import { Action, ActionsRepositoryToken } from './domain/action'
 import {
@@ -50,6 +52,10 @@ import { MiloRepositoryToken } from './domain/milo'
 import { NotificationRepositoryToken } from './domain/notification'
 import { OffresEmploiRepositoryToken } from './domain/offre-emploi'
 import { OffresImmersionRepositoryToken } from './domain/offre-immersion'
+import {
+  PlanificateurRepositoryToken,
+  PlanificateurService
+} from './domain/planificateur'
 import { RendezVousRepositoryToken } from './domain/rendez-vous'
 import { ApiKeyAuthGuard } from './infrastructure/auth/api-key.auth-guard'
 import { JwtService } from './infrastructure/auth/jwt.service'
@@ -67,6 +73,7 @@ import { MiloInMemoryRepository } from './infrastructure/repositories/milo-in-me
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
 import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre-emploi-http-sql.repository'
 import { OffresImmersionHttpRepository } from './infrastructure/repositories/offre-immersion-http.repository'
+import { PlanificateurRedisRepository } from './infrastructure/repositories/planificateur-redis.repository'
 import { RendezVousRepositorySql } from './infrastructure/repositories/rendez-vous-sql.repository'
 import { ActionsController } from './infrastructure/routes/actions.controller'
 import { AuthentificationController } from './infrastructure/routes/authentification.controller'
@@ -120,6 +127,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     ImmersionClient,
     Action.Factory,
     Authentification.Factory,
+    WorkerService,
     {
       provide: APP_GUARD,
       useClass: OidcAuthGuard
@@ -158,7 +166,6 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: MiloRepositoryToken,
-      /* eslint-disable no-process-env */
       useClass:
         process.env.IN_MEMORY == 'true'
           ? MiloInMemoryRepository
@@ -167,6 +174,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: OffresImmersionRepositoryToken,
       useClass: OffresImmersionHttpRepository
+    },
+    {
+      provide: PlanificateurRepositoryToken,
+      useClass: PlanificateurRedisRepository
     },
     ...databaseProviders
   ],
@@ -210,6 +221,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetCommunesEtDepartementsQueryHandler,
     GetDossierMiloJeuneQueryHandler,
     CreerJeuneMiloCommandHandler,
+    PlanificateurService,
     CreateEvenementCommandHandler,
     GetChatSecretsQueryHandler
   ]

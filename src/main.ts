@@ -1,3 +1,4 @@
+import { WorkerService } from './application/worker.service'
 import { initializeAPMAgent } from './infrastructure/monitoring/apm.init'
 initializeAPMAgent()
 
@@ -59,12 +60,20 @@ async function bootstrap(): Promise<void> {
   })
   const appConfig = app.get<ConfigService>(ConfigService)
   const port = appConfig.get('port')
+  const isWorker = appConfig.get('isWorker')
+  const isWeb = appConfig.get('isWeb')
   app.useLogger(app.get(Logger))
-  useSwagger(appConfig, app)
-  app.enableCors()
-  app.useGlobalPipes(new ValidationPipe())
-  app.disable('x-powered-by')
-  await app.listen(port)
+
+  if (isWorker) {
+    app.get(WorkerService).subscribe()
+  }
+  if (isWeb) {
+    useSwagger(appConfig, app)
+    app.enableCors()
+    app.useGlobalPipes(new ValidationPipe())
+    app.disable('x-powered-by')
+    await app.listen(port)
+  }
 }
 
 bootstrap()

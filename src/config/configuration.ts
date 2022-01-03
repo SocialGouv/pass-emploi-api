@@ -7,6 +7,8 @@ export default () => {
     'postgresql://passemploi:passemploi@localhost:55432/passemploidb'
   const { host, port, database, user, password } = parse(databaseUrl)
   return {
+    isWeb: process.env.IS_WEB !== 'false',
+    isWorker: process.env.IS_WORKER === 'true',
     port: process.env.PORT ? parseInt(process.env.PORT, 10) : 5000,
     database: {
       host,
@@ -56,6 +58,9 @@ export default () => {
     },
     apiKeys: {
       keycloak: process.env.API_KEY_KEYCLOAK ?? 'ceci-est-une-api-key'
+    },
+    redis: {
+      url: process.env.REDIS_URL ?? ''
     }
   }
 }

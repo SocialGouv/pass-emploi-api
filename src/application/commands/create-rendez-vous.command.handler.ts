@@ -12,6 +12,7 @@ import {
   Notification,
   NotificationRepositoryToken
 } from '../../domain/notification'
+import { PlanificateurService } from '../../domain/planificateur'
 import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
 import { IdService } from '../../utils/id-service'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
@@ -37,7 +38,8 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,
-    private conseillerAuthorizer: ConseillerAuthorizer
+    private conseillerAuthorizer: ConseillerAuthorizer,
+    private planificateurService: PlanificateurService
   ) {
     super()
   }
@@ -69,6 +71,8 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       )
       await this.notificationRepository.send(notification)
     }
+
+    await this.planificateurService.planifierRendezVous(rendezVous)
 
     return success(rendezVous.id)
   }

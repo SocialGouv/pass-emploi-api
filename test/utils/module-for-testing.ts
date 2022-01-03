@@ -53,6 +53,13 @@ export const testConfig = (): ConfigService => {
       url: 'https://milo.com',
       apiKeyRecupererDossier: 'apiKeyRecupererDossier',
       apiKeyCreerJeune: 'apiKeyCreerJeune'
+    },
+    redis: {
+      // eslint-disable-next-line no-process-env
+      url: process.env.REDIS_URL || 'redis://localhost:6767'
+    },
+    planificateur: {
+      url: 'https://planification.com'
     }
   })
 }

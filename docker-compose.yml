@@ -3,6 +3,7 @@ version: '3.7'
 
 volumes:
   api-db-data:
+  redis-db-data:
 
 services:
   apidb:
@@ -16,13 +17,37 @@ services:
       POSTGRES_DB: passemploidb
     volumes:
       - api-db-data:/var/lib/postgresql
-        
-  testdb:
+    
+  redisdb:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-db-data:/data
+    command: ['redis-server', '--appendonly yes']
+      
+  pgtestdb:
     image: postgres:14-alpine
-    container_name: testdb
+    container_name: pgtestdb
     ports:
       - "56432:5432"
     environment:
       POSTGRES_USER: test
       POSTGRES_PASSWORD: test
       POSTGRES_DB: test
+
+  redistestdb:
+    container_name: redistestdb
+    image: redis:6-alpine
+    ports:
+      - "6767:6379"
+
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:redisdb:6379
+    ports:
+      - "8901:8081"
