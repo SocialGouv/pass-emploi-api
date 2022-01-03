@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { UtilisateurMiloNonValide } from '../building-blocks/types/domain-error'
+import { ConseillerNonValide } from '../building-blocks/types/domain-error'
 import { failure, Result, success } from '../building-blocks/types/result'
 import { IdService } from '../utils/id-service'
 import { Core } from './core'
@@ -42,8 +42,8 @@ export namespace Authentification {
       email: string | undefined,
       structure: Core.Structure
     ): Result<Utilisateur> {
-      if (!nom || !prenom || !email) {
-        return failure(new UtilisateurMiloNonValide())
+      if (!nom || !prenom) {
+        return failure(new ConseillerNonValide())
       }
 
       const utilisateur = {

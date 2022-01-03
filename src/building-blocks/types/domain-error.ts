@@ -43,14 +43,14 @@ export class JeuneNonLieAuConseillerError implements DomainError {
   }
 }
 
-export class UtilisateurMiloNonValide implements DomainError {
-  static CODE = 'UTILISATEUR_MILO_NON_VALIDE'
-  readonly code: string = UtilisateurMiloNonValide.CODE
+export class ConseillerNonValide implements DomainError {
+  static CODE = 'CONSEILLER_NON_VALIDE'
+  readonly code: string = ConseillerNonValide.CODE
   readonly message: string
 
   constructor() {
     this.message =
-      'Il faut renseigner un nom, prenom et email pour créer un utilisateur Milo'
+      'Il faut renseigner un nom et un prénom pour créer un conseiller'
   }
 }
 

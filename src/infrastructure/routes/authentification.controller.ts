@@ -20,7 +20,7 @@ import {
 } from '../../application/queries/query-models/authentification.query-models'
 import {
   NonTrouveError,
-  UtilisateurMiloNonValide
+  ConseillerNonValide
 } from '../../building-blocks/types/domain-error'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
@@ -63,7 +63,7 @@ export class AuthentificationController {
       if (result.error.code === NonTrouveError.CODE) {
         throw new NotFoundException(result.error)
       }
-      if (result.error.code === UtilisateurMiloNonValide.CODE) {
+      if (result.error.code === ConseillerNonValide.CODE) {
         throw new BadRequestException(result.error)
       }
     }
