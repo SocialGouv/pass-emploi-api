@@ -3,7 +3,7 @@ import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { isFailure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Chat, ChatsRepositoryToken } from '../../domain/chat'
+import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { Core } from '../../domain/core'
 import { NotFound, Unauthorized } from '../../domain/erreur'
@@ -34,7 +34,7 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
-    @Inject(ChatsRepositoryToken) private chatRepository: Chat.Repository
+    @Inject(ChatRepositoryToken) private chatRepository: Chat.Repository
   ) {
     super()
   }

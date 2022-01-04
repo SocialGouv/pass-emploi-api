@@ -43,7 +43,7 @@ import {
   Authentification,
   AuthentificationRepositoryToken
 } from './domain/authentification'
-import { ChatsRepositoryToken } from './domain/chat'
+import { ChatRepositoryToken } from './domain/chat'
 import { ConseillersRepositoryToken } from './domain/conseiller'
 import { JeunesRepositoryToken } from './domain/jeune'
 import { MiloRepositoryToken } from './domain/milo'
@@ -84,6 +84,7 @@ import { OffresImmersionController } from './infrastructure/routes/offres-immers
 import { GetDetailOffreImmersionQueryHandler } from './application/queries/get-detail-offre-immersion.query.handler'
 import { EvenementsController } from './infrastructure/routes/evenements.controller'
 import { CreateEvenementCommandHandler } from './application/commands/create-evenement.command.handler'
+import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -144,7 +145,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       useClass: NotificationFirebaseRepository
     },
     {
-      provide: ChatsRepositoryToken,
+      provide: ChatRepositoryToken,
       useClass: ChatFirebaseRepository
     },
     {
@@ -209,7 +210,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetCommunesEtDepartementsQueryHandler,
     GetDossierMiloJeuneQueryHandler,
     CreerJeuneMiloCommandHandler,
-    CreateEvenementCommandHandler
+    CreateEvenementCommandHandler,
+    GetChatSecretsQueryHandler
   ]
 }
 

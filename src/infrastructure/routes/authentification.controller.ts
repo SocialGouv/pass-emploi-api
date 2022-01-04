@@ -2,6 +2,8 @@ import {
   BadRequestException,
   Body,
   Controller,
+  HttpException,
+  HttpStatus,
   NotFoundException,
   Param,
   Post,
@@ -10,6 +12,7 @@ import {
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger'
+import { GetChatSecretsQueryHandler } from 'src/application/queries/get-chat-secrets.query.handler'
 import {
   UpdateUtilisateurCommand,
   UpdateUtilisateurCommandHandler
@@ -25,7 +28,6 @@ import {
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
-import { FirebaseClient } from '../clients/firebase-client'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
 import { UpdateUserPayload } from './validation/authentification.inputs'
@@ -35,7 +37,7 @@ import { UpdateUserPayload } from './validation/authentification.inputs'
 export class AuthentificationController {
   constructor(
     private updateUtilisateurCommandHandler: UpdateUtilisateurCommandHandler,
-    private firebaseClient: FirebaseClient
+    private getChatSecretsQueryHandler: GetChatSecretsQueryHandler
   ) {}
 
   @SkipOidcAuth()
@@ -76,7 +78,14 @@ export class AuthentificationController {
   async postFirebaseToken(
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<FirebaseTokenQueryModel> {
-    const firebaseToken = await this.firebaseClient.getToken(utilisateur)
-    return { token: firebaseToken }
+    const queryModel = await this.getChatSecretsQueryHandler.execute({
+      utilisateur
+    })
+
+    if (queryModel) {
+      return queryModel
+    }
+
+    throw new HttpException(`Chat secrets not found`, HttpStatus.NOT_FOUND)
   }
 }
