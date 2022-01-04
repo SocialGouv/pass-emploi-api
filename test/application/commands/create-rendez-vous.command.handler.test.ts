@@ -154,7 +154,7 @@ describe('CreateRendezVousCommandHandler', () => {
             )
           )
           expect(
-            planificateurService.planifierRendezVous
+            planificateurService.planifierRappelsRendezVous
           ).to.have.been.calledWith(expectedRendezvous)
         })
       })
@@ -189,6 +189,31 @@ describe('CreateRendezVousCommandHandler', () => {
               expectedRendezvous.id
             )
           )
+        })
+      })
+      describe('quand le la planification des notifications échoue', () => {
+        it('renvoie un succès', async () => {
+          // Given
+          jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
+          rendezVous.jeune.pushNotificationToken = undefined
+          const command: CreateRendezVousCommand = {
+            idJeune: jeune.id,
+            idConseiller: jeune.conseiller.id,
+            commentaire: rendezVous.commentaire,
+            date: rendezVous.date.toDateString(),
+            duree: rendezVous.duree,
+            modalite: 'tel'
+          }
+          planificateurService.planifierRappelsRendezVous.rejects(new Error())
+          const expectedRendezvous = RendezVous.createRendezVousConseiller(
+            command,
+            jeune,
+            idService
+          )
+          // When
+          const result = await createRendezVousCommandHandler.handle(command)
+          // Then
+          expect(result).to.deep.equal(success(expectedRendezvous.id))
         })
       })
     })
