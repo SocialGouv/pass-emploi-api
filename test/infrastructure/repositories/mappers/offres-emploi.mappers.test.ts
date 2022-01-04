@@ -1,5 +1,8 @@
 import { uneOffreEmploiDto } from '../../../fixtures/offre-emploi.fixture'
-import { toOffresEmploiQueryModel } from '../../../../src/infrastructure/repositories/mappers/offres-emploi.mappers'
+import {
+  toOffresEmploiQueryModel,
+  toOffreEmploiQueryModel
+} from '../../../../src/infrastructure/repositories/mappers/offres-emploi.mappers'
 import { OffresEmploiDto } from '../../../../src/infrastructure/repositories/offre-emploi-http-sql.repository'
 import { expect } from '../../../utils'
 
@@ -100,6 +103,45 @@ describe('OffresEmploiMappers', () => {
         }
         // Then
         expect(result).to.deep.equal(expectedOffresEmploiQueryModel)
+      })
+    })
+  })
+  describe('toOffreEmploiQueryModel', () => {
+    describe("gestion de l'url de postulation", () => {
+      it('offre avec une un contact qui a une url de postulation doit renvoyer celle-ci', async () => {
+        // Given
+        offreEmploi.contact.urlPostulation = 'url/postulation'
+        // When
+        const result = await toOffreEmploiQueryModel(offreEmploi)
+
+        // Then
+        expect(result.urlRedirectPourPostulation).to.deep.equal(
+          'url/postulation'
+        )
+      })
+      it('offre avec un partenaire qui a une url doit renvoyer celle ci', async () => {
+        // Given
+        offreEmploi.contact.urlPostulation = ''
+        offreEmploi.origineOffre.partenaires = [{ url: 'url/partenaire' }]
+
+        // When
+        const result = await toOffreEmploiQueryModel(offreEmploi)
+
+        // Then
+        expect(result.urlRedirectPourPostulation).to.deep.equal(
+          'url/partenaire'
+        )
+      })
+      it("offre sans contact ni partenaire doit renvoyer l'url origine de l'offre", async () => {
+        // Given
+        offreEmploi.contact.urlPostulation = ''
+        offreEmploi.origineOffre.partenaires = []
+        offreEmploi.origineOffre.urlOrigine = 'url/offre'
+        // When
+        const result = await toOffreEmploiQueryModel(offreEmploi)
+
+        // Then
+        expect(result.urlRedirectPourPostulation).to.deep.equal('url/offre')
       })
     })
   })
