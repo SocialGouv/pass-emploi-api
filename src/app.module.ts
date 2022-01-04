@@ -82,6 +82,8 @@ import { IdService } from './utils/id-service'
 import { configureLoggerModule } from './utils/logger.module'
 import { OffresImmersionController } from './infrastructure/routes/offres-immersion.controller'
 import { GetDetailOffreImmersionQueryHandler } from './application/queries/get-detail-offre-immersion.query.handler'
+import { EvenementsController } from './infrastructure/routes/evenements.controller'
+import { CreateEvenementCommandHandler } from './application/commands/create-evenement.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -102,7 +104,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     HealthController,
     RendezVousController,
     AuthentificationController,
-    ReferentielsController
+    ReferentielsController,
+    EvenementsController
   ],
   providers: [
     ...buildQueryCommandsProviders(),
@@ -205,7 +208,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     UpdateUtilisateurCommandHandler,
     GetCommunesEtDepartementsQueryHandler,
     GetDossierMiloJeuneQueryHandler,
-    CreerJeuneMiloCommandHandler
+    CreerJeuneMiloCommandHandler,
+    CreateEvenementCommandHandler
   ]
 }
 
