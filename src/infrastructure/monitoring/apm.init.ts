@@ -7,7 +7,7 @@ const serviceName = process.env.APM_SERVICE_NAME || 'pa-back-local'
 const secretToken = process.env.APM_SECRET_TOKEN  || ''
 const serverUrl = process.env.APM_URL || ''
 const environment = process.env.ENVIRONMENT || 'development'
-const active =  Boolean(process.env.APM_IS_ACTIVE) || false
+const active =  process.env.APM_IS_ACTIVE === 'true'
 
 const config: APM.AgentConfigOptions = {
   serviceName,
