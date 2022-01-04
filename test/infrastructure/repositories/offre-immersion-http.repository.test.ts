@@ -218,7 +218,7 @@ describe('OffresImmersionHttpRepository', () => {
           failure(new RechercheDetailOffreInvalide("L'id fauxId n'est pas bon"))
         )
       })
-      it('renvoie NOT_FOUND quand l"offre recherchée est introuvable', async () => {
+      it('renvoie une erreur quand l"offre recherchée est introuvable', async () => {
         // Given
         const query = {
           idOffreImmersion: 'id'
@@ -250,6 +250,20 @@ describe('OffresImmersionHttpRepository', () => {
             new RechercheDetailOffreNonTrouve("Offre d'immersion id not found")
           )
         )
+      })
+      it('renvoie une erreur quand une erreur inconnue survient', async () => {
+        // Given
+        const query = {
+          idOffreImmersion: 'id'
+        }
+        const error = new Error('Erreur inconnue')
+        immersionClient.get.rejects(error)
+
+        // When
+        const offres = offresImmersionHttpRepository.get(query.idOffreImmersion)
+
+        // Then
+        await expect(offres).to.be.rejectedWith(error)
       })
     })
   })

@@ -60,13 +60,16 @@ export class OffresImmersionHttpRepository
       )
       return success(toDetailOffreImmersionQueryModel(response.data))
     } catch (e) {
-      if (e.response.status === 404) {
+      if (e.response?.status === 404) {
         const message = `Offre d'immersion ${idOffreImmersion} not found`
         return failure(new RechercheDetailOffreNonTrouve(message))
       }
-      return failure(
-        new RechercheDetailOffreInvalide(e.response.data.errors.message)
-      )
+      if (e.response?.status === 400) {
+        return failure(
+          new RechercheDetailOffreInvalide(e.response.data.errors.message)
+        )
+      }
+      throw e
     }
   }
 }
