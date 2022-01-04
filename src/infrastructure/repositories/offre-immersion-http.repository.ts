@@ -64,7 +64,9 @@ export class OffresImmersionHttpRepository
         const message = `Offre d'immersion ${idOffreImmersion} not found`
         return failure(new RechercheDetailOffreNonTrouve(message))
       }
-      return failure(new RechercheDetailOffreInvalide(e.response.data.errors))
+      return failure(
+        new RechercheDetailOffreInvalide(e.response.data.errors.message)
+      )
     }
   }
 }

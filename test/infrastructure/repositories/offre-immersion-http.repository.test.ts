@@ -1,6 +1,10 @@
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { expect } from 'chai'
-import { RechercheOffreInvalide } from '../../../src/building-blocks/types/domain-error'
+import {
+  RechercheDetailOffreInvalide,
+  RechercheDetailOffreNonTrouve,
+  RechercheOffreInvalide
+} from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { ImmersionClient } from '../../../src/infrastructure/clients/immersion-client'
 import { OffresImmersionHttpRepository } from '../../../src/infrastructure/repositories/offre-immersion-http.repository'
@@ -112,6 +116,139 @@ describe('OffresImmersionHttpRepository', () => {
         // Then
         expect(offres).to.deep.equal(
           failure(new RechercheOffreInvalide('Le champs Rome est pas bon'))
+        )
+      })
+    })
+  })
+  describe('get', () => {
+    describe('quand la requête est correcte', () => {
+      it("renvoie le détail d'une offre", async () => {
+        // Given
+        const query = {
+          idOffreImmersion: 'id'
+        }
+
+        const response: AxiosResponse = {
+          config: undefined,
+          headers: undefined,
+          request: undefined,
+          status: 200,
+          statusText: '',
+          data: {
+            romeLabel: 'rome',
+            nafLabel: 'naf',
+            id: 'id',
+            name: 'name',
+            city: 'Paris',
+            address: 'addresse',
+            voluntaryToImmersion: true,
+            contactMode: 'IN_PERSON',
+            contactDetails: {
+              id: '1',
+              lastName: 'Tavernier',
+              firstName: 'Nils',
+              role: 'manager'
+            }
+          }
+        }
+
+        immersionClient.get.resolves(response)
+
+        // When
+        const detailOffre = await offresImmersionHttpRepository.get(
+          query.idOffreImmersion
+        )
+
+        // Then
+        expect(immersionClient.get).to.have.been.calledWith(
+          `/get-immersion-by-id/${query.idOffreImmersion}`
+        )
+        expect(detailOffre).to.deep.equal(
+          success({
+            adresse: 'addresse',
+            estVolontaire: true,
+            id: 'id',
+            localisation: undefined,
+            metier: 'rome',
+            nomEtablissement: 'name',
+            secteurActivite: 'naf',
+            ville: 'Paris',
+            contact: {
+              email: undefined,
+              id: '1',
+              modeDeContact: 'PRESENTIEL',
+              nom: 'Nils',
+              prenom: 'Tavernier',
+              role: 'manager',
+              telephone: undefined
+            }
+          })
+        )
+      })
+    })
+    describe('quand la requête est mauvaise', () => {
+      it('renvoie une erreur quand la recherche est faite avec un mauvais id', async () => {
+        // Given
+        const query = {
+          idOffreImmersion: 'fauxId'
+        }
+
+        const badResponse: AxiosResponse = {
+          data: {
+            errors: {
+              message: "L'id fauxId n'est pas bon"
+            }
+          },
+          status: 400,
+          statusText: 'BAD_REQUEST',
+          request: '',
+          headers: '',
+          config: ''
+        }
+
+        immersionClient.get.rejects({ response: badResponse })
+
+        // When
+        const offres = await offresImmersionHttpRepository.get(
+          query.idOffreImmersion
+        )
+
+        // Then
+        expect(offres).to.deep.equal(
+          failure(new RechercheDetailOffreInvalide("L'id fauxId n'est pas bon"))
+        )
+      })
+      it('renvoie NOT_FOUND quand l"offre recherchée est introuvable', async () => {
+        // Given
+        const query = {
+          idOffreImmersion: 'id'
+        }
+
+        const badResponse: AxiosResponse = {
+          data: {
+            errors: {
+              message: "Offre d'immersion id not found"
+            }
+          },
+          status: 404,
+          statusText: 'NOT_FOUND',
+          request: '',
+          headers: '',
+          config: ''
+        }
+
+        immersionClient.get.rejects({ response: badResponse })
+
+        // When
+        const offres = await offresImmersionHttpRepository.get(
+          query.idOffreImmersion
+        )
+
+        // Then
+        expect(offres).to.deep.equal(
+          failure(
+            new RechercheDetailOffreNonTrouve("Offre d'immersion id not found")
+          )
         )
       })
     })
