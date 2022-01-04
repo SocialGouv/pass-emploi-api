@@ -40,6 +40,6 @@ export class CreateEvenementCommandHandler extends CommandHandler<
     if (memeType && memeStructure && memeId) {
       return
     }
-    throw new Unauthorized("Emetteur ne correspond pas à l'utilisateur")
+    throw new Unauthorized('évènement')
   }
 }

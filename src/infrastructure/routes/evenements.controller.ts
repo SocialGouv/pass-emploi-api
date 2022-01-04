@@ -5,6 +5,8 @@ import {
   CreateEvenementCommandHandler
 } from '../../application/commands/create-evenement.command.handler'
 import { CreateEvenementPayload } from './validation/evenements.inputs'
+import { Utilisateur } from '../decorators/authenticated.decorator'
+import { Authentification } from '../../domain/authentification'
 
 @Controller('evenements')
 @ApiOAuth2([])
@@ -16,12 +18,13 @@ export class EvenementsController {
 
   @Post()
   creerEvenement(
-    @Body() createEvenementPayload: CreateEvenementPayload
+    @Body() createEvenementPayload: CreateEvenementPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const command: CreateEvenementCommand = {
       type: createEvenementPayload.type,
       emetteur: createEvenementPayload.emetteur
     }
-    return this.createEvenementCommandHandler.execute(command)
+    return this.createEvenementCommandHandler.execute(command, utilisateur)
   }
 }
