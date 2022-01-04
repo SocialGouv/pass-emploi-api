@@ -2,6 +2,8 @@ import {
   BadRequestException,
   Body,
   Controller,
+  HttpException,
+  HttpStatus,
   NotFoundException,
   Param,
   Post,
@@ -76,8 +78,17 @@ export class AuthentificationController {
   async postFirebaseToken(
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<ChatSecretsQueryModel> {
-    return await this.getChatSecretsQueryHandler.execute({
+    const queryModel = await this.getChatSecretsQueryHandler.execute({
       utilisateur
     })
+
+    if (queryModel) {
+      return queryModel
+    }
+
+    throw new HttpException(
+      `Could not find chat secrets`,
+      HttpStatus.INTERNAL_SERVER_ERROR
+    )
   }
 }

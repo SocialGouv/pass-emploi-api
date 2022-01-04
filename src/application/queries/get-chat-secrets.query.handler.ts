@@ -12,7 +12,7 @@ export interface GetChatSecretsQuery extends Query {
 @Injectable()
 export class GetChatSecretsQueryHandler extends QueryHandler<
   GetChatSecretsQuery,
-  ChatSecretsQueryModel
+  ChatSecretsQueryModel | undefined
 > {
   constructor(
     @Inject(ChatRepositoryToken)
@@ -21,7 +21,9 @@ export class GetChatSecretsQueryHandler extends QueryHandler<
     super()
   }
 
-  async handle(query: GetChatSecretsQuery): Promise<ChatSecretsQueryModel> {
+  async handle(
+    query: GetChatSecretsQuery
+  ): Promise<ChatSecretsQueryModel | undefined> {
     return await this.chatRepository.getChatSecretsQueryModel(query.utilisateur)
   }
 

@@ -21,11 +21,15 @@ export class ChatFirebaseRepository implements Chat.Repository {
 
   async getChatSecretsQueryModel(
     utilisateur: Authentification.Utilisateur
-  ): Promise<ChatSecretsQueryModel> {
+  ): Promise<ChatSecretsQueryModel | undefined> {
     const firebaseToken = await this.firebaseClient.getToken(utilisateur)
-    return {
-      token: firebaseToken,
-      cle: this.configService.get('firebase').encryptionKey
-    }
+    const encryptionKey = this.configService.get('firebase').encryptionKey
+
+    return firebaseToken && encryptionKey
+      ? {
+          token: firebaseToken,
+          cle: encryptionKey
+        }
+      : undefined
   }
 }

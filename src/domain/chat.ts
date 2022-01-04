@@ -11,6 +11,6 @@ export namespace Chat {
     ): Promise<void>
     getChatSecretsQueryModel(
       utilisateur: Authentification.Utilisateur
-    ): Promise<ChatSecretsQueryModel>
+    ): Promise<ChatSecretsQueryModel | undefined>
   }
 }
