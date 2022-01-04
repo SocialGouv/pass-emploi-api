@@ -2,8 +2,6 @@ import {
   BadRequestException,
   Body,
   Controller,
-  HttpException,
-  HttpStatus,
   NotFoundException,
   Param,
   Post,
@@ -18,7 +16,7 @@ import {
   UpdateUtilisateurCommandHandler
 } from '../../application/commands/update-utilisateur.command.handler'
 import {
-  FirebaseTokenQueryModel,
+  ChatSecretsQueryModel,
   UtilisateurQueryModel
 } from '../../application/queries/query-models/authentification.query-models'
 import {
@@ -77,15 +75,9 @@ export class AuthentificationController {
   @ApiOAuth2([])
   async postFirebaseToken(
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<FirebaseTokenQueryModel> {
-    const queryModel = await this.getChatSecretsQueryHandler.execute({
+  ): Promise<ChatSecretsQueryModel> {
+    return await this.getChatSecretsQueryHandler.execute({
       utilisateur
     })
-
-    if (queryModel) {
-      return queryModel
-    }
-
-    throw new HttpException(`Chat secrets not found`, HttpStatus.NOT_FOUND)
   }
 }

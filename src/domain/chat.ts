@@ -1,4 +1,4 @@
-import { ChatSecretsQueryModel } from 'src/application/queries/query-models/chat.query-models'
+import { ChatSecretsQueryModel } from 'src/application/queries/query-models/authentification.query-models'
 import { Authentification } from './authentification'
 
 export const ChatRepositoryToken = 'ChatRepositoryToken'
@@ -11,6 +11,6 @@ export namespace Chat {
     ): Promise<void>
     getChatSecretsQueryModel(
       utilisateur: Authentification.Utilisateur
-    ): Promise<ChatSecretsQueryModel | undefined>
+    ): Promise<ChatSecretsQueryModel>
   }
 }

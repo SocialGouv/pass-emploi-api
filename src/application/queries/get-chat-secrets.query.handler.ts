@@ -3,7 +3,7 @@ import { Authentification } from 'src/domain/authentification'
 import { Chat, ChatRepositoryToken } from 'src/domain/chat'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { ChatSecretsQueryModel } from './query-models/chat.query-models'
+import { ChatSecretsQueryModel } from './query-models/authentification.query-models'
 
 export interface GetChatSecretsQuery extends Query {
   utilisateur: Authentification.Utilisateur
@@ -12,7 +12,7 @@ export interface GetChatSecretsQuery extends Query {
 @Injectable()
 export class GetChatSecretsQueryHandler extends QueryHandler<
   GetChatSecretsQuery,
-  ChatSecretsQueryModel | undefined
+  ChatSecretsQueryModel
 > {
   constructor(
     @Inject(ChatRepositoryToken)
@@ -21,9 +21,7 @@ export class GetChatSecretsQueryHandler extends QueryHandler<
     super()
   }
 
-  async handle(
-    query: GetChatSecretsQuery
-  ): Promise<ChatSecretsQueryModel | undefined> {
+  async handle(query: GetChatSecretsQuery): Promise<ChatSecretsQueryModel> {
     return await this.chatRepository.getChatSecretsQueryModel(query.utilisateur)
   }
 

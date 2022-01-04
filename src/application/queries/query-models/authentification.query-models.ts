@@ -26,7 +26,10 @@ export class UtilisateurQueryModel implements Authentification.Utilisateur {
   type: Authentification.Type
 }
 
-export class FirebaseTokenQueryModel {
+export class ChatSecretsQueryModel {
   @ApiProperty()
   token: string
+
+  @ApiProperty()
+  cle: string
 }

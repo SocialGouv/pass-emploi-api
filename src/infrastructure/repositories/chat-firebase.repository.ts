@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common'
-import { ChatSecretsQueryModel } from 'src/application/queries/query-models/chat.query-models'
+import { ConfigService } from '@nestjs/config'
+import { ChatSecretsQueryModel } from 'src/application/queries/query-models/authentification.query-models'
 import { Authentification } from 'src/domain/authentification'
 import { Chat } from '../../domain/chat'
 import { FirebaseClient } from '../clients/firebase-client'
 
 @Injectable()
 export class ChatFirebaseRepository implements Chat.Repository {
-  constructor(private firebaseClient: FirebaseClient) {}
+  constructor(
+    private firebaseClient: FirebaseClient,
+    private configService: ConfigService
+  ) {}
 
   async initializeChatIfNotExists(
     jeuneId: string,
@@ -17,8 +21,11 @@ export class ChatFirebaseRepository implements Chat.Repository {
 
   async getChatSecretsQueryModel(
     utilisateur: Authentification.Utilisateur
-  ): Promise<ChatSecretsQueryModel | undefined> {
+  ): Promise<ChatSecretsQueryModel> {
     const firebaseToken = await this.firebaseClient.getToken(utilisateur)
-    return { token: firebaseToken, cle: '' }
+    return {
+      token: firebaseToken,
+      cle: this.configService.get('firebase').encryptionKey
+    }
   }
 }
