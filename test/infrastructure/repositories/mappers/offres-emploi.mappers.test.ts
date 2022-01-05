@@ -7,9 +7,12 @@ import { OffresEmploiDto } from '../../../../src/infrastructure/repositories/off
 import { expect } from '../../../utils'
 
 describe('OffresEmploiMappers', () => {
-  const offreEmploi = uneOffreEmploiDto()
+  let offreEmploi = uneOffreEmploiDto()
   const page = 1
   const limit = 50
+  beforeEach(async () => {
+    offreEmploi = uneOffreEmploiDto()
+  })
 
   describe('toOffresEmploiQueryModel', () => {
     describe('quand il y a au moins une offre', () => {
