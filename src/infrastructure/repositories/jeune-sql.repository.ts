@@ -37,6 +37,17 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return fromSqlToJeune(jeuneSqlModel)
   }
 
+  async getByEmail(email: string): Promise<Jeune | undefined> {
+    const jeuneSqlModel = await JeuneSqlModel.findOne({
+      where: { email },
+      include: [ConseillerSqlModel]
+    })
+    if (!jeuneSqlModel) {
+      return undefined
+    }
+    return fromSqlToJeune(jeuneSqlModel)
+  }
+
   async getQueryModelById(
     id: string
   ): Promise<DetailJeuneQueryModel | undefined> {

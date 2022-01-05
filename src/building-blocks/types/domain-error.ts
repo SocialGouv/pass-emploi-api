@@ -43,6 +43,16 @@ export class JeuneNonLieAuConseillerError implements DomainError {
   }
 }
 
+export class EmailExisteDejaError implements DomainError {
+  static CODE = 'EMAIL_EXISTE_DEJA'
+  readonly code: string = EmailExisteDejaError.CODE
+  readonly message: string
+
+  constructor(email: string) {
+    this.message = `Un compte avec l'${email} existe déjà`
+  }
+}
+
 export class ConseillerNonValide implements DomainError {
   static CODE = 'CONSEILLER_NON_VALIDE'
   readonly code: string = ConseillerNonValide.CODE
