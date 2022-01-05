@@ -48,7 +48,8 @@ export default () => {
     },
     firebase: {
       environmentPrefix: process.env.FIREBASE_ENVIRONMENT_PREFIX ?? 'staging',
-      key: process.env.FIREBASE_SECRET_KEY ?? ''
+      key: process.env.FIREBASE_SECRET_KEY ?? '',
+      encryptionKey: process.env.CHAT_ENCRYPTION_KEY
     },
     oidc: {
       issuerUrl: process.env.OIDC_ISSUER_URL ?? ''

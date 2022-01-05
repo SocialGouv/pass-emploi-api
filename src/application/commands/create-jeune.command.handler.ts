@@ -7,7 +7,7 @@ import { Core } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
-import { Chat, ChatsRepositoryToken } from '../../domain/chat'
+import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { NotFound } from 'src/domain/erreur'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 
@@ -27,7 +27,7 @@ export class CreateJeuneCommandHandler extends CommandHandler<
     private jeuneRepository: Jeune.Repository,
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
-    @Inject(ChatsRepositoryToken)
+    @Inject(ChatRepositoryToken)
     private chatRepository: Chat.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer,
     private idService: IdService,
