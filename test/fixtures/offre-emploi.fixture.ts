@@ -33,7 +33,8 @@ export const uneOffreEmploiDto = (): OffreEmploiDto => ({
     urlPostulation: 'url/postulation'
   },
   origineOffre: {
-    urlOrigine: 'url/offre'
+    urlOrigine: 'url/offre',
+    partenaires: []
   },
   alternance: false
 })

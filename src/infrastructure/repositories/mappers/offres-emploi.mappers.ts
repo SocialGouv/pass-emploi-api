@@ -54,6 +54,7 @@ export function toOffreEmploiQueryModel(
     id: offreEmploiDto.id,
     urlRedirectPourPostulation:
       offreEmploiDto.contact?.urlPostulation ||
+      offreEmploiDto.origineOffre?.partenaires?.at(0)?.url ||
       offreEmploiDto.origineOffre?.urlOrigine,
     data: offreEmploiDto
   }
