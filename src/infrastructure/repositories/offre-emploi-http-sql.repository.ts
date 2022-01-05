@@ -178,11 +178,7 @@ export interface OffreEmploiDto {
   }
   origineOffre: {
     urlOrigine: string
-    partenaires: [
-      {
-        url?: string
-      }?
-    ]
+    partenaires?: Array<{ url?: string }>
   }
   alternance?: boolean
 }
