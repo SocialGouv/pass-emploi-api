@@ -32,6 +32,7 @@ import {
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
 import { RendezVousConseillerQueryModel } from '../../application/queries/query-models/rendez-vous.query-models'
 import {
+  EmailExisteDejaError,
   ErreurHttpMilo,
   JeuneNonLieAuConseillerError,
   NonTrouveError
@@ -46,7 +47,7 @@ import { Action } from '../../domain/action'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import {
   CreateActionPayload,
-  CreateJeunePayload,
+  CreateJeunePoleEmploiPayload,
   CreerJeuneMiloPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
@@ -107,30 +108,37 @@ export class ConseillersController {
     )
   }
 
-  @Post(':idConseiller/jeune')
+  @Post('pole-emploi/jeunes')
   @ApiResponse({
     type: DetailJeuneQueryModel,
     isArray: true
   })
-  async createJeune(
-    @Param('idConseiller') idConseiller: string,
-    @Body() createJeunePayload: CreateJeunePayload,
+  async createJeunePoleEmploi(
+    @Body() createJeunePayload: CreateJeunePoleEmploiPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DetailJeuneQueryModel> {
-    const jeune = await this.createJeuneCommandHandler.execute(
+    const result = await this.createJeuneCommandHandler.execute(
       {
-        idConseiller,
         ...createJeunePayload
       },
       utilisateur
     )
-    return {
-      id: jeune.id,
-      firstName: jeune.firstName,
-      lastName: jeune.lastName,
-      creationDate: jeune.creationDate.toString(),
-      isActivated: false
+    if (isFailure(result) && result.error.code === EmailExisteDejaError.CODE) {
+      throw new BadRequestException(result.error)
     }
+
+    if (isSuccess(result)) {
+      const jeune = result.data
+      return {
+        id: jeune.id,
+        firstName: jeune.firstName,
+        lastName: jeune.lastName,
+        creationDate: jeune.creationDate.toString(),
+        isActivated: false
+      }
+    }
+
+    throw new RuntimeException()
   }
 
   @Post(':idConseiller/jeunes/:idJeune/action')

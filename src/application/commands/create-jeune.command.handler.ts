@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { EmailExisteDejaError } from '../../building-blocks/types/domain-error'
+import { failure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { Core } from '../../domain/core'
@@ -15,12 +17,13 @@ export interface CreateJeuneCommand extends Command {
   idConseiller: string
   firstName: string
   lastName: string
+  email: string
 }
 
 @Injectable()
 export class CreateJeuneCommandHandler extends CommandHandler<
   CreateJeuneCommand,
-  Jeune
+  Result<Jeune>
 > {
   constructor(
     @Inject(JeunesRepositoryToken)
@@ -36,26 +39,31 @@ export class CreateJeuneCommandHandler extends CommandHandler<
     super()
   }
 
-  async handle(command: CreateJeuneCommand): Promise<Jeune> {
+  async handle(command: CreateJeuneCommand): Promise<Result<Jeune>> {
     const conseiller = await this.conseillerRepository.get(command.idConseiller)
     if (!conseiller) {
       throw new NotFound(command.idConseiller, 'Conseiller')
     }
+    const jeune = await this.jeuneRepository.getByEmail(command.email)
+    if (jeune) {
+      return failure(new EmailExisteDejaError(command.email))
+    }
 
-    const jeune: Jeune = {
+    const nouveauJeune: Jeune = {
       id: this.idService.generate(),
       firstName: command.firstName,
       lastName: command.lastName,
+      email: command.email,
       creationDate: this.dateService.now(),
       conseiller,
       structure: Core.Structure.PASS_EMPLOI
     }
-    await this.jeuneRepository.save(jeune)
+    await this.jeuneRepository.save(nouveauJeune)
     await this.chatRepository.initializeChatIfNotExists(
-      jeune.id,
-      jeune.conseiller.id
+      nouveauJeune.id,
+      nouveauJeune.conseiller.id
     )
-    return jeune
+    return success(nouveauJeune)
   }
 
   async authorize(

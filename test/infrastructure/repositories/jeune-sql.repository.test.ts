@@ -66,6 +66,49 @@ describe('JeuneSqlRepository', () => {
     })
   })
 
+  describe('getByEmail', () => {
+    let jeune: Jeune
+
+    beforeEach(async () => {
+      // Given
+      jeune = { ...unJeune(), tokenLastUpdate: uneDatetime }
+      await ConseillerSqlModel.creer(
+        unConseillerDto({
+          id: jeune.conseiller.id,
+          prenom: jeune.conseiller.firstName,
+          nom: jeune.conseiller.lastName
+        })
+      )
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          dateCreation: jeune.creationDate.toJSDate(),
+          pushNotificationToken: 'unToken',
+          dateDerniereActualisationToken: uneDatetime.toJSDate()
+        })
+      )
+    })
+
+    describe('quand un jeune existe avec cet email', () => {
+      it('retourne le jeune', async () => {
+        // When
+        const result = await jeuneSqlRepository.getByEmail('john.doe@plop.io')
+
+        // Then
+        expect(result).to.deep.equal(jeune)
+      })
+    })
+
+    describe("quand aucun jeune n'existe avec cet email", () => {
+      it('retourne undefined', async () => {
+        // When
+        const jeune = await jeuneSqlRepository.getByEmail('noreply@plop.io')
+
+        // Then
+        expect(jeune).to.equal(undefined)
+      })
+    })
+  })
+
   describe('getAllQueryModelsByConseiller', () => {
     it("retourne les jeunes d'un conseiller", async () => {
       const idConseiller: Conseiller.Id = '1'

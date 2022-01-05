@@ -28,7 +28,9 @@ export namespace Jeune {
 
   export interface Repository {
     get(id: string): Promise<Jeune | undefined>
+    getByEmail(email: string): Promise<Jeune | undefined>
     save(jeune: Jeune): Promise<void>
+
     getResumeActionsDesJeunesDuConseiller(
       idConseiller: Conseiller.Id
     ): Promise<ResumeActionsDuJeuneQueryModel[]>
