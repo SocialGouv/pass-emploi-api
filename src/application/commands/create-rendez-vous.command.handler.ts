@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
@@ -12,6 +12,7 @@ import {
   Notification,
   NotificationRepositoryToken
 } from '../../domain/notification'
+import { PlanificateurService } from '../../domain/planificateur'
 import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
 import { IdService } from '../../utils/id-service'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
@@ -30,6 +31,8 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
   CreateRendezVousCommand,
   Result<string>
 > {
+  private logger: Logger
+
   constructor(
     private idService: IdService,
     @Inject(RendezVousRepositoryToken)
@@ -37,9 +40,11 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,
-    private conseillerAuthorizer: ConseillerAuthorizer
+    private conseillerAuthorizer: ConseillerAuthorizer,
+    private planificateurService: PlanificateurService
   ) {
     super()
+    this.logger = new Logger('CreateRendezVousCommandHandler')
   }
 
   async handle(command: CreateRendezVousCommand): Promise<Result<string>> {
@@ -68,6 +73,15 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
         rendezVous.id
       )
       await this.notificationRepository.send(notification)
+    }
+
+    try {
+      await this.planificateurService.planifierRappelsRendezVous(rendezVous)
+    } catch (e) {
+      this.logger.warn(
+        `La planification des notifications du rendez-vous ${rendezVous.id} a échoué`,
+        e
+      )
     }
 
     return success(rendezVous.id)

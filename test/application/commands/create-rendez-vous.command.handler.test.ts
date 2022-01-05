@@ -1,4 +1,5 @@
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import { PlanificateurService } from '../../../src/domain/planificateur'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import {
   createSandbox,
@@ -30,6 +31,7 @@ describe('CreateRendezVousCommandHandler', () => {
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let notificationRepository: StubbedType<Notification.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
+  let planificateurService: StubbedClass<PlanificateurService>
   const conseillerAuthorizer = stubClass(ConseillerAuthorizer)
   let idService: StubbedClass<IdService>
   let createRendezVousCommandHandler: CreateRendezVousCommandHandler
@@ -41,13 +43,16 @@ describe('CreateRendezVousCommandHandler', () => {
     rendezVousRepository = stubInterface(sandbox)
     notificationRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
+    planificateurService = stubClass(PlanificateurService)
     idService = stubInterface(sandbox)
+
     createRendezVousCommandHandler = new CreateRendezVousCommandHandler(
       idService,
       rendezVousRepository,
       jeuneRepository,
       notificationRepository,
-      conseillerAuthorizer
+      conseillerAuthorizer,
+      planificateurService
     )
   })
 
@@ -119,7 +124,7 @@ describe('CreateRendezVousCommandHandler', () => {
     })
     describe('quand le jeune existe et est lié au bon conseiller', () => {
       describe('quand le jeune s"est connecté au moins une fois sur l"application', () => {
-        it('crée un rendez-vous et envoie une notification au jeune', async () => {
+        it('crée un rendez-vous, envoie une notification au jeune et planifie', async () => {
           // Given
           jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
           const command: CreateRendezVousCommand = {
@@ -148,6 +153,9 @@ describe('CreateRendezVousCommandHandler', () => {
               expectedRendezvous.id
             )
           )
+          expect(
+            planificateurService.planifierRappelsRendezVous
+          ).to.have.been.calledWith(expectedRendezvous)
         })
       })
       describe('quand le jeune ne s"est jamais connecté sur l"application', () => {
@@ -181,6 +189,31 @@ describe('CreateRendezVousCommandHandler', () => {
               expectedRendezvous.id
             )
           )
+        })
+      })
+      describe('quand le la planification des notifications échoue', () => {
+        it('renvoie un succès', async () => {
+          // Given
+          jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
+          rendezVous.jeune.pushNotificationToken = undefined
+          const command: CreateRendezVousCommand = {
+            idJeune: jeune.id,
+            idConseiller: jeune.conseiller.id,
+            commentaire: rendezVous.commentaire,
+            date: rendezVous.date.toDateString(),
+            duree: rendezVous.duree,
+            modalite: 'tel'
+          }
+          planificateurService.planifierRappelsRendezVous.rejects(new Error())
+          const expectedRendezvous = RendezVous.createRendezVousConseiller(
+            command,
+            jeune,
+            idService
+          )
+          // When
+          const result = await createRendezVousCommandHandler.handle(command)
+          // Then
+          expect(result).to.deep.equal(success(expectedRendezvous.id))
         })
       })
     })
