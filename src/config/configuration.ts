@@ -49,7 +49,6 @@ export default () => {
       apiKey: process.env.IMMERSION_API_KEY ?? ''
     },
     firebase: {
-      environmentPrefix: process.env.FIREBASE_ENVIRONMENT_PREFIX ?? 'staging',
       key: process.env.FIREBASE_SECRET_KEY ?? '',
       encryptionKey: process.env.CHAT_ENCRYPTION_KEY
     },
