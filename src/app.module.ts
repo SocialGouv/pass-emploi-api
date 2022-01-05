@@ -18,6 +18,7 @@ import { CreerJeuneMiloCommandHandler } from './application/commands/creer-jeune
 import { DeleteActionCommandHandler } from './application/commands/delete-action.command.handler'
 import { DeleteFavoriOffreEmploiCommandHandler } from './application/commands/delete-favori-offre-emploi.command.handler'
 import { DeleteRendezVousCommandHandler } from './application/commands/delete-rendez-vous.command.handler'
+import { HandleJobRendezVousCommandHandler } from './application/commands/handle-job-rendez-vous.command'
 import { SendNotificationNouveauMessageCommandHandler } from './application/commands/send-notification-nouveau-message.command.handler'
 import { UpdateNotificationTokenCommandHandler } from './application/commands/update-notification-token.command.handler'
 import { UpdateStatutActionCommandHandler } from './application/commands/update-statut-action.command.handler'
@@ -223,7 +224,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreerJeuneMiloCommandHandler,
     PlanificateurService,
     CreateEvenementCommandHandler,
-    GetChatSecretsQueryHandler
+    GetChatSecretsQueryHandler,
+    HandleJobRendezVousCommandHandler
   ]
 }
 

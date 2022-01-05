@@ -8,6 +8,7 @@ export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 export namespace Planificateur {
   export interface Repository {
     createJob(job: Job): Promise<void>
+    subscribe(callback: Handler): Promise<void>
   }
 
   export enum JobType {
@@ -22,6 +23,10 @@ export namespace Planificateur {
     date: Date
     type: JobType
     contenu: JobRendezVous
+  }
+
+  export interface Handler {
+    (job: Job): Promise<void>
   }
 }
 

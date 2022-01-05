@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon'
+import { DateService } from '../utils/date-service'
 
 export const NotificationRepositoryToken = 'NotificationRepositoryToken'
 
@@ -10,6 +11,7 @@ export namespace Notification {
   enum Type {
     NEW_ACTION = 'NEW_ACTION',
     NEW_RENDEZVOUS = 'NEW_RENDEZVOUS',
+    RAPPEL_RENDEZVOUS = 'RAPPEL_RENDEZVOUS',
     DELETED_RENDEZVOUS = 'DELETED_RENDEZVOUS',
     NEW_MESSAGE = 'NEW_MESSAGE'
   }
@@ -50,11 +52,46 @@ export namespace Notification {
     return {
       token,
       notification: {
-        title: 'Nouveau RDV',
-        body: 'Vous avez un nouveau RDV avec votre conseiller'
+        title: 'Nouveau rendez-vous',
+        body: 'Vous avez un nouveau rendez-vous avec votre conseiller'
       },
       data: {
         type: Type.NEW_RENDEZVOUS,
+        id: idRdv
+      }
+    }
+  }
+
+  export function createRappelRdv(
+    token: string,
+    idRdv: string,
+    date: DateTime,
+    dateService: DateService
+  ): Notification.Message {
+    const today = dateService.now()
+    let body = `Vous avez rendez-vous demain à ${date
+      .setZone('Europe/Paris')
+      .toFormat("HH'h'mm")}`
+    if (date.diff(today).as('day') > 1) {
+      body = `Vous avez rendez-vous le ${date
+        .setZone('Europe/Paris')
+        .toLocaleString(
+          {
+            weekday: 'long',
+            month: 'long',
+            day: '2-digit'
+          },
+          { locale: 'fr' }
+        )} à ${date.setZone('Europe/Paris').toFormat("HH'h'mm")}`
+    }
+    return {
+      token,
+      notification: {
+        title: 'Rappel rendez-vous',
+        body
+      },
+      data: {
+        type: Type.RAPPEL_RENDEZVOUS,
         id: idRdv
       }
     }
