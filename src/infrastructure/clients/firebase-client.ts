@@ -59,8 +59,7 @@ export class FirebaseClient implements IFirebaseClient {
     jeuneId: string,
     conseillerId: string
   ): Promise<void> {
-    const firebaseConfig = this.configService.get('firebase.environmentPrefix')
-    const collectionPath = `${firebaseConfig}-chat`
+    const collectionPath = 'chat'
     const chat = await this.firestore
       .collection(collectionPath)
       .where('jeuneId', '==', jeuneId)
