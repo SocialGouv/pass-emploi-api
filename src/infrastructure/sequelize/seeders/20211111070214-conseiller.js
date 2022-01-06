@@ -15,6 +15,13 @@ module.exports = {
         nom: 'Renoux',
         structure: 'PASS_EMPLOI',
         id_authentification: '42'
+      },
+      {
+        id: 'e04bb080-5805-402e-a527-0f9d2ee0840f',
+        prenom: 'Recette',
+        nom: 'Renoux',
+        structure: 'POLE_EMPLOI',
+        id_authentification: 'e04bb080-5805-402e-a527-0f9d2ee0840f'
       }
     ])
   },
