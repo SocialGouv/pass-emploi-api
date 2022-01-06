@@ -95,4 +95,8 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
   ): Promise<void> {
     return
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }

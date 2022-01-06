@@ -97,4 +97,8 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       command.idJeune
     )
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }

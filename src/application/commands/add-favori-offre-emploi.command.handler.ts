@@ -70,4 +70,8 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
   ): Promise<void> {
     await this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }

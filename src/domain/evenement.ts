@@ -3,6 +3,33 @@ import { Authentification } from './authentification'
 
 export const EvenementsRepositoryToken = 'EvenementsRepositoryToken'
 
+export namespace Evenement {
+  export enum Type {
+    ACTION_CREEE = 'ACTION_CREEE',
+    ACTION_MODIFIEE = 'ACTION_MODIFIEE',
+    ACTION_SUPPRIMEE = 'ACTION_SUPPRIMEE',
+    OFFRE_AFFICHEE = 'OFFRE_AFFICHEE',
+    OFFRE_RECHERCHEE = 'OFFRE_RECHERCHEE',
+    OFFRE_SAUVEGARDEE = 'OFFRE_SAUVEGARDEE',
+    OFFRE_POSTULEE = 'OFFRE_POSTULEE',
+    OFFRE_PARTAGEE = 'OFFRE_PARTAGEE',
+    MESSAGE_ENVOYE = 'MESSAGE_ENVOYE',
+    RDV_CREE = 'RDV_CREE',
+    RDV_SUPPRIME = 'RDV_SUPPRIME'
+  }
+
+  export interface Evenement {
+    utilisateur: Authentification.Type
+    categorie: string
+    action: string
+    nom?: string
+  }
+
+  export interface Repository {
+    sendEvenement(evenement: Evenement): Promise<void>
+  }
+}
+
 const evenements = {
   [Evenement.Type.ACTION_CREEE]: { categorie: 'Action', action: 'Création' },
   [Evenement.Type.ACTION_MODIFIEE]: {
@@ -39,33 +66,6 @@ const evenements = {
   [Evenement.Type.RDV_SUPPRIME]: {
     categorie: 'Rendez-vous',
     action: 'Suppression'
-  }
-}
-
-export namespace Evenement {
-  export enum Type {
-    ACTION_CREEE = 'ACTION_CREEE',
-    ACTION_MODIFIEE = 'ACTION_MODIFIEE',
-    ACTION_SUPPRIMEE = 'ACTION_SUPPRIMEE',
-    OFFRE_AFFICHEE = 'OFFRE_AFFICHEE',
-    OFFRE_RECHERCHEE = 'OFFRE_RECHERCHEE',
-    OFFRE_SAUVEGARDEE = 'OFFRE_SAUVEGARDEE',
-    OFFRE_POSTULEE = 'OFFRE_POSTULEE',
-    OFFRE_PARTAGEE = 'OFFRE_PARTAGEE',
-    MESSAGE_ENVOYE = 'MESSAGE_ENVOYE',
-    RDV_CREE = 'RDV_CREE',
-    RDV_SUPPRIME = 'RDV_SUPPRIME'
-  }
-
-  export interface Evenement {
-    utilisateur: Authentification.Type
-    categorie: string
-    action: string
-    nom?: string
-  }
-
-  export interface Repository {
-    sendEvenement(evenement: Evenement): Promise<void>
   }
 }
 

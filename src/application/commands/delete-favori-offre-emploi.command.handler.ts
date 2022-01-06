@@ -75,4 +75,8 @@ export class DeleteFavoriOffreEmploiCommandHandler extends CommandHandler<
       utilisateur
     )
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }

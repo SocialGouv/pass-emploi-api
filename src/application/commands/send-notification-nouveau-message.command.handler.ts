@@ -76,4 +76,8 @@ export class SendNotificationNouveauMessageCommandHandler extends CommandHandler
       command.idJeune
     )
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }
