@@ -67,4 +67,27 @@ describe('CreateActionCommandHandler', () => {
       })
     })
   })
+  describe('monitor', () => {
+    it('appelle le service de monitoring pour créer le bon évènement', async () => {
+      // Given
+      const command: CreateEvenementCommand = {
+        type: Evenement.Type.MESSAGE_ENVOYE,
+        emetteur: {
+          type: Authentification.Type.CONSEILLER,
+          structure: Core.Structure.MILO,
+          id: '1'
+        }
+      }
+      const utilisateur = unUtilisateurConseiller()
+
+      // When
+      await createEvenementCommandHandler.monitor(utilisateur, command)
+
+      // Then
+      expect(evenementService.creerEvenement).to.be.calledWith(
+        command.type,
+        utilisateur.type
+      )
+    })
+  })
 })
