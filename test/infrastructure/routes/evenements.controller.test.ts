@@ -7,7 +7,7 @@ import {
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { CreateEvenementCommandHandler } from '../../../src/application/commands/create-evenement.command.handler'
-import { Evenements } from '../../../src/domain/evenement'
+import { Evenement } from '../../../src/domain/evenement'
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
 import {
@@ -41,7 +41,7 @@ describe('EvenementsController', () => {
     it("crée l'évènement quand l'utilisateur a bien l'authorisation", async () => {
       // Given
       const createEvenementPayload: CreateEvenementPayload = {
-        type: Evenements.Type.OFFRE_PARTAGEE,
+        type: Evenement.Type.OFFRE_PARTAGEE,
         emetteur: {
           id: '1',
           type: Authentification.Type.CONSEILLER,
@@ -61,7 +61,7 @@ describe('EvenementsController', () => {
         createEvenementCommandHandler.execute
       ).to.have.been.calledWithExactly(
         {
-          type: Evenements.Type.OFFRE_PARTAGEE,
+          type: Evenement.Type.OFFRE_PARTAGEE,
           emetteur: {
             id: '1',
             type: Authentification.Type.CONSEILLER,
