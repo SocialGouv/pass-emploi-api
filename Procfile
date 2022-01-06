@@ -1,3 +1,3 @@
-web: yarn start:prod
+web: bash .scalingo/web.sh
 postdeploy: bash .scalingo/post-deploy.sh
 worker: yarn start:prod:worker
