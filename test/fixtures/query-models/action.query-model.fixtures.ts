@@ -17,6 +17,7 @@ export const uneActionQueryModelFromDomain = (
     id: action.idJeune,
     firstName: jeune.firstName,
     lastName: jeune.lastName,
+    email: jeune.email,
     creationDate: jeune.creationDate.toString(),
     isActivated: false
   },
@@ -44,6 +45,7 @@ export function uneActionQueryModel(
       id: '1',
       firstName: 'Damien',
       lastName: 'Saez',
+      email: 'damien.saez@email.fr',
       creationDate: '2021-11-10T08:03:30.000Z',
       isActivated: true
     },

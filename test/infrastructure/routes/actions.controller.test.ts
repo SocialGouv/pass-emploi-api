@@ -63,6 +63,7 @@ describe('ActionsController', () => {
           id: '1',
           lastName: 'Saez',
           firstName: 'Damien',
+          email: 'damien.saez@email.fr',
           creationDate: '2021-11-10T08:03:30.000Z',
           isActivated: true
         },

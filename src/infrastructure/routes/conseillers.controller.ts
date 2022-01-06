@@ -133,6 +133,7 @@ export class ConseillersController {
         id: jeune.id,
         firstName: jeune.firstName,
         lastName: jeune.lastName,
+        email: jeune.email,
         creationDate: jeune.creationDate.toString(),
         isActivated: false
       }

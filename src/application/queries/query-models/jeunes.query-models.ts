@@ -11,6 +11,9 @@ export class DetailJeuneQueryModel {
   @ApiProperty()
   lastName: string
 
+  @ApiProperty({ required: false })
+  email: string | undefined
+
   @ApiProperty()
   creationDate: string
 
