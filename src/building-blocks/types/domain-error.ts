@@ -49,7 +49,7 @@ export class EmailExisteDejaError implements DomainError {
   readonly message: string
 
   constructor(email: string) {
-    this.message = `Un compte avec l'${email} existe déjà`
+    this.message = `Un compte avec l'email ${email} existe déjà`
   }
 }
 
