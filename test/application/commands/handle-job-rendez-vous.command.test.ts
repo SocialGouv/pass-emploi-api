@@ -117,7 +117,11 @@ describe('HandlerJobRendezVousCommandHandler', () => {
           title: 'Rappel rendez-vous',
           body: 'Vous avez rendez-vous demain à 14h00'
         },
-        data: { type: 'RAPPEL_RENDEZVOUS', id: 'idRendezVous' }
+        data: {
+          type: 'RAPPEL_RENDEZVOUS',
+          id: 'idRendezVous',
+          date: DateTime.fromJSDate(unRendezVousSansToken.date).toUTC().toISO()
+        }
       })
     })
   })
@@ -153,7 +157,11 @@ describe('HandlerJobRendezVousCommandHandler', () => {
           title: 'Rappel rendez-vous',
           body: 'Vous avez rendez-vous le mercredi 13 avril à 14h00'
         },
-        data: { type: 'RAPPEL_RENDEZVOUS', id: 'idRendezVous' }
+        data: {
+          type: 'RAPPEL_RENDEZVOUS',
+          id: 'idRendezVous',
+          date: DateTime.fromJSDate(unRendezVousSansToken.date).toUTC().toISO()
+        }
       })
     })
   })

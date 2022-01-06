@@ -25,6 +25,7 @@ export namespace Notification {
     data: {
       type: string
       id?: string
+      date?: string
     }
   }
 
@@ -72,7 +73,7 @@ export namespace Notification {
     let body = `Vous avez rendez-vous demain à ${date
       .setZone('Europe/Paris')
       .toFormat("HH'h'mm")}`
-    if (date.diff(today).as('day') > 1) {
+    if (date.diff(today).as('day') > 2) {
       body = `Vous avez rendez-vous le ${date
         .setZone('Europe/Paris')
         .toLocaleString(
@@ -92,7 +93,8 @@ export namespace Notification {
       },
       data: {
         type: Type.RAPPEL_RENDEZVOUS,
-        id: idRdv
+        id: idRdv,
+        date: date.toUTC().toISO()
       }
     }
   }
@@ -105,7 +107,7 @@ export namespace Notification {
     return {
       token,
       notification: {
-        title: 'RDV supprimé',
+        title: 'Rendez-vous supprimé',
         body: `Votre rendez-vous du ${formattedDate} est supprimé`
       },
       data: {

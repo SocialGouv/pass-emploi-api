@@ -43,7 +43,7 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
       include: [JeuneSqlModel, ConseillerSqlModel]
     })
 
-    if (!rendezVousSql) {
+    if (!rendezVousSql || rendezVousSql.dateSuppression) {
       return undefined
     }
     return {
