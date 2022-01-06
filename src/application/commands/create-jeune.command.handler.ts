@@ -72,4 +72,8 @@ export class CreateJeuneCommandHandler extends CommandHandler<
   ): Promise<void> {
     await this.conseillerAuthorizer.authorize(command.idConseiller, utilisateur)
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }

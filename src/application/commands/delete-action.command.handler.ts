@@ -51,4 +51,8 @@ export class DeleteActionCommandHandler extends CommandHandler<
     }
     await this.actionAuthorizer.authorize(command.idAction, utilisateur)
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }

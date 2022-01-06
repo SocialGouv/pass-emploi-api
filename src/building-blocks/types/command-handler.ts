@@ -12,12 +12,20 @@ export abstract class CommandHandler<C, T> {
     utilisateur?: Authentification.Utilisateur
   ): Promise<T> {
     await this.authorize(command, utilisateur)
-    return this.handle(command)
+
+    const result = this.handle(command)
+    this.monitor(utilisateur, command)
+
+    return result
   }
 
   abstract handle(command: C): Promise<T>
   abstract authorize(
     command: C,
     utilisateur?: Authentification.Utilisateur
+  ): Promise<void>
+  abstract monitor(
+    utilisateur?: Authentification.Utilisateur,
+    command?: C
   ): Promise<void>
 }

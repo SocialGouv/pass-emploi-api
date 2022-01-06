@@ -88,4 +88,8 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     }
     await this.conseillerAuthorizer.authorize(command.idConseiller, utilisateur)
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }

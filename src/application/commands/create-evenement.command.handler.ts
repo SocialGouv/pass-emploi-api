@@ -23,11 +23,11 @@ export class CreateEvenementCommandHandler extends CommandHandler<
   constructor(private evenementService: EvenementService) {
     super()
   }
-  async handle(command: CreateEvenementCommand): Promise<void> {
-    await this.evenementService.creerEvenement(
-      command.type,
-      command.emetteur.type
-    )
+  async handle(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _command: CreateEvenementCommand
+  ): Promise<void> {
+    return
   }
 
   async authorize(
@@ -41,5 +41,12 @@ export class CreateEvenementCommandHandler extends CommandHandler<
       return
     }
     throw new Unauthorized('évènement')
+  }
+
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    command: CreateEvenementCommand
+  ): Promise<void> {
+    this.evenementService.creerEvenement(command.type, utilisateur.type)
   }
 }
