@@ -93,6 +93,8 @@ import { GetDetailOffreImmersionQueryHandler } from './application/queries/get-d
 import { EvenementsController } from './infrastructure/routes/evenements.controller'
 import { CreateEvenementCommandHandler } from './application/commands/create-evenement.command.handler'
 import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
+import { EvenementService, EvenementsRepositoryToken } from './domain/evenement'
+import { EvenementHttpRepository } from './infrastructure/repositories/evenement-http.repository'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -180,6 +182,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       provide: PlanificateurRepositoryToken,
       useClass: PlanificateurRedisRepository
     },
+    {
+      provide: EvenementsRepositoryToken,
+      useClass: EvenementHttpRepository
+    },
     ...databaseProviders
   ],
   exports: [...databaseProviders]
@@ -223,6 +229,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDossierMiloJeuneQueryHandler,
     CreerJeuneMiloCommandHandler,
     PlanificateurService,
+    EvenementService,
     CreateEvenementCommandHandler,
     GetChatSecretsQueryHandler,
     HandleJobRendezVousCommandHandler

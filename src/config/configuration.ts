@@ -60,6 +60,11 @@ export default () => {
     },
     redis: {
       url: process.env.REDIS_URL ?? ''
+    },
+    matomo: {
+      url:
+        process.env.MATOMO_API_URL ?? 'https://stats.data.gouv.fr/matomo.php',
+      envId: process.env.MATOMO_ENV_ID ?? '209'
     }
   }
 }
