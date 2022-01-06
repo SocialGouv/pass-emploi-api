@@ -283,6 +283,7 @@ describe('JeunesController', () => {
         id: idJeune,
         firstName: 'Kenji',
         lastName: 'Tavernier',
+        email: 'kenji.tavernier@email.fr',
         creationDate: 'une_date',
         isActivated: true
       }

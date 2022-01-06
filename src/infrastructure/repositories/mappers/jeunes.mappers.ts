@@ -17,6 +17,7 @@ export function fromSqlToDetailJeuneQueryModel(
     id: jeuneSqlModel.id,
     firstName: jeuneSqlModel.prenom,
     lastName: jeuneSqlModel.nom,
+    email: jeuneSqlModel.email ?? undefined,
     creationDate: jeuneSqlModel.dateCreation.toISOString(),
     isActivated: !!jeuneSqlModel.idAuthentification
   }
