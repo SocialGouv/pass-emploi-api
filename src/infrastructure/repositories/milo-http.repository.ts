@@ -53,16 +53,14 @@ export class MiloHttpRepository implements Milo.Repository {
         dateDeNaissance: dossierDto.data.dateNaissance
       })
     } catch (e) {
-      if (e.response.status >= 400 && e.response.status <= 404) {
+      this.logger.error(e)
+      if (e.response?.status >= 400 && e.response?.status <= 404) {
         const erreur = new ErreurHttpMilo(
           e.response.data?.message,
           e.response.status
         )
-        this.logger.error(e)
         return failure(erreur)
       }
-
-      this.logger.error(e)
       throw new RuntimeException(e.statusText)
     }
   }
@@ -78,9 +76,9 @@ export class MiloHttpRepository implements Milo.Repository {
       )
       return emptySuccess()
     } catch (e) {
-      this.logger.error(e.response.code)
+      this.logger.error(e)
 
-      if (e.response.status >= 400 && e.response.status <= 404) {
+      if (e.response?.status >= 400 && e.response?.status <= 404) {
         if (
           e.response.data?.code === 'SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT'
         ) {
@@ -104,11 +102,8 @@ export class MiloHttpRepository implements Milo.Repository {
           e.response.data?.message,
           e.response.status
         )
-        this.logger.log(e)
         return failure(erreur)
       }
-
-      this.logger.error(e.response.code)
       throw new RuntimeException(e.statusText)
     }
   }
