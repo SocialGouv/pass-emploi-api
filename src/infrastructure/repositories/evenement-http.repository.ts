@@ -22,19 +22,23 @@ export class EvenementHttpRepository implements Evenement.Repository {
     const params = new URLSearchParams()
     params.append('idsite', this.configService.get('matomo').envId)
 
+    const evenementCategorieQueryParam = 'e_c'
+    const evenementActionQueryParam = 'e_a'
+    const evenementNomQueryParam = 'e_n'
+
     if (evenement.categorie) {
-      params.append('e_c', evenement.categorie)
+      params.append(evenementCategorieQueryParam, evenement.categorie)
     }
     if (evenement.action) {
-      params.append('e_a', evenement.action)
+      params.append(evenementActionQueryParam, evenement.action)
     }
     if (evenement.nom) {
-      params.append('e_n', evenement.nom)
+      params.append(evenementNomQueryParam, evenement.nom)
     }
 
     try {
       await firstValueFrom(
-        this.httpService.get(`${this.apiUrl}`, {
+        this.httpService.post(`${this.apiUrl}`, {
           params
         })
       )
