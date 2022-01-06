@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { IsEnum, IsString } from 'class-validator'
 import { Authentification } from '../../../domain/authentification'
 import { Core } from '../../../domain/core'
-import { Evenements } from '../../../domain/evenements'
+import { Evenement } from '../../../domain/evenement'
 
 export class Emetteur {
   @ApiProperty()
@@ -21,10 +21,10 @@ export class Emetteur {
 }
 
 export class CreateEvenementPayload {
-  @ApiProperty({ enum: Evenements.Type })
+  @ApiProperty({ enum: Evenement.Type })
   @IsString()
-  @IsEnum(Evenements.Type)
-  type: Evenements.Type
+  @IsEnum(Evenement.Type)
+  type: Evenement.Type
 
   @ApiProperty()
   emetteur: Emetteur

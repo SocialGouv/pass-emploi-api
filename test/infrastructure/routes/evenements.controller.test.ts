@@ -7,7 +7,7 @@ import {
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { CreateEvenementCommandHandler } from '../../../src/application/commands/create-evenement.command.handler'
-import { Evenements } from '../../../src/domain/evenements'
+import { Evenements } from '../../../src/domain/evenement'
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
 import {
