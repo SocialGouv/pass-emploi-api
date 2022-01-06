@@ -21,11 +21,7 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
       this.configService.get('redis').url,
       {
         redis: {
-          commandTimeout: 1000,
-          enableOfflineQueue: false,
           enableReadyCheck: true,
-          connectTimeout: 1000,
-          maxRetriesPerRequest: 2,
           retryStrategy: (times: number): number => {
             this.logger.error('could not connect to redis!' + times.toString())
             this.isReady = true
@@ -47,6 +43,20 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     } else {
       throw new Error('Redis not ready to accept connection')
     }
+  }
+
+  async subscribe(handle: Planificateur.Handler): Promise<void> {
+    this.queue.process(async jobRedis => {
+      this.logger.log(
+        `Execution du job ${jobRedis.id} de type ${jobRedis.data.type}`
+      )
+      const job: Planificateur.Job = {
+        date: jobRedis.data.date,
+        type: jobRedis.data.type,
+        contenu: jobRedis.data.contenu
+      }
+      await handle(job)
+    })
   }
 
   async isQueueReady(): Promise<Bull.Queue> {
