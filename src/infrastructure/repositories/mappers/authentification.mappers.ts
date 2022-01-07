@@ -42,6 +42,7 @@ export function toSqlConseillerUtilisateur(
     prenom: utilisateur.prenom,
     email: utilisateur.email ? utilisateur.email : null,
     structure: utilisateur.structure,
-    idAuthentification: idUtilisateurAuth
+    idAuthentification: idUtilisateurAuth,
+    dateEvenementEngagement: null
   }
 }
