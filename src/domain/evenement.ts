@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Authentification } from './authentification'
+import { Result } from '../building-blocks/types/result'
 
 export const EvenementsRepositoryToken = 'EvenementsRepositoryToken'
 
@@ -34,7 +35,7 @@ export namespace Evenement {
       categorieEvenement: string,
       actionEvenement: string,
       nomEvenement?: string
-    ): Promise<void>
+    ): Promise<Result>
   }
 }
 

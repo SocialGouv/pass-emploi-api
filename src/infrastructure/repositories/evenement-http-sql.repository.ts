@@ -7,6 +7,7 @@ import { Evenement } from 'src/domain/evenement'
 import { DateService } from 'src/utils/date-service'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
+import { emptySuccess, Result } from '../../building-blocks/types/result'
 
 @Injectable()
 export class EvenementHttpSqlRepository implements Evenement.Repository {
@@ -25,7 +26,7 @@ export class EvenementHttpSqlRepository implements Evenement.Repository {
     categorieEvenement: string,
     actionEvenement: string,
     nomEvenement?: string
-  ): Promise<void> {
+  ): Promise<Result> {
     const params = new URLSearchParams()
     params.append('rec', '1')
     params.append('idsite', this.configService.get('matomo').envId)
@@ -66,5 +67,6 @@ export class EvenementHttpSqlRepository implements Evenement.Repository {
         { where: { id: utilisateur.id } }
       )
     }
+    return emptySuccess()
   }
 }
