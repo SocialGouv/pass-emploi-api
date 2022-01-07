@@ -23,14 +23,22 @@ export class EvenementHttpSqlRepository implements Evenement.Repository {
   }
 
   async sendEvenement(
-    idUtilisateur: string,
-    typeUtilisateur: Authentification.Type,
+    utilisateur: Authentification.Utilisateur,
     categorieEvenement: string,
     actionEvenement: string,
     nomEvenement?: string
   ): Promise<void> {
     const params = new URLSearchParams()
+    params.append('rec', '1')
     params.append('idsite', this.configService.get('matomo').envId)
+    params.append(
+      this.configService.get('matomo').paramTypeUtilisateur,
+      utilisateur.type
+    )
+    params.append(
+      this.configService.get('matomo').paramStructureUtilisateur,
+      utilisateur.structure
+    )
 
     const evenementCategorieQueryParam = 'e_c'
     const evenementActionQueryParam = 'e_a'
@@ -47,21 +55,18 @@ export class EvenementHttpSqlRepository implements Evenement.Repository {
     }
 
     try {
-      await firstValueFrom(
-        this.httpService.get(`${this.apiUrl}`, {
-          params
-        })
-      )
+      await firstValueFrom(this.httpService.post(`${this.apiUrl}`, params))
+
       const dateEvenement = this.dateService.nowJs()
-      if (typeUtilisateur === Authentification.Type.CONSEILLER) {
+      if (utilisateur.type === Authentification.Type.CONSEILLER) {
         await ConseillerSqlModel.update(
-          { date_evenement_engagement: dateEvenement },
-          { where: { id: idUtilisateur } }
+          { dateEvenementEngagement: dateEvenement },
+          { where: { id: utilisateur.id } }
         )
-      } else if (typeUtilisateur === Authentification.Type.JEUNE) {
+      } else if (utilisateur.type === Authentification.Type.JEUNE) {
         await JeuneSqlModel.update(
-          { date_evenement_engagement: dateEvenement },
-          { where: { id: idUtilisateur } }
+          { dateEvenementEngagement: dateEvenement },
+          { where: { id: utilisateur.id } }
         )
       }
     } catch (e) {
