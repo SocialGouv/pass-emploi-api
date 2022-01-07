@@ -12,7 +12,7 @@ import { JeuneAuthorizer } from './application/authorizers/authorize-jeune'
 import { RendezVousAuthorizer } from './application/authorizers/authorize-rendezvous'
 import { AddFavoriOffreEmploiCommandHandler } from './application/commands/add-favori-offre-emploi.command.handler'
 import { CreateActionCommandHandler } from './application/commands/create-action.command.handler'
-import { CreateJeuneCommandHandler } from './application/commands/create-jeune.command.handler'
+import { CreerJeunePoleEmploiCommandHandler } from './application/commands/creer-jeune-pole-emploi.command.handler'
 import { CreateRendezVousCommandHandler } from './application/commands/create-rendez-vous.command.handler'
 import { CreerJeuneMiloCommandHandler } from './application/commands/creer-jeune-milo.command.handler'
 import { DeleteActionCommandHandler } from './application/commands/delete-action.command.handler'
@@ -197,7 +197,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDetailJeuneQueryHandler,
     GetActionsByJeuneQueryHandler,
     CreateActionCommandHandler,
-    CreateJeuneCommandHandler,
+    CreerJeunePoleEmploiCommandHandler,
     AddFavoriOffreEmploiCommandHandler,
     DeleteFavoriOffreEmploiCommandHandler,
     GetFavorisIdsJeuneQueryHandler,

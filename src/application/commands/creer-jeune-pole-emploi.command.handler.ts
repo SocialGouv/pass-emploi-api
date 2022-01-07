@@ -1,16 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { NotFound, Unauthorized } from 'src/domain/erreur'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { EmailExisteDejaError } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { Core } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
-import { Chat, ChatRepositoryToken } from '../../domain/chat'
-import { NotFound } from 'src/domain/erreur'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 
 export interface CreateJeuneCommand extends Command {
@@ -21,7 +21,7 @@ export interface CreateJeuneCommand extends Command {
 }
 
 @Injectable()
-export class CreateJeuneCommandHandler extends CommandHandler<
+export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
   CreateJeuneCommand,
   Result<Jeune>
 > {
@@ -70,6 +70,14 @@ export class CreateJeuneCommandHandler extends CommandHandler<
     command: CreateJeuneCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
+    if (
+      !(
+        utilisateur.type === Authentification.Type.CONSEILLER &&
+        utilisateur.structure === Core.Structure.POLE_EMPLOI
+      )
+    ) {
+      throw new Unauthorized('CreerJeuneMilo')
+    }
     await this.conseillerAuthorizer.authorize(command.idConseiller, utilisateur)
   }
 }

@@ -4,21 +4,23 @@ import { SinonSandbox } from 'sinon'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import {
   CreateJeuneCommand,
-  CreateJeuneCommandHandler
-} from '../../../src/application/commands/create-jeune.command.handler'
+  CreerJeunePoleEmploiCommandHandler
+} from '../../../src/application/commands/creer-jeune-pole-emploi.command.handler'
 import { success } from '../../../src/building-blocks/types/result'
 import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
+import { Unauthorized } from '../../../src/domain/erreur'
 import { Jeune } from '../../../src/domain/jeune'
 import { DateService } from '../../../src/utils/date-service'
 import { IdService } from '../../../src/utils/id-service'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { createSandbox, expect, stubClass } from '../../utils'
+import Structure = Core.Structure
 
 describe('CreateJeuneCommandHandler', () => {
-  let createJeuneCommandHandler: CreateJeuneCommandHandler
+  let createJeuneCommandHandler: CreerJeunePoleEmploiCommandHandler
   const conseiller = unConseiller()
   const idNouveauJeune = 'DFKAL'
   const date = DateTime.fromISO('2020-04-06T12:00:00.000Z').toUTC()
@@ -35,7 +37,7 @@ describe('CreateJeuneCommandHandler', () => {
     conseillerRepository.get.withArgs(conseiller.id).resolves(conseiller)
     idService.generate.returns(idNouveauJeune)
     dateService.now.returns(date)
-    createJeuneCommandHandler = new CreateJeuneCommandHandler(
+    createJeuneCommandHandler = new CreerJeunePoleEmploiCommandHandler(
       jeuneRepository,
       conseillerRepository,
       chatRepository,
@@ -86,7 +88,9 @@ describe('CreateJeuneCommandHandler', () => {
         idConseiller: conseiller.id
       }
 
-      const utilisateur = unUtilisateurConseiller()
+      const utilisateur = unUtilisateurConseiller({
+        structure: Structure.POLE_EMPLOI
+      })
 
       // When
       await createJeuneCommandHandler.authorize(command, utilisateur)
@@ -96,6 +100,26 @@ describe('CreateJeuneCommandHandler', () => {
         command.idConseiller,
         utilisateur
       )
+    })
+
+    it('rejette un conseiller MILO', async () => {
+      // Given
+      const command: CreateJeuneCommand = {
+        firstName: 'Kenji',
+        lastName: 'Lefameux',
+        email: 'kenji.lefameur@poleemploi.fr',
+        idConseiller: conseiller.id
+      }
+
+      const utilisateur = unUtilisateurConseiller({
+        structure: Core.Structure.MILO
+      })
+
+      // When
+      const call = createJeuneCommandHandler.authorize(command, utilisateur)
+
+      // Then
+      await expect(call).to.be.rejectedWith(Unauthorized)
     })
   })
 })
