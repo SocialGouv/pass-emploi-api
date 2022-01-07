@@ -64,7 +64,10 @@ export default () => {
     matomo: {
       url:
         process.env.MATOMO_API_URL ?? 'https://stats.data.gouv.fr/matomo.php',
-      envId: process.env.MATOMO_ENV_ID ?? '209'
+      envId: process.env.MATOMO_ENV_ID ?? '209',
+      paramTypeUtilisateur: process.env.PARAM_TYPE_UTILISATEUR ?? 'dimension1',
+      paramStructureUtilisateur:
+        process.env.PARAM_STRUCTURE_UTILISATEUR ?? 'dimension2'
     }
   }
 }

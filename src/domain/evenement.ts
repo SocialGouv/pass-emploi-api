@@ -20,8 +20,7 @@ export namespace Evenement {
 
   export interface Repository {
     sendEvenement(
-      idUtilisateur: string,
-      typeUtilisateur: string,
+      utilisateur: Authentification.Utilisateur,
       categorieEvenement: string,
       actionEvenement: string,
       nomEvenement?: string
@@ -83,8 +82,7 @@ export class EvenementService {
       evenements[typeEvenement]
 
     this.evenementRepository.sendEvenement(
-      utilisateur.id,
-      utilisateur.type,
+      utilisateur,
       evenement.categorie,
       evenement.action,
       evenement.nom
