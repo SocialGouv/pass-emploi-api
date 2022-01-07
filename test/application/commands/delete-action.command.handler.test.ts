@@ -1,6 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { describe } from 'mocha'
 import { SinonSandbox } from 'sinon'
+import { EvenementService } from 'src/domain/evenement'
 import { ActionAuthorizer } from '../../../src/application/authorizers/authorize-action'
 import {
   DeleteActionCommand,
@@ -21,16 +22,19 @@ describe('DeleteActionCommandHandler', () => {
   let actionRepository: StubbedType<Action.Repository>
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
   let deleteActionCommandHandler: DeleteActionCommandHandler
+  let evenementService: StubbedClass<EvenementService>
 
   beforeEach(async () => {
     action = uneAction()
     const sandbox: SinonSandbox = createSandbox()
     actionRepository = stubInterface(sandbox)
     actionAuthorizer = stubClass(ActionAuthorizer)
+    evenementService = stubClass(EvenementService)
 
     deleteActionCommandHandler = new DeleteActionCommandHandler(
       actionRepository,
-      actionAuthorizer
+      actionAuthorizer,
+      evenementService
     )
   })
 

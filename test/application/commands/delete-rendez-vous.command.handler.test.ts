@@ -22,6 +22,7 @@ import {
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import { EvenementService } from 'src/domain/evenement'
 
 describe('DeleteRendezVousCommandHandler', () => {
   DatabaseForTesting.prepare()
@@ -29,6 +30,7 @@ describe('DeleteRendezVousCommandHandler', () => {
   let notificationRepository: StubbedType<Notification.Repository>
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
   let deleteRendezVousCommandHandler: DeleteRendezVousCommandHandler
+  let evenementService: StubbedClass<EvenementService>
   const jeune = unJeune()
   const rendezVous = unRendezVous(jeune)
 
@@ -37,11 +39,13 @@ describe('DeleteRendezVousCommandHandler', () => {
     rendezVousRepository = stubInterface(sandbox)
     notificationRepository = stubInterface(sandbox)
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
+    evenementService = stubClass(EvenementService)
 
     deleteRendezVousCommandHandler = new DeleteRendezVousCommandHandler(
       rendezVousRepository,
       notificationRepository,
-      rendezVousAuthorizer
+      rendezVousAuthorizer,
+      evenementService
     )
   })
 

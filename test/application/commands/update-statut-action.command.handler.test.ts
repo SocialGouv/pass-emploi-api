@@ -1,5 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
+import { EvenementService } from 'src/domain/evenement'
 import { ActionAuthorizer } from '../../../src/application/authorizers/authorize-action'
 import {
   UpdateStatutActionCommand,
@@ -19,14 +20,17 @@ describe('UpdateStatutActionCommandHandler', () => {
   let actionRepository: StubbedType<Action.Repository>
   let updateStatutActionCommandHandler: UpdateStatutActionCommandHandler
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
+  let evenementService: StubbedClass<EvenementService>
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     actionRepository = stubInterface(sandbox)
     actionAuthorizer = stubClass(ActionAuthorizer)
+    evenementService = stubClass(EvenementService)
     updateStatutActionCommandHandler = new UpdateStatutActionCommandHandler(
       actionRepository,
-      actionAuthorizer
+      actionAuthorizer,
+      evenementService
     )
   })
 

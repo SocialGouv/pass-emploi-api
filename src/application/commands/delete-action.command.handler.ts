@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
@@ -24,7 +25,8 @@ export class DeleteActionCommandHandler extends CommandHandler<
   constructor(
     @Inject(ActionsRepositoryToken)
     private readonly actionRepository: Action.Repository,
-    private actionAuthorizer: ActionAuthorizer
+    private actionAuthorizer: ActionAuthorizer,
+    private evenementService: EvenementService
   ) {
     super()
     this.logger = new Logger('DeleteActionCommandHandler')
@@ -50,7 +52,10 @@ export class DeleteActionCommandHandler extends CommandHandler<
     await this.actionAuthorizer.authorize(command.idAction, utilisateur)
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    this.evenementService.creerEvenement(
+      Evenement.Type.ACTION_SUPPRIMEE,
+      utilisateur
+    )
   }
 }

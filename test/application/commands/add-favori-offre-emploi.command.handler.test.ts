@@ -18,12 +18,14 @@ import {
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 import Utilisateur = Authentification.Utilisateur
+import { EvenementService } from 'src/domain/evenement'
 
 describe('AddFavoriOffreEmploiCommandHandler', () => {
   let offresEmploiRepository: StubbedType<OffresEmploi.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler
+  let evenementService: StubbedClass<EvenementService>
   const jeune = unJeune()
 
   beforeEach(async () => {
@@ -31,10 +33,12 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
     offresEmploiRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
+    evenementService = stubClass(EvenementService)
     addFavoriOffreEmploiCommandHandler = new AddFavoriOffreEmploiCommandHandler(
       offresEmploiRepository,
       jeuneRepository,
-      jeuneAuthorizer
+      jeuneAuthorizer,
+      evenementService
     )
   })
 
