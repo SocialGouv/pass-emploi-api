@@ -91,7 +91,7 @@ export class CreateActionCommandHandler extends CommandHandler<
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
     this.evenementService.creerEvenement(
       Evenement.Type.ACTION_CREEE,
-      utilisateur.type
+      utilisateur
     )
   }
 

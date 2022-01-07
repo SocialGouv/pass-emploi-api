@@ -18,15 +18,14 @@ export namespace Evenement {
     RDV_SUPPRIME = 'RDV_SUPPRIME'
   }
 
-  export interface Evenement {
-    utilisateur: Authentification.Type
-    categorie: string
-    action: string
-    nom?: string
-  }
-
   export interface Repository {
-    sendEvenement(evenement: Evenement): Promise<void>
+    sendEvenement(
+      idUtilisateur: string,
+      typeUtilisateur: string,
+      categorieEvenement: string,
+      actionEvenement: string,
+      nomEvenement?: string
+    ): Promise<void>
   }
 }
 
@@ -78,13 +77,17 @@ export class EvenementService {
 
   async creerEvenement(
     typeEvenement: Evenement.Type,
-    typeUtilisateur: Authentification.Type
+    utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const evenement: Evenement.Evenement = {
-      utilisateur: typeUtilisateur,
-      ...evenements[typeEvenement]
-    }
+    const evenement: { categorie: string; action: string; nom?: string } =
+      evenements[typeEvenement]
 
-    this.evenementRepository.sendEvenement(evenement)
+    this.evenementRepository.sendEvenement(
+      utilisateur.id,
+      utilisateur.type,
+      evenement.categorie,
+      evenement.action,
+      evenement.nom
+    )
   }
 }
