@@ -21,7 +21,7 @@ export interface UpdateStatutActionCommand extends Command {
 @Injectable()
 export class UpdateStatutActionCommandHandler extends CommandHandler<
   UpdateStatutActionCommand,
-  Result
+  void
 > {
   constructor(
     @Inject(ActionsRepositoryToken)
@@ -31,7 +31,7 @@ export class UpdateStatutActionCommandHandler extends CommandHandler<
     super()
   }
 
-  async handle(command: UpdateStatutActionCommand): Promise<Result> {
+  async handle(command: UpdateStatutActionCommand): Promise<Result<void>> {
     const action = await this.actionRepository.get(command.idAction)
     if (!action) {
       return failure(new NonTrouveError('Action', command.idAction))

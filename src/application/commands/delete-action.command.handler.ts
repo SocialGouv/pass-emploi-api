@@ -19,10 +19,8 @@ export interface DeleteActionCommand extends Command {
 @Injectable()
 export class DeleteActionCommandHandler extends CommandHandler<
   DeleteActionCommand,
-  Result
+  void
 > {
-  private logger: Logger
-
   constructor(
     @Inject(ActionsRepositoryToken)
     private readonly actionRepository: Action.Repository,
@@ -32,7 +30,7 @@ export class DeleteActionCommandHandler extends CommandHandler<
     this.logger = new Logger('DeleteActionCommandHandler')
   }
 
-  async handle(command: DeleteActionCommand): Promise<Result> {
+  async handle(command: DeleteActionCommand): Promise<Result<void>> {
     const action = await this.actionRepository.get(command.idAction)
     if (!action) {
       return failure(new NonTrouveError('Action', command.idAction))

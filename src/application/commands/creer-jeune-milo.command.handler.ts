@@ -24,7 +24,7 @@ export interface CreerJeuneMiloCommand extends Command {
 @Injectable()
 export class CreerJeuneMiloCommandHandler extends CommandHandler<
   CreerJeuneMiloCommand,
-  Result<{ id: string }>
+  { id: string }
 > {
   constructor(
     private idService: IdService,

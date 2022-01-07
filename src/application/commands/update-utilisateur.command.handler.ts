@@ -28,7 +28,7 @@ export interface UpdateUtilisateurCommand extends Command {
 @Injectable()
 export class UpdateUtilisateurCommandHandler extends CommandHandler<
   UpdateUtilisateurCommand,
-  Result<UtilisateurQueryModel>
+  UtilisateurQueryModel
 > {
   constructor(
     @Inject(AuthentificationRepositoryToken)

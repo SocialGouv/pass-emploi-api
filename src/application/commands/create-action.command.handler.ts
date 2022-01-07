@@ -31,10 +31,8 @@ export interface CreateActionCommand extends Command {
 @Injectable()
 export class CreateActionCommandHandler extends CommandHandler<
   CreateActionCommand,
-  Result<string>
+  string
 > {
-  private logger
-
   constructor(
     @Inject(ActionsRepositoryToken)
     private readonly actionRepository: Action.Repository,

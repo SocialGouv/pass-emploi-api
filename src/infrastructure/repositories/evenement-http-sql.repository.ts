@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios'
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
 import { Authentification } from 'src/domain/authentification'
@@ -10,7 +10,6 @@ import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 
 @Injectable()
 export class EvenementHttpSqlRepository implements Evenement.Repository {
-  private logger: Logger
   private apiUrl: string
 
   constructor(
@@ -18,7 +17,6 @@ export class EvenementHttpSqlRepository implements Evenement.Repository {
     private configService: ConfigService,
     private dateService: DateService
   ) {
-    this.logger = new Logger('EvenementHttpRepository')
     this.apiUrl = this.configService.get('matomo').url
   }
 
@@ -54,23 +52,19 @@ export class EvenementHttpSqlRepository implements Evenement.Repository {
       params.append(evenementNomQueryParam, nomEvenement)
     }
 
-    try {
-      await firstValueFrom(this.httpService.post(`${this.apiUrl}`, params))
+    await firstValueFrom(this.httpService.post(`${this.apiUrl}`, params))
 
-      const dateEvenement = this.dateService.nowJs()
-      if (utilisateur.type === Authentification.Type.CONSEILLER) {
-        await ConseillerSqlModel.update(
-          { dateEvenementEngagement: dateEvenement },
-          { where: { id: utilisateur.id } }
-        )
-      } else if (utilisateur.type === Authentification.Type.JEUNE) {
-        await JeuneSqlModel.update(
-          { dateEvenementEngagement: dateEvenement },
-          { where: { id: utilisateur.id } }
-        )
-      }
-    } catch (e) {
-      this.logger.error(e)
+    const dateEvenement = this.dateService.nowJs()
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      await ConseillerSqlModel.update(
+        { dateEvenementEngagement: dateEvenement },
+        { where: { id: utilisateur.id } }
+      )
+    } else if (utilisateur.type === Authentification.Type.JEUNE) {
+      await JeuneSqlModel.update(
+        { dateEvenementEngagement: dateEvenement },
+        { where: { id: utilisateur.id } }
+      )
     }
   }
 }

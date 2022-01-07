@@ -29,10 +29,8 @@ export interface CreateRendezVousCommand extends Command {
 @Injectable()
 export class CreateRendezVousCommandHandler extends CommandHandler<
   CreateRendezVousCommand,
-  Result<string>
+  string
 > {
-  private logger: Logger
-
   constructor(
     private idService: IdService,
     @Inject(RendezVousRepositoryToken)

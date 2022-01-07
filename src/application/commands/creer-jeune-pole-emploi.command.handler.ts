@@ -12,6 +12,7 @@ import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 
 export interface CreateJeuneCommand extends Command {
   idConseiller: string
@@ -42,7 +43,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
   async handle(command: CreateJeuneCommand): Promise<Result<Jeune>> {
     const conseiller = await this.conseillerRepository.get(command.idConseiller)
     if (!conseiller) {
-      throw new NotFound(command.idConseiller, 'Conseiller')
+      return failure(new NonTrouveError('Conseiller', command.idConseiller))
     }
     const jeune = await this.jeuneRepository.getByEmail(command.email)
     if (jeune) {
