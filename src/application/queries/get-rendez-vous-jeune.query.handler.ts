@@ -35,4 +35,8 @@ export class GetAllRendezVousJeuneQueryHandler extends QueryHandler<
       utilisateur
     )
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }

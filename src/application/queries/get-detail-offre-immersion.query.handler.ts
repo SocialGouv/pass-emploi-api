@@ -35,4 +35,8 @@ export class GetDetailOffreImmersionQueryHandler extends QueryHandler<
   ): Promise<void> {
     return
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }

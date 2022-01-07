@@ -8,11 +8,21 @@ export namespace Evenement {
     ACTION_CREEE = 'ACTION_CREEE',
     ACTION_MODIFIEE = 'ACTION_MODIFIEE',
     ACTION_SUPPRIMEE = 'ACTION_SUPPRIMEE',
-    OFFRE_AFFICHEE = 'OFFRE_AFFICHEE',
-    OFFRE_RECHERCHEE = 'OFFRE_RECHERCHEE',
-    OFFRE_SAUVEGARDEE = 'OFFRE_SAUVEGARDEE',
-    OFFRE_POSTULEE = 'OFFRE_POSTULEE',
-    OFFRE_PARTAGEE = 'OFFRE_PARTAGEE',
+    OFFRE_EMPLOI_AFFICHEE = 'OFFRE_EMPLOI_AFFICHEE',
+    OFFRE_EMPLOI_RECHERCHEE = 'OFFRE_EMPLOI_RECHERCHEE',
+    OFFRE_EMPLOI_SAUVEGARDEE = 'OFFRE_EMPLOI_SAUVEGARDEE',
+    OFFRE_EMPLOI_POSTULEE = 'OFFRE_EMPLOI_POSTULEE',
+    OFFRE_EMPLOI_PARTAGEE = 'OFFRE_EMPLOI_PARTAGEE',
+    OFFRE_IMMERSION_AFFICHEE = 'OFFRE_IMMERSION_AFFICHEE',
+    OFFRE_IMMERSION_RECHERCHEE = 'OFFRE_IMMERSION_RECHERCHEE',
+    OFFRE_IMMERSION_SAUVEGARDEE = 'OFFRE_IMMERSION_SAUVEGARDEE',
+    OFFRE_IMMERSION_POSTULEE = 'OFFRE_IMMERSION_POSTULEE',
+    OFFRE_IMMERSION_PARTAGEE = 'OFFRE_IMMERSION_PARTAGEE',
+    OFFRE_ALTERNANCE_AFFICHEE = 'OFFRE_ALTERNANCE_AFFICHEE',
+    OFFRE_ALTERNANCE_RECHERCHEE = 'OFFRE_ALTERNANCE_RECHERCHEE',
+    OFFRE_ALTERNANCE_SAUVEGARDEE = 'OFFRE_ALTERNANCE_SAUVEGARDEE',
+    OFFRE_ALTERNANCE_POSTULEE = 'OFFRE_ALTERNANCE_POSTULEE',
+    OFFRE_ALTERNANCE_PARTAGEE = 'OFFRE_ALTERNANCE_PARTAGEE',
     MESSAGE_ENVOYE = 'MESSAGE_ENVOYE',
     RDV_CREE = 'RDV_CREE',
     RDV_SUPPRIME = 'RDV_SUPPRIME'
@@ -38,27 +48,78 @@ const evenements = {
     categorie: 'Action',
     action: 'Suppression'
   },
-  [Evenement.Type.OFFRE_AFFICHEE]: {
+  [Evenement.Type.OFFRE_EMPLOI_AFFICHEE]: {
     categorie: 'Offre',
     action: 'Détail',
-    nom: "type d'offre (Emploi, Alternance, Immersion)"
+    nom: "type d'offre (Emploi)"
   },
-  [Evenement.Type.OFFRE_RECHERCHEE]: {
+  [Evenement.Type.OFFRE_EMPLOI_RECHERCHEE]: {
     categorie: 'Offre',
     action: 'Recherche',
-    nom: "type d'offre (Emploi, Alternance, Immersion)"
+    nom: "type d'offre (Emploi)"
   },
-  [Evenement.Type.OFFRE_SAUVEGARDEE]: {
+  [Evenement.Type.OFFRE_EMPLOI_SAUVEGARDEE]: {
     categorie: 'Offre',
     action: 'Favori',
-    nom: "type d'offre (Emploi, Alternance, Immersion)"
+    nom: "type d'offre (Emploi)"
   },
-  [Evenement.Type.OFFRE_POSTULEE]: {
+  [Evenement.Type.OFFRE_EMPLOI_POSTULEE]: {
     categorie: 'Offre',
     action: 'Postuler',
-    nom: "type d'offre (Emploi, Alternance, Immersion)"
+    nom: "type d'offre (Emploi)"
   },
-  [Evenement.Type.OFFRE_PARTAGEE]: { categorie: 'Offre', action: 'Partage' },
+  [Evenement.Type.OFFRE_EMPLOI_PARTAGEE]: {
+    categorie: 'Offre',
+    action: 'Partage'
+  },
+  [Evenement.Type.OFFRE_IMMERSION_AFFICHEE]: {
+    categorie: 'Offre',
+    action: 'Détail',
+    nom: "type d'offre (Immersion)"
+  },
+  [Evenement.Type.OFFRE_IMMERSION_RECHERCHEE]: {
+    categorie: 'Offre',
+    action: 'Recherche',
+    nom: "type d'offre (Immersion)"
+  },
+  [Evenement.Type.OFFRE_IMMERSION_SAUVEGARDEE]: {
+    categorie: 'Offre',
+    action: 'Favori',
+    nom: "type d'offre (Immersion)"
+  },
+  [Evenement.Type.OFFRE_IMMERSION_POSTULEE]: {
+    categorie: 'Offre',
+    action: 'Postuler',
+    nom: "type d'offre (Immersion)"
+  },
+  [Evenement.Type.OFFRE_IMMERSION_PARTAGEE]: {
+    categorie: 'Offre',
+    action: 'Partage'
+  },
+  [Evenement.Type.OFFRE_ALTERNANCE_AFFICHEE]: {
+    categorie: 'Offre',
+    action: 'Détail',
+    nom: "type d'offre (Alternance)"
+  },
+  [Evenement.Type.OFFRE_ALTERNANCE_RECHERCHEE]: {
+    categorie: 'Offre',
+    action: 'Recherche',
+    nom: "type d'offre (Alternance)"
+  },
+  [Evenement.Type.OFFRE_ALTERNANCE_SAUVEGARDEE]: {
+    categorie: 'Offre',
+    action: 'Favori',
+    nom: "type d'offre (Alternance)"
+  },
+  [Evenement.Type.OFFRE_ALTERNANCE_POSTULEE]: {
+    categorie: 'Offre',
+    action: 'Postuler',
+    nom: "type d'offre (Alternance)"
+  },
+  [Evenement.Type.OFFRE_ALTERNANCE_PARTAGEE]: {
+    categorie: 'Offre',
+    action: 'Partage'
+  },
   [Evenement.Type.MESSAGE_ENVOYE]: { categorie: 'Message', action: 'Envoi' },
   [Evenement.Type.RDV_CREE]: { categorie: 'Rendez-vous', action: 'Création' },
   [Evenement.Type.RDV_SUPPRIME]: {

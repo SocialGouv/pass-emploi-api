@@ -58,4 +58,8 @@ export class GetOffresEmploiQueryHandler extends QueryHandler<
   ): Promise<void> {
     return
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }

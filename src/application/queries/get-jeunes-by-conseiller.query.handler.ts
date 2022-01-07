@@ -35,4 +35,8 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
   ): Promise<void> {
     await this.conseillerAuthorizer.authorize(query.idConseiller, utilisateur)
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }
