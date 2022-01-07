@@ -56,7 +56,7 @@ describe('CreateActionCommandHandler', () => {
     )
   })
   describe('handle', () => {
-    it('créée une action', async () => {
+    it('crée une action', async () => {
       // Given
       actionFactory.buildAction.returns(success(action))
       const command: CreateActionCommand = {

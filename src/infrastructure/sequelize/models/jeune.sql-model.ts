@@ -48,7 +48,7 @@ export class JeuneDto extends Model {
   idAuthentification: string
 
   @Column({ field: 'date_evenement_engagement', type: DataType.DATE })
-  dateEvenementEngagement: Date
+  dateEvenementEngagement: Date | null
 }
 
 @Table({ timestamps: false, tableName: 'jeune' })
