@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
+import { emptySuccess, Result } from 'src/building-blocks/types/result'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
@@ -29,13 +30,13 @@ export class HandleJobRendezVousCommandHandler extends CommandHandler<
     super()
   }
 
-  async handle(command: HandleJobRendezVousCommand): Promise<void> {
+  async handle(command: HandleJobRendezVousCommand): Promise<Result<void>> {
     const rendezVous = await this.rendezVousRepository.get(
       command.job.contenu.idRendezVous
     )
 
     if (!rendezVous?.jeune.pushNotificationToken) {
-      return
+      return emptySuccess()
     }
 
     const notification = Notification.createRappelRdv(
@@ -45,12 +46,17 @@ export class HandleJobRendezVousCommandHandler extends CommandHandler<
       this.dateService
     )
     await this.notificationRepository.send(notification)
+    return emptySuccess()
   }
 
   async authorize(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _command: HandleJobRendezVousCommand
   ): Promise<void> {
+    return
+  }
+
+  async monitor(): Promise<void> {
     return
   }
 }

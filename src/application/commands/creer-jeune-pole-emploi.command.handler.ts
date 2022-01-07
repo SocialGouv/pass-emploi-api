@@ -24,7 +24,7 @@ export interface CreateJeuneCommand extends Command {
 @Injectable()
 export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
   CreateJeuneCommand,
-  Result<Jeune>
+  Jeune
 > {
   constructor(
     @Inject(JeunesRepositoryToken)
