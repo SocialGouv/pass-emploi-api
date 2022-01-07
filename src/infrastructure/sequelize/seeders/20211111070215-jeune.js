@@ -9,7 +9,8 @@ module.exports = {
         date_creation: '2021-09-24T10:00:00.000Z',
         email: 'kenji.lefameux@passemploi.com',
         structure: 'PASS_EMPLOI',
-        id_authentification: '1'
+        id_authentification: '1',
+        date_evenement_engagement: '2022-01-04T10:00:00.000Z'
       },
       {
         id: '2',

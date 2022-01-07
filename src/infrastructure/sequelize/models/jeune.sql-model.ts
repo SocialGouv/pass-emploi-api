@@ -46,6 +46,9 @@ export class JeuneDto extends Model {
 
   @Column({ field: 'id_authentification', type: DataType.STRING })
   idAuthentification: string
+
+  @Column({ field: 'date_evenement_engagement', type: DataType.DATE })
+  dateEvenementEngagement: Date
 }
 
 @Table({ timestamps: false, tableName: 'jeune' })
