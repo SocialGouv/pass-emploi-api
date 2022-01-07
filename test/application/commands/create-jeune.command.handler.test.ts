@@ -7,7 +7,6 @@ import {
   CreateJeuneCommand,
   CreateJeuneCommandHandler
 } from '../../../src/application/commands/create-jeune.command.handler'
-import { success } from '../../../src/building-blocks/types/result'
 import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'

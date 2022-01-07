@@ -11,7 +11,6 @@ import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
-import { failure, Result, success } from 'src/building-blocks/types/result'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 
 export interface CreateJeuneCommand extends Command {
@@ -24,7 +23,7 @@ export interface CreateJeuneCommand extends Command {
 @Injectable()
 export class CreateJeuneCommandHandler extends CommandHandler<
   CreateJeuneCommand,
-  Result<Jeune>
+  Jeune
 > {
   constructor(
     @Inject(JeunesRepositoryToken)
