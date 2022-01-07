@@ -8,6 +8,8 @@ export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 export namespace Planificateur {
   export interface Repository {
     createJob(job: Job): Promise<void>
+    deleteJobsForRendezVous(idRdv: string): Promise<void>
+
     subscribe(callback: Handler): Promise<void>
   }
 
@@ -66,5 +68,9 @@ export class PlanificateurService {
       contenu: { idRendezVous: rendezVous.id }
     }
     await this.planificateurRepository.createJob(job)
+  }
+
+  async supprimerRappelsRendezVous(idRdv: string): Promise<void> {
+    await this.planificateurRepository.deleteJobsForRendezVous(idRdv)
   }
 }

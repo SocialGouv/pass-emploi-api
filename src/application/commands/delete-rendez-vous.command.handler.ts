@@ -12,6 +12,7 @@ import {
   Notification,
   NotificationRepositoryToken
 } from '../../domain/notification'
+import { PlanificateurService } from '../../domain/planificateur'
 import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
 import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
 
@@ -29,6 +30,7 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     private rendezVousRepository: RendezVous.Repository,
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,
+    private readonly planificateurService: PlanificateurService,
     private rendezVousAuthorizer: RendezVousAuthorizer
   ) {
     super()
@@ -39,7 +41,8 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     if (!rendezVous) {
       return failure(new NonTrouveError('Rendez-Vous', command.idRendezVous))
     }
-    await this.rendezVousRepository.delete(command.idRendezVous)
+    await this.rendezVousRepository.delete(rendezVous.id)
+
     if (rendezVous.jeune.pushNotificationToken) {
       const notification = Notification.createRdvSupprime(
         rendezVous.jeune.pushNotificationToken,
@@ -47,6 +50,8 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
       )
       await this.notificationRepository.send(notification)
     }
+
+    await this.planificateurService.supprimerRappelsRendezVous(rendezVous.id)
     return emptySuccess()
   }
 

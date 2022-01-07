@@ -60,4 +60,44 @@ describe('PlanificateurRedisRepository', () => {
       })
     })
   })
+
+  describe('deleteJobsForRendezVous', () => {
+    it('supprime tous les jobs liés à un rdv', async () => {
+      // Given
+      await planificateurRedisRepository.createJob({
+        date: uneDatetime.plus({ days: 2 }).toJSDate(),
+        type: Planificateur.JobType.RENDEZVOUS,
+        contenu: {
+          idRendezVous: 'id-rdv-1'
+        }
+      })
+      await planificateurRedisRepository.createJob({
+        date: uneDatetime.plus({ days: 7 }).toJSDate(),
+        type: Planificateur.JobType.RENDEZVOUS,
+        contenu: {
+          idRendezVous: 'id-rdv-2'
+        }
+      })
+      await planificateurRedisRepository.createJob({
+        date: uneDatetime.plus({ days: 7 }).toJSDate(),
+        type: Planificateur.JobType.RENDEZVOUS,
+        contenu: {
+          idRendezVous: 'id-rdv-1'
+        }
+      })
+
+      // When
+      await planificateurRedisRepository.deleteJobsForRendezVous('id-rdv-1')
+
+      // Then
+      const redisJob = await redisClient.hGetAll('bull:JobQueue:1')
+      const redisJob2 = await redisClient.hGetAll('bull:JobQueue:2')
+      const redisJob3 = await redisClient.hGetAll('bull:JobQueue:3')
+      expect(redisJob).to.deep.equal({})
+      expect(Duration.fromMillis(parseInt(redisJob2.delay)).as('day')).to.equal(
+        7
+      )
+      expect(redisJob3).to.deep.equal({})
+    })
+  })
 })

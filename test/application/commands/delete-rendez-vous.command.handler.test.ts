@@ -1,4 +1,5 @@
 import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'
+import { PlanificateurService } from '../../../src/domain/planificateur'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import {
   createSandbox,
@@ -28,6 +29,7 @@ describe('DeleteRendezVousCommandHandler', () => {
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let notificationRepository: StubbedType<Notification.Repository>
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
+  let planificateurService: StubbedClass<PlanificateurService>
   let deleteRendezVousCommandHandler: DeleteRendezVousCommandHandler
   const jeune = unJeune()
   const rendezVous = unRendezVous(jeune)
@@ -36,11 +38,13 @@ describe('DeleteRendezVousCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     rendezVousRepository = stubInterface(sandbox)
     notificationRepository = stubInterface(sandbox)
+    planificateurService = stubClass(PlanificateurService)
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
 
     deleteRendezVousCommandHandler = new DeleteRendezVousCommandHandler(
       rendezVousRepository,
       notificationRepository,
+      planificateurService,
       rendezVousAuthorizer
     )
   })
@@ -69,6 +73,9 @@ describe('DeleteRendezVousCommandHandler', () => {
               rendezVous.date
             )
           )
+          expect(
+            planificateurService.supprimerRappelsRendezVous
+          ).to.have.been.calledOnceWith(rendezVous.id)
           expect(result).to.deep.equal(emptySuccess())
         })
       })
@@ -87,12 +94,10 @@ describe('DeleteRendezVousCommandHandler', () => {
           expect(rendezVousRepository.delete).to.have.been.calledWith(
             rendezVous.id
           )
-          expect(notificationRepository.send).not.to.have.been.calledWith(
-            Notification.createRdvSupprime(
-              jeune.pushNotificationToken,
-              rendezVous.date
-            )
-          )
+          expect(notificationRepository.send).to.have.callCount(0)
+          expect(
+            planificateurService.supprimerRappelsRendezVous
+          ).to.have.been.calledOnceWith(rendezVous.id)
           expect(result).to.deep.equal(emptySuccess())
         })
       })

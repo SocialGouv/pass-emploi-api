@@ -103,5 +103,22 @@ describe('Planificateur', () => {
         })
       })
     })
+
+    describe('supprimerRappelsRendezVous', () => {
+      describe('déclenche la suppression des rappels du rendez vous', () => {
+        it('ne génère pas de job', async () => {
+          // Given
+          const idRdv = unRendezVous().id
+
+          // When
+          await planificateurService.supprimerRappelsRendezVous(idRdv)
+
+          // Then
+          expect(
+            planificateurRepository.deleteJobsForRendezVous
+          ).to.have.been.calledOnceWith(idRdv)
+        })
+      })
+    })
   })
 })

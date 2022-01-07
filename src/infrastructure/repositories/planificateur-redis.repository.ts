@@ -4,6 +4,7 @@ import Bull, * as QueueBull from 'bull'
 import { DateTime } from 'luxon'
 import { Planificateur } from '../../domain/planificateur'
 import { DateService } from '../../utils/date-service'
+import JobType = Planificateur.JobType
 
 @Injectable()
 export class PlanificateurRedisRepository implements Planificateur.Repository {
@@ -45,6 +46,15 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     }
   }
 
+  async deleteJobsForRendezVous(idRdv: string): Promise<void> {
+    if (this.isReady) {
+      const jobs = await this.queue.getJobs(['delayed'])
+      await Promise.all(
+        jobs.filter(filterJobsDuRdv(idRdv)).map(job => job.remove())
+      )
+    }
+  }
+
   async subscribe(handle: Planificateur.Handler): Promise<void> {
     this.queue.process(async jobRedis => {
       this.logger.log(
@@ -65,5 +75,16 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
 
   async disconnect(): Promise<void> {
     await this.queue.close()
+  }
+}
+
+function filterJobsDuRdv(
+  idRdv: string
+): (job: { data: Planificateur.Job }) => boolean {
+  return (job: { data: Planificateur.Job }): boolean => {
+    const data = job.data
+    return (
+      data.type === JobType.RENDEZVOUS && data.contenu.idRendezVous === idRdv
+    )
   }
 }
