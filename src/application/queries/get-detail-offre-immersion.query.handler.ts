@@ -7,6 +7,8 @@ import {
 } from '../../domain/offre-immersion'
 import { DetailOffreImmersionQueryModel } from './query-models/offres-immersion.query-models'
 import { Result } from '../../building-blocks/types/result'
+import { Authentification } from 'src/domain/authentification'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 
 export interface GetDetailOffreImmersionQuery extends Query {
   idOffreImmersion: string
@@ -19,7 +21,8 @@ export class GetDetailOffreImmersionQueryHandler extends QueryHandler<
 > {
   constructor(
     @Inject(OffresImmersionRepositoryToken)
-    private offresImmersionRepository: OffresImmersion.Repository
+    private offresImmersionRepository: OffresImmersion.Repository,
+    private evenementService: EvenementService
   ) {
     super()
   }
@@ -36,7 +39,10 @@ export class GetDetailOffreImmersionQueryHandler extends QueryHandler<
     return
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    this.evenementService.creerEvenement(
+      Evenement.Type.OFFRE_IMMERSION_AFFICHEE,
+      utilisateur
+    )
   }
 }

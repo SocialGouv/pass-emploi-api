@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
@@ -29,7 +30,8 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     private rendezVousRepository: RendezVous.Repository,
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,
-    private rendezVousAuthorizer: RendezVousAuthorizer
+    private rendezVousAuthorizer: RendezVousAuthorizer,
+    private evenementService: EvenementService
   ) {
     super()
   }
@@ -57,7 +59,10 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     await this.rendezVousAuthorizer.authorize(command.idRendezVous, utilisateur)
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    this.evenementService.creerEvenement(
+      Evenement.Type.RDV_SUPPRIME,
+      utilisateur
+    )
   }
 }

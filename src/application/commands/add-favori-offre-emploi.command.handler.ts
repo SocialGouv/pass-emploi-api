@@ -19,6 +19,7 @@ import {
 } from '../../building-blocks/types/domain-error'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 
 export interface AddFavoriOffreEmploiCommand extends Command {
   idJeune: string
@@ -35,7 +36,8 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
     private offresEmploiRepository: OffresEmploi.Repository,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
-    private jeuneAuthorizer: JeuneAuthorizer
+    private jeuneAuthorizer: JeuneAuthorizer,
+    private evenementService: EvenementService
   ) {
     super()
   }
@@ -71,7 +73,10 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
     await this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    this.evenementService.creerEvenement(
+      Evenement.Type.OFFRE_EMPLOI_SAUVEGARDEE,
+      utilisateur
+    )
   }
 }
