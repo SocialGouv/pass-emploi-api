@@ -94,7 +94,7 @@ import { EvenementsController } from './infrastructure/routes/evenements.control
 import { CreateEvenementCommandHandler } from './application/commands/create-evenement.command.handler'
 import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
 import { EvenementService, EvenementsRepositoryToken } from './domain/evenement'
-import { EvenementHttpRepository } from './infrastructure/repositories/evenement-http.repository'
+import { EvenementHttpSqlRepository } from './infrastructure/repositories/evenement-http-sql.repository'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -184,7 +184,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: EvenementsRepositoryToken,
-      useClass: EvenementHttpRepository
+      useClass: EvenementHttpSqlRepository
     },
     ...databaseProviders
   ],

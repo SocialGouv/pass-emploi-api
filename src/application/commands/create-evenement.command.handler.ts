@@ -47,6 +47,6 @@ export class CreateEvenementCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur,
     command: CreateEvenementCommand
   ): Promise<void> {
-    this.evenementService.creerEvenement(command.type, utilisateur.type)
+    this.evenementService.creerEvenement(command.type, utilisateur)
   }
 }
