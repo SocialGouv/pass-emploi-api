@@ -20,7 +20,7 @@ export interface UpdateNotificationTokenCommand extends Command {
 @Injectable()
 export class UpdateNotificationTokenCommandHandler extends CommandHandler<
   UpdateNotificationTokenCommand,
-  Result
+  void
 > {
   constructor(
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
@@ -30,7 +30,7 @@ export class UpdateNotificationTokenCommandHandler extends CommandHandler<
     super()
   }
 
-  async handle(command: UpdateNotificationTokenCommand): Promise<Result> {
+  async handle(command: UpdateNotificationTokenCommand): Promise<Result<void>> {
     const jeune = await this.jeuneRepository.get(command.idJeune)
     if (!jeune) {
       return failure(new NonTrouveError(command.idJeune, 'Jeune'))

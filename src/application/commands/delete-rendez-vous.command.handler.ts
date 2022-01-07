@@ -22,7 +22,7 @@ export interface DeleteRendezVousCommand extends Command {
 @Injectable()
 export class DeleteRendezVousCommandHandler extends CommandHandler<
   DeleteRendezVousCommand,
-  Result
+  void
 > {
   constructor(
     @Inject(RendezVousRepositoryToken)
@@ -34,7 +34,7 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     super()
   }
 
-  async handle(command: DeleteRendezVousCommand): Promise<Result> {
+  async handle(command: DeleteRendezVousCommand): Promise<Result<void>> {
     const rendezVous = await this.rendezVousRepository.get(command.idRendezVous)
     if (!rendezVous) {
       return failure(new NonTrouveError('Rendez-Vous', command.idRendezVous))

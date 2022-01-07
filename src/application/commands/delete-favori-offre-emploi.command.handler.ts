@@ -26,10 +26,8 @@ export interface DeleteFavoriOffreEmploiCommand extends Command {
 @Injectable()
 export class DeleteFavoriOffreEmploiCommandHandler extends CommandHandler<
   DeleteFavoriOffreEmploiCommand,
-  Result
+  void
 > {
-  private logger: Logger
-
   constructor(
     @Inject(OffresEmploiRepositoryToken)
     private readonly offresEmploiRepository: OffresEmploi.Repository,
@@ -41,7 +39,7 @@ export class DeleteFavoriOffreEmploiCommandHandler extends CommandHandler<
     this.logger = new Logger('DeleteFavoriCommandHandler')
   }
 
-  async handle(command: DeleteFavoriOffreEmploiCommand): Promise<Result> {
+  async handle(command: DeleteFavoriOffreEmploiCommand): Promise<Result<void>> {
     const jeune = await this.jeuneRepository.get(command.idJeune)
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', command.idJeune))

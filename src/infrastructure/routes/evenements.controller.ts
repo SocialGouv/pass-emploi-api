@@ -17,7 +17,7 @@ export class EvenementsController {
   ) {}
 
   @Post()
-  creerEvenement(
+  async creerEvenement(
     @Body() createEvenementPayload: CreateEvenementPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
@@ -25,6 +25,6 @@ export class EvenementsController {
       type: createEvenementPayload.type,
       emetteur: createEvenementPayload.emetteur
     }
-    return this.createEvenementCommandHandler.execute(command, utilisateur)
+    this.createEvenementCommandHandler.execute(command, utilisateur)
   }
 }

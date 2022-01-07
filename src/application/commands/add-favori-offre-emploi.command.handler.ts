@@ -28,7 +28,7 @@ export interface AddFavoriOffreEmploiCommand extends Command {
 @Injectable()
 export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
   AddFavoriOffreEmploiCommand,
-  Result
+  void
 > {
   constructor(
     @Inject(OffresEmploiRepositoryToken)
@@ -40,7 +40,7 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
     super()
   }
 
-  async handle(command: AddFavoriOffreEmploiCommand): Promise<Result> {
+  async handle(command: AddFavoriOffreEmploiCommand): Promise<Result<void>> {
     const jeune = await this.jeuneRepository.get(command.idJeune)
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', command.idJeune))
