@@ -38,4 +38,8 @@ export class GetFavorisJeuneQueryHandler extends QueryHandler<
   ): Promise<void> {
     await this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }

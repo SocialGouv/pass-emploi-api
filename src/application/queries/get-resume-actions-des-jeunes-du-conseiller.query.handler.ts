@@ -36,4 +36,8 @@ export class GetResumeActionsDesJeunesDuConseillerQueryHandler extends QueryHand
   ): Promise<void> {
     await this.conseillerAuthorizer.authorize(query.idConseiller, utilisateur)
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }

@@ -42,4 +42,8 @@ export class GetDossierMiloJeuneQueryHandler extends QueryHandler<
       throw new Unauthorized('DossierMilo')
     }
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }

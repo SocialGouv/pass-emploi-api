@@ -33,4 +33,8 @@ export class GetChatSecretsQueryHandler extends QueryHandler<
   ): Promise<void> {
     return
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }

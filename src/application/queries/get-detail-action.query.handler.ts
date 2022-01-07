@@ -35,4 +35,8 @@ export class GetDetailActionQueryHandler extends QueryHandler<
   ): Promise<void> {
     await this.actionAuthorizer.authorize(query.idAction, utilisateur)
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }
