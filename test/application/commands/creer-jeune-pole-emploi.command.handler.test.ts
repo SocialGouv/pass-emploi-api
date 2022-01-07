@@ -1,6 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
+import { success } from 'src/building-blocks/types/result'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import {
   CreateJeuneCommand,

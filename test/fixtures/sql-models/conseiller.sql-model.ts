@@ -11,7 +11,8 @@ export function unConseillerDto(
     nom: 'Tavernier',
     email: 'nils.tavernier@passemploi.com',
     structure: Core.Structure.PASS_EMPLOI,
-    idAuthentification: 'un-id'
+    idAuthentification: 'un-id',
+    dateEvenementEngagement: null
   }
 
   return { ...defaults, ...args }

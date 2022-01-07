@@ -41,7 +41,7 @@ describe('EvenementsController', () => {
     it("crée l'évènement quand l'utilisateur a bien l'authorisation", async () => {
       // Given
       const createEvenementPayload: CreateEvenementPayload = {
-        type: Evenement.Type.OFFRE_PARTAGEE,
+        type: Evenement.Type.OFFRE_EMPLOI_PARTAGEE,
         emetteur: {
           id: '1',
           type: Authentification.Type.CONSEILLER,
@@ -61,7 +61,7 @@ describe('EvenementsController', () => {
         createEvenementCommandHandler.execute
       ).to.have.been.calledWithExactly(
         {
-          type: Evenement.Type.OFFRE_PARTAGEE,
+          type: Evenement.Type.OFFRE_EMPLOI_PARTAGEE,
           emetteur: {
             id: '1',
             type: Authentification.Type.CONSEILLER,

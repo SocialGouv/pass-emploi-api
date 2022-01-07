@@ -15,7 +15,8 @@ export function unJeuneDto(
     dateDerniereActualisationToken: null,
     email: 'john.doe@plop.io',
     structure: Core.Structure.MILO,
-    idAuthentification: 'un-id'
+    idAuthentification: 'un-id',
+    dateEvenementEngagement: null
   }
 
   return { ...defaults, ...args }

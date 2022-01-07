@@ -86,7 +86,7 @@ describe('CreateActionCommandHandler', () => {
       // Then
       expect(evenementService.creerEvenement).to.be.calledWith(
         command.type,
-        utilisateur.type
+        utilisateur
       )
     })
   })
