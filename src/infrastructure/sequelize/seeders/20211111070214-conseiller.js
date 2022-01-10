@@ -7,8 +7,7 @@ module.exports = {
         nom: 'Tavernier',
         email: 'nils.tavernier@passemploi.com',
         structure: 'PASS_EMPLOI',
-        id_authentification: '41',
-        date_evenement_engagement: '2022-01-04T10:00:00.000Z'
+        id_authentification: '41'
       },
       {
         id: '42',
