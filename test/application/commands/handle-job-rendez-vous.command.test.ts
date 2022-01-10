@@ -154,7 +154,7 @@ describe('HandlerJobRendezVousCommandHandler', () => {
         token: 'unToken',
         notification: {
           title: 'Rappel rendez-vous',
-          body: 'Vous avez un rendez-vous en approche'
+          body: 'Vous avez un rendez-vous dans une semaine'
         },
         data: {
           type: 'RAPPEL_RENDEZVOUS',

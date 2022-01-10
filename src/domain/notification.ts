@@ -71,7 +71,7 @@ export namespace Notification {
     const today = dateService.now()
     let body = 'Vous avez un rendez-vous demain'
     if (date.diff(today).as('day') > 2) {
-      body = 'Vous avez un rendez-vous en approche'
+      body = 'Vous avez un rendez-vous dans une semaine'
     }
     return {
       token,
@@ -90,7 +90,7 @@ export namespace Notification {
     token: string,
     date: Date
   ): Notification.Message {
-    const formattedDate = DateTime.fromJSDate(date).toFormat('dd/MM à HH:mm')
+    const formattedDate = DateTime.fromJSDate(date).toFormat('dd/MM')
     return {
       token,
       notification: {
