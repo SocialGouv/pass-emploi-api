@@ -19,7 +19,7 @@ import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-j
 import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
 import { Authentification } from 'src/domain/authentification'
 import { CreateActionCommandHandler } from '../../application/commands/create-action.command.handler'
-import { CreateJeuneCommandHandler } from '../../application/commands/create-jeune.command.handler'
+import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/creer-jeune-pole-emploi.command.handler'
 import { CreerJeuneMiloCommandHandler } from '../../application/commands/creer-jeune-milo.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from '../../application/commands/send-notification-nouveau-message.command.handler'
 import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
@@ -61,7 +61,7 @@ export class ConseillersController {
     private readonly getJeunesByConseillerQueryHandler: GetJeunesByConseillerQueryHandler,
     private readonly getResumeActionsDesJeunesDuConseillerQueryHandler: GetResumeActionsDesJeunesDuConseillerQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
-    private readonly createJeuneCommandHandler: CreateJeuneCommandHandler,
+    private readonly creerJeunePoleEmploiCommandHandler: CreerJeunePoleEmploiCommandHandler,
     private readonly sendNotificationNouveauMessage: SendNotificationNouveauMessageCommandHandler,
     private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler,
     private createRendezVousCommandHandler: CreateRendezVousCommandHandler,
@@ -117,7 +117,7 @@ export class ConseillersController {
     @Body() createJeunePayload: CreateJeunePoleEmploiPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DetailJeuneQueryModel> {
-    const result = await this.createJeuneCommandHandler.execute(
+    const result = await this.creerJeunePoleEmploiCommandHandler.execute(
       {
         ...createJeunePayload
       },
