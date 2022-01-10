@@ -50,7 +50,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
     }
 
     const nouveauJeune: Jeune = {
-      id: this.idService.generate(),
+      id: this.idService.uuid(),
       firstName: command.firstName,
       lastName: command.lastName,
       email: command.email,

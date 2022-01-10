@@ -22,7 +22,7 @@ import Structure = Core.Structure
 describe('CreateJeuneCommandHandler', () => {
   let createJeuneCommandHandler: CreerJeunePoleEmploiCommandHandler
   const conseiller = unConseiller()
-  const idNouveauJeune = 'DFKAL'
+  const idNouveauJeune = 'ae1785ac-71f3-11ec-a0ba-cf33623dcff5'
   const date = DateTime.fromISO('2020-04-06T12:00:00.000Z').toUTC()
   const sandbox: SinonSandbox = createSandbox()
   const jeuneRepository: StubbedType<Jeune.Repository> = stubInterface(sandbox)
@@ -35,7 +35,7 @@ describe('CreateJeuneCommandHandler', () => {
 
   before(async () => {
     conseillerRepository.get.withArgs(conseiller.id).resolves(conseiller)
-    idService.generate.returns(idNouveauJeune)
+    idService.uuid.returns(idNouveauJeune)
     dateService.now.returns(date)
     createJeuneCommandHandler = new CreerJeunePoleEmploiCommandHandler(
       jeuneRepository,
