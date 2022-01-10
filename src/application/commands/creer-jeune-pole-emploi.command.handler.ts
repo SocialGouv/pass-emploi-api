@@ -76,7 +76,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
         utilisateur.structure === Core.Structure.POLE_EMPLOI
       )
     ) {
-      throw new Unauthorized('CreerJeuneMilo')
+      throw new Unauthorized('CreerJeunePE')
     }
     await this.conseillerAuthorizer.authorize(command.idConseiller, utilisateur)
   }
