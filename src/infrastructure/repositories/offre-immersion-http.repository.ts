@@ -31,7 +31,7 @@ export class OffresImmersionHttpRepository
         lat,
         lon
       },
-      distance_km: 10
+      distance_km: 100
     }
 
     try {
