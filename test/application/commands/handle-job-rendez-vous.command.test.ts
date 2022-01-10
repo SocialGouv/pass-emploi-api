@@ -115,12 +115,11 @@ describe('HandlerJobRendezVousCommandHandler', () => {
         token: 'unToken',
         notification: {
           title: 'Rappel rendez-vous',
-          body: 'Vous avez rendez-vous demain à 14h00'
+          body: 'Vous avez un rendez-vous demain'
         },
         data: {
           type: 'RAPPEL_RENDEZVOUS',
-          id: 'idRendezVous',
-          date: DateTime.fromJSDate(unRendezVousSansToken.date).toUTC().toISO()
+          id: 'idRendezVous'
         }
       })
     })
@@ -155,12 +154,11 @@ describe('HandlerJobRendezVousCommandHandler', () => {
         token: 'unToken',
         notification: {
           title: 'Rappel rendez-vous',
-          body: 'Vous avez rendez-vous le mercredi 13 avril à 14h00'
+          body: 'Vous avez un rendez-vous en approche'
         },
         data: {
           type: 'RAPPEL_RENDEZVOUS',
-          id: 'idRendezVous',
-          date: DateTime.fromJSDate(unRendezVousSansToken.date).toUTC().toISO()
+          id: 'idRendezVous'
         }
       })
     })

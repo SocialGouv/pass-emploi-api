@@ -25,7 +25,6 @@ export namespace Notification {
     data: {
       type: string
       id?: string
-      date?: string
     }
   }
 
@@ -70,20 +69,9 @@ export namespace Notification {
     dateService: DateService
   ): Notification.Message {
     const today = dateService.now()
-    let body = `Vous avez rendez-vous demain à ${date
-      .setZone('Europe/Paris')
-      .toFormat("HH'h'mm")}`
+    let body = 'Vous avez un rendez-vous demain'
     if (date.diff(today).as('day') > 2) {
-      body = `Vous avez rendez-vous le ${date
-        .setZone('Europe/Paris')
-        .toLocaleString(
-          {
-            weekday: 'long',
-            month: 'long',
-            day: '2-digit'
-          },
-          { locale: 'fr' }
-        )} à ${date.setZone('Europe/Paris').toFormat("HH'h'mm")}`
+      body = 'Vous avez un rendez-vous en approche'
     }
     return {
       token,
@@ -93,8 +81,7 @@ export namespace Notification {
       },
       data: {
         type: Type.RAPPEL_RENDEZVOUS,
-        id: idRdv,
-        date: date.toUTC().toISO()
+        id: idRdv
       }
     }
   }
