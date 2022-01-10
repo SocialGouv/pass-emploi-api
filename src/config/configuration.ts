@@ -2,6 +2,8 @@
 import { parse } from 'pg-connection-string'
 
 export default () => {
+  console.log('process.env.CUSTOM_YO')
+  console.log(process.env.CUSTOM_YO)
   const databaseUrl =
     process.env.DATABASE_URL ||
     'postgresql://passemploi:passemploi@localhost:55432/passemploidb'
