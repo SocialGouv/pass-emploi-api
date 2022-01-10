@@ -8,6 +8,7 @@ import { DateService } from 'src/utils/date-service'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
+import { Core } from '../../domain/core'
 
 @Injectable()
 export class EvenementHttpSqlRepository implements Evenement.Repository {
@@ -28,6 +29,11 @@ export class EvenementHttpSqlRepository implements Evenement.Repository {
     nomEvenement?: string
   ): Promise<Result> {
     const params = new URLSearchParams()
+    const structureUtilisateur =
+      utilisateur.structure === Core.Structure.MILO
+        ? 'MISSION_LOCALE'
+        : utilisateur.structure
+
     params.append('rec', '1')
     params.append('idsite', this.configService.get('matomo').envId)
     params.append(
@@ -36,7 +42,7 @@ export class EvenementHttpSqlRepository implements Evenement.Repository {
     )
     params.append(
       this.configService.get('matomo').paramStructureUtilisateur,
-      utilisateur.structure
+      structureUtilisateur
     )
 
     const evenementCategorieQueryParam = 'e_c'
@@ -52,7 +58,6 @@ export class EvenementHttpSqlRepository implements Evenement.Repository {
     if (nomEvenement) {
       params.append(evenementNomQueryParam, nomEvenement)
     }
-
     await firstValueFrom(this.httpService.post(`${this.apiUrl}`, params))
 
     const dateEvenement = this.dateService.nowJs()

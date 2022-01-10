@@ -32,7 +32,7 @@ describe('EvenementHttpSqlRepository', () => {
           prenom: 'Kevin',
           nom: 'DeBrun',
           email: 'kd@gmail.com',
-          structure: Core.Structure.POLE_EMPLOI,
+          structure: Core.Structure.MILO,
           type: Authentification.Type.CONSEILLER
         },
         categorieEvenement: 'Action',
@@ -42,7 +42,7 @@ describe('EvenementHttpSqlRepository', () => {
       nock('https://stats.data.gouv.fr')
         .post(
           '/matomo.php',
-          'rec=1&idsite=1&dimension1=CONSEILLER&dimension2=POLE_EMPLOI&e_c=Action&e_a=Suppression'
+          'rec=1&idsite=1&dimension1=CONSEILLER&dimension2=MISSION_LOCALE&e_c=Action&e_a=Suppression'
         )
         .reply(200)
         .isDone()
