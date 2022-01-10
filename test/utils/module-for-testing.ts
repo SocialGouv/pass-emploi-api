@@ -63,9 +63,7 @@ export const testConfig = (): ConfigService => {
     },
     matomo: {
       url: 'https://stats.data.gouv.fr/matomo.php',
-      envId: '1',
-      paramTypeUtilisateur: 'dimension1',
-      paramStructureUtilisateur: 'dimension2'
+      envId: '1'
     }
   })
 }

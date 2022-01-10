@@ -5,10 +5,9 @@ import { firstValueFrom } from 'rxjs'
 import { Authentification } from 'src/domain/authentification'
 import { Evenement } from 'src/domain/evenement'
 import { DateService } from 'src/utils/date-service'
-import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { Core } from '../../domain/core'
+import { EvenementEngagementSqlModel } from '../sequelize/models/evenement-engagement.sql-model'
 
 @Injectable()
 export class EvenementHttpSqlRepository implements Evenement.Repository {
@@ -36,18 +35,15 @@ export class EvenementHttpSqlRepository implements Evenement.Repository {
 
     params.append('rec', '1')
     params.append('idsite', this.configService.get('matomo').envId)
-    params.append(
-      this.configService.get('matomo').paramTypeUtilisateur,
-      utilisateur.type
-    )
-    params.append(
-      this.configService.get('matomo').paramStructureUtilisateur,
-      structureUtilisateur
-    )
 
+    const paramTypeUtilisateur = 'dimension1'
+    const paramStructureUtilisateur = 'dimension2'
     const evenementCategorieQueryParam = 'e_c'
     const evenementActionQueryParam = 'e_a'
     const evenementNomQueryParam = 'e_n'
+
+    params.append(paramTypeUtilisateur, utilisateur.type)
+    params.append(paramStructureUtilisateur, structureUtilisateur)
 
     if (categorieEvenement) {
       params.append(evenementCategorieQueryParam, categorieEvenement)
@@ -61,17 +57,14 @@ export class EvenementHttpSqlRepository implements Evenement.Repository {
     await firstValueFrom(this.httpService.post(`${this.apiUrl}`, params))
 
     const dateEvenement = this.dateService.nowJs()
-    if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      await ConseillerSqlModel.update(
-        { dateEvenementEngagement: dateEvenement },
-        { where: { id: utilisateur.id } }
-      )
-    } else if (utilisateur.type === Authentification.Type.JEUNE) {
-      await JeuneSqlModel.update(
-        { dateEvenementEngagement: dateEvenement },
-        { where: { id: utilisateur.id } }
-      )
-    }
+    await EvenementEngagementSqlModel.create({
+      categorie: categorieEvenement ?? null,
+      action: actionEvenement ?? null,
+      nom: nomEvenement ?? null,
+      idUtilisateur: utilisateur.id,
+      typeUtilisateur: utilisateur.type,
+      dateEvenement: dateEvenement
+    })
     return emptySuccess()
   }
 }
