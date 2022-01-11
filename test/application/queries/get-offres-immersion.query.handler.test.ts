@@ -1,5 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
+import { EvenementService } from 'src/domain/evenement'
 import {
   GetOffresImmersionQuery,
   GetOffresImmersionQueryHandler
@@ -7,19 +8,22 @@ import {
 import { OffreImmersionQueryModel } from '../../../src/application/queries/query-models/offres-immersion.query-models'
 import { success } from '../../../src/building-blocks/types/result'
 import { OffresImmersion } from '../../../src/domain/offre-immersion'
-import { createSandbox, expect } from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('GetOffresImmersionQueryHandler', () => {
   let offresImmersionRepository: StubbedType<OffresImmersion.Repository>
   let getOffresImmersionQueryHandler: GetOffresImmersionQueryHandler
   let sandbox: SinonSandbox
+  let evenementService: StubbedClass<EvenementService>
 
   before(() => {
     sandbox = createSandbox()
     offresImmersionRepository = stubInterface(sandbox)
+    evenementService = stubClass(EvenementService)
 
     getOffresImmersionQueryHandler = new GetOffresImmersionQueryHandler(
-      offresImmersionRepository
+      offresImmersionRepository,
+      evenementService
     )
   })
 

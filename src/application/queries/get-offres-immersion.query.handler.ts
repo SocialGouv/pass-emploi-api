@@ -1,4 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { Authentification } from 'src/domain/authentification'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result } from '../../building-blocks/types/result'
@@ -21,7 +23,8 @@ export class GetOffresImmersionQueryHandler extends QueryHandler<
 > {
   constructor(
     @Inject(OffresImmersionRepositoryToken)
-    private offresImmersionRepository: OffresImmersion.Repository
+    private offresImmersionRepository: OffresImmersion.Repository,
+    private evenementService: EvenementService
   ) {
     super()
   }
@@ -40,5 +43,12 @@ export class GetOffresImmersionQueryHandler extends QueryHandler<
     _query: GetOffresImmersionQuery
   ): Promise<void> {
     return
+  }
+
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creerEvenement(
+      Evenement.Type.OFFRE_IMMERSION_RECHERCHEE,
+      utilisateur
+    )
   }
 }

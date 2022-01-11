@@ -1,4 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { Authentification } from 'src/domain/authentification'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import {
@@ -33,7 +35,8 @@ export class GetOffresEmploiQueryHandler extends QueryHandler<
 > {
   constructor(
     @Inject(OffresEmploiRepositoryToken)
-    private offresEmploiRepository: OffresEmploi.Repository
+    private offresEmploiRepository: OffresEmploi.Repository,
+    private evenementService: EvenementService
   ) {
     super()
   }
@@ -57,5 +60,12 @@ export class GetOffresEmploiQueryHandler extends QueryHandler<
     _query: GetOffresEmploiQuery
   ): Promise<void> {
     return
+  }
+
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creerEvenement(
+      Evenement.Type.OFFRE_EMPLOI_RECHERCHEE,
+      utilisateur
+    )
   }
 }

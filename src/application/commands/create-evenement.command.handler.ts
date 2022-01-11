@@ -1,13 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
-import { Evenements } from '../../domain/evenements'
+import { Evenement, EvenementService } from '../../domain/evenement'
 import { Unauthorized } from '../../domain/erreur'
+import { emptySuccess, Result } from 'src/building-blocks/types/result'
 
 export interface CreateEvenementCommand extends Command {
-  type: Evenements.Type
+  type: Evenement.Type
   emetteur: {
     id: string
     type: Authentification.Type
@@ -20,14 +21,14 @@ export class CreateEvenementCommandHandler extends CommandHandler<
   CreateEvenementCommand,
   void
 > {
-  private logger: Logger
-
-  constructor() {
+  constructor(private evenementService: EvenementService) {
     super()
-    this.logger = new Logger('CreateEvenementCommandHandler')
   }
-  async handle(command: CreateEvenementCommand): Promise<void> {
-    this.logger.log(command)
+  async handle(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _command: CreateEvenementCommand
+  ): Promise<Result<void>> {
+    return emptySuccess()
   }
 
   async authorize(
@@ -41,5 +42,12 @@ export class CreateEvenementCommandHandler extends CommandHandler<
       return
     }
     throw new Unauthorized('évènement')
+  }
+
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    command: CreateEvenementCommand
+  ): Promise<void> {
+    await this.evenementService.creerEvenement(command.type, utilisateur)
   }
 }

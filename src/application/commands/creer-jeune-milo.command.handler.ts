@@ -24,7 +24,7 @@ export interface CreerJeuneMiloCommand extends Command {
 @Injectable()
 export class CreerJeuneMiloCommandHandler extends CommandHandler<
   CreerJeuneMiloCommand,
-  Result<{ id: string }>
+  { id: string }
 > {
   constructor(
     private idService: IdService,
@@ -87,5 +87,9 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
       throw new Unauthorized('CreerJeuneMilo')
     }
     await this.conseillerAuthorizer.authorize(command.idConseiller, utilisateur)
+  }
+
+  async monitor(): Promise<void> {
+    return
   }
 }

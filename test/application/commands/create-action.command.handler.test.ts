@@ -1,5 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
+import { EvenementService } from 'src/domain/evenement'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import {
@@ -28,6 +29,7 @@ describe('CreateActionCommandHandler', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let createActionCommandHandler: CreateActionCommandHandler
+  let evenementService: StubbedClass<EvenementService>
 
   beforeEach(async () => {
     action = uneAction()
@@ -41,6 +43,7 @@ describe('CreateActionCommandHandler', () => {
     actionFactory = stubClass(Action.Factory)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
+    evenementService = stubClass(EvenementService)
 
     createActionCommandHandler = new CreateActionCommandHandler(
       actionRepository,
@@ -48,11 +51,12 @@ describe('CreateActionCommandHandler', () => {
       notificationRepository,
       actionFactory,
       jeuneAuthorizer,
-      conseillerAuthorizer
+      conseillerAuthorizer,
+      evenementService
     )
   })
   describe('handle', () => {
-    it('créée une action', async () => {
+    it('crée une action', async () => {
       // Given
       actionFactory.buildAction.returns(success(action))
       const command: CreateActionCommand = {

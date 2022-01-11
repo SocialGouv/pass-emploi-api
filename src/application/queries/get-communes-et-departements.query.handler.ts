@@ -48,6 +48,10 @@ export class GetCommunesEtDepartementsQueryHandler extends QueryHandler<
     return
   }
 
+  async monitor(): Promise<void> {
+    return
+  }
+
   private async findDepartements(
     recherche: string
   ): Promise<CommunesEtDepartementsQueryModel[]> {

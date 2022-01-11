@@ -41,4 +41,8 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
       await this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
     }
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }

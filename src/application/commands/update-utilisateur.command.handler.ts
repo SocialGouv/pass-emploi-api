@@ -28,7 +28,7 @@ export interface UpdateUtilisateurCommand extends Command {
 @Injectable()
 export class UpdateUtilisateurCommandHandler extends CommandHandler<
   UpdateUtilisateurCommand,
-  Result<UtilisateurQueryModel>
+  UtilisateurQueryModel
 > {
   constructor(
     @Inject(AuthentificationRepositoryToken)
@@ -93,6 +93,10 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _command: UpdateUtilisateurCommand
   ): Promise<void> {
+    return
+  }
+
+  async monitor(): Promise<void> {
     return
   }
 }

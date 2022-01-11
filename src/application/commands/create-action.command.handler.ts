@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
@@ -30,10 +31,8 @@ export interface CreateActionCommand extends Command {
 @Injectable()
 export class CreateActionCommandHandler extends CommandHandler<
   CreateActionCommand,
-  Result<string>
+  string
 > {
-  private logger
-
   constructor(
     @Inject(ActionsRepositoryToken)
     private readonly actionRepository: Action.Repository,
@@ -43,7 +42,8 @@ export class CreateActionCommandHandler extends CommandHandler<
     private readonly notificationRepository: Notification.Repository,
     private readonly actionFactory: Action.Factory,
     private readonly jeuneAuthorizer: JeuneAuthorizer,
-    private readonly conseillerAuthorizer: ConseillerAuthorizer
+    private readonly conseillerAuthorizer: ConseillerAuthorizer,
+    private evenementService: EvenementService
   ) {
     super()
     this.logger = new Logger('CreateActionCommandHandler')
@@ -84,6 +84,13 @@ export class CreateActionCommandHandler extends CommandHandler<
         command.idJeune
       )
     }
+  }
+
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creerEvenement(
+      Evenement.Type.ACTION_CREEE,
+      utilisateur
+    )
   }
 
   private buildAction(command: CreateActionCommand): Result<Action> {

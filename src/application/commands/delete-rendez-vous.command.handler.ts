@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
@@ -22,19 +23,20 @@ export interface DeleteRendezVousCommand extends Command {
 @Injectable()
 export class DeleteRendezVousCommandHandler extends CommandHandler<
   DeleteRendezVousCommand,
-  Result
+  void
 > {
   constructor(
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,
-    private rendezVousAuthorizer: RendezVousAuthorizer
+    private rendezVousAuthorizer: RendezVousAuthorizer,
+    private evenementService: EvenementService
   ) {
     super()
   }
 
-  async handle(command: DeleteRendezVousCommand): Promise<Result> {
+  async handle(command: DeleteRendezVousCommand): Promise<Result<void>> {
     const rendezVous = await this.rendezVousRepository.get(command.idRendezVous)
     if (!rendezVous) {
       return failure(new NonTrouveError('Rendez-Vous', command.idRendezVous))
@@ -55,5 +57,12 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     await this.rendezVousAuthorizer.authorize(command.idRendezVous, utilisateur)
+  }
+
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creerEvenement(
+      Evenement.Type.RDV_SUPPRIME,
+      utilisateur
+    )
   }
 }

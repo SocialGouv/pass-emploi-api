@@ -25,6 +25,7 @@ import {
   CreateRendezVousCommandHandler
 } from '../../../src/application/commands/create-rendez-vous.command.handler'
 import { IdService } from '../../../src/utils/id-service'
+import { EvenementService } from 'src/domain/evenement'
 
 describe('CreateRendezVousCommandHandler', () => {
   DatabaseForTesting.prepare()
@@ -35,6 +36,7 @@ describe('CreateRendezVousCommandHandler', () => {
   const conseillerAuthorizer = stubClass(ConseillerAuthorizer)
   let idService: StubbedClass<IdService>
   let createRendezVousCommandHandler: CreateRendezVousCommandHandler
+  let evenementService: StubbedClass<EvenementService>
   const jeune = unJeune()
   const rendezVous = unRendezVous(jeune)
 
@@ -45,6 +47,7 @@ describe('CreateRendezVousCommandHandler', () => {
     jeuneRepository = stubInterface(sandbox)
     planificateurService = stubClass(PlanificateurService)
     idService = stubInterface(sandbox)
+    evenementService = stubClass(EvenementService)
 
     createRendezVousCommandHandler = new CreateRendezVousCommandHandler(
       idService,
@@ -52,7 +55,8 @@ describe('CreateRendezVousCommandHandler', () => {
       jeuneRepository,
       notificationRepository,
       conseillerAuthorizer,
-      planificateurService
+      planificateurService,
+      evenementService
     )
   })
 

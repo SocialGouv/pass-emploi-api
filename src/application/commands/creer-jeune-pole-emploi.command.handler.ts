@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { NotFound, Unauthorized } from 'src/domain/erreur'
+import { Unauthorized } from 'src/domain/erreur'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { EmailExisteDejaError } from '../../building-blocks/types/domain-error'
@@ -12,6 +12,7 @@ import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 
 export interface CreateJeuneCommand extends Command {
   idConseiller: string
@@ -23,7 +24,7 @@ export interface CreateJeuneCommand extends Command {
 @Injectable()
 export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
   CreateJeuneCommand,
-  Result<Jeune>
+  Jeune
 > {
   constructor(
     @Inject(JeunesRepositoryToken)
@@ -42,7 +43,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
   async handle(command: CreateJeuneCommand): Promise<Result<Jeune>> {
     const conseiller = await this.conseillerRepository.get(command.idConseiller)
     if (!conseiller) {
-      throw new NotFound(command.idConseiller, 'Conseiller')
+      return failure(new NonTrouveError('Conseiller', command.idConseiller))
     }
     const jeune = await this.jeuneRepository.getByEmail(command.email)
     if (jeune) {
@@ -79,5 +80,9 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
       throw new Unauthorized('CreerJeunePE')
     }
     await this.conseillerAuthorizer.authorize(command.idConseiller, utilisateur)
+  }
+
+  async monitor(): Promise<void> {
+    return
   }
 }

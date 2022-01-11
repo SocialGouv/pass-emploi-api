@@ -19,6 +19,7 @@ import {
 } from '../../building-blocks/types/domain-error'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 
 export interface AddFavoriOffreEmploiCommand extends Command {
   idJeune: string
@@ -28,19 +29,20 @@ export interface AddFavoriOffreEmploiCommand extends Command {
 @Injectable()
 export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
   AddFavoriOffreEmploiCommand,
-  Result
+  void
 > {
   constructor(
     @Inject(OffresEmploiRepositoryToken)
     private offresEmploiRepository: OffresEmploi.Repository,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
-    private jeuneAuthorizer: JeuneAuthorizer
+    private jeuneAuthorizer: JeuneAuthorizer,
+    private evenementService: EvenementService
   ) {
     super()
   }
 
-  async handle(command: AddFavoriOffreEmploiCommand): Promise<Result> {
+  async handle(command: AddFavoriOffreEmploiCommand): Promise<Result<void>> {
     const jeune = await this.jeuneRepository.get(command.idJeune)
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', command.idJeune))
@@ -69,5 +71,12 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     await this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
+  }
+
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creerEvenement(
+      Evenement.Type.OFFRE_EMPLOI_SAUVEGARDEE,
+      utilisateur
+    )
   }
 }

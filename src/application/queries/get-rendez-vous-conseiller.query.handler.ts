@@ -36,4 +36,8 @@ export class GetAllRendezVousConseillerQueryHandler extends QueryHandler<
   ): Promise<void> {
     await this.conseillerAuthorizer.authorize(query.idConseiller, utilisateur)
   }
+
+  async monitor(): Promise<void> {
+    return
+  }
 }

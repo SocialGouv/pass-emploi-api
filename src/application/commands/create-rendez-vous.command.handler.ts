@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
@@ -29,10 +30,8 @@ export interface CreateRendezVousCommand extends Command {
 @Injectable()
 export class CreateRendezVousCommandHandler extends CommandHandler<
   CreateRendezVousCommand,
-  Result<string>
+  string
 > {
-  private logger: Logger
-
   constructor(
     private idService: IdService,
     @Inject(RendezVousRepositoryToken)
@@ -41,7 +40,8 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer,
-    private planificateurService: PlanificateurService
+    private planificateurService: PlanificateurService,
+    private evenementService: EvenementService
   ) {
     super()
     this.logger = new Logger('CreateRendezVousCommandHandler')
@@ -95,6 +95,13 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       command.idConseiller,
       utilisateur,
       command.idJeune
+    )
+  }
+
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creerEvenement(
+      Evenement.Type.RDV_CREE,
+      utilisateur
     )
   }
 }

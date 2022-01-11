@@ -26,10 +26,8 @@ export interface SendNotificationNouveauMessageCommand extends Command {
 @Injectable()
 export class SendNotificationNouveauMessageCommandHandler extends CommandHandler<
   SendNotificationNouveauMessageCommand,
-  Result
+  void
 > {
-  private logger
-
   constructor(
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
@@ -43,7 +41,7 @@ export class SendNotificationNouveauMessageCommandHandler extends CommandHandler
 
   async handle(
     command: SendNotificationNouveauMessageCommand
-  ): Promise<Result> {
+  ): Promise<Result<void>> {
     const jeune = await this.jeuneRepository.get(command.idJeune)
 
     if (!jeune) {
@@ -75,5 +73,9 @@ export class SendNotificationNouveauMessageCommandHandler extends CommandHandler
       utilisateur,
       command.idJeune
     )
+  }
+
+  async monitor(): Promise<void> {
+    return
   }
 }

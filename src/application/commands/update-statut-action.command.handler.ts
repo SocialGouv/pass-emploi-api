@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
@@ -21,17 +22,18 @@ export interface UpdateStatutActionCommand extends Command {
 @Injectable()
 export class UpdateStatutActionCommandHandler extends CommandHandler<
   UpdateStatutActionCommand,
-  Result
+  void
 > {
   constructor(
     @Inject(ActionsRepositoryToken)
     private readonly actionRepository: Action.Repository,
-    private actionAuthorizer: ActionAuthorizer
+    private actionAuthorizer: ActionAuthorizer,
+    private evenementService: EvenementService
   ) {
     super()
   }
 
-  async handle(command: UpdateStatutActionCommand): Promise<Result> {
+  async handle(command: UpdateStatutActionCommand): Promise<Result<void>> {
     const action = await this.actionRepository.get(command.idAction)
     if (!action) {
       return failure(new NonTrouveError('Action', command.idAction))
@@ -52,5 +54,12 @@ export class UpdateStatutActionCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     await this.actionAuthorizer.authorize(command.idAction, utilisateur)
+  }
+
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creerEvenement(
+      Evenement.Type.ACTION_MODIFIEE,
+      utilisateur
+    )
   }
 }
