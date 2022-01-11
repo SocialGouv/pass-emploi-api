@@ -74,7 +74,7 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    this.evenementService.creerEvenement(
+    await this.evenementService.creerEvenement(
       Evenement.Type.OFFRE_EMPLOI_SAUVEGARDEE,
       utilisateur
     )
