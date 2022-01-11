@@ -68,7 +68,7 @@ describe('CreateJeuneCommandHandler', () => {
         email: command.email,
         creationDate: date,
         conseiller: conseiller,
-        structure: Core.Structure.PASS_EMPLOI
+        structure: Core.Structure.POLE_EMPLOI
       }
       expect(result).to.deep.equal(success(expectedJeune))
       expect(chatRepository.initializeChatIfNotExists).to.have.been.calledWith(
