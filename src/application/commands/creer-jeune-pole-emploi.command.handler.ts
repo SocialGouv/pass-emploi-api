@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { NotFound, Unauthorized } from 'src/domain/erreur'
+import { Unauthorized } from 'src/domain/erreur'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { EmailExisteDejaError } from '../../building-blocks/types/domain-error'
