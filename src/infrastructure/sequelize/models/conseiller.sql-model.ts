@@ -29,9 +29,6 @@ export class ConseillerDto extends Model {
 
   @Column({ field: 'id_authentification', type: DataType.STRING })
   idAuthentification: string
-
-  @Column({ field: 'date_evenement_engagement', type: DataType.DATE })
-  dateEvenementEngagement: Date | null
 }
 
 @Table({ timestamps: false, tableName: 'conseiller' })
