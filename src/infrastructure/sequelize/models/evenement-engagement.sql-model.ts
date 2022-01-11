@@ -10,10 +10,9 @@ import { Authentification } from 'src/domain/authentification'
 
 export class EvenementEngagementDto extends Model {
   @PrimaryKey
-  // TODO autoincrement not working
   @AutoIncrement
-  @Column({ field: 'id', type: DataType.STRING })
-  id: number
+  @Column({ field: 'id', type: DataType.INTEGER })
+  id?: number
 
   @Column({ field: 'categorie', type: DataType.STRING })
   categorie: string | null

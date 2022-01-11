@@ -143,7 +143,7 @@ export class EvenementService {
     const evenement: { categorie: string; action: string; nom?: string } =
       evenements[typeEvenement]
 
-    this.evenementRepository.sendEvenement(
+    await this.evenementRepository.sendEvenement(
       utilisateur,
       evenement.categorie,
       evenement.action,

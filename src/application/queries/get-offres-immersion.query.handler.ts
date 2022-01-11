@@ -46,7 +46,7 @@ export class GetOffresImmersionQueryHandler extends QueryHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    this.evenementService.creerEvenement(
+    await this.evenementService.creerEvenement(
       Evenement.Type.OFFRE_IMMERSION_RECHERCHEE,
       utilisateur
     )

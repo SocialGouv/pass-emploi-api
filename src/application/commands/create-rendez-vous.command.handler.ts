@@ -99,6 +99,9 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    this.evenementService.creerEvenement(Evenement.Type.RDV_CREE, utilisateur)
+    await this.evenementService.creerEvenement(
+      Evenement.Type.RDV_CREE,
+      utilisateur
+    )
   }
 }
