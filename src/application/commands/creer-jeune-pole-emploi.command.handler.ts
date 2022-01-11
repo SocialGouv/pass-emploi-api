@@ -57,7 +57,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
       email: command.email,
       creationDate: this.dateService.now(),
       conseiller,
-      structure: Core.Structure.PASS_EMPLOI
+      structure: Core.Structure.POLE_EMPLOI
     }
     await this.jeuneRepository.save(nouveauJeune)
     await this.chatRepository.initializeChatIfNotExists(
