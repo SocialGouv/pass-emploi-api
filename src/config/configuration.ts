@@ -2,6 +2,14 @@
 import { parse } from 'pg-connection-string'
 
 export default () => {
+  const scalingoApp = process.env.APP
+  let baseUrl = ''
+  if (scalingoApp && scalingoApp.startsWith('pa-back-staging-pr')) {
+    baseUrl = `https://${scalingoApp}.osc-fr1.scalingo.io`
+  } else {
+    baseUrl = process.env.BASE_URL || 'http://localhost:5000'
+  }
+
   const databaseUrl =
     process.env.DATABASE_URL ||
     'postgresql://passemploi:passemploi@localhost:55432/passemploidb'
@@ -25,7 +33,7 @@ export default () => {
     debug: process.env.DEBUG,
     logLevel: process.env.LOG_LEVEL,
     nodeEnv: process.env.NODE_ENV || 'production',
-    baseUrl: process.env.BASE_URL || 'http://localhost:5000',
+    baseUrl,
     poleEmploi: {
       url:
         process.env.POLE_EMPLOI_API_BASE_URL ??
