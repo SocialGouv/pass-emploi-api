@@ -31,7 +31,7 @@ describe('OffresImmersionHttpRepository', () => {
             lat: 48.502103949334845,
             lon: 2.13082255225161
           },
-          distance_km: 100
+          distance_km: 30
         }
 
         const response: AxiosResponse = {
@@ -86,7 +86,7 @@ describe('OffresImmersionHttpRepository', () => {
             lat: 48.502103949334845,
             lon: 2.13082255225161
           },
-          distance_km: 10
+          distance_km: 30
         }
 
         const badResponse: AxiosResponse = {
