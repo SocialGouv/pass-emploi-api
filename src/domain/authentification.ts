@@ -27,8 +27,8 @@ export namespace Authentification {
       structure: Core.Structure,
       type: Authentification.Type
     ): Promise<Utilisateur | undefined>
-    getJeuneMiloByEmail(email: string): Promise<Utilisateur | undefined>
-    updateJeuneMilo(idJeune: string, idUtilisateurAuth: string): Promise<void>
+    getJeuneByEmail(email: string): Promise<Utilisateur | undefined>
+    updateJeune(idJeune: string, idUtilisateurAuth: string): Promise<void>
     save(utilisateur: Utilisateur, idUtilisateurAuth: string): Promise<void>
   }
 

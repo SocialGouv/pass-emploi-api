@@ -12,6 +12,15 @@ export class NonTrouveError implements DomainError {
     this.message = `${entityType} ${id} non trouvé(e)`
   }
 }
+export class NonTraitableError implements DomainError {
+  static CODE = 'NON_TRAITABLE'
+  readonly code: string = NonTraitableError.CODE
+  readonly message: string
+
+  constructor(entityType: string, id: string) {
+    this.message = `${entityType} ${id} non traitable`
+  }
+}
 
 export class FavoriNonTrouveError implements DomainError {
   static CODE = 'FAVORI_NON_TROUVE'

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { Op } from 'sequelize'
 import { Authentification } from 'src/domain/authentification'
 import { Core } from '../../domain/core'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
@@ -45,13 +46,15 @@ export class AuthentificationSqlRepository
     return undefined
   }
 
-  async getJeuneMiloByEmail(
+  async getJeuneByEmail(
     email: string
   ): Promise<Authentification.Utilisateur | undefined> {
     const jeuneSqlModel = await JeuneSqlModel.findOne({
       where: {
         email: email,
-        structure: Core.Structure.MILO
+        structure: {
+          [Op.or]: [Core.Structure.MILO, Core.Structure.POLE_EMPLOI]
+        }
       }
     })
 
@@ -62,10 +65,7 @@ export class AuthentificationSqlRepository
     return undefined
   }
 
-  async updateJeuneMilo(
-    idJeune: string,
-    idUtilisateurAuth: string
-  ): Promise<void> {
+  async updateJeune(idJeune: string, idUtilisateurAuth: string): Promise<void> {
     await JeuneSqlModel.update(
       { idAuthentification: idUtilisateurAuth },
       { where: { id: idJeune } }

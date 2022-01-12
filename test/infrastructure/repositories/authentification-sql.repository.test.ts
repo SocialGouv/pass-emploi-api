@@ -87,7 +87,7 @@ describe('AuthentificationSqlRepository', () => {
     })
   })
 
-  describe('getJeuneMiloByEmail', () => {
+  describe('getJeuneByEmail', () => {
     beforeEach(async () => {
       // Given
       await ConseillerSqlModel.creer(
@@ -107,10 +107,9 @@ describe('AuthentificationSqlRepository', () => {
     describe("quand c'est un jeune connu par son email", () => {
       it("retourne l'utilisateur quand il existe", async () => {
         // When
-        const utilisateur =
-          await authentificationSqlRepository.getJeuneMiloByEmail(
-            'john.doe@plop.io'
-          )
+        const utilisateur = await authentificationSqlRepository.getJeuneByEmail(
+          'john.doe@plop.io'
+        )
 
         // Then
         expect(utilisateur).to.deep.equal(unUtilisateurJeune())
@@ -118,10 +117,9 @@ describe('AuthentificationSqlRepository', () => {
 
       it("retourne undefined quand il n'existe pas", async () => {
         // When
-        const utilisateur =
-          await authentificationSqlRepository.getJeuneMiloByEmail(
-            'email@passemploi.com'
-          )
+        const utilisateur = await authentificationSqlRepository.getJeuneByEmail(
+          'email@passemploi.com'
+        )
 
         // Then
         expect(utilisateur).to.deep.equal(undefined)
@@ -129,7 +127,7 @@ describe('AuthentificationSqlRepository', () => {
     })
   })
 
-  describe('updateJeuneMilo', () => {
+  describe('updateJeune', () => {
     beforeEach(async () => {
       // Given
       await ConseillerSqlModel.creer(
@@ -148,7 +146,7 @@ describe('AuthentificationSqlRepository', () => {
     })
     it("met à jour l'utilisateur", async () => {
       // When
-      await authentificationSqlRepository.updateJeuneMilo(
+      await authentificationSqlRepository.updateJeune(
         'id-jeune',
         'id-authentification-jeune'
       )

@@ -1,7 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import {
+  NonTraitableError,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
 import {
   failure,
   isFailure,
@@ -73,20 +76,23 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       )
       return conseillerSso
     } else if (command.type === Authentification.Type.JEUNE && command.email) {
-      const jeuneMilo =
-        await this.authentificationRepository.getJeuneMiloByEmail(command.email)
+      const jeune = await this.authentificationRepository.getJeuneByEmail(
+        command.email
+      )
 
-      if (jeuneMilo) {
-        await this.authentificationRepository.updateJeuneMilo(
-          jeuneMilo.id,
+      if (jeune) {
+        await this.authentificationRepository.updateJeune(
+          jeune.id,
           command.idUtilisateurAuth
         )
 
-        return success(jeuneMilo)
+        return success(jeune)
       }
     }
 
-    return failure(new NonTrouveError('Utilisateur', command.idUtilisateurAuth))
+    return failure(
+      new NonTraitableError('Utilisateur', command.idUtilisateurAuth)
+    )
   }
 
   async authorize(
