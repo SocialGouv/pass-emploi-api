@@ -80,6 +80,17 @@ export class FirebaseClient implements IFirebaseClient {
     }
   }
 
+  async getNombreDeConversationsNonLues(conseillerId: string): Promise<number> {
+    const collectionPath = 'chat'
+    const chat = await this.firestore
+      .collection(collectionPath)
+      .where('conseillerId', '==', conseillerId)
+      .where('seenByConseiller', '==', false)
+      .get()
+
+    return chat.size
+  }
+
   async getToken(utilisateur: Authentification.Utilisateur): Promise<string> {
     const customClaims = {
       jeuneId: utilisateur.type === Type.JEUNE ? utilisateur.id : null,

@@ -32,4 +32,10 @@ export class ChatFirebaseRepository implements Chat.Repository {
         }
       : undefined
   }
+
+  async getNombreDeConversationsNonLues(conseillerId: string): Promise<number> {
+    return await this.firebaseClient.getNombreDeConversationsNonLues(
+      conseillerId
+    )
+  }
 }

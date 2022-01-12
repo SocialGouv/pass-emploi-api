@@ -46,29 +46,23 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
     if (!rendezVousSql || rendezVousSql.dateSuppression) {
       return undefined
     }
-    return {
-      id: rendezVousSql.id,
-      titre: rendezVousSql.titre,
-      sousTitre: rendezVousSql.sousTitre,
-      modalite: rendezVousSql.modalite,
-      duree: rendezVousSql.duree,
-      date: rendezVousSql.date,
-      commentaire: rendezVousSql.commentaire ?? undefined,
-      jeune: {
-        id: rendezVousSql.jeune.id,
-        firstName: rendezVousSql.jeune.prenom,
-        lastName: rendezVousSql.jeune.nom,
-        creationDate: DateTime.fromJSDate(rendezVousSql.jeune.dateCreation),
-        pushNotificationToken:
-          rendezVousSql.jeune.pushNotificationToken ?? undefined,
-        conseiller: {
-          id: rendezVousSql.conseiller.id,
-          firstName: rendezVousSql.conseiller.prenom,
-          lastName: rendezVousSql.conseiller.nom
+    return toRendezVous(rendezVousSql)
+  }
+
+  async getAllAVenir(): Promise<RendezVous[]> {
+    const maintenant = this.dateService.nowJs()
+    const rendezVousSql = await RendezVousSqlModel.findAll({
+      include: [JeuneSqlModel, ConseillerSqlModel],
+      where: {
+        date: {
+          [Op.gte]: maintenant
         },
-        structure: rendezVousSql.jeune.structure
+        dateSuppression: {
+          [Op.is]: null
+        }
       }
-    }
+    })
+    return rendezVousSql.map(toRendezVous)
   }
 
   async getAllQueryModelsByConseiller(
@@ -125,5 +119,31 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
     })
 
     return allRendezVousSql.map(fromSqlToRendezVousJeuneQueryModel)
+  }
+}
+
+function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
+  return {
+    id: rendezVousSql.id,
+    titre: rendezVousSql.titre,
+    sousTitre: rendezVousSql.sousTitre,
+    modalite: rendezVousSql.modalite,
+    duree: rendezVousSql.duree,
+    date: rendezVousSql.date,
+    commentaire: rendezVousSql.commentaire ?? undefined,
+    jeune: {
+      id: rendezVousSql.jeune.id,
+      firstName: rendezVousSql.jeune.prenom,
+      lastName: rendezVousSql.jeune.nom,
+      creationDate: DateTime.fromJSDate(rendezVousSql.jeune.dateCreation),
+      pushNotificationToken:
+        rendezVousSql.jeune.pushNotificationToken ?? undefined,
+      conseiller: {
+        id: rendezVousSql.conseiller.id,
+        firstName: rendezVousSql.conseiller.prenom,
+        lastName: rendezVousSql.conseiller.nom
+      },
+      structure: rendezVousSql.jeune.structure
+    }
   }
 }

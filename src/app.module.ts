@@ -67,7 +67,7 @@ import { ImmersionClient } from './infrastructure/clients/immersion-client'
 import { ActionSqlRepository } from './infrastructure/repositories/action-sql.repository'
 import { AuthentificationSqlRepository } from './infrastructure/repositories/authentification-sql.repository'
 import { ChatFirebaseRepository } from './infrastructure/repositories/chat-firebase.repository'
-import { ConseillerSqlRepository } from './infrastructure/repositories/conseiller-sql.repository'
+import { ConseillerSqlEmailRepository } from './infrastructure/repositories/conseiller-sql-email-repository.service'
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune-sql.repository'
 import { MiloHttpRepository } from './infrastructure/repositories/milo-http.repository'
 import { MiloInMemoryRepository } from './infrastructure/repositories/milo-in-memory.repository'
@@ -95,6 +95,10 @@ import { CreateEvenementCommandHandler } from './application/commands/create-eve
 import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
 import { EvenementService, EvenementsRepositoryToken } from './domain/evenement'
 import { EvenementHttpSqlRepository } from './infrastructure/repositories/evenement-http-sql.repository'
+import { HandleJobMailConseillerCommandHandler } from './application/commands/handle-job-mail-conseiller.command'
+import { MailSendinblueClient } from './infrastructure/repositories/mail-sendinblue.client'
+import { JobsController } from './infrastructure/routes/jobs.controller'
+import { SynchronizeJobsCommandHandler } from './application/commands/synchronize-jobs.command'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -116,7 +120,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     RendezVousController,
     AuthentificationController,
     ReferentielsController,
-    EvenementsController
+    EvenementsController,
+    JobsController
   ],
   providers: [
     ...buildQueryCommandsProviders(),
@@ -131,6 +136,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Action.Factory,
     Authentification.Factory,
     WorkerService,
+    MailSendinblueClient,
     {
       provide: APP_GUARD,
       useClass: OidcAuthGuard
@@ -145,7 +151,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: ConseillersRepositoryToken,
-      useClass: ConseillerSqlRepository
+      useClass: ConseillerSqlEmailRepository
     },
     {
       provide: OffresEmploiRepositoryToken,
@@ -232,7 +238,9 @@ export function buildQueryCommandsProviders(): Provider[] {
     EvenementService,
     CreateEvenementCommandHandler,
     GetChatSecretsQueryHandler,
-    HandleJobRendezVousCommandHandler
+    HandleJobRendezVousCommandHandler,
+    HandleJobMailConseillerCommandHandler,
+    SynchronizeJobsCommandHandler
   ]
 }
 

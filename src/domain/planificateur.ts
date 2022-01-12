@@ -7,26 +7,32 @@ export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 
 export namespace Planificateur {
   export interface Repository {
-    createJob(job: Job): Promise<void>
-    subscribe(callback: Handler): Promise<void>
+    createJob<T>(job: Job<T>): Promise<void>
+    subscribe(callback: Handler<unknown>): Promise<void>
+    supprimerTousLesJobs(): Promise<void>
   }
 
   export enum JobType {
-    RENDEZVOUS = 'RENDEZVOUS'
+    RENDEZVOUS = 'RENDEZVOUS',
+    MAIL_CONSEILLER = 'MAIL_CONSEILLER'
   }
 
-  interface JobRendezVous {
+  export interface JobRendezVous {
     idRendezVous: string
   }
 
-  export interface Job {
-    date: Date
-    type: JobType
-    contenu: JobRendezVous
+  export interface JobMailConseiller {
+    idConseiller: string
   }
 
-  export interface Handler {
-    (job: Job): Promise<void>
+  export interface Job<T> {
+    date: Date
+    type: JobType
+    contenu: T
+  }
+
+  export interface Handler<T> {
+    (job: Job<T>): Promise<void>
   }
 }
 
@@ -54,11 +60,25 @@ export class PlanificateurService {
     }
   }
 
+  async planifierJobRappelMail(idConseiller: string): Promise<void> {
+    const job: Planificateur.Job<Planificateur.JobMailConseiller> = {
+      date: this.dateService
+        .now()
+        .toUTC()
+        .set({ hour: 6, minute: 0, second: 0, millisecond: 0 })
+        .plus({ days: 1 })
+        .toJSDate(),
+      type: Planificateur.JobType.MAIL_CONSEILLER,
+      contenu: { idConseiller }
+    }
+    await this.planificateurRepository.createJob(job)
+  }
+
   private async creerJobRendezVous(
     rendezVous: RendezVous,
     days: number
   ): Promise<void> {
-    const job: Planificateur.Job = {
+    const job: Planificateur.Job<Planificateur.JobRendezVous> = {
       date: DateTime.fromJSDate(rendezVous.date)
         .minus({ days: days })
         .toJSDate(),

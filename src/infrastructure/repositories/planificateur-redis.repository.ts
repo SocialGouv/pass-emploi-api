@@ -39,7 +39,7 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     })
   }
 
-  async createJob(job: Planificateur.Job): Promise<void> {
+  async createJob<T>(job: Planificateur.Job<T>): Promise<void> {
     if (this.isReady) {
       const now = this.dateService.now()
       const delay = DateTime.fromJSDate(job.date).diff(now).milliseconds
@@ -49,12 +49,16 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     }
   }
 
-  async subscribe(handle: Planificateur.Handler): Promise<void> {
+  async supprimerTousLesJobs(): Promise<void> {
+    await this.queue.removeJobs('*')
+  }
+
+  async subscribe(handle: Planificateur.Handler<unknown>): Promise<void> {
     this.queue.process(async jobRedis => {
       this.logger.log(
         `Execution du job ${jobRedis.id} de type ${jobRedis.data.type}`
       )
-      const job: Planificateur.Job = {
+      const job: Planificateur.Job<unknown> = {
         date: jobRedis.data.date,
         type: jobRedis.data.type,
         contenu: jobRedis.data.contenu

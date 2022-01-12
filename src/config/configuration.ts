@@ -33,6 +33,7 @@ export default () => {
     debug: process.env.DEBUG,
     logLevel: process.env.LOG_LEVEL,
     nodeEnv: process.env.NODE_ENV || 'production',
+    frontEndUrl:  process.env.FRONTEND_URL || 'http://localhost:3000',
     baseUrl,
     poleEmploi: {
       url:
@@ -73,6 +74,12 @@ export default () => {
       url:
         process.env.MATOMO_API_URL ?? 'https://stats.data.gouv.fr/matomo.php',
       envId: process.env.MATOMO_ENV_ID ?? '209'
+    },
+    sendinblue: {
+      url:
+        process.env.SENDINBLUE_API_URL ?? 'https://api.sendinblue.com/v3/smtp/email',
+      apiKey: process.env.SENDINBLUE_API_KEY ?? '',
+      templateId: process.env.SENDINBLUE_TEMPLATE_ID ?? '2'
     }
   }
 }

@@ -18,7 +18,7 @@ export const uneActionQueryModelFromDomain = (
   lastUpdate: DateTime.fromJSDate(action.dateDerniereActualisation)
     .toUTC()
     .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
-  creator: 'John Doe',
+  creator: 'Nils Tavernier',
   creatorType: Action.TypeCreateur.CONSEILLER
 })
 
