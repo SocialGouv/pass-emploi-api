@@ -10,7 +10,6 @@ import {
 } from '../../building-blocks/types/result'
 import { Action, ActionsRepositoryToken } from '../../domain/action'
 import { Authentification } from '../../domain/authentification'
-import { Unauthorized } from '../../domain/erreur'
 import { ActionAuthorizer } from '../authorizers/authorize-action'
 
 export interface DeleteActionCommand extends Command {
@@ -46,9 +45,6 @@ export class DeleteActionCommandHandler extends CommandHandler<
     command: DeleteActionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    if (utilisateur.type !== Authentification.Type.JEUNE) {
-      throw new Unauthorized('Action')
-    }
     await this.actionAuthorizer.authorize(command.idAction, utilisateur)
   }
 
