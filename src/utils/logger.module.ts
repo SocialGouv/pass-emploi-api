@@ -4,7 +4,7 @@ import { LoggerModule } from 'nestjs-pino'
 import { MixinFn } from 'pino'
 import { ReqId } from 'pino-http'
 import * as uuid from 'uuid'
-import { getInstance } from '../infrastructure/monitoring/apm.init'
+import { getAPMInstance } from '../infrastructure/monitoring/apm.init'
 
 export const configureLoggerModule = (): DynamicModule =>
   LoggerModule.forRoot({
@@ -19,7 +19,7 @@ export const configureLoggerModule = (): DynamicModule =>
           'req.headers["x-api-key"]'
         ],
         mixin: (): (() => MixinFn) => {
-          const currentTraceIds = getInstance().currentTraceIds
+          const currentTraceIds = getAPMInstance().currentTraceIds
           /* eslint-disable @typescript-eslint/ban-ts-comment */
           // @ts-ignore
           return !Object.keys(currentTraceIds).length ? {} : { currentTraceIds }

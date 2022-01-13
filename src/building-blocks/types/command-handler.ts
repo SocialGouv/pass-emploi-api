@@ -2,6 +2,8 @@ import { Logger } from '@nestjs/common'
 import { Authentification } from '../../domain/authentification'
 import { LogEvent, LogEventKey } from './log.event'
 import { failure, isSuccess, Result } from './result'
+import { getAPMInstance } from '../../infrastructure/monitoring/apm.init'
+import * as APM from 'elastic-apm-node'
 
 /**
  * Implémente la logique nécessaire à la réalisation de la commande envoyée au système.
@@ -11,11 +13,13 @@ import { failure, isSuccess, Result } from './result'
  */
 export abstract class CommandHandler<C, T> {
   protected logger: Logger
+  protected apmService: APM.Agent
   private commandName: string
 
   constructor(commandName: string) {
     this.commandName = commandName
     this.logger = new Logger(commandName)
+    this.apmService = getAPMInstance()
   }
 
   async execute(
@@ -29,6 +33,7 @@ export abstract class CommandHandler<C, T> {
 
       if (isSuccess(result)) {
         this.monitor(utilisateur, command).catch(error => {
+          this.apmService.captureError(error)
           this.logger.error(error)
         })
       }

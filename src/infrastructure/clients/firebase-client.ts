@@ -4,6 +4,8 @@ import admin from 'firebase-admin'
 import { getMessaging, TokenMessage } from 'firebase-admin/messaging'
 import { Authentification } from '../../domain/authentification'
 import Type = Authentification.Type
+import { getAPMInstance } from '../monitoring/apm.init'
+import * as APM from 'elastic-apm-node'
 
 export interface IFirebaseClient {
   send(tokenMessage: TokenMessage): Promise<void>
@@ -23,6 +25,7 @@ export class FirebaseClient implements IFirebaseClient {
   private readonly app: admin.app.App
   private firestore: FirebaseFirestore.Firestore
   private logger: Logger
+  private apmService: APM.Agent
 
   constructor(private configService: ConfigService) {
     const firebase = this.configService.get('firebase.key')
@@ -37,6 +40,7 @@ export class FirebaseClient implements IFirebaseClient {
     this.messaging = getMessaging(this.app)
     this.firestore = admin.firestore(this.app)
     this.auth = admin.auth(this.app)
+    this.apmService = getAPMInstance()
   }
 
   private static getApp(firebase: string): admin.app.App {
@@ -49,9 +53,10 @@ export class FirebaseClient implements IFirebaseClient {
     try {
       await this.messaging.send(tokenMessage)
     } catch (e) {
-      this.logger.warn(
+      this.logger.error(
         `Impossible d'envoyer de notification sur le token ${tokenMessage.token}`
       )
+      this.apmService.captureError(e)
     }
   }
 

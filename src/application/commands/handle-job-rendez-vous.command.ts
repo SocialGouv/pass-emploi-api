@@ -30,7 +30,7 @@ export class HandleJobRendezVousCommandHandler extends CommandHandler<
     super('HandleJobRendezVousCommandHandler')
   }
 
-  async handle(command: HandleJobRendezVousCommand): Promise<Result<void>> {
+  async handle(command: HandleJobRendezVousCommand): Promise<Result> {
     const rendezVous = await this.rendezVousRepository.get(
       command.job.contenu.idRendezVous
     )

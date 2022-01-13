@@ -21,10 +21,13 @@ export const initializeAPMAgent = (): void => {
   instance = APM.start(config)
 }
 
-export const getInstance = (): APM.Agent => {
+export const setAPMInstance = (stubInstance: APM.Agent): void => {
+  instance = stubInstance
+}
+
+export const getAPMInstance = (): APM.Agent => {
   if (!instance) {
     throw new Error('APM Agent is not initialized (run initializeAPMAgent) ')
   }
-
   return instance
 }

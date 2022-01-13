@@ -3,6 +3,8 @@ import { Authentification } from 'src/domain/authentification'
 import { LogEvent, LogEventKey } from './log.event'
 import { Query } from './query'
 import { emptySuccess, failure, Result } from './result'
+import { getAPMInstance } from '../../infrastructure/monitoring/apm.init'
+import * as APM from 'elastic-apm-node'
 
 /**
  * Implémente la logique liée à la query envoyée au système.
@@ -13,10 +15,12 @@ import { emptySuccess, failure, Result } from './result'
 export abstract class QueryHandler<Q extends Query | void, QM> {
   protected logger: Logger
   private queryName: string
+  private apmService: APM.Agent
 
   constructor(queryName: string) {
     this.logger = new Logger(queryName)
     this.queryName = queryName
+    this.apmService = getAPMInstance()
   }
 
   async execute(
@@ -29,6 +33,7 @@ export abstract class QueryHandler<Q extends Query | void, QM> {
       const result = await this.handle(query)
       if (result) {
         this.monitor(utilisateur, query).catch(error => {
+          this.apmService.captureError(error)
           this.logger.error(error)
         })
       }

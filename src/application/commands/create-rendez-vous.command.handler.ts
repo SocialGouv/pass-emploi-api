@@ -77,10 +77,11 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     try {
       await this.planificateurService.planifierRappelsRendezVous(rendezVous)
     } catch (e) {
-      this.logger.warn(
+      this.logger.error(
         `La planification des notifications du rendez-vous ${rendezVous.id} a échoué`,
         e
       )
+      this.apmService.captureError(e)
     }
 
     return success(rendezVous.id)
