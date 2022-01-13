@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  UnprocessableEntityException,
   UseGuards
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
@@ -23,7 +24,8 @@ import {
 } from '../../application/queries/query-models/authentification.query-models'
 import {
   NonTrouveError,
-  ConseillerNonValide
+  ConseillerNonValide,
+  NonTraitableError
 } from '../../building-blocks/types/domain-error'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
@@ -64,6 +66,9 @@ export class AuthentificationController {
     if (isFailure(result)) {
       if (result.error.code === NonTrouveError.CODE) {
         throw new NotFoundException(result.error)
+      }
+      if (result.error.code === NonTraitableError.CODE) {
+        throw new UnprocessableEntityException(result.error)
       }
       if (result.error.code === ConseillerNonValide.CODE) {
         throw new BadRequestException(result.error)
