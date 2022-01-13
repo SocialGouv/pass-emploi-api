@@ -49,7 +49,7 @@ export class PlanificateurService {
       await this.creerJobRendezVous(rendezVous, 7)
     }
 
-    if (nombreDeJoursAvantLeRdv > 1) {
+    if (nombreDeJoursAvantLeRdv > 2) {
       await this.creerJobRendezVous(rendezVous, 1)
     }
   }
