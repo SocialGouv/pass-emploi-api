@@ -252,7 +252,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
           range: '0-49',
           motsCles: 'mots clés',
           departement: '75',
-          natureContrat: 'E2',
+          natureContrat: 'E2,FS',
           experience: '2,3',
           dureeHebdo: '1',
           typeContrat: 'CDI,DIN,CCE,FRA,LIB,REP,TTI',

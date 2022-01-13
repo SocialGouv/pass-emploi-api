@@ -50,7 +50,7 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
       params.append('departement', departement)
     }
     if (alternance) {
-      params.append('natureContrat', 'E2')
+      params.append('natureContrat', 'E2,FS')
     }
     if (experience) {
       params.append('experience', buildQueryParamFromArray(experience))
