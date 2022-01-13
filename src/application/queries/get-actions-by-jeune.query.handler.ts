@@ -22,7 +22,7 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
     private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer,
     private jeuneAuthorizer: JeuneAuthorizer
   ) {
-    super()
+    super('GetActionsByJeuneQueryHandler')
   }
 
   async handle(query: GetActionsByJeuneQuery): Promise<ActionQueryModel[]> {

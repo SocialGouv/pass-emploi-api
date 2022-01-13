@@ -20,7 +20,7 @@ export class GetAllRendezVousJeuneQueryHandler extends QueryHandler<
     private rendezVousRepository: RendezVous.Repository,
     private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer
   ) {
-    super()
+    super('GetAllRendezVousJeuneQueryHandler')
   }
 
   async handle(query: GetAllRendezVousJeune): Promise<RendezVousQueryModel[]> {

@@ -21,7 +21,7 @@ export class GetDossierMiloJeuneQueryHandler extends QueryHandler<
     @Inject(MiloRepositoryToken)
     private miloRepository: Milo.Repository
   ) {
-    super()
+    super('GetDossierMiloJeuneQueryHandler')
   }
 
   async handle(

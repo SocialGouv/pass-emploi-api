@@ -39,7 +39,7 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
     private jeuneAuthorizer: JeuneAuthorizer,
     private evenementService: EvenementService
   ) {
-    super()
+    super('AddFavoriOffreEmploiCommandHandler')
   }
 
   async handle(command: AddFavoriOffreEmploiCommand): Promise<Result<void>> {

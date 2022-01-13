@@ -30,7 +30,7 @@ export class UpdateStatutActionCommandHandler extends CommandHandler<
     private actionAuthorizer: ActionAuthorizer,
     private evenementService: EvenementService
   ) {
-    super()
+    super('UpdateStatutActionCommandHandler')
   }
 
   async handle(command: UpdateStatutActionCommand): Promise<Result<void>> {

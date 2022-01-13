@@ -19,7 +19,7 @@ export class GetHomeJeuneHandler extends QueryHandler<
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
     private jeuneAuthorizer: JeuneAuthorizer
   ) {
-    super()
+    super('GetHomeJeuneHandler')
   }
 
   async handle(query: GetHomeJeune): Promise<JeuneHomeQueryModel> {

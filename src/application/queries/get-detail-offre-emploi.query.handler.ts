@@ -23,7 +23,7 @@ export class GetDetailOffreEmploiQueryHandler extends QueryHandler<
     private offresEmploiRepository: OffresEmploi.Repository,
     private evenementService: EvenementService
   ) {
-    super()
+    super('GetDetailOffreEmploiQueryHandler')
   }
 
   async handle(

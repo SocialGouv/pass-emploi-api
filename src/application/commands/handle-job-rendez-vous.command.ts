@@ -27,7 +27,7 @@ export class HandleJobRendezVousCommandHandler extends CommandHandler<
     private notificationRepository: Notification.Repository,
     private dateService: DateService
   ) {
-    super()
+    super('HandleJobRendezVousCommandHandler')
   }
 
   async handle(command: HandleJobRendezVousCommand): Promise<Result<void>> {

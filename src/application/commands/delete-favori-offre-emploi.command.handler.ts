@@ -1,21 +1,21 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
+import {
+  FavoriNonTrouveError,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import {
   OffresEmploi,
   OffresEmploiRepositoryToken
 } from '../../domain/offre-emploi'
-import {
-  FavoriNonTrouveError,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { FavoriAuthorizer } from '../authorizers/authorize-favori'
 
 export interface DeleteFavoriOffreEmploiCommand extends Command {
@@ -35,8 +35,7 @@ export class DeleteFavoriOffreEmploiCommandHandler extends CommandHandler<
     private readonly jeuneRepository: Jeune.Repository,
     private readonly favoriAuthorizer: FavoriAuthorizer
   ) {
-    super()
-    this.logger = new Logger('DeleteFavoriCommandHandler')
+    super('DeleteFavoriCommandHandler')
   }
 
   async handle(command: DeleteFavoriOffreEmploiCommand): Promise<Result<void>> {

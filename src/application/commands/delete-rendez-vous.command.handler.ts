@@ -33,7 +33,7 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     private rendezVousAuthorizer: RendezVousAuthorizer,
     private evenementService: EvenementService
   ) {
-    super()
+    super('DeleteRendezVousCommandHandler')
   }
 
   async handle(command: DeleteRendezVousCommand): Promise<Result<void>> {

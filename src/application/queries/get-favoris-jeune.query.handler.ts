@@ -24,7 +24,7 @@ export class GetFavorisJeuneQueryHandler extends QueryHandler<
     private readonly offresEmploiRepository: OffresEmploi.Repository,
     private jeuneAuthorizer: JeuneAuthorizer
   ) {
-    super()
+    super('GetFavorisJeuneQueryHandler')
   }
 
   handle(query: GetFavorisJeuneQuery): Promise<OffreEmploiResumeQueryModel[]> {

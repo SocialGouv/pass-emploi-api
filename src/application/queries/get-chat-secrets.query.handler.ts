@@ -18,7 +18,7 @@ export class GetChatSecretsQueryHandler extends QueryHandler<
     @Inject(ChatRepositoryToken)
     private chatRepository: Chat.Repository
   ) {
-    super()
+    super('GetChatSecretsQueryHandler')
   }
 
   async handle(

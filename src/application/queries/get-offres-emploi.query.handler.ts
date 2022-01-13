@@ -38,7 +38,7 @@ export class GetOffresEmploiQueryHandler extends QueryHandler<
     private offresEmploiRepository: OffresEmploi.Repository,
     private evenementService: EvenementService
   ) {
-    super()
+    super('GetOffresEmploiQueryHandler')
   }
 
   async handle(query: GetOffresEmploiQuery): Promise<OffresEmploiQueryModel> {

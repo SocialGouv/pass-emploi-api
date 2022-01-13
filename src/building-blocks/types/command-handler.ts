@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common'
 import { Authentification } from '../../domain/authentification'
-import { isSuccess, Result } from './result'
+import { LogEvent, LogEventKey } from './log.event'
+import { failure, isSuccess, Result } from './result'
 
 /**
  * Implémente la logique nécessaire à la réalisation de la commande envoyée au système.
@@ -10,35 +11,59 @@ import { isSuccess, Result } from './result'
  */
 export abstract class CommandHandler<C, T> {
   protected logger: Logger
+  private commandName: string
 
-  constructor() {
-    this.logger = new Logger('CommandHandler')
+  constructor(commandName: string) {
+    this.commandName = commandName
+    this.logger = new Logger(commandName)
   }
 
   async execute(
     command: C,
     utilisateur?: Authentification.Utilisateur
   ): Promise<Result<T>> {
-    await this.authorize(command, utilisateur)
+    try {
+      await this.authorize(command, utilisateur)
 
-    const result = await this.handle(command)
+      const result = await this.handle(command)
 
-    if (isSuccess(result)) {
-      this.monitor(utilisateur, command).catch(error => {
-        this.logger.error(error)
-      })
+      if (isSuccess(result)) {
+        this.monitor(utilisateur, command).catch(error => {
+          this.logger.error(error)
+        })
+      }
+      this.logAfter(command, result, utilisateur)
+
+      return result
+    } catch (e) {
+      this.logAfter(command, failure(e), utilisateur)
+      throw e
     }
-
-    return result
   }
 
   abstract handle(command: C): Promise<Result<T>>
+
   abstract authorize(
     command: C,
     utilisateur?: Authentification.Utilisateur
   ): Promise<void>
+
   abstract monitor(
     utilisateur?: Authentification.Utilisateur,
     command?: C
   ): Promise<void>
+
+  protected logAfter(
+    command: C,
+    result: Result<T>,
+    utilisateur?: Authentification.Utilisateur
+  ): void {
+    const event = new LogEvent(LogEventKey.COMMAND_EVENT, {
+      handler: this.commandName,
+      command,
+      result,
+      utilisateur
+    })
+    this.logger.log(event)
+  }
 }

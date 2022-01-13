@@ -20,7 +20,7 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
     private jeunesRepository: Jeune.Repository,
     private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer
   ) {
-    super()
+    super('GetDetailJeuneQueryHandler')
   }
 
   async handle(
