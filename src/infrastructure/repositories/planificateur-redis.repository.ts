@@ -23,7 +23,11 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
         redis: {
           enableReadyCheck: true,
           retryStrategy: (times: number): number => {
-            this.logger.error('could not connect to redis!' + times.toString())
+            if (times > 1) {
+              this.logger.error(
+                'could not connect to redis!' + times.toString()
+              )
+            }
             this.isReady = true
             return 1000
           }
