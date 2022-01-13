@@ -17,8 +17,9 @@ export namespace Evenement {
     OFFRE_IMMERSION_AFFICHEE = 'OFFRE_IMMERSION_AFFICHEE',
     OFFRE_IMMERSION_RECHERCHEE = 'OFFRE_IMMERSION_RECHERCHEE',
     OFFRE_IMMERSION_SAUVEGARDEE = 'OFFRE_IMMERSION_SAUVEGARDEE',
-    OFFRE_IMMERSION_POSTULEE = 'OFFRE_IMMERSION_POSTULEE',
-    OFFRE_IMMERSION_PARTAGEE = 'OFFRE_IMMERSION_PARTAGEE',
+    OFFRE_IMMERSION_APPEL = 'OFFRE_IMMERSION_APPEL',
+    OFFRE_IMMERSION_ENVOI_EMAIL = 'OFFRE_IMMERSION_APPEL_ENVOI_EMAIL',
+    OFFRE_IMMERSION_LOCALISATION = 'OFFRE_IMMERSION_LOCALISATION',
     OFFRE_ALTERNANCE_AFFICHEE = 'OFFRE_ALTERNANCE_AFFICHEE',
     OFFRE_ALTERNANCE_RECHERCHEE = 'OFFRE_ALTERNANCE_RECHERCHEE',
     OFFRE_ALTERNANCE_SAUVEGARDEE = 'OFFRE_ALTERNANCE_SAUVEGARDEE',
@@ -52,22 +53,22 @@ const evenements = {
   [Evenement.Type.OFFRE_EMPLOI_AFFICHEE]: {
     categorie: 'Offre',
     action: 'Détail',
-    nom: "type d'offre (Emploi)"
+    nom: 'Emploi'
   },
   [Evenement.Type.OFFRE_EMPLOI_RECHERCHEE]: {
     categorie: 'Offre',
     action: 'Recherche',
-    nom: "type d'offre (Emploi)"
+    nom: 'Emploi'
   },
   [Evenement.Type.OFFRE_EMPLOI_SAUVEGARDEE]: {
     categorie: 'Offre',
     action: 'Favori',
-    nom: "type d'offre (Emploi)"
+    nom: 'Emploi'
   },
   [Evenement.Type.OFFRE_EMPLOI_POSTULEE]: {
     categorie: 'Offre',
     action: 'Postuler',
-    nom: "type d'offre (Emploi)"
+    nom: 'Emploi'
   },
   [Evenement.Type.OFFRE_EMPLOI_PARTAGEE]: {
     categorie: 'Offre',
@@ -76,46 +77,52 @@ const evenements = {
   [Evenement.Type.OFFRE_IMMERSION_AFFICHEE]: {
     categorie: 'Offre',
     action: 'Détail',
-    nom: "type d'offre (Immersion)"
+    nom: 'Immersion'
   },
   [Evenement.Type.OFFRE_IMMERSION_RECHERCHEE]: {
     categorie: 'Offre',
     action: 'Recherche',
-    nom: "type d'offre (Immersion)"
+    nom: 'Immersion'
   },
   [Evenement.Type.OFFRE_IMMERSION_SAUVEGARDEE]: {
     categorie: 'Offre',
     action: 'Favori',
-    nom: "type d'offre (Immersion)"
+    nom: 'Immersion'
   },
-  [Evenement.Type.OFFRE_IMMERSION_POSTULEE]: {
+  [Evenement.Type.OFFRE_IMMERSION_APPEL]: {
     categorie: 'Offre',
-    action: 'Postuler',
-    nom: "type d'offre (Immersion)"
+    action: 'Appel',
+    nom: 'Immersion'
   },
-  [Evenement.Type.OFFRE_IMMERSION_PARTAGEE]: {
+  [Evenement.Type.OFFRE_IMMERSION_ENVOI_EMAIL]: {
     categorie: 'Offre',
-    action: 'Partage'
+    action: 'Envoi email',
+    nom: 'Immersion'
+  },
+  [Evenement.Type.OFFRE_IMMERSION_LOCALISATION]: {
+    categorie: 'Offre',
+    action: 'Localiser',
+    nom: 'Immersion'
   },
   [Evenement.Type.OFFRE_ALTERNANCE_AFFICHEE]: {
     categorie: 'Offre',
     action: 'Détail',
-    nom: "type d'offre (Alternance)"
+    nom: 'Alternance'
   },
   [Evenement.Type.OFFRE_ALTERNANCE_RECHERCHEE]: {
     categorie: 'Offre',
     action: 'Recherche',
-    nom: "type d'offre (Alternance)"
+    nom: 'Alternance'
   },
   [Evenement.Type.OFFRE_ALTERNANCE_SAUVEGARDEE]: {
     categorie: 'Offre',
     action: 'Favori',
-    nom: "type d'offre (Alternance)"
+    nom: 'Alternance'
   },
   [Evenement.Type.OFFRE_ALTERNANCE_POSTULEE]: {
     categorie: 'Offre',
     action: 'Postuler',
-    nom: "type d'offre (Alternance)"
+    nom: 'Alternance'
   },
   [Evenement.Type.OFFRE_ALTERNANCE_PARTAGEE]: {
     categorie: 'Offre',

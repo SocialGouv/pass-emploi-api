@@ -27,6 +27,8 @@ import {
   GetDetailOffreImmersionQuery,
   GetDetailOffreImmersionQueryHandler
 } from '../../application/queries/get-detail-offre-immersion.query.handler'
+import { Utilisateur } from '../decorators/authenticated.decorator'
+import { Authentification } from '../../domain/authentification'
 
 @Controller('offres-immersion')
 @ApiOAuth2([])
@@ -43,7 +45,8 @@ export class OffresImmersionController {
     isArray: true
   })
   async getOffresImmersion(
-    @Query() getOffresImmersionQueryParams: GetOffresImmersionQueryParams
+    @Query() getOffresImmersionQueryParams: GetOffresImmersionQueryParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffreImmersionQueryModel[]> {
     const query: GetOffresImmersionQuery = {
       rome: getOffresImmersionQueryParams.rome,
@@ -51,7 +54,10 @@ export class OffresImmersionController {
       lon: getOffresImmersionQueryParams.lon
     }
 
-    const result = await this.getOffresImmersionQueryHandler.execute(query)
+    const result = await this.getOffresImmersionQueryHandler.execute(
+      query,
+      utilisateur
+    )
 
     if (isSuccess(result)) {
       return result.data
@@ -70,12 +76,16 @@ export class OffresImmersionController {
     isArray: true
   })
   async getDetailOffreImmersion(
-    @Param('idOffreImmersion') idOffreImmersion: string
+    @Param('idOffreImmersion') idOffreImmersion: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DetailOffreImmersionQueryModel | undefined> {
     const query: GetDetailOffreImmersionQuery = {
       idOffreImmersion
     }
-    const result = await this.getDetailOffreImmersionQueryHandler.execute(query)
+    const result = await this.getDetailOffreImmersionQueryHandler.execute(
+      query,
+      utilisateur
+    )
     if (isSuccess(result)) {
       return result.data
     }

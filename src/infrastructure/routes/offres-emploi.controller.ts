@@ -20,6 +20,8 @@ import {
   GetOffresEmploiQueryHandler
 } from '../../application/queries/get-offres-emploi.query.handler'
 import { FindOffresEmploiQuery } from './validation/offres-emploi.inputs'
+import { Utilisateur } from '../decorators/authenticated.decorator'
+import { Authentification } from '../../domain/authentification'
 
 @Controller('offres-emploi')
 @ApiOAuth2([])
@@ -35,7 +37,8 @@ export class OffresEmploiController {
     type: OffresEmploiQueryModel
   })
   getOffresEmploi(
-    @Query() findOffresEmploiQuery: FindOffresEmploiQuery
+    @Query() findOffresEmploiQuery: FindOffresEmploiQuery,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffresEmploiQueryModel> {
     const query: GetOffresEmploiQuery = {
       page: findOffresEmploiQuery.page,
@@ -50,7 +53,7 @@ export class OffresEmploiController {
       commune: findOffresEmploiQuery.commune
     }
 
-    return this.getOffresEmploiQueryHandler.execute(query)
+    return this.getOffresEmploiQueryHandler.execute(query, utilisateur)
   }
 
   @Get(':idOffreEmploi')
@@ -58,11 +61,12 @@ export class OffresEmploiController {
     type: OffreEmploiQueryModel
   })
   async getDetailOffreEmploi(
-    @Param('idOffreEmploi') idOffreEmploi: string
+    @Param('idOffreEmploi') idOffreEmploi: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffreEmploiQueryModel | undefined> {
     const query: GetDetailOffreEmploiQuery = { idOffreEmploi }
     const offreEmploiqueryModel =
-      await this.getDetailOffreEmploiQueryHandler.execute(query)
+      await this.getDetailOffreEmploiQueryHandler.execute(query, utilisateur)
 
     if (offreEmploiqueryModel) {
       return offreEmploiqueryModel
