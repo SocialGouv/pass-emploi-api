@@ -1,6 +1,7 @@
 export enum LogEventKey {
   USER_API_CALL = 'userApiCall',
-  USER_EVENT = 'userEvent'
+  COMMAND_EVENT = 'commandEvent',
+  QUERY_EVENT = 'queryEvent'
 }
 
 export class LogEvent {

@@ -20,7 +20,7 @@ export class GetAllRendezVousConseillerQueryHandler extends QueryHandler<
     private rendezVousRepository: RendezVous.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
-    super()
+    super('GetAllRendezVousConseillerQueryHandler')
   }
 
   async handle(

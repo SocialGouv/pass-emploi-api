@@ -20,7 +20,7 @@ export class GetDetailActionQueryHandler extends QueryHandler<
     private actionRepository: Action.Repository,
     private actionAuthorizer: ActionAuthorizer
   ) {
-    super()
+    super('GetDetailActionQueryHandler')
   }
 
   async handle(

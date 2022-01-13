@@ -1,6 +1,8 @@
 import { Logger } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
+import { LogEvent, LogEventKey } from './log.event'
 import { Query } from './query'
+import { emptySuccess, failure, Result } from './result'
 
 /**
  * Implémente la logique liée à la query envoyée au système.
@@ -10,33 +12,58 @@ import { Query } from './query'
  */
 export abstract class QueryHandler<Q extends Query | void, QM> {
   protected logger: Logger
+  private queryName: string
 
-  constructor() {
-    this.logger = new Logger('QueryHandler')
+  constructor(queryName: string) {
+    this.logger = new Logger(queryName)
+    this.queryName = queryName
   }
 
   async execute(
     query: Q,
     utilisateur?: Authentification.Utilisateur
   ): Promise<QM> {
-    await this.authorize(query, utilisateur)
+    try {
+      await this.authorize(query, utilisateur)
 
-    const result = await this.handle(query)
+      const result = await this.handle(query)
+      if (result) {
+        this.monitor(utilisateur, query).catch(error => {
+          this.logger.error(error)
+        })
+      }
 
-    if (result) {
-      this.monitor(utilisateur, query).catch(error => {
-        this.logger.error(error)
-      })
+      this.logAfter(query, emptySuccess(), utilisateur)
+      return result
+    } catch (e) {
+      this.logAfter(query, failure(e), utilisateur)
+      throw e
     }
-    return result
   }
+
   abstract handle(query: Q): Promise<QM>
+
   abstract authorize(
     query: Q,
     utilisateur?: Authentification.Utilisateur
   ): Promise<void>
+
   abstract monitor(
     utilisateur?: Authentification.Utilisateur,
     query?: Q
   ): Promise<void>
+
+  protected logAfter(
+    query: Q,
+    result: Result,
+    utilisateur?: Authentification.Utilisateur
+  ): void {
+    const event = new LogEvent(LogEventKey.QUERY_EVENT, {
+      handler: this.queryName,
+      query,
+      result,
+      utilisateur
+    })
+    this.logger.log(event)
+  }
 }

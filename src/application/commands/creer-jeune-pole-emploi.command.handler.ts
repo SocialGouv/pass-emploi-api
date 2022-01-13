@@ -37,7 +37,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
     private idService: IdService,
     private dateService: DateService
   ) {
-    super()
+    super('CreerJeunePoleEmploiCommandHandler')
   }
 
   async handle(command: CreateJeuneCommand): Promise<Result<Jeune>> {

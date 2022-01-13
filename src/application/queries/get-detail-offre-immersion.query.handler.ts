@@ -24,7 +24,7 @@ export class GetDetailOffreImmersionQueryHandler extends QueryHandler<
     private offresImmersionRepository: OffresImmersion.Repository,
     private evenementService: EvenementService
   ) {
-    super()
+    super('GetDetailOffreImmersionQueryHandler')
   }
 
   async handle(

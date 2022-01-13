@@ -20,7 +20,7 @@ export class GetResumeActionsDesJeunesDuConseillerQueryHandler extends QueryHand
     private readonly jeuneRepository: Jeune.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
-    super()
+    super('GetResumeActionsDesJeunesDuConseillerQueryHandler')
   }
 
   handle(

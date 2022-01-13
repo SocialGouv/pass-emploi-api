@@ -27,7 +27,7 @@ export class UpdateNotificationTokenCommandHandler extends CommandHandler<
     private jeuneAuthorizer: JeuneAuthorizer,
     private dateService: DateService
   ) {
-    super()
+    super('UpdateNotificationTokenCommandHandler')
   }
 
   async handle(command: UpdateNotificationTokenCommand): Promise<Result<void>> {

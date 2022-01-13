@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
@@ -35,8 +35,7 @@ export class SendNotificationNouveauMessageCommandHandler extends CommandHandler
     private notificationRepository: Notification.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
-    super()
-    this.logger = new Logger('SendNotificationNouveauMessageCommandHandler')
+    super('SendNotificationNouveauMessageCommandHandler')
   }
 
   async handle(

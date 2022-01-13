@@ -35,7 +35,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     private readonly authentificationRepository: Authentification.Repository,
     private authentificationFactory: Authentification.Factory
   ) {
-    super()
+    super('UpdateUtilisateurCommandHandler')
   }
 
   async handle(

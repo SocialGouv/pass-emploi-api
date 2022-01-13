@@ -21,7 +21,7 @@ export class GetCommunesEtDepartementsQueryHandler extends QueryHandler<
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
   ) {
-    super()
+    super('GetCommunesEtDepartementsQueryHandler')
   }
 
   async handle(

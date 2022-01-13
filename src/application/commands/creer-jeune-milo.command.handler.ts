@@ -36,7 +36,7 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     private conseillerRepository: Conseiller.Repository,
     @Inject(ChatRepositoryToken) private chatRepository: Chat.Repository
   ) {
-    super()
+    super('CreerJeuneMiloCommandHandler')
   }
 
   async handle(

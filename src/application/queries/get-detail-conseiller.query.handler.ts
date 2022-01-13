@@ -20,7 +20,7 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
     private readonly conseillersRepository: Conseiller.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
-    super()
+    super('GetDetailConseillerQueryHandler')
   }
 
   async handle(

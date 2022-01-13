@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
@@ -45,8 +45,7 @@ export class CreateActionCommandHandler extends CommandHandler<
     private readonly conseillerAuthorizer: ConseillerAuthorizer,
     private evenementService: EvenementService
   ) {
-    super()
-    this.logger = new Logger('CreateActionCommandHandler')
+    super('CreateActionCommandHandler')
   }
 
   async handle(command: CreateActionCommand): Promise<Result<string>> {

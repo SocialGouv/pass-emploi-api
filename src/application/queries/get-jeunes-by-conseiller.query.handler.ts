@@ -21,7 +21,7 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
     private readonly jeunesRepository: Jeune.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
-    super()
+    super('GetJeunesByConseillerQueryHandler')
   }
 
   handle(query: GetJeunesByConseillerQuery): Promise<DetailJeuneQueryModel[]> {
