@@ -103,6 +103,33 @@ describe('OffresEmploiHttpSqlRepository', () => {
         expect(favori).to.deep.equal(offreEmploi)
       })
     })
+
+    describe('quand le favori existe et que la localisation est vide', () => {
+      it("renvoie l'offre d'emploi avec des string vide dans la localisation pour ne pas casser le mobile", async () => {
+        // Given
+        const offreEmploiSansLocalisation: OffreEmploi = {
+          ...uneOffreEmploi(),
+          localisation: undefined,
+          id: 'une-offre-sans-localisation'
+        }
+        await offresEmploiHttpSqlRepository.saveAsFavori(
+          'ABCDE',
+          offreEmploiSansLocalisation
+        )
+
+        // When
+        const favori = await offresEmploiHttpSqlRepository.getFavori(
+          'ABCDE',
+          offreEmploiSansLocalisation.id
+        )
+        // Then
+        expect(favori?.localisation).to.deep.equal({
+          nom: '',
+          codePostal: '',
+          commune: ''
+        })
+      })
+    })
   })
 
   describe('.getFavorisIdsQueryModelsByJeune', () => {
