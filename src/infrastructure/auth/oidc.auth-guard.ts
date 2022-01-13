@@ -8,6 +8,7 @@ import {
 import { Reflector } from '@nestjs/core'
 import { Request } from 'express'
 import { JWTPayload } from 'jose'
+import { LogEvent, LogEventKey } from '../../building-blocks/types/log.event'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator'
@@ -55,7 +56,10 @@ export class OidcAuthGuard implements CanActivate {
         accesToken: payload,
         utilisateur
       }
-      this.logger.log(`${JSON.stringify(utilisateur)}`)
+      const event = new LogEvent(LogEventKey.USER_API_CALL, {
+        user: utilisateur
+      })
+      this.logger.log(event)
       return true
     } catch (error) {
       this.logger.error(error)
