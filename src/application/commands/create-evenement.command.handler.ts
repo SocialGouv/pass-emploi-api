@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
+import { emptySuccess, Result } from 'src/building-blocks/types/result'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { LogEvent, LogEventKey } from '../../building-blocks/types/log.event'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
-import { Evenement, EvenementService } from '../../domain/evenement'
 import { Unauthorized } from '../../domain/erreur'
-import { emptySuccess, Result } from 'src/building-blocks/types/result'
+import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface CreateEvenementCommand extends Command {
   type: Evenement.Type
@@ -23,11 +24,12 @@ export class CreateEvenementCommandHandler extends CommandHandler<
 > {
   constructor(private evenementService: EvenementService) {
     super()
+    this.logger = new Logger('CreateEvenementCommandHandler')
   }
-  async handle(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: CreateEvenementCommand
-  ): Promise<Result<void>> {
+
+  async handle(command: CreateEvenementCommand): Promise<Result<void>> {
+    const event = new LogEvent(LogEventKey.USER_EVENT, command)
+    this.logger.log(event)
     return emptySuccess()
   }
 
