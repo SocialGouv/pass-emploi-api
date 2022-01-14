@@ -1,7 +1,7 @@
 import { DomainError } from './domain-error'
 
 export type Result<Data = void> = Success<Data> | Failure
-type Success<Data = void> = { _isSuccess: true; data: Data }
+export type Success<Data = void> = { _isSuccess: true; data: Data }
 export type Failure = { _isSuccess: false; error: DomainError }
 
 export function emptySuccess(): Success {
