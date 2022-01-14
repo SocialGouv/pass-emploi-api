@@ -42,7 +42,7 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
     super('AddFavoriOffreEmploiCommandHandler')
   }
 
-  async handle(command: AddFavoriOffreEmploiCommand): Promise<Result<void>> {
+  async handle(command: AddFavoriOffreEmploiCommand): Promise<Result> {
     const jeune = await this.jeuneRepository.get(command.idJeune)
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', command.idJeune))
@@ -73,10 +73,14 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
     await this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
   }
 
-  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.OFFRE_EMPLOI_SAUVEGARDEE,
-      utilisateur
-    )
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    command: AddFavoriOffreEmploiCommand
+  ): Promise<void> {
+    const evenementType =
+      command.offreEmploi.alternance === true
+        ? Evenement.Type.OFFRE_ALTERNANCE_SAUVEGARDEE
+        : Evenement.Type.OFFRE_EMPLOI_SAUVEGARDEE
+    await this.evenementService.creerEvenement(evenementType, utilisateur)
   }
 }

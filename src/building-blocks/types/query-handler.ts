@@ -31,12 +31,11 @@ export abstract class QueryHandler<Q extends Query | void, QM> {
       await this.authorize(query, utilisateur)
 
       const result = await this.handle(query)
-      if (result) {
-        this.monitor(utilisateur, query).catch(error => {
-          this.apmService.captureError(error)
-          this.logger.error(error)
-        })
-      }
+
+      this.monitor(utilisateur, query).catch(error => {
+        this.apmService.captureError(error)
+        this.logger.error(error)
+      })
 
       this.logAfter(query, emptySuccess(), utilisateur)
       return result
