@@ -97,7 +97,6 @@ import { EvenementService, EvenementsRepositoryToken } from './domain/evenement'
 import { EvenementHttpSqlRepository } from './infrastructure/repositories/evenement-http-sql.repository'
 import { HandleJobMailConseillerCommandHandler } from './application/commands/handle-job-mail-conseiller.command'
 import { MailSendinblueClient } from './infrastructure/repositories/mail-sendinblue.client'
-import { JobsController } from './infrastructure/routes/jobs.controller'
 import { SynchronizeJobsCommandHandler } from './application/commands/synchronize-jobs.command'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
@@ -120,8 +119,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     RendezVousController,
     AuthentificationController,
     ReferentielsController,
-    EvenementsController,
-    JobsController
+    EvenementsController
   ],
   providers: [
     ...buildQueryCommandsProviders(),

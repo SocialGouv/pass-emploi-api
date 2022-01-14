@@ -14,6 +14,7 @@ import {
 import { SecuritySchemeObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface'
 import { Logger } from 'nestjs-pino'
 import { AppModule } from './app.module'
+import { SynchronizeJobsCommandHandler } from './application/commands/synchronize-jobs.command'
 
 function useSwagger(
   appConfig: ConfigService,
@@ -62,6 +63,7 @@ async function bootstrap(): Promise<void> {
   const port = appConfig.get('port')
   const isWorker = appConfig.get('isWorker')
   const isWeb = appConfig.get('isWeb')
+  const tasks = appConfig.get('tasks')
   app.useLogger(app.get(Logger))
 
   if (isWorker) {
@@ -73,6 +75,14 @@ async function bootstrap(): Promise<void> {
     app.useGlobalPipes(new ValidationPipe())
     app.disable('x-powered-by')
     await app.listen(port)
+  }
+
+  if (tasks && tasks.initAllJobs) {
+    const synchronizeJobsCommandHandler =
+      app.get<SynchronizeJobsCommandHandler>(SynchronizeJobsCommandHandler)
+    await synchronizeJobsCommandHandler.execute({})
+    await app.close()
+    process.exit(0)
   }
 }
 

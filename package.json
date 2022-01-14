@@ -30,7 +30,8 @@
     "start:db:redis:test": "docker-compose up -d redistestdb",
     "test": "yarn start:db:test && nyc mocha 'test/**/*.test.ts' --exit --timeout 10000",
     "test:ci": "yarn migration && nyc mocha 'test/**/*.test.ts' --exit --timeout 10000",
-    "watch": "yarn start:pg:db && yarn start:redis:db && dotenv -e .environment nest start --watch | npx pino-pretty"
+    "watch": "yarn start:pg:db && yarn start:redis:db && dotenv -e .environment nest start --watch | npx pino-pretty",
+    "tasks": "IS_WEB=false RUN_TASK_INIT_ALL_JOBS=true node dist/main"
   },
   "dependencies": {
     "@nestjs/axios": "0.0.3",
