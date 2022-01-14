@@ -2,7 +2,8 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox, SinonSandbox } from 'sinon'
 import {
   NonTrouveError,
-  ConseillerNonValide
+  ConseillerNonValide,
+  NonTraitableError
 } from 'src/building-blocks/types/domain-error'
 import { Authentification } from 'src/domain/authentification'
 import { IdService } from 'src/utils/id-service'
@@ -361,10 +362,10 @@ describe('UpdateUtilisateurCommandHandler', () => {
               command.type
             )
             .resolves(undefined)
-          authentificationRepository.getJeuneMiloByEmail
+          authentificationRepository.getJeuneByEmail
             .withArgs(command.email)
             .resolves(utilisateur)
-          authentificationRepository.updateJeuneMilo
+          authentificationRepository.updateJeune
             .withArgs('id-jeune', command.idUtilisateurAuth)
             .resolves()
 
@@ -395,7 +396,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
               command.type
             )
             .resolves(undefined)
-          authentificationRepository.getJeuneMiloByEmail
+          authentificationRepository.getJeuneByEmail
             .withArgs(command.email)
             .resolves(undefined)
 
@@ -405,7 +406,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
           // Then
           expect(result).to.deep.equal(
             failure(
-              new NonTrouveError('Utilisateur', command.idUtilisateurAuth)
+              new NonTraitableError('Utilisateur', command.idUtilisateurAuth)
             )
           )
         })
