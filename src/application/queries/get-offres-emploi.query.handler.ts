@@ -62,10 +62,14 @@ export class GetOffresEmploiQueryHandler extends QueryHandler<
     return
   }
 
-  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.OFFRE_EMPLOI_RECHERCHEE,
-      utilisateur
-    )
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    query: GetOffresEmploiQuery
+  ): Promise<void> {
+    const evenementType =
+      query.alternance === true
+        ? Evenement.Type.OFFRE_ALTERNANCE_RECHERCHEE
+        : Evenement.Type.OFFRE_EMPLOI_RECHERCHEE
+    await this.evenementService.creerEvenement(evenementType, utilisateur)
   }
 }

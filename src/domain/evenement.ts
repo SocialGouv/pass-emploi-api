@@ -25,6 +25,8 @@ export namespace Evenement {
     OFFRE_ALTERNANCE_SAUVEGARDEE = 'OFFRE_ALTERNANCE_SAUVEGARDEE',
     OFFRE_ALTERNANCE_POSTULEE = 'OFFRE_ALTERNANCE_POSTULEE',
     OFFRE_ALTERNANCE_PARTAGEE = 'OFFRE_ALTERNANCE_PARTAGEE',
+    OFFRE_POSTULEE = 'OFFRE_POSTULEE',
+    OFFRE_PARTAGEE = 'OFFRE_PARTAGEE',
     MESSAGE_ENVOYE = 'MESSAGE_ENVOYE',
     RDV_CREE = 'RDV_CREE',
     RDV_SUPPRIME = 'RDV_SUPPRIME'
@@ -126,7 +128,16 @@ const evenements = {
   },
   [Evenement.Type.OFFRE_ALTERNANCE_PARTAGEE]: {
     categorie: 'Offre',
-    action: 'Partage'
+    action: 'Partage',
+    nom: 'Alternance'
+  },
+  [Evenement.Type.OFFRE_PARTAGEE]: {
+    categorie: 'Offre',
+    action: 'Partager'
+  },
+  [Evenement.Type.OFFRE_POSTULEE]: {
+    categorie: 'Offre',
+    action: 'Postuler'
   },
   [Evenement.Type.MESSAGE_ENVOYE]: { categorie: 'Message', action: 'Envoi' },
   [Evenement.Type.RDV_CREE]: { categorie: 'Rendez-vous', action: 'Création' },
