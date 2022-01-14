@@ -33,7 +33,7 @@ describe('Planificateur', () => {
           // Given
           const rendezVous: RendezVous = {
             ...unRendezVous(),
-            date: today.plus({ day: 1, minute: 60 }).toJSDate()
+            date: today.plus({ day: 1 }).toJSDate()
           }
 
           // When
