@@ -19,35 +19,41 @@ import {
 import {
   failure,
   isFailure,
-  isSuccess
+  isSuccess,
+  Result
 } from '../../../src/building-blocks/types/result'
 import { Core } from '../../../src/domain/core'
-import { expect } from '../../utils'
+import { expect, StubbedClass, stubClass } from '../../utils'
+import { PlanificateurService } from '../../../src/domain/planificateur'
+import { UtilisateurQueryModel } from '../../../src/application/queries/query-models/authentification.query-models'
 
 describe('UpdateUtilisateurCommandHandler', () => {
   let authentificationRepository: StubbedType<Authentification.Repository>
   let updateUtilisateurCommandHandler: UpdateUtilisateurCommandHandler
+  const uuidGenere = '1'
   const idService: IdService = {
-    uuid: () => '1',
+    uuid: () => uuidGenere,
     generate: () => '1'
   }
   const authentificationFactory: Authentification.Factory =
     new Authentification.Factory(idService)
-
-  before(() => {
+  let planificateurService: StubbedClass<PlanificateurService>
+  beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     authentificationRepository = stubInterface(sandbox)
-
+    planificateurService = stubClass(PlanificateurService)
     updateUtilisateurCommandHandler = new UpdateUtilisateurCommandHandler(
       authentificationRepository,
-      authentificationFactory
+      authentificationFactory,
+      planificateurService
     )
   })
 
   describe('execute', () => {
     describe('conseiller venant du SSO PASS_EMPLOI', async () => {
       describe('conseiller connu', async () => {
-        it('retourne le conseiller', async () => {
+        let result: Result<UtilisateurQueryModel>
+        beforeEach(async () => {
           // Given
           const command: UpdateUtilisateurCommand = {
             idUtilisateurAuth: 'nilstavernier',
@@ -65,13 +71,20 @@ describe('UpdateUtilisateurCommandHandler', () => {
             .resolves(utilisateur)
 
           // When
-          const result = await updateUtilisateurCommandHandler.execute(command)
-
+          result = await updateUtilisateurCommandHandler.execute(command)
+        })
+        it('retourne le conseiller', async () => {
           // Then
           expect(isSuccess(result)).equal(true)
           if (isSuccess(result)) {
             expect(result.data).to.deep.equal(unUtilisateurQueryModel())
           }
+        })
+        it('ne planifie pas de jobs', async () => {
+          // Then
+          expect(planificateurService.planifierJobRappelMail).to.have.callCount(
+            0
+          )
         })
       })
       describe('conseiller inconnu', async () => {
@@ -135,7 +148,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
       })
       describe('conseiller inconnu', async () => {
         describe('quand il est valide', () => {
-          it('crée et retourne le conseiller', async () => {
+          let result: Result<UtilisateurQueryModel>
+          beforeEach(async () => {
             // Given
             const command: UpdateUtilisateurCommand = {
               nom: 'Tavernier',
@@ -167,15 +181,20 @@ describe('UpdateUtilisateurCommandHandler', () => {
               .resolves()
 
             // When
-            const result = await updateUtilisateurCommandHandler.execute(
-              command
-            )
-
+            result = await updateUtilisateurCommandHandler.execute(command)
+          })
+          it('crée et retourne le conseiller', async () => {
             // Then
             expect(isSuccess(result)).equal(true)
             if (isSuccess(result)) {
               expect(result.data).to.deep.equal(unUtilisateurQueryModel())
             }
+          })
+          it('planifie un job pour le conseiller', async () => {
+            // Then
+            expect(
+              planificateurService.planifierJobRappelMail
+            ).to.have.been.calledWith(uuidGenere)
           })
         })
         describe("quand il est valide mais il manque l' email", () => {
