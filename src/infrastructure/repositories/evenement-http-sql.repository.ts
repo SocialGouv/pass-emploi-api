@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios'
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
 import { Authentification } from 'src/domain/authentification'
@@ -11,6 +11,7 @@ import { EvenementEngagementSqlModel } from '../sequelize/models/evenement-engag
 
 @Injectable()
 export class EvenementHttpSqlRepository implements Evenement.Repository {
+  private logger: Logger
   private apiUrl: string
 
   constructor(
@@ -18,6 +19,7 @@ export class EvenementHttpSqlRepository implements Evenement.Repository {
     private configService: ConfigService,
     private dateService: DateService
   ) {
+    this.logger = new Logger('EvenementHttpSqlRepository')
     this.apiUrl = this.configService.get('matomo').url
   }
 
@@ -54,7 +56,20 @@ export class EvenementHttpSqlRepository implements Evenement.Repository {
     if (nomEvenement) {
       params.append(evenementNomQueryParam, nomEvenement)
     }
-    await firstValueFrom(this.httpService.post(`${this.apiUrl}`, params))
+
+    try {
+      const response = await firstValueFrom(
+        this.httpService.post(`${this.apiUrl}`, params)
+      )
+      this.logger.log({
+        status: response.status,
+        method: response.config?.method,
+        url: response.config?.url,
+        params: response.config?.data
+      })
+    } catch (err) {
+      this.logger.error(err)
+    }
 
     const dateEvenement = this.dateService.nowJs()
     await EvenementEngagementSqlModel.create({
