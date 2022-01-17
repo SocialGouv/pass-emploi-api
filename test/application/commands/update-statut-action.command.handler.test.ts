@@ -29,6 +29,7 @@ describe('UpdateStatutActionCommandHandler', () => {
     actionRepository = stubInterface(sandbox)
     actionAuthorizer = stubClass(ActionAuthorizer)
     evenementService = stubClass(EvenementService)
+    dateService = stubClass(DateService)
     updateStatutActionCommandHandler = new UpdateStatutActionCommandHandler(
       actionRepository,
       actionAuthorizer,
@@ -38,7 +39,7 @@ describe('UpdateStatutActionCommandHandler', () => {
   })
 
   describe('handle', () => {
-    xit("modifie le statut de l'action", async () => {
+    it("modifie le statut de l'action", async () => {
       // Given
       const idAction = '35399853-f224-4910-8d02-44fb1ac85606'
       const actionPasCommencee = uneAction({

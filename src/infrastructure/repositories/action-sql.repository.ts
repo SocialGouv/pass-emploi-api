@@ -83,7 +83,6 @@ export class ActionSqlRepository implements Action.Repository {
     })
     const actionsTermineesSqlModel = await ActionSqlModel.findAll({
       where: {
-        idJeune: id,
         statut: Action.Statut.TERMINEE
       },
       order: [['date_derniere_actualisation', 'DESC']],

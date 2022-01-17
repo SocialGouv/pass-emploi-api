@@ -6,21 +6,12 @@ import { uneAction } from '../action.fixture'
 import { unJeune } from '../jeune.fixture'
 
 export const uneActionQueryModelFromDomain = (
-  action: Action = uneAction(),
-  jeune: Jeune = unJeune()
+  action: Action = uneAction()
 ): ActionQueryModel => ({
   id: action.id,
   content: action.contenu,
   comment: action.commentaire,
   status: action.statut,
-  jeune: {
-    id: action.idJeune,
-    firstName: jeune.firstName,
-    lastName: jeune.lastName,
-    email: jeune.email,
-    creationDate: jeune.creationDate.toString(),
-    isActivated: false
-  },
   creationDate: DateTime.fromJSDate(action.dateCreation)
     .toUTC()
     .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
@@ -29,6 +20,21 @@ export const uneActionQueryModelFromDomain = (
     .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
   creator: 'John Doe',
   creatorType: Action.TypeCreateur.CONSEILLER
+})
+
+export const uneActionQueryModelWithJeuneFromDomain = (
+  action: Action = uneAction(),
+  jeune: Jeune = unJeune()
+): ActionQueryModel => ({
+  ...uneActionQueryModelFromDomain(action),
+  jeune: {
+    id: action.idJeune,
+    firstName: jeune.firstName,
+    lastName: jeune.lastName,
+    email: jeune.email,
+    creationDate: jeune.creationDate.toString(),
+    isActivated: false
+  }
 })
 
 export function uneActionQueryModel(
