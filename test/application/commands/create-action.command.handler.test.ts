@@ -7,7 +7,7 @@ import {
   CreateActionCommand,
   CreateActionCommandHandler
 } from '../../../src/application/commands/create-action.command.handler'
-import { failure, success } from '../../../src/building-blocks/types/result'
+import { success } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action'
 import { Authentification } from '../../../src/domain/authentification'
 import { Jeune } from '../../../src/domain/jeune'
@@ -80,29 +80,6 @@ describe('CreateActionCommandHandler', () => {
           action.id
         )
       )
-    })
-
-    describe('quand le statut est incorrect', () => {
-      it('remonte la failure', async () => {
-        // Given
-        const statutIncorrect = 'STATUT_INCORRECT'
-        const echec = failure(new Action.StatutInvalide(statutIncorrect))
-        actionFactory.buildAction.returns(echec)
-        const command: CreateActionCommand = {
-          idJeune: action.idJeune,
-          contenu: action.contenu,
-          idCreateur: action.idCreateur,
-          typeCreateur: action.typeCreateur,
-          statut: statutIncorrect as Action.Statut,
-          commentaire: action.commentaire
-        }
-
-        // When
-        const result = await createActionCommandHandler.handle(command)
-
-        // Then
-        expect(result).to.deep.equal(echec)
-      })
     })
   })
 
