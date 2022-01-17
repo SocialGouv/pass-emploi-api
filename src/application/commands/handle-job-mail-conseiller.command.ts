@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { emptySuccess, Result } from 'src/building-blocks/types/result'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { Planificateur } from '../../domain/planificateur'
+import { Planificateur, PlanificateurService } from '../../domain/planificateur'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 
@@ -19,12 +19,17 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
     @Inject(ChatRepositoryToken)
     private chatRepository: Chat.Repository,
     @Inject(ConseillersRepositoryToken)
-    private conseillerRepository: Conseiller.Repository
+    private conseillerRepository: Conseiller.Repository,
+    private planificateurService: PlanificateurService
   ) {
     super('HandleJobMailConseillerCommandHandler')
   }
 
   async handle(command: HandleJobMailConseillerCommand): Promise<Result> {
+    this.planificateurService.planifierJobRappelMail(
+      command.job.contenu.idConseiller
+    )
+
     const nombreDeConversationsNonLues =
       await this.chatRepository.getNombreDeConversationsNonLues(
         command.job.contenu.idConseiller

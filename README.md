@@ -67,7 +67,7 @@ yarn seed
 ***Pour ajouter des seeds, il faut aller dans le dossier src/infrastructure/sequelize/seeders***
 
 ## Lancer des tasks sur les environnements déployés
-    scalingo -a pa-back-staging run yarn tasks
+    scalingo --region ${MA_REGION} -a ${MON_APPLICATION} run yarn tasks
 
 ## Déploiement
 
