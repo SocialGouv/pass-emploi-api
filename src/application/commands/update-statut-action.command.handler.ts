@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Evenement, EvenementService } from 'src/domain/evenement'
+import { DateService } from 'src/utils/date-service'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
@@ -28,7 +29,8 @@ export class UpdateStatutActionCommandHandler extends CommandHandler<
     @Inject(ActionsRepositoryToken)
     private readonly actionRepository: Action.Repository,
     private actionAuthorizer: ActionAuthorizer,
-    private evenementService: EvenementService
+    private evenementService: EvenementService,
+    private dateService: DateService
   ) {
     super('UpdateStatutActionCommandHandler')
   }
@@ -41,7 +43,8 @@ export class UpdateStatutActionCommandHandler extends CommandHandler<
 
     const result: Result = action.updateStatut({
       statut: command.statut,
-      estTerminee: command.estTerminee
+      estTerminee: command.estTerminee,
+      date: this.dateService.nowJs()
     })
     if (isFailure(result)) return result
 

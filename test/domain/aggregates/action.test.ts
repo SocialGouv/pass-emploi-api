@@ -1,3 +1,4 @@
+import { uneDatetime } from 'test/fixtures/date.fixture'
 import { failure } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action'
 import { DateService } from '../../../src/utils/date-service'
@@ -22,6 +23,21 @@ describe('Action', () => {
         expect(action.statut).to.equal(enCours)
       })
 
+      it("met à jour la date d'actualisation de l'action", async () => {
+        // Given
+        const date = uneDatetime.toJSDate()
+        const action = uneAction({
+          statut: Action.Statut.PAS_COMMENCEE
+        })
+        const enCours = Action.Statut.EN_COURS
+
+        // When
+        action.updateStatut({ statut: enCours, date })
+
+        // Then
+        expect(action.dateDerniereActualisation).to.equal(date)
+      })
+
       it('ignore le paramètre estTerminee', async () => {
         // Given
         const action = uneAction({
@@ -30,7 +46,10 @@ describe('Action', () => {
         const enCours = Action.Statut.EN_COURS
 
         // When
-        action.updateStatut({ statut: enCours, estTerminee: true })
+        action.updateStatut({
+          statut: enCours,
+          estTerminee: true
+        })
 
         // Then
         expect(action.statut).to.equal(enCours)

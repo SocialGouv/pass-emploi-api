@@ -30,6 +30,7 @@ export interface ActionData {
 interface UpdateStatut {
   statut?: Action.Statut
   estTerminee?: boolean
+  date?: Date
 }
 
 export class Action implements ActionData {
@@ -37,10 +38,10 @@ export class Action implements ActionData {
   readonly contenu: string
   readonly commentaire: string
   readonly dateCreation: Date
-  readonly dateDerniereActualisation: Date
   readonly idJeune: Jeune.Id
   readonly idCreateur: Action.IdCreateur
   readonly typeCreateur: Action.TypeCreateur
+  private _dateDerniereActualisation: Date
   private _statut: Action.Statut
 
   constructor(args: ActionData) {
@@ -49,7 +50,7 @@ export class Action implements ActionData {
     this.contenu = args.contenu
     this.commentaire = args.commentaire
     this.dateCreation = args.dateCreation
-    this.dateDerniereActualisation = args.dateDerniereActualisation
+    this._dateDerniereActualisation = args.dateDerniereActualisation
     this.idJeune = args.idJeune
     this.idCreateur = args.idCreateur
     this.typeCreateur = args.typeCreateur
@@ -57,6 +58,9 @@ export class Action implements ActionData {
 
   get statut(): Action.Statut {
     return this._statut
+  }
+  get dateDerniereActualisation(): Date {
+    return this._dateDerniereActualisation
   }
 
   updateStatut(update: UpdateStatut): Result {
@@ -73,6 +77,9 @@ export class Action implements ActionData {
       this._statut = Action.Statut.TERMINEE
     } else if (this._statut === Action.Statut.TERMINEE) {
       this._statut = Action.Statut.EN_COURS
+    }
+    if (update.date) {
+      this._dateDerniereActualisation = update.date
     }
 
     return emptySuccess()
