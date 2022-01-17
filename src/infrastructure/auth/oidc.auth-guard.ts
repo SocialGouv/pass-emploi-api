@@ -6,6 +6,7 @@ import {
   UnauthorizedException
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
+import { UserObject } from 'elastic-apm-node'
 import { Request } from 'express'
 import { JWTPayload } from 'jose'
 import { LogEvent, LogEventKey } from '../../building-blocks/types/log.event'
@@ -13,6 +14,7 @@ import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator'
 import { SKIP_OIDC_AUTH_KEY } from '../decorators/skip-oidc-auth.decorator'
+import { getAPMInstance } from '../monitoring/apm.init'
 import { JwtService } from './jwt.service'
 
 @Injectable()
@@ -56,6 +58,12 @@ export class OidcAuthGuard implements CanActivate {
         accesToken: payload,
         utilisateur
       }
+      const userAPM: UserObject = {
+        id: utilisateur.id,
+        username: `${utilisateur.prenom}-${utilisateur.nom}-${utilisateur.type}-${utilisateur.structure}`,
+        email: utilisateur.email
+      }
+      getAPMInstance().setUserContext(userAPM)
       const event = new LogEvent(LogEventKey.USER_API_CALL, {
         user: utilisateur
       })
