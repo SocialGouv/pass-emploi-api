@@ -43,7 +43,7 @@ describe('PlanificateurRedisRepository', () => {
         // Given
         const job: Planificateur.Job<Planificateur.JobRendezVous> = {
           date: uneDatetime.plus({ days: 2 }).toJSDate(),
-          type: Planificateur.JobType.RENDEZVOUS,
+          type: Planificateur.JobEnum.RENDEZVOUS,
           contenu: {
             idRendezVous: 'id'
           }
@@ -67,7 +67,7 @@ describe('PlanificateurRedisRepository', () => {
         // Given
         const job: Planificateur.Job<Planificateur.JobRendezVous> = {
           date: uneDatetime.plus({ days: 2 }).toJSDate(),
-          type: Planificateur.JobType.RENDEZVOUS,
+          type: Planificateur.JobEnum.RENDEZVOUS,
           contenu: {
             idRendezVous: 'id'
           }

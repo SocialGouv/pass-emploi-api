@@ -15,7 +15,7 @@ import {
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { expect, stubClass } from '../../utils'
 import { DatabaseForTesting } from '../../utils'
-import { MailSendinblueClient } from '../../../src/infrastructure/repositories/mail-sendinblue.client'
+import { MailSendinblueClient } from '../../../src/infrastructure/clients/mail-sendinblue.client'
 
 describe('ActionSqlRepository', () => {
   let jeune: Jeune

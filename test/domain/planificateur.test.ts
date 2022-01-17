@@ -60,7 +60,7 @@ describe('Planificateur', () => {
             date: DateTime.fromJSDate(rendezVous.date)
               .minus({ days: 1 })
               .toJSDate(),
-            type: Planificateur.JobType.RENDEZVOUS,
+            type: Planificateur.JobEnum.RENDEZVOUS,
             contenu: { idRendezVous: rendezVous.id }
           })
         })
@@ -85,7 +85,7 @@ describe('Planificateur', () => {
             date: DateTime.fromJSDate(rendezVous.date)
               .minus({ days: 1 })
               .toJSDate(),
-            type: Planificateur.JobType.RENDEZVOUS,
+            type: Planificateur.JobEnum.RENDEZVOUS,
             contenu: { idRendezVous: rendezVous.id }
           })
         })
@@ -97,7 +97,7 @@ describe('Planificateur', () => {
             date: DateTime.fromJSDate(rendezVous.date)
               .minus({ days: 7 })
               .toJSDate(),
-            type: Planificateur.JobType.RENDEZVOUS,
+            type: Planificateur.JobEnum.RENDEZVOUS,
             contenu: { idRendezVous: rendezVous.id }
           })
         })
@@ -115,7 +115,7 @@ describe('Planificateur', () => {
         // Then
         expect(planificateurRepository.createJob).to.have.been.calledWith({
           date: prochainRappel.toJSDate(),
-          type: Planificateur.JobType.MAIL_CONSEILLER,
+          type: Planificateur.JobEnum.MAIL_CONSEILLER,
           contenu: { idConseiller: 'id-conseiller' }
         })
       })

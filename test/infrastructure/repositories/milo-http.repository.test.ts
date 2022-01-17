@@ -14,7 +14,7 @@ import { MiloHttpRepository } from '../../../src/infrastructure/repositories/mil
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { DatabaseForTesting, stubClass } from '../../utils'
 import { testConfig } from '../../utils/module-for-testing'
-import { MailSendinblueClient } from '../../../src/infrastructure/repositories/mail-sendinblue.client'
+import { MailSendinblueClient } from '../../../src/infrastructure/clients/mail-sendinblue.client'
 
 describe('MiloHttpRepository', () => {
   let miloHttpRepository: MiloHttpRepository

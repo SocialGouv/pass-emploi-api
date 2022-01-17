@@ -5,7 +5,7 @@ import { detailConseillerQueryModel } from '../../fixtures/query-models/conseill
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { DatabaseForTesting } from '../../utils'
-import { MailSendinblueClient } from '../../../src/infrastructure/repositories/mail-sendinblue.client'
+import { MailSendinblueClient } from '../../../src/infrastructure/clients/mail-sendinblue.client'
 
 describe('ConseillerSqlRepository', () => {
   DatabaseForTesting.prepare()

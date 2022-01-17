@@ -12,7 +12,7 @@ export namespace Planificateur {
     supprimerTousLesJobs(): Promise<void>
   }
 
-  export enum JobType {
+  export enum JobEnum {
     RENDEZVOUS = 'RENDEZVOUS',
     MAIL_CONSEILLER = 'MAIL_CONSEILLER'
   }
@@ -25,9 +25,11 @@ export namespace Planificateur {
     idConseiller: string
   }
 
-  export interface Job<T> {
+  export type JobType = JobRendezVous | JobMailConseiller
+
+  export interface Job<T = JobType> {
     date: Date
-    type: JobType
+    type: JobEnum
     contenu: T
   }
 
@@ -68,7 +70,7 @@ export class PlanificateurService {
         .set({ hour: 6, minute: 0, second: 0, millisecond: 0 })
         .plus({ days: 1 })
         .toJSDate(),
-      type: Planificateur.JobType.MAIL_CONSEILLER,
+      type: Planificateur.JobEnum.MAIL_CONSEILLER,
       contenu: { idConseiller }
     }
     await this.planificateurRepository.createJob(job)
@@ -82,7 +84,7 @@ export class PlanificateurService {
       date: DateTime.fromJSDate(rendezVous.date)
         .minus({ days: days })
         .toJSDate(),
-      type: Planificateur.JobType.RENDEZVOUS,
+      type: Planificateur.JobEnum.RENDEZVOUS,
       contenu: { idRendezVous: rendezVous.id }
     }
     await this.planificateurRepository.createJob(job)

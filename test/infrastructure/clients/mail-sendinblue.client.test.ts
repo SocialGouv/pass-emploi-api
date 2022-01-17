@@ -1,4 +1,4 @@
-import { MailSendinblueClient } from '../../../src/infrastructure/repositories/mail-sendinblue.client'
+import { MailSendinblueClient } from '../../../src/infrastructure/clients/mail-sendinblue.client'
 import { HttpService } from '@nestjs/axios'
 import { testConfig } from '../../utils/module-for-testing'
 import { unConseiller } from '../../fixtures/conseiller.fixture'

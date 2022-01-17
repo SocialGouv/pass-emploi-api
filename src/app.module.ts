@@ -96,7 +96,7 @@ import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secre
 import { EvenementService, EvenementsRepositoryToken } from './domain/evenement'
 import { EvenementHttpSqlRepository } from './infrastructure/repositories/evenement-http-sql.repository'
 import { HandleJobMailConseillerCommandHandler } from './application/commands/handle-job-mail-conseiller.command'
-import { MailSendinblueClient } from './infrastructure/repositories/mail-sendinblue.client'
+import { MailSendinblueClient } from './infrastructure/clients/mail-sendinblue.client'
 import { SynchronizeJobsCommandHandler } from './application/commands/synchronize-jobs.command'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({

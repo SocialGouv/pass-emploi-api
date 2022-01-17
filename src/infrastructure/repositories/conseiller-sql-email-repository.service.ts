@@ -3,7 +3,7 @@ import { DetailConseillerQueryModel } from 'src/application/queries/query-models
 import { Conseiller } from '../../domain/conseiller'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { fromSqlToDetailConseillerQueryModel } from './mappers/conseillers.mappers'
-import { MailSendinblueClient } from './mail-sendinblue.client'
+import { MailSendinblueClient } from '../clients/mail-sendinblue.client'
 
 @Injectable()
 export class ConseillerSqlEmailRepository implements Conseiller.Repository {

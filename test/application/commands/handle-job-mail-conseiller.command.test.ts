@@ -34,7 +34,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
       // Given
       const command: HandleJobMailConseillerCommand = {
         job: {
-          type: Planificateur.JobType.MAIL_CONSEILLER,
+          type: Planificateur.JobEnum.MAIL_CONSEILLER,
           contenu: {
             idConseiller: '1'
           },
@@ -58,7 +58,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
       // Given
       const command: HandleJobMailConseillerCommand = {
         job: {
-          type: Planificateur.JobType.MAIL_CONSEILLER,
+          type: Planificateur.JobEnum.MAIL_CONSEILLER,
           contenu: {
             idConseiller: '1'
           },

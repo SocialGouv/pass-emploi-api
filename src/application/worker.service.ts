@@ -33,11 +33,11 @@ export class WorkerService {
       'worker'
     )
     try {
-      if (job.type === Planificateur.JobType.RENDEZVOUS) {
+      if (job.type === Planificateur.JobEnum.RENDEZVOUS) {
         await this.handlerJobRendezVousCommandHandler.execute({
           job: job as Planificateur.Job<Planificateur.JobRendezVous>
         })
-      } else if (job.type === Planificateur.JobType.MAIL_CONSEILLER) {
+      } else if (job.type === Planificateur.JobEnum.MAIL_CONSEILLER) {
         await this.handleJobMailConseillerCommandHandler.execute({
           job: job as Planificateur.Job<Planificateur.JobMailConseiller>
         })
