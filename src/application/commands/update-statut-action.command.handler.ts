@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Evenement, EvenementService } from 'src/domain/evenement'
-import { DateService } from 'src/utils/date-service'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
@@ -16,8 +15,7 @@ import { ActionAuthorizer } from '../authorizers/authorize-action'
 
 export interface UpdateStatutActionCommand extends Command {
   idAction: Action.Id
-  statut?: Action.Statut
-  estTerminee?: boolean
+  statut: Action.Statut
 }
 
 @Injectable()
@@ -28,9 +26,9 @@ export class UpdateStatutActionCommandHandler extends CommandHandler<
   constructor(
     @Inject(ActionsRepositoryToken)
     private readonly actionRepository: Action.Repository,
+    private actionFactory: Action.Factory,
     private actionAuthorizer: ActionAuthorizer,
-    private evenementService: EvenementService,
-    private dateService: DateService
+    private evenementService: EvenementService
   ) {
     super('UpdateStatutActionCommandHandler')
   }
@@ -41,14 +39,10 @@ export class UpdateStatutActionCommandHandler extends CommandHandler<
       return failure(new NonTrouveError('Action', command.idAction))
     }
 
-    const result: Result = action.updateStatut({
-      statut: command.statut,
-      estTerminee: command.estTerminee,
-      date: this.dateService.nowJs()
-    })
+    const result = this.actionFactory.updateStatut(action, command.statut)
     if (isFailure(result)) return result
 
-    await this.actionRepository.save(action)
+    await this.actionRepository.save(result.data)
     return emptySuccess()
   }
 

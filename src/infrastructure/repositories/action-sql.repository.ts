@@ -107,7 +107,7 @@ export class ActionSqlRepository implements Action.Repository {
   }
 
   static actionFromSqlModel(sqlModel: AsSql<ActionDto>): Action {
-    return new Action({
+    return {
       id: sqlModel.id,
       statut: sqlModel.statut,
       idJeune: sqlModel.idJeune,
@@ -117,7 +117,7 @@ export class ActionSqlRepository implements Action.Repository {
       dateDerniereActualisation: sqlModel.dateDerniereActualisation,
       idCreateur: sqlModel.idCreateur,
       typeCreateur: sqlModel.typeCreateur
-    })
+    }
   }
 
   static sqlModelFromAction(action: Action): AsSql<ActionDto> {
