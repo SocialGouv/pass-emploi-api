@@ -7,13 +7,14 @@ import {
   failure,
   success
 } from '../../../src/building-blocks/types/result'
-import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository'
+import { ConseillerSqlEmailRepository } from '../../../src/infrastructure/repositories/conseiller-sql-email-repository.service'
 import { DossierMiloDto } from '../../../src/infrastructure/repositories/dto/milo.dto'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
 import { MiloHttpRepository } from '../../../src/infrastructure/repositories/milo-http.repository'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { DatabaseForTesting } from '../../utils'
+import { DatabaseForTesting, stubClass } from '../../utils'
 import { testConfig } from '../../utils/module-for-testing'
+import { MailSendinblueClient } from '../../../src/infrastructure/clients/mail-sendinblue.client'
 
 describe('MiloHttpRepository', () => {
   let miloHttpRepository: MiloHttpRepository
@@ -23,7 +24,11 @@ describe('MiloHttpRepository', () => {
 
   beforeEach(async () => {
     const httpService = new HttpService()
-    const conseillerSqlRepository = new ConseillerSqlRepository()
+    const mailSendinblueClient: MailSendinblueClient =
+      stubClass(MailSendinblueClient)
+    const conseillerSqlRepository = new ConseillerSqlEmailRepository(
+      mailSendinblueClient
+    )
     await conseillerSqlRepository.save(jeune.conseiller)
     const jeuneSqlRepository = new JeuneSqlRepository(database.sequelize)
     await jeuneSqlRepository.save(jeune)

@@ -31,6 +31,7 @@ export namespace RendezVous {
   export interface Repository {
     add(rendezVous: RendezVous): Promise<void>
     get(id: string): Promise<RendezVous | undefined>
+    getAllAVenir(): Promise<RendezVous[]>
     delete(idRendezVous: string): Promise<void>
     getAllQueryModelsByConseiller(
       idConseiller: string

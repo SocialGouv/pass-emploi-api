@@ -1,4 +1,3 @@
-import { Conseiller } from 'src/domain/conseiller'
 import { Action } from '../../../src/domain/action'
 import { Jeune } from '../../../src/domain/jeune'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
@@ -111,7 +110,7 @@ describe('JeuneSqlRepository', () => {
 
   describe('getAllQueryModelsByConseiller', () => {
     it("retourne les jeunes d'un conseiller", async () => {
-      const idConseiller: Conseiller.Id = '1'
+      const idConseiller = '1'
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
       await JeuneSqlModel.creer(unJeuneDto({ idConseiller }))
 

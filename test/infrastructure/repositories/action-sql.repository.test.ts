@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import { Action } from '../../../src/domain/action'
 import { Jeune } from '../../../src/domain/jeune'
 import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository'
-import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository'
+import { ConseillerSqlEmailRepository } from '../../../src/infrastructure/repositories/conseiller-sql-email-repository.service'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
 import { uneAction } from '../../fixtures/action.fixture'
@@ -13,8 +13,9 @@ import {
   uneActionQueryModelWithJeuneFromDomain
 } from '../../fixtures/query-models/action.query-model.fixtures'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
-import { expect } from '../../utils'
+import { expect, stubClass } from '../../utils'
 import { DatabaseForTesting } from '../../utils'
+import { MailSendinblueClient } from '../../../src/infrastructure/clients/mail-sendinblue.client'
 
 describe('ActionSqlRepository', () => {
   let jeune: Jeune
@@ -25,8 +26,11 @@ describe('ActionSqlRepository', () => {
     jeune = unJeune()
 
     actionSqlRepository = new ActionSqlRepository()
-
-    const conseillerRepository = new ConseillerSqlRepository()
+    const mailSendinblueClient: MailSendinblueClient =
+      stubClass(MailSendinblueClient)
+    const conseillerRepository = new ConseillerSqlEmailRepository(
+      mailSendinblueClient
+    )
     await conseillerRepository.save(unConseiller())
     const jeuneRepository = new JeuneSqlRepository(databaseForTesting.sequelize)
     await jeuneRepository.save(jeune)

@@ -7,7 +7,7 @@ import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { DetailConseillerQueryModel } from './query-models/conseillers.query-models'
 
 export interface GetDetailConseillerQuery extends Query {
-  idConseiller: Conseiller.Id
+  idConseiller: string
 }
 
 @Injectable()

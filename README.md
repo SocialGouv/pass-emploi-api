@@ -66,6 +66,9 @@ yarn seed
 
 ***Pour ajouter des seeds, il faut aller dans le dossier src/infrastructure/sequelize/seeders***
 
+## Lancer des tasks sur les environnements déployés
+    scalingo --region ${MA_REGION} -a ${MON_APPLICATION} run yarn tasks
+
 ## Déploiement
 
 Nous utilisons actuellement Scalingo comme hébergeur sur l'application Web. Il existe deux environnements : Staging & Prod

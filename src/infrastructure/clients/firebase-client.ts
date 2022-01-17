@@ -3,9 +3,9 @@ import { ConfigService } from '@nestjs/config'
 import admin from 'firebase-admin'
 import { getMessaging, TokenMessage } from 'firebase-admin/messaging'
 import { Authentification } from '../../domain/authentification'
-import Type = Authentification.Type
 import { getAPMInstance } from '../monitoring/apm.init'
 import * as APM from 'elastic-apm-node'
+import Type = Authentification.Type
 
 export interface IFirebaseClient {
   send(tokenMessage: TokenMessage): Promise<void>
@@ -17,6 +17,8 @@ export interface IFirebaseClient {
 
   getToken(utilisateur: Authentification.Utilisateur): Promise<string>
 }
+
+const FIREBASE_CHAT_PATH = 'chat'
 
 @Injectable()
 export class FirebaseClient implements IFirebaseClient {
@@ -64,7 +66,7 @@ export class FirebaseClient implements IFirebaseClient {
     jeuneId: string,
     conseillerId: string
   ): Promise<void> {
-    const collectionPath = 'chat'
+    const collectionPath = FIREBASE_CHAT_PATH
     const chat = await this.firestore
       .collection(collectionPath)
       .where('jeuneId', '==', jeuneId)
@@ -78,6 +80,16 @@ export class FirebaseClient implements IFirebaseClient {
       }
       await this.firestore.collection(collectionPath).add(newChat)
     }
+  }
+
+  async getNombreDeConversationsNonLues(conseillerId: string): Promise<number> {
+    const chat = await this.firestore
+      .collection(FIREBASE_CHAT_PATH)
+      .where('conseillerId', '==', conseillerId)
+      .where('seenByConseiller', '==', false)
+      .get()
+
+    return chat.size
   }
 
   async getToken(utilisateur: Authentification.Utilisateur): Promise<string> {

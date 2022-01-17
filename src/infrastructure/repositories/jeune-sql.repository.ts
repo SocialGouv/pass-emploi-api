@@ -6,7 +6,6 @@ import {
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
 import { Action } from '../../domain/action'
-import { Conseiller } from '../../domain/conseiller'
 import { NotFound } from '../../domain/erreur'
 import { Jeune } from '../../domain/jeune'
 import { ActionSqlModel } from '../sequelize/models/action.sql-model'
@@ -120,7 +119,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
   }
 
   async getResumeActionsDesJeunesDuConseiller(
-    idConseiller: Conseiller.Id
+    idConseiller: string
   ): Promise<ResumeActionsDuJeuneQueryModel[]> {
     const resumesActionsParJeune =
       await this.sequelize.query<ResumeActionsJeuneDto>(

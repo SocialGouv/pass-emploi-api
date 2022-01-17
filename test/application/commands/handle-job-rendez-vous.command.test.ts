@@ -38,7 +38,7 @@ describe('HandlerJobRendezVousCommandHandler', () => {
       // Given
       const command: HandleJobRendezVousCommand = {
         job: {
-          type: Planificateur.JobType.RENDEZVOUS,
+          type: Planificateur.JobEnum.RENDEZVOUS,
           contenu: {
             idRendezVous: 'idRendezVous'
           },
@@ -62,7 +62,7 @@ describe('HandlerJobRendezVousCommandHandler', () => {
       // Given
       const command: HandleJobRendezVousCommand = {
         job: {
-          type: Planificateur.JobType.RENDEZVOUS,
+          type: Planificateur.JobEnum.RENDEZVOUS,
           contenu: {
             idRendezVous: 'idRendezVous'
           },
@@ -91,7 +91,7 @@ describe('HandlerJobRendezVousCommandHandler', () => {
       // Given
       const command: HandleJobRendezVousCommand = {
         job: {
-          type: Planificateur.JobType.RENDEZVOUS,
+          type: Planificateur.JobEnum.RENDEZVOUS,
           contenu: {
             idRendezVous: 'idRendezVous'
           },
@@ -130,7 +130,7 @@ describe('HandlerJobRendezVousCommandHandler', () => {
       // Given
       const command: HandleJobRendezVousCommand = {
         job: {
-          type: Planificateur.JobType.RENDEZVOUS,
+          type: Planificateur.JobEnum.RENDEZVOUS,
           contenu: {
             idRendezVous: 'idRendezVous'
           },

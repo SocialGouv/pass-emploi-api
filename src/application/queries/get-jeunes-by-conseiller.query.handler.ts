@@ -3,12 +3,11 @@ import { Authentification } from 'src/domain/authentification'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Conseiller } from '../../domain/conseiller'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { DetailJeuneQueryModel } from './query-models/jeunes.query-models'
 
 export interface GetJeunesByConseillerQuery extends Query {
-  idConseiller: Conseiller.Id
+  idConseiller: string
 }
 
 @Injectable()

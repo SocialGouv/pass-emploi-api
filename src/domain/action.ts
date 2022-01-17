@@ -5,7 +5,6 @@ import { DomainError } from '../building-blocks/types/domain-error'
 import { Result, success } from '../building-blocks/types/result'
 import { DateService } from '../utils/date-service'
 import { IdService } from '../utils/id-service'
-import { Conseiller } from './conseiller'
 import { Jeune } from './jeune'
 
 export const ActionsRepositoryToken = 'ActionsRepositoryToken'
@@ -24,7 +23,7 @@ export interface Action {
 
 export namespace Action {
   export type Id = Brand<string, 'IdAction'>
-  export type IdCreateur = Conseiller.Id | Jeune.Id
+  export type IdCreateur = string | Jeune.Id
 
   export interface Repository {
     save(action: Action): Promise<void>

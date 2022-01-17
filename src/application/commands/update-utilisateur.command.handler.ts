@@ -17,6 +17,7 @@ import {
 } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { UtilisateurQueryModel } from '../queries/query-models/authentification.query-models'
+import { PlanificateurService } from '../../domain/planificateur'
 
 export interface UpdateUtilisateurCommand extends Command {
   idUtilisateurAuth: string
@@ -36,7 +37,8 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
   constructor(
     @Inject(AuthentificationRepositoryToken)
     private readonly authentificationRepository: Authentification.Repository,
-    private authentificationFactory: Authentification.Factory
+    private authentificationFactory: Authentification.Factory,
+    private planificateurService: PlanificateurService
   ) {
     super('UpdateUtilisateurCommandHandler')
   }
@@ -74,6 +76,9 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
         conseillerSso.data,
         command.idUtilisateurAuth
       )
+
+      this.planificateurService.planifierJobRappelMail(conseillerSso.data.id)
+
       return conseillerSso
     } else if (command.type === Authentification.Type.JEUNE && command.email) {
       const jeune = await this.authentificationRepository.getJeuneByEmail(

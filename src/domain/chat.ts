@@ -12,5 +12,6 @@ export namespace Chat {
     getChatSecretsQueryModel(
       utilisateur: Authentification.Utilisateur
     ): Promise<ChatSecretsQueryModel | undefined>
+    getNombreDeConversationsNonLues(conseillerId: string): Promise<number>
   }
 }

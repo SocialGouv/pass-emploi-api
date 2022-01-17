@@ -60,7 +60,7 @@ describe('Planificateur', () => {
             date: DateTime.fromJSDate(rendezVous.date)
               .minus({ days: 1 })
               .toJSDate(),
-            type: Planificateur.JobType.RENDEZVOUS,
+            type: Planificateur.JobEnum.RENDEZVOUS,
             contenu: { idRendezVous: rendezVous.id }
           })
         })
@@ -85,7 +85,7 @@ describe('Planificateur', () => {
             date: DateTime.fromJSDate(rendezVous.date)
               .minus({ days: 1 })
               .toJSDate(),
-            type: Planificateur.JobType.RENDEZVOUS,
+            type: Planificateur.JobEnum.RENDEZVOUS,
             contenu: { idRendezVous: rendezVous.id }
           })
         })
@@ -97,9 +97,26 @@ describe('Planificateur', () => {
             date: DateTime.fromJSDate(rendezVous.date)
               .minus({ days: 7 })
               .toJSDate(),
-            type: Planificateur.JobType.RENDEZVOUS,
+            type: Planificateur.JobEnum.RENDEZVOUS,
             contenu: { idRendezVous: rendezVous.id }
           })
+        })
+      })
+    })
+
+    describe('planifierJobRappelMail', () => {
+      it('génère un job', async () => {
+        // Given
+        const prochainRappel = DateTime.fromISO('2020-04-07T06:00:00.000Z')
+
+        // When
+        await planificateurService.planifierJobRappelMail('id-conseiller')
+
+        // Then
+        expect(planificateurRepository.createJob).to.have.been.calledWith({
+          date: prochainRappel.toJSDate(),
+          type: Planificateur.JobEnum.MAIL_CONSEILLER,
+          contenu: { idConseiller: 'id-conseiller' }
         })
       })
     })

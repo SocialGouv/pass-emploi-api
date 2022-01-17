@@ -34,7 +34,8 @@ export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
     conseiller: {
       id: jeuneSqlModel.conseiller.id,
       firstName: jeuneSqlModel.conseiller.prenom,
-      lastName: jeuneSqlModel.conseiller.nom
+      lastName: jeuneSqlModel.conseiller.nom,
+      email: jeuneSqlModel.conseiller.email || undefined
     },
     structure: jeuneSqlModel.structure,
     email: jeuneSqlModel.email ?? undefined

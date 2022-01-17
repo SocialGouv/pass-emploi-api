@@ -12,7 +12,7 @@ import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
 import { DateService } from '../../utils/date-service'
 
 export interface HandleJobRendezVousCommand extends Command {
-  job: Planificateur.Job
+  job: Planificateur.Job<Planificateur.JobRendezVous>
 }
 
 @Injectable()

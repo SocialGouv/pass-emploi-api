@@ -32,14 +32,14 @@ export namespace Jeune {
     save(jeune: Jeune): Promise<void>
 
     getResumeActionsDesJeunesDuConseiller(
-      idConseiller: Conseiller.Id
+      idConseiller: string
     ): Promise<ResumeActionsDuJeuneQueryModel[]>
     getHomeQueryModel(idJeune: string): Promise<JeuneHomeQueryModel>
     getQueryModelById(
       idJeune: string
     ): Promise<DetailJeuneQueryModel | undefined>
     getAllQueryModelsByConseiller(
-      idConseiller: Conseiller.Id
+      idConseiller: string
     ): Promise<DetailJeuneQueryModel[]>
   }
 
