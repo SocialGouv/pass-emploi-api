@@ -1,9 +1,9 @@
-import { Action, ActionData } from '../../src/domain/action'
+import { Action } from '../../src/domain/action'
 import { uneDatetime } from './date.fixture'
 
-export const uneAction = (args: Partial<ActionData> = {}): Action => {
+export const uneAction = (args: Partial<Action> = {}): Action => {
   const now = uneDatetime.toJSDate()
-  const defaults: ActionData = {
+  const defaults: Action = {
     id: '721e2108-60f5-4a75-b102-04fe6a40e899',
     statut: Action.Statut.PAS_COMMENCEE,
     idJeune: 'ABCDE',
@@ -15,5 +15,5 @@ export const uneAction = (args: Partial<ActionData> = {}): Action => {
     typeCreateur: Action.TypeCreateur.CONSEILLER
   }
 
-  return new Action({ ...defaults, ...args })
+  return { ...defaults, ...args }
 }

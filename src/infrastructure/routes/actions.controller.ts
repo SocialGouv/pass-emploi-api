@@ -25,7 +25,6 @@ import {
 import { ActionQueryModel } from '../../application/queries/query-models/actions.query-model'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { isFailure } from '../../building-blocks/types/result'
-import { Action } from '../../domain/action'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { UpdateStatutActionPayload } from './validation/actions.inputs'
 
@@ -71,9 +70,6 @@ export class ActionsController {
     const command: UpdateStatutActionCommand = {
       idAction,
       statut: updateStatutActionPayload.status
-        ? (updateStatutActionPayload.status as Action.Statut)
-        : undefined,
-      estTerminee: updateStatutActionPayload.isDone
     }
     const result = await this.updateStatutActionCommandHandler.execute(
       command,

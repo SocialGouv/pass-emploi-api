@@ -9,7 +9,8 @@ import {
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
-  failure
+  failure,
+  success
 } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action'
 import { uneAction } from '../../fixtures/action.fixture'
@@ -19,16 +20,19 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 describe('UpdateStatutActionCommandHandler', () => {
   let actionRepository: StubbedType<Action.Repository>
   let updateStatutActionCommandHandler: UpdateStatutActionCommandHandler
+  let actionFactory: StubbedClass<Action.Factory>
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
   let evenementService: StubbedClass<EvenementService>
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     actionRepository = stubInterface(sandbox)
+    actionFactory = stubClass(Action.Factory)
     actionAuthorizer = stubClass(ActionAuthorizer)
     evenementService = stubClass(EvenementService)
     updateStatutActionCommandHandler = new UpdateStatutActionCommandHandler(
       actionRepository,
+      actionFactory,
       actionAuthorizer,
       evenementService
     )
@@ -42,7 +46,12 @@ describe('UpdateStatutActionCommandHandler', () => {
         id: idAction,
         statut: Action.Statut.PAS_COMMENCEE
       })
+      const actionModifiee = uneAction({
+        id: idAction,
+        statut: Action.Statut.EN_COURS
+      })
       actionRepository.get.withArgs(idAction).resolves(actionPasCommencee)
+      actionFactory.updateStatut.returns(success(actionModifiee))
 
       // When
       const command: UpdateStatutActionCommand = {
@@ -52,10 +61,6 @@ describe('UpdateStatutActionCommandHandler', () => {
       const result = await updateStatutActionCommandHandler.handle(command)
 
       // Then
-      const actionModifiee = uneAction({
-        id: idAction,
-        statut: Action.Statut.EN_COURS
-      })
       expect(actionRepository.save).to.have.been.calledWithExactly(
         actionModifiee
       )
@@ -70,7 +75,8 @@ describe('UpdateStatutActionCommandHandler', () => {
 
         // When
         const result = await updateStatutActionCommandHandler.handle({
-          idAction
+          idAction,
+          statut: Action.Statut.PAS_COMMENCEE
         })
 
         // Then

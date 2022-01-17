@@ -15,8 +15,7 @@ import { ActionAuthorizer } from '../authorizers/authorize-action'
 
 export interface UpdateStatutActionCommand extends Command {
   idAction: Action.Id
-  statut?: Action.Statut
-  estTerminee?: boolean
+  statut: Action.Statut
 }
 
 @Injectable()
@@ -27,6 +26,7 @@ export class UpdateStatutActionCommandHandler extends CommandHandler<
   constructor(
     @Inject(ActionsRepositoryToken)
     private readonly actionRepository: Action.Repository,
+    private actionFactory: Action.Factory,
     private actionAuthorizer: ActionAuthorizer,
     private evenementService: EvenementService
   ) {
@@ -39,13 +39,10 @@ export class UpdateStatutActionCommandHandler extends CommandHandler<
       return failure(new NonTrouveError('Action', command.idAction))
     }
 
-    const result: Result = action.updateStatut({
-      statut: command.statut,
-      estTerminee: command.estTerminee
-    })
+    const result = this.actionFactory.updateStatut(action, command.statut)
     if (isFailure(result)) return result
 
-    await this.actionRepository.save(action)
+    await this.actionRepository.save(result.data)
     return emptySuccess()
   }
 

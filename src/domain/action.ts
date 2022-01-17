@@ -2,12 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { ActionQueryModel } from '../application/queries/query-models/actions.query-model'
 import { Brand } from '../building-blocks/types/brand'
 import { DomainError } from '../building-blocks/types/domain-error'
-import {
-  emptySuccess,
-  failure,
-  Result,
-  success
-} from '../building-blocks/types/result'
+import { Result, success } from '../building-blocks/types/result'
 import { DateService } from '../utils/date-service'
 import { IdService } from '../utils/id-service'
 import { Conseiller } from './conseiller'
@@ -15,7 +10,7 @@ import { Jeune } from './jeune'
 
 export const ActionsRepositoryToken = 'ActionsRepositoryToken'
 
-export interface ActionData {
+export interface Action {
   id: Action.Id
   statut: Action.Statut
   contenu: string
@@ -25,58 +20,6 @@ export interface ActionData {
   idJeune: Jeune.Id
   idCreateur: Action.IdCreateur
   typeCreateur: Action.TypeCreateur
-}
-
-interface UpdateStatut {
-  statut?: Action.Statut
-  estTerminee?: boolean
-}
-
-export class Action implements ActionData {
-  readonly id: Action.Id
-  readonly contenu: string
-  readonly commentaire: string
-  readonly dateCreation: Date
-  readonly dateDerniereActualisation: Date
-  readonly idJeune: Jeune.Id
-  readonly idCreateur: Action.IdCreateur
-  readonly typeCreateur: Action.TypeCreateur
-  private _statut: Action.Statut
-
-  constructor(args: ActionData) {
-    this.id = args.id
-    this._statut = args.statut
-    this.contenu = args.contenu
-    this.commentaire = args.commentaire
-    this.dateCreation = args.dateCreation
-    this.dateDerniereActualisation = args.dateDerniereActualisation
-    this.idJeune = args.idJeune
-    this.idCreateur = args.idCreateur
-    this.typeCreateur = args.typeCreateur
-  }
-
-  get statut(): Action.Statut {
-    return this._statut
-  }
-
-  updateStatut(update: UpdateStatut): Result {
-    if (update.statut === undefined && update.estTerminee === undefined) {
-      return emptySuccess()
-    }
-
-    if (update.statut) {
-      if (!Action.statutsPossibles.includes(update.statut)) {
-        return failure(new Action.StatutInvalide(update.statut))
-      }
-      this._statut = update.statut
-    } else if (update.estTerminee) {
-      this._statut = Action.Statut.TERMINEE
-    } else if (this._statut === Action.Statut.TERMINEE) {
-      this._statut = Action.Statut.EN_COURS
-    }
-
-    return emptySuccess()
-  }
 }
 
 export namespace Action {
@@ -106,8 +49,6 @@ export namespace Action {
     JEUNE = 'jeune'
   }
 
-  export const statutsPossibles: string[] = Object.values(Action.Statut)
-
   export class StatutInvalide implements DomainError {
     static CODE = 'StatutActionInvalide'
     readonly code: string = StatutInvalide.CODE
@@ -135,12 +76,9 @@ export namespace Action {
       createur: { id: Action.IdCreateur; type: Action.TypeCreateur }
     ): Result<Action> {
       const statut = data.statut ?? Action.Statut.PAS_COMMENCEE
-      if (!Action.statutsPossibles.includes(statut)) {
-        return failure(new Action.StatutInvalide(statut))
-      }
 
       const now = this.dateService.nowJs()
-      const action: Action = new Action({
+      const action: Action = {
         id: this.idService.uuid(),
         contenu: data.contenu,
         commentaire: data.commentaire ?? '',
@@ -150,8 +88,17 @@ export namespace Action {
         typeCreateur: createur.type,
         dateCreation: now,
         dateDerniereActualisation: now
-      })
+      }
       return success(action)
+    }
+
+    updateStatut(action: Action, statut: Action.Statut): Result<Action> {
+      const now = this.dateService.nowJs()
+      return success({
+        ...action,
+        statut,
+        dateDerniereActualisation: now
+      })
     }
   }
 }

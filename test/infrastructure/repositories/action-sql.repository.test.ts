@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { Action } from '../../../src/domain/action'
 import { Jeune } from '../../../src/domain/jeune'
 import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository'
@@ -7,7 +8,10 @@ import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/act
 import { uneAction } from '../../fixtures/action.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { uneActionQueryModelFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
+import {
+  uneActionQueryModelFromDomain,
+  uneActionQueryModelWithJeuneFromDomain
+} from '../../fixtures/query-models/action.query-model.fixtures'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { expect } from '../../utils'
 import { DatabaseForTesting } from '../../utils'
@@ -194,7 +198,7 @@ describe('ActionSqlRepository', () => {
 
         // Then
         expect(actionQueryModel).to.deep.equal(
-          uneActionQueryModelFromDomain(action, jeune)
+          uneActionQueryModelWithJeuneFromDomain(action, jeune)
         )
       })
     })
@@ -208,6 +212,178 @@ describe('ActionSqlRepository', () => {
 
         // Then
         expect(result).to.equal(undefined)
+      })
+    })
+  })
+
+  describe('.getQueryModelByJeuneId(id)', () => {
+    describe("quand aucune action n'existe", () => {
+      it('retourne un tableau vide', async () => {
+        // When
+        const actionsQueryModel =
+          await actionSqlRepository.getQueryModelByJeuneId(jeune.id)
+
+        // Then
+        expect(actionsQueryModel).to.deep.equal([])
+      })
+    })
+    describe('quand il existe uniquement des actions terminées', () => {
+      it('renvoie les actions triées par la plus récente', async () => {
+        // Given
+        const actionTerminee1 = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120001',
+          idJeune: jeune.id,
+          statut: Action.Statut.TERMINEE,
+          dateDerniereActualisation: DateTime.fromISO(
+            '2020-04-06T12:00:00.000Z'
+          )
+            .toUTC()
+            .toJSDate()
+        })
+        const actionTerminee2 = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120002',
+          idJeune: jeune.id,
+          statut: Action.Statut.TERMINEE,
+          dateDerniereActualisation: DateTime.fromISO(
+            '2020-04-12T12:00:00.000Z'
+          )
+            .toUTC()
+            .toJSDate()
+        })
+        const actionTerminee3 = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120003',
+          idJeune: jeune.id,
+          statut: Action.Statut.TERMINEE,
+          dateDerniereActualisation: DateTime.fromISO(
+            '2020-04-10T12:00:00.000Z'
+          )
+            .toUTC()
+            .toJSDate()
+        })
+        await actionSqlRepository.save(actionTerminee1)
+        await actionSqlRepository.save(actionTerminee2)
+        await actionSqlRepository.save(actionTerminee3)
+
+        // When
+        const actionsQueryModel =
+          await actionSqlRepository.getQueryModelByJeuneId(jeune.id)
+
+        // Then
+        expect(actionsQueryModel).to.deep.equal([
+          uneActionQueryModelFromDomain(actionTerminee2),
+          uneActionQueryModelFromDomain(actionTerminee3),
+          uneActionQueryModelFromDomain(actionTerminee1)
+        ])
+      })
+    })
+    describe('quand il existe des actions avec des statuts differents', () => {
+      it('renvoie les actions triées par la plus récente', async () => {
+        // Given
+        const actionPasCommencee = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120001',
+          idJeune: jeune.id,
+          statut: Action.Statut.PAS_COMMENCEE,
+          dateDerniereActualisation: DateTime.fromISO(
+            '2020-04-10T12:00:00.000Z'
+          )
+            .toUTC()
+            .toJSDate()
+        })
+        const actionEnCours1 = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120002',
+          idJeune: jeune.id,
+          statut: Action.Statut.EN_COURS,
+          dateDerniereActualisation: DateTime.fromISO(
+            '2020-04-06T12:00:00.000Z'
+          )
+            .toUTC()
+            .toJSDate()
+        })
+        const actionEnCours2 = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120003',
+          idJeune: jeune.id,
+          statut: Action.Statut.EN_COURS,
+          dateDerniereActualisation: DateTime.fromISO(
+            '2020-04-12T12:00:00.000Z'
+          )
+            .toUTC()
+            .toJSDate()
+        })
+        await actionSqlRepository.save(actionPasCommencee)
+        await actionSqlRepository.save(actionEnCours1)
+        await actionSqlRepository.save(actionEnCours2)
+
+        // When
+        const actionsQueryModel =
+          await actionSqlRepository.getQueryModelByJeuneId(jeune.id)
+
+        // Then
+        expect(actionsQueryModel).to.deep.equal([
+          uneActionQueryModelFromDomain(actionEnCours2),
+          uneActionQueryModelFromDomain(actionPasCommencee),
+          uneActionQueryModelFromDomain(actionEnCours1)
+        ])
+      })
+    })
+    describe('quand il existe uniquement des actions pas commencées et en cours', () => {
+      it('renvoie les actions triées par la plus récente avec le statut terminé en dernier', async () => {
+        // Given
+        const actionPasCommencee = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120001',
+          idJeune: jeune.id,
+          statut: Action.Statut.PAS_COMMENCEE,
+          dateDerniereActualisation: DateTime.fromISO(
+            '2020-04-05T12:00:00.000Z'
+          )
+            .toUTC()
+            .toJSDate()
+        })
+        const actionEnCours = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120002',
+          idJeune: jeune.id,
+          statut: Action.Statut.EN_COURS,
+          dateDerniereActualisation: DateTime.fromISO(
+            '2020-04-06T12:00:00.000Z'
+          )
+            .toUTC()
+            .toJSDate()
+        })
+        const actionTerminee1 = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120003',
+          idJeune: jeune.id,
+          statut: Action.Statut.TERMINEE,
+          dateDerniereActualisation: DateTime.fromISO(
+            '2020-04-07T12:00:00.000Z'
+          )
+            .toUTC()
+            .toJSDate()
+        })
+        const actionTerminee2 = uneAction({
+          id: '02b3710e-7779-11ec-90d6-0242ac120004',
+          idJeune: jeune.id,
+          statut: Action.Statut.TERMINEE,
+          dateDerniereActualisation: DateTime.fromISO(
+            '2020-04-08T12:00:00.000Z'
+          )
+            .toUTC()
+            .toJSDate()
+        })
+        await actionSqlRepository.save(actionPasCommencee)
+        await actionSqlRepository.save(actionEnCours)
+        await actionSqlRepository.save(actionTerminee1)
+        await actionSqlRepository.save(actionTerminee2)
+
+        // When
+        const actionsQueryModel =
+          await actionSqlRepository.getQueryModelByJeuneId(jeune.id)
+
+        // Then
+        expect(actionsQueryModel).to.deep.equal([
+          uneActionQueryModelFromDomain(actionEnCours),
+          uneActionQueryModelFromDomain(actionPasCommencee),
+          uneActionQueryModelFromDomain(actionTerminee2),
+          uneActionQueryModelFromDomain(actionTerminee1)
+        ])
       })
     })
   })

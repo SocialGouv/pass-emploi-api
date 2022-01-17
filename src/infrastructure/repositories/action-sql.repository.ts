@@ -4,6 +4,7 @@ import { Action } from '../../domain/action'
 import { ActionDto, ActionSqlModel } from '../sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { AsSql } from '../sequelize/types'
+import { Op } from 'sequelize'
 import {
   fromSqlToActionQueryModel,
   fromSqlToActionQueryModelWithJeune
@@ -65,10 +66,26 @@ export class ActionSqlRepository implements Action.Repository {
   }
 
   async getQueryModelByJeuneId(id: string): Promise<ActionQueryModel[]> {
-    const actionsSqlModel = await ActionSqlModel.findAll({
+    const actionsNonTermineesSqlModel = await ActionSqlModel.findAll({
       where: {
-        idJeune: id
+        idJeune: id,
+        statut: {
+          [Op.or]: [Action.Statut.PAS_COMMENCEE, Action.Statut.EN_COURS]
+        }
       },
+      order: [['date_derniere_actualisation', 'DESC']],
+      include: [
+        {
+          model: JeuneSqlModel,
+          required: true
+        }
+      ]
+    })
+    const actionsTermineesSqlModel = await ActionSqlModel.findAll({
+      where: {
+        statut: Action.Statut.TERMINEE
+      },
+      order: [['date_derniere_actualisation', 'DESC']],
       include: [
         {
           model: JeuneSqlModel,
@@ -77,6 +94,10 @@ export class ActionSqlRepository implements Action.Repository {
       ]
     })
 
+    const actionsSqlModel = [
+      ...actionsNonTermineesSqlModel,
+      ...actionsTermineesSqlModel
+    ]
     const actions = []
     for (const actionSql of actionsSqlModel) {
       actions.push(await fromSqlToActionQueryModel(actionSql))
@@ -86,7 +107,7 @@ export class ActionSqlRepository implements Action.Repository {
   }
 
   static actionFromSqlModel(sqlModel: AsSql<ActionDto>): Action {
-    return new Action({
+    return {
       id: sqlModel.id,
       statut: sqlModel.statut,
       idJeune: sqlModel.idJeune,
@@ -96,7 +117,7 @@ export class ActionSqlRepository implements Action.Repository {
       dateDerniereActualisation: sqlModel.dateDerniereActualisation,
       idCreateur: sqlModel.idCreateur,
       typeCreateur: sqlModel.typeCreateur
-    })
+    }
   }
 
   static sqlModelFromAction(action: Action): AsSql<ActionDto> {
