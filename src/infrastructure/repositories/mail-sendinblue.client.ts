@@ -30,7 +30,7 @@ export class MailSendinblueClient {
     try {
       await firstValueFrom(
         this.httpService.post(
-          `${this.sendinblueUrl}`,
+          `${this.sendinblueUrl}/v3/smtp/email`,
           {
             to: [
               {
@@ -38,7 +38,7 @@ export class MailSendinblueClient {
                 name: `${conseiller.firstName} ${conseiller.lastName}`
               }
             ],
-            templateId: this.templateId,
+            templateId: parseInt(this.templateId),
             params: {
               prenom: conseiller.firstName,
               conversationsNonLues: nombreDeConversationNonLues,
@@ -47,7 +47,11 @@ export class MailSendinblueClient {
             }
           },
           {
-            headers: { 'api-key': `${this.apiKey}` }
+            headers: {
+              'api-key': `${this.apiKey}`,
+              accept: 'application/json',
+              'content-type': 'application/json'
+            }
           }
         )
       )

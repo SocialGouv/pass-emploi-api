@@ -64,7 +64,13 @@ export const testConfig = (): ConfigService => {
     matomo: {
       url: 'https://stats.data.gouv.fr/matomo.php',
       envId: '1'
-    }
+    },
+    sendinblue: {
+      url: 'https://sendinblue.com',
+      apiKey: 'sendinblueapiKey',
+      templateId: '21'
+    },
+    frontEndUrl: 'http://frontend.com'
   })
 }
 

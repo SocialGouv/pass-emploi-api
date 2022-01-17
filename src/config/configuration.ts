@@ -84,7 +84,7 @@ export default () => {
     },
     sendinblue: {
       url:
-        process.env.SENDINBLUE_API_URL ?? 'https://api.sendinblue.com/v3/smtp/email',
+        process.env.SENDINBLUE_API_URL ?? 'https://api.sendinblue.com',
       apiKey: process.env.SENDINBLUE_API_KEY ?? '',
       templateId: process.env.SENDINBLUE_TEMPLATE_ID ?? '2'
     },
