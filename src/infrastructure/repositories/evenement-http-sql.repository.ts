@@ -38,8 +38,8 @@ export class EvenementHttpSqlRepository implements Evenement.Repository {
     params.append('rec', '1')
     params.append('idsite', this.configService.get('matomo').envId)
 
-    const paramTypeUtilisateur = 'dimension1'
-    const paramStructureUtilisateur = 'dimension2'
+    const paramTypeUtilisateur = 'dimension3'
+    const paramStructureUtilisateur = 'dimension4'
     const evenementCategorieQueryParam = 'e_c'
     const evenementActionQueryParam = 'e_a'
     const evenementNomQueryParam = 'e_n'

@@ -43,7 +43,7 @@ describe('EvenementHttpSqlRepository', () => {
       nock('https://stats.data.gouv.fr')
         .post(
           '/matomo.php',
-          'rec=1&idsite=1&dimension1=CONSEILLER&dimension2=MISSION_LOCALE&e_c=Test&e_a=Test'
+          'rec=1&idsite=1&dimension3=CONSEILLER&dimension4=MISSION_LOCALE&e_c=Test&e_a=Test'
         )
         .reply(200)
         .isDone()
