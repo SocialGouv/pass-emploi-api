@@ -30,8 +30,6 @@ import { GetDetailConseillerQueryHandler } from './application/queries/get-detai
 import { GetDetailJeuneQueryHandler } from './application/queries/get-detail-jeune.query.handler'
 import { GetDetailOffreEmploiQueryHandler } from './application/queries/get-detail-offre-emploi.query.handler'
 import { GetDossierMiloJeuneQueryHandler } from './application/queries/get-dossier-milo-jeune.query.handler'
-import { GetFavorisIdsJeuneQueryHandler } from './application/queries/get-favoris-ids-jeune.query.handler'
-import { GetFavorisJeuneQueryHandler } from './application/queries/get-favoris-jeune.query.handler'
 import { GetHomeJeuneHandler } from './application/queries/get-home-jeune.query.handler'
 import { GetJeunesByConseillerQueryHandler } from './application/queries/get-jeunes-by-conseiller.query.handler'
 import { GetOffresEmploiQueryHandler } from './application/queries/get-offres-emploi.query.handler'
@@ -84,6 +82,7 @@ import { JeunesController } from './infrastructure/routes/jeunes.controller'
 import { OffresEmploiController } from './infrastructure/routes/offres-emploi.controller'
 import { ReferentielsController } from './infrastructure/routes/referentiels.controller'
 import { RendezVousController } from './infrastructure/routes/rendez-vous.controller'
+import { FavorisController } from './infrastructure/routes/favoris.controller'
 import { databaseProviders } from './infrastructure/sequelize/providers'
 import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
@@ -98,6 +97,8 @@ import { EvenementHttpSqlRepository } from './infrastructure/repositories/evenem
 import { HandleJobMailConseillerCommandHandler } from './application/commands/handle-job-mail-conseiller.command'
 import { MailSendinblueClient } from './infrastructure/clients/mail-sendinblue.client'
 import { SynchronizeJobsCommandHandler } from './application/commands/synchronize-jobs.command'
+import { GetFavorisOffresEmploiIdsJeuneQueryHandler } from './application/queries/get-favoris-offres-emploi-ids-jeune.query.handler'
+import { GetFavorisOffresEmploiJeuneQueryHandler } from './application/queries/get-favoris-offres-emploi-jeune.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -119,7 +120,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     RendezVousController,
     AuthentificationController,
     ReferentielsController,
-    EvenementsController
+    EvenementsController,
+    FavorisController
   ],
   providers: [
     ...buildQueryCommandsProviders(),
@@ -210,8 +212,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreerJeunePoleEmploiCommandHandler,
     AddFavoriOffreEmploiCommandHandler,
     DeleteFavoriOffreEmploiCommandHandler,
-    GetFavorisIdsJeuneQueryHandler,
-    GetFavorisJeuneQueryHandler,
+    GetFavorisOffresEmploiIdsJeuneQueryHandler,
+    GetFavorisOffresEmploiJeuneQueryHandler,
     GetHomeJeuneHandler,
     GetOffresEmploiQueryHandler,
     GetOffresImmersionQueryHandler,
