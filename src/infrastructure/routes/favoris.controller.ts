@@ -20,7 +20,7 @@ import {
 import { GetFavorisOffresEmploiIdsJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-ids-jeune.query.handler'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler'
 import {
-  FavoriIdQueryModel,
+  FavoriOffreEmploiIdQueryModel,
   OffreEmploiResumeQueryModel
 } from 'src/application/queries/query-models/offres-emploi.query-models'
 import {
@@ -41,12 +41,18 @@ import { Utilisateur } from '../decorators/authenticated.decorator'
 import {
   AddFavoriImmersionPayload,
   AddFavoriOffresEmploiPayload,
-  GetFavorisOffresEmploiQuery
+  GetFavorisOffresEmploiQueryParams,
+  GetFavorisOffresImmersionQueryParams
 } from './validation/favoris.inputs'
 import {
   DeleteFavoriOffreImmersionCommand,
   DeleteFavoriOffreImmersionCommandHandler
 } from '../../application/commands/delete-favori-offre-immersion.command.handler'
+import { GetFavorisOffresImmersionJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-immersion-jeune.query.handler'
+import {
+  FavoriOffreImmersionIdQueryModel,
+  OffreImmersionQueryModel
+} from 'src/application/queries/query-models/offres-immersion.query-models'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -55,6 +61,7 @@ export class FavorisController {
   constructor(
     private readonly getFavorisOffresEmploiIdsJeuneQueryHandler: GetFavorisOffresEmploiIdsJeuneQueryHandler,
     private readonly getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
+    private readonly getFavorisOffresImmersionJeuneQueryHandler: GetFavorisOffresImmersionJeuneQueryHandler,
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
     private readonly deleteFavoriOffreEmploiCommandHandler: DeleteFavoriOffreEmploiCommandHandler,
     private readonly deleteFavoriOffreImmersionCommandHandler: DeleteFavoriOffreImmersionCommandHandler,
@@ -64,9 +71,9 @@ export class FavorisController {
   @Get('favoris/offres-emploi')
   async getFavorisOffresEmploi(
     @Param('idJeune') idJeune: string,
-    @Query() getFavorisQuery: GetFavorisOffresEmploiQuery,
+    @Query() getFavorisQuery: GetFavorisOffresEmploiQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<OffreEmploiResumeQueryModel[] | FavoriIdQueryModel[]> {
+  ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiIdQueryModel[]> {
     if (getFavorisQuery.detail === 'true') {
       return await this.getFavorisOffresEmploiJeuneQueryHandler.execute(
         { idJeune },
@@ -75,6 +82,18 @@ export class FavorisController {
     }
     return await this.getFavorisOffresEmploiIdsJeuneQueryHandler.execute(
       { idJeune },
+      utilisateur
+    )
+  }
+
+  @Get('favoris/offres-immersion')
+  async getFavorisOffresImmersion(
+    @Param('idJeune') idJeune: string,
+    @Query() getFavorisQuery: GetFavorisOffresImmersionQueryParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<OffreImmersionQueryModel[] | FavoriOffreImmersionIdQueryModel[]> {
+    return await this.getFavorisOffresImmersionJeuneQueryHandler.execute(
+      { idJeune, detail: getFavorisQuery.detail === 'true' },
       utilisateur
     )
   }
@@ -145,7 +164,7 @@ export class FavorisController {
     }
   }
 
-  @Delete('favori/:idOffreEmploi')
+  @Delete('favori/offres-emploi/:idOffreEmploi')
   @HttpCode(204)
   async deleteFavoriOffreEmploi(
     @Param('idJeune') idJeune: string,
@@ -165,7 +184,7 @@ export class FavorisController {
     }
   }
 
-  @Delete('favori/:idOffreImmersion')
+  @Delete('favori/offres-immersion/:idOffreImmersion')
   @HttpCode(204)
   async deleteFavoriOffreImmersion(
     @Param('idJeune') idJeune: string,
@@ -176,6 +195,7 @@ export class FavorisController {
       idJeune,
       idOffreImmersion
     }
+
     const result = await this.deleteFavoriOffreImmersionCommandHandler.execute(
       command,
       utilisateur

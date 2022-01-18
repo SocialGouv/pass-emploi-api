@@ -2,7 +2,8 @@ import {
   OffreImmersionQueryModel,
   DetailOffreImmersionQueryModel,
   ContactImmersionQueryModel,
-  LocalisationQueryModel
+  LocalisationQueryModel,
+  FavoriOffreImmersionIdQueryModel
 } from 'src/application/queries/query-models/offres-immersion.query-models'
 import { OffreImmersion, OffresImmersion } from 'src/domain/offre-immersion'
 import { FavoriOffreImmersionSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
@@ -32,6 +33,14 @@ interface OffreImmpersionDto {
         phone?: string
       }
     | undefined
+}
+
+export function fromSqlToFavorisOffresImmersionIdsQueryModels(
+  favorisIdsSql: FavoriOffreImmersionSqlModel[]
+): FavoriOffreImmersionIdQueryModel[] {
+  return favorisIdsSql.map(favori => {
+    return { id: favori.idOffre }
+  })
 }
 
 export function fromSqlToOffreImmersion(

@@ -38,6 +38,10 @@ export class OffreImmersionQueryModel {
   ville: string
 }
 
+export interface FavoriOffreImmersionIdQueryModel {
+  id: string
+}
+
 export class DetailOffreImmersionQueryModel extends OffreImmersionQueryModel {
   @ApiProperty()
   estVolontaire: boolean

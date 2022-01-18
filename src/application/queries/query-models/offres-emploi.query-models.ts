@@ -69,6 +69,6 @@ export class OffresEmploiQueryModel {
   results: OffreEmploiResumeQueryModel[]
 }
 
-export interface FavoriIdQueryModel {
+export interface FavoriOffreEmploiIdQueryModel {
   id: string
 }

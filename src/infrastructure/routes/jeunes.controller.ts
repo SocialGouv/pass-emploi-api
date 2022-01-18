@@ -20,7 +20,7 @@ import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
 import {
-  FavoriIdQueryModel,
+  FavoriOffreEmploiIdQueryModel,
   OffreEmploiResumeQueryModel
 } from 'src/application/queries/query-models/offres-emploi.query-models'
 import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
@@ -52,7 +52,7 @@ import { Utilisateur } from '../decorators/authenticated.decorator'
 import { CreateActionAvecStatutPayload } from './validation/conseillers.inputs'
 import {
   AddFavoriOffresEmploiPayload,
-  GetFavorisOffresEmploiQuery
+  GetFavorisOffresEmploiQueryParams
 } from './validation/favoris.inputs'
 import { PutNotificationTokenInput } from './validation/jeunes.inputs'
 import StatutInvalide = Action.StatutInvalide
@@ -68,8 +68,8 @@ export class JeunesController {
     private readonly getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly getAllRendezVousJeuneQueryHandler: GetAllRendezVousJeuneQueryHandler,
-    private readonly getFavorisIdsJeuneQueryHandler: GetFavorisOffresEmploiIdsJeuneQueryHandler,
-    private readonly getFavorisJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
+    private readonly getFavorisOffresEmploiIdsJeuneQueryHandler: GetFavorisOffresEmploiIdsJeuneQueryHandler,
+    private readonly getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
     private readonly deleteFavoriCommandHandler: DeleteFavoriOffreEmploiCommandHandler
   ) {}
@@ -197,16 +197,16 @@ export class JeunesController {
   @Get('favoris')
   async getFavoris(
     @Param('idJeune') idJeune: string,
-    @Query() getFavorisQuery: GetFavorisOffresEmploiQuery,
+    @Query() getFavorisQuery: GetFavorisOffresEmploiQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<OffreEmploiResumeQueryModel[] | FavoriIdQueryModel[]> {
+  ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiIdQueryModel[]> {
     if (getFavorisQuery.detail === 'true') {
-      return await this.getFavorisJeuneQueryHandler.execute(
+      return await this.getFavorisOffresEmploiJeuneQueryHandler.execute(
         { idJeune },
         utilisateur
       )
     }
-    return await this.getFavorisIdsJeuneQueryHandler.execute(
+    return await this.getFavorisOffresEmploiIdsJeuneQueryHandler.execute(
       { idJeune },
       utilisateur
     )
