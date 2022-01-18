@@ -345,4 +345,38 @@ describe('OffresImmersionHttpSqlRepository', () => {
       })
     })
   })
+  describe('.deleteFavori', () => {
+    let offreImmersion: OffreImmersion
+
+    beforeEach(async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseillerDto({ id: 'ZIDANE' }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: 'ABCDE',
+          idConseiller: 'ZIDANE'
+        })
+      )
+    })
+
+    it('supprime le favori', async () => {
+      // Given
+      offreImmersion = uneOffreImmersion()
+      await offresImmersionHttpSqlRepository.saveAsFavori(
+        'ABCDE',
+        offreImmersion
+      )
+      // When
+      await offresImmersionHttpSqlRepository.deleteFavori(
+        'ABCDE',
+        offreImmersion.id
+      )
+      // Then
+      const actual = await offresImmersionHttpSqlRepository.getFavori(
+        'ABCDE',
+        offreImmersion.id
+      )
+      expect(actual).to.equal(undefined)
+    })
+  })
 })

@@ -32,6 +32,8 @@ export namespace OffresImmersion {
     ): Promise<OffreImmersion | undefined>
 
     saveAsFavori(idJeune: string, offreImmersion: OffreImmersion): Promise<void>
+
+    deleteFavori(idJeune: string, idOffreImmersion: string): Promise<void>
   }
 
   export enum MethodeDeContact {

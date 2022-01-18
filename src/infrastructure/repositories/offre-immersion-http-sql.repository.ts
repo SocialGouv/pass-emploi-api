@@ -106,4 +106,13 @@ export class OffresImmersionHttpSqlRepository
       throw e
     }
   }
+
+  async deleteFavori(idJeune: string, idOffreImmersion: string): Promise<void> {
+    await FavoriOffreImmersionSqlModel.destroy({
+      where: {
+        idOffre: idOffreImmersion,
+        idJeune
+      }
+    })
+  }
 }

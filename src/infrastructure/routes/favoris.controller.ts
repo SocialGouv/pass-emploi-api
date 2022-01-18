@@ -43,6 +43,10 @@ import {
   AddFavoriOffresEmploiPayload,
   GetFavorisOffresEmploiQuery
 } from './validation/favoris.inputs'
+import {
+  DeleteFavoriOffreImmersionCommand,
+  DeleteFavoriOffreImmersionCommandHandler
+} from '../../application/commands/delete-favori-offre-immersion.command.handler'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -53,6 +57,7 @@ export class FavorisController {
     private readonly getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
     private readonly deleteFavoriOffreEmploiCommandHandler: DeleteFavoriOffreEmploiCommandHandler,
+    private readonly deleteFavoriOffreImmersionCommandHandler: DeleteFavoriOffreImmersionCommandHandler,
     private readonly addFavoriOffreImmersionCommandHandler: AddFavoriOffreImmersionCommandHandler
   ) {}
 
@@ -142,7 +147,7 @@ export class FavorisController {
 
   @Delete('favori/:idOffreEmploi')
   @HttpCode(204)
-  async deleteFavoriOffresEmploi(
+  async deleteFavoriOffreEmploi(
     @Param('idJeune') idJeune: string,
     @Param('idOffreEmploi') idOffreEmploi: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
@@ -152,6 +157,26 @@ export class FavorisController {
       idOffreEmploi
     }
     const result = await this.deleteFavoriOffreEmploiCommandHandler.execute(
+      command,
+      utilisateur
+    )
+    if (isFailure(result)) {
+      throw new NotFoundException(result.error)
+    }
+  }
+
+  @Delete('favori/:idOffreImmersion')
+  @HttpCode(204)
+  async deleteFavoriOffreImmersion(
+    @Param('idJeune') idJeune: string,
+    @Param('idOffreImmersion') idOffreImmersion: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: DeleteFavoriOffreImmersionCommand = {
+      idJeune,
+      idOffreImmersion
+    }
+    const result = await this.deleteFavoriOffreImmersionCommandHandler.execute(
       command,
       utilisateur
     )
