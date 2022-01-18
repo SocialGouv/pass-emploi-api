@@ -71,7 +71,7 @@ import { MiloHttpRepository } from './infrastructure/repositories/milo-http.repo
 import { MiloInMemoryRepository } from './infrastructure/repositories/milo-in-memory.repository'
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
 import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre-emploi-http-sql.repository'
-import { OffresImmersionHttpRepository } from './infrastructure/repositories/offre-immersion-http.repository'
+import { OffresImmersionHttpSqlRepository } from './infrastructure/repositories/offre-immersion-http-sql.repository'
 import { PlanificateurRedisRepository } from './infrastructure/repositories/planificateur-redis.repository'
 import { RendezVousRepositorySql } from './infrastructure/repositories/rendez-vous-sql.repository'
 import { ActionsController } from './infrastructure/routes/actions.controller'
@@ -99,6 +99,7 @@ import { MailSendinblueClient } from './infrastructure/clients/mail-sendinblue.c
 import { SynchronizeJobsCommandHandler } from './application/commands/synchronize-jobs.command'
 import { GetFavorisOffresEmploiIdsJeuneQueryHandler } from './application/queries/get-favoris-offres-emploi-ids-jeune.query.handler'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from './application/queries/get-favoris-offres-emploi-jeune.query.handler'
+import { AddFavoriOffreImmersionCommandHandler } from './application/commands/add-favori-offre-immersion.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -182,7 +183,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: OffresImmersionRepositoryToken,
-      useClass: OffresImmersionHttpRepository
+      useClass: OffresImmersionHttpSqlRepository
     },
     {
       provide: PlanificateurRepositoryToken,
@@ -211,6 +212,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateActionCommandHandler,
     CreerJeunePoleEmploiCommandHandler,
     AddFavoriOffreEmploiCommandHandler,
+    AddFavoriOffreImmersionCommandHandler,
     DeleteFavoriOffreEmploiCommandHandler,
     GetFavorisOffresEmploiIdsJeuneQueryHandler,
     GetFavorisOffresEmploiJeuneQueryHandler,

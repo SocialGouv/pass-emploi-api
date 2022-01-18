@@ -4,6 +4,7 @@ import { ConseillerSqlModel } from './conseiller.sql-model'
 import { DepartementSqlModel } from './departement.sql-model'
 import { EvenementEngagementSqlModel } from './evenement-engagement.sql-model'
 import { FavoriOffreEmploiSqlModel } from './favori-offre-emploi.sql-model'
+import { FavoriOffreImmersionSqlModel } from './favori-offre-immersion.sql-model'
 import { JeuneSqlModel } from './jeune.sql-model'
 import { RendezVousSqlModel } from './rendez-vous.sql-model'
 
@@ -15,5 +16,6 @@ export const sqlModels = [
   FavoriOffreEmploiSqlModel,
   CommuneSqlModel,
   DepartementSqlModel,
-  EvenementEngagementSqlModel
+  EvenementEngagementSqlModel,
+  FavoriOffreImmersionSqlModel
 ]

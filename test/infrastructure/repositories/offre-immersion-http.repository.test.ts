@@ -7,17 +7,17 @@ import {
 } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { ImmersionClient } from '../../../src/infrastructure/clients/immersion-client'
-import { OffresImmersionHttpRepository } from '../../../src/infrastructure/repositories/offre-immersion-http.repository'
+import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-immersion-http-sql.repository'
 import { StubbedClass, stubClass } from '../../utils'
 
 describe('OffresImmersionHttpRepository', () => {
-  let offresImmersionHttpRepository: OffresImmersionHttpRepository
+  let offresImmersionHttpRepository: OffresImmersionHttpSqlRepository
   let immersionClient: StubbedClass<ImmersionClient>
 
   beforeEach(() => {
     immersionClient = stubClass(ImmersionClient)
 
-    offresImmersionHttpRepository = new OffresImmersionHttpRepository(
+    offresImmersionHttpRepository = new OffresImmersionHttpSqlRepository(
       immersionClient
     )
   })
