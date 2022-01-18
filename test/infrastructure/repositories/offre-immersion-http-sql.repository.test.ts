@@ -8,16 +8,24 @@ import {
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { ImmersionClient } from '../../../src/infrastructure/clients/immersion-client'
 import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-immersion-http-sql.repository'
-import { StubbedClass, stubClass } from '../../utils'
+import { DatabaseForTesting, StubbedClass, stubClass } from '../../utils'
+import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
+import { uneOffreImmersion } from '../../fixtures/offre-immersion.fixture'
+import { FavoriOffreImmersionSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
+import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
+import { OffreImmersion } from '../../../src/domain/offre-immersion'
 
-describe('OffresImmersionHttpRepository', () => {
-  let offresImmersionHttpRepository: OffresImmersionHttpSqlRepository
+describe('OffresImmersionHttpSqlRepository', () => {
+  DatabaseForTesting.prepare()
+  let offresImmersionHttpSqlRepository: OffresImmersionHttpSqlRepository
   let immersionClient: StubbedClass<ImmersionClient>
 
   beforeEach(() => {
     immersionClient = stubClass(ImmersionClient)
 
-    offresImmersionHttpRepository = new OffresImmersionHttpSqlRepository(
+    offresImmersionHttpSqlRepository = new OffresImmersionHttpSqlRepository(
       immersionClient
     )
   })
@@ -56,7 +64,7 @@ describe('OffresImmersionHttpRepository', () => {
           .resolves(response)
 
         // When
-        const offres = await offresImmersionHttpRepository.findAll(
+        const offres = await offresImmersionHttpSqlRepository.findAll(
           query.rome,
           query.location.lat,
           query.location.lon
@@ -107,7 +115,7 @@ describe('OffresImmersionHttpRepository', () => {
         immersionClient.post.rejects({ response: badResponse })
 
         // When
-        const offres = await offresImmersionHttpRepository.findAll(
+        const offres = await offresImmersionHttpSqlRepository.findAll(
           query.rome,
           query.location.lat,
           query.location.lon
@@ -155,7 +163,7 @@ describe('OffresImmersionHttpRepository', () => {
         immersionClient.get.resolves(response)
 
         // When
-        const detailOffre = await offresImmersionHttpRepository.get(
+        const detailOffre = await offresImmersionHttpSqlRepository.get(
           query.idOffreImmersion
         )
 
@@ -209,7 +217,7 @@ describe('OffresImmersionHttpRepository', () => {
         immersionClient.get.rejects({ response: badResponse })
 
         // When
-        const offres = await offresImmersionHttpRepository.get(
+        const offres = await offresImmersionHttpSqlRepository.get(
           query.idOffreImmersion
         )
 
@@ -240,7 +248,7 @@ describe('OffresImmersionHttpRepository', () => {
         immersionClient.get.rejects({ response: badResponse })
 
         // When
-        const offres = await offresImmersionHttpRepository.get(
+        const offres = await offresImmersionHttpSqlRepository.get(
           query.idOffreImmersion
         )
 
@@ -260,10 +268,80 @@ describe('OffresImmersionHttpRepository', () => {
         immersionClient.get.rejects(error)
 
         // When
-        const offres = offresImmersionHttpRepository.get(query.idOffreImmersion)
+        const offres = offresImmersionHttpSqlRepository.get(
+          query.idOffreImmersion
+        )
 
         // Then
         await expect(offres).to.be.rejectedWith(error)
+      })
+    })
+  })
+  describe('.saveAsFavori', () => {
+    describe("quand le favori n'existe pas", () => {
+      it('sauvegarde un favori', async () => {
+        // Given
+        await ConseillerSqlModel.creer(unConseillerDto({ id: 'ZIDANE' }))
+        await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: 'ABCDE',
+            idConseiller: 'ZIDANE'
+          })
+        )
+        // When
+        await offresImmersionHttpSqlRepository.saveAsFavori(
+          'ABCDE',
+          uneOffreImmersion()
+        )
+
+        // Then
+        const offresImmersion = await FavoriOffreImmersionSqlModel.findAll()
+        expect(offresImmersion.length).to.equal(1)
+        expect(offresImmersion[0].idOffre).to.equal('123ABC')
+        expect(offresImmersion[0].idJeune).to.equal('ABCDE')
+      })
+    })
+  })
+  describe('.getFavori', () => {
+    let offreImmersion: OffreImmersion
+
+    beforeEach(async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseillerDto({ id: 'ZIDANE' }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: 'ABCDE',
+          idConseiller: 'ZIDANE'
+        })
+      )
+      offreImmersion = uneOffreImmersion()
+      await offresImmersionHttpSqlRepository.saveAsFavori(
+        'ABCDE',
+        offreImmersion
+      )
+    })
+
+    describe("quand le favori n'existe pas", () => {
+      it('renvoie undefined', async () => {
+        // When
+        const favori = await offresImmersionHttpSqlRepository.getFavori(
+          'ABCDE',
+          'UN MAUVAIS ID'
+        )
+        // Then
+        expect(favori).to.equal(undefined)
+      })
+    })
+
+    describe('quand le favori existe', () => {
+      it("renvoie l'offre d'emploi", async () => {
+        // When
+        const favori = await offresImmersionHttpSqlRepository.getFavori(
+          'ABCDE',
+          offreImmersion.id
+        )
+        // Then
+        expect(favori).to.deep.equal(offreImmersion)
       })
     })
   })
