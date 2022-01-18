@@ -6,6 +6,14 @@ import { Result } from '../building-blocks/types/result'
 
 export const OffresImmersionRepositoryToken = 'OffresImmersion.Repository'
 
+export interface OffreImmersion {
+  id: string
+  metier: string
+  nomEtablissement: string
+  secteurActivite: string
+  ville: string
+}
+
 export namespace OffresImmersion {
   export interface Repository {
     findAll(
@@ -17,6 +25,13 @@ export namespace OffresImmersion {
     get(
       idOffreImmersion: string
     ): Promise<Result<DetailOffreImmersionQueryModel>>
+
+    getFavori(
+      idJeune: string,
+      idOffreImmersion: string
+    ): Promise<OffreImmersion | undefined>
+
+    saveAsFavori(idJeune: string, offreImmersion: OffreImmersion): Promise<void>
   }
 
   export enum MethodeDeContact {

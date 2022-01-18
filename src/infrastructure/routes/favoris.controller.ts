@@ -13,6 +13,10 @@ import {
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiTags } from '@nestjs/swagger'
+import {
+  AddFavoriOffreImmersionCommand,
+  AddFavoriOffreImmersionCommandHandler
+} from 'src/application/commands/add-favori-offre-immersion.command.handler'
 import { GetFavorisOffresEmploiIdsJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-ids-jeune.query.handler'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler'
 import {
@@ -35,6 +39,7 @@ import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import {
+  AddFavoriImmersionPayload,
   AddFavoriOffresEmploiPayload,
   GetFavorisOffresEmploiQuery
 } from './validation/favoris.inputs'
@@ -47,7 +52,8 @@ export class FavorisController {
     private readonly getFavorisOffresEmploiIdsJeuneQueryHandler: GetFavorisOffresEmploiIdsJeuneQueryHandler,
     private readonly getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
-    private readonly deleteFavoriOffreEmploiCommandHandler: DeleteFavoriOffreEmploiCommandHandler
+    private readonly deleteFavoriOffreEmploiCommandHandler: DeleteFavoriOffreEmploiCommandHandler,
+    private readonly addFavoriOffreImmersionCommandHandler: AddFavoriOffreImmersionCommandHandler
   ) {}
 
   @Get('favoris/offres-emploi')
@@ -87,6 +93,38 @@ export class FavorisController {
       }
     }
     const result = await this.addFavoriOffreEmploiCommandHandler.execute(
+      command,
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      if (result.error.code === NonTrouveError.CODE) {
+        throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
+      }
+      if (result.error.code === FavoriExisteDejaError.CODE) {
+        throw new HttpException(result.error.message, HttpStatus.CONFLICT)
+      }
+      throw new RuntimeException(result.error.message)
+    }
+  }
+
+  @Post('favori/offres-immersion')
+  async postNouveauFavoriOffresImmersion(
+    @Param('idJeune') idJeune: string,
+    @Body() addFavoriPayload: AddFavoriImmersionPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: AddFavoriOffreImmersionCommand = {
+      idJeune,
+      offreImmersion: {
+        id: addFavoriPayload.idOffre,
+        metier: addFavoriPayload.metier,
+        nomEtablissement: addFavoriPayload.nomEtablissement,
+        secteurActivite: addFavoriPayload.secteurActivite,
+        ville: addFavoriPayload.ville
+      }
+    }
+    const result = await this.addFavoriOffreImmersionCommandHandler.execute(
       command,
       utilisateur
     )

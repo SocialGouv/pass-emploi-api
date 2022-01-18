@@ -59,6 +59,33 @@ export class AddFavoriOffresEmploiPayload {
   duree?: string
 }
 
+export class AddFavoriImmersionPayload {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  idOffre: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  metier: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  nomEtablissement: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  secteurActivite: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  ville: string
+}
+
 export class GetFavorisOffresEmploiQuery {
   @ApiPropertyOptional()
   @IsString()
