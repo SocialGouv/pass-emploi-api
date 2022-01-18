@@ -15,7 +15,7 @@ export interface GetFavorisIdsJeuneQuery extends Query {
 }
 
 @Injectable()
-export class GetFavorisIdsJeuneQueryHandler extends QueryHandler<
+export class GetFavorisOffresEmploiIdsJeuneQueryHandler extends QueryHandler<
   GetFavorisIdsJeuneQuery,
   FavoriIdQueryModel[]
 > {
@@ -24,7 +24,7 @@ export class GetFavorisIdsJeuneQueryHandler extends QueryHandler<
     private readonly offresEmploiRepository: OffresEmploi.Repository,
     private jeuneAuthorizer: JeuneAuthorizer
   ) {
-    super('GetFavorisIdsJeuneQueryHandler')
+    super('GetFavorisOffresEmploiIdsJeuneQueryHandler')
   }
 
   handle(query: GetFavorisIdsJeuneQuery): Promise<FavoriIdQueryModel[]> {

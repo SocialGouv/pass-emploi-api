@@ -15,8 +15,8 @@ import {
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler'
-import { GetFavorisIdsJeuneQueryHandler } from 'src/application/queries/get-favoris-ids-jeune.query.handler'
-import { GetFavorisJeuneQueryHandler } from 'src/application/queries/get-favoris-jeune.query.handler'
+import { GetFavorisOffresEmploiIdsJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-ids-jeune.query.handler'
+import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
 import {
@@ -51,10 +51,10 @@ import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { CreateActionAvecStatutPayload } from './validation/conseillers.inputs'
 import {
-  AddFavoriPayload,
-  GetFavorisQuery,
-  PutNotificationTokenInput
-} from './validation/jeunes.inputs'
+  AddFavoriOffresEmploiPayload,
+  GetFavorisOffresEmploiQuery
+} from './validation/favoris.inputs'
+import { PutNotificationTokenInput } from './validation/jeunes.inputs'
 import StatutInvalide = Action.StatutInvalide
 
 @Controller('jeunes/:idJeune')
@@ -68,8 +68,8 @@ export class JeunesController {
     private readonly getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly getAllRendezVousJeuneQueryHandler: GetAllRendezVousJeuneQueryHandler,
-    private readonly getFavorisIdsJeuneQueryHandler: GetFavorisIdsJeuneQueryHandler,
-    private readonly getFavorisJeuneQueryHandler: GetFavorisJeuneQueryHandler,
+    private readonly getFavorisIdsJeuneQueryHandler: GetFavorisOffresEmploiIdsJeuneQueryHandler,
+    private readonly getFavorisJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
     private readonly deleteFavoriCommandHandler: DeleteFavoriOffreEmploiCommandHandler
   ) {}
@@ -193,10 +193,11 @@ export class JeunesController {
     throw new RuntimeException()
   }
 
+  // Deprecated
   @Get('favoris')
   async getFavoris(
     @Param('idJeune') idJeune: string,
-    @Query() getFavorisQuery: GetFavorisQuery,
+    @Query() getFavorisQuery: GetFavorisOffresEmploiQuery,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffreEmploiResumeQueryModel[] | FavoriIdQueryModel[]> {
     if (getFavorisQuery.detail === 'true') {
@@ -211,10 +212,11 @@ export class JeunesController {
     )
   }
 
+  // Deprecated
   @Post('favori')
   async postNouveauFavori(
     @Param('idJeune') idJeune: string,
-    @Body() addFavoriPayload: AddFavoriPayload,
+    @Body() addFavoriPayload: AddFavoriOffresEmploiPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const command: AddFavoriOffreEmploiCommand = {
@@ -245,6 +247,7 @@ export class JeunesController {
     }
   }
 
+  // Deprecated
   @Delete('favori/:idOffreEmploi')
   @HttpCode(204)
   async deleteFavori(

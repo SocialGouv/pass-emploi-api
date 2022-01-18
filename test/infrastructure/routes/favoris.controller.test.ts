@@ -4,13 +4,10 @@ import {
   AddFavoriOffreEmploiCommand,
   AddFavoriOffreEmploiCommandHandler
 } from '../../../src/application/commands/add-favori-offre-emploi.command.handler'
-import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
 import {
   DeleteFavoriOffreEmploiCommand,
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
-import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler'
-import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-models'
 import {
   FavoriExisteDejaError,
   FavoriNonTrouveError,
@@ -18,11 +15,8 @@ import {
 } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
-  failure,
-  success
+  failure
 } from '../../../src/building-blocks/types/result'
-import { Action } from '../../../src/domain/action'
-import { CreateActionAvecStatutPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
 import { AddFavoriOffresEmploiPayload } from '../../../src/infrastructure/routes/validation/favoris.inputs'
 import {
   unHeaderAuthorization,
@@ -37,33 +31,24 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import StatutInvalide = Action.StatutInvalide
 
-describe('JeunesController', () => {
-  let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
+describe('FavorisController', () => {
   let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
   let deleteFavoriOffreEmploiCommandHandler: StubbedClass<DeleteFavoriOffreEmploiCommandHandler>
-  let getDetailJeuneQueryHandler: StubbedClass<GetDetailJeuneQueryHandler>
   let app: INestApplication
 
   before(async () => {
-    createActionCommandHandler = stubClass(CreateActionCommandHandler)
     addFavoriOffreEmploiCommandHandler = stubClass(
       AddFavoriOffreEmploiCommandHandler
     )
     deleteFavoriOffreEmploiCommandHandler = stubClass(
       DeleteFavoriOffreEmploiCommandHandler
     )
-    getDetailJeuneQueryHandler = stubClass(GetDetailJeuneQueryHandler)
     const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(CreateActionCommandHandler)
-      .useValue(createActionCommandHandler)
       .overrideProvider(AddFavoriOffreEmploiCommandHandler)
       .useValue(addFavoriOffreEmploiCommandHandler)
       .overrideProvider(DeleteFavoriOffreEmploiCommandHandler)
       .useValue(deleteFavoriOffreEmploiCommandHandler)
-      .overrideProvider(GetDetailJeuneQueryHandler)
-      .useValue(getDetailJeuneQueryHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -72,71 +57,6 @@ describe('JeunesController', () => {
 
   after(async () => {
     await app.close()
-  })
-
-  describe('POST /jeunes/:idJeune/action', () => {
-    const actionPayload: CreateActionAvecStatutPayload = {
-      content: "Ceci est un contenu d'action",
-      comment: 'Ceci est un commentaire',
-      status: Action.Statut.EN_COURS
-    }
-    it("renvoie l'id de l'action créée", async () => {
-      // Given
-      const idAction = 'a40a178e-9562-416f-ad9d-42dfbc663a8a'
-      createActionCommandHandler.execute.resolves(success(idAction))
-
-      // When
-      await request(app.getHttpServer())
-        .post('/jeunes/ABCDE/action')
-        .set('authorization', unHeaderAuthorization())
-        .send(actionPayload)
-
-        // Then
-        .expect(HttpStatus.CREATED)
-        .expect({ id: idAction })
-      expect(createActionCommandHandler.execute).to.have.been.calledWithExactly(
-        {
-          idJeune: 'ABCDE',
-          contenu: "Ceci est un contenu d'action",
-          idCreateur: 'ABCDE',
-          typeCreateur: Action.TypeCreateur.JEUNE,
-          statut: Action.Statut.EN_COURS,
-          commentaire: 'Ceci est un commentaire'
-        },
-        unUtilisateurDecode()
-      )
-    })
-
-    it("renvoie une 404 (Not Found) quand le jeune n'existe pas", async () => {
-      const echec = failure(new NonTrouveError('Jeune', 'ABCDE'))
-      createActionCommandHandler.execute.resolves(echec)
-
-      await request(app.getHttpServer())
-        .post('/jeunes/ABCDE/action')
-        .set('authorization', unHeaderAuthorization())
-        .send(actionPayload)
-        .expect(HttpStatus.NOT_FOUND)
-        .expect({
-          message: echec.error.message,
-          statusCode: HttpStatus.NOT_FOUND
-        })
-    })
-
-    it('renvoie une 400 (Bad Request) quand le statuts est incorrect', async () => {
-      const echec = failure(new StatutInvalide('whatever_status'))
-      createActionCommandHandler.execute.resolves(echec)
-
-      await request(app.getHttpServer())
-        .post('/jeunes/ABCDE/action')
-        .set('authorization', unHeaderAuthorization())
-        .send(actionPayload)
-        .expect(HttpStatus.BAD_REQUEST)
-        .expect({
-          message: echec.error.message,
-          statusCode: HttpStatus.BAD_REQUEST
-        })
-    })
-    ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/ABCDE/action')
   })
 
   describe('POST /jeunes/:idJeune/favori', () => {
@@ -273,56 +193,5 @@ describe('JeunesController', () => {
         .expect(expectedMessageJson)
     })
     ensureUserAuthenticationFailsIfInvalid('delete', '/jeunes/ABCDE/favori/123')
-  })
-
-  describe('GET /jeunes/:idJeune', () => {
-    const idJeune = '1'
-    it('renvoit le jeune quand il existe', async () => {
-      // Given
-      const detailJeuneQueryModel: DetailJeuneQueryModel = {
-        id: idJeune,
-        firstName: 'Kenji',
-        lastName: 'Tavernier',
-        email: 'kenji.tavernier@email.fr',
-        creationDate: 'une_date',
-        isActivated: true
-      }
-      getDetailJeuneQueryHandler.execute.resolves(detailJeuneQueryModel)
-
-      // When
-      await request(app.getHttpServer())
-        .get(`/jeunes/${idJeune}`)
-        .set('authorization', unHeaderAuthorization())
-        // Then
-        .expect(HttpStatus.OK)
-        .expect(detailJeuneQueryModel)
-      expect(getDetailJeuneQueryHandler.execute).to.have.been.calledWithExactly(
-        {
-          idJeune
-        },
-        unUtilisateurDecode()
-      )
-    })
-    it('renvoit une 404 quand le jeune n"existe pas', async () => {
-      // Given
-      getDetailJeuneQueryHandler.execute.resolves(undefined)
-      const expectedResponseJson = {
-        statusCode: HttpStatus.NOT_FOUND,
-        message: `Jeune ${idJeune} not found`
-      }
-      // When
-      await request(app.getHttpServer())
-        .get(`/jeunes/${idJeune}`)
-        .set('authorization', unHeaderAuthorization())
-        // Then
-        .expect(expectedResponseJson)
-      expect(getDetailJeuneQueryHandler.execute).to.have.been.calledWithExactly(
-        {
-          idJeune
-        },
-        unUtilisateurDecode()
-      )
-    })
-    ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1')
   })
 })
