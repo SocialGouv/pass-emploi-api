@@ -1,5 +1,5 @@
 import {
-  FavoriIdQueryModel,
+  FavoriOffreEmploiIdQueryModel,
   OffreEmploiQueryModel,
   OffreEmploiResumeQueryModel,
   OffresEmploiQueryModel
@@ -106,9 +106,9 @@ export function buildLocalisation(
   }
 }
 
-export function fromSqlToFavorisIdsQueryModels(
+export function fromSqlToFavorisOffresEmploiIdsQueryModels(
   favorisIdsSql: FavoriOffreEmploiSqlModel[]
-): FavoriIdQueryModel[] {
+): FavoriOffreEmploiIdQueryModel[] {
   return favorisIdsSql.map(favori => {
     return { id: favori.idOffre }
   })

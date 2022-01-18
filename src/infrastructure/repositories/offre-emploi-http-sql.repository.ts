@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import {
-  FavoriIdQueryModel,
+  FavoriOffreEmploiIdQueryModel,
   OffreEmploiQueryModel,
   OffreEmploiResumeQueryModel,
   OffresEmploiQueryModel
@@ -19,7 +19,7 @@ import {
   toOffreEmploiQueryModel,
   toFavoriOffreEmploiSqlModel,
   toOffreEmploi,
-  fromSqlToFavorisIdsQueryModels,
+  fromSqlToFavorisOffresEmploiIdsQueryModels,
   toPoleEmploiContrat
 } from './mappers/offres-emploi.mappers'
 
@@ -119,7 +119,7 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
 
   async getFavorisIdsQueryModelsByJeune(
     idJeune: string
-  ): Promise<FavoriIdQueryModel[]> {
+  ): Promise<FavoriOffreEmploiIdQueryModel[]> {
     const favorisIdsSql = await FavoriOffreEmploiSqlModel.findAll({
       attributes: ['idOffre'],
       where: {
@@ -127,7 +127,7 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
       }
     })
 
-    return fromSqlToFavorisIdsQueryModels(favorisIdsSql)
+    return fromSqlToFavorisOffresEmploiIdsQueryModels(favorisIdsSql)
   }
 
   async getFavorisQueryModelsByJeune(

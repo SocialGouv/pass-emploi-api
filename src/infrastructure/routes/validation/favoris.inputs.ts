@@ -86,7 +86,14 @@ export class AddFavoriImmersionPayload {
   ville: string
 }
 
-export class GetFavorisOffresEmploiQuery {
+export class GetFavorisOffresEmploiQueryParams {
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  detail?: string
+}
+
+export class GetFavorisOffresImmersionQueryParams {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()

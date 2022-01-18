@@ -1,5 +1,5 @@
 import {
-  FavoriIdQueryModel,
+  FavoriOffreEmploiIdQueryModel,
   OffreEmploiResumeQueryModel,
   OffreEmploiQueryModel,
   OffresEmploiQueryModel
@@ -43,7 +43,9 @@ export namespace OffresEmploi {
       idOffreEmploi: string
     ): Promise<OffreEmploiQueryModel | undefined>
 
-    getFavorisIdsQueryModelsByJeune(id: Jeune.Id): Promise<FavoriIdQueryModel[]>
+    getFavorisIdsQueryModelsByJeune(
+      id: Jeune.Id
+    ): Promise<FavoriOffreEmploiIdQueryModel[]>
 
     getFavorisQueryModelsByJeune(
       id: Jeune.Id

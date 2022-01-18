@@ -1,4 +1,5 @@
 import {
+  AutoIncrement,
   Column,
   DataType,
   ForeignKey,
@@ -10,10 +11,11 @@ import { JeuneSqlModel } from './jeune.sql-model'
 
 @Table({
   timestamps: false,
-  tableName: 'favoris_offres_emploi'
+  tableName: 'favori_offre_emploi'
 })
 export class FavoriOffreEmploiSqlModel extends Model {
   @PrimaryKey
+  @AutoIncrement
   @Column({
     field: 'id',
     type: DataType.INTEGER

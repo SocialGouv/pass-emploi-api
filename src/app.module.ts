@@ -101,6 +101,7 @@ import { GetFavorisOffresEmploiIdsJeuneQueryHandler } from './application/querie
 import { GetFavorisOffresEmploiJeuneQueryHandler } from './application/queries/get-favoris-offres-emploi-jeune.query.handler'
 import { AddFavoriOffreImmersionCommandHandler } from './application/commands/add-favori-offre-immersion.command.handler'
 import { DeleteFavoriOffreImmersionCommandHandler } from './application/commands/delete-favori-offre-immersion.command.handler'
+import { GetFavorisOffresImmersionJeuneQueryHandler } from './application/queries/get-favoris-offres-immersion-jeune.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -218,6 +219,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     DeleteFavoriOffreImmersionCommandHandler,
     GetFavorisOffresEmploiIdsJeuneQueryHandler,
     GetFavorisOffresEmploiJeuneQueryHandler,
+    GetFavorisOffresImmersionJeuneQueryHandler,
     GetHomeJeuneHandler,
     GetOffresEmploiQueryHandler,
     GetOffresImmersionQueryHandler,
