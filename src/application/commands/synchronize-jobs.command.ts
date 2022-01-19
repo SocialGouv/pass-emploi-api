@@ -34,15 +34,15 @@ export class SynchronizeJobsCommandHandler extends CommandHandler<
     const conseillersIds = await this.conseillerRepository.getAllIds()
 
     this.logger.log('Création des jobs conseillers')
-    conseillersIds.forEach(id => {
-      this.planificateurService.planifierJobRappelMail(id)
-    })
+    for (const id of conseillersIds) {
+      await this.planificateurService.planifierJobRappelMail(id)
+    }
 
     const rendezVous = await this.rendezVousRepository.getAllAVenir()
     this.logger.log('Création des jobs rendez vous')
-    rendezVous.forEach(rdv => {
-      this.planificateurService.planifierRappelsRendezVous(rdv)
-    })
+    for (const rdv of rendezVous) {
+      await this.planificateurService.planifierRappelsRendezVous(rdv)
+    }
 
     return emptySuccess()
   }
