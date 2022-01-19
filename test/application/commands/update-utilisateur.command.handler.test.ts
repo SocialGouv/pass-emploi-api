@@ -155,7 +155,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
               nom: 'Tavernier',
               prenom: 'Nils',
               type: Authentification.Type.CONSEILLER,
-              email: 'nils.tavernier@passemploi.com',
+              email: 'Nils.Tavernier@Passemploi.com',
               idUtilisateurAuth: 'nilstavernier',
               structure: Core.Structure.MILO
             }
@@ -183,7 +183,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             // When
             result = await updateUtilisateurCommandHandler.execute(command)
           })
-          it('crée et retourne le conseiller', async () => {
+          it('crée et retourne le conseiller avec un mail minusculisé', async () => {
             // Then
             expect(isSuccess(result)).equal(true)
             if (isSuccess(result)) {
@@ -249,7 +249,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
               type: Authentification.Type.CONSEILLER,
               idUtilisateurAuth: 'nilstavernier',
               structure: Core.Structure.MILO,
-              email: 'un-email@valide.fr'
+              email: 'Un-Email@valide.fr'
             }
 
             authentificationRepository.get
@@ -368,7 +368,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
           // Given
           const command: UpdateUtilisateurCommand = {
             idUtilisateurAuth: 'nilstavernier',
-            email: 'abc@test.com',
+            email: 'ABC@test.com',
             type: Authentification.Type.JEUNE,
             structure: Core.Structure.MILO
           }
@@ -382,7 +382,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             )
             .resolves(undefined)
           authentificationRepository.getJeuneByEmail
-            .withArgs(command.email)
+            .withArgs('abc@test.com')
             .resolves(utilisateur)
           authentificationRepository.updateJeune
             .withArgs('id-jeune', command.idUtilisateurAuth)

@@ -60,11 +60,12 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       )
     }
 
+    const lowerCaseEmail = command.email?.toLocaleLowerCase()
     if (command.type === Authentification.Type.CONSEILLER) {
       const conseillerSso = this.authentificationFactory.buildConseiller(
         command.nom,
         command.prenom,
-        command.email,
+        lowerCaseEmail,
         command.structure
       )
 
@@ -80,9 +81,9 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       this.planificateurService.planifierJobRappelMail(conseillerSso.data.id)
 
       return conseillerSso
-    } else if (command.type === Authentification.Type.JEUNE && command.email) {
+    } else if (command.type === Authentification.Type.JEUNE && lowerCaseEmail) {
       const jeune = await this.authentificationRepository.getJeuneByEmail(
-        command.email
+        lowerCaseEmail
       )
 
       if (jeune) {
