@@ -47,6 +47,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
     const idService = stubClass(IdService)
     idService.uuid.returns(idNouveauJeune)
     dateService.now.returns(date)
+    conseillerRepository.get.withArgs('idConseiller').resolves(conseiller)
     creerJeuneMiloCommandHandler = new CreerJeuneMiloCommandHandler(
       idService,
       dateService,
@@ -62,7 +63,6 @@ describe('CreerJeuneMiloCommandHandler', () => {
     describe("quand il n'existe pas dans Milo", () => {
       it('crée un jeune et initialise le chat si besoin', async () => {
         // Given
-        conseillerRepository.get.withArgs('idConseiller').resolves(conseiller)
         const command: CreerJeuneMiloCommand = {
           idDossier: 'idDossier',
           nom: 'nom',
@@ -92,28 +92,58 @@ describe('CreerJeuneMiloCommandHandler', () => {
         ).to.have.been.calledWith(idNouveauJeune, conseiller.id)
         expect(result).to.deep.equal(success({ id: idNouveauJeune }))
       })
-    })
-    describe('quand il existe pas dans Milo', () => {
-      describe("si il n'existe pas dans pass emploi", () => {
-        it('renvoie une erreur', async () => {
-          // Given
-          conseillerRepository.get.withArgs('idConseiller').resolves(conseiller)
-          const command: CreerJeuneMiloCommand = {
-            idDossier: 'idDossier',
-            nom: 'nom',
-            prenom: 'prenom',
-            email: 'email',
-            idConseiller: 'idConseiller'
-          }
-          const echec = failure(new ErreurHttpMilo(command.email, 400))
-          miloRepository.creerJeune.resolves(echec)
 
-          // When
-          const result = await creerJeuneMiloCommandHandler.handle(command)
+      it("minusculise l'email", async () => {
+        // Given
+        const command: CreerJeuneMiloCommand = {
+          idDossier: 'idDossier',
+          nom: 'nom',
+          prenom: 'prenom',
+          email: 'Jeune.Nom@Email.Com',
+          idConseiller: 'idConseiller'
+        }
+        miloRepository.creerJeune
+          .withArgs(command.idDossier, 'jeune.nom@email.com')
+          .resolves(emptySuccess())
 
-          // Then
-          expect(result).to.deep.equal(echec)
+        // When
+        const result = await creerJeuneMiloCommandHandler.handle(command)
+
+        // Then
+        expect(jeuneRepository.save).to.have.been.calledWithExactly({
+          id: idNouveauJeune,
+          firstName: command.prenom,
+          lastName: command.nom,
+          creationDate: date,
+          email: 'jeune.nom@email.com',
+          conseiller,
+          structure: Core.Structure.MILO
         })
+        expect(
+          chatRepository.initializeChatIfNotExists
+        ).to.have.been.calledWith(idNouveauJeune, conseiller.id)
+        expect(result).to.deep.equal(success({ id: idNouveauJeune }))
+      })
+    })
+
+    describe('quand il existe dans Milo mais pas dans Pass Emploi', () => {
+      it('renvoie une erreur', async () => {
+        // Given
+        const command: CreerJeuneMiloCommand = {
+          idDossier: 'idDossier',
+          nom: 'nom',
+          prenom: 'prenom',
+          email: 'email',
+          idConseiller: 'idConseiller'
+        }
+        const echec = failure(new ErreurHttpMilo(command.email, 400))
+        miloRepository.creerJeune.resolves(echec)
+
+        // When
+        const result = await creerJeuneMiloCommandHandler.handle(command)
+
+        // Then
+        expect(result).to.deep.equal(echec)
       })
     })
   })

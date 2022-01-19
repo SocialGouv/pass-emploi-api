@@ -46,10 +46,11 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     if (!conseiller) {
       throw new NotFound(command.idConseiller, 'Conseiller')
     }
+    const lowerCaseEmail = command.email.toLocaleLowerCase()
 
     const result = await this.miloRepository.creerJeune(
       command.idDossier,
-      command.email
+      lowerCaseEmail
     )
 
     if (isFailure(result)) {
@@ -61,7 +62,7 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
       firstName: command.prenom,
       lastName: command.nom,
       creationDate: this.dateService.now(),
-      email: command.email,
+      email: lowerCaseEmail,
       conseiller,
       structure: Core.Structure.MILO
     }

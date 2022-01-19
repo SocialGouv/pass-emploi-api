@@ -1,12 +1,13 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
-import { success } from 'src/building-blocks/types/result'
+import { failure, success } from 'src/building-blocks/types/result'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import {
   CreateJeuneCommand,
   CreerJeunePoleEmploiCommandHandler
 } from '../../../src/application/commands/creer-jeune-pole-emploi.command.handler'
+import { EmailExisteDejaError } from '../../../src/building-blocks/types/domain-error'
 import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
@@ -16,6 +17,7 @@ import { DateService } from '../../../src/utils/date-service'
 import { IdService } from '../../../src/utils/id-service'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, stubClass } from '../../utils'
 import Structure = Core.Structure
 
@@ -34,9 +36,6 @@ describe('CreateJeuneCommandHandler', () => {
   const idService = stubClass(IdService)
 
   before(async () => {
-    conseillerRepository.get.withArgs(conseiller.id).resolves(conseiller)
-    idService.uuid.returns(idNouveauJeune)
-    dateService.now.returns(date)
     createJeuneCommandHandler = new CreerJeunePoleEmploiCommandHandler(
       jeuneRepository,
       conseillerRepository,
@@ -45,6 +44,16 @@ describe('CreateJeuneCommandHandler', () => {
       idService,
       dateService
     )
+  })
+
+  beforeEach(async () => {
+    conseillerRepository.get.withArgs(conseiller.id).resolves(conseiller)
+    idService.uuid.returns(idNouveauJeune)
+    dateService.now.returns(date)
+  })
+
+  afterEach(() => {
+    sandbox.reset()
   })
 
   describe('handle', () => {
@@ -74,6 +83,48 @@ describe('CreateJeuneCommandHandler', () => {
       expect(chatRepository.initializeChatIfNotExists).to.have.been.calledWith(
         idNouveauJeune,
         conseiller.id
+      )
+    })
+
+    describe('quand il existe déjà un jeune avec cet email', () => {
+      it('renvoie une erreur', async () => {
+        // Given
+        const command: CreateJeuneCommand = {
+          firstName: 'Kenji',
+          lastName: 'Lefameux',
+          email: 'kenji.lefameur@poleemploi.fr',
+          idConseiller: conseiller.id
+        }
+        jeuneRepository.getByEmail.withArgs(command.email).resolves(unJeune())
+
+        // When
+        const result = await createJeuneCommandHandler.handle(command)
+
+        // Then
+        expect(result).to.deep.equal(
+          failure(new EmailExisteDejaError(command.email))
+        )
+      })
+    })
+
+    it("minusculise l'email", async () => {
+      // Given
+      const command: CreateJeuneCommand = {
+        firstName: 'Kenji',
+        lastName: 'Lefameux',
+        email: 'Kenji.Lefameux@Poleemploi.fr',
+        idConseiller: conseiller.id
+      }
+
+      // When
+      await createJeuneCommandHandler.handle(command)
+
+      // Then
+      expect(jeuneRepository.getByEmail).to.have.been.calledWithExactly(
+        'kenji.lefameux@poleemploi.fr'
+      )
+      expect(jeuneRepository.save).to.have.been.calledWithExactly(
+        sandbox.match.has('email', 'kenji.lefameux@poleemploi.fr')
       )
     })
   })
