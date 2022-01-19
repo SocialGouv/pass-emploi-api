@@ -45,16 +45,18 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
     if (!conseiller) {
       return failure(new NonTrouveError('Conseiller', command.idConseiller))
     }
-    const jeune = await this.jeuneRepository.getByEmail(command.email)
+
+    const lowerCaseEmail = command.email.toLocaleLowerCase()
+    const jeune = await this.jeuneRepository.getByEmail(lowerCaseEmail)
     if (jeune) {
-      return failure(new EmailExisteDejaError(command.email))
+      return failure(new EmailExisteDejaError(lowerCaseEmail))
     }
 
     const nouveauJeune: Jeune = {
       id: this.idService.uuid(),
       firstName: command.firstName,
       lastName: command.lastName,
-      email: command.email,
+      email: lowerCaseEmail,
       creationDate: this.dateService.now(),
       conseiller,
       structure: Core.Structure.POLE_EMPLOI
