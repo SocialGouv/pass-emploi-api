@@ -11,11 +11,18 @@ import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/re
 import { DatabaseForTesting, StubbedClass, stubClass } from '../../utils'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { uneOffreImmersion } from '../../fixtures/offre-immersion.fixture'
+import {
+  uneOffreImmersion,
+  uneOffreImmersionQueryModel
+} from '../../fixtures/offre-immersion.fixture'
 import { FavoriOffreImmersionSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { OffreImmersion } from '../../../src/domain/offre-immersion'
+import {
+  FavoriOffreImmersionIdQueryModel,
+  OffreImmersionQueryModel
+} from 'src/application/queries/query-models/offres-immersion.query-models'
 
 describe('OffresImmersionHttpSqlRepository', () => {
   DatabaseForTesting.prepare()
@@ -377,6 +384,76 @@ describe('OffresImmersionHttpSqlRepository', () => {
         offreImmersion.id
       )
       expect(actual).to.equal(undefined)
+    })
+  })
+
+  describe('.getFavorisQueryModelsByJeune', () => {
+    const idJeune = 'ABCDE'
+
+    beforeEach(async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseillerDto({ id: 'ZIDANE' }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: idJeune,
+          idConseiller: 'ZIDANE'
+        })
+      )
+      await offresImmersionHttpSqlRepository.saveAsFavori(
+        idJeune,
+        uneOffreImmersion()
+      )
+    })
+
+    it('recupère tous les favoris immersions du jeune', async () => {
+      // Given
+      const expectedResult: OffreImmersionQueryModel[] = [
+        uneOffreImmersionQueryModel()
+      ]
+      // When
+
+      const result =
+        await offresImmersionHttpSqlRepository.getFavorisQueryModelsByJeune(
+          idJeune
+        )
+      // Then
+
+      expect(result).to.deep.equal(expectedResult)
+    })
+  })
+
+  describe('.getFavorisIdsQueryModelsByJeune', () => {
+    const idJeune = 'ABCDE'
+
+    beforeEach(async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseillerDto({ id: 'ZIDANE' }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: idJeune,
+          idConseiller: 'ZIDANE'
+        })
+      )
+      await offresImmersionHttpSqlRepository.saveAsFavori(
+        idJeune,
+        uneOffreImmersion()
+      )
+    })
+
+    it('recupère tous les ids des favoris immersions du jeune', async () => {
+      // Given
+      const expectedResult: FavoriOffreImmersionIdQueryModel[] = [
+        { id: uneOffreImmersionQueryModel().id }
+      ]
+      // When
+
+      const result =
+        await offresImmersionHttpSqlRepository.getFavorisIdsQueryModelsByJeune(
+          idJeune
+        )
+      // Then
+
+      expect(result).to.deep.equal(expectedResult)
     })
   })
 })
