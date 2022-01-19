@@ -15,7 +15,6 @@ import {
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler'
-import { GetFavorisOffresEmploiIdsJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-ids-jeune.query.handler'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
@@ -68,7 +67,6 @@ export class JeunesController {
     private readonly getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly getAllRendezVousJeuneQueryHandler: GetAllRendezVousJeuneQueryHandler,
-    private readonly getFavorisOffresEmploiIdsJeuneQueryHandler: GetFavorisOffresEmploiIdsJeuneQueryHandler,
     private readonly getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
     private readonly deleteFavoriCommandHandler: DeleteFavoriOffreEmploiCommandHandler
@@ -200,14 +198,8 @@ export class JeunesController {
     @Query() getFavorisQuery: GetFavorisOffresEmploiQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiIdQueryModel[]> {
-    if (getFavorisQuery.detail === 'true') {
-      return await this.getFavorisOffresEmploiJeuneQueryHandler.execute(
-        { idJeune },
-        utilisateur
-      )
-    }
-    return await this.getFavorisOffresEmploiIdsJeuneQueryHandler.execute(
-      { idJeune },
+    return await this.getFavorisOffresEmploiJeuneQueryHandler.execute(
+      { idJeune, detail: getFavorisQuery.detail === 'true' },
       utilisateur
     )
   }

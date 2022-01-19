@@ -8,16 +8,20 @@ import {
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
-import { OffreEmploiResumeQueryModel } from './query-models/offres-emploi.query-models'
+import {
+  FavoriOffreEmploiIdQueryModel,
+  OffreEmploiResumeQueryModel
+} from './query-models/offres-emploi.query-models'
 
 export interface GetFavorisJeuneQuery extends Query {
   idJeune: Jeune.Id
+  detail: boolean
 }
 
 @Injectable()
 export class GetFavorisOffresEmploiJeuneQueryHandler extends QueryHandler<
   GetFavorisJeuneQuery,
-  OffreEmploiResumeQueryModel[]
+  OffreEmploiResumeQueryModel[] | FavoriOffreEmploiIdQueryModel[]
 > {
   constructor(
     @Inject(OffresEmploiRepositoryToken)
@@ -27,10 +31,14 @@ export class GetFavorisOffresEmploiJeuneQueryHandler extends QueryHandler<
     super('GetFavorisOffresEmploiJeuneQueryHandler')
   }
 
-  handle(query: GetFavorisJeuneQuery): Promise<OffreEmploiResumeQueryModel[]> {
-    return this.offresEmploiRepository.getFavorisQueryModelsByJeune(
-      query.idJeune
-    )
+  handle(
+    query: GetFavorisJeuneQuery
+  ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiIdQueryModel[]> {
+    return query.detail
+      ? this.offresEmploiRepository.getFavorisIdsQueryModelsByJeune(
+          query.idJeune
+        )
+      : this.offresEmploiRepository.getFavorisQueryModelsByJeune(query.idJeune)
   }
   async authorize(
     query: GetFavorisJeuneQuery,

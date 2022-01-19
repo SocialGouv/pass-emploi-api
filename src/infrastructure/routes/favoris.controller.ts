@@ -17,7 +17,6 @@ import {
   AddFavoriOffreImmersionCommand,
   AddFavoriOffreImmersionCommandHandler
 } from 'src/application/commands/add-favori-offre-immersion.command.handler'
-import { GetFavorisOffresEmploiIdsJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-ids-jeune.query.handler'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler'
 import {
   FavoriOffreEmploiIdQueryModel,
@@ -59,7 +58,6 @@ import {
 @ApiTags('Favoris')
 export class FavorisController {
   constructor(
-    private readonly getFavorisOffresEmploiIdsJeuneQueryHandler: GetFavorisOffresEmploiIdsJeuneQueryHandler,
     private readonly getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
     private readonly getFavorisOffresImmersionJeuneQueryHandler: GetFavorisOffresImmersionJeuneQueryHandler,
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
@@ -74,14 +72,8 @@ export class FavorisController {
     @Query() getFavorisQuery: GetFavorisOffresEmploiQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiIdQueryModel[]> {
-    if (getFavorisQuery.detail === 'true') {
-      return await this.getFavorisOffresEmploiJeuneQueryHandler.execute(
-        { idJeune },
-        utilisateur
-      )
-    }
-    return await this.getFavorisOffresEmploiIdsJeuneQueryHandler.execute(
-      { idJeune },
+    return await this.getFavorisOffresEmploiJeuneQueryHandler.execute(
+      { idJeune, detail: getFavorisQuery.detail === 'true' },
       utilisateur
     )
   }

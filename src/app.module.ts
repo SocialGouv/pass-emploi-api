@@ -97,7 +97,6 @@ import { EvenementHttpSqlRepository } from './infrastructure/repositories/evenem
 import { HandleJobMailConseillerCommandHandler } from './application/commands/handle-job-mail-conseiller.command'
 import { MailSendinblueClient } from './infrastructure/clients/mail-sendinblue.client'
 import { SynchronizeJobsCommandHandler } from './application/commands/synchronize-jobs.command'
-import { GetFavorisOffresEmploiIdsJeuneQueryHandler } from './application/queries/get-favoris-offres-emploi-ids-jeune.query.handler'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from './application/queries/get-favoris-offres-emploi-jeune.query.handler'
 import { AddFavoriOffreImmersionCommandHandler } from './application/commands/add-favori-offre-immersion.command.handler'
 import { DeleteFavoriOffreImmersionCommandHandler } from './application/commands/delete-favori-offre-immersion.command.handler'
@@ -217,7 +216,6 @@ export function buildQueryCommandsProviders(): Provider[] {
     AddFavoriOffreImmersionCommandHandler,
     DeleteFavoriOffreEmploiCommandHandler,
     DeleteFavoriOffreImmersionCommandHandler,
-    GetFavorisOffresEmploiIdsJeuneQueryHandler,
     GetFavorisOffresEmploiJeuneQueryHandler,
     GetFavorisOffresImmersionJeuneQueryHandler,
     GetHomeJeuneHandler,
