@@ -7,6 +7,8 @@ import {
   DeleteFavoriOffreImmersionCommand,
   DeleteFavoriOffreImmersionCommandHandler
 } from 'src/application/commands/delete-favori-offre-immersion.command.handler'
+import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler'
+import { GetFavorisOffresImmersionJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-immersion-jeune.query.handler'
 import * as request from 'supertest'
 import { uneOffreImmersion } from 'test/fixtures/offre-immersion.fixture'
 import {
@@ -44,11 +46,13 @@ import {
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 
-describe.only('FavorisController', () => {
+describe('FavorisController', () => {
   let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
   let deleteFavoriOffreEmploiCommandHandler: StubbedClass<DeleteFavoriOffreEmploiCommandHandler>
+  let getFavorisOffresEmploiJeuneQueryHandler: StubbedClass<GetFavorisOffresEmploiJeuneQueryHandler>
   let addFavoriOffreImmersionCommandHandler: StubbedClass<AddFavoriOffreImmersionCommandHandler>
   let deleteFavoriOffreImmersionCommandHandler: StubbedClass<DeleteFavoriOffreImmersionCommandHandler>
+  let getFavorisOffresImmersionJeuneQueryHandler: StubbedClass<GetFavorisOffresImmersionJeuneQueryHandler>
   let app: INestApplication
 
   before(async () => {
@@ -58,6 +62,9 @@ describe.only('FavorisController', () => {
     deleteFavoriOffreEmploiCommandHandler = stubClass(
       DeleteFavoriOffreEmploiCommandHandler
     )
+    getFavorisOffresEmploiJeuneQueryHandler = stubClass(
+      GetFavorisOffresEmploiJeuneQueryHandler
+    )
 
     addFavoriOffreImmersionCommandHandler = stubClass(
       AddFavoriOffreImmersionCommandHandler
@@ -65,16 +72,23 @@ describe.only('FavorisController', () => {
     deleteFavoriOffreImmersionCommandHandler = stubClass(
       DeleteFavoriOffreImmersionCommandHandler
     )
+    getFavorisOffresImmersionJeuneQueryHandler = stubClass(
+      GetFavorisOffresImmersionJeuneQueryHandler
+    )
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(AddFavoriOffreEmploiCommandHandler)
       .useValue(addFavoriOffreEmploiCommandHandler)
       .overrideProvider(DeleteFavoriOffreEmploiCommandHandler)
       .useValue(deleteFavoriOffreEmploiCommandHandler)
+      .overrideProvider(GetFavorisOffresEmploiJeuneQueryHandler)
+      .useValue(getFavorisOffresEmploiJeuneQueryHandler)
       .overrideProvider(AddFavoriOffreImmersionCommandHandler)
       .useValue(addFavoriOffreImmersionCommandHandler)
       .overrideProvider(DeleteFavoriOffreImmersionCommandHandler)
       .useValue(deleteFavoriOffreImmersionCommandHandler)
+      .overrideProvider(GetFavorisOffresImmersionJeuneQueryHandler)
+      .useValue(getFavorisOffresImmersionJeuneQueryHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -86,6 +100,22 @@ describe.only('FavorisController', () => {
   })
 
   describe(' Favoris Offres Emploi', () => {
+    describe('GET /jeunes/:idJeune/favoris/offres-emploi', () => {
+      it("Renvoie la liste des favoris offres emploi d'un jeune", async () => {
+        // Given
+        getFavorisOffresEmploiJeuneQueryHandler.execute
+          .withArgs({ idJeune: '1', detail: false }, unUtilisateurDecode())
+          .resolves([])
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/jeunes/1/favoris/offres-emploi')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(JSON.stringify([]))
+      })
+    })
+
     describe('POST /jeunes/:idJeune/favori/offres-emploi', () => {
       const offreEmploi = uneOffreEmploi()
       const command: AddFavoriOffreEmploiCommand = {
@@ -227,6 +257,22 @@ describe.only('FavorisController', () => {
   })
 
   describe(' Favoris Offres Immersion', () => {
+    describe('GET /jeunes/:idJeune/favoris/offres-immersion', () => {
+      it("Renvoie la liste des favoris immersion d'un jeune", async () => {
+        // Given
+        getFavorisOffresImmersionJeuneQueryHandler.execute
+          .withArgs({ idJeune: '1', detail: false }, unUtilisateurDecode())
+          .resolves([])
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/jeunes/1/favoris/offres-immersion')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(JSON.stringify([]))
+      })
+    })
+
     describe('POST /jeunes/:idJeune/favori/offres-immersion', () => {
       const offreImmersion = uneOffreImmersion()
       const command: AddFavoriOffreImmersionCommand = {
