@@ -112,7 +112,7 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
   }
 
   async saveAsFavori(idJeune: string, offreEmploi: OffreEmploi): Promise<void> {
-    await FavoriOffreEmploiSqlModel.upsert(
+    await FavoriOffreEmploiSqlModel.create(
       toFavoriOffreEmploiSqlModel(idJeune, offreEmploi)
     )
   }

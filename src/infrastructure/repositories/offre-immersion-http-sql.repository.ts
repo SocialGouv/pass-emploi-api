@@ -71,7 +71,7 @@ export class OffresImmersionHttpSqlRepository
     idJeune: string,
     offreImmersion: OffreImmersion
   ): Promise<void> {
-    await FavoriOffreImmersionSqlModel.upsert({
+    await FavoriOffreImmersionSqlModel.create({
       idOffre: offreImmersion.id,
       idJeune,
       metier: offreImmersion.metier,

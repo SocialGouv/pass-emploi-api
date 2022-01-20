@@ -1,22 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import {
-  FavoriNonTrouveError,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
+import { FavoriNonTrouveError } from '../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
-import { FavoriAuthorizer } from '../authorizers/authorize-favori'
 import {
   OffresImmersion,
   OffresImmersionRepositoryToken
 } from '../../domain/offre-immersion'
+import { FavoriAuthorizer } from '../authorizers/authorize-favori'
 
 export interface DeleteFavoriOffreImmersionCommand extends Command {
   idOffreImmersion: string
@@ -31,8 +27,6 @@ export class DeleteFavoriOffreImmersionCommandHandler extends CommandHandler<
   constructor(
     @Inject(OffresImmersionRepositoryToken)
     private readonly offresImmersionRepository: OffresImmersion.Repository,
-    @Inject(JeunesRepositoryToken)
-    private readonly jeuneRepository: Jeune.Repository,
     private readonly favoriAuthorizer: FavoriAuthorizer
   ) {
     super('DeleteFavoriCommandHandler')
@@ -41,10 +35,6 @@ export class DeleteFavoriOffreImmersionCommandHandler extends CommandHandler<
   async handle(
     command: DeleteFavoriOffreImmersionCommand
   ): Promise<Result<void>> {
-    const jeune = await this.jeuneRepository.get(command.idJeune)
-    if (!jeune) {
-      return failure(new NonTrouveError('Jeune', command.idJeune))
-    }
     const favoriOffreEmploi = await this.offresImmersionRepository.getFavori(
       command.idJeune,
       command.idOffreImmersion
@@ -57,9 +47,6 @@ export class DeleteFavoriOffreImmersionCommandHandler extends CommandHandler<
     await this.offresImmersionRepository.deleteFavori(
       command.idJeune,
       command.idOffreImmersion
-    )
-    this.logger.log(
-      `L'offre ${command.idOffreImmersion} a été supprimée des favoris du jeune ${command.idJeune}`
     )
     return emptySuccess()
   }

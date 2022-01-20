@@ -1,28 +1,23 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
+import { EvenementService } from 'src/domain/evenement'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
-import { Authentification } from '../../../src/domain/authentification'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { OffresEmploi } from '../../../src/domain/offre-emploi'
 import {
   AddFavoriOffreEmploiCommand,
   AddFavoriOffreEmploiCommandHandler
 } from '../../../src/application/commands/add-favori-offre-emploi.command.handler'
-import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
-import { Jeune } from '../../../src/domain/jeune'
-import { unJeune } from '../../fixtures/jeune.fixture'
+import { FavoriExisteDejaError } from '../../../src/building-blocks/types/domain-error'
 import { failure } from '../../../src/building-blocks/types/result'
-import {
-  FavoriExisteDejaError,
-  NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
+import { Authentification } from '../../../src/domain/authentification'
+import { OffresEmploi } from '../../../src/domain/offre-emploi'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import Utilisateur = Authentification.Utilisateur
-import { EvenementService } from 'src/domain/evenement'
 
 describe('AddFavoriOffreEmploiCommandHandler', () => {
   let offresEmploiRepository: StubbedType<OffresEmploi.Repository>
-  let jeuneRepository: StubbedType<Jeune.Repository>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler
   let evenementService: StubbedClass<EvenementService>
@@ -31,12 +26,10 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
     offresEmploiRepository = stubInterface(sandbox)
-    jeuneRepository = stubInterface(sandbox)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     evenementService = stubClass(EvenementService)
     addFavoriOffreEmploiCommandHandler = new AddFavoriOffreEmploiCommandHandler(
       offresEmploiRepository,
-      jeuneRepository,
       jeuneAuthorizer,
       evenementService
     )
@@ -50,7 +43,6 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
         idJeune: jeune.id,
         offreEmploi: offreEmploi
       }
-      jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
       offresEmploiRepository.getFavori
         .withArgs(jeune.id, offreEmploi.id)
         .resolves(undefined)
@@ -64,23 +56,6 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
         command.offreEmploi
       )
     })
-
-    it('renvoie une failure NonTrouveError quand le jeune n existe pas', async () => {
-      // Given
-      const command: AddFavoriOffreEmploiCommand = {
-        idJeune: 'FAUUX',
-        offreEmploi: uneOffreEmploi()
-      }
-      jeuneRepository.get.withArgs('FAUUX').resolves(undefined)
-
-      // When
-      const result = await addFavoriOffreEmploiCommandHandler.handle(command)
-
-      // Then
-      expect(result).to.deep.equal(
-        failure(new NonTrouveError('Jeune', 'FAUUX'))
-      )
-    })
     it('renvoie une failure ExisteDeja quand le jeune a déjà ce favori', async () => {
       // Given
       const offreEmploi = uneOffreEmploi()
@@ -88,7 +63,6 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
         idJeune: jeune.id,
         offreEmploi: offreEmploi
       }
-      jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
       offresEmploiRepository.getFavori
         .withArgs(jeune.id, offreEmploi.id)
         .resolves(offreEmploi)
