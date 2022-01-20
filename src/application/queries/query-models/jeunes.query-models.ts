@@ -19,6 +19,9 @@ export class DetailJeuneQueryModel {
 
   @ApiProperty()
   isActivated: boolean
+
+  @ApiProperty({ required: false })
+  lastActivity?: string | undefined
 }
 
 export class ResumeActionsDuJeuneQueryModel {

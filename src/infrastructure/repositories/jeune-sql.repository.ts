@@ -5,11 +5,13 @@ import {
   DetailJeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
+import { Authentification } from 'src/domain/authentification'
 import { Action } from '../../domain/action'
 import { NotFound } from '../../domain/erreur'
 import { Jeune } from '../../domain/jeune'
 import { ActionSqlModel } from '../sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
+import { EvenementEngagementSqlModel } from '../sequelize/models/evenement-engagement.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
 import { SequelizeInjectionToken } from '../sequelize/providers'
@@ -71,7 +73,31 @@ export class JeuneSqlRepository implements Jeune.Repository {
       ]
     })
 
-    return allJeunesSql.map(fromSqlToDetailJeuneQueryModel)
+    async function getJeuneLastActivity(
+      idJeune: string
+    ): Promise<string | undefined> {
+      const dernierEvenementEngagement =
+        await EvenementEngagementSqlModel.findAll({
+          where: {
+            idUtilisateur: idJeune,
+            typeUtilisateur: Authentification.Type.JEUNE
+          },
+          order: [['date_evenement', 'DESC']],
+          limit: 1
+        })
+      return dernierEvenementEngagement[0]?.dateEvenement.toISOString()
+    }
+
+    return await Promise.all(
+      allJeunesSql.map(async jeuneSql => {
+        const jeune = fromSqlToDetailJeuneQueryModel(jeuneSql)
+        const lastActivity = await getJeuneLastActivity(jeune.id)
+        if (lastActivity) {
+          jeune.lastActivity = lastActivity
+        }
+        return jeune
+      })
+    )
   }
 
   async save(jeune: Jeune): Promise<void> {

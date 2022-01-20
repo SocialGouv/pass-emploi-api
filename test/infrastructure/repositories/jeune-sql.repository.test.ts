@@ -1,3 +1,5 @@
+import { Authentification } from 'src/domain/authentification'
+import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { Action } from '../../../src/domain/action'
 import { Jeune } from '../../../src/domain/jeune'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
@@ -7,7 +9,7 @@ import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeun
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import {
-  listeDetailJeuneQueryModel,
+  unDetailJeuneQueryModel,
   unResumeActionDUnJeune
 } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
@@ -118,9 +120,31 @@ describe('JeuneSqlRepository', () => {
         idConseiller
       )
 
-      expect(actual).to.deep.equal(listeDetailJeuneQueryModel())
+      expect(actual).to.deep.equal([unDetailJeuneQueryModel()])
     })
+    it("retourne les jeunes d'un conseiller avec la date d'evenement d'engagement", async () => {
+      const idConseiller = '1'
+      const jeune = unJeuneDto({ idConseiller })
+      const dateEvenement = uneDatetime.toJSDate()
+      await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
+      await JeuneSqlModel.creer(jeune)
+      await EvenementEngagementSqlModel.create({
+        idUtilisateur: jeune.id,
+        typeUtilisateur: Authentification.Type.JEUNE,
+        dateEvenement
+      })
 
+      const actual = await jeuneSqlRepository.getAllQueryModelsByConseiller(
+        idConseiller
+      )
+
+      expect(actual).to.deep.equal([
+        {
+          ...unDetailJeuneQueryModel(),
+          lastActivity: dateEvenement.toISOString()
+        }
+      ])
+    })
     it("retourne tableau vide quand le conseiller n'existe pas", async () => {
       const actual = await jeuneSqlRepository.getAllQueryModelsByConseiller(
         'id-inexistant'
