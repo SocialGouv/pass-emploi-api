@@ -8,6 +8,13 @@ import {
 import { OffreImmersion, OffresImmersion } from 'src/domain/offre-immersion'
 import { FavoriOffreImmersionSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 
+const fromContactMode = {
+  UNKNOWN: OffresImmersion.MethodeDeContact.INCONNU,
+  EMAIL: OffresImmersion.MethodeDeContact.EMAIL,
+  PHONE: OffresImmersion.MethodeDeContact.TELEPHONE,
+  IN_PERSON: OffresImmersion.MethodeDeContact.PRESENTIEL
+}
+
 interface OffreImmpersionDto {
   id: string
   rome: string
@@ -98,13 +105,6 @@ export function buildLocalisation(
 export function buildContact(
   offreImmpersionDto: OffreImmpersionDto
 ): ContactImmersionQueryModel | undefined {
-  const fromContactMode = {
-    UNKNOWN: OffresImmersion.MethodeDeContact.INCONNU,
-    EMAIL: OffresImmersion.MethodeDeContact.EMAIL,
-    PHONE: OffresImmersion.MethodeDeContact.TELEPHONE,
-    IN_PERSON: OffresImmersion.MethodeDeContact.PRESENTIEL
-  }
-
   if (!offreImmpersionDto.contactDetails) {
     return undefined
   }

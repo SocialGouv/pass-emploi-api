@@ -18,10 +18,15 @@ import {
   AddFavoriOffreImmersionCommandHandler
 } from 'src/application/commands/add-favori-offre-immersion.command.handler'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler'
+import { GetFavorisOffresImmersionJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-immersion-jeune.query.handler'
 import {
   FavoriOffreEmploiIdQueryModel,
   OffreEmploiResumeQueryModel
 } from 'src/application/queries/query-models/offres-emploi.query-models'
+import {
+  FavoriOffreImmersionIdQueryModel,
+  OffreImmersionQueryModel
+} from 'src/application/queries/query-models/offres-immersion.query-models'
 import {
   AddFavoriOffreEmploiCommand,
   AddFavoriOffreEmploiCommandHandler
@@ -31,9 +36,10 @@ import {
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../application/commands/delete-favori-offre-emploi.command.handler'
 import {
-  FavoriExisteDejaError,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
+  DeleteFavoriOffreImmersionCommand,
+  DeleteFavoriOffreImmersionCommandHandler
+} from '../../application/commands/delete-favori-offre-immersion.command.handler'
+import { FavoriExisteDejaError } from '../../building-blocks/types/domain-error'
 import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
@@ -43,15 +49,6 @@ import {
   GetFavorisOffresEmploiQueryParams,
   GetFavorisOffresImmersionQueryParams
 } from './validation/favoris.inputs'
-import {
-  DeleteFavoriOffreImmersionCommand,
-  DeleteFavoriOffreImmersionCommandHandler
-} from '../../application/commands/delete-favori-offre-immersion.command.handler'
-import { GetFavorisOffresImmersionJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-immersion-jeune.query.handler'
-import {
-  FavoriOffreImmersionIdQueryModel,
-  OffreImmersionQueryModel
-} from 'src/application/queries/query-models/offres-immersion.query-models'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -114,9 +111,6 @@ export class FavorisController {
     )
 
     if (isFailure(result)) {
-      if (result.error.code === NonTrouveError.CODE) {
-        throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
-      }
       if (result.error.code === FavoriExisteDejaError.CODE) {
         throw new HttpException(result.error.message, HttpStatus.CONFLICT)
       }
@@ -146,9 +140,6 @@ export class FavorisController {
     )
 
     if (isFailure(result)) {
-      if (result.error.code === NonTrouveError.CODE) {
-        throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
-      }
       if (result.error.code === FavoriExisteDejaError.CODE) {
         throw new HttpException(result.error.message, HttpStatus.CONFLICT)
       }

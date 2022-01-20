@@ -229,9 +229,6 @@ export class JeunesController {
     )
 
     if (isFailure(result)) {
-      if (result.error.code === NonTrouveError.CODE) {
-        throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
-      }
       if (result.error.code === FavoriExisteDejaError.CODE) {
         throw new HttpException(result.error.message, HttpStatus.CONFLICT)
       }

@@ -173,21 +173,6 @@ describe('JeunesController', () => {
         addFavoriOffreEmploiCommandHandler.execute
       ).to.have.been.calledWithExactly(command, unUtilisateurDecode())
     })
-    it('renvoie une 404 (Not Found) quand le jeune n"existe pas', async () => {
-      // Given
-      addFavoriOffreEmploiCommandHandler.execute
-        .withArgs(command)
-        .resolves(failure(new NonTrouveError('Jeune', command.idJeune)))
-
-      // When
-      await request(app.getHttpServer())
-        .post('/jeunes/ABCDE/favori')
-        .set('authorization', unHeaderAuthorization())
-        .send(payload)
-
-        // Then
-        .expect(HttpStatus.NOT_FOUND)
-    })
     it('renvoie une 409 (Conflict) quand l"offre n"existe pas', async () => {
       // Given
       addFavoriOffreEmploiCommandHandler.execute
@@ -245,24 +230,6 @@ describe('JeunesController', () => {
       const expectedMessageJson = {
         code: 'FAVORI_NON_TROUVE',
         message: `Le Favori du jeune ${command.idJeune} correspondant à l'offre ${command.idOffreEmploi} n'existe pas`
-      }
-      //When
-      await request(app.getHttpServer())
-        .delete(`/jeunes/${jeune.id}/favori/${offreEmploi.id}`)
-        .set('authorization', unHeaderAuthorization())
-        //Then
-        .expect(HttpStatus.NOT_FOUND)
-        .expect(expectedMessageJson)
-    })
-    it('renvoie une 404(NOT FOUND) si le jeune n"existe pas', async () => {
-      //Given
-      deleteFavoriOffreEmploiCommandHandler.execute
-        .withArgs(command)
-        .resolves(failure(new NonTrouveError('Jeune', command.idJeune)))
-
-      const expectedMessageJson = {
-        code: 'NON_TROUVE',
-        message: `Jeune ${command.idJeune} non trouvé(e)`
       }
       //When
       await request(app.getHttpServer())
