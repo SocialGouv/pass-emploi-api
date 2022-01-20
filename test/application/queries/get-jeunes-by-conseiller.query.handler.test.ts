@@ -4,7 +4,6 @@ import {
   GetJeunesByConseillerQuery,
   GetJeunesByConseillerQueryHandler
 } from 'src/application/queries/get-jeunes-by-conseiller.query.handler'
-import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
 import { Jeune } from 'src/domain/jeune'
 import { unDetailJeuneQueryModel } from 'test/fixtures/query-models/jeunes.query-model.fixtures'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
@@ -39,13 +38,12 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       const getJeunesByConseillerQuery: GetJeunesByConseillerQuery = {
         idConseiller
       }
-      const conseillerEtSesJeunesQueryModel: DetailJeuneQueryModel[] = [
-        unDetailJeuneQueryModel()
-      ]
 
       jeunesRepository.getAllQueryModelsByConseiller
         .withArgs(idConseiller)
-        .resolves(conseillerEtSesJeunesQueryModel)
+        .resolves([
+          { ...unDetailJeuneQueryModel(), lastActivity: 'date-engagement' }
+        ])
 
       // When
       const actual = await getJeunesByConseillerQueryHandler.handle(
@@ -53,7 +51,9 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       )
 
       // Then
-      expect(actual).to.deep.equal(conseillerEtSesJeunesQueryModel)
+      expect(actual).to.deep.equal([
+        { ...unDetailJeuneQueryModel(), lastActivity: 'date-engagement' }
+      ])
     })
   })
 
