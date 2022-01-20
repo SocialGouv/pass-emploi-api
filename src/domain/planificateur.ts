@@ -14,7 +14,8 @@ export namespace Planificateur {
 
   export enum JobEnum {
     RENDEZVOUS = 'RENDEZVOUS',
-    MAIL_CONSEILLER = 'MAIL_CONSEILLER'
+    MAIL_CONSEILLER = 'MAIL_CONSEILLER',
+    FAKE = 'FAKE'
   }
 
   export interface JobRendezVous {
@@ -25,7 +26,11 @@ export namespace Planificateur {
     idConseiller: string
   }
 
-  export type JobType = JobRendezVous | JobMailConseiller
+  export interface JobFake {
+    message: string
+  }
+
+  export type JobType = JobRendezVous | JobMailConseiller | JobFake
 
   export interface Job<T = JobType> {
     date: Date

@@ -39,6 +39,7 @@ import { GetOffresImmersionQueryHandler } from './application/queries/get-offres
 import { GetAllRendezVousConseillerQueryHandler } from './application/queries/get-rendez-vous-conseiller.query.handler'
 import { GetAllRendezVousJeuneQueryHandler } from './application/queries/get-rendez-vous-jeune.query.handler'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from './application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
+import { TaskService } from './application/task.service'
 import { WorkerService } from './application/worker.service'
 import configuration from './config/configuration'
 import { Action, ActionsRepositoryToken } from './domain/action'
@@ -134,6 +135,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Action.Factory,
     Authentification.Factory,
     WorkerService,
+    TaskService,
     MailSendinblueClient,
     {
       provide: APP_GUARD,

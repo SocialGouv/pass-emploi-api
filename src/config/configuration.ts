@@ -16,6 +16,11 @@ export default () => {
       initAllJobs: true
     }
   }
+  if (process.env.RUN_TASK_DUMMY_JOB === 'true') {
+    tasks = {
+      dummyJob: true
+    }
+  }
 
   const databaseUrl =
     process.env.DATABASE_URL ||

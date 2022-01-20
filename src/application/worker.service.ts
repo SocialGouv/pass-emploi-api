@@ -1,17 +1,17 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
+import * as apm from 'elastic-apm-node'
 import {
   Planificateur,
   PlanificateurRepositoryToken
 } from '../domain/planificateur'
-import { HandleJobRendezVousCommandHandler } from './commands/handle-job-rendez-vous.command'
-import { HandleJobMailConseillerCommandHandler } from './commands/handle-job-mail-conseiller.command'
 import { getAPMInstance } from '../infrastructure/monitoring/apm.init'
-import * as apm from 'elastic-apm-node'
+import { HandleJobMailConseillerCommandHandler } from './commands/handle-job-mail-conseiller.command'
+import { HandleJobRendezVousCommandHandler } from './commands/handle-job-rendez-vous.command'
 
 @Injectable()
 export class WorkerService {
   private apmService: apm.Agent
-  private logger: Logger
+  private readonly logger: Logger = new Logger('WorkerService')
 
   constructor(
     @Inject(PlanificateurRepositoryToken)
@@ -20,7 +20,6 @@ export class WorkerService {
     private handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler
   ) {
     this.apmService = getAPMInstance()
-    this.logger = new Logger('WorkerService')
   }
 
   subscribe(): void {
@@ -32,6 +31,12 @@ export class WorkerService {
       `JOB-${job.type}`,
       'worker'
     )
+    const startTime = new Date().getMilliseconds()
+    let success = false
+    this.logger.log({
+      job,
+      state: 'started'
+    })
     try {
       if (job.type === Planificateur.JobEnum.RENDEZVOUS) {
         await this.handlerJobRendezVousCommandHandler.execute({
@@ -41,14 +46,28 @@ export class WorkerService {
         await this.handleJobMailConseillerCommandHandler.execute({
           job: job as Planificateur.Job<Planificateur.JobMailConseiller>
         })
+      } else if (job.type === Planificateur.JobEnum.FAKE) {
+        this.logger.log({
+          job,
+          msg: 'executed'
+        })
       }
-      transaction?.end('success')
     } catch (e) {
-      if (transaction) {
+      success = false
+      this.logger.error(e)
+    } finally {
+      this.logger.log({
+        job,
+        state: 'terminated',
+        success,
+        duration: new Date().getMilliseconds() - startTime
+      })
+      if (transaction && !success) {
         transaction.result = 'error'
         transaction.end('failure')
+      } else if (transaction && success) {
+        transaction.end('success')
       }
-      this.logger.error(e)
     }
   }
 }
