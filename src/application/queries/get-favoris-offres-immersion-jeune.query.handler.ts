@@ -35,10 +35,10 @@ export class GetFavorisOffresImmersionJeuneQueryHandler extends QueryHandler<
     query: GetFavorisOffresImmersionJeuneQuery
   ): Promise<OffreImmersionQueryModel[] | FavoriOffreImmersionIdQueryModel[]> {
     return query.detail
-      ? this.offresImmersionRepository.getFavorisIdsQueryModelsByJeune(
+      ? this.offresImmersionRepository.getFavorisQueryModelsByJeune(
           query.idJeune
         )
-      : this.offresImmersionRepository.getFavorisQueryModelsByJeune(
+      : this.offresImmersionRepository.getFavorisIdsQueryModelsByJeune(
           query.idJeune
         )
   }

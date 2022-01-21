@@ -35,10 +35,10 @@ export class GetFavorisOffresEmploiJeuneQueryHandler extends QueryHandler<
     query: GetFavorisJeuneQuery
   ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiIdQueryModel[]> {
     return query.detail
-      ? this.offresEmploiRepository.getFavorisIdsQueryModelsByJeune(
+      ? this.offresEmploiRepository.getFavorisQueryModelsByJeune(query.idJeune)
+      : this.offresEmploiRepository.getFavorisIdsQueryModelsByJeune(
           query.idJeune
         )
-      : this.offresEmploiRepository.getFavorisQueryModelsByJeune(query.idJeune)
   }
   async authorize(
     query: GetFavorisJeuneQuery,
