@@ -191,7 +191,7 @@ export class JeunesController {
     throw new RuntimeException()
   }
 
-  // Deprecated
+  // Deprecated (Mobile App v1.0.0)
   @Get('favoris')
   async getFavoris(
     @Param('idJeune') idJeune: string,
@@ -204,7 +204,7 @@ export class JeunesController {
     )
   }
 
-  // Deprecated
+  // Deprecated (Mobile App v1.0.0)
   @Post('favori')
   async postNouveauFavori(
     @Param('idJeune') idJeune: string,
@@ -236,7 +236,7 @@ export class JeunesController {
     }
   }
 
-  // Deprecated
+  // Deprecated (Mobile App v1.0.0)
   @Delete('favori/:idOffreEmploi')
   @HttpCode(204)
   async deleteFavori(
