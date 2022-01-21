@@ -12,7 +12,7 @@ import {
   OffresEmploi,
   OffresEmploiRepositoryToken
 } from '../../domain/offre-emploi'
-import { FavoriAuthorizer } from '../authorizers/authorize-favori'
+import { FavoriOffresEmploiAuthorizer } from '../authorizers/authorize-favori-offres-emploi'
 
 export interface DeleteFavoriOffreEmploiCommand extends Command {
   idOffreEmploi: string
@@ -27,7 +27,7 @@ export class DeleteFavoriOffreEmploiCommandHandler extends CommandHandler<
   constructor(
     @Inject(OffresEmploiRepositoryToken)
     private readonly offresEmploiRepository: OffresEmploi.Repository,
-    private readonly favoriAuthorizer: FavoriAuthorizer
+    private readonly favoriOffresEmploiAuthorizer: FavoriOffresEmploiAuthorizer
   ) {
     super('DeleteFavoriCommandHandler')
   }
@@ -53,7 +53,7 @@ export class DeleteFavoriOffreEmploiCommandHandler extends CommandHandler<
     command: DeleteFavoriOffreEmploiCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    await this.favoriAuthorizer.authorize(
+    await this.favoriOffresEmploiAuthorizer.authorize(
       command.idJeune,
       command.idOffreEmploi,
       utilisateur

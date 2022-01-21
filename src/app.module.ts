@@ -7,7 +7,8 @@ import { TerminusModule } from '@nestjs/terminus'
 import { ActionAuthorizer } from './application/authorizers/authorize-action'
 import { ConseillerAuthorizer } from './application/authorizers/authorize-conseiller'
 import { ConseillerForJeuneAuthorizer } from './application/authorizers/authorize-conseiller-for-jeune'
-import { FavoriAuthorizer } from './application/authorizers/authorize-favori'
+import { FavoriOffresEmploiAuthorizer } from './application/authorizers/authorize-favori-offres-emploi'
+import { FavoriOffresImmersionAuthorizer } from './application/authorizers/authorize-favori-offres-immersion'
 import { JeuneAuthorizer } from './application/authorizers/authorize-jeune'
 import { RendezVousAuthorizer } from './application/authorizers/authorize-rendezvous'
 import { AddFavoriOffreEmploiCommandHandler } from './application/commands/add-favori-offre-emploi.command.handler'
@@ -205,7 +206,8 @@ export function buildQueryCommandsProviders(): Provider[] {
   return [
     ActionAuthorizer,
     ConseillerAuthorizer,
-    FavoriAuthorizer,
+    FavoriOffresEmploiAuthorizer,
+    FavoriOffresImmersionAuthorizer,
     JeuneAuthorizer,
     ConseillerForJeuneAuthorizer,
     RendezVousAuthorizer,

@@ -1,4 +1,4 @@
-import { FavoriAuthorizer } from '../../../src/application/authorizers/authorize-favori'
+import { FavoriOffresEmploiAuthorizer } from '../../../src/application/authorizers/authorize-favori-offres-emploi'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import {
   createSandbox,
@@ -25,7 +25,7 @@ import { OffreEmploi, OffresEmploi } from '../../../src/domain/offre-emploi'
 describe('DeleteFavoriOffreEmploiCommandHandler', () => {
   DatabaseForTesting.prepare()
   let offresEmploiHttpSqlRepository: StubbedType<OffresEmploi.Repository>
-  let favoriAuthorizer: StubbedClass<FavoriAuthorizer>
+  let favoriOffresEmploiAuthorizer: StubbedClass<FavoriOffresEmploiAuthorizer>
   let deleteFavoriOffreEmploiCommandHandler: DeleteFavoriOffreEmploiCommandHandler
   let offreEmploi: OffreEmploi
   const jeune = unJeune()
@@ -34,12 +34,12 @@ describe('DeleteFavoriOffreEmploiCommandHandler', () => {
     offreEmploi = uneOffreEmploi()
     const sandbox: SinonSandbox = createSandbox()
     offresEmploiHttpSqlRepository = stubInterface(sandbox)
-    favoriAuthorizer = stubClass(FavoriAuthorizer)
+    favoriOffresEmploiAuthorizer = stubClass(FavoriOffresEmploiAuthorizer)
 
     deleteFavoriOffreEmploiCommandHandler =
       new DeleteFavoriOffreEmploiCommandHandler(
         offresEmploiHttpSqlRepository,
-        favoriAuthorizer
+        favoriOffresEmploiAuthorizer
       )
   })
 
@@ -113,7 +113,9 @@ describe('DeleteFavoriOffreEmploiCommandHandler', () => {
       )
 
       // Then
-      expect(favoriAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(
+        favoriOffresEmploiAuthorizer.authorize
+      ).to.have.been.calledWithExactly(
         command.idJeune,
         command.idOffreEmploi,
         utilisateur

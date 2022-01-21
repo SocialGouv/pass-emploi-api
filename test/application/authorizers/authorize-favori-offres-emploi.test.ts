@@ -1,19 +1,21 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { FavoriAuthorizer } from '../../../src/application/authorizers/authorize-favori'
+import { FavoriOffresEmploiAuthorizer } from '../../../src/application/authorizers/authorize-favori-offres-emploi'
 import { Unauthorized } from '../../../src/domain/erreur'
 import { OffresEmploi } from '../../../src/domain/offre-emploi'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
 import { createSandbox, expect } from '../../utils'
 
-describe('FavoriAuthorizer', () => {
+describe('FavoriOffresEmploiAuthorizer', () => {
   let offresEmploiRepository: StubbedType<OffresEmploi.Repository>
-  let favoriAuthorizer: FavoriAuthorizer
+  let favoriOffresEmploiAuthorizer: FavoriOffresEmploiAuthorizer
 
   beforeEach(() => {
     const sandbox = createSandbox()
     offresEmploiRepository = stubInterface(sandbox)
-    favoriAuthorizer = new FavoriAuthorizer(offresEmploiRepository)
+    favoriOffresEmploiAuthorizer = new FavoriOffresEmploiAuthorizer(
+      offresEmploiRepository
+    )
   })
 
   describe('authorize', () => {
@@ -28,7 +30,7 @@ describe('FavoriAuthorizer', () => {
           .resolves(offreEmploi)
 
         // When
-        const result = await favoriAuthorizer.authorize(
+        const result = await favoriOffresEmploiAuthorizer.authorize(
           utilisateur.id,
           offreEmploi.id,
           utilisateur
@@ -49,7 +51,7 @@ describe('FavoriAuthorizer', () => {
           .resolves(undefined)
 
         // When
-        const call = favoriAuthorizer.authorize(
+        const call = favoriOffresEmploiAuthorizer.authorize(
           utilisateur.id,
           offreEmploi.id,
           utilisateur
