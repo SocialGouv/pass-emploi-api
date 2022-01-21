@@ -44,6 +44,8 @@ describe('EvenementHttpSqlRepository', () => {
       expect(resultEvenement.length).to.equal(1)
       expect(resultEvenement[0].categorie).to.equal(categorieEvenement)
       expect(resultEvenement[0].idUtilisateur).to.equal(utilisateur.id)
+      expect(resultEvenement[0].typeUtilisateur).to.equal(utilisateur.type)
+      expect(resultEvenement[0].structure).to.equal(utilisateur.structure)
       expect(resultEvenement[0].dateEvenement).to.deep.equal(
         uneDatetime.toJSDate()
       )

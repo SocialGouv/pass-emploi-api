@@ -26,13 +26,15 @@ export class EvenementHttpSqlRepository implements Evenement.Repository {
       nom: nomEvenement ?? null,
       idUtilisateur: utilisateur.id,
       typeUtilisateur: utilisateur.type,
+      structure: utilisateur.structure,
       dateEvenement: dateEvenement
     })
     this.logger.log({
       categorie: categorieEvenement,
       action: actionEvenement,
       idUtilisateur: utilisateur.id,
-      typeUtilisateur: utilisateur.type
+      typeUtilisateur: utilisateur.type,
+      structure: utilisateur.structure
     })
     return emptySuccess()
   }
