@@ -20,7 +20,7 @@ import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { DatabaseForTesting, expect } from '../../utils'
 
-describe.only('JeuneSqlRepository', () => {
+describe('JeuneSqlRepository', () => {
   const databaseForTesting: DatabaseForTesting = DatabaseForTesting.prepare()
   let jeuneSqlRepository: JeuneSqlRepository
 

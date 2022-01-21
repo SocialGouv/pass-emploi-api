@@ -14,6 +14,7 @@ import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
 import { SequelizeInjectionToken } from '../sequelize/providers'
 import {
+  fromRawSqlToDetailJeuneQueryModel,
   fromSqlToDetailJeuneQueryModel,
   fromSqlToJeune,
   fromSqlToJeuneHomeQueryModel,
@@ -63,10 +64,11 @@ export class JeuneSqlRepository implements Jeune.Repository {
   ): Promise<DetailJeuneQueryModel[]> {
     const sqlJeunes = await this.sequelize.query(
       `
-      SELECT *, MAX(evenement_engagement.date_evenement
+      SELECT jeune.id, jeune.prenom, jeune.nom, jeune.email, jeune.date_creation, jeune.id_authentification, MAX(evenement_engagement.date_evenement) as date_evenement
       FROM jeune
-      LEFT JOIN evenement_engagement ON evenement_engagement.id_utilisateur = jeune.id AND evenement_engagement.type_utilisateur = JEUNE
+      LEFT JOIN evenement_engagement ON evenement_engagement.id_utilisateur = jeune.id AND evenement_engagement.type_utilisateur = 'JEUNE'
       WHERE jeune.id_conseiller = :idConseiller
+      GROUP BY jeune.id
       ORDER BY jeune.prenom ASC, jeune.nom ASC
     `,
       {
@@ -75,57 +77,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
       }
     )
 
-    console.log(sqlJeunes)
-    return []
-
-    //   const allJeunesSql = await JeuneSqlModel.findAll({
-    //     where: {
-    //       idConseiller
-    //     },
-    //     order: [
-    //       ['prenom', 'ASC'],
-    //       ['nom', 'ASC']
-    //     ],
-    //     include: {
-    //       model: EvenementEngagementSqlModel,
-    //       through: {
-    //         where: {
-    //           //idUtilisateur: idJeune,
-    //           typeUtilisateur: Authentification.Type.JEUNE
-    //           //dateEvenement: (SELECT MAX(date_evenement) FROM event);
-    //         },
-    //         attributes: ['date_evenement']
-    //       },
-    //       as: 'evenementsEngagement',
-    //       required: false
-    //     }
-    //   })
-
-    //   async function getJeuneLastActivity(
-    //     idJeune: string
-    //   ): Promise<string | undefined> {
-    //     const dernierEvenementEngagement =
-    //       await EvenementEngagementSqlModel.findAll({
-    //         where: {
-    //           idUtilisateur: idJeune,
-    //           typeUtilisateur: Authentification.Type.JEUNE
-    //         },
-    //         order: [['date_evenement', 'DESC']],
-    //         limit: 1
-    //       })
-    //     return dernierEvenementEngagement[0]?.dateEvenement.toISOString()
-    //   }
-
-    //   return await Promise.all(
-    //     allJeunesSql.map(async jeuneSql => {
-    //       const jeune = fromSqlToDetailJeuneQueryModel(jeuneSql)
-    //       const lastActivity = await getJeuneLastActivity(jeune.id)
-    //       if (lastActivity) {
-    //         jeune.lastActivity = lastActivity
-    //       }
-    //       return jeune
-    //     })
-    //   )
+    return sqlJeunes.map(fromRawSqlToDetailJeuneQueryModel)
   }
 
   async save(jeune: Jeune): Promise<void> {
