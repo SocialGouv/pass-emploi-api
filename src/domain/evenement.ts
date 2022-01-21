@@ -33,7 +33,7 @@ export namespace Evenement {
   }
 
   export interface Repository {
-    sendEvenement(
+    enregistrerEvenement(
       utilisateur: Authentification.Utilisateur,
       categorieEvenement: string,
       actionEvenement: string,
@@ -74,7 +74,8 @@ const evenements = {
   },
   [Evenement.Type.OFFRE_EMPLOI_PARTAGEE]: {
     categorie: 'Offre',
-    action: 'Partage'
+    action: 'Partage',
+    nom: 'Emploi'
   },
   [Evenement.Type.OFFRE_IMMERSION_AFFICHEE]: {
     categorie: 'Offre',
@@ -161,7 +162,7 @@ export class EvenementService {
     const evenement: { categorie: string; action: string; nom?: string } =
       evenements[typeEvenement]
 
-    await this.evenementRepository.sendEvenement(
+    await this.evenementRepository.enregistrerEvenement(
       utilisateur,
       evenement.categorie,
       evenement.action,
