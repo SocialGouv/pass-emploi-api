@@ -12,7 +12,7 @@ import {
   OffresImmersion,
   OffresImmersionRepositoryToken
 } from '../../domain/offre-immersion'
-import { FavoriAuthorizer } from '../authorizers/authorize-favori'
+import { FavoriOffresImmersionAuthorizer } from '../authorizers/authorize-favori-offres-immersion'
 
 export interface DeleteFavoriOffreImmersionCommand extends Command {
   idOffreImmersion: string
@@ -27,7 +27,7 @@ export class DeleteFavoriOffreImmersionCommandHandler extends CommandHandler<
   constructor(
     @Inject(OffresImmersionRepositoryToken)
     private readonly offresImmersionRepository: OffresImmersion.Repository,
-    private readonly favoriAuthorizer: FavoriAuthorizer
+    private readonly favoriOffresImmersionAuthorizer: FavoriOffresImmersionAuthorizer
   ) {
     super('DeleteFavoriCommandHandler')
   }
@@ -55,7 +55,7 @@ export class DeleteFavoriOffreImmersionCommandHandler extends CommandHandler<
     command: DeleteFavoriOffreImmersionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    await this.favoriAuthorizer.authorize(
+    await this.favoriOffresImmersionAuthorizer.authorize(
       command.idJeune,
       command.idOffreImmersion,
       utilisateur

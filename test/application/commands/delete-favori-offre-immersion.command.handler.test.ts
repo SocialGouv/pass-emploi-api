@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { FavoriAuthorizer } from '../../../src/application/authorizers/authorize-favori'
+import { FavoriOffresImmersionAuthorizer } from '../../../src/application/authorizers/authorize-favori-offres-immersion'
 import {
   DeleteFavoriOffreImmersionCommand,
   DeleteFavoriOffreImmersionCommandHandler
@@ -28,7 +28,7 @@ import {
 describe('DeleteFavoriOffreImmersionCommandHandler', () => {
   DatabaseForTesting.prepare()
   let offresImmersionHttpSqlRepository: StubbedType<OffresImmersion.Repository>
-  let favoriAuthorizer: StubbedClass<FavoriAuthorizer>
+  let favoriOffresImmersionAuthorizer: StubbedClass<FavoriOffresImmersionAuthorizer>
   let deleteFavoriOffreImmersionCommandHandler: DeleteFavoriOffreImmersionCommandHandler
   let offreImmersion: OffreImmersion
   const jeune = unJeune()
@@ -37,12 +37,12 @@ describe('DeleteFavoriOffreImmersionCommandHandler', () => {
     offreImmersion = uneOffreImmersion()
     const sandbox: SinonSandbox = createSandbox()
     offresImmersionHttpSqlRepository = stubInterface(sandbox)
-    favoriAuthorizer = stubClass(FavoriAuthorizer)
+    favoriOffresImmersionAuthorizer = stubClass(FavoriOffresImmersionAuthorizer)
 
     deleteFavoriOffreImmersionCommandHandler =
       new DeleteFavoriOffreImmersionCommandHandler(
         offresImmersionHttpSqlRepository,
-        favoriAuthorizer
+        favoriOffresImmersionAuthorizer
       )
   })
 
@@ -116,7 +116,9 @@ describe('DeleteFavoriOffreImmersionCommandHandler', () => {
       )
 
       // Then
-      expect(favoriAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(
+        favoriOffresImmersionAuthorizer.authorize
+      ).to.have.been.calledWithExactly(
         command.idJeune,
         command.idOffreImmersion,
         utilisateur

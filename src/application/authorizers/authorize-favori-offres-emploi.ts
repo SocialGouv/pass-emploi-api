@@ -7,7 +7,7 @@ import {
 } from '../../domain/offre-emploi'
 
 @Injectable()
-export class FavoriAuthorizer {
+export class FavoriOffresEmploiAuthorizer {
   constructor(
     @Inject(OffresEmploiRepositoryToken)
     private offresEmploiRepository: OffresEmploi.Repository
@@ -32,6 +32,6 @@ export class FavoriAuthorizer {
       return
     }
 
-    throw new Unauthorized('Favori')
+    throw new Unauthorized('FavoriOffresEmploi')
   }
 }
