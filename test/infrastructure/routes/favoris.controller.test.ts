@@ -115,7 +115,7 @@ describe('FavorisController', () => {
       })
     })
 
-    describe('POST /jeunes/:idJeune/favori/offres-emploi', () => {
+    describe('POST /jeunes/:idJeune/favoris/offres-emploi', () => {
       const offreEmploi = uneOffreEmploi()
       const command: AddFavoriOffreEmploiCommand = {
         idJeune: 'ABCDE',
@@ -139,7 +139,7 @@ describe('FavorisController', () => {
 
         // When
         await request(app.getHttpServer())
-          .post('/jeunes/ABCDE/favori/offres-emploi')
+          .post('/jeunes/ABCDE/favoris/offres-emploi')
           .set('authorization', unHeaderAuthorization())
           .send(payload)
 
@@ -161,7 +161,7 @@ describe('FavorisController', () => {
 
         // When
         await request(app.getHttpServer())
-          .post('/jeunes/ABCDE/favori/offres-emploi')
+          .post('/jeunes/ABCDE/favoris/offres-emploi')
           .set('authorization', unHeaderAuthorization())
           .send(payload)
 
@@ -171,7 +171,7 @@ describe('FavorisController', () => {
       ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/ABCDE/favori')
     })
 
-    describe('DELETE /jeunes/:idJeune/favori/offres-emploi/:idOffreEmploi', () => {
+    describe('DELETE /jeunes/:idJeune/favoris/offres-emploi/:idOffreEmploi', () => {
       const offreEmploi = uneOffreEmploi()
       const jeune = unJeune()
       const command: DeleteFavoriOffreEmploiCommand = {
@@ -185,7 +185,7 @@ describe('FavorisController', () => {
           .resolves(emptySuccess())
         //When
         await request(app.getHttpServer())
-          .delete(`/jeunes/${jeune.id}/favori/offres-emploi/${offreEmploi.id}`)
+          .delete(`/jeunes/${jeune.id}/favoris/offres-emploi/${offreEmploi.id}`)
           .set('authorization', unHeaderAuthorization())
           //Then
           .expect(HttpStatus.NO_CONTENT)
@@ -209,7 +209,7 @@ describe('FavorisController', () => {
         }
         //When
         await request(app.getHttpServer())
-          .delete(`/jeunes/${jeune.id}/favori/offres-emploi/${offreEmploi.id}`)
+          .delete(`/jeunes/${jeune.id}/favoris/offres-emploi/${offreEmploi.id}`)
           .set('authorization', unHeaderAuthorization())
           //Then
           .expect(HttpStatus.NOT_FOUND)
@@ -217,7 +217,7 @@ describe('FavorisController', () => {
       })
       ensureUserAuthenticationFailsIfInvalid(
         'delete',
-        '/jeunes/ABCDE/favori/offres-emploi/123'
+        '/jeunes/ABCDE/favoris/offres-emploi/123'
       )
     })
   })
@@ -239,7 +239,7 @@ describe('FavorisController', () => {
       })
     })
 
-    describe('POST /jeunes/:idJeune/favori/offres-immersion', () => {
+    describe('POST /jeunes/:idJeune/favoris/offres-immersion', () => {
       const offreImmersion = uneOffreImmersion()
       const command: AddFavoriOffreImmersionCommand = {
         idJeune: 'ABCDE',
@@ -261,7 +261,7 @@ describe('FavorisController', () => {
 
         // When
         await request(app.getHttpServer())
-          .post('/jeunes/ABCDE/favori/offres-immersion')
+          .post('/jeunes/ABCDE/favoris/offres-immersion')
           .set('authorization', unHeaderAuthorization())
           .send(payload)
 
@@ -286,7 +286,7 @@ describe('FavorisController', () => {
 
         // When
         await request(app.getHttpServer())
-          .post('/jeunes/ABCDE/favori/offres-immersion')
+          .post('/jeunes/ABCDE/favoris/offres-immersion')
           .set('authorization', unHeaderAuthorization())
           .send(payload)
 
@@ -296,7 +296,7 @@ describe('FavorisController', () => {
       ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/ABCDE/favori')
     })
 
-    describe('DELETE /jeunes/:idJeune/favori/offres-immersion/:idOffreImmersion', () => {
+    describe('DELETE /jeunes/:idJeune/favoris/offres-immersion/:idOffreImmersion', () => {
       const offreImmersion = uneOffreImmersion()
       const jeune = unJeune()
       const command: DeleteFavoriOffreImmersionCommand = {
@@ -311,7 +311,7 @@ describe('FavorisController', () => {
         //When
         await request(app.getHttpServer())
           .delete(
-            `/jeunes/${jeune.id}/favori/offres-immersion/${offreImmersion.id}`
+            `/jeunes/${jeune.id}/favoris/offres-immersion/${offreImmersion.id}`
           )
           .set('authorization', unHeaderAuthorization())
           //Then
@@ -340,7 +340,7 @@ describe('FavorisController', () => {
         //When
         await request(app.getHttpServer())
           .delete(
-            `/jeunes/${jeune.id}/favori/offres-immersion/${offreImmersion.id}`
+            `/jeunes/${jeune.id}/favoris/offres-immersion/${offreImmersion.id}`
           )
           .set('authorization', unHeaderAuthorization())
           //Then
@@ -349,7 +349,7 @@ describe('FavorisController', () => {
       })
       ensureUserAuthenticationFailsIfInvalid(
         'delete',
-        '/jeunes/ABCDE/favori/offres-immersion/123'
+        '/jeunes/ABCDE/favoris/offres-immersion/123'
       )
     })
   })

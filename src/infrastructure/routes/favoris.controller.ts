@@ -87,7 +87,7 @@ export class FavorisController {
     )
   }
 
-  @Post('favori/offres-emploi')
+  @Post('favoris/offres-emploi')
   async postNouveauFavoriOffresEmploi(
     @Param('idJeune') idJeune: string,
     @Body() addFavoriPayload: AddFavoriOffresEmploiPayload,
@@ -118,7 +118,7 @@ export class FavorisController {
     }
   }
 
-  @Post('favori/offres-immersion')
+  @Post('favoris/offres-immersion')
   async postNouveauFavoriOffresImmersion(
     @Param('idJeune') idJeune: string,
     @Body() addFavoriPayload: AddFavoriImmersionPayload,
@@ -147,7 +147,7 @@ export class FavorisController {
     }
   }
 
-  @Delete('favori/offres-emploi/:idOffreEmploi')
+  @Delete('favoris/offres-emploi/:idOffreEmploi')
   @HttpCode(204)
   async deleteFavoriOffreEmploi(
     @Param('idJeune') idJeune: string,
@@ -167,7 +167,7 @@ export class FavorisController {
     }
   }
 
-  @Delete('favori/offres-immersion/:idOffreImmersion')
+  @Delete('favoris/offres-immersion/:idOffreImmersion')
   @HttpCode(204)
   async deleteFavoriOffreImmersion(
     @Param('idJeune') idJeune: string,
