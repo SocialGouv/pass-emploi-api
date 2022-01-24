@@ -114,19 +114,21 @@ describe('JeuneSqlRepository', () => {
   })
 
   describe('getAllQueryModelsByConseiller', () => {
+    const idConseiller = '1'
     it("retourne les jeunes d'un conseiller", async () => {
-      const idConseiller = '1'
+      // Given
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
       await JeuneSqlModel.creer(unJeuneDto({ idConseiller }))
 
+      // When
       const actual = await jeuneSqlRepository.getAllQueryModelsByConseiller(
         idConseiller
       )
-
+      // Then
       expect(actual).to.deep.equal([unDetailJeuneQueryModel()])
     })
     it("retourne les jeunes d'un conseiller avec la date d'evenement d'engagement", async () => {
-      const idConseiller = '1'
+      // Given
       const jeune = unJeuneDto({ idConseiller })
       const dateEvenement = uneDatetime.toJSDate()
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
@@ -137,10 +139,12 @@ describe('JeuneSqlRepository', () => {
         dateEvenement
       })
 
+      // When
       const actual = await jeuneSqlRepository.getAllQueryModelsByConseiller(
         idConseiller
       )
 
+      // Then
       expect(actual).to.deep.equal([
         {
           ...unDetailJeuneQueryModel(),
@@ -149,7 +153,7 @@ describe('JeuneSqlRepository', () => {
       ])
     })
     it("retourne les jeunes d'un conseiller avec la date du DERNIER evenement d'engagement", async () => {
-      const idConseiller = '1'
+      // Given
       const jeune = unJeuneDto({ idConseiller })
       const dateEvenementRecent = uneDatetime.toJSDate()
       const dateEvenementAncien = uneDatetimeMoinsRecente.toJSDate()
@@ -166,10 +170,12 @@ describe('JeuneSqlRepository', () => {
         dateEvenement: dateEvenementRecent
       })
 
+      // When
       const actual = await jeuneSqlRepository.getAllQueryModelsByConseiller(
         idConseiller
       )
 
+      // Then
       expect(actual).to.deep.equal([
         {
           ...unDetailJeuneQueryModel(),
@@ -178,7 +184,7 @@ describe('JeuneSqlRepository', () => {
       ])
     })
     it("retourne les jeunes d'un conseiller sans la date d'evenement d'engagement", async () => {
-      const idConseiller = '1'
+      // Given
       const jeune = unJeuneDto({ idConseiller })
       const dateEvenement = uneDatetime.toJSDate()
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
@@ -189,10 +195,12 @@ describe('JeuneSqlRepository', () => {
         dateEvenement
       })
 
+      // When
       const actual = await jeuneSqlRepository.getAllQueryModelsByConseiller(
         idConseiller
       )
 
+      // Then
       expect(actual).to.deep.equal([unDetailJeuneQueryModel()])
     })
     it("retourne tableau vide quand le conseiller n'existe pas", async () => {

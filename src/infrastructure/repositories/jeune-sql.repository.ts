@@ -14,7 +14,6 @@ import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
 import { SequelizeInjectionToken } from '../sequelize/providers'
 import {
-  fromRawSqlToDetailJeuneQueryModel,
   fromSqlToDetailJeuneQueryModel,
   fromSqlToJeune,
   fromSqlToJeuneHomeQueryModel,
@@ -77,7 +76,30 @@ export class JeuneSqlRepository implements Jeune.Repository {
       }
     )
 
-    return sqlJeunes.map(fromRawSqlToDetailJeuneQueryModel)
+    return sqlJeunes.map(
+      (sqlJeune: {
+        id: string
+        prenom: string
+        nom: string
+        email: string
+        date_creation: Date
+        id_authentification: string
+        date_evenement: Date
+      }) => {
+        const jeuneQueryModel: DetailJeuneQueryModel = {
+          id: sqlJeune.id,
+          firstName: sqlJeune.prenom,
+          lastName: sqlJeune.nom,
+          email: sqlJeune.email ?? undefined,
+          creationDate: sqlJeune.date_creation.toISOString(),
+          isActivated: !!sqlJeune.id_authentification
+        }
+        if (sqlJeune.date_evenement) {
+          jeuneQueryModel.lastActivity = sqlJeune.date_evenement.toISOString()
+        }
+        return jeuneQueryModel
+      }
+    )
   }
 
   async save(jeune: Jeune): Promise<void> {

@@ -23,29 +23,6 @@ export function fromSqlToDetailJeuneQueryModel(
   }
 }
 
-export function fromRawSqlToDetailJeuneQueryModel(jeuneRawSql: {
-  id: string
-  prenom: string
-  nom: string
-  email: string
-  date_creation: Date
-  id_authentification: string
-  date_evenement: Date
-}): DetailJeuneQueryModel {
-  const jeuneQueryModel: DetailJeuneQueryModel = {
-    id: jeuneRawSql.id,
-    firstName: jeuneRawSql.prenom,
-    lastName: jeuneRawSql.nom,
-    email: jeuneRawSql.email ?? undefined,
-    creationDate: jeuneRawSql.date_creation.toISOString(),
-    isActivated: !!jeuneRawSql.id_authentification
-  }
-  if (jeuneRawSql.date_evenement) {
-    jeuneQueryModel.lastActivity = jeuneRawSql.date_evenement.toISOString()
-  }
-  return jeuneQueryModel
-}
-
 export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
   return {
     id: jeuneSqlModel.id,
