@@ -33,7 +33,7 @@ export namespace Evenement {
   }
 
   export interface Repository {
-    enregistrerEvenement(
+    saveEvenement(
       utilisateur: Authentification.Utilisateur,
       categorieEvenement: string,
       actionEvenement: string,
@@ -162,7 +162,7 @@ export class EvenementService {
     const evenement: { categorie: string; action: string; nom?: string } =
       evenements[typeEvenement]
 
-    await this.evenementRepository.enregistrerEvenement(
+    await this.evenementRepository.saveEvenement(
       utilisateur,
       evenement.categorie,
       evenement.action,

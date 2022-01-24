@@ -17,7 +17,7 @@ describe('EvenementHttpSqlRepository', () => {
     evenementHttpSqlRepository = new EvenementHttpSqlRepository(dateService)
   })
 
-  describe('enregistrerEvenement', () => {
+  describe('saveEvenement', () => {
     it("enregistre l'évènement en base", async () => {
       // Given
       const utilisateur = {
@@ -32,7 +32,7 @@ describe('EvenementHttpSqlRepository', () => {
       const actionEvenement = 'Test'
 
       // When
-      const result = await evenementHttpSqlRepository.enregistrerEvenement(
+      const result = await evenementHttpSqlRepository.saveEvenement(
         utilisateur,
         categorieEvenement,
         actionEvenement

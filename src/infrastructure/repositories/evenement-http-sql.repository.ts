@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { Evenement } from 'src/domain/evenement'
 import { DateService } from 'src/utils/date-service'
@@ -7,13 +7,9 @@ import { EvenementEngagementSqlModel } from '../sequelize/models/evenement-engag
 
 @Injectable()
 export class EvenementHttpSqlRepository implements Evenement.Repository {
-  private logger: Logger
+  constructor(private dateService: DateService) {}
 
-  constructor(private dateService: DateService) {
-    this.logger = new Logger('EvenementHttpSqlRepository')
-  }
-
-  async enregistrerEvenement(
+  async saveEvenement(
     utilisateur: Authentification.Utilisateur,
     categorieEvenement: string,
     actionEvenement: string,
@@ -28,13 +24,6 @@ export class EvenementHttpSqlRepository implements Evenement.Repository {
       typeUtilisateur: utilisateur.type,
       structure: utilisateur.structure,
       dateEvenement: dateEvenement
-    })
-    this.logger.log({
-      categorie: categorieEvenement,
-      action: actionEvenement,
-      idUtilisateur: utilisateur.id,
-      typeUtilisateur: utilisateur.type,
-      structure: utilisateur.structure
     })
     return emptySuccess()
   }
