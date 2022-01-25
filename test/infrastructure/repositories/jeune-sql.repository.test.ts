@@ -1,13 +1,18 @@
+import { Authentification } from 'src/domain/authentification'
+import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { Action } from '../../../src/domain/action'
 import { Jeune } from '../../../src/domain/jeune'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { uneDatetime } from '../../fixtures/date.fixture'
+import {
+  uneDatetime,
+  uneDatetimeMoinsRecente
+} from '../../fixtures/date.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import {
-  listeDetailJeuneQueryModel,
+  unDetailJeuneQueryModel,
   unResumeActionDUnJeune
 } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
@@ -109,18 +114,95 @@ describe('JeuneSqlRepository', () => {
   })
 
   describe('getAllQueryModelsByConseiller', () => {
+    const idConseiller = '1'
     it("retourne les jeunes d'un conseiller", async () => {
-      const idConseiller = '1'
+      // Given
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
       await JeuneSqlModel.creer(unJeuneDto({ idConseiller }))
 
+      // When
+      const actual = await jeuneSqlRepository.getAllQueryModelsByConseiller(
+        idConseiller
+      )
+      // Then
+      expect(actual).to.deep.equal([unDetailJeuneQueryModel()])
+    })
+    it("retourne les jeunes d'un conseiller avec la date d'evenement d'engagement", async () => {
+      // Given
+      const jeune = unJeuneDto({ idConseiller })
+      const dateEvenement = uneDatetime.toJSDate()
+      await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
+      await JeuneSqlModel.creer(jeune)
+      await EvenementEngagementSqlModel.create({
+        idUtilisateur: jeune.id,
+        typeUtilisateur: Authentification.Type.JEUNE,
+        dateEvenement
+      })
+
+      // When
       const actual = await jeuneSqlRepository.getAllQueryModelsByConseiller(
         idConseiller
       )
 
-      expect(actual).to.deep.equal(listeDetailJeuneQueryModel())
+      // Then
+      expect(actual).to.deep.equal([
+        {
+          ...unDetailJeuneQueryModel(),
+          lastActivity: dateEvenement.toISOString()
+        }
+      ])
     })
+    it("retourne les jeunes d'un conseiller avec la date du DERNIER evenement d'engagement", async () => {
+      // Given
+      const jeune = unJeuneDto({ idConseiller })
+      const dateEvenementRecent = uneDatetime.toJSDate()
+      const dateEvenementAncien = uneDatetimeMoinsRecente.toJSDate()
+      await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
+      await JeuneSqlModel.creer(jeune)
+      await EvenementEngagementSqlModel.create({
+        idUtilisateur: jeune.id,
+        typeUtilisateur: Authentification.Type.JEUNE,
+        dateEvenement: dateEvenementAncien
+      })
+      await EvenementEngagementSqlModel.create({
+        idUtilisateur: jeune.id,
+        typeUtilisateur: Authentification.Type.JEUNE,
+        dateEvenement: dateEvenementRecent
+      })
 
+      // When
+      const actual = await jeuneSqlRepository.getAllQueryModelsByConseiller(
+        idConseiller
+      )
+
+      // Then
+      expect(actual).to.deep.equal([
+        {
+          ...unDetailJeuneQueryModel(),
+          lastActivity: dateEvenementRecent.toISOString()
+        }
+      ])
+    })
+    it("retourne les jeunes d'un conseiller sans la date d'evenement d'engagement", async () => {
+      // Given
+      const jeune = unJeuneDto({ idConseiller })
+      const dateEvenement = uneDatetime.toJSDate()
+      await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
+      await JeuneSqlModel.creer(jeune)
+      await EvenementEngagementSqlModel.create({
+        idUtilisateur: 'faux-id',
+        typeUtilisateur: Authentification.Type.JEUNE,
+        dateEvenement
+      })
+
+      // When
+      const actual = await jeuneSqlRepository.getAllQueryModelsByConseiller(
+        idConseiller
+      )
+
+      // Then
+      expect(actual).to.deep.equal([unDetailJeuneQueryModel()])
+    })
     it("retourne tableau vide quand le conseiller n'existe pas", async () => {
       const actual = await jeuneSqlRepository.getAllQueryModelsByConseiller(
         'id-inexistant'

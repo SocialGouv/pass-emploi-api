@@ -18,17 +18,15 @@ export function unResumeActionDUnJeune(
   return { ...defaults, ...args }
 }
 
-export function listeDetailJeuneQueryModel(): DetailJeuneQueryModel[] {
-  const defaults: DetailJeuneQueryModel[] = [
-    {
-      id: 'ABCDE',
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john.doe@plop.io',
-      creationDate: '2021-11-11T08:03:30.000Z',
-      isActivated: true
-    }
-  ]
+export function unDetailJeuneQueryModel(): DetailJeuneQueryModel {
+  const defaults: DetailJeuneQueryModel = {
+    id: 'ABCDE',
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john.doe@plop.io',
+    creationDate: '2021-11-11T08:03:30.000Z',
+    isActivated: true
+  }
 
   return defaults
 }
