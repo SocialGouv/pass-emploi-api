@@ -15,23 +15,28 @@ import {
   StubbedClass,
   stubClass
 } from '../../utils'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 
-describe.only('CreateActionCommandHandler', () => {
+describe('CreateRechercheCommandHandler', () => {
   DatabaseForTesting.prepare()
   let rechercheRepository: StubbedType<Recherche.Repository>
   let idService: StubbedClass<IdService>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
+  let evenementService: StubbedClass<EvenementService>
   let createRechercheCommandHandler: CreateRechercheCommandHandler
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
     rechercheRepository = stubInterface(sandbox)
+    evenementService = stubClass(EvenementService)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     idService = stubClass(IdService)
     createRechercheCommandHandler = new CreateRechercheCommandHandler(
       rechercheRepository,
       idService,
-      jeuneAuthorizer
+      jeuneAuthorizer,
+      evenementService
     )
   })
 
@@ -42,7 +47,7 @@ describe.only('CreateActionCommandHandler', () => {
         const idRecherche = 'un-id'
         idService.uuid.returns(idRecherche)
         const command: CreateRechercheCommand = {
-          idJeune: '',
+          idJeune: 'ABC123',
           type: Recherche.Type.OFFRES_EMPLOI,
           titre: '',
           metier: '',
@@ -55,7 +60,88 @@ describe.only('CreateActionCommandHandler', () => {
 
         // Then
         expect(result).to.deep.equal(success({ id: idRecherche }))
+        expect(
+          rechercheRepository.saveRecherche
+        ).to.have.been.calledWithExactly('ABC123', {
+          id: 'un-id',
+          type: 'OFFRES_EMPLOI',
+          titre: '',
+          metier: '',
+          localisation: '',
+          criteres: {}
+        })
       })
+    })
+  })
+  describe('monitor', () => {
+    it("renvoie le bon évènement d'engagement quand la recherche est une offre d'emploi", async () => {
+      // Given
+      const idRecherche = 'un-id'
+      idService.uuid.returns(idRecherche)
+      const command: CreateRechercheCommand = {
+        idJeune: 'ABC123',
+        type: Recherche.Type.OFFRES_EMPLOI,
+        titre: '',
+        metier: '',
+        localisation: '',
+        criteres: {}
+      }
+      const utilisateur = unUtilisateurJeune()
+
+      // When
+      await createRechercheCommandHandler.monitor(utilisateur, command)
+
+      // Then
+      expect(evenementService.creerEvenement).to.be.calledWith(
+        Evenement.Type.OFFRE_EMPLOI_RECHERCHEE,
+        utilisateur
+      )
+    })
+    it("renvoie le bon évènement d'engagement quand la recherche est une offre d'immersion", async () => {
+      // Given
+      const idRecherche = 'un-id'
+      idService.uuid.returns(idRecherche)
+      const command: CreateRechercheCommand = {
+        idJeune: 'ABC123',
+        type: Recherche.Type.OFFRES_IMMERSION,
+        titre: '',
+        metier: '',
+        localisation: '',
+        criteres: {}
+      }
+      const utilisateur = unUtilisateurJeune()
+
+      // When
+      await createRechercheCommandHandler.monitor(utilisateur, command)
+
+      // Then
+      expect(evenementService.creerEvenement).to.be.calledWith(
+        Evenement.Type.OFFRE_IMMERSION_RECHERCHEE,
+        utilisateur
+      )
+    })
+    it("renvoie le bon évènement d'engagement quand la recherche est une offre d'alternance", async () => {
+      // Given
+      const idRecherche = 'un-id'
+      idService.uuid.returns(idRecherche)
+      const command: CreateRechercheCommand = {
+        idJeune: 'ABC123',
+        type: Recherche.Type.OFFRES_ALTERNANCE,
+        titre: '',
+        metier: '',
+        localisation: '',
+        criteres: {}
+      }
+      const utilisateur = unUtilisateurJeune()
+
+      // When
+      await createRechercheCommandHandler.monitor(utilisateur, command)
+
+      // Then
+      expect(evenementService.creerEvenement).to.be.calledWith(
+        Evenement.Type.OFFRE_ALTERNANCE_RECHERCHEE,
+        utilisateur
+      )
     })
   })
 })

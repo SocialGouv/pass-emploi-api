@@ -10,6 +10,7 @@ import { Recherche, RecherchesRepositoryToken } from '../../domain/recherche'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { GetOffresEmploiQuery } from '../queries/get-offres-emploi.query.handler'
 import { GetOffresImmersionQuery } from '../queries/get-offres-immersion.query.handler'
+import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface CreateRechercheCommand extends Command {
   idJeune: string
@@ -29,7 +30,8 @@ export class CreateRechercheCommandHandler extends CommandHandler<
     @Inject(RecherchesRepositoryToken)
     private rechercheRepository: Recherche.Repository,
     private idService: IdService,
-    private jeuneAuthorizer: JeuneAuthorizer
+    private jeuneAuthorizer: JeuneAuthorizer,
+    private evenementService: EvenementService
   ) {
     super('CreateRechercheCommandHandler')
   }
@@ -57,9 +59,31 @@ export class CreateRechercheCommandHandler extends CommandHandler<
   }
 
   async monitor(
-    _utilisateur: Authentification.Utilisateur,
-    _command: CreateRechercheCommand
+    utilisateur: Authentification.Utilisateur,
+    command: CreateRechercheCommand
   ): Promise<void> {
-    return
+    switch (command.type) {
+      case Recherche.Type.OFFRES_ALTERNANCE: {
+        await this.evenementService.creerEvenement(
+          Evenement.Type.OFFRE_ALTERNANCE_RECHERCHEE,
+          utilisateur
+        )
+        return
+      }
+      case Recherche.Type.OFFRES_EMPLOI: {
+        await this.evenementService.creerEvenement(
+          Evenement.Type.OFFRE_EMPLOI_RECHERCHEE,
+          utilisateur
+        )
+        return
+      }
+      case Recherche.Type.OFFRES_IMMERSION: {
+        await this.evenementService.creerEvenement(
+          Evenement.Type.OFFRE_IMMERSION_RECHERCHEE,
+          utilisateur
+        )
+        return
+      }
+    }
   }
 }

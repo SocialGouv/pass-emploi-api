@@ -8,8 +8,24 @@ module.exports = {
         primaryKey: true,
         allowNull: false
       },
+      idJeune: {
+        field: 'id_jeune',
+        type: Sequelize.STRING,
+        references: {
+          model: 'jeune',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+        allowNull: false
+      },
       titre: {
         field: 'titre',
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      type: {
+        field: 'type',
         type: Sequelize.STRING,
         allowNull: false
       },
