@@ -7,8 +7,8 @@ export interface Recherche {
   id: string
   type: Recherche.Type
   titre: string
-  metier: string
-  localisation: string
+  metier?: string
+  localisation?: string
   criteres: GetOffresEmploiQuery | GetOffresImmersionQuery
 }
 

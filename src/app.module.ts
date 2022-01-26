@@ -103,6 +103,10 @@ import { GetFavorisOffresEmploiJeuneQueryHandler } from './application/queries/g
 import { AddFavoriOffreImmersionCommandHandler } from './application/commands/add-favori-offre-immersion.command.handler'
 import { DeleteFavoriOffreImmersionCommandHandler } from './application/commands/delete-favori-offre-immersion.command.handler'
 import { GetFavorisOffresImmersionJeuneQueryHandler } from './application/queries/get-favoris-offres-immersion-jeune.query.handler'
+import { CreateRechercheCommandHandler } from './application/commands/create-recherche.command.handler'
+import { RecherchesController } from './infrastructure/routes/recherches.controller'
+import { RechercheSqlRepository } from './infrastructure/repositories/recherche-sql.repository'
+import { RecherchesRepositoryToken } from './domain/recherche'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -125,6 +129,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     AuthentificationController,
     ReferentielsController,
     EvenementsController,
+    RecherchesController,
     FavorisController
   ],
   providers: [
@@ -197,6 +202,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       provide: EvenementsRepositoryToken,
       useClass: EvenementHttpSqlRepository
     },
+    {
+      provide: RecherchesRepositoryToken,
+      useClass: RechercheSqlRepository
+    },
     ...databaseProviders
   ],
   exports: [...databaseProviders]
@@ -238,6 +247,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetAllRendezVousJeuneQueryHandler,
     SendNotificationNouveauMessageCommandHandler,
     DeleteActionCommandHandler,
+    CreateRechercheCommandHandler,
     UpdateUtilisateurCommandHandler,
     GetCommunesEtDepartementsQueryHandler,
     GetDossierMiloJeuneQueryHandler,

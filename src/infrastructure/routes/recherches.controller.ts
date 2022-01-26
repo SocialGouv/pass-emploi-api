@@ -6,7 +6,7 @@ import {
 } from '../../application/commands/create-recherche.command.handler'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
-import { Recherche } from 'src/domain/recherche'
+import { CreateRecherchePayload } from './validation/recherches.inputs'
 
 @Controller('recherches')
 @ApiOAuth2([])
@@ -23,11 +23,11 @@ export class RecherchesController {
   ): Promise<void> {
     const command: CreateRechercheCommand = {
       metier: createRecherchePayload.metier,
-      idJeune: '',
-      type: Recherche.Type.OFFRES_EMPLOI,
-      titre: '',
-      localisation: '',
-      criteres: undefined
+      idJeune: createRecherchePayload.idJeune,
+      type: createRecherchePayload.type,
+      titre: createRecherchePayload.titre,
+      localisation: createRecherchePayload.localisation,
+      criteres: createRecherchePayload.criteres
     }
     this.createRechercheCommandHandler.execute(command, utilisateur)
   }

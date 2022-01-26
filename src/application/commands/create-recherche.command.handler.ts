@@ -16,8 +16,8 @@ export interface CreateRechercheCommand extends Command {
   idJeune: string
   type: Recherche.Type
   titre: string
-  metier: string
-  localisation: string
+  metier?: string
+  localisation?: string
   criteres: GetOffresEmploiQuery | GetOffresImmersionQuery
 }
 
