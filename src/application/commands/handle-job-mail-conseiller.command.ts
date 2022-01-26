@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { emptySuccess, Result } from 'src/building-blocks/types/result'
+import { Result, success } from 'src/building-blocks/types/result'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { Planificateur, PlanificateurService } from '../../domain/planificateur'
@@ -10,10 +10,14 @@ export interface HandleJobMailConseillerCommand extends Command {
   job: Planificateur.Job<Planificateur.JobMailConseiller>
 }
 
+interface HandleJobMailConseillerCommandResult {
+  mailEnvoye: boolean
+}
+
 @Injectable()
 export class HandleJobMailConseillerCommandHandler extends CommandHandler<
   HandleJobMailConseillerCommand,
-  void
+  HandleJobMailConseillerCommandResult
 > {
   constructor(
     @Inject(ChatRepositoryToken)
@@ -25,7 +29,9 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
     super('HandleJobMailConseillerCommandHandler')
   }
 
-  async handle(command: HandleJobMailConseillerCommand): Promise<Result> {
+  async handle(
+    command: HandleJobMailConseillerCommand
+  ): Promise<Result<HandleJobMailConseillerCommandResult>> {
     this.planificateurService.planifierJobRappelMail(
       command.job.contenu.idConseiller
     )
@@ -36,7 +42,7 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
       )
 
     if (nombreDeConversationsNonLues === 0) {
-      return emptySuccess()
+      return success({ mailEnvoye: false })
     }
 
     await this.conseillerRepository.envoyerUnRappelParMail(
@@ -44,7 +50,7 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
       nombreDeConversationsNonLues
     )
 
-    return emptySuccess()
+    return success({ mailEnvoye: true })
   }
 
   async authorize(

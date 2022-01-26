@@ -13,7 +13,7 @@ import {
 import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { emptySuccess } from '../../../src/building-blocks/types/result'
+import { success } from '../../../src/building-blocks/types/result'
 
 describe('HandleJobMailConseillerCommandHandler', () => {
   let handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler
@@ -80,7 +80,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
       const result = await handleJobMailConseillerCommandHandler.handle(command)
 
       // Then
-      expect(result).to.deep.equal(emptySuccess())
+      expect(result).to.deep.equal(success({ mailEnvoye: false }))
       expect(conseillerRepository.envoyerUnRappelParMail).to.have.callCount(0)
     })
   })

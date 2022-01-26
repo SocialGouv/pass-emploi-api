@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { emptySuccess, Result } from 'src/building-blocks/types/result'
+import { Result, success } from 'src/building-blocks/types/result'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
@@ -15,10 +15,14 @@ export interface HandleJobRendezVousCommand extends Command {
   job: Planificateur.Job<Planificateur.JobRendezVous>
 }
 
+export interface HandleJobRendezVousCommandResult {
+  notificationEnvoyee: boolean
+}
+
 @Injectable()
 export class HandleJobRendezVousCommandHandler extends CommandHandler<
   HandleJobRendezVousCommand,
-  void
+  HandleJobRendezVousCommandResult
 > {
   constructor(
     @Inject(RendezVousRepositoryToken)
@@ -30,13 +34,15 @@ export class HandleJobRendezVousCommandHandler extends CommandHandler<
     super('HandleJobRendezVousCommandHandler')
   }
 
-  async handle(command: HandleJobRendezVousCommand): Promise<Result> {
+  async handle(
+    command: HandleJobRendezVousCommand
+  ): Promise<Result<HandleJobRendezVousCommandResult>> {
     const rendezVous = await this.rendezVousRepository.get(
       command.job.contenu.idRendezVous
     )
 
     if (!rendezVous?.jeune.pushNotificationToken) {
-      return emptySuccess()
+      return success({ notificationEnvoyee: false })
     }
 
     const notification = Notification.createRappelRdv(
@@ -46,7 +52,7 @@ export class HandleJobRendezVousCommandHandler extends CommandHandler<
       this.dateService
     )
     await this.notificationRepository.send(notification)
-    return emptySuccess()
+    return success({ notificationEnvoyee: true })
   }
 
   async authorize(
