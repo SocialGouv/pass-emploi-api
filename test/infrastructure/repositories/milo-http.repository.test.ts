@@ -15,12 +15,16 @@ import { unJeune } from '../../fixtures/jeune.fixture'
 import { DatabaseForTesting, stubClass } from '../../utils'
 import { testConfig } from '../../utils/module-for-testing'
 import { MailSendinblueClient } from '../../../src/infrastructure/clients/mail-sendinblue.client'
+import { IdService } from 'src/utils/id-service'
+import { DateService } from 'src/utils/date-service'
 
 describe('MiloHttpRepository', () => {
   let miloHttpRepository: MiloHttpRepository
   const configService = testConfig()
   const database = DatabaseForTesting.prepare()
   const jeune = { ...unJeune(), email: 'john@doe.io' }
+  let idService: IdService
+  let dateService: DateService
 
   beforeEach(async () => {
     const httpService = new HttpService()
@@ -30,7 +34,11 @@ describe('MiloHttpRepository', () => {
       mailSendinblueClient
     )
     await conseillerSqlRepository.save(jeune.conseiller)
-    const jeuneSqlRepository = new JeuneSqlRepository(database.sequelize)
+    const jeuneSqlRepository = new JeuneSqlRepository(
+      database.sequelize,
+      idService,
+      dateService
+    )
     await jeuneSqlRepository.save(jeune)
 
     miloHttpRepository = new MiloHttpRepository(httpService, configService)

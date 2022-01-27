@@ -5,25 +5,34 @@ import {
   DetailJeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
+import { DateService } from 'src/utils/date-service'
+import { IdService } from 'src/utils/id-service'
 import { Action } from '../../domain/action'
+import { Authentification } from '../../domain/authentification'
 import { NotFound } from '../../domain/erreur'
 import { Jeune } from '../../domain/jeune'
 import { ActionSqlModel } from '../sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
+import { TransfertConseillerSqlModel } from '../sequelize/models/transfert-conseiller.sql-model'
 import { SequelizeInjectionToken } from '../sequelize/providers'
 import {
+  DetailJeuneRawSql,
   fromSqlToDetailJeuneQueryModel,
   fromSqlToJeune,
   fromSqlToJeuneHomeQueryModel,
-  toResumeActionsDuJeuneQueryModel
+  toDetailJeunQueryModel,
+  toResumeActionsDuJeuneQueryModel,
+  toSqlJeune
 } from './mappers/jeunes.mappers'
 
 @Injectable()
 export class JeuneSqlRepository implements Jeune.Repository {
   constructor(
-    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
+    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
+    private idService: IdService,
+    private dateService: DateService
   ) {}
 
   async get(id: string): Promise<Jeune | undefined> {
@@ -58,48 +67,68 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return fromSqlToDetailJeuneQueryModel(jeuneSqlModel)
   }
 
+  async saveAll(jeunes: Jeune[]): Promise<void> {
+    for (const jeune of jeunes) {
+      await JeuneSqlModel.upsert(toSqlJeune(jeune))
+    }
+  }
+
+  async creerTransferts(
+    idConseillerSource: string,
+    idConseillerCible: string,
+    idsJeune: string[]
+  ): Promise<void> {
+    const dateTransfert = this.dateService.nowJs()
+    await TransfertConseillerSqlModel.bulkCreate(
+      idsJeune.map(idJeune => {
+        return {
+          id: this.idService.uuid(),
+          idJeune,
+          idConseillerSource,
+          idConseillerCible,
+          dateTransfert
+        }
+      })
+    )
+  }
+
   async getAllQueryModelsByConseiller(
     idConseiller: string
   ): Promise<DetailJeuneQueryModel[]> {
-    const sqlJeunes = await this.sequelize.query(
+    const sqlJeunes = (await this.sequelize.query(
       `
-      SELECT jeune.id, jeune.prenom, jeune.nom, jeune.email, jeune.date_creation, jeune.id_authentification, MAX(evenement_engagement.date_evenement) as date_evenement
-      FROM jeune
-      LEFT JOIN evenement_engagement ON evenement_engagement.id_utilisateur = jeune.id AND evenement_engagement.type_utilisateur = 'JEUNE'
-      WHERE jeune.id_conseiller = :idConseiller
-      GROUP BY jeune.id
-      ORDER BY jeune.prenom ASC, jeune.nom ASC
+        SELECT jeune.id,
+               jeune.prenom,
+               jeune.nom,
+               jeune.email,
+               jeune.date_creation,
+               jeune.id_authentification,
+               MAX(evenement_engagement.date_evenement) as date_evenement,
+               conseiller.email                         as email_conseiller_precedent
+        FROM jeune
+                 LEFT JOIN evenement_engagement
+                           ON evenement_engagement.id_utilisateur = jeune.id AND
+                              evenement_engagement.type_utilisateur = '${Authentification.Type.JEUNE}'
+                 LEFT JOIN transfert_conseiller
+                           ON transfert_conseiller.id = (SELECT transfert_conseiller.id
+                                                         FROM transfert_conseiller
+                                                         WHERE transfert_conseiller.id_jeune = jeune.id
+                                                           AND transfert_conseiller.id_conseiller_cible = jeune.id_conseiller
+                                                         ORDER BY transfert_conseiller.date_transfert DESC
+                                                         LIMIT 1
+                           )
+                 LEFT JOIN conseiller ON conseiller.id = transfert_conseiller.id_conseiller_source
+        WHERE jeune.id_conseiller = :idConseiller
+        GROUP BY jeune.id, transfert_conseiller.id, conseiller.id
+        ORDER BY jeune.prenom ASC, jeune.nom ASC
     `,
       {
         type: QueryTypes.SELECT,
         replacements: { idConseiller }
       }
-    )
+    )) as DetailJeuneRawSql[]
 
-    return sqlJeunes.map(
-      (sqlJeune: {
-        id: string
-        prenom: string
-        nom: string
-        email: string
-        date_creation: Date
-        id_authentification: string
-        date_evenement: Date
-      }) => {
-        const jeuneQueryModel: DetailJeuneQueryModel = {
-          id: sqlJeune.id,
-          firstName: sqlJeune.prenom,
-          lastName: sqlJeune.nom,
-          email: sqlJeune.email ?? undefined,
-          creationDate: sqlJeune.date_creation.toISOString(),
-          isActivated: !!sqlJeune.id_authentification
-        }
-        if (sqlJeune.date_evenement) {
-          jeuneQueryModel.lastActivity = sqlJeune.date_evenement.toISOString()
-        }
-        return jeuneQueryModel
-      }
-    )
+    return sqlJeunes.map(toDetailJeunQueryModel)
   }
 
   async save(jeune: Jeune): Promise<void> {

@@ -109,6 +109,7 @@ import { RecherchesController } from './infrastructure/routes/recherches.control
 import { RechercheSqlRepository } from './infrastructure/repositories/recherche-sql.repository'
 import { RecherchesRepositoryToken } from './domain/recherche'
 import { GetRecherchesQueryHandler } from './application/queries/get-recherches.query.handler'
+import { TransfererJeunesConseillerCommandHandler } from './application/commands/transferer-jeunes-conseiller.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -262,7 +263,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     HandleJobRendezVousCommandHandler,
     HandleJobMailConseillerCommandHandler,
     SynchronizeJobsCommandHandler,
-    GetConseillerByEmailQueryHandler
+    GetConseillerByEmailQueryHandler,
+    TransfererJeunesConseillerCommandHandler
   ]
 }
 

@@ -13,5 +13,6 @@ export namespace Chat {
       utilisateur: Authentification.Utilisateur
     ): Promise<ChatSecretsQueryModel | undefined>
     getNombreDeConversationsNonLues(conseillerId: string): Promise<number>
+    transfererChat(conseillerCibleId: string, jeuneIds: string[]): Promise<void>
   }
 }

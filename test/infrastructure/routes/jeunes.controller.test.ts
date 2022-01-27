@@ -1,4 +1,7 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
+import { TransfererJeunesConseillerCommandHandler } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
+import { Core } from 'src/domain/core'
+import { TransfererConseillerPayload } from 'src/infrastructure/routes/validation/jeunes.inputs'
 import * as request from 'supertest'
 import {
   AddFavoriOffreEmploiCommand,
@@ -12,8 +15,10 @@ import {
 import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler'
 import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-models'
 import {
+  DroitsInsuffisants,
   FavoriExisteDejaError,
   FavoriNonTrouveError,
+  JeuneNonLieAuConseillerError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 import {
@@ -44,6 +49,7 @@ describe('JeunesController', () => {
   let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
   let deleteFavoriOffreEmploiCommandHandler: StubbedClass<DeleteFavoriOffreEmploiCommandHandler>
   let getDetailJeuneQueryHandler: StubbedClass<GetDetailJeuneQueryHandler>
+  let transfererJeunesConseillerCommandHandler: StubbedClass<TransfererJeunesConseillerCommandHandler>
   let app: INestApplication
 
   before(async () => {
@@ -55,6 +61,9 @@ describe('JeunesController', () => {
       DeleteFavoriOffreEmploiCommandHandler
     )
     getDetailJeuneQueryHandler = stubClass(GetDetailJeuneQueryHandler)
+    transfererJeunesConseillerCommandHandler = stubClass(
+      TransfererJeunesConseillerCommandHandler
+    )
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
       .useValue(createActionCommandHandler)
@@ -64,6 +73,8 @@ describe('JeunesController', () => {
       .useValue(deleteFavoriOffreEmploiCommandHandler)
       .overrideProvider(GetDetailJeuneQueryHandler)
       .useValue(getDetailJeuneQueryHandler)
+      .overrideProvider(TransfererJeunesConseillerCommandHandler)
+      .useValue(transfererJeunesConseillerCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -72,6 +83,65 @@ describe('JeunesController', () => {
 
   after(async () => {
     await app.close()
+  })
+
+  describe('POST /jeunes/transferer', () => {
+    it('transfere les jeunes', async () => {
+      // Given
+      const payload: TransfererConseillerPayload = {
+        idConseillerSource: '1',
+        idConseillerCible: '2',
+        idsJeune: []
+      }
+      transfererJeunesConseillerCommandHandler.execute.resolves(emptySuccess())
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post('/jeunes/transferer')
+        .set('authorization', unHeaderAuthorization())
+        .send(payload)
+        .expect(HttpStatus.OK)
+
+      expect(
+        transfererJeunesConseillerCommandHandler.execute
+      ).to.have.been.calledWithExactly(
+        {
+          idConseillerSource: '1',
+          idConseillerCible: '2',
+          idsJeune: [],
+          structure: Core.Structure.MILO
+        },
+        unUtilisateurDecode()
+      )
+    })
+
+    it("renvoie un code 403 si l'utilisateur n'est pas superviseur", async () => {
+      // Given
+      transfererJeunesConseillerCommandHandler.execute.rejects(
+        new DroitsInsuffisants()
+      )
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post('/jeunes/transferer')
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.FORBIDDEN)
+    })
+
+    it("renvoie un code 403 si un jeune n'est pas lié au conseiller", async () => {
+      // Given
+      transfererJeunesConseillerCommandHandler.execute.resolves(
+        failure(new JeuneNonLieAuConseillerError('1', '1'))
+      )
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post('/jeunes/transferer')
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.FORBIDDEN)
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/transferer')
   })
 
   describe('POST /jeunes/:idJeune/action', () => {

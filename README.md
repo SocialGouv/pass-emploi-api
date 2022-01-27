@@ -1,4 +1,5 @@
 ## Pré-requis
+
 - Node 16.13.2
 - Docker et docker-compose
 
@@ -35,16 +36,19 @@ yarn test
 ## Tests avec l'IDE
 
 Pour lancer les tests avec votre IDE favori, il est nécessaire de lancer d'abord une base de données via le docker-compose.
+
 ```bash
 yarn start:db:test
 ```
 
 Ensuite on il faut exporter la variable DATABASE_URL.
+
 ```bash
 export DATABASE_URL=postgresql://test:test@localhost:56432/test
 ```
 
 Enfin on peut lancer les tests avec le script ci (qui ne lance pas de DB)
+
 ```bash
 yarn test:ci
 ```
@@ -56,17 +60,21 @@ yarn seed
 ```
 
 ## Créer une migration
+
     npx sequelize-cli migration:generate --name nom-de-la-migration
 
 ## Lancer les migrations
+
     npx sequelize-cli db:migrate
 
 ## Rollback la dernière migration
+
     npx sequelize-cli db:migrate:undo
 
-***Pour ajouter des seeds, il faut aller dans le dossier src/infrastructure/sequelize/seeders***
+**_Pour ajouter des seeds, il faut aller dans le dossier src/infrastructure/sequelize/seeders_**
 
 ## Lancer des tasks sur les environnements déployés
+
     scalingo --region ${MA_REGION} -a ${MON_APPLICATION} run yarn tasks
 
 ## Déploiement
@@ -95,3 +103,10 @@ Cette application est branchée sur la branche `master` du repo.
 Il est également possible de déployer manuellement en allant sur `pa-back-prod > Deploy > Manual deployments > Trigger deployment`
 
 Les review apps ne sont pas activés sur la prod.
+
+### Rollback
+
+Il est possible de rollback une application Scalingo sur un commit donné (de la branche rattachée à l'application).
+
+    git remote add scalingo git@ssh.${MA_REGION}.scalingo.com:${MON_APPLICATION}.git
+    git push --force ${ID_COMMIT}:refs/heads/master
