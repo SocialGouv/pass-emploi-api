@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common'
+import { Body, Controller, Param, Post } from '@nestjs/common'
 import { ApiOAuth2, ApiTags } from '@nestjs/swagger'
 import {
   CreateRechercheCommand,
@@ -8,7 +8,7 @@ import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
 import { CreateRecherchePayload } from './validation/recherches.inputs'
 
-@Controller('recherches')
+@Controller('jeunes')
 @ApiOAuth2([])
 @ApiTags('Recherches')
 export class RecherchesController {
@@ -16,14 +16,15 @@ export class RecherchesController {
     private readonly createRechercheCommandHandler: CreateRechercheCommandHandler
   ) {}
 
-  @Post()
+  @Post(':idJeune/recherches')
   async creerRecherche(
     @Body() createRecherchePayload: CreateRecherchePayload,
+    @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const command: CreateRechercheCommand = {
       metier: createRecherchePayload.metier,
-      idJeune: createRecherchePayload.idJeune,
+      idJeune: idJeune,
       type: createRecherchePayload.type,
       titre: createRecherchePayload.titre,
       localisation: createRecherchePayload.localisation,

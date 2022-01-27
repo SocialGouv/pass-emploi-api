@@ -41,7 +41,6 @@ describe('RecherchesController', () => {
       it("crée la recherche quand il n'y a pas de critères", async () => {
         // Given
         const createRecherchePayload: CreateRecherchePayload = {
-          idJeune: '1',
           titre: 'Ma recherche',
           type: Recherche.Type.OFFRES_EMPLOI,
           criteres: {}
@@ -49,7 +48,7 @@ describe('RecherchesController', () => {
 
         // When
         await request(app.getHttpServer())
-          .post('/recherches')
+          .post('/jeunes/1/recherches')
           .set('authorization', unHeaderAuthorization())
           .send(createRecherchePayload)
 
@@ -72,7 +71,6 @@ describe('RecherchesController', () => {
       it('crée la recherche avec les critères renseignés', async () => {
         // Given
         const createRecherchePayload: CreateRecherchePayload = {
-          idJeune: '1',
           titre: 'Ma recherche',
           type: Recherche.Type.OFFRES_ALTERNANCE,
           localisation: 'Paris',
@@ -93,7 +91,7 @@ describe('RecherchesController', () => {
 
         // When
         await request(app.getHttpServer())
-          .post('/recherches')
+          .post('/jeunes/1/recherches')
           .set('authorization', unHeaderAuthorization())
           .send(createRecherchePayload)
 
@@ -129,7 +127,6 @@ describe('RecherchesController', () => {
       it('crée la recherche avec les critères renseignés', async () => {
         // Given
         const createRecherchePayload: CreateRecherchePayload = {
-          idJeune: '1',
           titre: 'Ma recherche',
           type: Recherche.Type.OFFRES_IMMERSION,
           localisation: 'Paris',
@@ -142,7 +139,7 @@ describe('RecherchesController', () => {
 
         // When
         await request(app.getHttpServer())
-          .post('/recherches')
+          .post('/jeunes/1/recherches')
           .set('authorization', unHeaderAuthorization())
           .send(createRecherchePayload)
 
@@ -167,6 +164,6 @@ describe('RecherchesController', () => {
         )
       })
     })
-    ensureUserAuthenticationFailsIfInvalid('post', '/recherches')
+    ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/1/recherches')
   })
 })

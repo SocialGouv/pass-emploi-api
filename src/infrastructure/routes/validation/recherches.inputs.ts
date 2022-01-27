@@ -1,15 +1,11 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { IsNotEmpty, IsOptional, IsString, ValidateIf } from 'class-validator'
 import { Recherche } from '../../../domain/recherche'
 import { FindOffresEmploiQuery } from './offres-emploi.inputs'
 import { GetOffresImmersionQueryParams } from './offres-immersion.inputs'
+import { isCriteresValid } from './utils/validators'
 
 export class CreateRecherchePayload {
-  @ApiPropertyOptional()
-  @IsString()
-  @IsNotEmpty()
-  idJeune: string
-
   @ApiPropertyOptional()
   @IsString()
   @IsNotEmpty()
@@ -35,5 +31,6 @@ export class CreateRecherchePayload {
   @ApiPropertyOptional()
   @IsString()
   @IsNotEmpty()
-  criteres: FindOffresEmploiQuery | GetOffresImmersionQueryParams
+  @ValidateIf((payload: CreateRecherchePayload) => isCriteresValid(payload))
+  criteres?: FindOffresEmploiQuery | GetOffresImmersionQueryParams
 }

@@ -9,7 +9,7 @@ export interface Recherche {
   titre: string
   metier?: string
   localisation?: string
-  criteres: GetOffresEmploiQuery | GetOffresImmersionQuery
+  criteres?: GetOffresEmploiQuery | GetOffresImmersionQuery
 }
 
 export namespace Recherche {

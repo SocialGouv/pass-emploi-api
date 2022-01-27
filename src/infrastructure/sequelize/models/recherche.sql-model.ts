@@ -14,23 +14,23 @@ import { JeuneSqlModel } from './jeune.sql-model'
 export class RechercheDto extends Model {
   @PrimaryKey
   @Column({ field: 'id', type: DataType.STRING })
-  id!: string
+  id: string
 
   @ForeignKey(() => JeuneSqlModel)
   @Column({ field: 'id_jeune' })
   idJeune: string
 
   @Column({ field: 'type', type: DataType.STRING })
-  type!: Recherche.Type
+  type: Recherche.Type
 
   @Column({ field: 'metier', type: DataType.STRING })
-  metier!: string
+  metier: string
 
   @Column({ field: 'localisation', type: DataType.STRING })
-  localisation!: string
+  localisation: string
 
   @Column({ field: 'criteres', type: DataType.JSONB })
-  criteres!: GetOffresEmploiQuery | GetOffresImmersionQuery
+  criteres: GetOffresEmploiQuery | GetOffresImmersionQuery | null
 }
 
 @Table({ timestamps: false, tableName: 'recherche' })

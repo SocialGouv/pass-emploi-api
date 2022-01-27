@@ -18,7 +18,7 @@ export interface CreateRechercheCommand extends Command {
   titre: string
   metier?: string
   localisation?: string
-  criteres: GetOffresEmploiQuery | GetOffresImmersionQuery
+  criteres?: GetOffresEmploiQuery | GetOffresImmersionQuery
 }
 
 @Injectable()
@@ -47,6 +47,7 @@ export class CreateRechercheCommandHandler extends CommandHandler<
       localisation: command.localisation,
       criteres: command.criteres
     }
+
     await this.rechercheRepository.saveRecherche(command.idJeune, recherche)
     return success({ id: idRecherche })
   }
@@ -62,28 +63,16 @@ export class CreateRechercheCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur,
     command: CreateRechercheCommand
   ): Promise<void> {
-    switch (command.type) {
-      case Recherche.Type.OFFRES_ALTERNANCE: {
-        await this.evenementService.creerEvenement(
-          Evenement.Type.OFFRE_ALTERNANCE_RECHERCHEE,
-          utilisateur
-        )
-        return
-      }
-      case Recherche.Type.OFFRES_EMPLOI: {
-        await this.evenementService.creerEvenement(
-          Evenement.Type.OFFRE_EMPLOI_RECHERCHEE,
-          utilisateur
-        )
-        return
-      }
-      case Recherche.Type.OFFRES_IMMERSION: {
-        await this.evenementService.creerEvenement(
-          Evenement.Type.OFFRE_IMMERSION_RECHERCHEE,
-          utilisateur
-        )
-        return
+    let evenementType: Evenement.Type
+    if (command.type === Recherche.Type.OFFRES_ALTERNANCE) {
+      evenementType = Evenement.Type.OFFRE_ALTERNANCE_RECHERCHEE
+    } else {
+      if (command.type === Recherche.Type.OFFRES_EMPLOI) {
+        evenementType = Evenement.Type.OFFRE_EMPLOI_RECHERCHEE
+      } else {
+        evenementType = Evenement.Type.OFFRE_IMMERSION_RECHERCHEE
       }
     }
+    await this.evenementService.creerEvenement(evenementType, utilisateur)
   }
 }
