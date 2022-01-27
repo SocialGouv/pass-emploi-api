@@ -3,6 +3,7 @@ import { Conseiller, ConseillersRepositoryToken } from 'src/domain/conseiller'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
 import { Authentification } from 'src/domain/authentification'
 import { Unauthorized } from 'src/domain/erreur'
+import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
 
 @Injectable()
 export class ConseillerAuthorizer {
@@ -35,5 +36,15 @@ export class ConseillerAuthorizer {
     }
 
     throw new Unauthorized('Conseiller')
+  }
+
+  authorizeSuperviseur(utilisateur: Authentification.Utilisateur): void {
+    if (
+      utilisateur.type === Authentification.Type.CONSEILLER &&
+      utilisateur.roles.includes(Authentification.Role.SUPERVISEUR)
+    ) {
+      return
+    }
+    throw new DroitsInsuffisants()
   }
 }

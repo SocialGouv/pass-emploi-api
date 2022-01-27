@@ -24,6 +24,11 @@ export class UtilisateurQueryModel implements Authentification.Utilisateur {
     enum: Authentification.Type
   })
   type: Authentification.Type
+
+  @ApiProperty({
+    enum: Authentification.Role
+  })
+  roles: Authentification.Role[]
 }
 
 export class ChatSecretsQueryModel {

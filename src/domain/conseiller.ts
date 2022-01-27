@@ -1,4 +1,6 @@
 import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
+import { Result } from '../building-blocks/types/result'
+import { Core } from './core'
 
 export interface Conseiller {
   id: string
@@ -16,6 +18,12 @@ export namespace Conseiller {
     getQueryModelById(
       id: string
     ): Promise<DetailConseillerQueryModel | undefined>
+    getQueryModelByEmailAndStructure(
+      emailConseiller: string,
+      structure: Core.Structure
+    ): Promise<Result<DetailConseillerQueryModel>>
+
+    // TODO ça a rien à faire dans le repo ça
     envoyerUnRappelParMail(
       idConseiller: string,
       nombreDeConversationNonLues: number

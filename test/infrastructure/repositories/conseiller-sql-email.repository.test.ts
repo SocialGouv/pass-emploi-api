@@ -1,5 +1,12 @@
-import { ConseillerSqlEmailRepository } from '../../../src/infrastructure/repositories/conseiller-sql-email-repository.service'
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import { failure, success } from '../../../src/building-blocks/types/result'
+import { Core } from '../../../src/domain/core'
+import { ConseillerSqlEmailRepository } from '../../../src/infrastructure/repositories/conseiller-sql-email.repository'
+import {
+  ConseillerDto,
+  ConseillerSqlModel
+} from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
@@ -46,7 +53,7 @@ describe('ConseillerSqlRepository', () => {
   })
 
   describe('getQueryModelById', () => {
-    it('retourne les conseiller quand le conseiller existe', async () => {
+    it('retourne le conseiller quand le conseiller existe', async () => {
       const idConseiller = '1'
       await ConseillerSqlModel.creer(
         unConseillerDto({ id: idConseiller, prenom: 'toto', nom: 'tata' })
@@ -71,6 +78,52 @@ describe('ConseillerSqlRepository', () => {
       )
 
       expect(actual).to.equal(undefined)
+    })
+  })
+
+  describe('getQueryModelByEmailAndStructure', () => {
+    let email: string
+    let conseillerDto: AsSql<ConseillerDto>
+    beforeEach(async () => {
+      // Given
+      email = 'conseiller@email.fr'
+      conseillerDto = unConseillerDto({
+        prenom: 'toto',
+        nom: 'tata',
+        email: email
+      })
+      await ConseillerSqlModel.creer(conseillerDto)
+    })
+
+    it('retourne le conseiller quand le conseiller existe', async () => {
+      // When
+      const actual =
+        await conseillerSqlRepository.getQueryModelByEmailAndStructure(
+          email,
+          Core.Structure.PASS_EMPLOI
+        )
+
+      expect(actual).to.deep.equal(
+        success(
+          detailConseillerQueryModel({
+            id: conseillerDto.id,
+            firstName: 'toto',
+            lastName: 'tata'
+          })
+        )
+      )
+    })
+
+    it("retourne un échec quand le conseiller n'existe pas", async () => {
+      const actual =
+        await conseillerSqlRepository.getQueryModelByEmailAndStructure(
+          email,
+          Core.Structure.MILO
+        )
+
+      expect(actual).to.deep.equal(
+        failure(new NonTrouveError('Conseiller', 'conseiller@email.fr'))
+      )
     })
   })
 

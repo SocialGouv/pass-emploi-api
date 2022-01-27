@@ -26,6 +26,7 @@ import { UpdateStatutActionCommandHandler } from './application/commands/update-
 import { UpdateUtilisateurCommandHandler } from './application/commands/update-utilisateur.command.handler'
 import { GetActionsByJeuneQueryHandler } from './application/queries/get-actions-by-jeune.query.handler'
 import { GetCommunesEtDepartementsQueryHandler } from './application/queries/get-communes-et-departements.query.handler'
+import { GetConseillerByEmailQueryHandler } from './application/queries/get-conseiller-by-email.query.handler'
 import { GetDetailActionQueryHandler } from './application/queries/get-detail-action.query.handler'
 import { GetDetailConseillerQueryHandler } from './application/queries/get-detail-conseiller.query.handler'
 import { GetDetailJeuneQueryHandler } from './application/queries/get-detail-jeune.query.handler'
@@ -67,7 +68,7 @@ import { ImmersionClient } from './infrastructure/clients/immersion-client'
 import { ActionSqlRepository } from './infrastructure/repositories/action-sql.repository'
 import { AuthentificationSqlRepository } from './infrastructure/repositories/authentification-sql.repository'
 import { ChatFirebaseRepository } from './infrastructure/repositories/chat-firebase.repository'
-import { ConseillerSqlEmailRepository } from './infrastructure/repositories/conseiller-sql-email-repository.service'
+import { ConseillerSqlEmailRepository } from './infrastructure/repositories/conseiller-sql-email.repository'
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune-sql.repository'
 import { MiloHttpRepository } from './infrastructure/repositories/milo-http.repository'
 import { MiloInMemoryRepository } from './infrastructure/repositories/milo-in-memory.repository'
@@ -258,7 +259,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetChatSecretsQueryHandler,
     HandleJobRendezVousCommandHandler,
     HandleJobMailConseillerCommandHandler,
-    SynchronizeJobsCommandHandler
+    SynchronizeJobsCommandHandler,
+    GetConseillerByEmailQueryHandler
   ]
 }
 

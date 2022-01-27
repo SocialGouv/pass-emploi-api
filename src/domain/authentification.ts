@@ -12,13 +12,27 @@ export namespace Authentification {
     CONSEILLER = 'CONSEILLER'
   }
 
+  export enum Role {
+    SUPERVISEUR = 'SUPERVISEUR'
+  }
+
+  export function toRole(role: string): Authentification.Role | undefined {
+    switch (role) {
+      case 'conseiller_superviseur':
+        return Authentification.Role.SUPERVISEUR
+      default:
+        return undefined
+    }
+  }
+
   export interface Utilisateur {
     id: string
     prenom: string
     nom: string
-    email?: string
     structure: Core.Structure
     type: Authentification.Type
+    roles: Authentification.Role[]
+    email?: string
   }
 
   export interface Repository {
@@ -46,13 +60,14 @@ export namespace Authentification {
         return failure(new ConseillerNonValide())
       }
 
-      const utilisateur = {
+      const utilisateur: Utilisateur = {
         id: this.idService.uuid(),
         prenom: prenom,
         nom: nom,
         email: email,
         type: Type.CONSEILLER,
-        structure: structure
+        structure: structure,
+        roles: []
       }
       return success(utilisateur)
     }

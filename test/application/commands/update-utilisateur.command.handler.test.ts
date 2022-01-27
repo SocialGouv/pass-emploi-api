@@ -174,7 +174,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
               nom: command.nom || '',
               email: command.email,
               type: command.type,
-              structure: command.structure
+              structure: command.structure,
+              roles: []
             }
             authentificationRepository.save
               .withArgs(utilisateur, command.idUtilisateurAuth)
@@ -222,7 +223,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
               nom: command.nom || '',
               email: command.email,
               type: command.type,
-              structure: command.structure
+              structure: command.structure,
+              roles: []
             }
             authentificationRepository.save
               .withArgs(utilisateur, command.idUtilisateurAuth)

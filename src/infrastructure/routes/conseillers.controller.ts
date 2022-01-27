@@ -9,6 +9,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
   UnauthorizedException
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
@@ -22,6 +23,7 @@ import { CreateActionCommandHandler } from '../../application/commands/create-ac
 import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/creer-jeune-pole-emploi.command.handler'
 import { CreerJeuneMiloCommandHandler } from '../../application/commands/creer-jeune-milo.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from '../../application/commands/send-notification-nouveau-message.command.handler'
+import { GetConseillerByEmailQueryHandler } from '../../application/queries/get-conseiller-by-email.query.handler'
 import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
@@ -48,7 +50,8 @@ import { Utilisateur } from '../decorators/authenticated.decorator'
 import {
   CreateActionPayload,
   CreateJeunePoleEmploiPayload,
-  CreerJeuneMiloPayload
+  CreerJeuneMiloPayload,
+  GetConseillerQueryParams
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
 
@@ -58,16 +61,45 @@ import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
 export class ConseillersController {
   constructor(
     private readonly getDetailConseillerQueryHandler: GetDetailConseillerQueryHandler,
+    private readonly getConseillerByEmailQueryHandler: GetConseillerByEmailQueryHandler,
     private readonly getJeunesByConseillerQueryHandler: GetJeunesByConseillerQueryHandler,
     private readonly getResumeActionsDesJeunesDuConseillerQueryHandler: GetResumeActionsDesJeunesDuConseillerQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly creerJeunePoleEmploiCommandHandler: CreerJeunePoleEmploiCommandHandler,
     private readonly sendNotificationNouveauMessage: SendNotificationNouveauMessageCommandHandler,
     private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler,
-    private createRendezVousCommandHandler: CreateRendezVousCommandHandler,
-    private getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler,
-    private creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
+    private readonly createRendezVousCommandHandler: CreateRendezVousCommandHandler,
+    private readonly getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler,
+    private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
   ) {}
+
+  @Get()
+  @ApiResponse({
+    type: DetailConseillerQueryModel
+  })
+  async getDetailConseillerByEmail(
+    @Query() getConseillerQuery: GetConseillerQueryParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<DetailConseillerQueryModel> {
+    const result = await this.getConseillerByEmailQueryHandler.execute(
+      {
+        emailConseiller: getConseillerQuery.email,
+        structure: getConseillerQuery.structure
+      },
+      utilisateur
+    )
+    if (isSuccess(result)) {
+      return result.data
+    }
+
+    if (isFailure(result)) {
+      if (result.error instanceof NonTrouveError) {
+        throw new NotFoundException(result.error)
+      }
+    }
+
+    throw new RuntimeException()
+  }
 
   @Get(':idConseiller')
   @ApiResponse({
