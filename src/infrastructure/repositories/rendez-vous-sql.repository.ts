@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { DateTime } from 'luxon'
 import { Op } from 'sequelize'
 import {
   RendezVousConseillerQueryModel,
@@ -13,7 +12,8 @@ import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
 import {
   toRendezVousDto,
   fromSqlToRendezVousConseillerQueryModel,
-  fromSqlToRendezVousJeuneQueryModel
+  fromSqlToRendezVousJeuneQueryModel,
+  toRendezVous
 } from './mappers/rendez-vous.mappers'
 
 @Injectable()
@@ -40,7 +40,10 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
 
   async get(idRendezVous: string): Promise<RendezVous | undefined> {
     const rendezVousSql = await RendezVousSqlModel.findByPk(idRendezVous, {
-      include: [JeuneSqlModel, ConseillerSqlModel]
+      include: [
+        JeuneSqlModel,
+        { model: JeuneSqlModel, include: [ConseillerSqlModel] }
+      ]
     })
 
     if (!rendezVousSql || rendezVousSql.dateSuppression) {
@@ -52,7 +55,10 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
   async getAllAVenir(): Promise<RendezVous[]> {
     const maintenant = this.dateService.nowJs()
     const rendezVousSql = await RendezVousSqlModel.findAll({
-      include: [JeuneSqlModel, ConseillerSqlModel],
+      include: [
+        JeuneSqlModel,
+        { model: JeuneSqlModel, include: [ConseillerSqlModel] }
+      ],
       where: {
         date: {
           [Op.gte]: maintenant
@@ -70,10 +76,18 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
   ): Promise<RendezVousConseillerQueryModel> {
     const maintenant = this.dateService.nowJs()
 
-    const rendezVousPasses = await RendezVousSqlModel.findAll({
+    const jeunesSql = await JeuneSqlModel.findAll({
+      attributes: ['id'],
+      where: {
+        idConseiller
+      }
+    })
+    const jeunesIds = jeunesSql.map(jeuneSql => jeuneSql.id)
+
+    const rendezVousPassesPromise = RendezVousSqlModel.findAll({
       include: [JeuneSqlModel],
       where: {
-        idConseiller,
+        idJeune: { [Op.in]: jeunesIds },
         date: {
           [Op.lte]: maintenant
         },
@@ -84,10 +98,10 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
       order: [['date', 'DESC']]
     })
 
-    const rendezVousFuturs = await RendezVousSqlModel.findAll({
+    const rendezVousFutursPromise = RendezVousSqlModel.findAll({
       include: [JeuneSqlModel],
       where: {
-        idConseiller,
+        idJeune: { [Op.in]: jeunesIds },
         date: {
           [Op.gte]: maintenant
         },
@@ -97,6 +111,11 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
       },
       order: [['date', 'ASC']]
     })
+
+    const [rendezVousPasses, rendezVousFuturs] = await Promise.all([
+      rendezVousPassesPromise,
+      rendezVousFutursPromise
+    ])
 
     return {
       passes: rendezVousPasses.map(fromSqlToRendezVousConseillerQueryModel),
@@ -108,7 +127,7 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
     idJeune: string
   ): Promise<RendezVousQueryModel[]> {
     const allRendezVousSql = await RendezVousSqlModel.findAll({
-      include: [ConseillerSqlModel],
+      include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }],
       where: {
         idJeune,
         dateSuppression: {
@@ -119,31 +138,5 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
     })
 
     return allRendezVousSql.map(fromSqlToRendezVousJeuneQueryModel)
-  }
-}
-
-function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
-  return {
-    id: rendezVousSql.id,
-    titre: rendezVousSql.titre,
-    sousTitre: rendezVousSql.sousTitre,
-    modalite: rendezVousSql.modalite,
-    duree: rendezVousSql.duree,
-    date: rendezVousSql.date,
-    commentaire: rendezVousSql.commentaire ?? undefined,
-    jeune: {
-      id: rendezVousSql.jeune.id,
-      firstName: rendezVousSql.jeune.prenom,
-      lastName: rendezVousSql.jeune.nom,
-      creationDate: DateTime.fromJSDate(rendezVousSql.jeune.dateCreation),
-      pushNotificationToken:
-        rendezVousSql.jeune.pushNotificationToken ?? undefined,
-      conseiller: {
-        id: rendezVousSql.conseiller.id,
-        firstName: rendezVousSql.conseiller.prenom,
-        lastName: rendezVousSql.conseiller.nom
-      },
-      structure: rendezVousSql.jeune.structure
-    }
   }
 }

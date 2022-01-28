@@ -41,25 +41,21 @@ describe('RendezVousRepositorySql', () => {
 
     unRendezVousPasse = unRendezVousDto({
       idJeune: jeune.id,
-      idConseiller: jeune.conseiller.id,
       date: maintenant.minus({ days: 2 }).toJSDate(),
       titre: 'UN RENDEZ VOUS PASSÉ'
     })
     unRendezVousTresPasse = unRendezVousDto({
       idJeune: jeune.id,
-      idConseiller: jeune.conseiller.id,
       date: maintenant.minus({ days: 20 }).toJSDate(),
       titre: 'UN RENDEZ VOUS TRES PASSÉ'
     })
     unRendezVousProche = unRendezVousDto({
       idJeune: jeune.id,
-      idConseiller: jeune.conseiller.id,
       date: maintenant.plus({ days: 2 }).toJSDate(),
       titre: 'UN RENDEZ PROCHE'
     })
     unRendezVousTresFutur = unRendezVousDto({
       idJeune: jeune.id,
-      idConseiller: jeune.conseiller.id,
       date: maintenant.plus({ days: 20 }).toJSDate(),
       titre: 'UN RENDEZ TRES FUTUR'
     })
