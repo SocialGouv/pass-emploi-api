@@ -8,7 +8,7 @@ import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
 import { CreateRecherchePayload } from './validation/recherches.inputs'
 
-@Controller('jeunes')
+@Controller('jeunes/:idJeune')
 @ApiOAuth2([])
 @ApiTags('Recherches')
 export class RecherchesController {
@@ -16,7 +16,7 @@ export class RecherchesController {
     private readonly createRechercheCommandHandler: CreateRechercheCommandHandler
   ) {}
 
-  @Post(':idJeune/recherches')
+  @Post('recherches')
   async creerRecherche(
     @Body() createRecherchePayload: CreateRecherchePayload,
     @Param('idJeune') idJeune: string,

@@ -32,12 +32,12 @@ module.exports = {
       metier: {
         field: 'metier',
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       localisation: {
         field: 'localisation',
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       criteres: {
         field: 'criteres',

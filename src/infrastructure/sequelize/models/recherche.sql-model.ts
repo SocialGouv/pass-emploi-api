@@ -23,11 +23,14 @@ export class RechercheDto extends Model {
   @Column({ field: 'type', type: DataType.STRING })
   type: Recherche.Type
 
+  @Column({ field: 'titre', type: DataType.STRING })
+  titre: string
+
   @Column({ field: 'metier', type: DataType.STRING })
-  metier: string
+  metier: string | null
 
   @Column({ field: 'localisation', type: DataType.STRING })
-  localisation: string
+  localisation: string | null
 
   @Column({ field: 'criteres', type: DataType.JSONB })
   criteres: GetOffresEmploiQuery | GetOffresImmersionQuery | null
