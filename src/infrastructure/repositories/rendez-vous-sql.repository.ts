@@ -40,10 +40,7 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
 
   async get(idRendezVous: string): Promise<RendezVous | undefined> {
     const rendezVousSql = await RendezVousSqlModel.findByPk(idRendezVous, {
-      include: [
-        JeuneSqlModel,
-        { model: JeuneSqlModel, include: [ConseillerSqlModel] }
-      ]
+      include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }]
     })
 
     if (!rendezVousSql || rendezVousSql.dateSuppression) {
@@ -55,10 +52,7 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
   async getAllAVenir(): Promise<RendezVous[]> {
     const maintenant = this.dateService.nowJs()
     const rendezVousSql = await RendezVousSqlModel.findAll({
-      include: [
-        JeuneSqlModel,
-        { model: JeuneSqlModel, include: [ConseillerSqlModel] }
-      ],
+      include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }],
       where: {
         date: {
           [Op.gte]: maintenant
@@ -76,18 +70,9 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
   ): Promise<RendezVousConseillerQueryModel> {
     const maintenant = this.dateService.nowJs()
 
-    const jeunesSql = await JeuneSqlModel.findAll({
-      attributes: ['id'],
-      where: {
-        idConseiller
-      }
-    })
-    const jeunesIds = jeunesSql.map(jeuneSql => jeuneSql.id)
-
     const rendezVousPassesPromise = RendezVousSqlModel.findAll({
-      include: [JeuneSqlModel],
+      include: [{ model: JeuneSqlModel, where: { idConseiller } }],
       where: {
-        idJeune: { [Op.in]: jeunesIds },
         date: {
           [Op.lte]: maintenant
         },
@@ -99,9 +84,8 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
     })
 
     const rendezVousFutursPromise = RendezVousSqlModel.findAll({
-      include: [JeuneSqlModel],
+      include: [{ model: JeuneSqlModel, where: { idConseiller } }],
       where: {
-        idJeune: { [Op.in]: jeunesIds },
         date: {
           [Op.gte]: maintenant
         },

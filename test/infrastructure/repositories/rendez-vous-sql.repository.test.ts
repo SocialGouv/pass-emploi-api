@@ -19,7 +19,7 @@ import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { DatabaseForTesting, expect, stubClass } from '../../utils'
 
-describe('RendezVousRepositorySql', () => {
+describe.only('RendezVousRepositorySql', () => {
   DatabaseForTesting.prepare()
   let rendezVousRepositorySql: RendezVousRepositorySql
   const maintenant = uneDatetime
@@ -52,7 +52,7 @@ describe('RendezVousRepositorySql', () => {
     unRendezVousProche = unRendezVousDto({
       idJeune: jeune.id,
       date: maintenant.plus({ days: 2 }).toJSDate(),
-      titre: 'UN RENDEZ PROCHE'
+      titre: 'UN RENDEZ VOUS PROCHE'
     })
     unRendezVousTresFutur = unRendezVousDto({
       idJeune: jeune.id,
@@ -66,6 +66,47 @@ describe('RendezVousRepositorySql', () => {
       unRendezVousTresFutur,
       unRendezVousProche
     ])
+  })
+
+  describe('get', () => {
+    describe("quand le rdv n'existe pas", () => {
+      it('retourne undefined', async () => {
+        // Given
+        const idRdv = '6c242fa0-804f-11ec-a8a3-0242ac120002'
+        // When
+        const rendezVous = await rendezVousRepositorySql.get(idRdv)
+        // Then
+        expect(rendezVous).to.equal(undefined)
+      })
+    })
+    describe('quand le rdv existe', () => {
+      it('retourne le rendez-vous', async () => {
+        // Given
+        const idRdv = '6c242fa0-804f-11ec-a8a3-0242ac120002'
+        const unRendezVous = unRendezVousDto({
+          id: idRdv,
+          idJeune: jeune.id
+        })
+        await RendezVousSqlModel.create(unRendezVous)
+        // When
+        const rendezVous = await rendezVousRepositorySql.get(idRdv)
+        // Then
+        expect(rendezVous?.id).to.equal(unRendezVous.id)
+        expect(rendezVous?.jeune.id).to.equal(jeune.id)
+      })
+    })
+  })
+
+  describe('getAllAVenir', () => {
+    it('retourne le rendez-vous', async () => {
+      // When
+      const rendezVous = await rendezVousRepositorySql.getAllAVenir()
+      // Then
+      expect(rendezVous.length).to.equal(2)
+      expect(rendezVous[0].id).to.equal(unRendezVousTresFutur.id)
+      expect(rendezVous[0].jeune.id).to.equal(jeune.id)
+      expect(rendezVous[1].id).to.equal(unRendezVousProche.id)
+    })
   })
 
   describe('getAllQueryModelsByJeune', () => {
