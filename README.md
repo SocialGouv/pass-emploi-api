@@ -1,5 +1,5 @@
 ## Pré-requis
-- Node 16.13.0
+- Node 16.13.2
 - Docker et docker-compose
 
 ## Configuration
