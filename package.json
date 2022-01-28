@@ -36,7 +36,7 @@
     "tasks:dummy-job": "IS_WEB=false IS_WORKER=false RUN_TASK_DUMMY_JOB=true node dist/main"
   },
   "dependencies": {
-    "@nestjs/axios": "0.0.3",
+    "@nestjs/axios": "0.0.5",
     "@nestjs/common": "8.2.6",
     "@nestjs/config": "1.1.6",
     "@nestjs/core": "8.2.6",
