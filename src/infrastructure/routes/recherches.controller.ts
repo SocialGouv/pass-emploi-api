@@ -7,7 +7,6 @@ import {
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
 import {
-  CreateRechercheAlternancePayload,
   CreateRechercheImmersionPayload,
   CreateRechercheOffresEmploiPayload
 } from './validation/recherches.inputs'
@@ -30,24 +29,9 @@ export class RecherchesController {
     const command: CreateRechercheCommand = {
       metier: createRecherchePayload.metier,
       idJeune: idJeune,
-      type: Recherche.Type.OFFRES_EMPLOI,
-      titre: createRecherchePayload.titre,
-      localisation: createRecherchePayload.localisation,
-      criteres: createRecherchePayload.criteres
-    }
-    await this.createRechercheCommandHandler.execute(command, utilisateur)
-  }
-
-  @Post('recherches/alternances')
-  async creerRechercheAlternances(
-    @Body() createRecherchePayload: CreateRechercheAlternancePayload,
-    @Param('idJeune') idJeune: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    const command: CreateRechercheCommand = {
-      metier: createRecherchePayload.metier,
-      idJeune: idJeune,
-      type: Recherche.Type.OFFRES_ALTERNANCE,
+      type: createRecherchePayload.criteres?.alternance
+        ? Recherche.Type.OFFRES_ALTERNANCE
+        : Recherche.Type.OFFRES_EMPLOI,
       titre: createRecherchePayload.titre,
       localisation: createRecherchePayload.localisation,
       criteres: createRecherchePayload.criteres

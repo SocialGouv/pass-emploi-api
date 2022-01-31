@@ -1,5 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested
+} from 'class-validator'
+import { Type } from 'class-transformer'
 
 export class LocalisationPayload {
   @ApiProperty()
@@ -45,6 +52,8 @@ export class AddFavoriOffresEmploiPayload {
 
   @ApiProperty()
   @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => LocalisationPayload)
   localisation?: LocalisationPayload
 
   @ApiProperty()

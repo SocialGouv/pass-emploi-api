@@ -1,7 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested
+} from 'class-validator'
 import { FindOffresEmploiQuery } from './offres-emploi.inputs'
 import { GetOffresImmersionQueryParams } from './offres-immersion.inputs'
+import { Type } from 'class-transformer'
 
 export class CreateRechercheImmersionPayload {
   @ApiProperty()
@@ -19,7 +25,9 @@ export class CreateRechercheImmersionPayload {
   @IsOptional()
   localisation?: string
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: GetOffresImmersionQueryParams })
+  @ValidateNested({ each: true })
+  @Type(() => GetOffresImmersionQueryParams)
   criteres: GetOffresImmersionQueryParams
 }
 
@@ -39,26 +47,8 @@ export class CreateRechercheOffresEmploiPayload {
   @IsOptional()
   localisation?: string
 
-  @ApiPropertyOptional()
-  criteres?: FindOffresEmploiQuery
-}
-
-export class CreateRechercheAlternancePayload {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  titre: string
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  metier?: string
-
-  @ApiPropertyOptional()
-  @IsString()
-  @IsOptional()
-  localisation?: string
-
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: FindOffresEmploiQuery })
+  @ValidateNested({ each: true })
+  @Type(() => FindOffresEmploiQuery)
   criteres?: FindOffresEmploiQuery
 }
