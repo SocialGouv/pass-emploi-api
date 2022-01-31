@@ -7,6 +7,7 @@ export class IdService {
     return uuid.v4()
   }
 
+  // TODO: à supprimer
   generate(longueur = 5): string {
     let result = ''
     const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ'

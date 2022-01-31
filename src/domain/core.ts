@@ -4,4 +4,8 @@ export namespace Core {
     MILO = 'MILO',
     POLE_EMPLOI = 'POLE_EMPLOI'
   }
+
+  export interface Id {
+    id: string
+  }
 }
