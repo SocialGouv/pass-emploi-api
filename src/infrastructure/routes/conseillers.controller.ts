@@ -95,6 +95,9 @@ export class ConseillersController {
       if (e instanceof DroitsInsuffisants) {
         throw new ForbiddenException(e)
       }
+      if (e instanceof NonTrouveError) {
+        throw new NotFoundException(e)
+      }
       throw e
     }
 

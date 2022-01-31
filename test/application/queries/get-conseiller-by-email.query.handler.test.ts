@@ -6,10 +6,7 @@ import {
   GetConseillerByEmailQuery,
   GetConseillerByEmailQueryHandler
 } from '../../../src/application/queries/get-conseiller-by-email.query.handler'
-import {
-  DroitsInsuffisants,
-  NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
+import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
@@ -87,13 +84,14 @@ describe('GetConseillerByEmailQueryHandler', () => {
         emailConseiller: 'whatever@email.fr',
         structure
       }
-      conseillerAuthorizer.authorizeSuperviseur.throws(new DroitsInsuffisants())
 
       // When
-      const promise = getConseillerByEmail.authorize(query, utilisateur)
+      await getConseillerByEmail.authorize(query, utilisateur)
 
       // Then
-      expect(promise).to.be.rejectedWith(DroitsInsuffisants)
+      expect(
+        conseillerAuthorizer.authorizeSuperviseurStructure
+      ).to.have.been.calledWith(utilisateur, structure)
     })
   })
 })

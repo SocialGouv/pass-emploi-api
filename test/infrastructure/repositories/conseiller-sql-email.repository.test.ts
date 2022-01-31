@@ -114,7 +114,19 @@ describe('ConseillerSqlRepository', () => {
       )
     })
 
-    it("retourne un échec quand le conseiller n'existe pas", async () => {
+    it("retourne un échec quand le conseiller n'existe pas avec cet email", async () => {
+      const actual =
+        await conseillerSqlRepository.getQueryModelByEmailAndStructure(
+          'inexistant@email.com',
+          Core.Structure.PASS_EMPLOI
+        )
+
+      expect(actual).to.deep.equal(
+        failure(new NonTrouveError('Conseiller', 'inexistant@email.com'))
+      )
+    })
+
+    it("retourne un échec quand le conseiller n'existe pas avec cette structure", async () => {
       const actual =
         await conseillerSqlRepository.getQueryModelByEmailAndStructure(
           email,
@@ -122,7 +134,7 @@ describe('ConseillerSqlRepository', () => {
         )
 
       expect(actual).to.deep.equal(
-        failure(new NonTrouveError('Conseiller', 'conseiller@email.fr'))
+        failure(new NonTrouveError('Conseiller', email))
       )
     })
   })
