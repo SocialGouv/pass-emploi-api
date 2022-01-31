@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
 import { RendezVous } from 'src/domain/rendez-vous'
 import {
@@ -16,8 +17,33 @@ export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
     date: rendezVous.date,
     commentaire: rendezVous.commentaire ?? null,
     dateSuppression: null,
-    idConseiller: rendezVous.jeune.conseiller.id,
     idJeune: rendezVous.jeune.id
+  }
+}
+
+export function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
+  return {
+    id: rendezVousSql.id,
+    titre: rendezVousSql.titre,
+    sousTitre: rendezVousSql.sousTitre,
+    modalite: rendezVousSql.modalite,
+    duree: rendezVousSql.duree,
+    date: rendezVousSql.date,
+    commentaire: rendezVousSql.commentaire ?? undefined,
+    jeune: {
+      id: rendezVousSql.jeune.id,
+      firstName: rendezVousSql.jeune.prenom,
+      lastName: rendezVousSql.jeune.nom,
+      creationDate: DateTime.fromJSDate(rendezVousSql.jeune.dateCreation),
+      pushNotificationToken:
+        rendezVousSql.jeune.pushNotificationToken ?? undefined,
+      conseiller: {
+        id: rendezVousSql.jeune.conseiller.id,
+        firstName: rendezVousSql.jeune.conseiller.prenom,
+        lastName: rendezVousSql.jeune.conseiller.nom
+      },
+      structure: rendezVousSql.jeune.structure
+    }
   }
 }
 
@@ -40,7 +66,7 @@ export function fromSqlToRendezVousJeuneQueryModel(
   return {
     id: rendezVousSql.id,
     comment: rendezVousSql.commentaire ?? undefined,
-    title: `${rendezVousSql.conseiller.prenom} ${rendezVousSql.conseiller.nom}`,
+    title: `${rendezVousSql.jeune.conseiller.prenom} ${rendezVousSql.jeune.conseiller.nom}`,
     date: rendezVousSql.date,
     modality: rendezVousSql.modalite,
     duration: rendezVousSql.duree

@@ -7,7 +7,6 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
-import { ConseillerSqlModel } from './conseiller.sql-model'
 import { JeuneSqlModel } from './jeune.sql-model'
 
 export class RendezVousDto extends Model {
@@ -39,17 +38,10 @@ export class RendezVousDto extends Model {
   @ForeignKey(() => JeuneSqlModel)
   @Column({ field: 'id_jeune', type: DataType.STRING })
   idJeune!: string
-
-  @ForeignKey(() => ConseillerSqlModel)
-  @Column({ field: 'id_conseiller', type: DataType.STRING })
-  idConseiller!: string
 }
 
 @Table({ timestamps: false, tableName: 'rendez_vous' })
 export class RendezVousSqlModel extends RendezVousDto {
-  @BelongsTo(() => ConseillerSqlModel)
-  conseiller!: ConseillerSqlModel
-
   @BelongsTo(() => JeuneSqlModel)
   jeune!: JeuneSqlModel
 }
