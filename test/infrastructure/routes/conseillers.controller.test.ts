@@ -12,6 +12,7 @@ import { SendNotificationNouveauMessageCommandHandler } from '../../../src/appli
 import { GetConseillerByEmailQueryHandler } from '../../../src/application/queries/get-conseiller-by-email.query.handler'
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
 import {
+  DroitsInsuffisants,
   ErreurHttpMilo,
   JeuneNonLieAuConseillerError,
   NonTrouveError
@@ -105,6 +106,17 @@ describe('ConseillersController', () => {
         },
         unUtilisateurDecode()
       )
+    })
+
+    it("renvoie un code 403 si l'utilisateur n'est pas superviseur ", async () => {
+      // Given
+      getConseillerByEmailQueryHandler.execute.rejects(new DroitsInsuffisants())
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get('/conseillers?email=conseiller@email.fr&structure=POLE_EMPLOI')
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.FORBIDDEN)
     })
 
     ensureUserAuthenticationFailsIfInvalid(

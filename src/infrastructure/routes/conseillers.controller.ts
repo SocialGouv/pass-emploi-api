@@ -34,6 +34,7 @@ import {
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
 import { RendezVousConseillerQueryModel } from '../../application/queries/query-models/rendez-vous.query-models'
 import {
+  DroitsInsuffisants,
   EmailExisteDejaError,
   ErreurHttpMilo,
   JeuneNonLieAuConseillerError,
@@ -81,13 +82,22 @@ export class ConseillersController {
     @Query() getConseillerQuery: GetConseillerQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DetailConseillerQueryModel> {
-    const result = await this.getConseillerByEmailQueryHandler.execute(
-      {
-        emailConseiller: getConseillerQuery.email,
-        structure: getConseillerQuery.structure
-      },
-      utilisateur
-    )
+    let result: Result<DetailConseillerQueryModel>
+    try {
+      result = await this.getConseillerByEmailQueryHandler.execute(
+        {
+          emailConseiller: getConseillerQuery.email,
+          structure: getConseillerQuery.structure
+        },
+        utilisateur
+      )
+    } catch (e) {
+      if (e instanceof DroitsInsuffisants) {
+        throw new ForbiddenException(e)
+      }
+      throw e
+    }
+
     if (isSuccess(result)) {
       return result.data
     }

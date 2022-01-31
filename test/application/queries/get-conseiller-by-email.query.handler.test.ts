@@ -87,19 +87,13 @@ describe('GetConseillerByEmailQueryHandler', () => {
         emailConseiller: 'whatever@email.fr',
         structure
       }
-      const droitsInsuffisants = new DroitsInsuffisants()
-      conseillerAuthorizer.authorizeSuperviseur.throws(droitsInsuffisants)
+      conseillerAuthorizer.authorizeSuperviseur.throws(new DroitsInsuffisants())
 
       // When
-      let error
-      try {
-        await getConseillerByEmail.authorize(query, utilisateur)
-      } catch (e) {
-        error = e
-      }
+      const promise = getConseillerByEmail.authorize(query, utilisateur)
 
       // Then
-      expect(error).to.deep.equal(droitsInsuffisants)
+      expect(promise).to.be.rejectedWith(DroitsInsuffisants)
     })
   })
 })

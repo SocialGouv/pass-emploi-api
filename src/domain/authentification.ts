@@ -16,13 +16,8 @@ export namespace Authentification {
     SUPERVISEUR = 'SUPERVISEUR'
   }
 
-  export function toRole(role: string): Authentification.Role | undefined {
-    switch (role) {
-      case 'conseiller_superviseur':
-        return Authentification.Role.SUPERVISEUR
-      default:
-        return undefined
-    }
+  export const mappedRoles: { [roleKeycloak: string]: Role } = {
+    conseiller_superviseur: Role.SUPERVISEUR
   }
 
   export interface Utilisateur {

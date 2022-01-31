@@ -89,7 +89,7 @@ export class OidcAuthGuard implements CanActivate {
       type: payload.userType as Authentification.Type,
       structure: payload.userStructure as Core.Structure,
       roles: realmAccess.roles
-        .map(Authentification.toRole)
+        .map(role => Authentification.mappedRoles[role])
         .filter((role): role is Authentification.Role => role !== undefined)
     }
   }
