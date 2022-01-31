@@ -45,9 +45,7 @@ module.exports = {
         'id_conseiller',
         {
           type: Sequelize.STRING,
-          allowNull: false,
-          onUpdate: 'CASCADE',
-          onDelete: 'CASCADE'
+          allowNull: false
         },
         { transaction }
       )
