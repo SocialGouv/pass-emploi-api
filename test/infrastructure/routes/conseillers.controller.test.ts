@@ -1,6 +1,8 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
+import { GetAllRendezVousConseillerQueryHandler } from 'src/application/queries/get-rendez-vous-conseiller.query.handler'
 import { Action } from 'src/domain/action'
 import * as request from 'supertest'
+import { unRendezVousConseillerQueryModel } from 'test/fixtures/rendez-vous.fixture'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
 import {
   CreerJeuneMiloCommand,
@@ -36,6 +38,7 @@ describe('ConseillersController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
   let sendNotificationNouveauMessage: StubbedClass<SendNotificationNouveauMessageCommandHandler>
   let getDossierMiloJeuneQueryHandler: StubbedClass<GetDossierMiloJeuneQueryHandler>
+  let getAllRendezVousConseillerQueryHandler: StubbedClass<GetAllRendezVousConseillerQueryHandler>
   let creerJeuneMiloCommandHandler: StubbedClass<CreerJeuneMiloCommandHandler>
   let app: INestApplication
 
@@ -45,6 +48,9 @@ describe('ConseillersController', () => {
       SendNotificationNouveauMessageCommandHandler
     )
     getDossierMiloJeuneQueryHandler = stubClass(GetDossierMiloJeuneQueryHandler)
+    getAllRendezVousConseillerQueryHandler = stubClass(
+      GetAllRendezVousConseillerQueryHandler
+    )
     creerJeuneMiloCommandHandler = stubClass(CreerJeuneMiloCommandHandler)
 
     const testingModule = await buildTestingModuleForHttpTesting()
@@ -54,6 +60,8 @@ describe('ConseillersController', () => {
       .useValue(sendNotificationNouveauMessage)
       .overrideProvider(GetDossierMiloJeuneQueryHandler)
       .useValue(getDossierMiloJeuneQueryHandler)
+      .overrideProvider(GetAllRendezVousConseillerQueryHandler)
+      .useValue(getAllRendezVousConseillerQueryHandler)
       .overrideProvider(CreerJeuneMiloCommandHandler)
       .useValue(creerJeuneMiloCommandHandler)
       .compile()
@@ -175,6 +183,24 @@ describe('ConseillersController', () => {
       'post',
       '/conseillers/1/jeunes/ABCDE/notify-message'
     )
+  })
+
+  describe('GET /conseillers/:idConseiller/rendezvous', () => {
+    describe('quand le rendez-vous existe', () => {
+      it('renvoie le dossier', async () => {
+        // Given
+        getAllRendezVousConseillerQueryHandler.execute
+          .withArgs({ idConseiller: '41' }, unUtilisateurDecode())
+          .resolves(unRendezVousConseillerQueryModel())
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/conseillers/41/rendezvous')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(JSON.stringify(unRendezVousConseillerQueryModel()))
+      })
+    })
   })
 
   describe('GET /conseillers/milo/dossiers/:idDossier', () => {

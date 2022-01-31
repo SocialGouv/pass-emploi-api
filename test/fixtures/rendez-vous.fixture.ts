@@ -1,3 +1,7 @@
+import {
+  RendezVousConseillerQueryModel,
+  RendezVousQueryModel
+} from 'src/application/queries/query-models/rendez-vous.query-models'
 import { RendezVous } from '../../src/domain/rendez-vous'
 import { unJeune } from './jeune.fixture'
 
@@ -11,3 +15,18 @@ export const unRendezVous = (jeune = unJeune()): RendezVous => ({
   commentaire: 'commentaire',
   sousTitre: 'sous titre'
 })
+
+export const unRendezVousQueryModel = (): RendezVousQueryModel => ({
+  id: '1',
+  title: 'rdv',
+  modality: 'modalite',
+  comment: 'commentaire',
+  date: new Date('2021-11-11T08:03:30.000Z'),
+  duration: 30
+})
+
+export const unRendezVousConseillerQueryModel =
+  (): RendezVousConseillerQueryModel => ({
+    futurs: [unRendezVousQueryModel()],
+    passes: [unRendezVousQueryModel()]
+  })

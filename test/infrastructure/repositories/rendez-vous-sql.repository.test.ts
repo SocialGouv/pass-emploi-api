@@ -19,7 +19,7 @@ import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { DatabaseForTesting, expect, stubClass } from '../../utils'
 
-describe.only('RendezVousRepositorySql', () => {
+describe('RendezVousRepositorySql', () => {
   DatabaseForTesting.prepare()
   let rendezVousRepositorySql: RendezVousRepositorySql
   const maintenant = uneDatetime
