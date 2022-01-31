@@ -12,9 +12,13 @@ import {
 } from '../../fixtures/authentification.fixture'
 import * as request from 'supertest'
 import { CreateRechercheCommandHandler } from '../../../src/application/commands/create-recherche.command.handler'
-import { CreateRecherchePayload } from '../../../src/infrastructure/routes/validation/recherches.inputs'
 import { Recherche } from '../../../src/domain/recherche'
 import { Contrat, Duree, Experience } from '../../../src/domain/offre-emploi'
+import {
+  CreateRechercheAlternancePayload,
+  CreateRechercheImmersionPayload,
+  CreateRechercheOffresEmploiPayload
+} from '../../../src/infrastructure/routes/validation/recherches.inputs'
 
 describe('RecherchesController', () => {
   let createRechercheCommandHandler: StubbedClass<CreateRechercheCommandHandler>
@@ -36,19 +40,18 @@ describe('RecherchesController', () => {
     await app.close()
   })
 
-  describe('POST /recherches', () => {
-    describe("Quand la recherche est une offre d'emploi ou d'alternance", () => {
+  describe('POST /recherches/offres-emploi', () => {
+    describe("Quand la recherche est une offre d'emploi", () => {
       it("crée la recherche quand il n'y a pas de critères", async () => {
         // Given
-        const createRecherchePayload: CreateRecherchePayload = {
+        const createRecherchePayload: CreateRechercheOffresEmploiPayload = {
           titre: 'Ma recherche',
-          type: Recherche.Type.OFFRES_EMPLOI,
           criteres: {}
         }
 
         // When
         await request(app.getHttpServer())
-          .post('/jeunes/1/recherches')
+          .post('/jeunes/1/recherches/offres-emploi')
           .set('authorization', unHeaderAuthorization())
           .send(createRecherchePayload)
 
@@ -70,9 +73,98 @@ describe('RecherchesController', () => {
       })
       it('crée la recherche avec les critères renseignés', async () => {
         // Given
-        const createRecherchePayload: CreateRecherchePayload = {
+        const createRecherchePayload: CreateRechercheOffresEmploiPayload = {
           titre: 'Ma recherche',
-          type: Recherche.Type.OFFRES_ALTERNANCE,
+          localisation: 'Paris',
+          metier: 'Mécanicien',
+          criteres: {
+            page: 1,
+            limit: 50,
+            q: 'informatique',
+            alternance: false,
+            departement: 'Ile-de-France',
+            experience: [Experience.moinsdUnAn],
+            contrat: [Contrat.cdi, Contrat.cdd],
+            duree: [Duree.tempsPartiel],
+            rayon: 0,
+            commune: '75118'
+          }
+        }
+
+        // When
+        await request(app.getHttpServer())
+          .post('/jeunes/1/recherches/offres-emploi')
+          .set('authorization', unHeaderAuthorization())
+          .send(createRecherchePayload)
+
+          // Then
+          .expect(HttpStatus.CREATED)
+        expect(
+          createRechercheCommandHandler.execute
+        ).to.have.been.calledWithExactly(
+          {
+            idJeune: '1',
+            type: Recherche.Type.OFFRES_EMPLOI,
+            titre: 'Ma recherche',
+            localisation: 'Paris',
+            metier: 'Mécanicien',
+            criteres: {
+              page: 1,
+              limit: 50,
+              q: 'informatique',
+              alternance: false,
+              departement: 'Ile-de-France',
+              experience: [Experience.moinsdUnAn],
+              contrat: [Contrat.cdi, Contrat.cdd],
+              duree: [Duree.tempsPartiel],
+              rayon: 0,
+              commune: '75118'
+            }
+          },
+          unUtilisateurDecode()
+        )
+      })
+    })
+    ensureUserAuthenticationFailsIfInvalid(
+      'post',
+      '/jeunes/1/recherches/offres-emploi'
+    )
+  })
+  describe('POST /recherches/alternances', () => {
+    describe('Quand la recherche est une alternance', () => {
+      it("crée la recherche quand il n'y a pas de critères", async () => {
+        // Given
+        const createRecherchePayload: CreateRechercheAlternancePayload = {
+          titre: 'Ma recherche',
+          criteres: {}
+        }
+
+        // When
+        await request(app.getHttpServer())
+          .post('/jeunes/1/recherches/alternances')
+          .set('authorization', unHeaderAuthorization())
+          .send(createRecherchePayload)
+
+          // Then
+          .expect(HttpStatus.CREATED)
+        expect(
+          createRechercheCommandHandler.execute
+        ).to.have.been.calledWithExactly(
+          {
+            idJeune: '1',
+            type: Recherche.Type.OFFRES_ALTERNANCE,
+            titre: 'Ma recherche',
+            metier: undefined,
+            localisation: undefined,
+            criteres: {}
+          },
+          unUtilisateurDecode()
+        )
+      })
+      it('crée la recherche avec les critères renseignés', async () => {
+        // Given
+        const createRecherchePayload: CreateRechercheAlternancePayload = {
+          titre: 'Ma recherche',
           localisation: 'Paris',
           metier: 'Mécanicien',
           criteres: {
@@ -91,7 +183,7 @@ describe('RecherchesController', () => {
 
         // When
         await request(app.getHttpServer())
-          .post('/jeunes/1/recherches')
+          .post('/jeunes/1/recherches/alternances')
           .set('authorization', unHeaderAuthorization())
           .send(createRecherchePayload)
 
@@ -123,23 +215,29 @@ describe('RecherchesController', () => {
         )
       })
     })
-    describe("Quand la recherche est une offre d'immersion", () => {
+    ensureUserAuthenticationFailsIfInvalid(
+      'post',
+      '/jeunes/1/recherches/alternances'
+    )
+  })
+  describe('POST /recherches/immersions', () => {
+    describe('Quand la recherche est une immersion', () => {
       it('crée la recherche avec les critères renseignés', async () => {
         // Given
-        const createRecherchePayload: CreateRecherchePayload = {
+        const createRecherchePayload: CreateRechercheImmersionPayload = {
           titre: 'Ma recherche',
-          type: Recherche.Type.OFFRES_IMMERSION,
           localisation: 'Paris',
+          metier: 'Maitre nageur',
           criteres: {
-            rome: 'ABC123',
-            lat: 40,
-            lon: 8
+            lat: 48.868886438306724,
+            lon: 2.3341967558765795,
+            rome: 'G1204'
           }
         }
 
         // When
         await request(app.getHttpServer())
-          .post('/jeunes/1/recherches')
+          .post('/jeunes/1/recherches/immersions')
           .set('authorization', unHeaderAuthorization())
           .send(createRecherchePayload)
 
@@ -153,17 +251,20 @@ describe('RecherchesController', () => {
             type: Recherche.Type.OFFRES_IMMERSION,
             titre: 'Ma recherche',
             localisation: 'Paris',
-            metier: undefined,
+            metier: 'Maitre nageur',
             criteres: {
-              rome: 'ABC123',
-              lat: 40,
-              lon: 8
+              lat: 48.868886438306724,
+              lon: 2.3341967558765795,
+              rome: 'G1204'
             }
           },
           unUtilisateurDecode()
         )
       })
     })
-    ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/1/recherches')
+    ensureUserAuthenticationFailsIfInvalid(
+      'post',
+      '/jeunes/1/recherches/immersions'
+    )
   })
 })

@@ -6,7 +6,12 @@ import {
 } from '../../application/commands/create-recherche.command.handler'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
-import { CreateRecherchePayload } from './validation/recherches.inputs'
+import {
+  CreateRechercheAlternancePayload,
+  CreateRechercheImmersionPayload,
+  CreateRechercheOffresEmploiPayload
+} from './validation/recherches.inputs'
+import { Recherche } from '../../domain/recherche'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -16,20 +21,54 @@ export class RecherchesController {
     private readonly createRechercheCommandHandler: CreateRechercheCommandHandler
   ) {}
 
-  @Post('recherches')
-  async creerRecherche(
-    @Body() createRecherchePayload: CreateRecherchePayload,
+  @Post('recherches/offres-emploi')
+  async creerRechercheOffresEmplois(
+    @Body() createRecherchePayload: CreateRechercheOffresEmploiPayload,
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const command: CreateRechercheCommand = {
       metier: createRecherchePayload.metier,
       idJeune: idJeune,
-      type: createRecherchePayload.type,
+      type: Recherche.Type.OFFRES_EMPLOI,
       titre: createRecherchePayload.titre,
       localisation: createRecherchePayload.localisation,
       criteres: createRecherchePayload.criteres
     }
-    this.createRechercheCommandHandler.execute(command, utilisateur)
+    await this.createRechercheCommandHandler.execute(command, utilisateur)
+  }
+
+  @Post('recherches/alternances')
+  async creerRechercheAlternances(
+    @Body() createRecherchePayload: CreateRechercheAlternancePayload,
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: CreateRechercheCommand = {
+      metier: createRecherchePayload.metier,
+      idJeune: idJeune,
+      type: Recherche.Type.OFFRES_ALTERNANCE,
+      titre: createRecherchePayload.titre,
+      localisation: createRecherchePayload.localisation,
+      criteres: createRecherchePayload.criteres
+    }
+    await this.createRechercheCommandHandler.execute(command, utilisateur)
+  }
+
+  @Post('recherches/immersions')
+  async creerRechercheImmersions(
+    @Body() createRecherchePayload: CreateRechercheImmersionPayload,
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: CreateRechercheCommand = {
+      metier: createRecherchePayload.metier,
+      idJeune: idJeune,
+      type: Recherche.Type.OFFRES_IMMERSION,
+      titre: createRecherchePayload.titre,
+      localisation: createRecherchePayload.localisation,
+      criteres: createRecherchePayload.criteres
+    }
+    await this.createRechercheCommandHandler.execute(command, utilisateur)
   }
 }
