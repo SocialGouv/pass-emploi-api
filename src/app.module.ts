@@ -108,6 +108,7 @@ import { CreateRechercheCommandHandler } from './application/commands/create-rec
 import { RecherchesController } from './infrastructure/routes/recherches.controller'
 import { RechercheSqlRepository } from './infrastructure/repositories/recherche-sql.repository'
 import { RecherchesRepositoryToken } from './domain/recherche'
+import { GetRecherchesQueryHandler } from './application/queries/get-recherches.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -249,6 +250,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     SendNotificationNouveauMessageCommandHandler,
     DeleteActionCommandHandler,
     CreateRechercheCommandHandler,
+    GetRecherchesQueryHandler,
     UpdateUtilisateurCommandHandler,
     GetCommunesEtDepartementsQueryHandler,
     GetDossierMiloJeuneQueryHandler,

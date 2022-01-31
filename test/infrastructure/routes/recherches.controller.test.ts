@@ -18,17 +18,22 @@ import {
   CreateRechercheImmersionPayload,
   CreateRechercheOffresEmploiPayload
 } from '../../../src/infrastructure/routes/validation/recherches.inputs'
+import { GetRecherchesQueryHandler } from '../../../src/application/queries/get-recherches.query.handler'
+import { RechercheQueryModel } from '../../../src/application/queries/query-models/recherches.query-model'
 
 describe('RecherchesController', () => {
   let createRechercheCommandHandler: StubbedClass<CreateRechercheCommandHandler>
+  let getRecherchesQueryHandler: StubbedClass<GetRecherchesQueryHandler>
   let app: INestApplication
 
   before(async () => {
     createRechercheCommandHandler = stubClass(CreateRechercheCommandHandler)
-
+    getRecherchesQueryHandler = stubClass(GetRecherchesQueryHandler)
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateRechercheCommandHandler)
       .useValue(createRechercheCommandHandler)
+      .overrideProvider(GetRecherchesQueryHandler)
+      .useValue(getRecherchesQueryHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -175,5 +180,40 @@ describe('RecherchesController', () => {
       'post',
       '/jeunes/1/recherches/immersions'
     )
+  })
+  describe('GET /recherches', () => {
+    it('renvoie les recherches du jeune en question', async () => {
+      // Given
+      const recherchesQueryModel: RechercheQueryModel[] = [
+        {
+          id: '1',
+          metier: 'Boulanger',
+          localisation: '',
+          titre: 'titre',
+          type: 'OFFRES_EMPLOI',
+          criteres: {
+            page: 1,
+            limit: 50,
+            q: 'informatique',
+            alternance: true,
+            experience: [Experience.moinsdUnAn],
+            contrat: [Contrat.cdi, Contrat.cdd],
+            duree: [Duree.tempsPartiel],
+            rayon: 0,
+            commune: '75118'
+          }
+        }
+      ]
+      getRecherchesQueryHandler.execute.resolves(recherchesQueryModel)
+      // When
+      const result = await request(app.getHttpServer())
+        .get('/jeunes/1/recherches')
+        .set('authorization', unHeaderAuthorization())
+
+        // Then
+        .expect(HttpStatus.OK)
+      expect(result.body).to.deep.equal(recherchesQueryModel)
+    })
+    ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/recherches')
   })
 })
