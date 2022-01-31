@@ -1,5 +1,0 @@
-{
-  "scripts": {
-    "first-deploy": "bash .scalingo/first-deploy.sh"
-  }
-}
