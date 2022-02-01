@@ -8,8 +8,7 @@ export const unUtilisateurQueryModel = (): UtilisateurQueryModel => ({
   prenom: 'Nils',
   type: Authentification.Type.CONSEILLER,
   email: 'nils.tavernier@passemploi.com',
-  structure: Core.Structure.MILO,
-  roles: []
+  structure: Core.Structure.MILO
 })
 
 export const unUtilisateurSansEmailQueryModel = (): UtilisateurQueryModel => ({
@@ -18,6 +17,5 @@ export const unUtilisateurSansEmailQueryModel = (): UtilisateurQueryModel => ({
   prenom: 'Nils',
   type: Authentification.Type.CONSEILLER,
   email: undefined,
-  structure: Core.Structure.MILO,
-  roles: []
+  structure: Core.Structure.MILO
 })
