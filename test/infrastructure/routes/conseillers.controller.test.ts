@@ -84,7 +84,7 @@ describe('ConseillersController', () => {
     await app.close()
   })
 
-  describe('GET /conseillers?email&structure', () => {
+  describe('GET /conseillers?email', () => {
     it("renvoie les infos du conseiller s'il existe ", async () => {
       // Given
       const queryModel = detailConseillerQueryModel()
@@ -92,7 +92,7 @@ describe('ConseillersController', () => {
 
       // When - Then
       await request(app.getHttpServer())
-        .get('/conseillers?email=conseiller@email.fr&structure=POLE_EMPLOI')
+        .get('/conseillers?email=conseiller@email.fr')
         .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.OK)
         .expect(queryModel)
@@ -102,7 +102,7 @@ describe('ConseillersController', () => {
       ).to.have.been.calledWithExactly(
         {
           emailConseiller: 'conseiller@email.fr',
-          structure: Core.Structure.POLE_EMPLOI
+          structureUtilisateur: Core.Structure.MILO
         },
         unUtilisateurDecode()
       )

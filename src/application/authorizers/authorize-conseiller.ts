@@ -1,13 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Conseiller, ConseillersRepositoryToken } from 'src/domain/conseiller'
-import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
 import { Authentification } from 'src/domain/authentification'
+import { Conseiller, ConseillersRepositoryToken } from 'src/domain/conseiller'
 import { Unauthorized } from 'src/domain/erreur'
-import {
-  DroitsInsuffisants,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
-import { Core } from '../../domain/core'
+import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
+import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
 
 @Injectable()
 export class ConseillerAuthorizer {
@@ -43,18 +39,14 @@ export class ConseillerAuthorizer {
   }
 
   async authorizeSuperviseurStructure(
-    utilisateur: Authentification.Utilisateur,
-    structure: Core.Structure
+    utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const conseiller = await this.conseillerRepository.get(utilisateur.id)
-    if (!conseiller) {
-      throw new NonTrouveError('Conseiller', utilisateur.id)
-    }
 
     if (
+      conseiller &&
       utilisateur.type === Authentification.Type.CONSEILLER &&
-      utilisateur.roles.includes(Authentification.Role.SUPERVISEUR) &&
-      utilisateur.structure === structure
+      utilisateur.roles.includes(Authentification.Role.SUPERVISEUR)
     ) {
       return
     }

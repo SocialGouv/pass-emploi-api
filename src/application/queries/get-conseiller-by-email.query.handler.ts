@@ -10,7 +10,7 @@ import { DetailConseillerQueryModel } from './query-models/conseillers.query-mod
 
 export interface GetConseillerByEmailQuery extends Query {
   emailConseiller: string
-  structure: Core.Structure
+  structureUtilisateur: Core.Structure
 }
 
 @Injectable()
@@ -31,18 +31,15 @@ export class GetConseillerByEmailQueryHandler extends QueryHandler<
   ): Promise<Result<DetailConseillerQueryModel>> {
     return this.conseillersRepository.getQueryModelByEmailAndStructure(
       query.emailConseiller,
-      query.structure
+      query.structureUtilisateur
     )
   }
 
   async authorize(
-    query: GetConseillerByEmailQuery,
+    _query: GetConseillerByEmailQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    return this.conseillerAuthorizer.authorizeSuperviseurStructure(
-      utilisateur,
-      query.structure
-    )
+    return this.conseillerAuthorizer.authorizeSuperviseurStructure(utilisateur)
   }
 
   async monitor(): Promise<void> {

@@ -87,16 +87,13 @@ export class ConseillersController {
       result = await this.getConseillerByEmailQueryHandler.execute(
         {
           emailConseiller: getConseillerQuery.email,
-          structure: getConseillerQuery.structure
+          structureUtilisateur: utilisateur.structure
         },
         utilisateur
       )
     } catch (e) {
       if (e instanceof DroitsInsuffisants) {
         throw new ForbiddenException(e)
-      }
-      if (e instanceof NonTrouveError) {
-        throw new NotFoundException(e)
       }
       throw e
     }
