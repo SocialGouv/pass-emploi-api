@@ -87,7 +87,7 @@ export class ConseillersController {
       result = await this.getConseillerByEmailQueryHandler.execute(
         {
           emailConseiller: getConseillerQuery.email,
-          structure: getConseillerQuery.structure
+          structure: utilisateur.structure
         },
         utilisateur
       )
