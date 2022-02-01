@@ -11,10 +11,11 @@ export const unUtilisateurConseiller = (
     prenom: 'Nils',
     type: Authentification.Type.CONSEILLER,
     email: 'nils.tavernier@passemploi.com',
-    structure: Core.Structure.MILO
+    structure: Core.Structure.MILO,
+    roles: []
   }
 
-  return { ...defaults, ...args }
+  return { ...defaults, ...args, type: Authentification.Type.CONSEILLER }
 }
 
 export const unUtilisateurJeune = (
@@ -26,10 +27,11 @@ export const unUtilisateurJeune = (
     prenom: 'John',
     type: Authentification.Type.JEUNE,
     email: 'john.doe@plop.io',
-    structure: Core.Structure.MILO
+    structure: Core.Structure.MILO,
+    roles: []
   }
 
-  return { ...defaults, ...args }
+  return { ...defaults, ...args, type: Authentification.Type.JEUNE }
 }
 
 export const unJwtPayloadValide = (): JWTPayload => ({
@@ -53,7 +55,8 @@ export const unJwtPayloadValide = (): JWTPayload => ({
   given_name: 'Albert',
   family_name: 'Durant',
   userId: 'bcd60403-5f10-4a16-a660-2099d79ebd66',
-  email: 'conseiller.milo.passemploi@gmail.com'
+  email: 'conseiller.milo.passemploi@gmail.com',
+  realm_access: { roles: [] }
 })
 
 export const unUtilisateurDecode = (): Authentification.Utilisateur => ({
@@ -62,7 +65,8 @@ export const unUtilisateurDecode = (): Authentification.Utilisateur => ({
   nom: 'Durant',
   prenom: 'Albert',
   type: Authentification.Type.CONSEILLER,
-  structure: Core.Structure.MILO
+  structure: Core.Structure.MILO,
+  roles: []
 })
 
 export const unHeaderAuthorization = (): string => 'bearer coucou'

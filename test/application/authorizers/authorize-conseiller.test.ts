@@ -1,9 +1,18 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import {
+  DroitsInsuffisants,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
+import { Authentification } from '../../../src/domain/authentification'
 import { Conseiller } from '../../../src/domain/conseiller'
+import { Core } from '../../../src/domain/core'
 import { Unauthorized } from '../../../src/domain/erreur'
 import { Jeune } from '../../../src/domain/jeune'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect } from '../../utils'
@@ -126,6 +135,109 @@ describe('ConseillerAuthorizer', () => {
         // Then
         expect(call).to.be.rejectedWith(Unauthorized)
       })
+    })
+  })
+
+  describe('authorizeSuperviseur', () => {
+    it('autorise un conseiller superviseur', async () => {
+      // Given
+      const superviseur: Authentification.Utilisateur = unUtilisateurConseiller(
+        { roles: [Authentification.Role.SUPERVISEUR] }
+      )
+      conseillerRepository.get.withArgs(superviseur.id).resolves(unConseiller())
+
+      // When
+      const promise = conseillerAuthorizer.authorizeSuperviseurStructure(
+        superviseur,
+        Core.Structure.MILO
+      )
+
+      // Then
+      await expect(promise).to.be.fulfilled
+    })
+
+    it('interdit un conseiller non superviseur', async () => {
+      // Given
+      const conseiller: Authentification.Utilisateur = unUtilisateurConseiller()
+      conseillerRepository.get.withArgs(conseiller.id).resolves(unConseiller())
+
+      // When
+      let error
+      try {
+        await conseillerAuthorizer.authorizeSuperviseurStructure(
+          conseiller,
+          Core.Structure.MILO
+        )
+      } catch (e) {
+        error = e
+      }
+
+      // Then
+      expect(error).to.be.an.instanceof(DroitsInsuffisants)
+    })
+
+    it("interdit un superviseur d'une autre structure", async () => {
+      // Given
+      const superviseurPE: Authentification.Utilisateur =
+        unUtilisateurConseiller({ roles: [Authentification.Role.SUPERVISEUR] })
+      conseillerRepository.get
+        .withArgs(superviseurPE.id)
+        .resolves(unConseiller())
+
+      // When
+      let error
+      try {
+        await conseillerAuthorizer.authorizeSuperviseurStructure(
+          superviseurPE,
+          Core.Structure.POLE_EMPLOI
+        )
+      } catch (e) {
+        error = e
+      }
+
+      // Then
+      expect(error).to.be.an.instanceof(DroitsInsuffisants)
+    })
+
+    it('interdit un conseiller inexistant', async () => {
+      // Given
+      const utilisateur: Authentification.Utilisateur =
+        unUtilisateurConseiller()
+      conseillerRepository.get.withArgs(utilisateur.id).resolves(undefined)
+
+      // When
+      let error
+      try {
+        await conseillerAuthorizer.authorizeSuperviseurStructure(
+          utilisateur,
+          Core.Structure.MILO
+        )
+      } catch (e) {
+        error = e
+      }
+
+      // Then
+      expect(error).to.be.an.instanceof(NonTrouveError)
+    })
+
+    it('interdit un jeune qui se ferait passer pour un conseiller', async () => {
+      // Given
+      const jeune: Authentification.Utilisateur = unUtilisateurJeune()
+      conseillerRepository.get.withArgs(jeune.id).resolves(unConseiller())
+
+      // When
+      let error
+      try {
+        await conseillerAuthorizer.authorizeSuperviseurStructure(
+          jeune,
+          Core.Structure.MILO
+        )
+      } catch (e) {
+        error = e
+      }
+
+      // Then
+      expect(error).to.be.an.instanceof(DroitsInsuffisants)
     })
   })
 })

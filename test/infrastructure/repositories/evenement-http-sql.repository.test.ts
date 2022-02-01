@@ -6,6 +6,7 @@ import { Core } from '../../../src/domain/core'
 import { emptySuccess } from '../../../src/building-blocks/types/result'
 import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { uneDatetime } from 'test/fixtures/date.fixture'
+import Utilisateur = Authentification.Utilisateur
 
 describe('EvenementHttpSqlRepository', () => {
   DatabaseForTesting.prepare()
@@ -20,13 +21,14 @@ describe('EvenementHttpSqlRepository', () => {
   describe('saveEvenement', () => {
     it("enregistre l'évènement en base", async () => {
       // Given
-      const utilisateur = {
+      const utilisateur: Utilisateur = {
         id: '1',
         prenom: 'Kevin',
         nom: 'DeBrun',
         email: 'kd@gmail.com',
         structure: Core.Structure.MILO,
-        type: Authentification.Type.CONSEILLER
+        type: Authentification.Type.CONSEILLER,
+        roles: []
       }
       const categorieEvenement = 'Test'
       const actionEvenement = 'Test'

@@ -12,13 +12,22 @@ export namespace Authentification {
     CONSEILLER = 'CONSEILLER'
   }
 
+  export enum Role {
+    SUPERVISEUR = 'SUPERVISEUR'
+  }
+
+  export const mappedRoles: { [roleKeycloak: string]: Role } = {
+    conseiller_superviseur: Role.SUPERVISEUR
+  }
+
   export interface Utilisateur {
     id: string
     prenom: string
     nom: string
-    email?: string
     structure: Core.Structure
     type: Authentification.Type
+    roles: Authentification.Role[]
+    email?: string
   }
 
   export interface Repository {
@@ -46,13 +55,14 @@ export namespace Authentification {
         return failure(new ConseillerNonValide())
       }
 
-      const utilisateur = {
+      const utilisateur: Utilisateur = {
         id: this.idService.uuid(),
         prenom: prenom,
         nom: nom,
         email: email,
         type: Type.CONSEILLER,
-        structure: structure
+        structure: structure,
+        roles: []
       }
       return success(utilisateur)
     }

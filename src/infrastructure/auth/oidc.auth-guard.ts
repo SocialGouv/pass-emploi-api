@@ -45,7 +45,7 @@ export class OidcAuthGuard implements CanActivate {
       const payload: JWTPayload = await this.jwtService.verifyTokenAndGetJwt(
         accessToken
       )
-      const utilisateur = this.buildUtilisateur(payload)
+      const utilisateur = OidcAuthGuard.buildUtilisateur(payload)
       /*
       ts-ignore accepté ici
       On ajoute un nouvel attribut à la request au runtime pour le mettre dans le context et pouvoir l'utiliser plus tard dans l'execution
@@ -75,14 +75,22 @@ export class OidcAuthGuard implements CanActivate {
     }
   }
 
-  private buildUtilisateur(payload: JWTPayload): Authentification.Utilisateur {
+  private static buildUtilisateur(
+    payload: JWTPayload
+  ): Authentification.Utilisateur {
+    const realmAccess = payload.realm_access as {
+      roles: string[]
+    }
     return {
       id: payload.userId as string,
       email: payload.email as string,
       nom: payload.family_name as string,
       prenom: payload.given_name as string,
       type: payload.userType as Authentification.Type,
-      structure: payload.userStructure as Core.Structure
+      structure: payload.userStructure as Core.Structure,
+      roles: realmAccess.roles
+        .map(role => Authentification.mappedRoles[role])
+        .filter((role): role is Authentification.Role => role !== undefined)
     }
   }
 

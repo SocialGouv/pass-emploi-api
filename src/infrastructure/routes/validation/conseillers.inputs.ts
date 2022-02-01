@@ -7,6 +7,21 @@ import {
   IsString
 } from 'class-validator'
 import { Action } from '../../../domain/action'
+import { Core } from '../../../domain/core'
+
+export class GetConseillerQueryParams {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
+  email: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(Core.Structure)
+  structure: Core.Structure
+}
 
 export class CreateActionPayload {
   @ApiProperty()

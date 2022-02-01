@@ -7,7 +7,7 @@ import {
   failure,
   success
 } from '../../../src/building-blocks/types/result'
-import { ConseillerSqlEmailRepository } from '../../../src/infrastructure/repositories/conseiller-sql-email-repository.service'
+import { ConseillerSqlEmailRepository } from '../../../src/infrastructure/repositories/conseiller-sql-email.repository'
 import { DossierMiloDto } from '../../../src/infrastructure/repositories/dto/milo.dto'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
 import { MiloHttpRepository } from '../../../src/infrastructure/repositories/milo-http.repository'

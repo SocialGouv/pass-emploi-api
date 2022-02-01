@@ -8,10 +8,11 @@ export class NonTrouveError implements DomainError {
   readonly code: string = NonTrouveError.CODE
   readonly message: string
 
-  constructor(entityType: string, id: string) {
-    this.message = `${entityType} ${id} non trouvé(e)`
+  constructor(entityType: string, critereRecherche: string) {
+    this.message = `${entityType} ${critereRecherche} non trouvé(e)`
   }
 }
+
 export class NonTraitableError implements DomainError {
   static CODE = 'NON_TRAITABLE'
   readonly code: string = NonTraitableError.CODE
@@ -101,6 +102,12 @@ export class RechercheDetailOffreInvalide implements DomainError {
   constructor(message: string) {
     this.message = message
   }
+}
+
+export class DroitsInsuffisants implements DomainError {
+  static CODE = 'DROITS_INSUFFISANTS'
+  readonly code: string = DroitsInsuffisants.CODE
+  readonly message: string = "Vous n'avez pas le droit d'effectuer cette action"
 }
 
 export class ErreurHttpMilo implements DomainError {

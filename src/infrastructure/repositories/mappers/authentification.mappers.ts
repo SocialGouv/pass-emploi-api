@@ -15,7 +15,8 @@ export function fromConseillerSqlToUtilisateur(
     nom: conseillerSqlModel.nom,
     email: conseillerSqlModel.email ? conseillerSqlModel.email : undefined,
     structure: conseillerSqlModel.structure,
-    type: Authentification.Type.CONSEILLER
+    type: Authentification.Type.CONSEILLER,
+    roles: []
   }
 }
 
@@ -28,7 +29,8 @@ export function fromJeuneSqlToUtilisateur(
     nom: jeuneSqlModel.nom,
     email: jeuneSqlModel.email ? jeuneSqlModel.email : undefined,
     structure: jeuneSqlModel.structure,
-    type: Authentification.Type.JEUNE
+    type: Authentification.Type.JEUNE,
+    roles: []
   }
 }
 

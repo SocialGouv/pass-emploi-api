@@ -9,8 +9,10 @@ import {
   CreerJeuneMiloCommandHandler
 } from '../../../src/application/commands/creer-jeune-milo.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from '../../../src/application/commands/send-notification-nouveau-message.command.handler'
+import { GetConseillerByEmailQueryHandler } from '../../../src/application/queries/get-conseiller-by-email.query.handler'
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
 import {
+  DroitsInsuffisants,
   ErreurHttpMilo,
   JeuneNonLieAuConseillerError,
   NonTrouveError
@@ -20,12 +22,14 @@ import {
   failure,
   success
 } from '../../../src/building-blocks/types/result'
+import { Core } from '../../../src/domain/core'
 import { CreateActionPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
 import {
   unHeaderAuthorization,
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
 import { unDossierMilo } from '../../fixtures/milo.fixture'
+import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
 import {
   buildTestingModuleForHttpTesting,
   expect,
@@ -35,6 +39,7 @@ import {
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 
 describe('ConseillersController', () => {
+  let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
   let sendNotificationNouveauMessage: StubbedClass<SendNotificationNouveauMessageCommandHandler>
   let getDossierMiloJeuneQueryHandler: StubbedClass<GetDossierMiloJeuneQueryHandler>
@@ -43,6 +48,9 @@ describe('ConseillersController', () => {
   let app: INestApplication
 
   before(async () => {
+    getConseillerByEmailQueryHandler = stubClass(
+      GetConseillerByEmailQueryHandler
+    )
     createActionCommandHandler = stubClass(CreateActionCommandHandler)
     sendNotificationNouveauMessage = stubClass(
       SendNotificationNouveauMessageCommandHandler
@@ -54,6 +62,8 @@ describe('ConseillersController', () => {
     creerJeuneMiloCommandHandler = stubClass(CreerJeuneMiloCommandHandler)
 
     const testingModule = await buildTestingModuleForHttpTesting()
+      .overrideProvider(GetConseillerByEmailQueryHandler)
+      .useValue(getConseillerByEmailQueryHandler)
       .overrideProvider(CreateActionCommandHandler)
       .useValue(createActionCommandHandler)
       .overrideProvider(SendNotificationNouveauMessageCommandHandler)
@@ -72,6 +82,47 @@ describe('ConseillersController', () => {
 
   after(async () => {
     await app.close()
+  })
+
+  describe('GET /conseillers?email&structure', () => {
+    it("renvoie les infos du conseiller s'il existe ", async () => {
+      // Given
+      const queryModel = detailConseillerQueryModel()
+      getConseillerByEmailQueryHandler.execute.resolves(success(queryModel))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get('/conseillers?email=conseiller@email.fr&structure=POLE_EMPLOI')
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect(queryModel)
+
+      expect(
+        getConseillerByEmailQueryHandler.execute
+      ).to.have.been.calledWithExactly(
+        {
+          emailConseiller: 'conseiller@email.fr',
+          structure: Core.Structure.POLE_EMPLOI
+        },
+        unUtilisateurDecode()
+      )
+    })
+
+    it("renvoie un code 403 si l'utilisateur n'est pas superviseur ", async () => {
+      // Given
+      getConseillerByEmailQueryHandler.execute.rejects(new DroitsInsuffisants())
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get('/conseillers?email=conseiller@email.fr&structure=POLE_EMPLOI')
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.FORBIDDEN)
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers?email=conseiller@email.fr'
+    )
   })
 
   describe('POST /conseillers/:idConseiller/jeunes/:idJeune/action', () => {

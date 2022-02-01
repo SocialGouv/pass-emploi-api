@@ -1,6 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import { failure, Result, success } from '../../building-blocks/types/result'
 import { Conseiller } from '../../domain/conseiller'
+import { Core } from '../../domain/core'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { fromSqlToDetailConseillerQueryModel } from './mappers/conseillers.mappers'
 import { MailSendinblueClient } from '../clients/mail-sendinblue.client'
@@ -51,6 +54,20 @@ export class ConseillerSqlEmailRepository implements Conseiller.Repository {
     }
 
     return fromSqlToDetailConseillerQueryModel(conseillerSqlModel)
+  }
+
+  async getQueryModelByEmailAndStructure(
+    emailConseiller: string,
+    structure: Core.Structure
+  ): Promise<Result<DetailConseillerQueryModel>> {
+    const conseillerSqlModel = await ConseillerSqlModel.findOne({
+      where: { email: emailConseiller, structure }
+    })
+    if (!conseillerSqlModel) {
+      return failure(new NonTrouveError('Conseiller', emailConseiller))
+    }
+
+    return success(fromSqlToDetailConseillerQueryModel(conseillerSqlModel))
   }
 
   async envoyerUnRappelParMail(
