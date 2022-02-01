@@ -1,5 +1,5 @@
-import { Body, Controller, Param, Post } from '@nestjs/common'
-import { ApiOAuth2, ApiTags } from '@nestjs/swagger'
+import { Body, Controller, Get, Param, Post } from '@nestjs/common'
+import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   CreateRechercheCommand,
   CreateRechercheCommandHandler
@@ -11,13 +11,19 @@ import {
   CreateRechercheOffresEmploiPayload
 } from './validation/recherches.inputs'
 import { Recherche } from '../../domain/recherche'
+import {
+  GetRecherchesQuery,
+  GetRecherchesQueryHandler
+} from '../../application/queries/get-recherches.query.handler'
+import { RechercheQueryModel } from '../../application/queries/query-models/recherches.query-model'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
 @ApiTags('Recherches')
 export class RecherchesController {
   constructor(
-    private readonly createRechercheCommandHandler: CreateRechercheCommandHandler
+    private readonly createRechercheCommandHandler: CreateRechercheCommandHandler,
+    private readonly getRecherchesQueryHandler: GetRecherchesQueryHandler
   ) {}
 
   @Post('recherches/offres-emploi')
@@ -54,5 +60,18 @@ export class RecherchesController {
       criteres: createRecherchePayload.criteres
     }
     await this.createRechercheCommandHandler.execute(command, utilisateur)
+  }
+
+  @Get('recherches')
+  @ApiResponse({
+    type: RechercheQueryModel,
+    isArray: true
+  })
+  async getRecherches(
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<RechercheQueryModel[]> {
+    const query: GetRecherchesQuery = { idJeune }
+    return this.getRecherchesQueryHandler.execute(query, utilisateur)
   }
 }

@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { Recherche } from '../../domain/recherche'
 import { RechercheSqlModel } from '../sequelize/models/recherche.sql-model'
+import { fromSqlToRechercheQueryModel } from './mappers/recherches.mappers'
+import { RechercheQueryModel } from '../../application/queries/query-models/recherches.query-model'
 
 @Injectable()
 export class RechercheSqlRepository implements Recherche.Repository {
@@ -14,5 +16,14 @@ export class RechercheSqlRepository implements Recherche.Repository {
       localisation: recherche.localisation,
       criteres: recherche.criteres
     })
+  }
+
+  async getRecherches(idJeune: string): Promise<RechercheQueryModel[]> {
+    const recherchesSql = await RechercheSqlModel.findAll({
+      where: {
+        idJeune
+      }
+    })
+    return recherchesSql.map(fromSqlToRechercheQueryModel)
   }
 }
