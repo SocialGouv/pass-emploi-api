@@ -17,7 +17,18 @@ import {
   transformStringToArray
 } from './utils/transformers'
 
-export class FindOffresEmploiQuery {
+interface FindOffresEmploisQuery {
+  q?: string
+  departement?: string
+  alternance?: boolean
+  experience?: Experience[]
+  contrat?: Contrat[]
+  duree?: Duree[]
+  commune?: string
+  rayon?: number
+}
+
+export class FindOffresEmploiQueryParams implements FindOffresEmploisQuery {
   @ApiPropertyOptional()
   @IsNotEmpty()
   @IsOptional()
@@ -80,5 +91,52 @@ export class FindOffresEmploiQuery {
   @IsNumber()
   @IsPositive()
   @Transform(params => transformStringToInteger(params, 'rayon'))
+  rayon?: number
+}
+
+export class FindOffresEmploiQueryBody implements FindOffresEmploisQuery {
+  @ApiPropertyOptional()
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  q?: string
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  departement?: string
+
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  @IsIn([true, false])
+  alternance?: boolean
+
+  @ApiPropertyOptional({ enum: Experience, isArray: true })
+  @IsOptional()
+  @IsEnum(Experience, { each: true })
+  experience?: Experience[]
+
+  @ApiPropertyOptional({ enum: Contrat, isArray: true })
+  @IsOptional()
+  @IsEnum(Contrat, { each: true })
+  contrat?: Contrat[]
+
+  @ApiPropertyOptional({ enum: Duree, isArray: true })
+  @IsOptional()
+  @IsEnum(Duree, { each: true })
+  duree?: Duree[]
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  commune?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
   rayon?: number
 }

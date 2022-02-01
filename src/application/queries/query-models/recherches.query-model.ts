@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { FindOffresEmploiQuery } from '../../../infrastructure/routes/validation/offres-emploi.inputs'
+import { FindOffresEmploiQueryParams } from '../../../infrastructure/routes/validation/offres-emploi.inputs'
 import { GetOffresImmersionQueryParams } from '../../../infrastructure/routes/validation/offres-immersion.inputs'
 
 export class RechercheQueryModel {
@@ -14,5 +14,5 @@ export class RechercheQueryModel {
   @ApiProperty()
   localisation?: string
   @ApiProperty()
-  criteres?: FindOffresEmploiQuery | GetOffresImmersionQueryParams
+  criteres?: FindOffresEmploiQueryParams | GetOffresImmersionQueryParams
 }

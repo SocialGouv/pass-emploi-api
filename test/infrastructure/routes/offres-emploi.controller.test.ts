@@ -14,7 +14,7 @@ import {
   OffreEmploiQueryModel,
   OffresEmploiQueryModel
 } from '../../../src/application/queries/query-models/offres-emploi.query-models'
-import { FindOffresEmploiQuery } from '../../../src/infrastructure/routes/validation/offres-emploi.inputs'
+import { FindOffresEmploiQueryParams } from '../../../src/infrastructure/routes/validation/offres-emploi.inputs'
 import {
   GetDetailOffreEmploiQuery,
   GetDetailOffreEmploiQueryHandler
@@ -49,7 +49,7 @@ describe('OffresEmploiController', () => {
   describe('GET /offres-emploi', () => {
     it("fait appel à l'API Pôle Emploi avec les bons paramètres", async () => {
       // Given
-      const findOffresEmploiQuery: FindOffresEmploiQuery = {
+      const findOffresEmploiQuery: FindOffresEmploiQueryParams = {
         page: 1,
         limit: 50,
         q: 'informatique',

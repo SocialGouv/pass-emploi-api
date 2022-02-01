@@ -82,15 +82,13 @@ describe('RecherchesController', () => {
           localisation: 'Paris',
           metier: 'Mécanicien',
           criteres: {
-            page: 1,
-            limit: 50,
             q: 'informatique',
             alternance: true,
             departement: 'Ile-de-France',
             experience: [Experience.moinsdUnAn],
             contrat: [Contrat.cdi, Contrat.cdd],
             duree: [Duree.tempsPartiel],
-            rayon: 0,
+            rayon: 10,
             commune: '75118'
           }
         }
@@ -113,15 +111,13 @@ describe('RecherchesController', () => {
             localisation: 'Paris',
             metier: 'Mécanicien',
             criteres: {
-              page: 1,
-              limit: 50,
               q: 'informatique',
               alternance: true,
               departement: 'Ile-de-France',
               experience: [Experience.moinsdUnAn],
               contrat: [Contrat.cdi, Contrat.cdd],
               duree: [Duree.tempsPartiel],
-              rayon: 0,
+              rayon: 10,
               commune: '75118'
             }
           },
@@ -192,14 +188,12 @@ describe('RecherchesController', () => {
           titre: 'titre',
           type: 'OFFRES_EMPLOI',
           criteres: {
-            page: 1,
-            limit: 50,
             q: 'informatique',
             alternance: true,
             experience: [Experience.moinsdUnAn],
             contrat: [Contrat.cdi, Contrat.cdd],
             duree: [Duree.tempsPartiel],
-            rayon: 0,
+            rayon: 10,
             commune: '75118'
           }
         }

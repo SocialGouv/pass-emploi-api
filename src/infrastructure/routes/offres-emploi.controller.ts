@@ -19,7 +19,7 @@ import {
   GetOffresEmploiQuery,
   GetOffresEmploiQueryHandler
 } from '../../application/queries/get-offres-emploi.query.handler'
-import { FindOffresEmploiQuery } from './validation/offres-emploi.inputs'
+import { FindOffresEmploiQueryParams } from './validation/offres-emploi.inputs'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
 
@@ -37,7 +37,7 @@ export class OffresEmploiController {
     type: OffresEmploiQueryModel
   })
   getOffresEmploi(
-    @Query() findOffresEmploiQuery: FindOffresEmploiQuery,
+    @Query() findOffresEmploiQuery: FindOffresEmploiQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffresEmploiQueryModel> {
     const query: GetOffresEmploiQuery = {

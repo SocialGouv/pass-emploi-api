@@ -5,8 +5,8 @@ import {
   IsString,
   ValidateNested
 } from 'class-validator'
-import { FindOffresEmploiQuery } from './offres-emploi.inputs'
-import { GetOffresImmersionQueryParams } from './offres-immersion.inputs'
+import { FindOffresEmploiQueryBody } from './offres-emploi.inputs'
+import { GetOffresImmersionQueryBody } from './offres-immersion.inputs'
 import { Type } from 'class-transformer'
 
 export class CreateRechercheImmersionPayload {
@@ -25,10 +25,10 @@ export class CreateRechercheImmersionPayload {
   @IsOptional()
   localisation?: string
 
-  @ApiPropertyOptional({ type: GetOffresImmersionQueryParams })
+  @ApiPropertyOptional({ type: GetOffresImmersionQueryBody })
   @ValidateNested({ each: true })
-  @Type(() => GetOffresImmersionQueryParams)
-  criteres: GetOffresImmersionQueryParams
+  @Type(() => GetOffresImmersionQueryBody)
+  criteres: GetOffresImmersionQueryBody
 }
 
 export class CreateRechercheOffresEmploiPayload {
@@ -47,8 +47,8 @@ export class CreateRechercheOffresEmploiPayload {
   @IsOptional()
   localisation?: string
 
-  @ApiPropertyOptional({ type: FindOffresEmploiQuery })
+  @ApiPropertyOptional({ type: FindOffresEmploiQueryBody })
   @ValidateNested({ each: true })
-  @Type(() => FindOffresEmploiQuery)
-  criteres?: FindOffresEmploiQuery
+  @Type(() => FindOffresEmploiQueryBody)
+  criteres?: FindOffresEmploiQueryBody
 }
