@@ -8,11 +8,8 @@ export function fromSqlToRechercheQueryModel(
     id: rechercheSql.id,
     titre: rechercheSql.titre,
     type: rechercheSql.type,
-    metier: rechercheSql.metier === null ? undefined : rechercheSql.metier,
-    localisation:
-      rechercheSql.localisation === null
-        ? undefined
-        : rechercheSql.localisation,
-    criteres: rechercheSql.criteres === null ? undefined : rechercheSql.criteres
+    metier: rechercheSql.metier ?? undefined,
+    localisation: rechercheSql.localisation ?? undefined,
+    criteres: rechercheSql.criteres ?? undefined
   }
 }

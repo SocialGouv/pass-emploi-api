@@ -1,6 +1,5 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { success } from '../../../src/building-blocks/types/result'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import {
   GetRecherchesQuery,
@@ -61,13 +60,13 @@ describe('GetRecherchesQueryHandler', () => {
       ]
       recherchesRepository.getRecherches
         .withArgs(getRecherchesQuery.idJeune)
-        .resolves(success(recherchesQueryModel))
+        .resolves(recherchesQueryModel)
 
       // When
       const result = await getRecherchesQueryHandler.handle(getRecherchesQuery)
 
       // Then
-      expect(result).to.deep.equal(success(recherchesQueryModel))
+      expect(result).to.deep.equal(recherchesQueryModel)
     })
   })
 })
