@@ -38,7 +38,7 @@ describe('GetConseillerByEmailQueryHandler', () => {
       const emailConseiller = 'conseiller@email.fr'
       const getDetailConseillerQuery: GetConseillerByEmailQuery = {
         emailConseiller,
-        structure
+        structureUtilisateur: structure
       }
       const conseillerQueryModel: DetailConseillerQueryModel =
         detailConseillerQueryModel()
@@ -59,7 +59,7 @@ describe('GetConseillerByEmailQueryHandler', () => {
       const emailConseillerInexistant = 'inexistant@email.fr'
       const query: GetConseillerByEmailQuery = {
         emailConseiller: emailConseillerInexistant,
-        structure
+        structureUtilisateur: structure
       }
       const echec = failure(
         new NonTrouveError('conseiller', emailConseillerInexistant)
@@ -82,7 +82,7 @@ describe('GetConseillerByEmailQueryHandler', () => {
       const utilisateur = unUtilisateurConseiller({ roles: [] })
       const query: GetConseillerByEmailQuery = {
         emailConseiller: 'whatever@email.fr',
-        structure
+        structureUtilisateur: structure
       }
 
       // When
@@ -91,7 +91,7 @@ describe('GetConseillerByEmailQueryHandler', () => {
       // Then
       expect(
         conseillerAuthorizer.authorizeSuperviseurStructure
-      ).to.have.been.calledWith(utilisateur, structure)
+      ).to.have.been.calledWith(utilisateur)
     })
   })
 })

@@ -1,12 +1,8 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
-import {
-  DroitsInsuffisants,
-  NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
+import { DroitsInsuffisants } from '../../../src/building-blocks/types/domain-error'
 import { Authentification } from '../../../src/domain/authentification'
 import { Conseiller } from '../../../src/domain/conseiller'
-import { Core } from '../../../src/domain/core'
 import { Unauthorized } from '../../../src/domain/erreur'
 import { Jeune } from '../../../src/domain/jeune'
 import {
@@ -147,10 +143,8 @@ describe('ConseillerAuthorizer', () => {
       conseillerRepository.get.withArgs(superviseur.id).resolves(unConseiller())
 
       // When
-      const promise = conseillerAuthorizer.authorizeSuperviseurStructure(
-        superviseur,
-        Core.Structure.MILO
-      )
+      const promise =
+        conseillerAuthorizer.authorizeSuperviseurStructure(superviseur)
 
       // Then
       await expect(promise).to.be.fulfilled
@@ -164,33 +158,7 @@ describe('ConseillerAuthorizer', () => {
       // When
       let error
       try {
-        await conseillerAuthorizer.authorizeSuperviseurStructure(
-          conseiller,
-          Core.Structure.MILO
-        )
-      } catch (e) {
-        error = e
-      }
-
-      // Then
-      expect(error).to.be.an.instanceof(DroitsInsuffisants)
-    })
-
-    it("interdit un superviseur d'une autre structure", async () => {
-      // Given
-      const superviseurPE: Authentification.Utilisateur =
-        unUtilisateurConseiller({ roles: [Authentification.Role.SUPERVISEUR] })
-      conseillerRepository.get
-        .withArgs(superviseurPE.id)
-        .resolves(unConseiller())
-
-      // When
-      let error
-      try {
-        await conseillerAuthorizer.authorizeSuperviseurStructure(
-          superviseurPE,
-          Core.Structure.POLE_EMPLOI
-        )
+        await conseillerAuthorizer.authorizeSuperviseurStructure(conseiller)
       } catch (e) {
         error = e
       }
@@ -208,16 +176,13 @@ describe('ConseillerAuthorizer', () => {
       // When
       let error
       try {
-        await conseillerAuthorizer.authorizeSuperviseurStructure(
-          utilisateur,
-          Core.Structure.MILO
-        )
+        await conseillerAuthorizer.authorizeSuperviseurStructure(utilisateur)
       } catch (e) {
         error = e
       }
 
       // Then
-      expect(error).to.be.an.instanceof(NonTrouveError)
+      expect(error).to.be.an.instanceof(DroitsInsuffisants)
     })
 
     it('interdit un jeune qui se ferait passer pour un conseiller', async () => {
@@ -228,10 +193,7 @@ describe('ConseillerAuthorizer', () => {
       // When
       let error
       try {
-        await conseillerAuthorizer.authorizeSuperviseurStructure(
-          jeune,
-          Core.Structure.MILO
-        )
+        await conseillerAuthorizer.authorizeSuperviseurStructure(jeune)
       } catch (e) {
         error = e
       }

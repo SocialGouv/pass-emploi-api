@@ -102,7 +102,7 @@ describe('ConseillersController', () => {
       ).to.have.been.calledWithExactly(
         {
           emailConseiller: 'conseiller@email.fr',
-          structure: Core.Structure.MILO
+          structureUtilisateur: Core.Structure.MILO
         },
         unUtilisateurDecode()
       )
