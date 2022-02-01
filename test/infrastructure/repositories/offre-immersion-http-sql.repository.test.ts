@@ -74,7 +74,8 @@ describe('OffresImmersionHttpSqlRepository', () => {
         const offres = await offresImmersionHttpSqlRepository.findAll(
           query.rome,
           query.location.lat,
-          query.location.lon
+          query.location.lon,
+          30
         )
 
         // Then
@@ -125,7 +126,8 @@ describe('OffresImmersionHttpSqlRepository', () => {
         const offres = await offresImmersionHttpSqlRepository.findAll(
           query.rome,
           query.location.lat,
-          query.location.lon
+          query.location.lon,
+          30
         )
 
         // Then

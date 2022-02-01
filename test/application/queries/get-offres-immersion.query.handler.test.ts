@@ -6,7 +6,6 @@ import {
   GetOffresImmersionQueryHandler
 } from '../../../src/application/queries/get-offres-immersion.query.handler'
 import { OffreImmersionQueryModel } from '../../../src/application/queries/query-models/offres-immersion.query-models'
-import { success } from '../../../src/building-blocks/types/result'
 import { OffresImmersion } from '../../../src/domain/offre-immersion'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
@@ -52,9 +51,10 @@ describe('GetOffresImmersionQueryHandler', () => {
         .withArgs(
           getOffresImmersionQuery.rome,
           getOffresImmersionQuery.lat,
-          getOffresImmersionQuery.lon
+          getOffresImmersionQuery.lon,
+          30
         )
-        .resolves(success(offresImmersionQueryModel))
+        .resolves(offresImmersionQueryModel)
 
       // When
       const result = await getOffresImmersionQueryHandler.handle(
@@ -62,7 +62,7 @@ describe('GetOffresImmersionQueryHandler', () => {
       )
 
       // Then
-      expect(result).to.deep.equal(success(offresImmersionQueryModel))
+      expect(result).to.deep.equal(offresImmersionQueryModel)
     })
   })
 })

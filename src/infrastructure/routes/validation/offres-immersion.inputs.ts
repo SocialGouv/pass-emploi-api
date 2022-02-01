@@ -1,12 +1,16 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator'
-import { transformStringToFloat } from './utils/transformers'
+import { IsNotEmpty, IsString, IsNumber, IsOptional } from 'class-validator'
+import {
+  transformStringToFloat,
+  transformStringToInteger
+} from './utils/transformers'
 
 interface GetOffresImmersionQuery {
   rome: string
   lat: number
   lon: number
+  distance?: number
 }
 
 export class GetOffresImmersionQueryParams implements GetOffresImmersionQuery {
@@ -26,6 +30,12 @@ export class GetOffresImmersionQueryParams implements GetOffresImmersionQuery {
   @IsNotEmpty()
   @Transform(params => transformStringToFloat(params, 'lon'))
   lon: number
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  @Transform(params => transformStringToInteger(params, 'distance'))
+  distance?: number
 }
 
 export class GetOffresImmersionQueryBody {
@@ -43,4 +53,9 @@ export class GetOffresImmersionQueryBody {
   @IsNumber()
   @IsNotEmpty()
   lon: number
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  distance?: number
 }

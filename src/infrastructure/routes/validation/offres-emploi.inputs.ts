@@ -7,8 +7,7 @@ import {
   IsEnum,
   IsIn,
   IsBoolean,
-  IsNumber,
-  IsPositive
+  IsNumber
 } from 'class-validator'
 import { Contrat, Duree, Experience } from 'src/domain/offre-emploi'
 import {
@@ -89,7 +88,6 @@ export class FindOffresEmploiQueryParams implements FindOffresEmploisQuery {
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  @IsPositive()
   @Transform(params => transformStringToInteger(params, 'rayon'))
   rayon?: number
 }
@@ -137,6 +135,5 @@ export class FindOffresEmploiQueryBody implements FindOffresEmploisQuery {
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  @IsPositive()
   rayon?: number
 }
