@@ -51,7 +51,8 @@ export class OffresImmersionController {
     const query: GetOffresImmersionQuery = {
       rome: getOffresImmersionQueryParams.rome,
       lat: getOffresImmersionQueryParams.lat,
-      lon: getOffresImmersionQueryParams.lon
+      lon: getOffresImmersionQueryParams.lon,
+      distance: getOffresImmersionQueryParams.distance
     }
 
     const result = await this.getOffresImmersionQueryHandler.execute(

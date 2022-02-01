@@ -21,7 +21,8 @@ export namespace OffresImmersion {
     findAll(
       rome: string,
       lat: number,
-      lon: number
+      lon: number,
+      distance: number
     ): Promise<Result<OffreImmersionQueryModel[]>>
 
     getFavorisIdsQueryModelsByJeune(

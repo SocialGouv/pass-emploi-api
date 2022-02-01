@@ -14,7 +14,10 @@ export interface GetOffresImmersionQuery extends Query {
   rome: string
   lat: number
   lon: number
+  distance?: number
 }
+
+const DISTANCE_PAR_DEFAUT = 30
 
 @Injectable()
 export class GetOffresImmersionQueryHandler extends QueryHandler<
@@ -32,10 +35,11 @@ export class GetOffresImmersionQueryHandler extends QueryHandler<
   async handle(
     query: GetOffresImmersionQuery
   ): Promise<Result<OffreImmersionQueryModel[]>> {
-    return this.offresImmersionRepository.findAll(
+    return await this.offresImmersionRepository.findAll(
       query.rome,
       query.lat,
-      query.lon
+      query.lon,
+      query.distance ?? DISTANCE_PAR_DEFAUT
     )
   }
   async authorize(
