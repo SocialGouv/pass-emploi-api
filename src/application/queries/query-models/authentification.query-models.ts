@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { Authentification } from '../../../domain/authentification'
 import { Core } from '../../../domain/core'
 
-export class UtilisateurQueryModel implements Authentification.Utilisateur {
+export class UtilisateurQueryModel {
   @ApiProperty()
   id: string
 
@@ -24,11 +24,6 @@ export class UtilisateurQueryModel implements Authentification.Utilisateur {
     enum: Authentification.Type
   })
   type: Authentification.Type
-
-  @ApiProperty({
-    enum: Authentification.Role
-  })
-  roles: Authentification.Role[]
 }
 
 export class ChatSecretsQueryModel {
@@ -37,4 +32,17 @@ export class ChatSecretsQueryModel {
 
   @ApiProperty()
   cle: string
+}
+
+export function queryModelFromUtilisateur(
+  utilisateur: Authentification.Utilisateur
+): UtilisateurQueryModel {
+  return {
+    id: utilisateur.id,
+    prenom: utilisateur.prenom,
+    nom: utilisateur.nom,
+    email: utilisateur.email,
+    structure: utilisateur.structure,
+    type: utilisateur.type
+  }
 }

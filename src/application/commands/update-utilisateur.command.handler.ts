@@ -16,7 +16,10 @@ import {
   AuthentificationRepositoryToken
 } from '../../domain/authentification'
 import { Core } from '../../domain/core'
-import { UtilisateurQueryModel } from '../queries/query-models/authentification.query-models'
+import {
+  queryModelFromUtilisateur,
+  UtilisateurQueryModel
+} from '../queries/query-models/authentification.query-models'
 import { PlanificateurService } from '../../domain/planificateur'
 
 export interface UpdateUtilisateurCommand extends Command {
@@ -53,7 +56,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     )
 
     if (utilisateur) {
-      return success(utilisateur)
+      return success(queryModelFromUtilisateur(utilisateur))
     } else if (command.structure === Core.Structure.PASS_EMPLOI) {
       return failure(
         new NonTrouveError('Utilisateur', command.idUtilisateurAuth)
@@ -62,25 +65,26 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
 
     const lowerCaseEmail = command.email?.toLocaleLowerCase()
     if (command.type === Authentification.Type.CONSEILLER) {
-      const conseillerSso = this.authentificationFactory.buildConseiller(
+      const result = this.authentificationFactory.buildConseiller(
         command.nom,
         command.prenom,
         lowerCaseEmail,
         command.structure
       )
 
-      if (isFailure(conseillerSso)) {
-        return conseillerSso
+      if (isFailure(result)) {
+        return result
       }
 
+      const conseillerSso: Authentification.Utilisateur = result.data
       await this.authentificationRepository.save(
-        conseillerSso.data,
+        conseillerSso,
         command.idUtilisateurAuth
       )
 
-      this.planificateurService.planifierJobRappelMail(conseillerSso.data.id)
+      this.planificateurService.planifierJobRappelMail(conseillerSso.id)
 
-      return conseillerSso
+      return success(queryModelFromUtilisateur(conseillerSso))
     } else if (command.type === Authentification.Type.JEUNE && lowerCaseEmail) {
       const jeune = await this.authentificationRepository.getJeuneByEmail(
         lowerCaseEmail
@@ -92,7 +96,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
           command.idUtilisateurAuth
         )
 
-        return success(jeune)
+        return success(queryModelFromUtilisateur(jeune))
       }
     }
 
