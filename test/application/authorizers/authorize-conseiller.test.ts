@@ -3,6 +3,7 @@ import { ConseillerAuthorizer } from '../../../src/application/authorizers/autho
 import { DroitsInsuffisants } from '../../../src/building-blocks/types/domain-error'
 import { Authentification } from '../../../src/domain/authentification'
 import { Conseiller } from '../../../src/domain/conseiller'
+import { Core } from '../../../src/domain/core'
 import { Unauthorized } from '../../../src/domain/erreur'
 import { Jeune } from '../../../src/domain/jeune'
 import {
@@ -100,7 +101,8 @@ describe('ConseillerAuthorizer', () => {
         const unAutreConseiller: Conseiller = {
           id: 'un-autre-conseiller',
           lastName: 'Dylan',
-          firstName: 'Bob'
+          firstName: 'Bob',
+          structure: Core.Structure.POLE_EMPLOI
         }
         conseillerRepository.get
           .withArgs(unAutreConseiller.id)

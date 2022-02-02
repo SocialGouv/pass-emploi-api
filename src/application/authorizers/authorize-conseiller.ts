@@ -58,7 +58,7 @@ export class ConseillerAuthorizer {
     if (
       conseiller &&
       utilisateur.type === Authentification.Type.CONSEILLER &&
-      utilisateur.roles.includes(Authentification.Role.SUPERVISEUR)
+      Authentification.estSuperviseur(utilisateur)
     ) {
       return
     }

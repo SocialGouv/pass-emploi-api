@@ -7,7 +7,8 @@ import {
 } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Conseiller } from '../../domain/conseiller'
+import { failure, Result, success } from '../../building-blocks/types/result'
+import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { DetailJeuneQueryModel } from './query-models/jeunes.query-models'
 
@@ -18,11 +19,12 @@ export interface GetJeunesByConseillerQuery extends Query {
 @Injectable()
 export class GetJeunesByConseillerQueryHandler extends QueryHandler<
   GetJeunesByConseillerQuery,
-  DetailJeuneQueryModel[]
+  Result<DetailJeuneQueryModel[]>
 > {
   constructor(
-    @Inject(JeunesRepositoryToken)
+    @Inject(ConseillersRepositoryToken)
     private readonly conseillersRepository: Conseiller.Repository,
+    @Inject(JeunesRepositoryToken)
     private readonly jeunesRepository: Jeune.Repository,
     private readonly conseillerAuthorizer: ConseillerAuthorizer
   ) {
@@ -32,21 +34,22 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
   async handle(
     query: GetJeunesByConseillerQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<DetailJeuneQueryModel[]> {
+  ): Promise<Result<DetailJeuneQueryModel[]>> {
     const conseiller = await this.conseillersRepository.get(query.idConseiller)
-    if (!conseiller) throw new NonTrouveError('Conseiller', query.idConseiller)
+    if (!conseiller) {
+      return failure(new NonTrouveError('Conseiller', query.idConseiller))
+    }
     if (
-      !(
-        utilisateur.roles.includes(Authentification.Role.SUPERVISEUR) &&
-        conseiller.structure === utilisateur.structure
-      ) &&
-      query.idConseiller !== utilisateur.id
-    )
-      throw new DroitsInsuffisants()
+      !utilisateurEstSuperviseurDuConseiller(utilisateur, conseiller) &&
+      !utilisateurEstConseiller(utilisateur, conseiller)
+    ) {
+      return failure(new DroitsInsuffisants())
+    }
 
-    return this.jeunesRepository.getAllQueryModelsByConseiller(
-      query.idConseiller
+    const jeunes = await this.jeunesRepository.getAllQueryModelsByConseiller(
+      conseiller.id
     )
+    return success(jeunes)
   }
 
   async authorize(
@@ -59,4 +62,21 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
   async monitor(): Promise<void> {
     return
   }
+}
+
+function utilisateurEstSuperviseurDuConseiller(
+  utilisateur: Authentification.Utilisateur,
+  conseiller: Conseiller
+): boolean {
+  return (
+    Authentification.estSuperviseur(utilisateur) &&
+    conseiller.structure === utilisateur.structure
+  )
+}
+
+function utilisateurEstConseiller(
+  utilisateur: Authentification.Utilisateur,
+  conseiller: Conseiller
+): boolean {
+  return conseiller.id === utilisateur.id
 }

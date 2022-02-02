@@ -30,6 +30,11 @@ export namespace Authentification {
     email?: string
   }
 
+  // TODO : à mettre plutôt dans une classe Utilisateur ?
+  export function estSuperviseur(utilisateur: Utilisateur): boolean {
+    return utilisateur.roles.includes(Authentification.Role.SUPERVISEUR)
+  }
+
   export interface Repository {
     get(
       id: string,

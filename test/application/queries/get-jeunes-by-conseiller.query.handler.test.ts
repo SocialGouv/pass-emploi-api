@@ -11,6 +11,7 @@ import {
   DroitsInsuffisants,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
+import { failure, success } from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
@@ -73,9 +74,11 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       )
 
       // Then
-      expect(actual).to.deep.equal([
-        { ...unDetailJeuneQueryModel(), lastActivity: 'date-engagement' }
-      ])
+      expect(actual).to.deep.equal(
+        success([
+          { ...unDetailJeuneQueryModel(), lastActivity: 'date-engagement' }
+        ])
+      )
     })
 
     describe("quand le conseiller concerné n'existe pas", () => {
@@ -84,18 +87,15 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         const utilisateur = unUtilisateurConseiller()
 
         // When
-        let error
-        try {
-          await getJeunesByConseillerQueryHandler.handle(
-            { idConseiller: 'un-autre-id' },
-            utilisateur
-          )
-        } catch (e) {
-          error = e
-        }
+        const actual = await getJeunesByConseillerQueryHandler.handle(
+          { idConseiller: 'un-autre-id' },
+          utilisateur
+        )
 
         // Then
-        expect(error).to.be.an.instanceof(NonTrouveError)
+        expect(actual).to.deep.equal(
+          failure(new NonTrouveError('Conseiller', 'un-autre-id'))
+        )
       })
     })
 
@@ -105,18 +105,13 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         const utilisateur = unUtilisateurConseiller({ id: 'au-autre-id' })
 
         // When
-        let error
-        try {
-          await getJeunesByConseillerQueryHandler.handle(
-            getJeunesByConseillerQuery,
-            utilisateur
-          )
-        } catch (e) {
-          error = e
-        }
+        const actual = await getJeunesByConseillerQueryHandler.handle(
+          getJeunesByConseillerQuery,
+          utilisateur
+        )
 
         // Then
-        expect(error).to.be.an.instanceof(DroitsInsuffisants)
+        expect(actual).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
 
@@ -136,9 +131,11 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         )
 
         // Then
-        expect(actual).to.deep.equal([
-          { ...unDetailJeuneQueryModel(), lastActivity: 'date-engagement' }
-        ])
+        expect(actual).to.deep.equal(
+          success([
+            { ...unDetailJeuneQueryModel(), lastActivity: 'date-engagement' }
+          ])
+        )
       })
     })
 
@@ -152,18 +149,13 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         })
 
         // When
-        let error
-        try {
-          await getJeunesByConseillerQueryHandler.handle(
-            getJeunesByConseillerQuery,
-            utilisateur
-          )
-        } catch (e) {
-          error = e
-        }
+        const actual = await getJeunesByConseillerQueryHandler.handle(
+          getJeunesByConseillerQuery,
+          utilisateur
+        )
 
         // Then
-        expect(error).to.be.an.instanceof(DroitsInsuffisants)
+        expect(actual).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
   })

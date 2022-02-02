@@ -1,6 +1,7 @@
 import { Authentification } from 'src/domain/authentification'
 import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { Action } from '../../../src/domain/action'
+import { Core } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
@@ -34,15 +35,16 @@ describe('JeuneSqlRepository', () => {
     beforeEach(async () => {
       // Given
       jeune = { ...unJeune(), tokenLastUpdate: uneDatetime }
-      await ConseillerSqlModel.creer(
-        unConseillerDto({
-          id: jeune.conseiller.id,
-          prenom: jeune.conseiller.firstName,
-          nom: jeune.conseiller.lastName
-        })
-      )
+      const conseillerDto = unConseillerDto({
+        id: jeune.conseiller.id,
+        prenom: jeune.conseiller.firstName,
+        nom: jeune.conseiller.lastName,
+        structure: Core.Structure.POLE_EMPLOI
+      })
+      await ConseillerSqlModel.creer(conseillerDto)
       await JeuneSqlModel.creer(
         unJeuneDto({
+          idConseiller: conseillerDto.id,
           dateCreation: jeune.creationDate.toJSDate(),
           pushNotificationToken: 'unToken',
           dateDerniereActualisationToken: uneDatetime.toJSDate()
@@ -76,13 +78,13 @@ describe('JeuneSqlRepository', () => {
     beforeEach(async () => {
       // Given
       jeune = { ...unJeune(), tokenLastUpdate: uneDatetime }
-      await ConseillerSqlModel.creer(
-        unConseillerDto({
-          id: jeune.conseiller.id,
-          prenom: jeune.conseiller.firstName,
-          nom: jeune.conseiller.lastName
-        })
-      )
+      const conseillerDto = unConseillerDto({
+        id: jeune.conseiller.id,
+        prenom: jeune.conseiller.firstName,
+        nom: jeune.conseiller.lastName,
+        structure: Core.Structure.POLE_EMPLOI
+      })
+      await ConseillerSqlModel.creer(conseillerDto)
       await JeuneSqlModel.creer(
         unJeuneDto({
           dateCreation: jeune.creationDate.toJSDate(),

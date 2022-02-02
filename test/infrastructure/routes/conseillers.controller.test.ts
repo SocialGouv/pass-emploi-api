@@ -137,7 +137,7 @@ describe('ConseillersController', () => {
     it('renvoie la liste des jeunes du conseiller', async () => {
       // Given
       const listeJeunes = [unDetailJeuneQueryModel()]
-      getJeunesByConseillerQueryHandler.execute.resolves(listeJeunes)
+      getJeunesByConseillerQueryHandler.execute.resolves(success(listeJeunes))
 
       // When - Then
       await request(app.getHttpServer())
@@ -154,11 +154,26 @@ describe('ConseillersController', () => {
       )
     })
 
+    describe("quand l'utilisateur n'est pas autorisé", () => {
+      it('renvoie une 403 Interdit', async () => {
+        // Given
+        getJeunesByConseillerQueryHandler.execute.rejects(
+          new DroitsInsuffisants()
+        )
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/conseillers/1/jeunes')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.FORBIDDEN)
+      })
+    })
+
     describe("quand le conseiller n'existe pas", () => {
       it('renvoie une 404 Non Trouve', async () => {
         // Given
-        getJeunesByConseillerQueryHandler.execute.rejects(
-          new NonTrouveError('Conseiller', '1')
+        getJeunesByConseillerQueryHandler.execute.resolves(
+          failure(new NonTrouveError('Conseiller', '1'))
         )
 
         // When - Then
@@ -169,11 +184,11 @@ describe('ConseillersController', () => {
       })
     })
 
-    describe("quand l'utilisateur ne peut pas faire cette requếte", () => {
+    describe("quand le conseiller n'est pas autorisé", () => {
       it('renvoie une 403 Interdit', async () => {
         // Given
-        getJeunesByConseillerQueryHandler.execute.rejects(
-          new DroitsInsuffisants()
+        getJeunesByConseillerQueryHandler.execute.resolves(
+          failure(new DroitsInsuffisants())
         )
 
         // When - Then
