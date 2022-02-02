@@ -30,7 +30,7 @@ export abstract class QueryHandler<Q extends Query | void, QM> {
     try {
       await this.authorize(query, utilisateur)
 
-      const result = await this.handle(query)
+      const result = await this.handle(query, utilisateur)
 
       this.monitor(utilisateur, query).catch(error => {
         this.apmService.captureError(error)
@@ -45,7 +45,10 @@ export abstract class QueryHandler<Q extends Query | void, QM> {
     }
   }
 
-  abstract handle(query: Q): Promise<QM>
+  abstract handle(
+    query: Q,
+    utilisateur?: Authentification.Utilisateur
+  ): Promise<QM>
 
   abstract authorize(
     query: Q,

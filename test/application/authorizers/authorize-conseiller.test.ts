@@ -134,6 +134,56 @@ describe('ConseillerAuthorizer', () => {
     })
   })
 
+  describe('authorizeConseiller', () => {
+    it('autorise un conseiller', async () => {
+      // Given
+      const superviseur: Authentification.Utilisateur =
+        unUtilisateurConseiller()
+      conseillerRepository.get.withArgs(superviseur.id).resolves(unConseiller())
+
+      // When
+      const promise = conseillerAuthorizer.authorizeConseiller(superviseur)
+
+      // Then
+      await expect(promise).to.be.fulfilled
+    })
+
+    it('interdit un conseiller inexistant', async () => {
+      // Given
+      const utilisateur: Authentification.Utilisateur =
+        unUtilisateurConseiller()
+      conseillerRepository.get.withArgs(utilisateur.id).resolves(undefined)
+
+      // When
+      let error
+      try {
+        await conseillerAuthorizer.authorizeConseiller(utilisateur)
+      } catch (e) {
+        error = e
+      }
+
+      // Then
+      expect(error).to.be.an.instanceof(DroitsInsuffisants)
+    })
+
+    it('interdit un jeune qui se ferait passer pour un conseiller', async () => {
+      // Given
+      const jeune: Authentification.Utilisateur = unUtilisateurJeune()
+      conseillerRepository.get.withArgs(jeune.id).resolves(unConseiller())
+
+      // When
+      let error
+      try {
+        await conseillerAuthorizer.authorizeConseiller(jeune)
+      } catch (e) {
+        error = e
+      }
+
+      // Then
+      expect(error).to.be.an.instanceof(DroitsInsuffisants)
+    })
+  })
+
   describe('authorizeSuperviseur', () => {
     it('autorise un conseiller superviseur', async () => {
       // Given
@@ -143,8 +193,7 @@ describe('ConseillerAuthorizer', () => {
       conseillerRepository.get.withArgs(superviseur.id).resolves(unConseiller())
 
       // When
-      const promise =
-        conseillerAuthorizer.authorizeSuperviseurStructure(superviseur)
+      const promise = conseillerAuthorizer.authorizeSuperviseur(superviseur)
 
       // Then
       await expect(promise).to.be.fulfilled
@@ -158,7 +207,7 @@ describe('ConseillerAuthorizer', () => {
       // When
       let error
       try {
-        await conseillerAuthorizer.authorizeSuperviseurStructure(conseiller)
+        await conseillerAuthorizer.authorizeSuperviseur(conseiller)
       } catch (e) {
         error = e
       }
@@ -176,7 +225,7 @@ describe('ConseillerAuthorizer', () => {
       // When
       let error
       try {
-        await conseillerAuthorizer.authorizeSuperviseurStructure(utilisateur)
+        await conseillerAuthorizer.authorizeSuperviseur(utilisateur)
       } catch (e) {
         error = e
       }
@@ -193,7 +242,7 @@ describe('ConseillerAuthorizer', () => {
       // When
       let error
       try {
-        await conseillerAuthorizer.authorizeSuperviseurStructure(jeune)
+        await conseillerAuthorizer.authorizeSuperviseur(jeune)
       } catch (e) {
         error = e
       }

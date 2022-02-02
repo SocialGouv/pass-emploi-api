@@ -144,10 +144,20 @@ export class ConseillersController {
     @Param('idConseiller') idConseiller: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DetailJeuneQueryModel[]> {
-    return this.getJeunesByConseillerQueryHandler.execute(
-      { idConseiller },
-      utilisateur
-    )
+    try {
+      return await this.getJeunesByConseillerQueryHandler.execute(
+        { idConseiller },
+        utilisateur
+      )
+    } catch (erreur) {
+      if (erreur instanceof NonTrouveError) {
+        throw new NotFoundException(erreur)
+      }
+      if (erreur instanceof DroitsInsuffisants) {
+        throw new ForbiddenException(erreur)
+      }
+      throw erreur
+    }
   }
 
   @Post('pole-emploi/jeunes')

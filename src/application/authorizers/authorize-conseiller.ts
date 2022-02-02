@@ -38,7 +38,19 @@ export class ConseillerAuthorizer {
     throw new Unauthorized('Conseiller')
   }
 
-  async authorizeSuperviseurStructure(
+  async authorizeConseiller(
+    utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const conseiller = await this.conseillerRepository.get(utilisateur.id)
+
+    if (conseiller && utilisateur.type === Authentification.Type.CONSEILLER) {
+      return
+    }
+
+    throw new DroitsInsuffisants()
+  }
+
+  async authorizeSuperviseur(
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const conseiller = await this.conseillerRepository.get(utilisateur.id)
