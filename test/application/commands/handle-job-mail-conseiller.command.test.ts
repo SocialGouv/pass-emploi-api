@@ -1,19 +1,19 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
-import {
-  Planificateur,
-  PlanificateurService
-} from '../../../src/domain/planificateur'
 
 import {
   HandleJobMailConseillerCommand,
   HandleJobMailConseillerCommandHandler
 } from '../../../src/application/commands/handle-job-mail-conseiller.command'
+import { success } from '../../../src/building-blocks/types/result'
 import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller'
+import {
+  Planificateur,
+  PlanificateurService
+} from '../../../src/domain/planificateur'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { success } from '../../../src/building-blocks/types/result'
 
 describe('HandleJobMailConseillerCommandHandler', () => {
   let handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler
@@ -58,6 +58,30 @@ describe('HandleJobMailConseillerCommandHandler', () => {
       expect(
         planificateurService.planifierJobRappelMail
       ).to.have.been.calledWith(command.job.contenu.idConseiller)
+    })
+  })
+  describe("quand c'est le weekend", () => {
+    it("n'envoie pas de notification", async () => {
+      // Given
+      const command: HandleJobMailConseillerCommand = {
+        job: {
+          type: Planificateur.JobEnum.MAIL_CONSEILLER,
+          contenu: {
+            idConseiller: '1'
+          },
+          date: DateTime.fromISO('2022-02-06T12:00:00.000Z').toUTC().toJSDate()
+        }
+      }
+      chatRepository.getNombreDeConversationsNonLues
+        .withArgs(command.job.contenu.idConseiller)
+        .resolves(5)
+
+      // When
+      const result = await handleJobMailConseillerCommandHandler.handle(command)
+
+      // Then
+      expect(result).to.deep.equal(success({ mailEnvoye: false }))
+      expect(conseillerRepository.envoyerUnRappelParMail).to.have.callCount(0)
     })
   })
   describe('quand le conseiller n"a aucun message non lu', () => {

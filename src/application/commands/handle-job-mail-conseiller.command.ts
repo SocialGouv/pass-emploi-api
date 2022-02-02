@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { Result, success } from 'src/building-blocks/types/result'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
@@ -13,6 +14,10 @@ export interface HandleJobMailConseillerCommand extends Command {
 interface HandleJobMailConseillerCommandResult {
   mailEnvoye: boolean
 }
+
+const SAMEDI = 6
+
+const DIMANCHE = 7
 
 @Injectable()
 export class HandleJobMailConseillerCommandHandler extends CommandHandler<
@@ -35,6 +40,11 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
     this.planificateurService.planifierJobRappelMail(
       command.job.contenu.idConseiller
     )
+
+    const weekday = DateTime.fromJSDate(command.job.date).weekday
+    if (weekday === SAMEDI || weekday === DIMANCHE) {
+      return success({ mailEnvoye: false })
+    }
 
     const nombreDeConversationsNonLues =
       await this.chatRepository.getNombreDeConversationsNonLues(
