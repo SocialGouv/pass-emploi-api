@@ -1,6 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
 import { Conseiller } from '../../../src/domain/conseiller'
+import { Core } from '../../../src/domain/core'
 import { Unauthorized } from '../../../src/domain/erreur'
 import { Jeune } from '../../../src/domain/jeune'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
@@ -49,7 +50,8 @@ describe('ConseillerForJeuneAuthorizer', () => {
         const unAutreConseiller: Conseiller = {
           id: 'un-autre-conseiller',
           lastName: 'Dylan',
-          firstName: 'Bob'
+          firstName: 'Bob',
+          structure: Core.Structure.POLE_EMPLOI
         }
         const jeune = unJeune(unAutreConseiller)
         jeuneRepository.get.withArgs('un-jeune').resolves(jeune)

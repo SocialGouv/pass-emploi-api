@@ -6,6 +6,7 @@ export interface Conseiller {
   id: string
   firstName: string
   lastName: string
+  structure: Core.Structure
   email?: string
 }
 

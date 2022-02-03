@@ -89,9 +89,9 @@ describe('GetConseillerByEmailQueryHandler', () => {
       await getConseillerByEmail.authorize(query, utilisateur)
 
       // Then
-      expect(
-        conseillerAuthorizer.authorizeSuperviseurStructure
-      ).to.have.been.calledWith(utilisateur)
+      expect(conseillerAuthorizer.authorizeSuperviseur).to.have.been.calledWith(
+        utilisateur
+      )
     })
   })
 })

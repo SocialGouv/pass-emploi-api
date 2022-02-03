@@ -11,6 +11,7 @@ import {
 import { SendNotificationNouveauMessageCommandHandler } from '../../../src/application/commands/send-notification-nouveau-message.command.handler'
 import { GetConseillerByEmailQueryHandler } from '../../../src/application/queries/get-conseiller-by-email.query.handler'
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
+import { GetJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-jeunes-by-conseiller.query.handler'
 import {
   DroitsInsuffisants,
   ErreurHttpMilo,
@@ -30,6 +31,7 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { unDossierMilo } from '../../fixtures/milo.fixture'
 import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
+import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import {
   buildTestingModuleForHttpTesting,
   expect,
@@ -41,6 +43,7 @@ import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-
 describe('ConseillersController', () => {
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
+  let getJeunesByConseillerQueryHandler: StubbedClass<GetJeunesByConseillerQueryHandler>
   let sendNotificationNouveauMessage: StubbedClass<SendNotificationNouveauMessageCommandHandler>
   let getDossierMiloJeuneQueryHandler: StubbedClass<GetDossierMiloJeuneQueryHandler>
   let getAllRendezVousConseillerQueryHandler: StubbedClass<GetAllRendezVousConseillerQueryHandler>
@@ -60,6 +63,9 @@ describe('ConseillersController', () => {
       GetAllRendezVousConseillerQueryHandler
     )
     creerJeuneMiloCommandHandler = stubClass(CreerJeuneMiloCommandHandler)
+    getJeunesByConseillerQueryHandler = stubClass(
+      GetJeunesByConseillerQueryHandler
+    )
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(GetConseillerByEmailQueryHandler)
@@ -74,6 +80,8 @@ describe('ConseillersController', () => {
       .useValue(getAllRendezVousConseillerQueryHandler)
       .overrideProvider(CreerJeuneMiloCommandHandler)
       .useValue(creerJeuneMiloCommandHandler)
+      .overrideProvider(GetJeunesByConseillerQueryHandler)
+      .useValue(getJeunesByConseillerQueryHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -123,6 +131,75 @@ describe('ConseillersController', () => {
       'get',
       '/conseillers?email=conseiller@email.fr'
     )
+  })
+
+  describe('GET /conseillers/:idConseiller/jeunes', () => {
+    it('renvoie la liste des jeunes du conseiller', async () => {
+      // Given
+      const listeJeunes = [unDetailJeuneQueryModel()]
+      getJeunesByConseillerQueryHandler.execute.resolves(success(listeJeunes))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get('/conseillers/1/jeunes')
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect(listeJeunes)
+
+      expect(
+        getJeunesByConseillerQueryHandler.execute
+      ).to.have.been.calledWithExactly(
+        { idConseiller: '1' },
+        unUtilisateurDecode()
+      )
+    })
+
+    describe("quand l'utilisateur n'est pas autorisé", () => {
+      it('renvoie une 403 Interdit', async () => {
+        // Given
+        getJeunesByConseillerQueryHandler.execute.rejects(
+          new DroitsInsuffisants()
+        )
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/conseillers/1/jeunes')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.FORBIDDEN)
+      })
+    })
+
+    describe("quand le conseiller n'existe pas", () => {
+      it('renvoie une 404 Non Trouve', async () => {
+        // Given
+        getJeunesByConseillerQueryHandler.execute.resolves(
+          failure(new NonTrouveError('Conseiller', '1'))
+        )
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/conseillers/1/jeunes')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.NOT_FOUND)
+      })
+    })
+
+    describe("quand le conseiller n'est pas autorisé", () => {
+      it('renvoie une 403 Interdit', async () => {
+        // Given
+        getJeunesByConseillerQueryHandler.execute.resolves(
+          failure(new DroitsInsuffisants())
+        )
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/conseillers/1/jeunes')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.FORBIDDEN)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('get', '/conseillers/1/jeunes')
   })
 
   describe('POST /conseillers/:idConseiller/jeunes/:idJeune/action', () => {

@@ -40,7 +40,8 @@ export function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
       conseiller: {
         id: rendezVousSql.jeune.conseiller.id,
         firstName: rendezVousSql.jeune.conseiller.prenom,
-        lastName: rendezVousSql.jeune.conseiller.nom
+        lastName: rendezVousSql.jeune.conseiller.nom,
+        structure: rendezVousSql.jeune.conseiller.structure
       },
       structure: rendezVousSql.jeune.structure
     }
