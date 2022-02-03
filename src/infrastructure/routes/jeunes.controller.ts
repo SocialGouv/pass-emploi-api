@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpException,
@@ -14,6 +15,10 @@ import {
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  TransfererJeunesConseillerCommand,
+  TransfererJeunesConseillerCommandHandler
+} from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
 import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
@@ -41,10 +46,16 @@ import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.qu
 import { GetAllRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler'
 import { ActionQueryModel } from '../../application/queries/query-models/actions.query-model'
 import {
+  DroitsInsuffisants,
   FavoriExisteDejaError,
+  JeuneNonLieAuConseillerError,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
-import { isFailure, isSuccess } from '../../building-blocks/types/result'
+import {
+  isFailure,
+  isSuccess,
+  Result
+} from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
@@ -53,10 +64,13 @@ import {
   AddFavoriOffresEmploiPayload,
   GetFavorisOffresEmploiQueryParams
 } from './validation/favoris.inputs'
-import { PutNotificationTokenInput } from './validation/jeunes.inputs'
+import {
+  PutNotificationTokenInput,
+  TransfererConseillerPayload
+} from './validation/jeunes.inputs'
 import StatutInvalide = Action.StatutInvalide
 
-@Controller('jeunes/:idJeune')
+@Controller('jeunes')
 @ApiOAuth2([])
 @ApiTags('Jeunes')
 export class JeunesController {
@@ -69,10 +83,11 @@ export class JeunesController {
     private readonly getAllRendezVousJeuneQueryHandler: GetAllRendezVousJeuneQueryHandler,
     private readonly getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
-    private readonly deleteFavoriCommandHandler: DeleteFavoriOffreEmploiCommandHandler
+    private readonly deleteFavoriCommandHandler: DeleteFavoriOffreEmploiCommandHandler,
+    private readonly transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler
   ) {}
 
-  @Get()
+  @Get(':idJeune')
   @ApiResponse({
     type: DetailJeuneQueryModel
   })
@@ -93,7 +108,7 @@ export class JeunesController {
     throw new HttpException(`Jeune ${idJeune} not found`, HttpStatus.NOT_FOUND)
   }
 
-  @Put('push-notification-token')
+  @Put(':idJeune/push-notification-token')
   async updateNotificationToken(
     @Param('idJeune') idJeune: string,
     @Body() putNotificationTokenInput: PutNotificationTokenInput,
@@ -116,7 +131,7 @@ export class JeunesController {
     }
   }
 
-  @Get('home')
+  @Get(':idJeune/home')
   async getHome(
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
@@ -124,7 +139,7 @@ export class JeunesController {
     return await this.getHomeJeuneHandler.execute({ idJeune }, utilisateur)
   }
 
-  @Get('actions')
+  @Get(':idJeune/actions')
   @ApiResponse({
     type: ActionQueryModel,
     isArray: true
@@ -139,7 +154,7 @@ export class JeunesController {
     )
   }
 
-  @Get('rendezvous')
+  @Get(':idJeune/rendezvous')
   @ApiResponse({
     type: RendezVousQueryModel,
     isArray: true
@@ -154,7 +169,7 @@ export class JeunesController {
     )
   }
 
-  @Post('action')
+  @Post(':idJeune/action')
   async postNouvelleAction(
     @Param('idJeune') idJeune: string,
     @Body() createActionPayload: CreateActionAvecStatutPayload,
@@ -192,7 +207,7 @@ export class JeunesController {
   }
 
   // Deprecated (Mobile App v1.0.0)
-  @Get('favoris')
+  @Get(':idJeune/favoris')
   async getFavoris(
     @Param('idJeune') idJeune: string,
     @Query() getFavorisQuery: GetFavorisOffresEmploiQueryParams,
@@ -205,7 +220,7 @@ export class JeunesController {
   }
 
   // Deprecated (Mobile App v1.0.0)
-  @Post('favori')
+  @Post(':idJeune/favori')
   async postNouveauFavori(
     @Param('idJeune') idJeune: string,
     @Body() addFavoriPayload: AddFavoriOffresEmploiPayload,
@@ -237,7 +252,7 @@ export class JeunesController {
   }
 
   // Deprecated (Mobile App v1.0.0)
-  @Delete('favori/:idOffreEmploi')
+  @Delete(':idJeune/favori/:idOffreEmploi')
   @HttpCode(204)
   async deleteFavori(
     @Param('idJeune') idJeune: string,
@@ -254,6 +269,42 @@ export class JeunesController {
     )
     if (isFailure(result)) {
       throw new NotFoundException(result.error)
+    }
+  }
+
+  @Post('transferer')
+  @HttpCode(200)
+  async transfererConseiller(
+    @Body() transfererConseillerPayload: TransfererConseillerPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    let result: Result
+    try {
+      const command: TransfererJeunesConseillerCommand = {
+        idConseillerSource: transfererConseillerPayload.idConseillerSource,
+        idConseillerCible: transfererConseillerPayload.idConseillerCible,
+        idsJeune: transfererConseillerPayload.idsJeune,
+        structure: utilisateur.structure
+      }
+      result = await this.transfererJeunesConseillerCommandHandler.execute(
+        command,
+        utilisateur
+      )
+    } catch (e) {
+      if (e instanceof DroitsInsuffisants) {
+        throw new ForbiddenException(e)
+      }
+      throw e
+    }
+
+    if (isFailure(result)) {
+      if (result.error.code === NonTrouveError.CODE) {
+        throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
+      }
+      if (result.error.code === JeuneNonLieAuConseillerError.CODE) {
+        throw new ForbiddenException(result.error.message)
+      }
+      throw new RuntimeException(result.error.message)
     }
   }
 }

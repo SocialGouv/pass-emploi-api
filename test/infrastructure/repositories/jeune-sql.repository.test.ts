@@ -1,5 +1,8 @@
 import { Authentification } from 'src/domain/authentification'
 import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
+import { TransfertConseillerSqlModel } from 'src/infrastructure/sequelize/models/transfert-conseiller.sql-model'
+import { DateService } from 'src/utils/date-service'
+import { IdService } from 'src/utils/id-service'
 import { Action } from '../../../src/domain/action'
 import { Core } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune'
@@ -24,9 +27,15 @@ import { DatabaseForTesting, expect } from '../../utils'
 describe('JeuneSqlRepository', () => {
   const databaseForTesting: DatabaseForTesting = DatabaseForTesting.prepare()
   let jeuneSqlRepository: JeuneSqlRepository
+  let idService: IdService
+  let dateService: DateService
 
   beforeEach(async () => {
-    jeuneSqlRepository = new JeuneSqlRepository(databaseForTesting.sequelize)
+    jeuneSqlRepository = new JeuneSqlRepository(
+      databaseForTesting.sequelize,
+      idService,
+      dateService
+    )
   })
 
   describe('get', () => {
@@ -211,6 +220,55 @@ describe('JeuneSqlRepository', () => {
       )
 
       expect(actual).to.deep.equal([])
+    })
+    it("retourne les jeunes d'un conseiller avec l'email du conseiller precedent en prenant le dernier transfert", async () => {
+      // Given
+      const idConseillerSource = '1'
+      const idConseillerCible = '2'
+      const idDernierConseillerPrecedent = '43'
+      const idJeune = '1'
+      const jeune = unJeuneDto({ id: idJeune, idConseiller: idConseillerCible })
+      const dateTransfert = uneDatetime.toJSDate()
+      await ConseillerSqlModel.creer(
+        unConseillerDto({ id: idConseillerSource, email: '1@1.com' })
+      )
+      await ConseillerSqlModel.creer(
+        unConseillerDto({ id: idConseillerCible, email: '2@2.com' })
+      )
+      await ConseillerSqlModel.creer(
+        unConseillerDto({
+          id: idDernierConseillerPrecedent,
+          email: '43@43.com'
+        })
+      )
+      await JeuneSqlModel.creer(jeune)
+      await TransfertConseillerSqlModel.create({
+        id: '39d6cbf4-8507-11ec-a8a3-0242ac120002',
+        idConseillerSource,
+        idConseillerCible,
+        idJeune,
+        dateTransfert
+      })
+      await TransfertConseillerSqlModel.create({
+        id: '39d6cbf4-8507-11ec-a8a3-0242ac120003',
+        idConseillerSource: idDernierConseillerPrecedent,
+        idConseillerCible,
+        idJeune,
+        dateTransfert: uneDatetime.plus({ week: 1 }).toJSDate()
+      })
+
+      // When
+      const actual = await jeuneSqlRepository.getAllQueryModelsByConseiller(
+        idConseillerCible
+      )
+
+      // Then
+      expect(actual).to.deep.equal([
+        {
+          ...unDetailJeuneQueryModel({ id: idJeune }),
+          emailConseillerPrecedent: '43@43.com'
+        }
+      ])
     })
   })
 

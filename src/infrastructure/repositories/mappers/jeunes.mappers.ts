@@ -7,7 +7,11 @@ import {
 import { Action } from 'src/domain/action'
 import { Jeune } from 'src/domain/jeune'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
-import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
+import {
+  JeuneDto,
+  JeuneSqlModel
+} from 'src/infrastructure/sequelize/models/jeune.sql-model'
+import { AsSql } from '../../sequelize/types'
 import { ResumeActionsJeuneDto } from '../jeune-sql.repository'
 
 export function fromSqlToDetailJeuneQueryModel(
@@ -40,6 +44,22 @@ export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
     },
     structure: jeuneSqlModel.structure,
     email: jeuneSqlModel.email ?? undefined
+  }
+}
+
+export function toSqlJeune(
+  jeune: Jeune
+): Omit<AsSql<JeuneDto>, 'idAuthentification'> {
+  return {
+    id: jeune.id,
+    nom: jeune.lastName,
+    prenom: jeune.firstName,
+    idConseiller: jeune.conseiller.id,
+    dateCreation: jeune.creationDate.toJSDate(),
+    pushNotificationToken: jeune.pushNotificationToken ?? null,
+    dateDerniereActualisationToken: jeune.tokenLastUpdate?.toJSDate() ?? null,
+    email: jeune.email ?? null,
+    structure: jeune.structure
   }
 }
 
@@ -117,4 +137,36 @@ export function toResumeActionsDuJeuneQueryModel(
       resumeActionsJeuneDto.in_progress_actions_count
     )
   }
+}
+
+export function toDetailJeunQueryModel(
+  sqlJeune: DetailJeuneRawSql
+): DetailJeuneQueryModel {
+  const jeuneQueryModel: DetailJeuneQueryModel = {
+    id: sqlJeune.id,
+    firstName: sqlJeune.prenom,
+    lastName: sqlJeune.nom,
+    email: sqlJeune.email ?? undefined,
+    creationDate: sqlJeune.date_creation.toISOString(),
+    isActivated: !!sqlJeune.id_authentification
+  }
+  if (sqlJeune.date_evenement) {
+    jeuneQueryModel.lastActivity = sqlJeune.date_evenement.toISOString()
+  }
+  if (sqlJeune.email_conseiller_precedent) {
+    jeuneQueryModel.emailConseillerPrecedent =
+      sqlJeune.email_conseiller_precedent
+  }
+  return jeuneQueryModel
+}
+
+export interface DetailJeuneRawSql {
+  id: string
+  prenom: string
+  nom: string
+  email: string
+  date_creation: Date
+  id_authentification: string
+  date_evenement: Date
+  email_conseiller_precedent: string
 }

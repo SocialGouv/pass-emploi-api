@@ -16,10 +16,14 @@ import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { expect, stubClass } from '../../utils'
 import { DatabaseForTesting } from '../../utils'
 import { MailSendinblueClient } from '../../../src/infrastructure/clients/mail-sendinblue.client'
+import { IdService } from 'src/utils/id-service'
+import { DateService } from 'src/utils/date-service'
 
 describe('ActionSqlRepository', () => {
   let jeune: Jeune
   let actionSqlRepository: ActionSqlRepository
+  let idService: IdService
+  let dateService: DateService
   const databaseForTesting = DatabaseForTesting.prepare()
 
   beforeEach(async () => {
@@ -32,7 +36,11 @@ describe('ActionSqlRepository', () => {
       mailSendinblueClient
     )
     await conseillerRepository.save(unConseiller())
-    const jeuneRepository = new JeuneSqlRepository(databaseForTesting.sequelize)
+    const jeuneRepository = new JeuneSqlRepository(
+      databaseForTesting.sequelize,
+      idService,
+      dateService
+    )
     await jeuneRepository.save(jeune)
   })
 

@@ -22,6 +22,9 @@ export class DetailJeuneQueryModel {
 
   @ApiProperty({ required: false })
   lastActivity?: string | undefined
+
+  @ApiProperty({ required: false })
+  emailConseillerPrecedent?: string | undefined
 }
 
 export class ResumeActionsDuJeuneQueryModel {

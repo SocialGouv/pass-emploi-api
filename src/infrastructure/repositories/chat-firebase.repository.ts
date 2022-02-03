@@ -38,4 +38,11 @@ export class ChatFirebaseRepository implements Chat.Repository {
       conseillerId
     )
   }
+
+  async transfererChat(
+    conseillerCibleId: string,
+    jeuneIds: string[]
+  ): Promise<void> {
+    return await this.firebaseClient.transfererChat(conseillerCibleId, jeuneIds)
+  }
 }

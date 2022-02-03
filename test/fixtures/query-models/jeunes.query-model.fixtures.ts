@@ -18,7 +18,9 @@ export function unResumeActionDUnJeune(
   return { ...defaults, ...args }
 }
 
-export function unDetailJeuneQueryModel(): DetailJeuneQueryModel {
+export function unDetailJeuneQueryModel(
+  args: Partial<DetailJeuneQueryModel> = {}
+): DetailJeuneQueryModel {
   const defaults: DetailJeuneQueryModel = {
     id: 'ABCDE',
     firstName: 'John',
@@ -28,5 +30,5 @@ export function unDetailJeuneQueryModel(): DetailJeuneQueryModel {
     isActivated: true
   }
 
-  return defaults
+  return { ...defaults, ...args }
 }

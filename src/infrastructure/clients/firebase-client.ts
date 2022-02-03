@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import * as APM from 'elastic-apm-node'
 import admin from 'firebase-admin'
 import { getMessaging, TokenMessage } from 'firebase-admin/messaging'
 import { Authentification } from '../../domain/authentification'
 import { getAPMInstance } from '../monitoring/apm.init'
-import * as APM from 'elastic-apm-node'
 import Type = Authentification.Type
 
 export interface IFirebaseClient {
@@ -98,5 +98,36 @@ export class FirebaseClient implements IFirebaseClient {
       conseillerId: utilisateur.type === Type.CONSEILLER ? utilisateur.id : null
     }
     return await this.auth.createCustomToken(utilisateur.id, customClaims)
+  }
+
+  async transfererChat(
+    conseillerCibleId: string,
+    jeuneIds: string[]
+  ): Promise<void> {
+    try {
+      await this.firestore.runTransaction(async t => {
+        const conversations = await this.firestore.collection(
+          FIREBASE_CHAT_PATH
+        )
+        const conversationsCibles = await conversations
+          .where('jeuneId', 'in', jeuneIds)
+          .get()
+
+        for (const conversationCible of conversationsCibles.docs) {
+          await t.update(conversations.doc(conversationCible.id), {
+            conseillerId: conseillerCibleId
+          })
+        }
+      })
+      this.logger.log(
+        `Transfert du chat des jeunes au conseiller ${conseillerCibleId} réalisé avec succès`
+      )
+    } catch (e) {
+      this.logger.error(
+        `Echec du transfert du chat des jeunes au conseiller ${conseillerCibleId} :`,
+        e
+      )
+      throw e
+    }
   }
 }

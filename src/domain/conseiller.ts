@@ -23,7 +23,7 @@ export namespace Conseiller {
       emailConseiller: string,
       structure: Core.Structure
     ): Promise<Result<DetailConseillerQueryModel>>
-
+    existe(idConseiller: string, structure: Core.Structure): Promise<boolean>
     // TODO ça a rien à faire dans le repo ça
     envoyerUnRappelParMail(
       idConseiller: string,

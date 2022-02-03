@@ -41,6 +41,12 @@ export namespace Jeune {
     getAllQueryModelsByConseiller(
       idConseiller: string
     ): Promise<DetailJeuneQueryModel[]>
+    saveAll(jeunes: Jeune[]): Promise<void>
+    creerTransferts(
+      idConseillerSource: string,
+      idConseillerCible: string,
+      idsJeune: string[]
+    ): Promise<void>
   }
 
   export function updateToken(

@@ -4,9 +4,9 @@ import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Conseiller } from '../../domain/conseiller'
 import { Core } from '../../domain/core'
+import { MailSendinblueClient } from '../clients/mail-sendinblue.client'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { fromSqlToDetailConseillerQueryModel } from './mappers/conseillers.mappers'
-import { MailSendinblueClient } from '../clients/mail-sendinblue.client'
 
 @Injectable()
 export class ConseillerSqlEmailRepository implements Conseiller.Repository {
@@ -14,6 +14,16 @@ export class ConseillerSqlEmailRepository implements Conseiller.Repository {
 
   constructor(private mailSendinblueClient: MailSendinblueClient) {
     this.logger = new Logger('ConseillerSqlRepository')
+  }
+
+  async existe(
+    idConseiller: string,
+    structure: Core.Structure
+  ): Promise<boolean> {
+    const conseillerSqlModel = await ConseillerSqlModel.findOne({
+      where: { id: idConseiller, structure }
+    })
+    return conseillerSqlModel ? true : false
   }
 
   async getAllIds(): Promise<string[]> {
