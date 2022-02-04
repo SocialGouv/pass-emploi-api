@@ -24,7 +24,7 @@ import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { DatabaseForTesting, expect } from '../../utils'
 
-describe('JeuneSqlRepository', () => {
+describe.only('JeuneSqlRepository', () => {
   const databaseForTesting: DatabaseForTesting = DatabaseForTesting.prepare()
   let jeuneSqlRepository: JeuneSqlRepository
   let idService: IdService
@@ -238,6 +238,8 @@ describe('JeuneSqlRepository', () => {
       await ConseillerSqlModel.creer(
         unConseillerDto({
           id: idDernierConseillerPrecedent,
+          prenom: 'test',
+          nom: 'test',
           email: '43@43.com'
         })
       )
@@ -266,7 +268,11 @@ describe('JeuneSqlRepository', () => {
       expect(actual).to.deep.equal([
         {
           ...unDetailJeuneQueryModel({ id: idJeune }),
-          emailConseillerPrecedent: '43@43.com'
+          conseillerPrecedent: {
+            email: '43@43.com',
+            firstName: 'test',
+            lastName: 'test'
+          }
         }
       ])
     })

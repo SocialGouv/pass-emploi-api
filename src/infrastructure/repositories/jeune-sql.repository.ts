@@ -104,7 +104,9 @@ export class JeuneSqlRepository implements Jeune.Repository {
                jeune.date_creation,
                jeune.id_authentification,
                MAX(evenement_engagement.date_evenement) as date_evenement,
-               conseiller.email                         as email_conseiller_precedent
+               conseiller.email                         as email_conseiller_precedent,
+               conseiller.prenom                        as prenom_conseiller_precedent,
+               conseiller.nom                           as nom_conseiller_precedent
         FROM jeune
                  LEFT JOIN evenement_engagement
                            ON evenement_engagement.id_utilisateur = jeune.id AND
