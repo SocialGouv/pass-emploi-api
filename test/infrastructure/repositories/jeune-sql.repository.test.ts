@@ -266,7 +266,11 @@ describe('JeuneSqlRepository', () => {
       expect(actual).to.deep.equal([
         {
           ...unDetailJeuneQueryModel({ id: idJeune }),
-          emailConseillerPrecedent: '43@43.com'
+          conseillerPrecedent: {
+            email: '43@43.com',
+            nom: 'Tavernier',
+            prenom: 'Nils'
+          }
         }
       ])
     })

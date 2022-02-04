@@ -97,31 +97,33 @@ export class JeuneSqlRepository implements Jeune.Repository {
   ): Promise<DetailJeuneQueryModel[]> {
     const sqlJeunes = (await this.sequelize.query(
       `
-        SELECT jeune.id,
-               jeune.prenom,
-               jeune.nom,
-               jeune.email,
-               jeune.date_creation,
-               jeune.id_authentification,
-               MAX(evenement_engagement.date_evenement) as date_evenement,
-               conseiller.email                         as email_conseiller_precedent
-        FROM jeune
-                 LEFT JOIN evenement_engagement
-                           ON evenement_engagement.id_utilisateur = jeune.id AND
-                              evenement_engagement.type_utilisateur = '${Authentification.Type.JEUNE}'
-                 LEFT JOIN transfert_conseiller
-                           ON transfert_conseiller.id = (SELECT transfert_conseiller.id
-                                                         FROM transfert_conseiller
-                                                         WHERE transfert_conseiller.id_jeune = jeune.id
-                                                           AND transfert_conseiller.id_conseiller_cible = jeune.id_conseiller
-                                                         ORDER BY transfert_conseiller.date_transfert DESC
-                                                         LIMIT 1
-                           )
-                 LEFT JOIN conseiller ON conseiller.id = transfert_conseiller.id_conseiller_source
-        WHERE jeune.id_conseiller = :idConseiller
-        GROUP BY jeune.id, transfert_conseiller.id, conseiller.id
-        ORDER BY jeune.prenom ASC, jeune.nom ASC
-    `,
+          SELECT jeune.id,
+                 jeune.prenom,
+                 jeune.nom,
+                 jeune.email,
+                 jeune.date_creation,
+                 jeune.id_authentification,
+                 MAX(evenement_engagement.date_evenement) as date_evenement,
+                 conseiller.email                         as email_conseiller_precedent,
+                 conseiller.prenom                        as prenom_conseiller_precedent,
+                 conseiller.nom                           as nom_conseiller_precedent
+          FROM jeune
+                   LEFT JOIN evenement_engagement
+                             ON evenement_engagement.id_utilisateur = jeune.id AND
+                                evenement_engagement.type_utilisateur = '${Authentification.Type.JEUNE}'
+                   LEFT JOIN transfert_conseiller
+                             ON transfert_conseiller.id = (SELECT transfert_conseiller.id
+                                                           FROM transfert_conseiller
+                                                           WHERE transfert_conseiller.id_jeune = jeune.id
+                                                             AND transfert_conseiller.id_conseiller_cible = jeune.id_conseiller
+                                                           ORDER BY transfert_conseiller.date_transfert DESC
+                                                           LIMIT 1
+                             )
+                   LEFT JOIN conseiller ON conseiller.id = transfert_conseiller.id_conseiller_source
+          WHERE jeune.id_conseiller = :idConseiller
+          GROUP BY jeune.id, transfert_conseiller.id, conseiller.id
+          ORDER BY jeune.prenom ASC, jeune.nom ASC
+      `,
       {
         type: QueryTypes.SELECT,
         replacements: { idConseiller }
@@ -181,18 +183,18 @@ export class JeuneSqlRepository implements Jeune.Repository {
     const resumesActionsParJeune =
       await this.sequelize.query<ResumeActionsJeuneDto>(
         `
-        SELECT jeune.id                                                                   as id_jeune,
-               jeune.prenom                                                               as prenom_jeune,
-               jeune.nom                                                                  as nom_jeune,
-               COUNT(CASE WHEN statut = 'in_progress' AND id_jeune = jeune.id THEN 1 END) as in_progress_actions_count,
-               COUNT(CASE WHEN statut = 'not_started' AND id_jeune = jeune.id THEN 1 END) as todo_actions_count,
-               COUNT(CASE WHEN statut = 'done' AND id_jeune = jeune.id THEN 1 END)        as done_actions_count
-        FROM action
-                 RIGHT JOIN jeune ON action.id_jeune = jeune.id
-        WHERE id_conseiller = :idConseiller
-        GROUP BY jeune.id
-        ORDER BY jeune.nom
-    `,
+            SELECT jeune.id                                                                   as id_jeune,
+                   jeune.prenom                                                               as prenom_jeune,
+                   jeune.nom                                                                  as nom_jeune,
+                   COUNT(CASE WHEN statut = 'in_progress' AND id_jeune = jeune.id THEN 1 END) as in_progress_actions_count,
+                   COUNT(CASE WHEN statut = 'not_started' AND id_jeune = jeune.id THEN 1 END) as todo_actions_count,
+                   COUNT(CASE WHEN statut = 'done' AND id_jeune = jeune.id THEN 1 END)        as done_actions_count
+            FROM action
+                     RIGHT JOIN jeune ON action.id_jeune = jeune.id
+            WHERE id_conseiller = :idConseiller
+            GROUP BY jeune.id
+            ORDER BY jeune.nom
+        `,
         {
           type: QueryTypes.SELECT,
           replacements: { idConseiller }

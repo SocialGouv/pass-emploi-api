@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsArray, IsNotEmpty, IsString } from 'class-validator'
+import { ArrayNotEmpty, IsArray, IsNotEmpty, IsString } from 'class-validator'
 
 export class PutNotificationTokenInput {
   @ApiProperty()
@@ -21,6 +21,6 @@ export class TransfererConseillerPayload {
 
   @ApiProperty()
   @IsArray()
-  @IsNotEmpty()
+  @ArrayNotEmpty()
   idsJeune: string[]
 }
