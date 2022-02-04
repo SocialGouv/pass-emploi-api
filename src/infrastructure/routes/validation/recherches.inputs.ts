@@ -3,11 +3,16 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Validate,
   ValidateNested
 } from 'class-validator'
 import { FindOffresEmploiQueryBody } from './offres-emploi.inputs'
 import { GetOffresImmersionQueryBody } from './offres-immersion.inputs'
 import { Type } from 'class-transformer'
+import {
+  CustomOffresEmploiCriteres,
+  CustomOffresImmersionCriteres
+} from './utils/validators'
 
 export class CreateRechercheImmersionPayload {
   @ApiProperty()
@@ -25,8 +30,12 @@ export class CreateRechercheImmersionPayload {
   @IsOptional()
   localisation?: string
 
-  @ApiPropertyOptional({ type: GetOffresImmersionQueryBody })
-  @ValidateNested({ each: true })
+  @ApiProperty({ type: GetOffresImmersionQueryBody })
+  @Validate(CustomOffresImmersionCriteres, {
+    message:
+      'Certaines clés ne sont pas présentes dans le schéma de GetOffresImmersionQueryBody'
+  })
+  @ValidateNested({ always: true })
   @Type(() => GetOffresImmersionQueryBody)
   criteres: GetOffresImmersionQueryBody
 }
@@ -48,7 +57,11 @@ export class CreateRechercheOffresEmploiPayload {
   localisation?: string
 
   @ApiPropertyOptional({ type: FindOffresEmploiQueryBody })
-  @ValidateNested({ each: true })
+  @Validate(CustomOffresEmploiCriteres, {
+    message:
+      'Certaines clés ne sont pas présentes dans le schéma de FindOffresEmploiQueryBody'
+  })
+  @ValidateNested({ always: true })
   @Type(() => FindOffresEmploiQueryBody)
   criteres?: FindOffresEmploiQueryBody
 }
