@@ -63,18 +63,18 @@ export abstract class CommandHandler<C, T> {
     result: Result<T>,
     utilisateur?: Authentification.Utilisateur
   ): void {
-    const resultPourElastic = construireResultPourElastic(result)
+    const resultPourLog = construireResultPourLog(result)
     const event = new LogEvent(LogEventKey.COMMAND_EVENT, {
       handler: this.commandName,
       command,
-      result: resultPourElastic,
+      result: resultPourLog,
       utilisateur
     })
     this.logger.log(event)
   }
 }
 
-function construireResultPourElastic<T>(
+function construireResultPourLog<T>(
   result: Success<T> | Failure
 ): Result<unknown> {
   if (isSuccess(result)) {
