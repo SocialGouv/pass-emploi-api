@@ -71,7 +71,7 @@ async function bootstrap(): Promise<void> {
   if (isWeb) {
     useSwagger(appConfig, app)
     app.enableCors()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
+    app.useGlobalPipes(new ValidationPipe())
     app.disable('x-powered-by')
     await app.listen(port)
   }

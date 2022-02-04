@@ -93,7 +93,7 @@ describe('CreateRechercheCommandHandler', () => {
 
       // Then
       expect(evenementService.creerEvenement).to.be.calledWith(
-        Evenement.Type.RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE,
+        Evenement.Type.OFFRE_EMPLOI_RECHERCHEE,
         utilisateur
       )
     })
@@ -116,7 +116,7 @@ describe('CreateRechercheCommandHandler', () => {
 
       // Then
       expect(evenementService.creerEvenement).to.be.calledWith(
-        Evenement.Type.RECHERCHE_IMMERSION_SAUVEGARDEE,
+        Evenement.Type.OFFRE_IMMERSION_RECHERCHEE,
         utilisateur
       )
     })
@@ -139,7 +139,7 @@ describe('CreateRechercheCommandHandler', () => {
 
       // Then
       expect(evenementService.creerEvenement).to.be.calledWith(
-        Evenement.Type.RECHERCHE_ALTERNANCE_SAUVEGARDEE,
+        Evenement.Type.OFFRE_ALTERNANCE_RECHERCHEE,
         utilisateur
       )
     })
