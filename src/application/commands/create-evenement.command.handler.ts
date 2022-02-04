@@ -27,7 +27,7 @@ export class CreateEvenementCommandHandler extends CommandHandler<
   async handle(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _command: CreateEvenementCommand
-  ): Promise<Result<void>> {
+  ): Promise<Result> {
     return emptySuccess()
   }
 

@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
+  IsDefined,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -37,6 +38,7 @@ export class CreateRechercheImmersionPayload {
   })
   @ValidateNested({ always: true })
   @Type(() => GetOffresImmersionQueryBody)
+  @IsDefined()
   criteres: GetOffresImmersionQueryBody
 }
 
@@ -63,5 +65,6 @@ export class CreateRechercheOffresEmploiPayload {
   })
   @ValidateNested({ always: true })
   @Type(() => FindOffresEmploiQueryBody)
-  criteres?: FindOffresEmploiQueryBody
+  @IsDefined()
+  criteres: FindOffresEmploiQueryBody
 }
