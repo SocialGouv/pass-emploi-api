@@ -78,13 +78,11 @@ function construireResultPourElastic<T>(
   result: Success<T> | Failure
 ): Result<unknown> {
   if (isSuccess(result)) {
-    if (typeof result.data === 'object') {
-      return result
-    } else {
-      return success({
-        value: result.data
-      })
-    }
+    return typeof result.data === 'object'
+      ? result
+      : success({
+          value: result.data
+        })
   }
-  return failure(result.error)
+  return result
 }
