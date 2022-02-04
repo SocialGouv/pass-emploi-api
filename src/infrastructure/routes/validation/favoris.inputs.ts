@@ -50,9 +50,9 @@ export class AddFavoriOffresEmploiPayload {
   @IsNotEmpty()
   nomEntreprise?: string
 
-  @ApiProperty()
+  @ApiProperty({ type: LocalisationPayload })
   @IsOptional()
-  @ValidateNested({ each: true })
+  @ValidateNested()
   @Type(() => LocalisationPayload)
   localisation?: LocalisationPayload
 

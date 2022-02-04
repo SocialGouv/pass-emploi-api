@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEnum, IsString } from 'class-validator'
+import { IsDefined, IsEnum, IsString, ValidateNested } from 'class-validator'
 import { Authentification } from '../../../domain/authentification'
 import { Core } from '../../../domain/core'
 import { Evenement } from '../../../domain/evenement'
+import { Type } from 'class-transformer'
 
 export class Emetteur {
   @ApiProperty()
@@ -26,6 +27,9 @@ export class CreateEvenementPayload {
   @IsEnum(Evenement.Type)
   type: Evenement.Type
 
-  @ApiProperty()
+  @ApiProperty({ type: Emetteur })
+  @ValidateNested()
+  @Type(() => Emetteur)
+  @IsDefined()
   emetteur: Emetteur
 }

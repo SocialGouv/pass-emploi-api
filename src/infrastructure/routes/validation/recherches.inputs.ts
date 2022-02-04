@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
+  IsDefined,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -25,9 +26,10 @@ export class CreateRechercheImmersionPayload {
   @IsOptional()
   localisation?: string
 
-  @ApiPropertyOptional({ type: GetOffresImmersionQueryBody })
-  @ValidateNested({ each: true })
+  @ApiProperty({ type: GetOffresImmersionQueryBody })
+  @ValidateNested()
   @Type(() => GetOffresImmersionQueryBody)
+  @IsDefined()
   criteres: GetOffresImmersionQueryBody
 }
 
@@ -47,8 +49,9 @@ export class CreateRechercheOffresEmploiPayload {
   @IsOptional()
   localisation?: string
 
-  @ApiPropertyOptional({ type: FindOffresEmploiQueryBody })
-  @ValidateNested({ each: true })
+  @ApiProperty({ type: FindOffresEmploiQueryBody })
+  @ValidateNested()
   @Type(() => FindOffresEmploiQueryBody)
-  criteres?: FindOffresEmploiQueryBody
+  @IsDefined()
+  criteres: FindOffresEmploiQueryBody
 }

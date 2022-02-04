@@ -25,6 +25,6 @@ export class EvenementsController {
       type: createEvenementPayload.type,
       emetteur: createEvenementPayload.emetteur
     }
-    this.createEvenementCommandHandler.execute(command, utilisateur)
+    await this.createEvenementCommandHandler.execute(command, utilisateur)
   }
 }
