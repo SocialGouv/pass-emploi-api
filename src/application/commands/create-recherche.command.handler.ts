@@ -65,12 +65,12 @@ export class CreateRechercheCommandHandler extends CommandHandler<
   ): Promise<void> {
     let evenementType: Evenement.Type
     if (command.type === Recherche.Type.OFFRES_ALTERNANCE) {
-      evenementType = Evenement.Type.OFFRE_ALTERNANCE_RECHERCHEE
+      evenementType = Evenement.Type.RECHERCHE_ALTERNANCE_SAUVEGARDEE
     } else {
       if (command.type === Recherche.Type.OFFRES_EMPLOI) {
-        evenementType = Evenement.Type.OFFRE_EMPLOI_RECHERCHEE
+        evenementType = Evenement.Type.RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE
       } else {
-        evenementType = Evenement.Type.OFFRE_IMMERSION_RECHERCHEE
+        evenementType = Evenement.Type.RECHERCHE_IMMERSION_SAUVEGARDEE
       }
     }
     await this.evenementService.creerEvenement(evenementType, utilisateur)
