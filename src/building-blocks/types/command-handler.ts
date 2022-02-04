@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common'
 import { Authentification } from '../../domain/authentification'
 import { LogEvent, LogEventKey } from './log.event'
-import { Failure, Success, failure, isSuccess, Result } from './result'
+import { Failure, Success, failure, success, isSuccess, Result } from './result'
 import { getAPMInstance } from '../../infrastructure/monitoring/apm.init'
 import * as APM from 'elastic-apm-node'
 
@@ -63,29 +63,28 @@ export abstract class CommandHandler<C, T> {
     result: Result<T>,
     utilisateur?: Authentification.Utilisateur
   ): void {
-    const data = construireDataPourElastic(result)
+    const resultPourElastic = construireResultPourElastic(result)
     const event = new LogEvent(LogEventKey.COMMAND_EVENT, {
       handler: this.commandName,
       command,
-      result: {
-        _isSuccess: result._isSuccess,
-        data
-      },
+      result: resultPourElastic,
       utilisateur
     })
     this.logger.log(event)
   }
 }
 
-function construireDataPourElastic<T>(result: Success<T> | Failure): unknown {
+function construireResultPourElastic<T>(
+  result: Success<T> | Failure
+): Result<unknown> {
   if (isSuccess(result)) {
     if (typeof result.data === 'object') {
-      return result.data
+      return result
     } else {
-      return {
+      return success({
         value: result.data
-      }
+      })
     }
   }
-  return undefined
+  return failure(result.error)
 }
