@@ -29,7 +29,10 @@ export namespace Evenement {
     OFFRE_PARTAGEE = 'OFFRE_PARTAGEE',
     MESSAGE_ENVOYE = 'MESSAGE_ENVOYE',
     RDV_CREE = 'RDV_CREE',
-    RDV_SUPPRIME = 'RDV_SUPPRIME'
+    RDV_SUPPRIME = 'RDV_SUPPRIME',
+    RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE = 'RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE',
+    RECHERCHE_ALTERNANCE_SAUVEGARDEE = 'RECHERCHE_ALTERNANCE_SAUVEGARDEE',
+    RECHERCHE_IMMERSION_SAUVEGARDEE = 'RECHERCHE_IMMERSION_SAUVEGARDEE'
   }
 
   export interface Repository {
@@ -145,6 +148,21 @@ const evenements = {
   [Evenement.Type.RDV_SUPPRIME]: {
     categorie: 'Rendez-vous',
     action: 'Suppression'
+  },
+  [Evenement.Type.RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE]: {
+    categorie: 'Recherche',
+    action: 'Enregistrer',
+    nom: 'Emploi'
+  },
+  [Evenement.Type.RECHERCHE_ALTERNANCE_SAUVEGARDEE]: {
+    categorie: 'Recherche',
+    action: 'Enregistrer',
+    nom: 'Alternance'
+  },
+  [Evenement.Type.RECHERCHE_IMMERSION_SAUVEGARDEE]: {
+    categorie: 'Recherche',
+    action: 'Enregistrer',
+    nom: 'Immersion'
   }
 }
 
