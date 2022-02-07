@@ -19,7 +19,7 @@ import { MailSendinblueClient } from '../../../src/infrastructure/clients/mail-s
 import { IdService } from 'src/utils/id-service'
 import { DateService } from 'src/utils/date-service'
 
-describe('ActionSqlRepository', () => {
+describe.only('ActionSqlRepository', () => {
   let jeune: Jeune
   let actionSqlRepository: ActionSqlRepository
   let idService: IdService
@@ -29,7 +29,7 @@ describe('ActionSqlRepository', () => {
   beforeEach(async () => {
     jeune = unJeune()
 
-    actionSqlRepository = new ActionSqlRepository()
+    actionSqlRepository = new ActionSqlRepository(databaseForTesting.sequelize)
     const mailSendinblueClient: MailSendinblueClient =
       stubClass(MailSendinblueClient)
     const conseillerRepository = new ConseillerSqlEmailRepository(
