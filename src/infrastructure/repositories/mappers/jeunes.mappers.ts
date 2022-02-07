@@ -153,9 +153,17 @@ export function toDetailJeunQueryModel(
   if (sqlJeune.date_evenement) {
     jeuneQueryModel.lastActivity = sqlJeune.date_evenement.toISOString()
   }
-  if (sqlJeune.email_conseiller_precedent) {
-    jeuneQueryModel.emailConseillerPrecedent =
-      sqlJeune.email_conseiller_precedent
+
+  if (
+    sqlJeune.nom_conseiller_precedent ||
+    sqlJeune.prenom_conseiller_precedent ||
+    sqlJeune.email_conseiller_precedent
+  ) {
+    jeuneQueryModel.conseillerPrecedent = {
+      prenom: sqlJeune.prenom_conseiller_precedent,
+      nom: sqlJeune.nom_conseiller_precedent,
+      email: sqlJeune.email_conseiller_precedent ?? undefined
+    }
   }
   return jeuneQueryModel
 }
@@ -169,4 +177,6 @@ export interface DetailJeuneRawSql {
   id_authentification: string
   date_evenement: Date
   email_conseiller_precedent: string
+  nom_conseiller_precedent: string
+  prenom_conseiller_precedent: string
 }

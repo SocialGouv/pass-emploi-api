@@ -1,6 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Jeune } from 'src/domain/jeune'
 
+class ConseillerQueryModel {
+  @ApiProperty({ required: false })
+  email?: string
+
+  @ApiProperty()
+  nom: string
+
+  @ApiProperty()
+  prenom: string
+}
+
 export class DetailJeuneQueryModel {
   @ApiProperty()
   id: string
@@ -24,7 +35,7 @@ export class DetailJeuneQueryModel {
   lastActivity?: string | undefined
 
   @ApiProperty({ required: false })
-  emailConseillerPrecedent?: string | undefined
+  conseillerPrecedent?: ConseillerQueryModel
 }
 
 export class ResumeActionsDuJeuneQueryModel {
