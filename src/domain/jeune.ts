@@ -28,6 +28,7 @@ export namespace Jeune {
 
   export interface Repository {
     get(id: string): Promise<Jeune | undefined>
+    existe(id: string): Promise<boolean>
     getByEmail(email: string): Promise<Jeune | undefined>
     save(jeune: Jeune): Promise<void>
 

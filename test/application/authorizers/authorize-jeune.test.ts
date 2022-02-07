@@ -3,7 +3,6 @@ import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-
 import { Unauthorized } from '../../../src/domain/erreur'
 import { Jeune } from '../../../src/domain/jeune'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect } from '../../utils'
 
 describe('JeuneAuthorizer', () => {
@@ -21,9 +20,8 @@ describe('JeuneAuthorizer', () => {
       it("valide l'autorisation", async () => {
         // Given
         const utilisateur = unUtilisateurJeune({ id: 'jeune-id' })
-        const jeune = { ...unJeune(), id: 'jeune-id' }
 
-        jeuneRepository.get.withArgs('jeune-id').resolves(jeune)
+        jeuneRepository.existe.withArgs('jeune-id').resolves(true)
 
         // When
         const result = await jeuneAuthorizer.authorize('jeune-id', utilisateur)
@@ -36,9 +34,23 @@ describe('JeuneAuthorizer', () => {
       it('retourne une erreur', async () => {
         // Given
         const utilisateur = unUtilisateurJeune({ id: 'autre-jeune-id' })
-        const jeune = { ...unJeune(), id: 'jeune-id' }
 
-        jeuneRepository.get.withArgs('jeune-id').resolves(jeune)
+        jeuneRepository.existe.withArgs('jeune-id').resolves(true)
+
+        // When
+        const call = jeuneAuthorizer.authorize('jeune-id', utilisateur)
+
+        // Then
+        expect(call).to.be.rejectedWith(Unauthorized)
+      })
+    })
+
+    describe("quand le jeune n'existe pas", () => {
+      it('retourne une erreur', async () => {
+        // Given
+        const utilisateur = unUtilisateurJeune({ id: 'jeune-id' })
+
+        jeuneRepository.existe.withArgs('jeune-id').resolves(false)
 
         // When
         const call = jeuneAuthorizer.authorize('jeune-id', utilisateur)

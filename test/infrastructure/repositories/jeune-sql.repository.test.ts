@@ -81,6 +81,49 @@ describe('JeuneSqlRepository', () => {
     })
   })
 
+  describe('existe', () => {
+    let jeune: Jeune
+
+    beforeEach(async () => {
+      // Given
+      jeune = { ...unJeune(), tokenLastUpdate: uneDatetime }
+      const conseillerDto = unConseillerDto({
+        id: jeune.conseiller.id,
+        prenom: jeune.conseiller.firstName,
+        nom: jeune.conseiller.lastName,
+        structure: Core.Structure.POLE_EMPLOI
+      })
+      await ConseillerSqlModel.creer(conseillerDto)
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          idConseiller: conseillerDto.id,
+          dateCreation: jeune.creationDate.toJSDate(),
+          pushNotificationToken: 'unToken',
+          dateDerniereActualisationToken: uneDatetime.toJSDate()
+        })
+      )
+    })
+    describe('quand le jeune existe', () => {
+      it('retourne true', async () => {
+        // When
+        const result = await jeuneSqlRepository.existe('ABCDE')
+
+        // Then
+        expect(result).to.deep.equal(true)
+      })
+    })
+
+    describe("quand le jeune n'existe pas", () => {
+      it('retourne false', async () => {
+        // When
+        const jeune = await jeuneSqlRepository.existe('ZIZOU')
+
+        // Then
+        expect(jeune).to.equal(false)
+      })
+    })
+  })
+
   describe('getByEmail', () => {
     let jeune: Jeune
 

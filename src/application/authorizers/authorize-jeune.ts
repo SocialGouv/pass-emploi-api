@@ -14,12 +14,12 @@ export class JeuneAuthorizer {
     idJeune: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const jeune = await this.jeuneRepository.get(idJeune)
+    const jeune = await this.jeuneRepository.existe(idJeune)
 
     if (jeune && utilisateur) {
       if (
         utilisateur.type === Authentification.Type.JEUNE &&
-        utilisateur.id === jeune.id
+        utilisateur.id === idJeune
       ) {
         return
       }
