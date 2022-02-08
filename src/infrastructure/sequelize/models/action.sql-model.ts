@@ -24,7 +24,7 @@ export class ActionDto extends Model {
   idCreateur!: string
 
   @Column({ field: 'createur', type: DataType.JSONB })
-  createur!: {
+  createur: {
     nom: string
     prenom: string
     id: string
