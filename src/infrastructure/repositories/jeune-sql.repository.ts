@@ -45,6 +45,16 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return fromSqlToJeune(jeuneSqlModel)
   }
 
+  async existe(id: string): Promise<boolean> {
+    const exists = (await this.sequelize.query(
+      `select exists(select 1 from jeune where id=:idJeune)`,
+      {
+        replacements: { idJeune: id }
+      }
+    )) as Array<Array<{ exists: boolean }>>
+    return Boolean(exists[0][0].exists)
+  }
+
   async getByEmail(email: string): Promise<Jeune | undefined> {
     const jeuneSqlModel = await JeuneSqlModel.findOne({
       where: { email },

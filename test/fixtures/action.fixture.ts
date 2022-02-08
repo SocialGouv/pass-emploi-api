@@ -11,8 +11,12 @@ export const uneAction = (args: Partial<Action> = {}): Action => {
     commentaire: "Commentaire de l'action",
     dateDerniereActualisation: now,
     dateCreation: now,
-    idCreateur: '1',
-    typeCreateur: Action.TypeCreateur.CONSEILLER
+    createur: {
+      id: '1',
+      type: Action.TypeCreateur.CONSEILLER,
+      prenom: 'Nils',
+      nom: 'Tavernier'
+    }
   }
 
   return { ...defaults, ...args }

@@ -5,6 +5,7 @@ import { DateService } from '../../src/utils/date-service'
 import { IdService } from '../../src/utils/id-service'
 import { uneAction } from '../fixtures/action.fixture'
 import { expect, StubbedClass, stubClass } from '../utils'
+import { unJeune } from '../fixtures/jeune.fixture'
 
 describe('Action', () => {
   describe('Factory', () => {
@@ -45,12 +46,90 @@ describe('Action', () => {
 
       describe('buildAction', () => {
         describe('Quand le statut est present', () => {
-          it('crée une action avec le statut fourni', async () => {
+          describe('quand le conseiller est le créateur', () => {
+            it('crée une action avec le statut fourni', async () => {
+              // Given
+              const contenu = 'test'
+              const idJeune = '1'
+              const commentaire = 'test'
+              const statut = Action.Statut.EN_COURS
+              const typeCreateur = Action.TypeCreateur.CONSEILLER
+
+              const jeune = unJeune()
+
+              const action: Action = uneAction({
+                id,
+                dateCreation: nowJs,
+                dateDerniereActualisation: nowJs,
+                contenu,
+                commentaire,
+                idJeune,
+                statut,
+                createur: {
+                  id: jeune.conseiller.id,
+                  prenom: jeune.conseiller.firstName,
+                  nom: jeune.conseiller.lastName,
+                  type: Action.TypeCreateur.CONSEILLER
+                }
+              })
+
+              // When
+              const actual = actionFactory.buildAction(
+                { contenu, idJeune, statut, commentaire, typeCreateur },
+                jeune
+              )
+
+              // Then
+              expect(actual).to.deep.equal({ _isSuccess: true, data: action })
+            })
+          })
+          describe('quand le jeune est le créateur', () => {
+            it('crée une action avec le statut fourni', async () => {
+              // Given
+              const contenu = 'test'
+              const idJeune = '1'
+              const commentaire = 'test'
+              const statut = Action.Statut.EN_COURS
+              const typeCreateur = Action.TypeCreateur.JEUNE
+
+              const jeune = unJeune()
+
+              const action: Action = uneAction({
+                id,
+                dateCreation: nowJs,
+                dateDerniereActualisation: nowJs,
+                contenu,
+                commentaire,
+                idJeune,
+                statut,
+                createur: {
+                  id: jeune.id,
+                  prenom: jeune.firstName,
+                  nom: jeune.lastName,
+                  type: Action.TypeCreateur.JEUNE
+                }
+              })
+
+              // When
+              const actual = actionFactory.buildAction(
+                { contenu, idJeune, statut, commentaire, typeCreateur },
+                jeune
+              )
+
+              // Then
+              expect(actual).to.deep.equal({ _isSuccess: true, data: action })
+            })
+          })
+        })
+        describe('Quand le statut est absent', () => {
+          it('crée une action avec le statut Action.PAS_COMMENCEE par défaut', async () => {
             // Given
             const contenu = 'test'
             const idJeune = '1'
             const commentaire = 'test'
-            const statut = Action.Statut.EN_COURS
+            const typeCreateur = Action.TypeCreateur.JEUNE
+
+            const jeune = unJeune()
 
             const action: Action = uneAction({
               id,
@@ -59,41 +138,19 @@ describe('Action', () => {
               contenu,
               commentaire,
               idJeune,
-              statut
-            })
-
-            // When
-            const actual = actionFactory.buildAction(
-              { contenu, idJeune, statut, commentaire },
-              { id: action.idCreateur, type: action.typeCreateur }
-            )
-
-            // Then
-            expect(actual).to.deep.equal({ _isSuccess: true, data: action })
-          })
-        })
-
-        describe('Quand le statut est absent', () => {
-          it('crée une action avec le statut Action.PAS_COMMENCEE par défaut', async () => {
-            // Given
-            const contenu = 'test'
-            const idJeune = '1'
-            const commentaire = 'test'
-
-            const action: Action = uneAction({
-              id,
-              dateCreation: nowJs,
-              dateDerniereActualisation: nowJs,
               statut: Action.Statut.PAS_COMMENCEE,
-              contenu,
-              commentaire,
-              idJeune
+              createur: {
+                id: jeune.id,
+                prenom: jeune.firstName,
+                nom: jeune.lastName,
+                type: Action.TypeCreateur.JEUNE
+              }
             })
 
             // When
             const actual = actionFactory.buildAction(
-              { contenu, idJeune, commentaire },
-              { id: action.idCreateur, type: action.typeCreateur }
+              { contenu, idJeune, commentaire, typeCreateur },
+              jeune
             )
 
             // Then

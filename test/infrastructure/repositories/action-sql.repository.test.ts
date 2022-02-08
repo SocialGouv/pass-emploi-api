@@ -29,7 +29,7 @@ describe('ActionSqlRepository', () => {
   beforeEach(async () => {
     jeune = unJeune()
 
-    actionSqlRepository = new ActionSqlRepository()
+    actionSqlRepository = new ActionSqlRepository(databaseForTesting.sequelize)
     const mailSendinblueClient: MailSendinblueClient =
       stubClass(MailSendinblueClient)
     const conseillerRepository = new ConseillerSqlEmailRepository(

@@ -23,6 +23,13 @@ export class ActionDto extends Model {
   @Column({ field: 'id_createur', type: DataType.STRING })
   idCreateur!: string
 
+  @Column({ field: 'createur', type: DataType.JSONB })
+  createur: {
+    nom: string
+    prenom: string
+    id: string
+  }
+
   @Column({ field: 'type_createur', type: DataType.STRING })
   typeCreateur!: Action.TypeCreateur
 

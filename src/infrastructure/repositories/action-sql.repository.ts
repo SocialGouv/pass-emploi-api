@@ -1,17 +1,22 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { ActionQueryModel } from '../../application/queries/query-models/actions.query-model'
 import { Action } from '../../domain/action'
 import { ActionDto, ActionSqlModel } from '../sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { AsSql } from '../sequelize/types'
-import { Op } from 'sequelize'
 import {
   fromSqlToActionQueryModel,
   fromSqlToActionQueryModelWithJeune
 } from './mappers/actions.mappers'
+import { SequelizeInjectionToken } from '../sequelize/providers'
+import { Sequelize } from 'sequelize'
 
 @Injectable()
 export class ActionSqlRepository implements Action.Repository {
+  constructor(
+    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
+  ) {}
+
   async save(action: Action): Promise<void> {
     await ActionSqlModel.modifierOuCreer(
       ActionSqlRepository.sqlModelFromAction(action)
@@ -66,27 +71,16 @@ export class ActionSqlRepository implements Action.Repository {
   }
 
   async getQueryModelByJeuneId(id: string): Promise<ActionQueryModel[]> {
-    const actionsNonTermineesSqlModel = await ActionSqlModel.findAll({
+    const actionsSqlModel = await ActionSqlModel.findAll({
       where: {
-        idJeune: id,
-        statut: {
-          [Op.or]: [Action.Statut.PAS_COMMENCEE, Action.Statut.EN_COURS]
-        }
+        idJeune: id
       },
-      order: [['date_derniere_actualisation', 'DESC']],
-      include: [
-        {
-          model: JeuneSqlModel,
-          required: true
-        }
-      ]
-    })
-    const actionsTermineesSqlModel = await ActionSqlModel.findAll({
-      where: {
-        idJeune: id,
-        statut: Action.Statut.TERMINEE
-      },
-      order: [['date_derniere_actualisation', 'DESC']],
+      order: [
+        this.sequelize.literal(
+          `CASE WHEN statut = '${Action.Statut.TERMINEE}' THEN 1 ELSE 0 END`
+        ),
+        ['date_derniere_actualisation', 'DESC']
+      ],
       include: [
         {
           model: JeuneSqlModel,
@@ -95,16 +89,7 @@ export class ActionSqlRepository implements Action.Repository {
       ]
     })
 
-    const actionsSqlModel = [
-      ...actionsNonTermineesSqlModel,
-      ...actionsTermineesSqlModel
-    ]
-    const actions = []
-    for (const actionSql of actionsSqlModel) {
-      actions.push(await fromSqlToActionQueryModel(actionSql))
-    }
-
-    return actions
+    return actionsSqlModel.map(fromSqlToActionQueryModel)
   }
 
   static actionFromSqlModel(sqlModel: AsSql<ActionDto>): Action {
@@ -116,8 +101,12 @@ export class ActionSqlRepository implements Action.Repository {
       contenu: sqlModel.contenu,
       dateCreation: sqlModel.dateCreation,
       dateDerniereActualisation: sqlModel.dateDerniereActualisation,
-      idCreateur: sqlModel.idCreateur,
-      typeCreateur: sqlModel.typeCreateur
+      createur: {
+        id: sqlModel.createur.id,
+        nom: sqlModel.createur.nom,
+        prenom: sqlModel.createur.prenom,
+        type: sqlModel.typeCreateur
+      }
     }
   }
 
@@ -130,8 +119,13 @@ export class ActionSqlRepository implements Action.Repository {
       dateCreation: action.dateCreation,
       dateDerniereActualisation: action.dateDerniereActualisation,
       idJeune: action.idJeune,
-      idCreateur: action.idCreateur,
-      typeCreateur: action.typeCreateur,
+      idCreateur: action.createur.id,
+      createur: {
+        id: action.createur.id,
+        nom: action.createur.nom,
+        prenom: action.createur.prenom
+      },
+      typeCreateur: action.createur.type,
       estVisibleParConseiller: true,
       dateLimite: null
     }
