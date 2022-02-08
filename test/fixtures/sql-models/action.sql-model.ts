@@ -15,6 +15,11 @@ export function uneActionDto(
     idJeune: 'ABCDE',
     idCreateur: '1',
     typeCreateur: Action.TypeCreateur.CONSEILLER,
+    createur: {
+      id: '1',
+      prenom: 'Nils',
+      nom: 'Tavernier'
+    },
     estVisibleParConseiller: true,
     statut: Action.Statut.PAS_COMMENCEE,
     dateLimite: null

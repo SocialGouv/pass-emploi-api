@@ -19,7 +19,7 @@ import { MailSendinblueClient } from '../../../src/infrastructure/clients/mail-s
 import { IdService } from 'src/utils/id-service'
 import { DateService } from 'src/utils/date-service'
 
-describe.only('ActionSqlRepository', () => {
+describe('ActionSqlRepository', () => {
   let jeune: Jeune
   let actionSqlRepository: ActionSqlRepository
   let idService: IdService

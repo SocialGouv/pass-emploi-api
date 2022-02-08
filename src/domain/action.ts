@@ -17,8 +17,7 @@ export interface Action {
   dateCreation: Date
   dateDerniereActualisation: Date
   idJeune: Jeune.Id
-  idCreateur: Action.IdCreateur
-  typeCreateur: Action.TypeCreateur
+  createur: Action.Createur
 }
 
 export namespace Action {
@@ -35,6 +34,13 @@ export namespace Action {
 
     getQueryModelById(id: string): Promise<ActionQueryModel | undefined>
     getQueryModelByJeuneId(id: string): Promise<ActionQueryModel[]>
+  }
+
+  export interface Createur {
+    prenom: string
+    nom: string
+    id: string
+    type: Action.TypeCreateur
   }
 
   export enum Statut {
@@ -71,20 +77,37 @@ export namespace Action {
         idJeune: string
         statut?: Action.Statut
         commentaire?: string
+        typeCreateur: Action.TypeCreateur
       },
-      createur: { id: Action.IdCreateur; type: Action.TypeCreateur }
+      jeune: Jeune
     ): Result<Action> {
       const statut = data.statut ?? Action.Statut.PAS_COMMENCEE
 
       const now = this.dateService.nowJs()
+      let createur: Action.Createur
+      if (data.typeCreateur === Action.TypeCreateur.JEUNE) {
+        createur = {
+          id: jeune.id,
+          type: Action.TypeCreateur.JEUNE,
+          nom: jeune.lastName,
+          prenom: jeune.firstName
+        }
+      } else {
+        createur = {
+          id: jeune.conseiller.id,
+          type: Action.TypeCreateur.CONSEILLER,
+          nom: jeune.conseiller.lastName,
+          prenom: jeune.conseiller.firstName
+        }
+      }
+
       const action: Action = {
         id: this.idService.uuid(),
         contenu: data.contenu,
         commentaire: data.commentaire ?? '',
         idJeune: data.idJeune,
         statut: statut,
-        idCreateur: createur.id,
-        typeCreateur: createur.type,
+        createur,
         dateCreation: now,
         dateDerniereActualisation: now
       }

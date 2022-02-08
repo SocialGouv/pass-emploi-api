@@ -62,8 +62,8 @@ describe('CreateActionCommandHandler', () => {
       const command: CreateActionCommand = {
         idJeune: action.idJeune,
         contenu: action.contenu,
-        idCreateur: action.idCreateur,
-        typeCreateur: action.typeCreateur,
+        idCreateur: action.id,
+        typeCreateur: Action.TypeCreateur.JEUNE,
         statut: action.statut,
         commentaire: action.commentaire
       }
@@ -90,8 +90,8 @@ describe('CreateActionCommandHandler', () => {
         const command: CreateActionCommand = {
           idJeune: action.idJeune,
           contenu: action.contenu,
-          idCreateur: action.idCreateur,
-          typeCreateur: action.typeCreateur,
+          idCreateur: action.id,
+          typeCreateur: Action.TypeCreateur.JEUNE,
           statut: action.statut,
           commentaire: action.commentaire
         }
@@ -118,7 +118,7 @@ describe('CreateActionCommandHandler', () => {
           idJeune: action.idJeune,
           contenu: action.contenu,
           idCreateur: utilisateur.id,
-          typeCreateur: action.typeCreateur,
+          typeCreateur: Action.TypeCreateur.CONSEILLER,
           statut: action.statut,
           commentaire: action.commentaire
         }
@@ -128,7 +128,7 @@ describe('CreateActionCommandHandler', () => {
 
         // Then
         expect(conseillerAuthorizer.authorize).to.have.been.calledWithExactly(
-          action.idCreateur,
+          command.idCreateur,
           utilisateur,
           action.idJeune
         )

@@ -106,8 +106,12 @@ export class ActionSqlRepository implements Action.Repository {
       contenu: sqlModel.contenu,
       dateCreation: sqlModel.dateCreation,
       dateDerniereActualisation: sqlModel.dateDerniereActualisation,
-      idCreateur: sqlModel.idCreateur,
-      typeCreateur: sqlModel.typeCreateur
+      createur: {
+        id: sqlModel.createur.id,
+        nom: sqlModel.createur.nom,
+        prenom: sqlModel.createur.prenom,
+        type: sqlModel.typeCreateur
+      }
     }
   }
 
@@ -120,8 +124,13 @@ export class ActionSqlRepository implements Action.Repository {
       dateCreation: action.dateCreation,
       dateDerniereActualisation: action.dateDerniereActualisation,
       idJeune: action.idJeune,
-      idCreateur: action.idCreateur,
-      typeCreateur: action.typeCreateur,
+      idCreateur: action.createur.id,
+      createur: {
+        id: action.createur.id,
+        nom: action.createur.nom,
+        prenom: action.createur.prenom
+      },
+      typeCreateur: action.createur.type,
       estVisibleParConseiller: true,
       dateLimite: null
     }

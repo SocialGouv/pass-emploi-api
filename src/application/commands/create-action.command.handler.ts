@@ -54,7 +54,7 @@ export class CreateActionCommandHandler extends CommandHandler<
       return failure(new NonTrouveError('Jeune', command.idJeune))
     }
 
-    const result = this.buildAction(command)
+    const result = this.buildAction(command, jeune)
     if (isFailure(result)) return result
 
     const action = result.data
@@ -92,15 +92,19 @@ export class CreateActionCommandHandler extends CommandHandler<
     )
   }
 
-  private buildAction(command: CreateActionCommand): Result<Action> {
+  private buildAction(
+    command: CreateActionCommand,
+    jeune: Jeune
+  ): Result<Action> {
     return this.actionFactory.buildAction(
       {
         idJeune: command.idJeune,
         contenu: command.contenu,
         statut: command.statut,
-        commentaire: command.commentaire
+        commentaire: command.commentaire,
+        typeCreateur: command.typeCreateur
       },
-      { id: command.idCreateur, type: command.typeCreateur }
+      jeune
     )
   }
 
