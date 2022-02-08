@@ -89,12 +89,7 @@ export class ActionSqlRepository implements Action.Repository {
       ]
     })
 
-    const actions = []
-    for (const actionSql of actionsSqlModel) {
-      actions.push(await fromSqlToActionQueryModel(actionSql))
-    }
-
-    return actions
+    return actionsSqlModel.map(fromSqlToActionQueryModel)
   }
 
   static actionFromSqlModel(sqlModel: AsSql<ActionDto>): Action {
