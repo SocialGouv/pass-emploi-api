@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator'
+import { IsDateString, IsNotEmpty, IsNumber, IsString } from 'class-validator'
 
 export class CreateRendezVousPayload {
   @ApiProperty()
@@ -7,7 +7,7 @@ export class CreateRendezVousPayload {
   comment: string
 
   @ApiProperty()
-  @IsString()
+  @IsDateString()
   @IsNotEmpty()
   date: string
 
