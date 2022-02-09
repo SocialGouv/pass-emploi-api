@@ -19,7 +19,7 @@ import { CreerJeuneMiloCommandHandler } from './application/commands/creer-jeune
 import { DeleteActionCommandHandler } from './application/commands/delete-action.command.handler'
 import { DeleteFavoriOffreEmploiCommandHandler } from './application/commands/delete-favori-offre-emploi.command.handler'
 import { DeleteRendezVousCommandHandler } from './application/commands/delete-rendez-vous.command.handler'
-import { HandleJobRendezVousCommandHandler } from './application/commands/handle-job-rendez-vous.command'
+import { HandleJobRendezVousCommandHandler } from './application/commands/jobs/handle-job-rendez-vous.command'
 import { SendNotificationNouveauMessageCommandHandler } from './application/commands/send-notification-nouveau-message.command.handler'
 import { UpdateNotificationTokenCommandHandler } from './application/commands/update-notification-token.command.handler'
 import { UpdateStatutActionCommandHandler } from './application/commands/update-statut-action.command.handler'
@@ -97,7 +97,7 @@ import { CreateEvenementCommandHandler } from './application/commands/create-eve
 import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
 import { EvenementService, EvenementsRepositoryToken } from './domain/evenement'
 import { EvenementHttpSqlRepository } from './infrastructure/repositories/evenement-http-sql.repository'
-import { HandleJobMailConseillerCommandHandler } from './application/commands/handle-job-mail-conseiller.command'
+import { HandleJobMailConseillerCommandHandler } from './application/commands/jobs/handle-job-mail-conseiller.command'
 import { MailSendinblueClient } from './infrastructure/clients/mail-sendinblue.client'
 import { SynchronizeJobsCommandHandler } from './application/commands/synchronize-jobs.command'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from './application/queries/get-favoris-offres-emploi-jeune.query.handler'
@@ -110,6 +110,8 @@ import { RechercheSqlRepository } from './infrastructure/repositories/recherche-
 import { RecherchesRepositoryToken } from './domain/recherche'
 import { GetRecherchesQueryHandler } from './application/queries/get-recherches.query.handler'
 import { TransfererJeunesConseillerCommandHandler } from './application/commands/transferer-jeunes-conseiller.command.handler'
+import { InitJobsCommandHandler } from './application/commands/init-jobs.command'
+import { NotifierNouvellesOffresEmploiCommandHandler } from './application/commands/jobs/handle-job-notification-recherche.command'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -264,7 +266,9 @@ export function buildQueryCommandsProviders(): Provider[] {
     HandleJobMailConseillerCommandHandler,
     SynchronizeJobsCommandHandler,
     GetConseillerByEmailQueryHandler,
-    TransfererJeunesConseillerCommandHandler
+    TransfererJeunesConseillerCommandHandler,
+    InitJobsCommandHandler,
+    NotifierNouvellesOffresEmploiCommandHandler
   ]
 }
 

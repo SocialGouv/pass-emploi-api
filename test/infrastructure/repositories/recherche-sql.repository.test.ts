@@ -63,11 +63,9 @@ describe('RechercheSqlRepository', () => {
   describe('findAvantDate', () => {
     it('recupere les recherches avec le bon type et avant un certain jour', async () => {
       // Given
-      const dateMaintenant = uneDatetime.toJSDate()
-      const dateHier = uneDatetime.minus({ day: 1 }).toJSDate()
-      const dateRechercheAujourdhui = uneDatetime
-        .minus({ minute: 1 })
-        .toJSDate()
+      const dateMaintenant = uneDatetime
+      const dateHier = uneDatetime.minus({ day: 1 })
+      const dateRechercheAujourdhui = uneDatetime.minus({ minute: 1 })
       const limiteRecherches = 2
 
       const rechercheBonne = uneRecherche({

@@ -41,7 +41,7 @@ export class CreateRechercheCommandHandler extends CommandHandler<
   async handle(command: CreateRechercheCommand): Promise<Result<Core.Id>> {
     const idRecherche = this.idService.uuid()
 
-    const maintenant = this.dateService.nowJs()
+    const maintenant = this.dateService.now()
 
     const recherche: Recherche = {
       id: idRecherche,

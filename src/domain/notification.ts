@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 import { DateService } from '../utils/date-service'
+import { Recherche } from './recherche'
 
 export const NotificationRepositoryToken = 'NotificationRepositoryToken'
 
@@ -14,7 +15,7 @@ export namespace Notification {
     RAPPEL_RENDEZVOUS = 'RAPPEL_RENDEZVOUS',
     DELETED_RENDEZVOUS = 'DELETED_RENDEZVOUS',
     NEW_MESSAGE = 'NEW_MESSAGE',
-    NOUVELLE_OFFRE_EMPLOI = 'NOUVELLE_OFFRE_EMPLOI'
+    NOUVELLE_OFFRE = 'NOUVELLE_OFFRE'
   }
 
   export interface Message {
@@ -25,6 +26,7 @@ export namespace Notification {
     }
     data: {
       type: string
+      sousType?: string
       id?: string
     }
   }
@@ -48,16 +50,19 @@ export namespace Notification {
 
   export function createNouvelleOffreEmploi(
     token: string,
-    idRecherche: string
+    idRecherche: string,
+    titre: string,
+    typeRecherche: Recherche.Type
   ): Notification.Message {
     return {
       token,
       notification: {
-        title: "Nouvelle offre d'emploi !!!!",
-        body: 'PLOP'
+        title: titre,
+        body: 'De nouveaux résultats sont disponibles'
       },
       data: {
-        type: Type.NOUVELLE_OFFRE_EMPLOI,
+        type: Type.NOUVELLE_OFFRE,
+        sousType: typeRecherche,
         id: idRecherche
       }
     }

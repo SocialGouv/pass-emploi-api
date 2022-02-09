@@ -1,10 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Result, success } from 'src/building-blocks/types/result'
-import { Command } from '../../building-blocks/types/command'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { Planificateur, PlanificateurService } from '../../domain/planificateur'
-import { Chat, ChatRepositoryToken } from '../../domain/chat'
-import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
+import { Command } from '../../../building-blocks/types/command'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import {
+  Planificateur,
+  PlanificateurService
+} from '../../../domain/planificateur'
+import { Chat, ChatRepositoryToken } from '../../../domain/chat'
+import {
+  Conseiller,
+  ConseillersRepositoryToken
+} from '../../../domain/conseiller'
 
 export interface HandleJobMailConseillerCommand extends Command {
   job: Planificateur.Job<Planificateur.JobMailConseiller>

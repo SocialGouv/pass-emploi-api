@@ -12,8 +12,8 @@ export const uneRecherche = (args: Partial<Recherche> = {}): Recherche => {
       commune: '75017',
       query: 'Boulanger'
     },
-    dateCreation: uneDatetimeMoinsRecente.toJSDate(),
-    dateDerniereRecherche: uneDatetimeMoinsRecente.toJSDate(),
+    dateCreation: uneDatetimeMoinsRecente,
+    dateDerniereRecherche: uneDatetimeMoinsRecente,
     idJeune: '1',
     etat: Recherche.Etat.SUCCES
   }

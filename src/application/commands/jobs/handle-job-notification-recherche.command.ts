@@ -1,0 +1,196 @@
+import { Inject, Injectable } from '@nestjs/common'
+import {
+  failure,
+  isFailure,
+  isSuccess,
+  Result,
+  success
+} from 'src/building-blocks/types/result'
+import {
+  OffresEmploi,
+  OffresEmploiRepositoryToken
+} from 'src/domain/offre-emploi'
+import { Recherche, RecherchesRepositoryToken } from 'src/domain/recherche'
+import { DateService } from 'src/utils/date-service'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune'
+import {
+  Notification,
+  NotificationRepositoryToken
+} from '../../../domain/notification'
+import { OffresEmploiQueryModel } from '../../queries/query-models/offres-emploi.query-models'
+import { ErreurHttp } from '../../../building-blocks/types/domain-error'
+import { GetOffresEmploiQuery } from '../../queries/get-offres-emploi.query.handler'
+import { Command } from '../../../building-blocks/types/command'
+import { ConfigService } from '@nestjs/config'
+
+@Injectable()
+export class NotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
+  Command,
+  Stats
+> {
+  constructor(
+    private dateService: DateService,
+    @Inject(RecherchesRepositoryToken)
+    private rechercheRepository: Recherche.Repository,
+    @Inject(OffresEmploiRepositoryToken)
+    private offresEmploiRepository: OffresEmploi.Repository,
+    @Inject(NotificationRepositoryToken)
+    private notificationRepository: Notification.Repository,
+    @Inject(JeunesRepositoryToken)
+    private jeuneRepository: Jeune.Repository,
+    private configuration: ConfigService
+  ) {
+    super('NotifierNouvellesOffresEmploiCommandHandler')
+  }
+
+  async handle(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _command: Command
+  ): Promise<Result<Stats>> {
+    const maintenant = this.dateService.now()
+    const nombreRecherches = parseInt(
+      this.configuration.get(
+        'jobs.notificationRecherches.nombreDeRequetesEnParallele'
+      )!
+    )
+    const stats: Stats = {
+      succes: 0,
+      notificationsEnvoyees: 0,
+      429: 0,
+      echecs: 0
+    }
+
+    try {
+      while (true) {
+        const recherches = await this.rechercheRepository.findAvantDate(
+          [Recherche.Type.OFFRES_EMPLOI, Recherche.Type.OFFRES_ALTERNANCE],
+          nombreRecherches,
+          maintenant
+        )
+
+        const toutesLesRecherchesOntEteTraitees = !recherches.length
+        if (toutesLesRecherchesOntEteTraitees) {
+          break
+        }
+
+        const resultatsRecherches = await Promise.allSettled(
+          recherches.map(this.recupererLesNouvellesOffres.bind(this))
+        )
+
+        let ilYAeuUne429 = false
+
+        for (let i = 0; i < recherches.length; i++) {
+          const resultat = resultatsRecherches[i]
+          const recherche = recherches[i]
+          let etatRecherche: Recherche.Etat = Recherche.Etat.ECHEC
+
+          if (resultat.status === 'fulfilled' && isSuccess(resultat.value)) {
+            etatRecherche = Recherche.Etat.SUCCES
+            stats.succes = stats.succes + 1
+
+            if (resultat.value.data.results.length) {
+              const jeune = await this.jeuneRepository.get(recherche.idJeune)
+
+              if (jeune?.pushNotificationToken) {
+                stats.notificationsEnvoyees = stats.notificationsEnvoyees + 1
+
+                const notification = Notification.createNouvelleOffreEmploi(
+                  jeune.pushNotificationToken,
+                  recherche.id,
+                  recherche.titre,
+                  recherche.type
+                )
+                this.notificationRepository.send(notification)
+              }
+            }
+          }
+
+          await this.rechercheRepository.saveRecherche({
+            ...recherches[i],
+            dateDerniereRecherche: maintenant,
+            etat: etatRecherche
+          })
+
+          // Quand il y a une erreur
+          if (
+            (resultat.status === 'fulfilled' && isFailure(resultat.value)) ||
+            resultat.status === 'rejected'
+          ) {
+            stats.echecs = stats.echecs + 1
+            if (stats.echecs > 100) {
+              this.logger.error("Trop d'échecs dans le job")
+              break
+            }
+          }
+
+          // Quand il y a une 429
+          if (
+            resultat.status === 'fulfilled' &&
+            isFailure(resultat.value) &&
+            (resultat.value.error as ErreurHttp).statusCode === 429
+          ) {
+            stats['429'] = stats['429'] + 1
+            ilYAeuUne429 = true
+          }
+        }
+        if (ilYAeuUne429) {
+          this.logger.warn('Une 429 est apparue, on attend 10 secondes')
+          await new Promise(resolve => setTimeout(resolve, 10000))
+        } else {
+          this.logger.log('On attend 1 seconde')
+          await new Promise(resolve => setTimeout(resolve, 1000))
+        }
+      }
+
+      stats.tempsDExecution = maintenant.diffNow().milliseconds * -1
+      return success(stats)
+    } catch (e) {
+      this.logger.error("Le job de notifications s'est arrêté")
+      this.logger.log(stats)
+      return failure(e)
+    }
+  }
+
+  private async recupererLesNouvellesOffres(
+    recherche: Recherche
+  ): Promise<Result<OffresEmploiQueryModel>> {
+    const criteres = recherche.criteres as GetOffresEmploiQuery | undefined
+
+    const MIN_RESULTATS_OFFRES_PAGE = 1
+    const MIN_RESULTATS_OFFRES_LIMIT = 2
+
+    return this.offresEmploiRepository.findAll(
+      MIN_RESULTATS_OFFRES_PAGE,
+      MIN_RESULTATS_OFFRES_LIMIT,
+      criteres?.alternance,
+      criteres?.query,
+      criteres?.departement,
+      criteres?.experience,
+      criteres?.duree,
+      criteres?.contrat,
+      criteres?.rayon,
+      criteres?.commune,
+      recherche.dateDerniereRecherche
+    )
+  }
+
+  async authorize(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _command: Command
+  ): Promise<void> {
+    return
+  }
+
+  async monitor(): Promise<void> {
+    return
+  }
+}
+
+export interface Stats {
+  succes: number
+  notificationsEnvoyees: number
+  429: number
+  echecs: number
+  tempsDExecution?: number
+}

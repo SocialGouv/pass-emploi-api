@@ -6,6 +6,7 @@ import {
 } from 'src/application/queries/query-models/offres-emploi.query-models'
 import { Jeune } from './jeune'
 import { Result } from '../building-blocks/types/result'
+import { DateTime } from 'luxon'
 
 export interface OffreEmploi {
   id: string
@@ -38,7 +39,7 @@ export namespace OffresEmploi {
       contrat?: Contrat[],
       rayon?: number,
       commune?: string,
-      minDateCreation?: Date
+      minDateCreation?: DateTime
     ): Promise<Result<OffresEmploiQueryModel>>
 
     getOffreEmploiQueryModelById(

@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { NotifierNouvellesOffresEmploiCommandHandler } from 'src/application/commands/handle-job-notification-recherche.command'
+import { NotifierNouvellesOffresEmploiCommandHandler } from 'src/application/commands/jobs/handle-job-notification-recherche.command'
 import { Notification } from 'src/domain/notification'
 import {
   Contrat,
@@ -10,16 +10,20 @@ import {
 } from 'src/domain/offre-emploi'
 import { Recherche } from 'src/domain/recherche'
 import { DateService } from 'src/utils/date-service'
-import { uneDatetime } from 'test/fixtures/date.fixture'
+import {
+  uneDatetime,
+  uneDatetimeMoinsRecente
+} from 'test/fixtures/date.fixture'
 import { uneRecherche } from 'test/fixtures/recherche.fixture'
-import { GetOffresEmploiQuery } from '../../../src/application/queries/get-offres-emploi.query.handler'
-import { OffresEmploiQueryModel } from '../../../src/application/queries/query-models/offres-emploi.query-models'
-import { Jeune } from '../../../src/domain/jeune'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { uneOffreEmploiResumeQueryModel } from '../../fixtures/offre-emploi.fixture'
-import { createSandbox, expect, stubClass } from '../../utils'
-import { failure, success } from '../../../src/building-blocks/types/result'
-import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
+import { GetOffresEmploiQuery } from '../../../../src/application/queries/get-offres-emploi.query.handler'
+import { OffresEmploiQueryModel } from '../../../../src/application/queries/query-models/offres-emploi.query-models'
+import { Jeune } from '../../../../src/domain/jeune'
+import { unJeune } from '../../../fixtures/jeune.fixture'
+import { uneOffreEmploiResumeQueryModel } from '../../../fixtures/offre-emploi.fixture'
+import { createSandbox, expect, stubClass } from '../../../utils'
+import { failure, success } from '../../../../src/building-blocks/types/result'
+import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
+import { testConfig } from '../../../utils/module-for-testing'
 
 describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
   let notifierNouvellesOffresEmploiCommandHandler: NotifierNouvellesOffresEmploiCommandHandler
@@ -28,7 +32,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
   let notificationRepository: StubbedType<Notification.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
 
-  const date = uneDatetime.toJSDate()
+  const date = uneDatetime
 
   const offresEmploiQueryModelSansResultats: OffresEmploiQueryModel = {
     pagination: {
@@ -54,7 +58,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
     jeuneRepository = stubInterface(sandbox)
 
     const dateService = stubClass(DateService)
-    dateService.nowJs.returns(date)
+    dateService.now.returns(date)
 
     notifierNouvellesOffresEmploiCommandHandler =
       new NotifierNouvellesOffresEmploiCommandHandler(
@@ -62,13 +66,15 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         rechercheRepository,
         offresEmploiRepository,
         notificationRepository,
-        jeuneRepository
+        jeuneRepository,
+        testConfig()
       )
   })
 
   describe('quand tout va bien', () => {
     describe('quand il y a moins de 5 recherches', () => {
       const idJeune = '1'
+      const dateDerniereRecherche = uneDatetimeMoinsRecente
 
       let criteresRecherche1: GetOffresEmploiQuery
       let criteresRecherche2: GetOffresEmploiQuery
@@ -81,12 +87,14 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           uneRecherche({
             type: Recherche.Type.OFFRES_EMPLOI,
             criteres: criteresRecherche1,
-            idJeune
+            idJeune,
+            dateDerniereRecherche
           }),
           uneRecherche({
             type: Recherche.Type.OFFRES_EMPLOI,
             criteres: criteresRecherche2,
-            idJeune
+            idJeune,
+            dateDerniereRecherche
           })
         ]
 
@@ -114,15 +122,29 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         expect(offresEmploiRepository.findAll).to.have.callCount(2)
         expect(offresEmploiRepository.findAll).to.have.been.calledWith(
           1,
-          1,
+          2,
           undefined,
-          'test1'
+          'test1',
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          dateDerniereRecherche
         )
         expect(offresEmploiRepository.findAll).to.have.been.calledWith(
           1,
-          1,
+          2,
           undefined,
-          'test2'
+          'test2',
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          dateDerniereRecherche
         )
       })
       it('recupère les nouvelles offres avec tous les criteres', async () => {
@@ -172,7 +194,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         // Then
         expect(offresEmploiRepository.findAll).to.have.been.calledWithExactly(
           1,
-          1,
+          2,
           criteres.alternance,
           criteres.query,
           criteres.departement,
@@ -188,7 +210,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         // Given
         offresEmploiRepository.findAll
           .resolves(success(offresEmploiQueryModelSansResultats))
-          .withArgs(1, 1, undefined, criteresRecherche1.query)
+          .withArgs(1, 2, undefined, criteresRecherche1.query)
           .resolves(success(offresEmploiQueryModel))
 
         jeuneRepository.get.withArgs(idJeune).resolves(unJeune())
@@ -199,9 +221,13 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         // Then
         expect(notificationRepository.send).to.have.been.calledWithExactly({
           token: 'unToken',
-          notification: { title: "Nouvelle offre d'emploi !!!!", body: 'PLOP' },
+          notification: {
+            title: 'Boulanger en alternance',
+            body: 'De nouveaux résultats sont disponibles'
+          },
           data: {
-            type: 'NOUVELLE_OFFRE_EMPLOI',
+            type: 'NOUVELLE_OFFRE',
+            sousType: 'OFFRES_EMPLOI',
             id: '219e8ba5-cd88-4027-9828-55e8ca99a236'
           }
         })
@@ -389,9 +415,13 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         expect(notificationRepository.send).to.have.callCount(1)
         expect(notificationRepository.send).to.have.been.calledWithExactly({
           token: 'unToken',
-          notification: { title: "Nouvelle offre d'emploi !!!!", body: 'PLOP' },
+          notification: {
+            title: 'Boulanger en alternance',
+            body: 'De nouveaux résultats sont disponibles'
+          },
           data: {
-            type: 'NOUVELLE_OFFRE_EMPLOI',
+            type: 'NOUVELLE_OFFRE',
+            sousType: 'OFFRES_EMPLOI',
             id: '219e8ba5-cd88-4027-9828-55e8ca99a232'
           }
         })

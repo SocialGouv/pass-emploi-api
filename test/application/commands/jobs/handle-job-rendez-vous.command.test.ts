@@ -4,13 +4,13 @@ import { SinonSandbox } from 'sinon'
 import {
   HandleJobRendezVousCommand,
   HandleJobRendezVousCommandHandler
-} from '../../../src/application/commands/handle-job-rendez-vous.command'
-import { Planificateur } from '../../../src/domain/planificateur'
-import { RendezVous } from '../../../src/domain/rendez-vous'
-import { Notification } from '../../../src/domain/notification'
-import { DateService } from '../../../src/utils/date-service'
-import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+} from '../../../../src/application/commands/jobs/handle-job-rendez-vous.command'
+import { Planificateur } from '../../../../src/domain/planificateur'
+import { RendezVous } from '../../../../src/domain/rendez-vous'
+import { Notification } from '../../../../src/domain/notification'
+import { DateService } from '../../../../src/utils/date-service'
+import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 
 describe('HandlerJobRendezVousCommandHandler', () => {
   let handlerJobRendezVousCommandHandler: HandleJobRendezVousCommandHandler

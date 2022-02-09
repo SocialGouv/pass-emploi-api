@@ -1,6 +1,7 @@
 import { GetOffresEmploiQuery } from 'src/application/queries/get-offres-emploi.query.handler'
 import { GetOffresImmersionQuery } from 'src/application/queries/get-offres-immersion.query.handler'
 import { RechercheQueryModel } from '../application/queries/query-models/recherches.query-model'
+import { DateTime } from 'luxon'
 
 export const RecherchesRepositoryToken = 'RecherchesRepositoryToken'
 
@@ -12,8 +13,8 @@ export interface Recherche {
   localisation?: string
   criteres?: GetOffresEmploiQuery | GetOffresImmersionQuery
   idJeune: string
-  dateCreation: Date
-  dateDerniereRecherche: Date
+  dateCreation: DateTime
+  dateDerniereRecherche: DateTime
   etat: Recherche.Etat
 }
 
@@ -35,7 +36,7 @@ export namespace Recherche {
     findAvantDate(
       typeRecherches: Recherche.Type[],
       nombreRecherches: number,
-      date: Date
+      date: DateTime
     ): Promise<Recherche[]>
   }
 }

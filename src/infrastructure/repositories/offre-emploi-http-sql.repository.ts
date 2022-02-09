@@ -24,12 +24,17 @@ import {
 } from './mappers/offres-emploi.mappers'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
+import { DateService } from '../../utils/date-service'
+import { DateTime } from 'luxon'
 
 @Injectable()
 export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
   private logger: Logger
 
-  constructor(private poleEmploiClient: PoleEmploiClient) {
+  constructor(
+    private poleEmploiClient: PoleEmploiClient,
+    private dateService: DateService
+  ) {
     this.logger = new Logger('OffresEmploiHttpSqlRepository')
   }
 
@@ -44,7 +49,7 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
     contrat?: Contrat[],
     rayon?: number,
     commune?: string,
-    minDateCreation?: Date
+    minDateCreation?: DateTime
   ): Promise<Result<OffresEmploiQueryModel>> {
     const params = new URLSearchParams()
     params.append('sort', '1')
@@ -78,7 +83,21 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
       params.append('commune', commune)
     }
     if (minDateCreation) {
-      params.append('minCreationDate', minDateCreation.toISOString())
+      params.append(
+        'minCreationDate',
+        minDateCreation
+          .toUTC()
+          .set({ millisecond: 0 })
+          .toISO({ suppressMilliseconds: true })
+      )
+      params.append(
+        'maxCreationDate',
+        this.dateService
+          .now()
+          .toUTC()
+          .set({ millisecond: 0 })
+          .toISO({ suppressMilliseconds: true })
+      )
     }
 
     try {

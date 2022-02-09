@@ -5,8 +5,9 @@ import {
   PlanificateurRepositoryToken
 } from '../domain/planificateur'
 import { getAPMInstance } from '../infrastructure/monitoring/apm.init'
-import { HandleJobMailConseillerCommandHandler } from './commands/handle-job-mail-conseiller.command'
-import { HandleJobRendezVousCommandHandler } from './commands/handle-job-rendez-vous.command'
+import { HandleJobMailConseillerCommandHandler } from './commands/jobs/handle-job-mail-conseiller.command'
+import { HandleJobRendezVousCommandHandler } from './commands/jobs/handle-job-rendez-vous.command'
+import { NotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notification-recherche.command'
 
 @Injectable()
 export class WorkerService {
@@ -17,7 +18,8 @@ export class WorkerService {
     @Inject(PlanificateurRepositoryToken)
     private planificateurRepository: Planificateur.Repository,
     private handlerJobRendezVousCommandHandler: HandleJobRendezVousCommandHandler,
-    private handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler
+    private handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler,
+    private notifierNouvellesOffresEmploiCommandHandler: NotifierNouvellesOffresEmploiCommandHandler
   ) {
     this.apmService = getAPMInstance()
   }
@@ -46,6 +48,8 @@ export class WorkerService {
         await this.handleJobMailConseillerCommandHandler.execute({
           job: job as Planificateur.Job<Planificateur.JobMailConseiller>
         })
+      } else if (job.type === Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI) {
+        await this.notifierNouvellesOffresEmploiCommandHandler.execute({})
       } else if (job.type === Planificateur.JobEnum.FAKE) {
         this.logger.log({
           job,

@@ -66,7 +66,12 @@ export const testConfig = (): ConfigService => {
       apiKey: 'sendinblueapiKey',
       templateId: '21'
     },
-    frontEndUrl: 'http://frontend.com'
+    frontEndUrl: 'http://frontend.com',
+    jobs: {
+      notificationRecherches: {
+        nombreDeRequetesEnParallele: '5'
+      }
+    }
   })
 }
 

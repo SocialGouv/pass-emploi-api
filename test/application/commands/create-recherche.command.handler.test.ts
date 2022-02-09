@@ -29,7 +29,7 @@ describe('CreateRechercheCommandHandler', () => {
   let createRechercheCommandHandler: CreateRechercheCommandHandler
   let dateService: StubbedClass<DateService>
 
-  const date = uneDatetime.toJSDate()
+  const date = uneDatetime
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
@@ -39,7 +39,7 @@ describe('CreateRechercheCommandHandler', () => {
     idService = stubClass(IdService)
 
     dateService = stubClass(DateService)
-    dateService.nowJs.returns(date)
+    dateService.now.returns(date)
 
     createRechercheCommandHandler = new CreateRechercheCommandHandler(
       rechercheRepository,

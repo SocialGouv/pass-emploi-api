@@ -35,11 +35,9 @@ export class RechercheSqlRepository implements Recherche.Repository {
   async findAvantDate(
     typeRecherches: Recherche.Type[],
     nombreRecherches: number,
-    date: Date
+    date: DateTime
   ): Promise<Recherche[]> {
-    const dateAMinuit = DateTime.fromJSDate(date)
-      .set({ hour: 0, minute: 0, second: 0 })
-      .toJSDate()
+    const dateAMinuit = date.set({ hour: 0, minute: 0, second: 0 }).toJSDate()
     const recherchesSql = await RechercheSqlModel.findAll({
       where: {
         type: {
@@ -61,8 +59,10 @@ export class RechercheSqlRepository implements Recherche.Repository {
         localisation: rechercheSql.localisation ?? undefined,
         criteres: rechercheSql.criteres ?? undefined,
         idJeune: rechercheSql.idJeune,
-        dateCreation: rechercheSql.dateCreation,
-        dateDerniereRecherche: rechercheSql.dateDerniereRecherche,
+        dateCreation: DateTime.fromJSDate(rechercheSql.dateCreation),
+        dateDerniereRecherche: DateTime.fromJSDate(
+          rechercheSql.dateDerniereRecherche
+        ),
         etat: rechercheSql.etatDerniereRecherche
       }
     })

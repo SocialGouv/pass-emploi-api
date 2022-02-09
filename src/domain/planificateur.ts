@@ -8,8 +8,14 @@ export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 export namespace Planificateur {
   export interface Repository {
     createJob<T>(job: Job<T>): Promise<void>
+    createCron(cron: Cron): Promise<void>
+    cronExiste(job: CronJob): Promise<boolean>
     subscribe(callback: Handler<unknown>): Promise<void>
     supprimerTousLesJobs(): Promise<void>
+  }
+
+  export enum CronJob {
+    NOUVELLES_OFFRES_EMPLOI = 'NOUVELLES_OFFRES_EMPLOI'
   }
 
   export enum JobEnum {
@@ -34,8 +40,13 @@ export namespace Planificateur {
 
   export interface Job<T = JobType> {
     date: Date
-    type: JobEnum
+    type: JobEnum | CronJob
     contenu: T
+  }
+
+  export interface Cron {
+    type: CronJob
+    expression: string
   }
 
   export interface Handler<T> {
@@ -50,6 +61,17 @@ export class PlanificateurService {
     private planificateurRepository: Planificateur.Repository,
     private dateService: DateService
   ) {}
+
+  async planifierCron(cronJob: Planificateur.CronJob): Promise<void> {
+    switch (cronJob) {
+      case Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI:
+        const cron: Planificateur.Cron = {
+          type: Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI,
+          expression: '0 8 * * *'
+        }
+        await this.planificateurRepository.createCron(cron)
+    }
+  }
 
   async planifierRappelsRendezVous(rendezVous: RendezVous): Promise<void> {
     const now = this.dateService.now()

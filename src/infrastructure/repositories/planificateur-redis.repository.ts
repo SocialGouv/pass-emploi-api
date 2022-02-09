@@ -75,13 +75,22 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     await this.queue.close()
   }
 
-  // @ts-ignore
-  createCron (cron: Planificateur.Cron): Promise<void> {
-    return Promise.resolve(undefined);
+  async createCron(cron: Planificateur.Cron): Promise<void> {
+    await this.queue.add(cron, {
+      jobId: cron.type,
+      repeat: { cron: cron.expression }
+    })
   }
 
-  // @ts-ignore
-  cronExiste (job: Planificateur.CronJob): Promise<boolean> {
-    return Promise.resolve(false);
+  async cronExiste(_job: Planificateur.CronJob): Promise<boolean> {
+    const crons = await this.queue.getRepeatableJobs()
+    let cronExiste = false
+    crons.forEach(cron => {
+      if (cron.id === _job) {
+        cronExiste = false
+      }
+    })
+
+    return cronExiste
   }
 }
