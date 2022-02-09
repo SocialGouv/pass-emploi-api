@@ -74,4 +74,14 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
   async disconnect(): Promise<void> {
     await this.queue.close()
   }
+
+  // @ts-ignore
+  createCron (cron: Planificateur.Cron): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
+  // @ts-ignore
+  cronExiste (job: Planificateur.CronJob): Promise<boolean> {
+    return Promise.resolve(false);
+  }
 }

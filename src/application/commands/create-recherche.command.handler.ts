@@ -11,6 +11,7 @@ import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { GetOffresEmploiQuery } from '../queries/get-offres-emploi.query.handler'
 import { GetOffresImmersionQuery } from '../queries/get-offres-immersion.query.handler'
 import { Evenement, EvenementService } from '../../domain/evenement'
+import { DateService } from 'src/utils/date-service'
 
 export interface CreateRechercheCommand extends Command {
   idJeune: string
@@ -31,7 +32,8 @@ export class CreateRechercheCommandHandler extends CommandHandler<
     private rechercheRepository: Recherche.Repository,
     private idService: IdService,
     private jeuneAuthorizer: JeuneAuthorizer,
-    private evenementService: EvenementService
+    private evenementService: EvenementService,
+    private dateService: DateService
   ) {
     super('CreateRechercheCommandHandler')
   }
@@ -39,16 +41,22 @@ export class CreateRechercheCommandHandler extends CommandHandler<
   async handle(command: CreateRechercheCommand): Promise<Result<Core.Id>> {
     const idRecherche = this.idService.uuid()
 
-    const recherche = {
+    const maintenant = this.dateService.nowJs()
+
+    const recherche: Recherche = {
       id: idRecherche,
       type: command.type,
       titre: command.titre,
       metier: command.metier,
       localisation: command.localisation,
-      criteres: command.criteres
+      criteres: command.criteres,
+      idJeune: command.idJeune,
+      dateCreation: maintenant,
+      dateDerniereRecherche: maintenant,
+      etat: Recherche.Etat.SUCCES
     }
 
-    await this.rechercheRepository.saveRecherche(command.idJeune, recherche)
+    await this.rechercheRepository.saveRecherche(recherche)
     return success({ id: idRecherche })
   }
 

@@ -13,7 +13,8 @@ export namespace Notification {
     NEW_RENDEZVOUS = 'NEW_RENDEZVOUS',
     RAPPEL_RENDEZVOUS = 'RAPPEL_RENDEZVOUS',
     DELETED_RENDEZVOUS = 'DELETED_RENDEZVOUS',
-    NEW_MESSAGE = 'NEW_MESSAGE'
+    NEW_MESSAGE = 'NEW_MESSAGE',
+    NOUVELLE_OFFRE_EMPLOI = 'NOUVELLE_OFFRE_EMPLOI'
   }
 
   export interface Message {
@@ -41,6 +42,23 @@ export namespace Notification {
       data: {
         type: Type.NEW_ACTION,
         id: idAction
+      }
+    }
+  }
+
+  export function createNouvelleOffreEmploi(
+    token: string,
+    idRecherche: string
+  ): Notification.Message {
+    return {
+      token,
+      notification: {
+        title: "Nouvelle offre d'emploi !!!!",
+        body: 'PLOP'
+      },
+      data: {
+        type: Type.NOUVELLE_OFFRE_EMPLOI,
+        id: idRecherche
       }
     }
   }

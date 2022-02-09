@@ -20,6 +20,7 @@ import {
   GetDetailOffreEmploiQueryHandler
 } from '../../../src/application/queries/get-detail-offre-emploi.query.handler'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { success } from '../../../src/building-blocks/types/result'
 
 describe('OffresEmploiController', () => {
   let getOffresEmploiQueryHandler: StubbedClass<GetOffresEmploiQueryHandler>
@@ -82,7 +83,9 @@ describe('OffresEmploiController', () => {
         results: [uneOffreEmploiResumeQueryModel()]
       }
 
-      getOffresEmploiQueryHandler.execute.resolves(offresEmploiQueryModel)
+      getOffresEmploiQueryHandler.execute.resolves(
+        success(offresEmploiQueryModel)
+      )
 
       // When
       await request(app.getHttpServer())

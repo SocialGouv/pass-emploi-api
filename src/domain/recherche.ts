@@ -11,6 +11,10 @@ export interface Recherche {
   metier?: string
   localisation?: string
   criteres?: GetOffresEmploiQuery | GetOffresImmersionQuery
+  idJeune: string
+  dateCreation: Date
+  dateDerniereRecherche: Date
+  etat: Recherche.Etat
 }
 
 export namespace Recherche {
@@ -20,8 +24,18 @@ export namespace Recherche {
     OFFRES_ALTERNANCE = 'OFFRES_ALTERNANCE'
   }
 
+  export enum Etat {
+    SUCCES = 'SUCCES',
+    ECHEC = 'ECHEC'
+  }
+
   export interface Repository {
-    saveRecherche(idJeune: string, recherche: Recherche): Promise<void>
+    saveRecherche(recherche: Recherche): Promise<void>
     getRecherches(idJeune: string): Promise<RechercheQueryModel[]>
+    findAvantDate(
+      typeRecherches: Recherche.Type[],
+      nombreRecherches: number,
+      date: Date
+    ): Promise<Recherche[]>
   }
 }

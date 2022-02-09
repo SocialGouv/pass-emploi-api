@@ -227,6 +227,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
     describe('fait appel à l"API de Pôle Emploi avec les bons paramètres', () => {
       it('quand tous les query params sont fournis', async () => {
         // Given
+        const date = new Date(2022, 2, 1, 12)
         poleEmploiClient.get.resolves({
           config: undefined,
           headers: undefined,
@@ -245,7 +246,9 @@ describe('OffresEmploiHttpSqlRepository', () => {
           [Experience.entreUnEtTroisAns, Experience.plusDeTroisAns],
           [Duree.tempsPlein],
           [Contrat.cdi, Contrat.autre],
-          15
+          15,
+          'Paris',
+          date
         )
         const expectedQueryParams = new URLSearchParams({
           sort: '1',
@@ -256,7 +259,9 @@ describe('OffresEmploiHttpSqlRepository', () => {
           experience: '2,3',
           dureeHebdo: '1',
           typeContrat: 'CDI,DIN,CCE,FRA,LIB,REP,TTI',
-          distance: '15'
+          distance: '15',
+          commune: 'Paris',
+          minCreationDate: '2022-03-01T11:00:00.000Z'
         })
 
         // Then

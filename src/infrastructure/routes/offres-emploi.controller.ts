@@ -22,6 +22,9 @@ import {
 import { FindOffresEmploiQueryParams } from './validation/offres-emploi.inputs'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
+import { isFailure } from '../../building-blocks/types/result'
+import { ErreurHttp } from '../../building-blocks/types/domain-error'
+import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 
 @Controller('offres-emploi')
 @ApiOAuth2([])
@@ -36,7 +39,7 @@ export class OffresEmploiController {
   @ApiResponse({
     type: OffresEmploiQueryModel
   })
-  getOffresEmploi(
+  async getOffresEmploi(
     @Query() findOffresEmploiQuery: FindOffresEmploiQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffresEmploiQueryModel> {
@@ -53,7 +56,22 @@ export class OffresEmploiController {
       commune: findOffresEmploiQuery.commune
     }
 
-    return this.getOffresEmploiQueryHandler.execute(query, utilisateur)
+    const result = await this.getOffresEmploiQueryHandler.execute(
+      query,
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      if (result.error.code === ErreurHttp.CODE) {
+        throw new HttpException(
+          result.error.message,
+          (result.error as ErreurHttp).statusCode
+        )
+      }
+      throw new RuntimeException(result.error.message)
+    }
+
+    return result.data
   }
 
   @Get(':idOffreEmploi')
