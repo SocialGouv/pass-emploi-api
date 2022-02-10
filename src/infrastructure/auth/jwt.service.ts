@@ -25,7 +25,7 @@ export class JwtService implements IJwtService {
     } catch (error) {
       if (error instanceof errors.JWKSNoMatchingKey) {
         this.cacheJWKS = undefined
-        return await this.verifyTokenAndGetJwtWithoutRetry(token)
+        return this.verifyTokenAndGetJwtWithoutRetry(token)
       }
       throw error
     }

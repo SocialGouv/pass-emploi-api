@@ -18,13 +18,13 @@ export class ImmersionClient {
   }
 
   async post(suffixUrl: string, payload?: unknown): Promise<AxiosResponse> {
-    return await firstValueFrom(
+    return firstValueFrom(
       this.httpService.post(`${this.apiUrl}/${suffixUrl}`, payload)
     )
   }
 
   async get(suffixUrl: string): Promise<AxiosResponse> {
-    return await firstValueFrom(
+    return firstValueFrom(
       this.httpService.get(`${this.apiUrl}/${suffixUrl}`, {
         headers: {
           Authorization: this.immersionApiKey

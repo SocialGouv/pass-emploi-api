@@ -27,6 +27,6 @@ export class ReferentielsController {
   ): Promise<CommunesEtDepartementsQueryModel[]> {
     const query: GetCommunesEtDepartementsQuery = { recherche }
     query.villesOnly = villesOnly === 'true'
-    return await this.getCommunesEtDepartementsQueryHandler.execute(query)
+    return this.getCommunesEtDepartementsQueryHandler.execute(query)
   }
 }

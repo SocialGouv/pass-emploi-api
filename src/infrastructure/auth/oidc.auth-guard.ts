@@ -29,7 +29,7 @@ export class OidcAuthGuard implements CanActivate {
     if (this.isPublic(context) || this.isSkipOidcAuth(context)) {
       return true
     }
-    return await this.checkJWT(context)
+    return this.checkJWT(context)
   }
 
   private async checkJWT(context: ExecutionContext): Promise<boolean> {

@@ -33,8 +33,7 @@ export type RedisClient = RedisClientType<
       arrTrim: typeof import('@node-redis/json/dist/commands/ARRTRIM')
       DEBUG_MEMORY: typeof import('@node-redis/json/dist/commands/DEBUG_MEMORY')
       debugMemory: typeof import('@node-redis/json/dist/commands/DEBUG_MEMORY')
-      DEL: typeof import('@node-redis/json/dist/commands/DEL') // Given
-      // Given
+      DEL: typeof import('@node-redis/json/dist/commands/DEL')
       del: typeof import('@node-redis/json/dist/commands/DEL')
       FORGET: typeof import('@node-redis/json/dist/commands/FORGET')
       forget: typeof import('@node-redis/json/dist/commands/FORGET')

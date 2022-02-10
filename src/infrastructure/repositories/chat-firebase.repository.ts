@@ -34,15 +34,13 @@ export class ChatFirebaseRepository implements Chat.Repository {
   }
 
   async getNombreDeConversationsNonLues(conseillerId: string): Promise<number> {
-    return await this.firebaseClient.getNombreDeConversationsNonLues(
-      conseillerId
-    )
+    return this.firebaseClient.getNombreDeConversationsNonLues(conseillerId)
   }
 
   async transfererChat(
     conseillerCibleId: string,
     jeuneIds: string[]
   ): Promise<void> {
-    return await this.firebaseClient.transfererChat(conseillerCibleId, jeuneIds)
+    return this.firebaseClient.transfererChat(conseillerCibleId, jeuneIds)
   }
 }
