@@ -14,10 +14,9 @@ on:
   push:
     branches: [ develop ]
   pull_request:
-    # The branches below must be a subset of the branches above
     branches: [ develop ]
   schedule:
-    - cron: '29 17 * * 3'
+    - cron: '0 8 * * 1' # Tous les lundis à 8h
 
 jobs:
   semgrep:
