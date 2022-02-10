@@ -57,7 +57,12 @@ export function fromSqlToRendezVousConseillerQueryModel(
     title: `${rendezVousSql.jeune.prenom} ${rendezVousSql.jeune.nom}`,
     date: rendezVousSql.date,
     modality: rendezVousSql.modalite,
-    duration: rendezVousSql.duree
+    duration: rendezVousSql.duree,
+    jeune: {
+      id: rendezVousSql.jeune.id,
+      prenom: rendezVousSql.jeune.prenom,
+      nom: rendezVousSql.jeune.nom
+    }
   }
 }
 
@@ -70,6 +75,16 @@ export function fromSqlToRendezVousJeuneQueryModel(
     title: `${rendezVousSql.jeune.conseiller.prenom} ${rendezVousSql.jeune.conseiller.nom}`,
     date: rendezVousSql.date,
     modality: rendezVousSql.modalite,
-    duration: rendezVousSql.duree
+    duration: rendezVousSql.duree,
+    jeune: {
+      id: rendezVousSql.jeune.id,
+      prenom: rendezVousSql.jeune.prenom,
+      nom: rendezVousSql.jeune.nom
+    },
+    conseiller: {
+      id: rendezVousSql.jeune.conseiller.id,
+      prenom: rendezVousSql.jeune.conseiller.prenom,
+      nom: rendezVousSql.jeune.conseiller.nom
+    }
   }
 }
