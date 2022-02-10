@@ -1,13 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsDateString, IsNotEmpty, IsNumber, IsString } from 'class-validator'
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator'
 
 export class CreateRendezVousPayload {
   @ApiProperty()
   @IsString()
   comment: string
 
+  // TODO: ajouter IsDateString() après mep du web
   @ApiProperty()
-  @IsDateString()
+  @IsString()
   @IsNotEmpty()
   date: string
 
