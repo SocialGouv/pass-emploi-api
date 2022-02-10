@@ -52,12 +52,8 @@ export function fromSqlToRendezVousConseillerQueryModel(
   rendezVousSql: RendezVousSqlModel
 ): RendezVousQueryModel {
   return {
-    id: rendezVousSql.id,
-    comment: rendezVousSql.commentaire ?? undefined,
-    title: `${rendezVousSql.jeune.prenom} ${rendezVousSql.jeune.nom}`,
-    date: rendezVousSql.date,
-    modality: rendezVousSql.modalite,
-    duration: rendezVousSql.duree
+    ...fromSqlToRendezVousQueryModel(rendezVousSql),
+    title: `${rendezVousSql.jeune.prenom} ${rendezVousSql.jeune.nom}`
   }
 }
 
@@ -65,11 +61,29 @@ export function fromSqlToRendezVousJeuneQueryModel(
   rendezVousSql: RendezVousSqlModel
 ): RendezVousQueryModel {
   return {
+    ...fromSqlToRendezVousQueryModel(rendezVousSql),
+    title: `${rendezVousSql.jeune.conseiller.prenom} ${rendezVousSql.jeune.conseiller.nom}`,
+    conseiller: {
+      id: rendezVousSql.jeune.conseiller.id,
+      prenom: rendezVousSql.jeune.conseiller.prenom,
+      nom: rendezVousSql.jeune.conseiller.nom
+    }
+  }
+}
+
+function fromSqlToRendezVousQueryModel(
+  rendezVousSql: RendezVousSqlModel
+): Omit<RendezVousQueryModel, 'title'> {
+  return {
     id: rendezVousSql.id,
     comment: rendezVousSql.commentaire ?? undefined,
-    title: `${rendezVousSql.jeune.conseiller.prenom} ${rendezVousSql.jeune.conseiller.nom}`,
     date: rendezVousSql.date,
     modality: rendezVousSql.modalite,
-    duration: rendezVousSql.duree
+    duration: rendezVousSql.duree,
+    jeune: {
+      id: rendezVousSql.jeune.id,
+      prenom: rendezVousSql.jeune.prenom,
+      nom: rendezVousSql.jeune.nom
+    }
   }
 }

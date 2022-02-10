@@ -1,5 +1,27 @@
 import { ApiProperty } from '@nestjs/swagger'
 
+class JeuneQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
+  nom: string
+
+  @ApiProperty()
+  prenom: string
+}
+
+class ConseillerQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
+  nom: string
+
+  @ApiProperty()
+  prenom: string
+}
+
 export interface RendezVousBaseQueryModel {
   id: string
   title: string
@@ -25,6 +47,12 @@ export class RendezVousQueryModel implements RendezVousBaseQueryModel {
 
   @ApiProperty()
   duration: number
+
+  @ApiProperty()
+  jeune: JeuneQueryModel
+
+  @ApiProperty({ required: false })
+  conseiller?: ConseillerQueryModel
 }
 
 export class RendezVousConseillerQueryModel {

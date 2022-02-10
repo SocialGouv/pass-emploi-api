@@ -140,7 +140,9 @@ describe('RendezVousRepositorySql', () => {
       // Then
       expect(rendezVous.passes.length).to.equal(2)
       expect(rendezVous.passes[0].id).to.equal(unRendezVousPasse.id)
+      expect(rendezVous.passes[0].jeune.id).to.equal(jeune.id)
       expect(rendezVous.passes[1].id).to.equal(unRendezVousTresPasse.id)
+      expect(rendezVous.passes[1].jeune.id).to.equal(jeune.id)
     })
 
     it('retourne les rendez-vous à venir du conseiller', async () => {
