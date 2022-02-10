@@ -29,7 +29,7 @@
     "start:db:pg:test": "docker-compose up -d pgtestdb && ./test/utils/wait-for-db.sh && DATABASE_URL=postgresql://test:test@localhost:56432/test yarn migration",
     "start:db:redis:test": "docker-compose up -d redistestdb",
     "test": "yarn start:db:test && nyc mocha 'test/**/*.test.ts' --exit --timeout 10000",
-    "test:ci": "yarn migration && nyc mocha 'test/**/*.test.ts' --exit --timeout 10000",
+    "test:ci": "yarn migration && nyc --reporter=lcovonly mocha 'test/**/*.test.ts' --exit --timeout 10000",
     "watch": "yarn start:pg:db && yarn start:redis:db && nest start --watch | npx pino-pretty",
     "run:with:apm": "yarn start:pg:db && yarn start:redis:db && dotenv -e .environment nest start --watch | npx pino-pretty",
     "tasks:init-all-jobs": "IS_WEB=false RUN_TASK_INIT_ALL_JOBS=true node dist/main",
