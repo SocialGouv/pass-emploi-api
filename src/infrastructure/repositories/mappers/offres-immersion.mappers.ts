@@ -29,7 +29,7 @@ interface OffreImmpersionDto {
   city: string
   distance_m?: number
   contactId?: string
-  contactMode?: 'UNKNOWN' | 'EMAIL' | 'PHONE' | 'IN_PERSON' | undefined
+  contactMode?: 'UNKNOWN' | 'EMAIL' | 'PHONE' | 'IN_PERSON'
   contactDetails:
     | {
         id: string

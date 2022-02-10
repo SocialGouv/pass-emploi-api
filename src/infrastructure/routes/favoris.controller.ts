@@ -69,7 +69,7 @@ export class FavorisController {
     @Query() getFavorisQuery: GetFavorisOffresEmploiQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiIdQueryModel[]> {
-    return await this.getFavorisOffresEmploiJeuneQueryHandler.execute(
+    return this.getFavorisOffresEmploiJeuneQueryHandler.execute(
       { idJeune, detail: getFavorisQuery.detail === 'true' },
       utilisateur
     )
@@ -81,7 +81,7 @@ export class FavorisController {
     @Query() getFavorisQuery: GetFavorisOffresImmersionQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffreImmersionQueryModel[] | FavoriOffreImmersionIdQueryModel[]> {
-    return await this.getFavorisOffresImmersionJeuneQueryHandler.execute(
+    return this.getFavorisOffresImmersionJeuneQueryHandler.execute(
       { idJeune, detail: getFavorisQuery.detail === 'true' },
       utilisateur
     )

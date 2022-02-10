@@ -12,7 +12,7 @@ export class ApiKeyAuthGuard implements CanActivate {
   constructor(private configService: ConfigService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    return await this.checkApiKey(context)
+    return this.checkApiKey(context)
   }
 
   private async checkApiKey(context: ExecutionContext): Promise<boolean> {

@@ -24,7 +24,7 @@ export class GetChatSecretsQueryHandler extends QueryHandler<
   async handle(
     query: GetChatSecretsQuery
   ): Promise<ChatSecretsQueryModel | undefined> {
-    return await this.chatRepository.getChatSecretsQueryModel(query.utilisateur)
+    return this.chatRepository.getChatSecretsQueryModel(query.utilisateur)
   }
 
   async authorize(

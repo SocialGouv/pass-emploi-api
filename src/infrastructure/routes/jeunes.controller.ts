@@ -136,7 +136,7 @@ export class JeunesController {
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<JeuneHomeQueryModel> {
-    return await this.getHomeJeuneHandler.execute({ idJeune }, utilisateur)
+    return this.getHomeJeuneHandler.execute({ idJeune }, utilisateur)
   }
 
   @Get(':idJeune/actions')
@@ -148,10 +148,7 @@ export class JeunesController {
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<ActionQueryModel[]> {
-    return await this.getActionsByJeuneQueryHandler.execute(
-      { idJeune },
-      utilisateur
-    )
+    return this.getActionsByJeuneQueryHandler.execute({ idJeune }, utilisateur)
   }
 
   @Get(':idJeune/rendezvous')
@@ -163,7 +160,7 @@ export class JeunesController {
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<RendezVousQueryModel[]> {
-    return await this.getAllRendezVousJeuneQueryHandler.execute(
+    return this.getAllRendezVousJeuneQueryHandler.execute(
       { idJeune },
       utilisateur
     )
@@ -213,7 +210,7 @@ export class JeunesController {
     @Query() getFavorisQuery: GetFavorisOffresEmploiQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiIdQueryModel[]> {
-    return await this.getFavorisOffresEmploiJeuneQueryHandler.execute(
+    return this.getFavorisOffresEmploiJeuneQueryHandler.execute(
       { idJeune, detail: getFavorisQuery.detail === 'true' },
       utilisateur
     )

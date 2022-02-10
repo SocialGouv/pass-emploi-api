@@ -32,7 +32,7 @@ export class DetailJeuneQueryModel {
   isActivated: boolean
 
   @ApiProperty({ required: false })
-  lastActivity?: string | undefined
+  lastActivity?: string
 
   @ApiProperty({ required: false })
   conseillerPrecedent?: ConseillerQueryModel

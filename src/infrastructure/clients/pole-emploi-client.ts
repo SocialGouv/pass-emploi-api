@@ -28,7 +28,7 @@ export class PoleEmploiClient {
 
   async get(suffixUrl: string, params?: unknown): Promise<AxiosResponse> {
     const token = await this.getToken()
-    return await firstValueFrom(
+    return firstValueFrom(
       this.httpService.get(`${this.apiUrl}/${suffixUrl}`, {
         params,
         headers: { Authorization: `Bearer ${token}` }

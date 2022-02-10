@@ -32,8 +32,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
   let updateUtilisateurCommandHandler: UpdateUtilisateurCommandHandler
   const uuidGenere = '1'
   const idService: IdService = {
-    uuid: () => uuidGenere,
-    generate: () => '1'
+    uuid: () => uuidGenere
   }
   const authentificationFactory: Authentification.Factory =
     new Authentification.Factory(idService)

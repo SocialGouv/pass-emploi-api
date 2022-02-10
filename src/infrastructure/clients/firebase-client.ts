@@ -97,7 +97,7 @@ export class FirebaseClient implements IFirebaseClient {
       jeuneId: utilisateur.type === Type.JEUNE ? utilisateur.id : null,
       conseillerId: utilisateur.type === Type.CONSEILLER ? utilisateur.id : null
     }
-    return await this.auth.createCustomToken(utilisateur.id, customClaims)
+    return this.auth.createCustomToken(utilisateur.id, customClaims)
   }
 
   async transfererChat(
@@ -106,15 +106,13 @@ export class FirebaseClient implements IFirebaseClient {
   ): Promise<void> {
     try {
       await this.firestore.runTransaction(async t => {
-        const conversations = await this.firestore.collection(
-          FIREBASE_CHAT_PATH
-        )
+        const conversations = this.firestore.collection(FIREBASE_CHAT_PATH)
         const conversationsCibles = await conversations
           .where('jeuneId', 'in', jeuneIds)
           .get()
 
         for (const conversationCible of conversationsCibles.docs) {
-          await t.update(conversations.doc(conversationCible.id), {
+          t.update(conversations.doc(conversationCible.id), {
             conseillerId: conseillerCibleId
           })
         }
