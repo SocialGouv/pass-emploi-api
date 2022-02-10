@@ -48,8 +48,8 @@ export class RendezVousQueryModel implements RendezVousBaseQueryModel {
   @ApiProperty()
   duration: number
 
-  @ApiProperty({ required: false })
-  jeune?: JeuneQueryModel
+  @ApiProperty()
+  jeune: JeuneQueryModel
 
   @ApiProperty({ required: false })
   conseiller?: ConseillerQueryModel

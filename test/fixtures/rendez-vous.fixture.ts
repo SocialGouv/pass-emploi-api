@@ -22,7 +22,12 @@ export const unRendezVousQueryModel = (): RendezVousQueryModel => ({
   modality: 'modalite',
   comment: 'commentaire',
   date: new Date('2021-11-11T08:03:30.000Z'),
-  duration: 30
+  duration: 30,
+  jeune: {
+    id: '1',
+    nom: 'test',
+    prenom: 'test'
+  }
 })
 
 export const unRendezVousConseillerQueryModel =
