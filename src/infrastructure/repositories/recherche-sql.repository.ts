@@ -67,4 +67,30 @@ export class RechercheSqlRepository implements Recherche.Repository {
       }
     })
   }
+
+  async getRecherche(
+    idRecherche: string,
+    idJeune: string
+  ): Promise<RechercheQueryModel | undefined> {
+    const result = await RechercheSqlModel.findOne({
+      where: {
+        id: idRecherche,
+        idJeune: idJeune
+      }
+    })
+    if (!result) {
+      return undefined
+    }
+
+    return fromSqlToRechercheQueryModel(result)
+  }
+
+  async deleteRecherche(idRecherche: string, idJeune: string): Promise<void> {
+    await RechercheSqlModel.destroy({
+      where: {
+        id: idRecherche,
+        idJeune: idJeune
+      }
+    })
+  }
 }

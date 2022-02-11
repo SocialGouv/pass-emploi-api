@@ -112,6 +112,8 @@ import { GetRecherchesQueryHandler } from './application/queries/get-recherches.
 import { TransfererJeunesConseillerCommandHandler } from './application/commands/transferer-jeunes-conseiller.command.handler'
 import { InitJobsCommandHandler } from './application/commands/init-jobs.command'
 import { NotifierNouvellesOffresEmploiCommandHandler } from './application/commands/jobs/handle-job-notification-recherche.command'
+import { DeleteRechercheCommandHandler } from './application/commands/delete-recherche.command.handler'
+import { RechercheAuthorizer } from './application/authorizers/authorize-recherche'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -223,6 +225,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     FavoriOffresEmploiAuthorizer,
     FavoriOffresImmersionAuthorizer,
     JeuneAuthorizer,
+    RechercheAuthorizer,
     ConseillerForJeuneAuthorizer,
     RendezVousAuthorizer,
     GetDetailActionQueryHandler,
@@ -254,6 +257,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     DeleteActionCommandHandler,
     CreateRechercheCommandHandler,
     GetRecherchesQueryHandler,
+    DeleteRechercheCommandHandler,
     UpdateUtilisateurCommandHandler,
     GetCommunesEtDepartementsQueryHandler,
     GetDossierMiloJeuneQueryHandler,
