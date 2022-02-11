@@ -110,6 +110,8 @@ import { RechercheSqlRepository } from './infrastructure/repositories/recherche-
 import { RecherchesRepositoryToken } from './domain/recherche'
 import { GetRecherchesQueryHandler } from './application/queries/get-recherches.query.handler'
 import { TransfererJeunesConseillerCommandHandler } from './application/commands/transferer-jeunes-conseiller.command.handler'
+import { DeleteRechercheCommandHandler } from './application/commands/delete-recherche.command.handler'
+import { RechercheAuthorizer } from './application/authorizers/authorize-recherche'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -221,6 +223,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     FavoriOffresEmploiAuthorizer,
     FavoriOffresImmersionAuthorizer,
     JeuneAuthorizer,
+    RechercheAuthorizer,
     ConseillerForJeuneAuthorizer,
     RendezVousAuthorizer,
     GetDetailActionQueryHandler,
@@ -252,6 +255,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     DeleteActionCommandHandler,
     CreateRechercheCommandHandler,
     GetRecherchesQueryHandler,
+    DeleteRechercheCommandHandler,
     UpdateUtilisateurCommandHandler,
     GetCommunesEtDepartementsQueryHandler,
     GetDossierMiloJeuneQueryHandler,

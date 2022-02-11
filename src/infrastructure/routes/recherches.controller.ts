@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  NotFoundException,
+  Param,
+  Post
+} from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   CreateRechercheCommand,
@@ -16,6 +25,11 @@ import {
   GetRecherchesQueryHandler
 } from '../../application/queries/get-recherches.query.handler'
 import { RechercheQueryModel } from '../../application/queries/query-models/recherches.query-model'
+import { isFailure } from '../../building-blocks/types/result'
+import {
+  DeleteRechercheCommand,
+  DeleteRechercheCommandHandler
+} from '../../application/commands/delete-recherche.command.handler'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -23,7 +37,8 @@ import { RechercheQueryModel } from '../../application/queries/query-models/rech
 export class RecherchesController {
   constructor(
     private readonly createRechercheCommandHandler: CreateRechercheCommandHandler,
-    private readonly getRecherchesQueryHandler: GetRecherchesQueryHandler
+    private readonly getRecherchesQueryHandler: GetRecherchesQueryHandler,
+    private readonly deleteRechercheCommandHandler: DeleteRechercheCommandHandler
   ) {}
 
   @Post('recherches/offres-emploi')
@@ -73,5 +88,26 @@ export class RecherchesController {
   ): Promise<RechercheQueryModel[]> {
     const query: GetRecherchesQuery = { idJeune }
     return this.getRecherchesQueryHandler.execute(query, utilisateur)
+  }
+
+  @Delete('recherches/:idRecherche')
+  @HttpCode(204)
+  async deleteRecherche(
+    @Param('idJeune') idJeune: string,
+    @Param('idRecherche') idRecherche: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: DeleteRechercheCommand = {
+      idJeune,
+      idRecherche
+    }
+
+    const result = await this.deleteRechercheCommandHandler.execute(
+      command,
+      utilisateur
+    )
+    if (isFailure(result)) {
+      throw new NotFoundException(result.error)
+    }
   }
 }

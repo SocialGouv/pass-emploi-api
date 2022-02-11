@@ -20,20 +20,35 @@ import {
 } from '../../../src/infrastructure/routes/validation/recherches.inputs'
 import { GetRecherchesQueryHandler } from '../../../src/application/queries/get-recherches.query.handler'
 import { RechercheQueryModel } from '../../../src/application/queries/query-models/recherches.query-model'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import {
+  emptySuccess,
+  failure
+} from '../../../src/building-blocks/types/result'
+import { RechercheNonTrouveeError } from '../../../src/building-blocks/types/domain-error'
+import {
+  DeleteRechercheCommand,
+  DeleteRechercheCommandHandler
+} from '../../../src/application/commands/delete-recherche.command.handler'
+import { uneRecherche } from '../../fixtures/recherche.fixture'
 
 describe('RecherchesController', () => {
   let createRechercheCommandHandler: StubbedClass<CreateRechercheCommandHandler>
   let getRecherchesQueryHandler: StubbedClass<GetRecherchesQueryHandler>
+  let deleteRechercheCommandHandler: StubbedClass<DeleteRechercheCommandHandler>
   let app: INestApplication
 
   before(async () => {
     createRechercheCommandHandler = stubClass(CreateRechercheCommandHandler)
     getRecherchesQueryHandler = stubClass(GetRecherchesQueryHandler)
+    deleteRechercheCommandHandler = stubClass(DeleteRechercheCommandHandler)
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateRechercheCommandHandler)
       .useValue(createRechercheCommandHandler)
       .overrideProvider(GetRecherchesQueryHandler)
       .useValue(getRecherchesQueryHandler)
+      .overrideProvider(DeleteRechercheCommandHandler)
+      .useValue(deleteRechercheCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -209,5 +224,55 @@ describe('RecherchesController', () => {
       expect(result.body).to.deep.equal(recherchesQueryModel)
     })
     ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/recherches')
+  })
+
+  describe('DELETE /jeunes/:idJeune/recherches/:idRecherche', () => {
+    const recherche = uneRecherche()
+    const jeune = unJeune()
+    const command: DeleteRechercheCommand = {
+      idJeune: jeune.id,
+      idRecherche: recherche.id
+    }
+    it('supprime la recherche', async () => {
+      //Given
+      deleteRechercheCommandHandler.execute
+        .withArgs(command)
+        .resolves(emptySuccess())
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/${jeune.id}/recherches/${recherche.id}`)
+        .set('authorization', unHeaderAuthorization())
+        //Then
+        .expect(HttpStatus.NO_CONTENT)
+      expect(
+        deleteRechercheCommandHandler.execute
+      ).to.have.be.calledWithExactly(command, unUtilisateurDecode())
+    })
+    it('renvoie une 404(NOT FOUND) si la recherche n"existe pas', async () => {
+      //Given
+      deleteRechercheCommandHandler.execute
+        .withArgs(command)
+        .resolves(
+          failure(
+            new RechercheNonTrouveeError(command.idJeune, command.idRecherche)
+          )
+        )
+
+      const expectedMessageJson = {
+        code: 'RECHERCHE_NON_TROUVEE',
+        message: `La recherche du jeune ${command.idJeune} correspondant à la recherche ${command.idRecherche} n'existe pas`
+      }
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/${jeune.id}/recherches/${recherche.id}`)
+        .set('authorization', unHeaderAuthorization())
+        //Then
+        .expect(HttpStatus.NOT_FOUND)
+        .expect(expectedMessageJson)
+    })
+    ensureUserAuthenticationFailsIfInvalid(
+      'delete',
+      '/jeunes/ABCDE/recherches/123'
+    )
   })
 })
