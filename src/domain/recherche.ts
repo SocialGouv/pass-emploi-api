@@ -33,6 +33,11 @@ export namespace Recherche {
   export interface Repository {
     saveRecherche(recherche: Recherche): Promise<void>
     getRecherches(idJeune: string): Promise<RechercheQueryModel[]>
+    getRecherche(
+      idRecherche: string,
+      idJeune: string
+    ): Promise<RechercheQueryModel | undefined>
+    deleteRecherche(idRecherche: string, idJeune: string): Promise<void>
     findAvantDate(
       typeRecherches: Recherche.Type[],
       nombreRecherches: number,
