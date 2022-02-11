@@ -86,6 +86,44 @@ describe('UpdateUtilisateurCommandHandler', () => {
           )
         })
       })
+      describe('conseiller connu avec nouvel email', async () => {
+        it('met à jour son email et retourne le conseiller', async () => {
+          // Given
+          const command: UpdateUtilisateurCommand = {
+            idUtilisateurAuth: 'nilstavernier',
+            type: Authentification.Type.CONSEILLER,
+            structure: Core.Structure.PASS_EMPLOI,
+            email: 'New@email.com'
+          }
+
+          const utilisateur = unUtilisateurConseiller()
+          authentificationRepository.get
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
+            .resolves(utilisateur)
+
+          // When
+          const result = await updateUtilisateurCommandHandler.execute(command)
+
+          // Then
+          expect(
+            authentificationRepository.save
+          ).to.have.been.calledWithExactly(
+            {
+              ...utilisateur,
+              email: 'new@email.com'
+            },
+            command.idUtilisateurAuth
+          )
+          expect(isSuccess(result)).equal(true)
+          if (isSuccess(result)) {
+            expect(result.data.email).to.deep.equal('new@email.com')
+          }
+        })
+      })
       describe('conseiller inconnu', async () => {
         it('retourne une erreur', async () => {
           // Given

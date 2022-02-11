@@ -55,7 +55,19 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       command.type
     )
 
+    const lowerCaseEmail = command.email?.toLocaleLowerCase()
+
     if (utilisateur) {
+      if (
+        lowerCaseEmail &&
+        utilisateur.type === Authentification.Type.CONSEILLER
+      ) {
+        utilisateur.email = lowerCaseEmail
+        await this.authentificationRepository.save(
+          utilisateur,
+          command.idUtilisateurAuth
+        )
+      }
       return success(queryModelFromUtilisateur(utilisateur))
     } else if (command.structure === Core.Structure.PASS_EMPLOI) {
       return failure(
@@ -63,7 +75,6 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       )
     }
 
-    const lowerCaseEmail = command.email?.toLocaleLowerCase()
     if (command.type === Authentification.Type.CONSEILLER) {
       const result = this.authentificationFactory.buildConseiller(
         command.nom,
