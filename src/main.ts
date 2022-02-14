@@ -11,11 +11,11 @@ import {
   SwaggerModule
 } from '@nestjs/swagger'
 import { SecuritySchemeObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface'
-import helmet from 'helmet'
 import { Logger } from 'nestjs-pino'
 import { AppModule } from './app.module'
 import { Task, TaskService } from './application/task.service'
 import { WorkerService } from './application/worker.service'
+import helmet from 'helmet'
 
 function useSwagger(
   appConfig: ConfigService,
@@ -69,11 +69,11 @@ async function bootstrap(): Promise<void> {
   app.useLogger(logger)
 
   if (isWeb) {
+    useSwagger(appConfig, app)
     app.use(helmet())
     app.enableCors()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
     app.disable('x-powered-by')
-    useSwagger(appConfig, app)
     await app.listen(port)
   }
   app.flushLogs()
