@@ -21,6 +21,7 @@ import {
   UtilisateurQueryModel
 } from '../queries/query-models/authentification.query-models'
 import { PlanificateurService } from '../../domain/planificateur'
+import { DateService } from 'src/utils/date-service'
 
 export interface UpdateUtilisateurCommand extends Command {
   idUtilisateurAuth: string
@@ -41,7 +42,8 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     @Inject(AuthentificationRepositoryToken)
     private readonly authentificationRepository: Authentification.Repository,
     private authentificationFactory: Authentification.Factory,
-    private planificateurService: PlanificateurService
+    private planificateurService: PlanificateurService,
+    private dateService: DateService
   ) {
     super('UpdateUtilisateurCommandHandler')
   }
@@ -58,17 +60,11 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     const lowerCaseEmail = command.email?.toLocaleLowerCase()
 
     if (utilisateur) {
-      if (
-        lowerCaseEmail &&
-        utilisateur.type === Authentification.Type.CONSEILLER
-      ) {
-        utilisateur.email = lowerCaseEmail
-        await this.authentificationRepository.save(
-          utilisateur,
-          command.idUtilisateurAuth
-        )
-      }
-      return success(queryModelFromUtilisateur(utilisateur))
+      return await this.genererUtilisateurExistant(
+        utilisateur,
+        command.idUtilisateurAuth,
+        lowerCaseEmail
+      )
     } else if (command.structure === Core.Structure.PASS_EMPLOI) {
       return failure(
         new NonTrouveError('Utilisateur', command.idUtilisateurAuth)
@@ -76,26 +72,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     }
 
     if (command.type === Authentification.Type.CONSEILLER) {
-      const result = this.authentificationFactory.buildConseiller(
-        command.nom,
-        command.prenom,
-        lowerCaseEmail,
-        command.structure
-      )
-
-      if (isFailure(result)) {
-        return result
-      }
-
-      const conseillerSso: Authentification.Utilisateur = result.data
-      await this.authentificationRepository.save(
-        conseillerSso,
-        command.idUtilisateurAuth
-      )
-
-      this.planificateurService.planifierJobRappelMail(conseillerSso.id)
-
-      return success(queryModelFromUtilisateur(conseillerSso))
+      return await this.genererNouveauConseiller(command, lowerCaseEmail)
     } else if (command.type === Authentification.Type.JEUNE && lowerCaseEmail) {
       const jeune = await this.authentificationRepository.getJeuneByEmail(
         lowerCaseEmail
@@ -125,5 +102,47 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+
+  private async genererUtilisateurExistant(
+    utilisateur: Authentification.Utilisateur,
+    idUtilisateurAuth: string,
+    lowerCaseEmail?: string
+  ): Promise<Result<UtilisateurQueryModel>> {
+    if (
+      lowerCaseEmail &&
+      utilisateur.type === Authentification.Type.CONSEILLER
+    ) {
+      utilisateur.email = lowerCaseEmail
+      await this.authentificationRepository.save(utilisateur, idUtilisateurAuth)
+    }
+    return success(queryModelFromUtilisateur(utilisateur))
+  }
+
+  private async genererNouveauConseiller(
+    command: UpdateUtilisateurCommand,
+    lowerCaseEmail?: string
+  ): Promise<Result<UtilisateurQueryModel>> {
+    const result = this.authentificationFactory.buildConseiller(
+      command.nom,
+      command.prenom,
+      lowerCaseEmail,
+      command.structure
+    )
+
+    if (isFailure(result)) {
+      return result
+    }
+
+    const conseillerSso: Authentification.Utilisateur = result.data
+    await this.authentificationRepository.save(
+      conseillerSso,
+      command.idUtilisateurAuth,
+      this.dateService.nowJs()
+    )
+
+    this.planificateurService.planifierJobRappelMail(conseillerSso.id)
+
+    return success(queryModelFromUtilisateur(conseillerSso))
   }
 }

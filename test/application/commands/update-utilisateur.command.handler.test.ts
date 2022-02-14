@@ -26,10 +26,14 @@ import { Core } from '../../../src/domain/core'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { PlanificateurService } from '../../../src/domain/planificateur'
 import { UtilisateurQueryModel } from '../../../src/application/queries/query-models/authentification.query-models'
+import { DateService } from 'src/utils/date-service'
+import { uneDatetime } from 'test/fixtures/date.fixture'
 
 describe('UpdateUtilisateurCommandHandler', () => {
   let authentificationRepository: StubbedType<Authentification.Repository>
   let updateUtilisateurCommandHandler: UpdateUtilisateurCommandHandler
+  const dateService = stubClass(DateService)
+  dateService.nowJs.returns(uneDatetime.toJSDate())
   const uuidGenere = '1'
   const idService: IdService = {
     uuid: () => uuidGenere
@@ -44,7 +48,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
     updateUtilisateurCommandHandler = new UpdateUtilisateurCommandHandler(
       authentificationRepository,
       authentificationFactory,
-      planificateurService
+      planificateurService,
+      dateService
     )
   })
 

@@ -1,6 +1,7 @@
 import { Core } from '../../../src/domain/core'
 import { ConseillerDto } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
+import { uneDatetime } from '../date.fixture'
 
 export function unConseillerDto(
   args: Partial<AsSql<ConseillerDto>> = {}
@@ -11,7 +12,8 @@ export function unConseillerDto(
     nom: 'Tavernier',
     email: 'nils.tavernier@passemploi.com',
     structure: Core.Structure.PASS_EMPLOI,
-    idAuthentification: 'un-id'
+    idAuthentification: 'un-id',
+    dateCreation: uneDatetime.toJSDate()
   }
 
   return { ...defaults, ...args }
