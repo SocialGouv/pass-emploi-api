@@ -13,7 +13,7 @@ import {
 import { SecuritySchemeObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface'
 import { Logger } from 'nestjs-pino'
 import { AppModule } from './app.module'
-import { Task, TaskService } from './application/task.service'
+import { TaskService } from './application/task.service'
 import { WorkerService } from './application/worker.service'
 import helmet from 'helmet'
 
@@ -64,7 +64,7 @@ async function bootstrap(): Promise<void> {
   const port = appConfig.get('port')
   const isWorker = appConfig.get('isWorker')
   const isWeb = appConfig.get('isWeb')
-  const tasks = appConfig.get('tasks')
+  const task = appConfig.get('task')
   const logger = app.get(Logger)
   app.useLogger(logger)
 
@@ -84,13 +84,7 @@ async function bootstrap(): Promise<void> {
     worker.subscribe()
   }
 
-  if (tasks) {
-    logger.log({ tasks })
-    const task: Task | undefined = tasks.initAllJobs
-      ? Task.INIT_ALL_JOBS
-      : tasks.dummyJob
-      ? Task.DUMMY_JOB
-      : undefined
+  if (task) {
     await app.get(TaskService).handle(task)
     await app.close()
     process.exit(0)

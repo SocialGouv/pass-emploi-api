@@ -1,15 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { Result, success } from 'src/building-blocks/types/result'
-import { Command } from '../../building-blocks/types/command'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { Command } from '../../../building-blocks/types/command'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
   Notification,
   NotificationRepositoryToken
-} from '../../domain/notification'
-import { Planificateur } from '../../domain/planificateur'
-import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
-import { DateService } from '../../utils/date-service'
+} from '../../../domain/notification'
+import { Planificateur } from '../../../domain/planificateur'
+import {
+  RendezVous,
+  RendezVousRepositoryToken
+} from '../../../domain/rendez-vous'
+import { DateService } from '../../../utils/date-service'
 
 export interface HandleJobRendezVousCommand extends Command {
   job: Planificateur.Job<Planificateur.JobRendezVous>

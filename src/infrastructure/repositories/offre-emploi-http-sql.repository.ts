@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import {
   FavoriOffreEmploiIdQueryModel,
   OffreEmploiQueryModel,
@@ -22,10 +22,21 @@ import {
   fromSqlToFavorisOffresEmploiIdsQueryModels,
   toPoleEmploiContrat
 } from './mappers/offres-emploi.mappers'
+import { ErreurHttp } from '../../building-blocks/types/domain-error'
+import { failure, Result, success } from '../../building-blocks/types/result'
+import { DateService } from '../../utils/date-service'
+import { DateTime } from 'luxon'
 
 @Injectable()
 export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
-  constructor(private poleEmploiClient: PoleEmploiClient) {}
+  private logger: Logger
+
+  constructor(
+    private poleEmploiClient: PoleEmploiClient,
+    private dateService: DateService
+  ) {
+    this.logger = new Logger('OffresEmploiHttpSqlRepository')
+  }
 
   async findAll(
     page: number,
@@ -37,8 +48,9 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
     duree?: Duree[],
     contrat?: Contrat[],
     rayon?: number,
-    commune?: string
-  ): Promise<OffresEmploiQueryModel> {
+    commune?: string,
+    minDateCreation?: DateTime
+  ): Promise<Result<OffresEmploiQueryModel>> {
     const params = new URLSearchParams()
     params.append('sort', '1')
     params.append('range', this.generateRange(page, limit))
@@ -70,11 +82,41 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
     if (commune) {
       params.append('commune', commune)
     }
-    const response = await this.poleEmploiClient.get(
-      'offresdemploi/v2/offres/search',
-      params
-    )
-    return toOffresEmploiQueryModel(page, limit, response.data)
+    if (minDateCreation) {
+      params.append(
+        'minCreationDate',
+        minDateCreation
+          .toUTC()
+          .set({ millisecond: 0 })
+          .toISO({ suppressMilliseconds: true })
+      )
+      params.append(
+        'maxCreationDate',
+        this.dateService
+          .now()
+          .toUTC()
+          .set({ millisecond: 0 })
+          .toISO({ suppressMilliseconds: true })
+      )
+    }
+
+    try {
+      const response = await this.poleEmploiClient.get(
+        'offresdemploi/v2/offres/search',
+        params
+      )
+      return success(toOffresEmploiQueryModel(page, limit, response.data))
+    } catch (e) {
+      this.logger.error(e)
+      if (e.response?.status >= 400 && e.response?.status < 500) {
+        const erreur = new ErreurHttp(
+          e.response.data?.message,
+          e.response.status
+        )
+        return failure(erreur)
+      }
+      return failure(e)
+    }
   }
 
   async getOffreEmploiQueryModelById(

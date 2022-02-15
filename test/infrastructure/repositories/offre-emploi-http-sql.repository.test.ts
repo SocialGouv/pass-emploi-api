@@ -16,15 +16,22 @@ import {
   uneOffreEmploi,
   uneOffreEmploiResumeQueryModel
 } from '../../fixtures/offre-emploi.fixture'
+import { DateService } from '../../../src/utils/date-service'
+import { DateTime } from 'luxon'
 
 describe('OffresEmploiHttpSqlRepository', () => {
   DatabaseForTesting.prepare()
   let offresEmploiHttpSqlRepository: OffresEmploiHttpSqlRepository
   const poleEmploiClient = stubClass(PoleEmploiClient)
+  const maintenant = DateTime.fromISO('2020-04-06T12:00:00.001Z').toUTC()
 
   beforeEach(async () => {
+    const dateService = stubClass(DateService)
+    dateService.now.returns(maintenant)
+
     offresEmploiHttpSqlRepository = new OffresEmploiHttpSqlRepository(
-      poleEmploiClient
+      poleEmploiClient,
+      dateService
     )
   })
 
@@ -224,17 +231,20 @@ describe('OffresEmploiHttpSqlRepository', () => {
   })
 
   describe('.findAll', () => {
+    beforeEach(() => {
+      // Given
+      poleEmploiClient.get.resolves({
+        config: undefined,
+        headers: undefined,
+        request: undefined,
+        status: 0,
+        statusText: '',
+        data: []
+      })
+    })
+
     describe('fait appel à l"API de Pôle Emploi avec les bons paramètres', () => {
       it('quand tous les query params sont fournis', async () => {
-        // Given
-        poleEmploiClient.get.resolves({
-          config: undefined,
-          headers: undefined,
-          request: undefined,
-          status: 0,
-          statusText: '',
-          data: []
-        })
         // When
         await offresEmploiHttpSqlRepository.findAll(
           1,
@@ -245,7 +255,8 @@ describe('OffresEmploiHttpSqlRepository', () => {
           [Experience.entreUnEtTroisAns, Experience.plusDeTroisAns],
           [Duree.tempsPlein],
           [Contrat.cdi, Contrat.autre],
-          15
+          15,
+          'Paris'
         )
         const expectedQueryParams = new URLSearchParams({
           sort: '1',
@@ -256,7 +267,8 @@ describe('OffresEmploiHttpSqlRepository', () => {
           experience: '2,3',
           dureeHebdo: '1',
           typeContrat: 'CDI,DIN,CCE,FRA,LIB,REP,TTI',
-          distance: '15'
+          distance: '15',
+          commune: 'Paris'
         })
 
         // Then
@@ -266,15 +278,6 @@ describe('OffresEmploiHttpSqlRepository', () => {
         )
       })
       it('quand que quelques query params sont fournis', async () => {
-        // Given
-        poleEmploiClient.get.resolves({
-          config: undefined,
-          headers: undefined,
-          request: undefined,
-          status: 0,
-          statusText: '',
-          data: []
-        })
         // When
         await offresEmploiHttpSqlRepository.findAll(
           1,
@@ -298,6 +301,36 @@ describe('OffresEmploiHttpSqlRepository', () => {
 
         // Then
         expect(poleEmploiClient.get).to.have.been.calledWith(
+          'offresdemploi/v2/offres/search',
+          expectedQueryParams
+        )
+      })
+      it('quand il y a une date de création minimum', async () => {
+        // When
+        const minDateCreation = maintenant.minus({ day: 1, hour: 2 })
+        await offresEmploiHttpSqlRepository.findAll(
+          1,
+          50,
+          false,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          '75118',
+          minDateCreation
+        )
+        const expectedQueryParams = new URLSearchParams({
+          sort: '1',
+          range: '0-49',
+          commune: '75118',
+          minCreationDate: '2020-04-01T10:00:00Z',
+          maxCreationDate: '2020-04-06T12:00:00Z'
+        })
+
+        // Then
+        expect(poleEmploiClient.get).to.have.been.calledWithExactly(
           'offresdemploi/v2/offres/search',
           expectedQueryParams
         )

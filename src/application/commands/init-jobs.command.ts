@@ -1,0 +1,45 @@
+import { Inject, Injectable } from '@nestjs/common'
+import {
+  Planificateur,
+  PlanificateurRepositoryToken,
+  PlanificateurService
+} from '../../domain/planificateur'
+import { Command } from '../../building-blocks/types/command'
+import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { emptySuccess, Result } from '../../building-blocks/types/result'
+
+@Injectable()
+export class InitJobsCommandHandler extends CommandHandler<Command, void> {
+  constructor(
+    private planificateurService: PlanificateurService,
+    @Inject(PlanificateurRepositoryToken)
+    private planificateurRepository: Planificateur.Repository
+  ) {
+    super('SynchronizeJobsTask')
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async handle(_command: Command): Promise<Result> {
+    const cronJobOffresEmplois = await this.planificateurRepository.cronExiste(
+      Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI
+    )
+    if (!cronJobOffresEmplois) {
+      await this.planificateurService.planifierCron(
+        Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI
+      )
+    }
+
+    return emptySuccess()
+  }
+
+  async authorize(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _command: Command
+  ): Promise<void> {
+    return
+  }
+
+  async monitor(): Promise<void> {
+    return
+  }
+}

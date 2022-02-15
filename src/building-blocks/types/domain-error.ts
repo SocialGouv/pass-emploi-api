@@ -121,3 +121,15 @@ export class ErreurHttpMilo implements DomainError {
     this.statusCode = statusCode
   }
 }
+
+export class ErreurHttp implements DomainError {
+  static CODE = 'ERREUR_HTTP'
+  readonly code: string = ErreurHttp.CODE
+  readonly statusCode: number
+  readonly message: string
+
+  constructor(message: string, statusCode: number) {
+    this.message = message
+    this.statusCode = statusCode
+  }
+}

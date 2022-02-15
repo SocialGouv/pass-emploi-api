@@ -11,6 +11,7 @@ import {
   OffresEmploiRepositoryToken
 } from '../../domain/offre-emploi'
 import { OffresEmploiQueryModel } from './query-models/offres-emploi.query-models'
+import { Result } from '../../building-blocks/types/result'
 
 const DEFAULT_PAGE = 1
 const DEFAULT_LIMIT = 50
@@ -31,7 +32,7 @@ export interface GetOffresEmploiQuery extends Query {
 @Injectable()
 export class GetOffresEmploiQueryHandler extends QueryHandler<
   GetOffresEmploiQuery,
-  OffresEmploiQueryModel
+  Result<OffresEmploiQueryModel>
 > {
   constructor(
     @Inject(OffresEmploiRepositoryToken)
@@ -41,7 +42,9 @@ export class GetOffresEmploiQueryHandler extends QueryHandler<
     super('GetOffresEmploiQueryHandler')
   }
 
-  async handle(query: GetOffresEmploiQuery): Promise<OffresEmploiQueryModel> {
+  async handle(
+    query: GetOffresEmploiQuery
+  ): Promise<Result<OffresEmploiQueryModel>> {
     return this.offresEmploiRepository.findAll(
       query.page || DEFAULT_PAGE,
       query.limit || DEFAULT_LIMIT,

@@ -4,16 +4,16 @@ import { SinonSandbox } from 'sinon'
 import {
   Planificateur,
   PlanificateurService
-} from '../../../src/domain/planificateur'
+} from '../../../../src/domain/planificateur'
 
 import {
   HandleJobMailConseillerCommand,
   HandleJobMailConseillerCommandHandler
-} from '../../../src/application/commands/handle-job-mail-conseiller.command'
-import { Chat } from '../../../src/domain/chat'
-import { Conseiller } from '../../../src/domain/conseiller'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { success } from '../../../src/building-blocks/types/result'
+} from '../../../../src/application/commands/jobs/handle-job-mail-conseiller.command'
+import { Chat } from '../../../../src/domain/chat'
+import { Conseiller } from '../../../../src/domain/conseiller'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
+import { success } from '../../../../src/building-blocks/types/result'
 
 describe('HandleJobMailConseillerCommandHandler', () => {
   let handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler

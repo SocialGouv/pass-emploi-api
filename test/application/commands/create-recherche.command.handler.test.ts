@@ -17,6 +17,8 @@ import {
 } from '../../utils'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { DateService } from '../../../src/utils/date-service'
+import { uneDatetime } from '../../fixtures/date.fixture'
 
 describe('CreateRechercheCommandHandler', () => {
   DatabaseForTesting.prepare()
@@ -25,6 +27,9 @@ describe('CreateRechercheCommandHandler', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let evenementService: StubbedClass<EvenementService>
   let createRechercheCommandHandler: CreateRechercheCommandHandler
+  let dateService: StubbedClass<DateService>
+
+  const date = uneDatetime
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
@@ -32,11 +37,16 @@ describe('CreateRechercheCommandHandler', () => {
     evenementService = stubClass(EvenementService)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     idService = stubClass(IdService)
+
+    dateService = stubClass(DateService)
+    dateService.now.returns(date)
+
     createRechercheCommandHandler = new CreateRechercheCommandHandler(
       rechercheRepository,
       idService,
       jeuneAuthorizer,
-      evenementService
+      evenementService,
+      dateService
     )
   })
 
@@ -46,6 +56,7 @@ describe('CreateRechercheCommandHandler', () => {
         // Given
         const idRecherche = 'un-id'
         idService.uuid.returns(idRecherche)
+
         const command: CreateRechercheCommand = {
           idJeune: 'ABC123',
           type: Recherche.Type.OFFRES_EMPLOI,
@@ -62,13 +73,17 @@ describe('CreateRechercheCommandHandler', () => {
         expect(result).to.deep.equal(success({ id: idRecherche }))
         expect(
           rechercheRepository.saveRecherche
-        ).to.have.been.calledWithExactly('ABC123', {
+        ).to.have.been.calledWithExactly({
           id: 'un-id',
           type: 'OFFRES_EMPLOI',
           titre: '',
           metier: '',
           localisation: '',
-          criteres: {}
+          criteres: {},
+          idJeune: 'ABC123',
+          dateCreation: date,
+          dateDerniereRecherche: date,
+          etat: Recherche.Etat.SUCCES
         })
       })
     })

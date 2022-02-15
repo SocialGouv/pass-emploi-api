@@ -1,6 +1,7 @@
 import { GetOffresEmploiQuery } from 'src/application/queries/get-offres-emploi.query.handler'
 import { GetOffresImmersionQuery } from 'src/application/queries/get-offres-immersion.query.handler'
 import { RechercheQueryModel } from '../application/queries/query-models/recherches.query-model'
+import { DateTime } from 'luxon'
 
 export const RecherchesRepositoryToken = 'RecherchesRepositoryToken'
 
@@ -11,6 +12,10 @@ export interface Recherche {
   metier?: string
   localisation?: string
   criteres?: GetOffresEmploiQuery | GetOffresImmersionQuery
+  idJeune: string
+  dateCreation: DateTime
+  dateDerniereRecherche: DateTime
+  etat: Recherche.Etat
 }
 
 export namespace Recherche {
@@ -20,8 +25,18 @@ export namespace Recherche {
     OFFRES_ALTERNANCE = 'OFFRES_ALTERNANCE'
   }
 
+  export enum Etat {
+    SUCCES = 'SUCCES',
+    ECHEC = 'ECHEC'
+  }
+
   export interface Repository {
-    saveRecherche(idJeune: string, recherche: Recherche): Promise<void>
+    saveRecherche(recherche: Recherche): Promise<void>
     getRecherches(idJeune: string): Promise<RechercheQueryModel[]>
+    findAvantDate(
+      typeRecherches: Recherche.Type[],
+      nombreRecherches: number,
+      date: DateTime
+    ): Promise<Recherche[]>
   }
 }

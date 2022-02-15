@@ -34,6 +34,15 @@ export class RechercheDto extends Model {
 
   @Column({ field: 'criteres', type: DataType.JSONB })
   criteres: GetOffresEmploiQuery | GetOffresImmersionQuery | null
+
+  @Column({ field: 'date_creation', type: DataType.DATE })
+  dateCreation: Date
+
+  @Column({ field: 'date_derniere_recherche', type: DataType.DATE })
+  dateDerniereRecherche: Date
+
+  @Column({ field: 'etat_derniere_recherche', type: DataType.STRING })
+  etatDerniereRecherche: Recherche.Etat
 }
 
 @Table({ timestamps: false, tableName: 'recherche' })

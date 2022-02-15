@@ -10,18 +10,6 @@ export default () => {
     baseUrl = process.env.BASE_URL || 'http://localhost:5000'
   }
 
-  let tasks = undefined
-  if (process.env.RUN_TASK_INIT_ALL_JOBS === 'true') {
-    tasks = {
-      initAllJobs: true
-    }
-  }
-  if (process.env.RUN_TASK_DUMMY_JOB === 'true') {
-    tasks = {
-      dummyJob: true
-    }
-  }
-
   const databaseUrl =
     process.env.DATABASE_URL ||
     'postgresql://passemploi:passemploi@localhost:55432/passemploidb'
@@ -88,6 +76,11 @@ export default () => {
       apiKey: process.env.SENDINBLUE_API_KEY ?? '',
       templateId: process.env.SENDINBLUE_TEMPLATE_ID ?? '2'
     },
-    tasks
+    task: process.env.TASK,
+    jobs: {
+      notificationRecherches: {
+        nombreDeRequetesEnParallele: process.env.JOB_NOMBRE_RECHERCHES_PARALLELE ?? '5'
+      }
+    }
   }
 }

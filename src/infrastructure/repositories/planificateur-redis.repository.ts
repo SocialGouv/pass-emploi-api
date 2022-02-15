@@ -74,4 +74,23 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
   async disconnect(): Promise<void> {
     await this.queue.close()
   }
+
+  async createCron(cron: Planificateur.Cron): Promise<void> {
+    await this.queue.add(cron, {
+      jobId: cron.type,
+      repeat: { cron: cron.expression }
+    })
+  }
+
+  async cronExiste(_job: Planificateur.CronJob): Promise<boolean> {
+    const crons = await this.queue.getRepeatableJobs()
+    let cronExiste = false
+    crons.forEach(cron => {
+      if (cron.id === _job) {
+        cronExiste = false
+      }
+    })
+
+    return cronExiste
+  }
 }

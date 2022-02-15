@@ -32,8 +32,10 @@
     "test:ci": "yarn migration && nyc --reporter=lcovonly mocha 'test/**/*.test.ts' --exit --timeout 10000",
     "watch": "yarn start:pg:db && yarn start:redis:db && nest start --watch | npx pino-pretty",
     "run:with:apm": "yarn start:pg:db && yarn start:redis:db && dotenv -e .environment nest start --watch | npx pino-pretty",
-    "tasks:init-all-jobs": "IS_WEB=false RUN_TASK_INIT_ALL_JOBS=true node dist/main",
-    "tasks:dummy-job": "IS_WEB=false IS_WORKER=false RUN_TASK_DUMMY_JOB=true node dist/main"
+    "tasks:init-all-jobs": "IS_WEB=false RUN_TASK_TASK=INIT_ALL_JOBS node dist/main",
+    "tasks:dummy-job": "IS_WEB=false IS_WORKER=false TASK=DUMMY_JOB=true node dist/main",
+    "tasks:rechercher-les-nouvelles-offres": "IS_WEB=false IS_WORKER=false TASK=RECHERCHER_LES_NOUVELLES_OFFRES node dist/main",
+    "tasks:intialiser-les-crons": "IS_WEB=false IS_WORKER=false TASK=INITIALISER_LES_CRON node dist/main"
   },
   "dependencies": {
     "@nestjs/axios": "0.0.5",
