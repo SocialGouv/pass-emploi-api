@@ -43,7 +43,11 @@ export namespace Authentification {
     ): Promise<Utilisateur | undefined>
     getJeuneByEmail(email: string): Promise<Utilisateur | undefined>
     updateJeune(idJeune: string, idUtilisateurAuth: string): Promise<void>
-    save(utilisateur: Utilisateur, idUtilisateurAuth: string): Promise<void>
+    save(
+      utilisateur: Utilisateur,
+      idUtilisateurAuth: string,
+      dateCreation?: Date
+    ): Promise<void>
   }
 
   @Injectable()

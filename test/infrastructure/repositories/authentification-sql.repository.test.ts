@@ -1,12 +1,13 @@
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
+import { uneDatetime } from 'test/fixtures/date.fixture'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
 import { AuthentificationSqlRepository } from '../../../src/infrastructure/repositories/authentification-sql.repository'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import {
-  unUtilisateurJeune,
-  unUtilisateurConseiller
+  unUtilisateurConseiller,
+  unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { DatabaseForTesting, expect } from '../../utils'
@@ -181,6 +182,42 @@ describe('AuthentificationSqlRepository', () => {
           Authentification.Type.CONSEILLER
         )
         expect(utilisateur).to.deep.equal(unUtilisateurConseiller())
+      })
+    })
+    describe("quand c'est un conseiller deja existant", () => {
+      it("met à jour l'utilisateur sans mettre à jour la date de création", async () => {
+        // Given
+        const utilisateurConseiller = unUtilisateurConseiller()
+        const nouvelEmail = 'test@test.com'
+        const dateCreation = uneDatetime.toJSDate()
+
+        // When
+        await authentificationSqlRepository.save(
+          utilisateurConseiller,
+          'id-authentification-conseiller',
+          dateCreation
+        )
+        await authentificationSqlRepository.save(
+          { ...utilisateurConseiller, email: nouvelEmail },
+          'id-authentification-conseiller'
+        )
+
+        // Then
+        const utilisateur = await authentificationSqlRepository.get(
+          'id-authentification-conseiller',
+          Core.Structure.MILO,
+          Authentification.Type.CONSEILLER
+        )
+
+        const conseiller = utilisateur
+          ? await ConseillerSqlModel.findOne({ where: { id: utilisateur.id } })
+          : undefined
+
+        expect(utilisateur).to.deep.equal(
+          unUtilisateurConseiller({ email: nouvelEmail })
+        )
+
+        expect(conseiller?.dateCreation).to.deep.equal(dateCreation)
       })
     })
   })
