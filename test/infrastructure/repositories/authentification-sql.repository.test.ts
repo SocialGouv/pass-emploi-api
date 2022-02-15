@@ -1,5 +1,3 @@
-import { MailSendinblueClient } from 'src/infrastructure/clients/mail-sendinblue.client'
-import { ConseillerSqlEmailRepository } from 'src/infrastructure/repositories/conseiller-sql-email.repository'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
@@ -8,24 +6,18 @@ import { Core } from '../../../src/domain/core'
 import { AuthentificationSqlRepository } from '../../../src/infrastructure/repositories/authentification-sql.repository'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import {
-  unUtilisateurJeune,
-  unUtilisateurConseiller
+  unUtilisateurConseiller,
+  unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { DatabaseForTesting, expect, stubClass } from '../../utils'
+import { DatabaseForTesting, expect } from '../../utils'
 
 describe('AuthentificationSqlRepository', () => {
   DatabaseForTesting.prepare()
   let authentificationSqlRepository: AuthentificationSqlRepository
-  let conseillerSqlRepository: ConseillerSqlEmailRepository
 
   beforeEach(async () => {
     authentificationSqlRepository = new AuthentificationSqlRepository()
-    const mailSendinblueClient: MailSendinblueClient =
-      stubClass(MailSendinblueClient)
-    conseillerSqlRepository = new ConseillerSqlEmailRepository(
-      mailSendinblueClient
-    )
   })
 
   describe('get', () => {
@@ -218,7 +210,7 @@ describe('AuthentificationSqlRepository', () => {
         )
 
         const conseiller = utilisateur
-          ? await conseillerSqlRepository.get(utilisateur.id)
+          ? await ConseillerSqlModel.findOne({ where: { id: utilisateur.id } })
           : undefined
 
         expect(utilisateur).to.deep.equal(

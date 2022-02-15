@@ -8,7 +8,6 @@ export interface Conseiller {
   lastName: string
   structure: Core.Structure
   email?: string
-  dateCreation?: Date
 }
 
 export const ConseillersRepositoryToken = 'Conseiller.Repository'
