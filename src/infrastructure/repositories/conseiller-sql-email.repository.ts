@@ -43,7 +43,8 @@ export class ConseillerSqlEmailRepository implements Conseiller.Repository {
       firstName: conseillerSqlModel.prenom,
       lastName: conseillerSqlModel.nom,
       structure: conseillerSqlModel.structure,
-      email: conseillerSqlModel.email || undefined
+      email: conseillerSqlModel.email || undefined,
+      dateCreation: conseillerSqlModel.dateCreation
     }
   }
 
