@@ -25,7 +25,7 @@ import {
   emptySuccess,
   failure
 } from '../../../src/building-blocks/types/result'
-import { RechercheNonTrouveeError } from '../../../src/building-blocks/types/domain-error'
+import { RessourceNonTrouveeError } from '../../../src/building-blocks/types/domain-error'
 import {
   DeleteRechercheCommand,
   DeleteRechercheCommandHandler
@@ -254,7 +254,11 @@ describe('RecherchesController', () => {
         .withArgs(command)
         .resolves(
           failure(
-            new RechercheNonTrouveeError(command.idJeune, command.idRecherche)
+            new RessourceNonTrouveeError(
+              command.idJeune,
+              command.idRecherche,
+              'RECHERCHE'
+            )
           )
         )
 
