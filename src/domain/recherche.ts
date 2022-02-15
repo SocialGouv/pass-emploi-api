@@ -38,10 +38,7 @@ export namespace Recherche {
       nombreRecherches: number,
       date: DateTime
     ): Promise<Recherche[]>
-    getRecherche(
-      idRecherche: string,
-      idJeune: string
-    ): Promise<RechercheQueryModel | undefined>
-    deleteRecherche(idRecherche: string, idJeune: string): Promise<void>
+    getRecherche(idRecherche: string): Promise<RechercheQueryModel | undefined>
+    deleteRecherche(idRecherche: string): Promise<void>
   }
 }

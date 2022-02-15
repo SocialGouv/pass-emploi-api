@@ -139,7 +139,8 @@ export class RechercheNonTrouveeError implements DomainError {
   readonly code: string = RechercheNonTrouveeError.CODE
   readonly message: string
 
-  constructor(idJeune: string, idRecherche: string) {
-    this.message = `La recherche du jeune ${idJeune} correspondant à la recherche ${idRecherche} n'existe pas`
+  constructor(idJeune: string, idRessource: string, ressource: string) {
+    this.code = `${ressource}_NON_TROUVEE`
+    this.message = `La ressource ${ressource} du jeune ${idJeune} correspondant à la ressource ${ressource} ${idRessource} n'existe pas`
   }
 }

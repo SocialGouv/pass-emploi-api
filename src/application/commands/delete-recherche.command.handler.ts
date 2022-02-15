@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { RechercheNonTrouveeError } from '../../building-blocks/types/domain-error'
+import { RessourceNonTrouveeError } from '../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -31,18 +31,18 @@ export class DeleteRechercheCommandHandler extends CommandHandler<
 
   async handle(command: DeleteRechercheCommand): Promise<Result<void>> {
     const rechercheExiste = await this.rechercheRepository.getRecherche(
-      command.idRecherche,
-      command.idJeune
+      command.idRecherche
     )
     if (!rechercheExiste) {
       return failure(
-        new RechercheNonTrouveeError(command.idJeune, command.idRecherche)
+        new RessourceNonTrouveeError(
+          command.idJeune,
+          command.idRecherche,
+          'RECHERCHE'
+        )
       )
     }
-    await this.rechercheRepository.deleteRecherche(
-      command.idRecherche,
-      command.idJeune
-    )
+    await this.rechercheRepository.deleteRecherche(command.idRecherche)
     return emptySuccess()
   }
 
