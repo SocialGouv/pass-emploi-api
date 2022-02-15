@@ -9,9 +9,9 @@ export namespace Planificateur {
   export interface Repository {
     createJob<T>(job: Job<T>): Promise<void>
     createCron(cron: Cron): Promise<void>
-    cronExiste(job: CronJob): Promise<boolean>
     subscribe(callback: Handler<unknown>): Promise<void>
     supprimerTousLesJobs(): Promise<void>
+    supprimerLesCrons(): Promise<void>
   }
 
   export enum CronJob {

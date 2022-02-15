@@ -7,7 +7,7 @@ import { DateService } from '../../utils/date-service'
 
 @Injectable()
 export class PlanificateurRedisRepository implements Planificateur.Repository {
-  private queue: Bull.Queue
+  queue: Bull.Queue
   private isReady = false
   private logger: Logger
 
@@ -82,15 +82,13 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     })
   }
 
-  async cronExiste(_job: Planificateur.CronJob): Promise<boolean> {
-    const crons = await this.queue.getRepeatableJobs()
-    let cronExiste = false
-    crons.forEach(cron => {
-      if (cron.id === _job) {
-        cronExiste = false
-      }
-    })
-
-    return cronExiste
+  async supprimerLesCrons(): Promise<void> {
+    const repeatableJobs = await this.queue.getRepeatableJobs()
+    for (const job of repeatableJobs) {
+      await this.queue.removeRepeatable({
+        cron: job.cron,
+        jobId: job.id
+      })
+    }
   }
 }

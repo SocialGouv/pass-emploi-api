@@ -83,4 +83,47 @@ describe('PlanificateurRedisRepository', () => {
       })
     })
   })
+
+  describe('createCron', () => {
+    describe('si le redis est accessible', () => {
+      it('créée un cron', async () => {
+        // Given
+        const cron: Planificateur.Cron = {
+          type: Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI,
+          expression: '* * * * *'
+        }
+
+        // When
+        await planificateurRedisRepository.createCron(cron)
+
+        // Then
+        const crons =
+          await planificateurRedisRepository.queue.getRepeatableJobs()
+        expect(crons.length).to.equal(1)
+        expect(crons[0].id).to.equal(cron.type)
+        expect(crons[0].cron).to.equal(cron.expression)
+      })
+    })
+  })
+
+  describe('supprimerLesCrons', () => {
+    describe('si le redis est accessible', () => {
+      it('supprime les crons', async () => {
+        // Given
+        const cron: Planificateur.Cron = {
+          type: Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI,
+          expression: '* * * * *'
+        }
+        await planificateurRedisRepository.createCron(cron)
+
+        // When
+        await planificateurRedisRepository.supprimerLesCrons()
+
+        // Then
+        const crons =
+          await planificateurRedisRepository.queue.getRepeatableJobs()
+        expect(crons.length).to.equal(0)
+      })
+    })
+  })
 })

@@ -159,12 +159,11 @@ export class NotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
 
     const MIN_RESULTATS_OFFRES_PAGE = 1
     const MIN_RESULTATS_OFFRES_LIMIT = 2
-
     return this.offresEmploiRepository.findAll(
       MIN_RESULTATS_OFFRES_PAGE,
       MIN_RESULTATS_OFFRES_LIMIT,
       criteres?.alternance,
-      criteres?.query,
+      criteres?.q,
       criteres?.departement,
       criteres?.experience,
       criteres?.duree,

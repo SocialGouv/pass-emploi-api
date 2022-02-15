@@ -19,7 +19,7 @@ const DEFAULT_LIMIT = 50
 export interface GetOffresEmploiQuery extends Query {
   page?: number
   limit?: number
-  query?: string
+  q?: string
   departement?: string
   alternance?: boolean
   experience?: Experience[]
@@ -49,7 +49,7 @@ export class GetOffresEmploiQueryHandler extends QueryHandler<
       query.page || DEFAULT_PAGE,
       query.limit || DEFAULT_LIMIT,
       query.alternance,
-      query.query,
+      query.q,
       query.departement,
       query.experience,
       query.duree,

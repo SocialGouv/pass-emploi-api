@@ -6,7 +6,7 @@ import {
 import { SynchronizeJobsCommandHandler } from './commands/synchronize-jobs.command'
 import JobEnum = Planificateur.JobEnum
 import { NotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notification-recherche.command'
-import { InitJobsCommandHandler } from './commands/init-jobs.command'
+import { InitCronsCommandHandler } from './commands/init-crons.command'
 
 export enum Task {
   DUMMY_JOB = 'DUMMY_JOB',
@@ -24,7 +24,7 @@ export class TaskService {
     private planificateurRepository: Planificateur.Repository,
     private synchronizeJobsCommandHandler: SynchronizeJobsCommandHandler,
     private notifierNouvellesOffresEmploiCommandHandler: NotifierNouvellesOffresEmploiCommandHandler,
-    private initJobsCommandHandler: InitJobsCommandHandler
+    private initJobsCommandHandler: InitCronsCommandHandler
   ) {}
 
   async handle(task: Task | undefined): Promise<void> {
