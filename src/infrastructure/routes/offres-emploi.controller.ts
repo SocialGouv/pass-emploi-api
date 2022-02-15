@@ -46,7 +46,7 @@ export class OffresEmploiController {
     const query: GetOffresEmploiQuery = {
       page: findOffresEmploiQuery.page,
       limit: findOffresEmploiQuery.limit,
-      query: findOffresEmploiQuery.q,
+      q: findOffresEmploiQuery.q,
       departement: findOffresEmploiQuery.departement,
       alternance: findOffresEmploiQuery.alternance,
       experience: findOffresEmploiQuery.experience,

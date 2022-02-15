@@ -26,10 +26,14 @@ import { Core } from '../../../src/domain/core'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { PlanificateurService } from '../../../src/domain/planificateur'
 import { UtilisateurQueryModel } from '../../../src/application/queries/query-models/authentification.query-models'
+import { DateService } from 'src/utils/date-service'
+import { uneDatetime } from 'test/fixtures/date.fixture'
 
 describe('UpdateUtilisateurCommandHandler', () => {
   let authentificationRepository: StubbedType<Authentification.Repository>
   let updateUtilisateurCommandHandler: UpdateUtilisateurCommandHandler
+  const dateService = stubClass(DateService)
+  dateService.nowJs.returns(uneDatetime.toJSDate())
   const uuidGenere = '1'
   const idService: IdService = {
     uuid: () => uuidGenere
@@ -44,7 +48,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
     updateUtilisateurCommandHandler = new UpdateUtilisateurCommandHandler(
       authentificationRepository,
       authentificationFactory,
-      planificateurService
+      planificateurService,
+      dateService
     )
   })
 
@@ -84,6 +89,44 @@ describe('UpdateUtilisateurCommandHandler', () => {
           expect(planificateurService.planifierJobRappelMail).to.have.callCount(
             0
           )
+        })
+      })
+      describe('conseiller connu avec nouvel email', async () => {
+        it('met à jour son email et retourne le conseiller', async () => {
+          // Given
+          const command: UpdateUtilisateurCommand = {
+            idUtilisateurAuth: 'nilstavernier',
+            type: Authentification.Type.CONSEILLER,
+            structure: Core.Structure.PASS_EMPLOI,
+            email: 'New@email.com'
+          }
+
+          const utilisateur = unUtilisateurConseiller()
+          authentificationRepository.get
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
+            .resolves(utilisateur)
+
+          // When
+          const result = await updateUtilisateurCommandHandler.execute(command)
+
+          // Then
+          expect(
+            authentificationRepository.save
+          ).to.have.been.calledWithExactly(
+            {
+              ...utilisateur,
+              email: 'new@email.com'
+            },
+            command.idUtilisateurAuth
+          )
+          expect(isSuccess(result)).equal(true)
+          if (isSuccess(result)) {
+            expect(result.data.email).to.deep.equal('new@email.com')
+          }
         })
       })
       describe('conseiller inconnu', async () => {

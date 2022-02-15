@@ -11,7 +11,12 @@ module.exports = {
         id_jeune: '1',
         est_visible_par_conseiller: true,
         id_createur: '41',
-        type_createur: 'conseiller'
+        type_createur: 'conseiller',
+        createur: JSON.stringify({
+          nom: 'Tavernier',
+          prenom: 'Nils',
+          id: '41'
+        })
       },
       {
         id: '655b0837-9d81-4d4b-8391-2ec9e87879e8',
@@ -23,7 +28,12 @@ module.exports = {
         id_jeune: '1',
         est_visible_par_conseiller: true,
         id_createur: '41',
-        type_createur: 'conseiller'
+        type_createur: 'conseiller',
+        createur: JSON.stringify({
+          nom: 'Tavernier',
+          prenom: 'Nils',
+          id: '41'
+        })
       },
       {
         id: '3a309fd2-a8c6-4350-b31a-e490a3887d36',
@@ -35,7 +45,12 @@ module.exports = {
         id_jeune: '1',
         est_visible_par_conseiller: true,
         id_createur: '1',
-        type_createur: 'jeune'
+        type_createur: 'jeune',
+        createur: JSON.stringify({
+          nom: 'Lefameux',
+          prenom: 'Kenji',
+          id: '1'
+        })
       },
       {
         id: '6c7b1c4b-5ba7-443b-b46c-1ccd67907320',
@@ -47,7 +62,12 @@ module.exports = {
         id_jeune: '2',
         est_visible_par_conseiller: true,
         id_createur: '41',
-        type_createur: 'conseiller'
+        type_createur: 'conseiller',
+        createur: JSON.stringify({
+          nom: 'Tavernier',
+          prenom: 'Nils',
+          id: '41'
+        })
       },
       {
         id: '655b0837-9d81-4d4b-8391-2ec9e87879e9',
@@ -59,7 +79,12 @@ module.exports = {
         id_jeune: '2',
         est_visible_par_conseiller: true,
         id_createur: '2',
-        type_createur: 'jeune'
+        type_createur: 'jeune',
+        createur: JSON.stringify({
+          nom: '',
+          prenom: '',
+          id: '2'
+        })
       },
       {
         id: '3a309fd2-a8c6-4350-b31a-e490a3887d37',
@@ -71,7 +96,12 @@ module.exports = {
         id_jeune: '4',
         est_visible_par_conseiller: true,
         id_createur: '42',
-        type_createur: 'conseiller'
+        type_createur: 'conseiller',
+        createur: JSON.stringify({
+          nom: '',
+          prenom: '',
+          id: '42'
+        })
       }
     ])
   },

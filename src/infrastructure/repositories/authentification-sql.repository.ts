@@ -6,8 +6,7 @@ import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import {
   fromConseillerSqlToUtilisateur,
-  fromJeuneSqlToUtilisateur,
-  toSqlConseillerUtilisateur
+  fromJeuneSqlToUtilisateur
 } from './mappers/authentification.mappers'
 
 @Injectable()
@@ -74,12 +73,19 @@ export class AuthentificationSqlRepository
 
   async save(
     utilisateur: Authentification.Utilisateur,
-    idUtilisateurAuth: string
+    idUtilisateurAuth: string,
+    dateCreation?: Date
   ): Promise<void> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      await ConseillerSqlModel.creer(
-        toSqlConseillerUtilisateur(utilisateur, idUtilisateurAuth)
-      )
+      await ConseillerSqlModel.upsert({
+        id: utilisateur.id,
+        nom: utilisateur.nom,
+        prenom: utilisateur.prenom,
+        email: utilisateur.email ? utilisateur.email : null,
+        structure: utilisateur.structure,
+        idAuthentification: idUtilisateurAuth,
+        dateCreation: dateCreation ?? undefined
+      })
     }
   }
 }
