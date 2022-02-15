@@ -28,13 +28,11 @@ export class RechercheSqlRepository implements Recherche.Repository {
   }
 
   async getRecherche(
-    idRecherche: string,
-    idJeune: string
+    idRecherche: string
   ): Promise<RechercheQueryModel | undefined> {
     const result = await RechercheSqlModel.findOne({
       where: {
-        id: idRecherche,
-        idJeune: idJeune
+        id: idRecherche
       }
     })
     if (!result) {
@@ -44,11 +42,10 @@ export class RechercheSqlRepository implements Recherche.Repository {
     return fromSqlToRechercheQueryModel(result)
   }
 
-  async deleteRecherche(idRecherche: string, idJeune: string): Promise<void> {
+  async deleteRecherche(idRecherche: string): Promise<void> {
     await RechercheSqlModel.destroy({
       where: {
-        id: idRecherche,
-        idJeune: idJeune
+        id: idRecherche
       }
     })
   }

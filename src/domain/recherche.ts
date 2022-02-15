@@ -23,10 +23,7 @@ export namespace Recherche {
   export interface Repository {
     saveRecherche(idJeune: string, recherche: Recherche): Promise<void>
     getRecherches(idJeune: string): Promise<RechercheQueryModel[]>
-    getRecherche(
-      idRecherche: string,
-      idJeune: string
-    ): Promise<RechercheQueryModel | undefined>
-    deleteRecherche(idRecherche: string, idJeune: string): Promise<void>
+    getRecherche(idRecherche: string): Promise<RechercheQueryModel | undefined>
+    deleteRecherche(idRecherche: string): Promise<void>
   }
 }

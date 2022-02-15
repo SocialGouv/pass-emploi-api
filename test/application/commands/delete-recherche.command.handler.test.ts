@@ -13,7 +13,7 @@ import {
   failure
 } from '../../../src/building-blocks/types/result'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { RechercheNonTrouveeError } from '../../../src/building-blocks/types/domain-error'
+import { RessourceNonTrouveeError } from '../../../src/building-blocks/types/domain-error'
 import { RechercheAuthorizer } from '../../../src/application/authorizers/authorize-recherche'
 import { Recherche } from '../../../src/domain/recherche'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
@@ -47,7 +47,7 @@ describe('DeleteRechercheCommandHandler', () => {
       it('supprime la recherche', async () => {
         // Given
         rechercheSqlRepository.getRecherche
-          .withArgs(recherche.id, jeune.id)
+          .withArgs(recherche.id)
           .resolves(true)
 
         const command: DeleteRechercheCommand = {
@@ -59,8 +59,7 @@ describe('DeleteRechercheCommandHandler', () => {
         const result = await deleteRechercheCommandHandler.handle(command)
         // Then
         expect(rechercheSqlRepository.deleteRecherche).to.have.been.calledWith(
-          command.idRecherche,
-          command.idJeune
+          command.idRecherche
         )
         expect(result).to.deep.equal(emptySuccess())
       })
@@ -69,7 +68,7 @@ describe('DeleteRechercheCommandHandler', () => {
       it('renvoie une failure', async () => {
         // Given
         rechercheSqlRepository.getRecherche
-          .withArgs(recherche.id, jeune.id)
+          .withArgs(recherche.id)
           .resolves(false)
 
         const command: DeleteRechercheCommand = {
@@ -82,12 +81,16 @@ describe('DeleteRechercheCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(
           failure(
-            new RechercheNonTrouveeError(command.idJeune, command.idRecherche)
+            new RessourceNonTrouveeError(
+              command.idJeune,
+              command.idRecherche,
+              'RECHERCHE'
+            )
           )
         )
         expect(
           rechercheSqlRepository.deleteRecherche
-        ).not.to.have.been.calledWith(command.idRecherche, command.idJeune)
+        ).not.to.have.been.calledWith(command.idRecherche)
       })
     })
   })

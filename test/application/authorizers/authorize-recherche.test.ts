@@ -23,9 +23,7 @@ describe('RechecheAuthorizer', () => {
         const utilisateur = unUtilisateurJeune()
         const recherche = uneRecherche()
 
-        rechercheRepository.getRecherche
-          .withArgs(recherche.id, utilisateur.id)
-          .resolves(true)
+        rechercheRepository.getRecherche.withArgs(recherche.id).resolves(true)
 
         // When
         const result = await rechercheAuthorizer.authorize(
@@ -45,7 +43,7 @@ describe('RechecheAuthorizer', () => {
         const recherche = uneRecherche()
 
         rechercheRepository.getRecherche
-          .withArgs('une-recherche', utilisateur.id)
+          .withArgs('une-recherche')
           .resolves(false)
 
         // When
