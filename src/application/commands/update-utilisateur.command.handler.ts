@@ -60,11 +60,17 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     const lowerCaseEmail = command.email?.toLocaleLowerCase()
 
     if (utilisateur) {
-      return await this.genererUtilisateurExistant(
-        utilisateur,
-        command.idUtilisateurAuth,
-        lowerCaseEmail
-      )
+      if (
+        lowerCaseEmail &&
+        utilisateur.type === Authentification.Type.CONSEILLER
+      ) {
+        utilisateur.email = lowerCaseEmail
+        await this.authentificationRepository.save(
+          utilisateur,
+          command.idUtilisateurAuth
+        )
+      }
+      return success(queryModelFromUtilisateur(utilisateur))
     } else if (command.structure === Core.Structure.PASS_EMPLOI) {
       return failure(
         new NonTrouveError('Utilisateur', command.idUtilisateurAuth)
@@ -72,7 +78,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     }
 
     if (command.type === Authentification.Type.CONSEILLER) {
-      return await this.genererNouveauConseiller(command, lowerCaseEmail)
+      return await this.creerNouveauConseiller(command, lowerCaseEmail)
     } else if (command.type === Authentification.Type.JEUNE && lowerCaseEmail) {
       const jeune = await this.authentificationRepository.getJeuneByEmail(
         lowerCaseEmail
@@ -104,22 +110,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     return
   }
 
-  private async genererUtilisateurExistant(
-    utilisateur: Authentification.Utilisateur,
-    idUtilisateurAuth: string,
-    lowerCaseEmail?: string
-  ): Promise<Result<UtilisateurQueryModel>> {
-    if (
-      lowerCaseEmail &&
-      utilisateur.type === Authentification.Type.CONSEILLER
-    ) {
-      utilisateur.email = lowerCaseEmail
-      await this.authentificationRepository.save(utilisateur, idUtilisateurAuth)
-    }
-    return success(queryModelFromUtilisateur(utilisateur))
-  }
-
-  private async genererNouveauConseiller(
+  private async creerNouveauConseiller(
     command: UpdateUtilisateurCommand,
     lowerCaseEmail?: string
   ): Promise<Result<UtilisateurQueryModel>> {
