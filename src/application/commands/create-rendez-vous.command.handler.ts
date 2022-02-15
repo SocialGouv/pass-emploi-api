@@ -17,6 +17,7 @@ import { PlanificateurService } from '../../domain/planificateur'
 import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
 import { IdService } from '../../utils/id-service'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { MailSendinblueClient } from '../../infrastructure/clients/mail-sendinblue.client'
 
 export interface CreateRendezVousCommand extends Command {
   idJeune: string
@@ -47,7 +48,8 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     private notificationRepository: Notification.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer,
     private planificateurService: PlanificateurService,
-    private evenementService: EvenementService
+    private evenementService: EvenementService,
+    private mailSendinblueClient: MailSendinblueClient
   ) {
     super('CreateRendezVousCommandHandler')
   }
@@ -82,6 +84,24 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       this.logger.log(
         `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
       )
+    }
+
+    if (!jeune.conseiller.email) {
+      this.logger.warn(
+        `Impossible d'envoyer un mail au conseiller ${command.idConseiller}, il n'existe pas`
+      )
+    } else {
+      try {
+        await this.mailSendinblueClient.envoyerMailNouveauRendezVous(
+          jeune.conseiller,
+          rendezVous
+        )
+      } catch (e) {
+        this.logger.error(
+          "erreur lors de l'envoie de l'email du nouveau rendez-vous",
+          e
+        )
+      }
     }
 
     try {

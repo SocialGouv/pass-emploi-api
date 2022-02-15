@@ -87,7 +87,10 @@ export default () => {
     sendinblue: {
       url: process.env.SENDINBLUE_API_URL ?? 'https://api.sendinblue.com',
       apiKey: process.env.SENDINBLUE_API_KEY ?? '',
-      templateId: process.env.SENDINBLUE_TEMPLATE_ID ?? '2'
+      templates: {
+        conversationsNonLues: process.env.SENDINBLUE_CONVERSATIONS_TEMPLATE_ID ?? '2',
+        nouveauRendezvous: process.env.SENDINBLUE_NOUVEAU_RENDEZVOUS_TEMPLATE_ID ?? '3'
+      }
     },
     task: process.env.TASK,
     jobs: {

@@ -107,7 +107,7 @@ import { PoleEmploiClient } from './infrastructure/clients/pole-emploi-client'
 import { ActionSqlRepository } from './infrastructure/repositories/action-sql.repository'
 import { AuthentificationSqlRepository } from './infrastructure/repositories/authentification-sql.repository'
 import { ChatFirebaseRepository } from './infrastructure/repositories/chat-firebase.repository'
-import { ConseillerSqlEmailRepository } from './infrastructure/repositories/conseiller-sql-email.repository'
+import { ConseillerSqlRepository } from './infrastructure/repositories/conseiller-sql.repository'
 import { EvenementHttpSqlRepository } from './infrastructure/repositories/evenement-http-sql.repository'
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune-sql.repository'
 import { MiloHttpRepository } from './infrastructure/repositories/milo-http.repository'
@@ -141,6 +141,7 @@ import { PoleEmploiPartenaireClient } from './infrastructure/clients/pole-emploi
 import { GetActionsJeunePoleEmploiQueryHandler } from './application/queries/get-actions-jeune-pole-emploi.query.handler'
 import { GetJeuneMiloByDossierQueryHandler } from './application/queries/get-jeune-milo-by-dossier.query.handler'
 import { UpdateRendezVousCommandHandler } from './application/commands/update-rendez-vous.command.handler'
+import { InvitationIcsClient } from './infrastructure/clients/invitation-ics.client'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -186,6 +187,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     WorkerService,
     TaskService,
     MailSendinblueClient,
+    InvitationIcsClient,
     {
       provide: APP_GUARD,
       useClass: OidcAuthGuard
@@ -200,7 +202,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: ConseillersRepositoryToken,
-      useClass: ConseillerSqlEmailRepository
+      useClass: ConseillerSqlRepository
     },
     {
       provide: OffresEmploiRepositoryToken,

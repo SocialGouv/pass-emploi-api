@@ -1,0 +1,110 @@
+import { Jeune } from '../../../src/domain/jeune'
+import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
+import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
+import { DatabaseForTesting, expect } from '../../utils'
+import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitation-ics.client'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
+
+describe('InvitationIcsClient', () => {
+  const databaseForTesting = DatabaseForTesting.prepare()
+  let invitationIcsClient: InvitationIcsClient
+  let jeune: Jeune
+
+  beforeEach(async () => {
+    invitationIcsClient = new InvitationIcsClient(databaseForTesting.sequelize)
+
+    // Given
+    jeune = unJeune()
+    await ConseillerSqlModel.creer(unConseillerDto())
+    await JeuneSqlModel.creer(unJeuneDto())
+  })
+
+  describe('getAndIncrementRendezVousIcsSequence', () => {
+    describe('quand le rdv a une séquence ics qui est nulle', () => {
+      it('initialise la séquence ics à 0', async () => {
+        // Given
+        const idRdv = '6c242fa0-804f-11ec-a8a3-0242ac120002'
+        const unRendezVous = unRendezVousDto({
+          id: idRdv,
+          idJeune: jeune.id
+        })
+        await RendezVousSqlModel.create(unRendezVous)
+        // When
+        const rendezVousIcsSequence =
+          await invitationIcsClient.getAndIncrementRendezVousIcsSequence(idRdv)
+        // Then
+        expect(rendezVousIcsSequence).to.equal(0)
+      })
+    })
+    describe('quand le rdv a une séquence ics non nulle', () => {
+      it('incrémente la séquence ics', async () => {
+        // Given
+        const idRdv = '6c242fa0-804f-11ec-a8a3-0242ac120002'
+        const unRendezVous = unRendezVousDto({
+          id: idRdv,
+          idJeune: jeune.id,
+          icsSequence: 0
+        })
+        await RendezVousSqlModel.create(unRendezVous)
+        // When
+        const rendezVousIcsSequence =
+          await invitationIcsClient.getAndIncrementRendezVousIcsSequence(idRdv)
+        // Then
+        expect(rendezVousIcsSequence).to.equal(1)
+      })
+    })
+  })
+  describe('creerEvenementNouveauRendezVous', () => {
+    it('renvoie le bon évènement du nouveau rendez-vous', async () => {
+      // Given
+      const conseiller = unConseiller()
+      const rendezVous = unRendezVous()
+      const icsSequence = 0
+
+      // When
+      const result = invitationIcsClient.creerEvenementNouveauRendezVous(
+        conseiller,
+        rendezVous,
+        icsSequence
+      )
+
+      // Then
+      expect(result).to.deep.equal({
+        attendees: [
+          {
+            email: 'nils.tavernier@passemploi.com',
+            name: 'Tavernier Nils',
+            role: 'REQ-PARTICIPANT',
+            rsvp: true
+          },
+          {
+            name: 'Doe John',
+            role: 'REQ-PARTICIPANT',
+            rsvp: true
+          }
+        ],
+        description:
+          "Création d'un nouveau rendez-vous\nVous avez créé un rendez-vous de type Activités extérieures pour le jeudi 11 novembre 2021 à 08h03 .\nPour l'intégrer à votre agenda, vous devez accepter cette invitation.Attention, les modifications et refus effectués directement dans votre agenda ne sont pas pris en compte dans votre portail CEJ.\nBonne journée",
+        duration: {
+          minutes: 30
+        },
+        method: 'REQUEST',
+        organizer: {
+          email: 'nils.tavernier@passemploi.com',
+          name: 'Tavernier Nils'
+        },
+        sequence: 0,
+        start: [2021, 11, 11, 8, 3],
+        startInputType: 'utc',
+        title: 'Entretien individuel conseiller',
+        uid: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb'
+      })
+    })
+  })
+})

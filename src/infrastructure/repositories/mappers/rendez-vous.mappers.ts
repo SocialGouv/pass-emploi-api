@@ -22,7 +22,8 @@ export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
     adresse: rendezVous.adresse ?? null,
     organisme: rendezVous.organisme ?? null,
     presenceConseiller: rendezVous.presenceConseiller,
-    invitation: rendezVous.invitation ?? null
+    invitation: rendezVous.invitation ?? null,
+    icsSequence: null
   }
 }
 

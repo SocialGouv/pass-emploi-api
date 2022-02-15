@@ -9,6 +9,7 @@ import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../../domain/conseiller'
+import { MailSendinblueClient } from '../../../infrastructure/clients/mail-sendinblue.client'
 
 @Injectable()
 export class HandleJobMailConseillerCommandHandler extends CommandHandler<
@@ -20,6 +21,7 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
     private chatRepository: Chat.Repository,
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
+    private mailSendinblueClient: MailSendinblueClient,
     private dateService: DateService,
     private configuration: ConfigService
   ) {
@@ -61,11 +63,24 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
                 )
 
               if (nombreDeConversationsNonLues !== 0) {
-                await this.conseillerRepository.envoyerUnRappelParMail(
-                  conseiller.id,
-                  nombreDeConversationsNonLues
-                )
-                stats.mailsEnvoyes++
+                if (!conseiller?.email) {
+                  this.logger.warn(
+                    `Impossible d'envoyer un mail au conseiller ${conseiller.id}, il n'existe pas`
+                  )
+                } else {
+                  try {
+                    await this.mailSendinblueClient.envoyerMailConversationsNonLues(
+                      conseiller,
+                      nombreDeConversationsNonLues
+                    )
+                    stats.mailsEnvoyes++
+                  } catch (e) {
+                    this.logger.error(
+                      "erreur lors de l'envoie de l'email des conversations non lues",
+                      e
+                    )
+                  }
+                }
               }
               await this.conseillerRepository.save({
                 ...conseiller,

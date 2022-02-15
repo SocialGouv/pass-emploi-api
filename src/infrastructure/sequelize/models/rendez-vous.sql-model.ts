@@ -49,6 +49,9 @@ export class RendezVousDto extends Model {
   @Column({ field: 'adresse', type: DataType.STRING })
   adresse: string | null
 
+  @Column({ field: 'ics_sequence', type: DataType.INTEGER })
+  icsSequence: number | null
+
   @Column({ field: 'organisme', type: DataType.STRING })
   organisme: string | null
 

@@ -1,7 +1,7 @@
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Core } from '../../../src/domain/core'
-import { ConseillerSqlEmailRepository } from '../../../src/infrastructure/repositories/conseiller-sql-email.repository'
+import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository'
 import {
   ConseillerDto,
   ConseillerSqlModel
@@ -10,21 +10,15 @@ import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { DatabaseForTesting } from '../../utils'
-import { MailSendinblueClient } from '../../../src/infrastructure/clients/mail-sendinblue.client'
+import { DatabaseForTesting, expect } from '../../utils'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 
 describe('ConseillerSqlRepository', () => {
   DatabaseForTesting.prepare()
-  let conseillerSqlRepository: ConseillerSqlEmailRepository
-  let mailSendinblueClient: StubbedClass<MailSendinblueClient>
+  let conseillerSqlRepository: ConseillerSqlRepository
 
   beforeEach(async () => {
-    mailSendinblueClient = stubClass(MailSendinblueClient)
-    conseillerSqlRepository = new ConseillerSqlEmailRepository(
-      mailSendinblueClient
-    )
+    conseillerSqlRepository = new ConseillerSqlRepository()
   })
 
   describe('get', () => {
@@ -137,37 +131,6 @@ describe('ConseillerSqlRepository', () => {
       expect(actual).to.deep.equal(
         failure(new NonTrouveError('Conseiller', email))
       )
-    })
-  })
-
-  describe('envoyerUnRappelParMail', () => {
-    describe('quand le conseiller existe et a un email', () => {
-      it('lui envoie un mail', async () => {
-        // Given
-        const conseiller = unConseiller()
-        await conseillerSqlRepository.save(conseiller)
-
-        // When
-        await conseillerSqlRepository.envoyerUnRappelParMail(conseiller.id, 5)
-
-        // Then
-        expect(mailSendinblueClient.envoyer).to.have.been.calledWith(
-          conseiller,
-          5
-        )
-      })
-    })
-    describe("quand le conseiller n'existe pas", () => {
-      it('ne lui envoie pas de mail', async () => {
-        // When
-        await conseillerSqlRepository.envoyerUnRappelParMail(
-          'un-id-inexistant',
-          5
-        )
-
-        // Then
-        expect(mailSendinblueClient.envoyer).to.have.callCount(0)
-      })
     })
   })
 

@@ -1,0 +1,23 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:adamgibbons/ics
+METHOD:REQUEST
+X-PUBLISHED-TTL:PT1H
+BEGIN:VEVENT
+UID:20c8ca73-fd8b-4194-8d3c-80b6c9949deb
+SUMMARY:Entretien individuel conseiller
+DTSTAMP:20220405T083500Z
+DTSTART:20211111T080300Z
+DESCRIPTION:Création d'un nouveau rendez-vous\nVous avez créé un rendez-vou
+	s de type Activités extérieures pour le jeudi 11 novembre 2021 à 09h03 .\n
+	Pour l'intégrer à votre agenda\, vous devez accepter cette invitation.Atte
+	ntion\, les modifications et refus effectués directement dans votre agenda
+	 ne sont pas pris en compte dans votre portail CEJ.\nBonne journée
+ORGANIZER;CN=Tavernier Nils:mailto:nils.tavernier@passemploi.com
+ATTENDEE;RSVP=TRUE;ROLE=REQ-PARTICIPANT;CN=Tavernier Nils:mailto:nils.taver
+	nier@passemploi.com
+ATTENDEE;RSVP=TRUE;ROLE=REQ-PARTICIPANT;CN=Doe John
+DURATION:PT30M
+END:VEVENT
+END:VCALENDAR

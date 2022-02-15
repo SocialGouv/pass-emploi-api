@@ -1,0 +1,114 @@
+import { Inject, Injectable } from '@nestjs/common'
+import { QueryTypes, Sequelize } from 'sequelize'
+import { SequelizeInjectionToken } from '../sequelize/providers'
+import { Conseiller } from '../../domain/conseiller'
+import {
+  mapCodeLabelTypeRendezVous,
+  RendezVous
+} from '../../domain/rendez-vous'
+import * as icsService from 'ics'
+import {
+  formaterDateRendezVous,
+  formaterHeureRendezVous,
+  ICS
+} from './mail-sendinblue.client'
+import { EventAttributes } from 'ics'
+
+@Injectable()
+export class InvitationIcsClient {
+  constructor(
+    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
+  ) {}
+  async getAndIncrementRendezVousIcsSequence(
+    idRendezVous: string
+  ): Promise<number> {
+    const rendezVousIcsSequence = await this.sequelize.query(
+      ` UPDATE rendez_vous SET ics_sequence = CASE 
+            WHEN ics_sequence IS NOT NULL THEN ics_sequence + 1 ELSE 0 END 
+            WHERE id = :idRendezVous
+            RETURNING ics_sequence;`,
+      {
+        type: QueryTypes.UPDATE,
+        replacements: { idRendezVous }
+      }
+    )
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return rendezVousIcsSequence[0][0]['ics_sequence']
+  }
+
+  creerFichierInvitationNouveauRendezVous(
+    conseiller: Conseiller,
+    rendezVous: RendezVous,
+    icsSequence: number
+  ): ICS {
+    const event = this.creerEvenementNouveauRendezVous(
+      conseiller,
+      rendezVous,
+      icsSequence
+    )
+    const { error, value } = icsService.createEvent(event)
+    if (error || !value) {
+      throw error
+    }
+    return value
+  }
+
+  creerEvenementNouveauRendezVous(
+    conseiller: Conseiller,
+    rendezVous: RendezVous,
+    icsSequence: number
+  ): EventAttributes {
+    const dateRendezVousUtc = new Date(
+      Date.UTC(
+        rendezVous.date.getUTCFullYear(),
+        rendezVous.date.getUTCMonth(),
+        rendezVous.date.getUTCDate(),
+        rendezVous.date.getUTCHours(),
+        rendezVous.date.getUTCMinutes(),
+        rendezVous.date.getUTCSeconds()
+      )
+    )
+
+    return {
+      uid: rendezVous.id,
+      sequence: icsSequence,
+      startInputType: 'utc',
+      start: [
+        dateRendezVousUtc.getFullYear(),
+        dateRendezVousUtc.getMonth() + 1,
+        dateRendezVousUtc.getDate(),
+        dateRendezVousUtc.getUTCHours(),
+        dateRendezVousUtc.getMinutes()
+      ],
+      title: mapCodeLabelTypeRendezVous[rendezVous.type],
+      description:
+        "Création d'un nouveau rendez-vous\n" +
+        `Vous avez créé un rendez-vous de type Activités extérieures pour le ${formaterDateRendezVous(
+          rendezVous.date
+        )} à ${formaterHeureRendezVous(rendezVous.date)} .\n` +
+        "Pour l'intégrer à votre agenda, vous devez accepter cette invitation." +
+        'Attention, les modifications et refus effectués directement dans votre agenda ne sont pas pris en compte dans votre portail CEJ.\n' +
+        'Bonne journée',
+      duration: { minutes: rendezVous.duree },
+      organizer: {
+        name: conseiller.lastName + ' ' + conseiller.firstName,
+        email: conseiller.email
+      },
+      method: 'REQUEST',
+      attendees: [
+        {
+          name: conseiller.lastName + ' ' + conseiller.firstName,
+          email: conseiller.email,
+          rsvp: true,
+          role: 'REQ-PARTICIPANT'
+        },
+        {
+          name: rendezVous.jeune.lastName + ' ' + rendezVous.jeune.firstName,
+          rsvp: true,
+          role: 'REQ-PARTICIPANT'
+        }
+      ]
+    }
+  }
+}

@@ -67,7 +67,10 @@ export const testConfig = (): ConfigService => {
     sendinblue: {
       url: 'https://sendinblue.com',
       apiKey: 'sendinblueapiKey',
-      templateId: '21'
+      templates: {
+        conversationsNonLues: '200',
+        nouveauRendezvous: '300'
+      }
     },
     serviceCivique: {
       url: 'https://api.api-engagement.beta.gouv.op',
