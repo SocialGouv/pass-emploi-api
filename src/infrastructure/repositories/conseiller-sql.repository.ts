@@ -1,23 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Op } from 'sequelize'
 import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Conseiller } from '../../domain/conseiller'
 import { Core } from '../../domain/core'
-import { MailSendinblueClient } from '../clients/mail-sendinblue.client'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { fromSqlToDetailConseillerQueryModel } from './mappers/conseillers.mappers'
 import { DateTime } from 'luxon'
 
 @Injectable()
-export class ConseillerSqlEmailRepository implements Conseiller.Repository {
-  private logger: Logger
-
-  constructor(private mailSendinblueClient: MailSendinblueClient) {
-    this.logger = new Logger('ConseillerSqlRepository')
-  }
-
+export class ConseillerSqlRepository implements Conseiller.Repository {
   async existe(
     idConseiller: string,
     structure: Core.Structure
@@ -113,23 +106,5 @@ export class ConseillerSqlEmailRepository implements Conseiller.Repository {
     }
 
     return success(fromSqlToDetailConseillerQueryModel(conseillerSqlModel))
-  }
-
-  async envoyerUnRappelParMail(
-    idConseiller: string,
-    nombreDeConversationNonLues: number
-  ): Promise<void> {
-    const conseiller = await this.get(idConseiller)
-
-    if (!conseiller || !conseiller?.email) {
-      this.logger.warn(
-        `Impossible d'envoyer un mail au conseiller ${idConseiller}, il n'existe pas`
-      )
-    } else {
-      await this.mailSendinblueClient.envoyer(
-        conseiller,
-        nombreDeConversationNonLues
-      )
-    }
   }
 }

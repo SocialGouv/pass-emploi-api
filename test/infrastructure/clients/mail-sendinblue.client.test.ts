@@ -1,20 +1,34 @@
-import { MailSendinblueClient } from '../../../src/infrastructure/clients/mail-sendinblue.client'
+import {
+  MailDataDto,
+  MailSendinblueClient
+} from '../../../src/infrastructure/clients/mail-sendinblue.client'
 import { HttpService } from '@nestjs/axios'
 import { testConfig } from '../../utils/module-for-testing'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import * as nock from 'nock'
-import { expect } from '../../utils'
+import { DatabaseForTesting, expect } from '../../utils'
+import * as fs from 'fs'
+import * as path from 'path'
+import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
+import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitation-ics.client'
 
 describe('MailSendinblueClient', () => {
+  const databaseForTesting = DatabaseForTesting.prepare()
   let mailSendinblueClient: MailSendinblueClient
+  let invitationIcsClient: InvitationIcsClient
   const config = testConfig()
 
   beforeEach(() => {
     const httpService = new HttpService()
-    mailSendinblueClient = new MailSendinblueClient(httpService, config)
+    invitationIcsClient = new InvitationIcsClient(databaseForTesting.sequelize)
+    mailSendinblueClient = new MailSendinblueClient(
+      invitationIcsClient,
+      httpService,
+      config
+    )
   })
 
-  describe('envoyer', () => {
+  describe('envoyerMailConversationsNonLues', () => {
     describe('quand tout va bien', () => {
       it('envoie un mail', async () => {
         // Given
@@ -26,7 +40,9 @@ describe('MailSendinblueClient', () => {
               name: conseiller.firstName + ' ' + conseiller.lastName
             }
           ],
-          templateId: parseInt(config.get('sendinblue').templateId),
+          templateId: parseInt(
+            config.get('sendinblue').templates.conversationsNonLues
+          ),
           params: {
             prenom: conseiller.firstName,
             conversationsNonLues: 22,
@@ -39,7 +55,97 @@ describe('MailSendinblueClient', () => {
           .reply(200)
 
         // When
-        await mailSendinblueClient.envoyer(conseiller, 22)
+        await mailSendinblueClient.envoyerMailConversationsNonLues(
+          conseiller,
+          22
+        )
+
+        // Then
+        expect(scope.isDone()).to.equal(true)
+      })
+    })
+  })
+  describe('creerContenuMailNouveauRendezVous', () => {
+    it('renvoie le contenu du mail du nouveau rendez-vous', async () => {
+      // Given
+      const conseiller = unConseiller()
+      const rendezVous = unRendezVous()
+      const fichierInvitation = fs.readFileSync(
+        path.resolve(__dirname, '../../fixtures/invitation-mail.fixture.ics'),
+        'utf8'
+      )
+      const invitationBase64 = Buffer.from(fichierInvitation).toString('base64')
+
+      // When
+      const result = mailSendinblueClient.creerContenuMailNouveauRendezVous(
+        conseiller,
+        rendezVous,
+        fichierInvitation
+      )
+
+      // Then
+      expect(result).to.deep.equal({
+        attachment: [
+          {
+            content: invitationBase64,
+            name: 'invite.ics'
+          }
+        ],
+        params: {
+          dateRdv: 'jeudi 11 novembre 2021',
+          heureRdv: '08h03',
+          lienPortail: 'http://frontend.com',
+          typeRdv: 'Entretien individuel conseiller'
+        },
+        templateId: 300,
+        to: [
+          {
+            email: 'nils.tavernier@passemploi.com',
+            name: 'Nils Tavernier'
+          }
+        ]
+      })
+    })
+  })
+  describe('postMail', () => {
+    describe('quand tout va bien', () => {
+      it('envoie un mail', async () => {
+        // Given
+        const fichierInvitation = fs.readFileSync(
+          path.resolve(__dirname, '../../fixtures/invitation-mail.fixture.ics'),
+          'utf8'
+        )
+        const invitationBase64 =
+          Buffer.from(fichierInvitation).toString('base64')
+        const mailDataDto: MailDataDto = {
+          to: [
+            {
+              email: 'nils.tavernier@passemploi.com',
+              name: 'Nils  Tavernier'
+            }
+          ],
+          templateId: parseInt(
+            config.get('sendinblue').templates.conversationsNonLues
+          ),
+          params: {
+            prenom: 'Nils',
+            conversationsNonLues: 22,
+            nom: 'Tavernier',
+            lien: config.get('frontEndUrl')
+          },
+          attachment: [
+            {
+              name: 'invite.ics',
+              content: invitationBase64
+            }
+          ]
+        }
+        const scope = nock(config.get('sendinblue').url)
+          .post('/v3/smtp/email', JSON.stringify(mailDataDto))
+          .reply(200)
+
+        // When
+        await mailSendinblueClient.postMail(mailDataDto)
 
         // Then
         expect(scope.isDone()).to.equal(true)

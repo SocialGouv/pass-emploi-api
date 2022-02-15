@@ -23,7 +23,8 @@ export function unRendezVousDto(
     adresse: null,
     organisme: null,
     presenceConseiller: true,
-    invitation: null
+    invitation: null,
+    icsSequence: null
   }
 
   return { ...defaults, ...args }

@@ -26,10 +26,6 @@ export namespace Conseiller {
       structure: Core.Structure
     ): Promise<Result<DetailConseillerQueryModel>>
     existe(idConseiller: string, structure: Core.Structure): Promise<boolean>
-    envoyerUnRappelParMail(
-      idConseiller: string,
-      nombreDeConversationNonLues: number
-    ): Promise<void>
     findConseillersMessagesNonVerifies(
       nombreConseillers: number,
       dateVerification: DateTime
