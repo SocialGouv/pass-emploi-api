@@ -120,31 +120,23 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
 
         // Then
         expect(offresEmploiRepository.findAll).to.have.callCount(2)
+        const expectedFirstCall: OffresEmploi.Criteres = {
+          page: 1,
+          limit: 2,
+          q: 'test1',
+          minDateCreation: dateDerniereRecherche
+        }
         expect(offresEmploiRepository.findAll).to.have.been.calledWith(
-          1,
-          2,
-          undefined,
-          'test1',
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          dateDerniereRecherche
+          expectedFirstCall
         )
+        const expectedSecondCall: OffresEmploi.Criteres = {
+          page: 1,
+          limit: 2,
+          q: 'test2',
+          minDateCreation: dateDerniereRecherche
+        }
         expect(offresEmploiRepository.findAll).to.have.been.calledWith(
-          1,
-          2,
-          undefined,
-          'test2',
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          dateDerniereRecherche
+          expectedSecondCall
         )
       })
       it('recupère les nouvelles offres avec tous les criteres', async () => {
@@ -192,25 +184,34 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         await notifierNouvellesOffresEmploiCommandHandler.handle({})
 
         // Then
+        const expected: OffresEmploi.Criteres = {
+          page: 1,
+          limit: 2,
+          q: criteres.q,
+          departement: criteres.departement,
+          alternance: criteres.alternance,
+          experience: criteres.experience,
+          contrat: criteres.contrat,
+          duree: criteres.duree,
+          rayon: criteres.rayon,
+          commune: criteres.commune,
+          minDateCreation: dateDerniereRecherche
+        }
         expect(offresEmploiRepository.findAll).to.have.been.calledWithExactly(
-          1,
-          2,
-          criteres.alternance,
-          criteres.q,
-          criteres.departement,
-          criteres.experience,
-          criteres.duree,
-          criteres.contrat,
-          criteres.rayon,
-          criteres.commune,
-          dateDerniereRecherche
+          expected
         )
       })
       it('envoie une notification', async () => {
         // Given
+        const criteres: OffresEmploi.Criteres = {
+          page: 1,
+          limit: 2,
+          q: criteresRecherche1.q,
+          minDateCreation: dateDerniereRecherche
+        }
         offresEmploiRepository.findAll
           .resolves(success(offresEmploiQueryModelSansResultats))
-          .withArgs(1, 2, undefined, criteresRecherche1.q)
+          .withArgs(criteres)
           .resolves(success(offresEmploiQueryModel))
 
         jeuneRepository.get.withArgs(idJeune).resolves(unJeune())

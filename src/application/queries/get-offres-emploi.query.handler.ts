@@ -45,18 +45,12 @@ export class GetOffresEmploiQueryHandler extends QueryHandler<
   async handle(
     query: GetOffresEmploiQuery
   ): Promise<Result<OffresEmploiQueryModel>> {
-    return this.offresEmploiRepository.findAll(
-      query.page || DEFAULT_PAGE,
-      query.limit || DEFAULT_LIMIT,
-      query.alternance,
-      query.q,
-      query.departement,
-      query.experience,
-      query.duree,
-      query.contrat,
-      query.rayon,
-      query.commune
-    )
+    const criteres: OffresEmploi.Criteres = {
+      ...query,
+      page: query.page || DEFAULT_PAGE,
+      limit: query.limit || DEFAULT_LIMIT
+    }
+    return this.offresEmploiRepository.findAll(criteres)
   }
   async authorize(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

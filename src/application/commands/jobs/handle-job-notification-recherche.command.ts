@@ -156,23 +156,17 @@ export class NotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
   private async recupererLesNouvellesOffres(
     recherche: Recherche
   ): Promise<Result<OffresEmploiQueryModel>> {
-    const criteres = recherche.criteres as GetOffresEmploiQuery | undefined
+    const criteresBasiques = recherche.criteres as
+      | GetOffresEmploiQuery
+      | undefined
+    const criteres: OffresEmploi.Criteres = {
+      ...criteresBasiques,
+      minDateCreation: recherche.dateDerniereRecherche,
+      page: 1,
+      limit: 2
+    }
 
-    const MIN_RESULTATS_OFFRES_PAGE = 1
-    const MIN_RESULTATS_OFFRES_LIMIT = 2
-    return this.offresEmploiRepository.findAll(
-      MIN_RESULTATS_OFFRES_PAGE,
-      MIN_RESULTATS_OFFRES_LIMIT,
-      criteres?.alternance,
-      criteres?.q,
-      criteres?.departement,
-      criteres?.experience,
-      criteres?.duree,
-      criteres?.contrat,
-      criteres?.rayon,
-      criteres?.commune,
-      recherche.dateDerniereRecherche
-    )
+    return this.offresEmploiRepository.findAll(criteres)
   }
 
   async authorize(

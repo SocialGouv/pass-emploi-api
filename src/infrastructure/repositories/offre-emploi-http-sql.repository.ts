@@ -5,13 +5,7 @@ import {
   OffreEmploiResumeQueryModel,
   OffresEmploiQueryModel
 } from 'src/application/queries/query-models/offres-emploi.query-models'
-import {
-  OffresEmploi,
-  OffreEmploi,
-  Contrat,
-  Experience,
-  Duree
-} from '../../domain/offre-emploi'
+import { OffresEmploi, OffreEmploi } from '../../domain/offre-emploi'
 import { PoleEmploiClient } from '../clients/pole-emploi-client'
 import { FavoriOffreEmploiSqlModel } from '../sequelize/models/favori-offre-emploi.sql-model'
 import {
@@ -25,7 +19,7 @@ import {
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { DateService } from '../../utils/date-service'
-import { DateTime } from 'luxon'
+import { URLSearchParams } from 'url'
 
 @Injectable()
 export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
@@ -39,75 +33,46 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
   }
 
   async findAll(
-    page: number,
-    limit: number,
-    alternance?: boolean,
-    query?: string,
-    departement?: string,
-    experience?: Experience[],
-    duree?: Duree[],
-    contrat?: Contrat[],
-    rayon?: number,
-    commune?: string,
-    minDateCreation?: DateTime
+    criteres: OffresEmploi.Criteres
   ): Promise<Result<OffresEmploiQueryModel>> {
-    const params = new URLSearchParams()
-    params.append('sort', '1')
-    params.append('range', this.generateRange(page, limit))
+    return await this.trouverLesOffres(criteres)
+  }
 
-    if (query) {
-      params.append('motsCles', query)
-    }
-    if (departement) {
-      params.append('departement', departement)
-    }
-    if (alternance) {
-      params.append('natureContrat', 'E2,FS')
-    }
-    if (experience) {
-      params.append('experience', buildQueryParamFromArray(experience))
-    }
-    if (duree) {
-      params.append('dureeHebdo', buildQueryParamFromArray(duree))
-    }
-    if (contrat) {
-      params.append(
-        'typeContrat',
-        buildQueryParamFromArray(toPoleEmploiContrat(contrat))
-      )
-    }
-    if (rayon) {
-      params.append('distance', rayon.toString())
-    }
-    if (commune) {
-      params.append('commune', commune)
-    }
-    if (minDateCreation) {
-      params.append(
-        'minCreationDate',
-        minDateCreation
-          .toUTC()
-          .set({ millisecond: 0 })
-          .toISO({ suppressMilliseconds: true })
-      )
-      params.append(
-        'maxCreationDate',
-        this.dateService
-          .now()
-          .toUTC()
-          .set({ millisecond: 0 })
-          .toISO({ suppressMilliseconds: true })
+  private async trouverLesOffres(
+    criteres: OffresEmploi.Criteres,
+    secondesAAttendre?: number
+  ): Promise<Result<OffresEmploiQueryModel>> {
+    if (secondesAAttendre) {
+      await new Promise(resolve =>
+        setTimeout(resolve, secondesAAttendre * 1000)
       )
     }
 
     try {
+      const params = this.construireLesParams(criteres)
       const response = await this.poleEmploiClient.get(
         'offresdemploi/v2/offres/search',
         params
       )
-      return success(toOffresEmploiQueryModel(page, limit, response.data))
+      return success(
+        toOffresEmploiQueryModel(criteres.page, criteres.limit, response.data)
+      )
     } catch (e) {
       this.logger.error(e)
+
+      if (
+        e.response?.status === 429 &&
+        e.response?.headers &&
+        e.response?.headers['retry-after'] &&
+        !secondesAAttendre
+      ) {
+        this.logger.log('Retry de la requête')
+        return await this.trouverLesOffres(
+          criteres,
+          parseInt(e.response?.headers['retry-after'])
+        )
+      }
+
       if (e.response?.status >= 400 && e.response?.status < 500) {
         const erreur = new ErreurHttp(
           e.response.data?.message,
@@ -191,6 +156,73 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
         idJeune
       }
     })
+  }
+
+  private construireLesParams(
+    criteres: OffresEmploi.Criteres
+  ): URLSearchParams {
+    const {
+      page,
+      limit,
+      q,
+      departement,
+      alternance,
+      experience,
+      duree,
+      contrat,
+      commune,
+      rayon,
+      minDateCreation
+    } = criteres
+    const params = new URLSearchParams()
+    params.append('sort', '1')
+    params.append('range', this.generateRange(page, limit))
+
+    if (q) {
+      params.append('motsCles', q)
+    }
+    if (departement) {
+      params.append('departement', departement)
+    }
+    if (alternance) {
+      params.append('natureContrat', 'E2,FS')
+    }
+    if (experience) {
+      params.append('experience', buildQueryParamFromArray(experience))
+    }
+    if (duree) {
+      params.append('dureeHebdo', buildQueryParamFromArray(duree))
+    }
+    if (contrat) {
+      params.append(
+        'typeContrat',
+        buildQueryParamFromArray(toPoleEmploiContrat(contrat))
+      )
+    }
+    if (rayon) {
+      params.append('distance', rayon.toString())
+    }
+    if (commune) {
+      params.append('commune', commune)
+    }
+    if (minDateCreation) {
+      params.append(
+        'minCreationDate',
+        minDateCreation
+          .toUTC()
+          .set({ millisecond: 0 })
+          .toISO({ suppressMilliseconds: true })
+      )
+      params.append(
+        'maxCreationDate',
+        this.dateService
+          .now()
+          .toUTC()
+          .set({ millisecond: 0 })
+          .toISO({ suppressMilliseconds: true })
+      )
+    }
+    return params
   }
 }
 
