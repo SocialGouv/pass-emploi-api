@@ -111,6 +111,8 @@ import { RecherchesRepositoryToken } from './domain/recherche'
 import { GetRecherchesQueryHandler } from './application/queries/get-recherches.query.handler'
 import { TransfererJeunesConseillerCommandHandler } from './application/commands/transferer-jeunes-conseiller.command.handler'
 import { NotifierNouvellesOffresEmploiCommandHandler } from './application/commands/jobs/handle-job-notification-recherche.command'
+import { DeleteRechercheCommandHandler } from './application/commands/delete-recherche.command.handler'
+import { RechercheAuthorizer } from './application/authorizers/authorize-recherche'
 import { InitCronsCommandHandler } from './application/commands/init-crons.command'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
@@ -223,6 +225,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     FavoriOffresEmploiAuthorizer,
     FavoriOffresImmersionAuthorizer,
     JeuneAuthorizer,
+    RechercheAuthorizer,
     ConseillerForJeuneAuthorizer,
     RendezVousAuthorizer,
     GetDetailActionQueryHandler,
@@ -254,6 +257,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     DeleteActionCommandHandler,
     CreateRechercheCommandHandler,
     GetRecherchesQueryHandler,
+    DeleteRechercheCommandHandler,
     UpdateUtilisateurCommandHandler,
     GetCommunesEtDepartementsQueryHandler,
     GetDossierMiloJeuneQueryHandler,
