@@ -133,14 +133,3 @@ export class ErreurHttp implements DomainError {
     this.statusCode = statusCode
   }
 }
-
-export class RechercheNonTrouveeError implements DomainError {
-  static CODE = 'RECHERCHE_NON_TROUVEE'
-  readonly code: string = RechercheNonTrouveeError.CODE
-  readonly message: string
-
-  constructor(idJeune: string, idRessource: string, ressource: string) {
-    this.code = `${ressource}_NON_TROUVEE`
-    this.message = `La ressource ${ressource} du jeune ${idJeune} correspondant à la ressource ${ressource} ${idRessource} n'existe pas`
-  }
-}

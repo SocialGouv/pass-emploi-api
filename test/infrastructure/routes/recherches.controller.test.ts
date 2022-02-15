@@ -25,12 +25,12 @@ import {
   emptySuccess,
   failure
 } from '../../../src/building-blocks/types/result'
-import { RessourceNonTrouveeError } from '../../../src/building-blocks/types/domain-error'
 import {
   DeleteRechercheCommand,
   DeleteRechercheCommandHandler
 } from '../../../src/application/commands/delete-recherche.command.handler'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
+import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 
 describe('RecherchesController', () => {
   let createRechercheCommandHandler: StubbedClass<CreateRechercheCommandHandler>
@@ -252,19 +252,11 @@ describe('RecherchesController', () => {
       //Given
       deleteRechercheCommandHandler.execute
         .withArgs(command)
-        .resolves(
-          failure(
-            new RessourceNonTrouveeError(
-              command.idJeune,
-              command.idRecherche,
-              'RECHERCHE'
-            )
-          )
-        )
+        .resolves(failure(new NonTrouveError('Recherche', command.idRecherche)))
 
       const expectedMessageJson = {
-        code: 'RECHERCHE_NON_TROUVEE',
-        message: `La recherche du jeune ${command.idJeune} correspondant à la recherche ${command.idRecherche} n'existe pas`
+        code: 'NON_TROUVE',
+        message: `Recherche ${command.idRecherche} non trouvé(e)`
       }
       //When
       await request(app.getHttpServer())

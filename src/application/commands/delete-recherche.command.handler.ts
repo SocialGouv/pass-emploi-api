@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { RessourceNonTrouveeError } from '../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -10,6 +9,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { Recherche, RecherchesRepositoryToken } from '../../domain/recherche'
 import { RechercheAuthorizer } from '../authorizers/authorize-recherche'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 
 export interface DeleteRechercheCommand extends Command {
   idJeune: string
@@ -34,13 +34,7 @@ export class DeleteRechercheCommandHandler extends CommandHandler<
       command.idRecherche
     )
     if (!rechercheExiste) {
-      return failure(
-        new RessourceNonTrouveeError(
-          command.idJeune,
-          command.idRecherche,
-          'RECHERCHE'
-        )
-      )
+      return failure(new NonTrouveError('Recherche', command.idRecherche))
     }
     await this.rechercheRepository.deleteRecherche(command.idRecherche)
     return emptySuccess()

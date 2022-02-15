@@ -13,7 +13,6 @@ import {
   failure
 } from '../../../src/building-blocks/types/result'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { RessourceNonTrouveeError } from '../../../src/building-blocks/types/domain-error'
 import { RechercheAuthorizer } from '../../../src/application/authorizers/authorize-recherche'
 import { Recherche } from '../../../src/domain/recherche'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
@@ -21,6 +20,7 @@ import {
   DeleteRechercheCommand,
   DeleteRechercheCommandHandler
 } from '../../../src/application/commands/delete-recherche.command.handler'
+import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 
 describe('DeleteRechercheCommandHandler', () => {
   DatabaseForTesting.prepare()
@@ -80,13 +80,7 @@ describe('DeleteRechercheCommandHandler', () => {
         const result = await deleteRechercheCommandHandler.handle(command)
         // Then
         expect(result).to.deep.equal(
-          failure(
-            new RessourceNonTrouveeError(
-              command.idJeune,
-              command.idRecherche,
-              'RECHERCHE'
-            )
-          )
+          failure(new NonTrouveError('Recherche', command.idRecherche))
         )
         expect(
           rechercheSqlRepository.deleteRecherche
