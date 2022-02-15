@@ -115,7 +115,6 @@ import { DeleteRechercheCommandHandler } from './application/commands/delete-rec
 import { RechercheAuthorizer } from './application/authorizers/authorize-recherche'
 import { InitCronsCommandHandler } from './application/commands/init-crons.command'
 
-
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
     ConfigModule.forRoot({
