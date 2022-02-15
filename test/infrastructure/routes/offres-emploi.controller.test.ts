@@ -65,7 +65,7 @@ describe('OffresEmploiController', () => {
       const expectedQuery = {
         page: '1',
         limit: '50',
-        query: 'informatique',
+        q: 'informatique',
         departement: undefined,
         alternance: 'true',
         experience: '1',

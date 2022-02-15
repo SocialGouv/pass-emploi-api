@@ -81,8 +81,8 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
       let recherches: Recherche[]
 
       beforeEach(async () => {
-        criteresRecherche1 = { query: 'test1' }
-        criteresRecherche2 = { query: 'test2' }
+        criteresRecherche1 = { q: 'test1' }
+        criteresRecherche2 = { q: 'test2' }
         recherches = [
           uneRecherche({
             type: Recherche.Type.OFFRES_EMPLOI,
@@ -152,7 +152,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         const dateDerniereRecherche = date
 
         const criteres: GetOffresEmploiQuery = {
-          query: 'boulanger',
+          q: 'boulanger',
           departement: '75',
           alternance: false,
           experience: [
@@ -196,7 +196,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           1,
           2,
           criteres.alternance,
-          criteres.query,
+          criteres.q,
           criteres.departement,
           criteres.experience,
           criteres.duree,
@@ -210,7 +210,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         // Given
         offresEmploiRepository.findAll
           .resolves(success(offresEmploiQueryModelSansResultats))
-          .withArgs(1, 2, undefined, criteresRecherche1.query)
+          .withArgs(1, 2, undefined, criteresRecherche1.q)
           .resolves(success(offresEmploiQueryModel))
 
         jeuneRepository.get.withArgs(idJeune).resolves(unJeune())
@@ -277,29 +277,29 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         const recherches1 = [
           uneRecherche({
             type: Recherche.Type.OFFRES_EMPLOI,
-            criteres: { query: 'test1' }
+            criteres: { q: 'test1' }
           }),
           uneRecherche({
             type: Recherche.Type.OFFRES_EMPLOI,
-            criteres: { query: 'test2' }
+            criteres: { q: 'test2' }
           }),
           uneRecherche({
             type: Recherche.Type.OFFRES_EMPLOI,
-            criteres: { query: 'test3' }
+            criteres: { q: 'test3' }
           }),
           uneRecherche({
             type: Recherche.Type.OFFRES_EMPLOI,
-            criteres: { query: 'test4' }
+            criteres: { q: 'test4' }
           }),
           uneRecherche({
             type: Recherche.Type.OFFRES_EMPLOI,
-            criteres: { query: 'test5' }
+            criteres: { q: 'test5' }
           })
         ]
         const recherches2 = [
           uneRecherche({
             type: Recherche.Type.OFFRES_EMPLOI,
-            criteres: { query: 'test1' }
+            criteres: { q: 'test1' }
           })
         ]
         const nombreRecherches = 5
@@ -357,8 +357,8 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
       let recherches: Recherche[]
 
       beforeEach(async () => {
-        criteresRecherche1 = { query: 'test1' }
-        criteresRecherche2 = { query: 'test2' }
+        criteresRecherche1 = { q: 'test1' }
+        criteresRecherche2 = { q: 'test2' }
         recherches = [
           uneRecherche({
             id: '219e8ba5-cd88-4027-9828-55e8ca99a231',

@@ -110,8 +110,8 @@ import { RechercheSqlRepository } from './infrastructure/repositories/recherche-
 import { RecherchesRepositoryToken } from './domain/recherche'
 import { GetRecherchesQueryHandler } from './application/queries/get-recherches.query.handler'
 import { TransfererJeunesConseillerCommandHandler } from './application/commands/transferer-jeunes-conseiller.command.handler'
-import { InitJobsCommandHandler } from './application/commands/init-jobs.command'
 import { NotifierNouvellesOffresEmploiCommandHandler } from './application/commands/jobs/handle-job-notification-recherche.command'
+import { InitCronsCommandHandler } from './application/commands/init-crons.command'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -267,7 +267,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     SynchronizeJobsCommandHandler,
     GetConseillerByEmailQueryHandler,
     TransfererJeunesConseillerCommandHandler,
-    InitJobsCommandHandler,
+    InitCronsCommandHandler,
     NotifierNouvellesOffresEmploiCommandHandler
   ]
 }
