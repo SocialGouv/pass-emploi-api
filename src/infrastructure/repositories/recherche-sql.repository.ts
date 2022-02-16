@@ -90,4 +90,11 @@ export class RechercheSqlRepository implements Recherche.Repository {
       }
     })
   }
+
+  async existe(idRecherche: string, idJeune: string): Promise<boolean> {
+    const rechercheSqlModel = await RechercheSqlModel.findOne({
+      where: { id: idRecherche, idJeune: idJeune }
+    })
+    return !!rechercheSqlModel
+  }
 }

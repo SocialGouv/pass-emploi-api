@@ -6,7 +6,7 @@ import { Recherche } from '../../../src/domain/recherche'
 import { RechercheAuthorizer } from '../../../src/application/authorizers/authorize-recherche'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
 
-describe('RechecheAuthorizer', () => {
+describe('RechercheAuthorizer', () => {
   let rechercheRepository: StubbedType<Recherche.Repository>
   let rechercheAuthorizer: RechercheAuthorizer
 
@@ -23,7 +23,9 @@ describe('RechecheAuthorizer', () => {
         const utilisateur = unUtilisateurJeune()
         const recherche = uneRecherche()
 
-        rechercheRepository.getRecherche.withArgs(recherche.id).resolves(true)
+        rechercheRepository.existe
+          .withArgs(recherche.id, utilisateur.id)
+          .resolves(true)
 
         // When
         const result = await rechercheAuthorizer.authorize(
@@ -42,8 +44,8 @@ describe('RechecheAuthorizer', () => {
         const utilisateur = unUtilisateurJeune()
         const recherche = uneRecherche()
 
-        rechercheRepository.getRecherche
-          .withArgs('une-recherche')
+        rechercheRepository.existe
+          .withArgs('une-recherche', utilisateur.id)
           .resolves(false)
 
         // When

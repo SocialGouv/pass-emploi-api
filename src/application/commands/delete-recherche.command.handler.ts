@@ -30,10 +30,10 @@ export class DeleteRechercheCommandHandler extends CommandHandler<
   }
 
   async handle(command: DeleteRechercheCommand): Promise<Result<void>> {
-    const rechercheExiste = await this.rechercheRepository.getRecherche(
+    const rechercheQueryModel = await this.rechercheRepository.getRecherche(
       command.idRecherche
     )
-    if (!rechercheExiste) {
+    if (!rechercheQueryModel) {
       return failure(new NonTrouveError('Recherche', command.idRecherche))
     }
     await this.rechercheRepository.deleteRecherche(command.idRecherche)
