@@ -33,7 +33,7 @@ export default () => {
     debug: process.env.DEBUG,
     logLevel: process.env.LOG_LEVEL,
     nodeEnv: process.env.NODE_ENV || 'production',
-    frontEndUrl:  process.env.FRONTEND_URL || 'http://localhost:3000',
+    frontEndUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
     baseUrl,
     poleEmploi: {
       url:
@@ -71,15 +71,15 @@ export default () => {
       url: process.env.REDIS_URL ?? ''
     },
     sendinblue: {
-      url:
-        process.env.SENDINBLUE_API_URL ?? 'https://api.sendinblue.com',
+      url: process.env.SENDINBLUE_API_URL ?? 'https://api.sendinblue.com',
       apiKey: process.env.SENDINBLUE_API_KEY ?? '',
       templateId: process.env.SENDINBLUE_TEMPLATE_ID ?? '2'
     },
     task: process.env.TASK,
     jobs: {
       notificationRecherches: {
-        nombreDeRequetesEnParallele: process.env.JOB_NOMBRE_RECHERCHES_PARALLELE ?? '5'
+        nombreDeRequetesEnParallele:
+          process.env.JOB_NOMBRE_RECHERCHES_PARALLELE ?? '5'
       }
     }
   }

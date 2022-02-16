@@ -19,7 +19,7 @@
     "psql": "docker-compose exec apidb psql -h localhost -d passemploidb -U passemploi ",
     "seed": "sequelize db:seed:undo:all && sequelize db:seed:all",
     "seed:referentiel": "sequelize db:seed:undo --seed 20211201160540-referentiel-communes-et-departements.js && sequelize db:seed --seed 20211201160540-referentiel-communes-et-departements.js",
-    "start": "yarn start:db && nest start",
+    "start": "yarn start:pg:db && nest start",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "start:prod:worker": "IS_WEB=false IS_WORKER=true node dist/main",
@@ -32,7 +32,7 @@
     "test:ci": "yarn migration && nyc --reporter=lcovonly mocha 'test/**/*.test.ts' --exit --timeout 10000",
     "watch": "yarn start:pg:db && yarn start:redis:db && nest start --watch | npx pino-pretty",
     "run:with:apm": "yarn start:pg:db && yarn start:redis:db && dotenv -e .environment nest start --watch | npx pino-pretty",
-    "tasks:init-all-jobs": "IS_WEB=false RUN_TASK_TASK=INIT_ALL_JOBS node dist/main",
+    "tasks:init-all-jobs": "IS_WEB=false IS_WORKER=false TASK=INIT_ALL_JOBS node dist/main",
     "tasks:dummy-job": "IS_WEB=false IS_WORKER=false TASK=DUMMY_JOB=true node dist/main",
     "tasks:rechercher-les-nouvelles-offres": "IS_WEB=false IS_WORKER=false TASK=RECHERCHER_LES_NOUVELLES_OFFRES node dist/main",
     "tasks:intialiser-les-crons": "IS_WEB=false IS_WORKER=false TASK=INITIALISER_LES_CRON node dist/main"
