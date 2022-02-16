@@ -40,5 +40,6 @@ export namespace Recherche {
     ): Promise<Recherche[]>
     getRecherche(idRecherche: string): Promise<RechercheQueryModel | undefined>
     deleteRecherche(idRecherche: string): Promise<void>
+    existe(idRecherche: string, idJeune: string): Promise<boolean>
   }
 }
