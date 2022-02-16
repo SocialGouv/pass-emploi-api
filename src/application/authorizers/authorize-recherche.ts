@@ -15,13 +15,13 @@ export class RechercheAuthorizer {
     idRecherche: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const recherche = await this.rechercheRepository.existe(
+    const rechercheExiste = await this.rechercheRepository.existe(
       idRecherche,
       idJeune
     )
 
     if (
-      recherche &&
+      rechercheExiste &&
       utilisateur &&
       utilisateur.type === Authentification.Type.JEUNE &&
       utilisateur.id === idJeune
