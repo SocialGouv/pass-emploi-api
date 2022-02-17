@@ -59,12 +59,12 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
       )
     } catch (e) {
       this.logger.error(e)
-
+      const cestLePremierAppel = !secondesAAttendre
       if (
+        cestLePremierAppel &&
         e.response?.status === 429 &&
         e.response?.headers &&
-        e.response?.headers['retry-after'] &&
-        !secondesAAttendre
+        e.response?.headers['retry-after']
       ) {
         this.logger.log('Retry de la requête')
         return await this.trouverLesOffres(
