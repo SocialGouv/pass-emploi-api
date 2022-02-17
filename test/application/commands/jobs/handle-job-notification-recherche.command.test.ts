@@ -227,7 +227,6 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           },
           data: {
             type: 'NOUVELLE_OFFRE',
-            sousType: 'OFFRES_EMPLOI',
             id: '219e8ba5-cd88-4027-9828-55e8ca99a236'
           }
         })
@@ -421,7 +420,6 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           },
           data: {
             type: 'NOUVELLE_OFFRE',
-            sousType: 'OFFRES_EMPLOI',
             id: '219e8ba5-cd88-4027-9828-55e8ca99a232'
           }
         })

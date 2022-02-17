@@ -1,6 +1,5 @@
 import { DateTime } from 'luxon'
 import { DateService } from '../utils/date-service'
-import { Recherche } from './recherche'
 
 export const NotificationRepositoryToken = 'NotificationRepositoryToken'
 
@@ -26,7 +25,6 @@ export namespace Notification {
     }
     data: {
       type: string
-      sousType?: string
       id?: string
     }
   }
@@ -51,8 +49,7 @@ export namespace Notification {
   export function createNouvelleOffreEmploi(
     token: string,
     idRecherche: string,
-    titre: string,
-    typeRecherche: Recherche.Type
+    titre: string
   ): Notification.Message {
     return {
       token,
@@ -62,7 +59,6 @@ export namespace Notification {
       },
       data: {
         type: Type.NOUVELLE_OFFRE,
-        sousType: typeRecherche,
         id: idRecherche
       }
     }

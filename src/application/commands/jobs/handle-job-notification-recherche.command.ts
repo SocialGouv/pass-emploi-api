@@ -55,6 +55,7 @@ export class NotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
       )!
     )
     const stats: Stats = {
+      nombreDeRecherchesTotal: 0,
       succes: 0,
       notificationsEnvoyees: 0,
       429: 0,
@@ -98,8 +99,7 @@ export class NotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
                 const notification = Notification.createNouvelleOffreEmploi(
                   jeune.pushNotificationToken,
                   recherche.id,
-                  recherche.titre,
-                  recherche.type
+                  recherche.titre
                 )
                 this.notificationRepository.send(notification)
               }
@@ -144,6 +144,7 @@ export class NotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
       }
 
       stats.tempsDExecution = maintenant.diffNow().milliseconds * -1
+      stats.nombreDeRecherchesTotal = stats.succes + stats.echecs
       return success(stats)
     } catch (e) {
       this.logger.error("Le job de notifications s'est arrêté")
@@ -187,9 +188,10 @@ export class NotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
 }
 
 export interface Stats {
+  nombreDeRecherchesTotal: number
   succes: number
+  echecs: number
   notificationsEnvoyees: number
   429: number
-  echecs: number
   tempsDExecution?: number
 }
