@@ -114,6 +114,11 @@ import { NotifierNouvellesOffresEmploiCommandHandler } from './application/comma
 import { DeleteRechercheCommandHandler } from './application/commands/delete-recherche.command.handler'
 import { RechercheAuthorizer } from './application/authorizers/authorize-recherche'
 import { InitCronsCommandHandler } from './application/commands/init-crons.command'
+import { ServicesCiviqueController } from './infrastructure/routes/services-civique.controller'
+import { ServiceCiviqueClient } from './infrastructure/clients/service-civique-client'
+import { ServiceCiviqueRepositoryToken } from './domain/service-civique'
+import { ServiceCiviqueHttpRepository } from './infrastructure/repositories/service-civique-http.repository'
+import { GetServicesCiviqueQueryHandler } from './application/queries/get-services-civique.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -137,7 +142,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     ReferentielsController,
     EvenementsController,
     RecherchesController,
-    FavorisController
+    FavorisController,
+    ServicesCiviqueController
   ],
   providers: [
     ...buildQueryCommandsProviders(),
@@ -149,6 +155,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     DateService,
     PoleEmploiClient,
     ImmersionClient,
+    ServiceCiviqueClient,
     Action.Factory,
     Authentification.Factory,
     WorkerService,
@@ -213,6 +220,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       provide: RecherchesRepositoryToken,
       useClass: RechercheSqlRepository
     },
+    {
+      provide: ServiceCiviqueRepositoryToken,
+      useClass: ServiceCiviqueHttpRepository
+    },
     ...databaseProviders
   ],
   exports: [...databaseProviders]
@@ -272,7 +283,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetConseillerByEmailQueryHandler,
     TransfererJeunesConseillerCommandHandler,
     InitCronsCommandHandler,
-    NotifierNouvellesOffresEmploiCommandHandler
+    NotifierNouvellesOffresEmploiCommandHandler,
+    GetServicesCiviqueQueryHandler
   ]
 }
 

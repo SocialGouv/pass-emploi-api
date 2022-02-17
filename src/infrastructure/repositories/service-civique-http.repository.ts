@@ -1,0 +1,140 @@
+import { Injectable, Logger } from '@nestjs/common'
+import { ErreurHttp } from '../../building-blocks/types/domain-error'
+import { failure, Result, success } from '../../building-blocks/types/result'
+import { URLSearchParams } from 'url'
+import { ServiceCivique } from '../../domain/service-civique'
+import { ServiceCiviqueQueryModel } from '../../application/queries/query-models/service-civique.query-models'
+import { toServiceCiviqueQueryModel } from './mappers/service-civique.mapper'
+import { ServiceCiviqueClient } from '../clients/service-civique-client'
+
+@Injectable()
+export class ServiceCiviqueHttpRepository implements ServiceCivique.Repository {
+  private logger: Logger
+
+  constructor(private serviceCiviqueClient: ServiceCiviqueClient) {
+    this.logger = new Logger('ServiceCiviqueHttpRepository')
+  }
+
+  async findAll(
+    criteres: ServiceCivique.Criteres
+  ): Promise<Result<ServiceCiviqueQueryModel[]>> {
+    try {
+      const params = this.construireLesParams(criteres)
+      const response = await this.serviceCiviqueClient.get<ServicesCiviqueDto>(
+        'v0/mission/search',
+        params
+      )
+      return success(toServiceCiviqueQueryModel(response.data))
+    } catch (e) {
+      this.logger.error(e)
+      if (e.response?.status >= 400 && e.response?.status < 500) {
+        const erreur = new ErreurHttp(
+          e.response.data?.message,
+          e.response.status
+        )
+        return failure(erreur)
+      }
+      return failure(e)
+    }
+  }
+
+  private construireLesParams(
+    criteres: ServiceCivique.Criteres
+  ): URLSearchParams {
+    const {
+      page,
+      limit,
+      lat,
+      lon,
+      dateDeDebutMaximum,
+      dateDeDebutMinimum,
+      distance,
+      domaine
+    } = criteres
+    const params = new URLSearchParams()
+    params.append('size', limit.toString())
+    params.append('from', (page * limit - limit + 1).toString())
+
+    if (lat) {
+      params.append('lat', lat.toString())
+    }
+    if (lon) {
+      params.append('lon', lon.toString())
+    }
+    if (dateDeDebutMaximum) {
+      params.append('startAt', `lt:${dateDeDebutMaximum.toUTC().toISO()}`)
+    }
+    if (dateDeDebutMinimum) {
+      params.append('startAt', `gt:${dateDeDebutMinimum.toUTC().toISO()}`)
+    }
+    if (distance) {
+      params.append('distance', `${distance}km`)
+    }
+    if (domaine) {
+      params.append('domain', domaine)
+    }
+    return params
+  }
+}
+
+export interface ServicesCiviqueDto {
+  total: number
+  hits: [
+    {
+      id: string
+      publisherId: string
+      publisherName: string
+      publisherUrl: string
+      publisherLogo: string
+      lastSyncAt: string
+      applicationUrl: string
+      statusCode: string
+      statusComment: string
+      clientId: string
+      title: string
+      description: string
+      organizationName: string
+      organizationUrl: string
+      organizationFullAddress: string
+      organizationCity: string
+      organizationPostCode: string
+      organizationDescription: string
+      startAt: string
+      postedAt: string
+      priority: string
+      metadata: string
+      adresse: string
+      postalCode: string
+      departmentName: string
+      departmentCode: string
+      city: string
+      region: string
+      country: string
+      domain: string
+      domainLogo: string
+      activity: string
+      location: {
+        lon: number
+        lat: number
+      }
+      remote: string
+      deleted: string
+      createdAt: string
+      updatedAt: string
+    }
+  ]
+  facets: {
+    departmentName: Array<{
+      key: string
+      doc_count: number
+    }>
+    activities: Array<{
+      key: string
+      doc_count: number
+    }>
+    domains: Array<{
+      key: string
+      doc_count: number
+    }>
+  }
+}

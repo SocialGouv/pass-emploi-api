@@ -57,6 +57,12 @@ export default () => {
         'https://immersion-facile.beta.gouv.fr/api',
       apiKey: process.env.IMMERSION_API_KEY ?? ''
     },
+    serviceCivique: {
+      url:
+        process.env.SERVICE_CIVIQUE_API_URL ??
+      'https://api.api-engagement.beta.gouv.fr',
+      apiKey: process.env.SERVICE_CIVIQUE_API_KEY ?? ''
+    },
     firebase: {
       key: process.env.FIREBASE_SECRET_KEY ?? '',
       encryptionKey: process.env.CHAT_ENCRYPTION_KEY
