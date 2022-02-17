@@ -28,19 +28,7 @@ export const OffresEmploiRepositoryToken = 'OffresEmploi.Repository'
 
 export namespace OffresEmploi {
   export interface Repository {
-    findAll(
-      page: number,
-      limit: number,
-      alternance?: boolean,
-      query?: string,
-      departement?: string,
-      experience?: Experience[],
-      duree?: Duree[],
-      contrat?: Contrat[],
-      rayon?: number,
-      commune?: string,
-      minDateCreation?: DateTime
-    ): Promise<Result<OffresEmploiQueryModel>>
+    findAll(criteres: Criteres): Promise<Result<OffresEmploiQueryModel>>
 
     getOffreEmploiQueryModelById(
       idOffreEmploi: string
@@ -62,6 +50,20 @@ export namespace OffresEmploi {
     ): Promise<OffreEmploi | undefined>
 
     deleteFavori(idJeune: string, idOffreEmploi: string): Promise<void>
+  }
+
+  export interface Criteres {
+    page: number
+    limit: number
+    q?: string
+    departement?: string
+    alternance?: boolean
+    experience?: Experience[]
+    contrat?: Contrat[]
+    duree?: Duree[]
+    rayon?: number
+    commune?: string
+    minDateCreation?: DateTime
   }
 }
 

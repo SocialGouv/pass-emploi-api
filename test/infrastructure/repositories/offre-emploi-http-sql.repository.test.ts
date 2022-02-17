@@ -2,7 +2,8 @@ import {
   Contrat,
   Duree,
   Experience,
-  OffreEmploi
+  OffreEmploi,
+  OffresEmploi
 } from '../../../src/domain/offre-emploi'
 import { PoleEmploiClient } from '../../../src/infrastructure/clients/pole-emploi-client'
 import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-emploi-http-sql.repository'
@@ -11,23 +12,30 @@ import { FavoriOffreEmploiSqlModel } from '../../../src/infrastructure/sequelize
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { DatabaseForTesting, expect, stubClass } from '../../utils'
+import {
+  DatabaseForTesting,
+  expect,
+  StubbedClass,
+  stubClass
+} from '../../utils'
 import {
   uneOffreEmploi,
   uneOffreEmploiResumeQueryModel
 } from '../../fixtures/offre-emploi.fixture'
 import { DateService } from '../../../src/utils/date-service'
 import { DateTime } from 'luxon'
+import { isSuccess } from '../../../src/building-blocks/types/result'
 
 describe('OffresEmploiHttpSqlRepository', () => {
   DatabaseForTesting.prepare()
   let offresEmploiHttpSqlRepository: OffresEmploiHttpSqlRepository
-  const poleEmploiClient = stubClass(PoleEmploiClient)
+  let poleEmploiClient: StubbedClass<PoleEmploiClient>
   const maintenant = DateTime.fromISO('2020-04-06T12:00:00.001Z').toUTC()
 
   beforeEach(async () => {
     const dateService = stubClass(DateService)
     dateService.now.returns(maintenant)
+    poleEmploiClient = stubClass(PoleEmploiClient)
 
     offresEmploiHttpSqlRepository = new OffresEmploiHttpSqlRepository(
       poleEmploiClient,
@@ -231,6 +239,19 @@ describe('OffresEmploiHttpSqlRepository', () => {
   })
 
   describe('.findAll', () => {
+    const criteres: OffresEmploi.Criteres = {
+      page: 1,
+      limit: 50,
+      alternance: true,
+      duree: [Duree.tempsPlein],
+      contrat: [Contrat.cdd, Contrat.autre],
+      commune: 'Paris',
+      q: 'mots clés',
+      departement: '75',
+      experience: [Experience.entreUnEtTroisAns, Experience.plusDeTroisAns],
+      rayon: 15
+    }
+
     beforeEach(() => {
       // Given
       poleEmploiClient.get.resolves({
@@ -246,18 +267,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
     describe('fait appel à l"API de Pôle Emploi avec les bons paramètres', () => {
       it('quand tous les query params sont fournis', async () => {
         // When
-        await offresEmploiHttpSqlRepository.findAll(
-          1,
-          50,
-          true,
-          'mots clés',
-          '75',
-          [Experience.entreUnEtTroisAns, Experience.plusDeTroisAns],
-          [Duree.tempsPlein],
-          [Contrat.cdi, Contrat.autre],
-          15,
-          'Paris'
-        )
+        await offresEmploiHttpSqlRepository.findAll(criteres)
         const expectedQueryParams = new URLSearchParams({
           sort: '1',
           range: '0-49',
@@ -278,19 +288,18 @@ describe('OffresEmploiHttpSqlRepository', () => {
         )
       })
       it('quand que quelques query params sont fournis', async () => {
+        // Given
+        const criteres: OffresEmploi.Criteres = {
+          page: 1,
+          limit: 50,
+          alternance: false,
+          duree: [Duree.tempsPlein, Duree.tempsPartiel],
+          contrat: [Contrat.cdd],
+          commune: '75118'
+        }
+
         // When
-        await offresEmploiHttpSqlRepository.findAll(
-          1,
-          50,
-          false,
-          undefined,
-          undefined,
-          undefined,
-          [Duree.tempsPlein, Duree.tempsPartiel],
-          [Contrat.cdd],
-          undefined,
-          '75118'
-        )
+        await offresEmploiHttpSqlRepository.findAll(criteres)
         const expectedQueryParams = new URLSearchParams({
           sort: '1',
           range: '0-49',
@@ -308,19 +317,14 @@ describe('OffresEmploiHttpSqlRepository', () => {
       it('quand il y a une date de création minimum', async () => {
         // When
         const minDateCreation = maintenant.minus({ day: 1, hour: 2 })
-        await offresEmploiHttpSqlRepository.findAll(
-          1,
-          50,
-          false,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          '75118',
+        const criteres: OffresEmploi.Criteres = {
+          page: 1,
+          limit: 50,
+          alternance: false,
+          commune: '75118',
           minDateCreation
-        )
+        }
+        await offresEmploiHttpSqlRepository.findAll(criteres)
         const expectedQueryParams = new URLSearchParams({
           sort: '1',
           range: '0-49',
@@ -334,6 +338,55 @@ describe('OffresEmploiHttpSqlRepository', () => {
           'offresdemploi/v2/offres/search',
           expectedQueryParams
         )
+      })
+    })
+    describe('quand il y a une 429', () => {
+      it("rappelle l'api après le temps qu'il faut", async () => {
+        // Given
+        poleEmploiClient.get
+          .onFirstCall()
+          .rejects({
+            response: {
+              status: 429,
+              headers: {
+                'retry-after': 1
+              }
+            }
+          })
+          .onSecondCall()
+          .resolves({
+            config: undefined,
+            headers: undefined,
+            request: undefined,
+            status: 200,
+            statusText: '',
+            data: []
+          })
+
+        // When
+        const result = await offresEmploiHttpSqlRepository.findAll(criteres)
+
+        // Then
+        expect(isSuccess(result)).to.be.equal(true)
+        expect(poleEmploiClient.get).to.have.callCount(2)
+      })
+      it('rejette après 2 appels en 429', async () => {
+        // Given
+        poleEmploiClient.get.rejects({
+          response: {
+            status: 429,
+            headers: {
+              'retry-after': 1
+            }
+          }
+        })
+
+        // When
+        const result = await offresEmploiHttpSqlRepository.findAll(criteres)
+
+        // Then
+        expect(isSuccess(result)).to.be.equal(false)
+        expect(poleEmploiClient.get).to.have.callCount(2)
       })
     })
   })
