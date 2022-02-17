@@ -1,14 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
+import { Command } from '../../building-blocks/types/command'
+import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { emptySuccess, Result } from '../../building-blocks/types/result'
 import {
   Planificateur,
   PlanificateurRepositoryToken,
   PlanificateurService
 } from '../../domain/planificateur'
 import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
-import { Command } from '../../building-blocks/types/command'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { emptySuccess, Result } from '../../building-blocks/types/result'
 
 @Injectable()
 export class SynchronizeJobsCommandHandler extends CommandHandler<
@@ -16,8 +15,6 @@ export class SynchronizeJobsCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    @Inject(ConseillersRepositoryToken)
-    private conseillerRepository: Conseiller.Repository,
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
     private planificateurService: PlanificateurService,
@@ -30,13 +27,6 @@ export class SynchronizeJobsCommandHandler extends CommandHandler<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async handle(_command: Command): Promise<Result> {
     await this.planificateurRepository.supprimerTousLesJobs()
-
-    const conseillersIds = await this.conseillerRepository.getAllIds()
-
-    this.logger.log('Création des jobs conseillers')
-    for (const id of conseillersIds) {
-      await this.planificateurService.planifierJobRappelMail(id)
-    }
 
     const rendezVous = await this.rendezVousRepository.getAllAVenir()
     this.logger.log('Création des jobs rendez vous')

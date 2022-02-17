@@ -7,11 +7,13 @@ import { SynchronizeJobsCommandHandler } from './commands/synchronize-jobs.comma
 import JobEnum = Planificateur.JobEnum
 import { NotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notification-recherche.command'
 import { InitCronsCommandHandler } from './commands/init-crons.command'
+import { HandleJobMailConseillerCommandHandler } from './commands/jobs/handle-job-mail-conseiller.command'
 
 export enum Task {
   DUMMY_JOB = 'DUMMY_JOB',
   INIT_ALL_JOBS = 'INIT_ALL_JOBS',
   RECHERCHER_LES_NOUVELLES_OFFRES = 'RECHERCHER_LES_NOUVELLES_OFFRES',
+  ENVOYER_MAIL_CONSEILLER_MESSAGES = 'ENVOYER_MAIL_CONSEILLER_MESSAGES',
   INITIALISER_LES_CRON = 'INITIALISER_LES_CRON'
 }
 
@@ -24,7 +26,8 @@ export class TaskService {
     private planificateurRepository: Planificateur.Repository,
     private synchronizeJobsCommandHandler: SynchronizeJobsCommandHandler,
     private notifierNouvellesOffresEmploiCommandHandler: NotifierNouvellesOffresEmploiCommandHandler,
-    private initJobsCommandHandler: InitCronsCommandHandler
+    private handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler,
+    private initCronsCommandHandler: InitCronsCommandHandler
   ) {}
 
   async handle(task: Task | undefined): Promise<void> {
@@ -45,8 +48,11 @@ export class TaskService {
         case Task.RECHERCHER_LES_NOUVELLES_OFFRES:
           await this.notifierNouvellesOffresEmploiCommandHandler.execute({})
           break
+        case Task.ENVOYER_MAIL_CONSEILLER_MESSAGES:
+          await this.handleJobMailConseillerCommandHandler.execute({})
+          break
         case Task.INITIALISER_LES_CRON:
-          await this.initJobsCommandHandler.execute({})
+          await this.initCronsCommandHandler.execute({})
           break
         default:
           this.logger.log(

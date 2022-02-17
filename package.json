@@ -35,6 +35,7 @@
     "tasks:init-all-jobs": "IS_WEB=false IS_WORKER=false TASK=INIT_ALL_JOBS node dist/main",
     "tasks:dummy-job": "IS_WEB=false IS_WORKER=false TASK=DUMMY_JOB=true node dist/main",
     "tasks:rechercher-les-nouvelles-offres": "IS_WEB=false IS_WORKER=false TASK=RECHERCHER_LES_NOUVELLES_OFFRES node dist/main",
+    "tasks:envoyer-mail-conseiller-messages": "IS_WEB=false IS_WORKER=false TASK=ENVOYER_MAIL_CONSEILLER_MESSAGES node dist/main",
     "tasks:intialiser-les-crons": "IS_WEB=false IS_WORKER=false TASK=INITIALISER_LES_CRON node dist/main"
   },
   "dependencies": {

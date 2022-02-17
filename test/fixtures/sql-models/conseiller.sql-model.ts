@@ -13,7 +13,8 @@ export function unConseillerDto(
     email: 'nils.tavernier@passemploi.com',
     structure: Core.Structure.PASS_EMPLOI,
     idAuthentification: 'un-id',
-    dateCreation: uneDatetime.toJSDate()
+    dateCreation: uneDatetime.toJSDate(),
+    dateVerificationMessages: uneDatetime.toJSDate()
   }
 
   return { ...defaults, ...args }

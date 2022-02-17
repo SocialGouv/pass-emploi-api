@@ -180,8 +180,7 @@ export class NotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
     return
   }
 }
-
-export interface Stats {
+interface Stats {
   nombreDeRecherchesTotal: number
   succes: number
   echecs: number

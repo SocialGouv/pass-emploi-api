@@ -13,6 +13,7 @@ import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { DatabaseForTesting } from '../../utils'
 import { MailSendinblueClient } from '../../../src/infrastructure/clients/mail-sendinblue.client'
+import { uneDatetime } from 'test/fixtures/date.fixture'
 
 describe('ConseillerSqlRepository', () => {
   DatabaseForTesting.prepare()
@@ -167,6 +168,47 @@ describe('ConseillerSqlRepository', () => {
         // Then
         expect(mailSendinblueClient.envoyer).to.have.callCount(0)
       })
+    })
+  })
+
+  describe('findConseillersMessagesNonVerifies', () => {
+    it("recupere les conseillers avec des messages non verifies aujourd'hui", async () => {
+      // Given
+      const dateMaintenant = uneDatetime
+      const dateHier = uneDatetime.minus({ day: 1 })
+      const dateRechercheAujourdhui = uneDatetime.minus({ minute: 1 })
+
+      const conseillerAvecMessagesNonVerifies = unConseiller({
+        id: '1',
+        dateVerificationMessages: dateHier
+      })
+      const conseillerAvecMessagesVerifiesAujourdhui = unConseiller({
+        id: '2',
+        dateVerificationMessages: dateRechercheAujourdhui
+      })
+      const conseillerAvecMessagesDejaVerifies = unConseiller({
+        id: '3',
+        dateVerificationMessages: dateMaintenant
+      })
+
+      await conseillerSqlRepository.save(conseillerAvecMessagesNonVerifies)
+      await conseillerSqlRepository.save(
+        conseillerAvecMessagesVerifiesAujourdhui
+      )
+      await conseillerSqlRepository.save(conseillerAvecMessagesDejaVerifies)
+
+      // When
+      const conseillers =
+        await conseillerSqlRepository.findConseillersMessagesNonVerifies(
+          100,
+          dateMaintenant
+        )
+
+      // Then
+      expect(conseillers.length).to.equal(1)
+      expect(conseillers[0].id).to.deep.equal(
+        conseillerAvecMessagesNonVerifies.id
+      )
     })
   })
 })

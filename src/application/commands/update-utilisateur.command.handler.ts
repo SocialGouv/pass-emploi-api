@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DateService } from 'src/utils/date-service'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
@@ -20,8 +21,6 @@ import {
   queryModelFromUtilisateur,
   UtilisateurQueryModel
 } from '../queries/query-models/authentification.query-models'
-import { PlanificateurService } from '../../domain/planificateur'
-import { DateService } from 'src/utils/date-service'
 
 export interface UpdateUtilisateurCommand extends Command {
   idUtilisateurAuth: string
@@ -42,7 +41,6 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     @Inject(AuthentificationRepositoryToken)
     private readonly authentificationRepository: Authentification.Repository,
     private authentificationFactory: Authentification.Factory,
-    private planificateurService: PlanificateurService,
     private dateService: DateService
   ) {
     super('UpdateUtilisateurCommandHandler')
@@ -131,8 +129,6 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       command.idUtilisateurAuth,
       this.dateService.nowJs()
     )
-
-    this.planificateurService.planifierJobRappelMail(conseillerSso.id)
 
     return success(queryModelFromUtilisateur(conseillerSso))
   }

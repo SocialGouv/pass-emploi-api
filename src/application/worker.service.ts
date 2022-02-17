@@ -44,10 +44,8 @@ export class WorkerService {
         await this.handlerJobRendezVousCommandHandler.execute({
           job: job as Planificateur.Job<Planificateur.JobRendezVous>
         })
-      } else if (job.type === Planificateur.JobEnum.MAIL_CONSEILLER) {
-        await this.handleJobMailConseillerCommandHandler.execute({
-          job: job as Planificateur.Job<Planificateur.JobMailConseiller>
-        })
+      } else if (job.type === Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES) {
+        await this.handleJobMailConseillerCommandHandler.execute({})
       } else if (job.type === Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI) {
         await this.notifierNouvellesOffresEmploiCommandHandler.execute({})
       } else if (job.type === Planificateur.JobEnum.FAKE) {

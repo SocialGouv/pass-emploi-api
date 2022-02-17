@@ -78,6 +78,9 @@ export const testConfig = (): ConfigService => {
     jobs: {
       notificationRecherches: {
         nombreDeRequetesEnParallele: '5'
+      },
+      mailConseillers: {
+        nombreDeConseillersEnParallele: '100'
       }
     }
   })

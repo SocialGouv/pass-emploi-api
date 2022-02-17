@@ -32,6 +32,9 @@ export class ConseillerDto extends Model {
 
   @Column({ field: 'date_creation', type: DataType.DATE })
   dateCreation: Date
+
+  @Column({ field: 'date_verification_messages', type: DataType.DATE })
+  dateVerificationMessages: Date
 }
 
 @Table({ timestamps: false, tableName: 'conseiller' })
