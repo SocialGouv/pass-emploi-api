@@ -5,6 +5,7 @@ import {
   transformStringToFloat,
   transformStringToInteger
 } from './utils/transformers'
+import { OffreEngagement } from '../../../domain/offre-engagement'
 
 interface GetServicesCiviqueQuery {
   page?: number
@@ -62,7 +63,9 @@ export class GetServicesCiviqueQueryParams implements GetServicesCiviqueQuery {
   @IsOptional()
   dateDeDebutMaximum: string
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: Object.values(OffreEngagement.Domaine).join(', ')
+  })
   @IsString()
   @IsOptional()
   domaine: string
