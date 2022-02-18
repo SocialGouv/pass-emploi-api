@@ -18,12 +18,7 @@ export interface OffreImmersion {
 
 export namespace OffresImmersion {
   export interface Repository {
-    findAll(
-      rome: string,
-      lat: number,
-      lon: number,
-      distance: number
-    ): Promise<Result<OffreImmersionQueryModel[]>>
+    findAll(criteres: Criteres): Promise<Result<OffreImmersionQueryModel[]>>
 
     getFavorisIdsQueryModelsByJeune(
       id: Jeune.Id
@@ -45,6 +40,13 @@ export namespace OffresImmersion {
     saveAsFavori(idJeune: string, offreImmersion: OffreImmersion): Promise<void>
 
     deleteFavori(idJeune: string, idOffreImmersion: string): Promise<void>
+  }
+
+  export interface Criteres {
+    rome: string
+    lat: number
+    lon: number
+    distance: number
   }
 
   export enum MethodeDeContact {

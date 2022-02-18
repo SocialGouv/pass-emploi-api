@@ -71,12 +71,12 @@ describe('OffresImmersionHttpSqlRepository', () => {
           .resolves(response)
 
         // When
-        const offres = await offresImmersionHttpSqlRepository.findAll(
-          query.rome,
-          query.location.lat,
-          query.location.lon,
-          30
-        )
+        const offres = await offresImmersionHttpSqlRepository.findAll({
+          rome: query.rome,
+          lat: query.location.lat,
+          lon: query.location.lon,
+          distance: query.distance_km
+        })
 
         // Then
         expect(offres).to.deep.equal(
@@ -123,12 +123,12 @@ describe('OffresImmersionHttpSqlRepository', () => {
         immersionClient.post.rejects({ response: badResponse })
 
         // When
-        const offres = await offresImmersionHttpSqlRepository.findAll(
-          query.rome,
-          query.location.lat,
-          query.location.lon,
-          30
-        )
+        const offres = await offresImmersionHttpSqlRepository.findAll({
+          rome: query.rome,
+          lat: query.location.lat,
+          lon: query.location.lon,
+          distance: query.distance_km
+        })
 
         // Then
         expect(offres).to.deep.equal(

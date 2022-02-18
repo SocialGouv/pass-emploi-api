@@ -36,12 +36,12 @@ export class GetOffresImmersionQueryHandler extends QueryHandler<
     query: GetOffresImmersionQuery
   ): Promise<Result<OffreImmersionQueryModel[]>> {
     const distance = query.distance ? query.distance : DISTANCE_PAR_DEFAUT
-    return this.offresImmersionRepository.findAll(
-      query.rome,
-      query.lat,
-      query.lon,
+    return this.offresImmersionRepository.findAll({
+      rome: query.rome,
+      lat: query.lat,
+      lon: query.lon,
       distance
-    )
+    })
   }
   async authorize(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
