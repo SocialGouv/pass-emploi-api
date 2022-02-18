@@ -70,6 +70,10 @@ export const testConfig = (): ConfigService => {
       url: 'https://api.api-engagement.beta.gouv.op',
       apiKey: 'apiKey'
     },
+    immersion: {
+      url: 'https://api.api-immersion.beta.gouv.op',
+      apiKey: 'apiKey'
+    },
     frontEndUrl: 'http://frontend.com',
     jobs: {
       notificationRecherches: {
