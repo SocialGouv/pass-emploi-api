@@ -267,6 +267,20 @@ describe('RecherchesController', () => {
         .expect(HttpStatus.NOT_FOUND)
         .expect(expectedMessageJson)
     })
+    it('renvoie une 400(BAD REQUEST) si l"id de la recherche n"est pas un UUID', async () => {
+      const expectedMessageJson = {
+        statusCode: 400,
+        message: 'Validation failed (uuid  is expected)',
+        error: 'Bad Request'
+      }
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/${jeune.id}/recherches/12`)
+        .set('authorization', unHeaderAuthorization())
+        //Then
+        .expect(HttpStatus.BAD_REQUEST)
+        .expect(expectedMessageJson)
+    })
     ensureUserAuthenticationFailsIfInvalid(
       'delete',
       '/jeunes/ABCDE/recherches/123'

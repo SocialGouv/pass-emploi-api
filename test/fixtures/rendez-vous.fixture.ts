@@ -6,7 +6,7 @@ import { RendezVous } from '../../src/domain/rendez-vous'
 import { unJeune } from './jeune.fixture'
 
 export const unRendezVous = (jeune = unJeune()): RendezVous => ({
-  id: '1',
+  id: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb',
   titre: 'rdv',
   duree: 30,
   modalite: 'modalite',

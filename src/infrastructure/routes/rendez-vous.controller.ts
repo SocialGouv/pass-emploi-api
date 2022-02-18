@@ -1,6 +1,16 @@
-import { Controller, Delete, NotFoundException, Param } from '@nestjs/common'
+import {
+  Controller,
+  Delete,
+  HttpCode,
+  NotFoundException,
+  Param,
+  ParseUUIDPipe
+} from '@nestjs/common'
 import { ApiOAuth2, ApiTags } from '@nestjs/swagger'
-import { DeleteRendezVousCommandHandler } from '../../application/commands/delete-rendez-vous.command.handler'
+import {
+  DeleteRendezVousCommand,
+  DeleteRendezVousCommandHandler
+} from '../../application/commands/delete-rendez-vous.command.handler'
 import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
@@ -14,14 +24,16 @@ export class RendezVousController {
   ) {}
 
   @Delete('rendezvous/:idRendezVous')
+  @HttpCode(204)
   async deleteRendezVous(
-    @Param('idRendezVous') idRendezVous: string,
+    @Param('idRendezVous', new ParseUUIDPipe()) idRendezVous: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
+    const command: DeleteRendezVousCommand = {
+      idRendezVous
+    }
     const result = await this.deleteRendezVousCommandHandler.execute(
-      {
-        idRendezVous
-      },
+      command,
       utilisateur
     )
     if (isFailure(result)) {
