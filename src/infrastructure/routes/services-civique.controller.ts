@@ -6,7 +6,7 @@ import { isFailure } from '../../building-blocks/types/result'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { GetServicesCiviqueQueryParams } from './validation/services-civique.inputs'
-import { ServiceCiviqueQueryModel } from '../../application/queries/query-models/service-civique.query-models'
+import { OffreEngagementQueryModel } from '../../application/queries/query-models/service-civique.query-models'
 import {
   GetServicesCiviqueQuery,
   GetServicesCiviqueQueryHandler
@@ -23,13 +23,13 @@ export class ServicesCiviqueController {
 
   @Get()
   @ApiResponse({
-    type: ServiceCiviqueQueryModel,
+    type: OffreEngagementQueryModel,
     isArray: true
   })
   async getServicesCivique(
     @Query() findServicesCiviqueQuery: GetServicesCiviqueQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<ServiceCiviqueQueryModel[]> {
+  ): Promise<OffreEngagementQueryModel[]> {
     const query: GetServicesCiviqueQuery = {
       ...findServicesCiviqueQuery,
       dateDeDebutMinimum: findServicesCiviqueQuery.dateDeDebutMinimum

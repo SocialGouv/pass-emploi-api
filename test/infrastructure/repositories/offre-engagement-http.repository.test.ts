@@ -4,21 +4,21 @@ import {
   StubbedClass,
   stubClass
 } from '../../utils'
-import { ServiceCivique } from '../../../src/domain/service-civique'
-import { ServiceCiviqueHttpRepository } from '../../../src/infrastructure/repositories/service-civique-http.repository'
-import { ServiceCiviqueClient } from '../../../src/infrastructure/clients/service-civique-client'
+import { OffreEngagement } from '../../../src/domain/offre-engagement'
+import { EngagementClient } from '../../../src/infrastructure/clients/engagement-client.service'
 import { DateTime } from 'luxon'
 import { success } from '../../../src/building-blocks/types/result'
+import { EngagementHttpRepository } from '../../../src/infrastructure/repositories/offre-engagement-http.repository'
 
-describe('ServiceCiviqueHttpSqlRepository', () => {
+describe('OffreEngagementRepository', () => {
   DatabaseForTesting.prepare()
-  let serviceCiviqueHttpSqlRepository: ServiceCiviqueHttpRepository
-  let serviceCiviqueClient: StubbedClass<ServiceCiviqueClient>
+  let engagementHttpRepository: EngagementHttpRepository
+  let serviceCiviqueClient: StubbedClass<EngagementClient>
 
   beforeEach(async () => {
-    serviceCiviqueClient = stubClass(ServiceCiviqueClient)
+    serviceCiviqueClient = stubClass(EngagementClient)
 
-    serviceCiviqueHttpSqlRepository = new ServiceCiviqueHttpRepository(
+    engagementHttpRepository = new EngagementHttpRepository(
       serviceCiviqueClient
     )
   })
@@ -27,14 +27,15 @@ describe('ServiceCiviqueHttpSqlRepository', () => {
     describe('Quand tout va bien', () => {
       it('quand tous les query params sont fournis', async () => {
         // Given
-        const criteres: ServiceCivique.Criteres = {
+        const criteres: OffreEngagement.Criteres = {
           page: 1,
           limit: 50,
           dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
           lat: 48.86899229710103,
           lon: 2.3342718577284205,
           distance: 10,
-          domaine: 'environnement'
+          domaine: 'environnement',
+          editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE
         }
         const params = new URLSearchParams()
         params.append('size', '50')
@@ -44,6 +45,8 @@ describe('ServiceCiviqueHttpSqlRepository', () => {
         params.append('startAt', 'lt:2022-02-17T10:00:00.000Z')
         params.append('distance', '10km')
         params.append('domain', 'environnement')
+        params.append('publisher', OffreEngagement.Editeur.SERVICE_CIVIQUE)
+        params.append('sortBy', 'createdAt')
 
         serviceCiviqueClient.get.resolves({
           status: 200,
@@ -64,7 +67,7 @@ describe('ServiceCiviqueHttpSqlRepository', () => {
         })
 
         // When
-        const result = await serviceCiviqueHttpSqlRepository.findAll(criteres)
+        const result = await engagementHttpRepository.findAll(criteres)
 
         // Then
         expect(serviceCiviqueClient.get).to.have.been.calledWithExactly(
@@ -85,13 +88,14 @@ describe('ServiceCiviqueHttpSqlRepository', () => {
       })
       it('avec la deuxième page', async () => {
         // Given
-        const criteres: ServiceCivique.Criteres = {
+        const criteres: OffreEngagement.Criteres = {
           page: 2,
           limit: 63,
           dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
           lat: 48.86899229710103,
           lon: 2.3342718577284205,
-          distance: 10
+          distance: 10,
+          editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE
         }
         const params = new URLSearchParams()
         params.append('size', '63')
@@ -100,6 +104,8 @@ describe('ServiceCiviqueHttpSqlRepository', () => {
         params.append('lon', '2.3342718577284205')
         params.append('startAt', 'lt:2022-02-17T10:00:00.000Z')
         params.append('distance', '10')
+        params.append('publisher', OffreEngagement.Editeur.SERVICE_CIVIQUE)
+        params.append('sortBy', 'createdAt')
 
         serviceCiviqueClient.get.resolves({
           status: 200,
@@ -120,7 +126,7 @@ describe('ServiceCiviqueHttpSqlRepository', () => {
         })
 
         // When
-        const result = await serviceCiviqueHttpSqlRepository.findAll(criteres)
+        const result = await engagementHttpRepository.findAll(criteres)
 
         // Then
         expect(serviceCiviqueClient.get).to.have.been.calledWithExactly(

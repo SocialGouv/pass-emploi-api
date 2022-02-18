@@ -6,25 +6,25 @@ import {
   GetServicesCiviqueQuery,
   GetServicesCiviqueQueryHandler
 } from '../../../src/application/queries/get-services-civique.query.handler'
-import { ServiceCivique } from '../../../src/domain/service-civique'
+import { OffreEngagement } from '../../../src/domain/offre-engagement'
 import { DateTime } from 'luxon'
-import { serviceCiviqueQueryModel } from '../../fixtures/query-models/service-civique.query-model.fixtures'
-import { ServiceCiviqueQueryModel } from '../../../src/application/queries/query-models/service-civique.query-models'
+import { offreEngagementQueryModel } from '../../fixtures/query-models/offre-engagement.query-model.fixtures'
+import { OffreEngagementQueryModel } from '../../../src/application/queries/query-models/service-civique.query-models'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 
 describe('GetServicesCiviqueQueryHandler', () => {
-  let serviceCiviqueRepository: StubbedType<ServiceCivique.Repository>
+  let engagementRepository: StubbedType<OffreEngagement.Repository>
   let getServicesCiviqueQueryHandler: GetServicesCiviqueQueryHandler
   let sandbox: SinonSandbox
   let evenementService: StubbedClass<EvenementService>
 
   before(() => {
     sandbox = createSandbox()
-    serviceCiviqueRepository = stubInterface(sandbox)
+    engagementRepository = stubInterface(sandbox)
     evenementService = stubClass(EvenementService)
 
     getServicesCiviqueQueryHandler = new GetServicesCiviqueQueryHandler(
-      serviceCiviqueRepository,
+      engagementRepository,
       evenementService
     )
   })
@@ -46,11 +46,14 @@ describe('GetServicesCiviqueQueryHandler', () => {
         dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
         domaine: 'environnement'
       }
-      const serviceCiviqueQueryModels: ServiceCiviqueQueryModel[] =
-        serviceCiviqueQueryModel()
+      const serviceCiviqueQueryModels: OffreEngagementQueryModel[] =
+        offreEngagementQueryModel()
 
-      serviceCiviqueRepository.findAll
-        .withArgs(getServicesCiviqueQuery)
+      engagementRepository.findAll
+        .withArgs({
+          ...getServicesCiviqueQuery,
+          editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE
+        })
         .resolves(serviceCiviqueQueryModels)
 
       // When
@@ -70,16 +73,17 @@ describe('GetServicesCiviqueQueryHandler', () => {
         dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
         dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z')
       }
-      const serviceCiviqueQueryModels: ServiceCiviqueQueryModel[] =
-        serviceCiviqueQueryModel()
+      const offreEngagementQueryModels: OffreEngagementQueryModel[] =
+        offreEngagementQueryModel()
 
-      serviceCiviqueRepository.findAll
+      engagementRepository.findAll
         .withArgs({
           ...getServicesCiviqueQuery,
+          editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE,
           page: 1,
           limit: 50
         })
-        .resolves(serviceCiviqueQueryModels)
+        .resolves(offreEngagementQueryModels)
 
       // When
       const result = await getServicesCiviqueQueryHandler.handle(
@@ -87,7 +91,7 @@ describe('GetServicesCiviqueQueryHandler', () => {
       )
 
       // Then
-      expect(result).to.deep.equal(serviceCiviqueQueryModels)
+      expect(result).to.deep.equal(offreEngagementQueryModels)
     })
   })
 
@@ -104,11 +108,14 @@ describe('GetServicesCiviqueQueryHandler', () => {
         dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
         domaine: 'environnement'
       }
-      const serviceCiviqueQueryModels: ServiceCiviqueQueryModel[] =
-        serviceCiviqueQueryModel()
+      const serviceCiviqueQueryModels: OffreEngagementQueryModel[] =
+        offreEngagementQueryModel()
 
-      serviceCiviqueRepository.findAll
-        .withArgs(getServicesCiviqueQuery)
+      engagementRepository.findAll
+        .withArgs({
+          ...getServicesCiviqueQuery,
+          editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE
+        })
         .resolves(serviceCiviqueQueryModels)
 
       // When

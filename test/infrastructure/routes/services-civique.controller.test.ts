@@ -10,9 +10,9 @@ import {
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { success } from '../../../src/building-blocks/types/result'
 import { GetServicesCiviqueQueryHandler } from 'src/application/queries/get-services-civique.query.handler'
-import { ServiceCiviqueQueryModel } from '../../../src/application/queries/query-models/service-civique.query-models'
+import { OffreEngagementQueryModel } from '../../../src/application/queries/query-models/service-civique.query-models'
 import { DateTime } from 'luxon'
-import { serviceCiviqueQueryModel } from '../../fixtures/query-models/service-civique.query-model.fixtures'
+import { offreEngagementQueryModel } from '../../fixtures/query-models/offre-engagement.query-model.fixtures'
 
 describe('ServicesCiviqueController', () => {
   let getServicesCiviqueQueryHandler: StubbedClass<GetServicesCiviqueQueryHandler>
@@ -58,8 +58,8 @@ describe('ServicesCiviqueController', () => {
         domaine: 'environnement'
       }
 
-      const serviceCiviqueQueryModels: ServiceCiviqueQueryModel[] =
-        serviceCiviqueQueryModel()
+      const serviceCiviqueQueryModels: OffreEngagementQueryModel[] =
+        offreEngagementQueryModel()
 
       getServicesCiviqueQueryHandler.execute.resolves(
         success(serviceCiviqueQueryModels)

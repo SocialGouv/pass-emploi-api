@@ -2,25 +2,25 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { URLSearchParams } from 'url'
-import { ServiceCivique } from '../../domain/service-civique'
-import { ServiceCiviqueQueryModel } from '../../application/queries/query-models/service-civique.query-models'
+import { OffreEngagement } from '../../domain/offre-engagement'
+import { OffreEngagementQueryModel } from '../../application/queries/query-models/service-civique.query-models'
 import { toServiceCiviqueQueryModel } from './mappers/service-civique.mapper'
-import { ServiceCiviqueClient } from '../clients/service-civique-client'
+import { EngagementClient } from '../clients/engagement-client.service'
 
 @Injectable()
-export class ServiceCiviqueHttpRepository implements ServiceCivique.Repository {
+export class EngagementHttpRepository implements OffreEngagement.Repository {
   private logger: Logger
 
-  constructor(private serviceCiviqueClient: ServiceCiviqueClient) {
-    this.logger = new Logger('ServiceCiviqueHttpRepository')
+  constructor(private engagementClient: EngagementClient) {
+    this.logger = new Logger('EngagementHttpRepository')
   }
 
   async findAll(
-    criteres: ServiceCivique.Criteres
-  ): Promise<Result<ServiceCiviqueQueryModel[]>> {
+    criteres: OffreEngagement.Criteres
+  ): Promise<Result<OffreEngagementQueryModel[]>> {
     try {
       const params = this.construireLesParams(criteres)
-      const response = await this.serviceCiviqueClient.get<ServicesCiviqueDto>(
+      const response = await this.engagementClient.get<EngagementDto>(
         'v0/mission/search',
         params
       )
@@ -39,7 +39,7 @@ export class ServiceCiviqueHttpRepository implements ServiceCivique.Repository {
   }
 
   private construireLesParams(
-    criteres: ServiceCivique.Criteres
+    criteres: OffreEngagement.Criteres
   ): URLSearchParams {
     const {
       page,
@@ -49,7 +49,8 @@ export class ServiceCiviqueHttpRepository implements ServiceCivique.Repository {
       dateDeDebutMaximum,
       dateDeDebutMinimum,
       distance,
-      domaine
+      domaine,
+      editeur
     } = criteres
     const params = new URLSearchParams()
     params.append('size', limit.toString())
@@ -73,11 +74,14 @@ export class ServiceCiviqueHttpRepository implements ServiceCivique.Repository {
     if (domaine) {
       params.append('domain', domaine)
     }
+
+    params.append('publisher', editeur)
+    params.append('sortBy', 'createdAt')
     return params
   }
 }
 
-export interface ServicesCiviqueDto {
+export interface EngagementDto {
   total: number
   hits: [
     {

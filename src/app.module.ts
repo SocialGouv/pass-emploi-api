@@ -115,10 +115,10 @@ import { DeleteRechercheCommandHandler } from './application/commands/delete-rec
 import { RechercheAuthorizer } from './application/authorizers/authorize-recherche'
 import { InitCronsCommandHandler } from './application/commands/init-crons.command'
 import { ServicesCiviqueController } from './infrastructure/routes/services-civique.controller'
-import { ServiceCiviqueClient } from './infrastructure/clients/service-civique-client'
-import { ServiceCiviqueRepositoryToken } from './domain/service-civique'
-import { ServiceCiviqueHttpRepository } from './infrastructure/repositories/service-civique-http.repository'
+import { EngagementClient } from './infrastructure/clients/engagement-client.service'
+import { EngagementRepositoryToken } from './domain/offre-engagement'
 import { GetServicesCiviqueQueryHandler } from './application/queries/get-services-civique.query.handler'
+import { EngagementHttpRepository } from './infrastructure/repositories/offre-engagement-http.repository'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -155,7 +155,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     DateService,
     PoleEmploiClient,
     ImmersionClient,
-    ServiceCiviqueClient,
+    EngagementClient,
     Action.Factory,
     Authentification.Factory,
     WorkerService,
@@ -221,8 +221,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       useClass: RechercheSqlRepository
     },
     {
-      provide: ServiceCiviqueRepositoryToken,
-      useClass: ServiceCiviqueHttpRepository
+      provide: EngagementRepositoryToken,
+      useClass: EngagementHttpRepository
     },
     ...databaseProviders
   ],

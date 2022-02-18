@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 
-export class ServiceCiviqueQueryModel {
+export class OffreEngagementQueryModel {
   @ApiProperty()
   id: string
   @ApiProperty()

@@ -5,7 +5,7 @@ import { firstValueFrom } from 'rxjs'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 
 @Injectable()
-export class ServiceCiviqueClient {
+export class EngagementClient {
   private readonly apiUrl: string
   private readonly apiKey: string
 

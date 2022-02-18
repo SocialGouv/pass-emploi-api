@@ -1,14 +1,14 @@
-import { ServicesCiviqueDto } from '../service-civique-http.repository'
-import { ServiceCiviqueQueryModel } from '../../../application/queries/query-models/service-civique.query-models'
+import { OffreEngagementQueryModel } from '../../../application/queries/query-models/service-civique.query-models'
+import { EngagementDto } from '../offre-engagement-http.repository'
 
 export function toServiceCiviqueQueryModel(
-  servicesCiviqueDto: ServicesCiviqueDto
-): ServiceCiviqueQueryModel[] {
-  return servicesCiviqueDto.hits.map(serviceCiviqueDto => ({
-    id: serviceCiviqueDto.id,
-    titre: serviceCiviqueDto.title,
-    dateDeDebut: serviceCiviqueDto.startAt,
-    domaine: serviceCiviqueDto.domain,
-    ville: serviceCiviqueDto.city
+  servicesCiviqueDto: EngagementDto
+): OffreEngagementQueryModel[] {
+  return servicesCiviqueDto.hits.map(engagementDto => ({
+    id: engagementDto.id,
+    titre: engagementDto.title,
+    dateDeDebut: engagementDto.startAt,
+    domaine: engagementDto.domain,
+    ville: engagementDto.city
   }))
 }

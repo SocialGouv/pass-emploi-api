@@ -4,11 +4,11 @@ import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result } from '../../building-blocks/types/result'
-import { ServiceCiviqueQueryModel } from './query-models/service-civique.query-models'
+import { OffreEngagementQueryModel } from './query-models/service-civique.query-models'
 import {
-  ServiceCivique,
-  ServiceCiviqueRepositoryToken
-} from '../../domain/service-civique'
+  OffreEngagement,
+  EngagementRepositoryToken
+} from '../../domain/offre-engagement'
 import { DateTime } from 'luxon'
 
 const DEFAULT_PAGE = 1
@@ -28,11 +28,11 @@ export interface GetServicesCiviqueQuery extends Query {
 @Injectable()
 export class GetServicesCiviqueQueryHandler extends QueryHandler<
   GetServicesCiviqueQuery,
-  Result<ServiceCiviqueQueryModel[]>
+  Result<OffreEngagementQueryModel[]>
 > {
   constructor(
-    @Inject(ServiceCiviqueRepositoryToken)
-    private servicesCiviqueRepository: ServiceCivique.Repository,
+    @Inject(EngagementRepositoryToken)
+    private engagementRepository: OffreEngagement.Repository,
     private evenementService: EvenementService
   ) {
     super('GetServicesCiviqueQueryHandler')
@@ -40,13 +40,14 @@ export class GetServicesCiviqueQueryHandler extends QueryHandler<
 
   async handle(
     query: GetServicesCiviqueQuery
-  ): Promise<Result<ServiceCiviqueQueryModel[]>> {
-    const criteres: ServiceCivique.Criteres = {
+  ): Promise<Result<OffreEngagementQueryModel[]>> {
+    const criteres: OffreEngagement.Criteres = {
       ...query,
+      editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE,
       page: query.page || DEFAULT_PAGE,
       limit: query.limit || DEFAULT_LIMIT
     }
-    return this.servicesCiviqueRepository.findAll(criteres)
+    return this.engagementRepository.findAll(criteres)
   }
 
   async authorize(
