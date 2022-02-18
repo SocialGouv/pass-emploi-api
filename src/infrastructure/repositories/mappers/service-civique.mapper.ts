@@ -9,6 +9,7 @@ export function toServiceCiviqueQueryModel(
     titre: engagementDto.title,
     dateDeDebut: engagementDto.startAt,
     domaine: engagementDto.domain,
-    ville: engagementDto.city
+    ville: engagementDto.city,
+    organisation: engagementDto.organizationName
   }))
 }

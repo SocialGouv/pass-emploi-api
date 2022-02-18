@@ -12,6 +12,8 @@ export class OffreEngagementQueryModel {
   titre: string
   @ApiProperty()
   ville: string
+  @ApiProperty()
+  organisation: string
   @ApiProperty({
     example: '2022-02-15T10:12:14.000Z'
   })

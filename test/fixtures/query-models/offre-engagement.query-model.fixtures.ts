@@ -6,6 +6,7 @@ export const offreEngagementQueryModel = (): OffreEngagementQueryModel[] => [
     domaine: 'Informatique',
     dateDeDebut: '2022-02-23T10:00:00Z',
     titre: "Assistance à l'installation de matériel",
-    id: 'plopplop'
+    id: 'plopplop',
+    organisation: 'orga de ouf'
   }
 ]

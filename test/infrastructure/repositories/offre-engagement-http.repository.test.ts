@@ -61,7 +61,8 @@ describe('OffreEngagementRepository', () => {
                 title: 'unTitre',
                 startAt: '2022-02-17T10:00:00.000Z',
                 domain: 'Informatique',
-                city: 'paris'
+                city: 'paris',
+                organizationName: 'orga de ouf'
               }
             ]
           }
@@ -82,7 +83,8 @@ describe('OffreEngagementRepository', () => {
               domaine: 'Informatique',
               id: 'unId',
               titre: 'unTitre',
-              ville: 'paris'
+              ville: 'paris',
+              organisation: 'orga de ouf'
             }
           ])
         )
@@ -120,7 +122,8 @@ describe('OffreEngagementRepository', () => {
                 title: 'unTitre',
                 startAt: '2022-02-17T10:00:00.000Z',
                 domain: 'Informatique',
-                city: 'paris'
+                city: 'paris',
+                organizationName: 'orga de ouf'
               }
             ]
           }
@@ -141,7 +144,8 @@ describe('OffreEngagementRepository', () => {
               domaine: 'Informatique',
               id: 'unId',
               titre: 'unTitre',
-              ville: 'paris'
+              ville: 'paris',
+              organisation: 'orga de ouf'
             }
           ])
         )
