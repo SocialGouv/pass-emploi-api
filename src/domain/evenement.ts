@@ -32,7 +32,8 @@ export namespace Evenement {
     RDV_SUPPRIME = 'RDV_SUPPRIME',
     RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE = 'RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE',
     RECHERCHE_ALTERNANCE_SAUVEGARDEE = 'RECHERCHE_ALTERNANCE_SAUVEGARDEE',
-    RECHERCHE_IMMERSION_SAUVEGARDEE = 'RECHERCHE_IMMERSION_SAUVEGARDEE'
+    RECHERCHE_IMMERSION_SAUVEGARDEE = 'RECHERCHE_IMMERSION_SAUVEGARDEE',
+    SERVICE_CIVIQUE_RECHERCHE = 'SERVICE_CIVIQUE_RECHERCHE'
   }
 
   export interface Repository {
@@ -163,6 +164,11 @@ const evenements = {
     categorie: 'Recherche',
     action: 'Enregistrer',
     nom: 'Immersion'
+  },
+  [Evenement.Type.SERVICE_CIVIQUE_RECHERCHE]: {
+    categorie: 'Offre',
+    action: 'Recherche',
+    nom: 'Service Civique'
   }
 }
 

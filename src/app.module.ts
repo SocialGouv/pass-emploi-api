@@ -114,6 +114,11 @@ import { NotifierNouvellesOffresEmploiCommandHandler } from './application/comma
 import { DeleteRechercheCommandHandler } from './application/commands/delete-recherche.command.handler'
 import { RechercheAuthorizer } from './application/authorizers/authorize-recherche'
 import { InitCronsCommandHandler } from './application/commands/init-crons.command'
+import { ServicesCiviqueController } from './infrastructure/routes/services-civique.controller'
+import { EngagementClient } from './infrastructure/clients/engagement-client'
+import { EngagementRepositoryToken } from './domain/offre-engagement'
+import { GetServicesCiviqueQueryHandler } from './application/queries/get-services-civique.query.handler'
+import { EngagementHttpRepository } from './infrastructure/repositories/offre-engagement-http.repository'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -137,7 +142,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     ReferentielsController,
     EvenementsController,
     RecherchesController,
-    FavorisController
+    FavorisController,
+    ServicesCiviqueController
   ],
   providers: [
     ...buildQueryCommandsProviders(),
@@ -149,6 +155,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     DateService,
     PoleEmploiClient,
     ImmersionClient,
+    EngagementClient,
     Action.Factory,
     Authentification.Factory,
     WorkerService,
@@ -213,6 +220,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       provide: RecherchesRepositoryToken,
       useClass: RechercheSqlRepository
     },
+    {
+      provide: EngagementRepositoryToken,
+      useClass: EngagementHttpRepository
+    },
     ...databaseProviders
   ],
   exports: [...databaseProviders]
@@ -272,7 +283,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetConseillerByEmailQueryHandler,
     TransfererJeunesConseillerCommandHandler,
     InitCronsCommandHandler,
-    NotifierNouvellesOffresEmploiCommandHandler
+    NotifierNouvellesOffresEmploiCommandHandler,
+    GetServicesCiviqueQueryHandler
   ]
 }
 

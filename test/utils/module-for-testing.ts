@@ -66,6 +66,10 @@ export const testConfig = (): ConfigService => {
       apiKey: 'sendinblueapiKey',
       templateId: '21'
     },
+    serviceCivique: {
+      url: 'https://api.api-engagement.beta.gouv.op',
+      apiKey: 'apiKey'
+    },
     frontEndUrl: 'http://frontend.com',
     jobs: {
       notificationRecherches: {
