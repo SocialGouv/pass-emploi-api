@@ -115,7 +115,7 @@ import { DeleteRechercheCommandHandler } from './application/commands/delete-rec
 import { RechercheAuthorizer } from './application/authorizers/authorize-recherche'
 import { InitCronsCommandHandler } from './application/commands/init-crons.command'
 import { ServicesCiviqueController } from './infrastructure/routes/services-civique.controller'
-import { EngagementClient } from './infrastructure/clients/engagement-client.service'
+import { EngagementClient } from './infrastructure/clients/engagement-client'
 import { EngagementRepositoryToken } from './domain/offre-engagement'
 import { GetServicesCiviqueQueryHandler } from './application/queries/get-services-civique.query.handler'
 import { EngagementHttpRepository } from './infrastructure/repositories/offre-engagement-http.repository'

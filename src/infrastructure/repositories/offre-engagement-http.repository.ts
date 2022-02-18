@@ -5,7 +5,7 @@ import { URLSearchParams } from 'url'
 import { OffreEngagement } from '../../domain/offre-engagement'
 import { OffreEngagementQueryModel } from '../../application/queries/query-models/service-civique.query-models'
 import { toServiceCiviqueQueryModel } from './mappers/service-civique.mapper'
-import { EngagementClient } from '../clients/engagement-client.service'
+import { EngagementClient } from '../clients/engagement-client'
 
 @Injectable()
 export class EngagementHttpRepository implements OffreEngagement.Repository {

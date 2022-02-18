@@ -5,10 +5,11 @@ import {
   stubClass
 } from '../../utils'
 import { OffreEngagement } from '../../../src/domain/offre-engagement'
-import { EngagementClient } from '../../../src/infrastructure/clients/engagement-client.service'
+import { EngagementClient } from '../../../src/infrastructure/clients/engagement-client'
 import { DateTime } from 'luxon'
-import { success } from '../../../src/building-blocks/types/result'
+import { failure, success } from '../../../src/building-blocks/types/result'
 import { EngagementHttpRepository } from '../../../src/infrastructure/repositories/offre-engagement-http.repository'
+import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 
 describe('OffreEngagementRepository', () => {
   DatabaseForTesting.prepare()
@@ -143,6 +144,33 @@ describe('OffreEngagementRepository', () => {
               ville: 'paris'
             }
           ])
+        )
+      })
+    })
+    describe('Quand il y a une erreur', () => {
+      it('renvoie une failure http', async () => {
+        // Given
+        const criteres: OffreEngagement.Criteres = {
+          page: 1,
+          limit: 50,
+          editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE
+        }
+
+        serviceCiviqueClient.get.rejects({
+          response: {
+            status: 400,
+            data: {
+              message: 'Bad request'
+            }
+          }
+        })
+
+        // When
+        const result = await engagementHttpRepository.findAll(criteres)
+
+        // Then
+        expect(result).to.be.deep.equal(
+          failure(new ErreurHttp('Bad request', 400))
         )
       })
     })

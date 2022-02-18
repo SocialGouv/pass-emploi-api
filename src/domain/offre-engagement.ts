@@ -24,4 +24,19 @@ export namespace OffreEngagement {
   export enum Editeur {
     SERVICE_CIVIQUE = '5f99dbe75eb1ad767733b206'
   }
+
+  export enum Domaine {
+    'environnement' = 'environnement',
+    'solidarite-insertion' = 'solidarite-insertion',
+    'prevention-protection' = 'prevention-protection',
+    'sante' = 'sante',
+    'culture-loisirs' = 'culture-loisirs',
+    'education' = 'education',
+    'emploi' = 'emploi',
+    'sport' = 'sport',
+    'humanitaire' = 'humanitaire',
+    'animaux' = 'animaux',
+    'vivre-ensemble' = 'vivre-ensemble',
+    'autre' = 'autre'
+  }
 }
