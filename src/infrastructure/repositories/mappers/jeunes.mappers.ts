@@ -74,16 +74,6 @@ function getTokenLastUpdate(
 export function fromSqlToJeuneHomeQueryModel(
   jeuneSqlModel: JeuneSqlModel
 ): JeuneHomeQueryModel {
-  function toCreator(
-    actionSql: ActionSqlModel,
-    jeuneSqlModel: JeuneSqlModel
-  ): string {
-    if (actionSql.typeCreateur === Action.TypeCreateur.JEUNE) {
-      return `${jeuneSqlModel.prenom} ${jeuneSqlModel.nom}`
-    }
-    return `${jeuneSqlModel.conseiller.prenom} ${jeuneSqlModel.conseiller.nom}`
-  }
-
   return {
     conseiller: {
       id: jeuneSqlModel.conseiller.id,
@@ -122,6 +112,16 @@ export function fromSqlToJeuneHomeQueryModel(
       subtitle: rendezVousSql.sousTitre
     }))
   }
+}
+
+function toCreator(
+  actionSql: ActionSqlModel,
+  jeuneSqlModel: JeuneSqlModel
+): string {
+  if (actionSql.typeCreateur === Action.TypeCreateur.JEUNE) {
+    return `${jeuneSqlModel.prenom} ${jeuneSqlModel.nom}`
+  }
+  return `${jeuneSqlModel.conseiller.prenom} ${jeuneSqlModel.conseiller.nom}`
 }
 
 export function toResumeActionsDuJeuneQueryModel(

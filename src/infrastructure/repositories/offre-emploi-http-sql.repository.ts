@@ -35,7 +35,7 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
   async findAll(
     criteres: OffresEmploi.Criteres
   ): Promise<Result<OffresEmploiQueryModel>> {
-    return await this.trouverLesOffres(criteres)
+    return this.trouverLesOffres(criteres)
   }
 
   private async trouverLesOffres(
@@ -67,7 +67,7 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
         e.response?.headers['retry-after']
       ) {
         this.logger.log('Retry de la requête')
-        return await this.trouverLesOffres(
+        return this.trouverLesOffres(
           criteres,
           parseInt(e.response?.headers['retry-after'])
         )

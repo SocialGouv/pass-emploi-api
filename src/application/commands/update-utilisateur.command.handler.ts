@@ -78,7 +78,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     }
 
     if (command.type === Authentification.Type.CONSEILLER) {
-      return await this.creerNouveauConseiller(command, lowerCaseEmail)
+      return this.creerNouveauConseiller(command, lowerCaseEmail)
     } else if (command.type === Authentification.Type.JEUNE && lowerCaseEmail) {
       const jeune = await this.authentificationRepository.getJeuneByEmail(
         lowerCaseEmail
