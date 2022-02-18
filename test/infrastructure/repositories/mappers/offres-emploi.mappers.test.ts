@@ -5,6 +5,7 @@ import {
 } from '../../../../src/infrastructure/repositories/mappers/offres-emploi.mappers'
 import { OffresEmploiDto } from '../../../../src/infrastructure/repositories/offre-emploi-http-sql.repository'
 import { expect } from '../../../utils'
+import { desOffresEmploiQueryModel } from '../../../fixtures/query-models/offre-emploi.query-model.fixtures'
 
 describe('OffresEmploiMappers', () => {
   let offreEmploi = uneOffreEmploiDto()
@@ -27,29 +28,9 @@ describe('OffresEmploiMappers', () => {
           limit,
           offresEmploiDto
         )
-        const expectedOffresEmploiQueryModel = {
-          pagination: {
-            page,
-            limit
-          },
-          results: [
-            {
-              id: '123DXPM',
-              titre: 'Technicien / Technicienne en froid et climatisation',
-              typeContrat: 'MIS',
-              alternance: false,
-              duree: 'Temps plein',
-              nomEntreprise: 'RH TT INTERIM',
-              localisation: {
-                nom: 'libelle',
-                codePostal: '57000',
-                commune: '57463'
-              }
-            }
-          ]
-        }
+
         // Then
-        expect(result).to.deep.equal(expectedOffresEmploiQueryModel)
+        expect(result).to.deep.equal(desOffresEmploiQueryModel())
       })
       it('renvoie les bonnes informations le lieu de travail n"est pas renseigné dans l"offre', async () => {
         // Given
