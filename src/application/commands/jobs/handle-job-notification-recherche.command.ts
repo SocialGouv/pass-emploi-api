@@ -101,7 +101,7 @@ export class NotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
                   recherche.id,
                   recherche.titre
                 )
-                this.notificationRepository.send(notification)
+                await this.notificationRepository.send(notification)
               }
             }
           }
