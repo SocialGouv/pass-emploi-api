@@ -18,7 +18,6 @@ import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
 import { TransfertConseillerSqlModel } from '../sequelize/models/transfert-conseiller.sql-model'
 import { SequelizeInjectionToken } from '../sequelize/providers'
 import {
-  DetailJeuneRawSql,
   fromSqlToDetailJeuneQueryModel,
   fromSqlToJeune,
   fromSqlToJeuneHomeQueryModel,
@@ -105,7 +104,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
   async getAllQueryModelsByConseiller(
     idConseiller: string
   ): Promise<DetailJeuneQueryModel[]> {
-    const sqlJeunes = (await this.sequelize.query(
+    const sqlJeunes = await this.sequelize.query(
       `
           SELECT jeune.id,
                  jeune.prenom,
@@ -138,7 +137,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
         type: QueryTypes.SELECT,
         replacements: { idConseiller }
       }
-    )) as DetailJeuneRawSql[]
+    )
 
     return sqlJeunes.map(toDetailJeunQueryModel)
   }

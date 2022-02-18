@@ -82,18 +82,15 @@ export class OffresImmersionHttpSqlRepository
   }
 
   async findAll(
-    rome: string,
-    lat: number,
-    lon: number,
-    distance: number
+    criteres: OffresImmersion.Criteres
   ): Promise<Result<OffreImmersionQueryModel[]>> {
     const payload = {
-      rome,
+      rome: criteres.rome,
       location: {
-        lat,
-        lon
+        lat: criteres.lat,
+        lon: criteres.lon
       },
-      distance_km: distance
+      distance_km: criteres.distance
     }
 
     try {

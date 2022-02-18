@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication } from '@nestjs/common'
+import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import { TransfererJeunesConseillerCommandHandler } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
 import { Core } from 'src/domain/core'
 import { TransfererConseillerPayload } from 'src/infrastructure/routes/validation/jeunes.inputs'
@@ -78,6 +78,7 @@ describe('JeunesController', () => {
       .compile()
 
     app = testingModule.createNestApplication()
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
     await app.init()
   })
 
@@ -86,13 +87,13 @@ describe('JeunesController', () => {
   })
 
   describe('POST /jeunes/transferer', () => {
+    const payload: TransfererConseillerPayload = {
+      idConseillerSource: '1',
+      idConseillerCible: '2',
+      idsJeune: ['1']
+    }
     it('transfere les jeunes', async () => {
       // Given
-      const payload: TransfererConseillerPayload = {
-        idConseillerSource: '1',
-        idConseillerCible: '2',
-        idsJeune: []
-      }
       transfererJeunesConseillerCommandHandler.execute.resolves(emptySuccess())
 
       // When - Then
@@ -108,7 +109,7 @@ describe('JeunesController', () => {
         {
           idConseillerSource: '1',
           idConseillerCible: '2',
-          idsJeune: [],
+          idsJeune: ['1'],
           structure: Core.Structure.MILO
         },
         unUtilisateurDecode()
@@ -124,6 +125,7 @@ describe('JeunesController', () => {
       // When - Then
       await request(app.getHttpServer())
         .post('/jeunes/transferer')
+        .send(payload)
         .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.FORBIDDEN)
     })
@@ -137,6 +139,7 @@ describe('JeunesController', () => {
       // When - Then
       await request(app.getHttpServer())
         .post('/jeunes/transferer')
+        .send(payload)
         .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.FORBIDDEN)
     })

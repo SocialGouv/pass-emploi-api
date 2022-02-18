@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication } from '@nestjs/common'
+import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import * as request from 'supertest'
 import { DeleteActionCommandHandler } from '../../../src/application/commands/delete-action.command.handler'
 import { GetDetailActionQueryHandler } from '../../../src/application/queries/get-detail-action.query.handler'
@@ -36,6 +36,7 @@ describe('ActionsController', () => {
       .compile()
 
     app = testingModule.createNestApplication()
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
     await app.init()
   })
 

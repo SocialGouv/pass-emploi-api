@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication } from '@nestjs/common'
+import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import {
   buildTestingModuleForHttpTesting,
   expect,
@@ -52,6 +52,7 @@ describe('RecherchesController', () => {
       .compile()
 
     app = testingModule.createNestApplication()
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
     await app.init()
   })
 

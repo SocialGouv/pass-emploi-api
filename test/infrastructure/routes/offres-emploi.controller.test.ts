@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication } from '@nestjs/common'
+import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import * as request from 'supertest'
 import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
 import {
@@ -7,20 +7,23 @@ import {
   StubbedClass,
   stubClass
 } from '../../utils'
-import { GetOffresEmploiQueryHandler } from '../../../src/application/queries/get-offres-emploi.query.handler'
+import {
+  GetOffresEmploiQuery,
+  GetOffresEmploiQueryHandler
+} from '../../../src/application/queries/get-offres-emploi.query.handler'
 import { Contrat, Duree, Experience } from '../../../src/domain/offre-emploi'
 import { uneOffreEmploiResumeQueryModel } from '../../fixtures/offre-emploi.fixture'
 import {
   OffreEmploiQueryModel,
   OffresEmploiQueryModel
 } from '../../../src/application/queries/query-models/offres-emploi.query-models'
-import { FindOffresEmploiQueryParams } from '../../../src/infrastructure/routes/validation/offres-emploi.inputs'
 import {
   GetDetailOffreEmploiQuery,
   GetDetailOffreEmploiQueryHandler
 } from '../../../src/application/queries/get-detail-offre-emploi.query.handler'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { success } from '../../../src/building-blocks/types/result'
+import { failure, success } from '../../../src/building-blocks/types/result'
+import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 
 describe('OffresEmploiController', () => {
   let getOffresEmploiQueryHandler: StubbedClass<GetOffresEmploiQueryHandler>
@@ -40,6 +43,7 @@ describe('OffresEmploiController', () => {
       .compile()
 
     app = testingModule.createNestApplication()
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
     await app.init()
   })
 
@@ -48,56 +52,84 @@ describe('OffresEmploiController', () => {
   })
 
   describe('GET /offres-emploi', () => {
-    it("fait appel à l'API Pôle Emploi avec les bons paramètres", async () => {
-      // Given
-      const findOffresEmploiQuery: FindOffresEmploiQueryParams = {
-        page: 1,
-        limit: 50,
-        q: 'informatique',
-        departement: undefined,
-        alternance: true,
-        experience: [Experience.moinsdUnAn],
-        contrat: [Contrat.cdi, Contrat.cdd],
-        duree: [Duree.tempsPartiel],
-        rayon: 0,
-        commune: '75118'
-      }
-      const expectedQuery = {
-        page: '1',
-        limit: '50',
-        q: 'informatique',
-        departement: undefined,
-        alternance: 'true',
-        experience: '1',
-        contrat: ['CDI', 'CDD-interim-saisonnier'],
-        duree: '2',
-        rayon: '0',
-        commune: '75118'
-      }
-
-      const offresEmploiQueryModel: OffresEmploiQueryModel = {
-        pagination: {
+    describe('quand tout va bien', () => {
+      it("fait appel à l'API Pôle Emploi avec les bons paramètres", async () => {
+        // Given
+        const findOffresEmploiQuery = {
+          page: '1',
+          limit: '50',
+          q: 'informatique',
+          alternance: 'true',
+          experience: [Experience.moinsdUnAn],
+          contrat: [Contrat.cdi, Contrat.cdd],
+          duree: [Duree.tempsPartiel],
+          rayon: '10',
+          commune: '75118'
+        }
+        const expectedQuery: GetOffresEmploiQuery = {
           page: 1,
-          limit: 50
-        },
-        results: [uneOffreEmploiResumeQueryModel()]
-      }
+          limit: 50,
+          q: 'informatique',
+          departement: undefined,
+          alternance: true,
+          experience: [Experience.moinsdUnAn],
+          contrat: [Contrat.cdi, Contrat.cdd],
+          duree: [Duree.tempsPartiel],
+          rayon: 10,
+          commune: '75118'
+        }
 
-      getOffresEmploiQueryHandler.execute.resolves(
-        success(offresEmploiQueryModel)
-      )
+        const offresEmploiQueryModel: OffresEmploiQueryModel = {
+          pagination: {
+            page: 1,
+            limit: 50
+          },
+          results: [uneOffreEmploiResumeQueryModel()]
+        }
 
-      // When
-      await request(app.getHttpServer())
-        .get('/offres-emploi')
-        .set('authorization', unHeaderAuthorization())
-        .query(findOffresEmploiQuery)
-        // Then
-        .expect(HttpStatus.OK)
+        getOffresEmploiQueryHandler.execute.resolves(
+          success(offresEmploiQueryModel)
+        )
 
-      expect(getOffresEmploiQueryHandler.execute).to.have.been.calledWith(
-        expectedQuery
-      )
+        // When
+        await request(app.getHttpServer())
+          .get('/offres-emploi')
+          .set('authorization', unHeaderAuthorization())
+          .query(findOffresEmploiQuery)
+          // Then
+          .expect(HttpStatus.OK)
+
+        expect(getOffresEmploiQueryHandler.execute).to.have.been.calledWith(
+          expectedQuery
+        )
+      })
+    })
+    describe('quand il y a une erreur', () => {
+      it('renvoie le code http idoine', async () => {
+        // Given
+        const findOffresEmploiQuery = {
+          page: '1',
+          limit: '50',
+          q: 'informatique',
+          alternance: 'true',
+          experience: [Experience.moinsdUnAn],
+          contrat: [Contrat.cdi, Contrat.cdd],
+          duree: [Duree.tempsPartiel],
+          rayon: '10',
+          commune: '75118'
+        }
+        getOffresEmploiQueryHandler.execute.resolves(
+          failure(new ErreurHttp('Bad request', 400))
+        )
+
+        // When
+        await request(app.getHttpServer())
+          .get('/offres-emploi')
+          .set('authorization', unHeaderAuthorization())
+          .query(findOffresEmploiQuery)
+          // Then
+          .expect(HttpStatus.BAD_REQUEST)
+      })
     })
     ensureUserAuthenticationFailsIfInvalid('get', '/offres-emploi')
   })

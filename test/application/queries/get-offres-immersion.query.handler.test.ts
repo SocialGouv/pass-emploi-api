@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { EvenementService } from 'src/domain/evenement'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import {
   GetOffresImmersionQuery,
   GetOffresImmersionQueryHandler
@@ -8,6 +8,7 @@ import {
 import { OffreImmersionQueryModel } from '../../../src/application/queries/query-models/offres-immersion.query-models'
 import { OffresImmersion } from '../../../src/domain/offre-immersion'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 
 describe('GetOffresImmersionQueryHandler', () => {
   let offresImmersionRepository: StubbedType<OffresImmersion.Repository>
@@ -31,38 +32,100 @@ describe('GetOffresImmersionQueryHandler', () => {
   })
 
   describe('handle', () => {
-    it('retourne des offres', async () => {
-      // Given
-      const getOffresImmersionQuery: GetOffresImmersionQuery = {
-        rome: 'D1102',
-        lat: 48.502103949334845,
-        lon: 2.13082255225161
-      }
-      const offresImmersionQueryModel: OffreImmersionQueryModel[] = [
-        {
-          id: '1',
-          metier: 'Boulanger',
-          nomEtablissement: 'Boulangerie',
-          secteurActivite: 'Restauration',
-          ville: 'Paris'
+    describe('quand la distance est précisée', () => {
+      it('retourne des offres', async () => {
+        // Given
+        const getOffresImmersionQuery: GetOffresImmersionQuery = {
+          rome: 'D1102',
+          lat: 48.502103949334845,
+          lon: 2.13082255225161,
+          distance: 15
         }
-      ]
-      offresImmersionRepository.findAll
-        .withArgs(
-          getOffresImmersionQuery.rome,
-          getOffresImmersionQuery.lat,
-          getOffresImmersionQuery.lon,
-          30
-        )
-        .resolves(offresImmersionQueryModel)
+        const offresImmersionQueryModel: OffreImmersionQueryModel[] = [
+          {
+            id: '1',
+            metier: 'Boulanger',
+            nomEtablissement: 'Boulangerie',
+            secteurActivite: 'Restauration',
+            ville: 'Paris'
+          }
+        ]
+        const criteres: OffresImmersion.Criteres = {
+          rome: getOffresImmersionQuery.rome,
+          lat: getOffresImmersionQuery.lat,
+          lon: getOffresImmersionQuery.lon,
+          distance: getOffresImmersionQuery.distance!
+        }
+        offresImmersionRepository.findAll
+          .withArgs(criteres)
+          .resolves(offresImmersionQueryModel)
 
+        // When
+        const result = await getOffresImmersionQueryHandler.handle(
+          getOffresImmersionQuery
+        )
+
+        // Then
+        expect(result).to.deep.equal(offresImmersionQueryModel)
+      })
+    })
+
+    describe('quand la distance est absente', () => {
+      it('retourne des offres avec la distance par défaut', async () => {
+        // Given
+        const getOffresImmersionQuery: GetOffresImmersionQuery = {
+          rome: 'D1102',
+          lat: 48.502103949334845,
+          lon: 2.13082255225161
+        }
+        const offresImmersionQueryModel: OffreImmersionQueryModel[] = [
+          {
+            id: '1',
+            metier: 'Boulanger',
+            nomEtablissement: 'Boulangerie',
+            secteurActivite: 'Restauration',
+            ville: 'Paris'
+          }
+        ]
+        const criteres: OffresImmersion.Criteres = {
+          rome: getOffresImmersionQuery.rome,
+          lat: getOffresImmersionQuery.lat,
+          lon: getOffresImmersionQuery.lon,
+          distance: 30
+        }
+        offresImmersionRepository.findAll
+          .withArgs(criteres)
+          .resolves(offresImmersionQueryModel)
+
+        // When
+        const result = await getOffresImmersionQueryHandler.handle(
+          getOffresImmersionQuery
+        )
+
+        // Then
+        expect(result).to.deep.equal(offresImmersionQueryModel)
+      })
+    })
+  })
+
+  describe('monitor', () => {
+    it("crée un événement de recherche d'offre", async () => {
       // When
-      const result = await getOffresImmersionQueryHandler.handle(
-        getOffresImmersionQuery
-      )
+      await getOffresImmersionQueryHandler.monitor(unUtilisateurJeune())
 
       // Then
-      expect(result).to.deep.equal(offresImmersionQueryModel)
+      expect(evenementService.creerEvenement).to.have.been.calledWith(
+        Evenement.Type.OFFRE_IMMERSION_RECHERCHEE,
+        {
+          id: 'ABCDE',
+          nom: 'Doe',
+          prenom: 'John',
+          type: 'JEUNE',
+          email: 'john.doe@plop.io',
+          structure: 'MILO',
+          roles: []
+        }
+      )
     })
   })
 })
