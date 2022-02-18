@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication } from '@nestjs/common'
+import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import {
   buildTestingModuleForHttpTesting,
   expect,
@@ -52,6 +52,7 @@ describe('RecherchesController', () => {
       .compile()
 
     app = testingModule.createNestApplication()
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
     await app.init()
   })
 
@@ -264,6 +265,20 @@ describe('RecherchesController', () => {
         .set('authorization', unHeaderAuthorization())
         //Then
         .expect(HttpStatus.NOT_FOUND)
+        .expect(expectedMessageJson)
+    })
+    it('renvoie une 400(BAD REQUEST) si l"id de la recherche n"est pas un UUID', async () => {
+      const expectedMessageJson = {
+        statusCode: 400,
+        message: 'Validation failed (uuid  is expected)',
+        error: 'Bad Request'
+      }
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/${jeune.id}/recherches/12`)
+        .set('authorization', unHeaderAuthorization())
+        //Then
+        .expect(HttpStatus.BAD_REQUEST)
         .expect(expectedMessageJson)
     })
     ensureUserAuthenticationFailsIfInvalid(

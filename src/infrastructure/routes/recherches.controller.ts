@@ -6,6 +6,7 @@ import {
   HttpCode,
   NotFoundException,
   Param,
+  ParseUUIDPipe,
   Post
 } from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -94,7 +95,7 @@ export class RecherchesController {
   @HttpCode(204)
   async deleteRecherche(
     @Param('idJeune') idJeune: string,
-    @Param('idRecherche') idRecherche: string,
+    @Param('idRecherche', new ParseUUIDPipe()) idRecherche: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const command: DeleteRechercheCommand = {
