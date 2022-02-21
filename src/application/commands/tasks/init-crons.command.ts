@@ -3,10 +3,10 @@ import {
   Planificateur,
   PlanificateurRepositoryToken,
   PlanificateurService
-} from '../../domain/planificateur'
-import { Command } from '../../building-blocks/types/command'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { emptySuccess, Result } from '../../building-blocks/types/result'
+} from '../../../domain/planificateur'
+import { Command } from '../../../building-blocks/types/command'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import { emptySuccess, Result } from '../../../building-blocks/types/result'
 
 @Injectable()
 export class InitCronsCommandHandler extends CommandHandler<Command, void> {
@@ -26,6 +26,9 @@ export class InitCronsCommandHandler extends CommandHandler<Command, void> {
     )
     await this.planificateurService.planifierCron(
       Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES
+    )
+    await this.planificateurService.planifierCron(
+      Planificateur.CronJob.NETTOYER_LES_JOBS
     )
 
     return emptySuccess()

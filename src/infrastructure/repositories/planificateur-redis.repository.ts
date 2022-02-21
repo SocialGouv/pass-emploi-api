@@ -91,4 +91,14 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
       })
     }
   }
+
+  async supprimerLesAnciensJobs(): Promise<void> {
+    const ilYA7Jours = this.dateService.now().minus({ day: 7 }).toMillis()
+    const jobs = await this.queue.getCompleted()
+    for (const job of jobs) {
+      if (job.timestamp < ilYA7Jours) {
+        await this.queue.removeJobs(job.id.toString())
+      }
+    }
+  }
 }

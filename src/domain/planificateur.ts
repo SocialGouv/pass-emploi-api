@@ -12,11 +12,13 @@ export namespace Planificateur {
     subscribe(callback: Handler<unknown>): Promise<void>
     supprimerTousLesJobs(): Promise<void>
     supprimerLesCrons(): Promise<void>
+    supprimerLesAnciensJobs(): Promise<void>
   }
 
   export enum CronJob {
     NOUVELLES_OFFRES_EMPLOI = 'NOUVELLES_OFFRES_EMPLOI',
-    MAIL_CONSEILLER_MESSAGES = 'MAIL_CONSEILLER_MESSAGES'
+    MAIL_CONSEILLER_MESSAGES = 'MAIL_CONSEILLER_MESSAGES',
+    NETTOYER_LES_JOBS = 'NETTOYER_LES_JOBS'
   }
 
   export enum JobEnum {
@@ -72,6 +74,14 @@ export class PlanificateurService {
         const cron: Planificateur.Cron = {
           type: Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES,
           expression: '0 7 * * 1-5'
+        }
+        await this.planificateurRepository.createCron(cron)
+        break
+      }
+      case Planificateur.CronJob.NETTOYER_LES_JOBS: {
+        const cron: Planificateur.Cron = {
+          type: Planificateur.CronJob.NETTOYER_LES_JOBS,
+          expression: '0 3 * * *'
         }
         await this.planificateurRepository.createCron(cron)
         break

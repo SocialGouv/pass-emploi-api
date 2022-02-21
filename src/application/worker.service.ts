@@ -8,6 +8,7 @@ import { getAPMInstance } from '../infrastructure/monitoring/apm.init'
 import { HandleJobMailConseillerCommandHandler } from './commands/jobs/handle-job-mail-conseiller.command'
 import { HandleJobRendezVousCommandHandler } from './commands/jobs/handle-job-rendez-vous.command'
 import { NotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notification-recherche.command'
+import { HandleNettoyerLesJobsCommandHandler } from './commands/jobs/handle-job-nettoyer-les-jobs.command'
 
 @Injectable()
 export class WorkerService {
@@ -19,7 +20,8 @@ export class WorkerService {
     private planificateurRepository: Planificateur.Repository,
     private handlerJobRendezVousCommandHandler: HandleJobRendezVousCommandHandler,
     private handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler,
-    private notifierNouvellesOffresEmploiCommandHandler: NotifierNouvellesOffresEmploiCommandHandler
+    private notifierNouvellesOffresEmploiCommandHandler: NotifierNouvellesOffresEmploiCommandHandler,
+    private handleNettoyerLesJobsCommandHandler: HandleNettoyerLesJobsCommandHandler
   ) {
     this.apmService = getAPMInstance()
   }
@@ -40,19 +42,27 @@ export class WorkerService {
       state: 'started'
     })
     try {
-      if (job.type === Planificateur.JobEnum.RENDEZVOUS) {
-        await this.handlerJobRendezVousCommandHandler.execute({
-          job: job as Planificateur.Job<Planificateur.JobRendezVous>
-        })
-      } else if (job.type === Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES) {
-        await this.handleJobMailConseillerCommandHandler.execute({})
-      } else if (job.type === Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI) {
-        await this.notifierNouvellesOffresEmploiCommandHandler.execute({})
-      } else if (job.type === Planificateur.JobEnum.FAKE) {
-        this.logger.log({
-          job,
-          msg: 'executed'
-        })
+      switch (job.type) {
+        case Planificateur.JobEnum.RENDEZVOUS:
+          await this.handlerJobRendezVousCommandHandler.execute({
+            job: job as Planificateur.Job<Planificateur.JobRendezVous>
+          })
+          break
+        case Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES:
+          await this.handleJobMailConseillerCommandHandler.execute({})
+          break
+        case Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI:
+          await this.notifierNouvellesOffresEmploiCommandHandler.execute({})
+          break
+        case Planificateur.CronJob.NETTOYER_LES_JOBS:
+          await this.handleNettoyerLesJobsCommandHandler.execute({})
+          break
+        case Planificateur.JobEnum.FAKE:
+          this.logger.log({
+            job,
+            msg: 'executed'
+          })
+          break
       }
     } catch (e) {
       success = false

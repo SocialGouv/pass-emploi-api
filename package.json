@@ -33,10 +33,11 @@
     "watch": "yarn start:pg:db && yarn start:redis:db && nest start --watch | npx pino-pretty",
     "run:with:apm": "yarn start:pg:db && yarn start:redis:db && dotenv -e .environment nest start --watch | npx pino-pretty",
     "tasks:init-all-jobs": "IS_WEB=false IS_WORKER=false TASK=INIT_ALL_JOBS node dist/main",
-    "tasks:dummy-job": "IS_WEB=false IS_WORKER=false TASK=DUMMY_JOB=true node dist/main",
+    "tasks:dummy-job": "IS_WEB=false IS_WORKER=false TASK=DUMMY_JOB node dist/main",
+    "tasks:nettoyer-les-job": "IS_WEB=false IS_WORKER=false TASK=NETTOYER_LES_JOBS node dist/main",
     "tasks:rechercher-les-nouvelles-offres": "IS_WEB=false IS_WORKER=false TASK=RECHERCHER_LES_NOUVELLES_OFFRES node dist/main",
     "tasks:envoyer-mail-conseiller-messages": "IS_WEB=false IS_WORKER=false TASK=ENVOYER_MAIL_CONSEILLER_MESSAGES node dist/main",
-    "tasks:intialiser-les-crons": "IS_WEB=false IS_WORKER=false TASK=INITIALISER_LES_CRON node dist/main"
+    "tasks:initialiser-les-crons": "IS_WEB=false IS_WORKER=false TASK=INITIALISER_LES_CRON node dist/main"
   },
   "dependencies": {
     "@nestjs/axios": "0.0.5",
