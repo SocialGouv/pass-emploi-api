@@ -24,6 +24,9 @@ export class InitCronsCommandHandler extends CommandHandler<Command, void> {
     await this.planificateurService.planifierCron(
       Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI
     )
+    await this.planificateurService.planifierCron(
+      Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES
+    )
 
     return emptySuccess()
   }

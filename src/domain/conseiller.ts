@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
 import { Result } from '../building-blocks/types/result'
 import { Core } from './core'
@@ -8,6 +9,7 @@ export interface Conseiller {
   lastName: string
   structure: Core.Structure
   email?: string
+  dateVerificationMessages?: DateTime
 }
 
 export const ConseillersRepositoryToken = 'Conseiller.Repository'
@@ -28,5 +30,10 @@ export namespace Conseiller {
       idConseiller: string,
       nombreDeConversationNonLues: number
     ): Promise<void>
+    findConseillersMessagesNonVerifies(
+      nombreConseillers: number,
+      dateVerification: DateTime
+    ): Promise<Conseiller[]>
+    save(conseiller: Conseiller): Promise<void>
   }
 }

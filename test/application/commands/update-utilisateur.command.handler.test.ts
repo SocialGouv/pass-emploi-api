@@ -1,13 +1,15 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox, SinonSandbox } from 'sinon'
 import {
-  NonTrouveError,
   ConseillerNonValide,
-  NonTraitableError
+  NonTraitableError,
+  NonTrouveError
 } from 'src/building-blocks/types/domain-error'
 import { Authentification } from 'src/domain/authentification'
+import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
+import { uneDatetime } from 'test/fixtures/date.fixture'
 import {
   unUtilisateurQueryModel,
   unUtilisateurSansEmailQueryModel
@@ -16,6 +18,7 @@ import {
   UpdateUtilisateurCommand,
   UpdateUtilisateurCommandHandler
 } from '../../../src/application/commands/update-utilisateur.command.handler'
+import { UtilisateurQueryModel } from '../../../src/application/queries/query-models/authentification.query-models'
 import {
   failure,
   isFailure,
@@ -23,11 +26,7 @@ import {
   Result
 } from '../../../src/building-blocks/types/result'
 import { Core } from '../../../src/domain/core'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { PlanificateurService } from '../../../src/domain/planificateur'
-import { UtilisateurQueryModel } from '../../../src/application/queries/query-models/authentification.query-models'
-import { DateService } from 'src/utils/date-service'
-import { uneDatetime } from 'test/fixtures/date.fixture'
+import { expect, stubClass } from '../../utils'
 
 describe('UpdateUtilisateurCommandHandler', () => {
   let authentificationRepository: StubbedType<Authentification.Repository>
@@ -40,15 +39,12 @@ describe('UpdateUtilisateurCommandHandler', () => {
   }
   const authentificationFactory: Authentification.Factory =
     new Authentification.Factory(idService)
-  let planificateurService: StubbedClass<PlanificateurService>
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     authentificationRepository = stubInterface(sandbox)
-    planificateurService = stubClass(PlanificateurService)
     updateUtilisateurCommandHandler = new UpdateUtilisateurCommandHandler(
       authentificationRepository,
       authentificationFactory,
-      planificateurService,
       dateService
     )
   })
@@ -83,12 +79,6 @@ describe('UpdateUtilisateurCommandHandler', () => {
           if (isSuccess(result)) {
             expect(result.data).to.deep.equal(unUtilisateurQueryModel())
           }
-        })
-        it('ne planifie pas de jobs', async () => {
-          // Then
-          expect(planificateurService.planifierJobRappelMail).to.have.callCount(
-            0
-          )
         })
       })
       describe('conseiller connu avec nouvel email', async () => {
@@ -232,12 +222,6 @@ describe('UpdateUtilisateurCommandHandler', () => {
             if (isSuccess(result)) {
               expect(result.data).to.deep.equal(unUtilisateurQueryModel())
             }
-          })
-          it('planifie un job pour le conseiller', async () => {
-            // Then
-            expect(
-              planificateurService.planifierJobRappelMail
-            ).to.have.been.calledWith(uuidGenere)
           })
         })
         describe("quand il est valide mais il manque l' email", () => {

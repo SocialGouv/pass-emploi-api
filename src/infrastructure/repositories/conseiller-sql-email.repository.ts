@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { Op } from 'sequelize'
 import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
@@ -7,6 +8,7 @@ import { Core } from '../../domain/core'
 import { MailSendinblueClient } from '../clients/mail-sendinblue.client'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { fromSqlToDetailConseillerQueryModel } from './mappers/conseillers.mappers'
+import { DateTime } from 'luxon'
 
 @Injectable()
 export class ConseillerSqlEmailRepository implements Conseiller.Repository {
@@ -33,6 +35,36 @@ export class ConseillerSqlEmailRepository implements Conseiller.Repository {
     return rawIds.map(conseillerSql => conseillerSql.id)
   }
 
+  async findConseillersMessagesNonVerifies(
+    nombreConseillers: number,
+    dateVerification: DateTime
+  ): Promise<Conseiller[]> {
+    const dateAMinuit = dateVerification
+      .set({ hour: 0, minute: 0, second: 0 })
+      .toJSDate()
+    const conseillersSql = await ConseillerSqlModel.findAll({
+      where: {
+        dateVerificationMessages: {
+          [Op.lt]: dateAMinuit
+        }
+      },
+      limit: nombreConseillers
+    })
+
+    return conseillersSql.map(conseillerSql => {
+      return {
+        id: conseillerSql.id,
+        firstName: conseillerSql.prenom,
+        lastName: conseillerSql.nom,
+        structure: conseillerSql.structure,
+        email: conseillerSql.email ?? undefined,
+        dateVerificationMessages: DateTime.fromJSDate(
+          conseillerSql.dateVerificationMessages
+        )
+      }
+    })
+  }
+
   async get(id: string): Promise<Conseiller | undefined> {
     const conseillerSqlModel = await ConseillerSqlModel.findByPk(id)
     if (!conseillerSqlModel) {
@@ -53,7 +85,8 @@ export class ConseillerSqlEmailRepository implements Conseiller.Repository {
       prenom: conseiller.firstName,
       nom: conseiller.lastName,
       structure: conseiller.structure,
-      email: conseiller.email || null
+      email: conseiller.email || null,
+      dateVerificationMessages: conseiller.dateVerificationMessages ?? undefined
     })
   }
 

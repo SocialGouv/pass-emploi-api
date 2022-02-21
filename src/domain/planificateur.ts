@@ -15,12 +15,12 @@ export namespace Planificateur {
   }
 
   export enum CronJob {
-    NOUVELLES_OFFRES_EMPLOI = 'NOUVELLES_OFFRES_EMPLOI'
+    NOUVELLES_OFFRES_EMPLOI = 'NOUVELLES_OFFRES_EMPLOI',
+    MAIL_CONSEILLER_MESSAGES = 'MAIL_CONSEILLER_MESSAGES'
   }
 
   export enum JobEnum {
     RENDEZVOUS = 'RENDEZVOUS',
-    MAIL_CONSEILLER = 'MAIL_CONSEILLER',
     FAKE = 'FAKE'
   }
 
@@ -28,15 +28,11 @@ export namespace Planificateur {
     idRendezVous: string
   }
 
-  export interface JobMailConseiller {
-    idConseiller: string
-  }
-
   export interface JobFake {
     message: string
   }
 
-  export type JobType = JobRendezVous | JobMailConseiller | JobFake
+  export type JobType = JobRendezVous | JobFake
 
   export interface Job<T = JobType> {
     date: Date
@@ -64,12 +60,22 @@ export class PlanificateurService {
 
   async planifierCron(cronJob: Planificateur.CronJob): Promise<void> {
     switch (cronJob) {
-      case Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI:
+      case Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI: {
         const cron: Planificateur.Cron = {
           type: Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI,
           expression: '0 8 * * *'
         }
         await this.planificateurRepository.createCron(cron)
+        break
+      }
+      case Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES: {
+        const cron: Planificateur.Cron = {
+          type: Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES,
+          expression: '0 7 * * 1-5'
+        }
+        await this.planificateurRepository.createCron(cron)
+        break
+      }
     }
   }
 
@@ -87,20 +93,6 @@ export class PlanificateurService {
     if (nombreDeJoursAvantLeRdv > 1) {
       await this.creerJobRendezVous(rendezVous, 1)
     }
-  }
-
-  async planifierJobRappelMail(idConseiller: string): Promise<void> {
-    const job: Planificateur.Job<Planificateur.JobMailConseiller> = {
-      date: this.dateService
-        .now()
-        .toUTC()
-        .set({ hour: 6, minute: 0, second: 0, millisecond: 0 })
-        .plus({ days: 1 })
-        .toJSDate(),
-      type: Planificateur.JobEnum.MAIL_CONSEILLER,
-      contenu: { idConseiller }
-    }
-    await this.planificateurRepository.createJob(job)
   }
 
   private async creerJobRendezVous(

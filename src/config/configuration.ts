@@ -60,7 +60,7 @@ export default () => {
     serviceCivique: {
       url:
         process.env.SERVICE_CIVIQUE_API_URL ??
-      'https://api.api-engagement.beta.gouv.fr',
+        'https://api.api-engagement.beta.gouv.fr',
       apiKey: process.env.SERVICE_CIVIQUE_API_KEY ?? ''
     },
     firebase: {
@@ -86,6 +86,10 @@ export default () => {
       notificationRecherches: {
         nombreDeRequetesEnParallele:
           process.env.JOB_NOMBRE_RECHERCHES_PARALLELE ?? '5'
+      },
+      mailConseillers: {
+        nombreDeConseillersEnParallele:
+          process.env.JOB_NOMBRE_CONSEILLERS_PARALLELE ?? '100'
       }
     }
   }

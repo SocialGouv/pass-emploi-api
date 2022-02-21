@@ -1,67 +1,99 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Result, success } from 'src/building-blocks/types/result'
+import { ConfigService } from '@nestjs/config'
+import { failure, Result, success } from 'src/building-blocks/types/result'
+import { DateService } from 'src/utils/date-service'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
-import {
-  Planificateur,
-  PlanificateurService
-} from '../../../domain/planificateur'
 import { Chat, ChatRepositoryToken } from '../../../domain/chat'
 import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../../domain/conseiller'
 
-export interface HandleJobMailConseillerCommand extends Command {
-  job: Planificateur.Job<Planificateur.JobMailConseiller>
-}
-
-interface HandleJobMailConseillerCommandResult {
-  mailEnvoye: boolean
-}
-
 @Injectable()
 export class HandleJobMailConseillerCommandHandler extends CommandHandler<
-  HandleJobMailConseillerCommand,
-  HandleJobMailConseillerCommandResult
+  Command,
+  Stats
 > {
   constructor(
     @Inject(ChatRepositoryToken)
     private chatRepository: Chat.Repository,
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
-    private planificateurService: PlanificateurService
+    private dateService: DateService,
+    private configuration: ConfigService
   ) {
     super('HandleJobMailConseillerCommandHandler')
   }
 
   async handle(
-    command: HandleJobMailConseillerCommand
-  ): Promise<Result<HandleJobMailConseillerCommandResult>> {
-    this.planificateurService.planifierJobRappelMail(
-      command.job.contenu.idConseiller
-    )
-
-    const nombreDeConversationsNonLues =
-      await this.chatRepository.getNombreDeConversationsNonLues(
-        command.job.contenu.idConseiller
-      )
-
-    if (nombreDeConversationsNonLues === 0) {
-      return success({ mailEnvoye: false })
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _command: Command
+  ): Promise<Result<Stats>> {
+    const stats: Stats = {
+      succes: 0,
+      echecs: 0,
+      mailsEnvoyes: 0
     }
 
-    await this.conseillerRepository.envoyerUnRappelParMail(
-      command.job.contenu.idConseiller,
-      nombreDeConversationsNonLues
+    let conseillers = []
+    const maintenant = this.dateService.now()
+    const nombreConseillers = parseInt(
+      this.configuration.get(
+        'jobs.mailConseillers.nombreDeConseillersEnParallele'
+      )!
     )
 
-    return success({ mailEnvoye: true })
+    try {
+      do {
+        conseillers =
+          await this.conseillerRepository.findConseillersMessagesNonVerifies(
+            nombreConseillers,
+            maintenant
+          )
+
+        await Promise.all(
+          conseillers.map(async conseiller => {
+            try {
+              const nombreDeConversationsNonLues =
+                await this.chatRepository.getNombreDeConversationsNonLues(
+                  conseiller.id
+                )
+
+              if (nombreDeConversationsNonLues !== 0) {
+                await this.conseillerRepository.envoyerUnRappelParMail(
+                  conseiller.id,
+                  nombreDeConversationsNonLues
+                )
+                stats.mailsEnvoyes++
+              }
+              await this.conseillerRepository.save({
+                ...conseiller,
+                dateVerificationMessages: maintenant
+              })
+              stats.succes++
+            } catch (e) {
+              this.logger.error(
+                `Echec verification des messages non lus du conseiller ${conseiller.id}`
+              )
+              stats.echecs++
+            }
+          })
+        )
+      } while (conseillers.length)
+
+      stats.tempsDExecution = maintenant.diffNow().milliseconds * -1
+      return success(stats)
+    } catch (e) {
+      this.logger.error("Le job des mails des messages non lus s'est arrêté")
+      this.logger.log(stats)
+      return failure(e)
+    }
   }
 
   async authorize(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: HandleJobMailConseillerCommand
+    _command: Command
   ): Promise<void> {
     return
   }
@@ -69,4 +101,11 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
   async monitor(): Promise<void> {
     return
   }
+}
+
+interface Stats {
+  succes: number
+  echecs: number
+  mailsEnvoyes: number
+  tempsDExecution?: number
 }
