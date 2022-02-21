@@ -54,7 +54,7 @@ export class EngagementHttpRepository implements OffreEngagement.Repository {
     } = criteres
     const params = new URLSearchParams()
     params.append('size', limit.toString())
-    params.append('from', (page * limit - limit + 1).toString())
+    params.append('from', (page * limit - limit).toString())
 
     if (lat) {
       params.append('lat', lat.toString())

@@ -40,7 +40,7 @@ describe('OffreEngagementRepository', () => {
         }
         const params = new URLSearchParams()
         params.append('size', '50')
-        params.append('from', '1')
+        params.append('from', '0')
         params.append('lat', '48.86899229710103')
         params.append('lon', '2.3342718577284205')
         params.append('startAt', 'lt:2022-02-17T10:00:00.000Z')
@@ -102,7 +102,7 @@ describe('OffreEngagementRepository', () => {
         }
         const params = new URLSearchParams()
         params.append('size', '63')
-        params.append('from', '64')
+        params.append('from', '63')
         params.append('lat', '48.86899229710103')
         params.append('lon', '2.3342718577284205')
         params.append('startAt', 'lt:2022-02-17T10:00:00.000Z')
