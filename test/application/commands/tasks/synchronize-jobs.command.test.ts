@@ -1,13 +1,13 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { SynchronizeJobsCommandHandler } from '../../../src/application/commands/synchronize-jobs.command'
+import { SynchronizeJobsCommandHandler } from '../../../../src/application/commands/tasks/synchronize-jobs.command'
 import {
   Planificateur,
   PlanificateurService
-} from '../../../src/domain/planificateur'
-import { RendezVous } from '../../../src/domain/rendez-vous'
-import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+} from '../../../../src/domain/planificateur'
+import { RendezVous } from '../../../../src/domain/rendez-vous'
+import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 
 describe('SynchronizeJobsCommandHandler', () => {
   let synchronizeJobsCommandHandler: SynchronizeJobsCommandHandler

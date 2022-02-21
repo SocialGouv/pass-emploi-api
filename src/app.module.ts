@@ -99,7 +99,7 @@ import { EvenementService, EvenementsRepositoryToken } from './domain/evenement'
 import { EvenementHttpSqlRepository } from './infrastructure/repositories/evenement-http-sql.repository'
 import { HandleJobMailConseillerCommandHandler } from './application/commands/jobs/handle-job-mail-conseiller.command'
 import { MailSendinblueClient } from './infrastructure/clients/mail-sendinblue.client'
-import { SynchronizeJobsCommandHandler } from './application/commands/synchronize-jobs.command'
+import { SynchronizeJobsCommandHandler } from './application/commands/tasks/synchronize-jobs.command'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from './application/queries/get-favoris-offres-emploi-jeune.query.handler'
 import { AddFavoriOffreImmersionCommandHandler } from './application/commands/add-favori-offre-immersion.command.handler'
 import { DeleteFavoriOffreImmersionCommandHandler } from './application/commands/delete-favori-offre-immersion.command.handler'
@@ -113,12 +113,13 @@ import { TransfererJeunesConseillerCommandHandler } from './application/commands
 import { NotifierNouvellesOffresEmploiCommandHandler } from './application/commands/jobs/handle-job-notification-recherche.command'
 import { DeleteRechercheCommandHandler } from './application/commands/delete-recherche.command.handler'
 import { RechercheAuthorizer } from './application/authorizers/authorize-recherche'
-import { InitCronsCommandHandler } from './application/commands/init-crons.command'
+import { InitCronsCommandHandler } from './application/commands/tasks/init-crons.command'
 import { ServicesCiviqueController } from './infrastructure/routes/services-civique.controller'
 import { EngagementClient } from './infrastructure/clients/engagement-client'
 import { EngagementRepositoryToken } from './domain/offre-engagement'
 import { GetServicesCiviqueQueryHandler } from './application/queries/get-services-civique.query.handler'
 import { EngagementHttpRepository } from './infrastructure/repositories/offre-engagement-http.repository'
+import { HandleNettoyerLesJobsCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-jobs.command'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -284,7 +285,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     TransfererJeunesConseillerCommandHandler,
     InitCronsCommandHandler,
     NotifierNouvellesOffresEmploiCommandHandler,
-    GetServicesCiviqueQueryHandler
+    GetServicesCiviqueQueryHandler,
+    HandleNettoyerLesJobsCommandHandler
   ]
 }
 

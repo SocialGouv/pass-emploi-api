@@ -3,18 +3,20 @@ import {
   Planificateur,
   PlanificateurRepositoryToken
 } from '../domain/planificateur'
-import { SynchronizeJobsCommandHandler } from './commands/synchronize-jobs.command'
+import { SynchronizeJobsCommandHandler } from './commands/tasks/synchronize-jobs.command'
 import JobEnum = Planificateur.JobEnum
 import { NotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notification-recherche.command'
-import { InitCronsCommandHandler } from './commands/init-crons.command'
 import { HandleJobMailConseillerCommandHandler } from './commands/jobs/handle-job-mail-conseiller.command'
+import { HandleNettoyerLesJobsCommandHandler } from './commands/jobs/handle-job-nettoyer-les-jobs.command'
+import { InitCronsCommandHandler } from './commands/tasks/init-crons.command'
 
 export enum Task {
   DUMMY_JOB = 'DUMMY_JOB',
   INIT_ALL_JOBS = 'INIT_ALL_JOBS',
   RECHERCHER_LES_NOUVELLES_OFFRES = 'RECHERCHER_LES_NOUVELLES_OFFRES',
   ENVOYER_MAIL_CONSEILLER_MESSAGES = 'ENVOYER_MAIL_CONSEILLER_MESSAGES',
-  INITIALISER_LES_CRON = 'INITIALISER_LES_CRON'
+  INITIALISER_LES_CRON = 'INITIALISER_LES_CRON',
+  NETTOYER_LES_JOBS = 'NETTOYER_LES_JOBS'
 }
 
 @Injectable()
@@ -27,7 +29,8 @@ export class TaskService {
     private synchronizeJobsCommandHandler: SynchronizeJobsCommandHandler,
     private notifierNouvellesOffresEmploiCommandHandler: NotifierNouvellesOffresEmploiCommandHandler,
     private handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler,
-    private initCronsCommandHandler: InitCronsCommandHandler
+    private initCronsCommandHandler: InitCronsCommandHandler,
+    private handleNettoyerLesJobsCommandHandler: HandleNettoyerLesJobsCommandHandler
   ) {}
 
   async handle(task: Task | undefined): Promise<void> {
@@ -53,6 +56,9 @@ export class TaskService {
           break
         case Task.INITIALISER_LES_CRON:
           await this.initCronsCommandHandler.execute({})
+          break
+        case Task.NETTOYER_LES_JOBS:
+          await this.handleNettoyerLesJobsCommandHandler.execute({})
           break
         default:
           this.logger.log(
