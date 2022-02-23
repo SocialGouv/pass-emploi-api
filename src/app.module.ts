@@ -120,6 +120,7 @@ import { EngagementRepositoryToken } from './domain/offre-engagement'
 import { GetServicesCiviqueQueryHandler } from './application/queries/get-services-civique.query.handler'
 import { EngagementHttpRepository } from './infrastructure/repositories/offre-engagement-http.repository'
 import { HandleNettoyerLesJobsCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-jobs.command'
+import { GetDetailServiceCiviqueQueryHandler } from './application/queries/get-detail-service-civique.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -286,6 +287,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     InitCronsCommandHandler,
     NotifierNouvellesOffresEmploiCommandHandler,
     GetServicesCiviqueQueryHandler,
+    GetDetailServiceCiviqueQueryHandler,
     HandleNettoyerLesJobsCommandHandler
   ]
 }
