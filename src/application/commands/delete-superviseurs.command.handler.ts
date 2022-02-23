@@ -9,13 +9,13 @@ import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { SupportAuthorizer } from '../authorizers/authorize-support'
 
-export interface CreerSuperviseursCommand extends Command {
+export interface DeleteSuperviseursCommand extends Command {
   superviseurs: Superviseur[]
 }
 
 @Injectable()
-export class CreerSuperviseursCommandHandler extends CommandHandler<
-  CreerSuperviseursCommand,
+export class DeleteSuperviseursCommandHandler extends CommandHandler<
+  DeleteSuperviseursCommand,
   void
 > {
   constructor(
@@ -23,17 +23,17 @@ export class CreerSuperviseursCommandHandler extends CommandHandler<
     private readonly superviseurRepository: Superviseur.Repository,
     private supportAuthorizer: SupportAuthorizer
   ) {
-    super('CreerSuperviseursCommandHandler')
+    super('DeleteSuperviseursCommandHandler')
   }
 
-  async handle(command: CreerSuperviseursCommand): Promise<Result> {
-    await this.superviseurRepository.saveSuperviseurs(command.superviseurs)
+  async handle(command: DeleteSuperviseursCommand): Promise<Result<void>> {
+    await this.superviseurRepository.deleteSuperviseurs(command.superviseurs)
     return emptySuccess()
   }
 
   async authorize(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: CreerSuperviseursCommand,
+    _command: DeleteSuperviseursCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     await this.supportAuthorizer.authorize(utilisateur)

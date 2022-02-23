@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import {
+  ArrayNotEmpty,
+  IsArray,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -89,12 +91,23 @@ export class CreerJeuneMiloPayload {
 }
 
 class Superviseur {
+  @ApiProperty()
+  @IsString()
+  @IsEmail()
+  @IsNotEmpty()
   email: string
+
+  @ApiProperty({ enum: Core.Structure })
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(Core.Structure)
   structure: Core.Structure
 }
-export class CreerSuperviseursPayload {
+export class SuperviseursPayload {
   @ApiProperty({ type: Superviseur, isArray: true })
-  @ValidateNested()
+  @IsArray()
+  @ArrayNotEmpty()
+  @ValidateNested({ each: true })
   @Type(() => Superviseur)
   superviseurs: Superviseur[]
 }

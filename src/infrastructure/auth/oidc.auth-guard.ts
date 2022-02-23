@@ -84,7 +84,7 @@ export class OidcAuthGuard implements CanActivate {
         }
       | undefined
     return {
-      id: payload.userId as string,
+      id: payload.userId ? (payload.userId as string) : 'inconnu',
       email: payload.email as string,
       nom: payload.family_name as string,
       prenom: payload.given_name as string,
