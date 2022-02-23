@@ -120,6 +120,9 @@ import { EngagementRepositoryToken } from './domain/offre-engagement'
 import { GetServicesCiviqueQueryHandler } from './application/queries/get-services-civique.query.handler'
 import { EngagementHttpRepository } from './infrastructure/repositories/offre-engagement-http.repository'
 import { HandleNettoyerLesJobsCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-jobs.command'
+import { CreerSuperviseursCommandHandler } from './application/commands/creer-superviseurs.command.handler'
+import { SuperviseursRepositoryToken } from './domain/superviseur'
+import { SuperviseurSqlRepository } from './infrastructure/repositories/superviseur-sql.repository'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -225,6 +228,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       provide: EngagementRepositoryToken,
       useClass: EngagementHttpRepository
     },
+    {
+      provide: SuperviseursRepositoryToken,
+      useClass: SuperviseurSqlRepository
+    },
     ...databaseProviders
   ],
   exports: [...databaseProviders]
@@ -286,7 +293,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     InitCronsCommandHandler,
     NotifierNouvellesOffresEmploiCommandHandler,
     GetServicesCiviqueQueryHandler,
-    HandleNettoyerLesJobsCommandHandler
+    HandleNettoyerLesJobsCommandHandler,
+    CreerSuperviseursCommandHandler
   ]
 }
 

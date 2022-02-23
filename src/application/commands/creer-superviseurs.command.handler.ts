@@ -23,7 +23,7 @@ export class CreerSuperviseursCommandHandler extends CommandHandler<
     super('CreerSuperviseursCommandHandler')
   }
 
-  async handle(command: CreerSuperviseursCommand): Promise<Result<void>> {
+  async handle(command: CreerSuperviseursCommand): Promise<Result> {
     await this.superviseurRepository.saveSuperviseurs(command.superviseurs)
     return emptySuccess()
   }
