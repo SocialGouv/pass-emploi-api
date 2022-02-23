@@ -52,9 +52,11 @@ import {
   CreateActionPayload,
   CreateJeunePoleEmploiPayload,
   CreerJeuneMiloPayload,
+  CreerSuperviseursPayload,
   GetConseillerQueryParams
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
+import { CreerSuperviseursCommandHandler } from 'src/application/commands/creer-superviseurs.command.handler'
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -71,7 +73,8 @@ export class ConseillersController {
     private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler,
     private readonly createRendezVousCommandHandler: CreateRendezVousCommandHandler,
     private readonly getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler,
-    private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
+    private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler,
+    private readonly creerSuperviseursCommandHandler: CreerSuperviseursCommandHandler
   ) {}
 
   @Get()
@@ -360,6 +363,21 @@ export class ConseillersController {
     }
 
     return result.data
+  }
+
+  @Post('superviseurs')
+  async postSuperviseurs(
+    @Body() creerSuperviseursPayload: CreerSuperviseursPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.creerSuperviseursCommandHandler.execute(
+      creerSuperviseursPayload,
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      throw new RuntimeException(result.error.message)
+    }
   }
 }
 
