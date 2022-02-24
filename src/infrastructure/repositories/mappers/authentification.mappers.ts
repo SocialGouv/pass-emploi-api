@@ -3,7 +3,8 @@ import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseill
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 
 export function fromConseillerSqlToUtilisateur(
-  conseillerSqlModel: ConseillerSqlModel
+  conseillerSqlModel: ConseillerSqlModel,
+  roles: Authentification.Role[] = []
 ): Authentification.Utilisateur {
   return {
     id: conseillerSqlModel.id,
@@ -12,7 +13,7 @@ export function fromConseillerSqlToUtilisateur(
     email: conseillerSqlModel.email ? conseillerSqlModel.email : undefined,
     structure: conseillerSqlModel.structure,
     type: Authentification.Type.CONSEILLER,
-    roles: []
+    roles
   }
 }
 

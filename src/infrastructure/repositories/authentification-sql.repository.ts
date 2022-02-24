@@ -8,6 +8,7 @@ import {
   fromConseillerSqlToUtilisateur,
   fromJeuneSqlToUtilisateur
 } from './mappers/authentification.mappers'
+import { SuperviseurSqlModel } from '../sequelize/models/superviseur.sql-model'
 
 @Injectable()
 export class AuthentificationSqlRepository
@@ -27,7 +28,20 @@ export class AuthentificationSqlRepository
       })
 
       if (conseillerSqlModel) {
-        return fromConseillerSqlToUtilisateur(conseillerSqlModel)
+        const estSuperviseur = await SuperviseurSqlModel.findOne({
+          where: {
+            email: conseillerSqlModel.email,
+            structure: conseillerSqlModel.structure
+          }
+        })
+
+        if (estSuperviseur) {
+          return fromConseillerSqlToUtilisateur(conseillerSqlModel, [
+            Authentification.Role.SUPERVISEUR
+          ])
+        } else {
+          return fromConseillerSqlToUtilisateur(conseillerSqlModel)
+        }
       }
     } else if (type === Authentification.Type.JEUNE) {
       const jeuneSqlModel = await JeuneSqlModel.findOne({
