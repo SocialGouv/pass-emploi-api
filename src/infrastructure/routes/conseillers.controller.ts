@@ -5,6 +5,7 @@ import {
   Delete,
   ForbiddenException,
   Get,
+  HttpCode,
   HttpException,
   HttpStatus,
   NotFoundException,
@@ -384,6 +385,7 @@ export class ConseillersController {
   }
 
   @Delete('superviseurs')
+  @HttpCode(204)
   async deleteSuperviseurs(
     @Body() superviseursPayload: SuperviseursPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur

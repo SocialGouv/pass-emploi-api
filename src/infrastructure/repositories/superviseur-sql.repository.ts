@@ -18,14 +18,16 @@ export class SuperviseurSqlRepository implements Superviseur.Repository {
   }
 
   async deleteSuperviseurs(superviseurs: Superviseur[]): Promise<Result> {
-    superviseurs.forEach(async superviseur => {
-      await SuperviseurSqlModel.destroy({
-        where: {
-          email: superviseur.email,
-          structure: superviseur.structure
-        }
-      })
-    })
+    await Promise.all(
+      superviseurs.map(superviseur =>
+        SuperviseurSqlModel.destroy({
+          where: {
+            email: superviseur.email,
+            structure: superviseur.structure
+          }
+        })
+      )
+    )
     return emptySuccess()
   }
 }
