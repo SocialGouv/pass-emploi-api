@@ -179,4 +179,114 @@ describe('OffreEngagementRepository', () => {
       })
     })
   })
+  describe('.getOffreEngagementQueryModelById', () => {
+    describe('Quand tout va bien', () => {
+      it('quand l"offre existe', async () => {
+        // Given
+        const idOffreEngagement = 'unId'
+        serviceCiviqueClient.get.resolves({
+          status: 200,
+          statusText: 'OK',
+          headers: '',
+          config: '',
+          data: {
+            ok: true,
+            data: {
+              id: 'unId',
+              title: 'unTitre',
+              startAt: '2022-02-17T10:00:00.000Z',
+              endAt: '2022-07-17T10:00:00.000Z',
+              domain: 'Informatique',
+              city: 'paris',
+              organizationName: 'orga de ouf',
+              applicationUrl: 'lienoffre.com',
+              organizationUrl: 'lienorganisation.com',
+              adresse: 'adresse mission',
+              organizationFullAddress: 'adresse organistation',
+              postalCode: '75018',
+              description: 'offre très intéressante'
+            }
+          }
+        })
+
+        // When
+        const result =
+          await engagementHttpRepository.getOffreEngagementQueryModelById(
+            idOffreEngagement
+          )
+
+        // Then
+        expect(serviceCiviqueClient.get).to.have.been.calledWithExactly(
+          'v0/mission/unId'
+        )
+        expect(result).to.be.deep.equal(
+          success({
+            titre: 'unTitre',
+            dateDeDebut: '2022-02-17T10:00:00.000Z',
+            dateDeFin: '2022-07-17T10:00:00.000Z',
+            domaine: 'Informatique',
+            ville: 'paris',
+            organisation: 'orga de ouf',
+            lienAnnonce: 'lienoffre.com',
+            urlOrganisation: 'lienorganisation.com',
+            adresseMission: 'adresse mission',
+            adresseOrganisation: 'adresse organistation',
+            codeDepartement: '75018',
+            description: 'offre très intéressante'
+          })
+        )
+      })
+      it('quand l"offre n"existe pas', async () => {
+        // Given
+        const idOffreEngagement = 'unFauxId'
+        serviceCiviqueClient.get.rejects({
+          response: {
+            status: 404,
+            data: {
+              message: 'Not Found'
+            }
+          }
+        })
+
+        // When
+        const result =
+          await engagementHttpRepository.getOffreEngagementQueryModelById(
+            idOffreEngagement
+          )
+
+        // Then
+        expect(serviceCiviqueClient.get).to.have.been.calledWithExactly(
+          'v0/mission/unFauxId'
+        )
+        expect(result).to.be.deep.equal(
+          failure(new ErreurHttp('Not Found', 404))
+        )
+      })
+    })
+    describe('Quand il y a une erreur', () => {
+      it('renvoie une failure http', async () => {
+        // Given
+        const idOffreEngagement = 'unId'
+        serviceCiviqueClient.get.rejects({
+          response: {
+            status: 400,
+            data: {
+              message: 'Bad request'
+            }
+          }
+        })
+
+        // When
+        const result =
+          await engagementHttpRepository.getOffreEngagementQueryModelById(
+            idOffreEngagement
+          )
+
+        // Then
+        expect(result).to.be.deep.equal(
+          failure(new ErreurHttp('Bad request', 400))
+        )
+      })
+    })
+  })
 })

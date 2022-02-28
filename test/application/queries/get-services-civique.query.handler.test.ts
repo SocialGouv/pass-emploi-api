@@ -8,7 +8,7 @@ import {
 } from '../../../src/application/queries/get-services-civique.query.handler'
 import { OffreEngagement } from '../../../src/domain/offre-engagement'
 import { DateTime } from 'luxon'
-import { offreEngagementQueryModel } from '../../fixtures/query-models/offre-engagement.query-model.fixtures'
+import { offresEngagementQueryModel } from '../../fixtures/query-models/offre-engagement.query-model.fixtures'
 import { OffreEngagementQueryModel } from '../../../src/application/queries/query-models/service-civique.query-models'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 
@@ -47,7 +47,7 @@ describe('GetServicesCiviqueQueryHandler', () => {
         domaine: 'environnement'
       }
       const serviceCiviqueQueryModels: OffreEngagementQueryModel[] =
-        offreEngagementQueryModel()
+        offresEngagementQueryModel()
 
       engagementRepository.findAll
         .withArgs({
@@ -74,7 +74,7 @@ describe('GetServicesCiviqueQueryHandler', () => {
         dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z')
       }
       const offreEngagementQueryModels: OffreEngagementQueryModel[] =
-        offreEngagementQueryModel()
+        offresEngagementQueryModel()
 
       engagementRepository.findAll
         .withArgs({
@@ -109,7 +109,7 @@ describe('GetServicesCiviqueQueryHandler', () => {
         domaine: 'environnement'
       }
       const serviceCiviqueQueryModels: OffreEngagementQueryModel[] =
-        offreEngagementQueryModel()
+        offresEngagementQueryModel()
 
       engagementRepository.findAll
         .withArgs({

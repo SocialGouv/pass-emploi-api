@@ -13,21 +13,37 @@ import {
   GetServicesCiviqueQuery,
   GetServicesCiviqueQueryHandler
 } from 'src/application/queries/get-services-civique.query.handler'
-import { OffreEngagementQueryModel } from '../../../src/application/queries/query-models/service-civique.query-models'
+import {
+  DetailOffreEngagementQueryModel,
+  OffreEngagementQueryModel
+} from '../../../src/application/queries/query-models/service-civique.query-models'
 import { DateTime } from 'luxon'
-import { offreEngagementQueryModel } from '../../fixtures/query-models/offre-engagement.query-model.fixtures'
+import {
+  offresEngagementQueryModel,
+  unDetailOffreEngagementQuerymodel
+} from '../../fixtures/query-models/offre-engagement.query-model.fixtures'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
+import {
+  GetDetailServiceCiviqueQuery,
+  GetDetailServiceCiviqueQueryHandler
+} from '../../../src/application/queries/get-detail-service-civique.query.handler'
 
 describe('ServicesCiviqueController', () => {
   let getServicesCiviqueQueryHandler: StubbedClass<GetServicesCiviqueQueryHandler>
+  let getDetailServiceCiviqueQueryHandler: StubbedClass<GetDetailServiceCiviqueQueryHandler>
   let app: INestApplication
 
   before(async () => {
     getServicesCiviqueQueryHandler = stubClass(GetServicesCiviqueQueryHandler)
+    getDetailServiceCiviqueQueryHandler = stubClass(
+      GetDetailServiceCiviqueQueryHandler
+    )
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(GetServicesCiviqueQueryHandler)
       .useValue(getServicesCiviqueQueryHandler)
+      .overrideProvider(GetDetailServiceCiviqueQueryHandler)
+      .useValue(getDetailServiceCiviqueQueryHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -65,7 +81,7 @@ describe('ServicesCiviqueController', () => {
         }
 
         const serviceCiviqueQueryModels: OffreEngagementQueryModel[] =
-          offreEngagementQueryModel()
+          offresEngagementQueryModel()
 
         getServicesCiviqueQueryHandler.execute.resolves(
           success(serviceCiviqueQueryModels)
@@ -112,5 +128,45 @@ describe('ServicesCiviqueController', () => {
       })
     })
     ensureUserAuthenticationFailsIfInvalid('get', '/services-civique')
+  })
+  describe('GET /services-civique/:idOffreEngagement', () => {
+    const query: GetDetailServiceCiviqueQuery = {
+      idOffreEngagement: '1'
+    }
+    describe('quand tout va bien', () => {
+      it("fait appel à l'API services civique avec les bons paramètres", async () => {
+        // Given
+        const detailOffreEngagementQueryModel: DetailOffreEngagementQueryModel =
+          unDetailOffreEngagementQuerymodel()
+
+        getDetailServiceCiviqueQueryHandler.execute.resolves(
+          success(detailOffreEngagementQueryModel)
+        )
+
+        // When
+        await request(app.getHttpServer())
+          .get(`/services-civique/${query.idOffreEngagement}`)
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect(HttpStatus.OK)
+      })
+    })
+    describe('quand il y a une failure http', () => {
+      it('retourne une erreur http', async () => {
+        // Given
+        getDetailServiceCiviqueQueryHandler.execute.resolves(
+          failure(new ErreurHttp('Bad request', 400))
+        )
+
+        // When
+        await request(app.getHttpServer())
+          .get(`/services-civique/${query.idOffreEngagement}`)
+          .set('authorization', unHeaderAuthorization())
+
+          // Then
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+    ensureUserAuthenticationFailsIfInvalid('get', '/services-civique/123')
   })
 })
