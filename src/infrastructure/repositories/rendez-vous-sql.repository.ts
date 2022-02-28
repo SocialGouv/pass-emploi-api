@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common'
 import { Op } from 'sequelize'
 import {
   RendezVousConseillerQueryModel,
-  RendezVousQueryModel
+  RendezVousQueryModel,
+  TypesEvenementsQueryModel
 } from '../../application/queries/query-models/rendez-vous.query-models'
-import { RendezVous } from '../../domain/rendez-vous'
+import { RendezVous, TypeEvenement } from '../../domain/rendez-vous'
 import { DateService } from '../../utils/date-service'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
@@ -122,5 +123,9 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
     })
 
     return allRendezVousSql.map(fromSqlToRendezVousJeuneQueryModel)
+  }
+
+  getTypesEvenementsQueryModel(): TypesEvenementsQueryModel {
+    return Object.values(TypeEvenement)
   }
 }

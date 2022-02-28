@@ -1,6 +1,7 @@
 import {
   RendezVousConseillerQueryModel,
-  RendezVousQueryModel
+  RendezVousQueryModel,
+  TypesEvenementsQueryModel
 } from '../application/queries/query-models/rendez-vous.query-models'
 import { IdService } from '../utils/id-service'
 import { Jeune } from './jeune'
@@ -16,6 +17,16 @@ export interface RendezVous {
   date: Date
   duree: number
   jeune: Jeune
+}
+
+export enum TypeEvenement {
+  ACTIVITE = 'Activités extérieures',
+  ATELIER = 'Atelier',
+  ENTRETIEN_CONSEILLER = 'Entretien individuel conseiller',
+  ENTRETIEN_PARTENAIRE = 'Entretien par un partenaire',
+  INFORMATION = 'Information collective',
+  VISITE = 'Visite',
+  AUTRE = 'Autre'
 }
 
 interface InfosRendezVousACreer {
@@ -37,6 +48,7 @@ export namespace RendezVous {
       idConseiller: string
     ): Promise<RendezVousConseillerQueryModel>
     getAllQueryModelsByJeune(idJeune: string): Promise<RendezVousQueryModel[]>
+    getTypesEvenementsQueryModel(): TypesEvenementsQueryModel
   }
 
   export function createRendezVousConseiller(
