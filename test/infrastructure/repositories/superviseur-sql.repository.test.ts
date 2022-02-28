@@ -1,0 +1,122 @@
+import { SuperviseurSqlRepository } from 'src/infrastructure/repositories/superviseur-sql.repository'
+import { SuperviseurSqlModel } from 'src/infrastructure/sequelize/models/superviseur.sql-model'
+import { Core } from '../../../src/domain/core'
+import { DatabaseForTesting, expect } from '../../utils'
+
+describe('SuperviseurSqlRepository', () => {
+  DatabaseForTesting.prepare()
+  let superviseurSqlRepository: SuperviseurSqlRepository
+  // Given
+  const unSuperviseur1 = {
+    email: 'test1',
+    structure: Core.Structure.MILO
+  }
+  const unSuperviseur2 = {
+    email: 'test2',
+    structure: Core.Structure.MILO
+  }
+
+  beforeEach(async () => {
+    superviseurSqlRepository = new SuperviseurSqlRepository()
+  })
+
+  describe('saveSuperviseurs', () => {
+    describe('quand on save de nouveaux superviseurs', () => {
+      it('les nouveaux superviseurs sont sauvegardés', async () => {
+        // When
+        const result = await superviseurSqlRepository.saveSuperviseurs([
+          unSuperviseur1
+        ])
+
+        // Then
+        const superviseurSqlModel = await SuperviseurSqlModel.findOne({
+          raw: true,
+          where: {
+            email: unSuperviseur1.email,
+            structure: unSuperviseur1.structure
+          }
+        })
+
+        expect(result._isSuccess).to.equal(true)
+        expect(superviseurSqlModel).to.deep.equal(unSuperviseur1)
+      })
+    })
+    describe('quand on save des superviseurs deja sauvegardés', () => {
+      it("les superviseurs sont présents qu'une seule fois", async () => {
+        // When
+        const result = await superviseurSqlRepository.saveSuperviseurs([
+          unSuperviseur1,
+          unSuperviseur1
+        ])
+
+        // Then
+        const superviseursSqlModel = await SuperviseurSqlModel.findAll({
+          raw: true,
+          where: {
+            email: unSuperviseur1.email,
+            structure: unSuperviseur1.structure
+          }
+        })
+
+        expect(result._isSuccess).to.equal(true)
+        expect(superviseursSqlModel.length).to.equal(1)
+        expect(superviseursSqlModel[0]).to.deep.equal(unSuperviseur1)
+      })
+    })
+  })
+
+  describe('deleteSuperviseurs', () => {
+    describe('quand on supprime des superviseurs inexistants', () => {
+      it('on ne fait rien', async () => {
+        // When
+        const result = await superviseurSqlRepository.deleteSuperviseurs([
+          unSuperviseur1,
+          unSuperviseur2
+        ])
+
+        // Then
+        await SuperviseurSqlModel.findAll({
+          raw: true
+        })
+
+        expect(result._isSuccess).to.equal(true)
+      })
+    })
+
+    describe('quand on supprime des superviseurs existants', () => {
+      it('les superviseurs sont supprimés', async () => {
+        // Given
+        await superviseurSqlRepository.saveSuperviseurs([
+          unSuperviseur1,
+          unSuperviseur2
+        ])
+
+        // When
+        const result = await superviseurSqlRepository.deleteSuperviseurs([
+          unSuperviseur1,
+          unSuperviseur2
+        ])
+
+        // Then
+        const expectedSuperviseur1 = await SuperviseurSqlModel.findOne({
+          raw: true,
+          where: {
+            email: unSuperviseur1.email,
+            structure: unSuperviseur1.structure
+          }
+        })
+        const expectedSuperviseur2 = await SuperviseurSqlModel.findOne({
+          raw: true,
+          where: {
+            email: unSuperviseur2.email,
+            structure: unSuperviseur2.structure
+          }
+        })
+
+        expect(result._isSuccess).to.equal(true)
+        expect(expectedSuperviseur1).to.equal(null)
+        expect(expectedSuperviseur2).to.equal(null)
+      })
+    })
+  })
+})
