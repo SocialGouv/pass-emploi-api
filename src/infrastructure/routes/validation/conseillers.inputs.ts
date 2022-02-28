@@ -97,7 +97,10 @@ class Superviseur {
   @IsNotEmpty()
   email: string
 
-  @ApiProperty({ enum: Core.Structure })
+  @ApiProperty({
+    enum: Core.Structure,
+    example: `${Core.Structure.PASS_EMPLOI} | ${Core.Structure.MILO} | ${Core.Structure.POLE_EMPLOI}`
+  })
   @IsString()
   @IsNotEmpty()
   @IsEnum(Core.Structure)
