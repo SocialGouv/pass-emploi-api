@@ -126,6 +126,7 @@ import { SuperviseursRepositoryToken } from './domain/superviseur'
 import { CreerSuperviseursCommandHandler } from './application/commands/creer-superviseurs.command.handler'
 import { DeleteSuperviseursCommandHandler } from './application/commands/delete-superviseurs.command.handler'
 import { SupportAuthorizer } from './application/authorizers/authorize-support'
+import { GetTypesEvenementsQueryHandler } from './application/queries/get-types-evenements.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -300,7 +301,9 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDetailServiceCiviqueQueryHandler,
     HandleNettoyerLesJobsCommandHandler,
     CreerSuperviseursCommandHandler,
-    DeleteSuperviseursCommandHandler
+    DeleteSuperviseursCommandHandler,
+    HandleNettoyerLesJobsCommandHandler,
+    GetTypesEvenementsQueryHandler
   ]
 }
 

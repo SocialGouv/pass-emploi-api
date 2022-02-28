@@ -1,5 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common'
 import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { GetTypesEvenementsQueryHandler } from 'src/application/queries/get-types-evenements.query.handler'
+import { TypesEvenementsQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
 import {
   GetCommunesEtDepartementsQuery,
   GetCommunesEtDepartementsQueryHandler
@@ -12,7 +14,8 @@ import { Public } from '../decorators/public.decorator'
 @ApiTags('Referentiels')
 export class ReferentielsController {
   constructor(
-    private readonly getCommunesEtDepartementsQueryHandler: GetCommunesEtDepartementsQueryHandler
+    private readonly getCommunesEtDepartementsQueryHandler: GetCommunesEtDepartementsQueryHandler,
+    private readonly getTypesEvenementsQueryHandler: GetTypesEvenementsQueryHandler
   ) {}
 
   @Get('communes-et-departements')
@@ -28,5 +31,13 @@ export class ReferentielsController {
     const query: GetCommunesEtDepartementsQuery = { recherche }
     query.villesOnly = villesOnly === 'true'
     return this.getCommunesEtDepartementsQueryHandler.execute(query)
+  }
+
+  @Get('types-evenements')
+  @ApiResponse({
+    isArray: true
+  })
+  async getTypesEvenements(): Promise<TypesEvenementsQueryModel> {
+    return this.getTypesEvenementsQueryHandler.execute({})
   }
 }
