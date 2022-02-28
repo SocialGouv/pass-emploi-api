@@ -15,6 +15,11 @@ describe('SuperviseurSqlRepository', () => {
     email: 'test2',
     structure: Core.Structure.MILO
   }
+  const unSuperviseurUppercase = {
+    email: 'TEST@test.test',
+    structure: Core.Structure.MILO
+  }
+  const emailLowercase = 'test@test.test'
 
   beforeEach(async () => {
     superviseurSqlRepository = new SuperviseurSqlRepository()
@@ -39,6 +44,24 @@ describe('SuperviseurSqlRepository', () => {
 
         expect(result._isSuccess).to.equal(true)
         expect(superviseurSqlModel).to.deep.equal(unSuperviseur1)
+      })
+      it('les nouveaux superviseurs sont sauvegardés avec email en lowercase', async () => {
+        // When
+        const result = await superviseurSqlRepository.saveSuperviseurs([
+          unSuperviseurUppercase
+        ])
+
+        // Then
+        const superviseurSqlModel = await SuperviseurSqlModel.findOne({
+          raw: true,
+          where: {
+            email: emailLowercase,
+            structure: unSuperviseurUppercase.structure
+          }
+        })
+
+        expect(result._isSuccess).to.equal(true)
+        expect(superviseurSqlModel?.email).to.equal(emailLowercase)
       })
     })
     describe('quand on save des superviseurs deja sauvegardés', () => {
@@ -116,6 +139,29 @@ describe('SuperviseurSqlRepository', () => {
         expect(result._isSuccess).to.equal(true)
         expect(expectedSuperviseur1).to.equal(null)
         expect(expectedSuperviseur2).to.equal(null)
+      })
+      it('les superviseurs avec email uppercase sont supprimés', async () => {
+        // Given
+        await superviseurSqlRepository.saveSuperviseurs([
+          unSuperviseurUppercase
+        ])
+
+        // When
+        const result = await superviseurSqlRepository.deleteSuperviseurs([
+          unSuperviseurUppercase
+        ])
+
+        // Then
+        const expectedSuperviseur = await SuperviseurSqlModel.findOne({
+          raw: true,
+          where: {
+            email: emailLowercase,
+            structure: unSuperviseurUppercase.structure
+          }
+        })
+
+        expect(result._isSuccess).to.equal(true)
+        expect(expectedSuperviseur).to.equal(null)
       })
     })
   })
