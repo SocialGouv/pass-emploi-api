@@ -99,7 +99,7 @@ class Superviseur {
 
   @ApiProperty({
     enum: Core.Structure,
-    example: `${Core.Structure.PASS_EMPLOI} | ${Core.Structure.MILO} | ${Core.Structure.POLE_EMPLOI}`
+    example: Object.values(Core.Structure).join(' | ')
   })
   @IsString()
   @IsNotEmpty()

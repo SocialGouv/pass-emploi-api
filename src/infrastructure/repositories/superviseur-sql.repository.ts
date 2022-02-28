@@ -9,7 +9,7 @@ export class SuperviseurSqlRepository implements Superviseur.Repository {
     await Promise.all(
       superviseurs.map(superviseur =>
         SuperviseurSqlModel.upsert({
-          email: superviseur.email,
+          email: superviseur.email.toLocaleLowerCase(),
           structure: superviseur.structure
         })
       )
@@ -22,7 +22,7 @@ export class SuperviseurSqlRepository implements Superviseur.Repository {
       superviseurs.map(superviseur =>
         SuperviseurSqlModel.destroy({
           where: {
-            email: superviseur.email,
+            email: superviseur.email.toLocaleLowerCase(),
             structure: superviseur.structure
           }
         })
