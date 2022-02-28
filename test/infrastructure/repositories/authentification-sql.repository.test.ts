@@ -1,4 +1,5 @@
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
+import { SuperviseurSqlModel } from 'src/infrastructure/sequelize/models/superviseur.sql-model'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { Authentification } from '../../../src/domain/authentification'
@@ -21,14 +22,14 @@ describe('AuthentificationSqlRepository', () => {
   })
 
   describe('get', () => {
+    const conseillerDto = unConseillerDto({
+      idAuthentification: 'id-authentification-conseiller',
+      structure: Core.Structure.MILO
+    })
+
     beforeEach(async () => {
       // Given
-      await ConseillerSqlModel.creer(
-        unConseillerDto({
-          idAuthentification: 'id-authentification-conseiller',
-          structure: Core.Structure.MILO
-        })
-      )
+      await ConseillerSqlModel.creer(conseillerDto)
       await JeuneSqlModel.creer(
         unJeuneDto({
           idAuthentification: 'id-authentification-jeune',
@@ -59,6 +60,29 @@ describe('AuthentificationSqlRepository', () => {
 
         // Then
         expect(utilisateur).to.deep.equal(undefined)
+      })
+    })
+    describe("quand c'est un conseiller superviseur", () => {
+      it("retourne l'utilisateur avec le bon role", async () => {
+        // Given
+        await SuperviseurSqlModel.create({
+          email: conseillerDto.email,
+          structure: conseillerDto.structure
+        })
+
+        // When
+        const utilisateur = await authentificationSqlRepository.get(
+          conseillerDto.idAuthentification,
+          conseillerDto.structure,
+          Authentification.Type.CONSEILLER
+        )
+
+        // Then
+        expect(utilisateur).to.deep.equal(
+          unUtilisateurConseiller({
+            roles: [Authentification.Role.SUPERVISEUR]
+          })
+        )
       })
     })
     describe("quand c'est un jeune", () => {

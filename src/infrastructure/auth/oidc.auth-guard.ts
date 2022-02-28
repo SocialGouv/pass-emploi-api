@@ -78,11 +78,6 @@ export class OidcAuthGuard implements CanActivate {
   private static buildUtilisateur(
     payload: JWTPayload
   ): Authentification.Utilisateur {
-    const realmAccess = payload.realm_access as
-      | {
-          roles?: string[]
-        }
-      | undefined
     return {
       id: payload.userId as string,
       email: payload.email as string,
@@ -90,7 +85,7 @@ export class OidcAuthGuard implements CanActivate {
       prenom: payload.given_name as string,
       type: payload.userType as Authentification.Type,
       structure: payload.userStructure as Core.Structure,
-      roles: getRoles(realmAccess)
+      roles: getRoles(payload.userRoles as Authentification.Role[] | undefined)
     }
   }
 
@@ -109,11 +104,8 @@ export class OidcAuthGuard implements CanActivate {
   }
 }
 
-function getRoles(realmAccess?: { roles?: string[] }): Authentification.Role[] {
-  if (realmAccess?.roles?.length) {
-    return realmAccess.roles
-      .map(role => Authentification.mappedRoles[role])
-      .filter((role): role is Authentification.Role => role !== undefined)
-  }
-  return []
+function getRoles(
+  roles: Authentification.Role[] | undefined
+): Authentification.Role[] {
+  return roles ?? []
 }
