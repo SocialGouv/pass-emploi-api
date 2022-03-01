@@ -12,6 +12,9 @@ export class UtilisateurQueryModel {
   @ApiProperty()
   nom: string
 
+  @ApiProperty()
+  roles: Authentification.Role[]
+
   @ApiProperty({ required: false })
   email?: string
 
@@ -43,6 +46,7 @@ export function queryModelFromUtilisateur(
     nom: utilisateur.nom,
     email: utilisateur.email,
     structure: utilisateur.structure,
-    type: utilisateur.type
+    type: utilisateur.type,
+    roles: utilisateur.roles
   }
 }

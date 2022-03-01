@@ -1,12 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { Type } from 'class-transformer'
 import {
+  ArrayNotEmpty,
   IsArray,
   IsEmail,
   IsEnum,
   IsNotEmpty,
   IsOptional,
-  IsString
+  IsString,
+  ValidateNested
 } from 'class-validator'
+import { Core } from 'src/domain/core'
 import { Action } from '../../../domain/action'
 
 export class GetConseillerQueryParams {
@@ -91,4 +95,30 @@ export class EnvoyerNotificationsPayload {
   @IsArray()
   @IsNotEmpty()
   idsJeunes: string[]
+}
+
+class Superviseur {
+  @ApiProperty()
+  @IsString()
+  @IsEmail()
+  @IsNotEmpty()
+  email: string
+
+  @ApiProperty({
+    enum: Core.Structure,
+    example: Object.values(Core.Structure).join(' | ')
+  })
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(Core.Structure)
+  structure: Core.Structure
+}
+
+export class SuperviseursPayload {
+  @ApiProperty({ type: Superviseur, isArray: true })
+  @IsArray()
+  @ArrayNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => Superviseur)
+  superviseurs: Superviseur[]
 }

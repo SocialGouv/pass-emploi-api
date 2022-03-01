@@ -2,8 +2,10 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
+  HttpCode,
   HttpException,
   HttpStatus,
   NotFoundException,
@@ -15,13 +17,15 @@ import {
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CreateRendezVousCommandHandler } from 'src/application/commands/create-rendez-vous.command.handler'
+import { CreerSuperviseursCommandHandler } from 'src/application/commands/creer-superviseurs.command.handler'
+import { DeleteSuperviseursCommandHandler } from 'src/application/commands/delete-superviseurs.command.handler'
 import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler'
 import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler'
 import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
 import { Authentification } from 'src/domain/authentification'
 import { CreateActionCommandHandler } from '../../application/commands/create-action.command.handler'
-import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/creer-jeune-pole-emploi.command.handler'
 import { CreerJeuneMiloCommandHandler } from '../../application/commands/creer-jeune-milo.command.handler'
+import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/creer-jeune-pole-emploi.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from '../../application/commands/send-notification-nouveau-message.command.handler'
 import { GetConseillerByEmailQueryHandler } from '../../application/queries/get-conseiller-by-email.query.handler'
 import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
@@ -53,7 +57,8 @@ import {
   CreateJeunePoleEmploiPayload,
   CreerJeuneMiloPayload,
   EnvoyerNotificationsPayload,
-  GetConseillerQueryParams
+  GetConseillerQueryParams,
+  SuperviseursPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
 import {
@@ -77,7 +82,9 @@ export class ConseillersController {
     private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler,
     private readonly createRendezVousCommandHandler: CreateRendezVousCommandHandler,
     private readonly getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler,
-    private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
+    private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler,
+    private readonly creerSuperviseursCommandHandler: CreerSuperviseursCommandHandler,
+    private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler
   ) {}
 
   @Get()
@@ -393,6 +400,37 @@ export class ConseillersController {
     }
 
     return result.data
+  }
+
+  @Post('superviseurs')
+  async postSuperviseurs(
+    @Body() superviseursPayload: SuperviseursPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.creerSuperviseursCommandHandler.execute(
+      { superviseurs: superviseursPayload.superviseurs },
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      throw new RuntimeException(result.error.message)
+    }
+  }
+
+  @Delete('superviseurs')
+  @HttpCode(204)
+  async deleteSuperviseurs(
+    @Body() superviseursPayload: SuperviseursPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.deleteSuperviseursCommandHandler.execute(
+      { superviseurs: superviseursPayload.superviseurs },
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      throw new RuntimeException(result.error.message)
+    }
   }
 }
 

@@ -1,4 +1,9 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import {
+  CreerSuperviseursCommand,
+  CreerSuperviseursCommandHandler
+} from 'src/application/commands/creer-superviseurs.command.handler'
+import { DeleteSuperviseursCommandHandler } from 'src/application/commands/delete-superviseurs.command.handler'
 import { GetAllRendezVousConseillerQueryHandler } from 'src/application/queries/get-rendez-vous-conseiller.query.handler'
 import { Action } from 'src/domain/action'
 import * as request from 'supertest'
@@ -53,6 +58,8 @@ describe('ConseillersController', () => {
   let getDossierMiloJeuneQueryHandler: StubbedClass<GetDossierMiloJeuneQueryHandler>
   let getAllRendezVousConseillerQueryHandler: StubbedClass<GetAllRendezVousConseillerQueryHandler>
   let creerJeuneMiloCommandHandler: StubbedClass<CreerJeuneMiloCommandHandler>
+  let creerSuperviseursCommandHandler: StubbedClass<CreerSuperviseursCommandHandler>
+  let deleteSuperviseursCommandHandler: StubbedClass<DeleteSuperviseursCommandHandler>
   let app: INestApplication
 
   before(async () => {
@@ -74,6 +81,10 @@ describe('ConseillersController', () => {
     getJeunesByConseillerQueryHandler = stubClass(
       GetJeunesByConseillerQueryHandler
     )
+    creerSuperviseursCommandHandler = stubClass(CreerSuperviseursCommandHandler)
+    deleteSuperviseursCommandHandler = stubClass(
+      DeleteSuperviseursCommandHandler
+    )
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(GetConseillerByEmailQueryHandler)
@@ -92,6 +103,10 @@ describe('ConseillersController', () => {
       .useValue(creerJeuneMiloCommandHandler)
       .overrideProvider(GetJeunesByConseillerQueryHandler)
       .useValue(getJeunesByConseillerQueryHandler)
+      .overrideProvider(CreerSuperviseursCommandHandler)
+      .useValue(creerSuperviseursCommandHandler)
+      .overrideProvider(DeleteSuperviseursCommandHandler)
+      .useValue(deleteSuperviseursCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -515,5 +530,113 @@ describe('ConseillersController', () => {
       'get',
       '/conseillers/milo/dossiers/2'
     )
+  })
+
+  describe('POST /conseillers/superviseurs', () => {
+    describe('quand le payload est valide', () => {
+      it('renvoie 201', async () => {
+        // Given
+        const command: CreerSuperviseursCommand = {
+          superviseurs: [
+            { email: 'test@octo.com', structure: Core.Structure.MILO }
+          ]
+        }
+
+        creerSuperviseursCommandHandler.execute
+          .withArgs(command, unUtilisateurDecode())
+          .resolves(emptySuccess())
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/conseillers/superviseurs')
+          .send(command)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.CREATED)
+      })
+    })
+    describe("quand le payload n'est pas valide", () => {
+      it('renvoie 400 quand le champ email est pas bon', async () => {
+        // Given
+        const payload = {
+          superviseurs: [{ email: 'test', structure: Core.Structure.MILO }]
+        }
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/conseillers/superviseurs')
+          .send(payload)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+      it('renvoie 400 quand le superviseur est incomplet', async () => {
+        // Given
+        const payload = {
+          superviseurs: [{ email: 'test@octo.com' }]
+        }
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/conseillers/superviseurs')
+          .send(payload)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('get', '/conseillers/superviseurs')
+  })
+
+  describe('DELETE /conseillers/superviseurs', () => {
+    describe('quand le payload est valide', () => {
+      it('renvoie 201', async () => {
+        // Given
+        const command: CreerSuperviseursCommand = {
+          superviseurs: [
+            { email: 'test@octo.com', structure: Core.Structure.MILO }
+          ]
+        }
+
+        deleteSuperviseursCommandHandler.execute
+          .withArgs(command, unUtilisateurDecode())
+          .resolves(emptySuccess())
+
+        // When - Then
+        await request(app.getHttpServer())
+          .delete('/conseillers/superviseurs')
+          .send(command)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.NO_CONTENT)
+      })
+    })
+    describe("quand le payload n'est pas valide", () => {
+      it('renvoie 400 quand le champ email est pas bon', async () => {
+        // Given
+        const payload = {
+          superviseurs: [{ email: 'test', structure: Core.Structure.MILO }]
+        }
+
+        // When - Then
+        await request(app.getHttpServer())
+          .delete('/conseillers/superviseurs')
+          .send(payload)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+      it('renvoie 400 quand le superviseur est incomplet', async () => {
+        // Given
+        const payload = {
+          superviseurs: [{ email: 'test@octo.com' }]
+        }
+
+        // When - Then
+        await request(app.getHttpServer())
+          .delete('/conseillers/superviseurs')
+          .send(payload)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('get', '/conseillers/superviseurs')
   })
 })

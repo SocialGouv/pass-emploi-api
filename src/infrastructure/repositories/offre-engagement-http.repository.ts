@@ -3,8 +3,14 @@ import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { URLSearchParams } from 'url'
 import { OffreEngagement } from '../../domain/offre-engagement'
-import { OffreEngagementQueryModel } from '../../application/queries/query-models/service-civique.query-models'
-import { toServiceCiviqueQueryModel } from './mappers/service-civique.mapper'
+import {
+  DetailOffreEngagementQueryModel,
+  OffreEngagementQueryModel
+} from '../../application/queries/query-models/service-civique.query-models'
+import {
+  toDetailOffreEngagementQueryModel,
+  toServiceCiviqueQueryModel
+} from './mappers/service-civique.mapper'
 import { EngagementClient } from '../clients/engagement-client'
 
 @Injectable()
@@ -25,6 +31,28 @@ export class EngagementHttpRepository implements OffreEngagement.Repository {
         params
       )
       return success(toServiceCiviqueQueryModel(response.data))
+    } catch (e) {
+      this.logger.error(e)
+      if (e.response?.status >= 400 && e.response?.status < 500) {
+        const erreur = new ErreurHttp(
+          e.response.data?.message,
+          e.response.status
+        )
+        return failure(erreur)
+      }
+      return failure(e)
+    }
+  }
+
+  async getOffreEngagementQueryModelById(
+    idOffreEngagement: string
+  ): Promise<Result<DetailOffreEngagementQueryModel>> {
+    try {
+      const response =
+        await this.engagementClient.get<DetailOffreEngagementDto>(
+          `v0/mission/${idOffreEngagement}`
+        )
+      return success(toDetailOffreEngagementQueryModel(response.data.data))
     } catch (e) {
       this.logger.error(e)
       if (e.response?.status >= 400 && e.response?.status < 500) {
@@ -83,50 +111,7 @@ export class EngagementHttpRepository implements OffreEngagement.Repository {
 
 export interface EngagementDto {
   total: number
-  hits: [
-    {
-      id: string
-      publisherId: string
-      publisherName: string
-      publisherUrl: string
-      publisherLogo: string
-      lastSyncAt: string
-      applicationUrl: string
-      statusCode: string
-      statusComment: string
-      clientId: string
-      title: string
-      description: string
-      organizationName: string
-      organizationUrl: string
-      organizationFullAddress: string
-      organizationCity: string
-      organizationPostCode: string
-      organizationDescription: string
-      startAt: string
-      postedAt: string
-      priority: string
-      metadata: string
-      adresse: string
-      postalCode: string
-      departmentName: string
-      departmentCode: string
-      city: string
-      region: string
-      country: string
-      domain: string
-      domainLogo: string
-      activity: string
-      location: {
-        lon: number
-        lat: number
-      }
-      remote: string
-      deleted: string
-      createdAt: string
-      updatedAt: string
-    }
-  ]
+  hits: OffreEngagementDto[]
   facets: {
     departmentName: Array<{
       key: string
@@ -141,4 +126,53 @@ export interface EngagementDto {
       doc_count: number
     }>
   }
+}
+
+export interface DetailOffreEngagementDto {
+  ok: boolean
+  data: OffreEngagementDto
+}
+
+export interface OffreEngagementDto {
+  id: string
+  publisherId: string
+  publisherName: string
+  publisherUrl: string
+  publisherLogo: string
+  lastSyncAt: string
+  applicationUrl: string
+  statusCode: string
+  statusComment: string
+  clientId: string
+  title: string
+  description: string
+  organizationName: string
+  organizationUrl: string
+  organizationFullAddress: string
+  organizationCity: string
+  organizationPostCode: string
+  organizationDescription: string
+  startAt: string
+  endAt: string
+  postedAt: string
+  priority: string
+  metadata: string
+  adresse: string
+  postalCode: string
+  departmentName: string
+  departmentCode: string
+  city: string
+  region: string
+  country: string
+  domain: string
+  domainLogo: string
+  activity: string
+  location: {
+    lon: number
+    lat: number
+  }
+  remote: string
+  deleted: string
+  createdAt: string
+  updatedAt: string
 }

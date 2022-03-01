@@ -9,6 +9,7 @@ import { JeuneSqlModel } from './jeune.sql-model'
 import { RendezVousSqlModel } from './rendez-vous.sql-model'
 import { RechercheSqlModel } from './recherche.sql-model'
 import { TransfertConseillerSqlModel } from './transfert-conseiller.sql-model'
+import { SuperviseurSqlModel } from './superviseur.sql-model'
 
 export const sqlModels = [
   ConseillerSqlModel,
@@ -21,5 +22,6 @@ export const sqlModels = [
   EvenementEngagementSqlModel,
   RechercheSqlModel,
   FavoriOffreImmersionSqlModel,
-  TransfertConseillerSqlModel
+  TransfertConseillerSqlModel,
+  SuperviseurSqlModel
 ]

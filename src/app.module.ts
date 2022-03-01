@@ -121,6 +121,12 @@ import { GetServicesCiviqueQueryHandler } from './application/queries/get-servic
 import { EngagementHttpRepository } from './infrastructure/repositories/offre-engagement-http.repository'
 import { HandleNettoyerLesJobsCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-jobs.command'
 import { SendNotificationsNouveauxMessagesCommandHandler } from './application/commands/send-notifications-nouveaux-messages.command.handler'
+import { GetDetailServiceCiviqueQueryHandler } from './application/queries/get-detail-service-civique.query.handler'
+import { SuperviseurSqlRepository } from './infrastructure/repositories/superviseur-sql.repository'
+import { SuperviseursRepositoryToken } from './domain/superviseur'
+import { CreerSuperviseursCommandHandler } from './application/commands/creer-superviseurs.command.handler'
+import { DeleteSuperviseursCommandHandler } from './application/commands/delete-superviseurs.command.handler'
+import { SupportAuthorizer } from './application/authorizers/authorize-support'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -226,6 +232,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       provide: EngagementRepositoryToken,
       useClass: EngagementHttpRepository
     },
+    {
+      provide: SuperviseursRepositoryToken,
+      useClass: SuperviseurSqlRepository
+    },
     ...databaseProviders
   ],
   exports: [...databaseProviders]
@@ -241,6 +251,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     RechercheAuthorizer,
     ConseillerForJeuneAuthorizer,
     RendezVousAuthorizer,
+    SupportAuthorizer,
     GetDetailActionQueryHandler,
     GetDetailJeuneQueryHandler,
     GetActionsByJeuneQueryHandler,
@@ -288,7 +299,10 @@ export function buildQueryCommandsProviders(): Provider[] {
     InitCronsCommandHandler,
     NotifierNouvellesOffresEmploiCommandHandler,
     GetServicesCiviqueQueryHandler,
-    HandleNettoyerLesJobsCommandHandler
+    GetDetailServiceCiviqueQueryHandler,
+    HandleNettoyerLesJobsCommandHandler,
+    CreerSuperviseursCommandHandler,
+    DeleteSuperviseursCommandHandler
   ]
 }
 

@@ -19,3 +19,36 @@ export class OffreEngagementQueryModel {
   })
   dateDeDebut: string
 }
+
+export class DetailOffreEngagementQueryModel {
+  @ApiProperty({
+    enum: OffreEngagement.Domaine
+  })
+  domaine: string
+  @ApiProperty()
+  titre: string
+  @ApiProperty()
+  ville: string
+  @ApiProperty()
+  organisation: string
+  @ApiProperty({
+    example: '2022-02-15T10:12:14.000Z'
+  })
+  dateDeDebut: string
+  @ApiProperty({
+    example: '2022-02-15T10:12:14.000Z'
+  })
+  dateDeFin: string
+  @ApiProperty()
+  description: string
+  @ApiProperty()
+  lienAnnonce: string
+  @ApiProperty()
+  adresseOrganisation: string
+  @ApiProperty()
+  adresseMission: string
+  @ApiProperty()
+  urlOrganisation: string
+  @ApiProperty()
+  codeDepartement: string
+}

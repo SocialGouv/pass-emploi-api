@@ -1,5 +1,8 @@
 import { Result } from '../building-blocks/types/result'
-import { OffreEngagementQueryModel } from '../application/queries/query-models/service-civique.query-models'
+import {
+  DetailOffreEngagementQueryModel,
+  OffreEngagementQueryModel
+} from '../application/queries/query-models/service-civique.query-models'
 import { DateTime } from 'luxon'
 
 export const EngagementRepositoryToken = 'Engagement.Repository'
@@ -7,6 +10,10 @@ export const EngagementRepositoryToken = 'Engagement.Repository'
 export namespace OffreEngagement {
   export interface Repository {
     findAll(criteres: Criteres): Promise<Result<OffreEngagementQueryModel[]>>
+
+    getOffreEngagementQueryModelById(
+      idOffreEngagement: string
+    ): Promise<Result<DetailOffreEngagementQueryModel>>
   }
 
   export interface Criteres {

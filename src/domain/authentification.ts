@@ -9,7 +9,8 @@ export const AuthentificationRepositoryToken = 'Authentification.Repository'
 export namespace Authentification {
   export enum Type {
     JEUNE = 'JEUNE',
-    CONSEILLER = 'CONSEILLER'
+    CONSEILLER = 'CONSEILLER',
+    SUPPORT = 'SUPPORT'
   }
 
   export enum Role {
