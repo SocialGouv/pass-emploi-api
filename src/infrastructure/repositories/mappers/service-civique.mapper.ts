@@ -34,7 +34,9 @@ export function toDetailOffreEngagementQueryModel(
     urlOrganisation: serviceCiviqueDto.organizationUrl,
     adresseMission: serviceCiviqueDto.adresse,
     adresseOrganisation: serviceCiviqueDto.organizationFullAddress,
-    codeDepartement: serviceCiviqueDto.postalCode,
-    description: serviceCiviqueDto.description
+    codeDepartement: serviceCiviqueDto.departmentCode,
+    description: serviceCiviqueDto.description,
+    codePostal: serviceCiviqueDto.postalCode,
+    descriptionOrganisation: serviceCiviqueDto.organizationDescription
   }
 }
