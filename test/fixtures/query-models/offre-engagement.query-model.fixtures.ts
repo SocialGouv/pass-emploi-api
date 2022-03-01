@@ -28,6 +28,8 @@ export const unDetailOffreEngagementQuerymodel =
     urlOrganisation: 'lienorganisation.com',
     adresseMission: 'adresse mission',
     adresseOrganisation: 'adresse organistation',
-    codeDepartement: '75018',
-    description: 'offre très intéressante'
+    codeDepartement: '75',
+    description: 'offre très intéressante',
+    codePostal: '75018',
+    descriptionOrganisation: 'description organisation'
   })

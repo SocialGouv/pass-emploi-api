@@ -51,4 +51,8 @@ export class DetailOffreEngagementQueryModel {
   urlOrganisation: string
   @ApiProperty()
   codeDepartement: string
+  @ApiProperty()
+  codePostal: string
+  @ApiProperty()
+  descriptionOrganisation: string
 }

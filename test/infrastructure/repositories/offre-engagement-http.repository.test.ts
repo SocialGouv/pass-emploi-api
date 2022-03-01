@@ -204,7 +204,9 @@ describe('OffreEngagementRepository', () => {
               adresse: 'adresse mission',
               organizationFullAddress: 'adresse organistation',
               postalCode: '75018',
-              description: 'offre très intéressante'
+              description: 'offre très intéressante',
+              departmentCode: '75',
+              organizationDescription: 'description'
             }
           }
         })
@@ -231,8 +233,10 @@ describe('OffreEngagementRepository', () => {
             urlOrganisation: 'lienorganisation.com',
             adresseMission: 'adresse mission',
             adresseOrganisation: 'adresse organistation',
-            codeDepartement: '75018',
-            description: 'offre très intéressante'
+            codeDepartement: '75',
+            description: 'offre très intéressante',
+            codePostal: '75018',
+            descriptionOrganisation: 'description'
           })
         )
       })
