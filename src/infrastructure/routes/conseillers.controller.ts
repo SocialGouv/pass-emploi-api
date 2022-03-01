@@ -52,6 +52,7 @@ import {
   CreateActionPayload,
   CreateJeunePoleEmploiPayload,
   CreerJeuneMiloPayload,
+  EnvoyerNotificationsPayload,
   GetConseillerQueryParams
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
@@ -293,17 +294,18 @@ export class ConseillersController {
   @Post(':idConseiller/jeunes/notify-messages')
   async postNotifications(
     @Param('idConseiller') idConseiller: string,
-    @Body() idsJeunesList: string[],
+    @Body() envoyerNotificationsPayload: EnvoyerNotificationsPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const command: SendNotificationsNouveauxMessagesCommand = {
-      idsJeunes: idsJeunesList,
+      idsJeunes: envoyerNotificationsPayload.idsJeunes,
       idConseiller
     }
     const result = await this.sendNotificationsNouveauxMessages.execute(
       command,
       utilisateur
     )
+
     if (isFailure(result)) {
       if (
         result.error.code === NonTrouveError.CODE ||

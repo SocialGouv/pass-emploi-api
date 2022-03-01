@@ -44,6 +44,16 @@ export class SendNotificationsNouveauxMessagesCommandHandler extends CommandHand
     for (const idJeune of command.idsJeunes) {
       const jeune = await this.jeuneRepository.get(idJeune)
 
+      if (jeune && jeune.conseiller.id == command.idConseiller) {
+        if (jeune.pushNotificationToken) {
+          const notification = Notification.createNouveauMessage(
+            jeune.pushNotificationToken
+          )
+          await this.notificationRepository.send(notification)
+          this.logger.log('Notification envoyée')
+        }
+      }
+
       if (!jeune) {
         return failure(new NonTrouveError('Jeune', idJeune))
       }
@@ -52,14 +62,6 @@ export class SendNotificationsNouveauxMessagesCommandHandler extends CommandHand
         return failure(
           new JeuneNonLieAuConseillerError(command.idConseiller, idJeune)
         )
-      }
-
-      if (jeune.pushNotificationToken) {
-        const notification = Notification.createNouveauMessage(
-          jeune.pushNotificationToken
-        )
-        await this.notificationRepository.send(notification)
-        this.logger.log('Notification envoyée')
       }
     }
     return emptySuccess()

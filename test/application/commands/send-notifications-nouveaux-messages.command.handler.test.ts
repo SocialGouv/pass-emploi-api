@@ -42,12 +42,16 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
 
   describe('handle', () => {
     describe('quand un des jeunes n"existe pas', () => {
-      it('renvoie une failure', async () => {
+      it('renvoie une failure sans envoyer de notifications à aucun jeune', async () => {
         // Given
+        const jeune2 = unJeune({ id: '2' })
+
         jeuneRepository.get.withArgs(jeune.id).resolves(undefined)
+        jeuneRepository.get.withArgs(jeune2.id).resolves(jeune2)
+
         const command: SendNotificationsNouveauxMessagesCommand = {
-          idsJeunes: [jeune.id],
-          idConseiller: jeune.conseiller.id
+          idsJeunes: [jeune.id, jeune2.id],
+          idConseiller: '1'
         }
 
         // When
@@ -57,13 +61,16 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
         expect(notificationRepository.send).not.to.have.been.calledWith(
           Notification.createNouveauMessage(jeune.pushNotificationToken)
         )
+        expect(notificationRepository.send).not.to.have.been.calledWith(
+          Notification.createNouveauMessage(jeune2.pushNotificationToken)
+        )
         expect(result).to.deep.equal(
           failure(new NonTrouveError('Jeune', jeune.id))
         )
       })
     })
     describe('quand un jeune n"est pas lié au conseiller', () => {
-      it('renvoie une failure', async () => {
+      it('renvoie une failure sans envoyer de notifications', async () => {
         // Given
         jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
         const command: SendNotificationsNouveauxMessagesCommand = {
@@ -89,21 +96,19 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
       describe('quand tous les jeunes se sont connectés au moins une fois sur l"application', () => {
         it('envoie une notification de type nouveau message aux jeunes', async () => {
           // Given
-          const jeune1 = unJeune({ id: '1' })
           const jeune2 = unJeune({ id: '2' })
 
-          jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
           jeuneRepository.get.withArgs(jeune2.id).resolves(jeune2)
 
           const command: SendNotificationsNouveauxMessagesCommand = {
-            idsJeunes: [jeune1.id, jeune2.id],
+            idsJeunes: [jeune.id, jeune2.id],
             idConseiller: '1'
           }
           // When
           await sendNotificationsNouveauxMessagesCommandHandler.handle(command)
           // Then
           expect(notificationRepository.send).to.have.been.calledWith(
-            Notification.createNouveauMessage(jeune1.pushNotificationToken)
+            Notification.createNouveauMessage(jeune.pushNotificationToken)
           )
           expect(notificationRepository.send).to.have.been.calledWith(
             Notification.createNouveauMessage(jeune2.pushNotificationToken)

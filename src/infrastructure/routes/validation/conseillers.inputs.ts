@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import {
+  IsArray,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -83,4 +84,11 @@ export class CreerJeuneMiloPayload {
   @IsString()
   @IsNotEmpty()
   idConseiller: string
+}
+
+export class EnvoyerNotificationsPayload {
+  @ApiProperty()
+  @IsArray()
+  @IsNotEmpty()
+  idsJeunes: string[]
 }
