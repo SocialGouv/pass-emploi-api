@@ -68,7 +68,7 @@ export class ServicesCiviqueController {
 
   @Get(':idOffreEngagement')
   @ApiResponse({
-    type: OffreEngagementQueryModel
+    type: DetailOffreEngagementQueryModel
   })
   async getDetailServiceCivique(
     @Param('idOffreEngagement') idOffreEngagement: string,
