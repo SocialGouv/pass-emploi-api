@@ -101,9 +101,9 @@ export function fromSqlToJeuneHomeQueryModel(
     rendezvous: jeuneSqlModel.rendezVous.map(rendezVousSql => ({
       id: rendezVousSql.id,
       comment: rendezVousSql.commentaire ?? '',
-      date: DateTime.fromJSDate(rendezVousSql.date).toFormat(
-        'EEE, d MMM yyyy HH:mm:ss z'
-      ),
+      date: DateTime.fromJSDate(rendezVousSql.date)
+        .setZone('Europe/Paris')
+        .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
       duration: Duration.fromObject({
         minutes: rendezVousSql.duree
       }).toFormat('h:mm:ss'),
