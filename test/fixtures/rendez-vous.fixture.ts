@@ -2,7 +2,7 @@ import {
   RendezVousConseillerQueryModel,
   RendezVousQueryModel
 } from 'src/application/queries/query-models/rendez-vous.query-models'
-import { RendezVous } from '../../src/domain/rendez-vous'
+import { RendezVous, CodeTypeRendezVous } from '../../src/domain/rendez-vous'
 import { unJeune } from './jeune.fixture'
 
 export const unRendezVous = (jeune = unJeune()): RendezVous => ({
@@ -13,7 +13,9 @@ export const unRendezVous = (jeune = unJeune()): RendezVous => ({
   date: new Date('2021-11-11T08:03:30.000Z'),
   jeune: jeune,
   commentaire: 'commentaire',
-  sousTitre: 'sous titre'
+  sousTitre: 'sous titre',
+  type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+  presenceConseiller: true
 })
 
 export const unRendezVousQueryModel = (): RendezVousQueryModel => ({

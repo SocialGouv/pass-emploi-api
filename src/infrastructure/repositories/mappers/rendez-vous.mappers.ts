@@ -12,12 +12,17 @@ export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
     id: rendezVous.id,
     titre: rendezVous.titre,
     sousTitre: rendezVous.sousTitre,
-    modalite: rendezVous.modalite,
+    modalite: rendezVous.modalite ?? null,
     duree: rendezVous.duree,
     date: rendezVous.date,
     commentaire: rendezVous.commentaire ?? null,
     dateSuppression: null,
-    idJeune: rendezVous.jeune.id
+    idJeune: rendezVous.jeune.id,
+    type: rendezVous.type,
+    precision: rendezVous.precision ?? null,
+    adresse: rendezVous.adresse ?? null,
+    organisme: rendezVous.organisme ?? null,
+    presenceConseiller: rendezVous.presenceConseiller
   }
 }
 
@@ -26,7 +31,7 @@ export function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
     id: rendezVousSql.id,
     titre: rendezVousSql.titre,
     sousTitre: rendezVousSql.sousTitre,
-    modalite: rendezVousSql.modalite,
+    modalite: rendezVousSql.modalite ?? undefined,
     duree: rendezVousSql.duree,
     date: rendezVousSql.date,
     commentaire: rendezVousSql.commentaire ?? undefined,
@@ -44,7 +49,12 @@ export function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
         structure: rendezVousSql.jeune.conseiller.structure
       },
       structure: rendezVousSql.jeune.structure
-    }
+    },
+    type: rendezVousSql.type,
+    precision: rendezVousSql.precision ?? undefined,
+    adresse: rendezVousSql.adresse ?? undefined,
+    organisme: rendezVousSql.organisme ?? undefined,
+    presenceConseiller: rendezVousSql.presenceConseiller
   }
 }
 
@@ -78,7 +88,7 @@ function fromSqlToRendezVousQueryModel(
     id: rendezVousSql.id,
     comment: rendezVousSql.commentaire ?? undefined,
     date: rendezVousSql.date,
-    modality: rendezVousSql.modalite,
+    modality: rendezVousSql.modalite ?? '',
     duration: rendezVousSql.duree,
     jeune: {
       id: rendezVousSql.jeune.id,

@@ -1,3 +1,4 @@
+import { CodeTypeRendezVous } from 'src/domain/rendez-vous'
 import { RendezVousDto } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { IdService } from '../../../src/utils/id-service'
@@ -16,7 +17,12 @@ export function unRendezVousDto(
     idJeune: '1',
     commentaire: 'commentaire',
     sousTitre: 'sous titre',
-    dateSuppression: null
+    dateSuppression: null,
+    type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+    precision: null,
+    adresse: null,
+    organisme: null,
+    presenceConseiller: true
   }
 
   return { ...defaults, ...args }

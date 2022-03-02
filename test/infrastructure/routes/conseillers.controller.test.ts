@@ -1,4 +1,5 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { CreateRendezVousCommandHandler } from 'src/application/commands/create-rendez-vous.command.handler'
 import {
   CreerSuperviseursCommand,
   CreerSuperviseursCommandHandler
@@ -6,7 +7,10 @@ import {
 import { DeleteSuperviseursCommandHandler } from 'src/application/commands/delete-superviseurs.command.handler'
 import { GetAllRendezVousConseillerQueryHandler } from 'src/application/queries/get-rendez-vous-conseiller.query.handler'
 import { Action } from 'src/domain/action'
+import { CodeTypeRendezVous } from 'src/domain/rendez-vous'
+import { CreateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
 import * as request from 'supertest'
+import { uneDatetime } from 'test/fixtures/date.fixture'
 import { unRendezVousConseillerQueryModel } from 'test/fixtures/rendez-vous.fixture'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
 import {
@@ -52,6 +56,7 @@ describe('ConseillersController', () => {
   let sendNotificationNouveauMessage: StubbedClass<SendNotificationNouveauMessageCommandHandler>
   let getDossierMiloJeuneQueryHandler: StubbedClass<GetDossierMiloJeuneQueryHandler>
   let getAllRendezVousConseillerQueryHandler: StubbedClass<GetAllRendezVousConseillerQueryHandler>
+  let createRendezVousCommandHandler: StubbedClass<CreateRendezVousCommandHandler>
   let creerJeuneMiloCommandHandler: StubbedClass<CreerJeuneMiloCommandHandler>
   let creerSuperviseursCommandHandler: StubbedClass<CreerSuperviseursCommandHandler>
   let deleteSuperviseursCommandHandler: StubbedClass<DeleteSuperviseursCommandHandler>
@@ -69,6 +74,7 @@ describe('ConseillersController', () => {
     getAllRendezVousConseillerQueryHandler = stubClass(
       GetAllRendezVousConseillerQueryHandler
     )
+    createRendezVousCommandHandler = stubClass(CreateRendezVousCommandHandler)
     creerJeuneMiloCommandHandler = stubClass(CreerJeuneMiloCommandHandler)
     getJeunesByConseillerQueryHandler = stubClass(
       GetJeunesByConseillerQueryHandler
@@ -89,6 +95,8 @@ describe('ConseillersController', () => {
       .useValue(getDossierMiloJeuneQueryHandler)
       .overrideProvider(GetAllRendezVousConseillerQueryHandler)
       .useValue(getAllRendezVousConseillerQueryHandler)
+      .overrideProvider(CreateRendezVousCommandHandler)
+      .useValue(createRendezVousCommandHandler)
       .overrideProvider(CreerJeuneMiloCommandHandler)
       .useValue(creerJeuneMiloCommandHandler)
       .overrideProvider(GetJeunesByConseillerQueryHandler)
@@ -331,7 +339,7 @@ describe('ConseillersController', () => {
 
   describe('GET /conseillers/:idConseiller/rendezvous', () => {
     describe('quand le rendez-vous existe', () => {
-      it('renvoie le dossier', async () => {
+      it('renvoie le rendezvous', async () => {
         // Given
         getAllRendezVousConseillerQueryHandler.execute
           .withArgs({ idConseiller: '41' }, unUtilisateurDecode())
@@ -344,6 +352,120 @@ describe('ConseillersController', () => {
           .expect(HttpStatus.OK)
           .expect(JSON.stringify(unRendezVousConseillerQueryModel()))
       })
+    })
+  })
+
+  describe('POST /conseillers/:idConseiller/rendezvous', () => {
+    it('crée le rendezvous quand tout va bien', async () => {
+      // Given
+      const idConseiller = '41'
+      const payload: CreateRendezVousPayload = {
+        jeuneId: '1',
+        comment: '',
+        date: uneDatetime.toJSDate().toISOString(),
+        duration: 30,
+        modality: 'rdv'
+      }
+      createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post(`/conseillers/${idConseiller}/rendezvous`)
+        .set('authorization', unHeaderAuthorization())
+        .send(payload)
+        .expect(HttpStatus.CREATED)
+        .expect({ id: 'id-rdv' })
+
+      expect(createRendezVousCommandHandler.execute).to.have.been.calledWith(
+        {
+          idJeune: payload.jeuneId,
+          commentaire: payload.comment,
+          date: payload.date,
+          duree: payload.duration,
+          modalite: payload.modality,
+          idConseiller: idConseiller,
+          type: undefined,
+          precision: undefined,
+          adresse: undefined,
+          organisme: undefined,
+          presenceConseiller: undefined
+        },
+        unUtilisateurDecode()
+      )
+    })
+    it("retourne une 400 quand la date n'est pas une dateString", async () => {
+      // Given
+      const idConseiller = '41'
+      const payload: CreateRendezVousPayload = {
+        jeuneId: '1',
+        comment: '',
+        date: '',
+        duration: 30
+      }
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post(`/conseillers/${idConseiller}/rendezvous`)
+        .set('authorization', unHeaderAuthorization())
+        .send(payload)
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+    it("retourne une 400 quand le type n'est pas bon", async () => {
+      // Given
+      const idConseiller = '41'
+      const payload: CreateRendezVousPayload = {
+        jeuneId: '1',
+        comment: '',
+        date: uneDatetime.toJSDate().toISOString(),
+        duration: 30,
+        type: 'blabla'
+      }
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post(`/conseillers/${idConseiller}/rendezvous`)
+        .set('authorization', unHeaderAuthorization())
+        .send(payload)
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+    it("retourne une 400 quand le champ precision n'est pas rempli", async () => {
+      // Given
+      const idConseiller = '41'
+      const payload: CreateRendezVousPayload = {
+        jeuneId: '1',
+        comment: '',
+        date: uneDatetime.toJSDate().toISOString(),
+        duration: 30,
+        type: CodeTypeRendezVous.AUTRE
+      }
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post(`/conseillers/${idConseiller}/rendezvous`)
+        .set('authorization', unHeaderAuthorization())
+        .send(payload)
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+    it('retourne une 201 quand le champ precision est rempli', async () => {
+      // Given
+      const idConseiller = '41'
+      const payload: CreateRendezVousPayload = {
+        jeuneId: '1',
+        comment: '',
+        date: uneDatetime.toJSDate().toISOString(),
+        duration: 30,
+        type: CodeTypeRendezVous.AUTRE,
+        precision: 'aa'
+      }
+      createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post(`/conseillers/${idConseiller}/rendezvous`)
+        .set('authorization', unHeaderAuthorization())
+        .send(payload)
+        .expect(HttpStatus.CREATED)
+        .expect({ id: 'id-rdv' })
     })
   })
 

@@ -97,6 +97,27 @@ describe('RendezVousRepositorySql', () => {
     })
   })
 
+  describe('getTypesRendezVousQueryModel', () => {
+    it('retourne les types de rdv', async () => {
+      // When
+      const typesRendezVous =
+        await rendezVousRepositorySql.getTypesRendezVousQueryModel()
+      // Then
+      expect(typesRendezVous).to.deep.equal([
+        { code: 'ACTIVITE_EXTERIEURES', label: 'Activités extérieures' },
+        { code: 'ATELIER', label: 'Atelier' },
+        {
+          code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
+          label: 'Entretien individuel conseiller'
+        },
+        { code: 'ENTRETIEN_PARTENAIRE', label: 'Entretien par un partenaire' },
+        { code: 'INFORMATION_COLLECTIVE', label: 'Information collective' },
+        { code: 'VISITE', label: 'Visite' },
+        { code: 'AUTRE', label: 'Autre' }
+      ])
+    })
+  })
+
   describe('getAllAVenir', () => {
     it('retourne le rendez-vous', async () => {
       // When

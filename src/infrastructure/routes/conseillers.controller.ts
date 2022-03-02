@@ -16,7 +16,10 @@ import {
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { CreateRendezVousCommandHandler } from 'src/application/commands/create-rendez-vous.command.handler'
+import {
+  CreateRendezVousCommand,
+  CreateRendezVousCommandHandler
+} from 'src/application/commands/create-rendez-vous.command.handler'
 import { CreerSuperviseursCommandHandler } from 'src/application/commands/creer-superviseurs.command.handler'
 import { DeleteSuperviseursCommandHandler } from 'src/application/commands/delete-superviseurs.command.handler'
 import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler'
@@ -298,18 +301,22 @@ export class ConseillersController {
     @Body() createRendezVousPayload: CreateRendezVousPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<{ id: string }> {
+    const command: CreateRendezVousCommand = {
+      idJeune: createRendezVousPayload.jeuneId,
+      commentaire: createRendezVousPayload.comment,
+      date: createRendezVousPayload.date,
+      duree: createRendezVousPayload.duration,
+      idConseiller: idConseiller,
+      modalite: createRendezVousPayload.modality,
+      type: createRendezVousPayload.type,
+      precision: createRendezVousPayload.precision,
+      adresse: createRendezVousPayload.adresse,
+      organisme: createRendezVousPayload.organisme,
+      presenceConseiller: createRendezVousPayload.presenceConseiller
+    }
+
     const result: Result<string> =
-      await this.createRendezVousCommandHandler.execute(
-        {
-          idJeune: createRendezVousPayload.jeuneId,
-          commentaire: createRendezVousPayload.comment,
-          date: createRendezVousPayload.date,
-          duree: createRendezVousPayload.duration,
-          idConseiller: idConseiller,
-          modalite: createRendezVousPayload.modality
-        },
-        utilisateur
-      )
+      await this.createRendezVousCommandHandler.execute(command, utilisateur)
 
     if (isFailure(result)) {
       switch (result.error.code) {

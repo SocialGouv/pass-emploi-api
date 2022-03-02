@@ -24,7 +24,12 @@ export interface CreateRendezVousCommand extends Command {
   commentaire?: string
   date: string
   duree: number
-  modalite: string
+  modalite?: string
+  type?: string
+  precision?: string
+  adresse?: string
+  organisme?: string
+  presenceConseiller?: boolean
 }
 
 @Injectable()
