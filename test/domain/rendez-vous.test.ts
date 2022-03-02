@@ -1,0 +1,42 @@
+import { CodeTypeRendezVous, RendezVous } from 'src/domain/rendez-vous'
+import { IdService } from 'src/utils/id-service'
+import { uneDatetime } from 'test/fixtures/date.fixture'
+import { unJeune } from 'test/fixtures/jeune.fixture'
+import { expect, stubClass } from '../utils'
+
+describe('Rendez-vous', () => {
+  const id = '26279b34-318a-45e4-a8ad-514a1090462c'
+  const idService = stubClass(IdService)
+  idService.uuid.returns(id)
+
+  describe('createRendezVousConseiller', () => {
+    // Given
+    const infosRdv = {
+      idJeune: '1',
+      idConseiller: '41',
+      commentaire: '',
+      date: uneDatetime.toJSDate().toISOString(),
+      duree: 10
+    }
+
+    // When
+    const rendezVous = RendezVous.createRendezVousConseiller(
+      infosRdv,
+      unJeune(),
+      idService
+    )
+
+    it('renvoie un rdv avec titre et sousTitre', async () => {
+      expect(rendezVous.sousTitre).to.equal('avec Nils')
+      expect(rendezVous.titre).to.equal('Rendez-vous conseiller')
+    })
+    it('renvoie un rdv avec type par défaut', async () => {
+      expect(rendezVous.type).to.equal(
+        CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
+      )
+    })
+    it('renvoie un rdv avec presenceConseiller par défaut', async () => {
+      expect(rendezVous.presenceConseiller).to.equal(true)
+    })
+  })
+})

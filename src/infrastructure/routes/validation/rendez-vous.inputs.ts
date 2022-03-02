@@ -1,15 +1,26 @@
-import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import {
+  IsBoolean,
+  IsDateString,
+  IsEnum,
+  IsIn,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateIf
+} from 'class-validator'
+import { CodeTypeRendezVous } from 'src/domain/rendez-vous'
 
 export class CreateRendezVousPayload {
   @ApiProperty()
   @IsString()
   comment: string
 
-  // TODO: ajouter IsDateString() après mep du web
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  @IsDateString()
   date: string
 
   @ApiProperty()
@@ -17,13 +28,44 @@ export class CreateRendezVousPayload {
   @IsNotEmpty()
   duration: number
 
-  @ApiProperty()
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  modality: string
+  modality?: string
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   jeuneId: string
+
+  @ApiPropertyOptional({ enum: CodeTypeRendezVous })
+  @IsOptional()
+  @IsString()
+  @IsEnum(CodeTypeRendezVous)
+  type?: string
+
+  @ApiPropertyOptional()
+  @ValidateIf(payload => payload.type === CodeTypeRendezVous.AUTRE)
+  @IsString()
+  @IsNotEmpty()
+  precision?: string
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  @IsNotEmpty()
+  adresse?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  organisme?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  @IsIn([true, false])
+  presenceConseiller?: boolean
 }

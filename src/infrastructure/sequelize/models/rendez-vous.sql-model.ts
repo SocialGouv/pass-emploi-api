@@ -7,6 +7,7 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
+import { CodeTypeRendezVous } from 'src/domain/rendez-vous'
 import { JeuneSqlModel } from './jeune.sql-model'
 
 export class RendezVousDto extends Model {
@@ -24,7 +25,7 @@ export class RendezVousDto extends Model {
   commentaire: string | null
 
   @Column({ field: 'modalite', type: DataType.STRING })
-  modalite!: string
+  modalite: string | null
 
   @Column({ field: 'date', type: DataType.DATE })
   date!: Date
@@ -38,6 +39,21 @@ export class RendezVousDto extends Model {
   @ForeignKey(() => JeuneSqlModel)
   @Column({ field: 'id_jeune', type: DataType.STRING })
   idJeune!: string
+
+  @Column({ field: 'type', type: DataType.STRING })
+  type: CodeTypeRendezVous
+
+  @Column({ field: 'precision', type: DataType.STRING })
+  precision: string | null
+
+  @Column({ field: 'adresse', type: DataType.STRING })
+  adresse: string | null
+
+  @Column({ field: 'organisme', type: DataType.STRING })
+  organisme: string | null
+
+  @Column({ field: 'presence_conseiller', type: DataType.BOOLEAN })
+  presenceConseiller: boolean
 }
 
 @Table({ timestamps: false, tableName: 'rendez_vous' })

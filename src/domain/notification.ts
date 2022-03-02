@@ -72,7 +72,7 @@ export namespace Notification {
       token,
       notification: {
         title: 'Nouveau rendez-vous',
-        body: 'Vous avez un nouveau rendez-vous avec votre conseiller'
+        body: 'Votre conseiller a programmé un nouveau rendez-vous'
       },
       data: {
         type: Type.NEW_RENDEZVOUS,

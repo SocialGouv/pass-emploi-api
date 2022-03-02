@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { TypeEvenement } from 'src/domain/rendez-vous'
+import { TypeRendezVous } from 'src/domain/rendez-vous'
 
 class JeuneQueryModel {
   @ApiProperty()
@@ -70,4 +70,4 @@ export class RendezVousConseillerQueryModel {
   passes: RendezVousQueryModel[]
 }
 
-export type TypesEvenementsQueryModel = TypeEvenement[]
+export type TypesRendezVousQueryModel = TypeRendezVous[]

@@ -3,18 +3,22 @@ import { Op } from 'sequelize'
 import {
   RendezVousConseillerQueryModel,
   RendezVousQueryModel,
-  TypesEvenementsQueryModel
+  TypesRendezVousQueryModel
 } from '../../application/queries/query-models/rendez-vous.query-models'
-import { RendezVous, TypeEvenement } from '../../domain/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  mapCodeLabelTypeRendezVous,
+  RendezVous
+} from '../../domain/rendez-vous'
 import { DateService } from '../../utils/date-service'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
 import {
-  toRendezVousDto,
   fromSqlToRendezVousConseillerQueryModel,
   fromSqlToRendezVousJeuneQueryModel,
-  toRendezVous
+  toRendezVous,
+  toRendezVousDto
 } from './mappers/rendez-vous.mappers'
 
 @Injectable()
@@ -125,7 +129,9 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
     return allRendezVousSql.map(fromSqlToRendezVousJeuneQueryModel)
   }
 
-  getTypesEvenementsQueryModel(): TypesEvenementsQueryModel {
-    return Object.values(TypeEvenement)
+  getTypesRendezVousQueryModel(): TypesRendezVousQueryModel {
+    return Object.values(CodeTypeRendezVous).map(code => {
+      return { code, label: mapCodeLabelTypeRendezVous[code] }
+    })
   }
 }

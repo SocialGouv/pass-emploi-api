@@ -100,8 +100,7 @@ describe('CreateRendezVousCommandHandler', () => {
           idConseiller: 'FAKE_CONSEILLER',
           commentaire: rendezVous.commentaire,
           date: rendezVous.date.toDateString(),
-          duree: rendezVous.duree,
-          modalite: 'tel'
+          duree: rendezVous.duree
         }
 
         // When
@@ -136,8 +135,7 @@ describe('CreateRendezVousCommandHandler', () => {
             idConseiller: jeune.conseiller.id,
             commentaire: rendezVous.commentaire,
             date: rendezVous.date.toDateString(),
-            duree: rendezVous.duree,
-            modalite: 'tel'
+            duree: rendezVous.duree
           }
           const expectedRendezvous = RendezVous.createRendezVousConseiller(
             command,
@@ -172,8 +170,7 @@ describe('CreateRendezVousCommandHandler', () => {
             idConseiller: jeune.conseiller.id,
             commentaire: rendezVous.commentaire,
             date: rendezVous.date.toDateString(),
-            duree: rendezVous.duree,
-            modalite: 'tel'
+            duree: rendezVous.duree
           }
           const expectedRendezvous = RendezVous.createRendezVousConseiller(
             command,
@@ -205,8 +202,7 @@ describe('CreateRendezVousCommandHandler', () => {
             idConseiller: jeune.conseiller.id,
             commentaire: rendezVous.commentaire,
             date: rendezVous.date.toDateString(),
-            duree: rendezVous.duree,
-            modalite: 'tel'
+            duree: rendezVous.duree
           }
           planificateurService.planifierRappelsRendezVous.rejects(new Error())
           const expectedRendezvous = RendezVous.createRendezVousConseiller(
@@ -231,8 +227,7 @@ describe('CreateRendezVousCommandHandler', () => {
         idConseiller: jeune.conseiller.id,
         commentaire: rendezVous.commentaire,
         date: rendezVous.date.toDateString(),
-        duree: rendezVous.duree,
-        modalite: 'tel'
+        duree: rendezVous.duree
       }
 
       const utilisateur = unUtilisateurConseiller()
