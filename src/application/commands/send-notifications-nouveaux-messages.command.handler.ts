@@ -1,15 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import {
-  JeuneNonLieAuConseillerError,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
-import {
-  emptySuccess,
-  failure,
-  Result
-} from '../../building-blocks/types/result'
+import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import {
@@ -41,43 +33,35 @@ export class SendNotificationsNouveauxMessagesCommandHandler extends CommandHand
   async handle(
     command: SendNotificationsNouveauxMessagesCommand
   ): Promise<Result<void>> {
-    for (const idJeune of command.idsJeunes) {
-      const jeune = await this.jeuneRepository.get(idJeune)
-
-      if (jeune && jeune.conseiller.id == command.idConseiller) {
-        if (jeune.pushNotificationToken) {
-          const notification = Notification.createNouveauMessage(
-            jeune.pushNotificationToken
-          )
-          await this.notificationRepository.send(notification)
-          this.logger.log('Notification envoyée')
-        }
-      }
-
-      if (!jeune) {
-        return failure(new NonTrouveError('Jeune', idJeune))
-      }
-
-      if (jeune.conseiller.id !== command.idConseiller) {
-        return failure(
-          new JeuneNonLieAuConseillerError(command.idConseiller, idJeune)
-        )
-      }
-    }
+    const jeunes = await this.jeuneRepository.getJeunes(command.idsJeunes)
+    await Promise.all(jeunes.map(this.envoyerNotifications.bind(this)))
     return emptySuccess()
+  }
+
+  private async envoyerNotifications(jeune: Jeune): Promise<void> {
+    if (jeune.pushNotificationToken) {
+      const notification = Notification.createNouveauMessage(
+        jeune.pushNotificationToken
+      )
+      await this.notificationRepository.send(notification)
+      this.logger.log(`Notification envoyée pour le jeune ${jeune.id}`)
+    }
   }
 
   async authorize(
     command: SendNotificationsNouveauxMessagesCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    for (const idJeune of command.idsJeunes) {
-      await this.conseillerAuthorizer.authorize(
-        command.idConseiller,
-        utilisateur,
-        idJeune
+    const idsJeunes = command.idsJeunes
+    await Promise.all(
+      idsJeunes.map(idJeune =>
+        this.conseillerAuthorizer.authorize(
+          command.idConseiller,
+          utilisateur,
+          idJeune
+        )
       )
-    }
+    )
   }
 
   async monitor(): Promise<void> {

@@ -124,6 +124,62 @@ describe('JeuneSqlRepository', () => {
     })
   })
 
+  describe('getJeunes', () => {
+    let jeune1: Jeune
+    let jeune2: Jeune
+
+    beforeEach(async () => {
+      // Given
+      jeune1 = { ...unJeune({ id: '1' }), tokenLastUpdate: uneDatetime }
+      jeune2 = { ...unJeune({ id: '2' }), tokenLastUpdate: uneDatetime }
+      const conseillerDto = unConseillerDto({
+        id: jeune1.conseiller.id,
+        prenom: jeune1.conseiller.firstName,
+        nom: jeune1.conseiller.lastName,
+        structure: Core.Structure.POLE_EMPLOI
+      })
+      await ConseillerSqlModel.creer(conseillerDto)
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: '1',
+          idConseiller: conseillerDto.id,
+          dateCreation: jeune1.creationDate.toJSDate(),
+          pushNotificationToken: 'unToken',
+          dateDerniereActualisationToken: uneDatetime.toJSDate()
+        })
+      )
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: '2',
+          idConseiller: conseillerDto.id,
+          dateCreation: jeune2.creationDate.toJSDate(),
+          pushNotificationToken: 'unToken',
+          dateDerniereActualisationToken: uneDatetime.toJSDate()
+        })
+      )
+    })
+    describe('quand les jeunes existent', () => {
+      it('retourne la liste des jeunes', async () => {
+        // When
+        const result = await jeuneSqlRepository.getJeunes(['1', '2'])
+
+        // Then
+        expect(result.length).to.equal(2)
+        expect(result).to.deep.include.members([jeune1, jeune2])
+      })
+    })
+
+    describe("quand aucun jeune n'existe", () => {
+      it('retourne une liste vide', async () => {
+        // When
+        const result = await jeuneSqlRepository.getJeunes(['FAUX_ID'])
+
+        // Then
+        expect(result).to.deep.equal([])
+      })
+    })
+  })
+
   describe('getByEmail', () => {
     let jeune: Jeune
 

@@ -31,6 +31,7 @@ export namespace Jeune {
     existe(id: string): Promise<boolean>
     getByEmail(email: string): Promise<Jeune | undefined>
     save(jeune: Jeune): Promise<void>
+    getJeunes(idsJeune: string[]): Promise<Jeune[]>
 
     getResumeActionsDesJeunesDuConseiller(
       idConseiller: string

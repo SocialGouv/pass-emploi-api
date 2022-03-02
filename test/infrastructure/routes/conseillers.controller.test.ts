@@ -373,54 +373,6 @@ describe('ConseillersController', () => {
       })
     })
 
-    describe("quand un des jeunes n'existe pas", () => {
-      it('renvoie 404', async () => {
-        // Given
-        const payload: EnvoyerNotificationsPayload = {
-          idsJeunes: ['ABCDE', 'CJKDB']
-        }
-        const result = failure(new NonTrouveError('Jeune', 'ABCDE'))
-        sendNotificationsNouveauxMessages.execute
-          .withArgs({
-            idConseiller: '1',
-            idsJeunes: ['ABCDE', 'CJKDB']
-          })
-          .resolves(result)
-
-        // When - Then
-        await request(app.getHttpServer())
-          .post('/conseillers/1/jeunes/notify-messages')
-          .send(payload)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.NOT_FOUND)
-      })
-    })
-
-    describe("quand le conseiller n'est pas lié au jeune", () => {
-      it('renvoie 404', async () => {
-        // Given
-        const payload: EnvoyerNotificationsPayload = {
-          idsJeunes: ['ABCDE', 'CJKDB']
-        }
-        const result = failure(
-          new JeuneNonLieAuConseillerError('JACQUET', 'ABCDE')
-        )
-        sendNotificationsNouveauxMessages.execute
-          .withArgs({
-            idConseiller: 'JACQUET',
-            idsJeunes: ['ABCDE', 'CJKDB']
-          })
-          .resolves(result)
-
-        // When - Then
-        await request(app.getHttpServer())
-          .post('/conseillers/JACQUET/jeunes/notify-messages')
-          .send(payload)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.NOT_FOUND)
-      })
-    })
-
     ensureUserAuthenticationFailsIfInvalid(
       'post',
       '/conseillers/1/jeunes/notify-messages'

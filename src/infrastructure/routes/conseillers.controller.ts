@@ -272,7 +272,7 @@ export class ConseillersController {
       utilisateur
     )
   }
-
+  // Deprecated (Web)
   @Post(':idConseiller/jeunes/:idJeune/notify-message')
   async postNotificationDeprecated(
     @Param('idConseiller') idConseiller: string,
@@ -314,14 +314,7 @@ export class ConseillersController {
     )
 
     if (isFailure(result)) {
-      if (
-        result.error.code === NonTrouveError.CODE ||
-        result.error.code === JeuneNonLieAuConseillerError.CODE
-      ) {
-        throw new NotFoundException(result.error)
-      } else {
-        throw new RuntimeException()
-      }
+      throw new RuntimeException()
     }
   }
 

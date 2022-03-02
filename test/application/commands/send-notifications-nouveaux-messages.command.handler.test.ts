@@ -1,14 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
-import {
-  JeuneNonLieAuConseillerError,
-  NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
-import {
-  emptySuccess,
-  failure
-} from '../../../src/building-blocks/types/result'
+import { emptySuccess } from '../../../src/building-blocks/types/result'
 import { Jeune } from '../../../src/domain/jeune'
 import { Notification } from '../../../src/domain/notification'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
@@ -41,69 +34,19 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
   })
 
   describe('handle', () => {
-    describe('quand un des jeunes n"existe pas', () => {
-      it('renvoie une failure sans envoyer de notifications à aucun jeune', async () => {
-        // Given
-        const jeune2 = unJeune({ id: '2' })
-
-        jeuneRepository.get.withArgs(jeune.id).resolves(undefined)
-        jeuneRepository.get.withArgs(jeune2.id).resolves(jeune2)
-
-        const command: SendNotificationsNouveauxMessagesCommand = {
-          idsJeunes: [jeune.id, jeune2.id],
-          idConseiller: '1'
-        }
-
-        // When
-        const result =
-          await sendNotificationsNouveauxMessagesCommandHandler.handle(command)
-        // Then
-        expect(notificationRepository.send).not.to.have.been.calledWith(
-          Notification.createNouveauMessage(jeune.pushNotificationToken)
-        )
-        expect(notificationRepository.send).not.to.have.been.calledWith(
-          Notification.createNouveauMessage(jeune2.pushNotificationToken)
-        )
-        expect(result).to.deep.equal(
-          failure(new NonTrouveError('Jeune', jeune.id))
-        )
-      })
-    })
-    describe('quand un jeune n"est pas lié au conseiller', () => {
-      it('renvoie une failure sans envoyer de notifications', async () => {
-        // Given
-        jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
-        const command: SendNotificationsNouveauxMessagesCommand = {
-          idsJeunes: [jeune.id],
-          idConseiller: 'FAKE_CONSEILLER'
-        }
-
-        // When
-        const result =
-          await sendNotificationsNouveauxMessagesCommandHandler.handle(command)
-        // Then
-        expect(notificationRepository.send).not.to.have.been.calledWith(
-          Notification.createNouveauMessage(jeune.pushNotificationToken)
-        )
-        expect(result).to.deep.equal(
-          failure(
-            new JeuneNonLieAuConseillerError(command.idConseiller, jeune.id)
-          )
-        )
-      })
-    })
     describe('quand les jeunes existent et sont liés au bon conseiller', () => {
       describe('quand tous les jeunes se sont connectés au moins une fois sur l"application', () => {
         it('envoie une notification de type nouveau message aux jeunes', async () => {
           // Given
           const jeune2 = unJeune({ id: '2' })
-
-          jeuneRepository.get.withArgs(jeune2.id).resolves(jeune2)
-
           const command: SendNotificationsNouveauxMessagesCommand = {
             idsJeunes: [jeune.id, jeune2.id],
             idConseiller: '1'
           }
+          jeuneRepository.getJeunes
+            .withArgs(command.idsJeunes)
+            .resolves([jeune, jeune2])
+
           // When
           await sendNotificationsNouveauxMessagesCommandHandler.handle(command)
           // Then
@@ -116,18 +59,20 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
         })
       })
       describe('quand un des jeunes ne s"est jamais connecté sur l"application', () => {
-        it('renvoie un success sans envoyer de notifications', async () => {
+        it('envoie une notification uniquement aux jeunes qui se sont déjà connectés', async () => {
           // Given
           const jeune = unJeuneSansPushNotificationToken()
           const jeune2 = unJeune({ id: '2' })
-
-          jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
-          jeuneRepository.get.withArgs(jeune2.id).resolves(jeune2)
 
           const command: SendNotificationsNouveauxMessagesCommand = {
             idsJeunes: [jeune.id, jeune2.id],
             idConseiller: '1'
           }
+
+          jeuneRepository.getJeunes
+            .withArgs(command.idsJeunes)
+            .resolves([jeune, jeune2])
+
           // When
           const result =
             await sendNotificationsNouveauxMessagesCommandHandler.handle(
@@ -147,7 +92,7 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
   })
 
   describe('authorize', () => {
-    it('autorise un conseiller à envoyer une notification plusieurs jeunes', async () => {
+    it('autorise un conseiller à envoyer des notifications à plusieurs jeunes', async () => {
       // Given
       const command: SendNotificationsNouveauxMessagesCommand = {
         idsJeunes: ['ABCDE', 'GHEIJ'],

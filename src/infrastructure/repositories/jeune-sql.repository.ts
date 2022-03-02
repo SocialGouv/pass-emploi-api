@@ -82,6 +82,18 @@ export class JeuneSqlRepository implements Jeune.Repository {
     }
   }
 
+  async getJeunes(idsJeune: string[]): Promise<Jeune[]> {
+    const jeunesSqlModel = await JeuneSqlModel.findAll({
+      where: {
+        id: {
+          [Op.in]: idsJeune
+        }
+      },
+      include: [ConseillerSqlModel]
+    })
+    return jeunesSqlModel.map(fromSqlToJeune)
+  }
+
   async creerTransferts(
     idConseillerSource: string,
     idConseillerCible: string,
