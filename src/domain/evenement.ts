@@ -34,7 +34,9 @@ export namespace Evenement {
     RECHERCHE_ALTERNANCE_SAUVEGARDEE = 'RECHERCHE_ALTERNANCE_SAUVEGARDEE',
     RECHERCHE_IMMERSION_SAUVEGARDEE = 'RECHERCHE_IMMERSION_SAUVEGARDEE',
     SERVICE_CIVIQUE_RECHERCHE = 'SERVICE_CIVIQUE_RECHERCHE',
-    OFFRE_SERVICE_CIVIQUE_AFFICHE = 'OFFRE_SERVICE_CIVIQUE_AFFICHE'
+    OFFRE_SERVICE_CIVIQUE_AFFICHE = 'OFFRE_SERVICE_CIVIQUE_AFFICHE',
+    OFFRE_SERVICE_CIVIQUE_PARTAGEE = 'OFFRE_SERVICE_CIVIQUE_PARTAGEE',
+    OFFRE_SERVICE_CIVIQUE_POSTULEE = 'OFFRE_SERVICE_CIVIQUE_POSTULEE'
   }
 
   export interface Repository {
@@ -174,6 +176,16 @@ const evenements = {
   [Evenement.Type.OFFRE_SERVICE_CIVIQUE_AFFICHE]: {
     categorie: 'Offre',
     action: 'Détail',
+    nom: 'Service Civique'
+  },
+  [Evenement.Type.OFFRE_SERVICE_CIVIQUE_POSTULEE]: {
+    categorie: 'Offre',
+    action: 'Postuler',
+    nom: 'Service Civique'
+  },
+  [Evenement.Type.OFFRE_SERVICE_CIVIQUE_PARTAGEE]: {
+    categorie: 'Offre',
+    action: 'Partager',
     nom: 'Service Civique'
   }
 }
