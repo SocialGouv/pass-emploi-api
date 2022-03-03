@@ -5,7 +5,7 @@ import {
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
 import { Action } from 'src/domain/action'
-import { Jeune, JeuneSansConseiller } from 'src/domain/jeune'
+import { Jeune } from 'src/domain/jeune'
 import { mapCodeLabelTypeRendezVous } from 'src/domain/rendez-vous'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
 import {
@@ -36,28 +36,15 @@ export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
     creationDate: DateTime.fromJSDate(jeuneSqlModel.dateCreation).toUTC(),
     pushNotificationToken: jeuneSqlModel.pushNotificationToken ?? undefined,
     tokenLastUpdate: getTokenLastUpdate(jeuneSqlModel),
-    conseiller: {
-      id: jeuneSqlModel.conseiller.id,
-      firstName: jeuneSqlModel.conseiller.prenom,
-      lastName: jeuneSqlModel.conseiller.nom,
-      structure: jeuneSqlModel.conseiller.structure,
-      email: jeuneSqlModel.conseiller.email || undefined
-    },
-    structure: jeuneSqlModel.structure,
-    email: jeuneSqlModel.email ?? undefined
-  }
-}
-
-export function fromSqlToJeuneSansConseiller(
-  jeuneSqlModel: JeuneSqlModel
-): JeuneSansConseiller {
-  return {
-    id: jeuneSqlModel.id,
-    firstName: jeuneSqlModel.prenom,
-    lastName: jeuneSqlModel.nom,
-    creationDate: DateTime.fromJSDate(jeuneSqlModel.dateCreation).toUTC(),
-    pushNotificationToken: jeuneSqlModel.pushNotificationToken ?? undefined,
-    tokenLastUpdate: getTokenLastUpdate(jeuneSqlModel),
+    conseiller: jeuneSqlModel.conseiller
+      ? {
+          id: jeuneSqlModel.conseiller.id,
+          firstName: jeuneSqlModel.conseiller.prenom,
+          lastName: jeuneSqlModel.conseiller.nom,
+          structure: jeuneSqlModel.conseiller.structure,
+          email: jeuneSqlModel.conseiller.email || undefined
+        }
+      : undefined,
     structure: jeuneSqlModel.structure,
     email: jeuneSqlModel.email ?? undefined
   }
@@ -92,9 +79,9 @@ export function fromSqlToJeuneHomeQueryModel(
 ): JeuneHomeQueryModel {
   return {
     conseiller: {
-      id: jeuneSqlModel.conseiller.id,
-      firstName: jeuneSqlModel.conseiller.prenom,
-      lastName: jeuneSqlModel.conseiller.nom
+      id: jeuneSqlModel.conseiller!.id,
+      firstName: jeuneSqlModel.conseiller!.prenom,
+      lastName: jeuneSqlModel.conseiller!.nom
     },
     doneActionsCount: jeuneSqlModel.actions.filter(
       actionsSql => actionsSql.statut === Action.Statut.TERMINEE
@@ -146,7 +133,7 @@ function toCreator(
   if (actionSql.typeCreateur === Action.TypeCreateur.JEUNE) {
     return `${jeuneSqlModel.prenom} ${jeuneSqlModel.nom}`
   }
-  return `${jeuneSqlModel.conseiller.prenom} ${jeuneSqlModel.conseiller.nom}`
+  return `${jeuneSqlModel.conseiller!.prenom} ${jeuneSqlModel.conseiller!.nom}`
 }
 
 export function toResumeActionsDuJeuneQueryModel(

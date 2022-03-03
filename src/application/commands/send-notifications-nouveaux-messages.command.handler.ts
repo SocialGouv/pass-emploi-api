@@ -3,11 +3,7 @@ import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import {
-  Jeune,
-  JeuneSansConseiller,
-  JeunesRepositoryToken
-} from '../../domain/jeune'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import {
   Notification,
   NotificationRepositoryToken
@@ -37,24 +33,18 @@ export class SendNotificationsNouveauxMessagesCommandHandler extends CommandHand
   async handle(
     command: SendNotificationsNouveauxMessagesCommand
   ): Promise<Result<void>> {
-    const jeunes = await this.jeuneRepository.getJeunesSansConseiller(
-      command.idsJeunes
-    )
+    const jeunes = await this.jeuneRepository.getJeunes(command.idsJeunes)
     await Promise.all(jeunes.map(this.envoyerNotifications.bind(this)))
     return emptySuccess()
   }
 
-  private async envoyerNotifications(
-    jeuneSansConseiller: JeuneSansConseiller
-  ): Promise<void> {
-    if (jeuneSansConseiller.pushNotificationToken) {
+  private async envoyerNotifications(jeune: Jeune): Promise<void> {
+    if (jeune.pushNotificationToken) {
       const notification = Notification.createNouveauMessage(
-        jeuneSansConseiller.pushNotificationToken
+        jeune.pushNotificationToken
       )
       await this.notificationRepository.send(notification)
-      this.logger.log(
-        `Notification envoyée pour le jeune ${jeuneSansConseiller.id}`
-      )
+      this.logger.log(`Notification envoyée pour le jeune ${jeune.id}`)
     }
   }
 

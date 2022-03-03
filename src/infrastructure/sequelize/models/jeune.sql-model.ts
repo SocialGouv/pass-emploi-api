@@ -51,7 +51,7 @@ export class JeuneDto extends Model {
 @Table({ timestamps: false, tableName: 'jeune' })
 export class JeuneSqlModel extends JeuneDto {
   @BelongsTo(() => ConseillerSqlModel)
-  conseiller!: ConseillerSqlModel
+  conseiller?: ConseillerSqlModel
 
   @HasMany(() => RendezVousSqlModel)
   rendezVous!: RendezVousSqlModel[]
