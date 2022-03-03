@@ -5,7 +5,7 @@ import {
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
 import { Action } from 'src/domain/action'
-import { Jeune } from 'src/domain/jeune'
+import { Jeune, JeuneSansConseiller } from 'src/domain/jeune'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
 import {
   JeuneDto,
@@ -42,6 +42,21 @@ export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
       structure: jeuneSqlModel.conseiller.structure,
       email: jeuneSqlModel.conseiller.email || undefined
     },
+    structure: jeuneSqlModel.structure,
+    email: jeuneSqlModel.email ?? undefined
+  }
+}
+
+export function fromSqlToJeuneSansConseiller(
+  jeuneSqlModel: JeuneSqlModel
+): JeuneSansConseiller {
+  return {
+    id: jeuneSqlModel.id,
+    firstName: jeuneSqlModel.prenom,
+    lastName: jeuneSqlModel.nom,
+    creationDate: DateTime.fromJSDate(jeuneSqlModel.dateCreation).toUTC(),
+    pushNotificationToken: jeuneSqlModel.pushNotificationToken ?? undefined,
+    tokenLastUpdate: getTokenLastUpdate(jeuneSqlModel),
     structure: jeuneSqlModel.structure,
     email: jeuneSqlModel.email ?? undefined
   }

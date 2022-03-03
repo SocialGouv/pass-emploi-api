@@ -43,7 +43,7 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
             idsJeunes: [jeune.id, jeune2.id],
             idConseiller: '1'
           }
-          jeuneRepository.getJeunes
+          jeuneRepository.getJeunesSansConseiller
             .withArgs(command.idsJeunes)
             .resolves([jeune, jeune2])
 
@@ -69,7 +69,7 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
             idConseiller: '1'
           }
 
-          jeuneRepository.getJeunes
+          jeuneRepository.getJeunesSansConseiller
             .withArgs(command.idsJeunes)
             .resolves([jeune, jeune2])
 

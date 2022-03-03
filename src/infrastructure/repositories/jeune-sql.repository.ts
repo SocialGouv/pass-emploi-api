@@ -10,7 +10,7 @@ import { IdService } from 'src/utils/id-service'
 import { Action } from '../../domain/action'
 import { Authentification } from '../../domain/authentification'
 import { NotFound } from '../../domain/erreur'
-import { Jeune } from '../../domain/jeune'
+import { Jeune, JeuneSansConseiller } from '../../domain/jeune'
 import { ActionSqlModel } from '../sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
@@ -21,6 +21,7 @@ import {
   fromSqlToDetailJeuneQueryModel,
   fromSqlToJeune,
   fromSqlToJeuneHomeQueryModel,
+  fromSqlToJeuneSansConseiller,
   toDetailJeunQueryModel,
   toResumeActionsDuJeuneQueryModel,
   toSqlJeune
@@ -82,16 +83,17 @@ export class JeuneSqlRepository implements Jeune.Repository {
     }
   }
 
-  async getJeunes(idsJeune: string[]): Promise<Jeune[]> {
+  async getJeunesSansConseiller(
+    idsJeune: string[]
+  ): Promise<JeuneSansConseiller[]> {
     const jeunesSqlModel = await JeuneSqlModel.findAll({
       where: {
         id: {
           [Op.in]: idsJeune
         }
-      },
-      include: [ConseillerSqlModel]
+      }
     })
-    return jeunesSqlModel.map(fromSqlToJeune)
+    return jeunesSqlModel.map(fromSqlToJeuneSansConseiller)
   }
 
   async creerTransferts(
