@@ -23,6 +23,17 @@ export interface Jeune {
   tokenLastUpdate?: DateTime
 }
 
+export interface JeuneSansConseiller {
+  id: string
+  firstName: string
+  lastName: string
+  creationDate: DateTime
+  structure: Core.Structure
+  email?: string
+  pushNotificationToken?: string
+  tokenLastUpdate?: DateTime
+}
+
 export namespace Jeune {
   export type Id = Brand<string, 'JeuneId'>
 
@@ -31,6 +42,7 @@ export namespace Jeune {
     existe(id: string): Promise<boolean>
     getByEmail(email: string): Promise<Jeune | undefined>
     save(jeune: Jeune): Promise<void>
+    getJeunesSansConseiller(idsJeune: string[]): Promise<JeuneSansConseiller[]>
 
     getResumeActionsDesJeunesDuConseiller(
       idConseiller: string

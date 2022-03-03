@@ -120,6 +120,7 @@ import { EngagementRepositoryToken } from './domain/offre-engagement'
 import { GetServicesCiviqueQueryHandler } from './application/queries/get-services-civique.query.handler'
 import { EngagementHttpRepository } from './infrastructure/repositories/offre-engagement-http.repository'
 import { HandleNettoyerLesJobsCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-jobs.command'
+import { SendNotificationsNouveauxMessagesCommandHandler } from './application/commands/send-notifications-nouveaux-messages.command.handler'
 import { GetDetailServiceCiviqueQueryHandler } from './application/queries/get-detail-service-civique.query.handler'
 import { SuperviseurSqlRepository } from './infrastructure/repositories/superviseur-sql.repository'
 import { SuperviseursRepositoryToken } from './domain/superviseur'
@@ -278,6 +279,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetAllRendezVousConseillerQueryHandler,
     GetAllRendezVousJeuneQueryHandler,
     SendNotificationNouveauMessageCommandHandler,
+    SendNotificationsNouveauxMessagesCommandHandler,
     DeleteActionCommandHandler,
     CreateRechercheCommandHandler,
     GetRecherchesQueryHandler,

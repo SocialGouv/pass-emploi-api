@@ -59,10 +59,15 @@ import {
   CreateActionPayload,
   CreateJeunePoleEmploiPayload,
   CreerJeuneMiloPayload,
+  EnvoyerNotificationsPayload,
   GetConseillerQueryParams,
   SuperviseursPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
+import {
+  SendNotificationsNouveauxMessagesCommand,
+  SendNotificationsNouveauxMessagesCommandHandler
+} from '../../application/commands/send-notifications-nouveaux-messages.command.handler'
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -76,6 +81,7 @@ export class ConseillersController {
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly creerJeunePoleEmploiCommandHandler: CreerJeunePoleEmploiCommandHandler,
     private readonly sendNotificationNouveauMessage: SendNotificationNouveauMessageCommandHandler,
+    private readonly sendNotificationsNouveauxMessages: SendNotificationsNouveauxMessagesCommandHandler,
     private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler,
     private readonly createRendezVousCommandHandler: CreateRendezVousCommandHandler,
     private readonly getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler,
@@ -269,9 +275,9 @@ export class ConseillersController {
       utilisateur
     )
   }
-
+  // Deprecated (Web)
   @Post(':idConseiller/jeunes/:idJeune/notify-message')
-  async postNotification(
+  async postNotificationDeprecated(
     @Param('idConseiller') idConseiller: string,
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
@@ -292,6 +298,26 @@ export class ConseillersController {
       } else {
         throw new RuntimeException()
       }
+    }
+  }
+
+  @Post(':idConseiller/jeunes/notify-messages')
+  async postNotifications(
+    @Param('idConseiller') idConseiller: string,
+    @Body() envoyerNotificationsPayload: EnvoyerNotificationsPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: SendNotificationsNouveauxMessagesCommand = {
+      idsJeunes: envoyerNotificationsPayload.idsJeunes,
+      idConseiller
+    }
+    const result = await this.sendNotificationsNouveauxMessages.execute(
+      command,
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      throw new RuntimeException()
     }
   }
 

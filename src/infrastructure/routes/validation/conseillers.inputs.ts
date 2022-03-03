@@ -90,6 +90,13 @@ export class CreerJeuneMiloPayload {
   idConseiller: string
 }
 
+export class EnvoyerNotificationsPayload {
+  @ApiProperty()
+  @IsArray()
+  @IsNotEmpty()
+  idsJeunes: string[]
+}
+
 class Superviseur {
   @ApiProperty()
   @IsString()
@@ -106,6 +113,7 @@ class Superviseur {
   @IsEnum(Core.Structure)
   structure: Core.Structure
 }
+
 export class SuperviseursPayload {
   @ApiProperty({ type: Superviseur, isArray: true })
   @IsArray()
