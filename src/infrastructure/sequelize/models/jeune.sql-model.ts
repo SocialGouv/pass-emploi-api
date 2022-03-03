@@ -27,7 +27,7 @@ export class JeuneDto extends Model {
 
   @ForeignKey(() => ConseillerSqlModel)
   @Column({ field: 'id_conseiller', type: DataType.STRING })
-  idConseiller!: string
+  idConseiller?: string
 
   @Column({ field: 'date_creation', type: DataType.DATE })
   dateCreation!: Date

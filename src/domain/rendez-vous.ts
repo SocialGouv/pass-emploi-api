@@ -89,7 +89,7 @@ export namespace RendezVous {
       date: new Date(infosRendezVousACreer.date),
       modalite: infosRendezVousACreer.modalite,
       jeune,
-      sousTitre: `avec ${jeune.conseiller.firstName}`,
+      sousTitre: `avec ${jeune.conseiller!.firstName}`,
       titre: 'Rendez-vous conseiller',
       type: infosRendezVousACreer.type
         ? (infosRendezVousACreer.type as CodeTypeRendezVous)

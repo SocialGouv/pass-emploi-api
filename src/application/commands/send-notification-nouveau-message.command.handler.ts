@@ -47,7 +47,7 @@ export class SendNotificationNouveauMessageCommandHandler extends CommandHandler
       return failure(new NonTrouveError('Jeune', command.idJeune))
     }
 
-    if (jeune.conseiller.id !== command.idConseiller) {
+    if (jeune.conseiller?.id !== command.idConseiller) {
       return failure(
         new JeuneNonLieAuConseillerError(command.idConseiller, command.idJeune)
       )

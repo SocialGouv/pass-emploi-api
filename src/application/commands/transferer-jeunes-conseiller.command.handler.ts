@@ -74,7 +74,7 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
         return failure(new NonTrouveError('Jeune', idJeune))
       }
 
-      if (jeune.conseiller.id !== command.idConseillerSource) {
+      if (jeune.conseiller?.id !== command.idConseillerSource) {
         return failure(
           new JeuneNonLieAuConseillerError(command.idConseillerSource, idJeune)
         )

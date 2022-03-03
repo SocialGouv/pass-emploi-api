@@ -27,7 +27,7 @@ export class ConseillerAuthorizer {
     ) {
       if (idJeune) {
         const jeune = await this.jeuneRepository.get(idJeune)
-        if (jeune && jeune.conseiller.id === utilisateur.id) {
+        if (jeune && jeune.conseiller?.id === utilisateur.id) {
           return
         }
       } else {

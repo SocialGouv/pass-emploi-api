@@ -64,7 +64,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
     await this.jeuneRepository.save(nouveauJeune)
     await this.chatRepository.initializeChatIfNotExists(
       nouveauJeune.id,
-      nouveauJeune.conseiller.id
+      nouveauJeune.conseiller!.id
     )
     return success(nouveauJeune)
   }

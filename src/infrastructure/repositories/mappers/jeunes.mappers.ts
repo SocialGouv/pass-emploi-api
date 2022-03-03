@@ -70,7 +70,7 @@ export function toSqlJeune(
     id: jeune.id,
     nom: jeune.lastName,
     prenom: jeune.firstName,
-    idConseiller: jeune.conseiller.id,
+    idConseiller: jeune.conseiller?.id,
     dateCreation: jeune.creationDate.toJSDate(),
     pushNotificationToken: jeune.pushNotificationToken ?? null,
     dateDerniereActualisationToken: jeune.tokenLastUpdate?.toJSDate() ?? null,

@@ -16,7 +16,7 @@ export interface Jeune {
   firstName: string
   lastName: string
   creationDate: DateTime
-  conseiller: Conseiller
+  conseiller?: Conseiller
   structure: Core.Structure
   email?: string
   pushNotificationToken?: string

@@ -69,7 +69,7 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     await this.jeuneRepository.save(jeune)
     await this.chatRepository.initializeChatIfNotExists(
       jeune.id,
-      jeune.conseiller.id
+      jeune.conseiller!.id
     )
 
     return success({ id: jeune.id })
