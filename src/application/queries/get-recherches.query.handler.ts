@@ -8,6 +8,7 @@ import { RechercheQueryModel } from './query-models/recherches.query-model'
 
 export interface GetRecherchesQuery extends Query {
   idJeune: string
+  avecGeometrie: boolean
 }
 
 @Injectable()
@@ -24,7 +25,10 @@ export class GetRecherchesQueryHandler extends QueryHandler<
   }
 
   handle(query: GetRecherchesQuery): Promise<RechercheQueryModel[]> {
-    return this.rechercheRepository.getRecherches(query.idJeune)
+    return this.rechercheRepository.getRecherches(
+      query.idJeune,
+      query.avecGeometrie
+    )
   }
   async authorize(
     query: GetRecherchesQuery,
