@@ -69,7 +69,10 @@ describe('RechercheSqlRepository', () => {
       await rechercheSqlRepository.createRecherche(recherche)
 
       // When
-      const recherches = await rechercheSqlRepository.getRecherches(idJeune)
+      const recherches = await rechercheSqlRepository.getRecherches(
+        idJeune,
+        false
+      )
 
       // Then
       expect(recherches.length).to.equal(1)

@@ -55,3 +55,10 @@ export class CreateRechercheOffresEmploiPayload {
   @IsDefined()
   criteres: FindOffresEmploiQueryBody
 }
+
+export class GetRecherchesQueryParams {
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  avecGeometrie?: string
+}

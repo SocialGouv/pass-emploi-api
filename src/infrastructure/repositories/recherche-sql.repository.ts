@@ -12,6 +12,7 @@ import {
   DISTANCE_PAR_DEFAUT_IMMERSION,
   GetOffresImmersionQuery
 } from '../../application/queries/get-offres-immersion.query.handler'
+import { FindOptions } from 'sequelize/dist/lib/model'
 
 @Injectable()
 export class RechercheSqlRepository implements Recherche.Repository {
@@ -98,12 +99,23 @@ export class RechercheSqlRepository implements Recherche.Repository {
     })
   }
 
-  async getRecherches(idJeune: string): Promise<RechercheQueryModel[]> {
-    const recherchesSql = await RechercheSqlModel.findAll({
+  async getRecherches(
+    idJeune: string,
+    avecGeometrie: boolean
+  ): Promise<RechercheQueryModel[]> {
+    const options: FindOptions = {
       where: {
         idJeune
       }
-    })
+    }
+
+    if (!avecGeometrie) {
+      options.attributes = {
+        exclude: ['geometrie']
+      }
+    }
+
+    const recherchesSql = await RechercheSqlModel.findAll(options)
     return recherchesSql.map(fromSqlToRechercheQueryModel)
   }
 

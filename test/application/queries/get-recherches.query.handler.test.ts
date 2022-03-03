@@ -35,7 +35,8 @@ describe('GetRecherchesQueryHandler', () => {
     it('retourne des recherches', async () => {
       // Given
       const getRecherchesQuery: GetRecherchesQuery = {
-        idJeune: '1'
+        idJeune: '1',
+        avecGeometrie: false
       }
       const recherchesQueryModel: RechercheQueryModel[] = [
         {
@@ -59,7 +60,7 @@ describe('GetRecherchesQueryHandler', () => {
         }
       ]
       recherchesRepository.getRecherches
-        .withArgs(getRecherchesQuery.idJeune)
+        .withArgs(getRecherchesQuery.idJeune, getRecherchesQuery.avecGeometrie)
         .resolves(recherchesQueryModel)
 
       // When
