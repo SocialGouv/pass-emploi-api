@@ -72,7 +72,7 @@ describe('CreateRechercheCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(success({ id: idRecherche }))
         expect(
-          rechercheRepository.saveRecherche
+          rechercheRepository.createRecherche
         ).to.have.been.calledWithExactly({
           id: 'un-id',
           type: 'OFFRES_EMPLOI',

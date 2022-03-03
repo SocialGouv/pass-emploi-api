@@ -54,8 +54,8 @@ module.exports = {
               type: 'Point',
               coordinates: [commune[0].longitude, commune[0].latitude]
             }
-            const distance = offreSql.criteres.distance
-              ? offreSql.criteres.distance
+            const distance = offreSql.criteres.rayon
+              ? offreSql.criteres.rayon
               : 10
             await queryInterface.sequelize.query(
               `UPDATE recherche
