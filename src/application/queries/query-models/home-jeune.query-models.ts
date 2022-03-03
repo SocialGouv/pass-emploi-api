@@ -20,6 +20,9 @@ class RendezVousJeuneHomeQueryModel implements RendezVousBaseQueryModel {
   date: string
 
   @ApiProperty()
+  dateUtc: string
+
+  @ApiProperty()
   duration: string
 }
 

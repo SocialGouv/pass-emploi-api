@@ -119,6 +119,7 @@ export function fromSqlToJeuneHomeQueryModel(
       date: DateTime.fromJSDate(rendezVousSql.date)
         .setZone('Europe/Paris')
         .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
+      dateUtc: DateTime.fromJSDate(rendezVousSql.date).toUTC().toISO(),
       duration: Duration.fromObject({
         minutes: rendezVousSql.duree
       }).toFormat('h:mm:ss'),
