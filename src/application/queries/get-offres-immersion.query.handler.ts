@@ -17,7 +17,7 @@ export interface GetOffresImmersionQuery extends Query {
   distance?: number
 }
 
-const DISTANCE_PAR_DEFAUT = 30
+export const DISTANCE_PAR_DEFAUT_IMMERSION = 30
 
 @Injectable()
 export class GetOffresImmersionQueryHandler extends QueryHandler<
@@ -35,7 +35,9 @@ export class GetOffresImmersionQueryHandler extends QueryHandler<
   async handle(
     query: GetOffresImmersionQuery
   ): Promise<Result<OffreImmersionQueryModel[]>> {
-    const distance = query.distance ? query.distance : DISTANCE_PAR_DEFAUT
+    const distance = query.distance
+      ? query.distance
+      : DISTANCE_PAR_DEFAUT_IMMERSION
     return this.offresImmersionRepository.findAll({
       rome: query.rome,
       lat: query.lat,
