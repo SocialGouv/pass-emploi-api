@@ -45,9 +45,6 @@ describe('JeuneSqlRepository', () => {
       // Given
       jeune = { ...unJeune(), tokenLastUpdate: uneDatetime }
       const conseillerDto = unConseillerDto({
-        id: jeune.conseiller.id,
-        prenom: jeune.conseiller.firstName,
-        nom: jeune.conseiller.lastName,
         structure: Core.Structure.POLE_EMPLOI
       })
       await ConseillerSqlModel.creer(conseillerDto)
@@ -88,9 +85,6 @@ describe('JeuneSqlRepository', () => {
       // Given
       jeune = { ...unJeune(), tokenLastUpdate: uneDatetime }
       const conseillerDto = unConseillerDto({
-        id: jeune.conseiller.id,
-        prenom: jeune.conseiller.firstName,
-        nom: jeune.conseiller.lastName,
         structure: Core.Structure.POLE_EMPLOI
       })
       await ConseillerSqlModel.creer(conseillerDto)
@@ -131,9 +125,6 @@ describe('JeuneSqlRepository', () => {
       // Given
       jeune = { ...unJeune(), tokenLastUpdate: uneDatetime }
       const conseillerDto = unConseillerDto({
-        id: jeune.conseiller.id,
-        prenom: jeune.conseiller.firstName,
-        nom: jeune.conseiller.lastName,
         structure: Core.Structure.POLE_EMPLOI
       })
       await ConseillerSqlModel.creer(conseillerDto)

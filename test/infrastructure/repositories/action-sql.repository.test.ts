@@ -144,7 +144,7 @@ describe('ActionSqlRepository', () => {
 
       // Then
       expect(actual).to.deep.equal({
-        idConseiller: jeune.conseiller.id,
+        idConseiller: jeune.conseiller?.id,
         idJeune: jeune.id
       })
     })
