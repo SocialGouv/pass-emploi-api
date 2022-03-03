@@ -1,14 +1,89 @@
-import { Injectable } from '@nestjs/common'
-import { Op } from 'sequelize'
+import { Inject, Injectable } from '@nestjs/common'
+import { Op, Sequelize } from 'sequelize'
 import { RechercheQueryModel } from '../../application/queries/query-models/recherches.query-model'
 import { Recherche } from '../../domain/recherche'
 import { RechercheSqlModel } from '../sequelize/models/recherche.sql-model'
 import { fromSqlToRechercheQueryModel } from './mappers/recherches.mappers'
 import { DateTime } from 'luxon'
+import { GetOffresEmploiQuery } from '../../application/queries/get-offres-emploi.query.handler'
+import { CommuneSqlModel } from '../sequelize/models/commune.sql-model'
+import { SequelizeInjectionToken } from '../sequelize/providers'
+import {
+  DISTANCE_PAR_DEFAUT_IMMERSION,
+  GetOffresImmersionQuery
+} from '../../application/queries/get-offres-immersion.query.handler'
 
 @Injectable()
 export class RechercheSqlRepository implements Recherche.Repository {
-  async saveRecherche(recherche: Recherche): Promise<void> {
+  constructor(
+    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
+  ) {}
+
+  async createRecherche(recherche: Recherche): Promise<void> {
+    await RechercheSqlModel.upsert({
+      id: recherche.id,
+      idJeune: recherche.idJeune,
+      titre: recherche.titre,
+      metier: recherche.metier,
+      type: recherche.type,
+      localisation: recherche.localisation,
+      criteres: recherche.criteres,
+      dateCreation: recherche.dateCreation,
+      dateDerniereRecherche: recherche.dateDerniereRecherche,
+      etatDerniereRecherche: recherche.etat
+    })
+
+    switch (recherche.type) {
+      case Recherche.Type.OFFRES_EMPLOI:
+      case Recherche.Type.OFFRES_ALTERNANCE:
+        if ((recherche.criteres as GetOffresEmploiQuery).commune) {
+          const commune = await CommuneSqlModel.findOne({
+            where: {
+              code: (recherche.criteres as GetOffresEmploiQuery).commune
+            }
+          })
+
+          if (commune) {
+            const center = {
+              type: 'Point',
+              coordinates: [commune.longitude, commune.latitude]
+            }
+            const distance =
+              (recherche.criteres as GetOffresEmploiQuery).rayon ?? 10
+            await this.sequelize.query(
+              `UPDATE recherche
+             SET geometrie = (
+                 ST_Buffer(ST_SetSRID(ST_GeomFromGeoJSON('${JSON.stringify(
+                   center
+                 )}')::geography, 4326), ${distance * 1000})::geometry)
+            WHERE id='${recherche.id}'
+              `
+            )
+          }
+        }
+        break
+      case Recherche.Type.OFFRES_IMMERSION:
+        const criteres = recherche.criteres as GetOffresImmersionQuery
+        if (criteres.lon && criteres.lat) {
+          const center = {
+            type: 'Point',
+            coordinates: [criteres.lon, criteres.lat]
+          }
+          const distance = criteres.distance ?? DISTANCE_PAR_DEFAUT_IMMERSION
+          await this.sequelize.query(
+            `UPDATE recherche
+             SET geometrie = (
+                 ST_Buffer(ST_SetSRID(ST_GeomFromGeoJSON('${JSON.stringify(
+                   center
+                 )}')::geography, 4326), ${distance * 1000})::geometry)
+            WHERE id='${recherche.id}'
+              `
+          )
+        }
+    }
+  }
+
+  async updateRecherche(recherche: Recherche): Promise<void> {
     await RechercheSqlModel.upsert({
       id: recherche.id,
       idJeune: recherche.idJeune,

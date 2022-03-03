@@ -106,7 +106,7 @@ export class NotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
             }
           }
 
-          await this.rechercheRepository.saveRecherche({
+          await this.rechercheRepository.updateRecherche({
             ...recherches[i],
             dateDerniereRecherche: maintenant,
             etat: etatRecherche
