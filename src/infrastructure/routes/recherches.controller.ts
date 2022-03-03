@@ -7,7 +7,8 @@ import {
   NotFoundException,
   Param,
   ParseUUIDPipe,
-  Post
+  Post,
+  Query
 } from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
@@ -18,7 +19,8 @@ import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
 import {
   CreateRechercheImmersionPayload,
-  CreateRechercheOffresEmploiPayload
+  CreateRechercheOffresEmploiPayload,
+  GetRecherchesQueryParams
 } from './validation/recherches.inputs'
 import { Recherche } from '../../domain/recherche'
 import {
@@ -85,9 +87,13 @@ export class RecherchesController {
   })
   async getRecherches(
     @Param('idJeune') idJeune: string,
+    @Query() queryParams: GetRecherchesQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<RechercheQueryModel[]> {
-    const query: GetRecherchesQuery = { idJeune }
+    const query: GetRecherchesQuery = {
+      idJeune,
+      avecGeometrie: queryParams.avecGeometrie === 'true'
+    }
     return this.getRecherchesQueryHandler.execute(query, utilisateur)
   }
 
