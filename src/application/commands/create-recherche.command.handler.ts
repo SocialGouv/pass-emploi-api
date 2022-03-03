@@ -56,7 +56,7 @@ export class CreateRechercheCommandHandler extends CommandHandler<
       etat: Recherche.Etat.SUCCES
     }
 
-    await this.rechercheRepository.saveRecherche(recherche)
+    await this.rechercheRepository.createRecherche(recherche)
     return success({ id: idRecherche })
   }
 

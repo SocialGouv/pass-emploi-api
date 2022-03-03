@@ -10,13 +10,13 @@ import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { DatabaseForTesting, expect } from '../../utils'
 
 describe('RechercheSqlRepository', () => {
-  DatabaseForTesting.prepare()
+  const database = DatabaseForTesting.prepare()
 
   let rechercheSqlRepository: RechercheSqlRepository
   const idJeune = 'ABCDE'
 
   beforeEach(async () => {
-    rechercheSqlRepository = new RechercheSqlRepository()
+    rechercheSqlRepository = new RechercheSqlRepository(database.sequelize)
 
     const conseillerDto = unConseillerDto()
     await ConseillerSqlModel.creer(conseillerDto)
@@ -31,13 +31,13 @@ describe('RechercheSqlRepository', () => {
     )
   })
 
-  describe('saveRecherche', () => {
+  describe('createRecherche', () => {
     it('sauvegarde une recherche', async () => {
       // Given
       const recherche = uneRecherche({ idJeune })
 
       // When
-      await rechercheSqlRepository.saveRecherche(recherche)
+      await rechercheSqlRepository.createRecherche(recherche)
 
       // Then
       const recherches = await RechercheSqlModel.findAll({ raw: true })
@@ -45,12 +45,28 @@ describe('RechercheSqlRepository', () => {
       expect(recherches[0].id).to.equal(recherche.id)
     })
   })
+
+  describe('updateRecherche', () => {
+    it('sauvegarde une recherche', async () => {
+      // Given
+      const recherche = uneRecherche({ idJeune })
+
+      // When
+      await rechercheSqlRepository.updateRecherche(recherche)
+
+      // Then
+      const recherches = await RechercheSqlModel.findAll({ raw: true })
+      expect(recherches.length).to.equal(1)
+      expect(recherches[0].id).to.equal(recherche.id)
+    })
+  })
+
   describe('getRecherches', () => {
     it('recupere une recherche sauvegardée', async () => {
       // Given
       const recherche = uneRecherche({ idJeune })
 
-      await rechercheSqlRepository.saveRecherche(recherche)
+      await rechercheSqlRepository.createRecherche(recherche)
 
       // When
       const recherches = await rechercheSqlRepository.getRecherches(idJeune)
@@ -93,12 +109,12 @@ describe('RechercheSqlRepository', () => {
         dateDerniereRecherche: dateMaintenant
       })
 
-      await rechercheSqlRepository.saveRecherche(rechercheBonne)
-      await rechercheSqlRepository.saveRecherche(
+      await rechercheSqlRepository.createRecherche(rechercheBonne)
+      await rechercheSqlRepository.createRecherche(
         rechercheBonneMaisDejaFaiteAujourdhui
       )
-      await rechercheSqlRepository.saveRecherche(rechercheDuMauvaisType)
-      await rechercheSqlRepository.saveRecherche(rechercheRecente)
+      await rechercheSqlRepository.createRecherche(rechercheDuMauvaisType)
+      await rechercheSqlRepository.createRecherche(rechercheRecente)
 
       // When
       const recherches = await rechercheSqlRepository.findAvantDate(

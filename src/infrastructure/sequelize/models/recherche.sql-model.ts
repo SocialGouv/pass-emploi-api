@@ -6,6 +6,7 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
+import { Polygon } from 'geojson'
 import { Recherche } from '../../../domain/recherche'
 import { GetOffresEmploiQuery } from '../../../application/queries/get-offres-emploi.query.handler'
 import { GetOffresImmersionQuery } from '../../../application/queries/get-offres-immersion.query.handler'
@@ -43,6 +44,9 @@ export class RechercheDto extends Model {
 
   @Column({ field: 'etat_derniere_recherche', type: DataType.STRING })
   etatDerniereRecherche: Recherche.Etat
+
+  @Column({ field: 'geometrie', type: DataType.GEOMETRY('POLYGON', 4326) })
+  geometrie: Polygon
 }
 
 @Table({ timestamps: false, tableName: 'recherche' })
