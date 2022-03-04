@@ -96,7 +96,8 @@ export class CreerJeuneMiloPayload {
 export class EnvoyerNotificationsPayload {
   @ApiProperty()
   @IsArray()
-  @IsNotEmpty()
+  @ArrayNotEmpty()
+  @IsNotEmpty({ each: true })
   idsJeunes: string[]
 }
 

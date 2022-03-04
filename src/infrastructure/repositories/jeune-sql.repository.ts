@@ -157,7 +157,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
       id: jeune.id,
       nom: jeune.lastName,
       prenom: jeune.firstName,
-      idConseiller: jeune.conseiller?.id,
+      idConseiller: jeune.conseiller!.id,
       pushNotificationToken: jeune.pushNotificationToken ?? null,
       dateCreation: jeune.creationDate.toJSDate(),
       dateDerniereActualisationToken: jeune.tokenLastUpdate?.toJSDate() ?? null,
