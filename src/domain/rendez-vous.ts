@@ -70,7 +70,8 @@ export namespace RendezVous {
     getAllAVenir(): Promise<RendezVous[]>
     delete(idRendezVous: string): Promise<void>
     getAllQueryModelsByConseiller(
-      idConseiller: string
+      idConseiller: string,
+      presenceConseiller?: boolean
     ): Promise<RendezVousConseillerQueryModel>
     getAllQueryModelsByJeune(idJeune: string): Promise<RendezVousQueryModel[]>
     getTypesRendezVousQueryModel(): TypesRendezVousQueryModel

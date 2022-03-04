@@ -71,9 +71,15 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
   }
 
   async getAllQueryModelsByConseiller(
-    idConseiller: string
+    idConseiller: string,
+    presenceConseiller?: boolean
   ): Promise<RendezVousConseillerQueryModel> {
     const maintenant = this.dateService.nowJs()
+
+    const presenceConseillerCondition: { presenceConseiller?: boolean } = {}
+    if (presenceConseiller !== undefined) {
+      presenceConseillerCondition.presenceConseiller = presenceConseiller
+    }
 
     const rendezVousPassesPromise = RendezVousSqlModel.findAll({
       include: [{ model: JeuneSqlModel, where: { idConseiller } }],
@@ -83,7 +89,8 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
         },
         dateSuppression: {
           [Op.is]: null
-        }
+        },
+        ...presenceConseillerCondition
       },
       order: [['date', 'DESC']]
     })
@@ -96,7 +103,8 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
         },
         dateSuppression: {
           [Op.is]: null
-        }
+        },
+        ...presenceConseillerCondition
       },
       order: [['date', 'ASC']]
     })

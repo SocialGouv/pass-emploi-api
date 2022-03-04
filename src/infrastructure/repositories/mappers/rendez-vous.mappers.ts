@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
-import { RendezVous } from 'src/domain/rendez-vous'
+import { mapCodeLabelTypeRendezVous, RendezVous } from 'src/domain/rendez-vous'
 import {
   RendezVousDto,
   RendezVousSqlModel
@@ -94,6 +94,14 @@ function fromSqlToRendezVousQueryModel(
       id: rendezVousSql.jeune.id,
       prenom: rendezVousSql.jeune.prenom,
       nom: rendezVousSql.jeune.nom
-    }
+    },
+    type: {
+      code: rendezVousSql.type,
+      label: mapCodeLabelTypeRendezVous[rendezVousSql.type]
+    },
+    precision: rendezVousSql.precision ?? undefined,
+    adresse: rendezVousSql.adresse ?? undefined,
+    organisme: rendezVousSql.organisme ?? undefined,
+    presenceConseiller: rendezVousSql.presenceConseiller
   }
 }

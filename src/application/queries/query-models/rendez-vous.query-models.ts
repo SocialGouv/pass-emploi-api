@@ -50,6 +50,21 @@ export class RendezVousQueryModel implements RendezVousBaseQueryModel {
   duration: number
 
   @ApiProperty()
+  type: TypeRendezVous
+
+  @ApiProperty({ required: false })
+  precision?: string
+
+  @ApiProperty({ required: false })
+  adresse?: string
+
+  @ApiProperty({ required: false })
+  organisme?: string
+
+  @ApiProperty()
+  presenceConseiller: boolean
+
+  @ApiProperty()
   jeune: JeuneQueryModel
 
   @ApiProperty({ required: false })

@@ -8,6 +8,7 @@ import { RendezVousConseillerQueryModel } from './query-models/rendez-vous.query
 
 export interface GetAllRendezVousConseiller extends Query {
   idConseiller: string
+  presenceConseiller?: boolean
 }
 
 @Injectable()
@@ -27,7 +28,8 @@ export class GetAllRendezVousConseillerQueryHandler extends QueryHandler<
     query: GetAllRendezVousConseiller
   ): Promise<RendezVousConseillerQueryModel> {
     return this.rendezVousRepository.getAllQueryModelsByConseiller(
-      query.idConseiller
+      query.idConseiller,
+      query.presenceConseiller
     )
   }
   async authorize(

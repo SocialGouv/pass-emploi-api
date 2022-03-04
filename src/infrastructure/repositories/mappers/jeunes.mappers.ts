@@ -6,6 +6,7 @@ import {
 } from 'src/application/queries/query-models/jeunes.query-models'
 import { Action } from 'src/domain/action'
 import { Jeune, JeuneSansConseiller } from 'src/domain/jeune'
+import { mapCodeLabelTypeRendezVous } from 'src/domain/rendez-vous'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
 import {
   JeuneDto,
@@ -125,7 +126,15 @@ export function fromSqlToJeuneHomeQueryModel(
       }).toFormat('h:mm:ss'),
       modality: rendezVousSql.modalite ?? '',
       title: rendezVousSql.titre,
-      subtitle: rendezVousSql.sousTitre
+      subtitle: rendezVousSql.sousTitre,
+      type: {
+        code: rendezVousSql.type,
+        label: mapCodeLabelTypeRendezVous[rendezVousSql.type]
+      },
+      precision: rendezVousSql.precision ?? undefined,
+      adresse: rendezVousSql.adresse ?? undefined,
+      organisme: rendezVousSql.organisme ?? undefined,
+      presenceConseiller: rendezVousSql.presenceConseiller
     }))
   }
 }

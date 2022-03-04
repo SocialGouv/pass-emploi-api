@@ -61,6 +61,7 @@ import {
   CreerJeuneMiloPayload,
   EnvoyerNotificationsPayload,
   GetConseillerQueryParams,
+  GetRendezVousConseillerQueryParams,
   SuperviseursPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
@@ -267,11 +268,15 @@ export class ConseillersController {
     type: RendezVousConseillerQueryModel
   })
   async getRendezVous(
+    @Query() getRendezVousConseillerQuery: GetRendezVousConseillerQueryParams,
     @Param('idConseiller') idConseiller: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<RendezVousConseillerQueryModel> {
     return this.getAllRendezVousConseillerQueryHandler.execute(
-      { idConseiller },
+      {
+        idConseiller,
+        presenceConseiller: getRendezVousConseillerQuery.presenceConseiller
+      },
       utilisateur
     )
   }

@@ -392,7 +392,10 @@ describe('ConseillersController', () => {
       it('renvoie le rendezvous', async () => {
         // Given
         getAllRendezVousConseillerQueryHandler.execute
-          .withArgs({ idConseiller: '41' }, unUtilisateurDecode())
+          .withArgs(
+            { idConseiller: '41', presenceConseiller: undefined },
+            unUtilisateurDecode()
+          )
           .resolves(unRendezVousConseillerQueryModel())
 
         // When - Then
@@ -477,6 +480,115 @@ describe('ConseillersController', () => {
         .set('authorization', unHeaderAuthorization())
         .send(payload)
         .expect(HttpStatus.BAD_REQUEST)
+    })
+    it('retourne une 400 quand presenceConseiller est false pour le type ENTRETIEN_CONSEILLER', async () => {
+      // Given
+      const idConseiller = '41'
+      const payload: CreateRendezVousPayload = {
+        jeuneId: '1',
+        comment: '',
+        date: uneDatetime.toJSDate().toISOString(),
+        duration: 30,
+        type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+        presenceConseiller: false
+      }
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post(`/conseillers/${idConseiller}/rendezvous`)
+        .set('authorization', unHeaderAuthorization())
+        .send(payload)
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+    it('retourne une 400 quand presenceConseiller est false pour le type par defaut', async () => {
+      // Given
+      const idConseiller = '41'
+      const payload: CreateRendezVousPayload = {
+        jeuneId: '1',
+        comment: '',
+        date: uneDatetime.toJSDate().toISOString(),
+        duration: 30,
+        presenceConseiller: false
+      }
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post(`/conseillers/${idConseiller}/rendezvous`)
+        .set('authorization', unHeaderAuthorization())
+        .send(payload)
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+    it('retourne une 200 quand presenceConseiller est undefined pour le type ENTRETIEN_CONSEILLER', async () => {
+      // Given
+      const idConseiller = '41'
+      const payload: CreateRendezVousPayload = {
+        jeuneId: '1',
+        comment: '',
+        date: uneDatetime.toJSDate().toISOString(),
+        duration: 30,
+        type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
+      }
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post(`/conseillers/${idConseiller}/rendezvous`)
+        .set('authorization', unHeaderAuthorization())
+        .send(payload)
+        .expect(HttpStatus.CREATED)
+    })
+    it('retourne une 200 quand presenceConseiller est undefined pour le type par defaut', async () => {
+      // Given
+      const idConseiller = '41'
+      const payload: CreateRendezVousPayload = {
+        jeuneId: '1',
+        comment: '',
+        date: uneDatetime.toJSDate().toISOString(),
+        duration: 30
+      }
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post(`/conseillers/${idConseiller}/rendezvous`)
+        .set('authorization', unHeaderAuthorization())
+        .send(payload)
+        .expect(HttpStatus.CREATED)
+    })
+    it('retourne une 200 quand presenceConseiller est true pour le type ENTRETIEN_CONSEILLER', async () => {
+      // Given
+      const idConseiller = '41'
+      const payload: CreateRendezVousPayload = {
+        jeuneId: '1',
+        comment: '',
+        date: uneDatetime.toJSDate().toISOString(),
+        duration: 30,
+        type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+        presenceConseiller: true
+      }
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post(`/conseillers/${idConseiller}/rendezvous`)
+        .set('authorization', unHeaderAuthorization())
+        .send(payload)
+        .expect(HttpStatus.CREATED)
+    })
+    it('retourne une 200 quand presenceConseiller est true pour le type par defaut', async () => {
+      // Given
+      const idConseiller = '41'
+      const payload: CreateRendezVousPayload = {
+        jeuneId: '1',
+        comment: '',
+        date: uneDatetime.toJSDate().toISOString(),
+        duration: 30,
+        presenceConseiller: true
+      }
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post(`/conseillers/${idConseiller}/rendezvous`)
+        .set('authorization', unHeaderAuthorization())
+        .send(payload)
+        .expect(HttpStatus.CREATED)
     })
     it("retourne une 400 quand le champ precision n'est pas rempli", async () => {
       // Given
