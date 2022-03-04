@@ -1,0 +1,21 @@
+{
+  "scripts": {
+    "first-deploy": "bash .scalingo/first-deploy.sh"
+  },
+  "env": {
+    "IS_REVIEW_APP": {
+      "value": "true"
+    }
+  },
+  "addons": [
+    {
+      "plan": "postgresql:postgresql-starter-512",
+      "options": {
+        "version": "13"
+      }
+    },
+    {
+      "plan": "redis:redis-starter-128"
+    }
+  ]
+}
