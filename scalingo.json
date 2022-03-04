@@ -1,0 +1,14 @@
+{
+  "addons": [
+    {
+      "plan": "postgresql:postgresql-starter-512",
+      "options": {
+        "version": "13",
+        "extensions": ["postgis", "postgis_topology", "fuzzystrmatch", "postgis_tiger_geocoder"]
+      }
+    },
+    {
+      "plan": "redis:redis-starter-128"
+    }
+  ]
+}
