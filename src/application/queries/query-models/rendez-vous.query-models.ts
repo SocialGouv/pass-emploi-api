@@ -1,5 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { TypeRendezVous } from 'src/domain/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  mapCodeLabelTypeRendezVous,
+  TypeRendezVous
+} from 'src/domain/rendez-vous'
 
 class JeuneQueryModel {
   @ApiProperty()
@@ -49,7 +53,13 @@ export class RendezVousQueryModel implements RendezVousBaseQueryModel {
   @ApiProperty()
   duration: number
 
-  @ApiProperty()
+  @ApiProperty({
+    description: Object.values(CodeTypeRendezVous)
+      .map(code => {
+        return JSON.stringify({ code, label: mapCodeLabelTypeRendezVous[code] })
+      })
+      .join(' | ')
+  })
   type: TypeRendezVous
 
   @ApiProperty({ required: false })
