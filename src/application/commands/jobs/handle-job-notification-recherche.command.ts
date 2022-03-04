@@ -96,7 +96,7 @@ export class NotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
               if (jeune?.pushNotificationToken) {
                 stats.notificationsEnvoyees = stats.notificationsEnvoyees + 1
 
-                const notification = Notification.createNouvelleOffreEmploi(
+                const notification = Notification.createNouvelleOffre(
                   jeune.pushNotificationToken,
                   recherche.id,
                   recherche.titre
@@ -180,6 +180,7 @@ export class NotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
     return
   }
 }
+
 interface Stats {
   nombreDeRecherchesTotal: number
   succes: number

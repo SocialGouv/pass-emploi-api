@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  SetMetadata,
   UnprocessableEntityException,
   UseGuards
 } from '@nestjs/common'
@@ -45,6 +46,10 @@ export class AuthentificationController {
   @SkipOidcAuth()
   @UseGuards(ApiKeyAuthGuard)
   @ApiSecurity('api_key')
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.KEYCLOAK
+  )
   @Put('auth/users/:idUtilisateurAuth')
   @ApiResponse({
     type: UtilisateurQueryModel

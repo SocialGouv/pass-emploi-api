@@ -8,6 +8,7 @@ import {
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { ImmersionClient } from '../../../src/infrastructure/clients/immersion-client'
 import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-immersion-http-sql.repository'
+import { offreImmersionDto } from '../../fixtures/offre-immersion.dto.fixture'
 import { DatabaseForTesting, StubbedClass, stubClass } from '../../utils'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
@@ -151,22 +152,7 @@ describe('OffresImmersionHttpSqlRepository', () => {
           request: undefined,
           status: 200,
           statusText: '',
-          data: {
-            romeLabel: 'rome',
-            nafLabel: 'naf',
-            id: 'id',
-            name: 'name',
-            city: 'Paris',
-            address: 'addresse',
-            voluntaryToImmersion: true,
-            contactMode: 'IN_PERSON',
-            contactDetails: {
-              id: '1',
-              lastName: 'Tavernier',
-              firstName: 'Nils',
-              role: 'manager'
-            }
-          }
+          data: offreImmersionDto()
         }
 
         immersionClient.get.resolves(response)
@@ -185,7 +171,10 @@ describe('OffresImmersionHttpSqlRepository', () => {
             adresse: 'addresse',
             estVolontaire: true,
             id: 'id',
-            localisation: undefined,
+            localisation: {
+              latitude: 42,
+              longitude: 2
+            },
             metier: 'rome',
             nomEtablissement: 'name',
             secteurActivite: 'naf',

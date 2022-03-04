@@ -4,15 +4,18 @@ import { CommuneSqlModel } from 'src/infrastructure/sequelize/models/commune.sql
 import {
   communeColombes,
   criteresImmersionNice,
+  criteresImmersionParis,
   criteresOffreEmploiColombes,
   geometrieColombes,
   geometrieNice,
   uneRecherche
 } from 'test/fixtures/recherche.fixture'
+import { GetOffresImmersionQuery } from '../../../src/application/queries/get-offres-immersion.query.handler'
 import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/recherche-sql.repository'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { RechercheSqlModel } from '../../../src/infrastructure/sequelize/models/recherche.sql-model'
+import { IdService } from '../../../src/utils/id-service'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
@@ -262,4 +265,128 @@ describe('RechercheSqlRepository', () => {
       expect(recherches[0].id).to.deep.equal(rechercheBonne.id)
     })
   })
+  describe('trouverLesRecherchesImmersion', () => {
+    describe('quand la latlon et le rome correspondent', async () => {
+      // Given
+      const rechercheCharpentierANice = uneRecherche({
+        id: '80b0a6fd-5c65-470f-8d2c-a2b500824e7a',
+        idJeune,
+        type: Recherche.Type.OFFRES_IMMERSION,
+        criteres: {
+          ...criteresImmersionNice,
+          rome: 'charpentier'
+        }
+      })
+
+      const rechercheBoulangerANice = uneRecherche({
+        id: 'cda271d8-2d95-42a7-9c3B-47d142b55c39',
+        idJeune,
+        type: Recherche.Type.OFFRES_IMMERSION,
+        criteres: {
+          ...criteresImmersionNice,
+          rome: 'boulanger'
+        }
+      })
+
+      const rechercheBoulangerAParis = uneRecherche({
+        id: 'cda271d8-2d95-42a7-9c3B-47d142b55c34',
+        idJeune,
+        type: Recherche.Type.OFFRES_IMMERSION,
+        criteres: {
+          ...criteresImmersionParis,
+          rome: 'boulanger'
+        }
+      })
+      await rechercheSqlRepository.createRecherche(rechercheCharpentierANice)
+      await rechercheSqlRepository.createRecherche(rechercheBoulangerANice)
+      await rechercheSqlRepository.createRecherche(rechercheBoulangerAParis)
+
+      it('retourne la recherche de charpentier', async () => {
+        // When
+        const criteresASaintJeanCapFerrat: GetOffresImmersionQuery = {
+          rome: 'charpentier',
+          lat: 43.681503002546734,
+          lon: 7.330287995125166
+        }
+        const recherches =
+          await rechercheSqlRepository.trouverLesRecherchesImmersions(
+            criteresASaintJeanCapFerrat,
+            100,
+            0
+          )
+
+        // Then
+        expect(recherches.length).to.equal(1)
+        expect(recherches[0]).to.deep.equal(rechercheCharpentierANice)
+      })
+    })
+
+    describe('pagination', () => {
+      it('pagine par rapport à la date de création', async () => {
+        // Given
+        const recherchesPaginees = creerDesRecherchesPourLaPagination(idJeune)
+        for (const recherche of recherchesPaginees) {
+          await rechercheSqlRepository.createRecherche(recherche)
+        }
+
+        const criteresASaintJeanCapFerrat: GetOffresImmersionQuery = {
+          rome: 'charpentier',
+          lat: 43.681503002546734,
+          lon: 7.330287995125166
+        }
+
+        // When
+        const recherchesPage1 =
+          await rechercheSqlRepository.trouverLesRecherchesImmersions(
+            criteresASaintJeanCapFerrat,
+            10,
+            0
+          )
+        const recherchesPage2 =
+          await rechercheSqlRepository.trouverLesRecherchesImmersions(
+            criteresASaintJeanCapFerrat,
+            10,
+            10
+          )
+        const recherchesPage3 =
+          await rechercheSqlRepository.trouverLesRecherchesImmersions(
+            criteresASaintJeanCapFerrat,
+            10,
+            20
+          )
+
+        // Then
+        expect(recherchesPage1.length).to.be.equal(10)
+        expect(recherchesPage1[0]).to.be.deep.equal(recherchesPaginees[0])
+        expect(recherchesPage1[9]).to.be.deep.equal(recherchesPaginees[9])
+
+        expect(recherchesPage2.length).to.be.equal(10)
+        expect(recherchesPage2[0]).to.be.deep.equal(recherchesPaginees[10])
+        expect(recherchesPage2[9]).to.be.deep.equal(recherchesPaginees[19])
+
+        expect(recherchesPage3.length).to.be.equal(5)
+        expect(recherchesPage3[0]).to.be.deep.equal(recherchesPaginees[20])
+        expect(recherchesPage3[4]).to.be.deep.equal(recherchesPaginees[24])
+      })
+    })
+  })
 })
+
+function creerDesRecherchesPourLaPagination(idJeune: string): Recherche[] {
+  const recherches: Recherche[] = []
+  const idService = new IdService()
+
+  for (let i = 0; i < 25; i++) {
+    recherches.push(
+      uneRecherche({
+        id: idService.uuid(),
+        idJeune,
+        dateCreation: uneDatetime.plus({ day: i }),
+        type: Recherche.Type.OFFRES_IMMERSION,
+        criteres: { ...criteresImmersionNice, rome: 'charpentier' }
+      })
+    )
+  }
+
+  return recherches
+}

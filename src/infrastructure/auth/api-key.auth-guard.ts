@@ -6,10 +6,15 @@ import {
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Request } from 'express'
+import { Reflector } from '@nestjs/core'
+import { Authentification } from '../../domain/authentification'
 
 @Injectable()
 export class ApiKeyAuthGuard implements CanActivate {
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private configService: ConfigService,
+    private reflector: Reflector
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     return this.checkApiKey(context)
@@ -24,7 +29,19 @@ export class ApiKeyAuthGuard implements CanActivate {
       )
     }
 
-    const apiKey = this.configService.get('apiKeys.keycloak')
+    let apiKey = ''
+    const partenaire = this.reflector.get<Authentification.Partenaire>(
+      Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+      context.getHandler()
+    )
+    switch (partenaire) {
+      case Authentification.Partenaire.IMMERSION:
+        apiKey = this.configService.get('apiKeys.immersion')!
+        break
+      case Authentification.Partenaire.KEYCLOAK:
+        apiKey = this.configService.get('apiKeys.keycloak')!
+        break
+    }
 
     if (apiKeyRequest === apiKey) {
       return true

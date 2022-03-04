@@ -1,6 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { Transform } from 'class-transformer'
-import { IsNotEmpty, IsString, IsNumber, IsOptional } from 'class-validator'
+import { Transform, Type } from 'class-transformer'
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsOptional,
+  ValidateNested,
+  IsEnum,
+  IsArray,
+  IsBoolean
+} from 'class-validator'
+import { OffresImmersion } from '../../../domain/offre-immersion'
 import {
   transformStringToFloat,
   transformStringToInteger
@@ -58,4 +68,133 @@ export class GetOffresImmersionQueryBody {
   @IsOptional()
   @IsNumber()
   distance?: number
+}
+
+class ContactDetails {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  id: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  lastName: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  firstName: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  role: string
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  email?: string
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  phone?: string
+}
+
+class Location {
+  @ApiProperty()
+  @IsNumber()
+  lat: number
+
+  @ApiProperty()
+  @IsNumber()
+  lon: number
+}
+
+class NouvelleOffreImmersion implements OffresImmersion.Partenaire.Dto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  address: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  city: string
+
+  @ApiPropertyOptional({ type: ContactDetails })
+  @ValidateNested()
+  @Type(() => ContactDetails)
+  contactDetails: ContactDetails | undefined
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  contactId: string
+
+  @ApiPropertyOptional({ enum: OffresImmersion.Partenaire.ContactMode })
+  @IsString()
+  @IsOptional()
+  @IsEnum(OffresImmersion.Partenaire.ContactMode)
+  contactMode?: OffresImmersion.Partenaire.ContactMode
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  distance_m?: number
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  id: string
+
+  @ApiPropertyOptional({ type: Location })
+  @ValidateNested()
+  @IsOptional()
+  @Type(() => Location)
+  location?: Location
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  naf: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  nafLabel: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  name: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  rome: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  romeLabel: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  siret: string
+
+  @ApiProperty()
+  @IsBoolean()
+  @IsNotEmpty()
+  voluntaryToImmersion: boolean
+}
+
+export class NouvellesOffresImmersions {
+  @ApiProperty({ type: NouvelleOffreImmersion, isArray: true })
+  @ValidateNested()
+  @Type(() => NouvelleOffreImmersion)
+  @IsArray()
+  immersions: NouvelleOffreImmersion[]
 }

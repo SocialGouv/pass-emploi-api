@@ -46,7 +46,7 @@ export namespace Notification {
     }
   }
 
-  export function createNouvelleOffreEmploi(
+  export function createNouvelleOffre(
     token: string,
     idRecherche: string,
     titre: string

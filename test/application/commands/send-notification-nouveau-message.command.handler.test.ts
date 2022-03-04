@@ -22,7 +22,7 @@ import {
 } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, stubClass } from '../../utils'
 
-describe('LoginJeuneCommandHandler', () => {
+describe('SendNotificationNouveauMessageCommandHandler', () => {
   let sendNotificationNouveauMessageCommandHandler: SendNotificationNouveauMessageCommandHandler
   const sandbox: SinonSandbox = createSandbox()
   const jeune = unJeune()
