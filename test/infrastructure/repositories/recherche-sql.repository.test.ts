@@ -1,5 +1,13 @@
 import { Recherche } from 'src/domain/recherche'
-import { uneRecherche } from 'test/fixtures/recherche.fixture'
+import { CommuneSqlModel } from 'src/infrastructure/sequelize/models/commune.sql-model'
+import {
+  communeColombes,
+  criteresImmersionNice,
+  criteresOffreEmploiColombes,
+  geometrieColombes,
+  geometrieNice,
+  uneRecherche
+} from 'test/fixtures/recherche.fixture'
 import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/recherche-sql.repository'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
@@ -32,17 +40,104 @@ describe('RechercheSqlRepository', () => {
   })
 
   describe('createRecherche', () => {
-    it('sauvegarde une recherche', async () => {
-      // Given
-      const recherche = uneRecherche({ idJeune })
+    describe("quand c'est une offre d'immersion", () => {
+      describe('quand lat lon ne sont pas présents', () => {
+        it('sauvegarde une recherche', async () => {
+          // Given
+          const recherche = uneRecherche({
+            idJeune,
+            type: Recherche.Type.OFFRES_IMMERSION,
+            criteres: {}
+          })
 
-      // When
-      await rechercheSqlRepository.createRecherche(recherche)
+          // When
+          await rechercheSqlRepository.createRecherche(recherche)
 
-      // Then
-      const recherches = await RechercheSqlModel.findAll({ raw: true })
-      expect(recherches.length).to.equal(1)
-      expect(recherches[0].id).to.equal(recherche.id)
+          // Then
+          const recherches = await RechercheSqlModel.findAll({ raw: true })
+          expect(recherches.length).to.equal(1)
+          expect(recherches[0].id).to.equal(recherche.id)
+        })
+      })
+      describe('quand lat lon sont présents', () => {
+        it('sauvegarde une recherche avec la bonne geometrie', async () => {
+          // Given
+          const recherche = uneRecherche({
+            idJeune,
+            type: Recherche.Type.OFFRES_IMMERSION,
+            criteres: criteresImmersionNice
+          })
+
+          // When
+          await rechercheSqlRepository.createRecherche(recherche)
+
+          // Then
+          const recherches = await RechercheSqlModel.findAll({ raw: true })
+
+          expect(recherches.length).to.equal(1)
+          expect(recherches[0].id).to.equal(recherche.id)
+          expect(recherches[0].geometrie.coordinates).to.deep.equal(
+            geometrieNice
+          )
+        })
+      })
+    })
+    describe("quand c'est une offre d'emploi", () => {
+      describe("quand la commune n'est pas présente", () => {
+        it('sauvegarde une recherche', async () => {
+          // Given
+          const recherche = uneRecherche({ idJeune, criteres: {} })
+
+          // When
+          await rechercheSqlRepository.createRecherche(recherche)
+
+          // Then
+          const recherches = await RechercheSqlModel.findAll({ raw: true })
+          expect(recherches.length).to.equal(1)
+          expect(recherches[0].id).to.equal(recherche.id)
+        })
+      })
+      describe("quand la commune est présente mais n'est pas referencée", () => {
+        it('sauvegarde une recherche sans geometrie', async () => {
+          // Given
+          const recherche = uneRecherche({
+            idJeune,
+            type: Recherche.Type.OFFRES_EMPLOI,
+            criteres: criteresOffreEmploiColombes
+          })
+
+          // When
+          await rechercheSqlRepository.createRecherche(recherche)
+
+          // Then
+          const recherches = await RechercheSqlModel.findAll({ raw: true })
+
+          expect(recherches.length).to.equal(1)
+          expect(recherches[0].id).to.equal(recherche.id)
+          expect(recherches[0].geometrie).to.equal(null)
+        })
+        it('sauvegarde une recherche avec la bonne geometrie', async () => {
+          // Given
+          const recherche = uneRecherche({
+            idJeune,
+            type: Recherche.Type.OFFRES_EMPLOI,
+            criteres: criteresOffreEmploiColombes
+          })
+          await CommuneSqlModel.create(communeColombes)
+
+          // When
+          await rechercheSqlRepository.createRecherche(recherche)
+
+          // Then
+          const recherches = await RechercheSqlModel.findAll({ raw: true })
+
+          expect(recherches.length).to.equal(1)
+          expect(recherches[0].id).to.equal(recherche.id)
+          expect(recherches[0].geometrie.coordinates).to.deep.equal(
+            geometrieColombes
+          )
+        })
+      })
     })
   })
 
