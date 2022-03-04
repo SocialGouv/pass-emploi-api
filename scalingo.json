@@ -3,8 +3,7 @@
     {
       "plan": "postgresql:postgresql-starter-512",
       "options": {
-        "version": "13",
-        "extensions": ["postgis", "postgis_topology", "fuzzystrmatch", "postgis_tiger_geocoder"]
+        "version": "13"
       }
     },
     {
