@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { TypeRendezVous } from 'src/domain/rendez-vous'
 import { ActionQueryModel } from './actions.query-model'
 import { DetailConseillerQueryModel } from './conseillers.query-models'
 import { RendezVousBaseQueryModel } from './rendez-vous.query-models'
@@ -24,6 +25,21 @@ class RendezVousJeuneHomeQueryModel implements RendezVousBaseQueryModel {
 
   @ApiProperty()
   duration: string
+
+  @ApiProperty()
+  type: TypeRendezVous
+
+  @ApiProperty({ required: false })
+  precision?: string
+
+  @ApiProperty({ required: false })
+  adresse?: string
+
+  @ApiProperty({ required: false })
+  organisme?: string
+
+  @ApiProperty()
+  presenceConseiller: boolean
 }
 
 export class JeuneHomeQueryModel {

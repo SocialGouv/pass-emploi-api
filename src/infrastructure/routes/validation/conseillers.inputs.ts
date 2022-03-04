@@ -1,10 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger'
-import { Type } from 'class-transformer'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { Transform, Type } from 'class-transformer'
 import {
   ArrayNotEmpty,
   IsArray,
+  IsBoolean,
   IsEmail,
   IsEnum,
+  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -12,6 +14,7 @@ import {
 } from 'class-validator'
 import { Core } from 'src/domain/core'
 import { Action } from '../../../domain/action'
+import { transformStringToBoolean } from './utils/transformers'
 
 export class GetConseillerQueryParams {
   @ApiProperty()
@@ -121,4 +124,13 @@ export class SuperviseursPayload {
   @ValidateNested({ each: true })
   @Type(() => Superviseur)
   superviseurs: Superviseur[]
+}
+
+export class GetRendezVousConseillerQueryParams {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  @IsIn([true, false])
+  @Transform(params => transformStringToBoolean(params, 'presenceConseiller'))
+  presenceConseiller?: boolean
 }

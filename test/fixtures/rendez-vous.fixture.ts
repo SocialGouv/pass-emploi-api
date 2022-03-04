@@ -2,7 +2,11 @@ import {
   RendezVousConseillerQueryModel,
   RendezVousQueryModel
 } from 'src/application/queries/query-models/rendez-vous.query-models'
-import { RendezVous, CodeTypeRendezVous } from '../../src/domain/rendez-vous'
+import {
+  RendezVous,
+  CodeTypeRendezVous,
+  mapCodeLabelTypeRendezVous
+} from '../../src/domain/rendez-vous'
 import { unJeune } from './jeune.fixture'
 
 export const unRendezVous = (jeune = unJeune()): RendezVous => ({
@@ -29,7 +33,15 @@ export const unRendezVousQueryModel = (): RendezVousQueryModel => ({
     id: '1',
     nom: 'test',
     prenom: 'test'
-  }
+  },
+  type: {
+    code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+    label:
+      mapCodeLabelTypeRendezVous[
+        CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
+      ]
+  },
+  presenceConseiller: true
 })
 
 export const unRendezVousConseillerQueryModel =

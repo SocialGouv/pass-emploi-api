@@ -4,6 +4,7 @@ import {
   IsDateString,
   IsEnum,
   IsIn,
+  Equals,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -67,5 +68,11 @@ export class CreateRendezVousPayload {
   @IsOptional()
   @IsBoolean()
   @IsIn([true, false])
+  @ValidateIf(
+    payload =>
+      payload.type === undefined ||
+      payload.type === CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
+  )
+  @Equals(true)
   presenceConseiller?: boolean
 }
