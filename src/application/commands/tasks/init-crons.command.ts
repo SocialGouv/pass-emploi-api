@@ -15,7 +15,7 @@ export class InitCronsCommandHandler extends CommandHandler<Command, void> {
     @Inject(PlanificateurRepositoryToken)
     private planificateurRepository: Planificateur.Repository
   ) {
-    super('SynchronizeJobsTask')
+    super('InitCronsCommandHandler')
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
