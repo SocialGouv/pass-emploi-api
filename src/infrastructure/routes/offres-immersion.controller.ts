@@ -1,13 +1,17 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Get,
   NotFoundException,
   Param,
-  Query
+  Post,
+  Query,
+  SetMetadata,
+  UseGuards
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOAuth2, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger'
 import {
   DetailOffreImmersionQueryModel,
   OffreImmersionQueryModel
@@ -29,6 +33,9 @@ import {
 } from '../../application/queries/get-detail-offre-immersion.query.handler'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
+import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
+import { NotifierNouvellesImmersionsCommandHandler } from '../../application/commands/notifier-nouvelles-immersions.command.handler'
+import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
 
 @Controller('offres-immersion')
 @ApiOAuth2([])
@@ -36,7 +43,8 @@ import { Authentification } from '../../domain/authentification'
 export class OffresImmersionController {
   constructor(
     private readonly getDetailOffreImmersionQueryHandler: GetDetailOffreImmersionQueryHandler,
-    private readonly getOffresImmersionQueryHandler: GetOffresImmersionQueryHandler
+    private readonly getOffresImmersionQueryHandler: GetOffresImmersionQueryHandler,
+    private readonly notifierNouvellesImmersionsCommandHandler: NotifierNouvellesImmersionsCommandHandler
   ) {}
 
   @Get()
@@ -98,5 +106,18 @@ export class OffresImmersionController {
     }
 
     throw new RuntimeException(result.error.message)
+  }
+
+  @SkipOidcAuth()
+  @UseGuards(ApiKeyAuthGuard)
+  @ApiSecurity('api_key')
+  @SetMetadata('partenaire', Authentification.Partenaire.IMMERSION)
+  @Post()
+  async notifierNouvellesImmersions(
+    @Body() nouvellesImmersions: DetailOffreImmersionQueryModel[]
+  ): Promise<void> {
+    await this.notifierNouvellesImmersionsCommandHandler.execute({
+      immersions: nouvellesImmersions
+    })
   }
 }

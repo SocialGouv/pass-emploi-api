@@ -36,7 +36,8 @@ export class RechercheSqlRepository implements Recherche.Repository {
     switch (recherche.type) {
       case Recherche.Type.OFFRES_EMPLOI:
       case Recherche.Type.OFFRES_ALTERNANCE:
-        await this.createGeometrieOffreEmploiAlternance(recherche)
+        await this.createGeometrieOffreEmploiAlternance( recherche
+               )
         break
       case Recherche.Type.OFFRES_IMMERSION:
         await this.createGeometrieOffreImmersion(recherche)
@@ -142,6 +143,50 @@ export class RechercheSqlRepository implements Recherche.Repository {
       where: { id: idRecherche, idJeune: idJeune }
     })
     return !!rechercheSqlModel
+  }
+
+  async trouverLesRecherchesImmersions(
+    criteres: GetOffresImmersionQuery
+  ): Promise<Recherche[]> {
+    const point = {
+      type: 'Point',
+      coordinates: [criteres.lon, criteres.lat]
+    }
+
+    const rechercheSqlModels = await RechercheSqlModel.findAll({
+      attributes: {
+        exclude: ['geometrie']
+      },
+      where: {
+        [Op.and]: [
+          { type: Recherche.Type.OFFRES_IMMERSION },
+          {
+            criteres: {
+              rome: {
+                [Op.eq]: criteres.rome
+              }
+            }
+          },
+          Sequelize.literal(`ST_CONTAINS(geometrie, ST_SetSRID(
+        st_geomfromgeojson('${JSON.stringify(point)}'),4326)::geometry)`)
+        ]
+      }
+    })
+
+    return rechercheSqlModels.map(rechercheSql => ({
+      id: rechercheSql.id,
+      idJeune: rechercheSql.idJeune,
+      type: rechercheSql.type,
+      titre: rechercheSql.titre,
+      metier: rechercheSql.metier ?? undefined,
+      localisation: rechercheSql.localisation ?? undefined,
+      criteres: rechercheSql.criteres as GetOffresImmersionQuery,
+      etat: rechercheSql.etatDerniereRecherche,
+      dateDerniereRecherche: DateTime.fromJSDate(
+        rechercheSql.dateDerniereRecherche
+      ),
+      dateCreation: DateTime.fromJSDate(rechercheSql.dateCreation)
+    }))
   }
 
   private async createGeometrieOffreEmploiAlternance(

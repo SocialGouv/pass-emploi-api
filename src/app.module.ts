@@ -128,6 +128,7 @@ import { CreerSuperviseursCommandHandler } from './application/commands/creer-su
 import { DeleteSuperviseursCommandHandler } from './application/commands/delete-superviseurs.command.handler'
 import { SupportAuthorizer } from './application/authorizers/authorize-support'
 import { GetTypesRendezVousQueryHandler } from './application/queries/get-types-rendezvous.query.handler'
+import { NotifierNouvellesImmersionsCommandHandler } from './application/commands/notifier-nouvelles-immersions.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -304,7 +305,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     HandleNettoyerLesJobsCommandHandler,
     CreerSuperviseursCommandHandler,
     DeleteSuperviseursCommandHandler,
-    GetTypesRendezVousQueryHandler
+    GetTypesRendezVousQueryHandler,
+    NotifierNouvellesImmersionsCommandHandler
   ]
 }
 

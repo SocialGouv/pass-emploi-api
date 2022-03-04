@@ -71,7 +71,8 @@ export default () => {
       issuerUrl: process.env.OIDC_ISSUER_URL ?? ''
     },
     apiKeys: {
-      keycloak: process.env.API_KEY_KEYCLOAK ?? 'ceci-est-une-api-key'
+      keycloak: process.env.API_KEY_KEYCLOAK ?? 'ceci-est-une-api-key',
+      immersion: process.env.API_KEY_IMMERSION ?? 'ceci-est-une-autre-api-key'
     },
     redis: {
       url: process.env.REDIS_URL ?? ''
