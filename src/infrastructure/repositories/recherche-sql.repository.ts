@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Op, Sequelize } from 'sequelize'
 import { RechercheQueryModel } from '../../application/queries/query-models/recherches.query-model'
+import { OffresEmploi } from '../../domain/offre-emploi'
+import { OffresImmersion } from '../../domain/offre-immersion'
 import { Recherche } from '../../domain/recherche'
 import { RechercheSqlModel } from '../sequelize/models/recherche.sql-model'
 import { fromSqlToRechercheQueryModel } from './mappers/recherches.mappers'
@@ -8,10 +10,7 @@ import { DateTime } from 'luxon'
 import { GetOffresEmploiQuery } from '../../application/queries/get-offres-emploi.query.handler'
 import { CommuneSqlModel } from '../sequelize/models/commune.sql-model'
 import { SequelizeInjectionToken } from '../sequelize/providers'
-import {
-  DISTANCE_PAR_DEFAUT_IMMERSION,
-  GetOffresImmersionQuery
-} from '../../application/queries/get-offres-immersion.query.handler'
+import { GetOffresImmersionQuery } from '../../application/queries/get-offres-immersion.query.handler'
 import { FindOptions } from 'sequelize/dist/lib/model'
 
 @Injectable()
@@ -50,7 +49,8 @@ export class RechercheSqlRepository implements Recherche.Repository {
               coordinates: [commune.longitude, commune.latitude]
             }
             const distance =
-              (recherche.criteres as GetOffresEmploiQuery).rayon ?? 10
+              (recherche.criteres as GetOffresEmploiQuery).rayon ??
+              OffresEmploi.DISTANCE_PAR_DEFAUT
             await this.sequelize.query(
               `UPDATE recherche
              SET geometrie = (
@@ -70,7 +70,8 @@ export class RechercheSqlRepository implements Recherche.Repository {
             type: 'Point',
             coordinates: [criteres.lon, criteres.lat]
           }
-          const distance = criteres.distance ?? DISTANCE_PAR_DEFAUT_IMMERSION
+          const distance =
+            criteres.distance ?? OffresImmersion.DISTANCE_PAR_DEFAUT
           await this.sequelize.query(
             `UPDATE recherche
              SET geometrie = (
@@ -101,7 +102,7 @@ export class RechercheSqlRepository implements Recherche.Repository {
 
   async getRecherches(
     idJeune: string,
-    avecGeometrie: boolean
+    avecGeometrie?: boolean
   ): Promise<RechercheQueryModel[]> {
     const options: FindOptions = {
       where: {

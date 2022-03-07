@@ -27,6 +27,8 @@ export interface Localisation {
 export const OffresEmploiRepositoryToken = 'OffresEmploi.Repository'
 
 export namespace OffresEmploi {
+  export const DISTANCE_PAR_DEFAUT = 30
+
   export interface Repository {
     findAll(criteres: Criteres): Promise<Result<OffresEmploiQueryModel>>
 

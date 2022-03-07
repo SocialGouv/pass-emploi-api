@@ -36,7 +36,7 @@ export namespace Recherche {
 
     getRecherches(
       idJeune: string,
-      avecGeometrie: boolean
+      avecGeometrie?: boolean
     ): Promise<RechercheQueryModel[]>
     findAvantDate(
       typeRecherches: Recherche.Type[],

@@ -8,7 +8,7 @@ import { RechercheQueryModel } from './query-models/recherches.query-model'
 
 export interface GetRecherchesQuery extends Query {
   idJeune: string
-  avecGeometrie: boolean
+  avecGeometrie?: boolean
 }
 
 @Injectable()

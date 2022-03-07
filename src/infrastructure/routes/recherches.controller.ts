@@ -92,7 +92,7 @@ export class RecherchesController {
   ): Promise<RechercheQueryModel[]> {
     const query: GetRecherchesQuery = {
       idJeune,
-      avecGeometrie: queryParams.avecGeometrie === 'true'
+      avecGeometrie: queryParams.avecGeometrie
     }
     return this.getRecherchesQueryHandler.execute(query, utilisateur)
   }
