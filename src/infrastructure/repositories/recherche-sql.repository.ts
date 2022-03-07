@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Op, Sequelize } from 'sequelize'
+import { Op, QueryTypes, Sequelize } from 'sequelize'
 import { RechercheQueryModel } from '../../application/queries/query-models/recherches.query-model'
 import { OffresEmploi } from '../../domain/offre-emploi'
 import { OffresImmersion } from '../../domain/offre-immersion'
@@ -33,55 +33,37 @@ export class RechercheSqlRepository implements Recherche.Repository {
       etatDerniereRecherche: recherche.etat
     })
 
+    let criteres
+    let distance
     switch (recherche.type) {
       case Recherche.Type.OFFRES_EMPLOI:
       case Recherche.Type.OFFRES_ALTERNANCE:
-        if ((recherche.criteres as GetOffresEmploiQuery).commune) {
+        criteres = recherche.criteres as GetOffresEmploiQuery
+
+        if (criteres.commune) {
           const commune = await CommuneSqlModel.findOne({
             where: {
-              code: (recherche.criteres as GetOffresEmploiQuery).commune
+              code: criteres.commune
             }
           })
-
-          if (commune) {
-            const center = {
-              type: 'Point',
-              coordinates: [commune.longitude, commune.latitude]
-            }
-            const distance =
-              (recherche.criteres as GetOffresEmploiQuery).rayon ??
-              OffresEmploi.DISTANCE_PAR_DEFAUT
-            await this.sequelize.query(
-              `UPDATE recherche
-             SET geometrie = (
-                 ST_Buffer(ST_SetSRID(ST_GeomFromGeoJSON('${JSON.stringify(
-                   center
-                 )}')::geography, 4326), ${distance * 1000})::geometry)
-            WHERE id='${recherche.id}'
-              `
-            )
-          }
+          distance = criteres.rayon ?? OffresEmploi.DISTANCE_PAR_DEFAUT
+          await this.createGeometrie(
+            recherche.id,
+            distance,
+            Number(commune?.longitude),
+            Number(commune?.latitude)
+          )
         }
         break
       case Recherche.Type.OFFRES_IMMERSION:
-        const criteres = recherche.criteres as GetOffresImmersionQuery
-        if (criteres.lon && criteres.lat) {
-          const center = {
-            type: 'Point',
-            coordinates: [criteres.lon, criteres.lat]
-          }
-          const distance =
-            criteres.distance ?? OffresImmersion.DISTANCE_PAR_DEFAUT
-          await this.sequelize.query(
-            `UPDATE recherche
-             SET geometrie = (
-                 ST_Buffer(ST_SetSRID(ST_GeomFromGeoJSON('${JSON.stringify(
-                   center
-                 )}')::geography, 4326), ${distance * 1000})::geometry)
-            WHERE id='${recherche.id}'
-              `
-          )
-        }
+        criteres = recherche.criteres as GetOffresImmersionQuery
+        distance = criteres.distance ?? OffresImmersion.DISTANCE_PAR_DEFAUT
+        await this.createGeometrie(
+          recherche.id,
+          distance,
+          criteres.lon,
+          criteres.lat
+        )
     }
   }
 
@@ -184,5 +166,34 @@ export class RechercheSqlRepository implements Recherche.Repository {
       where: { id: idRecherche, idJeune: idJeune }
     })
     return !!rechercheSqlModel
+  }
+
+  private async createGeometrie(
+    idRecherche: string,
+    distance: number,
+    longitude?: number,
+    latitude?: number
+  ): Promise<void> {
+    if (longitude && latitude) {
+      const center = {
+        type: 'Point',
+        coordinates: [longitude, latitude]
+      }
+
+      await this.sequelize.query(
+        `UPDATE recherche
+         SET geometrie = (
+             ST_Buffer(ST_SetSRID(ST_GeomFromGeoJSON(:center)::geography, 4326), :distance)::geometry)
+        WHERE id = :id_recherche`,
+        {
+          type: QueryTypes.UPDATE,
+          replacements: {
+            center: JSON.stringify(center),
+            distance: distance * 1000,
+            id_recherche: idRecherche
+          }
+        }
+      )
+    }
   }
 }
