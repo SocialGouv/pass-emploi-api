@@ -17,6 +17,8 @@ export interface OffreImmersion {
 }
 
 export namespace OffresImmersion {
+  export const DISTANCE_PAR_DEFAUT = 10
+
   export interface Repository {
     findAll(criteres: Criteres): Promise<Result<OffreImmersionQueryModel[]>>
 

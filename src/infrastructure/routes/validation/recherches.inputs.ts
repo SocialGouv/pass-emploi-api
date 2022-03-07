@@ -1,6 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
+  IsBoolean,
   IsDefined,
+  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -8,7 +10,8 @@ import {
 } from 'class-validator'
 import { FindOffresEmploiQueryBody } from './offres-emploi.inputs'
 import { GetOffresImmersionQueryBody } from './offres-immersion.inputs'
-import { Type } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
+import { transformStringToBoolean } from './utils/transformers'
 
 export class CreateRechercheImmersionPayload {
   @ApiProperty()
@@ -58,7 +61,9 @@ export class CreateRechercheOffresEmploiPayload {
 
 export class GetRecherchesQueryParams {
   @ApiPropertyOptional()
-  @IsString()
+  @IsBoolean()
   @IsOptional()
-  avecGeometrie?: string
+  @IsIn([true, false])
+  @Transform(params => transformStringToBoolean(params, 'avecGeometrie'))
+  avecGeometrie?: boolean
 }

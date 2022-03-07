@@ -91,7 +91,7 @@ describe('GetOffresImmersionQueryHandler', () => {
           rome: getOffresImmersionQuery.rome,
           lat: getOffresImmersionQuery.lat,
           lon: getOffresImmersionQuery.lon,
-          distance: 30
+          distance: 10
         }
         offresImmersionRepository.findAll
           .withArgs(criteres)

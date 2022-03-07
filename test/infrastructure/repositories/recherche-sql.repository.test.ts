@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { Recherche } from 'src/domain/recherche'
 import { CommuneSqlModel } from 'src/infrastructure/sequelize/models/commune.sql-model'
 import {
@@ -116,6 +117,8 @@ describe('RechercheSqlRepository', () => {
           expect(recherches[0].id).to.equal(recherche.id)
           expect(recherches[0].geometrie).to.equal(null)
         })
+      })
+      describe('quand la commune est présente mais et est referencée', () => {
         it('sauvegarde une recherche avec la bonne geometrie', async () => {
           // Given
           const recherche = uneRecherche({
@@ -142,36 +145,69 @@ describe('RechercheSqlRepository', () => {
   })
 
   describe('updateRecherche', () => {
-    it('sauvegarde une recherche', async () => {
+    it('met à jour une recherche', async () => {
       // Given
       const recherche = uneRecherche({ idJeune })
+      await rechercheSqlRepository.createRecherche(recherche)
+      const rechercheMiseAJour: Recherche = {
+        ...recherche,
+        dateDerniereRecherche: DateTime.fromISO('2022-03-07T10:10:11')
+      }
 
       // When
-      await rechercheSqlRepository.updateRecherche(recherche)
+      await rechercheSqlRepository.updateRecherche(rechercheMiseAJour)
 
       // Then
       const recherches = await RechercheSqlModel.findAll({ raw: true })
       expect(recherches.length).to.equal(1)
       expect(recherches[0].id).to.equal(recherche.id)
+      expect(recherches[0].dateDerniereRecherche).to.deep.equal(
+        DateTime.fromISO('2022-03-07T10:10:11').toJSDate()
+      )
     })
   })
 
-  describe('getRecherches', () => {
-    it('recupere une recherche sauvegardée', async () => {
-      // Given
-      const recherche = uneRecherche({ idJeune })
+  describe('getRecherches', async () => {
+    // Given
+    const recherche = uneRecherche({
+      idJeune,
+      type: Recherche.Type.OFFRES_IMMERSION,
+      criteres: criteresImmersionNice
+    })
 
-      await rechercheSqlRepository.createRecherche(recherche)
+    await rechercheSqlRepository.createRecherche(recherche)
 
-      // When
-      const recherches = await rechercheSqlRepository.getRecherches(
-        idJeune,
-        false
-      )
+    describe('sans géométrie', () => {
+      it('recupere une recherche sauvegardée sans sa géométrie', async () => {
+        // Given
+        await rechercheSqlRepository.createRecherche(recherche)
 
-      // Then
-      expect(recherches.length).to.equal(1)
-      expect(recherches[0].id).to.deep.equal(recherche.id)
+        // When
+        const recherches = await rechercheSqlRepository.getRecherches(
+          idJeune,
+          false
+        )
+
+        // Then
+        expect(recherches.length).to.equal(1)
+        expect(recherches[0].id).to.deep.equal(recherche.id)
+        expect(recherches[0].geometrie).to.equal(undefined)
+      })
+    })
+    describe('avec géométrie', () => {
+      it('recupere une recherche sauvegardée avec sa géométrie', async () => {
+        // When
+        const recherches = await rechercheSqlRepository.getRecherches(
+          idJeune,
+          true
+        )
+
+        // Then
+        expect(recherches.length).to.equal(1)
+        expect(recherches[0].geometrie!.coordinates).to.deep.equal(
+          geometrieNice
+        )
+      })
     })
   })
   describe('findAvantDate', () => {
