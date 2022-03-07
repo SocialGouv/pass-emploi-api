@@ -118,7 +118,7 @@ describe('RechercheSqlRepository', () => {
           expect(recherches[0].geometrie).to.equal(null)
         })
       })
-      describe('quand la commune est présente mais et est referencée', () => {
+      describe('quand la commune est présente et referencée', () => {
         it('sauvegarde une recherche avec la bonne geometrie', async () => {
           // Given
           const recherche = uneRecherche({
