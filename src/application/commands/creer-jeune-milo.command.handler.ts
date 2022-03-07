@@ -48,10 +48,7 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     }
     const lowerCaseEmail = command.email.toLocaleLowerCase()
 
-    const result = await this.miloRepository.creerJeune(
-      command.idDossier,
-      lowerCaseEmail
-    )
+    const result = await this.miloRepository.creerJeune(command.idDossier)
 
     if (isFailure(result)) {
       return result

@@ -10,9 +10,7 @@ import {
   Result,
   success
 } from '../../building-blocks/types/result'
-import { Core } from '../../domain/core'
 import { Milo } from '../../domain/milo'
-import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { DossierMiloDto } from './dto/milo.dto'
 
 @Injectable()
@@ -65,7 +63,7 @@ export class MiloHttpRepository implements Milo.Repository {
     }
   }
 
-  async creerJeune(idDossier: string, email: string): Promise<Result> {
+  async creerJeune(idDossier: string): Promise<Result> {
     try {
       await firstValueFrom(
         this.httpService.post(
@@ -79,25 +77,6 @@ export class MiloHttpRepository implements Milo.Repository {
       this.logger.error(e)
 
       if (e.response?.status >= 400 && e.response?.status <= 404) {
-        if (
-          e.response.data?.code === 'SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT'
-        ) {
-          const jeuneExistant = await JeuneSqlModel.findOne({
-            attributes: ['id'],
-            where: {
-              email,
-              structure: Core.Structure.MILO
-            }
-          })
-
-          if (jeuneExistant) {
-            return failure(
-              new ErreurHttpMilo(e.response.data?.message, e.response.status)
-            )
-          } else {
-            return emptySuccess()
-          }
-        }
         const erreur = new ErreurHttpMilo(
           e.response.data?.message,
           e.response.status

@@ -71,7 +71,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
           idConseiller: 'idConseiller'
         }
         miloRepository.creerJeune
-          .withArgs(command.idDossier, command.email)
+          .withArgs(command.idDossier)
           .resolves(emptySuccess())
 
         // When
@@ -103,7 +103,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
           idConseiller: 'idConseiller'
         }
         miloRepository.creerJeune
-          .withArgs(command.idDossier, 'jeune.nom@email.com')
+          .withArgs(command.idDossier)
           .resolves(emptySuccess())
 
         // When

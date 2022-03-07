@@ -98,7 +98,7 @@ describe('MiloHttpRepository', () => {
         nock('https://milo.com').post('/compte-jeune/1').reply(204).isDone()
 
         // When
-        const dossier = await miloHttpRepository.creerJeune('1', jeune.email)
+        const dossier = await miloHttpRepository.creerJeune('1')
 
         // Then
         expect(dossier).to.deep.equal(emptySuccess())
@@ -106,27 +106,7 @@ describe('MiloHttpRepository', () => {
     })
     describe('quand il y a un bad request', () => {
       describe("quand c'est SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT", () => {
-        describe("quand le jeune n'existe pas chez nous avec cet email", () => {
-          it('renvoie un succès', async () => {
-            // Given
-            nock('https://milo.com')
-              .post('/compte-jeune/1')
-              .reply(400, {
-                code: 'SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT'
-              })
-              .isDone()
-
-            // When
-            const dossier = await miloHttpRepository.creerJeune(
-              '1',
-              'un-autre-email'
-            )
-
-            // Then
-            expect(dossier).to.deep.equal(emptySuccess())
-          })
-        })
-        describe('quand le jeune existe chez nous avec cet email', () => {
+        describe('que le jeune existe ou pas chez nous', () => {
           it('renvoie un échec', async () => {
             // Given
             nock('https://milo.com')
@@ -138,10 +118,7 @@ describe('MiloHttpRepository', () => {
               .isDone()
 
             // When
-            const dossier = await miloHttpRepository.creerJeune(
-              '1',
-              jeune.email
-            )
+            const dossier = await miloHttpRepository.creerJeune('1')
 
             // Then
             expect(dossier).to.deep.equal(
