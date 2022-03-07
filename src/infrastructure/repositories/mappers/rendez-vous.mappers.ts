@@ -43,10 +43,10 @@ export function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
       pushNotificationToken:
         rendezVousSql.jeune.pushNotificationToken ?? undefined,
       conseiller: {
-        id: rendezVousSql.jeune.conseiller.id,
-        firstName: rendezVousSql.jeune.conseiller.prenom,
-        lastName: rendezVousSql.jeune.conseiller.nom,
-        structure: rendezVousSql.jeune.conseiller.structure
+        id: rendezVousSql.jeune.conseiller!.id,
+        firstName: rendezVousSql.jeune.conseiller!.prenom,
+        lastName: rendezVousSql.jeune.conseiller!.nom,
+        structure: rendezVousSql.jeune.conseiller!.structure
       },
       structure: rendezVousSql.jeune.structure
     },
@@ -72,11 +72,13 @@ export function fromSqlToRendezVousJeuneQueryModel(
 ): RendezVousQueryModel {
   return {
     ...fromSqlToRendezVousQueryModel(rendezVousSql),
-    title: `${rendezVousSql.jeune.conseiller.prenom} ${rendezVousSql.jeune.conseiller.nom}`,
+    title: `${rendezVousSql.jeune.conseiller!.prenom} ${
+      rendezVousSql.jeune.conseiller!.nom
+    }`,
     conseiller: {
-      id: rendezVousSql.jeune.conseiller.id,
-      prenom: rendezVousSql.jeune.conseiller.prenom,
-      nom: rendezVousSql.jeune.conseiller.nom
+      id: rendezVousSql.jeune.conseiller!.id,
+      prenom: rendezVousSql.jeune.conseiller!.prenom,
+      nom: rendezVousSql.jeune.conseiller!.nom
     }
   }
 }

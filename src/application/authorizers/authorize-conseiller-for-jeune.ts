@@ -19,7 +19,7 @@ export class ConseillerForJeuneAuthorizer {
     if (jeune && utilisateur) {
       if (
         utilisateur.type === Authentification.Type.CONSEILLER &&
-        utilisateur.id === jeune.conseiller.id
+        utilisateur.id === jeune.conseiller?.id
       ) {
         return
       }

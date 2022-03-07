@@ -14,7 +14,7 @@ import {
   uneDatetime,
   uneDatetimeMoinsRecente
 } from '../../fixtures/date.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
+import { unJeune, unJeuneSansConseiller } from '../../fixtures/jeune.fixture'
 import {
   unDetailJeuneQueryModel,
   unResumeActionDUnJeune
@@ -45,9 +45,6 @@ describe('JeuneSqlRepository', () => {
       // Given
       jeune = { ...unJeune(), tokenLastUpdate: uneDatetime }
       const conseillerDto = unConseillerDto({
-        id: jeune.conseiller.id,
-        prenom: jeune.conseiller.firstName,
-        nom: jeune.conseiller.lastName,
         structure: Core.Structure.POLE_EMPLOI
       })
       await ConseillerSqlModel.creer(conseillerDto)
@@ -81,6 +78,55 @@ describe('JeuneSqlRepository', () => {
     })
   })
 
+  describe('getJeunes', () => {
+    let jeune1: Jeune
+    let jeune2: Jeune
+
+    beforeEach(async () => {
+      // Given
+      jeune1 = unJeuneSansConseiller({ id: '1' })
+      jeune2 = unJeuneSansConseiller({ id: '2' })
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: '1',
+          idConseiller: undefined,
+          dateCreation: jeune2.creationDate.toJSDate(),
+          pushNotificationToken: 'unToken',
+          dateDerniereActualisationToken: uneDatetime.toJSDate()
+        })
+      )
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: '2',
+          idConseiller: undefined,
+          dateCreation: jeune2.creationDate.toJSDate(),
+          pushNotificationToken: 'unToken',
+          dateDerniereActualisationToken: uneDatetime.toJSDate()
+        })
+      )
+    })
+    describe('quand les jeunes existent', () => {
+      it('retourne la liste des jeunes', async () => {
+        // When
+        const result = await jeuneSqlRepository.getJeunes(['1', '2'])
+
+        // Then
+        expect(result.length).to.equal(2)
+        expect(result).to.deep.include.members([jeune1, jeune2])
+      })
+    })
+
+    describe("quand aucun jeune n'existe", () => {
+      it('retourne une liste vide', async () => {
+        // When
+        const result = await jeuneSqlRepository.getJeunes(['FAUX_ID'])
+
+        // Then
+        expect(result).to.deep.equal([])
+      })
+    })
+  })
+
   describe('existe', () => {
     let jeune: Jeune
 
@@ -88,9 +134,6 @@ describe('JeuneSqlRepository', () => {
       // Given
       jeune = { ...unJeune(), tokenLastUpdate: uneDatetime }
       const conseillerDto = unConseillerDto({
-        id: jeune.conseiller.id,
-        prenom: jeune.conseiller.firstName,
-        nom: jeune.conseiller.lastName,
         structure: Core.Structure.POLE_EMPLOI
       })
       await ConseillerSqlModel.creer(conseillerDto)
@@ -129,16 +172,10 @@ describe('JeuneSqlRepository', () => {
 
     beforeEach(async () => {
       // Given
-      jeune = { ...unJeune(), tokenLastUpdate: uneDatetime }
-      const conseillerDto = unConseillerDto({
-        id: jeune.conseiller.id,
-        prenom: jeune.conseiller.firstName,
-        nom: jeune.conseiller.lastName,
-        structure: Core.Structure.POLE_EMPLOI
-      })
-      await ConseillerSqlModel.creer(conseillerDto)
+      jeune = unJeuneSansConseiller()
       await JeuneSqlModel.creer(
         unJeuneDto({
+          idConseiller: undefined,
           dateCreation: jeune.creationDate.toJSDate(),
           pushNotificationToken: 'unToken',
           dateDerniereActualisationToken: uneDatetime.toJSDate()

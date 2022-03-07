@@ -94,10 +94,10 @@ export namespace Action {
         }
       } else {
         createur = {
-          id: jeune.conseiller.id,
+          id: jeune.conseiller!.id,
           type: Action.TypeCreateur.CONSEILLER,
-          nom: jeune.conseiller.lastName,
-          prenom: jeune.conseiller.firstName
+          nom: jeune.conseiller!.lastName,
+          prenom: jeune.conseiller!.firstName
         }
       }
 

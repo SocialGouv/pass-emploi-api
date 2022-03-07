@@ -27,7 +27,7 @@ export class JeuneDto extends Model {
 
   @ForeignKey(() => ConseillerSqlModel)
   @Column({ field: 'id_conseiller', type: DataType.STRING })
-  idConseiller!: string
+  idConseiller?: string
 
   @Column({ field: 'date_creation', type: DataType.DATE })
   dateCreation!: Date
@@ -51,7 +51,7 @@ export class JeuneDto extends Model {
 @Table({ timestamps: false, tableName: 'jeune' })
 export class JeuneSqlModel extends JeuneDto {
   @BelongsTo(() => ConseillerSqlModel)
-  conseiller!: ConseillerSqlModel
+  conseiller?: ConseillerSqlModel
 
   @HasMany(() => RendezVousSqlModel)
   rendezVous!: RendezVousSqlModel[]

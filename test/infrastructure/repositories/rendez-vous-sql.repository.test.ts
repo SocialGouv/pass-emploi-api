@@ -33,7 +33,7 @@ describe('RendezVousRepositorySql', () => {
 
     // Given
     jeune = unJeune()
-    await ConseillerSqlModel.creer(unConseillerDto({ id: jeune.conseiller.id }))
+    await ConseillerSqlModel.creer(unConseillerDto())
     await JeuneSqlModel.creer(unJeuneDto())
 
     unRendezVousPasse = unRendezVousDto({
@@ -156,7 +156,7 @@ describe('RendezVousRepositorySql', () => {
       //When
       const rendezVous =
         await rendezVousRepositorySql.getAllQueryModelsByConseiller(
-          jeune.conseiller.id
+          jeune.conseiller!.id
         )
       // Then
       expect(rendezVous.passes.length).to.equal(2)
@@ -169,7 +169,7 @@ describe('RendezVousRepositorySql', () => {
       //When
       const rendezVous =
         await rendezVousRepositorySql.getAllQueryModelsByConseiller(
-          jeune.conseiller.id
+          jeune.conseiller!.id
         )
       // Then
       expect(rendezVous.futurs.length).to.equal(2)
@@ -182,7 +182,7 @@ describe('RendezVousRepositorySql', () => {
       //When
       const rendezVous =
         await rendezVousRepositorySql.getAllQueryModelsByConseiller(
-          jeune.conseiller.id,
+          jeune.conseiller!.id,
           false
         )
       // Then

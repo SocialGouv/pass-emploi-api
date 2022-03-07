@@ -10,7 +10,7 @@ import { IdService } from 'src/utils/id-service'
 import { Action } from '../../domain/action'
 import { Authentification } from '../../domain/authentification'
 import { NotFound } from '../../domain/erreur'
-import { Jeune, JeuneSansConseiller } from '../../domain/jeune'
+import { Jeune } from '../../domain/jeune'
 import { ActionSqlModel } from '../sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
@@ -21,7 +21,6 @@ import {
   fromSqlToDetailJeuneQueryModel,
   fromSqlToJeune,
   fromSqlToJeuneHomeQueryModel,
-  fromSqlToJeuneSansConseiller,
   toDetailJeunQueryModel,
   toResumeActionsDuJeuneQueryModel,
   toSqlJeune
@@ -57,8 +56,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
 
   async getByEmail(email: string): Promise<Jeune | undefined> {
     const jeuneSqlModel = await JeuneSqlModel.findOne({
-      where: { email },
-      include: [ConseillerSqlModel]
+      where: { email }
     })
     if (!jeuneSqlModel) {
       return undefined
@@ -83,9 +81,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
     }
   }
 
-  async getJeunesSansConseiller(
-    idsJeune: string[]
-  ): Promise<JeuneSansConseiller[]> {
+  async getJeunes(idsJeune: string[]): Promise<Jeune[]> {
     const jeunesSqlModel = await JeuneSqlModel.findAll({
       where: {
         id: {
@@ -93,7 +89,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
         }
       }
     })
-    return jeunesSqlModel.map(fromSqlToJeuneSansConseiller)
+    return jeunesSqlModel.map(fromSqlToJeune)
   }
 
   async creerTransferts(
@@ -161,7 +157,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
       id: jeune.id,
       nom: jeune.lastName,
       prenom: jeune.firstName,
-      idConseiller: jeune.conseiller.id,
+      idConseiller: jeune.conseiller!.id,
       pushNotificationToken: jeune.pushNotificationToken ?? null,
       dateCreation: jeune.creationDate.toJSDate(),
       dateDerniereActualisationToken: jeune.tokenLastUpdate?.toJSDate() ?? null,
