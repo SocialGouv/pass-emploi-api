@@ -3,7 +3,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { firstValueFrom } from 'rxjs'
-import { ErreurHttpMilo } from '../../building-blocks/types/domain-error'
+import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -53,7 +53,7 @@ export class MiloHttpRepository implements Milo.Repository {
     } catch (e) {
       this.logger.error(e)
       if (e.response?.status >= 400 && e.response?.status <= 404) {
-        const erreur = new ErreurHttpMilo(
+        const erreur = new ErreurHttp(
           e.response.data?.message,
           e.response.status
         )
@@ -77,7 +77,7 @@ export class MiloHttpRepository implements Milo.Repository {
       this.logger.error(e)
 
       if (e.response?.status >= 400 && e.response?.status <= 404) {
-        const erreur = new ErreurHttpMilo(
+        const erreur = new ErreurHttp(
           e.response.data?.message,
           e.response.status
         )

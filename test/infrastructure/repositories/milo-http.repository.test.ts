@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios'
 import { expect } from 'chai'
 import * as nock from 'nock'
-import { ErreurHttpMilo } from '../../../src/building-blocks/types/domain-error'
+import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -85,7 +85,7 @@ describe('MiloHttpRepository', () => {
 
         // Then
         expect(dossier).to.deep.equal(
-          failure(new ErreurHttpMilo('un message', 404))
+          failure(new ErreurHttp('un message', 404))
         )
       })
     })
@@ -122,7 +122,7 @@ describe('MiloHttpRepository', () => {
 
             // Then
             expect(dossier).to.deep.equal(
-              failure(new ErreurHttpMilo('le mail est pas bon john', 400))
+              failure(new ErreurHttp('le mail est pas bon john', 400))
             )
           })
         })

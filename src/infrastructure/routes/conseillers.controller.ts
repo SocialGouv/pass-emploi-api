@@ -11,8 +11,7 @@ import {
   NotFoundException,
   Param,
   Post,
-  Query,
-  UnauthorizedException
+  Query
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -43,12 +42,11 @@ import { RendezVousConseillerQueryModel } from '../../application/queries/query-
 import {
   DroitsInsuffisants,
   EmailExisteDejaError,
-  ErreurHttpMilo,
+  ErreurHttp,
   JeuneNonLieAuConseillerError,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import {
-  Failure,
   isFailure,
   isSuccess,
   Result
@@ -378,8 +376,11 @@ export class ConseillersController {
     )
 
     if (isFailure(result)) {
-      if (result.error.code === ErreurHttpMilo.CODE) {
-        transmettreLesErreursHttpMilo(result)
+      if (result.error.code === ErreurHttp.CODE) {
+        throw new HttpException(
+          result.error.message,
+          (result.error as ErreurHttp).statusCode
+        )
       }
       throw new RuntimeException(result.error.message)
     }
@@ -398,8 +399,11 @@ export class ConseillersController {
     )
 
     if (isFailure(result)) {
-      if (result.error.code === ErreurHttpMilo.CODE) {
-        transmettreLesErreursHttpMilo(result)
+      if (result.error.code === ErreurHttp.CODE) {
+        throw new HttpException(
+          result.error.message,
+          (result.error as ErreurHttp).statusCode
+        )
       }
       throw new RuntimeException(result.error.message)
     }
@@ -434,20 +438,13 @@ export class ConseillersController {
     )
 
     if (isFailure(result)) {
+      if (result.error.code === ErreurHttp.CODE) {
+        throw new HttpException(
+          result.error.message,
+          (result.error as ErreurHttp).statusCode
+        )
+      }
       throw new RuntimeException(result.error.message)
     }
-  }
-}
-
-function transmettreLesErreursHttpMilo(result: Failure): void {
-  switch ((result.error as ErreurHttpMilo).statusCode) {
-    case 401:
-      throw new UnauthorizedException(result.error.message)
-    case 403:
-      throw new ForbiddenException(result.error.message)
-    case 404:
-      throw new NotFoundException(result.error.message)
-    default:
-      throw new BadRequestException(result.error.message)
   }
 }
