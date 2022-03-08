@@ -1,13 +1,18 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Get,
+  HttpCode,
   NotFoundException,
   Param,
-  Query
+  Post,
+  Query,
+  SetMetadata,
+  UseGuards
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOAuth2, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger'
 import {
   DetailOffreImmersionQueryModel,
   OffreImmersionQueryModel
@@ -22,13 +27,19 @@ import {
   RechercheOffreInvalide
 } from '../../building-blocks/types/domain-error'
 import { isSuccess } from '../../building-blocks/types/result'
-import { GetOffresImmersionQueryParams } from './validation/offres-immersion.inputs'
+import {
+  GetOffresImmersionQueryParams,
+  NouvellesOffresImmersions
+} from './validation/offres-immersion.inputs'
 import {
   GetDetailOffreImmersionQuery,
   GetDetailOffreImmersionQueryHandler
 } from '../../application/queries/get-detail-offre-immersion.query.handler'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
+import { SkipOidcAuth } from '../decorators/skip-oidc-auth.decorator'
+import { NotifierNouvellesImmersionsCommandHandler } from '../../application/commands/notifier-nouvelles-immersions.command.handler'
+import { ApiKeyAuthGuard } from '../auth/api-key.auth-guard'
 
 @Controller('offres-immersion')
 @ApiOAuth2([])
@@ -36,7 +47,8 @@ import { Authentification } from '../../domain/authentification'
 export class OffresImmersionController {
   constructor(
     private readonly getDetailOffreImmersionQueryHandler: GetDetailOffreImmersionQueryHandler,
-    private readonly getOffresImmersionQueryHandler: GetOffresImmersionQueryHandler
+    private readonly getOffresImmersionQueryHandler: GetOffresImmersionQueryHandler,
+    private readonly notifierNouvellesImmersionsCommandHandler: NotifierNouvellesImmersionsCommandHandler
   ) {}
 
   @Get()
@@ -98,5 +110,22 @@ export class OffresImmersionController {
     }
 
     throw new RuntimeException(result.error.message)
+  }
+
+  @SkipOidcAuth()
+  @UseGuards(ApiKeyAuthGuard)
+  @ApiSecurity('api_key')
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.IMMERSION
+  )
+  @Post()
+  @HttpCode(202)
+  async notifierNouvellesImmersions(
+    @Body() nouvellesImmersions: NouvellesOffresImmersions
+  ): Promise<void> {
+    this.notifierNouvellesImmersionsCommandHandler.execute({
+      immersions: nouvellesImmersions.immersions
+    })
   }
 }

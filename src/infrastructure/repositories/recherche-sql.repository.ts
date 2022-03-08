@@ -168,6 +168,55 @@ export class RechercheSqlRepository implements Recherche.Repository {
     return !!rechercheSqlModel
   }
 
+  async trouverLesRecherchesImmersions(
+    criteres: GetOffresImmersionQuery,
+    limit: number,
+    offset: number
+  ): Promise<Recherche[]> {
+    const point = {
+      type: 'Point',
+      coordinates: [criteres.lon, criteres.lat]
+    }
+
+    const rechercheSqlModels = await RechercheSqlModel.findAll({
+      attributes: {
+        exclude: ['geometrie']
+      },
+      order: [['dateCreation', 'ASC']],
+      limit,
+      offset,
+      where: {
+        [Op.and]: [
+          { type: Recherche.Type.OFFRES_IMMERSION },
+          {
+            criteres: {
+              rome: {
+                [Op.eq]: criteres.rome
+              }
+            }
+          },
+          Sequelize.literal(`ST_CONTAINS(geometrie, ST_SetSRID(
+        st_geomfromgeojson('${JSON.stringify(point)}'),4326)::geometry)`)
+        ]
+      }
+    })
+
+    return rechercheSqlModels.map(rechercheSql => ({
+      id: rechercheSql.id,
+      idJeune: rechercheSql.idJeune,
+      type: rechercheSql.type,
+      titre: rechercheSql.titre,
+      metier: rechercheSql.metier ?? undefined,
+      localisation: rechercheSql.localisation ?? undefined,
+      criteres: rechercheSql.criteres as GetOffresImmersionQuery,
+      etat: rechercheSql.etatDerniereRecherche,
+      dateDerniereRecherche: DateTime.fromJSDate(
+        rechercheSql.dateDerniereRecherche
+      ).toUTC(),
+      dateCreation: DateTime.fromJSDate(rechercheSql.dateCreation).toUTC()
+    }))
+  }
+
   private async createGeometrie(
     idRecherche: string,
     distance: number,

@@ -28,6 +28,13 @@ export const criteresImmersionNice = {
   distance: 15
 }
 
+export const criteresImmersionParis = {
+  rome: 'string',
+  lat: 48.86898523985519,
+  lon: 2.3341860274142405,
+  distance: 25
+}
+
 export const geometrieNice = [
   [
     [7.423767113317894, 43.689918084407125],

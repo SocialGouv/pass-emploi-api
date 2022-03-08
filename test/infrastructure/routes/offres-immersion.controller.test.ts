@@ -1,5 +1,6 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import * as request from 'supertest'
+import { NotifierNouvellesImmersionsCommandHandler } from '../../../src/application/commands/notifier-nouvelles-immersions.command.handler'
 import {
   GetOffresImmersionQuery,
   GetOffresImmersionQueryHandler
@@ -15,6 +16,7 @@ import {
 } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
+import { offreImmersionDto } from '../../fixtures/offre-immersion.dto.fixture'
 import {
   buildTestingModuleForHttpTesting,
   expect,
@@ -30,6 +32,7 @@ import {
 describe('OffresImmersionController', () => {
   let getOffresImmersionQueryHandler: StubbedClass<GetOffresImmersionQueryHandler>
   let getDetailOffreImmersionQueryHandler: StubbedClass<GetDetailOffreImmersionQueryHandler>
+  let notifierNouvellesImmersionsCommandHandler: StubbedClass<NotifierNouvellesImmersionsCommandHandler>
   let app: INestApplication
 
   before(async () => {
@@ -37,11 +40,17 @@ describe('OffresImmersionController', () => {
     getDetailOffreImmersionQueryHandler = stubClass(
       GetDetailOffreImmersionQueryHandler
     )
+    notifierNouvellesImmersionsCommandHandler = stubClass(
+      NotifierNouvellesImmersionsCommandHandler
+    )
+
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(GetOffresImmersionQueryHandler)
       .useValue(getOffresImmersionQueryHandler)
       .overrideProvider(GetDetailOffreImmersionQueryHandler)
       .useValue(getDetailOffreImmersionQueryHandler)
+      .overrideProvider(NotifierNouvellesImmersionsCommandHandler)
+      .useValue(notifierNouvellesImmersionsCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -179,5 +188,44 @@ describe('OffresImmersionController', () => {
       })
     })
     ensureUserAuthenticationFailsIfInvalid('get', '/offres-immersion/1')
+  })
+  describe('POST /offres-immersion', () => {
+    describe('quand le payload est bon', () => {
+      it('appelle la commande et répond 202', async () => {
+        // When
+        await request(app.getHttpServer())
+          .post('/offres-immersion')
+          .send({ immersions: [offreImmersionDto()] })
+          .set({ 'X-API-KEY': 'ceci-est-une-autre-api-key' })
+          // Then
+          .expect(HttpStatus.ACCEPTED)
+
+        expect(
+          notifierNouvellesImmersionsCommandHandler.execute
+        ).to.have.been.calledWithExactly({ immersions: [offreImmersionDto()] })
+      })
+    })
+    describe('quand le payload est pas bon', () => {
+      it('répond 400', async () => {
+        // When
+        await request(app.getHttpServer())
+          .post('/offres-immersion')
+          .send({ immersions: [{ plop: 'john' }] })
+          .set({ 'X-API-KEY': 'ceci-est-une-autre-api-key' })
+          // Then
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+    describe("quand l'api key est pas bonne", () => {
+      it('répond 401', async () => {
+        // When
+        await request(app.getHttpServer())
+          .post('/offres-immersion')
+          .send({ immersions: [offreImmersionDto()] })
+          .set({ 'X-API-KEY': 'ceci-est-une-mauvaise-api-key' })
+          // Then
+          .expect(HttpStatus.UNAUTHORIZED)
+      })
+    })
   })
 })

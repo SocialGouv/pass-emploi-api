@@ -15,33 +15,6 @@ const fromContactMode = {
   IN_PERSON: OffresImmersion.MethodeDeContact.PRESENTIEL
 }
 
-interface OffreImmpersionDto {
-  id: string
-  rome: string
-  romeLabel: string
-  naf: string
-  nafLabel: string
-  siret: string
-  name: string
-  voluntaryToImmersion: boolean
-  location?: { lat: number; lon: number }
-  address: string
-  city: string
-  distance_m?: number
-  contactId?: string
-  contactMode?: 'UNKNOWN' | 'EMAIL' | 'PHONE' | 'IN_PERSON'
-  contactDetails:
-    | {
-        id: string
-        lastName: string
-        firstName: string
-        role: string
-        email?: string
-        phone?: string
-      }
-    | undefined
-}
-
 export function fromSqlToFavorisOffresImmersionIdsQueryModels(
   favorisIdsSql: FavoriOffreImmersionSqlModel[]
 ): FavoriOffreImmersionIdQueryModel[] {
@@ -63,7 +36,7 @@ export function fromSqlToOffreImmersion(
 }
 
 export function toOffreImmersionQueryModel(
-  offresImmersionDto: OffreImmpersionDto
+  offresImmersionDto: OffresImmersion.Partenaire.Dto
 ): OffreImmersionQueryModel {
   return {
     id: offresImmersionDto.id,
@@ -75,7 +48,7 @@ export function toOffreImmersionQueryModel(
 }
 
 export function toDetailOffreImmersionQueryModel(
-  offreImmpersionDto: OffreImmpersionDto
+  offreImmpersionDto: OffresImmersion.Partenaire.Dto
 ): DetailOffreImmersionQueryModel {
   return {
     id: offreImmpersionDto.id,
@@ -91,7 +64,7 @@ export function toDetailOffreImmersionQueryModel(
 }
 
 export function buildLocalisation(
-  offreImmpersionDto: OffreImmpersionDto
+  offreImmpersionDto: OffresImmersion.Partenaire.Dto
 ): LocalisationQueryModel | undefined {
   if (!offreImmpersionDto.location) {
     return undefined
@@ -103,7 +76,7 @@ export function buildLocalisation(
 }
 
 export function buildContact(
-  offreImmpersionDto: OffreImmpersionDto
+  offreImmpersionDto: OffresImmersion.Partenaire.Dto
 ): ContactImmersionQueryModel | undefined {
   if (!offreImmpersionDto.contactDetails) {
     return undefined

@@ -17,6 +17,13 @@ export namespace Authentification {
     SUPERVISEUR = 'SUPERVISEUR'
   }
 
+  export const METADATA_IDENTIFIER_API_KEY_PARTENAIRE = 'partenaire'
+
+  export enum Partenaire {
+    KEYCLOAK = 'KEYCLOAK',
+    IMMERSION = 'IMMERSION'
+  }
+
   export const mappedRoles: { [roleKeycloak: string]: Role } = {
     conseiller_superviseur: Role.SUPERVISEUR
   }
