@@ -14,6 +14,6 @@ export namespace Milo {
 
   export interface Repository {
     getDossier(id: string): Promise<Result<Dossier>>
-    creerJeune(idDossier: string, email: string): Promise<Result>
+    creerJeune(idDossier: string): Promise<Result>
   }
 }

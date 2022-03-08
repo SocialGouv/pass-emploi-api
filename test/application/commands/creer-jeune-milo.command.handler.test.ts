@@ -7,7 +7,7 @@ import {
   CreerJeuneMiloCommand,
   CreerJeuneMiloCommandHandler
 } from '../../../src/application/commands/creer-jeune-milo.command.handler'
-import { ErreurHttpMilo } from '../../../src/building-blocks/types/domain-error'
+import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -71,7 +71,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
           idConseiller: 'idConseiller'
         }
         miloRepository.creerJeune
-          .withArgs(command.idDossier, command.email)
+          .withArgs(command.idDossier)
           .resolves(emptySuccess())
 
         // When
@@ -103,7 +103,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
           idConseiller: 'idConseiller'
         }
         miloRepository.creerJeune
-          .withArgs(command.idDossier, 'jeune.nom@email.com')
+          .withArgs(command.idDossier)
           .resolves(emptySuccess())
 
         // When
@@ -136,7 +136,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
           email: 'email',
           idConseiller: 'idConseiller'
         }
-        const echec = failure(new ErreurHttpMilo(command.email, 400))
+        const echec = failure(new ErreurHttp(command.email, 400))
         miloRepository.creerJeune.resolves(echec)
 
         // When

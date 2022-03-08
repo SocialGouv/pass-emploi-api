@@ -23,7 +23,7 @@ import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/querie
 import { GetJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-jeunes-by-conseiller.query.handler'
 import {
   DroitsInsuffisants,
-  ErreurHttpMilo,
+  ErreurHttp,
   JeuneNonLieAuConseillerError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
@@ -654,7 +654,7 @@ describe('ConseillersController', () => {
         // Given
         getDossierMiloJeuneQueryHandler.execute
           .withArgs({ idDossier: '2' }, unUtilisateurDecode())
-          .resolves(failure(new ErreurHttpMilo('Pas trouvé', 404)))
+          .resolves(failure(new ErreurHttp('Pas trouvé', 404)))
 
         // When - Then
         await request(app.getHttpServer())
@@ -701,7 +701,7 @@ describe('ConseillersController', () => {
         // Given
         // Given
         creerJeuneMiloCommandHandler.execute.resolves(
-          failure(new ErreurHttpMilo('email pas bon', 400))
+          failure(new ErreurHttp('email pas bon', 400))
         )
 
         // When - Then

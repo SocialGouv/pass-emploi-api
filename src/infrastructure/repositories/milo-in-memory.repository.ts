@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { ErreurHttpMilo } from '../../building-blocks/types/domain-error'
+import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -21,15 +21,15 @@ export class MiloInMemoryRepository implements Milo.Repository {
     if (dossier) {
       return success(dossier)
     }
-    return failure(new ErreurHttpMilo('pas trouvé le dossier john', 404))
+    return failure(new ErreurHttp('pas trouvé le dossier john', 404))
   }
 
-  async creerJeune(idDossier: string, email: string): Promise<Result> {
+  async creerJeune(idDossier: string): Promise<Result> {
     switch (idDossier) {
       case '1':
         return emptySuccess()
       case '3':
-        return failure(new ErreurHttpMilo(email, 400))
+        return failure(new ErreurHttp('email', 400))
       default:
         return emptySuccess()
     }

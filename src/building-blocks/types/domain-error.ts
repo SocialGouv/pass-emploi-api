@@ -110,18 +110,6 @@ export class DroitsInsuffisants implements DomainError {
   readonly message: string = "Vous n'avez pas le droit d'effectuer cette action"
 }
 
-export class ErreurHttpMilo implements DomainError {
-  static CODE = 'ERREUR_HTTP_MILO'
-  readonly code: string = ErreurHttpMilo.CODE
-  readonly statusCode: number
-  readonly message: string
-
-  constructor(message: string, statusCode: number) {
-    this.message = message
-    this.statusCode = statusCode
-  }
-}
-
 export class ErreurHttp implements DomainError {
   static CODE = 'ERREUR_HTTP'
   readonly code: string = ErreurHttp.CODE
