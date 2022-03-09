@@ -405,6 +405,9 @@ export class ConseillersController {
           (result.error as ErreurHttp).statusCode
         )
       }
+      if (result.error.code === EmailExisteDejaError.CODE) {
+        throw new HttpException(result.error.message, 409)
+      }
       throw new RuntimeException(result.error.message)
     }
 

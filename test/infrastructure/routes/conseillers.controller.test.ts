@@ -23,6 +23,7 @@ import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/querie
 import { GetJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-jeunes-by-conseiller.query.handler'
 import {
   DroitsInsuffisants,
+  EmailExisteDejaError,
   ErreurHttp,
   JeuneNonLieAuConseillerError,
   NonTrouveError
@@ -700,6 +701,13 @@ describe('ConseillersController', () => {
       it('renvoie 400', async () => {
         // Given
         // Given
+        const command: CreerJeuneMiloCommand = {
+          idDossier: 'ID400',
+          nom: 'nom',
+          prenom: 'prenom',
+          email: 'email',
+          idConseiller: 'idConseiller'
+        }
         creerJeuneMiloCommandHandler.execute.resolves(
           failure(new ErreurHttp('email pas bon', 400))
         )
@@ -707,8 +715,33 @@ describe('ConseillersController', () => {
         // When - Then
         await request(app.getHttpServer())
           .post('/conseillers/milo/jeunes')
+          .send(command)
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    describe('quand le mail existe déja', () => {
+      it('renvoie 409', async () => {
+        // Given
+        const command: CreerJeuneMiloCommand = {
+          idDossier: 'ID409',
+          nom: 'nom',
+          prenom: 'prenom',
+          email: 'email',
+          idConseiller: 'idConseiller'
+        }
+
+        creerJeuneMiloCommandHandler.execute.resolves(
+          failure(new EmailExisteDejaError('test@test.fr'))
+        )
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/conseillers/milo/jeunes')
+          .send(command)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.CONFLICT)
       })
     })
 
