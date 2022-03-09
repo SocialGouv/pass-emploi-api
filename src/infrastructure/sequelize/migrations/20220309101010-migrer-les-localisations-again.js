@@ -48,8 +48,7 @@ module.exports = {
     await queryInterface.sequelize.query(
       `UPDATE recherche
        SET geometrie = null
-       WHERE geometrie is not null AND (type = 'OFFRES_EMPLOI'
-            OR type = 'OFFRES_ALTERNANCE');`
+       WHERE type = 'OFFRES_EMPLOI' OR type = 'OFFRES_ALTERNANCE';`
     )
   }
 }
