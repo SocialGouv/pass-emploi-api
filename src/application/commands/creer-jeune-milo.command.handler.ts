@@ -1,7 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { isFailure, Result, success } from '../../building-blocks/types/result'
+import {
+  failure,
+  isFailure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
@@ -12,6 +17,7 @@ import { Milo, MiloRepositoryToken } from '../../domain/milo'
 import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { EmailExisteDejaError } from '../../building-blocks/types/domain-error'
 
 export interface CreerJeuneMiloCommand extends Command {
   idDossier: string
@@ -47,6 +53,10 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
       throw new NotFound(command.idConseiller, 'Conseiller')
     }
     const lowerCaseEmail = command.email.toLocaleLowerCase()
+    const jeune = await this.jeuneRepository.getByEmail(lowerCaseEmail)
+    if (jeune) {
+      return failure(new EmailExisteDejaError(lowerCaseEmail))
+    }
 
     const result = await this.miloRepository.creerJeune(command.idDossier)
 
@@ -54,7 +64,7 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
       return result
     }
 
-    const jeune: Jeune = {
+    const nouveauJeune: Jeune = {
       id: this.idService.uuid(),
       firstName: command.prenom,
       lastName: command.nom,
@@ -63,13 +73,13 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
       conseiller,
       structure: Core.Structure.MILO
     }
-    await this.jeuneRepository.save(jeune)
+    await this.jeuneRepository.save(nouveauJeune)
     await this.chatRepository.initializeChatIfNotExists(
-      jeune.id,
-      jeune.conseiller!.id
+      nouveauJeune.id,
+      nouveauJeune.conseiller!.id
     )
 
-    return success({ id: jeune.id })
+    return success({ id: nouveauJeune.id })
   }
 
   async authorize(
