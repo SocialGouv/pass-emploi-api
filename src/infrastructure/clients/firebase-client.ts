@@ -107,14 +107,19 @@ export class FirebaseClient implements IFirebaseClient {
     try {
       await this.firestore.runTransaction(async t => {
         const conversations = this.firestore.collection(FIREBASE_CHAT_PATH)
-        const conversationsCibles = await conversations
-          .where('jeuneId', 'in', jeuneIds)
-          .get()
 
-        for (const conversationCible of conversationsCibles.docs) {
-          t.update(conversations.doc(conversationCible.id), {
-            conseillerId: conseillerCibleId
-          })
+        const jeunesIdsPar10: string[][] = chunk(jeuneIds)
+
+        for (const ids of jeunesIdsPar10) {
+          const conversationsCibles = await conversations
+            .where('jeuneId', 'in', ids)
+            .get()
+
+          for (const conversationCible of conversationsCibles.docs) {
+            t.update(conversations.doc(conversationCible.id), {
+              conseillerId: conseillerCibleId
+            })
+          }
         }
       })
       this.logger.log(
@@ -128,4 +133,15 @@ export class FirebaseClient implements IFirebaseClient {
       throw e
     }
   }
+}
+
+function chunk(tableau: string[]): string[][] {
+  const chunkSize = 10
+  const resultat: string[][] = []
+
+  for (let i = 0, len = tableau.length; i < len; i += chunkSize) {
+    resultat.push(tableau.slice(i, i + chunkSize))
+  }
+
+  return resultat
 }
