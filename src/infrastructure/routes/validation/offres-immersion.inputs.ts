@@ -73,21 +73,25 @@ export class GetOffresImmersionQueryBody {
 class ContactDetails {
   @ApiProperty()
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   id: string
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   lastName: string
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   firstName: string
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   role: string
 
@@ -115,11 +119,13 @@ class Location {
 class NouvelleOffreImmersion implements OffresImmersion.Partenaire.Dto {
   @ApiProperty()
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   address: string
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   city: string
 
@@ -146,6 +152,7 @@ class NouvelleOffreImmersion implements OffresImmersion.Partenaire.Dto {
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   id: string
 
@@ -157,16 +164,19 @@ class NouvelleOffreImmersion implements OffresImmersion.Partenaire.Dto {
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   naf: string
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   nafLabel: string
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   name: string
 
@@ -177,16 +187,19 @@ class NouvelleOffreImmersion implements OffresImmersion.Partenaire.Dto {
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   romeLabel: string
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   siret: string
 
   @ApiProperty()
   @IsBoolean()
+  @IsOptional()
   @IsNotEmpty()
   voluntaryToImmersion: boolean
 }
