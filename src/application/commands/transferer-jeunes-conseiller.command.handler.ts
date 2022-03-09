@@ -84,17 +84,17 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       jeunes.push(updatedJeune)
     }
 
+    await this.chatRepository.transfererChat(
+      command.idConseillerCible,
+      command.idsJeune
+    )
     await Promise.all([
-      this.jeuneRepository.saveAll(jeunes),
       this.jeuneRepository.creerTransferts(
         command.idConseillerSource,
         command.idConseillerCible,
         command.idsJeune
       ),
-      this.chatRepository.transfererChat(
-        command.idConseillerCible,
-        command.idsJeune
-      )
+      this.jeuneRepository.saveAll(jeunes)
     ])
 
     return emptySuccess()
