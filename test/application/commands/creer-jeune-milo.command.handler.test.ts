@@ -7,7 +7,10 @@ import {
   CreerJeuneMiloCommand,
   CreerJeuneMiloCommandHandler
 } from '../../../src/application/commands/creer-jeune-milo.command.handler'
-import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
+import {
+  EmailExisteDejaError,
+  ErreurHttp
+} from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -24,6 +27,7 @@ import { IdService } from '../../../src/utils/id-service'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { unJeune } from '../../fixtures/jeune.fixture'
 
 describe('CreerJeuneMiloCommandHandler', () => {
   let creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
@@ -60,6 +64,27 @@ describe('CreerJeuneMiloCommandHandler', () => {
   })
 
   describe('handle', () => {
+    describe('quand il existe déjà un jeune avec cet email', () => {
+      it('renvoie une erreur', async () => {
+        // Given
+        const command: CreerJeuneMiloCommand = {
+          idDossier: 'idDossier',
+          nom: 'nom',
+          prenom: 'prenom',
+          email: 'email',
+          idConseiller: 'idConseiller'
+        }
+        jeuneRepository.getByEmail.withArgs(command.email).resolves(unJeune())
+
+        // When
+        const result = await creerJeuneMiloCommandHandler.handle(command)
+
+        // Then
+        expect(result).to.deep.equal(
+          failure(new EmailExisteDejaError(command.email))
+        )
+      })
+    })
     describe("quand il n'existe pas dans Milo", () => {
       it('crée un jeune et initialise le chat si besoin', async () => {
         // Given
