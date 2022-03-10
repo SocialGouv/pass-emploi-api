@@ -4,6 +4,7 @@ import {
   Delete,
   ForbiddenException,
   Get,
+  Headers,
   HttpCode,
   HttpException,
   HttpStatus,
@@ -21,6 +22,7 @@ import {
 } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
 import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler'
+import { GetRendezVousJeunePoleEmploiQueryHandler } from 'src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
 import {
@@ -28,6 +30,7 @@ import {
   OffreEmploiResumeQueryModel
 } from 'src/application/queries/query-models/offres-emploi.query-models'
 import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
+import { Core } from 'src/domain/core'
 import {
   AddFavoriOffreEmploiCommand,
   AddFavoriOffreEmploiCommandHandler
@@ -47,10 +50,11 @@ import {
 import { UpdateNotificationTokenCommandHandler } from '../../application/commands/update-notification-token.command.handler'
 import { GetActionsByJeuneQueryHandler } from '../../application/queries/get-actions-by-jeune.query.handler'
 import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
-import { GetAllRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler'
+import { GetRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler'
 import { ActionQueryModel } from '../../application/queries/query-models/actions.query-model'
 import {
   DroitsInsuffisants,
+  ErreurHttp,
   FavoriExisteDejaError,
   JeuneNonLieAuConseillerError,
   JeunePasInactifError,
@@ -85,7 +89,8 @@ export class JeunesController {
     private readonly getHomeJeuneHandler: GetHomeJeuneHandler,
     private readonly getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
-    private readonly getAllRendezVousJeuneQueryHandler: GetAllRendezVousJeuneQueryHandler,
+    private readonly getRendezVousJeuneQueryHandler: GetRendezVousJeuneQueryHandler,
+    private readonly getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler,
     private readonly getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
     private readonly deleteFavoriCommandHandler: DeleteFavoriOffreEmploiCommandHandler,
@@ -164,12 +169,33 @@ export class JeunesController {
   })
   async getRendezVous(
     @Param('idJeune') idJeune: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @Headers('x-idp-token') idpToken?: string
   ): Promise<RendezVousQueryModel[]> {
-    return this.getAllRendezVousJeuneQueryHandler.execute(
-      { idJeune },
-      utilisateur
-    )
+    if (utilisateur.structure === Core.Structure.POLE_EMPLOI && idpToken) {
+      const result =
+        await this.getRendezVousJeunePoleEmploiQueryHandler.execute(
+          { idJeune, idpToken },
+          utilisateur
+        )
+
+      if (isSuccess(result)) {
+        return result.data
+      }
+      if (isFailure(result)) {
+        if (result.error.code === NonTrouveError.CODE) {
+          throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
+        }
+        if (result.error.code === ErreurHttp.CODE) {
+          throw new HttpException(
+            result.error.message,
+            (result.error as ErreurHttp).statusCode
+          )
+        }
+        throw new RuntimeException(result.error.message)
+      }
+    }
+    return this.getRendezVousJeuneQueryHandler.execute({ idJeune }, utilisateur)
   }
 
   @Post(':idJeune/action')

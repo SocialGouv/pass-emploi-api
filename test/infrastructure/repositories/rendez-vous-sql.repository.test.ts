@@ -111,6 +111,7 @@ describe('RendezVousRepositorySql', () => {
         { code: 'ENTRETIEN_PARTENAIRE', label: 'Entretien par un partenaire' },
         { code: 'INFORMATION_COLLECTIVE', label: 'Information collective' },
         { code: 'VISITE', label: 'Visite' },
+        { code: 'PRESTATION', label: 'Prestation' },
         { code: 'AUTRE', label: 'Autre' }
       ])
     })

@@ -15,6 +15,7 @@ export default () => {
     'postgresql://passemploi:passemploi@localhost:55432/passemploidb'
   const { host, port, database, user, password } = parse(databaseUrl)
   return {
+    environment: process.env.ENVIRONMENT,
     isWeb: process.env.IS_WEB !== 'false',
     isWorker: process.env.IS_WORKER === 'true',
     port: process.env.PORT ? parseInt(process.env.PORT, 10) : 5000,
@@ -46,6 +47,11 @@ export default () => {
       clientSecret: process.env.POLE_EMPLOI_CLIENT_SECRET ?? '',
       scope: process.env.POLE_EMPLOI_SCOPE ?? ''
     },
+    poleEmploiPrestations: {
+      url:
+        process.env.POLE_EMPLOI_PRESTATIONS_API_BASE_URL ??
+        'https://api-r.es-qvr.fr/partenaire/peconnect-gerer-prestations/v1'
+    },
     milo: {
       url: process.env.MILO_API_URL,
       apiKeyRecupererDossier: process.env.MILO_DOSSIER_API_KEY,
@@ -72,7 +78,8 @@ export default () => {
     },
     apiKeys: {
       keycloak: process.env.API_KEY_KEYCLOAK ?? 'ceci-est-une-api-key',
-      immersion: process.env.API_KEY_PARTENAIRE_IMMERSION ?? 'ceci-est-une-autre-api-key'
+      immersion:
+        process.env.API_KEY_PARTENAIRE_IMMERSION ?? 'ceci-est-une-autre-api-key'
     },
     redis: {
       url: process.env.REDIS_URL ?? ''
