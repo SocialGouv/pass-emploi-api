@@ -74,6 +74,27 @@ export class RendezVousQueryModel implements RendezVousBaseQueryModel {
   @ApiProperty()
   presenceConseiller: boolean
 
+  @ApiProperty({ required: false })
+  description?: string
+
+  @ApiProperty({ required: false })
+  telephone?: string
+
+  @ApiProperty({ required: false })
+  theme?: string
+
+  @ApiProperty({ required: false })
+  visio?: boolean
+
+  @ApiProperty({ required: false })
+  annule?: boolean
+
+  @ApiProperty({ required: false })
+  lienVisio?: string
+
+  @ApiProperty({ required: false })
+  agencePE?: boolean
+
   @ApiProperty()
   jeune: JeuneQueryModel
 

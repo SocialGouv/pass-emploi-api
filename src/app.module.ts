@@ -11,6 +11,7 @@ import { FavoriOffresEmploiAuthorizer } from './application/authorizers/authoriz
 import { FavoriOffreEngagementAuthorizer } from './application/authorizers/authorize-favori-offres-engagement'
 import { FavoriOffresImmersionAuthorizer } from './application/authorizers/authorize-favori-offres-immersion'
 import { JeuneAuthorizer } from './application/authorizers/authorize-jeune'
+import { JeunePoleEmploiAuthorizer } from './application/authorizers/authorize-jeune-pole-emploi'
 import { RechercheAuthorizer } from './application/authorizers/authorize-recherche'
 import { RendezVousAuthorizer } from './application/authorizers/authorize-rendezvous'
 import { SupportAuthorizer } from './application/authorizers/authorize-support'
@@ -65,7 +66,8 @@ import { GetOffresEmploiQueryHandler } from './application/queries/get-offres-em
 import { GetOffresImmersionQueryHandler } from './application/queries/get-offres-immersion.query.handler'
 import { GetRecherchesQueryHandler } from './application/queries/get-recherches.query.handler'
 import { GetAllRendezVousConseillerQueryHandler } from './application/queries/get-rendez-vous-conseiller.query.handler'
-import { GetAllRendezVousJeuneQueryHandler } from './application/queries/get-rendez-vous-jeune.query.handler'
+import { GetRendezVousJeunePoleEmploiQueryHandler } from './application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
+import { GetRendezVousJeuneQueryHandler } from './application/queries/get-rendez-vous-jeune.query.handler'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from './application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
 import { GetServicesCiviqueQueryHandler } from './application/queries/get-services-civique.query.handler'
 import { GetTypesRendezVousQueryHandler } from './application/queries/get-types-rendezvous.query.handler'
@@ -101,6 +103,7 @@ import { FirebaseClient } from './infrastructure/clients/firebase-client'
 import { ImmersionClient } from './infrastructure/clients/immersion-client'
 import { MailSendinblueClient } from './infrastructure/clients/mail-sendinblue.client'
 import { PoleEmploiClient } from './infrastructure/clients/pole-emploi-client'
+import { PoleEmploiPrestationsClient } from './infrastructure/clients/pole-emploi-prestations-client'
 import { ActionSqlRepository } from './infrastructure/repositories/action-sql.repository'
 import { AuthentificationSqlRepository } from './infrastructure/repositories/authentification-sql.repository'
 import { ChatFirebaseRepository } from './infrastructure/repositories/chat-firebase.repository'
@@ -171,6 +174,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     PoleEmploiClient,
     ImmersionClient,
     EngagementClient,
+    PoleEmploiPrestationsClient,
     Action.Factory,
     Authentification.Factory,
     WorkerService,
@@ -257,6 +261,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     JeuneAuthorizer,
     RechercheAuthorizer,
     ConseillerForJeuneAuthorizer,
+    JeunePoleEmploiAuthorizer,
     RendezVousAuthorizer,
     SupportAuthorizer,
     FavoriOffreEngagementAuthorizer,
@@ -284,7 +289,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateRendezVousCommandHandler,
     DeleteRendezVousCommandHandler,
     GetAllRendezVousConseillerQueryHandler,
-    GetAllRendezVousJeuneQueryHandler,
+    GetRendezVousJeuneQueryHandler,
+    GetRendezVousJeunePoleEmploiQueryHandler,
     SendNotificationNouveauMessageCommandHandler,
     SendNotificationsNouveauxMessagesCommandHandler,
     DeleteActionCommandHandler,

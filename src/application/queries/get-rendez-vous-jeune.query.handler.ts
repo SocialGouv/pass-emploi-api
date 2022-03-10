@@ -7,13 +7,13 @@ import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseille
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
 
-export interface GetAllRendezVousJeune extends Query {
+export interface GetRendezVousJeuneQuery extends Query {
   idJeune: string
 }
 
 @Injectable()
-export class GetAllRendezVousJeuneQueryHandler extends QueryHandler<
-  GetAllRendezVousJeune,
+export class GetRendezVousJeuneQueryHandler extends QueryHandler<
+  GetRendezVousJeuneQuery,
   RendezVousQueryModel[]
 > {
   constructor(
@@ -22,14 +22,16 @@ export class GetAllRendezVousJeuneQueryHandler extends QueryHandler<
     private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer,
     private jeuneAuthorizer: JeuneAuthorizer
   ) {
-    super('GetAllRendezVousJeuneQueryHandler')
+    super('GetRendezVousJeuneQueryHandler')
   }
 
-  async handle(query: GetAllRendezVousJeune): Promise<RendezVousQueryModel[]> {
+  async handle(
+    query: GetRendezVousJeuneQuery
+  ): Promise<RendezVousQueryModel[]> {
     return this.rendezVousRepository.getAllQueryModelsByJeune(query.idJeune)
   }
   async authorize(
-    query: GetAllRendezVousJeune,
+    query: GetRendezVousJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {

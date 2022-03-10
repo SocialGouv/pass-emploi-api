@@ -15,6 +15,7 @@ export enum CodeTypeRendezVous {
   ENTRETIEN_PARTENAIRE = 'ENTRETIEN_PARTENAIRE',
   INFORMATION_COLLECTIVE = 'INFORMATION_COLLECTIVE',
   VISITE = 'VISITE',
+  PRESTATION = 'PRESTATION',
   AUTRE = 'AUTRE'
 }
 
@@ -25,6 +26,7 @@ export const mapCodeLabelTypeRendezVous: Record<CodeTypeRendezVous, string> = {
   ENTRETIEN_PARTENAIRE: 'Entretien par un partenaire',
   INFORMATION_COLLECTIVE: 'Information collective',
   VISITE: 'Visite',
+  PRESTATION: 'Prestation',
   AUTRE: 'Autre'
 }
 
