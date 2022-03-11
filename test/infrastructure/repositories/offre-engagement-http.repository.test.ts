@@ -1,4 +1,11 @@
 import {
+  JeuneDto,
+  JeuneSqlModel
+} from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { AsSql } from '../../../src/infrastructure/sequelize/types'
+import { uneOffreEngagement } from '../../fixtures/offre-engagement.fixture'
+import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
+import {
   DatabaseForTesting,
   expect,
   StubbedClass,
@@ -8,18 +15,18 @@ import { OffreEngagement } from '../../../src/domain/offre-engagement'
 import { EngagementClient } from '../../../src/infrastructure/clients/engagement-client'
 import { DateTime } from 'luxon'
 import { failure, success } from '../../../src/building-blocks/types/result'
-import { EngagementHttpRepository } from '../../../src/infrastructure/repositories/offre-engagement-http.repository'
+import { EngagementHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-engagement-http.repository'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 
 describe('OffreEngagementRepository', () => {
   DatabaseForTesting.prepare()
-  let engagementHttpRepository: EngagementHttpRepository
+  let engagementHttpSqlRepository: EngagementHttpSqlRepository
   let serviceCiviqueClient: StubbedClass<EngagementClient>
 
   beforeEach(async () => {
     serviceCiviqueClient = stubClass(EngagementClient)
 
-    engagementHttpRepository = new EngagementHttpRepository(
+    engagementHttpSqlRepository = new EngagementHttpSqlRepository(
       serviceCiviqueClient
     )
   })
@@ -69,25 +76,14 @@ describe('OffreEngagementRepository', () => {
         })
 
         // When
-        const result = await engagementHttpRepository.findAll(criteres)
+        const result = await engagementHttpSqlRepository.findAll(criteres)
 
         // Then
         expect(serviceCiviqueClient.get).to.have.been.calledWithExactly(
           'v0/mission/search',
           params
         )
-        expect(result).to.be.deep.equal(
-          success([
-            {
-              dateDeDebut: '2022-02-17T10:00:00.000Z',
-              domaine: 'Informatique',
-              id: 'unId',
-              titre: 'unTitre',
-              ville: 'paris',
-              organisation: 'orga de ouf'
-            }
-          ])
-        )
+        expect(result).to.be.deep.equal(success([uneOffreEngagement()]))
       })
       it('avec la deuxième page', async () => {
         // Given
@@ -130,7 +126,7 @@ describe('OffreEngagementRepository', () => {
         })
 
         // When
-        const result = await engagementHttpRepository.findAll(criteres)
+        const result = await engagementHttpSqlRepository.findAll(criteres)
 
         // Then
         expect(serviceCiviqueClient.get).to.have.been.calledWithExactly(
@@ -170,7 +166,7 @@ describe('OffreEngagementRepository', () => {
         })
 
         // When
-        const result = await engagementHttpRepository.findAll(criteres)
+        const result = await engagementHttpSqlRepository.findAll(criteres)
 
         // Then
         expect(result).to.be.deep.equal(
@@ -213,7 +209,7 @@ describe('OffreEngagementRepository', () => {
 
         // When
         const result =
-          await engagementHttpRepository.getOffreEngagementQueryModelById(
+          await engagementHttpSqlRepository.getOffreEngagementQueryModelById(
             idOffreEngagement
           )
 
@@ -254,7 +250,7 @@ describe('OffreEngagementRepository', () => {
 
         // When
         const result =
-          await engagementHttpRepository.getOffreEngagementQueryModelById(
+          await engagementHttpSqlRepository.getOffreEngagementQueryModelById(
             idOffreEngagement
           )
 
@@ -282,7 +278,7 @@ describe('OffreEngagementRepository', () => {
 
         // When
         const result =
-          await engagementHttpRepository.getOffreEngagementQueryModelById(
+          await engagementHttpSqlRepository.getOffreEngagementQueryModelById(
             idOffreEngagement
           )
 
@@ -291,6 +287,118 @@ describe('OffreEngagementRepository', () => {
           failure(new ErreurHttp('Bad request', 400))
         )
       })
+    })
+  })
+
+  describe('getFavorisIdsQueryModelsByJeune', () => {
+    it('renvoie les id des favoris', async () => {
+      // Given
+      const jeuneDto: AsSql<JeuneDto> = {
+        ...unJeuneDto(),
+        idConseiller: undefined
+      }
+      await JeuneSqlModel.creer(jeuneDto)
+      const offre = uneOffreEngagement()
+      await engagementHttpSqlRepository.saveAsFavori(jeuneDto.id, offre)
+
+      // When
+      const ids =
+        await engagementHttpSqlRepository.getFavorisIdsQueryModelsByJeune(
+          jeuneDto.id
+        )
+
+      // Then
+      expect(ids).to.deep.equal([{ id: offre.id }])
+    })
+  })
+
+  describe('getFavorisQueryModelsByJeune', () => {
+    it('renvoie les favoris query models', async () => {
+      // Given
+      const jeuneDto: AsSql<JeuneDto> = {
+        ...unJeuneDto(),
+        idConseiller: undefined
+      }
+      await JeuneSqlModel.creer(jeuneDto)
+      const offre = uneOffreEngagement()
+      await engagementHttpSqlRepository.saveAsFavori(jeuneDto.id, offre)
+
+      // When
+      const queryModels =
+        await engagementHttpSqlRepository.getFavorisQueryModelsByJeune(
+          jeuneDto.id
+        )
+
+      // Then
+      expect(queryModels).to.deep.equal([uneOffreEngagement()])
+    })
+  })
+
+  describe('getFavori', () => {
+    describe('quand il existe', () => {
+      it('renvoie le favori', async () => {
+        // Given
+        const jeuneDto: AsSql<JeuneDto> = {
+          ...unJeuneDto(),
+          idConseiller: undefined
+        }
+        await JeuneSqlModel.creer(jeuneDto)
+        const offre = uneOffreEngagement()
+        await engagementHttpSqlRepository.saveAsFavori(jeuneDto.id, offre)
+
+        // When
+        const favori = await engagementHttpSqlRepository.getFavori(
+          jeuneDto.id,
+          offre.id
+        )
+
+        // Then
+        expect(favori).to.deep.equal(uneOffreEngagement())
+      })
+    })
+
+    describe('quand il existe pas', () => {
+      it('renvoie undefined', async () => {
+        // Given
+        const jeuneDto: AsSql<JeuneDto> = {
+          ...unJeuneDto(),
+          idConseiller: undefined
+        }
+        await JeuneSqlModel.creer(jeuneDto)
+        const offre = uneOffreEngagement()
+
+        // When
+        const favori = await engagementHttpSqlRepository.getFavori(
+          jeuneDto.id,
+          offre.id
+        )
+
+        // Then
+        expect(favori).to.equal(undefined)
+      })
+    })
+  })
+
+  describe('deleteFavori', () => {
+    it('supprime un favori', async () => {
+      // Given
+      const jeuneDto: AsSql<JeuneDto> = {
+        ...unJeuneDto(),
+        idConseiller: undefined
+      }
+      await JeuneSqlModel.creer(jeuneDto)
+      const offre = uneOffreEngagement()
+      await engagementHttpSqlRepository.saveAsFavori(jeuneDto.id, offre)
+
+      // When
+      await engagementHttpSqlRepository.deleteFavori(jeuneDto.id, offre.id)
+
+      // Then
+      const favori = await engagementHttpSqlRepository.getFavori(
+        jeuneDto.id,
+        offre.id
+      )
+      expect(favori).to.equal(undefined)
     })
   })
 })

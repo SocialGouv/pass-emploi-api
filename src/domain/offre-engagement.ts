@@ -4,8 +4,19 @@ import {
   OffreEngagementQueryModel
 } from '../application/queries/query-models/service-civique.query-models'
 import { DateTime } from 'luxon'
+import { Core } from './core'
+import { Jeune } from './jeune'
 
 export const EngagementRepositoryToken = 'Engagement.Repository'
+
+export interface OffreEngagement {
+  id: string
+  domaine: string
+  titre: string
+  ville?: string
+  organisation?: string
+  dateDeDebut?: string
+}
 
 export namespace OffreEngagement {
   export interface Repository {
@@ -14,6 +25,24 @@ export namespace OffreEngagement {
     getOffreEngagementQueryModelById(
       idOffreEngagement: string
     ): Promise<Result<DetailOffreEngagementQueryModel>>
+
+    getFavorisIdsQueryModelsByJeune(id: Jeune.Id): Promise<Core.Id[]>
+
+    getFavorisQueryModelsByJeune(
+      id: Jeune.Id
+    ): Promise<OffreEngagementQueryModel[]>
+
+    saveAsFavori(
+      idJeune: string,
+      offreEngagement: OffreEngagement
+    ): Promise<void>
+
+    getFavori(
+      idJeune: string,
+      idOffre: string
+    ): Promise<OffreEngagement | undefined>
+
+    deleteFavori(idJeune: string, idOffre: string): Promise<void>
   }
 
   export interface Criteres {

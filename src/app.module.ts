@@ -8,16 +8,19 @@ import { ActionAuthorizer } from './application/authorizers/authorize-action'
 import { ConseillerAuthorizer } from './application/authorizers/authorize-conseiller'
 import { ConseillerForJeuneAuthorizer } from './application/authorizers/authorize-conseiller-for-jeune'
 import { FavoriOffresEmploiAuthorizer } from './application/authorizers/authorize-favori-offres-emploi'
+import { FavoriOffreEngagementAuthorizer } from './application/authorizers/authorize-favori-offres-engagement'
 import { FavoriOffresImmersionAuthorizer } from './application/authorizers/authorize-favori-offres-immersion'
 import { JeuneAuthorizer } from './application/authorizers/authorize-jeune'
 import { RendezVousAuthorizer } from './application/authorizers/authorize-rendezvous'
 import { AddFavoriOffreEmploiCommandHandler } from './application/commands/add-favori-offre-emploi.command.handler'
+import { AddFavoriOffreEngagementCommandHandler } from './application/commands/add-favori-offre-engagement.command.handler'
 import { CreateActionCommandHandler } from './application/commands/create-action.command.handler'
 import { CreerJeunePoleEmploiCommandHandler } from './application/commands/creer-jeune-pole-emploi.command.handler'
 import { CreateRendezVousCommandHandler } from './application/commands/create-rendez-vous.command.handler'
 import { CreerJeuneMiloCommandHandler } from './application/commands/creer-jeune-milo.command.handler'
 import { DeleteActionCommandHandler } from './application/commands/delete-action.command.handler'
 import { DeleteFavoriOffreEmploiCommandHandler } from './application/commands/delete-favori-offre-emploi.command.handler'
+import { DeleteFavoriOffreEngagementCommandHandler } from './application/commands/delete-favori-offre-engagement.command.handler'
 import { DeleteRendezVousCommandHandler } from './application/commands/delete-rendez-vous.command.handler'
 import { HandleJobRendezVousCommandHandler } from './application/commands/jobs/handle-job-rendez-vous.command'
 import { SendNotificationNouveauMessageCommandHandler } from './application/commands/send-notification-nouveau-message.command.handler'
@@ -32,6 +35,7 @@ import { GetDetailConseillerQueryHandler } from './application/queries/get-detai
 import { GetDetailJeuneQueryHandler } from './application/queries/get-detail-jeune.query.handler'
 import { GetDetailOffreEmploiQueryHandler } from './application/queries/get-detail-offre-emploi.query.handler'
 import { GetDossierMiloJeuneQueryHandler } from './application/queries/get-dossier-milo-jeune.query.handler'
+import { GetFavorisOffresEngagementJeuneQueryHandler } from './application/queries/get-favoris-offres-engagement-jeune.query.handler'
 import { GetHomeJeuneHandler } from './application/queries/get-home-jeune.query.handler'
 import { GetJeunesByConseillerQueryHandler } from './application/queries/get-jeunes-by-conseiller.query.handler'
 import { GetOffresEmploiQueryHandler } from './application/queries/get-offres-emploi.query.handler'
@@ -118,7 +122,7 @@ import { ServicesCiviqueController } from './infrastructure/routes/services-civi
 import { EngagementClient } from './infrastructure/clients/engagement-client'
 import { EngagementRepositoryToken } from './domain/offre-engagement'
 import { GetServicesCiviqueQueryHandler } from './application/queries/get-services-civique.query.handler'
-import { EngagementHttpRepository } from './infrastructure/repositories/offre-engagement-http.repository'
+import { EngagementHttpSqlRepository } from './infrastructure/repositories/offre-engagement-http.repository'
 import { HandleNettoyerLesJobsCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-jobs.command'
 import { SendNotificationsNouveauxMessagesCommandHandler } from './application/commands/send-notifications-nouveaux-messages.command.handler'
 import { GetDetailServiceCiviqueQueryHandler } from './application/queries/get-detail-service-civique.query.handler'
@@ -232,7 +236,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: EngagementRepositoryToken,
-      useClass: EngagementHttpRepository
+      useClass: EngagementHttpSqlRepository
     },
     {
       provide: SuperviseursRepositoryToken,
@@ -254,6 +258,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     ConseillerForJeuneAuthorizer,
     RendezVousAuthorizer,
     SupportAuthorizer,
+    FavoriOffreEngagementAuthorizer,
     GetDetailActionQueryHandler,
     GetDetailJeuneQueryHandler,
     GetActionsByJeuneQueryHandler,
@@ -306,7 +311,10 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreerSuperviseursCommandHandler,
     DeleteSuperviseursCommandHandler,
     GetTypesRendezVousQueryHandler,
-    NotifierNouvellesImmersionsCommandHandler
+    NotifierNouvellesImmersionsCommandHandler,
+    AddFavoriOffreEngagementCommandHandler,
+    GetFavorisOffresEngagementJeuneQueryHandler,
+    DeleteFavoriOffreEngagementCommandHandler
   ]
 }
 
