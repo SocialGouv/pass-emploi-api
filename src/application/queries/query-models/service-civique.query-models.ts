@@ -1,7 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { OffreEngagement } from '../../../domain/offre-engagement'
 
-export class OffreEngagementQueryModel {
+export class OffreEngagementQueryModel implements OffreEngagement {
   @ApiProperty()
   id: string
   @ApiProperty({
@@ -10,14 +10,14 @@ export class OffreEngagementQueryModel {
   domaine: string
   @ApiProperty()
   titre: string
-  @ApiProperty()
-  ville: string
-  @ApiProperty()
-  organisation: string
-  @ApiProperty({
+  @ApiPropertyOptional()
+  ville?: string
+  @ApiPropertyOptional()
+  organisation?: string
+  @ApiPropertyOptional({
     example: '2022-02-15T10:12:14.000Z'
   })
-  dateDeDebut: string
+  dateDeDebut?: string
 }
 
 export class DetailOffreEngagementQueryModel {

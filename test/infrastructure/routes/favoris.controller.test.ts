@@ -16,9 +16,18 @@ import {
   AddFavoriOffreEmploiCommandHandler
 } from '../../../src/application/commands/add-favori-offre-emploi.command.handler'
 import {
+  AddFavoriOffreEngagementCommand,
+  AddFavoriOffreEngagementCommandHandler
+} from '../../../src/application/commands/add-favori-offre-engagement.command.handler'
+import {
   DeleteFavoriOffreEmploiCommand,
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
+import {
+  DeleteFavoriOffreEngagementCommand,
+  DeleteFavoriOffreEngagementCommandHandler
+} from '../../../src/application/commands/delete-favori-offre-engagement.command.handler'
+import { GetFavorisOffresEngagementJeuneQueryHandler } from '../../../src/application/queries/get-favoris-offres-engagement-jeune.query.handler'
 import {
   FavoriExisteDejaError,
   FavoriNonTrouveError
@@ -37,6 +46,7 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
+import { uneOffreEngagement } from '../../fixtures/offre-engagement.fixture'
 import {
   buildTestingModuleForHttpTesting,
   expect,
@@ -52,6 +62,9 @@ describe('FavorisController', () => {
   let addFavoriOffreImmersionCommandHandler: StubbedClass<AddFavoriOffreImmersionCommandHandler>
   let deleteFavoriOffreImmersionCommandHandler: StubbedClass<DeleteFavoriOffreImmersionCommandHandler>
   let getFavorisOffresImmersionJeuneQueryHandler: StubbedClass<GetFavorisOffresImmersionJeuneQueryHandler>
+  let addFavoriOffreEngagementCommandHandler: StubbedClass<AddFavoriOffreEngagementCommandHandler>
+  let deleteFavoriOffreEngagementCommandHandler: StubbedClass<DeleteFavoriOffreEngagementCommandHandler>
+  let getFavorisOffresEngagementJeuneQueryHandler: StubbedClass<GetFavorisOffresEngagementJeuneQueryHandler>
   let app: INestApplication
 
   before(async () => {
@@ -75,6 +88,16 @@ describe('FavorisController', () => {
       GetFavorisOffresImmersionJeuneQueryHandler
     )
 
+    addFavoriOffreEngagementCommandHandler = stubClass(
+      AddFavoriOffreEngagementCommandHandler
+    )
+    deleteFavoriOffreEngagementCommandHandler = stubClass(
+      DeleteFavoriOffreEngagementCommandHandler
+    )
+    getFavorisOffresEngagementJeuneQueryHandler = stubClass(
+      GetFavorisOffresEngagementJeuneQueryHandler
+    )
+
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(AddFavoriOffreEmploiCommandHandler)
       .useValue(addFavoriOffreEmploiCommandHandler)
@@ -88,6 +111,12 @@ describe('FavorisController', () => {
       .useValue(deleteFavoriOffreImmersionCommandHandler)
       .overrideProvider(GetFavorisOffresImmersionJeuneQueryHandler)
       .useValue(getFavorisOffresImmersionJeuneQueryHandler)
+      .overrideProvider(AddFavoriOffreEngagementCommandHandler)
+      .useValue(addFavoriOffreEngagementCommandHandler)
+      .overrideProvider(DeleteFavoriOffreEngagementCommandHandler)
+      .useValue(deleteFavoriOffreEngagementCommandHandler)
+      .overrideProvider(GetFavorisOffresEngagementJeuneQueryHandler)
+      .useValue(getFavorisOffresEngagementJeuneQueryHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -351,6 +380,122 @@ describe('FavorisController', () => {
       ensureUserAuthenticationFailsIfInvalid(
         'delete',
         '/jeunes/ABCDE/favoris/offres-immersion/123'
+      )
+    })
+  })
+
+  describe(' Favoris Services Civique', () => {
+    describe('GET /jeunes/:idJeune/favoris/services-civique', () => {
+      it("Renvoie la liste des favoris services civique d'un jeune", async () => {
+        // Given
+        getFavorisOffresEngagementJeuneQueryHandler.execute
+          .withArgs({ idJeune: '1', detail: false }, unUtilisateurDecode())
+          .resolves([])
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/jeunes/1/favoris/services-civique')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(JSON.stringify([]))
+      })
+    })
+
+    describe('POST /jeunes/:idJeune/favoris/services-civique', () => {
+      const offre = uneOffreEngagement()
+      const command: AddFavoriOffreEngagementCommand = {
+        idJeune: 'ABCDE',
+        offre
+      }
+
+      it('crée un favori', async () => {
+        // Given
+        addFavoriOffreEngagementCommandHandler.execute
+          .withArgs(command)
+          .resolves(emptySuccess())
+
+        // When
+        await request(app.getHttpServer())
+          .post('/jeunes/ABCDE/favoris/services-civique')
+          .set('authorization', unHeaderAuthorization())
+          .send(offre)
+
+          // Then
+          .expect(HttpStatus.CREATED)
+        expect(
+          addFavoriOffreEngagementCommandHandler.execute
+        ).to.have.been.calledWithExactly(command, unUtilisateurDecode())
+      })
+      it("renvoie une 409 (Conflict) quand l'offre n'existe pas", async () => {
+        // Given
+        addFavoriOffreEngagementCommandHandler.execute
+          .withArgs(command)
+          .resolves(
+            failure(
+              new FavoriExisteDejaError(command.idJeune, command.offre.id)
+            )
+          )
+
+        // When
+        await request(app.getHttpServer())
+          .post('/jeunes/ABCDE/favoris/services-civique')
+          .set('authorization', unHeaderAuthorization())
+          .send(offre)
+
+          // Then
+          .expect(HttpStatus.CONFLICT)
+      })
+      ensureUserAuthenticationFailsIfInvalid(
+        'post',
+        '/jeunes/ABCDE/favoris/services-civique'
+      )
+    })
+
+    describe('DELETE /jeunes/:idJeune/favoris/services-civique/:idOffre', () => {
+      const offre = uneOffreEngagement()
+      const jeune = unJeune()
+      const command: DeleteFavoriOffreEngagementCommand = {
+        idJeune: jeune.id,
+        idOffre: offre.id
+      }
+      it('supprime le favori', async () => {
+        //Given
+        deleteFavoriOffreEngagementCommandHandler.execute
+          .withArgs(command)
+          .resolves(emptySuccess())
+        //When
+        await request(app.getHttpServer())
+          .delete(`/jeunes/${jeune.id}/favoris/services-civique/${offre.id}`)
+          .set('authorization', unHeaderAuthorization())
+          //Then
+          .expect(HttpStatus.NO_CONTENT)
+        expect(
+          deleteFavoriOffreEngagementCommandHandler.execute
+        ).to.have.be.calledWithExactly(command, unUtilisateurDecode())
+      })
+      it('renvoie une 404(NOT FOUND) si le favori n"existe pas', async () => {
+        //Given
+        deleteFavoriOffreEngagementCommandHandler.execute
+          .withArgs(command)
+          .resolves(
+            failure(new FavoriNonTrouveError(command.idJeune, command.idOffre))
+          )
+
+        const expectedMessageJson = {
+          code: 'FAVORI_NON_TROUVE',
+          message: `Le Favori du jeune ${command.idJeune} correspondant à l'offre ${command.idOffre} n'existe pas`
+        }
+        //When
+        await request(app.getHttpServer())
+          .delete(`/jeunes/${jeune.id}/favoris/services-civique/${offre.id}`)
+          .set('authorization', unHeaderAuthorization())
+          //Then
+          .expect(HttpStatus.NOT_FOUND)
+          .expect(expectedMessageJson)
+      })
+      ensureUserAuthenticationFailsIfInvalid(
+        'delete',
+        '/jeunes/ABCDE/favoris/services-civique/123'
       )
     })
   })

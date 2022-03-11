@@ -211,7 +211,7 @@ export class JeunesController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiIdQueryModel[]> {
     return this.getFavorisOffresEmploiJeuneQueryHandler.execute(
-      { idJeune, detail: getFavorisQuery.detail === 'true' },
+      { idJeune, detail: Boolean(getFavorisQuery.detail) },
       utilisateur
     )
   }

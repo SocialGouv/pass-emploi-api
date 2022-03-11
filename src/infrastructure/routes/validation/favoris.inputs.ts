@@ -1,12 +1,15 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
   IsBoolean,
+  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
   ValidateNested
 } from 'class-validator'
-import { Type } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
+import { OffreEngagement } from '../../../domain/offre-engagement'
+import { transformStringToBoolean } from './utils/transformers'
 
 export class LocalisationPayload {
   @ApiProperty()
@@ -95,16 +98,64 @@ export class AddFavoriImmersionPayload {
   ville: string
 }
 
-export class GetFavorisOffresEmploiQueryParams {
+export class AddFavoriServicesCivique implements OffreEngagement {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  id: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  titre: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  domaine: string
+
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  detail?: string
+  @IsNotEmpty()
+  organisation?: string
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  dateDeDebut?: string
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  ville?: string
+}
+
+export class GetFavorisOffresEmploiQueryParams {
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  @IsIn([true, false])
+  @Transform(params => transformStringToBoolean(params, 'detail'))
+  detail?: boolean
 }
 
 export class GetFavorisOffresImmersionQueryParams {
   @ApiPropertyOptional()
-  @IsString()
+  @IsBoolean()
   @IsOptional()
-  detail?: string
+  @IsIn([true, false])
+  @Transform(params => transformStringToBoolean(params, 'detail'))
+  detail?: boolean
+}
+
+export class GetFavorisServicesCiviqueQueryParams {
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  @IsIn([true, false])
+  @Transform(params => transformStringToBoolean(params, 'detail'))
+  detail?: boolean
 }

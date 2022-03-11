@@ -32,13 +32,22 @@ import {
   AddFavoriOffreEmploiCommandHandler
 } from '../../application/commands/add-favori-offre-emploi.command.handler'
 import {
+  AddFavoriOffreEngagementCommand,
+  AddFavoriOffreEngagementCommandHandler
+} from '../../application/commands/add-favori-offre-engagement.command.handler'
+import {
   DeleteFavoriOffreEmploiCommand,
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../application/commands/delete-favori-offre-emploi.command.handler'
 import {
+  DeleteFavoriOffreEngagementCommand,
+  DeleteFavoriOffreEngagementCommandHandler
+} from '../../application/commands/delete-favori-offre-engagement.command.handler'
+import {
   DeleteFavoriOffreImmersionCommand,
   DeleteFavoriOffreImmersionCommandHandler
 } from '../../application/commands/delete-favori-offre-immersion.command.handler'
+import { GetFavorisOffresEngagementJeuneQueryHandler } from '../../application/queries/get-favoris-offres-engagement-jeune.query.handler'
 import { FavoriExisteDejaError } from '../../building-blocks/types/domain-error'
 import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
@@ -46,8 +55,10 @@ import { Utilisateur } from '../decorators/authenticated.decorator'
 import {
   AddFavoriImmersionPayload,
   AddFavoriOffresEmploiPayload,
+  AddFavoriServicesCivique,
   GetFavorisOffresEmploiQueryParams,
-  GetFavorisOffresImmersionQueryParams
+  GetFavorisOffresImmersionQueryParams,
+  GetFavorisServicesCiviqueQueryParams
 } from './validation/favoris.inputs'
 
 @Controller('jeunes/:idJeune')
@@ -57,10 +68,13 @@ export class FavorisController {
   constructor(
     private readonly getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
     private readonly getFavorisOffresImmersionJeuneQueryHandler: GetFavorisOffresImmersionJeuneQueryHandler,
+    private readonly getFavorisOffresEngagementJeuneQueryHandler: GetFavorisOffresEngagementJeuneQueryHandler,
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
+    private readonly addFavoriOffreImmersionCommandHandler: AddFavoriOffreImmersionCommandHandler,
+    private readonly addFavoriOffreEngagementCommandHandler: AddFavoriOffreEngagementCommandHandler,
     private readonly deleteFavoriOffreEmploiCommandHandler: DeleteFavoriOffreEmploiCommandHandler,
     private readonly deleteFavoriOffreImmersionCommandHandler: DeleteFavoriOffreImmersionCommandHandler,
-    private readonly addFavoriOffreImmersionCommandHandler: AddFavoriOffreImmersionCommandHandler
+    private readonly deleteFavoriOffreEngagementCommandHandler: DeleteFavoriOffreEngagementCommandHandler
   ) {}
 
   @Get('favoris/offres-emploi')
@@ -70,7 +84,7 @@ export class FavorisController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiIdQueryModel[]> {
     return this.getFavorisOffresEmploiJeuneQueryHandler.execute(
-      { idJeune, detail: getFavorisQuery.detail === 'true' },
+      { idJeune, detail: Boolean(getFavorisQuery.detail) },
       utilisateur
     )
   }
@@ -82,7 +96,19 @@ export class FavorisController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffreImmersionQueryModel[] | FavoriOffreImmersionIdQueryModel[]> {
     return this.getFavorisOffresImmersionJeuneQueryHandler.execute(
-      { idJeune, detail: getFavorisQuery.detail === 'true' },
+      { idJeune, detail: Boolean(getFavorisQuery.detail) },
+      utilisateur
+    )
+  }
+
+  @Get('favoris/services-civique')
+  async getFavorisServicesCivique(
+    @Param('idJeune') idJeune: string,
+    @Query() getFavorisQuery: GetFavorisServicesCiviqueQueryParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<OffreImmersionQueryModel[] | FavoriOffreImmersionIdQueryModel[]> {
+    return this.getFavorisOffresEngagementJeuneQueryHandler.execute(
+      { idJeune, detail: Boolean(getFavorisQuery.detail) },
       utilisateur
     )
   }
@@ -147,6 +173,29 @@ export class FavorisController {
     }
   }
 
+  @Post('favoris/services-civique')
+  async postNouveauFavoriServicesCivique(
+    @Param('idJeune') idJeune: string,
+    @Body() addFavoriPayload: AddFavoriServicesCivique,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: AddFavoriOffreEngagementCommand = {
+      idJeune,
+      offre: addFavoriPayload
+    }
+    const result = await this.addFavoriOffreEngagementCommandHandler.execute(
+      command,
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      if (result.error.code === FavoriExisteDejaError.CODE) {
+        throw new HttpException(result.error.message, HttpStatus.CONFLICT)
+      }
+      throw new RuntimeException(result.error.message)
+    }
+  }
+
   @Delete('favoris/offres-emploi/:idOffreEmploi')
   @HttpCode(204)
   async deleteFavoriOffreEmploi(
@@ -180,6 +229,27 @@ export class FavorisController {
     }
 
     const result = await this.deleteFavoriOffreImmersionCommandHandler.execute(
+      command,
+      utilisateur
+    )
+    if (isFailure(result)) {
+      throw new NotFoundException(result.error)
+    }
+  }
+
+  @Delete('favoris/services-civique/:idOffre')
+  @HttpCode(204)
+  async deleteFavoriServiceCivique(
+    @Param('idJeune') idJeune: string,
+    @Param('idOffre') idOffre: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: DeleteFavoriOffreEngagementCommand = {
+      idJeune,
+      idOffre
+    }
+
+    const result = await this.deleteFavoriOffreEngagementCommandHandler.execute(
       command,
       utilisateur
     )

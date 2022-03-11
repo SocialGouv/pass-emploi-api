@@ -2,6 +2,8 @@ import {
   DetailOffreEngagementQueryModel,
   OffreEngagementQueryModel
 } from '../../../application/queries/query-models/service-civique.query-models'
+import { Core } from '../../../domain/core'
+import { FavoriOffreEngagementSqlModel } from '../../sequelize/models/favori-offre-engagement.sql-model'
 import {
   EngagementDto,
   OffreEngagementDto
@@ -38,5 +40,26 @@ export function toDetailOffreEngagementQueryModel(
     description: serviceCiviqueDto.description,
     codePostal: serviceCiviqueDto.postalCode,
     descriptionOrganisation: serviceCiviqueDto.organizationDescription
+  }
+}
+
+export function fromSqlToIds(
+  favoriOffreEngagementSqlModels: FavoriOffreEngagementSqlModel[]
+): Core.Id[] {
+  return favoriOffreEngagementSqlModels.map(favori => {
+    return { id: favori.idOffre }
+  })
+}
+
+export function fromSqlToOffreEngagement(
+  favoriOffreEngagementSqlModel: FavoriOffreEngagementSqlModel
+): OffreEngagementQueryModel {
+  return {
+    id: favoriOffreEngagementSqlModel.idOffre,
+    domaine: favoriOffreEngagementSqlModel.domaine,
+    ville: favoriOffreEngagementSqlModel.ville ?? undefined,
+    titre: favoriOffreEngagementSqlModel.titre,
+    organisation: favoriOffreEngagementSqlModel.organisation ?? undefined,
+    dateDeDebut: favoriOffreEngagementSqlModel.dateDeDebut ?? undefined
   }
 }
