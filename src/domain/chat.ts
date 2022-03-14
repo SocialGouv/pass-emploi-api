@@ -14,5 +14,6 @@ export namespace Chat {
     ): Promise<ChatSecretsQueryModel | undefined>
     getNombreDeConversationsNonLues(conseillerId: string): Promise<number>
     transfererChat(conseillerCibleId: string, jeuneIds: string[]): Promise<void>
+    supprimerChat(idJeune: string): Promise<void>
   }
 }

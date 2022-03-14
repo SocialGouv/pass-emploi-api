@@ -53,6 +53,16 @@ export class JeuneNonLieAuConseillerError implements DomainError {
   }
 }
 
+export class JeunePasInactifError implements DomainError {
+  static CODE = 'JEUNE_PAS_INACTIF'
+  readonly code: string = JeunePasInactifError.CODE
+  readonly message: string
+
+  constructor(idJeune: string) {
+    this.message = `Le jeune ${idJeune} a activé son compte`
+  }
+}
+
 export class EmailExisteDejaError implements DomainError {
   static CODE = 'EMAIL_EXISTE_DEJA'
   readonly code: string = EmailExisteDejaError.CODE

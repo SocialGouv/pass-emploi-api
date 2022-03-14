@@ -62,4 +62,8 @@ export class JeuneSqlModel extends JeuneDto {
   static async creer(jeuneDto: AsSql<JeuneDto>): Promise<void> {
     await JeuneSqlModel.create(jeuneDto)
   }
+
+  static async supprimer(idJeune: string): Promise<void> {
+    await JeuneSqlModel.destroy({ where: { id: idJeune } })
+  }
 }

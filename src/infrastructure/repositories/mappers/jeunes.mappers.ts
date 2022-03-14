@@ -24,30 +24,32 @@ export function fromSqlToDetailJeuneQueryModel(
     lastName: jeuneSqlModel.nom,
     email: jeuneSqlModel.email ?? undefined,
     creationDate: jeuneSqlModel.dateCreation.toISOString(),
-    isActivated: !!jeuneSqlModel.idAuthentification
+    isActivated: Boolean(jeuneSqlModel.idAuthentification)
   }
 }
 
 export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
-  return {
+  const jeune: Jeune = {
     id: jeuneSqlModel.id,
     firstName: jeuneSqlModel.prenom,
     lastName: jeuneSqlModel.nom,
     creationDate: DateTime.fromJSDate(jeuneSqlModel.dateCreation).toUTC(),
+    isActivated: Boolean(jeuneSqlModel.idAuthentification),
     pushNotificationToken: jeuneSqlModel.pushNotificationToken ?? undefined,
     tokenLastUpdate: getTokenLastUpdate(jeuneSqlModel),
-    conseiller: jeuneSqlModel.conseiller
-      ? {
-          id: jeuneSqlModel.conseiller.id,
-          firstName: jeuneSqlModel.conseiller.prenom,
-          lastName: jeuneSqlModel.conseiller.nom,
-          structure: jeuneSqlModel.conseiller.structure,
-          email: jeuneSqlModel.conseiller.email || undefined
-        }
-      : undefined,
     structure: jeuneSqlModel.structure,
     email: jeuneSqlModel.email ?? undefined
   }
+  if (jeuneSqlModel.conseiller) {
+    jeune.conseiller = {
+      id: jeuneSqlModel.conseiller.id,
+      firstName: jeuneSqlModel.conseiller.prenom,
+      lastName: jeuneSqlModel.conseiller.nom,
+      structure: jeuneSqlModel.conseiller.structure,
+      email: jeuneSqlModel.conseiller.email || undefined
+    }
+  }
+  return jeune
 }
 
 export function toSqlJeune(
@@ -160,7 +162,7 @@ export function toDetailJeunQueryModel(
     lastName: sqlJeune.nom,
     email: sqlJeune.email ?? undefined,
     creationDate: sqlJeune.date_creation.toISOString(),
-    isActivated: !!sqlJeune.id_authentification
+    isActivated: Boolean(sqlJeune.id_authentification)
   }
   if (sqlJeune.date_evenement) {
     jeuneQueryModel.lastActivity = sqlJeune.date_evenement.toISOString()

@@ -166,6 +166,10 @@ export class JeuneSqlRepository implements Jeune.Repository {
     })
   }
 
+  async supprimer(jeune: Jeune.Id): Promise<void> {
+    await JeuneSqlModel.supprimer(jeune)
+  }
+
   async getHomeQueryModel(idJeune: string): Promise<JeuneHomeQueryModel> {
     const jeuneSqlModel = await JeuneSqlModel.findByPk(idJeune, {
       include: [

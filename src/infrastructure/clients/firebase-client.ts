@@ -133,6 +133,19 @@ export class FirebaseClient implements IFirebaseClient {
       throw e
     }
   }
+
+  async supprimerChat(idJeune: string): Promise<void> {
+    const collection = this.firestore.collection(FIREBASE_CHAT_PATH)
+    const chatsASupprimer = await collection
+      .where('jeuneId', '==', idJeune)
+      .get()
+
+    if (!chatsASupprimer.empty) {
+      for (const chat of chatsASupprimer.docs) {
+        await collection.doc(chat.id).delete()
+      }
+    }
+  }
 }
 
 function chunk(tableau: string[]): string[][] {

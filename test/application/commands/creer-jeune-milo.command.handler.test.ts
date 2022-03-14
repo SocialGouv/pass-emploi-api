@@ -108,6 +108,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
           firstName: command.prenom,
           lastName: command.nom,
           creationDate: date,
+          isActivated: false,
           email: command.email,
           conseiller,
           structure: Core.Structure.MILO
@@ -139,6 +140,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
           id: idNouveauJeune,
           firstName: command.prenom,
           lastName: command.nom,
+          isActivated: false,
           creationDate: date,
           email: 'jeune.nom@email.com',
           conseiller,
