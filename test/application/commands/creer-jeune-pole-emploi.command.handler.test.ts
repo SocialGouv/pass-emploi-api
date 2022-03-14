@@ -21,7 +21,7 @@ import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, stubClass } from '../../utils'
 import Structure = Core.Structure
 
-describe('CreateJeuneCommandHandler', () => {
+describe('CreateJeunePoleEmploiCommandHandler', () => {
   let createJeuneCommandHandler: CreerJeunePoleEmploiCommandHandler
   const conseiller = unConseiller()
   const idNouveauJeune = 'ae1785ac-71f3-11ec-a0ba-cf33623dcff5'
@@ -75,6 +75,7 @@ describe('CreateJeuneCommandHandler', () => {
         firstName: command.firstName,
         lastName: command.lastName,
         email: command.email,
+        isActivated: false,
         creationDate: date,
         conseiller: conseiller,
         structure: Core.Structure.POLE_EMPLOI

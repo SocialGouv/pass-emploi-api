@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon'
 import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
 import { mapCodeLabelTypeRendezVous, RendezVous } from 'src/domain/rendez-vous'
 import {
@@ -39,7 +38,6 @@ export function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
       id: rendezVousSql.jeune.id,
       firstName: rendezVousSql.jeune.prenom,
       lastName: rendezVousSql.jeune.nom,
-      creationDate: DateTime.fromJSDate(rendezVousSql.jeune.dateCreation),
       pushNotificationToken:
         rendezVousSql.jeune.pushNotificationToken ?? undefined,
       conseiller: {
@@ -47,8 +45,7 @@ export function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
         firstName: rendezVousSql.jeune.conseiller!.prenom,
         lastName: rendezVousSql.jeune.conseiller!.nom,
         structure: rendezVousSql.jeune.conseiller!.structure
-      },
-      structure: rendezVousSql.jeune.structure
+      }
     },
     type: rendezVousSql.type,
     precision: rendezVousSql.precision ?? undefined,

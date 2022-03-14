@@ -57,6 +57,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
       firstName: command.firstName,
       lastName: command.lastName,
       email: lowerCaseEmail,
+      isActivated: false,
       creationDate: this.dateService.now(),
       conseiller,
       structure: Core.Structure.POLE_EMPLOI

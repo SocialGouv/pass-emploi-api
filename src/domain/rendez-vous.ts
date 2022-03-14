@@ -41,7 +41,10 @@ export interface RendezVous {
   modalite?: string
   date: Date
   duree: number
-  jeune: Jeune
+  jeune: Pick<
+    Jeune,
+    'id' | 'firstName' | 'lastName' | 'conseiller' | 'pushNotificationToken'
+  >
   type: CodeTypeRendezVous
   precision?: string
   adresse?: string
@@ -88,7 +91,13 @@ export namespace RendezVous {
       duree: infosRendezVousACreer.duree,
       date: new Date(infosRendezVousACreer.date),
       modalite: infosRendezVousACreer.modalite,
-      jeune,
+      jeune: {
+        id: jeune.id,
+        firstName: jeune.firstName,
+        lastName: jeune.lastName,
+        conseiller: jeune.conseiller,
+        pushNotificationToken: jeune.pushNotificationToken
+      },
       sousTitre: `avec ${jeune.conseiller!.firstName}`,
       titre: 'Rendez-vous conseiller',
       type: infosRendezVousACreer.type

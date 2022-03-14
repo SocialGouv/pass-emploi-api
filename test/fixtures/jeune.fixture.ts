@@ -4,15 +4,15 @@ import { unConseiller } from './conseiller.fixture'
 import { uneDatetime } from './date.fixture'
 
 export const unJeune = (
-  args: Partial<Jeune> = {},
-  conseiller = unConseiller()
+  args: Partial<Jeune> = {}
 ): Required<Omit<Jeune, 'tokenLastUpdate'>> => {
   const defaults = {
     id: 'ABCDE',
     lastName: 'Doe',
     firstName: 'John',
     pushNotificationToken: 'unToken',
-    conseiller,
+    isActivated: true,
+    conseiller: unConseiller(),
     creationDate: uneDatetime,
     email: 'john.doe@plop.io',
     structure: Core.Structure.MILO
@@ -28,6 +28,7 @@ export const unJeuneSansPushNotificationToken = (
   lastName: 'Doe',
   firstName: 'John',
   pushNotificationToken: '',
+  isActivated: false,
   conseiller,
   creationDate: uneDatetime,
   email: 'john.doe@plop.io',
@@ -35,17 +36,17 @@ export const unJeuneSansPushNotificationToken = (
 })
 
 export const unJeuneSansConseiller = (
-  args: Partial<Jeune> = {}
+  args: Partial<Omit<Jeune, 'conseiller'>> = {}
 ): Required<Omit<Jeune, 'conseiller'>> => {
   const defaults = {
     id: 'ABCDE',
     lastName: 'Doe',
     firstName: 'John',
     pushNotificationToken: 'unToken',
+    isActivated: true,
     creationDate: uneDatetime,
     tokenLastUpdate: uneDatetime,
     email: 'john.doe@plop.io',
-    conseiller: undefined,
     structure: Core.Structure.MILO
   }
 

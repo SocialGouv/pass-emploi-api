@@ -86,24 +86,23 @@ describe('JeuneSqlRepository', () => {
       // Given
       jeune1 = unJeuneSansConseiller({ id: '1' })
       jeune2 = unJeuneSansConseiller({ id: '2' })
-      await JeuneSqlModel.creer(
-        unJeuneDto({
-          id: '1',
-          idConseiller: undefined,
-          dateCreation: jeune2.creationDate.toJSDate(),
-          pushNotificationToken: 'unToken',
-          dateDerniereActualisationToken: uneDatetime.toJSDate()
-        })
-      )
-      await JeuneSqlModel.creer(
-        unJeuneDto({
-          id: '2',
-          idConseiller: undefined,
-          dateCreation: jeune2.creationDate.toJSDate(),
-          pushNotificationToken: 'unToken',
-          dateDerniereActualisationToken: uneDatetime.toJSDate()
-        })
-      )
+      const jeune1Dto = unJeuneDto({
+        id: '1',
+        dateCreation: jeune2.creationDate.toJSDate(),
+        pushNotificationToken: 'unToken',
+        dateDerniereActualisationToken: uneDatetime.toJSDate()
+      })
+      delete jeune1Dto.idConseiller
+      await JeuneSqlModel.creer(jeune1Dto)
+      const jeune2Dto = unJeuneDto({
+        id: '2',
+        idConseiller: undefined,
+        dateCreation: jeune2.creationDate.toJSDate(),
+        pushNotificationToken: 'unToken',
+        dateDerniereActualisationToken: uneDatetime.toJSDate()
+      })
+      delete jeune2Dto.idConseiller
+      await JeuneSqlModel.creer(jeune2Dto)
     })
     describe('quand les jeunes existent', () => {
       it('retourne la liste des jeunes', async () => {
@@ -201,6 +200,24 @@ describe('JeuneSqlRepository', () => {
         // Then
         expect(jeune).to.equal(undefined)
       })
+    })
+  })
+
+  describe('supprimer', () => {
+    it('supprime le jeune', async () => {
+      // Given
+      const conseillerDto = unConseillerDto({
+        structure: Core.Structure.POLE_EMPLOI
+      })
+      await ConseillerSqlModel.creer(conseillerDto)
+      await JeuneSqlModel.creer(unJeuneDto({ idConseiller: conseillerDto.id }))
+
+      // When
+      await expect(await jeuneSqlRepository.get('ABCDE')).not.to.be.undefined
+      await jeuneSqlRepository.supprimer('ABCDE')
+
+      // Then
+      await expect(await jeuneSqlRepository.get('ABCDE')).to.be.undefined
     })
   })
 

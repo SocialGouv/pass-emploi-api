@@ -16,19 +16,9 @@ export interface Jeune {
   firstName: string
   lastName: string
   creationDate: DateTime
+  structure: Core.Structure
+  isActivated: boolean
   conseiller?: Conseiller
-  structure: Core.Structure
-  email?: string
-  pushNotificationToken?: string
-  tokenLastUpdate?: DateTime
-}
-
-export interface JeuneSansConseiller {
-  id: string
-  firstName: string
-  lastName: string
-  creationDate: DateTime
-  structure: Core.Structure
   email?: string
   pushNotificationToken?: string
   tokenLastUpdate?: DateTime
@@ -43,6 +33,7 @@ export namespace Jeune {
     getByEmail(email: string): Promise<Jeune | undefined>
     save(jeune: Jeune): Promise<void>
     getJeunes(idsJeune: string[]): Promise<Jeune[]>
+    supprimer(idJeune: Jeune.Id): Promise<void>
 
     getResumeActionsDesJeunesDuConseiller(
       idConseiller: string

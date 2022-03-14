@@ -40,6 +40,10 @@ import {
   DeleteFavoriOffreEmploiCommand,
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../application/commands/delete-favori-offre-emploi.command.handler'
+import {
+  DeleteJeuneCommand,
+  DeleteJeuneCommandHandler
+} from '../../application/commands/delete-jeune.command.handler'
 import { UpdateNotificationTokenCommandHandler } from '../../application/commands/update-notification-token.command.handler'
 import { GetActionsByJeuneQueryHandler } from '../../application/queries/get-actions-by-jeune.query.handler'
 import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
@@ -49,6 +53,7 @@ import {
   DroitsInsuffisants,
   FavoriExisteDejaError,
   JeuneNonLieAuConseillerError,
+  JeunePasInactifError,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import {
@@ -84,7 +89,8 @@ export class JeunesController {
     private readonly getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
     private readonly deleteFavoriCommandHandler: DeleteFavoriOffreEmploiCommandHandler,
-    private readonly transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler
+    private readonly transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler,
+    private readonly deleteJeuneCommandHandler: DeleteJeuneCommandHandler
   ) {}
 
   @Get(':idJeune')
@@ -302,6 +308,35 @@ export class JeunesController {
         throw new ForbiddenException(result.error.message)
       }
       throw new RuntimeException(result.error.message)
+    }
+  }
+
+  @Delete(':idJeune')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async supprimerJeune(
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: DeleteJeuneCommand = {
+      idConseiller: utilisateur.id,
+      idJeune
+    }
+    const result = await this.deleteJeuneCommandHandler.execute(
+      command,
+      utilisateur
+    )
+
+    if (isSuccess(result)) return
+
+    switch (result.error.code) {
+      case NonTrouveError.CODE:
+        throw new NotFoundException(result.error, result.error.message)
+      case DroitsInsuffisants.CODE:
+      case JeuneNonLieAuConseillerError.CODE:
+      case JeunePasInactifError.CODE:
+        throw new ForbiddenException(result.error, result.error.message)
+      default:
+        throw new RuntimeException()
     }
   }
 }

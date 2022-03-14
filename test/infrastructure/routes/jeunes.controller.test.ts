@@ -12,13 +12,16 @@ import {
   DeleteFavoriOffreEmploiCommand,
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
+import { DeleteJeuneCommandHandler } from '../../../src/application/commands/delete-jeune.command.handler'
 import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler'
 import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-models'
 import {
+  DomainError,
   DroitsInsuffisants,
   FavoriExisteDejaError,
   FavoriNonTrouveError,
   JeuneNonLieAuConseillerError,
+  JeunePasInactifError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 import {
@@ -50,6 +53,7 @@ describe('JeunesController', () => {
   let deleteFavoriOffreEmploiCommandHandler: StubbedClass<DeleteFavoriOffreEmploiCommandHandler>
   let getDetailJeuneQueryHandler: StubbedClass<GetDetailJeuneQueryHandler>
   let transfererJeunesConseillerCommandHandler: StubbedClass<TransfererJeunesConseillerCommandHandler>
+  let deleteJeuneCommandHandler: StubbedClass<DeleteJeuneCommandHandler>
   let app: INestApplication
 
   before(async () => {
@@ -64,6 +68,8 @@ describe('JeunesController', () => {
     transfererJeunesConseillerCommandHandler = stubClass(
       TransfererJeunesConseillerCommandHandler
     )
+    deleteJeuneCommandHandler = stubClass(DeleteJeuneCommandHandler)
+
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
       .useValue(createActionCommandHandler)
@@ -75,6 +81,8 @@ describe('JeunesController', () => {
       .useValue(getDetailJeuneQueryHandler)
       .overrideProvider(TransfererJeunesConseillerCommandHandler)
       .useValue(transfererJeunesConseillerCommandHandler)
+      .overrideProvider(DeleteJeuneCommandHandler)
+      .useValue(deleteJeuneCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -364,5 +372,104 @@ describe('JeunesController', () => {
       )
     })
     ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1')
+  })
+
+  describe('DELETE /jeunes/:idJeune', () => {
+    it('supprime le jeune', async () => {
+      //Given
+      deleteJeuneCommandHandler.execute.resolves(emptySuccess())
+
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/id-jeune`)
+        .set('authorization', unHeaderAuthorization())
+        //Then
+        .expect(HttpStatus.NO_CONTENT)
+
+      expect(deleteJeuneCommandHandler.execute).to.have.be.calledWithExactly(
+        {
+          idConseiller: 'bcd60403-5f10-4a16-a660-2099d79ebd66',
+          idJeune: 'id-jeune'
+        },
+        unUtilisateurDecode()
+      )
+    })
+
+    it("renvoie une 403 si l'utilisateur n'a pas les droits", async () => {
+      //Given
+      deleteJeuneCommandHandler.execute.resolves(
+        failure(new DroitsInsuffisants())
+      )
+
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/id-jeune`)
+        .set('authorization', unHeaderAuthorization())
+        //Then
+        .expect(HttpStatus.FORBIDDEN)
+    })
+
+    it("renvoie une 404 si une ressource n'existe pas", async () => {
+      //Given
+      deleteJeuneCommandHandler.execute.resolves(
+        failure(new NonTrouveError('Whenever', 'wherever'))
+      )
+
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/id-jeune`)
+        .set('authorization', unHeaderAuthorization())
+        //Then
+        .expect(HttpStatus.NOT_FOUND)
+    })
+
+    it("renvoie une 403 si le jeune n'est pas lié à l'utilisateur", async () => {
+      //Given
+      deleteJeuneCommandHandler.execute.resolves(
+        failure(new JeuneNonLieAuConseillerError('whenever', 'wherever'))
+      )
+
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/id-jeune`)
+        .set('authorization', unHeaderAuthorization())
+        //Then
+        .expect(HttpStatus.FORBIDDEN)
+    })
+
+    it('renvoie une 403 si le jeune est actif', async () => {
+      //Given
+      deleteJeuneCommandHandler.execute.resolves(
+        failure(new JeunePasInactifError('whenever'))
+      )
+
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/id-jeune`)
+        .set('authorization', unHeaderAuthorization())
+        //Then
+        .expect(HttpStatus.FORBIDDEN)
+    })
+
+    it("renvoie une erreur 500 s'il se passe qqch d'imprévu", async () => {
+      //Given
+      deleteJeuneCommandHandler.execute.resolves(
+        failure(
+          new (class implements DomainError {
+            readonly code = 'WHATEVER'
+            readonly message = 'whatever'
+          })()
+        )
+      )
+
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/id-jeune`)
+        .set('authorization', unHeaderAuthorization())
+        //Then
+        .expect(HttpStatus.INTERNAL_SERVER_ERROR)
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('delete', '/jeunes/whatever')
   })
 })
