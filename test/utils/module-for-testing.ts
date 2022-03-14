@@ -49,6 +49,9 @@ export const testConfig = (): ConfigService => {
       clientSecret: 'pole-emploi-client-secret',
       scope: 'pole-emploi-scope'
     },
+    poleEmploiPrestations: {
+      url: 'https://api-r.es-qvr.fr/partenaire/peconnect-gerer-prestations/v1'
+    },
     milo: {
       url: 'https://milo.com',
       apiKeyRecupererDossier: 'apiKeyRecupererDossier',

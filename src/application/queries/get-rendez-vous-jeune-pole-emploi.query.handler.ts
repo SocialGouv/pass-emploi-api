@@ -15,16 +15,15 @@ import { PoleEmploiPrestationsClient } from 'src/infrastructure/clients/pole-emp
 import { DateService } from 'src/utils/date-service'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { DetailJeuneQueryModel } from './query-models/jeunes.query-models'
-import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
+import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
 
 export interface GetRendezVousJeunePoleEmploiQuery extends Query {
   idJeune: string
   idpToken: string
 }
 
-interface PrestationDto {
+export interface PrestationDto {
   annule?: boolean
   datefin?: Date
   identifiantStable?: string
@@ -102,7 +101,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
   async handle(
     query: GetRendezVousJeunePoleEmploiQuery
   ): Promise<Result<RendezVousQueryModel[]>> {
-    const jeune = await this.jeuneRepository.getQueryModelById(query.idJeune)
+    const jeune = await this.jeuneRepository.get(query.idJeune)
 
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
@@ -118,36 +117,35 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
 
       const prestations: PrestationDto[] = response?.data ?? []
 
-      return success(
-        await Promise.all(
-          prestations.map(async prestation => {
-            const dateRendezVous = DateTime.fromJSDate(
-              prestation.session.dateDebut
-            )
-            let lienVisio = undefined
+      const rendezVous = await Promise.all(
+        prestations.map(async prestation => {
+          const dateRendezVous = DateTime.fromJSDate(
+            prestation.session.dateDebut
+          )
+          let lienVisio = undefined
 
-            if (
-              prestation.identifiantStable &&
-              dateRendezVous.day == maintenant.day &&
-              dateRendezVous.month == dateRendezVous.month &&
-              dateRendezVous.year == dateRendezVous.year
-            ) {
-              const response =
-                await this.poleEmploiPrestationsClient.getLienVisio(
-                  query.idpToken,
-                  prestation.identifiantStable
-                )
-              lienVisio = response?.data
-            }
+          if (
+            prestation.identifiantStable &&
+            dateRendezVous.day === maintenant.day &&
+            dateRendezVous.month === dateRendezVous.month &&
+            dateRendezVous.year === dateRendezVous.year
+          ) {
+            const response =
+              await this.poleEmploiPrestationsClient.getLienVisio(
+                query.idpToken,
+                prestation.identifiantStable
+              )
+            lienVisio = response?.data
+          }
 
-            return this.fromPrestationDtoToRendezVousQueryModel(
-              prestation,
-              jeune,
-              lienVisio
-            )
-          })
-        )
+          return this.fromPrestationDtoToRendezVousQueryModel(
+            prestation,
+            jeune,
+            lienVisio
+          )
+        })
       )
+      return success(rendezVous)
     } catch (e) {
       this.logger.error(e)
       return failure(
@@ -167,19 +165,18 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     return
   }
 
-  private async fromPrestationDtoToRendezVousQueryModel(
+  fromPrestationDtoToRendezVousQueryModel(
     prestation: PrestationDto,
-    jeune: DetailJeuneQueryModel,
+    jeune: Jeune,
     lienVisio?: string
-  ): Promise<RendezVousQueryModel> {
+  ): RendezVousQueryModel {
     return {
       id: 'inconnu-prestation',
-      title: 'Prestation',
+      title: '',
       type: {
         code: CodeTypeRendezVous.PRESTATION,
         label: mapCodeLabelTypeRendezVous[CodeTypeRendezVous.PRESTATION]
       },
-      presenceConseiller: true,
       date: prestation.session.dateDebut,
       comment: prestation.session.commentaire,
       jeune: { id: jeune.id, nom: jeune.lastName, prenom: jeune.firstName },
@@ -240,8 +237,8 @@ function buildAdresse(prestation: PrestationDto): string | undefined {
 function buildDuration(prestation: PrestationDto): number {
   switch (prestation.session.duree.unite) {
     case 'HEURE':
-      return prestation.session.duree.valeur * 60
-    case 'JOUR':
-      return prestation.session.duree.valeur * 24 * 60
+      return Math.floor(prestation.session.duree.valeur * 60)
+    default:
+      return 0
   }
 }
