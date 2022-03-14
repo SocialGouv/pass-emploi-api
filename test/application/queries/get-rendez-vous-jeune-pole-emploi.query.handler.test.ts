@@ -1,6 +1,7 @@
 import {
   GetRendezVousJeunePoleEmploiQuery,
-  GetRendezVousJeunePoleEmploiQueryHandler
+  GetRendezVousJeunePoleEmploiQueryHandler,
+  PrestationDto
 } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { DateService } from '../../../src/utils/date-service'
@@ -14,6 +15,7 @@ import { failure } from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
+import { DateTime } from 'luxon'
 
 describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   let jeunesRepository: StubbedType<Jeune.Repository>
@@ -42,9 +44,318 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
     sandbox.restore()
   })
 
+  describe('fromPrestationDtoToRendezVousQueryModel', () => {
+    it('retourne un RendezVousQueryModel avec la durée en jour', async () => {
+      // Given
+      const jeune = unJeune()
+      const date = new Date('2020-04-06')
+      const maintenant = uneDatetime
+      dateService.now.returns(maintenant)
+      const prestation: PrestationDto = {
+        annule: false,
+        datefin: date,
+        session: {
+          dateDebut: date,
+          dateFinPrevue: date,
+          dateLimite: date,
+          duree: {
+            unite: 'JOUR',
+            valeur: 1.0
+          },
+          enAgence: true,
+          infoCollective: false,
+          realiteVirtuelle: false
+        }
+      }
+
+      // When
+      const rendezVousQueryModel =
+        await getRendezVousJeunePoleEmploiQueryHandler.fromPrestationDtoToRendezVousQueryModel(
+          prestation,
+          jeune
+        )
+
+      // Then
+      expect(rendezVousQueryModel).to.deep.equal({
+        agencePE: true,
+        annule: false,
+        date,
+        duration: 0,
+        id: 'inconnu-prestation',
+        jeune: {
+          id: 'ABCDE',
+          nom: 'Doe',
+          prenom: 'John'
+        },
+        modality: '',
+        theme: undefined,
+        telephone: undefined,
+        organisme: undefined,
+        description: undefined,
+        comment: undefined,
+        adresse: undefined,
+        title: '',
+        type: {
+          code: 'PRESTATION',
+          label: 'Prestation'
+        },
+        visio: false,
+        lienVisio: undefined
+      })
+    })
+    it('retourne un RendezVousQueryModel avec la duree en heures', async () => {
+      // Given
+      const jeune = unJeune()
+      const date = new Date('2020-04-06')
+      const maintenant = uneDatetime
+      dateService.now.returns(maintenant)
+      const prestation: PrestationDto = {
+        annule: false,
+        datefin: date,
+        session: {
+          dateDebut: date,
+          dateFinPrevue: date,
+          dateLimite: date,
+          duree: {
+            unite: 'HEURE',
+            valeur: 1.5
+          },
+          enAgence: true,
+          infoCollective: false,
+          realiteVirtuelle: false
+        }
+      }
+
+      // When
+      const rendezVousQueryModel =
+        await getRendezVousJeunePoleEmploiQueryHandler.fromPrestationDtoToRendezVousQueryModel(
+          prestation,
+          jeune
+        )
+
+      // Then
+      expect(rendezVousQueryModel).to.deep.equal({
+        agencePE: true,
+        annule: false,
+        date,
+        duration: 90,
+        id: 'inconnu-prestation',
+        jeune: {
+          id: 'ABCDE',
+          nom: 'Doe',
+          prenom: 'John'
+        },
+        modality: '',
+        theme: undefined,
+        telephone: undefined,
+        organisme: undefined,
+        description: undefined,
+        comment: undefined,
+        adresse: undefined,
+        title: '',
+        type: {
+          code: 'PRESTATION',
+          label: 'Prestation'
+        },
+        visio: false,
+        lienVisio: undefined
+      })
+    })
+    it('retourne un RendezVousQueryModel avec la visio', async () => {
+      // Given
+      const jeune = unJeune()
+      const date = new Date('2020-04-06')
+      const maintenant = uneDatetime
+      dateService.now.returns(maintenant)
+      const prestation: PrestationDto = {
+        annule: false,
+        datefin: date,
+        session: {
+          modalitePremierRendezVous: 'WEBCAM',
+          dateDebut: date,
+          dateFinPrevue: date,
+          dateLimite: date,
+          duree: {
+            unite: 'HEURE',
+            valeur: 1.5
+          },
+          enAgence: true,
+          infoCollective: false,
+          realiteVirtuelle: false
+        }
+      }
+
+      // When
+      const rendezVousQueryModel =
+        await getRendezVousJeunePoleEmploiQueryHandler.fromPrestationDtoToRendezVousQueryModel(
+          prestation,
+          jeune
+        )
+
+      // Then
+      expect(rendezVousQueryModel).to.deep.equal({
+        agencePE: true,
+        annule: false,
+        date,
+        duration: 90,
+        id: 'inconnu-prestation',
+        jeune: {
+          id: 'ABCDE',
+          nom: 'Doe',
+          prenom: 'John'
+        },
+        modality: 'par visio',
+        theme: undefined,
+        telephone: undefined,
+        organisme: undefined,
+        description: undefined,
+        comment: undefined,
+        adresse: undefined,
+        title: '',
+        type: {
+          code: 'PRESTATION',
+          label: 'Prestation'
+        },
+        visio: true,
+        lienVisio: undefined
+      })
+    })
+    it("retourne un RendezVousQueryModel avec l'adresse", async () => {
+      // Given
+      const jeune = unJeune()
+      const date = new Date('2020-04-06')
+      const maintenant = uneDatetime
+      dateService.now.returns(maintenant)
+      const prestation: PrestationDto = {
+        annule: false,
+        datefin: date,
+        session: {
+          modalitePremierRendezVous: 'WEBCAM',
+          dateDebut: date,
+          dateFinPrevue: date,
+          dateLimite: date,
+          duree: {
+            unite: 'HEURE',
+            valeur: 1.5
+          },
+          adresse: {
+            adresseLigne1: 'ligne1',
+            adresseLigne2: 'ligne2',
+            codePostal: 'code postal',
+            ville: 'ville'
+          },
+          enAgence: true,
+          infoCollective: false,
+          realiteVirtuelle: false
+        }
+      }
+
+      // When
+      const rendezVousQueryModel =
+        await getRendezVousJeunePoleEmploiQueryHandler.fromPrestationDtoToRendezVousQueryModel(
+          prestation,
+          jeune
+        )
+
+      // Then
+      expect(rendezVousQueryModel).to.deep.equal({
+        agencePE: true,
+        annule: false,
+        date,
+        duration: 90,
+        id: 'inconnu-prestation',
+        jeune: {
+          id: 'ABCDE',
+          nom: 'Doe',
+          prenom: 'John'
+        },
+        modality: 'par visio',
+        theme: undefined,
+        telephone: undefined,
+        organisme: undefined,
+        description: undefined,
+        comment: undefined,
+        adresse: 'ligne1 ligne2 code postal ville',
+        title: '',
+        type: {
+          code: 'PRESTATION',
+          label: 'Prestation'
+        },
+        visio: true,
+        lienVisio: undefined
+      })
+    })
+    it('retourne un RendezVousQueryModel avec la description', async () => {
+      // Given
+      const jeune = unJeune()
+      const date = new Date('2020-04-06')
+      const maintenant = uneDatetime
+      dateService.now.returns(maintenant)
+      const prestation: PrestationDto = {
+        annule: false,
+        datefin: date,
+        session: {
+          typePrestation: {
+            code: 'ATC'
+          },
+          sousThemeAtelier: {
+            libelleSousThemeAtelier: 'sous theme',
+            descriptifSousThemeAtelier: 'descriptif'
+          },
+          modalitePremierRendezVous: 'WEBCAM',
+          dateDebut: date,
+          dateFinPrevue: date,
+          dateLimite: date,
+          duree: {
+            unite: 'HEURE',
+            valeur: 1.5
+          },
+          enAgence: true,
+          infoCollective: false,
+          realiteVirtuelle: false
+        }
+      }
+
+      // When
+      const rendezVousQueryModel =
+        await getRendezVousJeunePoleEmploiQueryHandler.fromPrestationDtoToRendezVousQueryModel(
+          prestation,
+          jeune
+        )
+
+      // Then
+      expect(rendezVousQueryModel).to.deep.equal({
+        agencePE: true,
+        annule: false,
+        date,
+        duration: 90,
+        id: 'inconnu-prestation',
+        jeune: {
+          id: 'ABCDE',
+          nom: 'Doe',
+          prenom: 'John'
+        },
+        modality: 'par visio',
+        theme: undefined,
+        telephone: undefined,
+        organisme: undefined,
+        description: 'sous theme\ndescriptif',
+        comment: undefined,
+        adresse: undefined,
+        title: '',
+        type: {
+          code: 'PRESTATION',
+          label: 'Prestation'
+        },
+        visio: true,
+        lienVisio: undefined
+      })
+    })
+  })
+
   describe('handle', () => {
     describe('quand le jeune existe', () => {
-      describe('quand le lien de la visio n"est pas encore disponible', () => {
+      describe("quand le lien de la visio n'est pas encore disponible", () => {
         it('récupère les rendez-vous Pole Emploi du jeune', async () => {
           // Given
           const query: GetRendezVousJeunePoleEmploiQuery = {
@@ -54,7 +365,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           const jeune = unJeune()
           const date = new Date('2020-04-06')
           const maintenant = uneDatetime
-          const rendezVousPoleEmploiPrestationsResponse = {
+          const prestationsResponse = {
             config: undefined,
             headers: undefined,
             request: undefined,
@@ -101,13 +412,11 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
             ]
           }
 
-          jeunesRepository.getQueryModelById
-            .withArgs(query.idJeune)
-            .resolves(jeune)
+          jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           dateService.now.returns(maintenant)
           poleEmploiPrestationsClient.getRendezVous
             .withArgs(query.idpToken, maintenant)
-            .resolves(rendezVousPoleEmploiPrestationsResponse)
+            .resolves(prestationsResponse)
 
           // When
           const result = await getRendezVousJeunePoleEmploiQueryHandler.handle(
@@ -125,7 +434,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                 comment: undefined,
                 date: date,
                 description: "Utiliser Internet dans sa recherche d'emploi",
-                duration: 1440,
+                duration: 0,
                 id: 'inconnu-prestation',
                 jeune: {
                   id: 'ABCDE',
@@ -135,10 +444,9 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                 lienVisio: undefined,
                 modality: '',
                 organisme: undefined,
-                presenceConseiller: true,
                 telephone: undefined,
                 theme: 'Atelier',
-                title: 'Prestation',
+                title: '',
                 type: {
                   code: 'PRESTATION',
                   label: 'Prestation'
@@ -158,7 +466,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           }
           const date = new Date('2020-04-06')
           const jeune = unJeune()
-          const maintenant = uneDatetime
+          const idVisio = '1'
           const rendezVousPoleEmploiPrestationsResponse = {
             config: undefined,
             headers: undefined,
@@ -169,17 +477,8 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
               {
                 annule: false,
                 datefin: date,
-                identifiantStable: '1',
+                identifiantStable: idVisio,
                 session: {
-                  adresse: {
-                    adresseLigne1: '588 BOULEVARD ALBERT CAMUS',
-                    codeInsee: '69264',
-                    codePostal: '69665',
-                    identifiantAurore: '69065_00014597',
-                    typeLieu: 'INTERNE',
-                    ville: 'VILLEFRANCHE SUR SAONE',
-                    villePostale: 'VILLEFRANCHE SUR SAONE CEDEX'
-                  },
                   dateDebut: date,
                   dateFinPrevue: date,
                   dateLimite: date,
@@ -187,21 +486,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                     unite: 'JOUR',
                     valeur: 1.0
                   },
-                  enAgence: true,
-                  infoCollective: false,
-                  realiteVirtuelle: false,
-                  themeAtelier: {
-                    code: 'A14',
-                    disponibleAutoInscription: false,
-                    libelle: "Utiliser Internet dans sa recherche d'emploi",
-                    type: 'THA',
-                    typeCourrier: 'CON'
-                  },
-                  typePrestation: {
-                    code: 'ATE',
-                    libelle: 'Atelier',
-                    actif: true
-                  }
+                  enAgence: true
                 }
               }
             ]
@@ -216,15 +501,17 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
             data: 'lienvisio.com'
           }
 
-          jeunesRepository.getQueryModelById
-            .withArgs(query.idJeune)
-            .resolves(jeune)
+          const maintenant = DateTime.fromISO(
+            '2020-04-06T12:00:00.000Z'
+          ).toUTC()
+
           dateService.now.returns(maintenant)
+          jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPrestationsClient.getRendezVous
             .withArgs(query.idpToken, maintenant)
             .resolves(rendezVousPoleEmploiPrestationsResponse)
           poleEmploiPrestationsClient.getLienVisio
-            .withArgs(query.idpToken, '1')
+            .withArgs(query.idpToken, idVisio)
             .resolves(lienVisioResponse)
 
           // When
@@ -236,14 +523,13 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
             _isSuccess: true,
             data: [
               {
-                adresse:
-                  '588 BOULEVARD ALBERT CAMUS  69665 VILLEFRANCHE SUR SAONE',
+                adresse: undefined,
                 agencePE: true,
                 annule: false,
                 comment: undefined,
-                date: date,
-                description: "Utiliser Internet dans sa recherche d'emploi",
-                duration: 1440,
+                date,
+                description: undefined,
+                duration: 0,
                 id: 'inconnu-prestation',
                 jeune: {
                   id: 'ABCDE',
@@ -253,10 +539,9 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                 lienVisio: 'lienvisio.com',
                 modality: '',
                 organisme: undefined,
-                presenceConseiller: true,
                 telephone: undefined,
-                theme: 'Atelier',
-                title: 'Prestation',
+                theme: undefined,
+                title: '',
                 type: {
                   code: 'PRESTATION',
                   label: 'Prestation'
@@ -267,8 +552,34 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           })
         })
       })
+      describe('quand une erreur se produit', () => {
+        it('renvoie une failure', async () => {
+          // Given
+          const query: GetRendezVousJeunePoleEmploiQuery = {
+            idJeune: '1',
+            idpToken: 'token'
+          }
+          const jeune = unJeune()
+          const maintenant = uneDatetime
+
+          jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+          dateService.now.returns(maintenant)
+          poleEmploiPrestationsClient.getRendezVous
+            .withArgs(query.idpToken, maintenant)
+            .rejects()
+
+          // When
+          const result = await getRendezVousJeunePoleEmploiQueryHandler.handle(
+            query
+          )
+          // Then
+          expect(result._isSuccess).to.equal(false)
+          if (!result._isSuccess)
+            expect(result.error.code).to.equal('ERREUR_HTTP')
+        })
+      })
     })
-    describe('quand le jeune n"existe pas', () => {
+    describe("quand le jeune n'existe pas", () => {
       it('renvoie une failure', async () => {
         // Given
         const query: GetRendezVousJeunePoleEmploiQuery = {
@@ -276,9 +587,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           idpToken: 'token'
         }
 
-        jeunesRepository.getQueryModelById
-          .withArgs(query.idJeune)
-          .resolves(undefined)
+        jeunesRepository.get.withArgs(query.idJeune).resolves(undefined)
 
         // When
         const result = await getRendezVousJeunePoleEmploiQueryHandler.handle(
