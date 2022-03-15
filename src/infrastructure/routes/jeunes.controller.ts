@@ -317,14 +317,22 @@ export class JeunesController {
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const command: DeleteJeuneCommand = {
-      idConseiller: utilisateur.id,
-      idJeune
+    let result: Result
+    try {
+      const command: DeleteJeuneCommand = {
+        idConseiller: utilisateur.id,
+        idJeune
+      }
+      result = await this.deleteJeuneCommandHandler.execute(
+        command,
+        utilisateur
+      )
+    } catch (e) {
+      if (e instanceof DroitsInsuffisants) {
+        throw new ForbiddenException(e, e.message)
+      }
+      throw e
     }
-    const result = await this.deleteJeuneCommandHandler.execute(
-      command,
-      utilisateur
-    )
 
     if (isSuccess(result)) return
 
