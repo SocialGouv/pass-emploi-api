@@ -397,9 +397,7 @@ describe('JeunesController', () => {
 
     it("renvoie une 403 si l'utilisateur n'a pas les droits", async () => {
       //Given
-      deleteJeuneCommandHandler.execute.resolves(
-        failure(new DroitsInsuffisants())
-      )
+      deleteJeuneCommandHandler.execute.rejects(new DroitsInsuffisants())
 
       //When
       await request(app.getHttpServer())
