@@ -49,35 +49,43 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
   async handle(
     command: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
-    const utilisateur = await this.authentificationRepository.get(
+    const utilisateurConnu = await this.authentificationRepository.get(
       command.idUtilisateurAuth,
       command.structure,
       command.type
     )
 
     const lowerCaseEmail = command.email?.toLocaleLowerCase()
+    const estStructurePassEmploi =
+      command.structure === Core.Structure.PASS_EMPLOI
+    const estUnConseiller = command.type === Authentification.Type.CONSEILLER
+    const estUnJeune = command.type === Authentification.Type.JEUNE
+    const estUnJeuneAvecUnEmail = estUnJeune && lowerCaseEmail
 
-    if (utilisateur) {
-      if (
-        lowerCaseEmail &&
-        utilisateur.type === Authentification.Type.CONSEILLER
-      ) {
-        utilisateur.email = lowerCaseEmail
-        await this.authentificationRepository.save(
-          utilisateur,
-          command.idUtilisateurAuth
+    if (utilisateurConnu) {
+      await this.miseAJourdeLUtilisateurSiCestUnConseiller(
+        lowerCaseEmail,
+        utilisateurConnu,
+        command.idUtilisateurAuth
+      )
+      return success(queryModelFromUtilisateur(utilisateurConnu))
+    } else {
+      if (estStructurePassEmploi) {
+        return failure(
+          new NonTrouveError('Utilisateur', command.idUtilisateurAuth)
         )
       }
-      return success(queryModelFromUtilisateur(utilisateur))
-    } else if (command.structure === Core.Structure.PASS_EMPLOI) {
-      return failure(
-        new NonTrouveError('Utilisateur', command.idUtilisateurAuth)
-      )
     }
 
-    if (command.type === Authentification.Type.CONSEILLER) {
+    // ******************************************
+    // Première connexion
+    // ******************************************
+
+    if (estUnConseiller) {
       return this.creerNouveauConseiller(command, lowerCaseEmail)
-    } else if (command.type === Authentification.Type.JEUNE && lowerCaseEmail) {
+    }
+
+    if (estUnJeuneAvecUnEmail) {
       const jeune = await this.authentificationRepository.getJeuneByEmail(
         lowerCaseEmail
       )
@@ -87,7 +95,6 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
           jeune.id,
           command.idUtilisateurAuth
         )
-
         return success(queryModelFromUtilisateur(jeune))
       }
     }
@@ -131,5 +138,19 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     )
 
     return success(queryModelFromUtilisateur(conseillerSso))
+  }
+
+  private async miseAJourdeLUtilisateurSiCestUnConseiller(
+    lowerCaseEmail: string | undefined,
+    utilisateur: Authentification.Utilisateur,
+    idUtilisateurAuth: string
+  ): Promise<void> {
+    if (
+      lowerCaseEmail &&
+      utilisateur.type === Authentification.Type.CONSEILLER
+    ) {
+      utilisateur.email = lowerCaseEmail
+      await this.authentificationRepository.save(utilisateur, idUtilisateurAuth)
+    }
   }
 }
