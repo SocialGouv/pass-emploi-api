@@ -110,12 +110,13 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     const maintenant = this.dateService.now()
 
     try {
-      const response = await this.poleEmploiPrestationsClient.getRendezVous(
-        query.idpToken,
-        maintenant
-      )
+      const responseRendezVous =
+        await this.poleEmploiPrestationsClient.getRendezVous(
+          query.idpToken,
+          maintenant
+        )
 
-      const prestations: PrestationDto[] = response?.data ?? []
+      const prestations: PrestationDto[] = responseRendezVous?.data ?? []
 
       const rendezVous = await Promise.all(
         prestations.map(async prestation => {
@@ -127,15 +128,15 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
           if (
             prestation.identifiantStable &&
             dateRendezVous.day === maintenant.day &&
-            dateRendezVous.month === dateRendezVous.month &&
-            dateRendezVous.year === dateRendezVous.year
+            dateRendezVous.month === maintenant.month &&
+            dateRendezVous.year === maintenant.year
           ) {
-            const response =
+            const responseLienVisio =
               await this.poleEmploiPrestationsClient.getLienVisio(
                 query.idpToken,
                 prestation.identifiantStable
               )
-            lienVisio = response?.data
+            lienVisio = responseLienVisio?.data
           }
 
           return this.fromPrestationDtoToRendezVousQueryModel(
@@ -180,12 +181,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
       date: prestation.session.dateDebut,
       comment: prestation.session.commentaire,
       jeune: { id: jeune.id, nom: jeune.lastName, prenom: jeune.firstName },
-      modality:
-        prestation.session.modalitePremierRendezVous === 'WEBCAM'
-          ? 'par visio'
-          : prestation.session.modalitePremierRendezVous === 'PHYSIQUE'
-          ? 'en présentiel'
-          : '',
+      modality: buildModality(prestation),
       duration: buildDuration(prestation),
       description: buildDescription(prestation),
       adresse: buildAdresse(prestation),
@@ -199,6 +195,17 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
         prestation.session.modalitePremierRendezVous === 'WEBCAM',
       lienVisio
     }
+  }
+}
+
+function buildModality(prestation: PrestationDto): string {
+  switch (prestation.session.modalitePremierRendezVous) {
+    case 'WEBCAM':
+      return 'par visio'
+    case 'PHYSIQUE':
+      return 'en présentiel'
+    default:
+      return ''
   }
 }
 
@@ -235,10 +242,8 @@ function buildAdresse(prestation: PrestationDto): string | undefined {
 }
 
 function buildDuration(prestation: PrestationDto): number {
-  switch (prestation.session.duree.unite) {
-    case 'HEURE':
-      return Math.floor(prestation.session.duree.valeur * 60)
-    default:
-      return 0
+  if (prestation.session.duree.unite === 'HEURE') {
+    return Math.floor(prestation.session.duree.valeur * 60)
   }
+  return 0
 }
