@@ -4,7 +4,10 @@ import {
   DetailOffreEngagementQueryModel,
   OffreEngagementQueryModel
 } from '../../application/queries/query-models/service-civique.query-models'
-import { ErreurHttp } from '../../building-blocks/types/domain-error'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Core } from '../../domain/core'
 import { OffreEngagement } from '../../domain/offre-engagement'
@@ -60,11 +63,19 @@ export class EngagementHttpSqlRepository implements OffreEngagement.Repository {
     } catch (e) {
       this.logger.error(e)
       if (e.response?.status >= 400 && e.response?.status < 500) {
-        const erreur = new ErreurHttp(
-          e.response.data?.message,
-          e.response.status
-        )
-        return failure(erreur)
+        if (e.response?.status == 404) {
+          const erreur = new NonTrouveError(
+            'OffreEngagement',
+            idOffreEngagement
+          )
+          return failure(erreur)
+        } else {
+          const erreur = new ErreurHttp(
+            e.response.data?.message,
+            e.response.status
+          )
+          return failure(erreur)
+        }
       }
       return failure(e)
     }

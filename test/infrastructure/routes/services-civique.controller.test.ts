@@ -22,7 +22,10 @@ import {
   offresEngagementQueryModel,
   unDetailOffreEngagementQuerymodel
 } from '../../fixtures/query-models/offre-engagement.query-model.fixtures'
-import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
 import {
   GetDetailServiceCiviqueQuery,
   GetDetailServiceCiviqueQueryHandler
@@ -165,6 +168,24 @@ describe('ServicesCiviqueController', () => {
 
           // Then
           .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+    describe('quand l"offre n"existe pas', () => {
+      it('retourne une erreur not found', async () => {
+        // Given
+        getDetailServiceCiviqueQueryHandler.execute.resolves(
+          failure(
+            new NonTrouveError('OffreEngagement', query.idOffreEngagement)
+          )
+        )
+
+        // When
+        await request(app.getHttpServer())
+          .get(`/services-civique/${query.idOffreEngagement}`)
+          .set('authorization', unHeaderAuthorization())
+
+          // Then
+          .expect(HttpStatus.NOT_FOUND)
       })
     })
     ensureUserAuthenticationFailsIfInvalid('get', '/services-civique/123')

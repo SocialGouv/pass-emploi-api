@@ -16,7 +16,10 @@ import { EngagementClient } from '../../../src/infrastructure/clients/engagement
 import { DateTime } from 'luxon'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { EngagementHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-engagement-http.repository'
-import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
 
 describe('OffreEngagementRepository', () => {
   DatabaseForTesting.prepare()
@@ -259,7 +262,7 @@ describe('OffreEngagementRepository', () => {
           'v0/mission/unFauxId'
         )
         expect(result).to.be.deep.equal(
-          failure(new ErreurHttp('Not Found', 404))
+          failure(new NonTrouveError('OffreEngagement', 'unFauxId'))
         )
       })
     })
