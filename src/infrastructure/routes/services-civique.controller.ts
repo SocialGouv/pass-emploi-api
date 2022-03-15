@@ -1,9 +1,19 @@
-import { Controller, Get, HttpException, Param, Query } from '@nestjs/common'
+import {
+  Controller,
+  Get,
+  HttpException,
+  NotFoundException,
+  Param,
+  Query
+} from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
 import { isFailure } from '../../building-blocks/types/result'
-import { ErreurHttp } from '../../building-blocks/types/domain-error'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { GetServicesCiviqueQueryParams } from './validation/services-civique.inputs'
 import {
@@ -81,6 +91,9 @@ export class ServicesCiviqueController {
     )
 
     if (isFailure(result)) {
+      if (result.error.code === NonTrouveError.CODE) {
+        throw new NotFoundException(result.error)
+      }
       if (result.error.code === ErreurHttp.CODE) {
         throw new HttpException(
           result.error.message,

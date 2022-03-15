@@ -11,7 +11,7 @@ import {
   GetDetailServiceCiviqueQueryHandler
 } from '../../../src/application/queries/get-detail-service-civique.query.handler'
 import { failure } from '../../../src/building-blocks/types/result'
-import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
+import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 
 describe('GetDetailServiceCiviqueQuery', () => {
   let engagementRepository: StubbedType<OffreEngagement.Repository>
@@ -64,7 +64,14 @@ describe('GetDetailServiceCiviqueQuery', () => {
 
       engagementRepository.getOffreEngagementQueryModelById
         .withArgs(getServicesCiviqueQuery.idOffreEngagement)
-        .resolves(failure(new ErreurHttp('Not Found', 404)))
+        .resolves(
+          failure(
+            new NonTrouveError(
+              'OffreEngagement',
+              getServicesCiviqueQuery.idOffreEngagement
+            )
+          )
+        )
 
       // When
       const result = await getDetailServiceCiviqueQueryHandler.handle(
@@ -72,7 +79,14 @@ describe('GetDetailServiceCiviqueQuery', () => {
       )
 
       // Then
-      expect(result).to.be.deep.equal(failure(new ErreurHttp('Not Found', 404)))
+      expect(result).to.be.deep.equal(
+        failure(
+          new NonTrouveError(
+            'OffreEngagement',
+            getServicesCiviqueQuery.idOffreEngagement
+          )
+        )
+      )
     })
   })
 
