@@ -4,6 +4,7 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
 import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
+import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
 
 export interface GetAllRendezVousJeune extends Query {
@@ -18,7 +19,8 @@ export class GetAllRendezVousJeuneQueryHandler extends QueryHandler<
   constructor(
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
-    private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer
+    private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer,
+    private jeuneAuthorizer: JeuneAuthorizer
   ) {
     super('GetAllRendezVousJeuneQueryHandler')
   }
@@ -30,10 +32,14 @@ export class GetAllRendezVousJeuneQueryHandler extends QueryHandler<
     query: GetAllRendezVousJeune,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    await this.conseillerForJeuneAuthorizer.authorize(
-      query.idJeune,
-      utilisateur
-    )
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      await this.conseillerForJeuneAuthorizer.authorize(
+        query.idJeune,
+        utilisateur
+      )
+    } else {
+      await this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    }
   }
 
   async monitor(): Promise<void> {
