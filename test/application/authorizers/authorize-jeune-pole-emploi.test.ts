@@ -1,20 +1,15 @@
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { Unauthorized } from '../../../src/domain/erreur'
-import { Jeune } from '../../../src/domain/jeune'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { createSandbox, expect } from '../../utils'
 import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
 import { Core } from '../../../src/domain/core'
+import { Unauthorized } from '../../../src/domain/erreur'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { expect } from '../../utils'
 import Structure = Core.Structure
 
 describe('JeunePoleEmploiAuthorizer', () => {
-  let jeuneRepository: StubbedType<Jeune.Repository>
   let jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer
 
   beforeEach(() => {
-    const sandbox = createSandbox()
-    jeuneRepository = stubInterface(sandbox)
-    jeunePoleEmploiAuthorizer = new JeunePoleEmploiAuthorizer(jeuneRepository)
+    jeunePoleEmploiAuthorizer = new JeunePoleEmploiAuthorizer()
   })
 
   describe('authorize', () => {
@@ -26,8 +21,6 @@ describe('JeunePoleEmploiAuthorizer', () => {
             id: 'jeune-id',
             structure: Structure.POLE_EMPLOI
           })
-
-          jeuneRepository.existe.withArgs('jeune-id').resolves(true)
 
           // When
           const result = await jeunePoleEmploiAuthorizer.authorize(
@@ -43,8 +36,6 @@ describe('JeunePoleEmploiAuthorizer', () => {
         it('retourne une erreur', async () => {
           // Given
           const utilisateur = unUtilisateurJeune({ id: 'autre-jeune-id' })
-
-          jeuneRepository.existe.withArgs('jeune-id').resolves(true)
 
           // When
           const call = jeunePoleEmploiAuthorizer.authorize(
@@ -62,8 +53,6 @@ describe('JeunePoleEmploiAuthorizer', () => {
         // Given
         const utilisateur = unUtilisateurJeune({ id: 'autre-jeune-id' })
 
-        jeuneRepository.existe.withArgs('jeune-id').resolves(true)
-
         // When
         const call = jeunePoleEmploiAuthorizer.authorize(
           'jeune-id',
@@ -79,8 +68,6 @@ describe('JeunePoleEmploiAuthorizer', () => {
       it('retourne une erreur', async () => {
         // Given
         const utilisateur = unUtilisateurJeune({ id: 'jeune-id' })
-
-        jeuneRepository.existe.withArgs('jeune-id').resolves(false)
 
         // When
         const call = jeunePoleEmploiAuthorizer.authorize(
