@@ -16,7 +16,8 @@ import { Recherche } from '../../../src/domain/recherche'
 import { Contrat, Duree, Experience } from '../../../src/domain/offre-emploi'
 import {
   CreateRechercheImmersionPayload,
-  CreateRechercheOffresEmploiPayload
+  CreateRechercheOffresEmploiPayload,
+  CreateRechercheServiceCiviquePayload
 } from '../../../src/infrastructure/routes/validation/recherches.inputs'
 import { GetRecherchesQueryHandler } from '../../../src/application/queries/get-recherches.query.handler'
 import { RechercheQueryModel } from '../../../src/application/queries/query-models/recherches.query-model'
@@ -31,6 +32,7 @@ import {
 } from '../../../src/application/commands/delete-recherche.command.handler'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import { DateTime } from 'luxon'
 
 describe('RecherchesController', () => {
   let createRechercheCommandHandler: StubbedClass<CreateRechercheCommandHandler>
@@ -191,6 +193,57 @@ describe('RecherchesController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'post',
       '/jeunes/1/recherches/immersions'
+    )
+  })
+  describe('POST /recherches/services-civiques', () => {
+    describe('Quand la recherche est un service civique', () => {
+      it('crée la recherche avec les critères renseignés', async () => {
+        // Given
+        const createRecherchePayload: CreateRechercheServiceCiviquePayload = {
+          titre: 'Ma recherche',
+          domaine: 'Le yolo domaine',
+          lat: 12345,
+          lon: 67890,
+          distance: 30,
+          dateDeDebutMinimum: '1998-07-12T10:12:14.000Z',
+          dateDeDebutMaximum: '2018-07-15T10:12:14.000Z'
+        }
+
+        // When
+        await request(app.getHttpServer())
+          .post('/jeunes/1/recherches/services-civique')
+          .set('authorization', unHeaderAuthorization())
+          .send(createRecherchePayload)
+
+          // Then
+          .expect(HttpStatus.CREATED)
+        expect(
+          createRechercheCommandHandler.execute
+        ).to.have.been.calledWithExactly(
+          {
+            metier: undefined,
+            idJeune: '1',
+            type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+            titre: 'Ma recherche',
+            localisation: undefined,
+            criteres: {
+              page: undefined,
+              limit: undefined,
+              lat: 12345,
+              lon: 67890,
+              distance: 30,
+              dateDeDebutMinimum: DateTime.fromISO('1998-07-12T10:12:14.000Z'),
+              dateDeDebutMaximum: DateTime.fromISO('2018-07-15T10:12:14.000Z'),
+              domaine: 'Le yolo domaine'
+            }
+          },
+          unUtilisateurDecode()
+        )
+      })
+    })
+    ensureUserAuthenticationFailsIfInvalid(
+      'post',
+      '/jeunes/1/recherches/services-civique'
     )
   })
   describe('GET /recherches', () => {
