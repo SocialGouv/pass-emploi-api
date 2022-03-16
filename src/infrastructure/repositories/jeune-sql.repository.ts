@@ -18,6 +18,7 @@ import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
 import { TransfertConseillerSqlModel } from '../sequelize/models/transfert-conseiller.sql-model'
 import { SequelizeInjectionToken } from '../sequelize/providers'
 import {
+  fromSqlToConseillerDuJeuneQueryModel,
   fromSqlToDetailJeuneQueryModel,
   fromSqlToJeune,
   fromSqlToJeuneHomeQueryModel,
@@ -25,6 +26,7 @@ import {
   toResumeActionsDuJeuneQueryModel,
   toSqlJeune
 } from './mappers/jeunes.mappers'
+import { Conseiller } from '../../domain/conseiller'
 
 @Injectable()
 export class JeuneSqlRepository implements Jeune.Repository {
@@ -62,6 +64,16 @@ export class JeuneSqlRepository implements Jeune.Repository {
       return undefined
     }
     return fromSqlToJeune(jeuneSqlModel)
+  }
+
+  async getConseiller(idJeune: string): Promise<Conseiller | undefined> {
+    const jeuneSqlModel = await JeuneSqlModel.findByPk(idJeune, {
+      include: [ConseillerSqlModel]
+    })
+    if (!jeuneSqlModel?.conseiller) {
+      return undefined
+    }
+    return fromSqlToConseillerDuJeuneQueryModel(jeuneSqlModel)
   }
 
   async getQueryModelById(
