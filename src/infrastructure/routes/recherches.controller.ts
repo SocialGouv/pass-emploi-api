@@ -20,6 +20,7 @@ import { Authentification } from '../../domain/authentification'
 import {
   CreateRechercheImmersionPayload,
   CreateRechercheOffresEmploiPayload,
+  CreateRechercheServiceCiviquePayload,
   GetRecherchesQueryParams
 } from './validation/recherches.inputs'
 import { Recherche } from '../../domain/recherche'
@@ -33,6 +34,8 @@ import {
   DeleteRechercheCommand,
   DeleteRechercheCommandHandler
 } from '../../application/commands/delete-recherche.command.handler'
+import { GetServicesCiviqueQuery } from '../../application/queries/get-services-civique.query.handler'
+import { DateTime } from 'luxon'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -76,6 +79,37 @@ export class RecherchesController {
       titre: createRecherchePayload.titre,
       localisation: createRecherchePayload.localisation,
       criteres: createRecherchePayload.criteres
+    }
+    await this.createRechercheCommandHandler.execute(command, utilisateur)
+  }
+
+  @Post('recherches/services-civique')
+  async creerRechercheServicesCivique(
+    @Body() createRecherchePayload: CreateRechercheServiceCiviquePayload,
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const getServicesCiviqueQuery: GetServicesCiviqueQuery = {
+      page: undefined,
+      limit: undefined,
+      lat: createRecherchePayload.lat,
+      lon: createRecherchePayload.lon,
+      distance: createRecherchePayload.distance,
+      dateDeDebutMaximum: createRecherchePayload.dateDeDebutMaximum
+        ? DateTime.fromISO(createRecherchePayload.dateDeDebutMaximum)
+        : undefined,
+      dateDeDebutMinimum: createRecherchePayload.dateDeDebutMinimum
+        ? DateTime.fromISO(createRecherchePayload.dateDeDebutMinimum)
+        : undefined,
+      domaine: createRecherchePayload.domaine
+    }
+    const command: CreateRechercheCommand = {
+      metier: undefined,
+      idJeune: idJeune,
+      type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+      titre: createRecherchePayload.titre,
+      localisation: undefined,
+      criteres: getServicesCiviqueQuery
     }
     await this.createRechercheCommandHandler.execute(command, utilisateur)
   }
