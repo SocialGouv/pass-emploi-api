@@ -80,6 +80,9 @@ export namespace RendezVous {
     ): Promise<RendezVousConseillerQueryModel>
     getAllQueryModelsByJeune(idJeune: string): Promise<RendezVousQueryModel[]>
     getTypesRendezVousQueryModel(): TypesRendezVousQueryModel
+    getQueryModelById(
+      idRendezVous: string
+    ): Promise<RendezVousQueryModel | undefined>
   }
 
   export function createRendezVousConseiller(

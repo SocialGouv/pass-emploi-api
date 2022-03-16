@@ -55,6 +55,7 @@ import { GetDetailConseillerQueryHandler } from './application/queries/get-detai
 import { GetDetailJeuneQueryHandler } from './application/queries/get-detail-jeune.query.handler'
 import { GetDetailOffreEmploiQueryHandler } from './application/queries/get-detail-offre-emploi.query.handler'
 import { GetDetailOffreImmersionQueryHandler } from './application/queries/get-detail-offre-immersion.query.handler'
+import { GetDetailRendezVousQueryHandler } from './application/queries/get-detail-rendez-vous.query.handler'
 import { GetDetailServiceCiviqueQueryHandler } from './application/queries/get-detail-service-civique.query.handler'
 import { GetDossierMiloJeuneQueryHandler } from './application/queries/get-dossier-milo-jeune.query.handler'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from './application/queries/get-favoris-offres-emploi-jeune.query.handler'
@@ -70,7 +71,7 @@ import { GetRendezVousJeunePoleEmploiQueryHandler } from './application/queries/
 import { GetRendezVousJeuneQueryHandler } from './application/queries/get-rendez-vous-jeune.query.handler'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from './application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
 import { GetServicesCiviqueQueryHandler } from './application/queries/get-services-civique.query.handler'
-import { GetTypesRendezVousQueryHandler } from './application/queries/get-types-rendezvous.query.handler'
+import { GetTypesRendezVousQueryHandler } from './application/queries/get-types-rendez-vous.query.handler'
 import { TaskService } from './application/task.service'
 import { WorkerService } from './application/worker.service'
 import configuration from './config/configuration'
@@ -322,7 +323,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     AddFavoriOffreEngagementCommandHandler,
     GetFavorisOffresEngagementJeuneQueryHandler,
     DeleteFavoriOffreEngagementCommandHandler,
-    DeleteJeuneCommandHandler
+    DeleteJeuneCommandHandler,
+    GetDetailRendezVousQueryHandler
   ]
 }
 

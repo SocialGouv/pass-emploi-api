@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common'
 import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { GetTypesRendezVousQueryHandler } from 'src/application/queries/get-types-rendezvous.query.handler'
+import { GetTypesRendezVousQueryHandler } from 'src/application/queries/get-types-rendez-vous.query.handler'
 import { TypesRendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
 import {
   GetCommunesEtDepartementsQuery,
