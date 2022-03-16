@@ -52,6 +52,10 @@ export default () => {
         process.env.POLE_EMPLOI_PRESTATIONS_API_BASE_URL ??
         'https://api-r.es-qvr.fr/partenaire/peconnect-gerer-prestations/v1'
     },
+    poleEmploiRendezVous: {
+      url: process.env.POLE_EMPLOI_RENDEZ_VOUS_API_BASE_URL ??
+        'https://api-r.es-qvr.fr/partenaire/peconnect-rendezvousagenda/v1'
+    },
     milo: {
       url: process.env.MILO_API_URL,
       apiKeyRecupererDossier: process.env.MILO_DOSSIER_API_KEY,

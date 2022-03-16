@@ -52,6 +52,9 @@ export const testConfig = (): ConfigService => {
     poleEmploiPrestations: {
       url: 'https://api-r.es-qvr.fr/partenaire/peconnect-gerer-prestations/v1'
     },
+    poleEmploiRendezVous: {
+      url: 'https://api.emploi-store.fr/partenaire/peconnect-rendezvousagenda/v1'
+    },
     milo: {
       url: 'https://milo.com',
       apiKeyRecupererDossier: 'apiKeyRecupererDossier',

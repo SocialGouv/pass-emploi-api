@@ -21,6 +21,11 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
 import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
+import {
+  PoleEmploiRendezVousClient,
+  RendezVousPoleEmploiDto
+} from '../../infrastructure/clients/pole-emploi-rendez-vous-client'
+import { Conseiller } from '../../domain/conseiller'
 
 export interface GetRendezVousJeunePoleEmploiQuery extends Query {
   idJeune: string
@@ -36,6 +41,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     private poleEmploiPrestationsClient: PoleEmploiPrestationsClient,
+    private poleEmploiRendezVousClient: PoleEmploiRendezVousClient,
     private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer,
     private dateService: DateService,
     private idService: IdService
@@ -52,18 +58,27 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
 
+    const conseiller = await this.jeuneRepository.getConseiller(query.idJeune)
+
     const maintenant = this.dateService.now()
 
     try {
-      const responseRendezVous =
+      const responsePrestationsRendezVous =
         await this.poleEmploiPrestationsClient.getRendezVous(
           query.idpToken,
           maintenant
         )
 
-      const prestations: PrestationDto[] = responseRendezVous?.data ?? []
+      const responseRendezVousPoleEmploi =
+        await this.poleEmploiRendezVousClient.getRendezVous(query.idpToken)
 
-      const rendezVous = await Promise.all(
+      const prestations: PrestationDto[] =
+        responsePrestationsRendezVous?.data ?? []
+
+      const rendezVousPoleEmploiDto: RendezVousPoleEmploiDto[] =
+        responseRendezVousPoleEmploi?.data ?? []
+
+      const rendezVousPrestations = await Promise.all(
         prestations.map(async prestation => {
           const dateRendezVous = DateTime.fromJSDate(
             prestation.session.dateDebut
@@ -89,7 +104,16 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
           )
         })
       )
-      return success(rendezVous)
+      const rendezVousPoleEmploi = await Promise.all(
+        rendezVousPoleEmploiDto.map(rendezVous => {
+          return this.fromRendezVousPoleEmploiDtoToRendezVousQueryModel(
+            rendezVous,
+            jeune,
+            conseiller
+          )
+        })
+      )
+      return success(rendezVousPrestations.concat(rendezVousPoleEmploi))
     } catch (e) {
       this.logger.error(e)
       return failure(
@@ -125,10 +149,10 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
       date: prestation.session.dateDebut,
       comment: prestation.session.commentaire,
       jeune: { id: jeune.id, nom: jeune.lastName, prenom: jeune.firstName },
-      modality: buildModality(prestation),
-      duration: buildDuration(prestation),
-      description: buildDescription(prestation),
-      adresse: buildAdresse(prestation),
+      modality: buildPrestationModality(prestation),
+      duration: buildPrestationDuration(prestation),
+      description: buildPrestationDescription(prestation),
+      adresse: buildPrestationAdresse(prestation),
       organisme: prestation.session.adresse?.adresseLigne3,
       agencePE: prestation.session.enAgence,
       theme: prestation.session.typePrestation?.libelle,
@@ -140,9 +164,45 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
       lienVisio
     }
   }
+
+  fromRendezVousPoleEmploiDtoToRendezVousQueryModel(
+    rendezVousPoleEmploiDto: RendezVousPoleEmploiDto,
+    jeune: Jeune,
+    conseiller?: Conseiller
+  ): RendezVousQueryModel {
+    return {
+      id: this.idService.uuid(),
+      title: '',
+      type: {
+        code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+        label:
+          mapCodeLabelTypeRendezVous[
+            CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
+          ]
+      },
+      date: buildRendezVousDate(rendezVousPoleEmploiDto),
+      comment: rendezVousPoleEmploiDto.commentaire,
+      jeune: { id: jeune.id, nom: jeune.lastName, prenom: jeune.firstName },
+      modality: buildRendezVousModality(rendezVousPoleEmploiDto),
+      duration: rendezVousPoleEmploiDto.duree,
+      adresse: buildRendezVousAdresse(rendezVousPoleEmploiDto),
+      agencePE: !!rendezVousPoleEmploiDto.agence,
+      conseiller: conseiller
+        ? {
+            id: conseiller.id,
+            nom: conseiller.lastName,
+            prenom: conseiller.firstName
+          }
+        : undefined,
+      theme: rendezVousPoleEmploiDto.theme,
+      presenceConseiller: true,
+      visio: rendezVousPoleEmploiDto.modaliteContact === 'VISIO',
+      lienVisio: rendezVousPoleEmploiDto.lienVisio
+    }
+  }
 }
 
-function buildModality(prestation: PrestationDto): string {
+function buildPrestationModality(prestation: PrestationDto): string {
   switch (prestation.session.modalitePremierRendezVous) {
     case 'WEBCAM':
       return 'par visio'
@@ -153,7 +213,9 @@ function buildModality(prestation: PrestationDto): string {
   }
 }
 
-function buildDescription(prestation: PrestationDto): string | undefined {
+function buildPrestationDescription(
+  prestation: PrestationDto
+): string | undefined {
   switch (prestation.session.typePrestation?.code) {
     case 'ATE':
       return prestation.session.themeAtelier?.libelle
@@ -171,7 +233,7 @@ function buildDescription(prestation: PrestationDto): string | undefined {
   }
 }
 
-function buildAdresse(prestation: PrestationDto): string | undefined {
+function buildPrestationAdresse(prestation: PrestationDto): string | undefined {
   const adresse = [
     prestation.session.adresse?.adresseLigne1,
     prestation.session.adresse?.adresseLigne2,
@@ -183,9 +245,49 @@ function buildAdresse(prestation: PrestationDto): string | undefined {
   return adresse || undefined
 }
 
-function buildDuration(prestation: PrestationDto): number {
+function buildPrestationDuration(prestation: PrestationDto): number {
   if (prestation.session.duree.unite === 'HEURE') {
     return Math.floor(prestation.session.duree.valeur * 60)
   }
   return 0
+}
+
+function buildRendezVousAdresse(
+  rendezVousPoleEmploi: RendezVousPoleEmploiDto
+): string | undefined {
+  const adresse = [
+    rendezVousPoleEmploi.adresse?.ligne4,
+    rendezVousPoleEmploi.adresse?.ligne5,
+    rendezVousPoleEmploi.adresse?.ligne6
+  ]
+    .join(' ')
+    .trim()
+  return adresse || undefined
+}
+
+function buildRendezVousModality(
+  rendezVousPoleEmploiDto: RendezVousPoleEmploiDto
+): string {
+  if (rendezVousPoleEmploiDto.agence) {
+    return 'en agence Pôle emploi'
+  }
+  switch (rendezVousPoleEmploiDto.modaliteContact) {
+    case 'VISIO':
+      return 'par visio'
+    case 'TELEPHONIQUE':
+      return 'par téléphone'
+    case 'AGENCE':
+      return 'en agence Pôle emploi'
+    default:
+      return ''
+  }
+}
+
+function buildRendezVousDate(
+  rendezVousPoleEmploiDto: RendezVousPoleEmploiDto
+): Date {
+  const date = new Date(rendezVousPoleEmploiDto.date)
+  const heuresEtMinutes = rendezVousPoleEmploiDto.heure.split(':')
+  date.setHours(parseInt(heuresEtMinutes[0]), parseInt(heuresEtMinutes[1]))
+  return date
 }

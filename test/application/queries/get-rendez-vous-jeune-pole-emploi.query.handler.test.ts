@@ -19,11 +19,16 @@ import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
 import { DateTime } from 'luxon'
 import { IdService } from 'src/utils/id-service'
+import {
+  PoleEmploiRendezVousClient,
+  RendezVousPoleEmploiDto
+} from '../../../src/infrastructure/clients/pole-emploi-rendez-vous-client'
 
 describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   let jeunesRepository: StubbedType<Jeune.Repository>
   let dateService: StubbedClass<DateService>
   let poleEmploiPrestationsClient: StubbedClass<PoleEmploiPrestationsClient>
+  let poleEmploiRendezVousClient: StubbedClass<PoleEmploiRendezVousClient>
   let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
   let getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler
   let sandbox: SinonSandbox
@@ -32,6 +37,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
     sandbox = createSandbox()
     jeunesRepository = stubInterface(sandbox)
     poleEmploiPrestationsClient = stubClass(PoleEmploiPrestationsClient)
+    poleEmploiRendezVousClient = stubClass(PoleEmploiRendezVousClient)
     jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
     dateService = stubClass(DateService)
     const idService = stubClass(IdService)
@@ -41,6 +47,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       new GetRendezVousJeunePoleEmploiQueryHandler(
         jeunesRepository,
         poleEmploiPrestationsClient,
+        poleEmploiRendezVousClient,
         jeunePoleEmploiAuthorizer,
         dateService,
         idService
@@ -357,6 +364,184 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         },
         visio: true,
         lienVisio: undefined
+      })
+    })
+  })
+
+  describe('fromRendezVousPoleEmploiDtoToRendezVousQueryModel', () => {
+    it("retourne un RendezVousQueryModel avec l'adresse", async () => {
+      // Given
+      const jeune = unJeune()
+      const date = new Date('2020-04-06')
+      dateService.now.returns(uneDatetime)
+      const rendezVousPoleEmploiDto: RendezVousPoleEmploiDto = {
+        theme: 'theme',
+        date: date,
+        heure: '12:20',
+        duree: 23,
+        modaliteContact: 'VISIO',
+        nomConseiller: 'Tavernier',
+        prenomConseiller: 'Nils',
+        agence: 'Agence',
+        adresse: {
+          bureauDistributeur: 'bureau',
+          ligne4: '12 rue Albert Camus',
+          ligne5: '75018',
+          ligne6: 'Paris'
+        },
+        commentaire: 'commentaire',
+        typeRDV: 'RDVL',
+        lienVisio: 'lien'
+      }
+      const expectedDate = new Date('2020-04-06T12:20:00')
+
+      // When
+      const rendezVousQueryModel =
+        await getRendezVousJeunePoleEmploiQueryHandler.fromRendezVousPoleEmploiDtoToRendezVousQueryModel(
+          rendezVousPoleEmploiDto,
+          jeune
+        )
+
+      // Then
+      expect(rendezVousQueryModel).to.deep.equal({
+        agencePE: true,
+        date: expectedDate,
+        duration: 23,
+        id: 'inconnu-prestation',
+        jeune: {
+          id: 'ABCDE',
+          nom: 'Doe',
+          prenom: 'John'
+        },
+        modality: 'en agence Pôle emploi',
+        theme: 'theme',
+        conseiller: undefined,
+        presenceConseiller: true,
+        comment: 'commentaire',
+        adresse: '12 rue Albert Camus 75018 Paris',
+        title: '',
+        type: {
+          code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
+          label: 'Entretien individuel conseiller'
+        },
+        visio: true,
+        lienVisio: 'lien'
+      })
+    })
+    it('retourne un RendezVousQueryModel avec la modalité', async () => {
+      // Given
+      const jeune = unJeune()
+      const date = new Date('2020-04-06')
+      dateService.now.returns(uneDatetime)
+      const rendezVousPoleEmploiDto: RendezVousPoleEmploiDto = {
+        theme: 'theme',
+        date: date,
+        heure: '07:59',
+        duree: 23,
+        modaliteContact: 'VISIO',
+        nomConseiller: 'Tavernier',
+        prenomConseiller: 'Nils',
+        adresse: {
+          bureauDistributeur: 'bureau',
+          ligne4: '12 rue Albert Camus',
+          ligne5: '75018',
+          ligne6: 'Paris'
+        },
+        commentaire: 'commentaire',
+        typeRDV: 'RDVL',
+        lienVisio: 'lien'
+      }
+      const expectedDate = new Date('2020-04-06T07:59:00')
+
+      // When
+      const rendezVousQueryModel =
+        await getRendezVousJeunePoleEmploiQueryHandler.fromRendezVousPoleEmploiDtoToRendezVousQueryModel(
+          rendezVousPoleEmploiDto,
+          jeune
+        )
+
+      // Then
+      expect(rendezVousQueryModel).to.deep.equal({
+        agencePE: false,
+        date: expectedDate,
+        duration: 23,
+        id: 'inconnu-prestation',
+        jeune: {
+          id: 'ABCDE',
+          nom: 'Doe',
+          prenom: 'John'
+        },
+        modality: 'par visio',
+        theme: 'theme',
+        conseiller: undefined,
+        presenceConseiller: true,
+        comment: 'commentaire',
+        adresse: '12 rue Albert Camus 75018 Paris',
+        title: '',
+        type: {
+          code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
+          label: 'Entretien individuel conseiller'
+        },
+        visio: true,
+        lienVisio: 'lien'
+      })
+    })
+    it('retourne un RendezVousQueryModel avec la bonne date', async () => {
+      // Given
+      const jeune = unJeune()
+      const date = new Date('2020-04-06')
+      dateService.now.returns(uneDatetime)
+      const rendezVousPoleEmploiDto: RendezVousPoleEmploiDto = {
+        theme: 'theme',
+        date: date,
+        heure: '12:20',
+        duree: 23,
+        modaliteContact: 'VISIO',
+        nomConseiller: 'Tavernier',
+        prenomConseiller: 'Nils',
+        adresse: {
+          bureauDistributeur: 'bureau',
+          ligne4: '12 rue Albert Camus',
+          ligne5: '75018',
+          ligne6: 'Paris'
+        },
+        commentaire: 'commentaire',
+        typeRDV: 'RDVL',
+        lienVisio: 'lien'
+      }
+      const expectedDate = new Date('2020-04-06T12:20:00')
+
+      // When
+      const rendezVousQueryModel =
+        await getRendezVousJeunePoleEmploiQueryHandler.fromRendezVousPoleEmploiDtoToRendezVousQueryModel(
+          rendezVousPoleEmploiDto,
+          jeune
+        )
+
+      // Then
+      expect(rendezVousQueryModel).to.deep.equal({
+        agencePE: false,
+        date: expectedDate,
+        duration: 23,
+        id: 'inconnu-prestation',
+        jeune: {
+          id: 'ABCDE',
+          nom: 'Doe',
+          prenom: 'John'
+        },
+        modality: 'par visio',
+        theme: 'theme',
+        conseiller: undefined,
+        presenceConseiller: true,
+        comment: 'commentaire',
+        adresse: '12 rue Albert Camus 75018 Paris',
+        title: '',
+        type: {
+          code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
+          label: 'Entretien individuel conseiller'
+        },
+        visio: true,
+        lienVisio: 'lien'
       })
     })
   })

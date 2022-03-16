@@ -14,6 +14,7 @@ import {
 } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { AsSql } from '../../sequelize/types'
 import { ResumeActionsJeuneDto } from '../jeune-sql.repository'
+import { Conseiller } from '../../../domain/conseiller'
 
 export function fromSqlToDetailJeuneQueryModel(
   jeuneSqlModel: JeuneSqlModel
@@ -125,6 +126,18 @@ export function fromSqlToJeuneHomeQueryModel(
       organisme: rendezVousSql.organisme ?? undefined,
       presenceConseiller: rendezVousSql.presenceConseiller
     }))
+  }
+}
+
+export function fromSqlToConseillerDuJeuneQueryModel(
+  jeuneSqlModel: JeuneSqlModel
+): Conseiller {
+  return {
+    id: jeuneSqlModel.conseiller!.id,
+    firstName: jeuneSqlModel.conseiller!.prenom,
+    lastName: jeuneSqlModel.conseiller!.nom,
+    structure: jeuneSqlModel.conseiller!.structure,
+    email: jeuneSqlModel.conseiller!.email || undefined
   }
 }
 

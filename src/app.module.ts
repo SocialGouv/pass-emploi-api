@@ -138,6 +138,7 @@ import { databaseProviders } from './infrastructure/sequelize/providers'
 import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
 import { configureLoggerModule } from './utils/logger.module'
+import { PoleEmploiRendezVousClient } from './infrastructure/clients/pole-emploi-rendez-vous-client'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -176,6 +177,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     ImmersionClient,
     EngagementClient,
     PoleEmploiPrestationsClient,
+    PoleEmploiRendezVousClient,
     Action.Factory,
     Authentification.Factory,
     WorkerService,
