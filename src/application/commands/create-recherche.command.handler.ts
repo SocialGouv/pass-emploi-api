@@ -12,6 +12,7 @@ import { GetOffresEmploiQuery } from '../queries/get-offres-emploi.query.handler
 import { GetOffresImmersionQuery } from '../queries/get-offres-immersion.query.handler'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { DateService } from 'src/utils/date-service'
+import { GetServicesCiviqueQuery } from '../queries/get-services-civique.query.handler'
 
 export interface CreateRechercheCommand extends Command {
   idJeune: string
@@ -19,7 +20,10 @@ export interface CreateRechercheCommand extends Command {
   titre: string
   metier?: string
   localisation?: string
-  criteres?: GetOffresEmploiQuery | GetOffresImmersionQuery
+  criteres?:
+    | GetOffresEmploiQuery
+    | GetOffresImmersionQuery
+    | GetServicesCiviqueQuery
 }
 
 @Injectable()
