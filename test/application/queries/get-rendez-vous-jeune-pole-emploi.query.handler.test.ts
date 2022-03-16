@@ -1,14 +1,16 @@
 import {
   GetRendezVousJeunePoleEmploiQuery,
-  GetRendezVousJeunePoleEmploiQueryHandler,
-  PrestationDto
+  GetRendezVousJeunePoleEmploiQueryHandler
 } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { DateService } from '../../../src/utils/date-service'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { Jeune } from '../../../src/domain/jeune'
-import { PoleEmploiPrestationsClient } from '../../../src/infrastructure/clients/pole-emploi-prestations-client'
+import {
+  PoleEmploiPrestationsClient,
+  PrestationDto
+} from '../../../src/infrastructure/clients/pole-emploi-prestations-client'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { failure } from '../../../src/building-blocks/types/result'
@@ -16,6 +18,7 @@ import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
 import { DateTime } from 'luxon'
+import { IdService } from 'src/utils/id-service'
 
 describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   let jeunesRepository: StubbedType<Jeune.Repository>
@@ -31,12 +34,16 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
     poleEmploiPrestationsClient = stubClass(PoleEmploiPrestationsClient)
     jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
     dateService = stubClass(DateService)
+    const idService = stubClass(IdService)
+    idService.uuid.returns('inconnu-prestation')
+
     getRendezVousJeunePoleEmploiQueryHandler =
       new GetRendezVousJeunePoleEmploiQueryHandler(
         jeunesRepository,
         poleEmploiPrestationsClient,
         jeunePoleEmploiAuthorizer,
-        dateService
+        dateService,
+        idService
       )
   })
 
@@ -365,51 +372,49 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           const jeune = unJeune()
           const date = new Date('2020-04-06')
           const maintenant = uneDatetime
+          const prestations: PrestationDto[] = [
+            {
+              annule: false,
+              datefin: date,
+              session: {
+                adresse: {
+                  adresseLigne1: '588 BOULEVARD ALBERT CAMUS',
+                  codeInsee: '69264',
+                  codePostal: '69665',
+                  identifiantAurore: '69065_00014597',
+                  typeLieu: 'INTERNE',
+                  ville: 'VILLEFRANCHE SUR SAONE',
+                  villePostale: 'VILLEFRANCHE SUR SAONE CEDEX'
+                },
+                dateDebut: date,
+                dateFinPrevue: date,
+                dateLimite: date,
+                duree: {
+                  unite: 'JOUR',
+                  valeur: 1.0
+                },
+                enAgence: true,
+                infoCollective: false,
+                realiteVirtuelle: false,
+                themeAtelier: {
+                  code: 'A14',
+                  libelle: "Utiliser Internet dans sa recherche d'emploi"
+                },
+                typePrestation: {
+                  code: 'ATE',
+                  libelle: 'Atelier',
+                  actif: true
+                }
+              }
+            }
+          ]
           const prestationsResponse = {
             config: undefined,
             headers: undefined,
             request: undefined,
             status: 200,
             statusText: '',
-            data: [
-              {
-                annule: false,
-                datefin: date,
-                session: {
-                  adresse: {
-                    adresseLigne1: '588 BOULEVARD ALBERT CAMUS',
-                    codeInsee: '69264',
-                    codePostal: '69665',
-                    identifiantAurore: '69065_00014597',
-                    typeLieu: 'INTERNE',
-                    ville: 'VILLEFRANCHE SUR SAONE',
-                    villePostale: 'VILLEFRANCHE SUR SAONE CEDEX'
-                  },
-                  dateDebut: date,
-                  dateFinPrevue: date,
-                  dateLimite: date,
-                  duree: {
-                    unite: 'JOUR',
-                    valeur: 1.0
-                  },
-                  enAgence: true,
-                  infoCollective: false,
-                  realiteVirtuelle: false,
-                  themeAtelier: {
-                    code: 'A14',
-                    disponibleAutoInscription: false,
-                    libelle: "Utiliser Internet dans sa recherche d'emploi",
-                    type: 'THA',
-                    typeCourrier: 'CON'
-                  },
-                  typePrestation: {
-                    code: 'ATE',
-                    libelle: 'Atelier',
-                    actif: true
-                  }
-                }
-              }
-            ]
+            data: prestations
           }
 
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
@@ -467,29 +472,31 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           const date = new Date('2020-04-06')
           const jeune = unJeune()
           const idVisio = '1'
+          const prestations: PrestationDto[] = [
+            {
+              annule: false,
+              datefin: date,
+              identifiantStable: idVisio,
+              session: {
+                dateDebut: date,
+                dateFinPrevue: date,
+                dateLimite: date,
+                duree: {
+                  unite: 'JOUR',
+                  valeur: 1.0
+                },
+                enAgence: true
+              }
+            }
+          ]
+
           const rendezVousPoleEmploiPrestationsResponse = {
             config: undefined,
             headers: undefined,
             request: undefined,
             status: 200,
             statusText: '',
-            data: [
-              {
-                annule: false,
-                datefin: date,
-                identifiantStable: idVisio,
-                session: {
-                  dateDebut: date,
-                  dateFinPrevue: date,
-                  dateLimite: date,
-                  duree: {
-                    unite: 'JOUR',
-                    valeur: 1.0
-                  },
-                  enAgence: true
-                }
-              }
-            ]
+            data: prestations
           }
 
           const lienVisioResponse = {
@@ -506,6 +513,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           ).toUTC()
 
           dateService.now.returns(maintenant)
+          dateService.isSameDateDay.returns(true)
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPrestationsClient.getRendezVous
             .withArgs(query.idpToken, maintenant)

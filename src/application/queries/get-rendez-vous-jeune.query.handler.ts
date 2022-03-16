@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
@@ -14,7 +15,7 @@ export interface GetRendezVousJeuneQuery extends Query {
 @Injectable()
 export class GetRendezVousJeuneQueryHandler extends QueryHandler<
   GetRendezVousJeuneQuery,
-  RendezVousQueryModel[]
+  Result<RendezVousQueryModel[]>
 > {
   constructor(
     @Inject(RendezVousRepositoryToken)
@@ -27,8 +28,11 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
 
   async handle(
     query: GetRendezVousJeuneQuery
-  ): Promise<RendezVousQueryModel[]> {
-    return this.rendezVousRepository.getAllQueryModelsByJeune(query.idJeune)
+  ): Promise<Result<RendezVousQueryModel[]>> {
+    const responseRendezVous =
+      await this.rendezVousRepository.getAllQueryModelsByJeune(query.idJeune)
+
+    return success(responseRendezVous)
   }
   async authorize(
     query: GetRendezVousJeuneQuery,

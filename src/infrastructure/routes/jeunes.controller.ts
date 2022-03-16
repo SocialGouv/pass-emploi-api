@@ -172,30 +172,34 @@ export class JeunesController {
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @Headers('x-idp-token') idpToken?: string
   ): Promise<RendezVousQueryModel[]> {
+    let result: Result<RendezVousQueryModel[]>
     if (utilisateur.structure === Core.Structure.POLE_EMPLOI && idpToken) {
-      const result =
-        await this.getRendezVousJeunePoleEmploiQueryHandler.execute(
-          { idJeune, idpToken },
-          utilisateur
-        )
+      result = await this.getRendezVousJeunePoleEmploiQueryHandler.execute(
+        { idJeune, idpToken },
+        utilisateur
+      )
+    } else {
+      result = await this.getRendezVousJeuneQueryHandler.execute(
+        { idJeune },
+        utilisateur
+      )
+    }
 
-      if (isSuccess(result)) {
-        return result.data
+    if (isSuccess(result)) {
+      return result.data
+    }
+    if (isFailure(result)) {
+      if (result.error.code === NonTrouveError.CODE) {
+        throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
       }
-      if (isFailure(result)) {
-        if (result.error.code === NonTrouveError.CODE) {
-          throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
-        }
-        if (result.error.code === ErreurHttp.CODE) {
-          throw new HttpException(
-            result.error.message,
-            (result.error as ErreurHttp).statusCode
-          )
-        }
-        throw new RuntimeException(result.error.message)
+      if (result.error.code === ErreurHttp.CODE) {
+        throw new HttpException(
+          result.error.message,
+          (result.error as ErreurHttp).statusCode
+        )
       }
     }
-    return this.getRendezVousJeuneQueryHandler.execute({ idJeune }, utilisateur)
+    throw new RuntimeException(result.error.message)
   }
 
   @Post(':idJeune/action')

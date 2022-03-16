@@ -10,4 +10,8 @@ export class DateService {
   nowJs(): Date {
     return new Date()
   }
+
+  isSameDateDay(date1: DateTime, date2: DateTime): boolean {
+    return date1.startOf('day').equals(date2.startOf('day'))
+  }
 }

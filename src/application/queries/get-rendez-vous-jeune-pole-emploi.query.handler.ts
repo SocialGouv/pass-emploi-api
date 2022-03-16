@@ -11,8 +11,12 @@ import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous
 } from 'src/domain/rendez-vous'
-import { PoleEmploiPrestationsClient } from 'src/infrastructure/clients/pole-emploi-prestations-client'
+import {
+  PoleEmploiPrestationsClient,
+  PrestationDto
+} from 'src/infrastructure/clients/pole-emploi-prestations-client'
 import { DateService } from 'src/utils/date-service'
+import { IdService } from 'src/utils/id-service'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
@@ -21,66 +25,6 @@ import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
 export interface GetRendezVousJeunePoleEmploiQuery extends Query {
   idJeune: string
   idpToken: string
-}
-
-export interface PrestationDto {
-  annule?: boolean
-  datefin?: Date
-  identifiantStable?: string
-  session: {
-    dateDebut: Date
-    dateFinPrevue?: Date
-    dateLimite?: Date
-    enAgence?: boolean
-    infoCollective?: boolean
-    natureAnimation?: 'INTERNE' | 'EXTERNE' | 'CO_ANIMEE'
-    realiteVirtuelle?: boolean
-    modalitePremierRendezVous?: 'WEBCAM' | 'PHYSIQUE'
-    adresse?: {
-      adresseLigne1?: string
-      adresseLigne2?: string
-      adresseLigne3?: string
-      codeInsee?: string
-      codePostal?: string
-      telephone?: string
-      typeLieu?: 'INTERNE' | 'EXTERNE' | 'AUTRE'
-      ville?: string
-      villePostale?: string
-      coordonneesGPS?: {
-        latitude?: number
-        longitude?: number
-      }
-      identifiantAurore?: string
-    }
-    duree: {
-      unite: 'JOUR' | 'HEURE'
-      valeur: number
-    }
-    typePrestation?: {
-      code?: string
-      libelle?: string
-      accroche?: string
-      actif?: boolean
-      descriptifTypePrestation?: string
-    }
-    themeAtelier?: {
-      libelle?: string
-      accroche?: string
-      code?: string
-      codeTypePrestation?: string
-    }
-    sousThemeAtelier?: {
-      codeSousThemeAtelier?: string
-      libelleSousThemeAtelier?: string
-      descriptifSousThemeAtelier?: string
-    }
-    dureeReunionInformationCollective?: {
-      unite?: string
-      valeur?: number
-    }
-    reunionInfoCommentaire?: string
-    commentaire?: string
-  }
 }
 
 @Injectable()
@@ -93,7 +37,8 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     private jeuneRepository: Jeune.Repository,
     private poleEmploiPrestationsClient: PoleEmploiPrestationsClient,
     private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer,
-    private dateService: DateService
+    private dateService: DateService,
+    private idService: IdService
   ) {
     super('GetRendezVousJeunePoleEmploiQueryHandler')
   }
@@ -127,9 +72,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
 
           if (
             prestation.identifiantStable &&
-            dateRendezVous.day === maintenant.day &&
-            dateRendezVous.month === maintenant.month &&
-            dateRendezVous.year === maintenant.year
+            this.dateService.isSameDateDay(dateRendezVous, maintenant)
           ) {
             const responseLienVisio =
               await this.poleEmploiPrestationsClient.getLienVisio(
@@ -172,7 +115,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     lienVisio?: string
   ): RendezVousQueryModel {
     return {
-      id: 'inconnu-prestation',
+      id: this.idService.uuid(),
       title: '',
       type: {
         code: CodeTypeRendezVous.PRESTATION,
@@ -215,30 +158,28 @@ function buildDescription(prestation: PrestationDto): string | undefined {
       return prestation.session.themeAtelier?.libelle
     case 'ATL':
     case 'ATC':
-      return (
-        [
-          prestation.session.sousThemeAtelier?.libelleSousThemeAtelier,
-          prestation.session.sousThemeAtelier?.descriptifSousThemeAtelier
-        ]
-          .join('\n')
-          .trim() || undefined
-      )
+      const description = [
+        prestation.session.sousThemeAtelier?.libelleSousThemeAtelier,
+        prestation.session.sousThemeAtelier?.descriptifSousThemeAtelier
+      ]
+        .join('\n')
+        .trim()
+      return description || undefined
     default:
       return prestation.session.typePrestation?.descriptifTypePrestation
   }
 }
 
 function buildAdresse(prestation: PrestationDto): string | undefined {
-  return (
-    [
-      prestation.session.adresse?.adresseLigne1,
-      prestation.session.adresse?.adresseLigne2,
-      prestation.session.adresse?.codePostal,
-      prestation.session.adresse?.ville
-    ]
-      .join(' ')
-      .trim() || undefined
-  )
+  const adresse = [
+    prestation.session.adresse?.adresseLigne1,
+    prestation.session.adresse?.adresseLigne2,
+    prestation.session.adresse?.codePostal,
+    prestation.session.adresse?.ville
+  ]
+    .join(' ')
+    .trim()
+  return adresse || undefined
 }
 
 function buildDuration(prestation: PrestationDto): number {

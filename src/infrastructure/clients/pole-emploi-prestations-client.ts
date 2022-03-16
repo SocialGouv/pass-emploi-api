@@ -6,6 +6,66 @@ import * as https from 'https'
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
 
+export interface PrestationDto {
+  annule?: boolean
+  datefin?: Date
+  identifiantStable?: string
+  session: {
+    dateDebut: Date
+    dateFinPrevue?: Date
+    dateLimite?: Date
+    enAgence?: boolean
+    infoCollective?: boolean
+    natureAnimation?: 'INTERNE' | 'EXTERNE' | 'CO_ANIMEE'
+    realiteVirtuelle?: boolean
+    modalitePremierRendezVous?: 'WEBCAM' | 'PHYSIQUE'
+    adresse?: {
+      adresseLigne1?: string
+      adresseLigne2?: string
+      adresseLigne3?: string
+      codeInsee?: string
+      codePostal?: string
+      telephone?: string
+      typeLieu?: 'INTERNE' | 'EXTERNE' | 'AUTRE'
+      ville?: string
+      villePostale?: string
+      coordonneesGPS?: {
+        latitude?: number
+        longitude?: number
+      }
+      identifiantAurore?: string
+    }
+    duree: {
+      unite: 'JOUR' | 'HEURE'
+      valeur: number
+    }
+    typePrestation?: {
+      code?: string
+      libelle?: string
+      accroche?: string
+      actif?: boolean
+      descriptifTypePrestation?: string
+    }
+    themeAtelier?: {
+      libelle?: string
+      accroche?: string
+      code?: string
+      codeTypePrestation?: string
+    }
+    sousThemeAtelier?: {
+      codeSousThemeAtelier?: string
+      libelleSousThemeAtelier?: string
+      descriptifSousThemeAtelier?: string
+    }
+    dureeReunionInformationCollective?: {
+      unite?: string
+      valeur?: number
+    }
+    reunionInfoCommentaire?: string
+    commentaire?: string
+  }
+}
+
 @Injectable()
 export class PoleEmploiPrestationsClient {
   private readonly apiUrl: string
@@ -21,15 +81,18 @@ export class PoleEmploiPrestationsClient {
 
   async getRendezVous(
     tokenDuJeune: string,
-    date: DateTime
-  ): Promise<AxiosResponse> {
+    dateRechercheRendezVous: DateTime
+  ): Promise<AxiosResponse<PrestationDto[]>> {
     this.logger.log(
-      `recuperation des prestations du jeune à date du ${date.toFormat(
+      `recuperation des prestations du jeune à partir de la date du ${dateRechercheRendezVous.toFormat(
         'yyyy-MM-dd'
       )}`
     )
     const params = new URLSearchParams()
-    params.append('dateRecherche', date.toFormat('yyyy-MM-dd'))
+    params.append(
+      'dateRecherche',
+      dateRechercheRendezVous.toFormat('yyyy-MM-dd')
+    )
 
     return this.get('rendez-vous', tokenDuJeune, params)
   }
@@ -37,7 +100,7 @@ export class PoleEmploiPrestationsClient {
   async getLienVisio(
     tokenDuJeune: string,
     idVisio: string
-  ): Promise<AxiosResponse> {
+  ): Promise<AxiosResponse<string>> {
     this.logger.log('recuperation visio')
     const params = new URLSearchParams()
     params.append('idVisio', idVisio)
