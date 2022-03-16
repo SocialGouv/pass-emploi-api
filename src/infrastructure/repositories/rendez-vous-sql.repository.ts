@@ -17,6 +17,7 @@ import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
 import {
   fromSqlToRendezVousConseillerQueryModel,
   fromSqlToRendezVousJeuneQueryModel,
+  fromSqlToRendezVousQueryModel,
   toRendezVous,
   toRendezVousDto
 } from './mappers/rendez-vous.mappers'
@@ -24,6 +25,22 @@ import {
 @Injectable()
 export class RendezVousRepositorySql implements RendezVous.Repository {
   constructor(private dateService: DateService) {}
+
+  async getQueryModelById(
+    id: string
+  ): Promise<RendezVousQueryModel | undefined> {
+    const rendezVousSqlModel = await RendezVousSqlModel.findByPk(id, {
+      include: [
+        {
+          model: JeuneSqlModel,
+          required: true
+        }
+      ]
+    })
+    if (!rendezVousSqlModel) return undefined
+
+    return fromSqlToRendezVousQueryModel(rendezVousSqlModel)
+  }
 
   async add(rendezVous: RendezVous): Promise<void> {
     const rendezVousDto = toRendezVousDto(rendezVous)

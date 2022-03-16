@@ -80,15 +80,16 @@ export function fromSqlToRendezVousJeuneQueryModel(
   }
 }
 
-function fromSqlToRendezVousQueryModel(
+export function fromSqlToRendezVousQueryModel(
   rendezVousSql: RendezVousSqlModel
-): Omit<RendezVousQueryModel, 'title'> {
+): RendezVousQueryModel {
   return {
     id: rendezVousSql.id,
     comment: rendezVousSql.commentaire ?? undefined,
     date: rendezVousSql.date,
     modality: rendezVousSql.modalite ?? '',
     duration: rendezVousSql.duree,
+    title: '',
     jeune: {
       id: rendezVousSql.jeune.id,
       prenom: rendezVousSql.jeune.prenom,
