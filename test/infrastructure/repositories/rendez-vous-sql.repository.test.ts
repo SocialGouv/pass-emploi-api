@@ -66,6 +66,30 @@ describe('RendezVousRepositorySql', () => {
     ])
   })
 
+  describe('getQueryModelById', () => {
+    describe("quand le rdv n'existe pas", () => {
+      it('retourne undefined', async () => {
+        // Given
+        const idRdv = '6c242fa0-804f-11ec-a8a3-0242ac120002'
+        // When
+        const rendezVous = await rendezVousRepositorySql.getQueryModelById(
+          idRdv
+        )
+        // Then
+        expect(rendezVous).to.equal(undefined)
+      })
+    })
+    describe('quand le rdv existe', () => {
+      it('retourne le rdv', async () => {
+        // When
+        const rendezVous = await rendezVousRepositorySql.getQueryModelById(
+          unRendezVousPasse.id
+        )
+        // Then
+        expect(rendezVous?.id).to.deep.equal(unRendezVousPasse.id)
+      })
+    })
+  })
   describe('get', () => {
     describe("quand le rdv n'existe pas", () => {
       it('retourne undefined', async () => {
