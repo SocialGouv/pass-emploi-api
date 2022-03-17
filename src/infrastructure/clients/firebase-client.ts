@@ -56,7 +56,8 @@ export class FirebaseClient implements IFirebaseClient {
       await this.messaging.send(tokenMessage)
     } catch (e) {
       this.logger.error(
-        `Impossible d'envoyer de notification sur le token ${tokenMessage.token}`
+        `Impossible d'envoyer de notification sur le token ${tokenMessage.token}`,
+        e
       )
       this.apmService.captureError(e)
     }

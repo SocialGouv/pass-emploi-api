@@ -54,21 +54,19 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       command.structure,
       command.type
     )
-
-    const lowerCaseEmail = command.email?.toLocaleLowerCase()
+    command.email = command.email?.toLocaleLowerCase()
     const estStructurePassEmploi =
       command.structure === Core.Structure.PASS_EMPLOI
     const estUnConseiller = command.type === Authentification.Type.CONSEILLER
     const estUnJeune = command.type === Authentification.Type.JEUNE
-    const estUnJeuneAvecUnEmail = estUnJeune && lowerCaseEmail
+    const estUnJeuneAvecUnEmail = estUnJeune && command.email
 
     if (utilisateurConnu) {
-      await this.miseAJourdeLUtilisateurSiCestUnConseiller(
-        lowerCaseEmail,
+      const utilisateurMisAJour = await this.miseAJourdeLUtilisateur(
         utilisateurConnu,
-        command.idUtilisateurAuth
+        command
       )
-      return success(queryModelFromUtilisateur(utilisateurConnu))
+      return success(queryModelFromUtilisateur(utilisateurMisAJour))
     } else {
       if (estStructurePassEmploi) {
         return failure(
@@ -82,12 +80,12 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     // ******************************************
 
     if (estUnConseiller) {
-      return this.creerNouveauConseiller(command, lowerCaseEmail)
+      return this.creerNouveauConseiller(command)
     }
 
     if (estUnJeuneAvecUnEmail) {
       const jeune = await this.authentificationRepository.getJeuneByEmail(
-        lowerCaseEmail
+        command.email!
       )
 
       if (jeune) {
@@ -116,13 +114,13 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
   }
 
   private async creerNouveauConseiller(
-    command: UpdateUtilisateurCommand,
-    lowerCaseEmail?: string
+    command: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
     const result = this.authentificationFactory.buildConseiller(
+      command.idUtilisateurAuth,
       command.nom,
       command.prenom,
-      lowerCaseEmail,
+      command.email,
       command.structure
     )
 
@@ -133,24 +131,25 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     const conseillerSso: Authentification.Utilisateur = result.data
     await this.authentificationRepository.save(
       conseillerSso,
-      command.idUtilisateurAuth,
       this.dateService.nowJs()
     )
 
     return success(queryModelFromUtilisateur(conseillerSso))
   }
 
-  private async miseAJourdeLUtilisateurSiCestUnConseiller(
-    lowerCaseEmail: string | undefined,
+  private async miseAJourdeLUtilisateur(
     utilisateur: Authentification.Utilisateur,
-    idUtilisateurAuth: string
-  ): Promise<void> {
-    if (
-      lowerCaseEmail &&
-      utilisateur.type === Authentification.Type.CONSEILLER
-    ) {
-      utilisateur.email = lowerCaseEmail
-      await this.authentificationRepository.save(utilisateur, idUtilisateurAuth)
+    command: UpdateUtilisateurCommand
+  ): Promise<Authentification.Utilisateur> {
+    const utilisateurMisAJour = {
+      ...utilisateur,
+      email: command.email ?? utilisateur.email,
+      idAuthentification: command.idUtilisateurAuth,
+      nom: command.nom ?? utilisateur.nom,
+      prenom: command.prenom ?? utilisateur.prenom
     }
+
+    await this.authentificationRepository.update(utilisateurMisAJour)
+    return utilisateurMisAJour
   }
 }

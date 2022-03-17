@@ -116,15 +116,7 @@ describe('GetOffresImmersionQueryHandler', () => {
       // Then
       expect(evenementService.creerEvenement).to.have.been.calledWith(
         Evenement.Type.OFFRE_IMMERSION_RECHERCHEE,
-        {
-          id: 'ABCDE',
-          nom: 'Doe',
-          prenom: 'John',
-          type: 'JEUNE',
-          email: 'john.doe@plop.io',
-          structure: 'MILO',
-          roles: []
-        }
+        unUtilisateurJeune()
       )
     })
   })

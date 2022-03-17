@@ -85,9 +85,32 @@ export class AuthentificationSqlRepository
     )
   }
 
+  async update(utilisateur: Authentification.Utilisateur): Promise<void> {
+    if (Authentification.Type.JEUNE === utilisateur.type) {
+      await JeuneSqlModel.update(
+        {
+          idAuthentification: utilisateur.idAuthentification,
+          email: utilisateur.email,
+          nom: utilisateur.nom,
+          prenom: utilisateur.prenom
+        },
+        { where: { id: utilisateur.id } }
+      )
+    } else if (Authentification.Type.CONSEILLER === utilisateur.type) {
+      await ConseillerSqlModel.update(
+        {
+          idAuthentification: utilisateur.idAuthentification,
+          email: utilisateur.email,
+          nom: utilisateur.nom,
+          prenom: utilisateur.prenom
+        },
+        { where: { id: utilisateur.id } }
+      )
+    }
+  }
+
   async save(
     utilisateur: Authentification.Utilisateur,
-    idUtilisateurAuth: string,
     dateCreation?: Date
   ): Promise<void> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
@@ -97,7 +120,7 @@ export class AuthentificationSqlRepository
         prenom: utilisateur.prenom,
         email: utilisateur.email ? utilisateur.email : null,
         structure: utilisateur.structure,
-        idAuthentification: idUtilisateurAuth,
+        idAuthentification: utilisateur.idAuthentification,
         dateCreation: dateCreation ?? undefined
       })
     }

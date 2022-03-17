@@ -152,6 +152,67 @@ describe('AuthentificationSqlRepository', () => {
     })
   })
 
+  describe('update', () => {
+    const unConseiller = unConseillerDto({
+      idAuthentification: 'id-authentification-conseiller',
+      structure: Core.Structure.MILO
+    })
+    const unJeune = unJeuneDto({
+      id: 'id-jeune',
+      email: 'john.doe@plop.io',
+      structure: Core.Structure.MILO
+    })
+
+    beforeEach(async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseiller)
+      await JeuneSqlModel.creer(unJeune)
+    })
+    it("met à jour l'utilisateur de type JEUNE", async () => {
+      // When
+      const unJeuneMisAJour: Authentification.Utilisateur = {
+        id: unJeune.id,
+        type: Authentification.Type.JEUNE,
+        structure: Core.Structure.MILO,
+        roles: [],
+        nom: 'nouveauNom',
+        prenom: 'nouveauPrenom',
+        email: 'nouveauEmail',
+        idAuthentification: 'nouvelIdAuthentification'
+      }
+      await authentificationSqlRepository.update(unJeuneMisAJour)
+
+      // Then
+      const utilisateur = await authentificationSqlRepository.get(
+        'nouvelIdAuthentification',
+        Core.Structure.MILO,
+        Authentification.Type.JEUNE
+      )
+      expect(utilisateur).to.deep.equal(unJeuneMisAJour)
+    })
+    it("met à jour l'utilisateur de type CONSEILLER", async () => {
+      // When
+      const unConseillerMisAJour: Authentification.Utilisateur = {
+        id: unConseiller.id,
+        type: Authentification.Type.CONSEILLER,
+        structure: Core.Structure.MILO,
+        roles: [],
+        nom: 'nouveauNom',
+        prenom: 'nouveauPrenom',
+        email: 'nouveauEmail',
+        idAuthentification: 'nouvelIdAuthentification'
+      }
+      await authentificationSqlRepository.update(unConseillerMisAJour)
+
+      // Then
+      const utilisateur = await authentificationSqlRepository.get(
+        'nouvelIdAuthentification',
+        Core.Structure.MILO,
+        Authentification.Type.CONSEILLER
+      )
+      expect(utilisateur).to.deep.equal(unConseillerMisAJour)
+    })
+  })
   describe('updateJeune', () => {
     beforeEach(async () => {
       // Given
@@ -194,10 +255,7 @@ describe('AuthentificationSqlRepository', () => {
     describe("quand c'est un conseiller", () => {
       it("met à jour l'utilisateur", async () => {
         // When
-        await authentificationSqlRepository.save(
-          unUtilisateurConseiller(),
-          'id-authentification-conseiller'
-        )
+        await authentificationSqlRepository.save(unUtilisateurConseiller())
 
         // Then
         const utilisateur = await authentificationSqlRepository.get(
@@ -218,13 +276,12 @@ describe('AuthentificationSqlRepository', () => {
         // When
         await authentificationSqlRepository.save(
           utilisateurConseiller,
-          'id-authentification-conseiller',
           dateCreation
         )
-        await authentificationSqlRepository.save(
-          { ...utilisateurConseiller, email: nouvelEmail },
-          'id-authentification-conseiller'
-        )
+        await authentificationSqlRepository.save({
+          ...utilisateurConseiller,
+          email: nouvelEmail
+        })
 
         // Then
         const utilisateur = await authentificationSqlRepository.get(

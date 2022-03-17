@@ -52,8 +52,7 @@ describe('AuthentificationController', () => {
         prenom: 'Nils',
         type: Authentification.Type.CONSEILLER,
         email: 'nils.tavernier@passemploi.com',
-        structure: Core.Structure.MILO,
-        federatedToken: 'le-token-milo'
+        structure: Core.Structure.MILO
       }
 
       const command: UpdateUtilisateurCommand = {
