@@ -1,6 +1,6 @@
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { SuperviseurSqlModel } from 'src/infrastructure/sequelize/models/superviseur.sql-model'
-import { uneDatetime } from 'test/fixtures/date.fixture'
+import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
@@ -178,7 +178,8 @@ describe('AuthentificationSqlRepository', () => {
         nom: 'nouveauNom',
         prenom: 'nouveauPrenom',
         email: 'nouveauEmail',
-        idAuthentification: 'nouvelIdAuthentification'
+        idAuthentification: 'nouvelIdAuthentification',
+        dateDerniereConnexion: uneDate()
       }
       await authentificationSqlRepository.update(unJeuneMisAJour)
 
@@ -200,7 +201,8 @@ describe('AuthentificationSqlRepository', () => {
         nom: 'nouveauNom',
         prenom: 'nouveauPrenom',
         email: 'nouveauEmail',
-        idAuthentification: 'nouvelIdAuthentification'
+        idAuthentification: 'nouvelIdAuthentification',
+        dateDerniereConnexion: uneDate()
       }
       await authentificationSqlRepository.update(unConseillerMisAJour)
 
@@ -213,7 +215,7 @@ describe('AuthentificationSqlRepository', () => {
       expect(utilisateur).to.deep.equal(unConseillerMisAJour)
     })
   })
-  describe('updateJeune', () => {
+  describe('updateJeunePremiereConnexion', () => {
     beforeEach(async () => {
       // Given
       await ConseillerSqlModel.creer(
@@ -232,22 +234,23 @@ describe('AuthentificationSqlRepository', () => {
     })
     it("met à jour l'utilisateur", async () => {
       // When
-      await authentificationSqlRepository.updateJeune(
+      await authentificationSqlRepository.updateJeunePremiereConnexion(
         'id-jeune',
-        'id-authentification-jeune'
+        'id-authentification-jeune',
+        uneDate()
       )
 
       // Then
-      const utilisateur = await authentificationSqlRepository.get(
-        'id-authentification-jeune',
-        Core.Structure.MILO,
-        Authentification.Type.JEUNE
+      const jeuneSql = await JeuneSqlModel.findOne({
+        where: { id: 'id-jeune' }
+      })
+      expect(jeuneSql).not.to.be.equal(null)
+      expect(jeuneSql!.id).to.be.equal('id-jeune')
+      expect(jeuneSql!.idAuthentification).to.be.equal(
+        'id-authentification-jeune'
       )
-      expect(utilisateur).to.deep.equal(
-        unUtilisateurJeune({
-          id: 'id-jeune'
-        })
-      )
+      expect(jeuneSql!.datePremiereConnexion).to.be.deep.equal(uneDate())
+      expect(jeuneSql!.dateDerniereConnexion).to.be.deep.equal(uneDate())
     })
   })
 

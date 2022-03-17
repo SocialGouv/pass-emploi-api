@@ -14,7 +14,8 @@ export function unConseillerDto(
     structure: Core.Structure.PASS_EMPLOI,
     idAuthentification: 'un-id',
     dateCreation: uneDatetime.toJSDate(),
-    dateVerificationMessages: uneDatetime.toJSDate()
+    dateVerificationMessages: uneDatetime.toJSDate(),
+    dateDerniereConnexion: null
   }
 
   return { ...defaults, ...args }

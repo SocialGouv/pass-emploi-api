@@ -84,16 +84,18 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     }
 
     if (estUnJeuneAvecUnEmail) {
-      const jeune = await this.authentificationRepository.getJeuneByEmail(
-        command.email!
-      )
+      const jeuneCreeParConseillerPourPremiereConnexion =
+        await this.authentificationRepository.getJeuneByEmail(command.email!)
 
-      if (jeune) {
-        await this.authentificationRepository.updateJeune(
-          jeune.id,
-          command.idUtilisateurAuth
+      if (jeuneCreeParConseillerPourPremiereConnexion) {
+        await this.authentificationRepository.updateJeunePremiereConnexion(
+          jeuneCreeParConseillerPourPremiereConnexion.id,
+          command.idUtilisateurAuth,
+          this.dateService.nowJs()
         )
-        return success(queryModelFromUtilisateur(jeune))
+        return success(
+          queryModelFromUtilisateur(jeuneCreeParConseillerPourPremiereConnexion)
+        )
       }
     }
 
@@ -129,6 +131,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     }
 
     const conseillerSso: Authentification.Utilisateur = result.data
+    conseillerSso.dateDerniereConnexion = this.dateService.nowJs()
     await this.authentificationRepository.save(
       conseillerSso,
       this.dateService.nowJs()
@@ -141,12 +144,13 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur,
     command: UpdateUtilisateurCommand
   ): Promise<Authentification.Utilisateur> {
-    const utilisateurMisAJour = {
+    const utilisateurMisAJour: Authentification.Utilisateur = {
       ...utilisateur,
       email: command.email ?? utilisateur.email,
       idAuthentification: command.idUtilisateurAuth,
       nom: command.nom ?? utilisateur.nom,
-      prenom: command.prenom ?? utilisateur.prenom
+      prenom: command.prenom ?? utilisateur.prenom,
+      dateDerniereConnexion: this.dateService.nowJs()
     }
 
     await this.authentificationRepository.update(utilisateurMisAJour)

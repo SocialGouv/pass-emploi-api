@@ -16,39 +16,84 @@ import { RendezVousSqlModel } from './rendez-vous.sql-model'
 
 export class JeuneDto extends Model {
   @PrimaryKey
-  @Column({ field: 'id', type: DataType.STRING })
+  @Column({
+    field: 'id',
+    type: DataType.STRING
+  })
   id!: string
 
-  @Column({ field: 'nom', type: DataType.STRING })
+  @Column({
+    field: 'nom',
+    type: DataType.STRING
+  })
   nom!: string
 
-  @Column({ field: 'prenom', type: DataType.STRING })
+  @Column({
+    field: 'prenom',
+    type: DataType.STRING
+  })
   prenom!: string
 
   @ForeignKey(() => ConseillerSqlModel)
-  @Column({ field: 'id_conseiller', type: DataType.STRING })
+  @Column({
+    field: 'id_conseiller',
+    type: DataType.STRING
+  })
   idConseiller?: string
 
-  @Column({ field: 'date_creation', type: DataType.DATE })
+  @Column({
+    field: 'date_creation',
+    type: DataType.DATE
+  })
   dateCreation!: Date
 
-  @Column({ field: 'push_notification_token', type: DataType.STRING })
+  @Column({
+    field: 'push_notification_token',
+    type: DataType.STRING
+  })
   pushNotificationToken!: string | null
 
-  @Column({ field: 'date_derniere_actualisation_token', type: DataType.DATE })
+  @Column({
+    field: 'date_derniere_actualisation_token',
+    type: DataType.DATE
+  })
   dateDerniereActualisationToken!: Date | null
 
-  @Column({ field: 'email', type: DataType.STRING })
+  @Column({
+    field: 'email',
+    type: DataType.STRING
+  })
   email: string | null
 
-  @Column({ field: 'structure', type: DataType.STRING })
+  @Column({
+    field: 'structure',
+    type: DataType.STRING
+  })
   structure: Core.Structure
 
-  @Column({ field: 'id_authentification', type: DataType.STRING })
+  @Column({
+    field: 'id_authentification',
+    type: DataType.STRING
+  })
   idAuthentification: string
+
+  @Column({
+    field: 'date_premiere_connexion',
+    type: DataType.DATE
+  })
+  datePremiereConnexion: Date | null
+
+  @Column({
+    field: 'date_derniere_connexion',
+    type: DataType.DATE
+  })
+  dateDerniereConnexion: Date | null
 }
 
-@Table({ timestamps: false, tableName: 'jeune' })
+@Table({
+  timestamps: false,
+  tableName: 'jeune'
+})
 export class JeuneSqlModel extends JeuneDto {
   @BelongsTo(() => ConseillerSqlModel)
   conseiller?: ConseillerSqlModel

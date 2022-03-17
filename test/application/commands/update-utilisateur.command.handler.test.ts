@@ -12,7 +12,7 @@ import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from 'test/fixtures/authentification.fixture'
-import { uneDatetime } from 'test/fixtures/date.fixture'
+import { uneDate } from 'test/fixtures/date.fixture'
 import {
   unUtilisateurQueryModel,
   unUtilisateurSansEmailQueryModel
@@ -35,7 +35,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
   let authentificationRepository: StubbedType<Authentification.Repository>
   let updateUtilisateurCommandHandler: UpdateUtilisateurCommandHandler
   const dateService = stubClass(DateService)
-  dateService.nowJs.returns(uneDatetime.toJSDate())
+  dateService.nowJs.returns(uneDate())
   const uuidGenere = '1'
   const idService: IdService = {
     uuid: () => uuidGenere
@@ -117,7 +117,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
             ...utilisateur,
             email: 'new@email.com',
             nom: 'newNom',
-            prenom: 'newPrenom'
+            prenom: 'newPrenom',
+            dateDerniereConnexion: uneDate()
           })
           expect(isSuccess(result)).equal(true)
           if (isSuccess(result)) {
@@ -217,7 +218,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
             ...utilisateur,
             email: 'new@email.com',
             nom: 'newNom',
-            prenom: 'newPrenom'
+            prenom: 'newPrenom',
+            dateDerniereConnexion: uneDate()
           })
           expect(isSuccess(result)).equal(true)
           if (isSuccess(result)) {
@@ -472,7 +474,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
               ...utilisateur,
               email: 'new@email.com',
               nom: 'newNom',
-              prenom: 'newPrenom'
+              prenom: 'newPrenom',
+              dateDerniereConnexion: uneDate()
             })
             expect(isSuccess(result)).equal(true)
             if (isSuccess(result)) {
@@ -482,7 +485,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
         })
       })
       describe('jeune connu par son email', async () => {
-        it('retourne le jeune et enregistre le sub', async () => {
+        it('retourne le jeune et enregistre le sub + mise à jour date premiere connexion', async () => {
           // Given
           const command: UpdateUtilisateurCommand = {
             idUtilisateurAuth: 'nilstavernier',
@@ -502,8 +505,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
           authentificationRepository.getJeuneByEmail
             .withArgs('abc@test.com')
             .resolves(utilisateur)
-          authentificationRepository.updateJeune
-            .withArgs('id-jeune', command.idUtilisateurAuth)
+          authentificationRepository.updateJeunePremiereConnexion
+            .withArgs('id-jeune', command.idUtilisateurAuth, uneDate())
             .resolves()
 
           // When
@@ -513,6 +516,13 @@ describe('UpdateUtilisateurCommandHandler', () => {
           expect(isSuccess(result)).equal(true)
           if (isSuccess(result)) {
             expect(result.data).to.deep.equal(unUtilisateurQueryModel())
+            expect(
+              authentificationRepository.updateJeunePremiereConnexion
+            ).to.have.been.calledWithExactly(
+              utilisateur.id,
+              command.idUtilisateurAuth,
+              uneDate()
+            )
           }
         })
       })

@@ -78,9 +78,17 @@ export class AuthentificationSqlRepository
     return undefined
   }
 
-  async updateJeune(idJeune: string, idUtilisateurAuth: string): Promise<void> {
+  async updateJeunePremiereConnexion(
+    idJeune: string,
+    idUtilisateurAuth: string,
+    datePremiereConnexion: Date
+  ): Promise<void> {
     await JeuneSqlModel.update(
-      { idAuthentification: idUtilisateurAuth },
+      {
+        idAuthentification: idUtilisateurAuth,
+        datePremiereConnexion,
+        dateDerniereConnexion: datePremiereConnexion
+      },
       { where: { id: idJeune } }
     )
   }
@@ -92,7 +100,8 @@ export class AuthentificationSqlRepository
           idAuthentification: utilisateur.idAuthentification,
           email: utilisateur.email,
           nom: utilisateur.nom,
-          prenom: utilisateur.prenom
+          prenom: utilisateur.prenom,
+          dateDerniereConnexion: utilisateur.dateDerniereConnexion
         },
         { where: { id: utilisateur.id } }
       )
@@ -102,7 +111,8 @@ export class AuthentificationSqlRepository
           idAuthentification: utilisateur.idAuthentification,
           email: utilisateur.email,
           nom: utilisateur.nom,
-          prenom: utilisateur.prenom
+          prenom: utilisateur.prenom,
+          dateDerniereConnexion: utilisateur.dateDerniereConnexion
         },
         { where: { id: utilisateur.id } }
       )
@@ -121,7 +131,8 @@ export class AuthentificationSqlRepository
         email: utilisateur.email ? utilisateur.email : null,
         structure: utilisateur.structure,
         idAuthentification: utilisateur.idAuthentification,
-        dateCreation: dateCreation ?? undefined
+        dateCreation: dateCreation ?? undefined,
+        dateDerniereConnexion: utilisateur.dateDerniereConnexion
       })
     }
   }
