@@ -34,8 +34,6 @@ import {
   DeleteRechercheCommand,
   DeleteRechercheCommandHandler
 } from '../../application/commands/delete-recherche.command.handler'
-import { GetServicesCiviqueQuery } from '../../application/queries/get-services-civique.query.handler'
-import { DateTime } from 'luxon'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -89,27 +87,13 @@ export class RecherchesController {
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const getServicesCiviqueQuery: GetServicesCiviqueQuery = {
-      page: undefined,
-      limit: undefined,
-      lat: createRecherchePayload.lat,
-      lon: createRecherchePayload.lon,
-      distance: createRecherchePayload.distance,
-      dateDeDebutMaximum: createRecherchePayload.dateDeDebutMaximum
-        ? DateTime.fromISO(createRecherchePayload.dateDeDebutMaximum)
-        : undefined,
-      dateDeDebutMinimum: createRecherchePayload.dateDeDebutMinimum
-        ? DateTime.fromISO(createRecherchePayload.dateDeDebutMinimum)
-        : undefined,
-      domaine: createRecherchePayload.domaine
-    }
     const command: CreateRechercheCommand = {
       metier: undefined,
       idJeune: idJeune,
       type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
       titre: createRecherchePayload.titre,
       localisation: createRecherchePayload.localisation,
-      criteres: getServicesCiviqueQuery
+      criteres: createRecherchePayload.criteres
     }
     await this.createRechercheCommandHandler.execute(command, utilisateur)
   }
