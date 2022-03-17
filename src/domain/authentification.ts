@@ -30,6 +30,7 @@ export namespace Authentification {
 
   export interface Utilisateur {
     id: string
+    idAuthentification?: string
     prenom: string
     nom: string
     structure: Core.Structure
@@ -49,13 +50,14 @@ export namespace Authentification {
       structure: Core.Structure,
       type: Authentification.Type
     ): Promise<Utilisateur | undefined>
+
     getJeuneByEmail(email: string): Promise<Utilisateur | undefined>
+
+    update(utilisateur: Authentification.Utilisateur): Promise<void>
+
     updateJeune(idJeune: string, idUtilisateurAuth: string): Promise<void>
-    save(
-      utilisateur: Utilisateur,
-      idUtilisateurAuth: string,
-      dateCreation?: Date
-    ): Promise<void>
+
+    save(utilisateur: Utilisateur, dateCreation?: Date): Promise<void>
   }
 
   @Injectable()
@@ -63,6 +65,7 @@ export namespace Authentification {
     constructor(private readonly idService: IdService) {}
 
     buildConseiller(
+      idAuthentification: string,
       nom: string | undefined,
       prenom: string | undefined,
       email: string | undefined,
@@ -74,6 +77,7 @@ export namespace Authentification {
 
       const utilisateur: Utilisateur = {
         id: this.idService.uuid(),
+        idAuthentification,
         prenom: prenom,
         nom: nom,
         email: email,

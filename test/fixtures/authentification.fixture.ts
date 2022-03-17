@@ -7,6 +7,7 @@ export const unUtilisateurConseiller = (
 ): Authentification.Utilisateur => {
   const defaults: Authentification.Utilisateur = {
     id: '1',
+    idAuthentification: 'id-authentification-conseiller',
     nom: 'Tavernier',
     prenom: 'Nils',
     type: Authentification.Type.CONSEILLER,
@@ -15,7 +16,11 @@ export const unUtilisateurConseiller = (
     roles: []
   }
 
-  return { ...defaults, ...args, type: Authentification.Type.CONSEILLER }
+  return {
+    ...defaults,
+    ...args,
+    type: Authentification.Type.CONSEILLER
+  }
 }
 
 export const unUtilisateurJeune = (
@@ -23,6 +28,7 @@ export const unUtilisateurJeune = (
 ): Authentification.Utilisateur => {
   const defaults: Authentification.Utilisateur = {
     id: 'ABCDE',
+    idAuthentification: 'id-authentification-jeune',
     nom: 'Doe',
     prenom: 'John',
     type: Authentification.Type.JEUNE,
@@ -31,7 +37,11 @@ export const unUtilisateurJeune = (
     roles: []
   }
 
-  return { ...defaults, ...args, type: Authentification.Type.JEUNE }
+  return {
+    ...defaults,
+    ...args,
+    type: Authentification.Type.JEUNE
+  }
 }
 
 export const unJwtPayloadValide = (): JWTPayload => ({

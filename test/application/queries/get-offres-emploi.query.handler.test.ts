@@ -114,15 +114,7 @@ describe('GetOffresEmploiQueryHandler', () => {
         // Then
         expect(evenementService.creerEvenement).to.have.been.calledWith(
           Evenement.Type.OFFRE_ALTERNANCE_RECHERCHEE,
-          {
-            id: 'ABCDE',
-            nom: 'Doe',
-            prenom: 'John',
-            type: 'JEUNE',
-            email: 'john.doe@plop.io',
-            structure: 'MILO',
-            roles: []
-          }
+          unUtilisateurJeune()
         )
       })
     })
@@ -147,15 +139,7 @@ describe('GetOffresEmploiQueryHandler', () => {
         // Then
         expect(evenementService.creerEvenement).to.have.been.calledWith(
           Evenement.Type.OFFRE_EMPLOI_RECHERCHEE,
-          {
-            id: 'ABCDE',
-            nom: 'Doe',
-            prenom: 'John',
-            type: 'JEUNE',
-            email: 'john.doe@plop.io',
-            structure: 'MILO',
-            roles: []
-          }
+          unUtilisateurJeune()
         )
       })
     })

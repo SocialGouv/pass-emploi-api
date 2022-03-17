@@ -8,7 +8,10 @@ import {
 import { Authentification } from 'src/domain/authentification'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
-import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from 'test/fixtures/authentification.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import {
   unUtilisateurQueryModel,
@@ -81,17 +84,21 @@ describe('UpdateUtilisateurCommandHandler', () => {
           }
         })
       })
-      describe('conseiller connu avec nouvel email', async () => {
-        it('met à jour son email et retourne le conseiller', async () => {
+      describe('conseiller connu avec nouvel email, nom et prenom', async () => {
+        it('met à jour ses infos et retourne le conseiller', async () => {
           // Given
           const command: UpdateUtilisateurCommand = {
             idUtilisateurAuth: 'nilstavernier',
             type: Authentification.Type.CONSEILLER,
             structure: Core.Structure.PASS_EMPLOI,
-            email: 'New@email.com'
+            email: 'New@email.com',
+            nom: 'newNom',
+            prenom: 'newPrenom'
           }
 
-          const utilisateur = unUtilisateurConseiller()
+          const utilisateur = unUtilisateurConseiller({
+            idAuthentification: command.idUtilisateurAuth
+          })
           authentificationRepository.get
             .withArgs(
               command.idUtilisateurAuth,
@@ -105,14 +112,13 @@ describe('UpdateUtilisateurCommandHandler', () => {
 
           // Then
           expect(
-            authentificationRepository.save
-          ).to.have.been.calledWithExactly(
-            {
-              ...utilisateur,
-              email: 'new@email.com'
-            },
-            command.idUtilisateurAuth
-          )
+            authentificationRepository.update
+          ).to.have.been.calledWithExactly({
+            ...utilisateur,
+            email: 'new@email.com',
+            nom: 'newNom',
+            prenom: 'newPrenom'
+          })
           expect(isSuccess(result)).equal(true)
           if (isSuccess(result)) {
             expect(result.data.email).to.deep.equal('new@email.com')
@@ -175,6 +181,47 @@ describe('UpdateUtilisateurCommandHandler', () => {
           expect(isSuccess(result)).equal(true)
           if (isSuccess(result)) {
             expect(result.data).to.deep.equal(unUtilisateurQueryModel())
+          }
+        })
+      })
+      describe('conseiller connu avec nouvel email, nom et prenom', async () => {
+        it('met à jour ses infos et retourne le conseiller', async () => {
+          // Given
+          const command: UpdateUtilisateurCommand = {
+            idUtilisateurAuth: 'nilstavernier',
+            type: Authentification.Type.CONSEILLER,
+            structure: Core.Structure.MILO,
+            email: 'New@email.com',
+            nom: 'newNom',
+            prenom: 'newPrenom'
+          }
+
+          const utilisateur = unUtilisateurConseiller({
+            idAuthentification: command.idUtilisateurAuth
+          })
+          authentificationRepository.get
+            .withArgs(
+              command.idUtilisateurAuth,
+              command.structure,
+              command.type
+            )
+            .resolves(utilisateur)
+
+          // When
+          const result = await updateUtilisateurCommandHandler.execute(command)
+
+          // Then
+          expect(
+            authentificationRepository.update
+          ).to.have.been.calledWithExactly({
+            ...utilisateur,
+            email: 'new@email.com',
+            nom: 'newNom',
+            prenom: 'newPrenom'
+          })
+          expect(isSuccess(result)).equal(true)
+          if (isSuccess(result)) {
+            expect(result.data.email).to.deep.equal('new@email.com')
           }
         })
       })
@@ -389,6 +436,49 @@ describe('UpdateUtilisateurCommandHandler', () => {
           if (isSuccess(result)) {
             expect(result.data).to.deep.equal(unUtilisateurQueryModel())
           }
+        })
+        describe('avec nouvel email, nom et prenom', async () => {
+          it('met à jour ses infos et retourne le jeune', async () => {
+            // Given
+            const command: UpdateUtilisateurCommand = {
+              idUtilisateurAuth: 'nilstavernier',
+              type: Authentification.Type.JEUNE,
+              structure: Core.Structure.MILO,
+              email: 'New@email.com',
+              nom: 'newNom',
+              prenom: 'newPrenom'
+            }
+
+            const utilisateur = unUtilisateurJeune({
+              idAuthentification: command.idUtilisateurAuth
+            })
+            authentificationRepository.get
+              .withArgs(
+                command.idUtilisateurAuth,
+                command.structure,
+                command.type
+              )
+              .resolves(utilisateur)
+
+            // When
+            const result = await updateUtilisateurCommandHandler.execute(
+              command
+            )
+
+            // Then
+            expect(
+              authentificationRepository.update
+            ).to.have.been.calledWithExactly({
+              ...utilisateur,
+              email: 'new@email.com',
+              nom: 'newNom',
+              prenom: 'newPrenom'
+            })
+            expect(isSuccess(result)).equal(true)
+            if (isSuccess(result)) {
+              expect(result.data.email).to.deep.equal('new@email.com')
+            }
+          })
         })
       })
       describe('jeune connu par son email', async () => {

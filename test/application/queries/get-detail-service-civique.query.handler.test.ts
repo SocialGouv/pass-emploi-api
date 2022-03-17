@@ -112,15 +112,7 @@ describe('GetDetailServiceCiviqueQuery', () => {
       // Then
       expect(evenementService.creerEvenement).to.have.been.calledWith(
         Evenement.Type.OFFRE_SERVICE_CIVIQUE_AFFICHE,
-        {
-          id: 'ABCDE',
-          nom: 'Doe',
-          prenom: 'John',
-          type: 'JEUNE',
-          email: 'john.doe@plop.io',
-          structure: 'MILO',
-          roles: []
-        }
+        unUtilisateurJeune()
       )
     })
   })

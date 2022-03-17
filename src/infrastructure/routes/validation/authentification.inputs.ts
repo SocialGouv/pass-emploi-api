@@ -29,9 +29,4 @@ export class UpdateUserPayload {
   @IsString()
   @IsEnum(Core.Structure)
   structure: Core.Structure
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  federatedToken?: string
 }

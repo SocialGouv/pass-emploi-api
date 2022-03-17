@@ -8,6 +8,7 @@ export function fromConseillerSqlToUtilisateur(
 ): Authentification.Utilisateur {
   return {
     id: conseillerSqlModel.id,
+    idAuthentification: conseillerSqlModel.idAuthentification,
     prenom: conseillerSqlModel.prenom,
     nom: conseillerSqlModel.nom,
     email: conseillerSqlModel.email ? conseillerSqlModel.email : undefined,
@@ -22,6 +23,7 @@ export function fromJeuneSqlToUtilisateur(
 ): Authentification.Utilisateur {
   return {
     id: jeuneSqlModel.id,
+    idAuthentification: jeuneSqlModel.idAuthentification,
     prenom: jeuneSqlModel.prenom,
     nom: jeuneSqlModel.nom,
     email: jeuneSqlModel.email ? jeuneSqlModel.email : undefined,
