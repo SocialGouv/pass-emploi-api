@@ -22,27 +22,32 @@ export const unRendezVous = (jeune = unJeune()): RendezVous => ({
   presenceConseiller: true
 })
 
-export const unRendezVousQueryModel = (): RendezVousQueryModel => ({
-  id: '1',
-  title: 'rdv',
-  modality: 'modalite',
-  comment: 'commentaire',
-  date: new Date('2021-11-11T08:03:30.000Z'),
-  duration: 30,
-  jeune: {
+export const unRendezVousQueryModel = (
+  args: Partial<RendezVousQueryModel> = {}
+): RendezVousQueryModel => {
+  const defaults = {
     id: '1',
-    nom: 'test',
-    prenom: 'test'
-  },
-  type: {
-    code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
-    label:
-      mapCodeLabelTypeRendezVous[
-        CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
-      ]
-  },
-  presenceConseiller: true
-})
+    title: '',
+    modality: 'modalite',
+    comment: 'commentaire',
+    date: new Date('2021-11-11T08:03:30.000Z'),
+    duration: 30,
+    jeune: {
+      id: '1',
+      nom: 'test',
+      prenom: 'test'
+    },
+    type: {
+      code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+      label:
+        mapCodeLabelTypeRendezVous[
+          CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
+        ]
+    },
+    presenceConseiller: true
+  }
+  return { ...defaults, ...args }
+}
 
 export const unRendezVousConseillerQueryModel =
   (): RendezVousConseillerQueryModel => ({
