@@ -13,6 +13,7 @@ export const unUtilisateurConseiller = (
     type: Authentification.Type.CONSEILLER,
     email: 'nils.tavernier@passemploi.com',
     structure: Core.Structure.MILO,
+    dateDerniereConnexion: null,
     roles: []
   }
 
@@ -34,6 +35,7 @@ export const unUtilisateurJeune = (
     type: Authentification.Type.JEUNE,
     email: 'john.doe@plop.io',
     structure: Core.Structure.MILO,
+    dateDerniereConnexion: null,
     roles: []
   }
 
