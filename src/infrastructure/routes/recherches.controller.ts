@@ -108,7 +108,7 @@ export class RecherchesController {
       idJeune: idJeune,
       type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
       titre: createRecherchePayload.titre,
-      localisation: undefined,
+      localisation: createRecherchePayload.localisation,
       criteres: getServicesCiviqueQuery
     }
     await this.createRechercheCommandHandler.execute(command, utilisateur)
