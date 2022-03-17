@@ -202,6 +202,7 @@ describe('RecherchesController', () => {
         const createRecherchePayload: CreateRechercheServiceCiviquePayload = {
           titre: 'Ma recherche',
           domaine: 'Le yolo domaine',
+          localisation: 'Saint Étienne',
           lat: 12345,
           lon: 67890,
           distance: 30,
@@ -225,7 +226,7 @@ describe('RecherchesController', () => {
             idJeune: '1',
             type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
             titre: 'Ma recherche',
-            localisation: undefined,
+            localisation: 'Saint Étienne',
             criteres: {
               page: undefined,
               limit: undefined,

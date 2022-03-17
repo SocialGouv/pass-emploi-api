@@ -77,6 +77,11 @@ export class CreateRechercheServiceCiviquePayload {
   domaine?: string
 
   @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  localisation?: string
+
+  @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
   @Transform(params => transformStringToFloat(params, 'lat'))
