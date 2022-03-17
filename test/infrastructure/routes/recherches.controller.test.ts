@@ -32,7 +32,6 @@ import {
 } from '../../../src/application/commands/delete-recherche.command.handler'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
-import { DateTime } from 'luxon'
 
 describe('RecherchesController', () => {
   let createRechercheCommandHandler: StubbedClass<CreateRechercheCommandHandler>
@@ -201,13 +200,15 @@ describe('RecherchesController', () => {
         // Given
         const createRecherchePayload: CreateRechercheServiceCiviquePayload = {
           titre: 'Ma recherche',
-          domaine: 'Le yolo domaine',
           localisation: 'Saint Étienne',
-          lat: 12345,
-          lon: 67890,
-          distance: 30,
-          dateDeDebutMinimum: '1998-07-12T10:12:14.000Z',
-          dateDeDebutMaximum: '2018-07-15T10:12:14.000Z'
+          criteres: {
+            domaine: 'Le yolo domaine',
+            lat: 12345,
+            lon: 67890,
+            distance: 30,
+            dateDeDebutMinimum: '1998-07-12T10:12:14.000Z',
+            dateDeDebutMaximum: '2018-07-15T10:12:14.000Z'
+          }
         }
 
         // When
@@ -228,14 +229,12 @@ describe('RecherchesController', () => {
             titre: 'Ma recherche',
             localisation: 'Saint Étienne',
             criteres: {
-              page: undefined,
-              limit: undefined,
+              domaine: 'Le yolo domaine',
               lat: 12345,
               lon: 67890,
               distance: 30,
-              dateDeDebutMinimum: DateTime.fromISO('1998-07-12T10:12:14.000Z'),
-              dateDeDebutMaximum: DateTime.fromISO('2018-07-15T10:12:14.000Z'),
-              domaine: 'Le yolo domaine'
+              dateDeDebutMinimum: '1998-07-12T10:12:14.000Z',
+              dateDeDebutMaximum: '2018-07-15T10:12:14.000Z'
             }
           },
           unUtilisateurDecode()

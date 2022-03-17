@@ -1,11 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
   IsBoolean,
-  IsDateString,
   IsDefined,
   IsIn,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   ValidateNested
@@ -13,11 +11,8 @@ import {
 import { FindOffresEmploiQueryBody } from './offres-emploi.inputs'
 import { GetOffresImmersionQueryBody } from './offres-immersion.inputs'
 import { Transform, Type } from 'class-transformer'
-import {
-  transformStringToBoolean,
-  transformStringToFloat,
-  transformStringToInteger
-} from './utils/transformers'
+import { transformStringToBoolean } from './utils/transformers'
+import { GetServicesCiviqueQueryParams } from './services-civique.inputs'
 
 export class CreateRechercheImmersionPayload {
   @ApiProperty()
@@ -74,44 +69,13 @@ export class CreateRechercheServiceCiviquePayload {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  domaine?: string
-
-  @ApiPropertyOptional()
-  @IsString()
-  @IsOptional()
   localisation?: string
 
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  @Transform(params => transformStringToFloat(params, 'lat'))
-  lat?: number
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  @Transform(params => transformStringToFloat(params, 'lon'))
-  lon?: number
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  @Transform(params => transformStringToInteger(params, 'distance'))
-  distance?: number
-
-  @ApiPropertyOptional({
-    example: '2022-02-15T10:12:14.000Z'
-  })
-  @IsDateString()
-  @IsOptional()
-  dateDeDebutMinimum?: string
-
-  @ApiPropertyOptional({
-    example: '2022-02-15T10:12:14.000Z'
-  })
-  @IsDateString()
-  @IsOptional()
-  dateDeDebutMaximum?: string
+  @ApiProperty({ type: GetServicesCiviqueQueryParams })
+  @ValidateNested()
+  @Type(() => GetServicesCiviqueQueryParams)
+  @IsDefined()
+  criteres: GetServicesCiviqueQueryParams
 }
 
 export class GetRecherchesQueryParams {
