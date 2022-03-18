@@ -78,6 +78,8 @@ export class CreateRechercheCommandHandler extends CommandHandler<
     let evenementType: Evenement.Type
     if (command.type === Recherche.Type.OFFRES_ALTERNANCE) {
       evenementType = Evenement.Type.RECHERCHE_ALTERNANCE_SAUVEGARDEE
+    } else if (command.type === Recherche.Type.OFFRES_SERVICES_CIVIQUE) {
+      evenementType = Evenement.Type.RECHERCHE_SERVICE_CIVIQUE_SAUVEGARDEE
     } else {
       if (command.type === Recherche.Type.OFFRES_EMPLOI) {
         evenementType = Evenement.Type.RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE
