@@ -28,6 +28,7 @@ export namespace Evenement {
     OFFRE_POSTULEE = 'OFFRE_POSTULEE',
     OFFRE_PARTAGEE = 'OFFRE_PARTAGEE',
     MESSAGE_ENVOYE = 'MESSAGE_ENVOYE',
+    MESSAGE_ENVOYE_MULTIPLE = 'MESSAGE_ENVOYE_MULTIPLE',
     RDV_CREE = 'RDV_CREE',
     RDV_SUPPRIME = 'RDV_SUPPRIME',
     RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE = 'RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE',
@@ -149,6 +150,10 @@ const evenements = {
     action: 'Postuler'
   },
   [Evenement.Type.MESSAGE_ENVOYE]: { categorie: 'Message', action: 'Envoi' },
+  [Evenement.Type.MESSAGE_ENVOYE_MULTIPLE]: {
+    categorie: 'Message',
+    action: 'Envoi multiple'
+  },
   [Evenement.Type.RDV_CREE]: { categorie: 'Rendez-vous', action: 'Création' },
   [Evenement.Type.RDV_SUPPRIME]: {
     categorie: 'Rendez-vous',
