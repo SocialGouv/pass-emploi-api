@@ -11,21 +11,18 @@ import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous
 } from 'src/domain/rendez-vous'
-import {
-  PoleEmploiPrestationsClient,
-  PrestationDto
-} from 'src/infrastructure/clients/pole-emploi-prestations-client'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
 import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
-import {
-  PoleEmploiRendezVousClient,
-  RendezVousPoleEmploiDto
-} from '../../infrastructure/clients/pole-emploi-rendez-vous-client'
 import { Conseiller } from '../../domain/conseiller'
+import {
+  PoleEmploiPartenaireClient,
+  PrestationDto,
+  RendezVousPoleEmploiDto
+} from '../../infrastructure/clients/pole-emploi-partenaire-client'
 
 export interface GetRendezVousJeunePoleEmploiQuery extends Query {
   idJeune: string
@@ -40,8 +37,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
   constructor(
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
-    private poleEmploiPrestationsClient: PoleEmploiPrestationsClient,
-    private poleEmploiRendezVousClient: PoleEmploiRendezVousClient,
+    private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer,
     private dateService: DateService,
     private idService: IdService
@@ -64,13 +60,13 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
 
     try {
       const responsePrestationsRendezVous =
-        await this.poleEmploiPrestationsClient.getRendezVous(
+        await this.poleEmploiPartenaireClient.getPrestations(
           query.idpToken,
           maintenant
         )
 
       const responseRendezVousPoleEmploi =
-        await this.poleEmploiRendezVousClient.getRendezVous(query.idpToken)
+        await this.poleEmploiPartenaireClient.getRendezVous(query.idpToken)
 
       const prestations: PrestationDto[] =
         responsePrestationsRendezVous?.data ?? []
@@ -90,7 +86,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
             this.dateService.isSameDateDay(dateRendezVous, maintenant)
           ) {
             const responseLienVisio =
-              await this.poleEmploiPrestationsClient.getLienVisio(
+              await this.poleEmploiPartenaireClient.getLienVisio(
                 query.idpToken,
                 prestation.identifiantStable
               )

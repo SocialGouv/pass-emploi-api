@@ -66,8 +66,28 @@ export interface PrestationDto {
   }
 }
 
+export interface RendezVousPoleEmploiDto {
+  theme?: string
+  date: Date
+  heure: string
+  duree: number
+  modaliteContact?: 'VISIO' | 'TELEPHONIQUE' | 'AGENCE'
+  nomConseiller?: string
+  prenomConseiller?: string
+  agence?: string
+  adresse?: {
+    bureauDistributeur?: string
+    ligne4?: string
+    ligne5?: string
+    ligne6?: string
+  }
+  commentaire?: string
+  typeRDV?: 'RDVL' | 'CONVOCATION'
+  lienVisio?: string
+}
+
 @Injectable()
-export class PoleEmploiPrestationsClient {
+export class PoleEmploiPartenaireClient {
   private readonly apiUrl: string
   private logger: Logger
 
@@ -75,11 +95,22 @@ export class PoleEmploiPrestationsClient {
     private httpService: HttpService,
     private configService: ConfigService
   ) {
-    this.logger = new Logger('PoleEmploiPrestationsClient')
-    this.apiUrl = this.configService.get('poleEmploiPrestations').url
+    this.logger = new Logger('PoleEmploiPartenaireClient')
+    this.apiUrl = this.configService.get('poleEmploiPartenaire').url
   }
 
-  async getRendezVous(
+  async getRendezVous(tokenDuJeune: string): Promise<AxiosResponse> {
+    this.logger.log(
+      `recuperation des rendez-vous du jeune'
+      )}`
+    )
+    return this.get(
+      'peconnect-rendezvousagenda/v1/listerendezvous',
+      tokenDuJeune
+    )
+  }
+
+  async getPrestations(
     tokenDuJeune: string,
     dateRechercheRendezVous: DateTime
   ): Promise<AxiosResponse<PrestationDto[]>> {
@@ -94,7 +125,11 @@ export class PoleEmploiPrestationsClient {
       dateRechercheRendezVous.toFormat('yyyy-MM-dd')
     )
 
-    return this.get('rendez-vous', tokenDuJeune, params)
+    return this.get(
+      'peconnect-gerer-prestations/v1/rendez-vous',
+      tokenDuJeune,
+      params
+    )
   }
 
   async getLienVisio(
@@ -105,7 +140,10 @@ export class PoleEmploiPrestationsClient {
     const params = new URLSearchParams()
     params.append('idVisio', idVisio)
 
-    return this.get(`lien-visio/rendez-vous/${idVisio}`, tokenDuJeune)
+    return this.get(
+      `peconnect-gerer-prestations/v1/lien-visio/rendez-vous/${idVisio}`,
+      tokenDuJeune
+    )
   }
 
   private get(

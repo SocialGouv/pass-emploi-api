@@ -49,11 +49,8 @@ export const testConfig = (): ConfigService => {
       clientSecret: 'pole-emploi-client-secret',
       scope: 'pole-emploi-scope'
     },
-    poleEmploiPrestations: {
-      url: 'https://api-r.es-qvr.fr/partenaire/peconnect-gerer-prestations/v1'
-    },
-    poleEmploiRendezVous: {
-      url: 'https://api.emploi-store.fr/partenaire/peconnect-rendezvousagenda/v1'
+    poleEmploiPartenaire: {
+      url: 'https://api-r.es-qvr.fr/partenaire'
     },
     milo: {
       url: 'https://milo.com',

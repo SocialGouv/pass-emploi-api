@@ -7,10 +7,6 @@ import { DateService } from '../../../src/utils/date-service'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { Jeune } from '../../../src/domain/jeune'
-import {
-  PoleEmploiPrestationsClient,
-  PrestationDto
-} from '../../../src/infrastructure/clients/pole-emploi-prestations-client'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { failure } from '../../../src/building-blocks/types/result'
@@ -20,15 +16,16 @@ import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/
 import { DateTime } from 'luxon'
 import { IdService } from 'src/utils/id-service'
 import {
-  PoleEmploiRendezVousClient,
+  PoleEmploiPartenaireClient,
+  PrestationDto,
   RendezVousPoleEmploiDto
-} from '../../../src/infrastructure/clients/pole-emploi-rendez-vous-client'
+} from '../../../src/infrastructure/clients/pole-emploi-partenaire-client'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
 
 describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   let jeunesRepository: StubbedType<Jeune.Repository>
   let dateService: StubbedClass<DateService>
-  let poleEmploiPrestationsClient: StubbedClass<PoleEmploiPrestationsClient>
-  let poleEmploiRendezVousClient: StubbedClass<PoleEmploiRendezVousClient>
+  let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
   let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
   let getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler
   let sandbox: SinonSandbox
@@ -36,18 +33,16 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   before(() => {
     sandbox = createSandbox()
     jeunesRepository = stubInterface(sandbox)
-    poleEmploiPrestationsClient = stubClass(PoleEmploiPrestationsClient)
-    poleEmploiRendezVousClient = stubClass(PoleEmploiRendezVousClient)
+    poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
     jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
     dateService = stubClass(DateService)
     const idService = stubClass(IdService)
-    idService.uuid.returns('inconnu-prestation')
+    idService.uuid.returns('random-id')
 
     getRendezVousJeunePoleEmploiQueryHandler =
       new GetRendezVousJeunePoleEmploiQueryHandler(
         jeunesRepository,
-        poleEmploiPrestationsClient,
-        poleEmploiRendezVousClient,
+        poleEmploiPartenaireClient,
         jeunePoleEmploiAuthorizer,
         dateService,
         idService
@@ -95,7 +90,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         idStable: undefined,
         date,
         duration: 0,
-        id: 'inconnu-prestation',
+        id: 'random-id',
         jeune: {
           id: 'ABCDE',
           nom: 'Doe',
@@ -153,7 +148,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         idStable: undefined,
         date,
         duration: 90,
-        id: 'inconnu-prestation',
+        id: 'random-id',
         jeune: {
           id: 'ABCDE',
           nom: 'Doe',
@@ -212,7 +207,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         idStable: undefined,
         date,
         duration: 90,
-        id: 'inconnu-prestation',
+        id: 'random-id',
         jeune: {
           id: 'ABCDE',
           nom: 'Doe',
@@ -277,7 +272,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         idStable: undefined,
         date,
         duration: 90,
-        id: 'inconnu-prestation',
+        id: 'random-id',
         jeune: {
           id: 'ABCDE',
           nom: 'Doe',
@@ -344,7 +339,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         idStable: undefined,
         date,
         duration: 90,
-        id: 'inconnu-prestation',
+        id: 'random-id',
         jeune: {
           id: 'ABCDE',
           nom: 'Doe',
@@ -407,7 +402,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         agencePE: true,
         date: expectedDate,
         duration: 23,
-        id: 'inconnu-prestation',
+        id: 'random-id',
         jeune: {
           id: 'ABCDE',
           nom: 'Doe',
@@ -465,7 +460,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         agencePE: false,
         date: expectedDate,
         duration: 23,
-        id: 'inconnu-prestation',
+        id: 'random-id',
         jeune: {
           id: 'ABCDE',
           nom: 'Doe',
@@ -523,7 +518,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         agencePE: false,
         date: expectedDate,
         duration: 23,
-        id: 'inconnu-prestation',
+        id: 'random-id',
         jeune: {
           id: 'ABCDE',
           nom: 'Doe',
@@ -548,8 +543,8 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
 
   describe('handle', () => {
     describe('quand le jeune existe', () => {
-      describe("quand le lien de la visio n'est pas encore disponible", () => {
-        it('récupère les rendez-vous Pole Emploi du jeune', async () => {
+      describe("quand le lien de la visio prestations n'est pas encore disponible", () => {
+        it('récupère les rendez-vous et les prestations Pole Emploi du jeune', async () => {
           // Given
           const query: GetRendezVousJeunePoleEmploiQuery = {
             idJeune: '1',
@@ -595,6 +590,29 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
               }
             }
           ]
+          const rendezVous: RendezVousPoleEmploiDto[] = [
+            {
+              theme: 'theme',
+              date: date,
+              heure: '12:20',
+              duree: 23,
+              modaliteContact: 'VISIO',
+              nomConseiller: 'Tavernier',
+              prenomConseiller: 'Nils',
+              agence: 'Agence',
+              adresse: {
+                bureauDistributeur: 'bureau',
+                ligne4: '12 rue Albert Camus',
+                ligne5: '75018',
+                ligne6: 'Paris'
+              },
+              commentaire: 'commentaire',
+              typeRDV: 'RDVL',
+              lienVisio: 'lien'
+            }
+          ]
+          const expectedRendezvousDate = new Date('2020-04-06T12:20:00')
+
           const prestationsResponse = {
             config: undefined,
             headers: undefined,
@@ -603,12 +621,23 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
             statusText: '',
             data: prestations
           }
+          const rendezVousResponse = {
+            config: undefined,
+            headers: undefined,
+            request: undefined,
+            status: 200,
+            statusText: '',
+            data: rendezVous
+          }
 
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           dateService.now.returns(maintenant)
-          poleEmploiPrestationsClient.getRendezVous
+          poleEmploiPartenaireClient.getPrestations
             .withArgs(query.idpToken, maintenant)
             .resolves(prestationsResponse)
+          poleEmploiPartenaireClient.getRendezVous
+            .withArgs(query.idpToken)
+            .resolves(rendezVousResponse)
 
           // When
           const result = await getRendezVousJeunePoleEmploiQueryHandler.handle(
@@ -628,7 +657,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                 date: date,
                 description: "Utiliser Internet dans sa recherche d'emploi",
                 duration: 0,
-                id: 'inconnu-prestation',
+                id: 'random-id',
                 jeune: {
                   id: 'ABCDE',
                   nom: 'Doe',
@@ -645,13 +674,37 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                   label: 'Prestation'
                 },
                 visio: false
+              },
+              {
+                agencePE: true,
+                date: expectedRendezvousDate,
+                duration: 23,
+                id: 'random-id',
+                jeune: {
+                  id: 'ABCDE',
+                  nom: 'Doe',
+                  prenom: 'John'
+                },
+                modality: 'en agence Pôle emploi',
+                theme: 'theme',
+                conseiller: undefined,
+                presenceConseiller: true,
+                comment: 'commentaire',
+                adresse: '12 rue Albert Camus 75018 Paris',
+                title: '',
+                type: {
+                  code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
+                  label: 'Entretien individuel conseiller'
+                },
+                visio: true,
+                lienVisio: 'lien'
               }
             ]
           })
         })
       })
-      describe('quand le lien de la visio est disponible', () => {
-        it('récupère les rendez-vous Pole Emploi du jeune avec le lien de la visio', async () => {
+      describe('quand le lien de la visio prestations est disponible', () => {
+        it('récupère les rendez-vous et les prestations Pole Emploi du jeune avec le lien de la visio', async () => {
           // Given
           const query: GetRendezVousJeunePoleEmploiQuery = {
             idJeune: '1',
@@ -659,6 +712,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           }
           const date = new Date('2020-04-06')
           const jeune = unJeune()
+          const conseiller = unConseiller()
           const idVisio = '1'
           const prestations: PrestationDto[] = [
             {
@@ -677,14 +731,44 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
               }
             }
           ]
+          const rendezVous: RendezVousPoleEmploiDto[] = [
+            {
+              theme: 'theme',
+              date: date,
+              heure: '12:20',
+              duree: 23,
+              modaliteContact: 'VISIO',
+              nomConseiller: 'Tavernier',
+              prenomConseiller: 'Nils',
+              agence: 'Agence',
+              adresse: {
+                bureauDistributeur: 'bureau',
+                ligne4: '12 rue Albert Camus',
+                ligne5: '75018',
+                ligne6: 'Paris'
+              },
+              commentaire: 'commentaire',
+              typeRDV: 'RDVL',
+              lienVisio: 'lien'
+            }
+          ]
+          const expectedRendezvousDate = new Date('2020-04-06T12:20:00')
 
-          const rendezVousPoleEmploiPrestationsResponse = {
+          const prestationsResponse = {
             config: undefined,
             headers: undefined,
             request: undefined,
             status: 200,
             statusText: '',
             data: prestations
+          }
+          const rendezVousResponse = {
+            config: undefined,
+            headers: undefined,
+            request: undefined,
+            status: 200,
+            statusText: '',
+            data: rendezVous
           }
 
           const lienVisioResponse = {
@@ -703,12 +787,18 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           dateService.now.returns(maintenant)
           dateService.isSameDateDay.returns(true)
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
-          poleEmploiPrestationsClient.getRendezVous
+          jeunesRepository.getConseiller
+            .withArgs(query.idJeune)
+            .resolves(conseiller)
+          poleEmploiPartenaireClient.getPrestations
             .withArgs(query.idpToken, maintenant)
-            .resolves(rendezVousPoleEmploiPrestationsResponse)
-          poleEmploiPrestationsClient.getLienVisio
+            .resolves(prestationsResponse)
+          poleEmploiPartenaireClient.getLienVisio
             .withArgs(query.idpToken, idVisio)
             .resolves(lienVisioResponse)
+          poleEmploiPartenaireClient.getRendezVous
+            .withArgs(query.idpToken)
+            .resolves(rendezVousResponse)
 
           // When
           const result = await getRendezVousJeunePoleEmploiQueryHandler.handle(
@@ -727,7 +817,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                 date,
                 description: undefined,
                 duration: 0,
-                id: 'inconnu-prestation',
+                id: 'random-id',
                 jeune: {
                   id: 'ABCDE',
                   nom: 'Doe',
@@ -744,6 +834,34 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                   label: 'Prestation'
                 },
                 visio: false
+              },
+              {
+                agencePE: true,
+                date: expectedRendezvousDate,
+                duration: 23,
+                id: 'random-id',
+                jeune: {
+                  id: 'ABCDE',
+                  nom: 'Doe',
+                  prenom: 'John'
+                },
+                modality: 'en agence Pôle emploi',
+                theme: 'theme',
+                presenceConseiller: true,
+                comment: 'commentaire',
+                adresse: '12 rue Albert Camus 75018 Paris',
+                title: '',
+                conseiller: {
+                  id: '1',
+                  nom: 'Tavernier',
+                  prenom: 'Nils'
+                },
+                type: {
+                  code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
+                  label: 'Entretien individuel conseiller'
+                },
+                visio: true,
+                lienVisio: 'lien'
               }
             ]
           })
@@ -761,7 +879,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
 
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           dateService.now.returns(maintenant)
-          poleEmploiPrestationsClient.getRendezVous
+          poleEmploiPartenaireClient.getPrestations
             .withArgs(query.idpToken, maintenant)
             .rejects()
 

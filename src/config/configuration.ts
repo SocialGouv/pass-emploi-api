@@ -47,14 +47,10 @@ export default () => {
       clientSecret: process.env.POLE_EMPLOI_CLIENT_SECRET ?? '',
       scope: process.env.POLE_EMPLOI_SCOPE ?? ''
     },
-    poleEmploiPrestations: {
+    poleEmploiPartenaire: {
       url:
-        process.env.POLE_EMPLOI_PRESTATIONS_API_BASE_URL ??
-        'https://api-r.es-qvr.fr/partenaire/peconnect-gerer-prestations/v1'
-    },
-    poleEmploiRendezVous: {
-      url: process.env.POLE_EMPLOI_RENDEZ_VOUS_API_BASE_URL ??
-        'https://api-r.es-qvr.fr/partenaire/peconnect-rendezvousagenda/v1'
+        process.env.POLE_EMPLOI_PARTENAIRE_API_BASE_URL ??
+        'https://api-r.es-qvr.fr/partenaire'
     },
     milo: {
       url: process.env.MILO_API_URL,

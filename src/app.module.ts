@@ -104,7 +104,6 @@ import { FirebaseClient } from './infrastructure/clients/firebase-client'
 import { ImmersionClient } from './infrastructure/clients/immersion-client'
 import { MailSendinblueClient } from './infrastructure/clients/mail-sendinblue.client'
 import { PoleEmploiClient } from './infrastructure/clients/pole-emploi-client'
-import { PoleEmploiPrestationsClient } from './infrastructure/clients/pole-emploi-prestations-client'
 import { ActionSqlRepository } from './infrastructure/repositories/action-sql.repository'
 import { AuthentificationSqlRepository } from './infrastructure/repositories/authentification-sql.repository'
 import { ChatFirebaseRepository } from './infrastructure/repositories/chat-firebase.repository'
@@ -138,7 +137,7 @@ import { databaseProviders } from './infrastructure/sequelize/providers'
 import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
 import { configureLoggerModule } from './utils/logger.module'
-import { PoleEmploiRendezVousClient } from './infrastructure/clients/pole-emploi-rendez-vous-client'
+import { PoleEmploiPartenaireClient } from './infrastructure/clients/pole-emploi-partenaire-client'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -176,8 +175,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     PoleEmploiClient,
     ImmersionClient,
     EngagementClient,
-    PoleEmploiPrestationsClient,
-    PoleEmploiRendezVousClient,
+    PoleEmploiPartenaireClient,
     Action.Factory,
     Authentification.Factory,
     WorkerService,
