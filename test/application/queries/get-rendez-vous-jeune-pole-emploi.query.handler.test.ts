@@ -56,8 +56,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       // Given
       const jeune = unJeune()
       const date = new Date('2020-04-06')
-      const maintenant = uneDatetime
-      dateService.now.returns(maintenant)
+      dateService.now.returns(uneDatetime)
       const prestation: PrestationDto = {
         annule: false,
         datefin: date,
@@ -86,6 +85,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       expect(rendezVousQueryModel).to.deep.equal({
         agencePE: true,
         annule: false,
+        idStable: undefined,
         date,
         duration: 0,
         id: 'inconnu-prestation',
@@ -114,8 +114,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       // Given
       const jeune = unJeune()
       const date = new Date('2020-04-06')
-      const maintenant = uneDatetime
-      dateService.now.returns(maintenant)
+      dateService.now.returns(uneDatetime)
       const prestation: PrestationDto = {
         annule: false,
         datefin: date,
@@ -144,6 +143,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       expect(rendezVousQueryModel).to.deep.equal({
         agencePE: true,
         annule: false,
+        idStable: undefined,
         date,
         duration: 90,
         id: 'inconnu-prestation',
@@ -172,8 +172,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       // Given
       const jeune = unJeune()
       const date = new Date('2020-04-06')
-      const maintenant = uneDatetime
-      dateService.now.returns(maintenant)
+      dateService.now.returns(uneDatetime)
       const prestation: PrestationDto = {
         annule: false,
         datefin: date,
@@ -203,6 +202,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       expect(rendezVousQueryModel).to.deep.equal({
         agencePE: true,
         annule: false,
+        idStable: undefined,
         date,
         duration: 90,
         id: 'inconnu-prestation',
@@ -231,8 +231,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       // Given
       const jeune = unJeune()
       const date = new Date('2020-04-06')
-      const maintenant = uneDatetime
-      dateService.now.returns(maintenant)
+      dateService.now.returns(uneDatetime)
       const prestation: PrestationDto = {
         annule: false,
         datefin: date,
@@ -268,6 +267,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       expect(rendezVousQueryModel).to.deep.equal({
         agencePE: true,
         annule: false,
+        idStable: undefined,
         date,
         duration: 90,
         id: 'inconnu-prestation',
@@ -296,11 +296,11 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       // Given
       const jeune = unJeune()
       const date = new Date('2020-04-06')
-      const maintenant = uneDatetime
-      dateService.now.returns(maintenant)
+      dateService.now.returns(uneDatetime)
       const prestation: PrestationDto = {
         annule: false,
         datefin: date,
+        identifiantStable: undefined,
         session: {
           typePrestation: {
             code: 'ATC'
@@ -334,6 +334,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       expect(rendezVousQueryModel).to.deep.equal({
         agencePE: true,
         annule: false,
+        idStable: undefined,
         date,
         duration: 90,
         id: 'inconnu-prestation',
@@ -376,6 +377,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
             {
               annule: false,
               datefin: date,
+              identifiantStable: undefined,
               session: {
                 adresse: {
                   adresseLigne1: '588 BOULEVARD ALBERT CAMUS',
@@ -432,6 +434,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
             _isSuccess: true,
             data: [
               {
+                idStable: undefined,
                 adresse:
                   '588 BOULEVARD ALBERT CAMUS  69665 VILLEFRANCHE SUR SAONE',
                 agencePE: true,
@@ -531,6 +534,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
             _isSuccess: true,
             data: [
               {
+                idStable: idVisio,
                 adresse: undefined,
                 agencePE: true,
                 annule: false,
