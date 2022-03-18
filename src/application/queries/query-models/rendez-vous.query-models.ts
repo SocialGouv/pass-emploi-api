@@ -95,6 +95,9 @@ export class RendezVousQueryModel implements RendezVousBaseQueryModel {
   @ApiProperty({ required: false })
   agencePE?: boolean
 
+  @ApiProperty({ required: false })
+  idStable?: string
+
   @ApiProperty()
   jeune: JeuneQueryModel
 

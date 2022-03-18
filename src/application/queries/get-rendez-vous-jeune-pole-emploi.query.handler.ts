@@ -117,6 +117,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     return {
       id: this.idService.uuid(),
       title: '',
+      idStable: prestation.identifiantStable,
       type: {
         code: CodeTypeRendezVous.PRESTATION,
         label: mapCodeLabelTypeRendezVous[CodeTypeRendezVous.PRESTATION]
