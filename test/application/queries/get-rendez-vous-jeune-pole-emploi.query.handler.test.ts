@@ -1,6 +1,8 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
+import { fromRendezVousDtoToRendezVousQueryModel } from 'src/application/queries/query-mappers/rendez-vous-pole-emploi.mappers'
+import { fromPrestationDtoToRendezVousQueryModel } from 'src/application/queries/query-mappers/rendez-vous-prestation.mappers'
 import { IdService } from 'src/utils/id-service'
 import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
 import {
@@ -24,6 +26,7 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   let jeunesRepository: StubbedType<Jeune.Repository>
   let dateService: StubbedClass<DateService>
+  let idService: StubbedClass<IdService>
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
   let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
   let getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler
@@ -35,7 +38,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
     jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
     dateService = stubClass(DateService)
-    const idService = stubClass(IdService)
+    idService = stubClass(IdService)
     idService.uuid.returns('random-id')
 
     getRendezVousJeunePoleEmploiQueryHandler =
@@ -76,11 +79,11 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       }
 
       // When
-      const rendezVousQueryModel =
-        await getRendezVousJeunePoleEmploiQueryHandler.fromPrestationDtoToRendezVousQueryModel(
-          prestation,
-          jeune
-        )
+      const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
+        prestation,
+        jeune,
+        idService
+      )
 
       // Then
       expect(rendezVousQueryModel).to.deep.equal({
@@ -134,11 +137,11 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       }
 
       // When
-      const rendezVousQueryModel =
-        await getRendezVousJeunePoleEmploiQueryHandler.fromPrestationDtoToRendezVousQueryModel(
-          prestation,
-          jeune
-        )
+      const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
+        prestation,
+        jeune,
+        idService
+      )
 
       // Then
       expect(rendezVousQueryModel).to.deep.equal({
@@ -193,11 +196,11 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       }
 
       // When
-      const rendezVousQueryModel =
-        await getRendezVousJeunePoleEmploiQueryHandler.fromPrestationDtoToRendezVousQueryModel(
-          prestation,
-          jeune
-        )
+      const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
+        prestation,
+        jeune,
+        idService
+      )
 
       // Then
       expect(rendezVousQueryModel).to.deep.equal({
@@ -258,11 +261,11 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       }
 
       // When
-      const rendezVousQueryModel =
-        await getRendezVousJeunePoleEmploiQueryHandler.fromPrestationDtoToRendezVousQueryModel(
-          prestation,
-          jeune
-        )
+      const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
+        prestation,
+        jeune,
+        idService
+      )
 
       // Then
       expect(rendezVousQueryModel).to.deep.equal({
@@ -325,11 +328,11 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       }
 
       // When
-      const rendezVousQueryModel =
-        await getRendezVousJeunePoleEmploiQueryHandler.fromPrestationDtoToRendezVousQueryModel(
-          prestation,
-          jeune
-        )
+      const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
+        prestation,
+        jeune,
+        idService
+      )
 
       // Then
       expect(rendezVousQueryModel).to.deep.equal({
@@ -388,11 +391,11 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       const expectedDate = new Date('2020-04-06T12:20:00')
 
       // When
-      const rendezVousQueryModel =
-        await getRendezVousJeunePoleEmploiQueryHandler.fromRendezVousPoleEmploiDtoToRendezVousQueryModel(
-          rendezVousPoleEmploiDto,
-          jeune
-        )
+      const rendezVousQueryModel = fromRendezVousDtoToRendezVousQueryModel(
+        rendezVousPoleEmploiDto,
+        jeune,
+        idService
+      )
 
       // Then
       expect(rendezVousQueryModel).to.deep.equal({
@@ -446,11 +449,11 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       const expectedDate = new Date('2020-04-06T07:59:00')
 
       // When
-      const rendezVousQueryModel =
-        await getRendezVousJeunePoleEmploiQueryHandler.fromRendezVousPoleEmploiDtoToRendezVousQueryModel(
-          rendezVousPoleEmploiDto,
-          jeune
-        )
+      const rendezVousQueryModel = fromRendezVousDtoToRendezVousQueryModel(
+        rendezVousPoleEmploiDto,
+        jeune,
+        idService
+      )
 
       // Then
       expect(rendezVousQueryModel).to.deep.equal({
@@ -506,11 +509,11 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       const expectedDate = new Date('2020-04-06T12:20:00')
 
       // When
-      const rendezVousQueryModel =
-        await getRendezVousJeunePoleEmploiQueryHandler.fromRendezVousPoleEmploiDtoToRendezVousQueryModel(
-          rendezVousPoleEmploiDto,
-          jeune
-        )
+      const rendezVousQueryModel = fromRendezVousDtoToRendezVousQueryModel(
+        rendezVousPoleEmploiDto,
+        jeune,
+        idService
+      )
 
       // Then
       expect(rendezVousQueryModel).to.deep.equal({
