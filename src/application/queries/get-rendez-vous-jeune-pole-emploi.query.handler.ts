@@ -15,14 +15,13 @@ import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
-import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
-import { Conseiller } from '../../domain/conseiller'
 import {
   PoleEmploiPartenaireClient,
   PrestationDto,
   RendezVousPoleEmploiDto
 } from '../../infrastructure/clients/pole-emploi-partenaire-client'
+import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
+import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
 
 export interface GetRendezVousJeunePoleEmploiQuery extends Query {
   idJeune: string
@@ -53,8 +52,6 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
-
-    const conseiller = await this.jeuneRepository.getConseiller(query.idJeune)
 
     const maintenant = this.dateService.now()
 
@@ -103,8 +100,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
       const rendezVousPoleEmploi = rendezVousPoleEmploiDto.map(rendezVous => {
         return this.fromRendezVousPoleEmploiDtoToRendezVousQueryModel(
           rendezVous,
-          jeune,
-          conseiller
+          jeune
         )
       })
 
@@ -162,8 +158,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
 
   fromRendezVousPoleEmploiDtoToRendezVousQueryModel(
     rendezVousPoleEmploiDto: RendezVousPoleEmploiDto,
-    jeune: Jeune,
-    conseiller?: Conseiller
+    jeune: Jeune
   ): RendezVousQueryModel {
     return {
       id: this.idService.uuid(),
@@ -182,13 +177,15 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
       duration: rendezVousPoleEmploiDto.duree,
       adresse: buildRendezVousAdresse(rendezVousPoleEmploiDto),
       agencePE: !!rendezVousPoleEmploiDto.agence,
-      conseiller: conseiller
-        ? {
-            id: conseiller.id,
-            nom: conseiller.lastName,
-            prenom: conseiller.firstName
-          }
-        : undefined,
+      conseiller:
+        rendezVousPoleEmploiDto.nomConseiller &&
+        rendezVousPoleEmploiDto.prenomConseiller
+          ? {
+              id: this.idService.uuid(),
+              nom: rendezVousPoleEmploiDto.nomConseiller,
+              prenom: rendezVousPoleEmploiDto.prenomConseiller
+            }
+          : undefined,
       theme: rendezVousPoleEmploiDto.theme,
       presenceConseiller: true,
       visio: rendezVousPoleEmploiDto.modaliteContact === 'VISIO',

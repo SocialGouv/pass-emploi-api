@@ -1,26 +1,25 @@
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { DateTime } from 'luxon'
+import { SinonSandbox } from 'sinon'
+import { IdService } from 'src/utils/id-service'
+import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
 import {
   GetRendezVousJeunePoleEmploiQuery,
   GetRendezVousJeunePoleEmploiQueryHandler
 } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { DateService } from '../../../src/utils/date-service'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { SinonSandbox } from 'sinon'
-import { Jeune } from '../../../src/domain/jeune'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { uneDatetime } from '../../fixtures/date.fixture'
-import { failure } from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
-import { DateTime } from 'luxon'
-import { IdService } from 'src/utils/id-service'
+import { failure } from '../../../src/building-blocks/types/result'
+import { Jeune } from '../../../src/domain/jeune'
 import {
   PoleEmploiPartenaireClient,
   PrestationDto,
   RendezVousPoleEmploiDto
 } from '../../../src/infrastructure/clients/pole-emploi-partenaire-client'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { DateService } from '../../../src/utils/date-service'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { uneDatetime } from '../../fixtures/date.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   let jeunesRepository: StubbedType<Jeune.Repository>
@@ -375,8 +374,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         heure: '12:20',
         duree: 23,
         modaliteContact: 'VISIO',
-        nomConseiller: 'Tavernier',
-        prenomConseiller: 'Nils',
         agence: 'Agence',
         adresse: {
           bureauDistributeur: 'bureau',
@@ -423,7 +420,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         lienVisio: 'lien'
       })
     })
-    it('retourne un RendezVousQueryModel avec la modalité', async () => {
+    it('retourne un RendezVousQueryModel avec la modalité et le conseiller', async () => {
       // Given
       const jeune = unJeune()
       const date = new Date('2020-04-06')
@@ -468,7 +465,11 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         },
         modality: 'par visio',
         theme: 'theme',
-        conseiller: undefined,
+        conseiller: {
+          id: 'random-id',
+          nom: 'Tavernier',
+          prenom: 'Nils'
+        },
         presenceConseiller: true,
         comment: 'commentaire',
         adresse: '12 rue Albert Camus 75018 Paris',
@@ -492,8 +493,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         heure: '12:20',
         duree: 23,
         modaliteContact: 'VISIO',
-        nomConseiller: 'Tavernier',
-        prenomConseiller: 'Nils',
         adresse: {
           bureauDistributeur: 'bureau',
           ligne4: '12 rue Albert Camus',
@@ -597,8 +596,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
               heure: '12:20',
               duree: 23,
               modaliteContact: 'VISIO',
-              nomConseiller: 'Tavernier',
-              prenomConseiller: 'Nils',
               agence: 'Agence',
               adresse: {
                 bureauDistributeur: 'bureau',
@@ -712,7 +709,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           }
           const date = new Date('2020-04-06')
           const jeune = unJeune()
-          const conseiller = unConseiller()
           const idVisio = '1'
           const prestations: PrestationDto[] = [
             {
@@ -738,8 +734,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
               heure: '12:20',
               duree: 23,
               modaliteContact: 'VISIO',
-              nomConseiller: 'Tavernier',
-              prenomConseiller: 'Nils',
               agence: 'Agence',
               adresse: {
                 bureauDistributeur: 'bureau',
@@ -787,9 +781,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           dateService.now.returns(maintenant)
           dateService.isSameDateDay.returns(true)
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
-          jeunesRepository.getConseiller
-            .withArgs(query.idJeune)
-            .resolves(conseiller)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(query.idpToken, maintenant)
             .resolves(prestationsResponse)
@@ -848,14 +839,10 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                 modality: 'en agence Pôle emploi',
                 theme: 'theme',
                 presenceConseiller: true,
+                conseiller: undefined,
                 comment: 'commentaire',
                 adresse: '12 rue Albert Camus 75018 Paris',
                 title: '',
-                conseiller: {
-                  id: '1',
-                  nom: 'Tavernier',
-                  prenom: 'Nils'
-                },
                 type: {
                   code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
                   label: 'Entretien individuel conseiller'

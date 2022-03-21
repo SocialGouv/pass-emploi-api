@@ -34,8 +34,6 @@ export namespace Jeune {
     save(jeune: Jeune): Promise<void>
     getJeunes(idsJeune: string[]): Promise<Jeune[]>
     supprimer(idJeune: Jeune.Id): Promise<void>
-
-    getConseiller(idJeune: string): Promise<Conseiller | undefined>
     getResumeActionsDesJeunesDuConseiller(
       idConseiller: string
     ): Promise<ResumeActionsDuJeuneQueryModel[]>
