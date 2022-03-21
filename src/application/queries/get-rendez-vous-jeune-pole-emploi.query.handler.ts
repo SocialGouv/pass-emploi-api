@@ -59,14 +59,14 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     const maintenant = this.dateService.now()
 
     try {
-      const responsePrestationsRendezVous =
-        await this.poleEmploiPartenaireClient.getPrestations(
-          query.idpToken,
-          maintenant
-        )
-
-      const responseRendezVousPoleEmploi =
-        await this.poleEmploiPartenaireClient.getRendezVous(query.idpToken)
+      const [responsePrestationsRendezVous, responseRendezVousPoleEmploi] =
+        await Promise.all([
+          await this.poleEmploiPartenaireClient.getPrestations(
+            query.idpToken,
+            maintenant
+          ),
+          await this.poleEmploiPartenaireClient.getRendezVous(query.idpToken)
+        ])
 
       const prestations: PrestationDto[] =
         responsePrestationsRendezVous?.data ?? []
@@ -100,15 +100,14 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
           )
         })
       )
-      const rendezVousPoleEmploi = await Promise.all(
-        rendezVousPoleEmploiDto.map(rendezVous => {
-          return this.fromRendezVousPoleEmploiDtoToRendezVousQueryModel(
-            rendezVous,
-            jeune,
-            conseiller
-          )
-        })
-      )
+      const rendezVousPoleEmploi = rendezVousPoleEmploiDto.map(rendezVous => {
+        return this.fromRendezVousPoleEmploiDtoToRendezVousQueryModel(
+          rendezVous,
+          jeune,
+          conseiller
+        )
+      })
+
       return success(rendezVousPrestations.concat(rendezVousPoleEmploi))
     } catch (e) {
       this.logger.error(e)

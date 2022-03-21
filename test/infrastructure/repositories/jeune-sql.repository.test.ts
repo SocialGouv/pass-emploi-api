@@ -23,6 +23,8 @@ import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { DatabaseForTesting, expect } from '../../utils'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { Conseiller } from '../../../src/domain/conseiller'
 
 describe('JeuneSqlRepository', () => {
   const databaseForTesting: DatabaseForTesting = DatabaseForTesting.prepare()
@@ -74,6 +76,48 @@ describe('JeuneSqlRepository', () => {
 
         // Then
         expect(jeune).to.equal(undefined)
+      })
+    })
+  })
+
+  describe('getConseiller', () => {
+    let jeune: Jeune
+    let conseiller: Conseiller
+
+    beforeEach(async () => {
+      // Given
+      jeune = { ...unJeune(), tokenLastUpdate: uneDatetime }
+      conseiller = unConseiller()
+      const conseillerDto = unConseillerDto({
+        structure: Core.Structure.POLE_EMPLOI
+      })
+      await ConseillerSqlModel.creer(conseillerDto)
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          idConseiller: conseillerDto.id,
+          dateCreation: jeune.creationDate.toJSDate(),
+          pushNotificationToken: 'unToken',
+          dateDerniereActualisationToken: uneDatetime.toJSDate()
+        })
+      )
+    })
+    describe('quand le conseiller existe', () => {
+      it('retourne le conseiller', async () => {
+        // When
+        const result = await jeuneSqlRepository.getConseiller('ABCDE')
+
+        // Then
+        expect(result).to.deep.equal(conseiller)
+      })
+    })
+
+    describe("quand le conseiller n'existe pas", () => {
+      it('retourne undefined', async () => {
+        // When
+        const result = await jeuneSqlRepository.getConseiller('ZIZOU')
+
+        // Then
+        expect(result).to.equal(undefined)
       })
     })
   })

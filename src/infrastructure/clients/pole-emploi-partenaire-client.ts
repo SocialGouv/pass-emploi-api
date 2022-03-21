@@ -99,7 +99,9 @@ export class PoleEmploiPartenaireClient {
     this.apiUrl = this.configService.get('poleEmploiPartenaire').url
   }
 
-  async getRendezVous(tokenDuJeune: string): Promise<AxiosResponse> {
+  async getRendezVous(
+    tokenDuJeune: string
+  ): Promise<AxiosResponse<RendezVousPoleEmploiDto[]>> {
     this.logger.log(
       `recuperation des rendez-vous du jeune'
       )}`
@@ -137,8 +139,6 @@ export class PoleEmploiPartenaireClient {
     idVisio: string
   ): Promise<AxiosResponse<string>> {
     this.logger.log('recuperation visio')
-    const params = new URLSearchParams()
-    params.append('idVisio', idVisio)
 
     return this.get(
       `peconnect-gerer-prestations/v1/lien-visio/rendez-vous/${idVisio}`,

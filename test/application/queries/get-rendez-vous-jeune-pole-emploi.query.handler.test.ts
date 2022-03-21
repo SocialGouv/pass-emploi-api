@@ -112,7 +112,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         lienVisio: undefined
       })
     })
-    it('retourne un RendezVousQueryModel avec la duree en heures', async () => {
+    it('retourne un RendezVousQueryModel avec la duration en heures', async () => {
       // Given
       const jeune = unJeune()
       const date = new Date('2020-04-06')
