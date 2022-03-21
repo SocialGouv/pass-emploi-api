@@ -80,12 +80,16 @@ export class AuthentificationSqlRepository
 
   async updateJeunePremiereConnexion(
     idJeune: string,
+    nom: string,
+    prenom: string,
     idUtilisateurAuth: string,
     datePremiereConnexion: Date
   ): Promise<void> {
     await JeuneSqlModel.update(
       {
         idAuthentification: idUtilisateurAuth,
+        nom,
+        prenom,
         datePremiereConnexion,
         dateDerniereConnexion: datePremiereConnexion
       },

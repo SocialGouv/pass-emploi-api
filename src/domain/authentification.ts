@@ -58,6 +58,8 @@ export namespace Authentification {
 
     updateJeunePremiereConnexion(
       idJeune: string,
+      nom: string,
+      prenom: string,
       idUtilisateurAuth: string,
       datePremiereConnexion: Date
     ): Promise<void>

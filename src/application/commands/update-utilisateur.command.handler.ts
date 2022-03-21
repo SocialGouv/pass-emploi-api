@@ -90,6 +90,8 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       if (jeuneCreeParConseillerPourPremiereConnexion) {
         await this.authentificationRepository.updateJeunePremiereConnexion(
           jeuneCreeParConseillerPourPremiereConnexion.id,
+          command.nom!,
+          command.prenom!,
           command.idUtilisateurAuth,
           this.dateService.nowJs()
         )

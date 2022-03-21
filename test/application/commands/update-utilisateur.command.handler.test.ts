@@ -489,6 +489,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
           // Given
           const command: UpdateUtilisateurCommand = {
             idUtilisateurAuth: 'nilstavernier',
+            nom: 'nom',
+            prenom: 'prenom',
             email: 'ABC@test.com',
             type: Authentification.Type.JEUNE,
             structure: Core.Structure.MILO
@@ -520,6 +522,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
               authentificationRepository.updateJeunePremiereConnexion
             ).to.have.been.calledWithExactly(
               utilisateur.id,
+              command.nom,
+              command.prenom,
               command.idUtilisateurAuth,
               uneDate()
             )

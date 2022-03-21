@@ -236,6 +236,8 @@ describe('AuthentificationSqlRepository', () => {
       // When
       await authentificationSqlRepository.updateJeunePremiereConnexion(
         'id-jeune',
+        'nouveauNom',
+        'nouveauPrenom',
         'id-authentification-jeune',
         uneDate()
       )
@@ -246,6 +248,8 @@ describe('AuthentificationSqlRepository', () => {
       })
       expect(jeuneSql).not.to.be.equal(null)
       expect(jeuneSql!.id).to.be.equal('id-jeune')
+      expect(jeuneSql!.nom).to.be.equal('nouveauNom')
+      expect(jeuneSql!.prenom).to.be.equal('nouveauPrenom')
       expect(jeuneSql!.idAuthentification).to.be.equal(
         'id-authentification-jeune'
       )
