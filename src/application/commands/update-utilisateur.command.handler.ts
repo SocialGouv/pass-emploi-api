@@ -88,10 +88,15 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
         await this.authentificationRepository.getJeuneByEmail(command.email!)
 
       if (jeuneCreeParConseillerPourPremiereConnexion) {
+        jeuneCreeParConseillerPourPremiereConnexion.nom =
+          command.nom ?? jeuneCreeParConseillerPourPremiereConnexion.nom
+        jeuneCreeParConseillerPourPremiereConnexion.prenom =
+          command.prenom ?? jeuneCreeParConseillerPourPremiereConnexion.prenom
+
         await this.authentificationRepository.updateJeunePremiereConnexion(
           jeuneCreeParConseillerPourPremiereConnexion.id,
-          command.nom!,
-          command.prenom!,
+          jeuneCreeParConseillerPourPremiereConnexion.nom,
+          jeuneCreeParConseillerPourPremiereConnexion.prenom,
           command.idUtilisateurAuth,
           this.dateService.nowJs()
         )

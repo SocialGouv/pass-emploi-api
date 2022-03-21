@@ -517,7 +517,10 @@ describe('UpdateUtilisateurCommandHandler', () => {
           // Then
           expect(isSuccess(result)).equal(true)
           if (isSuccess(result)) {
-            expect(result.data).to.deep.equal(unUtilisateurQueryModel())
+            const expectedUtilisateur = unUtilisateurQueryModel()
+            expectedUtilisateur.nom = command.nom!
+            expectedUtilisateur.prenom = command.prenom!
+            expect(result.data).to.deep.equal(expectedUtilisateur)
             expect(
               authentificationRepository.updateJeunePremiereConnexion
             ).to.have.been.calledWithExactly(
