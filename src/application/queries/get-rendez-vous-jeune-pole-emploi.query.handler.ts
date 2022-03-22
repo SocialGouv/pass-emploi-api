@@ -129,7 +129,10 @@ function sortRendezVousByDate(
   rdv1: RendezVousQueryModel,
   rdv2: RendezVousQueryModel
 ): number {
-  if (rdv1.date.getTime() < rdv2.date.getTime()) return -1
-  if (rdv1.date.getTime() > rdv2.date.getTime()) return 1
+  const date1 = new Date(rdv1.date).getTime()
+  const date2 = new Date(rdv2.date).getTime()
+
+  if (date1 < date2) return -1
+  if (date1 > date2) return 1
   return 0
 }
