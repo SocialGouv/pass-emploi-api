@@ -100,7 +100,11 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
         )
       })
 
-      return success(rendezVousPrestations.concat(rendezVousPoleEmploi))
+      const rendezVousDuJeune = rendezVousPrestations
+        .concat(rendezVousPoleEmploi)
+        .sort(sortRendezVousByDate)
+
+      return success(rendezVousDuJeune)
     } catch (e) {
       this.logger.error(e)
       return failure(
@@ -119,4 +123,13 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
   async monitor(): Promise<void> {
     return
   }
+}
+
+function sortRendezVousByDate(
+  rdv1: RendezVousQueryModel,
+  rdv2: RendezVousQueryModel
+): number {
+  if (rdv1.date.getTime() < rdv2.date.getTime()) return -1
+  if (rdv1.date.getTime() > rdv2.date.getTime()) return 1
+  return 0
 }

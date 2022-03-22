@@ -546,19 +546,23 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   describe('handle', () => {
     describe('quand le jeune existe', () => {
       describe("quand le lien de la visio prestations n'est pas encore disponible", () => {
-        it('récupère les rendez-vous et les prestations Pole Emploi du jeune', async () => {
+        it('récupère les rendez-vous et les prestations Pole Emploi du jeune bien triés', async () => {
           // Given
           const query: GetRendezVousJeunePoleEmploiQuery = {
             idJeune: '1',
             idpToken: 'token'
           }
           const jeune = unJeune()
-          const date = new Date('2020-04-06')
+          const datePrestation = new Date('2020-04-06')
+          const dateRendezVous = new Date('2020-04-05')
+          const heureRendezVous = '12:20'
+          const expectedRendezvousDate = new Date('2020-04-05T12:20:00')
           const maintenant = uneDatetime
+
           const prestations: PrestationDto[] = [
             {
               annule: false,
-              datefin: date,
+              datefin: datePrestation,
               identifiantStable: undefined,
               session: {
                 adresse: {
@@ -570,9 +574,9 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                   ville: 'VILLEFRANCHE SUR SAONE',
                   villePostale: 'VILLEFRANCHE SUR SAONE CEDEX'
                 },
-                dateDebut: date,
-                dateFinPrevue: date,
-                dateLimite: date,
+                dateDebut: datePrestation,
+                dateFinPrevue: datePrestation,
+                dateLimite: datePrestation,
                 duree: {
                   unite: 'JOUR',
                   valeur: 1.0
@@ -595,8 +599,8 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           const rendezVous: RendezVousPoleEmploiDto[] = [
             {
               theme: 'theme',
-              date: date,
-              heure: '12:20',
+              date: dateRendezVous,
+              heure: heureRendezVous,
               duree: 23,
               modaliteContact: 'VISIO',
               agence: 'Agence',
@@ -611,7 +615,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
               lienVisio: 'lien'
             }
           ]
-          const expectedRendezvousDate = new Date('2020-04-06T12:20:00')
 
           const prestationsResponse = {
             config: undefined,
@@ -648,34 +651,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
             _isSuccess: true,
             data: [
               {
-                idStable: undefined,
-                adresse:
-                  '588 BOULEVARD ALBERT CAMUS  69665 VILLEFRANCHE SUR SAONE',
-                agencePE: true,
-                annule: false,
-                comment: undefined,
-                date: date,
-                description: "Utiliser Internet dans sa recherche d'emploi",
-                duration: 0,
-                id: 'random-id',
-                jeune: {
-                  id: 'ABCDE',
-                  nom: 'Doe',
-                  prenom: 'John'
-                },
-                lienVisio: undefined,
-                modality: '',
-                organisme: undefined,
-                telephone: undefined,
-                theme: 'Atelier',
-                title: '',
-                type: {
-                  code: 'PRESTATION',
-                  label: 'Prestation'
-                },
-                visio: false
-              },
-              {
                 agencePE: true,
                 date: expectedRendezvousDate,
                 duration: 23,
@@ -698,6 +673,34 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                 },
                 visio: true,
                 lienVisio: 'lien'
+              },
+              {
+                idStable: undefined,
+                adresse:
+                  '588 BOULEVARD ALBERT CAMUS  69665 VILLEFRANCHE SUR SAONE',
+                agencePE: true,
+                annule: false,
+                comment: undefined,
+                date: datePrestation,
+                description: "Utiliser Internet dans sa recherche d'emploi",
+                duration: 0,
+                id: 'random-id',
+                jeune: {
+                  id: 'ABCDE',
+                  nom: 'Doe',
+                  prenom: 'John'
+                },
+                lienVisio: undefined,
+                modality: '',
+                organisme: undefined,
+                telephone: undefined,
+                theme: 'Atelier',
+                title: '',
+                type: {
+                  code: 'PRESTATION',
+                  label: 'Prestation'
+                },
+                visio: false
               }
             ]
           })

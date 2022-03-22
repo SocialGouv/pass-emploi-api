@@ -15,7 +15,7 @@ import {
   Query
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiHeader, ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   TransfererJeunesConseillerCommand,
   TransfererJeunesConseillerCommandHandler
@@ -163,6 +163,11 @@ export class JeunesController {
   }
 
   @Get(':idJeune/rendezvous')
+  @ApiHeader({
+    name: 'x-idp-token',
+    description: 'Token du Jeune Pole Emploi',
+    required: false
+  })
   @ApiResponse({
     type: RendezVousQueryModel,
     isArray: true
