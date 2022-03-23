@@ -52,6 +52,7 @@ export interface RendezVous {
   adresse?: string
   organisme?: string
   presenceConseiller: boolean
+  invitation?: boolean
 }
 
 interface InfosRendezVousACreer {
@@ -66,6 +67,7 @@ interface InfosRendezVousACreer {
   adresse?: string
   organisme?: string
   presenceConseiller?: boolean
+  invitation?: boolean
 }
 
 export namespace RendezVous {
@@ -111,6 +113,7 @@ export namespace RendezVous {
       precision: infosRendezVousACreer.precision,
       adresse: infosRendezVousACreer.adresse,
       organisme: infosRendezVousACreer.organisme,
+      invitation: infosRendezVousACreer.invitation,
       presenceConseiller:
         infosRendezVousACreer.presenceConseiller === undefined
           ? true

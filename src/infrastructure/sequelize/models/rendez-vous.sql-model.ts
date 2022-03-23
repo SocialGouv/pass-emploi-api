@@ -54,6 +54,9 @@ export class RendezVousDto extends Model {
 
   @Column({ field: 'presence_conseiller', type: DataType.BOOLEAN })
   presenceConseiller: boolean
+
+  @Column({ field: 'invitation', type: DataType.BOOLEAN })
+  invitation: boolean | null
 }
 
 @Table({ timestamps: false, tableName: 'rendez_vous' })

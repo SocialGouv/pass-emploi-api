@@ -21,7 +21,8 @@ export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
     precision: rendezVous.precision ?? null,
     adresse: rendezVous.adresse ?? null,
     organisme: rendezVous.organisme ?? null,
-    presenceConseiller: rendezVous.presenceConseiller
+    presenceConseiller: rendezVous.presenceConseiller,
+    invitation: rendezVous.invitation ?? null
   }
 }
 
@@ -51,7 +52,8 @@ export function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
     precision: rendezVousSql.precision ?? undefined,
     adresse: rendezVousSql.adresse ?? undefined,
     organisme: rendezVousSql.organisme ?? undefined,
-    presenceConseiller: rendezVousSql.presenceConseiller
+    presenceConseiller: rendezVousSql.presenceConseiller,
+    invitation: rendezVousSql.invitation ?? undefined
   }
 }
 
@@ -102,6 +104,7 @@ export function fromSqlToRendezVousQueryModel(
     precision: rendezVousSql.precision ?? undefined,
     adresse: rendezVousSql.adresse ?? undefined,
     organisme: rendezVousSql.organisme ?? undefined,
+    invitation: rendezVousSql.invitation ?? undefined,
     presenceConseiller: rendezVousSql.presenceConseiller
   }
 }
