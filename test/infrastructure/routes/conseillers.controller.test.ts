@@ -442,7 +442,8 @@ describe('ConseillersController', () => {
           precision: undefined,
           adresse: undefined,
           organisme: undefined,
-          presenceConseiller: undefined
+          presenceConseiller: undefined,
+          invitation: undefined
         },
         unUtilisateurDecode()
       )

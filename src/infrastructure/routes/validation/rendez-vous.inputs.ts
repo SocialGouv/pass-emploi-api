@@ -75,4 +75,9 @@ export class CreateRendezVousPayload {
   )
   @Equals(true)
   presenceConseiller?: boolean
+
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  invitation?: boolean
 }

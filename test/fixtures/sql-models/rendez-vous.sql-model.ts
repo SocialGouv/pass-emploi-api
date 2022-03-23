@@ -22,7 +22,8 @@ export function unRendezVousDto(
     precision: null,
     adresse: null,
     organisme: null,
-    presenceConseiller: true
+    presenceConseiller: true,
+    invitation: null
   }
 
   return { ...defaults, ...args }
