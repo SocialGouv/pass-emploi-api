@@ -79,5 +79,6 @@ export class CreateRendezVousPayload {
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
+  @IsIn([true, false])
   invitation?: boolean
 }
