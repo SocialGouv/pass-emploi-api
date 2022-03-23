@@ -418,7 +418,8 @@ describe('ConseillersController', () => {
         comment: '',
         date: uneDatetime.toJSDate().toISOString(),
         duration: 30,
-        modality: 'rdv'
+        modality: 'rdv',
+        invitation: true
       }
       createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
 
@@ -443,7 +444,7 @@ describe('ConseillersController', () => {
           adresse: undefined,
           organisme: undefined,
           presenceConseiller: undefined,
-          invitation: undefined
+          invitation: true
         },
         unUtilisateurDecode()
       )
