@@ -861,7 +861,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         })
       })
       describe('quand une erreur se produit', () => {
-        it('renvoie une failure', async () => {
+        it('renvoie une failure quand une erreur client se produit', async () => {
           // Given
           const query: GetRendezVousJeunePoleEmploiQuery = {
             idJeune: '1',
@@ -874,7 +874,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           dateService.now.returns(maintenant)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(query.idpToken, maintenant)
-            .rejects()
+            .throws({ response: { data: {} } })
 
           // When
           const result = await getRendezVousJeunePoleEmploiQueryHandler.handle(
@@ -884,6 +884,25 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           expect(result._isSuccess).to.equal(false)
           if (!result._isSuccess)
             expect(result.error.code).to.equal('ERREUR_HTTP')
+        })
+        it('throw une erreur quand une erreur interne se produit', async () => {
+          // Given
+          const query: GetRendezVousJeunePoleEmploiQuery = {
+            idJeune: '1',
+            idpToken: 'token'
+          }
+          const jeune = unJeune()
+          const errorMessage = 'Date Error'
+
+          jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+          dateService.now.throws(new Error(errorMessage))
+
+          try {
+            await getRendezVousJeunePoleEmploiQueryHandler.handle(query)
+            expect.fail(null, null, 'handle test did not reject with an error')
+          } catch (e) {
+            expect(e.message).to.equal(errorMessage)
+          }
         })
       })
     })

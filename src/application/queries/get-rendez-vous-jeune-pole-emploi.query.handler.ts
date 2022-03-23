@@ -107,9 +107,12 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
       return success(rendezVousDuJeune)
     } catch (e) {
       this.logger.error(e)
-      return failure(
-        new ErreurHttp(e.response?.data?.message, e.response?.status)
-      )
+      if (e.response) {
+        return failure(
+          new ErreurHttp(e.response.data?.message, e.response.status)
+        )
+      }
+      throw e
     }
   }
 
