@@ -71,7 +71,7 @@ export class RendezVousQueryModel implements RendezVousBaseQueryModel {
   @ApiProperty({ required: false })
   organisme?: string
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   presenceConseiller?: boolean
 
   @ApiProperty({ required: false })

@@ -87,6 +87,45 @@ export interface RendezVousPoleEmploiDto {
   lienVisio?: string
 }
 
+export interface DemarcheDto {
+  id?: string
+  etat: 'AC' | 'RE' | 'AN' | 'EC' | 'AF'
+  dateDebut?: string
+  dateFin: string
+  dateAnnulation?: string
+  dateCreation: string
+  dateModification?: string
+  origineCreateur: 'INDIVIDU' | 'CONSEILLER' | 'PARTENAIRE' | 'ENTREPRISE'
+  origineModificateur?: 'INDIVIDU' | 'CONSEILLER' | 'PARTENAIRE' | 'ENTREPRISE'
+  origineDemarche:
+    | 'ACTION'
+    | 'ACTUALISATION'
+    | 'CANDIDATURE'
+    | 'JRE_CONSEILLER'
+    | 'JRE_DE'
+    | 'CV'
+    | 'LM'
+    | 'PUBLICATION_PROFIL'
+    | 'ENTRETIEN'
+    | 'RECHERCHE_ENREGISTREE'
+    | 'SUGGESTION'
+    | 'PASS_EMPLOI'
+  pourquoi: string
+  libellePourquoi: string
+  quoi: string
+  libelleQuoi: string
+  comment?: string
+  libelleComment?: string
+  libelleLong?: string
+  libelleCourt?: string
+  ou?: string
+  description?: string
+  organisme?: string
+  metier?: string
+  nombre?: string
+  contact?: string
+}
+
 @Injectable()
 export class PoleEmploiPartenaireClient {
   private readonly apiUrl: string
@@ -100,13 +139,17 @@ export class PoleEmploiPartenaireClient {
     this.apiUrl = this.configService.get('poleEmploiPartenaire').url
   }
 
+  async getDemarches(
+    tokenDuJeune: string
+  ): Promise<AxiosResponse<DemarcheDto[]>> {
+    this.logger.log('recuperation des demarches du jeune')
+    return this.get('peconnect-demarches/v1/demarches', tokenDuJeune)
+  }
+
   async getRendezVous(
     tokenDuJeune: string
   ): Promise<AxiosResponse<RendezVousPoleEmploiDto[]>> {
-    this.logger.log(
-      `recuperation des rendez-vous du jeune'
-      )}`
-    )
+    this.logger.log('recuperation des rendez-vous du jeune')
     return this.get(
       'peconnect-rendezvousagenda/v1/listerendezvous',
       tokenDuJeune

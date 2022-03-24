@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { Action } from '../../../domain/action'
+import { Action, ActionPoleEmploi } from '../../../domain/action'
 import { DetailJeuneQueryModel } from './jeunes.query-models'
 
 export class ActionQueryModel {
@@ -32,4 +32,24 @@ export class ActionQueryModel {
     required: false
   })
   jeune?: DetailJeuneQueryModel
+}
+
+export class ActionPoleEmploiQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty({ required: false })
+  contenu?: string
+
+  @ApiProperty()
+  statut: ActionPoleEmploi.Statut
+
+  @ApiProperty()
+  dateFin: Date
+
+  @ApiProperty({ required: false })
+  dateAnnulation?: Date
+
+  @ApiProperty()
+  creeParConseiller: boolean
 }
