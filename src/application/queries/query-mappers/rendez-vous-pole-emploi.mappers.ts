@@ -28,7 +28,7 @@ export function fromRendezVousDtoToRendezVousQueryModel(
     modality: buildModality(rendezVousPoleEmploiDto),
     duration: rendezVousPoleEmploiDto.duree,
     adresse: buildAdresse(rendezVousPoleEmploiDto),
-    agencePE: !!rendezVousPoleEmploiDto.agence,
+    agencePE: rendezVousPoleEmploiDto.modaliteContact === 'AGENCE',
     conseiller:
       rendezVousPoleEmploiDto.nomConseiller &&
       rendezVousPoleEmploiDto.prenomConseiller
@@ -61,9 +61,6 @@ function buildAdresse(
 function buildModality(
   rendezVousPoleEmploiDto: RendezVousPoleEmploiDto
 ): string {
-  if (rendezVousPoleEmploiDto.agence) {
-    return 'en agence Pôle emploi'
-  }
   switch (rendezVousPoleEmploiDto.modaliteContact) {
     case 'VISIO':
       return 'par visio'
@@ -80,6 +77,6 @@ function buildDate(rendezVousPoleEmploiDto: RendezVousPoleEmploiDto): Date {
   const date = new Date(rendezVousPoleEmploiDto.date)
   const heuresEtMinutes = rendezVousPoleEmploiDto.heure.split(':')
   if (heuresEtMinutes?.length === 2)
-    date.setHours(parseInt(heuresEtMinutes[0]), parseInt(heuresEtMinutes[1]))
+    date.setUTCHours(parseInt(heuresEtMinutes[0]), parseInt(heuresEtMinutes[1]))
   return date
 }

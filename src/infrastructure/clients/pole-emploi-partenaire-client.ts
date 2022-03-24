@@ -8,12 +8,12 @@ import { firstValueFrom } from 'rxjs'
 
 export interface PrestationDto {
   annule?: boolean
-  datefin?: Date
+  datefin?: string
   identifiantStable?: string
   session: {
-    dateDebut: Date
-    dateFinPrevue?: Date
-    dateLimite?: Date
+    dateDebut: string
+    dateFinPrevue?: string
+    dateLimite?: string
     enAgence?: boolean
     infoCollective?: boolean
     natureAnimation?: 'INTERNE' | 'EXTERNE' | 'CO_ANIMEE'
@@ -48,6 +48,7 @@ export interface PrestationDto {
     }
     themeAtelier?: {
       libelle?: string
+      descriptif?: string
       accroche?: string
       code?: string
       codeTypePrestation?: string
@@ -68,7 +69,7 @@ export interface PrestationDto {
 
 export interface RendezVousPoleEmploiDto {
   theme?: string
-  date: Date
+  date: string
   heure: string
   duree: number
   modaliteContact?: 'VISIO' | 'TELEPHONIQUE' | 'AGENCE'
