@@ -138,6 +138,7 @@ import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
 import { configureLoggerModule } from './utils/logger.module'
 import { PoleEmploiPartenaireClient } from './infrastructure/clients/pole-emploi-partenaire-client'
+import { GetActionsJeunePoleEmploiQueryHandler } from './application/queries/get-actions-jeune-pole-emploi.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -324,7 +325,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetFavorisOffresEngagementJeuneQueryHandler,
     DeleteFavoriOffreEngagementCommandHandler,
     DeleteJeuneCommandHandler,
-    GetDetailRendezVousQueryHandler
+    GetDetailRendezVousQueryHandler,
+    GetActionsJeunePoleEmploiQueryHandler
   ]
 }
 

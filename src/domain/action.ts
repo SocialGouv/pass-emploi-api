@@ -20,6 +20,16 @@ export interface Action {
   createur: Action.Createur
 }
 
+export namespace ActionPoleEmploi {
+  export enum Statut {
+    EN_RETARD = 'EN_RETARD',
+    EN_COURS = 'EN_COURS',
+    A_FAIRE = 'A_FAIRE',
+    REALISEE = 'REALISEE',
+    ANNULEE = 'ANNULEE'
+  }
+}
+
 export namespace Action {
   export type Id = Brand<string, 'IdAction'>
   export type IdCreateur = string | Jeune.Id

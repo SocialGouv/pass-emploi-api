@@ -20,6 +20,7 @@ import {
   TransfererJeunesConseillerCommand,
   TransfererJeunesConseillerCommandHandler
 } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
+import { GetActionsJeunePoleEmploiQueryHandler } from 'src/application/queries/get-actions-jeune-pole-emploi.query.handler'
 import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from 'src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
@@ -51,7 +52,10 @@ import { UpdateNotificationTokenCommandHandler } from '../../application/command
 import { GetActionsByJeuneQueryHandler } from '../../application/queries/get-actions-by-jeune.query.handler'
 import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
 import { GetRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler'
-import { ActionQueryModel } from '../../application/queries/query-models/actions.query-model'
+import {
+  ActionPoleEmploiQueryModel,
+  ActionQueryModel
+} from '../../application/queries/query-models/actions.query-model'
 import {
   DroitsInsuffisants,
   ErreurHttp,
@@ -95,7 +99,8 @@ export class JeunesController {
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
     private readonly deleteFavoriCommandHandler: DeleteFavoriOffreEmploiCommandHandler,
     private readonly transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler,
-    private readonly deleteJeuneCommandHandler: DeleteJeuneCommandHandler
+    private readonly deleteJeuneCommandHandler: DeleteJeuneCommandHandler,
+    private readonly getActionsPoleEmploiQueryHandler: GetActionsJeunePoleEmploiQueryHandler
   ) {}
 
   @Get(':idJeune')
@@ -160,6 +165,42 @@ export class JeunesController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<ActionQueryModel[]> {
     return this.getActionsByJeuneQueryHandler.execute({ idJeune }, utilisateur)
+  }
+
+  @Get(':idJeune/pole-emploi/actions')
+  @ApiHeader({
+    name: 'x-idp-token',
+    description: 'Token du Jeune Pole Emploi',
+    required: true
+  })
+  @ApiResponse({
+    type: ActionPoleEmploiQueryModel,
+    isArray: true
+  })
+  async getActionsPoleEmploi(
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @Headers('x-idp-token') idpToken: string
+  ): Promise<ActionPoleEmploiQueryModel[]> {
+    const result = await this.getActionsPoleEmploiQueryHandler.execute(
+      { idJeune, idpToken },
+      utilisateur
+    )
+    if (isSuccess(result)) {
+      return result.data
+    }
+    if (isFailure(result)) {
+      if (result.error.code === NonTrouveError.CODE) {
+        throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
+      }
+      if (result.error.code === ErreurHttp.CODE) {
+        throw new HttpException(
+          result.error.message,
+          (result.error as ErreurHttp).statusCode
+        )
+      }
+    }
+    throw new RuntimeException(result.error.message)
   }
 
   @Get(':idJeune/rendezvous')
