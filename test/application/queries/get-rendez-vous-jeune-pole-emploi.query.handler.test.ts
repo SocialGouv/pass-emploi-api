@@ -1,5 +1,4 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
 import { fromRendezVousDtoToRendezVousQueryModel } from 'src/application/queries/query-mappers/rendez-vous-pole-emploi.mappers'
 import { fromPrestationDtoToRendezVousQueryModel } from 'src/application/queries/query-mappers/rendez-vous-prestation.mappers'
@@ -56,28 +55,28 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   })
 
   describe('fromPrestationDtoToRendezVousQueryModel', () => {
-    it('retourne un RendezVousQueryModel avec la durée en jour', async () => {
-      // Given
-      const jeune = unJeune()
-      const date = new Date('2020-04-06')
-      dateService.now.returns(uneDatetime)
-      const prestation: PrestationDto = {
-        annule: false,
-        datefin: date,
-        session: {
-          dateDebut: date,
-          dateFinPrevue: date,
-          dateLimite: date,
-          duree: {
-            unite: 'JOUR',
-            valeur: 1.0
-          },
-          enAgence: true,
-          infoCollective: false,
-          realiteVirtuelle: false
-        }
+    const jeune = unJeune()
+    const dateString = '2014-03-24T09:00:00+01:00'
+    const dateUTC = new Date('2014-03-24T08:00:00.000Z')
+    const prestation: PrestationDto = {
+      annule: false,
+      datefin: dateString,
+      session: {
+        modalitePremierRendezVous: 'WEBCAM',
+        dateDebut: dateString,
+        dateFinPrevue: dateString,
+        dateLimite: dateString,
+        duree: {
+          unite: 'JOUR',
+          valeur: 1.0
+        },
+        enAgence: true,
+        infoCollective: false,
+        realiteVirtuelle: false
       }
+    }
 
+    it('retourne un RendezVousQueryModel avec le bon modele, la durée en jour et la date en UTC', async () => {
       // When
       const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
         prestation,
@@ -90,7 +89,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         agencePE: true,
         annule: false,
         idStable: undefined,
-        date,
+        date: dateUTC,
         duration: 0,
         id: 'random-id',
         jeune: {
@@ -98,123 +97,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           nom: 'Doe',
           prenom: 'John'
         },
-        modality: '',
-        theme: undefined,
-        telephone: undefined,
-        organisme: undefined,
-        description: undefined,
-        comment: undefined,
-        adresse: undefined,
-        title: '',
-        type: {
-          code: 'PRESTATION',
-          label: 'Prestation'
-        },
-        visio: false,
-        lienVisio: undefined
-      })
-    })
-    it('retourne un RendezVousQueryModel avec la duration en heures', async () => {
-      // Given
-      const jeune = unJeune()
-      const date = new Date('2020-04-06')
-      dateService.now.returns(uneDatetime)
-      const prestation: PrestationDto = {
-        annule: false,
-        datefin: date,
-        session: {
-          dateDebut: date,
-          dateFinPrevue: date,
-          dateLimite: date,
-          duree: {
-            unite: 'HEURE',
-            valeur: 1.5
-          },
-          enAgence: true,
-          infoCollective: false,
-          realiteVirtuelle: false
-        }
-      }
-
-      // When
-      const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
-        prestation,
-        jeune,
-        idService
-      )
-
-      // Then
-      expect(rendezVousQueryModel).to.deep.equal({
-        agencePE: true,
-        annule: false,
-        idStable: undefined,
-        date,
-        duration: 90,
-        id: 'random-id',
-        jeune: {
-          id: 'ABCDE',
-          nom: 'Doe',
-          prenom: 'John'
-        },
-        modality: '',
-        theme: undefined,
-        telephone: undefined,
-        organisme: undefined,
-        description: undefined,
-        comment: undefined,
-        adresse: undefined,
-        title: '',
-        type: {
-          code: 'PRESTATION',
-          label: 'Prestation'
-        },
-        visio: false,
-        lienVisio: undefined
-      })
-    })
-    it('retourne un RendezVousQueryModel avec la visio', async () => {
-      // Given
-      const jeune = unJeune()
-      const date = new Date('2020-04-06')
-      dateService.now.returns(uneDatetime)
-      const prestation: PrestationDto = {
-        annule: false,
-        datefin: date,
-        session: {
-          modalitePremierRendezVous: 'WEBCAM',
-          dateDebut: date,
-          dateFinPrevue: date,
-          dateLimite: date,
-          duree: {
-            unite: 'HEURE',
-            valeur: 1.5
-          },
-          enAgence: true,
-          infoCollective: false,
-          realiteVirtuelle: false
-        }
-      }
-
-      // When
-      const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
-        prestation,
-        jeune,
-        idService
-      )
-
-      // Then
-      expect(rendezVousQueryModel).to.deep.equal({
-        agencePE: true,
-        annule: false,
-        idStable: undefined,
-        date,
-        duration: 90,
-        id: 'random-id',
-        jeune: {
-          id: 'ABCDE',
-          nom: 'Doe',
-          prenom: 'John'
-        },
         modality: 'par visio',
         theme: undefined,
         telephone: undefined,
@@ -230,224 +112,112 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         visio: true,
         lienVisio: undefined
       })
+    })
+    it('retourne un RendezVousQueryModel avec la durée en heures', async () => {
+      prestation.session.duree = {
+        unite: 'HEURE',
+        valeur: 1.5
+      }
+      // When
+      const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
+        prestation,
+        jeune,
+        idService
+      )
+      // Then
+      expect(rendezVousQueryModel.duration).to.equal(90)
+    })
+    it('retourne un RendezVousQueryModel avec la visio', async () => {
+      //Given
+      const lienVisio = 'visio'
+      // When
+      const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
+        prestation,
+        jeune,
+        idService,
+        lienVisio
+      )
+      // Then
+      expect(rendezVousQueryModel.lienVisio).to.equal(lienVisio)
     })
     it("retourne un RendezVousQueryModel avec l'adresse", async () => {
       // Given
-      const jeune = unJeune()
-      const date = new Date('2020-04-06')
-      dateService.now.returns(uneDatetime)
-      const prestation: PrestationDto = {
-        annule: false,
-        datefin: date,
-        session: {
-          modalitePremierRendezVous: 'WEBCAM',
-          dateDebut: date,
-          dateFinPrevue: date,
-          dateLimite: date,
-          duree: {
-            unite: 'HEURE',
-            valeur: 1.5
-          },
-          adresse: {
-            adresseLigne1: 'ligne1',
-            adresseLigne2: 'ligne2',
-            codePostal: 'code postal',
-            ville: 'ville'
-          },
-          enAgence: true,
-          infoCollective: false,
-          realiteVirtuelle: false
-        }
+      prestation.session.adresse = {
+        adresseLigne1: 'ligne1',
+        adresseLigne2: 'ligne2',
+        codePostal: 'code postal',
+        ville: 'ville'
       }
-
       // When
       const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
         prestation,
         jeune,
         idService
       )
-
       // Then
-      expect(rendezVousQueryModel).to.deep.equal({
-        agencePE: true,
-        annule: false,
-        idStable: undefined,
-        date,
-        duration: 90,
-        id: 'random-id',
-        jeune: {
-          id: 'ABCDE',
-          nom: 'Doe',
-          prenom: 'John'
-        },
-        modality: 'par visio',
-        theme: undefined,
-        telephone: undefined,
-        organisme: undefined,
-        description: undefined,
-        comment: undefined,
-        adresse: 'ligne1 ligne2 code postal ville',
-        title: '',
-        type: {
-          code: 'PRESTATION',
-          label: 'Prestation'
-        },
-        visio: true,
-        lienVisio: undefined
-      })
+      expect(rendezVousQueryModel.adresse).to.equal(
+        'ligne1 ligne2 code postal ville'
+      )
     })
-    it('retourne un RendezVousQueryModel avec la description', async () => {
-      // Given
-      const jeune = unJeune()
-      const date = new Date('2020-04-06')
-      dateService.now.returns(uneDatetime)
-      const prestation: PrestationDto = {
-        annule: false,
-        datefin: date,
-        identifiantStable: undefined,
-        session: {
-          typePrestation: {
-            code: 'ATC'
-          },
-          sousThemeAtelier: {
-            libelleSousThemeAtelier: 'sous theme',
-            descriptifSousThemeAtelier: 'descriptif'
-          },
-          modalitePremierRendezVous: 'WEBCAM',
-          dateDebut: date,
-          dateFinPrevue: date,
-          dateLimite: date,
-          duree: {
-            unite: 'HEURE',
-            valeur: 1.5
-          },
-          enAgence: true,
-          infoCollective: false,
-          realiteVirtuelle: false
-        }
+    it('retourne un RendezVousQueryModel avec la description theme', async () => {
+      prestation.session.themeAtelier = {
+        libelle: 'sous theme',
+        descriptif: 'descriptif'
       }
-
       // When
       const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
         prestation,
         jeune,
         idService
       )
-
       // Then
-      expect(rendezVousQueryModel).to.deep.equal({
-        agencePE: true,
-        annule: false,
-        idStable: undefined,
-        date,
-        duration: 90,
-        id: 'random-id',
-        jeune: {
-          id: 'ABCDE',
-          nom: 'Doe',
-          prenom: 'John'
-        },
-        modality: 'par visio',
-        theme: undefined,
-        telephone: undefined,
-        organisme: undefined,
-        description: 'sous theme\ndescriptif',
-        comment: undefined,
-        adresse: undefined,
-        title: '',
-        type: {
-          code: 'PRESTATION',
-          label: 'Prestation'
-        },
-        visio: true,
-        lienVisio: undefined
-      })
+      expect(rendezVousQueryModel.description).to.equal(
+        'sous theme\ndescriptif'
+      )
+    })
+    it('retourne un RendezVousQueryModel avec la description sous theme', async () => {
+      prestation.session.sousThemeAtelier = {
+        libelleSousThemeAtelier: 'sous theme',
+        descriptifSousThemeAtelier: 'descriptif'
+      }
+      // When
+      const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
+        prestation,
+        jeune,
+        idService
+      )
+      // Then
+      expect(rendezVousQueryModel.description).to.equal(
+        'sous theme\ndescriptif'
+      )
     })
   })
 
   describe('fromRendezVousPoleEmploiDtoToRendezVousQueryModel', () => {
-    it("retourne un RendezVousQueryModel avec l'adresse", async () => {
-      // Given
-      const jeune = unJeune()
-      const date = new Date('2020-04-06')
-      dateService.now.returns(uneDatetime)
-      const rendezVousPoleEmploiDto: RendezVousPoleEmploiDto = {
-        theme: 'theme',
-        date: date,
-        heure: '12:20',
-        duree: 23,
-        modaliteContact: 'VISIO',
-        agence: 'Agence',
-        adresse: {
-          bureauDistributeur: 'bureau',
-          ligne4: '12 rue Albert Camus',
-          ligne5: '75018',
-          ligne6: 'Paris'
-        },
-        commentaire: 'commentaire',
-        typeRDV: 'RDVL',
-        lienVisio: 'lien'
-      }
-      const expectedDate = new Date('2020-04-06T12:20:00')
+    const jeune = unJeune()
+    const dateString = '2020-04-06'
+    const heure = '12:20'
+    const dateUTC = new Date('2020-04-06T12:20:00.000Z')
 
-      // When
-      const rendezVousQueryModel = fromRendezVousDtoToRendezVousQueryModel(
-        rendezVousPoleEmploiDto,
-        jeune,
-        idService
-      )
+    const rendezVousPoleEmploiDto: RendezVousPoleEmploiDto = {
+      theme: 'theme',
+      date: dateString,
+      heure,
+      duree: 23,
+      modaliteContact: 'VISIO',
+      agence: 'Agence',
+      adresse: {
+        bureauDistributeur: 'bureau',
+        ligne4: '12 rue Albert Camus',
+        ligne5: '75018',
+        ligne6: 'Paris'
+      },
+      commentaire: 'commentaire',
+      typeRDV: 'RDVL',
+      lienVisio: 'lien'
+    }
 
-      // Then
-      expect(rendezVousQueryModel).to.deep.equal({
-        agencePE: true,
-        date: expectedDate,
-        duration: 23,
-        id: 'random-id',
-        jeune: {
-          id: 'ABCDE',
-          nom: 'Doe',
-          prenom: 'John'
-        },
-        modality: 'en agence Pôle emploi',
-        theme: 'theme',
-        conseiller: undefined,
-        presenceConseiller: true,
-        comment: 'commentaire',
-        adresse: '12 rue Albert Camus 75018 Paris',
-        title: '',
-        type: {
-          code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
-          label: 'Entretien individuel conseiller'
-        },
-        visio: true,
-        lienVisio: 'lien'
-      })
-    })
-    it('retourne un RendezVousQueryModel avec la modalité et le conseiller', async () => {
-      // Given
-      const jeune = unJeune()
-      const date = new Date('2020-04-06')
-      dateService.now.returns(uneDatetime)
-      const rendezVousPoleEmploiDto: RendezVousPoleEmploiDto = {
-        theme: 'theme',
-        date: date,
-        heure: '07:59',
-        duree: 23,
-        modaliteContact: 'VISIO',
-        nomConseiller: 'Tavernier',
-        prenomConseiller: 'Nils',
-        adresse: {
-          bureauDistributeur: 'bureau',
-          ligne4: '12 rue Albert Camus',
-          ligne5: '75018',
-          ligne6: 'Paris'
-        },
-        commentaire: 'commentaire',
-        typeRDV: 'RDVL',
-        lienVisio: 'lien'
-      }
-      const expectedDate = new Date('2020-04-06T07:59:00')
-
+    it("retourne un RendezVousQueryModel avec la modalité visio, l'adresse et la date", async () => {
       // When
       const rendezVousQueryModel = fromRendezVousDtoToRendezVousQueryModel(
         rendezVousPoleEmploiDto,
@@ -458,67 +228,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       // Then
       expect(rendezVousQueryModel).to.deep.equal({
         agencePE: false,
-        date: expectedDate,
-        duration: 23,
-        id: 'random-id',
-        jeune: {
-          id: 'ABCDE',
-          nom: 'Doe',
-          prenom: 'John'
-        },
-        modality: 'par visio',
-        theme: 'theme',
-        conseiller: {
-          id: 'random-id',
-          nom: 'Tavernier',
-          prenom: 'Nils'
-        },
-        presenceConseiller: true,
-        comment: 'commentaire',
-        adresse: '12 rue Albert Camus 75018 Paris',
-        title: '',
-        type: {
-          code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
-          label: 'Entretien individuel conseiller'
-        },
-        visio: true,
-        lienVisio: 'lien'
-      })
-    })
-    it('retourne un RendezVousQueryModel avec la bonne date', async () => {
-      // Given
-      const jeune = unJeune()
-      const date = new Date('2020-04-06')
-      dateService.now.returns(uneDatetime)
-      const rendezVousPoleEmploiDto: RendezVousPoleEmploiDto = {
-        theme: 'theme',
-        date: date,
-        heure: '12:20',
-        duree: 23,
-        modaliteContact: 'VISIO',
-        adresse: {
-          bureauDistributeur: 'bureau',
-          ligne4: '12 rue Albert Camus',
-          ligne5: '75018',
-          ligne6: 'Paris'
-        },
-        commentaire: 'commentaire',
-        typeRDV: 'RDVL',
-        lienVisio: 'lien'
-      }
-      const expectedDate = new Date('2020-04-06T12:20:00')
-
-      // When
-      const rendezVousQueryModel = fromRendezVousDtoToRendezVousQueryModel(
-        rendezVousPoleEmploiDto,
-        jeune,
-        idService
-      )
-
-      // Then
-      expect(rendezVousQueryModel).to.deep.equal({
-        agencePE: false,
-        date: expectedDate,
+        date: dateUTC,
         duration: 23,
         id: 'random-id',
         jeune: {
@@ -539,30 +249,59 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         },
         visio: true,
         lienVisio: 'lien'
+      })
+    })
+    it('retourne un RendezVousQueryModel avec la modalité agence, et le conseiller', async () => {
+      // Given
+      rendezVousPoleEmploiDto.modaliteContact = 'AGENCE'
+      rendezVousPoleEmploiDto.nomConseiller = 'Tavernier'
+      rendezVousPoleEmploiDto.prenomConseiller = 'Nils'
+      // When
+      const rendezVousQueryModel = fromRendezVousDtoToRendezVousQueryModel(
+        rendezVousPoleEmploiDto,
+        jeune,
+        idService
+      )
+      // Then
+      expect(rendezVousQueryModel.agencePE).to.equal(true)
+      expect(rendezVousQueryModel.modality).to.equal('en agence Pôle emploi')
+      expect(rendezVousQueryModel.conseiller).to.deep.equal({
+        id: 'random-id',
+        nom: 'Tavernier',
+        prenom: 'Nils'
       })
     })
   })
 
   describe('handle', () => {
     describe('quand le jeune existe', () => {
+      const query: GetRendezVousJeunePoleEmploiQuery = {
+        idJeune: '1',
+        idpToken: 'token'
+      }
+      const jeune = unJeune()
+      const datePrestation = '2014-03-24T14:00:00+01:00'
+      const expectedDatePrestation = new Date('2014-03-24T13:00:00.000Z')
+      const dateRendezVous = '2014-03-24'
+      const heureRendezVous = '12:20'
+      const expectedDateRendezVous = new Date('2014-03-24T12:20:00.000Z')
+      const maintenant = uneDatetime
+
+      const axiosResponse = {
+        config: undefined,
+        headers: undefined,
+        request: undefined,
+        status: 200,
+        statusText: '',
+        data: {}
+      }
+
       describe("quand le lien de la visio prestations n'est pas encore disponible", () => {
         it('récupère les rendez-vous et les prestations Pole Emploi du jeune bien triés', async () => {
-          // Given
-          const query: GetRendezVousJeunePoleEmploiQuery = {
-            idJeune: '1',
-            idpToken: 'token'
-          }
-          const jeune = unJeune()
-          const datePrestation = new Date('2020-04-06')
-          const dateRendezVous = new Date('2020-04-05')
-          const heureRendezVous = '12:20'
-          const expectedRendezvousDate = new Date('2020-04-05T12:20:00')
-          const maintenant = uneDatetime
-
           const prestations: PrestationDto[] = [
             {
               annule: false,
-              datefin: datePrestation,
+              datefin: '',
               identifiantStable: undefined,
               session: {
                 adresse: {
@@ -575,8 +314,8 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                   villePostale: 'VILLEFRANCHE SUR SAONE CEDEX'
                 },
                 dateDebut: datePrestation,
-                dateFinPrevue: datePrestation,
-                dateLimite: datePrestation,
+                dateFinPrevue: '',
+                dateLimite: '',
                 duree: {
                   unite: 'JOUR',
                   valeur: 1.0
@@ -585,13 +324,10 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                 infoCollective: false,
                 realiteVirtuelle: false,
                 themeAtelier: {
-                  code: 'A14',
                   libelle: "Utiliser Internet dans sa recherche d'emploi"
                 },
                 typePrestation: {
-                  code: 'ATE',
-                  libelle: 'Atelier',
-                  actif: true
+                  libelle: 'Atelier'
                 }
               }
             }
@@ -602,7 +338,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
               date: dateRendezVous,
               heure: heureRendezVous,
               duree: 23,
-              modaliteContact: 'VISIO',
+              modaliteContact: 'AGENCE',
               agence: 'Agence',
               adresse: {
                 bureauDistributeur: 'bureau',
@@ -616,31 +352,14 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
             }
           ]
 
-          const prestationsResponse = {
-            config: undefined,
-            headers: undefined,
-            request: undefined,
-            status: 200,
-            statusText: '',
-            data: prestations
-          }
-          const rendezVousResponse = {
-            config: undefined,
-            headers: undefined,
-            request: undefined,
-            status: 200,
-            statusText: '',
-            data: rendezVous
-          }
-
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           dateService.now.returns(maintenant)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(query.idpToken, maintenant)
-            .resolves(prestationsResponse)
+            .resolves({ ...axiosResponse, data: prestations })
           poleEmploiPartenaireClient.getRendezVous
             .withArgs(query.idpToken)
-            .resolves(rendezVousResponse)
+            .resolves({ ...axiosResponse, data: rendezVous })
 
           // When
           const result = await getRendezVousJeunePoleEmploiQueryHandler.handle(
@@ -652,7 +371,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
             data: [
               {
                 agencePE: true,
-                date: expectedRendezvousDate,
+                date: expectedDateRendezVous,
                 duration: 23,
                 id: 'random-id',
                 jeune: {
@@ -671,7 +390,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                   code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
                   label: 'Entretien individuel conseiller'
                 },
-                visio: true,
+                visio: false,
                 lienVisio: 'lien'
               },
               {
@@ -681,7 +400,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                 agencePE: true,
                 annule: false,
                 comment: undefined,
-                date: datePrestation,
+                date: expectedDatePrestation,
                 description: "Utiliser Internet dans sa recherche d'emploi",
                 duration: 0,
                 id: 'random-id',
@@ -709,22 +428,16 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       describe('quand le lien de la visio prestations est disponible', () => {
         it('récupère les rendez-vous et les prestations Pole Emploi du jeune avec le lien de la visio', async () => {
           // Given
-          const query: GetRendezVousJeunePoleEmploiQuery = {
-            idJeune: '1',
-            idpToken: 'token'
-          }
-          const date = new Date('2020-04-06')
-          const jeune = unJeune()
           const idVisio = '1'
           const prestations: PrestationDto[] = [
             {
               annule: false,
-              datefin: date,
+              datefin: '',
               identifiantStable: idVisio,
               session: {
-                dateDebut: date,
-                dateFinPrevue: date,
-                dateLimite: date,
+                dateDebut: datePrestation,
+                dateFinPrevue: '',
+                dateLimite: '',
                 duree: {
                   unite: 'JOUR',
                   valeur: 1.0
@@ -736,8 +449,8 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           const rendezVous: RendezVousPoleEmploiDto[] = [
             {
               theme: 'theme',
-              date: date,
-              heure: '12:20',
+              date: dateRendezVous,
+              heure: heureRendezVous,
               duree: 23,
               modaliteContact: 'VISIO',
               agence: 'Agence',
@@ -752,50 +465,19 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
               lienVisio: 'lien'
             }
           ]
-          const expectedRendezvousDate = new Date('2020-04-06T12:20:00')
-
-          const prestationsResponse = {
-            config: undefined,
-            headers: undefined,
-            request: undefined,
-            status: 200,
-            statusText: '',
-            data: prestations
-          }
-          const rendezVousResponse = {
-            config: undefined,
-            headers: undefined,
-            request: undefined,
-            status: 200,
-            statusText: '',
-            data: rendezVous
-          }
-
-          const lienVisioResponse = {
-            config: undefined,
-            headers: undefined,
-            request: undefined,
-            status: 200,
-            statusText: '',
-            data: 'lienvisio.com'
-          }
-
-          const maintenant = DateTime.fromISO(
-            '2020-04-06T12:00:00.000Z'
-          ).toUTC()
 
           dateService.now.returns(maintenant)
           dateService.isSameDateDay.returns(true)
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(query.idpToken, maintenant)
-            .resolves(prestationsResponse)
+            .resolves({ ...axiosResponse, data: prestations })
           poleEmploiPartenaireClient.getLienVisio
             .withArgs(query.idpToken, idVisio)
-            .resolves(lienVisioResponse)
+            .resolves({ ...axiosResponse, data: 'lienvisio.com' })
           poleEmploiPartenaireClient.getRendezVous
             .withArgs(query.idpToken)
-            .resolves(rendezVousResponse)
+            .resolves({ ...axiosResponse, data: rendezVous })
 
           // When
           const result = await getRendezVousJeunePoleEmploiQueryHandler.handle(
@@ -806,12 +488,36 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
             _isSuccess: true,
             data: [
               {
+                agencePE: false,
+                date: expectedDateRendezVous,
+                duration: 23,
+                id: 'random-id',
+                jeune: {
+                  id: 'ABCDE',
+                  nom: 'Doe',
+                  prenom: 'John'
+                },
+                modality: 'par visio',
+                theme: 'theme',
+                presenceConseiller: true,
+                conseiller: undefined,
+                comment: 'commentaire',
+                adresse: '12 rue Albert Camus 75018 Paris',
+                title: '',
+                type: {
+                  code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
+                  label: 'Entretien individuel conseiller'
+                },
+                visio: true,
+                lienVisio: 'lien'
+              },
+              {
                 idStable: idVisio,
                 adresse: undefined,
                 agencePE: true,
                 annule: false,
                 comment: undefined,
-                date,
+                date: expectedDatePrestation,
                 description: undefined,
                 duration: 0,
                 id: 'random-id',
@@ -831,45 +537,79 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                   label: 'Prestation'
                 },
                 visio: false
-              },
-              {
-                agencePE: true,
-                date: expectedRendezvousDate,
-                duration: 23,
-                id: 'random-id',
-                jeune: {
-                  id: 'ABCDE',
-                  nom: 'Doe',
-                  prenom: 'John'
-                },
-                modality: 'en agence Pôle emploi',
-                theme: 'theme',
-                presenceConseiller: true,
-                conseiller: undefined,
-                comment: 'commentaire',
-                adresse: '12 rue Albert Camus 75018 Paris',
-                title: '',
-                type: {
-                  code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
-                  label: 'Entretien individuel conseiller'
-                },
-                visio: true,
-                lienVisio: 'lien'
               }
             ]
           })
+        })
+        it('renvoie les prestations et rdv quand une erreur se produit lors de la recuperation de la visio', async () => {
+          // Given
+          const idVisio = '1'
+          const prestations: PrestationDto[] = [
+            {
+              identifiantStable: idVisio,
+              session: {
+                dateDebut: datePrestation,
+                dateFinPrevue: '',
+                dateLimite: '',
+                duree: {
+                  unite: 'JOUR',
+                  valeur: 1.0
+                },
+                enAgence: true
+              }
+            },
+            {
+              session: {
+                dateDebut: datePrestation,
+                dateFinPrevue: '',
+                dateLimite: '',
+                duree: {
+                  unite: 'JOUR',
+                  valeur: 1.0
+                },
+                enAgence: true
+              }
+            }
+          ]
+          const rendezVous: RendezVousPoleEmploiDto[] = [
+            {
+              date: dateRendezVous,
+              heure: heureRendezVous,
+              duree: 23
+            }
+          ]
+
+          dateService.now.returns(maintenant)
+          dateService.isSameDateDay.returns(true)
+          jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+          poleEmploiPartenaireClient.getPrestations
+            .withArgs(query.idpToken, maintenant)
+            .resolves({ ...axiosResponse, data: prestations })
+          poleEmploiPartenaireClient.getLienVisio
+            .withArgs(query.idpToken, idVisio)
+            .rejects()
+          poleEmploiPartenaireClient.getRendezVous
+            .withArgs(query.idpToken)
+            .resolves({ ...axiosResponse, data: rendezVous })
+
+          // When
+          const result = await getRendezVousJeunePoleEmploiQueryHandler.handle(
+            query
+          )
+          // Then
+          expect(
+            poleEmploiPartenaireClient.getLienVisio
+          ).to.have.been.calledWithExactly(
+            query.idpToken,
+            prestations[0].identifiantStable
+          )
+          expect(result._isSuccess).to.equal(true)
+          if (result._isSuccess) expect(result.data.length).to.equal(3)
         })
       })
       describe('quand une erreur se produit', () => {
         it('renvoie une failure quand une erreur client se produit', async () => {
           // Given
-          const query: GetRendezVousJeunePoleEmploiQuery = {
-            idJeune: '1',
-            idpToken: 'token'
-          }
-          const jeune = unJeune()
-          const maintenant = uneDatetime
-
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           dateService.now.returns(maintenant)
           poleEmploiPartenaireClient.getPrestations
@@ -887,11 +627,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         })
         it('throw une erreur quand une erreur interne se produit', async () => {
           // Given
-          const query: GetRendezVousJeunePoleEmploiQuery = {
-            idJeune: '1',
-            idpToken: 'token'
-          }
-          const jeune = unJeune()
           const errorMessage = 'Date Error'
 
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)

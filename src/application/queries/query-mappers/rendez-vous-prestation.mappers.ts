@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { Jeune } from 'src/domain/jeune'
 import {
   CodeTypeRendezVous,
@@ -21,7 +22,7 @@ export function fromPrestationDtoToRendezVousQueryModel(
       code: CodeTypeRendezVous.PRESTATION,
       label: mapCodeLabelTypeRendezVous[CodeTypeRendezVous.PRESTATION]
     },
-    date: prestation.session.dateDebut,
+    date: DateTime.fromISO(prestation.session.dateDebut).toUTC().toJSDate(),
     comment: prestation.session.commentaire,
     jeune: { id: jeune.id, nom: jeune.lastName, prenom: jeune.firstName },
     modality: buildModality(prestation),
@@ -52,21 +53,23 @@ function buildModality(prestation: PrestationDto): string {
 }
 
 function buildDescription(prestation: PrestationDto): string | undefined {
-  switch (prestation.session.typePrestation?.code) {
-    case 'ATE':
-      return prestation.session.themeAtelier?.libelle
-    case 'ATL':
-    case 'ATC':
-      const description = [
-        prestation.session.sousThemeAtelier?.libelleSousThemeAtelier,
-        prestation.session.sousThemeAtelier?.descriptifSousThemeAtelier
-      ]
-        .join('\n')
-        .trim()
-      return description || undefined
-    default:
-      return prestation.session.typePrestation?.descriptifTypePrestation
-  }
+  const descriptionTheme = [
+    prestation.session.themeAtelier?.libelle,
+    prestation.session.themeAtelier?.descriptif
+  ]
+    .join('\n')
+    .trim()
+  if (descriptionTheme) return descriptionTheme
+
+  const descriptionSousTheme = [
+    prestation.session.sousThemeAtelier?.libelleSousThemeAtelier,
+    prestation.session.sousThemeAtelier?.descriptifSousThemeAtelier
+  ]
+    .join('\n')
+    .trim()
+  if (descriptionSousTheme) return descriptionSousTheme
+
+  return undefined
 }
 
 function buildAdresse(prestation: PrestationDto): string | undefined {

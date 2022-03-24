@@ -67,21 +67,24 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
 
       const rendezVousPrestations = await Promise.all(
         prestations.map(async prestation => {
-          const dateRendezVous = DateTime.fromJSDate(
-            prestation.session.dateDebut
-          )
+          const dateRendezVous = DateTime.fromISO(prestation.session.dateDebut)
           let lienVisio = undefined
 
           if (
             prestation.identifiantStable &&
             this.dateService.isSameDateDay(dateRendezVous, maintenant)
           ) {
-            const responseLienVisio =
-              await this.poleEmploiPartenaireClient.getLienVisio(
-                query.idpToken,
-                prestation.identifiantStable
-              )
-            lienVisio = responseLienVisio?.data
+            try {
+              const responseLienVisio =
+                await this.poleEmploiPartenaireClient.getLienVisio(
+                  query.idpToken,
+                  prestation.identifiantStable
+                )
+              lienVisio = responseLienVisio?.data
+            } catch (e) {
+              this.logger.error('Impossible de récupérer le lien de la visio')
+              this.logger.error(e)
+            }
           }
 
           return fromPrestationDtoToRendezVousQueryModel(
