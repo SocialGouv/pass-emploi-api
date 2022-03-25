@@ -91,6 +91,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
             prestation,
             jeune,
             this.idService,
+            this.dateService,
             lienVisio
           )
         })

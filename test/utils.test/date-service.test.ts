@@ -12,3 +12,27 @@ describe('isSameDateDay', () => {
     expect(dateService.isSameDateDay(date1, date2)).to.equal(true)
   })
 })
+
+describe('fromISOStringToUTCJSDate', () => {
+  it('retourne une date JS en UTC', () => {
+    const dateString = '2020-04-06T12:00:00+02:00'
+    const dateUTC = dateService.fromISOStringToUTCJSDate(dateString)
+    const expectedDateUTC = new Date('2020-04-06T10:00:00.000Z')
+
+    expect(dateUTC).to.deep.equal(expectedDateUTC)
+  })
+  it("retourne une date JS en UTC quand la date n'a pas de timezone en heure d'été", () => {
+    const dateString = '2020-04-06T12:00:00'
+    const dateUTC = dateService.fromISOStringToUTCJSDate(dateString)
+    const expectedDateUTC = new Date('2020-04-06T10:00:00.000Z')
+
+    expect(dateUTC).to.deep.equal(expectedDateUTC)
+  })
+  it("retourne une date JS en UTC quand la date n'a pas de timezone en heure d'hiver", () => {
+    const dateString = '2020-03-06T12:00:00'
+    const dateUTC = dateService.fromISOStringToUTCJSDate(dateString)
+    const expectedDateUTC = new Date('2020-03-06T11:00:00.000Z')
+
+    expect(dateUTC).to.deep.equal(expectedDateUTC)
+  })
+})
