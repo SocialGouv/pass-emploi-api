@@ -42,8 +42,8 @@ describe('GetServicesCiviqueQueryHandler', () => {
         lat: 48.86899229710103,
         lon: 2.3342718577284205,
         distance: 10,
-        dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
-        dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
+        dateDeDebutMaximum: '2022-02-17T10:00:00Z',
+        dateDeDebutMinimum: '2022-02-17T10:00:00Z',
         domaine: 'environnement'
       }
       const serviceCiviqueQueryModels: OffreEngagementQueryModel[] =
@@ -52,6 +52,8 @@ describe('GetServicesCiviqueQueryHandler', () => {
       engagementRepository.findAll
         .withArgs({
           ...getServicesCiviqueQuery,
+          dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
+          dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
           editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE
         })
         .resolves(serviceCiviqueQueryModels)
@@ -70,8 +72,8 @@ describe('GetServicesCiviqueQueryHandler', () => {
         lat: 48.86899229710103,
         lon: 2.3342718577284205,
         distance: 10,
-        dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
-        dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z')
+        dateDeDebutMaximum: '2022-02-17T10:00:00Z',
+        dateDeDebutMinimum: '2022-02-17T10:00:00Z'
       }
       const offreEngagementQueryModels: OffreEngagementQueryModel[] =
         offresEngagementQueryModel()
@@ -79,6 +81,8 @@ describe('GetServicesCiviqueQueryHandler', () => {
       engagementRepository.findAll
         .withArgs({
           ...getServicesCiviqueQuery,
+          dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
+          dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
           editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE,
           page: 1,
           limit: 50
@@ -104,8 +108,8 @@ describe('GetServicesCiviqueQueryHandler', () => {
         lat: 48.86899229710103,
         lon: 2.3342718577284205,
         distance: 10,
-        dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
-        dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
+        dateDeDebutMaximum: '2022-02-17T10:00:00Z',
+        dateDeDebutMinimum: '2022-02-17T10:00:00Z',
         domaine: 'environnement'
       }
       const serviceCiviqueQueryModels: OffreEngagementQueryModel[] =
@@ -114,6 +118,8 @@ describe('GetServicesCiviqueQueryHandler', () => {
       engagementRepository.findAll
         .withArgs({
           ...getServicesCiviqueQuery,
+          dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
+          dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
           editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE
         })
         .resolves(serviceCiviqueQueryModels)

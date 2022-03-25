@@ -12,7 +12,7 @@ import { FindOffresEmploiQueryBody } from './offres-emploi.inputs'
 import { GetOffresImmersionQueryBody } from './offres-immersion.inputs'
 import { Transform, Type } from 'class-transformer'
 import { transformStringToBoolean } from './utils/transformers'
-import { GetServicesCiviqueQueryParams } from './services-civique.inputs'
+import { ServicesCiviqueCriteresBody } from './services-civique.inputs'
 
 export class CreateRechercheImmersionPayload {
   @ApiProperty()
@@ -71,11 +71,11 @@ export class CreateRechercheServiceCiviquePayload {
   @IsOptional()
   localisation?: string
 
-  @ApiProperty({ type: GetServicesCiviqueQueryParams })
+  @ApiProperty({ type: ServicesCiviqueCriteresBody })
   @ValidateNested()
-  @Type(() => GetServicesCiviqueQueryParams)
+  @Type(() => ServicesCiviqueCriteresBody)
   @IsDefined()
-  criteres: GetServicesCiviqueQueryParams
+  criteres: ServicesCiviqueCriteresBody
 }
 
 export class GetRecherchesQueryParams {

@@ -206,8 +206,7 @@ describe('RecherchesController', () => {
             lat: 12345,
             lon: 67890,
             distance: 30,
-            dateDeDebutMinimum: '1998-07-12T10:12:14.000Z',
-            dateDeDebutMaximum: '2018-07-15T10:12:14.000Z'
+            dateDeDebutMinimum: '1998-07-12T10:12:14.000Z'
           }
         }
 
@@ -233,8 +232,7 @@ describe('RecherchesController', () => {
               lat: 12345,
               lon: 67890,
               distance: 30,
-              dateDeDebutMinimum: '1998-07-12T10:12:14.000Z',
-              dateDeDebutMaximum: '2018-07-15T10:12:14.000Z'
+              dateDeDebutMinimum: '1998-07-12T10:12:14.000Z'
             }
           },
           unUtilisateurDecode()

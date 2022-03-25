@@ -7,9 +7,7 @@ import {
 } from './utils/transformers'
 import { OffreEngagement } from '../../../domain/offre-engagement'
 
-interface GetServicesCiviqueQuery {
-  page?: number
-  limit?: number
+export interface GetServicesCiviqueQuery {
   lat?: number
   lon?: number
   distance?: number
@@ -61,12 +59,42 @@ export class GetServicesCiviqueQueryParams implements GetServicesCiviqueQuery {
   @ApiPropertyOptional()
   @IsDateString()
   @IsOptional()
-  dateDeDebutMaximum: string
+  dateDeDebutMaximum?: string
 
   @ApiPropertyOptional({
     description: Object.values(OffreEngagement.Domaine).join(', ')
   })
   @IsString()
   @IsOptional()
-  domaine: string
+  domaine?: string
+}
+
+export class ServicesCiviqueCriteresBody implements GetServicesCiviqueQuery {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  lat: number
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  lon: number
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  @IsNumber()
+  distance?: number
+
+  @ApiPropertyOptional()
+  @IsDateString()
+  @IsOptional()
+  dateDeDebutMinimum?: string
+
+  @ApiPropertyOptional({
+    description: Object.values(OffreEngagement.Domaine).join(', ')
+  })
+  @IsString()
+  @IsOptional()
+  domaine?: string
 }

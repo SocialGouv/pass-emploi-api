@@ -6,29 +6,28 @@ import {
   Param,
   Query
 } from '@nestjs/common'
-import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { Utilisateur } from '../decorators/authenticated.decorator'
-import { Authentification } from '../../domain/authentification'
-import { isFailure } from '../../building-blocks/types/result'
-import {
-  ErreurHttp,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { GetServicesCiviqueQueryParams } from './validation/services-civique.inputs'
+import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  GetDetailServiceCiviqueQuery,
+  GetDetailServiceCiviqueQueryHandler
+} from '../../application/queries/get-detail-service-civique.query.handler'
+import {
+  GetServicesCiviqueQuery,
+  GetServicesCiviqueQueryHandler
+} from '../../application/queries/get-services-civique.query.handler'
 import {
   DetailOffreEngagementQueryModel,
   OffreEngagementQueryModel
 } from '../../application/queries/query-models/service-civique.query-models'
 import {
-  GetServicesCiviqueQuery,
-  GetServicesCiviqueQueryHandler
-} from '../../application/queries/get-services-civique.query.handler'
-import { DateTime } from 'luxon'
-import {
-  GetDetailServiceCiviqueQuery,
-  GetDetailServiceCiviqueQueryHandler
-} from '../../application/queries/get-detail-service-civique.query.handler'
+  ErreurHttp,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
+import { isFailure } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Utilisateur } from '../decorators/authenticated.decorator'
+import { GetServicesCiviqueQueryParams } from './validation/services-civique.inputs'
 
 @Controller('services-civique')
 @ApiOAuth2([])
@@ -48,15 +47,7 @@ export class ServicesCiviqueController {
     @Query() findServicesCiviqueQuery: GetServicesCiviqueQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffreEngagementQueryModel[]> {
-    const query: GetServicesCiviqueQuery = {
-      ...findServicesCiviqueQuery,
-      dateDeDebutMinimum: findServicesCiviqueQuery.dateDeDebutMinimum
-        ? DateTime.fromISO(findServicesCiviqueQuery.dateDeDebutMinimum)
-        : undefined,
-      dateDeDebutMaximum: findServicesCiviqueQuery.dateDeDebutMaximum
-        ? DateTime.fromISO(findServicesCiviqueQuery.dateDeDebutMaximum)
-        : undefined
-    }
+    const query: GetServicesCiviqueQuery = findServicesCiviqueQuery
 
     const result = await this.getServicesCiviqueQueryHandler.execute(
       query,
