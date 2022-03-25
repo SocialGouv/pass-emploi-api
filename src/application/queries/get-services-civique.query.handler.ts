@@ -20,8 +20,8 @@ export interface GetServicesCiviqueQuery extends Query {
   lat?: number
   lon?: number
   distance?: number
-  dateDeDebutMinimum?: DateTime
-  dateDeDebutMaximum?: DateTime
+  dateDeDebutMinimum?: string
+  dateDeDebutMaximum?: string
   domaine?: string
 }
 
@@ -43,6 +43,12 @@ export class GetServicesCiviqueQueryHandler extends QueryHandler<
   ): Promise<Result<OffreEngagementQueryModel[]>> {
     const criteres: OffreEngagement.Criteres = {
       ...query,
+      dateDeDebutMinimum: query.dateDeDebutMinimum
+        ? DateTime.fromISO(query.dateDeDebutMinimum)
+        : undefined,
+      dateDeDebutMaximum: query.dateDeDebutMaximum
+        ? DateTime.fromISO(query.dateDeDebutMaximum)
+        : undefined,
       editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE,
       page: query.page || DEFAULT_PAGE,
       limit: query.limit || DEFAULT_LIMIT

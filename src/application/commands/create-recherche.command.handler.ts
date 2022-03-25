@@ -8,10 +8,10 @@ import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { Recherche, RecherchesRepositoryToken } from '../../domain/recherche'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
-import { GetOffresEmploiQuery } from '../queries/get-offres-emploi.query.handler'
-import { GetOffresImmersionQuery } from '../queries/get-offres-immersion.query.handler'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { DateService } from 'src/utils/date-service'
+import { GetOffresEmploiQuery } from '../queries/get-offres-emploi.query.handler'
+import { GetOffresImmersionQuery } from '../queries/get-offres-immersion.query.handler'
 import { GetServicesCiviqueQuery } from '../queries/get-services-civique.query.handler'
 
 export interface CreateRechercheCommand extends Command {

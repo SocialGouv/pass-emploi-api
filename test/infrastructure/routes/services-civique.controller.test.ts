@@ -1,6 +1,27 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import {
+  GetServicesCiviqueQuery,
+  GetServicesCiviqueQueryHandler
+} from 'src/application/queries/get-services-civique.query.handler'
 import * as request from 'supertest'
+import {
+  GetDetailServiceCiviqueQuery,
+  GetDetailServiceCiviqueQueryHandler
+} from '../../../src/application/queries/get-detail-service-civique.query.handler'
+import {
+  DetailOffreEngagementQueryModel,
+  OffreEngagementQueryModel
+} from '../../../src/application/queries/query-models/service-civique.query-models'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
+import { failure, success } from '../../../src/building-blocks/types/result'
 import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
+import {
+  offresEngagementQueryModel,
+  unDetailOffreEngagementQuerymodel
+} from '../../fixtures/query-models/offre-engagement.query-model.fixtures'
 import {
   buildTestingModuleForHttpTesting,
   expect,
@@ -8,28 +29,6 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { failure, success } from '../../../src/building-blocks/types/result'
-import {
-  GetServicesCiviqueQuery,
-  GetServicesCiviqueQueryHandler
-} from 'src/application/queries/get-services-civique.query.handler'
-import {
-  DetailOffreEngagementQueryModel,
-  OffreEngagementQueryModel
-} from '../../../src/application/queries/query-models/service-civique.query-models'
-import { DateTime } from 'luxon'
-import {
-  offresEngagementQueryModel,
-  unDetailOffreEngagementQuerymodel
-} from '../../fixtures/query-models/offre-engagement.query-model.fixtures'
-import {
-  ErreurHttp,
-  NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
-import {
-  GetDetailServiceCiviqueQuery,
-  GetDetailServiceCiviqueQueryHandler
-} from '../../../src/application/queries/get-detail-service-civique.query.handler'
 
 describe('ServicesCiviqueController', () => {
   let getServicesCiviqueQueryHandler: StubbedClass<GetServicesCiviqueQueryHandler>
@@ -75,8 +74,8 @@ describe('ServicesCiviqueController', () => {
         const expectedQuery: GetServicesCiviqueQuery = {
           page: 1,
           limit: 50,
-          dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
-          dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
+          dateDeDebutMaximum: '2022-02-17T10:00:00Z',
+          dateDeDebutMinimum: '2022-02-17T10:00:00Z',
           lat: 48.86899229710103,
           lon: 2.3342718577284205,
           distance: 10,
