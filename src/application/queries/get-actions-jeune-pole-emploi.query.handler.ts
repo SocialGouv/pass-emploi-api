@@ -6,6 +6,7 @@ import {
 import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
+import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
@@ -32,7 +33,8 @@ export class GetActionsJeunePoleEmploiQueryHandler extends QueryHandler<
     private jeuneRepository: Jeune.Repository,
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer,
-    private idService: IdService
+    private idService: IdService,
+    private dateService: DateService
   ) {
     super('GetActionsJeunePoleEmploiQueryHandler')
   }
@@ -55,7 +57,8 @@ export class GetActionsJeunePoleEmploiQueryHandler extends QueryHandler<
         demarchesDto.map(demarcheDto =>
           fromDemarcheDtoToActionPoleEmploiQueryModel(
             demarcheDto,
-            this.idService
+            this.idService,
+            this.dateService
           )
         )
       )

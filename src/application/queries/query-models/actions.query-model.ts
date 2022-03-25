@@ -51,5 +51,5 @@ export class ActionPoleEmploiQueryModel {
   dateAnnulation?: Date
 
   @ApiProperty()
-  creeParConseiller: boolean
+  creeeParConseiller: boolean
 }

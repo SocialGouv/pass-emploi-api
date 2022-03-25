@@ -58,6 +58,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
     const jeune = unJeune()
     const dateString = '2014-03-24T09:00:00+01:00'
     const dateUTC = new Date('2014-03-24T08:00:00.000Z')
+
     const prestation: PrestationDto = {
       annule: false,
       datefin: dateString,
@@ -77,11 +78,13 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
     }
 
     it('retourne un RendezVousQueryModel avec le bon modele, la durée en jour et la date en UTC', async () => {
+      dateService.fromISOStringToUTCJSDate.returns(dateUTC)
       // When
       const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
         prestation,
         jeune,
-        idService
+        idService,
+        dateService
       )
 
       // Then
@@ -122,7 +125,8 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
         prestation,
         jeune,
-        idService
+        idService,
+        dateService
       )
       // Then
       expect(rendezVousQueryModel.duration).to.equal(90)
@@ -135,6 +139,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         prestation,
         jeune,
         idService,
+        dateService,
         lienVisio
       )
       // Then
@@ -152,7 +157,8 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
         prestation,
         jeune,
-        idService
+        idService,
+        dateService
       )
       // Then
       expect(rendezVousQueryModel.adresse).to.equal(
@@ -168,7 +174,8 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
         prestation,
         jeune,
-        idService
+        idService,
+        dateService
       )
       // Then
       expect(rendezVousQueryModel.description).to.equal(
@@ -184,7 +191,8 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
         prestation,
         jeune,
-        idService
+        idService,
+        dateService
       )
       // Then
       expect(rendezVousQueryModel.description).to.equal(
@@ -354,6 +362,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
 
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           dateService.now.returns(maintenant)
+          dateService.fromISOStringToUTCJSDate.returns(expectedDatePrestation)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(query.idpToken, maintenant)
             .resolves({ ...axiosResponse, data: prestations })
@@ -467,6 +476,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           ]
 
           dateService.now.returns(maintenant)
+          dateService.fromISOStringToUTCJSDate.returns(expectedDatePrestation)
           dateService.isSameDateDay.returns(true)
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getPrestations

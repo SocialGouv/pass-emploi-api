@@ -68,7 +68,7 @@ describe('PoleEmploiPartenaireClient', () => {
     })
   })
 
-  describe('getRendezVouss', () => {
+  describe('getRendezVous', () => {
     it('fait un appel http get avec les bons paramètres', async () => {
       // Given
       const tokenJeune = 'token'
@@ -84,6 +84,27 @@ describe('PoleEmploiPartenaireClient', () => {
       const response = await poleEmploiPartenaireClient.getRendezVous(
         tokenJeune
       )
+
+      // Then
+      expect(response.status).to.equal(200)
+      expect(response.data).to.deep.equal({ resultats: [] })
+    })
+  })
+
+  describe('getDemarches', () => {
+    it('fait un appel http get avec les bons paramètres', async () => {
+      // Given
+      const tokenJeune = 'token'
+
+      nock('https://api-r.es-qvr.fr/partenaire')
+        .get('/peconnect-demarches/v1/demarches')
+        .reply(200, {
+          resultats: []
+        })
+        .isDone()
+
+      // When
+      const response = await poleEmploiPartenaireClient.getDemarches(tokenJeune)
 
       // Then
       expect(response.status).to.equal(200)

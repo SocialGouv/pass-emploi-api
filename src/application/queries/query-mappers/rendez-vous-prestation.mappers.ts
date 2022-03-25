@@ -1,10 +1,10 @@
-import { DateTime } from 'luxon'
 import { Jeune } from 'src/domain/jeune'
 import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous
 } from 'src/domain/rendez-vous'
 import { PrestationDto } from 'src/infrastructure/clients/pole-emploi-partenaire-client'
+import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { RendezVousQueryModel } from '../query-models/rendez-vous.query-models'
 
@@ -12,6 +12,7 @@ export function fromPrestationDtoToRendezVousQueryModel(
   prestation: PrestationDto,
   jeune: Jeune,
   idService: IdService,
+  dateService: DateService,
   lienVisio?: string
 ): RendezVousQueryModel {
   return {
@@ -22,7 +23,7 @@ export function fromPrestationDtoToRendezVousQueryModel(
       code: CodeTypeRendezVous.PRESTATION,
       label: mapCodeLabelTypeRendezVous[CodeTypeRendezVous.PRESTATION]
     },
-    date: DateTime.fromISO(prestation.session.dateDebut).toUTC().toJSDate(),
+    date: dateService.fromISOStringToUTCJSDate(prestation.session.dateDebut),
     comment: prestation.session.commentaire,
     jeune: { id: jeune.id, nom: jeune.lastName, prenom: jeune.firstName },
     modality: buildModality(prestation),

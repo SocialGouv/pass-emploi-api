@@ -170,7 +170,7 @@ export class JeunesController {
   @Get(':idJeune/pole-emploi/actions')
   @ApiHeader({
     name: 'x-idp-token',
-    description: 'Token du Jeune Pole Emploi',
+    description: 'Token Pole Emploi du Jeune',
     required: true
   })
   @ApiResponse({
@@ -206,7 +206,7 @@ export class JeunesController {
   @Get(':idJeune/rendezvous')
   @ApiHeader({
     name: 'x-idp-token',
-    description: 'Token du Jeune Pole Emploi',
+    description: 'Token Pole Emploi du Jeune',
     required: false
   })
   @ApiResponse({
