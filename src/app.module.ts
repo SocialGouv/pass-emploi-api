@@ -147,7 +147,9 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       load: [configuration]
     }),
     configureLoggerModule(),
-    HttpModule,
+    HttpModule.register({
+      timeout: 5000
+    }),
     TerminusModule
   ],
   controllers: [
