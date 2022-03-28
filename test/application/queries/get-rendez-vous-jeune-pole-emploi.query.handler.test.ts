@@ -71,6 +71,9 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           unite: 'JOUR',
           valeur: 1.0
         },
+        typePrestation: {
+          descriptifTypePrestation: 'desc'
+        },
         enAgence: true,
         infoCollective: false,
         realiteVirtuelle: false
@@ -104,7 +107,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         theme: undefined,
         telephone: undefined,
         organisme: undefined,
-        description: undefined,
+        description: 'desc',
         comment: undefined,
         adresse: undefined,
         title: '',
@@ -167,7 +170,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
     })
     it('retourne un RendezVousQueryModel avec la description theme', async () => {
       prestation.session.themeAtelier = {
-        libelle: 'sous theme',
+        libelle: 'theme',
         descriptif: 'descriptif'
       }
       // When
@@ -178,9 +181,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         dateService
       )
       // Then
-      expect(rendezVousQueryModel.description).to.equal(
-        'sous theme\ndescriptif'
-      )
+      expect(rendezVousQueryModel.description).to.equal('theme\ndescriptif')
     })
     it('retourne un RendezVousQueryModel avec la description sous theme', async () => {
       prestation.session.sousThemeAtelier = {

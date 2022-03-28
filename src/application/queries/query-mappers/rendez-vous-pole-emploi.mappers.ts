@@ -64,6 +64,7 @@ function buildModality(
   switch (rendezVousPoleEmploiDto.modaliteContact) {
     case 'VISIO':
       return 'par visio'
+    case 'TELEPHONE':
     case 'TELEPHONIQUE':
       return 'par téléphone'
     case 'AGENCE':

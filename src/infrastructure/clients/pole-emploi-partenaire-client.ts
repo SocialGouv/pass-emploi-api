@@ -72,7 +72,7 @@ export interface RendezVousPoleEmploiDto {
   date: string
   heure: string
   duree: number
-  modaliteContact?: 'VISIO' | 'TELEPHONIQUE' | 'AGENCE'
+  modaliteContact?: 'VISIO' | 'TELEPHONIQUE' | 'TELEPHONE' | 'AGENCE'
   nomConseiller?: string
   prenomConseiller?: string
   agence?: string
