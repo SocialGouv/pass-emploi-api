@@ -54,14 +54,6 @@ function buildModality(prestation: PrestationDto): string {
 }
 
 function buildDescription(prestation: PrestationDto): string | undefined {
-  const descriptionTheme = [
-    prestation.session.themeAtelier?.libelle,
-    prestation.session.themeAtelier?.descriptif
-  ]
-    .join('\n')
-    .trim()
-  if (descriptionTheme) return descriptionTheme
-
   const descriptionSousTheme = [
     prestation.session.sousThemeAtelier?.libelleSousThemeAtelier,
     prestation.session.sousThemeAtelier?.descriptifSousThemeAtelier
@@ -70,7 +62,15 @@ function buildDescription(prestation: PrestationDto): string | undefined {
     .trim()
   if (descriptionSousTheme) return descriptionSousTheme
 
-  return undefined
+  const descriptionTheme = [
+    prestation.session.themeAtelier?.libelle,
+    prestation.session.themeAtelier?.descriptif
+  ]
+    .join('\n')
+    .trim()
+  if (descriptionTheme) return descriptionTheme
+
+  return prestation.session.typePrestation?.descriptifTypePrestation
 }
 
 function buildAdresse(prestation: PrestationDto): string | undefined {
