@@ -72,7 +72,8 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
       isActivated: false,
       email: lowerCaseEmail,
       conseiller,
-      structure: Core.Structure.MILO
+      structure: Core.Structure.MILO,
+      idDossier: command.idDossier
     }
     await this.jeuneRepository.save(nouveauJeune)
     await this.chatRepository.initializeChatIfNotExists(

@@ -88,6 +88,12 @@ export class JeuneDto extends Model {
     type: DataType.DATE
   })
   dateDerniereConnexion: Date | null
+
+  @Column({
+    field: 'id_dossier',
+    type: DataType.STRING
+  })
+  idDossier: string | null
 }
 
 @Table({

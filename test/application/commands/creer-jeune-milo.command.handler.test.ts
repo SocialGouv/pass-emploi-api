@@ -111,7 +111,8 @@ describe('CreerJeuneMiloCommandHandler', () => {
           isActivated: false,
           email: command.email,
           conseiller,
-          structure: Core.Structure.MILO
+          structure: Core.Structure.MILO,
+          idDossier: command.idDossier
         })
         expect(
           chatRepository.initializeChatIfNotExists
@@ -144,7 +145,8 @@ describe('CreerJeuneMiloCommandHandler', () => {
           creationDate: date,
           email: 'jeune.nom@email.com',
           conseiller,
-          structure: Core.Structure.MILO
+          structure: Core.Structure.MILO,
+          idDossier: command.idDossier
         })
         expect(
           chatRepository.initializeChatIfNotExists

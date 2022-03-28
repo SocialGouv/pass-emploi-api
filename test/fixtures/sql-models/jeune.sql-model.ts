@@ -17,7 +17,8 @@ export function unJeuneDto(
     structure: Core.Structure.MILO,
     idAuthentification: 'un-id',
     dateDerniereConnexion: null,
-    datePremiereConnexion: null
+    datePremiereConnexion: null,
+    idDossier: null
   }
 
   return { ...defaults, ...args }
