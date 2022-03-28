@@ -22,7 +22,7 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('CreateActionCommandHandler', () => {
   let action: Action
-  let jeune: Required<Omit<Jeune, 'tokenLastUpdate'>>
+  let jeune: Required<Omit<Jeune, 'tokenLastUpdate' | 'idDossier'>>
   let actionRepository: StubbedType<Action.Repository>
   let notificationRepository: StubbedType<Notification.Repository>
   let actionFactory: StubbedClass<Action.Factory>

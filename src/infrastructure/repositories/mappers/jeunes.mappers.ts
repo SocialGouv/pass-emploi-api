@@ -67,7 +67,8 @@ export function toSqlJeune(
     pushNotificationToken: jeune.pushNotificationToken ?? null,
     dateDerniereActualisationToken: jeune.tokenLastUpdate?.toJSDate() ?? null,
     email: jeune.email ?? null,
-    structure: jeune.structure
+    structure: jeune.structure,
+    idDossier: jeune.idDossier ?? null
   }
 }
 

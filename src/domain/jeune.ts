@@ -22,6 +22,7 @@ export interface Jeune {
   email?: string
   pushNotificationToken?: string
   tokenLastUpdate?: DateTime
+  idDossier?: string
 }
 
 export namespace Jeune {
