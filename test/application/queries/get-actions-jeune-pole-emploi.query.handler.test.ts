@@ -160,10 +160,76 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
       }
       const jeune = unJeune()
 
-      const demarcheDto: DemarcheDto = {
+      const demarcheDtoRetard: DemarcheDto = {
         id: 'id-demarche',
         etat: 'AC',
         dateFin: '2020-04-06T10:20:00+02:00',
+        dateCreation: '',
+        dateModification: '',
+        origineCreateur: 'INDIVIDU',
+        origineDemarche: 'PASS_EMPLOI',
+        pourquoi: '',
+        libellePourquoi: '',
+        quoi: '',
+        libelleQuoi: ''
+      }
+      const demarcheDtoEnCoursProche: DemarcheDto = {
+        id: 'id-demarche',
+        etat: 'EC',
+        dateFin: '2222-04-01T10:20:00+02:00',
+        dateCreation: '',
+        dateModification: '',
+        origineCreateur: 'INDIVIDU',
+        origineDemarche: 'PASS_EMPLOI',
+        pourquoi: '',
+        libellePourquoi: '',
+        quoi: '',
+        libelleQuoi: ''
+      }
+      const demarcheDtoAFaireAuMilieu: DemarcheDto = {
+        id: 'id-demarche',
+        etat: 'AF',
+        dateFin: '2222-04-02T10:20:00+02:00',
+        dateCreation: '',
+        dateModification: '',
+        dateDebut: '2222-04-06T10:20:00+02:00',
+        origineCreateur: 'INDIVIDU',
+        origineDemarche: 'PASS_EMPLOI',
+        pourquoi: '',
+        libellePourquoi: '',
+        quoi: '',
+        libelleQuoi: ''
+      }
+      const demarcheDtoEnCours: DemarcheDto = {
+        id: 'id-demarche',
+        etat: 'EC',
+        dateFin: '2222-04-03T10:20:00+02:00',
+        dateCreation: '',
+        dateModification: '',
+        origineCreateur: 'INDIVIDU',
+        origineDemarche: 'PASS_EMPLOI',
+        pourquoi: '',
+        libellePourquoi: '',
+        quoi: '',
+        libelleQuoi: ''
+      }
+      const demarcheDtoAnnulee: DemarcheDto = {
+        id: 'id-demarche',
+        etat: 'AN',
+        dateFin: '2020-04-01T10:20:00+02:00',
+        dateCreation: '',
+        dateModification: '',
+        origineCreateur: 'INDIVIDU',
+        origineDemarche: 'PASS_EMPLOI',
+        pourquoi: '',
+        libellePourquoi: '',
+        quoi: '',
+        libelleQuoi: ''
+      }
+      const demarcheDtoRealisee: DemarcheDto = {
+        id: 'id-demarche',
+        etat: 'RE',
+        dateFin: '2020-04-02T10:20:00+02:00',
         dateCreation: '',
         dateModification: '',
         origineCreateur: 'INDIVIDU',
@@ -179,10 +245,17 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
         request: undefined,
         status: 200,
         statusText: '',
-        data: [demarcheDto]
+        data: [
+          demarcheDtoAnnulee,
+          demarcheDtoEnCours,
+          demarcheDtoRetard,
+          demarcheDtoRealisee,
+          demarcheDtoAFaireAuMilieu,
+          demarcheDtoEnCoursProche
+        ]
       }
       describe("quand pas d'erreur", () => {
-        it('récupère les demarches Pole Emploi du jeune', async () => {
+        it('récupère les demarches Pole Emploi du jeune bien triés', async () => {
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getDemarches
             .withArgs(query.idpToken)
@@ -200,6 +273,46 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
                 id: 'id-demarche',
                 contenu: undefined,
                 statut: ActionPoleEmploi.Statut.EN_RETARD,
+                dateFin: new Date(stringUTC),
+                dateAnnulation: undefined,
+                creeeParConseiller: false
+              },
+              {
+                id: 'id-demarche',
+                contenu: undefined,
+                statut: ActionPoleEmploi.Statut.EN_COURS,
+                dateFin: new Date(stringUTC),
+                dateAnnulation: undefined,
+                creeeParConseiller: false
+              },
+              {
+                id: 'id-demarche',
+                contenu: undefined,
+                statut: ActionPoleEmploi.Statut.A_FAIRE,
+                dateFin: new Date(stringUTC),
+                dateAnnulation: undefined,
+                creeeParConseiller: false
+              },
+              {
+                id: 'id-demarche',
+                contenu: undefined,
+                statut: ActionPoleEmploi.Statut.EN_COURS,
+                dateFin: new Date(stringUTC),
+                dateAnnulation: undefined,
+                creeeParConseiller: false
+              },
+              {
+                id: 'id-demarche',
+                contenu: undefined,
+                statut: ActionPoleEmploi.Statut.ANNULEE,
+                dateFin: new Date(stringUTC),
+                dateAnnulation: undefined,
+                creeeParConseiller: false
+              },
+              {
+                id: 'id-demarche',
+                contenu: undefined,
+                statut: ActionPoleEmploi.Statut.REALISEE,
                 dateFin: new Date(stringUTC),
                 dateAnnulation: undefined,
                 creeeParConseiller: false
