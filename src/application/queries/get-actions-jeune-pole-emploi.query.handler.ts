@@ -19,8 +19,6 @@ import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-e
 import { fromDemarcheDtoToActionPoleEmploiQueryModel } from './query-mappers/actions-pole-emploi.mappers'
 import { ActionPoleEmploiQueryModel } from './query-models/actions.query-model'
 
-const Statut = ActionPoleEmploi.Statut
-
 export interface GetActionsJeunePoleEmploiQuery extends Query {
   idJeune: string
   idpToken: string
@@ -64,7 +62,7 @@ export class GetActionsJeunePoleEmploiQueryHandler extends QueryHandler<
             this.dateService
           )
         )
-        .sort(sortDemarchesByStatut)
+        .sort(compareDemarchesByStatutOrDateFin)
 
       return success(demarches)
     } catch (e) {
@@ -90,44 +88,34 @@ export class GetActionsJeunePoleEmploiQueryHandler extends QueryHandler<
   }
 }
 
-function sortDemarchesByStatut(
+function compareDemarchesByStatutOrDateFin(
   demarche1: ActionPoleEmploiQueryModel,
   demarche2: ActionPoleEmploiQueryModel
 ): number {
-  if (statutEgal(demarche1.statut, demarche2.statut)) {
-    const date1 = new Date(demarche1.dateFin).getTime()
-    const date2 = new Date(demarche2.dateFin).getTime()
-
-    if (date1 < date2) return -1
-    if (date1 > date2) return 1
-    return 0
-  }
-  if (stautInferieur(demarche1.statut, demarche2.statut)) {
-    return -1
-  }
-  return 1
-}
-
-const statutsEnCours = [Statut.EN_COURS, Statut.A_FAIRE]
-const statutsTermines = [Statut.REALISEE, Statut.ANNULEE]
-
-function statutEgal(
-  statut1: ActionPoleEmploi.Statut,
-  statut2: ActionPoleEmploi.Statut
-): boolean {
   return (
-    statut1 === statut2 ||
-    (statutsEnCours.includes(statut1) && statutsEnCours.includes(statut2)) ||
-    (statutsTermines.includes(statut1) && statutsTermines.includes(statut2))
+    compareStatuts(demarche1, demarche2) ||
+    compareDatesFin(demarche1, demarche2)
   )
 }
 
-function stautInferieur(
-  statut1: ActionPoleEmploi.Statut,
-  statut2: ActionPoleEmploi.Statut
-): boolean {
-  if (statut1 === Statut.EN_RETARD) return true
-  if (statutsEnCours.includes(statut1) && statutsTermines.includes(statut2))
-    return true
-  return false
+const statutsOrder: { [statut in ActionPoleEmploi.Statut]: number } = {
+  EN_RETARD: 0,
+  A_FAIRE: 1,
+  EN_COURS: 1,
+  ANNULEE: 2,
+  REALISEE: 2
+}
+
+function compareStatuts(
+  demarche1: ActionPoleEmploiQueryModel,
+  demarche2: ActionPoleEmploiQueryModel
+): number {
+  return statutsOrder[demarche1.statut] - statutsOrder[demarche2.statut]
+}
+
+function compareDatesFin(
+  demarche1: ActionPoleEmploiQueryModel,
+  demarche2: ActionPoleEmploiQueryModel
+): number {
+  return demarche1.dateFin.getTime() - demarche2.dateFin.getTime()
 }
