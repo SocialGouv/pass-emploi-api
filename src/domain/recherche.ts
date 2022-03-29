@@ -2,6 +2,7 @@ import { GetOffresEmploiQuery } from 'src/application/queries/get-offres-emploi.
 import { GetOffresImmersionQuery } from 'src/application/queries/get-offres-immersion.query.handler'
 import { RechercheQueryModel } from '../application/queries/query-models/recherches.query-model'
 import { DateTime } from 'luxon'
+import { GetServicesCiviqueQuery } from 'src/application/queries/get-services-civique.query.handler'
 
 export const RecherchesRepositoryToken = 'RecherchesRepositoryToken'
 
@@ -11,7 +12,10 @@ export interface Recherche {
   titre: string
   metier?: string
   localisation?: string
-  criteres?: GetOffresEmploiQuery | GetOffresImmersionQuery
+  criteres?:
+    | GetOffresEmploiQuery
+    | GetOffresImmersionQuery
+    | GetServicesCiviqueQuery
   idJeune: string
   dateCreation: DateTime
   dateDerniereRecherche: DateTime

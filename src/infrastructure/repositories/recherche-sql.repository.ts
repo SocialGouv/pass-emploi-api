@@ -12,6 +12,7 @@ import { CommuneSqlModel } from '../sequelize/models/commune.sql-model'
 import { SequelizeInjectionToken } from '../sequelize/providers'
 import { GetOffresImmersionQuery } from '../../application/queries/get-offres-immersion.query.handler'
 import { FindOptions } from 'sequelize/dist/lib/model'
+import { GetServicesCiviqueQuery } from 'src/application/queries/get-services-civique.query.handler'
 
 @Injectable()
 export class RechercheSqlRepository implements Recherche.Repository {
@@ -35,6 +36,8 @@ export class RechercheSqlRepository implements Recherche.Repository {
 
     let criteres
     let distance
+    let longitude
+    let latitude
     switch (recherche.type) {
       case Recherche.Type.OFFRES_EMPLOI:
       case Recherche.Type.OFFRES_ALTERNANCE:
@@ -47,23 +50,24 @@ export class RechercheSqlRepository implements Recherche.Repository {
             }
           })
           distance = criteres.rayon ?? OffresEmploi.DISTANCE_PAR_DEFAUT
-          await this.createGeometrie(
-            recherche.id,
-            distance,
-            Number(commune?.longitude),
-            Number(commune?.latitude)
-          )
+          longitude = Number(commune?.longitude)
+          latitude = Number(commune?.latitude)
         }
         break
       case Recherche.Type.OFFRES_IMMERSION:
         criteres = recherche.criteres as GetOffresImmersionQuery
         distance = criteres.distance ?? OffresImmersion.DISTANCE_PAR_DEFAUT
-        await this.createGeometrie(
-          recherche.id,
-          distance,
-          criteres.lon,
-          criteres.lat
-        )
+        longitude = criteres.lon
+        latitude = criteres.lat
+        break
+      case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
+        criteres = recherche.criteres as GetServicesCiviqueQuery
+        distance = criteres.distance ?? 0
+        longitude = criteres.lon
+        latitude = criteres.lat
+    }
+    if (distance !== undefined) {
+      await this.createGeometrie(recherche.id, distance, longitude, latitude)
     }
   }
 
