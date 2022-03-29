@@ -78,6 +78,44 @@ describe('JeuneSqlRepository', () => {
     })
   })
 
+  describe('save', () => {
+    beforeEach(async () => {
+      // Given
+      const conseillerDto = unConseillerDto({
+        structure: Core.Structure.POLE_EMPLOI
+      })
+      await ConseillerSqlModel.creer(conseillerDto)
+    })
+    describe("quand c'est un jeune", () => {
+      it('crée le jeune', async () => {
+        //Given
+        const idJeune = 'test-save-jeune'
+        // When
+        await jeuneSqlRepository.save(unJeune({ id: idJeune }))
+
+        // Then
+        const jeune = await JeuneSqlModel.findByPk(idJeune)
+        expect(jeune?.id).to.equal(idJeune)
+      })
+    })
+
+    describe("quand c'est un jeune existant", () => {
+      it('met à jour les informations du jeune', async () => {
+        //Given
+        const idJeune = 'test-save-jeune'
+        const idDossier = 'test-id-dossier'
+        // When
+        await jeuneSqlRepository.save(unJeune({ id: idJeune }))
+        await jeuneSqlRepository.save(unJeune({ id: idJeune, idDossier }))
+
+        // Then
+        const jeune = await JeuneSqlModel.findByPk(idJeune)
+        expect(jeune?.id).to.equal(idJeune)
+        expect(jeune?.idDossier).to.equal(idDossier)
+      })
+    })
+  })
+
   describe('getJeunes', () => {
     let jeune1: Jeune
     let jeune2: Jeune
