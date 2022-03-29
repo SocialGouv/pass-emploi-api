@@ -6,6 +6,7 @@ import {
   criteresImmersionNice,
   criteresImmersionParis,
   criteresOffreEmploiColombes,
+  criteresServiceCiviqueNice,
   geometrieColombes,
   geometrieNice,
   uneRecherche
@@ -61,6 +62,7 @@ describe('RechercheSqlRepository', () => {
           const recherches = await RechercheSqlModel.findAll({ raw: true })
           expect(recherches.length).to.equal(1)
           expect(recherches[0].id).to.equal(recherche.id)
+          expect(recherches[0].type).to.equal(recherche.type)
         })
       })
       describe('quand lat lon sont présents', () => {
@@ -80,6 +82,51 @@ describe('RechercheSqlRepository', () => {
 
           expect(recherches.length).to.equal(1)
           expect(recherches[0].id).to.equal(recherche.id)
+          expect(recherches[0].type).to.equal(recherche.type)
+          expect(recherches[0].geometrie.coordinates).to.deep.equal(
+            geometrieNice
+          )
+        })
+      })
+    })
+    describe("quand c'est une offre service civique", () => {
+      describe('quand lat lon ne sont pas présents', () => {
+        it('sauvegarde une recherche', async () => {
+          // Given
+          const recherche = uneRecherche({
+            idJeune,
+            type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+            criteres: {}
+          })
+
+          // When
+          await rechercheSqlRepository.createRecherche(recherche)
+
+          // Then
+          const recherches = await RechercheSqlModel.findAll({ raw: true })
+          expect(recherches.length).to.equal(1)
+          expect(recherches[0].id).to.equal(recherche.id)
+          expect(recherches[0].type).to.equal(recherche.type)
+        })
+      })
+      describe('quand lat lon sont présents', () => {
+        it('sauvegarde une recherche avec la bonne geometrie', async () => {
+          // Given
+          const recherche = uneRecherche({
+            idJeune,
+            type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+            criteres: criteresServiceCiviqueNice
+          })
+
+          // When
+          await rechercheSqlRepository.createRecherche(recherche)
+
+          // Then
+          const recherches = await RechercheSqlModel.findAll({ raw: true })
+
+          expect(recherches.length).to.equal(1)
+          expect(recherches[0].id).to.equal(recherche.id)
+          expect(recherches[0].type).to.equal(recherche.type)
           expect(recherches[0].geometrie.coordinates).to.deep.equal(
             geometrieNice
           )

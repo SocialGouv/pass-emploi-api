@@ -21,6 +21,13 @@ export const uneRecherche = (args: Partial<Recherche> = {}): Recherche => {
   return { ...defaults, ...args }
 }
 
+export const criteresServiceCiviqueNice = {
+  lat: 43.68720052287055,
+  lon: 7.237724249725603,
+  distance: 15,
+  domaine: ''
+}
+
 export const criteresImmersionNice = {
   rome: 'string',
   lat: 43.68720052287055,
