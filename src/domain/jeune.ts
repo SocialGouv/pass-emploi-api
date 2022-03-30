@@ -42,6 +42,10 @@ export namespace Jeune {
     getQueryModelById(
       idJeune: string
     ): Promise<DetailJeuneQueryModel | undefined>
+    getQueryModelByIdDossier(
+      idDossier: string,
+      idConseiller: string
+    ): Promise<DetailJeuneQueryModel | undefined>
     getAllQueryModelsByConseiller(
       idConseiller: string
     ): Promise<DetailJeuneQueryModel[]>

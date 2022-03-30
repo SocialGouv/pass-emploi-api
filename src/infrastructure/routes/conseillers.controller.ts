@@ -67,6 +67,7 @@ import {
   SendNotificationsNouveauxMessagesCommand,
   SendNotificationsNouveauxMessagesCommandHandler
 } from '../../application/commands/send-notifications-nouveaux-messages.command.handler'
+import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler'
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -84,6 +85,7 @@ export class ConseillersController {
     private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler,
     private readonly createRendezVousCommandHandler: CreateRendezVousCommandHandler,
     private readonly getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler,
+    private readonly getJeuneMiloByDossierQueryHandler: GetJeuneMiloByDossierQueryHandler,
     private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler,
     private readonly creerSuperviseursCommandHandler: CreerSuperviseursCommandHandler,
     private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler
@@ -377,6 +379,35 @@ export class ConseillersController {
     )
 
     if (isFailure(result)) {
+      if (result.error.code === ErreurHttp.CODE) {
+        throw new HttpException(
+          result.error.message,
+          (result.error as ErreurHttp).statusCode
+        )
+      }
+      throw new RuntimeException(result.error.message)
+    }
+
+    return result.data
+  }
+
+  @Get('milo/jeunes/:idDossier')
+  @ApiResponse({
+    type: DetailJeuneQueryModel
+  })
+  async getJeuneMiloByDossier(
+    @Param('idDossier') idDossier: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<DetailJeuneQueryModel> {
+    const result = await this.getJeuneMiloByDossierQueryHandler.execute(
+      { idDossier },
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      if (result.error.code === NonTrouveError.CODE) {
+        throw new NotFoundException(result.error)
+      }
       if (result.error.code === ErreurHttp.CODE) {
         throw new HttpException(
           result.error.message,
