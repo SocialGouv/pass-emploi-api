@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { Conseiller, ConseillersRepositoryToken } from 'src/domain/conseiller'
+import { Core } from 'src/domain/core'
 import { Unauthorized } from 'src/domain/erreur'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
 import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
@@ -39,12 +40,15 @@ export class ConseillerAuthorizer {
   }
 
   async authorizeConseiller(
-    utilisateur: Authentification.Utilisateur
+    utilisateur: Authentification.Utilisateur,
+    structure?: Core.Structure
   ): Promise<void> {
     const conseiller = await this.conseillerRepository.get(utilisateur.id)
 
-    if (conseiller && utilisateur.type === Authentification.Type.CONSEILLER) {
-      return
+    if (!structure || structure === utilisateur.structure) {
+      if (conseiller && utilisateur.type === Authentification.Type.CONSEILLER) {
+        return
+      }
     }
 
     throw new DroitsInsuffisants()
