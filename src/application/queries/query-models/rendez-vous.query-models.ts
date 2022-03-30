@@ -101,6 +101,9 @@ export class RendezVousQueryModel implements RendezVousBaseQueryModel {
   @ApiProperty({ required: false })
   invitation?: boolean
 
+  @ApiProperty({ required: false })
+  isLocaleDate?: boolean
+
   @ApiProperty()
   jeune: JeuneQueryModel
 
