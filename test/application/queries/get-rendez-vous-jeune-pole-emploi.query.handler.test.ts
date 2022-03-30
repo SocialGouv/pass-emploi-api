@@ -238,6 +238,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       expect(rendezVousQueryModel).to.deep.equal({
         agencePE: false,
         date: dateUTC,
+        isLocaleDate: true,
         duration: 23,
         id: 'random-id',
         jeune: {
@@ -400,6 +401,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                   code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
                   label: 'Entretien individuel conseiller'
                 },
+                isLocaleDate: true,
                 visio: false,
                 lienVisio: 'lien'
               },
@@ -519,6 +521,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                   code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
                   label: 'Entretien individuel conseiller'
                 },
+                isLocaleDate: true,
                 visio: true,
                 lienVisio: 'lien'
               },

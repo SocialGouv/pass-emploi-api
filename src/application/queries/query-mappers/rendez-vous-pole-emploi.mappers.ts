@@ -23,6 +23,7 @@ export function fromRendezVousDtoToRendezVousQueryModel(
         ]
     },
     date: buildDate(rendezVousPoleEmploiDto),
+    isLocaleDate: true,
     comment: rendezVousPoleEmploiDto.commentaire,
     jeune: { id: jeune.id, nom: jeune.lastName, prenom: jeune.firstName },
     modality: buildModality(rendezVousPoleEmploiDto),
