@@ -43,6 +43,9 @@ export class GetServicesCiviqueQueryHandler extends QueryHandler<
   ): Promise<Result<OffreEngagementQueryModel[]>> {
     const criteres: OffreEngagement.Criteres = {
       ...query,
+      distance: query.distance
+        ? query.distance
+        : OffreEngagement.DISTANCE_PAR_DEFAUT,
       dateDeDebutMinimum: query.dateDeDebutMinimum
         ? DateTime.fromISO(query.dateDeDebutMinimum)
         : undefined,

@@ -19,6 +19,8 @@ export interface OffreEngagement {
 }
 
 export namespace OffreEngagement {
+  export const DISTANCE_PAR_DEFAUT = 10
+
   export interface Repository {
     findAll(criteres: Criteres): Promise<Result<OffreEngagementQueryModel[]>>
 

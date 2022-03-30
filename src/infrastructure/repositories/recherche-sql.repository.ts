@@ -13,6 +13,7 @@ import { SequelizeInjectionToken } from '../sequelize/providers'
 import { GetOffresImmersionQuery } from '../../application/queries/get-offres-immersion.query.handler'
 import { FindOptions } from 'sequelize/dist/lib/model'
 import { GetServicesCiviqueQuery } from 'src/application/queries/get-services-civique.query.handler'
+import { OffreEngagement } from 'src/domain/offre-engagement'
 
 @Injectable()
 export class RechercheSqlRepository implements Recherche.Repository {
@@ -62,7 +63,7 @@ export class RechercheSqlRepository implements Recherche.Repository {
         break
       case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
         criteres = recherche.criteres as GetServicesCiviqueQuery
-        distance = criteres.distance ?? 0
+        distance = criteres.distance ?? OffreEngagement.DISTANCE_PAR_DEFAUT
         longitude = criteres.lon
         latitude = criteres.lat
     }
