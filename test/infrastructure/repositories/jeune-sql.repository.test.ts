@@ -241,6 +241,99 @@ describe('JeuneSqlRepository', () => {
     })
   })
 
+  describe('getByIdDossier', () => {
+    let jeune: Jeune
+
+    beforeEach(async () => {
+      // Given
+      jeune = unJeuneSansConseiller()
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          idConseiller: undefined,
+          dateCreation: jeune.creationDate.toJSDate(),
+          pushNotificationToken: 'unToken',
+          dateDerniereActualisationToken: uneDatetime.toJSDate(),
+          idDossier: 'test-id-dossier'
+        })
+      )
+    })
+
+    describe('quand un jeune existe avec cet id dossier', () => {
+      it('retourne le jeune', async () => {
+        // When
+        const result = await jeuneSqlRepository.getByIdDossier(
+          'test-id-dossier'
+        )
+
+        // Then
+        expect(result).to.deep.equal(jeune)
+      })
+    })
+
+    describe("quand aucun jeune n'existe avec cet email", () => {
+      it('retourne undefined', async () => {
+        // When
+        const jeune = await jeuneSqlRepository.getByIdDossier(
+          'test-id-dossier-inconnu'
+        )
+
+        // Then
+        expect(jeune).to.equal(undefined)
+      })
+    })
+  })
+
+  describe('getQueryModelById', () => {
+    const idJeune = '1'
+    const idConseiller = '1'
+    it('retourne un jeune', async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
+      await JeuneSqlModel.creer(unJeuneDto({ id: idJeune, idConseiller }))
+
+      // When
+      const actual = await jeuneSqlRepository.getQueryModelById(idJeune)
+      // Then
+      expect(actual).to.deep.equal(unDetailJeuneQueryModel({ id: idJeune }))
+    })
+  })
+
+  describe('getQueryModelByIdDossier', () => {
+    const idJeune = 'test'
+    const idDossier = '1'
+    const idConseiller = '1'
+    it('retourne un jeune quand le conseiller est le bon', async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({ id: idJeune, idDossier, idConseiller })
+      )
+
+      // When
+      const actual = await jeuneSqlRepository.getQueryModelByIdDossier(
+        idDossier,
+        idConseiller
+      )
+      // Then
+      expect(actual).to.deep.equal(unDetailJeuneQueryModel({ id: idJeune }))
+    })
+    it("retourne undefined quand le conseiller n'est pas le bon", async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({ id: idJeune, idDossier, idConseiller })
+      )
+
+      // When
+      const actual = await jeuneSqlRepository.getQueryModelByIdDossier(
+        idDossier,
+        'fake-id-conseiller'
+      )
+      // Then
+      expect(actual).to.equal(undefined)
+    })
+  })
+
   describe('supprimer', () => {
     it('supprime le jeune', async () => {
       // Given

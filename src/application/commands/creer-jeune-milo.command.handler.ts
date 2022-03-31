@@ -17,7 +17,10 @@ import { Milo, MiloRepositoryToken } from '../../domain/milo'
 import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
-import { EmailExisteDejaError } from '../../building-blocks/types/domain-error'
+import {
+  DossierExisteDejaError,
+  EmailExisteDejaError
+} from '../../building-blocks/types/domain-error'
 
 export interface CreerJeuneMiloCommand extends Command {
   idDossier: string
@@ -53,9 +56,15 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
       throw new NotFound(command.idConseiller, 'Conseiller')
     }
     const lowerCaseEmail = command.email.toLocaleLowerCase()
-    const jeune = await this.jeuneRepository.getByEmail(lowerCaseEmail)
-    if (jeune) {
+    const [jeuneByEmail, jeuneByIdDossier] = await Promise.all([
+      this.jeuneRepository.getByEmail(lowerCaseEmail),
+      this.jeuneRepository.getByIdDossier(command.idDossier)
+    ])
+    if (jeuneByEmail) {
       return failure(new EmailExisteDejaError(lowerCaseEmail))
+    }
+    if (jeuneByIdDossier) {
+      return failure(new DossierExisteDejaError(command.idDossier))
     }
 
     const result = await this.miloRepository.creerJeune(command.idDossier)

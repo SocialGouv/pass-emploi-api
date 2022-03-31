@@ -22,6 +22,7 @@ import { GetConseillerByEmailQueryHandler } from '../../../src/application/queri
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
 import { GetJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-jeunes-by-conseiller.query.handler'
 import {
+  DossierExisteDejaError,
   DroitsInsuffisants,
   EmailExisteDejaError,
   ErreurHttp,
@@ -53,6 +54,7 @@ import {
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { SendNotificationsNouveauxMessagesCommandHandler } from '../../../src/application/commands/send-notifications-nouveaux-messages.command.handler'
+import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler'
 
 describe('ConseillersController', () => {
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
@@ -61,6 +63,7 @@ describe('ConseillersController', () => {
   let sendNotificationNouveauMessage: StubbedClass<SendNotificationNouveauMessageCommandHandler>
   let sendNotificationsNouveauxMessages: StubbedClass<SendNotificationsNouveauxMessagesCommandHandler>
   let getDossierMiloJeuneQueryHandler: StubbedClass<GetDossierMiloJeuneQueryHandler>
+  let getJeuneMiloByDossierQueryHandler: StubbedClass<GetJeuneMiloByDossierQueryHandler>
   let getAllRendezVousConseillerQueryHandler: StubbedClass<GetAllRendezVousConseillerQueryHandler>
   let createRendezVousCommandHandler: StubbedClass<CreateRendezVousCommandHandler>
   let creerJeuneMiloCommandHandler: StubbedClass<CreerJeuneMiloCommandHandler>
@@ -80,6 +83,9 @@ describe('ConseillersController', () => {
       SendNotificationsNouveauxMessagesCommandHandler
     )
     getDossierMiloJeuneQueryHandler = stubClass(GetDossierMiloJeuneQueryHandler)
+    getJeuneMiloByDossierQueryHandler = stubClass(
+      GetJeuneMiloByDossierQueryHandler
+    )
     getAllRendezVousConseillerQueryHandler = stubClass(
       GetAllRendezVousConseillerQueryHandler
     )
@@ -104,6 +110,8 @@ describe('ConseillersController', () => {
       .useValue(sendNotificationsNouveauxMessages)
       .overrideProvider(GetDossierMiloJeuneQueryHandler)
       .useValue(getDossierMiloJeuneQueryHandler)
+      .overrideProvider(GetJeuneMiloByDossierQueryHandler)
+      .useValue(getJeuneMiloByDossierQueryHandler)
       .overrideProvider(GetAllRendezVousConseillerQueryHandler)
       .useValue(getAllRendezVousConseillerQueryHandler)
       .overrideProvider(CreateRendezVousCommandHandler)
@@ -673,6 +681,45 @@ describe('ConseillersController', () => {
     )
   })
 
+  describe('GET /conseillers/milo/jeunes/:idDossier', () => {
+    describe('quand le dossier existe', () => {
+      it('renvoie le jeune', async () => {
+        // Given
+        getJeuneMiloByDossierQueryHandler.execute
+          .withArgs({ idDossier: '1' }, unUtilisateurDecode())
+          .resolves(success(unDetailJeuneQueryModel()))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/conseillers/milo/jeunes/1')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(JSON.stringify(unDetailJeuneQueryModel()))
+      })
+    })
+
+    describe("quand le dossier n'existe pas", () => {
+      it('renvoie 404', async () => {
+        // Given
+        // Given
+        getJeuneMiloByDossierQueryHandler.execute
+          .withArgs({ idDossier: '2' }, unUtilisateurDecode())
+          .resolves(failure(new ErreurHttp('Pas trouvé', 404)))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/conseillers/milo/jeunes/2')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.NOT_FOUND)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers/milo/dossiers/2'
+    )
+  })
+
   describe('POST /conseillers/milo/jeunes', () => {
     describe('quand le jeune est nouveau', () => {
       it('renvoie 201', async () => {
@@ -736,6 +783,30 @@ describe('ConseillersController', () => {
 
         creerJeuneMiloCommandHandler.execute.resolves(
           failure(new EmailExisteDejaError('test@test.fr'))
+        )
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post('/conseillers/milo/jeunes')
+          .send(command)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.CONFLICT)
+      })
+    })
+
+    describe("quand l'id dossier existe déja", () => {
+      it('renvoie 409', async () => {
+        // Given
+        const command: CreerJeuneMiloCommand = {
+          idDossier: 'ID409',
+          nom: 'nom',
+          prenom: 'prenom',
+          email: 'email',
+          idConseiller: 'idConseiller'
+        }
+
+        creerJeuneMiloCommandHandler.execute.resolves(
+          failure(new DossierExisteDejaError('ID409'))
         )
 
         // When - Then

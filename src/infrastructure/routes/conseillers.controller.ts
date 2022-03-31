@@ -40,6 +40,7 @@ import {
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
 import { RendezVousConseillerQueryModel } from '../../application/queries/query-models/rendez-vous.query-models'
 import {
+  DossierExisteDejaError,
   DroitsInsuffisants,
   EmailExisteDejaError,
   ErreurHttp,
@@ -437,7 +438,10 @@ export class ConseillersController {
           (result.error as ErreurHttp).statusCode
         )
       }
-      if (result.error.code === EmailExisteDejaError.CODE) {
+      if (
+        result.error.code === EmailExisteDejaError.CODE ||
+        result.error.code === DossierExisteDejaError.CODE
+      ) {
         throw new HttpException(result.error.message, 409)
       }
       throw new RuntimeException(result.error.message)

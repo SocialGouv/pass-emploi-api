@@ -8,6 +8,7 @@ import {
   CreerJeuneMiloCommandHandler
 } from '../../../src/application/commands/creer-jeune-milo.command.handler'
 import {
+  DossierExisteDejaError,
   EmailExisteDejaError,
   ErreurHttp
 } from '../../../src/building-blocks/types/domain-error'
@@ -82,6 +83,29 @@ describe('CreerJeuneMiloCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(
           failure(new EmailExisteDejaError(command.email))
+        )
+      })
+    })
+    describe('quand il existe déjà un jeune avec cet id dossier', () => {
+      it('renvoie une erreur', async () => {
+        // Given
+        const command: CreerJeuneMiloCommand = {
+          idDossier: 'idDossier',
+          nom: 'nom',
+          prenom: 'prenom',
+          email: 'email',
+          idConseiller: 'idConseiller'
+        }
+        jeuneRepository.getByIdDossier
+          .withArgs(command.idDossier)
+          .resolves(unJeune())
+
+        // When
+        const result = await creerJeuneMiloCommandHandler.handle(command)
+
+        // Then
+        expect(result).to.deep.equal(
+          failure(new DossierExisteDejaError(command.idDossier))
         )
       })
     })

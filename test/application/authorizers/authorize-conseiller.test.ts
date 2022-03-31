@@ -149,6 +149,18 @@ describe('ConseillerAuthorizer', () => {
       // Then
       await expect(promise).to.be.fulfilled
     })
+    it('autorise un conseiller avec la bonne structure', async () => {
+      // Given
+      const superviseur: Authentification.Utilisateur =
+        unUtilisateurConseiller()
+      conseillerRepository.get.withArgs(superviseur.id).resolves(unConseiller())
+
+      // When
+      const promise = conseillerAuthorizer.authorizeConseiller(superviseur)
+
+      // Then
+      await expect(promise).to.be.fulfilled
+    })
 
     it('interdit un conseiller inexistant', async () => {
       // Given
