@@ -39,11 +39,11 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     })
   }
 
-  async createJob<T>(job: Planificateur.Job<T>): Promise<void> {
+  async createJob<T>(job: Planificateur.Job<T>, jobId?: string): Promise<void> {
     if (this.isReady) {
       const now = this.dateService.now()
       const delay = DateTime.fromJSDate(job.date).diff(now).milliseconds
-      await this.queue.add(job, { delay })
+      await this.queue.add(job, { delay, jobId })
     } else {
       throw new Error('Redis not ready to accept connection')
     }
@@ -100,5 +100,9 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
         await this.queue.removeJobs(job.id.toString())
       }
     }
+  }
+
+  async supprimerJobsSelonPattern(pattern: string): Promise<void> {
+    await this.queue.removeJobs(`*${pattern}*`)
   }
 }

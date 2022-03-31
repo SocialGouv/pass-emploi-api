@@ -33,7 +33,7 @@ export interface CreerJeuneMiloCommand extends Command {
 @Injectable()
 export class CreerJeuneMiloCommandHandler extends CommandHandler<
   CreerJeuneMiloCommand,
-  { id: string }
+  Core.Id
 > {
   constructor(
     private idService: IdService,
@@ -48,9 +48,7 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     super('CreerJeuneMiloCommandHandler')
   }
 
-  async handle(
-    command: CreerJeuneMiloCommand
-  ): Promise<Result<{ id: string }>> {
+  async handle(command: CreerJeuneMiloCommand): Promise<Result<Core.Id>> {
     const conseiller = await this.conseillerRepository.get(command.idConseiller)
     if (!conseiller) {
       throw new NotFound(command.idConseiller, 'Conseiller')

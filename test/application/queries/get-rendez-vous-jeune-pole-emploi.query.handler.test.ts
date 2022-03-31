@@ -96,6 +96,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         annule: false,
         idStable: undefined,
         date: dateUTC,
+        isLocaleDate: false,
         duration: 0,
         id: 'random-id',
         jeune: {
@@ -413,6 +414,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                 annule: false,
                 comment: undefined,
                 date: expectedDatePrestation,
+                isLocaleDate: false,
                 description: "Utiliser Internet dans sa recherche d'emploi",
                 duration: 0,
                 id: 'random-id',
@@ -532,6 +534,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                 annule: false,
                 comment: undefined,
                 date: expectedDatePrestation,
+                isLocaleDate: false,
                 description: undefined,
                 duration: 0,
                 id: 'random-id',

@@ -1,3 +1,4 @@
+import { unRendezVous } from 'test/fixtures/rendez-vous.fixture'
 import { RendezVousQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-models'
 import { Jeune } from '../../../src/domain/jeune'
 import { RendezVousRepositorySql } from '../../../src/infrastructure/repositories/rendez-vous-sql.repository'
@@ -115,6 +116,42 @@ describe('RendezVousRepositorySql', () => {
         // Then
         expect(rendezVous?.id).to.equal(unRendezVous.id)
         expect(rendezVous?.jeune.id).to.equal(jeune.id)
+      })
+    })
+  })
+
+  describe('save', () => {
+    beforeEach(async () => {
+      // Given
+      const jeuneDto = unJeuneDto({ id: '1' })
+      await JeuneSqlModel.creer(jeuneDto)
+    })
+    describe("quand c'est un rdv inexistant", () => {
+      it('crée le rdv', async () => {
+        //Given
+        const id = '20c8ca73-fd8b-4194-8d3c-80b6c9949dea'
+        // When
+        await rendezVousRepositorySql.save(unRendezVous({ id }))
+
+        // Then
+        const rdv = await RendezVousSqlModel.findByPk(id)
+        expect(rdv?.id).to.equal(id)
+      })
+    })
+
+    describe("quand c'est un rdv existant", () => {
+      it('met à jour les informations du rdv', async () => {
+        //Given
+        const id = '20c8ca73-fd8b-4194-8d3c-80b6c9949dea'
+        const commentaire = 'new'
+        // When
+        await rendezVousRepositorySql.save(unRendezVous({ id }))
+        await rendezVousRepositorySql.save(unRendezVous({ id, commentaire }))
+
+        // Then
+        const rdv = await RendezVousSqlModel.findByPk(id)
+        expect(rdv?.id).to.equal(id)
+        expect(rdv?.commentaire).to.equal(commentaire)
       })
     })
   })

@@ -7,12 +7,13 @@ export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 
 export namespace Planificateur {
   export interface Repository {
-    createJob<T>(job: Job<T>): Promise<void>
+    createJob<T>(job: Job<T>, jobId?: string): Promise<void>
     createCron(cron: Cron): Promise<void>
     subscribe(callback: Handler<unknown>): Promise<void>
     supprimerTousLesJobs(): Promise<void>
     supprimerLesCrons(): Promise<void>
     supprimerLesAnciensJobs(): Promise<void>
+    supprimerJobsSelonPattern(pattern: string): Promise<void>
   }
 
   export enum CronJob {
@@ -104,11 +105,15 @@ export class PlanificateurService {
       await this.creerJobRendezVous(rendezVous, 1)
     }
   }
+  async supprimerRappelsRendezVous(rendezVous: RendezVous): Promise<void> {
+    await this.planificateurRepository.supprimerJobsSelonPattern(rendezVous.id)
+  }
 
   private async creerJobRendezVous(
     rendezVous: RendezVous,
     days: number
   ): Promise<void> {
+    const jobId = `rdv:${rendezVous.id}:${days}`
     const job: Planificateur.Job<Planificateur.JobRendezVous> = {
       date: DateTime.fromJSDate(rendezVous.date)
         .minus({ days: days })
@@ -116,6 +121,6 @@ export class PlanificateurService {
       type: Planificateur.JobEnum.RENDEZVOUS,
       contenu: { idRendezVous: rendezVous.id }
     }
-    await this.planificateurRepository.createJob(job)
+    await this.planificateurRepository.createJob(job, jobId)
   }
 }

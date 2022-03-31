@@ -30,6 +30,7 @@ export namespace Evenement {
     MESSAGE_ENVOYE = 'MESSAGE_ENVOYE',
     MESSAGE_ENVOYE_MULTIPLE = 'MESSAGE_ENVOYE_MULTIPLE',
     RDV_CREE = 'RDV_CREE',
+    RDV_MODIFIE = 'RDV_MODIFIE',
     RDV_SUPPRIME = 'RDV_SUPPRIME',
     RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE = 'RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE',
     RECHERCHE_ALTERNANCE_SAUVEGARDEE = 'RECHERCHE_ALTERNANCE_SAUVEGARDEE',
@@ -156,6 +157,10 @@ const evenements = {
     action: 'Envoi multiple'
   },
   [Evenement.Type.RDV_CREE]: { categorie: 'Rendez-vous', action: 'Création' },
+  [Evenement.Type.RDV_MODIFIE]: {
+    categorie: 'Rendez-vous',
+    action: 'Modification'
+  },
   [Evenement.Type.RDV_SUPPRIME]: {
     categorie: 'Rendez-vous',
     action: 'Suppression'

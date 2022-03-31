@@ -1,0 +1,218 @@
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { SinonSandbox } from 'sinon'
+import { RendezVousAuthorizer } from 'src/application/authorizers/authorize-rendezvous'
+import {
+  UpdateRendezVousCommand,
+  UpdateRendezVousCommandHandler
+} from 'src/application/commands/update-rendez-vous.command.handler'
+import { EvenementService } from 'src/domain/evenement'
+import {
+  MauvaiseCommandeError,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
+import { failure, success } from '../../../src/building-blocks/types/result'
+import { Notification } from '../../../src/domain/notification'
+import { PlanificateurService } from '../../../src/domain/planificateur'
+import { RendezVous } from '../../../src/domain/rendez-vous'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
+import {
+  createSandbox,
+  DatabaseForTesting,
+  expect,
+  StubbedClass,
+  stubClass
+} from '../../utils'
+
+describe('UpdateRendezVousCommandHandler', () => {
+  DatabaseForTesting.prepare()
+  let rendezVousRepository: StubbedType<RendezVous.Repository>
+  let notificationRepository: StubbedType<Notification.Repository>
+  let planificateurService: StubbedClass<PlanificateurService>
+  let rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
+  let evenementService: StubbedClass<EvenementService>
+  let updateRendezVousCommandHandler: UpdateRendezVousCommandHandler
+  const jeune = unJeune()
+  const rendezVous = unRendezVous({}, jeune)
+
+  beforeEach(async () => {
+    const sandbox: SinonSandbox = createSandbox()
+    rendezVousRepository = stubInterface(sandbox)
+    notificationRepository = stubInterface(sandbox)
+    rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
+    planificateurService = stubClass(PlanificateurService)
+    evenementService = stubClass(EvenementService)
+
+    updateRendezVousCommandHandler = new UpdateRendezVousCommandHandler(
+      rendezVousRepository,
+      notificationRepository,
+      rendezVousAuthorizer,
+      planificateurService,
+      evenementService
+    )
+  })
+
+  describe('handle', () => {
+    describe("quand le rendez-vous n'existe pas", () => {
+      it('renvoie une failure', async () => {
+        // Given
+        const command: UpdateRendezVousCommand = {
+          idRendezVous: rendezVous.id,
+          date: '2021-11-11T08:03:30.000Z',
+          duree: 30,
+          presenceConseiller: true
+        }
+        rendezVousRepository.get
+          .withArgs(command.idRendezVous)
+          .resolves(undefined)
+        // When
+        const result = await updateRendezVousCommandHandler.handle(command)
+        // Then
+        expect(rendezVousRepository.save).not.to.have.been.calledWith(
+          rendezVous
+        )
+        expect(notificationRepository.send).not.to.have.been.calledWith(
+          Notification.updateRdv(jeune.pushNotificationToken, rendezVous.id)
+        )
+        expect(result).to.deep.equal(
+          failure(new NonTrouveError('RendezVous', command.idRendezVous))
+        )
+      })
+    })
+    describe('quand la presence conseiller est false pour un ENTRETIEN_INDIVIDUEL', () => {
+      it('renvoie une failure', async () => {
+        // Given
+        const command: UpdateRendezVousCommand = {
+          idRendezVous: rendezVous.id,
+          date: '2021-11-11T08:03:30.000Z',
+          duree: 30,
+          presenceConseiller: false
+        }
+        rendezVousRepository.get
+          .withArgs(command.idRendezVous)
+          .resolves(rendezVous)
+        // When
+        const result = await updateRendezVousCommandHandler.handle(command)
+        // Then
+        expect(rendezVousRepository.save).not.to.have.been.calledWith(
+          rendezVous
+        )
+        expect(notificationRepository.send).not.to.have.been.calledWith(
+          Notification.updateRdv(jeune.pushNotificationToken, rendezVous.id)
+        )
+        expect(result).to.deep.equal(
+          failure(
+            new MauvaiseCommandeError(
+              'Le champ presenceConseiller ne peut etre modifé pour un rendez-vous Conseiller'
+            )
+          )
+        )
+      })
+    })
+    describe('quand la date est modifiée', () => {
+      it('envoie la notif, replanifie les rappels et met à jour le rendez-vous', async () => {
+        // Given
+        const date = '2022-04-04T09:54:04.561Z'
+        const command: UpdateRendezVousCommand = {
+          idRendezVous: rendezVous.id,
+          date,
+          duree: rendezVous.duree,
+          presenceConseiller: rendezVous.presenceConseiller,
+          modalite: rendezVous.modalite,
+          adresse: rendezVous.adresse,
+          organisme: rendezVous.organisme
+        }
+        rendezVousRepository.get
+          .withArgs(command.idRendezVous)
+          .resolves(rendezVous)
+        const rendezVousUpdated: RendezVous = {
+          ...rendezVous,
+          date: new Date(date)
+        }
+        // When
+        const result = await updateRendezVousCommandHandler.handle(command)
+        // Then
+        expect(result).to.deep.equal(success({ id: rendezVousUpdated.id }))
+        expect(rendezVousRepository.save).to.have.been.calledWith(
+          rendezVousUpdated
+        )
+        expect(notificationRepository.send).to.have.been.calledWith(
+          Notification.updateRdv(
+            jeune.pushNotificationToken,
+            rendezVousUpdated.id
+          )
+        )
+        expect(
+          planificateurService.supprimerRappelsRendezVous
+        ).to.have.been.calledWith(rendezVousUpdated)
+        expect(
+          planificateurService.planifierRappelsRendezVous
+        ).to.have.been.calledWith(rendezVousUpdated)
+      })
+    })
+    describe("quand la date n'est pas modifiée", () => {
+      it('ne replanifie pas les rappels', async () => {
+        // Given
+        const command: UpdateRendezVousCommand = {
+          idRendezVous: rendezVous.id,
+          date: '2021-11-11T08:03:30.000Z',
+          duree: rendezVous.duree,
+          presenceConseiller: rendezVous.presenceConseiller,
+          modalite: rendezVous.modalite,
+          adresse: rendezVous.adresse,
+          organisme: rendezVous.organisme
+        }
+        rendezVousRepository.get
+          .withArgs(command.idRendezVous)
+          .resolves(rendezVous)
+        const rendezVousUpdated: RendezVous = {
+          ...rendezVous,
+          date: rendezVous.date
+        }
+        // When
+        const result = await updateRendezVousCommandHandler.handle(command)
+        // Then
+        expect(result).to.deep.equal(success({ id: rendezVousUpdated.id }))
+        expect(rendezVousRepository.save).to.have.been.calledWith(
+          rendezVousUpdated
+        )
+        expect(notificationRepository.send).to.have.been.calledWith(
+          Notification.updateRdv(
+            jeune.pushNotificationToken,
+            rendezVousUpdated.id
+          )
+        )
+        expect(
+          planificateurService.supprimerRappelsRendezVous
+        ).not.to.have.been.calledWith(rendezVousUpdated)
+        expect(
+          planificateurService.planifierRappelsRendezVous
+        ).not.to.have.been.calledWith(rendezVousUpdated)
+      })
+    })
+  })
+
+  describe('authorize', () => {
+    it('authorise un conseiller', async () => {
+      // Given
+      const command: UpdateRendezVousCommand = {
+        idRendezVous: rendezVous.id,
+        date: '2021-11-11T08:03:30.000Z',
+        duree: 30,
+        presenceConseiller: true
+      }
+
+      const utilisateur = unUtilisateurConseiller()
+
+      // When
+      await updateRendezVousCommandHandler.authorize(command, utilisateur)
+
+      // Then
+      expect(rendezVousAuthorizer.authorize).to.have.been.calledWithExactly(
+        command.idRendezVous,
+        utilisateur
+      )
+    })
+  })
+})

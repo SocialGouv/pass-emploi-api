@@ -32,7 +32,7 @@ describe('DeleteRendezVousCommandHandler', () => {
   let deleteRendezVousCommandHandler: DeleteRendezVousCommandHandler
   let evenementService: StubbedClass<EvenementService>
   const jeune = unJeune()
-  const rendezVous = unRendezVous(jeune)
+  const rendezVous = unRendezVous({}, jeune)
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
@@ -54,8 +54,8 @@ describe('DeleteRendezVousCommandHandler', () => {
       describe('quand le jeune s"est déjà connecté au moins une fois sur l"application', () => {
         it('supprime le rendezvous et envoit une notification au jeune', async () => {
           // Given
+          rendezVous.jeune.pushNotificationToken = 'token'
           rendezVousRepository.get.withArgs(rendezVous.id).resolves(rendezVous)
-          rendezVous.jeune.pushNotificationToken = 'firebaseToken'
           const command: DeleteRendezVousCommand = {
             idRendezVous: rendezVous.id
           }
@@ -69,7 +69,7 @@ describe('DeleteRendezVousCommandHandler', () => {
           )
           expect(notificationRepository.send).to.have.been.calledWith(
             Notification.createRdvSupprime(
-              jeune.pushNotificationToken,
+              rendezVous.jeune.pushNotificationToken,
               rendezVous.date
             )
           )

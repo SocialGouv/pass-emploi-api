@@ -42,7 +42,7 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
     return fromSqlToRendezVousQueryModel(rendezVousSqlModel)
   }
 
-  async add(rendezVous: RendezVous): Promise<void> {
+  async save(rendezVous: RendezVous): Promise<void> {
     const rendezVousDto = toRendezVousDto(rendezVous)
     await RendezVousSqlModel.upsert(rendezVousDto)
   }

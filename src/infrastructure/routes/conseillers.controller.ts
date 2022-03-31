@@ -22,6 +22,7 @@ import {
 import { CreerSuperviseursCommandHandler } from 'src/application/commands/creer-superviseurs.command.handler'
 import { DeleteSuperviseursCommandHandler } from 'src/application/commands/delete-superviseurs.command.handler'
 import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler'
+import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler'
 import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler'
 import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
 import { Authentification } from 'src/domain/authentification'
@@ -29,6 +30,10 @@ import { CreateActionCommandHandler } from '../../application/commands/create-ac
 import { CreerJeuneMiloCommandHandler } from '../../application/commands/creer-jeune-milo.command.handler'
 import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/creer-jeune-pole-emploi.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from '../../application/commands/send-notification-nouveau-message.command.handler'
+import {
+  SendNotificationsNouveauxMessagesCommand,
+  SendNotificationsNouveauxMessagesCommandHandler
+} from '../../application/commands/send-notifications-nouveaux-messages.command.handler'
 import { GetConseillerByEmailQueryHandler } from '../../application/queries/get-conseiller-by-email.query.handler'
 import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler'
@@ -53,6 +58,7 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
+import { Core } from '../../domain/core'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import {
   CreateActionPayload,
@@ -64,11 +70,6 @@ import {
   SuperviseursPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
-import {
-  SendNotificationsNouveauxMessagesCommand,
-  SendNotificationsNouveauxMessagesCommandHandler
-} from '../../application/commands/send-notifications-nouveaux-messages.command.handler'
-import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler'
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -332,7 +333,7 @@ export class ConseillersController {
     @Param('idConseiller') idConseiller: string,
     @Body() createRendezVousPayload: CreateRendezVousPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<{ id: string }> {
+  ): Promise<Core.Id> {
     const command: CreateRendezVousCommand = {
       idJeune: createRendezVousPayload.jeuneId,
       commentaire: createRendezVousPayload.comment,
@@ -425,7 +426,7 @@ export class ConseillersController {
   async postJeuneMilo(
     @Body() creerJeuneMiloPayload: CreerJeuneMiloPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<{ id: string }> {
+  ): Promise<Core.Id> {
     const result = await this.creerJeuneMiloCommandHandler.execute(
       creerJeuneMiloPayload,
       utilisateur

@@ -56,13 +56,16 @@ describe('Planificateur', () => {
 
           // Then
           expect(planificateurRepository.createJob).to.have.callCount(1)
-          expect(planificateurRepository.createJob).to.have.been.calledWith({
-            date: DateTime.fromJSDate(rendezVous.date)
-              .minus({ days: 1 })
-              .toJSDate(),
-            type: Planificateur.JobEnum.RENDEZVOUS,
-            contenu: { idRendezVous: rendezVous.id }
-          })
+          expect(planificateurRepository.createJob).to.have.been.calledWith(
+            {
+              date: DateTime.fromJSDate(rendezVous.date)
+                .minus({ days: 1 })
+                .toJSDate(),
+              type: Planificateur.JobEnum.RENDEZVOUS,
+              contenu: { idRendezVous: rendezVous.id }
+            },
+            `rdv:${rendezVous.id}:1`
+          )
         })
       })
       describe('quand le rendez vous est à plus de 7 jours', () => {
@@ -81,25 +84,31 @@ describe('Planificateur', () => {
 
         it('génère un job pour un rappel un jour avant le rendez vous', async () => {
           // Then
-          expect(planificateurRepository.createJob).to.have.been.calledWith({
-            date: DateTime.fromJSDate(rendezVous.date)
-              .minus({ days: 1 })
-              .toJSDate(),
-            type: Planificateur.JobEnum.RENDEZVOUS,
-            contenu: { idRendezVous: rendezVous.id }
-          })
+          expect(planificateurRepository.createJob).to.have.been.calledWith(
+            {
+              date: DateTime.fromJSDate(rendezVous.date)
+                .minus({ days: 1 })
+                .toJSDate(),
+              type: Planificateur.JobEnum.RENDEZVOUS,
+              contenu: { idRendezVous: rendezVous.id }
+            },
+            `rdv:${rendezVous.id}:1`
+          )
         })
 
         it('génère un job pour un rappel sept jours avant le rendez vous', async () => {
           // Then
           expect(planificateurRepository.createJob).to.have.callCount(2)
-          expect(planificateurRepository.createJob).to.have.been.calledWith({
-            date: DateTime.fromJSDate(rendezVous.date)
-              .minus({ days: 7 })
-              .toJSDate(),
-            type: Planificateur.JobEnum.RENDEZVOUS,
-            contenu: { idRendezVous: rendezVous.id }
-          })
+          expect(planificateurRepository.createJob).to.have.been.calledWith(
+            {
+              date: DateTime.fromJSDate(rendezVous.date)
+                .minus({ days: 7 })
+                .toJSDate(),
+              type: Planificateur.JobEnum.RENDEZVOUS,
+              contenu: { idRendezVous: rendezVous.id }
+            },
+            `rdv:${rendezVous.id}:7`
+          )
         })
       })
     })

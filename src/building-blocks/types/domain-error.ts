@@ -23,6 +23,16 @@ export class NonTraitableError implements DomainError {
   }
 }
 
+export class MauvaiseCommandeError implements DomainError {
+  static CODE = 'MAUVAISE_COMMANDE'
+  readonly code: string = MauvaiseCommandeError.CODE
+  readonly message: string
+
+  constructor(message: string) {
+    this.message = message
+  }
+}
+
 export class FavoriNonTrouveError implements DomainError {
   static CODE = 'FAVORI_NON_TROUVE'
   readonly code: string = FavoriNonTrouveError.CODE
