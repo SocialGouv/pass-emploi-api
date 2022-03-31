@@ -400,10 +400,18 @@ export class ConseillersController {
     @Param('idDossier') idDossier: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DetailJeuneQueryModel> {
-    const result = await this.getJeuneMiloByDossierQueryHandler.execute(
-      { idDossier },
-      utilisateur
-    )
+    let result: Result<DetailJeuneQueryModel>
+    try {
+      result = await this.getJeuneMiloByDossierQueryHandler.execute(
+        { idDossier },
+        utilisateur
+      )
+    } catch (e) {
+      if (e instanceof DroitsInsuffisants) {
+        throw new ForbiddenException(e)
+      }
+      throw e
+    }
 
     if (isFailure(result)) {
       if (result.error.code === NonTrouveError.CODE) {
