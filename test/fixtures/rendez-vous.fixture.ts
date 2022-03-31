@@ -9,18 +9,26 @@ import {
 } from '../../src/domain/rendez-vous'
 import { unJeune } from './jeune.fixture'
 
-export const unRendezVous = (jeune = unJeune()): RendezVous => ({
-  id: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb',
-  titre: 'rdv',
-  duree: 30,
-  modalite: 'modalite',
-  date: new Date('2021-11-11T08:03:30.000Z'),
-  jeune: jeune,
-  commentaire: 'commentaire',
-  sousTitre: 'sous titre',
-  type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
-  presenceConseiller: true
-})
+export const unRendezVous = (
+  args: Partial<RendezVous> = {},
+  jeune = unJeune()
+): RendezVous => {
+  const defaults = {
+    id: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb',
+    titre: 'rdv',
+    duree: 30,
+    modalite: 'modalite',
+    date: new Date('2021-11-11T08:03:30.000Z'),
+    jeune: jeune,
+    commentaire: 'commentaire',
+    sousTitre: 'sous titre',
+    type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+    presenceConseiller: true,
+    adresse: undefined,
+    organisme: undefined
+  }
+  return { ...defaults, ...args }
+}
 
 export const unRendezVousQueryModel = (
   args: Partial<RendezVousQueryModel> = {}
@@ -31,6 +39,7 @@ export const unRendezVousQueryModel = (
     modality: 'modalite',
     comment: 'commentaire',
     date: new Date('2021-11-11T08:03:30.000Z'),
+    isLocaleDate: false,
     duration: 30,
     jeune: {
       id: '1',

@@ -58,6 +58,26 @@ describe('PlanificateurRedisRepository', () => {
           Duration.fromMillis(parseInt(redisJob.delay)).as('day')
         ).to.equal(2)
       })
+      it('créée un job avec id custom', async () => {
+        // Given
+        const job: Planificateur.Job<Planificateur.JobRendezVous> = {
+          date: uneDatetime.plus({ days: 2 }).toJSDate(),
+          type: Planificateur.JobEnum.RENDEZVOUS,
+          contenu: {
+            idRendezVous: 'id'
+          }
+        }
+        const idJob = 'test'
+
+        // When
+        await planificateurRedisRepository.createJob(job, idJob)
+
+        // Then
+        const redisJob = await redisClient.hGetAll(`bull:JobQueue:${idJob}`)
+        expect(
+          Duration.fromMillis(parseInt(redisJob.delay)).as('day')
+        ).to.equal(2)
+      })
     })
   })
 
@@ -79,6 +99,30 @@ describe('PlanificateurRedisRepository', () => {
 
         // Then
         const redisJob = await redisClient.hGetAll('bull:JobQueue:1')
+        expect(redisJob).to.deep.equal({})
+      })
+    })
+  })
+
+  describe('supprimerJobsSelonPattern', () => {
+    describe('si le redis est accessible', () => {
+      it('supprime les jobs avec id', async () => {
+        // Given
+        const job: Planificateur.Job<Planificateur.JobRendezVous> = {
+          date: uneDatetime.plus({ days: 2 }).toJSDate(),
+          type: Planificateur.JobEnum.RENDEZVOUS,
+          contenu: {
+            idRendezVous: 'id'
+          }
+        }
+        const idJob = 'test'
+        await planificateurRedisRepository.createJob(job, idJob)
+
+        // When
+        await planificateurRedisRepository.supprimerJobsSelonPattern(idJob)
+
+        // Then
+        const redisJob = await redisClient.hGetAll(`bull:JobQueue:${idJob}`)
         expect(redisJob).to.deep.equal({})
       })
     })

@@ -38,7 +38,7 @@ describe('CreateRendezVousCommandHandler', () => {
   let createRendezVousCommandHandler: CreateRendezVousCommandHandler
   let evenementService: StubbedClass<EvenementService>
   const jeune = unJeune()
-  const rendezVous = unRendezVous(jeune)
+  const rendezVous = unRendezVous({}, jeune)
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
@@ -77,7 +77,7 @@ describe('CreateRendezVousCommandHandler', () => {
         // When
         const result = await createRendezVousCommandHandler.handle(command)
         // Then
-        expect(rendezVousRepository.add).not.to.have.been.calledWith(
+        expect(rendezVousRepository.save).not.to.have.been.calledWith(
           rendezVous.id
         )
         expect(notificationRepository.send).not.to.have.been.calledWith(
@@ -106,7 +106,7 @@ describe('CreateRendezVousCommandHandler', () => {
         // When
         const result = await createRendezVousCommandHandler.handle(command)
         // Then
-        expect(rendezVousRepository.add).not.to.have.been.calledWith(
+        expect(rendezVousRepository.save).not.to.have.been.calledWith(
           rendezVous.id
         )
         expect(notificationRepository.send).not.to.have.been.calledWith(
@@ -146,7 +146,7 @@ describe('CreateRendezVousCommandHandler', () => {
           const result = await createRendezVousCommandHandler.handle(command)
           // Then
           expect(result).to.deep.equal(success(expectedRendezvous.id))
-          expect(rendezVousRepository.add).to.have.been.calledWith(
+          expect(rendezVousRepository.save).to.have.been.calledWith(
             expectedRendezvous
           )
           expect(notificationRepository.send).to.have.been.calledWith(
@@ -160,11 +160,11 @@ describe('CreateRendezVousCommandHandler', () => {
           ).to.have.been.calledWith(expectedRendezvous)
         })
       })
-      describe('quand le jeune ne s"est jamais connecté sur l"application', () => {
+      describe("quand le jeune ne s'est jamais connecté sur l'application", () => {
         it('crée un rendez-vous sans envoyer de notifications', async () => {
           // Given
+          const jeune = unJeune({ pushNotificationToken: undefined })
           jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
-          rendezVous.jeune.pushNotificationToken = undefined
           const command: CreateRendezVousCommand = {
             idJeune: jeune.id,
             idConseiller: jeune.conseiller.id,
@@ -181,7 +181,7 @@ describe('CreateRendezVousCommandHandler', () => {
           const result = await createRendezVousCommandHandler.handle(command)
           // Then
           expect(result).to.deep.equal(success(expectedRendezvous.id))
-          expect(rendezVousRepository.add).to.have.been.calledWith(
+          expect(rendezVousRepository.save).to.have.been.calledWith(
             expectedRendezvous
           )
           expect(notificationRepository.send).not.to.have.been.calledWith(

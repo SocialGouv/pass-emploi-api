@@ -89,6 +89,7 @@ export function fromSqlToRendezVousQueryModel(
     id: rendezVousSql.id,
     comment: rendezVousSql.commentaire ?? undefined,
     date: rendezVousSql.date,
+    isLocaleDate: false,
     modality: rendezVousSql.modalite ?? '',
     duration: rendezVousSql.duree,
     title: '',

@@ -70,7 +70,7 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       jeune,
       this.idService
     )
-    await this.rendezVousRepository.add(rendezVous)
+    await this.rendezVousRepository.save(rendezVous)
 
     if (jeune.pushNotificationToken) {
       const notification = Notification.createNouveauRdv(
@@ -78,6 +78,10 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
         rendezVous.id
       )
       await this.notificationRepository.send(notification)
+    } else {
+      this.logger.log(
+        `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
+      )
     }
 
     try {

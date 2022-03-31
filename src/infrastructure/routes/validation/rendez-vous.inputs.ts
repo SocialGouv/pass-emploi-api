@@ -82,3 +82,45 @@ export class CreateRendezVousPayload {
   @IsIn([true, false])
   invitation?: boolean
 }
+
+export class UpdateRendezVousPayload {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  comment?: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @IsDateString()
+  date: string
+
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  duration: number
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  modality?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  adresse?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  organisme?: string
+
+  @ApiProperty()
+  @IsBoolean()
+  @IsIn([true, false])
+  presenceConseiller: boolean
+}

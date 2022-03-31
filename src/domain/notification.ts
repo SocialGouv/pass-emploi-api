@@ -81,6 +81,23 @@ export namespace Notification {
     }
   }
 
+  export function updateRdv(
+    token: string,
+    idRdv: string
+  ): Notification.Message {
+    return {
+      token,
+      notification: {
+        title: 'Rendez-vous modifié',
+        body: 'Votre rendez-vous a été modifié'
+      },
+      data: {
+        type: Type.NEW_RENDEZVOUS,
+        id: idRdv
+      }
+    }
+  }
+
   export function createRappelRdv(
     token: string,
     idRdv: string,

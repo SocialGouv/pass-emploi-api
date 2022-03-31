@@ -140,6 +140,7 @@ import { configureLoggerModule } from './utils/logger.module'
 import { PoleEmploiPartenaireClient } from './infrastructure/clients/pole-emploi-partenaire-client'
 import { GetActionsJeunePoleEmploiQueryHandler } from './application/queries/get-actions-jeune-pole-emploi.query.handler'
 import { GetJeuneMiloByDossierQueryHandler } from './application/queries/get-jeune-milo-by-dossier.query.handler'
+import { UpdateRendezVousCommandHandler } from './application/commands/update-rendez-vous.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -330,7 +331,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     DeleteJeuneCommandHandler,
     GetDetailRendezVousQueryHandler,
     GetActionsJeunePoleEmploiQueryHandler,
-    GetJeuneMiloByDossierQueryHandler
+    GetJeuneMiloByDossierQueryHandler,
+    UpdateRendezVousCommandHandler
   ]
 }
 

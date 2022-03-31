@@ -1,17 +1,28 @@
 import {
+  BadRequestException,
+  Body,
   Controller,
   Delete,
   Get,
   HttpCode,
   NotFoundException,
   Param,
-  ParseUUIDPipe
+  ParseUUIDPipe,
+  Put
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  UpdateRendezVousCommand,
+  UpdateRendezVousCommandHandler
+} from 'src/application/commands/update-rendez-vous.command.handler'
 import { GetDetailRendezVousQueryHandler } from 'src/application/queries/get-detail-rendez-vous.query.handler'
 import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
-import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+import {
+  MauvaiseCommandeError,
+  NonTrouveError
+} from 'src/building-blocks/types/domain-error'
+import { Core } from 'src/domain/core'
 import {
   DeleteRendezVousCommand,
   DeleteRendezVousCommandHandler
@@ -19,6 +30,7 @@ import {
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
+import { UpdateRendezVousPayload } from './validation/rendez-vous.inputs'
 
 @Controller('rendezvous')
 @ApiOAuth2([])
@@ -26,7 +38,8 @@ import { Utilisateur } from '../decorators/authenticated.decorator'
 export class RendezVousController {
   constructor(
     private readonly getDetailRendezVousQueryHandler: GetDetailRendezVousQueryHandler,
-    private readonly deleteRendezVousCommandHandler: DeleteRendezVousCommandHandler
+    private readonly deleteRendezVousCommandHandler: DeleteRendezVousCommandHandler,
+    private readonly updateRendezVousCommandHandler: UpdateRendezVousCommandHandler
   ) {}
 
   @Get(':idRendezVous')
@@ -71,5 +84,41 @@ export class RendezVousController {
     if (isFailure(result)) {
       throw new NotFoundException(result.error)
     }
+  }
+
+  @Put(':idRendezVous')
+  async updateRendezVous(
+    @Param('idRendezVous') idRendezVous: string,
+    @Body() updateRendezVousPayload: UpdateRendezVousPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<Core.Id> {
+    const command: UpdateRendezVousCommand = {
+      idRendezVous: idRendezVous,
+      commentaire: updateRendezVousPayload.comment,
+      date: updateRendezVousPayload.date,
+      duree: updateRendezVousPayload.duration,
+      modalite: updateRendezVousPayload.modality,
+      adresse: updateRendezVousPayload.adresse,
+      organisme: updateRendezVousPayload.organisme,
+      presenceConseiller: updateRendezVousPayload.presenceConseiller
+    }
+
+    const result = await this.updateRendezVousCommandHandler.execute(
+      command,
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      switch (result.error.code) {
+        case NonTrouveError.CODE:
+          throw new NotFoundException(result.error)
+        case MauvaiseCommandeError.CODE:
+          throw new BadRequestException(result.error)
+      }
+    }
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw new RuntimeException()
   }
 }

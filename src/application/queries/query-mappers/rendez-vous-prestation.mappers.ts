@@ -24,6 +24,7 @@ export function fromPrestationDtoToRendezVousQueryModel(
       label: mapCodeLabelTypeRendezVous[CodeTypeRendezVous.PRESTATION]
     },
     date: dateService.fromISOStringToUTCJSDate(prestation.session.dateDebut),
+    isLocaleDate: false,
     comment: prestation.session.commentaire,
     jeune: { id: jeune.id, nom: jeune.lastName, prenom: jeune.firstName },
     modality: buildModality(prestation),
