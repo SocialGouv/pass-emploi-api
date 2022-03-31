@@ -35,7 +35,7 @@ describe('GetDossierMiloJeuneQueryHandler', () => {
     it('retourne le dossier', async () => {
       // Given
       const idDossier = '1'
-      const getDetailActionQuery: GetDossierMiloJeuneQuery = {
+      const getDossierMiloJeuneQuery: GetDossierMiloJeuneQuery = {
         idDossier
       }
 
@@ -43,7 +43,7 @@ describe('GetDossierMiloJeuneQueryHandler', () => {
 
       // When
       const actual = await getDossierMiloJeuneQueryHandler.handle(
-        getDetailActionQuery
+        getDossierMiloJeuneQuery
       )
 
       // Then

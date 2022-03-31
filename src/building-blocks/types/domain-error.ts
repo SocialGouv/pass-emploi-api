@@ -73,6 +73,16 @@ export class EmailExisteDejaError implements DomainError {
   }
 }
 
+export class DossierExisteDejaError implements DomainError {
+  static CODE = 'DOSSIER_EXISTE_DEJA'
+  readonly code: string = DossierExisteDejaError.CODE
+  readonly message: string
+
+  constructor(idDossier: string) {
+    this.message = `Un compte avec l'id dossier ${idDossier} existe déjà`
+  }
+}
+
 export class ConseillerNonValide implements DomainError {
   static CODE = 'CONSEILLER_NON_VALIDE'
   readonly code: string = ConseillerNonValide.CODE
