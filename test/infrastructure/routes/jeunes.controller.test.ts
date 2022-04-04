@@ -203,7 +203,7 @@ describe('JeunesController', () => {
         })
     })
 
-    it('renvoie une 400 (Bad Request) quand le statuts est incorrect', async () => {
+    it('renvoie une 400 (Bad Request) quand le statut est incorrect', async () => {
       const echec = failure(new StatutInvalide('whatever_status'))
       createActionCommandHandler.execute.resolves(echec)
 

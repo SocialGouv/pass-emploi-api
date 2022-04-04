@@ -1,6 +1,7 @@
 import { DateTime, Duration } from 'luxon'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 import {
+  DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
@@ -157,10 +158,10 @@ export function toResumeActionsDuJeuneQueryModel(
   }
 }
 
-export function toDetailJeunQueryModel(
+export function toDetailJeuneConseillerQueryModel(
   sqlJeune: DetailJeuneRawSql
-): DetailJeuneQueryModel {
-  const jeuneQueryModel: DetailJeuneQueryModel = {
+): DetailJeuneConseillerQueryModel {
+  const jeuneQueryModel: DetailJeuneConseillerQueryModel = {
     id: sqlJeune.id,
     firstName: sqlJeune.prenom,
     lastName: sqlJeune.nom,
