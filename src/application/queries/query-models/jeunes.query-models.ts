@@ -30,7 +30,8 @@ export class DetailJeuneQueryModel {
 
   @ApiProperty()
   isActivated: boolean
-
+}
+export class DetailJeuneConseillerQueryModel extends DetailJeuneQueryModel {
   @ApiProperty({ required: false })
   lastActivity?: string
 

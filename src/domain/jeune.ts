@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 import {
+  DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
@@ -49,7 +50,7 @@ export namespace Jeune {
     ): Promise<DetailJeuneQueryModel | undefined>
     getAllQueryModelsByConseiller(
       idConseiller: string
-    ): Promise<DetailJeuneQueryModel[]>
+    ): Promise<DetailJeuneConseillerQueryModel[]>
     saveAll(jeunes: Jeune[]): Promise<void>
     creerTransferts(
       idConseillerSource: string,

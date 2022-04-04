@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Op, QueryTypes, Sequelize } from 'sequelize'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 import {
+  DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
@@ -21,7 +22,7 @@ import {
   fromSqlToDetailJeuneQueryModel,
   fromSqlToJeune,
   fromSqlToJeuneHomeQueryModel,
-  toDetailJeunQueryModel,
+  toDetailJeuneConseillerQueryModel,
   toResumeActionsDuJeuneQueryModel,
   toSqlJeune
 } from './mappers/jeunes.mappers'
@@ -137,7 +138,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
 
   async getAllQueryModelsByConseiller(
     idConseiller: string
-  ): Promise<DetailJeuneQueryModel[]> {
+  ): Promise<DetailJeuneConseillerQueryModel[]> {
     const sqlJeunes = await this.sequelize.query(
       `
           SELECT jeune.id,
@@ -164,7 +165,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
                              )
                    LEFT JOIN conseiller ON conseiller.id = transfert_conseiller.id_conseiller_source
           WHERE jeune.id_conseiller = :idConseiller
-          GROUP BY jeune.id, transfert_conseiller.id, conseiller.id
+          GROUP BY jeune.id, transfert_conseiller.id, conseiller.id, jeune.prenom, jeune.nom
           ORDER BY jeune.prenom ASC, jeune.nom ASC
       `,
       {
@@ -173,7 +174,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
       }
     )
 
-    return sqlJeunes.map(toDetailJeunQueryModel)
+    return sqlJeunes.map(toDetailJeuneConseillerQueryModel)
   }
 
   async save(jeune: Jeune): Promise<void> {

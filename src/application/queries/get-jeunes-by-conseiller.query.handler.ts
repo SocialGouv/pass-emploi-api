@@ -10,7 +10,7 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
-import { DetailJeuneQueryModel } from './query-models/jeunes.query-models'
+import { DetailJeuneConseillerQueryModel } from './query-models/jeunes.query-models'
 
 export interface GetJeunesByConseillerQuery extends Query {
   idConseiller: string
@@ -19,7 +19,7 @@ export interface GetJeunesByConseillerQuery extends Query {
 @Injectable()
 export class GetJeunesByConseillerQueryHandler extends QueryHandler<
   GetJeunesByConseillerQuery,
-  Result<DetailJeuneQueryModel[]>
+  Result<DetailJeuneConseillerQueryModel[]>
 > {
   constructor(
     @Inject(ConseillersRepositoryToken)
@@ -34,7 +34,7 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
   async handle(
     query: GetJeunesByConseillerQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<Result<DetailJeuneQueryModel[]>> {
+  ): Promise<Result<DetailJeuneConseillerQueryModel[]>> {
     const conseiller = await this.conseillersRepository.get(query.idConseiller)
     if (!conseiller) {
       return failure(new NonTrouveError('Conseiller', query.idConseiller))

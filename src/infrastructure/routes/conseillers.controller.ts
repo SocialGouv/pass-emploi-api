@@ -39,6 +39,7 @@ import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-d
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
 import {
+  DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from '../../application/queries/query-models/jeunes.query-models'
@@ -156,13 +157,13 @@ export class ConseillersController {
 
   @Get(':idConseiller/jeunes')
   @ApiResponse({
-    type: DetailJeuneQueryModel,
+    type: DetailJeuneConseillerQueryModel,
     isArray: true
   })
   async getJeunes(
     @Param('idConseiller') idConseiller: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<DetailJeuneQueryModel[]> {
+  ): Promise<DetailJeuneConseillerQueryModel[]> {
     let result
     try {
       result = await this.getJeunesByConseillerQueryHandler.execute(
