@@ -88,7 +88,7 @@ export class RendezVousController {
 
   @Put(':idRendezVous')
   async updateRendezVous(
-    @Param('idRendezVous') idRendezVous: string,
+    @Param('idRendezVous', new ParseUUIDPipe()) idRendezVous: string,
     @Body() updateRendezVousPayload: UpdateRendezVousPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<Core.Id> {
