@@ -30,10 +30,7 @@ export const uneActionQueryModelWithJeuneFromDomain = (
   jeune: {
     id: action.idJeune,
     firstName: jeune.firstName,
-    lastName: jeune.lastName,
-    email: jeune.email,
-    creationDate: jeune.creationDate.toString(),
-    isActivated: false
+    lastName: jeune.lastName
   }
 })
 
@@ -50,10 +47,7 @@ export function uneActionQueryModel(
     jeune: {
       id: '1',
       firstName: 'Damien',
-      lastName: 'Saez',
-      email: 'damien.saez@email.fr',
-      creationDate: '2021-11-10T08:03:30.000Z',
-      isActivated: true
+      lastName: 'Saez'
     },
     creatorType: Action.TypeCreateur.CONSEILLER,
     creator: 'Nils Tavernier'

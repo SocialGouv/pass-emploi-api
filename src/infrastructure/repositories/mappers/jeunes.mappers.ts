@@ -3,6 +3,7 @@ import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-j
 import {
   DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel,
+  JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
 import { Action } from 'src/domain/action'
@@ -19,13 +20,33 @@ import { ResumeActionsJeuneDto } from '../jeune-sql.repository'
 export function fromSqlToDetailJeuneQueryModel(
   jeuneSqlModel: JeuneSqlModel
 ): DetailJeuneQueryModel {
+  const depuis =
+    jeuneSqlModel.transferts!.length > 0
+      ? jeuneSqlModel.transferts![0].dateTransfert
+      : jeuneSqlModel.dateCreation
   return {
     id: jeuneSqlModel.id,
     firstName: jeuneSqlModel.prenom,
     lastName: jeuneSqlModel.nom,
     email: jeuneSqlModel.email ?? undefined,
     creationDate: jeuneSqlModel.dateCreation.toISOString(),
-    isActivated: Boolean(jeuneSqlModel.idAuthentification)
+    isActivated: Boolean(jeuneSqlModel.idAuthentification),
+    conseiller: {
+      email: jeuneSqlModel.conseiller!.email ?? undefined,
+      prenom: jeuneSqlModel.conseiller!.prenom,
+      nom: jeuneSqlModel.conseiller!.nom,
+      depuis: depuis.toISOString()
+    }
+  }
+}
+
+export function fromSqlToJeuneQueryModel(
+  jeuneSqlModel: JeuneSqlModel
+): JeuneQueryModel {
+  return {
+    id: jeuneSqlModel.id,
+    firstName: jeuneSqlModel.prenom,
+    lastName: jeuneSqlModel.nom
   }
 }
 

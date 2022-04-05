@@ -4,6 +4,7 @@ import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-j
 import {
   DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel,
+  JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
 import { DateService } from 'src/utils/date-service'
@@ -22,6 +23,7 @@ import {
   fromSqlToDetailJeuneQueryModel,
   fromSqlToJeune,
   fromSqlToJeuneHomeQueryModel,
+  fromSqlToJeuneQueryModel,
   toDetailJeuneConseillerQueryModel,
   toResumeActionsDuJeuneQueryModel,
   toSqlJeune
@@ -47,7 +49,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
 
   async existe(id: string): Promise<boolean> {
     const exists = (await this.sequelize.query(
-      `select exists(select 1 from jeune where id=:idJeune)`,
+      `select exists(select 1 from jeune where id = :idJeune)`,
       {
         replacements: { idJeune: id }
       }
@@ -75,29 +77,41 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return fromSqlToJeune(jeuneSqlModel)
   }
 
-  async getQueryModelById(
+  async getDetailJeuneQueryModelById(
     id: string
   ): Promise<DetailJeuneQueryModel | undefined> {
-    const jeuneSqlModel = await JeuneSqlModel.findByPk(id)
+    const jeuneSqlModel = await JeuneSqlModel.findByPk(id, {
+      include: [
+        ConseillerSqlModel,
+        {
+          model: TransfertConseillerSqlModel,
+          separate: true,
+          order: [['dateTransfert', 'DESC']],
+          limit: 1
+        }
+      ]
+    })
     if (!jeuneSqlModel) {
       return undefined
     }
-
     return fromSqlToDetailJeuneQueryModel(jeuneSqlModel)
   }
 
-  async getQueryModelByIdDossier(
+  async getJeuneQueryModelByIdDossier(
     idDossier: string,
     idConseiller: string
-  ): Promise<DetailJeuneQueryModel | undefined> {
+  ): Promise<JeuneQueryModel | undefined> {
     const jeuneSqlModel = await JeuneSqlModel.findOne({
-      where: { idDossier, idConseiller }
+      where: {
+        idDossier,
+        idConseiller
+      }
     })
     if (!jeuneSqlModel) {
       return undefined
     }
 
-    return fromSqlToDetailJeuneQueryModel(jeuneSqlModel)
+    return fromSqlToJeuneQueryModel(jeuneSqlModel)
   }
 
   async saveAll(jeunes: Jeune[]): Promise<void> {
@@ -241,7 +255,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
             FROM action
                      RIGHT JOIN jeune ON action.id_jeune = jeune.id
             WHERE id_conseiller = :idConseiller
-            GROUP BY jeune.id
+            GROUP BY jeune.id,jeune.nom
             ORDER BY jeune.nom
         `,
         {

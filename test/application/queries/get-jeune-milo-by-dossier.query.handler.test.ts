@@ -42,7 +42,7 @@ describe('GetJeuneMiloByDossierQueryHandler', () => {
         idDossier
       }
 
-      jeunesRepository.getQueryModelByIdDossier
+      jeunesRepository.getJeuneQueryModelByIdDossier
         .withArgs(idDossier, idConseiller)
         .resolves(unDetailJeuneQueryModel())
 
@@ -63,7 +63,7 @@ describe('GetJeuneMiloByDossierQueryHandler', () => {
         idDossier
       }
 
-      jeunesRepository.getQueryModelByIdDossier
+      jeunesRepository.getJeuneQueryModelByIdDossier
         .withArgs(idDossier, idConseiller)
         .resolves(undefined)
 

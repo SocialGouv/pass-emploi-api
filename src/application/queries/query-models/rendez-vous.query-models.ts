@@ -15,7 +15,6 @@ class JeuneQueryModel {
   @ApiProperty()
   prenom: string
 }
-
 class ConseillerQueryModel {
   @ApiProperty()
   id: string
@@ -56,7 +55,10 @@ export class RendezVousQueryModel implements RendezVousBaseQueryModel {
   @ApiProperty({
     description: Object.values(CodeTypeRendezVous)
       .map(code => {
-        return JSON.stringify({ code, label: mapCodeLabelTypeRendezVous[code] })
+        return JSON.stringify({
+          code,
+          label: mapCodeLabelTypeRendezVous[code]
+        })
       })
       .join(' | ')
   })

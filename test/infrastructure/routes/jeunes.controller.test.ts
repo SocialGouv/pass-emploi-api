@@ -38,6 +38,7 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
+import { unConseillerJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import {
   buildTestingModuleForHttpTesting,
   expect,
@@ -333,7 +334,8 @@ describe('JeunesController', () => {
         lastName: 'Tavernier',
         email: 'kenji.tavernier@email.fr',
         creationDate: 'une_date',
-        isActivated: true
+        isActivated: true,
+        conseiller: unConseillerJeuneQueryModel()
       }
       getDetailJeuneQueryHandler.execute.resolves(detailJeuneQueryModel)
 
