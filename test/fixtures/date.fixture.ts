@@ -6,3 +6,4 @@ export const uneDatetimeMoinsRecente = DateTime.fromISO(
 ).toUTC()
 
 export const uneDate = (): Date => new Date('2022-03-01T03:24:00')
+export const uneAutreDate = (): Date => new Date('2022-04-01T03:24:00')

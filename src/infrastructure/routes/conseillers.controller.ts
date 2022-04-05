@@ -41,6 +41,7 @@ import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from '../../applica
 import {
   DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel,
+  JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from '../../application/queries/query-models/jeunes.query-models'
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
@@ -216,7 +217,13 @@ export class ConseillersController {
         lastName: jeune.lastName,
         email: jeune.email,
         creationDate: jeune.creationDate.toString(),
-        isActivated: false
+        isActivated: false,
+        conseiller: {
+          depuis: new Date().toISOString(),
+          prenom: 'bah non',
+          email: 'bah non 2',
+          nom: 'bah non 3'
+        }
       }
     }
 
@@ -283,6 +290,7 @@ export class ConseillersController {
       utilisateur
     )
   }
+
   // Deprecated (Web)
   @Post(':idConseiller/jeunes/:idJeune/notify-message')
   async postNotificationDeprecated(
@@ -401,8 +409,8 @@ export class ConseillersController {
   async getJeuneMiloByDossier(
     @Param('idDossier') idDossier: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<DetailJeuneQueryModel> {
-    let result: Result<DetailJeuneQueryModel>
+  ): Promise<JeuneQueryModel> {
+    let result: Result<JeuneQueryModel>
     try {
       result = await this.getJeuneMiloByDossierQueryHandler.execute(
         { idDossier },

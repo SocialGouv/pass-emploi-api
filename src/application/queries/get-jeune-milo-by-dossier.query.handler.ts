@@ -7,7 +7,7 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
-import { DetailJeuneQueryModel } from './query-models/jeunes.query-models'
+import { JeuneQueryModel } from './query-models/jeunes.query-models'
 
 export interface GetJeuneMiloByDossierQuery extends Query {
   idDossier: string
@@ -16,7 +16,7 @@ export interface GetJeuneMiloByDossierQuery extends Query {
 @Injectable()
 export class GetJeuneMiloByDossierQueryHandler extends QueryHandler<
   GetJeuneMiloByDossierQuery,
-  Result<DetailJeuneQueryModel>
+  Result<JeuneQueryModel>
 > {
   constructor(
     @Inject(JeunesRepositoryToken)
@@ -29,8 +29,8 @@ export class GetJeuneMiloByDossierQueryHandler extends QueryHandler<
   async handle(
     query: GetJeuneMiloByDossierQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<Result<DetailJeuneQueryModel>> {
-    const jeune = await this.jeunesRepository.getQueryModelByIdDossier(
+  ): Promise<Result<JeuneQueryModel>> {
+    const jeune = await this.jeunesRepository.getJeuneQueryModelByIdDossier(
       query.idDossier,
       utilisateur.id
     )

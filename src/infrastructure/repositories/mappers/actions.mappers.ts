@@ -1,14 +1,14 @@
 import { DateTime } from 'luxon'
 import { ActionQueryModel } from 'src/application/queries/query-models/actions.query-model'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
-import { fromSqlToDetailJeuneQueryModel } from './jeunes.mappers'
+import { fromSqlToJeuneQueryModel } from './jeunes.mappers'
 
 export function fromSqlToActionQueryModelWithJeune(
   actionSqlModel: ActionSqlModel
 ): ActionQueryModel {
   return {
     ...fromSqlToActionQueryModel(actionSqlModel),
-    jeune: fromSqlToDetailJeuneQueryModel(actionSqlModel.jeune)
+    jeune: fromSqlToJeuneQueryModel(actionSqlModel.jeune)
   }
 }
 

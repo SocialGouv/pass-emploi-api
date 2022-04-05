@@ -3,6 +3,7 @@ import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-j
 import {
   DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel,
+  JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
 import { Brand } from '../building-blocks/types/brand'
@@ -41,13 +42,13 @@ export namespace Jeune {
       idConseiller: string
     ): Promise<ResumeActionsDuJeuneQueryModel[]>
     getHomeQueryModel(idJeune: string): Promise<JeuneHomeQueryModel>
-    getQueryModelById(
+    getDetailJeuneQueryModelById(
       idJeune: string
     ): Promise<DetailJeuneQueryModel | undefined>
-    getQueryModelByIdDossier(
+    getJeuneQueryModelByIdDossier(
       idDossier: string,
       idConseiller: string
-    ): Promise<DetailJeuneQueryModel | undefined>
+    ): Promise<JeuneQueryModel | undefined>
     getAllQueryModelsByConseiller(
       idConseiller: string
     ): Promise<DetailJeuneConseillerQueryModel[]>

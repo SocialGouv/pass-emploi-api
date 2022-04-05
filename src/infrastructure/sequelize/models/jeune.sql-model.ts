@@ -13,6 +13,7 @@ import { AsSql } from '../types'
 import { ActionSqlModel } from './action.sql-model'
 import { ConseillerSqlModel } from './conseiller.sql-model'
 import { RendezVousSqlModel } from './rendez-vous.sql-model'
+import { TransfertConseillerSqlModel } from './transfert-conseiller.sql-model'
 
 export class JeuneDto extends Model {
   @PrimaryKey
@@ -109,6 +110,9 @@ export class JeuneSqlModel extends JeuneDto {
 
   @HasMany(() => ActionSqlModel)
   actions!: ActionSqlModel[]
+
+  @HasMany(() => TransfertConseillerSqlModel)
+  transferts: TransfertConseillerSqlModel[]
 
   static async creer(jeuneDto: AsSql<JeuneDto>): Promise<void> {
     await JeuneSqlModel.create(jeuneDto)

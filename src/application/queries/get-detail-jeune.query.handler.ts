@@ -26,7 +26,7 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
   async handle(
     query: GetDetailJeuneQuery
   ): Promise<DetailJeuneQueryModel | undefined> {
-    return this.jeunesRepository.getQueryModelById(query.idJeune)
+    return this.jeunesRepository.getDetailJeuneQueryModelById(query.idJeune)
   }
 
   async authorize(
