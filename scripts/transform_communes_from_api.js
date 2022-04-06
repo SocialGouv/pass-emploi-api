@@ -2,12 +2,29 @@
 import { readFile, writeFile } from 'fs/promises'
 import fetch from 'node-fetch'
 
+let communesManquantesJson = []
+try {
+  communesManquantesJson = await readFile(
+    './communes_manquantes.json'
+  )
+} catch (err) {
+  console.error(err)
+  process.exit()
+}
+
+const communesManquantes = JSON.parse(communesManquantesJson);
+
+const dictionnaryCommunesManquantes = communesManquantes.reduce(
+  function(acc, currentData) {
+  acc[currentData.id] = currentData;
+  return acc;},[]);
+
 const start = new Date()
-console.log('STARTED', startTimestamp)
+console.log('STARTED', start)
 let communesJson = []
 try {
   communesJson = await readFile(
-    './src/infrastructure/sequelize/seeders/data/communes_from_api.json'
+    '../src/infrastructure/sequelize/seeders/data/communes_from_api.json'
   )
 } catch (err) {
   console.error(err)
@@ -39,8 +56,17 @@ for await (const commune of communes) {
 
   const data = await response.json()
   if (!data?.features.length) {
-    console.log('/!\\ data not ok')
-    failed++
+    console.log(commune.code + "-" + commune.codePostal);
+    const dataInCommunesManquantes = dictionnaryCommunesManquantes[commune.code + "-" + commune.codePostal];
+    console.log(dataInCommunesManquantes);
+    if (!dataInCommunesManquantes) {
+      console.log('/!\\ data not ok')
+      failed++
+      continue
+    }
+    communesReferentiel.push(dataInCommunesManquantes);
+    count++
+    console.log('...add commune manquante')
     continue
   }
 
@@ -64,10 +90,11 @@ try {
     `# Writing file : ${total} parsed${failed ? `, with ${failed} failed` : ''}`
   )
   await writeFile(
-    './src/infrastructure/sequelize/seeders/data/communes.json',
+    '../src/infrastructure/sequelize/seeders/data/communes.json',
     JSON.stringify(communesReferentiel)
   )
   console.log(`ENDED ${new Date()} (started at ${start})`)
 } catch (err) {
   console.error(err)
 }
+
