@@ -12,12 +12,10 @@ try {
   process.exit()
 }
 
-const communesManquantes = JSON.parse(communesManquantesJson);
-
-const dictionnaryCommunesManquantes = communesManquantes.reduce(
+const dictionnaryCommunesManquantes = JSON.parse(communesManquantesJson).reduce(
   function(acc, currentData) {
   acc[currentData.id] = currentData;
-  return acc;},[]);
+  return acc;},{});
 
 const start = new Date()
 console.log('STARTED', start)
@@ -56,9 +54,9 @@ for await (const commune of communes) {
 
   const data = await response.json()
   if (!data?.features.length) {
-    console.log(commune.code + "-" + commune.codePostal);
-    const dataInCommunesManquantes = dictionnaryCommunesManquantes[commune.code + "-" + commune.codePostal];
-    console.log(dataInCommunesManquantes);
+    const idCommune = commune.code + '-' + commune.codePostal
+    console.log(idCommune);
+    const dataInCommunesManquantes = dictionnaryCommunesManquantes[idCommune];
     if (!dataInCommunesManquantes) {
       console.log('/!\\ data not ok')
       failed++
