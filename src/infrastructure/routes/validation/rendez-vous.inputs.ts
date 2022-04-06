@@ -87,7 +87,6 @@ export class UpdateRendezVousPayload {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
   comment?: string
 
   @ApiProperty()
@@ -104,19 +103,16 @@ export class UpdateRendezVousPayload {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
   modality?: string
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
   adresse?: string
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
   organisme?: string
 
   @ApiProperty()
