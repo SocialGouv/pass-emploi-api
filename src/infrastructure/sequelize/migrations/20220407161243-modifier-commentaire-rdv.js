@@ -7,7 +7,7 @@ module.exports = {
         'rendez_vous',
         'commentaire',
         {
-          type: Sequelize.STRING,
+          type: Sequelize.STRING(2048),
           allowNull: true
         },
         { transaction }
