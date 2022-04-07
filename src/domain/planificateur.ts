@@ -66,7 +66,7 @@ export class PlanificateurService {
       case Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI: {
         const cron: Planificateur.Cron = {
           type: Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI,
-          expression: '0 8 * * *'
+          expression: '0 9 * * *'
         }
         await this.planificateurRepository.createCron(cron)
         break
@@ -74,7 +74,7 @@ export class PlanificateurService {
       case Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES: {
         const cron: Planificateur.Cron = {
           type: Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES,
-          expression: '0 7 * * 1-5'
+          expression: '0 8 * * 1-5'
         }
         await this.planificateurRepository.createCron(cron)
         break
@@ -82,7 +82,7 @@ export class PlanificateurService {
       case Planificateur.CronJob.NETTOYER_LES_JOBS: {
         const cron: Planificateur.Cron = {
           type: Planificateur.CronJob.NETTOYER_LES_JOBS,
-          expression: '0 3 * * *'
+          expression: '0 4 * * *'
         }
         await this.planificateurRepository.createCron(cron)
         break
