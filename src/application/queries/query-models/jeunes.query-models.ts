@@ -11,6 +11,7 @@ export class JeuneQueryModel {
   @ApiProperty()
   firstName: string
 }
+
 class ConseillerQueryModel {
   @ApiProperty({ required: false })
   email?: string
@@ -34,6 +35,23 @@ export class ConseillerJeuneQueryModel {
 
   @ApiProperty()
   depuis: string
+}
+
+export class HistoriqueConseillerJeuneQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
+  email: string | undefined
+
+  @ApiProperty()
+  nom: string
+
+  @ApiProperty()
+  prenom: string
+
+  @ApiProperty()
+  date: string
 }
 
 export class DetailJeuneQueryModel {

@@ -25,7 +25,10 @@ import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-j
 import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from 'src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
-import { DetailJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
+import {
+  DetailJeuneQueryModel,
+  HistoriqueConseillerJeuneQueryModel
+} from 'src/application/queries/query-models/jeunes.query-models'
 import {
   FavoriOffreEmploiIdQueryModel,
   OffreEmploiResumeQueryModel
@@ -50,6 +53,7 @@ import {
 } from '../../application/commands/delete-jeune.command.handler'
 import { UpdateNotificationTokenCommandHandler } from '../../application/commands/update-notification-token.command.handler'
 import { GetActionsByJeuneQueryHandler } from '../../application/queries/get-actions-by-jeune.query.handler'
+import { GetConseillersJeuneQueryHandler } from '../../application/queries/get-conseillers-jeune.query.handler'
 import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
 import { GetRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler'
 import {
@@ -100,7 +104,8 @@ export class JeunesController {
     private readonly deleteFavoriCommandHandler: DeleteFavoriOffreEmploiCommandHandler,
     private readonly transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler,
     private readonly deleteJeuneCommandHandler: DeleteJeuneCommandHandler,
-    private readonly getActionsPoleEmploiQueryHandler: GetActionsJeunePoleEmploiQueryHandler
+    private readonly getActionsPoleEmploiQueryHandler: GetActionsJeunePoleEmploiQueryHandler,
+    private readonly getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler
   ) {}
 
   @Get(':idJeune')
@@ -112,6 +117,28 @@ export class JeunesController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DetailJeuneQueryModel | undefined> {
     const queryModel = await this.getDetailJeuneQueryHandler.execute(
+      {
+        idJeune
+      },
+      utilisateur
+    )
+    if (queryModel) {
+      return queryModel
+    }
+
+    throw new HttpException(`Jeune ${idJeune} not found`, HttpStatus.NOT_FOUND)
+  }
+
+  @Get(':idJeune/conseillers')
+  @ApiResponse({
+    type: HistoriqueConseillerJeuneQueryModel,
+    isArray: true
+  })
+  async getConseillersJeune(
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<HistoriqueConseillerJeuneQueryModel[]> {
+    const queryModel = await this.getConseillersJeuneQueryHandler.execute(
       {
         idJeune
       },
@@ -183,7 +210,10 @@ export class JeunesController {
     @Headers('x-idp-token') idpToken: string
   ): Promise<ActionPoleEmploiQueryModel[]> {
     const result = await this.getActionsPoleEmploiQueryHandler.execute(
-      { idJeune, idpToken },
+      {
+        idJeune,
+        idpToken
+      },
       utilisateur
     )
     if (isSuccess(result)) {
@@ -221,7 +251,10 @@ export class JeunesController {
     let result: Result<RendezVousQueryModel[]>
     if (utilisateur.structure === Core.Structure.POLE_EMPLOI && idpToken) {
       result = await this.getRendezVousJeunePoleEmploiQueryHandler.execute(
-        { idJeune, idpToken },
+        {
+          idJeune,
+          idpToken
+        },
         utilisateur
       )
     } else {
@@ -293,7 +326,10 @@ export class JeunesController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiIdQueryModel[]> {
     return this.getFavorisOffresEmploiJeuneQueryHandler.execute(
-      { idJeune, detail: Boolean(getFavorisQuery.detail) },
+      {
+        idJeune,
+        detail: Boolean(getFavorisQuery.detail)
+      },
       utilisateur
     )
   }

@@ -50,6 +50,7 @@ import { GetActionsByJeuneQueryHandler } from './application/queries/get-actions
 import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
 import { GetCommunesEtDepartementsQueryHandler } from './application/queries/get-communes-et-departements.query.handler'
 import { GetConseillerByEmailQueryHandler } from './application/queries/get-conseiller-by-email.query.handler'
+import { GetConseillersJeuneQueryHandler } from './application/queries/get-conseillers-jeune.query.handler'
 import { GetDetailActionQueryHandler } from './application/queries/get-detail-action.query.handler'
 import { GetDetailConseillerQueryHandler } from './application/queries/get-detail-conseiller.query.handler'
 import { GetDetailJeuneQueryHandler } from './application/queries/get-detail-jeune.query.handler'
@@ -338,7 +339,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDetailRendezVousQueryHandler,
     GetActionsJeunePoleEmploiQueryHandler,
     GetJeuneMiloByDossierQueryHandler,
-    UpdateRendezVousCommandHandler
+    UpdateRendezVousCommandHandler,
+    GetConseillersJeuneQueryHandler
   ]
 }
 

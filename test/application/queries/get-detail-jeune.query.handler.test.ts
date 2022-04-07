@@ -33,7 +33,7 @@ describe('GetDetailJeuneQueryHandler', () => {
   })
 
   describe('handle', () => {
-    it('retourne un conseiller', async () => {
+    it('retourne un jeune', async () => {
       // Given
       const idJeune = 'idJeune'
       const getDetailJeuneQuery: GetDetailJeuneQuery = {
