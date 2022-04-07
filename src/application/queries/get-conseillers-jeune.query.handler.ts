@@ -1,0 +1,118 @@
+import { Injectable } from '@nestjs/common'
+import { Authentification } from 'src/domain/authentification'
+import { Query } from '../../building-blocks/types/query'
+import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
+import { TransfertConseillerSqlModel } from '../../infrastructure/sequelize/models/transfert-conseiller.sql-model'
+import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
+import { HistoriqueConseillerJeuneQueryModel } from './query-models/jeunes.query-models'
+
+export interface GetConseillersJeuneQuery extends Query {
+  idJeune: string
+}
+
+@Injectable()
+export class GetConseillersJeuneQueryHandler extends QueryHandler<
+  GetConseillersJeuneQuery,
+  HistoriqueConseillerJeuneQueryModel[] | undefined
+> {
+  constructor(
+    private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer
+  ) {
+    super('GetConseillersJeuneQueryHandler')
+  }
+
+  async handle(
+    query: GetConseillersJeuneQuery
+  ): Promise<HistoriqueConseillerJeuneQueryModel[] | undefined> {
+    const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune, {
+      include: [
+        ConseillerSqlModel,
+        {
+          model: TransfertConseillerSqlModel,
+          separate: true,
+          order: [['dateTransfert', 'DESC']],
+          include: [
+            {
+              model: ConseillerSqlModel,
+              as: 'conseillerSource'
+            },
+            {
+              model: ConseillerSqlModel,
+              as: 'conseillerCible'
+            }
+          ]
+        }
+      ]
+    })
+    if (!jeuneSqlModel) {
+      return undefined
+    }
+
+    const result: HistoriqueConseillerJeuneQueryModel[] = []
+    const ilNyAPasEuDeTransfert = !jeuneSqlModel.transferts.length
+    if (ilNyAPasEuDeTransfert) {
+      const conseillerInitial: ConseillerSqlModel = jeuneSqlModel.conseiller!
+      result.push(
+        this.buildHistoriqueConseiller(
+          conseillerInitial,
+          jeuneSqlModel.dateCreation
+        )
+      )
+    } else {
+      for (
+        let transfertIndex = 0;
+        transfertIndex < jeuneSqlModel.transferts.length;
+        transfertIndex++
+      ) {
+        const transfert = jeuneSqlModel.transferts[transfertIndex]
+        result.push(
+          this.buildHistoriqueConseiller(
+            transfert.conseillerCible,
+            transfert.dateTransfert
+          )
+        )
+        const estLeConseillerInitial =
+          transfertIndex === jeuneSqlModel.transferts.length - 1
+        if (estLeConseillerInitial) {
+          result.push(
+            this.buildHistoriqueConseiller(
+              transfert.conseillerSource,
+              jeuneSqlModel.dateCreation
+            )
+          )
+        }
+      }
+    }
+
+    return result
+  }
+
+  private buildHistoriqueConseiller(
+    conseillerSqlModel: ConseillerSqlModel,
+    date: Date
+  ): HistoriqueConseillerJeuneQueryModel {
+    return {
+      id: conseillerSqlModel.id,
+      nom: conseillerSqlModel.nom,
+      prenom: conseillerSqlModel.prenom,
+      email: conseillerSqlModel.email ?? undefined,
+      date: date.toISOString()
+    }
+  }
+
+  async authorize(
+    query: GetConseillersJeuneQuery,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    await this.conseillerForJeuneAuthorizer.authorize(
+      query.idJeune,
+      utilisateur
+    )
+  }
+
+  async monitor(): Promise<void> {
+    return
+  }
+}

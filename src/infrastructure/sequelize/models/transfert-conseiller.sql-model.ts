@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -42,6 +43,20 @@ export class TransfertConseillerDto extends Model {
   tableName: 'transfert_conseiller'
 })
 export class TransfertConseillerSqlModel extends TransfertConseillerDto {
+  @BelongsTo(() => ConseillerSqlModel, {
+    foreignKey: {
+      name: 'id_conseiller_source'
+    }
+  })
+  conseillerSource: ConseillerSqlModel
+
+  @BelongsTo(() => ConseillerSqlModel, {
+    foreignKey: {
+      name: 'id_conseiller_cible'
+    }
+  })
+  conseillerCible: ConseillerSqlModel
+
   static async creer(
     transfertConseillerDto: AsSql<TransfertConseillerDto>
   ): Promise<void> {

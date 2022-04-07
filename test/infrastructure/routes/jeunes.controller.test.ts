@@ -13,6 +13,7 @@ import {
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
 import { DeleteJeuneCommandHandler } from '../../../src/application/commands/delete-jeune.command.handler'
+import { GetConseillersJeuneQueryHandler } from '../../../src/application/queries/get-conseillers-jeune.query.handler'
 import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler'
 import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-models'
 import {
@@ -53,6 +54,7 @@ describe('JeunesController', () => {
   let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
   let deleteFavoriOffreEmploiCommandHandler: StubbedClass<DeleteFavoriOffreEmploiCommandHandler>
   let getDetailJeuneQueryHandler: StubbedClass<GetDetailJeuneQueryHandler>
+  let getConseillersJeuneQueryHandler: StubbedClass<GetConseillersJeuneQueryHandler>
   let transfererJeunesConseillerCommandHandler: StubbedClass<TransfererJeunesConseillerCommandHandler>
   let deleteJeuneCommandHandler: StubbedClass<DeleteJeuneCommandHandler>
   let app: INestApplication
@@ -70,6 +72,7 @@ describe('JeunesController', () => {
       TransfererJeunesConseillerCommandHandler
     )
     deleteJeuneCommandHandler = stubClass(DeleteJeuneCommandHandler)
+    getConseillersJeuneQueryHandler = stubClass(GetConseillersJeuneQueryHandler)
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
@@ -84,6 +87,8 @@ describe('JeunesController', () => {
       .useValue(transfererJeunesConseillerCommandHandler)
       .overrideProvider(DeleteJeuneCommandHandler)
       .useValue(deleteJeuneCommandHandler)
+      .overrideProvider(GetConseillersJeuneQueryHandler)
+      .useValue(getConseillersJeuneQueryHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -374,6 +379,52 @@ describe('JeunesController', () => {
       )
     })
     ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1')
+  })
+  describe('GET /jeunes/:idJeune/conseillers', () => {
+    const idJeune = '1'
+    it("renvoit l'historique des conseillers quand il existe", async () => {
+      // Given
+      getConseillersJeuneQueryHandler.execute.resolves([])
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/conseillers`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.OK)
+        .expect([])
+      expect(
+        getConseillersJeuneQueryHandler.execute
+      ).to.have.been.calledWithExactly(
+        {
+          idJeune
+        },
+        unUtilisateurDecode()
+      )
+    })
+    it('renvoit une 404 quand le jeune n"existe pas', async () => {
+      // Given
+      getConseillersJeuneQueryHandler.execute.resolves(undefined)
+      const expectedResponseJson = {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `Jeune ${idJeune} not found`
+      }
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/conseillers`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(expectedResponseJson)
+      expect(
+        getConseillersJeuneQueryHandler.execute
+      ).to.have.been.calledWithExactly(
+        {
+          idJeune
+        },
+        unUtilisateurDecode()
+      )
+    })
+    ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/conseillers')
   })
 
   describe('DELETE /jeunes/:idJeune', () => {
