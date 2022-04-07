@@ -142,6 +142,7 @@ import { GetActionsJeunePoleEmploiQueryHandler } from './application/queries/get
 import { GetJeuneMiloByDossierQueryHandler } from './application/queries/get-jeune-milo-by-dossier.query.handler'
 import { UpdateRendezVousCommandHandler } from './application/commands/update-rendez-vous.command.handler'
 import { InvitationIcsClient } from './infrastructure/clients/invitation-ics.client'
+import { MailClientToken } from './domain/mail'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -186,7 +187,6 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Authentification.Factory,
     WorkerService,
     TaskService,
-    MailSendinblueClient,
     InvitationIcsClient,
     {
       provide: APP_GUARD,
@@ -215,6 +215,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: ChatRepositoryToken,
       useClass: ChatFirebaseRepository
+    },
+    {
+      provide: MailClientToken,
+      useClass: MailSendinblueClient
     },
     {
       provide: RendezVousRepositoryToken,

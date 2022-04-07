@@ -26,7 +26,7 @@ import {
 } from '../../../src/application/commands/create-rendez-vous.command.handler'
 import { IdService } from '../../../src/utils/id-service'
 import { EvenementService } from 'src/domain/evenement'
-import { MailSendinblueClient } from '../../../src/infrastructure/clients/mail-sendinblue.client'
+import { Mail } from '../../../src/domain/mail'
 
 describe('CreateRendezVousCommandHandler', () => {
   DatabaseForTesting.prepare()
@@ -38,7 +38,7 @@ describe('CreateRendezVousCommandHandler', () => {
   let idService: StubbedClass<IdService>
   let createRendezVousCommandHandler: CreateRendezVousCommandHandler
   let evenementService: StubbedClass<EvenementService>
-  let mailSendinblueClient: StubbedClass<MailSendinblueClient>
+  let mailClient: StubbedType<Mail.Client>
   const jeune = unJeune()
   const rendezVous = unRendezVous({}, jeune)
 
@@ -50,17 +50,17 @@ describe('CreateRendezVousCommandHandler', () => {
     planificateurService = stubClass(PlanificateurService)
     idService = stubInterface(sandbox)
     evenementService = stubClass(EvenementService)
-    mailSendinblueClient = stubClass(MailSendinblueClient)
+    mailClient = stubInterface(sandbox)
 
     createRendezVousCommandHandler = new CreateRendezVousCommandHandler(
       idService,
       rendezVousRepository,
       jeuneRepository,
       notificationRepository,
+      mailClient,
       conseillerAuthorizer,
       planificateurService,
-      evenementService,
-      mailSendinblueClient
+      evenementService
     )
   })
 
@@ -90,7 +90,7 @@ describe('CreateRendezVousCommandHandler', () => {
             rendezVous.id
           )
         )
-        expect(mailSendinblueClient.envoyerMailNouveauRendezVous).callCount(0)
+        expect(mailClient.envoyerMailNouveauRendezVous).callCount(0)
         expect(result).to.deep.equal(
           failure(new NonTrouveError('Jeune', command.idJeune))
         )
@@ -120,7 +120,7 @@ describe('CreateRendezVousCommandHandler', () => {
             rendezVous.id
           )
         )
-        expect(mailSendinblueClient.envoyerMailNouveauRendezVous).callCount(0)
+        expect(mailClient.envoyerMailNouveauRendezVous).callCount(0)
         expect(result).to.deep.equal(
           failure(
             new JeuneNonLieAuConseillerError(
@@ -162,7 +162,7 @@ describe('CreateRendezVousCommandHandler', () => {
             )
           )
           expect(
-            mailSendinblueClient.envoyerMailNouveauRendezVous
+            mailClient.envoyerMailNouveauRendezVous
           ).to.have.been.calledWith(jeune.conseiller, expectedRendezvous)
           expect(
             planificateurService.planifierRappelsRendezVous
@@ -200,7 +200,7 @@ describe('CreateRendezVousCommandHandler', () => {
             )
           )
           expect(
-            mailSendinblueClient.envoyerMailNouveauRendezVous
+            mailClient.envoyerMailNouveauRendezVous
           ).to.have.been.calledWith(jeune.conseiller, expectedRendezvous)
         })
       })
@@ -235,7 +235,7 @@ describe('CreateRendezVousCommandHandler', () => {
               expectedRendezvous.id
             )
           )
-          expect(mailSendinblueClient.envoyerMailNouveauRendezVous).callCount(0)
+          expect(mailClient.envoyerMailNouveauRendezVous).callCount(0)
         })
       })
       describe('quand le la planification des notifications échoue', () => {
