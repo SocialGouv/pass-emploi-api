@@ -109,6 +109,16 @@ export class RendezVousQueryModel implements RendezVousBaseQueryModel {
 
   @ApiProperty({ required: false })
   conseiller?: ConseillerQueryModel
+
+  @ApiProperty({
+    required: false,
+    description: 'Créateur non existant pour les API Pôle Emploi'
+  })
+  createur?: {
+    id: string
+    nom: string
+    prenom: string
+  }
 }
 
 export class RendezVousConseillerQueryModel {

@@ -5,6 +5,7 @@ import {
 } from '../application/queries/query-models/rendez-vous.query-models'
 import { IdService } from '../utils/id-service'
 import { Jeune } from './jeune'
+import { Conseiller } from './conseiller'
 
 export const RendezVousRepositoryToken = 'RendezVous.Repository'
 
@@ -35,6 +36,12 @@ export interface TypeRendezVous {
   label: string
 }
 
+export interface Createur {
+  id: string
+  nom: string
+  prenom: string
+}
+
 export interface RendezVous {
   id: string
   titre: string
@@ -53,6 +60,7 @@ export interface RendezVous {
   organisme?: string
   presenceConseiller: boolean
   invitation?: boolean
+  createur: Createur
 }
 
 interface InfosRendezVousACreer {
@@ -90,6 +98,7 @@ export namespace RendezVous {
   export function createRendezVousConseiller(
     infosRendezVousACreer: InfosRendezVousACreer,
     jeune: Jeune,
+    conseiller: Conseiller,
     idService: IdService
   ): RendezVous {
     return {
@@ -117,7 +126,12 @@ export namespace RendezVous {
       presenceConseiller:
         infosRendezVousACreer.presenceConseiller === undefined
           ? true
-          : infosRendezVousACreer.presenceConseiller
+          : infosRendezVousACreer.presenceConseiller,
+      createur: {
+        id: conseiller.id,
+        nom: conseiller.lastName,
+        prenom: conseiller.firstName
+      }
     }
   }
 }
