@@ -5,6 +5,8 @@ import { DateTime } from 'luxon'
 import { Planificateur } from '../../domain/planificateur'
 import { DateService } from '../../utils/date-service'
 
+const CRON_TIMEZONE = 'Europe/Paris'
+
 @Injectable()
 export class PlanificateurRedisRepository implements Planificateur.Repository {
   queue: Bull.Queue
@@ -78,7 +80,7 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
   async createCron(cron: Planificateur.Cron): Promise<void> {
     await this.queue.add(cron, {
       jobId: cron.type,
-      repeat: { cron: cron.expression, tz: 'Europe/Paris' }
+      repeat: { cron: cron.expression, tz: CRON_TIMEZONE }
     })
   }
 
@@ -87,6 +89,7 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     for (const job of repeatableJobs) {
       await this.queue.removeRepeatable({
         cron: job.cron,
+        tz: CRON_TIMEZONE,
         jobId: job.id
       })
     }
