@@ -117,6 +117,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         const command: UpdateRendezVousCommand = {
           idRendezVous: rendezVous.id,
           date,
+          commentaire: rendezVous.commentaire,
           duree: rendezVous.duree,
           presenceConseiller: rendezVous.presenceConseiller,
           modalite: rendezVous.modalite,
@@ -158,6 +159,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           idRendezVous: rendezVous.id,
           date: '2021-11-11T08:03:30.000Z',
           duree: rendezVous.duree,
+          commentaire: rendezVous.commentaire,
           presenceConseiller: rendezVous.presenceConseiller,
           modalite: rendezVous.modalite,
           adresse: rendezVous.adresse,

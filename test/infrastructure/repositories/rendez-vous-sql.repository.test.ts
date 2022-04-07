@@ -153,6 +153,37 @@ describe('RendezVousRepositorySql', () => {
         expect(rdv?.id).to.equal(id)
         expect(rdv?.commentaire).to.equal(commentaire)
       })
+      it('supprime les informations du rdv', async () => {
+        //Given
+        const id = '20c8ca73-fd8b-4194-8d3c-80b6c9949dea'
+        // When
+        await rendezVousRepositorySql.save(
+          unRendezVous({
+            id,
+            commentaire: 'test',
+            modalite: 'test',
+            adresse: 'test',
+            organisme: 'test'
+          })
+        )
+        await rendezVousRepositorySql.save(
+          unRendezVous({
+            id,
+            commentaire: undefined,
+            modalite: undefined,
+            adresse: undefined,
+            organisme: undefined
+          })
+        )
+
+        // Then
+        const rdv = await RendezVousSqlModel.findByPk(id)
+        expect(rdv?.id).to.equal(id)
+        expect(rdv?.commentaire).to.equal(null)
+        expect(rdv?.modalite).to.equal(null)
+        expect(rdv?.adresse).to.equal(null)
+        expect(rdv?.organisme).to.equal(null)
+      })
     })
   })
 

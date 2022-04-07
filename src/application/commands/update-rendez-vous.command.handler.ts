@@ -58,9 +58,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
 
     const rendezVousUpdated: RendezVous = {
       ...rendezVous,
-      commentaire: command.commentaire
-        ? command.commentaire
-        : rendezVous.commentaire,
+      commentaire: command.commentaire,
       date: new Date(command.date),
       duree: command.duree,
       modalite: command.modalite,
