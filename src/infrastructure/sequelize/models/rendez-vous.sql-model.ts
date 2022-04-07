@@ -60,6 +60,13 @@ export class RendezVousDto extends Model {
 
   @Column({ field: 'invitation', type: DataType.BOOLEAN })
   invitation: boolean | null
+
+  @Column({ field: 'createur', type: DataType.JSONB })
+  createur: {
+    id: string
+    nom: string
+    prenom: string
+  }
 }
 
 @Table({ timestamps: false, tableName: 'rendez_vous' })

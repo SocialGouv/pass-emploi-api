@@ -18,6 +18,7 @@ import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
 import { IdService } from '../../utils/id-service'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { Mail, MailClientToken } from '../../domain/mail'
+import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 
 export interface CreateRendezVousCommand extends Command {
   idJeune: string
@@ -44,6 +45,8 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
+    @Inject(ConseillersRepositoryToken)
+    private conseillerRepository: Conseiller.Repository,
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,
     @Inject(MailClientToken)
@@ -68,9 +71,11 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       )
     }
 
+    const conseiller = await this.conseillerRepository.get(command.idConseiller)
     const rendezVous = RendezVous.createRendezVousConseiller(
       command,
       jeune,
+      conseiller!,
       this.idService
     )
     await this.rendezVousRepository.save(rendezVous)
