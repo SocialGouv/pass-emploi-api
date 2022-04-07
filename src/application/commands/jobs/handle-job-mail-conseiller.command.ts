@@ -9,7 +9,7 @@ import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../../domain/conseiller'
-import { MailSendinblueClient } from '../../../infrastructure/clients/mail-sendinblue.client'
+import { Mail, MailClientToken } from '../../../domain/mail'
 
 @Injectable()
 export class HandleJobMailConseillerCommandHandler extends CommandHandler<
@@ -21,7 +21,8 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
     private chatRepository: Chat.Repository,
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
-    private mailSendinblueClient: MailSendinblueClient,
+    @Inject(MailClientToken)
+    private mailClient: Mail.Client,
     private dateService: DateService,
     private configuration: ConfigService
   ) {
@@ -69,7 +70,7 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
                   )
                 } else {
                   try {
-                    await this.mailSendinblueClient.envoyerMailConversationsNonLues(
+                    await this.mailClient.envoyerMailConversationsNonLues(
                       conseiller,
                       nombreDeConversationsNonLues
                     )

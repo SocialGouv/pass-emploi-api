@@ -9,20 +9,20 @@ import { isSuccess } from '../../../../src/building-blocks/types/result'
 import { Chat } from '../../../../src/domain/chat'
 import { Conseiller } from '../../../../src/domain/conseiller'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
-import { MailSendinblueClient } from '../../../../src/infrastructure/clients/mail-sendinblue.client'
+import { Mail } from '../../../../src/domain/mail'
 
 describe('HandleJobMailConseillerCommandHandler', () => {
   let handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler
   let chatRepository: StubbedType<Chat.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
-  let mailSendinblueClient: StubbedClass<MailSendinblueClient>
+  let mailClient: StubbedType<Mail.Client>
   let dateService: StubbedClass<DateService>
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     chatRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
-    mailSendinblueClient = stubClass(MailSendinblueClient)
+    mailClient = stubInterface(sandbox)
 
     dateService = stubClass(DateService)
     dateService.now.returns(uneDatetime)
@@ -31,7 +31,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
       new HandleJobMailConseillerCommandHandler(
         chatRepository,
         conseillerRepository,
-        mailSendinblueClient,
+        mailClient,
         dateService,
         testConfig()
       )
@@ -57,11 +57,9 @@ describe('HandleJobMailConseillerCommandHandler', () => {
       const result = await handleJobMailConseillerCommandHandler.handle({})
 
       // Then
+      expect(mailClient.envoyerMailConversationsNonLues).to.have.callCount(1)
       expect(
-        mailSendinblueClient.envoyerMailConversationsNonLues
-      ).to.have.callCount(1)
-      expect(
-        mailSendinblueClient.envoyerMailConversationsNonLues
+        mailClient.envoyerMailConversationsNonLues
       ).to.have.been.calledWithExactly(conseillers[0], 1)
       expect(result._isSuccess).to.equal(true)
       if (isSuccess(result)) {
@@ -88,9 +86,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
       const result = await handleJobMailConseillerCommandHandler.handle({})
 
       // Then
-      expect(
-        mailSendinblueClient.envoyerMailConversationsNonLues
-      ).to.have.callCount(0)
+      expect(mailClient.envoyerMailConversationsNonLues).to.have.callCount(0)
       expect(result._isSuccess).to.equal(true)
       if (isSuccess(result)) {
         expect(result.data.mailsEnvoyes).to.equal(0)
@@ -111,7 +107,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
         .withArgs(conseillers[1].id)
         .resolves(1)
 
-      mailSendinblueClient.envoyerMailConversationsNonLues
+      mailClient.envoyerMailConversationsNonLues
         .withArgs(conseillers[0], 1)
         .rejects()
         .withArgs(conseillers[1], 1)

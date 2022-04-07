@@ -7,30 +7,13 @@ import {
   mapCodeLabelTypeRendezVous,
   RendezVous
 } from '../../domain/rendez-vous'
-import { MailClient } from './mail-client'
+import { Mail, MailDataDto } from '../../domain/mail'
 import { InvitationIcsClient } from './invitation-ics.client'
 
 export type ICS = string
 
-export interface MailDataDto {
-  to: RecipientDto[]
-  templateId: number
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  params?: Object
-  attachment?: AttachmentDto[]
-}
-interface RecipientDto {
-  email: string
-  name: string
-}
-
-interface AttachmentDto {
-  name: string
-  content: string
-}
-
 @Injectable()
-export class MailSendinblueClient implements MailClient {
+export class MailSendinblueClient implements Mail.Client {
   private sendinblueUrl: string
   private apiKey: string
   private templates: { conversationsNonLues: string; nouveauRendezvous: string }
@@ -122,19 +105,15 @@ export class MailSendinblueClient implements MailClient {
   }
 
   async postMail(data: MailDataDto): Promise<void> {
-    try {
-      await firstValueFrom(
-        this.httpService.post(`${this.sendinblueUrl}/v3/smtp/email`, data, {
-          headers: {
-            'api-key': `${this.apiKey}`,
-            accept: 'application/json',
-            'content-type': 'application/json'
-          }
-        })
-      )
-    } catch (e) {
-      throw e
-    }
+    await firstValueFrom(
+      this.httpService.post(`${this.sendinblueUrl}/v3/smtp/email`, data, {
+        headers: {
+          'api-key': `${this.apiKey}`,
+          accept: 'application/json',
+          'content-type': 'application/json'
+        }
+      })
+    )
   }
 }
 

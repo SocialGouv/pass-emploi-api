@@ -1,7 +1,4 @@
-import {
-  MailDataDto,
-  MailSendinblueClient
-} from '../../../src/infrastructure/clients/mail-sendinblue.client'
+import { MailSendinblueClient } from '../../../src/infrastructure/clients/mail-sendinblue.client'
 import { HttpService } from '@nestjs/axios'
 import { testConfig } from '../../utils/module-for-testing'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
@@ -11,6 +8,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitation-ics.client'
+import { MailDataDto } from '../../../src/domain/mail'
 
 describe('MailSendinblueClient', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
