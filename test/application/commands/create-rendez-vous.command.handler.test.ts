@@ -27,12 +27,15 @@ import {
 import { IdService } from '../../../src/utils/id-service'
 import { EvenementService } from 'src/domain/evenement'
 import { Mail } from '../../../src/domain/mail'
+import { Conseiller } from 'src/domain/conseiller'
+import { unConseiller } from 'test/fixtures/conseiller.fixture'
 
 describe('CreateRendezVousCommandHandler', () => {
   DatabaseForTesting.prepare()
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let notificationRepository: StubbedType<Notification.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
+  let conseillerRepository: StubbedType<Conseiller.Repository>
   let planificateurService: StubbedClass<PlanificateurService>
   const conseillerAuthorizer = stubClass(ConseillerAuthorizer)
   let idService: StubbedClass<IdService>
@@ -45,6 +48,7 @@ describe('CreateRendezVousCommandHandler', () => {
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
     rendezVousRepository = stubInterface(sandbox)
+    conseillerRepository = stubInterface(sandbox)
     notificationRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
     planificateurService = stubClass(PlanificateurService)
@@ -56,6 +60,7 @@ describe('CreateRendezVousCommandHandler', () => {
       idService,
       rendezVousRepository,
       jeuneRepository,
+      conseillerRepository,
       notificationRepository,
       mailClient,
       conseillerAuthorizer,
@@ -132,10 +137,9 @@ describe('CreateRendezVousCommandHandler', () => {
       })
     })
     describe('quand le jeune existe et est lié au bon conseiller', () => {
-      describe('quand le jeune s"est connecté au moins une fois sur l"application', () => {
+      describe("quand le jeune s'est connecté au moins une fois sur l'application", () => {
         it('crée un rendez-vous, envoie une notification au jeune, envoie un mail au conseiller et planifie', async () => {
           // Given
-          jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
           const command: CreateRendezVousCommand = {
             idJeune: jeune.id,
             idConseiller: jeune.conseiller.id,
@@ -143,13 +147,23 @@ describe('CreateRendezVousCommandHandler', () => {
             date: rendezVous.date.toDateString(),
             duree: rendezVous.duree
           }
+          jeuneRepository.get.withArgs(command.idJeune).resolves(jeune)
+
+          const conseiller = unConseiller()
+          conseillerRepository.get
+            .withArgs(command.idConseiller)
+            .resolves(conseiller)
+
           const expectedRendezvous = RendezVous.createRendezVousConseiller(
             command,
             jeune,
+            conseiller,
             idService
           )
+
           // When
           const result = await createRendezVousCommandHandler.handle(command)
+
           // Then
           expect(result).to.deep.equal(success(expectedRendezvous.id))
           expect(rendezVousRepository.save).to.have.been.calledWith(
@@ -181,9 +195,14 @@ describe('CreateRendezVousCommandHandler', () => {
             date: rendezVous.date.toDateString(),
             duree: rendezVous.duree
           }
+          const conseiller = unConseiller()
+          conseillerRepository.get
+            .withArgs(command.idConseiller)
+            .resolves(conseiller)
           const expectedRendezvous = RendezVous.createRendezVousConseiller(
             command,
             jeune,
+            conseiller,
             idService
           )
           // When
@@ -204,7 +223,7 @@ describe('CreateRendezVousCommandHandler', () => {
           ).to.have.been.calledWith(jeune.conseiller, expectedRendezvous)
         })
       })
-      describe('quand le conseiller du jeune n"a pas d"email', () => {
+      describe("quand le conseiller du jeune n'a pas d'email", () => {
         it('crée un rendez-vous sans envoyer un mail au conseiller', async () => {
           // Given
           jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
@@ -217,9 +236,15 @@ describe('CreateRendezVousCommandHandler', () => {
             date: rendezVous.date.toDateString(),
             duree: rendezVous.duree
           }
+          const conseiller = unConseiller()
+          conseillerRepository.get
+            .withArgs(command.idConseiller)
+            .resolves(conseiller)
+
           const expectedRendezvous = RendezVous.createRendezVousConseiller(
             command,
             jeune,
+            conseiller,
             idService
           )
           // When
@@ -250,10 +275,15 @@ describe('CreateRendezVousCommandHandler', () => {
             date: rendezVous.date.toDateString(),
             duree: rendezVous.duree
           }
+          const conseiller = unConseiller()
+          conseillerRepository.get
+            .withArgs(command.idConseiller)
+            .resolves(conseiller)
           planificateurService.planifierRappelsRendezVous.rejects(new Error())
           const expectedRendezvous = RendezVous.createRendezVousConseiller(
             command,
             jeune,
+            conseiller,
             idService
           )
           // When

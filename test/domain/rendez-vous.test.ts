@@ -1,5 +1,6 @@
 import { CodeTypeRendezVous, RendezVous } from 'src/domain/rendez-vous'
 import { IdService } from 'src/utils/id-service'
+import { unConseiller } from 'test/fixtures/conseiller.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { expect, stubClass } from '../utils'
@@ -18,11 +19,13 @@ describe('Rendez-vous', () => {
       date: uneDatetime.toJSDate().toISOString(),
       duree: 10
     }
+    const conseiller = unConseiller()
 
     // When
     const rendezVous = RendezVous.createRendezVousConseiller(
       infosRdv,
       unJeune(),
+      conseiller,
       idService
     )
 
@@ -37,6 +40,13 @@ describe('Rendez-vous', () => {
     })
     it('renvoie un rdv avec presenceConseiller par défaut', async () => {
       expect(rendezVous.presenceConseiller).to.equal(true)
+    })
+    it('renvoie un rdv avec le bon créateur', async () => {
+      expect(rendezVous.createur).to.deep.equal({
+        id: conseiller.id,
+        nom: conseiller.lastName,
+        prenom: conseiller.firstName
+      })
     })
   })
 })

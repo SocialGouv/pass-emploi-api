@@ -116,6 +116,7 @@ describe('RendezVousRepositorySql', () => {
         // Then
         expect(rendezVous?.id).to.equal(unRendezVous.id)
         expect(rendezVous?.jeune.id).to.equal(jeune.id)
+        expect(rendezVous?.createur).to.deep.equal(unRendezVous.createur)
       })
     })
   })
