@@ -192,13 +192,12 @@ export class ConseillersController {
 
   @Post('pole-emploi/jeunes')
   @ApiResponse({
-    type: DetailJeuneQueryModel,
-    isArray: true
+    type: JeuneQueryModel
   })
   async createJeunePoleEmploi(
     @Body() createJeunePayload: CreateJeunePoleEmploiPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<DetailJeuneQueryModel> {
+  ): Promise<JeuneQueryModel> {
     const result = await this.creerJeunePoleEmploiCommandHandler.execute(
       {
         ...createJeunePayload
@@ -214,16 +213,7 @@ export class ConseillersController {
       return {
         id: jeune.id,
         firstName: jeune.firstName,
-        lastName: jeune.lastName,
-        email: jeune.email,
-        creationDate: jeune.creationDate.toString(),
-        isActivated: false,
-        conseiller: {
-          depuis: new Date().toISOString(),
-          prenom: 'bah non',
-          email: 'bah non 2',
-          nom: 'bah non 3'
-        }
+        lastName: jeune.lastName
       }
     }
 
