@@ -1,11 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import * as APM from 'elastic-apm-node'
-import admin from 'firebase-admin'
+import admin, { firestore } from 'firebase-admin'
 import { getMessaging, TokenMessage } from 'firebase-admin/messaging'
 import { Authentification } from '../../domain/authentification'
 import { getAPMInstance } from '../monitoring/apm.init'
 import Type = Authentification.Type
+import Timestamp = firestore.Timestamp
 
 export interface IFirebaseClient {
   send(tokenMessage: TokenMessage): Promise<void>
@@ -120,6 +121,17 @@ export class FirebaseClient implements IFirebaseClient {
             t.update(conversations.doc(conversationCible.id), {
               conseillerId: conseillerCibleId
             })
+            t.set(
+              conversations
+                .doc(conversationCible.id)
+                .collection('messages')
+                .doc(),
+              {
+                sentBy: 'conseiller',
+                type: 'NOUVEAU_CONSEILLER',
+                creationDate: Timestamp.fromDate(new Date())
+              }
+            )
           }
         }
       })
