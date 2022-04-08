@@ -25,7 +25,12 @@ export const unRendezVous = (
     type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
     presenceConseiller: true,
     adresse: undefined,
-    organisme: undefined
+    organisme: undefined,
+    createur: {
+      id: '1',
+      nom: 'Tavernier',
+      prenom: 'Nils'
+    }
   }
   return { ...defaults, ...args }
 }

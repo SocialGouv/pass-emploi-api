@@ -24,7 +24,8 @@ export function unRendezVousDto(
     organisme: null,
     presenceConseiller: true,
     invitation: null,
-    icsSequence: null
+    icsSequence: null,
+    createur: { id: '1', nom: 'Tavernier', prenom: 'Nils' }
   }
 
   return { ...defaults, ...args }
