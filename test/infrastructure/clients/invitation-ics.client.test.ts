@@ -10,14 +10,19 @@ import { DatabaseForTesting, expect } from '../../utils'
 import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitation-ics.client'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
+import { testConfig } from '../../utils/module-for-testing'
 
 describe('InvitationIcsClient', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
   let invitationIcsClient: InvitationIcsClient
+  const config = testConfig()
   let jeune: Jeune
 
   beforeEach(async () => {
-    invitationIcsClient = new InvitationIcsClient(databaseForTesting.sequelize)
+    invitationIcsClient = new InvitationIcsClient(
+      databaseForTesting.sequelize,
+      config
+    )
 
     // Given
     jeune = unJeune()
@@ -86,17 +91,18 @@ describe('InvitationIcsClient', () => {
           {
             name: 'Doe John',
             role: 'REQ-PARTICIPANT',
+            email: 'john.doe@plop.io',
             rsvp: true
           }
         ],
         description:
-          "Création d'un nouveau rendez-vous\nVous avez créé un rendez-vous de type Activités extérieures pour le jeudi 11 novembre 2021 à 08h03 .\nPour l'intégrer à votre agenda, vous devez accepter cette invitation.Attention, les modifications et refus effectués directement dans votre agenda ne sont pas pris en compte dans votre portail CEJ.\nBonne journée",
+          "Création d'un nouveau rendez-vous\nVous avez créé un rendez-vous de type Activités extérieures pour le jeudi 11 novembre 2021 à 09h03 .\nPour l'intégrer à votre agenda, vous devez accepter cette invitation.Attention, les modifications et refus effectués directement dans votre agenda ne sont pas pris en compte dans votre portail CEJ.\nBonne journée",
         duration: {
           minutes: 30
         },
         method: 'REQUEST',
         organizer: {
-          email: 'nils.tavernier@passemploi.com',
+          email: 'pass.emploi.contact@gmail.com',
           name: 'Tavernier Nils'
         },
         sequence: 0,

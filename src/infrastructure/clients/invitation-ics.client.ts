@@ -13,12 +13,19 @@ import {
   ICS
 } from './mail-sendinblue.client'
 import { EventAttributes } from 'ics'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class InvitationIcsClient {
+  private passEmploiContactEmail: string
+
   constructor(
-    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
-  ) {}
+    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
+    private configService: ConfigService
+  ) {
+    this.passEmploiContactEmail =
+      this.configService.get('passEmploiContactEmail') ?? ''
+  }
   async getAndIncrementRendezVousIcsSequence(
     idRendezVous: string
   ): Promise<number> {
@@ -93,7 +100,7 @@ export class InvitationIcsClient {
       duration: { minutes: rendezVous.duree },
       organizer: {
         name: conseiller.lastName + ' ' + conseiller.firstName,
-        email: conseiller.email
+        email: this.passEmploiContactEmail
       },
       method: 'REQUEST',
       attendees: [
@@ -105,6 +112,7 @@ export class InvitationIcsClient {
         },
         {
           name: rendezVous.jeune.lastName + ' ' + rendezVous.jeune.firstName,
+          email: rendezVous.jeune.email,
           rsvp: true,
           role: 'REQ-PARTICIPANT'
         }
