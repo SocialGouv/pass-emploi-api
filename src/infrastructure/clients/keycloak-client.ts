@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios'
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
 
@@ -31,13 +31,24 @@ export class KeycloakClient {
       requested_issuer: 'pe-jeune'
     }
     const headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
-    const result: TokenExchangeResponse = (
-      await firstValueFrom(
-        this.httpService.post(url, new URLSearchParams(payload), { headers })
-      )
-    ).data
-    this.logger.log('Token exchange success', { expires_in: result.expires_in })
-    return result.access_token
+    try {
+      const result: TokenExchangeResponse = (
+        await firstValueFrom(
+          this.httpService.post(url, new URLSearchParams(payload), { headers })
+        )
+      ).data
+      this.logger.log('Token exchange success', {
+        expires_in: result.expires_in
+      })
+      return result.access_token
+    } catch (e) {
+      this.logger.error('erreur lors du token exchange', e)
+      throw new UnauthorizedException({
+        statusCode: 401,
+        message: 'Unauthorized',
+        code: 'token_pole_emploi_expired'
+      })
+    }
   }
 }
 
