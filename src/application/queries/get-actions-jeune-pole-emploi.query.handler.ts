@@ -11,6 +11,7 @@ import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
 import {
   DemarcheDto,
   PoleEmploiPartenaireClient
@@ -21,7 +22,7 @@ import { ActionPoleEmploiQueryModel } from './query-models/actions.query-model'
 
 export interface GetActionsJeunePoleEmploiQuery extends Query {
   idJeune: string
-  idpToken: string
+  accessToken: string
 }
 
 @Injectable()
@@ -35,7 +36,8 @@ export class GetActionsJeunePoleEmploiQueryHandler extends QueryHandler<
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer,
     private idService: IdService,
-    private dateService: DateService
+    private dateService: DateService,
+    private keycloakClient: KeycloakClient
   ) {
     super('GetActionsJeunePoleEmploiQueryHandler')
   }
@@ -47,10 +49,13 @@ export class GetActionsJeunePoleEmploiQueryHandler extends QueryHandler<
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
+    const idpToken = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
+      query.accessToken
+    )
 
     try {
       const responseDemarches =
-        await this.poleEmploiPartenaireClient.getDemarches(query.idpToken)
+        await this.poleEmploiPartenaireClient.getDemarches(idpToken)
 
       const demarchesDto: DemarcheDto[] = responseDemarches?.data ?? []
 

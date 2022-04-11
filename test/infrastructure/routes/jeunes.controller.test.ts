@@ -13,6 +13,7 @@ import {
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
 import { DeleteJeuneCommandHandler } from '../../../src/application/commands/delete-jeune.command.handler'
+import { GetActionsJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-actions-jeune-pole-emploi.query.handler'
 import { GetConseillersJeuneQueryHandler } from '../../../src/application/queries/get-conseillers-jeune.query.handler'
 import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
@@ -64,6 +65,7 @@ describe('JeunesController', () => {
   let deleteJeuneCommandHandler: StubbedClass<DeleteJeuneCommandHandler>
   let getRendezVousJeuneQueryHandler: StubbedClass<GetRendezVousJeuneQueryHandler>
   let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
+  let getActionsPoleEmploiQueryHandler: StubbedClass<GetActionsJeunePoleEmploiQueryHandler>
   let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
@@ -85,6 +87,9 @@ describe('JeunesController', () => {
       GetRendezVousJeunePoleEmploiQueryHandler
     )
     getRendezVousJeuneQueryHandler = stubClass(GetRendezVousJeuneQueryHandler)
+    getActionsPoleEmploiQueryHandler = stubClass(
+      GetActionsJeunePoleEmploiQueryHandler
+    )
     jwtService = stubClass(JwtService)
 
     const testingModule = await buildTestingModuleForHttpTesting()
@@ -106,6 +111,8 @@ describe('JeunesController', () => {
       .useValue(getRendezVousJeuneQueryHandler)
       .overrideProvider(GetRendezVousJeunePoleEmploiQueryHandler)
       .useValue(getRendezVousJeunePoleEmploiQueryHandler)
+      .overrideProvider(GetActionsJeunePoleEmploiQueryHandler)
+      .useValue(getActionsPoleEmploiQueryHandler)
       .overrideProvider(JwtService)
       .useValue(jwtService)
       .compile()
@@ -613,5 +620,42 @@ describe('JeunesController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/rendezvous')
+  })
+
+  describe('GET /jeunes/:idJeune/pole-emploi/actions', () => {
+    const idJeune = '1'
+    it('renvoit une 404 quand le jeune n"existe pas', async () => {
+      // Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
+      getActionsPoleEmploiQueryHandler.execute.resolves(
+        failure(new NonTrouveError('Jeune', '1'))
+      )
+      const expectedResponseJson = {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `Jeune ${idJeune} non trouvé(e)`
+      }
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/pole-emploi/actions`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(expectedResponseJson)
+    })
+    it('retourne les rdv', async () => {
+      // Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
+      getActionsPoleEmploiQueryHandler.execute.resolves(success([]))
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/pole-emploi/actions`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect([])
+    })
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/jeunes/1/pole-emploi/actions'
+    )
   })
 })
