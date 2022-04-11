@@ -36,6 +36,7 @@ export default () => {
     nodeEnv: process.env.NODE_ENV || 'production',
     frontEndUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
     passEmploiContactEmail:  process.env.PASS_EMPLOI_CONTACT_EMAIL || 'pass.emploi.contact@gmail.com',
+    firebaseCryptKey: process.env.FIREBASE_CRYPT_KEY || '',
     baseUrl,
     poleEmploi: {
       url:

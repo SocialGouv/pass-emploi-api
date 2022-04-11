@@ -7,6 +7,7 @@ import { Authentification } from '../../domain/authentification'
 import { getAPMInstance } from '../monitoring/apm.init'
 import Type = Authentification.Type
 import Timestamp = firestore.Timestamp
+import { ChatCrypto } from '../../utils/chat-crypto'
 
 export interface IFirebaseClient {
   send(tokenMessage: TokenMessage): Promise<void>
@@ -30,7 +31,10 @@ export class FirebaseClient implements IFirebaseClient {
   private logger: Logger
   private apmService: APM.Agent
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    private readonly chatCrypto: ChatCrypto
+  ) {
     const firebase = this.configService.get('firebase.key')
     this.app = FirebaseClient.getApp(firebase)
     this.logger = new Logger('FirebaseClient')
@@ -106,6 +110,9 @@ export class FirebaseClient implements IFirebaseClient {
     conseillerCibleId: string,
     jeuneIds: string[]
   ): Promise<void> {
+    const messageTransfertChat =
+      'Vous échangez avec votre nouveau conseiller.\n Il a accès à l’historique de vos échanges'
+    const messageCrypte = this.chatCrypto.encrypt(messageTransfertChat)
     try {
       await this.firestore.runTransaction(async t => {
         const conversations = this.firestore.collection(FIREBASE_CHAT_PATH)
@@ -128,7 +135,10 @@ export class FirebaseClient implements IFirebaseClient {
                 .doc(),
               {
                 sentBy: 'conseiller',
+                conseillerId: conseillerCibleId,
                 type: 'NOUVEAU_CONSEILLER',
+                content: messageCrypte.encryptedText,
+                iv: messageCrypte.iv,
                 creationDate: Timestamp.fromDate(new Date())
               }
             )
