@@ -75,7 +75,7 @@ import {
 } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
 import { Authentification } from '../../domain/authentification'
-import { Utilisateur } from '../decorators/authenticated.decorator'
+import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { CreateActionAvecStatutPayload } from './validation/conseillers.inputs'
 import {
   AddFavoriOffresEmploiPayload,
@@ -234,11 +234,6 @@ export class JeunesController {
   }
 
   @Get(':idJeune/rendezvous')
-  @ApiHeader({
-    name: 'x-idp-token',
-    description: 'Token Pole Emploi du Jeune',
-    required: false
-  })
   @ApiResponse({
     type: RendezVousQueryModel,
     isArray: true
@@ -246,14 +241,14 @@ export class JeunesController {
   async getRendezVous(
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @Headers('x-idp-token') idpToken?: string
+    @AccessToken() accessToken: string
   ): Promise<RendezVousQueryModel[]> {
     let result: Result<RendezVousQueryModel[]>
-    if (utilisateur.structure === Core.Structure.POLE_EMPLOI && idpToken) {
+    if (utilisateur.structure === Core.Structure.POLE_EMPLOI && accessToken) {
       result = await this.getRendezVousJeunePoleEmploiQueryHandler.execute(
         {
           idJeune,
-          idpToken
+          accessToken
         },
         utilisateur
       )

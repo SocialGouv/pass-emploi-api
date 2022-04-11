@@ -103,6 +103,7 @@ import { OidcAuthGuard } from './infrastructure/auth/oidc.auth-guard'
 import { EngagementClient } from './infrastructure/clients/engagement-client'
 import { FirebaseClient } from './infrastructure/clients/firebase-client'
 import { ImmersionClient } from './infrastructure/clients/immersion-client'
+import { KeycloakClient } from './infrastructure/clients/keycloak-client'
 import { MailSendinblueClient } from './infrastructure/clients/mail-sendinblue.client'
 import { PoleEmploiClient } from './infrastructure/clients/pole-emploi-client'
 import { ActionSqlRepository } from './infrastructure/repositories/action-sql.repository'
@@ -189,6 +190,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     WorkerService,
     TaskService,
     InvitationIcsClient,
+    KeycloakClient,
     {
       provide: APP_GUARD,
       useClass: OidcAuthGuard

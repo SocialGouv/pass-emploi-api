@@ -15,6 +15,8 @@ import {
 import { DeleteJeuneCommandHandler } from '../../../src/application/commands/delete-jeune.command.handler'
 import { GetConseillersJeuneQueryHandler } from '../../../src/application/queries/get-conseillers-jeune.query.handler'
 import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler'
+import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
+import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune.query.handler'
 import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-models'
 import {
   DomainError,
@@ -31,10 +33,13 @@ import {
   success
 } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action'
+import { JwtService } from '../../../src/infrastructure/auth/jwt.service'
 import { CreateActionAvecStatutPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
 import { AddFavoriOffresEmploiPayload } from '../../../src/infrastructure/routes/validation/favoris.inputs'
 import {
   unHeaderAuthorization,
+  unJwtPayloadValide,
+  unJwtPayloadValideJeunePE,
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
@@ -57,6 +62,9 @@ describe('JeunesController', () => {
   let getConseillersJeuneQueryHandler: StubbedClass<GetConseillersJeuneQueryHandler>
   let transfererJeunesConseillerCommandHandler: StubbedClass<TransfererJeunesConseillerCommandHandler>
   let deleteJeuneCommandHandler: StubbedClass<DeleteJeuneCommandHandler>
+  let getRendezVousJeuneQueryHandler: StubbedClass<GetRendezVousJeuneQueryHandler>
+  let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
+  let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
   before(async () => {
@@ -73,6 +81,11 @@ describe('JeunesController', () => {
     )
     deleteJeuneCommandHandler = stubClass(DeleteJeuneCommandHandler)
     getConseillersJeuneQueryHandler = stubClass(GetConseillersJeuneQueryHandler)
+    getRendezVousJeunePoleEmploiQueryHandler = stubClass(
+      GetRendezVousJeunePoleEmploiQueryHandler
+    )
+    getRendezVousJeuneQueryHandler = stubClass(GetRendezVousJeuneQueryHandler)
+    jwtService = stubClass(JwtService)
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
@@ -89,11 +102,21 @@ describe('JeunesController', () => {
       .useValue(deleteJeuneCommandHandler)
       .overrideProvider(GetConseillersJeuneQueryHandler)
       .useValue(getConseillersJeuneQueryHandler)
+      .overrideProvider(GetRendezVousJeuneQueryHandler)
+      .useValue(getRendezVousJeuneQueryHandler)
+      .overrideProvider(GetRendezVousJeunePoleEmploiQueryHandler)
+      .useValue(getRendezVousJeunePoleEmploiQueryHandler)
+      .overrideProvider(JwtService)
+      .useValue(jwtService)
       .compile()
 
     app = testingModule.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
     await app.init()
+  })
+
+  beforeEach(() => {
+    jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
   })
 
   after(async () => {
@@ -380,6 +403,7 @@ describe('JeunesController', () => {
     })
     ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1')
   })
+
   describe('GET /jeunes/:idJeune/conseillers', () => {
     const idJeune = '1'
     it("renvoit l'historique des conseillers quand il existe", async () => {
@@ -522,5 +546,72 @@ describe('JeunesController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('delete', '/jeunes/whatever')
+  })
+
+  describe('GET /jeunes/:idJeune/rendez-vous', () => {
+    const idJeune = '1'
+    describe("quand c'est un jeune pole-emploi", () => {
+      it('renvoit une 404 quand le jeune n"existe pas', async () => {
+        // Given
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
+        getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(
+          failure(new NonTrouveError('Jeune', '1'))
+        )
+        const expectedResponseJson = {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: `Jeune ${idJeune} non trouvé(e)`
+        }
+        // When
+        await request(app.getHttpServer())
+          .get(`/jeunes/${idJeune}/rendezvous`)
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect(expectedResponseJson)
+      })
+      it('retourne les rdv', async () => {
+        // Given
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
+        getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(success([]))
+
+        // When
+        await request(app.getHttpServer())
+          .get(`/jeunes/${idJeune}/rendezvous`)
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect([])
+      })
+    })
+
+    describe("quand ce n'est un jeune pole-emploi", () => {
+      it('renvoit une 404 quand le jeune n"existe pas', async () => {
+        // Given
+        getRendezVousJeuneQueryHandler.execute.resolves(
+          failure(new NonTrouveError('Jeune', '1'))
+        )
+        const expectedResponseJson = {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: `Jeune ${idJeune} non trouvé(e)`
+        }
+        // When
+        await request(app.getHttpServer())
+          .get(`/jeunes/${idJeune}/rendezvous`)
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect(expectedResponseJson)
+      })
+      it('retourne les rdv', async () => {
+        // Given
+        getRendezVousJeuneQueryHandler.execute.resolves(success([]))
+
+        // When
+        await request(app.getHttpServer())
+          .get(`/jeunes/${idJeune}/rendezvous`)
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect([])
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/rendezvous')
   })
 })
