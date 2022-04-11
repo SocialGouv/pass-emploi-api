@@ -65,6 +65,13 @@ export abstract class QueryHandler<Q extends Query | void, QM> {
     result: Result,
     utilisateur?: Authentification.Utilisateur
   ): void {
+    /* eslint-disable @typescript-eslint/ban-ts-comment */
+    // @ts-ignore
+    if (query.accessToken) {
+      /* eslint-disable @typescript-eslint/ban-ts-comment */
+      // @ts-ignore
+      query.accessToken = '[REDACTED]'
+    }
     const event = new LogEvent(LogEventKey.QUERY_EVENT, {
       handler: this.queryName,
       query,

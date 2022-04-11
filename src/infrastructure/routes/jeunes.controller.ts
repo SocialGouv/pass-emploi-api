@@ -4,7 +4,6 @@ import {
   Delete,
   ForbiddenException,
   Get,
-  Headers,
   HttpCode,
   HttpException,
   HttpStatus,
@@ -15,7 +14,7 @@ import {
   Query
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiHeader, ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   TransfererJeunesConseillerCommand,
   TransfererJeunesConseillerCommandHandler
@@ -195,11 +194,6 @@ export class JeunesController {
   }
 
   @Get(':idJeune/pole-emploi/actions')
-  @ApiHeader({
-    name: 'x-idp-token',
-    description: 'Token Pole Emploi du Jeune',
-    required: true
-  })
   @ApiResponse({
     type: ActionPoleEmploiQueryModel,
     isArray: true
@@ -207,12 +201,12 @@ export class JeunesController {
   async getActionsPoleEmploi(
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @Headers('x-idp-token') idpToken: string
+    @AccessToken() accessToken: string
   ): Promise<ActionPoleEmploiQueryModel[]> {
     const result = await this.getActionsPoleEmploiQueryHandler.execute(
       {
         idJeune,
-        idpToken
+        accessToken
       },
       utilisateur
     )

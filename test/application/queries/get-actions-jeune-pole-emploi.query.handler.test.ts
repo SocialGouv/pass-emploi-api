@@ -11,6 +11,7 @@ import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { failure } from '../../../src/building-blocks/types/result'
 import { Jeune } from '../../../src/domain/jeune'
+import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client'
 import {
   DemarcheDto,
   PoleEmploiPartenaireClient
@@ -27,8 +28,10 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
   let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
   let getActionsJeunePoleEmploiQueryHandler: GetActionsJeunePoleEmploiQueryHandler
+  let keycloakClient: StubbedClass<KeycloakClient>
   let sandbox: SinonSandbox
   const stringUTC = '2020-04-06T10:20:00.000Z'
+  const idpToken = 'idpToken'
 
   before(() => {
     sandbox = createSandbox()
@@ -40,6 +43,8 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
     idService.uuid.returns('random-id')
     dateService.nowJs.returns(new Date())
     dateService.fromISOStringToUTCJSDate.returns(new Date(stringUTC))
+    keycloakClient = stubClass(KeycloakClient)
+    keycloakClient.exchangeTokenPoleEmploiJeune.resolves(idpToken)
 
     getActionsJeunePoleEmploiQueryHandler =
       new GetActionsJeunePoleEmploiQueryHandler(
@@ -47,7 +52,8 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
         poleEmploiPartenaireClient,
         jeunePoleEmploiAuthorizer,
         idService,
-        dateService
+        dateService,
+        keycloakClient
       )
   })
 
@@ -156,7 +162,7 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
     describe('quand le jeune existe', () => {
       const query: GetActionsJeunePoleEmploiQuery = {
         idJeune: '1',
-        idpToken: 'token'
+        accessToken: 'token'
       }
       const jeune = unJeune()
 
@@ -258,7 +264,7 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
         it('récupère les demarches Pole Emploi du jeune bien triés', async () => {
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getDemarches
-            .withArgs(query.idpToken)
+            .withArgs(idpToken)
             .resolves(axiosResponse)
 
           // When
@@ -326,7 +332,7 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
           // Given
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getDemarches
-            .withArgs(query.idpToken)
+            .withArgs(idpToken)
             .throws({ response: { data: {} } })
 
           // When
@@ -345,7 +351,7 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
         // Given
         const query: GetActionsJeunePoleEmploiQuery = {
           idJeune: '1',
-          idpToken: 'token'
+          accessToken: 'token'
         }
 
         jeunesRepository.get.withArgs(query.idJeune).resolves(undefined)
@@ -365,7 +371,7 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
       // Given
       const query: GetActionsJeunePoleEmploiQuery = {
         idJeune: 'ABCDE',
-        idpToken: 'token'
+        accessToken: 'token'
       }
       const utilisateur = unUtilisateurJeune()
 
