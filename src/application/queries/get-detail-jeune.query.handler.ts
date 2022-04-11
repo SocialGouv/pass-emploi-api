@@ -4,6 +4,7 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
+import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { DetailJeuneQueryModel } from './query-models/jeunes.query-models'
 
 export interface GetDetailJeuneQuery extends Query {
@@ -18,7 +19,8 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
   constructor(
     @Inject(JeunesRepositoryToken)
     private jeunesRepository: Jeune.Repository,
-    private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer
+    private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer,
+    private jeuneAuthorizer: JeuneAuthorizer
   ) {
     super('GetDetailJeuneQueryHandler')
   }
@@ -33,10 +35,14 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
     query: GetDetailJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    await this.conseillerForJeuneAuthorizer.authorize(
-      query.idJeune,
-      utilisateur
-    )
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      await this.conseillerForJeuneAuthorizer.authorize(
+        query.idJeune,
+        utilisateur
+      )
+    } else {
+      await this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    }
   }
 
   async monitor(): Promise<void> {
