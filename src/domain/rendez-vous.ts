@@ -52,7 +52,12 @@ export interface RendezVous {
   duree: number
   jeune: Pick<
     Jeune,
-    'id' | 'firstName' | 'lastName' | 'conseiller' | 'pushNotificationToken'
+    | 'id'
+    | 'firstName'
+    | 'lastName'
+    | 'conseiller'
+    | 'pushNotificationToken'
+    | 'email'
   >
   type: CodeTypeRendezVous
   precision?: string
@@ -112,7 +117,8 @@ export namespace RendezVous {
         firstName: jeune.firstName,
         lastName: jeune.lastName,
         conseiller: jeune.conseiller,
-        pushNotificationToken: jeune.pushNotificationToken
+        pushNotificationToken: jeune.pushNotificationToken,
+        email: jeune.email
       },
       sousTitre: `avec ${jeune.conseiller!.firstName}`,
       titre: 'Rendez-vous conseiller',

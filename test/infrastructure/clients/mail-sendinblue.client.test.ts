@@ -18,7 +18,10 @@ describe('MailSendinblueClient', () => {
 
   beforeEach(() => {
     const httpService = new HttpService()
-    invitationIcsClient = new InvitationIcsClient(databaseForTesting.sequelize)
+    invitationIcsClient = new InvitationIcsClient(
+      databaseForTesting.sequelize,
+      config
+    )
     mailSendinblueClient = new MailSendinblueClient(
       invitationIcsClient,
       httpService,
@@ -91,7 +94,7 @@ describe('MailSendinblueClient', () => {
         ],
         params: {
           dateRdv: 'jeudi 11 novembre 2021',
-          heureRdv: '08h03',
+          heureRdv: '09h03',
           lienPortail: 'http://frontend.com',
           typeRdv: 'Entretien individuel conseiller'
         },

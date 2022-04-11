@@ -123,7 +123,7 @@ export function formaterDateRendezVous(rendezVousDate: Date): string {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-    timeZone: 'UTC'
+    timeZone: 'Europe/Paris'
   }
   return rendezVousDate.toLocaleString('fr-FR', dateOptions)
 }
@@ -133,7 +133,7 @@ export function formaterHeureRendezVous(rendezVousDate: Date): string {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
-    timeZone: 'UTC'
+    timeZone: 'Europe/Paris'
   }
   return rendezVousDate.toLocaleString('fr-FR', timeOptions).replace(':', 'h')
 }

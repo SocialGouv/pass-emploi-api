@@ -35,6 +35,7 @@ export default () => {
     logLevel: process.env.LOG_LEVEL,
     nodeEnv: process.env.NODE_ENV || 'production',
     frontEndUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+    passEmploiContactEmail:  process.env.PASS_EMPLOI_CONTACT_EMAIL || 'pass.emploi.contact@gmail.com',
     baseUrl,
     poleEmploi: {
       url:
