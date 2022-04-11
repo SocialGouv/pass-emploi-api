@@ -55,7 +55,7 @@ export class OidcAuthGuard implements CanActivate {
       /* eslint-disable @typescript-eslint/ban-ts-comment */
       // @ts-ignore
       req.authenticated = {
-        accesToken: payload,
+        accessToken,
         utilisateur
       }
       const userAPM: UserObject = {

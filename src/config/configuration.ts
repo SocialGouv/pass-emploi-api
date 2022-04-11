@@ -75,7 +75,9 @@ export default () => {
       encryptionKey: process.env.CHAT_ENCRYPTION_KEY
     },
     oidc: {
-      issuerUrl: process.env.OIDC_ISSUER_URL ?? ''
+      issuerUrl: process.env.OIDC_ISSUER_URL ?? '',
+      clientId: process.env.OIDC_CLIENT_ID ?? '',
+      clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
     },
     apiKeys: {
       keycloak: process.env.API_KEY_KEYCLOAK ?? 'ceci-est-une-api-key',

@@ -11,6 +11,7 @@ import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
 import {
   PoleEmploiPartenaireClient,
   PrestationDto,
@@ -23,7 +24,7 @@ import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
 
 export interface GetRendezVousJeunePoleEmploiQuery extends Query {
   idJeune: string
-  idpToken: string
+  accessToken: string
 }
 
 @Injectable()
@@ -37,7 +38,8 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer,
     private dateService: DateService,
-    private idService: IdService
+    private idService: IdService,
+    private keycloakClient: KeycloakClient
   ) {
     super('GetRendezVousJeunePoleEmploiQueryHandler')
   }
@@ -51,14 +53,17 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     }
 
     const maintenant = this.dateService.now()
+    const idpToken = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
+      query.accessToken
+    )
 
     try {
       const [responsePrestations, responseRendezVous] = await Promise.all([
         await this.poleEmploiPartenaireClient.getPrestations(
-          query.idpToken,
+          idpToken,
           maintenant
         ),
-        await this.poleEmploiPartenaireClient.getRendezVous(query.idpToken)
+        await this.poleEmploiPartenaireClient.getRendezVous(idpToken)
       ])
 
       const prestations: PrestationDto[] = responsePrestations?.data ?? []
@@ -77,7 +82,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
             try {
               const responseLienVisio =
                 await this.poleEmploiPartenaireClient.getLienVisio(
-                  query.idpToken,
+                  idpToken,
                   prestation.identifiantStable
                 )
               lienVisio = responseLienVisio?.data

@@ -11,6 +11,7 @@ import {
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { failure } from '../../../src/building-blocks/types/result'
 import { Jeune } from '../../../src/domain/jeune'
+import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client'
 import {
   PoleEmploiPartenaireClient,
   PrestationDto,
@@ -27,18 +28,22 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   let dateService: StubbedClass<DateService>
   let idService: StubbedClass<IdService>
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
+  let keycloakClient: StubbedClass<KeycloakClient>
   let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
   let getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler
   let sandbox: SinonSandbox
+  const idpToken = 'idpToken'
 
   before(() => {
     sandbox = createSandbox()
     jeunesRepository = stubInterface(sandbox)
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
+    keycloakClient = stubClass(KeycloakClient)
     jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
     dateService = stubClass(DateService)
     idService = stubClass(IdService)
     idService.uuid.returns('random-id')
+    keycloakClient.exchangeTokenPoleEmploiJeune.resolves(idpToken)
 
     getRendezVousJeunePoleEmploiQueryHandler =
       new GetRendezVousJeunePoleEmploiQueryHandler(
@@ -46,7 +51,8 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         poleEmploiPartenaireClient,
         jeunePoleEmploiAuthorizer,
         dateService,
-        idService
+        idService,
+        keycloakClient
       )
   })
 
@@ -288,7 +294,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
     describe('quand le jeune existe', () => {
       const query: GetRendezVousJeunePoleEmploiQuery = {
         idJeune: '1',
-        idpToken: 'token'
+        accessToken: 'token'
       }
       const jeune = unJeune()
       const datePrestation = '2014-03-24T14:00:00+01:00'
@@ -367,10 +373,10 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           dateService.now.returns(maintenant)
           dateService.fromISOStringToUTCJSDate.returns(expectedDatePrestation)
           poleEmploiPartenaireClient.getPrestations
-            .withArgs(query.idpToken, maintenant)
+            .withArgs(idpToken, maintenant)
             .resolves({ ...axiosResponse, data: prestations })
           poleEmploiPartenaireClient.getRendezVous
-            .withArgs(query.idpToken)
+            .withArgs(idpToken)
             .resolves({ ...axiosResponse, data: rendezVous })
 
           // When
@@ -485,13 +491,13 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           dateService.isSameDateDay.returns(true)
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getPrestations
-            .withArgs(query.idpToken, maintenant)
+            .withArgs(idpToken, maintenant)
             .resolves({ ...axiosResponse, data: prestations })
           poleEmploiPartenaireClient.getLienVisio
-            .withArgs(query.idpToken, idVisio)
+            .withArgs(idpToken, idVisio)
             .resolves({ ...axiosResponse, data: 'lienvisio.com' })
           poleEmploiPartenaireClient.getRendezVous
-            .withArgs(query.idpToken)
+            .withArgs(idpToken)
             .resolves({ ...axiosResponse, data: rendezVous })
 
           // When
@@ -600,13 +606,13 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           dateService.isSameDateDay.returns(true)
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getPrestations
-            .withArgs(query.idpToken, maintenant)
+            .withArgs(idpToken, maintenant)
             .resolves({ ...axiosResponse, data: prestations })
           poleEmploiPartenaireClient.getLienVisio
-            .withArgs(query.idpToken, idVisio)
+            .withArgs(idpToken, idVisio)
             .rejects()
           poleEmploiPartenaireClient.getRendezVous
-            .withArgs(query.idpToken)
+            .withArgs(idpToken)
             .resolves({ ...axiosResponse, data: rendezVous })
 
           // When
@@ -617,7 +623,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           expect(
             poleEmploiPartenaireClient.getLienVisio
           ).to.have.been.calledWithExactly(
-            query.idpToken,
+            idpToken,
             prestations[0].identifiantStable
           )
           expect(result._isSuccess).to.equal(true)
@@ -630,7 +636,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           dateService.now.returns(maintenant)
           poleEmploiPartenaireClient.getPrestations
-            .withArgs(query.idpToken, maintenant)
+            .withArgs(idpToken, maintenant)
             .throws({ response: { data: {} } })
 
           // When
@@ -663,7 +669,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         // Given
         const query: GetRendezVousJeunePoleEmploiQuery = {
           idJeune: '1',
-          idpToken: 'token'
+          accessToken: 'token'
         }
 
         jeunesRepository.get.withArgs(query.idJeune).resolves(undefined)
@@ -685,7 +691,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       // Given
       const query: GetRendezVousJeunePoleEmploiQuery = {
         idJeune: 'ABCDE',
-        idpToken: 'token'
+        accessToken: 'token'
       }
       const utilisateur = unUtilisateurJeune()
 

@@ -6,3 +6,10 @@ export const Utilisateur = createParamDecorator(
     return request.authenticated?.utilisateur
   }
 )
+
+export const AccessToken = createParamDecorator(
+  (_data: string, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest()
+    return request.authenticated?.accessToken
+  }
+)
