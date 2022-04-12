@@ -91,7 +91,9 @@ export class InvitationIcsClient {
       title: mapCodeLabelTypeRendezVous[rendezVous.type],
       description:
         "Création d'un nouveau rendez-vous\n" +
-        `Vous avez créé un rendez-vous de type Activités extérieures pour le ${formaterDateRendezVous(
+        `Vous avez créé un rendez-vous de type [CEJ] ${
+          mapCodeLabelTypeRendezVous[rendezVous.type]
+        } pour le ${formaterDateRendezVous(
           rendezVous.date
         )} à ${formaterHeureRendezVous(rendezVous.date)} .\n` +
         "Pour l'intégrer à votre agenda, vous devez accepter cette invitation." +
