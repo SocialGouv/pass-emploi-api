@@ -10,6 +10,7 @@ import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
 
 export interface GetRendezVousJeuneQuery extends Query {
   idJeune: string
+  periode?: RendezVous.Periode
 }
 
 @Injectable()
@@ -29,8 +30,27 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
   async handle(
     query: GetRendezVousJeuneQuery
   ): Promise<Result<RendezVousQueryModel[]>> {
-    const responseRendezVous =
-      await this.rendezVousRepository.getAllQueryModelsByJeune(query.idJeune)
+    let responseRendezVous: RendezVousQueryModel[]
+
+    switch (query.periode) {
+      case RendezVous.Periode.PASSES:
+        responseRendezVous =
+          await this.rendezVousRepository.getRendezVousPassesQueryModelsByJeune(
+            query.idJeune
+          )
+        break
+      case RendezVous.Periode.FUTURS:
+        responseRendezVous =
+          await this.rendezVousRepository.getRendezVousFutursQueryModelsByJeune(
+            query.idJeune
+          )
+        break
+      default:
+        responseRendezVous =
+          await this.rendezVousRepository.getAllQueryModelsByJeune(
+            query.idJeune
+          )
+    }
 
     return success(responseRendezVous)
   }
