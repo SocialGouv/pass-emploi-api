@@ -88,10 +88,10 @@ export class InvitationIcsClient {
         dateRendezVousUtc.getUTCHours(),
         dateRendezVousUtc.getMinutes()
       ],
-      title: mapCodeLabelTypeRendezVous[rendezVous.type],
+      title: `[CEJ] ${mapCodeLabelTypeRendezVous[rendezVous.type]}`,
       description:
         "Création d'un nouveau rendez-vous\n" +
-        `Vous avez créé un rendez-vous de type [CEJ] ${
+        `Vous avez créé un rendez-vous de type ${
           mapCodeLabelTypeRendezVous[rendezVous.type]
         } pour le ${formaterDateRendezVous(
           rendezVous.date
