@@ -3,16 +3,21 @@ import Base64 from 'crypto-js/enc-base64'
 import Utf8 from 'crypto-js/enc-utf8'
 import WordArray from 'crypto-js/lib-typedarrays'
 import { ConfigService } from '@nestjs/config'
+import { Injectable } from '@nestjs/common'
+import * as CryptoJS from 'crypto-js'
 
 export interface EncryptedTextWithInitializationVector {
   encryptedText: string
   iv: string
 }
 
+@Injectable()
 export class ChatCrypto {
   key: CryptoJS.lib.WordArray
   constructor(private configService: ConfigService) {
-    this.key = Utf8.parse(this.configService.get('firebaseCryptKey') ?? '')
+    this.key = CryptoJS.enc.Utf8.parse(
+      this.configService.get('firebase.encryptionKey') ?? ''
+    )
   }
 
   encrypt(message: string): EncryptedTextWithInitializationVector {
