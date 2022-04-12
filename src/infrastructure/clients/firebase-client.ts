@@ -114,6 +114,7 @@ export class FirebaseClient implements IFirebaseClient {
       'Vous échangez avec votre nouveau conseiller.\n Il a accès à l’historique de vos échanges'
     const messageCrypteAvecVecteurInitialisation =
       this.chatCrypto.encrypt(messageTransfertChat)
+
     try {
       await this.firestore.runTransaction(async t => {
         const conversations = this.firestore.collection(FIREBASE_CHAT_PATH)
