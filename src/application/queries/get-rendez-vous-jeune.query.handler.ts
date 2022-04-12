@@ -10,6 +10,8 @@ import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
 
 export interface GetRendezVousJeuneQuery extends Query {
   idJeune: string
+  dateMin?: Date
+  dateMax?: Date
 }
 
 @Injectable()
@@ -29,9 +31,23 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
   async handle(
     query: GetRendezVousJeuneQuery
   ): Promise<Result<RendezVousQueryModel[]>> {
-    const responseRendezVous =
-      await this.rendezVousRepository.getAllQueryModelsByJeune(query.idJeune)
-
+    let responseRendezVous
+    if (!query.dateMax && !query.dateMin) {
+      responseRendezVous =
+        await this.rendezVousRepository.getAllQueryModelsByJeune(query.idJeune)
+    } else if (query.dateMin) {
+      responseRendezVous =
+        await this.rendezVousRepository.getQueryModelsByJeuneAfter(
+          query.idJeune,
+          query.dateMin
+        )
+    } else {
+      responseRendezVous =
+        await this.rendezVousRepository.getQueryModelsByJeuneBefore(
+          query.idJeune,
+          query.dateMax
+        )
+    }
     return success(responseRendezVous)
   }
   async authorize(

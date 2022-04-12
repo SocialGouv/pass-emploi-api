@@ -94,6 +94,14 @@ export namespace RendezVous {
       presenceConseiller?: boolean
     ): Promise<RendezVousConseillerQueryModel>
     getAllQueryModelsByJeune(idJeune: string): Promise<RendezVousQueryModel[]>
+    getQueryModelsByJeuneBefore(
+      idJeune: string,
+      date?: Date
+    ): Promise<RendezVousQueryModel[]>
+    getQueryModelsByJeuneAfter(
+      idJeune: string,
+      date?: Date
+    ): Promise<RendezVousQueryModel[]>
     getTypesRendezVousQueryModel(): TypesRendezVousQueryModel
     getQueryModelById(
       idRendezVous: string

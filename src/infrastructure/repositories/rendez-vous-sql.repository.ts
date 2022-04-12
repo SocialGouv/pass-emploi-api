@@ -159,4 +159,48 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
       return { code, label: mapCodeLabelTypeRendezVous[code] }
     })
   }
+
+  async getQueryModelsByJeuneAfter(
+    idJeune: string,
+    date: Date
+  ): Promise<RendezVousQueryModel[]> {
+    const rendezVousSqlAfter = await RendezVousSqlModel.findAll({
+      include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }],
+      where: {
+        idJeune,
+        date: {
+          [Op.gte]: date
+        },
+        dateSuppression: {
+          [Op.is]: null
+        }
+      },
+      order: [['date', 'ASC']],
+      limit: 50
+    })
+
+    return rendezVousSqlAfter.map(fromSqlToRendezVousJeuneQueryModel)
+  }
+
+  async getQueryModelsByJeuneBefore(
+    idJeune: string,
+    date: Date
+  ): Promise<RendezVousQueryModel[]> {
+    const rendezVousSqlBefore = await RendezVousSqlModel.findAll({
+      include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }],
+      where: {
+        idJeune,
+        date: {
+          [Op.lt]: date
+        },
+        dateSuppression: {
+          [Op.is]: null
+        }
+      },
+      order: [['date', 'DESC']],
+      limit: 50
+    })
+
+    return rendezVousSqlBefore.map(fromSqlToRendezVousJeuneQueryModel)
+  }
 }

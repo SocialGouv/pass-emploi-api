@@ -81,6 +81,7 @@ import {
   GetFavorisOffresEmploiQueryParams
 } from './validation/favoris.inputs'
 import {
+  GetRendezVousJeuneQueryParams,
   PutNotificationTokenInput,
   TransfererConseillerPayload
 } from './validation/jeunes.inputs'
@@ -235,7 +236,8 @@ export class JeunesController {
   async getRendezVous(
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @AccessToken() accessToken: string
+    @AccessToken() accessToken: string,
+    @Query() getRendezVousQueryParams?: GetRendezVousJeuneQueryParams
   ): Promise<RendezVousQueryModel[]> {
     let result: Result<RendezVousQueryModel[]>
     if (utilisateur.structure === Core.Structure.POLE_EMPLOI && accessToken) {
@@ -248,7 +250,11 @@ export class JeunesController {
       )
     } else {
       result = await this.getRendezVousJeuneQueryHandler.execute(
-        { idJeune },
+        {
+          idJeune,
+          dateMin: getRendezVousQueryParams?.dateMin,
+          dateMax: getRendezVousQueryParams?.dateMax
+        },
         utilisateur
       )
     }

@@ -19,6 +19,7 @@ import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune.query.handler'
 import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-models'
+import { RendezVousQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-models'
 import {
   DomainError,
   DroitsInsuffisants,
@@ -91,6 +92,7 @@ describe('JeunesController', () => {
       GetActionsJeunePoleEmploiQueryHandler
     )
     jwtService = stubClass(JwtService)
+    getRendezVousJeuneQueryHandler = stubClass(GetRendezVousJeuneQueryHandler)
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
@@ -101,6 +103,8 @@ describe('JeunesController', () => {
       .useValue(deleteFavoriOffreEmploiCommandHandler)
       .overrideProvider(GetDetailJeuneQueryHandler)
       .useValue(getDetailJeuneQueryHandler)
+      .overrideProvider(GetRendezVousJeuneQueryHandler)
+      .useValue(getRendezVousJeuneQueryHandler)
       .overrideProvider(TransfererJeunesConseillerCommandHandler)
       .useValue(transfererJeunesConseillerCommandHandler)
       .overrideProvider(DeleteJeuneCommandHandler)
@@ -334,7 +338,7 @@ describe('JeunesController', () => {
         deleteFavoriOffreEmploiCommandHandler.execute
       ).to.have.be.calledWithExactly(command, unUtilisateurDecode())
     })
-    it('renvoie une 404(NOT FOUND) si le favori n"existe pas', async () => {
+    it("renvoie une 404(NOT FOUND) si le favori n'existe pas", async () => {
       //Given
       deleteFavoriOffreEmploiCommandHandler.execute
         .withArgs(command)
@@ -558,7 +562,7 @@ describe('JeunesController', () => {
   describe('GET /jeunes/:idJeune/rendez-vous', () => {
     const idJeune = '1'
     describe("quand c'est un jeune pole-emploi", () => {
-      it('renvoit une 404 quand le jeune n"existe pas', async () => {
+      it('renvoie une 404 quand le jeune n"existe pas', async () => {
         // Given
         jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
         getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(
@@ -590,6 +594,9 @@ describe('JeunesController', () => {
     })
 
     describe("quand ce n'est un jeune pole-emploi", () => {
+      const idJeune = '1'
+      const uneDateString = '2020-10-10'
+      const rendezVousJeuneQueryModel: RendezVousQueryModel[] = []
       it('renvoit une 404 quand le jeune n"existe pas', async () => {
         // Given
         getRendezVousJeuneQueryHandler.execute.resolves(
@@ -606,16 +613,93 @@ describe('JeunesController', () => {
           // Then
           .expect(expectedResponseJson)
       })
-      it('retourne les rdv', async () => {
+      it("retourne tous les rendez-vous si aucune date n'est renseignée", async () => {
         // Given
-        getRendezVousJeuneQueryHandler.execute.resolves(success([]))
-
-        // When
+        getRendezVousJeuneQueryHandler.execute.resolves(
+          success(rendezVousJeuneQueryModel)
+        )
+        // When - Then
         await request(app.getHttpServer())
           .get(`/jeunes/${idJeune}/rendezvous`)
           .set('authorization', unHeaderAuthorization())
-          // Then
-          .expect([])
+          .expect(HttpStatus.OK)
+        expect(
+          getRendezVousJeuneQueryHandler.execute
+        ).to.have.been.calledWithExactly(
+          {
+            idJeune,
+            dateMin: undefined,
+            dateMax: undefined
+          },
+          unUtilisateurDecode()
+        )
+      })
+      it('retourne les rendez-vous futurs si dateMin est renseignée', async () => {
+        // Given
+        getRendezVousJeuneQueryHandler.execute.resolves(
+          success(rendezVousJeuneQueryModel)
+        )
+        // When - Then
+        await request(app.getHttpServer())
+          .get(`/jeunes/${idJeune}/rendezvous?dateMin=${uneDateString}`)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+        expect(
+          getRendezVousJeuneQueryHandler.execute
+        ).to.have.been.calledWithExactly(
+          {
+            idJeune,
+            dateMin: new Date(uneDateString),
+            dateMax: undefined
+          },
+          unUtilisateurDecode()
+        )
+      })
+      it('retourne les rendez-vous passés si aucune dateMax est renseignée', async () => {
+        // Given
+        getRendezVousJeuneQueryHandler.execute.resolves(
+          success(rendezVousJeuneQueryModel)
+        )
+        // When - Then
+        await request(app.getHttpServer())
+          .get(`/jeunes/${idJeune}/rendezvous?dateMax=${uneDateString}`)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+        expect(
+          getRendezVousJeuneQueryHandler.execute
+        ).to.have.been.calledWithExactly(
+          {
+            idJeune,
+            dateMax: new Date(uneDateString),
+            dateMin: undefined
+          },
+          unUtilisateurDecode()
+        )
+      })
+      it('retourne une 400 quand une date est mal formatée', async () => {
+        // Given
+        const dateStringMalFormatée = '202-33XXX'
+        getRendezVousJeuneQueryHandler.execute.resolves(
+          success(rendezVousJeuneQueryModel)
+        )
+        // When - Then
+        await request(app.getHttpServer())
+          .get(`/jeunes/${idJeune}/rendezvous?dateMin=${dateStringMalFormatée}`)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+      it("retourne une 400 quand il y'a les 2 dates", async () => {
+        // Given
+        getRendezVousJeuneQueryHandler.execute.resolves(
+          success(rendezVousJeuneQueryModel)
+        )
+        // When - Then
+        await request(app.getHttpServer())
+          .get(
+            `/jeunes/${idJeune}/rendezvous?dateMin=${uneDateString}&dateMax=${uneDateString}`
+          )
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
       })
     })
 
