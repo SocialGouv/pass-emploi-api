@@ -146,6 +146,7 @@ import { UpdateRendezVousCommandHandler } from './application/commands/update-re
 import { InvitationIcsClient } from './infrastructure/clients/invitation-ics.client'
 import { MailClientToken } from './domain/mail'
 import { ChatCryptoService } from './utils/chat-crypto-service'
+import { DeleteJeuneCommandHandler } from './application/commands/delete-jeune.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -339,6 +340,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     AddFavoriOffreEngagementCommandHandler,
     GetFavorisOffresEngagementJeuneQueryHandler,
     DeleteFavoriOffreEngagementCommandHandler,
+    DeleteJeuneCommandHandler,
     DeleteJeuneInactifCommandHandler,
     GetDetailRendezVousQueryHandler,
     GetActionsJeunePoleEmploiQueryHandler,
