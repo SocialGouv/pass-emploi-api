@@ -96,7 +96,7 @@ describe('InvitationIcsClient', () => {
           }
         ],
         description:
-          "Création d'un nouveau rendez-vous\nVous avez créé un rendez-vous de type Activités extérieures pour le jeudi 11 novembre 2021 à 09h03 .\nPour l'intégrer à votre agenda, vous devez accepter cette invitation.Attention, les modifications et refus effectués directement dans votre agenda ne sont pas pris en compte dans votre portail CEJ.\nBonne journée",
+          "Création d'un nouveau rendez-vous\nVous avez créé un rendez-vous de type [CEJ] Entretien individuel conseiller pour le jeudi 11 novembre 2021 à 09h03 .\nPour l'intégrer à votre agenda, vous devez accepter cette invitation.Attention, les modifications et refus effectués directement dans votre agenda ne sont pas pris en compte dans votre portail CEJ.\nBonne journée",
         duration: {
           minutes: 30
         },
