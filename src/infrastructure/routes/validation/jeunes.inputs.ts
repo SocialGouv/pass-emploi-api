@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { ArrayNotEmpty, IsArray, IsNotEmpty, IsString } from 'class-validator'
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString
+} from 'class-validator'
+import { RendezVous } from 'src/domain/rendez-vous'
 
 export class PutNotificationTokenInput {
   @ApiProperty()
@@ -23,4 +31,12 @@ export class TransfererConseillerPayload {
   @IsArray()
   @ArrayNotEmpty()
   idsJeune: string[]
+}
+
+export class GetRendezVousJeuneQueryParams {
+  @ApiProperty({ required: false, enum: RendezVous.Periode })
+  @IsOptional()
+  @IsString()
+  @IsEnum(RendezVous.Periode)
+  periode?: RendezVous.Periode
 }

@@ -313,6 +313,20 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         data: {}
       }
 
+      describe('quand periode est PASSES', () => {
+        it('renvoie un tableau vide', async () => {
+          jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+          // When
+          const result = await getRendezVousJeunePoleEmploiQueryHandler.handle(
+            query
+          )
+          // Then
+          expect(result).to.deep.equal({
+            _isSuccess: true,
+            data: []
+          })
+        })
+      })
       describe("quand le lien de la visio prestations n'est pas encore disponible", () => {
         it('récupère les rendez-vous et les prestations Pole Emploi du jeune bien triés', async () => {
           const prestations: PrestationDto[] = [

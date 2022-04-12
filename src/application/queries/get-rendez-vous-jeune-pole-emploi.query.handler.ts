@@ -7,6 +7,7 @@ import {
 import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
+import { RendezVous } from 'src/domain/rendez-vous'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { Query } from '../../building-blocks/types/query'
@@ -25,6 +26,7 @@ import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
 export interface GetRendezVousJeunePoleEmploiQuery extends Query {
   idJeune: string
   accessToken: string
+  periode?: RendezVous.Periode
 }
 
 @Injectable()
@@ -52,6 +54,10 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
 
+    if (query.periode === RendezVous.Periode.PASSES) {
+      return success([])
+    }
+
     const maintenant = this.dateService.now()
     const idpToken = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
       query.accessToken
@@ -59,11 +65,8 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
 
     try {
       const [responsePrestations, responseRendezVous] = await Promise.all([
-        await this.poleEmploiPartenaireClient.getPrestations(
-          idpToken,
-          maintenant
-        ),
-        await this.poleEmploiPartenaireClient.getRendezVous(idpToken)
+        this.poleEmploiPartenaireClient.getPrestations(idpToken, maintenant),
+        this.poleEmploiPartenaireClient.getRendezVous(idpToken)
       ])
 
       const prestations: PrestationDto[] = responsePrestations?.data ?? []

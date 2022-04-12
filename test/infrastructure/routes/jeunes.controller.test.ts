@@ -1,6 +1,7 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import { TransfererJeunesConseillerCommandHandler } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
 import { Core } from 'src/domain/core'
+import { RendezVous } from 'src/domain/rendez-vous'
 import { TransfererConseillerPayload } from 'src/infrastructure/routes/validation/jeunes.inputs'
 import * as request from 'supertest'
 import {
@@ -19,6 +20,7 @@ import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune.query.handler'
 import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-models'
+import { RendezVousQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-models'
 import {
   DomainError,
   DroitsInsuffisants,
@@ -91,6 +93,7 @@ describe('JeunesController', () => {
       GetActionsJeunePoleEmploiQueryHandler
     )
     jwtService = stubClass(JwtService)
+    getRendezVousJeuneQueryHandler = stubClass(GetRendezVousJeuneQueryHandler)
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
@@ -101,6 +104,8 @@ describe('JeunesController', () => {
       .useValue(deleteFavoriOffreEmploiCommandHandler)
       .overrideProvider(GetDetailJeuneQueryHandler)
       .useValue(getDetailJeuneQueryHandler)
+      .overrideProvider(GetRendezVousJeuneQueryHandler)
+      .useValue(getRendezVousJeuneQueryHandler)
       .overrideProvider(TransfererJeunesConseillerCommandHandler)
       .useValue(transfererJeunesConseillerCommandHandler)
       .overrideProvider(DeleteJeuneCommandHandler)
@@ -334,7 +339,7 @@ describe('JeunesController', () => {
         deleteFavoriOffreEmploiCommandHandler.execute
       ).to.have.be.calledWithExactly(command, unUtilisateurDecode())
     })
-    it('renvoie une 404(NOT FOUND) si le favori n"existe pas', async () => {
+    it("renvoie une 404(NOT FOUND) si le favori n'existe pas", async () => {
       //Given
       deleteFavoriOffreEmploiCommandHandler.execute
         .withArgs(command)
@@ -558,7 +563,7 @@ describe('JeunesController', () => {
   describe('GET /jeunes/:idJeune/rendez-vous', () => {
     const idJeune = '1'
     describe("quand c'est un jeune pole-emploi", () => {
-      it('renvoit une 404 quand le jeune n"existe pas', async () => {
+      it('renvoie une 404 quand le jeune n"existe pas', async () => {
         // Given
         jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
         getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(
@@ -589,7 +594,10 @@ describe('JeunesController', () => {
       })
     })
 
-    describe("quand ce n'est un jeune pole-emploi", () => {
+    describe("quand ce n'est pas un jeune pole-emploi", () => {
+      const idJeune = '1'
+      const rendezVousJeuneQueryModel: RendezVousQueryModel[] = []
+
       it('renvoit une 404 quand le jeune n"existe pas', async () => {
         // Given
         getRendezVousJeuneQueryHandler.execute.resolves(
@@ -606,16 +614,72 @@ describe('JeunesController', () => {
           // Then
           .expect(expectedResponseJson)
       })
-      it('retourne les rdv', async () => {
+      it("retourne tous les rendez-vous si aucune période n'est renseignée", async () => {
         // Given
-        getRendezVousJeuneQueryHandler.execute.resolves(success([]))
-
-        // When
+        getRendezVousJeuneQueryHandler.execute.resolves(
+          success(rendezVousJeuneQueryModel)
+        )
+        // When - Then
         await request(app.getHttpServer())
           .get(`/jeunes/${idJeune}/rendezvous`)
           .set('authorization', unHeaderAuthorization())
-          // Then
-          .expect([])
+          .expect(HttpStatus.OK)
+        expect(
+          getRendezVousJeuneQueryHandler.execute
+        ).to.have.been.calledWithExactly(
+          {
+            idJeune,
+            periode: undefined
+          },
+          unUtilisateurDecode()
+        )
+      })
+      it('retourne les rendez-vous futurs si periode FUTURS est renseignée', async () => {
+        // Given
+        getRendezVousJeuneQueryHandler.execute.resolves(
+          success(rendezVousJeuneQueryModel)
+        )
+        // When - Then
+        await request(app.getHttpServer())
+          .get(`/jeunes/${idJeune}/rendezvous?periode=FUTURS`)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+        expect(
+          getRendezVousJeuneQueryHandler.execute
+        ).to.have.been.calledWithExactly(
+          {
+            idJeune,
+            periode: RendezVous.Periode.FUTURS
+          },
+          unUtilisateurDecode()
+        )
+      })
+      it('retourne les rendez-vous passés si periode PASSES est renseignée', async () => {
+        // Given
+        getRendezVousJeuneQueryHandler.execute.resolves(
+          success(rendezVousJeuneQueryModel)
+        )
+        // When - Then
+        await request(app.getHttpServer())
+          .get(`/jeunes/${idJeune}/rendezvous?periode=PASSES`)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+        expect(
+          getRendezVousJeuneQueryHandler.execute
+        ).to.have.been.calledWithExactly(
+          {
+            idJeune,
+            periode: RendezVous.Periode.PASSES
+          },
+          unUtilisateurDecode()
+        )
+      })
+      it('retourne une 400 quand periode est mal formatée', async () => {
+        // When - Then
+        await request(app.getHttpServer())
+          .get(`/jeunes/${idJeune}/rendezvous?periode=XX`)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
       })
     })
 

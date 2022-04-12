@@ -245,6 +245,38 @@ describe('RendezVousRepositorySql', () => {
     })
   })
 
+  describe('getRendezVousPassesQueryModelsByJeune', () => {
+    it('retourne les rendez-vous passés du jeune', async () => {
+      // When
+      const rendezVous =
+        await rendezVousRepositorySql.getRendezVousPassesQueryModelsByJeune(
+          jeune.id
+        )
+
+      // Then
+      expect(rendezVous.length).to.equal(2)
+      expect(rendezVous[0].id).to.equal(unRendezVousPasse.id)
+      expect(rendezVous[1].id).to.equal(unRendezVousTresPasse.id)
+    })
+  })
+
+  describe('getRendezVousFutursQueryModelsByJeune', () => {
+    it('retourne les rendez-vous futurs du jeune', async () => {
+      // When
+      const rendezVous =
+        await rendezVousRepositorySql.getRendezVousFutursQueryModelsByJeune(
+          jeune.id
+        )
+
+      // Then
+      expect(rendezVous.length).to.equal(2)
+      expect(rendezVous[0].id).to.equal(unRendezVousProche.id)
+      expect(rendezVous[1].id).to.equal(
+        unRendezVousTresFuturPresenceConseillerFalse.id
+      )
+    })
+  })
+
   describe('getAllQueryModelsByConseiller', () => {
     it('retourne les rendez-vous passés du conseiller', async () => {
       //When
