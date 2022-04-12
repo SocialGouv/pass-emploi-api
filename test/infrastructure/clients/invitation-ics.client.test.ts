@@ -96,7 +96,7 @@ describe('InvitationIcsClient', () => {
           }
         ],
         description:
-          "Création d'un nouveau rendez-vous\nVous avez créé un rendez-vous de type [CEJ] Entretien individuel conseiller pour le jeudi 11 novembre 2021 à 09h03 .\nPour l'intégrer à votre agenda, vous devez accepter cette invitation.Attention, les modifications et refus effectués directement dans votre agenda ne sont pas pris en compte dans votre portail CEJ.\nBonne journée",
+          "Création d'un nouveau rendez-vous\nVous avez créé un rendez-vous de type Entretien individuel conseiller pour le jeudi 11 novembre 2021 à 09h03 .\nPour l'intégrer à votre agenda, vous devez accepter cette invitation.Attention, les modifications et refus effectués directement dans votre agenda ne sont pas pris en compte dans votre portail CEJ.\nBonne journée",
         duration: {
           minutes: 30
         },
@@ -108,7 +108,7 @@ describe('InvitationIcsClient', () => {
         sequence: 0,
         start: [2021, 11, 11, 8, 3],
         startInputType: 'utc',
-        title: 'Entretien individuel conseiller',
+        title: '[CEJ] Entretien individuel conseiller',
         uid: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb'
       })
     })
