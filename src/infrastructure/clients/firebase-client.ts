@@ -112,7 +112,8 @@ export class FirebaseClient implements IFirebaseClient {
   ): Promise<void> {
     const messageTransfertChat =
       'Vous échangez avec votre nouveau conseiller.\n Il a accès à l’historique de vos échanges'
-    const messageCrypte = this.chatCrypto.encrypt(messageTransfertChat)
+    const messageCrypteAvecVecteurInitialisation =
+      this.chatCrypto.encrypt(messageTransfertChat)
     try {
       await this.firestore.runTransaction(async t => {
         const conversations = this.firestore.collection(FIREBASE_CHAT_PATH)
@@ -137,8 +138,8 @@ export class FirebaseClient implements IFirebaseClient {
                 sentBy: 'conseiller',
                 conseillerId: conseillerCibleId,
                 type: 'NOUVEAU_CONSEILLER',
-                content: messageCrypte.encryptedText,
-                iv: messageCrypte.iv,
+                content: messageCrypteAvecVecteurInitialisation.encryptedText,
+                iv: messageCrypteAvecVecteurInitialisation.iv,
                 creationDate: Timestamp.fromDate(new Date())
               }
             )
