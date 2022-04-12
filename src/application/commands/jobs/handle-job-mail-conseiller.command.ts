@@ -77,7 +77,7 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
                     stats.mailsEnvoyes++
                   } catch (e) {
                     this.logger.error(
-                      "erreur lors de l'envoie de l'email des conversations non lues",
+                      "Erreur lors de l'envoi de l'email des conversations non lues",
                       e
                     )
                   }

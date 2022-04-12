@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Evenement, EvenementService } from 'src/domain/evenement'
+import { PlanificateurService } from 'src/domain/planificateur'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
@@ -31,6 +32,7 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,
     private rendezVousAuthorizer: RendezVousAuthorizer,
+    private planificateurService: PlanificateurService,
     private evenementService: EvenementService
   ) {
     super('DeleteRendezVousCommandHandler')
@@ -42,13 +44,30 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
       return failure(new NonTrouveError('Rendez-Vous', command.idRendezVous))
     }
     await this.rendezVousRepository.delete(command.idRendezVous)
-    if (rendezVous.jeune.pushNotificationToken) {
+
+    const tokenDuJeune = rendezVous.jeune.pushNotificationToken
+    if (tokenDuJeune) {
       const notification = Notification.createRdvSupprime(
-        rendezVous.jeune.pushNotificationToken,
+        tokenDuJeune,
         rendezVous.date
       )
       await this.notificationRepository.send(notification)
+    } else {
+      this.logger.log(
+        `Le jeune ${rendezVous.jeune.id} ne s'est jamais connecté sur l'application`
+      )
     }
+
+    try {
+      await this.planificateurService.supprimerRappelsRendezVous(rendezVous)
+    } catch (e) {
+      this.logger.error(
+        `La suppression des notifications du rendez-vous ${rendezVous.id} a échoué`,
+        e
+      )
+      this.apmService.captureError(e)
+    }
+
     return emptySuccess()
   }
 

@@ -92,6 +92,16 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       )
     }
 
+    try {
+      await this.planificateurService.planifierRappelsRendezVous(rendezVous)
+    } catch (e) {
+      this.logger.error(
+        `La planification des notifications du rendez-vous ${rendezVous.id} a échoué`,
+        e
+      )
+      this.apmService.captureError(e)
+    }
+
     if (!jeune.conseiller.email) {
       this.logger.warn(
         `Impossible d'envoyer un mail au conseiller ${command.idConseiller}, il n'existe pas`
@@ -104,20 +114,10 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
         )
       } catch (e) {
         this.logger.error(
-          "erreur lors de l'envoie de l'email du nouveau rendez-vous",
+          "Erreur lors de l'envoi de l'email du nouveau rendez-vous",
           e
         )
       }
-    }
-
-    try {
-      await this.planificateurService.planifierRappelsRendezVous(rendezVous)
-    } catch (e) {
-      this.logger.error(
-        `La planification des notifications du rendez-vous ${rendezVous.id} a échoué`,
-        e
-      )
-      this.apmService.captureError(e)
     }
 
     return success(rendezVous.id)
