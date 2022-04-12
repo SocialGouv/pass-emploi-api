@@ -16,14 +16,14 @@ import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 
-export interface DeleteJeuneCommand {
+export interface DeleteJeuneInactifCommand {
   idConseiller: string
   idJeune: Jeune.Id
 }
 
 @Injectable()
-export class DeleteJeuneCommandHandler extends CommandHandler<
-  DeleteJeuneCommand,
+export class DeleteJeuneInactifCommandHandler extends CommandHandler<
+  DeleteJeuneInactifCommand,
   void
 > {
   constructor(
@@ -34,11 +34,11 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
     @Inject(ChatRepositoryToken)
     private readonly chatRepository: Chat.Repository
   ) {
-    super('DeleteJeune')
+    super('DeleteJeuneInactifCommandHandler')
   }
 
   async authorize(
-    _command: DeleteJeuneCommand,
+    _command: DeleteJeuneInactifCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     if (utilisateur.type !== Authentification.Type.CONSEILLER) {
@@ -46,7 +46,10 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
     }
   }
 
-  async handle({ idConseiller, idJeune }: DeleteJeuneCommand): Promise<Result> {
+  async handle({
+    idConseiller,
+    idJeune
+  }: DeleteJeuneInactifCommand): Promise<Result> {
     const conseiller = await this.conseillerRepository.get(idConseiller)
     if (!conseiller) {
       return failure(new NonTrouveError('Conseiller', idConseiller))

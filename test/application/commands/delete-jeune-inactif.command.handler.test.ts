@@ -1,8 +1,8 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import {
-  DeleteJeuneCommand,
-  DeleteJeuneCommandHandler
-} from '../../../src/application/commands/delete-jeune.command.handler'
+  DeleteJeuneInactifCommand,
+  DeleteJeuneInactifCommandHandler
+} from '../../../src/application/commands/delete-jeune-inactif.command.handler'
 import {
   DroitsInsuffisants,
   JeuneNonLieAuConseillerError,
@@ -26,20 +26,20 @@ import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect } from '../../utils'
 
-describe('DeleteJeuneCommandHandler', () => {
+describe('DeleteJeuneInactifCommandHandler', () => {
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let chatRepository: StubbedType<Chat.Repository>
-  let commandHandler: DeleteJeuneCommandHandler
+  let commandHandler: DeleteJeuneInactifCommandHandler
   let conseiller: Conseiller
   let jeune: Jeune
-  let command: DeleteJeuneCommand
+  let command: DeleteJeuneInactifCommand
   beforeEach(() => {
     const sandbox = createSandbox()
     conseillerRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
     chatRepository = stubInterface(sandbox)
-    commandHandler = new DeleteJeuneCommandHandler(
+    commandHandler = new DeleteJeuneInactifCommandHandler(
       conseillerRepository,
       jeuneRepository,
       chatRepository

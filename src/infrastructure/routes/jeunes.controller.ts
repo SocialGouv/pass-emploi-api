@@ -47,9 +47,10 @@ import {
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../application/commands/delete-favori-offre-emploi.command.handler'
 import {
-  DeleteJeuneCommand,
-  DeleteJeuneCommandHandler
-} from '../../application/commands/delete-jeune.command.handler'
+  DeleteJeuneInactifCommand,
+  DeleteJeuneInactifCommandHandler
+} from '../../application/commands/delete-jeune-inactif.command.handler'
+
 import { UpdateNotificationTokenCommandHandler } from '../../application/commands/update-notification-token.command.handler'
 import { GetActionsByJeuneQueryHandler } from '../../application/queries/get-actions-by-jeune.query.handler'
 import { GetConseillersJeuneQueryHandler } from '../../application/queries/get-conseillers-jeune.query.handler'
@@ -103,7 +104,7 @@ export class JeunesController {
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
     private readonly deleteFavoriCommandHandler: DeleteFavoriOffreEmploiCommandHandler,
     private readonly transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler,
-    private readonly deleteJeuneCommandHandler: DeleteJeuneCommandHandler,
+    private readonly deleteJeuneInactifCommandHandler: DeleteJeuneInactifCommandHandler,
     private readonly getActionsPoleEmploiQueryHandler: GetActionsJeunePoleEmploiQueryHandler,
     private readonly getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler
   ) {}
@@ -426,11 +427,11 @@ export class JeunesController {
   ): Promise<void> {
     let result: Result
     try {
-      const command: DeleteJeuneCommand = {
+      const command: DeleteJeuneInactifCommand = {
         idConseiller: utilisateur.id,
         idJeune
       }
-      result = await this.deleteJeuneCommandHandler.execute(
+      result = await this.deleteJeuneInactifCommandHandler.execute(
         command,
         utilisateur
       )

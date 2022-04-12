@@ -13,7 +13,7 @@ import {
   DeleteFavoriOffreEmploiCommand,
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
-import { DeleteJeuneCommandHandler } from '../../../src/application/commands/delete-jeune.command.handler'
+import { DeleteJeuneInactifCommandHandler } from '../../../src/application/commands/delete-jeune-inactif.command.handler'
 import { GetActionsJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-actions-jeune-pole-emploi.query.handler'
 import { GetConseillersJeuneQueryHandler } from '../../../src/application/queries/get-conseillers-jeune.query.handler'
 import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler'
@@ -64,7 +64,7 @@ describe('JeunesController', () => {
   let getDetailJeuneQueryHandler: StubbedClass<GetDetailJeuneQueryHandler>
   let getConseillersJeuneQueryHandler: StubbedClass<GetConseillersJeuneQueryHandler>
   let transfererJeunesConseillerCommandHandler: StubbedClass<TransfererJeunesConseillerCommandHandler>
-  let deleteJeuneCommandHandler: StubbedClass<DeleteJeuneCommandHandler>
+  let deleteJeuneInactifCommandHandler: StubbedClass<DeleteJeuneInactifCommandHandler>
   let getRendezVousJeuneQueryHandler: StubbedClass<GetRendezVousJeuneQueryHandler>
   let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
   let getActionsPoleEmploiQueryHandler: StubbedClass<GetActionsJeunePoleEmploiQueryHandler>
@@ -83,7 +83,9 @@ describe('JeunesController', () => {
     transfererJeunesConseillerCommandHandler = stubClass(
       TransfererJeunesConseillerCommandHandler
     )
-    deleteJeuneCommandHandler = stubClass(DeleteJeuneCommandHandler)
+    deleteJeuneInactifCommandHandler = stubClass(
+      DeleteJeuneInactifCommandHandler
+    )
     getConseillersJeuneQueryHandler = stubClass(GetConseillersJeuneQueryHandler)
     getRendezVousJeunePoleEmploiQueryHandler = stubClass(
       GetRendezVousJeunePoleEmploiQueryHandler
@@ -108,8 +110,8 @@ describe('JeunesController', () => {
       .useValue(getRendezVousJeuneQueryHandler)
       .overrideProvider(TransfererJeunesConseillerCommandHandler)
       .useValue(transfererJeunesConseillerCommandHandler)
-      .overrideProvider(DeleteJeuneCommandHandler)
-      .useValue(deleteJeuneCommandHandler)
+      .overrideProvider(DeleteJeuneInactifCommandHandler)
+      .useValue(deleteJeuneInactifCommandHandler)
       .overrideProvider(GetConseillersJeuneQueryHandler)
       .useValue(getConseillersJeuneQueryHandler)
       .overrideProvider(GetRendezVousJeuneQueryHandler)
@@ -466,7 +468,7 @@ describe('JeunesController', () => {
   describe('DELETE /jeunes/:idJeune', () => {
     it('supprime le jeune', async () => {
       //Given
-      deleteJeuneCommandHandler.execute.resolves(emptySuccess())
+      deleteJeuneInactifCommandHandler.execute.resolves(emptySuccess())
 
       //When
       await request(app.getHttpServer())
@@ -475,7 +477,9 @@ describe('JeunesController', () => {
         //Then
         .expect(HttpStatus.NO_CONTENT)
 
-      expect(deleteJeuneCommandHandler.execute).to.have.be.calledWithExactly(
+      expect(
+        deleteJeuneInactifCommandHandler.execute
+      ).to.have.be.calledWithExactly(
         {
           idConseiller: 'bcd60403-5f10-4a16-a660-2099d79ebd66',
           idJeune: 'id-jeune'
@@ -486,7 +490,7 @@ describe('JeunesController', () => {
 
     it("renvoie une 403 si l'utilisateur n'a pas les droits", async () => {
       //Given
-      deleteJeuneCommandHandler.execute.rejects(new DroitsInsuffisants())
+      deleteJeuneInactifCommandHandler.execute.rejects(new DroitsInsuffisants())
 
       //When
       await request(app.getHttpServer())
@@ -498,7 +502,7 @@ describe('JeunesController', () => {
 
     it("renvoie une 404 si une ressource n'existe pas", async () => {
       //Given
-      deleteJeuneCommandHandler.execute.resolves(
+      deleteJeuneInactifCommandHandler.execute.resolves(
         failure(new NonTrouveError('Whenever', 'wherever'))
       )
 
@@ -512,7 +516,7 @@ describe('JeunesController', () => {
 
     it("renvoie une 403 si le jeune n'est pas lié à l'utilisateur", async () => {
       //Given
-      deleteJeuneCommandHandler.execute.resolves(
+      deleteJeuneInactifCommandHandler.execute.resolves(
         failure(new JeuneNonLieAuConseillerError('whenever', 'wherever'))
       )
 
@@ -526,7 +530,7 @@ describe('JeunesController', () => {
 
     it('renvoie une 403 si le jeune est actif', async () => {
       //Given
-      deleteJeuneCommandHandler.execute.resolves(
+      deleteJeuneInactifCommandHandler.execute.resolves(
         failure(new JeunePasInactifError('whenever'))
       )
 
@@ -540,7 +544,7 @@ describe('JeunesController', () => {
 
     it("renvoie une erreur 500 s'il se passe qqch d'imprévu", async () => {
       //Given
-      deleteJeuneCommandHandler.execute.resolves(
+      deleteJeuneInactifCommandHandler.execute.resolves(
         failure(
           new (class implements DomainError {
             readonly code = 'WHATEVER'
