@@ -40,7 +40,8 @@ export namespace Evenement {
     OFFRE_SERVICE_CIVIQUE_PARTAGEE = 'OFFRE_SERVICE_CIVIQUE_PARTAGEE',
     OFFRE_SERVICE_CIVIQUE_POSTULEE = 'OFFRE_SERVICE_CIVIQUE_POSTULEE',
     OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE = 'OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE',
-    RECHERCHE_SERVICE_CIVIQUE_SAUVEGARDEE = 'RECHERCHE_SERVICE_CIVIQUE_SAUVEGARDEE'
+    RECHERCHE_SERVICE_CIVIQUE_SAUVEGARDEE = 'RECHERCHE_SERVICE_CIVIQUE_SAUVEGARDEE',
+    COMPTE_SUPPRIME = 'COMPTE_SUPPRIME'
   }
 
   export interface Repository {
@@ -209,6 +210,10 @@ const evenements = {
     categorie: 'Recherche',
     action: 'Enregistrer',
     nom: 'Service Civique'
+  },
+  [Evenement.Type.COMPTE_SUPPRIME]: {
+    categorie: 'Compte',
+    action: 'Suppression'
   }
 }
 

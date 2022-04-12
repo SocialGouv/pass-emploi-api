@@ -15,6 +15,7 @@ import {
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
 import {
   TransfererJeunesConseillerCommand,
   TransfererJeunesConseillerCommandHandler
@@ -46,10 +47,7 @@ import {
   DeleteFavoriOffreEmploiCommand,
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../application/commands/delete-favori-offre-emploi.command.handler'
-import {
-  DeleteJeuneInactifCommand,
-  DeleteJeuneInactifCommandHandler
-} from '../../application/commands/delete-jeune-inactif.command.handler'
+import { DeleteJeuneInactifCommandHandler } from '../../application/commands/delete-jeune-inactif.command.handler'
 
 import { UpdateNotificationTokenCommandHandler } from '../../application/commands/update-notification-token.command.handler'
 import { GetActionsByJeuneQueryHandler } from '../../application/queries/get-actions-by-jeune.query.handler'
@@ -104,6 +102,7 @@ export class JeunesController {
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
     private readonly deleteFavoriCommandHandler: DeleteFavoriOffreEmploiCommandHandler,
     private readonly transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler,
+    private readonly deleteJeuneCommandHandler: DeleteJeuneCommandHandler,
     private readonly deleteJeuneInactifCommandHandler: DeleteJeuneInactifCommandHandler,
     private readonly getActionsPoleEmploiQueryHandler: GetActionsJeunePoleEmploiQueryHandler,
     private readonly getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler
@@ -427,14 +426,29 @@ export class JeunesController {
   ): Promise<void> {
     let result: Result
     try {
-      const command: DeleteJeuneInactifCommand = {
-        idConseiller: utilisateur.id,
-        idJeune
+      switch (utilisateur.type) {
+        case Authentification.Type.CONSEILLER:
+          result = await this.deleteJeuneInactifCommandHandler.execute(
+            {
+              idConseiller: utilisateur.id,
+              idJeune
+            },
+            utilisateur
+          )
+          break
+        case Authentification.Type.JEUNE:
+          result = await this.deleteJeuneCommandHandler.execute(
+            {
+              idJeune
+            },
+            utilisateur
+          )
+          break
+        default:
+          throw new ForbiddenException(
+            "Vous n'avez pas le droit d'effectuer cette action"
+          )
       }
-      result = await this.deleteJeuneInactifCommandHandler.execute(
-        command,
-        utilisateur
-      )
     } catch (e) {
       if (e instanceof DroitsInsuffisants) {
         throw new ForbiddenException(e, e.message)

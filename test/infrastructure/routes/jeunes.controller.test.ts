@@ -1,4 +1,5 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
 import { TransfererJeunesConseillerCommandHandler } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
 import { Core } from 'src/domain/core'
 import { RendezVous } from 'src/domain/rendez-vous'
@@ -65,6 +66,7 @@ describe('JeunesController', () => {
   let getConseillersJeuneQueryHandler: StubbedClass<GetConseillersJeuneQueryHandler>
   let transfererJeunesConseillerCommandHandler: StubbedClass<TransfererJeunesConseillerCommandHandler>
   let deleteJeuneInactifCommandHandler: StubbedClass<DeleteJeuneInactifCommandHandler>
+  let deleteJeuneCommandHandler: StubbedClass<DeleteJeuneCommandHandler>
   let getRendezVousJeuneQueryHandler: StubbedClass<GetRendezVousJeuneQueryHandler>
   let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
   let getActionsPoleEmploiQueryHandler: StubbedClass<GetActionsJeunePoleEmploiQueryHandler>
@@ -86,6 +88,7 @@ describe('JeunesController', () => {
     deleteJeuneInactifCommandHandler = stubClass(
       DeleteJeuneInactifCommandHandler
     )
+    deleteJeuneCommandHandler = stubClass(DeleteJeuneCommandHandler)
     getConseillersJeuneQueryHandler = stubClass(GetConseillersJeuneQueryHandler)
     getRendezVousJeunePoleEmploiQueryHandler = stubClass(
       GetRendezVousJeunePoleEmploiQueryHandler
@@ -112,6 +115,8 @@ describe('JeunesController', () => {
       .useValue(transfererJeunesConseillerCommandHandler)
       .overrideProvider(DeleteJeuneInactifCommandHandler)
       .useValue(deleteJeuneInactifCommandHandler)
+      .overrideProvider(DeleteJeuneCommandHandler)
+      .useValue(deleteJeuneCommandHandler)
       .overrideProvider(GetConseillersJeuneQueryHandler)
       .useValue(getConseillersJeuneQueryHandler)
       .overrideProvider(GetRendezVousJeuneQueryHandler)
@@ -466,7 +471,7 @@ describe('JeunesController', () => {
   })
 
   describe('DELETE /jeunes/:idJeune', () => {
-    it('supprime le jeune', async () => {
+    it("supprime le jeune inactif quand t'es conseiller", async () => {
       //Given
       deleteJeuneInactifCommandHandler.execute.resolves(emptySuccess())
 
@@ -486,6 +491,23 @@ describe('JeunesController', () => {
         },
         unUtilisateurDecode()
       )
+    })
+
+    it("supprime le jeune quand t'es jeune", async () => {
+      //Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
+      deleteJeuneCommandHandler.execute.resolves(emptySuccess())
+
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/id-jeune`)
+        .set('authorization', unHeaderAuthorization())
+        //Then
+        .expect(HttpStatus.NO_CONTENT)
+
+      expect(deleteJeuneCommandHandler.execute).to.have.be.calledWith({
+        idJeune: 'id-jeune'
+      })
     })
 
     it("renvoie une 403 si l'utilisateur n'a pas les droits", async () => {
