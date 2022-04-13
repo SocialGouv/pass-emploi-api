@@ -56,7 +56,7 @@ describe('RechercheAuthorizer', () => {
         )
 
         // Then
-        expect(call).to.be.rejectedWith(Unauthorized)
+        await expect(call).to.be.rejectedWith(Unauthorized)
       })
     })
   })

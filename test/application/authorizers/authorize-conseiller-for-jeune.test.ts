@@ -53,7 +53,7 @@ describe('ConseillerForJeuneAuthorizer', () => {
           firstName: 'Bob',
           structure: Core.Structure.POLE_EMPLOI
         }
-        const jeune = unJeune(unAutreConseiller)
+        const jeune = unJeune({ conseiller: unAutreConseiller })
         jeuneRepository.get.withArgs('un-jeune').resolves(jeune)
 
         // When
@@ -63,7 +63,7 @@ describe('ConseillerForJeuneAuthorizer', () => {
         )
 
         // Then
-        expect(call).to.be.rejectedWith(Unauthorized)
+        await expect(call).to.be.rejectedWith(Unauthorized)
       })
     })
     describe("quand le jeune n'existe pas", () => {
@@ -81,7 +81,7 @@ describe('ConseillerForJeuneAuthorizer', () => {
         )
 
         // Then
-        expect(call).to.be.rejectedWith(Unauthorized)
+        await expect(call).to.be.rejectedWith(Unauthorized)
       })
     })
   })

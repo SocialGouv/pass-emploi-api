@@ -118,7 +118,7 @@ describe('ConseillerAuthorizer', () => {
         )
 
         // Then
-        expect(call).to.be.rejectedWith(Unauthorized)
+        await expect(call).to.be.rejectedWith(Unauthorized)
       })
     })
     describe("quand le conseiller n'existe pas", () => {
@@ -131,7 +131,7 @@ describe('ConseillerAuthorizer', () => {
         const call = conseillerAuthorizer.authorize(conseiller.id, utilisateur)
 
         // Then
-        expect(call).to.be.rejectedWith(Unauthorized)
+        await expect(call).to.be.rejectedWith(Unauthorized)
       })
     })
   })

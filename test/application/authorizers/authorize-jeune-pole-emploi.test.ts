@@ -44,7 +44,7 @@ describe('JeunePoleEmploiAuthorizer', () => {
           )
 
           // Then
-          expect(call).to.be.rejectedWith(Unauthorized)
+          await expect(call).to.be.rejectedWith(Unauthorized)
         })
       })
     })
@@ -60,7 +60,7 @@ describe('JeunePoleEmploiAuthorizer', () => {
         )
 
         // Then
-        expect(call).to.be.rejectedWith(Unauthorized)
+        await expect(call).to.be.rejectedWith(Unauthorized)
       })
     })
 
@@ -76,7 +76,7 @@ describe('JeunePoleEmploiAuthorizer', () => {
         )
 
         // Then
-        expect(call).to.be.rejectedWith(Unauthorized)
+        await expect(call).to.be.rejectedWith(Unauthorized)
       })
     })
   })

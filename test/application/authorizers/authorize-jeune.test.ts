@@ -41,7 +41,7 @@ describe('JeuneAuthorizer', () => {
         const call = jeuneAuthorizer.authorize('jeune-id', utilisateur)
 
         // Then
-        expect(call).to.be.rejectedWith(Unauthorized)
+        await expect(call).to.be.rejectedWith(Unauthorized)
       })
     })
 
@@ -56,7 +56,7 @@ describe('JeuneAuthorizer', () => {
         const call = jeuneAuthorizer.authorize('jeune-id', utilisateur)
 
         // Then
-        expect(call).to.be.rejectedWith(Unauthorized)
+        await expect(call).to.be.rejectedWith(Unauthorized)
       })
     })
   })
