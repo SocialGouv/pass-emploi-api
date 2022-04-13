@@ -31,23 +31,25 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
   async handle(
     query: GetRendezVousJeuneQuery
   ): Promise<Result<RendezVousQueryModel[]>> {
-    let responseRendezVous
-    if (!query.dateMax && !query.dateMin) {
-      responseRendezVous =
-        await this.rendezVousRepository.getAllQueryModelsByJeune(query.idJeune)
-    } else if (query.dateMin) {
+    let responseRendezVous: RendezVousQueryModel[]
+
+    if (query.dateMin) {
       responseRendezVous =
         await this.rendezVousRepository.getQueryModelsByJeuneAfter(
           query.idJeune,
           query.dateMin
         )
-    } else {
+    } else if (query.dateMax) {
       responseRendezVous =
         await this.rendezVousRepository.getQueryModelsByJeuneBefore(
           query.idJeune,
           query.dateMax
         )
+    } else {
+      responseRendezVous =
+        await this.rendezVousRepository.getAllQueryModelsByJeune(query.idJeune)
     }
+
     return success(responseRendezVous)
   }
   async authorize(

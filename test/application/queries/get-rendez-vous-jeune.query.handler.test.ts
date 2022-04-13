@@ -38,6 +38,35 @@ describe('GetRendezVousJeuneQueryHandler', () => {
   describe('handle', () => {
     const idJeune = '1'
     const uneDate: Date = new Date('2022-10-10')
+    const rendezVousReponse: RendezVousQueryModel[] = []
+
+    describe('sans date', () => {
+      it('appelle la methode pour tous les rendez-vous', async () => {
+        // Given
+        const query: GetRendezVousJeuneQuery = {
+          idJeune: idJeune,
+          dateMin: undefined,
+          dateMax: undefined
+        }
+        rendezVousRepository.getAllQueryModelsByJeune.resolves(
+          rendezVousReponse
+        )
+
+        // When
+        const obtenu: Result<RendezVousQueryModel[]> =
+          await getRendezVousQueryHandler.handle(query)
+
+        // Then
+        expect(
+          rendezVousRepository.getAllQueryModelsByJeune
+        ).to.have.been.calledWithExactly(query.idJeune)
+        expect(obtenu._isSuccess).to.equal(true)
+        if (obtenu._isSuccess) {
+          expect(obtenu.data).to.equal(rendezVousReponse)
+        }
+      })
+    })
+
     describe('dateMin renseignée', () => {
       it('appelle la methode pour les rendez-vous futurs', async () => {
         // Given
@@ -46,10 +75,9 @@ describe('GetRendezVousJeuneQueryHandler', () => {
           dateMin: uneDate,
           dateMax: undefined
         }
-        const rendezVousReponse: RendezVousQueryModel[] = []
-        rendezVousRepository.getQueryModelsByJeuneAfter
-          .withArgs(query.idJeune, query.dateMin)
-          .resolves(rendezVousReponse)
+        rendezVousRepository.getQueryModelsByJeuneAfter.resolves(
+          rendezVousReponse
+        )
 
         // When
         const obtenu: Result<RendezVousQueryModel[]> =
@@ -73,10 +101,9 @@ describe('GetRendezVousJeuneQueryHandler', () => {
           dateMin: undefined,
           dateMax: uneDate
         }
-        const rendezVousReponse: RendezVousQueryModel[] = []
-        rendezVousRepository.getQueryModelsByJeuneBefore
-          .withArgs(query.idJeune, query.dateMax)
-          .resolves(rendezVousReponse)
+        rendezVousRepository.getQueryModelsByJeuneBefore.resolves(
+          rendezVousReponse
+        )
 
         // When
         const obtenu: Result<RendezVousQueryModel[]> =
