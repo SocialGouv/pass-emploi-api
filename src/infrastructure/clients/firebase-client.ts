@@ -7,7 +7,7 @@ import { Authentification } from '../../domain/authentification'
 import { getAPMInstance } from '../monitoring/apm.init'
 import Type = Authentification.Type
 import Timestamp = firestore.Timestamp
-import { ChatCrypto } from '../../utils/chat-crypto'
+import { ChatCryptoService } from '../../utils/chat-crypto-service'
 
 export interface IFirebaseClient {
   send(tokenMessage: TokenMessage): Promise<void>
@@ -33,7 +33,7 @@ export class FirebaseClient implements IFirebaseClient {
 
   constructor(
     private configService: ConfigService,
-    private readonly chatCrypto: ChatCrypto
+    private readonly chatCryptoService: ChatCryptoService
   ) {
     const firebase = this.configService.get('firebase.key')
     this.app = FirebaseClient.getApp(firebase)
@@ -111,9 +111,9 @@ export class FirebaseClient implements IFirebaseClient {
     jeuneIds: string[]
   ): Promise<void> {
     const messageTransfertChat =
-      'Vous échangez avec votre nouveau conseiller.\n Il a accès à l’historique de vos échanges'
-    const messageCrypteAvecVecteurInitialisation =
-      this.chatCrypto.encrypt(messageTransfertChat)
+      'Vous échangez avec votre nouveau conseiller.\nIl a accès à l’historique de vos échanges'
+    const { encryptedText, iv } =
+      this.chatCryptoService.encrypt(messageTransfertChat)
 
     try {
       await this.firestore.runTransaction(async t => {
@@ -139,8 +139,8 @@ export class FirebaseClient implements IFirebaseClient {
                 sentBy: 'conseiller',
                 conseillerId: conseillerCibleId,
                 type: 'NOUVEAU_CONSEILLER',
-                content: messageCrypteAvecVecteurInitialisation.encryptedText,
-                iv: messageCrypteAvecVecteurInitialisation.iv,
+                content: encryptedText,
+                iv: iv,
                 creationDate: Timestamp.fromDate(new Date())
               }
             )

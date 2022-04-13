@@ -145,7 +145,7 @@ import { GetJeuneMiloByDossierQueryHandler } from './application/queries/get-jeu
 import { UpdateRendezVousCommandHandler } from './application/commands/update-rendez-vous.command.handler'
 import { InvitationIcsClient } from './infrastructure/clients/invitation-ics.client'
 import { MailClientToken } from './domain/mail'
-import { ChatCrypto } from './utils/chat-crypto'
+import { ChatCryptoService } from './utils/chat-crypto-service'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -182,7 +182,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     JwtService,
     IdService,
     DateService,
-    ChatCrypto,
+    ChatCryptoService,
     PoleEmploiClient,
     ImmersionClient,
     EngagementClient,
