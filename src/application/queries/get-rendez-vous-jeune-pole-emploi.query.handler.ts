@@ -25,6 +25,7 @@ import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
 export interface GetRendezVousJeunePoleEmploiQuery extends Query {
   idJeune: string
   accessToken: string
+  dateMin?: Date
 }
 
 @Injectable()
@@ -58,12 +59,13 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     )
 
     try {
+      const dateRecherche = query.dateMin
+        ? DateTime.fromJSDate(query.dateMin)
+        : maintenant
+
       const [responsePrestations, responseRendezVous] = await Promise.all([
-        await this.poleEmploiPartenaireClient.getPrestations(
-          idpToken,
-          maintenant
-        ),
-        await this.poleEmploiPartenaireClient.getRendezVous(idpToken)
+        this.poleEmploiPartenaireClient.getPrestations(idpToken, dateRecherche),
+        this.poleEmploiPartenaireClient.getRendezVous(idpToken)
       ])
 
       const prestations: PrestationDto[] = responsePrestations?.data ?? []
@@ -101,13 +103,18 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
           )
         })
       )
-      const rendezVousPoleEmploi = rendezVousPoleEmploiDto.map(rendezVous => {
-        return fromRendezVousDtoToRendezVousQueryModel(
-          rendezVous,
-          jeune,
-          this.idService
+      const rendezVousPoleEmploi = rendezVousPoleEmploiDto
+        .map(rendezVous => {
+          return fromRendezVousDtoToRendezVousQueryModel(
+            rendezVous,
+            jeune,
+            this.idService
+          )
+        })
+        .filter(
+          rendezVous =>
+            query.dateMin && rendezVous.date.getTime() > query.dateMin.getTime()
         )
-      })
 
       const rendezVousDuJeune = rendezVousPrestations
         .concat(rendezVousPoleEmploi)

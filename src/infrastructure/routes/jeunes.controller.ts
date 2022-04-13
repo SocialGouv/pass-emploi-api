@@ -244,7 +244,8 @@ export class JeunesController {
       result = await this.getRendezVousJeunePoleEmploiQueryHandler.execute(
         {
           idJeune,
-          accessToken
+          accessToken,
+          dateMin: getRendezVousQueryParams?.dateMin
         },
         utilisateur
       )
