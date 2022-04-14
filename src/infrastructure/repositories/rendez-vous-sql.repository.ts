@@ -163,7 +163,7 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
   async getRendezVousPassesQueryModelsByJeune(
     idJeune: string
   ): Promise<RendezVousQueryModel[]> {
-    const maintenant = this.dateService.nowJs()
+    const maintenant = this.dateService.nowAtMidnightJs()
     const rendezVousSqlAfter = await RendezVousSqlModel.findAll({
       include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }],
       where: {
@@ -185,7 +185,7 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
   async getRendezVousFutursQueryModelsByJeune(
     idJeune: string
   ): Promise<RendezVousQueryModel[]> {
-    const maintenant = this.dateService.nowJs()
+    const maintenant = this.dateService.nowAtMidnightJs()
     const rendezVousSqlBefore = await RendezVousSqlModel.findAll({
       include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }],
       where: {

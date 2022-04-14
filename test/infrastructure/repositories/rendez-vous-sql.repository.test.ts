@@ -10,7 +10,7 @@ import {
 } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { DateService } from '../../../src/utils/date-service'
-import { uneDatetime } from '../../fixtures/date.fixture'
+import { uneDatetime, uneDatetimeMinuit } from '../../fixtures/date.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
@@ -21,6 +21,7 @@ describe('RendezVousRepositorySql', () => {
   DatabaseForTesting.prepare()
   let rendezVousRepositorySql: RendezVousRepositorySql
   const maintenant = uneDatetime
+  const aujourdhuiMinuit = uneDatetimeMinuit
   let unRendezVousPasse: AsSql<RendezVousDto>
   let unRendezVousTresPasse: AsSql<RendezVousDto>
   let unRendezVousProche: AsSql<RendezVousDto>
@@ -30,6 +31,7 @@ describe('RendezVousRepositorySql', () => {
   beforeEach(async () => {
     const dateService = stubClass(DateService)
     dateService.nowJs.returns(maintenant.toJSDate())
+    dateService.nowAtMidnightJs.returns(aujourdhuiMinuit.toJSDate())
     rendezVousRepositorySql = new RendezVousRepositorySql(dateService)
 
     // Given

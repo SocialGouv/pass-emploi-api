@@ -22,6 +22,7 @@ import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { RendezVous } from '../../../src/domain/rendez-vous'
 
 describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   let jeunesRepository: StubbedType<Jeune.Repository>
@@ -315,12 +316,20 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
 
       describe('quand periode est PASSES', () => {
         it('renvoie un tableau vide', async () => {
+          // Given
+          const queryPasses: GetRendezVousJeunePoleEmploiQuery = {
+            idJeune: '1',
+            accessToken: 'token',
+            periode: RendezVous.Periode.PASSES
+          }
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           // When
           const result = await getRendezVousJeunePoleEmploiQueryHandler.handle(
-            query
+            queryPasses
           )
           // Then
+          expect(poleEmploiPartenaireClient.getPrestations).to.have.callCount(0)
+          expect(poleEmploiPartenaireClient.getRendezVous).to.have.callCount(0)
           expect(result).to.deep.equal({
             _isSuccess: true,
             data: []
