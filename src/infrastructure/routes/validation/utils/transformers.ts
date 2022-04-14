@@ -27,14 +27,6 @@ export function transformStringToBoolean(
   return params.obj[key]
 }
 
-export function transformStringToDate(
-  params: TransformFnParams,
-  key: string
-): Date {
-  params.obj[key] = new Date(params.value)
-  return params.obj[key]
-}
-
 export function transformStringToInteger(
   params: TransformFnParams,
   key: string
