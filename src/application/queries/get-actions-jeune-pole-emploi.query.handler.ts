@@ -12,10 +12,7 @@ import { IdService } from 'src/utils/id-service'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
-import {
-  DemarcheDto,
-  PoleEmploiPartenaireClient
-} from '../../infrastructure/clients/pole-emploi-partenaire-client'
+import { PoleEmploiPartenaireClient } from '../../infrastructure/clients/pole-emploi-partenaire-client'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
 import { fromDemarcheDtoToActionPoleEmploiQueryModel } from './query-mappers/actions-pole-emploi.mappers'
 import { ActionPoleEmploiQueryModel } from './query-models/actions.query-model'
@@ -54,10 +51,9 @@ export class GetActionsJeunePoleEmploiQueryHandler extends QueryHandler<
     )
 
     try {
-      const responseDemarches =
-        await this.poleEmploiPartenaireClient.getDemarches(idpToken)
-
-      const demarchesDto: DemarcheDto[] = responseDemarches?.data ?? []
+      const demarchesDto = await this.poleEmploiPartenaireClient.getDemarches(
+        idpToken
+      )
 
       const demarches = demarchesDto
         .map(demarcheDto =>

@@ -4,6 +4,7 @@ import * as nock from 'nock'
 import { testConfig } from '../../utils/module-for-testing'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { PoleEmploiPartenaireClient } from '../../../src/infrastructure/clients/pole-emploi-partenaire-client'
+import { uneDemarcheDto } from '../../fixtures/demarches-dto.fixtures'
 
 describe('PoleEmploiPartenaireClient', () => {
   let poleEmploiPartenaireClient: PoleEmploiPartenaireClient
@@ -92,23 +93,45 @@ describe('PoleEmploiPartenaireClient', () => {
   })
 
   describe('getDemarches', () => {
-    it('fait un appel http get avec les bons paramètres', async () => {
-      // Given
-      const tokenJeune = 'token'
+    describe('quand il y a des data', () => {
+      it('renvoie les démarches', async () => {
+        // Given
+        const tokenJeune = 'token'
 
-      nock('https://api-r.es-qvr.fr/partenaire')
-        .get('/peconnect-demarches/v1/demarches')
-        .reply(200, {
-          resultats: []
-        })
-        .isDone()
+        nock('https://api-r.es-qvr.fr/partenaire')
+          .get('/peconnect-demarches/v1/demarches')
+          .reply(200, {
+            resultats: [uneDemarcheDto()]
+          })
+          .isDone()
 
-      // When
-      const response = await poleEmploiPartenaireClient.getDemarches(tokenJeune)
+        // When
+        const demarcheDtos = await poleEmploiPartenaireClient.getDemarches(
+          tokenJeune
+        )
 
-      // Then
-      expect(response.status).to.equal(200)
-      expect(response.data).to.deep.equal({ resultats: [] })
+        // Then
+        expect(demarcheDtos).to.deep.equal([uneDemarcheDto()])
+      })
+    })
+    describe('quand il y a no content', () => {
+      it('renvoie un tableau vide', async () => {
+        // Given
+        const tokenJeune = 'token'
+
+        nock('https://api-r.es-qvr.fr/partenaire')
+          .get('/peconnect-demarches/v1/demarches')
+          .reply(204, '')
+          .isDone()
+
+        // When
+        const demarcheDtos = await poleEmploiPartenaireClient.getDemarches(
+          tokenJeune
+        )
+
+        // Then
+        expect(demarcheDtos).to.deep.equal([])
+      })
     })
   })
 })

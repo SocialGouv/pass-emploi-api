@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios'
-import { Injectable, Logger } from '@nestjs/common'
+import { HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import * as https from 'https'
@@ -139,11 +139,19 @@ export class PoleEmploiPartenaireClient {
     this.apiUrl = this.configService.get('poleEmploiPartenaire').url
   }
 
-  async getDemarches(
-    tokenDuJeune: string
-  ): Promise<AxiosResponse<DemarcheDto[]>> {
+  async getDemarches(tokenDuJeune: string): Promise<DemarcheDto[]> {
     this.logger.log('recuperation des demarches du jeune')
-    return this.get('peconnect-demarches/v1/demarches', tokenDuJeune)
+
+    const response = await this.get(
+      'peconnect-demarches/v1/demarches',
+      tokenDuJeune
+    )
+
+    if (response.status === HttpStatus.NO_CONTENT) {
+      return []
+    }
+
+    return response.data?.resultats ?? []
   }
 
   async getRendezVous(

@@ -20,6 +20,7 @@ import { DateService } from '../../../src/utils/date-service'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { uneDemarcheDto } from '../../fixtures/demarches-dto.fixtures'
 
 describe('GetActionsJeunePoleEmploiQueryHandler', () => {
   let jeunesRepository: StubbedType<Jeune.Repository>
@@ -179,19 +180,8 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
         quoi: '',
         libelleQuoi: ''
       }
-      const demarcheDtoEnCoursProche: DemarcheDto = {
-        id: 'id-demarche',
-        etat: 'EC',
-        dateFin: '2222-04-01T10:20:00+02:00',
-        dateCreation: '',
-        dateModification: '',
-        origineCreateur: 'INDIVIDU',
-        origineDemarche: 'PASS_EMPLOI',
-        pourquoi: '',
-        libellePourquoi: '',
-        quoi: '',
-        libelleQuoi: ''
-      }
+      const demarcheDtoEnCoursProche: DemarcheDto = uneDemarcheDto()
+
       const demarcheDtoAFaireAuMilieu: DemarcheDto = {
         id: 'id-demarche',
         etat: 'AF',
@@ -245,27 +235,20 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
         quoi: '',
         libelleQuoi: ''
       }
-      const axiosResponse = {
-        config: undefined,
-        headers: undefined,
-        request: undefined,
-        status: 200,
-        statusText: '',
-        data: [
-          demarcheDtoAnnulee,
-          demarcheDtoEnCours,
-          demarcheDtoRetard,
-          demarcheDtoRealisee,
-          demarcheDtoAFaireAuMilieu,
-          demarcheDtoEnCoursProche
-        ]
-      }
+
       describe("quand pas d'erreur", () => {
         it('récupère les demarches Pole Emploi du jeune bien triés', async () => {
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getDemarches
             .withArgs(idpToken)
-            .resolves(axiosResponse)
+            .resolves([
+              demarcheDtoAnnulee,
+              demarcheDtoEnCours,
+              demarcheDtoRetard,
+              demarcheDtoRealisee,
+              demarcheDtoAFaireAuMilieu,
+              demarcheDtoEnCoursProche
+            ])
 
           // When
           const result = await getActionsJeunePoleEmploiQueryHandler.handle(
