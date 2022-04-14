@@ -191,6 +191,28 @@ describe('AuthentificationSqlRepository', () => {
       )
       expect(utilisateur).to.deep.equal(unJeuneMisAJour)
     })
+    it("conserve l'id dossier d'un jeune MILO", async () => {
+      const jeuneAvant = await JeuneSqlModel.findByPk(unJeune.id)
+      expect(jeuneAvant?.idDossier).to.deep.equal(unJeune.idDossier)
+
+      // When
+      const unJeuneMisAJour: Authentification.Utilisateur = {
+        id: unJeune.id,
+        type: Authentification.Type.JEUNE,
+        structure: Core.Structure.MILO,
+        roles: [],
+        nom: 'nouveauNom',
+        prenom: 'nouveauPrenom',
+        email: 'nouveauEmail',
+        idAuthentification: 'nouvelIdAuthentification',
+        dateDerniereConnexion: uneDate()
+      }
+      await authentificationSqlRepository.update(unJeuneMisAJour)
+
+      // Then
+      const jeune = await JeuneSqlModel.findByPk(unJeune.id)
+      expect(jeune?.idDossier).to.deep.equal(unJeune.idDossier)
+    })
     it("met à jour l'utilisateur de type CONSEILLER", async () => {
       // When
       const unConseillerMisAJour: Authentification.Utilisateur = {
