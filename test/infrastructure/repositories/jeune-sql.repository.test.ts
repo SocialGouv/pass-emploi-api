@@ -264,7 +264,7 @@ describe('JeuneSqlRepository', () => {
 
     beforeEach(async () => {
       // Given
-      jeune = unJeuneSansConseiller()
+      jeune = { ...unJeuneSansConseiller(), idDossier: 'test-id-dossier' }
       await JeuneSqlModel.creer(
         unJeuneDto({
           idConseiller: undefined,

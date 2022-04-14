@@ -15,6 +15,7 @@ export const unJeune = (
     conseiller: unConseiller(),
     creationDate: uneDatetime,
     email: 'john.doe@plop.io',
+    idDossier: '1234',
     structure: Core.Structure.MILO
   }
 
@@ -23,7 +24,7 @@ export const unJeune = (
 
 export const unJeuneSansPushNotificationToken = (
   conseiller = unConseiller()
-): Required<Omit<Jeune, 'tokenLastUpdate' | 'idDossier'>> => ({
+): Required<Omit<Jeune, 'tokenLastUpdate'>> => ({
   id: 'ABCDE',
   lastName: 'Doe',
   firstName: 'John',
@@ -32,6 +33,7 @@ export const unJeuneSansPushNotificationToken = (
   conseiller,
   creationDate: uneDatetime,
   email: 'john.doe@plop.io',
+  idDossier: '1234',
   structure: Core.Structure.MILO
 })
 
@@ -47,6 +49,7 @@ export const unJeuneSansConseiller = (
     creationDate: uneDatetime,
     tokenLastUpdate: uneDatetime,
     email: 'john.doe@plop.io',
+    idDossier: '1234',
     structure: Core.Structure.MILO
   }
 

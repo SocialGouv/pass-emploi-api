@@ -60,7 +60,8 @@ export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
     pushNotificationToken: jeuneSqlModel.pushNotificationToken ?? undefined,
     tokenLastUpdate: getTokenLastUpdate(jeuneSqlModel),
     structure: jeuneSqlModel.structure,
-    email: jeuneSqlModel.email ?? undefined
+    email: jeuneSqlModel.email ?? undefined,
+    idDossier: jeuneSqlModel.idDossier ?? undefined
   }
   if (jeuneSqlModel.conseiller) {
     jeune.conseiller = {
