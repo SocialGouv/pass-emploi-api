@@ -55,7 +55,7 @@ describe('RendezVousAuthorizer', () => {
         const call = rendezVousAuthorizer.authorize('rdv-id', utilisateur)
 
         // Then
-        expect(call).to.be.rejectedWith(Unauthorized)
+        await expect(call).to.be.rejectedWith(Unauthorized)
       })
     })
   })

@@ -1,6 +1,7 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import { TransfererJeunesConseillerCommandHandler } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
 import { Core } from 'src/domain/core'
+import { RendezVous } from 'src/domain/rendez-vous'
 import { TransfererConseillerPayload } from 'src/infrastructure/routes/validation/jeunes.inputs'
 import * as request from 'supertest'
 import {
@@ -593,9 +594,8 @@ describe('JeunesController', () => {
       })
     })
 
-    describe("quand ce n'est un jeune pole-emploi", () => {
+    describe("quand ce n'est pas un jeune pole-emploi", () => {
       const idJeune = '1'
-      const uneDateString = '2020-10-10'
       const rendezVousJeuneQueryModel: RendezVousQueryModel[] = []
       it('renvoit une 404 quand le jeune n"existe pas', async () => {
         // Given
@@ -613,7 +613,7 @@ describe('JeunesController', () => {
           // Then
           .expect(expectedResponseJson)
       })
-      it("retourne tous les rendez-vous si aucune date n'est renseignée", async () => {
+      it("retourne tous les rendez-vous si aucune période n'est renseignée", async () => {
         // Given
         getRendezVousJeuneQueryHandler.execute.resolves(
           success(rendezVousJeuneQueryModel)
@@ -628,20 +628,20 @@ describe('JeunesController', () => {
         ).to.have.been.calledWithExactly(
           {
             idJeune,
-            dateMin: undefined,
-            dateMax: undefined
+            periode: undefined
           },
           unUtilisateurDecode()
         )
       })
-      it('retourne les rendez-vous futurs si dateMin est renseignée', async () => {
+
+      it('retourne les rendez-vous futurs si periode FUTURS est renseignée', async () => {
         // Given
         getRendezVousJeuneQueryHandler.execute.resolves(
           success(rendezVousJeuneQueryModel)
         )
         // When - Then
         await request(app.getHttpServer())
-          .get(`/jeunes/${idJeune}/rendezvous?dateMin=${uneDateString}`)
+          .get(`/jeunes/${idJeune}/rendezvous?periode=FUTURS`)
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.OK)
         expect(
@@ -649,20 +649,19 @@ describe('JeunesController', () => {
         ).to.have.been.calledWithExactly(
           {
             idJeune,
-            dateMin: new Date(uneDateString),
-            dateMax: undefined
+            periode: RendezVous.Periode.FUTURS
           },
           unUtilisateurDecode()
         )
       })
-      it('retourne les rendez-vous passés si aucune dateMax est renseignée', async () => {
+      it('retourne les rendez-vous passés si periode PASSES est renseignée', async () => {
         // Given
         getRendezVousJeuneQueryHandler.execute.resolves(
           success(rendezVousJeuneQueryModel)
         )
         // When - Then
         await request(app.getHttpServer())
-          .get(`/jeunes/${idJeune}/rendezvous?dateMax=${uneDateString}`)
+          .get(`/jeunes/${idJeune}/rendezvous?periode=PASSES`)
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.OK)
         expect(
@@ -670,34 +669,15 @@ describe('JeunesController', () => {
         ).to.have.been.calledWithExactly(
           {
             idJeune,
-            dateMax: new Date(uneDateString),
-            dateMin: undefined
+            periode: RendezVous.Periode.PASSES
           },
           unUtilisateurDecode()
         )
       })
-      it('retourne une 400 quand une date est mal formatée', async () => {
-        // Given
-        const dateStringMalFormatée = '202-33XXX'
-        getRendezVousJeuneQueryHandler.execute.resolves(
-          success(rendezVousJeuneQueryModel)
-        )
+      it('retourne une 400 quand periode est mal formatée', async () => {
         // When - Then
         await request(app.getHttpServer())
-          .get(`/jeunes/${idJeune}/rendezvous?dateMin=${dateStringMalFormatée}`)
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.BAD_REQUEST)
-      })
-      it("retourne une 400 quand il y'a les 2 dates", async () => {
-        // Given
-        getRendezVousJeuneQueryHandler.execute.resolves(
-          success(rendezVousJeuneQueryModel)
-        )
-        // When - Then
-        await request(app.getHttpServer())
-          .get(
-            `/jeunes/${idJeune}/rendezvous?dateMin=${uneDateString}&dateMax=${uneDateString}`
-          )
+          .get(`/jeunes/${idJeune}/rendezvous?periode=XX`)
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.BAD_REQUEST)
       })

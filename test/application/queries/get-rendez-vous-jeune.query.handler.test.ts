@@ -37,16 +37,14 @@ describe('GetRendezVousJeuneQueryHandler', () => {
 
   describe('handle', () => {
     const idJeune = '1'
-    const uneDate: Date = new Date('2022-10-10')
     const rendezVousReponse: RendezVousQueryModel[] = []
 
-    describe('sans date', () => {
+    describe('sans periode', () => {
       it('appelle la methode pour tous les rendez-vous', async () => {
         // Given
         const query: GetRendezVousJeuneQuery = {
           idJeune: idJeune,
-          dateMin: undefined,
-          dateMax: undefined
+          periode: undefined
         }
         rendezVousRepository.getAllQueryModelsByJeune.resolves(
           rendezVousReponse
@@ -67,52 +65,49 @@ describe('GetRendezVousJeuneQueryHandler', () => {
       })
     })
 
-    describe('dateMin renseignée', () => {
+    describe('periode FUTURS renseignée', () => {
       it('appelle la methode pour les rendez-vous futurs', async () => {
         // Given
         const query: GetRendezVousJeuneQuery = {
           idJeune: idJeune,
-          dateMin: uneDate,
-          dateMax: undefined
+          periode: RendezVous.Periode.FUTURS
         }
-        rendezVousRepository.getQueryModelsByJeuneAfter.resolves(
+        rendezVousRepository.getRendezVousFutursQueryModelsByJeune.resolves(
           rendezVousReponse
         )
-
         // When
         const obtenu: Result<RendezVousQueryModel[]> =
           await getRendezVousQueryHandler.handle(query)
 
         // Then
         expect(
-          rendezVousRepository.getQueryModelsByJeuneAfter
-        ).to.have.been.calledWithExactly(query.idJeune, query.dateMin)
+          rendezVousRepository.getRendezVousFutursQueryModelsByJeune
+        ).to.have.been.calledWithExactly(query.idJeune)
         expect(obtenu._isSuccess).to.equal(true)
         if (obtenu._isSuccess) {
           expect(obtenu.data).to.equal(rendezVousReponse)
         }
       })
     })
-    describe('dateMax renseignée', () => {
+
+    describe('periode PASSES renseignée', () => {
       it('appelle la methode pour les rendez-vous passés', async () => {
         // Given
         const query: GetRendezVousJeuneQuery = {
           idJeune: idJeune,
-          dateMin: undefined,
-          dateMax: uneDate
+          periode: RendezVous.Periode.PASSES
         }
-        rendezVousRepository.getQueryModelsByJeuneBefore.resolves(
+        rendezVousRepository.getRendezVousPassesQueryModelsByJeune.resolves(
           rendezVousReponse
         )
-
         // When
         const obtenu: Result<RendezVousQueryModel[]> =
           await getRendezVousQueryHandler.handle(query)
 
         // Then
         expect(
-          rendezVousRepository.getQueryModelsByJeuneBefore
-        ).to.have.been.calledWithExactly(query.idJeune, query.dateMax)
+          rendezVousRepository.getRendezVousPassesQueryModelsByJeune
+        ).to.have.been.calledWithExactly(query.idJeune)
         expect(obtenu._isSuccess).to.equal(true)
         if (obtenu._isSuccess) {
           expect(obtenu.data).to.equal(rendezVousReponse)

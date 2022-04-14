@@ -245,7 +245,7 @@ export class JeunesController {
         {
           idJeune,
           accessToken,
-          dateMin: getRendezVousQueryParams?.dateMin
+          periode: getRendezVousQueryParams?.periode
         },
         utilisateur
       )
@@ -253,8 +253,7 @@ export class JeunesController {
       result = await this.getRendezVousJeuneQueryHandler.execute(
         {
           idJeune,
-          dateMin: getRendezVousQueryParams?.dateMin,
-          dateMax: getRendezVousQueryParams?.dateMax
+          periode: getRendezVousQueryParams?.periode
         },
         utilisateur
       )

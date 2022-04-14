@@ -160,45 +160,44 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
     })
   }
 
-  async getQueryModelsByJeuneAfter(
-    idJeune: string,
-    date: Date
+  async getRendezVousPassesQueryModelsByJeune(
+    idJeune: string
   ): Promise<RendezVousQueryModel[]> {
+    const maintenant = this.dateService.nowJs()
     const rendezVousSqlAfter = await RendezVousSqlModel.findAll({
       include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }],
       where: {
         idJeune,
         date: {
-          [Op.gte]: date
-        },
-        dateSuppression: {
-          [Op.is]: null
-        }
-      },
-      order: [['date', 'ASC']],
-      limit: 50
-    })
-
-    return rendezVousSqlAfter.map(fromSqlToRendezVousJeuneQueryModel)
-  }
-
-  async getQueryModelsByJeuneBefore(
-    idJeune: string,
-    date: Date
-  ): Promise<RendezVousQueryModel[]> {
-    const rendezVousSqlBefore = await RendezVousSqlModel.findAll({
-      include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }],
-      where: {
-        idJeune,
-        date: {
-          [Op.lt]: date
+          [Op.lt]: maintenant
         },
         dateSuppression: {
           [Op.is]: null
         }
       },
       order: [['date', 'DESC']],
-      limit: 50
+      limit: 100
+    })
+
+    return rendezVousSqlAfter.map(fromSqlToRendezVousJeuneQueryModel)
+  }
+
+  async getRendezVousFutursQueryModelsByJeune(
+    idJeune: string
+  ): Promise<RendezVousQueryModel[]> {
+    const maintenant = this.dateService.nowJs()
+    const rendezVousSqlBefore = await RendezVousSqlModel.findAll({
+      include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }],
+      where: {
+        idJeune,
+        date: {
+          [Op.gte]: maintenant
+        },
+        dateSuppression: {
+          [Op.is]: null
+        }
+      },
+      order: [['date', 'ASC']]
     })
 
     return rendezVousSqlBefore.map(fromSqlToRendezVousJeuneQueryModel)

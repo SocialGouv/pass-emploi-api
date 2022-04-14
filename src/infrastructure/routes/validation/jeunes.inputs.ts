@@ -1,16 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { Transform } from 'class-transformer'
+
 import {
   ArrayNotEmpty,
-  Equals,
   IsArray,
-  IsDate,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
-  IsString,
-  ValidateIf
+  IsString
 } from 'class-validator'
-import { transformStringToDate } from './utils/transformers'
+import { RendezVous } from 'src/domain/rendez-vous'
 
 export class PutNotificationTokenInput {
   @ApiProperty()
@@ -37,23 +35,9 @@ export class TransfererConseillerPayload {
 }
 
 export class GetRendezVousJeuneQueryParams {
-  @ApiProperty({
-    description: 'date incluse',
-    required: false
-  })
+  @ApiProperty({ required: false, enum: RendezVous.Periode })
   @IsOptional()
-  @IsDate()
-  @Transform(params => transformStringToDate(params, 'dateMin'))
-  dateMin?: Date
-
-  @ApiProperty({
-    description: 'date exclue',
-    required: false
-  })
-  @IsOptional()
-  @IsDate()
-  @Transform(params => transformStringToDate(params, 'dateMax'))
-  @ValidateIf(payload => payload.dateMin !== undefined)
-  @Equals(undefined)
-  dateMax?: Date
+  @IsString()
+  @IsEnum(RendezVous.Periode)
+  periode?: RendezVous.Periode
 }

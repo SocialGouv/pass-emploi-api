@@ -94,18 +94,21 @@ export namespace RendezVous {
       presenceConseiller?: boolean
     ): Promise<RendezVousConseillerQueryModel>
     getAllQueryModelsByJeune(idJeune: string): Promise<RendezVousQueryModel[]>
-    getQueryModelsByJeuneBefore(
-      idJeune: string,
-      date?: Date
+    getRendezVousPassesQueryModelsByJeune(
+      idJeune: string
     ): Promise<RendezVousQueryModel[]>
-    getQueryModelsByJeuneAfter(
-      idJeune: string,
-      date?: Date
+    getRendezVousFutursQueryModelsByJeune(
+      idJeune: string
     ): Promise<RendezVousQueryModel[]>
     getTypesRendezVousQueryModel(): TypesRendezVousQueryModel
     getQueryModelById(
       idRendezVous: string
     ): Promise<RendezVousQueryModel | undefined>
+  }
+
+  export enum Periode {
+    PASSES = 'PASSES',
+    FUTURS = 'FUTURS'
   }
 
   export function createRendezVousConseiller(

@@ -14,9 +14,10 @@ import {
 import { CodeTypeRendezVous } from 'src/domain/rendez-vous'
 
 export class CreateRendezVousPayload {
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsString()
-  comment: string
+  @IsOptional()
+  comment?: string
 
   @ApiProperty()
   @IsString()

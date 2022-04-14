@@ -245,59 +245,35 @@ describe('RendezVousRepositorySql', () => {
     })
   })
 
-  describe('getQueryModelsByJeuneAfter', () => {
-    it('retourne les rendez-vous du jeune', async () => {
-      // Given
-      const uneDateProche: Date = maintenant.plus({ days: 1 }).toJSDate()
-      const uneDateTresFutur: Date = maintenant.plus({ days: 19 }).toJSDate()
-
+  describe('getRendezVousPassesQueryModelsByJeune', () => {
+    it('retourne les rendez-vous passés du jeune', async () => {
       // When
-      const rendezVousDateProche: RendezVousQueryModel[] =
-        await rendezVousRepositorySql.getQueryModelsByJeuneAfter(
-          jeune.id,
-          uneDateProche
+      const rendezVous =
+        await rendezVousRepositorySql.getRendezVousPassesQueryModelsByJeune(
+          jeune.id
         )
-      const rendezVousDateTresFutur: RendezVousQueryModel[] =
-        await rendezVousRepositorySql.getQueryModelsByJeuneAfter(
-          jeune.id,
-          uneDateTresFutur
-        )
+
       // Then
-      expect(rendezVousDateProche.length).to.equal(2)
-      expect(rendezVousDateProche[0].id).to.equal(unRendezVousProche.id)
-      expect(rendezVousDateProche[1].id).to.equal(
-        unRendezVousTresFuturPresenceConseillerFalse.id
-      )
-      expect(rendezVousDateTresFutur.length).to.equal(1)
-      expect(rendezVousDateTresFutur[0].id).to.equal(
-        unRendezVousTresFuturPresenceConseillerFalse.id
-      )
+      expect(rendezVous.length).to.equal(2)
+      expect(rendezVous[0].id).to.equal(unRendezVousPasse.id)
+      expect(rendezVous[1].id).to.equal(unRendezVousTresPasse.id)
     })
   })
 
-  describe('getQueryModelsByJeuneBefore', () => {
-    it('retourne les rendez-vous du jeune', async () => {
-      // Given
-      const uneDatePassee: Date = maintenant.minus({ days: 1 }).toJSDate()
-      const uneDateTresPassee: Date = maintenant.minus({ days: 19 }).toJSDate()
-
+  describe('getRendezVousFutursQueryModelsByJeune', () => {
+    it('retourne les rendez-vous futurs du jeune', async () => {
       // When
-      const rendezVousDatePassee: RendezVousQueryModel[] =
-        await rendezVousRepositorySql.getQueryModelsByJeuneBefore(
-          jeune.id,
-          uneDatePassee
+      const rendezVous =
+        await rendezVousRepositorySql.getRendezVousFutursQueryModelsByJeune(
+          jeune.id
         )
-      const rendezVousDateTresPassee: RendezVousQueryModel[] =
-        await rendezVousRepositorySql.getQueryModelsByJeuneBefore(
-          jeune.id,
-          uneDateTresPassee
-        )
+
       // Then
-      expect(rendezVousDatePassee.length).to.equal(2)
-      expect(rendezVousDatePassee[0].id).to.equal(unRendezVousPasse.id)
-      expect(rendezVousDatePassee[1].id).to.equal(unRendezVousTresPasse.id)
-      expect(rendezVousDateTresPassee.length).to.equal(1)
-      expect(rendezVousDateTresPassee[0].id).to.equal(unRendezVousTresPasse.id)
+      expect(rendezVous.length).to.equal(2)
+      expect(rendezVous[0].id).to.equal(unRendezVousProche.id)
+      expect(rendezVous[1].id).to.equal(
+        unRendezVousTresFuturPresenceConseillerFalse.id
+      )
     })
   })
 

@@ -7,6 +7,7 @@ import {
 import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
+import { RendezVous } from 'src/domain/rendez-vous'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { Query } from '../../building-blocks/types/query'
@@ -25,7 +26,7 @@ import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
 export interface GetRendezVousJeunePoleEmploiQuery extends Query {
   idJeune: string
   accessToken: string
-  dateMin?: Date
+  periode?: RendezVous.Periode
 }
 
 @Injectable()
@@ -53,18 +54,18 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
 
+    if (query.periode === RendezVous.Periode.PASSES) {
+      return success([])
+    }
+
     const maintenant = this.dateService.now()
     const idpToken = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
       query.accessToken
     )
 
     try {
-      const dateRecherche = query.dateMin
-        ? DateTime.fromJSDate(query.dateMin)
-        : maintenant
-
       const [responsePrestations, responseRendezVous] = await Promise.all([
-        this.poleEmploiPartenaireClient.getPrestations(idpToken, dateRecherche),
+        this.poleEmploiPartenaireClient.getPrestations(idpToken, maintenant),
         this.poleEmploiPartenaireClient.getRendezVous(idpToken)
       ])
 
@@ -103,18 +104,13 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
           )
         })
       )
-      const rendezVousPoleEmploi = rendezVousPoleEmploiDto
-        .map(rendezVous => {
-          return fromRendezVousDtoToRendezVousQueryModel(
-            rendezVous,
-            jeune,
-            this.idService
-          )
-        })
-        .filter(
-          rendezVous =>
-            query.dateMin && rendezVous.date.getTime() > query.dateMin.getTime()
+      const rendezVousPoleEmploi = rendezVousPoleEmploiDto.map(rendezVous => {
+        return fromRendezVousDtoToRendezVousQueryModel(
+          rendezVous,
+          jeune,
+          this.idService
         )
+      })
 
       const rendezVousDuJeune = rendezVousPrestations
         .concat(rendezVousPoleEmploi)
