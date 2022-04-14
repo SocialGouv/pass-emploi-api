@@ -175,7 +175,8 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
           [Op.is]: null
         }
       },
-      order: [['date', 'DESC']]
+      order: [['date', 'DESC']],
+      limit: 100
     })
 
     return rendezVousSqlAfter.map(fromSqlToRendezVousJeuneQueryModel)
