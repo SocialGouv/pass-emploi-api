@@ -1,5 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { EvenementService } from 'src/domain/evenement'
+import { Mail } from 'src/domain/mail'
+import { unMailDto } from 'test/fixtures/mail.fixture'
 import {
   DeleteJeuneCommand,
   DeleteJeuneCommandHandler
@@ -27,21 +29,30 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('DeleteJeuneCommandHandler', () => {
   let jeuneRepository: StubbedType<Jeune.Repository>
+  let conseillerRepository: StubbedType<Conseiller.Repository>
   let chatRepository: StubbedType<Chat.Repository>
   let commandHandler: DeleteJeuneCommandHandler
   let evenementService: StubbedClass<EvenementService>
+  let mailFactory: StubbedClass<Mail.Factory>
+  let mailClient: StubbedType<Mail.Client>
   let conseiller: Conseiller
   let jeune: Jeune
   let command: DeleteJeuneCommand
   beforeEach(() => {
     const sandbox = createSandbox()
     jeuneRepository = stubInterface(sandbox)
+    conseillerRepository = stubInterface(sandbox)
     chatRepository = stubInterface(sandbox)
     evenementService = stubClass(EvenementService)
+    mailClient = stubInterface(sandbox)
+    mailFactory = stubClass(Mail.Factory)
     commandHandler = new DeleteJeuneCommandHandler(
       jeuneRepository,
+      conseillerRepository,
       chatRepository,
-      evenementService
+      evenementService,
+      mailClient,
+      mailFactory
     )
 
     conseiller = unConseiller()
@@ -51,6 +62,8 @@ describe('DeleteJeuneCommandHandler', () => {
     })
     command = { idJeune: 'ABCDE' }
     jeuneRepository.get.withArgs('ABCDE').resolves(jeune)
+    conseillerRepository.get.withArgs(jeune.conseiller?.id).resolves(conseiller)
+    mailFactory.creerMailSuppressionJeune.returns(unMailDto())
   })
 
   describe('.authorize', () => {
@@ -127,6 +140,14 @@ describe('DeleteJeuneCommandHandler', () => {
         expect(chatRepository.supprimerChat).to.have.been.calledWith(
           command.idJeune
         )
+      })
+
+      it('envoie un email au conseiller', () => {
+        expect(mailFactory.creerMailSuppressionJeune).to.have.been.calledWith(
+          conseiller,
+          jeune
+        )
+        expect(mailClient.postMail).to.have.been.calledWith(unMailDto())
       })
 
       it('renvoie un succès', () => {

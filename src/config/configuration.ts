@@ -35,7 +35,8 @@ export default () => {
     logLevel: process.env.LOG_LEVEL,
     nodeEnv: process.env.NODE_ENV || 'production',
     frontEndUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
-    passEmploiContactEmail:  process.env.PASS_EMPLOI_CONTACT_EMAIL || 'pass.emploi.contact@gmail.com',
+    passEmploiContactEmail:
+      process.env.PASS_EMPLOI_CONTACT_EMAIL || 'pass.emploi.contact@gmail.com',
     baseUrl,
     poleEmploi: {
       url:
@@ -77,7 +78,7 @@ export default () => {
     oidc: {
       issuerUrl: process.env.OIDC_ISSUER_URL ?? '',
       clientId: process.env.OIDC_CLIENT_ID ?? '',
-      clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
+      clientSecret: process.env.OIDC_CLIENT_SECRET ?? ''
     },
     apiKeys: {
       keycloak: process.env.API_KEY_KEYCLOAK ?? 'ceci-est-une-api-key',
@@ -91,8 +92,14 @@ export default () => {
       url: process.env.SENDINBLUE_API_URL ?? 'https://api.sendinblue.com',
       apiKey: process.env.SENDINBLUE_API_KEY ?? '',
       templates: {
-        conversationsNonLues: process.env.SENDINBLUE_CONVERSATIONS_TEMPLATE_ID ?? '2',
-        nouveauRendezvous: process.env.SENDINBLUE_NOUVEAU_RENDEZVOUS_TEMPLATE_ID ?? '3'
+        conversationsNonLues:
+          process.env.SENDINBLUE_CONVERSATIONS_TEMPLATE_ID ?? '2',
+        nouveauRendezvous:
+          process.env.SENDINBLUE_NOUVEAU_RENDEZVOUS_TEMPLATE_ID ?? '3',
+        suppressionJeuneMilo:
+          process.env.SENDINBLUE_SUPPRESSION_JEUNE_MILO_ID ?? '14',
+        suppressionJeunePE:
+          process.env.SENDINBLUE_SUPPRESSION_JEUNE_PE_ID ?? '17'
       }
     },
     task: process.env.TASK,

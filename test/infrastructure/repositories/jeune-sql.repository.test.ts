@@ -6,6 +6,12 @@ import {
 } from 'src/infrastructure/sequelize/models/transfert-conseiller.sql-model'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
+import { unEvenementEngagement } from 'test/fixtures/sql-models/evenement-engagement.sql-model'
+import {
+  unFavoriOffreEmploi,
+  unFavoriOffreEngagement,
+  unFavoriOffreImmersion
+} from 'test/fixtures/sql-models/favoris.sql-model'
 import { Action } from '../../../src/domain/action'
 import { Core } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune'
@@ -14,12 +20,12 @@ import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeu
 import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/recherche-sql.repository'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { RechercheSqlModel } from '../../../src/infrastructure/sequelize/models/recherche.sql-model'
-import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { FavoriOffreEmploiSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
 import { FavoriOffreEngagementSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import { FavoriOffreImmersionSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
+import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { RechercheSqlModel } from '../../../src/infrastructure/sequelize/models/recherche.sql-model'
+import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import {
   uneAutreDate,
@@ -39,12 +45,6 @@ import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { DatabaseForTesting, expect } from '../../utils'
-import {
-  unFavoriOffreEmploi,
-  unFavoriOffreEngagement,
-  unFavoriOffreImmersion
-} from 'test/fixtures/sql-models/favoris.sql-model'
-import { unEvenementEngagement } from 'test/fixtures/sql-models/evenement-engagement.sql-model'
 
 describe('JeuneSqlRepository', () => {
   const databaseForTesting: DatabaseForTesting = DatabaseForTesting.prepare()
@@ -517,40 +517,27 @@ describe('JeuneSqlRepository', () => {
       // Then
       await expect(await jeuneSqlRepository.get('ABCDE')).to.be.undefined
     })
-    it('supprime toutes les dépendences au jeune', async () => {
-      // Given
+
+    describe('supprime toutes les dépendences au jeune', () => {
+      // Given - When
       const conseillerDto = unConseillerDto({
         structure: Core.Structure.POLE_EMPLOI
       })
-      await ConseillerSqlModel.creer(conseillerDto)
-
       const jeuneDto = unJeuneDto({ idConseiller: conseillerDto.id })
-      await JeuneSqlModel.creer(jeuneDto)
-
       const actionDto = uneActionDto({ idJeune: jeuneDto.id })
-      await ActionSqlModel.creer(actionDto)
-
       const rechercheEmploi = uneRecherche({
         idJeune: jeuneDto.id,
         type: Recherche.Type.OFFRES_EMPLOI,
         criteres: {}
       })
-      await rechercheSqlRepository.createRecherche(rechercheEmploi)
-
       const rendezVousDto = unRendezVousDto({ idJeune: jeuneDto.id })
-      await RendezVousSqlModel.create(rendezVousDto)
-
       const favoriOffreEmploi = unFavoriOffreEmploi({ idJeune: jeuneDto.id })
-      await FavoriOffreEmploiSqlModel.create(favoriOffreEmploi)
       const favoriOffreEngagement = unFavoriOffreEngagement({
         idJeune: jeuneDto.id
       })
-      await FavoriOffreEngagementSqlModel.create(favoriOffreEngagement)
       const favoriOffreImmersion = unFavoriOffreImmersion({
         idJeune: jeuneDto.id
       })
-      await FavoriOffreImmersionSqlModel.create(favoriOffreImmersion)
-
       const unTransfertDto: AsSql<TransfertConseillerDto> = {
         id: '070fa845-7316-496e-b96c-b69c2a1f4ce8',
         dateTransfert: new Date('2022-04-02T03:24:00'),
@@ -558,41 +545,67 @@ describe('JeuneSqlRepository', () => {
         idConseillerCible: conseillerDto.id,
         idConseillerSource: conseillerDto.id
       }
-      await TransfertConseillerSqlModel.create(unTransfertDto)
-
       const evenementEngagement = unEvenementEngagement({
         idUtilisateur: jeuneDto.id
       })
-      await EvenementEngagementSqlModel.create(evenementEngagement)
+      beforeEach(async () => {
+        await ConseillerSqlModel.creer(conseillerDto)
+        await JeuneSqlModel.creer(jeuneDto)
+        await ActionSqlModel.creer(actionDto)
+        await rechercheSqlRepository.createRecherche(rechercheEmploi)
+        await RendezVousSqlModel.create(rendezVousDto)
+        await FavoriOffreEmploiSqlModel.create(favoriOffreEmploi)
+        await FavoriOffreEngagementSqlModel.create(favoriOffreEngagement)
+        await FavoriOffreImmersionSqlModel.create(favoriOffreImmersion)
+        await TransfertConseillerSqlModel.create(unTransfertDto)
+        await EvenementEngagementSqlModel.create(evenementEngagement)
 
-      // When
-      await expect(await jeuneSqlRepository.get('ABCDE')).not.to.be.undefined
-      await jeuneSqlRepository.supprimer('ABCDE')
+        await jeuneSqlRepository.supprimer('ABCDE')
+      })
 
-      // Then
-      await expect(await jeuneSqlRepository.get('ABCDE')).to.be.undefined
-      await expect(await ConseillerSqlModel.findByPk(conseillerDto.id)).to.not
-        .be.null
-      await expect(await ActionSqlModel.findByPk(actionDto.id)).to.be.null
-      await expect(await RechercheSqlModel.findByPk(rechercheEmploi.id)).to.be
-        .null
-      await expect(await RendezVousSqlModel.findByPk(rendezVousDto.id)).to.be
-        .null
-      await expect(
-        await TransfertConseillerSqlModel.findByPk(unTransfertDto.id)
-      ).to.be.null
-      await expect(
-        await FavoriOffreEmploiSqlModel.findByPk(favoriOffreEmploi.id)
-      ).to.be.null
-      await expect(
-        await FavoriOffreEngagementSqlModel.findByPk(favoriOffreEngagement.id)
-      ).to.be.null
-      await expect(
-        await FavoriOffreImmersionSqlModel.findByPk(favoriOffreImmersion.id)
-      ).to.be.null
-      await expect(
-        await EvenementEngagementSqlModel.findByPk(evenementEngagement.id)
-      ).not.to.be.null
+      it('supprime le jeune', async () => {
+        await expect(await jeuneSqlRepository.get('ABCDE')).to.be.undefined
+      })
+      it('supprime les actions du jeune', async () => {
+        await expect(await ActionSqlModel.findByPk(actionDto.id)).to.be.null
+      })
+      it('supprime les recherches du jeune', async () => {
+        await expect(await RechercheSqlModel.findByPk(rechercheEmploi.id)).to.be
+          .null
+      })
+      it('supprime les rendez-vous du jeune', async () => {
+        await expect(await RendezVousSqlModel.findByPk(rendezVousDto.id)).to.be
+          .null
+      })
+      it('supprime les transferts du jeune', async () => {
+        await expect(
+          await TransfertConseillerSqlModel.findByPk(unTransfertDto.id)
+        ).to.be.null
+      })
+      it('supprime les favoris emploi du jeune', async () => {
+        await expect(
+          await FavoriOffreEmploiSqlModel.findByPk(favoriOffreEmploi.id)
+        ).to.be.null
+      })
+      it('supprime les favoris engagement du jeune', async () => {
+        await expect(
+          await FavoriOffreEngagementSqlModel.findByPk(favoriOffreEngagement.id)
+        ).to.be.null
+      })
+      it('supprime les favoris immersion du jeune', async () => {
+        await expect(
+          await FavoriOffreImmersionSqlModel.findByPk(favoriOffreImmersion.id)
+        ).to.be.null
+      })
+      it('ne supprime pas le conseiller du jeune', async () => {
+        await expect(await ConseillerSqlModel.findByPk(conseillerDto.id)).to.not
+          .be.null
+      })
+      it("ne supprime pas les evenements d'engagement du jeune", async () => {
+        await expect(
+          await EvenementEngagementSqlModel.findByPk(evenementEngagement.id)
+        ).not.to.be.null
+      })
     })
   })
 
