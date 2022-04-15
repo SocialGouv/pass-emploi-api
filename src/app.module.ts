@@ -144,7 +144,7 @@ import { GetActionsJeunePoleEmploiQueryHandler } from './application/queries/get
 import { GetJeuneMiloByDossierQueryHandler } from './application/queries/get-jeune-milo-by-dossier.query.handler'
 import { UpdateRendezVousCommandHandler } from './application/commands/update-rendez-vous.command.handler'
 import { InvitationIcsClient } from './infrastructure/clients/invitation-ics.client'
-import { MailClientToken } from './domain/mail'
+import { Mail, MailClientToken } from './domain/mail'
 import { ChatCryptoService } from './utils/chat-crypto-service'
 import { DeleteJeuneCommandHandler } from './application/commands/delete-jeune.command.handler'
 
@@ -189,6 +189,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     EngagementClient,
     PoleEmploiPartenaireClient,
     Action.Factory,
+    Mail.Factory,
     Authentification.Factory,
     WorkerService,
     TaskService,

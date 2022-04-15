@@ -1,5 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { Conseiller, ConseillersRepositoryToken } from 'src/domain/conseiller'
 import { Evenement, EvenementService } from 'src/domain/evenement'
+import { Mail } from 'src/domain/mail'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   DroitsInsuffisants,
@@ -28,9 +30,13 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
   constructor(
     @Inject(JeunesRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository,
+    @Inject(ConseillersRepositoryToken)
+    private readonly conseillerRepository: Conseiller.Repository,
     @Inject(ChatRepositoryToken)
     private readonly chatRepository: Chat.Repository,
-    private evenementService: EvenementService
+    private evenementService: EvenementService,
+    private mailClient: Mail.Client,
+    private mailFactory: Mail.Factory
   ) {
     super('DeleteJeuneCommandHandler')
   }
@@ -58,7 +64,16 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
       this.jeuneRepository.supprimer(idJeune),
       this.chatRepository.supprimerChat(idJeune)
     ])
-    // TODO: envoyer un email au conseiller
+
+    const conseiller = jeune.conseiller
+      ? await this.conseillerRepository.get(jeune.conseiller.id)
+      : undefined
+
+    if (conseiller) {
+      const mail = this.mailFactory.creerMailSuppressionJeune(conseiller, jeune)
+      await this.mailClient.postMail(mail)
+    }
+
     return emptySuccess()
   }
 
