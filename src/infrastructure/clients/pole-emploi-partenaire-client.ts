@@ -151,7 +151,7 @@ export class PoleEmploiPartenaireClient {
       return []
     }
 
-    return response.data?.resultats ?? []
+    return response.data ?? []
   }
 
   async getRendezVous(

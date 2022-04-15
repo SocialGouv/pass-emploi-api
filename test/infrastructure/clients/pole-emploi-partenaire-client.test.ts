@@ -100,9 +100,7 @@ describe('PoleEmploiPartenaireClient', () => {
 
         nock('https://api-r.es-qvr.fr/partenaire')
           .get('/peconnect-demarches/v1/demarches')
-          .reply(200, {
-            resultats: [uneDemarcheDto()]
-          })
+          .reply(200, [uneDemarcheDto()])
           .isDone()
 
         // When
