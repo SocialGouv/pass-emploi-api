@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Conseiller, ConseillersRepositoryToken } from 'src/domain/conseiller'
 import { Evenement, EvenementService } from 'src/domain/evenement'
-import { Mail } from 'src/domain/mail'
+import { Mail, MailClientToken } from 'src/domain/mail'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   DroitsInsuffisants,
@@ -35,7 +35,8 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
     @Inject(ChatRepositoryToken)
     private readonly chatRepository: Chat.Repository,
     private evenementService: EvenementService,
-    private mailClient: Mail.Client,
+    @Inject(MailClientToken)
+    private readonly mailClient: Mail.Client,
     private mailFactory: Mail.Factory
   ) {
     super('DeleteJeuneCommandHandler')
