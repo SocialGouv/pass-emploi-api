@@ -74,12 +74,6 @@ describe('CreateActionCommandHandler', () => {
       // Then
       expect(result).to.deep.equal(success(action.id))
       expect(actionRepository.save).to.have.been.calledWithExactly(action)
-      expect(notificationRepository.send).to.have.been.calledWith(
-        Notification.createNouvelleAction(
-          jeune.pushNotificationToken,
-          action.id
-        )
-      )
     })
   })
 
