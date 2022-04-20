@@ -266,7 +266,7 @@ describe('JeunesController', () => {
         })
     })
 
-    it('renvoie une 400 (Bad Request) quand le statut vaut "annulée"', async () => {
+    it('renvoie une 400 (Bad Request) quand le statut est égal à "annulée"', async () => {
       const actionPayloadWithCanceledStatus: CreateActionAvecStatutPayload = {
         content: "Ceci est un contenu d'action",
         comment: 'Ceci est un commentaire',
