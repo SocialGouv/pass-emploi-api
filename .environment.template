@@ -7,7 +7,11 @@ POLE_EMPLOI_CLIENT_ID=id
 POLE_EMPLOI_CLIENT_SECRET=secret
 POLE_EMPLOI_SCOPE=scope
 
-OIDC_ISSUER_URL=https://pa-auth-staging.osc-secnum-fr1.scalingo.io/auth/realms/pass-emploi
+OIDC_ISSUER_URL=https://id.pass-emploi.incubateur.net/auth/realms/pass-emploi
+OIDC_ISSUER_API_URL=https://id.pass-emploi.incubateur.net/auth/admin/realms/pass-emploi
+OIDC_CLIENT_ID=pass-emploi-api
+OIDC_CLIENT_SECRET=
+
 
 API_KEY_KEYCLOAK=ceci-est-une-api-key
 

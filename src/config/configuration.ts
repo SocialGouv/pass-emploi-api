@@ -77,6 +77,7 @@ export default () => {
     },
     oidc: {
       issuerUrl: process.env.OIDC_ISSUER_URL ?? '',
+      issuerApiUrl: process.env.OIDC_ISSUER_API_URL ?? '',
       clientId: process.env.OIDC_CLIENT_ID ?? '',
       clientSecret: process.env.OIDC_CLIENT_SECRET ?? ''
     },
