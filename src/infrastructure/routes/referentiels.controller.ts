@@ -8,6 +8,9 @@ import {
 } from '../../application/queries/get-communes-et-departements.query.handler'
 import { CommunesEtDepartementsQueryModel } from '../../application/queries/query-models/communes-et-departements.query-model'
 import { Public } from '../decorators/public.decorator'
+import { AgenceQueryModel } from '../../application/queries/query-models/agence.query-models'
+import { GetAgencesQueryHandler } from '../../application/queries/get-agences.query.handler'
+import { GetAgencesQueryParams } from './validation/agences.inputs'
 
 @Public()
 @Controller('referentiels')
@@ -15,7 +18,8 @@ import { Public } from '../decorators/public.decorator'
 export class ReferentielsController {
   constructor(
     private readonly getCommunesEtDepartementsQueryHandler: GetCommunesEtDepartementsQueryHandler,
-    private readonly getTypesRendezvousQueryHandler: GetTypesRendezVousQueryHandler
+    private readonly getTypesRendezvousQueryHandler: GetTypesRendezVousQueryHandler,
+    private readonly getAgencesQueryHandler: GetAgencesQueryHandler
   ) {}
 
   @Get('communes-et-departements')
@@ -39,5 +43,16 @@ export class ReferentielsController {
   })
   async getTypesRendezvous(): Promise<TypesRendezVousQueryModel> {
     return this.getTypesRendezvousQueryHandler.execute({})
+  }
+
+  @Get('agences')
+  @ApiResponse({
+    type: AgenceQueryModel,
+    isArray: true
+  })
+  async getAgences(
+    @Query() structure: GetAgencesQueryParams
+  ): Promise<AgenceQueryModel[]> {
+    return this.getAgencesQueryHandler.execute(structure)
   }
 }

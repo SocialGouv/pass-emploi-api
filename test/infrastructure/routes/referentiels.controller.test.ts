@@ -7,17 +7,25 @@ import {
   StubbedClass,
   stubClass
 } from '../../utils'
+import { GetAgencesQueryHandler } from '../../../src/application/queries/get-agences.query.handler'
+import { Core } from '../../../src/domain/core'
+import Structure = Core.Structure
 
 let getCommunesEtDepartementsQueryHandler: StubbedClass<GetCommunesEtDepartementsQueryHandler>
+let getAgencesQueryHandler: StubbedClass<GetAgencesQueryHandler>
+
 describe('ReferentielsController', () => {
   getCommunesEtDepartementsQueryHandler = stubClass(
     GetCommunesEtDepartementsQueryHandler
   )
+  getAgencesQueryHandler = stubClass(GetAgencesQueryHandler)
   let app: INestApplication
   before(async () => {
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(GetCommunesEtDepartementsQueryHandler)
       .useValue(getCommunesEtDepartementsQueryHandler)
+      .overrideProvider(GetAgencesQueryHandler)
+      .useValue(getAgencesQueryHandler)
       .compile()
     app = testingModule.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
@@ -104,6 +112,84 @@ describe('ReferentielsController', () => {
             type: 'COMMUNE'
           }
         ])
+    })
+  })
+
+  describe('GET /referentiels/agences?structure=POLE_EMPLOI', () => {
+    it('renvoie les agences Pôle emploi', () => {
+      // Given
+      getAgencesQueryHandler.execute
+        .withArgs({ structure: Structure.POLE_EMPLOI })
+        .resolves([
+          {
+            id: 'jean michel id',
+            nom: 'Agence Batman'
+          },
+          {
+            id: 'el yolo de la muerte',
+            nom: 'Agence des chauves'
+          }
+        ])
+
+      // When - Then
+      return request(app.getHttpServer())
+        .get('/referentiels/agences?structure=POLE_EMPLOI')
+        .set('Authorization', 'Bearer ceci-est-un-jwt')
+        .expect(HttpStatus.OK)
+        .expect([
+          {
+            id: 'jean michel id',
+            nom: 'Agence Batman'
+          },
+          {
+            id: 'el yolo de la muerte',
+            nom: 'Agence des chauves'
+          }
+        ])
+    })
+  })
+
+  describe('GET /referentiels/agences?structure=MILO', () => {
+    it('renvoie les agences milo', () => {
+      // Given
+      getAgencesQueryHandler.execute
+        .withArgs({ structure: Structure.MILO })
+        .resolves([
+          {
+            id: 'jean michel id',
+            nom: 'Agence Batman'
+          },
+          {
+            id: 'el yolo de la muerte',
+            nom: 'Agence des chauves'
+          }
+        ])
+
+      // When - Then
+      return request(app.getHttpServer())
+        .get('/referentiels/agences?structure=MILO')
+        .set('Authorization', 'Bearer ceci-est-un-jwt')
+        .expect(HttpStatus.OK)
+        .expect([
+          {
+            id: 'jean michel id',
+            nom: 'Agence Batman'
+          },
+          {
+            id: 'el yolo de la muerte',
+            nom: 'Agence des chauves'
+          }
+        ])
+    })
+  })
+
+  describe('GET /referentiels/agences', () => {
+    it('renvoie une 400', () => {
+      // When - Then
+      return request(app.getHttpServer())
+        .get('/referentiels/agences')
+        .set('Authorization', 'Bearer ceci-est-un-jwt')
+        .expect(HttpStatus.BAD_REQUEST)
     })
   })
 })
