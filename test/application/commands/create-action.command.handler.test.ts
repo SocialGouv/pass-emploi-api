@@ -56,24 +56,54 @@ describe('CreateActionCommandHandler', () => {
     )
   })
   describe('handle', () => {
-    it('crée une action', async () => {
-      // Given
-      actionFactory.buildAction.returns(success(action))
-      const command: CreateActionCommand = {
-        idJeune: action.idJeune,
-        contenu: action.contenu,
-        idCreateur: action.id,
-        typeCreateur: Action.TypeCreateur.JEUNE,
-        statut: action.statut,
-        commentaire: action.commentaire
-      }
+    describe("quand c'est un jeune", () => {
+      it('crée une action', async () => {
+        // Given
+        actionFactory.buildAction.returns(success(action))
+        const command: CreateActionCommand = {
+          idJeune: action.idJeune,
+          contenu: action.contenu,
+          idCreateur: action.id,
+          typeCreateur: Action.TypeCreateur.JEUNE,
+          statut: action.statut,
+          commentaire: action.commentaire
+        }
 
-      // When
-      const result = await createActionCommandHandler.handle(command)
+        // When
+        const result = await createActionCommandHandler.handle(command)
 
-      // Then
-      expect(result).to.deep.equal(success(action.id))
-      expect(actionRepository.save).to.have.been.calledWithExactly(action)
+        // Then
+        expect(result).to.deep.equal(success(action.id))
+        expect(actionRepository.save).to.have.been.calledWithExactly(action)
+        expect(notificationRepository.send).to.have.callCount(0)
+      })
+    })
+    describe("quand c'est un conseiller", () => {
+      it('crée une action et envoie une notification au jeune', async () => {
+        // Given
+        actionFactory.buildAction.returns(success(action))
+        const command: CreateActionCommand = {
+          idJeune: action.idJeune,
+          contenu: action.contenu,
+          idCreateur: action.id,
+          typeCreateur: Action.TypeCreateur.CONSEILLER,
+          statut: action.statut,
+          commentaire: action.commentaire
+        }
+
+        // When
+        const result = await createActionCommandHandler.handle(command)
+
+        // Then
+        expect(result).to.deep.equal(success(action.id))
+        expect(actionRepository.save).to.have.been.calledWithExactly(action)
+        expect(notificationRepository.send).to.have.been.calledWithExactly(
+          Notification.createNouvelleAction(
+            jeune.pushNotificationToken,
+            action.id
+          )
+        )
+      })
     })
   })
 
