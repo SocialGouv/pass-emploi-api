@@ -8,6 +8,7 @@ import {
   IsEnum,
   IsIn,
   IsNotEmpty,
+  IsNotIn,
   IsOptional,
   IsString,
   ValidateNested
@@ -40,6 +41,7 @@ export class CreateActionAvecStatutPayload extends CreateActionPayload {
   @ApiProperty({ enum: Action.Statut })
   @IsString()
   @IsEnum(Action.Statut)
+  @IsNotIn([Action.Statut.ANNULEE])
   @IsOptional()
   status?: Action.Statut
 }
