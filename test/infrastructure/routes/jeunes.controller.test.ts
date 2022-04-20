@@ -265,6 +265,21 @@ describe('JeunesController', () => {
           statusCode: HttpStatus.BAD_REQUEST
         })
     })
+
+    it('renvoie une 400 (Bad Request) quand le statut vaut "annulée"', async () => {
+      const actionPayloadWithCanceledStatus: CreateActionAvecStatutPayload = {
+        content: "Ceci est un contenu d'action",
+        comment: 'Ceci est un commentaire',
+        status: Action.Statut.ANNULEE
+      }
+
+      await request(app.getHttpServer())
+        .post('/jeunes/ABCDE/action')
+        .set('authorization', unHeaderAuthorization())
+        .send(actionPayloadWithCanceledStatus)
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+
     ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/ABCDE/action')
   })
 

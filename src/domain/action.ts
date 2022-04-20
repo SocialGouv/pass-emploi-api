@@ -56,7 +56,8 @@ export namespace Action {
   export enum Statut {
     EN_COURS = 'in_progress',
     PAS_COMMENCEE = 'not_started',
-    TERMINEE = 'done'
+    TERMINEE = 'done',
+    ANNULEE = 'canceled'
   }
 
   export enum TypeCreateur {
