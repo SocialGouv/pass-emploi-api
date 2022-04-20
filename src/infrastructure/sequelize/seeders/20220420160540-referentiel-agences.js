@@ -18,7 +18,6 @@ module.exports = {
       { isolationLevel: Sequelize.Transaction.SERIALIZABLE },
       async transaction => {
         await queryInterface.bulkDelete('agence', null, {})
-        await queryInterface.bulkDelete('agence', null, {})
       }
     )
   }
