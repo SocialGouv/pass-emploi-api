@@ -65,6 +65,8 @@ export namespace Authentification {
     ): Promise<void>
 
     save(utilisateur: Utilisateur, dateCreation?: Date): Promise<void>
+
+    deleteJeuneIdp(idJeune: string): Promise<void>
   }
 
   @Injectable()

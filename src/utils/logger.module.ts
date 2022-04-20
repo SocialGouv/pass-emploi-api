@@ -34,3 +34,15 @@ export const configureLoggerModule = (): DynamicModule =>
       }
     ]
   })
+
+export interface LogError {
+  message: string
+  err: Error
+}
+
+export function buildError(message: string, error: Error): LogError {
+  return {
+    message,
+    err: error
+  }
+}

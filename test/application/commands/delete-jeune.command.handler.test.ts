@@ -16,6 +16,7 @@ import {
   isFailure,
   Result
 } from '../../../src/building-blocks/types/result'
+import { Authentification } from '../../../src/domain/authentification'
 import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Jeune } from '../../../src/domain/jeune'
@@ -35,6 +36,7 @@ describe('DeleteJeuneCommandHandler', () => {
   let evenementService: StubbedClass<EvenementService>
   let mailFactory: StubbedClass<Mail.Factory>
   let mailClient: StubbedType<Mail.Client>
+  let authentificationRepository: StubbedType<Authentification.Repository>
   let conseiller: Conseiller
   let jeune: Jeune
   let command: DeleteJeuneCommand
@@ -44,12 +46,14 @@ describe('DeleteJeuneCommandHandler', () => {
     conseillerRepository = stubInterface(sandbox)
     chatRepository = stubInterface(sandbox)
     evenementService = stubClass(EvenementService)
+    authentificationRepository = stubInterface(sandbox)
     mailClient = stubInterface(sandbox)
     mailFactory = stubClass(Mail.Factory)
     commandHandler = new DeleteJeuneCommandHandler(
       jeuneRepository,
       conseillerRepository,
       chatRepository,
+      authentificationRepository,
       evenementService,
       mailClient,
       mailFactory

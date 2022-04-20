@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { Op } from 'sequelize'
 import { Authentification } from 'src/domain/authentification'
 import { Core } from '../../domain/core'
@@ -9,11 +9,18 @@ import {
   fromJeuneSqlToUtilisateur
 } from './mappers/authentification.mappers'
 import { SuperviseurSqlModel } from '../sequelize/models/superviseur.sql-model'
+import { KeycloakClient } from '../clients/keycloak-client'
 
 @Injectable()
 export class AuthentificationSqlRepository
   implements Authentification.Repository
 {
+  private logger: Logger
+
+  constructor(private keycloakClient: KeycloakClient) {
+    this.logger = new Logger('AuthentificationSqlRepository')
+  }
+
   async get(
     idUtilisateurAuth: string,
     structure: Core.Structure,
@@ -138,6 +145,20 @@ export class AuthentificationSqlRepository
         dateCreation: dateCreation ?? undefined,
         dateDerniereConnexion: utilisateur.dateDerniereConnexion
       })
+    }
+  }
+
+  async deleteJeuneIdp(idJeune: string): Promise<void> {
+    const jeuneSqlModel = await JeuneSqlModel.findByPk(idJeune)
+
+    if (jeuneSqlModel) {
+      const idAuthentification = jeuneSqlModel.idAuthentification
+      await this.keycloakClient.deleteUserByIdAuthentification(
+        idAuthentification
+      )
+      this.logger.log(`jeune ${idJeune} supprimé`)
+    } else {
+      this.logger.error(`jeune ${idJeune} non trouvé`)
     }
   }
 }

@@ -12,7 +12,10 @@ import {
   failure,
   Result
 } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
+import {
+  Authentification,
+  AuthentificationRepositoryToken
+} from '../../domain/authentification'
 
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 
@@ -34,6 +37,8 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
     private readonly conseillerRepository: Conseiller.Repository,
     @Inject(ChatRepositoryToken)
     private readonly chatRepository: Chat.Repository,
+    @Inject(AuthentificationRepositoryToken)
+    private readonly authentificationRepository: Authentification.Repository,
     private evenementService: EvenementService,
     @Inject(MailClientToken)
     private readonly mailClient: Mail.Client,
@@ -62,6 +67,7 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
     }
 
     await Promise.all([
+      this.authentificationRepository.deleteJeuneIdp(idJeune),
       this.jeuneRepository.supprimer(idJeune),
       this.chatRepository.supprimerChat(idJeune)
     ])
