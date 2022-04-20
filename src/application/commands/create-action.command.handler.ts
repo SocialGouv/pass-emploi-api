@@ -60,7 +60,10 @@ export class CreateActionCommandHandler extends CommandHandler<
     const action = result.data
     await this.actionRepository.save(action)
 
-    if (jeune.pushNotificationToken) {
+    if (
+      command.typeCreateur === Action.TypeCreateur.CONSEILLER &&
+      jeune.pushNotificationToken
+    ) {
       await this.sendNotifcationNouvelleAction(
         jeune.pushNotificationToken,
         action
