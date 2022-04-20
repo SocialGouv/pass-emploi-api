@@ -1,19 +1,22 @@
 [
   {
+    "id": 1,
     "nom_agence": "Mission Locale des pays d'Epernay",
     "code_postal": 51200,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 51,
     "structure": "MILO"
   },
   {
+    "id": 2,
     "nom_agence": "Mission Locale Nord Ardèche",
-    "code_postal": "07100",
+    "code_postal": 7100,
     "nom_region": "Auvergne-Rhône-Alpes",
-    "code_departement": "07",
+    "code_departement": 7,
     "structure": "MILO"
   },
   {
+    "id": 3,
     "nom_agence": "Mission Locale Fontaine",
     "code_postal": 38600,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -21,13 +24,15 @@
     "structure": "MILO"
   },
   {
+    "id": 4,
     "nom_agence": "Mission Locale Than",
     "code_postal": 68800,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 68,
     "structure": "MILO"
   },
   {
+    "id": 5,
     "nom_agence": "Mission Locale Péronne",
     "code_postal": 80200,
     "nom_region": "Hauts-de-France",
@@ -35,13 +40,15 @@
     "structure": "MILO"
   },
   {
+    "id": 6,
     "nom_agence": "Mission Locale jeunes Bugey Plaine de l'Ain",
-    "code_postal": "01500",
+    "code_postal": 1500,
     "nom_region": "Auvergne-Rhône-Alpes",
-    "code_departement": "01",
+    "code_departement": 1,
     "structure": "MILO"
   },
   {
+    "id": 7,
     "nom_agence": "1-Mission Locale du Grand Angoumois",
     "code_postal": 16000,
     "nom_region": "Nouvelle-Aquitaine",
@@ -49,6 +56,7 @@
     "structure": "MILO"
   },
   {
+    "id": 8,
     "nom_agence": "13-ML AUBAGNE",
     "code_postal": 13400,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -56,6 +64,7 @@
     "structure": "MILO"
   },
   {
+    "id": 9,
     "nom_agence": "18-MISSION LOCALE DE BOURGES MEHUN SUR YEVRE ET ST FLORENT SUR CHER",
     "code_postal": 18000,
     "nom_region": "Centre-Val de Loire",
@@ -63,6 +72,7 @@
     "structure": "MILO"
   },
   {
+    "id": 10,
     "nom_agence": "2B-ML RURALE DE HAUTE CORSE",
     "code_postal": 20250,
     "nom_region": "Corse",
@@ -70,6 +80,7 @@
     "structure": "MILO"
   },
   {
+    "id": 11,
     "nom_agence": "30-ML BAGNOLS SUR CEZE",
     "code_postal": 30201,
     "nom_region": "Occitanie",
@@ -77,6 +88,7 @@
     "structure": "MILO"
   },
   {
+    "id": 12,
     "nom_agence": "31-ML TOULOUSE",
     "code_postal": 31500,
     "nom_region": "Occitanie",
@@ -84,6 +96,7 @@
     "structure": "MILO"
   },
   {
+    "id": 13,
     "nom_agence": "34- MLJ du Coeur d'Hérault",
     "code_postal": 34700,
     "nom_region": "Occitanie",
@@ -91,6 +104,7 @@
     "structure": "MILO"
   },
   {
+    "id": 14,
     "nom_agence": "34-Mission Locale des Jeunes de Montpellier Méditerranée Métropole",
     "code_postal": 34000,
     "nom_region": "Occitanie",
@@ -98,13 +112,15 @@
     "structure": "MILO"
   },
   {
+    "id": 15,
     "nom_agence": "54-Mission Locale du Val de Lorraine",
     "code_postal": 54700,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 54,
     "structure": "MILO"
   },
   {
+    "id": 16,
     "nom_agence": "62-ML AGGLOMERATION HENIN CARVIN",
     "code_postal": 62110,
     "nom_region": "Hauts-de-France",
@@ -112,6 +128,7 @@
     "structure": "MILO"
   },
   {
+    "id": 17,
     "nom_agence": "72-ML SARTHE NORD",
     "code_postal": 72600,
     "nom_region": "Pays de la Loire",
@@ -119,6 +136,7 @@
     "structure": "MILO"
   },
   {
+    "id": 18,
     "nom_agence": "78-ML SAINT QUENTIN EN YVELINES",
     "code_postal": 78190,
     "nom_region": "Île-de-France",
@@ -126,6 +144,7 @@
     "structure": "MILO"
   },
   {
+    "id": 19,
     "nom_agence": "971-ML LES ABYMES (siège)",
     "code_postal": 97139,
     "nom_region": "Guadeloupe",
@@ -133,6 +152,7 @@
     "structure": "MILO"
   },
   {
+    "id": 20,
     "nom_agence": "ADEFI - MISSION LOCALE",
     "code_postal": 62130,
     "nom_region": "Hauts-de-France",
@@ -140,6 +160,7 @@
     "structure": "MILO"
   },
   {
+    "id": 21,
     "nom_agence": "AGIRE Mission Locale Le Creusot / Montceau",
     "code_postal": 71200,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -147,6 +168,7 @@
     "structure": "MILO"
   },
   {
+    "id": 22,
     "nom_agence": "AIFP Mission Locale Plaine Centrale du Val de Marne",
     "code_postal": 94000,
     "nom_region": "Île-de-France",
@@ -154,6 +176,7 @@
     "structure": "MILO"
   },
   {
+    "id": 23,
     "nom_agence": "AILE SUD BOURGOGNE",
     "code_postal": 71000,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -161,6 +184,7 @@
     "structure": "MILO"
   },
   {
+    "id": 24,
     "nom_agence": "Antenne de BLAYE",
     "code_postal": 33390,
     "nom_region": "Nouvelle-Aquitaine",
@@ -168,6 +192,7 @@
     "structure": "MILO"
   },
   {
+    "id": 25,
     "nom_agence": "Antenne de Tarbes",
     "code_postal": 65000,
     "nom_region": "Occitanie",
@@ -175,6 +200,7 @@
     "structure": "MILO"
   },
   {
+    "id": 26,
     "nom_agence": "Antenne de Villiers",
     "code_postal": 94350,
     "nom_region": "Île-de-France",
@@ -182,6 +208,7 @@
     "structure": "MILO"
   },
   {
+    "id": 27,
     "nom_agence": "Antenne SEVRAN",
     "code_postal": 93270,
     "nom_region": "Île-de-France",
@@ -189,6 +216,7 @@
     "structure": "MILO"
   },
   {
+    "id": 28,
     "nom_agence": "AVEC",
     "code_postal": 95800,
     "nom_region": "Île-de-France",
@@ -196,6 +224,7 @@
     "structure": "MILO"
   },
   {
+    "id": 29,
     "nom_agence": "DYNAMIQUE EMPLOI",
     "code_postal": 91002,
     "nom_region": "Île-de-France",
@@ -203,6 +232,7 @@
     "structure": "MILO"
   },
   {
+    "id": 30,
     "nom_agence": "EMPLOI VALLEE SUD GRAND PARIS",
     "code_postal": 92160,
     "nom_region": "Île-de-France",
@@ -210,6 +240,7 @@
     "structure": "MILO"
   },
   {
+    "id": 31,
     "nom_agence": "ESPACE 2M - ML ROANNE",
     "code_postal": 42300,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -217,6 +248,7 @@
     "structure": "MILO"
   },
   {
+    "id": 32,
     "nom_agence": "GIP Maison de l'Emploi Rueil Suresnes - Mission Locale",
     "code_postal": 92500,
     "nom_region": "Île-de-France",
@@ -224,6 +256,7 @@
     "structure": "MILO"
   },
   {
+    "id": 33,
     "nom_agence": "IDEIS MISSION LOCALE DU PAYS DE MONTBELIARD",
     "code_postal": 25200,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -231,6 +264,7 @@
     "structure": "MILO"
   },
   {
+    "id": 34,
     "nom_agence": "LA FABRIQUE DEFI",
     "code_postal": 62100,
     "nom_region": "Hauts-de-France",
@@ -238,6 +272,7 @@
     "structure": "MILO"
   },
   {
+    "id": 35,
     "nom_agence": "La Mission locale d'Argentan",
     "code_postal": 61200,
     "nom_region": "Normandie",
@@ -245,6 +280,7 @@
     "structure": "MILO"
   },
   {
+    "id": 36,
     "nom_agence": "Maison de l'emploi du Bocage Bressuirais / ML",
     "code_postal": 79300,
     "nom_region": "Nouvelle-Aquitaine",
@@ -252,13 +288,15 @@
     "structure": "MILO"
   },
   {
+    "id": 37,
     "nom_agence": "Maison de l'Emploi et de la Formation du Pays Chaunois - Service Mission Locale",
-    "code_postal": "02700",
+    "code_postal": 2700,
     "nom_region": "Hauts-de-France",
-    "code_departement": "02",
+    "code_departement": 2,
     "structure": "MILO"
   },
   {
+    "id": 38,
     "nom_agence": "MAISON DE L'EMPLOI ET DE LA FORMATION DU PAYS DU GRAND BEAUVAISIS - Service Mission Locale",
     "code_postal": 60000,
     "nom_region": "Hauts-de-France",
@@ -266,20 +304,23 @@
     "structure": "MILO"
   },
   {
+    "id": 39,
     "nom_agence": "Maison de l'Emploi et de la Formation du Pays du Grand Laonnois",
-    "code_postal": "02000",
+    "code_postal": 2000,
     "nom_region": "Hauts-de-France",
-    "code_departement": "02",
+    "code_departement": 2,
     "structure": "MILO"
   },
   {
+    "id": 40,
     "nom_agence": "Maison de l'Emploi et de la Formation du Saint Quentinois - Service Mission Locale",
-    "code_postal": "02100",
+    "code_postal": 2100,
     "nom_region": "Hauts-de-France",
-    "code_departement": "02",
+    "code_departement": 2,
     "structure": "MILO"
   },
   {
+    "id": 41,
     "nom_agence": "Maison de l'Emploi et de la Formation du Sud-Ouest de l'Oise - Service Mission Locale",
     "code_postal": 60110,
     "nom_region": "Hauts-de-France",
@@ -287,6 +328,7 @@
     "structure": "MILO"
   },
   {
+    "id": 42,
     "nom_agence": "Maison de l'Emploi et de la Formation du Thouarsais - Service Mission Locale",
     "code_postal": 79100,
     "nom_region": "Nouvelle-Aquitaine",
@@ -294,6 +336,7 @@
     "structure": "MILO"
   },
   {
+    "id": 43,
     "nom_agence": "MDEE Parthenay-Gâtine",
     "code_postal": 79200,
     "nom_region": "Nouvelle-Aquitaine",
@@ -301,6 +344,7 @@
     "structure": "MILO"
   },
   {
+    "id": 44,
     "nom_agence": "MENDE",
     "code_postal": 48000,
     "nom_region": "Occitanie",
@@ -308,6 +352,7 @@
     "structure": "MILO"
   },
   {
+    "id": 45,
     "nom_agence": "MISSION INTERCOMMUNALE INSERTION JEUNES EPINAY SUR SEINE SAINT-OUEN VILLETANEUSE L'ILE-SAINT-DENIS",
     "code_postal": 93800,
     "nom_region": "Île-de-France",
@@ -315,6 +360,7 @@
     "structure": "MILO"
   },
   {
+    "id": 46,
     "nom_agence": "Mission Intercommunale pour l'Emploi des Jeunes",
     "code_postal": 93100,
     "nom_region": "Île-de-France",
@@ -322,6 +368,7 @@
     "structure": "MILO"
   },
   {
+    "id": 47,
     "nom_agence": "Mission Intercommunale Vers l'Emploi",
     "code_postal": 91100,
     "nom_region": "Île-de-France",
@@ -329,13 +376,15 @@
     "structure": "MILO"
   },
   {
+    "id": 48,
     "nom_agence": "Mission Jeunes 05",
-    "code_postal": "05000",
+    "code_postal": 5000,
     "nom_region": "Provence-Alpes-Côte d'Azur",
-    "code_departement": "05",
+    "code_departement": 5,
     "structure": "MILO"
   },
   {
+    "id": 49,
     "nom_agence": "MISSION LOCALE  DU CHINONAIS",
     "code_postal": 37500,
     "nom_region": "Centre-Val de Loire",
@@ -343,6 +392,7 @@
     "structure": "MILO"
   },
   {
+    "id": 50,
     "nom_agence": "Mission Locale - Siège administratif",
     "code_postal": 76100,
     "nom_region": "Normandie",
@@ -350,6 +400,7 @@
     "structure": "MILO"
   },
   {
+    "id": 51,
     "nom_agence": "Mission Locale (siège)",
     "code_postal": 17300,
     "nom_region": "Nouvelle-Aquitaine",
@@ -357,6 +408,7 @@
     "structure": "MILO"
   },
   {
+    "id": 52,
     "nom_agence": "Mission Locale Agglomération et Territoire du Valentinois",
     "code_postal": 26000,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -364,6 +416,7 @@
     "structure": "MILO"
   },
   {
+    "id": 53,
     "nom_agence": "Mission Locale Angevine",
     "code_postal": 49000,
     "nom_region": "Pays de la Loire",
@@ -371,6 +424,7 @@
     "structure": "MILO"
   },
   {
+    "id": 54,
     "nom_agence": "Mission Locale Arc Charente",
     "code_postal": 16100,
     "nom_region": "Nouvelle-Aquitaine",
@@ -378,13 +432,15 @@
     "structure": "MILO"
   },
   {
+    "id": 55,
     "nom_agence": "Mission Locale Ardeche Méridionale",
-    "code_postal": "07200",
+    "code_postal": 7200,
     "nom_region": "Auvergne-Rhône-Alpes",
-    "code_departement": "07",
+    "code_departement": 7,
     "structure": "MILO"
   },
   {
+    "id": 56,
     "nom_agence": "MISSION LOCALE ARMENTIERES - VALLEE DE LA LYS",
     "code_postal": 59280,
     "nom_region": "Hauts-de-France",
@@ -392,6 +448,7 @@
     "structure": "MILO"
   },
   {
+    "id": 57,
     "nom_agence": "Mission Locale arrondissement AURILLAC",
     "code_postal": 15000,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -399,6 +456,7 @@
     "structure": "MILO"
   },
   {
+    "id": 58,
     "nom_agence": "MISSION LOCALE AVENIR JEUNES PAYS BASQUE",
     "code_postal": 64600,
     "nom_region": "Nouvelle-Aquitaine",
@@ -406,13 +464,15 @@
     "structure": "MILO"
   },
   {
+    "id": 59,
     "nom_agence": "Mission Locale Bassin de Saint-Dié et Hautes Vosges",
     "code_postal": 88100,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 88,
     "structure": "MILO"
   },
   {
+    "id": 60,
     "nom_agence": "Mission Locale Bassin Thiernois",
     "code_postal": 63300,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -420,6 +480,7 @@
     "structure": "MILO"
   },
   {
+    "id": 61,
     "nom_agence": "MISSION LOCALE BASTIA",
     "code_postal": 20600,
     "nom_region": "Corse",
@@ -427,6 +488,7 @@
     "structure": "MILO"
   },
   {
+    "id": 62,
     "nom_agence": "MISSION LOCALE BEARN ADOUR",
     "code_postal": 64160,
     "nom_region": "Nouvelle-Aquitaine",
@@ -434,6 +496,7 @@
     "structure": "MILO"
   },
   {
+    "id": 63,
     "nom_agence": "Mission Locale Bordeaux Avenir Jeunes",
     "code_postal": 33000,
     "nom_region": "Nouvelle-Aquitaine",
@@ -441,6 +504,7 @@
     "structure": "MILO"
   },
   {
+    "id": 64,
     "nom_agence": "Mission Locale Bourgogne Nivernaise",
     "code_postal": 58200,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -448,6 +512,7 @@
     "structure": "MILO"
   },
   {
+    "id": 65,
     "nom_agence": "Mission Locale Bron Décines Meyzieu",
     "code_postal": 69150,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -455,6 +520,7 @@
     "structure": "MILO"
   },
   {
+    "id": 66,
     "nom_agence": "MISSION LOCALE CAEN LA MER CALVADOS CENTRE",
     "code_postal": 14200,
     "nom_region": "Normandie",
@@ -462,6 +528,7 @@
     "structure": "MILO"
   },
   {
+    "id": 67,
     "nom_agence": "MISSION LOCALE CAUX SEINE AUSTREBERTHE",
     "code_postal": 76190,
     "nom_region": "Normandie",
@@ -469,13 +536,15 @@
     "structure": "MILO"
   },
   {
+    "id": 68,
     "nom_agence": "Mission Locale Centre Ardèche",
-    "code_postal": "07400",
+    "code_postal": 7400,
     "nom_region": "Auvergne-Rhône-Alpes",
-    "code_departement": "07",
+    "code_departement": 7,
     "structure": "MILO"
   },
   {
+    "id": 69,
     "nom_agence": "Mission Locale Centre Ouest Bretagne",
     "code_postal": 29834,
     "nom_region": "Bretagne",
@@ -483,6 +552,7 @@
     "structure": "MILO"
   },
   {
+    "id": 70,
     "nom_agence": "MISSION LOCALE CHABLAIS",
     "code_postal": 74200,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -490,6 +560,7 @@
     "structure": "MILO"
   },
   {
+    "id": 71,
     "nom_agence": "MISSION LOCALE CHER SUD",
     "code_postal": 18200,
     "nom_region": "Centre-Val de Loire",
@@ -497,6 +568,7 @@
     "structure": "MILO"
   },
   {
+    "id": 72,
     "nom_agence": "MISSION LOCALE COEUR DE PICARDIE",
     "code_postal": 60400,
     "nom_region": "Hauts-de-France",
@@ -504,13 +576,15 @@
     "structure": "MILO"
   },
   {
+    "id": 73,
     "nom_agence": "MISSION LOCALE COLMAR CENTRE ALSACE",
     "code_postal": 68000,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 68,
     "structure": "MILO"
   },
   {
+    "id": 74,
     "nom_agence": "mission locale colombes",
     "code_postal": 92700,
     "nom_region": "Île-de-France",
@@ -518,6 +592,7 @@
     "structure": "MILO"
   },
   {
+    "id": 75,
     "nom_agence": "MISSION LOCALE CORAIL",
     "code_postal": 83400,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -525,6 +600,7 @@
     "structure": "MILO"
   },
   {
+    "id": 76,
     "nom_agence": "MISSION LOCALE COURNON",
     "code_postal": 63800,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -532,6 +608,7 @@
     "structure": "MILO"
   },
   {
+    "id": 77,
     "nom_agence": "MISSION LOCALE D'AJACCIO",
     "code_postal": 20090,
     "nom_region": "Corse",
@@ -539,13 +616,15 @@
     "structure": "MILO"
   },
   {
+    "id": 78,
     "nom_agence": "MISSION LOCALE D'ALSACE DU NORD",
     "code_postal": 67500,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 67,
     "structure": "MILO"
   },
   {
+    "id": 79,
     "nom_agence": "MISSION LOCALE D'ARCACHON",
     "code_postal": 33260,
     "nom_region": "Nouvelle-Aquitaine",
@@ -553,6 +632,7 @@
     "structure": "MILO"
   },
   {
+    "id": 80,
     "nom_agence": "MISSION LOCALE D'AUBERVILLIERS",
     "code_postal": 93300,
     "nom_region": "Île-de-France",
@@ -560,6 +640,7 @@
     "structure": "MILO"
   },
   {
+    "id": 81,
     "nom_agence": "Mission Locale d'Héricourt",
     "code_postal": 70400,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -567,6 +648,7 @@
     "structure": "MILO"
   },
   {
+    "id": 82,
     "nom_agence": "mission locale d'insertion du centre herault",
     "code_postal": 34120,
     "nom_region": "Occitanie",
@@ -574,6 +656,7 @@
     "structure": "MILO"
   },
   {
+    "id": 83,
     "nom_agence": "Mission Locale d'Insertion du Poitou",
     "code_postal": 86000,
     "nom_region": "Nouvelle-Aquitaine",
@@ -581,6 +664,7 @@
     "structure": "MILO"
   },
   {
+    "id": 84,
     "nom_agence": "Mission Locale de Baie de Seine",
     "code_postal": 14600,
     "nom_region": "Normandie",
@@ -588,13 +672,15 @@
     "structure": "MILO"
   },
   {
+    "id": 85,
     "nom_agence": "Mission Locale de Chaumont",
     "code_postal": 52000,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 52,
     "structure": "MILO"
   },
   {
+    "id": 86,
     "nom_agence": "Mission Locale de Clichy",
     "code_postal": 92110,
     "nom_region": "Île-de-France",
@@ -602,6 +688,7 @@
     "structure": "MILO"
   },
   {
+    "id": 87,
     "nom_agence": "Mission Locale de Dole-Revermont",
     "code_postal": 39100,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -609,6 +696,7 @@
     "structure": "MILO"
   },
   {
+    "id": 88,
     "nom_agence": "MISSION LOCALE DE FLANDRE INTERIEURE",
     "code_postal": 59190,
     "nom_region": "Hauts-de-France",
@@ -616,6 +704,7 @@
     "structure": "MILO"
   },
   {
+    "id": 89,
     "nom_agence": "Mission Locale de Grenoble",
     "code_postal": 38000,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -623,6 +712,7 @@
     "structure": "MILO"
   },
   {
+    "id": 90,
     "nom_agence": "Mission Locale de Guyane",
     "code_postal": 97331,
     "nom_region": "Guyane",
@@ -630,6 +720,7 @@
     "structure": "MILO"
   },
   {
+    "id": 91,
     "nom_agence": "Mission Locale de haute-saintonge",
     "code_postal": 17500,
     "nom_region": "Nouvelle-Aquitaine",
@@ -637,6 +728,7 @@
     "structure": "MILO"
   },
   {
+    "id": 92,
     "nom_agence": "MISSION LOCALE DE L'AGENAIS DE L'ALBRET ET DU CONFLUENT",
     "code_postal": 47000,
     "nom_region": "Nouvelle-Aquitaine",
@@ -644,6 +736,7 @@
     "structure": "MILO"
   },
   {
+    "id": 93,
     "nom_agence": "MISSION LOCALE DE L'AGGLOMERATION DE LENS-LIEVIN",
     "code_postal": 62800,
     "nom_region": "Hauts-de-France",
@@ -651,6 +744,7 @@
     "structure": "MILO"
   },
   {
+    "id": 94,
     "nom_agence": "MISSION LOCALE DE L'AGGLOMERATION DE LIMOGES",
     "code_postal": 87000,
     "nom_region": "Nouvelle-Aquitaine",
@@ -658,6 +752,7 @@
     "structure": "MILO"
   },
   {
+    "id": 95,
     "nom_agence": "MISSION LOCALE DE L'AGGLOMERATION DUNKERQUOISE",
     "code_postal": 59140,
     "nom_region": "Hauts-de-France",
@@ -665,6 +760,7 @@
     "structure": "MILO"
   },
   {
+    "id": 96,
     "nom_agence": "Mission Locale de l'Agglomération Mancelle",
     "code_postal": 72100,
     "nom_region": "Pays de la Loire",
@@ -672,6 +768,7 @@
     "structure": "MILO"
   },
   {
+    "id": 97,
     "nom_agence": "Mission Locale de l'agglomération nazairienne",
     "code_postal": 44600,
     "nom_region": "Pays de la Loire",
@@ -679,6 +776,7 @@
     "structure": "MILO"
   },
   {
+    "id": 98,
     "nom_agence": "Mission Locale de l'Agglomération Royan Atlantique",
     "code_postal": 17200,
     "nom_region": "Nouvelle-Aquitaine",
@@ -686,6 +784,7 @@
     "structure": "MILO"
   },
   {
+    "id": 99,
     "nom_agence": "MISSION LOCALE DE L'AIGLE",
     "code_postal": 61300,
     "nom_region": "Normandie",
@@ -693,6 +792,7 @@
     "structure": "MILO"
   },
   {
+    "id": 100,
     "nom_agence": "MISSION LOCALE DE L'ARRONDISSEMENT D'ISSOUDUN",
     "code_postal": 36100,
     "nom_region": "Centre-Val de Loire",
@@ -700,6 +800,7 @@
     "structure": "MILO"
   },
   {
+    "id": 101,
     "nom_agence": "Mission Locale de l'arrondissement de Beaune",
     "code_postal": 21200,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -707,6 +808,7 @@
     "structure": "MILO"
   },
   {
+    "id": 102,
     "nom_agence": "MISSION LOCALE DE L'ARRONDISSEMENT DE CHARTRES",
     "code_postal": 28000,
     "nom_region": "Centre-Val de Loire",
@@ -714,13 +816,15 @@
     "structure": "MILO"
   },
   {
+    "id": 103,
     "nom_agence": "Mission Locale de l'arrondissement de Château-Thierry",
-    "code_postal": "02400",
+    "code_postal": 2400,
     "nom_region": "Hauts-de-France",
-    "code_departement": "02",
+    "code_departement": 2,
     "structure": "MILO"
   },
   {
+    "id": 104,
     "nom_agence": "MISSION LOCALE DE L'ARRONDISSEMENT DE DIJON",
     "code_postal": 21000,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -728,13 +832,15 @@
     "structure": "MILO"
   },
   {
+    "id": 105,
     "nom_agence": "Mission locale de l'arrondissement de langres",
     "code_postal": 52200,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 52,
     "structure": "MILO"
   },
   {
+    "id": 106,
     "nom_agence": "MISSION LOCALE DE L'ARRONDISSEMENT DE SAINT-OMER",
     "code_postal": 62503,
     "nom_region": "Hauts-de-France",
@@ -742,6 +848,7 @@
     "structure": "MILO"
   },
   {
+    "id": 107,
     "nom_agence": "MISSION LOCALE DE L'ARTOIS",
     "code_postal": 62400,
     "nom_region": "Hauts-de-France",
@@ -749,6 +856,7 @@
     "structure": "MILO"
   },
   {
+    "id": 108,
     "nom_agence": "Mission Locale de l'Autunois",
     "code_postal": 71400,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -756,6 +864,7 @@
     "structure": "MILO"
   },
   {
+    "id": 109,
     "nom_agence": "MISSION LOCALE DE L'AUXERROIS",
     "code_postal": 89000,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -763,6 +872,7 @@
     "structure": "MILO"
   },
   {
+    "id": 110,
     "nom_agence": "Mission Locale de l'Orléanais",
     "code_postal": 45000,
     "nom_region": "Centre-Val de Loire",
@@ -770,6 +880,7 @@
     "structure": "MILO"
   },
   {
+    "id": 111,
     "nom_agence": "Mission Locale de la Bièvre",
     "code_postal": 38270,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -777,6 +888,7 @@
     "structure": "MILO"
   },
   {
+    "id": 112,
     "nom_agence": "Mission Locale de La Ciotat",
     "code_postal": 13600,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -784,6 +896,7 @@
     "structure": "MILO"
   },
   {
+    "id": 113,
     "nom_agence": "MISSION LOCALE DE LA MARNE AUX BOIS",
     "code_postal": 93110,
     "nom_region": "Île-de-France",
@@ -791,6 +904,7 @@
     "structure": "MILO"
   },
   {
+    "id": 114,
     "nom_agence": "Mission Locale de la Mayenne",
     "code_postal": 53000,
     "nom_region": "Pays de la Loire",
@@ -798,6 +912,7 @@
     "structure": "MILO"
   },
   {
+    "id": 115,
     "nom_agence": "MISSION LOCALE DE LA PICARDIE MARITIME",
     "code_postal": 80100,
     "nom_region": "Hauts-de-France",
@@ -805,13 +920,15 @@
     "structure": "MILO"
   },
   {
+    "id": 116,
     "nom_agence": "MISSION LOCALE DE LA PLAINE DES VOSGES",
     "code_postal": 88300,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 88,
     "structure": "MILO"
   },
   {
+    "id": 117,
     "nom_agence": "Mission Locale de la Presqu'île Guérandaise",
     "code_postal": 44350,
     "nom_region": "Pays de la Loire",
@@ -819,6 +936,7 @@
     "structure": "MILO"
   },
   {
+    "id": 118,
     "nom_agence": "MISSION LOCALE DE LA VALLEE DE L'OISE",
     "code_postal": 60175,
     "nom_region": "Hauts-de-France",
@@ -826,6 +944,7 @@
     "structure": "MILO"
   },
   {
+    "id": 119,
     "nom_agence": "MISSION LOCALE DE LILLE",
     "code_postal": 59800,
     "nom_region": "Hauts-de-France",
@@ -833,6 +952,7 @@
     "structure": "MILO"
   },
   {
+    "id": 120,
     "nom_agence": "Mission Locale de Lure / Luxeuil-les-Bains / Champagney",
     "code_postal": 70200,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -840,6 +960,7 @@
     "structure": "MILO"
   },
   {
+    "id": 121,
     "nom_agence": "Mission Locale de Lyon",
     "code_postal": 69007,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -847,6 +968,7 @@
     "structure": "MILO"
   },
   {
+    "id": 122,
     "nom_agence": "Mission Locale de Marseille",
     "code_postal": 13001,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -854,6 +976,7 @@
     "structure": "MILO"
   },
   {
+    "id": 123,
     "nom_agence": "Mission locale de mayotte",
     "code_postal": 97600,
     "nom_region": "Mayotte",
@@ -861,6 +984,7 @@
     "structure": "MILO"
   },
   {
+    "id": 124,
     "nom_agence": "Mission Locale de Montargis - Gien",
     "code_postal": 45200,
     "nom_region": "Centre-Val de Loire",
@@ -868,27 +992,31 @@
     "structure": "MILO"
   },
   {
+    "id": 125,
     "nom_agence": "MISSION LOCALE DE MOSELLE CENTRE (Siège)",
     "code_postal": 57500,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 57,
     "structure": "MILO"
   },
   {
+    "id": 126,
     "nom_agence": "Mission Locale de Moulins et sa Région",
-    "code_postal": "03000",
+    "code_postal": 3000,
     "nom_region": "Auvergne-Rhône-Alpes",
-    "code_departement": "03",
+    "code_departement": 3,
     "structure": "MILO"
   },
   {
+    "id": 127,
     "nom_agence": "Mission Locale de Mulhouse SEMAPHORE MULHOUSE SUD ALSACE",
     "code_postal": 68100,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 68,
     "structure": "MILO"
   },
   {
+    "id": 128,
     "nom_agence": "Mission Locale de Nanterre (Siège)",
     "code_postal": 92000,
     "nom_region": "Île-de-France",
@@ -896,6 +1024,7 @@
     "structure": "MILO"
   },
   {
+    "id": 129,
     "nom_agence": "Mission Locale de Pithiviers",
     "code_postal": 45300,
     "nom_region": "Centre-Val de Loire",
@@ -903,6 +1032,7 @@
     "structure": "MILO"
   },
   {
+    "id": 130,
     "nom_agence": "Mission Locale de Ploërmel",
     "code_postal": 56800,
     "nom_region": "Bretagne",
@@ -910,27 +1040,31 @@
     "structure": "MILO"
   },
   {
+    "id": 131,
     "nom_agence": "MISSION LOCALE DE SAINT DIZIER",
     "code_postal": 52100,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 52,
     "structure": "MILO"
   },
   {
+    "id": 132,
     "nom_agence": "MISSION LOCALE DE SCHILTIGHEIM",
     "code_postal": 67300,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 67,
     "structure": "MILO"
   },
   {
+    "id": 133,
     "nom_agence": "Mission Locale de Sélestat",
     "code_postal": 67600,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 67,
     "structure": "MILO"
   },
   {
+    "id": 134,
     "nom_agence": "Mission Locale de Sénart",
     "code_postal": 77550,
     "nom_region": "Île-de-France",
@@ -938,6 +1072,7 @@
     "structure": "MILO"
   },
   {
+    "id": 135,
     "nom_agence": "MISSION LOCALE DE TOURAINE",
     "code_postal": 37000,
     "nom_region": "Centre-Val de Loire",
@@ -945,13 +1080,15 @@
     "structure": "MILO"
   },
   {
+    "id": 136,
     "nom_agence": "Mission Locale de Troyes",
     "code_postal": 10000,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 10,
     "structure": "MILO"
   },
   {
+    "id": 137,
     "nom_agence": "Mission Locale de Tulle centre Corrèze",
     "code_postal": 19000,
     "nom_region": "Nouvelle-Aquitaine",
@@ -959,6 +1096,7 @@
     "structure": "MILO"
   },
   {
+    "id": 138,
     "nom_agence": "mission locale de Vaulx en Velin",
     "code_postal": 69120,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -966,6 +1104,7 @@
     "structure": "MILO"
   },
   {
+    "id": 139,
     "nom_agence": "MISSION LOCALE DE VENISSIEUX",
     "code_postal": 69634,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -973,6 +1112,7 @@
     "structure": "MILO"
   },
   {
+    "id": 140,
     "nom_agence": "Mission Locale Départementale de l'Aveyron",
     "code_postal": 12101,
     "nom_region": "Occitanie",
@@ -980,6 +1120,7 @@
     "structure": "MILO"
   },
   {
+    "id": 141,
     "nom_agence": "MISSION LOCALE DES 2 RIVES",
     "code_postal": 33081,
     "nom_region": "Nouvelle-Aquitaine",
@@ -987,13 +1128,15 @@
     "structure": "MILO"
   },
   {
+    "id": 142,
     "nom_agence": "MISSION LOCALE DES ALPES DE HAUTE PROVENCE",
-    "code_postal": "04600",
+    "code_postal": 4600,
     "nom_region": "Provence-Alpes-Côte d'Azur",
-    "code_departement": "04",
+    "code_departement": 4,
     "structure": "MILO"
   },
   {
+    "id": 143,
     "nom_agence": "Mission Locale des Boucles de la Marne",
     "code_postal": 77400,
     "nom_region": "Île-de-France",
@@ -1001,6 +1144,7 @@
     "structure": "MILO"
   },
   {
+    "id": 144,
     "nom_agence": "MISSION LOCALE DES GRAVES",
     "code_postal": 33610,
     "nom_region": "Nouvelle-Aquitaine",
@@ -1008,6 +1152,7 @@
     "structure": "MILO"
   },
   {
+    "id": 145,
     "nom_agence": "Mission Locale des Hautes-Terres et du Nord Ouest Cantal",
     "code_postal": 15100,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1015,6 +1160,7 @@
     "structure": "MILO"
   },
   {
+    "id": 146,
     "nom_agence": "MISSION LOCALE DES HAUTS DE GARONNE",
     "code_postal": 33150,
     "nom_region": "Nouvelle-Aquitaine",
@@ -1022,6 +1168,7 @@
     "structure": "MILO"
   },
   {
+    "id": 147,
     "nom_agence": "MISSION LOCALE DES JEUNES DU BOCAGE",
     "code_postal": 61100,
     "nom_region": "Normandie",
@@ -1029,6 +1176,7 @@
     "structure": "MILO"
   },
   {
+    "id": 148,
     "nom_agence": "MISSION LOCALE DES LANDES",
     "code_postal": 40000,
     "nom_region": "Nouvelle-Aquitaine",
@@ -1036,13 +1184,15 @@
     "structure": "MILO"
   },
   {
+    "id": 149,
     "nom_agence": "MISSION LOCALE DES PAYS DE BRIEY",
     "code_postal": 54150,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 54,
     "structure": "MILO"
   },
   {
+    "id": 150,
     "nom_agence": "MISSION LOCALE DES RIVES DE L'AA ET DE LA COLME",
     "code_postal": 59630,
     "nom_region": "Hauts-de-France",
@@ -1050,6 +1200,7 @@
     "structure": "MILO"
   },
   {
+    "id": 151,
     "nom_agence": "MISSION LOCALE DES ULIS",
     "code_postal": 91940,
     "nom_region": "Île-de-France",
@@ -1057,6 +1208,7 @@
     "structure": "MILO"
   },
   {
+    "id": 152,
     "nom_agence": "mission locale des villes du nord du bois",
     "code_postal": 94120,
     "nom_region": "Île-de-France",
@@ -1064,6 +1216,7 @@
     "structure": "MILO"
   },
   {
+    "id": 153,
     "nom_agence": "MISSION LOCALE DIEPPE COTE D'ALBATRE",
     "code_postal": 76200,
     "nom_region": "Normandie",
@@ -1071,6 +1224,7 @@
     "structure": "MILO"
   },
   {
+    "id": 154,
     "nom_agence": "MISSION LOCALE DRACENIE COEUR DU VAR",
     "code_postal": 83300,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -1078,13 +1232,15 @@
     "structure": "MILO"
   },
   {
+    "id": 155,
     "nom_agence": "Mission Locale du bassin d'emploi d'Epinal",
     "code_postal": 88000,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 88,
     "structure": "MILO"
   },
   {
+    "id": 156,
     "nom_agence": "Mission Locale du Bassin d'emploi de Besançon",
     "code_postal": 25000,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -1092,6 +1248,7 @@
     "structure": "MILO"
   },
   {
+    "id": 157,
     "nom_agence": "MISSION LOCALE DU BASSIN D'EMPLOI DE BRIOUDE",
     "code_postal": 43100,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1099,13 +1256,15 @@
     "structure": "MILO"
   },
   {
+    "id": 158,
     "nom_agence": "Mission Locale du bassin d'emploi de Charleville-Mézières",
-    "code_postal": "08000",
-    "nom_region": "Grand-Est",
-    "code_departement": "08",
+    "code_postal": 8000,
+    "nom_region": "Grand Est",
+    "code_departement": 8,
     "structure": "MILO"
   },
   {
+    "id": 159,
     "nom_agence": "mission locale du bassin d'emploi de fougères",
     "code_postal": 35300,
     "nom_region": "Bretagne",
@@ -1113,6 +1272,7 @@
     "structure": "MILO"
   },
   {
+    "id": 160,
     "nom_agence": "Mission Locale du Bassin d'emploi de Vesoul",
     "code_postal": 70000,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -1120,13 +1280,15 @@
     "structure": "MILO"
   },
   {
+    "id": 161,
     "nom_agence": "Mission Locale du Bassin d'Emploi du Soissonnais",
-    "code_postal": "02200",
+    "code_postal": 2200,
     "nom_region": "Hauts-de-France",
-    "code_departement": "02",
+    "code_departement": 2,
     "structure": "MILO"
   },
   {
+    "id": 162,
     "nom_agence": "MISSION LOCALE DU BASSIN D'EMPLOI GRANVILLAIS",
     "code_postal": 50400,
     "nom_region": "Normandie",
@@ -1134,20 +1296,23 @@
     "structure": "MILO"
   },
   {
+    "id": 163,
     "nom_agence": "MISSION LOCALE DU BASSIN DE LONGWY",
     "code_postal": 54810,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 54,
     "structure": "MILO"
   },
   {
+    "id": 164,
     "nom_agence": "MISSION LOCALE DU BASSIN DE SARREGUEMINES",
     "code_postal": 57200,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 57,
     "structure": "MILO"
   },
   {
+    "id": 165,
     "nom_agence": "Mission Locale du Bassin Graylois",
     "code_postal": 70100,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -1155,13 +1320,15 @@
     "structure": "MILO"
   },
   {
+    "id": 166,
     "nom_agence": "MISSION LOCALE DU BASSIN HOUILLER",
     "code_postal": 57800,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 57,
     "structure": "MILO"
   },
   {
+    "id": 167,
     "nom_agence": "MISSION LOCALE DU BERGERACOIS",
     "code_postal": 24100,
     "nom_region": "Nouvelle-Aquitaine",
@@ -1169,6 +1336,7 @@
     "structure": "MILO"
   },
   {
+    "id": 168,
     "nom_agence": "MISSION LOCALE DU BESSIN AU VIROIS",
     "code_postal": 14500,
     "nom_region": "Normandie",
@@ -1176,6 +1344,7 @@
     "structure": "MILO"
   },
   {
+    "id": 169,
     "nom_agence": "Mission Locale du Biterrois",
     "code_postal": 34500,
     "nom_region": "Occitanie",
@@ -1183,6 +1352,7 @@
     "structure": "MILO"
   },
   {
+    "id": 170,
     "nom_agence": "Mission Locale du Blaisois",
     "code_postal": 41000,
     "nom_region": "Centre-Val de Loire",
@@ -1190,6 +1360,7 @@
     "structure": "MILO"
   },
   {
+    "id": 171,
     "nom_agence": "MISSION LOCALE DU CAMBRESIS",
     "code_postal": 59400,
     "nom_region": "Hauts-de-France",
@@ -1197,6 +1368,7 @@
     "structure": "MILO"
   },
   {
+    "id": 172,
     "nom_agence": "MISSION LOCALE DU CENTRE MANCHE",
     "code_postal": 50006,
     "nom_region": "Normandie",
@@ -1204,6 +1376,7 @@
     "structure": "MILO"
   },
   {
+    "id": 173,
     "nom_agence": "MISSION LOCALE du CHALONNAIS",
     "code_postal": 71100,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -1211,6 +1384,7 @@
     "structure": "MILO"
   },
   {
+    "id": 174,
     "nom_agence": "Mission Locale du Charolais",
     "code_postal": 71130,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -1218,6 +1392,7 @@
     "structure": "MILO"
   },
   {
+    "id": 175,
     "nom_agence": "Mission Locale du Choletais",
     "code_postal": 49300,
     "nom_region": "Pays de la Loire",
@@ -1225,6 +1400,7 @@
     "structure": "MILO"
   },
   {
+    "id": 176,
     "nom_agence": "Mission Locale du Clermontois",
     "code_postal": 60600,
     "nom_region": "Hauts-de-France",
@@ -1232,6 +1408,7 @@
     "structure": "MILO"
   },
   {
+    "id": 177,
     "nom_agence": "Mission Locale du Comtat Venaissin",
     "code_postal": 84200,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -1239,6 +1416,7 @@
     "structure": "MILO"
   },
   {
+    "id": 178,
     "nom_agence": "MISSION LOCALE DU COTENTIN",
     "code_postal": 50130,
     "nom_region": "Normandie",
@@ -1246,6 +1424,7 @@
     "structure": "MILO"
   },
   {
+    "id": 179,
     "nom_agence": "Mission Locale du Coudon au Gapeau",
     "code_postal": 83130,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -1253,6 +1432,7 @@
     "structure": "MILO"
   },
   {
+    "id": 180,
     "nom_agence": "MISSION LOCALE DU DOUAISIS",
     "code_postal": 59500,
     "nom_region": "Hauts-de-France",
@@ -1260,6 +1440,7 @@
     "structure": "MILO"
   },
   {
+    "id": 181,
     "nom_agence": "MISSION LOCALE DU DROUAIS",
     "code_postal": 28100,
     "nom_region": "Centre-Val de Loire",
@@ -1267,6 +1448,7 @@
     "structure": "MILO"
   },
   {
+    "id": 182,
     "nom_agence": "MISSION LOCALE DU FOREZ",
     "code_postal": 42600,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1274,6 +1456,7 @@
     "structure": "MILO"
   },
   {
+    "id": 183,
     "nom_agence": "Mission Locale du Genevois Haut Savoyard",
     "code_postal": 74100,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1281,6 +1464,7 @@
     "structure": "MILO"
   },
   {
+    "id": 184,
     "nom_agence": "Mission Locale du Golfe de St Tropez",
     "code_postal": 83310,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -1288,13 +1472,15 @@
     "structure": "MILO"
   },
   {
+    "id": 185,
     "nom_agence": "MISSION LOCALE DU GRAND NANCY",
     "code_postal": 54000,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 54,
     "structure": "MILO"
   },
   {
+    "id": 186,
     "nom_agence": "MISSION LOCALE DU GRAND PERIGUEUX",
     "code_postal": 24000,
     "nom_region": "Nouvelle-Aquitaine",
@@ -1302,6 +1488,7 @@
     "structure": "MILO"
   },
   {
+    "id": 187,
     "nom_agence": "MISSION LOCALE DU HAUT BOCAGE",
     "code_postal": 85500,
     "nom_region": "Pays de la Loire",
@@ -1309,6 +1496,7 @@
     "structure": "MILO"
   },
   {
+    "id": 188,
     "nom_agence": "MISSION LOCALE DU HAUT PERIGORD",
     "code_postal": 24800,
     "nom_region": "Nouvelle-Aquitaine",
@@ -1316,6 +1504,7 @@
     "structure": "MILO"
   },
   {
+    "id": 189,
     "nom_agence": "Mission Locale du Haut Vaucluse",
     "code_postal": 84600,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -1323,6 +1512,7 @@
     "structure": "MILO"
   },
   {
+    "id": 190,
     "nom_agence": "MISSION LOCALE DU LIBOURNAIS",
     "code_postal": 33500,
     "nom_region": "Nouvelle-Aquitaine",
@@ -1330,6 +1520,7 @@
     "structure": "MILO"
   },
   {
+    "id": 191,
     "nom_agence": "mission locale du livradois-forez",
     "code_postal": 63600,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1337,6 +1528,7 @@
     "structure": "MILO"
   },
   {
+    "id": 192,
     "nom_agence": "Mission Locale du Lot",
     "code_postal": 46000,
     "nom_region": "Occitanie",
@@ -1344,6 +1536,7 @@
     "structure": "MILO"
   },
   {
+    "id": 193,
     "nom_agence": "Mission Locale du Luberon",
     "code_postal": 84120,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -1351,13 +1544,15 @@
     "structure": "MILO"
   },
   {
+    "id": 194,
     "nom_agence": "MISSION LOCALE DU LUNEVILLOIS",
     "code_postal": 54300,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 54,
     "structure": "MILO"
   },
   {
+    "id": 195,
     "nom_agence": "Mission Locale du Mantois",
     "code_postal": 78200,
     "nom_region": "Île-de-France",
@@ -1365,6 +1560,7 @@
     "structure": "MILO"
   },
   {
+    "id": 196,
     "nom_agence": "MISSION LOCALE DU MEDOC",
     "code_postal": 33340,
     "nom_region": "Nouvelle-Aquitaine",
@@ -1372,6 +1568,7 @@
     "structure": "MILO"
   },
   {
+    "id": 197,
     "nom_agence": "Mission Locale du Migennois et du Jovinien",
     "code_postal": 89400,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -1379,27 +1576,31 @@
     "structure": "MILO"
   },
   {
+    "id": 198,
     "nom_agence": "Mission Locale du Nord Meusien",
     "code_postal": 55100,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 55,
     "structure": "MILO"
   },
   {
+    "id": 199,
     "nom_agence": "Mission Locale du Nord Mosellan",
     "code_postal": 57970,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 57,
     "structure": "MILO"
   },
   {
+    "id": 200,
     "nom_agence": "Mission Locale du Nord Ouest Aubois",
     "code_postal": 10100,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 10,
     "structure": "MILO"
   },
   {
+    "id": 201,
     "nom_agence": "Mission locale du nord-est 77",
     "code_postal": 77100,
     "nom_region": "Île-de-France",
@@ -1407,6 +1608,7 @@
     "structure": "MILO"
   },
   {
+    "id": 202,
     "nom_agence": "MISSION LOCALE DU PAYS BOULONNAIS",
     "code_postal": 62200,
     "nom_region": "Hauts-de-France",
@@ -1414,6 +1616,7 @@
     "structure": "MILO"
   },
   {
+    "id": 203,
     "nom_agence": "MISSION LOCALE DU PAYS COMPIEGNOIS ET DU PAYS DES SOURCES",
     "code_postal": 60200,
     "nom_region": "Hauts-de-France",
@@ -1421,6 +1624,7 @@
     "structure": "MILO"
   },
   {
+    "id": 204,
     "nom_agence": "Mission Locale du Pays d' Ancenis",
     "code_postal": 44150,
     "nom_region": "Pays de la Loire",
@@ -1428,6 +1632,7 @@
     "structure": "MILO"
   },
   {
+    "id": 205,
     "nom_agence": "MISSION LOCALE DU PAYS D'ALENCON",
     "code_postal": 61000,
     "nom_region": "Normandie",
@@ -1435,6 +1640,7 @@
     "structure": "MILO"
   },
   {
+    "id": 206,
     "nom_agence": "Mission Locale du Pays de Brest",
     "code_postal": 29200,
     "nom_region": "Bretagne",
@@ -1442,6 +1648,7 @@
     "structure": "MILO"
   },
   {
+    "id": 207,
     "nom_agence": "Mission Locale du Pays de Caux Vallée de Seine",
     "code_postal": 76170,
     "nom_region": "Normandie",
@@ -1449,6 +1656,7 @@
     "structure": "MILO"
   },
   {
+    "id": 208,
     "nom_agence": "Mission Locale du Pays de Cornouaille",
     "code_postal": 29000,
     "nom_region": "Bretagne",
@@ -1456,6 +1664,7 @@
     "structure": "MILO"
   },
   {
+    "id": 209,
     "nom_agence": "MISSION LOCALE DU PAYS DE COUTANCES",
     "code_postal": 50200,
     "nom_region": "Normandie",
@@ -1463,13 +1672,15 @@
     "structure": "MILO"
   },
   {
+    "id": 210,
     "nom_agence": "Mission Locale du Pays de Remiremont et de ses Vallées",
     "code_postal": 88200,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 88,
     "structure": "MILO"
   },
   {
+    "id": 211,
     "nom_agence": "Mission Locale du Pays de Retz",
     "code_postal": 44270,
     "nom_region": "Pays de la Loire",
@@ -1477,13 +1688,15 @@
     "structure": "MILO"
   },
   {
+    "id": 212,
     "nom_agence": "MISSION LOCALE DU PAYS DE SAVERNE PLAINE ET PLATEAU",
     "code_postal": 67700,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 67,
     "structure": "MILO"
   },
   {
+    "id": 213,
     "nom_agence": "Mission Locale du Pays de Vannes",
     "code_postal": 56000,
     "nom_region": "Bretagne",
@@ -1491,13 +1704,15 @@
     "structure": "MILO"
   },
   {
+    "id": 214,
     "nom_agence": "Mission Locale du Pays Messin",
     "code_postal": 57070,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 57,
     "structure": "MILO"
   },
   {
+    "id": 215,
     "nom_agence": "Mission Locale du pays Nevers sud Nivernais",
     "code_postal": 58000,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -1505,6 +1720,7 @@
     "structure": "MILO"
   },
   {
+    "id": 216,
     "nom_agence": "mission locale du pays salonais",
     "code_postal": 13300,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -1512,6 +1728,7 @@
     "structure": "MILO"
   },
   {
+    "id": 217,
     "nom_agence": "MISSION LOCALE DU PAYS VILLENEUVOIS",
     "code_postal": 47300,
     "nom_region": "Nouvelle-Aquitaine",
@@ -1519,6 +1736,7 @@
     "structure": "MILO"
   },
   {
+    "id": 218,
     "nom_agence": "Mission Locale du Pays Yonnais",
     "code_postal": 85000,
     "nom_region": "Pays de la Loire",
@@ -1526,6 +1744,7 @@
     "structure": "MILO"
   },
   {
+    "id": 219,
     "nom_agence": "MISSION LOCALE DU PERIGORD NOIR",
     "code_postal": 24200,
     "nom_region": "Nouvelle-Aquitaine",
@@ -1533,6 +1752,7 @@
     "structure": "MILO"
   },
   {
+    "id": 220,
     "nom_agence": "Mission Locale du Provinois",
     "code_postal": 77160,
     "nom_region": "Île-de-France",
@@ -1540,6 +1760,7 @@
     "structure": "MILO"
   },
   {
+    "id": 221,
     "nom_agence": "Mission Locale du Saumurois",
     "code_postal": 49400,
     "nom_region": "Pays de la Loire",
@@ -1547,6 +1768,7 @@
     "structure": "MILO"
   },
   {
+    "id": 222,
     "nom_agence": "Mission Locale du Segreen",
     "code_postal": 49500,
     "nom_region": "Pays de la Loire",
@@ -1554,6 +1776,7 @@
     "structure": "MILO"
   },
   {
+    "id": 223,
     "nom_agence": "MISSION LOCALE DU SUD MANCHE",
     "code_postal": 50300,
     "nom_region": "Normandie",
@@ -1561,20 +1784,23 @@
     "structure": "MILO"
   },
   {
+    "id": 224,
     "nom_agence": "MISSION LOCALE DU SUD MEUSIEN",
     "code_postal": 55000,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 55,
     "structure": "MILO"
   },
   {
+    "id": 225,
     "nom_agence": "MISSION LOCALE DU SUD MOSELLAN",
     "code_postal": 57400,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 57,
     "structure": "MILO"
   },
   {
+    "id": 226,
     "nom_agence": "MISSION LOCALE DU TARN & GARONNE",
     "code_postal": 82000,
     "nom_region": "Occitanie",
@@ -1582,6 +1808,7 @@
     "structure": "MILO"
   },
   {
+    "id": 227,
     "nom_agence": "MISSION LOCALE DU TERRITOIRE DE BELFORT",
     "code_postal": 90000,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -1589,6 +1816,7 @@
     "structure": "MILO"
   },
   {
+    "id": 228,
     "nom_agence": "Mission Locale du Velay",
     "code_postal": 43000,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1596,6 +1824,7 @@
     "structure": "MILO"
   },
   {
+    "id": 229,
     "nom_agence": "MISSION LOCALE DU VENDOMOIS",
     "code_postal": 41100,
     "nom_region": "Centre-Val de Loire",
@@ -1603,6 +1832,7 @@
     "structure": "MILO"
   },
   {
+    "id": 230,
     "nom_agence": "Mission Locale du Vignoble Nantais",
     "code_postal": 44190,
     "nom_region": "Pays de la Loire",
@@ -1610,6 +1840,7 @@
     "structure": "MILO"
   },
   {
+    "id": 231,
     "nom_agence": "MISSION LOCALE ELBEUF",
     "code_postal": 76500,
     "nom_region": "Normandie",
@@ -1617,6 +1848,7 @@
     "structure": "MILO"
   },
   {
+    "id": 232,
     "nom_agence": "MISSION LOCALE EN PAYS D'ARTOIS",
     "code_postal": 62000,
     "nom_region": "Hauts-de-France",
@@ -1624,13 +1856,15 @@
     "structure": "MILO"
   },
   {
+    "id": 233,
     "nom_agence": "Mission Locale Espace Jeunes de Vichy et sa Région",
-    "code_postal": "03200",
+    "code_postal": 3200,
     "nom_region": "Auvergne-Rhône-Alpes",
-    "code_departement": "03",
+    "code_departement": 3,
     "structure": "MILO"
   },
   {
+    "id": 234,
     "nom_agence": "mission locale est",
     "code_postal": 97470,
     "nom_region": "La Réunion",
@@ -1638,13 +1872,15 @@
     "structure": "MILO"
   },
   {
+    "id": 235,
     "nom_agence": "Mission Locale EST 06",
-    "code_postal": "06500",
+    "code_postal": 6500,
     "nom_region": "Provence-Alpes-Côte d'Azur",
-    "code_departement": "06",
+    "code_departement": 6,
     "structure": "MILO"
   },
   {
+    "id": 236,
     "nom_agence": "Mission Locale Est Etang de Berre",
     "code_postal": 13130,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -1652,6 +1888,7 @@
     "structure": "MILO"
   },
   {
+    "id": 237,
     "nom_agence": "Mission Locale Est-VAR",
     "code_postal": 83600,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -1659,6 +1896,7 @@
     "structure": "MILO"
   },
   {
+    "id": 238,
     "nom_agence": "Mission Locale Gagny/Villemomble/les Pavillons-sous-Bois",
     "code_postal": 93250,
     "nom_region": "Île-de-France",
@@ -1666,6 +1904,7 @@
     "structure": "MILO"
   },
   {
+    "id": 239,
     "nom_agence": "MISSION LOCALE GIER PILAT",
     "code_postal": 42400,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1673,6 +1912,7 @@
     "structure": "MILO"
   },
   {
+    "id": 240,
     "nom_agence": "Mission Locale Grésivaudan-Alpes-Métropole",
     "code_postal": 38920,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1680,6 +1920,7 @@
     "structure": "MILO"
   },
   {
+    "id": 241,
     "nom_agence": "Mission Locale Haut-Doubs",
     "code_postal": 25300,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -1687,6 +1928,7 @@
     "structure": "MILO"
   },
   {
+    "id": 242,
     "nom_agence": "Mission Locale Haute-Garonne",
     "code_postal": 31200,
     "nom_region": "Occitanie",
@@ -1694,6 +1936,7 @@
     "structure": "MILO"
   },
   {
+    "id": 243,
     "nom_agence": "Mission Locale Indre Sud",
     "code_postal": 36300,
     "nom_region": "Centre-Val de Loire",
@@ -1701,6 +1944,7 @@
     "structure": "MILO"
   },
   {
+    "id": 244,
     "nom_agence": "Mission Locale INNOVAM",
     "code_postal": 94230,
     "nom_region": "Île-de-France",
@@ -1708,6 +1952,7 @@
     "structure": "MILO"
   },
   {
+    "id": 245,
     "nom_agence": "Mission Locale Insertion Formation Emploi du Grand Amiénois",
     "code_postal": 80000,
     "nom_region": "Hauts-de-France",
@@ -1715,6 +1960,7 @@
     "structure": "MILO"
   },
   {
+    "id": 246,
     "nom_agence": "Mission Locale Intercommunale de Sartrouville",
     "code_postal": 78500,
     "nom_region": "Île-de-France",
@@ -1722,6 +1968,7 @@
     "structure": "MILO"
   },
   {
+    "id": 247,
     "nom_agence": "MISSION LOCALE INTERCOMMUNALE DE VERSAILLES",
     "code_postal": 78000,
     "nom_region": "Île-de-France",
@@ -1729,6 +1976,7 @@
     "structure": "MILO"
   },
   {
+    "id": 248,
     "nom_agence": "mission locale intercommunale des mureaux",
     "code_postal": 78130,
     "nom_region": "Île-de-France",
@@ -1736,13 +1984,15 @@
     "structure": "MILO"
   },
   {
+    "id": 249,
     "nom_agence": "Mission Locale Jeune Ariege",
-    "code_postal": "09000",
+    "code_postal": 9000,
     "nom_region": "Occitanie",
-    "code_departement": "09",
+    "code_departement": 9,
     "structure": "MILO"
   },
   {
+    "id": 250,
     "nom_agence": "Mission Locale Jeunes",
     "code_postal": 38400,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1750,6 +2000,7 @@
     "structure": "MILO"
   },
   {
+    "id": 251,
     "nom_agence": "Mission Locale Jeunes Albertville-Tarentaise",
     "code_postal": 73200,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1757,13 +2008,15 @@
     "structure": "MILO"
   },
   {
+    "id": 252,
     "nom_agence": "Mission Locale Jeunes Bresse Dombes Côtière",
-    "code_postal": "01000",
+    "code_postal": 1000,
     "nom_region": "Auvergne-Rhône-Alpes",
-    "code_departement": "01",
+    "code_departement": 1,
     "structure": "MILO"
   },
   {
+    "id": 253,
     "nom_agence": "MISSION LOCALE JEUNES DE CHATEAUROUX",
     "code_postal": 36000,
     "nom_region": "Centre-Val de Loire",
@@ -1771,6 +2024,7 @@
     "structure": "MILO"
   },
   {
+    "id": 254,
     "nom_agence": "Mission Locale Jeunes des Pyrénées Orientales",
     "code_postal": 66000,
     "nom_region": "Occitanie",
@@ -1778,6 +2032,7 @@
     "structure": "MILO"
   },
   {
+    "id": 255,
     "nom_agence": "Mission Locale Jeunes des Territoires de Mourenx Oloron Orthez",
     "code_postal": 64150,
     "nom_region": "Nouvelle-Aquitaine",
@@ -1785,6 +2040,7 @@
     "structure": "MILO"
   },
   {
+    "id": 256,
     "nom_agence": "Mission Locale Jeunes du Bassin Annécien",
     "code_postal": 74000,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1792,6 +2048,7 @@
     "structure": "MILO"
   },
   {
+    "id": 257,
     "nom_agence": "mission locale jeunes du bassin chamberien",
     "code_postal": 73000,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1799,6 +2056,7 @@
     "structure": "MILO"
   },
   {
+    "id": 258,
     "nom_agence": "Mission Locale Jeunes du Grand Narbonne",
     "code_postal": 11100,
     "nom_region": "Occitanie",
@@ -1806,6 +2064,7 @@
     "structure": "MILO"
   },
   {
+    "id": 259,
     "nom_agence": "MISSION LOCALE JEUNES DU PAYS DE VIERZON",
     "code_postal": 18100,
     "nom_region": "Centre-Val de Loire",
@@ -1813,6 +2072,7 @@
     "structure": "MILO"
   },
   {
+    "id": 260,
     "nom_agence": "MISSION LOCALE JEUNES DU VALENCIENNOIS",
     "code_postal": 59770,
     "nom_region": "Hauts-de-France",
@@ -1820,6 +2080,7 @@
     "structure": "MILO"
   },
   {
+    "id": 261,
     "nom_agence": "Mission Locale Jeunes Faucigny Mont-Blanc",
     "code_postal": 74300,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1827,6 +2088,7 @@
     "structure": "MILO"
   },
   {
+    "id": 262,
     "nom_agence": "Mission Locale Jeunes Grand Avignon",
     "code_postal": 84000,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -1834,6 +2096,7 @@
     "structure": "MILO"
   },
   {
+    "id": 263,
     "nom_agence": "Mission Locale Jeunes Ondaine et Haut Pilat",
     "code_postal": 42700,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1841,6 +2104,7 @@
     "structure": "MILO"
   },
   {
+    "id": 264,
     "nom_agence": "MISSION LOCALE JEUNES PAYS DE MAURIENNE",
     "code_postal": 73303,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1848,6 +2112,7 @@
     "structure": "MILO"
   },
   {
+    "id": 265,
     "nom_agence": "Mission Locale Jeunes Saint-Marcellin Vercors Isère",
     "code_postal": 38160,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1855,6 +2120,7 @@
     "structure": "MILO"
   },
   {
+    "id": 266,
     "nom_agence": "MISSION LOCALE LISIEUX NORMANDIE",
     "code_postal": 14100,
     "nom_region": "Normandie",
@@ -1862,6 +2128,7 @@
     "structure": "MILO"
   },
   {
+    "id": 267,
     "nom_agence": "MISSION LOCALE LOIRE TOURAINE",
     "code_postal": 37530,
     "nom_region": "Centre-Val de Loire",
@@ -1869,6 +2136,7 @@
     "structure": "MILO"
   },
   {
+    "id": 268,
     "nom_agence": "MISSION LOCALE LOUVIERS-VAL DE REUIL-ANDELLE",
     "code_postal": 27100,
     "nom_region": "Normandie",
@@ -1876,6 +2144,7 @@
     "structure": "MILO"
   },
   {
+    "id": 269,
     "nom_agence": "MISSION LOCALE LYS-TOURCOING",
     "code_postal": 59200,
     "nom_region": "Hauts-de-France",
@@ -1883,6 +2152,7 @@
     "structure": "MILO"
   },
   {
+    "id": 270,
     "nom_agence": "Mission Locale Maisons Alfort Charenton St Maur St Maurice",
     "code_postal": 94700,
     "nom_region": "Île-de-France",
@@ -1890,6 +2160,7 @@
     "structure": "MILO"
   },
   {
+    "id": 271,
     "nom_agence": "Mission Locale Métropole Est",
     "code_postal": 59650,
     "nom_region": "Hauts-de-France",
@@ -1897,6 +2168,7 @@
     "structure": "MILO"
   },
   {
+    "id": 272,
     "nom_agence": "MISSION LOCALE METROPOLE NORD-OUEST",
     "code_postal": 59130,
     "nom_region": "Hauts-de-France",
@@ -1904,6 +2176,7 @@
     "structure": "MILO"
   },
   {
+    "id": 273,
     "nom_agence": "Mission locale Métropole Sud",
     "code_postal": 59790,
     "nom_region": "Hauts-de-France",
@@ -1911,13 +2184,15 @@
     "structure": "MILO"
   },
   {
+    "id": 274,
     "nom_agence": "MISSION LOCALE MOLSHEIM",
     "code_postal": 67120,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 67,
     "structure": "MILO"
   },
   {
+    "id": 275,
     "nom_agence": "MISSION LOCALE MONTREUIL - CÃ”TE D'OPALE",
     "code_postal": 62170,
     "nom_region": "Hauts-de-France",
@@ -1925,6 +2200,7 @@
     "structure": "MILO"
   },
   {
+    "id": 276,
     "nom_agence": "MISSION LOCALE MORLAIX",
     "code_postal": 29600,
     "nom_region": "Bretagne",
@@ -1932,6 +2208,7 @@
     "structure": "MILO"
   },
   {
+    "id": 277,
     "nom_agence": "Mission Locale Moyenne Garonne",
     "code_postal": 47200,
     "nom_region": "Nouvelle-Aquitaine",
@@ -1939,13 +2216,15 @@
     "structure": "MILO"
   },
   {
+    "id": 278,
     "nom_agence": "Mission Locale Nice Côte d'Azur",
-    "code_postal": "06000",
+    "code_postal": 6000,
     "nom_region": "Provence-Alpes-Côte d'Azur",
-    "code_departement": "06",
+    "code_departement": 6,
     "structure": "MILO"
   },
   {
+    "id": 279,
     "nom_agence": "MISSION LOCALE NIVERNAIS MORVAN",
     "code_postal": 58120,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -1953,6 +2232,7 @@
     "structure": "MILO"
   },
   {
+    "id": 280,
     "nom_agence": "Mission locale nord",
     "code_postal": 97490,
     "nom_region": "La Réunion",
@@ -1960,6 +2240,7 @@
     "structure": "MILO"
   },
   {
+    "id": 281,
     "nom_agence": "Mission Locale Nord Atlantique",
     "code_postal": 44170,
     "nom_region": "Pays de la Loire",
@@ -1967,6 +2248,7 @@
     "structure": "MILO"
   },
   {
+    "id": 282,
     "nom_agence": "Mission Locale Nord Essonne",
     "code_postal": 91260,
     "nom_region": "Île-de-France",
@@ -1974,6 +2256,7 @@
     "structure": "MILO"
   },
   {
+    "id": 283,
     "nom_agence": "MISSION LOCALE NORD ISERE",
     "code_postal": 38300,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -1981,6 +2264,7 @@
     "structure": "MILO"
   },
   {
+    "id": 284,
     "nom_agence": "MISSION LOCALE NORD MARTINIQUE",
     "code_postal": 97231,
     "nom_region": "Martinique",
@@ -1988,6 +2272,7 @@
     "structure": "MILO"
   },
   {
+    "id": 285,
     "nom_agence": "Mission Locale Nord Val d'Oise",
     "code_postal": 95260,
     "nom_region": "Île-de-France",
@@ -1995,6 +2280,7 @@
     "structure": "MILO"
   },
   {
+    "id": 286,
     "nom_agence": "Mission Locale Nord Vienne",
     "code_postal": 86100,
     "nom_region": "Nouvelle-Aquitaine",
@@ -2002,6 +2288,7 @@
     "structure": "MILO"
   },
   {
+    "id": 287,
     "nom_agence": "Mission Locale Nyons",
     "code_postal": 26110,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2009,6 +2296,7 @@
     "structure": "MILO"
   },
   {
+    "id": 288,
     "nom_agence": "MISSION LOCALE OUEST ET SUD EURE ET LOIR",
     "code_postal": 28400,
     "nom_region": "Centre-Val de Loire",
@@ -2016,6 +2304,7 @@
     "structure": "MILO"
   },
   {
+    "id": 289,
     "nom_agence": "mission locale ouest eure",
     "code_postal": 27300,
     "nom_region": "Normandie",
@@ -2023,6 +2312,7 @@
     "structure": "MILO"
   },
   {
+    "id": 290,
     "nom_agence": "mission locale ouest haut var",
     "code_postal": 83170,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -2030,6 +2320,7 @@
     "structure": "MILO"
   },
   {
+    "id": 291,
     "nom_agence": "Mission locale Paris-Vallée de la Marne",
     "code_postal": 77200,
     "nom_region": "Île-de-France",
@@ -2037,6 +2328,7 @@
     "structure": "MILO"
   },
   {
+    "id": 292,
     "nom_agence": "MISSION LOCALE PAYS D'EVREUX ET EURE SUD",
     "code_postal": 27000,
     "nom_region": "Normandie",
@@ -2044,6 +2336,7 @@
     "structure": "MILO"
   },
   {
+    "id": 293,
     "nom_agence": "Mission Locale Pays de Martigues Côte Bleue",
     "code_postal": 13500,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -2051,6 +2344,7 @@
     "structure": "MILO"
   },
   {
+    "id": 294,
     "nom_agence": "Mission Locale Pays de Saint-Malo",
     "code_postal": 35400,
     "nom_region": "Bretagne",
@@ -2058,6 +2352,7 @@
     "structure": "MILO"
   },
   {
+    "id": 295,
     "nom_agence": "Mission locale Plateau Nord Val de Saône",
     "code_postal": 69140,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2065,6 +2360,7 @@
     "structure": "MILO"
   },
   {
+    "id": 296,
     "nom_agence": "MISSION LOCALE PORTO-VECCHIO SUD CORSE",
     "code_postal": 20137,
     "nom_region": "Corse",
@@ -2072,13 +2368,15 @@
     "structure": "MILO"
   },
   {
+    "id": 297,
     "nom_agence": "MISSION LOCALE POUR L'EMPLOI",
     "code_postal": 67000,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 67,
     "structure": "MILO"
   },
   {
+    "id": 298,
     "nom_agence": "mission locale pour l'emploi des jeunes de bondy",
     "code_postal": 93140,
     "nom_region": "Île-de-France",
@@ -2086,6 +2384,7 @@
     "structure": "MILO"
   },
   {
+    "id": 299,
     "nom_agence": "Mission locale pour l'emploi du gers",
     "code_postal": 32013,
     "nom_region": "Occitanie",
@@ -2093,13 +2392,15 @@
     "structure": "MILO"
   },
   {
+    "id": 300,
     "nom_agence": "Mission Locale pour l'Emploi en Thiérache",
-    "code_postal": "02140",
+    "code_postal": 2140,
     "nom_region": "Hauts-de-France",
-    "code_departement": "02",
+    "code_departement": 2,
     "structure": "MILO"
   },
   {
+    "id": 301,
     "nom_agence": "MISSION LOCALE POUR L'INSERTION SOCIALE ET PROFESSIONNELLE DES JEUNES DE LA BRESSE LOUHANNAISE",
     "code_postal": 71500,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -2107,6 +2408,7 @@
     "structure": "MILO"
   },
   {
+    "id": 302,
     "nom_agence": "MISSION LOCALE POUR LES JEUNES PAU PYRENEES",
     "code_postal": 64000,
     "nom_region": "Nouvelle-Aquitaine",
@@ -2114,6 +2416,7 @@
     "structure": "MILO"
   },
   {
+    "id": 303,
     "nom_agence": "Mission Locale Réseaux pour l'emploi pays de Lorient",
     "code_postal": 56100,
     "nom_region": "Bretagne",
@@ -2121,6 +2424,7 @@
     "structure": "MILO"
   },
   {
+    "id": 304,
     "nom_agence": "Mission Locale Rhône Sud",
     "code_postal": 69700,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2128,6 +2432,7 @@
     "structure": "MILO"
   },
   {
+    "id": 305,
     "nom_agence": "Mission Locale Rhône Sud-Est",
     "code_postal": 69800,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2135,6 +2440,7 @@
     "structure": "MILO"
   },
   {
+    "id": 306,
     "nom_agence": "MISSION LOCALE RIBERACOIS VALLEE DE L'ISLE",
     "code_postal": 24600,
     "nom_region": "Nouvelle-Aquitaine",
@@ -2142,6 +2448,7 @@
     "structure": "MILO"
   },
   {
+    "id": 307,
     "nom_agence": "Mission Locale Riom Limagne Combrailles",
     "code_postal": 63200,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2149,6 +2456,7 @@
     "structure": "MILO"
   },
   {
+    "id": 308,
     "nom_agence": "MISSION LOCALE ROUBAIX LYS LEZ LANNOY",
     "code_postal": 59100,
     "nom_region": "Hauts-de-France",
@@ -2156,6 +2464,7 @@
     "structure": "MILO"
   },
   {
+    "id": 309,
     "nom_agence": "Mission Locale Rurale de la Haute Vienne",
     "code_postal": 87700,
     "nom_region": "Nouvelle-Aquitaine",
@@ -2163,6 +2472,7 @@
     "structure": "MILO"
   },
   {
+    "id": 310,
     "nom_agence": "MISSION LOCALE RURALE DES MARCHES DE BOURGOGNE",
     "code_postal": 21400,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -2170,6 +2480,7 @@
     "structure": "MILO"
   },
   {
+    "id": 311,
     "nom_agence": "MISSION LOCALE RURALE DU GRAND PLATEAU PICARD",
     "code_postal": 60130,
     "nom_region": "Hauts-de-France",
@@ -2177,6 +2488,7 @@
     "structure": "MILO"
   },
   {
+    "id": 312,
     "nom_agence": "Mission Locale Rurale du Talou",
     "code_postal": 76510,
     "nom_region": "Normandie",
@@ -2184,6 +2496,7 @@
     "structure": "MILO"
   },
   {
+    "id": 313,
     "nom_agence": "Mission Locale Rurale du Tonnerrois et de l'Avallonnais",
     "code_postal": 89700,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -2191,6 +2504,7 @@
     "structure": "MILO"
   },
   {
+    "id": 314,
     "nom_agence": "mission locale rurale nord ouest rhone",
     "code_postal": 69170,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2198,6 +2512,7 @@
     "structure": "MILO"
   },
   {
+    "id": 315,
     "nom_agence": "Mission Locale Saint Etienne et Couronne Stéphanoise",
     "code_postal": 42000,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2205,6 +2520,7 @@
     "structure": "MILO"
   },
   {
+    "id": 316,
     "nom_agence": "Mission Locale Saint-Denis / Pierrefitte",
     "code_postal": 93200,
     "nom_region": "Île-de-France",
@@ -2212,6 +2528,7 @@
     "structure": "MILO"
   },
   {
+    "id": 317,
     "nom_agence": "Mission Locale Saintes",
     "code_postal": 17100,
     "nom_region": "Nouvelle-Aquitaine",
@@ -2219,6 +2536,7 @@
     "structure": "MILO"
   },
   {
+    "id": 318,
     "nom_agence": "MISSION LOCALE SANCERRE-SOLOGNE",
     "code_postal": 18700,
     "nom_region": "Centre-Val de Loire",
@@ -2226,6 +2544,7 @@
     "structure": "MILO"
   },
   {
+    "id": 319,
     "nom_agence": "Mission Locale Sarthe et Loir",
     "code_postal": 72200,
     "nom_region": "Pays de la Loire",
@@ -2233,13 +2552,15 @@
     "structure": "MILO"
   },
   {
+    "id": 320,
     "nom_agence": "mission locale sedan",
-    "code_postal": "08200",
-    "nom_region": "Grand-Est",
-    "code_departement": "08",
+    "code_postal": 8200,
+    "nom_region": "Grand Est",
+    "code_departement": 8,
     "structure": "MILO"
   },
   {
+    "id": 321,
     "nom_agence": "Mission Locale Sud",
     "code_postal": 97410,
     "nom_region": "La Réunion",
@@ -2247,13 +2568,15 @@
     "structure": "MILO"
   },
   {
+    "id": 322,
     "nom_agence": "Mission Locale Sud Ardennes",
-    "code_postal": "08300",
-    "nom_region": "Grand-Est",
-    "code_departement": "08",
+    "code_postal": 8300,
+    "nom_region": "Grand Est",
+    "code_departement": 8,
     "structure": "MILO"
   },
   {
+    "id": 323,
     "nom_agence": "Mission Locale sud Essonne",
     "code_postal": 91150,
     "nom_region": "Île-de-France",
@@ -2261,6 +2584,7 @@
     "structure": "MILO"
   },
   {
+    "id": 324,
     "nom_agence": "MISSION LOCALE SUD GIRONDE",
     "code_postal": 33210,
     "nom_region": "Nouvelle-Aquitaine",
@@ -2268,6 +2592,7 @@
     "structure": "MILO"
   },
   {
+    "id": 325,
     "nom_agence": "Mission Locale Sud Isère",
     "code_postal": 38130,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2275,6 +2600,7 @@
     "structure": "MILO"
   },
   {
+    "id": 326,
     "nom_agence": "MISSION LOCALE SUD JURA",
     "code_postal": 39000,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -2282,6 +2608,7 @@
     "structure": "MILO"
   },
   {
+    "id": 327,
     "nom_agence": "MISSION LOCALE SUD OUEST LYONNAIS",
     "code_postal": 69600,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2289,6 +2616,7 @@
     "structure": "MILO"
   },
   {
+    "id": 328,
     "nom_agence": "MISSION LOCALE SUD VENDEE FLC",
     "code_postal": 85200,
     "nom_region": "Pays de la Loire",
@@ -2296,6 +2624,7 @@
     "structure": "MILO"
   },
   {
+    "id": 329,
     "nom_agence": "Mission Locale Tarn Sud",
     "code_postal": 81100,
     "nom_region": "Occitanie",
@@ -2303,6 +2632,7 @@
     "structure": "MILO"
   },
   {
+    "id": 330,
     "nom_agence": "MISSION LOCALE TECHNOWEST",
     "code_postal": 33700,
     "nom_region": "Nouvelle-Aquitaine",
@@ -2310,13 +2640,15 @@
     "structure": "MILO"
   },
   {
+    "id": 331,
     "nom_agence": "Mission Locale Terres de Lorraine",
     "code_postal": 54200,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 54,
     "structure": "MILO"
   },
   {
+    "id": 332,
     "nom_agence": "Mission Locale Ussel",
     "code_postal": 19200,
     "nom_region": "Nouvelle-Aquitaine",
@@ -2324,6 +2656,7 @@
     "structure": "MILO"
   },
   {
+    "id": 333,
     "nom_agence": "Mission Locale Val d'Yerres - Val de Seine",
     "code_postal": 91230,
     "nom_region": "Île-de-France",
@@ -2331,6 +2664,7 @@
     "structure": "MILO"
   },
   {
+    "id": 334,
     "nom_agence": "MISSION LOCALE VAL DE MARQUE",
     "code_postal": 59510,
     "nom_region": "Hauts-de-France",
@@ -2338,6 +2672,7 @@
     "structure": "MILO"
   },
   {
+    "id": 335,
     "nom_agence": "MISSION LOCALE VENDEE ATLANTIQUE",
     "code_postal": 85100,
     "nom_region": "Pays de la Loire",
@@ -2345,6 +2680,7 @@
     "structure": "MILO"
   },
   {
+    "id": 336,
     "nom_agence": "Mission Locale Vernon Seine Vexin",
     "code_postal": 27203,
     "nom_region": "Normandie",
@@ -2352,6 +2688,7 @@
     "structure": "MILO"
   },
   {
+    "id": 337,
     "nom_agence": "Mission Locale VILLEFRANCHE BEAUJOLAIS",
     "code_postal": 69400,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2359,6 +2696,7 @@
     "structure": "MILO"
   },
   {
+    "id": 338,
     "nom_agence": "Mission Locale Villeurbanne",
     "code_postal": 69100,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2366,6 +2704,7 @@
     "structure": "MILO"
   },
   {
+    "id": 339,
     "nom_agence": "MISSION LOCALE WATTRELOS-LEERS",
     "code_postal": 59150,
     "nom_region": "Hauts-de-France",
@@ -2373,6 +2712,7 @@
     "structure": "MILO"
   },
   {
+    "id": 340,
     "nom_agence": "MISSION LOCALE YSSINGEAUX",
     "code_postal": 43200,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2380,6 +2720,7 @@
     "structure": "MILO"
   },
   {
+    "id": 341,
     "nom_agence": "MJTN",
     "code_postal": 81000,
     "nom_region": "Occitanie",
@@ -2387,6 +2728,7 @@
     "structure": "MILO"
   },
   {
+    "id": 342,
     "nom_agence": "ml aix en provence",
     "code_postal": 13090,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -2394,13 +2736,15 @@
     "structure": "MILO"
   },
   {
+    "id": 343,
     "nom_agence": "ml antipolis",
-    "code_postal": "06600",
+    "code_postal": 6600,
     "nom_region": "Provence-Alpes-Côte d'Azur",
-    "code_departement": "06",
+    "code_departement": 6,
     "structure": "MILO"
   },
   {
+    "id": 344,
     "nom_agence": "ml arles",
     "code_postal": 13200,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -2408,6 +2752,7 @@
     "structure": "MILO"
   },
   {
+    "id": 345,
     "nom_agence": "ML ASI Siège Vizille",
     "code_postal": 38220,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2415,6 +2760,7 @@
     "structure": "MILO"
   },
   {
+    "id": 346,
     "nom_agence": "ML ASNIERES-SUR-SEINE/VILLENEUVE-LA-GARENNE",
     "code_postal": 92600,
     "nom_region": "Île-de-France",
@@ -2422,6 +2768,7 @@
     "structure": "MILO"
   },
   {
+    "id": 347,
     "nom_agence": "ml aulnay sous bois",
     "code_postal": 93600,
     "nom_region": "Île-de-France",
@@ -2429,6 +2776,7 @@
     "structure": "MILO"
   },
   {
+    "id": 348,
     "nom_agence": "ml auray",
     "code_postal": 56402,
     "nom_region": "Bretagne",
@@ -2436,6 +2784,7 @@
     "structure": "MILO"
   },
   {
+    "id": 349,
     "nom_agence": "ML bassin Chellois",
     "code_postal": 77500,
     "nom_region": "Île-de-France",
@@ -2443,6 +2792,7 @@
     "structure": "MILO"
   },
   {
+    "id": 350,
     "nom_agence": "ML Bièvre Val de Marne",
     "code_postal": 94260,
     "nom_region": "Île-de-France",
@@ -2450,6 +2800,7 @@
     "structure": "MILO"
   },
   {
+    "id": 351,
     "nom_agence": "ML BRETIGNY SUR ORGE",
     "code_postal": 91220,
     "nom_region": "Île-de-France",
@@ -2457,6 +2808,7 @@
     "structure": "MILO"
   },
   {
+    "id": 352,
     "nom_agence": "ml brive la gaillarde",
     "code_postal": 19100,
     "nom_region": "Nouvelle-Aquitaine",
@@ -2464,13 +2816,15 @@
     "structure": "MILO"
   },
   {
+    "id": 353,
     "nom_agence": "ml chalons en champagne/ste menehould",
     "code_postal": 51000,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 51,
     "structure": "MILO"
   },
   {
+    "id": 354,
     "nom_agence": "ML Civray",
     "code_postal": 86400,
     "nom_region": "Nouvelle-Aquitaine",
@@ -2478,6 +2832,7 @@
     "structure": "MILO"
   },
   {
+    "id": 355,
     "nom_agence": "ML CLERMONT métropole et volcans",
     "code_postal": 63100,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2485,13 +2840,15 @@
     "structure": "MILO"
   },
   {
+    "id": 356,
     "nom_agence": "ml cote des bar",
     "code_postal": 10200,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 10,
     "structure": "MILO"
   },
   {
+    "id": 357,
     "nom_agence": "ML CREUSE",
     "code_postal": 23000,
     "nom_region": "Nouvelle-Aquitaine",
@@ -2499,6 +2856,7 @@
     "structure": "MILO"
   },
   {
+    "id": 358,
     "nom_agence": "ml de la seine et du loing",
     "code_postal": 77140,
     "nom_region": "Île-de-France",
@@ -2506,6 +2864,7 @@
     "structure": "MILO"
   },
   {
+    "id": 359,
     "nom_agence": "ML de Loches",
     "code_postal": 37600,
     "nom_region": "Centre-Val de Loire",
@@ -2513,6 +2872,7 @@
     "structure": "MILO"
   },
   {
+    "id": 360,
     "nom_agence": "ML DHUYS",
     "code_postal": 93390,
     "nom_region": "Île-de-France",
@@ -2520,6 +2880,7 @@
     "structure": "MILO"
   },
   {
+    "id": 361,
     "nom_agence": "ml dinan",
     "code_postal": 22100,
     "nom_region": "Bretagne",
@@ -2527,13 +2888,15 @@
     "structure": "MILO"
   },
   {
+    "id": 362,
     "nom_agence": "ml du pays de grasse",
-    "code_postal": "06130",
+    "code_postal": 6130,
     "nom_region": "Provence-Alpes-Côte d'Azur",
-    "code_departement": "06",
+    "code_departement": 6,
     "structure": "MILO"
   },
   {
+    "id": 363,
     "nom_agence": "ml du plateau briard",
     "code_postal": 94470,
     "nom_region": "Île-de-France",
@@ -2541,6 +2904,7 @@
     "structure": "MILO"
   },
   {
+    "id": 364,
     "nom_agence": "ML du Plateau de Brie",
     "code_postal": 77680,
     "nom_region": "Île-de-France",
@@ -2548,6 +2912,7 @@
     "structure": "MILO"
   },
   {
+    "id": 365,
     "nom_agence": "ml franconville",
     "code_postal": 95130,
     "nom_region": "Île-de-France",
@@ -2555,6 +2920,7 @@
     "structure": "MILO"
   },
   {
+    "id": 366,
     "nom_agence": "ml gennevilliers",
     "code_postal": 92230,
     "nom_region": "Île-de-France",
@@ -2562,6 +2928,7 @@
     "structure": "MILO"
   },
   {
+    "id": 367,
     "nom_agence": "ml grigny",
     "code_postal": 91350,
     "nom_region": "Île-de-France",
@@ -2569,6 +2936,7 @@
     "structure": "MILO"
   },
   {
+    "id": 368,
     "nom_agence": "ml intercommunale de rambouillet",
     "code_postal": 78120,
     "nom_region": "Île-de-France",
@@ -2576,6 +2944,7 @@
     "structure": "MILO"
   },
   {
+    "id": 369,
     "nom_agence": "ML Isère Rhodanienne",
     "code_postal": 38200,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2583,6 +2952,7 @@
     "structure": "MILO"
   },
   {
+    "id": 370,
     "nom_agence": "ML ISSOIRE",
     "code_postal": 63500,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2590,6 +2960,7 @@
     "structure": "MILO"
   },
   {
+    "id": 371,
     "nom_agence": "ml jeunes nimes metropole",
     "code_postal": 30020,
     "nom_region": "Occitanie",
@@ -2597,6 +2968,7 @@
     "structure": "MILO"
   },
   {
+    "id": 372,
     "nom_agence": "ml la rochelle -re- pays d'aunis",
     "code_postal": 17000,
     "nom_region": "Nouvelle-Aquitaine",
@@ -2604,6 +2976,7 @@
     "structure": "MILO"
   },
   {
+    "id": 373,
     "nom_agence": "ml la seyne sur mer",
     "code_postal": 83500,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -2611,6 +2984,7 @@
     "structure": "MILO"
   },
   {
+    "id": 374,
     "nom_agence": "ML LE HAVRE ESTUAIRE LITTORAL",
     "code_postal": 76620,
     "nom_region": "Normandie",
@@ -2618,6 +2992,7 @@
     "structure": "MILO"
   },
   {
+    "id": 375,
     "nom_agence": "ml le perreux sur marne",
     "code_postal": 94170,
     "nom_region": "Île-de-France",
@@ -2625,6 +3000,7 @@
     "structure": "MILO"
   },
   {
+    "id": 376,
     "nom_agence": "ML LYR",
     "code_postal": 93500,
     "nom_region": "Île-de-France",
@@ -2632,6 +3008,7 @@
     "structure": "MILO"
   },
   {
+    "id": 377,
     "nom_agence": "ml melun",
     "code_postal": 77000,
     "nom_region": "Île-de-France",
@@ -2639,6 +3016,7 @@
     "structure": "MILO"
   },
   {
+    "id": 378,
     "nom_agence": "ML MONTEREAU FAULT YONNE",
     "code_postal": 77130,
     "nom_region": "Île-de-France",
@@ -2646,13 +3024,15 @@
     "structure": "MILO"
   },
   {
+    "id": 379,
     "nom_agence": "ML MONTLUCON",
-    "code_postal": "03100",
+    "code_postal": 3100,
     "nom_region": "Auvergne-Rhône-Alpes",
-    "code_departement": "03",
+    "code_departement": 3,
     "structure": "MILO"
   },
   {
+    "id": 380,
     "nom_agence": "ml nantes",
     "code_postal": 44100,
     "nom_region": "Pays de la Loire",
@@ -2660,20 +3040,23 @@
     "structure": "MILO"
   },
   {
+    "id": 381,
     "nom_agence": "ML Nord Ardèche",
-    "code_postal": "07100",
+    "code_postal": 7100,
     "nom_region": "Auvergne-Rhône-Alpes",
-    "code_departement": "07",
+    "code_departement": 7,
     "structure": "MILO"
   },
   {
+    "id": 382,
     "nom_agence": "ML Nord-Ardennes",
-    "code_postal": "08500",
-    "nom_region": "Grand-Est",
-    "code_departement": "08",
+    "code_postal": 8500,
+    "nom_region": "Grand Est",
+    "code_departement": 8,
     "structure": "MILO"
   },
   {
+    "id": 383,
     "nom_agence": "ml Orly Choisy Villeneuve Ablon",
     "code_postal": 94310,
     "nom_region": "Île-de-France",
@@ -2681,6 +3064,7 @@
     "structure": "MILO"
   },
   {
+    "id": 384,
     "nom_agence": "ML Ouest Côtes d'Armor",
     "code_postal": 22300,
     "nom_region": "Bretagne",
@@ -2688,6 +3072,7 @@
     "structure": "MILO"
   },
   {
+    "id": 385,
     "nom_agence": "ml petite camargue heraultaise",
     "code_postal": 34400,
     "nom_region": "Occitanie",
@@ -2695,6 +3080,7 @@
     "structure": "MILO"
   },
   {
+    "id": 386,
     "nom_agence": "ml poissy",
     "code_postal": 78300,
     "nom_region": "Île-de-France",
@@ -2702,6 +3088,7 @@
     "structure": "MILO"
   },
   {
+    "id": 387,
     "nom_agence": "ML PONTIVY",
     "code_postal": 56305,
     "nom_region": "Bretagne",
@@ -2709,6 +3096,7 @@
     "structure": "MILO"
   },
   {
+    "id": 388,
     "nom_agence": "ML REDON",
     "code_postal": 35600,
     "nom_region": "Bretagne",
@@ -2716,13 +3104,15 @@
     "structure": "MILO"
   },
   {
+    "id": 389,
     "nom_agence": "ml reims",
     "code_postal": 51100,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 51,
     "structure": "MILO"
   },
   {
+    "id": 390,
     "nom_agence": "ml rives de seine",
     "code_postal": 92400,
     "nom_region": "Île-de-France",
@@ -2730,6 +3120,7 @@
     "structure": "MILO"
   },
   {
+    "id": 391,
     "nom_agence": "ML Romans Royans Vercors",
     "code_postal": 26100,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2737,13 +3128,15 @@
     "structure": "MILO"
   },
   {
+    "id": 392,
     "nom_agence": "ml rurale du nord marnais",
     "code_postal": 51110,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 51,
     "structure": "MILO"
   },
   {
+    "id": 393,
     "nom_agence": "ml sainte genevieve des bois",
     "code_postal": 91700,
     "nom_region": "Île-de-France",
@@ -2751,6 +3144,7 @@
     "structure": "MILO"
   },
   {
+    "id": 394,
     "nom_agence": "ML SEINOISE",
     "code_postal": 95170,
     "nom_region": "Île-de-France",
@@ -2758,6 +3152,7 @@
     "structure": "MILO"
   },
   {
+    "id": 395,
     "nom_agence": "ml st brieuc",
     "code_postal": 22023,
     "nom_region": "Bretagne",
@@ -2765,6 +3160,7 @@
     "structure": "MILO"
   },
   {
+    "id": 396,
     "nom_agence": "ml st germain en laye et communes environnantes",
     "code_postal": 78100,
     "nom_region": "Île-de-France",
@@ -2772,6 +3168,7 @@
     "structure": "MILO"
   },
   {
+    "id": 397,
     "nom_agence": "ml st gildas des bois",
     "code_postal": 44530,
     "nom_region": "Pays de la Loire",
@@ -2779,6 +3176,7 @@
     "structure": "MILO"
   },
   {
+    "id": 398,
     "nom_agence": "ml st paul",
     "code_postal": 97460,
     "nom_region": "La Réunion",
@@ -2786,6 +3184,7 @@
     "structure": "MILO"
   },
   {
+    "id": 399,
     "nom_agence": "ML Sud 79",
     "code_postal": 79000,
     "nom_region": "Nouvelle-Aquitaine",
@@ -2793,6 +3192,7 @@
     "structure": "MILO"
   },
   {
+    "id": 400,
     "nom_agence": "ML Sud 93",
     "code_postal": 93160,
     "nom_region": "Île-de-France",
@@ -2800,6 +3200,7 @@
     "structure": "MILO"
   },
   {
+    "id": 401,
     "nom_agence": "ML TASSIN LA DEMI LUNE",
     "code_postal": 69160,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2807,6 +3208,7 @@
     "structure": "MILO"
   },
   {
+    "id": 402,
     "nom_agence": "ML TAVERNY",
     "code_postal": 95150,
     "nom_region": "Île-de-France",
@@ -2814,6 +3216,7 @@
     "structure": "MILO"
   },
   {
+    "id": 403,
     "nom_agence": "ml toulon",
     "code_postal": 83000,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -2821,6 +3224,7 @@
     "structure": "MILO"
   },
   {
+    "id": 404,
     "nom_agence": "ml val-d'oise est (MLVOE)",
     "code_postal": 95200,
     "nom_region": "Île-de-France",
@@ -2828,6 +3232,7 @@
     "structure": "MILO"
   },
   {
+    "id": 405,
     "nom_agence": "ml vauvert",
     "code_postal": 30600,
     "nom_region": "Occitanie",
@@ -2835,6 +3240,7 @@
     "structure": "MILO"
   },
   {
+    "id": 406,
     "nom_agence": "ml villeneuve st georges",
     "code_postal": 94190,
     "nom_region": "Île-de-France",
@@ -2842,6 +3248,7 @@
     "structure": "MILO"
   },
   {
+    "id": 407,
     "nom_agence": "ml vitacité",
     "code_postal": 91300,
     "nom_region": "Île-de-France",
@@ -2849,6 +3256,7 @@
     "structure": "MILO"
   },
   {
+    "id": 408,
     "nom_agence": "ml vitre",
     "code_postal": 35500,
     "nom_region": "Bretagne",
@@ -2856,13 +3264,15 @@
     "structure": "MILO"
   },
   {
+    "id": 409,
     "nom_agence": "ml vitry le francois",
     "code_postal": 51305,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 51,
     "structure": "MILO"
   },
   {
+    "id": 410,
     "nom_agence": "ml vitry-sur-seine",
     "code_postal": 94400,
     "nom_region": "Île-de-France",
@@ -2870,6 +3280,7 @@
     "structure": "MILO"
   },
   {
+    "id": 411,
     "nom_agence": "ML Voiron",
     "code_postal": 38516,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -2877,6 +3288,7 @@
     "structure": "MILO"
   },
   {
+    "id": 412,
     "nom_agence": "ml-bobigny",
     "code_postal": 93000,
     "nom_region": "Île-de-France",
@@ -2884,6 +3296,7 @@
     "structure": "MILO"
   },
   {
+    "id": 413,
     "nom_agence": "MLAB Siège",
     "code_postal": 95100,
     "nom_region": "Île-de-France",
@@ -2891,6 +3304,7 @@
     "structure": "MILO"
   },
   {
+    "id": 414,
     "nom_agence": "MLEJ Senlis",
     "code_postal": 60300,
     "nom_region": "Hauts-de-France",
@@ -2898,6 +3312,7 @@
     "structure": "MILO"
   },
   {
+    "id": 415,
     "nom_agence": "MLGC ANTENNE de SAINT MATHIEU DE TREVIERS",
     "code_postal": 34270,
     "nom_region": "Occitanie",
@@ -2905,6 +3320,7 @@
     "structure": "MILO"
   },
   {
+    "id": 416,
     "nom_agence": "MLI La Courneuve",
     "code_postal": 93120,
     "nom_region": "Île-de-France",
@@ -2912,6 +3328,7 @@
     "structure": "MILO"
   },
   {
+    "id": 417,
     "nom_agence": "MLIJ du bassin de Thau",
     "code_postal": 34200,
     "nom_region": "Occitanie",
@@ -2919,6 +3336,7 @@
     "structure": "MILO"
   },
   {
+    "id": 418,
     "nom_agence": "MLJ ALES PAYS CEVENNES",
     "code_postal": 30100,
     "nom_region": "Occitanie",
@@ -2926,6 +3344,7 @@
     "structure": "MILO"
   },
   {
+    "id": 419,
     "nom_agence": "MLJ Beaucaire Rhône et Argence - siège Beaucaire",
     "code_postal": 30300,
     "nom_region": "Occitanie",
@@ -2933,6 +3352,7 @@
     "structure": "MILO"
   },
   {
+    "id": 420,
     "nom_agence": "MLOA - Site de Carcassonne",
     "code_postal": 11000,
     "nom_region": "Occitanie",
@@ -2940,13 +3360,15 @@
     "structure": "MILO"
   },
   {
+    "id": 421,
     "nom_agence": "MLOBG Oyonnax",
-    "code_postal": "01100",
+    "code_postal": 1100,
     "nom_region": "Auvergne-Rhône-Alpes",
-    "code_departement": "01",
+    "code_departement": 1,
     "structure": "MILO"
   },
   {
+    "id": 422,
     "nom_agence": "Mission Locale Paris 01",
     "code_postal": 75001,
     "nom_region": "Île-de-France",
@@ -2954,6 +3376,7 @@
     "structure": "MILO"
   },
   {
+    "id": 423,
     "nom_agence": "Mission Locale Paris 02",
     "code_postal": 75002,
     "nom_region": "Île-de-France",
@@ -2961,6 +3384,7 @@
     "structure": "MILO"
   },
   {
+    "id": 424,
     "nom_agence": "Mission Locale Paris 03",
     "code_postal": 75003,
     "nom_region": "Île-de-France",
@@ -2968,6 +3392,7 @@
     "structure": "MILO"
   },
   {
+    "id": 425,
     "nom_agence": "Mission Locale Paris 04",
     "code_postal": 75004,
     "nom_region": "Île-de-France",
@@ -2975,6 +3400,7 @@
     "structure": "MILO"
   },
   {
+    "id": 426,
     "nom_agence": "Mission Locale Paris 05",
     "code_postal": 75005,
     "nom_region": "Île-de-France",
@@ -2982,6 +3408,7 @@
     "structure": "MILO"
   },
   {
+    "id": 427,
     "nom_agence": "Mission Locale Paris 06",
     "code_postal": 75006,
     "nom_region": "Île-de-France",
@@ -2989,6 +3416,7 @@
     "structure": "MILO"
   },
   {
+    "id": 428,
     "nom_agence": "Mission Locale Paris 07",
     "code_postal": 75007,
     "nom_region": "Île-de-France",
@@ -2996,6 +3424,7 @@
     "structure": "MILO"
   },
   {
+    "id": 429,
     "nom_agence": "Mission Locale Paris 08",
     "code_postal": 75008,
     "nom_region": "Île-de-France",
@@ -3003,6 +3432,7 @@
     "structure": "MILO"
   },
   {
+    "id": 430,
     "nom_agence": "Mission Locale Paris 09",
     "code_postal": 75009,
     "nom_region": "Île-de-France",
@@ -3010,6 +3440,7 @@
     "structure": "MILO"
   },
   {
+    "id": 431,
     "nom_agence": "Mission Locale Paris 10",
     "code_postal": 75010,
     "nom_region": "Île-de-France",
@@ -3017,6 +3448,7 @@
     "structure": "MILO"
   },
   {
+    "id": 432,
     "nom_agence": "Mission Locale Paris 11",
     "code_postal": 75011,
     "nom_region": "Île-de-France",
@@ -3024,6 +3456,7 @@
     "structure": "MILO"
   },
   {
+    "id": 433,
     "nom_agence": "Mission Locale Paris 12",
     "code_postal": 75012,
     "nom_region": "Île-de-France",
@@ -3031,6 +3464,7 @@
     "structure": "MILO"
   },
   {
+    "id": 434,
     "nom_agence": "Mission Locale Paris 13",
     "code_postal": 75013,
     "nom_region": "Île-de-France",
@@ -3038,6 +3472,7 @@
     "structure": "MILO"
   },
   {
+    "id": 435,
     "nom_agence": "Mission Locale Paris 14",
     "code_postal": 75014,
     "nom_region": "Île-de-France",
@@ -3045,6 +3480,7 @@
     "structure": "MILO"
   },
   {
+    "id": 436,
     "nom_agence": "Mission Locale Paris 15",
     "code_postal": 75015,
     "nom_region": "Île-de-France",
@@ -3052,6 +3488,7 @@
     "structure": "MILO"
   },
   {
+    "id": 437,
     "nom_agence": "Mission Locale Paris 16",
     "code_postal": 75016,
     "nom_region": "Île-de-France",
@@ -3059,6 +3496,7 @@
     "structure": "MILO"
   },
   {
+    "id": 438,
     "nom_agence": "Mission Locale Paris 17",
     "code_postal": 75017,
     "nom_region": "Île-de-France",
@@ -3066,6 +3504,7 @@
     "structure": "MILO"
   },
   {
+    "id": 439,
     "nom_agence": "Mission Locale Paris 18",
     "code_postal": 75018,
     "nom_region": "Île-de-France",
@@ -3073,6 +3512,7 @@
     "structure": "MILO"
   },
   {
+    "id": 440,
     "nom_agence": "Mission Locale Paris 19",
     "code_postal": 75019,
     "nom_region": "Île-de-France",
@@ -3080,6 +3520,7 @@
     "structure": "MILO"
   },
   {
+    "id": 441,
     "nom_agence": "Mission Locale Paris 20",
     "code_postal": 75020,
     "nom_region": "Île-de-France",
@@ -3087,6 +3528,7 @@
     "structure": "MILO"
   },
   {
+    "id": 442,
     "nom_agence": "MLPP SIEGE",
     "code_postal": 26200,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -3094,13 +3536,15 @@
     "structure": "MILO"
   },
   {
+    "id": 443,
     "nom_agence": "MLS3F SAINT-LOUIS",
     "code_postal": 68300,
-    "nom_region": "Grand-Est",
+    "nom_region": "Grand Est",
     "code_departement": 68,
     "structure": "MILO"
   },
   {
+    "id": 444,
     "nom_agence": "PEIPS MISSION LOCALE DU SENONAIS",
     "code_postal": 89100,
     "nom_region": "Bourgogne-Franche-Comté",
@@ -3108,6 +3552,7 @@
     "structure": "MILO"
   },
   {
+    "id": 445,
     "nom_agence": "REUSSIR EN SAMBRE AVESNOIS",
     "code_postal": 59600,
     "nom_region": "Hauts-de-France",
@@ -3115,6 +3560,7 @@
     "structure": "MILO"
   },
   {
+    "id": 446,
     "nom_agence": "ROMORANTIN",
     "code_postal": 41200,
     "nom_region": "Centre-Val de Loire",
@@ -3122,6 +3568,7 @@
     "structure": "MILO"
   },
   {
+    "id": 447,
     "nom_agence": "Seine Ouest Entreprise et Emploi",
     "code_postal": 92100,
     "nom_region": "Île-de-France",
@@ -3129,6 +3576,7 @@
     "structure": "MILO"
   },
   {
+    "id": 448,
     "nom_agence": "SIEGE",
     "code_postal": 13800,
     "nom_region": "Provence-Alpes-Côte d'Azur",
@@ -3136,6 +3584,7 @@
     "structure": "MILO"
   },
   {
+    "id": 449,
     "nom_agence": "Siège",
     "code_postal": 26400,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -3143,6 +3592,7 @@
     "structure": "MILO"
   },
   {
+    "id": 450,
     "nom_agence": "SIEGE  ML DE LA BRIE ET DES MORINS",
     "code_postal": 77120,
     "nom_region": "Île-de-France",
@@ -3150,13 +3600,15 @@
     "structure": "MILO"
   },
   {
+    "id": 451,
     "nom_agence": "Siège Administratif",
-    "code_postal": "06150",
+    "code_postal": 6150,
     "nom_region": "Provence-Alpes-Côte d'Azur",
-    "code_departement": "06",
+    "code_departement": 6,
     "structure": "MILO"
   },
   {
+    "id": 452,
     "nom_agence": "Siège Mission Locale de La Plaine de France",
     "code_postal": 77290,
     "nom_region": "Île-de-France",
@@ -3164,6 +3616,7 @@
     "structure": "MILO"
   },
   {
+    "id": 453,
     "nom_agence": "Siège Mission locale du centre",
     "code_postal": 97232,
     "nom_region": "Martinique",
@@ -3171,6 +3624,7 @@
     "structure": "MILO"
   },
   {
+    "id": 454,
     "nom_agence": "SIEGE MISSION LOCALE ESPACE SUD",
     "code_postal": 97224,
     "nom_region": "Martinique",
@@ -3178,6 +3632,7 @@
     "structure": "MILO"
   },
   {
+    "id": 455,
     "nom_agence": "Siège MLJ - Aix-les-Bains",
     "code_postal": 73100,
     "nom_region": "Auvergne-Rhône-Alpes",
@@ -3185,6 +3640,7 @@
     "structure": "MILO"
   },
   {
+    "id": 456,
     "nom_agence": "We Ker",
     "code_postal": 35000,
     "nom_region": "Bretagne",
