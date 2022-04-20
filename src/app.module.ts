@@ -147,6 +147,9 @@ import { InvitationIcsClient } from './infrastructure/clients/invitation-ics.cli
 import { Mail, MailClientToken } from './domain/mail'
 import { ChatCryptoService } from './utils/chat-crypto-service'
 import { DeleteJeuneCommandHandler } from './application/commands/delete-jeune.command.handler'
+import { AgenceRepositoryToken } from './domain/agence'
+import { AgenceSqlRepository } from './infrastructure/repositories/agence-sql.repository'
+import { GetAgencesQueryHandler } from './application/queries/get-agences.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -266,6 +269,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       provide: SuperviseursRepositoryToken,
       useClass: SuperviseurSqlRepository
     },
+    {
+      provide: AgenceRepositoryToken,
+      useClass: AgenceSqlRepository
+    },
     ...databaseProviders
   ],
   exports: [...databaseProviders]
@@ -347,7 +354,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetActionsJeunePoleEmploiQueryHandler,
     GetJeuneMiloByDossierQueryHandler,
     UpdateRendezVousCommandHandler,
-    GetConseillersJeuneQueryHandler
+    GetConseillersJeuneQueryHandler,
+    GetAgencesQueryHandler
   ]
 }
 
