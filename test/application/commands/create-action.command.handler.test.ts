@@ -57,7 +57,7 @@ describe('CreateActionCommandHandler', () => {
   })
   describe('handle', () => {
     describe("quand c'est un jeune", () => {
-      it('crée une action', async () => {
+      it("crée une action et n'envoie pas de notification", async () => {
         // Given
         actionFactory.buildAction.returns(success(action))
         const command: CreateActionCommand = {

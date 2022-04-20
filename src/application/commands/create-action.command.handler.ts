@@ -61,7 +61,7 @@ export class CreateActionCommandHandler extends CommandHandler<
     await this.actionRepository.save(action)
 
     if (
-      command.typeCreateur === Action.TypeCreateur.CONSEILLER &&
+      !(command.typeCreateur === Action.TypeCreateur.JEUNE) &&
       jeune.pushNotificationToken
     ) {
       await this.sendNotifcationNouvelleAction(
