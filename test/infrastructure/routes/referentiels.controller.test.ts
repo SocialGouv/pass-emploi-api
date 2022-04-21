@@ -115,81 +115,93 @@ describe('ReferentielsController', () => {
     })
   })
 
-  describe('GET /referentiels/agences?structure=POLE_EMPLOI', () => {
-    it('renvoie les agences Pôle emploi', () => {
-      // Given
-      getAgencesQueryHandler.execute
-        .withArgs({ structure: Structure.POLE_EMPLOI })
-        .resolves([
-          {
-            id: 'jean michel id',
-            nom: 'Agence Batman'
-          },
-          {
-            id: 'el yolo de la muerte',
-            nom: 'Agence des chauves'
-          }
-        ])
-
-      // When - Then
-      return request(app.getHttpServer())
-        .get('/referentiels/agences?structure=POLE_EMPLOI')
-        .set('Authorization', 'Bearer ceci-est-un-jwt')
-        .expect(HttpStatus.OK)
-        .expect([
-          {
-            id: 'jean michel id',
-            nom: 'Agence Batman'
-          },
-          {
-            id: 'el yolo de la muerte',
-            nom: 'Agence des chauves'
-          }
-        ])
-    })
-  })
-
-  describe('GET /referentiels/agences?structure=MILO', () => {
-    it('renvoie les agences milo', () => {
-      // Given
-      getAgencesQueryHandler.execute
-        .withArgs({ structure: Structure.MILO })
-        .resolves([
-          {
-            id: 'jean michel id',
-            nom: 'Agence Batman'
-          },
-          {
-            id: 'el yolo de la muerte',
-            nom: 'Agence des chauves'
-          }
-        ])
-
-      // When - Then
-      return request(app.getHttpServer())
-        .get('/referentiels/agences?structure=MILO')
-        .set('Authorization', 'Bearer ceci-est-un-jwt')
-        .expect(HttpStatus.OK)
-        .expect([
-          {
-            id: 'jean michel id',
-            nom: 'Agence Batman'
-          },
-          {
-            id: 'el yolo de la muerte',
-            nom: 'Agence des chauves'
-          }
-        ])
-    })
-  })
-
   describe('GET /referentiels/agences', () => {
-    it('renvoie une 400', () => {
-      // When - Then
-      return request(app.getHttpServer())
-        .get('/referentiels/agences')
-        .set('Authorization', 'Bearer ceci-est-un-jwt')
-        .expect(HttpStatus.BAD_REQUEST)
+    describe('avec le query param POLE_EMPLOI', () => {
+      it('renvoie les agences Pôle emploi', () => {
+        // Given
+        getAgencesQueryHandler.execute
+          .withArgs({ structure: Structure.POLE_EMPLOI })
+          .resolves([
+            {
+              id: 'jean michel id',
+              nom: 'Agence Batman'
+            },
+            {
+              id: 'el yolo de la muerte',
+              nom: 'Agence des chauves'
+            }
+          ])
+
+        // When - Then
+        return request(app.getHttpServer())
+          .get('/referentiels/agences?structure=POLE_EMPLOI')
+          .set('Authorization', 'Bearer ceci-est-un-jwt')
+          .expect(HttpStatus.OK)
+          .expect([
+            {
+              id: 'jean michel id',
+              nom: 'Agence Batman'
+            },
+            {
+              id: 'el yolo de la muerte',
+              nom: 'Agence des chauves'
+            }
+          ])
+      })
+    })
+
+    describe('avec le query param POLE_EMPLOI MILO', () => {
+      it('renvoie les agences milo', () => {
+        // Given
+        getAgencesQueryHandler.execute
+          .withArgs({ structure: Structure.MILO })
+          .resolves([
+            {
+              id: 'jean michel id',
+              nom: 'Agence Batman'
+            },
+            {
+              id: 'el yolo de la muerte',
+              nom: 'Agence des chauves'
+            }
+          ])
+
+        // When - Then
+        return request(app.getHttpServer())
+          .get('/referentiels/agences?structure=MILO')
+          .set('Authorization', 'Bearer ceci-est-un-jwt')
+          .expect(HttpStatus.OK)
+          .expect([
+            {
+              id: 'jean michel id',
+              nom: 'Agence Batman'
+            },
+            {
+              id: 'el yolo de la muerte',
+              nom: 'Agence des chauves'
+            }
+          ])
+      })
+    })
+
+    describe('sans structure en query param', () => {
+      it('renvoie une 400 ', () => {
+        // When - Then
+        return request(app.getHttpServer())
+          .get('/referentiels/agences')
+          .set('Authorization', 'Bearer ceci-est-un-jwt')
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    describe('avec une structure bidon', () => {
+      it('renvoie une 400 ', () => {
+        // When - Then
+        return request(app.getHttpServer())
+          .get('/referentiels/agences?structure=PLOP')
+          .set('Authorization', 'Bearer ceci-est-un-jwt')
+          .expect(HttpStatus.BAD_REQUEST)
+      })
     })
   })
 })
