@@ -52,7 +52,7 @@ export class MailSendinblueService implements Mail.Service {
     await this.envoyer(mailDataDto)
   }
 
-  async envoyerMailNouveauRendezVous(
+  async envoyerMailRendezVous(
     conseiller: Conseiller,
     rendezVous: RendezVous
   ): Promise<void> {

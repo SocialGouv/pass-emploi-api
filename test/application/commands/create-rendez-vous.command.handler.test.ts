@@ -95,7 +95,7 @@ describe('CreateRendezVousCommandHandler', () => {
             rendezVous.id
           )
         )
-        expect(mailClient.envoyerMailNouveauRendezVous).callCount(0)
+        expect(mailClient.envoyerMailRendezVous).callCount(0)
         expect(result).to.deep.equal(
           failure(new NonTrouveError('Jeune', command.idJeune))
         )
@@ -125,7 +125,7 @@ describe('CreateRendezVousCommandHandler', () => {
             rendezVous.id
           )
         )
-        expect(mailClient.envoyerMailNouveauRendezVous).callCount(0)
+        expect(mailClient.envoyerMailRendezVous).callCount(0)
         expect(result).to.deep.equal(
           failure(
             new JeuneNonLieAuConseillerError(
@@ -175,9 +175,10 @@ describe('CreateRendezVousCommandHandler', () => {
               expectedRendezvous.id
             )
           )
-          expect(
-            mailClient.envoyerMailNouveauRendezVous
-          ).to.have.been.calledWith(jeune.conseiller, expectedRendezvous)
+          expect(mailClient.envoyerMailRendezVous).to.have.been.calledWith(
+            jeune.conseiller,
+            expectedRendezvous
+          )
           expect(
             planificateurService.planifierRappelsRendezVous
           ).to.have.been.calledWith(expectedRendezvous)
@@ -218,9 +219,10 @@ describe('CreateRendezVousCommandHandler', () => {
               expectedRendezvous.id
             )
           )
-          expect(
-            mailClient.envoyerMailNouveauRendezVous
-          ).to.have.been.calledWith(jeune.conseiller, expectedRendezvous)
+          expect(mailClient.envoyerMailRendezVous).to.have.been.calledWith(
+            jeune.conseiller,
+            expectedRendezvous
+          )
         })
       })
       describe("quand le conseiller du jeune n'a pas d'email", () => {
@@ -260,7 +262,7 @@ describe('CreateRendezVousCommandHandler', () => {
               expectedRendezvous.id
             )
           )
-          expect(mailClient.envoyerMailNouveauRendezVous).callCount(0)
+          expect(mailClient.envoyerMailRendezVous).callCount(0)
         })
       })
       describe('quand le la planification des notifications échoue', () => {

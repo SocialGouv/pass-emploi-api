@@ -24,11 +24,15 @@ import {
   StubbedClass,
   stubClass
 } from '../../utils'
+import { Conseiller } from '../../../src/domain/conseiller'
+import { Mail } from '../../../src/domain/mail'
 
 describe('UpdateRendezVousCommandHandler', () => {
   DatabaseForTesting.prepare()
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let notificationRepository: StubbedType<Notification.Repository>
+  let conseillerRepository: StubbedType<Conseiller.Repository>
+  let mailClient: StubbedType<Mail.Client>
   let planificateurService: StubbedClass<PlanificateurService>
   let rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
   let evenementService: StubbedClass<EvenementService>
@@ -40,6 +44,8 @@ describe('UpdateRendezVousCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     rendezVousRepository = stubInterface(sandbox)
     notificationRepository = stubInterface(sandbox)
+    conseillerRepository = stubInterface(sandbox)
+    mailClient = stubInterface(sandbox)
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
     planificateurService = stubClass(PlanificateurService)
     evenementService = stubClass(EvenementService)
@@ -47,6 +53,8 @@ describe('UpdateRendezVousCommandHandler', () => {
     updateRendezVousCommandHandler = new UpdateRendezVousCommandHandler(
       rendezVousRepository,
       notificationRepository,
+      mailClient,
+      conseillerRepository,
       rendezVousAuthorizer,
       planificateurService,
       evenementService
@@ -191,6 +199,108 @@ describe('UpdateRendezVousCommandHandler', () => {
         expect(
           planificateurService.planifierRappelsRendezVous
         ).not.to.have.been.calledWith(rendezVousUpdated)
+      })
+    })
+    describe('quand l"invitation est false', () => {
+      it('n"envoie aucun mail', async () => {
+        // Given
+        rendezVous.invitation = false
+        const command: UpdateRendezVousCommand = {
+          idRendezVous: rendezVous.id,
+          date: '2021-11-11T08:03:30.000Z',
+          duree: 30,
+          presenceConseiller: true
+        }
+        rendezVousRepository.get
+          .withArgs(command.idRendezVous)
+          .resolves(rendezVous)
+        // When
+        await updateRendezVousCommandHandler.handle(command)
+        // Then
+        expect(mailClient.envoyerMailRendezVous).not.to.have.been.calledWith(
+          jeune.conseiller,
+          rendezVous
+        )
+      })
+    })
+    describe('quand l"invitation est true', () => {
+      describe('quand c"est le conseiller qui a créé le rendez-vous qui le modifie', () => {
+        it('envoie le mail à ce conseiller ', async () => {
+          // Given
+          rendezVous.invitation = true
+          const date = '2022-04-04T09:54:04.561Z'
+          const command: UpdateRendezVousCommand = {
+            idRendezVous: rendezVous.id,
+            date,
+            commentaire: rendezVous.commentaire,
+            duree: rendezVous.duree,
+            presenceConseiller: rendezVous.presenceConseiller,
+            modalite: rendezVous.modalite,
+            adresse: rendezVous.adresse,
+            organisme: rendezVous.organisme
+          }
+          rendezVousRepository.get
+            .withArgs(command.idRendezVous)
+            .resolves(rendezVous)
+          const rendezVousUpdated: RendezVous = {
+            ...rendezVous,
+            date: new Date(date)
+          }
+          // When
+          await updateRendezVousCommandHandler.handle(command)
+          // Then
+          expect(
+            mailClient.envoyerMailRendezVous
+          ).to.have.been.calledWithExactly(
+            rendezVousUpdated.jeune.conseiller,
+            rendezVousUpdated
+          )
+        })
+      })
+      describe('quand le conseiller qui modifie le rendez-vous n"est pas celui qui l"a créé', () => {
+        it('envoie le mail au conseiller créateur', async () => {
+          // Given
+          rendezVous.invitation = true
+          const date = '2022-04-04T09:54:04.561Z'
+          const command: UpdateRendezVousCommand = {
+            idRendezVous: rendezVous.id,
+            date,
+            commentaire: rendezVous.commentaire,
+            duree: rendezVous.duree,
+            presenceConseiller: rendezVous.presenceConseiller,
+            modalite: rendezVous.modalite,
+            adresse: rendezVous.adresse,
+            organisme: rendezVous.organisme
+          }
+          rendezVousRepository.get
+            .withArgs(command.idRendezVous)
+            .resolves(rendezVous)
+          const rendezVousUpdated: RendezVous = {
+            ...rendezVous,
+            date: new Date(date)
+          }
+
+          const conseillerModificateur = jeune.conseiller
+          conseillerModificateur.id = 'faux-id'
+
+          const conseillerCreateur = rendezVousRepository.get(
+            rendezVousUpdated.createur.id
+          )
+
+          // When
+          await updateRendezVousCommandHandler.handle(command)
+          // Then
+          expect(mailClient.envoyerMailRendezVous).not.to.have.been.calledWith(
+            conseillerModificateur,
+            rendezVousUpdated
+          )
+          expect(
+            mailClient.envoyerMailRendezVous
+          ).to.have.been.calledWithExactly(
+            conseillerCreateur,
+            rendezVousUpdated
+          )
+        })
       })
     })
   })

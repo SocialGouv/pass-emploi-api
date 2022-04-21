@@ -20,6 +20,8 @@ import {
   RendezVousRepositoryToken
 } from '../../domain/rendez-vous'
 import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
+import { Mail, MailClientToken } from '../../domain/mail'
+import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 
 export interface UpdateRendezVousCommand extends Command {
   idRendezVous: string
@@ -42,6 +44,10 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     private rendezVousRepository: RendezVous.Repository,
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,
+    @Inject(MailClientToken)
+    private mailClient: Mail.Client,
+    @Inject(ConseillersRepositoryToken)
+    private conseillerRepository: Conseiller.Repository,
     private rendezVousAuthorizer: RendezVousAuthorizer,
     private planificateurService: PlanificateurService,
     private evenementService: EvenementService
@@ -108,6 +114,24 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       this.logger.log(
         `Le jeune ${rendezVous.jeune.id} ne s'est jamais connecté sur l'application`
       )
+    }
+
+    if (rendezVousUpdated.invitation) {
+      const conseillerDestinataire =
+        rendezVousUpdated.createur.id === rendezVousUpdated.jeune.conseiller!.id
+          ? rendezVousUpdated.jeune.conseiller
+          : await this.conseillerRepository.get(rendezVousUpdated.createur.id)
+      try {
+        await this.mailClient.envoyerMailRendezVous(
+          conseillerDestinataire!,
+          rendezVousUpdated
+        )
+      } catch (e) {
+        this.logger.error(
+          "Erreur lors de l'envoi de l'email du nouveau rendez-vous",
+          e
+        )
+      }
     }
 
     return success({ id: rendezVousUpdated.id })
