@@ -1,22 +1,23 @@
 import { DatabaseForTesting, expect } from '../../utils'
 import { AgenceSqlRepository } from '../../../src/infrastructure/repositories/agence-sql.repository'
-import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
+import {
+  AgenceDto,
+  AgenceSqlModel
+} from '../../../src/infrastructure/sequelize/models/agence.sql-model'
 
 describe('AgenceSqlRepository', () => {
   DatabaseForTesting.prepare()
   let agenceSqlRepository: AgenceSqlRepository
-  const agenceMilo = {
+  const agenceMilo: Partial<AgenceDto> = {
     id: 'Bonjour je suis un id milo',
     nomAgence: 'Bonjour je suis une agence',
-    codePostal: "C'est toi le code postal",
     structure: 'MILO',
     codeDepartement: '45',
     nomRegion: 'yolo'
   }
-  const agencePE = {
+  const agencePE: Partial<AgenceDto> = {
     id: 'Bonjour je suis un id pe',
     nomAgence: 'Bonjour je suis une agence',
-    codePostal: "C'est toi le code postal",
     structure: 'POLE_EMPLOI',
     codeDepartement: '45',
     nomRegion: 'yolo'

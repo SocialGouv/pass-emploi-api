@@ -21,12 +21,6 @@ export class AgenceDto extends Model {
   nomAgence!: string
 
   @Column({
-    field: 'code_postal',
-    type: DataType.STRING
-  })
-  codePostal!: string
-
-  @Column({
     field: 'nom_region',
     type: DataType.STRING
   })
