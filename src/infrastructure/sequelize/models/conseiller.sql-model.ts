@@ -1,6 +1,8 @@
 import {
+  BelongsTo,
   Column,
   DataType,
+  ForeignKey,
   HasMany,
   Model,
   PrimaryKey,
@@ -9,6 +11,7 @@ import {
 import { Core } from '../../../domain/core'
 import { AsSql } from '../types'
 import { JeuneSqlModel } from './jeune.sql-model'
+import { AgenceSqlModel } from './agence.sql-model'
 
 export class ConseillerDto extends Model {
   @PrimaryKey
@@ -65,6 +68,19 @@ export class ConseillerDto extends Model {
     type: DataType.DATE
   })
   dateDerniereConnexion: Date | null
+
+  @ForeignKey(() => AgenceSqlModel)
+  @Column({
+    field: 'id_agence',
+    type: DataType.STRING
+  })
+  idAgence?: string
+
+  @Column({
+    field: 'nom_manuel_agence',
+    type: DataType.STRING
+  })
+  nomManuelAgence: string
 }
 
 @Table({
@@ -74,6 +90,9 @@ export class ConseillerDto extends Model {
 export class ConseillerSqlModel extends ConseillerDto {
   @HasMany(() => JeuneSqlModel)
   jeunes!: JeuneSqlModel[]
+
+  @BelongsTo(() => AgenceSqlModel, 'id_agence')
+  agence?: AgenceSqlModel
 
   static async creer(conseillerDto: AsSql<ConseillerDto>): Promise<void> {
     await ConseillerSqlModel.create(conseillerDto)

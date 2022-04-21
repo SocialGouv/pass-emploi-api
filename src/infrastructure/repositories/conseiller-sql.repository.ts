@@ -4,6 +4,7 @@ import { Conseiller } from '../../domain/conseiller'
 import { Core } from '../../domain/core'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { DateTime } from 'luxon'
+import { AgenceSqlModel } from '../sequelize/models/agence.sql-model'
 
 @Injectable()
 export class ConseillerSqlRepository implements Conseiller.Repository {
@@ -55,17 +56,13 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
   }
 
   async get(id: string): Promise<Conseiller | undefined> {
-    const conseillerSqlModel = await ConseillerSqlModel.findByPk(id)
+    const conseillerSqlModel = await ConseillerSqlModel.findByPk(id, {
+      include: [AgenceSqlModel]
+    })
     if (!conseillerSqlModel) {
       return undefined
     }
-    return {
-      id: conseillerSqlModel.id,
-      firstName: conseillerSqlModel.prenom,
-      lastName: conseillerSqlModel.nom,
-      structure: conseillerSqlModel.structure,
-      email: conseillerSqlModel.email || undefined
-    }
+    return fromSqlConseiller(conseillerSqlModel)
   }
 
   async save(conseiller: Conseiller): Promise<void> {
@@ -75,7 +72,35 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
       nom: conseiller.lastName,
       structure: conseiller.structure,
       email: conseiller.email || null,
-      dateVerificationMessages: conseiller.dateVerificationMessages ?? undefined
+      dateVerificationMessages:
+        conseiller.dateVerificationMessages ?? undefined,
+      idAgence: conseiller.agence?.id ?? null,
+      nomManuelAgence:
+        conseiller.agence?.id == null ? conseiller.agence?.nom : null
     })
   }
+}
+
+export function fromSqlConseiller(
+  conseillerSqlModel: ConseillerSqlModel
+): Conseiller {
+  const conseiller: Conseiller = {
+    id: conseillerSqlModel.id,
+    firstName: conseillerSqlModel.prenom,
+    lastName: conseillerSqlModel.nom,
+    structure: conseillerSqlModel.structure,
+    email: conseillerSqlModel.email || undefined
+  }
+  if (conseillerSqlModel.agence) {
+    conseiller.agence = {
+      id: conseillerSqlModel.agence.id,
+      nom: conseillerSqlModel.agence.nomAgence
+    }
+  } else if (conseillerSqlModel.nomManuelAgence) {
+    conseiller.agence = {
+      id: undefined,
+      nom: conseillerSqlModel.nomManuelAgence
+    }
+  }
+  return conseiller
 }

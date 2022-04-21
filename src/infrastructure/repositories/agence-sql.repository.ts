@@ -17,4 +17,12 @@ export class AgenceSqlRepository implements Agence.Repository {
       return new AgenceQueryModel(sql.id, sql.nomAgence)
     })
   }
+
+  async get(id: string): Promise<Agence | undefined> {
+    const agence = await AgenceSqlModel.findByPk(id)
+    if (!agence) {
+      return undefined
+    }
+    return agence
+  }
 }
