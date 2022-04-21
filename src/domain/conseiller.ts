@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 import { Core } from './core'
+import { Agence } from './agence'
 
 export interface Conseiller {
   id: string
@@ -8,6 +9,7 @@ export interface Conseiller {
   structure: Core.Structure
   email?: string
   dateVerificationMessages?: DateTime
+  agence?: Agence
 }
 
 export const ConseillersRepositoryToken = 'Conseiller.Repository'

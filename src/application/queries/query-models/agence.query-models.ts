@@ -7,8 +7,8 @@ export class AgenceQueryModel {
   }
 
   @ApiProperty({ type: 'string' })
-  id: string
+  id?: string
 
   @ApiProperty({ type: 'string' })
-  nom: string
+  nom?: string
 }

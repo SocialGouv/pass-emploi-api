@@ -11,10 +11,11 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
   Query
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   CreateRendezVousCommand,
   CreateRendezVousCommandHandler
@@ -72,6 +73,7 @@ import {
   SuperviseursPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
+import { ModifierConseillerQueryHandler } from '../../application/queries/modifier-conseiller.query.handler'
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -92,7 +94,8 @@ export class ConseillersController {
     private readonly getJeuneMiloByDossierQueryHandler: GetJeuneMiloByDossierQueryHandler,
     private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler,
     private readonly creerSuperviseursCommandHandler: CreerSuperviseursCommandHandler,
-    private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler
+    private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler,
+    private readonly modifierConseillerQueryHandler: ModifierConseillerQueryHandler
   ) {}
 
   @Get()
@@ -493,5 +496,34 @@ export class ConseillersController {
       }
       throw new RuntimeException(result.error.message)
     }
+  }
+
+  @Put(':idConseiller')
+  @ApiResponse({
+    type: DetailConseillerQueryModel
+  })
+  @ApiBody({
+    type: DetailConseillerQueryModel
+  })
+  async modiferConseiller(
+    @Param('idConseiller') idConseiller: string,
+    @Body() modifierConseillerPayload: Partial<DetailConseillerQueryModel>,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<DetailConseillerQueryModel> {
+    const queryModel = await this.modifierConseillerQueryHandler.execute(
+      {
+        idConseiller: idConseiller,
+        champsConseillerAModifier: modifierConseillerPayload
+      },
+      utilisateur
+    )
+    if (queryModel) {
+      return queryModel
+    }
+
+    throw new HttpException(
+      `Conseiller ${idConseiller} not found`,
+      HttpStatus.NOT_FOUND
+    )
   }
 }
