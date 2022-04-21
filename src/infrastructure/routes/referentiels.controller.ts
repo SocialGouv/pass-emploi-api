@@ -1,5 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common'
-import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOAuth2, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetTypesRendezVousQueryHandler } from 'src/application/queries/get-types-rendez-vous.query.handler'
 import { TypesRendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
 import {
@@ -11,8 +11,9 @@ import { Public } from '../decorators/public.decorator'
 import { AgenceQueryModel } from '../../application/queries/query-models/agence.query-models'
 import { GetAgencesQueryHandler } from '../../application/queries/get-agences.query.handler'
 import { GetAgencesQueryParams } from './validation/agences.inputs'
+import { Utilisateur } from '../decorators/authenticated.decorator'
+import { Authentification } from '../../domain/authentification'
 
-@Public()
 @Controller('referentiels')
 @ApiTags('Referentiels')
 export class ReferentielsController {
@@ -23,6 +24,7 @@ export class ReferentielsController {
   ) {}
 
   @Get('communes-et-departements')
+  @Public()
   @ApiResponse({
     type: CommunesEtDepartementsQueryModel,
     isArray: true
@@ -38,6 +40,7 @@ export class ReferentielsController {
   }
 
   @Get('types-rendezvous')
+  @Public()
   @ApiResponse({
     isArray: true
   })
@@ -46,13 +49,15 @@ export class ReferentielsController {
   }
 
   @Get('agences')
+  @ApiOAuth2([])
   @ApiResponse({
     type: AgenceQueryModel,
     isArray: true
   })
   async getAgences(
-    @Query() structure: GetAgencesQueryParams
+    @Query() structure: GetAgencesQueryParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<AgenceQueryModel[]> {
-    return this.getAgencesQueryHandler.execute(structure)
+    return this.getAgencesQueryHandler.execute(structure, utilisateur)
   }
 }
