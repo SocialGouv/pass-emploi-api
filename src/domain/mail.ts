@@ -40,7 +40,7 @@ export namespace Mail {
       nombreDeConversationNonLues: number
     ): Promise<void>
 
-    envoyerMailNouveauRendezVous(
+    envoyerMailRendezVous(
       conseiller: Conseiller,
       rendezVous: RendezVous
     ): Promise<void>

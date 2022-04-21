@@ -108,7 +108,7 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       )
     } else {
       try {
-        await this.mailService.envoyerMailNouveauRendezVous(
+        await this.mailService.envoyerMailRendezVous(
           jeune.conseiller,
           rendezVous
         )

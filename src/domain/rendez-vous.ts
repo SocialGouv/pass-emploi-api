@@ -65,6 +65,7 @@ export interface RendezVous {
   organisme?: string
   presenceConseiller: boolean
   invitation?: boolean
+  icsSequence?: number
   createur: Createur
 }
 
