@@ -77,27 +77,13 @@ export class KeycloakClient {
         })
       )
 
-      if (reponseGet.status !== 200) {
-        this.logger.log(reponseGet)
-        this.logger.error(
-          `erreur lors de la récuperation de l\'utilisateur ${idAuthentification}`
-        )
-        return
-      }
-
       const userId = reponseGet.data[0]?.id
 
-      const responseDelete: AxiosResponse = await firstValueFrom(
+      await firstValueFrom(
         this.httpService.delete(`${url}/${userId}`, { headers })
       )
 
-      if (responseDelete.status !== 204) {
-        this.logger.error(
-          `erreur lors de la suppression de l\'utilisateur ${idAuthentification}`
-        )
-      } else {
-        this.logger.log(`utilisateur ${idAuthentification} supprimé`)
-      }
+      this.logger.log(`utilisateur ${idAuthentification} supprimé`)
     } catch (e) {
       this.logger.error(
         buildError(
@@ -114,8 +100,7 @@ export class KeycloakClient {
     const payload = {
       grant_type: 'client_credentials',
       client_id: this.clientId,
-      client_secret: this.clientSecret,
-      scopes: 'openid profil'
+      client_secret: this.clientSecret
     }
     const headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
 
@@ -128,7 +113,7 @@ export class KeycloakClient {
 
       return result.access_token
     } catch (e) {
-      this.logger.error("erreur lors de l'obtention du token", e)
+      this.logger.error(buildError("erreur lors de l'obtention du token", e))
       throw new RuntimeException(e)
     }
   }
