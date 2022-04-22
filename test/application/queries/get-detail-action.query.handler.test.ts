@@ -1,4 +1,3 @@
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { uneAction } from 'test/fixtures/action.fixture'
 import { ActionAuthorizer } from '../../../src/application/authorizers/authorize-action'
@@ -6,25 +5,38 @@ import {
   GetDetailActionQuery,
   GetDetailActionQueryHandler
 } from '../../../src/application/queries/get-detail-action.query.handler'
-import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
-import { Action } from '../../../src/domain/action'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { uneActionQueryModel } from '../../fixtures/query-models/action.query-model.fixtures'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { uneActionQueryModelWithJeuneFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
+import {
+  createSandbox,
+  DatabaseForTesting,
+  expect,
+  StubbedClass,
+  stubClass
+} from '../../utils'
+import { Action } from '../../../src/domain/action'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository'
+import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
+import { IdService } from '../../../src/utils/id-service'
+import { DateService } from '../../../src/utils/date-service'
 
 describe('GetDetailActionQueryHandler', () => {
-  let actionsRepository: StubbedType<Action.Repository>
+  const database = DatabaseForTesting.prepare()
+  let actionSqlRepository: Action.Repository
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
   let getDetailActionQueryHandler: GetDetailActionQueryHandler
   let sandbox: SinonSandbox
+  const jeune = unJeune()
 
   before(() => {
     sandbox = createSandbox()
-    actionsRepository = stubInterface(sandbox)
     actionAuthorizer = stubClass(ActionAuthorizer)
+    actionSqlRepository = new ActionSqlRepository(database.sequelize)
 
     getDetailActionQueryHandler = new GetDetailActionQueryHandler(
-      actionsRepository,
       actionAuthorizer
     )
   })
@@ -34,47 +46,46 @@ describe('GetDetailActionQueryHandler', () => {
   })
 
   describe('handle', () => {
-    it("retourne le détail d'une action", async () => {
-      // Given
-      const idAction = 'idAction'
-      const getDetailActionQuery: GetDetailActionQuery = {
-        idAction
-      }
-      const actionQueryModel: ActionQueryModel = uneActionQueryModel({
-        id: idAction
-      })
-      actionsRepository.getQueryModelById
-        .withArgs(idAction)
-        .resolves(actionQueryModel)
-      const action = uneAction({
-        id: '1'
-      })
-      actionsRepository.get.withArgs(idAction).resolves(action)
+    let action: Action
 
-      // When
-      const actual = await getDetailActionQueryHandler.handle(
-        getDetailActionQuery
+    beforeEach(async () => {
+      const conseillerRepository = new ConseillerSqlRepository()
+      await conseillerRepository.save(unConseiller())
+      const jeuneRepository = new JeuneSqlRepository(
+        database.sequelize,
+        new IdService(),
+        new DateService()
       )
+      await jeuneRepository.save(jeune)
 
-      // Then
-      expect(actual).to.deep.equal(actionQueryModel)
+      action = uneAction({ idJeune: jeune.id })
+      await actionSqlRepository.save(action)
     })
 
-    it("retourne undefined si l'action n'existe pas", async () => {
-      // Given
-      const idActionInexistante = 'idActionInexistante'
-      const query: GetDetailActionQuery = {
-        idAction: idActionInexistante
-      }
-      actionsRepository.getQueryModelById
-        .withArgs(idActionInexistante)
-        .resolves()
+    describe("quand l'action existe", () => {
+      it('retourne le query model', async () => {
+        // When
+        const actionQueryModel = await getDetailActionQueryHandler.handle({
+          idAction: action.id
+        })
 
-      // When
-      const actual = await getDetailActionQueryHandler.handle(query)
+        // Then
+        expect(actionQueryModel).to.deep.equal(
+          uneActionQueryModelWithJeuneFromDomain(action, jeune)
+        )
+      })
+    })
 
-      // Then
-      expect(actual).to.equal(undefined)
+    describe("quand l'action n'existe pas", () => {
+      it('renvoie undefined', async () => {
+        // When
+        const result = await getDetailActionQueryHandler.handle({
+          idAction: 'b11e5d7b-a046-4e2a-9f78-ac54411593e9'
+        })
+
+        // Then
+        expect(result).to.equal(undefined)
+      })
     })
   })
 

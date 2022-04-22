@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { ActionQueryModel } from '../application/queries/query-models/actions.query-model'
 import { Brand } from '../building-blocks/types/brand'
 import { DomainError } from '../building-blocks/types/domain-error'
 import { Result, success } from '../building-blocks/types/result'
@@ -41,9 +40,6 @@ export namespace Action {
       id: Action.Id
     ): Promise<{ idConseiller: string; idJeune: string } | undefined>
     delete(id: Action.Id): Promise<void>
-
-    getQueryModelById(id: string): Promise<ActionQueryModel | undefined>
-    getQueryModelByJeuneId(id: string): Promise<ActionQueryModel[]>
   }
 
   export interface Createur {

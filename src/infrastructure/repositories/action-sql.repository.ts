@@ -4,10 +4,7 @@ import { Action } from '../../domain/action'
 import { ActionDto, ActionSqlModel } from '../sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { AsSql } from '../sequelize/types'
-import {
-  fromSqlToActionQueryModel,
-  fromSqlToActionQueryModelWithJeune
-} from './mappers/actions.mappers'
+import { fromSqlToActionQueryModel } from './mappers/actions.mappers'
 import { SequelizeInjectionToken } from '../sequelize/providers'
 import { Sequelize } from 'sequelize'
 
@@ -54,20 +51,6 @@ export class ActionSqlRepository implements Action.Repository {
         id: idAction
       }
     })
-  }
-
-  async getQueryModelById(id: string): Promise<ActionQueryModel | undefined> {
-    const actionSqlModel = await ActionSqlModel.findByPk(id, {
-      include: [
-        {
-          model: JeuneSqlModel,
-          required: true
-        }
-      ]
-    })
-    if (!actionSqlModel) return undefined
-
-    return fromSqlToActionQueryModelWithJeune(actionSqlModel)
   }
 
   async getQueryModelByJeuneId(id: string): Promise<ActionQueryModel[]> {

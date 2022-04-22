@@ -1,10 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Action, ActionsRepositoryToken } from '../../domain/action'
 import { ActionAuthorizer } from '../authorizers/authorize-action'
 import { ActionQueryModel } from './query-models/actions.query-model'
+import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
+import { fromSqlToActionQueryModelWithJeune } from '../../infrastructure/repositories/mappers/actions.mappers'
 
 export interface GetDetailActionQuery extends Query {
   idAction: string
@@ -15,18 +17,24 @@ export class GetDetailActionQueryHandler extends QueryHandler<
   GetDetailActionQuery,
   ActionQueryModel | undefined
 > {
-  constructor(
-    @Inject(ActionsRepositoryToken)
-    private actionRepository: Action.Repository,
-    private actionAuthorizer: ActionAuthorizer
-  ) {
+  constructor(private actionAuthorizer: ActionAuthorizer) {
     super('GetDetailActionQueryHandler')
   }
 
   async handle(
     query: GetDetailActionQuery
   ): Promise<ActionQueryModel | undefined> {
-    return this.actionRepository.getQueryModelById(query.idAction)
+    const actionSqlModel = await ActionSqlModel.findByPk(query.idAction, {
+      include: [
+        {
+          model: JeuneSqlModel,
+          required: true
+        }
+      ]
+    })
+    if (!actionSqlModel) return undefined
+
+    return fromSqlToActionQueryModelWithJeune(actionSqlModel)
   }
 
   async authorize(
