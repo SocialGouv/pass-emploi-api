@@ -1,6 +1,3 @@
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { SinonSandbox } from 'sinon'
-import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import {
   GetConseillerByEmailQuery,
@@ -8,71 +5,91 @@ import {
 } from '../../../src/application/queries/get-conseiller-by-email.query.handler'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
-import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import {
+  DatabaseForTesting,
+  expect,
+  StubbedClass,
+  stubClass
+} from '../../utils'
+import { AsSql } from '../../../src/infrastructure/sequelize/types'
+import {
+  ConseillerDto,
+  ConseillerSqlModel
+} from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 
 describe('GetConseillerByEmailQueryHandler', () => {
-  let conseillersRepository: StubbedType<Conseiller.Repository>
+  DatabaseForTesting.prepare()
+
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getConseillerByEmail: GetConseillerByEmailQueryHandler
-  let sandbox: SinonSandbox
 
   beforeEach(() => {
-    sandbox = createSandbox()
-    conseillersRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
 
     getConseillerByEmail = new GetConseillerByEmailQueryHandler(
-      conseillersRepository,
       conseillerAuthorizer
     )
   })
 
   const structure = Core.Structure.POLE_EMPLOI
+
   describe('handle', () => {
-    it('retourne un conseiller', async () => {
+    let email: string
+    let conseillerDto: AsSql<ConseillerDto>
+
+    beforeEach(async () => {
       // Given
-      const emailConseiller = 'conseiller@email.fr'
-      const getDetailConseillerQuery: GetConseillerByEmailQuery = {
-        emailConseiller,
-        structureUtilisateur: structure
-      }
-      const conseillerQueryModel: DetailConseillerQueryModel =
-        detailConseillerQueryModel()
-
-      conseillersRepository.getQueryModelByEmailAndStructure
-        .withArgs(emailConseiller, structure)
-        .resolves(success(conseillerQueryModel))
-
-      // When
-      const actual = await getConseillerByEmail.handle(getDetailConseillerQuery)
-
-      // Then
-      expect(actual).to.deep.equal(success(conseillerQueryModel))
+      email = 'conseiller@email.fr'
+      conseillerDto = unConseillerDto({
+        prenom: 'toto',
+        nom: 'tata',
+        email: email
+      })
+      await ConseillerSqlModel.creer(conseillerDto)
     })
 
-    it("retourne un échec si le conseiller n'existe pas", async () => {
-      // Given
-      const emailConseillerInexistant = 'inexistant@email.fr'
-      const query: GetConseillerByEmailQuery = {
-        emailConseiller: emailConseillerInexistant,
-        structureUtilisateur: structure
-      }
-      const echec = failure(
-        new NonTrouveError('conseiller', emailConseillerInexistant)
-      )
-      conseillersRepository.getQueryModelByEmailAndStructure
-        .withArgs(emailConseillerInexistant)
-        .resolves(echec)
-
+    it('retourne le conseiller quand le conseiller existe', async () => {
       // When
-      const actual = await getConseillerByEmail.handle(query)
+      const actual = await getConseillerByEmail.handle({
+        emailConseiller: email,
+        structureUtilisateur: Core.Structure.PASS_EMPLOI
+      })
 
-      // Then
-      expect(actual).to.equal(echec)
+      expect(actual).to.deep.equal(
+        success(
+          detailConseillerQueryModel({
+            id: conseillerDto.id,
+            firstName: 'toto',
+            lastName: 'tata'
+          })
+        )
+      )
+    })
+
+    it("retourne un échec quand le conseiller n'existe pas avec cet email", async () => {
+      const actual = await getConseillerByEmail.handle({
+        emailConseiller: 'inexistant@email.com',
+        structureUtilisateur: Core.Structure.PASS_EMPLOI
+      })
+
+      expect(actual).to.deep.equal(
+        failure(new NonTrouveError('Conseiller', 'inexistant@email.com'))
+      )
+    })
+
+    it("retourne un échec quand le conseiller n'existe pas avec cette structure", async () => {
+      const actual = await getConseillerByEmail.handle({
+        emailConseiller: email,
+        structureUtilisateur: Core.Structure.MILO
+      })
+
+      expect(actual).to.deep.equal(
+        failure(new NonTrouveError('Conseiller', email))
+      )
     })
   })
 

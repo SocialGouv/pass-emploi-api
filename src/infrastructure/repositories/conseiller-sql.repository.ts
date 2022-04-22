@@ -1,12 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { Op } from 'sequelize'
-import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import { failure, Result, success } from '../../building-blocks/types/result'
 import { Conseiller } from '../../domain/conseiller'
 import { Core } from '../../domain/core'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
-import { fromSqlToDetailConseillerQueryModel } from './mappers/conseillers.mappers'
 import { DateTime } from 'luxon'
 
 @Injectable()
@@ -18,7 +14,7 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
     const conseillerSqlModel = await ConseillerSqlModel.findOne({
       where: { id: idConseiller, structure }
     })
-    return conseillerSqlModel ? true : false
+    return !!conseillerSqlModel
   }
 
   async getAllIds(): Promise<string[]> {
@@ -81,30 +77,5 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
       email: conseiller.email || null,
       dateVerificationMessages: conseiller.dateVerificationMessages ?? undefined
     })
-  }
-
-  async getQueryModelById(
-    id: string
-  ): Promise<DetailConseillerQueryModel | undefined> {
-    const conseillerSqlModel = await ConseillerSqlModel.findByPk(id)
-    if (!conseillerSqlModel) {
-      return undefined
-    }
-
-    return fromSqlToDetailConseillerQueryModel(conseillerSqlModel)
-  }
-
-  async getQueryModelByEmailAndStructure(
-    emailConseiller: string,
-    structure: Core.Structure
-  ): Promise<Result<DetailConseillerQueryModel>> {
-    const conseillerSqlModel = await ConseillerSqlModel.findOne({
-      where: { email: emailConseiller, structure }
-    })
-    if (!conseillerSqlModel) {
-      return failure(new NonTrouveError('Conseiller', emailConseiller))
-    }
-
-    return success(fromSqlToDetailConseillerQueryModel(conseillerSqlModel))
   }
 }
