@@ -1,12 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Result } from '../../building-blocks/types/result'
-import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
+import { failure, Result, success } from '../../building-blocks/types/result'
 import { Core } from '../../domain/core'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { DetailConseillerQueryModel } from './query-models/conseillers.query-models'
+import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import { fromSqlToDetailConseillerQueryModel } from '../../infrastructure/repositories/mappers/conseillers.mappers'
 
 export interface GetConseillerByEmailQuery extends Query {
   emailConseiller: string
@@ -18,21 +20,24 @@ export class GetConseillerByEmailQueryHandler extends QueryHandler<
   GetConseillerByEmailQuery,
   Result<DetailConseillerQueryModel>
 > {
-  constructor(
-    @Inject(ConseillersRepositoryToken)
-    private readonly conseillersRepository: Conseiller.Repository,
-    private conseillerAuthorizer: ConseillerAuthorizer
-  ) {
+  constructor(private conseillerAuthorizer: ConseillerAuthorizer) {
     super('GetConseillerByEmailQueryHandler')
   }
 
   async handle(
     query: GetConseillerByEmailQuery
   ): Promise<Result<DetailConseillerQueryModel>> {
-    return this.conseillersRepository.getQueryModelByEmailAndStructure(
-      query.emailConseiller,
-      query.structureUtilisateur
-    )
+    const conseillerSqlModel = await ConseillerSqlModel.findOne({
+      where: {
+        email: query.emailConseiller,
+        structure: query.structureUtilisateur
+      }
+    })
+    if (!conseillerSqlModel) {
+      return failure(new NonTrouveError('Conseiller', query.emailConseiller))
+    }
+
+    return success(fromSqlToDetailConseillerQueryModel(conseillerSqlModel))
   }
 
   async authorize(

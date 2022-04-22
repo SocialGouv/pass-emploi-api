@@ -1,29 +1,25 @@
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import {
   GetDetailConseillerQuery,
   GetDetailConseillerQueryHandler
 } from '../../../src/application/queries/get-detail-conseiller.query.handler'
-import { Conseiller } from '../../../src/domain/conseiller'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 
 describe('GetDetailConseillerQueryHandler', () => {
-  let conseillersRepository: StubbedType<Conseiller.Repository>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getDetailConseillerQueryHandler: GetDetailConseillerQueryHandler
   let sandbox: SinonSandbox
 
   before(() => {
     sandbox = createSandbox()
-    conseillersRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
 
     getDetailConseillerQueryHandler = new GetDetailConseillerQueryHandler(
-      conseillersRepository,
       conseillerAuthorizer
     )
   })
@@ -33,42 +29,30 @@ describe('GetDetailConseillerQueryHandler', () => {
   })
 
   describe('handle', () => {
-    it('retourne un conseiller', async () => {
-      // Given
-      const idConseiller = 'idConseiller'
-      const getDetailConseillerQuery: GetDetailConseillerQuery = {
-        idConseiller
-      }
-      const conseillerEtSesJeunesQueryModel: DetailConseillerQueryModel =
-        detailConseillerQueryModel()
-
-      conseillersRepository.getQueryModelById
-        .withArgs(idConseiller)
-        .resolves(conseillerEtSesJeunesQueryModel)
-
-      // When
-      const actual = await getDetailConseillerQueryHandler.handle(
-        getDetailConseillerQuery
+    it('retourne le conseiller quand il existe', async () => {
+      const idConseiller = '1'
+      await ConseillerSqlModel.creer(
+        unConseillerDto({ id: idConseiller, prenom: 'toto', nom: 'tata' })
       )
 
-      // Then
-      expect(actual).to.deep.equal(conseillerEtSesJeunesQueryModel)
+      const actual = await getDetailConseillerQueryHandler.handle({
+        idConseiller: idConseiller
+      })
+
+      expect(actual).to.deep.equal(
+        detailConseillerQueryModel({
+          id: idConseiller,
+          firstName: 'toto',
+          lastName: 'tata'
+        })
+      )
     })
 
-    it("retourne undefined si le conseiller n'existe pas", async () => {
-      // Given
-      const idConseillerInexistante = 'idConseillerInexistant'
-      const query: GetDetailConseillerQuery = {
-        idConseiller: idConseillerInexistante
-      }
-      conseillersRepository.getQueryModelById
-        .withArgs(idConseillerInexistante)
-        .resolves()
+    it("retourne undefined quand le conseiller n'existe pas", async () => {
+      const actual = await getDetailConseillerQueryHandler.handle({
+        idConseiller: 'id-inexistant'
+      })
 
-      // When
-      const actual = await getDetailConseillerQueryHandler.handle(query)
-
-      // Then
       expect(actual).to.equal(undefined)
     })
   })

@@ -1,6 +1,4 @@
 import { DateTime } from 'luxon'
-import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
-import { Result } from '../building-blocks/types/result'
 import { Core } from './core'
 
 export interface Conseiller {
@@ -18,13 +16,6 @@ export namespace Conseiller {
   export interface Repository {
     get(id: string): Promise<Conseiller | undefined>
     getAllIds(): Promise<string[]>
-    getQueryModelById(
-      id: string
-    ): Promise<DetailConseillerQueryModel | undefined>
-    getQueryModelByEmailAndStructure(
-      emailConseiller: string,
-      structure: Core.Structure
-    ): Promise<Result<DetailConseillerQueryModel>>
     existe(idConseiller: string, structure: Core.Structure): Promise<boolean>
     findConseillersMessagesNonVerifies(
       nombreConseillers: number,
