@@ -7,13 +7,19 @@ import {
   Notification,
   NotificationRepositoryToken
 } from '../../domain/notification'
-import { OffresImmersion } from '../../domain/offre-immersion'
 import { Recherche, RecherchesRepositoryToken } from '../../domain/recherche'
 import { DateService } from '../../utils/date-service'
 import { GetOffresImmersionQuery } from '../queries/get-offres-immersion.query.handler'
 
 export interface NotifierNouvellesImmersionsCommand extends Command {
-  immersions: OffresImmersion.Partenaire.Dto[]
+  immersions: Array<{
+    location?: {
+      lat: number
+      lon: number
+    }
+    rome: string
+    siret: string
+  }>
 }
 
 const LIMITE_PAGINATION = 100

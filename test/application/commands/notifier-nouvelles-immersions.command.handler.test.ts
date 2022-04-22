@@ -10,9 +10,9 @@ import { Notification } from '../../../src/domain/notification'
 import { Recherche } from '../../../src/domain/recherche'
 import { DateService } from '../../../src/utils/date-service'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { offreImmersionDto } from '../../fixtures/offre-immersion.dto.fixture'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
 import { createSandbox, expect } from '../../utils'
+import { uneNouvelleImmersionCommand } from '../../fixtures/offre-immersion.fixture'
 
 describe('NotifierNouvellesImmersionsCommandHandler', () => {
   let notifierNouvellesImmersionsCommandHandler: NotifierNouvellesImmersionsCommandHandler
@@ -42,15 +42,12 @@ describe('NotifierNouvellesImmersionsCommandHandler', () => {
 
       beforeEach(() => {
         // Given
-        const offre = offreImmersionDto()
-        command = {
-          immersions: [offre]
-        }
+        command = uneNouvelleImmersionCommand()
 
         const criteres: GetOffresImmersionQuery = {
-          rome: offre.rome,
-          lat: offre.location!.lat,
-          lon: offre.location!.lon
+          rome: command.immersions[0].rome,
+          lat: command.immersions[0].location!.lat,
+          lon: command.immersions[0].location!.lon
         }
 
         rechercheRepository.trouverLesRecherchesImmersions
@@ -96,15 +93,12 @@ describe('NotifierNouvellesImmersionsCommandHandler', () => {
 
       beforeEach(() => {
         // Given
-        const offre = offreImmersionDto()
-        command = {
-          immersions: [offre]
-        }
+        command = uneNouvelleImmersionCommand()
 
         criteres = {
-          rome: offre.rome,
-          lat: offre.location!.lat,
-          lon: offre.location!.lon
+          rome: command.immersions[0].rome,
+          lat: command.immersions[0].location!.lat,
+          lon: command.immersions[0].location!.lon
         }
 
         rechercheRepository.trouverLesRecherchesImmersions

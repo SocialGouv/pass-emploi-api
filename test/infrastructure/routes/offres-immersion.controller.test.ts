@@ -1,6 +1,9 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import * as request from 'supertest'
-import { NotifierNouvellesImmersionsCommandHandler } from '../../../src/application/commands/notifier-nouvelles-immersions.command.handler'
+import {
+  NotifierNouvellesImmersionsCommand,
+  NotifierNouvellesImmersionsCommandHandler
+} from '../../../src/application/commands/notifier-nouvelles-immersions.command.handler'
 import {
   GetOffresImmersionQuery,
   GetOffresImmersionQueryHandler
@@ -16,7 +19,6 @@ import {
 } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
-import { offreImmersionDto } from '../../fixtures/offre-immersion.dto.fixture'
 import {
   buildTestingModuleForHttpTesting,
   expect,
@@ -190,19 +192,32 @@ describe('OffresImmersionController', () => {
     ensureUserAuthenticationFailsIfInvalid('get', '/offres-immersion/1')
   })
   describe('POST /offres-immersion', () => {
+    // Given
+    const uneNouvelleImmersion: NotifierNouvellesImmersionsCommand = {
+      immersions: [
+        {
+          rome: 'unRome',
+          location: {
+            lon: 1.2,
+            lat: 3.4
+          },
+          siret: '22334343'
+        }
+      ]
+    }
     describe('quand le payload est bon', () => {
       it('appelle la commande et répond 202', async () => {
         // When
         await request(app.getHttpServer())
           .post('/offres-immersion')
-          .send({ immersions: [offreImmersionDto()] })
+          .send(uneNouvelleImmersion)
           .set({ 'X-API-KEY': 'ceci-est-une-autre-api-key' })
           // Then
           .expect(HttpStatus.ACCEPTED)
 
         expect(
           notifierNouvellesImmersionsCommandHandler.execute
-        ).to.have.been.calledWithExactly({ immersions: [offreImmersionDto()] })
+        ).to.have.been.calledWithExactly(uneNouvelleImmersion)
       })
     })
     describe('quand le payload est pas bon', () => {
@@ -221,7 +236,7 @@ describe('OffresImmersionController', () => {
         // When
         await request(app.getHttpServer())
           .post('/offres-immersion')
-          .send({ immersions: [offreImmersionDto()] })
+          .send(uneNouvelleImmersion)
           .set({ 'X-API-KEY': 'ceci-est-une-mauvaise-api-key' })
           // Then
           .expect(HttpStatus.UNAUTHORIZED)
