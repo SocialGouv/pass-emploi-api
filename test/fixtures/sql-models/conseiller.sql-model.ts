@@ -15,7 +15,9 @@ export function unConseillerDto(
     idAuthentification: 'un-id',
     dateCreation: uneDatetime.toJSDate(),
     dateVerificationMessages: uneDatetime.toJSDate(),
-    dateDerniereConnexion: null
+    dateDerniereConnexion: null,
+    idAgence: undefined,
+    nomManuelAgence: undefined
   }
 
   return { ...defaults, ...args }

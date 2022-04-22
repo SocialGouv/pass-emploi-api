@@ -9,7 +9,8 @@ export interface Conseiller {
   structure: Core.Structure
   email?: string
   dateVerificationMessages?: DateTime
-  agence?: Agence
+  agence?: Agence,
+  nomAgenceManuel?: string
 }
 
 export const ConseillersRepositoryToken = 'Conseiller.Repository'

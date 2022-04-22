@@ -1,5 +1,6 @@
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { DatabaseForTesting, expect } from '../../utils'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 

@@ -152,7 +152,7 @@ import { DeleteJeuneCommandHandler } from './application/commands/delete-jeune.c
 import { AgenceRepositoryToken } from './domain/agence'
 import { AgenceSqlRepository } from './infrastructure/repositories/agence-sql.repository'
 import { GetAgencesQueryHandler } from './application/queries/get-agences.query.handler'
-import { ModifierConseillerQueryHandler } from './application/queries/modifier-conseiller.query.handler'
+import { ModifierConseillerCommandHandler } from './application/queries/modifier-conseiller-command-handler.service'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -363,8 +363,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     UpdateRendezVousCommandHandler,
     GetConseillersJeuneQueryHandler,
     GetAgencesQueryHandler,
-    ModifierConseillerQueryHandler,
-    HandleJobUpdateMailingListConseillerCommandHandler
+    HandleJobUpdateMailingListConseillerCommandHandler,
+    ModifierConseillerCommandHandler
   ]
 }
 

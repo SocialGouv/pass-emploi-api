@@ -80,7 +80,7 @@ export class ConseillerDto extends Model {
     field: 'nom_manuel_agence',
     type: DataType.STRING
   })
-  nomManuelAgence: string
+  nomManuelAgence?: string
 }
 
 @Table({
