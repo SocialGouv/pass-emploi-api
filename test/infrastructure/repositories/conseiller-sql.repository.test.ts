@@ -1,8 +1,12 @@
-import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { DatabaseForTesting, expect } from '../../utils'
-import { uneDatetime } from 'test/fixtures/date.fixture'
+
+import {ConseillerSqlRepository} from '../../../src/infrastructure/repositories/conseiller-sql.repository'
+
+import {unConseiller} from '../../fixtures/conseiller.fixture'
+import {unConseillerDto} from '../../fixtures/sql-models/conseiller.sql-model'
+import {DatabaseForTesting, expect} from '../../utils'
+import {uneDatetime} from 'test/fixtures/date.fixture'
+import {Conseiller} from "../../../src/domain/conseiller";
+import {AgenceSqlModel} from "../../../src/infrastructure/sequelize/models/agence.sql-model";
 
 describe('ConseillerSqlRepository', () => {
   DatabaseForTesting.prepare()
@@ -15,13 +19,41 @@ describe('ConseillerSqlRepository', () => {
   describe('get', () => {
     it('retourne le conseiller', async () => {
       // Given
-      await conseillerSqlRepository.save(unConseiller())
+      const conseiller: Conseiller = {
+        id: '1',
+        lastName: 'Tavernier',
+        firstName: 'Nils',
+        structure: Core.Structure.POLE_EMPLOI,
+        email: 'nils.tavernier@passemploi.com',
+        agence: {
+          id: "id"
+        }
+      }
+      await AgenceSqlModel.create({
+        id: "id",
+        nomAgence: "nom",
+        nomRegion: "nomRegion",
+        codeDepartement: "codeDepartement",
+        structure: "MILO"
+      })
+      await conseillerSqlRepository.save(conseiller)
 
       // When
-      const conseiller = await conseillerSqlRepository.get(unConseiller().id)
+      const result = await conseillerSqlRepository.get(conseiller.id)
 
       // Then
-      expect(conseiller).to.deep.equal(unConseiller())
+      expect(result).to.deep.equal({
+        id: '1',
+        lastName: 'Tavernier',
+        firstName: 'Nils',
+        structure: Core.Structure.POLE_EMPLOI,
+        email: 'nils.tavernier@passemploi.com',
+        agence: {
+          id: "id",
+          nom: "nom"
+        },
+        nomAgenceManuel: null
+      })
     })
   })
 
