@@ -80,6 +80,10 @@ export const testConfig = (): ConfigService => {
       url: 'https://api.api-immersion.beta.gouv.op',
       apiKey: 'apiKey'
     },
+    firebase: {
+      key: 'firebase-key',
+      encryptionKey: 'firebase-encryption-key'
+    },
     passEmploiContactEmail: 'pass.emploi.contact@gmail.com',
     frontEndUrl: 'http://frontend.com',
     jobs: {

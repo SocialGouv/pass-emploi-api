@@ -1,9 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
-import { Chat, ChatRepositoryToken } from 'src/domain/chat'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { ChatSecretsQueryModel } from './query-models/authentification.query-models'
+import { FirebaseClient } from '../../infrastructure/clients/firebase-client'
+import { ConfigService } from '@nestjs/config'
 
 export interface GetChatSecretsQuery extends Query {
   utilisateur: Authentification.Utilisateur
@@ -15,8 +16,8 @@ export class GetChatSecretsQueryHandler extends QueryHandler<
   ChatSecretsQueryModel | undefined
 > {
   constructor(
-    @Inject(ChatRepositoryToken)
-    private chatRepository: Chat.Repository
+    private firebaseClient: FirebaseClient,
+    private configService: ConfigService
   ) {
     super('GetChatSecretsQueryHandler')
   }
@@ -24,7 +25,15 @@ export class GetChatSecretsQueryHandler extends QueryHandler<
   async handle(
     query: GetChatSecretsQuery
   ): Promise<ChatSecretsQueryModel | undefined> {
-    return this.chatRepository.getChatSecretsQueryModel(query.utilisateur)
+    const firebaseToken = await this.firebaseClient.getToken(query.utilisateur)
+    const encryptionKey = this.configService.get('firebase').encryptionKey
+
+    return firebaseToken && encryptionKey
+      ? {
+          token: firebaseToken,
+          cle: encryptionKey
+        }
+      : undefined
   }
 
   async authorize(

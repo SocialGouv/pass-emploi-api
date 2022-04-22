@@ -1,24 +1,27 @@
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import {
   GetChatSecretsQuery,
   GetChatSecretsQueryHandler
 } from 'src/application/queries/get-chat-secrets.query.handler'
 import { Authentification } from 'src/domain/authentification'
-import { Chat } from 'src/domain/chat'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
-import { createSandbox, expect } from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
+import { testConfig } from '../../utils/module-for-testing'
 
 describe('GetChatSecretsQueryHandler', () => {
-  let chatRepository: StubbedType<Chat.Repository>
+  let firebaseClient: StubbedClass<FirebaseClient>
   let getChatSecretsQueryHandler: GetChatSecretsQueryHandler
   let sandbox: SinonSandbox
 
   before(() => {
     sandbox = createSandbox()
-    chatRepository = stubInterface(sandbox)
+    firebaseClient = stubClass(FirebaseClient)
 
-    getChatSecretsQueryHandler = new GetChatSecretsQueryHandler(chatRepository)
+    getChatSecretsQueryHandler = new GetChatSecretsQueryHandler(
+      firebaseClient,
+      testConfig()
+    )
   })
 
   afterEach(() => {
@@ -34,10 +37,7 @@ describe('GetChatSecretsQueryHandler', () => {
         utilisateur
       }
 
-      const mockedChatSecrets = {}
-      chatRepository.getChatSecretsQueryModel
-        .withArgs(utilisateur)
-        .resolves(mockedChatSecrets)
+      firebaseClient.getToken.withArgs(utilisateur).resolves('un-token')
 
       // When
       const actual = await getChatSecretsQueryHandler.handle(
@@ -45,7 +45,10 @@ describe('GetChatSecretsQueryHandler', () => {
       )
 
       // Then
-      expect(actual).to.deep.equal(mockedChatSecrets)
+      expect(actual).to.deep.equal({
+        cle: 'firebase-encryption-key',
+        token: 'un-token'
+      })
     })
   })
 })
