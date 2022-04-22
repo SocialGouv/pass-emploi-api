@@ -6,11 +6,8 @@ import {
   IsNumber,
   IsOptional,
   ValidateNested,
-  IsEnum,
-  IsArray,
-  IsBoolean
+  IsArray
 } from 'class-validator'
-import { OffresImmersion } from '../../../domain/offre-immersion'
 import {
   transformStringToFloat,
   transformStringToInteger
@@ -70,42 +67,6 @@ export class GetOffresImmersionQueryBody {
   distance?: number
 }
 
-class ContactDetails {
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  @IsNotEmpty()
-  id: string
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  @IsNotEmpty()
-  lastName: string
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  @IsNotEmpty()
-  firstName: string
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  @IsNotEmpty()
-  role: string
-
-  @ApiPropertyOptional()
-  @IsString()
-  @IsOptional()
-  email?: string
-
-  @ApiPropertyOptional()
-  @IsString()
-  @IsOptional()
-  phone?: string
-}
-
 class Location {
   @ApiProperty()
   @IsNumber()
@@ -116,69 +77,12 @@ class Location {
   lon: number
 }
 
-class NouvelleOffreImmersion implements OffresImmersion.Partenaire.Dto {
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  @IsNotEmpty()
-  address: string
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  @IsNotEmpty()
-  city: string
-
-  @ApiPropertyOptional({ type: ContactDetails })
-  @ValidateNested()
-  @Type(() => ContactDetails)
-  contactDetails: ContactDetails | undefined
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  contactId: string
-
-  @ApiPropertyOptional({ enum: OffresImmersion.Partenaire.ContactMode })
-  @IsString()
-  @IsOptional()
-  @IsEnum(OffresImmersion.Partenaire.ContactMode)
-  contactMode?: OffresImmersion.Partenaire.ContactMode
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  distance_m?: number
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  @IsNotEmpty()
-  id: string
-
+class NouvelleOffreImmersion {
   @ApiPropertyOptional({ type: Location })
   @ValidateNested()
   @IsOptional()
   @Type(() => Location)
   location?: Location
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  @IsNotEmpty()
-  naf: string
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  @IsNotEmpty()
-  nafLabel: string
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  @IsNotEmpty()
-  name: string
 
   @ApiProperty()
   @IsString()
@@ -189,19 +93,7 @@ class NouvelleOffreImmersion implements OffresImmersion.Partenaire.Dto {
   @IsString()
   @IsOptional()
   @IsNotEmpty()
-  romeLabel: string
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  @IsNotEmpty()
   siret: string
-
-  @ApiProperty()
-  @IsBoolean()
-  @IsOptional()
-  @IsNotEmpty()
-  voluntaryToImmersion: boolean
 }
 
 export class NouvellesOffresImmersions {
