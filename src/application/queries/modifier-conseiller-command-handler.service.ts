@@ -1,11 +1,13 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { Query } from '../../building-blocks/types/query'
-import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Authentification } from '../../domain/authentification'
 import { Unauthorized } from '../../domain/erreur'
 import { DetailConseillerQueryModel } from './query-models/conseillers.query-models'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { Agence, AgenceRepositoryToken } from '../../domain/agence'
+import {CommandHandler} from "../../building-blocks/types/command-handler";
+import {emptySuccess, failure, Result} from "../../building-blocks/types/result";
+import {ErreurHttp} from "../../building-blocks/types/domain-error";
 
 export interface ModifierConseillerQuery extends Query {
   idConseiller: string
@@ -13,9 +15,9 @@ export interface ModifierConseillerQuery extends Query {
 }
 
 @Injectable()
-export class ModifierConseillerQueryHandler extends QueryHandler<
+export class ModifierConseillerCommandHandler extends CommandHandler<
   ModifierConseillerQuery,
-  DetailConseillerQueryModel | undefined
+  void
 > {
   constructor(
     @Inject(ConseillersRepositoryToken)
@@ -28,29 +30,27 @@ export class ModifierConseillerQueryHandler extends QueryHandler<
 
   async handle(
     query: ModifierConseillerQuery
-  ): Promise<DetailConseillerQueryModel | undefined> {
+  ): Promise<Result> {
     const conseillerActuel = await this.conseillerRepository.get(
       query.idConseiller
     )
     if (conseillerActuel != null) {
       return await this.modifierConseillerExistant(conseillerActuel, query)
     } else {
-      return undefined
+      return failure(new ErreurHttp('le conseiller ' + query.idConseiller + " n'éxiste pas", 404))
     }
   }
 
   private async modifierConseillerExistant(
     conseillerActuel: Conseiller,
     query: ModifierConseillerQuery
-  ): Promise<Conseiller> {
+  ): Promise<Result> {
     if (query.champsConseillerAModifier.agence?.id) {
       const agence = await this.agencesRepository.get(
         query.champsConseillerAModifier.agence.id
       )
       if (!agence)
-        throw new NotFoundException(
-          'Agence ' + query.champsConseillerAModifier.agence.id + ' not found'
-        )
+        return failure(new ErreurHttp("l'agence " + query.champsConseillerAModifier.agence.id + " n'éxiste pas", 404))
     }
     const conseiller = {
       id: conseillerActuel.id,
@@ -62,7 +62,7 @@ export class ModifierConseillerQueryHandler extends QueryHandler<
       agence: query.champsConseillerAModifier.agence ?? conseillerActuel.agence
     }
     await this.conseillerRepository.save(conseiller)
-    return conseiller
+    return emptySuccess()
   }
 
   async authorize(

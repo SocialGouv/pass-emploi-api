@@ -62,7 +62,7 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
     if (!conseillerSqlModel) {
       return undefined
     }
-    return fromSqlConseiller(conseillerSqlModel)
+    return fromSqlConseillerToAggregate(conseillerSqlModel)
   }
 
   async save(conseiller: Conseiller): Promise<void> {
@@ -81,7 +81,7 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
   }
 }
 
-export function fromSqlConseiller(
+export function fromSqlConseillerToAggregate(
   conseillerSqlModel: ConseillerSqlModel
 ): Conseiller {
   const conseiller: Conseiller = {
@@ -89,7 +89,32 @@ export function fromSqlConseiller(
     firstName: conseillerSqlModel.prenom,
     lastName: conseillerSqlModel.nom,
     structure: conseillerSqlModel.structure,
-    email: conseillerSqlModel.email || undefined
+    email: conseillerSqlModel.email || undefined,
+    agence: conseillerSqlModel.agence,
+    nomAgenceManuel: conseillerSqlModel.nomManuelAgence
+  }
+  if (conseillerSqlModel.agence) {
+    conseiller.agence = {
+      id: conseillerSqlModel.agence.id,
+      nom: conseillerSqlModel.agence.nomAgence
+    }
+  } else if (conseillerSqlModel.nomManuelAgence) {
+    conseiller.agence = {
+      id: undefined,
+      nom: conseillerSqlModel.nomManuelAgence
+    }
+  }
+  return conseiller
+}
+
+export function fromSqlConseillerToQueryModel(
+    conseillerSqlModel: ConseillerSqlModel
+): DetailConseillerQueryModel {
+  const conseiller: DetailConseillerQueryModel = {
+    id: conseillerSqlModel.id,
+    firstName: conseillerSqlModel.prenom,
+    lastName: conseillerSqlModel.nom,
+    agence: conseillerSqlModel.agence,
   }
   if (conseillerSqlModel.agence) {
     conseiller.agence = {
