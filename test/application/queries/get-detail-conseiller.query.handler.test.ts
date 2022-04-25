@@ -6,7 +6,7 @@ import {
 } from '../../../src/application/queries/get-detail-conseiller.query.handler'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import {createSandbox, DatabaseForTesting, expect, StubbedClass, stubClass} from '../../utils'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 
@@ -16,6 +16,7 @@ describe('GetDetailConseillerQueryHandler', () => {
   let sandbox: SinonSandbox
 
   before(() => {
+    DatabaseForTesting.prepare()
     sandbox = createSandbox()
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
 
@@ -43,7 +44,8 @@ describe('GetDetailConseillerQueryHandler', () => {
         detailConseillerQueryModel({
           id: idConseiller,
           firstName: 'toto',
-          lastName: 'tata'
+          lastName: 'tata',
+          agence: undefined
         })
       )
     })

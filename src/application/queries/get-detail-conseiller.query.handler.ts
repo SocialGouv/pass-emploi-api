@@ -26,8 +26,8 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
   ): Promise<DetailConseillerQueryModel | undefined> {
     const conseillerSqlModel = await ConseillerSqlModel.findByPk(
       query.idConseiller, {
-        include: [AgenceSqlModel],
-        }
+        include: [AgenceSqlModel]
+      }
     )
     if (!conseillerSqlModel) {
       return undefined

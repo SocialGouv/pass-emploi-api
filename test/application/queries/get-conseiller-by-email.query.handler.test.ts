@@ -64,7 +64,8 @@ describe('GetConseillerByEmailQueryHandler', () => {
           detailConseillerQueryModel({
             id: conseillerDto.id,
             firstName: 'toto',
-            lastName: 'tata'
+            lastName: 'tata',
+            agence: undefined
           })
         )
       )
