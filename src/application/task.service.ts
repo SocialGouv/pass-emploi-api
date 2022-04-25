@@ -3,6 +3,7 @@ import {
   Planificateur,
   PlanificateurRepositoryToken
 } from '../domain/planificateur'
+import { HandleJobUpdateMailingListConseillerCommandHandler } from './commands/jobs/handle-job-update-mailing-list-conseiller.command'
 import { SynchronizeJobsCommandHandler } from './commands/tasks/synchronize-jobs.command'
 import JobEnum = Planificateur.JobEnum
 import { NotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notification-recherche.command'
@@ -16,7 +17,8 @@ export enum Task {
   RECHERCHER_LES_NOUVELLES_OFFRES = 'RECHERCHER_LES_NOUVELLES_OFFRES',
   ENVOYER_MAIL_CONSEILLER_MESSAGES = 'ENVOYER_MAIL_CONSEILLER_MESSAGES',
   INITIALISER_LES_CRON = 'INITIALISER_LES_CRON',
-  NETTOYER_LES_JOBS = 'NETTOYER_LES_JOBS'
+  NETTOYER_LES_JOBS = 'NETTOYER_LES_JOBS',
+  METTRE_A_JOUR_MAILING_LIST_CONSEILLER = 'METTRE_A_JOUR_MAILING_LIST_CONSEILLER'
 }
 
 @Injectable()
@@ -30,7 +32,8 @@ export class TaskService {
     private notifierNouvellesOffresEmploiCommandHandler: NotifierNouvellesOffresEmploiCommandHandler,
     private handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler,
     private initCronsCommandHandler: InitCronsCommandHandler,
-    private handleNettoyerLesJobsCommandHandler: HandleNettoyerLesJobsCommandHandler
+    private handleNettoyerLesJobsCommandHandler: HandleNettoyerLesJobsCommandHandler,
+    private handleJobUpdateMailingListConseillerCommandHandler: HandleJobUpdateMailingListConseillerCommandHandler
   ) {}
 
   async handle(task: Task | undefined): Promise<void> {
@@ -59,6 +62,11 @@ export class TaskService {
           break
         case Task.NETTOYER_LES_JOBS:
           await this.handleNettoyerLesJobsCommandHandler.execute({})
+          break
+        case Task.METTRE_A_JOUR_MAILING_LIST_CONSEILLER:
+          await this.handleJobUpdateMailingListConseillerCommandHandler.execute(
+            {}
+          )
           break
         default:
           this.logger.log(

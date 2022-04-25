@@ -41,7 +41,7 @@ describe('CreateRendezVousCommandHandler', () => {
   let idService: StubbedClass<IdService>
   let createRendezVousCommandHandler: CreateRendezVousCommandHandler
   let evenementService: StubbedClass<EvenementService>
-  let mailClient: StubbedType<Mail.Client>
+  let mailClient: StubbedType<Mail.Service>
   const jeune = unJeune()
   const rendezVous = unRendezVous({}, jeune)
 

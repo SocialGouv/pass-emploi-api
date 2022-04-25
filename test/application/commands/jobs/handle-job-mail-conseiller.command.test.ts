@@ -15,7 +15,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
   let handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler
   let chatRepository: StubbedType<Chat.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
-  let mailClient: StubbedType<Mail.Client>
+  let mailClient: StubbedType<Mail.Service>
   let dateService: StubbedClass<DateService>
 
   beforeEach(() => {

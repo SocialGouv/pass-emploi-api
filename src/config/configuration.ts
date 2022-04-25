@@ -13,7 +13,13 @@ export default () => {
   const databaseUrl =
     process.env.DATABASE_URL ||
     'postgresql://passemploi:passemploi@localhost:55432/passemploidb'
-  const { host, port, database, user, password } = parse(databaseUrl)
+  const {
+    host,
+    port,
+    database,
+    user,
+    password
+  } = parse(databaseUrl)
   return {
     environment: process.env.ENVIRONMENT,
     isWeb: process.env.IS_WEB !== 'false',
@@ -99,8 +105,11 @@ export default () => {
           process.env.SENDINBLUE_NOUVEAU_RENDEZVOUS_TEMPLATE_ID ?? '3',
         suppressionJeuneMilo:
           process.env.SENDINBLUE_SUPPRESSION_JEUNE_MILO_ID ?? '14',
-        suppressionJeunePE:
-          process.env.SENDINBLUE_SUPPRESSION_JEUNE_PE_ID ?? '17'
+        suppressionJeunePE: process.env.SENDINBLUE_SUPPRESSION_JEUNE_PE_ID ?? '17'
+      },
+      mailingLists: {
+        poleEmploi: process.env.SENDINBLUE_POLE_EMPLOI_MAILING_LIST_ID ?? 7,
+        milo: process.env.SENDINBLUE_MILO_MAILING_LIST_ID ?? 8
       }
     },
     task: process.env.TASK,

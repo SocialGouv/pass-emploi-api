@@ -37,6 +37,7 @@ import { HandleJobMailConseillerCommandHandler } from './application/commands/jo
 import { HandleNettoyerLesJobsCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-jobs.command'
 import { NotifierNouvellesOffresEmploiCommandHandler } from './application/commands/jobs/handle-job-notification-recherche.command'
 import { HandleJobRendezVousCommandHandler } from './application/commands/jobs/handle-job-rendez-vous.command'
+import { HandleJobUpdateMailingListConseillerCommandHandler } from './application/commands/jobs/handle-job-update-mailing-list-conseiller.command'
 import { NotifierNouvellesImmersionsCommandHandler } from './application/commands/notifier-nouvelles-immersions.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from './application/commands/send-notification-nouveau-message.command.handler'
 import { SendNotificationsNouveauxMessagesCommandHandler } from './application/commands/send-notifications-nouveaux-messages.command.handler'
@@ -104,7 +105,7 @@ import { EngagementClient } from './infrastructure/clients/engagement-client'
 import { FirebaseClient } from './infrastructure/clients/firebase-client'
 import { ImmersionClient } from './infrastructure/clients/immersion-client'
 import { KeycloakClient } from './infrastructure/clients/keycloak-client'
-import { MailSendinblueClient } from './infrastructure/clients/mail-sendinblue.client'
+import { MailSendinblueService } from './infrastructure/clients/mail-sendinblue.service'
 import { PoleEmploiClient } from './infrastructure/clients/pole-emploi-client'
 import { ActionSqlRepository } from './infrastructure/repositories/action-sql.repository'
 import { AuthentificationSqlRepository } from './infrastructure/repositories/authentification-sql.repository'
@@ -112,6 +113,7 @@ import { ChatFirebaseRepository } from './infrastructure/repositories/chat-fireb
 import { ConseillerSqlRepository } from './infrastructure/repositories/conseiller-sql.repository'
 import { EvenementHttpSqlRepository } from './infrastructure/repositories/evenement-http-sql.repository'
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune-sql.repository'
+import { MailSqlRepository } from './infrastructure/repositories/mail.sql.repository'
 import { MiloHttpRepository } from './infrastructure/repositories/milo-http.repository'
 import { MiloInMemoryRepository } from './infrastructure/repositories/milo-in-memory.repository'
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
@@ -144,7 +146,7 @@ import { GetActionsJeunePoleEmploiQueryHandler } from './application/queries/get
 import { GetJeuneMiloByDossierQueryHandler } from './application/queries/get-jeune-milo-by-dossier.query.handler'
 import { UpdateRendezVousCommandHandler } from './application/commands/update-rendez-vous.command.handler'
 import { InvitationIcsClient } from './infrastructure/clients/invitation-ics.client'
-import { Mail, MailClientToken } from './domain/mail'
+import { Mail, MailRepositoryToken, MailServiceToken } from './domain/mail'
 import { ChatCryptoService } from './utils/chat-crypto-service'
 import { DeleteJeuneCommandHandler } from './application/commands/delete-jeune.command.handler'
 import { AgenceRepositoryToken } from './domain/agence'
@@ -227,8 +229,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       useClass: ChatFirebaseRepository
     },
     {
-      provide: MailClientToken,
-      useClass: MailSendinblueClient
+      provide: MailServiceToken,
+      useClass: MailSendinblueService
     },
     {
       provide: RendezVousRepositoryToken,
@@ -272,6 +274,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: AgenceRepositoryToken,
       useClass: AgenceSqlRepository
+    },
+    {
+      provide: MailRepositoryToken,
+      useClass: MailSqlRepository
     },
     ...databaseProviders
   ],
@@ -355,7 +361,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetJeuneMiloByDossierQueryHandler,
     UpdateRendezVousCommandHandler,
     GetConseillersJeuneQueryHandler,
-    GetAgencesQueryHandler
+    GetAgencesQueryHandler,
+    HandleJobUpdateMailingListConseillerCommandHandler
   ]
 }
 
