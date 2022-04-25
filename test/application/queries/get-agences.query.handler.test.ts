@@ -9,13 +9,13 @@ import { expect } from '../../utils'
 import { Unauthorized } from '../../../src/domain/erreur'
 import { Authentification } from '../../../src/domain/authentification'
 import Structure = Core.Structure
-import {Agence} from "../../../src/domain/agence";
+import { Agence } from '../../../src/domain/agence'
 
 describe('GetAgenceQuery', () => {
   describe('authorize', () => {
     const handler = new GetAgencesQueryHandler({
       get(): Promise<Agence | undefined> {
-        return Promise.resolve(undefined);
+        return Promise.resolve(undefined)
       },
       getAllQueryModelsByStructure(): Promise<AgenceQueryModel[]> {
         return Promise.resolve([])

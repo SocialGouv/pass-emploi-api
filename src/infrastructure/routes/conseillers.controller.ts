@@ -14,39 +14,39 @@ import {
   Put,
   Query
 } from '@nestjs/common'
-import {RuntimeException} from '@nestjs/core/errors/exceptions/runtime.exception'
-import {ApiBody, ApiOAuth2, ApiResponse, ApiTags} from '@nestjs/swagger'
+import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
+import { ApiBody, ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   CreateRendezVousCommand,
   CreateRendezVousCommandHandler
 } from 'src/application/commands/create-rendez-vous.command.handler'
-import {CreerSuperviseursCommandHandler} from 'src/application/commands/creer-superviseurs.command.handler'
-import {DeleteSuperviseursCommandHandler} from 'src/application/commands/delete-superviseurs.command.handler'
-import {GetDetailConseillerQueryHandler} from 'src/application/queries/get-detail-conseiller.query.handler'
-import {GetJeuneMiloByDossierQueryHandler} from 'src/application/queries/get-jeune-milo-by-dossier.query.handler'
-import {GetJeunesByConseillerQueryHandler} from 'src/application/queries/get-jeunes-by-conseiller.query.handler'
-import {DetailConseillerQueryModel} from 'src/application/queries/query-models/conseillers.query-models'
-import {Authentification} from 'src/domain/authentification'
-import {CreateActionCommandHandler} from '../../application/commands/create-action.command.handler'
-import {CreerJeuneMiloCommandHandler} from '../../application/commands/creer-jeune-milo.command.handler'
-import {CreerJeunePoleEmploiCommandHandler} from '../../application/commands/creer-jeune-pole-emploi.command.handler'
-import {SendNotificationNouveauMessageCommandHandler} from '../../application/commands/send-notification-nouveau-message.command.handler'
+import { CreerSuperviseursCommandHandler } from 'src/application/commands/creer-superviseurs.command.handler'
+import { DeleteSuperviseursCommandHandler } from 'src/application/commands/delete-superviseurs.command.handler'
+import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler'
+import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler'
+import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler'
+import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
+import { Authentification } from 'src/domain/authentification'
+import { CreateActionCommandHandler } from '../../application/commands/create-action.command.handler'
+import { CreerJeuneMiloCommandHandler } from '../../application/commands/creer-jeune-milo.command.handler'
+import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/creer-jeune-pole-emploi.command.handler'
+import { SendNotificationNouveauMessageCommandHandler } from '../../application/commands/send-notification-nouveau-message.command.handler'
 import {
   SendNotificationsNouveauxMessagesCommand,
   SendNotificationsNouveauxMessagesCommandHandler
 } from '../../application/commands/send-notifications-nouveaux-messages.command.handler'
-import {GetConseillerByEmailQueryHandler} from '../../application/queries/get-conseiller-by-email.query.handler'
-import {GetDossierMiloJeuneQueryHandler} from '../../application/queries/get-dossier-milo-jeune.query.handler'
-import {GetAllRendezVousConseillerQueryHandler} from '../../application/queries/get-rendez-vous-conseiller.query.handler'
-import {GetResumeActionsDesJeunesDuConseillerQueryHandler} from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
+import { GetConseillerByEmailQueryHandler } from '../../application/queries/get-conseiller-by-email.query.handler'
+import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
+import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler'
+import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
 import {
   DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel,
   JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from '../../application/queries/query-models/jeunes.query-models'
-import {DossierJeuneMiloQueryModel} from '../../application/queries/query-models/milo.query-model'
-import {RendezVousConseillerQueryModel} from '../../application/queries/query-models/rendez-vous.query-models'
+import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
+import { RendezVousConseillerQueryModel } from '../../application/queries/query-models/rendez-vous.query-models'
 import {
   DossierExisteDejaError,
   DroitsInsuffisants,
@@ -55,10 +55,14 @@ import {
   JeuneNonLieAuConseillerError,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
-import {isFailure, isSuccess, Result} from '../../building-blocks/types/result'
-import {Action} from '../../domain/action'
-import {Core} from '../../domain/core'
-import {Utilisateur} from '../decorators/authenticated.decorator'
+import {
+  isFailure,
+  isSuccess,
+  Result
+} from '../../building-blocks/types/result'
+import { Action } from '../../domain/action'
+import { Core } from '../../domain/core'
+import { Utilisateur } from '../decorators/authenticated.decorator'
 import {
   CreateActionPayload,
   CreateJeunePoleEmploiPayload,
@@ -68,8 +72,8 @@ import {
   GetRendezVousConseillerQueryParams,
   SuperviseursPayload
 } from './validation/conseillers.inputs'
-import {CreateRendezVousPayload} from './validation/rendez-vous.inputs'
-import {ModifierConseillerCommandHandler} from '../../application/queries/modifier-conseiller-command-handler.service'
+import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
+import { ModifierConseillerCommandHandler } from '../../application/queries/modifier-conseiller-command-handler.service'
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -507,17 +511,17 @@ export class ConseillersController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const result = await this.modifierConseillerQueryHandler.execute(
-        {
-          idConseiller: idConseiller,
-          champsConseillerAModifier: modifierConseillerPayload
-        },
-        utilisateur
+      {
+        idConseiller: idConseiller,
+        champsConseillerAModifier: modifierConseillerPayload
+      },
+      utilisateur
     )
     if (isFailure(result)) {
       if (result.error.code === ErreurHttp.CODE) {
         throw new HttpException(
-            result.error.message,
-            (result.error as ErreurHttp).statusCode
+          result.error.message,
+          (result.error as ErreurHttp).statusCode
         )
       }
       throw new RuntimeException(result.error.message)

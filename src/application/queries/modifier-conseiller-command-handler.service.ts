@@ -5,9 +5,13 @@ import { Unauthorized } from '../../domain/erreur'
 import { DetailConseillerQueryModel } from './query-models/conseillers.query-models'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { Agence, AgenceRepositoryToken } from '../../domain/agence'
-import {CommandHandler} from "../../building-blocks/types/command-handler";
-import {emptySuccess, failure, Result} from "../../building-blocks/types/result";
-import {ErreurHttp} from "../../building-blocks/types/domain-error";
+import { CommandHandler } from '../../building-blocks/types/command-handler'
+import {
+  emptySuccess,
+  failure,
+  Result
+} from '../../building-blocks/types/result'
+import { ErreurHttp } from '../../building-blocks/types/domain-error'
 
 export interface ModifierConseillerQuery extends Query {
   idConseiller: string
@@ -28,16 +32,19 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
     super('ModifierConseillerQueryHandler')
   }
 
-  async handle(
-    query: ModifierConseillerQuery
-  ): Promise<Result> {
+  async handle(query: ModifierConseillerQuery): Promise<Result> {
     const conseillerActuel = await this.conseillerRepository.get(
       query.idConseiller
     )
     if (conseillerActuel != null) {
       return await this.modifierConseillerExistant(conseillerActuel, query)
     } else {
-      return failure(new ErreurHttp('le conseiller ' + query.idConseiller + " n'éxiste pas", 404))
+      return failure(
+        new ErreurHttp(
+          'le conseiller ' + query.idConseiller + " n'éxiste pas",
+          404
+        )
+      )
     }
   }
 
@@ -50,7 +57,14 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
         query.champsConseillerAModifier.agence.id
       )
       if (!agence)
-        return failure(new ErreurHttp("l'agence " + query.champsConseillerAModifier.agence.id + " n'éxiste pas", 404))
+        return failure(
+          new ErreurHttp(
+            "l'agence " +
+              query.champsConseillerAModifier.agence.id +
+              " n'éxiste pas",
+            404
+          )
+        )
     }
     const conseiller = {
       id: conseillerActuel.id,
@@ -70,9 +84,9 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     if (
-      query.champsConseillerAModifier.id != null ||
-      query.champsConseillerAModifier.firstName != null ||
-      query.champsConseillerAModifier.lastName != null
+      query.champsConseillerAModifier.id != undefined ||
+      query.champsConseillerAModifier.firstName != undefined ||
+      query.champsConseillerAModifier.lastName != undefined
     ) {
       throw new Unauthorized("On ne peut modifier que l'agence d'un Conseiller")
     }
