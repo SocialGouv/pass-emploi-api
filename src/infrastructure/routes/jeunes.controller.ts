@@ -33,7 +33,7 @@ import {
   FavoriOffreEmploiIdQueryModel,
   OffreEmploiResumeQueryModel
 } from 'src/application/queries/query-models/offres-emploi.query-models'
-import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
+import { RendezVousJeuneQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
 import { Core } from 'src/domain/core'
 import {
   AddFavoriOffreEmploiCommand,
@@ -230,7 +230,7 @@ export class JeunesController {
 
   @Get(':idJeune/rendezvous')
   @ApiResponse({
-    type: RendezVousQueryModel,
+    type: RendezVousJeuneQueryModel,
     isArray: true
   })
   async getRendezVous(
@@ -238,8 +238,8 @@ export class JeunesController {
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string,
     @Query() getRendezVousQueryParams?: GetRendezVousJeuneQueryParams
-  ): Promise<RendezVousQueryModel[]> {
-    let result: Result<RendezVousQueryModel[]>
+  ): Promise<RendezVousJeuneQueryModel[]> {
+    let result: Result<RendezVousJeuneQueryModel[]>
     if (utilisateur.structure === Core.Structure.POLE_EMPLOI && accessToken) {
       result = await this.getRendezVousJeunePoleEmploiQueryHandler.execute(
         {

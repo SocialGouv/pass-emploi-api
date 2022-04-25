@@ -5,13 +5,13 @@ import {
 } from 'src/domain/rendez-vous'
 import { RendezVousPoleEmploiDto } from 'src/infrastructure/clients/pole-emploi-partenaire-client'
 import { IdService } from 'src/utils/id-service'
-import { RendezVousQueryModel } from '../query-models/rendez-vous.query-models'
+import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-models'
 
 export function fromRendezVousDtoToRendezVousQueryModel(
   rendezVousPoleEmploiDto: RendezVousPoleEmploiDto,
   jeune: Jeune,
   idService: IdService
-): RendezVousQueryModel {
+): RendezVousJeuneQueryModel {
   return {
     id: idService.uuid(),
     title: '',

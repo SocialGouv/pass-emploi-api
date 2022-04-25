@@ -33,7 +33,7 @@ export interface RendezVousBaseQueryModel {
   modality: string
 }
 
-export class RendezVousQueryModel implements RendezVousBaseQueryModel {
+export class RendezVousJeuneQueryModel implements RendezVousBaseQueryModel {
   @ApiProperty()
   id: string
 
@@ -53,14 +53,7 @@ export class RendezVousQueryModel implements RendezVousBaseQueryModel {
   duration: number
 
   @ApiProperty({
-    description: Object.values(CodeTypeRendezVous)
-      .map(code => {
-        return JSON.stringify({
-          code,
-          label: mapCodeLabelTypeRendezVous[code]
-        })
-      })
-      .join(' | ')
+    description: descriptionTypeRdv()
   })
   type: TypeRendezVous
 
@@ -123,18 +116,84 @@ export class RendezVousQueryModel implements RendezVousBaseQueryModel {
   }
 }
 
-export class RendezVousConseillerQueryModel {
-  @ApiProperty({
-    type: RendezVousQueryModel,
-    isArray: true
-  })
-  futurs: RendezVousQueryModel[]
+export class RendezVousConseillerQueryModel
+  implements RendezVousBaseQueryModel
+{
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
+  title: string
+
+  @ApiProperty({ required: false })
+  comment?: string
+
+  @ApiProperty()
+  modality: string
+
+  @ApiProperty()
+  date: Date
+
+  @ApiProperty()
+  duration: number
+
+  @ApiProperty()
+  invitation: boolean
 
   @ApiProperty({
-    type: RendezVousQueryModel,
+    description: descriptionTypeRdv()
+  })
+  type: TypeRendezVous
+
+  @ApiProperty({ required: false })
+  precision?: string
+
+  @ApiProperty({ required: false })
+  adresse?: string
+
+  @ApiProperty({ required: false })
+  organisme?: string
+
+  @ApiProperty({ required: false })
+  presenceConseiller?: boolean
+
+  @ApiProperty()
+  jeune: JeuneQueryModel
+
+  @ApiProperty()
+  jeunes: JeuneQueryModel[]
+
+  @ApiProperty({ required: false })
+  createur?: {
+    id: string
+    nom: string
+    prenom: string
+  }
+}
+
+export class RendezVousConseillerFutursEtPassesQueryModel {
+  @ApiProperty({
+    type: RendezVousConseillerQueryModel,
     isArray: true
   })
-  passes: RendezVousQueryModel[]
+  futurs: RendezVousConseillerQueryModel[]
+
+  @ApiProperty({
+    type: RendezVousConseillerQueryModel,
+    isArray: true
+  })
+  passes: RendezVousConseillerQueryModel[]
 }
 
 export type TypesRendezVousQueryModel = TypeRendezVous[]
+
+function descriptionTypeRdv(): string | undefined {
+  return Object.values(CodeTypeRendezVous)
+    .map(code => {
+      return JSON.stringify({
+        code,
+        label: mapCodeLabelTypeRendezVous[code]
+      })
+    })
+    .join(' | ')
+}

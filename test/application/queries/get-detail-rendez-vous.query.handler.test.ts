@@ -1,30 +1,31 @@
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { RendezVousAuthorizer } from 'src/application/authorizers/authorize-rendezvous'
-import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
-import { RendezVous } from 'src/domain/rendez-vous'
-import { unRendezVousQueryModel } from 'test/fixtures/rendez-vous.fixture'
-import {
-  GetDetailRendezVousQuery,
-  GetDetailRendezVousQueryHandler
-} from '../../../src/application/queries/get-detail-rendez-vous.query.handler'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { GetDetailRendezVousQueryHandler } from '../../../src/application/queries/get-detail-rendez-vous.query.handler'
+import { createSandbox, DatabaseForTesting, expect } from '../../utils'
+import { failure, success } from '../../../src/building-blocks/types/result'
+import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
+import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
+import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { uneDatetime } from '../../fixtures/date.fixture'
+import { RendezVousConseillerQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-models'
+import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous'
+import { RendezVousJeuneAssociationModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import { Unauthorized } from '../../../src/domain/erreur'
 
 describe('GetDetailRendezVousQueryHandler', () => {
-  let rendezVousRepository: StubbedType<RendezVous.Repository>
-  let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
+  DatabaseForTesting.prepare()
   let getDetailRendezVousQueryHandler: GetDetailRendezVousQueryHandler
   let sandbox: SinonSandbox
 
   before(() => {
     sandbox = createSandbox()
-    rendezVousRepository = stubInterface(sandbox)
-    rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
 
-    getDetailRendezVousQueryHandler = new GetDetailRendezVousQueryHandler(
-      rendezVousRepository,
-      rendezVousAuthorizer
-    )
+    getDetailRendezVousQueryHandler = new GetDetailRendezVousQueryHandler()
   })
 
   afterEach(() => {
@@ -32,47 +33,349 @@ describe('GetDetailRendezVousQueryHandler', () => {
   })
 
   describe('handle', () => {
-    it("retourne le détail d'une rendez-vous", async () => {
-      // Given
-      const idRendezVous = 'idRendezVous'
-      const getDetailRendezVousQuery: GetDetailRendezVousQuery = {
-        idRendezVous
-      }
-      const rendezVousQueryModel: RendezVousQueryModel = unRendezVousQueryModel(
-        {
-          id: idRendezVous
-        }
-      )
-      rendezVousRepository.getQueryModelById
-        .withArgs(idRendezVous)
-        .resolves(rendezVousQueryModel)
+    describe("quand le rdv n'existe pas", () => {
+      it('retourne une failure', async () => {
+        // Given
+        const idRdv = '6c242fa0-804f-11ec-a8a3-0242ac120002'
 
-      // When
-      const actual = await getDetailRendezVousQueryHandler.handle(
-        getDetailRendezVousQuery
-      )
+        // When
+        const result = await getDetailRendezVousQueryHandler.handle({
+          idRendezVous: idRdv
+        })
 
-      // Then
-      expect(actual._isSuccess).to.deep.equal(true)
-      if (actual._isSuccess)
-        expect(actual.data).to.deep.equal(rendezVousQueryModel)
+        // Then
+        expect(result).to.deep.equal(
+          failure(new NonTrouveError('RendezVous', idRdv))
+        )
+      })
     })
+    describe('quand le rdv existe', () => {
+      it('retourne le rdv quand il y a un jeune participant', async () => {
+        // Given
+        const jeune = unJeune()
+        await ConseillerSqlModel.creer(unConseillerDto())
+        await JeuneSqlModel.creer(unJeuneDto())
 
-    it("retourne une failure si l'RendezVous n'existe pas", async () => {
-      // Given
-      const idRendezVousInexistante = 'idRendezVousInexistante'
-      const query: GetDetailRendezVousQuery = {
-        idRendezVous: idRendezVousInexistante
-      }
-      rendezVousRepository.getQueryModelById
-        .withArgs(idRendezVousInexistante)
-        .resolves()
+        const unRendezVous = unRendezVousDto({
+          date: uneDatetime.toJSDate(),
+          titre: 'UN RENDEZ VOUS'
+        })
 
-      // When
-      const actual = await getDetailRendezVousQueryHandler.handle(query)
+        await RendezVousSqlModel.create({
+          ...unRendezVous
+        })
 
-      // Then
-      expect(actual._isSuccess).to.equal(false)
+        await RendezVousJeuneAssociationModel.create({
+          idJeune: jeune.id,
+          idRendezVous: unRendezVous.id
+        })
+
+        // When
+        const result = await getDetailRendezVousQueryHandler.handle({
+          idRendezVous: unRendezVous.id
+        })
+
+        // Then
+        const data: RendezVousConseillerQueryModel = {
+          adresse: undefined,
+          comment: 'commentaire',
+          createur: {
+            id: '1',
+            nom: 'Tavernier',
+            prenom: 'Nils'
+          },
+          date: uneDatetime.toJSDate(),
+          duration: 30,
+          id: unRendezVous.id,
+          jeune: {
+            id: 'ABCDE',
+            nom: 'Doe',
+            prenom: 'John'
+          },
+          jeunes: [
+            {
+              id: 'ABCDE',
+              nom: 'Doe',
+              prenom: 'John'
+            }
+          ],
+          modality: 'modalite',
+          organisme: undefined,
+          precision: undefined,
+          presenceConseiller: true,
+          invitation: false,
+          title: 'UN RENDEZ VOUS',
+          type: {
+            code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+            label: 'Entretien individuel conseiller'
+          }
+        }
+        expect(result).to.deep.equal(success(data))
+      })
+
+      it('retourne le rdv quand il y a plusieurs jeunes participants', async () => {
+        // Given
+        await ConseillerSqlModel.creer(unConseillerDto())
+        const jeune1 = await JeuneSqlModel.creer(unJeuneDto())
+        const jeune2 = await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: 'PLOP'
+          })
+        )
+
+        const unRendezVous = unRendezVousDto({
+          date: uneDatetime.toJSDate(),
+          titre: 'UN RENDEZ VOUS'
+        })
+
+        await RendezVousSqlModel.create({
+          ...unRendezVous
+        })
+
+        await RendezVousJeuneAssociationModel.bulkCreate([
+          {
+            idJeune: jeune1.id,
+            idRendezVous: unRendezVous.id
+          },
+          {
+            idJeune: jeune2.id,
+            idRendezVous: unRendezVous.id
+          }
+        ])
+
+        // When
+        const result = await getDetailRendezVousQueryHandler.handle({
+          idRendezVous: unRendezVous.id
+        })
+
+        // Then
+        const data: RendezVousConseillerQueryModel = {
+          adresse: undefined,
+          comment: 'commentaire',
+          createur: {
+            id: '1',
+            nom: 'Tavernier',
+            prenom: 'Nils'
+          },
+          date: uneDatetime.toJSDate(),
+          duration: 30,
+          id: unRendezVous.id,
+          jeune: {
+            id: 'ABCDE',
+            nom: 'Doe',
+            prenom: 'John'
+          },
+          jeunes: [
+            {
+              id: 'ABCDE',
+              nom: 'Doe',
+              prenom: 'John'
+            },
+            {
+              id: 'PLOP',
+              nom: 'Doe',
+              prenom: 'John'
+            }
+          ],
+          modality: 'modalite',
+          organisme: undefined,
+          precision: undefined,
+          presenceConseiller: true,
+          invitation: false,
+          title: 'UN RENDEZ VOUS',
+          type: {
+            code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+            label: 'Entretien individuel conseiller'
+          }
+        }
+        expect(result).to.deep.equal(success(data))
+      })
+
+      it('retourne le rdv avec les bons jeunes', async () => {
+        // Given
+        await ConseillerSqlModel.creer(unConseillerDto())
+        const jeune1 = await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: 'jeune-1'
+          })
+        )
+        const jeune2 = await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: 'jeune-2'
+          })
+        )
+        const jeune3 = await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: 'jeune-3'
+          })
+        )
+        const unRendezVous = unRendezVousDto({
+          date: uneDatetime.toJSDate(),
+          titre: 'UN RENDEZ VOUS'
+        })
+        const unAutreRendezVous = unRendezVousDto({
+          date: uneDatetime.toJSDate(),
+          titre: 'UN RENDEZ VOUS'
+        })
+
+        await RendezVousSqlModel.bulkCreate([unRendezVous, unAutreRendezVous])
+
+        await RendezVousJeuneAssociationModel.bulkCreate([
+          {
+            idJeune: jeune1.id,
+            idRendezVous: unRendezVous.id
+          },
+          {
+            idJeune: jeune2.id,
+            idRendezVous: unRendezVous.id
+          },
+          {
+            idJeune: jeune3.id,
+            idRendezVous: unAutreRendezVous.id
+          }
+        ])
+
+        // When
+        const result = await getDetailRendezVousQueryHandler.handle({
+          idRendezVous: unRendezVous.id
+        })
+
+        // Then
+        const data: RendezVousConseillerQueryModel = {
+          adresse: undefined,
+          comment: 'commentaire',
+          createur: {
+            id: '1',
+            nom: 'Tavernier',
+            prenom: 'Nils'
+          },
+          date: uneDatetime.toJSDate(),
+          duration: 30,
+          id: unRendezVous.id,
+          jeune: {
+            id: 'jeune-1',
+            nom: 'Doe',
+            prenom: 'John'
+          },
+          jeunes: [
+            {
+              id: 'jeune-1',
+              nom: 'Doe',
+              prenom: 'John'
+            },
+            {
+              id: 'jeune-2',
+              nom: 'Doe',
+              prenom: 'John'
+            }
+          ],
+          modality: 'modalite',
+          organisme: undefined,
+          precision: undefined,
+          presenceConseiller: true,
+          invitation: false,
+          title: 'UN RENDEZ VOUS',
+          type: {
+            code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+            label: 'Entretien individuel conseiller'
+          }
+        }
+        expect(result).to.deep.equal(success(data))
+      })
+    })
+  })
+
+  describe('authorize', () => {
+    describe('quand au moins un des jeunes du conseiller qui fait la requête est dans le rendez-vous', () => {
+      it('autorise', async () => {
+        // Given
+        const conseillerNilsDto = unConseillerDto()
+        await ConseillerSqlModel.creer(conseillerNilsDto)
+        const jeune2DeNils = await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: 'PLOP'
+          })
+        )
+
+        const unRendezVousDuJeune2DeNils = unRendezVousDto({
+          date: uneDatetime.toJSDate(),
+          titre: 'UN RENDEZ VOUS'
+        })
+        await RendezVousSqlModel.create(unRendezVousDuJeune2DeNils)
+
+        const conseillerJohnDto = unConseillerDto({ id: 'JOHN' })
+        await ConseillerSqlModel.creer(conseillerJohnDto)
+        const jeuneDeJohn = await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: 'JEUNE-JOHN'
+          })
+        )
+
+        await RendezVousJeuneAssociationModel.create({
+          idJeune: jeune2DeNils.id,
+          idRendezVous: unRendezVousDuJeune2DeNils.id
+        })
+
+        await RendezVousJeuneAssociationModel.create({
+          idJeune: jeuneDeJohn.id,
+          idRendezVous: unRendezVousDuJeune2DeNils.id
+        })
+
+        // When
+        const call = getDetailRendezVousQueryHandler.authorize(
+          {
+            idRendezVous: unRendezVousDuJeune2DeNils.id
+          },
+          unUtilisateurConseiller({ id: conseillerJohnDto.id })
+        )
+
+        // Then
+        expect(call).not.to.be.rejectedWith(Unauthorized)
+      })
+    })
+    describe("quand aucun des jeunes du conseiller qui fait la requête n'est dans le rendez-vous", () => {
+      it("n'autorise pas", async () => {
+        // Given
+        const conseillerDto = unConseillerDto()
+        await ConseillerSqlModel.creer(conseillerDto)
+        const jeune1 = await JeuneSqlModel.creer(unJeuneDto())
+        const jeune2 = await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: 'PLOP'
+          })
+        )
+
+        const unRendezVous = unRendezVousDto({
+          date: uneDatetime.toJSDate(),
+          titre: 'UN RENDEZ VOUS'
+        })
+
+        await RendezVousSqlModel.create({
+          ...unRendezVous
+        })
+
+        await RendezVousJeuneAssociationModel.bulkCreate([
+          {
+            idJeune: jeune1.id,
+            idRendezVous: unRendezVous.id
+          },
+          {
+            idJeune: jeune2.id,
+            idRendezVous: unRendezVous.id
+          }
+        ])
+
+        // When
+        const call = getDetailRendezVousQueryHandler.authorize(
+          {
+            idRendezVous: unRendezVous.id
+          },
+          unUtilisateurConseiller({ id: 'un-autre-id' })
+        )
+
+        // Then
+        expect(call).to.be.rejectedWith(Unauthorized)
+      })
     })
   })
 })

@@ -1,6 +1,6 @@
 import {
-  RendezVousConseillerQueryModel,
-  RendezVousQueryModel
+  RendezVousConseillerFutursEtPassesQueryModel,
+  RendezVousConseillerQueryModel
 } from 'src/application/queries/query-models/rendez-vous.query-models'
 import {
   RendezVous,
@@ -35,22 +35,29 @@ export const unRendezVous = (
   return { ...defaults, ...args }
 }
 
-export const unRendezVousQueryModel = (
-  args: Partial<RendezVousQueryModel> = {}
-): RendezVousQueryModel => {
+export const unRendezVousConseillerQueryModel = (
+  args: Partial<RendezVousConseillerQueryModel> = {}
+): RendezVousConseillerQueryModel => {
   const defaults = {
     id: '1',
     title: '',
     modality: 'modalite',
     comment: 'commentaire',
     date: new Date('2021-11-11T08:03:30.000Z'),
-    isLocaleDate: false,
     duration: 30,
+    invitation: false,
     jeune: {
       id: '1',
       nom: 'test',
       prenom: 'test'
     },
+    jeunes: [
+      {
+        id: '1',
+        nom: 'test',
+        prenom: 'test'
+      }
+    ],
     type: {
       code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
       label:
@@ -63,8 +70,8 @@ export const unRendezVousQueryModel = (
   return { ...defaults, ...args }
 }
 
-export const unRendezVousConseillerQueryModel =
-  (): RendezVousConseillerQueryModel => ({
-    futurs: [unRendezVousQueryModel()],
-    passes: [unRendezVousQueryModel()]
+export const unRendezVousConseillerFutursEtPassesQueryModel =
+  (): RendezVousConseillerFutursEtPassesQueryModel => ({
+    futurs: [unRendezVousConseillerQueryModel()],
+    passes: [unRendezVousConseillerQueryModel()]
   })

@@ -1,5 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common'
-import { RendezVous, RendezVousRepositoryToken } from 'src/domain/rendez-vous'
+import { Injectable } from '@nestjs/common'
+import {
+  CodeTypeRendezVous,
+  mapCodeLabelTypeRendezVous
+} from 'src/domain/rendez-vous'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { TypesRendezVousQueryModel } from './query-models/rendez-vous.query-models'
@@ -9,10 +12,7 @@ export class GetTypesRendezVousQueryHandler extends QueryHandler<
   Query,
   TypesRendezVousQueryModel
 > {
-  constructor(
-    @Inject(RendezVousRepositoryToken)
-    private rendezVousRepository: RendezVous.Repository
-  ) {
+  constructor() {
     super('GetTypesRendezvousQueryHandler')
   }
 
@@ -20,7 +20,9 @@ export class GetTypesRendezVousQueryHandler extends QueryHandler<
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _query: Query
   ): Promise<TypesRendezVousQueryModel> {
-    return this.rendezVousRepository.getTypesRendezVousQueryModel()
+    return Object.values(CodeTypeRendezVous).map(code => {
+      return { code, label: mapCodeLabelTypeRendezVous[code] }
+    })
   }
 
   async authorize(

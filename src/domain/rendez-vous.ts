@@ -1,8 +1,3 @@
-import {
-  RendezVousConseillerQueryModel,
-  RendezVousQueryModel,
-  TypesRendezVousQueryModel
-} from '../application/queries/query-models/rendez-vous.query-models'
 import { IdService } from '../utils/id-service'
 import { Jeune } from './jeune'
 import { Conseiller } from './conseiller'
@@ -88,23 +83,8 @@ export namespace RendezVous {
   export interface Repository {
     save(rendezVous: RendezVous): Promise<void>
     get(id: string): Promise<RendezVous | undefined>
-    getAllAVenir(): Promise<RendezVous[]>
     delete(idRendezVous: string): Promise<void>
-    getAllQueryModelsByConseiller(
-      idConseiller: string,
-      presenceConseiller?: boolean
-    ): Promise<RendezVousConseillerQueryModel>
-    getAllQueryModelsByJeune(idJeune: string): Promise<RendezVousQueryModel[]>
-    getRendezVousPassesQueryModelsByJeune(
-      idJeune: string
-    ): Promise<RendezVousQueryModel[]>
-    getRendezVousFutursQueryModelsByJeune(
-      idJeune: string
-    ): Promise<RendezVousQueryModel[]>
-    getTypesRendezVousQueryModel(): TypesRendezVousQueryModel
-    getQueryModelById(
-      idRendezVous: string
-    ): Promise<RendezVousQueryModel | undefined>
+    getAllAVenir(): Promise<RendezVous[]>
   }
 
   export enum Periode {

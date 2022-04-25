@@ -1,13 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
+import { Op } from 'sequelize'
 import { Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
+import { RendezVous } from '../../domain/rendez-vous'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
+import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
+import { DateService } from '../../utils/date-service'
 import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
-import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
 import { Evenement, EvenementService } from '../../domain/evenement'
+import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
+import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-models'
 
 export interface GetRendezVousJeuneQuery extends Query {
   idJeune: string
@@ -17,11 +22,10 @@ export interface GetRendezVousJeuneQuery extends Query {
 @Injectable()
 export class GetRendezVousJeuneQueryHandler extends QueryHandler<
   GetRendezVousJeuneQuery,
-  Result<RendezVousQueryModel[]>
+  Result<RendezVousJeuneQueryModel[]>
 > {
   constructor(
-    @Inject(RendezVousRepositoryToken)
-    private rendezVousRepository: RendezVous.Repository,
+    private dateService: DateService,
     private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer,
     private jeuneAuthorizer: JeuneAuthorizer,
     private evenementService: EvenementService
@@ -31,31 +35,27 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
 
   async handle(
     query: GetRendezVousJeuneQuery
-  ): Promise<Result<RendezVousQueryModel[]>> {
-    let responseRendezVous: RendezVousQueryModel[]
+  ): Promise<Result<RendezVousJeuneQueryModel[]>> {
+    let rendezVousSql
 
     switch (query.periode) {
       case RendezVous.Periode.PASSES:
-        responseRendezVous =
-          await this.rendezVousRepository.getRendezVousPassesQueryModelsByJeune(
-            query.idJeune
-          )
+        rendezVousSql = await this.getRendezVousPassesQueryModelsByJeune(
+          query.idJeune
+        )
         break
       case RendezVous.Periode.FUTURS:
-        responseRendezVous =
-          await this.rendezVousRepository.getRendezVousFutursQueryModelsByJeune(
-            query.idJeune
-          )
+        rendezVousSql = await this.getRendezVousFutursQueryModelsByJeune(
+          query.idJeune
+        )
         break
       default:
-        responseRendezVous =
-          await this.rendezVousRepository.getAllQueryModelsByJeune(
-            query.idJeune
-          )
+        rendezVousSql = await this.getAllQueryModelsByJeune(query.idJeune)
     }
 
-    return success(responseRendezVous)
+    return success(rendezVousSql.map(fromSqlToRendezVousJeuneQueryModel))
   }
+
   async authorize(
     query: GetRendezVousJeuneQuery,
     utilisateur: Authentification.Utilisateur
@@ -80,5 +80,71 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
         utilisateur
       )
     }
+  }
+
+  private async getRendezVousPassesQueryModelsByJeune(
+    idJeune: string
+  ): Promise<RendezVousSqlModel[]> {
+    const maintenant = this.dateService.nowAtMidnightJs()
+    return RendezVousSqlModel.findAll({
+      include: [
+        {
+          model: JeuneSqlModel,
+          where: { id: idJeune }
+        }
+      ],
+      where: {
+        date: {
+          [Op.lt]: maintenant
+        },
+        dateSuppression: {
+          [Op.is]: null
+        }
+      },
+      order: [['date', 'DESC']],
+      limit: 100
+    })
+  }
+
+  private async getRendezVousFutursQueryModelsByJeune(
+    idJeune: string
+  ): Promise<RendezVousSqlModel[]> {
+    const maintenant = this.dateService.nowAtMidnightJs()
+    return RendezVousSqlModel.findAll({
+      include: [
+        {
+          model: JeuneSqlModel,
+          where: { id: idJeune }
+        }
+      ],
+      where: {
+        date: {
+          [Op.gte]: maintenant
+        },
+        dateSuppression: {
+          [Op.is]: null
+        }
+      },
+      order: [['date', 'ASC']]
+    })
+  }
+
+  private async getAllQueryModelsByJeune(
+    idJeune: string
+  ): Promise<RendezVousSqlModel[]> {
+    return RendezVousSqlModel.findAll({
+      include: [
+        {
+          model: JeuneSqlModel,
+          where: { id: idJeune }
+        }
+      ],
+      where: {
+        dateSuppression: {
+          [Op.is]: null
+        }
+      },
+      order: [['date', 'ASC']]
+    })
   }
 }
