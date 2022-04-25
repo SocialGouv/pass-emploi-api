@@ -46,7 +46,7 @@ import {
   ResumeActionsDuJeuneQueryModel
 } from '../../application/queries/query-models/jeunes.query-models'
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
-import { RendezVousConseillerQueryModel } from '../../application/queries/query-models/rendez-vous.query-models'
+import { RendezVousConseillerFutursEtPassesQueryModel } from '../../application/queries/query-models/rendez-vous.query-models'
 import {
   DossierExisteDejaError,
   DroitsInsuffisants,
@@ -269,13 +269,13 @@ export class ConseillersController {
 
   @Get(':idConseiller/rendezvous')
   @ApiResponse({
-    type: RendezVousConseillerQueryModel
+    type: RendezVousConseillerFutursEtPassesQueryModel
   })
   async getRendezVous(
     @Query() getRendezVousConseillerQuery: GetRendezVousConseillerQueryParams,
     @Param('idConseiller') idConseiller: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<RendezVousConseillerQueryModel> {
+  ): Promise<RendezVousConseillerFutursEtPassesQueryModel> {
     return this.getAllRendezVousConseillerQueryHandler.execute(
       {
         idConseiller,

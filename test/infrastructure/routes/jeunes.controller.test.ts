@@ -21,7 +21,7 @@ import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune.query.handler'
 import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-models'
-import { RendezVousQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-models'
+import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-models'
 import {
   DomainError,
   DroitsInsuffisants,
@@ -637,7 +637,7 @@ describe('JeunesController', () => {
 
     describe("quand ce n'est pas un jeune pole-emploi", () => {
       const idJeune = '1'
-      const rendezVousJeuneQueryModel: RendezVousQueryModel[] = []
+      const rendezVousJeuneQueryModel: RendezVousJeuneQueryModel[] = []
 
       it('renvoit une 404 quand le jeune n"existe pas', async () => {
         // Given

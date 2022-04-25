@@ -6,7 +6,7 @@ import {
 import { PrestationDto } from 'src/infrastructure/clients/pole-emploi-partenaire-client'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
-import { RendezVousQueryModel } from '../query-models/rendez-vous.query-models'
+import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-models'
 
 export function fromPrestationDtoToRendezVousQueryModel(
   prestation: PrestationDto,
@@ -14,7 +14,7 @@ export function fromPrestationDtoToRendezVousQueryModel(
   idService: IdService,
   dateService: DateService,
   lienVisio?: string
-): RendezVousQueryModel {
+): RendezVousJeuneQueryModel {
   return {
     id: idService.uuid(),
     title: '',

@@ -11,7 +11,7 @@ import { CodeTypeRendezVous } from 'src/domain/rendez-vous'
 import { CreateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
 import * as request from 'supertest'
 import { uneDatetime } from 'test/fixtures/date.fixture'
-import { unRendezVousConseillerQueryModel } from 'test/fixtures/rendez-vous.fixture'
+import { unRendezVousConseillerFutursEtPassesQueryModel } from 'test/fixtures/rendez-vous.fixture'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
 import {
   CreerJeuneMiloCommand,
@@ -405,14 +405,16 @@ describe('ConseillersController', () => {
             { idConseiller: '41', presenceConseiller: undefined },
             unUtilisateurDecode()
           )
-          .resolves(unRendezVousConseillerQueryModel())
+          .resolves(unRendezVousConseillerFutursEtPassesQueryModel())
 
         // When - Then
         await request(app.getHttpServer())
           .get('/conseillers/41/rendezvous')
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.OK)
-          .expect(JSON.stringify(unRendezVousConseillerQueryModel()))
+          .expect(
+            JSON.stringify(unRendezVousConseillerFutursEtPassesQueryModel())
+          )
       })
     })
   })

@@ -1,5 +1,6 @@
 import {
   BelongsTo,
+  BelongsToMany,
   Column,
   DataType,
   ForeignKey,
@@ -12,8 +13,12 @@ import { Core } from '../../../domain/core'
 import { AsSql } from '../types'
 import { ActionSqlModel } from './action.sql-model'
 import { ConseillerSqlModel } from './conseiller.sql-model'
-import { RendezVousSqlModel } from './rendez-vous.sql-model'
+import {
+  RendezVousSqlModelOld,
+  RendezVousSqlModel
+} from './rendez-vous.sql-model'
 import { TransfertConseillerSqlModel } from './transfert-conseiller.sql-model'
+import { RendezVousJeuneAssociationModel } from './rendez-vous-jeune-association.model'
 
 export class JeuneDto extends Model {
   @PrimaryKey
@@ -105,8 +110,14 @@ export class JeuneSqlModel extends JeuneDto {
   @BelongsTo(() => ConseillerSqlModel)
   conseiller?: ConseillerSqlModel
 
-  @HasMany(() => RendezVousSqlModel)
-  rendezVous!: RendezVousSqlModel[]
+  @HasMany(() => RendezVousSqlModelOld)
+  rendezVous!: RendezVousSqlModelOld[]
+
+  @BelongsToMany(
+    () => RendezVousSqlModel,
+    () => RendezVousJeuneAssociationModel
+  )
+  rdv: RendezVousSqlModel[]
 
   @HasMany(() => ActionSqlModel)
   actions!: ActionSqlModel[]
@@ -114,8 +125,8 @@ export class JeuneSqlModel extends JeuneDto {
   @HasMany(() => TransfertConseillerSqlModel)
   transferts: TransfertConseillerSqlModel[]
 
-  static async creer(jeuneDto: AsSql<JeuneDto>): Promise<void> {
-    await JeuneSqlModel.create(jeuneDto)
+  static async creer(jeuneDto: AsSql<JeuneDto>): Promise<JeuneSqlModel> {
+    return JeuneSqlModel.create(jeuneDto)
   }
 
   static async supprimer(idJeune: string): Promise<void> {

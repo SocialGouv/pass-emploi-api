@@ -6,6 +6,7 @@ import {
 } from 'src/building-blocks/types/domain-error'
 import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
 import { RendezVous } from 'src/domain/rendez-vous'
 import { DateService } from 'src/utils/date-service'
@@ -21,8 +22,7 @@ import {
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
 import { fromRendezVousDtoToRendezVousQueryModel } from './query-mappers/rendez-vous-pole-emploi.mappers'
 import { fromPrestationDtoToRendezVousQueryModel } from './query-mappers/rendez-vous-prestation.mappers'
-import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
-import { Evenement, EvenementService } from '../../domain/evenement'
+import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-models'
 
 export interface GetRendezVousJeunePoleEmploiQuery extends Query {
   idJeune: string
@@ -33,7 +33,7 @@ export interface GetRendezVousJeunePoleEmploiQuery extends Query {
 @Injectable()
 export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
   GetRendezVousJeunePoleEmploiQuery,
-  Result<RendezVousQueryModel[]>
+  Result<RendezVousJeuneQueryModel[]>
 > {
   constructor(
     @Inject(JeunesRepositoryToken)
@@ -50,7 +50,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
 
   async handle(
     query: GetRendezVousJeunePoleEmploiQuery
-  ): Promise<Result<RendezVousQueryModel[]>> {
+  ): Promise<Result<RendezVousJeuneQueryModel[]>> {
     const jeune = await this.jeuneRepository.get(query.idJeune)
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
@@ -151,8 +151,8 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
 }
 
 function sortRendezVousByDate(
-  rdv1: RendezVousQueryModel,
-  rdv2: RendezVousQueryModel
+  rdv1: RendezVousJeuneQueryModel,
+  rdv2: RendezVousJeuneQueryModel
 ): number {
   const date1 = new Date(rdv1.date).getTime()
   const date2 = new Date(rdv2.date).getTime()

@@ -1,36 +1,70 @@
+import { stubInterface } from '@salesforce/ts-sinon'
+import { RendezVousJeuneAssociationModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
+import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { SinonSandbox } from 'sinon'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import Periode = RendezVous.Periode
 import {
   GetRendezVousJeuneQuery,
   GetRendezVousJeuneQueryHandler
 } from '../../../src/application/queries/get-rendez-vous-jeune.query.handler'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { RendezVous } from '../../../src/domain/rendez-vous'
-import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
-import { SinonSandbox } from 'sinon'
-import { RendezVousQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-models'
-import { Result } from '../../../src/building-blocks/types/result'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { Evenement, EvenementService } from '../../../src/domain/evenement'
-import Periode = RendezVous.Periode
+import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import {
+  RendezVousDto,
+  RendezVousSqlModel
+} from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { AsSql } from '../../../src/infrastructure/sequelize/types'
+import { DateService } from '../../../src/utils/date-service'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
+import { uneDatetime, uneDatetimeMinuit } from '../../fixtures/date.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
+import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
+import {
+  createSandbox,
+  DatabaseForTesting,
+  expect,
+  StubbedClass,
+  stubClass
+} from '../../utils'
 
 describe('GetRendezVousJeuneQueryHandler', () => {
-  let rendezVousRepository: StubbedType<RendezVous.Repository>
+  DatabaseForTesting.prepare()
+  let dateService: StubbedClass<DateService>
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let getRendezVousQueryHandler: GetRendezVousJeuneQueryHandler
   let evenementService: StubbedClass<EvenementService>
   let sandbox: SinonSandbox
 
+  const maintenant = uneDatetime
+  const aujourdhuiMinuit = uneDatetimeMinuit
+  let unRendezVousPasse: AsSql<RendezVousDto>
+  let unRendezVousTresPasse: AsSql<RendezVousDto>
+  let unRendezVousProche: AsSql<RendezVousDto>
+  let unRendezVousTresFuturPresenceConseillerFalse: AsSql<RendezVousDto>
+  const jeune1 = unJeune({ id: 'jeune-1' })
+  const jeune2 = unJeune({ id: 'jeune-2' })
+
   beforeEach(() => {
     sandbox = createSandbox()
-    rendezVousRepository = stubInterface(sandbox)
+    dateService = stubInterface(sandbox)
+    dateService.nowJs.returns(maintenant.toJSDate())
+    dateService.nowAtMidnightJs.returns(aujourdhuiMinuit.toJSDate())
+
     conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     evenementService = stubClass(EvenementService)
 
     getRendezVousQueryHandler = new GetRendezVousJeuneQueryHandler(
-      rendezVousRepository,
+      dateService,
       conseillerForJeuneAuthorizer,
       jeuneAuthorizer,
       evenementService
@@ -42,79 +76,141 @@ describe('GetRendezVousJeuneQueryHandler', () => {
   })
 
   describe('handle', () => {
-    const idJeune = '1'
-    const rendezVousReponse: RendezVousQueryModel[] = []
+    beforeEach(async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseillerDto())
+      await JeuneSqlModel.creer(unJeuneDto({ id: jeune1.id }))
+      await JeuneSqlModel.creer(unJeuneDto({ id: jeune2.id }))
+
+      unRendezVousPasse = unRendezVousDto({
+        date: maintenant.minus({ days: 2 }).toJSDate(),
+        titre: 'UN RENDEZ VOUS PASSÉ'
+      })
+      unRendezVousTresPasse = unRendezVousDto({
+        date: maintenant.minus({ days: 20 }).toJSDate(),
+        titre: 'UN RENDEZ VOUS TRES PASSÉ'
+      })
+      unRendezVousProche = unRendezVousDto({
+        date: maintenant.plus({ days: 2 }).toJSDate(),
+        titre: 'UN RENDEZ VOUS PROCHE'
+      })
+      unRendezVousTresFuturPresenceConseillerFalse = unRendezVousDto({
+        date: maintenant.plus({ days: 20 }).toJSDate(),
+        titre: 'UN RENDEZ TRES FUTUR',
+        presenceConseiller: false
+      })
+
+      await RendezVousSqlModel.bulkCreate([
+        unRendezVousPasse,
+        unRendezVousTresPasse,
+        unRendezVousTresFuturPresenceConseillerFalse,
+        unRendezVousProche
+      ])
+      await RendezVousJeuneAssociationModel.bulkCreate([
+        {
+          idJeune: jeune1.id,
+          idRendezVous: unRendezVousPasse.id
+        },
+        {
+          idJeune: jeune1.id,
+          idRendezVous: unRendezVousTresPasse.id
+        },
+        {
+          idJeune: jeune2.id,
+          idRendezVous: unRendezVousTresPasse.id
+        },
+        {
+          idJeune: jeune1.id,
+          idRendezVous: unRendezVousTresFuturPresenceConseillerFalse.id
+        },
+        {
+          idJeune: jeune2.id,
+          idRendezVous: unRendezVousTresFuturPresenceConseillerFalse.id
+        },
+        {
+          idJeune: jeune1.id,
+          idRendezVous: unRendezVousProche.id
+        }
+      ])
+    })
 
     describe('sans periode', () => {
-      it('appelle la methode pour tous les rendez-vous', async () => {
-        // Given
-        const query: GetRendezVousJeuneQuery = {
-          idJeune: idJeune,
-          periode: undefined
-        }
-        rendezVousRepository.getAllQueryModelsByJeune.resolves(
-          rendezVousReponse
-        )
+      it('retourne tous les rendez-vous du jeune', async () => {
         // When
-        const obtenu: Result<RendezVousQueryModel[]> =
-          await getRendezVousQueryHandler.handle(query)
+        const result = await getRendezVousQueryHandler.handle({
+          idJeune: jeune1.id
+        })
 
         // Then
-        expect(
-          rendezVousRepository.getAllQueryModelsByJeune
-        ).to.have.been.calledWithExactly(query.idJeune)
-        expect(obtenu._isSuccess).to.equal(true)
-        if (obtenu._isSuccess) {
-          expect(obtenu.data).to.equal(rendezVousReponse)
+        expect(result._isSuccess).to.equal(true)
+
+        if (result._isSuccess) {
+          expect(result.data.length).to.equal(4)
+          expect(result.data[0].id).to.equal(unRendezVousTresPasse.id)
+          expect(result.data[0].jeune.id).to.equal(jeune1.id)
+          expect(result.data[1].id).to.equal(unRendezVousPasse.id)
+          expect(result.data[2].id).to.equal(unRendezVousProche.id)
+          expect(result.data[3].id).to.equal(
+            unRendezVousTresFuturPresenceConseillerFalse.id
+          )
+        }
+      })
+      it('retourne que les rendez-vous qui concernent le jeune', async () => {
+        // When
+        const result = await getRendezVousQueryHandler.handle({
+          idJeune: jeune2.id
+        })
+
+        // Then
+        expect(result._isSuccess).to.equal(true)
+
+        if (result._isSuccess) {
+          expect(result.data.length).to.equal(2)
+          expect(result.data[0].id).to.equal(unRendezVousTresPasse.id)
+          expect(result.data[0].jeune.id).to.equal(jeune2.id)
+          expect(result.data[1].id).to.equal(
+            unRendezVousTresFuturPresenceConseillerFalse.id
+          )
         }
       })
     })
 
     describe('periode FUTURS renseignée', () => {
-      it('appelle la methode pour les rendez-vous futurs', async () => {
-        // Given
-        const query: GetRendezVousJeuneQuery = {
-          idJeune: idJeune,
-          periode: RendezVous.Periode.FUTURS
-        }
-        rendezVousRepository.getRendezVousFutursQueryModelsByJeune.resolves(
-          rendezVousReponse
-        )
+      it('retourne les rendez-vous futurs du jeune', async () => {
         // When
-        const obtenu: Result<RendezVousQueryModel[]> =
-          await getRendezVousQueryHandler.handle(query)
+        const result = await getRendezVousQueryHandler.handle({
+          idJeune: jeune1.id,
+          periode: RendezVous.Periode.FUTURS
+        })
 
         // Then
-        expect(
-          rendezVousRepository.getRendezVousFutursQueryModelsByJeune
-        ).to.have.been.calledWithExactly(query.idJeune)
-        expect(obtenu._isSuccess).to.equal(true)
-        if (obtenu._isSuccess) {
-          expect(obtenu.data).to.equal(rendezVousReponse)
+        expect(result._isSuccess).to.equal(true)
+
+        if (result._isSuccess) {
+          expect(result.data.length).to.equal(2)
+          expect(result.data[0].id).to.equal(unRendezVousProche.id)
+          expect(result.data[1].id).to.equal(
+            unRendezVousTresFuturPresenceConseillerFalse.id
+          )
         }
       })
     })
+
     describe('periode PASSES renseignée', () => {
-      it('appelle la methode pour les rendez-vous passés', async () => {
-        // Given
-        const query: GetRendezVousJeuneQuery = {
-          idJeune: idJeune,
-          periode: RendezVous.Periode.PASSES
-        }
-        rendezVousRepository.getRendezVousPassesQueryModelsByJeune.resolves(
-          rendezVousReponse
-        )
+      it('retourne les rendez-vous passés du jeune', async () => {
         // When
-        const obtenu: Result<RendezVousQueryModel[]> =
-          await getRendezVousQueryHandler.handle(query)
+        const result = await getRendezVousQueryHandler.handle({
+          idJeune: jeune1.id,
+          periode: RendezVous.Periode.PASSES
+        })
 
         // Then
-        expect(
-          rendezVousRepository.getRendezVousPassesQueryModelsByJeune
-        ).to.have.been.calledWithExactly(query.idJeune)
-        expect(obtenu._isSuccess).to.equal(true)
-        if (obtenu._isSuccess) {
-          expect(obtenu.data).to.equal(rendezVousReponse)
+        expect(result._isSuccess).to.equal(true)
+
+        if (result._isSuccess) {
+          expect(result.data.length).to.equal(2)
+          expect(result.data[0].id).to.equal(unRendezVousPasse.id)
+          expect(result.data[1].id).to.equal(unRendezVousTresPasse.id)
         }
       })
     })
@@ -170,6 +266,38 @@ describe('GetRendezVousJeuneQueryHandler', () => {
 
       // Then
       expect(evenementService.creerEvenement).to.have.callCount(0)
+    })
+  })
+  describe('authorize', () => {
+    it('autorise un jeune', () => {
+      // When
+      getRendezVousQueryHandler.authorize(
+        {
+          idJeune: jeune1.id
+        },
+        unUtilisateurJeune()
+      )
+
+      // Then
+      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+        jeune1.id,
+        unUtilisateurJeune()
+      )
+    })
+
+    it('autorise le conseiller du jeune', () => {
+      // When
+      getRendezVousQueryHandler.authorize(
+        {
+          idJeune: jeune1.id
+        },
+        unUtilisateurConseiller()
+      )
+
+      // Then
+      expect(
+        conseillerForJeuneAuthorizer.authorize
+      ).to.have.been.calledWithExactly(jeune1.id, unUtilisateurConseiller())
     })
   })
 })

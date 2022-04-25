@@ -92,18 +92,19 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       }
     }
 
-    it('retourne un RendezVousQueryModel avec le bon modele, la durée en jour et la date en UTC', async () => {
+    it('retourne un RendezVousConseillerQueryModel avec le bon modele, la durée en jour et la date en UTC', async () => {
       dateService.fromISOStringToUTCJSDate.returns(dateUTC)
       // When
-      const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
-        prestation,
-        jeune,
-        idService,
-        dateService
-      )
+      const RendezVousConseillerQueryModel =
+        fromPrestationDtoToRendezVousQueryModel(
+          prestation,
+          jeune,
+          idService,
+          dateService
+        )
 
       // Then
-      expect(rendezVousQueryModel).to.deep.equal({
+      expect(RendezVousConseillerQueryModel).to.deep.equal({
         agencePE: true,
         annule: false,
         idStable: undefined,
@@ -132,36 +133,38 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         lienVisio: undefined
       })
     })
-    it('retourne un RendezVousQueryModel avec la durée en heures', async () => {
+    it('retourne un RendezVousConseillerQueryModel avec la durée en heures', async () => {
       prestation.session.duree = {
         unite: 'HEURE',
         valeur: 1.5
       }
       // When
-      const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
-        prestation,
-        jeune,
-        idService,
-        dateService
-      )
+      const RendezVousConseillerQueryModel =
+        fromPrestationDtoToRendezVousQueryModel(
+          prestation,
+          jeune,
+          idService,
+          dateService
+        )
       // Then
-      expect(rendezVousQueryModel.duration).to.equal(90)
+      expect(RendezVousConseillerQueryModel.duration).to.equal(90)
     })
-    it('retourne un RendezVousQueryModel avec la visio', async () => {
+    it('retourne un RendezVousConseillerQueryModel avec la visio', async () => {
       //Given
       const lienVisio = 'visio'
       // When
-      const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
-        prestation,
-        jeune,
-        idService,
-        dateService,
-        lienVisio
-      )
+      const RendezVousConseillerQueryModel =
+        fromPrestationDtoToRendezVousQueryModel(
+          prestation,
+          jeune,
+          idService,
+          dateService,
+          lienVisio
+        )
       // Then
-      expect(rendezVousQueryModel.lienVisio).to.equal(lienVisio)
+      expect(RendezVousConseillerQueryModel.lienVisio).to.equal(lienVisio)
     })
-    it("retourne un RendezVousQueryModel avec l'adresse", async () => {
+    it("retourne un RendezVousConseillerQueryModel avec l'adresse", async () => {
       // Given
       prestation.session.adresse = {
         adresseLigne1: 'ligne1',
@@ -170,46 +173,51 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         ville: 'ville'
       }
       // When
-      const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
-        prestation,
-        jeune,
-        idService,
-        dateService
-      )
+      const RendezVousConseillerQueryModel =
+        fromPrestationDtoToRendezVousQueryModel(
+          prestation,
+          jeune,
+          idService,
+          dateService
+        )
       // Then
-      expect(rendezVousQueryModel.adresse).to.equal(
+      expect(RendezVousConseillerQueryModel.adresse).to.equal(
         'ligne1 ligne2 code postal ville'
       )
     })
-    it('retourne un RendezVousQueryModel avec la description theme', async () => {
+    it('retourne un RendezVousConseillerQueryModel avec la description theme', async () => {
       prestation.session.themeAtelier = {
         libelle: 'theme',
         descriptif: 'descriptif'
       }
       // When
-      const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
-        prestation,
-        jeune,
-        idService,
-        dateService
-      )
+      const RendezVousConseillerQueryModel =
+        fromPrestationDtoToRendezVousQueryModel(
+          prestation,
+          jeune,
+          idService,
+          dateService
+        )
       // Then
-      expect(rendezVousQueryModel.description).to.equal('theme\ndescriptif')
+      expect(RendezVousConseillerQueryModel.description).to.equal(
+        'theme\ndescriptif'
+      )
     })
-    it('retourne un RendezVousQueryModel avec la description sous theme', async () => {
+    it('retourne un RendezVousConseillerQueryModel avec la description sous theme', async () => {
       prestation.session.sousThemeAtelier = {
         libelleSousThemeAtelier: 'sous theme',
         descriptifSousThemeAtelier: 'descriptif'
       }
       // When
-      const rendezVousQueryModel = fromPrestationDtoToRendezVousQueryModel(
-        prestation,
-        jeune,
-        idService,
-        dateService
-      )
+      const RendezVousConseillerQueryModel =
+        fromPrestationDtoToRendezVousQueryModel(
+          prestation,
+          jeune,
+          idService,
+          dateService
+        )
       // Then
-      expect(rendezVousQueryModel.description).to.equal(
+      expect(RendezVousConseillerQueryModel.description).to.equal(
         'sous theme\ndescriptif'
       )
     })
@@ -239,16 +247,17 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       lienVisio: 'lien'
     }
 
-    it("retourne un RendezVousQueryModel avec la modalité visio, l'adresse et la date", async () => {
+    it("retourne un RendezVousConseillerQueryModel avec la modalité visio, l'adresse et la date", async () => {
       // When
-      const rendezVousQueryModel = fromRendezVousDtoToRendezVousQueryModel(
-        rendezVousPoleEmploiDto,
-        jeune,
-        idService
-      )
+      const RendezVousConseillerQueryModel =
+        fromRendezVousDtoToRendezVousQueryModel(
+          rendezVousPoleEmploiDto,
+          jeune,
+          idService
+        )
 
       // Then
-      expect(rendezVousQueryModel).to.deep.equal({
+      expect(RendezVousConseillerQueryModel).to.deep.equal({
         agencePE: false,
         date: dateUTC,
         isLocaleDate: true,
@@ -274,21 +283,24 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         lienVisio: 'lien'
       })
     })
-    it('retourne un RendezVousQueryModel avec la modalité agence, et le conseiller', async () => {
+    it('retourne un RendezVousConseillerQueryModel avec la modalité agence, et le conseiller', async () => {
       // Given
       rendezVousPoleEmploiDto.modaliteContact = 'AGENCE'
       rendezVousPoleEmploiDto.nomConseiller = 'Tavernier'
       rendezVousPoleEmploiDto.prenomConseiller = 'Nils'
       // When
-      const rendezVousQueryModel = fromRendezVousDtoToRendezVousQueryModel(
-        rendezVousPoleEmploiDto,
-        jeune,
-        idService
-      )
+      const RendezVousConseillerQueryModel =
+        fromRendezVousDtoToRendezVousQueryModel(
+          rendezVousPoleEmploiDto,
+          jeune,
+          idService
+        )
       // Then
-      expect(rendezVousQueryModel.agencePE).to.equal(true)
-      expect(rendezVousQueryModel.modality).to.equal('en agence Pôle emploi')
-      expect(rendezVousQueryModel.conseiller).to.deep.equal({
+      expect(RendezVousConseillerQueryModel.agencePE).to.equal(true)
+      expect(RendezVousConseillerQueryModel.modality).to.equal(
+        'en agence Pôle emploi'
+      )
+      expect(RendezVousConseillerQueryModel.conseiller).to.deep.equal({
         id: 'random-id',
         nom: 'Tavernier',
         prenom: 'Nils'

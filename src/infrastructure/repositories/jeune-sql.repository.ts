@@ -16,7 +16,7 @@ import { Jeune } from '../../domain/jeune'
 import { ActionSqlModel } from '../sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
-import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
+import { RendezVousSqlModelOld } from '../sequelize/models/rendez-vous.sql-model'
 import { TransfertConseillerSqlModel } from '../sequelize/models/transfert-conseiller.sql-model'
 import { SequelizeInjectionToken } from '../sequelize/providers'
 import {
@@ -215,7 +215,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
       include: [
         ConseillerSqlModel,
         {
-          model: RendezVousSqlModel,
+          model: RendezVousSqlModelOld,
           where: {
             dateSuppression: {
               [Op.is]: null

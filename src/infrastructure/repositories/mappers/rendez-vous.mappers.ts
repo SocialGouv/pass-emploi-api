@@ -1,12 +1,13 @@
-import { RendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
-import { mapCodeLabelTypeRendezVous, RendezVous } from 'src/domain/rendez-vous'
+import { RendezVous } from 'src/domain/rendez-vous'
 import {
-  RendezVousDto,
-  RendezVousSqlModel
+  RendezVousDtoOld,
+  RendezVousSqlModelOld
 } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from 'src/infrastructure/sequelize/types'
 
-export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
+export function toRendezVousDto(
+  rendezVous: RendezVous
+): AsSql<RendezVousDtoOld> {
   return {
     id: rendezVous.id,
     titre: rendezVous.titre,
@@ -28,7 +29,7 @@ export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
   }
 }
 
-export function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
+export function toRendezVous(rendezVousSql: RendezVousSqlModelOld): RendezVous {
   return {
     id: rendezVousSql.id,
     titre: rendezVousSql.titre,
@@ -59,60 +60,6 @@ export function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
     presenceConseiller: rendezVousSql.presenceConseiller,
     invitation: rendezVousSql.invitation ?? undefined,
     icsSequence: rendezVousSql.icsSequence ?? undefined,
-    createur: rendezVousSql.createur
-  }
-}
-
-export function fromSqlToRendezVousConseillerQueryModel(
-  rendezVousSql: RendezVousSqlModel
-): RendezVousQueryModel {
-  return {
-    ...fromSqlToRendezVousQueryModel(rendezVousSql),
-    title: `${rendezVousSql.jeune.prenom} ${rendezVousSql.jeune.nom}`
-  }
-}
-
-export function fromSqlToRendezVousJeuneQueryModel(
-  rendezVousSql: RendezVousSqlModel
-): RendezVousQueryModel {
-  return {
-    ...fromSqlToRendezVousQueryModel(rendezVousSql),
-    title: `${rendezVousSql.jeune.conseiller!.prenom} ${
-      rendezVousSql.jeune.conseiller!.nom
-    }`,
-    conseiller: {
-      id: rendezVousSql.jeune.conseiller!.id,
-      prenom: rendezVousSql.jeune.conseiller!.prenom,
-      nom: rendezVousSql.jeune.conseiller!.nom
-    }
-  }
-}
-
-export function fromSqlToRendezVousQueryModel(
-  rendezVousSql: RendezVousSqlModel
-): RendezVousQueryModel {
-  return {
-    id: rendezVousSql.id,
-    comment: rendezVousSql.commentaire ?? undefined,
-    date: rendezVousSql.date,
-    isLocaleDate: false,
-    modality: rendezVousSql.modalite ?? '',
-    duration: rendezVousSql.duree,
-    title: '',
-    jeune: {
-      id: rendezVousSql.jeune.id,
-      prenom: rendezVousSql.jeune.prenom,
-      nom: rendezVousSql.jeune.nom
-    },
-    type: {
-      code: rendezVousSql.type,
-      label: mapCodeLabelTypeRendezVous[rendezVousSql.type]
-    },
-    precision: rendezVousSql.precision ?? undefined,
-    adresse: rendezVousSql.adresse ?? undefined,
-    organisme: rendezVousSql.organisme ?? undefined,
-    invitation: rendezVousSql.invitation ?? undefined,
-    presenceConseiller: rendezVousSql.presenceConseiller,
     createur: rendezVousSql.createur
   }
 }
