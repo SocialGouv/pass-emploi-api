@@ -21,11 +21,14 @@ export class AgenceSqlRepository implements Agence.Repository {
   }
 
   async get(id: string): Promise<Agence | undefined> {
-    const agence = await AgenceSqlModel.findByPk(id)
-    if (!agence) {
+    const agenceSql = await AgenceSqlModel.findByPk(id)
+    if (!agenceSql) {
       return undefined
     }
-    return agence
+    return {
+      id: agenceSql.id,
+      nom: agenceSql.nomAgence
+    }
   }
 
   async getStructureOfAgence(id: string): Promise<Structure | undefined> {
