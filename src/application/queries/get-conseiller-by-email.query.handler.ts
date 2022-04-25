@@ -9,7 +9,7 @@ import { DetailConseillerQueryModel } from './query-models/conseillers.query-mod
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { fromSqlToDetailConseillerQueryModel } from '../../infrastructure/repositories/mappers/conseillers.mappers'
-import {AgenceSqlModel} from "../../infrastructure/sequelize/models/agence.sql-model";
+import { AgenceSqlModel } from '../../infrastructure/sequelize/models/agence.sql-model'
 
 export interface GetConseillerByEmailQuery extends Query {
   emailConseiller: string

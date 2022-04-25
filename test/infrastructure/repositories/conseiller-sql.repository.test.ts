@@ -1,12 +1,11 @@
+import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository'
 
-import {ConseillerSqlRepository} from '../../../src/infrastructure/repositories/conseiller-sql.repository'
-
-import {unConseiller} from '../../fixtures/conseiller.fixture'
-import {DatabaseForTesting, expect} from '../../utils'
-import {uneDatetime} from 'test/fixtures/date.fixture'
-import {Conseiller} from "../../../src/domain/conseiller";
-import {AgenceSqlModel} from "../../../src/infrastructure/sequelize/models/agence.sql-model";
-import {Core} from "../../../src/domain/core";
+import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { DatabaseForTesting, expect } from '../../utils'
+import { uneDatetime } from 'test/fixtures/date.fixture'
+import { Conseiller } from '../../../src/domain/conseiller'
+import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
+import { Core } from '../../../src/domain/core'
 
 describe('ConseillerSqlRepository', () => {
   DatabaseForTesting.prepare()
@@ -26,15 +25,15 @@ describe('ConseillerSqlRepository', () => {
         structure: Core.Structure.POLE_EMPLOI,
         email: 'nils.tavernier@passemploi.com',
         agence: {
-          id: "id"
+          id: 'id'
         }
       }
       await AgenceSqlModel.create({
-        id: "id",
-        nomAgence: "nom",
-        nomRegion: "nomRegion",
-        codeDepartement: "codeDepartement",
-        structure: "MILO"
+        id: 'id',
+        nomAgence: 'nom',
+        nomRegion: 'nomRegion',
+        codeDepartement: 'codeDepartement',
+        structure: 'MILO'
       })
       await conseillerSqlRepository.save(conseiller)
 
@@ -49,8 +48,8 @@ describe('ConseillerSqlRepository', () => {
         structure: Core.Structure.POLE_EMPLOI,
         email: 'nils.tavernier@passemploi.com',
         agence: {
-          id: "id",
-          nom: "nom"
+          id: 'id',
+          nom: 'nom'
         },
         nomAgenceManuel: null
       })

@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiPropertyOptional } from '@nestjs/swagger'
 
 export class AgenceQueryModel {
   constructor(id: string, nom: string) {
@@ -6,9 +6,9 @@ export class AgenceQueryModel {
     this.nom = nom
   }
 
-  @ApiProperty({ type: 'string' })
+  @ApiPropertyOptional({ type: 'string' })
   id?: string
 
-  @ApiProperty({ type: 'string' })
+  @ApiPropertyOptional({ type: 'string' })
   nom?: string
 }
