@@ -83,7 +83,7 @@ import {
   AuthentificationRepositoryToken
 } from './domain/authentification'
 import { ChatRepositoryToken } from './domain/chat'
-import { ConseillersRepositoryToken } from './domain/conseiller'
+import { Conseiller, ConseillersRepositoryToken } from './domain/conseiller'
 import { EvenementService, EvenementsRepositoryToken } from './domain/evenement'
 import { JeunesRepositoryToken } from './domain/jeune'
 import { MiloRepositoryToken } from './domain/milo'
@@ -201,6 +201,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     TaskService,
     InvitationIcsClient,
     KeycloakClient,
+    Conseiller.Factory,
     {
       provide: APP_GUARD,
       useClass: OidcAuthGuard

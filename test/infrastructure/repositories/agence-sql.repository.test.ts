@@ -4,6 +4,8 @@ import {
   AgenceDto,
   AgenceSqlModel
 } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
+import { Core } from '../../../src/domain/core'
+import Structure = Core.Structure
 
 describe('AgenceSqlRepository', () => {
   DatabaseForTesting.prepare()
@@ -11,14 +13,14 @@ describe('AgenceSqlRepository', () => {
   const agenceMilo: Partial<AgenceDto> = {
     id: 'Bonjour je suis un id milo',
     nomAgence: 'Bonjour je suis une agence',
-    structure: 'MILO',
+    structure: Structure.MILO,
     codeDepartement: '45',
     nomRegion: 'yolo'
   }
   const agencePE: Partial<AgenceDto> = {
     id: 'Bonjour je suis un id pe',
     nomAgence: 'Bonjour je suis une agence',
-    structure: 'POLE_EMPLOI',
+    structure: Structure.POLE_EMPLOI,
     codeDepartement: '45',
     nomRegion: 'yolo'
   }

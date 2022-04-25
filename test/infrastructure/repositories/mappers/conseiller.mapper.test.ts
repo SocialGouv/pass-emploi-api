@@ -6,6 +6,8 @@ import {
   AgenceDto,
   AgenceSqlModel
 } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
+import { Core } from '../../../../src/domain/core'
+import Structure = Core.Structure
 
 describe('fromSqlToDetailConseillerQueryModel', () => {
   before(() => {
@@ -61,7 +63,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
       const uneAgence: Partial<AgenceDto> = {
         id: "id d'agence",
         nomAgence: 'Bonjour je suis une agence',
-        structure: 'MILO',
+        structure: Structure.MILO,
         codeDepartement: '45',
         nomRegion: 'yolo'
       }

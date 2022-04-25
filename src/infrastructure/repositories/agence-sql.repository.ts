@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common'
 import { Agence } from '../../domain/agence'
 import { AgenceQueryModel } from '../../application/queries/query-models/agence.query-models'
 import { AgenceSqlModel } from '../sequelize/models/agence.sql-model'
+import { Core } from '../../domain/core'
+import Structure = Core.Structure
 
 @Injectable()
 export class AgenceSqlRepository implements Agence.Repository {
@@ -24,5 +26,13 @@ export class AgenceSqlRepository implements Agence.Repository {
       return undefined
     }
     return agence
+  }
+
+  async getStructureOfAgence(id: string): Promise<Structure | undefined> {
+    const agence = await AgenceSqlModel.findByPk(id)
+    if (!agence) {
+      return undefined
+    }
+    return agence.structure
   }
 }

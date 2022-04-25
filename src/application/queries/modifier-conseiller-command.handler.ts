@@ -90,6 +90,16 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
       utilisateur.type === Authentification.Type.CONSEILLER &&
       utilisateur.id === query.idConseiller
     ) {
+      const id = query.champsConseillerAModifier.agence?.id
+      if (
+        id &&
+        (await this.agencesRepository.getStructureOfAgence(id)) !=
+          utilisateur.structure
+      ) {
+        throw new Unauthorized(
+          "Le conseiller et l'agence n'appartiennent pas à la même structure"
+        )
+      }
       return
     }
     throw new Unauthorized('Conseiller')
