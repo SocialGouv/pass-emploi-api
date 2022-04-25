@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { NotifierNouvellesOffresEmploiCommandHandler } from 'src/application/commands/jobs/handle-job-notification-recherche.command'
+import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from 'src/application/commands/jobs/handle-job-notification-recherche.command'
 import { Notification } from 'src/domain/notification'
 import {
   Contrat,
@@ -26,7 +26,7 @@ import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import { testConfig } from '../../../utils/module-for-testing'
 
 describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
-  let notifierNouvellesOffresEmploiCommandHandler: NotifierNouvellesOffresEmploiCommandHandler
+  let notifierNouvellesOffresEmploiCommandHandler: HandleJobNotifierNouvellesOffresEmploiCommandHandler
   let rechercheRepository: StubbedType<Recherche.Repository>
   let offresEmploiRepository: StubbedType<OffresEmploi.Repository>
   let notificationRepository: StubbedType<Notification.Repository>
@@ -61,7 +61,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
     dateService.now.returns(date)
 
     notifierNouvellesOffresEmploiCommandHandler =
-      new NotifierNouvellesOffresEmploiCommandHandler(
+      new HandleJobNotifierNouvellesOffresEmploiCommandHandler(
         dateService,
         rechercheRepository,
         offresEmploiRepository,

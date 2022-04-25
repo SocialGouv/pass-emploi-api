@@ -8,17 +8,24 @@ export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 export namespace Planificateur {
   export interface Repository {
     createJob<T>(job: Job<T>, jobId?: string): Promise<void>
+
     createCron(cron: Cron): Promise<void>
+
     subscribe(callback: Handler<unknown>): Promise<void>
+
     supprimerTousLesJobs(): Promise<void>
+
     supprimerLesCrons(): Promise<void>
+
     supprimerLesAnciensJobs(): Promise<void>
+
     supprimerJobsSelonPattern(pattern: string): Promise<void>
   }
 
   export enum CronJob {
     NOUVELLES_OFFRES_EMPLOI = 'NOUVELLES_OFFRES_EMPLOI',
     MAIL_CONSEILLER_MESSAGES = 'MAIL_CONSEILLER_MESSAGES',
+    UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS = 'UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS',
     NETTOYER_LES_JOBS = 'NETTOYER_LES_JOBS'
   }
 
@@ -87,6 +94,14 @@ export class PlanificateurService {
         await this.planificateurRepository.createCron(cron)
         break
       }
+      case Planificateur.CronJob.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS: {
+        const cron: Planificateur.Cron = {
+          type: Planificateur.CronJob.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS,
+          expression: '0 1 * * *'
+        }
+        await this.planificateurRepository.createCron(cron)
+        break
+      }
     }
   }
 
@@ -105,6 +120,7 @@ export class PlanificateurService {
       await this.creerJobRendezVous(rendezVous, 1)
     }
   }
+
   async supprimerRappelsRendezVous(rendezVous: RendezVous): Promise<void> {
     await this.planificateurRepository.supprimerJobsSelonPattern(rendezVous.id)
   }
