@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import { Core } from './core'
 import { Agence } from './agence'
 import { Injectable } from '@nestjs/common'
-import { AgenceQueryModel } from '../application/queries/query-models/agence.query-models'
+import { AgenceInput } from '../infrastructure/routes/validation/agences.inputs'
 
 export interface Conseiller {
   id: string
@@ -33,7 +33,7 @@ export namespace Conseiller {
   export class Factory {
     ajoutAgenceAUnConseiller(
       actuel: Conseiller,
-      agence?: AgenceQueryModel
+      agence?: AgenceInput
     ): Conseiller {
       return {
         id: actuel.id,
