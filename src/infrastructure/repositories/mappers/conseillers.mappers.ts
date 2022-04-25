@@ -8,7 +8,7 @@ export function fromSqlToDetailConseillerQueryModel(
     id: conseillerSqlModel.id,
     firstName: conseillerSqlModel.prenom,
     lastName: conseillerSqlModel.nom,
-    agence: conseillerSqlModel.agence,
+    agence: conseillerSqlModel.agence ?? undefined,
   }
   if (conseillerSqlModel.agence) {
     conseiller.agence = {
