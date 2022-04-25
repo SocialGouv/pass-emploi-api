@@ -7,7 +7,7 @@ import {
 import { getAPMInstance } from '../infrastructure/monitoring/apm.init'
 import { HandleJobMailConseillerCommandHandler } from './commands/jobs/handle-job-mail-conseiller.command'
 import { HandleJobRendezVousCommandHandler } from './commands/jobs/handle-job-rendez-vous.command'
-import { NotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notification-recherche.command'
+import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notification-recherche.command'
 import { HandleNettoyerLesJobsCommandHandler } from './commands/jobs/handle-job-nettoyer-les-jobs.command'
 
 @Injectable()
@@ -20,7 +20,7 @@ export class WorkerService {
     private planificateurRepository: Planificateur.Repository,
     private handlerJobRendezVousCommandHandler: HandleJobRendezVousCommandHandler,
     private handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler,
-    private notifierNouvellesOffresEmploiCommandHandler: NotifierNouvellesOffresEmploiCommandHandler,
+    private notifierNouvellesOffresEmploiCommandHandler: HandleJobNotifierNouvellesOffresEmploiCommandHandler,
     private handleNettoyerLesJobsCommandHandler: HandleNettoyerLesJobsCommandHandler
   ) {
     this.apmService = getAPMInstance()

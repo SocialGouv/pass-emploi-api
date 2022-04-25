@@ -6,7 +6,7 @@ import {
 import { HandleJobUpdateMailingListConseillerCommandHandler } from './commands/jobs/handle-job-update-mailing-list-conseiller.command'
 import { SynchronizeJobsCommandHandler } from './commands/tasks/synchronize-jobs.command'
 import JobEnum = Planificateur.JobEnum
-import { NotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notification-recherche.command'
+import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notification-recherche.command'
 import { HandleJobMailConseillerCommandHandler } from './commands/jobs/handle-job-mail-conseiller.command'
 import { HandleNettoyerLesJobsCommandHandler } from './commands/jobs/handle-job-nettoyer-les-jobs.command'
 import { InitCronsCommandHandler } from './commands/tasks/init-crons.command'
@@ -29,7 +29,7 @@ export class TaskService {
     @Inject(PlanificateurRepositoryToken)
     private planificateurRepository: Planificateur.Repository,
     private synchronizeJobsCommandHandler: SynchronizeJobsCommandHandler,
-    private notifierNouvellesOffresEmploiCommandHandler: NotifierNouvellesOffresEmploiCommandHandler,
+    private notifierNouvellesOffresEmploiCommandHandler: HandleJobNotifierNouvellesOffresEmploiCommandHandler,
     private handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler,
     private initCronsCommandHandler: InitCronsCommandHandler,
     private handleNettoyerLesJobsCommandHandler: HandleNettoyerLesJobsCommandHandler,

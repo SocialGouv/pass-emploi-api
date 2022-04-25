@@ -35,7 +35,7 @@ import { DeleteRendezVousCommandHandler } from './application/commands/delete-re
 import { DeleteSuperviseursCommandHandler } from './application/commands/delete-superviseurs.command.handler'
 import { HandleJobMailConseillerCommandHandler } from './application/commands/jobs/handle-job-mail-conseiller.command'
 import { HandleNettoyerLesJobsCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-jobs.command'
-import { NotifierNouvellesOffresEmploiCommandHandler } from './application/commands/jobs/handle-job-notification-recherche.command'
+import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './application/commands/jobs/handle-job-notification-recherche.command'
 import { HandleJobRendezVousCommandHandler } from './application/commands/jobs/handle-job-rendez-vous.command'
 import { HandleJobUpdateMailingListConseillerCommandHandler } from './application/commands/jobs/handle-job-update-mailing-list-conseiller.command'
 import { NotifierNouvellesImmersionsCommandHandler } from './application/commands/notifier-nouvelles-immersions.command.handler'
@@ -343,7 +343,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetConseillerByEmailQueryHandler,
     TransfererJeunesConseillerCommandHandler,
     InitCronsCommandHandler,
-    NotifierNouvellesOffresEmploiCommandHandler,
+    HandleJobNotifierNouvellesOffresEmploiCommandHandler,
     GetServicesCiviqueQueryHandler,
     GetDetailServiceCiviqueQueryHandler,
     HandleNettoyerLesJobsCommandHandler,

@@ -25,7 +25,7 @@ import { Command } from '../../../building-blocks/types/command'
 import { ConfigService } from '@nestjs/config'
 
 @Injectable()
-export class NotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
+export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
   Command,
   Stats
 > {
@@ -41,7 +41,7 @@ export class NotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
     private jeuneRepository: Jeune.Repository,
     private configuration: ConfigService
   ) {
-    super('NotifierNouvellesOffresEmploiCommandHandler')
+    super('HandleJobNotifierNouvellesOffresEmploiCommandHandler')
   }
 
   async handle(
