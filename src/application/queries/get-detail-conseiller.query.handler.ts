@@ -6,6 +6,7 @@ import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { DetailConseillerQueryModel } from './query-models/conseillers.query-models'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { fromSqlToDetailConseillerQueryModel } from '../../infrastructure/repositories/mappers/conseillers.mappers'
+import {AgenceSqlModel} from "../../infrastructure/sequelize/models/agence.sql-model";
 
 export interface GetDetailConseillerQuery extends Query {
   idConseiller: string
@@ -24,7 +25,9 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
     query: GetDetailConseillerQuery
   ): Promise<DetailConseillerQueryModel | undefined> {
     const conseillerSqlModel = await ConseillerSqlModel.findByPk(
-      query.idConseiller
+      query.idConseiller, {
+        include: [AgenceSqlModel],
+        }
     )
     if (!conseillerSqlModel) {
       return undefined
