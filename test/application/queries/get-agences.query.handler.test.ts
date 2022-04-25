@@ -14,8 +14,7 @@ import {Agence} from "../../../src/domain/agence";
 describe('GetAgenceQuery', () => {
   describe('authorize', () => {
     const handler = new GetAgencesQueryHandler({
-    // @ts-ignore
-      get(id: string): Promise<Agence | undefined> {
+      get(): Promise<Agence | undefined> {
         return Promise.resolve(undefined);
       },
       getAllQueryModelsByStructure(): Promise<AgenceQueryModel[]> {
