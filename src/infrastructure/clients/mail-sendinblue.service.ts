@@ -1,19 +1,19 @@
-import { Injectable } from '@nestjs/common'
-import { Conseiller } from '../../domain/conseiller'
 import { HttpService } from '@nestjs/axios'
-import { firstValueFrom } from 'rxjs'
+import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { firstValueFrom } from 'rxjs'
+import { Conseiller } from '../../domain/conseiller'
+import { Mail, MailDataDto } from '../../domain/mail'
 import {
   mapCodeLabelTypeRendezVous,
   RendezVous
 } from '../../domain/rendez-vous'
-import { Mail, MailDataDto } from '../../domain/mail'
 import { InvitationIcsClient } from './invitation-ics.client'
 
 export type ICS = string
 
 @Injectable()
-export class MailSendinblueClient implements Mail.Client {
+export class MailSendinblueService implements Mail.Service {
   private sendinblueUrl: string
   private apiKey: string
   private templates: { conversationsNonLues: string; nouveauRendezvous: string }
@@ -49,7 +49,7 @@ export class MailSendinblueClient implements Mail.Client {
         lien: this.frontendUrl
       }
     }
-    await this.postMail(mailDataDto)
+    await this.envoyer(mailDataDto)
   }
 
   async envoyerMailNouveauRendezVous(
@@ -72,7 +72,7 @@ export class MailSendinblueClient implements Mail.Client {
       fichierInvitation
     )
 
-    await this.postMail(mailDatadto)
+    await this.envoyer(mailDatadto)
   }
 
   creerContenuMailNouveauRendezVous(
@@ -104,7 +104,7 @@ export class MailSendinblueClient implements Mail.Client {
     }
   }
 
-  async postMail(data: MailDataDto): Promise<void> {
+  async envoyer(data: MailDataDto): Promise<void> {
     await firstValueFrom(
       this.httpService.post(`${this.sendinblueUrl}/v3/smtp/email`, data, {
         headers: {
@@ -113,6 +113,40 @@ export class MailSendinblueClient implements Mail.Client {
           'content-type': 'application/json'
         }
       })
+    )
+  }
+
+  async mettreAJourMailingList(
+    contacts: Mail.Contact[],
+    mailingListId: number
+  ): Promise<void> {
+    const contactsDTO: Sendinblue.Contact[] = contacts.map(contact => ({
+      email: contact.email,
+      attributes: {
+        nom: contact.nom,
+        prenom: contact.prenom
+      }
+    }))
+    const payload = {
+      listIds: [mailingListId],
+      emailBlacklist: false,
+      smsBlacklist: false,
+      updateExistingContacts: true,
+      emptyContactsAttributes: false,
+      jsonBody: contactsDTO
+    }
+    await firstValueFrom(
+      this.httpService.post(
+        `${this.sendinblueUrl}/v3/contacts/import`,
+        payload,
+        {
+          headers: {
+            'api-key': `${this.apiKey}`,
+            accept: 'application/json',
+            'content-type': 'application/json'
+          }
+        }
+      )
     )
   }
 }
@@ -126,6 +160,18 @@ export function formaterDateRendezVous(rendezVousDate: Date): string {
     timeZone: 'Europe/Paris'
   }
   return rendezVousDate.toLocaleString('fr-FR', dateOptions)
+}
+
+export namespace Sendinblue {
+  export interface Contact {
+    email: string
+    attributes: AttributesContact
+  }
+
+  export interface AttributesContact {
+    nom: string
+    prenom: string
+  }
 }
 
 export function formaterHeureRendezVous(rendezVousDate: Date): string {

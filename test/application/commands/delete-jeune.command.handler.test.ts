@@ -35,7 +35,7 @@ describe('DeleteJeuneCommandHandler', () => {
   let commandHandler: DeleteJeuneCommandHandler
   let evenementService: StubbedClass<EvenementService>
   let mailFactory: StubbedClass<Mail.Factory>
-  let mailClient: StubbedType<Mail.Client>
+  let mailClient: StubbedType<Mail.Service>
   let authentificationRepository: StubbedType<Authentification.Repository>
   let conseiller: Conseiller
   let jeune: Jeune
@@ -151,7 +151,7 @@ describe('DeleteJeuneCommandHandler', () => {
           conseiller,
           jeune
         )
-        expect(mailClient.postMail).to.have.been.calledWith(unMailDto())
+        expect(mailClient.envoyer).to.have.been.calledWith(unMailDto())
       })
 
       it('renvoie un succès', () => {

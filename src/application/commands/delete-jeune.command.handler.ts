@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Conseiller, ConseillersRepositoryToken } from 'src/domain/conseiller'
 import { Evenement, EvenementService } from 'src/domain/evenement'
-import { Mail, MailClientToken } from 'src/domain/mail'
+import { Mail, MailServiceToken } from 'src/domain/mail'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   DroitsInsuffisants,
@@ -40,8 +40,8 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
     @Inject(AuthentificationRepositoryToken)
     private readonly authentificationRepository: Authentification.Repository,
     private evenementService: EvenementService,
-    @Inject(MailClientToken)
-    private readonly mailClient: Mail.Client,
+    @Inject(MailServiceToken)
+    private readonly mailService: Mail.Service,
     private mailFactory: Mail.Factory
   ) {
     super('DeleteJeuneCommandHandler')
@@ -78,7 +78,7 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
 
     if (conseiller) {
       const mail = this.mailFactory.creerMailSuppressionJeune(conseiller, jeune)
-      await this.mailClient.postMail(mail)
+      await this.mailService.envoyer(mail)
     }
 
     return emptySuccess()

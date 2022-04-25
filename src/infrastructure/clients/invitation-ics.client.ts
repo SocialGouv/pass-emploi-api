@@ -11,7 +11,7 @@ import {
   formaterDateRendezVous,
   formaterHeureRendezVous,
   ICS
-} from './mail-sendinblue.client'
+} from './mail-sendinblue.service'
 import { EventAttributes } from 'ics'
 import { ConfigService } from '@nestjs/config'
 

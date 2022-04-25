@@ -1,12 +1,13 @@
-import { Conseiller } from './conseiller'
-import { RendezVous } from './rendez-vous'
-import { ICS } from '../infrastructure/clients/mail-sendinblue.client'
 import { Injectable } from '@nestjs/common'
-import { Jeune } from './jeune'
-import { Core } from './core'
 import { ConfigService } from '@nestjs/config'
+import { ICS } from '../infrastructure/clients/mail-sendinblue.service'
+import { Conseiller } from './conseiller'
+import { Core } from './core'
+import { Jeune } from './jeune'
+import { RendezVous } from './rendez-vous'
 
-export const MailClientToken = 'MailClientToken'
+export const MailServiceToken = 'MailServiceToken'
+export const MailRepositoryToken = 'MailRepositoryToken'
 
 export interface MailDataDto {
   to: RecipientDto[]
@@ -25,8 +26,15 @@ interface AttachmentDto {
   name: string
   content: string
 }
+
 export namespace Mail {
-  export interface Client {
+  export interface Contact {
+    email: string
+    nom: string
+    prenom: string
+  }
+
+  export interface Service {
     envoyerMailConversationsNonLues(
       conseiller: Conseiller,
       nombreDeConversationNonLues: number
@@ -37,13 +45,26 @@ export namespace Mail {
       rendezVous: RendezVous
     ): Promise<void>
 
-    postMail(data: MailDataDto): Promise<void>
+    envoyer(data: MailDataDto): Promise<void>
 
     creerContenuMailNouveauRendezVous(
       conseiller: Conseiller,
       rendezVous: RendezVous,
       fichierInvitation: ICS
     ): MailDataDto
+
+    mettreAJourMailingList(
+      contacts: Contact[],
+      mailingListId: number
+    ): Promise<void>
+  }
+
+  export interface Repository {
+    findAllContactsConseillerByStructure(
+      structure: Core.Structure
+    ): Promise<Mail.Contact[]>
+
+    countContactsConseillerSansEmail(): Promise<number>
   }
 
   @Injectable()

@@ -1,4 +1,4 @@
-import { MailSendinblueClient } from '../../../src/infrastructure/clients/mail-sendinblue.client'
+import { MailSendinblueService } from '../../../src/infrastructure/clients/mail-sendinblue.service'
 import { HttpService } from '@nestjs/axios'
 import { testConfig } from '../../utils/module-for-testing'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
@@ -10,9 +10,9 @@ import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitation-ics.client'
 import { MailDataDto } from '../../../src/domain/mail'
 
-describe('MailSendinblueClient', () => {
+describe('MailSendinblueService', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
-  let mailSendinblueClient: MailSendinblueClient
+  let mailSendinblueService: MailSendinblueService
   let invitationIcsClient: InvitationIcsClient
   const config = testConfig()
 
@@ -22,7 +22,7 @@ describe('MailSendinblueClient', () => {
       databaseForTesting.sequelize,
       config
     )
-    mailSendinblueClient = new MailSendinblueClient(
+    mailSendinblueService = new MailSendinblueService(
       invitationIcsClient,
       httpService,
       config
@@ -56,7 +56,7 @@ describe('MailSendinblueClient', () => {
           .reply(200)
 
         // When
-        await mailSendinblueClient.envoyerMailConversationsNonLues(
+        await mailSendinblueService.envoyerMailConversationsNonLues(
           conseiller,
           22
         )
@@ -78,7 +78,7 @@ describe('MailSendinblueClient', () => {
       const invitationBase64 = Buffer.from(fichierInvitation).toString('base64')
 
       // When
-      const result = mailSendinblueClient.creerContenuMailNouveauRendezVous(
+      const result = mailSendinblueService.creerContenuMailNouveauRendezVous(
         conseiller,
         rendezVous,
         fichierInvitation
@@ -108,7 +108,7 @@ describe('MailSendinblueClient', () => {
       })
     })
   })
-  describe('postMail', () => {
+  describe('envoyer', () => {
     describe('quand tout va bien', () => {
       it('envoie un mail', async () => {
         // Given
@@ -146,7 +146,7 @@ describe('MailSendinblueClient', () => {
           .reply(200)
 
         // When
-        await mailSendinblueClient.postMail(mailDataDto)
+        await mailSendinblueService.envoyer(mailDataDto)
 
         // Then
         expect(scope.isDone()).to.equal(true)

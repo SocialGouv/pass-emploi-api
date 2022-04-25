@@ -9,7 +9,7 @@ import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../../domain/conseiller'
-import { Mail, MailClientToken } from '../../../domain/mail'
+import { Mail, MailServiceToken } from '../../../domain/mail'
 
 @Injectable()
 export class HandleJobMailConseillerCommandHandler extends CommandHandler<
@@ -21,8 +21,8 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
     private chatRepository: Chat.Repository,
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
-    @Inject(MailClientToken)
-    private mailClient: Mail.Client,
+    @Inject(MailServiceToken)
+    private mailService: Mail.Service,
     private dateService: DateService,
     private configuration: ConfigService
   ) {
@@ -70,7 +70,7 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
                   )
                 } else {
                   try {
-                    await this.mailClient.envoyerMailConversationsNonLues(
+                    await this.mailService.envoyerMailConversationsNonLues(
                       conseiller,
                       nombreDeConversationsNonLues
                     )

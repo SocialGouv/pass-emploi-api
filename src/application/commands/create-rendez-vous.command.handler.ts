@@ -17,7 +17,7 @@ import { PlanificateurService } from '../../domain/planificateur'
 import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
 import { IdService } from '../../utils/id-service'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
-import { Mail, MailClientToken } from '../../domain/mail'
+import { Mail, MailServiceToken } from '../../domain/mail'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 
 export interface CreateRendezVousCommand extends Command {
@@ -49,8 +49,8 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     private conseillerRepository: Conseiller.Repository,
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,
-    @Inject(MailClientToken)
-    private mailClient: Mail.Client,
+    @Inject(MailServiceToken)
+    private mailService: Mail.Service,
     private conseillerAuthorizer: ConseillerAuthorizer,
     private planificateurService: PlanificateurService,
     private evenementService: EvenementService
@@ -108,7 +108,7 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       )
     } else {
       try {
-        await this.mailClient.envoyerMailNouveauRendezVous(
+        await this.mailService.envoyerMailNouveauRendezVous(
           jeune.conseiller,
           rendezVous
         )
