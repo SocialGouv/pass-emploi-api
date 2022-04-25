@@ -8,6 +8,7 @@ import {
   IsEnum,
   IsIn,
   IsNotEmpty,
+  IsNotEmptyObject,
   IsNotIn,
   IsOptional,
   IsString,
@@ -16,6 +17,7 @@ import {
 import { Core } from 'src/domain/core'
 import { Action } from '../../../domain/action'
 import { transformStringToBoolean } from './utils/transformers'
+import { AgenceInput } from './agences.inputs'
 
 export class GetConseillerQueryParams {
   @ApiProperty()
@@ -136,4 +138,12 @@ export class GetRendezVousConseillerQueryParams {
   @IsIn([true, false])
   @Transform(params => transformStringToBoolean(params, 'presenceConseiller'))
   presenceConseiller?: boolean
+}
+
+export class DetailConseillerPayload {
+  id?: string
+
+  @ApiPropertyOptional()
+  @IsNotEmptyObject()
+  agence?: AgenceInput
 }

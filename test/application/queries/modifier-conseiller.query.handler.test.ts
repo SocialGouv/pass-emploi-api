@@ -3,8 +3,8 @@ import { Conseiller } from '../../../src/domain/conseiller'
 import { Agence } from '../../../src/domain/agence'
 import { ModifierConseillerCommandHandler } from '../../../src/application/queries/modifier-conseiller-command.handler'
 import { createSandbox, expect } from '../../utils'
-import { Failure } from '../../../src/building-blocks/types/result'
-import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
+import { failure, Failure } from '../../../src/building-blocks/types/result'
+import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { Core } from '../../../src/domain/core'
 import {
   unUtilisateurConseiller,
@@ -63,9 +63,9 @@ describe('ModifierConseillerQueryHandler', () => {
 
         // Then
         expect(result._isSuccess).to.equal(false)
-        const expectedError = new ErreurHttp(
-          "le conseiller id qui n'éxiste pas n'éxiste pas",
-          404
+        const expectedError = new NonTrouveError(
+          'Conseiller',
+          "id qui n'éxiste pas"
         )
         expect((result as Failure).error).to.deep.equal(expectedError)
       })
@@ -76,10 +76,8 @@ describe('ModifierConseillerQueryHandler', () => {
         // When
         const query = {
           idConseiller: 'id qui éxiste',
-          champsConseillerAModifier: {
-            agence: {
-              id: "agence qui n'éxiste pas"
-            }
+          agence: {
+            id: "agence qui n'éxiste pas"
           }
         }
         conseillerRepository.get
@@ -94,11 +92,9 @@ describe('ModifierConseillerQueryHandler', () => {
 
         // Then
         expect(result._isSuccess).to.equal(false)
-        expect((result as Failure).error).to.deep.equal({
-          code: ErreurHttp.CODE,
-          statusCode: 404,
-          message: "l'agence agence qui n'éxiste pas n'éxiste pas"
-        })
+        expect((result as Failure).error).to.deep.equal(
+          new NonTrouveError('Agence', "agence qui n'éxiste pas")
+        )
       })
     })
 
@@ -107,10 +103,8 @@ describe('ModifierConseillerQueryHandler', () => {
         // Given
         const query = {
           idConseiller: 'id qui éxiste',
-          champsConseillerAModifier: {
-            agence: {
-              id: "agence qui n'éxiste pas"
-            }
+          agence: {
+            id: "agence qui n'éxiste pas"
           }
         }
         conseillerRepository.get
@@ -130,69 +124,13 @@ describe('ModifierConseillerQueryHandler', () => {
   })
 
   describe('authorize', () => {
-    describe("Quand on modifie l'id", () => {
-      it('on reçoit une unauthorized', async () => {
-        // Given
-        const query = {
-          idConseiller: 'id qui éxiste',
-          champsConseillerAModifier: {
-            id: 'Bonjour je suis un id'
-          }
-        }
-
-        // When
-        const call = handler.execute(query, unUtilisateurConseiller())
-
-        // Then
-        await expect(call).to.be.rejectedWith(Unauthorized)
-      })
-    })
-
-    describe('Quand on modifie le firstName', () => {
-      it('on reçoit une unauthorized', async () => {
-        // Given
-        const query = {
-          idConseiller: 'id qui éxiste',
-          champsConseillerAModifier: {
-            firstName: 'Jackie'
-          }
-        }
-
-        // When
-        const call = handler.execute(query, unUtilisateurConseiller())
-
-        // Then
-        await expect(call).to.be.rejectedWith(Unauthorized)
-      })
-    })
-
-    describe('Quand on modifie le lastName', () => {
-      it('on reçoit une unauthorized', async () => {
-        // Given
-        const query = {
-          idConseiller: 'id qui éxiste',
-          champsConseillerAModifier: {
-            lastName: 'Bla bla bla'
-          }
-        }
-
-        // When
-        const call = handler.execute(query, unUtilisateurConseiller())
-
-        // Then
-        await expect(call).to.be.rejectedWith(Unauthorized)
-      })
-    })
-
     describe('Quand on est un jeune', () => {
       it('on reçoit une unauthorized', async () => {
         // Given
         const query = {
           idConseiller: 'id qui éxiste',
-          champsConseillerAModifier: {
-            agence: {
-              id: 'agence qui éxiste'
-            }
+          agence: {
+            id: 'agence qui éxiste'
           }
         }
 
@@ -209,10 +147,8 @@ describe('ModifierConseillerQueryHandler', () => {
         // Given
         const query = {
           idConseiller: 'id qui éxiste',
-          champsConseillerAModifier: {
-            agence: {
-              id: 'agence qui éxiste'
-            }
+          agence: {
+            id: 'agence qui éxiste'
           }
         }
 
@@ -228,10 +164,8 @@ describe('ModifierConseillerQueryHandler', () => {
   describe('Quand on est un conseiller avec le bon id', () => {
     const query = {
       idConseiller: 'id qui éxiste',
-      champsConseillerAModifier: {
-        agence: {
-          id: 'agence qui éxiste'
-        }
+      agence: {
+        id: 'agence qui éxiste'
       }
     }
 
@@ -263,7 +197,7 @@ describe('ModifierConseillerQueryHandler', () => {
     describe("et que l'agence et le conseiller n'ont pas la même structure", () => {
       it('on reçoi un unauthorized', async () => {
         // When
-        const call = handler.execute(
+        const result = await handler.execute(
           query,
           unUtilisateurConseiller({
             structure: Core.Structure.POLE_EMPLOI,
@@ -272,7 +206,9 @@ describe('ModifierConseillerQueryHandler', () => {
         )
 
         // Then
-        await expect(call).to.be.rejectedWith(Unauthorized)
+        expect(result).to.deep.equal(
+          failure(new NonTrouveError('Conseiller', 'id qui éxiste'))
+        )
       })
     })
   })

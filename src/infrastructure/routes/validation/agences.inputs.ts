@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { IsEnum, IsNotEmpty } from 'class-validator'
 import { Core } from '../../../domain/core'
 import Structure = Core.Structure
@@ -11,4 +11,12 @@ export class GetAgencesQueryParams {
   @IsEnum(Structure)
   @IsNotEmpty()
   structure: Structure
+}
+
+export class AgenceInput {
+  @ApiPropertyOptional({ type: 'string' })
+  id?: string
+
+  @ApiPropertyOptional({ type: 'string' })
+  nom?: string
 }

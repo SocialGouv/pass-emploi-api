@@ -32,39 +32,12 @@ describe('AgenceSqlRepository', () => {
   })
 
   describe('Quand la base contient des agences', () => {
-    it('getAllQueryModelsByStructure retourne la liste des agences correspondant à milo', async () => {
-      // When
-      const result = await agenceSqlRepository.getAllQueryModelsByStructure(
-        'MILO'
-      )
-
-      // Then
-      expect(result).to.deep.equal([
-        {
-          id: 'Bonjour je suis un id milo',
-          nom: 'Bonjour je suis une agence'
-        }
-      ])
-    })
-
-    it('getAllQueryModelsByStructure retourne la liste des agences correspondant à pe', async () => {
-      // When
-      const result = await agenceSqlRepository.getAllQueryModelsByStructure(
-        'POLE_EMPLOI'
-      )
-
-      // Then
-      expect(result).to.deep.equal([
-        {
-          id: 'Bonjour je suis un id pe',
-          nom: 'Bonjour je suis une agence'
-        }
-      ])
-    })
-
     it("get retourne l'agence correspondante", async () => {
       // When
-      const result = await agenceSqlRepository.get('Bonjour je suis un id pe')
+      const result = await agenceSqlRepository.get(
+        'Bonjour je suis un id pe',
+        Structure.POLE_EMPLOI
+      )
 
       // Then
       expect(result).to.deep.equal({

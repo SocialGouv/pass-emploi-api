@@ -67,6 +67,7 @@ import {
   CreateActionPayload,
   CreateJeunePoleEmploiPayload,
   CreerJeuneMiloPayload,
+  DetailConseillerPayload,
   EnvoyerNotificationsPayload,
   GetConseillerQueryParams,
   GetRendezVousConseillerQueryParams,
@@ -503,26 +504,23 @@ export class ConseillersController {
     type: DetailConseillerQueryModel
   })
   @ApiBody({
-    type: DetailConseillerQueryModel
+    type: DetailConseillerPayload
   })
   async modiferConseiller(
     @Param('idConseiller') idConseiller: string,
-    @Body() modifierConseillerPayload: Partial<DetailConseillerQueryModel>,
+    @Body() modifierConseillerPayload: DetailConseillerPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const result = await this.modifierConseillerQueryHandler.execute(
       {
         idConseiller: idConseiller,
-        champsConseillerAModifier: modifierConseillerPayload
+        agence: modifierConseillerPayload.agence
       },
       utilisateur
     )
     if (isFailure(result)) {
-      if (result.error.code === ErreurHttp.CODE) {
-        throw new HttpException(
-          result.error.message,
-          (result.error as ErreurHttp).statusCode
-        )
+      if (result.error.code === NonTrouveError.CODE) {
+        throw new NotFoundException(result.error.message)
       }
       throw new RuntimeException(result.error.message)
     }

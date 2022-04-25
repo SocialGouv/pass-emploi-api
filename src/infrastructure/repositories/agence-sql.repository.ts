@@ -1,27 +1,18 @@
 import { Injectable } from '@nestjs/common'
 import { Agence } from '../../domain/agence'
-import { AgenceQueryModel } from '../../application/queries/query-models/agence.query-models'
 import { AgenceSqlModel } from '../sequelize/models/agence.sql-model'
 import { Core } from '../../domain/core'
 import Structure = Core.Structure
 
 @Injectable()
 export class AgenceSqlRepository implements Agence.Repository {
-  async getAllQueryModelsByStructure(
-    structure: string
-  ): Promise<AgenceQueryModel[]> {
-    const sqlModels = await AgenceSqlModel.findAll({
+  async get(id: string, structure: Structure): Promise<Agence | undefined> {
+    const agenceSql = await AgenceSqlModel.findOne({
       where: {
+        id: id,
         structure: structure
       }
     })
-    return sqlModels.map(sql => {
-      return new AgenceQueryModel(sql.id, sql.nomAgence)
-    })
-  }
-
-  async get(id: string): Promise<Agence | undefined> {
-    const agenceSql = await AgenceSqlModel.findByPk(id)
     if (!agenceSql) {
       return undefined
     }
