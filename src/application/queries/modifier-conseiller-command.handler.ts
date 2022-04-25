@@ -27,7 +27,8 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     @Inject(AgenceRepositoryToken)
-    private agencesRepository: Agence.Repository
+    private agencesRepository: Agence.Repository,
+    private conseillerFactory: Conseiller.Factory
   ) {
     super('ModifierConseillerQueryHandler')
   }
@@ -37,7 +38,7 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
       query.idConseiller
     )
     if (conseillerActuel != null) {
-      return await this.modifierConseillerExistant(conseillerActuel, query)
+      return this.modifierConseillerExistant(conseillerActuel, query)
     } else {
       return failure(
         new ErreurHttp(
@@ -66,15 +67,10 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
           )
         )
     }
-    const conseiller = {
-      id: conseillerActuel.id,
-      firstName: conseillerActuel.firstName,
-      lastName: conseillerActuel.lastName,
-      structure: conseillerActuel.structure,
-      email: conseillerActuel.email,
-      dateVerificationMessages: conseillerActuel.dateVerificationMessages,
-      agence: query.champsConseillerAModifier.agence ?? conseillerActuel.agence
-    }
+    const conseiller = this.conseillerFactory.ajoutAgenceAUnConseiller(
+      conseillerActuel,
+      query.champsConseillerAModifier.agence
+    )
     await this.conseillerRepository.save(conseiller)
     return emptySuccess()
   }

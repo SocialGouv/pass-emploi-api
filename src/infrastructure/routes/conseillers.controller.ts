@@ -73,7 +73,7 @@ import {
   SuperviseursPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
-import { ModifierConseillerCommandHandler } from '../../application/queries/modifier-conseiller-command-handler.service'
+import { ModifierConseillerCommandHandler } from '../../application/queries/modifier-conseiller-command.handler'
 
 @Controller('conseillers')
 @ApiOAuth2([])

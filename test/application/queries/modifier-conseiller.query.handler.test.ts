@@ -1,7 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Agence } from '../../../src/domain/agence'
-import { ModifierConseillerCommandHandler } from '../../../src/application/queries/modifier-conseiller-command-handler.service'
+import { ModifierConseillerCommandHandler } from '../../../src/application/queries/modifier-conseiller-command.handler'
 import { createSandbox, expect } from '../../utils'
 import { Failure } from '../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
@@ -41,7 +41,8 @@ describe('ModifierConseillerQueryHandler', () => {
 
     handler = new ModifierConseillerCommandHandler(
       conseillerRepository,
-      agencesRepository
+      agencesRepository,
+      new Conseiller.Factory()
     )
   })
 
