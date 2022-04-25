@@ -5,6 +5,7 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
+import { Core } from '../../../domain/core'
 
 export class AgenceDto extends Model {
   @PrimaryKey
@@ -36,7 +37,7 @@ export class AgenceDto extends Model {
     field: 'structure',
     type: DataType.STRING
   })
-  structure!: string
+  structure!: Core.Structure
 }
 
 @Table({

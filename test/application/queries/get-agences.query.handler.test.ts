@@ -19,6 +19,9 @@ describe('GetAgenceQuery', () => {
       },
       getAllQueryModelsByStructure(): Promise<AgenceQueryModel[]> {
         return Promise.resolve([])
+      },
+      getStructureOfAgence(): Promise<Core.Structure | undefined> {
+        return Promise.resolve(undefined)
       }
     })
 

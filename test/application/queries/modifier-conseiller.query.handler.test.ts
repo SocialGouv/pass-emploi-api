@@ -6,12 +6,12 @@ import { createSandbox, expect } from '../../utils'
 import { Failure } from '../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { Core } from '../../../src/domain/core'
-import Structure = Core.Structure
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { Unauthorized } from '../../../src/domain/erreur'
+import Structure = Core.Structure
 
 describe('ModifierConseillerQueryHandler', () => {
   let conseillerRepository: StubbedType<Conseiller.Repository>
@@ -225,28 +225,55 @@ describe('ModifierConseillerQueryHandler', () => {
     })
   })
 
-  describe('Quand on est un conseiller avec le mauvais id', () => {
-    it('on reçoit une unauthorized', async () => {
-      // Given
-      const query = {
-        idConseiller: 'id qui éxiste',
-        champsConseillerAModifier: {
-          agence: {
-            id: 'agence qui éxiste'
-          }
+  describe('Quand on est un conseiller avec le bon id', () => {
+    const query = {
+      idConseiller: 'id qui éxiste',
+      champsConseillerAModifier: {
+        agence: {
+          id: 'agence qui éxiste'
         }
       }
+    }
 
-      // When
-      const call = handler.execute(
-        query,
-        unUtilisateurConseiller({
-          id: 'id qui éxiste'
-        })
-      )
+    beforeEach(() => {
+      agencesRepository.get
+        .withArgs('agence qui éxiste')
+        .resolves(agenceQuiExiste)
+      agencesRepository.getStructureOfAgence
+        .withArgs('agence qui éxiste')
+        .resolves(Structure.MILO)
+    })
 
-      // Then
-      await expect(call).to.not.be.rejected
+    describe("et que l'agence et le conseiller ont la même structure", () => {
+      it('on modifie le conseiller', async () => {
+        // When
+        const call = handler.execute(
+          query,
+          unUtilisateurConseiller({
+            structure: Core.Structure.MILO,
+            id: 'id qui éxiste'
+          })
+        )
+
+        // Then
+        await expect(call).to.not.be.rejected
+      })
+    })
+
+    describe("et que l'agence et le conseiller n'ont pas la même structure", () => {
+      it('on reçoi un unauthorized', async () => {
+        // When
+        const call = handler.execute(
+          query,
+          unUtilisateurConseiller({
+            structure: Core.Structure.POLE_EMPLOI,
+            id: 'id qui éxiste'
+          })
+        )
+
+        // Then
+        await expect(call).to.be.rejectedWith(Unauthorized)
+      })
     })
   })
 })
