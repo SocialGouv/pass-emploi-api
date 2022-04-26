@@ -23,6 +23,7 @@ import { uneDatetime } from '../../fixtures/date.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { RendezVous } from '../../../src/domain/rendez-vous'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
 
 describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   let jeunesRepository: StubbedType<Jeune.Repository>
@@ -32,6 +33,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   let keycloakClient: StubbedClass<KeycloakClient>
   let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
   let getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler
+  let evenementService: StubbedClass<EvenementService>
   let sandbox: SinonSandbox
   const idpToken = 'idpToken'
 
@@ -43,6 +45,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
     jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
     dateService = stubClass(DateService)
     idService = stubClass(IdService)
+    evenementService = stubClass(EvenementService)
     idService.uuid.returns('random-id')
     keycloakClient.exchangeTokenPoleEmploiJeune.resolves(idpToken)
 
@@ -53,7 +56,8 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         jeunePoleEmploiAuthorizer,
         dateService,
         idService,
-        keycloakClient
+        keycloakClient,
+        evenementService
       )
   })
 
@@ -726,6 +730,22 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       // Then
       expect(jeunePoleEmploiAuthorizer.authorize).to.have.been.calledWith(
         query.idJeune,
+        utilisateur
+      )
+    })
+  })
+
+  describe('monitor', () => {
+    it('envoie un évenement de consultation de la liste des rendez vous', async () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+
+      // When
+      await getRendezVousJeunePoleEmploiQueryHandler.monitor(utilisateur)
+
+      // Then
+      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
+        Evenement.Type.RDV_LISTE,
         utilisateur
       )
     })

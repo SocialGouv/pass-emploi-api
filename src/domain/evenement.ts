@@ -9,6 +9,8 @@ export namespace Evenement {
     ACTION_CREEE = 'ACTION_CREEE',
     ACTION_MODIFIEE = 'ACTION_MODIFIEE',
     ACTION_SUPPRIMEE = 'ACTION_SUPPRIMEE',
+    ACTION_LISTE = 'ACTION_LISTE',
+    ACTION_DETAIL = 'ACTION_DETAIL',
     OFFRE_EMPLOI_AFFICHEE = 'OFFRE_EMPLOI_AFFICHEE',
     OFFRE_EMPLOI_RECHERCHEE = 'OFFRE_EMPLOI_RECHERCHEE',
     OFFRE_EMPLOI_SAUVEGARDEE = 'OFFRE_EMPLOI_SAUVEGARDEE',
@@ -32,6 +34,8 @@ export namespace Evenement {
     RDV_CREE = 'RDV_CREE',
     RDV_MODIFIE = 'RDV_MODIFIE',
     RDV_SUPPRIME = 'RDV_SUPPRIME',
+    RDV_LISTE = 'RDV_LISTE',
+    RDV_DETAIL = 'RDV_DETAIL',
     RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE = 'RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE',
     RECHERCHE_ALTERNANCE_SAUVEGARDEE = 'RECHERCHE_ALTERNANCE_SAUVEGARDEE',
     RECHERCHE_IMMERSION_SAUVEGARDEE = 'RECHERCHE_IMMERSION_SAUVEGARDEE',
@@ -214,6 +218,26 @@ const evenements = {
   [Evenement.Type.COMPTE_SUPPRIME]: {
     categorie: 'Compte',
     action: 'Suppression'
+  },
+  [Evenement.Type.RDV_LISTE]: {
+    categorie: 'Rendez-vous',
+    action: 'Consultation',
+    nom: 'Liste'
+  },
+  [Evenement.Type.RDV_DETAIL]: {
+    categorie: 'Rendez-vous',
+    action: 'Consultation',
+    nom: 'Détail'
+  },
+  [Evenement.Type.ACTION_LISTE]: {
+    categorie: 'Action',
+    action: 'Consultation',
+    nom: 'Liste'
+  },
+  [Evenement.Type.ACTION_DETAIL]: {
+    categorie: 'Action',
+    action: 'Consultation',
+    nom: 'Détail'
   }
 }
 

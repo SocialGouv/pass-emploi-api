@@ -22,6 +22,7 @@ import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-e
 import { fromRendezVousDtoToRendezVousQueryModel } from './query-mappers/rendez-vous-pole-emploi.mappers'
 import { fromPrestationDtoToRendezVousQueryModel } from './query-mappers/rendez-vous-prestation.mappers'
 import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
+import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface GetRendezVousJeunePoleEmploiQuery extends Query {
   idJeune: string
@@ -41,7 +42,8 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer,
     private dateService: DateService,
     private idService: IdService,
-    private keycloakClient: KeycloakClient
+    private keycloakClient: KeycloakClient,
+    private evenementService: EvenementService
   ) {
     super('GetRendezVousJeunePoleEmploiQueryHandler')
   }
@@ -135,8 +137,11 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     await this.jeunePoleEmploiAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creerEvenement(
+      Evenement.Type.RDV_LISTE,
+      utilisateur
+    )
   }
 }
 
