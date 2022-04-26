@@ -9,6 +9,7 @@ import { HandleJobMailConseillerCommandHandler } from './commands/jobs/handle-jo
 import { HandleJobRendezVousCommandHandler } from './commands/jobs/handle-job-rendez-vous.command'
 import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notification-recherche.command'
 import { HandleNettoyerLesJobsCommandHandler } from './commands/jobs/handle-job-nettoyer-les-jobs.command'
+import { HandleJobUpdateMailingListConseillerCommandHandler } from './commands/jobs/handle-job-update-mailing-list-conseiller.command'
 
 @Injectable()
 export class WorkerService {
@@ -21,7 +22,8 @@ export class WorkerService {
     private handlerJobRendezVousCommandHandler: HandleJobRendezVousCommandHandler,
     private handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler,
     private notifierNouvellesOffresEmploiCommandHandler: HandleJobNotifierNouvellesOffresEmploiCommandHandler,
-    private handleNettoyerLesJobsCommandHandler: HandleNettoyerLesJobsCommandHandler
+    private handleNettoyerLesJobsCommandHandler: HandleNettoyerLesJobsCommandHandler,
+    private handleJobUpdateMailingListConseillerCommandHandler: HandleJobUpdateMailingListConseillerCommandHandler
   ) {
     this.apmService = getAPMInstance()
   }
@@ -57,12 +59,22 @@ export class WorkerService {
         case Planificateur.CronJob.NETTOYER_LES_JOBS:
           await this.handleNettoyerLesJobsCommandHandler.execute({})
           break
+        case Planificateur.CronJob.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS:
+          await this.handleJobUpdateMailingListConseillerCommandHandler.execute(
+            {}
+          )
+          break
         case Planificateur.JobEnum.FAKE:
           this.logger.log({
             job,
             msg: 'executed'
           })
           break
+        default:
+          this.logger.error(
+            `Pas de job handler trouvé pour le type: ${job.type}`
+          )
+          success = false
       }
     } catch (e) {
       success = false
