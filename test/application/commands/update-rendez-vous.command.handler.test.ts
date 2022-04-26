@@ -32,7 +32,7 @@ describe('UpdateRendezVousCommandHandler', () => {
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let notificationRepository: StubbedType<Notification.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
-  let mailClient: StubbedType<Mail.Client>
+  let mailService: StubbedType<Mail.Service>
   let planificateurService: StubbedClass<PlanificateurService>
   let rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
   let evenementService: StubbedClass<EvenementService>
@@ -45,7 +45,7 @@ describe('UpdateRendezVousCommandHandler', () => {
     rendezVousRepository = stubInterface(sandbox)
     notificationRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
-    mailClient = stubInterface(sandbox)
+    mailService = stubInterface(sandbox)
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
     planificateurService = stubClass(PlanificateurService)
     evenementService = stubClass(EvenementService)
@@ -53,7 +53,7 @@ describe('UpdateRendezVousCommandHandler', () => {
     updateRendezVousCommandHandler = new UpdateRendezVousCommandHandler(
       rendezVousRepository,
       notificationRepository,
-      mailClient,
+      mailService,
       conseillerRepository,
       rendezVousAuthorizer,
       planificateurService,
@@ -217,7 +217,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         // When
         await updateRendezVousCommandHandler.handle(command)
         // Then
-        expect(mailClient.envoyerMailRendezVous).not.to.have.been.calledWith(
+        expect(mailService.envoyerMailRendezVous).not.to.have.been.calledWith(
           jeune.conseiller,
           rendezVous
         )
@@ -250,7 +250,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           await updateRendezVousCommandHandler.handle(command)
           // Then
           expect(
-            mailClient.envoyerMailRendezVous
+            mailService.envoyerMailRendezVous
           ).to.have.been.calledWithExactly(
             rendezVousUpdated.jeune.conseiller,
             rendezVousUpdated
@@ -290,12 +290,12 @@ describe('UpdateRendezVousCommandHandler', () => {
           // When
           await updateRendezVousCommandHandler.handle(command)
           // Then
-          expect(mailClient.envoyerMailRendezVous).not.to.have.been.calledWith(
+          expect(mailService.envoyerMailRendezVous).not.to.have.been.calledWith(
             conseillerModificateur,
             rendezVousUpdated
           )
           expect(
-            mailClient.envoyerMailRendezVous
+            mailService.envoyerMailRendezVous
           ).to.have.been.calledWithExactly(
             conseillerCreateur,
             rendezVousUpdated

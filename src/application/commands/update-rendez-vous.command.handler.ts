@@ -20,7 +20,7 @@ import {
   RendezVousRepositoryToken
 } from '../../domain/rendez-vous'
 import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
-import { Mail, MailClientToken } from '../../domain/mail'
+import { Mail, MailServiceToken } from '../../domain/mail'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 
 export interface UpdateRendezVousCommand extends Command {
@@ -44,8 +44,8 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     private rendezVousRepository: RendezVous.Repository,
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,
-    @Inject(MailClientToken)
-    private mailClient: Mail.Client,
+    @Inject(MailServiceToken)
+    private mailClient: Mail.Service,
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     private rendezVousAuthorizer: RendezVousAuthorizer,
