@@ -12,7 +12,7 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v2
       - name: Run HawkScan
-        uses: stackhawk/hawkscan-action@v1.3.0
+        uses: stackhawk/hawkscan-action@v1.3.4
         with:
           apiKey: ${{ secrets.HAWK_API_KEY }}
           codeScanningAlerts: true
