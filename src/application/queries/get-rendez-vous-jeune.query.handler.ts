@@ -7,6 +7,7 @@ import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
 import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
+import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface GetRendezVousJeuneQuery extends Query {
   idJeune: string
@@ -22,7 +23,8 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
     private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer,
-    private jeuneAuthorizer: JeuneAuthorizer
+    private jeuneAuthorizer: JeuneAuthorizer,
+    private evenementService: EvenementService
   ) {
     super('GetRendezVousJeuneQueryHandler')
   }
@@ -68,7 +70,10 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
     }
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creerEvenement(
+      Evenement.Type.RDV_LISTE,
+      utilisateur
+    )
   }
 }

@@ -10,12 +10,15 @@ import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-
 import { SinonSandbox } from 'sinon'
 import { RendezVousQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-models'
 import { Result } from '../../../src/building-blocks/types/result'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
 
 describe('GetRendezVousJeuneQueryHandler', () => {
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let getRendezVousQueryHandler: GetRendezVousJeuneQueryHandler
+  let evenementService: StubbedClass<EvenementService>
   let sandbox: SinonSandbox
 
   before(() => {
@@ -23,11 +26,13 @@ describe('GetRendezVousJeuneQueryHandler', () => {
     rendezVousRepository = stubInterface(sandbox)
     conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
+    evenementService = stubClass(EvenementService)
 
     getRendezVousQueryHandler = new GetRendezVousJeuneQueryHandler(
       rendezVousRepository,
       conseillerForJeuneAuthorizer,
-      jeuneAuthorizer
+      jeuneAuthorizer,
+      evenementService
     )
   })
 
@@ -111,6 +116,22 @@ describe('GetRendezVousJeuneQueryHandler', () => {
           expect(obtenu.data).to.equal(rendezVousReponse)
         }
       })
+    })
+  })
+
+  describe('monitor', () => {
+    it('envoie un évenement de consultation de la liste des rendez vous', async () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+
+      // When
+      await getRendezVousQueryHandler.monitor(utilisateur)
+
+      // Then
+      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
+        Evenement.Type.RDV_LISTE,
+        utilisateur
+      )
     })
   })
 })
