@@ -60,7 +60,7 @@
     "luxon": "2.3.0",
     "nestjs-pino": "2.5.0",
     "openid-client": "5.1.2",
-    "pg": "8.7.1",
+    "pg": "8.7.3",
     "pg-connection-string": "2.5.0",
     "pino-http": "6.6.0",
     "remove-accents": "0.4.2",
