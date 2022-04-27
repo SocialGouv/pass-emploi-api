@@ -16,7 +16,7 @@ export class HandleJobUpdateMailingListConseillerCommandHandler extends CommandH
   Command,
   Stats
 > {
-  private mailingLists: { poleEmploi: number; milo: number }
+  private mailingLists: { poleEmploi: string; milo: string }
 
   constructor(
     @Inject(MailServiceToken)
@@ -46,11 +46,11 @@ export class HandleJobUpdateMailingListConseillerCommandHandler extends CommandH
       )
     await this.mailService.mettreAJourMailingList(
       contactsMilo,
-      this.mailingLists.milo
+      parseInt(this.mailingLists.milo)
     )
     await this.mailService.mettreAJourMailingList(
       contactsPoleEmploi,
-      this.mailingLists.poleEmploi
+      parseInt(this.mailingLists.poleEmploi)
     )
     const conseillersSansEmail =
       await this.mailRepository.countContactsConseillerSansEmail()
