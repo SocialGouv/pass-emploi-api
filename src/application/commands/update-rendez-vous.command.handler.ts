@@ -22,6 +22,7 @@ import {
 import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
+import { buildError } from '../../utils/logger.module'
 
 export interface UpdateRendezVousCommand extends Command {
   idRendezVous: string
@@ -94,8 +95,10 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
         )
       } catch (e) {
         this.logger.error(
-          `La replanification des notifications du rendez-vous ${rendezVousUpdated.id} a échoué`,
-          e
+          buildError(
+            `La replanification des notifications du rendez-vous ${rendezVousUpdated.id} a échoué`,
+            e
+          )
         )
         this.apmService.captureError(e)
       }
@@ -128,8 +131,10 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
         )
       } catch (e) {
         this.logger.error(
-          "Erreur lors de l'envoi de l'email du nouveau rendez-vous",
-          e
+          buildError(
+            "Erreur lors de l'envoi de l'email du nouveau rendez-vous",
+            e
+          )
         )
       }
     }

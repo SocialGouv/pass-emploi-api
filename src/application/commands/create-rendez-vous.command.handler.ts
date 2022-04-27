@@ -19,6 +19,7 @@ import { IdService } from '../../utils/id-service'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
+import { buildError } from '../../utils/logger.module'
 
 export interface CreateRendezVousCommand extends Command {
   idJeune: string
@@ -96,8 +97,10 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       await this.planificateurService.planifierRappelsRendezVous(rendezVous)
     } catch (e) {
       this.logger.error(
-        `La planification des notifications du rendez-vous ${rendezVous.id} a échoué`,
-        e
+        buildError(
+          `La planification des notifications du rendez-vous ${rendezVous.id} a échoué`,
+          e
+        )
       )
       this.apmService.captureError(e)
     }
@@ -114,8 +117,10 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
         )
       } catch (e) {
         this.logger.error(
-          "Erreur lors de l'envoi de l'email du nouveau rendez-vous",
-          e
+          buildError(
+            "Erreur lors de l'envoi de l'email du nouveau rendez-vous",
+            e
+          )
         )
       }
     }
