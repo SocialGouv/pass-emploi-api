@@ -101,7 +101,7 @@ export class OffresImmersionHttpSqlRepository
 
       return success(response.data.map(toOffreImmersionQueryModel))
     } catch (e) {
-      if (e.response.status === 400) {
+      if (e.response?.status === 400) {
         const message = e.response.data.errors
           .map((error: { message: string }) => error.message)
           .join(' - ')

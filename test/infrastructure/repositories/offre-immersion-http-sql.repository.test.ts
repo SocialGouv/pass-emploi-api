@@ -24,6 +24,7 @@ import {
   FavoriOffreImmersionIdQueryModel,
   OffreImmersionQueryModel
 } from 'src/application/queries/query-models/offres-immersion.query-models'
+import { TIMEOUT } from 'dns'
 
 describe('OffresImmersionHttpSqlRepository', () => {
   DatabaseForTesting.prepare()
@@ -135,6 +136,34 @@ describe('OffresImmersionHttpSqlRepository', () => {
         expect(offres).to.deep.equal(
           failure(new RechercheOffreInvalide('Le champs Rome est pas bon'))
         )
+      })
+    })
+    describe('quand la requête renvoie une erreur', () => {
+      it('renvoie une erreur', async () => {
+        // Given
+        const query = {
+          rome: 'PLOP',
+          location: {
+            lat: 48.502103949334845,
+            lon: 2.13082255225161
+          },
+          distance_km: 30
+        }
+
+        const error: Error = new Error(TIMEOUT)
+
+        immersionClient.post.rejects(error)
+
+        // When
+        const call = offresImmersionHttpSqlRepository.findAll({
+          rome: query.rome,
+          lat: query.location.lat,
+          lon: query.location.lon,
+          distance: query.distance_km
+        })
+
+        // Then
+        await expect(call).to.be.rejectedWith(error)
       })
     })
   })
