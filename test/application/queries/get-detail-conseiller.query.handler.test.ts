@@ -51,6 +51,7 @@ describe('GetDetailConseillerQueryHandler', () => {
           id: idConseiller,
           firstName: 'toto',
           lastName: 'tata',
+          email: 'nils.tavernier@passemploi.com',
           agence: undefined
         })
       )

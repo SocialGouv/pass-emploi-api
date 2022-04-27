@@ -27,6 +27,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
         id: '1',
         firstName: 'Nils',
         lastName: 'Tavernier',
+        email: 'nils.tavernier@passemploi.com',
         agence: undefined
       })
     })
@@ -49,6 +50,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
         id: '1',
         firstName: 'Nils',
         lastName: 'Tavernier',
+        email: 'nils.tavernier@passemploi.com',
         agence: {
           id: undefined,
           nom: "nom d'agence"
@@ -86,6 +88,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
         id: '1',
         firstName: 'Nils',
         lastName: 'Tavernier',
+        email: 'nils.tavernier@passemploi.com',
         agence: {
           id: "id d'agence",
           nom: 'Bonjour je suis une agence'

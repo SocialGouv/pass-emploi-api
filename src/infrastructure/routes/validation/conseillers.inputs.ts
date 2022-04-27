@@ -145,5 +145,7 @@ export class DetailConseillerPayload {
 
   @ApiPropertyOptional()
   @IsNotEmptyObject()
+  @ValidateNested({ each: true })
+  @Type(() => AgenceInput)
   agence?: AgenceInput
 }
