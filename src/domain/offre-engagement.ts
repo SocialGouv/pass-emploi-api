@@ -1,8 +1,4 @@
 import { Result } from '../building-blocks/types/result'
-import {
-  DetailOffreEngagementQueryModel,
-  OffreEngagementQueryModel
-} from '../application/queries/query-models/service-civique.query-models'
 import { DateTime } from 'luxon'
 import { Core } from './core'
 import { Jeune } from './jeune'
@@ -16,23 +12,31 @@ export interface OffreEngagement {
   ville?: string
   organisation?: string
   dateDeDebut?: string
+  dateDeFin?: string
+  description?: string
+  lienAnnonce?: string
+  adresseOrganisation?: string
+  adresseMission?: string
+  urlOrganisation?: string
+  codeDepartement?: string
+  codePostal?: string
+  descriptionOrganisation?: string
+  localisation?: OffreEngagement.Localisation
 }
 
 export namespace OffreEngagement {
   export const DISTANCE_PAR_DEFAUT = 10
 
   export interface Repository {
-    findAll(criteres: Criteres): Promise<Result<OffreEngagementQueryModel[]>>
+    findAll(criteres: Criteres): Promise<Result<OffreEngagement[]>>
 
-    getOffreEngagementQueryModelById(
+    getOffreEngagementById(
       idOffreEngagement: string
-    ): Promise<Result<DetailOffreEngagementQueryModel>>
+    ): Promise<Result<OffreEngagement>>
 
-    getFavorisIdsQueryModelsByJeune(id: Jeune.Id): Promise<Core.Id[]>
+    getFavorisIdsByJeune(id: Jeune.Id): Promise<Core.Id[]>
 
-    getFavorisQueryModelsByJeune(
-      id: Jeune.Id
-    ): Promise<OffreEngagementQueryModel[]>
+    getFavorisByJeune(id: Jeune.Id): Promise<OffreEngagement[]>
 
     saveAsFavori(
       idJeune: string,
@@ -56,6 +60,7 @@ export namespace OffreEngagement {
     dateDeDebutMinimum?: DateTime
     dateDeDebutMaximum?: DateTime
     domaine?: string
+    dateDeCreationMinimum?: DateTime
     editeur: Editeur
   }
 
@@ -76,5 +81,10 @@ export namespace OffreEngagement {
     'animaux' = 'animaux',
     'vivre-ensemble' = 'vivre-ensemble',
     'autre' = 'autre'
+  }
+
+  export interface Localisation {
+    latitude: number
+    longitude: number
   }
 }

@@ -3,7 +3,10 @@ import {
   JeuneSqlModel
 } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
-import { uneOffreEngagement } from '../../fixtures/offre-engagement.fixture'
+import {
+  uneOffreEngagement,
+  uneOffreEngagementDto
+} from '../../fixtures/offre-engagement.fixture'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import {
   DatabaseForTesting,
@@ -65,16 +68,7 @@ describe('OffreEngagementRepository', () => {
           headers: '',
           config: '',
           data: {
-            hits: [
-              {
-                id: 'unId',
-                title: 'unTitre',
-                startAt: '2022-02-17T10:00:00.000Z',
-                domain: 'Informatique',
-                city: 'paris',
-                organizationName: 'orga de ouf'
-              }
-            ]
+            hits: [uneOffreEngagementDto()]
           }
         })
 
@@ -115,16 +109,7 @@ describe('OffreEngagementRepository', () => {
           headers: '',
           config: '',
           data: {
-            hits: [
-              {
-                id: 'unId',
-                title: 'unTitre',
-                startAt: '2022-02-17T10:00:00.000Z',
-                domain: 'Informatique',
-                city: 'paris',
-                organizationName: 'orga de ouf'
-              }
-            ]
+            hits: [uneOffreEngagementDto()]
           }
         })
 
@@ -136,18 +121,7 @@ describe('OffreEngagementRepository', () => {
           'v0/mission/search',
           params
         )
-        expect(result).to.be.deep.equal(
-          success([
-            {
-              dateDeDebut: '2022-02-17T10:00:00.000Z',
-              domaine: 'Informatique',
-              id: 'unId',
-              titre: 'unTitre',
-              ville: 'paris',
-              organisation: 'orga de ouf'
-            }
-          ])
-        )
+        expect(result).to.be.deep.equal(success([uneOffreEngagement()]))
       })
     })
     describe('Quand il y a une erreur', () => {
@@ -190,54 +164,41 @@ describe('OffreEngagementRepository', () => {
           config: '',
           data: {
             ok: true,
-            data: {
-              id: 'unId',
-              title: 'unTitre',
-              startAt: '2022-02-17T10:00:00.000Z',
-              endAt: '2022-07-17T10:00:00.000Z',
-              domain: 'Informatique',
-              city: 'paris',
-              organizationName: 'orga de ouf',
-              applicationUrl: 'lienoffre.com',
-              organizationUrl: 'lienorganisation.com',
-              adresse: 'adresse mission',
-              organizationFullAddress: 'adresse organistation',
-              postalCode: '75018',
-              description: 'offre très intéressante',
-              departmentCode: '75',
-              organizationDescription: 'description'
-            }
+            data: uneOffreEngagementDto()
           }
         })
 
         // When
-        const result =
-          await engagementHttpSqlRepository.getOffreEngagementQueryModelById(
-            idOffreEngagement
-          )
+        const result = await engagementHttpSqlRepository.getOffreEngagementById(
+          idOffreEngagement
+        )
 
         // Then
         expect(serviceCiviqueClient.get).to.have.been.calledWithExactly(
           'v0/mission/unId'
         )
-        expect(result).to.be.deep.equal(
-          success({
-            titre: 'unTitre',
-            dateDeDebut: '2022-02-17T10:00:00.000Z',
-            dateDeFin: '2022-07-17T10:00:00.000Z',
-            domaine: 'Informatique',
-            ville: 'paris',
-            organisation: 'orga de ouf',
-            lienAnnonce: 'lienoffre.com',
-            urlOrganisation: 'lienorganisation.com',
-            adresseMission: 'adresse mission',
-            adresseOrganisation: 'adresse organistation',
-            codeDepartement: '75',
-            description: 'offre très intéressante',
-            codePostal: '75018',
-            descriptionOrganisation: 'description'
-          })
-        )
+        const offreEngagement: OffreEngagement = {
+          titre: 'unTitre',
+          dateDeDebut: '2022-02-17T10:00:00.000Z',
+          dateDeFin: '2022-07-17T10:00:00.000Z',
+          domaine: 'Informatique',
+          ville: 'paris',
+          organisation: 'orga de ouf',
+          lienAnnonce: 'lienoffre.com',
+          urlOrganisation: 'lienorganisation.com',
+          adresseMission: 'adresse mission',
+          adresseOrganisation: 'adresse organistation',
+          codeDepartement: '75',
+          description: 'offre très intéressante',
+          codePostal: '75018',
+          descriptionOrganisation: 'description',
+          id: 'unId',
+          localisation: {
+            longitude: 1.2,
+            latitude: 3.4
+          }
+        }
+        expect(result).to.be.deep.equal(success(offreEngagement))
       })
       it('quand l"offre n"existe pas', async () => {
         // Given
@@ -252,10 +213,9 @@ describe('OffreEngagementRepository', () => {
         })
 
         // When
-        const result =
-          await engagementHttpSqlRepository.getOffreEngagementQueryModelById(
-            idOffreEngagement
-          )
+        const result = await engagementHttpSqlRepository.getOffreEngagementById(
+          idOffreEngagement
+        )
 
         // Then
         expect(serviceCiviqueClient.get).to.have.been.calledWithExactly(
@@ -280,10 +240,9 @@ describe('OffreEngagementRepository', () => {
         })
 
         // When
-        const result =
-          await engagementHttpSqlRepository.getOffreEngagementQueryModelById(
-            idOffreEngagement
-          )
+        const result = await engagementHttpSqlRepository.getOffreEngagementById(
+          idOffreEngagement
+        )
 
         // Then
         expect(result).to.be.deep.equal(
@@ -305,35 +264,40 @@ describe('OffreEngagementRepository', () => {
       await engagementHttpSqlRepository.saveAsFavori(jeuneDto.id, offre)
 
       // When
-      const ids =
-        await engagementHttpSqlRepository.getFavorisIdsQueryModelsByJeune(
-          jeuneDto.id
-        )
+      const ids = await engagementHttpSqlRepository.getFavorisIdsByJeune(
+        jeuneDto.id
+      )
 
       // Then
       expect(ids).to.deep.equal([{ id: offre.id }])
     })
   })
 
-  describe('getFavorisQueryModelsByJeune', () => {
-    it('renvoie les favoris query models', async () => {
+  describe('getFavoriByJeune', () => {
+    it('renvoie les favoris', async () => {
       // Given
       const jeuneDto: AsSql<JeuneDto> = {
         ...unJeuneDto(),
         idConseiller: undefined
       }
       await JeuneSqlModel.creer(jeuneDto)
-      const offre = uneOffreEngagement()
+      const offre: OffreEngagement = {
+        id: 'unId',
+        domaine: OffreEngagement.Domaine.education,
+        ville: 'Paris',
+        titre: 'La best offre',
+        organisation: 'FNAC',
+        dateDeDebut: '2022-05-12T10:00:10'
+      }
       await engagementHttpSqlRepository.saveAsFavori(jeuneDto.id, offre)
 
       // When
-      const queryModels =
-        await engagementHttpSqlRepository.getFavorisQueryModelsByJeune(
-          jeuneDto.id
-        )
+      const queryModels = await engagementHttpSqlRepository.getFavorisByJeune(
+        jeuneDto.id
+      )
 
       // Then
-      expect(queryModels).to.deep.equal([uneOffreEngagement()])
+      expect(queryModels).to.deep.equal([offre])
     })
   })
 
@@ -346,7 +310,14 @@ describe('OffreEngagementRepository', () => {
           idConseiller: undefined
         }
         await JeuneSqlModel.creer(jeuneDto)
-        const offre = uneOffreEngagement()
+        const offre: OffreEngagement = {
+          id: 'unId',
+          domaine: OffreEngagement.Domaine.education,
+          ville: 'Paris',
+          titre: 'La best offre',
+          organisation: 'FNAC',
+          dateDeDebut: '2022-05-12T10:00:10'
+        }
         await engagementHttpSqlRepository.saveAsFavori(jeuneDto.id, offre)
 
         // When
@@ -356,7 +327,7 @@ describe('OffreEngagementRepository', () => {
         )
 
         // Then
-        expect(favori).to.deep.equal(uneOffreEngagement())
+        expect(favori).to.deep.equal(offre)
       })
     })
 

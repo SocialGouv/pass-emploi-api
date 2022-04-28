@@ -34,12 +34,8 @@ export class GetFavorisOffresEngagementJeuneQueryHandler extends QueryHandler<
     query: GetFavorisOffresEngagementJeuneQuery
   ): Promise<OffreEngagementQueryModel[] | Core.Id[]> {
     return query.detail
-      ? this.offresEngagementRepository.getFavorisQueryModelsByJeune(
-          query.idJeune
-        )
-      : this.offresEngagementRepository.getFavorisIdsQueryModelsByJeune(
-          query.idJeune
-        )
+      ? this.offresEngagementRepository.getFavorisByJeune(query.idJeune)
+      : this.offresEngagementRepository.getFavorisIdsByJeune(query.idJeune)
   }
   async authorize(
     query: GetFavorisOffresEngagementJeuneQuery,

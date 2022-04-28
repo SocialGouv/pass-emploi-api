@@ -1,10 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { URLSearchParams } from 'url'
 import {
-  DetailOffreEngagementQueryModel,
-  OffreEngagementQueryModel
-} from '../../application/queries/query-models/service-civique.query-models'
-import {
   ErreurHttp,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
@@ -16,8 +12,8 @@ import { FavoriOffreEngagementSqlModel } from '../sequelize/models/favori-offre-
 import {
   fromSqlToIds,
   fromSqlToOffreEngagement,
-  toDetailOffreEngagementQueryModel,
-  toServiceCiviqueQueryModel
+  toOffreEngagement,
+  toOffresEngagement
 } from './mappers/service-civique.mapper'
 
 @Injectable()
@@ -30,14 +26,14 @@ export class EngagementHttpSqlRepository implements OffreEngagement.Repository {
 
   async findAll(
     criteres: OffreEngagement.Criteres
-  ): Promise<Result<OffreEngagementQueryModel[]>> {
+  ): Promise<Result<OffreEngagement[]>> {
     try {
-      const params = this.construireLesParams(criteres)
+      const params = EngagementHttpSqlRepository.construireLesParams(criteres)
       const response = await this.engagementClient.get<EngagementDto>(
         'v0/mission/search',
         params
       )
-      return success(toServiceCiviqueQueryModel(response.data))
+      return success(toOffresEngagement(response.data))
     } catch (e) {
       this.logger.error(e)
       if (e.response?.status >= 400 && e.response?.status < 500) {
@@ -51,15 +47,15 @@ export class EngagementHttpSqlRepository implements OffreEngagement.Repository {
     }
   }
 
-  async getOffreEngagementQueryModelById(
+  async getOffreEngagementById(
     idOffreEngagement: string
-  ): Promise<Result<DetailOffreEngagementQueryModel>> {
+  ): Promise<Result<OffreEngagement>> {
     try {
       const response =
         await this.engagementClient.get<DetailOffreEngagementDto>(
           `v0/mission/${idOffreEngagement}`
         )
-      return success(toDetailOffreEngagementQueryModel(response.data.data))
+      return success(toOffreEngagement(response.data.data))
     } catch (e) {
       this.logger.error(e)
       if (e.response?.status >= 400 && e.response?.status < 500) {
@@ -81,7 +77,7 @@ export class EngagementHttpSqlRepository implements OffreEngagement.Repository {
     }
   }
 
-  private construireLesParams(
+  private static construireLesParams(
     criteres: OffreEngagement.Criteres
   ): URLSearchParams {
     const {
@@ -123,7 +119,7 @@ export class EngagementHttpSqlRepository implements OffreEngagement.Repository {
     return params
   }
 
-  async getFavorisIdsQueryModelsByJeune(idJeune: string): Promise<Core.Id[]> {
+  async getFavorisIdsByJeune(idJeune: string): Promise<Core.Id[]> {
     const favorisIdsSql = await FavoriOffreEngagementSqlModel.findAll({
       attributes: ['idOffre'],
       where: {
@@ -134,9 +130,7 @@ export class EngagementHttpSqlRepository implements OffreEngagement.Repository {
     return fromSqlToIds(favorisIdsSql)
   }
 
-  async getFavorisQueryModelsByJeune(
-    idJeune: string
-  ): Promise<OffreEngagementQueryModel[]> {
+  async getFavorisByJeune(idJeune: string): Promise<OffreEngagement[]> {
     const favorisSql = await FavoriOffreEngagementSqlModel.findAll({
       where: {
         idJeune
@@ -212,44 +206,44 @@ export interface DetailOffreEngagementDto {
 
 export interface OffreEngagementDto {
   id: string
-  publisherId: string
-  publisherName: string
-  publisherUrl: string
-  publisherLogo: string
-  lastSyncAt: string
-  applicationUrl: string
-  statusCode: string
-  statusComment: string
-  clientId: string
   title: string
-  description: string
-  organizationName: string
-  organizationUrl: string
-  organizationFullAddress: string
-  organizationCity: string
-  organizationPostCode: string
-  organizationDescription: string
-  startAt: string
-  endAt: string
-  postedAt: string
-  priority: string
-  metadata: string
-  adresse: string
-  postalCode: string
-  departmentName: string
-  departmentCode: string
-  city: string
-  region: string
-  country: string
   domain: string
-  domainLogo: string
-  activity: string
-  location: {
+  publisherId?: string
+  publisherName?: string
+  publisherUrl?: string
+  publisherLogo?: string
+  lastSyncAt?: string
+  applicationUrl?: string
+  statusCode?: string
+  statusComment?: string
+  clientId?: string
+  description?: string
+  organizationName?: string
+  organizationUrl?: string
+  organizationFullAddress?: string
+  organizationCity?: string
+  organizationPostCode?: string
+  organizationDescription?: string
+  startAt?: string
+  endAt?: string
+  postedAt?: string
+  priority?: string
+  metadata?: string
+  adresse?: string
+  postalCode?: string
+  departmentName?: string
+  departmentCode?: string
+  city?: string
+  region?: string
+  country?: string
+  domainLogo?: string
+  activity?: string
+  location?: {
     lon: number
     lat: number
   }
-  remote: string
-  deleted: string
-  createdAt: string
-  updatedAt: string
+  remote?: string
+  deleted?: string
+  createdAt?: string
+  updatedAt?: string
 }

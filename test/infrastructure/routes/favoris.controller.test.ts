@@ -54,6 +54,7 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { OffreEngagement } from '../../../src/domain/offre-engagement'
 
 describe('FavorisController', () => {
   let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
@@ -402,7 +403,14 @@ describe('FavorisController', () => {
     })
 
     describe('POST /jeunes/:idJeune/favoris/services-civique', () => {
-      const offre = uneOffreEngagement()
+      const offre: OffreEngagement = {
+        id: 'unId',
+        domaine: OffreEngagement.Domaine.education,
+        ville: 'Paris',
+        titre: 'La best offre',
+        organisation: 'FNAC',
+        dateDeDebut: '2022-05-12T10:00:10'
+      }
       const command: AddFavoriOffreEngagementCommand = {
         idJeune: 'ABCDE',
         offre
