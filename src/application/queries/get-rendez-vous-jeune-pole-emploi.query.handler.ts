@@ -23,7 +23,6 @@ import { fromRendezVousDtoToRendezVousQueryModel } from './query-mappers/rendez-
 import { fromPrestationDtoToRendezVousQueryModel } from './query-mappers/rendez-vous-prestation.mappers'
 import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
 import { Evenement, EvenementService } from '../../domain/evenement'
-import Periode = RendezVous.Periode
 
 export interface GetRendezVousJeunePoleEmploiQuery extends Query {
   idJeune: string
@@ -142,7 +141,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur,
     query: GetRendezVousJeunePoleEmploiQuery
   ): Promise<void> {
-    if (query?.periode != Periode.PASSES) {
+    if (query?.periode !== RendezVous.Periode.PASSES) {
       await this.evenementService.creerEvenement(
         Evenement.Type.RDV_LISTE,
         utilisateur
