@@ -6,10 +6,10 @@ import {
 import { HandleJobUpdateMailingListConseillerCommandHandler } from './commands/jobs/handle-job-update-mailing-list-conseiller.command'
 import { SynchronizeJobsCommandHandler } from './commands/tasks/synchronize-jobs.command'
 import JobEnum = Planificateur.JobEnum
-import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notification-recherche.command'
 import { HandleJobMailConseillerCommandHandler } from './commands/jobs/handle-job-mail-conseiller.command'
 import { HandleNettoyerLesJobsCommandHandler } from './commands/jobs/handle-job-nettoyer-les-jobs.command'
 import { InitCronsCommandHandler } from './commands/tasks/init-crons.command'
+import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
 
 export enum Task {
   DUMMY_JOB = 'DUMMY_JOB',
