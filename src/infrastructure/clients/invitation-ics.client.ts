@@ -12,7 +12,7 @@ import {
   formaterHeureRendezVous,
   ICS
 } from './mail-sendinblue.service'
-import { EventAttributes } from 'ics'
+import { Attendee, EventAttributes } from 'ics'
 import { ConfigService } from '@nestjs/config'
 
 @Injectable()
@@ -112,12 +112,14 @@ export class InvitationIcsClient {
           rsvp: true,
           role: 'REQ-PARTICIPANT'
         },
-        {
-          name: rendezVous.jeune.lastName + ' ' + rendezVous.jeune.firstName,
-          email: rendezVous.jeune.email,
-          rsvp: true,
-          role: 'REQ-PARTICIPANT'
-        }
+        ...rendezVous.jeunes.map((jeune): Attendee => {
+          return {
+            name: jeune.lastName + ' ' + jeune.firstName,
+            email: jeune.email,
+            rsvp: true,
+            role: 'REQ-PARTICIPANT'
+          }
+        })
       ]
     }
   }

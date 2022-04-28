@@ -338,7 +338,10 @@ export class ConseillersController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<Core.Id> {
     const command: CreateRendezVousCommand = {
-      idJeune: createRendezVousPayload.jeuneId,
+      idsJeunes: buildIdsJeunes(
+        createRendezVousPayload.jeuneId,
+        createRendezVousPayload.jeunesIds
+      ),
       commentaire: createRendezVousPayload.comment,
       date: createRendezVousPayload.date,
       duree: createRendezVousPayload.duration,
@@ -525,4 +528,16 @@ export class ConseillersController {
       throw new RuntimeException(result.error.message)
     }
   }
+}
+
+// TODO: ENLEVER QUAND LE WEB EST A JOUR
+function buildIdsJeunes(idJeune?: string, idsJeunes?: string[]): string[] {
+  if (idsJeunes) {
+    return idsJeunes
+  }
+  if (idJeune) {
+    return [idJeune]
+  }
+  // cas non atteignable
+  return []
 }

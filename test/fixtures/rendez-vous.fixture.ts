@@ -20,6 +20,7 @@ export const unRendezVous = (
     modalite: 'modalite',
     date: new Date('2021-11-11T08:03:30.000Z'),
     jeune: jeune,
+    jeunes: [jeune],
     commentaire: 'commentaire',
     sousTitre: 'sous titre',
     type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,

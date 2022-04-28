@@ -106,37 +106,45 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
 
     await this.rendezVousRepository.save(rendezVousUpdated)
 
-    const tokenDuJeune = rendezVous.jeune.pushNotificationToken
-    if (tokenDuJeune) {
-      const notification = Notification.updateRdv(
-        tokenDuJeune,
-        rendezVousUpdated.id
-      )
-      await this.notificationRepository.send(notification)
-    } else {
-      this.logger.log(
-        `Le jeune ${rendezVous.jeune.id} ne s'est jamais connecté sur l'application`
-      )
-    }
+    await Promise.all(
+      rendezVous.jeunes.map(async jeune => {
+        if (jeune.pushNotificationToken) {
+          const notification = Notification.createNouveauRdv(
+            jeune.pushNotificationToken,
+            rendezVous.id
+          )
+          await this.notificationRepository.send(notification)
+        } else {
+          this.logger.log(
+            `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
+          )
+        }
+      })
+    )
 
     if (rendezVousUpdated.invitation) {
-      const conseillerDestinataire =
-        rendezVousUpdated.createur.id === rendezVousUpdated.jeune.conseiller!.id
-          ? rendezVousUpdated.jeune.conseiller
-          : await this.conseillerRepository.get(rendezVousUpdated.createur.id)
-      try {
-        await this.mailClient.envoyerMailRendezVous(
-          conseillerDestinataire!,
-          rendezVousUpdated
-        )
-      } catch (e) {
-        this.logger.error(
-          buildError(
-            "Erreur lors de l'envoi de l'email du nouveau rendez-vous",
-            e
+      const conseillerDestinataire = await this.conseillerRepository.get(
+        rendezVousUpdated.createur.id
+      )
+      if (conseillerDestinataire && conseillerDestinataire.email) {
+        try {
+          await this.mailClient.envoyerMailRendezVous(
+            conseillerDestinataire,
+            rendezVousUpdated
           )
-        )
+        } catch (e) {
+          this.logger.error(
+            buildError(
+              "Erreur lors de l'envoi de l'email du nouveau rendez-vous",
+              e
+            )
+          )
+        }
       }
+    } else {
+      this.logger.warn(
+        `Impossible d'envoyer un e-mail au conseiller ${rendezVousUpdated.createur.id}, l'adresse n'existe pas`
+      )
     }
 
     return success({ id: rendezVousUpdated.id })

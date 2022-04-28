@@ -11,7 +11,7 @@ import { RendezVousSqlModel } from './rendez-vous.sql-model'
 import { JeuneSqlModel } from './jeune.sql-model'
 
 @Table({ timestamps: false, tableName: 'rendez_vous_jeune_association' })
-export class RendezVousJeuneAssociationModel extends Model {
+export class RendezVousJeuneAssociationSqlModel extends Model {
   @PrimaryKey
   @AutoIncrement
   @Column({ field: 'id', type: DataType.INTEGER })

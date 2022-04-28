@@ -1,6 +1,6 @@
 import { stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { RendezVousJeuneAssociationModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
+import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
 import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import {
@@ -105,7 +105,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
         unRendezVousTresFuturPresenceConseillerFalse,
         unRendezVousProche
       ])
-      await RendezVousJeuneAssociationModel.bulkCreate([
+      await RendezVousJeuneAssociationSqlModel.bulkCreate([
         {
           idJeune: jeune1.id,
           idRendezVous: unRendezVousPasse.id

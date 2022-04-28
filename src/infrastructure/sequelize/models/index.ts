@@ -7,22 +7,18 @@ import { FavoriOffreEmploiSqlModel } from './favori-offre-emploi.sql-model'
 import { FavoriOffreEngagementSqlModel } from './favori-offre-engagement.sql-model'
 import { FavoriOffreImmersionSqlModel } from './favori-offre-immersion.sql-model'
 import { JeuneSqlModel } from './jeune.sql-model'
-import {
-  RendezVousSqlModelOld,
-  RendezVousSqlModel
-} from './rendez-vous.sql-model'
+import { RendezVousSqlModel } from './rendez-vous.sql-model'
 import { RechercheSqlModel } from './recherche.sql-model'
 import { TransfertConseillerSqlModel } from './transfert-conseiller.sql-model'
 import { SuperviseurSqlModel } from './superviseur.sql-model'
 import { AgenceSqlModel } from './agence.sql-model'
-import { RendezVousJeuneAssociationModel } from './rendez-vous-jeune-association.model'
+import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-association.model'
 
 export const sqlModels = [
   ConseillerSqlModel,
   JeuneSqlModel,
   ActionSqlModel,
   RendezVousSqlModel,
-  RendezVousSqlModelOld,
   FavoriOffreEmploiSqlModel,
   CommuneSqlModel,
   DepartementSqlModel,
@@ -33,5 +29,5 @@ export const sqlModels = [
   SuperviseurSqlModel,
   FavoriOffreEngagementSqlModel,
   AgenceSqlModel,
-  RendezVousJeuneAssociationModel
+  RendezVousJeuneAssociationSqlModel
 ]

@@ -13,12 +13,9 @@ import { Core } from '../../../domain/core'
 import { AsSql } from '../types'
 import { ActionSqlModel } from './action.sql-model'
 import { ConseillerSqlModel } from './conseiller.sql-model'
-import {
-  RendezVousSqlModelOld,
-  RendezVousSqlModel
-} from './rendez-vous.sql-model'
+import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-association.model'
+import { RendezVousSqlModel } from './rendez-vous.sql-model'
 import { TransfertConseillerSqlModel } from './transfert-conseiller.sql-model'
-import { RendezVousJeuneAssociationModel } from './rendez-vous-jeune-association.model'
 
 export class JeuneDto extends Model {
   @PrimaryKey
@@ -110,12 +107,9 @@ export class JeuneSqlModel extends JeuneDto {
   @BelongsTo(() => ConseillerSqlModel)
   conseiller?: ConseillerSqlModel
 
-  @HasMany(() => RendezVousSqlModelOld)
-  rendezVous!: RendezVousSqlModelOld[]
-
   @BelongsToMany(
     () => RendezVousSqlModel,
-    () => RendezVousJeuneAssociationModel
+    () => RendezVousJeuneAssociationSqlModel
   )
   rdv: RendezVousSqlModel[]
 

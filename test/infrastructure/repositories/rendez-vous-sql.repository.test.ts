@@ -4,8 +4,8 @@ import { RendezVousRepositorySql } from '../../../src/infrastructure/repositorie
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import {
-  RendezVousDtoOld,
-  RendezVousSqlModelOld
+  RendezVousDto,
+  RendezVousSqlModel
 } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { DateService } from '../../../src/utils/date-service'
@@ -13,7 +13,7 @@ import { uneDatetime, uneDatetimeMinuit } from '../../fixtures/date.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { unRendezVousDtoOld } from '../../fixtures/sql-models/rendez-vous.sql-model'
+import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { DatabaseForTesting, expect, stubClass } from '../../utils'
 
 describe('RendezVousRepositorySql', () => {
@@ -21,10 +21,10 @@ describe('RendezVousRepositorySql', () => {
   let rendezVousRepositorySql: RendezVousRepositorySql
   const maintenant = uneDatetime
   const aujourdhuiMinuit = uneDatetimeMinuit
-  let unRendezVousPasse: AsSql<RendezVousDtoOld>
-  let unRendezVousTresPasse: AsSql<RendezVousDtoOld>
-  let unRendezVousProche: AsSql<RendezVousDtoOld>
-  let unRendezVousTresFuturPresenceConseillerFalse: AsSql<RendezVousDtoOld>
+  let unRendezVousPasse: AsSql<RendezVousDto>
+  let unRendezVousTresPasse: AsSql<RendezVousDto>
+  let unRendezVousProche: AsSql<RendezVousDto>
+  let unRendezVousTresFuturPresenceConseillerFalse: AsSql<RendezVousDto>
   let jeune: Jeune
 
   beforeEach(async () => {
@@ -38,29 +38,29 @@ describe('RendezVousRepositorySql', () => {
     await ConseillerSqlModel.creer(unConseillerDto())
     await JeuneSqlModel.creer(unJeuneDto())
 
-    unRendezVousPasse = unRendezVousDtoOld({
+    unRendezVousPasse = unRendezVousDto({
       idJeune: jeune.id,
       date: maintenant.minus({ days: 2 }).toJSDate(),
       titre: 'UN RENDEZ VOUS PASSÉ'
     })
-    unRendezVousTresPasse = unRendezVousDtoOld({
+    unRendezVousTresPasse = unRendezVousDto({
       idJeune: jeune.id,
       date: maintenant.minus({ days: 20 }).toJSDate(),
       titre: 'UN RENDEZ VOUS TRES PASSÉ'
     })
-    unRendezVousProche = unRendezVousDtoOld({
+    unRendezVousProche = unRendezVousDto({
       idJeune: jeune.id,
       date: maintenant.plus({ days: 2 }).toJSDate(),
       titre: 'UN RENDEZ VOUS PROCHE'
     })
-    unRendezVousTresFuturPresenceConseillerFalse = unRendezVousDtoOld({
+    unRendezVousTresFuturPresenceConseillerFalse = unRendezVousDto({
       idJeune: jeune.id,
       date: maintenant.plus({ days: 20 }).toJSDate(),
       titre: 'UN RENDEZ TRES FUTUR',
       presenceConseiller: false
     })
 
-    await RendezVousSqlModelOld.bulkCreate([
+    await RendezVousSqlModel.bulkCreate([
       unRendezVousPasse,
       unRendezVousTresPasse,
       unRendezVousTresFuturPresenceConseillerFalse,
@@ -83,11 +83,11 @@ describe('RendezVousRepositorySql', () => {
       it('retourne le rendez-vous', async () => {
         // Given
         const idRdv = '6c242fa0-804f-11ec-a8a3-0242ac120002'
-        const unRendezVous = unRendezVousDtoOld({
+        const unRendezVous = unRendezVousDto({
           id: idRdv,
           idJeune: jeune.id
         })
-        await RendezVousSqlModelOld.create(unRendezVous)
+        await RendezVousSqlModel.create(unRendezVous)
         // When
         const rendezVous = await rendezVousRepositorySql.get(idRdv)
         // Then
@@ -112,7 +112,7 @@ describe('RendezVousRepositorySql', () => {
         await rendezVousRepositorySql.save(unRendezVous({ id }))
 
         // Then
-        const rdv = await RendezVousSqlModelOld.findByPk(id)
+        const rdv = await RendezVousSqlModel.findByPk(id)
         expect(rdv?.id).to.equal(id)
       })
     })
@@ -127,7 +127,7 @@ describe('RendezVousRepositorySql', () => {
         await rendezVousRepositorySql.save(unRendezVous({ id, commentaire }))
 
         // Then
-        const rdv = await RendezVousSqlModelOld.findByPk(id)
+        const rdv = await RendezVousSqlModel.findByPk(id)
         expect(rdv?.id).to.equal(id)
         expect(rdv?.commentaire).to.equal(commentaire)
       })
@@ -155,7 +155,7 @@ describe('RendezVousRepositorySql', () => {
         )
 
         // Then
-        const rdv = await RendezVousSqlModelOld.findByPk(id)
+        const rdv = await RendezVousSqlModel.findByPk(id)
         expect(rdv?.id).to.equal(id)
         expect(rdv?.commentaire).to.equal(null)
         expect(rdv?.modalite).to.equal(null)

@@ -22,7 +22,7 @@ import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { buildError } from '../../utils/logger.module'
 
 export interface CreateRendezVousCommand extends Command {
-  idJeune: string
+  idsJeunes: string[]
   idConseiller: string
   commentaire?: string
   date: string
@@ -60,38 +60,44 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
   }
 
   async handle(command: CreateRendezVousCommand): Promise<Result<string>> {
-    const jeune = await this.jeuneRepository.get(command.idJeune)
-
-    if (!jeune) {
-      return failure(new NonTrouveError('Jeune', command.idJeune))
-    }
-
-    if (jeune.conseiller?.id !== command.idConseiller) {
-      return failure(
-        new JeuneNonLieAuConseillerError(command.idConseiller, command.idJeune)
-      )
+    const jeunes: Jeune[] = []
+    for (const idJeune of command.idsJeunes) {
+      const jeune = await this.jeuneRepository.get(idJeune)
+      if (!jeune) {
+        return failure(new NonTrouveError('Jeune', idJeune))
+      }
+      if (jeune.conseiller?.id !== command.idConseiller) {
+        return failure(
+          new JeuneNonLieAuConseillerError(command.idConseiller, jeune.id)
+        )
+      }
+      jeunes.push(jeune)
     }
 
     const conseiller = await this.conseillerRepository.get(command.idConseiller)
     const rendezVous = RendezVous.createRendezVousConseiller(
       command,
-      jeune,
+      jeunes,
       conseiller!,
       this.idService
     )
     await this.rendezVousRepository.save(rendezVous)
 
-    if (jeune.pushNotificationToken) {
-      const notification = Notification.createNouveauRdv(
-        jeune.pushNotificationToken,
-        rendezVous.id
-      )
-      await this.notificationRepository.send(notification)
-    } else {
-      this.logger.log(
-        `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
-      )
-    }
+    await Promise.all(
+      jeunes.map(async jeune => {
+        if (jeune.pushNotificationToken) {
+          const notification = Notification.createNouveauRdv(
+            jeune.pushNotificationToken,
+            rendezVous.id
+          )
+          await this.notificationRepository.send(notification)
+        } else {
+          this.logger.log(
+            `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
+          )
+        }
+      })
+    )
 
     try {
       await this.planificateurService.planifierRappelsRendezVous(rendezVous)
@@ -105,16 +111,9 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       this.apmService.captureError(e)
     }
 
-    if (!jeune.conseiller.email) {
-      this.logger.warn(
-        `Impossible d'envoyer un mail au conseiller ${command.idConseiller}, il n'existe pas`
-      )
-    } else {
+    if (conseiller!.email) {
       try {
-        await this.mailService.envoyerMailRendezVous(
-          jeune.conseiller,
-          rendezVous
-        )
+        await this.mailService.envoyerMailRendezVous(conseiller!, rendezVous)
       } catch (e) {
         this.logger.error(
           buildError(
@@ -123,6 +122,10 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
           )
         )
       }
+    } else {
+      this.logger.warn(
+        `Impossible d'envoyer un e-mail au conseiller ${command.idConseiller}, l'adresse n'existe pas`
+      )
     }
 
     return success(rendezVous.id)
@@ -132,11 +135,7 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     command: CreateRendezVousCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    await this.conseillerAuthorizer.authorize(
-      command.idConseiller,
-      utilisateur,
-      command.idJeune
-    )
+    await this.conseillerAuthorizer.authorize(command.idConseiller, utilisateur)
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

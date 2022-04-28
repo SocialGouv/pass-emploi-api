@@ -20,7 +20,7 @@ export class RendezVousAuthorizer {
       rendezVous &&
       utilisateur &&
       utilisateur.type === Authentification.Type.CONSEILLER &&
-      utilisateur.id === rendezVous.jeune.conseiller?.id
+      rendezVous.jeunes.find(jeune => utilisateur.id === jeune.conseiller?.id)
     ) {
       return
     }

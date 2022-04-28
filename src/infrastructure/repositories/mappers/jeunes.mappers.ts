@@ -14,6 +14,7 @@ import {
   JeuneDto,
   JeuneSqlModel
 } from 'src/infrastructure/sequelize/models/jeune.sql-model'
+import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../sequelize/types'
 import { ResumeActionsJeuneDto } from '../jeune-sql.repository'
 
@@ -104,7 +105,8 @@ function getTokenLastUpdate(
 }
 
 export function fromSqlToJeuneHomeQueryModel(
-  jeuneSqlModel: JeuneSqlModel
+  jeuneSqlModel: JeuneSqlModel,
+  rdvJeuneSqlModel: RendezVousSqlModel[]
 ): JeuneHomeQueryModel {
   return {
     conseiller: {
@@ -131,28 +133,29 @@ export function fromSqlToJeuneHomeQueryModel(
       creatorType: actionSql.typeCreateur,
       creator: toCreator(actionSql, jeuneSqlModel)
     })),
-    rendezvous: jeuneSqlModel.rendezVous.map(rendezVousSql => ({
-      id: rendezVousSql.id,
-      comment: rendezVousSql.commentaire ?? '',
-      date: DateTime.fromJSDate(rendezVousSql.date)
-        .setZone('Europe/Paris')
-        .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
-      dateUtc: DateTime.fromJSDate(rendezVousSql.date).toUTC().toISO(),
-      duration: Duration.fromObject({
-        minutes: rendezVousSql.duree
-      }).toFormat('h:mm:ss'),
-      modality: rendezVousSql.modalite ?? '',
-      title: rendezVousSql.titre,
-      subtitle: rendezVousSql.sousTitre,
-      type: {
-        code: rendezVousSql.type,
-        label: mapCodeLabelTypeRendezVous[rendezVousSql.type]
-      },
-      precision: rendezVousSql.precision ?? undefined,
-      adresse: rendezVousSql.adresse ?? undefined,
-      organisme: rendezVousSql.organisme ?? undefined,
-      presenceConseiller: rendezVousSql.presenceConseiller
-    }))
+    rendezvous:
+      rdvJeuneSqlModel?.map(rendezVousSql => ({
+        id: rendezVousSql.id,
+        comment: rendezVousSql.commentaire ?? '',
+        date: DateTime.fromJSDate(rendezVousSql.date)
+          .setZone('Europe/Paris')
+          .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
+        dateUtc: DateTime.fromJSDate(rendezVousSql.date).toUTC().toISO(),
+        duration: Duration.fromObject({
+          minutes: rendezVousSql.duree
+        }).toFormat('h:mm:ss'),
+        modality: rendezVousSql.modalite ?? '',
+        title: rendezVousSql.titre,
+        subtitle: rendezVousSql.sousTitre,
+        type: {
+          code: rendezVousSql.type,
+          label: mapCodeLabelTypeRendezVous[rendezVousSql.type]
+        },
+        precision: rendezVousSql.precision ?? undefined,
+        adresse: rendezVousSql.adresse ?? undefined,
+        organisme: rendezVousSql.organisme ?? undefined,
+        presenceConseiller: rendezVousSql.presenceConseiller
+      })) ?? []
   }
 }
 
