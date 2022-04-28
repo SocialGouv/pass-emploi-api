@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Op, QueryTypes, Sequelize } from 'sequelize'
+import { FindOptions, Op, QueryTypes, Sequelize } from 'sequelize'
 import { RechercheQueryModel } from '../../application/queries/query-models/recherches.query-model'
 import { OffresEmploi } from '../../domain/offre-emploi'
 import { OffresImmersion } from '../../domain/offre-immersion'
@@ -11,7 +11,6 @@ import { GetOffresEmploiQuery } from '../../application/queries/get-offres-emplo
 import { CommuneSqlModel } from '../sequelize/models/commune.sql-model'
 import { SequelizeInjectionToken } from '../sequelize/providers'
 import { GetOffresImmersionQuery } from '../../application/queries/get-offres-immersion.query.handler'
-import { FindOptions } from 'sequelize/dist/lib/model'
 import { GetServicesCiviqueQuery } from 'src/application/queries/get-services-civique.query.handler'
 import { OffreEngagement } from 'src/domain/offre-engagement'
 
