@@ -42,12 +42,13 @@ export class KeycloakClient {
           this.httpService.post(url, new URLSearchParams(payload), { headers })
         )
       ).data
-      this.logger.log('Token exchange success', {
+      this.logger.log({
+        message: 'Token exchange success',
         expires_in: result.expires_in
       })
       return result.access_token
     } catch (e) {
-      this.logger.error('erreur lors du token exchange', e)
+      this.logger.error(buildError('erreur lors du token exchange', e))
       throw new UnauthorizedException({
         statusCode: 401,
         message: 'Unauthorized',
