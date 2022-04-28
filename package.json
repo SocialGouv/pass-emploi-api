@@ -52,7 +52,7 @@
     "class-transformer": "0.5.1",
     "class-validator": "0.13.2",
     "crypto-js": "4.1.1",
-    "elastic-apm-node": "3.27.0",
+    "elastic-apm-node": "3.32.0",
     "firebase-admin": "10.0.2",
     "geojson": "^0.5.0",
     "helmet": "^5.0.2",
