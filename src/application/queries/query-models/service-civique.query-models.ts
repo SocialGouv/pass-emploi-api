@@ -1,11 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { OffreEngagement } from '../../../domain/offre-engagement'
+import { OffreServiceCivique } from '../../../domain/offre-service-civique'
 
-export class OffreEngagementQueryModel {
+export class ServiceCiviqueQueryModel {
   @ApiProperty()
   id: string
   @ApiProperty({
-    enum: OffreEngagement.Domaine
+    enum: OffreServiceCivique.Domaine
   })
   domaine: string
   @ApiProperty()
@@ -20,9 +20,9 @@ export class OffreEngagementQueryModel {
   dateDeDebut?: string
 }
 
-export class DetailOffreEngagementQueryModel {
+export class DetailServiceCiviqueQueryModel {
   @ApiProperty({
-    enum: OffreEngagement.Domaine
+    enum: OffreServiceCivique.Domaine
   })
   domaine: string
   @ApiProperty()

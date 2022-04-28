@@ -21,6 +21,7 @@ import { uneDatetime } from '../../fixtures/date.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { DatabaseForTesting, expect } from '../../utils'
+import { GetServicesCiviqueQuery } from '../../../src/application/queries/get-services-civique.query.handler'
 
 describe('RechercheSqlRepository', () => {
   const database = DatabaseForTesting.prepare()
@@ -260,6 +261,7 @@ describe('RechercheSqlRepository', () => {
       })
     })
   })
+
   describe('findAvantDate', () => {
     it('recupere les recherches avec le bon type et avant un certain jour', async () => {
       // Given
@@ -312,6 +314,7 @@ describe('RechercheSqlRepository', () => {
       expect(recherches[0].id).to.deep.equal(rechercheBonne.id)
     })
   })
+
   describe('trouverLesRecherchesImmersion', () => {
     describe('quand la latlon et le rome correspondent', async () => {
       // Given
@@ -414,6 +417,413 @@ describe('RechercheSqlRepository', () => {
         expect(recherchesPage3.length).to.be.equal(5)
         expect(recherchesPage3[0]).to.be.deep.equal(recherchesPaginees[20])
         expect(recherchesPage3[4]).to.be.deep.equal(recherchesPaginees[24])
+      })
+    })
+  })
+
+  describe('trouverLesRecherchesServicesCiviques', () => {
+    describe('localisation', async () => {
+      describe('critere de la recherche sauvegardée à null', () => {
+        let recherche: Recherche
+
+        beforeEach(async () => {
+          // Given
+          recherche = uneRecherche({
+            id: '80b0a6fd-5c65-470f-8d2c-a2b500824e7a',
+            idJeune,
+            type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+            criteres: {
+              lat: undefined,
+              lon: undefined
+            }
+          })
+
+          await rechercheSqlRepository.createRecherche(recherche)
+        })
+
+        describe("l'offre a une localisation quelconque", () => {
+          it('ça matche', async () => {
+            // When
+            const query: GetServicesCiviqueQuery = {
+              lat: 1.2,
+              lon: 2.3
+            }
+            const recherches =
+              await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
+                query,
+                100,
+                0,
+                uneDatetime
+              )
+
+            // Then
+            expect(recherches.length).to.equal(1)
+            expect(recherches[0].id).to.equal(recherche.id)
+          })
+        })
+
+        describe("l'offre n'a pas de localisation", () => {
+          it('ça matche', async () => {
+            // When
+            const query: GetServicesCiviqueQuery = {}
+            const recherches =
+              await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
+                query,
+                100,
+                0,
+                uneDatetime
+              )
+
+            // Then
+            expect(recherches.length).to.equal(1)
+            expect(recherches[0].id).to.equal(recherche.id)
+          })
+        })
+      })
+      describe('critere de la recherche sauvegardée avec une valeur', () => {
+        let rechercheAParisPetiteCouronne: Recherche
+
+        beforeEach(async () => {
+          // Given
+          rechercheAParisPetiteCouronne = uneRecherche({
+            id: '80b0a6fd-5c65-470f-8d2c-a2b500824e7a',
+            idJeune,
+            type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+            criteres: {
+              lat: 48.888066499900376,
+              lon: 2.335560138635666,
+              distance: 20
+            }
+          })
+
+          await rechercheSqlRepository.createRecherche(
+            rechercheAParisPetiteCouronne
+          )
+        })
+        describe("l'offre a localisation non matchante", () => {
+          it('ça matche pas', async () => {
+            // When
+            const queryAOrleans: GetServicesCiviqueQuery = {
+              lat: 47.896350605224946,
+              lon: 1.865196371096853
+            }
+
+            const recherches =
+              await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
+                queryAOrleans,
+                100,
+                0,
+                uneDatetime
+              )
+
+            // Then
+            expect(recherches.length).to.equal(0)
+          })
+        })
+
+        describe("l'offre a une localisation dans le périmètre", () => {
+          it('ça matche', async () => {
+            // When
+            const queryANanterre: GetServicesCiviqueQuery = {
+              lat: 48.88918462148984,
+              lon: 2.213421481495165
+            }
+
+            const recherches =
+              await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
+                queryANanterre,
+                100,
+                0,
+                uneDatetime
+              )
+
+            // Then
+            expect(recherches.length).to.equal(1)
+            expect(recherches[0].id).to.equal(rechercheAParisPetiteCouronne.id)
+          })
+        })
+
+        describe("l'offre n'a pas de localisation", () => {
+          it('ça matche pas', async () => {
+            // When
+            const querySansLocalisation: GetServicesCiviqueQuery = {}
+
+            const recherches =
+              await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
+                querySansLocalisation,
+                100,
+                0,
+                uneDatetime
+              )
+
+            // Then
+            expect(recherches.length).to.equal(0)
+          })
+        })
+      })
+    })
+
+    describe('domaine', async () => {
+      describe('critere de la recherche sauvegardée à null', () => {
+        let recherche: Recherche
+
+        beforeEach(async () => {
+          // Given
+          recherche = uneRecherche({
+            id: '80b0a6fd-5c65-470f-8d2c-a2b500824e7a',
+            idJeune,
+            type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+            criteres: {
+              domaine: undefined
+            }
+          })
+
+          await rechercheSqlRepository.createRecherche(recherche)
+        })
+        describe("l'offre a un domaine quelconque", () => {
+          it('ça matche', async () => {
+            // When
+            const query: GetServicesCiviqueQuery = {
+              domaine: 'environnement'
+            }
+            const recherches =
+              await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
+                query,
+                100,
+                0,
+                uneDatetime
+              )
+
+            // Then
+            expect(recherches.length).to.equal(1)
+            expect(recherches[0].id).to.equal(recherche.id)
+          })
+        })
+
+        describe("l'offre n'a pas de domaine", () => {
+          it('ça matche', async () => {
+            // When
+            const query: GetServicesCiviqueQuery = {
+              domaine: undefined
+            }
+            const recherches =
+              await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
+                query,
+                100,
+                0,
+                uneDatetime
+              )
+
+            // Then
+            expect(recherches.length).to.equal(1)
+            expect(recherches[0].id).to.equal(recherche.id)
+          })
+        })
+      })
+      describe('critere de la recherche sauvegardée avec une valeur', () => {
+        let recherche: Recherche
+
+        beforeEach(async () => {
+          // Given
+          recherche = uneRecherche({
+            id: '80b0a6fd-5c65-470f-8d2c-a2b500824e7a',
+            idJeune,
+            type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+            criteres: {
+              domaine: 'sport'
+            }
+          })
+
+          await rechercheSqlRepository.createRecherche(recherche)
+        })
+        describe("l'offre a un autre domaine", () => {
+          it('ça matche pas', async () => {
+            // When
+            const query: GetServicesCiviqueQuery = {
+              domaine: 'environnement'
+            }
+            const recherches =
+              await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
+                query,
+                100,
+                0,
+                uneDatetime
+              )
+
+            // Then
+            expect(recherches.length).to.equal(0)
+          })
+        })
+
+        describe("l'offre a le même domaine", () => {
+          it('ça matche', async () => {
+            // When
+            const query: GetServicesCiviqueQuery = {
+              domaine: 'sport'
+            }
+            const recherches =
+              await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
+                query,
+                100,
+                0,
+                uneDatetime
+              )
+
+            // Then
+            expect(recherches.length).to.equal(1)
+            expect(recherches[0].id).to.equal(recherche.id)
+          })
+        })
+
+        describe("l'offre n'a pas de domaine", () => {
+          it('ça matche pas', async () => {
+            // When
+            const query: GetServicesCiviqueQuery = {}
+            const recherches =
+              await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
+                query,
+                100,
+                0,
+                uneDatetime
+              )
+
+            // Then
+            expect(recherches.length).to.equal(0)
+          })
+        })
+      })
+    })
+
+    describe('date de début', async () => {
+      describe('critere de la recherche sauvegardée à null', () => {
+        let recherche: Recherche
+
+        beforeEach(async () => {
+          // Given
+          recherche = uneRecherche({
+            id: '80b0a6fd-5c65-470f-8d2c-a2b500824e7a',
+            idJeune,
+            type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+            criteres: {
+              dateDeDebutMinimum: undefined
+            }
+          })
+
+          await rechercheSqlRepository.createRecherche(recherche)
+        })
+        describe("l'offre a une date de début", () => {
+          it('ça matche', async () => {
+            // When
+            const query: GetServicesCiviqueQuery = {
+              dateDeDebutMinimum: '2022-04-28T10:10:10'
+            }
+            const recherches =
+              await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
+                query,
+                100,
+                0,
+                uneDatetime
+              )
+
+            // Then
+            expect(recherches.length).to.equal(1)
+            expect(recherches[0].id).to.equal(recherche.id)
+          })
+        })
+
+        describe("l'offre n'a pas de date de début", () => {
+          it('ça matche', async () => {
+            // When
+            const query: GetServicesCiviqueQuery = {
+              dateDeDebutMinimum: undefined
+            }
+            const recherches =
+              await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
+                query,
+                100,
+                0,
+                uneDatetime
+              )
+
+            // Then
+            expect(recherches.length).to.equal(1)
+            expect(recherches[0].id).to.equal(recherche.id)
+          })
+        })
+      })
+      describe('critere de la recherche sauvegardée avec une valeur', () => {
+        let recherche: Recherche
+
+        beforeEach(async () => {
+          // Given
+          recherche = uneRecherche({
+            id: '80b0a6fd-5c65-470f-8d2c-a2b500824e7a',
+            idJeune,
+            type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+            criteres: {
+              dateDeDebutMinimum: '2022-05-01T10:10:10'
+            }
+          })
+
+          await rechercheSqlRepository.createRecherche(recherche)
+        })
+        describe("l'offre a une date de début avant", () => {
+          it('ça matche pas', async () => {
+            // When
+            const query: GetServicesCiviqueQuery = {
+              dateDeDebutMinimum: '2022-04-01T10:10:10'
+            }
+            const recherches =
+              await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
+                query,
+                100,
+                0,
+                uneDatetime
+              )
+
+            // Then
+            expect(recherches.length).to.equal(0)
+          })
+        })
+
+        describe("l'offre a une date de début après", () => {
+          it('ça matche', async () => {
+            // When
+            const query: GetServicesCiviqueQuery = {
+              dateDeDebutMinimum: '2022-05-02T10:10:10'
+            }
+            const recherches =
+              await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
+                query,
+                100,
+                0,
+                uneDatetime
+              )
+
+            // Then
+            expect(recherches.length).to.equal(1)
+            expect(recherches[0].id).to.equal(recherche.id)
+          })
+        })
+
+        describe("l'offre n'a pas de date de début", () => {
+          it('ça matche pas', async () => {
+            // When
+            const query: GetServicesCiviqueQuery = {
+              dateDeDebutMinimum: undefined
+            }
+            const recherches =
+              await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
+                query,
+                100,
+                0,
+                uneDatetime
+              )
+
+            // Then
+            expect(recherches.length).to.equal(0)
+          })
+        })
       })
     })
   })

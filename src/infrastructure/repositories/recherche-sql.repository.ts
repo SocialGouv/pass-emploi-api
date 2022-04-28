@@ -1,18 +1,21 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { FindOptions, Op, QueryTypes, Sequelize } from 'sequelize'
+import { FindOptions, Op, QueryTypes, Sequelize, WhereOptions } from 'sequelize'
 import { RechercheQueryModel } from '../../application/queries/query-models/recherches.query-model'
 import { OffresEmploi } from '../../domain/offre-emploi'
 import { OffresImmersion } from '../../domain/offre-immersion'
 import { Recherche } from '../../domain/recherche'
 import { RechercheSqlModel } from '../sequelize/models/recherche.sql-model'
-import { fromSqlToRechercheQueryModel } from './mappers/recherches.mappers'
+import {
+  fromSqlToRecherche,
+  fromSqlToRechercheQueryModel
+} from './mappers/recherches.mappers'
 import { DateTime } from 'luxon'
 import { GetOffresEmploiQuery } from '../../application/queries/get-offres-emploi.query.handler'
 import { CommuneSqlModel } from '../sequelize/models/commune.sql-model'
 import { SequelizeInjectionToken } from '../sequelize/providers'
 import { GetOffresImmersionQuery } from '../../application/queries/get-offres-immersion.query.handler'
 import { GetServicesCiviqueQuery } from 'src/application/queries/get-services-civique.query.handler'
-import { OffreEngagement } from 'src/domain/offre-engagement'
+import { OffreServiceCivique } from 'src/domain/offre-service-civique'
 
 @Injectable()
 export class RechercheSqlRepository implements Recherche.Repository {
@@ -62,7 +65,7 @@ export class RechercheSqlRepository implements Recherche.Repository {
         break
       case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
         criteres = recherche.criteres as GetServicesCiviqueQuery
-        distance = criteres.distance ?? OffreEngagement.DISTANCE_PAR_DEFAUT
+        distance = criteres.distance ?? OffreServiceCivique.DISTANCE_PAR_DEFAUT
         longitude = criteres.lon
         latitude = criteres.lat
     }
@@ -200,7 +203,9 @@ export class RechercheSqlRepository implements Recherche.Repository {
             }
           },
           Sequelize.literal(`ST_CONTAINS(geometrie, ST_SetSRID(
-        st_geomfromgeojson('${JSON.stringify(point)}'),4326)::geometry)`)
+        st_geomfromgeojson('${JSON.stringify(point)}'),${
+            Recherche.Geometrie.PROJECTION_WGS84
+          })::geometry)`)
         ]
       }
     })
@@ -236,7 +241,7 @@ export class RechercheSqlRepository implements Recherche.Repository {
       await this.sequelize.query(
         `UPDATE recherche
          SET geometrie = (
-             ST_Buffer(ST_SetSRID(ST_GeomFromGeoJSON(:center)::geography, 4326), :distance)::geometry)
+             ST_Buffer(ST_SetSRID(ST_GeomFromGeoJSON(:center)::geography, ${Recherche.Geometrie.PROJECTION_WGS84}), :distance)::geometry)
         WHERE id = :id_recherche`,
         {
           type: QueryTypes.UPDATE,
@@ -247,6 +252,118 @@ export class RechercheSqlRepository implements Recherche.Repository {
           }
         }
       )
+    }
+  }
+
+  async trouverLesRecherchesServicesCiviques(
+    query: GetServicesCiviqueQuery,
+    limit: number,
+    offset: number,
+    date: DateTime
+  ): Promise<Recherche[]> {
+    const filtres: WhereOptions = [
+      { type: Recherche.Type.OFFRES_SERVICES_CIVIQUE }
+    ]
+    filtres.push(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.construireLeFiltreDomaine(query),
+      this.construireLeFiltreDateDeDebut(query),
+      this.construireLeFiltreDepuisLaDerniereRecherche(date),
+      this.construireLeFiltreLocalisation(query)
+    )
+
+    const rechercheSqlModels = await RechercheSqlModel.findAll({
+      attributes: {
+        exclude: ['geometrie']
+      },
+      order: [['dateCreation', 'ASC']],
+      limit,
+      offset,
+      where: {
+        [Op.and]: filtres
+      }
+    })
+    return rechercheSqlModels.map(fromSqlToRecherche)
+  }
+
+  private construireLeFiltreLocalisation(
+    query: GetServicesCiviqueQuery
+  ): WhereOptions {
+    if (query.lat && query.lon) {
+      const point = {
+        type: 'Point',
+        coordinates: [query.lon, query.lat]
+      }
+      return {
+        [Op.or]: [
+          Sequelize.literal(`ST_CONTAINS(geometrie, ST_SetSRID(
+  st_geomfromgeojson('${JSON.stringify(point)}'),${
+            Recherche.Geometrie.PROJECTION_WGS84
+          })::geometry)`),
+          {
+            geometrie: {
+              [Op.eq]: null
+            }
+          }
+        ]
+      }
+    } else {
+      return { geometrie: { [Op.eq]: null } }
+    }
+  }
+
+  private construireLeFiltreDateDeDebut(
+    query: GetServicesCiviqueQuery
+  ): WhereOptions {
+    if (query.dateDeDebutMinimum) {
+      return {
+        criteres: {
+          dateDeDebutMinimum: {
+            [Op.or]: [{ [Op.eq]: null }, { [Op.lte]: query.dateDeDebutMinimum }]
+          }
+        }
+      }
+    } else {
+      return {
+        criteres: {
+          dateDeDebutMinimum: {
+            [Op.eq]: null
+          }
+        }
+      }
+    }
+  }
+
+  private construireLeFiltreDepuisLaDerniereRecherche(
+    depuis: DateTime
+  ): WhereOptions {
+    return {
+      dateDerniereRecherche: {
+        [Op.lt]: depuis.toJSDate()
+      }
+    }
+  }
+
+  private construireLeFiltreDomaine(
+    query: GetServicesCiviqueQuery
+  ): WhereOptions {
+    if (query.domaine) {
+      return {
+        criteres: {
+          domaine: {
+            [Op.or]: [{ [Op.eq]: null }, { [Op.eq]: query.domaine }]
+          }
+        }
+      }
+    } else {
+      return {
+        criteres: {
+          domaine: {
+            [Op.eq]: null
+          }
+        }
+      }
     }
   }
 }

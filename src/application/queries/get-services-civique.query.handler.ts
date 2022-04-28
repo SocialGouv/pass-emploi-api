@@ -4,11 +4,11 @@ import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { isFailure, Result, success } from '../../building-blocks/types/result'
-import { OffreEngagementQueryModel } from './query-models/service-civique.query-models'
+import { ServiceCiviqueQueryModel } from './query-models/service-civique.query-models'
 import {
-  OffreEngagement,
-  EngagementRepositoryToken
-} from '../../domain/offre-engagement'
+  OffreServiceCivique,
+  OffreServiceCiviqueRepositoryToken
+} from '../../domain/offre-service-civique'
 import { DateTime } from 'luxon'
 
 const DEFAULT_PAGE = 1
@@ -28,11 +28,11 @@ export interface GetServicesCiviqueQuery extends Query {
 @Injectable()
 export class GetServicesCiviqueQueryHandler extends QueryHandler<
   GetServicesCiviqueQuery,
-  Result<OffreEngagementQueryModel[]>
+  Result<ServiceCiviqueQueryModel[]>
 > {
   constructor(
-    @Inject(EngagementRepositoryToken)
-    private engagementRepository: OffreEngagement.Repository,
+    @Inject(OffreServiceCiviqueRepositoryToken)
+    private engagementRepository: OffreServiceCivique.Repository,
     private evenementService: EvenementService
   ) {
     super('GetServicesCiviqueQueryHandler')
@@ -40,19 +40,19 @@ export class GetServicesCiviqueQueryHandler extends QueryHandler<
 
   async handle(
     query: GetServicesCiviqueQuery
-  ): Promise<Result<OffreEngagementQueryModel[]>> {
-    const criteres: OffreEngagement.Criteres = {
+  ): Promise<Result<ServiceCiviqueQueryModel[]>> {
+    const criteres: OffreServiceCivique.Criteres = {
       ...query,
       distance: query.distance
         ? query.distance
-        : OffreEngagement.DISTANCE_PAR_DEFAUT,
+        : OffreServiceCivique.DISTANCE_PAR_DEFAUT,
       dateDeDebutMinimum: query.dateDeDebutMinimum
         ? DateTime.fromISO(query.dateDeDebutMinimum)
         : undefined,
       dateDeDebutMaximum: query.dateDeDebutMaximum
         ? DateTime.fromISO(query.dateDeDebutMaximum)
         : undefined,
-      editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE,
+      editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE,
       page: query.page || DEFAULT_PAGE,
       limit: query.limit || DEFAULT_LIMIT
     }
@@ -62,7 +62,7 @@ export class GetServicesCiviqueQueryHandler extends QueryHandler<
       return result
     }
 
-    const offresQueryModel: OffreEngagementQueryModel[] = result.data.map(
+    const offresQueryModel: ServiceCiviqueQueryModel[] = result.data.map(
       offre => ({
         id: offre.id,
         titre: offre.titre,

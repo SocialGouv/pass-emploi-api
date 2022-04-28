@@ -6,34 +6,37 @@ import {
 } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Core } from '../../domain/core'
-import { OffreEngagement } from '../../domain/offre-engagement'
+import { OffreServiceCivique } from '../../domain/offre-service-civique'
 import { EngagementClient } from '../clients/engagement-client'
 import { FavoriOffreEngagementSqlModel } from '../sequelize/models/favori-offre-engagement.sql-model'
 import {
   fromSqlToIds,
-  fromSqlToOffreEngagement,
+  fromSqlToOffreServiceCivique,
   toOffreEngagement,
-  toOffresEngagement
+  toOffresServicesCivique
 } from './mappers/service-civique.mapper'
 
 @Injectable()
-export class EngagementHttpSqlRepository implements OffreEngagement.Repository {
+export class OffreServiceCiviqueHttpSqlRepository
+  implements OffreServiceCivique.Repository
+{
   private logger: Logger
 
   constructor(private engagementClient: EngagementClient) {
-    this.logger = new Logger('EngagementHttpSqlRepository')
+    this.logger = new Logger('OffreServiceCiviqueHttpSqlRepository')
   }
 
   async findAll(
-    criteres: OffreEngagement.Criteres
-  ): Promise<Result<OffreEngagement[]>> {
+    criteres: OffreServiceCivique.Criteres
+  ): Promise<Result<OffreServiceCivique[]>> {
     try {
-      const params = EngagementHttpSqlRepository.construireLesParams(criteres)
+      const params =
+        OffreServiceCiviqueHttpSqlRepository.construireLesParams(criteres)
       const response = await this.engagementClient.get<EngagementDto>(
         'v0/mission/search',
         params
       )
-      return success(toOffresEngagement(response.data))
+      return success(toOffresServicesCivique(response.data))
     } catch (e) {
       this.logger.error(e)
       if (e.response?.status >= 400 && e.response?.status < 500) {
@@ -47,9 +50,9 @@ export class EngagementHttpSqlRepository implements OffreEngagement.Repository {
     }
   }
 
-  async getOffreEngagementById(
+  async getServiceCiviqueById(
     idOffreEngagement: string
-  ): Promise<Result<OffreEngagement>> {
+  ): Promise<Result<OffreServiceCivique>> {
     try {
       const response =
         await this.engagementClient.get<DetailOffreEngagementDto>(
@@ -78,7 +81,7 @@ export class EngagementHttpSqlRepository implements OffreEngagement.Repository {
   }
 
   private static construireLesParams(
-    criteres: OffreEngagement.Criteres
+    criteres: OffreServiceCivique.Criteres
   ): URLSearchParams {
     const {
       page,
@@ -89,7 +92,8 @@ export class EngagementHttpSqlRepository implements OffreEngagement.Repository {
       dateDeDebutMinimum,
       distance,
       domaine,
-      editeur
+      editeur,
+      dateDeCreationMinimum
     } = criteres
     const params = new URLSearchParams()
     params.append('size', limit.toString())
@@ -106,6 +110,9 @@ export class EngagementHttpSqlRepository implements OffreEngagement.Repository {
     }
     if (dateDeDebutMinimum) {
       params.append('startAt', `gt:${dateDeDebutMinimum.toUTC().toISO()}`)
+    }
+    if (dateDeCreationMinimum) {
+      params.append('createdAt', `gt:${dateDeCreationMinimum.toUTC().toISO()}`)
     }
     if (distance) {
       params.append('distance', `${distance}km`)
@@ -130,20 +137,20 @@ export class EngagementHttpSqlRepository implements OffreEngagement.Repository {
     return fromSqlToIds(favorisIdsSql)
   }
 
-  async getFavorisByJeune(idJeune: string): Promise<OffreEngagement[]> {
+  async getFavorisByJeune(idJeune: string): Promise<OffreServiceCivique[]> {
     const favorisSql = await FavoriOffreEngagementSqlModel.findAll({
       where: {
         idJeune
       }
     })
 
-    return favorisSql.map(fromSqlToOffreEngagement)
+    return favorisSql.map(fromSqlToOffreServiceCivique)
   }
 
   async getFavori(
     idJeune: string,
     idOffre: string
-  ): Promise<OffreEngagement | undefined> {
+  ): Promise<OffreServiceCivique | undefined> {
     const result = await FavoriOffreEngagementSqlModel.findOne({
       where: {
         idJeune,
@@ -155,10 +162,13 @@ export class EngagementHttpSqlRepository implements OffreEngagement.Repository {
       return undefined
     }
 
-    return fromSqlToOffreEngagement(result)
+    return fromSqlToOffreServiceCivique(result)
   }
 
-  async saveAsFavori(idJeune: string, offre: OffreEngagement): Promise<void> {
+  async saveAsFavori(
+    idJeune: string,
+    offre: OffreServiceCivique
+  ): Promise<void> {
     await FavoriOffreEngagementSqlModel.create({
       idOffre: offre.id,
       idJeune,

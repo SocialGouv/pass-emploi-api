@@ -6,11 +6,11 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Core } from '../../domain/core'
 import {
-  EngagementRepositoryToken,
-  OffreEngagement
-} from '../../domain/offre-engagement'
+  OffreServiceCiviqueRepositoryToken,
+  OffreServiceCivique
+} from '../../domain/offre-service-civique'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
-import { OffreEngagementQueryModel } from './query-models/service-civique.query-models'
+import { ServiceCiviqueQueryModel } from './query-models/service-civique.query-models'
 
 export interface GetFavorisOffresEngagementJeuneQuery extends Query {
   idJeune: Jeune.Id
@@ -18,24 +18,30 @@ export interface GetFavorisOffresEngagementJeuneQuery extends Query {
 }
 
 @Injectable()
-export class GetFavorisOffresEngagementJeuneQueryHandler extends QueryHandler<
+export class GetFavorisServiceCiviqueJeuneQueryHandler extends QueryHandler<
   GetFavorisOffresEngagementJeuneQuery,
-  OffreEngagementQueryModel[] | Core.Id[]
+  ServiceCiviqueQueryModel[] | Core.Id[]
 > {
   constructor(
-    @Inject(EngagementRepositoryToken)
-    private readonly offresEngagementRepository: OffreEngagement.Repository,
+    @Inject(OffreServiceCiviqueRepositoryToken)
+    private readonly offresServiceCiviqueRepository: OffreServiceCivique.Repository,
     private jeuneAuthorizer: JeuneAuthorizer
   ) {
-    super('GetFavorisOffresEngagementJeuneQueryHandler')
+    super('GetFavorisServiceCiviqueJeuneQueryHandler')
   }
 
   handle(
     query: GetFavorisOffresEngagementJeuneQuery
-  ): Promise<OffreEngagementQueryModel[] | Core.Id[]> {
-    return query.detail
-      ? this.offresEngagementRepository.getFavorisByJeune(query.idJeune)
-      : this.offresEngagementRepository.getFavorisIdsByJeune(query.idJeune)
+  ): Promise<ServiceCiviqueQueryModel[] | Core.Id[]> {
+    if (query.detail) {
+      return this.offresServiceCiviqueRepository.getFavorisByJeune(
+        query.idJeune
+      )
+    } else {
+      return this.offresServiceCiviqueRepository.getFavorisIdsByJeune(
+        query.idJeune
+      )
+    }
   }
   async authorize(
     query: GetFavorisOffresEngagementJeuneQuery,

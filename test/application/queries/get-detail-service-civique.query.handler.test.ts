@@ -2,19 +2,19 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { OffreEngagement } from '../../../src/domain/offre-engagement'
-import { unDetailOffreEngagementQuerymodel } from '../../fixtures/query-models/offre-engagement.query-model.fixtures'
-import { DetailOffreEngagementQueryModel } from '../../../src/application/queries/query-models/service-civique.query-models'
+import { OffreServiceCivique } from '../../../src/domain/offre-service-civique'
+import { DetailServiceCiviqueQueryModel } from '../../../src/application/queries/query-models/service-civique.query-models'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import {
-  GetDetailServiceCiviqueQuery,
+  GetDetailOffreServiceCiviqueQuery,
   GetDetailServiceCiviqueQueryHandler
 } from '../../../src/application/queries/get-detail-service-civique.query.handler'
 import { failure } from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import { unDetailOffreServiceCiviqueQuerymodel } from '../../fixtures/query-models/offre-service-civique.query-model.fixtures'
 
 describe('GetDetailServiceCiviqueQuery', () => {
-  let engagementRepository: StubbedType<OffreEngagement.Repository>
+  let engagementRepository: StubbedType<OffreServiceCivique.Repository>
   let getDetailServiceCiviqueQueryHandler: GetDetailServiceCiviqueQueryHandler
   let evenementService: StubbedClass<EvenementService>
   let sandbox: SinonSandbox
@@ -38,15 +38,15 @@ describe('GetDetailServiceCiviqueQuery', () => {
   describe('handle', () => {
     it('retourne l"offre quand elle existe', async () => {
       // Given
-      const getServicesCiviqueQuery: GetDetailServiceCiviqueQuery = {
-        idOffreEngagement: 'ABC123'
+      const getServicesCiviqueQuery: GetDetailOffreServiceCiviqueQuery = {
+        idOffre: 'ABC123'
       }
-      const detailOffreEngagementQueryModel: DetailOffreEngagementQueryModel =
-        unDetailOffreEngagementQuerymodel()
+      const detailServiceCiviqueQueryModel: DetailServiceCiviqueQueryModel =
+        unDetailOffreServiceCiviqueQuerymodel()
 
-      engagementRepository.getOffreEngagementById
-        .withArgs(getServicesCiviqueQuery.idOffreEngagement)
-        .resolves(detailOffreEngagementQueryModel)
+      engagementRepository.getServiceCiviqueById
+        .withArgs(getServicesCiviqueQuery.idOffre)
+        .resolves(detailServiceCiviqueQueryModel)
 
       // When
       const result = await getDetailServiceCiviqueQueryHandler.handle(
@@ -54,21 +54,21 @@ describe('GetDetailServiceCiviqueQuery', () => {
       )
 
       // Then
-      expect(result).to.deep.equal(detailOffreEngagementQueryModel)
+      expect(result).to.deep.equal(detailServiceCiviqueQueryModel)
     })
     it('retourne une failure quand l"offre n"existe pas', async () => {
       // Given
-      const getServicesCiviqueQuery: GetDetailServiceCiviqueQuery = {
-        idOffreEngagement: 'ABC123'
+      const getServicesCiviqueQuery: GetDetailOffreServiceCiviqueQuery = {
+        idOffre: 'ABC123'
       }
 
-      engagementRepository.getOffreEngagementById
-        .withArgs(getServicesCiviqueQuery.idOffreEngagement)
+      engagementRepository.getServiceCiviqueById
+        .withArgs(getServicesCiviqueQuery.idOffre)
         .resolves(
           failure(
             new NonTrouveError(
               'OffreEngagement',
-              getServicesCiviqueQuery.idOffreEngagement
+              getServicesCiviqueQuery.idOffre
             )
           )
         )
@@ -81,10 +81,7 @@ describe('GetDetailServiceCiviqueQuery', () => {
       // Then
       expect(result).to.be.deep.equal(
         failure(
-          new NonTrouveError(
-            'OffreEngagement',
-            getServicesCiviqueQuery.idOffreEngagement
-          )
+          new NonTrouveError('OffreEngagement', getServicesCiviqueQuery.idOffre)
         )
       )
     })
@@ -93,13 +90,13 @@ describe('GetDetailServiceCiviqueQuery', () => {
   describe('monitor', () => {
     it('crée un événement de détail d"une offre service civique', async () => {
       // Given
-      const getServicesCiviqueQuery: GetDetailServiceCiviqueQuery = {
-        idOffreEngagement: 'ABC123'
+      const getServicesCiviqueQuery: GetDetailOffreServiceCiviqueQuery = {
+        idOffre: 'ABC123'
       }
-      const detailOffreEngagementQueryModel: DetailOffreEngagementQueryModel =
-        unDetailOffreEngagementQuerymodel()
+      const detailOffreEngagementQueryModel: DetailServiceCiviqueQueryModel =
+        unDetailOffreServiceCiviqueQuerymodel()
 
-      engagementRepository.getOffreEngagementById
+      engagementRepository.getServiceCiviqueById
         .withArgs(getServicesCiviqueQuery)
         .resolves(detailOffreEngagementQueryModel)
 

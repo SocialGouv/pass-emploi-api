@@ -1,7 +1,7 @@
-import { OffreEngagement } from '../../src/domain/offre-engagement'
+import { OffreServiceCivique } from '../../src/domain/offre-service-civique'
 import { OffreEngagementDto } from '../../src/infrastructure/repositories/offre-engagement-http.repository'
 
-export const uneOffreEngagement = (): OffreEngagement => ({
+export const uneOffreServiceCivique = (): OffreServiceCivique => ({
   adresseMission: 'adresse mission',
   adresseOrganisation: 'adresse organistation',
   codeDepartement: '75',
@@ -23,7 +23,7 @@ export const uneOffreEngagement = (): OffreEngagement => ({
   ville: 'paris'
 })
 
-export const uneOffreEngagementDto = (): OffreEngagementDto => ({
+export const uneOffreServiceCiviqueDto = (): OffreEngagementDto => ({
   id: 'unId',
   title: 'unTitre',
   domain: 'Informatique',

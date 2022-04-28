@@ -3,9 +3,10 @@ import { DateTime } from 'luxon'
 import { Core } from './core'
 import { Jeune } from './jeune'
 
-export const EngagementRepositoryToken = 'Engagement.Repository'
+export const OffreServiceCiviqueRepositoryToken =
+  'OffreServiceCivique.Repository'
 
-export interface OffreEngagement {
+export interface OffreServiceCivique {
   id: string
   domaine: string
   titre: string
@@ -21,32 +22,27 @@ export interface OffreEngagement {
   codeDepartement?: string
   codePostal?: string
   descriptionOrganisation?: string
-  localisation?: OffreEngagement.Localisation
+  localisation?: Core.Localisation
 }
 
-export namespace OffreEngagement {
+export namespace OffreServiceCivique {
   export const DISTANCE_PAR_DEFAUT = 10
 
   export interface Repository {
-    findAll(criteres: Criteres): Promise<Result<OffreEngagement[]>>
+    findAll(criteres: Criteres): Promise<Result<OffreServiceCivique[]>>
 
-    getOffreEngagementById(
-      idOffreEngagement: string
-    ): Promise<Result<OffreEngagement>>
+    getServiceCiviqueById(id: string): Promise<Result<OffreServiceCivique>>
 
     getFavorisIdsByJeune(id: Jeune.Id): Promise<Core.Id[]>
 
-    getFavorisByJeune(id: Jeune.Id): Promise<OffreEngagement[]>
+    getFavorisByJeune(id: Jeune.Id): Promise<OffreServiceCivique[]>
 
-    saveAsFavori(
-      idJeune: string,
-      offreEngagement: OffreEngagement
-    ): Promise<void>
+    saveAsFavori(idJeune: string, offre: OffreServiceCivique): Promise<void>
 
     getFavori(
       idJeune: string,
       idOffre: string
-    ): Promise<OffreEngagement | undefined>
+    ): Promise<OffreServiceCivique | undefined>
 
     deleteFavori(idJeune: string, idOffre: string): Promise<void>
   }
@@ -81,10 +77,5 @@ export namespace OffreEngagement {
     'animaux' = 'animaux',
     'vivre-ensemble' = 'vivre-ensemble',
     'autre' = 'autre'
-  }
-
-  export interface Localisation {
-    latitude: number
-    longitude: number
   }
 }

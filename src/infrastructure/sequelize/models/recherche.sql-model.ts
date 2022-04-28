@@ -45,7 +45,10 @@ export class RechercheDto extends Model {
   @Column({ field: 'etat_derniere_recherche', type: DataType.STRING })
   etatDerniereRecherche: Recherche.Etat
 
-  @Column({ field: 'geometrie', type: DataType.GEOMETRY('POLYGON', 4326) })
+  @Column({
+    field: 'geometrie',
+    type: DataType.GEOMETRY('POLYGON', Recherche.Geometrie.PROJECTION_WGS84)
+  })
   geometrie: Polygon
 }
 

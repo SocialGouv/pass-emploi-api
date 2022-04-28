@@ -6,25 +6,25 @@ import {
   GetServicesCiviqueQuery,
   GetServicesCiviqueQueryHandler
 } from '../../../src/application/queries/get-services-civique.query.handler'
-import { OffreEngagement } from '../../../src/domain/offre-engagement'
+import { OffreServiceCivique } from '../../../src/domain/offre-service-civique'
 import { DateTime } from 'luxon'
-import { offresEngagementQueryModel } from '../../fixtures/query-models/offre-engagement.query-model.fixtures'
-import { OffreEngagementQueryModel } from '../../../src/application/queries/query-models/service-civique.query-models'
+import { ServiceCiviqueQueryModel } from '../../../src/application/queries/query-models/service-civique.query-models'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { offresServicesCiviqueQueryModel } from '../../fixtures/query-models/offre-service-civique.query-model.fixtures'
 
 describe('GetServicesCiviqueQueryHandler', () => {
-  let engagementRepository: StubbedType<OffreEngagement.Repository>
+  let offresServiceCiviqueRepository: StubbedType<OffreServiceCivique.Repository>
   let getServicesCiviqueQueryHandler: GetServicesCiviqueQueryHandler
   let sandbox: SinonSandbox
   let evenementService: StubbedClass<EvenementService>
 
   before(() => {
     sandbox = createSandbox()
-    engagementRepository = stubInterface(sandbox)
+    offresServiceCiviqueRepository = stubInterface(sandbox)
     evenementService = stubClass(EvenementService)
 
     getServicesCiviqueQueryHandler = new GetServicesCiviqueQueryHandler(
-      engagementRepository,
+      offresServiceCiviqueRepository,
       evenementService
     )
   })
@@ -46,15 +46,15 @@ describe('GetServicesCiviqueQueryHandler', () => {
         dateDeDebutMinimum: '2022-02-17T10:00:00Z',
         domaine: 'environnement'
       }
-      const serviceCiviqueQueryModels: OffreEngagementQueryModel[] =
-        offresEngagementQueryModel()
+      const serviceCiviqueQueryModels: ServiceCiviqueQueryModel[] =
+        offresServicesCiviqueQueryModel()
 
-      engagementRepository.findAll
+      offresServiceCiviqueRepository.findAll
         .withArgs({
           ...getServicesCiviqueQuery,
           dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
           dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
-          editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE
+          editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE
         })
         .resolves(serviceCiviqueQueryModels)
 
@@ -75,15 +75,15 @@ describe('GetServicesCiviqueQueryHandler', () => {
         dateDeDebutMaximum: '2022-02-17T10:00:00Z',
         dateDeDebutMinimum: '2022-02-17T10:00:00Z'
       }
-      const offreEngagementQueryModels: OffreEngagementQueryModel[] =
-        offresEngagementQueryModel()
+      const offreEngagementQueryModels: ServiceCiviqueQueryModel[] =
+        offresServicesCiviqueQueryModel()
 
-      engagementRepository.findAll
+      offresServiceCiviqueRepository.findAll
         .withArgs({
           ...getServicesCiviqueQuery,
           dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
           dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
-          editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE,
+          editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE,
           page: 1,
           limit: 50
         })
@@ -112,15 +112,15 @@ describe('GetServicesCiviqueQueryHandler', () => {
         dateDeDebutMinimum: '2022-02-17T10:00:00Z',
         domaine: 'environnement'
       }
-      const serviceCiviqueQueryModels: OffreEngagementQueryModel[] =
-        offresEngagementQueryModel()
+      const serviceCiviqueQueryModels: ServiceCiviqueQueryModel[] =
+        offresServicesCiviqueQueryModel()
 
-      engagementRepository.findAll
+      offresServiceCiviqueRepository.findAll
         .withArgs({
           ...getServicesCiviqueQuery,
           dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
           dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
-          editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE
+          editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE
         })
         .resolves(serviceCiviqueQueryModels)
 

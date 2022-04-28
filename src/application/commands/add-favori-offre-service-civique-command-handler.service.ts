@@ -10,32 +10,32 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import {
-  EngagementRepositoryToken,
-  OffreEngagement
-} from '../../domain/offre-engagement'
+  OffreServiceCiviqueRepositoryToken,
+  OffreServiceCivique
+} from '../../domain/offre-service-civique'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 
-export interface AddFavoriOffreEngagementCommand extends Command {
+export interface AddFavoriServiceCiviqueCommand extends Command {
   idJeune: string
-  offre: OffreEngagement
+  offre: OffreServiceCivique
 }
 
 @Injectable()
-export class AddFavoriOffreEngagementCommandHandler extends CommandHandler<
-  AddFavoriOffreEngagementCommand,
+export class AddFavoriOffreServiceCiviqueCommandHandler extends CommandHandler<
+  AddFavoriServiceCiviqueCommand,
   void
 > {
   constructor(
-    @Inject(EngagementRepositoryToken)
-    private offreEngagementRepository: OffreEngagement.Repository,
+    @Inject(OffreServiceCiviqueRepositoryToken)
+    private offreServiceCiviqueRepository: OffreServiceCivique.Repository,
     private jeuneAuthorizer: JeuneAuthorizer,
     private evenementService: EvenementService
   ) {
     super('AddFavoriOffreEngagementCommandHandler')
   }
 
-  async handle(command: AddFavoriOffreEngagementCommand): Promise<Result> {
-    const favori = await this.offreEngagementRepository.getFavori(
+  async handle(command: AddFavoriServiceCiviqueCommand): Promise<Result> {
+    const favori = await this.offreServiceCiviqueRepository.getFavori(
       command.idJeune,
       command.offre.id
     )
@@ -46,7 +46,7 @@ export class AddFavoriOffreEngagementCommandHandler extends CommandHandler<
       )
     }
 
-    await this.offreEngagementRepository.saveAsFavori(
+    await this.offreServiceCiviqueRepository.saveAsFavori(
       command.idJeune,
       command.offre
     )
@@ -55,7 +55,7 @@ export class AddFavoriOffreEngagementCommandHandler extends CommandHandler<
   }
 
   async authorize(
-    command: AddFavoriOffreEngagementCommand,
+    command: AddFavoriServiceCiviqueCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     await this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
