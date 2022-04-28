@@ -1,6 +1,5 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from 'src/application/commands/jobs/handle-job-notification-recherche.command'
 import { Notification } from 'src/domain/notification'
 import {
   Contrat,
@@ -24,6 +23,7 @@ import { createSandbox, expect, stubClass } from '../../../utils'
 import { failure, success } from '../../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import { testConfig } from '../../../utils/module-for-testing'
+import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from '../../../../src/application/commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
 
 describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
   let notifierNouvellesOffresEmploiCommandHandler: HandleJobNotifierNouvellesOffresEmploiCommandHandler
