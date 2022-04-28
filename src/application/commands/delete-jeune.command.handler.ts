@@ -18,11 +18,19 @@ import {
 } from '../../domain/authentification'
 
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
+import { Core } from '../../domain/core'
 
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 
 export interface DeleteJeuneCommand {
   idJeune: Jeune.Id
+  jeune?: {
+    firstName: string
+    lastName: string
+    structure: Core.Structure
+    email?: string
+    idDossier?: string
+  }
 }
 
 @Injectable()
@@ -64,6 +72,15 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
     const jeune = await this.jeuneRepository.get(idJeune)
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', idJeune))
+    }
+
+    //Mute la commande pour enrichir les logs
+    command.jeune = {
+      firstName: jeune.firstName,
+      lastName: jeune.lastName,
+      structure: jeune.structure,
+      email: jeune.email,
+      idDossier: jeune.idDossier
     }
 
     await Promise.all([
