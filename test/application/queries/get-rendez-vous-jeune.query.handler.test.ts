@@ -1,14 +1,13 @@
 import { stubInterface } from '@salesforce/ts-sinon'
+import { SinonSandbox } from 'sinon'
 import { RendezVousJeuneAssociationModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
 import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
-import { SinonSandbox } from 'sinon'
-import { Evenement, EvenementService } from '../../../src/domain/evenement'
-import Periode = RendezVous.Periode
 import {
   GetRendezVousJeuneQuery,
   GetRendezVousJeuneQueryHandler
 } from '../../../src/application/queries/get-rendez-vous-jeune.query.handler'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { RendezVous } from '../../../src/domain/rendez-vous'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
@@ -53,7 +52,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
   const jeune1 = unJeune({ id: 'jeune-1' })
   const jeune2 = unJeune({ id: 'jeune-2' })
 
-  beforeEach(() => {
+  before(() => {
     sandbox = createSandbox()
     dateService = stubInterface(sandbox)
     dateService.nowJs.returns(maintenant.toJSDate())
@@ -219,55 +218,53 @@ describe('GetRendezVousJeuneQueryHandler', () => {
   describe('monitor', () => {
     it('envoie un évenement de consultation de la liste des rendez vous sans période', async () => {
       // Given
-      const utilisateur = unUtilisateurJeune()
+      const utilisateur = unUtilisateurJeune({ id: 'sans-periode' })
       const query: GetRendezVousJeuneQuery = {
         idJeune: 'id',
         periode: undefined
       }
-
       // When
       await getRendezVousQueryHandler.monitor(utilisateur, query)
-
       // Then
       expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
         Evenement.Type.RDV_LISTE,
         utilisateur
       )
     })
-
     it('envoie un évenement de consultation de la liste des rendez vous dans le futur', async () => {
       // Given
-      const utilisateur = unUtilisateurJeune()
+      const utilisateur = unUtilisateurJeune({ id: 'periode-futur' })
       const query: GetRendezVousJeuneQuery = {
         idJeune: 'id',
-        periode: Periode.FUTURS
+        periode: RendezVous.Periode.FUTURS
       }
-
       // When
       await getRendezVousQueryHandler.monitor(utilisateur, query)
-
       // Then
       expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
         Evenement.Type.RDV_LISTE,
         utilisateur
       )
     })
-
     it("n'envoie pas un évenement de consultation de la liste des rendez vous dans le passé", async () => {
       // Given
-      const utilisateur = unUtilisateurJeune()
+      const utilisateur = unUtilisateurJeune({ id: 'periode-passe' })
       const query: GetRendezVousJeuneQuery = {
         idJeune: 'id',
-        periode: Periode.PASSES
+        periode: RendezVous.Periode.PASSES
       }
-
       // When
       await getRendezVousQueryHandler.monitor(utilisateur, query)
-
       // Then
-      expect(evenementService.creerEvenement).to.have.callCount(0)
+      expect(
+        evenementService.creerEvenement
+      ).not.to.have.been.calledWithExactly(
+        Evenement.Type.RDV_LISTE,
+        utilisateur
+      )
     })
   })
+
   describe('authorize', () => {
     it('autorise un jeune', () => {
       // When

@@ -74,7 +74,7 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur,
     query: GetRendezVousJeuneQuery
   ): Promise<void> {
-    if (query?.periode !== RendezVous.Periode.PASSES) {
+    if (query.periode !== RendezVous.Periode.PASSES) {
       await this.evenementService.creerEvenement(
         Evenement.Type.RDV_LISTE,
         utilisateur
