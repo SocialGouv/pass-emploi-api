@@ -8,6 +8,7 @@ import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseille
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
 import { Evenement, EvenementService } from '../../domain/evenement'
+import Periode = RendezVous.Periode
 
 export interface GetRendezVousJeuneQuery extends Query {
   idJeune: string
@@ -70,10 +71,15 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
     }
   }
 
-  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.RDV_LISTE,
-      utilisateur
-    )
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    query: GetRendezVousJeuneQuery
+  ): Promise<void> {
+    if (query?.periode != Periode.PASSES) {
+      await this.evenementService.creerEvenement(
+        Evenement.Type.RDV_LISTE,
+        utilisateur
+      )
+    }
   }
 }
