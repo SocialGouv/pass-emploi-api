@@ -8,7 +8,6 @@ import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseille
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { RendezVousQueryModel } from './query-models/rendez-vous.query-models'
 import { Evenement, EvenementService } from '../../domain/evenement'
-import Periode = RendezVous.Periode
 
 export interface GetRendezVousJeuneQuery extends Query {
   idJeune: string
@@ -75,7 +74,7 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur,
     query: GetRendezVousJeuneQuery
   ): Promise<void> {
-    if (query?.periode != Periode.PASSES) {
+    if (query?.periode !== RendezVous.Periode.PASSES) {
       await this.evenementService.creerEvenement(
         Evenement.Type.RDV_LISTE,
         utilisateur
