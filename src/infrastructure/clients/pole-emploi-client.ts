@@ -5,6 +5,10 @@ import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
 import { DateService } from '../../utils/date-service'
+import {
+  OffreEmploiDto,
+  OffresEmploiDto
+} from '../repositories/offre-emploi-http-sql.repository'
 
 @Injectable()
 export class PoleEmploiClient {
@@ -24,6 +28,21 @@ export class PoleEmploiClient {
     this.logger = new Logger('PoleEmploiClient')
     this.inMemoryToken = { token: undefined, tokenDate: undefined }
     this.apiUrl = this.configService.get('poleEmploi').url
+  }
+
+  async getOffreEmploi(
+    idOffreEmploi: string
+  ): Promise<OffreEmploiDto | undefined> {
+    const response = await this.get(`offresdemploi/v2/offres/${idOffreEmploi}`)
+    if (response.status !== 200) {
+      return undefined
+    }
+    return response.data
+  }
+
+  async getOffresEmploi(params?: unknown): Promise<OffresEmploiDto> {
+    const response = await this.get('offresdemploi/v2/offres/search', params)
+    return response.data
   }
 
   async get(suffixUrl: string, params?: unknown): Promise<AxiosResponse> {

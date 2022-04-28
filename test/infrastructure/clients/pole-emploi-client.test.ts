@@ -6,6 +6,7 @@ import { PoleEmploiClient } from 'src/infrastructure/clients/pole-emploi-client'
 import { DateService } from 'src/utils/date-service'
 import { stubClass } from 'test/utils'
 import { testConfig } from '../../utils/module-for-testing'
+import { uneOffreEmploiDto } from '../../fixtures/offre-emploi.fixture'
 
 describe('PoleEmploiClient', () => {
   let poleEmploiClient: PoleEmploiClient
@@ -129,6 +130,29 @@ describe('PoleEmploiClient', () => {
       // Then
       expect(response.status).to.equal(200)
       expect(response.data).to.deep.equal({ resultats: [] })
+    })
+  })
+  describe('getOffreEmploi', () => {
+    it('récupère l"offre quand elle existe', async () => {
+      // Given
+      const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+        minutes: 20
+      })
+      poleEmploiClient.inMemoryToken = {
+        token: 'test-token',
+        tokenDate: uneDatetimeDeMoinsDe25Minutes
+      }
+
+      nock('https://api.emploi-store.fr/partenaire')
+        .get('/offresdemploi/v2/offres/1')
+        .reply(200, uneOffreEmploiDto())
+        .isDone()
+
+      // When
+      const offreEmploi = await poleEmploiClient.getOffreEmploi('1')
+
+      // Then
+      expect(offreEmploi).to.deep.equal(uneOffreEmploiDto())
     })
   })
 })

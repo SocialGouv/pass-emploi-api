@@ -20,6 +20,7 @@ import {
 } from '../../utils'
 import {
   uneOffreEmploi,
+  uneOffreEmploiDto,
   uneOffreEmploiResumeQueryModel
 } from '../../fixtures/offre-emploi.fixture'
 import { DateService } from '../../../src/utils/date-service'
@@ -282,8 +283,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
         })
 
         // Then
-        expect(poleEmploiClient.get).to.have.been.calledWith(
-          'offresdemploi/v2/offres/search',
+        expect(poleEmploiClient.getOffresEmploi).to.have.been.calledWith(
           expectedQueryParams
         )
       })
@@ -309,8 +309,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
         })
 
         // Then
-        expect(poleEmploiClient.get).to.have.been.calledWith(
-          'offresdemploi/v2/offres/search',
+        expect(poleEmploiClient.getOffresEmploi).to.have.been.calledWith(
           expectedQueryParams
         )
       })
@@ -334,8 +333,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
         })
 
         // Then
-        expect(poleEmploiClient.get).to.have.been.calledWithExactly(
-          'offresdemploi/v2/offres/search',
+        expect(poleEmploiClient.getOffresEmploi).to.have.been.calledWithExactly(
           expectedQueryParams
         )
       })
@@ -343,7 +341,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
     describe('quand il y a une 429', () => {
       it("rappelle l'api après le temps qu'il faut", async () => {
         // Given
-        poleEmploiClient.get
+        poleEmploiClient.getOffresEmploi
           .onFirstCall()
           .rejects({
             response: {
@@ -354,25 +352,18 @@ describe('OffresEmploiHttpSqlRepository', () => {
             }
           })
           .onSecondCall()
-          .resolves({
-            config: undefined,
-            headers: undefined,
-            request: undefined,
-            status: 200,
-            statusText: '',
-            data: []
-          })
+          .resolves({ resultats: [uneOffreEmploiDto()] })
 
         // When
         const result = await offresEmploiHttpSqlRepository.findAll(criteres)
 
         // Then
         expect(isSuccess(result)).to.be.equal(true)
-        expect(poleEmploiClient.get).to.have.callCount(2)
+        expect(poleEmploiClient.getOffresEmploi).to.have.callCount(2)
       })
       it('rejette après 2 appels en 429', async () => {
         // Given
-        poleEmploiClient.get.rejects({
+        poleEmploiClient.getOffresEmploi.rejects({
           response: {
             status: 429,
             headers: {
@@ -386,7 +377,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
 
         // Then
         expect(isSuccess(result)).to.be.equal(false)
-        expect(poleEmploiClient.get).to.have.callCount(2)
+        expect(poleEmploiClient.getOffresEmploi).to.have.callCount(2)
       })
     })
   })
