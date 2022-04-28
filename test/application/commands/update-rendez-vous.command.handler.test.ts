@@ -205,6 +205,7 @@ describe('UpdateRendezVousCommandHandler', () => {
       it('n"envoie aucun mail', async () => {
         // Given
         rendezVous.invitation = false
+        const date = '2022-04-04T09:54:04.561Z'
         const command: UpdateRendezVousCommand = {
           idRendezVous: rendezVous.id,
           date: '2021-11-11T08:03:30.000Z',
@@ -214,12 +215,17 @@ describe('UpdateRendezVousCommandHandler', () => {
         rendezVousRepository.get
           .withArgs(command.idRendezVous)
           .resolves(rendezVous)
+        const rendezVousUpdated: RendezVous = {
+          ...rendezVous,
+          date: new Date(date)
+        }
         // When
         await updateRendezVousCommandHandler.handle(command)
         // Then
         expect(mailService.envoyerMailRendezVous).not.to.have.been.calledWith(
           jeune.conseiller,
-          rendezVous
+          rendezVous,
+          rendezVousUpdated
         )
       })
     })
@@ -253,6 +259,7 @@ describe('UpdateRendezVousCommandHandler', () => {
             mailService.envoyerMailRendezVous
           ).to.have.been.calledWithExactly(
             rendezVousUpdated.jeune.conseiller,
+            rendezVous,
             rendezVousUpdated
           )
         })
@@ -292,12 +299,14 @@ describe('UpdateRendezVousCommandHandler', () => {
           // Then
           expect(mailService.envoyerMailRendezVous).not.to.have.been.calledWith(
             conseillerModificateur,
+            rendezVous,
             rendezVousUpdated
           )
           expect(
             mailService.envoyerMailRendezVous
           ).to.have.been.calledWithExactly(
             conseillerCreateur,
+            rendezVous,
             rendezVousUpdated
           )
         })

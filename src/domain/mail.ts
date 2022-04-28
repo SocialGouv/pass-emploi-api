@@ -42,15 +42,17 @@ export namespace Mail {
 
     envoyerMailRendezVous(
       conseiller: Conseiller,
-      rendezVous: RendezVous
+      rendezVous: RendezVous,
+      rendezVousMisAJour?: RendezVous
     ): Promise<void>
 
     envoyer(data: MailDataDto): Promise<void>
 
-    creerContenuMailNouveauRendezVous(
+    creerContenuMailRendezVous(
       conseiller: Conseiller,
       rendezVous: RendezVous,
-      fichierInvitation: ICS
+      fichierInvitation: ICS,
+      rendezVousMisAJour?: RendezVous
     ): MailDataDto
 
     mettreAJourMailingList(

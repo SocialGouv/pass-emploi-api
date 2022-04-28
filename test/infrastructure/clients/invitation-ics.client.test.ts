@@ -65,15 +65,15 @@ describe('InvitationIcsClient', () => {
       })
     })
   })
-  describe('creerEvenementNouveauRendezVous', () => {
-    it('renvoie le bon évènement du nouveau rendez-vous', async () => {
+  describe('creerEvenementRendezVous', () => {
+    it('renvoie le bon évènement quand c"est un nouveau rendez-vous', async () => {
       // Given
       const conseiller = unConseiller()
       const rendezVous = unRendezVous()
       const icsSequence = 0
 
       // When
-      const result = invitationIcsClient.creerEvenementNouveauRendezVous(
+      const result = invitationIcsClient.creerEvenementRendezVous(
         conseiller,
         rendezVous,
         icsSequence
@@ -107,6 +107,56 @@ describe('InvitationIcsClient', () => {
         },
         sequence: 0,
         start: [2021, 11, 11, 8, 3],
+        startInputType: 'utc',
+        title: '[CEJ] Entretien individuel conseiller',
+        uid: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb'
+      })
+    })
+    it('renvoie le bon évènement quand c"est un rappel de rendez-vous', async () => {
+      // Given
+      const conseiller = unConseiller()
+      const rendezVous = unRendezVous()
+      const rendezVousMisAJour = unRendezVous({
+        date: new Date('2022-10-10T08:03:30.000Z')
+      })
+      const icsSequence = 0
+
+      // When
+      const result = invitationIcsClient.creerEvenementRendezVous(
+        conseiller,
+        rendezVous,
+        icsSequence,
+        rendezVousMisAJour
+      )
+
+      // Then
+      expect(result).to.deep.equal({
+        attendees: [
+          {
+            email: 'nils.tavernier@passemploi.com',
+            name: 'Tavernier Nils',
+            role: 'REQ-PARTICIPANT',
+            rsvp: true
+          },
+          {
+            name: 'Doe John',
+            role: 'REQ-PARTICIPANT',
+            email: 'john.doe@plop.io',
+            rsvp: true
+          }
+        ],
+        description:
+          "Création d'un nouveau rendez-vous\nVous avez créé un rendez-vous de type Entretien individuel conseiller pour le lundi 10 octobre 2022 à 10h03 .\nPour l'intégrer à votre agenda, vous devez accepter cette invitation.Attention, les modifications et refus effectués directement dans votre agenda ne sont pas pris en compte dans votre portail CEJ.\nBonne journée",
+        duration: {
+          minutes: 30
+        },
+        method: 'REQUEST',
+        organizer: {
+          email: 'pass.emploi.contact@gmail.com',
+          name: 'Tavernier Nils'
+        },
+        sequence: 0,
+        start: [2022, 10, 10, 8, 3],
         startInputType: 'utc',
         title: '[CEJ] Entretien individuel conseiller',
         uid: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb'

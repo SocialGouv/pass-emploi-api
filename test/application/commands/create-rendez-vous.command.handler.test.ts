@@ -138,50 +138,100 @@ describe('CreateRendezVousCommandHandler', () => {
     })
     describe('quand le jeune existe et est lié au bon conseiller', () => {
       describe("quand le jeune s'est connecté au moins une fois sur l'application", () => {
-        it('crée un rendez-vous, envoie une notification au jeune, envoie un mail au conseiller et planifie', async () => {
-          // Given
-          const command: CreateRendezVousCommand = {
-            idJeune: jeune.id,
-            idConseiller: jeune.conseiller.id,
-            commentaire: rendezVous.commentaire,
-            date: rendezVous.date.toDateString(),
-            duree: rendezVous.duree
-          }
-          jeuneRepository.get.withArgs(command.idJeune).resolves(jeune)
+        describe('quand le champ invitation du rendez-vous est à true', () => {
+          it('crée un rendez-vous, envoie une notification au jeune, envoie un mail au conseiller et planifie', async () => {
+            // Given
+            const command: CreateRendezVousCommand = {
+              idJeune: jeune.id,
+              idConseiller: jeune.conseiller.id,
+              commentaire: rendezVous.commentaire,
+              date: rendezVous.date.toDateString(),
+              duree: rendezVous.duree,
+              invitation: true
+            }
+            jeuneRepository.get.withArgs(command.idJeune).resolves(jeune)
 
-          const conseiller = unConseiller()
-          conseillerRepository.get
-            .withArgs(command.idConseiller)
-            .resolves(conseiller)
+            const conseiller = unConseiller()
+            conseillerRepository.get
+              .withArgs(command.idConseiller)
+              .resolves(conseiller)
 
-          const expectedRendezvous = RendezVous.createRendezVousConseiller(
-            command,
-            jeune,
-            conseiller,
-            idService
-          )
-
-          // When
-          const result = await createRendezVousCommandHandler.handle(command)
-
-          // Then
-          expect(result).to.deep.equal(success(expectedRendezvous.id))
-          expect(rendezVousRepository.save).to.have.been.calledWith(
-            expectedRendezvous
-          )
-          expect(notificationRepository.send).to.have.been.calledWith(
-            Notification.createNouveauRdv(
-              jeune.pushNotificationToken,
-              expectedRendezvous.id
+            const expectedRendezvous = RendezVous.createRendezVousConseiller(
+              command,
+              jeune,
+              conseiller,
+              idService
             )
-          )
-          expect(mailClient.envoyerMailRendezVous).to.have.been.calledWith(
-            jeune.conseiller,
-            expectedRendezvous
-          )
-          expect(
-            planificateurService.planifierRappelsRendezVous
-          ).to.have.been.calledWith(expectedRendezvous)
+
+            // When
+            const result = await createRendezVousCommandHandler.handle(command)
+
+            // Then
+            expect(result).to.deep.equal(success(expectedRendezvous.id))
+            expect(rendezVousRepository.save).to.have.been.calledWith(
+              expectedRendezvous
+            )
+            expect(notificationRepository.send).to.have.been.calledWith(
+              Notification.createNouveauRdv(
+                jeune.pushNotificationToken,
+                expectedRendezvous.id
+              )
+            )
+            expect(mailClient.envoyerMailRendezVous).to.have.been.calledWith(
+              jeune.conseiller,
+              expectedRendezvous
+            )
+            expect(
+              planificateurService.planifierRappelsRendezVous
+            ).to.have.been.calledWith(expectedRendezvous)
+          })
+        })
+        describe('quand le champ invitation du rendez-vous est à false', () => {
+          it('crée un rendez-vous, envoie une notification au jeune, planifie sans envoyer de mail au conseiller', async () => {
+            // Given
+            const command: CreateRendezVousCommand = {
+              idJeune: jeune.id,
+              idConseiller: jeune.conseiller.id,
+              commentaire: rendezVous.commentaire,
+              date: rendezVous.date.toDateString(),
+              duree: rendezVous.duree,
+              invitation: false
+            }
+            jeuneRepository.get.withArgs(command.idJeune).resolves(jeune)
+
+            const conseiller = unConseiller()
+            conseillerRepository.get
+              .withArgs(command.idConseiller)
+              .resolves(conseiller)
+
+            const expectedRendezvous = RendezVous.createRendezVousConseiller(
+              command,
+              jeune,
+              conseiller,
+              idService
+            )
+
+            // When
+            const result = await createRendezVousCommandHandler.handle(command)
+
+            // Then
+            expect(result).to.deep.equal(success(expectedRendezvous.id))
+            expect(rendezVousRepository.save).to.have.been.calledWith(
+              expectedRendezvous
+            )
+            expect(notificationRepository.send).to.have.been.calledWith(
+              Notification.createNouveauRdv(
+                jeune.pushNotificationToken,
+                expectedRendezvous.id
+              )
+            )
+            expect(
+              mailClient.envoyerMailRendezVous
+            ).not.to.have.been.calledWith(jeune.conseiller, expectedRendezvous)
+            expect(
+              planificateurService.planifierRappelsRendezVous
+            ).to.have.been.calledWith(expectedRendezvous)
+          })
         })
       })
       describe("quand le jeune ne s'est jamais connecté sur l'application", () => {
@@ -194,7 +244,8 @@ describe('CreateRendezVousCommandHandler', () => {
             idConseiller: jeune.conseiller.id,
             commentaire: rendezVous.commentaire,
             date: rendezVous.date.toDateString(),
-            duree: rendezVous.duree
+            duree: rendezVous.duree,
+            invitation: true
           }
           const conseiller = unConseiller()
           conseillerRepository.get

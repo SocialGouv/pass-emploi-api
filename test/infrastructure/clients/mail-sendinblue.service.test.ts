@@ -66,8 +66,8 @@ describe('MailSendinblueService', () => {
       })
     })
   })
-  describe('creerContenuMailNouveauRendezVous', () => {
-    it('renvoie le contenu du mail du nouveau rendez-vous', async () => {
+  describe('creerContenuMailRendezVous', () => {
+    it('renvoie le contenu du mail quand c"est un nouveau rendez-vous', async () => {
       // Given
       const conseiller = unConseiller()
       const rendezVous = unRendezVous()
@@ -78,7 +78,7 @@ describe('MailSendinblueService', () => {
       const invitationBase64 = Buffer.from(fichierInvitation).toString('base64')
 
       // When
-      const result = mailSendinblueService.creerContenuMailNouveauRendezVous(
+      const result = mailSendinblueService.creerContenuMailRendezVous(
         conseiller,
         rendezVous,
         fichierInvitation
@@ -99,6 +99,50 @@ describe('MailSendinblueService', () => {
           typeRdv: 'Entretien individuel conseiller'
         },
         templateId: 300,
+        to: [
+          {
+            email: 'nils.tavernier@passemploi.com',
+            name: 'Nils Tavernier'
+          }
+        ]
+      })
+    })
+    it('renvoie le contenu du mail quand c"est un rappel de rendez-vous', async () => {
+      // Given
+      const conseiller = unConseiller()
+      const rendezVous = unRendezVous()
+      const rendezVousMisAJour = unRendezVous({
+        date: new Date('2022-10-10T08:03:30.000Z')
+      })
+      const fichierInvitation = fs.readFileSync(
+        path.resolve(__dirname, '../../fixtures/invitation-mail.fixture.ics'),
+        'utf8'
+      )
+      const invitationBase64 = Buffer.from(fichierInvitation).toString('base64')
+
+      // When
+      const result = mailSendinblueService.creerContenuMailRendezVous(
+        conseiller,
+        rendezVous,
+        fichierInvitation,
+        rendezVousMisAJour
+      )
+
+      // Then
+      expect(result).to.deep.equal({
+        attachment: [
+          {
+            content: invitationBase64,
+            name: 'invite.ics'
+          }
+        ],
+        params: {
+          dateRdv: 'jeudi 11 novembre 2021',
+          heureRdv: '09h03',
+          lienPortail: 'http://frontend.com',
+          typeRdv: 'Entretien individuel conseiller'
+        },
+        templateId: 400,
         to: [
           {
             email: 'nils.tavernier@passemploi.com',

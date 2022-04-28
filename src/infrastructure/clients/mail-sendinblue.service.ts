@@ -16,7 +16,11 @@ export type ICS = string
 export class MailSendinblueService implements Mail.Service {
   private sendinblueUrl: string
   private apiKey: string
-  private templates: { conversationsNonLues: string; nouveauRendezvous: string }
+  private templates: {
+    conversationsNonLues: string
+    nouveauRendezvous: string
+    rappelRendezvous: string
+  }
   private frontendUrl: string
 
   constructor(
@@ -54,33 +58,40 @@ export class MailSendinblueService implements Mail.Service {
 
   async envoyerMailRendezVous(
     conseiller: Conseiller,
-    rendezVous: RendezVous
+    rendezVous: RendezVous,
+    rendezVousMisAJour?: RendezVous
   ): Promise<void> {
     const rendezVousIcsSequence =
       await this.invitationIcsClient.getAndIncrementRendezVousIcsSequence(
         rendezVous.id
       )
     const fichierInvitation =
-      this.invitationIcsClient.creerFichierInvitationNouveauRendezVous(
+      this.invitationIcsClient.creerFichierInvitationRendezVous(
         conseiller,
         rendezVous,
-        rendezVousIcsSequence
+        rendezVousIcsSequence,
+        rendezVousMisAJour
       )
-    const mailDatadto = this.creerContenuMailNouveauRendezVous(
+    const mailDatadto = this.creerContenuMailRendezVous(
       conseiller,
       rendezVous,
-      fichierInvitation
+      fichierInvitation,
+      rendezVousMisAJour
     )
 
     await this.envoyer(mailDatadto)
   }
 
-  creerContenuMailNouveauRendezVous(
+  creerContenuMailRendezVous(
     conseiller: Conseiller,
     rendezVous: RendezVous,
-    fichierInvitation: ICS
+    fichierInvitation: ICS,
+    rendezVousMisAJour?: RendezVous
   ): MailDataDto {
     const invitationBase64 = Buffer.from(fichierInvitation).toString('base64')
+    const templateId = rendezVousMisAJour
+      ? parseInt(this.templates.rappelRendezvous)
+      : parseInt(this.templates.nouveauRendezvous)
     return {
       to: [
         {
@@ -100,7 +111,7 @@ export class MailSendinblueService implements Mail.Service {
           content: invitationBase64
         }
       ],
-      templateId: parseInt(this.templates.nouveauRendezvous)
+      templateId
     }
   }
 

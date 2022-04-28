@@ -103,6 +103,8 @@ export default () => {
           process.env.SENDINBLUE_CONVERSATIONS_TEMPLATE_ID ?? '2',
         nouveauRendezvous:
           process.env.SENDINBLUE_NOUVEAU_RENDEZVOUS_TEMPLATE_ID ?? '3',
+        rappelRendezvous:
+          process.env.SENDINBLUE_RAPPEL_RENDEZVOUS_TEMPLATE_ID ?? '18',
         suppressionJeuneMilo:
           process.env.SENDINBLUE_SUPPRESSION_JEUNE_MILO_ID ?? '14',
         suppressionJeunePE: process.env.SENDINBLUE_SUPPRESSION_JEUNE_PE_ID ?? '17'

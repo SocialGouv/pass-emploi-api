@@ -110,18 +110,20 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
         `Impossible d'envoyer un mail au conseiller ${command.idConseiller}, il n'existe pas`
       )
     } else {
-      try {
-        await this.mailService.envoyerMailRendezVous(
-          jeune.conseiller,
-          rendezVous
-        )
-      } catch (e) {
-        this.logger.error(
-          buildError(
-            "Erreur lors de l'envoi de l'email du nouveau rendez-vous",
-            e
+      if (rendezVous.invitation) {
+        try {
+          await this.mailService.envoyerMailRendezVous(
+            jeune.conseiller,
+            rendezVous
           )
-        )
+        } catch (e) {
+          this.logger.error(
+            buildError(
+              "Erreur lors de l'envoi de l'email du nouveau rendez-vous",
+              e
+            )
+          )
+        }
       }
     }
 
