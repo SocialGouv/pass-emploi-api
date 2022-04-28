@@ -19,13 +19,14 @@ export interface HandleJobRendezVousCommand extends Command {
 }
 
 export interface HandleJobRendezVousCommandResult {
+  idJeune: string
   notificationEnvoyee: boolean
 }
 
 @Injectable()
 export class HandleJobRendezVousCommandHandler extends CommandHandler<
   HandleJobRendezVousCommand,
-  HandleJobRendezVousCommandResult
+  HandleJobRendezVousCommandResult[]
 > {
   constructor(
     @Inject(RendezVousRepositoryToken)
@@ -39,23 +40,33 @@ export class HandleJobRendezVousCommandHandler extends CommandHandler<
 
   async handle(
     command: HandleJobRendezVousCommand
-  ): Promise<Result<HandleJobRendezVousCommandResult>> {
+  ): Promise<Result<HandleJobRendezVousCommandResult[]>> {
     const rendezVous = await this.rendezVousRepository.get(
       command.job.contenu.idRendezVous
     )
 
-    if (!rendezVous?.jeune.pushNotificationToken) {
-      return success({ notificationEnvoyee: false })
+    const stats: HandleJobRendezVousCommandResult[] = []
+
+    if (rendezVous) {
+      await Promise.all(
+        rendezVous.jeunes.map(async jeune => {
+          if (!jeune.pushNotificationToken) {
+            stats.push({ idJeune: jeune.id, notificationEnvoyee: false })
+          } else {
+            const notification = Notification.createRappelRdv(
+              jeune.pushNotificationToken,
+              command.job.contenu.idRendezVous,
+              DateTime.fromJSDate(rendezVous.date),
+              this.dateService
+            )
+            await this.notificationRepository.send(notification)
+            stats.push({ idJeune: jeune.id, notificationEnvoyee: true })
+          }
+        })
+      )
     }
 
-    const notification = Notification.createRappelRdv(
-      rendezVous.jeune.pushNotificationToken,
-      command.job.contenu.idRendezVous,
-      DateTime.fromJSDate(rendezVous.date),
-      this.dateService
-    )
-    await this.notificationRepository.send(notification)
-    return success({ notificationEnvoyee: true })
+    return success(stats)
   }
 
   async authorize(

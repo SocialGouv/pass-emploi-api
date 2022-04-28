@@ -4,7 +4,8 @@ import { RendezVous } from '../../domain/rendez-vous'
 import { DateService } from '../../utils/date-service'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
-import { RendezVousSqlModelOld } from '../sequelize/models/rendez-vous.sql-model'
+import { RendezVousJeuneAssociationSqlModel } from '../sequelize/models/rendez-vous-jeune-association.model'
+import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
 import { toRendezVous, toRendezVousDto } from './mappers/rendez-vous.mappers'
 
 @Injectable()
@@ -12,12 +13,20 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
   constructor(private dateService: DateService) {}
 
   async save(rendezVous: RendezVous): Promise<void> {
-    const RendezVousDtoOld = toRendezVousDto(rendezVous)
-    await RendezVousSqlModelOld.upsert(RendezVousDtoOld)
+    const rendezVousDto = toRendezVousDto(rendezVous)
+    await RendezVousSqlModel.upsert(rendezVousDto)
+    await Promise.all(
+      rendezVous.jeunes.map(jeune =>
+        RendezVousJeuneAssociationSqlModel.upsert({
+          idJeune: jeune.id,
+          idRendezVous: rendezVous.id
+        })
+      )
+    )
   }
 
   async delete(idRendezVous: string): Promise<void> {
-    await RendezVousSqlModelOld.update(
+    await RendezVousSqlModel.update(
       {
         dateSuppression: this.dateService.nowJs()
       },
@@ -27,10 +36,13 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
         }
       }
     )
+    await RendezVousJeuneAssociationSqlModel.destroy({
+      where: { idRendezVous: idRendezVous }
+    })
   }
 
   async get(idRendezVous: string): Promise<RendezVous | undefined> {
-    const rendezVousSql = await RendezVousSqlModelOld.findByPk(idRendezVous, {
+    const rendezVousSql = await RendezVousSqlModel.findByPk(idRendezVous, {
       include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }]
     })
 
@@ -42,7 +54,7 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
 
   async getAllAVenir(): Promise<RendezVous[]> {
     const maintenant = this.dateService.nowJs()
-    const rendezVousSql = await RendezVousSqlModelOld.findAll({
+    const rendezVousSql = await RendezVousSqlModel.findAll({
       include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }],
       where: {
         date: {

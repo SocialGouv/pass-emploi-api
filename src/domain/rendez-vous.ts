@@ -45,14 +45,16 @@ export interface RendezVous {
   modalite?: string
   date: Date
   duree: number
-  jeune: Pick<
-    Jeune,
-    | 'id'
-    | 'firstName'
-    | 'lastName'
-    | 'conseiller'
-    | 'pushNotificationToken'
-    | 'email'
+  jeunes: Array<
+    Pick<
+      Jeune,
+      | 'id'
+      | 'firstName'
+      | 'lastName'
+      | 'conseiller'
+      | 'pushNotificationToken'
+      | 'email'
+    >
   >
   type: CodeTypeRendezVous
   precision?: string
@@ -65,7 +67,7 @@ export interface RendezVous {
 }
 
 interface InfosRendezVousACreer {
-  idJeune: string
+  idsJeunes: string[]
   idConseiller: string
   commentaire?: string
   date: string
@@ -94,7 +96,7 @@ export namespace RendezVous {
 
   export function createRendezVousConseiller(
     infosRendezVousACreer: InfosRendezVousACreer,
-    jeune: Jeune,
+    jeunes: Jeune[],
     conseiller: Conseiller,
     idService: IdService
   ): RendezVous {
@@ -104,15 +106,8 @@ export namespace RendezVous {
       duree: infosRendezVousACreer.duree,
       date: new Date(infosRendezVousACreer.date),
       modalite: infosRendezVousACreer.modalite,
-      jeune: {
-        id: jeune.id,
-        firstName: jeune.firstName,
-        lastName: jeune.lastName,
-        conseiller: jeune.conseiller,
-        pushNotificationToken: jeune.pushNotificationToken,
-        email: jeune.email
-      },
-      sousTitre: `avec ${jeune.conseiller!.firstName}`,
+      jeunes: jeunes,
+      sousTitre: `avec ${jeunes[0].conseiller!.firstName}`,
       titre: 'Rendez-vous conseiller',
       type: infosRendezVousACreer.type
         ? (infosRendezVousACreer.type as CodeTypeRendezVous)

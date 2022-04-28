@@ -13,7 +13,7 @@ import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { RendezVousConseillerQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-models'
 import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous'
-import { RendezVousJeuneAssociationModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
+import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { Unauthorized } from '../../../src/domain/erreur'
 
@@ -65,7 +65,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
           ...unRendezVous
         })
 
-        await RendezVousJeuneAssociationModel.create({
+        await RendezVousJeuneAssociationSqlModel.create({
           idJeune: jeune.id,
           idRendezVous: unRendezVous.id
         })
@@ -132,7 +132,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
           ...unRendezVous
         })
 
-        await RendezVousJeuneAssociationModel.bulkCreate([
+        await RendezVousJeuneAssociationSqlModel.bulkCreate([
           {
             idJeune: jeune1.id,
             idRendezVous: unRendezVous.id
@@ -220,7 +220,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
 
         await RendezVousSqlModel.bulkCreate([unRendezVous, unAutreRendezVous])
 
-        await RendezVousJeuneAssociationModel.bulkCreate([
+        await RendezVousJeuneAssociationSqlModel.bulkCreate([
           {
             idJeune: jeune1.id,
             idRendezVous: unRendezVous.id
@@ -311,12 +311,12 @@ describe('GetDetailRendezVousQueryHandler', () => {
           })
         )
 
-        await RendezVousJeuneAssociationModel.create({
+        await RendezVousJeuneAssociationSqlModel.create({
           idJeune: jeune2DeNils.id,
           idRendezVous: unRendezVousDuJeune2DeNils.id
         })
 
-        await RendezVousJeuneAssociationModel.create({
+        await RendezVousJeuneAssociationSqlModel.create({
           idJeune: jeuneDeJohn.id,
           idRendezVous: unRendezVousDuJeune2DeNils.id
         })
@@ -354,7 +354,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
           ...unRendezVous
         })
 
-        await RendezVousJeuneAssociationModel.bulkCreate([
+        await RendezVousJeuneAssociationSqlModel.bulkCreate([
           {
             idJeune: jeune1.id,
             idRendezVous: unRendezVous.id

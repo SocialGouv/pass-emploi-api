@@ -45,18 +45,21 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     }
     await this.rendezVousRepository.delete(command.idRendezVous)
 
-    const tokenDuJeune = rendezVous.jeune.pushNotificationToken
-    if (tokenDuJeune) {
-      const notification = Notification.createRdvSupprime(
-        tokenDuJeune,
-        rendezVous.date
-      )
-      await this.notificationRepository.send(notification)
-    } else {
-      this.logger.log(
-        `Le jeune ${rendezVous.jeune.id} ne s'est jamais connecté sur l'application`
-      )
-    }
+    await Promise.all(
+      rendezVous.jeunes.map(async jeune => {
+        if (jeune.pushNotificationToken) {
+          const notification = Notification.createNouveauRdv(
+            jeune.pushNotificationToken,
+            rendezVous.id
+          )
+          await this.notificationRepository.send(notification)
+        } else {
+          this.logger.log(
+            `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
+          )
+        }
+      })
+    )
 
     try {
       await this.planificateurService.supprimerRappelsRendezVous(rendezVous)

@@ -9,7 +9,9 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  ValidateIf
+  ValidateIf,
+  IsArray,
+  ArrayNotEmpty
 } from 'class-validator'
 import { CodeTypeRendezVous } from 'src/domain/rendez-vous'
 
@@ -36,10 +38,17 @@ export class CreateRendezVousPayload {
   @IsNotEmpty()
   modality?: string
 
-  @ApiProperty()
+  @ApiPropertyOptional()
+  @ValidateIf(payload => payload.jeunesIds === undefined)
   @IsString()
   @IsNotEmpty()
-  jeuneId: string
+  jeuneId?: string
+
+  @ApiPropertyOptional()
+  @ValidateIf(payload => payload.jeuneId === undefined)
+  @IsArray()
+  @ArrayNotEmpty()
+  jeunesIds?: string[]
 
   @ApiPropertyOptional({ enum: CodeTypeRendezVous })
   @IsOptional()

@@ -23,7 +23,7 @@ import { SinonSandbox } from 'sinon'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import { GetAllRendezVousConseillerQueryHandler } from '../../../src/application/queries/get-rendez-vous-conseiller.query.handler'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { RendezVousJeuneAssociationModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
+import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
 
 describe('GetRendezVousConseillerQueryHandler', () => {
   DatabaseForTesting.prepare()
@@ -85,7 +85,7 @@ describe('GetRendezVousConseillerQueryHandler', () => {
       unRendezVousTresFuturPresenceConseillerFalse,
       unRendezVousProche
     ])
-    await RendezVousJeuneAssociationModel.bulkCreate([
+    await RendezVousJeuneAssociationSqlModel.bulkCreate([
       {
         idJeune: jeune1.id,
         idRendezVous: unRendezVousPasse.id

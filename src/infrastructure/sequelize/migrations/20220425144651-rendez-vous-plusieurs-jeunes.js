@@ -30,17 +30,45 @@ module.exports = {
             allowNull: false
           }
         },
-        { transaction }
+        {
+          transaction,
+          uniqueKeys: {
+            rendez_vous_jeune_association_unique: {
+              fields: ['id_rendez_vous', 'id_jeune']
+            }
+          }
+        }
       )
 
       await queryInterface.sequelize.query(
-        `INSERT INTO rendez_vous_jeune_association (id_rendez_vous, id_jeune) SELECT id, id_jeune FROM rendez_vous`,
+        `INSERT INTO rendez_vous_jeune_association (id_rendez_vous, id_jeune) SELECT id, id_jeune FROM rendez_vous WHERE id_jeune IS NOT NULL`,
         { transaction }
       )
+
+      await queryInterface.removeColumn('rendez_vous', 'id_jeune', {
+        transaction
+      })
     })
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('rendez_vous_jeune_association')
+    await queryInterface.sequelize.transaction(async transaction => {
+      await queryInterface.addColumn(
+        'rendez_vous',
+        'id_jeune',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+          references: {
+            model: 'jeune',
+            key: 'id'
+          }
+        },
+        { transaction }
+      )
+      await queryInterface.dropTable('rendez_vous_jeune_association', {
+        transaction
+      })
+    })
   }
 }

@@ -443,7 +443,7 @@ describe('ConseillersController', () => {
 
       expect(createRendezVousCommandHandler.execute).to.have.been.calledWith(
         {
-          idJeune: payload.jeuneId,
+          idsJeunes: [payload.jeuneId],
           commentaire: payload.comment,
           date: payload.date,
           duree: payload.duration,

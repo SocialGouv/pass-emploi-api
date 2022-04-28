@@ -25,7 +25,7 @@ import { FavoriOffreEngagementSqlModel } from '../../../src/infrastructure/seque
 import { FavoriOffreImmersionSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { RechercheSqlModel } from '../../../src/infrastructure/sequelize/models/recherche.sql-model'
-import { RendezVousSqlModelOld } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import {
   uneAutreDate,
@@ -43,7 +43,7 @@ import { uneRecherche } from '../../fixtures/recherche.fixture'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { unRendezVousDtoOld } from '../../fixtures/sql-models/rendez-vous.sql-model'
+import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { DatabaseForTesting, expect } from '../../utils'
 
 describe('JeuneSqlRepository', () => {
@@ -530,7 +530,7 @@ describe('JeuneSqlRepository', () => {
         type: Recherche.Type.OFFRES_EMPLOI,
         criteres: {}
       })
-      const RendezVousDtoOld = unRendezVousDtoOld({ idJeune: jeuneDto.id })
+      const RendezVousDto = unRendezVousDto({ idJeune: jeuneDto.id })
       const favoriOffreEmploi = unFavoriOffreEmploi({ idJeune: jeuneDto.id })
       const favoriOffreEngagement = unFavoriOffreEngagement({
         idJeune: jeuneDto.id
@@ -553,7 +553,7 @@ describe('JeuneSqlRepository', () => {
         await JeuneSqlModel.creer(jeuneDto)
         await ActionSqlModel.creer(actionDto)
         await rechercheSqlRepository.createRecherche(rechercheEmploi)
-        await RendezVousSqlModelOld.create(RendezVousDtoOld)
+        await RendezVousSqlModel.create(RendezVousDto)
         await FavoriOffreEmploiSqlModel.create(favoriOffreEmploi)
         await FavoriOffreEngagementSqlModel.create(favoriOffreEngagement)
         await FavoriOffreImmersionSqlModel.create(favoriOffreImmersion)
@@ -574,8 +574,8 @@ describe('JeuneSqlRepository', () => {
           .null
       })
       it('supprime les rendez-vous du jeune', async () => {
-        await expect(await RendezVousSqlModelOld.findByPk(RendezVousDtoOld.id))
-          .to.be.null
+        await expect(await RendezVousSqlModel.findByPk(RendezVousDto.id)).to.be
+          .null
       })
       it('supprime les transferts du jeune', async () => {
         await expect(
