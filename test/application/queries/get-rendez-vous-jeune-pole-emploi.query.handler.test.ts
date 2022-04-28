@@ -24,6 +24,7 @@ import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { RendezVous } from '../../../src/domain/rendez-vous'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import Periode = RendezVous.Periode
 
 describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   let jeunesRepository: StubbedType<Jeune.Repository>
@@ -37,7 +38,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   let sandbox: SinonSandbox
   const idpToken = 'idpToken'
 
-  before(() => {
+  beforeEach(() => {
     sandbox = createSandbox()
     jeunesRepository = stubInterface(sandbox)
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
@@ -736,18 +737,58 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   })
 
   describe('monitor', () => {
-    it('envoie un évenement de consultation de la liste des rendez vous', async () => {
+    it('envoie un évenement de consultation de la liste des rendez vous sans période', async () => {
       // Given
       const utilisateur = unUtilisateurJeune()
+      const query: GetRendezVousJeunePoleEmploiQuery = {
+        idJeune: 'id',
+        accessToken: 'accessToken',
+        periode: undefined
+      }
 
       // When
-      await getRendezVousJeunePoleEmploiQueryHandler.monitor(utilisateur)
+      await getRendezVousJeunePoleEmploiQueryHandler.monitor(utilisateur, query)
 
       // Then
       expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
         Evenement.Type.RDV_LISTE,
         utilisateur
       )
+    })
+
+    it('envoie un évenement de consultation de la liste des rendez vous dans le futur', async () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+      const query: GetRendezVousJeunePoleEmploiQuery = {
+        idJeune: 'id',
+        accessToken: 'accessToken',
+        periode: Periode.FUTURS
+      }
+
+      // When
+      await getRendezVousJeunePoleEmploiQueryHandler.monitor(utilisateur, query)
+
+      // Then
+      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
+        Evenement.Type.RDV_LISTE,
+        utilisateur
+      )
+    })
+
+    it("n'envoie pas un évenement de consultation de la liste des rendez vous dans le passé", async () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+      const query: GetRendezVousJeunePoleEmploiQuery = {
+        idJeune: 'id',
+        accessToken: 'accessToken',
+        periode: Periode.PASSES
+      }
+
+      // When
+      await getRendezVousJeunePoleEmploiQueryHandler.monitor(utilisateur, query)
+
+      // Then
+      expect(evenementService.creerEvenement).to.have.callCount(0)
     })
   })
 })
