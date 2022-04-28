@@ -44,7 +44,7 @@ describe('GetDetailServiceCiviqueQuery', () => {
       const detailOffreEngagementQueryModel: DetailOffreEngagementQueryModel =
         unDetailOffreEngagementQuerymodel()
 
-      engagementRepository.getOffreEngagementQueryModelById
+      engagementRepository.getOffreEngagementById
         .withArgs(getServicesCiviqueQuery.idOffreEngagement)
         .resolves(detailOffreEngagementQueryModel)
 
@@ -62,7 +62,7 @@ describe('GetDetailServiceCiviqueQuery', () => {
         idOffreEngagement: 'ABC123'
       }
 
-      engagementRepository.getOffreEngagementQueryModelById
+      engagementRepository.getOffreEngagementById
         .withArgs(getServicesCiviqueQuery.idOffreEngagement)
         .resolves(
           failure(
@@ -99,7 +99,7 @@ describe('GetDetailServiceCiviqueQuery', () => {
       const detailOffreEngagementQueryModel: DetailOffreEngagementQueryModel =
         unDetailOffreEngagementQuerymodel()
 
-      engagementRepository.getOffreEngagementQueryModelById
+      engagementRepository.getOffreEngagementById
         .withArgs(getServicesCiviqueQuery)
         .resolves(detailOffreEngagementQueryModel)
 

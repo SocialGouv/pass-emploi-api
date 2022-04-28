@@ -8,7 +8,7 @@ import {
   EngagementRepositoryToken,
   OffreEngagement
 } from '../../domain/offre-engagement'
-import { Result } from '../../building-blocks/types/result'
+import { isFailure, Result, success } from '../../building-blocks/types/result'
 
 export interface GetDetailServiceCiviqueQuery extends Query {
   idOffreEngagement: string
@@ -30,9 +30,32 @@ export class GetDetailServiceCiviqueQueryHandler extends QueryHandler<
   async handle(
     query: GetDetailServiceCiviqueQuery
   ): Promise<Result<DetailOffreEngagementQueryModel>> {
-    return this.engagementRepository.getOffreEngagementQueryModelById(
+    const result = await this.engagementRepository.getOffreEngagementById(
       query.idOffreEngagement
     )
+
+    if (isFailure(result)) {
+      return result
+    }
+
+    const offreQueryModel: DetailOffreEngagementQueryModel = {
+      domaine: result.data.domaine,
+      titre: result.data.titre,
+      ville: result.data.ville,
+      organisation: result.data.organisation,
+      dateDeDebut: result.data.dateDeDebut,
+      dateDeFin: result.data.dateDeFin,
+      description: result.data.description,
+      lienAnnonce: result.data.lienAnnonce,
+      adresseOrganisation: result.data.adresseOrganisation,
+      adresseMission: result.data.adresseMission,
+      urlOrganisation: result.data.urlOrganisation,
+      codeDepartement: result.data.codeDepartement,
+      codePostal: result.data.codePostal,
+      descriptionOrganisation: result.data.descriptionOrganisation
+    }
+
+    return success(offreQueryModel)
   }
 
   async authorize(

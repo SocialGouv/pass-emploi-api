@@ -3,7 +3,7 @@ import { Authentification } from 'src/domain/authentification'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Result } from '../../building-blocks/types/result'
+import { isFailure, Result, success } from '../../building-blocks/types/result'
 import { OffreEngagementQueryModel } from './query-models/service-civique.query-models'
 import {
   OffreEngagement,
@@ -56,7 +56,24 @@ export class GetServicesCiviqueQueryHandler extends QueryHandler<
       page: query.page || DEFAULT_PAGE,
       limit: query.limit || DEFAULT_LIMIT
     }
-    return this.engagementRepository.findAll(criteres)
+    const result = await this.engagementRepository.findAll(criteres)
+
+    if (isFailure(result)) {
+      return result
+    }
+
+    const offresQueryModel: OffreEngagementQueryModel[] = result.data.map(
+      offre => ({
+        id: offre.id,
+        titre: offre.titre,
+        organisation: offre.organisation,
+        ville: offre.ville,
+        domaine: offre.domaine,
+        dateDeDebut: offre.dateDeDebut
+      })
+    )
+
+    return success(offresQueryModel)
   }
 
   async authorize(

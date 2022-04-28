@@ -1,31 +1,22 @@
-import {
-  DetailOffreEngagementQueryModel,
-  OffreEngagementQueryModel
-} from '../../../application/queries/query-models/service-civique.query-models'
 import { Core } from '../../../domain/core'
 import { FavoriOffreEngagementSqlModel } from '../../sequelize/models/favori-offre-engagement.sql-model'
 import {
   EngagementDto,
   OffreEngagementDto
 } from '../offre-engagement-http.repository'
+import { OffreEngagement } from '../../../domain/offre-engagement'
 
-export function toServiceCiviqueQueryModel(
+export function toOffresEngagement(
   servicesCiviqueDto: EngagementDto
-): OffreEngagementQueryModel[] {
-  return servicesCiviqueDto.hits.map(engagementDto => ({
-    id: engagementDto.id,
-    titre: engagementDto.title,
-    dateDeDebut: engagementDto.startAt,
-    domaine: engagementDto.domain,
-    ville: engagementDto.city,
-    organisation: engagementDto.organizationName
-  }))
+): OffreEngagement[] {
+  return servicesCiviqueDto.hits.map(toOffreEngagement)
 }
 
-export function toDetailOffreEngagementQueryModel(
+export function toOffreEngagement(
   serviceCiviqueDto: OffreEngagementDto
-): DetailOffreEngagementQueryModel {
+): OffreEngagement {
   return {
+    id: serviceCiviqueDto.id,
     titre: serviceCiviqueDto.title,
     dateDeDebut: serviceCiviqueDto.startAt,
     dateDeFin: serviceCiviqueDto.endAt,
@@ -39,7 +30,8 @@ export function toDetailOffreEngagementQueryModel(
     codeDepartement: serviceCiviqueDto.departmentCode,
     description: serviceCiviqueDto.description,
     codePostal: serviceCiviqueDto.postalCode,
-    descriptionOrganisation: serviceCiviqueDto.organizationDescription
+    descriptionOrganisation: serviceCiviqueDto.organizationDescription,
+    localisation: buildLocalisation(serviceCiviqueDto)
   }
 }
 
@@ -53,7 +45,7 @@ export function fromSqlToIds(
 
 export function fromSqlToOffreEngagement(
   favoriOffreEngagementSqlModel: FavoriOffreEngagementSqlModel
-): OffreEngagementQueryModel {
+): OffreEngagement {
   return {
     id: favoriOffreEngagementSqlModel.idOffre,
     domaine: favoriOffreEngagementSqlModel.domaine,
@@ -62,4 +54,16 @@ export function fromSqlToOffreEngagement(
     organisation: favoriOffreEngagementSqlModel.organisation ?? undefined,
     dateDeDebut: favoriOffreEngagementSqlModel.dateDeDebut ?? undefined
   }
+}
+
+function buildLocalisation(
+  serviceCiviqueDto: OffreEngagementDto
+): OffreEngagement.Localisation | undefined {
+  if (serviceCiviqueDto.location) {
+    return {
+      latitude: serviceCiviqueDto.location.lat,
+      longitude: serviceCiviqueDto.location.lon
+    }
+  }
+  return undefined
 }
