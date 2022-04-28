@@ -50,12 +50,11 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
 
     try {
       const params = this.construireLesParams(criteres)
-      const response = await this.poleEmploiClient.get(
-        'offresdemploi/v2/offres/search',
+      const offresEmploiDto = await this.poleEmploiClient.getOffresEmploi(
         params
       )
       return success(
-        toOffresEmploiQueryModel(criteres.page, criteres.limit, response.data)
+        toOffresEmploiQueryModel(criteres.page, criteres.limit, offresEmploiDto)
       )
     } catch (e) {
       this.logger.error(e)
@@ -87,15 +86,14 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
   async getOffreEmploiQueryModelById(
     idOffreEmploi: string
   ): Promise<OffreEmploiQueryModel | undefined> {
-    const response = await this.poleEmploiClient.get(
-      `offresdemploi/v2/offres/${idOffreEmploi}`
+    const offreEmploiDto = await this.poleEmploiClient.getOffreEmploi(
+      idOffreEmploi
     )
-
-    if (response.status !== 200) {
+    if (offreEmploiDto) {
+      return toOffreEmploiQueryModel(offreEmploiDto)
+    } else {
       return undefined
     }
-
-    return toOffreEmploiQueryModel(response.data)
   }
 
   generateRange(page: number, limit: number): string {
