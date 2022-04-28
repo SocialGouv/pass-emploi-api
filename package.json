@@ -35,7 +35,8 @@
     "tasks:init-all-jobs": "IS_WEB=false IS_WORKER=false TASK=INIT_ALL_JOBS node dist/main",
     "tasks:dummy-job": "IS_WEB=false IS_WORKER=false TASK=DUMMY_JOB node dist/main",
     "tasks:nettoyer-les-job": "IS_WEB=false IS_WORKER=false TASK=NETTOYER_LES_JOBS node dist/main",
-    "tasks:rechercher-les-nouvelles-offres": "IS_WEB=false IS_WORKER=false TASK=RECHERCHER_LES_NOUVELLES_OFFRES node dist/main",
+    "tasks:rechercher-les-nouvelles-offres-poles-emploi": "IS_WEB=false IS_WORKER=false TASK=RECHERCHER_LES_NOUVELLES_OFFRES node dist/main",
+    "tasks:rechercher-les-nouvelles-offres-civiques": "IS_WEB=false IS_WORKER=false TASK=RECHERCHER_LES_NOUVELLES_OFFRES_SERVICES_CIVIQUE node dist/main",
     "tasks:envoyer-mail-conseiller-messages": "IS_WEB=false IS_WORKER=false TASK=ENVOYER_MAIL_CONSEILLER_MESSAGES node dist/main",
     "tasks:initialiser-les-crons": "IS_WEB=false IS_WORKER=false TASK=INITIALISER_LES_CRON node dist/main",
     "tasks:mettre-a-jour-mailing-list-conseiller": "IS_WEB=false IS_WORKER=false TASK=METTRE_A_JOUR_MAILING_LIST_CONSEILLER node dist/main"

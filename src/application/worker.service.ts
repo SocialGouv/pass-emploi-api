@@ -10,6 +10,7 @@ import { HandleJobRendezVousCommandHandler } from './commands/jobs/handle-job-re
 import { HandleNettoyerLesJobsCommandHandler } from './commands/jobs/handle-job-nettoyer-les-jobs.command'
 import { HandleJobUpdateMailingListConseillerCommandHandler } from './commands/jobs/handle-job-update-mailing-list-conseiller.command'
 import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
+import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
 
 @Injectable()
 export class WorkerService {
@@ -23,7 +24,8 @@ export class WorkerService {
     private handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler,
     private notifierNouvellesOffresEmploiCommandHandler: HandleJobNotifierNouvellesOffresEmploiCommandHandler,
     private handleNettoyerLesJobsCommandHandler: HandleNettoyerLesJobsCommandHandler,
-    private handleJobUpdateMailingListConseillerCommandHandler: HandleJobUpdateMailingListConseillerCommandHandler
+    private handleJobUpdateMailingListConseillerCommandHandler: HandleJobUpdateMailingListConseillerCommandHandler,
+    private handleJobNotifierNouveauxServicesCiviqueCommandHandler: HandleJobNotifierNouveauxServicesCiviqueCommandHandler
   ) {
     this.apmService = getAPMInstance()
   }
@@ -55,6 +57,11 @@ export class WorkerService {
           break
         case Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI:
           await this.notifierNouvellesOffresEmploiCommandHandler.execute({})
+          break
+        case Planificateur.CronJob.NOUVELLES_OFFRES_SERVICE_CIVIQUE:
+          await this.handleJobNotifierNouveauxServicesCiviqueCommandHandler.execute(
+            {}
+          )
           break
         case Planificateur.CronJob.NETTOYER_LES_JOBS:
           await this.handleNettoyerLesJobsCommandHandler.execute({})

@@ -9,31 +9,33 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import {
-  EngagementRepositoryToken,
-  OffreEngagement
-} from '../../domain/offre-engagement'
-import { FavoriOffreEngagementAuthorizer } from '../authorizers/authorize-favori-offres-engagement'
+  OffreServiceCiviqueRepositoryToken,
+  OffreServiceCivique
+} from '../../domain/offre-service-civique'
+import { FavoriOffreServiceCiviqueAuthorizer } from '../authorizers/authorize-favori-offres-engagement'
 
-export interface DeleteFavoriOffreEngagementCommand extends Command {
+export interface DeleteFavoriOffreServiceCiviqueCommand extends Command {
   idOffre: string
   idJeune: string
 }
 
 @Injectable()
 export class DeleteFavoriOffreEngagementCommandHandler extends CommandHandler<
-  DeleteFavoriOffreEngagementCommand,
+  DeleteFavoriOffreServiceCiviqueCommand,
   void
 > {
   constructor(
-    @Inject(EngagementRepositoryToken)
-    private readonly offreEngagementRepository: OffreEngagement.Repository,
-    private readonly favoriOffreEngagementAuthorizer: FavoriOffreEngagementAuthorizer
+    @Inject(OffreServiceCiviqueRepositoryToken)
+    private readonly offreServiceCiviqueRepository: OffreServiceCivique.Repository,
+    private readonly favoriOffreEngagementAuthorizer: FavoriOffreServiceCiviqueAuthorizer
   ) {
     super('DeleteFavoriCommandHandler')
   }
 
-  async handle(command: DeleteFavoriOffreEngagementCommand): Promise<Result> {
-    const favoriOffre = await this.offreEngagementRepository.getFavori(
+  async handle(
+    command: DeleteFavoriOffreServiceCiviqueCommand
+  ): Promise<Result> {
+    const favoriOffre = await this.offreServiceCiviqueRepository.getFavori(
       command.idJeune,
       command.idOffre
     )
@@ -41,7 +43,7 @@ export class DeleteFavoriOffreEngagementCommandHandler extends CommandHandler<
     if (!favoriOffre) {
       return failure(new FavoriNonTrouveError(command.idJeune, command.idOffre))
     }
-    await this.offreEngagementRepository.deleteFavori(
+    await this.offreServiceCiviqueRepository.deleteFavori(
       command.idJeune,
       command.idOffre
     )
@@ -49,7 +51,7 @@ export class DeleteFavoriOffreEngagementCommandHandler extends CommandHandler<
   }
 
   async authorize(
-    command: DeleteFavoriOffreEngagementCommand,
+    command: DeleteFavoriOffreServiceCiviqueCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     await this.favoriOffreEngagementAuthorizer.authorize(

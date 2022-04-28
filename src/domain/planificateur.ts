@@ -24,6 +24,7 @@ export namespace Planificateur {
 
   export enum CronJob {
     NOUVELLES_OFFRES_EMPLOI = 'NOUVELLES_OFFRES_EMPLOI',
+    NOUVELLES_OFFRES_SERVICE_CIVIQUE = 'NOUVELLES_OFFRES_SERVICE_CIVIQUE',
     MAIL_CONSEILLER_MESSAGES = 'MAIL_CONSEILLER_MESSAGES',
     UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS = 'UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS',
     NETTOYER_LES_JOBS = 'NETTOYER_LES_JOBS'
@@ -74,6 +75,14 @@ export class PlanificateurService {
         const cron: Planificateur.Cron = {
           type: Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI,
           expression: '0 9 * * *'
+        }
+        await this.planificateurRepository.createCron(cron)
+        break
+      }
+      case Planificateur.CronJob.NOUVELLES_OFFRES_SERVICE_CIVIQUE: {
+        const cron: Planificateur.Cron = {
+          type: Planificateur.CronJob.NOUVELLES_OFFRES_SERVICE_CIVIQUE,
+          expression: '0 11 * * *'
         }
         await this.planificateurRepository.createCron(cron)
         break

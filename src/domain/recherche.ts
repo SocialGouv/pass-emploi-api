@@ -35,6 +35,10 @@ export namespace Recherche {
     ECHEC = 'ECHEC'
   }
 
+  export namespace Geometrie {
+    export const PROJECTION_WGS84 = 4326
+  }
+
   export interface Repository {
     createRecherche(recherche: Recherche): Promise<void>
     updateRecherche(recherche: Recherche): Promise<void>
@@ -55,6 +59,12 @@ export namespace Recherche {
       criteres: GetOffresImmersionQuery,
       limit: number,
       offset: number
+    ): Promise<Recherche[]>
+    trouverLesRecherchesServicesCiviques(
+      query: GetServicesCiviqueQuery,
+      limit: number,
+      offset: number,
+      depuis: DateTime
     ): Promise<Recherche[]>
   }
 }

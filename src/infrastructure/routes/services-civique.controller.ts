@@ -9,7 +9,7 @@ import {
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
-  GetDetailServiceCiviqueQuery,
+  GetDetailOffreServiceCiviqueQuery,
   GetDetailServiceCiviqueQueryHandler
 } from '../../application/queries/get-detail-service-civique.query.handler'
 import {
@@ -17,8 +17,8 @@ import {
   GetServicesCiviqueQueryHandler
 } from '../../application/queries/get-services-civique.query.handler'
 import {
-  DetailOffreEngagementQueryModel,
-  OffreEngagementQueryModel
+  DetailServiceCiviqueQueryModel,
+  ServiceCiviqueQueryModel
 } from '../../application/queries/query-models/service-civique.query-models'
 import {
   ErreurHttp,
@@ -40,13 +40,13 @@ export class ServicesCiviqueController {
 
   @Get()
   @ApiResponse({
-    type: OffreEngagementQueryModel,
+    type: ServiceCiviqueQueryModel,
     isArray: true
   })
   async getServicesCivique(
     @Query() findServicesCiviqueQuery: GetServicesCiviqueQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<OffreEngagementQueryModel[]> {
+  ): Promise<ServiceCiviqueQueryModel[]> {
     const query: GetServicesCiviqueQuery = findServicesCiviqueQuery
 
     const result = await this.getServicesCiviqueQueryHandler.execute(
@@ -69,13 +69,15 @@ export class ServicesCiviqueController {
 
   @Get(':idOffreEngagement')
   @ApiResponse({
-    type: DetailOffreEngagementQueryModel
+    type: DetailServiceCiviqueQueryModel
   })
   async getDetailServiceCivique(
     @Param('idOffreEngagement') idOffreEngagement: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<DetailOffreEngagementQueryModel> {
-    const query: GetDetailServiceCiviqueQuery = { idOffreEngagement }
+  ): Promise<DetailServiceCiviqueQueryModel> {
+    const query: GetDetailOffreServiceCiviqueQuery = {
+      idOffre: idOffreEngagement
+    }
     const result = await this.getDetailServiceCiviqueQueryHandler.execute(
       query,
       utilisateur

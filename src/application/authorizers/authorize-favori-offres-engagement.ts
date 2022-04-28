@@ -2,15 +2,15 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { Unauthorized } from 'src/domain/erreur'
 import {
-  EngagementRepositoryToken,
-  OffreEngagement
-} from '../../domain/offre-engagement'
+  OffreServiceCiviqueRepositoryToken,
+  OffreServiceCivique
+} from '../../domain/offre-service-civique'
 
 @Injectable()
-export class FavoriOffreEngagementAuthorizer {
+export class FavoriOffreServiceCiviqueAuthorizer {
   constructor(
-    @Inject(EngagementRepositoryToken)
-    private offresEngagementRepository: OffreEngagement.Repository
+    @Inject(OffreServiceCiviqueRepositoryToken)
+    private offresServiceCiviqueRepository: OffreServiceCivique.Repository
   ) {}
 
   async authorize(
@@ -18,7 +18,7 @@ export class FavoriOffreEngagementAuthorizer {
     idOffre: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const favori = await this.offresEngagementRepository.getFavori(
+    const favori = await this.offresServiceCiviqueRepository.getFavori(
       idJeune,
       idOffre
     )
@@ -32,6 +32,6 @@ export class FavoriOffreEngagementAuthorizer {
       return
     }
 
-    throw new Unauthorized('FavoriOffreEngagement')
+    throw new Unauthorized('Favoris.OffreServiceCivique')
   }
 }

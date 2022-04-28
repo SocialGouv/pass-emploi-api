@@ -4,9 +4,9 @@ import {
 } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import {
-  uneOffreEngagement,
-  uneOffreEngagementDto
-} from '../../fixtures/offre-engagement.fixture'
+  uneOffreServiceCivique,
+  uneOffreServiceCiviqueDto
+} from '../../fixtures/offre-service-civique.fixture'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import {
   DatabaseForTesting,
@@ -14,34 +14,33 @@ import {
   StubbedClass,
   stubClass
 } from '../../utils'
-import { OffreEngagement } from '../../../src/domain/offre-engagement'
+import { OffreServiceCivique } from '../../../src/domain/offre-service-civique'
 import { EngagementClient } from '../../../src/infrastructure/clients/engagement-client'
 import { DateTime } from 'luxon'
 import { failure, success } from '../../../src/building-blocks/types/result'
-import { EngagementHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-engagement-http.repository'
+import { OffreServiceCiviqueHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-engagement-http.repository'
 import {
   ErreurHttp,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 
-describe('OffreEngagementRepository', () => {
+describe('OffreServiceCiviqueHttpSqlRepository', () => {
   DatabaseForTesting.prepare()
-  let engagementHttpSqlRepository: EngagementHttpSqlRepository
+  let offreServiceCiviqueHttpSqlRepository: OffreServiceCiviqueHttpSqlRepository
   let serviceCiviqueClient: StubbedClass<EngagementClient>
 
   beforeEach(async () => {
     serviceCiviqueClient = stubClass(EngagementClient)
 
-    engagementHttpSqlRepository = new EngagementHttpSqlRepository(
-      serviceCiviqueClient
-    )
+    offreServiceCiviqueHttpSqlRepository =
+      new OffreServiceCiviqueHttpSqlRepository(serviceCiviqueClient)
   })
 
   describe('.findAll', () => {
     describe('Quand tout va bien', () => {
       it('quand tous les query params sont fournis', async () => {
         // Given
-        const criteres: OffreEngagement.Criteres = {
+        const criteres: OffreServiceCivique.Criteres = {
           page: 1,
           limit: 50,
           dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
@@ -49,7 +48,7 @@ describe('OffreEngagementRepository', () => {
           lon: 2.3342718577284205,
           distance: 10,
           domaine: 'environnement',
-          editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE
+          editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE
         }
         const params = new URLSearchParams()
         params.append('size', '50')
@@ -59,7 +58,7 @@ describe('OffreEngagementRepository', () => {
         params.append('startAt', 'lt:2022-02-17T10:00:00.000Z')
         params.append('distance', '10km')
         params.append('domain', 'environnement')
-        params.append('publisher', OffreEngagement.Editeur.SERVICE_CIVIQUE)
+        params.append('publisher', OffreServiceCivique.Editeur.SERVICE_CIVIQUE)
         params.append('sortBy', 'createdAt')
 
         serviceCiviqueClient.get.resolves({
@@ -68,30 +67,33 @@ describe('OffreEngagementRepository', () => {
           headers: '',
           config: '',
           data: {
-            hits: [uneOffreEngagementDto()]
+            hits: [uneOffreServiceCiviqueDto()]
           }
         })
 
         // When
-        const result = await engagementHttpSqlRepository.findAll(criteres)
+        const result = await offreServiceCiviqueHttpSqlRepository.findAll(
+          criteres
+        )
 
         // Then
         expect(serviceCiviqueClient.get).to.have.been.calledWithExactly(
           'v0/mission/search',
           params
         )
-        expect(result).to.be.deep.equal(success([uneOffreEngagement()]))
+        expect(result).to.be.deep.equal(success([uneOffreServiceCivique()]))
       })
       it('avec la deuxième page', async () => {
         // Given
-        const criteres: OffreEngagement.Criteres = {
+        const criteres: OffreServiceCivique.Criteres = {
           page: 2,
           limit: 63,
           dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
           lat: 48.86899229710103,
           lon: 2.3342718577284205,
           distance: 10,
-          editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE
+          dateDeCreationMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
+          editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE
         }
         const params = new URLSearchParams()
         params.append('size', '63')
@@ -100,8 +102,9 @@ describe('OffreEngagementRepository', () => {
         params.append('lon', '2.3342718577284205')
         params.append('startAt', 'lt:2022-02-17T10:00:00.000Z')
         params.append('distance', '10')
-        params.append('publisher', OffreEngagement.Editeur.SERVICE_CIVIQUE)
+        params.append('publisher', OffreServiceCivique.Editeur.SERVICE_CIVIQUE)
         params.append('sortBy', 'createdAt')
+        params.append('createdAt', 'gt:2022-02-17T10:00:00Z')
 
         serviceCiviqueClient.get.resolves({
           status: 200,
@@ -109,28 +112,30 @@ describe('OffreEngagementRepository', () => {
           headers: '',
           config: '',
           data: {
-            hits: [uneOffreEngagementDto()]
+            hits: [uneOffreServiceCiviqueDto()]
           }
         })
 
         // When
-        const result = await engagementHttpSqlRepository.findAll(criteres)
+        const result = await offreServiceCiviqueHttpSqlRepository.findAll(
+          criteres
+        )
 
         // Then
         expect(serviceCiviqueClient.get).to.have.been.calledWithExactly(
           'v0/mission/search',
           params
         )
-        expect(result).to.be.deep.equal(success([uneOffreEngagement()]))
+        expect(result).to.be.deep.equal(success([uneOffreServiceCivique()]))
       })
     })
     describe('Quand il y a une erreur', () => {
       it('renvoie une failure http', async () => {
         // Given
-        const criteres: OffreEngagement.Criteres = {
+        const criteres: OffreServiceCivique.Criteres = {
           page: 1,
           limit: 50,
-          editeur: OffreEngagement.Editeur.SERVICE_CIVIQUE
+          editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE
         }
 
         serviceCiviqueClient.get.rejects({
@@ -143,7 +148,9 @@ describe('OffreEngagementRepository', () => {
         })
 
         // When
-        const result = await engagementHttpSqlRepository.findAll(criteres)
+        const result = await offreServiceCiviqueHttpSqlRepository.findAll(
+          criteres
+        )
 
         // Then
         expect(result).to.be.deep.equal(
@@ -152,7 +159,7 @@ describe('OffreEngagementRepository', () => {
       })
     })
   })
-  describe('.getOffreEngagementQueryModelById', () => {
+  describe('.getOffreEngagementById', () => {
     describe('Quand tout va bien', () => {
       it('quand l"offre existe', async () => {
         // Given
@@ -164,20 +171,21 @@ describe('OffreEngagementRepository', () => {
           config: '',
           data: {
             ok: true,
-            data: uneOffreEngagementDto()
+            data: uneOffreServiceCiviqueDto()
           }
         })
 
         // When
-        const result = await engagementHttpSqlRepository.getOffreEngagementById(
-          idOffreEngagement
-        )
+        const result =
+          await offreServiceCiviqueHttpSqlRepository.getServiceCiviqueById(
+            idOffreEngagement
+          )
 
         // Then
         expect(serviceCiviqueClient.get).to.have.been.calledWithExactly(
           'v0/mission/unId'
         )
-        const offreEngagement: OffreEngagement = {
+        const offreEngagement: OffreServiceCivique = {
           titre: 'unTitre',
           dateDeDebut: '2022-02-17T10:00:00.000Z',
           dateDeFin: '2022-07-17T10:00:00.000Z',
@@ -213,9 +221,10 @@ describe('OffreEngagementRepository', () => {
         })
 
         // When
-        const result = await engagementHttpSqlRepository.getOffreEngagementById(
-          idOffreEngagement
-        )
+        const result =
+          await offreServiceCiviqueHttpSqlRepository.getServiceCiviqueById(
+            idOffreEngagement
+          )
 
         // Then
         expect(serviceCiviqueClient.get).to.have.been.calledWithExactly(
@@ -240,9 +249,10 @@ describe('OffreEngagementRepository', () => {
         })
 
         // When
-        const result = await engagementHttpSqlRepository.getOffreEngagementById(
-          idOffreEngagement
-        )
+        const result =
+          await offreServiceCiviqueHttpSqlRepository.getServiceCiviqueById(
+            idOffreEngagement
+          )
 
         // Then
         expect(result).to.be.deep.equal(
@@ -252,7 +262,7 @@ describe('OffreEngagementRepository', () => {
     })
   })
 
-  describe('getFavorisIdsQueryModelsByJeune', () => {
+  describe('getFavorisIdsByJeune', () => {
     it('renvoie les id des favoris', async () => {
       // Given
       const jeuneDto: AsSql<JeuneDto> = {
@@ -260,13 +270,17 @@ describe('OffreEngagementRepository', () => {
         idConseiller: undefined
       }
       await JeuneSqlModel.creer(jeuneDto)
-      const offre = uneOffreEngagement()
-      await engagementHttpSqlRepository.saveAsFavori(jeuneDto.id, offre)
+      const offre = uneOffreServiceCivique()
+      await offreServiceCiviqueHttpSqlRepository.saveAsFavori(
+        jeuneDto.id,
+        offre
+      )
 
       // When
-      const ids = await engagementHttpSqlRepository.getFavorisIdsByJeune(
-        jeuneDto.id
-      )
+      const ids =
+        await offreServiceCiviqueHttpSqlRepository.getFavorisIdsByJeune(
+          jeuneDto.id
+        )
 
       // Then
       expect(ids).to.deep.equal([{ id: offre.id }])
@@ -281,23 +295,27 @@ describe('OffreEngagementRepository', () => {
         idConseiller: undefined
       }
       await JeuneSqlModel.creer(jeuneDto)
-      const offre: OffreEngagement = {
+      const offre: OffreServiceCivique = {
         id: 'unId',
-        domaine: OffreEngagement.Domaine.education,
+        domaine: OffreServiceCivique.Domaine.education,
         ville: 'Paris',
         titre: 'La best offre',
         organisation: 'FNAC',
         dateDeDebut: '2022-05-12T10:00:10'
       }
-      await engagementHttpSqlRepository.saveAsFavori(jeuneDto.id, offre)
-
-      // When
-      const queryModels = await engagementHttpSqlRepository.getFavorisByJeune(
-        jeuneDto.id
+      await offreServiceCiviqueHttpSqlRepository.saveAsFavori(
+        jeuneDto.id,
+        offre
       )
 
+      // When
+      const favoris =
+        await offreServiceCiviqueHttpSqlRepository.getFavorisByJeune(
+          jeuneDto.id
+        )
+
       // Then
-      expect(queryModels).to.deep.equal([offre])
+      expect(favoris).to.deep.equal([offre])
     })
   })
 
@@ -310,18 +328,21 @@ describe('OffreEngagementRepository', () => {
           idConseiller: undefined
         }
         await JeuneSqlModel.creer(jeuneDto)
-        const offre: OffreEngagement = {
+        const offre: OffreServiceCivique = {
           id: 'unId',
-          domaine: OffreEngagement.Domaine.education,
+          domaine: OffreServiceCivique.Domaine.education,
           ville: 'Paris',
           titre: 'La best offre',
           organisation: 'FNAC',
           dateDeDebut: '2022-05-12T10:00:10'
         }
-        await engagementHttpSqlRepository.saveAsFavori(jeuneDto.id, offre)
+        await offreServiceCiviqueHttpSqlRepository.saveAsFavori(
+          jeuneDto.id,
+          offre
+        )
 
         // When
-        const favori = await engagementHttpSqlRepository.getFavori(
+        const favori = await offreServiceCiviqueHttpSqlRepository.getFavori(
           jeuneDto.id,
           offre.id
         )
@@ -339,10 +360,10 @@ describe('OffreEngagementRepository', () => {
           idConseiller: undefined
         }
         await JeuneSqlModel.creer(jeuneDto)
-        const offre = uneOffreEngagement()
+        const offre = uneOffreServiceCivique()
 
         // When
-        const favori = await engagementHttpSqlRepository.getFavori(
+        const favori = await offreServiceCiviqueHttpSqlRepository.getFavori(
           jeuneDto.id,
           offre.id
         )
@@ -361,14 +382,20 @@ describe('OffreEngagementRepository', () => {
         idConseiller: undefined
       }
       await JeuneSqlModel.creer(jeuneDto)
-      const offre = uneOffreEngagement()
-      await engagementHttpSqlRepository.saveAsFavori(jeuneDto.id, offre)
+      const offre = uneOffreServiceCivique()
+      await offreServiceCiviqueHttpSqlRepository.saveAsFavori(
+        jeuneDto.id,
+        offre
+      )
 
       // When
-      await engagementHttpSqlRepository.deleteFavori(jeuneDto.id, offre.id)
+      await offreServiceCiviqueHttpSqlRepository.deleteFavori(
+        jeuneDto.id,
+        offre.id
+      )
 
       // Then
-      const favori = await engagementHttpSqlRepository.getFavori(
+      const favori = await offreServiceCiviqueHttpSqlRepository.getFavori(
         jeuneDto.id,
         offre.id
       )

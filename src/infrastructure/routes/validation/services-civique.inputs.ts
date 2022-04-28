@@ -5,7 +5,7 @@ import {
   transformStringToFloat,
   transformStringToInteger
 } from './utils/transformers'
-import { OffreEngagement } from '../../../domain/offre-engagement'
+import { OffreServiceCivique } from '../../../domain/offre-service-civique'
 
 export interface GetServicesCiviqueQuery {
   lat?: number
@@ -62,7 +62,7 @@ export class GetServicesCiviqueQueryParams implements GetServicesCiviqueQuery {
   dateDeDebutMaximum?: string
 
   @ApiPropertyOptional({
-    description: Object.values(OffreEngagement.Domaine).join(', ')
+    description: Object.values(OffreServiceCivique.Domaine).join(', ')
   })
   @IsString()
   @IsOptional()
@@ -92,7 +92,7 @@ export class ServicesCiviqueCriteresBody implements GetServicesCiviqueQuery {
   dateDeDebutMinimum?: string
 
   @ApiPropertyOptional({
-    description: Object.values(OffreEngagement.Domaine).join(', ')
+    description: Object.values(OffreServiceCivique.Domaine).join(', ')
   })
   @IsString()
   @IsOptional()

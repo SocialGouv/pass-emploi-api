@@ -16,18 +16,17 @@ import {
   AddFavoriOffreEmploiCommandHandler
 } from '../../../src/application/commands/add-favori-offre-emploi.command.handler'
 import {
-  AddFavoriOffreEngagementCommand,
-  AddFavoriOffreEngagementCommandHandler
-} from '../../../src/application/commands/add-favori-offre-engagement.command.handler'
+  AddFavoriServiceCiviqueCommand,
+  AddFavoriOffreServiceCiviqueCommandHandler
+} from '../../../src/application/commands/add-favori-offre-service-civique-command-handler.service'
 import {
   DeleteFavoriOffreEmploiCommand,
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
 import {
-  DeleteFavoriOffreEngagementCommand,
+  DeleteFavoriOffreServiceCiviqueCommand,
   DeleteFavoriOffreEngagementCommandHandler
 } from '../../../src/application/commands/delete-favori-offre-engagement.command.handler'
-import { GetFavorisOffresEngagementJeuneQueryHandler } from '../../../src/application/queries/get-favoris-offres-engagement-jeune.query.handler'
 import {
   FavoriExisteDejaError,
   FavoriNonTrouveError
@@ -46,7 +45,6 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
-import { uneOffreEngagement } from '../../fixtures/offre-engagement.fixture'
 import {
   buildTestingModuleForHttpTesting,
   expect,
@@ -54,7 +52,9 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { OffreEngagement } from '../../../src/domain/offre-engagement'
+import { OffreServiceCivique } from '../../../src/domain/offre-service-civique'
+import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../../src/application/queries/get-favoris-service-civique-jeune.query.handler'
+import { uneOffreServiceCivique } from '../../fixtures/offre-service-civique.fixture'
 
 describe('FavorisController', () => {
   let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
@@ -63,9 +63,9 @@ describe('FavorisController', () => {
   let addFavoriOffreImmersionCommandHandler: StubbedClass<AddFavoriOffreImmersionCommandHandler>
   let deleteFavoriOffreImmersionCommandHandler: StubbedClass<DeleteFavoriOffreImmersionCommandHandler>
   let getFavorisOffresImmersionJeuneQueryHandler: StubbedClass<GetFavorisOffresImmersionJeuneQueryHandler>
-  let addFavoriOffreEngagementCommandHandler: StubbedClass<AddFavoriOffreEngagementCommandHandler>
+  let addFavoriOffreEngagementCommandHandler: StubbedClass<AddFavoriOffreServiceCiviqueCommandHandler>
   let deleteFavoriOffreEngagementCommandHandler: StubbedClass<DeleteFavoriOffreEngagementCommandHandler>
-  let getFavorisOffresEngagementJeuneQueryHandler: StubbedClass<GetFavorisOffresEngagementJeuneQueryHandler>
+  let getFavorisServiceCiviqueJeuneQueryHandler: StubbedClass<GetFavorisServiceCiviqueJeuneQueryHandler>
   let app: INestApplication
 
   before(async () => {
@@ -90,13 +90,13 @@ describe('FavorisController', () => {
     )
 
     addFavoriOffreEngagementCommandHandler = stubClass(
-      AddFavoriOffreEngagementCommandHandler
+      AddFavoriOffreServiceCiviqueCommandHandler
     )
     deleteFavoriOffreEngagementCommandHandler = stubClass(
       DeleteFavoriOffreEngagementCommandHandler
     )
-    getFavorisOffresEngagementJeuneQueryHandler = stubClass(
-      GetFavorisOffresEngagementJeuneQueryHandler
+    getFavorisServiceCiviqueJeuneQueryHandler = stubClass(
+      GetFavorisServiceCiviqueJeuneQueryHandler
     )
 
     const testingModule = await buildTestingModuleForHttpTesting()
@@ -112,12 +112,12 @@ describe('FavorisController', () => {
       .useValue(deleteFavoriOffreImmersionCommandHandler)
       .overrideProvider(GetFavorisOffresImmersionJeuneQueryHandler)
       .useValue(getFavorisOffresImmersionJeuneQueryHandler)
-      .overrideProvider(AddFavoriOffreEngagementCommandHandler)
+      .overrideProvider(AddFavoriOffreServiceCiviqueCommandHandler)
       .useValue(addFavoriOffreEngagementCommandHandler)
       .overrideProvider(DeleteFavoriOffreEngagementCommandHandler)
       .useValue(deleteFavoriOffreEngagementCommandHandler)
-      .overrideProvider(GetFavorisOffresEngagementJeuneQueryHandler)
-      .useValue(getFavorisOffresEngagementJeuneQueryHandler)
+      .overrideProvider(GetFavorisServiceCiviqueJeuneQueryHandler)
+      .useValue(getFavorisServiceCiviqueJeuneQueryHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -389,7 +389,7 @@ describe('FavorisController', () => {
     describe('GET /jeunes/:idJeune/favoris/services-civique', () => {
       it("Renvoie la liste des favoris services civique d'un jeune", async () => {
         // Given
-        getFavorisOffresEngagementJeuneQueryHandler.execute
+        getFavorisServiceCiviqueJeuneQueryHandler.execute
           .withArgs({ idJeune: '1', detail: false }, unUtilisateurDecode())
           .resolves([])
 
@@ -403,15 +403,15 @@ describe('FavorisController', () => {
     })
 
     describe('POST /jeunes/:idJeune/favoris/services-civique', () => {
-      const offre: OffreEngagement = {
+      const offre: OffreServiceCivique = {
         id: 'unId',
-        domaine: OffreEngagement.Domaine.education,
+        domaine: OffreServiceCivique.Domaine.education,
         ville: 'Paris',
         titre: 'La best offre',
         organisation: 'FNAC',
         dateDeDebut: '2022-05-12T10:00:10'
       }
-      const command: AddFavoriOffreEngagementCommand = {
+      const command: AddFavoriServiceCiviqueCommand = {
         idJeune: 'ABCDE',
         offre
       }
@@ -460,9 +460,9 @@ describe('FavorisController', () => {
     })
 
     describe('DELETE /jeunes/:idJeune/favoris/services-civique/:idOffre', () => {
-      const offre = uneOffreEngagement()
+      const offre = uneOffreServiceCivique()
       const jeune = unJeune()
-      const command: DeleteFavoriOffreEngagementCommand = {
+      const command: DeleteFavoriOffreServiceCiviqueCommand = {
         idJeune: jeune.id,
         idOffre: offre.id
       }

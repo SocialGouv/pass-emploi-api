@@ -4,17 +4,17 @@ import {
   EngagementDto,
   OffreEngagementDto
 } from '../offre-engagement-http.repository'
-import { OffreEngagement } from '../../../domain/offre-engagement'
+import { OffreServiceCivique } from '../../../domain/offre-service-civique'
 
-export function toOffresEngagement(
+export function toOffresServicesCivique(
   servicesCiviqueDto: EngagementDto
-): OffreEngagement[] {
+): OffreServiceCivique[] {
   return servicesCiviqueDto.hits.map(toOffreEngagement)
 }
 
 export function toOffreEngagement(
   serviceCiviqueDto: OffreEngagementDto
-): OffreEngagement {
+): OffreServiceCivique {
   return {
     id: serviceCiviqueDto.id,
     titre: serviceCiviqueDto.title,
@@ -43,9 +43,9 @@ export function fromSqlToIds(
   })
 }
 
-export function fromSqlToOffreEngagement(
+export function fromSqlToOffreServiceCivique(
   favoriOffreEngagementSqlModel: FavoriOffreEngagementSqlModel
-): OffreEngagement {
+): OffreServiceCivique {
   return {
     id: favoriOffreEngagementSqlModel.idOffre,
     domaine: favoriOffreEngagementSqlModel.domaine,
@@ -58,7 +58,7 @@ export function fromSqlToOffreEngagement(
 
 function buildLocalisation(
   serviceCiviqueDto: OffreEngagementDto
-): OffreEngagement.Localisation | undefined {
+): Core.Localisation | undefined {
   if (serviceCiviqueDto.location) {
     return {
       latitude: serviceCiviqueDto.location.lat,

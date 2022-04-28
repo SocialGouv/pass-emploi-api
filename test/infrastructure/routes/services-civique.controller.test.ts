@@ -5,12 +5,12 @@ import {
 } from 'src/application/queries/get-services-civique.query.handler'
 import * as request from 'supertest'
 import {
-  GetDetailServiceCiviqueQuery,
+  GetDetailOffreServiceCiviqueQuery,
   GetDetailServiceCiviqueQueryHandler
 } from '../../../src/application/queries/get-detail-service-civique.query.handler'
 import {
-  DetailOffreEngagementQueryModel,
-  OffreEngagementQueryModel
+  DetailServiceCiviqueQueryModel,
+  ServiceCiviqueQueryModel
 } from '../../../src/application/queries/query-models/service-civique.query-models'
 import {
   ErreurHttp,
@@ -19,16 +19,16 @@ import {
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
 import {
-  offresEngagementQueryModel,
-  unDetailOffreEngagementQuerymodel
-} from '../../fixtures/query-models/offre-engagement.query-model.fixtures'
-import {
   buildTestingModuleForHttpTesting,
   expect,
   StubbedClass,
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import {
+  offresServicesCiviqueQueryModel,
+  unDetailOffreServiceCiviqueQuerymodel
+} from '../../fixtures/query-models/offre-service-civique.query-model.fixtures'
 
 describe('ServicesCiviqueController', () => {
   let getServicesCiviqueQueryHandler: StubbedClass<GetServicesCiviqueQueryHandler>
@@ -82,8 +82,8 @@ describe('ServicesCiviqueController', () => {
           domaine: 'environnement'
         }
 
-        const serviceCiviqueQueryModels: OffreEngagementQueryModel[] =
-          offresEngagementQueryModel()
+        const serviceCiviqueQueryModels: ServiceCiviqueQueryModel[] =
+          offresServicesCiviqueQueryModel()
 
         getServicesCiviqueQueryHandler.execute.resolves(
           success(serviceCiviqueQueryModels)
@@ -132,14 +132,14 @@ describe('ServicesCiviqueController', () => {
     ensureUserAuthenticationFailsIfInvalid('get', '/services-civique')
   })
   describe('GET /services-civique/:idOffreEngagement', () => {
-    const query: GetDetailServiceCiviqueQuery = {
-      idOffreEngagement: '1'
+    const query: GetDetailOffreServiceCiviqueQuery = {
+      idOffre: '1'
     }
     describe('quand tout va bien', () => {
       it("fait appel à l'API services civique avec les bons paramètres", async () => {
         // Given
-        const detailOffreEngagementQueryModel: DetailOffreEngagementQueryModel =
-          unDetailOffreEngagementQuerymodel()
+        const detailOffreEngagementQueryModel: DetailServiceCiviqueQueryModel =
+          unDetailOffreServiceCiviqueQuerymodel()
 
         getDetailServiceCiviqueQueryHandler.execute.resolves(
           success(detailOffreEngagementQueryModel)
@@ -147,7 +147,7 @@ describe('ServicesCiviqueController', () => {
 
         // When
         await request(app.getHttpServer())
-          .get(`/services-civique/${query.idOffreEngagement}`)
+          .get(`/services-civique/${query.idOffre}`)
           .set('authorization', unHeaderAuthorization())
           // Then
           .expect(HttpStatus.OK)
@@ -162,7 +162,7 @@ describe('ServicesCiviqueController', () => {
 
         // When
         await request(app.getHttpServer())
-          .get(`/services-civique/${query.idOffreEngagement}`)
+          .get(`/services-civique/${query.idOffre}`)
           .set('authorization', unHeaderAuthorization())
 
           // Then
@@ -173,14 +173,12 @@ describe('ServicesCiviqueController', () => {
       it('retourne une erreur not found', async () => {
         // Given
         getDetailServiceCiviqueQueryHandler.execute.resolves(
-          failure(
-            new NonTrouveError('OffreEngagement', query.idOffreEngagement)
-          )
+          failure(new NonTrouveError('OffreServiceCivique', query.idOffre))
         )
 
         // When
         await request(app.getHttpServer())
-          .get(`/services-civique/${query.idOffreEngagement}`)
+          .get(`/services-civique/${query.idOffre}`)
           .set('authorization', unHeaderAuthorization())
 
           // Then

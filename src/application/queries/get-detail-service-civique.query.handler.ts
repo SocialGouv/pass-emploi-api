@@ -3,42 +3,43 @@ import { Authentification } from 'src/domain/authentification'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { DetailOffreEngagementQueryModel } from './query-models/service-civique.query-models'
+import { DetailServiceCiviqueQueryModel } from './query-models/service-civique.query-models'
 import {
-  EngagementRepositoryToken,
-  OffreEngagement
-} from '../../domain/offre-engagement'
+  OffreServiceCiviqueRepositoryToken,
+  OffreServiceCivique
+} from '../../domain/offre-service-civique'
 import { isFailure, Result, success } from '../../building-blocks/types/result'
 
-export interface GetDetailServiceCiviqueQuery extends Query {
-  idOffreEngagement: string
+export interface GetDetailOffreServiceCiviqueQuery extends Query {
+  idOffre: string
 }
 
 @Injectable()
 export class GetDetailServiceCiviqueQueryHandler extends QueryHandler<
-  GetDetailServiceCiviqueQuery,
-  Result<DetailOffreEngagementQueryModel>
+  GetDetailOffreServiceCiviqueQuery,
+  Result<DetailServiceCiviqueQueryModel>
 > {
   constructor(
-    @Inject(EngagementRepositoryToken)
-    private engagementRepository: OffreEngagement.Repository,
+    @Inject(OffreServiceCiviqueRepositoryToken)
+    private offreServiceCiviqueRepository: OffreServiceCivique.Repository,
     private evenementService: EvenementService
   ) {
     super('GetDetailServiceCiviqueQueryHandler')
   }
 
   async handle(
-    query: GetDetailServiceCiviqueQuery
-  ): Promise<Result<DetailOffreEngagementQueryModel>> {
-    const result = await this.engagementRepository.getOffreEngagementById(
-      query.idOffreEngagement
-    )
+    query: GetDetailOffreServiceCiviqueQuery
+  ): Promise<Result<DetailServiceCiviqueQueryModel>> {
+    const result =
+      await this.offreServiceCiviqueRepository.getServiceCiviqueById(
+        query.idOffre
+      )
 
     if (isFailure(result)) {
       return result
     }
 
-    const offreQueryModel: DetailOffreEngagementQueryModel = {
+    const offreQueryModel: DetailServiceCiviqueQueryModel = {
       domaine: result.data.domaine,
       titre: result.data.titre,
       ville: result.data.ville,
@@ -60,7 +61,7 @@ export class GetDetailServiceCiviqueQueryHandler extends QueryHandler<
 
   async authorize(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _query: GetDetailServiceCiviqueQuery
+    _query: GetDetailOffreServiceCiviqueQuery
   ): Promise<void> {
     return
   }
@@ -68,7 +69,7 @@ export class GetDetailServiceCiviqueQueryHandler extends QueryHandler<
   async monitor(
     utilisateur: Authentification.Utilisateur,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _query: GetDetailServiceCiviqueQuery
+    _query: GetDetailOffreServiceCiviqueQuery
   ): Promise<void> {
     await this.evenementService.creerEvenement(
       Evenement.Type.OFFRE_SERVICE_CIVIQUE_AFFICHE,

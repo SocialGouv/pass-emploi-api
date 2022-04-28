@@ -32,22 +32,21 @@ import {
   AddFavoriOffreEmploiCommandHandler
 } from '../../application/commands/add-favori-offre-emploi.command.handler'
 import {
-  AddFavoriOffreEngagementCommand,
-  AddFavoriOffreEngagementCommandHandler
-} from '../../application/commands/add-favori-offre-engagement.command.handler'
+  AddFavoriServiceCiviqueCommand,
+  AddFavoriOffreServiceCiviqueCommandHandler
+} from '../../application/commands/add-favori-offre-service-civique-command-handler.service'
 import {
   DeleteFavoriOffreEmploiCommand,
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../application/commands/delete-favori-offre-emploi.command.handler'
 import {
-  DeleteFavoriOffreEngagementCommand,
+  DeleteFavoriOffreServiceCiviqueCommand,
   DeleteFavoriOffreEngagementCommandHandler
 } from '../../application/commands/delete-favori-offre-engagement.command.handler'
 import {
   DeleteFavoriOffreImmersionCommand,
   DeleteFavoriOffreImmersionCommandHandler
 } from '../../application/commands/delete-favori-offre-immersion.command.handler'
-import { GetFavorisOffresEngagementJeuneQueryHandler } from '../../application/queries/get-favoris-offres-engagement-jeune.query.handler'
 import { FavoriExisteDejaError } from '../../building-blocks/types/domain-error'
 import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
@@ -60,6 +59,7 @@ import {
   GetFavorisOffresImmersionQueryParams,
   GetFavorisServicesCiviqueQueryParams
 } from './validation/favoris.inputs'
+import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../application/queries/get-favoris-service-civique-jeune.query.handler'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -68,10 +68,10 @@ export class FavorisController {
   constructor(
     private readonly getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
     private readonly getFavorisOffresImmersionJeuneQueryHandler: GetFavorisOffresImmersionJeuneQueryHandler,
-    private readonly getFavorisOffresEngagementJeuneQueryHandler: GetFavorisOffresEngagementJeuneQueryHandler,
+    private readonly getFavorisServiceCiviqueJeuneQueryHandler: GetFavorisServiceCiviqueJeuneQueryHandler,
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
     private readonly addFavoriOffreImmersionCommandHandler: AddFavoriOffreImmersionCommandHandler,
-    private readonly addFavoriOffreEngagementCommandHandler: AddFavoriOffreEngagementCommandHandler,
+    private readonly addFavoriOffreEngagementCommandHandler: AddFavoriOffreServiceCiviqueCommandHandler,
     private readonly deleteFavoriOffreEmploiCommandHandler: DeleteFavoriOffreEmploiCommandHandler,
     private readonly deleteFavoriOffreImmersionCommandHandler: DeleteFavoriOffreImmersionCommandHandler,
     private readonly deleteFavoriOffreEngagementCommandHandler: DeleteFavoriOffreEngagementCommandHandler
@@ -107,7 +107,7 @@ export class FavorisController {
     @Query() getFavorisQuery: GetFavorisServicesCiviqueQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffreImmersionQueryModel[] | FavoriOffreImmersionIdQueryModel[]> {
-    return this.getFavorisOffresEngagementJeuneQueryHandler.execute(
+    return this.getFavorisServiceCiviqueJeuneQueryHandler.execute(
       { idJeune, detail: Boolean(getFavorisQuery.detail) },
       utilisateur
     )
@@ -179,7 +179,7 @@ export class FavorisController {
     @Body() addFavoriPayload: AddFavoriServicesCivique,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const command: AddFavoriOffreEngagementCommand = {
+    const command: AddFavoriServiceCiviqueCommand = {
       idJeune,
       offre: addFavoriPayload
     }
@@ -244,7 +244,7 @@ export class FavorisController {
     @Param('idOffre') idOffre: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const command: DeleteFavoriOffreEngagementCommand = {
+    const command: DeleteFavoriOffreServiceCiviqueCommand = {
       idJeune,
       idOffre
     }

@@ -10,11 +10,13 @@ import { HandleJobMailConseillerCommandHandler } from './commands/jobs/handle-jo
 import { HandleNettoyerLesJobsCommandHandler } from './commands/jobs/handle-job-nettoyer-les-jobs.command'
 import { InitCronsCommandHandler } from './commands/tasks/init-crons.command'
 import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
+import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
 
 export enum Task {
   DUMMY_JOB = 'DUMMY_JOB',
   INIT_ALL_JOBS = 'INIT_ALL_JOBS',
   RECHERCHER_LES_NOUVELLES_OFFRES = 'RECHERCHER_LES_NOUVELLES_OFFRES',
+  RECHERCHER_LES_NOUVELLES_OFFRES_SERVICES_CIVIQUE = 'RECHERCHER_LES_NOUVELLES_OFFRES_SERVICES_CIVIQUE',
   ENVOYER_MAIL_CONSEILLER_MESSAGES = 'ENVOYER_MAIL_CONSEILLER_MESSAGES',
   INITIALISER_LES_CRON = 'INITIALISER_LES_CRON',
   NETTOYER_LES_JOBS = 'NETTOYER_LES_JOBS',
@@ -33,7 +35,8 @@ export class TaskService {
     private handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler,
     private initCronsCommandHandler: InitCronsCommandHandler,
     private handleNettoyerLesJobsCommandHandler: HandleNettoyerLesJobsCommandHandler,
-    private handleJobUpdateMailingListConseillerCommandHandler: HandleJobUpdateMailingListConseillerCommandHandler
+    private handleJobUpdateMailingListConseillerCommandHandler: HandleJobUpdateMailingListConseillerCommandHandler,
+    private handleJobNotifierNouveauxServicesCiviqueCommandHandler: HandleJobNotifierNouveauxServicesCiviqueCommandHandler
   ) {}
 
   async handle(task: Task | undefined): Promise<void> {
@@ -65,6 +68,11 @@ export class TaskService {
           break
         case Task.METTRE_A_JOUR_MAILING_LIST_CONSEILLER:
           await this.handleJobUpdateMailingListConseillerCommandHandler.execute(
+            {}
+          )
+          break
+        case Task.RECHERCHER_LES_NOUVELLES_OFFRES_SERVICES_CIVIQUE:
+          await this.handleJobNotifierNouveauxServicesCiviqueCommandHandler.execute(
             {}
           )
           break

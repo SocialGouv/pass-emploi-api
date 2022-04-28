@@ -1,5 +1,7 @@
 import { Recherche } from 'src/domain/recherche'
-import { uneDatetimeMoinsRecente } from './date.fixture'
+import { uneDatetime, uneDatetimeMoinsRecente } from './date.fixture'
+import { OffreServiceCivique } from '../../src/domain/offre-service-civique'
+import Editeur = OffreServiceCivique.Editeur
 
 export const uneRecherche = (args: Partial<Recherche> = {}): Recherche => {
   const defaults = {
@@ -21,11 +23,24 @@ export const uneRecherche = (args: Partial<Recherche> = {}): Recherche => {
   return { ...defaults, ...args }
 }
 
-export const criteresServiceCiviqueNice = {
+export const criteresServiceCiviqueNice: OffreServiceCivique.Criteres = {
   lat: 43.68720052287055,
   lon: 7.237724249725603,
   distance: 15,
-  domaine: ''
+  domaine: 'environnement',
+  editeur: Editeur.SERVICE_CIVIQUE,
+  limit: 100,
+  page: 0,
+  dateDeDebutMinimum: uneDatetime
+}
+
+export const criteresServiceCiviqueLargeAParis: OffreServiceCivique.Criteres = {
+  lat: 48.888066499900376,
+  lon: 2.335560138635666,
+  distance: 15,
+  editeur: Editeur.SERVICE_CIVIQUE,
+  limit: 100,
+  page: 0
 }
 
 export const criteresImmersionNice = {
