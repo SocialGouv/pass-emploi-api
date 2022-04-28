@@ -10,6 +10,7 @@ import {
   ConseillersRepositoryToken
 } from '../../../domain/conseiller'
 import { Mail, MailServiceToken } from '../../../domain/mail'
+import { buildError } from '../../../utils/logger.module'
 
 @Injectable()
 export class HandleJobMailConseillerCommandHandler extends CommandHandler<
@@ -77,8 +78,10 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
                     stats.mailsEnvoyes++
                   } catch (e) {
                     this.logger.error(
-                      "Erreur lors de l'envoi de l'email des conversations non lues",
-                      e
+                      buildError(
+                        "Erreur lors de l'envoi de l'email des conversations non lues",
+                        e
+                      )
                     )
                   }
                 }

@@ -15,6 +15,7 @@ import {
   NotificationRepositoryToken
 } from '../../domain/notification'
 import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
+import { buildError } from '../../utils/logger.module'
 import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
 
 export interface DeleteRendezVousCommand extends Command {
@@ -65,8 +66,10 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
       await this.planificateurService.supprimerRappelsRendezVous(rendezVous)
     } catch (e) {
       this.logger.error(
-        `La suppression des notifications du rendez-vous ${rendezVous.id} a échoué`,
-        e
+        buildError(
+          `La suppression des notifications du rendez-vous ${rendezVous.id} a échoué`,
+          e
+        )
       )
       this.apmService.captureError(e)
     }

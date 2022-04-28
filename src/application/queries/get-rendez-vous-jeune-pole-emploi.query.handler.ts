@@ -19,6 +19,7 @@ import {
   PrestationDto,
   RendezVousPoleEmploiDto
 } from '../../infrastructure/clients/pole-emploi-partenaire-client'
+import { buildError } from '../../utils/logger.module'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
 import { fromRendezVousDtoToRendezVousQueryModel } from './query-mappers/rendez-vous-pole-emploi.mappers'
 import { fromPrestationDtoToRendezVousQueryModel } from './query-mappers/rendez-vous-prestation.mappers'
@@ -92,8 +93,9 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
                 )
               lienVisio = responseLienVisio?.data
             } catch (e) {
-              this.logger.error('Impossible de récupérer le lien de la visio')
-              this.logger.error(e)
+              this.logger.error(
+                buildError('Impossible de récupérer le lien de la visio', e)
+              )
             }
           }
 

@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Sequelize } from 'sequelize-typescript'
+import { buildError } from '../../utils/logger.module'
 import { sqlModels } from './models'
 
 export const SequelizeInjectionToken = 'SEQUELIZE'
@@ -35,7 +36,9 @@ export const databaseProviders = [
         logger.log('Connection with the PostgreSQL database is OK')
         return sequelize
       } catch (e) {
-        logger.error('Error connecting to the PostgreSQL database', e)
+        logger.error(
+          buildError('Error connecting to the PostgreSQL database', e)
+        )
         throw e
       }
     }

@@ -4,6 +4,7 @@ import * as APM from 'elastic-apm-node'
 import admin, { firestore } from 'firebase-admin'
 import { getMessaging, TokenMessage } from 'firebase-admin/messaging'
 import { Authentification } from '../../domain/authentification'
+import { buildError } from '../../utils/logger.module'
 import { getAPMInstance } from '../monitoring/apm.init'
 import Type = Authentification.Type
 import Timestamp = firestore.Timestamp
@@ -43,7 +44,7 @@ export class FirebaseClient implements IFirebaseClient {
       .remoteConfig()
       .listVersions()
       .then(() => this.logger.log('Connexion à firebase OK'))
-      .catch(e => this.logger.error('Connexion à firebase KO', e))
+      .catch(e => this.logger.error(buildError('Connexion à firebase KO', e)))
     this.messaging = getMessaging(this.app)
     this.firestore = admin.firestore(this.app)
     this.auth = admin.auth(this.app)
@@ -61,8 +62,10 @@ export class FirebaseClient implements IFirebaseClient {
       await this.messaging.send(tokenMessage)
     } catch (e) {
       this.logger.error(
-        `Impossible d'envoyer de notification sur le token ${tokenMessage.token}`,
-        e
+        buildError(
+          `Impossible d'envoyer de notification sur le token ${tokenMessage.token}`,
+          e
+        )
       )
       this.apmService.captureError(e)
     }
@@ -152,8 +155,10 @@ export class FirebaseClient implements IFirebaseClient {
       )
     } catch (e) {
       this.logger.error(
-        `Echec du transfert du chat des jeunes au conseiller ${conseillerCibleId} :`,
-        e
+        buildError(
+          `Echec du transfert du chat des jeunes au conseiller ${conseillerCibleId} :`,
+          e
+        )
       )
       throw e
     }
