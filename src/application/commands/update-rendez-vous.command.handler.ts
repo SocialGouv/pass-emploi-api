@@ -63,19 +63,10 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       return failure(new NonTrouveError('RendezVous', command.idRendezVous))
     }
 
-    const rendezVousUpdated: RendezVous = {
-      ...rendezVous,
-      commentaire: command.commentaire,
-      date: new Date(command.date),
-      duree: command.duree,
-      modalite: command.modalite,
-      adresse: command.adresse,
-      organisme: command.organisme,
-      presenceConseiller: command.presenceConseiller
-    }
+    const rendezVousUpdated = RendezVous.mettreAJour(rendezVous, command)
 
     if (
-      command.presenceConseiller === false &&
+      !command.presenceConseiller &&
       rendezVous.type === CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
     ) {
       return failure(
@@ -85,43 +76,16 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       )
     }
 
-    if (rendezVousUpdated.date.getTime() !== rendezVous.date.getTime()) {
-      try {
-        await this.planificateurService.supprimerRappelsRendezVous(
-          rendezVousUpdated
-        )
-        await this.planificateurService.planifierRappelsRendezVous(
-          rendezVousUpdated
-        )
-      } catch (e) {
-        this.logger.error(
-          buildError(
-            `La replanification des notifications du rendez-vous ${rendezVousUpdated.id} a échoué`,
-            e
-          )
-        )
-        this.apmService.captureError(e)
-      }
-    }
-
+    await this.replanifierLesRappelsDeRendezVous(rendezVousUpdated, rendezVous)
     await this.rendezVousRepository.save(rendezVousUpdated)
+    this.notifierLesJeunes(rendezVous)
+    this.envoyerLesInvitationsCalendaires(rendezVousUpdated)
+    return success({ id: rendezVousUpdated.id })
+  }
 
-    await Promise.all(
-      rendezVous.jeunes.map(async jeune => {
-        if (jeune.pushNotificationToken) {
-          const notification = Notification.createNouveauRdv(
-            jeune.pushNotificationToken,
-            rendezVous.id
-          )
-          await this.notificationRepository.send(notification)
-        } else {
-          this.logger.log(
-            `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
-          )
-        }
-      })
-    )
-
+  private async envoyerLesInvitationsCalendaires(
+    rendezVousUpdated: RendezVous
+  ): Promise<void> {
     if (rendezVousUpdated.invitation) {
       const conseillerDestinataire = await this.conseillerRepository.get(
         rendezVousUpdated.createur.id
@@ -146,8 +110,48 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
         `Impossible d'envoyer un e-mail au conseiller ${rendezVousUpdated.createur.id}, l'adresse n'existe pas`
       )
     }
+  }
 
-    return success({ id: rendezVousUpdated.id })
+  private notifierLesJeunes(rendezVous: RendezVous): void {
+    rendezVous.jeunes.forEach(jeune => {
+      if (jeune.pushNotificationToken) {
+        const notification = Notification.createRendezVousMisAJour(
+          jeune.pushNotificationToken,
+          rendezVous.id
+        )
+        this.notificationRepository.send(notification)
+      } else {
+        this.logger.log(
+          `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
+        )
+      }
+    })
+  }
+
+  private async replanifierLesRappelsDeRendezVous(
+    rendezVousUpdated: RendezVous,
+    rendezVous: RendezVous
+  ): Promise<void> {
+    const laDateAEteModifiee =
+      rendezVousUpdated.date.getTime() !== rendezVous.date.getTime()
+    if (laDateAEteModifiee) {
+      try {
+        await this.planificateurService.supprimerRappelsRendezVous(
+          rendezVousUpdated
+        )
+        await this.planificateurService.planifierRappelsRendezVous(
+          rendezVousUpdated
+        )
+      } catch (e) {
+        this.logger.error(
+          buildError(
+            `La replanification des notifications du rendez-vous ${rendezVousUpdated.id} a échoué`,
+            e
+          )
+        )
+        this.apmService.captureError(e)
+      }
+    }
   }
 
   async authorize(

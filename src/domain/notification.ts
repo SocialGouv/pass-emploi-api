@@ -81,7 +81,7 @@ export namespace Notification {
     }
   }
 
-  export function updateRdv(
+  export function createRendezVousMisAJour(
     token: string,
     idRdv: string
   ): Notification.Message {

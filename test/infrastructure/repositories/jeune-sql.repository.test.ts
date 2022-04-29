@@ -1,5 +1,6 @@
 import { Authentification } from 'src/domain/authentification'
 import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
+import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
 import {
   TransfertConseillerDto,
   TransfertConseillerSqlModel
@@ -530,7 +531,7 @@ describe('JeuneSqlRepository', () => {
         type: Recherche.Type.OFFRES_EMPLOI,
         criteres: {}
       })
-      const RendezVousDto = unRendezVousDto({ idJeune: jeuneDto.id })
+      const rendezVousDto = unRendezVousDto()
       const favoriOffreEmploi = unFavoriOffreEmploi({ idJeune: jeuneDto.id })
       const favoriOffreEngagement = unFavoriOffreEngagement({
         idJeune: jeuneDto.id
@@ -553,28 +554,28 @@ describe('JeuneSqlRepository', () => {
         await JeuneSqlModel.creer(jeuneDto)
         await ActionSqlModel.creer(actionDto)
         await rechercheSqlRepository.createRecherche(rechercheEmploi)
-        await RendezVousSqlModel.create(RendezVousDto)
+        await RendezVousSqlModel.create(rendezVousDto)
+        await RendezVousJeuneAssociationSqlModel.create({
+          idRendezVous: rendezVousDto.id,
+          idJeune: jeuneDto.id
+        })
         await FavoriOffreEmploiSqlModel.create(favoriOffreEmploi)
         await FavoriOffreEngagementSqlModel.create(favoriOffreEngagement)
         await FavoriOffreImmersionSqlModel.create(favoriOffreImmersion)
         await TransfertConseillerSqlModel.create(unTransfertDto)
         await EvenementEngagementSqlModel.create(evenementEngagement)
 
-        await jeuneSqlRepository.supprimer('ABCDE')
+        await jeuneSqlRepository.supprimer(jeuneDto.id)
       })
 
       it('supprime le jeune', async () => {
-        await expect(await jeuneSqlRepository.get('ABCDE')).to.be.undefined
+        await expect(await jeuneSqlRepository.get(jeuneDto.id)).to.be.undefined
       })
       it('supprime les actions du jeune', async () => {
         await expect(await ActionSqlModel.findByPk(actionDto.id)).to.be.null
       })
       it('supprime les recherches du jeune', async () => {
         await expect(await RechercheSqlModel.findByPk(rechercheEmploi.id)).to.be
-          .null
-      })
-      it('supprime les rendez-vous du jeune', async () => {
-        await expect(await RendezVousSqlModel.findByPk(RendezVousDto.id)).to.be
           .null
       })
       it('supprime les transferts du jeune', async () => {
@@ -598,7 +599,18 @@ describe('JeuneSqlRepository', () => {
         ).to.be.null
       })
       it('ne supprime pas le conseiller du jeune', async () => {
-        await expect(await ConseillerSqlModel.findByPk(conseillerDto.id)).to.not
+        await expect(await ConseillerSqlModel.findByPk(conseillerDto.id)).not.to
+          .be.null
+      })
+      it("supprime l'association rendez-vous jeune", async () => {
+        await expect(
+          await RendezVousJeuneAssociationSqlModel.findAll({
+            where: { idJeune: jeuneDto.id }
+          })
+        ).to.deep.equal([])
+      })
+      it('ne supprime pas le rendez-vous', async () => {
+        await expect(await RendezVousSqlModel.findByPk(rendezVousDto.id)).not.to
           .be.null
       })
       it("ne supprime pas les evenements d'engagement du jeune", async () => {

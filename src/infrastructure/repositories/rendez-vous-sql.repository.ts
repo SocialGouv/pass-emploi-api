@@ -15,6 +15,11 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
   async save(rendezVous: RendezVous): Promise<void> {
     const rendezVousDto = toRendezVousDto(rendezVous)
     await RendezVousSqlModel.upsert(rendezVousDto)
+    await RendezVousJeuneAssociationSqlModel.destroy({
+      where: {
+        idRendezVous: rendezVous.id
+      }
+    })
     await Promise.all(
       rendezVous.jeunes.map(jeune =>
         RendezVousJeuneAssociationSqlModel.upsert({

@@ -1,6 +1,12 @@
 import { SinonSandbox } from 'sinon'
 import { GetDetailRendezVousQueryHandler } from '../../../src/application/queries/get-detail-rendez-vous.query.handler'
-import { createSandbox, DatabaseForTesting, expect } from '../../utils'
+import {
+  createSandbox,
+  DatabaseForTesting,
+  expect,
+  StubbedClass,
+  stubClass
+} from '../../utils'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { unJeune } from '../../fixtures/jeune.fixture'
@@ -15,17 +21,20 @@ import { RendezVousConseillerQueryModel } from '../../../src/application/queries
 import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { Unauthorized } from '../../../src/domain/erreur'
+import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'
 
 describe('GetDetailRendezVousQueryHandler', () => {
   DatabaseForTesting.prepare()
   let getDetailRendezVousQueryHandler: GetDetailRendezVousQueryHandler
+  let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
   let sandbox: SinonSandbox
 
-  before(() => {
+  beforeEach(() => {
     sandbox = createSandbox()
-
-    getDetailRendezVousQueryHandler = new GetDetailRendezVousQueryHandler()
+    rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
+    getDetailRendezVousQueryHandler = new GetDetailRendezVousQueryHandler(
+      rendezVousAuthorizer
+    )
   })
 
   afterEach(() => {
@@ -286,96 +295,23 @@ describe('GetDetailRendezVousQueryHandler', () => {
   })
 
   describe('authorize', () => {
-    describe('quand au moins un des jeunes du conseiller qui fait la requête est dans le rendez-vous', () => {
-      it('autorise', async () => {
-        // Given
-        const conseillerNilsDto = unConseillerDto()
-        await ConseillerSqlModel.creer(conseillerNilsDto)
-        const jeune2DeNils = await JeuneSqlModel.creer(
-          unJeuneDto({
-            id: 'PLOP'
-          })
-        )
+    it("valide l'autorisation", async () => {
+      // Given
+      const utilisateur = unUtilisateurConseiller({ id: 'idConseiller' })
 
-        const unRendezVousDuJeune2DeNils = unRendezVousDto({
-          date: uneDatetime.toJSDate(),
-          titre: 'UN RENDEZ VOUS'
-        })
-        await RendezVousSqlModel.create(unRendezVousDuJeune2DeNils)
+      // When
+      await getDetailRendezVousQueryHandler.authorize(
+        {
+          idRendezVous: 'idRdv'
+        },
+        utilisateur
+      )
 
-        const conseillerJohnDto = unConseillerDto({ id: 'JOHN' })
-        await ConseillerSqlModel.creer(conseillerJohnDto)
-        const jeuneDeJohn = await JeuneSqlModel.creer(
-          unJeuneDto({
-            id: 'JEUNE-JOHN'
-          })
-        )
-
-        await RendezVousJeuneAssociationSqlModel.create({
-          idJeune: jeune2DeNils.id,
-          idRendezVous: unRendezVousDuJeune2DeNils.id
-        })
-
-        await RendezVousJeuneAssociationSqlModel.create({
-          idJeune: jeuneDeJohn.id,
-          idRendezVous: unRendezVousDuJeune2DeNils.id
-        })
-
-        // When
-        const call = getDetailRendezVousQueryHandler.authorize(
-          {
-            idRendezVous: unRendezVousDuJeune2DeNils.id
-          },
-          unUtilisateurConseiller({ id: conseillerJohnDto.id })
-        )
-
-        // Then
-        expect(call).not.to.be.rejectedWith(Unauthorized)
-      })
-    })
-    describe("quand aucun des jeunes du conseiller qui fait la requête n'est dans le rendez-vous", () => {
-      it("n'autorise pas", async () => {
-        // Given
-        const conseillerDto = unConseillerDto()
-        await ConseillerSqlModel.creer(conseillerDto)
-        const jeune1 = await JeuneSqlModel.creer(unJeuneDto())
-        const jeune2 = await JeuneSqlModel.creer(
-          unJeuneDto({
-            id: 'PLOP'
-          })
-        )
-
-        const unRendezVous = unRendezVousDto({
-          date: uneDatetime.toJSDate(),
-          titre: 'UN RENDEZ VOUS'
-        })
-
-        await RendezVousSqlModel.create({
-          ...unRendezVous
-        })
-
-        await RendezVousJeuneAssociationSqlModel.bulkCreate([
-          {
-            idJeune: jeune1.id,
-            idRendezVous: unRendezVous.id
-          },
-          {
-            idJeune: jeune2.id,
-            idRendezVous: unRendezVous.id
-          }
-        ])
-
-        // When
-        const call = getDetailRendezVousQueryHandler.authorize(
-          {
-            idRendezVous: unRendezVous.id
-          },
-          unUtilisateurConseiller({ id: 'un-autre-id' })
-        )
-
-        // Then
-        expect(call).to.be.rejectedWith(Unauthorized)
-      })
+      // Then
+      expect(rendezVousAuthorizer.authorize).to.have.been.calledWithExactly(
+        'idRdv',
+        utilisateur
+      )
     })
   })
 })

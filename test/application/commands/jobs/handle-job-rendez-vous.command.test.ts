@@ -73,7 +73,7 @@ describe('HandlerJobRendezVousCommandHandler', () => {
       const unRendezVousSansToken: RendezVous = {
         ...unRendezVous()
       }
-      unRendezVousSansToken.jeune.pushNotificationToken = undefined
+      unRendezVousSansToken.jeunes[0].pushNotificationToken = undefined
       rendezVousRepository.get
         .withArgs(command.job.contenu.idRendezVous)
         .resolves(unRendezVousSansToken)

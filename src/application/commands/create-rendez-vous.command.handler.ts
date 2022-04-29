@@ -83,22 +83,38 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     )
     await this.rendezVousRepository.save(rendezVous)
 
-    await Promise.all(
-      jeunes.map(async jeune => {
-        if (jeune.pushNotificationToken) {
-          const notification = Notification.createNouveauRdv(
-            jeune.pushNotificationToken,
-            rendezVous.id
-          )
-          await this.notificationRepository.send(notification)
-        } else {
-          this.logger.log(
-            `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
-          )
-        }
-      })
-    )
+    this.notifierLesJeunes(rendezVous)
+    this.planifierLesRappelsDeRendezVous(rendezVous)
+    this.envoyerLesInvitationsCalendaires(conseiller, rendezVous)
 
+    return success(rendezVous.id)
+  }
+
+  private async envoyerLesInvitationsCalendaires(
+    conseiller: Conseiller | undefined,
+    rendezVous: RendezVous
+  ): Promise<void> {
+    if (conseiller && conseiller.email) {
+      try {
+        await this.mailService.envoyerMailRendezVous(conseiller, rendezVous)
+      } catch (e) {
+        this.logger.error(
+          buildError(
+            "Erreur lors de l'envoi de l'email du nouveau rendez-vous",
+            e
+          )
+        )
+      }
+    } else {
+      this.logger.warn(
+        `Impossible d'envoyer un e-mail au conseiller ${conseiller?.id}, l'adresse n'existe pas`
+      )
+    }
+  }
+
+  private async planifierLesRappelsDeRendezVous(
+    rendezVous: RendezVous
+  ): Promise<void> {
     try {
       await this.planificateurService.planifierRappelsRendezVous(rendezVous)
     } catch (e) {
@@ -110,25 +126,22 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       )
       this.apmService.captureError(e)
     }
+  }
 
-    if (conseiller!.email) {
-      try {
-        await this.mailService.envoyerMailRendezVous(conseiller!, rendezVous)
-      } catch (e) {
-        this.logger.error(
-          buildError(
-            "Erreur lors de l'envoi de l'email du nouveau rendez-vous",
-            e
-          )
+  private notifierLesJeunes(rendezVous: RendezVous): void {
+    rendezVous.jeunes.forEach(jeune => {
+      if (jeune.pushNotificationToken) {
+        const notification = Notification.createNouveauRdv(
+          jeune.pushNotificationToken,
+          rendezVous.id
+        )
+        this.notificationRepository.send(notification)
+      } else {
+        this.logger.log(
+          `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
         )
       }
-    } else {
-      this.logger.warn(
-        `Impossible d'envoyer un e-mail au conseiller ${command.idConseiller}, l'adresse n'existe pas`
-      )
-    }
-
-    return success(rendezVous.id)
+    })
   }
 
   async authorize(
