@@ -47,14 +47,12 @@ export class InvitationIcsClient {
   creerFichierInvitationRendezVous(
     conseiller: Conseiller,
     rendezVous: RendezVous,
-    icsSequence: number,
-    rendezVousMisAJour?: RendezVous
+    icsSequence: number
   ): ICS {
     const event = this.creerEvenementRendezVous(
       conseiller,
       rendezVous,
-      icsSequence,
-      rendezVousMisAJour
+      icsSequence
     )
     const { error, value } = icsService.createEvent(event)
     if (error || !value) {
@@ -66,45 +64,41 @@ export class InvitationIcsClient {
   creerEvenementRendezVous(
     conseiller: Conseiller,
     rendezVous: RendezVous,
-    icsSequence: number,
-    rendezVousMisAJour?: RendezVous
+    icsSequence: number
   ): EventAttributes {
-    const rendezVousEvenement = rendezVousMisAJour
-      ? rendezVousMisAJour
-      : rendezVous
-    const dateRendezVousUtc = new Date(
+    const date = new Date(
       Date.UTC(
-        rendezVousEvenement.date.getUTCFullYear(),
-        rendezVousEvenement.date.getUTCMonth(),
-        rendezVousEvenement.date.getUTCDate(),
-        rendezVousEvenement.date.getUTCHours(),
-        rendezVousEvenement.date.getUTCMinutes(),
-        rendezVousEvenement.date.getUTCSeconds()
+        rendezVous.date.getUTCFullYear(),
+        rendezVous.date.getUTCMonth(),
+        rendezVous.date.getUTCDate(),
+        rendezVous.date.getUTCHours(),
+        rendezVous.date.getUTCMinutes(),
+        rendezVous.date.getUTCSeconds()
       )
     )
     return {
-      uid: rendezVousEvenement.id,
+      uid: rendezVous.id,
       sequence: icsSequence,
       startInputType: 'utc',
       start: [
-        dateRendezVousUtc.getFullYear(),
-        dateRendezVousUtc.getMonth() + 1,
-        dateRendezVousUtc.getDate(),
-        dateRendezVousUtc.getUTCHours(),
-        dateRendezVousUtc.getMinutes()
+        date.getFullYear(),
+        date.getMonth() + 1,
+        date.getDate(),
+        date.getUTCHours(),
+        date.getMinutes()
       ],
-      title: `[CEJ] ${mapCodeLabelTypeRendezVous[rendezVousEvenement.type]}`,
+      title: `[CEJ] ${mapCodeLabelTypeRendezVous[rendezVous.type]}`,
       description:
         "Création d'un nouveau rendez-vous\n" +
         `Vous avez créé un rendez-vous de type ${
-          mapCodeLabelTypeRendezVous[rendezVousEvenement.type]
+          mapCodeLabelTypeRendezVous[rendezVous.type]
         } pour le ${formaterDateRendezVous(
-          rendezVousEvenement.date
-        )} à ${formaterHeureRendezVous(rendezVousEvenement.date)} .\n` +
+          rendezVous.date
+        )} à ${formaterHeureRendezVous(rendezVous.date)} .\n` +
         "Pour l'intégrer à votre agenda, vous devez accepter cette invitation." +
         'Attention, les modifications et refus effectués directement dans votre agenda ne sont pas pris en compte dans votre portail CEJ.\n' +
         'Bonne journée',
-      duration: { minutes: rendezVousEvenement.duree },
+      duration: { minutes: rendezVous.duree },
       organizer: {
         name: conseiller.lastName + ' ' + conseiller.firstName,
         email: this.passEmploiContactEmail
@@ -118,11 +112,8 @@ export class InvitationIcsClient {
           role: 'REQ-PARTICIPANT'
         },
         {
-          name:
-            rendezVousEvenement.jeune.lastName +
-            ' ' +
-            rendezVousEvenement.jeune.firstName,
-          email: rendezVousEvenement.jeune.email,
+          name: rendezVous.jeune.lastName + ' ' + rendezVous.jeune.firstName,
+          email: rendezVous.jeune.email,
           rsvp: true,
           role: 'REQ-PARTICIPANT'
         }

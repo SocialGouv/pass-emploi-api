@@ -127,8 +127,8 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       try {
         await this.mailClient.envoyerMailRendezVous(
           conseillerDestinataire!,
-          rendezVous,
-          rendezVousUpdated
+          rendezVousUpdated,
+          true
         )
       } catch (e) {
         this.logger.error(

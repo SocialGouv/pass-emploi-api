@@ -59,7 +59,7 @@ export class MailSendinblueService implements Mail.Service {
   async envoyerMailRendezVous(
     conseiller: Conseiller,
     rendezVous: RendezVous,
-    rendezVousMisAJour?: RendezVous
+    rendezVousMisAJour?: boolean
   ): Promise<void> {
     const rendezVousIcsSequence =
       await this.invitationIcsClient.getAndIncrementRendezVousIcsSequence(
@@ -69,8 +69,7 @@ export class MailSendinblueService implements Mail.Service {
       this.invitationIcsClient.creerFichierInvitationRendezVous(
         conseiller,
         rendezVous,
-        rendezVousIcsSequence,
-        rendezVousMisAJour
+        rendezVousIcsSequence
       )
     const mailDatadto = this.creerContenuMailRendezVous(
       conseiller,
@@ -86,7 +85,7 @@ export class MailSendinblueService implements Mail.Service {
     conseiller: Conseiller,
     rendezVous: RendezVous,
     fichierInvitation: ICS,
-    rendezVousMisAJour?: RendezVous
+    rendezVousMisAJour?: boolean
   ): MailDataDto {
     const invitationBase64 = Buffer.from(fichierInvitation).toString('base64')
     const templateId = rendezVousMisAJour

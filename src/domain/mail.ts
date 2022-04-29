@@ -43,7 +43,7 @@ export namespace Mail {
     envoyerMailRendezVous(
       conseiller: Conseiller,
       rendezVous: RendezVous,
-      rendezVousMisAJour?: RendezVous
+      rendezVousMisAJour?: boolean
     ): Promise<void>
 
     envoyer(data: MailDataDto): Promise<void>
@@ -52,7 +52,7 @@ export namespace Mail {
       conseiller: Conseiller,
       rendezVous: RendezVous,
       fichierInvitation: ICS,
-      rendezVousMisAJour?: RendezVous
+      rendezVousMisAJour?: boolean
     ): MailDataDto
 
     mettreAJourMailingList(

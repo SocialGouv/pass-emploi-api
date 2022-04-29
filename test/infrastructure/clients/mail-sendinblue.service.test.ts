@@ -111,9 +111,6 @@ describe('MailSendinblueService', () => {
       // Given
       const conseiller = unConseiller()
       const rendezVous = unRendezVous()
-      const rendezVousMisAJour = unRendezVous({
-        date: new Date('2022-10-10T08:03:30.000Z')
-      })
       const fichierInvitation = fs.readFileSync(
         path.resolve(__dirname, '../../fixtures/invitation-mail.fixture.ics'),
         'utf8'
@@ -125,7 +122,7 @@ describe('MailSendinblueService', () => {
         conseiller,
         rendezVous,
         fichierInvitation,
-        rendezVousMisAJour
+        true
       )
 
       // Then
