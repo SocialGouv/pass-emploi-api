@@ -38,7 +38,7 @@ describe('UpdateRendezVousCommandHandler', () => {
   let evenementService: StubbedClass<EvenementService>
   let updateRendezVousCommandHandler: UpdateRendezVousCommandHandler
   const jeune = unJeune()
-  const rendezVous = unRendezVous({}, jeune)
+  let rendezVous: RendezVous
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
@@ -49,6 +49,7 @@ describe('UpdateRendezVousCommandHandler', () => {
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
     planificateurService = stubClass(PlanificateurService)
     evenementService = stubClass(EvenementService)
+    rendezVous = unRendezVous({}, jeune)
 
     updateRendezVousCommandHandler = new UpdateRendezVousCommandHandler(
       rendezVousRepository,
@@ -81,7 +82,10 @@ describe('UpdateRendezVousCommandHandler', () => {
           rendezVous
         )
         expect(notificationRepository.send).not.to.have.been.calledWith(
-          Notification.updateRdv(jeune.pushNotificationToken, rendezVous.id)
+          Notification.createRendezVousMisAJour(
+            jeune.pushNotificationToken,
+            rendezVous.id
+          )
         )
         expect(result).to.deep.equal(
           failure(new NonTrouveError('RendezVous', command.idRendezVous))
@@ -107,7 +111,10 @@ describe('UpdateRendezVousCommandHandler', () => {
           rendezVous
         )
         expect(notificationRepository.send).not.to.have.been.calledWith(
-          Notification.updateRdv(jeune.pushNotificationToken, rendezVous.id)
+          Notification.createRendezVousMisAJour(
+            jeune.pushNotificationToken,
+            rendezVous.id
+          )
         )
         expect(result).to.deep.equal(
           failure(
@@ -147,7 +154,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           rendezVousUpdated
         )
         expect(notificationRepository.send).to.have.been.calledWith(
-          Notification.updateRdv(
+          Notification.createRendezVousMisAJour(
             jeune.pushNotificationToken,
             rendezVousUpdated.id
           )
@@ -188,7 +195,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           rendezVousUpdated
         )
         expect(notificationRepository.send).to.have.been.calledWith(
-          Notification.updateRdv(
+          Notification.createRendezVousMisAJour(
             jeune.pushNotificationToken,
             rendezVousUpdated.id
           )
@@ -228,6 +235,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         it('envoie le mail à ce conseiller ', async () => {
           // Given
           rendezVous.invitation = true
+
           const date = '2022-04-04T09:54:04.561Z'
           const command: UpdateRendezVousCommand = {
             idRendezVous: rendezVous.id,
@@ -246,13 +254,18 @@ describe('UpdateRendezVousCommandHandler', () => {
             ...rendezVous,
             date: new Date(date)
           }
+
+          conseillerRepository.get
+            .withArgs(rendezVousUpdated.jeunes[0].conseiller?.id)
+            .resolves(rendezVousUpdated.jeunes[0].conseiller)
+
           // When
           await updateRendezVousCommandHandler.handle(command)
           // Then
           expect(
             mailService.envoyerMailRendezVous
           ).to.have.been.calledWithExactly(
-            rendezVousUpdated.jeune.conseiller,
+            rendezVousUpdated.jeunes[0].conseiller,
             rendezVousUpdated
           )
         })
@@ -280,24 +293,17 @@ describe('UpdateRendezVousCommandHandler', () => {
             date: new Date(date)
           }
 
-          const conseillerModificateur = jeune.conseiller
-          conseillerModificateur.id = 'faux-id'
-
-          const conseillerCreateur = rendezVousRepository.get(
-            rendezVousUpdated.createur.id
-          )
+          conseillerRepository.get
+            .withArgs(rendezVousUpdated.createur.id)
+            .resolves(rendezVousUpdated.jeunes[0].conseiller)
 
           // When
           await updateRendezVousCommandHandler.handle(command)
           // Then
-          expect(mailService.envoyerMailRendezVous).not.to.have.been.calledWith(
-            conseillerModificateur,
-            rendezVousUpdated
-          )
           expect(
             mailService.envoyerMailRendezVous
           ).to.have.been.calledWithExactly(
-            conseillerCreateur,
+            rendezVousUpdated.jeunes[0].conseiller,
             rendezVousUpdated
           )
         })

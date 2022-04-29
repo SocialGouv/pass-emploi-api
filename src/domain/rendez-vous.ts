@@ -66,7 +66,7 @@ export interface RendezVous {
   createur: Createur
 }
 
-interface InfosRendezVousACreer {
+export interface InfosRendezVousACreer {
   idsJeunes: string[]
   idConseiller: string
   commentaire?: string
@@ -79,6 +79,16 @@ interface InfosRendezVousACreer {
   organisme?: string
   presenceConseiller?: boolean
   invitation?: boolean
+}
+
+export interface InfosRendezVousAMettreAJour {
+  commentaire?: string
+  date: string
+  duree: number
+  modalite?: string
+  adresse?: string
+  organisme?: string
+  presenceConseiller: boolean
 }
 
 export namespace RendezVous {
@@ -125,6 +135,22 @@ export namespace RendezVous {
         nom: conseiller.lastName,
         prenom: conseiller.firstName
       }
+    }
+  }
+
+  export function mettreAJour(
+    rendezVousInitial: RendezVous,
+    infosRendezVousAMettreAJour: InfosRendezVousAMettreAJour
+  ): RendezVous {
+    return {
+      ...rendezVousInitial,
+      commentaire: infosRendezVousAMettreAJour.commentaire,
+      date: new Date(infosRendezVousAMettreAJour.date),
+      duree: infosRendezVousAMettreAJour.duree,
+      modalite: infosRendezVousAMettreAJour.modalite,
+      adresse: infosRendezVousAMettreAJour.adresse,
+      organisme: infosRendezVousAMettreAJour.organisme,
+      presenceConseiller: infosRendezVousAMettreAJour.presenceConseiller
     }
   }
 }

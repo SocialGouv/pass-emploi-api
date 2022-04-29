@@ -19,7 +19,7 @@ describe('RendezVousAuthorizer', () => {
   })
 
   describe('authorize', () => {
-    describe('quand le conseillé connecté est lié au rdv', () => {
+    describe('quand au moins un des jeunes du conseiller qui fait la requête est dans le rendez-vous', () => {
       it("valide l'autorisation", async () => {
         // Given
         const conseiller = unConseiller()
@@ -39,7 +39,7 @@ describe('RendezVousAuthorizer', () => {
         expect(result).to.be.equal(undefined)
       })
     })
-    describe("quand le conseillé connecté n'est pas lié au rdv", () => {
+    describe("quand aucun des jeunes du conseiller qui fait la requête n'est dans le rendez-vous", () => {
       it('rejette', async () => {
         // Given
         const conseiller = unConseiller()

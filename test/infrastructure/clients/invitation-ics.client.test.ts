@@ -1,8 +1,6 @@
-import { Jeune } from '../../../src/domain/jeune'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { unJeune } from '../../fixtures/jeune.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
@@ -16,7 +14,6 @@ describe('InvitationIcsClient', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
   let invitationIcsClient: InvitationIcsClient
   const config = testConfig()
-  let jeune: Jeune
 
   beforeEach(async () => {
     invitationIcsClient = new InvitationIcsClient(
@@ -25,7 +22,6 @@ describe('InvitationIcsClient', () => {
     )
 
     // Given
-    jeune = unJeune()
     await ConseillerSqlModel.creer(unConseillerDto())
     await JeuneSqlModel.creer(unJeuneDto())
   })
@@ -36,8 +32,7 @@ describe('InvitationIcsClient', () => {
         // Given
         const idRdv = '6c242fa0-804f-11ec-a8a3-0242ac120002'
         const unRendezVous = unRendezVousDto({
-          id: idRdv,
-          idJeune: jeune.id
+          id: idRdv
         })
         await RendezVousSqlModel.create(unRendezVous)
         // When
@@ -53,7 +48,6 @@ describe('InvitationIcsClient', () => {
         const idRdv = '6c242fa0-804f-11ec-a8a3-0242ac120002'
         const unRendezVous = unRendezVousDto({
           id: idRdv,
-          idJeune: jeune.id,
           icsSequence: 0
         })
         await RendezVousSqlModel.create(unRendezVous)

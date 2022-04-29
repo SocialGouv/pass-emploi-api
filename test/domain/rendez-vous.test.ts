@@ -1,4 +1,8 @@
-import { CodeTypeRendezVous, RendezVous } from 'src/domain/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  InfosRendezVousACreer,
+  RendezVous
+} from 'src/domain/rendez-vous'
 import { IdService } from 'src/utils/id-service'
 import { unConseiller } from 'test/fixtures/conseiller.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
@@ -12,8 +16,8 @@ describe('Rendez-vous', () => {
 
   describe('createRendezVousConseiller', () => {
     // Given
-    const infosRdv = {
-      idJeune: '1',
+    const infosRdv: InfosRendezVousACreer = {
+      idsJeunes: ['1'],
       idConseiller: '41',
       commentaire: '',
       date: uneDatetime.toJSDate().toISOString(),
@@ -24,7 +28,7 @@ describe('Rendez-vous', () => {
     // When
     const rendezVous = RendezVous.createRendezVousConseiller(
       infosRdv,
-      unJeune(),
+      [unJeune()],
       conseiller,
       idService
     )

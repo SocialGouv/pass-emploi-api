@@ -48,9 +48,9 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     await Promise.all(
       rendezVous.jeunes.map(async jeune => {
         if (jeune.pushNotificationToken) {
-          const notification = Notification.createNouveauRdv(
+          const notification = Notification.createRdvSupprime(
             jeune.pushNotificationToken,
-            rendezVous.id
+            rendezVous.date
           )
           await this.notificationRepository.send(notification)
         } else {
