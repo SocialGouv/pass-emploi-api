@@ -23,7 +23,8 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
       this.configService.get('redis').url,
       {
         redis: {
-          enableReadyCheck: true,
+          enableReadyCheck: false,
+          maxRetriesPerRequest: null,
           retryStrategy: (times: number): number => {
             if (times > 1) {
               this.logger.error(
