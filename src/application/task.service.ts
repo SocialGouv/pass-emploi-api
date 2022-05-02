@@ -52,29 +52,25 @@ export class TaskService {
           await this.planificateurRepository.createJob(job)
           break
         case Task.INIT_ALL_JOBS:
-          await this.synchronizeJobsCommandHandler.execute({})
+          await this.synchronizeJobsCommandHandler.execute()
           break
         case Task.RECHERCHER_LES_NOUVELLES_OFFRES:
-          await this.notifierNouvellesOffresEmploiCommandHandler.execute({})
+          await this.notifierNouvellesOffresEmploiCommandHandler.execute()
           break
         case Task.ENVOYER_MAIL_CONSEILLER_MESSAGES:
-          await this.handleJobMailConseillerCommandHandler.execute({})
+          await this.handleJobMailConseillerCommandHandler.execute()
           break
         case Task.INITIALISER_LES_CRON:
-          await this.initCronsCommandHandler.execute({})
+          await this.initCronsCommandHandler.execute()
           break
         case Task.NETTOYER_LES_JOBS:
-          await this.handleNettoyerLesJobsCommandHandler.execute({})
+          await this.handleNettoyerLesJobsCommandHandler.execute()
           break
         case Task.METTRE_A_JOUR_MAILING_LIST_CONSEILLER:
-          await this.handleJobUpdateMailingListConseillerCommandHandler.execute(
-            {}
-          )
+          await this.handleJobUpdateMailingListConseillerCommandHandler.execute()
           break
         case Task.RECHERCHER_LES_NOUVELLES_OFFRES_SERVICES_CIVIQUE:
-          await this.handleJobNotifierNouveauxServicesCiviqueCommandHandler.execute(
-            {}
-          )
+          await this.handleJobNotifierNouveauxServicesCiviqueCommandHandler.execute()
           break
         default:
           this.logger.log(

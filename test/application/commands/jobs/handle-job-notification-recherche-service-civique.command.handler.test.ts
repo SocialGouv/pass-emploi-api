@@ -71,9 +71,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
 
         // When
         const result =
-          await handleJobNotifierNouveauxServicesCiviqueCommandHandler.handle(
-            {}
-          )
+          await handleJobNotifierNouveauxServicesCiviqueCommandHandler.handle()
 
         // Then
         expect(isSuccess(result)).to.equal(true)
@@ -111,9 +109,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
 
           // When
           result =
-            await handleJobNotifierNouveauxServicesCiviqueCommandHandler.handle(
-              {}
-            )
+            await handleJobNotifierNouveauxServicesCiviqueCommandHandler.handle()
 
           // Then
           expect(isSuccess(result)).to.equal(true)
@@ -143,9 +139,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
         it('renvoie les stats', async () => {
           // When
           result =
-            await handleJobNotifierNouveauxServicesCiviqueCommandHandler.handle(
-              {}
-            )
+            await handleJobNotifierNouveauxServicesCiviqueCommandHandler.handle()
 
           // Then
           expect(isSuccess(result)).to.equal(true)
@@ -159,9 +153,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
         it('notifie le jeune', async () => {
           // When
           result =
-            await handleJobNotifierNouveauxServicesCiviqueCommandHandler.handle(
-              {}
-            )
+            await handleJobNotifierNouveauxServicesCiviqueCommandHandler.handle()
 
           // Then
           if (isSuccess(result)) {
@@ -209,7 +201,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
         jeuneRepository.get.withArgs(uneRecherche().idJeune).resolves(unJeune())
 
         // When
-        await handleJobNotifierNouveauxServicesCiviqueCommandHandler.handle({})
+        await handleJobNotifierNouveauxServicesCiviqueCommandHandler.handle()
 
         // Then
         expect(

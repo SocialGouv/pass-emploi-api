@@ -30,10 +30,7 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
     super('HandleJobMailConseillerCommandHandler')
   }
 
-  async handle(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: Command
-  ): Promise<Result<Stats>> {
+  async handle(): Promise<Result<Stats>> {
     const stats: Stats = {
       succes: 0,
       echecs: 0,
@@ -110,10 +107,7 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
     }
   }
 
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: Command
-  ): Promise<void> {
+  async authorize(): Promise<void> {
     return
   }
 

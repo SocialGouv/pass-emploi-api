@@ -54,7 +54,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
         .resolves(0)
 
       // When
-      const result = await handleJobMailConseillerCommandHandler.handle({})
+      const result = await handleJobMailConseillerCommandHandler.handle()
 
       // Then
       expect(mailClient.envoyerMailConversationsNonLues).to.have.callCount(1)
@@ -83,7 +83,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
         .resolves(0)
 
       // When
-      const result = await handleJobMailConseillerCommandHandler.handle({})
+      const result = await handleJobMailConseillerCommandHandler.handle()
 
       // Then
       expect(mailClient.envoyerMailConversationsNonLues).to.have.callCount(0)
@@ -114,7 +114,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
         .resolves()
 
       // When
-      const result = await handleJobMailConseillerCommandHandler.handle({})
+      const result = await handleJobMailConseillerCommandHandler.handle()
 
       // Then
       expect(result._isSuccess).to.equal(true)
@@ -138,7 +138,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
         .resolves(0)
 
       // When
-      const result = await handleJobMailConseillerCommandHandler.handle({})
+      const result = await handleJobMailConseillerCommandHandler.handle()
       // Then
       expect(conseillerRepository.save).to.have.callCount(2)
       if (isSuccess(result)) {
@@ -164,7 +164,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
         .rejects()
 
       // When
-      const result = await handleJobMailConseillerCommandHandler.handle({})
+      const result = await handleJobMailConseillerCommandHandler.handle()
 
       // Then
       expect(result._isSuccess).to.equal(true)
@@ -182,7 +182,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
       conseillerRepository.findConseillersMessagesNonVerifies.rejects()
 
       // When
-      const result = await handleJobMailConseillerCommandHandler.handle({})
+      const result = await handleJobMailConseillerCommandHandler.handle()
 
       // Then
       expect(result._isSuccess).to.equal(false)

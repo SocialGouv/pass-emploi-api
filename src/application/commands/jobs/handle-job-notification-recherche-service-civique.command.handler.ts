@@ -44,10 +44,7 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
     super('HandleJobNotifierNouveauxServicesCiviqueCommandHandler')
   }
 
-  async handle(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: HandleJobNotifierNouveauxServicesCiviqueCommand
-  ): Promise<Result<Stats>> {
+  async handle(): Promise<Result<Stats>> {
     const stats: Stats = {
       nombreDeNouvellesOffres: 0,
       erreurs: 0,
@@ -144,10 +141,7 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
     }
   }
 
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: HandleJobNotifierNouveauxServicesCiviqueCommand
-  ): Promise<void> {
+  async authorize(): Promise<void> {
     return
   }
 

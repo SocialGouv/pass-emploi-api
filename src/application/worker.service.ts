@@ -22,7 +22,7 @@ export class WorkerService {
     private planificateurRepository: Planificateur.Repository,
     private handlerJobRendezVousCommandHandler: HandleJobRendezVousCommandHandler,
     private handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler,
-    private notifierNouvellesOffresEmploiCommandHandler: HandleJobNotifierNouvellesOffresEmploiCommandHandler,
+    private handleJobNotifierNouvellesOffresEmploiCommandHandler: HandleJobNotifierNouvellesOffresEmploiCommandHandler,
     private handleNettoyerLesJobsCommandHandler: HandleNettoyerLesJobsCommandHandler,
     private handleJobUpdateMailingListConseillerCommandHandler: HandleJobUpdateMailingListConseillerCommandHandler,
     private handleJobNotifierNouveauxServicesCiviqueCommandHandler: HandleJobNotifierNouveauxServicesCiviqueCommandHandler
@@ -53,23 +53,19 @@ export class WorkerService {
           })
           break
         case Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES:
-          await this.handleJobMailConseillerCommandHandler.execute({})
+          await this.handleJobMailConseillerCommandHandler.execute()
           break
         case Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI:
-          await this.notifierNouvellesOffresEmploiCommandHandler.execute({})
+          await this.handleJobNotifierNouvellesOffresEmploiCommandHandler.execute()
           break
         case Planificateur.CronJob.NOUVELLES_OFFRES_SERVICE_CIVIQUE:
-          await this.handleJobNotifierNouveauxServicesCiviqueCommandHandler.execute(
-            {}
-          )
+          await this.handleJobNotifierNouveauxServicesCiviqueCommandHandler.execute()
           break
         case Planificateur.CronJob.NETTOYER_LES_JOBS:
-          await this.handleNettoyerLesJobsCommandHandler.execute({})
+          await this.handleNettoyerLesJobsCommandHandler.execute()
           break
         case Planificateur.CronJob.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS:
-          await this.handleJobUpdateMailingListConseillerCommandHandler.execute(
-            {}
-          )
+          await this.handleJobUpdateMailingListConseillerCommandHandler.execute()
           break
         case Planificateur.JobEnum.FAKE:
           this.logger.log({

@@ -30,10 +30,7 @@ export class HandleJobUpdateMailingListConseillerCommandHandler extends CommandH
     this.mailingLists = this.configuration.get('sendinblue').mailingLists
   }
 
-  async handle(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: Command
-  ): Promise<Result<Stats>> {
+  async handle(): Promise<Result<Stats>> {
     const maintenant = this.dateService.now()
 
     const contactsMilo =
@@ -63,10 +60,7 @@ export class HandleJobUpdateMailingListConseillerCommandHandler extends CommandH
     return success(stats)
   }
 
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: Command
-  ): Promise<void> {
+  async authorize(): Promise<void> {
     return
   }
 

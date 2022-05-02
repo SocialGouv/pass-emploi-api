@@ -23,7 +23,7 @@ export abstract class CommandHandler<C, T> {
   }
 
   async execute(
-    command: C,
+    command?: C,
     utilisateur?: Authentification.Utilisateur
   ): Promise<Result<T>> {
     try {
@@ -37,19 +37,19 @@ export abstract class CommandHandler<C, T> {
           this.logger.error(error)
         })
       }
-      this.logAfter(command, result, utilisateur)
+      this.logAfter(result, command, utilisateur)
 
       return result
     } catch (e) {
-      this.logAfter(command, failure(e), utilisateur)
+      this.logAfter(failure(e), command, utilisateur)
       throw e
     }
   }
 
-  abstract handle(command: C): Promise<Result<T>>
+  abstract handle(command?: C): Promise<Result<T>>
 
   abstract authorize(
-    command: C,
+    command?: C,
     utilisateur?: Authentification.Utilisateur
   ): Promise<void>
 
@@ -59,8 +59,8 @@ export abstract class CommandHandler<C, T> {
   ): Promise<void>
 
   protected logAfter(
-    command: C,
     result: Result<T>,
+    command?: C,
     utilisateur?: Authentification.Utilisateur
   ): void {
     const resultPourLog = construireResultPourLog(result)
