@@ -30,7 +30,6 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('DeleteJeuneCommandHandler', () => {
   let jeuneRepository: StubbedType<Jeune.Repository>
-  let conseillerRepository: StubbedType<Conseiller.Repository>
   let chatRepository: StubbedType<Chat.Repository>
   let commandHandler: DeleteJeuneCommandHandler
   let evenementService: StubbedClass<EvenementService>
@@ -43,7 +42,6 @@ describe('DeleteJeuneCommandHandler', () => {
   beforeEach(() => {
     const sandbox = createSandbox()
     jeuneRepository = stubInterface(sandbox)
-    conseillerRepository = stubInterface(sandbox)
     chatRepository = stubInterface(sandbox)
     evenementService = stubClass(EvenementService)
     authentificationRepository = stubInterface(sandbox)
@@ -51,7 +49,6 @@ describe('DeleteJeuneCommandHandler', () => {
     mailFactory = stubClass(Mail.Factory)
     commandHandler = new DeleteJeuneCommandHandler(
       jeuneRepository,
-      conseillerRepository,
       chatRepository,
       authentificationRepository,
       evenementService,
@@ -66,7 +63,6 @@ describe('DeleteJeuneCommandHandler', () => {
     })
     command = { idJeune: 'ABCDE' }
     jeuneRepository.get.withArgs('ABCDE').resolves(jeune)
-    conseillerRepository.get.withArgs(jeune.conseiller?.id).resolves(conseiller)
     mailFactory.creerMailSuppressionJeune.returns(unMailDto())
   })
 
@@ -148,7 +144,6 @@ describe('DeleteJeuneCommandHandler', () => {
 
       it('envoie un email au conseiller', () => {
         expect(mailFactory.creerMailSuppressionJeune).to.have.been.calledWith(
-          conseiller,
           jeune
         )
         expect(mailClient.envoyer).to.have.been.calledWith(unMailDto())
