@@ -74,13 +74,14 @@ export namespace Mail {
       this.templates = this.configService.get('sendinblue').templates
     }
 
-    creerMailSuppressionJeune(
-      conseiller: Conseiller,
-      jeune: Jeune
-    ): MailDataDto {
+    creerMailSuppressionJeune(jeune: Jeune): MailDataDto {
       let templateId: number
 
-      if (conseiller.structure === Core.Structure.POLE_EMPLOI) {
+      if (!jeune.conseiller) {
+        throw new Error(`Le jeune ${jeune.id} n'a pas de conseiller`)
+      }
+
+      if (jeune.conseiller.structure === Core.Structure.POLE_EMPLOI) {
         templateId = parseInt(this.templates.suppressionJeunePE)
       } else {
         templateId = parseInt(this.templates.suppressionJeuneMilo)
@@ -89,8 +90,8 @@ export namespace Mail {
       return {
         to: [
           {
-            email: conseiller.email!,
-            name: `${conseiller.firstName} ${conseiller.lastName}`
+            email: jeune.conseiller.email!,
+            name: `${jeune.conseiller.firstName} ${jeune.conseiller.lastName}`
           }
         ],
         templateId,

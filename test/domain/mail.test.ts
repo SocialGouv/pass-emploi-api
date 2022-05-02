@@ -1,6 +1,5 @@
 import { ConfigService } from '@nestjs/config'
 import { Mail } from 'src/domain/mail'
-import { unConseiller } from 'test/fixtures/conseiller.fixture'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { expect, StubbedClass, stubClass } from 'test/utils'
 
@@ -26,14 +25,10 @@ describe('Mail', () => {
       describe("Quand c'est un conseiller MILO", () => {
         it('crée une action avec le statut fourni', async () => {
           // Given
-          const conseiller = unConseiller()
           const jeune = unJeune()
 
           // When
-          const actual = mailFactory.creerMailSuppressionJeune(
-            conseiller,
-            jeune
-          )
+          const actual = mailFactory.creerMailSuppressionJeune(jeune)
 
           // Then
           expect(actual.params).to.deep.equal({

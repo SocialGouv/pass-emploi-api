@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Conseiller, ConseillersRepositoryToken } from 'src/domain/conseiller'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Mail, MailServiceToken } from 'src/domain/mail'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
@@ -41,8 +40,6 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
   constructor(
     @Inject(JeunesRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository,
-    @Inject(ConseillersRepositoryToken)
-    private readonly conseillerRepository: Conseiller.Repository,
     @Inject(ChatRepositoryToken)
     private readonly chatRepository: Chat.Repository,
     @Inject(AuthentificationRepositoryToken)
@@ -89,12 +86,8 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
       this.chatRepository.supprimerChat(idJeune)
     ])
 
-    const conseiller = jeune.conseiller
-      ? await this.conseillerRepository.get(jeune.conseiller.id)
-      : undefined
-
-    if (conseiller) {
-      const mail = this.mailFactory.creerMailSuppressionJeune(conseiller, jeune)
+    if (jeune.conseiller) {
+      const mail = this.mailFactory.creerMailSuppressionJeune(jeune)
       await this.mailService.envoyer(mail)
     }
 
