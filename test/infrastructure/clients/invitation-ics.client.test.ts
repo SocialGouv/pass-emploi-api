@@ -59,15 +59,15 @@ describe('InvitationIcsClient', () => {
       })
     })
   })
-  describe('creerEvenementNouveauRendezVous', () => {
-    it('renvoie le bon évènement du nouveau rendez-vous', async () => {
+  describe('creerEvenementRendezVous', () => {
+    it('renvoie le bon évènement du rendez-vous', async () => {
       // Given
       const conseiller = unConseiller()
       const rendezVous = unRendezVous()
       const icsSequence = 0
 
       // When
-      const result = invitationIcsClient.creerEvenementNouveauRendezVous(
+      const result = invitationIcsClient.creerEvenementRendezVous(
         conseiller,
         rendezVous,
         icsSequence

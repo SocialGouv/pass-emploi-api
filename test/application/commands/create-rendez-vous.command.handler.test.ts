@@ -148,7 +148,8 @@ describe('CreateRendezVousCommandHandler', () => {
             idConseiller: jeune1.conseiller.id,
             commentaire: rendezVous.commentaire,
             date: rendezVous.date.toDateString(),
-            duree: rendezVous.duree
+            duree: rendezVous.duree,
+            invitation: true
           }
           jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
           jeuneRepository.get.withArgs(jeune2.id).resolves(jeune2)
@@ -197,7 +198,8 @@ describe('CreateRendezVousCommandHandler', () => {
             idConseiller: jeune.conseiller.id,
             commentaire: rendezVous.commentaire,
             date: rendezVous.date.toDateString(),
-            duree: rendezVous.duree
+            duree: rendezVous.duree,
+            invitation: true
           }
           const conseiller = unConseiller()
           conseillerRepository.get
@@ -239,12 +241,55 @@ describe('CreateRendezVousCommandHandler', () => {
             idConseiller: jeune1.conseiller.id,
             commentaire: rendezVous.commentaire,
             date: rendezVous.date.toDateString(),
-            duree: rendezVous.duree
+            duree: rendezVous.duree,
+            invitation: true
           }
           const conseiller: Conseiller = {
             ...unConseiller(),
             email: undefined
           }
+          conseillerRepository.get
+            .withArgs(command.idConseiller)
+            .resolves(conseiller)
+
+          const expectedRendezvous = RendezVous.createRendezVousConseiller(
+            command,
+            [jeune1],
+            conseiller,
+            idService
+          )
+          // When
+          const result = await createRendezVousCommandHandler.handle(command)
+          // Then
+          expect(result).to.deep.equal(success(expectedRendezvous.id))
+          expect(rendezVousRepository.save).to.have.been.calledWith(
+            expectedRendezvous
+          )
+          expect(notificationRepository.send).not.to.have.been.calledWith(
+            Notification.createNouveauRdv(
+              jeune1.pushNotificationToken,
+              expectedRendezvous.id
+            )
+          )
+          expect(mailClient.envoyerMailRendezVous).callCount(0)
+        })
+      })
+      describe("quand le conseiller a choisi de ne pas recevoir d'invitation par email", () => {
+        it('crée un rendez-vous sans envoyer un mail au conseiller', async () => {
+          // Given
+          jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
+          rendezVous.jeunes[0].pushNotificationToken = undefined
+
+          const command: CreateRendezVousCommand = {
+            idsJeunes: [jeune1.id],
+            idConseiller: jeune1.conseiller.id,
+            commentaire: rendezVous.commentaire,
+            date: rendezVous.date.toDateString(),
+            duree: rendezVous.duree,
+            invitation: false
+          }
+          const conseiller: Conseiller = unConseiller()
+
           conseillerRepository.get
             .withArgs(command.idConseiller)
             .resolves(conseiller)

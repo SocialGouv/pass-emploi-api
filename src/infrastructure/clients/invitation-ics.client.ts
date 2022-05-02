@@ -44,12 +44,12 @@ export class InvitationIcsClient {
     return rendezVousIcsSequence[0][0]['ics_sequence']
   }
 
-  creerFichierInvitationNouveauRendezVous(
+  creerFichierInvitationRendezVous(
     conseiller: Conseiller,
     rendezVous: RendezVous,
     icsSequence: number
   ): ICS {
-    const event = this.creerEvenementNouveauRendezVous(
+    const event = this.creerEvenementRendezVous(
       conseiller,
       rendezVous,
       icsSequence
@@ -61,7 +61,7 @@ export class InvitationIcsClient {
     return value
   }
 
-  creerEvenementNouveauRendezVous(
+  creerEvenementRendezVous(
     conseiller: Conseiller,
     rendezVous: RendezVous,
     icsSequence: number

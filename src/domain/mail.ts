@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { ICS } from '../infrastructure/clients/mail-sendinblue.service'
 import { Conseiller } from './conseiller'
 import { Core } from './core'
 import { Jeune } from './jeune'
@@ -42,16 +41,11 @@ export namespace Mail {
 
     envoyerMailRendezVous(
       conseiller: Conseiller,
-      rendezVous: RendezVous
+      rendezVous: RendezVous,
+      rendezVousMisAJour?: boolean
     ): Promise<void>
 
     envoyer(data: MailDataDto): Promise<void>
-
-    creerContenuMailNouveauRendezVous(
-      conseiller: Conseiller,
-      rendezVous: RendezVous,
-      fichierInvitation: ICS
-    ): MailDataDto
 
     mettreAJourMailingList(
       contacts: Contact[],

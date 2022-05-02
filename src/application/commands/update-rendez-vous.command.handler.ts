@@ -79,31 +79,32 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     await this.replanifierLesRappelsDeRendezVous(rendezVousUpdated, rendezVous)
     await this.rendezVousRepository.save(rendezVousUpdated)
     this.notifierLesJeunes(rendezVous)
-    this.envoyerLesInvitationsCalendaires(rendezVousUpdated)
+    if (rendezVousUpdated.invitation) {
+      this.envoyerLesInvitationsCalendaires(rendezVousUpdated)
+    }
     return success({ id: rendezVousUpdated.id })
   }
 
   private async envoyerLesInvitationsCalendaires(
     rendezVousUpdated: RendezVous
   ): Promise<void> {
-    if (rendezVousUpdated.invitation) {
-      const conseillerDestinataire = await this.conseillerRepository.get(
-        rendezVousUpdated.createur.id
-      )
-      if (conseillerDestinataire && conseillerDestinataire.email) {
-        try {
-          await this.mailClient.envoyerMailRendezVous(
-            conseillerDestinataire,
-            rendezVousUpdated
+    const conseillerDestinataire = await this.conseillerRepository.get(
+      rendezVousUpdated.createur.id
+    )
+    if (conseillerDestinataire && conseillerDestinataire.email) {
+      try {
+        await this.mailClient.envoyerMailRendezVous(
+          conseillerDestinataire,
+          rendezVousUpdated,
+          true
+        )
+      } catch (e) {
+        this.logger.error(
+          buildError(
+            "Erreur lors de l'envoi de l'email du nouveau rendez-vous",
+            e
           )
-        } catch (e) {
-          this.logger.error(
-            buildError(
-              "Erreur lors de l'envoi de l'email du nouveau rendez-vous",
-              e
-            )
-          )
-        }
+        )
       }
     } else {
       this.logger.warn(

@@ -85,8 +85,9 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
 
     this.notifierLesJeunes(rendezVous)
     this.planifierLesRappelsDeRendezVous(rendezVous)
-    this.envoyerLesInvitationsCalendaires(conseiller, rendezVous)
-
+    if (rendezVous.invitation) {
+      this.envoyerLesInvitationsCalendaires(conseiller, rendezVous)
+    }
     return success(rendezVous.id)
   }
 

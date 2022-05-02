@@ -69,7 +69,8 @@ export const testConfig = (): ConfigService => {
       apiKey: 'sendinblueapiKey',
       templates: {
         conversationsNonLues: '200',
-        nouveauRendezvous: '300'
+        nouveauRendezvous: '300',
+        rappelRendezvous: '400'
       }
     },
     serviceCivique: {

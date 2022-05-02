@@ -226,7 +226,8 @@ describe('UpdateRendezVousCommandHandler', () => {
         // Then
         expect(mailService.envoyerMailRendezVous).not.to.have.been.calledWith(
           jeune.conseiller,
-          rendezVous
+          rendezVous,
+          true
         )
       })
     })
@@ -266,7 +267,8 @@ describe('UpdateRendezVousCommandHandler', () => {
             mailService.envoyerMailRendezVous
           ).to.have.been.calledWithExactly(
             rendezVousUpdated.jeunes[0].conseiller,
-            rendezVousUpdated
+            rendezVousUpdated,
+            true
           )
         })
       })
@@ -304,7 +306,8 @@ describe('UpdateRendezVousCommandHandler', () => {
             mailService.envoyerMailRendezVous
           ).to.have.been.calledWithExactly(
             rendezVousUpdated.jeunes[0].conseiller,
-            rendezVousUpdated
+            rendezVousUpdated,
+            true
           )
         })
       })
