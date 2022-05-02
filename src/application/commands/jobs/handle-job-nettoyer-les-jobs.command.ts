@@ -19,10 +19,7 @@ export class HandleNettoyerLesJobsCommandHandler extends CommandHandler<
     super('HandleNettoyerLesJobsCommandHandler')
   }
 
-  async handle(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: Command
-  ): Promise<Result> {
+  async handle(): Promise<Result> {
     try {
       await this.planificateurRepository.supprimerLesAnciensJobs()
       return emptySuccess()
@@ -31,10 +28,7 @@ export class HandleNettoyerLesJobsCommandHandler extends CommandHandler<
     }
   }
 
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: Command
-  ): Promise<void> {
+  async authorize(): Promise<void> {
     return
   }
 

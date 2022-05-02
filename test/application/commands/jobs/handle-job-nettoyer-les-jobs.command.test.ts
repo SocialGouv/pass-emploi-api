@@ -15,7 +15,7 @@ describe('HandleNettoyerLesJobsCommandHandler', () => {
         new HandleNettoyerLesJobsCommandHandler(planificateurRepository)
 
       // When
-      handleNettoyerLesJobsCommandHandler.handle({})
+      handleNettoyerLesJobsCommandHandler.handle()
 
       // Then
       expect(planificateurRepository.supprimerLesAnciensJobs).to.have.callCount(

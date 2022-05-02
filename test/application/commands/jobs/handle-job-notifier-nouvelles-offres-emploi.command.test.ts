@@ -116,7 +116,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         )
 
         // When
-        await notifierNouvellesOffresEmploiCommandHandler.handle({})
+        await notifierNouvellesOffresEmploiCommandHandler.handle()
 
         // Then
         expect(offresEmploiRepository.findAll).to.have.callCount(2)
@@ -181,7 +181,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         )
 
         // When
-        await notifierNouvellesOffresEmploiCommandHandler.handle({})
+        await notifierNouvellesOffresEmploiCommandHandler.handle()
 
         // Then
         const expected: OffresEmploi.Criteres = {
@@ -217,7 +217,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         jeuneRepository.get.withArgs(idJeune).resolves(unJeune())
 
         // When
-        await notifierNouvellesOffresEmploiCommandHandler.handle({})
+        await notifierNouvellesOffresEmploiCommandHandler.handle()
 
         // Then
         expect(notificationRepository.send).to.have.been.calledWithExactly({
@@ -245,7 +245,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         offresEmploiRepository.findAll.resolves(success(offresEmploiQueryModel))
 
         // When
-        await notifierNouvellesOffresEmploiCommandHandler.handle({})
+        await notifierNouvellesOffresEmploiCommandHandler.handle()
 
         // Then
         expect(
@@ -321,7 +321,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         )
 
         // When
-        await notifierNouvellesOffresEmploiCommandHandler.handle({})
+        await notifierNouvellesOffresEmploiCommandHandler.handle()
 
         // Then
         expect(offresEmploiRepository.findAll).to.have.callCount(6)
@@ -341,7 +341,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           .resolves([])
 
         // When
-        await notifierNouvellesOffresEmploiCommandHandler.handle({})
+        await notifierNouvellesOffresEmploiCommandHandler.handle()
 
         // Then
         expect(offresEmploiRepository.findAll).to.have.callCount(0)
@@ -396,7 +396,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         jeuneRepository.get.withArgs(idJeune).resolves(unJeune())
 
         // When
-        await notifierNouvellesOffresEmploiCommandHandler.handle({})
+        await notifierNouvellesOffresEmploiCommandHandler.handle()
 
         // Then
         expect(offresEmploiRepository.findAll).to.have.callCount(2)

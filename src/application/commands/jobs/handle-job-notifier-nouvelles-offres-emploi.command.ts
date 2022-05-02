@@ -44,10 +44,7 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
     super('HandleJobNotifierNouvellesOffresEmploiCommandHandler')
   }
 
-  async handle(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: Command
-  ): Promise<Result<Stats>> {
+  async handle(): Promise<Result<Stats>> {
     const maintenant = this.dateService.now()
     const nombreRecherches = parseInt(
       this.configuration.get(
@@ -169,10 +166,7 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
     return this.offresEmploiRepository.findAll(criteres)
   }
 
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: Command
-  ): Promise<void> {
+  async authorize(): Promise<void> {
     return
   }
 
