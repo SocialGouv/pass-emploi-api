@@ -103,7 +103,7 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
             }
           }
 
-          await this.rechercheRepository.updateRecherche({
+          await this.rechercheRepository.update({
             ...recherches[i],
             dateDerniereRecherche: maintenant,
             etat: etatRecherche

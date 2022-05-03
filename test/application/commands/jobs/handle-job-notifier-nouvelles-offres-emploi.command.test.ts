@@ -248,9 +248,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         await notifierNouvellesOffresEmploiCommandHandler.handle()
 
         // Then
-        expect(
-          rechercheRepository.updateRecherche
-        ).to.have.been.calledWithExactly(
+        expect(rechercheRepository.update).to.have.been.calledWithExactly(
           uneRecherche({
             type: Recherche.Type.OFFRES_EMPLOI,
             criteres: criteresRecherche1,
@@ -258,9 +256,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
             dateDerniereRecherche: date
           })
         )
-        expect(
-          rechercheRepository.updateRecherche
-        ).to.have.been.calledWithExactly(
+        expect(rechercheRepository.update).to.have.been.calledWithExactly(
           uneRecherche({
             type: Recherche.Type.OFFRES_EMPLOI,
             criteres: criteresRecherche2,
@@ -400,10 +396,8 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
 
         // Then
         expect(offresEmploiRepository.findAll).to.have.callCount(2)
-        expect(rechercheRepository.updateRecherche).to.have.callCount(2)
-        expect(
-          rechercheRepository.updateRecherche
-        ).to.have.been.calledWithExactly(
+        expect(rechercheRepository.update).to.have.callCount(2)
+        expect(rechercheRepository.update).to.have.been.calledWithExactly(
           uneRecherche({
             id: '219e8ba5-cd88-4027-9828-55e8ca99a232',
             type: Recherche.Type.OFFRES_EMPLOI,

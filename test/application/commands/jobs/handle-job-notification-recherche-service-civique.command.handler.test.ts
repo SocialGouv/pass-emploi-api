@@ -121,7 +121,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
         })
       })
       describe('quand une recherche correspond', () => {
-        beforeEach(() => {
+        beforeEach(async () => {
           // Given
           const criteres: GetServicesCiviqueQuery = {
             domaine: uneOffre.domaine,
@@ -135,15 +135,14 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
           jeuneRepository.get
             .withArgs(uneRecherche().idJeune)
             .resolves(unJeune())
-        })
-        it('renvoie les stats', async () => {
+
           // When
           result =
             await handleJobNotifierNouveauxServicesCiviqueCommandHandler.handle()
-
+        })
+        it('renvoie les stats', async () => {
           // Then
           expect(isSuccess(result)).to.equal(true)
-
           if (isSuccess(result)) {
             expect(result.data.nombreDeNouvellesOffres).to.equal(1)
             expect(result.data.recherchesCorrespondantes).to.equal(1)
@@ -151,24 +150,27 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
         })
 
         it('notifie le jeune', async () => {
-          // When
-          result =
-            await handleJobNotifierNouveauxServicesCiviqueCommandHandler.handle()
-
           // Then
-          if (isSuccess(result)) {
-            expect(notificationRepository.send).to.have.been.calledWithExactly({
-              token: 'unToken',
-              notification: {
-                title: 'Boulanger en alternance',
-                body: 'De nouveaux résultats sont disponibles'
-              },
-              data: {
-                type: 'NOUVELLE_OFFRE',
-                id: '219e8ba5-cd88-4027-9828-55e8ca99a236'
-              }
-            })
-          }
+          expect(notificationRepository.send).to.have.been.calledWithExactly({
+            token: 'unToken',
+            notification: {
+              title: 'Boulanger en alternance',
+              body: 'De nouveaux résultats sont disponibles'
+            },
+            data: {
+              type: 'NOUVELLE_OFFRE',
+              id: '219e8ba5-cd88-4027-9828-55e8ca99a236'
+            }
+          })
+        })
+
+        it('met à jour la recherche', async () => {
+          // Then
+          expect(rechercheRepository.update).to.have.been.calledWithExactly({
+            ...uneRecherche(),
+            dateDerniereRecherche: now,
+            etat: Recherche.Etat.SUCCES
+          })
         })
       })
     })

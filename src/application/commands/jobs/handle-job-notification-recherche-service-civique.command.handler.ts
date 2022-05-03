@@ -125,7 +125,7 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
   ): Promise<void> {
     const jeune = await this.jeuneRepository.get(recherche.idJeune)
 
-    await this.rechercheRepository.updateRecherche({
+    await this.rechercheRepository.update({
       ...recherche,
       dateDerniereRecherche: date,
       etat: Recherche.Etat.SUCCES
