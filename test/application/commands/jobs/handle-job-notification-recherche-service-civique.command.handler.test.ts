@@ -101,7 +101,8 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
           const criteres: GetServicesCiviqueQuery = {
             domaine: uneOffre.domaine,
             lat: uneOffre.localisation!.latitude,
-            lon: uneOffre.localisation!.longitude
+            lon: uneOffre.localisation!.longitude,
+            dateDeDebutMinimum: uneOffre.dateDeDebut
           }
           rechercheRepository.trouverLesRecherchesServicesCiviques
             .withArgs(criteres, LIMITE_PAGINATION, 0)
@@ -126,7 +127,8 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
           const criteres: GetServicesCiviqueQuery = {
             domaine: uneOffre.domaine,
             lat: uneOffre.localisation!.latitude,
-            lon: uneOffre.localisation!.longitude
+            lon: uneOffre.localisation!.longitude,
+            dateDeDebutMinimum: uneOffre.dateDeDebut
           }
           rechercheRepository.trouverLesRecherchesServicesCiviques
             .withArgs(criteres, LIMITE_PAGINATION, 0)
@@ -191,7 +193,8 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
         const criteres: GetServicesCiviqueQuery = {
           domaine: uneOffre.domaine,
           lat: uneOffre.localisation!.latitude,
-          lon: uneOffre.localisation!.longitude
+          lon: uneOffre.localisation!.longitude,
+          dateDeDebutMinimum: uneOffre.dateDeDebut
         }
         const centRecherches = Array.from({ length: 100 }).fill(uneRecherche())
         rechercheRepository.trouverLesRecherchesServicesCiviques

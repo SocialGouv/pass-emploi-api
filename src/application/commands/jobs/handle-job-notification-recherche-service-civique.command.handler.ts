@@ -80,7 +80,8 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
         const criteres: GetServicesCiviqueQuery = {
           domaine: offre.domaine,
           lat: offre.localisation.latitude,
-          lon: offre.localisation.longitude
+          lon: offre.localisation.longitude,
+          dateDeDebutMinimum: offre.dateDeDebut
         }
         const depuisMinuit = maintenant.set({ hour: 0, minute: 0, second: 0 })
         const recherches =
