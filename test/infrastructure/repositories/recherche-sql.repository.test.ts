@@ -206,7 +206,7 @@ describe('RechercheSqlRepository', () => {
       }
 
       // When
-      await rechercheSqlRepository.updateRecherche(rechercheMiseAJour)
+      await rechercheSqlRepository.update(rechercheMiseAJour)
 
       // Then
       const recherches = await RechercheSqlModel.findAll({ raw: true })

@@ -74,7 +74,7 @@ export class RechercheSqlRepository implements Recherche.Repository {
     }
   }
 
-  async updateRecherche(recherche: Recherche): Promise<void> {
+  async update(recherche: Recherche): Promise<void> {
     await RechercheSqlModel.upsert({
       id: recherche.id,
       idJeune: recherche.idJeune,
