@@ -80,11 +80,9 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
       idDossier: jeune.idDossier
     }
 
-    await Promise.all([
-      this.authentificationRepository.deleteJeuneIdp(idJeune),
-      this.jeuneRepository.supprimer(idJeune),
-      this.chatRepository.supprimerChat(idJeune)
-    ])
+    await this.authentificationRepository.deleteJeuneIdp(idJeune)
+    await this.jeuneRepository.supprimer(idJeune)
+    await this.chatRepository.supprimerChat(idJeune)
 
     if (jeune.conseiller) {
       const mail = this.mailFactory.creerMailSuppressionJeune(jeune)
