@@ -9,7 +9,6 @@ module.exports = {
         modalite: 'Par téléphone',
         date: '2020-09-24T10:00:00.000',
         duree: '30',
-        id_jeune: '1',
         createur: '{"nom": "Tavernier", "prenom": "Nils", "id": "41"}'
       },
       {
@@ -20,7 +19,6 @@ module.exports = {
         modalite: 'Par téléphone',
         date: '2019-09-24T10:00:00.000',
         duree: '30',
-        id_jeune: '1',
         createur: '{"nom": "Tavernier", "prenom": "Nils", "id": "41"}'
       },
       {
@@ -31,7 +29,6 @@ module.exports = {
         modalite: 'Par téléphone',
         date: '2023-09-24T10:00:00.000',
         duree: '30',
-        id_jeune: '1',
         createur: '{"nom": "Tavernier", "prenom": "Nils", "id": "41"}'
       },
       {
@@ -42,7 +39,6 @@ module.exports = {
         modalite: 'Par téléphone',
         date: '2023-09-24T11:00:00.000',
         duree: '30',
-        id_jeune: '1',
         createur: '{"nom": "Tavernier", "prenom": "Nils", "id": "41"}'
       },
       {
@@ -53,7 +49,6 @@ module.exports = {
         modalite: 'Par téléphone',
         date: '2023-09-24T12:00:00.000',
         duree: '30',
-        id_jeune: '1',
         createur: '{"nom": "Tavernier", "prenom": "Nils", "id": "41"}'
       },
       {
@@ -64,7 +59,6 @@ module.exports = {
         modalite: 'Par téléphone',
         date: '2023-09-24T13:00:00.000',
         duree: '30',
-        id_jeune: '2',
         createur: '{"nom": "Tavernier", "prenom": "Nils", "id": "41"}'
       },
       {
@@ -75,7 +69,6 @@ module.exports = {
         modalite: 'Par téléphone',
         date: '2023-09-24T14:00:00.000',
         duree: '30',
-        id_jeune: '3',
         createur: '{"nom": "Tavernier", "prenom": "Nils", "id": "41"}'
       },
       {
@@ -86,7 +79,6 @@ module.exports = {
         modalite: 'Par téléphone',
         date: '2023-09-24T15:00:00.000',
         duree: '30',
-        id_jeune: '4',
         createur: '{"nom": "Tavernier", "prenom": "Nils", "id": "41"}'
       }
     ])
