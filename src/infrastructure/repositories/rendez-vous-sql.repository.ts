@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Op } from 'sequelize'
-import { RendezVous } from '../../domain/rendez-vous'
+import { JeuneDuRendezVous, RendezVous } from '../../domain/rendez-vous'
 import { DateService } from '../../utils/date-service'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
@@ -43,6 +43,18 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
     )
     await RendezVousJeuneAssociationSqlModel.destroy({
       where: { idRendezVous: idRendezVous }
+    })
+  }
+
+  async deleteAssociationAvecJeunes(
+    jeunes: JeuneDuRendezVous[]
+  ): Promise<void> {
+    await RendezVousJeuneAssociationSqlModel.destroy({
+      where: {
+        idJeune: {
+          [Op.in]: jeunes.map(jeune => jeune.id)
+        }
+      }
     })
   }
 

@@ -37,6 +37,16 @@ export interface Createur {
   prenom: string
 }
 
+export type JeuneDuRendezVous = Pick<
+  Jeune,
+  | 'id'
+  | 'firstName'
+  | 'lastName'
+  | 'conseiller'
+  | 'pushNotificationToken'
+  | 'email'
+>
+
 export interface RendezVous {
   id: string
   titre: string
@@ -45,17 +55,7 @@ export interface RendezVous {
   modalite?: string
   date: Date
   duree: number
-  jeunes: Array<
-    Pick<
-      Jeune,
-      | 'id'
-      | 'firstName'
-      | 'lastName'
-      | 'conseiller'
-      | 'pushNotificationToken'
-      | 'email'
-    >
-  >
+  jeunes: JeuneDuRendezVous[]
   type: CodeTypeRendezVous
   precision?: string
   adresse?: string
@@ -97,6 +97,7 @@ export namespace RendezVous {
     get(id: string): Promise<RendezVous | undefined>
     delete(idRendezVous: string): Promise<void>
     getAllAVenir(): Promise<RendezVous[]>
+    deleteAssociationAvecJeunes(jeunes: JeuneDuRendezVous[]): Promise<void>
   }
 
   export enum Periode {
