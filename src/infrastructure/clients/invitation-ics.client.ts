@@ -77,17 +77,14 @@ export class InvitationIcsClient {
       )
     )
 
-    const jeunesAttendees: Attendee[] = []
-    rendezVous.jeunes.forEach(jeune => {
-      if (jeune.email) {
-        jeunesAttendees.push({
-          name: jeune.lastName + ' ' + jeune.firstName,
-          email: jeune.email,
-          rsvp: true,
-          role: 'REQ-PARTICIPANT'
-        })
-      }
-    })
+    const jeunesAttendeesAvecEmail: Attendee[] = rendezVous.jeunes
+      .filter(jeune => jeune.email)
+      .map(jeune => ({
+        name: jeune.lastName + ' ' + jeune.firstName,
+        email: jeune.email,
+        rsvp: true,
+        role: 'REQ-PARTICIPANT'
+      }))
 
     return {
       uid: rendezVous.id,
@@ -124,7 +121,7 @@ export class InvitationIcsClient {
           rsvp: true,
           role: 'REQ-PARTICIPANT'
         },
-        ...jeunesAttendees
+        ...jeunesAttendeesAvecEmail
       ]
     }
   }
