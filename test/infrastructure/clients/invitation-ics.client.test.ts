@@ -9,6 +9,7 @@ import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitat
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { testConfig } from '../../utils/module-for-testing'
+import { unJeune } from 'test/fixtures/jeune.fixture'
 
 describe('InvitationIcsClient', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -60,10 +61,14 @@ describe('InvitationIcsClient', () => {
     })
   })
   describe('creerEvenementRendezVous', () => {
-    it('renvoie le bon évènement du rendez-vous', async () => {
+    it('renvoie le bon évènement du rendez-vous en excluant un jeune sans email', async () => {
       // Given
       const conseiller = unConseiller()
-      const rendezVous = unRendezVous()
+      const unJeuneAvecEmail = unJeune({ email: 'test@test.com' })
+      const unJeuneSansEmail = unJeune({ email: undefined })
+      const rendezVous = unRendezVous({
+        jeunes: [unJeuneAvecEmail, unJeuneSansEmail]
+      })
       const icsSequence = 0
 
       // When
@@ -85,7 +90,7 @@ describe('InvitationIcsClient', () => {
           {
             name: 'Doe John',
             role: 'REQ-PARTICIPANT',
-            email: 'john.doe@plop.io',
+            email: unJeuneAvecEmail.email,
             rsvp: true
           }
         ],
