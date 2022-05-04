@@ -94,6 +94,7 @@ export class RendezVousController {
   ): Promise<Core.Id> {
     const command: UpdateRendezVousCommand = {
       idRendezVous: idRendezVous,
+      idsJeunes: updateRendezVousPayload.jeunesIds,
       commentaire: updateRendezVousPayload.comment,
       date: updateRendezVousPayload.date,
       duree: updateRendezVousPayload.duration,
