@@ -84,47 +84,38 @@ module.exports = {
     ])
     await queryInterface.bulkInsert('rendez_vous_jeune_association', [
       {
-        id: 1,
         id_rendez_vous: '20C8CA73-FD8B-4194-8D3C-80B6C9949DEB',
         id_jeune: '1'
       },
       {
-        id: 2,
         id_rendez_vous: '77A9A9C5-A26A-4664-B07B-1356B6642D01',
         id_jeune: '1'
       },
       {
-        id: 3,
         id_rendez_vous: '89092e0a-1111-411b-ac32-4e8cb18498e3',
         id_jeune: '1'
       },
       {
-        id: 4,
         id_rendez_vous: '89092e0a-1111-411b-ac32-4e8cb18498e4',
         id_jeune: '1'
       },
       {
-        id: 5,
         id_rendez_vous: '89092e0a-1111-411b-ac32-4e8cb18498e5',
         id_jeune: '1'
       },
       {
-        id: 6,
         id_rendez_vous: '89092e0a-1111-411b-ac32-4e8cb18498e6',
         id_jeune: '2'
       },
       {
-        id: 7,
         id_rendez_vous: '89092e0a-1111-411b-ac32-4e8cb18498e7',
         id_jeune: '3'
       },
       {
-        id: 8,
         id_rendez_vous: '89092e0a-1111-411b-ac32-4e8cb18498e8',
         id_jeune: '4'
       },
       {
-        id: 9,
         id_rendez_vous: '20C8CA73-FD8B-4194-8D3C-80B6C9949DEB',
         id_jeune: '2'
       }
