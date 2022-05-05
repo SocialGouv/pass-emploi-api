@@ -81,11 +81,11 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
 
     const jeunesActuels: JeuneDuRendezVous[] = rendezVous.jeunes
     const jeunesInchanges: JeuneDuRendezVous[] = jeunesActuels.filter(
-      jeuneActuel => command.idsJeunes.includes(jeuneActuel.id!)
+      jeuneActuel => command.idsJeunes.includes(jeuneActuel.id)
     )
 
     const jeunesSupprimes: JeuneDuRendezVous[] = jeunesActuels.filter(
-      jeuneActuel => !command.idsJeunes.includes(jeuneActuel.id!)
+      jeuneActuel => !command.idsJeunes.includes(jeuneActuel.id)
     )
 
     const jeunesAjoutes: JeuneDuRendezVous[] = []
