@@ -102,8 +102,10 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       }
     }
 
-    const rendezVousUpdated = RendezVous.mettreAJour(rendezVous, command)
-    rendezVousUpdated.jeunes = [...jeunesInchanges, ...jeunesAjoutes]
+    const rendezVousUpdated = RendezVous.mettreAJour(rendezVous, {
+      ...command,
+      jeunes: [...jeunesInchanges, ...jeunesAjoutes]
+    })
 
     await this.replanifierLesRappelsDeRendezVous(rendezVousUpdated, rendezVous)
     await this.rendezVousRepository.save(rendezVousUpdated)
