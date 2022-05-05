@@ -14,12 +14,9 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
 
   async save(rendezVous: RendezVous): Promise<void> {
     const rendezVousDto = toRendezVousDto(rendezVous)
+
     await RendezVousSqlModel.upsert(rendezVousDto)
-    await RendezVousJeuneAssociationSqlModel.destroy({
-      where: {
-        idRendezVous: rendezVous.id
-      }
-    })
+
     await Promise.all(
       rendezVous.jeunes.map(jeune =>
         RendezVousJeuneAssociationSqlModel.upsert({
@@ -49,10 +46,12 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
   async deleteAssociationAvecJeunes(
     jeunes: JeuneDuRendezVous[]
   ): Promise<void> {
+    const idsJeunes = jeunes.map(jeune => jeune.id)
+
     await RendezVousJeuneAssociationSqlModel.destroy({
       where: {
         idJeune: {
-          [Op.in]: jeunes.map(jeune => jeune.id)
+          [Op.in]: idsJeunes
         }
       }
     })

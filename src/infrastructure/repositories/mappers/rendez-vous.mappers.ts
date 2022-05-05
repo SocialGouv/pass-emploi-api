@@ -1,10 +1,9 @@
-import { RendezVous } from 'src/domain/rendez-vous'
+import { JeuneDuRendezVous, RendezVous } from 'src/domain/rendez-vous'
 import {
   RendezVousDto,
   RendezVousSqlModel
 } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from 'src/infrastructure/sequelize/types'
-import { Jeune } from '../../../domain/jeune'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 
 export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
@@ -37,7 +36,7 @@ export function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
     duree: rendezVousSql.duree,
     date: rendezVousSql.date,
     commentaire: rendezVousSql.commentaire ?? undefined,
-    jeunes: pickJeunesRdv(rendezVousSql.jeunes),
+    jeunes: rendezVousSql.jeunes.map(fromJeuneSqlToJeuneDuRdv),
     type: rendezVousSql.type,
     precision: rendezVousSql.precision ?? undefined,
     adresse: rendezVousSql.adresse ?? undefined,
@@ -49,33 +48,19 @@ export function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
   }
 }
 
-function pickJeunesRdv(
-  jeunes: JeuneSqlModel[]
-): Array<
-  Pick<
-    Jeune,
-    | 'id'
-    | 'firstName'
-    | 'lastName'
-    | 'conseiller'
-    | 'pushNotificationToken'
-    | 'email'
-  >
-> {
-  return jeunes.map(jeune => {
-    return {
-      id: jeune.id,
-      firstName: jeune.prenom,
-      lastName: jeune.nom,
-      email: jeune.email ?? undefined,
-      pushNotificationToken: jeune.pushNotificationToken ?? undefined,
-      conseiller: {
-        id: jeune.conseiller!.id,
-        firstName: jeune.conseiller!.prenom,
-        lastName: jeune.conseiller!.nom,
-        structure: jeune.conseiller!.structure,
-        email: jeune.conseiller!.email ?? undefined
-      }
+function fromJeuneSqlToJeuneDuRdv(jeune: JeuneSqlModel): JeuneDuRendezVous {
+  return {
+    id: jeune.id,
+    firstName: jeune.prenom,
+    lastName: jeune.nom,
+    email: jeune.email ?? undefined,
+    pushNotificationToken: jeune.pushNotificationToken ?? undefined,
+    conseiller: {
+      id: jeune.conseiller!.id,
+      firstName: jeune.conseiller!.prenom,
+      lastName: jeune.conseiller!.nom,
+      structure: jeune.conseiller!.structure,
+      email: jeune.conseiller!.email ?? undefined
     }
-  })
+  }
 }

@@ -58,7 +58,7 @@ describe('RendezvousController', () => {
 
   describe('DELETE rendezvous/:idRendezVous', () => {
     const jeune = unJeune()
-    const rendezvous = unRendezVous({}, jeune)
+    const rendezvous = unRendezVous({ jeunes: [jeune] })
     const command: DeleteRendezVousCommand = {
       idRendezVous: rendezvous.id
     }
@@ -115,22 +115,24 @@ describe('RendezvousController', () => {
   })
   describe('PUT rendezvous/:idRendezVous', () => {
     const jeune = unJeune()
-    const rendezvous = unRendezVous({}, jeune)
-    const command: UpdateRendezVousCommand = {
+    const rendezvous = unRendezVous({ jeunes: [jeune] })
+    const payload: UpdateRendezVousPayload = {
+      jeunesIds: ['1'],
+      date: '2021-11-11T08:03:30.000Z',
+      comment: undefined,
+      duration: 30,
+      modality: undefined,
+      adresse: undefined,
+      organisme: undefined,
+      presenceConseiller: true
+    }
+    const expectedCommand: UpdateRendezVousCommand = {
+      idsJeunes: ['1'],
       idRendezVous: rendezvous.id,
       commentaire: undefined,
       date: '2021-11-11T08:03:30.000Z',
       duree: 30,
       modalite: undefined,
-      adresse: undefined,
-      organisme: undefined,
-      presenceConseiller: true
-    }
-    const payload: UpdateRendezVousPayload = {
-      date: '2021-11-11T08:03:30.000Z',
-      comment: undefined,
-      duration: 30,
-      modality: undefined,
       adresse: undefined,
       organisme: undefined,
       presenceConseiller: true
@@ -149,19 +151,21 @@ describe('RendezvousController', () => {
 
       expect(
         updateRendezVousCommandHandler.execute
-      ).to.have.be.calledWithExactly(command, unUtilisateurDecode())
+      ).to.have.be.calledWithExactly(expectedCommand, unUtilisateurDecode())
     })
     it("renvoie une 404 (NOT FOUND) quand le rendez-vous n'existe pas", async () => {
       //Given
       updateRendezVousCommandHandler.execute
-        .withArgs(command)
+        .withArgs(expectedCommand)
         .resolves(
-          failure(new NonTrouveError('Rendez-vous', command.idRendezVous))
+          failure(
+            new NonTrouveError('Rendez-vous', expectedCommand.idRendezVous)
+          )
         )
 
       const expectedMessageJson = {
         code: 'NON_TROUVE',
-        message: `Rendez-vous ${command.idRendezVous} non trouvé(e)`
+        message: `Rendez-vous ${expectedCommand.idRendezVous} non trouvé(e)`
       }
       //When - Then
       await request(app.getHttpServer())
@@ -173,7 +177,7 @@ describe('RendezvousController', () => {
     })
     it('renvoie une 400 (BAD REQUEST) pour une mauvaise commande', async () => {
       updateRendezVousCommandHandler.execute
-        .withArgs(command)
+        .withArgs(expectedCommand)
         .resolves(failure(new MauvaiseCommandeError('Rendez-vous')))
 
       //When - Then

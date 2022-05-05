@@ -34,7 +34,7 @@ describe('DeleteRendezVousCommandHandler', () => {
   let planificateurService: StubbedClass<PlanificateurService>
   let evenementService: StubbedClass<EvenementService>
   const jeune = unJeune()
-  const rendezVous = unRendezVous({}, jeune)
+  const rendezVous = unRendezVous({ jeunes: [jeune] })
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()

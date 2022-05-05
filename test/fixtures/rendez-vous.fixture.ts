@@ -9,17 +9,14 @@ import {
 } from '../../src/domain/rendez-vous'
 import { unJeune } from './jeune.fixture'
 
-export const unRendezVous = (
-  args: Partial<RendezVous> = {},
-  jeune = unJeune()
-): RendezVous => {
+export const unRendezVous = (args: Partial<RendezVous> = {}): RendezVous => {
   const defaults = {
     id: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb',
     titre: 'rdv',
     duree: 30,
     modalite: 'modalite',
     date: new Date('2021-11-11T08:03:30.000Z'),
-    jeunes: [jeune],
+    jeunes: [unJeune()],
     commentaire: 'commentaire',
     sousTitre: 'sous titre',
     type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
