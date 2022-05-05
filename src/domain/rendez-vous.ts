@@ -86,6 +86,7 @@ export interface InfosRendezVousAMettreAJour {
   date: string
   duree: number
   modalite?: string
+  jeunes: JeuneDuRendezVous[]
   adresse?: string
   organisme?: string
   presenceConseiller: boolean
@@ -149,6 +150,7 @@ export namespace RendezVous {
       date: new Date(infosRendezVousAMettreAJour.date),
       duree: infosRendezVousAMettreAJour.duree,
       modalite: infosRendezVousAMettreAJour.modalite,
+      jeunes: infosRendezVousAMettreAJour.jeunes,
       adresse: infosRendezVousAMettreAJour.adresse,
       organisme: infosRendezVousAMettreAJour.organisme,
       presenceConseiller: infosRendezVousAMettreAJour.presenceConseiller
