@@ -44,7 +44,7 @@ describe('CreateRendezVousCommandHandler', () => {
   let mailClient: StubbedType<Mail.Service>
   const jeune1 = unJeune({ id: 'jeune-1' })
   const jeune2 = unJeune({ id: 'jeune-2' })
-  const rendezVous = unRendezVous({}, jeune1)
+  const rendezVous = unRendezVous({ jeunes: [jeune1] })
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()

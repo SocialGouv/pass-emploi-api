@@ -68,6 +68,17 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       return failure(new NonTrouveError('RendezVous', command.idRendezVous))
     }
 
+    if (
+      !command.presenceConseiller &&
+      rendezVous.type === CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
+    ) {
+      return failure(
+        new MauvaiseCommandeError(
+          'Le champ presenceConseiller ne peut etre modifé pour un rendez-vous Conseiller'
+        )
+      )
+    }
+
     const jeunesActuels: JeuneDuRendezVous[] = rendezVous.jeunes
     const jeunesInchanges: JeuneDuRendezVous[] = jeunesActuels.filter(
       jeuneActuel => command.idsJeunes.includes(jeuneActuel.id!)
@@ -93,17 +104,6 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
 
     const rendezVousUpdated = RendezVous.mettreAJour(rendezVous, command)
     rendezVousUpdated.jeunes = [...jeunesInchanges, ...jeunesAjoutes]
-
-    if (
-      !command.presenceConseiller &&
-      rendezVous.type === CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
-    ) {
-      return failure(
-        new MauvaiseCommandeError(
-          'Le champ presenceConseiller ne peut etre modifé pour un rendez-vous Conseiller'
-        )
-      )
-    }
 
     await this.replanifierLesRappelsDeRendezVous(rendezVousUpdated, rendezVous)
     await this.rendezVousRepository.save(rendezVousUpdated)

@@ -66,56 +66,55 @@ describe('RendezVousRepositorySql', () => {
   })
 
   describe('save', () => {
-    describe("quand c'est un rdv inexistant", () => {
-      it('crée le rdv', async () => {
-        //Given
-        const id = '20c8ca73-fd8b-4194-8d3c-80b6c9949dea'
+    //Given
+    const id = '20c8ca73-fd8b-4194-8d3c-80b6c9949dea'
+    const jeune = unJeune()
+    const unRendezVousTest = unRendezVous({ id, jeunes: [jeune] })
 
+    describe("quand c'est un rdv inexistant", () => {
+      it("crée le rdv et l'association", async () => {
         // When
-        await rendezVousRepositorySql.save(unRendezVous({ id }))
+        await rendezVousRepositorySql.save(unRendezVousTest)
 
         // Then
         const rdv = await RendezVousSqlModel.findByPk(id)
+        const associations = await RendezVousJeuneAssociationSqlModel.findAll({
+          where: { idRendezVous: id }
+        })
         expect(rdv?.id).to.equal(id)
+        expect(associations.length).to.equal(1)
+        expect(associations[0].idJeune).to.equal(jeune.id)
       })
     })
     describe("quand c'est un rdv existant", () => {
-      it('met à jour les informations du rdv', async () => {
-        //Given
-        const id = '20c8ca73-fd8b-4194-8d3c-80b6c9949dea'
-        const commentaire = 'new'
-        await rendezVousRepositorySql.save(unRendezVous({ id }))
+      //Given
+      const commentaire = 'modification'
 
-        // When
-        await rendezVousRepositorySql.save(unRendezVous({ id, commentaire }))
+      // When
+      beforeEach(async () => {
+        await rendezVousRepositorySql.save(unRendezVousTest)
+        await rendezVousRepositorySql.save({ ...unRendezVousTest, commentaire })
+      })
 
+      it('met à jour les informations du rdv en ne rajoutant pas une association supplémentaire', async () => {
         // Then
         const rdv = await RendezVousSqlModel.findByPk(id)
+        const associations = await RendezVousJeuneAssociationSqlModel.findAll({
+          where: { idRendezVous: id }
+        })
         expect(rdv?.id).to.equal(id)
         expect(rdv?.commentaire).to.equal(commentaire)
+        expect(associations.length).to.equal(1)
+        expect(associations[0].idJeune).to.equal(jeune.id)
       })
       it('supprime les informations du rdv', async () => {
-        //Given
-        const id = '20c8ca73-fd8b-4194-8d3c-80b6c9949dea'
-        // When
-        await rendezVousRepositorySql.save(
-          unRendezVous({
-            id,
-            commentaire: 'test',
-            modalite: 'test',
-            adresse: 'test',
-            organisme: 'test'
-          })
-        )
-        await rendezVousRepositorySql.save(
-          unRendezVous({
-            id,
-            commentaire: undefined,
-            modalite: undefined,
-            adresse: undefined,
-            organisme: undefined
-          })
-        )
+        await rendezVousRepositorySql.save({
+          ...unRendezVousTest,
+          commentaire: undefined,
+          modalite: undefined,
+          adresse: undefined,
+          organisme: undefined
+        })
 
         // Then
         const rdv = await RendezVousSqlModel.findByPk(id)
@@ -125,29 +124,24 @@ describe('RendezVousRepositorySql', () => {
         expect(rdv?.adresse).to.equal(null)
         expect(rdv?.organisme).to.equal(null)
       })
-      it('met à jour les informations des jeunes en supprimant les anciennes associations', async () => {
-        //Given
-        const id = '20c8ca73-fd8b-4194-8d3c-80b6c9949dea'
-        const unAutreJeune = unJeune({ id: 'PLOP' })
-        await JeuneSqlModel.creer(unJeuneDto({ id: 'PLOP' }))
-        await rendezVousRepositorySql.save(
-          unRendezVous({ id, jeunes: [jeune, unAutreJeune] })
-        )
-
-        // When
-        await rendezVousRepositorySql.save(
-          unRendezVous({ id, jeunes: [jeune] })
-        )
-
-        // Then
-        const association = await RendezVousJeuneAssociationSqlModel.findAll({
-          where: {
-            idRendezVous: id
-          }
+      it('met à jour les informations du rdv en ajoutant une association quand on rajoute un jeune', async () => {
+        // Given
+        const nouveauJeune = unJeune({ id: 'nouveauJeune' })
+        await JeuneSqlModel.creer(unJeuneDto({ id: nouveauJeune.id }))
+        await rendezVousRepositorySql.save({
+          ...unRendezVousTest,
+          jeunes: unRendezVousTest.jeunes.concat(nouveauJeune)
         })
 
-        expect(association.length).to.equal(1)
-        expect(association[0].idJeune).to.equal(jeune.id)
+        // Then
+        const rdv = await RendezVousSqlModel.findByPk(id)
+        const associations = await RendezVousJeuneAssociationSqlModel.findAll({
+          where: { idRendezVous: id }
+        })
+        expect(rdv?.id).to.equal(id)
+        expect(associations.length).to.equal(2)
+        expect(associations[0].idJeune).to.equal(jeune.id)
+        expect(associations[1].idJeune).to.equal(nouveauJeune.id)
       })
     })
   })
@@ -200,6 +194,56 @@ describe('RendezVousRepositorySql', () => {
       )
       expect(rendezVous[0].jeunes[0].id).to.equal(jeune.id)
       expect(rendezVous[1].id).to.equal(unRendezVousProche.id)
+    })
+  })
+
+  describe('delete', () => {
+    describe('quand le rdv existe', () => {
+      it("met une date de suppression et supprime l'association", async () => {
+        // Given
+        const idRdv = '6c242fa0-804f-11ec-a8a3-0242ac120002'
+        const rendezVousDto = unRendezVousDto({
+          id: idRdv
+        })
+        await RendezVousSqlModel.create(rendezVousDto)
+        await RendezVousJeuneAssociationSqlModel.create({
+          idRendezVous: rendezVousDto.id,
+          idJeune: jeune.id
+        })
+        // When
+        await rendezVousRepositorySql.delete(idRdv)
+        // Then
+        const rdvSupprime = await RendezVousSqlModel.findByPk(rendezVousDto.id)
+        const associations = await RendezVousJeuneAssociationSqlModel.findAll({
+          where: { idRendezVous: rendezVousDto.id }
+        })
+        expect(rdvSupprime?.id).to.equal(rendezVousDto.id)
+        expect(rdvSupprime?.dateSuppression).to.deep.equal(
+          maintenant.toJSDate()
+        )
+        expect(associations.length).to.equal(0)
+      })
+    })
+  })
+
+  describe('deleteAssociationAvecJeunes', () => {
+    it("supprime les associations d'un jeune", async () => {
+      // Given
+      const rendezVousDto = unRendezVousDto({
+        id: '6c242fa0-804f-11ec-a8a3-0242ac120002'
+      })
+      await RendezVousSqlModel.create(rendezVousDto)
+      await RendezVousJeuneAssociationSqlModel.create({
+        idRendezVous: rendezVousDto.id,
+        idJeune: jeune.id
+      })
+      // When
+      await rendezVousRepositorySql.deleteAssociationAvecJeunes([jeune])
+      // Then
+      const associations = await RendezVousJeuneAssociationSqlModel.findAll({
+        where: { idJeune: jeune.id }
+      })
+      expect(associations.length).to.equal(0)
     })
   })
 })

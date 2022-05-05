@@ -25,7 +25,10 @@ describe('RendezVousAuthorizer', () => {
         const conseiller = unConseiller()
         const jeune = unJeune(conseiller)
         const utilisateur = unUtilisateurConseiller({ id: conseiller.id })
-        const rendezVous = { ...unRendezVous({}, jeune), id: 'rdv-id' }
+        const rendezVous = {
+          ...unRendezVous({ jeunes: [jeune] }),
+          id: 'rdv-id'
+        }
 
         rendezVousRepository.get.withArgs('rdv-id').resolves(rendezVous)
 
@@ -44,7 +47,10 @@ describe('RendezVousAuthorizer', () => {
         // Given
         const conseiller = unConseiller()
         const jeune = unJeune(conseiller)
-        const rendezVous = { ...unRendezVous({}, jeune), id: 'rdv-id' }
+        const rendezVous = {
+          ...unRendezVous({ jeunes: [jeune] }),
+          id: 'rdv-id'
+        }
         const utilisateur = unUtilisateurConseiller({
           id: 'un_autre-conseiller'
         })
