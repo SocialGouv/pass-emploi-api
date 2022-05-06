@@ -7,7 +7,8 @@ export const unConseiller = (args: Partial<Conseiller> = {}): Conseiller => {
     lastName: 'Tavernier',
     firstName: 'Nils',
     structure: Core.Structure.POLE_EMPLOI,
-    email: 'nils.tavernier@passemploi.com'
+    email: 'nils.tavernier@passemploi.com',
+    notificationsSonores: false
   }
   return { ...defaults, ...args }
 }

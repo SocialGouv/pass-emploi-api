@@ -50,7 +50,8 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
         email: conseillerSql.email ?? undefined,
         dateVerificationMessages: DateTime.fromJSDate(
           conseillerSql.dateVerificationMessages
-        )
+        ),
+        notificationsSonores: conseillerSql.notificationsSonores
       }
     })
   }
@@ -75,7 +76,8 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
       dateVerificationMessages:
         conseiller.dateVerificationMessages ?? undefined,
       idAgence: conseiller.agence?.id ?? null,
-      nomManuelAgence: !conseiller.agence?.id ? conseiller.agence?.nom : null
+      nomManuelAgence: !conseiller.agence?.id ? conseiller.agence?.nom : null,
+      notificationsSonores: conseiller.notificationsSonores
     })
   }
 }
@@ -90,7 +92,8 @@ export function fromSqlConseillerToAggregate(
     structure: conseillerSqlModel.structure,
     email: conseillerSqlModel.email || undefined,
     agence: conseillerSqlModel.agence,
-    nomAgenceManuel: conseillerSqlModel.nomManuelAgence
+    nomAgenceManuel: conseillerSqlModel.nomManuelAgence ?? undefined,
+    notificationsSonores: conseillerSqlModel.notificationsSonores
   }
   if (conseillerSqlModel.agence) {
     conseiller.agence = {

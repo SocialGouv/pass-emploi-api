@@ -8,6 +8,7 @@ import {
 } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { Core } from '../../../../src/domain/core'
 import Structure = Core.Structure
+import { DetailConseillerQueryModel } from '../../../../src/application/queries/query-models/conseillers.query-models'
 
 describe('fromSqlToDetailConseillerQueryModel', () => {
   before(() => {
@@ -23,13 +24,15 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
       const result = fromSqlToDetailConseillerQueryModel(sql)
 
       // Then
-      expect(result).to.deep.equal({
+      const expected: DetailConseillerQueryModel = {
         id: '1',
         firstName: 'Nils',
         lastName: 'Tavernier',
         email: 'nils.tavernier@passemploi.com',
-        agence: undefined
-      })
+        agence: undefined,
+        notificationsSonores: false
+      }
+      expect(result).to.deep.equal(expected)
     })
   })
 
@@ -46,7 +49,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
       const result = fromSqlToDetailConseillerQueryModel(sql)
 
       // Then
-      expect(result).to.deep.equal({
+      const expected: DetailConseillerQueryModel = {
         id: '1',
         firstName: 'Nils',
         lastName: 'Tavernier',
@@ -54,8 +57,10 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
         agence: {
           id: undefined,
           nom: "nom d'agence"
-        }
-      })
+        },
+        notificationsSonores: false
+      }
+      expect(result).to.deep.equal(expected)
     })
   })
 
@@ -84,7 +89,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
       const result = fromSqlToDetailConseillerQueryModel(sql!)
 
       // Then
-      expect(result).to.deep.equal({
+      const expected: DetailConseillerQueryModel = {
         id: '1',
         firstName: 'Nils',
         lastName: 'Tavernier',
@@ -92,8 +97,10 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
         agence: {
           id: "id d'agence",
           nom: 'Bonjour je suis une agence'
-        }
-      })
+        },
+        notificationsSonores: false
+      }
+      expect(result).to.deep.equal(expected)
     })
   })
 })

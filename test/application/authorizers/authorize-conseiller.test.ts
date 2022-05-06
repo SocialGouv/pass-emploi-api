@@ -102,7 +102,8 @@ describe('ConseillerAuthorizer', () => {
           id: 'un-autre-conseiller',
           lastName: 'Dylan',
           firstName: 'Bob',
-          structure: Core.Structure.POLE_EMPLOI
+          structure: Core.Structure.POLE_EMPLOI,
+          notificationsSonores: false
         }
         conseillerRepository.get
           .withArgs(unAutreConseiller.id)

@@ -6,7 +6,8 @@ export function detailConseillerQueryModel(
   const defaults: DetailConseillerQueryModel = {
     id: '1',
     firstName: 'Nils',
-    lastName: 'Tavernier'
+    lastName: 'Tavernier',
+    notificationsSonores: false
   }
 
   return { ...defaults, ...args }
