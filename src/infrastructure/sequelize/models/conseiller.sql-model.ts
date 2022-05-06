@@ -81,6 +81,12 @@ export class ConseillerDto extends Model {
     type: DataType.STRING
   })
   nomManuelAgence?: string
+
+  @Column({
+    field: 'notifications_sonores',
+    type: DataType.BOOLEAN
+  })
+  notificationsSonores: boolean
 }
 
 @Table({
