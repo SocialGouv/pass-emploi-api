@@ -1,7 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { TypeRendezVous } from 'src/domain/rendez-vous'
 import { ActionQueryModel } from './actions.query-model'
-import { DetailConseillerQueryModel } from './conseillers.query-models'
 import { RendezVousBaseQueryModel } from './rendez-vous.query-models'
 
 class RendezVousJeuneHomeQueryModel implements RendezVousBaseQueryModel {
@@ -42,6 +41,20 @@ class RendezVousJeuneHomeQueryModel implements RendezVousBaseQueryModel {
   presenceConseiller: boolean
 }
 
+export class ConseillerJeuneQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
+  firstName: string
+
+  @ApiProperty()
+  lastName: string
+
+  @ApiPropertyOptional()
+  email?: string
+}
+
 export class JeuneHomeQueryModel {
   @ApiProperty({
     type: ActionQueryModel,
@@ -53,9 +66,9 @@ export class JeuneHomeQueryModel {
   doneActionsCount: number
 
   @ApiProperty({
-    type: DetailConseillerQueryModel
+    type: ConseillerJeuneQueryModel
   })
-  conseiller: DetailConseillerQueryModel
+  conseiller: ConseillerJeuneQueryModel
 
   @ApiProperty({
     type: RendezVousJeuneHomeQueryModel,

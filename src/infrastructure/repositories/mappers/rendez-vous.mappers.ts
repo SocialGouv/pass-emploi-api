@@ -60,7 +60,9 @@ function fromJeuneSqlToJeuneDuRdv(jeune: JeuneSqlModel): JeuneDuRendezVous {
       firstName: jeune.conseiller!.prenom,
       lastName: jeune.conseiller!.nom,
       structure: jeune.conseiller!.structure,
-      email: jeune.conseiller!.email ?? undefined
+      email: jeune.conseiller!.email ?? undefined,
+        notificationsSonores: jeune.conseiller!.notificationsSonores
+      }
     }
-  }
+
 }

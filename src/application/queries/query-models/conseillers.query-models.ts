@@ -16,4 +16,7 @@ export class DetailConseillerQueryModel {
 
   @ApiProperty({ required: false })
   agence?: AgenceQueryModel
+
+  @ApiProperty()
+  notificationsSonores: boolean
 }

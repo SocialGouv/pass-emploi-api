@@ -11,6 +11,7 @@ export interface Conseiller {
   dateVerificationMessages?: DateTime
   agence?: Agence
   nomAgenceManuel?: string
+  notificationsSonores: boolean
 }
 
 export const ConseillersRepositoryToken = 'Conseiller.Repository'
@@ -33,7 +34,8 @@ export namespace Conseiller {
   ): Conseiller {
     return {
       ...conseiller,
-      agence: infosDeMiseAJour.agence
+      agence: infosDeMiseAJour.agence,
+      notificationsSonores: Boolean(infosDeMiseAJour.notificationsSonores)
     }
   }
 

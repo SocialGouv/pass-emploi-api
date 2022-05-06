@@ -46,7 +46,8 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
           return failure(new NonTrouveError('Agence', query.agence.id))
       }
       const conseiller = Conseiller.mettreAJour(conseillerActuel, {
-        agence: query.agence
+        agence: query.agence,
+        notificationsSonores: query.notificationsSonores
       })
       await this.conseillerRepository.save(conseiller)
       return emptySuccess()

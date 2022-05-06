@@ -11,7 +11,10 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { Unauthorized } from '../../../src/domain/erreur'
 import Structure = Core.Structure
-import { ModifierConseillerCommandHandler } from '../../../src/application/commands/modifier-conseiller.command.handler'
+import {
+  ModifierConseillerCommand,
+  ModifierConseillerCommandHandler
+} from '../../../src/application/commands/modifier-conseiller.command.handler'
 
 describe('ModifierConseillerQueryHandler', () => {
   let conseillerRepository: StubbedType<Conseiller.Repository>
@@ -26,7 +29,8 @@ describe('ModifierConseillerQueryHandler', () => {
     email: 'mail@mail.mail',
     dateVerificationMessages: undefined,
     agence: undefined,
-    nomAgenceManuel: undefined
+    nomAgenceManuel: undefined,
+    notificationsSonores: false
   }
 
   const agenceQuiExiste: Agence = {
@@ -100,24 +104,34 @@ describe('ModifierConseillerQueryHandler', () => {
     describe("Quand le conseiller et l'agence existent", () => {
       it('le conseiller est bien modifié', async function () {
         // Given
-        const query = {
-          idConseiller: 'id qui existe',
+        const command: ModifierConseillerCommand = {
+          idConseiller: 'id-conseiller',
           agence: {
-            id: "agence qui n'existe pas"
-          }
+            id: 'id-agence'
+          },
+          notificationsSonores: true
         }
         conseillerRepository.get
-          .withArgs('id qui existe')
+          .withArgs('id-conseiller')
           .resolves(conseillerQuiExiste)
-        agencesRepository.get
-          .withArgs("agence qui n'existe pas")
-          .resolves(agenceQuiExiste)
+        agencesRepository.get.withArgs('id-agence').resolves(agenceQuiExiste)
 
         // When
-        const result = await handler.handle(query)
+        const result = await handler.handle(command)
 
         // Then
         expect(result._isSuccess).to.equal(true)
+        expect(conseillerRepository.save).to.have.been.calledWithExactly({
+          id: 'id qui existe',
+          firstName: 'Jean michel',
+          lastName: 'Conseiller',
+          structure: 'MILO',
+          email: 'mail@mail.mail',
+          dateVerificationMessages: undefined,
+          agence: { id: 'id-agence' },
+          nomAgenceManuel: undefined,
+          notificationsSonores: true
+        })
       })
     })
   })

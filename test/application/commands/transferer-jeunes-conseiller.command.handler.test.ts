@@ -75,7 +75,8 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
               id: command.idConseillerSource,
               firstName: 'test',
               lastName: 'test',
-              structure: Structure.PASS_EMPLOI
+              structure: Structure.PASS_EMPLOI,
+              notificationsSonores: false
             }
           })
         )
@@ -86,7 +87,8 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
               id: command.idConseillerSource,
               firstName: 'test',
               lastName: 'test',
-              structure: Structure.PASS_EMPLOI
+              structure: Structure.PASS_EMPLOI,
+              notificationsSonores: false
             }
           })
         )
@@ -228,7 +230,8 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
               id: 'ABC123',
               firstName: 'test',
               lastName: 'test',
-              structure: Structure.PASS_EMPLOI
+              structure: Structure.PASS_EMPLOI,
+              notificationsSonores: false
             }
           })
         )

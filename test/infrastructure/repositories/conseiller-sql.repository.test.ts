@@ -24,6 +24,7 @@ describe('ConseillerSqlRepository', () => {
         firstName: 'Nils',
         structure: Core.Structure.POLE_EMPLOI,
         email: 'nils.tavernier@passemploi.com',
+        notificationsSonores: false,
         agence: {
           id: 'id'
         }
@@ -41,7 +42,7 @@ describe('ConseillerSqlRepository', () => {
       const result = await conseillerSqlRepository.get(conseiller.id)
 
       // Then
-      expect(result).to.deep.equal({
+      const expected: Conseiller = {
         id: '1',
         lastName: 'Tavernier',
         firstName: 'Nils',
@@ -51,8 +52,10 @@ describe('ConseillerSqlRepository', () => {
           id: 'id',
           nom: 'nom'
         },
-        nomAgenceManuel: null
-      })
+        nomAgenceManuel: undefined,
+        notificationsSonores: false
+      }
+      expect(result).to.deep.equal(expected)
     })
   })
 
