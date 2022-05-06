@@ -11,7 +11,7 @@ export function unJeuneDto(
     nom: 'Doe',
     idConseiller: '1',
     dateCreation: new Date('2021-11-11T08:03:30.000Z'),
-    pushNotificationToken: null,
+    pushNotificationToken: 'unToken',
     dateDerniereActualisationToken: null,
     email: 'john.doe@plop.io',
     structure: Core.Structure.MILO,

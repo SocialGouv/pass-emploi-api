@@ -86,7 +86,6 @@ export interface InfosRendezVousAMettreAJour {
   date: string
   duree: number
   modalite?: string
-  idsJeunes: string[]
   jeunes: Jeune[]
   adresse?: string
   organisme?: string
