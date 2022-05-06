@@ -76,7 +76,10 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
       dateVerificationMessages:
         conseiller.dateVerificationMessages ?? undefined,
       idAgence: conseiller.agence?.id ?? null,
-      nomManuelAgence: !conseiller.agence?.id ? conseiller.agence?.nom : null,
+      nomManuelAgence:
+        !conseiller.agence?.id && conseiller.agence?.nom
+          ? conseiller.agence.nom
+          : null,
       notificationsSonores: conseiller.notificationsSonores
     })
   }
