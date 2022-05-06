@@ -20,13 +20,15 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
   async save(rendezVous: RendezVous): Promise<void> {
     const rendezVousDto = toRendezVousDto(rendezVous)
 
-    const queryInterface = this.sequelize.getQueryInterface()
-    await queryInterface.sequelize.transaction(async transaction => {
+    await this.sequelize.transaction(async transaction => {
       await RendezVousSqlModel.upsert(rendezVousDto, { transaction })
       await RendezVousJeuneAssociationSqlModel.destroy({
         transaction,
         where: {
-          idRendezVous: rendezVous.id
+          idRendezVous: rendezVous.id,
+          idJeune: {
+            [Op.notIn]: rendezVous.jeunes.map(jeune => jeune.id)
+          }
         }
       })
       await Promise.all(

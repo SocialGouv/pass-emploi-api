@@ -1,24 +1,29 @@
-import { unRendezVous } from 'test/fixtures/rendez-vous.fixture'
-import { Jeune } from '../../../src/domain/jeune'
+import {
+  unJeuneDuRendezVous,
+  unRendezVous
+} from 'test/fixtures/rendez-vous.fixture'
 import { RendezVousRepositorySql } from '../../../src/infrastructure/repositories/rendez-vous-sql.repository'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { DateService } from '../../../src/utils/date-service'
 import { uneDatetime, uneDatetimeMinuit } from '../../fixtures/date.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { DatabaseForTesting, expect, stubClass } from '../../utils'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
+import { JeuneDuRendezVous, RendezVous } from '../../../src/domain/rendez-vous'
+import { Core } from '../../../src/domain/core'
+import Structure = Core.Structure
 
 describe('RendezVousRepositorySql', () => {
   const databaseForTesting: DatabaseForTesting = DatabaseForTesting.prepare()
   let rendezVousRepositorySql: RendezVousRepositorySql
   const maintenant = uneDatetime
   const aujourdhuiMinuit = uneDatetimeMinuit
-  let jeune: Jeune
+  let jeune: JeuneDuRendezVous
+  let unAutreJeune: JeuneDuRendezVous
 
   beforeEach(async () => {
     const dateService = stubClass(DateService)
@@ -30,9 +35,15 @@ describe('RendezVousRepositorySql', () => {
     )
 
     // Given
-    jeune = unJeune()
-    await ConseillerSqlModel.creer(unConseillerDto())
+    await ConseillerSqlModel.creer(
+      unConseillerDto({
+        structure: Structure.POLE_EMPLOI
+      })
+    )
+    jeune = unJeuneDuRendezVous()
     await JeuneSqlModel.creer(unJeuneDto())
+    unAutreJeune = unJeuneDuRendezVous({ id: 'un-autre-jeune' })
+    await JeuneSqlModel.creer(unJeuneDto({ id: 'un-autre-jeune' }))
   })
 
   describe('get', () => {
@@ -69,10 +80,13 @@ describe('RendezVousRepositorySql', () => {
   })
 
   describe('save', () => {
-    //Given
     const id = '20c8ca73-fd8b-4194-8d3c-80b6c9949dea'
-    const jeune = unJeune()
-    const unRendezVousTest = unRendezVous({ id, jeunes: [jeune] })
+    let unRendezVousTest: RendezVous
+
+    beforeEach(() => {
+      //Given
+      unRendezVousTest = unRendezVous({ id, jeunes: [jeune] })
+    })
 
     describe("quand c'est un rdv inexistant", () => {
       it("crée le rdv et l'association", async () => {
@@ -90,26 +104,71 @@ describe('RendezVousRepositorySql', () => {
       })
     })
     describe("quand c'est un rdv existant", () => {
-      //Given
-      const commentaire = 'modification'
-
       // When
       beforeEach(async () => {
         await rendezVousRepositorySql.save(unRendezVousTest)
-        await rendezVousRepositorySql.save({ ...unRendezVousTest, commentaire })
       })
 
-      it('met à jour les informations du rdv en ne rajoutant pas une association supplémentaire', async () => {
-        // Then
-        const rdv = await RendezVousSqlModel.findByPk(id)
-        const associations = await RendezVousJeuneAssociationSqlModel.findAll({
-          where: { idRendezVous: id }
+      describe('quand il y a un jeune en plus', () => {
+        it('met à jour les informations du rdv en ajoutant une association quand on rajoute un jeune', async () => {
+          // Given
+          const nouveauJeune = unJeuneDuRendezVous({ id: 'nouveauJeune' })
+          await JeuneSqlModel.creer(unJeuneDto({ id: nouveauJeune.id }))
+          const rendezVousAvecUnJeuneDePlus: RendezVous = {
+            ...unRendezVousTest,
+            jeunes: unRendezVousTest.jeunes.concat(nouveauJeune)
+          }
+          await rendezVousRepositorySql.save(rendezVousAvecUnJeuneDePlus)
+
+          // Then
+          const actual = await rendezVousRepositorySql.get(
+            rendezVousAvecUnJeuneDePlus.id
+          )
+          expect(actual).to.deep.equal(rendezVousAvecUnJeuneDePlus)
         })
-        expect(rdv?.id).to.equal(id)
-        expect(rdv?.commentaire).to.equal(commentaire)
-        expect(associations.length).to.equal(1)
-        expect(associations[0].idJeune).to.equal(jeune.id)
       })
+
+      describe('quand on enlève un jeune du rendez-vous', () => {
+        it('met à jour les informations du rdv en ajoutant une association quand on rajoute un jeune', async () => {
+          // Given
+          const rendezVousAvecUnJeuneDeMoins: RendezVous = {
+            ...unRendezVousTest,
+            jeunes: unRendezVousTest.jeunes.filter(
+              jeune => jeune.id !== unAutreJeune.id
+            )
+          }
+          await rendezVousRepositorySql.save(rendezVousAvecUnJeuneDeMoins)
+
+          // Then
+          const actual = await rendezVousRepositorySql.get(
+            rendezVousAvecUnJeuneDeMoins.id
+          )
+          expect(actual).to.deep.equal(rendezVousAvecUnJeuneDeMoins)
+        })
+      })
+
+      describe('quand on ne change pas le nombre de jeunes', () => {
+        it('met à jour les informations du rdv en ne rajoutant pas une association supplémentaire', async () => {
+          // Given
+          const unRendezVousModifie: RendezVous = {
+            ...unRendezVousTest,
+            commentaire: 'un commentaire modifié',
+            precision: 'une autre précision',
+            adresse: 'un autre endroit',
+            invitation: false,
+            sousTitre: 'nouveau sous titre',
+            presenceConseiller: true
+          }
+
+          // When
+          await rendezVousRepositorySql.save(unRendezVousModifie)
+
+          // Then
+          const actual = await rendezVousRepositorySql.get(unRendezVousTest.id)
+          expect(actual).to.deep.equal(unRendezVousModifie)
+        })
+      })
+
       it('supprime les informations du rdv', async () => {
         await rendezVousRepositorySql.save({
           ...unRendezVousTest,
@@ -126,25 +185,6 @@ describe('RendezVousRepositorySql', () => {
         expect(rdv?.modalite).to.equal(null)
         expect(rdv?.adresse).to.equal(null)
         expect(rdv?.organisme).to.equal(null)
-      })
-      it('met à jour les informations du rdv en ajoutant une association quand on rajoute un jeune', async () => {
-        // Given
-        const nouveauJeune = unJeune({ id: 'nouveauJeune' })
-        await JeuneSqlModel.creer(unJeuneDto({ id: nouveauJeune.id }))
-        await rendezVousRepositorySql.save({
-          ...unRendezVousTest,
-          jeunes: unRendezVousTest.jeunes.concat(nouveauJeune)
-        })
-
-        // Then
-        const rdv = await RendezVousSqlModel.findByPk(id)
-        const associations = await RendezVousJeuneAssociationSqlModel.findAll({
-          where: { idRendezVous: id }
-        })
-        expect(rdv?.id).to.equal(id)
-        expect(associations.length).to.equal(2)
-        expect(associations[0].idJeune).to.equal(jeune.id)
-        expect(associations[1].idJeune).to.equal(nouveauJeune.id)
       })
     })
   })

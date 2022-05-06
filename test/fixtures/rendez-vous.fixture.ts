@@ -5,30 +5,49 @@ import {
 import {
   RendezVous,
   CodeTypeRendezVous,
-  mapCodeLabelTypeRendezVous
+  mapCodeLabelTypeRendezVous,
+  JeuneDuRendezVous
 } from '../../src/domain/rendez-vous'
-import { unJeune } from './jeune.fixture'
+import { unConseiller } from './conseiller.fixture'
 
 export const unRendezVous = (args: Partial<RendezVous> = {}): RendezVous => {
-  const defaults = {
+  const defaults: RendezVous = {
     id: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb',
     titre: 'rdv',
     duree: 30,
     modalite: 'modalite',
     date: new Date('2021-11-11T08:03:30.000Z'),
-    jeunes: [unJeune()],
+    jeunes: [unJeuneDuRendezVous()],
     commentaire: 'commentaire',
     sousTitre: 'sous titre',
     type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
     presenceConseiller: true,
     adresse: undefined,
     organisme: undefined,
+    invitation: undefined,
+    icsSequence: undefined,
+    precision: 'Ceci est une précision',
     createur: {
       id: '1',
       nom: 'Tavernier',
       prenom: 'Nils'
     }
   }
+  return { ...defaults, ...args }
+}
+
+export const unJeuneDuRendezVous = (
+  args: Partial<JeuneDuRendezVous> = {}
+): Required<JeuneDuRendezVous> => {
+  const defaults = {
+    id: 'ABCDE',
+    firstName: 'John',
+    lastName: 'Doe',
+    conseiller: unConseiller(),
+    pushNotificationToken: 'unToken',
+    email: 'john.doe@plop.io'
+  }
+
   return { ...defaults, ...args }
 }
 
