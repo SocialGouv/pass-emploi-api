@@ -86,7 +86,8 @@ export interface InfosRendezVousAMettreAJour {
   date: string
   duree: number
   modalite?: string
-  jeunes: JeuneDuRendezVous[]
+  idsJeunes: string[]
+  jeunes: Jeune[]
   adresse?: string
   organisme?: string
   presenceConseiller: boolean
@@ -98,7 +99,6 @@ export namespace RendezVous {
     get(id: string): Promise<RendezVous | undefined>
     delete(idRendezVous: string): Promise<void>
     getAllAVenir(): Promise<RendezVous[]>
-    deleteAssociationAvecJeunes(jeunes: JeuneDuRendezVous[]): Promise<void>
   }
 
   export enum Periode {
@@ -140,10 +140,10 @@ export namespace RendezVous {
     }
   }
 
-  export function mettreAJour(
+  export async function mettreAJour(
     rendezVousInitial: RendezVous,
     infosRendezVousAMettreAJour: InfosRendezVousAMettreAJour
-  ): RendezVous {
+  ): Promise<RendezVous> {
     return {
       ...rendezVousInitial,
       commentaire: infosRendezVousAMettreAJour.commentaire,

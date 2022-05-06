@@ -1,30 +1,46 @@
-import { Injectable } from '@nestjs/common'
-import { Op } from 'sequelize'
-import { JeuneDuRendezVous, RendezVous } from '../../domain/rendez-vous'
+import { Inject, Injectable } from '@nestjs/common'
+import { Op, Sequelize } from 'sequelize'
+import { RendezVous } from '../../domain/rendez-vous'
 import { DateService } from '../../utils/date-service'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from '../sequelize/models/rendez-vous-jeune-association.model'
 import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
 import { toRendezVous, toRendezVousDto } from './mappers/rendez-vous.mappers'
+import { SequelizeInjectionToken } from '../sequelize/providers'
 
 @Injectable()
 export class RendezVousRepositorySql implements RendezVous.Repository {
-  constructor(private dateService: DateService) {}
+  constructor(
+    private dateService: DateService,
+    @Inject(SequelizeInjectionToken)
+    private readonly sequelize: Sequelize
+  ) {}
 
   async save(rendezVous: RendezVous): Promise<void> {
     const rendezVousDto = toRendezVousDto(rendezVous)
 
-    await RendezVousSqlModel.upsert(rendezVousDto)
-
-    await Promise.all(
-      rendezVous.jeunes.map(jeune =>
-        RendezVousJeuneAssociationSqlModel.upsert({
-          idJeune: jeune.id,
+    const queryInterface = this.sequelize.getQueryInterface()
+    await queryInterface.sequelize.transaction(async transaction => {
+      await RendezVousSqlModel.upsert(rendezVousDto, { transaction })
+      await RendezVousJeuneAssociationSqlModel.destroy({
+        transaction,
+        where: {
           idRendezVous: rendezVous.id
-        })
+        }
+      })
+      await Promise.all(
+        rendezVous.jeunes.map(jeune =>
+          RendezVousJeuneAssociationSqlModel.upsert(
+            {
+              idJeune: jeune.id,
+              idRendezVous: rendezVous.id
+            },
+            { transaction }
+          )
+        )
       )
-    )
+    })
   }
 
   async delete(idRendezVous: string): Promise<void> {
@@ -40,20 +56,6 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
     )
     await RendezVousJeuneAssociationSqlModel.destroy({
       where: { idRendezVous: idRendezVous }
-    })
-  }
-
-  async deleteAssociationAvecJeunes(
-    jeunes: JeuneDuRendezVous[]
-  ): Promise<void> {
-    const idsJeunes = jeunes.map(jeune => jeune.id)
-
-    await RendezVousJeuneAssociationSqlModel.destroy({
-      where: {
-        idJeune: {
-          [Op.in]: idsJeunes
-        }
-      }
     })
   }
 

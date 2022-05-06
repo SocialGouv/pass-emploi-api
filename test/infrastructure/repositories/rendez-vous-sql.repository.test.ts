@@ -14,7 +14,7 @@ import { DatabaseForTesting, expect, stubClass } from '../../utils'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
 
 describe('RendezVousRepositorySql', () => {
-  DatabaseForTesting.prepare()
+  const databaseForTesting: DatabaseForTesting = DatabaseForTesting.prepare()
   let rendezVousRepositorySql: RendezVousRepositorySql
   const maintenant = uneDatetime
   const aujourdhuiMinuit = uneDatetimeMinuit
@@ -24,7 +24,10 @@ describe('RendezVousRepositorySql', () => {
     const dateService = stubClass(DateService)
     dateService.nowJs.returns(maintenant.toJSDate())
     dateService.nowAtMidnightJs.returns(aujourdhuiMinuit.toJSDate())
-    rendezVousRepositorySql = new RendezVousRepositorySql(dateService)
+    rendezVousRepositorySql = new RendezVousRepositorySql(
+      dateService,
+      databaseForTesting.sequelize
+    )
 
     // Given
     jeune = unJeune()
@@ -223,27 +226,6 @@ describe('RendezVousRepositorySql', () => {
         )
         expect(associations.length).to.equal(0)
       })
-    })
-  })
-
-  describe('deleteAssociationAvecJeunes', () => {
-    it("supprime les associations d'un jeune", async () => {
-      // Given
-      const rendezVousDto = unRendezVousDto({
-        id: '6c242fa0-804f-11ec-a8a3-0242ac120002'
-      })
-      await RendezVousSqlModel.create(rendezVousDto)
-      await RendezVousJeuneAssociationSqlModel.create({
-        idRendezVous: rendezVousDto.id,
-        idJeune: jeune.id
-      })
-      // When
-      await rendezVousRepositorySql.deleteAssociationAvecJeunes([jeune])
-      // Then
-      const associations = await RendezVousJeuneAssociationSqlModel.findAll({
-        where: { idJeune: jeune.id }
-      })
-      expect(associations.length).to.equal(0)
     })
   })
 })

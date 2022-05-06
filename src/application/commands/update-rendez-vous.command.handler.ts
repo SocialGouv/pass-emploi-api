@@ -16,7 +16,6 @@ import {
 import { PlanificateurService } from '../../domain/planificateur'
 import {
   CodeTypeRendezVous,
-  JeuneDuRendezVous,
   RendezVous,
   RendezVousRepositoryToken
 } from '../../domain/rendez-vous'
@@ -24,7 +23,7 @@ import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { buildError } from '../../utils/logger.module'
-import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 
 export interface UpdateRendezVousCommand extends Command {
   idRendezVous: string
@@ -79,37 +78,21 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       )
     }
 
-    const jeunesActuels: JeuneDuRendezVous[] = rendezVous.jeunes
-    const jeunesInchanges: JeuneDuRendezVous[] = jeunesActuels.filter(
-      jeuneActuel => command.idsJeunes.includes(jeuneActuel.id)
-    )
-
-    const jeunesSupprimes: JeuneDuRendezVous[] = jeunesActuels.filter(
-      jeuneActuel => !command.idsJeunes.includes(jeuneActuel.id)
-    )
-
-    const jeunesAjoutes: JeuneDuRendezVous[] = []
+    const jeunes: Jeune[] = []
     for (const idJeune of command.idsJeunes) {
-      const estUnNouveauJeune = !jeunesActuels.find(
-        jeune => jeune.id === idJeune
-      )
-      if (estUnNouveauJeune) {
-        const jeuneAjoute = await this.jeuneRepository.get(idJeune)
-        if (!jeuneAjoute) {
-          return failure(new NonTrouveError('Jeune', idJeune))
-        }
-        jeunesAjoutes.push(jeuneAjoute)
+      const jeune = await this.jeuneRepository.get(idJeune)
+      if (!jeune) {
+        return failure(new NonTrouveError('Jeune', idJeune))
       }
+      jeunes.push(jeune)
     }
-
-    const rendezVousUpdated = RendezVous.mettreAJour(rendezVous, {
+    const rendezVousUpdated = await RendezVous.mettreAJour(rendezVous, {
       ...command,
-      jeunes: [...jeunesInchanges, ...jeunesAjoutes]
+      jeunes: jeunes
     })
+    await this.rendezVousRepository.save(rendezVousUpdated)
 
     await this.replanifierLesRappelsDeRendezVous(rendezVousUpdated, rendezVous)
-    await this.rendezVousRepository.save(rendezVousUpdated)
-    await this.rendezVousRepository.deleteAssociationAvecJeunes(jeunesSupprimes)
     this.notifierLesJeunes(rendezVous)
     if (rendezVousUpdated.invitation) {
       this.envoyerLesInvitationsCalendaires(rendezVousUpdated)
