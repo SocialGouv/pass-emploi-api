@@ -55,6 +55,12 @@ import {
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { SendNotificationsNouveauxMessagesCommandHandler } from '../../../src/application/commands/send-notifications-nouveaux-messages.command.handler'
 import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler'
+import {
+  ModifierConseillerCommand,
+  ModifierConseillerCommandHandler
+} from '../../../src/application/commands/modifier-conseiller.command.handler'
+import { uneAgence } from '../../fixtures/agence.fixture'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
 
 describe('ConseillersController', () => {
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
@@ -69,6 +75,7 @@ describe('ConseillersController', () => {
   let creerJeuneMiloCommandHandler: StubbedClass<CreerJeuneMiloCommandHandler>
   let creerSuperviseursCommandHandler: StubbedClass<CreerSuperviseursCommandHandler>
   let deleteSuperviseursCommandHandler: StubbedClass<DeleteSuperviseursCommandHandler>
+  let modifierConseillerCommandHandler: StubbedClass<ModifierConseillerCommandHandler>
   let app: INestApplication
 
   before(async () => {
@@ -98,6 +105,9 @@ describe('ConseillersController', () => {
     deleteSuperviseursCommandHandler = stubClass(
       DeleteSuperviseursCommandHandler
     )
+    modifierConseillerCommandHandler = stubClass(
+      ModifierConseillerCommandHandler
+    )
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(GetConseillerByEmailQueryHandler)
@@ -124,6 +134,8 @@ describe('ConseillersController', () => {
       .useValue(creerSuperviseursCommandHandler)
       .overrideProvider(DeleteSuperviseursCommandHandler)
       .useValue(deleteSuperviseursCommandHandler)
+      .overrideProvider(ModifierConseillerCommandHandler)
+      .useValue(modifierConseillerCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -1068,5 +1080,77 @@ describe('ConseillersController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('get', '/conseillers/superviseurs')
+  })
+
+  describe('PUT /conseillers/{idConseiller}', () => {
+    const conseiller = unConseiller()
+    const agence = uneAgence()
+
+    describe('quand le payload est valide', () => {
+      it('met à jour le conseiller', async () => {
+        // Given
+        const command: ModifierConseillerCommand = {
+          notificationsSonores: true,
+          agence: agence,
+          idConseiller: conseiller.id
+        }
+
+        modifierConseillerCommandHandler.execute
+          .withArgs(command, unUtilisateurDecode())
+          .resolves(emptySuccess())
+
+        // When - Then
+        await request(app.getHttpServer())
+          .put(`/conseillers/${conseiller.id}`)
+          .send({
+            notificationsSonores: true,
+            agence: agence
+          })
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+      })
+    })
+
+    describe('quand le payload est invalide', () => {
+      it('renvoie 400', async () => {
+        // Given
+        // When - Then
+        await request(app.getHttpServer())
+          .put(`/conseillers/${conseiller.id}`)
+          .send({
+            notificationsSonores: 'plop',
+            agence: 'plop'
+          })
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    describe("quand l'agence n'existe pas", () => {
+      it('renvoie 404', async () => {
+        // Given
+        const command: ModifierConseillerCommand = {
+          notificationsSonores: true,
+          agence: agence,
+          idConseiller: conseiller.id
+        }
+
+        modifierConseillerCommandHandler.execute
+          .withArgs(command, unUtilisateurDecode())
+          .resolves(failure(new NonTrouveError('Agence', agence.id!)))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .put(`/conseillers/${conseiller.id}`)
+          .send({
+            notificationsSonores: true,
+            agence: uneAgence()
+          })
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.NOT_FOUND)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('put', '/conseillers/2')
   })
 })

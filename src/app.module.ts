@@ -150,7 +150,7 @@ import { DeleteJeuneCommandHandler } from './application/commands/delete-jeune.c
 import { AgenceRepositoryToken } from './domain/agence'
 import { AgenceSqlRepository } from './infrastructure/repositories/agence-sql.repository'
 import { GetAgencesQueryHandler } from './application/queries/get-agences.query.handler'
-import { ModifierConseillerCommandHandler } from './application/queries/modifier-conseiller-command.handler'
+import { ModifierConseillerCommandHandler } from './application/commands/modifier-conseiller.command.handler'
 import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './application/commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
 import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './application/commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from './application/queries/get-favoris-service-civique-jeune.query.handler'

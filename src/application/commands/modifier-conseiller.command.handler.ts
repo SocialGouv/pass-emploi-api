@@ -12,14 +12,15 @@ import {
 } from '../../building-blocks/types/result'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 
-export interface ModifierConseillerQuery extends Query {
+export interface ModifierConseillerCommand extends Query {
   idConseiller: string
   agence?: Agence
+  notificationsSonores?: boolean
 }
 
 @Injectable()
 export class ModifierConseillerCommandHandler extends CommandHandler<
-  ModifierConseillerQuery,
+  ModifierConseillerCommand,
   void
 > {
   constructor(
@@ -32,7 +33,7 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
     super('ModifierConseillerQueryHandler')
   }
 
-  async handle(query: ModifierConseillerQuery): Promise<Result> {
+  async handle(query: ModifierConseillerCommand): Promise<Result> {
     const conseillerActuel = await this.conseillerRepository.get(
       query.idConseiller
     )
@@ -45,7 +46,7 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
 
   private async modifierConseillerExistant(
     conseillerActuel: Conseiller,
-    query: ModifierConseillerQuery
+    query: ModifierConseillerCommand
   ): Promise<Result> {
     if (query.agence?.id) {
       const agence = await this.agencesRepository.get(
@@ -63,7 +64,7 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
   }
 
   async authorize(
-    query: ModifierConseillerQuery,
+    query: ModifierConseillerCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     if (

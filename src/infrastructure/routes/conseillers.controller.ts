@@ -74,7 +74,7 @@ import {
   SuperviseursPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
-import { ModifierConseillerCommandHandler } from '../../application/queries/modifier-conseiller-command.handler'
+import { ModifierConseillerCommandHandler } from '../../application/commands/modifier-conseiller.command.handler'
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -96,7 +96,7 @@ export class ConseillersController {
     private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler,
     private readonly creerSuperviseursCommandHandler: CreerSuperviseursCommandHandler,
     private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler,
-    private readonly modifierConseillerQueryHandler: ModifierConseillerCommandHandler
+    private readonly modifierConseillerCommandHandler: ModifierConseillerCommandHandler
   ) {}
 
   @Get()
@@ -514,10 +514,11 @@ export class ConseillersController {
     @Body() modifierConseillerPayload: DetailConseillerPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const result = await this.modifierConseillerQueryHandler.execute(
+    const result = await this.modifierConseillerCommandHandler.execute(
       {
         idConseiller: idConseiller,
-        agence: modifierConseillerPayload.agence
+        agence: modifierConseillerPayload.agence,
+        notificationsSonores: modifierConseillerPayload.notificationsSonores
       },
       utilisateur
     )
