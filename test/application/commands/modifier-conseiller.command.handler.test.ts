@@ -1,7 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Agence } from '../../../src/domain/agence'
-import { ModifierConseillerCommandHandler } from '../../../src/application/queries/modifier-conseiller-command.handler'
 import { createSandbox, expect } from '../../utils'
 import { failure, Failure } from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
@@ -12,6 +11,7 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { Unauthorized } from '../../../src/domain/erreur'
 import Structure = Core.Structure
+import { ModifierConseillerCommandHandler } from '../../../src/application/commands/modifier-conseiller.command.handler'
 
 describe('ModifierConseillerQueryHandler', () => {
   let conseillerRepository: StubbedType<Conseiller.Repository>
@@ -19,7 +19,7 @@ describe('ModifierConseillerQueryHandler', () => {
   let handler: ModifierConseillerCommandHandler
 
   const conseillerQuiExiste: Conseiller = {
-    id: 'id qui éxiste',
+    id: 'id qui existe',
     firstName: 'Jean michel',
     lastName: 'Conseiller',
     structure: Structure.MILO,
@@ -30,7 +30,7 @@ describe('ModifierConseillerQueryHandler', () => {
   }
 
   const agenceQuiExiste: Agence = {
-    id: 'agence qui éxiste',
+    id: 'agence qui existe',
     nom: 'Bonjour, je suis une agence'
   }
 
@@ -47,15 +47,15 @@ describe('ModifierConseillerQueryHandler', () => {
   })
 
   describe('handle', () => {
-    describe("Quand le conseiller n'éxiste pas", () => {
+    describe("Quand le conseiller n'existe pas", () => {
       it('on doit avoir une erreur 404', async () => {
         // When
         const query = {
-          idConseiller: "id qui n'éxiste pas",
+          idConseiller: "id qui n'existe pas",
           champsConseillerAModifier: {}
         }
         conseillerRepository.get
-          .withArgs("id qui n'éxiste pas")
+          .withArgs("id qui n'existe pas")
           .resolves(undefined)
 
         // Given
@@ -65,26 +65,26 @@ describe('ModifierConseillerQueryHandler', () => {
         expect(result._isSuccess).to.equal(false)
         const expectedError = new NonTrouveError(
           'Conseiller',
-          "id qui n'éxiste pas"
+          "id qui n'existe pas"
         )
         expect((result as Failure).error).to.deep.equal(expectedError)
       })
     })
 
-    describe("Quand l'agence n'éxiste pas", () => {
+    describe("Quand l'agence n'existe pas", () => {
       it('on doit avoir une erreur 404', async () => {
         // When
         const query = {
-          idConseiller: 'id qui éxiste',
+          idConseiller: 'id qui existe',
           agence: {
-            id: "agence qui n'éxiste pas"
+            id: "agence qui n'existe pas"
           }
         }
         conseillerRepository.get
-          .withArgs('id qui éxiste')
+          .withArgs('id qui existe')
           .resolves(conseillerQuiExiste)
         agencesRepository.get
-          .withArgs("agence qui n'éxiste pas")
+          .withArgs("agence qui n'existe pas")
           .resolves(undefined)
 
         // Given
@@ -93,25 +93,25 @@ describe('ModifierConseillerQueryHandler', () => {
         // Then
         expect(result._isSuccess).to.equal(false)
         expect((result as Failure).error).to.deep.equal(
-          new NonTrouveError('Agence', "agence qui n'éxiste pas")
+          new NonTrouveError('Agence', "agence qui n'existe pas")
         )
       })
     })
 
-    describe("Quand le conseiller et l'agence éxistent", () => {
+    describe("Quand le conseiller et l'agence existent", () => {
       it('le conseiller est bien modifié', async function () {
         // Given
         const query = {
-          idConseiller: 'id qui éxiste',
+          idConseiller: 'id qui existe',
           agence: {
-            id: "agence qui n'éxiste pas"
+            id: "agence qui n'existe pas"
           }
         }
         conseillerRepository.get
-          .withArgs('id qui éxiste')
+          .withArgs('id qui existe')
           .resolves(conseillerQuiExiste)
         agencesRepository.get
-          .withArgs("agence qui n'éxiste pas")
+          .withArgs("agence qui n'existe pas")
           .resolves(agenceQuiExiste)
 
         // When
@@ -128,9 +128,9 @@ describe('ModifierConseillerQueryHandler', () => {
       it('on reçoit une unauthorized', async () => {
         // Given
         const query = {
-          idConseiller: 'id qui éxiste',
+          idConseiller: 'id qui existe',
           agence: {
-            id: 'agence qui éxiste'
+            id: 'agence qui existe'
           }
         }
 
@@ -146,9 +146,9 @@ describe('ModifierConseillerQueryHandler', () => {
       it('on reçoit une unauthorized', async () => {
         // Given
         const query = {
-          idConseiller: 'id qui éxiste',
+          idConseiller: 'id qui existe',
           agence: {
-            id: 'agence qui éxiste'
+            id: 'agence qui existe'
           }
         }
 
@@ -163,18 +163,18 @@ describe('ModifierConseillerQueryHandler', () => {
 
   describe('Quand on est un conseiller avec le bon id', () => {
     const query = {
-      idConseiller: 'id qui éxiste',
+      idConseiller: 'id qui existe',
       agence: {
-        id: 'agence qui éxiste'
+        id: 'agence qui existe'
       }
     }
 
     beforeEach(() => {
       agencesRepository.get
-        .withArgs('agence qui éxiste')
+        .withArgs('agence qui existe')
         .resolves(agenceQuiExiste)
       agencesRepository.getStructureOfAgence
-        .withArgs('agence qui éxiste')
+        .withArgs('agence qui existe')
         .resolves(Structure.MILO)
     })
 
@@ -185,7 +185,7 @@ describe('ModifierConseillerQueryHandler', () => {
           query,
           unUtilisateurConseiller({
             structure: Core.Structure.MILO,
-            id: 'id qui éxiste'
+            id: 'id qui existe'
           })
         )
 
@@ -201,13 +201,13 @@ describe('ModifierConseillerQueryHandler', () => {
           query,
           unUtilisateurConseiller({
             structure: Core.Structure.POLE_EMPLOI,
-            id: 'id qui éxiste'
+            id: 'id qui existe'
           })
         )
 
         // Then
         expect(result).to.deep.equal(
-          failure(new NonTrouveError('Conseiller', 'id qui éxiste'))
+          failure(new NonTrouveError('Conseiller', 'id qui existe'))
         )
       })
     })

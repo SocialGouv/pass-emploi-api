@@ -148,4 +148,9 @@ export class DetailConseillerPayload {
   @ValidateNested({ each: true })
   @Type(() => AgenceInput)
   agence?: AgenceInput
+
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  notificationsSonores?: boolean
 }
