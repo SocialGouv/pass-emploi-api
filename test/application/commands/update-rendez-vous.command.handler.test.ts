@@ -187,9 +187,6 @@ describe('UpdateRendezVousCommandHandler', () => {
           expect(rendezVousRepository.save).to.have.been.calledWith(
             rendezVousUpdated
           )
-          expect(
-            rendezVousRepository.deleteAssociationAvecJeunes
-          ).to.have.been.calledWith([jeuneSupprime])
           expect(notificationRepository.send).to.have.been.calledWith(
             Notification.createRendezVousMisAJour(
               jeune.pushNotificationToken,
