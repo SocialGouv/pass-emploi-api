@@ -41,8 +41,7 @@ describe('ModifierConseillerQueryHandler', () => {
 
     handler = new ModifierConseillerCommandHandler(
       conseillerRepository,
-      agencesRepository,
-      new Conseiller.Factory()
+      agencesRepository
     )
   })
 

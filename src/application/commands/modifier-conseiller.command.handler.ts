@@ -27,8 +27,7 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     @Inject(AgenceRepositoryToken)
-    private agencesRepository: Agence.Repository,
-    private conseillerFactory: Conseiller.Factory
+    private agencesRepository: Agence.Repository
   ) {
     super('ModifierConseillerQueryHandler')
   }
@@ -38,29 +37,22 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
       query.idConseiller
     )
     if (conseillerActuel) {
-      return this.modifierConseillerExistant(conseillerActuel, query)
+      if (query.agence?.id) {
+        const agence = await this.agencesRepository.get(
+          query.agence.id,
+          conseillerActuel.structure
+        )
+        if (!agence)
+          return failure(new NonTrouveError('Agence', query.agence.id))
+      }
+      const conseiller = Conseiller.mettreAJour(conseillerActuel, {
+        agence: query.agence
+      })
+      await this.conseillerRepository.save(conseiller)
+      return emptySuccess()
     } else {
       return failure(new NonTrouveError('Conseiller', query.idConseiller))
     }
-  }
-
-  private async modifierConseillerExistant(
-    conseillerActuel: Conseiller,
-    query: ModifierConseillerCommand
-  ): Promise<Result> {
-    if (query.agence?.id) {
-      const agence = await this.agencesRepository.get(
-        query.agence.id,
-        conseillerActuel.structure
-      )
-      if (!agence) return failure(new NonTrouveError('Agence', query.agence.id))
-    }
-    const conseiller = this.conseillerFactory.ajoutAgenceAUnConseiller(
-      conseillerActuel,
-      query.agence
-    )
-    await this.conseillerRepository.save(conseiller)
-    return emptySuccess()
   }
 
   async authorize(
