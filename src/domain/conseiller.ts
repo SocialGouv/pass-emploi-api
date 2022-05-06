@@ -39,7 +39,7 @@ export namespace Conseiller {
     }
   }
 
-  interface InfoDeMiseAJour {
+  export interface InfoDeMiseAJour {
     agence?: Agence
     notificationsSonores?: boolean
   }

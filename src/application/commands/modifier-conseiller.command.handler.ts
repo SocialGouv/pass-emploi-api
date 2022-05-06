@@ -37,18 +37,26 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
       query.idConseiller
     )
     if (conseillerActuel) {
-      if (query.agence?.id) {
-        const agence = await this.agencesRepository.get(
-          query.agence.id,
-          conseillerActuel.structure
-        )
-        if (!agence)
-          return failure(new NonTrouveError('Agence', query.agence.id))
-      }
-      const conseiller = Conseiller.mettreAJour(conseillerActuel, {
-        agence: query.agence,
+      const infosDeMiseAJour: Conseiller.InfoDeMiseAJour = {
         notificationsSonores: query.notificationsSonores
-      })
+      }
+      if (query.agence) {
+        if (query.agence?.id) {
+          const agence = await this.agencesRepository.get(
+            query.agence.id,
+            conseillerActuel.structure
+          )
+          if (!agence) {
+            return failure(new NonTrouveError('Agence', query.agence.id))
+          }
+        }
+        infosDeMiseAJour.agence = query.agence
+      }
+
+      const conseiller = Conseiller.mettreAJour(
+        conseillerActuel,
+        infosDeMiseAJour
+      )
       await this.conseillerRepository.save(conseiller)
       return emptySuccess()
     } else {
