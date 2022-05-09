@@ -4,13 +4,13 @@ import { Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { Evenement, EvenementService } from '../../domain/evenement'
 import { RendezVous } from '../../domain/rendez-vous'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { DateService } from '../../utils/date-service'
 import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
-import { Evenement, EvenementService } from '../../domain/evenement'
 import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-models'
 
@@ -74,6 +74,7 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur,
     query: GetRendezVousJeuneQuery
   ): Promise<void> {
+    if (Authentification.Type.CONSEILLER === utilisateur.type) return
     if (query.periode !== RendezVous.Periode.PASSES) {
       await this.evenementService.creerEvenement(
         Evenement.Type.RDV_LISTE,
