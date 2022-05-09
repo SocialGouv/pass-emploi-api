@@ -1,6 +1,7 @@
 import { RedisClientType } from '@node-redis/client/dist/lib/client'
 import {
   createStubInstance,
+  SinonSandbox,
   SinonStubbedInstance,
   SinonStubbedMember,
   StubbableType
@@ -11,6 +12,15 @@ export function stubClass<T>(
   overrides?: { [K in keyof T]?: SinonStubbedMember<T[K]> }
 ): StubbedClass<T> {
   const stub = createStubInstance<T>(constructor, overrides)
+  return stub as unknown as StubbedClass<T>
+}
+
+export function stubClassSandbox<T>(
+  constructor: StubbableType<T>,
+  sandbox: SinonSandbox,
+  overrides?: { [K in keyof T]?: SinonStubbedMember<T[K]> }
+): StubbedClass<T> {
+  const stub = sandbox.createStubInstance<T>(constructor, overrides)
   return stub as unknown as StubbedClass<T>
 }
 

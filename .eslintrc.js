@@ -33,13 +33,13 @@ module.exports = {
     '@typescript-eslint/semi': [
       'error',
       'never',
-      { beforeStatementContinuationChars: 'always' }
+      {beforeStatementContinuationChars: 'always'}
     ],
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'error',
     '@typescript-eslint/explicit-module-boundary-types': 'error',
     '@typescript-eslint/no-explicit-any': 'error',
-    '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
+    '@typescript-eslint/array-type': ['error', {default: 'array-simple'}],
     '@typescript-eslint/no-non-null-assertion': 'off'
   }
 }

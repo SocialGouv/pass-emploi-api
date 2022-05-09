@@ -1,6 +1,7 @@
 /* eslint-disable no-process-env */
 import * as chai from 'chai'
 import * as chaiAsPromised from 'chai-as-promised'
+import * as dirtyChai from 'dirty-chai'
 import { createSandbox } from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import { DatabaseForTesting } from './database-for-testing'
@@ -12,6 +13,7 @@ import * as apm from 'elastic-apm-node'
 
 chai.use(sinonChai)
 chai.use(chaiAsPromised)
+chai.use(dirtyChai)
 
 const expect = chai.expect
 export { createSandbox, expect }
