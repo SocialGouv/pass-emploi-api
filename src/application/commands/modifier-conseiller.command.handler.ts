@@ -32,25 +32,27 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
     super('ModifierConseillerQueryHandler')
   }
 
-  async handle(query: ModifierConseillerCommand): Promise<Result> {
+  async handle(command: ModifierConseillerCommand): Promise<Result> {
     const conseillerActuel = await this.conseillerRepository.get(
-      query.idConseiller
+      command.idConseiller
     )
     if (conseillerActuel) {
       const infosDeMiseAJour: Conseiller.InfoDeMiseAJour = {
-        notificationsSonores: query.notificationsSonores
+        notificationsSonores:
+          command.notificationsSonores ?? conseillerActuel.notificationsSonores,
+        agence: command.agence ?? conseillerActuel.agence
       }
-      if (query.agence) {
-        if (query.agence?.id) {
+
+      if (command.agence) {
+        if (command.agence?.id) {
           const agence = await this.agencesRepository.get(
-            query.agence.id,
+            command.agence.id,
             conseillerActuel.structure
           )
           if (!agence) {
-            return failure(new NonTrouveError('Agence', query.agence.id))
+            return failure(new NonTrouveError('Agence', command.agence.id))
           }
         }
-        infosDeMiseAJour.agence = query.agence
       }
 
       const conseiller = Conseiller.mettreAJour(
@@ -60,7 +62,7 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
       await this.conseillerRepository.save(conseiller)
       return emptySuccess()
     } else {
-      return failure(new NonTrouveError('Conseiller', query.idConseiller))
+      return failure(new NonTrouveError('Conseiller', command.idConseiller))
     }
   }
 
