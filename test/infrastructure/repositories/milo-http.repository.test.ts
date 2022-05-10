@@ -10,7 +10,7 @@ import {
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository'
 import { DossierMiloDto } from '../../../src/infrastructure/repositories/dto/milo.dto'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
-import { MiloHttpRepository } from '../../../src/infrastructure/repositories/milo-http.repository'
+import { MiloHttpSqlRepository } from '../../../src/infrastructure/repositories/milo-http-sql.repository'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { DatabaseForTesting } from '../../utils'
 import { testConfig } from '../../utils/module-for-testing'
@@ -18,7 +18,7 @@ import { IdService } from 'src/utils/id-service'
 import { DateService } from 'src/utils/date-service'
 
 describe('MiloHttpRepository', () => {
-  let miloHttpRepository: MiloHttpRepository
+  let miloHttpRepository: MiloHttpSqlRepository
   const configService = testConfig()
   const database = DatabaseForTesting.prepare()
   const jeune = { ...unJeune(), email: 'john@doe.io' }
@@ -36,7 +36,7 @@ describe('MiloHttpRepository', () => {
     )
     await jeuneSqlRepository.save(jeune)
 
-    miloHttpRepository = new MiloHttpRepository(httpService, configService)
+    miloHttpRepository = new MiloHttpSqlRepository(httpService, configService)
   })
 
   describe('getDossier', () => {

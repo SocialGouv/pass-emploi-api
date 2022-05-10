@@ -11,6 +11,7 @@ import { HandleNettoyerLesJobsCommandHandler } from './commands/jobs/handle-job-
 import { InitCronsCommandHandler } from './commands/tasks/init-crons.command'
 import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
 import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
+import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from './commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
 
 export enum Task {
   DUMMY_JOB = 'DUMMY_JOB',
@@ -20,7 +21,8 @@ export enum Task {
   ENVOYER_MAIL_CONSEILLER_MESSAGES = 'ENVOYER_MAIL_CONSEILLER_MESSAGES',
   INITIALISER_LES_CRON = 'INITIALISER_LES_CRON',
   NETTOYER_LES_JOBS = 'NETTOYER_LES_JOBS',
-  METTRE_A_JOUR_MAILING_LIST_CONSEILLER = 'METTRE_A_JOUR_MAILING_LIST_CONSEILLER'
+  METTRE_A_JOUR_MAILING_LIST_CONSEILLER = 'METTRE_A_JOUR_MAILING_LIST_CONSEILLER',
+  RECUPERER_SITUATIONS_JEUNES_MILO = 'RECUPERER_SITUATIONS_JEUNES_MILO'
 }
 
 @Injectable()
@@ -36,7 +38,8 @@ export class TaskService {
     private initCronsCommandHandler: InitCronsCommandHandler,
     private handleNettoyerLesJobsCommandHandler: HandleNettoyerLesJobsCommandHandler,
     private handleJobUpdateMailingListConseillerCommandHandler: HandleJobUpdateMailingListConseillerCommandHandler,
-    private handleJobNotifierNouveauxServicesCiviqueCommandHandler: HandleJobNotifierNouveauxServicesCiviqueCommandHandler
+    private handleJobNotifierNouveauxServicesCiviqueCommandHandler: HandleJobNotifierNouveauxServicesCiviqueCommandHandler,
+    private handleJobRecupererSituationsJeunesMiloCommandHandler: HandleJobRecupererSituationsJeunesMiloCommandHandler
   ) {}
 
   async handle(task: Task | undefined): Promise<void> {
@@ -72,9 +75,12 @@ export class TaskService {
         case Task.RECHERCHER_LES_NOUVELLES_OFFRES_SERVICES_CIVIQUE:
           await this.handleJobNotifierNouveauxServicesCiviqueCommandHandler.execute()
           break
+        case Task.RECUPERER_SITUATIONS_JEUNES_MILO:
+          await this.handleJobRecupererSituationsJeunesMiloCommandHandler.execute()
+          break
         default:
           this.logger.log(
-            `Tache non connue, voici les tâches possibles : ${Object.values(
+            `Tache ${task} non connue, voici les tâches possibles : ${Object.values(
               Task
             )}`
           )

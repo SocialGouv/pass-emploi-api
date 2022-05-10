@@ -32,6 +32,7 @@ export namespace Jeune {
 
   export interface Repository {
     get(id: string): Promise<Jeune | undefined>
+    getAllMilo(): Promise<Jeune[]>
     existe(id: string): Promise<boolean>
     getByEmail(email: string): Promise<Jeune | undefined>
     getByIdDossier(idDossier: string): Promise<Jeune | undefined>

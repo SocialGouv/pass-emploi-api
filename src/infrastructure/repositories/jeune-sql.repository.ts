@@ -7,6 +7,7 @@ import {
   JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
+import { Core } from 'src/domain/core'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { Action } from '../../domain/action'
@@ -269,6 +270,16 @@ export class JeuneSqlRepository implements Jeune.Repository {
       )
 
     return resumesActionsParJeune.map(toResumeActionsDuJeuneQueryModel)
+  }
+
+  async getAllMilo(): Promise<Jeune[]> {
+    const jeunesMiloSqlModel = await JeuneSqlModel.findAll({
+      where: {
+        structure: Core.Structure.MILO,
+        idDossier: { [Op.ne]: null }
+      }
+    })
+    return jeunesMiloSqlModel.map(fromSqlToJeune)
   }
 }
 

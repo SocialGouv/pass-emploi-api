@@ -7,6 +7,7 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { Milo } from '../../domain/milo'
+import { SituationsMiloSqlModel } from '../sequelize/models/situations_milo.sql-model'
 
 @Injectable()
 export class MiloInMemoryRepository implements Milo.Repository {
@@ -34,6 +35,33 @@ export class MiloInMemoryRepository implements Milo.Repository {
         return emptySuccess()
     }
   }
+
+  async saveSituationsJeune(situations: Milo.SituationsDuJeune): Promise<void> {
+    await SituationsMiloSqlModel.upsert(
+      {
+        idJeune: situations.idJeune,
+        situationCourante: situations.situationCourante,
+        situations: situations.situations
+      },
+      { conflictFields: ['id_jeune'] }
+    )
+  }
+
+  async getSituationsByJeune(
+    idJeune: string
+  ): Promise<Milo.SituationsDuJeune | undefined> {
+    const situationsSql = await SituationsMiloSqlModel.findOne({
+      where: { idJeune }
+    })
+
+    return situationsSql
+      ? {
+          idJeune: situationsSql.idJeune,
+          situationCourante: situationsSql.situationCourante ?? undefined,
+          situations: situationsSql.situations
+        }
+      : undefined
+  }
 }
 
 const unDossierMiloAvecEmail = (): Milo.Dossier => ({
@@ -42,7 +70,17 @@ const unDossierMiloAvecEmail = (): Milo.Dossier => ({
   prenom: 'Jack',
   dateDeNaissance: '1888-09-01',
   email: 'jack.dawson@milo.com',
-  codePostal: '91580'
+  codePostal: '91580',
+  situations: [
+    {
+      etat: Milo.EtatSituation.PREVU,
+      categorie: Milo.CategorieSituation.EMPLOI
+    },
+    {
+      etat: Milo.EtatSituation.EN_COURS,
+      categorie: Milo.CategorieSituation.EMPLOI
+    }
+  ]
 })
 
 const unDossierMiloSansEmail = (): Milo.Dossier => ({
@@ -50,5 +88,6 @@ const unDossierMiloSansEmail = (): Milo.Dossier => ({
   nom: 'Dylan',
   prenom: 'Bob',
   dateDeNaissance: '1941-05-24',
-  codePostal: '75008'
+  codePostal: '75008',
+  situations: []
 })
