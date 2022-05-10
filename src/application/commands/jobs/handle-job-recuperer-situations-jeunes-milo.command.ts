@@ -6,6 +6,8 @@ import { DateService } from 'src/utils/date-service'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 
+const PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM = 100
+
 @Injectable()
 export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends CommandHandler<
   Command,
@@ -26,27 +28,38 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends Comman
     }
     const maintenant = this.dateService.now()
 
-    const jeunes = await this.jeuneRepository.getAllMilo()
+    let offset = 0
+    let jeunes: Jeune[] = []
 
-    for (const jeune of jeunes) {
-      const dossier = await this.miloRepository.getDossier(jeune.idDossier!)
+    do {
+      jeunes = await this.jeuneRepository.getJeunesMilo(
+        offset,
+        PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM
+      )
 
-      if (isFailure(dossier)) {
-        stats.dossiersNonTrouves++
-        continue
-      }
+      await Promise.all(
+        jeunes.map(async jeune => {
+          const dossier = await this.miloRepository.getDossier(jeune.idDossier!)
 
-      const situationsTriees = Milo.trierSituations(dossier.data.situations)
-      const situationsDuJeune: Milo.SituationsDuJeune = {
-        idJeune: jeune.id,
-        situationCourante: Milo.trouverSituationCourante(situationsTriees),
-        situations: situationsTriees
-      }
+          if (isFailure(dossier)) {
+            stats.dossiersNonTrouves++
+            return
+          }
 
-      await this.miloRepository.saveSituationsJeune(situationsDuJeune)
-    }
+          const situationsTriees = Milo.trierSituations(dossier.data.situations)
+          const situationsDuJeune: Milo.SituationsDuJeune = {
+            idJeune: jeune.id,
+            situationCourante: Milo.trouverSituationCourante(situationsTriees),
+            situations: situationsTriees
+          }
 
-    stats.jeunesMilo = jeunes.length
+          await this.miloRepository.saveSituationsJeune(situationsDuJeune)
+        })
+      )
+      stats.jeunesMilo += jeunes.length
+      offset += PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM
+    } while (jeunes.length)
+
     stats.tempsDExecution = maintenant.diffNow().milliseconds * -1
     return success(stats)
   }

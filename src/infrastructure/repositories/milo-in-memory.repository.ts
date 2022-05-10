@@ -6,7 +6,11 @@ import {
   Result,
   success
 } from '../../building-blocks/types/result'
-import { Milo } from '../../domain/milo'
+import {
+  CategorieSituationMilo,
+  EtatSituationMilo,
+  Milo
+} from '../../domain/milo'
 import { SituationsMiloSqlModel } from '../sequelize/models/situations_milo.sql-model'
 
 @Injectable()
@@ -73,12 +77,12 @@ const unDossierMiloAvecEmail = (): Milo.Dossier => ({
   codePostal: '91580',
   situations: [
     {
-      etat: Milo.EtatSituation.PREVU,
-      categorie: Milo.CategorieSituation.EMPLOI
+      etat: EtatSituationMilo.PREVU,
+      categorie: CategorieSituationMilo.EMPLOI
     },
     {
-      etat: Milo.EtatSituation.EN_COURS,
-      categorie: Milo.CategorieSituation.EMPLOI
+      etat: EtatSituationMilo.EN_COURS,
+      categorie: CategorieSituationMilo.EMPLOI
     }
   ]
 })
