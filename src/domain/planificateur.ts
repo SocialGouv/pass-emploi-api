@@ -27,6 +27,7 @@ export namespace Planificateur {
     NOUVELLES_OFFRES_SERVICE_CIVIQUE = 'NOUVELLES_OFFRES_SERVICE_CIVIQUE',
     MAIL_CONSEILLER_MESSAGES = 'MAIL_CONSEILLER_MESSAGES',
     UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS = 'UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS',
+    RECUPERER_SITUATIONS_JEUNES_MILO = 'RECUPERER_SITUATIONS_JEUNES_MILO',
     NETTOYER_LES_JOBS = 'NETTOYER_LES_JOBS'
   }
 
@@ -107,6 +108,14 @@ export class PlanificateurService {
         const cron: Planificateur.Cron = {
           type: Planificateur.CronJob.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS,
           expression: '0 1 * * *'
+        }
+        await this.planificateurRepository.createCron(cron)
+        break
+      }
+      case Planificateur.CronJob.RECUPERER_SITUATIONS_JEUNES_MILO: {
+        const cron: Planificateur.Cron = {
+          type: Planificateur.CronJob.RECUPERER_SITUATIONS_JEUNES_MILO,
+          expression: '0 0 * * *'
         }
         await this.planificateurRepository.createCron(cron)
         break

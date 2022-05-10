@@ -11,10 +11,11 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { Milo } from '../../domain/milo'
+import { SituationsMiloSqlModel } from '../sequelize/models/situations_milo.sql-model'
 import { DossierMiloDto } from './dto/milo.dto'
 
 @Injectable()
-export class MiloHttpRepository implements Milo.Repository {
+export class MiloHttpSqlRepository implements Milo.Repository {
   private logger: Logger
   private apiUrl: string
   private apiKeyRecupererDossier: string
@@ -48,7 +49,14 @@ export class MiloHttpRepository implements Milo.Repository {
         nom: dossierDto.data.nomUsage,
         email: dossierDto.data.mail ?? undefined,
         codePostal: dossierDto.data.adresse?.codePostal ?? '',
-        dateDeNaissance: dossierDto.data.dateNaissance
+        dateDeNaissance: dossierDto.data.dateNaissance,
+        situations: dossierDto.data.situations.map(situation => {
+          return {
+            etat: situation.etat,
+            categorie: situation.categorieSituation,
+            dateFin: situation.dateFin ?? undefined
+          }
+        })
       })
     } catch (e) {
       this.logger.error(e)
@@ -85,5 +93,32 @@ export class MiloHttpRepository implements Milo.Repository {
       }
       throw new RuntimeException(e.statusText)
     }
+  }
+
+  async saveSituationsJeune(situations: Milo.SituationsDuJeune): Promise<void> {
+    await SituationsMiloSqlModel.upsert(
+      {
+        idJeune: situations.idJeune,
+        situationCourante: situations.situationCourante,
+        situations: situations.situations
+      },
+      { conflictFields: ['id_jeune'] }
+    )
+  }
+
+  async getSituationsByJeune(
+    idJeune: string
+  ): Promise<Milo.SituationsDuJeune | undefined> {
+    const situationsSql = await SituationsMiloSqlModel.findOne({
+      where: { idJeune }
+    })
+
+    return situationsSql
+      ? {
+          idJeune: situationsSql.idJeune,
+          situationCourante: situationsSql.situationCourante ?? undefined,
+          situations: situationsSql.situations
+        }
+      : undefined
   }
 }

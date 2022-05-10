@@ -13,6 +13,7 @@ import { TransfertConseillerSqlModel } from './transfert-conseiller.sql-model'
 import { SuperviseurSqlModel } from './superviseur.sql-model'
 import { AgenceSqlModel } from './agence.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-association.model'
+import { SituationsMiloSqlModel } from './situations_milo.sql-model'
 
 export const sqlModels = [
   ConseillerSqlModel,
@@ -29,5 +30,6 @@ export const sqlModels = [
   SuperviseurSqlModel,
   FavoriOffreEngagementSqlModel,
   AgenceSqlModel,
-  RendezVousJeuneAssociationSqlModel
+  RendezVousJeuneAssociationSqlModel,
+  SituationsMiloSqlModel
 ]

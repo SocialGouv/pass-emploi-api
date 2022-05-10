@@ -112,7 +112,7 @@ import { ConseillerSqlRepository } from './infrastructure/repositories/conseille
 import { EvenementHttpSqlRepository } from './infrastructure/repositories/evenement-http-sql.repository'
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune-sql.repository'
 import { MailSqlRepository } from './infrastructure/repositories/mail.sql.repository'
-import { MiloHttpRepository } from './infrastructure/repositories/milo-http.repository'
+import { MiloHttpSqlRepository } from './infrastructure/repositories/milo-http-sql.repository'
 import { MiloInMemoryRepository } from './infrastructure/repositories/milo-in-memory.repository'
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
 import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre-emploi-http-sql.repository'
@@ -154,6 +154,7 @@ import { ModifierConseillerCommandHandler } from './application/commands/modifie
 import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './application/commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
 import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './application/commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from './application/queries/get-favoris-service-civique-jeune.query.handler'
+import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from './application/commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -247,7 +248,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       useClass:
         process.env.IN_MEMORY == 'true'
           ? MiloInMemoryRepository
-          : MiloHttpRepository
+          : MiloHttpSqlRepository
     },
     {
       provide: OffresImmersionRepositoryToken,
@@ -346,6 +347,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     TransfererJeunesConseillerCommandHandler,
     InitCronsCommandHandler,
     HandleJobNotifierNouvellesOffresEmploiCommandHandler,
+    HandleJobRecupererSituationsJeunesMiloCommandHandler,
     GetServicesCiviqueQueryHandler,
     GetDetailServiceCiviqueQueryHandler,
     HandleNettoyerLesJobsCommandHandler,
