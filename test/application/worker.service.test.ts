@@ -10,6 +10,7 @@ import { PlanificateurRedisRepository } from '../../src/infrastructure/repositor
 import { testConfig } from '../utils/module-for-testing'
 import { DateService } from '../../src/utils/date-service'
 import { Planificateur } from '../../src/domain/planificateur'
+import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from 'src/application/commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
 
 describe('WorkerService', () => {
   describe('handler', () => {
@@ -42,6 +43,9 @@ describe('WorkerService', () => {
       const handleJobNotifierNouveauxServicesCiviqueCommandHandler = stubClass(
         HandleJobNotifierNouveauxServicesCiviqueCommandHandler
       )
+      const handleJobRecupererSituationsJeunesMiloCommandHandler = stubClass(
+        HandleJobRecupererSituationsJeunesMiloCommandHandler
+      )
       const workerService = new WorkerService(
         planificateurRepository,
         handlerJobRendezVousCommandHandler,
@@ -49,7 +53,8 @@ describe('WorkerService', () => {
         notifierNouvellesOffresEmploiCommandHandler,
         handleNettoyerLesJobsCommandHandler,
         handleJobUpdateMailingListConseillerCommandHandler,
-        handleJobNotifierNouveauxServicesCiviqueCommandHandler
+        handleJobNotifierNouveauxServicesCiviqueCommandHandler,
+        handleJobRecupererSituationsJeunesMiloCommandHandler
       )
 
       workerService.subscribe()

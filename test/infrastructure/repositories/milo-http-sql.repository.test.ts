@@ -1,6 +1,11 @@
 import { HttpService } from '@nestjs/axios'
 import { expect } from 'chai'
 import * as nock from 'nock'
+import { CategorieSituationMilo, EtatSituationMilo } from 'src/domain/milo'
+import { SituationsMiloSqlModel } from 'src/infrastructure/sequelize/models/situations_milo.sql-model'
+import { DateService } from 'src/utils/date-service'
+import { IdService } from 'src/utils/id-service'
+import { uneSituationsMilo } from 'test/fixtures/milo.fixture'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
@@ -14,14 +19,12 @@ import { MiloHttpSqlRepository } from '../../../src/infrastructure/repositories/
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { DatabaseForTesting } from '../../utils'
 import { testConfig } from '../../utils/module-for-testing'
-import { IdService } from 'src/utils/id-service'
-import { DateService } from 'src/utils/date-service'
 
 describe('MiloHttpRepository', () => {
-  let miloHttpRepository: MiloHttpSqlRepository
+  let miloHttpSqlRepository: MiloHttpSqlRepository
   const configService = testConfig()
   const database = DatabaseForTesting.prepare()
-  const jeune = { ...unJeune(), email: 'john@doe.io' }
+  const jeune = unJeune({ email: 'john@doe.io' })
   let idService: IdService
   let dateService: DateService
 
@@ -36,7 +39,10 @@ describe('MiloHttpRepository', () => {
     )
     await jeuneSqlRepository.save(jeune)
 
-    miloHttpRepository = new MiloHttpSqlRepository(httpService, configService)
+    miloHttpSqlRepository = new MiloHttpSqlRepository(
+      httpService,
+      configService
+    )
   })
 
   describe('getDossier', () => {
@@ -49,7 +55,7 @@ describe('MiloHttpRepository', () => {
           .isDone()
 
         // When
-        const dossier = await miloHttpRepository.getDossier('1')
+        const dossier = await miloHttpSqlRepository.getDossier('1')
 
         // Then
         expect(dossier).to.deep.equal(
@@ -59,7 +65,14 @@ describe('MiloHttpRepository', () => {
             nom: 'PEREZ',
             prenom: 'Olivier',
             codePostal: '65410',
-            dateDeNaissance: '1997-05-08'
+            dateDeNaissance: '1997-05-08',
+            situations: [
+              {
+                categorie: "Demandeur d'emploi",
+                etat: 'EN_COURS',
+                dateFin: undefined
+              }
+            ]
           })
         )
       })
@@ -76,7 +89,7 @@ describe('MiloHttpRepository', () => {
           .isDone()
 
         // When
-        const dossier = await miloHttpRepository.getDossier('1')
+        const dossier = await miloHttpSqlRepository.getDossier('1')
 
         // Then
         expect(dossier).to.deep.equal(
@@ -93,7 +106,7 @@ describe('MiloHttpRepository', () => {
         nock('https://milo.com').post('/compte-jeune/1').reply(204).isDone()
 
         // When
-        const dossier = await miloHttpRepository.creerJeune('1')
+        const dossier = await miloHttpSqlRepository.creerJeune('1')
 
         // Then
         expect(dossier).to.deep.equal(emptySuccess())
@@ -113,7 +126,7 @@ describe('MiloHttpRepository', () => {
               .isDone()
 
             // When
-            const dossier = await miloHttpRepository.creerJeune('1')
+            const dossier = await miloHttpSqlRepository.creerJeune('1')
 
             // Then
             expect(dossier).to.deep.equal(
@@ -122,6 +135,62 @@ describe('MiloHttpRepository', () => {
           })
         })
       })
+    })
+  })
+
+  describe('saveSituationsJeune', () => {
+    describe("quand le jeune n'a pas de situations", () => {
+      it('sauvegarde les nouvelles situations', async () => {
+        // Given
+        const situationsMilo = uneSituationsMilo({ idJeune: jeune.id })
+
+        // When
+        await miloHttpSqlRepository.saveSituationsJeune(situationsMilo)
+
+        // Then
+        const result = await SituationsMiloSqlModel.findAll({
+          where: { idJeune: jeune.id }
+        })
+        expect(result.length).to.equal(1)
+        expect(result[0].idJeune).to.equal(jeune.id)
+        expect(result[0].situationCourante).to.deep.equal(
+          situationsMilo.situationCourante
+        )
+        expect(result[0].situations).to.deep.equal(situationsMilo.situations)
+      })
+    })
+    describe('quand le jeune a deja des situations', () => {
+      it('met à jour les situations', async () => {
+        // Given
+        const situationsMilo = uneSituationsMilo({ idJeune: jeune.id })
+
+        // When
+        await miloHttpSqlRepository.saveSituationsJeune(situationsMilo)
+        situationsMilo.situations = []
+        await miloHttpSqlRepository.saveSituationsJeune(situationsMilo)
+
+        // Then
+        const result = await SituationsMiloSqlModel.findAll({
+          where: { idJeune: jeune.id }
+        })
+        expect(result.length).to.equal(1)
+        expect(result[0].idJeune).to.equal(jeune.id)
+        expect(result[0].situations).to.deep.equal(situationsMilo.situations)
+      })
+    })
+  })
+
+  describe('getSituationsByJeune', () => {
+    it('recupere les situations', async () => {
+      // Given
+      const situationsMilo = uneSituationsMilo({ idJeune: jeune.id })
+      await SituationsMiloSqlModel.create({ ...situationsMilo })
+
+      // When
+      const result = await miloHttpSqlRepository.getSituationsByJeune(jeune.id)
+
+      // Then
+      expect(result).to.deep.equal(situationsMilo)
     })
   })
 })
@@ -156,9 +225,9 @@ const dossierDto = (): DossierMiloDto => ({
   },
   situations: [
     {
-      etat: 'EN_COURS',
+      etat: EtatSituationMilo.EN_COURS,
       dateFin: null,
-      categorieSituation: "Demandeur d'emploi",
+      categorieSituation: CategorieSituationMilo.DEMANDEUR_D_EMPLOI,
       codeRomeMetierPrepare: null,
       codeRomePremierMetier: 'F1501',
       codeRomeMetierExerce: null

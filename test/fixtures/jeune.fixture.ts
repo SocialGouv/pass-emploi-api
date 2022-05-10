@@ -5,7 +5,7 @@ import { uneDatetime } from './date.fixture'
 
 export const unJeune = (
   args: Partial<Jeune> = {}
-): Required<Omit<Jeune, 'tokenLastUpdate' | 'idDossier'>> => {
+): Required<Omit<Jeune, 'tokenLastUpdate'>> => {
   const defaults = {
     id: 'ABCDE',
     lastName: 'Doe',
@@ -39,7 +39,7 @@ export const unJeuneSansPushNotificationToken = (
 
 export const unJeuneSansConseiller = (
   args: Partial<Omit<Jeune, 'conseiller'>> = {}
-): Required<Omit<Jeune, 'conseiller' | 'idDossier'>> => {
+): Required<Omit<Jeune, 'conseiller'>> => {
   const defaults = {
     id: 'ABCDE',
     lastName: 'Doe',
