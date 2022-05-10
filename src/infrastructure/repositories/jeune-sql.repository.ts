@@ -278,6 +278,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
         structure: Core.Structure.MILO,
         idDossier: { [Op.ne]: null }
       },
+      order: [['id', 'ASC']],
       offset,
       limit
     })
