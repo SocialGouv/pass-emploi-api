@@ -272,13 +272,16 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return resumesActionsParJeune.map(toResumeActionsDuJeuneQueryModel)
   }
 
-  async getAllMilo(): Promise<Jeune[]> {
+  async getJeunesMilo(offset: number, limit: number): Promise<Jeune[]> {
     const jeunesMiloSqlModel = await JeuneSqlModel.findAll({
       where: {
         structure: Core.Structure.MILO,
         idDossier: { [Op.ne]: null }
-      }
+      },
+      offset,
+      limit
     })
+
     return jeunesMiloSqlModel.map(fromSqlToJeune)
   }
 }

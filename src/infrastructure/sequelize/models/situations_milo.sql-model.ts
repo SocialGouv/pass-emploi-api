@@ -7,12 +7,12 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
-import { Milo } from 'src/domain/milo'
+import { CategorieSituationMilo, EtatSituationMilo } from 'src/domain/milo'
 import { JeuneSqlModel } from './jeune.sql-model'
 
 interface Situation {
-  etat: Milo.EtatSituation
-  categorie: Milo.CategorieSituation
+  etat: EtatSituationMilo
+  categorie: CategorieSituationMilo
   dateFin?: string
 }
 

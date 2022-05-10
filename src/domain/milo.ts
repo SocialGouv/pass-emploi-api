@@ -2,25 +2,26 @@ import { Result } from '../building-blocks/types/result'
 
 export const MiloRepositoryToken = 'Milo.Repository'
 
+export enum EtatSituationMilo {
+  PREVU = 'PREVU',
+  EN_COURS = 'EN_COURS',
+  TERMINE = 'TERMINE'
+}
+export enum CategorieSituationMilo {
+  EMPLOI = 'Emploi',
+  CONTRAT_EN_ALTERNANCE = 'Contrat en Alternance',
+  FORMATION = 'Formation',
+  IMMERSION_EN_ENTREPRISE = 'Immersion en entreprise',
+  PMSMP = 'Pmsmp',
+  CONTRAT_DE_VOLONTARIAT_BENEVOLAT = 'Contrat de volontariat - bénévolat',
+  SCOLARITE = 'Scolarité',
+  DEMANDEUR_D_EMPLOI = "Demandeur d'emploi"
+}
+
 export namespace Milo {
-  export enum EtatSituation {
-    PREVU = 'PREVU',
-    EN_COURS = 'EN_COURS',
-    TERMINE = 'TERMINE'
-  }
-  export enum CategorieSituation {
-    EMPLOI = 'Emploi',
-    CONTRAT_EN_ALTERNANCE = 'Contrat en Alternance',
-    FORMATION = 'Formation',
-    IMMERSION_EN_ENTREPRISE = 'Immersion en entreprise',
-    PMSMP = 'Pmsmp',
-    CONTRAT_DE_VOLONTARIAT_BENEVOLAT = 'Contrat de volontariat - bénévolat',
-    SCOLARITE = 'Scolarité',
-    DEMANDEUR_D_EMPLOI = "Demandeur d'emploi"
-  }
   interface Situation {
-    etat: EtatSituation
-    categorie: CategorieSituation
+    etat: EtatSituationMilo
+    categorie: CategorieSituationMilo
     dateFin?: string
   }
 
@@ -49,12 +50,12 @@ export namespace Milo {
   }
 
   export function trierSituations(situations: Situation[]): Situation[] {
-    const etatsOrder: { [etat in EtatSituation]: number } = {
+    const etatsOrder: { [etat in EtatSituationMilo]: number } = {
       EN_COURS: 0,
       PREVU: 1,
       TERMINE: 2
     }
-    const categoriesOrder: { [categorie in CategorieSituation]: number } = {
+    const categoriesOrder: { [categorie in CategorieSituationMilo]: number } = {
       Emploi: 0,
       'Contrat en Alternance': 1,
       Formation: 2,
@@ -82,7 +83,7 @@ export namespace Milo {
     situationsTriees: Situation[]
   ): Situation | undefined {
     return situationsTriees.find(
-      situation => situation.etat === EtatSituation.EN_COURS
+      situation => situation.etat === EtatSituationMilo.EN_COURS
     )
   }
 }

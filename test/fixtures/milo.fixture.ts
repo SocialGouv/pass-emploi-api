@@ -6,5 +6,6 @@ export const unDossierMilo = (): Milo.Dossier => ({
   prenom: 'Jack',
   dateDeNaissance: '1888-09-01',
   codePostal: '91580',
-  email: 'jack.dawson@milo.com'
+  email: 'jack.dawson@milo.com',
+  situations: []
 })
