@@ -25,7 +25,8 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends Comman
     const stats: Stats = {
       jeunesMilo: 0,
       dossiersNonTrouves: 0,
-      situationsJeuneSauvegardees: 0
+      situationsJeuneSauvegardees: 0,
+      erreurs: 0
     }
     const maintenant = this.dateService.now()
 
@@ -38,7 +39,7 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends Comman
         PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM
       )
 
-      await Promise.all(
+      const promises = await Promise.allSettled(
         jeunes.map(async jeune => {
           const dossier = await this.miloRepository.getDossier(jeune.idDossier!)
 
@@ -58,6 +59,13 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends Comman
           stats.situationsJeuneSauvegardees++
         })
       )
+
+      promises.forEach(promise => {
+        if (promise.status === 'rejected') {
+          stats.erreurs++
+          this.logger.error(promise.reason)
+        }
+      })
       stats.jeunesMilo += jeunes.length
       offset += PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM
     } while (jeunes.length)
@@ -79,5 +87,6 @@ interface Stats {
   jeunesMilo: number
   situationsJeuneSauvegardees: number
   dossiersNonTrouves: number
+  erreurs: number
   tempsDExecution?: number
 }
