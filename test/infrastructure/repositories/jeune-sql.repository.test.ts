@@ -320,6 +320,54 @@ describe('JeuneSqlRepository', () => {
     })
   })
 
+  describe('getJeunesMilo', () => {
+    const idJeuneTest = 'jeune-a-retrouver'
+
+    beforeEach(async () => {
+      // Given
+      await JeuneSqlModel.bulkCreate([
+        unJeuneDto({
+          id: 'jeune-pas-milo',
+          idConseiller: undefined,
+          structure: Core.Structure.POLE_EMPLOI,
+          idDossier: undefined
+        }),
+        unJeuneDto({
+          id: 'jeune-sans-id-dossier',
+          idConseiller: undefined,
+          structure: Core.Structure.MILO,
+          idDossier: undefined
+        }),
+        unJeuneDto({
+          id: idJeuneTest,
+          idConseiller: undefined,
+          structure: Core.Structure.MILO,
+          idDossier: 'test-id-dossier'
+        })
+      ])
+    })
+
+    describe('quand un jeune Milo existe avec id dossier', () => {
+      it('retourne les jeunes', async () => {
+        // When
+        const result = await jeuneSqlRepository.getJeunesMilo(0, 10)
+
+        // Then
+        expect(result.length).to.equal(1)
+        expect(result[0].id).to.equal(idJeuneTest)
+      })
+    })
+    describe('quand la pagination atteint la limite', () => {
+      it('retourne liste vide', async () => {
+        // When
+        const result = await jeuneSqlRepository.getJeunesMilo(1, 1)
+
+        // Then
+        expect(result).to.deep.equal([])
+      })
+    })
+  })
+
   describe('getDetailJeuneQueryModelById', () => {
     describe("quand il n'y a pas eu de transfert", () => {
       const idJeune = '1'

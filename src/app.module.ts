@@ -113,7 +113,6 @@ import { EvenementHttpSqlRepository } from './infrastructure/repositories/evenem
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune-sql.repository'
 import { MailSqlRepository } from './infrastructure/repositories/mail.sql.repository'
 import { MiloHttpSqlRepository } from './infrastructure/repositories/milo-http-sql.repository'
-import { MiloInMemoryRepository } from './infrastructure/repositories/milo-in-memory.repository'
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
 import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre-emploi-http-sql.repository'
 import { OffreServiceCiviqueHttpSqlRepository } from './infrastructure/repositories/offre-engagement-http.repository'
@@ -246,10 +245,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: MiloRepositoryToken,
-      useClass:
-        process.env.IN_MEMORY == 'true'
-          ? MiloInMemoryRepository
-          : MiloHttpSqlRepository
+      useClass: MiloHttpSqlRepository
     },
     {
       provide: OffresImmersionRepositoryToken,

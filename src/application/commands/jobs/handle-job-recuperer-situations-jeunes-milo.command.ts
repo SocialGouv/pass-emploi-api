@@ -24,7 +24,8 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends Comman
   async handle(): Promise<Result<Stats>> {
     const stats: Stats = {
       jeunesMilo: 0,
-      dossiersNonTrouves: 0
+      dossiersNonTrouves: 0,
+      situationsJeuneSauvegardees: 0
     }
     const maintenant = this.dateService.now()
 
@@ -54,6 +55,7 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends Comman
           }
 
           await this.miloRepository.saveSituationsJeune(situationsDuJeune)
+          stats.situationsJeuneSauvegardees++
         })
       )
       stats.jeunesMilo += jeunes.length
@@ -75,6 +77,7 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends Comman
 
 interface Stats {
   jeunesMilo: number
+  situationsJeuneSauvegardees: number
   dossiersNonTrouves: number
   tempsDExecution?: number
 }

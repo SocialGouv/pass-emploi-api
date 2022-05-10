@@ -1,0 +1,134 @@
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { SinonSandbox } from 'sinon'
+import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from 'src/application/commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
+import { ErreurHttp } from 'src/building-blocks/types/domain-error'
+import { failure, isSuccess, success } from 'src/building-blocks/types/result'
+import { Core } from 'src/domain/core'
+import { Jeune } from 'src/domain/jeune'
+import { Milo } from 'src/domain/milo'
+import { uneDatetime } from 'test/fixtures/date.fixture'
+import { unJeune } from 'test/fixtures/jeune.fixture'
+import { unDossierMilo } from 'test/fixtures/milo.fixture'
+import { DateService } from '../../../../src/utils/date-service'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
+
+describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
+  let handleJobRecupererSituationsJeunesMiloCommandHandler: HandleJobRecupererSituationsJeunesMiloCommandHandler
+  let miloRepository: StubbedType<Milo.Repository>
+  let jeuneRepository: StubbedType<Jeune.Repository>
+  let dateSevice: StubbedClass<DateService>
+
+  const jeune1 = unJeune({
+    id: 'jeune1',
+    structure: Core.Structure.MILO,
+    idDossier: '1'
+  })
+  const jeune2 = unJeune({
+    id: 'jeune2',
+    structure: Core.Structure.MILO,
+    idDossier: '2'
+  })
+
+  beforeEach(() => {
+    const sandbox: SinonSandbox = createSandbox()
+    miloRepository = stubInterface(sandbox)
+    jeuneRepository = stubInterface(sandbox)
+    dateSevice = stubClass(DateService)
+    dateSevice.now.returns(uneDatetime)
+
+    handleJobRecupererSituationsJeunesMiloCommandHandler =
+      new HandleJobRecupererSituationsJeunesMiloCommandHandler(
+        miloRepository,
+        jeuneRepository,
+        dateSevice
+      )
+  })
+
+  describe("quand aucun jeune n'existe", () => {
+    it('ne fais rien', async () => {
+      // Given
+      jeuneRepository.getJeunesMilo.withArgs(0, 100).resolves([])
+
+      // When
+      const result =
+        await handleJobRecupererSituationsJeunesMiloCommandHandler.handle()
+
+      // Then
+      expect(miloRepository.saveSituationsJeune).to.have.callCount(0)
+      expect(result._isSuccess).to.equal(true)
+      if (isSuccess(result)) {
+        expect(result.data.jeunesMilo).to.equal(0)
+        expect(result.data.situationsJeuneSauvegardees).to.equal(0)
+      }
+    })
+  })
+
+  describe('quand il existe moins de 100 jeunes', () => {
+    it('recupere et sauvegarde les situations', async () => {
+      // Given
+      jeuneRepository.getJeunesMilo.withArgs(0, 100).resolves([jeune1, jeune2])
+      jeuneRepository.getJeunesMilo.withArgs(100, 100).resolves([])
+      miloRepository.getDossier
+        .withArgs(jeune1.idDossier)
+        .resolves(success(unDossierMilo({ id: jeune1.idDossier })))
+      miloRepository.getDossier
+        .withArgs(jeune2.idDossier)
+        .resolves(failure(new ErreurHttp('', 0)))
+
+      // When
+      const result =
+        await handleJobRecupererSituationsJeunesMiloCommandHandler.handle()
+
+      // Then
+      expect(miloRepository.saveSituationsJeune).to.have.callCount(1)
+      expect(
+        miloRepository.saveSituationsJeune
+      ).to.have.been.calledOnceWithExactly({
+        idJeune: jeune1.id,
+        situationCourante: undefined,
+        situations: []
+      })
+      expect(result._isSuccess).to.equal(true)
+      if (isSuccess(result)) {
+        expect(result.data.jeunesMilo).to.equal(2)
+        expect(result.data.dossiersNonTrouves).to.equal(1)
+        expect(result.data.situationsJeuneSauvegardees).to.equal(1)
+      }
+    })
+  })
+
+  describe('quand il existe plus de 100 jeunes', () => {
+    it('recupere et sauvegarde les situations', async () => {
+      // Given
+      jeuneRepository.getJeunesMilo.withArgs(0, 100).resolves([jeune1])
+      jeuneRepository.getJeunesMilo.withArgs(100, 100).resolves([jeune2])
+      jeuneRepository.getJeunesMilo.withArgs(200, 100).resolves([])
+      miloRepository.getDossier
+        .withArgs(jeune1.idDossier)
+        .resolves(success(unDossierMilo({ id: jeune1.idDossier })))
+      miloRepository.getDossier
+        .withArgs(jeune2.idDossier)
+        .resolves(failure(new ErreurHttp('', 0)))
+
+      // When
+      const result =
+        await handleJobRecupererSituationsJeunesMiloCommandHandler.handle()
+
+      // Then
+      expect(miloRepository.saveSituationsJeune).to.have.callCount(1)
+      expect(
+        miloRepository.saveSituationsJeune
+      ).to.have.been.calledOnceWithExactly({
+        idJeune: jeune1.id,
+        situationCourante: undefined,
+        situations: []
+      })
+      expect(result._isSuccess).to.equal(true)
+      if (isSuccess(result)) {
+        expect(result.data.jeunesMilo).to.equal(2)
+        expect(result.data.dossiersNonTrouves).to.equal(1)
+        expect(result.data.situationsJeuneSauvegardees).to.equal(1)
+      }
+    })
+  })
+})
