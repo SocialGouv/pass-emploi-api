@@ -95,6 +95,37 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
         expect(result.data.situationsJeuneSauvegardees).to.equal(1)
       }
     })
+    it("ne s'arrete pas pas quand une erreur se produit", async () => {
+      // Given
+      jeuneRepository.getJeunesMilo
+        .withArgs(0, 100)
+        .resolves([undefined, jeune1])
+      jeuneRepository.getJeunesMilo.withArgs(100, 100).resolves([])
+      miloRepository.getDossier
+        .withArgs(jeune1.idDossier)
+        .resolves(success(unDossierMilo({ id: jeune1.idDossier })))
+
+      // When
+      const result =
+        await handleJobRecupererSituationsJeunesMiloCommandHandler.handle()
+
+      // Then
+      expect(miloRepository.saveSituationsJeune).to.have.callCount(1)
+      expect(
+        miloRepository.saveSituationsJeune
+      ).to.have.been.calledOnceWithExactly({
+        idJeune: jeune1.id,
+        situationCourante: undefined,
+        situations: []
+      })
+      expect(result._isSuccess).to.equal(true)
+      if (isSuccess(result)) {
+        expect(result.data.jeunesMilo).to.equal(2)
+        expect(result.data.dossiersNonTrouves).to.equal(0)
+        expect(result.data.situationsJeuneSauvegardees).to.equal(1)
+        expect(result.data.erreurs).to.equal(1)
+      }
+    })
   })
 
   describe('quand il existe plus de 100 jeunes', () => {
