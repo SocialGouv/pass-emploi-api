@@ -22,7 +22,8 @@ import { Conseiller } from '../../../src/domain/conseiller'
 import { Jeune } from '../../../src/domain/jeune'
 import {
   unUtilisateurConseiller,
-  unUtilisateurJeune
+  unUtilisateurJeune,
+  unUtilisateurSupport
 } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
@@ -75,7 +76,18 @@ describe('DeleteJeuneCommandHandler', () => {
       const promise = commandHandler.authorize(command, utilisateur)
 
       // Then
-      await expect(promise).not.to.be.rejected
+      await expect(promise).not.to.be.rejected()
+    })
+
+    it('autorise le support', async () => {
+      // Given
+      const utilisateur = unUtilisateurSupport()
+
+      // When
+      const promise = commandHandler.authorize(command, utilisateur)
+
+      // Then
+      expect(promise).not.to.be.rejected()
     })
 
     it('interdit un autre jeune', async () => {

@@ -44,6 +44,7 @@ import {
   unHeaderAuthorization,
   unJwtPayloadValide,
   unJwtPayloadValideJeunePE,
+  unJwtPayloadValideSupport,
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
@@ -511,6 +512,22 @@ describe('JeunesController', () => {
     it("supprime le jeune quand t'es jeune", async () => {
       //Given
       jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
+      deleteJeuneCommandHandler.execute.resolves(emptySuccess())
+
+      //When
+      await request(app.getHttpServer())
+        .delete(`/jeunes/id-jeune`)
+        .set('authorization', unHeaderAuthorization())
+        //Then
+        .expect(HttpStatus.NO_CONTENT)
+
+      expect(deleteJeuneCommandHandler.execute).to.have.be.calledWith({
+        idJeune: 'id-jeune'
+      })
+    })
+    it("supprime le jeune quand t'es au support", async () => {
+      //Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideSupport())
       deleteJeuneCommandHandler.execute.resolves(emptySuccess())
 
       //When
