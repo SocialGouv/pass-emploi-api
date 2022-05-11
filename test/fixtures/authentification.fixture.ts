@@ -46,6 +46,28 @@ export const unUtilisateurJeune = (
   }
 }
 
+export const unUtilisateurSupport = (
+  args: Partial<Authentification.Utilisateur> = {}
+): Authentification.Utilisateur => {
+  const defaults: Authentification.Utilisateur = {
+    id: 'ABCDE-support',
+    idAuthentification: 'id-authentification-support',
+    nom: 'Doe',
+    prenom: 'John',
+    type: Authentification.Type.SUPPORT,
+    email: 'john.doe@plop.io',
+    structure: Core.Structure.PASS_EMPLOI,
+    dateDerniereConnexion: null,
+    roles: []
+  }
+
+  return {
+    ...defaults,
+    ...args,
+    type: Authentification.Type.SUPPORT
+  }
+}
+
 export const unJwtPayloadValide = (): JWTPayload => ({
   exp: 1638970870,
   iat: 1638970570,
@@ -87,6 +109,30 @@ export const unJwtPayloadValideJeunePE = (): JWTPayload => ({
   userStructure: 'POLE_EMPLOI',
   name: 'Albert Durant',
   userType: 'JEUNE',
+  preferred_username: 'a.durant',
+  given_name: 'Albert',
+  family_name: 'Durant',
+  userId: 'bcd60403-5f10-4a16-a660-2099d79ebd66',
+  email: 'conseiller.milo.passemploi@gmail.com',
+  realm_access: { roles: [] }
+})
+export const unJwtPayloadValideSupport = (): JWTPayload => ({
+  exp: 1638970870,
+  iat: 1638970570,
+  auth_time: 1638969913,
+  jti: '9c84a1ab-96e2-4841-935a-16d69fe2e7ff',
+  iss: 'https://pa-auth-staging.osc-secnum-fr1.scalingo.io/auth/realms/pass-emploi',
+  sub: '46bf1a0a-ecc2-4b59-9ce3-cca0efa3b7f5',
+  typ: 'Bearer',
+  azp: 'pass-emploi-web',
+  session_state: 'c627ac87-410f-486d-a5c9-d7e8811c610a',
+  acr: '0',
+  scope: 'pass-emploi-user email profile',
+  sid: 'c627ac87-410f-486d-a5c9-d7e8811c610a',
+  email_verified: false,
+  userStructure: 'PASS_EMPLOI',
+  name: 'Albert Durant',
+  userType: 'SUPPORT',
   preferred_username: 'a.durant',
   given_name: 'Albert',
   family_name: 'Durant',

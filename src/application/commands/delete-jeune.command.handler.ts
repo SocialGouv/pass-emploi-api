@@ -56,10 +56,13 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
     command: DeleteJeuneCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    if (
-      utilisateur.type !== Authentification.Type.JEUNE ||
-      command.idJeune !== utilisateur.id
-    ) {
+    const estLeJeune =
+      utilisateur.type === Authentification.Type.JEUNE &&
+      command.idJeune === utilisateur.id
+    const estDuSupport = utilisateur.type === Authentification.Type.SUPPORT
+    if (estLeJeune || estDuSupport) {
+      return
+    } else {
       throw new DroitsInsuffisants()
     }
   }

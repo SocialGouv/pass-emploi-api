@@ -437,6 +437,7 @@ export class JeunesController {
           )
           break
         case Authentification.Type.JEUNE:
+        case Authentification.Type.SUPPORT:
           result = await this.deleteJeuneCommandHandler.execute(
             {
               idJeune
