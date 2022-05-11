@@ -203,7 +203,7 @@ describe('ModifierConseillerQueryHandler', () => {
         )
 
         // Then
-        await expect(call).to.not.be.rejected
+        await expect(call).to.not.be.rejected()
       })
     })
 

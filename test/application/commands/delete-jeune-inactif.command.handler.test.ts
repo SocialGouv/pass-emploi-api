@@ -61,7 +61,7 @@ describe('DeleteJeuneInactifCommandHandler', () => {
       const promise = commandHandler.authorize(command, utilisateur)
 
       // Then
-      await expect(promise).not.to.be.rejected
+      await expect(promise).not.to.be.rejected()
     })
 
     it('interdit un jeune', async () => {

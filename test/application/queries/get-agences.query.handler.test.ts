@@ -68,7 +68,7 @@ describe('GetAgenceQuery', () => {
           unUtilisateurConseiller({ structure: Structure.MILO })
         )
 
-        await expect(call).to.not.be.rejected
+        await expect(call).to.not.be.rejected()
       })
     })
   })
