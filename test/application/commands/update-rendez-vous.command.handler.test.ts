@@ -188,11 +188,18 @@ describe('UpdateRendezVousCommandHandler', () => {
             rendezVousUpdated
           )
           expect(notificationRepository.send).to.have.been.calledWith(
-            Notification.createRendezVousMisAJour(
-              jeune.pushNotificationToken,
+            Notification.createNouveauRdv(
+              jeuneAjoute.pushNotificationToken,
               rendezVousUpdated.id
             )
           )
+          expect(notificationRepository.send).to.have.been.calledWith(
+            Notification.createRdvSupprime(
+              jeuneSupprime.pushNotificationToken,
+              rendezVous.date
+            )
+          )
+          expect(notificationRepository.send).to.have.callCount(2)
           expect(
             planificateurService.supprimerRappelsRendezVous
           ).to.have.callCount(0)
@@ -202,7 +209,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         })
       })
       describe("quand la date n'est pas modifiée", () => {
-        it('ne replanifie pas les rappels', async () => {
+        it("ne replanifie pas les rappels et n'envoie pas la notif", async () => {
           // Given
           rendezVousRepository.get
             .withArgs(command.idRendezVous)
@@ -219,12 +226,7 @@ describe('UpdateRendezVousCommandHandler', () => {
           expect(rendezVousRepository.save).to.have.been.calledWith(
             rendezVousUpdated
           )
-          expect(notificationRepository.send).to.have.been.calledWith(
-            Notification.createRendezVousMisAJour(
-              jeune.pushNotificationToken,
-              rendezVousUpdated.id
-            )
-          )
+          expect(notificationRepository.send).to.have.callCount(0)
           expect(
             planificateurService.supprimerRappelsRendezVous
           ).not.to.have.been.calledWith(rendezVousUpdated)

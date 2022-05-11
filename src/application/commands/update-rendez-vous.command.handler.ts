@@ -16,6 +16,7 @@ import {
 import { PlanificateurService } from '../../domain/planificateur'
 import {
   CodeTypeRendezVous,
+  JeuneDuRendezVous,
   RendezVous,
   RendezVousRepositoryToken
 } from '../../domain/rendez-vous'
@@ -99,9 +100,9 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     await this.rendezVousRepository.save(rendezVousUpdated)
 
     await this.replanifierLesRappelsDeRendezVous(rendezVousUpdated, rendezVous)
-    this.notifierLesJeunes(rendezVous)
+    await this.notifierLesJeunes(rendezVous, rendezVousUpdated)
     if (rendezVousUpdated.invitation) {
-      this.envoyerLesInvitationsCalendaires(rendezVousUpdated)
+      await this.envoyerLesInvitationsCalendaires(rendezVousUpdated)
     }
     return success({ id: rendezVousUpdated.id })
   }
@@ -134,10 +135,36 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     }
   }
 
-  private notifierLesJeunes(rendezVous: RendezVous): void {
-    rendezVous.jeunes.forEach(jeune => {
+  private async notifierLesJeunes(
+    rendezVous: RendezVous,
+    rendezVousUpdated: RendezVous
+  ): Promise<void> {
+    const jeunesAnciens: JeuneDuRendezVous[] = rendezVous.jeunes
+    const idsJeunesRdvUpdated: string[] = rendezVousUpdated.jeunes.map(
+      jeune => jeune.id
+    )
+
+    const jeunesInchanges: JeuneDuRendezVous[] = jeunesAnciens.filter(
+      jeuneAncien => idsJeunesRdvUpdated.includes(jeuneAncien.id)
+    )
+    const jeunesSupprimes: JeuneDuRendezVous[] = jeunesAnciens.filter(
+      jeuneAncien => !idsJeunesRdvUpdated.includes(jeuneAncien.id)
+    )
+
+    const jeunesAjoutes: JeuneDuRendezVous[] = []
+    for (const idJeune of idsJeunesRdvUpdated) {
+      const estUnNouveauJeune = !jeunesAnciens.find(
+        jeune => jeune.id === idJeune
+      )
+      if (estUnNouveauJeune) {
+        const jeuneAjoute = await this.jeuneRepository.get(idJeune)
+        jeunesAjoutes.push(jeuneAjoute!)
+      }
+    }
+
+    jeunesAjoutes.forEach(jeune => {
       if (jeune.pushNotificationToken) {
-        const notification = Notification.createRendezVousMisAJour(
+        const notification = Notification.createNouveauRdv(
           jeune.pushNotificationToken,
           rendezVous.id
         )
@@ -148,6 +175,61 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
         )
       }
     })
+
+    jeunesSupprimes.forEach(jeune => {
+      if (jeune.pushNotificationToken) {
+        const notification = Notification.createRdvSupprime(
+          jeune.pushNotificationToken,
+          rendezVous.date
+        )
+        this.notificationRepository.send(notification)
+      } else {
+        this.logger.log(
+          `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
+        )
+      }
+    })
+
+    if (
+      this.listeBeneficiairesNEstPasModifiee(jeunesAjoutes, jeunesSupprimes) &&
+      this.rendezVousEstModifie(rendezVous, rendezVousUpdated)
+    ) {
+      jeunesInchanges.forEach(jeune => {
+        if (jeune.pushNotificationToken) {
+          const notification = Notification.createRendezVousMisAJour(
+            jeune.pushNotificationToken,
+            rendezVous.id
+          )
+          this.notificationRepository.send(notification)
+        } else {
+          this.logger.log(
+            `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
+          )
+        }
+      })
+    }
+  }
+
+  private listeBeneficiairesNEstPasModifiee(
+    jeunesAjoutes: JeuneDuRendezVous[],
+    jeunesSupprimes: JeuneDuRendezVous[]
+  ): boolean {
+    return jeunesSupprimes.length === 0 && jeunesAjoutes.length === 0
+  }
+  private rendezVousEstModifie(
+    rendezVous: RendezVous,
+    rendezVousUpdated: RendezVous
+  ): boolean {
+    return (
+      rendezVous.commentaire != rendezVousUpdated.commentaire ||
+      rendezVous.date != rendezVousUpdated.date ||
+      rendezVous.duree != rendezVousUpdated.duree ||
+      rendezVous.modalite != rendezVousUpdated.modalite ||
+      rendezVous.jeunes != rendezVousUpdated.jeunes ||
+      rendezVous.adresse != rendezVousUpdated.adresse ||
+      rendezVous.organisme != rendezVousUpdated.organisme ||
+      rendezVous.presenceConseiller != rendezVousUpdated.presenceConseiller
+    )
   }
 
   private async replanifierLesRappelsDeRendezVous(
