@@ -148,7 +148,7 @@ describe('ConseillerAuthorizer', () => {
       const promise = conseillerAuthorizer.authorizeConseiller(superviseur)
 
       // Then
-      await expect(promise).to.be.fulfilled
+      await expect(promise).to.be.fulfilled()
     })
     it('autorise un conseiller avec la bonne structure', async () => {
       // Given
@@ -160,7 +160,7 @@ describe('ConseillerAuthorizer', () => {
       const promise = conseillerAuthorizer.authorizeConseiller(superviseur)
 
       // Then
-      await expect(promise).to.be.fulfilled
+      await expect(promise).to.be.fulfilled()
     })
 
     it('interdit un conseiller inexistant', async () => {
@@ -211,7 +211,7 @@ describe('ConseillerAuthorizer', () => {
       const promise = conseillerAuthorizer.authorizeSuperviseur(superviseur)
 
       // Then
-      await expect(promise).to.be.fulfilled
+      await expect(promise).to.be.fulfilled()
     })
 
     it('interdit un conseiller non superviseur', async () => {
