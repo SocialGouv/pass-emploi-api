@@ -191,8 +191,8 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     })
 
     if (
-      this.listeBeneficiairesNEstPasModifiee(jeunesAjoutes, jeunesSupprimes) &&
-      this.rendezVousEstModifie(rendezVous, rendezVousUpdated)
+      this.beneficiairesNeSontPasModifies(jeunesAjoutes, jeunesSupprimes) &&
+      this.infosRendezVousSontModifies(rendezVous, rendezVousUpdated)
     ) {
       jeunesInchanges.forEach(jeune => {
         if (jeune.pushNotificationToken) {
@@ -210,25 +210,24 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     }
   }
 
-  private listeBeneficiairesNEstPasModifiee(
+  private beneficiairesNeSontPasModifies(
     jeunesAjoutes: JeuneDuRendezVous[],
     jeunesSupprimes: JeuneDuRendezVous[]
   ): boolean {
     return jeunesSupprimes.length === 0 && jeunesAjoutes.length === 0
   }
-  private rendezVousEstModifie(
+  private infosRendezVousSontModifies(
     rendezVous: RendezVous,
     rendezVousUpdated: RendezVous
   ): boolean {
     return (
-      rendezVous.commentaire != rendezVousUpdated.commentaire ||
-      rendezVous.date != rendezVousUpdated.date ||
-      rendezVous.duree != rendezVousUpdated.duree ||
-      rendezVous.modalite != rendezVousUpdated.modalite ||
-      rendezVous.jeunes != rendezVousUpdated.jeunes ||
-      rendezVous.adresse != rendezVousUpdated.adresse ||
-      rendezVous.organisme != rendezVousUpdated.organisme ||
-      rendezVous.presenceConseiller != rendezVousUpdated.presenceConseiller
+      rendezVous.commentaire !== rendezVousUpdated.commentaire ||
+      rendezVous.date.getTime() !== rendezVousUpdated.date.getTime() ||
+      rendezVous.duree !== rendezVousUpdated.duree ||
+      rendezVous.modalite !== rendezVousUpdated.modalite ||
+      rendezVous.adresse !== rendezVousUpdated.adresse ||
+      rendezVous.organisme !== rendezVousUpdated.organisme ||
+      rendezVous.presenceConseiller !== rendezVousUpdated.presenceConseiller
     )
   }
 
