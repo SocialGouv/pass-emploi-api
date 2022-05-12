@@ -86,7 +86,7 @@ export interface InfosRendezVousAMettreAJour {
   date: string
   duree: number
   modalite?: string
-  jeunes: Jeune[]
+  jeunes: JeuneDuRendezVous[]
   adresse?: string
   organisme?: string
   presenceConseiller: boolean

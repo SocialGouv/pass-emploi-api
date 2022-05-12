@@ -94,10 +94,11 @@ export class CreateRendezVousPayload {
 }
 
 export class UpdateRendezVousPayload {
-  @ApiProperty()
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsArray()
   @ArrayNotEmpty()
-  jeunesIds: string[]
+  jeunesIds?: string[]
 
   @ApiPropertyOptional()
   @IsOptional()

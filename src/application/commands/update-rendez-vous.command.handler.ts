@@ -27,7 +27,7 @@ import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 
 export interface UpdateRendezVousCommand extends Command {
   idRendezVous: string
-  idsJeunes: string[]
+  idsJeunes?: string[]
   commentaire?: string
   date: string
   duree: number
@@ -79,16 +79,19 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     }
 
     const jeunes: Jeune[] = []
-    for (const idJeune of command.idsJeunes) {
-      const jeune = await this.jeuneRepository.get(idJeune)
-      if (!jeune) {
-        return failure(new NonTrouveError('Jeune', idJeune))
+
+    if (command.idsJeunes) {
+      for (const idJeune of command.idsJeunes) {
+        const jeune = await this.jeuneRepository.get(idJeune)
+        if (!jeune) {
+          return failure(new NonTrouveError('Jeune', idJeune))
+        }
+        jeunes.push(jeune)
       }
-      jeunes.push(jeune)
     }
     const rendezVousUpdated = await RendezVous.mettreAJour(rendezVous, {
       ...command,
-      jeunes: jeunes
+      jeunes: command.idsJeunes ? jeunes : rendezVous.jeunes
     })
     await this.rendezVousRepository.save(rendezVousUpdated)
 
