@@ -3,7 +3,6 @@ import { Op, QueryTypes, Sequelize } from 'sequelize'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 import {
   DetailJeuneConseillerQueryModel,
-  DetailJeuneQueryModel,
   JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
@@ -21,7 +20,6 @@ import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
 import { TransfertConseillerSqlModel } from '../sequelize/models/transfert-conseiller.sql-model'
 import { SequelizeInjectionToken } from '../sequelize/providers'
 import {
-  fromSqlToDetailJeuneQueryModel,
   fromSqlToJeune,
   fromSqlToJeuneHomeQueryModel,
   fromSqlToJeuneQueryModel,
@@ -76,26 +74,6 @@ export class JeuneSqlRepository implements Jeune.Repository {
       return undefined
     }
     return fromSqlToJeune(jeuneSqlModel)
-  }
-
-  async getDetailJeuneQueryModelById(
-    id: string
-  ): Promise<DetailJeuneQueryModel | undefined> {
-    const jeuneSqlModel = await JeuneSqlModel.findByPk(id, {
-      include: [
-        ConseillerSqlModel,
-        {
-          model: TransfertConseillerSqlModel,
-          separate: true,
-          order: [['dateTransfert', 'DESC']],
-          limit: 1
-        }
-      ]
-    })
-    if (!jeuneSqlModel) {
-      return undefined
-    }
-    return fromSqlToDetailJeuneQueryModel(jeuneSqlModel)
   }
 
   async getJeuneQueryModelByIdDossier(

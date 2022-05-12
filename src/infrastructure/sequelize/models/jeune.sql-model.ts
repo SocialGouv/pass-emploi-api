@@ -5,6 +5,7 @@ import {
   DataType,
   ForeignKey,
   HasMany,
+  HasOne,
   Model,
   PrimaryKey,
   Table
@@ -15,6 +16,7 @@ import { ActionSqlModel } from './action.sql-model'
 import { ConseillerSqlModel } from './conseiller.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-association.model'
 import { RendezVousSqlModel } from './rendez-vous.sql-model'
+import { SituationsMiloSqlModel } from './situations-milo.sql-model'
 import { TransfertConseillerSqlModel } from './transfert-conseiller.sql-model'
 
 export class JeuneDto extends Model {
@@ -118,6 +120,9 @@ export class JeuneSqlModel extends JeuneDto {
 
   @HasMany(() => TransfertConseillerSqlModel)
   transferts: TransfertConseillerSqlModel[]
+
+  @HasOne(() => SituationsMiloSqlModel)
+  situations?: SituationsMiloSqlModel
 
   static async creer(jeuneDto: AsSql<JeuneDto>): Promise<JeuneSqlModel> {
     return JeuneSqlModel.create(jeuneDto)

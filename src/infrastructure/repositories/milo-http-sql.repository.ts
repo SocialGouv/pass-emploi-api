@@ -11,7 +11,7 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { Milo } from '../../domain/milo'
-import { SituationsMiloSqlModel } from '../sequelize/models/situations_milo.sql-model'
+import { SituationsMiloSqlModel } from '../sequelize/models/situations-milo.sql-model'
 import { DossierMiloDto } from './dto/milo.dto'
 
 @Injectable()

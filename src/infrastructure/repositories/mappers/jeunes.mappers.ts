@@ -2,7 +2,6 @@ import { DateTime, Duration } from 'luxon'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 import {
   DetailJeuneConseillerQueryModel,
-  DetailJeuneQueryModel,
   JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
@@ -17,29 +16,6 @@ import {
 import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../sequelize/types'
 import { ResumeActionsJeuneDto } from '../jeune-sql.repository'
-
-export function fromSqlToDetailJeuneQueryModel(
-  jeuneSqlModel: JeuneSqlModel
-): DetailJeuneQueryModel {
-  const depuis =
-    jeuneSqlModel.transferts!.length > 0
-      ? jeuneSqlModel.transferts![0].dateTransfert
-      : jeuneSqlModel.dateCreation
-  return {
-    id: jeuneSqlModel.id,
-    firstName: jeuneSqlModel.prenom,
-    lastName: jeuneSqlModel.nom,
-    email: jeuneSqlModel.email ?? undefined,
-    creationDate: jeuneSqlModel.dateCreation.toISOString(),
-    isActivated: Boolean(jeuneSqlModel.idAuthentification),
-    conseiller: {
-      email: jeuneSqlModel.conseiller!.email ?? undefined,
-      prenom: jeuneSqlModel.conseiller!.prenom,
-      nom: jeuneSqlModel.conseiller!.nom,
-      depuis: depuis.toISOString()
-    }
-  }
-}
 
 export function fromSqlToJeuneQueryModel(
   jeuneSqlModel: JeuneSqlModel

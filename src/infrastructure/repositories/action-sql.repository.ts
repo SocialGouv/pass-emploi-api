@@ -1,19 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common'
-import { ActionQueryModel } from '../../application/queries/query-models/actions.query-model'
+import { Injectable } from '@nestjs/common'
 import { Action } from '../../domain/action'
 import { ActionDto, ActionSqlModel } from '../sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { AsSql } from '../sequelize/types'
-import { fromSqlToActionQueryModel } from './mappers/actions.mappers'
-import { SequelizeInjectionToken } from '../sequelize/providers'
-import { Sequelize } from 'sequelize'
 
 @Injectable()
 export class ActionSqlRepository implements Action.Repository {
-  constructor(
-    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
-  ) {}
-
   async save(action: Action): Promise<void> {
     await ActionSqlModel.modifierOuCreer(
       ActionSqlRepository.sqlModelFromAction(action)
@@ -51,28 +43,6 @@ export class ActionSqlRepository implements Action.Repository {
         id: idAction
       }
     })
-  }
-
-  async getQueryModelByJeuneId(id: string): Promise<ActionQueryModel[]> {
-    const actionsSqlModel = await ActionSqlModel.findAll({
-      where: {
-        idJeune: id
-      },
-      order: [
-        this.sequelize.literal(
-          `CASE WHEN statut = '${Action.Statut.TERMINEE}' THEN 1 ELSE 0 END`
-        ),
-        ['date_derniere_actualisation', 'DESC']
-      ],
-      include: [
-        {
-          model: JeuneSqlModel,
-          required: true
-        }
-      ]
-    })
-
-    return actionsSqlModel.map(fromSqlToActionQueryModel)
   }
 
   static actionFromSqlModel(sqlModel: AsSql<ActionDto>): Action {
