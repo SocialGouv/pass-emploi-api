@@ -11,7 +11,7 @@ import {
   ParseUUIDPipe,
   Put
 } from '@nestjs/common'
-import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Authentification } from 'src/domain/authentification'
 import { DeleteActionCommandHandler } from '../../application/commands/delete-action.command.handler'
 import {
@@ -38,6 +38,10 @@ export class ActionsController {
     private readonly deleteActionCommandHandler: DeleteActionCommandHandler
   ) {}
 
+  @ApiOperation({
+    summary: 'Récupère une action',
+    description: 'Pour un jeune et son conseiller'
+  })
   @Get(':idAction')
   @ApiResponse({
     type: ActionQueryModel
@@ -61,6 +65,10 @@ export class ActionsController {
     )
   }
 
+  @ApiOperation({
+    summary: 'Modifie le statut une action',
+    description: 'Pour un jeune et son conseiller'
+  })
   @Put(':idAction')
   async updateStatutAction(
     @Param('idAction', new ParseUUIDPipe()) idAction: string,
@@ -87,6 +95,10 @@ export class ActionsController {
     }
   }
 
+  @ApiOperation({
+    summary: 'Supprime une action',
+    description: 'Pour un jeune et son conseiller'
+  })
   @Delete(':idAction')
   @HttpCode(204)
   async deleteAction(

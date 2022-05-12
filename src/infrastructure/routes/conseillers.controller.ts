@@ -15,7 +15,13 @@ import {
   Query
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiBody, ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  ApiBody,
+  ApiOAuth2,
+  ApiOperation,
+  ApiResponse,
+  ApiTags
+} from '@nestjs/swagger'
 import {
   CreateRendezVousCommand,
   CreateRendezVousCommandHandler
@@ -99,6 +105,10 @@ export class ConseillersController {
     private readonly modifierConseillerCommandHandler: ModifierConseillerCommandHandler
   ) {}
 
+  @ApiOperation({
+    summary: 'Récupère un conseiller par email',
+    description: 'Pour un conseiller'
+  })
   @Get()
   @ApiResponse({
     type: DetailConseillerQueryModel
@@ -136,6 +146,10 @@ export class ConseillersController {
     throw new RuntimeException()
   }
 
+  @ApiOperation({
+    summary: 'Récupère un conseiller',
+    description: 'Pour un conseiller'
+  })
   @Get(':idConseiller')
   @ApiResponse({
     type: DetailConseillerQueryModel
@@ -160,6 +174,10 @@ export class ConseillersController {
     )
   }
 
+  @ApiOperation({
+    summary: "Récupère les jeunes d'un conseiller",
+    description: 'Pour un conseiller'
+  })
   @Get(':idConseiller/jeunes')
   @ApiResponse({
     type: DetailJeuneConseillerQueryModel,
@@ -189,6 +207,10 @@ export class ConseillersController {
     throw new RuntimeException()
   }
 
+  @ApiOperation({
+    summary: 'Crée un jeune PE',
+    description: 'Pour un conseiller PE'
+  })
   @Post('pole-emploi/jeunes')
   @ApiResponse({
     type: JeuneQueryModel
@@ -219,6 +241,10 @@ export class ConseillersController {
     throw new RuntimeException()
   }
 
+  @ApiOperation({
+    summary: 'Crée une action pour un jeune',
+    description: 'Pour un conseiller du jeune'
+  })
   @Post(':idConseiller/jeunes/:idJeune/action')
   async createAction(
     @Param('idConseiller') idConseiller: string,
@@ -249,6 +275,10 @@ export class ConseillersController {
     throw new RuntimeException()
   }
 
+  @ApiOperation({
+    summary: "Récupère les actions d'un conseiller",
+    description: 'Pour un conseiller'
+  })
   @Get(':idConseiller/actions')
   async getActions(
     @Param('idConseiller') idConseiller: string,
@@ -262,6 +292,10 @@ export class ConseillersController {
     )
   }
 
+  @ApiOperation({
+    summary: "Récupère les rendez-vous d'un conseiller",
+    description: 'Pour un conseiller'
+  })
   @Get(':idConseiller/rendezvous')
   @ApiResponse({
     type: RendezVousConseillerFutursEtPassesQueryModel
@@ -280,7 +314,10 @@ export class ConseillersController {
     )
   }
 
-  // Deprecated (Web)
+  @ApiOperation({
+    summary: 'Deprecated (Web)',
+    deprecated: true
+  })
   @Post(':idConseiller/jeunes/:idJeune/notify-message')
   async postNotificationDeprecated(
     @Param('idConseiller') idConseiller: string,
@@ -306,6 +343,10 @@ export class ConseillersController {
     }
   }
 
+  @ApiOperation({
+    summary: "Envoie une notification d'un nouveau message à des jeunes",
+    description: 'Pour un conseiller'
+  })
   @Post(':idConseiller/jeunes/notify-messages')
   async postNotifications(
     @Param('idConseiller') idConseiller: string,
@@ -326,6 +367,10 @@ export class ConseillersController {
     }
   }
 
+  @ApiOperation({
+    summary: 'Crée un rendez-vous pour des jeunes',
+    description: 'Pour un conseiller'
+  })
   @Post(':idConseiller/rendezvous')
   async createRendezVous(
     @Param('idConseiller') idConseiller: string,
@@ -368,6 +413,10 @@ export class ConseillersController {
     throw new RuntimeException()
   }
 
+  @ApiOperation({
+    summary: "Récupère le dossier Milo d'un jeune",
+    description: 'Pour un conseiller du jeune'
+  })
   @Get('/milo/dossiers/:idDossier')
   @ApiResponse({
     type: DossierJeuneMiloQueryModel
@@ -394,6 +443,10 @@ export class ConseillersController {
     return result.data
   }
 
+  @ApiOperation({
+    summary: 'Récupère un jeune par son idDossier Milo',
+    description: 'Pour un conseiller du jeune'
+  })
   @Get('milo/jeunes/:idDossier')
   @ApiResponse({
     type: DetailJeuneQueryModel
@@ -431,6 +484,10 @@ export class ConseillersController {
     return result.data
   }
 
+  @ApiOperation({
+    summary: 'Crée un jeune Milo',
+    description: 'Pour un conseiller Milo'
+  })
   @Post('milo/jeunes')
   async postJeuneMilo(
     @Body() creerJeuneMiloPayload: CreerJeuneMiloPayload,
@@ -460,6 +517,10 @@ export class ConseillersController {
     return result.data
   }
 
+  @ApiOperation({
+    summary: 'Ajoute des droits de supervision à des conseillers',
+    description: 'Pour un utilisateur support'
+  })
   @Post('superviseurs')
   async postSuperviseurs(
     @Body() superviseursPayload: SuperviseursPayload,
@@ -475,6 +536,10 @@ export class ConseillersController {
     }
   }
 
+  @ApiOperation({
+    summary: 'Supprime des droits de supervision à des conseillers',
+    description: 'Pour un utilisateur support'
+  })
   @Delete('superviseurs')
   @HttpCode(204)
   async deleteSuperviseurs(
@@ -497,6 +562,10 @@ export class ConseillersController {
     }
   }
 
+  @ApiOperation({
+    summary: "Modifie l'agence et les notifications sonores d'un conseiller",
+    description: 'Pour un conseiller'
+  })
   @Put(':idConseiller')
   @ApiResponse({
     type: DetailConseillerQueryModel

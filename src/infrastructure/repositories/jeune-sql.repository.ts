@@ -98,6 +98,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
 
   async getJeunes(idsJeune: string[]): Promise<Jeune[]> {
     const jeunesSqlModel = await JeuneSqlModel.findAll({
+      include: [ConseillerSqlModel],
       where: {
         id: {
           [Op.in]: idsJeune

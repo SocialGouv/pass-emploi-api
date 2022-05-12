@@ -13,7 +13,13 @@ import {
   UseGuards
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiOAuth2, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger'
+import {
+  ApiOAuth2,
+  ApiOperation,
+  ApiResponse,
+  ApiSecurity,
+  ApiTags
+} from '@nestjs/swagger'
 import { GetChatSecretsQueryHandler } from 'src/application/queries/get-chat-secrets.query.handler'
 import {
   UpdateUtilisateurCommand,
@@ -50,6 +56,10 @@ export class AuthentificationController {
     Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
     Authentification.Partenaire.KEYCLOAK
   )
+  @ApiOperation({
+    summary:
+      "Récupère un jeune/conseiller, crée le conseiller PE/Milo si il n'existe pas"
+  })
   @Put('auth/users/:idUtilisateurAuth')
   @ApiResponse({
     type: UtilisateurQueryModel
@@ -83,6 +93,9 @@ export class AuthentificationController {
     throw new RuntimeException()
   }
 
+  @ApiOperation({
+    summary: 'Récupère le token et la clé de chiffrement du chat du jeune'
+  })
   @Post('auth/firebase/token')
   @ApiOAuth2([])
   async postFirebaseToken(
