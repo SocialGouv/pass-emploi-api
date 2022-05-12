@@ -1,22 +1,37 @@
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
+import { CategorieSituationMilo, EtatSituationMilo } from 'src/domain/milo'
+import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
+import { SituationsMiloSqlModel } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
+import {
+  TransfertConseillerDto,
+  TransfertConseillerSqlModel
+} from 'src/infrastructure/sequelize/models/transfert-conseiller.sql-model'
+import { AsSql } from 'src/infrastructure/sequelize/types'
+import { uneAutreDate } from 'test/fixtures/date.fixture'
+import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import {
   GetDetailJeuneQuery,
   GetDetailJeuneQueryHandler
 } from '../../../src/application/queries/get-detail-jeune.query.handler'
-import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-models'
-import { Jeune } from '../../../src/domain/jeune'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import {
+  createSandbox,
+  DatabaseForTesting,
+  expect,
+  StubbedClass,
+  stubClass
+} from '../../utils'
 
 describe('GetDetailJeuneQueryHandler', () => {
-  let jeuneRepository: StubbedType<Jeune.Repository>
+  DatabaseForTesting.prepare()
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let getDetailJeuneQueryHandler: GetDetailJeuneQueryHandler
@@ -24,12 +39,10 @@ describe('GetDetailJeuneQueryHandler', () => {
 
   before(() => {
     sandbox = createSandbox()
-    jeuneRepository = stubInterface(sandbox)
     conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
     getDetailJeuneQueryHandler = new GetDetailJeuneQueryHandler(
-      jeuneRepository,
       conseillerForJeuneAuthorizer,
       jeuneAuthorizer
     )
@@ -40,43 +53,174 @@ describe('GetDetailJeuneQueryHandler', () => {
   })
 
   describe('handle', () => {
-    it('retourne un jeune', async () => {
-      // Given
-      const idJeune = 'idJeune'
-      const getDetailJeuneQuery: GetDetailJeuneQuery = {
-        idJeune
-      }
-      const detailJeuneQueryModel: DetailJeuneQueryModel =
-        unDetailJeuneQueryModel()
+    describe("quand il n'y a pas eu de transfert", () => {
+      const idJeune = '1'
+      const idConseiller = '1'
+      it('retourne un jeune avec son conseiller avec la date de creation du jeune', async () => {
+        // Given
+        const conseillerDto = unConseillerDto({ id: idConseiller })
+        await ConseillerSqlModel.creer(conseillerDto)
+        await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: idJeune,
+            idConseiller
+          })
+        )
 
-      jeuneRepository.getDetailJeuneQueryModelById
-        .withArgs(idJeune)
-        .resolves(detailJeuneQueryModel)
+        // When
+        const actual = await getDetailJeuneQueryHandler.handle({ idJeune })
+        // Then
+        const expected = unDetailJeuneQueryModel({
+          id: idJeune,
+          conseiller: {
+            email: conseillerDto.email!,
+            nom: conseillerDto.nom,
+            prenom: conseillerDto.prenom,
+            depuis: new Date(
+              unDetailJeuneQueryModel().creationDate
+            ).toISOString()
+          },
+          situations: undefined
+        })
+        expect(actual).to.deep.equal(expected)
+      })
+      it('retourne un jeune avec ses situations', async () => {
+        // Given
+        const conseillerDto = unConseillerDto({ id: idConseiller })
+        await ConseillerSqlModel.creer(conseillerDto)
+        await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: idJeune,
+            idConseiller
+          })
+        )
+        await SituationsMiloSqlModel.create({
+          idJeune,
+          situations: [
+            {
+              etat: EtatSituationMilo.EN_COURS,
+              categorie: CategorieSituationMilo.EMPLOI
+            }
+          ]
+        })
 
-      // When
-      const actual = await getDetailJeuneQueryHandler.handle(
-        getDetailJeuneQuery
-      )
-
-      // Then
-      expect(actual).to.deep.equal(detailJeuneQueryModel)
+        // When
+        const actual = await getDetailJeuneQueryHandler.handle({ idJeune })
+        // Then
+        const expected = unDetailJeuneQueryModel({
+          id: idJeune,
+          conseiller: {
+            email: conseillerDto.email!,
+            nom: conseillerDto.nom,
+            prenom: conseillerDto.prenom,
+            depuis: new Date(
+              unDetailJeuneQueryModel().creationDate
+            ).toISOString()
+          },
+          situations: [{ etat: 'EN_COURS', categorie: 'Emploi' }]
+        })
+        expect(actual).to.deep.equal(expected)
+      })
     })
+    describe('quand il y a eu un transfert', () => {
+      const idJeune = '1'
+      const idConseiller = '1'
+      it('retourne un jeune avec son conseiller avec la date du transfert', async () => {
+        // Given
+        const conseillerDto = unConseillerDto({ id: idConseiller })
+        await ConseillerSqlModel.creer(conseillerDto)
+        const idConseillerSource = '2'
+        const unAutreconseillerDto = unConseillerDto({ id: idConseillerSource })
+        await ConseillerSqlModel.creer(unAutreconseillerDto)
 
-    it("retourne undefined si le jeune n'existe pas", async () => {
-      // Given
-      const idJeuneInexistant = 'idJeuneInexistant'
-      const query: GetDetailJeuneQuery = {
-        idJeune: idJeuneInexistant
-      }
-      jeuneRepository.getDetailJeuneQueryModelById
-        .withArgs(idJeuneInexistant)
-        .resolves()
+        await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: idJeune,
+            idConseiller
+          })
+        )
+        const dateTransfert = uneAutreDate()
+        const unTransfert: AsSql<TransfertConseillerDto> = {
+          id: '070fa845-7316-496e-b96c-b69c2a1f4ce8',
+          dateTransfert,
+          idJeune,
+          idConseillerCible: idConseiller,
+          idConseillerSource
+        }
+        await TransfertConseillerSqlModel.creer(unTransfert)
 
-      // When
-      const actual = await getDetailJeuneQueryHandler.handle(query)
+        // When
+        const actual = await getDetailJeuneQueryHandler.handle({ idJeune })
+        // Then
+        const expected = unDetailJeuneQueryModel({
+          id: idJeune,
+          conseiller: {
+            email: conseillerDto.email!,
+            nom: conseillerDto.nom,
+            prenom: conseillerDto.prenom,
+            depuis: dateTransfert.toISOString()
+          },
+          situations: undefined
+        })
+        expect(actual).to.deep.equal(expected)
+      })
+    })
+    describe('quand il y a eu plusieurs transferts', () => {
+      const idJeune = '1'
+      const idConseiller = '1'
+      it('retourne un jeune avec son conseiller avec la date du dernier transfert', async () => {
+        // Given
+        const conseillerDto = unConseillerDto({ id: idConseiller })
+        await ConseillerSqlModel.creer(conseillerDto)
+        const idConseillerSource = '2'
+        const unAutreconseillerDto = unConseillerDto({ id: idConseillerSource })
+        await ConseillerSqlModel.creer(unAutreconseillerDto)
+        const idConseillerSource2 = '3'
+        const encoreUnAutreconseillerDto = unConseillerDto({
+          id: idConseillerSource2
+        })
+        await ConseillerSqlModel.creer(encoreUnAutreconseillerDto)
 
-      // Then
-      expect(actual).to.equal(undefined)
+        await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: idJeune,
+            idConseiller
+          })
+        )
+        const dateTransfert1 = new Date('2022-04-02T03:24:00')
+        const unTransfert: AsSql<TransfertConseillerDto> = {
+          id: '070fa845-7316-496e-b96c-b69c2a1f4ce8',
+          dateTransfert: dateTransfert1,
+          idJeune,
+          idConseillerCible: idConseillerSource,
+          idConseillerSource: idConseillerSource2
+        }
+        await TransfertConseillerSqlModel.creer(unTransfert)
+        const dateTransfert2 = new Date('2022-04-08T03:24:00')
+        const unAutreTransfert: AsSql<TransfertConseillerDto> = {
+          id: '070fa845-7316-496e-b96c-b69c2a1f4ce9',
+          dateTransfert: dateTransfert2,
+          idJeune,
+          idConseillerCible: idConseiller,
+          idConseillerSource
+        }
+        await TransfertConseillerSqlModel.creer(unAutreTransfert)
+
+        // When
+        const actual = await getDetailJeuneQueryHandler.handle({ idJeune })
+        // Then
+        const expected = unDetailJeuneQueryModel({
+          id: idJeune,
+          conseiller: {
+            email: conseillerDto.email!,
+            nom: conseillerDto.nom,
+            prenom: conseillerDto.prenom,
+            depuis: dateTransfert2.toISOString()
+          },
+          situations: undefined
+        })
+        expect(actual).to.deep.equal(expected)
+      })
     })
   })
 

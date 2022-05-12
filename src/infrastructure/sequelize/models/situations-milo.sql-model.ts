@@ -16,8 +16,7 @@ interface Situation {
   dateFin?: string
 }
 
-@Table({ timestamps: false, tableName: 'situations_milo' })
-export class SituationsMiloSqlModel extends Model {
+export class SituationsMiloDto extends Model {
   @PrimaryKey
   @AutoIncrement
   @Column({ field: 'id', type: DataType.INTEGER })
@@ -33,3 +32,6 @@ export class SituationsMiloSqlModel extends Model {
   @Column({ field: 'situations', type: DataType.ARRAY(DataType.JSONB) })
   situations: Situation[]
 }
+
+@Table({ timestamps: false, tableName: 'situations_milo' })
+export class SituationsMiloSqlModel extends SituationsMiloDto {}

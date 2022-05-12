@@ -1,10 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
+import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
+import { SituationsMiloSqlModel } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
+import { TransfertConseillerSqlModel } from 'src/infrastructure/sequelize/models/transfert-conseiller.sql-model'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { JeunesRepositoryToken } from '../../domain/jeune'
 import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { fromSqlToDetailJeuneQueryModel } from './query-mappers/jeune.mappers'
 import { DetailJeuneQueryModel } from './query-models/jeunes.query-models'
 
 export interface GetDetailJeuneQuery extends Query {
@@ -18,7 +23,6 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
 > {
   constructor(
     @Inject(JeunesRepositoryToken)
-    private jeunesRepository: Jeune.Repository,
     private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer,
     private jeuneAuthorizer: JeuneAuthorizer
   ) {
@@ -28,7 +32,22 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
   async handle(
     query: GetDetailJeuneQuery
   ): Promise<DetailJeuneQueryModel | undefined> {
-    return this.jeunesRepository.getDetailJeuneQueryModelById(query.idJeune)
+    const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune, {
+      include: [
+        ConseillerSqlModel,
+        SituationsMiloSqlModel,
+        {
+          model: TransfertConseillerSqlModel,
+          separate: true,
+          order: [['dateTransfert', 'DESC']],
+          limit: 1
+        }
+      ]
+    })
+    if (!jeuneSqlModel) {
+      return undefined
+    }
+    return fromSqlToDetailJeuneQueryModel(jeuneSqlModel)
   }
 
   async authorize(

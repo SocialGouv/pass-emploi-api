@@ -2,7 +2,6 @@ import { DateTime } from 'luxon'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 import {
   DetailJeuneConseillerQueryModel,
-  DetailJeuneQueryModel,
   JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
@@ -43,9 +42,6 @@ export namespace Jeune {
       idConseiller: string
     ): Promise<ResumeActionsDuJeuneQueryModel[]>
     getHomeQueryModel(idJeune: string): Promise<JeuneHomeQueryModel>
-    getDetailJeuneQueryModelById(
-      idJeune: string
-    ): Promise<DetailJeuneQueryModel | undefined>
     getJeuneQueryModelByIdDossier(
       idDossier: string,
       idConseiller: string
