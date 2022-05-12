@@ -99,10 +99,10 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     )
     await this.rendezVousRepository.save(rendezVousUpdated)
 
-    await this.replanifierLesRappelsDeRendezVous(rendezVousUpdated, rendezVous)
-    await this.notifierLesJeunes(rendezVous, rendezVousUpdated)
+    this.replanifierLesRappelsDeRendezVous(rendezVousUpdated, rendezVous)
+    this.notifierLesJeunes(rendezVous, rendezVousUpdated)
     if (rendezVousUpdated.invitation) {
-      await this.envoyerLesInvitationsCalendaires(rendezVousUpdated)
+      this.envoyerLesInvitationsCalendaires(rendezVousUpdated)
     }
     return success({ id: rendezVousUpdated.id })
   }
@@ -190,10 +190,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       }
     })
 
-    if (
-      this.beneficiairesNeSontPasModifies(jeunesAjoutes, jeunesSupprimes) &&
-      this.infosRendezVousSontModifies(rendezVous, rendezVousUpdated)
-    ) {
+    if (this.infosRendezVousSontModifies(rendezVous, rendezVousUpdated)) {
       jeunesInchanges.forEach(jeune => {
         if (jeune.pushNotificationToken) {
           const notification = Notification.createRendezVousMisAJour(
@@ -210,12 +207,6 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     }
   }
 
-  private beneficiairesNeSontPasModifies(
-    jeunesAjoutes: JeuneDuRendezVous[],
-    jeunesSupprimes: JeuneDuRendezVous[]
-  ): boolean {
-    return jeunesSupprimes.length === 0 && jeunesAjoutes.length === 0
-  }
   private infosRendezVousSontModifies(
     rendezVous: RendezVous,
     rendezVousUpdated: RendezVous

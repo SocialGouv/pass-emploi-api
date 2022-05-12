@@ -236,16 +236,26 @@ describe('UpdateRendezVousCommandHandler', () => {
         })
       })
       describe('quand la date est modifiée', () => {
-        it('envoie la notif, replanifie les rappels et met à jour le rendez-vous', async () => {
+        it('envoie la notif de modification au jeune inchange, de creation au jeune ajoute, replanifie les rappels et met à jour le rendez-vous', async () => {
           // Given
           const date = '2022-04-04T09:54:04.561Z'
+          const jeuneInchange = unJeune({ id: 'jeuneInchange' })
+          const jeuneAjoute = unJeune({ id: 'jeuneAjoute' })
+          rendezVous.jeunes = [jeuneInchange]
           command.date = date
+          command.idsJeunes = [jeuneInchange.id, jeuneAjoute.id]
           rendezVousRepository.get
             .withArgs(command.idRendezVous)
             .resolves(rendezVous)
-          jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
+          jeuneRepository.get
+            .withArgs(command.idsJeunes[0])
+            .resolves(jeuneInchange)
+          jeuneRepository.get
+            .withArgs(command.idsJeunes[1])
+            .resolves(jeuneAjoute)
           const rendezVousUpdated: RendezVous = {
             ...rendezVous,
+            jeunes: [jeuneInchange, jeuneAjoute],
             date: new Date(date)
           }
           // When
@@ -255,9 +265,16 @@ describe('UpdateRendezVousCommandHandler', () => {
           expect(rendezVousRepository.save).to.have.been.calledWith(
             rendezVousUpdated
           )
+          expect(notificationRepository.send).to.have.callCount(2)
           expect(notificationRepository.send).to.have.been.calledWith(
             Notification.createRendezVousMisAJour(
-              jeune.pushNotificationToken,
+              jeuneInchange.pushNotificationToken,
+              rendezVousUpdated.id
+            )
+          )
+          expect(notificationRepository.send).to.have.been.calledWith(
+            Notification.createNouveauRdv(
+              jeuneAjoute.pushNotificationToken,
               rendezVousUpdated.id
             )
           )
