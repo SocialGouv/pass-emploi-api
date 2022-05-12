@@ -34,11 +34,17 @@ export class SendNotificationsNouveauxMessagesCommandHandler extends CommandHand
     command: SendNotificationsNouveauxMessagesCommand
   ): Promise<Result<void>> {
     const jeunes = await this.jeuneRepository.getJeunes(command.idsJeunes)
-    await Promise.all(jeunes.map(this.envoyerNotifications.bind(this)))
+
+    for (const jeune of jeunes) {
+      if (jeune && jeune.conseiller?.id === command.idConseiller) {
+        this.envoyerNotification(jeune)
+      }
+    }
+
     return emptySuccess()
   }
 
-  private async envoyerNotifications(jeune: Jeune): Promise<void> {
+  private async envoyerNotification(jeune: Jeune): Promise<void> {
     if (jeune.pushNotificationToken) {
       const notification = Notification.createNouveauMessage(
         jeune.pushNotificationToken
@@ -52,16 +58,7 @@ export class SendNotificationsNouveauxMessagesCommandHandler extends CommandHand
     command: SendNotificationsNouveauxMessagesCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const idsJeunes = command.idsJeunes
-    await Promise.all(
-      idsJeunes.map(idJeune =>
-        this.conseillerAuthorizer.authorize(
-          command.idConseiller,
-          utilisateur,
-          idJeune
-        )
-      )
-    )
+    await this.conseillerAuthorizer.authorize(command.idConseiller, utilisateur)
   }
 
   async monitor(): Promise<void> {
