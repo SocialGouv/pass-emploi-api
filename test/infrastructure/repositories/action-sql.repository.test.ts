@@ -22,7 +22,7 @@ describe('ActionSqlRepository', () => {
   beforeEach(async () => {
     jeune = unJeune()
 
-    actionSqlRepository = new ActionSqlRepository(databaseForTesting.sequelize)
+    actionSqlRepository = new ActionSqlRepository()
     const conseillerRepository = new ConseillerSqlRepository()
     await conseillerRepository.save(unConseiller())
     const jeuneRepository = new JeuneSqlRepository(

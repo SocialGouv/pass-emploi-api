@@ -1,12 +1,14 @@
 import { Authentification } from 'src/domain/authentification'
 import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
+import { SituationsMiloSqlModel } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
 import {
   TransfertConseillerDto,
   TransfertConseillerSqlModel
 } from 'src/infrastructure/sequelize/models/transfert-conseiller.sql-model'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
+import { uneSituationsMiloDto } from 'test/fixtures/milo.fixture'
 import { unEvenementEngagement } from 'test/fixtures/sql-models/evenement-engagement.sql-model'
 import {
   unFavoriOffreEmploi,
@@ -457,6 +459,8 @@ describe('JeuneSqlRepository', () => {
       const evenementEngagement = unEvenementEngagement({
         idUtilisateur: jeuneDto.id
       })
+      const situations = uneSituationsMiloDto({ idJeune: jeuneDto.id })
+
       beforeEach(async () => {
         await ConseillerSqlModel.creer(conseillerDto)
         await JeuneSqlModel.creer(jeuneDto)
@@ -472,6 +476,7 @@ describe('JeuneSqlRepository', () => {
         await FavoriOffreImmersionSqlModel.create(favoriOffreImmersion)
         await TransfertConseillerSqlModel.create(unTransfertDto)
         await EvenementEngagementSqlModel.create(evenementEngagement)
+        await SituationsMiloSqlModel.create(situations)
 
         await jeuneSqlRepository.supprimer(jeuneDto.id)
       })
@@ -525,6 +530,13 @@ describe('JeuneSqlRepository', () => {
         await expect(
           await EvenementEngagementSqlModel.findByPk(evenementEngagement.id)
         ).not.to.be.null
+      })
+      it('supprime les situations du jeune', async () => {
+        await expect(
+          await SituationsMiloSqlModel.findAll({
+            where: { idJeune: jeuneDto.id }
+          })
+        ).to.deep.equal([])
       })
     })
   })
@@ -686,6 +698,26 @@ describe('JeuneSqlRepository', () => {
             prenom: 'Nils'
           }
         }
+      ])
+    })
+    it("retourne les jeunes d'un conseiller avec situation courante", async () => {
+      // Given
+      const idJeune = '1'
+      const situationsDuJeune = uneSituationsMiloDto({ idJeune })
+      await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
+      await JeuneSqlModel.creer(unJeuneDto({ id: idJeune, idConseiller }))
+      await SituationsMiloSqlModel.create(situationsDuJeune)
+
+      // When
+      const actual = await jeuneSqlRepository.getAllQueryModelsByConseiller(
+        idConseiller
+      )
+      // Then
+      expect(actual).to.deep.equal([
+        unDetailJeuneConseillerQueryModel({
+          id: idJeune,
+          situation: situationsDuJeune.situationCourante ?? undefined
+        })
       ])
     })
   })
