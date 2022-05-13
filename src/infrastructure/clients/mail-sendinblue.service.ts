@@ -20,6 +20,7 @@ export class MailSendinblueService implements Mail.Service {
     conversationsNonLues: string
     nouveauRendezvous: string
     rappelRendezvous: string
+    rendezVousSupprime: string
   }
   private frontendUrl: string
 
@@ -79,6 +80,27 @@ export class MailSendinblueService implements Mail.Service {
     )
 
     await this.envoyer(mailDatadto)
+  }
+
+  async envoyerMailRendezVousSupprime(
+    conseiller: Conseiller,
+    rendezVous: RendezVous
+  ): Promise<void> {
+    const mailDataDto: MailDataDto = {
+      to: [
+        {
+          email: conseiller.email!,
+          name: conseiller.firstName + ' ' + conseiller.lastName
+        }
+      ],
+      templateId: parseInt(this.templates.rendezVousSupprime),
+      params: {
+        typeRdv: mapCodeLabelTypeRendezVous[rendezVous.type],
+        dateRdv: formaterDateRendezVous(rendezVous.date),
+        heureRdv: formaterHeureRendezVous(rendezVous.date)
+      }
+    }
+    return this.envoyer(mailDataDto)
   }
 
   creerContenuMailRendezVous(

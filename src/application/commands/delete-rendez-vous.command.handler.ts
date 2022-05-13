@@ -17,6 +17,8 @@ import {
 import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
 import { buildError } from '../../utils/logger.module'
 import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
+import { Mail, MailServiceToken } from '../../domain/mail'
+import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 
 export interface DeleteRendezVousCommand extends Command {
   idRendezVous: string
@@ -30,10 +32,14 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
   constructor(
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
+    @Inject(ConseillersRepositoryToken)
+    private conseillerRepository: Conseiller.Repository,
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,
     private rendezVousAuthorizer: RendezVousAuthorizer,
     private planificateurService: PlanificateurService,
+    @Inject(MailServiceToken)
+    private mailService: Mail.Service,
     private evenementService: EvenementService
   ) {
     super('DeleteRendezVousCommandHandler')
@@ -63,7 +69,7 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     )
 
     try {
-      await this.planificateurService.supprimerRappelsRendezVous(rendezVous)
+      this.planificateurService.supprimerRappelsRendezVous(rendezVous)
     } catch (e) {
       this.logger.error(
         buildError(
@@ -74,6 +80,20 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
       this.apmService.captureError(e)
     }
 
+    if (rendezVous.invitation) {
+      const createur = await this.conseillerRepository.get(
+        rendezVous.createur.id
+      )
+      if (!createur) {
+        return failure(
+          new NonTrouveError(
+            'Conseiller créateur du rendez-vous',
+            rendezVous.createur.id
+          )
+        )
+      }
+      this.mailService.envoyerMailRendezVousSupprime(createur, rendezVous)
+    }
     return emptySuccess()
   }
 

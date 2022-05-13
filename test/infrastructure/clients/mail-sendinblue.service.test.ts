@@ -1,4 +1,8 @@
-import { MailSendinblueService } from '../../../src/infrastructure/clients/mail-sendinblue.service'
+import {
+  formaterDateRendezVous,
+  formaterHeureRendezVous,
+  MailSendinblueService
+} from '../../../src/infrastructure/clients/mail-sendinblue.service'
 import { HttpService } from '@nestjs/axios'
 import { testConfig } from '../../utils/module-for-testing'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
@@ -9,6 +13,7 @@ import * as path from 'path'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitation-ics.client'
 import { MailDataDto } from '../../../src/domain/mail'
+import { mapCodeLabelTypeRendezVous } from '../../../src/domain/rendez-vous'
 
 describe('MailSendinblueService', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -34,7 +39,7 @@ describe('MailSendinblueService', () => {
       it('envoie un mail', async () => {
         // Given
         const conseiller = unConseiller()
-        const expectBody = {
+        const expectedBody = {
           to: [
             {
               email: conseiller.email,
@@ -52,13 +57,50 @@ describe('MailSendinblueService', () => {
           }
         }
         const scope = nock(config.get('sendinblue').url)
-          .post('/v3/smtp/email', JSON.stringify(expectBody))
+          .post('/v3/smtp/email', JSON.stringify(expectedBody))
           .reply(200)
 
         // When
         await mailSendinblueService.envoyerMailConversationsNonLues(
           conseiller,
           22
+        )
+
+        // Then
+        expect(scope.isDone()).to.equal(true)
+      })
+    })
+  })
+  describe('envoyerMailRendezVousSupprime', () => {
+    describe('quand tout va bien', () => {
+      it('envoie un mail', async () => {
+        // Given
+        const conseiller = unConseiller()
+        const rendezVous = unRendezVous()
+        const expectedBody: MailDataDto = {
+          to: [
+            {
+              email: conseiller.email!,
+              name: conseiller.firstName + ' ' + conseiller.lastName
+            }
+          ],
+          templateId: parseInt(
+            config.get('sendinblue').templates.rendezVousSupprime
+          ),
+          params: {
+            typeRdv: mapCodeLabelTypeRendezVous[rendezVous.type],
+            dateRdv: formaterDateRendezVous(rendezVous.date),
+            heureRdv: formaterHeureRendezVous(rendezVous.date)
+          }
+        }
+        const scope = nock(config.get('sendinblue').url)
+          .post('/v3/smtp/email', JSON.stringify(expectedBody))
+          .reply(200)
+
+        // When
+        await mailSendinblueService.envoyerMailRendezVousSupprime(
+          conseiller,
+          rendezVous
         )
 
         // Then
