@@ -99,6 +99,8 @@ export default () => {
           process.env.SENDINBLUE_NOUVEAU_RENDEZVOUS_TEMPLATE_ID ?? '3',
         rappelRendezvous:
           process.env.SENDINBLUE_RAPPEL_RENDEZVOUS_TEMPLATE_ID ?? '18',
+        rendezVousSupprime:
+          process.env.SENDINBLUE_RENDEZVOUS_SUPPRIME_TEMPLATE_ID ?? '19',
         suppressionJeuneMilo:
           process.env.SENDINBLUE_SUPPRESSION_JEUNE_MILO_ID ?? '14',
         suppressionJeunePE:

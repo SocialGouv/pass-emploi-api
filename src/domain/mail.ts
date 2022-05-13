@@ -45,6 +45,11 @@ export namespace Mail {
       rendezVousMisAJour?: boolean
     ): Promise<void>
 
+    envoyerMailRendezVousSupprime(
+      conseiller: Conseiller,
+      rendezVous: RendezVous
+    ): Promise<void>
+
     envoyer(data: MailDataDto): Promise<void>
 
     mettreAJourMailingList(
@@ -66,6 +71,7 @@ export namespace Mail {
     private templates: {
       conversationsNonLues: string
       nouveauRendezvous: string
+      rendezVousSupprime: string
       suppressionJeuneMilo: string
       suppressionJeunePE: string
     }
