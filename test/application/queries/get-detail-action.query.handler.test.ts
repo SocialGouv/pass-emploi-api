@@ -34,7 +34,7 @@ describe('GetDetailActionQueryHandler', () => {
   before(() => {
     sandbox = createSandbox()
     actionAuthorizer = stubClass(ActionAuthorizer)
-    actionSqlRepository = new ActionSqlRepository(database.sequelize)
+    actionSqlRepository = new ActionSqlRepository()
 
     getDetailActionQueryHandler = new GetDetailActionQueryHandler(
       actionAuthorizer

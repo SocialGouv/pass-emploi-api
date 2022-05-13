@@ -40,7 +40,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
     sandbox = createSandbox()
     conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
-    actionSqlRepository = new ActionSqlRepository(database.sequelize)
+    actionSqlRepository = new ActionSqlRepository()
     getActionsByJeuneQueryHandler = new GetActionsByJeuneQueryHandler(
       database.sequelize,
       conseillerForJeuneAuthorizer,

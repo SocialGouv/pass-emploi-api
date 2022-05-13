@@ -1,3 +1,5 @@
+import { SituationsMiloDto } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
+import { AsSql } from 'src/infrastructure/sequelize/types'
 import {
   CategorieSituationMilo,
   EtatSituationMilo,
@@ -23,6 +25,27 @@ export const uneSituationsMilo = (
   args: Partial<Milo.SituationsDuJeune> = {}
 ): Milo.SituationsDuJeune => {
   const defaults = {
+    idJeune: 'ABCDE',
+    situationCourante: {
+      etat: EtatSituationMilo.EN_COURS,
+      categorie: CategorieSituationMilo.CONTRAT_DE_VOLONTARIAT_BENEVOLAT
+    },
+    situations: [
+      {
+        etat: EtatSituationMilo.PREVU,
+        categorie: CategorieSituationMilo.CONTRAT_DE_VOLONTARIAT_BENEVOLAT,
+        dateFin: ''
+      }
+    ]
+  }
+  return { ...defaults, ...args }
+}
+
+export const uneSituationsMiloDto = (
+  args: Partial<SituationsMiloDto> = {}
+): AsSql<SituationsMiloDto> => {
+  const defaults = {
+    id: 1,
     idJeune: 'ABCDE',
     situationCourante: {
       etat: EtatSituationMilo.EN_COURS,

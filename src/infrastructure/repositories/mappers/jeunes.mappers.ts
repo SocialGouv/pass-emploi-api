@@ -172,7 +172,7 @@ export function toDetailJeuneConseillerQueryModel(
     email: sqlJeune.email ?? undefined,
     creationDate: sqlJeune.date_creation.toISOString(),
     isActivated: Boolean(sqlJeune.id_authentification),
-    situation: sqlJeune.situation_courante
+    situation: sqlJeune.situation_courante ?? undefined
   }
   if (sqlJeune.date_evenement) {
     jeuneQueryModel.lastActivity = sqlJeune.date_evenement.toISOString()
