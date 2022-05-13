@@ -10,7 +10,7 @@ import {
 import { CategorieSituationMilo, EtatSituationMilo } from 'src/domain/milo'
 import { JeuneSqlModel } from './jeune.sql-model'
 
-interface Situation {
+export interface Situation {
   etat: EtatSituationMilo
   categorie: CategorieSituationMilo
   dateFin?: string
