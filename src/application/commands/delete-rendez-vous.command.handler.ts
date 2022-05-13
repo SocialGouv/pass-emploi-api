@@ -69,7 +69,7 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     )
 
     try {
-      this.planificateurService.supprimerRappelsRendezVous(rendezVous)
+      await this.planificateurService.supprimerRappelsRendezVous(rendezVous)
     } catch (e) {
       this.logger.error(
         buildError(
