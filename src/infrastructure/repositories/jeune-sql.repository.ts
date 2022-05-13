@@ -144,6 +144,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
                  conseiller.email                         as email_conseiller_precedent,
                  conseiller.prenom                        as prenom_conseiller_precedent,
                  conseiller.nom                           as nom_conseiller_precedent
+                 situations_milo.situation_courante       as situation_courante
           FROM jeune
                    LEFT JOIN evenement_engagement
                              ON evenement_engagement.id_utilisateur = jeune.id AND
@@ -157,6 +158,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
                                                            LIMIT 1
                              )
                    LEFT JOIN conseiller ON conseiller.id = transfert_conseiller.id_conseiller_source
+                   LEFT JOIN situations_milo ON situations_milo.id_jeune = jeune.id
           WHERE jeune.id_conseiller = :idConseiller
           GROUP BY jeune.id, transfert_conseiller.id, conseiller.id, jeune.prenom, jeune.nom
           ORDER BY jeune.prenom ASC, jeune.nom ASC

@@ -16,6 +16,7 @@ import {
 import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../sequelize/types'
 import { ResumeActionsJeuneDto } from '../jeune-sql.repository'
+import { Situation } from '../../sequelize/models/situations-milo.sql-model'
 
 export function fromSqlToJeuneQueryModel(
   jeuneSqlModel: JeuneSqlModel
@@ -170,7 +171,8 @@ export function toDetailJeuneConseillerQueryModel(
     lastName: sqlJeune.nom,
     email: sqlJeune.email ?? undefined,
     creationDate: sqlJeune.date_creation.toISOString(),
-    isActivated: Boolean(sqlJeune.id_authentification)
+    isActivated: Boolean(sqlJeune.id_authentification),
+    situation: sqlJeune.situation_courante
   }
   if (sqlJeune.date_evenement) {
     jeuneQueryModel.lastActivity = sqlJeune.date_evenement.toISOString()
@@ -201,4 +203,5 @@ export interface DetailJeuneRawSql {
   email_conseiller_precedent: string
   nom_conseiller_precedent: string
   prenom_conseiller_precedent: string
+  situation_courante: Situation
 }
