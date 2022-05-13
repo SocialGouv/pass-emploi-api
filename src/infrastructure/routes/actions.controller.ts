@@ -66,7 +66,7 @@ export class ActionsController {
   }
 
   @ApiOperation({
-    summary: 'Modifie le statut une action',
+    summary: "Modifie le statut d'une action",
     description: 'Pour un jeune et son conseiller'
   })
   @Put(':idAction')
