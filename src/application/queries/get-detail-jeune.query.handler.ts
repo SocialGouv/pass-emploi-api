@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
@@ -6,7 +6,6 @@ import { SituationsMiloSqlModel } from 'src/infrastructure/sequelize/models/situ
 import { TransfertConseillerSqlModel } from 'src/infrastructure/sequelize/models/transfert-conseiller.sql-model'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { JeunesRepositoryToken } from '../../domain/jeune'
 import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { fromSqlToDetailJeuneQueryModel } from './query-mappers/jeune.mappers'
@@ -22,7 +21,6 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
   DetailJeuneQueryModel | undefined
 > {
   constructor(
-    @Inject(JeunesRepositoryToken)
     private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer,
     private jeuneAuthorizer: JeuneAuthorizer
   ) {
