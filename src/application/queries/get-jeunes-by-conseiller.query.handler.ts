@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { QueryTypes, Sequelize } from 'sequelize'
 import { Authentification } from 'src/domain/authentification'
-import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
+import { SequelizeInjectionToken } from 'src/infrastructure/sequelize/providers'
 import {
   DroitsInsuffisants,
   NonTrouveError
@@ -10,6 +11,7 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { toDetailJeuneConseillerQueryModel } from './query-mappers/jeune.mappers'
 import { DetailJeuneConseillerQueryModel } from './query-models/jeunes.query-models'
 
 export interface GetJeunesByConseillerQuery extends Query {
@@ -22,10 +24,9 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
   Result<DetailJeuneConseillerQueryModel[]>
 > {
   constructor(
+    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
     @Inject(ConseillersRepositoryToken)
     private readonly conseillersRepository: Conseiller.Repository,
-    @Inject(JeunesRepositoryToken)
-    private readonly jeunesRepository: Jeune.Repository,
     private readonly conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('GetJeunesByConseillerQueryHandler')
@@ -46,9 +47,7 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
       return failure(new DroitsInsuffisants())
     }
 
-    const jeunes = await this.jeunesRepository.getAllQueryModelsByConseiller(
-      conseiller.id
-    )
+    const jeunes = await this.getAllQueryModelsByConseiller(conseiller.id)
     return success(jeunes)
   }
 
@@ -61,6 +60,49 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+
+  async getAllQueryModelsByConseiller(
+    idConseiller: string
+  ): Promise<DetailJeuneConseillerQueryModel[]> {
+    const sqlJeunes = await this.sequelize.query(
+      `
+          SELECT jeune.id,
+                 jeune.prenom,
+                 jeune.nom,
+                 jeune.email,
+                 jeune.date_creation,
+                 jeune.id_authentification,
+                 MAX(evenement_engagement.date_evenement) as date_evenement,
+                 conseiller.email                         as email_conseiller_precedent,
+                 conseiller.prenom                        as prenom_conseiller_precedent,
+                 conseiller.nom                           as nom_conseiller_precedent,
+                 situations_milo.situation_courante       as situation_courante
+          FROM jeune
+                   LEFT JOIN evenement_engagement
+                             ON evenement_engagement.id_utilisateur = jeune.id AND
+                                evenement_engagement.type_utilisateur = '${Authentification.Type.JEUNE}'
+                   LEFT JOIN transfert_conseiller
+                             ON transfert_conseiller.id = (SELECT transfert_conseiller.id
+                                                           FROM transfert_conseiller
+                                                           WHERE transfert_conseiller.id_jeune = jeune.id
+                                                             AND transfert_conseiller.id_conseiller_cible = jeune.id_conseiller
+                                                           ORDER BY transfert_conseiller.date_transfert DESC
+                                                           LIMIT 1
+                             )
+                   LEFT JOIN conseiller ON conseiller.id = transfert_conseiller.id_conseiller_source
+                   LEFT JOIN situations_milo ON situations_milo.id_jeune = jeune.id
+          WHERE jeune.id_conseiller = :idConseiller
+          GROUP BY jeune.id, transfert_conseiller.id, conseiller.id, jeune.prenom, jeune.nom, situations_milo.situation_courante
+          ORDER BY jeune.prenom ASC, jeune.nom ASC
+      `,
+      {
+        type: QueryTypes.SELECT,
+        replacements: { idConseiller }
+      }
+    )
+
+    return sqlJeunes.map(toDetailJeuneConseillerQueryModel)
   }
 }
 

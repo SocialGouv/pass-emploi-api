@@ -1,7 +1,6 @@
 import { DateTime, Duration } from 'luxon'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 import {
-  DetailJeuneConseillerQueryModel,
   JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
@@ -16,7 +15,6 @@ import {
 import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../sequelize/types'
 import { ResumeActionsJeuneDto } from '../jeune-sql.repository'
-import { Situation } from '../../sequelize/models/situations-milo.sql-model'
 
 export function fromSqlToJeuneQueryModel(
   jeuneSqlModel: JeuneSqlModel
@@ -160,48 +158,4 @@ export function toResumeActionsDuJeuneQueryModel(
       resumeActionsJeuneDto.in_progress_actions_count
     )
   }
-}
-
-export function toDetailJeuneConseillerQueryModel(
-  sqlJeune: DetailJeuneRawSql
-): DetailJeuneConseillerQueryModel {
-  const jeuneQueryModel: DetailJeuneConseillerQueryModel = {
-    id: sqlJeune.id,
-    firstName: sqlJeune.prenom,
-    lastName: sqlJeune.nom,
-    email: sqlJeune.email ?? undefined,
-    creationDate: sqlJeune.date_creation.toISOString(),
-    isActivated: Boolean(sqlJeune.id_authentification),
-    situation: sqlJeune.situation_courante ?? undefined
-  }
-  if (sqlJeune.date_evenement) {
-    jeuneQueryModel.lastActivity = sqlJeune.date_evenement.toISOString()
-  }
-
-  if (
-    sqlJeune.nom_conseiller_precedent ||
-    sqlJeune.prenom_conseiller_precedent ||
-    sqlJeune.email_conseiller_precedent
-  ) {
-    jeuneQueryModel.conseillerPrecedent = {
-      prenom: sqlJeune.prenom_conseiller_precedent,
-      nom: sqlJeune.nom_conseiller_precedent,
-      email: sqlJeune.email_conseiller_precedent ?? undefined
-    }
-  }
-  return jeuneQueryModel
-}
-
-export interface DetailJeuneRawSql {
-  id: string
-  prenom: string
-  nom: string
-  email: string
-  date_creation: Date
-  id_authentification: string
-  date_evenement: Date
-  email_conseiller_precedent: string
-  nom_conseiller_precedent: string
-  prenom_conseiller_precedent: string
-  situation_courante: Situation
 }
