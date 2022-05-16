@@ -79,7 +79,7 @@ describe('CreateActionCommandHandler', () => {
     })
     describe('notifications', () => {
       describe("quand c'est un jeune", () => {
-        it("n'envoie pas de notification", async () => {
+        it("n'envoie pas de notification push", async () => {
           // Given
           actionFactory.buildAction.returns(success(action))
           const command: CreateActionCommand = {
@@ -99,7 +99,7 @@ describe('CreateActionCommandHandler', () => {
         })
       })
       describe("quand c'est un conseiller", () => {
-        it('envoie une notification au jeune', async () => {
+        it('envoie une notification push au jeune', async () => {
           // Given
           actionFactory.buildAction.returns(success(action))
           const command: CreateActionCommand = {
