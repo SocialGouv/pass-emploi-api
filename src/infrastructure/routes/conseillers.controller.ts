@@ -179,18 +179,13 @@ export class ConseillersController {
       if (erreur instanceof DroitsInsuffisants) {
         throw new ForbiddenException(erreur)
       }
+      if (erreur instanceof NonTrouveError) {
+        throw new NotFoundException(erreur)
+      }
       throw erreur
     }
     if (isSuccess(result)) return result.data
-    if (isFailure(result)) {
-      const error = result.error
-      if (error instanceof NonTrouveError) {
-        throw new NotFoundException(error)
-      }
-      if (error instanceof DroitsInsuffisants) {
-        throw new ForbiddenException(error)
-      }
-    }
+
     throw new RuntimeException()
   }
 
