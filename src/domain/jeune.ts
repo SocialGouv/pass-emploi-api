@@ -35,7 +35,10 @@ export namespace Jeune {
     getByEmail(email: string): Promise<Jeune | undefined>
     getByIdDossier(idDossier: string): Promise<Jeune | undefined>
     save(jeune: Jeune): Promise<void>
-    getJeunes(idsJeune: string[]): Promise<Jeune[]>
+    findAllJeunesByConseiller(
+      idsJeune: string[],
+      idConseiller: string
+    ): Promise<Jeune[]>
     supprimer(idJeune: Jeune.Id): Promise<void>
     getResumeActionsDesJeunesDuConseiller(
       idConseiller: string

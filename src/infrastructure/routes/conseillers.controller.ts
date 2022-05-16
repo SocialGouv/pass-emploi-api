@@ -107,7 +107,7 @@ export class ConseillersController {
 
   @ApiOperation({
     summary: 'Récupère un conseiller par email',
-    description: 'Pour un conseiller'
+    description: 'Autorisé pour un conseiller'
   })
   @Get()
   @ApiResponse({
@@ -148,7 +148,7 @@ export class ConseillersController {
 
   @ApiOperation({
     summary: 'Récupère un conseiller',
-    description: 'Pour un conseiller'
+    description: 'Autorisé pour un conseiller'
   })
   @Get(':idConseiller')
   @ApiResponse({
@@ -176,7 +176,7 @@ export class ConseillersController {
 
   @ApiOperation({
     summary: "Récupère les jeunes d'un conseiller",
-    description: 'Pour un conseiller'
+    description: 'Autorisé pour un conseiller'
   })
   @Get(':idConseiller/jeunes')
   @ApiResponse({
@@ -209,7 +209,7 @@ export class ConseillersController {
 
   @ApiOperation({
     summary: 'Crée un jeune PE',
-    description: 'Pour un conseiller PE'
+    description: 'Autorisé pour un conseiller PE'
   })
   @Post('pole-emploi/jeunes')
   @ApiResponse({
@@ -242,8 +242,8 @@ export class ConseillersController {
   }
 
   @ApiOperation({
-    summary: 'Crée une action pour un jeune',
-    description: 'Pour un conseiller du jeune'
+    summary: 'Crée une action Autorisé pour un jeune',
+    description: 'Autorisé pour un conseiller du jeune'
   })
   @Post(':idConseiller/jeunes/:idJeune/action')
   async createAction(
@@ -277,7 +277,7 @@ export class ConseillersController {
 
   @ApiOperation({
     summary: "Récupère les actions d'un conseiller",
-    description: 'Pour un conseiller'
+    description: 'Autorisé pour un conseiller'
   })
   @Get(':idConseiller/actions')
   async getActions(
@@ -294,7 +294,7 @@ export class ConseillersController {
 
   @ApiOperation({
     summary: "Récupère les rendez-vous d'un conseiller",
-    description: 'Pour un conseiller'
+    description: 'Autorisé pour un conseiller'
   })
   @Get(':idConseiller/rendezvous')
   @ApiResponse({
@@ -345,7 +345,7 @@ export class ConseillersController {
 
   @ApiOperation({
     summary: "Envoie une notification d'un nouveau message à des jeunes",
-    description: 'Pour un conseiller'
+    description: 'Autorisé pour un conseiller'
   })
   @Post(':idConseiller/jeunes/notify-messages')
   async postNotifications(
@@ -369,7 +369,7 @@ export class ConseillersController {
 
   @ApiOperation({
     summary: 'Crée un rendez-vous pour des jeunes',
-    description: 'Pour un conseiller'
+    description: 'Autorisé pour un conseiller'
   })
   @Post(':idConseiller/rendezvous')
   async createRendezVous(
@@ -415,7 +415,7 @@ export class ConseillersController {
 
   @ApiOperation({
     summary: "Récupère le dossier Milo d'un jeune",
-    description: 'Pour un conseiller du jeune'
+    description: 'Autorisé pour un conseiller du jeune'
   })
   @Get('/milo/dossiers/:idDossier')
   @ApiResponse({
@@ -445,7 +445,7 @@ export class ConseillersController {
 
   @ApiOperation({
     summary: 'Récupère un jeune par son idDossier Milo',
-    description: 'Pour un conseiller du jeune'
+    description: 'Autorisé pour un conseiller du jeune'
   })
   @Get('milo/jeunes/:idDossier')
   @ApiResponse({
@@ -486,7 +486,7 @@ export class ConseillersController {
 
   @ApiOperation({
     summary: 'Crée un jeune Milo',
-    description: 'Pour un conseiller Milo'
+    description: 'Autorisé pour un conseiller Milo'
   })
   @Post('milo/jeunes')
   async postJeuneMilo(
@@ -519,7 +519,7 @@ export class ConseillersController {
 
   @ApiOperation({
     summary: 'Ajoute des droits de supervision à des conseillers',
-    description: 'Pour un utilisateur support'
+    description: 'Autorisé pour un utilisateur support'
   })
   @Post('superviseurs')
   async postSuperviseurs(
@@ -538,7 +538,7 @@ export class ConseillersController {
 
   @ApiOperation({
     summary: 'Supprime des droits de supervision à des conseillers',
-    description: 'Pour un utilisateur support'
+    description: 'Autorisé pour un utilisateur support'
   })
   @Delete('superviseurs')
   @HttpCode(204)
@@ -564,7 +564,8 @@ export class ConseillersController {
 
   @ApiOperation({
     summary: "Modifie l'agence et les notifications sonores d'un conseiller",
-    description: 'Pour un conseiller'
+    description:
+      'Autorisé pour un conseiller - Ne supprime pas les champs quand ils sont vides'
   })
   @Put(':idConseiller')
   @ApiResponse({
