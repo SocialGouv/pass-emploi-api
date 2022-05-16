@@ -134,7 +134,7 @@ describe('DeleteJeuneCommandHandler', () => {
       expect((result as Failure).error).to.be.an.instanceof(NonTrouveError)
     })
 
-    describe('suppression du jeune', () => {
+    describe('quand on supprime les données du jeune', () => {
       let result: Result
       beforeEach(async () => {
         // When
