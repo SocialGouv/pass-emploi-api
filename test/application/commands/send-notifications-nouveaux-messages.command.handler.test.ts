@@ -35,55 +35,6 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
   })
 
   describe('handle', () => {
-    describe("quand des jeunes n'existent pas", () => {
-      it("n'envoie pas de notification", async () => {
-        // Given
-        const jeunePasBon = unJeune({
-          id: 'jeune-non-trouve',
-          pushNotificationToken: 'jeune-non-trouve'
-        })
-        const command: SendNotificationsNouveauxMessagesCommand = {
-          idsJeunes: [jeune1.id, jeunePasBon.id],
-          idConseiller: jeune1.conseiller.id
-        }
-        jeuneRepository.getJeunes
-          .withArgs(command.idsJeunes)
-          .resolves([jeune1, undefined])
-
-        // When
-        await sendNotificationsNouveauxMessagesCommandHandler.handle(command)
-        // Then
-        expect(notificationRepository.send).to.have.been.calledWithExactly(
-          Notification.createNouveauMessage(jeune1.pushNotificationToken)
-        )
-        expect(notificationRepository.send).not.to.have.been.calledWith(
-          Notification.createNouveauMessage(jeunePasBon.pushNotificationToken)
-        )
-      })
-    })
-    describe('quand des jeunes ne sont pas liés au conseiller', () => {
-      it("n'envoie pas de notification", async () => {
-        // Given
-        const jeunePasBon = unJeune({
-          id: 'jeune-pas-du-conseiller',
-          pushNotificationToken: 'jeune-pas-du-conseiller'
-        })
-        const command: SendNotificationsNouveauxMessagesCommand = {
-          idsJeunes: [jeunePasBon.id],
-          idConseiller: 'x'
-        }
-        jeuneRepository.getJeunes
-          .withArgs(command.idsJeunes)
-          .resolves([jeunePasBon])
-
-        // When
-        await sendNotificationsNouveauxMessagesCommandHandler.handle(command)
-        // Then
-        expect(notificationRepository.send).not.to.have.been.calledWith(
-          Notification.createNouveauMessage(jeunePasBon.pushNotificationToken)
-        )
-      })
-    })
     describe("quand tous les jeunes se sont connectés au moins une fois à l'application", () => {
       it('envoie une notification de type nouveau message aux jeunes', async () => {
         // Given
@@ -91,8 +42,8 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
           idsJeunes: [jeune1.id, jeune2.id],
           idConseiller: jeune1.conseiller.id
         }
-        jeuneRepository.getJeunes
-          .withArgs(command.idsJeunes)
+        jeuneRepository.findAllJeunesByConseiller
+          .withArgs(command.idsJeunes, command.idConseiller)
           .resolves([jeune1, jeune2])
 
         // When
@@ -116,8 +67,8 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
           idConseiller: jeune1.conseiller.id
         }
 
-        jeuneRepository.getJeunes
-          .withArgs(command.idsJeunes)
+        jeuneRepository.findAllJeunesByConseiller
+          .withArgs(command.idsJeunes, command.idConseiller)
           .resolves([jeune, jeune2])
 
         // When

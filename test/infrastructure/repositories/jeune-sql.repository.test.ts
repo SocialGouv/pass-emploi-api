@@ -8,6 +8,7 @@ import {
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { uneSituationsMiloDto } from 'test/fixtures/milo.fixture'
+import { unConseiller } from 'test/fixtures/conseiller.fixture'
 import { unEvenementEngagement } from 'test/fixtures/sql-models/evenement-engagement.sql-model'
 import {
   unFavoriOffreEmploi,
@@ -145,47 +146,59 @@ describe('JeuneSqlRepository', () => {
     })
   })
 
-  describe('getJeunes', () => {
-    let jeune1: Jeune
-    let jeune2: Jeune
+  describe('findAllJeunesByConseiller', () => {
+    const conseiller = unConseiller({ id: 'test' })
+    const conseiller3 = unConseiller({ id: 'test3' })
+    const jeune1Id = '1'
+    const jeune2Id = '2'
+    const jeune3Id = '3'
 
     beforeEach(async () => {
       // Given
-      jeune1 = unJeuneSansConseiller({ id: '1' })
-      jeune2 = unJeuneSansConseiller({ id: '2' })
-      const jeune1Dto = unJeuneDto({
-        id: '1',
-        dateCreation: jeune2.creationDate.toJSDate(),
-        pushNotificationToken: 'unToken',
-        dateDerniereActualisationToken: uneDatetime.toJSDate()
-      })
-      delete jeune1Dto.idConseiller
-      await JeuneSqlModel.creer(jeune1Dto)
-      const jeune2Dto = unJeuneDto({
-        id: '2',
-        idConseiller: undefined,
-        dateCreation: jeune2.creationDate.toJSDate(),
-        pushNotificationToken: 'unToken',
-        dateDerniereActualisationToken: uneDatetime.toJSDate()
-      })
-      delete jeune2Dto.idConseiller
-      await JeuneSqlModel.creer(jeune2Dto)
+      await ConseillerSqlModel.creer(unConseillerDto({ id: conseiller.id }))
+      await ConseillerSqlModel.creer(unConseillerDto({ id: conseiller3.id }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: jeune1Id,
+          idConseiller: conseiller.id
+        })
+      )
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: jeune2Id,
+          idConseiller: conseiller.id
+        })
+      )
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: jeune3Id,
+          idConseiller: conseiller3.id
+        })
+      )
     })
+
     describe('quand les jeunes existent', () => {
       it('retourne la liste des jeunes', async () => {
         // When
-        const result = await jeuneSqlRepository.getJeunes(['1', '2'])
+        const result = await jeuneSqlRepository.findAllJeunesByConseiller(
+          [jeune1Id, jeune2Id, jeune3Id],
+          conseiller.id
+        )
 
         // Then
         expect(result.length).to.equal(2)
-        expect(result).to.deep.include.members([jeune1, jeune2])
+        expect(result[0].id).to.equal(jeune1Id)
+        expect(result[1].id).to.equal(jeune2Id)
       })
     })
 
     describe("quand aucun jeune n'existe", () => {
       it('retourne une liste vide', async () => {
         // When
-        const result = await jeuneSqlRepository.getJeunes(['FAUX_ID'])
+        const result = await jeuneSqlRepository.findAllJeunesByConseiller(
+          ['FAUX_ID'],
+          conseiller.id
+        )
 
         // Then
         expect(result).to.deep.equal([])

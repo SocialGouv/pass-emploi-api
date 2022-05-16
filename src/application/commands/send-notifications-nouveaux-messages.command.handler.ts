@@ -33,12 +33,13 @@ export class SendNotificationsNouveauxMessagesCommandHandler extends CommandHand
   async handle(
     command: SendNotificationsNouveauxMessagesCommand
   ): Promise<Result> {
-    const jeunes = await this.jeuneRepository.getJeunes(command.idsJeunes)
+    const jeunes = await this.jeuneRepository.findAllJeunesByConseiller(
+      command.idsJeunes,
+      command.idConseiller
+    )
 
     for (const jeune of jeunes) {
-      if (jeune && jeune.conseiller?.id === command.idConseiller) {
-        this.envoyerNotification(jeune)
-      }
+      this.envoyerNotification(jeune)
     }
 
     return emptySuccess()

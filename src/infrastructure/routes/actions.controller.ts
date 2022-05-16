@@ -40,7 +40,7 @@ export class ActionsController {
 
   @ApiOperation({
     summary: 'Récupère une action',
-    description: 'Pour un jeune et son conseiller'
+    description: 'Autorisé pour un jeune et son conseiller'
   })
   @Get(':idAction')
   @ApiResponse({
@@ -67,7 +67,7 @@ export class ActionsController {
 
   @ApiOperation({
     summary: "Modifie le statut d'une action",
-    description: 'Pour un jeune et son conseiller'
+    description: 'Autorisé pour un jeune et son conseiller'
   })
   @Put(':idAction')
   async updateStatutAction(
@@ -97,7 +97,7 @@ export class ActionsController {
 
   @ApiOperation({
     summary: 'Supprime une action',
-    description: 'Pour un jeune et son conseiller'
+    description: 'Autorisé pour un jeune et son conseiller'
   })
   @Delete(':idAction')
   @HttpCode(204)
