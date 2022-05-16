@@ -10,15 +10,11 @@ import {
 } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { failure, success } from '../../../src/building-blocks/types/result'
 import { RendezVous } from '../../../src/domain/rendez-vous'
 import { Notification } from '../../../src/domain/notification'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import {
-  JeuneNonLieAuConseillerError,
-  NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
+
 import { Jeune } from '../../../src/domain/jeune'
 import {
   CreateRendezVousCommand,
@@ -29,6 +25,11 @@ import { EvenementService } from 'src/domain/evenement'
 import { Mail } from '../../../src/domain/mail'
 import { Conseiller } from 'src/domain/conseiller'
 import { unConseiller } from 'test/fixtures/conseiller.fixture'
+import { failure, success } from '../../../src/building-blocks/types/result'
+import {
+  JeuneNonLieAuConseillerError,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
 
 describe('CreateRendezVousCommandHandler', () => {
   DatabaseForTesting.prepare()
@@ -71,8 +72,8 @@ describe('CreateRendezVousCommandHandler', () => {
   })
 
   describe('handle', () => {
-    describe("quand un des jeunes n'existe pas", () => {
-      it('renvoie une failure', async () => {
+    describe('erreurs', () => {
+      it("renvoie une failure quand un des jeunes n'existe pas", async () => {
         // Given
         const command: CreateRendezVousCommand = {
           idsJeunes: [jeune1.id, jeune2.id],
@@ -91,20 +92,11 @@ describe('CreateRendezVousCommandHandler', () => {
         expect(rendezVousRepository.save).not.to.have.been.calledWith(
           rendezVous.id
         )
-        expect(notificationRepository.send).not.to.have.been.calledWith(
-          Notification.createNouveauRdv(
-            jeune1.pushNotificationToken,
-            rendezVous.id
-          )
-        )
-        expect(mailClient.envoyerMailRendezVous).callCount(0)
         expect(result).to.deep.equal(
           failure(new NonTrouveError('Jeune', jeune2.id))
         )
       })
-    })
-    describe("quand un des jeunes n'est pas lié au conseiller", () => {
-      it('renvoie une failure', async () => {
+      it("renvoie une failure quad un des jeunes n'est pas lié au conseiller", async () => {
         // Given
         const command: CreateRendezVousCommand = {
           idsJeunes: [jeune1.id, jeune2.id],
@@ -122,13 +114,6 @@ describe('CreateRendezVousCommandHandler', () => {
         expect(rendezVousRepository.save).not.to.have.been.calledWith(
           rendezVous.id
         )
-        expect(notificationRepository.send).not.to.have.been.calledWith(
-          Notification.createNouveauRdv(
-            jeune1.pushNotificationToken,
-            rendezVous.id
-          )
-        )
-        expect(mailClient.envoyerMailRendezVous).callCount(0)
         expect(result).to.deep.equal(
           failure(
             new JeuneNonLieAuConseillerError(
@@ -139,212 +124,249 @@ describe('CreateRendezVousCommandHandler', () => {
         )
       })
     })
-    describe('quand tous les jeunes existent et sont liés au bon conseiller', () => {
-      describe("quand le jeune s'est connecté au moins une fois sur l'application", () => {
-        it('crée un rendez-vous, envoie une notification au jeune, envoie un mail au conseiller et planifie', async () => {
-          // Given
-          const command: CreateRendezVousCommand = {
-            idsJeunes: [jeune1.id, jeune2.id],
-            idConseiller: jeune1.conseiller.id,
-            commentaire: rendezVous.commentaire,
-            date: rendezVous.date.toDateString(),
-            duree: rendezVous.duree,
-            invitation: true
-          }
-          jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
-          jeuneRepository.get.withArgs(jeune2.id).resolves(jeune2)
+    describe('save : quand tous les jeunes existent et sont liés au bon conseiller', () => {
+      it('crée un rendez-vous multi-bénéficiaires', async () => {
+        // Given
+        const command: CreateRendezVousCommand = {
+          idsJeunes: [jeune1.id, jeune2.id],
+          idConseiller: jeune1.conseiller.id,
+          commentaire: rendezVous.commentaire,
+          date: rendezVous.date.toDateString(),
+          duree: rendezVous.duree,
+          invitation: true
+        }
+        jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
+        jeuneRepository.get.withArgs(jeune2.id).resolves(jeune2)
 
-          conseillerRepository.get
-            .withArgs(command.idConseiller)
-            .resolves(jeune1.conseiller)
+        conseillerRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(jeune1.conseiller)
 
-          const expectedRendezvous = RendezVous.createRendezVousConseiller(
-            command,
-            [jeune1, jeune2],
-            jeune1.conseiller,
-            idService
-          )
+        const expectedRendezvous = RendezVous.createRendezVousConseiller(
+          command,
+          [jeune1, jeune2],
+          jeune1.conseiller,
+          idService
+        )
 
-          // When
-          const result = await createRendezVousCommandHandler.handle(command)
+        // When
+        const result = await createRendezVousCommandHandler.handle(command)
 
-          // Then
-          expect(result).to.deep.equal(success(expectedRendezvous.id))
-          expect(rendezVousRepository.save).to.have.been.calledWith(
-            expectedRendezvous
-          )
-          expect(notificationRepository.send).to.have.been.calledWith(
-            Notification.createNouveauRdv(
-              jeune1.pushNotificationToken,
-              expectedRendezvous.id
-            )
-          )
-          expect(mailClient.envoyerMailRendezVous).to.have.been.calledWith(
-            jeune1.conseiller,
-            expectedRendezvous
-          )
-          expect(
-            planificateurService.planifierRappelsRendezVous
-          ).to.have.been.calledWith(expectedRendezvous)
-        })
+        // Then
+        expect(result).to.deep.equal(success(expectedRendezvous.id))
+        expect(rendezVousRepository.save).to.have.been.calledWith(
+          expectedRendezvous
+        )
       })
-      describe("quand un jeune ne s'est jamais connecté sur l'application", () => {
-        it('crée un rendez-vous et envoie un mail au conseiller sans envoyer de notifications au jeune', async () => {
-          // Given
-          const jeune = unJeune({ pushNotificationToken: undefined })
-          jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
-          const command: CreateRendezVousCommand = {
-            idsJeunes: [jeune.id],
-            idConseiller: jeune.conseiller.id,
-            commentaire: rendezVous.commentaire,
-            date: rendezVous.date.toDateString(),
-            duree: rendezVous.duree,
-            invitation: true
-          }
-          const conseiller = unConseiller()
-          conseillerRepository.get
-            .withArgs(command.idConseiller)
-            .resolves(conseiller)
-          const expectedRendezvous = RendezVous.createRendezVousConseiller(
-            command,
-            [jeune],
-            conseiller,
-            idService
+    })
+    describe('notifications', () => {
+      it("n'envoie pas de notification push à un jeune qui ne s'est jamais connecté", async () => {
+        // Given
+        const jeune = unJeune({ pushNotificationToken: undefined })
+        jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
+        const command: CreateRendezVousCommand = {
+          idsJeunes: [jeune.id],
+          idConseiller: jeune.conseiller.id,
+          commentaire: rendezVous.commentaire,
+          date: rendezVous.date.toDateString(),
+          duree: rendezVous.duree,
+          invitation: true
+        }
+        const conseiller = unConseiller()
+        conseillerRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(conseiller)
+        const expectedRendezvous = RendezVous.createRendezVousConseiller(
+          command,
+          [jeune],
+          conseiller,
+          idService
+        )
+
+        // When
+        await createRendezVousCommandHandler.handle(command)
+
+        // Then
+        expect(notificationRepository.send).not.to.have.been.calledWith(
+          Notification.createNouveauRdv(
+            jeune.pushNotificationToken,
+            expectedRendezvous.id
           )
-          // When
-          const result = await createRendezVousCommandHandler.handle(command)
-          // Then
-          expect(result).to.deep.equal(success(expectedRendezvous.id))
-          expect(rendezVousRepository.save).to.have.been.calledWith(
-            expectedRendezvous
-          )
-          expect(notificationRepository.send).not.to.have.been.calledWith(
-            Notification.createNouveauRdv(
-              jeune.pushNotificationToken,
-              expectedRendezvous.id
-            )
-          )
-          expect(mailClient.envoyerMailRendezVous).to.have.been.calledWith(
-            jeune.conseiller,
-            expectedRendezvous
-          )
-        })
+        )
       })
-      describe("quand le conseiller n'a pas d'email", () => {
-        it('crée un rendez-vous sans envoyer un mail au conseiller', async () => {
-          // Given
-          jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
-          rendezVous.jeunes[0].pushNotificationToken = undefined
+      it("envoie une notification push à un jeune qui s'est déjà connecté", async () => {
+        // Given
+        const command: CreateRendezVousCommand = {
+          idsJeunes: [jeune1.id],
+          idConseiller: jeune1.conseiller.id,
+          commentaire: rendezVous.commentaire,
+          date: rendezVous.date.toDateString(),
+          duree: rendezVous.duree,
+          invitation: true
+        }
+        jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
 
-          const command: CreateRendezVousCommand = {
-            idsJeunes: [jeune1.id],
-            idConseiller: jeune1.conseiller.id,
-            commentaire: rendezVous.commentaire,
-            date: rendezVous.date.toDateString(),
-            duree: rendezVous.duree,
-            invitation: true
-          }
-          const conseiller: Conseiller = {
-            ...unConseiller(),
-            email: undefined
-          }
-          conseillerRepository.get
-            .withArgs(command.idConseiller)
-            .resolves(conseiller)
+        conseillerRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(jeune1.conseiller)
 
-          const expectedRendezvous = RendezVous.createRendezVousConseiller(
-            command,
-            [jeune1],
-            conseiller,
-            idService
+        const expectedRendezvous = RendezVous.createRendezVousConseiller(
+          command,
+          [jeune1],
+          jeune1.conseiller,
+          idService
+        )
+
+        // When
+        await createRendezVousCommandHandler.handle(command)
+
+        // Then
+        expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
+          Notification.createNouveauRdv(
+            jeune1.pushNotificationToken,
+            expectedRendezvous.id
           )
-          // When
-          const result = await createRendezVousCommandHandler.handle(command)
-          // Then
-          expect(result).to.deep.equal(success(expectedRendezvous.id))
-          expect(rendezVousRepository.save).to.have.been.calledWith(
-            expectedRendezvous
-          )
-          expect(notificationRepository.send).not.to.have.been.calledWith(
-            Notification.createNouveauRdv(
-              jeune1.pushNotificationToken,
-              expectedRendezvous.id
-            )
-          )
-          expect(mailClient.envoyerMailRendezVous).callCount(0)
-        })
+        )
       })
-      describe("quand le conseiller a choisi de ne pas recevoir d'invitation par email", () => {
-        it('crée un rendez-vous sans envoyer un mail au conseiller', async () => {
-          // Given
-          jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
-          rendezVous.jeunes[0].pushNotificationToken = undefined
+      it('envoie un email a un conseiller qui a accepté les invitations', async () => {
+        // Given
+        const command: CreateRendezVousCommand = {
+          idsJeunes: [jeune1.id],
+          idConseiller: jeune1.conseiller.id,
+          commentaire: rendezVous.commentaire,
+          date: rendezVous.date.toDateString(),
+          duree: rendezVous.duree,
+          invitation: true
+        }
+        jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
 
-          const command: CreateRendezVousCommand = {
-            idsJeunes: [jeune1.id],
-            idConseiller: jeune1.conseiller.id,
-            commentaire: rendezVous.commentaire,
-            date: rendezVous.date.toDateString(),
-            duree: rendezVous.duree,
-            invitation: false
-          }
-          const conseiller: Conseiller = unConseiller()
+        conseillerRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(jeune1.conseiller)
 
-          conseillerRepository.get
-            .withArgs(command.idConseiller)
-            .resolves(conseiller)
+        const expectedRendezvous = RendezVous.createRendezVousConseiller(
+          command,
+          [jeune1],
+          jeune1.conseiller,
+          idService
+        )
+        // When
+        await createRendezVousCommandHandler.handle(command)
 
-          const expectedRendezvous = RendezVous.createRendezVousConseiller(
-            command,
-            [jeune1],
-            conseiller,
-            idService
-          )
-          // When
-          const result = await createRendezVousCommandHandler.handle(command)
-          // Then
-          expect(result).to.deep.equal(success(expectedRendezvous.id))
-          expect(rendezVousRepository.save).to.have.been.calledWith(
-            expectedRendezvous
-          )
-          expect(notificationRepository.send).not.to.have.been.calledWith(
-            Notification.createNouveauRdv(
-              jeune1.pushNotificationToken,
-              expectedRendezvous.id
-            )
-          )
-          expect(mailClient.envoyerMailRendezVous).callCount(0)
-        })
+        // Then
+        expect(mailClient.envoyerMailRendezVous).to.have.been.calledWith(
+          jeune1.conseiller,
+          expectedRendezvous
+        )
       })
-      describe('quand le la planification des notifications échoue', () => {
-        it('renvoie un succès', async () => {
-          // Given
-          jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
-          rendezVous.jeunes[0].pushNotificationToken = undefined
-          const command: CreateRendezVousCommand = {
-            idsJeunes: [jeune1.id],
-            idConseiller: jeune1.conseiller.id,
-            commentaire: rendezVous.commentaire,
-            date: rendezVous.date.toDateString(),
-            duree: rendezVous.duree
-          }
-          const conseiller = unConseiller()
-          conseillerRepository.get
-            .withArgs(command.idConseiller)
-            .resolves(conseiller)
-          planificateurService.planifierRappelsRendezVous.rejects(new Error())
-          const expectedRendezvous = RendezVous.createRendezVousConseiller(
-            command,
-            [jeune1],
-            conseiller,
-            idService
-          )
-          // When
-          const result = await createRendezVousCommandHandler.handle(command)
-          // Then
-          expect(result).to.deep.equal(success(expectedRendezvous.id))
-        })
+      it("n'envoie pas d'email a un conseiller sans adresse renseignée", async () => {
+        // Given
+        jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
+
+        const command: CreateRendezVousCommand = {
+          idsJeunes: [jeune1.id],
+          idConseiller: jeune1.conseiller.id,
+          commentaire: rendezVous.commentaire,
+          date: rendezVous.date.toDateString(),
+          duree: rendezVous.duree,
+          invitation: true
+        }
+        const conseiller: Conseiller = {
+          ...unConseiller(),
+          email: undefined
+        }
+        conseillerRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(conseiller)
+
+        // When
+        await createRendezVousCommandHandler.handle(command)
+        // Then
+        expect(mailClient.envoyerMailRendezVous).not.to.have.been.called()
       })
+      it("n'envoie pas d'email a un conseiller qui a choisi de ne pas recevoir les recevoir", async () => {
+        // Given
+        jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
+
+        const command: CreateRendezVousCommand = {
+          idsJeunes: [jeune1.id],
+          idConseiller: jeune1.conseiller.id,
+          commentaire: rendezVous.commentaire,
+          date: rendezVous.date.toDateString(),
+          duree: rendezVous.duree,
+          invitation: false
+        }
+        const conseiller: Conseiller = unConseiller()
+
+        conseillerRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(conseiller)
+
+        // When
+        await createRendezVousCommandHandler.handle(command)
+        // Then
+        expect(mailClient.envoyerMailRendezVous).callCount(0)
+      })
+      it('planifie les rappels de rdv pour les jeunes', async () => {
+        // Given
+        const command: CreateRendezVousCommand = {
+          idsJeunes: [jeune1.id],
+          idConseiller: jeune1.conseiller.id,
+          commentaire: rendezVous.commentaire,
+          date: rendezVous.date.toDateString(),
+          duree: rendezVous.duree,
+          invitation: true
+        }
+        jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
+
+        conseillerRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(jeune1.conseiller)
+
+        const expectedRendezvous = RendezVous.createRendezVousConseiller(
+          command,
+          [jeune1],
+          jeune1.conseiller,
+          idService
+        )
+
+        // When
+        await createRendezVousCommandHandler.handle(command)
+
+        // Then
+        expect(
+          planificateurService.planifierRappelsRendezVous
+        ).to.have.been.calledWith(expectedRendezvous)
+      })
+    })
+    it('est un succès quand la planification échoue', async () => {
+      // Given
+      const jeuneSansPushToken = unJeune({ pushNotificationToken: undefined })
+      jeuneRepository.get
+        .withArgs(jeuneSansPushToken.id)
+        .resolves(jeuneSansPushToken)
+      const command: CreateRendezVousCommand = {
+        idsJeunes: [jeuneSansPushToken.id],
+        idConseiller: jeuneSansPushToken.conseiller.id,
+        commentaire: rendezVous.commentaire,
+        date: rendezVous.date.toDateString(),
+        duree: rendezVous.duree
+      }
+      const conseiller = unConseiller()
+      conseillerRepository.get
+        .withArgs(command.idConseiller)
+        .resolves(conseiller)
+      planificateurService.planifierRappelsRendezVous.rejects(new Error())
+      const expectedRendezvous = RendezVous.createRendezVousConseiller(
+        command,
+        [jeuneSansPushToken],
+        conseiller,
+        idService
+      )
+      // When
+      const result = await createRendezVousCommandHandler.handle(command)
+      // Then
+      expect(result).to.deep.equal(success(expectedRendezvous.id))
     })
   })
 
