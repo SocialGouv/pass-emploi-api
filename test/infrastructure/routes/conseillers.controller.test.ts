@@ -227,8 +227,8 @@ describe('ConseillersController', () => {
     describe("quand le conseiller n'existe pas", () => {
       it('renvoie une 404 Non Trouve', async () => {
         // Given
-        getJeunesByConseillerQueryHandler.execute.resolves(
-          failure(new NonTrouveError('Conseiller', '1'))
+        getJeunesByConseillerQueryHandler.execute.rejects(
+          new NonTrouveError('Conseiller', '1')
         )
 
         // When - Then
@@ -242,8 +242,8 @@ describe('ConseillersController', () => {
     describe("quand le conseiller n'est pas autorisé", () => {
       it('renvoie une 403 Interdit', async () => {
         // Given
-        getJeunesByConseillerQueryHandler.execute.resolves(
-          failure(new DroitsInsuffisants())
+        getJeunesByConseillerQueryHandler.execute.rejects(
+          new DroitsInsuffisants()
         )
 
         // When - Then

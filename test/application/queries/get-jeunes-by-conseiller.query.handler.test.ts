@@ -1,9 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import {
-  GetJeunesByConseillerQuery,
-  GetJeunesByConseillerQueryHandler
-} from 'src/application/queries/get-jeunes-by-conseiller.query.handler'
+import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
@@ -14,10 +11,7 @@ import {
   uneDatetimeMoinsRecente
 } from 'test/fixtures/date.fixture'
 import { uneSituationsMiloDto } from 'test/fixtures/milo.fixture'
-import {
-  unDetailJeuneConseillerQueryModel,
-  unDetailJeuneQueryModel
-} from 'test/fixtures/query-models/jeunes.query-model.fixtures'
+import { unDetailJeuneConseillerQueryModel } from 'test/fixtures/query-models/jeunes.query-model.fixtures'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
@@ -25,7 +19,7 @@ import {
   DroitsInsuffisants,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
-import { failure, success } from '../../../src/building-blocks/types/result'
+import { success } from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
@@ -63,130 +57,6 @@ describe('GetJeunesByConseillerQueryHandler', () => {
   })
 
   describe('handle', () => {
-    const idConseiller = 'idConseiller'
-    const getJeunesByConseillerQuery: GetJeunesByConseillerQuery = {
-      idConseiller
-    }
-    beforeEach(async () => {
-      conseillersRepository.get.withArgs(idConseiller).resolves(
-        unConseiller({
-          id: idConseiller,
-          structure: Core.Structure.POLE_EMPLOI
-        })
-      )
-
-      sandbox
-        .stub(
-          GetJeunesByConseillerQueryHandler.prototype,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          'getAllQueryModelsByConseiller' as any
-        )
-        .withArgs(idConseiller)
-        .resolves([
-          { ...unDetailJeuneQueryModel(), lastActivity: 'date-engagement' }
-        ])
-    })
-
-    describe("quand le conseiller concerné est l'utilisateur", () => {
-      it('retourne un tableau de jeunes', async () => {
-        // Given
-        const utilisateur = unUtilisateurConseiller({ id: idConseiller })
-
-        // When
-        const actual = await getJeunesByConseillerQueryHandler.handle(
-          getJeunesByConseillerQuery,
-          utilisateur
-        )
-
-        // Then
-        expect(actual).to.deep.equal(
-          success([
-            { ...unDetailJeuneQueryModel(), lastActivity: 'date-engagement' }
-          ])
-        )
-      })
-    })
-
-    describe("quand le conseiller concerné n'existe pas", () => {
-      it('renvoie un échec NonTrouve', async () => {
-        // Given
-        const utilisateur = unUtilisateurConseiller()
-
-        // When
-        const actual = await getJeunesByConseillerQueryHandler.handle(
-          { idConseiller: 'un-autre-id' },
-          utilisateur
-        )
-
-        // Then
-        expect(actual).to.deep.equal(
-          failure(new NonTrouveError('Conseiller', 'un-autre-id'))
-        )
-      })
-    })
-
-    describe("quand l'utilisateur n'est pas le conseiller concerné", () => {
-      it('renvoie un échec DroitsInsuffisants', async () => {
-        // Given
-        const utilisateur = unUtilisateurConseiller({ id: 'au-autre-id' })
-
-        // When
-        const actual = await getJeunesByConseillerQueryHandler.handle(
-          getJeunesByConseillerQuery,
-          utilisateur
-        )
-
-        // Then
-        expect(actual).to.deep.equal(failure(new DroitsInsuffisants()))
-      })
-    })
-
-    describe("quand l'utilisateur est un superviseur", () => {
-      it('retourne les jeunes du conseiller', async () => {
-        // Given
-        const utilisateur = unUtilisateurConseiller({
-          id: 'un-autre-id',
-          structure: Core.Structure.POLE_EMPLOI,
-          roles: [Authentification.Role.SUPERVISEUR]
-        })
-
-        // When
-        const actual = await getJeunesByConseillerQueryHandler.handle(
-          getJeunesByConseillerQuery,
-          utilisateur
-        )
-
-        // Then
-        expect(actual).to.deep.equal(
-          success([
-            { ...unDetailJeuneQueryModel(), lastActivity: 'date-engagement' }
-          ])
-        )
-      })
-    })
-
-    describe("quand l'utilisateur est un superviseur d'une autre structure", () => {
-      it('renvoie un échec DroitsInsuffisants', async () => {
-        // Given
-        const utilisateur = unUtilisateurConseiller({
-          id: 'un-autre-id',
-          structure: Core.Structure.MILO,
-          roles: [Authentification.Role.SUPERVISEUR]
-        })
-
-        // When
-        const actual = await getJeunesByConseillerQueryHandler.handle(
-          getJeunesByConseillerQuery,
-          utilisateur
-        )
-
-        // Then
-        expect(actual).to.deep.equal(failure(new DroitsInsuffisants()))
-      })
-    })
-  })
-
-  describe('getAllQueryModelsByConseiller', () => {
     const idConseiller = '1'
     it("retourne les jeunes d'un conseiller", async () => {
       // Given
@@ -194,12 +64,13 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       await JeuneSqlModel.creer(unJeuneDto({ idConseiller }))
 
       // When
-      const actual =
-        await getJeunesByConseillerQueryHandler.getAllQueryModelsByConseiller(
-          idConseiller
-        )
+      const actual = await getJeunesByConseillerQueryHandler.handle({
+        idConseiller
+      })
       // Then
-      expect(actual).to.deep.equal([unDetailJeuneConseillerQueryModel()])
+      expect(actual).to.deep.equal(
+        success([unDetailJeuneConseillerQueryModel()])
+      )
     })
     it("retourne les jeunes d'un conseiller avec la date d'evenement d'engagement", async () => {
       // Given
@@ -214,18 +85,19 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       })
 
       // When
-      const actual =
-        await getJeunesByConseillerQueryHandler.getAllQueryModelsByConseiller(
-          idConseiller
-        )
+      const actual = await getJeunesByConseillerQueryHandler.handle({
+        idConseiller
+      })
 
       // Then
-      expect(actual).to.deep.equal([
-        {
-          ...unDetailJeuneConseillerQueryModel(),
-          lastActivity: dateEvenement.toISOString()
-        }
-      ])
+      expect(actual).to.deep.equal(
+        success([
+          {
+            ...unDetailJeuneConseillerQueryModel(),
+            lastActivity: dateEvenement.toISOString()
+          }
+        ])
+      )
     })
     it("retourne les jeunes d'un conseiller avec la date du DERNIER evenement d'engagement", async () => {
       // Given
@@ -246,18 +118,19 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       })
 
       // When
-      const actual =
-        await getJeunesByConseillerQueryHandler.getAllQueryModelsByConseiller(
-          idConseiller
-        )
+      const actual = await getJeunesByConseillerQueryHandler.handle({
+        idConseiller
+      })
 
       // Then
-      expect(actual).to.deep.equal([
-        {
-          ...unDetailJeuneConseillerQueryModel(),
-          lastActivity: dateEvenementRecent.toISOString()
-        }
-      ])
+      expect(actual).to.deep.equal(
+        success([
+          {
+            ...unDetailJeuneConseillerQueryModel(),
+            lastActivity: dateEvenementRecent.toISOString()
+          }
+        ])
+      )
     })
     it("retourne les jeunes d'un conseiller sans la date d'evenement d'engagement", async () => {
       // Given
@@ -272,21 +145,21 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       })
 
       // When
-      const actual =
-        await getJeunesByConseillerQueryHandler.getAllQueryModelsByConseiller(
-          idConseiller
-        )
+      const actual = await getJeunesByConseillerQueryHandler.handle({
+        idConseiller
+      })
 
       // Then
-      expect(actual).to.deep.equal([unDetailJeuneConseillerQueryModel()])
+      expect(actual).to.deep.equal(
+        success([unDetailJeuneConseillerQueryModel()])
+      )
     })
     it("retourne tableau vide quand le conseiller n'existe pas", async () => {
-      const actual =
-        await getJeunesByConseillerQueryHandler.getAllQueryModelsByConseiller(
-          'id-inexistant'
-        )
+      const actual = await getJeunesByConseillerQueryHandler.handle({
+        idConseiller: 'id-inexistant'
+      })
 
-      expect(actual).to.deep.equal([])
+      expect(actual).to.deep.equal(success([]))
     })
     it("retourne les jeunes d'un conseiller avec l'email du conseiller precedent en prenant le dernier transfert", async () => {
       // Given
@@ -334,22 +207,23 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       })
 
       // When
-      const actual =
-        await getJeunesByConseillerQueryHandler.getAllQueryModelsByConseiller(
-          idConseillerCible
-        )
+      const actual = await getJeunesByConseillerQueryHandler.handle({
+        idConseiller: idConseillerCible
+      })
 
       // Then
-      expect(actual).to.deep.equal([
-        {
-          ...unDetailJeuneConseillerQueryModel({ id: idJeune }),
-          conseillerPrecedent: {
-            email: '43@43.com',
-            nom: 'Tavernier',
-            prenom: 'Nils'
+      expect(actual).to.deep.equal(
+        success([
+          {
+            ...unDetailJeuneConseillerQueryModel({ id: idJeune }),
+            conseillerPrecedent: {
+              email: '43@43.com',
+              nom: 'Tavernier',
+              prenom: 'Nils'
+            }
           }
-        }
-      ])
+        ])
+      )
     })
     it("retourne les jeunes d'un conseiller avec situation courante", async () => {
       // Given
@@ -360,36 +234,166 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       await SituationsMiloSqlModel.create(situationsDuJeune)
 
       // When
-      const actual =
-        await getJeunesByConseillerQueryHandler.getAllQueryModelsByConseiller(
-          idConseiller
-        )
+      const actual = await getJeunesByConseillerQueryHandler.handle({
+        idConseiller: idConseiller
+      })
       // Then
-      expect(actual).to.deep.equal([
-        unDetailJeuneConseillerQueryModel({
-          id: idJeune,
-          situationCourante: situationsDuJeune.situationCourante ?? undefined
-        })
-      ])
+      expect(actual).to.deep.equal(
+        success([
+          unDetailJeuneConseillerQueryModel({
+            id: idJeune,
+            situationCourante: situationsDuJeune.situationCourante ?? undefined
+          })
+        ])
+      )
     })
   })
 
   describe('authorize', () => {
-    it('autorise un conseiller', async () => {
-      // Given
-      const utilisateur = unUtilisateurConseiller()
+    const query = {
+      idConseiller: 'idConseiller'
+    }
 
-      const query: GetJeunesByConseillerQuery = {
-        idConseiller: utilisateur.id
-      }
+    describe("quand le conseiller concerné est l'utilisateur", () => {
+      it('autorise le conseiller', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({ id: query.idConseiller })
+        conseillersRepository.get.withArgs(query.idConseiller).resolves(
+          unConseiller({
+            id: query.idConseiller
+          })
+        )
+        // When
+        const promise = getJeunesByConseillerQueryHandler.authorize(
+          query,
+          utilisateur
+        )
+        // Then
+        expect(
+          conseillerAuthorizer.authorizeConseiller
+        ).to.have.been.calledWithExactly(utilisateur)
+        await expect(promise).to.be.fulfilled()
+      })
+    })
 
-      // When
-      await getJeunesByConseillerQueryHandler.authorize(query, utilisateur)
+    describe("quand le conseiller concerné n'existe pas", () => {
+      it('renvoie un échec NonTrouve', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller()
+        conseillersRepository.get.withArgs(utilisateur.id).resolves(
+          unConseiller({
+            id: utilisateur.id
+          })
+        )
 
-      // Then
-      expect(
-        conseillerAuthorizer.authorizeConseiller
-      ).to.have.been.calledWithExactly(utilisateur)
+        // When
+        let error
+        try {
+          await getJeunesByConseillerQueryHandler.authorize(
+            { idConseiller: 'un-autre-id' },
+            utilisateur
+          )
+        } catch (e) {
+          error = e
+        }
+
+        // Then
+        expect(error).to.be.an.instanceof(NonTrouveError)
+      })
+    })
+
+    describe("quand l'utilisateur n'est pas le conseiller concerné", () => {
+      it('renvoie un échec DroitsInsuffisants', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({ id: 'au-autre-id' })
+        conseillersRepository.get.withArgs(utilisateur.id).resolves(
+          unConseiller({
+            id: utilisateur.id
+          })
+        )
+        conseillersRepository.get.withArgs(query.idConseiller).resolves(
+          unConseiller({
+            id: query.idConseiller
+          })
+        )
+
+        // When
+        let error
+        try {
+          await getJeunesByConseillerQueryHandler.authorize(query, utilisateur)
+        } catch (e) {
+          error = e
+        }
+
+        // Then
+        expect(error).to.be.an.instanceof(DroitsInsuffisants)
+      })
+    })
+
+    describe("quand l'utilisateur est un superviseur", () => {
+      it('retourne les jeunes du conseiller', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          id: 'un-autre-id',
+          structure: Core.Structure.POLE_EMPLOI,
+          roles: [Authentification.Role.SUPERVISEUR]
+        })
+        conseillersRepository.get.withArgs(utilisateur.id).resolves(
+          unConseiller({
+            id: utilisateur.id,
+            structure: Core.Structure.POLE_EMPLOI
+          })
+        )
+        conseillersRepository.get.withArgs(query.idConseiller).resolves(
+          unConseiller({
+            id: query.idConseiller,
+            structure: Core.Structure.POLE_EMPLOI
+          })
+        )
+
+        // When
+        const promise = getJeunesByConseillerQueryHandler.authorize(
+          query,
+          utilisateur
+        )
+
+        // Then
+        await expect(promise).to.be.fulfilled()
+      })
+    })
+
+    describe("quand l'utilisateur est un superviseur d'une autre structure", () => {
+      it('renvoie un échec DroitsInsuffisants', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          id: 'un-autre-id',
+          structure: Core.Structure.MILO,
+          roles: [Authentification.Role.SUPERVISEUR]
+        })
+        conseillersRepository.get.withArgs(utilisateur.id).resolves(
+          unConseiller({
+            id: utilisateur.id,
+            structure: Core.Structure.POLE_EMPLOI
+          })
+        )
+        conseillersRepository.get.withArgs(query.idConseiller).resolves(
+          unConseiller({
+            id: query.idConseiller,
+            structure: Core.Structure.POLE_EMPLOI
+          })
+        )
+
+        // When
+        let error
+        try {
+          await getJeunesByConseillerQueryHandler.authorize(query, utilisateur)
+        } catch (e) {
+          error = e
+        }
+
+        // Then
+        expect(error).to.be.an.instanceof(DroitsInsuffisants)
+      })
     })
   })
 })

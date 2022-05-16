@@ -8,7 +8,7 @@ import {
 } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { failure, Result, success } from '../../building-blocks/types/result'
+import { Result, success } from '../../building-blocks/types/result'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { toDetailJeuneConseillerQueryModel } from './query-mappers/jeune.mappers'
@@ -33,36 +33,35 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
   }
 
   async handle(
+    query: GetJeunesByConseillerQuery
+  ): Promise<Result<DetailJeuneConseillerQueryModel[]>> {
+    const jeunes = await this.getAllQueryModelsByConseiller(query.idConseiller)
+    return success(jeunes)
+  }
+
+  async authorize(
     query: GetJeunesByConseillerQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<Result<DetailJeuneConseillerQueryModel[]>> {
+  ): Promise<void> {
+    this.conseillerAuthorizer.authorizeConseiller(utilisateur)
+
     const conseiller = await this.conseillersRepository.get(query.idConseiller)
     if (!conseiller) {
-      return failure(new NonTrouveError('Conseiller', query.idConseiller))
+      throw new NonTrouveError('Conseiller', query.idConseiller)
     }
     if (
       !utilisateurEstSuperviseurDuConseiller(utilisateur, conseiller) &&
       !utilisateurEstConseiller(utilisateur, conseiller)
     ) {
-      return failure(new DroitsInsuffisants())
+      throw new DroitsInsuffisants()
     }
-
-    const jeunes = await this.getAllQueryModelsByConseiller(conseiller.id)
-    return success(jeunes)
-  }
-
-  async authorize(
-    _query: GetJeunesByConseillerQuery,
-    utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    return this.conseillerAuthorizer.authorizeConseiller(utilisateur)
   }
 
   async monitor(): Promise<void> {
     return
   }
 
-  async getAllQueryModelsByConseiller(
+  private async getAllQueryModelsByConseiller(
     idConseiller: string
   ): Promise<DetailJeuneConseillerQueryModel[]> {
     const sqlJeunes = await this.sequelize.query(
