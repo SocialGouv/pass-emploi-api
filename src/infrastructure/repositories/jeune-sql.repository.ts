@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Op, QueryTypes, Sequelize } from 'sequelize'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
 import {
-  DetailJeuneConseillerQueryModel,
   JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-models'
@@ -10,7 +9,6 @@ import { Core } from 'src/domain/core'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { Action } from '../../domain/action'
-import { Authentification } from '../../domain/authentification'
 import { NotFound } from '../../domain/erreur'
 import { Jeune } from '../../domain/jeune'
 import { ActionSqlModel } from '../sequelize/models/action.sql-model'
@@ -23,7 +21,6 @@ import {
   fromSqlToJeune,
   fromSqlToJeuneHomeQueryModel,
   fromSqlToJeuneQueryModel,
-  toDetailJeuneConseillerQueryModel,
   toResumeActionsDuJeuneQueryModel,
   toSqlJeune
 } from './mappers/jeunes.mappers'
@@ -127,49 +124,6 @@ export class JeuneSqlRepository implements Jeune.Repository {
         }
       })
     )
-  }
-
-  async getAllQueryModelsByConseiller(
-    idConseiller: string
-  ): Promise<DetailJeuneConseillerQueryModel[]> {
-    const sqlJeunes = await this.sequelize.query(
-      `
-          SELECT jeune.id,
-                 jeune.prenom,
-                 jeune.nom,
-                 jeune.email,
-                 jeune.date_creation,
-                 jeune.id_authentification,
-                 MAX(evenement_engagement.date_evenement) as date_evenement,
-                 conseiller.email                         as email_conseiller_precedent,
-                 conseiller.prenom                        as prenom_conseiller_precedent,
-                 conseiller.nom                           as nom_conseiller_precedent,
-                 situations_milo.situation_courante       as situation_courante
-          FROM jeune
-                   LEFT JOIN evenement_engagement
-                             ON evenement_engagement.id_utilisateur = jeune.id AND
-                                evenement_engagement.type_utilisateur = '${Authentification.Type.JEUNE}'
-                   LEFT JOIN transfert_conseiller
-                             ON transfert_conseiller.id = (SELECT transfert_conseiller.id
-                                                           FROM transfert_conseiller
-                                                           WHERE transfert_conseiller.id_jeune = jeune.id
-                                                             AND transfert_conseiller.id_conseiller_cible = jeune.id_conseiller
-                                                           ORDER BY transfert_conseiller.date_transfert DESC
-                                                           LIMIT 1
-                             )
-                   LEFT JOIN conseiller ON conseiller.id = transfert_conseiller.id_conseiller_source
-                   LEFT JOIN situations_milo ON situations_milo.id_jeune = jeune.id
-          WHERE jeune.id_conseiller = :idConseiller
-          GROUP BY jeune.id, transfert_conseiller.id, conseiller.id, jeune.prenom, jeune.nom, situations_milo.situation_courante
-          ORDER BY jeune.prenom ASC, jeune.nom ASC
-      `,
-      {
-        type: QueryTypes.SELECT,
-        replacements: { idConseiller }
-      }
-    )
-
-    return sqlJeunes.map(toDetailJeuneConseillerQueryModel)
   }
 
   async save(jeune: Jeune): Promise<void> {

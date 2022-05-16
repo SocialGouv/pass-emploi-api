@@ -58,7 +58,7 @@ export function unDetailJeuneConseillerQueryModel(
     email: 'john.doe@plop.io',
     creationDate: '2021-11-11T08:03:30.000Z',
     isActivated: true,
-    situation: undefined
+    situationCourante: undefined
   }
 
   return { ...defaults, ...args }

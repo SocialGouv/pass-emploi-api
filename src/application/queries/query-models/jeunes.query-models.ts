@@ -117,7 +117,7 @@ export class DetailJeuneConseillerQueryModel {
   conseillerPrecedent?: ConseillerQueryModel
 
   @ApiProperty({ required: false })
-  situation?: SituationQueryModel
+  situationCourante?: SituationQueryModel
 }
 
 export class ResumeActionsDuJeuneQueryModel {
