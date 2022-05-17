@@ -1,7 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { TypeRendezVous } from 'src/domain/rendez-vous'
-import { ActionQueryModel } from './actions.query-model'
+import {
+  ActionPoleEmploiQueryModel,
+  ActionQueryModel
+} from './actions.query-model'
 import { RendezVousBaseQueryModel } from './rendez-vous.query-models'
+import { CampagneQueryModel } from './campagne.query-model'
 
 class RendezVousJeuneHomeQueryModel implements RendezVousBaseQueryModel {
   @ApiProperty()
@@ -75,4 +79,32 @@ export class JeuneHomeQueryModel {
     isArray: true
   })
   rendezvous: RendezVousJeuneHomeQueryModel[]
+}
+
+export class JeuneHomeActionQueryModel {
+  @ApiProperty({
+    type: ActionQueryModel,
+    isArray: true
+  })
+  actions: ActionQueryModel[]
+
+  @ApiProperty({
+    type: CampagneQueryModel,
+    required: false
+  })
+  campagne?: CampagneQueryModel
+}
+
+export class JeuneHomeDemarcheQueryModel {
+  @ApiProperty({
+    type: ActionPoleEmploiQueryModel,
+    isArray: true
+  })
+  actions: ActionPoleEmploiQueryModel[]
+
+  @ApiProperty({
+    type: CampagneQueryModel,
+    required: false
+  })
+  campagne?: CampagneQueryModel
 }

@@ -1,5 +1,7 @@
 import { Campagne } from '../../src/domain/campagne'
 import { uneDatetime } from './date.fixture'
+import { CampagneQueryModel } from '../../src/application/queries/query-models/campagne.query-model'
+import { questionsInMemory } from '../../src/application/queries/campagne/get-campagne.query.handler'
 
 export const uneCampagne = (args: Partial<Campagne> = {}): Campagne => {
   const defaults: Campagne = {
@@ -11,3 +13,14 @@ export const uneCampagne = (args: Partial<Campagne> = {}): Campagne => {
 
   return { ...defaults, ...args }
 }
+
+export const uneCampagneQueryModel = (
+  campagne = uneCampagne()
+): CampagneQueryModel => ({
+  id: campagne.id,
+  dateDebut: campagne.dateDebut.toString(),
+  dateFin: campagne.dateFin.toString(),
+  description: "Votre expérience sur l'application",
+  titre: 'Donnez nous votre avis',
+  questions: questionsInMemory()
+})

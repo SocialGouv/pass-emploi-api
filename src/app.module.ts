@@ -158,6 +158,9 @@ import { CampagnesController } from './infrastructure/routes/campagnes.controlle
 import { Campagne, CampagneRepositoryToken } from './domain/campagne'
 import { CampagneSqlRepository } from './infrastructure/repositories/campagne-sql.repository'
 import { CreateCampagneCommandHandler } from './application/commands/create-campagne.command'
+import { GetJeuneHomeDemarchesQueryHandler } from './application/queries/get-jeune-home-demarches.query.handler'
+import { GetJeuneHomeActionsQueryHandler } from './application/queries/get-jeune-home-actions.query.handler'
+import { GetCampagneQueryModel } from './application/queries/campagne/get-campagne.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -375,7 +378,10 @@ export function buildQueryCommandsProviders(): Provider[] {
     HandleJobUpdateMailingListConseillerCommandHandler,
     ModifierConseillerCommandHandler,
     HandleJobNotifierNouveauxServicesCiviqueCommandHandler,
-    CreateCampagneCommandHandler
+    CreateCampagneCommandHandler,
+    GetJeuneHomeDemarchesQueryHandler,
+    GetJeuneHomeActionsQueryHandler,
+    GetCampagneQueryModel
   ]
 }
 

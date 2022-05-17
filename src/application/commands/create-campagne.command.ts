@@ -7,6 +7,7 @@ import { Unauthorized } from '../../domain/erreur'
 import { Inject } from '@nestjs/common'
 import { Campagne, CampagneRepositoryToken } from '../../domain/campagne'
 import { CampagneExisteDejaError } from '../../building-blocks/types/domain-error'
+import { Core } from '../../domain/core'
 
 export interface CreateCampagneCommand extends Command {
   nom: string
@@ -16,7 +17,7 @@ export interface CreateCampagneCommand extends Command {
 
 export class CreateCampagneCommandHandler extends CommandHandler<
   CreateCampagneCommand,
-  string
+  Core.Id
 > {
   constructor(
     @Inject(CampagneRepositoryToken)
@@ -35,7 +36,7 @@ export class CreateCampagneCommandHandler extends CommandHandler<
     }
   }
 
-  async handle(command: CreateCampagneCommand): Promise<Result<string>> {
+  async handle(command: CreateCampagneCommand): Promise<Result<Core.Id>> {
     const campagneExistanteSurLIntervalleOuLeNom =
       await this.campagneRepository.getByIntervalOrName(
         command.dateDebut,
@@ -50,14 +51,9 @@ export class CreateCampagneCommandHandler extends CommandHandler<
     const campagne = this.campagneFactory.creer(command)
     await this.campagneRepository.save(campagne)
 
-    return success(campagne.id)
+    return success({ id: campagne.id })
   }
 
-  async monitor(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _utilisateur: Authentification.Utilisateur,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: CreateCampagneCommand
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-  ): Promise<void> {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  async monitor(): Promise<void> {}
 }
