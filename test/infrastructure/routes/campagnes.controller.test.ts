@@ -1,0 +1,92 @@
+import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import {
+  buildTestingModuleForHttpTesting,
+  StubbedClass,
+  stubClass
+} from '../../utils'
+import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
+import * as request from 'supertest'
+import { CreateCampagneCommandHandler } from '../../../src/application/commands/create-campagne.command'
+import { CreateCampagnePayload } from '../../../src/infrastructure/routes/validation/campagnes.inputs'
+import { uneCampagne } from '../../fixtures/campagne.fixture'
+import { failure, success } from '../../../src/building-blocks/types/result'
+import { CampagneExisteDejaError } from '../../../src/building-blocks/types/domain-error'
+
+describe('CampagnesController', () => {
+  let createCampagneCommandHandler: StubbedClass<CreateCampagneCommandHandler>
+  let app: INestApplication
+
+  beforeEach(async () => {
+    createCampagneCommandHandler = stubClass(CreateCampagneCommandHandler)
+
+    const testingModule = await buildTestingModuleForHttpTesting()
+      .overrideProvider(CreateCampagneCommandHandler)
+      .useValue(createCampagneCommandHandler)
+      .compile()
+
+    app = testingModule.createNestApplication()
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
+    await app.init()
+  })
+
+  after(async () => {
+    await app.close()
+  })
+
+  describe('POST /campagnes', () => {
+    const campagne = uneCampagne()
+
+    describe('quand la commande est bonne', () => {
+      it('crée la campagne', async () => {
+        // Given
+        const createCampagnePayload: CreateCampagnePayload = {
+          nom: campagne.nom,
+          dateDebut: campagne.dateDebut.toUTC().toString(),
+          dateFin: campagne.dateFin.toUTC().toString()
+        }
+
+        createCampagneCommandHandler.execute
+          .withArgs({
+            nom: campagne.nom,
+            dateDebut: campagne.dateDebut.toUTC(),
+            dateFin: campagne.dateFin.toUTC()
+          })
+          .resolves(success(campagne.id))
+
+        // When
+        await request(app.getHttpServer())
+          .post('/campagnes')
+          .set('authorization', unHeaderAuthorization())
+          .send(createCampagnePayload)
+
+          // Then
+          .expect(HttpStatus.CREATED)
+      })
+    })
+    describe('quand la commande est pas bonne', () => {
+      it('crée la campagne', async () => {
+        // Given
+        const createCampagnePayload: CreateCampagnePayload = {
+          nom: campagne.nom,
+          dateDebut: campagne.dateDebut.toString(),
+          dateFin: campagne.dateFin.toString()
+        }
+
+        createCampagneCommandHandler.execute.resolves(
+          failure(new CampagneExisteDejaError())
+        )
+
+        // When
+        await request(app.getHttpServer())
+          .post('/campagnes')
+          .set('authorization', unHeaderAuthorization())
+          .send(createCampagnePayload)
+
+          // Then
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+    ensureUserAuthenticationFailsIfInvalid('post', '/campagnes')
+  })
+})

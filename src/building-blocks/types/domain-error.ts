@@ -151,3 +151,13 @@ export class ErreurHttp implements DomainError {
     this.statusCode = statusCode
   }
 }
+
+export class CampagneExisteDejaError implements DomainError {
+  static CODE = 'CAMPAGNE_EXISTE_DEJA'
+  readonly code: string = CampagneExisteDejaError.CODE
+  readonly message: string
+
+  constructor() {
+    this.message = `Une campagne sur ces dates ou avec le même nom existe déjà`
+  }
+}
