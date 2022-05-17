@@ -13,6 +13,7 @@ import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseille
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-models'
+import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 
 export interface GetRendezVousJeuneQuery extends Query {
   idJeune: string
@@ -91,7 +92,8 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
       include: [
         {
           model: JeuneSqlModel,
-          where: { id: idJeune }
+          where: { id: idJeune },
+          include: [ConseillerSqlModel]
         }
       ],
       where: {
@@ -115,7 +117,8 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
       include: [
         {
           model: JeuneSqlModel,
-          where: { id: idJeune }
+          where: { id: idJeune },
+          include: [ConseillerSqlModel]
         }
       ],
       where: {
@@ -137,7 +140,8 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
       include: [
         {
           model: JeuneSqlModel,
-          where: { id: idJeune }
+          where: { id: idJeune },
+          include: [ConseillerSqlModel]
         }
       ],
       where: {

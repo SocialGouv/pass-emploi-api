@@ -30,7 +30,12 @@ export function fromSqlToRendezVousJeuneQueryModel(
     organisme: rendezVousSql.organisme ?? undefined,
     presenceConseiller: rendezVousSql.presenceConseiller,
     invitation: Boolean(rendezVousSql.invitation),
-    createur: rendezVousSql.createur
+    createur: rendezVousSql.createur,
+    conseiller: {
+      id: rendezVousSql.jeunes[0].conseiller!.id,
+      nom: rendezVousSql.jeunes[0].conseiller!.nom,
+      prenom: rendezVousSql.jeunes[0].conseiller!.prenom
+    }
   }
 }
 
