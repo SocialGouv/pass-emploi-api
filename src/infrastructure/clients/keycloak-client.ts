@@ -57,9 +57,7 @@ export class KeycloakClient {
     }
   }
 
-  public async deleteUserByIdAuthentification(
-    idAuthentification: string
-  ): Promise<void> {
+  public async deleteUserByIdUser(idUser: string): Promise<void> {
     const token = await this.getToken()
     const url = `${this.issuerApiUrl}/users`
 
@@ -67,7 +65,7 @@ export class KeycloakClient {
       Authorization: `Bearer ${token}`
     }
     const params = {
-      q: `id_user:${idAuthentification}`
+      q: `id_user:${idUser}`
     }
 
     try {
@@ -78,17 +76,20 @@ export class KeycloakClient {
         })
       )
 
-      const userId = reponseGet.data[0]?.id
+      const userIdKeycloak = reponseGet.data[0]?.id
 
-      await firstValueFrom(
-        this.httpService.delete(`${url}/${userId}`, { headers })
-      )
-
-      this.logger.log(`utilisateur ${idAuthentification} supprimé`)
+      if (userIdKeycloak) {
+        await firstValueFrom(
+          this.httpService.delete(`${url}/${userIdKeycloak}`, { headers })
+        )
+        this.logger.log(`utilisateur ${idUser} supprimé`)
+      } else {
+        this.logger.log(`utilisateur ${idUser} n'existe pas dans keycloak`)
+      }
     } catch (e) {
       this.logger.error(
         buildError(
-          `erreur lors de la suppression de l\'utilisateur ${idAuthentification}`,
+          `erreur lors de la suppression de l\'utilisateur ${idUser}`,
           e
         )
       )
