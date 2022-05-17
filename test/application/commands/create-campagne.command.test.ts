@@ -64,7 +64,7 @@ describe('CreateCampagneCommandHandler', () => {
         const result = await createCampagneCommandeHandler.handle(command)
 
         // Then
-        expect(result).to.deep.equal(success(campagne.id))
+        expect(result).to.deep.equal(success({ id: campagne.id }))
         expect(campagneRepository.save).to.have.been.calledWithExactly(campagne)
       })
     })

@@ -14,7 +14,7 @@ import {
   Query
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
 import {
   TransfererJeunesConseillerCommand,
@@ -24,7 +24,11 @@ import { GetActionsJeunePoleEmploiQueryHandler } from 'src/application/queries/g
 import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from 'src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
-import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
+import {
+  JeuneHomeActionQueryModel,
+  JeuneHomeDemarcheQueryModel,
+  JeuneHomeQueryModel
+} from 'src/application/queries/query-models/home-jeune.query-models'
 import {
   DetailJeuneQueryModel,
   HistoriqueConseillerJeuneQueryModel
@@ -84,7 +88,9 @@ import {
   PutNotificationTokenInput,
   TransfererConseillerPayload
 } from './validation/jeunes.inputs'
+import { GetJeuneHomeActionsQueryHandler } from '../../application/queries/get-jeune-home-actions.query.handler'
 import StatutInvalide = Action.StatutInvalide
+import { GetJeuneHomeDemarchesQueryHandler } from '../../application/queries/get-jeune-home-demarches.query.handler'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -95,6 +101,8 @@ export class JeunesController {
     private readonly updateNotificationTokenCommandHandler: UpdateNotificationTokenCommandHandler,
     private readonly getHomeJeuneHandler: GetHomeJeuneHandler,
     private readonly getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
+    private readonly getJeuneHomeActionsQueryHandler: GetJeuneHomeActionsQueryHandler,
+    private readonly getJeuneHomeDemarchesQueryHandler: GetJeuneHomeDemarchesQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly getRendezVousJeuneQueryHandler: GetRendezVousJeuneQueryHandler,
     private readonly getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler,
@@ -174,6 +182,10 @@ export class JeunesController {
     }
   }
 
+  @ApiOperation({
+    summary: 'Deprecated (Mobile V1.2)',
+    deprecated: true
+  })
   @Get(':idJeune/home')
   async getHome(
     @Param('idJeune') idJeune: string,
@@ -182,6 +194,10 @@ export class JeunesController {
     return this.getHomeJeuneHandler.execute({ idJeune }, utilisateur)
   }
 
+  @ApiOperation({
+    summary: 'Deprecated (Mobile V1.6)',
+    deprecated: true
+  })
   @Get(':idJeune/actions')
   @ApiResponse({
     type: ActionQueryModel,
@@ -194,6 +210,57 @@ export class JeunesController {
     return this.getActionsByJeuneQueryHandler.execute({ idJeune }, utilisateur)
   }
 
+  @Get(':idJeune/home/actions')
+  @ApiResponse({
+    type: JeuneHomeActionQueryModel
+  })
+  async getHomeActions(
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<JeuneHomeActionQueryModel> {
+    return await this.getJeuneHomeActionsQueryHandler.execute(
+      { idJeune },
+      utilisateur
+    )
+  }
+
+  @Get(':idJeune/home/demarches')
+  @ApiResponse({
+    type: JeuneHomeDemarcheQueryModel
+  })
+  async getHomeDemarches(
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
+  ): Promise<JeuneHomeDemarcheQueryModel> {
+    const result = await this.getJeuneHomeDemarchesQueryHandler.execute(
+      {
+        idJeune,
+        accessToken
+      },
+      utilisateur
+    )
+    if (isSuccess(result)) {
+      return result.data
+    }
+    if (isFailure(result)) {
+      if (result.error.code === NonTrouveError.CODE) {
+        throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
+      }
+      if (result.error.code === ErreurHttp.CODE) {
+        throw new HttpException(
+          result.error.message,
+          (result.error as ErreurHttp).statusCode
+        )
+      }
+    }
+    throw new RuntimeException(result.error.message)
+  }
+
+  @ApiOperation({
+    summary: 'Deprecated (Mobile V1.6)',
+    deprecated: true
+  })
   @Get(':idJeune/pole-emploi/actions')
   @ApiResponse({
     type: ActionPoleEmploiQueryModel,

@@ -52,7 +52,7 @@ describe('CampagnesController', () => {
             dateDebut: campagne.dateDebut.toUTC(),
             dateFin: campagne.dateFin.toUTC()
           })
-          .resolves(success(campagne.id))
+          .resolves(success({ id: campagne.id }))
 
         // When
         await request(app.getHttpServer())

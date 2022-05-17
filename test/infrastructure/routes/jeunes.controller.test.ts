@@ -25,6 +25,7 @@ import { RendezVousJeuneQueryModel } from '../../../src/application/queries/quer
 import {
   DomainError,
   DroitsInsuffisants,
+  ErreurHttp,
   FavoriExisteDejaError,
   FavoriNonTrouveError,
   JeuneNonLieAuConseillerError,
@@ -57,6 +58,8 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { GetJeuneHomeDemarchesQueryHandler } from '../../../src/application/queries/get-jeune-home-demarches.query.handler'
+import { GetJeuneHomeActionsQueryHandler } from '../../../src/application/queries/get-jeune-home-actions.query.handler'
 import StatutInvalide = Action.StatutInvalide
 
 describe('JeunesController', () => {
@@ -71,6 +74,8 @@ describe('JeunesController', () => {
   let getRendezVousJeuneQueryHandler: StubbedClass<GetRendezVousJeuneQueryHandler>
   let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
   let getActionsPoleEmploiQueryHandler: StubbedClass<GetActionsJeunePoleEmploiQueryHandler>
+  let getJeuneHomeDemarchesQueryHandler: StubbedClass<GetJeuneHomeDemarchesQueryHandler>
+  let getJeuneHomeActionsQueryHandler: StubbedClass<GetJeuneHomeActionsQueryHandler>
   let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
@@ -100,6 +105,10 @@ describe('JeunesController', () => {
     )
     jwtService = stubClass(JwtService)
     getRendezVousJeuneQueryHandler = stubClass(GetRendezVousJeuneQueryHandler)
+    getJeuneHomeActionsQueryHandler = stubClass(GetJeuneHomeActionsQueryHandler)
+    getJeuneHomeDemarchesQueryHandler = stubClass(
+      GetJeuneHomeDemarchesQueryHandler
+    )
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
@@ -126,6 +135,10 @@ describe('JeunesController', () => {
       .useValue(getRendezVousJeunePoleEmploiQueryHandler)
       .overrideProvider(GetActionsJeunePoleEmploiQueryHandler)
       .useValue(getActionsPoleEmploiQueryHandler)
+      .overrideProvider(GetJeuneHomeActionsQueryHandler)
+      .useValue(getJeuneHomeActionsQueryHandler)
+      .overrideProvider(GetJeuneHomeDemarchesQueryHandler)
+      .useValue(getJeuneHomeDemarchesQueryHandler)
       .overrideProvider(JwtService)
       .useValue(jwtService)
       .compile()
@@ -779,5 +792,85 @@ describe('JeunesController', () => {
       'get',
       '/jeunes/1/pole-emploi/actions'
     )
+  })
+
+  describe('GET /jeunes/:idJeune/home/actions', () => {
+    const idJeune = '1'
+    it('retourne la home action du jeune', async () => {
+      // Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+      getJeuneHomeActionsQueryHandler.execute
+        .withArgs(
+          {
+            idJeune
+          },
+          unUtilisateurDecode()
+        )
+        .resolves({
+          actions: []
+        })
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/home/actions`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect({ actions: [] })
+    })
+    ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/home/actions')
+  })
+
+  describe('GET /jeunes/:idJeune/home/demarches', () => {
+    const idJeune = '1'
+    describe("quand c'est en succès", () => {
+      it('retourne la home demarches du jeune', async () => {
+        // Given
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+        getJeuneHomeDemarchesQueryHandler.execute
+          .withArgs(
+            {
+              idJeune,
+              accessToken: 'coucou'
+            },
+            unUtilisateurDecode()
+          )
+          .resolves(
+            success({
+              actions: []
+            })
+          )
+
+        // When
+        await request(app.getHttpServer())
+          .get(`/jeunes/${idJeune}/home/demarches`)
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect({ actions: [] })
+      })
+    })
+    describe("quand c'est en échec", () => {
+      it('renvoie une erreur HTTP', async () => {
+        // Given
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+        getJeuneHomeDemarchesQueryHandler.execute
+          .withArgs(
+            {
+              idJeune,
+              accessToken: 'coucou'
+            },
+            unUtilisateurDecode()
+          )
+          .resolves(failure(new ErreurHttp("C'est cassé", 400)))
+
+        // When
+        await request(app.getHttpServer())
+          .get(`/jeunes/${idJeune}/home/demarches`)
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/home/demarches')
   })
 })

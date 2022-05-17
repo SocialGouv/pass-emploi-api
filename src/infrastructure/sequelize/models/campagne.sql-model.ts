@@ -1,10 +1,12 @@
 import {
   Column,
   DataType,
+  HasMany,
   Model,
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
+import { ReponseCampagneSqlModel } from './reponse-campagne.sql-model'
 
 export class CampagneDto extends Model {
   @PrimaryKey
@@ -22,4 +24,7 @@ export class CampagneDto extends Model {
 }
 
 @Table({ timestamps: false, tableName: 'campagne' })
-export class CampagneSqlModel extends CampagneDto {}
+export class CampagneSqlModel extends CampagneDto {
+  @HasMany(() => ReponseCampagneSqlModel)
+  reponses!: ReponseCampagneSqlModel[]
+}
