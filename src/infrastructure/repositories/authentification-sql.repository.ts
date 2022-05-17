@@ -149,16 +149,7 @@ export class AuthentificationSqlRepository
   }
 
   async deleteJeuneIdp(idJeune: string): Promise<void> {
-    const jeuneSqlModel = await JeuneSqlModel.findByPk(idJeune)
-
-    if (jeuneSqlModel) {
-      const idAuthentification = jeuneSqlModel.idAuthentification
-      await this.keycloakClient.deleteUserByIdAuthentification(
-        idAuthentification
-      )
-      this.logger.log(`jeune ${idJeune} supprimé`)
-    } else {
-      this.logger.error(`jeune ${idJeune} non trouvé`)
-    }
+    await this.keycloakClient.deleteUserByIdUser(idJeune)
+    this.logger.log(`jeune ${idJeune} supprimé de keycloak`)
   }
 }
