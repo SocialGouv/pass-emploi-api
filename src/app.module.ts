@@ -154,6 +154,10 @@ import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './applicat
 import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './application/commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from './application/queries/get-favoris-service-civique-jeune.query.handler'
 import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from './application/commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
+import { CampagnesController } from './infrastructure/routes/campagnes.controller'
+import { Campagne, CampagneRepositoryToken } from './domain/campagne'
+import { CampagneSqlRepository } from './infrastructure/repositories/campagne-sql.repository'
+import { CreateCampagneCommandHandler } from './application/commands/create-campagne.command'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -180,7 +184,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     EvenementsController,
     RecherchesController,
     FavorisController,
-    ServicesCiviqueController
+    ServicesCiviqueController,
+    CampagnesController
   ],
   providers: [
     ...buildQueryCommandsProviders(),
@@ -198,6 +203,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Action.Factory,
     Mail.Factory,
     Authentification.Factory,
+    Campagne.Factory,
     WorkerService,
     TaskService,
     InvitationIcsClient,
@@ -277,6 +283,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: MailRepositoryToken,
       useClass: MailSqlRepository
+    },
+    {
+      provide: CampagneRepositoryToken,
+      useClass: CampagneSqlRepository
     },
     ...databaseProviders
   ],
@@ -364,7 +374,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetAgencesQueryHandler,
     HandleJobUpdateMailingListConseillerCommandHandler,
     ModifierConseillerCommandHandler,
-    HandleJobNotifierNouveauxServicesCiviqueCommandHandler
+    HandleJobNotifierNouveauxServicesCiviqueCommandHandler,
+    CreateCampagneCommandHandler
   ]
 }
 
