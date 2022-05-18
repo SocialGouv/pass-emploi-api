@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsDateString, IsNotEmpty, IsString } from 'class-validator'
+import { IsDateString, IsNotEmpty, IsNumber, IsString } from 'class-validator'
 
 export class CreateCampagnePayload {
   @ApiProperty()
@@ -18,4 +18,21 @@ export class CreateCampagnePayload {
   @IsNotEmpty()
   @IsDateString()
   dateFin: string
+}
+
+export class ReponseCampagnePayload {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  idQuestion: number
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  idOption: number
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  pourquoi: string
 }

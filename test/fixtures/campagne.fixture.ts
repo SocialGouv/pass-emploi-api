@@ -24,3 +24,45 @@ export const uneCampagneQueryModel = (
   titre: 'Donnez nous votre avis',
   questions: questionsInMemory()
 })
+
+export const uneEvaluationIncomplete = (
+  campagne = uneCampagne()
+): Campagne.Evaluation => ({
+  jeune: {
+    id: 'idJeune',
+    dateCreation: uneDatetime,
+    structure: 'MILO'
+  },
+  date: uneDatetime,
+  idCampagne: campagne.id,
+  reponses: [
+    {
+      pourquoi: 'parce que',
+      idOption: 3,
+      idQuestion: 1
+    }
+  ]
+})
+
+export const uneEvaluationComplete = (
+  campagne = uneCampagne()
+): Campagne.Evaluation => ({
+  jeune: {
+    id: 'idJeune',
+    dateCreation: uneDatetime,
+    structure: 'MILO'
+  },
+  date: uneDatetime,
+  idCampagne: campagne.id,
+  reponses: [
+    {
+      idOption: 4,
+      idQuestion: 1
+    },
+    {
+      idOption: 3,
+      idQuestion: 2,
+      pourquoi: 'Voila pourquoi'
+    }
+  ]
+})

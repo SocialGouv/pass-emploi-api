@@ -8,8 +8,28 @@ export class NonTrouveError implements DomainError {
   readonly code: string = NonTrouveError.CODE
   readonly message: string
 
-  constructor(entityType: string, critereRecherche: string) {
+  constructor(entityType: string, critereRecherche = '') {
     this.message = `${entityType} ${critereRecherche} non trouvé(e)`
+  }
+}
+
+export class CampagneNonActive implements DomainError {
+  static CODE = 'CAMPAGNE_NON_ACTIVE'
+  readonly code: string = CampagneNonActive.CODE
+  readonly message: string
+
+  constructor(nom: string) {
+    this.message = `La campagne ${nom} n'est pas en cours`
+  }
+}
+
+export class ReponsesCampagneInvalide implements DomainError {
+  static CODE = 'REPONSES_CAMPAGNE_INVALIDE'
+  readonly code: string = ReponsesCampagneInvalide.CODE
+  readonly message: string
+
+  constructor() {
+    this.message = `Il faut répondre au moins à la première question`
   }
 }
 

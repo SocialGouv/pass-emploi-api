@@ -7,11 +7,13 @@ import { CampagneSqlModel } from '../../../infrastructure/sequelize/models/campa
 import { DateService } from '../../../utils/date-service'
 import { Op } from 'sequelize'
 import { ReponseCampagneSqlModel } from '../../../infrastructure/sequelize/models/reponse-campagne.sql-model'
+import { Injectable } from '@nestjs/common'
 
 export interface GetCampagneQuery extends Query {
   idJeune: string
 }
 
+@Injectable()
 export class GetCampagneQueryModel {
   constructor(private dateService: DateService) {}
 

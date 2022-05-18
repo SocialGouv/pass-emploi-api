@@ -161,6 +161,7 @@ import { CreateCampagneCommandHandler } from './application/commands/create-camp
 import { GetJeuneHomeDemarchesQueryHandler } from './application/queries/get-jeune-home-demarches.query.handler'
 import { GetJeuneHomeActionsQueryHandler } from './application/queries/get-jeune-home-actions.query.handler'
 import { GetCampagneQueryModel } from './application/queries/campagne/get-campagne.query.handler'
+import { CreateEvaluationCommandHandler } from './application/commands/create-evaluation.command'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -381,7 +382,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateCampagneCommandHandler,
     GetJeuneHomeDemarchesQueryHandler,
     GetJeuneHomeActionsQueryHandler,
-    GetCampagneQueryModel
+    GetCampagneQueryModel,
+    CreateEvaluationCommandHandler
   ]
 }
 

@@ -1,8 +1,13 @@
 import { DatabaseForTesting, expect } from '../../utils'
 import { CampagneSqlRepository } from '../../../src/infrastructure/repositories/campagne-sql.repository'
-import { uneCampagne } from '../../fixtures/campagne.fixture'
+import {
+  uneCampagne,
+  uneEvaluationComplete,
+  uneEvaluationIncomplete
+} from '../../fixtures/campagne.fixture'
 import { CampagneSqlModel } from '../../../src/infrastructure/sequelize/models/campagne.sql-model'
 import { DateTime } from 'luxon'
+import { ReponseCampagneSqlModel } from '../../../src/infrastructure/sequelize/models/reponse-campagne.sql-model'
 
 describe('CampagneSqlRepository', () => {
   DatabaseForTesting.prepare()
@@ -32,6 +37,20 @@ describe('CampagneSqlRepository', () => {
       expect(
         DateTime.fromJSDate(campagnesSql[0].dateDebut).toUTC()
       ).to.deep.equal(campagne.dateDebut.toUTC())
+    })
+  })
+
+  describe('get', () => {
+    it('récupère une campagne', async () => {
+      // Given
+      const campagne = uneCampagne()
+      await campagneSqlRepository.save(campagne)
+
+      // When
+      const actual = await campagneSqlRepository.get(campagne.id)
+
+      // Then
+      expect(actual).to.deep.equal(campagne)
     })
   })
 
@@ -85,6 +104,89 @@ describe('CampagneSqlRepository', () => {
       )
       // Then
       expect(campagneCherchee).to.be.undefined()
+    })
+  })
+
+  describe('saveEvaluation', () => {
+    const campagne = uneCampagne()
+
+    beforeEach(async () => {
+      await campagneSqlRepository.save(campagne)
+    })
+
+    describe("quand c'est la première sur une campagne", () => {
+      it('la crée', async () => {
+        // Given
+        const evaluation = uneEvaluationIncomplete()
+
+        // When
+        await campagneSqlRepository.saveEvaluation(evaluation)
+
+        // Then
+        const reponseCampagneSqlModels = await ReponseCampagneSqlModel.findAll()
+        expect(reponseCampagneSqlModels).to.have.length(1)
+        expect(reponseCampagneSqlModels[0].idCampagne).to.equal(
+          evaluation.idCampagne
+        )
+        expect(reponseCampagneSqlModels[0].idJeune).to.equal(
+          evaluation.jeune.id
+        )
+        expect(reponseCampagneSqlModels[0].structureJeune).to.equal(
+          evaluation.jeune.structure
+        )
+        expect(reponseCampagneSqlModels[0].dateCreationJeune).to.deep.equal(
+          evaluation.jeune.dateCreation.toJSDate()
+        )
+        expect(reponseCampagneSqlModels[0].dateReponse).to.deep.equal(
+          evaluation.date.toJSDate()
+        )
+        expect(reponseCampagneSqlModels[0].reponse1).to.equal(
+          evaluation.reponses[0].idOption.toString()
+        )
+        expect(reponseCampagneSqlModels[0].pourquoi1).to.equal(
+          evaluation.reponses[0].pourquoi
+        )
+      })
+    })
+
+    describe("quand c'est la seconde sur une campagne", () => {
+      it("l'écrase", async () => {
+        // Given
+        await campagneSqlRepository.saveEvaluation(uneEvaluationIncomplete())
+        const evaluationComplete = uneEvaluationComplete()
+
+        // When
+        await campagneSqlRepository.saveEvaluation(evaluationComplete)
+
+        // Then
+        const reponseCampagneSqlModels = await ReponseCampagneSqlModel.findAll()
+        expect(reponseCampagneSqlModels).to.have.length(1)
+        expect(reponseCampagneSqlModels[0].idCampagne).to.equal(
+          evaluationComplete.idCampagne
+        )
+        expect(reponseCampagneSqlModels[0].idJeune).to.equal(
+          evaluationComplete.jeune.id
+        )
+        expect(reponseCampagneSqlModels[0].structureJeune).to.equal(
+          evaluationComplete.jeune.structure
+        )
+        expect(reponseCampagneSqlModels[0].dateCreationJeune).to.deep.equal(
+          evaluationComplete.jeune.dateCreation.toJSDate()
+        )
+        expect(reponseCampagneSqlModels[0].dateReponse).to.deep.equal(
+          evaluationComplete.date.toJSDate()
+        )
+        expect(reponseCampagneSqlModels[0].reponse1).to.equal(
+          evaluationComplete.reponses[0].idOption.toString()
+        )
+        expect(reponseCampagneSqlModels[0].pourquoi1).to.equal(null)
+        expect(reponseCampagneSqlModels[0].reponse2).to.equal(
+          evaluationComplete.reponses[1].idOption.toString()
+        )
+        expect(reponseCampagneSqlModels[0].pourquoi2).to.equal(
+          evaluationComplete.reponses[1].pourquoi
+        )
+      })
     })
   })
 })
