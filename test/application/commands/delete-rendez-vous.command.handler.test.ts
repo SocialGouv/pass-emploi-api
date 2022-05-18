@@ -63,185 +63,166 @@ describe('DeleteRendezVousCommandHandler', () => {
   })
 
   describe('handle', () => {
-    describe('quand le rendez-vous existe', () => {
-      describe("quand l'invitation est à true", () => {
-        describe('quand le conseiller qui supprime est différent du créateur', () => {
-          it('envoie un email au créateur du rendez-vous', async () => {
-            // Given
-            const conseillerSuppression = unConseiller({
-              id: 'cons-suppr'
-            })
-            const conseillerCreateur = unConseiller({
-              id: 'cons-crea',
-              firstName: 'poi',
-              lastName: 'poi'
-            })
-            jeune.conseiller = conseillerSuppression
-            rendezVous.jeunes = [jeune]
-            rendezVous.createur = {
-              id: conseillerCreateur.id,
-              nom: conseillerCreateur.lastName,
-              prenom: conseillerCreateur.firstName
-            }
-            rendezVous.invitation = true
-            const command: DeleteRendezVousCommand = {
-              idRendezVous: rendezVous.id
-            }
-            rendezVousRepository.get
-              .withArgs(rendezVous.id)
-              .resolves(rendezVous)
-            conseillerRepository.get
-              .withArgs(conseillerCreateur.id)
-              .resolves(conseillerCreateur)
-            planificateurService.supprimerRappelsRendezVous.resolves()
+    it('renvoie une failure pour un rendez-vous inexistant', async () => {
+      // Given
+      rendezVousRepository.get.withArgs(rendezVous.id).resolves(undefined)
+      const command: DeleteRendezVousCommand = {
+        idRendezVous: rendezVous.id
+      }
 
-            // When
-            await deleteRendezVousCommandHandler.handle(command)
-
-            // Then
-            expect(mailService.envoyerMailRendezVous).to.have.been.calledWith(
-              conseillerCreateur,
-              rendezVous,
-              RendezVous.Operation.SUPPRESSION
-            )
-          })
-        })
-        describe("quand l'invitation est à false", () => {
-          it("n'envoie pas d'email au conseiller créateur", async () => {
-            // Given
-            const conseillerSuppression = unConseiller({
-              id: 'cons-suppr'
-            })
-            const conseillerCreateur = unConseiller({
-              id: 'cons-crea',
-              firstName: 'poi',
-              lastName: 'poi'
-            })
-            jeune.conseiller = conseillerSuppression
-            rendezVous.jeunes = [jeune]
-            rendezVous.createur = {
-              id: conseillerCreateur.id,
-              nom: conseillerCreateur.lastName,
-              prenom: conseillerCreateur.firstName
-            }
-            rendezVous.invitation = false
-            const command: DeleteRendezVousCommand = {
-              idRendezVous: rendezVous.id
-            }
-            rendezVousRepository.get
-              .withArgs(rendezVous.id)
-              .resolves(rendezVous)
-            conseillerRepository.get
-              .withArgs(conseillerCreateur.id)
-              .resolves(conseillerCreateur)
-            planificateurService.supprimerRappelsRendezVous.resolves()
-
-            // When
-            await deleteRendezVousCommandHandler.handle(command)
-
-            // Then
-            expect(mailService.envoyerMailRendezVous).not.to.have.been.called()
-          })
-        })
-        describe("quand le jeune s'est déjà connecté au moins une fois sur l'application", () => {
-          it('supprime le rendez-vous et envoie une notification au jeune', async () => {
-            // Given
-            rendezVous.jeunes[0].pushNotificationToken = 'token'
-            rendezVousRepository.get
-              .withArgs(rendezVous.id)
-              .resolves(rendezVous)
-            const command: DeleteRendezVousCommand = {
-              idRendezVous: rendezVous.id
-            }
-
-            // When
-            const result = await deleteRendezVousCommandHandler.handle(command)
-
-            // Then
-            expect(rendezVousRepository.delete).to.have.been.calledWith(
-              rendezVous.id
-            )
-            expect(notificationRepository.send).to.have.been.calledWith(
-              Notification.createRdvSupprime(
-                rendezVous.jeunes[0].pushNotificationToken,
-                rendezVous.date
-              )
-            )
-            expect(result).to.deep.equal(emptySuccess())
-          })
-        })
-        describe('quand le jeune ne s"est jamais connecté sur l"application', () => {
-          it('supprime le rendez-vous sans envoyer de notification au jeune', async () => {
-            // Given
-            rendezVousRepository.get
-              .withArgs(rendezVous.id)
-              .resolves(rendezVous)
-            rendezVous.jeunes[0].pushNotificationToken = undefined
-            const command: DeleteRendezVousCommand = {
-              idRendezVous: rendezVous.id
-            }
-
-            // When
-            const result = await deleteRendezVousCommandHandler.handle(command)
-            // Then
-            expect(rendezVousRepository.delete).to.have.been.calledWith(
-              rendezVous.id
-            )
-            expect(notificationRepository.send).not.to.have.been.calledWith(
-              Notification.createRdvSupprime(
-                jeune.pushNotificationToken,
-                rendezVous.date
-              )
-            )
-            expect(result).to.deep.equal(emptySuccess())
-          })
-        })
-      })
-      describe('quand le rendez-vous n"existe pas', () => {
-        it('renvoie une failure', async () => {
-          // Given
-          rendezVousRepository.get.withArgs(rendezVous.id).resolves(undefined)
-          const command: DeleteRendezVousCommand = {
-            idRendezVous: rendezVous.id
-          }
-
-          // When
-          const result = await deleteRendezVousCommandHandler.handle(command)
-          // Then
-          expect(rendezVousRepository.delete).not.to.have.been.calledWith(
-            rendezVous.id
-          )
-          expect(notificationRepository.send).not.to.have.been.calledWith(
-            Notification.createRdvSupprime(
-              jeune.pushNotificationToken,
-              rendezVous.date
-            )
-          )
-          expect(result).to.deep.equal(
-            failure(new NonTrouveError('Rendez-Vous', command.idRendezVous))
-          )
-        })
-      })
+      // When
+      const result = await deleteRendezVousCommandHandler.handle(command)
+      // Then
+      expect(rendezVousRepository.delete).not.to.have.been.calledWith(
+        rendezVous.id
+      )
+      expect(notificationRepository.send).not.to.have.been.calledWith(
+        Notification.createRdvSupprime(
+          jeune.pushNotificationToken,
+          rendezVous.date
+        )
+      )
+      expect(result).to.deep.equal(
+        failure(new NonTrouveError('Rendez-Vous', command.idRendezVous))
+      )
     })
-
-    describe('authorize', () => {
-      it('autorise un jeune ou un conseiller à supprimer un rdv', async () => {
+    it('supprime un rendez-vous existant', async () => {
+      const command: DeleteRendezVousCommand = {
+        idRendezVous: rendezVous.id
+      }
+      rendezVousRepository.get.withArgs(rendezVous.id).resolves(rendezVous)
+      // When
+      const result = await deleteRendezVousCommandHandler.handle(command)
+      // Then
+      expect(rendezVousRepository.delete).to.have.been.calledWith(rendezVous.id)
+      expect(result).to.deep.equal(emptySuccess())
+    })
+    describe('notifications', () => {
+      it("envoie un email au créateur d'un rendez-vous avec invitation", async () => {
         // Given
+        const conseillerSuppression = unConseiller({
+          id: 'cons-suppr'
+        })
+        const conseillerCreateur = unConseiller({
+          id: 'cons-crea',
+          firstName: 'poi',
+          lastName: 'poi'
+        })
+        jeune.conseiller = conseillerSuppression
+        rendezVous.jeunes = [jeune]
+        rendezVous.createur = {
+          id: conseillerCreateur.id,
+          nom: conseillerCreateur.lastName,
+          prenom: conseillerCreateur.firstName
+        }
+        rendezVous.invitation = true
+        const command: DeleteRendezVousCommand = {
+          idRendezVous: rendezVous.id
+        }
+        rendezVousRepository.get.withArgs(rendezVous.id).resolves(rendezVous)
+        conseillerRepository.get
+          .withArgs(conseillerCreateur.id)
+          .resolves(conseillerCreateur)
+        planificateurService.supprimerRappelsRendezVous.resolves()
+
+        // When
+        await deleteRendezVousCommandHandler.handle(command)
+
+        // Then
+        expect(mailService.envoyerMailRendezVous).to.have.been.calledWith(
+          conseillerCreateur,
+          rendezVous,
+          RendezVous.Operation.SUPPRESSION
+        )
+      })
+      it("n'envoie pas d'email au créateur d'un rendez-vous sans invitation", async () => {
+        // Given
+        const conseillerSuppression = unConseiller({
+          id: 'cons-suppr'
+        })
+        const conseillerCreateur = unConseiller({
+          id: 'cons-crea',
+          firstName: 'poi',
+          lastName: 'poi'
+        })
+        jeune.conseiller = conseillerSuppression
+        rendezVous.jeunes = [jeune]
+        rendezVous.createur = {
+          id: conseillerCreateur.id,
+          nom: conseillerCreateur.lastName,
+          prenom: conseillerCreateur.firstName
+        }
+        rendezVous.invitation = false
+        const command: DeleteRendezVousCommand = {
+          idRendezVous: rendezVous.id
+        }
+        rendezVousRepository.get.withArgs(rendezVous.id).resolves(rendezVous)
+        conseillerRepository.get
+          .withArgs(conseillerCreateur.id)
+          .resolves(conseillerCreateur)
+        planificateurService.supprimerRappelsRendezVous.resolves()
+
+        // When
+        await deleteRendezVousCommandHandler.handle(command)
+
+        // Then
+        expect(mailService.envoyerMailRendezVous).not.to.have.been.called()
+      })
+      it("envoie une notification push à un jeune qui s'est déjà connecté sur l'application", async () => {
+        // Given
+        rendezVous.jeunes[0].pushNotificationToken = 'token'
+        rendezVousRepository.get.withArgs(rendezVous.id).resolves(rendezVous)
         const command: DeleteRendezVousCommand = {
           idRendezVous: rendezVous.id
         }
 
-        const utilisateur = unUtilisateurConseiller()
-
         // When
-        await deleteRendezVousCommandHandler.authorize(command, utilisateur)
+        await deleteRendezVousCommandHandler.handle(command)
 
         // Then
-        expect(rendezVousAuthorizer.authorize).to.have.been.calledWithExactly(
-          command.idRendezVous,
-          utilisateur
+        expect(notificationRepository.send).to.have.been.calledWith(
+          Notification.createRdvSupprime(
+            rendezVous.jeunes[0].pushNotificationToken,
+            rendezVous.date
+          )
         )
       })
+      it("n'envoie pas de notification à un jeune qui ne s'est jamais connecté sur l'application", async () => {
+        // Given
+        rendezVousRepository.get.withArgs(rendezVous.id).resolves(rendezVous)
+        rendezVous.jeunes[0].pushNotificationToken = undefined
+        const command: DeleteRendezVousCommand = {
+          idRendezVous: rendezVous.id
+        }
+        // When
+        await deleteRendezVousCommandHandler.handle(command)
+        // Then
+        expect(notificationRepository.send).not.to.have.been.calledWith(
+          Notification.createRdvSupprime(
+            jeune.pushNotificationToken,
+            rendezVous.date
+          )
+        )
+      })
+    })
+  })
+  describe('authorize', () => {
+    it('autorise un jeune ou un conseiller à supprimer un rdv', async () => {
+      // Given
+      const command: DeleteRendezVousCommand = {
+        idRendezVous: rendezVous.id
+      }
+
+      const utilisateur = unUtilisateurConseiller()
+
+      // When
+      await deleteRendezVousCommandHandler.authorize(command, utilisateur)
+
+      // Then
+      expect(rendezVousAuthorizer.authorize).to.have.been.calledWithExactly(
+        command.idRendezVous,
+        utilisateur
+      )
     })
   })
 })
