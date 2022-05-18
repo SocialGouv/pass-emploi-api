@@ -92,7 +92,11 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
           )
         )
       }
-      this.mailService.envoyerMailRendezVousSupprime(createur, rendezVous)
+      this.mailService.envoyerMailRendezVous(
+        createur,
+        rendezVous,
+        RendezVous.Operation.SUPPRESSION
+      )
     }
     return emptySuccess()
   }

@@ -42,12 +42,7 @@ export namespace Mail {
     envoyerMailRendezVous(
       conseiller: Conseiller,
       rendezVous: RendezVous,
-      rendezVousMisAJour?: boolean
-    ): Promise<void>
-
-    envoyerMailRendezVousSupprime(
-      conseiller: Conseiller,
-      rendezVous: RendezVous
+      operation: RendezVous.Operation
     ): Promise<void>
 
     envoyer(data: MailDataDto): Promise<void>

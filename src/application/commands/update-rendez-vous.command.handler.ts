@@ -102,13 +102,17 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     this.replanifierLesRappelsDeRendezVous(rendezVousUpdated, rendezVous)
     this.notifierLesJeunes(rendezVous, rendezVousUpdated)
     if (rendezVousUpdated.invitation) {
-      this.envoyerLesInvitationsCalendaires(rendezVousUpdated)
+      this.envoyerLesInvitationsCalendaires(
+        rendezVousUpdated,
+        RendezVous.Operation.MODIFICATION
+      )
     }
     return success({ id: rendezVousUpdated.id })
   }
 
   private async envoyerLesInvitationsCalendaires(
-    rendezVousUpdated: RendezVous
+    rendezVousUpdated: RendezVous,
+    operation: RendezVous.Operation
   ): Promise<void> {
     const conseillerDestinataire = await this.conseillerRepository.get(
       rendezVousUpdated.createur.id
@@ -118,7 +122,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
         await this.mailClient.envoyerMailRendezVous(
           conseillerDestinataire,
           rendezVousUpdated,
-          true
+          operation
         )
       } catch (e) {
         this.logger.error(

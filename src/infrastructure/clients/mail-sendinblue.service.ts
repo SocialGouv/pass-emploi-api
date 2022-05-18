@@ -60,30 +60,7 @@ export class MailSendinblueService implements Mail.Service {
   async envoyerMailRendezVous(
     conseiller: Conseiller,
     rendezVous: RendezVous,
-    rendezVousMisAJour = false
-  ): Promise<void> {
-    const rendezVousIcsSequence =
-      await this.invitationIcsClient.getAndIncrementRendezVousIcsSequence(
-        rendezVous.id
-      )
-    const fichierInvitation =
-      this.invitationIcsClient.creerFichierInvitationRendezVous(
-        conseiller,
-        rendezVous,
-        rendezVousIcsSequence
-      )
-    const mailDatadto = this.creerContenuMailRendezVous(
-      conseiller,
-      rendezVous,
-      fichierInvitation,
-      rendezVousMisAJour
-    )
-    await this.envoyer(mailDatadto)
-  }
-
-  async envoyerMailRendezVousSupprime(
-    conseiller: Conseiller,
-    rendezVous: RendezVous
+    operation: RendezVous.Operation
   ): Promise<void> {
     const rendezVousIcsSequence =
       await this.invitationIcsClient.getAndIncrementRendezVousIcsSequence(
@@ -94,56 +71,25 @@ export class MailSendinblueService implements Mail.Service {
         conseiller,
         rendezVous,
         rendezVousIcsSequence,
-        true
+        operation
       )
-    const mailDataDto = this.creerContenuMailSuppressionRdv(
-      fichierInvitation,
+    const mailDatadto = this.creerContenuMailRendezVous(
       conseiller,
-      rendezVous
+      rendezVous,
+      fichierInvitation,
+      operation
     )
-    return this.envoyer(mailDataDto)
-  }
-
-  private creerContenuMailSuppressionRdv(
-    fichierInvitation: string,
-    conseiller: Conseiller,
-    rendezVous: RendezVous
-  ): MailDataDto {
-    const invitationBase64 = Buffer.from(fichierInvitation).toString('base64')
-    const mailDataDto: MailDataDto = {
-      to: [
-        {
-          email: conseiller.email!,
-          name: conseiller.firstName + ' ' + conseiller.lastName
-        }
-      ],
-      templateId: parseInt(this.templates.rendezVousSupprime),
-      params: {
-        typeRdv: mapCodeLabelTypeRendezVous[rendezVous.type],
-        dateRdv: formaterDateRendezVous(rendezVous.date),
-        heureRdv: formaterHeureRendezVous(rendezVous.date)
-      },
-      attachment: [
-        {
-          name: 'invite.ics',
-          content: invitationBase64
-        }
-      ]
-    }
-    return mailDataDto
+    await this.envoyer(mailDatadto)
   }
 
   creerContenuMailRendezVous(
     conseiller: Conseiller,
     rendezVous: RendezVous,
     fichierInvitation: ICS,
-    rendezVousMisAJour: boolean
+    operation: RendezVous.Operation
   ): MailDataDto {
     const invitationBase64 = Buffer.from(fichierInvitation).toString('base64')
-    const templateId = rendezVousMisAJour
-      ? parseInt(this.templates.rappelRendezvous)
-      : parseInt(this.templates.nouveauRendezvous)
-
+    const templateId = this.fromOperationToTemplateId(operation)
     return {
       to: [
         {
@@ -164,6 +110,20 @@ export class MailSendinblueService implements Mail.Service {
         }
       ],
       templateId
+    }
+  }
+
+  private fromOperationToTemplateId(operation: RendezVous.Operation): number {
+    switch (operation) {
+      case RendezVous.Operation.CREATION: {
+        return parseInt(this.templates.nouveauRendezvous)
+      }
+      case RendezVous.Operation.MODIFICATION: {
+        return parseInt(this.templates.rappelRendezvous)
+      }
+      case RendezVous.Operation.SUPPRESSION: {
+        return parseInt(this.templates.rendezVousSupprime)
+      }
     }
   }
 

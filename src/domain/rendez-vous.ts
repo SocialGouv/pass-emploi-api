@@ -105,6 +105,12 @@ export namespace RendezVous {
     FUTURS = 'FUTURS'
   }
 
+  export enum Operation {
+    CREATION = 'CREATION',
+    MODIFICATION = 'MODIFICATION',
+    SUPPRESSION = 'SUPPRESSION'
+  }
+
   export function createRendezVousConseiller(
     infosRendezVousACreer: InfosRendezVousACreer,
     jeunes: Jeune[],

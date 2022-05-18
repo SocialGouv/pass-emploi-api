@@ -10,6 +10,7 @@ import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { testConfig } from '../../utils/module-for-testing'
 import { unJeune } from 'test/fixtures/jeune.fixture'
+import { RendezVous } from '../../../src/domain/rendez-vous'
 
 describe('InvitationIcsClient', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -75,7 +76,8 @@ describe('InvitationIcsClient', () => {
       const result = invitationIcsClient.creerEvenementRendezVous(
         conseiller,
         rendezVous,
-        icsSequence
+        icsSequence,
+        RendezVous.Operation.CREATION
       )
 
       // Then
@@ -108,7 +110,8 @@ describe('InvitationIcsClient', () => {
         start: [2021, 11, 11, 8, 3],
         startInputType: 'utc',
         title: '[CEJ] Entretien individuel conseiller',
-        uid: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb'
+        uid: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb',
+        status: 'CONFIRMED'
       })
     })
   })

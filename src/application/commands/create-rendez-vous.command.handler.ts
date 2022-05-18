@@ -86,18 +86,27 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     this.notifierLesJeunes(rendezVous)
     this.planifierLesRappelsDeRendezVous(rendezVous)
     if (rendezVous.invitation) {
-      this.envoyerLesInvitationsCalendaires(conseiller, rendezVous)
+      this.envoyerLesInvitationsCalendaires(
+        conseiller,
+        rendezVous,
+        RendezVous.Operation.CREATION
+      )
     }
     return success(rendezVous.id)
   }
 
   private async envoyerLesInvitationsCalendaires(
     conseiller: Conseiller | undefined,
-    rendezVous: RendezVous
+    rendezVous: RendezVous,
+    operation: RendezVous.Operation
   ): Promise<void> {
     if (conseiller && conseiller.email) {
       try {
-        await this.mailService.envoyerMailRendezVous(conseiller, rendezVous)
+        await this.mailService.envoyerMailRendezVous(
+          conseiller,
+          rendezVous,
+          operation
+        )
       } catch (e) {
         this.logger.error(
           buildError(
