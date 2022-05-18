@@ -2,6 +2,7 @@ import { Campagne } from '../../domain/campagne'
 import { DateTime } from 'luxon'
 import { CampagneSqlModel } from '../sequelize/models/campagne.sql-model'
 import { Op } from 'sequelize'
+import { ReponseCampagneSqlModel } from '../sequelize/models/reponse-campagne.sql-model'
 
 export class CampagneSqlRepository implements Campagne.Repository {
   async getByIntervalOrName(
@@ -37,5 +38,42 @@ export class CampagneSqlRepository implements Campagne.Repository {
 
   async save(campagne: Campagne): Promise<void> {
     await CampagneSqlModel.create({ ...campagne })
+  }
+
+  async saveEvaluation(evaluation: Campagne.Evaluation): Promise<void> {
+    const reponse1 = evaluation.reponses.find(
+      reponse => reponse.idQuestion == 1
+    )
+
+    const reponse2 = evaluation.reponses.find(
+      reponse => reponse.idQuestion == 2
+    )
+
+    await ReponseCampagneSqlModel.upsert({
+      idJeune: evaluation.jeune.id,
+      structureJeune: evaluation.jeune.structure,
+      idCampagne: evaluation.idCampagne,
+      dateReponse: evaluation.date,
+      dateCreationJeune: evaluation.jeune.dateCreation,
+      reponse1: reponse1?.idOption,
+      pourquoi1: reponse1?.pourquoi || null,
+      reponse2: reponse2?.idOption || null,
+      pourquoi2: reponse2?.pourquoi || null
+    })
+  }
+
+  async get(id: string): Promise<Campagne | undefined> {
+    const campagneSqlModel = await CampagneSqlModel.findByPk(id)
+
+    if (!campagneSqlModel) {
+      return undefined
+    }
+
+    return {
+      id: campagneSqlModel.id,
+      nom: campagneSqlModel.nom,
+      dateDebut: DateTime.fromJSDate(campagneSqlModel.dateDebut).toUTC(),
+      dateFin: DateTime.fromJSDate(campagneSqlModel.dateFin).toUTC()
+    }
   }
 }
