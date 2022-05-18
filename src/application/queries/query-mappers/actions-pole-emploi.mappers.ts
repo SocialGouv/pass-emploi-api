@@ -26,7 +26,6 @@ function buildStatut(
   dateService: DateService
 ): ActionPoleEmploi.Statut {
   const maintenant = dateService.nowJs().getTime()
-  const fin = new Date(demarcheDto.dateFin).getTime()
   const debut = demarcheDto.dateDebut
     ? new Date(demarcheDto.dateDebut).getTime()
     : undefined
@@ -35,7 +34,6 @@ function buildStatut(
     case 'AC':
     case 'AF':
     case 'EC':
-      if (fin < maintenant) return ActionPoleEmploi.Statut.EN_RETARD
       if (!debut || debut < maintenant) return ActionPoleEmploi.Statut.EN_COURS
       return ActionPoleEmploi.Statut.A_FAIRE
     case 'RE':

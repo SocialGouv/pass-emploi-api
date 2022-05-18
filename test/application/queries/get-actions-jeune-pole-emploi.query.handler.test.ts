@@ -20,7 +20,6 @@ import { DateService } from '../../../src/utils/date-service'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { uneDemarcheDto } from '../../fixtures/demarches-dto.fixtures'
 
 describe('GetActionsJeunePoleEmploiQueryHandler', () => {
   let jeunesRepository: StubbedType<Jeune.Repository>
@@ -77,24 +76,6 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
       libelleQuoi: ''
     }
 
-    it('retourne un ActionPoleEmploiQueryModel avec statut en retard', async () => {
-      // When
-      const queryModel = fromDemarcheDtoToActionPoleEmploiQueryModel(
-        demarcheDto,
-        idService,
-        dateService
-      )
-
-      // Then
-      expect(queryModel).to.deep.equal({
-        id: 'id-demarche',
-        contenu: undefined,
-        statut: ActionPoleEmploi.Statut.EN_RETARD,
-        dateFin: new Date(stringUTC),
-        dateAnnulation: undefined,
-        creeeParConseiller: false
-      })
-    })
     it('retourne un ActionPoleEmploiQueryModel avec contenu, statut realisée et date annulation', async () => {
       // Given
       demarcheDto.id = undefined
@@ -167,149 +148,6 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
       }
       const jeune = unJeune()
 
-      const demarcheDtoRetard: DemarcheDto = {
-        id: 'id-demarche',
-        etat: 'AC',
-        dateFin: '2020-04-06T10:20:00+02:00',
-        dateCreation: '',
-        dateModification: '',
-        origineCreateur: 'INDIVIDU',
-        origineDemarche: 'PASS_EMPLOI',
-        pourquoi: '',
-        libellePourquoi: '',
-        quoi: '',
-        libelleQuoi: ''
-      }
-      const demarcheDtoEnCoursProche: DemarcheDto = uneDemarcheDto()
-
-      const demarcheDtoAFaireAuMilieu: DemarcheDto = {
-        id: 'id-demarche',
-        etat: 'AF',
-        dateFin: '2222-04-02T10:20:00+02:00',
-        dateCreation: '',
-        dateModification: '',
-        dateDebut: '2222-04-06T10:20:00+02:00',
-        origineCreateur: 'INDIVIDU',
-        origineDemarche: 'PASS_EMPLOI',
-        pourquoi: '',
-        libellePourquoi: '',
-        quoi: '',
-        libelleQuoi: ''
-      }
-      const demarcheDtoEnCours: DemarcheDto = {
-        id: 'id-demarche',
-        etat: 'EC',
-        dateFin: '2222-04-03T10:20:00+02:00',
-        dateCreation: '',
-        dateModification: '',
-        origineCreateur: 'INDIVIDU',
-        origineDemarche: 'PASS_EMPLOI',
-        pourquoi: '',
-        libellePourquoi: '',
-        quoi: '',
-        libelleQuoi: ''
-      }
-      const demarcheDtoAnnulee: DemarcheDto = {
-        id: 'id-demarche',
-        etat: 'AN',
-        dateFin: '2020-04-01T10:20:00+02:00',
-        dateCreation: '',
-        dateModification: '',
-        origineCreateur: 'INDIVIDU',
-        origineDemarche: 'PASS_EMPLOI',
-        pourquoi: '',
-        libellePourquoi: '',
-        quoi: '',
-        libelleQuoi: ''
-      }
-      const demarcheDtoRealisee: DemarcheDto = {
-        id: 'id-demarche',
-        etat: 'RE',
-        dateFin: '2020-04-02T10:20:00+02:00',
-        dateCreation: '',
-        dateModification: '',
-        origineCreateur: 'INDIVIDU',
-        origineDemarche: 'PASS_EMPLOI',
-        pourquoi: '',
-        libellePourquoi: '',
-        quoi: '',
-        libelleQuoi: ''
-      }
-
-      describe("quand pas d'erreur", () => {
-        it('récupère les demarches Pole Emploi du jeune bien triés', async () => {
-          jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
-          poleEmploiPartenaireClient.getDemarches
-            .withArgs(idpToken)
-            .resolves([
-              demarcheDtoAnnulee,
-              demarcheDtoEnCours,
-              demarcheDtoRetard,
-              demarcheDtoRealisee,
-              demarcheDtoAFaireAuMilieu,
-              demarcheDtoEnCoursProche
-            ])
-
-          // When
-          const result = await getActionsJeunePoleEmploiQueryHandler.handle(
-            query
-          )
-          // Then
-          expect(result).to.deep.equal({
-            _isSuccess: true,
-            data: [
-              {
-                id: 'id-demarche',
-                contenu: undefined,
-                statut: ActionPoleEmploi.Statut.EN_RETARD,
-                dateFin: new Date(stringUTC),
-                dateAnnulation: undefined,
-                creeeParConseiller: false
-              },
-              {
-                id: 'id-demarche',
-                contenu: undefined,
-                statut: ActionPoleEmploi.Statut.EN_COURS,
-                dateFin: new Date(stringUTC),
-                dateAnnulation: undefined,
-                creeeParConseiller: false
-              },
-              {
-                id: 'id-demarche',
-                contenu: undefined,
-                statut: ActionPoleEmploi.Statut.A_FAIRE,
-                dateFin: new Date(stringUTC),
-                dateAnnulation: undefined,
-                creeeParConseiller: false
-              },
-              {
-                id: 'id-demarche',
-                contenu: undefined,
-                statut: ActionPoleEmploi.Statut.EN_COURS,
-                dateFin: new Date(stringUTC),
-                dateAnnulation: undefined,
-                creeeParConseiller: false
-              },
-              {
-                id: 'id-demarche',
-                contenu: undefined,
-                statut: ActionPoleEmploi.Statut.ANNULEE,
-                dateFin: new Date(stringUTC),
-                dateAnnulation: undefined,
-                creeeParConseiller: false
-              },
-              {
-                id: 'id-demarche',
-                contenu: undefined,
-                statut: ActionPoleEmploi.Statut.REALISEE,
-                dateFin: new Date(stringUTC),
-                dateAnnulation: undefined,
-                creeeParConseiller: false
-              }
-            ]
-          })
-        })
-      })
       describe('quand une erreur se produit', () => {
         it('renvoie une failure quand une erreur client se produit', async () => {
           // Given
