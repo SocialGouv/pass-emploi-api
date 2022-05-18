@@ -158,6 +158,35 @@ describe('CreateRendezVousCommandHandler', () => {
           expectedRendezvous
         )
       })
+      it('est un succès quand la planification échoue', async () => {
+        // Given
+        const jeuneSansPushToken = unJeune({ pushNotificationToken: undefined })
+        jeuneRepository.get
+          .withArgs(jeuneSansPushToken.id)
+          .resolves(jeuneSansPushToken)
+        const command: CreateRendezVousCommand = {
+          idsJeunes: [jeuneSansPushToken.id],
+          idConseiller: jeuneSansPushToken.conseiller.id,
+          commentaire: rendezVous.commentaire,
+          date: rendezVous.date.toDateString(),
+          duree: rendezVous.duree
+        }
+        const conseiller = unConseiller()
+        conseillerRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(conseiller)
+        planificateurService.planifierRappelsRendezVous.rejects(new Error())
+        const expectedRendezvous = RendezVous.createRendezVousConseiller(
+          command,
+          [jeuneSansPushToken],
+          conseiller,
+          idService
+        )
+        // When
+        const result = await createRendezVousCommandHandler.handle(command)
+        // Then
+        expect(result).to.deep.equal(success(expectedRendezvous.id))
+      })
     })
     describe('notifications', () => {
       it("n'envoie pas de notification push à un jeune qui ne s'est jamais connecté", async () => {
@@ -338,35 +367,6 @@ describe('CreateRendezVousCommandHandler', () => {
           planificateurService.planifierRappelsRendezVous
         ).to.have.been.calledWith(expectedRendezvous)
       })
-    })
-    it('est un succès quand la planification échoue', async () => {
-      // Given
-      const jeuneSansPushToken = unJeune({ pushNotificationToken: undefined })
-      jeuneRepository.get
-        .withArgs(jeuneSansPushToken.id)
-        .resolves(jeuneSansPushToken)
-      const command: CreateRendezVousCommand = {
-        idsJeunes: [jeuneSansPushToken.id],
-        idConseiller: jeuneSansPushToken.conseiller.id,
-        commentaire: rendezVous.commentaire,
-        date: rendezVous.date.toDateString(),
-        duree: rendezVous.duree
-      }
-      const conseiller = unConseiller()
-      conseillerRepository.get
-        .withArgs(command.idConseiller)
-        .resolves(conseiller)
-      planificateurService.planifierRappelsRendezVous.rejects(new Error())
-      const expectedRendezvous = RendezVous.createRendezVousConseiller(
-        command,
-        [jeuneSansPushToken],
-        conseiller,
-        idService
-      )
-      // When
-      const result = await createRendezVousCommandHandler.handle(command)
-      // Then
-      expect(result).to.deep.equal(success(expectedRendezvous.id))
     })
   })
 
