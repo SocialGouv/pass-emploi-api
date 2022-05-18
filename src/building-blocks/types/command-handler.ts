@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common'
 import { Authentification } from '../../domain/authentification'
 import { LogEvent, LogEventKey } from './log.event'
-import { Failure, Success, failure, success, isSuccess, Result } from './result'
+import { Failure, failure, isSuccess, Result, Success, success } from './result'
 import { getAPMInstance } from '../../infrastructure/monitoring/apm.init'
 import * as APM from 'elastic-apm-node'
 
@@ -64,9 +64,11 @@ export abstract class CommandHandler<C, T> {
     utilisateur?: Authentification.Utilisateur
   ): void {
     const resultPourLog = construireResultPourLog(result)
+    const commandSanitized = nettoyerLaCommand(command)
+
     const event = new LogEvent(LogEventKey.COMMAND_EVENT, {
       handler: this.commandName,
-      command,
+      command: commandSanitized,
       result: resultPourLog,
       utilisateur
     })
@@ -85,4 +87,21 @@ function construireResultPourLog<T>(
         })
   }
   return result
+}
+
+function nettoyerLaCommand<C>(command: C | undefined): C | undefined {
+  const commandSanitized = {
+    ...command
+  }
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  if (commandSanitized && commandSanitized.file) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    commandSanitized.file = { ...commandSanitized.file, buffer: undefined }
+  }
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return commandSanitized
 }

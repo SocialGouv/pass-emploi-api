@@ -97,13 +97,13 @@ export class JeuneSqlRepository implements Jeune.Repository {
   }
 
   async findAllJeunesByConseiller(
-    idsJeune: string[],
+    idsJeunes: string[],
     idConseiller: string
   ): Promise<Jeune[]> {
     const jeunesSqlModel = await JeuneSqlModel.findAll({
       where: {
         id: {
-          [Op.in]: idsJeune
+          [Op.in]: idsJeunes
         },
         idConseiller
       }
@@ -114,11 +114,11 @@ export class JeuneSqlRepository implements Jeune.Repository {
   async creerTransferts(
     idConseillerSource: string,
     idConseillerCible: string,
-    idsJeune: string[]
+    idsJeunes: string[]
   ): Promise<void> {
     const dateTransfert = this.dateService.nowJs()
     await TransfertConseillerSqlModel.bulkCreate(
-      idsJeune.map(idJeune => {
+      idsJeunes.map(idJeune => {
         return {
           id: this.idService.uuid(),
           idJeune,

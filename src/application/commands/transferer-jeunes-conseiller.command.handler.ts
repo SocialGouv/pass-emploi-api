@@ -20,7 +20,7 @@ import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 export interface TransfererJeunesConseillerCommand extends Command {
   idConseillerSource: string
   idConseillerCible: string
-  idsJeune: string[]
+  idsJeunes: string[]
   structure: Core.Structure
 }
 
@@ -50,7 +50,7 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
         ),
         this.conseillerRepository.get(command.idConseillerCible),
         this.jeuneRepository.findAllJeunesByConseiller(
-          command.idsJeune,
+          command.idsJeunes,
           command.idConseillerSource
         )
       ]
@@ -66,7 +66,7 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
         new NonTrouveError('Conseiller', command.idConseillerCible)
       )
     }
-    if (jeunes?.length !== command.idsJeune.length) {
+    if (jeunes?.length !== command.idsJeunes.length) {
       return failure(
         new MauvaiseCommandeError('Liste des jeunes à transférer invalide')
       )
@@ -79,13 +79,13 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
 
     await this.chatRepository.transfererChat(
       command.idConseillerCible,
-      command.idsJeune
+      command.idsJeunes
     )
     await Promise.all([
       this.jeuneRepository.creerTransferts(
         command.idConseillerSource,
         command.idConseillerCible,
-        command.idsJeune
+        command.idsJeunes
       ),
       this.jeuneRepository.saveAll(updatedJeunes)
     ])

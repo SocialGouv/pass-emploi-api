@@ -6,6 +6,7 @@ import { EvenementEngagementSqlModel } from './evenement-engagement.sql-model'
 import { FavoriOffreEmploiSqlModel } from './favori-offre-emploi.sql-model'
 import { FavoriOffreEngagementSqlModel } from './favori-offre-engagement.sql-model'
 import { FavoriOffreImmersionSqlModel } from './favori-offre-immersion.sql-model'
+import { FichierSqlModel } from './fichier.sql-model'
 import { JeuneSqlModel } from './jeune.sql-model'
 import { RendezVousSqlModel } from './rendez-vous.sql-model'
 import { RechercheSqlModel } from './recherche.sql-model'
@@ -35,5 +36,6 @@ export const sqlModels = [
   RendezVousJeuneAssociationSqlModel,
   SituationsMiloSqlModel,
   CampagneSqlModel,
-  ReponseCampagneSqlModel
+  ReponseCampagneSqlModel,
+  FichierSqlModel
 ]

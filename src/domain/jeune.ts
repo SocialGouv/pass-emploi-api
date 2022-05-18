@@ -36,7 +36,7 @@ export namespace Jeune {
     getByIdDossier(idDossier: string): Promise<Jeune | undefined>
     save(jeune: Jeune): Promise<void>
     findAllJeunesByConseiller(
-      idsJeune: string[],
+      idsJeunes: string[],
       idConseiller: string
     ): Promise<Jeune[]>
     supprimer(idJeune: Jeune.Id): Promise<void>
@@ -52,7 +52,7 @@ export namespace Jeune {
     creerTransferts(
       idConseillerSource: string,
       idConseillerCible: string,
-      idsJeune: string[]
+      idsJeunes: string[]
     ): Promise<void>
   }
 

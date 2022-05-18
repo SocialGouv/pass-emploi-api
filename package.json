@@ -33,8 +33,8 @@
     "test:local:db": "yarn start:db:test && DATABASE_URL=postgresql://test:test@localhost:56432/test mocha 'test/**/*.db.test.ts' --exit --timeout 10000",
     "test:ci:db": "yarn migration && mocha 'test/**/*.db.test.ts' --exit --timeout 10000",
     "test": "yarn cover:unit && yarn cover:db && npm run cover:report",
-    "cover:unit": "nyc --silent yarn test:local:unit",
-    "cover:db": "nyc --silent --no-clean yarn test:local:db",
+    "cover:unit": "nyc yarn test:local:unit",
+    "cover:db": "nyc --no-clean yarn test:local:db",
     "cover:ci:db": "nyc --silent --no-clean yarn test:ci:db",
     "test:ci": "yarn cover:unit && yarn cover:ci:db && npm run cover:report",
     "cover:report": "nyc report --reporter=lcovonly",
@@ -51,6 +51,8 @@
     "tasks:recuperer-les-situations-milo": "IS_WEB=false IS_WORKER=false TASK=RECUPERER_SITUATIONS_JEUNES_MILO node dist/main"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.92.0",
+    "@aws-sdk/s3-request-presigner": "^3.92.0",
     "@nestjs/axios": "0.0.8",
     "@nestjs/common": "8.4.6",
     "@nestjs/config": "2.1.0",
@@ -100,6 +102,7 @@
     "@types/geojson": "^7946.0.8",
     "@types/luxon": "^2.3.2",
     "@types/mocha": "^9.1.1",
+    "@types/multer": "^1.4.7",
     "@types/node": "^17.0.38",
     "@types/pino-multi-stream": "^5.1.3",
     "@types/sinon": "^10.0.11",

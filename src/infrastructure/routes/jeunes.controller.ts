@@ -536,7 +536,7 @@ export class JeunesController {
       const command: TransfererJeunesConseillerCommand = {
         idConseillerSource: transfererConseillerPayload.idConseillerSource,
         idConseillerCible: transfererConseillerPayload.idConseillerCible,
-        idsJeune: transfererConseillerPayload.idsJeune,
+        idsJeunes: transfererConseillerPayload.idsJeune,
         structure: utilisateur.structure
       }
       result = await this.transfererJeunesConseillerCommandHandler.execute(
