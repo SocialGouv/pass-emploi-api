@@ -333,7 +333,7 @@ describe('UpdateRendezVousCommandHandler', () => {
             ).to.have.been.calledWithExactly(
               rendezVousUpdated.jeunes[0].conseiller,
               rendezVousUpdated,
-              true
+              RendezVous.Operation.MODIFICATION
             )
           })
         })
@@ -364,7 +364,7 @@ describe('UpdateRendezVousCommandHandler', () => {
             ).to.have.been.calledWithExactly(
               rendezVousUpdated.jeunes[0].conseiller,
               rendezVousUpdated,
-              true
+              RendezVous.Operation.MODIFICATION
             )
           })
         })

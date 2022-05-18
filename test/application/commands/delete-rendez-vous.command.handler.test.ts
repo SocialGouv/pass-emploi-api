@@ -99,9 +99,11 @@ describe('DeleteRendezVousCommandHandler', () => {
             await deleteRendezVousCommandHandler.handle(command)
 
             // Then
-            expect(
-              mailService.envoyerMailRendezVousSupprime
-            ).to.have.been.calledWith(conseillerCreateur, rendezVous)
+            expect(mailService.envoyerMailRendezVous).to.have.been.calledWith(
+              conseillerCreateur,
+              rendezVous,
+              RendezVous.Operation.SUPPRESSION
+            )
           })
         })
         describe("quand l'invitation est à false", () => {
@@ -138,9 +140,7 @@ describe('DeleteRendezVousCommandHandler', () => {
             await deleteRendezVousCommandHandler.handle(command)
 
             // Then
-            expect(
-              mailService.envoyerMailRendezVousSupprime
-            ).not.to.have.been.called()
+            expect(mailService.envoyerMailRendezVous).not.to.have.been.called()
           })
         })
         describe("quand le jeune s'est déjà connecté au moins une fois sur l'application", () => {

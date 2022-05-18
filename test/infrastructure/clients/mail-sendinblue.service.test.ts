@@ -1,8 +1,4 @@
-import {
-  formaterDateRendezVous,
-  formaterHeureRendezVous,
-  MailSendinblueService
-} from '../../../src/infrastructure/clients/mail-sendinblue.service'
+import { MailSendinblueService } from '../../../src/infrastructure/clients/mail-sendinblue.service'
 import { HttpService } from '@nestjs/axios'
 import { testConfig } from '../../utils/module-for-testing'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
@@ -13,7 +9,7 @@ import * as path from 'path'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitation-ics.client'
 import { MailDataDto } from '../../../src/domain/mail'
-import { mapCodeLabelTypeRendezVous } from '../../../src/domain/rendez-vous'
+import { RendezVous } from '../../../src/domain/rendez-vous'
 
 describe('MailSendinblueService', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -71,43 +67,6 @@ describe('MailSendinblueService', () => {
       })
     })
   })
-  describe('envoyerMailRendezVousSupprime', () => {
-    describe('quand tout va bien', () => {
-      it('envoie un mail', async () => {
-        // Given
-        const conseiller = unConseiller()
-        const rendezVous = unRendezVous()
-        const expectedBody: MailDataDto = {
-          to: [
-            {
-              email: conseiller.email!,
-              name: conseiller.firstName + ' ' + conseiller.lastName
-            }
-          ],
-          templateId: parseInt(
-            config.get('sendinblue').templates.rendezVousSupprime
-          ),
-          params: {
-            typeRdv: mapCodeLabelTypeRendezVous[rendezVous.type],
-            dateRdv: formaterDateRendezVous(rendezVous.date),
-            heureRdv: formaterHeureRendezVous(rendezVous.date)
-          }
-        }
-        const scope = nock(config.get('sendinblue').url)
-          .post('/v3/smtp/email', JSON.stringify(expectedBody))
-          .reply(200)
-
-        // When
-        await mailSendinblueService.envoyerMailRendezVousSupprime(
-          conseiller,
-          rendezVous
-        )
-
-        // Then
-        expect(scope.isDone()).to.equal(true)
-      })
-    })
-  })
   describe('creerContenuMailRendezVous', () => {
     it('renvoie le contenu du mail du nouveau rendez-vous', async () => {
       // Given
@@ -124,7 +83,7 @@ describe('MailSendinblueService', () => {
         conseiller,
         rendezVous,
         fichierInvitation,
-        false
+        RendezVous.Operation.CREATION
       )
 
       // Then
@@ -150,7 +109,7 @@ describe('MailSendinblueService', () => {
         ]
       })
     })
-    it("renvoie le contenu du mail quand c'est un rappel de rendez-vous", async () => {
+    it('renvoie le contenu du mail du rappel de rendez-vous', async () => {
       // Given
       const conseiller = unConseiller()
       const rendezVous = unRendezVous()
@@ -165,7 +124,7 @@ describe('MailSendinblueService', () => {
         conseiller,
         rendezVous,
         fichierInvitation,
-        true
+        RendezVous.Operation.MODIFICATION
       )
 
       // Then
@@ -183,6 +142,52 @@ describe('MailSendinblueService', () => {
           typeRdv: 'Entretien individuel conseiller'
         },
         templateId: 400,
+        to: [
+          {
+            email: 'nils.tavernier@passemploi.com',
+            name: 'Nils Tavernier'
+          }
+        ]
+      })
+    })
+    it('renvoie le contenu du mail du rendez-vous supprimé', async () => {
+      // Given
+      const conseiller = unConseiller()
+      const rendezVous = unRendezVous()
+      const fichierInvitation = fs.readFileSync(
+        path.resolve(
+          __dirname,
+          '../../fixtures/invitation-mail-annulee.fixture.ics'
+        ),
+        'utf8'
+      )
+      const invitationBase64 = Buffer.from(fichierInvitation).toString('base64')
+
+      // When
+      const result = mailSendinblueService.creerContenuMailRendezVous(
+        conseiller,
+        rendezVous,
+        fichierInvitation,
+        RendezVous.Operation.SUPPRESSION
+      )
+
+      // Then
+      expect(result).to.deep.equal({
+        attachment: [
+          {
+            content: invitationBase64,
+            name: 'invite.ics'
+          }
+        ],
+        params: {
+          dateRdv: 'jeudi 11 novembre 2021',
+          heureRdv: '09h03',
+          lienPortail: 'http://frontend.com',
+          typeRdv: 'Entretien individuel conseiller'
+        },
+        templateId: parseInt(
+          config.get('sendinblue').templates.rendezVousSupprime
+        ),
         to: [
           {
             email: 'nils.tavernier@passemploi.com',

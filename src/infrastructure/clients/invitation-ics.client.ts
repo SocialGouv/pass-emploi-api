@@ -48,13 +48,13 @@ export class InvitationIcsClient {
     conseiller: Conseiller,
     rendezVous: RendezVous,
     icsSequence: number,
-    estUneSuppression = false
+    operation: RendezVous.Operation
   ): ICS {
     const event = this.creerEvenementRendezVous(
       conseiller,
       rendezVous,
       icsSequence,
-      estUneSuppression
+      operation
     )
     const { error, value } = icsService.createEvent(event)
     if (error || !value) {
@@ -67,7 +67,7 @@ export class InvitationIcsClient {
     conseiller: Conseiller,
     rendezVous: RendezVous,
     icsSequence: number,
-    estUneSuppression: boolean
+    operation: RendezVous.Operation
   ): EventAttributes {
     const dateRendezVousUtc = new Date(
       Date.UTC(
@@ -126,7 +126,10 @@ export class InvitationIcsClient {
         },
         ...jeunesAttendeesAvecEmail
       ],
-      status: estUneSuppression ? 'CANCELLED' : 'CONFIRMED'
+      status:
+        operation === RendezVous.Operation.SUPPRESSION
+          ? 'CANCELLED'
+          : 'CONFIRMED'
     }
   }
 }
