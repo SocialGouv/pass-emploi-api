@@ -100,6 +100,7 @@ function compareDemarchesByStatutOrDateFin(
 }
 
 const statutsOrder: { [statut in ActionPoleEmploi.Statut]: number } = {
+  EN_RETARD: 0,
   A_FAIRE: 1,
   EN_COURS: 1,
   ANNULEE: 2,

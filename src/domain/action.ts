@@ -21,6 +21,7 @@ export interface Action {
 
 export namespace ActionPoleEmploi {
   export enum Statut {
+    EN_RETARD = 'EN_RETARD',
     EN_COURS = 'EN_COURS',
     A_FAIRE = 'A_FAIRE',
     REALISEE = 'REALISEE',
