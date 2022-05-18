@@ -199,7 +199,7 @@ describe('JeunesController', () => {
         {
           idConseillerSource: '1',
           idConseillerCible: '2',
-          idsJeune: ['1'],
+          idsJeunes: ['1'],
           structure: Core.Structure.MILO
         },
         unUtilisateurDecode()

@@ -5,7 +5,10 @@ import { Core } from 'src/domain/core'
 import { Jeune } from 'src/domain/jeune'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
-import { TransfererJeunesConseillerCommandHandler } from '../../../src/application/commands/transferer-jeunes-conseiller.command.handler'
+import {
+  TransfererJeunesConseillerCommand,
+  TransfererJeunesConseillerCommandHandler
+} from '../../../src/application/commands/transferer-jeunes-conseiller.command.handler'
 import {
   MauvaiseCommandeError,
   NonTrouveError
@@ -44,10 +47,10 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
   })
 
   describe('handle', () => {
-    const command = {
+    const command: TransfererJeunesConseillerCommand = {
       idConseillerSource: '40',
       idConseillerCible: '41',
-      idsJeune: ['1', '2'],
+      idsJeunes: ['1', '2'],
       structure: Core.Structure.PASS_EMPLOI
     }
     describe('quand les conseillers et les jeunes correspondent au superviseur', () => {
@@ -65,7 +68,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
           .resolves(conseillerCible)
 
         const jeune1 = unJeune({
-          id: command.idsJeune[0],
+          id: command.idsJeunes[0],
           conseiller: {
             id: command.idConseillerSource,
             firstName: 'test',
@@ -75,7 +78,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
           }
         })
         const jeune2 = unJeune({
-          id: command.idsJeune[1],
+          id: command.idsJeunes[1],
           conseiller: {
             id: command.idConseillerSource,
             firstName: 'test',
@@ -85,7 +88,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
           }
         })
         jeuneRepository.findAllJeunesByConseiller
-          .withArgs(command.idsJeune, command.idConseillerSource)
+          .withArgs(command.idsJeunes, command.idConseillerSource)
           .resolves([jeune1, jeune2])
 
         // When
@@ -98,11 +101,11 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
         expect(jeuneRepository.creerTransferts).to.have.been.calledWithExactly(
           command.idConseillerSource,
           command.idConseillerCible,
-          command.idsJeune
+          command.idsJeunes
         )
         expect(chatRepository.transfererChat).to.have.been.calledWithExactly(
           command.idConseillerCible,
-          command.idsJeune
+          command.idsJeunes
         )
 
         jeune1.conseiller = conseillerCible
@@ -167,7 +170,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
           .resolves(conseillerCible)
 
         jeuneRepository.findAllJeunesByConseiller
-          .withArgs(command.idsJeune, command.idConseillerSource)
+          .withArgs(command.idsJeunes, command.idConseillerSource)
           .resolves([unJeune()])
 
         // When

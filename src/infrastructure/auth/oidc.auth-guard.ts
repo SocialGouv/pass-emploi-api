@@ -13,7 +13,10 @@ import { LogEvent, LogEventKey } from '../../building-blocks/types/log.event'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator'
-import { SKIP_OIDC_AUTH_KEY } from '../decorators/skip-oidc-auth.decorator'
+import {
+  OIDC_QUERY_TOKEN,
+  SKIP_OIDC_AUTH_KEY
+} from '../decorators/skip-oidc-auth.decorator'
 import { getAPMInstance } from '../monitoring/apm.init'
 import { JwtService } from './jwt.service'
 
@@ -34,7 +37,10 @@ export class OidcAuthGuard implements CanActivate {
 
   private async checkJWT(context: ExecutionContext): Promise<boolean> {
     const req: Request = context.switchToHttp().getRequest()
-    const authorization = req.header('Authorization')
+    let authorization = req.header('Authorization')
+    if (!authorization && this.isQueryToken(context)) {
+      authorization = req.query.token as unknown as string
+    }
     const accessToken = authorization?.replace(/bearer /gi, '')
     if (!accessToken) {
       throw new UnauthorizedException(
@@ -98,6 +104,13 @@ export class OidcAuthGuard implements CanActivate {
 
   private isSkipOidcAuth(context: ExecutionContext): boolean {
     return this.reflector.getAllAndOverride<boolean>(SKIP_OIDC_AUTH_KEY, [
+      context.getHandler(),
+      context.getClass()
+    ])
+  }
+
+  private isQueryToken(context: ExecutionContext): boolean {
+    return this.reflector.getAllAndOverride<boolean>(OIDC_QUERY_TOKEN, [
       context.getHandler(),
       context.getClass()
     ])

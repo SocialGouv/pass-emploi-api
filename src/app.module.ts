@@ -7,6 +7,7 @@ import { TerminusModule } from '@nestjs/terminus'
 import { ActionAuthorizer } from './application/authorizers/authorize-action'
 import { ConseillerAuthorizer } from './application/authorizers/authorize-conseiller'
 import { ConseillerForJeuneAuthorizer } from './application/authorizers/authorize-conseiller-for-jeune'
+import { AuthorizeConseillerForJeunes } from './application/authorizers/authorize-conseiller-for-jeunes'
 import { FavoriOffresEmploiAuthorizer } from './application/authorizers/authorize-favori-offres-emploi'
 import { FavoriOffreServiceCiviqueAuthorizer } from './application/authorizers/authorize-favori-offres-engagement'
 import { FavoriOffresImmersionAuthorizer } from './application/authorizers/authorize-favori-offres-immersion'
@@ -46,6 +47,7 @@ import { TransfererJeunesConseillerCommandHandler } from './application/commands
 import { UpdateNotificationTokenCommandHandler } from './application/commands/update-notification-token.command.handler'
 import { UpdateStatutActionCommandHandler } from './application/commands/update-statut-action.command.handler'
 import { UpdateUtilisateurCommandHandler } from './application/commands/update-utilisateur.command.handler'
+import { UploadFileCommandHandler } from './application/commands/upload-file.command.handler'
 import { GetActionsByJeuneQueryHandler } from './application/queries/get-actions-by-jeune.query.handler.db'
 import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
 import { GetCommunesEtDepartementsQueryHandler } from './application/queries/get-communes-et-departements.query.handler.db'
@@ -83,6 +85,7 @@ import {
 import { ChatRepositoryToken } from './domain/chat'
 import { ConseillersRepositoryToken } from './domain/conseiller'
 import { EvenementService, EvenementsRepositoryToken } from './domain/evenement'
+import { Fichier, FichierRepositoryToken } from './domain/fichier'
 import { JeunesRepositoryToken } from './domain/jeune'
 import { MiloRepositoryToken } from './domain/milo'
 import { NotificationRepositoryToken } from './domain/notification'
@@ -104,12 +107,14 @@ import { FirebaseClient } from './infrastructure/clients/firebase-client'
 import { ImmersionClient } from './infrastructure/clients/immersion-client'
 import { KeycloakClient } from './infrastructure/clients/keycloak-client'
 import { MailSendinblueService } from './infrastructure/clients/mail-sendinblue.service'
+import { ObjectStorageClient } from './infrastructure/clients/object-storage.client'
 import { PoleEmploiClient } from './infrastructure/clients/pole-emploi-client'
 import { ActionSqlRepository } from './infrastructure/repositories/action-sql.repository.db'
 import { AuthentificationSqlRepository } from './infrastructure/repositories/authentification-sql.repository.db'
 import { ChatFirebaseRepository } from './infrastructure/repositories/chat-firebase.repository'
 import { ConseillerSqlRepository } from './infrastructure/repositories/conseiller-sql.repository.db'
 import { EvenementHttpSqlRepository } from './infrastructure/repositories/evenement-http-sql.repository.db'
+import { FichierSqlS3Repository } from './infrastructure/repositories/fichier-sql-s3.repository.db'
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune-sql.repository.db'
 import { MailSqlRepository } from './infrastructure/repositories/mail-sql.repository.db'
 import { MiloHttpSqlRepository } from './infrastructure/repositories/milo-http-sql.repository.db'
@@ -166,6 +171,7 @@ import { DemarcheHttpRepositoryDb } from './infrastructure/repositories/demarche
 import { Demarche, DemarcheRepositoryToken } from './domain/demarche'
 import { UpdateStatutDemarcheCommandHandler } from './application/commands/update-demarche.command.handler'
 import { CreateDemarcheCommandHandler } from './application/commands/create-demarche.command.handler'
+import { FilesController } from './infrastructure/routes/files.controller'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -194,7 +200,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     RecherchesController,
     FavorisController,
     ServicesCiviqueController,
-    CampagnesController
+    CampagnesController,
+    FilesController
   ],
   providers: [
     ...buildQueryCommandsProviders(),
@@ -209,11 +216,13 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     ImmersionClient,
     EngagementClient,
     PoleEmploiPartenaireClient,
+    ObjectStorageClient,
     Action.Factory,
     Mail.Factory,
     Authentification.Factory,
     Campagne.Factory,
     Demarche.Factory,
+    Fichier.Factory,
     WorkerService,
     TaskService,
     InvitationIcsClient,
@@ -302,6 +311,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       provide: DemarcheRepositoryToken,
       useClass: DemarcheHttpRepositoryDb
     },
+    {
+      provide: FichierRepositoryToken,
+      useClass: FichierSqlS3Repository
+    },
     ...databaseProviders
   ],
   exports: [...databaseProviders]
@@ -319,6 +332,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     JeunePoleEmploiAuthorizer,
     RendezVousAuthorizer,
     SupportAuthorizer,
+    AuthorizeConseillerForJeunes,
     FavoriOffreServiceCiviqueAuthorizer,
     GetDetailActionQueryHandler,
     GetDetailJeuneQueryHandler,
@@ -395,7 +409,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetCampagneQueryModel,
     CreateEvaluationCommandHandler,
     UpdateStatutDemarcheCommandHandler,
-    CreateDemarcheCommandHandler
+    CreateDemarcheCommandHandler,
+    UploadFileCommandHandler
   ]
 }
 
