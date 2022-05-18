@@ -82,6 +82,14 @@ export const configurationSchema = Joi.object({
       milo: Joi.number().required()
     })
   }),
+  s3: Joi.object({
+    endpoint: Joi.string().required(),
+    region: Joi.string().required(),
+    accessKeyId: Joi.string().required(),
+    secretAccessKey: Joi.string().required(),
+    bucket: Joi.string().required(),
+    bucket_prefix_pieces_jointes: Joi.string().required()
+  }),
   task: Joi.string(),
   jobs: Joi.object({
     notificationRecherches: Joi.object({

@@ -126,6 +126,7 @@ import { AuthentificationController } from './infrastructure/routes/authentifica
 import { ConseillersController } from './infrastructure/routes/conseillers.controller'
 import { EvenementsController } from './infrastructure/routes/evenements.controller'
 import { FavorisController } from './infrastructure/routes/favoris.controller'
+import { FilesController } from './infrastructure/routes/files.controller'
 import { HealthController } from './infrastructure/routes/health.controller'
 import { JeunesController } from './infrastructure/routes/jeunes.controller'
 import { OffresEmploiController } from './infrastructure/routes/offres-emploi.controller'
@@ -180,6 +181,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     TerminusModule
   ],
   controllers: [
+    FilesController,
     ActionsController,
     JeunesController,
     OffresEmploiController,

@@ -115,6 +115,14 @@ export default () => {
         milo: process.env.SENDINBLUE_MILO_MAILING_LIST_ID ?? 8
       }
     },
+    s3: {
+      endpoint: process.env.S3_ENDPOINT ?? 'https://s3.gra.cloud.ovh.net',
+      region: process.env.S3_REGION ?? 'GRA',
+      accessKeyId: process.env.S3_ACCESS_KEY_ID,
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+      bucket: process.env.S3_BUCKET,
+      bucket_prefix_pieces_jointes: process.env.S3_BUCKET_PREFIX_PJ ?? 'pj/'
+    },
     task: process.env.TASK,
     jobs: {
       notificationRecherches: {
