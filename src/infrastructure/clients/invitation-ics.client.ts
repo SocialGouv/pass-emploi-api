@@ -47,12 +47,14 @@ export class InvitationIcsClient {
   creerFichierInvitationRendezVous(
     conseiller: Conseiller,
     rendezVous: RendezVous,
-    icsSequence: number
+    icsSequence: number,
+    estUneSuppression = false
   ): ICS {
     const event = this.creerEvenementRendezVous(
       conseiller,
       rendezVous,
-      icsSequence
+      icsSequence,
+      estUneSuppression
     )
     const { error, value } = icsService.createEvent(event)
     if (error || !value) {
@@ -64,7 +66,8 @@ export class InvitationIcsClient {
   creerEvenementRendezVous(
     conseiller: Conseiller,
     rendezVous: RendezVous,
-    icsSequence: number
+    icsSequence: number,
+    estUneSuppression: boolean
   ): EventAttributes {
     const dateRendezVousUtc = new Date(
       Date.UTC(
@@ -122,7 +125,8 @@ export class InvitationIcsClient {
           role: 'REQ-PARTICIPANT'
         },
         ...jeunesAttendeesAvecEmail
-      ]
+      ],
+      status: estUneSuppression ? 'CANCELLED' : 'CONFIRMED'
     }
   }
 }

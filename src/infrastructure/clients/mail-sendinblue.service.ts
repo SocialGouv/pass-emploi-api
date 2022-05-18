@@ -78,7 +78,6 @@ export class MailSendinblueService implements Mail.Service {
       fichierInvitation,
       rendezVousMisAJour
     )
-
     await this.envoyer(mailDatadto)
   }
 
@@ -86,6 +85,31 @@ export class MailSendinblueService implements Mail.Service {
     conseiller: Conseiller,
     rendezVous: RendezVous
   ): Promise<void> {
+    const rendezVousIcsSequence =
+      await this.invitationIcsClient.getAndIncrementRendezVousIcsSequence(
+        rendezVous.id
+      )
+    const fichierInvitation =
+      this.invitationIcsClient.creerFichierInvitationRendezVous(
+        conseiller,
+        rendezVous,
+        rendezVousIcsSequence,
+        true
+      )
+    const mailDataDto = this.creerContenuMailSuppressionRdv(
+      fichierInvitation,
+      conseiller,
+      rendezVous
+    )
+    return this.envoyer(mailDataDto)
+  }
+
+  private creerContenuMailSuppressionRdv(
+    fichierInvitation: string,
+    conseiller: Conseiller,
+    rendezVous: RendezVous
+  ): MailDataDto {
+    const invitationBase64 = Buffer.from(fichierInvitation).toString('base64')
     const mailDataDto: MailDataDto = {
       to: [
         {
@@ -98,9 +122,15 @@ export class MailSendinblueService implements Mail.Service {
         typeRdv: mapCodeLabelTypeRendezVous[rendezVous.type],
         dateRdv: formaterDateRendezVous(rendezVous.date),
         heureRdv: formaterHeureRendezVous(rendezVous.date)
-      }
+      },
+      attachment: [
+        {
+          name: 'invite.ics',
+          content: invitationBase64
+        }
+      ]
     }
-    return this.envoyer(mailDataDto)
+    return mailDataDto
   }
 
   creerContenuMailRendezVous(
