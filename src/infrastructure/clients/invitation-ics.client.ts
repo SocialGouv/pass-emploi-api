@@ -85,7 +85,7 @@ export class InvitationIcsClient {
       .map(jeune => ({
         name: jeune.lastName + ' ' + jeune.firstName,
         email: jeune.email,
-        rsvp: true,
+        rsvp: operation !== RendezVous.Operation.SUPPRESSION,
         role: 'REQ-PARTICIPANT'
       }))
 
@@ -121,7 +121,7 @@ export class InvitationIcsClient {
         {
           name: conseiller.lastName + ' ' + conseiller.firstName,
           email: conseiller.email,
-          rsvp: true,
+          rsvp: operation !== RendezVous.Operation.SUPPRESSION,
           role: 'REQ-PARTICIPANT'
         },
         ...jeunesAttendeesAvecEmail
