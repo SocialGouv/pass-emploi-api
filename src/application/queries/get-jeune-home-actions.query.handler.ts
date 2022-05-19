@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { JeuneHomeActionQueryModel } from './query-models/home-jeune.query-models'
-import { GetCampagneQueryModel } from './campagne/get-campagne.query.handler'
+import { GetCampagneQueryModel } from './query-getters/get-campagne.query.getter'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Authentification } from '../../domain/authentification'

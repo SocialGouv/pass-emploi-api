@@ -56,7 +56,7 @@ describe('CreateEvaluationCommandHandler', () => {
         // Given
         campagneRepository.get.withArgs(campagne.id).resolves(campagne)
         jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
-        campagneFactory.evaluer
+        campagneFactory.construireEvaluation
           .withArgs(campagne, jeune, command.reponses)
           .returns(success(evaluation))
 
@@ -76,7 +76,7 @@ describe('CreateEvaluationCommandHandler', () => {
         // Given
         campagneRepository.get.withArgs(campagne.id).resolves(campagne)
         jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
-        campagneFactory.evaluer
+        campagneFactory.construireEvaluation
           .withArgs(campagne, jeune, command.reponses)
           .returns(failure(new ReponsesCampagneInvalide()))
 

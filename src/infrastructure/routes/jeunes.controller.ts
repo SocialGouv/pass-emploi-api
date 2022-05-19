@@ -194,10 +194,6 @@ export class JeunesController {
     return this.getHomeJeuneHandler.execute({ idJeune }, utilisateur)
   }
 
-  @ApiOperation({
-    summary: 'Deprecated (Mobile V1.6)',
-    deprecated: true
-  })
   @Get(':idJeune/actions')
   @ApiResponse({
     type: ActionQueryModel,

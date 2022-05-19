@@ -39,7 +39,7 @@ export namespace Campagne {
 
   export interface Reponse {
     idQuestion: number
-    idOption: number
+    idReponse: number
     pourquoi?: string
   }
 
@@ -71,7 +71,7 @@ export namespace Campagne {
       }
     }
 
-    evaluer(
+    construireEvaluation(
       campagne: Campagne | undefined,
       jeune: Jeune,
       reponses: Reponse[]
@@ -89,11 +89,11 @@ export namespace Campagne {
         return failure(new CampagneNonActive(campagne.nom))
       }
 
-      const lesReponsesSontValides = Boolean(
+      const ilYAUneReponseALaPremiereQuestion = Boolean(
         reponses.find(reponse => reponse.idQuestion == 1)
       )
 
-      if (!lesReponsesSontValides) {
+      if (!ilYAUneReponseALaPremiereQuestion) {
         return failure(new ReponsesCampagneInvalide())
       }
 

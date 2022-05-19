@@ -4,6 +4,7 @@ import {
   Controller,
   NotFoundException,
   Param,
+  ParseArrayPipe,
   Post
 } from '@nestjs/common'
 import { ApiBody, ApiOAuth2, ApiOperation, ApiTags } from '@nestjs/swagger'
@@ -31,6 +32,7 @@ import {
   CreateEvaluationCommand,
   CreateEvaluationCommandHandler
 } from '../../application/commands/create-evaluation.command'
+import { ValidateNested } from 'class-validator'
 
 @Controller()
 @ApiOAuth2([])
@@ -79,12 +81,14 @@ export class CampagnesController {
     description: 'Autorisé pour un jeune'
   })
   @Post('jeunes/:idJeune/campagnes/:idCampagne/evaluer')
+  @ValidateNested({ each: true })
   @ApiBody({
     type: ReponseCampagnePayload,
     isArray: true
   })
   async evaluer(
-    @Body() reponsesCampagnePayload: ReponseCampagnePayload[],
+    @Body(new ParseArrayPipe({ items: ReponseCampagnePayload }))
+    reponsesCampagnePayload: ReponseCampagnePayload[],
     @Param('idJeune') idJeune: string,
     @Param('idCampagne') idCampagne: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur

@@ -54,6 +54,7 @@ export class CreateCampagneCommandHandler extends CommandHandler<
     return success({ id: campagne.id })
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  async monitor(): Promise<void> {}
+  async monitor(): Promise<void> {
+    return
+  }
 }

@@ -141,7 +141,7 @@ describe('CampagneSqlRepository', () => {
           evaluation.date.toJSDate()
         )
         expect(reponseCampagneSqlModels[0].reponse1).to.equal(
-          evaluation.reponses[0].idOption.toString()
+          evaluation.reponses[0].idReponse.toString()
         )
         expect(reponseCampagneSqlModels[0].pourquoi1).to.equal(
           evaluation.reponses[0].pourquoi
@@ -177,11 +177,11 @@ describe('CampagneSqlRepository', () => {
           evaluationComplete.date.toJSDate()
         )
         expect(reponseCampagneSqlModels[0].reponse1).to.equal(
-          evaluationComplete.reponses[0].idOption.toString()
+          evaluationComplete.reponses[0].idReponse.toString()
         )
         expect(reponseCampagneSqlModels[0].pourquoi1).to.equal(null)
         expect(reponseCampagneSqlModels[0].reponse2).to.equal(
-          evaluationComplete.reponses[1].idOption.toString()
+          evaluationComplete.reponses[1].idReponse.toString()
         )
         expect(reponseCampagneSqlModels[0].pourquoi2).to.equal(
           evaluationComplete.reponses[1].pourquoi
