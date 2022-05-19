@@ -16,7 +16,7 @@ export interface CreateEvaluationCommand extends Command {
   idJeune: string
   reponses: Array<{
     idQuestion: number
-    idOption: number
+    idReponse: number
     pourquoi?: string
   }>
 }
@@ -46,7 +46,7 @@ export class CreateEvaluationCommandHandler extends CommandHandler<
   async handle(command: CreateEvaluationCommand): Promise<Result> {
     const campagne = await this.campagneRepository.get(command.idCampagne)
     const jeune = await this.jeuneRepository.get(command.idJeune)
-    const evaluation = this.campagneFactory.evaluer(
+    const evaluation = this.campagneFactory.construireEvaluation(
       campagne,
       jeune!,
       command.reponses

@@ -1,5 +1,5 @@
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { GetCampagneQueryModel } from '../../../src/application/queries/campagne/get-campagne.query.handler'
+import { GetCampagneQueryModel } from '../../../src/application/queries/query-getters/get-campagne.query.getter'
 import { uneCampagneQueryModel } from '../../fixtures/campagne.fixture'
 import { GetActionsJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-actions-jeune-pole-emploi.query.handler'
 import { GetJeuneHomeDemarchesQueryHandler } from '../../../src/application/queries/get-jeune-home-demarches.query.handler'

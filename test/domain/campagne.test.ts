@@ -37,13 +37,17 @@ describe('Campagne', () => {
         // Given
         const reponses: Campagne.Reponse[] = [
           {
-            idOption: 1,
+            idReponse: 1,
             idQuestion: 1
           }
         ]
 
         // When
-        const evaluation = campagneFactory.evaluer(undefined, jeune, reponses)
+        const evaluation = campagneFactory.construireEvaluation(
+          undefined,
+          jeune,
+          reponses
+        )
 
         // Then
         expect(evaluation).to.be.deep.equal(
@@ -57,7 +61,7 @@ describe('Campagne', () => {
           // Given
           const reponses: Campagne.Reponse[] = [
             {
-              idOption: 1,
+              idReponse: 1,
               idQuestion: 1
             }
           ]
@@ -68,7 +72,7 @@ describe('Campagne', () => {
           })
 
           // When
-          const evaluation = campagneFactory.evaluer(
+          const evaluation = campagneFactory.construireEvaluation(
             campagnePassee,
             jeune,
             reponses
@@ -91,13 +95,13 @@ describe('Campagne', () => {
             // Given
             const reponsesValides: Campagne.Reponse[] = [
               {
-                idOption: 1,
+                idReponse: 1,
                 idQuestion: 1
               }
             ]
 
             // When
-            const evaluation = campagneFactory.evaluer(
+            const evaluation = campagneFactory.construireEvaluation(
               campagneEnCours,
               jeune,
               reponsesValides
@@ -122,13 +126,13 @@ describe('Campagne', () => {
             // Given
             const reponsesInvalides: Campagne.Reponse[] = [
               {
-                idOption: 2,
+                idReponse: 2,
                 idQuestion: 2
               }
             ]
 
             // When
-            const evaluation = campagneFactory.evaluer(
+            const evaluation = campagneFactory.construireEvaluation(
               campagneEnCours,
               jeune,
               reponsesInvalides

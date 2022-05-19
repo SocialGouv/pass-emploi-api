@@ -1,7 +1,7 @@
 import { Campagne } from '../../src/domain/campagne'
 import { uneDatetime } from './date.fixture'
 import { CampagneQueryModel } from '../../src/application/queries/query-models/campagne.query-model'
-import { questionsInMemory } from '../../src/application/queries/campagne/get-campagne.query.handler'
+import { questionsInMemory } from '../../src/application/queries/query-getters/get-campagne.query.getter'
 
 export const uneCampagne = (args: Partial<Campagne> = {}): Campagne => {
   const defaults: Campagne = {
@@ -38,7 +38,7 @@ export const uneEvaluationIncomplete = (
   reponses: [
     {
       pourquoi: 'parce que',
-      idOption: 3,
+      idReponse: 3,
       idQuestion: 1
     }
   ]
@@ -56,11 +56,11 @@ export const uneEvaluationComplete = (
   idCampagne: campagne.id,
   reponses: [
     {
-      idOption: 4,
+      idReponse: 4,
       idQuestion: 1
     },
     {
-      idOption: 3,
+      idReponse: 3,
       idQuestion: 2,
       pourquoi: 'Voila pourquoi'
     }

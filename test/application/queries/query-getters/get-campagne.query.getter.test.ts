@@ -8,7 +8,7 @@ import { DateService } from '../../../../src/utils/date-service'
 import {
   GetCampagneQueryModel,
   questionsInMemory
-} from '../../../../src/application/queries/campagne/get-campagne.query.handler'
+} from '../../../../src/application/queries/query-getters/get-campagne.query.getter'
 import { CampagneSqlModel } from '../../../../src/infrastructure/sequelize/models/campagne.sql-model'
 import { DateTime } from 'luxon'
 import { ReponseCampagneSqlModel } from '../../../../src/infrastructure/sequelize/models/reponse-campagne.sql-model'

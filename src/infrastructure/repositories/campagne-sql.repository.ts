@@ -55,9 +55,9 @@ export class CampagneSqlRepository implements Campagne.Repository {
       idCampagne: evaluation.idCampagne,
       dateReponse: evaluation.date,
       dateCreationJeune: evaluation.jeune.dateCreation,
-      reponse1: reponse1?.idOption,
+      reponse1: reponse1?.idReponse,
       pourquoi1: reponse1?.pourquoi || null,
-      reponse2: reponse2?.idOption || null,
+      reponse2: reponse2?.idReponse || null,
       pourquoi2: reponse2?.pourquoi || null
     })
   }

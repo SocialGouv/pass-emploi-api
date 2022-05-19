@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { JeuneHomeDemarcheQueryModel } from './query-models/home-jeune.query-models'
 import { GetActionsJeunePoleEmploiQueryHandler } from './get-actions-jeune-pole-emploi.query.handler'
-import { GetCampagneQueryModel } from './campagne/get-campagne.query.handler'
+import { GetCampagneQueryModel } from './query-getters/get-campagne.query.getter'
 import { isFailure, Result, success } from '../../building-blocks/types/result'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
