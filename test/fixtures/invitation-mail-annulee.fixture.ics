@@ -16,7 +16,7 @@ DESCRIPTION:Création d'un nouveau rendez-vous\nVous avez créé un rendez-vou
 	 ne sont pas pris en compte dans votre portail CEJ.\nBonne journée
 STATUS:CANCELLED
 ORGANIZER;CN=Tavernier Nils:mailto:nils.tavernier@passemploi.com
-ATTENDEE;RSVP=TRUE;ROLE=REQ-PARTICIPANT;CN=Tavernier Nils:mailto:nils.taver
+ATTENDEE;RSVP=FALSE;ROLE=REQ-PARTICIPANT;CN=Tavernier Nils:mailto:nils.taver
 	nier@passemploi.com
 ATTENDEE;RSVP=TRUE;ROLE=REQ-PARTICIPANT;CN=Doe John
 DURATION:PT30M
