@@ -116,7 +116,8 @@ export class InvitationIcsClient {
         name: conseiller.lastName + ' ' + conseiller.firstName,
         email: this.passEmploiContactEmail
       },
-      method: 'REQUEST',
+      method:
+        operation === RendezVous.Operation.SUPPRESSION ? 'CANCEL' : 'REQUEST',
       attendees: [
         {
           name: conseiller.lastName + ' ' + conseiller.firstName,
