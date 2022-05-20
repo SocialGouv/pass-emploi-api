@@ -1,14 +1,15 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { RendezVousConseillerFutursEtPassesQueryModel } from './query-models/rendez-vous.query-models'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
-import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
-import { Op } from 'sequelize'
+import { Op, Sequelize } from 'sequelize'
 import { DateService } from '../../utils/date-service'
 import { fromSqlToRendezVousConseillerQueryModel } from './query-mappers/rendez-vous-milo.mappers'
+import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 
 export interface GetAllRendezVousConseiller extends Query {
   idConseiller: string
@@ -21,6 +22,7 @@ export class GetAllRendezVousConseillerQueryHandler extends QueryHandler<
   RendezVousConseillerFutursEtPassesQueryModel
 > {
   constructor(
+    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
     private dateService: DateService,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
@@ -38,10 +40,17 @@ export class GetAllRendezVousConseillerQueryHandler extends QueryHandler<
     }
 
     const rendezVousPassesPromise = RendezVousSqlModel.findAll({
-      include: [
-        { model: JeuneSqlModel, where: { idConseiller: query.idConseiller } }
-      ],
+      include: [{ model: JeuneSqlModel }],
+      replacements: { id_conseiller: query.idConseiller },
       where: {
+        id: {
+          [Op.in]: this.sequelize.literal(`(
+                SELECT DISTINCT id_rendez_vous
+              FROM rendez_vous_jeune_association, jeune
+              WHERE rendez_vous_jeune_association.id_jeune = jeune.id
+              AND jeune.id_conseiller = :id_conseiller
+            )`)
+        },
         date: {
           [Op.lte]: maintenant
         },
@@ -54,10 +63,17 @@ export class GetAllRendezVousConseillerQueryHandler extends QueryHandler<
     })
 
     const rendezVousFutursPromise = RendezVousSqlModel.findAll({
-      include: [
-        { model: JeuneSqlModel, where: { idConseiller: query.idConseiller } }
-      ],
+      include: [{ model: JeuneSqlModel }],
+      replacements: { id_conseiller: query.idConseiller },
       where: {
+        id: {
+          [Op.in]: this.sequelize.literal(`(
+                SELECT DISTINCT id_rendez_vous
+              FROM rendez_vous_jeune_association, jeune
+              WHERE rendez_vous_jeune_association.id_jeune = jeune.id
+              AND jeune.id_conseiller = :id_conseiller
+            )`)
+        },
         date: {
           [Op.gte]: maintenant
         },

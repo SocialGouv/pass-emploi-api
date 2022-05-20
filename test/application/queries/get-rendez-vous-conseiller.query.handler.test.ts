@@ -26,7 +26,7 @@ import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
 
 describe('GetRendezVousConseillerQueryHandler', () => {
-  DatabaseForTesting.prepare()
+  const db = DatabaseForTesting.prepare()
   let dateService: StubbedClass<DateService>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler
@@ -50,6 +50,7 @@ describe('GetRendezVousConseillerQueryHandler', () => {
 
     getAllRendezVousConseillerQueryHandler =
       new GetAllRendezVousConseillerQueryHandler(
+        db.sequelize,
         dateService,
         conseillerAuthorizer
       )
@@ -58,8 +59,9 @@ describe('GetRendezVousConseillerQueryHandler', () => {
   beforeEach(async () => {
     // Given
     await ConseillerSqlModel.creer(unConseillerDto())
+    await ConseillerSqlModel.creer(unConseillerDto({ id: '2' }))
     await JeuneSqlModel.creer(unJeuneDto({ id: jeune1.id }))
-    await JeuneSqlModel.creer(unJeuneDto({ id: jeune2.id }))
+    await JeuneSqlModel.creer(unJeuneDto({ id: jeune2.id, idConseiller: '2' }))
 
     unRendezVousPasse = unRendezVousDto({
       date: maintenant.minus({ days: 2 }).toJSDate(),
