@@ -1,22 +1,69 @@
-import { ActionPoleEmploiQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
+import { DemarcheQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
 import { ActionPoleEmploi } from '../../../src/domain/action'
-import { uneDate } from '../date.fixture'
 
-export const desDemarches = (): ActionPoleEmploiQueryModel[] => [
+export const desDemarches = (): DemarcheQueryModel[] => [
   {
-    id: 'id-demarche',
-    contenu: undefined,
-    statut: ActionPoleEmploi.Statut.EN_RETARD,
-    dateFin: uneDate(),
-    dateAnnulation: undefined,
-    creeeParConseiller: false
+    attributs: [
+      {
+        cle: 'metier',
+        label: 'Nom du métier',
+        valeur: 'Agriculture'
+      },
+      {
+        cle: 'description',
+        label: 'Description',
+        valeur: 'Candidature chez diffÃ©rents employeurs'
+      },
+      {
+        cle: 'nombre',
+        label: 'Nombre',
+        valeur: 5
+      }
+    ],
+    codeDemarche: '',
+    contenu: 'Identification de ses compétences avec pole-emploi.fr',
+    creeeParConseiller: true,
+    dateCreation: new Date('2020-04-06T10:20:00.000Z'),
+    dateFin: new Date('2020-04-06T10:20:00.000Z'),
+    dateModification: new Date('2020-04-06T10:20:00.000Z'),
+    id: '198916488',
+    label: 'Mon (nouveau) métier',
+    modifieParConseiller: false,
+    sousTitre: 'Par un autre moyen',
+    statut: ActionPoleEmploi.Statut.REALISEE,
+    statutsPossibles: [],
+    titre: 'Identification de ses points forts et de ses compétences'
   },
   {
-    id: 'id-demarche',
-    contenu: undefined,
+    attributs: [
+      {
+        cle: 'metier',
+        label: 'Nom du métier',
+        valeur: 'Agriculture'
+      },
+      {
+        cle: 'description',
+        label: 'Description',
+        valeur: 'Candidature chez diffÃ©rents employeurs'
+      },
+      {
+        cle: 'nombre',
+        label: 'Nombre',
+        valeur: 5
+      }
+    ],
+    codeDemarche: '',
+    contenu: 'Identification de ses compétences avec pole-emploi.fr',
+    creeeParConseiller: true,
+    dateCreation: new Date('2020-04-06T10:20:00.000Z'),
+    dateFin: new Date('2020-04-06T10:20:00.000Z'),
+    dateModification: new Date('2020-04-06T10:20:00.000Z'),
+    id: '198916489',
+    label: 'Mon (nouveau) métier',
+    modifieParConseiller: false,
+    sousTitre: 'Par un autre moyen',
     statut: ActionPoleEmploi.Statut.EN_COURS,
-    dateFin: uneDate(),
-    dateAnnulation: undefined,
-    creeeParConseiller: false
+    statutsPossibles: [],
+    titre: 'Identification de ses points forts et de ses compétences'
   }
 ]

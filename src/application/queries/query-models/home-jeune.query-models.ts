@@ -1,9 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { TypeRendezVous } from 'src/domain/rendez-vous'
-import {
-  ActionPoleEmploiQueryModel,
-  ActionQueryModel
-} from './actions.query-model'
+import { DemarcheQueryModel, ActionQueryModel } from './actions.query-model'
 import { RendezVousBaseQueryModel } from './rendez-vous.query-models'
 import { CampagneQueryModel } from './campagne.query-model'
 
@@ -97,10 +94,10 @@ export class JeuneHomeActionQueryModel {
 
 export class JeuneHomeDemarcheQueryModel {
   @ApiProperty({
-    type: ActionPoleEmploiQueryModel,
+    type: DemarcheQueryModel,
     isArray: true
   })
-  actions: ActionPoleEmploiQueryModel[]
+  actions: DemarcheQueryModel[]
 
   @ApiProperty({
     type: CampagneQueryModel,
