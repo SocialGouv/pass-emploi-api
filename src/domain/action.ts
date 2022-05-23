@@ -21,11 +21,20 @@ export interface Action {
 
 export namespace ActionPoleEmploi {
   export enum Statut {
-    EN_RETARD = 'EN_RETARD',
     EN_COURS = 'EN_COURS',
     A_FAIRE = 'A_FAIRE',
     REALISEE = 'REALISEE',
     ANNULEE = 'ANNULEE'
+  }
+
+  export interface Code {
+    quoi: string
+    pourquoi: string
+    comment?: string
+  }
+
+  export function toBase64(code: Code): string {
+    return Buffer.from(JSON.stringify(code)).toString('base64')
   }
 }
 

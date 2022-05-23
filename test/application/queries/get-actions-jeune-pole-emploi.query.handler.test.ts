@@ -4,9 +4,7 @@ import {
   GetActionsJeunePoleEmploiQuery,
   GetActionsJeunePoleEmploiQueryHandler
 } from 'src/application/queries/get-actions-jeune-pole-emploi.query.handler'
-import { fromDemarcheDtoToActionPoleEmploiQueryModel } from 'src/application/queries/query-mappers/actions-pole-emploi.mappers'
 import { ActionPoleEmploi } from 'src/domain/action'
-import { IdService } from 'src/utils/id-service'
 import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { failure } from '../../../src/building-blocks/types/result'
@@ -21,11 +19,11 @@ import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { uneDemarcheDto } from '../../fixtures/demarches-dto.fixtures'
+import { fromDemarcheDtoToDemarcheQueryModel } from '../../../src/application/queries/query-mappers/actions-pole-emploi.mappers'
 
 describe('GetActionsJeunePoleEmploiQueryHandler', () => {
   let jeunesRepository: StubbedType<Jeune.Repository>
   let dateService: StubbedClass<DateService>
-  let idService: StubbedClass<IdService>
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
   let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
   let getActionsJeunePoleEmploiQueryHandler: GetActionsJeunePoleEmploiQueryHandler
@@ -40,8 +38,6 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
     jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
     dateService = stubClass(DateService)
-    idService = stubClass(IdService)
-    idService.uuid.returns('random-id')
     dateService.nowJs.returns(new Date())
     dateService.fromISOStringToUTCJSDate.returns(new Date(stringUTC))
     keycloakClient = stubClass(KeycloakClient)
@@ -52,7 +48,6 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
         jeunesRepository,
         poleEmploiPartenaireClient,
         jeunePoleEmploiAuthorizer,
-        idService,
         dateService,
         keycloakClient
       )
@@ -62,69 +57,83 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
     sandbox.restore()
   })
 
-  describe('fromDemarcheDtoToActionPoleEmploiQueryModel', () => {
-    const demarcheDto: DemarcheDto = {
-      id: 'id-demarche',
-      etat: 'AC',
-      dateFin: '2020-04-06T10:20:00+02:00',
-      dateCreation: '',
-      dateModification: '',
-      origineCreateur: 'INDIVIDU',
-      origineDemarche: 'PASS_EMPLOI',
-      pourquoi: '',
-      libellePourquoi: '',
-      quoi: '',
-      libelleQuoi: ''
-    }
+  describe('fromDemarcheDtoToDemarcheQueryModel', () => {
+    let demarcheDto: DemarcheDto
 
-    it('retourne un ActionPoleEmploiQueryModel avec statut en retard', async () => {
-      // When
-      const queryModel = fromDemarcheDtoToActionPoleEmploiQueryModel(
-        demarcheDto,
-        idService,
-        dateService
-      )
-
-      // Then
-      expect(queryModel).to.deep.equal({
-        id: 'id-demarche',
-        contenu: undefined,
-        statut: ActionPoleEmploi.Statut.EN_RETARD,
-        dateFin: new Date(stringUTC),
-        dateAnnulation: undefined,
-        creeeParConseiller: false
-      })
+    beforeEach(() => {
+      demarcheDto = {
+        id: '198916488',
+        etat: 'RE',
+        dateDebut: '2022-05-09T08:11:00+02:00',
+        dateFin: '2022-05-10T10:00:00+02:00',
+        dateCreation: '2022-05-11T11:04:00+02:00',
+        dateModification: '2021-11-29T11:04:00+01:00',
+        origineCreateur: 'CONSEILLER',
+        origineDemarche: 'PASS_EMPLOI',
+        pourquoi: 'P01',
+        libellePourquoi: 'Mon (nouveau) métier',
+        quoi: 'Q01',
+        libelleQuoi: 'Identification de ses points forts et de ses compétences',
+        comment: 'C01.05',
+        libelleComment: 'Par un autre moyen',
+        libelleCourt: 'Identification de ses compétences avec pole-emploi.fr',
+        libelleLong:
+          'Identification de ses points forts et de ses compétences par un autre moyen',
+        description: 'Candidature chez diffÃ©rents employeurs',
+        nombre: 5,
+        ou: 'pole-emploi.fr',
+        metier: 'Agriculture',
+        droitsDemarche: {}
+      }
     })
+
     it('retourne un ActionPoleEmploiQueryModel avec contenu, statut realisée et date annulation', async () => {
-      // Given
-      demarcheDto.id = undefined
-      demarcheDto.etat = 'RE'
-      demarcheDto.dateAnnulation = 'test'
-      demarcheDto.libelleCourt = 'test'
-      demarcheDto.origineCreateur = 'CONSEILLER'
       // When
-      const queryModel = fromDemarcheDtoToActionPoleEmploiQueryModel(
+      const queryModel = fromDemarcheDtoToDemarcheQueryModel(
         demarcheDto,
-        idService,
         dateService
       )
       // Then
       expect(queryModel).to.deep.equal({
-        id: 'random-id',
-        contenu: 'test',
-        statut: ActionPoleEmploi.Statut.REALISEE,
-        dateFin: new Date(stringUTC),
-        dateAnnulation: new Date(stringUTC),
-        creeeParConseiller: true
+        attributs: [
+          {
+            cle: 'metier',
+            label: 'Nom du métier',
+            valeur: 'Agriculture'
+          },
+          {
+            cle: 'description',
+            label: 'Description',
+            valeur: 'Candidature chez diffÃ©rents employeurs'
+          },
+          {
+            cle: 'nombre',
+            label: 'Nombre',
+            valeur: 5
+          }
+        ],
+        codeDemarche:
+          'eyJxdW9pIjoiUTAxIiwicG91cnF1b2kiOiJQMDEiLCJjb21tZW50IjoiQzAxLjA1In0=',
+        contenu: 'Identification de ses compétences avec pole-emploi.fr',
+        creeeParConseiller: true,
+        dateCreation: new Date('2020-04-06T10:20:00.000Z'),
+        dateFin: new Date('2020-04-06T10:20:00.000Z'),
+        dateModification: new Date('2020-04-06T10:20:00.000Z'),
+        id: '198916488',
+        label: 'Mon (nouveau) métier',
+        modifieParConseiller: false,
+        sousTitre: 'Par un autre moyen',
+        statut: 'REALISEE',
+        statutsPossibles: [],
+        titre: 'Identification de ses points forts et de ses compétences'
       })
     })
     it('retourne statut annulée', async () => {
       // Given
       demarcheDto.etat = 'AN'
       // When
-      const queryModel = fromDemarcheDtoToActionPoleEmploiQueryModel(
+      const queryModel = fromDemarcheDtoToDemarcheQueryModel(
         demarcheDto,
-        idService,
         dateService
       )
       // Then
@@ -136,9 +145,8 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
       demarcheDto.dateFin = '2222-04-06T10:20:00+02:00'
       demarcheDto.dateDebut = '2020-04-06T10:20:00+02:00'
       // When
-      const queryModel = fromDemarcheDtoToActionPoleEmploiQueryModel(
+      const queryModel = fromDemarcheDtoToDemarcheQueryModel(
         demarcheDto,
-        idService,
         dateService
       )
       // Then
@@ -149,13 +157,115 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
       demarcheDto.etat = 'AF'
       demarcheDto.dateDebut = '2222-04-06T10:20:00+02:00'
       // When
-      const queryModel = fromDemarcheDtoToActionPoleEmploiQueryModel(
+      const queryModel = fromDemarcheDtoToDemarcheQueryModel(
         demarcheDto,
-        idService,
         dateService
       )
       // Then
       expect(queryModel.statut).to.equal(ActionPoleEmploi.Statut.A_FAIRE)
+    })
+    it('retourne les attributs', async () => {
+      // Given
+      demarcheDto.organisme = 'pole emploi'
+      demarcheDto.metier = 'Boulanger'
+      demarcheDto.description = 'Le pain'
+      demarcheDto.nombre = 4
+      demarcheDto.contact = 'contact@contact.contact'
+      // When
+      const queryModel = fromDemarcheDtoToDemarcheQueryModel(
+        demarcheDto,
+        dateService
+      )
+      // Then
+      expect(queryModel.attributs).to.deep.equal([
+        {
+          cle: 'organisme',
+          label: 'Nom de l’organisme',
+          valeur: 'pole emploi'
+        },
+        {
+          cle: 'metier',
+          label: 'Nom du métier',
+          valeur: 'Boulanger'
+        },
+        {
+          cle: 'description',
+          label: 'Description',
+          valeur: 'Le pain'
+        },
+        {
+          cle: 'nombre',
+          label: 'Nombre',
+          valeur: 4
+        },
+        {
+          cle: 'contact',
+          label: 'Contact',
+          valeur: 'contact@contact.contact'
+        }
+      ])
+    })
+    describe('droits de modification', () => {
+      it("autorise l'annulation", async () => {
+        // Given
+        demarcheDto.droitsDemarche!.annulation = true
+        // When
+        const queryModel = fromDemarcheDtoToDemarcheQueryModel(
+          demarcheDto,
+          dateService
+        )
+        // Then
+        expect(queryModel.statutsPossibles).to.deep.equal([
+          ActionPoleEmploi.Statut.ANNULEE
+        ])
+      })
+      it('autorise la réalisation', async () => {
+        // Given
+        demarcheDto.droitsDemarche!.realisation = true
+        // When
+        const queryModel = fromDemarcheDtoToDemarcheQueryModel(
+          demarcheDto,
+          dateService
+        )
+        // Then
+        expect(queryModel.statutsPossibles).to.deep.equal([
+          ActionPoleEmploi.Statut.REALISEE
+        ])
+      })
+      describe('quand la modification est possible', () => {
+        it('autorise a faire et en cours', async () => {
+          // Given
+          demarcheDto.etat = 'AC'
+          demarcheDto.droitsDemarche!.modificationDate = true
+          // When
+          const queryModel = fromDemarcheDtoToDemarcheQueryModel(
+            demarcheDto,
+            dateService
+          )
+          // Then
+          expect(queryModel.statutsPossibles).to.deep.equal([
+            ActionPoleEmploi.Statut.A_FAIRE,
+            ActionPoleEmploi.Statut.EN_COURS
+          ])
+        })
+      })
+      describe('quand la replanification est possible', () => {
+        it('autorise a faire et en cours', async () => {
+          // Given
+          demarcheDto.etat = 'RE'
+          demarcheDto.droitsDemarche!.replanificationDate = true
+          // When
+          const queryModel = fromDemarcheDtoToDemarcheQueryModel(
+            demarcheDto,
+            dateService
+          )
+          // Then
+          expect(queryModel.statutsPossibles).to.deep.equal([
+            ActionPoleEmploi.Statut.A_FAIRE,
+            ActionPoleEmploi.Statut.EN_COURS
+          ])
+        })
+      })
     })
   })
 
@@ -178,7 +288,8 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
         pourquoi: '',
         libellePourquoi: '',
         quoi: '',
-        libelleQuoi: ''
+        libelleQuoi: '',
+        droitsDemarche: {}
       }
       const demarcheDtoEnCoursProche: DemarcheDto = uneDemarcheDto()
 
@@ -194,7 +305,8 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
         pourquoi: '',
         libellePourquoi: '',
         quoi: '',
-        libelleQuoi: ''
+        libelleQuoi: '',
+        droitsDemarche: {}
       }
       const demarcheDtoEnCours: DemarcheDto = {
         id: 'id-demarche',
@@ -207,7 +319,8 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
         pourquoi: '',
         libellePourquoi: '',
         quoi: '',
-        libelleQuoi: ''
+        libelleQuoi: '',
+        droitsDemarche: {}
       }
       const demarcheDtoAnnulee: DemarcheDto = {
         id: 'id-demarche',
@@ -220,7 +333,8 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
         pourquoi: '',
         libellePourquoi: '',
         quoi: '',
-        libelleQuoi: ''
+        libelleQuoi: '',
+        droitsDemarche: {}
       }
       const demarcheDtoRealisee: DemarcheDto = {
         id: 'id-demarche',
@@ -233,7 +347,8 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
         pourquoi: '',
         libellePourquoi: '',
         quoi: '',
-        libelleQuoi: ''
+        libelleQuoi: '',
+        droitsDemarche: {}
       }
 
       describe("quand pas d'erreur", () => {
@@ -258,54 +373,30 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
           expect(result).to.deep.equal({
             _isSuccess: true,
             data: [
-              {
-                id: 'id-demarche',
-                contenu: undefined,
-                statut: ActionPoleEmploi.Statut.EN_RETARD,
-                dateFin: new Date(stringUTC),
-                dateAnnulation: undefined,
-                creeeParConseiller: false
-              },
-              {
-                id: 'id-demarche',
-                contenu: undefined,
-                statut: ActionPoleEmploi.Statut.EN_COURS,
-                dateFin: new Date(stringUTC),
-                dateAnnulation: undefined,
-                creeeParConseiller: false
-              },
-              {
-                id: 'id-demarche',
-                contenu: undefined,
-                statut: ActionPoleEmploi.Statut.A_FAIRE,
-                dateFin: new Date(stringUTC),
-                dateAnnulation: undefined,
-                creeeParConseiller: false
-              },
-              {
-                id: 'id-demarche',
-                contenu: undefined,
-                statut: ActionPoleEmploi.Statut.EN_COURS,
-                dateFin: new Date(stringUTC),
-                dateAnnulation: undefined,
-                creeeParConseiller: false
-              },
-              {
-                id: 'id-demarche',
-                contenu: undefined,
-                statut: ActionPoleEmploi.Statut.ANNULEE,
-                dateFin: new Date(stringUTC),
-                dateAnnulation: undefined,
-                creeeParConseiller: false
-              },
-              {
-                id: 'id-demarche',
-                contenu: undefined,
-                statut: ActionPoleEmploi.Statut.REALISEE,
-                dateFin: new Date(stringUTC),
-                dateAnnulation: undefined,
-                creeeParConseiller: false
-              }
+              fromDemarcheDtoToDemarcheQueryModel(
+                demarcheDtoEnCoursProche,
+                dateService
+              ),
+              fromDemarcheDtoToDemarcheQueryModel(
+                demarcheDtoRetard,
+                dateService
+              ),
+              fromDemarcheDtoToDemarcheQueryModel(
+                demarcheDtoAFaireAuMilieu,
+                dateService
+              ),
+              fromDemarcheDtoToDemarcheQueryModel(
+                demarcheDtoEnCours,
+                dateService
+              ),
+              fromDemarcheDtoToDemarcheQueryModel(
+                demarcheDtoAnnulee,
+                dateService
+              ),
+              fromDemarcheDtoToDemarcheQueryModel(
+                demarcheDtoRealisee,
+                dateService
+              )
             ]
           })
         })

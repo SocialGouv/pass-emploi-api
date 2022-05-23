@@ -11,5 +11,6 @@ export const uneDemarcheDto = (): DemarcheDto => ({
   pourquoi: '',
   libellePourquoi: '',
   quoi: '',
-  libelleQuoi: ''
+  libelleQuoi: '',
+  droitsDemarche: {}
 })

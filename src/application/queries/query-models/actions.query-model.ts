@@ -34,7 +34,18 @@ export class ActionQueryModel {
   jeune?: JeuneQueryModel
 }
 
-export class ActionPoleEmploiQueryModel {
+export class AttributDemarcheQueryModel {
+  @ApiProperty()
+  label: string
+
+  @ApiProperty()
+  valeur: string | number
+
+  @ApiProperty()
+  cle: string
+}
+
+export class DemarcheQueryModel {
   @ApiProperty()
   id: string
 
@@ -47,9 +58,36 @@ export class ActionPoleEmploiQueryModel {
   @ApiProperty()
   dateFin: Date
 
+  @ApiProperty()
+  label: string
+
+  @ApiProperty()
+  titre: string
+
+  @ApiProperty({ required: false })
+  sousTitre?: string
+
+  @ApiProperty()
+  dateCreation: Date
+
+  @ApiProperty({ required: false })
+  dateModification?: Date
+
   @ApiProperty({ required: false })
   dateAnnulation?: Date
 
   @ApiProperty()
   creeeParConseiller: boolean
+
+  @ApiProperty()
+  modifieParConseiller: boolean
+
+  @ApiProperty({ type: AttributDemarcheQueryModel, isArray: true })
+  attributs: AttributDemarcheQueryModel[]
+
+  @ApiProperty()
+  codeDemarche: string
+
+  @ApiProperty({ isArray: true, enum: ActionPoleEmploi.Statut })
+  statutsPossibles: ActionPoleEmploi.Statut[]
 }

@@ -59,7 +59,7 @@ import { GetConseillersJeuneQueryHandler } from '../../application/queries/get-c
 import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
 import { GetRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler'
 import {
-  ActionPoleEmploiQueryModel,
+  DemarcheQueryModel,
   ActionQueryModel
 } from '../../application/queries/query-models/actions.query-model'
 import {
@@ -259,14 +259,14 @@ export class JeunesController {
   })
   @Get(':idJeune/pole-emploi/actions')
   @ApiResponse({
-    type: ActionPoleEmploiQueryModel,
+    type: DemarcheQueryModel,
     isArray: true
   })
   async getActionsPoleEmploi(
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
-  ): Promise<ActionPoleEmploiQueryModel[]> {
+  ): Promise<DemarcheQueryModel[]> {
     const result = await this.getActionsPoleEmploiQueryHandler.execute(
       {
         idJeune,

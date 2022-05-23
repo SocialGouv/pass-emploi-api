@@ -88,7 +88,7 @@ export interface RendezVousPoleEmploiDto {
 }
 
 export interface DemarcheDto {
-  id?: string
+  id: string
   etat: 'AC' | 'RE' | 'AN' | 'EC' | 'AF'
   dateDebut?: string
   dateFin: string
@@ -122,8 +122,14 @@ export interface DemarcheDto {
   description?: string
   organisme?: string
   metier?: string
-  nombre?: string
+  nombre?: number
   contact?: string
+  droitsDemarche?: {
+    annulation?: boolean
+    realisation?: boolean
+    replanificationDate?: boolean
+    modificationDate?: boolean
+  }
 }
 
 @Injectable()
@@ -142,7 +148,7 @@ export class PoleEmploiPartenaireClient {
   async getDemarches(tokenDuJeune: string): Promise<DemarcheDto[]> {
     this.logger.log('recuperation des demarches du jeune')
 
-    const response = await this.get(
+    const response = await this.get<DemarcheDto[]>(
       'peconnect-demarches/v1/demarches',
       tokenDuJeune
     )
@@ -198,13 +204,13 @@ export class PoleEmploiPartenaireClient {
     )
   }
 
-  private get(
+  private get<T>(
     suffixUrl: string,
     tokenDuJeune: string,
     params?: URLSearchParams
-  ): Promise<AxiosResponse> {
+  ): Promise<AxiosResponse<T>> {
     return firstValueFrom(
-      this.httpService.get(`${this.apiUrl}/${suffixUrl}`, {
+      this.httpService.get<T>(`${this.apiUrl}/${suffixUrl}`, {
         params,
         headers: { Authorization: `Bearer ${tokenDuJeune}` },
         httpsAgent:
