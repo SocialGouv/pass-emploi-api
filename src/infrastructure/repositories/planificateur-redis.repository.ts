@@ -90,7 +90,7 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     for (const job of repeatableJobs) {
       await this.queue.removeRepeatable({
         cron: job.cron,
-        tz: CRON_TIMEZONE,
+        tz: job.tz,
         jobId: job.id
       })
     }
