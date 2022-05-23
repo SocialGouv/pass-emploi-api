@@ -71,12 +71,12 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
       let toutesLesRecherchesOntEteAnalysees = false
       let offset = 0
 
-      while (!toutesLesRecherchesOntEteAnalysees) {
-        if (!offre.localisation) {
-          this.logger.warn(`L'offre ${offre.id} n'a pas de localisation`)
-          continue
-        }
+      if (!offre.localisation) {
+        this.logger.warn(`L'offre ${offre.id} n'a pas de localisation`)
+        continue
+      }
 
+      while (!toutesLesRecherchesOntEteAnalysees) {
         const criteres: GetServicesCiviqueQuery = {
           domaine: offre.domaine,
           lat: offre.localisation.latitude,

@@ -214,5 +214,30 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
         ).to.have.callCount(2)
       })
     })
+    describe('quand il y a une offre sans localisation', () => {
+      it("passe à l'offre suivante", async () => {
+        // Given
+        const uneOffreSansLocalisation: OffreServiceCivique = {
+          ...uneOffreServiceCivique(),
+          localisation: undefined
+        }
+
+        offreEngagementRepository.findAll
+          .withArgs({
+            dateDeCreationMinimum: hier,
+            page: 1,
+            limit: 1000,
+            editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE
+          })
+          .resolves(success([uneOffreSansLocalisation]))
+
+        // When
+        const result =
+          await handleJobNotifierNouveauxServicesCiviqueCommandHandler.handle()
+
+        // Then
+        expect(isSuccess(result)).to.be.true()
+      })
+    })
   })
 })
