@@ -38,6 +38,6 @@ Afin de relancer les workers 2 actions ont été entreprises :
 ### Actions
 | Action                                               | Type    | Owner           | Statut |
 |------------------------------------------------------|---------|-----------------|--------|
-| Créer une alerte lorsque les jobs ne sont pas lancés | detect  | Joseph          | TO DO  |
+| [Créer une alerte lorsque les jobs ne sont pas lancés](https://trello.com/c/H2LfRszb) | detect  | Joseph          | TO DO  |
 | Fixer la boucle infinie                              | prevent | Joseph & Adrien | DONE   |
 |                                                      |         |                 |        |
