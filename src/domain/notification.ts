@@ -1,14 +1,35 @@
 import { DateTime } from 'luxon'
 import { DateService } from '../utils/date-service'
+import { RendezVous } from './rendez-vous'
+import { Logger } from '@nestjs/common'
 
 export const NotificationRepositoryToken = 'NotificationRepositoryToken'
 
 export namespace Notification {
-  export interface Repository {
-    send(message: Notification.Message): Promise<void>
+  export abstract class Service {
+    async notifier(rendezVous: RendezVous, logger: Logger): Promise<void> {
+      rendezVous.jeunes.forEach(jeune => {
+        if (jeune.pushNotificationToken) {
+          const messagePush = this.createContenuPushNouveauRdv(
+            jeune.pushNotificationToken,
+            rendezVous.id
+          )
+          this.envoyer(messagePush)
+        } else {
+          logger.log(
+            `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
+          )
+        }
+      })
+    }
+    abstract envoyer(message: Notification.Message): Promise<void>
+    abstract createContenuPushNouveauRdv(
+      token: string,
+      idRdv: string
+    ): Notification.Message
   }
 
-  enum Type {
+  export enum Type {
     NEW_ACTION = 'NEW_ACTION',
     NEW_RENDEZVOUS = 'NEW_RENDEZVOUS',
     RAPPEL_RENDEZVOUS = 'RAPPEL_RENDEZVOUS',

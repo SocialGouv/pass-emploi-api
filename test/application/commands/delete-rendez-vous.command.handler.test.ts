@@ -32,7 +32,7 @@ describe('DeleteRendezVousCommandHandler', () => {
   DatabaseForTesting.prepare()
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
-  let notificationRepository: StubbedType<Notification.Repository>
+  let notificationRepository: StubbedType<Notification.Service>
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
   let deleteRendezVousCommandHandler: DeleteRendezVousCommandHandler
   let planificateurService: StubbedClass<PlanificateurService>
@@ -76,7 +76,7 @@ describe('DeleteRendezVousCommandHandler', () => {
       expect(rendezVousRepository.delete).not.to.have.been.calledWith(
         rendezVous.id
       )
-      expect(notificationRepository.send).not.to.have.been.calledWith(
+      expect(notificationRepository.envoyer).not.to.have.been.calledWith(
         Notification.createRdvSupprime(
           jeune.pushNotificationToken,
           rendezVous.date
@@ -180,7 +180,7 @@ describe('DeleteRendezVousCommandHandler', () => {
         await deleteRendezVousCommandHandler.handle(command)
 
         // Then
-        expect(notificationRepository.send).to.have.been.calledWith(
+        expect(notificationRepository.envoyer).to.have.been.calledWith(
           Notification.createRdvSupprime(
             rendezVous.jeunes[0].pushNotificationToken,
             rendezVous.date
@@ -197,7 +197,7 @@ describe('DeleteRendezVousCommandHandler', () => {
         // When
         await deleteRendezVousCommandHandler.handle(command)
         // Then
-        expect(notificationRepository.send).not.to.have.been.calledWith(
+        expect(notificationRepository.envoyer).not.to.have.been.calledWith(
           Notification.createRdvSupprime(
             jeune.pushNotificationToken,
             rendezVous.date

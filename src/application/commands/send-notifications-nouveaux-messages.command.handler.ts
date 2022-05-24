@@ -24,7 +24,7 @@ export class SendNotificationsNouveauxMessagesCommandHandler extends CommandHand
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository,
+    private notificationRepository: Notification.Service,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('SendNotificationsNouveauxMessagesCommandHandler')
@@ -50,7 +50,7 @@ export class SendNotificationsNouveauxMessagesCommandHandler extends CommandHand
       const notification = Notification.createNouveauMessage(
         jeune.pushNotificationToken
       )
-      await this.notificationRepository.send(notification)
+      await this.notificationRepository.envoyer(notification)
       this.logger.log(`Notification envoyée pour le jeune ${jeune.id}`)
     }
   }

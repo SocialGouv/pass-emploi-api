@@ -34,7 +34,7 @@ export class NotifierNouvellesImmersionsCommandHandler extends CommandHandler<
     private recherchesRepository: Recherche.Repository,
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
     @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository,
+    private notificationRepository: Notification.Service,
     private dateService: DateService
   ) {
     super('NotifierNouvellesImmersionsHandler')
@@ -107,7 +107,7 @@ export class NotifierNouvellesImmersionsCommandHandler extends CommandHandler<
         recherche.id,
         recherche.titre
       )
-      await this.notificationRepository.send(notification)
+      await this.notificationRepository.envoyer(notification)
     }
   }
 

@@ -27,7 +27,7 @@ describe('SendNotificationNouveauMessageCommandHandler', () => {
   const sandbox: SinonSandbox = createSandbox()
   const jeune = unJeune()
   const jeuneRepository: StubbedType<Jeune.Repository> = stubInterface(sandbox)
-  const notificationRepository: StubbedType<Notification.Repository> =
+  const notificationRepository: StubbedType<Notification.Service> =
     stubInterface(sandbox)
   const conseillerAuthorizer = stubClass(ConseillerAuthorizer)
 
@@ -54,7 +54,7 @@ describe('SendNotificationNouveauMessageCommandHandler', () => {
         const result =
           await sendNotificationNouveauMessageCommandHandler.handle(command)
         // Then
-        expect(notificationRepository.send).not.to.have.been.calledWith(
+        expect(notificationRepository.envoyer).not.to.have.been.calledWith(
           Notification.createNouveauMessage(jeune.pushNotificationToken)
         )
         expect(result).to.deep.equal(
@@ -75,7 +75,7 @@ describe('SendNotificationNouveauMessageCommandHandler', () => {
         const result =
           await sendNotificationNouveauMessageCommandHandler.handle(command)
         // Then
-        expect(notificationRepository.send).not.to.have.been.calledWith(
+        expect(notificationRepository.envoyer).not.to.have.been.calledWith(
           Notification.createNouveauMessage(jeune.pushNotificationToken)
         )
         expect(result).to.deep.equal(
@@ -100,7 +100,7 @@ describe('SendNotificationNouveauMessageCommandHandler', () => {
           // When
           await sendNotificationNouveauMessageCommandHandler.handle(command)
           // Then
-          expect(notificationRepository.send).to.have.been.calledWith(
+          expect(notificationRepository.envoyer).to.have.been.calledWith(
             Notification.createNouveauMessage(jeune.pushNotificationToken)
           )
         })
@@ -119,7 +119,7 @@ describe('SendNotificationNouveauMessageCommandHandler', () => {
             await sendNotificationNouveauMessageCommandHandler.handle(command)
           // Then
           expect(result).to.deep.equal(emptySuccess())
-          expect(notificationRepository.send).not.to.have.been.calledWith(
+          expect(notificationRepository.envoyer).not.to.have.been.calledWith(
             Notification.createNouveauMessage(jeune.pushNotificationToken)
           )
         })

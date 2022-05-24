@@ -34,7 +34,7 @@ import {
 describe('CreateRendezVousCommandHandler', () => {
   DatabaseForTesting.prepare()
   let rendezVousRepository: StubbedType<RendezVous.Repository>
-  let notificationRepository: StubbedType<Notification.Repository>
+  let notificationRepository: StubbedType<Notification.Service>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let planificateurService: StubbedClass<PlanificateurService>
@@ -216,7 +216,7 @@ describe('CreateRendezVousCommandHandler', () => {
         await createRendezVousCommandHandler.handle(command)
 
         // Then
-        expect(notificationRepository.send).not.to.have.been.calledWith(
+        expect(notificationRepository.envoyer).not.to.have.been.calledWith(
           Notification.createNouveauRdv(
             jeune.pushNotificationToken,
             expectedRendezvous.id
@@ -250,7 +250,9 @@ describe('CreateRendezVousCommandHandler', () => {
         await createRendezVousCommandHandler.handle(command)
 
         // Then
-        expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
+        expect(
+          notificationRepository.envoyer
+        ).to.have.been.calledOnceWithExactly(
           Notification.createNouveauRdv(
             jeune1.pushNotificationToken,
             expectedRendezvous.id

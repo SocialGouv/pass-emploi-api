@@ -29,7 +29,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
   let notifierNouvellesOffresEmploiCommandHandler: HandleJobNotifierNouvellesOffresEmploiCommandHandler
   let rechercheRepository: StubbedType<Recherche.Repository>
   let offresEmploiRepository: StubbedType<OffresEmploi.Repository>
-  let notificationRepository: StubbedType<Notification.Repository>
+  let notificationRepository: StubbedType<Notification.Service>
   let jeuneRepository: StubbedType<Jeune.Repository>
 
   const date = uneDatetime
@@ -220,7 +220,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         await notifierNouvellesOffresEmploiCommandHandler.handle()
 
         // Then
-        expect(notificationRepository.send).to.have.been.calledWithExactly({
+        expect(notificationRepository.envoyer).to.have.been.calledWithExactly({
           token: 'unToken',
           notification: {
             title: 'Boulanger en alternance',
@@ -406,8 +406,8 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
             dateDerniereRecherche: date
           })
         )
-        expect(notificationRepository.send).to.have.callCount(1)
-        expect(notificationRepository.send).to.have.been.calledWithExactly({
+        expect(notificationRepository.envoyer).to.have.callCount(1)
+        expect(notificationRepository.envoyer).to.have.been.calledWithExactly({
           token: 'unToken',
           notification: {
             title: 'Boulanger en alternance',

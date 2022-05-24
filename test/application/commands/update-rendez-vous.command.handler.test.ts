@@ -32,7 +32,7 @@ describe('UpdateRendezVousCommandHandler', () => {
   DatabaseForTesting.prepare()
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
-  let notificationRepository: StubbedType<Notification.Repository>
+  let notificationRepository: StubbedType<Notification.Service>
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let mailService: StubbedType<Mail.Service>
   let planificateurService: StubbedClass<PlanificateurService>
@@ -83,7 +83,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         const result = await updateRendezVousCommandHandler.handle(command)
         // Then
         expect(rendezVousRepository.save).to.have.callCount(0)
-        expect(notificationRepository.send).to.have.callCount(0)
+        expect(notificationRepository.envoyer).to.have.callCount(0)
         expect(result).to.deep.equal(
           failure(new NonTrouveError('RendezVous', command.idRendezVous))
         )
@@ -104,7 +104,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         const result = await updateRendezVousCommandHandler.handle(command)
         // Then
         expect(rendezVousRepository.save).to.have.callCount(0)
-        expect(notificationRepository.send).to.have.callCount(0)
+        expect(notificationRepository.envoyer).to.have.callCount(0)
         expect(result).to.deep.equal(
           failure(
             new MauvaiseCommandeError(
@@ -132,7 +132,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         const result = await updateRendezVousCommandHandler.handle(command)
         // Then
         expect(rendezVousRepository.save).to.have.callCount(0)
-        expect(notificationRepository.send).to.have.callCount(0)
+        expect(notificationRepository.envoyer).to.have.callCount(0)
         expect(result).to.deep.equal(
           failure(new NonTrouveError('Jeune', idJeuneNonTrouve))
         )
@@ -303,7 +303,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         // When
         await updateRendezVousCommandHandler.handle(command)
         // Then
-        expect(notificationRepository.send).to.have.callCount(0)
+        expect(notificationRepository.envoyer).to.have.callCount(0)
         expect(
           planificateurService.supprimerRappelsRendezVous
         ).not.to.have.been.calledWith(rendezVousUpdated)
@@ -328,7 +328,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         await updateRendezVousCommandHandler.handle(command)
 
         // Then
-        expect(notificationRepository.send).to.have.been.calledWith(
+        expect(notificationRepository.envoyer).to.have.been.calledWith(
           Notification.createRendezVousMisAJour(
             jeune.pushNotificationToken,
             rendezVousUpdated.id
@@ -358,7 +358,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         // When
         await updateRendezVousCommandHandler.handle(command)
         // Then
-        expect(notificationRepository.send).to.have.been.calledWith(
+        expect(notificationRepository.envoyer).to.have.been.calledWith(
           Notification.createNouveauRdv(
             jeuneAjoute.pushNotificationToken,
             rendezVousUpdated.id
@@ -387,7 +387,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         expect(rendezVousRepository.save).to.have.been.calledWith(
           rendezVousUpdated
         )
-        expect(notificationRepository.send).to.have.been.calledWith(
+        expect(notificationRepository.envoyer).to.have.been.calledWith(
           Notification.createRdvSupprime(
             jeuneSupprime.pushNotificationToken,
             rendezVous.date

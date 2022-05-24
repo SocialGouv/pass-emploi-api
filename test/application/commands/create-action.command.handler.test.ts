@@ -24,7 +24,7 @@ describe('CreateActionCommandHandler', () => {
   let action: Action
   let jeune: Required<Omit<Jeune, 'tokenLastUpdate' | 'idDossier'>>
   let actionRepository: StubbedType<Action.Repository>
-  let notificationRepository: StubbedType<Notification.Repository>
+  let notificationRepository: StubbedType<Notification.Service>
   let actionFactory: StubbedClass<Action.Factory>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
@@ -95,7 +95,7 @@ describe('CreateActionCommandHandler', () => {
           await createActionCommandHandler.handle(command)
 
           // Then
-          expect(notificationRepository.send).to.have.callCount(0)
+          expect(notificationRepository.envoyer).to.have.callCount(0)
         })
       })
       describe("quand c'est un conseiller", () => {
@@ -115,7 +115,7 @@ describe('CreateActionCommandHandler', () => {
           await createActionCommandHandler.handle(command)
 
           // Then
-          expect(notificationRepository.send).to.have.been.calledWithExactly(
+          expect(notificationRepository.envoyer).to.have.been.calledWithExactly(
             Notification.createNouvelleAction(
               jeune.pushNotificationToken,
               action.id

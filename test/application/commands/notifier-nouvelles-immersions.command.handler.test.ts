@@ -21,7 +21,7 @@ describe('NotifierNouvellesImmersionsCommandHandler', () => {
   const recherche = uneRecherche()
   let rechercheRepository: StubbedType<Recherche.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
-  let notificationRepository: StubbedType<Notification.Repository>
+  let notificationRepository: StubbedType<Notification.Service>
 
   beforeEach(async () => {
     rechercheRepository = stubInterface(sandbox)
@@ -63,7 +63,7 @@ describe('NotifierNouvellesImmersionsCommandHandler', () => {
           await notifierNouvellesImmersionsCommandHandler.handle(command)
 
           // Then
-          expect(notificationRepository.send).to.have.been.calledWithExactly(
+          expect(notificationRepository.envoyer).to.have.been.calledWithExactly(
             Notification.createNouvelleOffre(
               jeune.pushNotificationToken,
               recherche.id,
@@ -83,7 +83,7 @@ describe('NotifierNouvellesImmersionsCommandHandler', () => {
           await notifierNouvellesImmersionsCommandHandler.handle(command)
 
           // Then
-          expect(notificationRepository.send).to.have.callCount(0)
+          expect(notificationRepository.envoyer).to.have.callCount(0)
         })
       })
     })

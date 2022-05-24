@@ -36,7 +36,7 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
     @Inject(OffresEmploiRepositoryToken)
     private offresEmploiRepository: OffresEmploi.Repository,
     @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository,
+    private notificationRepository: Notification.Service,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     private configuration: ConfigService
@@ -98,7 +98,7 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
                   recherche.id,
                   recherche.titre
                 )
-                await this.notificationRepository.send(notification)
+                await this.notificationRepository.envoyer(notification)
               }
             }
           }

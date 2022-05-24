@@ -3,10 +3,29 @@ import { Notification } from '../../domain/notification'
 import { FirebaseClient } from '../clients/firebase-client'
 
 @Injectable()
-export class NotificationFirebaseRepository implements Notification.Repository {
-  constructor(private firebaseClient: FirebaseClient) {}
+export class NotificationFirebaseRepository extends Notification.Service {
+  constructor(private firebaseClient: FirebaseClient) {
+    super()
+  }
 
-  async send(message: Notification.Message): Promise<void> {
+  async envoyer(message: Notification.Message): Promise<void> {
     this.firebaseClient.send(message)
+  }
+
+  createContenuPushNouveauRdv(
+    token: string,
+    idRdv: string
+  ): Notification.Message {
+    return {
+      token,
+      notification: {
+        title: 'Nouveau rendez-vous',
+        body: 'Votre conseiller a programmé un nouveau rendez-vous'
+      },
+      data: {
+        type: Notification.Type.NEW_RENDEZVOUS,
+        id: idRdv
+      }
+    }
   }
 }

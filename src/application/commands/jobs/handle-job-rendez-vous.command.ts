@@ -32,7 +32,7 @@ export class HandleJobRendezVousCommandHandler extends CommandHandler<
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
     @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository,
+    private notificationRepository: Notification.Service,
     private dateService: DateService
   ) {
     super('HandleJobRendezVousCommandHandler')
@@ -59,7 +59,7 @@ export class HandleJobRendezVousCommandHandler extends CommandHandler<
               DateTime.fromJSDate(rendezVous.date),
               this.dateService
             )
-            await this.notificationRepository.send(notification)
+            await this.notificationRepository.envoyer(notification)
             stats.push({ idJeune: jeune.id, notificationEnvoyee: true })
           }
         })

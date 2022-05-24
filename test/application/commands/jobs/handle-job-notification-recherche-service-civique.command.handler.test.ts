@@ -25,7 +25,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
   describe('handle', () => {
     let rechercheRepository: StubbedType<Recherche.Repository>
     let jeuneRepository: StubbedType<Jeune.Repository>
-    let notificationRepository: StubbedType<Notification.Repository>
+    let notificationRepository: StubbedType<Notification.Service>
     let offreEngagementRepository: StubbedType<OffreServiceCivique.Repository>
     let dateService: StubbedClass<DateService>
 
@@ -153,17 +153,19 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
 
         it('notifie le jeune', async () => {
           // Then
-          expect(notificationRepository.send).to.have.been.calledWithExactly({
-            token: 'unToken',
-            notification: {
-              title: 'Boulanger en alternance',
-              body: 'De nouveaux résultats sont disponibles'
-            },
-            data: {
-              type: 'NOUVELLE_OFFRE',
-              id: '219e8ba5-cd88-4027-9828-55e8ca99a236'
+          expect(notificationRepository.envoyer).to.have.been.calledWithExactly(
+            {
+              token: 'unToken',
+              notification: {
+                title: 'Boulanger en alternance',
+                body: 'De nouveaux résultats sont disponibles'
+              },
+              data: {
+                type: 'NOUVELLE_OFFRE',
+                id: '219e8ba5-cd88-4027-9828-55e8ca99a236'
+              }
             }
-          })
+          )
         })
 
         it('met à jour la recherche', async () => {

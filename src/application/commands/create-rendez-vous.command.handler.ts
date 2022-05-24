@@ -49,7 +49,7 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository,
+    private notificationRepository: Notification.Service,
     @Inject(MailServiceToken)
     private mailService: Mail.Service,
     private conseillerAuthorizer: ConseillerAuthorizer,
@@ -83,7 +83,7 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     )
     await this.rendezVousRepository.save(rendezVous)
 
-    this.notifierLesJeunes(rendezVous)
+    this.notificationRepository.notifier(rendezVous, this.logger)
     this.planifierLesRappelsDeRendezVous(rendezVous)
     if (rendezVous.invitation) {
       this.envoyerLesInvitationsCalendaires(
@@ -136,22 +136,6 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       )
       this.apmService.captureError(e)
     }
-  }
-
-  private notifierLesJeunes(rendezVous: RendezVous): void {
-    rendezVous.jeunes.forEach(jeune => {
-      if (jeune.pushNotificationToken) {
-        const notification = Notification.createNouveauRdv(
-          jeune.pushNotificationToken,
-          rendezVous.id
-        )
-        this.notificationRepository.send(notification)
-      } else {
-        this.logger.log(
-          `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
-        )
-      }
-    })
   }
 
   async authorize(

@@ -35,7 +35,7 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository,
+    private notificationRepository: Notification.Service,
     private rendezVousAuthorizer: RendezVousAuthorizer,
     private planificateurService: PlanificateurService,
     @Inject(MailServiceToken)
@@ -59,7 +59,7 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
             jeune.pushNotificationToken,
             rendezVous.date
           )
-          await this.notificationRepository.send(notification)
+          await this.notificationRepository.envoyer(notification)
         } else {
           this.logger.log(
             `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`

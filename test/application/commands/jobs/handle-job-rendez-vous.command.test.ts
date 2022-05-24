@@ -15,7 +15,7 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 describe('HandlerJobRendezVousCommandHandler', () => {
   let handlerJobRendezVousCommandHandler: HandleJobRendezVousCommandHandler
   let rendezVousRepository: StubbedType<RendezVous.Repository>
-  let notificationRepository: StubbedType<Notification.Repository>
+  let notificationRepository: StubbedType<Notification.Service>
   let dateSevice: StubbedClass<DateService>
   const today = DateTime.fromISO('2022-04-06T12:00:00.000Z').toUTC()
 
@@ -53,7 +53,7 @@ describe('HandlerJobRendezVousCommandHandler', () => {
       await handlerJobRendezVousCommandHandler.handle(command)
 
       // Then
-      expect(notificationRepository.send).to.have.callCount(0)
+      expect(notificationRepository.envoyer).to.have.callCount(0)
     })
   })
 
@@ -82,7 +82,7 @@ describe('HandlerJobRendezVousCommandHandler', () => {
       await handlerJobRendezVousCommandHandler.handle(command)
 
       // Then
-      expect(notificationRepository.send).to.have.callCount(0)
+      expect(notificationRepository.envoyer).to.have.callCount(0)
     })
   })
 
@@ -111,7 +111,7 @@ describe('HandlerJobRendezVousCommandHandler', () => {
       await handlerJobRendezVousCommandHandler.handle(command)
 
       // Then
-      expect(notificationRepository.send).to.have.been.calledWith({
+      expect(notificationRepository.envoyer).to.have.been.calledWith({
         token: 'unToken',
         notification: {
           title: 'Rappel rendez-vous',
@@ -150,7 +150,7 @@ describe('HandlerJobRendezVousCommandHandler', () => {
       await handlerJobRendezVousCommandHandler.handle(command)
 
       // Then
-      expect(notificationRepository.send).to.have.been.calledWithExactly({
+      expect(notificationRepository.envoyer).to.have.been.calledWithExactly({
         token: 'unToken',
         notification: {
           title: 'Rappel rendez-vous',

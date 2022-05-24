@@ -49,7 +49,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository,
+    private notificationRepository: Notification.Service,
     @Inject(MailServiceToken)
     private mailClient: Mail.Service,
     @Inject(ConseillersRepositoryToken)
@@ -172,7 +172,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
           jeune.pushNotificationToken,
           rendezVous.id
         )
-        this.notificationRepository.send(notification)
+        this.notificationRepository.envoyer(notification)
       } else {
         this.logger.log(
           `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
@@ -186,7 +186,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
           jeune.pushNotificationToken,
           rendezVous.date
         )
-        this.notificationRepository.send(notification)
+        this.notificationRepository.envoyer(notification)
       } else {
         this.logger.log(
           `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
@@ -201,7 +201,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
             jeune.pushNotificationToken,
             rendezVous.id
           )
-          this.notificationRepository.send(notification)
+          this.notificationRepository.envoyer(notification)
         } else {
           this.logger.log(
             `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`

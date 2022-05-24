@@ -39,7 +39,7 @@ export class CreateActionCommandHandler extends CommandHandler<
     @Inject(JeunesRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository,
     @Inject(NotificationRepositoryToken)
-    private readonly notificationRepository: Notification.Repository,
+    private readonly notificationRepository: Notification.Service,
     private readonly actionFactory: Action.Factory,
     private readonly jeuneAuthorizer: JeuneAuthorizer,
     private readonly conseillerAuthorizer: ConseillerAuthorizer,
@@ -116,7 +116,7 @@ export class CreateActionCommandHandler extends CommandHandler<
     action: Action
   ): Promise<void> {
     const notification = Notification.createNouvelleAction(token, action.id)
-    await this.notificationRepository.send(notification)
+    await this.notificationRepository.envoyer(notification)
     this.logger.log('Notification envoyée')
   }
 }

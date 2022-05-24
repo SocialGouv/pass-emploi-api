@@ -36,7 +36,7 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository,
+    private notificationRepository: Notification.Service,
     @Inject(OffreServiceCiviqueRepositoryToken)
     private offreEngagementRepository: OffreServiceCivique.Repository,
     private dateService: DateService
@@ -138,7 +138,7 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
         recherche.id,
         recherche.titre
       )
-      await this.notificationRepository.send(notification)
+      await this.notificationRepository.envoyer(notification)
     }
   }
 

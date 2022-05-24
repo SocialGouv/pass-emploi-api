@@ -21,7 +21,7 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
   const jeune1 = unJeune({ id: '1' })
   const jeune2 = unJeune({ id: '2' })
   const jeuneRepository: StubbedType<Jeune.Repository> = stubInterface(sandbox)
-  const notificationRepository: StubbedType<Notification.Repository> =
+  const notificationRepository: StubbedType<Notification.Service> =
     stubInterface(sandbox)
   const conseillerAuthorizer = stubClass(ConseillerAuthorizer)
 
@@ -49,10 +49,10 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
         // When
         await sendNotificationsNouveauxMessagesCommandHandler.handle(command)
         // Then
-        expect(notificationRepository.send).to.have.been.calledWithExactly(
+        expect(notificationRepository.envoyer).to.have.been.calledWithExactly(
           Notification.createNouveauMessage(jeune1.pushNotificationToken)
         )
-        expect(notificationRepository.send).to.have.been.calledWithExactly(
+        expect(notificationRepository.envoyer).to.have.been.calledWithExactly(
           Notification.createNouveauMessage(jeune2.pushNotificationToken)
         )
       })
@@ -76,10 +76,12 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
           await sendNotificationsNouveauxMessagesCommandHandler.handle(command)
         // Then
         expect(result).to.deep.equal(emptySuccess())
-        expect(notificationRepository.send).not.to.have.been.calledWithExactly(
+        expect(
+          notificationRepository.envoyer
+        ).not.to.have.been.calledWithExactly(
           Notification.createNouveauMessage(jeune.pushNotificationToken)
         )
-        expect(notificationRepository.send).to.have.been.calledWithExactly(
+        expect(notificationRepository.envoyer).to.have.been.calledWithExactly(
           Notification.createNouveauMessage(jeune2.pushNotificationToken)
         )
       })
