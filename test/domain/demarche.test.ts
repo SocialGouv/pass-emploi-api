@@ -22,7 +22,7 @@ describe('Demarche', () => {
 
         // When
         const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
-          demarche,
+          demarche.id,
           Demarche.Statut.EN_COURS
         )
 
@@ -44,8 +44,9 @@ describe('Demarche', () => {
           })
           // When
           const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
-            demarche,
-            Demarche.Statut.REALISEE
+            demarche.id,
+            Demarche.Statut.REALISEE,
+            demarche.dateDebut
           )
 
           // Then
@@ -67,8 +68,9 @@ describe('Demarche', () => {
           })
           // When
           const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
-            demarche,
-            Demarche.Statut.REALISEE
+            demarche.id,
+            Demarche.Statut.REALISEE,
+            demarche.dateDebut
           )
 
           // Then
@@ -88,8 +90,9 @@ describe('Demarche', () => {
           })
           // When
           const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
-            demarche,
-            Demarche.Statut.REALISEE
+            demarche.id,
+            Demarche.Statut.REALISEE,
+            demarche.dateDebut
           )
 
           // Then
@@ -109,8 +112,9 @@ describe('Demarche', () => {
         const demarche = uneDemarche()
         // When
         const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
-          demarche,
-          Demarche.Statut.A_FAIRE
+          demarche.id,
+          Demarche.Statut.A_FAIRE,
+          demarche.dateDebut
         )
 
         // Then
@@ -128,8 +132,9 @@ describe('Demarche', () => {
         const demarche = uneDemarche()
         // When
         const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
-          demarche,
-          Demarche.Statut.ANNULEE
+          demarche.id,
+          Demarche.Statut.ANNULEE,
+          demarche.dateDebut
         )
 
         // Then

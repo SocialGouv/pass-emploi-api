@@ -1,10 +1,12 @@
 import { HttpService } from '@nestjs/axios'
-import { expect } from 'chai'
 import * as nock from 'nock'
 import { testConfig } from '../../utils/module-for-testing'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { PoleEmploiPartenaireClient } from '../../../src/infrastructure/clients/pole-emploi-partenaire-client'
 import { uneDemarcheDto } from '../../fixtures/demarches-dto.fixtures'
+import { Demarche } from '../../../src/domain/demarche'
+import { isSuccess } from '../../../src/building-blocks/types/result'
+import { expect } from '../../utils'
 
 describe('PoleEmploiPartenaireClient', () => {
   let poleEmploiPartenaireClient: PoleEmploiPartenaireClient
@@ -129,6 +131,89 @@ describe('PoleEmploiPartenaireClient', () => {
 
         // Then
         expect(demarcheDtos).to.deep.equal([])
+      })
+    })
+  })
+
+  describe('updateDemarche', () => {
+    const demarcheDto = uneDemarcheDto()
+
+    describe('quand tout fonctionne', () => {
+      describe('statut en cours', () => {
+        it('construit le payload et met à jour la démarche', async () => {
+          // Given
+          const tokenJeune = 'token'
+          const demarcheModifiee: Demarche.Modifiee = {
+            id: 'idDemarche',
+            statut: Demarche.Statut.EN_COURS,
+            dateModification: uneDatetime,
+            dateDebut: uneDatetime
+          }
+          const body = {
+            id: demarcheModifiee.id,
+            dateModification: '2020-04-06T12:00:00.000',
+            origineModificateur: 'INDIVIDU',
+            etat: 'AC',
+            dateDebut: '2020-04-06T12:00:00.000',
+            dateFin: undefined,
+            dateAnnulation: undefined
+          }
+
+          nock('https://api-r.es-qvr.fr/partenaire')
+            .put('/peconnect-demarches/v1/demarches/idDemarche', body)
+            .reply(200, demarcheDto)
+            .isDone()
+
+          // When
+          const result = await poleEmploiPartenaireClient.updateDemarche(
+            demarcheModifiee,
+            tokenJeune
+          )
+
+          // Then
+          expect(isSuccess(result)).to.be.true()
+          if (isSuccess(result)) {
+            expect(result.data).to.deep.equal(demarcheDto)
+          }
+        })
+      })
+      describe('statut à faire', () => {
+        it('construit le payload et met à jour la démarche', async () => {
+          // Given
+          const tokenJeune = 'token'
+          const demarcheModifiee: Demarche.Modifiee = {
+            id: 'idDemarche',
+            statut: Demarche.Statut.A_FAIRE,
+            dateModification: uneDatetime,
+            dateDebut: null
+          }
+          const body = {
+            id: demarcheModifiee.id,
+            dateModification: '2020-04-06T12:00:00.000',
+            origineModificateur: 'INDIVIDU',
+            etat: 'AC',
+            dateDebut: null,
+            dateFin: undefined,
+            dateAnnulation: undefined
+          }
+
+          nock('https://api-r.es-qvr.fr/partenaire')
+            .put('/peconnect-demarches/v1/demarches/idDemarche', body)
+            .reply(200, demarcheDto)
+            .isDone()
+
+          // When
+          const result = await poleEmploiPartenaireClient.updateDemarche(
+            demarcheModifiee,
+            tokenJeune
+          )
+
+          // Then
+          expect(isSuccess(result)).to.be.true()
+          if (isSuccess(result)) {
+            expect(result.data).to.deep.equal(demarcheDto)
+          }
+        })
       })
     })
   })
