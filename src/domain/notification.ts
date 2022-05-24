@@ -7,10 +7,15 @@ export const NotificationRepositoryToken = 'NotificationRepositoryToken'
 
 export namespace Notification {
   export abstract class Service {
-    async notifier(rendezVous: RendezVous, logger: Logger): Promise<void> {
+    async envoyerNotificationsPushJeunes(
+      type: Notification.Type,
+      rendezVous: RendezVous,
+      logger: Logger
+    ): Promise<void> {
       rendezVous.jeunes.forEach(jeune => {
         if (jeune.pushNotificationToken) {
-          const messagePush = this.createContenuPushNouveauRdv(
+          const messagePush = this.creerContenuPush(
+            type,
             jeune.pushNotificationToken,
             rendezVous.id
           )
@@ -23,9 +28,10 @@ export namespace Notification {
       })
     }
     abstract envoyer(message: Notification.Message): Promise<void>
-    abstract createContenuPushNouveauRdv(
-      token: string,
-      idRdv: string
+    abstract creerContenuPush(
+      typeNotification: Notification.Type,
+      pushNotificationToken: string,
+      id: string
     ): Notification.Message
   }
 

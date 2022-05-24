@@ -83,7 +83,11 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     )
     await this.rendezVousRepository.save(rendezVous)
 
-    this.notificationRepository.notifier(rendezVous, this.logger)
+    this.notificationRepository.envoyerNotificationsPushJeunes(
+      Notification.Type.NEW_RENDEZVOUS,
+      rendezVous,
+      this.logger
+    )
     this.planifierLesRappelsDeRendezVous(rendezVous)
     if (rendezVous.invitation) {
       this.envoyerLesInvitationsCalendaires(
