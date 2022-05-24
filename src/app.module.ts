@@ -162,6 +162,9 @@ import { GetJeuneHomeDemarchesQueryHandler } from './application/queries/get-jeu
 import { GetJeuneHomeActionsQueryHandler } from './application/queries/get-jeune-home-actions.query.handler'
 import { GetCampagneQueryModel } from './application/queries/query-getters/get-campagne.query.getter'
 import { CreateEvaluationCommandHandler } from './application/commands/create-evaluation.command'
+import { DemarcheHttpRepository } from './infrastructure/repositories/demarche-http.repository'
+import { Demarche, DemarcheRepositoryToken } from './domain/demarche'
+import { UpdateDemarcheCommandHandler } from './application/commands/update-demarche.commande.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -208,6 +211,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Mail.Factory,
     Authentification.Factory,
     Campagne.Factory,
+    Demarche.Factory,
     WorkerService,
     TaskService,
     InvitationIcsClient,
@@ -291,6 +295,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: CampagneRepositoryToken,
       useClass: CampagneSqlRepository
+    },
+    {
+      provide: DemarcheRepositoryToken,
+      useClass: DemarcheHttpRepository
     },
     ...databaseProviders
   ],
@@ -383,7 +391,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetJeuneHomeDemarchesQueryHandler,
     GetJeuneHomeActionsQueryHandler,
     GetCampagneQueryModel,
-    CreateEvaluationCommandHandler
+    CreateEvaluationCommandHandler,
+    UpdateDemarcheCommandHandler
   ]
 }
 

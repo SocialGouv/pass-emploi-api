@@ -19,25 +19,6 @@ export interface Action {
   createur: Action.Createur
 }
 
-export namespace ActionPoleEmploi {
-  export enum Statut {
-    EN_COURS = 'EN_COURS',
-    A_FAIRE = 'A_FAIRE',
-    REALISEE = 'REALISEE',
-    ANNULEE = 'ANNULEE'
-  }
-
-  export interface Code {
-    quoi: string
-    pourquoi: string
-    comment?: string
-  }
-
-  export function toBase64(code: Code): string {
-    return Buffer.from(JSON.stringify(code)).toString('base64')
-  }
-}
-
 export namespace Action {
   export type Id = Brand<string, 'IdAction'>
   export type IdCreateur = string | Jeune.Id

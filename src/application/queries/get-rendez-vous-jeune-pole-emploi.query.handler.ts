@@ -14,16 +14,16 @@ import { IdService } from 'src/utils/id-service'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
-import {
-  PoleEmploiPartenaireClient,
-  PrestationDto,
-  RendezVousPoleEmploiDto
-} from '../../infrastructure/clients/pole-emploi-partenaire-client'
+import { PoleEmploiPartenaireClient } from '../../infrastructure/clients/pole-emploi-partenaire-client'
 import { buildError } from '../../utils/logger.module'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
 import { fromRendezVousDtoToRendezVousQueryModel } from './query-mappers/rendez-vous-pole-emploi.mappers'
 import { fromPrestationDtoToRendezVousQueryModel } from './query-mappers/rendez-vous-prestation.mappers'
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-models'
+import {
+  PrestationDto,
+  RendezVousPoleEmploiDto
+} from '../../infrastructure/clients/dto/pole-emploi.dto'
 
 export interface GetRendezVousJeunePoleEmploiQuery extends Query {
   idJeune: string

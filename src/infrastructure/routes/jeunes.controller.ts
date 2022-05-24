@@ -59,8 +59,8 @@ import { GetConseillersJeuneQueryHandler } from '../../application/queries/get-c
 import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
 import { GetRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler'
 import {
-  DemarcheQueryModel,
-  ActionQueryModel
+  ActionQueryModel,
+  DemarcheQueryModel
 } from '../../application/queries/query-models/actions.query-model'
 import {
   DroitsInsuffisants,
@@ -89,8 +89,8 @@ import {
   TransfererConseillerPayload
 } from './validation/jeunes.inputs'
 import { GetJeuneHomeActionsQueryHandler } from '../../application/queries/get-jeune-home-actions.query.handler'
-import StatutInvalide = Action.StatutInvalide
 import { GetJeuneHomeDemarchesQueryHandler } from '../../application/queries/get-jeune-home-demarches.query.handler'
+import StatutInvalide = Action.StatutInvalide
 
 @Controller('jeunes')
 @ApiOAuth2([])

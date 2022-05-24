@@ -4,7 +4,6 @@ import {
   NonTrouveError
 } from 'src/building-blocks/types/domain-error'
 import { failure, Result, success } from 'src/building-blocks/types/result'
-import { ActionPoleEmploi } from 'src/domain/action'
 import { Authentification } from 'src/domain/authentification'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
 import { DateService } from 'src/utils/date-service'
@@ -13,8 +12,9 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
 import { PoleEmploiPartenaireClient } from '../../infrastructure/clients/pole-emploi-partenaire-client'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
-import { fromDemarcheDtoToDemarcheQueryModel } from './query-mappers/actions-pole-emploi.mappers'
+import { fromDemarcheDtoToDemarche } from './query-mappers/actions-pole-emploi.mappers'
 import { DemarcheQueryModel } from './query-models/actions.query-model'
+import { Demarche } from '../../domain/demarche'
 
 export interface GetActionsJeunePoleEmploiQuery extends Query {
   idJeune: string
@@ -55,7 +55,7 @@ export class GetActionsJeunePoleEmploiQueryHandler extends QueryHandler<
 
       const demarches = demarchesDto
         .map(demarcheDto =>
-          fromDemarcheDtoToDemarcheQueryModel(demarcheDto, this.dateService)
+          fromDemarcheDtoToDemarche(demarcheDto, this.dateService)
         )
         .sort(compareDemarchesByStatutOrDateFin)
 
@@ -93,7 +93,7 @@ function compareDemarchesByStatutOrDateFin(
   )
 }
 
-const statutsOrder: { [statut in ActionPoleEmploi.Statut]: number } = {
+const statutsOrder: { [statut in Demarche.Statut]: number } = {
   A_FAIRE: 1,
   EN_COURS: 1,
   ANNULEE: 2,

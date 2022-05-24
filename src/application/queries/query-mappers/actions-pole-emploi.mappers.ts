@@ -1,17 +1,16 @@
-import { ActionPoleEmploi } from 'src/domain/action'
-import { DemarcheDto } from 'src/infrastructure/clients/pole-emploi-partenaire-client'
 import { DateService } from 'src/utils/date-service'
+import { Demarche } from '../../../domain/demarche'
 import {
-  DemarcheQueryModel,
-  AttributDemarcheQueryModel
-} from '../query-models/actions.query-model'
+  DemarcheDto,
+  DemarcheDtoEtat
+} from '../../../infrastructure/clients/dto/pole-emploi.dto'
 
-export function fromDemarcheDtoToDemarcheQueryModel(
+export function fromDemarcheDtoToDemarche(
   demarcheDto: DemarcheDto,
   dateService: DateService
-): DemarcheQueryModel {
+): Demarche {
   return {
-    id: demarcheDto.id,
+    id: demarcheDto.idDemarche,
     codeDemarche: codeEnBase64(demarcheDto),
     contenu: demarcheDto.libelleCourt,
     dateModification: demarcheDto.dateModification
@@ -19,6 +18,12 @@ export function fromDemarcheDtoToDemarcheQueryModel(
       : undefined,
     statut: buildStatut(demarcheDto, dateService),
     dateFin: dateService.fromISOStringToUTCJSDate(demarcheDto.dateFin),
+    dateDebut: demarcheDto.dateDebut
+      ? dateService.fromISOStringToUTCJSDate(demarcheDto.dateDebut)
+      : undefined,
+    dateAnnulation: demarcheDto.dateAnnulation
+      ? dateService.fromISOStringToUTCJSDate(demarcheDto.dateAnnulation)
+      : undefined,
     label: demarcheDto.libellePourquoi,
     titre: demarcheDto.libelleQuoi,
     sousTitre: demarcheDto.libelleComment,
@@ -32,46 +37,41 @@ export function fromDemarcheDtoToDemarcheQueryModel(
   }
 }
 
-function buildStatutsPossibles(
-  demarcheDto: DemarcheDto
-): ActionPoleEmploi.Statut[] {
-  const statuts: ActionPoleEmploi.Statut[] = []
+function buildStatutsPossibles(demarcheDto: DemarcheDto): Demarche.Statut[] {
+  const statuts: Demarche.Statut[] = []
 
   if (demarcheDto.droitsDemarche?.annulation) {
-    statuts.push(ActionPoleEmploi.Statut.ANNULEE)
+    statuts.push(Demarche.Statut.ANNULEE)
   }
 
   if (demarcheDto.droitsDemarche?.realisation) {
-    statuts.push(ActionPoleEmploi.Statut.REALISEE)
+    statuts.push(Demarche.Statut.REALISEE)
   }
 
   if (
     (demarcheDto.etat === 'AC' &&
       demarcheDto.droitsDemarche?.modificationDate) ||
-    (demarcheDto.etat === 'RE' &&
-      demarcheDto.droitsDemarche?.replanificationDate)
+    (demarcheDto.etat === 'RE' && demarcheDto.droitsDemarche?.replanification)
   ) {
-    statuts.push(ActionPoleEmploi.Statut.A_FAIRE)
-    statuts.push(ActionPoleEmploi.Statut.EN_COURS)
+    statuts.push(Demarche.Statut.A_FAIRE)
+    statuts.push(Demarche.Statut.EN_COURS)
   }
 
   return statuts
 }
 
 function codeEnBase64(demarcheDto: DemarcheDto): string {
-  const code: ActionPoleEmploi.Code = {
+  const code: Demarche.Code = {
     quoi: demarcheDto.quoi,
     pourquoi: demarcheDto.pourquoi,
     comment: demarcheDto.comment
   }
 
-  return ActionPoleEmploi.toBase64(code)
+  return Demarche.toBase64(code)
 }
 
-function buildAttributs(
-  demarcheDto: DemarcheDto
-): AttributDemarcheQueryModel[] {
-  const attributs: AttributDemarcheQueryModel[] = []
+function buildAttributs(demarcheDto: DemarcheDto): Demarche.Attribut[] {
+  const attributs: Demarche.Attribut[] = []
 
   if (demarcheDto.organisme) {
     attributs.push({
@@ -119,21 +119,21 @@ function buildAttributs(
 function buildStatut(
   demarcheDto: DemarcheDto,
   dateService: DateService
-): ActionPoleEmploi.Statut {
+): Demarche.Statut {
   const maintenant = dateService.nowJs().getTime()
   const debut = demarcheDto.dateDebut
     ? new Date(demarcheDto.dateDebut).getTime()
     : undefined
 
   switch (demarcheDto.etat) {
-    case 'AC':
-    case 'AF':
-    case 'EC':
-      if (!debut || debut < maintenant) return ActionPoleEmploi.Statut.EN_COURS
-      return ActionPoleEmploi.Statut.A_FAIRE
-    case 'RE':
-      return ActionPoleEmploi.Statut.REALISEE
-    case 'AN':
-      return ActionPoleEmploi.Statut.ANNULEE
+    case DemarcheDtoEtat.AC:
+    case DemarcheDtoEtat.AF:
+    case DemarcheDtoEtat.EC:
+      if (!debut || debut < maintenant) return Demarche.Statut.EN_COURS
+      return Demarche.Statut.A_FAIRE
+    case DemarcheDtoEtat.RE:
+      return Demarche.Statut.REALISEE
+    case DemarcheDtoEtat.AN:
+      return Demarche.Statut.ANNULEE
   }
 }
