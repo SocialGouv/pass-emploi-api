@@ -7,16 +7,17 @@ import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-e
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Demarche, DemarcheRepositoryToken } from '../../domain/demarche'
 
-export interface UpdateDemarcheCommand extends Command {
+export interface UpdateStatutDemarcheCommand extends Command {
   idJeune: string
   accessToken: string
-  demarcheInitiale: Demarche
-  statut?: Demarche.Statut
+  idDemarche: string
+  dateDebut?: Date
+  statut: Demarche.Statut
 }
 
 @Injectable()
-export class UpdateDemarcheCommandHandler extends CommandHandler<
-  UpdateDemarcheCommand,
+export class UpdateStatutDemarcheCommandHandler extends CommandHandler<
+  UpdateStatutDemarcheCommand,
   Demarche
 > {
   constructor(
@@ -26,22 +27,28 @@ export class UpdateDemarcheCommandHandler extends CommandHandler<
     @Inject(DemarcheRepositoryToken)
     private demarcheRepository: Demarche.Repository
   ) {
-    super('UpdateDemarcheCommandHandler')
+    super('UpdateStatutDemarcheCommandHandler')
   }
 
   async authorize(
-    command: UpdateDemarcheCommand,
+    command: UpdateStatutDemarcheCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     await this.jeunePoleEmploiAuthorizer.authorize(command.idJeune, utilisateur)
   }
 
-  async handle(command: UpdateDemarcheCommand): Promise<Result<Demarche>> {
-    const demarche = this.demarcheFactory.mettreAJourLeStatut(
-      command.demarcheInitiale,
-      command.statut!
+  async handle(
+    command: UpdateStatutDemarcheCommand
+  ): Promise<Result<Demarche>> {
+    const demarcheMiseAJour = this.demarcheFactory.mettreAJourLeStatut(
+      command.idDemarche,
+      command.statut,
+      command.dateDebut
     )
-    return this.demarcheRepository.update(demarche, command.accessToken)
+    return this.demarcheRepository.update(
+      demarcheMiseAJour,
+      command.accessToken
+    )
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

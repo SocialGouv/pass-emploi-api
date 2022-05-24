@@ -1,6 +1,6 @@
 import {
-  UpdateDemarcheCommand,
-  UpdateDemarcheCommandHandler
+  UpdateStatutDemarcheCommand,
+  UpdateStatutDemarcheCommandHandler
 } from '../../../src/application/commands/update-demarche.commande.handler'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
@@ -19,7 +19,7 @@ import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { uneDemarche } from '../../fixtures/demarche.fixture'
 
 describe('UpdateDemarcheCommandHandler', () => {
-  let updateDemarcheCommandHandler: UpdateDemarcheCommandHandler
+  let updateDemarcheCommandHandler: UpdateStatutDemarcheCommandHandler
   let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
   let evenementService: StubbedClass<EvenementService>
   let demarcheFactory: StubbedClass<Demarche.Factory>
@@ -34,7 +34,7 @@ describe('UpdateDemarcheCommandHandler', () => {
     demarcheFactory = stubClass(Demarche.Factory)
     demarcheRepository = stubInterface(sandbox)
 
-    updateDemarcheCommandHandler = new UpdateDemarcheCommandHandler(
+    updateDemarcheCommandHandler = new UpdateStatutDemarcheCommandHandler(
       jeunePoleEmploiAuthorizer,
       evenementService,
       demarcheFactory,
@@ -44,10 +44,11 @@ describe('UpdateDemarcheCommandHandler', () => {
 
   describe('handle', () => {
     describe('quand il y a un nouveau statut', () => {
-      const command: UpdateDemarcheCommand = {
+      const command: UpdateStatutDemarcheCommand = {
         idJeune: 'idJeune',
         accessToken: 'accessToken',
-        demarcheInitiale: demarche,
+        dateDebut: demarche.dateDebut,
+        idDemarche: demarche.id,
         statut: Demarche.Statut.EN_COURS
       }
 
@@ -61,7 +62,7 @@ describe('UpdateDemarcheCommandHandler', () => {
             dateDebut: uneDatetime
           }
           demarcheFactory.mettreAJourLeStatut
-            .withArgs(demarche, command.statut!)
+            .withArgs(demarche.id, command.statut, demarche.dateDebut)
             .returns(demarcheModifiee)
 
           demarcheRepository.update
@@ -85,7 +86,7 @@ describe('UpdateDemarcheCommandHandler', () => {
             dateDebut: uneDatetime
           }
           demarcheFactory.mettreAJourLeStatut
-            .withArgs(demarche, command.statut!)
+            .withArgs(demarche.id, command.statut!, demarche.dateDebut)
             .returns(demarcheModifiee)
 
           const erreurHttp = failure(new ErreurHttp("C'est mauvais", 400))
@@ -106,10 +107,11 @@ describe('UpdateDemarcheCommandHandler', () => {
   describe('authorize', () => {
     it('autorise les jeunes pole emploi', async () => {
       // Given
-      const command: UpdateDemarcheCommand = {
+      const command: UpdateStatutDemarcheCommand = {
         idJeune: 'idJeune',
         accessToken: 'accessToken',
-        demarcheInitiale: demarche
+        idDemarche: demarche.id,
+        statut: demarche.statut
       }
 
       // When

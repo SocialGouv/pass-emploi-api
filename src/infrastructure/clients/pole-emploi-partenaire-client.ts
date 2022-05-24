@@ -15,6 +15,8 @@ import {
   toEtat
 } from './dto/pole-emploi.dto'
 
+const ORIGINE_MODIFICATEUR = 'INDIVIDU'
+
 @Injectable()
 export class PoleEmploiPartenaireClient {
   private readonly apiUrl: string
@@ -97,9 +99,12 @@ export class PoleEmploiPartenaireClient {
         dateModification: demarcheModifiee.dateModification.toISO({
           includeOffset: false
         }),
-        origineModificateur: 'INDIVIDU',
-        etat: toEtat(demarcheModifiee.statut!),
-        dateDebut: demarcheModifiee.dateDebut?.toISO({ includeOffset: false }),
+        origineModificateur: ORIGINE_MODIFICATEUR,
+        etat: toEtat(demarcheModifiee.statut),
+        dateDebut:
+          demarcheModifiee.dateDebut === null
+            ? null
+            : demarcheModifiee.dateDebut?.toISO({ includeOffset: false }),
         dateFin: demarcheModifiee.dateFin?.toISO({ includeOffset: false }),
         dateAnnulation: demarcheModifiee.dateAnnulation?.toISO({
           includeOffset: false
@@ -113,8 +118,11 @@ export class PoleEmploiPartenaireClient {
       return success(demarcheDto.data)
     } catch (e) {
       this.logger.error(e)
-      const erreur = new ErreurHttp(e.response.data, e.response.status)
-      return failure(erreur)
+      if (e.response?.data && e.response?.status) {
+        const erreur = new ErreurHttp(e.response.data, e.response.status)
+        return failure(erreur)
+      }
+      throw e
     }
   }
 

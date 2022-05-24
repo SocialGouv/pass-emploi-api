@@ -136,13 +136,12 @@ export enum DemarcheDtoEtat {
 
 export function toEtat(statut: Demarche.Statut): DemarcheDtoEtat {
   switch (statut) {
-    case Demarche.Statut.A_FAIRE:
-      return DemarcheDtoEtat.AF
     case Demarche.Statut.ANNULEE:
       return DemarcheDtoEtat.AN
     case Demarche.Statut.REALISEE:
       return DemarcheDtoEtat.RE
     case Demarche.Statut.EN_COURS:
+    case Demarche.Statut.A_FAIRE:
       return DemarcheDtoEtat.AC
   }
 }

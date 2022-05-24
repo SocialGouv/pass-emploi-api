@@ -91,6 +91,11 @@ import {
 import { GetJeuneHomeActionsQueryHandler } from '../../application/queries/get-jeune-home-actions.query.handler'
 import { GetJeuneHomeDemarchesQueryHandler } from '../../application/queries/get-jeune-home-demarches.query.handler'
 import StatutInvalide = Action.StatutInvalide
+import { UpdateStatutDemarchePayload } from './validation/demarches.inputs'
+import {
+  UpdateStatutDemarcheCommand,
+  UpdateStatutDemarcheCommandHandler
+} from '../../application/commands/update-demarche.commande.handler'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -113,7 +118,8 @@ export class JeunesController {
     private readonly deleteJeuneCommandHandler: DeleteJeuneCommandHandler,
     private readonly deleteJeuneInactifCommandHandler: DeleteJeuneInactifCommandHandler,
     private readonly getActionsPoleEmploiQueryHandler: GetActionsJeunePoleEmploiQueryHandler,
-    private readonly getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler
+    private readonly getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler,
+    private readonly updateStatutDemarcheCommandHandler: UpdateStatutDemarcheCommandHandler
   ) {}
 
   @Get(':idJeune')
@@ -251,6 +257,36 @@ export class JeunesController {
       }
     }
     throw new RuntimeException(result.error.message)
+  }
+
+  @Put(':idJeune/demarches/:idDemarche/statut')
+  async udpateStatutDemarche(
+    @Param('idJeune') idJeune: string,
+    @Param('idDemarche') idDemarche: string,
+    @Body() updateDemarchePayload: UpdateStatutDemarchePayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
+  ): Promise<DemarcheQueryModel> {
+    const command: UpdateStatutDemarcheCommand = {
+      ...updateDemarchePayload,
+      idJeune,
+      idDemarche,
+      accessToken
+    }
+    const result = await this.updateStatutDemarcheCommandHandler.execute(
+      command,
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+
+    if (isFailure(result) && result.error instanceof ErreurHttp) {
+      throw new HttpException(result.error.message, result.error.statusCode)
+    }
+
+    throw new RuntimeException()
   }
 
   @ApiOperation({

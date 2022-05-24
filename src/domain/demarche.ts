@@ -28,7 +28,7 @@ export namespace Demarche {
   export interface Modifiee {
     id: string
     dateModification: DateTime
-    statut?: Demarche.Statut
+    statut: Demarche.Statut
     dateDebut?: DateTime | null
     dateFin?: DateTime
     dateAnnulation?: DateTime
@@ -69,22 +69,20 @@ export namespace Demarche {
     constructor(private dateService: DateService) {}
 
     mettreAJourLeStatut(
-      demarcheInitiale: Demarche,
-      statut: Demarche.Statut
+      id: string,
+      statut: Demarche.Statut,
+      dateDebut?: Date
     ): Demarche.Modifiee {
       const maintenant = this.dateService.now()
 
       const demarcheModifiee: Demarche.Modifiee = {
-        id: demarcheInitiale.id,
+        id,
         statut,
         dateModification: maintenant
       }
 
       if (statut === Demarche.Statut.REALISEE) {
-        if (
-          demarcheInitiale.dateDebut &&
-          demarcheInitiale.dateDebut < maintenant.toJSDate()
-        ) {
+        if (dateDebut && dateDebut < maintenant.toJSDate()) {
           return {
             ...demarcheModifiee,
             dateFin: maintenant
