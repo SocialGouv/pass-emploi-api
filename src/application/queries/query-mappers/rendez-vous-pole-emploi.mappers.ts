@@ -3,9 +3,9 @@ import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous
 } from 'src/domain/rendez-vous'
-import { RendezVousPoleEmploiDto } from 'src/infrastructure/clients/pole-emploi-partenaire-client'
 import { IdService } from 'src/utils/id-service'
 import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-models'
+import { RendezVousPoleEmploiDto } from '../../../infrastructure/clients/dto/pole-emploi.dto'
 
 export function fromRendezVousDtoToRendezVousQueryModel(
   rendezVousPoleEmploiDto: RendezVousPoleEmploiDto,

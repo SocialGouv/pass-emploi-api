@@ -9,6 +9,7 @@ export namespace Evenement {
     ACTION_CREEE = 'ACTION_CREEE',
     ACTION_MODIFIEE = 'ACTION_MODIFIEE',
     ACTION_SUPPRIMEE = 'ACTION_SUPPRIMEE',
+    DEMARCHE_MODIFIEE = 'DEMARCHE_MODIFIEE',
     ACTION_LISTE = 'ACTION_LISTE',
     ACTION_DETAIL = 'ACTION_DETAIL',
     OFFRE_EMPLOI_AFFICHEE = 'OFFRE_EMPLOI_AFFICHEE',
@@ -67,6 +68,10 @@ const evenements = {
   [Evenement.Type.ACTION_SUPPRIMEE]: {
     categorie: 'Action',
     action: 'Suppression'
+  },
+  [Evenement.Type.DEMARCHE_MODIFIEE]: {
+    categorie: 'Demarche',
+    action: 'Modification'
   },
   [Evenement.Type.OFFRE_EMPLOI_AFFICHEE]: {
     categorie: 'Offre',

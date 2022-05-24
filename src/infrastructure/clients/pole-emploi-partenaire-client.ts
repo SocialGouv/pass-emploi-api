@@ -5,132 +5,15 @@ import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios
 import * as https from 'https'
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
-
-export interface PrestationDto {
-  annule?: boolean
-  datefin?: string
-  identifiantStable?: string
-  session: {
-    dateDebut: string
-    dateFinPrevue?: string
-    dateLimite?: string
-    enAgence?: boolean
-    infoCollective?: boolean
-    natureAnimation?: 'INTERNE' | 'EXTERNE' | 'CO_ANIMEE'
-    realiteVirtuelle?: boolean
-    modalitePremierRendezVous?: 'WEBCAM' | 'PHYSIQUE'
-    adresse?: {
-      adresseLigne1?: string
-      adresseLigne2?: string
-      adresseLigne3?: string
-      codeInsee?: string
-      codePostal?: string
-      telephone?: string
-      typeLieu?: 'INTERNE' | 'EXTERNE' | 'AUTRE'
-      ville?: string
-      villePostale?: string
-      coordonneesGPS?: {
-        latitude?: number
-        longitude?: number
-      }
-      identifiantAurore?: string
-    }
-    duree: {
-      unite: 'JOUR' | 'HEURE'
-      valeur: number
-    }
-    typePrestation?: {
-      code?: string
-      libelle?: string
-      accroche?: string
-      actif?: boolean
-      descriptifTypePrestation?: string
-    }
-    themeAtelier?: {
-      libelle?: string
-      descriptif?: string
-      accroche?: string
-      code?: string
-      codeTypePrestation?: string
-    }
-    sousThemeAtelier?: {
-      codeSousThemeAtelier?: string
-      libelleSousThemeAtelier?: string
-      descriptifSousThemeAtelier?: string
-    }
-    dureeReunionInformationCollective?: {
-      unite?: string
-      valeur?: number
-    }
-    reunionInfoCommentaire?: string
-    commentaire?: string
-  }
-}
-
-export interface RendezVousPoleEmploiDto {
-  theme?: string
-  date: string
-  heure: string
-  duree: number
-  modaliteContact?: 'VISIO' | 'TELEPHONIQUE' | 'TELEPHONE' | 'AGENCE'
-  nomConseiller?: string
-  prenomConseiller?: string
-  agence?: string
-  adresse?: {
-    bureauDistributeur?: string
-    ligne4?: string
-    ligne5?: string
-    ligne6?: string
-  }
-  commentaire?: string
-  typeRDV?: 'RDVL' | 'CONVOCATION'
-  lienVisio?: string
-}
-
-export interface DemarcheDto {
-  id: string
-  etat: 'AC' | 'RE' | 'AN' | 'EC' | 'AF'
-  dateDebut?: string
-  dateFin: string
-  dateAnnulation?: string
-  dateCreation: string
-  dateModification?: string
-  origineCreateur: 'INDIVIDU' | 'CONSEILLER' | 'PARTENAIRE' | 'ENTREPRISE'
-  origineModificateur?: 'INDIVIDU' | 'CONSEILLER' | 'PARTENAIRE' | 'ENTREPRISE'
-  origineDemarche:
-    | 'ACTION'
-    | 'ACTUALISATION'
-    | 'CANDIDATURE'
-    | 'JRE_CONSEILLER'
-    | 'JRE_DE'
-    | 'CV'
-    | 'LM'
-    | 'PUBLICATION_PROFIL'
-    | 'ENTRETIEN'
-    | 'RECHERCHE_ENREGISTREE'
-    | 'SUGGESTION'
-    | 'PASS_EMPLOI'
-  pourquoi: string
-  libellePourquoi: string
-  quoi: string
-  libelleQuoi: string
-  comment?: string
-  libelleComment?: string
-  libelleLong?: string
-  libelleCourt?: string
-  ou?: string
-  description?: string
-  organisme?: string
-  metier?: string
-  nombre?: number
-  contact?: string
-  droitsDemarche?: {
-    annulation?: boolean
-    realisation?: boolean
-    replanificationDate?: boolean
-    modificationDate?: boolean
-  }
-}
+import { failure, Result, success } from '../../building-blocks/types/result'
+import { Demarche } from '../../domain/demarche'
+import { ErreurHttp } from '../../building-blocks/types/domain-error'
+import {
+  DemarcheDto,
+  PrestationDto,
+  RendezVousPoleEmploiDto,
+  toEtat
+} from './dto/pole-emploi.dto'
 
 @Injectable()
 export class PoleEmploiPartenaireClient {
@@ -204,6 +87,37 @@ export class PoleEmploiPartenaireClient {
     )
   }
 
+  async updateDemarche(
+    demarcheModifiee: Demarche.Modifiee,
+    token: string
+  ): Promise<Result<DemarcheDto>> {
+    try {
+      const body = {
+        id: demarcheModifiee.id,
+        dateModification: demarcheModifiee.dateModification.toISO({
+          includeOffset: false
+        }),
+        origineModificateur: 'INDIVIDU',
+        etat: toEtat(demarcheModifiee.statut!),
+        dateDebut: demarcheModifiee.dateDebut?.toISO({ includeOffset: false }),
+        dateFin: demarcheModifiee.dateFin?.toISO({ includeOffset: false }),
+        dateAnnulation: demarcheModifiee.dateAnnulation?.toISO({
+          includeOffset: false
+        })
+      }
+      const demarcheDto = await this.put<DemarcheDto>(
+        `peconnect-demarches/v1/demarches/${demarcheModifiee.id}`,
+        token,
+        body
+      )
+      return success(demarcheDto.data)
+    } catch (e) {
+      this.logger.error(e)
+      const erreur = new ErreurHttp(e.response.data, e.response.status)
+      return failure(erreur)
+    }
+  }
+
   private get<T>(
     suffixUrl: string,
     tokenDuJeune: string,
@@ -212,6 +126,24 @@ export class PoleEmploiPartenaireClient {
     return firstValueFrom(
       this.httpService.get<T>(`${this.apiUrl}/${suffixUrl}`, {
         params,
+        headers: { Authorization: `Bearer ${tokenDuJeune}` },
+        httpsAgent:
+          this.configService.get('environment') !== 'prod'
+            ? new https.Agent({
+                rejectUnauthorized: false
+              })
+            : undefined
+      })
+    )
+  }
+
+  private put<T>(
+    suffixUrl: string,
+    tokenDuJeune: string,
+    body: object
+  ): Promise<AxiosResponse<T>> {
+    return firstValueFrom(
+      this.httpService.put<T>(`${this.apiUrl}/${suffixUrl}`, body, {
         headers: { Authorization: `Bearer ${tokenDuJeune}` },
         httpsAgent:
           this.configService.get('environment') !== 'prod'

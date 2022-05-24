@@ -12,11 +12,7 @@ import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { failure } from '../../../src/building-blocks/types/result'
 import { Jeune } from '../../../src/domain/jeune'
 import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client'
-import {
-  PoleEmploiPartenaireClient,
-  PrestationDto,
-  RendezVousPoleEmploiDto
-} from '../../../src/infrastructure/clients/pole-emploi-partenaire-client'
+import { PoleEmploiPartenaireClient } from '../../../src/infrastructure/clients/pole-emploi-partenaire-client'
 import { DateService } from '../../../src/utils/date-service'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { uneDatetime } from '../../fixtures/date.fixture'
@@ -25,6 +21,10 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { RendezVous } from '../../../src/domain/rendez-vous'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import Periode = RendezVous.Periode
+import {
+  PrestationDto,
+  RendezVousPoleEmploiDto
+} from '../../../src/infrastructure/clients/dto/pole-emploi.dto'
 
 describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   let jeunesRepository: StubbedType<Jeune.Repository>

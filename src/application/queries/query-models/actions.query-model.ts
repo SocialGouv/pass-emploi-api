@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { Action, ActionPoleEmploi } from '../../../domain/action'
+import { Action } from '../../../domain/action'
 import { JeuneQueryModel } from './jeunes.query-models'
+import { Demarche } from '../../../domain/demarche'
 
 export class ActionQueryModel {
   @ApiProperty()
@@ -45,7 +46,7 @@ export class AttributDemarcheQueryModel {
   cle: string
 }
 
-export class DemarcheQueryModel {
+export class DemarcheQueryModel implements Demarche {
   @ApiProperty()
   id: string
 
@@ -53,10 +54,13 @@ export class DemarcheQueryModel {
   contenu?: string
 
   @ApiProperty()
-  statut: ActionPoleEmploi.Statut
+  statut: Demarche.Statut
 
   @ApiProperty()
   dateFin: Date
+
+  @ApiProperty({ required: false })
+  dateDebut?: Date
 
   @ApiProperty()
   label: string
@@ -88,6 +92,6 @@ export class DemarcheQueryModel {
   @ApiProperty()
   codeDemarche: string
 
-  @ApiProperty({ isArray: true, enum: ActionPoleEmploi.Statut })
-  statutsPossibles: ActionPoleEmploi.Statut[]
+  @ApiProperty({ isArray: true, enum: Demarche.Statut })
+  statutsPossibles: Demarche.Statut[]
 }

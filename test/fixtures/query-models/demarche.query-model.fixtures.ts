@@ -1,5 +1,5 @@
 import { DemarcheQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
-import { ActionPoleEmploi } from '../../../src/domain/action'
+import { Demarche } from '../../../src/domain/demarche'
 
 export const desDemarches = (): DemarcheQueryModel[] => [
   {
@@ -30,7 +30,7 @@ export const desDemarches = (): DemarcheQueryModel[] => [
     label: 'Mon (nouveau) métier',
     modifieParConseiller: false,
     sousTitre: 'Par un autre moyen',
-    statut: ActionPoleEmploi.Statut.REALISEE,
+    statut: Demarche.Statut.REALISEE,
     statutsPossibles: [],
     titre: 'Identification de ses points forts et de ses compétences'
   },
@@ -62,7 +62,7 @@ export const desDemarches = (): DemarcheQueryModel[] => [
     label: 'Mon (nouveau) métier',
     modifieParConseiller: false,
     sousTitre: 'Par un autre moyen',
-    statut: ActionPoleEmploi.Statut.EN_COURS,
+    statut: Demarche.Statut.EN_COURS,
     statutsPossibles: [],
     titre: 'Identification de ses points forts et de ses compétences'
   }
