@@ -170,6 +170,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
     ConfigModule.forRoot({
       envFilePath: '.environment',
+      cache: true,
       load: [configuration]
     }),
     configureLoggerModule(),
