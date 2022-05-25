@@ -1,43 +1,29 @@
 import { DateTime } from 'luxon'
 import { DateService } from '../utils/date-service'
-import { RendezVous } from './rendez-vous'
-import { Logger } from '@nestjs/common'
+import { JeuneDuRendezVous } from './rendez-vous'
 
 export const NotificationRepositoryToken = 'NotificationRepositoryToken'
 
 export namespace Notification {
   export abstract class Service {
-    async envoyerNotificationsPushJeunes(
-      type: Notification.Type,
-      rendezVous: RendezVous,
-      logger: Logger
+    async envoyerNotificationPush(
+      jeune: JeuneDuRendezVous,
+      data: { type: Notification.Type; id?: string; date?: Date }
     ): Promise<void> {
-      rendezVous.jeunes.forEach(jeune => {
-        if (jeune.pushNotificationToken) {
-          const messagePush = this.creerContenuPush(
-            type,
-            jeune.pushNotificationToken,
-            rendezVous.id
-          )
-          this.envoyer(messagePush)
-        } else {
-          logger.log(
-            `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
-          )
-        }
-      })
+      const messagePush = creerContenuPush(
+        data.type,
+        jeune.pushNotificationToken!,
+        data.id
+      )
+      this.envoyer(messagePush!)
     }
     abstract envoyer(message: Notification.Message): Promise<void>
-    abstract creerContenuPush(
-      typeNotification: Notification.Type,
-      pushNotificationToken: string,
-      id: string
-    ): Notification.Message
   }
 
   export enum Type {
     NEW_ACTION = 'NEW_ACTION',
     NEW_RENDEZVOUS = 'NEW_RENDEZVOUS',
+    UPDATED_RENDEZVOUS = 'UPDATED_RENDEZVOUS',
     RAPPEL_RENDEZVOUS = 'RAPPEL_RENDEZVOUS',
     DELETED_RENDEZVOUS = 'DELETED_RENDEZVOUS',
     NEW_MESSAGE = 'NEW_MESSAGE',
@@ -53,6 +39,27 @@ export namespace Notification {
     data: {
       type: string
       id?: string
+    }
+  }
+
+  function creerContenuPush(
+    type: Notification.Type,
+    token: string,
+    id?: string,
+    date?: Date
+  ): Notification.Message | undefined {
+    switch (type) {
+      case Notification.Type.NEW_RENDEZVOUS: {
+        return createNouveauRdv(token, id!)
+      }
+      case Notification.Type.DELETED_RENDEZVOUS: {
+        return createRdvSupprime(token, date!)
+      }
+      case Notification.Type.UPDATED_RENDEZVOUS: {
+        return createRendezVousMisAJour(token, id!)
+      }
+      default:
+        return undefined
     }
   }
 
@@ -119,7 +126,7 @@ export namespace Notification {
         body: 'Votre rendez-vous a été modifié'
       },
       data: {
-        type: Type.NEW_RENDEZVOUS,
+        type: Type.UPDATED_RENDEZVOUS,
         id: idRdv
       }
     }

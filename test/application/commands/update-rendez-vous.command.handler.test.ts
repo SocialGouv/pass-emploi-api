@@ -32,7 +32,7 @@ describe('UpdateRendezVousCommandHandler', () => {
   DatabaseForTesting.prepare()
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
-  let notificationRepository: StubbedType<Notification.Service>
+  let notificationService: StubbedType<Notification.Service>
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let mailService: StubbedType<Mail.Service>
   let planificateurService: StubbedClass<PlanificateurService>
@@ -46,7 +46,7 @@ describe('UpdateRendezVousCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     rendezVousRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
-    notificationRepository = stubInterface(sandbox)
+    notificationService = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
     mailService = stubInterface(sandbox)
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
@@ -56,7 +56,7 @@ describe('UpdateRendezVousCommandHandler', () => {
     updateRendezVousCommandHandler = new UpdateRendezVousCommandHandler(
       rendezVousRepository,
       jeuneRepository,
-      notificationRepository,
+      notificationService,
       mailService,
       conseillerRepository,
       rendezVousAuthorizer,
@@ -83,7 +83,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         const result = await updateRendezVousCommandHandler.handle(command)
         // Then
         expect(rendezVousRepository.save).to.have.callCount(0)
-        expect(notificationRepository.envoyer).to.have.callCount(0)
+        expect(notificationService.envoyer).to.have.callCount(0)
         expect(result).to.deep.equal(
           failure(new NonTrouveError('RendezVous', command.idRendezVous))
         )
@@ -104,7 +104,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         const result = await updateRendezVousCommandHandler.handle(command)
         // Then
         expect(rendezVousRepository.save).to.have.callCount(0)
-        expect(notificationRepository.envoyer).to.have.callCount(0)
+        expect(notificationService.envoyer).to.have.callCount(0)
         expect(result).to.deep.equal(
           failure(
             new MauvaiseCommandeError(
@@ -132,7 +132,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         const result = await updateRendezVousCommandHandler.handle(command)
         // Then
         expect(rendezVousRepository.save).to.have.callCount(0)
-        expect(notificationRepository.envoyer).to.have.callCount(0)
+        expect(notificationService.envoyer).to.have.callCount(0)
         expect(result).to.deep.equal(
           failure(new NonTrouveError('Jeune', idJeuneNonTrouve))
         )
@@ -229,7 +229,6 @@ describe('UpdateRendezVousCommandHandler', () => {
         )
       })
     })
-
     describe('notifications', () => {
       const command: UpdateRendezVousCommand = {
         idsJeunes: [jeune.id],
@@ -303,7 +302,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         // When
         await updateRendezVousCommandHandler.handle(command)
         // Then
-        expect(notificationRepository.envoyer).to.have.callCount(0)
+        expect(notificationService.envoyer).to.have.callCount(0)
         expect(
           planificateurService.supprimerRappelsRendezVous
         ).not.to.have.been.calledWith(rendezVousUpdated)
@@ -328,12 +327,12 @@ describe('UpdateRendezVousCommandHandler', () => {
         await updateRendezVousCommandHandler.handle(command)
 
         // Then
-        expect(notificationRepository.envoyer).to.have.been.calledWith(
-          Notification.createRendezVousMisAJour(
-            jeune.pushNotificationToken,
-            rendezVousUpdated.id
-          )
-        )
+        expect(
+          notificationService.envoyerNotificationPush
+        ).to.have.been.calledWith(jeune, {
+          type: Notification.Type.UPDATED_RENDEZVOUS,
+          id: rendezVousUpdated.id
+        })
         expect(
           planificateurService.supprimerRappelsRendezVous
         ).to.have.been.calledWith(rendezVousUpdated)
@@ -351,19 +350,16 @@ describe('UpdateRendezVousCommandHandler', () => {
           .resolves(rendezVous)
         jeuneRepository.get.withArgs(command.idsJeunes[0]).resolves(jeune)
         jeuneRepository.get.withArgs(command.idsJeunes[1]).resolves(jeuneAjoute)
-        const rendezVousUpdated: RendezVous = {
-          ...rendezVous,
-          jeunes: [jeune, jeuneAjoute]
-        }
+
         // When
         await updateRendezVousCommandHandler.handle(command)
         // Then
-        expect(notificationRepository.envoyer).to.have.been.calledWith(
-          Notification.createNouveauRdv(
-            jeuneAjoute.pushNotificationToken,
-            rendezVousUpdated.id
-          )
-        )
+        expect(
+          notificationService.envoyerNotificationPush
+        ).to.have.been.calledWith(jeuneAjoute, {
+          type: Notification.Type.NEW_RENDEZVOUS,
+          id: rendezVous.id
+        })
       })
       it('notifie les jeunes supprimés de la suppression du rendez-vous pour leur retrait de la liste des bénéficiaires', async () => {
         // Given
@@ -377,22 +373,15 @@ describe('UpdateRendezVousCommandHandler', () => {
         jeuneRepository.get
           .withArgs(command.idsJeunes[1])
           .resolves(jeuneSupprime)
-        const rendezVousUpdated: RendezVous = {
-          ...rendezVous,
-          jeunes: [jeune]
-        }
         // When
         await updateRendezVousCommandHandler.handle(command)
         // Then
-        expect(rendezVousRepository.save).to.have.been.calledWith(
-          rendezVousUpdated
-        )
-        expect(notificationRepository.envoyer).to.have.been.calledWith(
-          Notification.createRdvSupprime(
-            jeuneSupprime.pushNotificationToken,
-            rendezVous.date
-          )
-        )
+        expect(
+          notificationService.envoyerNotificationPush
+        ).to.have.been.calledWith(jeuneSupprime, {
+          type: Notification.Type.DELETED_RENDEZVOUS,
+          date: rendezVous.date
+        })
       })
     })
   })

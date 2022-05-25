@@ -35,7 +35,7 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Service,
+    private notificationService: Notification.Service,
     private rendezVousAuthorizer: RendezVousAuthorizer,
     private planificateurService: PlanificateurService,
     @Inject(MailServiceToken)
@@ -52,22 +52,7 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     }
     await this.rendezVousRepository.delete(command.idRendezVous)
 
-    await Promise.all(
-      rendezVous.jeunes.map(async jeune => {
-        if (jeune.pushNotificationToken) {
-          const notification = Notification.createRdvSupprime(
-            jeune.pushNotificationToken,
-            rendezVous.date
-          )
-          await this.notificationRepository.envoyer(notification)
-        } else {
-          this.logger.log(
-            `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
-          )
-        }
-      })
-    )
-
+    this.envoyerLesNotificationsAuxJeunes(rendezVous)
     try {
       await this.planificateurService.supprimerRappelsRendezVous(rendezVous)
     } catch (e) {
@@ -99,6 +84,21 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
       )
     }
     return emptySuccess()
+  }
+
+  private envoyerLesNotificationsAuxJeunes(rendezVous: RendezVous): void {
+    rendezVous.jeunes.map(jeune => {
+      if (jeune.pushNotificationToken) {
+        this.notificationService.envoyerNotificationPush(jeune, {
+          type: Notification.Type.DELETED_RENDEZVOUS,
+          date: rendezVous.date
+        })
+      } else {
+        this.logger.log(
+          `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
+        )
+      }
+    })
   }
 
   async authorize(

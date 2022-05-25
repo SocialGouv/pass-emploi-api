@@ -49,7 +49,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Service,
+    private notificationService: Notification.Service,
     @Inject(MailServiceToken)
     private mailClient: Mail.Service,
     @Inject(ConseillersRepositoryToken)
@@ -168,11 +168,10 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
 
     jeunesAjoutes.forEach(jeune => {
       if (jeune.pushNotificationToken) {
-        const notification = Notification.createNouveauRdv(
-          jeune.pushNotificationToken,
-          rendezVous.id
-        )
-        this.notificationRepository.envoyer(notification)
+        this.notificationService.envoyerNotificationPush(jeune, {
+          type: Notification.Type.NEW_RENDEZVOUS,
+          id: rendezVous.id
+        })
       } else {
         this.logger.log(
           `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
@@ -182,11 +181,10 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
 
     jeunesSupprimes.forEach(jeune => {
       if (jeune.pushNotificationToken) {
-        const notification = Notification.createRdvSupprime(
-          jeune.pushNotificationToken,
-          rendezVous.date
-        )
-        this.notificationRepository.envoyer(notification)
+        this.notificationService.envoyerNotificationPush(jeune, {
+          type: Notification.Type.DELETED_RENDEZVOUS,
+          date: rendezVous.date
+        })
       } else {
         this.logger.log(
           `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
@@ -197,11 +195,10 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     if (this.infosRendezVousSontModifies(rendezVous, rendezVousUpdated)) {
       jeunesInchanges.forEach(jeune => {
         if (jeune.pushNotificationToken) {
-          const notification = Notification.createRendezVousMisAJour(
-            jeune.pushNotificationToken,
-            rendezVous.id
-          )
-          this.notificationRepository.envoyer(notification)
+          this.notificationService.envoyerNotificationPush(jeune, {
+            type: Notification.Type.UPDATED_RENDEZVOUS,
+            id: rendezVous.id
+          })
         } else {
           this.logger.log(
             `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`

@@ -32,7 +32,7 @@ describe('DeleteRendezVousCommandHandler', () => {
   DatabaseForTesting.prepare()
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
-  let notificationRepository: StubbedType<Notification.Service>
+  let notificationService: StubbedType<Notification.Service>
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
   let deleteRendezVousCommandHandler: DeleteRendezVousCommandHandler
   let planificateurService: StubbedClass<PlanificateurService>
@@ -45,7 +45,7 @@ describe('DeleteRendezVousCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     rendezVousRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
-    notificationRepository = stubInterface(sandbox)
+    notificationService = stubInterface(sandbox)
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
     planificateurService = stubClass(PlanificateurService)
     mailService = stubInterface(sandbox)
@@ -54,7 +54,7 @@ describe('DeleteRendezVousCommandHandler', () => {
     deleteRendezVousCommandHandler = new DeleteRendezVousCommandHandler(
       rendezVousRepository,
       conseillerRepository,
-      notificationRepository,
+      notificationService,
       rendezVousAuthorizer,
       planificateurService,
       mailService,
@@ -76,7 +76,7 @@ describe('DeleteRendezVousCommandHandler', () => {
       expect(rendezVousRepository.delete).not.to.have.been.calledWith(
         rendezVous.id
       )
-      expect(notificationRepository.envoyer).not.to.have.been.calledWith(
+      expect(notificationService.envoyer).not.to.have.been.calledWith(
         Notification.createRdvSupprime(
           jeune.pushNotificationToken,
           rendezVous.date
@@ -180,12 +180,12 @@ describe('DeleteRendezVousCommandHandler', () => {
         await deleteRendezVousCommandHandler.handle(command)
 
         // Then
-        expect(notificationRepository.envoyer).to.have.been.calledWith(
-          Notification.createRdvSupprime(
-            rendezVous.jeunes[0].pushNotificationToken,
-            rendezVous.date
-          )
-        )
+        expect(
+          notificationService.envoyerNotificationPush
+        ).to.have.been.calledWith(rendezVous.jeunes[0], {
+          type: Notification.Type.DELETED_RENDEZVOUS,
+          date: rendezVous.date
+        })
       })
       it("n'envoie pas de notification à un jeune qui ne s'est jamais connecté sur l'application", async () => {
         // Given
@@ -197,12 +197,9 @@ describe('DeleteRendezVousCommandHandler', () => {
         // When
         await deleteRendezVousCommandHandler.handle(command)
         // Then
-        expect(notificationRepository.envoyer).not.to.have.been.calledWith(
-          Notification.createRdvSupprime(
-            jeune.pushNotificationToken,
-            rendezVous.date
-          )
-        )
+        expect(
+          notificationService.envoyerNotificationPush
+        ).not.to.have.been.called()
       })
     })
   })

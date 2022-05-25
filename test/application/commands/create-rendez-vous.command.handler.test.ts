@@ -34,7 +34,7 @@ import {
 describe('CreateRendezVousCommandHandler', () => {
   DatabaseForTesting.prepare()
   let rendezVousRepository: StubbedType<RendezVous.Repository>
-  let notificationRepository: StubbedType<Notification.Service>
+  let notificationService: StubbedType<Notification.Service>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let planificateurService: StubbedClass<PlanificateurService>
@@ -51,7 +51,7 @@ describe('CreateRendezVousCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     rendezVousRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
-    notificationRepository = stubInterface(sandbox)
+    notificationService = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
     planificateurService = stubClass(PlanificateurService)
     idService = stubInterface(sandbox)
@@ -63,7 +63,7 @@ describe('CreateRendezVousCommandHandler', () => {
       rendezVousRepository,
       jeuneRepository,
       conseillerRepository,
-      notificationRepository,
+      notificationService,
       mailClient,
       conseillerAuthorizer,
       planificateurService,
@@ -189,9 +189,34 @@ describe('CreateRendezVousCommandHandler', () => {
       })
     })
     describe('notifications', () => {
-      it("n'envoie pas de notification push à un jeune qui ne s'est jamais connecté", async () => {
+      it("n'envoie pas de notif à un jeune jamais connecté sur l'application", async () => {
         // Given
         const jeune = unJeune({ pushNotificationToken: undefined })
+        jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
+        const command: CreateRendezVousCommand = {
+          idsJeunes: [jeune.id],
+          idConseiller: jeune.conseiller.id,
+          commentaire: rendezVous.commentaire,
+          date: rendezVous.date.toDateString(),
+          duree: rendezVous.duree,
+          invitation: true
+        }
+        const conseiller = unConseiller()
+        conseillerRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(conseiller)
+
+        // When
+        await createRendezVousCommandHandler.handle(command)
+
+        // Then
+        expect(
+          notificationService.envoyerNotificationPush
+        ).not.to.have.been.called()
+      })
+      it("envoie une notif push à un jeune qui s'est déjà connecté sur l'application", async () => {
+        // Given
+        const jeune = unJeune()
         jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
         const command: CreateRendezVousCommand = {
           idsJeunes: [jeune.id],
@@ -216,48 +241,12 @@ describe('CreateRendezVousCommandHandler', () => {
         await createRendezVousCommandHandler.handle(command)
 
         // Then
-        expect(notificationRepository.envoyer).not.to.have.been.calledWith(
-          Notification.createNouveauRdv(
-            jeune.pushNotificationToken,
-            expectedRendezvous.id
-          )
-        )
-      })
-      it("envoie une notification push à un jeune qui s'est déjà connecté", async () => {
-        // Given
-        const command: CreateRendezVousCommand = {
-          idsJeunes: [jeune1.id],
-          idConseiller: jeune1.conseiller.id,
-          commentaire: rendezVous.commentaire,
-          date: rendezVous.date.toDateString(),
-          duree: rendezVous.duree,
-          invitation: true
-        }
-        jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
-
-        conseillerRepository.get
-          .withArgs(command.idConseiller)
-          .resolves(jeune1.conseiller)
-
-        const expectedRendezvous = RendezVous.createRendezVousConseiller(
-          command,
-          [jeune1],
-          jeune1.conseiller,
-          idService
-        )
-
-        // When
-        await createRendezVousCommandHandler.handle(command)
-
-        // Then
         expect(
-          notificationRepository.envoyer
-        ).to.have.been.calledOnceWithExactly(
-          Notification.createNouveauRdv(
-            jeune1.pushNotificationToken,
-            expectedRendezvous.id
-          )
-        )
+          notificationService.envoyerNotificationPush
+        ).to.have.been.calledWith(expectedRendezvous.jeunes[0], {
+          type: Notification.Type.NEW_RENDEZVOUS,
+          id: expectedRendezvous.id
+        })
       })
       it('envoie un email a un conseiller qui a accepté les invitations', async () => {
         // Given
