@@ -1,6 +1,7 @@
 import { initializeAPMAgent } from './infrastructure/monitoring/apm.init'
 initializeAPMAgent()
 
+import * as compression from 'compression'
 import { ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
@@ -25,6 +26,7 @@ async function bootstrap(): Promise<void> {
   app.useLogger(logger)
 
   if (isWeb) {
+    app.use(compression())
     useSwagger(appConfig, app)
     app.use(helmet())
     app.enableCors()
