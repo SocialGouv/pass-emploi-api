@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { Authentification } from 'src/domain/authentification'
+import { Core } from 'src/domain/core'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { SituationsMiloSqlModel } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
@@ -22,7 +24,8 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
 > {
   constructor(
     private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer,
-    private jeuneAuthorizer: JeuneAuthorizer
+    private jeuneAuthorizer: JeuneAuthorizer,
+    private configService: ConfigService
   ) {
     super('GetDetailJeuneQueryHandler')
   }
@@ -45,7 +48,12 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
     if (!jeuneSqlModel) {
       return undefined
     }
-    return fromSqlToDetailJeuneQueryModel(jeuneSqlModel)
+
+    let urlDossier
+    if (jeuneSqlModel.structure === Core.Structure.MILO) {
+      urlDossier = this.configService.get('milo.urlWeb')
+    }
+    return fromSqlToDetailJeuneQueryModel(jeuneSqlModel, urlDossier)
   }
 
   async authorize(

@@ -6,7 +6,8 @@ import {
 } from '../query-models/jeunes.query-models'
 
 export function fromSqlToDetailJeuneQueryModel(
-  jeuneSqlModel: JeuneSqlModel
+  jeuneSqlModel: JeuneSqlModel,
+  baseUrlDossier?: string
 ): DetailJeuneQueryModel {
   const depuis =
     jeuneSqlModel.transferts.length > 0
@@ -25,7 +26,11 @@ export function fromSqlToDetailJeuneQueryModel(
       nom: jeuneSqlModel.conseiller!.nom,
       depuis: depuis.toISOString()
     },
-    situations: jeuneSqlModel.situations?.situations
+    situations: jeuneSqlModel.situations?.situations,
+    urlDossier:
+      baseUrlDossier && jeuneSqlModel.idDossier
+        ? `${baseUrlDossier}/${jeuneSqlModel.idDossier}/acces-externe`
+        : undefined
   }
 }
 
