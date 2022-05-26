@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import {
-  JeuneNonLieAuConseillerError,
+  MauvaiseCommandeError,
   NonTrouveError
 } from 'src/building-blocks/types/domain-error'
 import { Core } from 'src/domain/core'
@@ -42,47 +42,40 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
   }
 
   async handle(command: TransfererJeunesConseillerCommand): Promise<Result> {
-    const [conseillerSourceExiste, conseillerCibleExiste, conseillerCible] =
-      await Promise.all([
+    const [conseillerSourceExiste, conseillerCible, jeunes] = await Promise.all(
+      [
         this.conseillerRepository.existe(
           command.idConseillerSource,
           command.structure
         ),
-        this.conseillerRepository.existe(
-          command.idConseillerCible,
-          command.structure
-        ),
-        this.conseillerRepository.get(command.idConseillerCible)
-      ])
+        this.conseillerRepository.get(command.idConseillerCible),
+        this.jeuneRepository.findAllJeunesByConseiller(
+          command.idsJeune,
+          command.idConseillerSource
+        )
+      ]
+    )
 
     if (!conseillerSourceExiste) {
       return failure(
         new NonTrouveError('Conseiller', command.idConseillerSource)
       )
     }
-    if (!conseillerCibleExiste || !conseillerCible) {
+    if (!conseillerCible) {
       return failure(
         new NonTrouveError('Conseiller', command.idConseillerCible)
       )
     }
-
-    const jeunes: Jeune[] = []
-    for (const idJeune of command.idsJeune) {
-      const jeune = await this.jeuneRepository.get(idJeune)
-
-      if (!jeune) {
-        return failure(new NonTrouveError('Jeune', idJeune))
-      }
-
-      if (jeune.conseiller?.id !== command.idConseillerSource) {
-        return failure(
-          new JeuneNonLieAuConseillerError(command.idConseillerSource, idJeune)
-        )
-      }
-
-      const updatedJeune = { ...jeune, conseiller: conseillerCible }
-      jeunes.push(updatedJeune)
+    if (jeunes?.length !== command.idsJeune.length) {
+      return failure(
+        new MauvaiseCommandeError('Liste des jeunes à transférer invalide')
+      )
     }
+
+    const updatedJeunes = jeunes.map(jeune => ({
+      ...jeune,
+      conseiller: conseillerCible
+    }))
 
     await this.chatRepository.transfererChat(
       command.idConseillerCible,
@@ -94,7 +87,7 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
         command.idConseillerCible,
         command.idsJeune
       ),
-      this.jeuneRepository.saveAll(jeunes)
+      this.jeuneRepository.saveAll(updatedJeunes)
     ])
 
     return emptySuccess()

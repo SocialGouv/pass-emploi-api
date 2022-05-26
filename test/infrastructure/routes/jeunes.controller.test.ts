@@ -30,6 +30,7 @@ import {
   FavoriNonTrouveError,
   JeuneNonLieAuConseillerError,
   JeunePasInactifError,
+  MauvaiseCommandeError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 import {
@@ -200,10 +201,10 @@ describe('JeunesController', () => {
         .expect(HttpStatus.FORBIDDEN)
     })
 
-    it("renvoie un code 403 si un jeune n'est pas lié au conseiller", async () => {
+    it("renvoie un code 400 si un jeune n'est pas lié au conseiller", async () => {
       // Given
       transfererJeunesConseillerCommandHandler.execute.resolves(
-        failure(new JeuneNonLieAuConseillerError('1', '1'))
+        failure(new MauvaiseCommandeError('jeunes invalides'))
       )
 
       // When - Then
@@ -211,7 +212,7 @@ describe('JeunesController', () => {
         .post('/jeunes/transferer')
         .send(payload)
         .set('authorization', unHeaderAuthorization())
-        .expect(HttpStatus.FORBIDDEN)
+        .expect(HttpStatus.BAD_REQUEST)
     })
 
     ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/transferer')
