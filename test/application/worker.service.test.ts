@@ -1,7 +1,7 @@
 import { WorkerService } from '../../src/application/worker.service'
 import { DatabaseForTesting, expect, StubbedClass, stubClass } from '../utils'
 import { HandleJobMailConseillerCommandHandler } from '../../src/application/commands/jobs/handle-job-mail-conseiller.command'
-import { HandleJobRendezVousCommandHandler } from '../../src/application/commands/jobs/handle-job-rendez-vous.command'
+import { HandleJobRappelRendezVousCommandHandler } from '../../src/application/commands/jobs/handle-job-rappel-rendez-vous.command'
 import { HandleNettoyerLesJobsCommandHandler } from '../../src/application/commands/jobs/handle-job-nettoyer-les-jobs.command'
 import { HandleJobUpdateMailingListConseillerCommandHandler } from '../../src/application/commands/jobs/handle-job-update-mailing-list-conseiller.command'
 import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from '../../src/application/commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
@@ -26,7 +26,7 @@ describe('WorkerService', () => {
       await planificateurRepository.isQueueReady()
 
       const handlerJobRendezVousCommandHandler = stubClass(
-        HandleJobRendezVousCommandHandler
+        HandleJobRappelRendezVousCommandHandler
       )
       const handleJobMailConseillerCommandHandler = stubClass(
         HandleJobMailConseillerCommandHandler

@@ -35,7 +35,7 @@ import { DeleteRendezVousCommandHandler } from './application/commands/delete-re
 import { DeleteSuperviseursCommandHandler } from './application/commands/delete-superviseurs.command.handler'
 import { HandleJobMailConseillerCommandHandler } from './application/commands/jobs/handle-job-mail-conseiller.command'
 import { HandleNettoyerLesJobsCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-jobs.command'
-import { HandleJobRendezVousCommandHandler } from './application/commands/jobs/handle-job-rendez-vous.command'
+import { HandleJobRappelRendezVousCommandHandler } from './application/commands/jobs/handle-job-rappel-rendez-vous.command'
 import { HandleJobUpdateMailingListConseillerCommandHandler } from './application/commands/jobs/handle-job-update-mailing-list-conseiller.command'
 import { NotifierNouvellesImmersionsCommandHandler } from './application/commands/notifier-nouvelles-immersions.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from './application/commands/send-notification-nouveau-message.command.handler'
@@ -359,7 +359,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     EvenementService,
     CreateEvenementCommandHandler,
     GetChatSecretsQueryHandler,
-    HandleJobRendezVousCommandHandler,
+    HandleJobRappelRendezVousCommandHandler,
     HandleJobMailConseillerCommandHandler,
     SynchronizeJobsCommandHandler,
     GetConseillerByEmailQueryHandler,

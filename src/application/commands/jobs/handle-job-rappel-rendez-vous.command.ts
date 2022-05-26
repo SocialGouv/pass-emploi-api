@@ -14,19 +14,19 @@ import {
 } from '../../../domain/rendez-vous'
 import { DateService } from '../../../utils/date-service'
 
-export interface HandleJobRendezVousCommand extends Command {
+export interface HandleJobRappelRendezVousCommand extends Command {
   job: Planificateur.Job<Planificateur.JobRendezVous>
 }
 
-export interface HandleJobRendezVousCommandResult {
+export interface HandleJobRappelRendezVousCommandResult {
   idJeune: string
   notificationEnvoyee: boolean
 }
 
 @Injectable()
-export class HandleJobRendezVousCommandHandler extends CommandHandler<
-  HandleJobRendezVousCommand,
-  HandleJobRendezVousCommandResult[]
+export class HandleJobRappelRendezVousCommandHandler extends CommandHandler<
+  HandleJobRappelRendezVousCommand,
+  HandleJobRappelRendezVousCommandResult[]
 > {
   constructor(
     @Inject(RendezVousRepositoryToken)
@@ -35,17 +35,17 @@ export class HandleJobRendezVousCommandHandler extends CommandHandler<
     private notificationRepository: Notification.Repository,
     private dateService: DateService
   ) {
-    super('HandleJobRendezVousCommandHandler')
+    super('HandleJobRappelRendezVousCommandHandler')
   }
 
   async handle(
-    command: HandleJobRendezVousCommand
-  ): Promise<Result<HandleJobRendezVousCommandResult[]>> {
+    command: HandleJobRappelRendezVousCommand
+  ): Promise<Result<HandleJobRappelRendezVousCommandResult[]>> {
     const rendezVous = await this.rendezVousRepository.get(
       command.job.contenu.idRendezVous
     )
 
-    const stats: HandleJobRendezVousCommandResult[] = []
+    const stats: HandleJobRappelRendezVousCommandResult[] = []
 
     if (rendezVous) {
       await Promise.all(
@@ -59,7 +59,9 @@ export class HandleJobRendezVousCommandHandler extends CommandHandler<
               DateTime.fromJSDate(rendezVous.date),
               this.dateService
             )
-            await this.notificationRepository.send(notification)
+            if (notification) {
+              await this.notificationRepository.send(notification)
+            }
             stats.push({ idJeune: jeune.id, notificationEnvoyee: true })
           }
         })
@@ -71,7 +73,7 @@ export class HandleJobRendezVousCommandHandler extends CommandHandler<
 
   async authorize(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: HandleJobRendezVousCommand
+    _command: HandleJobRappelRendezVousCommand
   ): Promise<void> {
     return
   }
