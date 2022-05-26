@@ -191,15 +191,14 @@ describe('ConseillersController', () => {
   describe('GET /conseillers/:idConseiller/jeunes', () => {
     it('renvoie la liste des jeunes du conseiller', async () => {
       // Given
-      const listeJeunes = [unDetailJeuneQueryModel()]
-      getJeunesByConseillerQueryHandler.execute.resolves(success(listeJeunes))
+      getJeunesByConseillerQueryHandler.execute.resolves(success([]))
 
       // When - Then
       await request(app.getHttpServer())
         .get('/conseillers/1/jeunes')
         .set('authorization', unHeaderAuthorization())
         .expect(HttpStatus.OK)
-        .expect(listeJeunes)
+        .expect([])
 
       expect(
         getJeunesByConseillerQueryHandler.execute

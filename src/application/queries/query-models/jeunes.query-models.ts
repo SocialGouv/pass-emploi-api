@@ -89,6 +89,9 @@ export class DetailJeuneQueryModel {
 
   @ApiProperty({ required: false })
   situations?: SituationQueryModel[]
+
+  @ApiProperty({ required: false })
+  urlDossier?: string
 }
 
 export class DetailJeuneConseillerQueryModel {

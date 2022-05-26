@@ -1,4 +1,5 @@
 import { SinonSandbox } from 'sinon'
+import { Core } from 'src/domain/core'
 import { CategorieSituationMilo, EtatSituationMilo } from 'src/domain/milo'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
@@ -11,6 +12,7 @@ import { AsSql } from 'src/infrastructure/sequelize/types'
 import { uneAutreDate } from 'test/fixtures/date.fixture'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
+import { testConfig } from 'test/utils/module-for-testing'
 import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import {
@@ -44,7 +46,8 @@ describe('GetDetailJeuneQueryHandler', () => {
 
     getDetailJeuneQueryHandler = new GetDetailJeuneQueryHandler(
       conseillerForJeuneAuthorizer,
-      jeuneAuthorizer
+      jeuneAuthorizer,
+      testConfig()
     )
   })
 
@@ -56,14 +59,18 @@ describe('GetDetailJeuneQueryHandler', () => {
     describe("quand il n'y a pas eu de transfert", () => {
       const idJeune = '1'
       const idConseiller = '1'
+      const conseillerDto = unConseillerDto({ id: idConseiller })
+      beforeEach(async () => {
+        await ConseillerSqlModel.creer(conseillerDto)
+      })
+
       it('retourne un jeune avec son conseiller avec la date de creation du jeune', async () => {
         // Given
-        const conseillerDto = unConseillerDto({ id: idConseiller })
-        await ConseillerSqlModel.creer(conseillerDto)
         await JeuneSqlModel.creer(
           unJeuneDto({
             id: idJeune,
-            idConseiller
+            idConseiller,
+            structure: Core.Structure.PASS_EMPLOI
           })
         )
 
@@ -86,12 +93,11 @@ describe('GetDetailJeuneQueryHandler', () => {
       })
       it('retourne un jeune avec ses situations', async () => {
         // Given
-        const conseillerDto = unConseillerDto({ id: idConseiller })
-        await ConseillerSqlModel.creer(conseillerDto)
         await JeuneSqlModel.creer(
           unJeuneDto({
             id: idJeune,
-            idConseiller
+            idConseiller,
+            structure: Core.Structure.PASS_EMPLOI
           })
         )
         await SituationsMiloSqlModel.create({
@@ -121,6 +127,40 @@ describe('GetDetailJeuneQueryHandler', () => {
         })
         expect(actual).to.deep.equal(expected)
       })
+      describe("quand c'est un jeune MILO", () => {
+        it("retourne l'url MILO quand l'id dossier existe", async () => {
+          // Given
+          await JeuneSqlModel.creer(
+            unJeuneDto({
+              id: idJeune,
+              idConseiller,
+              structure: Core.Structure.MILO,
+              idDossier: '123'
+            })
+          )
+          // When
+          const actual = await getDetailJeuneQueryHandler.handle({ idJeune })
+          // Then
+          expect(actual?.urlDossier).to.equal(
+            'https://milo.com/123/acces-externe'
+          )
+        })
+        it("ne retourne pas d'url MILO quand l'id dossier est inexistant", async () => {
+          // Given
+          await JeuneSqlModel.creer(
+            unJeuneDto({
+              id: idJeune,
+              idConseiller,
+              structure: Core.Structure.MILO,
+              idDossier: undefined
+            })
+          )
+          // When
+          const actual = await getDetailJeuneQueryHandler.handle({ idJeune })
+          // Then
+          expect(actual?.urlDossier).to.be.undefined()
+        })
+      })
     })
     describe('quand il y a eu un transfert', () => {
       const idJeune = '1'
@@ -136,7 +176,8 @@ describe('GetDetailJeuneQueryHandler', () => {
         await JeuneSqlModel.creer(
           unJeuneDto({
             id: idJeune,
-            idConseiller
+            idConseiller,
+            structure: Core.Structure.PASS_EMPLOI
           })
         )
         const dateTransfert = uneAutreDate()
@@ -184,7 +225,8 @@ describe('GetDetailJeuneQueryHandler', () => {
         await JeuneSqlModel.creer(
           unJeuneDto({
             id: idJeune,
-            idConseiller
+            idConseiller,
+            structure: Core.Structure.PASS_EMPLOI
           })
         )
         const dateTransfert1 = new Date('2022-04-02T03:24:00')
