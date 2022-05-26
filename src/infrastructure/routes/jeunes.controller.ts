@@ -96,6 +96,8 @@ import {
   UpdateStatutDemarcheCommand,
   UpdateStatutDemarcheCommandHandler
 } from '../../application/commands/update-demarche.commande.handler'
+import { handleFailure } from './utils/failure.handler'
+import { handleError } from './utils/error.handler'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -500,21 +502,11 @@ export class JeunesController {
         utilisateur
       )
     } catch (e) {
-      if (e instanceof DroitsInsuffisants) {
-        throw new ForbiddenException(e)
-      }
+      handleError(e)
       throw e
     }
 
-    if (isFailure(result)) {
-      if (result.error.code === NonTrouveError.CODE) {
-        throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
-      }
-      if (result.error.code === JeuneNonLieAuConseillerError.CODE) {
-        throw new ForbiddenException(result.error.message)
-      }
-      throw new RuntimeException(result.error.message)
-    }
+    handleFailure(result)
   }
 
   @Delete(':idJeune')
