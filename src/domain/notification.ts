@@ -101,14 +101,31 @@ export namespace Notification {
   export function createRappelRdv(
     token: string,
     idRdv: string,
-    date: DateTime,
+    dateRdv: DateTime,
     dateService: DateService
-  ): Notification.Message {
-    const today = dateService.now()
-    let body = 'Vous avez un rendez-vous demain'
-    if (date.diff(today).as('day') > 2) {
-      body = 'Vous avez un rendez-vous dans une semaine'
+  ): Notification.Message | undefined {
+    const maintenant = dateService.now()
+    const joursAvantRdv = dateRdv.diff(maintenant).as('day')
+
+    const rdvPasse = joursAvantRdv < 0
+    const rdvDansPlusDUnJour = joursAvantRdv > 2
+    const rdvDansMoinsDUneSemaine = joursAvantRdv < 6
+
+    if (rdvPasse) {
+      return
     }
+
+    let body = 'Vous avez un rendez-vous demain'
+
+    if (rdvDansPlusDUnJour) {
+      body = 'Vous avez un rendez-vous dans une semaine'
+      if (rdvDansMoinsDUneSemaine) {
+        body = `Vous avez un rendez-vous dans ${Math.trunc(
+          joursAvantRdv
+        )} jours`
+      }
+    }
+
     return {
       token,
       notification: {
