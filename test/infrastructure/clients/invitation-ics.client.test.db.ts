@@ -4,16 +4,16 @@ import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { DatabaseForTesting, expect } from '../../utils'
+import { expect } from '../../utils'
 import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitation-ics.client'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { testConfig } from '../../utils/module-for-testing'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { RendezVous } from '../../../src/domain/rendez-vous'
+import { databaseForTesting } from '../../test-with-bd.test'
 
 describe('InvitationIcsClient', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
   let invitationIcsClient: InvitationIcsClient
   const config = testConfig()
 

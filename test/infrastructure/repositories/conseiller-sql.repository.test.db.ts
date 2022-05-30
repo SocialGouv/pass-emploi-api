@@ -1,14 +1,13 @@
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository'
 
 import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { DatabaseForTesting, expect } from '../../utils'
+import { expect } from '../../utils'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { Core } from '../../../src/domain/core'
 
 describe('ConseillerSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let conseillerSqlRepository: ConseillerSqlRepository
 
   beforeEach(async () => {

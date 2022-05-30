@@ -5,13 +5,7 @@ import {
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { uneActionQueryModelFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
-import {
-  createSandbox,
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { Action } from '../../../src/domain/action'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository'
@@ -27,9 +21,9 @@ import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
 import { IdService } from '../../../src/utils/id-service'
 import { DateService } from '../../../src/utils/date-service'
+import { databaseForTesting } from '../../test-with-bd.test'
 
 describe('GetActionsByJeuneQueryHandler', () => {
-  const database = DatabaseForTesting.prepare()
   let actionSqlRepository: Action.Repository
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
@@ -42,7 +36,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     actionSqlRepository = new ActionSqlRepository()
     getActionsByJeuneQueryHandler = new GetActionsByJeuneQueryHandler(
-      database.sequelize,
+      databaseForTesting.sequelize,
       conseillerForJeuneAuthorizer,
       jeuneAuthorizer
     )
@@ -59,7 +53,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
       const conseillerRepository = new ConseillerSqlRepository()
       await conseillerRepository.save(unConseiller())
       const jeuneRepository = new JeuneSqlRepository(
-        database.sequelize,
+        databaseForTesting.sequelize,
         new IdService(),
         new DateService()
       )

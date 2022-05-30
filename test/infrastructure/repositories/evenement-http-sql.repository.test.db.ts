@@ -1,5 +1,5 @@
 import { Authentification } from '../../../src/domain/authentification'
-import { DatabaseForTesting, expect, stubClass } from '../../utils'
+import { expect, stubClass } from '../../utils'
 import { EvenementHttpSqlRepository } from '../../../src/infrastructure/repositories/evenement-http-sql.repository'
 import { DateService } from '../../../src/utils/date-service'
 import { Core } from '../../../src/domain/core'
@@ -9,7 +9,6 @@ import { uneDatetime } from 'test/fixtures/date.fixture'
 import Utilisateur = Authentification.Utilisateur
 
 describe('EvenementHttpSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let evenementHttpSqlRepository: EvenementHttpSqlRepository
   const dateService = stubClass(DateService)
   dateService.nowJs.returns(uneDatetime.toJSDate())

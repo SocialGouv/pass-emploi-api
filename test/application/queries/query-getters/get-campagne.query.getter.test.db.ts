@@ -1,9 +1,4 @@
-import {
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../../utils'
+import { expect, StubbedClass, stubClass } from '../../../utils'
 import { DateService } from '../../../../src/utils/date-service'
 import {
   GetCampagneQueryModel,
@@ -15,7 +10,6 @@ import { ReponseCampagneSqlModel } from '../../../../src/infrastructure/sequeliz
 import { Campagne } from '../../../../src/domain/campagne'
 
 describe('GetCampagneQueryModel', () => {
-  DatabaseForTesting.prepare()
   let dateService: StubbedClass<DateService>
   let getCampagneQueryModel: GetCampagneQueryModel
   const maintenant = DateTime.fromISO('2022-05-17T03:24:00')

@@ -8,12 +8,7 @@ import { failure, success } from '../../../src/building-blocks/types/result'
 import { Core } from '../../../src/domain/core'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
-import {
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { expect, StubbedClass, stubClass } from '../../utils'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import {
   ConseillerDto,
@@ -22,8 +17,6 @@ import {
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 
 describe('GetConseillerByEmailQueryHandler', () => {
-  DatabaseForTesting.prepare()
-
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getConseillerByEmail: GetConseillerByEmailQueryHandler
 

@@ -4,12 +4,11 @@ import { PlanificateurRedisRepository } from 'src/infrastructure/repositories/pl
 import { Planificateur } from '../../../src/domain/planificateur'
 import { DateService } from '../../../src/utils/date-service'
 import { uneDatetime } from '../../fixtures/date.fixture'
-import { DatabaseForTesting, expect, stubClass } from '../../utils'
+import { expect, stubClass } from '../../utils'
 import { testConfig } from '../../utils/module-for-testing'
 import { RedisClient } from '../../utils/types'
 
 describe('PlanificateurRedisRepository', () => {
-  DatabaseForTesting.prepare()
   let planificateurRedisRepository: PlanificateurRedisRepository
   let redisClient: RedisClient
 

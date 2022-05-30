@@ -1,10 +1,4 @@
-import {
-  createSandbox,
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { uneDatetime, uneDatetimeMinuit } from '../../fixtures/date.fixture'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import {
@@ -24,9 +18,9 @@ import { ConseillerAuthorizer } from '../../../src/application/authorizers/autho
 import { GetAllRendezVousConseillerQueryHandler } from '../../../src/application/queries/get-rendez-vous-conseiller.query.handler'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
+import { databaseForTesting } from '../../test-with-bd.test'
 
 describe('GetRendezVousConseillerQueryHandler', () => {
-  const db = DatabaseForTesting.prepare()
   let dateService: StubbedClass<DateService>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler
@@ -50,7 +44,7 @@ describe('GetRendezVousConseillerQueryHandler', () => {
 
     getAllRendezVousConseillerQueryHandler =
       new GetAllRendezVousConseillerQueryHandler(
-        db.sequelize,
+        databaseForTesting.sequelize,
         dateService,
         conseillerAuthorizer
       )

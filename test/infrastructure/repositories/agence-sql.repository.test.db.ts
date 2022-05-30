@@ -1,4 +1,4 @@
-import { DatabaseForTesting, expect } from '../../utils'
+import { expect } from '../../utils'
 import { AgenceSqlRepository } from '../../../src/infrastructure/repositories/agence-sql.repository'
 import {
   AgenceDto,
@@ -8,7 +8,6 @@ import { Core } from '../../../src/domain/core'
 import Structure = Core.Structure
 
 describe('AgenceSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let agenceSqlRepository: AgenceSqlRepository
   const agenceMilo: Partial<AgenceDto> = {
     id: 'Bonjour je suis un id milo',

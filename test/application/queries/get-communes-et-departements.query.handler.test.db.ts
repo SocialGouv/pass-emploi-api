@@ -4,14 +4,14 @@ import { CommuneSqlModel } from '../../../src/infrastructure/sequelize/models/co
 import { DepartementSqlModel } from '../../../src/infrastructure/sequelize/models/departement.sql-model'
 import { uneCommuneDto } from '../../fixtures/sql-models/commune.sql-model'
 import { unDepartementDto } from '../../fixtures/sql-models/departement.sql-model'
-import { DatabaseForTesting, expect } from '../../utils'
+import { expect } from '../../utils'
+import { databaseForTesting } from '../../test-with-bd.test'
 
 describe('GetCommunesEtDepartementsQueryHandler', () => {
-  const db = DatabaseForTesting.prepare()
   let getCommunesEtDepartementsQueryHandler: GetCommunesEtDepartementsQueryHandler
   before(() => {
     getCommunesEtDepartementsQueryHandler =
-      new GetCommunesEtDepartementsQueryHandler(db.sequelize)
+      new GetCommunesEtDepartementsQueryHandler(databaseForTesting.sequelize)
   })
 
   describe('Avec que des départements', () => {

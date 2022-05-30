@@ -11,14 +11,14 @@ import { uneDatetime, uneDatetimeMinuit } from '../../fixtures/date.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { DatabaseForTesting, expect, stubClass } from '../../utils'
+import { expect, stubClass } from '../../utils'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
 import { JeuneDuRendezVous, RendezVous } from '../../../src/domain/rendez-vous'
 import { Core } from '../../../src/domain/core'
+import { databaseForTesting } from '../../test-with-bd.test'
 import Structure = Core.Structure
 
 describe('RendezVousRepositorySql', () => {
-  const databaseForTesting: DatabaseForTesting = DatabaseForTesting.prepare()
   let rendezVousRepositorySql: RendezVousRepositorySql
   const maintenant = uneDatetime
   const aujourdhuiMinuit = uneDatetimeMinuit

@@ -9,7 +9,7 @@ import { failure, success } from '../../../src/building-blocks/types/result'
 import { ImmersionClient } from '../../../src/infrastructure/clients/immersion-client'
 import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-immersion-http-sql.repository'
 import { offreImmersionDto } from '../../fixtures/offre-immersion.dto.fixture'
-import { DatabaseForTesting, StubbedClass, stubClass } from '../../utils'
+import { StubbedClass, stubClass } from '../../utils'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import {
@@ -27,7 +27,6 @@ import {
 import { TIMEOUT } from 'dns'
 
 describe('OffresImmersionHttpSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let offresImmersionHttpSqlRepository: OffresImmersionHttpSqlRepository
   let immersionClient: StubbedClass<ImmersionClient>
 

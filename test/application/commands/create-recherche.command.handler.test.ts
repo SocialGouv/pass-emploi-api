@@ -8,20 +8,13 @@ import {
   CreateRechercheCommandHandler
 } from '../../../src/application/commands/create-recherche.command.handler'
 import { Recherche } from '../../../src/domain/recherche'
-import {
-  createSandbox,
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { DateService } from '../../../src/utils/date-service'
 import { uneDatetime } from '../../fixtures/date.fixture'
 
 describe('CreateRechercheCommandHandler', () => {
-  DatabaseForTesting.prepare()
   let rechercheRepository: StubbedType<Recherche.Repository>
   let idService: StubbedClass<IdService>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
