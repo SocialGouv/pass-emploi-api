@@ -17,19 +17,12 @@ import { RendezVous } from '../../../src/domain/rendez-vous'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
-import {
-  createSandbox,
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Mail } from '../../../src/domain/mail'
 import { Jeune } from 'src/domain/jeune'
 
 describe('UpdateRendezVousCommandHandler', () => {
-  DatabaseForTesting.prepare()
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let notificationRepository: StubbedType<Notification.Repository>

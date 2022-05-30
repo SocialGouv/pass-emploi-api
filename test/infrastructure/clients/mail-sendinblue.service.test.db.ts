@@ -3,16 +3,16 @@ import { HttpService } from '@nestjs/axios'
 import { testConfig } from '../../utils/module-for-testing'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import * as nock from 'nock'
-import { DatabaseForTesting, expect } from '../../utils'
+import { expect } from '../../utils'
 import * as fs from 'fs'
 import * as path from 'path'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitation-ics.client'
 import { MailDataDto } from '../../../src/domain/mail'
 import { RendezVous } from '../../../src/domain/rendez-vous'
+import { databaseForTesting } from '../../test-with-bd.test'
 
 describe('MailSendinblueService', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
   let mailSendinblueService: MailSendinblueService
   let invitationIcsClient: InvitationIcsClient
   const config = testConfig()

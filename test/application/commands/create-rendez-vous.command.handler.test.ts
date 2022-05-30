@@ -1,13 +1,7 @@
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import { PlanificateurService } from '../../../src/domain/planificateur'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import {
-  createSandbox,
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { failure, success } from '../../../src/building-blocks/types/result'
@@ -31,7 +25,6 @@ import { Conseiller } from 'src/domain/conseiller'
 import { unConseiller } from 'test/fixtures/conseiller.fixture'
 
 describe('CreateRendezVousCommandHandler', () => {
-  DatabaseForTesting.prepare()
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let notificationRepository: StubbedType<Notification.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>

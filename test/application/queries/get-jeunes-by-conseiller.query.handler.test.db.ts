@@ -25,16 +25,10 @@ import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
-import {
-  createSandbox,
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { databaseForTesting } from '../../test-with-bd.test'
 
 describe('GetJeunesByConseillerQueryHandler', () => {
-  const db = DatabaseForTesting.prepare()
   let conseillersRepository: StubbedType<Conseiller.Repository>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getJeunesByConseillerQueryHandler: GetJeunesByConseillerQueryHandler
@@ -46,7 +40,7 @@ describe('GetJeunesByConseillerQueryHandler', () => {
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
 
     getJeunesByConseillerQueryHandler = new GetJeunesByConseillerQueryHandler(
-      db.sequelize,
+      databaseForTesting.sequelize,
       conseillersRepository,
       conseillerAuthorizer
     )

@@ -1,12 +1,6 @@
 import { FavoriOffresEmploiAuthorizer } from '../../../src/application/authorizers/authorize-favori-offres-emploi'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import {
-  createSandbox,
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import {
@@ -23,7 +17,6 @@ import { FavoriNonTrouveError } from '../../../src/building-blocks/types/domain-
 import { OffreEmploi, OffresEmploi } from '../../../src/domain/offre-emploi'
 
 describe('DeleteFavoriOffreEmploiCommandHandler', () => {
-  DatabaseForTesting.prepare()
   let offresEmploiHttpSqlRepository: StubbedType<OffresEmploi.Repository>
   let favoriOffresEmploiAuthorizer: StubbedClass<FavoriOffresEmploiAuthorizer>
   let deleteFavoriOffreEmploiCommandHandler: DeleteFavoriOffreEmploiCommandHandler

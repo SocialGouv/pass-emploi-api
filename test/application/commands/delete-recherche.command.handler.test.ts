@@ -1,11 +1,5 @@
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import {
-  createSandbox,
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import {
@@ -23,7 +17,6 @@ import {
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 
 describe('DeleteRechercheCommandHandler', () => {
-  DatabaseForTesting.prepare()
   let rechercheSqlRepository: StubbedType<Recherche.Repository>
   let rechercheAuthorizer: StubbedClass<RechercheAuthorizer>
   let deleteRechercheCommandHandler: DeleteRechercheCommandHandler

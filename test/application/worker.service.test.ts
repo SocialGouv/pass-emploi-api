@@ -1,5 +1,5 @@
 import { WorkerService } from '../../src/application/worker.service'
-import { DatabaseForTesting, expect, StubbedClass, stubClass } from '../utils'
+import { expect, StubbedClass, stubClass } from '../utils'
 import { HandleJobMailConseillerCommandHandler } from '../../src/application/commands/jobs/handle-job-mail-conseiller.command'
 import { HandleJobRappelRendezVousCommandHandler } from '../../src/application/commands/jobs/handle-job-rappel-rendez-vous.command'
 import { HandleNettoyerLesJobsCommandHandler } from '../../src/application/commands/jobs/handle-job-nettoyer-les-jobs.command'
@@ -18,7 +18,6 @@ describe('WorkerService', () => {
 
     beforeEach(async () => {
       // Given
-      DatabaseForTesting.prepare()
       const planificateurRepository = new PlanificateurRedisRepository(
         testConfig(),
         new DateService()

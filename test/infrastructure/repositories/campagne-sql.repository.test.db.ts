@@ -1,4 +1,4 @@
-import { DatabaseForTesting, expect } from '../../utils'
+import { expect } from '../../utils'
 import { CampagneSqlRepository } from '../../../src/infrastructure/repositories/campagne-sql.repository'
 import {
   uneCampagne,
@@ -10,8 +10,6 @@ import { DateTime } from 'luxon'
 import { ReponseCampagneSqlModel } from '../../../src/infrastructure/sequelize/models/reponse-campagne.sql-model'
 
 describe('CampagneSqlRepository', () => {
-  DatabaseForTesting.prepare()
-
   let campagneSqlRepository: CampagneSqlRepository
 
   beforeEach(() => {

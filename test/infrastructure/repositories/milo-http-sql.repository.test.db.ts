@@ -17,13 +17,12 @@ import { DossierMiloDto } from '../../../src/infrastructure/repositories/dto/mil
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
 import { MiloHttpSqlRepository } from '../../../src/infrastructure/repositories/milo-http-sql.repository'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { DatabaseForTesting } from '../../utils'
 import { testConfig } from '../../utils/module-for-testing'
+import { databaseForTesting } from '../../test-with-bd.test'
 
 describe('MiloHttpRepository', () => {
   let miloHttpSqlRepository: MiloHttpSqlRepository
   const configService = testConfig()
-  const database = DatabaseForTesting.prepare()
   const jeune = unJeune({ email: 'john@doe.io' })
   let idService: IdService
   let dateService: DateService
@@ -33,7 +32,7 @@ describe('MiloHttpRepository', () => {
     const conseillerSqlRepository = new ConseillerSqlRepository()
     await conseillerSqlRepository.save(jeune.conseiller)
     const jeuneSqlRepository = new JeuneSqlRepository(
-      database.sequelize,
+      databaseForTesting.sequelize,
       idService,
       dateService
     )

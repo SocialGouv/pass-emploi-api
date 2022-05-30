@@ -7,13 +7,7 @@ import {
 } from '../../../src/application/queries/get-detail-action.query.handler'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { uneActionQueryModelWithJeuneFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
-import {
-  createSandbox,
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { Action } from '../../../src/domain/action'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository'
@@ -22,9 +16,9 @@ import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
 import { IdService } from '../../../src/utils/id-service'
 import { DateService } from '../../../src/utils/date-service'
+import { databaseForTesting } from '../../test-with-bd.test'
 
 describe('GetDetailActionQueryHandler', () => {
-  const database = DatabaseForTesting.prepare()
   let actionSqlRepository: Action.Repository
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
   let getDetailActionQueryHandler: GetDetailActionQueryHandler
@@ -52,7 +46,7 @@ describe('GetDetailActionQueryHandler', () => {
       const conseillerRepository = new ConseillerSqlRepository()
       await conseillerRepository.save(unConseiller())
       const jeuneRepository = new JeuneSqlRepository(
-        database.sequelize,
+        databaseForTesting.sequelize,
         new IdService(),
         new DateService()
       )
