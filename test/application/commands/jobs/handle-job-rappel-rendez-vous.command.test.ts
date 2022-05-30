@@ -136,7 +136,7 @@ describe('HandlerJobRendezVousCommandHandler', () => {
     })
   })
   describe("le rendez-vous est dans moins d'une semaine et plus d'un jour", () => {
-    it('envoie une notification avec le nombre de jours', async () => {
+    it("n'envoie pas de notification", async () => {
       // Given
       const unRendezVousSansToken: RendezVous = {
         ...unRendezVous(),
@@ -150,17 +150,7 @@ describe('HandlerJobRendezVousCommandHandler', () => {
       await handlerJobRendezVousCommandHandler.handle(command)
 
       // Then
-      expect(notificationRepository.send).to.have.been.calledWithExactly({
-        token: 'unToken',
-        notification: {
-          title: 'Rappel rendez-vous',
-          body: 'Vous avez un rendez-vous dans 5 jours'
-        },
-        data: {
-          type: 'RAPPEL_RENDEZVOUS',
-          id: 'idRendezVous'
-        }
-      })
+      expect(notificationRepository.send).not.to.have.been.called()
     })
   })
   describe('quand le rendez-vous est passé', () => {
@@ -178,7 +168,7 @@ describe('HandlerJobRendezVousCommandHandler', () => {
       await handlerJobRendezVousCommandHandler.handle(command)
 
       // Then
-      expect(notificationRepository.send).to.have.callCount(0)
+      expect(notificationRepository.send).not.to.have.been.called()
     })
   })
 })

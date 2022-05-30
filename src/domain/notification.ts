@@ -120,9 +120,7 @@ export namespace Notification {
     if (rdvDansPlusDUnJour) {
       body = 'Vous avez un rendez-vous dans une semaine'
       if (rdvDansMoinsDUneSemaine) {
-        body = `Vous avez un rendez-vous dans ${Math.trunc(
-          joursAvantRdv
-        )} jours`
+        return
       }
     }
 
