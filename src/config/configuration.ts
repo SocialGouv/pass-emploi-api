@@ -1,5 +1,7 @@
 /* eslint-disable */
 import { parse } from 'pg-connection-string'
+import * as Joi from 'joi'
+import { configurationSchema } from './configuration.schema'
 
 export default () => {
   const scalingoApp = process.env.APP
@@ -7,14 +9,18 @@ export default () => {
   if (scalingoApp && scalingoApp.startsWith('pa-back-staging-pr')) {
     baseUrl = `https://${scalingoApp}.osc-fr1.scalingo.io`
   } else {
-    baseUrl = process.env.BASE_URL || 'http://localhost:5000'
+    baseUrl = process.env.BASE_URL as string
   }
 
-  const databaseUrl =
-    process.env.DATABASE_URL ||
-    'postgresql://passemploi:passemploi@localhost:55432/passemploidb'
-  const { host, port, database, user, password } = parse(databaseUrl)
-  return {
+  const databaseUrl = process.env.DATABASE_URL as string
+  const {
+    host,
+    port,
+    database,
+    user,
+    password
+  } = parse(databaseUrl)
+  const configuration = {
     environment: process.env.ENVIRONMENT,
     isWeb: process.env.IS_WEB !== 'false',
     isWorker: process.env.IS_WORKER === 'true',
@@ -33,10 +39,10 @@ export default () => {
     },
     debug: process.env.DEBUG,
     logLevel: process.env.LOG_LEVEL,
-    nodeEnv: process.env.NODE_ENV || 'production',
-    frontEndUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+    nodeEnv: process.env.NODE_ENV ?? 'production',
+    frontEndUrl: process.env.FRONTEND_URL,
     passEmploiContactEmail:
-      process.env.PASS_EMPLOI_CONTACT_EMAIL || 'pass.emploi.contact@gmail.com',
+      process.env.PASS_EMPLOI_CONTACT_EMAIL ?? 'pass.emploi.contact@gmail.com',
     baseUrl,
     poleEmploi: {
       url:
@@ -50,9 +56,7 @@ export default () => {
       scope: process.env.POLE_EMPLOI_SCOPE ?? ''
     },
     poleEmploiPartenaire: {
-      url:
-        process.env.POLE_EMPLOI_PARTENAIRE_API_BASE_URL ??
-        'https://api-r.es-qvr.fr/partenaire'
+      url: process.env.POLE_EMPLOI_PARTENAIRE_API_BASE_URL
     },
     milo: {
       url: process.env.MILO_API_URL,
@@ -83,12 +87,11 @@ export default () => {
       clientSecret: process.env.OIDC_CLIENT_SECRET ?? ''
     },
     apiKeys: {
-      keycloak: process.env.API_KEY_KEYCLOAK ?? 'ceci-est-une-api-key',
-      immersion:
-        process.env.API_KEY_PARTENAIRE_IMMERSION ?? 'ceci-est-une-autre-api-key'
+      keycloak: process.env.API_KEY_KEYCLOAK,
+      immersion: process.env.API_KEY_PARTENAIRE_IMMERSION
     },
     redis: {
-      url: process.env.REDIS_URL ?? ''
+      url: process.env.REDIS_URL
     },
     sendinblue: {
       url: process.env.SENDINBLUE_API_URL ?? 'https://api.sendinblue.com',
@@ -124,4 +127,5 @@ export default () => {
       }
     }
   }
+  return Joi.attempt(configuration, configurationSchema)
 }
