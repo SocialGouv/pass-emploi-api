@@ -96,8 +96,7 @@ import {
   UpdateStatutDemarcheCommand,
   UpdateStatutDemarcheCommandHandler
 } from '../../application/commands/update-demarche.commande.handler'
-import { handleFailure } from './utils/failure.handler'
-import { handleError } from './utils/error.handler'
+import { handleFailure } from './failure.handler'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -502,7 +501,9 @@ export class JeunesController {
         utilisateur
       )
     } catch (e) {
-      handleError(e)
+      if (e instanceof DroitsInsuffisants) {
+        throw new ForbiddenException(e)
+      }
       throw e
     }
 
