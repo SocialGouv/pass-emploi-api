@@ -88,7 +88,8 @@ describe('GetCampagneQueryModel', () => {
           dateDebut: campagneEnCours.dateDebut.toUTC().toString(),
           dateFin: campagneEnCours.dateFin.toUTC().toString(),
           description: "Votre expérience sur l'application",
-          titre: 'Donnez nous votre avis',
+          titre:
+            "Aidez-nous à améliorer l'application en répondant à 2 questions",
           questions
         })
       })
@@ -116,7 +117,8 @@ describe('GetCampagneQueryModel', () => {
           dateDebut: campagneEnCours.dateDebut.toUTC().toString(),
           dateFin: campagneEnCours.dateFin.toUTC().toString(),
           description: "Votre expérience sur l'application",
-          titre: 'Donnez nous votre avis',
+          titre:
+            "Aidez-nous à améliorer l'application en répondant à 2 questions",
           questions
         })
       })

@@ -51,7 +51,8 @@ export class GetCampagneQueryModel {
         dateDebut: campagneEnCours.dateDebut.toISOString(),
         dateFin: campagneEnCours.dateFin.toISOString(),
         description: "Votre expérience sur l'application",
-        titre: 'Donnez nous votre avis',
+        titre:
+          "Aidez-nous à améliorer l'application en répondant à 2 questions",
         questions: questionsInMemory()
       }
     }
