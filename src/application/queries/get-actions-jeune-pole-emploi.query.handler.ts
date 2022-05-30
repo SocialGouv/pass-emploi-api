@@ -95,9 +95,9 @@ function compareDemarchesByStatutOrDateFin(
 
 const statutsOrder: { [statut in Demarche.Statut]: number } = {
   A_FAIRE: 1,
-  EN_COURS: 2,
-  ANNULEE: 4,
-  REALISEE: 3
+  EN_COURS: 1,
+  ANNULEE: 2,
+  REALISEE: 2
 }
 
 function compareStatuts(
