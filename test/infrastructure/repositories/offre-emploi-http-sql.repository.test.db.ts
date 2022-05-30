@@ -12,12 +12,7 @@ import { FavoriOffreEmploiSqlModel } from '../../../src/infrastructure/sequelize
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import {
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { expect, StubbedClass, stubClass } from '../../utils'
 import {
   uneOffreEmploi,
   uneOffreEmploiDto,
@@ -28,7 +23,6 @@ import { DateTime } from 'luxon'
 import { isSuccess } from '../../../src/building-blocks/types/result'
 
 describe('OffresEmploiHttpSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let offresEmploiHttpSqlRepository: OffresEmploiHttpSqlRepository
   let poleEmploiClient: StubbedClass<PoleEmploiClient>
   const maintenant = DateTime.fromISO('2020-04-06T12:00:00.001Z').toUTC()

@@ -1,12 +1,6 @@
 import { SinonSandbox } from 'sinon'
 import { GetDetailRendezVousQueryHandler } from '../../../src/application/queries/get-detail-rendez-vous.query.handler'
-import {
-  createSandbox,
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { unJeune } from '../../fixtures/jeune.fixture'
@@ -24,7 +18,6 @@ import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture
 import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'
 
 describe('GetDetailRendezVousQueryHandler', () => {
-  DatabaseForTesting.prepare()
   let getDetailRendezVousQueryHandler: GetDetailRendezVousQueryHandler
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
   let sandbox: SinonSandbox

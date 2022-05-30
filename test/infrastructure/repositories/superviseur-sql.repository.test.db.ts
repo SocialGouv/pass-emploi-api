@@ -1,10 +1,9 @@
 import { SuperviseurSqlRepository } from 'src/infrastructure/repositories/superviseur-sql.repository'
 import { SuperviseurSqlModel } from 'src/infrastructure/sequelize/models/superviseur.sql-model'
 import { Core } from '../../../src/domain/core'
-import { DatabaseForTesting, expect } from '../../utils'
+import { expect } from '../../utils'
 
 describe('SuperviseurSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let superviseurSqlRepository: SuperviseurSqlRepository
   // Given
   const unSuperviseur1 = {

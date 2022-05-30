@@ -8,16 +8,16 @@ import { uneAction } from '../../fixtures/action.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
-import { DatabaseForTesting, expect } from '../../utils'
+import { expect } from '../../utils'
 import { IdService } from 'src/utils/id-service'
 import { DateService } from 'src/utils/date-service'
+import { databaseForTesting } from '../../test-with-bd.test'
 
 describe('ActionSqlRepository', () => {
   let jeune: Jeune
   let actionSqlRepository: ActionSqlRepository
   let idService: IdService
   let dateService: DateService
-  const databaseForTesting = DatabaseForTesting.prepare()
 
   beforeEach(async () => {
     jeune = unJeune()

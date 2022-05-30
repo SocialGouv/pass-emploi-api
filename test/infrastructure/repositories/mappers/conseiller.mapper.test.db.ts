@@ -1,20 +1,16 @@
 import { fromSqlToDetailConseillerQueryModel } from '../../../../src/infrastructure/repositories/mappers/conseillers.mappers'
 import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { DatabaseForTesting, expect } from '../../../utils'
+import { expect } from '../../../utils'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import {
   AgenceDto,
   AgenceSqlModel
 } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { Core } from '../../../../src/domain/core'
-import Structure = Core.Structure
 import { DetailConseillerQueryModel } from '../../../../src/application/queries/query-models/conseillers.query-models'
+import Structure = Core.Structure
 
 describe('fromSqlToDetailConseillerQueryModel', () => {
-  before(() => {
-    DatabaseForTesting.prepare()
-  })
-
   describe('sans agence', () => {
     it('renvoie le query model', async () => {
       // Given

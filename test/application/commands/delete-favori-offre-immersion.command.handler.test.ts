@@ -17,16 +17,9 @@ import {
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneOffreImmersion } from '../../fixtures/offre-immersion.fixture'
-import {
-  createSandbox,
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('DeleteFavoriOffreImmersionCommandHandler', () => {
-  DatabaseForTesting.prepare()
   let offresImmersionHttpSqlRepository: StubbedType<OffresImmersion.Repository>
   let favoriOffresImmersionAuthorizer: StubbedClass<FavoriOffresImmersionAuthorizer>
   let deleteFavoriOffreImmersionCommandHandler: DeleteFavoriOffreImmersionCommandHandler

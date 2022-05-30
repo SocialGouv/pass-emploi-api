@@ -20,18 +20,18 @@ import { IdService } from '../../../src/utils/id-service'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { DatabaseForTesting, expect } from '../../utils'
+import { expect } from '../../utils'
 import { GetServicesCiviqueQuery } from '../../../src/application/queries/get-services-civique.query.handler'
+import { databaseForTesting } from '../../test-with-bd.test'
 
 describe('RechercheSqlRepository', () => {
-  const database = DatabaseForTesting.prepare()
+  const rechercheSqlRepository = new RechercheSqlRepository(
+    databaseForTesting.sequelize
+  )
 
-  let rechercheSqlRepository: RechercheSqlRepository
   const idJeune = 'ABCDE'
 
   beforeEach(async () => {
-    rechercheSqlRepository = new RechercheSqlRepository(database.sequelize)
-
     const conseillerDto = unConseillerDto()
     await ConseillerSqlModel.creer(conseillerDto)
     await JeuneSqlModel.creer(

@@ -12,15 +12,9 @@ import {
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import {
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { expect, StubbedClass, stubClass } from '../../utils'
 
 describe('AuthentificationSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let authentificationSqlRepository: AuthentificationSqlRepository
   let keycloakClient: StubbedClass<KeycloakClient>
 

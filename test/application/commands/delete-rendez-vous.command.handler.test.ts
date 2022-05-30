@@ -1,12 +1,6 @@
 import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import {
-  createSandbox,
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import {
@@ -29,7 +23,6 @@ import { Mail } from '../../../src/domain/mail'
 import { Conseiller } from '../../../src/domain/conseiller'
 
 describe('DeleteRendezVousCommandHandler', () => {
-  DatabaseForTesting.prepare()
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let notificationRepository: StubbedType<Notification.Repository>

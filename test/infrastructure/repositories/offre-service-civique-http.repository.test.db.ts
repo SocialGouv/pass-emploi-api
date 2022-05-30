@@ -8,12 +8,7 @@ import {
   uneOffreServiceCiviqueDto
 } from '../../fixtures/offre-service-civique.fixture'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import {
-  DatabaseForTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { expect, StubbedClass, stubClass } from '../../utils'
 import { OffreServiceCivique } from '../../../src/domain/offre-service-civique'
 import { EngagementClient } from '../../../src/infrastructure/clients/engagement-client'
 import { DateTime } from 'luxon'
@@ -25,7 +20,6 @@ import {
 } from '../../../src/building-blocks/types/domain-error'
 
 describe('OffreServiceCiviqueHttpSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let offreServiceCiviqueHttpSqlRepository: OffreServiceCiviqueHttpSqlRepository
   let serviceCiviqueClient: StubbedClass<EngagementClient>
 
