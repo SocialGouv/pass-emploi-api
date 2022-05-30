@@ -10,7 +10,6 @@ import {
   buildModuleMetadata,
   buildQueryCommandsProviders
 } from '../../src/app.module'
-import configuration from '../../src/config/configuration'
 import { Authentification } from '../../src/domain/authentification'
 import {
   IJwtService,
@@ -27,13 +26,7 @@ import TokenMessage = messaging.TokenMessage
 export function buildTestingModuleForHttpTesting(): TestingModuleBuilder {
   const moduleMetadata = buildModuleMetadata()
   return Test.createTestingModule({
-    imports: [
-      HttpModule,
-      ConfigModule.forRoot({
-        load: [configuration]
-      }),
-      TerminusModule
-    ],
+    imports: [HttpModule, ConfigModule.forRoot(), TerminusModule],
     providers: stubProviders(),
     controllers: moduleMetadata.controllers
   })
@@ -95,6 +88,10 @@ export const testConfig = (): ConfigService => {
       mailConseillers: {
         nombreDeConseillersEnParallele: '100'
       }
+    },
+    apiKeys: {
+      keycloak: 'ceci-est-une-api-key',
+      immersion: 'ceci-est-une-autre-api-key'
     }
   })
 }
@@ -112,6 +109,10 @@ const stubProviders = (): Provider[] => {
     {
       provide: FirebaseClient,
       useClass: FakeFirebaseClient
+    },
+    {
+      provide: ConfigService,
+      useValue: testConfig()
     }
   ]
   const queryCommandsProviders = buildQueryCommandsProviders().map(
