@@ -1,5 +1,6 @@
 import { DynamicModule } from '@nestjs/common'
 import { Request } from 'express'
+import { IncomingMessage } from 'http'
 import { LoggerModule } from 'nestjs-pino'
 import { MixinFn } from 'pino'
 import { ReqId } from 'pino-http'
@@ -12,7 +13,14 @@ export const configureLoggerModule = (): DynamicModule =>
     // @ts-ignore
     pinoHttp: [
       {
-        autoLogging: { ignorePaths: ['/health'] },
+        autoLogging: {
+          ignore: (req: IncomingMessage): boolean => {
+            if (req.url?.endsWith('/health')) {
+              return true
+            }
+            return false
+          }
+        },
         redact: [
           'req.headers.authorization',
           'req.headers.cookie',
