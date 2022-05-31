@@ -13,7 +13,7 @@ import {
 import * as request from 'supertest'
 import { CreateRechercheCommandHandler } from '../../../src/application/commands/create-recherche.command.handler'
 import { Recherche } from '../../../src/domain/recherche'
-import { Contrat, Duree, Experience } from '../../../src/domain/offre-emploi'
+import { Contrat, Duree } from '../../../src/domain/offre-emploi'
 import {
   CreateRechercheImmersionPayload,
   CreateRechercheOffresEmploiPayload,
@@ -102,7 +102,7 @@ describe('RecherchesController', () => {
             q: 'informatique',
             alternance: true,
             departement: 'Ile-de-France',
-            experience: [Experience.moinsdUnAn],
+            debutantAccepte: true,
             contrat: [Contrat.cdi, Contrat.cdd],
             duree: [Duree.tempsPartiel],
             rayon: 10,
@@ -131,7 +131,7 @@ describe('RecherchesController', () => {
               q: 'informatique',
               alternance: true,
               departement: 'Ile-de-France',
-              experience: [Experience.moinsdUnAn],
+              debutantAccepte: true,
               contrat: [Contrat.cdi, Contrat.cdd],
               duree: [Duree.tempsPartiel],
               rayon: 10,
@@ -257,7 +257,7 @@ describe('RecherchesController', () => {
           criteres: {
             q: 'informatique',
             alternance: true,
-            experience: [Experience.moinsdUnAn],
+            debutantAccepte: true,
             contrat: [Contrat.cdi, Contrat.cdd],
             duree: [Duree.tempsPartiel],
             rayon: 10,

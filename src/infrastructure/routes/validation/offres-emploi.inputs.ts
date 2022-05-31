@@ -124,6 +124,12 @@ export class FindOffresEmploiQueryBody implements FindOffresEmploisQuery {
   @IsEnum(Experience, { each: true })
   experience?: Experience[]
 
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  @IsIn([true, false])
+  debutantAccepte?: boolean
+
   @ApiPropertyOptional({ enum: Contrat, isArray: true })
   @IsOptional()
   @IsEnum(Contrat, { each: true })
