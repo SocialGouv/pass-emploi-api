@@ -21,6 +21,7 @@ interface FindOffresEmploisQuery {
   departement?: string
   alternance?: boolean
   experience?: Experience[]
+  debutantAccepte?: boolean
   contrat?: Contrat[]
   duree?: Duree[]
   commune?: string
@@ -66,6 +67,13 @@ export class FindOffresEmploiQueryParams implements FindOffresEmploisQuery {
   @IsEnum(Experience, { each: true })
   @Transform(params => transformStringToArray(params, 'experience'))
   experience?: Experience[]
+
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  @IsIn([true, false])
+  @Transform(params => transformStringToBoolean(params, 'debutantAccepte'))
+  debutantAccepte?: boolean
 
   @ApiPropertyOptional({ enum: Contrat, isArray: true })
   @IsOptional()

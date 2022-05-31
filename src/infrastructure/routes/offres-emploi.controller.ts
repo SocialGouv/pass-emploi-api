@@ -50,6 +50,7 @@ export class OffresEmploiController {
       departement: findOffresEmploiQuery.departement,
       alternance: findOffresEmploiQuery.alternance,
       experience: findOffresEmploiQuery.experience,
+      debutantAccepte: findOffresEmploiQuery.debutantAccepte,
       contrat: findOffresEmploiQuery.contrat,
       duree: findOffresEmploiQuery.duree,
       rayon: findOffresEmploiQuery.rayon,

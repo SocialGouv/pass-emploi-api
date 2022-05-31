@@ -166,6 +166,7 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
       departement,
       alternance,
       experience,
+      debutantAccepte,
       duree,
       contrat,
       commune,
@@ -187,6 +188,9 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
     }
     if (experience) {
       params.append('experience', buildQueryParamFromArray(experience))
+    }
+    if (debutantAccepte) {
+      params.append('experienceExigence', 'D')
     }
     if (duree) {
       params.append('dureeHebdo', buildQueryParamFromArray(duree))
