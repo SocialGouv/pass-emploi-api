@@ -1,7 +1,12 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { Notification } from 'src/domain/notification'
-import { Contrat, Duree, OffresEmploi } from 'src/domain/offre-emploi'
+import {
+  Contrat,
+  Duree,
+  Experience,
+  OffresEmploi
+} from 'src/domain/offre-emploi'
 import { Recherche } from 'src/domain/recherche'
 import { DateService } from 'src/utils/date-service'
 import {
@@ -142,6 +147,11 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           q: 'boulanger',
           departement: '75',
           alternance: false,
+          experience: [
+            Experience.moinsdUnAn,
+            Experience.entreUnEtTroisAns,
+            Experience.plusDeTroisAns
+          ],
           debutantAccepte: true,
           contrat: [Contrat.autre, Contrat.cdi, Contrat.cdd],
           duree: [Duree.tempsPartiel, Duree.tempsPlein],
@@ -181,6 +191,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           q: criteres.q,
           departement: criteres.departement,
           alternance: criteres.alternance,
+          experience: criteres.experience,
           debutantAccepte: criteres.debutantAccepte,
           contrat: criteres.contrat,
           duree: criteres.duree,
