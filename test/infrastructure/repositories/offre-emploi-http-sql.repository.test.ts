@@ -250,6 +250,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
       q: 'mots clés',
       departement: '75',
       experience: [Experience.entreUnEtTroisAns, Experience.plusDeTroisAns],
+      debutantAccepte: true,
       rayon: 15
     }
 
@@ -276,6 +277,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
           departement: '75',
           natureContrat: 'E2,FS',
           experience: '2,3',
+          experienceExigence: 'D',
           dureeHebdo: '1',
           typeContrat: 'CDI,DIN,CCE,FRA,LIB,REP,TTI',
           distance: '15',

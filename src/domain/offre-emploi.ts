@@ -61,6 +61,7 @@ export namespace OffresEmploi {
     departement?: string
     alternance?: boolean
     experience?: Experience[]
+    debutantAccepte?: boolean
     contrat?: Contrat[]
     duree?: Duree[]
     rayon?: number

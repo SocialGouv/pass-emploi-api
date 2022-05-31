@@ -47,7 +47,7 @@ describe('GetOffresEmploiQueryHandler', () => {
           q: 'boulanger',
           departement: '75',
           alternance: true,
-          experience: [Experience.entreUnEtTroisAns],
+          debutantAccepte: false,
           contrat: [Contrat.cdd],
           duree: [Duree.tempsPlein]
         }
@@ -72,7 +72,7 @@ describe('GetOffresEmploiQueryHandler', () => {
           q: 'boulanger',
           departement: '75',
           alternance: true,
-          experience: [Experience.entreUnEtTroisAns],
+          debutantAccepte: false,
           contrat: [Contrat.cdd],
           duree: [Duree.tempsPlein]
         }
