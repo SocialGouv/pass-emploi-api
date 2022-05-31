@@ -35,7 +35,9 @@ export const configurationSchema = Joi.object({
   }),
   milo: Joi.object({
     url: Joi.string().uri().required(),
-    urlWeb: Joi.string().uri().required(),
+    urlWeb: Joi.string()
+      .uri()
+      .description("feature flipping pour ajouter l'url du dossier du jeune"),
     apiKeyRecupererDossier: Joi.string().required(),
     apiKeyCreerJeune: Joi.string().required()
   }),
