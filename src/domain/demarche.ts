@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { DateService } from '../utils/date-service'
 import { Result } from '../building-blocks/types/result'
+import { DateService } from '../utils/date-service'
 
 export const DemarcheRepositoryToken = 'DemarcheRepositoryToken'
+const POURQUOI_DEMARCHE_PERSO = 'P01'
+const QUOI_DEMARCHE_PERSO = 'Q38'
 
 export interface Demarche {
   id: string
@@ -33,6 +35,16 @@ export namespace Demarche {
     dateFin?: DateTime
     dateAnnulation?: DateTime
   }
+  export interface Creee {
+    statut: Demarche.Statut
+    dateCreation: DateTime
+    dateDebut: DateTime
+    dateFin: DateTime
+    pourquoi: string
+    quoi: string
+    comment?: string
+    description?: string
+  }
 
   export enum Statut {
     EN_COURS = 'EN_COURS',
@@ -60,6 +72,10 @@ export namespace Demarche {
   export interface Repository {
     update(
       demarcheModifiee: Demarche.Modifiee,
+      accessToken: string
+    ): Promise<Result<Demarche>>
+    save(
+      demarche: Demarche.Creee,
       accessToken: string
     ): Promise<Result<Demarche>>
   }
@@ -113,6 +129,22 @@ export namespace Demarche {
         ...demarcheModifiee,
         dateDebut: maintenant
       }
+    }
+
+    creerDemarchePerso(description: string, dateFin: Date): Demarche.Creee {
+      const maintenant = this.dateService.now()
+      const dateTimeFin = DateTime.fromJSDate(dateFin)
+
+      const demarche: Demarche.Creee = {
+        statut: Demarche.Statut.A_FAIRE,
+        dateCreation: maintenant,
+        dateDebut: dateTimeFin,
+        dateFin: dateTimeFin,
+        pourquoi: POURQUOI_DEMARCHE_PERSO,
+        quoi: QUOI_DEMARCHE_PERSO,
+        description
+      }
+      return demarche
     }
   }
 }

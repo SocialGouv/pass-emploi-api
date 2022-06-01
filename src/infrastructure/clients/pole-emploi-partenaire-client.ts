@@ -15,7 +15,8 @@ import {
   toEtat
 } from './dto/pole-emploi.dto'
 
-const ORIGINE_MODIFICATEUR = 'INDIVIDU'
+const ORIGINE = 'INDIVIDU'
+const DEMARCHES_URL = 'peconnect-demarches/v1/demarches'
 
 @Injectable()
 export class PoleEmploiPartenaireClient {
@@ -33,10 +34,7 @@ export class PoleEmploiPartenaireClient {
   async getDemarches(tokenDuJeune: string): Promise<DemarcheDto[]> {
     this.logger.log('recuperation des demarches du jeune')
 
-    const response = await this.get<DemarcheDto[]>(
-      'peconnect-demarches/v1/demarches',
-      tokenDuJeune
-    )
+    const response = await this.get<DemarcheDto[]>(DEMARCHES_URL, tokenDuJeune)
 
     if (response.status === HttpStatus.NO_CONTENT) {
       return []
@@ -99,7 +97,7 @@ export class PoleEmploiPartenaireClient {
         dateModification: demarcheModifiee.dateModification.toISO({
           includeOffset: false
         }),
-        origineModificateur: ORIGINE_MODIFICATEUR,
+        origineModificateur: ORIGINE,
         etat: toEtat(demarcheModifiee.statut),
         dateDebut:
           demarcheModifiee.dateDebut === null
@@ -111,7 +109,40 @@ export class PoleEmploiPartenaireClient {
         })
       }
       const demarcheDto = await this.put<DemarcheDto>(
-        `peconnect-demarches/v1/demarches/${demarcheModifiee.id}`,
+        `${DEMARCHES_URL}/${demarcheModifiee.id}`,
+        token,
+        body
+      )
+      return success(demarcheDto.data)
+    } catch (e) {
+      this.logger.error(e)
+      if (e.response?.data && e.response?.status) {
+        const erreur = new ErreurHttp(e.response.data, e.response.status)
+        return failure(erreur)
+      }
+      throw e
+    }
+  }
+
+  async createDemarche(
+    demarche: Demarche.Creee,
+    token: string
+  ): Promise<Result<DemarcheDto>> {
+    try {
+      const body = {
+        origineCreateur: ORIGINE,
+        etat: toEtat(demarche.statut),
+        dateCreation: demarche.dateCreation.toISO({
+          includeOffset: false
+        }),
+        dateDebut: demarche.dateDebut.toISO({ includeOffset: false }),
+        dateFin: demarche.dateFin.toISO({ includeOffset: false }),
+        pourquoi: demarche.pourquoi,
+        quoi: demarche.quoi,
+        description: demarche.description
+      }
+      const demarcheDto = await this.post<DemarcheDto>(
+        DEMARCHES_URL,
         token,
         body
       )
@@ -152,6 +183,24 @@ export class PoleEmploiPartenaireClient {
   ): Promise<AxiosResponse<T>> {
     return firstValueFrom(
       this.httpService.put<T>(`${this.apiUrl}/${suffixUrl}`, body, {
+        headers: { Authorization: `Bearer ${tokenDuJeune}` },
+        httpsAgent:
+          this.configService.get('environment') !== 'prod'
+            ? new https.Agent({
+                rejectUnauthorized: false
+              })
+            : undefined
+      })
+    )
+  }
+
+  private post<T>(
+    suffixUrl: string,
+    tokenDuJeune: string,
+    body: object
+  ): Promise<AxiosResponse<T>> {
+    return firstValueFrom(
+      this.httpService.post<T>(`${this.apiUrl}/${suffixUrl}`, body, {
         headers: { Authorization: `Bearer ${tokenDuJeune}` },
         httpsAgent:
           this.configService.get('environment') !== 'prod'

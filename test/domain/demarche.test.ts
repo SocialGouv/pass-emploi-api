@@ -1,8 +1,9 @@
+import { DateTime } from 'luxon'
 import { Demarche } from '../../src/domain/demarche'
-import { expect, StubbedClass, stubClass } from '../utils'
 import { DateService } from '../../src/utils/date-service'
-import { uneDatetime } from '../fixtures/date.fixture'
+import { uneDate, uneDatetime } from '../fixtures/date.fixture'
 import { uneDemarche } from '../fixtures/demarche.fixture'
+import { expect, StubbedClass, stubClass } from '../utils'
 
 describe('Demarche', () => {
   let demarcheFactory: Demarche.Factory
@@ -144,6 +145,27 @@ describe('Demarche', () => {
           dateModification: uneDatetime,
           dateAnnulation: uneDatetime
         })
+      })
+    })
+  })
+  describe('creerDemarchePerso', () => {
+    it('génère une démarche perso', () => {
+      // Given
+      const description = 'test'
+      const dateFin = uneDate()
+
+      // When
+      const demarche = demarcheFactory.creerDemarchePerso(description, dateFin)
+
+      // Then
+      expect(demarche).to.deep.equal({
+        statut: Demarche.Statut.A_FAIRE,
+        dateCreation: uneDatetime,
+        dateDebut: DateTime.fromJSDate(dateFin),
+        dateFin: DateTime.fromJSDate(dateFin),
+        pourquoi: 'P01',
+        quoi: 'Q38',
+        description
       })
     })
   })

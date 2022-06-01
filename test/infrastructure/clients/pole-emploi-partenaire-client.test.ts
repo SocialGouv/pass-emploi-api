@@ -5,12 +5,14 @@ import { uneDatetime } from '../../fixtures/date.fixture'
 import { PoleEmploiPartenaireClient } from '../../../src/infrastructure/clients/pole-emploi-partenaire-client'
 import { uneDemarcheDto } from '../../fixtures/demarches-dto.fixtures'
 import { Demarche } from '../../../src/domain/demarche'
-import { isSuccess } from '../../../src/building-blocks/types/result'
+import { failure, isSuccess } from '../../../src/building-blocks/types/result'
 import { expect } from '../../utils'
+import { ErreurHttp } from 'src/building-blocks/types/domain-error'
 
 describe('PoleEmploiPartenaireClient', () => {
   let poleEmploiPartenaireClient: PoleEmploiPartenaireClient
   const configService = testConfig()
+  const tokenJeune = 'token'
 
   beforeEach(() => {
     const httpService = new HttpService()
@@ -23,8 +25,6 @@ describe('PoleEmploiPartenaireClient', () => {
   describe('getPrestations', () => {
     it('fait un appel http get avec les bons paramètres', async () => {
       // Given
-      const tokenJeune = 'token'
-
       nock('https://api-r.es-qvr.fr/partenaire')
         .get(
           '/peconnect-gerer-prestations/v1/rendez-vous?dateRecherche=2020-04-06'
@@ -49,7 +49,6 @@ describe('PoleEmploiPartenaireClient', () => {
   describe('getLienVisio', () => {
     it('fait un appel http get avec les bons paramètres', async () => {
       // Given
-      const tokenJeune = 'token'
       const idVisio = '1'
 
       nock('https://api-r.es-qvr.fr/partenaire')
@@ -74,8 +73,6 @@ describe('PoleEmploiPartenaireClient', () => {
   describe('getRendezVous', () => {
     it('fait un appel http get avec les bons paramètres', async () => {
       // Given
-      const tokenJeune = 'token'
-
       nock('https://api-r.es-qvr.fr/partenaire')
         .get('/peconnect-rendezvousagenda/v1/listerendezvous')
         .reply(200, {
@@ -98,8 +95,6 @@ describe('PoleEmploiPartenaireClient', () => {
     describe('quand il y a des data', () => {
       it('renvoie les démarches', async () => {
         // Given
-        const tokenJeune = 'token'
-
         nock('https://api-r.es-qvr.fr/partenaire')
           .get('/peconnect-demarches/v1/demarches')
           .reply(200, [uneDemarcheDto()])
@@ -117,8 +112,6 @@ describe('PoleEmploiPartenaireClient', () => {
     describe('quand il y a no content', () => {
       it('renvoie un tableau vide', async () => {
         // Given
-        const tokenJeune = 'token'
-
         nock('https://api-r.es-qvr.fr/partenaire')
           .get('/peconnect-demarches/v1/demarches')
           .reply(204, '')
@@ -142,7 +135,6 @@ describe('PoleEmploiPartenaireClient', () => {
       describe('statut en cours', () => {
         it('construit le payload et met à jour la démarche', async () => {
           // Given
-          const tokenJeune = 'token'
           const demarcheModifiee: Demarche.Modifiee = {
             id: 'idDemarche',
             statut: Demarche.Statut.EN_COURS,
@@ -180,7 +172,6 @@ describe('PoleEmploiPartenaireClient', () => {
       describe('statut à faire', () => {
         it('construit le payload et met à jour la démarche', async () => {
           // Given
-          const tokenJeune = 'token'
           const demarcheModifiee: Demarche.Modifiee = {
             id: 'idDemarche',
             statut: Demarche.Statut.A_FAIRE,
@@ -214,6 +205,101 @@ describe('PoleEmploiPartenaireClient', () => {
             expect(result.data).to.deep.equal(demarcheDto)
           }
         })
+      })
+    })
+    describe("quand il y' une erreur", () => {
+      it('renvoie une failure', async () => {
+        // Given
+        const demarcheModifiee: Demarche.Modifiee = {
+          id: 'idDemarche',
+          statut: Demarche.Statut.EN_COURS,
+          dateModification: uneDatetime,
+          dateDebut: uneDatetime
+        }
+        const body = {
+          id: demarcheModifiee.id,
+          dateModification: '2020-04-06T12:00:00.000',
+          origineModificateur: 'INDIVIDU',
+          etat: 'AC',
+          dateDebut: '2020-04-06T12:00:00.000',
+          dateFin: undefined,
+          dateAnnulation: undefined
+        }
+        nock('https://api-r.es-qvr.fr/partenaire')
+          .put('/peconnect-demarches/v1/demarches/idDemarche', body)
+          .reply(400, 'un message')
+          .isDone()
+
+        // When
+        const result = await poleEmploiPartenaireClient.updateDemarche(
+          demarcheModifiee,
+          tokenJeune
+        )
+
+        // Then
+        expect(result).to.deep.equal(failure(new ErreurHttp('un message', 400)))
+      })
+    })
+  })
+
+  describe('createDemarche', () => {
+    const demarcheDto = uneDemarcheDto()
+    const demarche: Demarche.Creee = {
+      statut: Demarche.Statut.A_FAIRE,
+      dateCreation: uneDatetime,
+      dateDebut: uneDatetime,
+      dateFin: uneDatetime,
+      pourquoi: 'test',
+      quoi: 'test',
+      description: 'test'
+    }
+    const body = {
+      origineCreateur: 'INDIVIDU',
+      etat: 'AC',
+      dateCreation: '2020-04-06T12:00:00.000',
+      dateDebut: '2020-04-06T12:00:00.000',
+      dateFin: '2020-04-06T12:00:00.000',
+      pourquoi: 'test',
+      quoi: 'test',
+      description: 'test'
+    }
+    describe('quand tout va bien', () => {
+      it('construit le payload et crée la démarche', async () => {
+        // Given
+        nock('https://api-r.es-qvr.fr/partenaire')
+          .post('/peconnect-demarches/v1/demarches', body)
+          .reply(200, demarcheDto)
+          .isDone()
+
+        // When
+        const result = await poleEmploiPartenaireClient.createDemarche(
+          demarche,
+          tokenJeune
+        )
+
+        // Then
+        expect(isSuccess(result)).to.be.true()
+        if (isSuccess(result)) {
+          expect(result.data).to.deep.equal(demarcheDto)
+        }
+      })
+    })
+    describe("quand il y' une erreur", () => {
+      it('renvoie une failure', async () => {
+        // Given
+        nock('https://api-r.es-qvr.fr/partenaire')
+          .post('/peconnect-demarches/v1/demarches', body)
+          .reply(400, 'un message')
+          .isDone()
+
+        // When
+        const result = await poleEmploiPartenaireClient.createDemarche(
+          demarche,
+          tokenJeune
+        )
+
+        // Then
+        expect(result).to.deep.equal(failure(new ErreurHttp('un message', 400)))
       })
     })
   })

@@ -32,4 +32,23 @@ export class DemarcheHttpRepository implements Demarche.Repository {
 
     return result
   }
+
+  async save(
+    demarche: Demarche.Creee,
+    accessToken: string
+  ): Promise<Result<Demarche>> {
+    const token = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
+      accessToken
+    )
+    const result = await this.poleEmploiPartenaireClient.createDemarche(
+      demarche,
+      token
+    )
+
+    if (isSuccess(result)) {
+      return success(fromDemarcheDtoToDemarche(result.data, this.dateService))
+    }
+
+    return result
+  }
 }

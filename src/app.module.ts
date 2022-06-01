@@ -164,7 +164,8 @@ import { GetCampagneQueryModel } from './application/queries/query-getters/get-c
 import { CreateEvaluationCommandHandler } from './application/commands/create-evaluation.command'
 import { DemarcheHttpRepository } from './infrastructure/repositories/demarche-http.repository'
 import { Demarche, DemarcheRepositoryToken } from './domain/demarche'
-import { UpdateStatutDemarcheCommandHandler } from './application/commands/update-demarche.commande.handler'
+import { UpdateStatutDemarcheCommandHandler } from './application/commands/update-demarche.command.handler'
+import { CreateDemarcheCommandHandler } from './application/commands/create-demarche.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -393,7 +394,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetJeuneHomeActionsQueryHandler,
     GetCampagneQueryModel,
     CreateEvaluationCommandHandler,
-    UpdateStatutDemarcheCommandHandler
+    UpdateStatutDemarcheCommandHandler,
+    CreateDemarcheCommandHandler
   ]
 }
 
