@@ -1,4 +1,30 @@
-#!/bin/sh
+#!/bin/bash
 . "$(dirname "$0")/_/husky.sh"
+function generate_plantuml(){
+  CURRENT_FILES=$(git diff --name-only --cached)
+  PUML=false
+  pumls=""
+  
+  for file in $CURRENT_FILES
+  do
+    if [[ $file == *".puml" ]]; then
+      pumls="${pumls} ${file}"
+      PUML=true
+    fi
+  done
+  
+  if [[ $PUML == true ]]; then
+    echo ".puml files detected"
+    for puml in $pumls
+    do
+      puml_svg="${puml%.*}.svg"
+      echo "generate ${puml} to ${puml_svg}"
+      docker run -v ${PWD}:/work -w /work --rm miy4/plantuml -tsvg $puml
+      git add $puml_svg
+    done
+  fi
+  echo $pumls
+}
 
 yarn lint-staged
+generate_plantuml
