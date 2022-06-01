@@ -39,3 +39,11 @@ lerna-debug.log*
 
 .environment
 .environment.planificateur
+
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
