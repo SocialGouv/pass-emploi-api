@@ -91,12 +91,19 @@ import {
 import { GetJeuneHomeActionsQueryHandler } from '../../application/queries/get-jeune-home-actions.query.handler'
 import { GetJeuneHomeDemarchesQueryHandler } from '../../application/queries/get-jeune-home-demarches.query.handler'
 import StatutInvalide = Action.StatutInvalide
-import { UpdateStatutDemarchePayload } from './validation/demarches.inputs'
+import {
+  CreateDemarchePayload,
+  UpdateStatutDemarchePayload
+} from './validation/demarches.inputs'
 import {
   UpdateStatutDemarcheCommand,
   UpdateStatutDemarcheCommandHandler
-} from '../../application/commands/update-demarche.commande.handler'
+} from '../../application/commands/update-demarche.command.handler'
 import { handleFailure } from './failure.handler'
+import {
+  CreateDemarcheCommand,
+  CreateDemarcheCommandHandler
+} from 'src/application/commands/create-demarche.command.handler'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -120,7 +127,8 @@ export class JeunesController {
     private readonly deleteJeuneInactifCommandHandler: DeleteJeuneInactifCommandHandler,
     private readonly getActionsPoleEmploiQueryHandler: GetActionsJeunePoleEmploiQueryHandler,
     private readonly getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler,
-    private readonly updateStatutDemarcheCommandHandler: UpdateStatutDemarcheCommandHandler
+    private readonly updateStatutDemarcheCommandHandler: UpdateStatutDemarcheCommandHandler,
+    private readonly createDemarcheCommandHandler: CreateDemarcheCommandHandler
   ) {}
 
   @Get(':idJeune')
@@ -260,6 +268,9 @@ export class JeunesController {
     throw new RuntimeException(result.error.message)
   }
 
+  @ApiOperation({
+    summary: "Modifie le statut d'une démarche"
+  })
   @Put(':idJeune/demarches/:idDemarche/statut')
   async udpateStatutDemarche(
     @Param('idJeune') idJeune: string,
@@ -275,6 +286,38 @@ export class JeunesController {
       accessToken
     }
     const result = await this.updateStatutDemarcheCommandHandler.execute(
+      command,
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+
+    if (isFailure(result) && result.error instanceof ErreurHttp) {
+      throw new HttpException(result.error.message, result.error.statusCode)
+    }
+
+    throw new RuntimeException()
+  }
+
+  @ApiOperation({
+    summary: 'Crée une démarche'
+  })
+  @Post(':idJeune/demarches')
+  async createDemarche(
+    @Param('idJeune') idJeune: string,
+    @Body() createDemarchePayload: CreateDemarchePayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
+  ): Promise<DemarcheQueryModel> {
+    const command: CreateDemarcheCommand = {
+      idJeune,
+      accessToken,
+      description: createDemarchePayload.description,
+      dateFin: createDemarchePayload.dateFin
+    }
+    const result = await this.createDemarcheCommandHandler.execute(
       command,
       utilisateur
     )

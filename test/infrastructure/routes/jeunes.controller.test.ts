@@ -62,6 +62,15 @@ import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-
 import { GetJeuneHomeDemarchesQueryHandler } from '../../../src/application/queries/get-jeune-home-demarches.query.handler'
 import { GetJeuneHomeActionsQueryHandler } from '../../../src/application/queries/get-jeune-home-actions.query.handler'
 import StatutInvalide = Action.StatutInvalide
+import { UpdateStatutDemarcheCommandHandler } from 'src/application/commands/update-demarche.command.handler'
+import { CreateDemarcheCommandHandler } from 'src/application/commands/create-demarche.command.handler'
+import { Demarche } from 'src/domain/demarche'
+import {
+  CreateDemarchePayload,
+  UpdateStatutDemarchePayload
+} from 'src/infrastructure/routes/validation/demarches.inputs'
+import { uneDemarche } from 'test/fixtures/demarche.fixture'
+import { uneDate } from 'test/fixtures/date.fixture'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -77,6 +86,8 @@ describe('JeunesController', () => {
   let getActionsPoleEmploiQueryHandler: StubbedClass<GetActionsJeunePoleEmploiQueryHandler>
   let getJeuneHomeDemarchesQueryHandler: StubbedClass<GetJeuneHomeDemarchesQueryHandler>
   let getJeuneHomeActionsQueryHandler: StubbedClass<GetJeuneHomeActionsQueryHandler>
+  let updateStatutDemarcheCommandHandler: StubbedClass<UpdateStatutDemarcheCommandHandler>
+  let createDemarcheCommandHandler: StubbedClass<CreateDemarcheCommandHandler>
   let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
@@ -110,6 +121,10 @@ describe('JeunesController', () => {
     getJeuneHomeDemarchesQueryHandler = stubClass(
       GetJeuneHomeDemarchesQueryHandler
     )
+    updateStatutDemarcheCommandHandler = stubClass(
+      UpdateStatutDemarcheCommandHandler
+    )
+    createDemarcheCommandHandler = stubClass(CreateDemarcheCommandHandler)
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
@@ -140,6 +155,10 @@ describe('JeunesController', () => {
       .useValue(getJeuneHomeActionsQueryHandler)
       .overrideProvider(GetJeuneHomeDemarchesQueryHandler)
       .useValue(getJeuneHomeDemarchesQueryHandler)
+      .overrideProvider(UpdateStatutDemarcheCommandHandler)
+      .useValue(updateStatutDemarcheCommandHandler)
+      .overrideProvider(CreateDemarcheCommandHandler)
+      .useValue(createDemarcheCommandHandler)
       .overrideProvider(JwtService)
       .useValue(jwtService)
       .compile()
@@ -873,5 +892,142 @@ describe('JeunesController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/home/demarches')
+  })
+
+  describe('PUT /jeunes/:idJeune/demarches/:idDemarche/statut', () => {
+    const idJeune = '1'
+    const idDemarche = 'demarche'
+    const payload: UpdateStatutDemarchePayload = {
+      statut: Demarche.Statut.REALISEE
+    }
+    const demarche = uneDemarche()
+    describe("quand c'est en succès", () => {
+      it('met à jour le statut et retourne la demarche', async () => {
+        // Given
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+        updateStatutDemarcheCommandHandler.execute
+          .withArgs(
+            {
+              statut: payload.statut,
+              idJeune,
+              idDemarche,
+              accessToken: 'coucou'
+            },
+            unUtilisateurDecode()
+          )
+          .resolves(success(demarche))
+
+        // When
+        await request(app.getHttpServer())
+          .put(`/jeunes/${idJeune}/demarches/${idDemarche}/statut`)
+          .set('authorization', unHeaderAuthorization())
+          .send(payload)
+          // Then
+          .expect(HttpStatus.OK)
+      })
+    })
+    describe("quand c'est en échec", () => {
+      it('renvoie une erreur HTTP', async () => {
+        // Given
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+        updateStatutDemarcheCommandHandler.execute
+          .withArgs(
+            {
+              statut: payload.statut,
+              idJeune,
+              idDemarche,
+              accessToken: 'coucou'
+            },
+            unUtilisateurDecode()
+          )
+          .resolves(failure(new ErreurHttp("C'est cassé", 400)))
+
+        // When
+        await request(app.getHttpServer())
+          .put(`/jeunes/${idJeune}/demarches/${idDemarche}/statut`)
+          .set('authorization', unHeaderAuthorization())
+          .send(payload)
+          // Then
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'put',
+      '/jeunes/1/demarches/123/statut'
+    )
+  })
+
+  describe('POST /jeunes/:idJeune/demarches', () => {
+    const idJeune = '1'
+    const payload: CreateDemarchePayload = {
+      description: 'string',
+      dateFin: uneDate()
+    }
+    const demarche = uneDemarche()
+    describe("quand c'est en succès", () => {
+      it('crée et retourne la demarche', async () => {
+        // Given
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+        createDemarcheCommandHandler.execute
+          .withArgs(
+            {
+              idJeune,
+              accessToken: 'coucou',
+              description: payload.description,
+              dateFin: payload.dateFin
+            },
+            unUtilisateurDecode()
+          )
+          .resolves(success(demarche))
+
+        // When
+        await request(app.getHttpServer())
+          .post(`/jeunes/${idJeune}/demarches`)
+          .set('authorization', unHeaderAuthorization())
+          .send(payload)
+          // Then
+          .expect(HttpStatus.CREATED)
+      })
+    })
+    describe("quand c'est en échec", () => {
+      it('renvoie une erreur HTTP', async () => {
+        // Given
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+        createDemarcheCommandHandler.execute
+          .withArgs(
+            {
+              idJeune,
+              accessToken: 'coucou',
+              description: payload.description,
+              dateFin: payload.dateFin
+            },
+            unUtilisateurDecode()
+          )
+          .resolves(failure(new ErreurHttp("C'est cassé", 400)))
+
+        // When
+        await request(app.getHttpServer())
+          .post(`/jeunes/${idJeune}/demarches`)
+          .set('authorization', unHeaderAuthorization())
+          .send(payload)
+          // Then
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+      it('renvoie une erreur 400 quand la description ne respecte pas la longeur autorisée', async () => {
+        // Given
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+
+        // When
+        await request(app.getHttpServer())
+          .post(`/jeunes/${idJeune}/demarches`)
+          .set('authorization', unHeaderAuthorization())
+          .send({ ...payload, description: 'a' })
+          // Then
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/1/demarches')
   })
 })

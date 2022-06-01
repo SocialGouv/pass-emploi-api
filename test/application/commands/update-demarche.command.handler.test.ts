@@ -1,7 +1,7 @@
 import {
   UpdateStatutDemarcheCommand,
   UpdateStatutDemarcheCommandHandler
-} from '../../../src/application/commands/update-demarche.commande.handler'
+} from '../../../src/application/commands/update-demarche.command.handler'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
