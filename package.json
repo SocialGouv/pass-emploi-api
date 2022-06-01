@@ -6,8 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "engines": {
-    "npm": "^8.1.0",
-    "node": "16.13.2"
+    "npm": "8.5.5",
+    "yarn": "3.2.1",
+    "node": "16.15.0"
   },
   "scripts": {
     "prebuild": "rimraf dist",
@@ -133,5 +134,6 @@
   },
   "lint-staged": {
     "*.ts": "yarn lint:fix"
-  }
+  },
+  "packageManager": "yarn@3.2.1"
 }
