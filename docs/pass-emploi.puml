@@ -1,0 +1,87 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include DEVICONS/nodejs_small.puml
+!include DEVICONS/postgresql.puml
+!include DEVICONS/redis.puml
+!include DEVICONS/react.puml
+!include DEVICONS/firebase.puml
+!include DEVICONS/java.puml
+!include FONTAWESOME/envelope.puml
+!include FONTAWESOME/mobile.puml
+
+LAYOUT_TOP_DOWN()
+LAYOUT_WITH_LEGEND()
+
+Person(jeune, "Jeune")
+Person(conseiller, "Conseiller")
+Person(support, "Support")
+
+System_Boundary(pass_emploi, "Pass emploi"){
+    
+    Container(front, "Back office", "Nextjs, React", "Conseillers back office", $sprite="react")
+    Container(app, "Application mobile", "Flutter", "Jeunes application", $sprite="mobile")
+    System_Boundary(backend, "Backend"){
+        Container(api, "API", "Nestjs, Express", "", $sprite="nodejs_small")
+        Container(worker, "Worker", "Nestjs", "", $sprite="nodejs_small")
+        ContainerDb(back_db, "Database", "Postgres", "",$sprite="postgresql")
+        ContainerDb(back_key_value, "Key/Value storage", "Redis", "", $sprite="redis")
+    }
+    System_Boundary(auth, "Authent"){
+        Container(auth_server, "Server", "Keycloak, Java", "", $sprite="java")
+        ContainerDb(auth_db, "Database", "Postgres", "",$sprite="postgresql")
+    }
+    System_Ext(mail, "Mail service", "sendinblue", $sprite="envelope")
+    System_Ext(push, "Push service", "Firebase", $sprite="firebase")
+    System_Ext(chat, "Chat service", "Firestore", $sprite="firebase")
+    System_Ext(object_storage, "Object Storage Service", "OVH/S3")
+}
+
+System_Ext(auth_milo, "Auth Milo")
+System_Ext(auth_pe, "Auth Pole Emploi")
+System_Ext(api_pe, "API Pole Emploi")
+System_Ext(api_milo, "API MILO")
+System_Ext(immersion, "API Immersion")
+System_Ext(services_civiques, "API Services Civiques")
+
+
+Rel(jeune, app, "CEJ App", "Mobile")
+Rel(conseiller, front, "Uses", "Browser")
+Rel(support, api, "Uses", "Browser")
+
+Rel(front, api, "Uses", "HTTPS")
+Rel(front, auth_server, "Uses", "HTTPS")
+Rel(api, auth_server, "Uses", "HTTPS")
+Rel(app, auth_server, "Uses", "HTTPS")
+Rel(app, api, "Uses", "HTTPS")
+Rel(push, app, "Uses", "HTTPS")
+Rel(api, push, "Uses", "HTTPS")
+Rel(api, object_storage, "Uses", "HTTPS")
+Rel(worker, push, "Uses", "HTTPS")
+Rel(front, chat, "Uses", "HTTPS")
+Rel(app, chat, "Uses", "HTTPS")
+
+Rel(api, back_db, "R/W")
+Rel(api, mail, "Uses","HTTPS")
+Rel(api, api_pe, "Uses","HTTPS")
+Rel(api, api_milo, "Uses","HTTPS")
+BiRel(api, immersion, "Uses","HTTPS")
+Rel(api, services_civiques, "Uses","HTTPS")
+
+Rel(worker, mail, "Uses","HTTPS")
+Rel(worker, back_db, "R/W")
+Rel(worker, back_key_value, "R/W")
+Rel(worker, back_key_value, "R/W")
+Rel(worker, api_pe, "Uses","HTTPS")
+Rel(worker, api_milo, "Uses","HTTPS")
+Rel(worker, immersion, "Uses","HTTPS")
+
+Rel(auth_server, auth_db, "R/W")
+Rel(auth_server, api, "Uses", "HTTPS")
+Rel(auth_server, auth_milo, "Uses", "HTTPS")
+Rel(auth_server, auth_pe, "Uses", "HTTPS")
+
+
+
+@enduml
