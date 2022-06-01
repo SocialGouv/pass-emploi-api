@@ -5621,7 +5621,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:^4.1.4":
+"jose@npm:^4.1.4, jose@npm:^4.8.1":
   version: 4.8.1
   resolution: "jose@npm:4.8.1"
   checksum: c3e239ccbb07863c28250aedea3e734e4a3b26abc1cbf6acf333381db5ef31e5d1eeced791299076f13b24f41b4b463a7a1e4eaa0079ae0febf9bfd60acb555a
@@ -6794,6 +6794,7 @@ __metadata:
     husky: ^8.0.0
     ics: ^2.35.0
     joi: ^17.6.0
+    jose: ^4.8.1
     lint-staged: ^13.0.0
     luxon: 2.4.0
     mocha: ^10.0.0
