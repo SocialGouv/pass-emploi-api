@@ -60,6 +60,7 @@ export class FirebaseClient implements IFirebaseClient {
   async send(tokenMessage: TokenMessage): Promise<void> {
     try {
       await this.messaging.send(tokenMessage)
+      this.logger.log(tokenMessage)
     } catch (e) {
       this.logger.error(
         buildError(
