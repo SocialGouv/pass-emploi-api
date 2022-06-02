@@ -39,5 +39,5 @@ Afin de relancer les workers 2 actions ont été entreprises :
 | Action                                               | Type    | Owner           | Statut |
 |------------------------------------------------------|---------|-----------------|--------|
 | Créer une alerte lorsque les jobs ne sont pas lancés | detect  | Joseph          | TO DO  |
-| [Fixer les jobs en retard lors du redémarrage des workers](https://trello.com/c/H2LfRszb) | prevent | Malek | TO DO |
+| [Fixer les jobs en retard lors du redémarrage des workers](https://trello.com/c/H2LfRszb) | prevent | Malek | DONE |
 | Fixer la boucle infinie                              | prevent | Joseph & Adrien | DONE   |
