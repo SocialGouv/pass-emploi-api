@@ -2,7 +2,7 @@ import { ConseillerAuthorizer } from '../../../src/application/authorizers/autho
 import {
   GetConseillerByEmailQuery,
   GetConseillerByEmailQueryHandler
-} from '../../../src/application/queries/get-conseiller-by-email.query.handler'
+} from '../../../src/application/queries/get-conseiller-by-email.query.handler.db'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Core } from '../../../src/domain/core'

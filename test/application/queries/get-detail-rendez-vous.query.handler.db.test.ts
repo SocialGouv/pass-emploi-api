@@ -1,5 +1,5 @@
 import { SinonSandbox } from 'sinon'
-import { GetDetailRendezVousQueryHandler } from '../../../src/application/queries/get-detail-rendez-vous.query.handler'
+import { GetDetailRendezVousQueryHandler } from '../../../src/application/queries/get-detail-rendez-vous.query.handler.db'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'

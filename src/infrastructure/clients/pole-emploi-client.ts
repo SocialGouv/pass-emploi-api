@@ -8,7 +8,7 @@ import { DateService } from '../../utils/date-service'
 import {
   OffreEmploiDto,
   OffresEmploiDto
-} from '../repositories/offre-emploi-http-sql.repository'
+} from '../repositories/offre-emploi-http-sql.repository.db'
 
 @Injectable()
 export class PoleEmploiClient {

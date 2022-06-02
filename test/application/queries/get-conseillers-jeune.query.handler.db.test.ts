@@ -3,8 +3,8 @@ import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorize
 import {
   GetConseillersJeuneQuery,
   GetConseillersJeuneQueryHandler
-} from '../../../src/application/queries/get-conseillers-jeune.query.handler'
-import { GetDetailJeuneQuery } from '../../../src/application/queries/get-detail-jeune.query.handler'
+} from '../../../src/application/queries/get-conseillers-jeune.query.handler.db'
+import { GetDetailJeuneQuery } from '../../../src/application/queries/get-detail-jeune.query.handler.db'
 import { HistoriqueConseillerJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-models'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'

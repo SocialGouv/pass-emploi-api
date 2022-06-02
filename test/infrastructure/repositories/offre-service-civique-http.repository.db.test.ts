@@ -13,7 +13,7 @@ import { OffreServiceCivique } from '../../../src/domain/offre-service-civique'
 import { EngagementClient } from '../../../src/infrastructure/clients/engagement-client'
 import { DateTime } from 'luxon'
 import { failure, success } from '../../../src/building-blocks/types/result'
-import { OffreServiceCiviqueHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-engagement-http.repository'
+import { OffreServiceCiviqueHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-service-civique-http.repository.db'
 import {
   ErreurHttp,
   NonTrouveError

@@ -1,5 +1,5 @@
 import { expect } from '../../utils'
-import { AgenceSqlRepository } from '../../../src/infrastructure/repositories/agence-sql.repository'
+import { AgenceSqlRepository } from '../../../src/infrastructure/repositories/agence-sql.repository.db'
 import {
   AgenceDto,
   AgenceSqlModel

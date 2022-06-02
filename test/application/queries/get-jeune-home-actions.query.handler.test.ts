@@ -1,5 +1,5 @@
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { GetActionsByJeuneQueryHandler } from '../../../src/application/queries/get-actions-by-jeune.query.handler'
+import { GetActionsByJeuneQueryHandler } from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
 import { GetCampagneQueryModel } from '../../../src/application/queries/query-getters/get-campagne.query.getter'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import { GetJeuneHomeActionsQueryHandler } from '../../../src/application/queries/get-jeune-home-actions.query.handler'

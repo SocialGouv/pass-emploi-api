@@ -12,10 +12,10 @@ import {
   failure,
   success
 } from '../../../src/building-blocks/types/result'
-import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository'
+import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
 import { DossierMiloDto } from '../../../src/infrastructure/repositories/dto/milo.dto'
-import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
-import { MiloHttpSqlRepository } from '../../../src/infrastructure/repositories/milo-http-sql.repository'
+import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository.db'
+import { MiloHttpSqlRepository } from '../../../src/infrastructure/repositories/milo-http-sql.repository.db'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { testConfig } from '../../utils/module-for-testing'
 import { databaseForTesting } from '../../utils/database-for-testing'

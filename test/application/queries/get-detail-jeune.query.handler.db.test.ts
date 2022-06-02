@@ -18,7 +18,7 @@ import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-
 import {
   GetDetailJeuneQuery,
   GetDetailJeuneQueryHandler
-} from '../../../src/application/queries/get-detail-jeune.query.handler'
+} from '../../../src/application/queries/get-detail-jeune.query.handler.db'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune

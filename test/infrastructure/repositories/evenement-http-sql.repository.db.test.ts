@@ -1,6 +1,6 @@
 import { Authentification } from '../../../src/domain/authentification'
 import { expect, stubClass } from '../../utils'
-import { EvenementHttpSqlRepository } from '../../../src/infrastructure/repositories/evenement-http-sql.repository'
+import { EvenementHttpSqlRepository } from '../../../src/infrastructure/repositories/evenement-http-sql.repository.db'
 import { DateService } from '../../../src/utils/date-service'
 import { Core } from '../../../src/domain/core'
 import { emptySuccess } from '../../../src/building-blocks/types/result'

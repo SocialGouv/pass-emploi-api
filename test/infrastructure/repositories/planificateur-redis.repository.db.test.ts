@@ -1,6 +1,6 @@
 import { Duration } from 'luxon'
 import { createClient } from 'redis'
-import { PlanificateurRedisRepository } from 'src/infrastructure/repositories/planificateur-redis.repository'
+import { PlanificateurRedisRepository } from 'src/infrastructure/repositories/planificateur-redis.repository.db'
 import { Planificateur } from '../../../src/domain/planificateur'
 import { DateService } from '../../../src/utils/date-service'
 import { uneDatetime } from '../../fixtures/date.fixture'

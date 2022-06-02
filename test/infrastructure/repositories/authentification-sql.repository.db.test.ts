@@ -5,7 +5,7 @@ import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
 import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client'
-import { AuthentificationSqlRepository } from '../../../src/infrastructure/repositories/authentification-sql.repository'
+import { AuthentificationSqlRepository } from '../../../src/infrastructure/repositories/authentification-sql.repository.db'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import {
   unUtilisateurConseiller,
