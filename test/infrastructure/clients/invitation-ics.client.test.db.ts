@@ -11,7 +11,7 @@ import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { testConfig } from '../../utils/module-for-testing'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { RendezVous } from '../../../src/domain/rendez-vous'
-import { databaseForTesting } from '../../test-with-bd.test'
+import { databaseForTesting } from '../../utils/database-for-testing'
 
 describe('InvitationIcsClient', () => {
   let invitationIcsClient: InvitationIcsClient

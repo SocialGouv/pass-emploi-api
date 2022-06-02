@@ -4,7 +4,6 @@ import * as chaiAsPromised from 'chai-as-promised'
 import * as dirtyChai from 'dirty-chai'
 import { createSandbox } from 'sinon'
 import * as sinonChai from 'sinon-chai'
-import { DatabaseForTesting } from './database-for-testing'
 import { buildTestingModuleForHttpTesting } from './module-for-testing'
 import { StubbedClass, stubClass } from './types'
 import { setAPMInstance } from '../../src/infrastructure/monitoring/apm.init'
@@ -21,8 +20,6 @@ export { createSandbox, expect }
 export { stubClass, StubbedClass }
 
 export { buildTestingModuleForHttpTesting }
-
-export { DatabaseForTesting }
 
 const instanceMock: StubbedType<apm.Agent> = stubInterface(createSandbox())
 setAPMInstance(instanceMock)
