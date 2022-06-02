@@ -10,7 +10,7 @@ import helmet from 'helmet'
 import { Logger } from 'nestjs-pino'
 import { AppModule } from './app.module'
 import { TaskService } from './application/task.service'
-import { WorkerService } from './application/worker.service'
+import { WorkerService } from './application/worker.service.db'
 import { useSwagger } from './infrastructure/middlewares/swagger.middleware'
 
 async function bootstrap(): Promise<void> {

@@ -7,7 +7,7 @@ import { fromDemarcheDtoToDemarche } from '../../application/queries/query-mappe
 import { DateService } from '../../utils/date-service'
 
 @Injectable()
-export class DemarcheHttpRepository implements Demarche.Repository {
+export class DemarcheHttpRepositoryDb implements Demarche.Repository {
   constructor(
     private keycloakClient: KeycloakClient,
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,

@@ -73,7 +73,7 @@ import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from './application
 import { GetServicesCiviqueQueryHandler } from './application/queries/get-services-civique.query.handler'
 import { GetTypesRendezVousQueryHandler } from './application/queries/get-types-rendez-vous.query.handler'
 import { TaskService } from './application/task.service'
-import { WorkerService } from './application/worker.service'
+import { WorkerService } from './application/worker.service.db'
 import configuration from './config/configuration'
 import { Action, ActionsRepositoryToken } from './domain/action'
 import {
@@ -162,7 +162,7 @@ import { GetJeuneHomeDemarchesQueryHandler } from './application/queries/get-jeu
 import { GetJeuneHomeActionsQueryHandler } from './application/queries/get-jeune-home-actions.query.handler'
 import { GetCampagneQueryModel } from './application/queries/query-getters/get-campagne.query.getter'
 import { CreateEvaluationCommandHandler } from './application/commands/create-evaluation.command'
-import { DemarcheHttpRepository } from './infrastructure/repositories/demarche-http.repository'
+import { DemarcheHttpRepositoryDb } from './infrastructure/repositories/demarche-http.repository.db'
 import { Demarche, DemarcheRepositoryToken } from './domain/demarche'
 import { UpdateStatutDemarcheCommandHandler } from './application/commands/update-demarche.command.handler'
 import { CreateDemarcheCommandHandler } from './application/commands/create-demarche.command.handler'
@@ -300,7 +300,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: DemarcheRepositoryToken,
-      useClass: DemarcheHttpRepository
+      useClass: DemarcheHttpRepositoryDb
     },
     ...databaseProviders
   ],

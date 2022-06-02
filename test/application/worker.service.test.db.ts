@@ -1,4 +1,4 @@
-import { WorkerService } from '../../src/application/worker.service'
+import { WorkerService } from '../../src/application/worker.service.db'
 import { expect, StubbedClass, stubClass } from '../utils'
 import { HandleJobMailConseillerCommandHandler } from '../../src/application/commands/jobs/handle-job-mail-conseiller.command'
 import { HandleJobRappelRendezVousCommandHandler } from '../../src/application/commands/jobs/handle-job-rappel-rendez-vous.command'
