@@ -5,9 +5,10 @@ import { DepartementSqlModel } from '../../../src/infrastructure/sequelize/model
 import { uneCommuneDto } from '../../fixtures/sql-models/commune.sql-model'
 import { unDepartementDto } from '../../fixtures/sql-models/departement.sql-model'
 import { expect } from '../../utils'
-import { databaseForTesting } from '../../utils/'
+import { useDatabase } from '../../utils/database-for-testing'
 
 describe('GetCommunesEtDepartementsQueryHandler', () => {
+  const databaseForTesting = useDatabase()
   let getCommunesEtDepartementsQueryHandler: GetCommunesEtDepartementsQueryHandler
   before(() => {
     getCommunesEtDepartementsQueryHandler =

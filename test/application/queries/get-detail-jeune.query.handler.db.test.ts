@@ -25,8 +25,10 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { useDatabase } from '../../utils/database-for-testing'
 
 describe('GetDetailJeuneQueryHandler', () => {
+  useDatabase()
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let getDetailJeuneQueryHandler: GetDetailJeuneQueryHandler

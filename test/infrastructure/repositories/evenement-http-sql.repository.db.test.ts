@@ -7,8 +7,10 @@ import { emptySuccess } from '../../../src/building-blocks/types/result'
 import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import Utilisateur = Authentification.Utilisateur
+import { useDatabase } from '../../utils/database-for-testing'
 
 describe('EvenementHttpSqlRepository', () => {
+  useDatabase()
   let evenementHttpSqlRepository: EvenementHttpSqlRepository
   const dateService = stubClass(DateService)
   dateService.nowJs.returns(uneDatetime.toJSDate())

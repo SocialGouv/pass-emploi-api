@@ -18,8 +18,10 @@ import {
   ErreurHttp,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
+import { useDatabase } from '../../utils/database-for-testing'
 
 describe('OffreServiceCiviqueHttpSqlRepository', () => {
+  useDatabase()
   let offreServiceCiviqueHttpSqlRepository: OffreServiceCiviqueHttpSqlRepository
   let serviceCiviqueClient: StubbedClass<EngagementClient>
 

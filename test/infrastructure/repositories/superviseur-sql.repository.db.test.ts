@@ -2,8 +2,10 @@ import { SuperviseurSqlRepository } from 'src/infrastructure/repositories/superv
 import { SuperviseurSqlModel } from 'src/infrastructure/sequelize/models/superviseur.sql-model'
 import { Core } from '../../../src/domain/core'
 import { expect } from '../../utils'
+import { useDatabase } from '../../utils/database-for-testing'
 
 describe('SuperviseurSqlRepository', () => {
+  useDatabase()
   let superviseurSqlRepository: SuperviseurSqlRepository
   // Given
   const unSuperviseur1 = {

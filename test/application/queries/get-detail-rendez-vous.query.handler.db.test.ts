@@ -16,8 +16,10 @@ import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'
+import { useDatabase } from '../../utils/database-for-testing'
 
 describe('GetDetailRendezVousQueryHandler', () => {
+  useDatabase()
   let getDetailRendezVousQueryHandler: GetDetailRendezVousQueryHandler
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
   let sandbox: SinonSandbox

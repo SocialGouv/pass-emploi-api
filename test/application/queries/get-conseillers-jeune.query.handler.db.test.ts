@@ -18,8 +18,10 @@ import { uneAutreDate } from '../../fixtures/date.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { useDatabase } from '../../utils/database-for-testing'
 
 describe('GetConseillersJeuneQueryHandler', () => {
+  useDatabase()
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
   let getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler
   let sandbox: SinonSandbox

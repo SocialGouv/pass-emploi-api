@@ -16,9 +16,10 @@ import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository.db'
 import { IdService } from '../../../src/utils/id-service'
 import { DateService } from '../../../src/utils/date-service'
-import { databaseForTesting } from '../../utils/'
+import { useDatabase } from '../../utils/database-for-testing'
 
 describe('GetDetailActionQueryHandler', () => {
+  const databaseForTesting = useDatabase()
   let actionSqlRepository: Action.Repository
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
   let getDetailActionQueryHandler: GetDetailActionQueryHandler

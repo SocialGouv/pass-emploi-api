@@ -26,9 +26,10 @@ import { Core } from '../../../src/domain/core'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { databaseForTesting } from '../../utils/'
+import { useDatabase } from '../../utils/database-for-testing'
 
 describe('GetJeunesByConseillerQueryHandler', () => {
+  const databaseForTesting = useDatabase()
   let conseillersRepository: StubbedType<Conseiller.Repository>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getJeunesByConseillerQueryHandler: GetJeunesByConseillerQueryHandler

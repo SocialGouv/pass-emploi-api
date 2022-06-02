@@ -6,8 +6,10 @@ import { uneDatetime } from 'test/fixtures/date.fixture'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { Core } from '../../../src/domain/core'
+import { useDatabase } from '../../utils/database-for-testing'
 
 describe('ConseillerSqlRepository', () => {
+  useDatabase()
   let conseillerSqlRepository: ConseillerSqlRepository
 
   beforeEach(async () => {

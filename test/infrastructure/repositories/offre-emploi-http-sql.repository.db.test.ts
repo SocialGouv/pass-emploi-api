@@ -21,8 +21,10 @@ import {
 import { DateService } from '../../../src/utils/date-service'
 import { DateTime } from 'luxon'
 import { isSuccess } from '../../../src/building-blocks/types/result'
+import { useDatabase } from '../../utils/database-for-testing'
 
 describe('OffresEmploiHttpSqlRepository', () => {
+  useDatabase()
   let offresEmploiHttpSqlRepository: OffresEmploiHttpSqlRepository
   let poleEmploiClient: StubbedClass<PoleEmploiClient>
   const maintenant = DateTime.fromISO('2020-04-06T12:00:00.001Z').toUTC()

@@ -9,8 +9,10 @@ import { uneDatetime } from 'test/fixtures/date.fixture'
 import { uneDemarcheDto } from 'test/fixtures/demarches-dto.fixtures'
 import { DateService } from '../../../src/utils/date-service'
 import { expect, StubbedClass, stubClass } from '../../utils'
+import { useDatabase } from '../../utils/database-for-testing'
 
 describe('DemarcheHttpRepository', () => {
+  useDatabase()
   let demarcheHttpRepository: DemarcheHttpRepository
   let keycloakClient: StubbedClass<KeycloakClient>
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>

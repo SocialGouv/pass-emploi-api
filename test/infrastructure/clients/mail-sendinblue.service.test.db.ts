@@ -10,9 +10,10 @@ import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitation-ics.client'
 import { MailDataDto } from '../../../src/domain/mail'
 import { RendezVous } from '../../../src/domain/rendez-vous'
-import { databaseForTesting } from '../../utils/database-for-testing'
+import { useDatabase } from '../../utils/database-for-testing'
 
 describe('MailSendinblueService', () => {
+  const databaseForTesting = useDatabase()
   let mailSendinblueService: MailSendinblueService
   let invitationIcsClient: InvitationIcsClient
   const config = testConfig()

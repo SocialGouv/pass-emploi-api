@@ -18,9 +18,10 @@ import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeu
 import { MiloHttpSqlRepository } from '../../../src/infrastructure/repositories/milo-http-sql.repository.db'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { testConfig } from '../../utils/module-for-testing'
-import { databaseForTesting } from '../../utils/database-for-testing'
+import { useDatabase } from '../../utils/database-for-testing'
 
 describe('MiloHttpRepository', () => {
+  const databaseForTesting = useDatabase()
   let miloHttpSqlRepository: MiloHttpSqlRepository
   const configService = testConfig()
   const jeune = unJeune({ email: 'john@doe.io' })

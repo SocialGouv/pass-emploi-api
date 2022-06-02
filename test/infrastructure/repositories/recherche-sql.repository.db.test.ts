@@ -22,9 +22,10 @@ import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { expect } from '../../utils'
 import { GetServicesCiviqueQuery } from '../../../src/application/queries/get-services-civique.query.handler'
-import { databaseForTesting } from '../../utils/database-for-testing'
+import { useDatabase } from '../../utils/database-for-testing'
 
 describe('RechercheSqlRepository', () => {
+  const databaseForTesting = useDatabase()
   const rechercheSqlRepository = new RechercheSqlRepository(
     databaseForTesting.sequelize
   )
