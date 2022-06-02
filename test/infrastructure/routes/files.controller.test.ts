@@ -62,7 +62,7 @@ describe('FilesController', () => {
 
       // When
       await request(app.getHttpServer())
-        .post('/files/upload')
+        .post('/files')
         .field({
           jeunesIds: '1'
         })
@@ -72,6 +72,6 @@ describe('FilesController', () => {
         // Then
         .expect({ id: idFile, nom: 'image.jpg' })
     })
-    ensureUserAuthenticationFailsIfInvalid('post', '/files/upload')
+    ensureUserAuthenticationFailsIfInvalid('post', '/files')
   })
 })

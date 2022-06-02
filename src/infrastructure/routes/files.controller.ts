@@ -70,7 +70,7 @@ export class FilesController {
     }
   }
 
-  @Post('upload')
+  @Post()
   @ApiConsumes('multipart/form-data')
   @ApiOAuth2([])
   @UseInterceptors(FileInterceptor('file'))
