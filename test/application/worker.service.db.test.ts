@@ -11,8 +11,10 @@ import { testConfig } from '../utils/module-for-testing'
 import { DateService } from '../../src/utils/date-service'
 import { Planificateur } from '../../src/domain/planificateur'
 import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from 'src/application/commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
+import { DatabaseForTesting } from '../utils/database-for-testing'
 
 describe('WorkerService', () => {
+  DatabaseForTesting.prepare()
   describe('handler', () => {
     let handleNettoyerLesJobsCommandHandler: StubbedClass<HandleNettoyerLesJobsCommandHandler>
 
