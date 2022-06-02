@@ -79,17 +79,22 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
       const rendezVousPrestations = await Promise.all(
         prestations.map(async prestation => {
           const dateRendezVous = DateTime.fromISO(prestation.session.dateDebut)
+          const avecVisio =
+            prestation.session.natureAnimation === 'INTERNE' ||
+            prestation.session.modalitePremierRendezVous === 'WEBCAM'
           let lienVisio = undefined
 
-          if (
+          const laVisioEstDisponible =
+            avecVisio &&
             prestation.identifiantStable &&
             this.dateService.isSameDateDay(dateRendezVous, maintenant)
-          ) {
+
+          if (laVisioEstDisponible) {
             try {
               const responseLienVisio =
                 await this.poleEmploiPartenaireClient.getLienVisio(
                   idpToken,
-                  prestation.identifiantStable
+                  prestation.identifiantStable!
                 )
               lienVisio = responseLienVisio?.data
             } catch (e) {

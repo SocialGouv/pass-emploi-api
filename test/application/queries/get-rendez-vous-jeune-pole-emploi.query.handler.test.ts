@@ -495,6 +495,8 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
               datefin: '',
               identifiantStable: idVisio,
               session: {
+                natureAnimation: 'INTERNE',
+                modalitePremierRendezVous: 'WEBCAM',
                 dateDebut: datePrestation,
                 dateFinPrevue: '',
                 dateLimite: '',
@@ -590,7 +592,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                   prenom: 'John'
                 },
                 lienVisio: 'lienvisio.com',
-                modality: '',
+                modality: 'par visio',
                 organisme: undefined,
                 telephone: undefined,
                 theme: undefined,
@@ -599,7 +601,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                   code: 'PRESTATION',
                   label: 'Prestation'
                 },
-                visio: false
+                visio: true
               }
             ]
           })
@@ -611,6 +613,8 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
             {
               identifiantStable: idVisio,
               session: {
+                natureAnimation: 'INTERNE',
+                modalitePremierRendezVous: 'WEBCAM',
                 dateDebut: datePrestation,
                 dateFinPrevue: '',
                 dateLimite: '',
