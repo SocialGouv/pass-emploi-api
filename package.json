@@ -35,7 +35,7 @@
     "test": "yarn cover:unit && yarn cover:db && npm run cover:report",
     "cover:unit": "nyc yarn test:local:unit",
     "cover:db": "nyc --no-clean yarn test:local:db",
-    "cover:ci:db": "nyc --silent --no-clean yarn test:ci:db",
+    "cover:ci:db": "nyc --no-clean yarn test:ci:db",
     "test:ci": "yarn cover:unit && yarn cover:ci:db && npm run cover:report",
     "cover:report": "nyc report --reporter=lcovonly",
     "watch": "yarn start:pg:db && yarn start:redis:db && nest start --watch | npx pino-pretty",
