@@ -1,4 +1,4 @@
-import { GetCommunesEtDepartementsQueryHandler } from '../../../src/application/queries/get-communes-et-departements.query.handler'
+import { GetCommunesEtDepartementsQueryHandler } from '../../../src/application/queries/get-communes-et-departements.query.handler.db'
 import { CommunesEtDepartementsQueryModel } from '../../../src/application/queries/query-models/communes-et-departements.query-model'
 import { CommuneSqlModel } from '../../../src/infrastructure/sequelize/models/commune.sql-model'
 import { DepartementSqlModel } from '../../../src/infrastructure/sequelize/models/departement.sql-model'

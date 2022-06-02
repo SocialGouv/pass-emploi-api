@@ -8,17 +8,17 @@ import { uneActionQueryModelFromDomain } from '../../fixtures/query-models/actio
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { Action } from '../../../src/domain/action'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository'
+import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository.db'
 import {
   GetActionsByJeuneQuery,
   GetActionsByJeuneQueryHandler
-} from '../../../src/application/queries/get-actions-by-jeune.query.handler'
+} from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
 import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import { DateTime } from 'luxon'
-import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository'
+import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
+import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository.db'
 import { IdService } from '../../../src/utils/id-service'
 import { DateService } from '../../../src/utils/date-service'
 import { databaseForTesting } from '../../utils/database-for-testing'

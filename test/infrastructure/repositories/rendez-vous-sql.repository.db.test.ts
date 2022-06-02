@@ -2,7 +2,7 @@ import {
   unJeuneDuRendezVous,
   unRendezVous
 } from 'test/fixtures/rendez-vous.fixture'
-import { RendezVousRepositorySql } from '../../../src/infrastructure/repositories/rendez-vous-sql.repository'
+import { RendezVousRepositorySql } from '../../../src/infrastructure/repositories/rendez-vous-sql.repository.db'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'

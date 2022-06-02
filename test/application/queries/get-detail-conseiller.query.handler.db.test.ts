@@ -3,7 +3,7 @@ import { ConseillerAuthorizer } from '../../../src/application/authorizers/autho
 import {
   GetDetailConseillerQuery,
   GetDetailConseillerQueryHandler
-} from '../../../src/application/queries/get-detail-conseiller.query.handler'
+} from '../../../src/application/queries/get-detail-conseiller.query.handler.db'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'

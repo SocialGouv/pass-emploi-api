@@ -28,9 +28,9 @@ import {
 } from 'src/application/commands/create-rendez-vous.command.handler'
 import { CreerSuperviseursCommandHandler } from 'src/application/commands/creer-superviseurs.command.handler'
 import { DeleteSuperviseursCommandHandler } from 'src/application/commands/delete-superviseurs.command.handler'
-import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler'
+import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler.db'
 import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler'
-import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler'
+import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler.db'
 import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
 import { Authentification } from 'src/domain/authentification'
 import { CreateActionCommandHandler } from '../../application/commands/create-action.command.handler'
@@ -41,9 +41,9 @@ import {
   SendNotificationsNouveauxMessagesCommand,
   SendNotificationsNouveauxMessagesCommandHandler
 } from '../../application/commands/send-notifications-nouveaux-messages.command.handler'
-import { GetConseillerByEmailQueryHandler } from '../../application/queries/get-conseiller-by-email.query.handler'
+import { GetConseillerByEmailQueryHandler } from '../../application/queries/get-conseiller-by-email.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
-import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler'
+import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler.db'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
 import {
   DetailJeuneConseillerQueryModel,

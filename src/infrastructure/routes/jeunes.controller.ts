@@ -21,7 +21,7 @@ import {
   TransfererJeunesConseillerCommandHandler
 } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
 import { GetActionsJeunePoleEmploiQueryHandler } from 'src/application/queries/get-actions-jeune-pole-emploi.query.handler'
-import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler'
+import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler.db'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from 'src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import {
@@ -54,10 +54,10 @@ import {
 import { DeleteJeuneInactifCommandHandler } from '../../application/commands/delete-jeune-inactif.command.handler'
 
 import { UpdateNotificationTokenCommandHandler } from '../../application/commands/update-notification-token.command.handler'
-import { GetActionsByJeuneQueryHandler } from '../../application/queries/get-actions-by-jeune.query.handler'
-import { GetConseillersJeuneQueryHandler } from '../../application/queries/get-conseillers-jeune.query.handler'
+import { GetActionsByJeuneQueryHandler } from '../../application/queries/get-actions-by-jeune.query.handler.db'
+import { GetConseillersJeuneQueryHandler } from '../../application/queries/get-conseillers-jeune.query.handler.db'
 import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
-import { GetRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler'
+import { GetRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler.db'
 import {
   ActionQueryModel,
   DemarcheQueryModel

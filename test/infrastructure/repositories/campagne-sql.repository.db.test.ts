@@ -1,5 +1,5 @@
 import { expect } from '../../utils'
-import { CampagneSqlRepository } from '../../../src/infrastructure/repositories/campagne-sql.repository'
+import { CampagneSqlRepository } from '../../../src/infrastructure/repositories/campagne-sql.repository.db'
 import {
   uneCampagne,
   uneEvaluationComplete,

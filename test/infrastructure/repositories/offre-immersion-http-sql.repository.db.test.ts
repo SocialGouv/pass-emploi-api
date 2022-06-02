@@ -7,7 +7,7 @@ import {
 } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { ImmersionClient } from '../../../src/infrastructure/clients/immersion-client'
-import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-immersion-http-sql.repository'
+import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-immersion-http-sql.repository.db'
 import { offreImmersionDto } from '../../fixtures/offre-immersion.dto.fixture'
 import { StubbedClass, stubClass } from '../../utils'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'

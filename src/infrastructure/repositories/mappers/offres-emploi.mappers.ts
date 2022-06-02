@@ -13,7 +13,7 @@ import { FavoriOffreEmploiSqlModel } from '../../sequelize/models/favori-offre-e
 import {
   OffresEmploiDto,
   OffreEmploiDto
-} from '../offre-emploi-http-sql.repository'
+} from '../offre-emploi-http-sql.repository.db'
 
 export function toOffresEmploiQueryModel(
   page: number,

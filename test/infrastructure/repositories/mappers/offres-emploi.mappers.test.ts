@@ -3,7 +3,7 @@ import {
   toOffresEmploiQueryModel,
   toOffreEmploiQueryModel
 } from '../../../../src/infrastructure/repositories/mappers/offres-emploi.mappers'
-import { OffresEmploiDto } from '../../../../src/infrastructure/repositories/offre-emploi-http-sql.repository'
+import { OffresEmploiDto } from '../../../../src/infrastructure/repositories/offre-emploi-http-sql.repository.db'
 import { expect } from '../../../utils'
 import { desOffresEmploiQueryModel } from '../../../fixtures/query-models/offre-emploi.query-model.fixtures'
 

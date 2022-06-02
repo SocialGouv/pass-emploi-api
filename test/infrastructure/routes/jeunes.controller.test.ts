@@ -16,10 +16,10 @@ import {
 } from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
 import { DeleteJeuneInactifCommandHandler } from '../../../src/application/commands/delete-jeune-inactif.command.handler'
 import { GetActionsJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-actions-jeune-pole-emploi.query.handler'
-import { GetConseillersJeuneQueryHandler } from '../../../src/application/queries/get-conseillers-jeune.query.handler'
-import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler'
+import { GetConseillersJeuneQueryHandler } from '../../../src/application/queries/get-conseillers-jeune.query.handler.db'
+import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler.db'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
-import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune.query.handler'
+import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune.query.handler.db'
 import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-models'
 import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-models'
 import {

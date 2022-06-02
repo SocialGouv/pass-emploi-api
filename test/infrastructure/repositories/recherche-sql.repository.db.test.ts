@@ -12,7 +12,7 @@ import {
   uneRecherche
 } from 'test/fixtures/recherche.fixture'
 import { GetOffresImmersionQuery } from '../../../src/application/queries/get-offres-immersion.query.handler'
-import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/recherche-sql.repository'
+import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/recherche-sql.repository.db'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { RechercheSqlModel } from '../../../src/infrastructure/sequelize/models/recherche.sql-model'

@@ -5,7 +5,7 @@ import { TypesRendezVousQueryModel } from 'src/application/queries/query-models/
 import {
   GetCommunesEtDepartementsQuery,
   GetCommunesEtDepartementsQueryHandler
-} from '../../application/queries/get-communes-et-departements.query.handler'
+} from '../../application/queries/get-communes-et-departements.query.handler.db'
 import { CommunesEtDepartementsQueryModel } from '../../application/queries/query-models/communes-et-departements.query-model'
 import { Public } from '../decorators/public.decorator'
 import { AgenceQueryModel } from '../../application/queries/query-models/agence.query-models'

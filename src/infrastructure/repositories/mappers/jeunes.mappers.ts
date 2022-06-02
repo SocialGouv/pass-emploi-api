@@ -14,7 +14,7 @@ import {
 } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../sequelize/types'
-import { ResumeActionsJeuneDto } from '../jeune-sql.repository'
+import { ResumeActionsJeuneDto } from '../jeune-sql.repository.db'
 
 export function fromSqlToJeuneQueryModel(
   jeuneSqlModel: JeuneSqlModel

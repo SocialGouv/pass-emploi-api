@@ -4,16 +4,16 @@ import { ActionAuthorizer } from '../../../src/application/authorizers/authorize
 import {
   GetDetailActionQuery,
   GetDetailActionQueryHandler
-} from '../../../src/application/queries/get-detail-action.query.handler'
+} from '../../../src/application/queries/get-detail-action.query.handler.db'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { uneActionQueryModelWithJeuneFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { Action } from '../../../src/domain/action'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository'
-import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository'
+import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository.db'
+import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
+import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository.db'
 import { IdService } from '../../../src/utils/id-service'
 import { DateService } from '../../../src/utils/date-service'
 import { databaseForTesting } from '../../utils/database-for-testing'

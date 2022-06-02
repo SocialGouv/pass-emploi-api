@@ -6,7 +6,7 @@ import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-
 import {
   GetRendezVousJeuneQuery,
   GetRendezVousJeuneQueryHandler
-} from '../../../src/application/queries/get-rendez-vous-jeune.query.handler'
+} from '../../../src/application/queries/get-rendez-vous-jeune.query.handler.db'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { RendezVous } from '../../../src/domain/rendez-vous'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'

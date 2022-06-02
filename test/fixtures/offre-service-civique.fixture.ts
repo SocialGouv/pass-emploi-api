@@ -1,5 +1,5 @@
 import { OffreServiceCivique } from '../../src/domain/offre-service-civique'
-import { OffreEngagementDto } from '../../src/infrastructure/repositories/offre-engagement-http.repository'
+import { OffreEngagementDto } from '../../src/infrastructure/repositories/offre-service-civique-http.repository.db'
 
 export const uneOffreServiceCivique = (): OffreServiceCivique => ({
   adresseMission: 'adresse mission',

@@ -6,7 +6,7 @@ import { HandleNettoyerLesJobsCommandHandler } from '../../src/application/comma
 import { HandleJobUpdateMailingListConseillerCommandHandler } from '../../src/application/commands/jobs/handle-job-update-mailing-list-conseiller.command'
 import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from '../../src/application/commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
 import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from '../../src/application/commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
-import { PlanificateurRedisRepository } from '../../src/infrastructure/repositories/planificateur-redis.repository'
+import { PlanificateurRedisRepository } from '../../src/infrastructure/repositories/planificateur-redis.repository.db'
 import { testConfig } from '../utils/module-for-testing'
 import { DateService } from '../../src/utils/date-service'
 import { Planificateur } from '../../src/domain/planificateur'

@@ -1,6 +1,6 @@
 import { Core } from '../../../src/domain/core'
 import { Mail } from '../../../src/domain/mail'
-import { MailSqlRepository } from '../../../src/infrastructure/repositories/mail.sql.repository'
+import { MailSqlRepository } from '../../../src/infrastructure/repositories/mail-sql.repository.db'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { expect } from '../../utils'

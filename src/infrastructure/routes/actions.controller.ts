@@ -21,7 +21,7 @@ import {
 import {
   GetDetailActionQuery,
   GetDetailActionQueryHandler
-} from '../../application/queries/get-detail-action.query.handler'
+} from '../../application/queries/get-detail-action.query.handler.db'
 import { ActionQueryModel } from '../../application/queries/query-models/actions.query-model'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { isFailure } from '../../building-blocks/types/result'

@@ -1,4 +1,4 @@
-import { SuperviseurSqlRepository } from 'src/infrastructure/repositories/superviseur-sql.repository'
+import { SuperviseurSqlRepository } from 'src/infrastructure/repositories/superviseur-sql.repository.db'
 import { SuperviseurSqlModel } from 'src/infrastructure/sequelize/models/superviseur.sql-model'
 import { Core } from '../../../src/domain/core'
 import { expect } from '../../utils'

@@ -20,7 +20,7 @@ import {
 import {
   GetDetailOffreEmploiQuery,
   GetDetailOffreEmploiQueryHandler
-} from '../../../src/application/queries/get-detail-offre-emploi.query.handler'
+} from '../../../src/application/queries/get-detail-offre-emploi.query.handler.db'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'

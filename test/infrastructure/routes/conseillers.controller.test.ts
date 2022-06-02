@@ -5,7 +5,7 @@ import {
   CreerSuperviseursCommandHandler
 } from 'src/application/commands/creer-superviseurs.command.handler'
 import { DeleteSuperviseursCommandHandler } from 'src/application/commands/delete-superviseurs.command.handler'
-import { GetAllRendezVousConseillerQueryHandler } from 'src/application/queries/get-rendez-vous-conseiller.query.handler'
+import { GetAllRendezVousConseillerQueryHandler } from 'src/application/queries/get-rendez-vous-conseiller.query.handler.db'
 import { Action } from 'src/domain/action'
 import { CodeTypeRendezVous } from 'src/domain/rendez-vous'
 import { CreateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
@@ -18,9 +18,9 @@ import {
   CreerJeuneMiloCommandHandler
 } from '../../../src/application/commands/creer-jeune-milo.command.handler'
 import { SendNotificationNouveauMessageCommandHandler } from '../../../src/application/commands/send-notification-nouveau-message.command.handler'
-import { GetConseillerByEmailQueryHandler } from '../../../src/application/queries/get-conseiller-by-email.query.handler'
+import { GetConseillerByEmailQueryHandler } from '../../../src/application/queries/get-conseiller-by-email.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
-import { GetJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-jeunes-by-conseiller.query.handler'
+import { GetJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-jeunes-by-conseiller.query.handler.db'
 import {
   DossierExisteDejaError,
   DroitsInsuffisants,

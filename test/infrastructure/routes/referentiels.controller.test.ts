@@ -1,6 +1,6 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import * as request from 'supertest'
-import { GetCommunesEtDepartementsQueryHandler } from '../../../src/application/queries/get-communes-et-departements.query.handler'
+import { GetCommunesEtDepartementsQueryHandler } from '../../../src/application/queries/get-communes-et-departements.query.handler.db'
 import { CommunesEtDepartementsQueryModel } from '../../../src/application/queries/query-models/communes-et-departements.query-model'
 import {
   buildTestingModuleForHttpTesting,

@@ -1,6 +1,6 @@
 import { OffreEmploiResumeQueryModel } from 'src/application/queries/query-models/offres-emploi.query-models'
 import { OffreEmploi } from '../../src/domain/offre-emploi'
-import { OffreEmploiDto } from '../../src/infrastructure/repositories/offre-emploi-http-sql.repository'
+import { OffreEmploiDto } from '../../src/infrastructure/repositories/offre-emploi-http-sql.repository.db'
 
 export const uneOffreEmploi = (): OffreEmploi => ({
   id: '123DXPM',

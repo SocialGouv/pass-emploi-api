@@ -1,4 +1,4 @@
-import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository'
+import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
 
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { expect } from '../../utils'

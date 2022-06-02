@@ -1,7 +1,7 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import * as request from 'supertest'
 import { DeleteActionCommandHandler } from '../../../src/application/commands/delete-action.command.handler'
-import { GetDetailActionQueryHandler } from '../../../src/application/queries/get-detail-action.query.handler'
+import { GetDetailActionQueryHandler } from '../../../src/application/queries/get-detail-action.query.handler.db'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
