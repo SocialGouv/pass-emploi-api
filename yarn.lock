@@ -4604,9 +4604,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"elastic-apm-node@npm:3.34.0":
-  version: 3.34.0
-  resolution: "elastic-apm-node@npm:3.34.0"
+"elastic-apm-node@npm:3.35.0":
+  version: 3.35.0
+  resolution: "elastic-apm-node@npm:3.35.0"
   dependencies:
     "@elastic/ecs-pino-format": ^1.2.0
     "@opentelemetry/api": ^1.1.0
@@ -4640,7 +4640,7 @@ __metadata:
     sql-summary: ^1.0.1
     traverse: ^0.6.6
     unicode-byte-truncate: ^1.0.0
-  checksum: 9f82ece316aa848543fb801fc382e155531ea62e83d569d88383b81124d2248ba98bacc40be1f68b3bf849d9e1101cbde79b77aefe988fce52028ea1e2a85989
+  checksum: 2a0c8249172f1a83698756d9d7e0280df8c068cd06f7f454d9609f85d8059d79ad7797af758d2aa1bbadb838898fdb7a2f31e3492e1867e132cd4e54906b9664
   languageName: node
   linkType: hard
 
@@ -7907,7 +7907,7 @@ __metadata:
     crypto-js: 4.1.1
     dirty-chai: ^2.0.1
     dotenv-cli: ^5.1.0
-    elastic-apm-node: 3.34.0
+    elastic-apm-node: 3.35.0
     eslint: ^8.16.0
     eslint-config-prettier: ^8.5.0
     eslint-plugin-chai-friendly: ^0.7.2
