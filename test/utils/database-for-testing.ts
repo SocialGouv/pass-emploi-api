@@ -43,3 +43,5 @@ export class DatabaseForTesting {
     return new DatabaseForTesting()
   }
 }
+
+export const databaseForTesting = DatabaseForTesting.prepare()

@@ -5,7 +5,7 @@ import { DepartementSqlModel } from '../../../src/infrastructure/sequelize/model
 import { uneCommuneDto } from '../../fixtures/sql-models/commune.sql-model'
 import { unDepartementDto } from '../../fixtures/sql-models/departement.sql-model'
 import { expect } from '../../utils'
-import { databaseForTesting } from '../../test-with-bd.test'
+import { databaseForTesting } from '../../utils/database-for-testing'
 
 describe('GetCommunesEtDepartementsQueryHandler', () => {
   let getCommunesEtDepartementsQueryHandler: GetCommunesEtDepartementsQueryHandler

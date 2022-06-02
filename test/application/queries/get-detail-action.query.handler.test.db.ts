@@ -16,7 +16,7 @@ import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository'
 import { IdService } from '../../../src/utils/id-service'
 import { DateService } from '../../../src/utils/date-service'
-import { databaseForTesting } from '../../test-with-bd.test'
+import { databaseForTesting } from '../../utils/database-for-testing'
 
 describe('GetDetailActionQueryHandler', () => {
   let actionSqlRepository: Action.Repository

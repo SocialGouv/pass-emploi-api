@@ -18,7 +18,7 @@ import { ConseillerAuthorizer } from '../../../src/application/authorizers/autho
 import { GetAllRendezVousConseillerQueryHandler } from '../../../src/application/queries/get-rendez-vous-conseiller.query.handler'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
-import { databaseForTesting } from '../../test-with-bd.test'
+import { databaseForTesting } from '../../utils/database-for-testing'
 
 describe('GetRendezVousConseillerQueryHandler', () => {
   let dateService: StubbedClass<DateService>

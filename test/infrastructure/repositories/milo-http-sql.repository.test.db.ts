@@ -18,7 +18,7 @@ import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeu
 import { MiloHttpSqlRepository } from '../../../src/infrastructure/repositories/milo-http-sql.repository'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { testConfig } from '../../utils/module-for-testing'
-import { databaseForTesting } from '../../test-with-bd.test'
+import { databaseForTesting } from '../../utils/database-for-testing'
 
 describe('MiloHttpRepository', () => {
   let miloHttpSqlRepository: MiloHttpSqlRepository

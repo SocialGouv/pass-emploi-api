@@ -15,8 +15,8 @@ import { expect, stubClass } from '../../utils'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
 import { JeuneDuRendezVous, RendezVous } from '../../../src/domain/rendez-vous'
 import { Core } from '../../../src/domain/core'
-import { databaseForTesting } from '../../test-with-bd.test'
 import Structure = Core.Structure
+import { databaseForTesting } from '../../utils/database-for-testing'
 
 describe('RendezVousRepositorySql', () => {
   let rendezVousRepositorySql: RendezVousRepositorySql
