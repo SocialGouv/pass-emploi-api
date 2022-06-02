@@ -11,7 +11,7 @@ import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { expect } from '../../utils'
 import { IdService } from 'src/utils/id-service'
 import { DateService } from 'src/utils/date-service'
-import { databaseForTesting } from '../../utils/database-for-testing'
+import { databaseForTesting } from '../../utils'
 
 describe('ActionSqlRepository', () => {
   let jeune: Jeune

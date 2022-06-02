@@ -9,6 +9,7 @@ import { StubbedClass, stubClass } from './types'
 import { setAPMInstance } from '../../src/infrastructure/monitoring/apm.init'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import * as apm from 'elastic-apm-node'
+import { databaseForTesting } from './database-for-testing'
 
 chai.use(sinonChai)
 chai.use(chaiAsPromised)
@@ -20,6 +21,8 @@ export { createSandbox, expect }
 export { stubClass, StubbedClass }
 
 export { buildTestingModuleForHttpTesting }
+
+export { databaseForTesting }
 
 const instanceMock: StubbedType<apm.Agent> = stubInterface(createSandbox())
 setAPMInstance(instanceMock)
