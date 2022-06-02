@@ -25,10 +25,10 @@ import {
   OffreImmersionQueryModel
 } from 'src/application/queries/query-models/offres-immersion.query-models'
 import { TIMEOUT } from 'dns'
-import { useDatabase } from '../../utils/database-for-testing'
+import { DatabaseForTesting } from '../../utils/database-for-testing'
 
 describe('OffresImmersionHttpSqlRepository', () => {
-  useDatabase()
+  DatabaseForTesting.prepare()
   let offresImmersionHttpSqlRepository: OffresImmersionHttpSqlRepository
   let immersionClient: StubbedClass<ImmersionClient>
 

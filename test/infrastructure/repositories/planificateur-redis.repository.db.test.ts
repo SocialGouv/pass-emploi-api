@@ -7,10 +7,10 @@ import { uneDatetime } from '../../fixtures/date.fixture'
 import { expect, stubClass } from '../../utils'
 import { testConfig } from '../../utils/module-for-testing'
 import { RedisClient } from '../../utils/types'
-import { useDatabase } from '../../utils/database-for-testing'
+import { DatabaseForTesting } from '../../utils/database-for-testing'
 
 describe('PlanificateurRedisRepository', () => {
-  useDatabase()
+  DatabaseForTesting.prepare()
   let planificateurRedisRepository: PlanificateurRedisRepository
   let redisClient: RedisClient
 

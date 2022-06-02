@@ -15,10 +15,10 @@ import {
   ConseillerSqlModel
 } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { useDatabase } from '../../utils/database-for-testing'
+import { DatabaseForTesting } from '../../utils/database-for-testing'
 
 describe('GetConseillerByEmailQueryHandler', () => {
-  useDatabase()
+  DatabaseForTesting.prepare()
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getConseillerByEmail: GetConseillerByEmailQueryHandler
 

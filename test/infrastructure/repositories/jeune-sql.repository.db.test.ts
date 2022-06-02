@@ -42,10 +42,10 @@ import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { expect } from '../../utils'
-import { useDatabase } from '../../utils/database-for-testing'
+import { DatabaseForTesting } from '../../utils/database-for-testing'
 
 describe('JeuneSqlRepository', () => {
-  const databaseForTesting = useDatabase()
+  const databaseForTesting = DatabaseForTesting.prepare()
   const rechercheSqlRepository = new RechercheSqlRepository(
     databaseForTesting.sequelize
   )

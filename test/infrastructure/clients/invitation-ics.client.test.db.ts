@@ -11,10 +11,10 @@ import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { testConfig } from '../../utils/module-for-testing'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { RendezVous } from '../../../src/domain/rendez-vous'
-import { useDatabase } from '../../utils/database-for-testing'
+import { DatabaseForTesting } from '../../utils/database-for-testing'
 
 describe('InvitationIcsClient', () => {
-  const databaseForTesting = useDatabase()
+  const databaseForTesting = DatabaseForTesting.prepare()
   let invitationIcsClient: InvitationIcsClient
   const config = testConfig()
 

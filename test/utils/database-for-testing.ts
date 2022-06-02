@@ -38,8 +38,8 @@ export class DatabaseForTesting {
       await this.sequelize.close()
     })
   }
+
+  static prepare(): DatabaseForTesting {
+    return new DatabaseForTesting()
+  }
 }
-
-const databaseforTesting = new DatabaseForTesting()
-
-export const useDatabase = (): DatabaseForTesting => databaseforTesting

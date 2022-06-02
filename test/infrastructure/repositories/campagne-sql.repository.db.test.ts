@@ -8,10 +8,10 @@ import {
 import { CampagneSqlModel } from '../../../src/infrastructure/sequelize/models/campagne.sql-model'
 import { DateTime } from 'luxon'
 import { ReponseCampagneSqlModel } from '../../../src/infrastructure/sequelize/models/reponse-campagne.sql-model'
-import { useDatabase } from '../../utils/database-for-testing'
+import { DatabaseForTesting } from '../../utils/database-for-testing'
 
 describe('CampagneSqlRepository', () => {
-  useDatabase()
+  DatabaseForTesting.prepare()
   let campagneSqlRepository: CampagneSqlRepository
 
   beforeEach(() => {

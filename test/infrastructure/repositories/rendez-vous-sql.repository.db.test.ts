@@ -16,10 +16,10 @@ import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/
 import { JeuneDuRendezVous, RendezVous } from '../../../src/domain/rendez-vous'
 import { Core } from '../../../src/domain/core'
 import Structure = Core.Structure
-import { useDatabase } from '../../utils/database-for-testing'
+import { DatabaseForTesting } from '../../utils/database-for-testing'
 
 describe('RendezVousRepositorySql', () => {
-  const databaseForTesting = useDatabase()
+  const databaseForTesting = DatabaseForTesting.prepare()
   let rendezVousRepositorySql: RendezVousRepositorySql
   const maintenant = uneDatetime
   const aujourdhuiMinuit = uneDatetimeMinuit

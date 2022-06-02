@@ -28,10 +28,10 @@ import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { stubClassSandbox } from '../../utils/types'
-import { useDatabase } from '../../utils/database-for-testing'
+import { DatabaseForTesting } from '../../utils/database-for-testing'
 
 describe('GetRendezVousJeuneQueryHandler', () => {
-  useDatabase()
+  DatabaseForTesting.prepare()
   let dateService: StubbedClass<DateService>
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>

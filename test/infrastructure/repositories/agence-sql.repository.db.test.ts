@@ -6,10 +6,10 @@ import {
 } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { Core } from '../../../src/domain/core'
 import Structure = Core.Structure
-import { useDatabase } from '../../utils/database-for-testing'
+import { DatabaseForTesting } from '../../utils/database-for-testing'
 
 describe('AgenceSqlRepository', () => {
-  useDatabase()
+  DatabaseForTesting.prepare()
   let agenceSqlRepository: AgenceSqlRepository
   const agenceMilo: Partial<AgenceDto> = {
     id: 'Bonjour je suis un id milo',
