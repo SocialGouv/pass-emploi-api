@@ -172,6 +172,7 @@ import { Demarche, DemarcheRepositoryToken } from './domain/demarche'
 import { UpdateStatutDemarcheCommandHandler } from './application/commands/update-demarche.command.handler'
 import { CreateDemarcheCommandHandler } from './application/commands/create-demarche.command.handler'
 import { FilesController } from './infrastructure/routes/files.controller'
+import { TelechargerFichierQueryHandler } from './application/queries/telecharger-fichier.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -410,7 +411,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateEvaluationCommandHandler,
     UpdateStatutDemarcheCommandHandler,
     CreateDemarcheCommandHandler,
-    UploadFileCommandHandler
+    UploadFileCommandHandler,
+    TelechargerFichierQueryHandler
   ]
 }
 

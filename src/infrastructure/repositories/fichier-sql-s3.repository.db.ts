@@ -12,4 +12,21 @@ export class FichierSqlS3Repository implements Fichier.Repository {
 
     await FichierSqlModel.creer(fichier)
   }
+
+  async getFichierMetadata(
+    idFichier: string
+  ): Promise<Fichier.FichierMetadata | undefined> {
+    const fichierSql = await FichierSqlModel.findByPk(idFichier)
+
+    if (fichierSql) {
+      return {
+        id: fichierSql.id,
+        mimeType: fichierSql.mimeType,
+        nom: fichierSql.nom,
+        idsJeunes: fichierSql.idsJeunes,
+        dateCreation: fichierSql.dateCreation
+      }
+    }
+    return undefined
+  }
 }
