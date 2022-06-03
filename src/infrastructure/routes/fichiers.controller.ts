@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  ParseUUIDPipe,
   Post,
   Redirect,
   UploadedFile,
@@ -37,7 +38,7 @@ export class FilesController {
   @Redirect('blank', HttpStatus.PERMANENT_REDIRECT)
   @OidcQueryToken()
   async getFichierRedirected(
-    @Param('idFichier') idFichier: string,
+    @Param('idFichier', new ParseUUIDPipe()) idFichier: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<{ url: string; statusCode: number }> {
     const result = await this.telechargerFichierQueryHandler.execute(

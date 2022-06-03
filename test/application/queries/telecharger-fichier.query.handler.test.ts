@@ -117,7 +117,9 @@ describe('TelechargerFichierQueryHandler', () => {
       fichierRepository.getFichierMetadata
         .withArgs(query.idFichier)
         .resolves(fichierMetadata)
-      objectStorageClient.download.withArgs(fichierMetadata).resolves(url)
+      objectStorageClient.getUrlPresignee
+        .withArgs(fichierMetadata)
+        .resolves(url)
 
       // When
       const result = await telechargerFichierQueryHandler.handle(query)

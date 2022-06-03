@@ -60,7 +60,7 @@ export class TelechargerFichierQueryHandler extends QueryHandler<
       query.idFichier
     ))!
 
-    const url = await this.objectStorageClient.download(fichierMetadata)
+    const url = await this.objectStorageClient.getUrlPresignee(fichierMetadata)
 
     return success(url)
   }
