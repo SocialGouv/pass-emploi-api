@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { Result, success } from '../building-blocks/types/result'
 import { DateService } from '../utils/date-service'
 import { IdService } from '../utils/id-service'
+import { Authentification } from './authentification'
 
 export interface Fichier {
   id: string
@@ -10,7 +11,8 @@ export interface Fichier {
   nom: string
   idsJeunes: string[]
   dateCreation: Date
-  taille: number
+  idCreateur: string
+  typeCreateur: Authentification.Type
 }
 
 export const FichierRepositoryToken = 'FichierRepositoryToken'
@@ -24,13 +26,17 @@ export namespace Fichier {
     dateCreation: Date
   }
   export interface ACreer {
-    file: {
+    fichier: {
       buffer: Buffer
       mimeType: string
       name: string
       size: number
     }
     jeunesIds: string[]
+    createur: {
+      id: string
+      type: Authentification.Type
+    }
   }
 
   export interface Repository {
@@ -48,12 +54,13 @@ export namespace Fichier {
     creer(fichierACreer: Fichier.ACreer): Result<Fichier> {
       const fichier: Fichier = {
         id: this.idService.uuid(),
-        buffer: fichierACreer.file.buffer,
-        mimeType: fichierACreer.file.mimeType,
-        nom: fichierACreer.file.name,
+        buffer: fichierACreer.fichier.buffer,
+        mimeType: fichierACreer.fichier.mimeType,
+        nom: fichierACreer.fichier.name,
         idsJeunes: fichierACreer.jeunesIds,
         dateCreation: this.dateService.nowJs(),
-        taille: fichierACreer.file.size
+        idCreateur: fichierACreer.createur.id,
+        typeCreateur: fichierACreer.createur.type
       }
       return success(fichier)
     }

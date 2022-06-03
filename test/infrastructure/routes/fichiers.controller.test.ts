@@ -2,7 +2,7 @@ import {
   UploadFileCommand,
   UploadFileCommandHandler,
   UploadFileCommandOutput
-} from '../../../src/application/commands/upload-file.command.handler'
+} from '../../../src/application/commands/televerser-fichier.command.handler'
 import * as request from 'supertest'
 import {
   unHeaderAuthorization,

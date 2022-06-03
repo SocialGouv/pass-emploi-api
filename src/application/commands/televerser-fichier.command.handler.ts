@@ -6,24 +6,28 @@ import { Authentification } from '../../domain/authentification'
 import { Fichier, FichierRepositoryToken } from '../../domain/fichier'
 import { AuthorizeConseillerForJeunes } from '../authorizers/authorize-conseiller-for-jeunes'
 
-export interface UploadFileCommand extends Command {
-  file: {
+export interface TeleverserFichierCommand extends Command {
+  fichier: {
     buffer: Buffer
     mimeType: string
     name: string
     size: number
   }
   jeunesIds: string[]
+  createur: {
+    id: string
+    type: Authentification.Type
+  }
 }
-export interface UploadFileCommandOutput {
+export interface TeleverserFichierCommandOutput {
   id: string
   nom: string
 }
 
 @Injectable()
-export class UploadFileCommandHandler extends CommandHandler<
-  UploadFileCommand,
-  UploadFileCommandOutput
+export class TeleverserFichierCommandHandler extends CommandHandler<
+  TeleverserFichierCommand,
+  TeleverserFichierCommandOutput
 > {
   constructor(
     @Inject(FichierRepositoryToken)
@@ -31,11 +35,11 @@ export class UploadFileCommandHandler extends CommandHandler<
     private fichierFactory: Fichier.Factory,
     private authorizeConseillerForJeunes: AuthorizeConseillerForJeunes
   ) {
-    super('UploadFileCommandHandler')
+    super('TeleverserFichierCommandHandler')
   }
 
   async authorize(
-    command: UploadFileCommand,
+    command: TeleverserFichierCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     await this.authorizeConseillerForJeunes.authorize(
@@ -45,8 +49,8 @@ export class UploadFileCommandHandler extends CommandHandler<
   }
 
   async handle(
-    command: UploadFileCommand
-  ): Promise<Result<UploadFileCommandOutput>> {
+    command: TeleverserFichierCommand
+  ): Promise<Result<TeleverserFichierCommandOutput>> {
     const result = this.fichierFactory.creer(command)
 
     if (isFailure(result)) {

@@ -47,7 +47,7 @@ import { TransfererJeunesConseillerCommandHandler } from './application/commands
 import { UpdateNotificationTokenCommandHandler } from './application/commands/update-notification-token.command.handler'
 import { UpdateStatutActionCommandHandler } from './application/commands/update-statut-action.command.handler'
 import { UpdateUtilisateurCommandHandler } from './application/commands/update-utilisateur.command.handler'
-import { UploadFileCommandHandler } from './application/commands/upload-file.command.handler'
+import { TeleverserFichierCommandHandler } from './application/commands/televerser-fichier.command.handler'
 import { GetActionsByJeuneQueryHandler } from './application/queries/get-actions-by-jeune.query.handler.db'
 import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
 import { GetCommunesEtDepartementsQueryHandler } from './application/queries/get-communes-et-departements.query.handler.db'
@@ -171,7 +171,7 @@ import { DemarcheHttpRepositoryDb } from './infrastructure/repositories/demarche
 import { Demarche, DemarcheRepositoryToken } from './domain/demarche'
 import { UpdateStatutDemarcheCommandHandler } from './application/commands/update-demarche.command.handler'
 import { CreateDemarcheCommandHandler } from './application/commands/create-demarche.command.handler'
-import { FilesController } from './infrastructure/routes/files.controller'
+import { FilesController } from './infrastructure/routes/fichiers.controller'
 import { TelechargerFichierQueryHandler } from './application/queries/telecharger-fichier.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
@@ -411,7 +411,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateEvaluationCommandHandler,
     UpdateStatutDemarcheCommandHandler,
     CreateDemarcheCommandHandler,
-    UploadFileCommandHandler,
+    TeleverserFichierCommandHandler,
     TelechargerFichierQueryHandler
   ]
 }

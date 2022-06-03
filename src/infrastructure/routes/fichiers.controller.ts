@@ -14,23 +14,23 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { ApiConsumes, ApiOAuth2, ApiTags } from '@nestjs/swagger'
 import { TelechargerFichierQueryHandler } from 'src/application/queries/telecharger-fichier.query.handler'
 import {
-  UploadFileCommand,
-  UploadFileCommandHandler,
-  UploadFileCommandOutput
-} from '../../application/commands/upload-file.command.handler'
+  TeleverserFichierCommand,
+  TeleverserFichierCommandHandler,
+  TeleverserFichierCommandOutput
+} from '../../application/commands/televerser-fichier.command.handler'
 import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { OidcQueryToken } from '../decorators/skip-oidc-auth.decorator'
-import { UploadFilePayload } from './validation/files.inputs'
+import { TeleverserFichierPayload } from './validation/fichiers.inputs'
 
-@Controller('files')
+@Controller('fichiers')
 @ApiOAuth2([])
-@ApiTags('Fichier')
+@ApiTags('Fichiers')
 export class FilesController {
   constructor(
     private telechargerFichierQueryHandler: TelechargerFichierQueryHandler,
-    private televerserFichierCommandHandler: UploadFileCommandHandler
+    private televerserFichierCommandHandler: TeleverserFichierCommandHandler
   ) {}
 
   @Get(':idFichier')
@@ -59,29 +59,32 @@ export class FilesController {
   @Post()
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(
+  async postFichier(
     @UploadedFile() file: Express.Multer.File,
-    @Body() payload: UploadFilePayload,
+    @Body() payload: TeleverserFichierPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<UploadFileCommandOutput> {
-    const uploadFileCommand: UploadFileCommand = {
-      file: {
+  ): Promise<TeleverserFichierCommandOutput> {
+    const command: TeleverserFichierCommand = {
+      fichier: {
         buffer: file.buffer,
         mimeType: file.mimetype,
         name: file.originalname,
         size: file.size
       },
-      jeunesIds: payload.jeunesIds
+      jeunesIds: payload.jeunesIds,
+      createur: {
+        id: utilisateur.id,
+        type: utilisateur.type
+      }
     }
     const result = await this.televerserFichierCommandHandler.execute(
-      uploadFileCommand,
+      command,
       utilisateur
     )
 
     if (isSuccess(result)) {
       return result.data
     }
-
     throw new RuntimeException()
   }
 }

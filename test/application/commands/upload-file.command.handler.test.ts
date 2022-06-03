@@ -5,7 +5,7 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import {
   UploadFileCommand,
   UploadFileCommandHandler
-} from '../../../src/application/commands/upload-file.command.handler'
+} from '../../../src/application/commands/televerser-fichier.command.handler'
 import { createSandbox } from 'sinon'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { failure, success } from '../../../src/building-blocks/types/result'

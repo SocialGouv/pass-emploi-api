@@ -27,7 +27,7 @@ describe('Fichier', () => {
 
         // When
         const result = fichierFactory.creer({
-          file: {
+          fichier: {
             buffer: Buffer.alloc(1),
             mimeType: 'jpg',
             name: 'fichier-test.jpg',
