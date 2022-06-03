@@ -3,7 +3,7 @@ import { ArrayNotEmpty, IsArray } from 'class-validator'
 import { Transform } from 'class-transformer'
 import { transformStringToArray } from './utils/transformers'
 
-export class UploadFilePayload {
+export class TeleverserFichierPayload {
   @ApiProperty()
   @Transform(params => transformStringToArray(params, 'jeunesIds'))
   @IsArray()
@@ -11,5 +11,5 @@ export class UploadFilePayload {
   jeunesIds: string[]
 
   @ApiProperty({ type: 'string', format: 'binary' })
-  file: Express.Multer.File
+  fichier: Express.Multer.File
 }

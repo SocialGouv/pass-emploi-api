@@ -5,6 +5,7 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
+import { Authentification } from 'src/domain/authentification'
 import { AsSql } from '../types'
 
 export class FichierDto extends Model {
@@ -38,6 +39,18 @@ export class FichierDto extends Model {
     type: DataType.DATE
   })
   dateCreation: Date
+
+  @Column({
+    field: 'id_createur',
+    type: DataType.STRING
+  })
+  idCreateur: string
+
+  @Column({
+    field: 'type_createur',
+    type: DataType.STRING
+  })
+  typeCreateur: Authentification.Type
 }
 
 @Table({
