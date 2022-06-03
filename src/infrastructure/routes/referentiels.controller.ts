@@ -13,6 +13,9 @@ import { GetAgencesQueryHandler } from '../../application/queries/get-agences.qu
 import { GetAgencesQueryParams } from './validation/agences.inputs'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
+import { TypesDemarcheQueryModel } from '../../application/queries/query-models/types-demarche.query-model'
+import { RechercherTypesDemarcheQueryHandler } from '../../application/queries/rechercher-types-demarche.query.handler'
+import { TypesDemarchesQueryParams } from './validation/demarches.inputs'
 
 @Controller('referentiels')
 @ApiTags('Referentiels')
@@ -20,6 +23,7 @@ export class ReferentielsController {
   constructor(
     private readonly getCommunesEtDepartementsQueryHandler: GetCommunesEtDepartementsQueryHandler,
     private readonly getTypesRendezvousQueryHandler: GetTypesRendezVousQueryHandler,
+    private readonly rechercherTypesDemarcheQueryHandler: RechercherTypesDemarcheQueryHandler,
     private readonly getAgencesQueryHandler: GetAgencesQueryHandler
   ) {}
 
@@ -46,6 +50,15 @@ export class ReferentielsController {
   })
   async getTypesRendezvous(): Promise<TypesRendezVousQueryModel> {
     return this.getTypesRendezvousQueryHandler.execute({})
+  }
+
+  @Get('types-demarches')
+  @ApiOAuth2([])
+  async getTypesDemarches(
+    @Query() query: TypesDemarchesQueryParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<TypesDemarcheQueryModel[]> {
+    return this.rechercherTypesDemarcheQueryHandler.execute(query, utilisateur)
   }
 
   @Get('agences')

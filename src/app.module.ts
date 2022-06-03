@@ -171,6 +171,7 @@ import { DemarcheHttpRepositoryDb } from './infrastructure/repositories/demarche
 import { Demarche, DemarcheRepositoryToken } from './domain/demarche'
 import { UpdateStatutDemarcheCommandHandler } from './application/commands/update-demarche.command.handler'
 import { CreateDemarcheCommandHandler } from './application/commands/create-demarche.command.handler'
+import { RechercherTypesDemarcheQueryHandler } from './application/queries/rechercher-types-demarche.query.handler'
 import { FilesController } from './infrastructure/routes/fichiers.controller'
 import { TelechargerFichierQueryHandler } from './application/queries/telecharger-fichier.query.handler'
 
@@ -411,6 +412,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateEvaluationCommandHandler,
     UpdateStatutDemarcheCommandHandler,
     CreateDemarcheCommandHandler,
+    RechercherTypesDemarcheQueryHandler,
     TeleverserFichierCommandHandler,
     TelechargerFichierQueryHandler
   ]

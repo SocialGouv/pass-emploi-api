@@ -134,6 +134,20 @@ export enum DemarcheDtoEtat {
   AF = 'AF'
 }
 
+export interface ListeTypeDemarchesDto {
+  listeDemarches?: TypeDemarcheDto[]
+}
+
+export interface TypeDemarcheDto {
+  codeQuoiTypeDemarche: string
+  libelleQuoiTypeDemarche: string
+  codePourQuoiObjectifDemarche: string
+  libellePourQuoiObjectifDemarche: string
+  codeCommentDemarche?: string
+  libelleCommentDemarche?: string
+  estUneAction: boolean
+}
+
 export function toEtat(statut: Demarche.Statut): DemarcheDtoEtat {
   switch (statut) {
     case Demarche.Statut.ANNULEE:

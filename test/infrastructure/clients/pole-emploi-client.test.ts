@@ -1,12 +1,12 @@
 import { HttpService } from '@nestjs/axios'
-import { expect } from 'chai'
 import { DateTime } from 'luxon'
 import * as nock from 'nock'
 import { PoleEmploiClient } from 'src/infrastructure/clients/pole-emploi-client'
 import { DateService } from 'src/utils/date-service'
-import { stubClass } from 'test/utils'
+import { expect, stubClass } from 'test/utils'
 import { testConfig } from '../../utils/module-for-testing'
 import { uneOffreEmploiDto } from '../../fixtures/offre-emploi.fixture'
+import { desTypesDemarchesDto } from '../../fixtures/pole-emploi.dto.fixture'
 
 describe('PoleEmploiClient', () => {
   let poleEmploiClient: PoleEmploiClient
@@ -153,6 +153,90 @@ describe('PoleEmploiClient', () => {
 
       // Then
       expect(offreEmploi).to.deep.equal(uneOffreEmploiDto())
+    })
+  })
+  describe('rechercherTypesDemarches', () => {
+    describe('quand il y a des démarches', () => {
+      it('renvoie les types de démarche', async () => {
+        // Given
+        const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+          minutes: 20
+        })
+        poleEmploiClient.inMemoryToken = {
+          token: 'test-token',
+          tokenDate: uneDatetimeDeMoinsDe25Minutes
+        }
+
+        nock('https://api.emploi-store.fr/partenaire')
+          .post('/rechercher-demarche/v1/solr/search/demarche', {
+            codeUtilisateur: 0,
+            motCle: 'salon'
+          })
+          .reply(200, { listeDemarches: desTypesDemarchesDto() })
+          .isDone()
+
+        // When
+        const typeDemarcheDtos =
+          await poleEmploiClient.rechercherTypesDemarches('salon')
+
+        // Then
+        expect(typeDemarcheDtos).to.deep.equal(desTypesDemarchesDto())
+      })
+    })
+    describe("quand il n'y a pas de démarche", () => {
+      it('renvoie un tableau vide', async () => {
+        // Given
+        const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+          minutes: 20
+        })
+        poleEmploiClient.inMemoryToken = {
+          token: 'test-token',
+          tokenDate: uneDatetimeDeMoinsDe25Minutes
+        }
+
+        nock('https://api.emploi-store.fr/partenaire')
+          .post('/rechercher-demarche/v1/solr/search/demarche', {
+            codeUtilisateur: 0,
+            motCle: 'salon'
+          })
+          .reply(200, { listeDemarches: undefined })
+          .isDone()
+
+        // When
+        const typeDemarcheDtos =
+          await poleEmploiClient.rechercherTypesDemarches('salon')
+
+        // Then
+        expect(typeDemarcheDtos).to.deep.equal([])
+      })
+    })
+    describe("quand ce n'est pas sur staging ou development", () => {
+      describe('quand PE est cassé', () => {
+        it('renvoie une erreur', async () => {
+          // Given
+          const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+            minutes: 20
+          })
+          poleEmploiClient.inMemoryToken = {
+            token: 'test-token',
+            tokenDate: uneDatetimeDeMoinsDe25Minutes
+          }
+
+          nock('https://api.emploi-store.fr/partenaire')
+            .post('/rechercher-demarche/v1/solr/search/demarche', {
+              codeUtilisateur: 0,
+              motCle: 'salon'
+            })
+            .reply(500)
+            .isDone()
+
+          // When
+          const call = poleEmploiClient.rechercherTypesDemarches('salon')
+
+          // Then
+          await expect(call).to.be.rejected()
+        })
+      })
     })
   })
 })
