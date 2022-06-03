@@ -43,7 +43,7 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
     query: GetJeunesByConseillerQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    this.conseillerAuthorizer.authorizeConseiller(utilisateur)
+    await this.conseillerAuthorizer.authorizeConseiller(utilisateur)
 
     const conseiller = await this.conseillersRepository.get(query.idConseiller)
     if (!conseiller) {
