@@ -1,16 +1,36 @@
+import { Authentification } from 'src/domain/authentification'
 import { Readable } from 'stream'
-import { Fichier } from '../../src/domain/fichier'
+import { Fichier, FichierMetadata } from '../../src/domain/fichier'
 import { uneDate } from './date.fixture'
 
-export const unFichier = (): Fichier => ({
-  id: 'id-test',
-  buffer: Buffer.alloc(1),
-  mimeType: 'jpg',
-  nom: 'fichier-test.jpg',
-  idsJeunes: ['1'],
-  dateCreation: uneDate(),
-  taille: 788
-})
+export const unFichier = (args: Partial<Fichier> = {}): Fichier => {
+  const defaults = {
+    id: '640c1e15-f2dc-4944-8d82-bc421a3c92db',
+    buffer: Buffer.alloc(1),
+    mimeType: 'jpg',
+    nom: 'fichier-test.jpg',
+    idsJeunes: ['1'],
+    dateCreation: uneDate(),
+    idCreateur: '1',
+    typeCreateur: Authentification.Type.CONSEILLER
+  }
+  return { ...defaults, ...args }
+}
+
+export const unFichierMetadata = (
+  args: Partial<FichierMetadata> = {}
+): FichierMetadata => {
+  const defaults = {
+    id: '640c1e15-f2dc-4944-8d82-bc421a3c92db',
+    mimeType: 'jpg',
+    nom: 'fichier-test.jpg',
+    idsJeunes: ['1'],
+    dateCreation: uneDate(),
+    idCreateur: '1',
+    typeCreateur: Authentification.Type.CONSEILLER
+  }
+  return { ...defaults, ...args }
+}
 
 export const uneImage = (): Express.Multer.File => ({
   fieldname: 'file',
@@ -29,10 +49,11 @@ export const unFichierImage = (): Fichier => ({
   nom: 'image.jpg',
   mimeType: 'image/jpeg',
   buffer: Buffer.from(bufferData),
-  taille: 788,
   dateCreation: uneDate(),
   idsJeunes: ['aa'],
-  id: '640c1e15-f2dc-4944-8d82-bc421a3c92db'
+  id: '640c1e15-f2dc-4944-8d82-bc421a3c92db',
+  idCreateur: '1',
+  typeCreateur: Authentification.Type.CONSEILLER
 })
 
 const bufferData = [
