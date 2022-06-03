@@ -24,6 +24,6 @@ export class MailSqlRepository implements Mail.Repository {
   }
 
   async countContactsConseillerSansEmail(): Promise<number> {
-    return await ConseillerSqlModel.count({ where: { email: null } })
+    return ConseillerSqlModel.count({ where: { email: null } })
   }
 }

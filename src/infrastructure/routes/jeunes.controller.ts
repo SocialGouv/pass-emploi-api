@@ -229,7 +229,7 @@ export class JeunesController {
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<JeuneHomeActionQueryModel> {
-    return await this.getJeuneHomeActionsQueryHandler.execute(
+    return this.getJeuneHomeActionsQueryHandler.execute(
       { idJeune },
       utilisateur
     )
