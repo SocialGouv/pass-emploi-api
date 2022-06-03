@@ -9,16 +9,24 @@ import {
 } from '../../utils'
 import { GetAgencesQueryHandler } from '../../../src/application/queries/get-agences.query.handler'
 import { Core } from '../../../src/domain/core'
+import { RechercherTypesDemarcheQueryHandler } from '../../../src/application/queries/rechercher-types-demarche.query.handler'
+import { unUtilisateurDecode } from '../../fixtures/authentification.fixture'
+import { TypesDemarcheQueryModel } from '../../../src/application/queries/query-models/types-demarche.query-model'
 import Structure = Core.Structure
+import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 
 let getCommunesEtDepartementsQueryHandler: StubbedClass<GetCommunesEtDepartementsQueryHandler>
 let getAgencesQueryHandler: StubbedClass<GetAgencesQueryHandler>
+let rechercherTypesDemarcheQueryHandler: StubbedClass<RechercherTypesDemarcheQueryHandler>
 
 describe('ReferentielsController', () => {
   getCommunesEtDepartementsQueryHandler = stubClass(
     GetCommunesEtDepartementsQueryHandler
   )
   getAgencesQueryHandler = stubClass(GetAgencesQueryHandler)
+  rechercherTypesDemarcheQueryHandler = stubClass(
+    RechercherTypesDemarcheQueryHandler
+  )
   let app: INestApplication
   before(async () => {
     const testingModule = await buildTestingModuleForHttpTesting()
@@ -26,6 +34,8 @@ describe('ReferentielsController', () => {
       .useValue(getCommunesEtDepartementsQueryHandler)
       .overrideProvider(GetAgencesQueryHandler)
       .useValue(getAgencesQueryHandler)
+      .overrideProvider(RechercherTypesDemarcheQueryHandler)
+      .useValue(rechercherTypesDemarcheQueryHandler)
       .compile()
     app = testingModule.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
@@ -203,5 +213,54 @@ describe('ReferentielsController', () => {
           .expect(HttpStatus.BAD_REQUEST)
       })
     })
+  })
+
+  describe('GET /referentiels/types-demarche', () => {
+    describe('sans query param', () => {
+      it('rejette', () => {
+        // When - Then
+        return request(app.getHttpServer())
+          .get('/referentiels/types-demarches')
+          .set('Authorization', 'Bearer ceci-est-un-jwt')
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    describe('avec un query param', () => {
+      describe('quand PE est UP', () => {
+        it('renvoie les types de démarches', () => {
+          // Given
+          const desTypesDemarcheQueryModel: TypesDemarcheQueryModel[] = [
+            {
+              codePourquoi: 'FAKE-P03',
+              codeQuoi: 'FAKE-Q12',
+              libellePourquoi: 'FAKE-Mes candidatures',
+              libelleQuoi: "Recherche d'offres d'emploi ou d'entreprises",
+              commentObligatoire: false,
+              comment: [
+                {
+                  code: 'FAKE-C12.06',
+                  label: 'FAKE-Par un autre moyen'
+                }
+              ]
+            }
+          ]
+          rechercherTypesDemarcheQueryHandler.execute
+            .withArgs({ recherche: 'salon' }, unUtilisateurDecode())
+            .resolves(desTypesDemarcheQueryModel)
+
+          // When - Then
+          return request(app.getHttpServer())
+            .get('/referentiels/types-demarches?recherche=salon')
+            .set('Authorization', 'Bearer ceci-est-un-jwt')
+            .expect(HttpStatus.OK)
+            .expect(desTypesDemarcheQueryModel)
+        })
+      })
+    })
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/referentiels/types-demarches'
+    )
   })
 })

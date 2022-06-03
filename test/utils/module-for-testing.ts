@@ -35,6 +35,7 @@ export function buildTestingModuleForHttpTesting(): TestingModuleBuilder {
 
 export const testConfig = (): ConfigService => {
   return new ConfigService({
+    environment: 'test',
     poleEmploi: {
       url: 'https://api.emploi-store.fr/partenaire',
       loginUrl:

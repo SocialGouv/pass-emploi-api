@@ -26,3 +26,11 @@ export class CreateDemarchePayload {
   @IsDate()
   dateFin: Date
 }
+
+export class TypesDemarchesQueryParams {
+  @ApiProperty({
+    required: true
+  })
+  @IsNotEmpty()
+  recherche: string
+}

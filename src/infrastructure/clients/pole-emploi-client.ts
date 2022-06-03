@@ -9,6 +9,8 @@ import {
   OffreEmploiDto,
   OffresEmploiDto
 } from '../repositories/offre-emploi-http-sql.repository.db'
+import { ListeTypeDemarchesDto, TypeDemarcheDto } from './dto/pole-emploi.dto'
+import { buildError } from '../../utils/logger.module'
 
 @Injectable()
 export class PoleEmploiClient {
@@ -43,6 +45,37 @@ export class PoleEmploiClient {
   async getOffresEmploi(params?: unknown): Promise<OffresEmploiDto> {
     const response = await this.get('offresdemploi/v2/offres/search', params)
     return response.data
+  }
+
+  async rechercherTypesDemarches(
+    recherche: string
+  ): Promise<TypeDemarcheDto[]> {
+    const token = await this.getToken()
+
+    try {
+      const url = `${this.apiUrl}/rechercher-demarche/v1/solr/search/demarche`
+      const body = {
+        codeUtilisateur: 0,
+        motCle: recherche
+      }
+      const result = await firstValueFrom(
+        this.httpService.post<ListeTypeDemarchesDto>(url, body, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      )
+      return result.data.listeDemarches ?? []
+    } catch (e) {
+      this.logger.error(
+        buildError('Erreur lors de la récupération des types de démarches', e)
+      )
+      if (
+        this.configService.get('environment') === 'development' ||
+        this.configService.get('environment') === 'staging'
+      ) {
+        return desTypeDemarchesDtos()
+      }
+      throw e
+    }
   }
 
   async get(suffixUrl: string, params?: unknown): Promise<AxiosResponse> {
@@ -100,3 +133,51 @@ export class PoleEmploiClient {
     return token
   }
 }
+
+const desTypeDemarchesDtos = (): TypeDemarcheDto[] => [
+  {
+    codeCommentDemarche: 'FAKE-C12.06',
+    codePourQuoiObjectifDemarche: 'FAKE-P03',
+    codeQuoiTypeDemarche: 'FAKE-Q12',
+    estUneAction: false,
+    libelleCommentDemarche: 'FAKE-Par un autre moyen',
+    libellePourQuoiObjectifDemarche: 'FAKE-Mes candidatures',
+    libelleQuoiTypeDemarche: "Recherche d'offres d'emploi ou d'entreprises"
+  },
+  {
+    codeCommentDemarche: 'FAKE-C12.07',
+    codePourQuoiObjectifDemarche: 'FAKE-P03',
+    codeQuoiTypeDemarche: 'FAKE-Q12',
+    estUneAction: false,
+    libelleCommentDemarche: 'FAKE-Moyen à définir',
+    libellePourQuoiObjectifDemarche: 'FAKE-Mes candidatures',
+    libelleQuoiTypeDemarche: "Recherche d'offres d'emploi ou d'entreprises"
+  },
+  {
+    codeCommentDemarche: 'FAKE-C13.01',
+    codePourQuoiObjectifDemarche: 'FAKE-P03',
+    codeQuoiTypeDemarche: 'FAKE-Q13',
+    estUneAction: false,
+    libelleCommentDemarche: 'FAKE-Sur internet',
+    libellePourQuoiObjectifDemarche: 'FAKE-Mes candidatures',
+    libelleQuoiTypeDemarche:
+      'Participation à un salon ou un forum pour rechercher des offres'
+  },
+  {
+    codeCommentDemarche: 'FAKE-C13.02',
+    codePourQuoiObjectifDemarche: 'FAKE-P03',
+    codeQuoiTypeDemarche: 'FAKE-Q13',
+    estUneAction: false,
+    libelleCommentDemarche: 'FAKE-En présentiel',
+    libellePourQuoiObjectifDemarche: 'FAKE-Mes candidatures',
+    libelleQuoiTypeDemarche:
+      'Participation à un salon ou un forum pour rechercher des offres'
+  },
+  {
+    codePourQuoiObjectifDemarche: 'FAKE-P03',
+    codeQuoiTypeDemarche: 'FAKE-Q14',
+    estUneAction: false,
+    libellePourQuoiObjectifDemarche: 'FAKE-Mes candidatures',
+    libelleQuoiTypeDemarche: "Réponse à des offres d'emploi"
+  }
+]

@@ -6,7 +6,10 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { CommuneSqlModel } from '../../infrastructure/sequelize/models/commune.sql-model'
 import { DepartementSqlModel } from '../../infrastructure/sequelize/models/departement.sql-model'
 import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
-import { CommunesEtDepartementsQueryModel } from './query-models/communes-et-departements.query-model'
+import {
+  CommuneOuDepartementType,
+  CommunesEtDepartementsQueryModel
+} from './query-models/communes-et-departements.query-model'
 
 export interface GetCommunesEtDepartementsQuery extends Query {
   recherche: string
@@ -68,7 +71,7 @@ export class GetCommunesEtDepartementsQueryHandler extends QueryHandler<
     return departements.map(departement => ({
       libelle: departement.libelle,
       code: departement.code,
-      type: CommunesEtDepartementsQueryModel.Type.DEPARTEMENT,
+      type: CommuneOuDepartementType.DEPARTEMENT,
       score: departement.score
     }))
   }
@@ -91,7 +94,7 @@ export class GetCommunesEtDepartementsQueryHandler extends QueryHandler<
         libelle: commune.libelle,
         code: commune.code,
         codePostal: commune.codePostal,
-        type: CommunesEtDepartementsQueryModel.Type.COMMUNE,
+        type: CommuneOuDepartementType.COMMUNE,
         score: commune.score,
         longitude: Number.parseFloat(commune.longitude),
         latitude: Number.parseFloat(commune.latitude)

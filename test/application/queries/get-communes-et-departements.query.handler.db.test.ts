@@ -1,5 +1,5 @@
 import { GetCommunesEtDepartementsQueryHandler } from '../../../src/application/queries/get-communes-et-departements.query.handler.db'
-import { CommunesEtDepartementsQueryModel } from '../../../src/application/queries/query-models/communes-et-departements.query-model'
+import { CommuneOuDepartementType } from '../../../src/application/queries/query-models/communes-et-departements.query-model'
 import { CommuneSqlModel } from '../../../src/infrastructure/sequelize/models/commune.sql-model'
 import { DepartementSqlModel } from '../../../src/infrastructure/sequelize/models/departement.sql-model'
 import { uneCommuneDto } from '../../fixtures/sql-models/commune.sql-model'
@@ -40,7 +40,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       expect(result[0]).to.be.deep.equal({
         code: departement.code,
         libelle: departement.libelle,
-        type: CommunesEtDepartementsQueryModel.Type.DEPARTEMENT,
+        type: CommuneOuDepartementType.DEPARTEMENT,
         score: 0.5714286
       })
     })
@@ -119,7 +119,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       expect(result[0]).to.be.deep.equal({
         code: departement.code,
         libelle: departement.libelle,
-        type: CommunesEtDepartementsQueryModel.Type.DEPARTEMENT,
+        type: CommuneOuDepartementType.DEPARTEMENT,
         score: 1
       })
     })
@@ -277,7 +277,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
         code: commune.code,
         libelle: commune.libelle,
         codePostal: commune.codePostal,
-        type: CommunesEtDepartementsQueryModel.Type.COMMUNE,
+        type: CommuneOuDepartementType.COMMUNE,
         score: 0.5714286,
         longitude: -1.677425,
         latitude: 48.110198
@@ -359,7 +359,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
         code: commune.code,
         libelle: commune.libelle,
         codePostal: commune.codePostal,
-        type: CommunesEtDepartementsQueryModel.Type.COMMUNE,
+        type: CommuneOuDepartementType.COMMUNE,
         score: 1,
         longitude: -1.677425,
         latitude: 48.110198
