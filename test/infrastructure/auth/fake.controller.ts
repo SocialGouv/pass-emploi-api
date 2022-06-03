@@ -1,5 +1,6 @@
-import { Controller, Get } from '@nestjs/common'
+import { Controller, Get, SetMetadata, UseGuards } from '@nestjs/common'
 import { Authentification } from '../../../src/domain/authentification'
+import { ApiKeyAuthGuard } from '../../../src/infrastructure/auth/api-key.auth-guard'
 import { Utilisateur } from '../../../src/infrastructure/decorators/authenticated.decorator'
 import { Public } from '../../../src/infrastructure/decorators/public.decorator'
 import {
@@ -38,5 +39,34 @@ export class FakeController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<Authentification.Utilisateur> {
     return utilisateur
+  }
+
+  @SkipOidcAuth()
+  @UseGuards(ApiKeyAuthGuard)
+  @Get('/api-key')
+  async getApiKey(): Promise<string> {
+    return '👌'
+  }
+
+  @SkipOidcAuth()
+  @UseGuards(ApiKeyAuthGuard)
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.KEYCLOAK
+  )
+  @Get('/api-key/keycloak')
+  async getApiKeyKeycloak(): Promise<string> {
+    return '👌'
+  }
+
+  @SkipOidcAuth()
+  @UseGuards(ApiKeyAuthGuard)
+  @SetMetadata(
+    Authentification.METADATA_IDENTIFIER_API_KEY_PARTENAIRE,
+    Authentification.Partenaire.IMMERSION
+  )
+  @Get('/api-key/immersion')
+  async getApiKeyImmersion(): Promise<string> {
+    return '👌'
   }
 }
