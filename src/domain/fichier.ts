@@ -16,6 +16,13 @@ export interface Fichier {
 export const FichierRepositoryToken = 'FichierRepositoryToken'
 
 export namespace Fichier {
+  export interface FichierMetadata {
+    id: string
+    mimeType: string
+    nom: string
+    idsJeunes: string[]
+    dateCreation: Date
+  }
   export interface ACreer {
     file: {
       buffer: Buffer
@@ -28,6 +35,7 @@ export namespace Fichier {
 
   export interface Repository {
     save(fichier: Fichier): Promise<void>
+    getFichierMetadata(idFichier: string): Promise<FichierMetadata | undefined>
   }
 
   @Injectable()
