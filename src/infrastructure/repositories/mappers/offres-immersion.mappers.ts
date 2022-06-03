@@ -1,9 +1,9 @@
 import {
-  OffreImmersionQueryModel,
-  DetailOffreImmersionQueryModel,
   ContactImmersionQueryModel,
+  DetailOffreImmersionQueryModel,
+  FavoriOffreImmersionIdQueryModel,
   LocalisationQueryModel,
-  FavoriOffreImmersionIdQueryModel
+  OffreImmersionQueryModel
 } from 'src/application/queries/query-models/offres-immersion.query-models'
 import { OffreImmersion, OffresImmersion } from 'src/domain/offre-immersion'
 import { FavoriOffreImmersionSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
@@ -78,7 +78,13 @@ export function buildLocalisation(
 export function buildContact(
   offreImmpersionDto: OffresImmersion.Partenaire.Dto
 ): ContactImmersionQueryModel | undefined {
-  if (!offreImmpersionDto.contactDetails) {
+  if (
+    !offreImmpersionDto.contactDetails ||
+    !offreImmpersionDto.contactDetails.id ||
+    !offreImmpersionDto.contactDetails.firstName ||
+    !offreImmpersionDto.contactDetails.lastName ||
+    !offreImmpersionDto.contactDetails.role
+  ) {
     return undefined
   }
 
