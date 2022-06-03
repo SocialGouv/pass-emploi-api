@@ -43,8 +43,11 @@ export class OidcAuthGuard implements CanActivate {
     }
     const accessToken = authorization?.replace(/bearer /gi, '')
     if (!accessToken) {
+      const erreurQueryParam = this.isQueryToken(context)
+        ? ` ou dans le query param 'token'`
+        : ''
       throw new UnauthorizedException(
-        `Access token non présent dans le header 'Authorization'`
+        `Access token non présent dans le header 'Authorization'${erreurQueryParam}`
       )
     }
     try {

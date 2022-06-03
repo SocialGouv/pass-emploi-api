@@ -21,6 +21,7 @@ import {
   IFirebaseClient
 } from '../../src/infrastructure/clients/firebase-client'
 import { unJwtPayloadValide } from '../fixtures/authentification.fixture'
+import { FakeController } from '../infrastructure/auth/fake.controller'
 import TokenMessage = messaging.TokenMessage
 
 export function buildTestingModuleForHttpTesting(): TestingModuleBuilder {
@@ -28,7 +29,7 @@ export function buildTestingModuleForHttpTesting(): TestingModuleBuilder {
   return Test.createTestingModule({
     imports: [HttpModule, ConfigModule.forRoot(), TerminusModule],
     providers: stubProviders(),
-    controllers: moduleMetadata.controllers
+    controllers: [...moduleMetadata.controllers!, FakeController]
   })
 }
 
