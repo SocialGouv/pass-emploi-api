@@ -1,33 +1,38 @@
-import {
-  UploadFileCommand,
-  UploadFileCommandHandler,
-  UploadFileCommandOutput
-} from '../../../src/application/commands/televerser-fichier.command.handler'
+import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { TelechargerFichierQueryHandler } from 'src/application/queries/telecharger-fichier.query.handler'
 import * as request from 'supertest'
+import {
+  TeleverserFichierCommand,
+  TeleverserFichierCommandHandler,
+  TeleverserFichierCommandOutput
+} from '../../../src/application/commands/televerser-fichier.command.handler'
+import { success } from '../../../src/building-blocks/types/result'
 import {
   unHeaderAuthorization,
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
-import { success } from '../../../src/building-blocks/types/result'
+import { uneImage } from '../../fixtures/fichier.fixture'
 import {
   buildTestingModuleForHttpTesting,
   StubbedClass,
   stubClass
 } from '../../utils'
-import { uneImage } from '../../fixtures/fichier.fixture'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 
-describe('FilesController', () => {
-  let uploadFileCommandHandler: StubbedClass<UploadFileCommandHandler>
+describe('FichiersController', () => {
+  let telechargerFichierQueryHandler: StubbedClass<TelechargerFichierQueryHandler>
+  let televerserFichierCommandHandler: StubbedClass<TeleverserFichierCommandHandler>
   let app: INestApplication
 
   before(async () => {
-    uploadFileCommandHandler = stubClass(UploadFileCommandHandler)
+    telechargerFichierQueryHandler = stubClass(TelechargerFichierQueryHandler)
+    televerserFichierCommandHandler = stubClass(TeleverserFichierCommandHandler)
 
     const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(UploadFileCommandHandler)
-      .useValue(uploadFileCommandHandler)
+      .overrideProvider(TelechargerFichierQueryHandler)
+      .useValue(telechargerFichierQueryHandler)
+      .overrideProvider(TeleverserFichierCommandHandler)
+      .useValue(televerserFichierCommandHandler)
       .compile()
     app = testingModule.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
@@ -38,40 +43,65 @@ describe('FilesController', () => {
     await app.close()
   })
 
-  describe('POST /files', () => {
-    it('renvoie l’id du fichier créé', async () => {
+  describe('GET /fichiers/:idFichier', () => {
+    it("retoune l'url du fichier + redirect", async () => {
       // Given
-      const idFile = '15916d7e-f13a-4158-b7eb-3936aa933a0a'
+      const url = 'test'
+      const idFichier = '15916d7e-f13a-4158-b7eb-3936aa933a0a'
+
+      telechargerFichierQueryHandler.execute
+        .withArgs({ idFichier }, unUtilisateurDecode())
+        .resolves(success(url))
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/fichiers/${idFichier}`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.TEMPORARY_REDIRECT)
+    })
+    ensureUserAuthenticationFailsIfInvalid('post', '/fichiers')
+  })
+
+  describe('POST /fichiers', () => {
+    it("renvoie l'id du fichier créé", async () => {
+      // Given
+      const utilisateur = unUtilisateurDecode()
+      const idFichier = '15916d7e-f13a-4158-b7eb-3936aa933a0a'
       const image = uneImage()
-      const uploadFileCommand: UploadFileCommand = {
-        file: {
+      const command: TeleverserFichierCommand = {
+        fichier: {
           buffer: image.buffer,
           mimeType: image.mimetype,
           name: image.originalname,
           size: image.size
         },
-        jeunesIds: ['1']
+        jeunesIds: ['1'],
+        createur: {
+          id: utilisateur.id,
+          type: utilisateur.type
+        }
       }
-      const commandOutput: UploadFileCommandOutput = {
-        id: idFile,
+      const commandOutput: TeleverserFichierCommandOutput = {
+        id: idFichier,
         nom: 'image.jpg'
       }
-      uploadFileCommandHandler.execute
-        .withArgs(uploadFileCommand, unUtilisateurDecode())
+      televerserFichierCommandHandler.execute
+        .withArgs(command, utilisateur)
         .resolves(success(commandOutput))
 
       // When
       await request(app.getHttpServer())
-        .post('/files')
+        .post('/fichiers')
         .field({
           jeunesIds: '1'
         })
         .attach('file', 'test/fixtures/image.jpg')
         .set('authorization', unHeaderAuthorization())
-        .expect(HttpStatus.CREATED)
         // Then
-        .expect({ id: idFile, nom: 'image.jpg' })
+        .expect(HttpStatus.CREATED)
+        .expect({ id: idFichier, nom: 'image.jpg' })
     })
-    ensureUserAuthenticationFailsIfInvalid('post', '/files')
+    ensureUserAuthenticationFailsIfInvalid('post', '/fichiers')
   })
 })

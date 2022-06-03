@@ -1,4 +1,5 @@
 import { success } from 'src/building-blocks/types/result'
+import { Authentification } from 'src/domain/authentification'
 import { Fichier } from '../../src/domain/fichier'
 import { DateService } from '../../src/utils/date-service'
 import { IdService } from '../../src/utils/id-service'
@@ -13,7 +14,7 @@ describe('Fichier', () => {
     const idService = stubClass(IdService)
     const dateService = stubClass(DateService)
 
-    idService.uuid.returns('id-test')
+    idService.uuid.returns('640c1e15-f2dc-4944-8d82-bc421a3c92db')
     dateService.nowJs.returns(uneDate())
 
     fichierFactory = new Fichier.Factory(idService, dateService)
@@ -33,7 +34,11 @@ describe('Fichier', () => {
             name: 'fichier-test.jpg',
             size: 788
           },
-          jeunesIds: ['1']
+          jeunesIds: ['1'],
+          createur: {
+            id: '1',
+            type: Authentification.Type.CONSEILLER
+          }
         })
 
         // Then

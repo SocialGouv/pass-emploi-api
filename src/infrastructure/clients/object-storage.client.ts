@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common'
 import {
   GetObjectCommand,
   PutObjectCommand,
   PutObjectCommandInput,
   S3Client
 } from '@aws-sdk/client-s3'
-import { ConfigService } from '@nestjs/config'
-import { Fichier } from '../../domain/fichier'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { Fichier, FichierMetadata } from '../../domain/fichier'
 
 @Injectable()
 export class ObjectStorageClient {
@@ -37,7 +37,7 @@ export class ObjectStorageClient {
     await this.client.send(putObjectCommand)
   }
 
-  async download(fichier: Fichier.FichierMetadata): Promise<string> {
+  async download(fichier: FichierMetadata): Promise<string> {
     const bucketPrefix = this.configService.get(
       's3.bucket_prefix_pieces_jointes'
     )

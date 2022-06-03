@@ -58,18 +58,18 @@ export class FilesController {
 
   @Post()
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('fichier'))
   async postFichier(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() fichier: Express.Multer.File,
     @Body() payload: TeleverserFichierPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<TeleverserFichierCommandOutput> {
     const command: TeleverserFichierCommand = {
       fichier: {
-        buffer: file.buffer,
-        mimeType: file.mimetype,
-        name: file.originalname,
-        size: file.size
+        buffer: fichier.buffer,
+        mimeType: fichier.mimetype,
+        name: fichier.originalname,
+        size: fichier.size
       },
       jeunesIds: payload.jeunesIds,
       createur: {

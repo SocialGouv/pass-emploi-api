@@ -4,9 +4,8 @@ import { DateService } from '../utils/date-service'
 import { IdService } from '../utils/id-service'
 import { Authentification } from './authentification'
 
-export interface Fichier {
+export interface FichierMetadata {
   id: string
-  buffer: Buffer
   mimeType: string
   nom: string
   idsJeunes: string[]
@@ -14,17 +13,13 @@ export interface Fichier {
   idCreateur: string
   typeCreateur: Authentification.Type
 }
+export interface Fichier extends FichierMetadata {
+  buffer: Buffer
+}
 
 export const FichierRepositoryToken = 'FichierRepositoryToken'
 
 export namespace Fichier {
-  export interface FichierMetadata {
-    id: string
-    mimeType: string
-    nom: string
-    idsJeunes: string[]
-    dateCreation: Date
-  }
   export interface ACreer {
     fichier: {
       buffer: Buffer

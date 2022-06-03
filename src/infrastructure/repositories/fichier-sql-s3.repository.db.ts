@@ -1,5 +1,5 @@
-import { Fichier } from '../../domain/fichier'
 import { Injectable } from '@nestjs/common'
+import { Fichier, FichierMetadata } from '../../domain/fichier'
 import { ObjectStorageClient } from '../clients/object-storage.client'
 import { FichierSqlModel } from '../sequelize/models/fichier.sql-model'
 
@@ -15,7 +15,7 @@ export class FichierSqlS3Repository implements Fichier.Repository {
 
   async getFichierMetadata(
     idFichier: string
-  ): Promise<Fichier.FichierMetadata | undefined> {
+  ): Promise<FichierMetadata | undefined> {
     const fichierSql = await FichierSqlModel.findByPk(idFichier)
 
     if (fichierSql) {
@@ -24,7 +24,9 @@ export class FichierSqlS3Repository implements Fichier.Repository {
         mimeType: fichierSql.mimeType,
         nom: fichierSql.nom,
         idsJeunes: fichierSql.idsJeunes,
-        dateCreation: fichierSql.dateCreation
+        dateCreation: fichierSql.dateCreation,
+        idCreateur: fichierSql.idCreateur,
+        typeCreateur: fichierSql.typeCreateur
       }
     }
     return undefined
