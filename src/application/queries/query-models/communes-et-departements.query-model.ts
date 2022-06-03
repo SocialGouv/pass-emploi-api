@@ -1,5 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger'
 
+export enum CommuneOuDepartementType {
+  COMMUNE = 'COMMUNE',
+  DEPARTEMENT = 'DEPARTEMENT'
+}
+
 export class CommunesEtDepartementsQueryModel {
   @ApiProperty()
   code: string
@@ -7,8 +12,8 @@ export class CommunesEtDepartementsQueryModel {
   @ApiProperty()
   libelle: string
 
-  @ApiProperty()
-  type: CommunesEtDepartementsQueryModel.Type
+  @ApiProperty({ enum: CommuneOuDepartementType })
+  type: CommuneOuDepartementType
 
   @ApiProperty()
   score: number
@@ -21,11 +26,4 @@ export class CommunesEtDepartementsQueryModel {
 
   @ApiProperty({ required: false })
   latitude?: number
-}
-
-export namespace CommunesEtDepartementsQueryModel {
-  export enum Type {
-    COMMUNE = 'COMMUNE',
-    DEPARTEMENT = 'DEPARTEMENT'
-  }
 }
