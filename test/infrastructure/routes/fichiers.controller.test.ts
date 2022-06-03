@@ -59,6 +59,7 @@ describe('FichiersController', () => {
         .set('authorization', unHeaderAuthorization())
         // Then
         .expect(HttpStatus.TEMPORARY_REDIRECT)
+        .expect('Location', url)
     })
     ensureUserAuthenticationFailsIfInvalid('post', '/fichiers')
   })
@@ -96,7 +97,7 @@ describe('FichiersController', () => {
         .field({
           jeunesIds: '1'
         })
-        .attach('file', 'test/fixtures/image.jpg')
+        .attach('fichier', 'test/fixtures/image.jpg')
         .set('authorization', unHeaderAuthorization())
         // Then
         .expect(HttpStatus.CREATED)

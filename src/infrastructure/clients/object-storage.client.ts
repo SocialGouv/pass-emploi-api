@@ -37,7 +37,7 @@ export class ObjectStorageClient {
     await this.client.send(putObjectCommand)
   }
 
-  async download(fichier: FichierMetadata): Promise<string> {
+  async getUrlPresignee(fichier: FichierMetadata): Promise<string> {
     const bucketPrefix = this.configService.get(
       's3.bucket_prefix_pieces_jointes'
     )
