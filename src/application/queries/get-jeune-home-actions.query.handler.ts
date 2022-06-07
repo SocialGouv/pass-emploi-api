@@ -27,13 +27,13 @@ export class GetJeuneHomeActionsQueryHandler extends QueryHandler<
   async handle(
     query: GetJeuneHomeActionsQuery
   ): Promise<JeuneHomeActionQueryModel> {
-    const [actions, campagne] = await Promise.all([
+    const [actionsJeune, campagne] = await Promise.all([
       this.getActionsByJeuneQueryHandler.handle(query),
       this.getCampagneQueryModel.handle(query)
     ])
 
     return {
-      actions: actions,
+      actions: actionsJeune.actions,
       campagne: campagne
     }
   }

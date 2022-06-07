@@ -1,4 +1,9 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import {
+  HttpException,
+  HttpStatus,
+  INestApplication,
+  ValidationPipe
+} from '@nestjs/common'
 import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
 import { TransfererJeunesConseillerCommandHandler } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
 import { Core } from 'src/domain/core'
@@ -71,6 +76,7 @@ import {
 } from 'src/infrastructure/routes/validation/demarches.inputs'
 import { uneDemarche } from 'test/fixtures/demarche.fixture'
 import { uneDate } from 'test/fixtures/date.fixture'
+import { GetActionsByJeuneQueryHandler } from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -88,6 +94,7 @@ describe('JeunesController', () => {
   let getJeuneHomeActionsQueryHandler: StubbedClass<GetJeuneHomeActionsQueryHandler>
   let updateStatutDemarcheCommandHandler: StubbedClass<UpdateStatutDemarcheCommandHandler>
   let createDemarcheCommandHandler: StubbedClass<CreateDemarcheCommandHandler>
+  let getActionsByJeuneQueryHandler: StubbedClass<GetActionsByJeuneQueryHandler>
   let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
@@ -125,6 +132,7 @@ describe('JeunesController', () => {
       UpdateStatutDemarcheCommandHandler
     )
     createDemarcheCommandHandler = stubClass(CreateDemarcheCommandHandler)
+    getActionsByJeuneQueryHandler = stubClass(GetActionsByJeuneQueryHandler)
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
@@ -159,6 +167,8 @@ describe('JeunesController', () => {
       .useValue(updateStatutDemarcheCommandHandler)
       .overrideProvider(CreateDemarcheCommandHandler)
       .useValue(createDemarcheCommandHandler)
+      .overrideProvider(GetActionsByJeuneQueryHandler)
+      .useValue(getActionsByJeuneQueryHandler)
       .overrideProvider(JwtService)
       .useValue(jwtService)
       .compile()
@@ -449,7 +459,7 @@ describe('JeunesController', () => {
         unUtilisateurDecode()
       )
     })
-    it('renvoit une 404 quand le jeune n"existe pas', async () => {
+    it('renvoie une 404 quand le jeune n"existe pas', async () => {
       // Given
       getDetailJeuneQueryHandler.execute.resolves(undefined)
       const expectedResponseJson = {
@@ -474,7 +484,7 @@ describe('JeunesController', () => {
 
   describe('GET /jeunes/:idJeune/conseillers', () => {
     const idJeune = '1'
-    it("renvoit l'historique des conseillers quand il existe", async () => {
+    it("renvoie l'historique des conseillers quand il existe", async () => {
       // Given
       getConseillersJeuneQueryHandler.execute.resolves([])
 
@@ -1029,5 +1039,103 @@ describe('JeunesController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/1/demarches')
+  })
+
+  describe('GET /jeunes/:idJeune/actions', () => {
+    const idJeune = '1'
+    it('400 quand le paramètre page est au mauvais format', async () => {
+      // Given
+      const queryActions = {
+        idJeune: idJeune,
+        page: 'poi'
+      }
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/actions`)
+        .set('authorization', unHeaderAuthorization())
+        .query(queryActions)
+        // Then
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+    it('404 quand le numero de page est trop haut', async () => {
+      // Given
+      const queryActions = {
+        idJeune: idJeune,
+        page: 2
+      }
+      getActionsByJeuneQueryHandler.execute.throws(
+        new HttpException('Page non trouvée.', HttpStatus.NOT_FOUND)
+      )
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/actions`)
+        .set('authorization', unHeaderAuthorization())
+        .query(queryActions)
+        // Then
+        .expect(HttpStatus.NOT_FOUND)
+    })
+    it('400 quand le paramètre tri est au mauvais format', async () => {
+      // Given
+      const queryActions = {
+        tri: 'atchoum'
+      }
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/actions`)
+        .set('authorization', unHeaderAuthorization())
+        .query(queryActions)
+        // Then
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+    it('400 quand le paramètre statuts est au mauvais format', async () => {
+      // Given
+      const queryActions = {
+        statuts: ['à tes souhaits']
+      }
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/actions`)
+        .set('authorization', unHeaderAuthorization())
+        .query(queryActions)
+        // Then
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+    it('206 quand tous les paramètres sont renseignés au bon format', async () => {
+      // Given
+      const queryActions = {
+        idJeune: idJeune,
+        page: 1,
+        tri: 'date_croissante',
+        statuts: ['done']
+      }
+      const expectedActions = { actions: [], nombreTotal: 0 }
+      getActionsByJeuneQueryHandler.execute.resolves(expectedActions)
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/actions`)
+        .set('authorization', unHeaderAuthorization())
+        .set('nombre-total-actions', expectedActions.nombreTotal.toString())
+        .query(queryActions)
+        // Then
+        .expect(HttpStatus.PARTIAL_CONTENT)
+        .expect([])
+    })
+    it("200, retourne toutes les actions si aucun paramètre n'est renseigné", async () => {
+      // Given
+      const queryActions = {
+        idJeune: idJeune
+      }
+      const expectedActions = { actions: [], nombreTotal: 0 }
+      getActionsByJeuneQueryHandler.execute.resolves(expectedActions)
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/actions`)
+        .set('authorization', unHeaderAuthorization())
+        .set('nombre-total-actions', expectedActions.nombreTotal.toString())
+        .query(queryActions)
+        // Then
+        .expect(HttpStatus.OK)
+        .expect([])
+    })
   })
 })
