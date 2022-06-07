@@ -1,12 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
-import { Unauthorized } from 'src/domain/erreur'
-import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
 import { ObjectStorageClient } from 'src/infrastructure/clients/object-storage.client'
 import { Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Fichier, FichierRepositoryToken } from '../../domain/fichier'
+import { FichierAuthorizer } from '../authorizers/authorize-fichier'
 
 export interface TelechargerFichierQuery extends Query {
   idFichier: string
@@ -20,8 +19,7 @@ export class TelechargerFichierQueryHandler extends QueryHandler<
   constructor(
     @Inject(FichierRepositoryToken)
     private fichierRepository: Fichier.Repository,
-    @Inject(JeunesRepositoryToken)
-    private jeuneRepository: Jeune.Repository,
+    private fichierAuthorizer: FichierAuthorizer,
     private objectStorageClient: ObjectStorageClient
   ) {
     super('TelechargerFichierQueryHandler')
@@ -31,28 +29,7 @@ export class TelechargerFichierQueryHandler extends QueryHandler<
     query: TelechargerFichierQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const fichierMetadata = await this.fichierRepository.getFichierMetadata(
-      query.idFichier
-    )
-    if (fichierMetadata) {
-      if (utilisateur.type === Authentification.Type.JEUNE) {
-        if (fichierMetadata.idsJeunes.includes(utilisateur.id)) {
-          return
-        }
-      }
-      if (utilisateur.type === Authentification.Type.CONSEILLER) {
-        const jeunesDuFichier =
-          await this.jeuneRepository.findAllJeunesByConseiller(
-            fichierMetadata.idsJeunes,
-            utilisateur.id
-          )
-        const leConseillerADesJeunesDansLeFichier = jeunesDuFichier.length > 0
-        if (leConseillerADesJeunesDansLeFichier) {
-          return
-        }
-      }
-    }
-    throw new Unauthorized('Fichier')
+    await this.fichierAuthorizer.authorize(query.idFichier, utilisateur)
   }
 
   async handle(query: TelechargerFichierQuery): Promise<Result<string>> {
