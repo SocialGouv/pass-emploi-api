@@ -10,6 +10,9 @@
     "yarn": "3.2.1",
     "node": "16.15.0"
   },
+  "bin": {
+    "vault": "./.vault/vault.cjs"
+  },
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
@@ -109,6 +112,7 @@
     "@types/sinon-chai": "^3.2.8",
     "@types/supertest": "^2.0.12",
     "@types/uuid": "^8.3.4",
+    "@types/yargs": "^17",
     "@typescript-eslint/eslint-plugin": "^5.27.0",
     "@typescript-eslint/parser": "^5.27.0",
     "chai": "^4.3.6",
@@ -135,7 +139,8 @@
     "ts-loader": "^9.3.0",
     "ts-node": "^10.8.0",
     "tsconfig-paths": "^4.0.0",
-    "typescript": "^4.7.2"
+    "typescript": "^4.7.2",
+    "yargs": "^17.5.1"
   },
   "mocha": {
     "require": [

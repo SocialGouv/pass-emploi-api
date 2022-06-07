@@ -39,6 +39,7 @@ lerna-debug.log*
 
 .environment
 .environment.planificateur
+*.secret
 
 .pnp.*
 .yarn/*
