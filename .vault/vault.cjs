@@ -1,16 +1,15 @@
 #! /usr/bin/env node
-const LOCAL_VAULT_ENCRYPTED_FILE = "./.vault/local.secret"
-const LOCAL_VAULT_DECRYPTED_FILE = "./.vault/local.env"
-const LOCAL_ENVIRONMENT_FILE = ".environment"
-const BEGIN_VAULT_PATTERN = "// VAULT START"
-const END_OF_VAULT_PATTERN = "// VAULT END"
-const iv = "19ea8528d76f4502"
-const TEXT_ENCODING = "utf8"
-const VAULT_ENCODING = "hex"
-const CIPHER_ALGORITHM = "aes-256-cbc"
-
-require("dotenv").config({path: LOCAL_ENVIRONMENT_FILE})
-const vaultKey = process.env.VAULT_KEY
+const DEFAULT_LOCAL_ENVIRONMENT_FILE = ".environment"
+require("dotenv").config({path: DEFAULT_LOCAL_ENVIRONMENT_FILE})
+const vaultKey = process.env.VAULT_ENV_VAULT_KEY
+const LOCAL_VAULT_ENCRYPTED_FILE = process.env.VAULT_ENV_LOCAL_VAULT_ENCRYPTED_FILE || "./.vault/local.secret"
+const LOCAL_VAULT_DECRYPTED_FILE = process.env.VAULT_ENV_LOCAL_VAULT_DECRYPTED_FILE || "./.vault/local.env"
+const BEGIN_VAULT_PATTERN = process.env.VAULT_ENV_BEGIN_VAULT_PATTERN || "// VAULT START"
+const END_OF_VAULT_PATTERN = process.env.VAULT_ENV_END_OF_VAULT_PATTERN || "// VAULT END"
+const iv = process.env.VAULT_ENV_CIPHER_IV || "19ea8528d76f4502"
+const TEXT_ENCODING = process.env.VAULT_ENV_TEXT_ENCODING || "utf8"
+const VAULT_ENCODING = process.env.VAULT_ENV_VAULT_ENCODING || "hex"
+const CIPHER_ALGORITHM = process.env.VAULT_ENV_CIPHER_ALGORITHM || "aes-256-cbc"
 
 const yargs = require("yargs")
 const fs = require("fs")
@@ -18,18 +17,8 @@ const crypto = require("crypto")
 
 const options = yargs
   .usage("Usage: vault <command> [options]")
-  .command("encrypt", "encrypt local.secret into local.env file", {
-    env: {
-      alias: "e",
-      default: "local"
-    }
-  })
-  .command("decrypt", "decrypt local.env into local.secret and into the vault block part of .environment", {
-    env: {
-      alias: "e",
-      default: "local"
-    }
-  })
+  .command("encrypt", "encrypt local.secret into local.env file")
+  .command("decrypt", "decrypt local.env into local.secret and into the vault block part of .environment")
   .demandCommand(1, "encrypt or decrypt command missing")
   .help("h")
   .argv
@@ -75,7 +64,7 @@ function decryptIntoLocalSecrets() {
 }
 
 function writeIntoEnvironmentFile(decryptedData) {
-  const envOrigin = fs.readFileSync(`./${LOCAL_ENVIRONMENT_FILE}`, TEXT_ENCODING)
+  const envOrigin = fs.readFileSync(`./${DEFAULT_LOCAL_ENVIRONMENT_FILE}`, TEXT_ENCODING)
   const patternStart = BEGIN_VAULT_PATTERN
   const indexStart = envOrigin.indexOf(patternStart)
   const patterndEnd = END_OF_VAULT_PATTERN
@@ -83,5 +72,5 @@ function writeIntoEnvironmentFile(decryptedData) {
   const avantVault = envOrigin.substring(0, indexStart + patternStart.length)
   const apresVault = envOrigin.substring(indexEnd, envOrigin.length + patterndEnd.length)
   const total = avantVault + "\n" + decryptedData + apresVault
-  fs.writeFileSync(LOCAL_ENVIRONMENT_FILE, total)
+  fs.writeFileSync(DEFAULT_LOCAL_ENVIRONMENT_FILE, total)
 }
