@@ -1,32 +1,5 @@
-BASE_URL=http://localhost:5000
-FIREBASE_SECRET_KEY=
-CHAT_ENCRYPTION_KEY=
+VAULT_ENV_VAULT_KEY=
 
-### POLE EMPLOI
-POLE_EMPLOI_CLIENT_ID=id
-POLE_EMPLOI_CLIENT_SECRET=secret
-POLE_EMPLOI_SCOPE=scope
+// VAULT START
 
-OIDC_ISSUER_URL=https://id.pass-emploi.incubateur.net/auth/realms/pass-emploi
-OIDC_ISSUER_API_URL=https://id.pass-emploi.incubateur.net/auth/admin/realms/pass-emploi
-OIDC_CLIENT_ID=pass-emploi-api
-OIDC_CLIENT_SECRET=
-
-
-API_KEY_KEYCLOAK=ceci-est-une-api-key
-
-MILO_WEB_URL=
-MILO_API_URL=
-MILO_DOSSIER_API_KEY=
-
-IN_MEMORY=
-
-IMMERSION_API_URL=
-IMMERSION_API_KEY=
-
-IS_WORKER=false
-IS_WEB=true
-
-SENDINBLUE_API_KEY=
-
-SERVICE_CIVIQUE_API_KEY=
+// VAULT END

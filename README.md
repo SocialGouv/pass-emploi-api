@@ -4,9 +4,15 @@
 
 ## Configuration
 
-Créez un nouveau fichier à la racine du projet et nommez le `.environment`. Copiez ensuite le contenu du fichier `.environment.template` et collez le dans votre nouveau fichier.
+### Récupérer les variables d'environnement
+1. Créer un fichier ```.environment``` en copiant le .environment.template
+2. Mettre la valeur VAULT_ENV_VAULT_KEY indiquée sur Dashlane
+3. Exécuter ```vault decrypt```
 
-Allez sur l'application scalingo et choississez `pa-back-staging > Environment > switch to bulk edit`. Copiez tout les variables nécessaires dans `.environment`
+### Mettre à jour les variables d'environnement
+1. Mettre à jour les variables désirées dans ```.vault/local.secret```
+2. Exécuter ```vault decrypt```
+3. Pousser sur git
 
 ## Lancement
 
