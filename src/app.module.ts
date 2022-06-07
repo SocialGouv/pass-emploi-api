@@ -174,6 +174,8 @@ import { CreateDemarcheCommandHandler } from './application/commands/create-dema
 import { RechercherTypesDemarcheQueryHandler } from './application/queries/rechercher-types-demarche.query.handler'
 import { FilesController } from './infrastructure/routes/fichiers.controller'
 import { TelechargerFichierQueryHandler } from './application/queries/telecharger-fichier.query.handler'
+import { SupprimerFichierCommandHandler } from './application/commands/supprimer-fichier.command.handler'
+import { FichierAuthorizer } from './application/authorizers/authorize-fichier'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -414,7 +416,9 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateDemarcheCommandHandler,
     RechercherTypesDemarcheQueryHandler,
     TeleverserFichierCommandHandler,
-    TelechargerFichierQueryHandler
+    TelechargerFichierQueryHandler,
+    SupprimerFichierCommandHandler,
+    FichierAuthorizer
   ]
 }
 

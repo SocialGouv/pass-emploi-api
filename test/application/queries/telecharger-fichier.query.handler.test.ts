@@ -1,25 +1,20 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox } from 'sinon'
-import { Unauthorized } from 'src/domain/erreur'
-import { Jeune } from 'src/domain/jeune'
+import { FichierAuthorizer } from 'src/application/authorizers/authorize-fichier'
 import { ObjectStorageClient } from 'src/infrastructure/clients/object-storage.client'
-import { unJeune } from 'test/fixtures/jeune.fixture'
+import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import {
   TelechargerFichierQuery,
   TelechargerFichierQueryHandler
 } from '../../../src/application/queries/telecharger-fichier.query.handler'
 import { success } from '../../../src/building-blocks/types/result'
 import { Fichier } from '../../../src/domain/fichier'
-import {
-  unUtilisateurConseiller,
-  unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
 import { unFichierMetadata } from '../../fixtures/fichier.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
 
 describe('TelechargerFichierQueryHandler', () => {
   let fichierRepository: StubbedType<Fichier.Repository>
-  let jeuneRepository: StubbedType<Jeune.Repository>
+  let fichierAuthorizer: StubbedClass<FichierAuthorizer>
   let objectStorageClient: StubbedClass<ObjectStorageClient>
   let telechargerFichierQueryHandler: TelechargerFichierQueryHandler
 
@@ -30,81 +25,29 @@ describe('TelechargerFichierQueryHandler', () => {
   beforeEach(() => {
     const sandbox = createSandbox()
     fichierRepository = stubInterface(sandbox)
-    jeuneRepository = stubInterface(sandbox)
+    fichierAuthorizer = stubClass(FichierAuthorizer)
     objectStorageClient = stubClass(ObjectStorageClient)
     telechargerFichierQueryHandler = new TelechargerFichierQueryHandler(
       fichierRepository,
-      jeuneRepository,
+      fichierAuthorizer,
       objectStorageClient
     )
   })
 
   describe('authorize', () => {
-    it('autorise un conseiller quand un de ses jeunes est présent', async () => {
-      //Given
+    it("valide que l'utilisateur est bien autorisé à télécharger le fichier", async () => {
+      // Given
       const utilisateur = unUtilisateurConseiller()
-      const idJeuneDuConseiller = '1'
-      fichierRepository.getFichierMetadata
-        .withArgs(query.idFichier)
-        .resolves(unFichierMetadata({ idsJeunes: [idJeuneDuConseiller] }))
-      jeuneRepository.findAllJeunesByConseiller
-        .withArgs([idJeuneDuConseiller], utilisateur.id)
-        .resolves([unJeune()])
+      const idFichier = '1'
 
       // When
-      const call = await telechargerFichierQueryHandler.authorize(
-        query,
+      await telechargerFichierQueryHandler.authorize({ idFichier }, utilisateur)
+
+      // Then
+      expect(fichierAuthorizer.authorize).to.have.been.calledWithExactly(
+        idFichier,
         utilisateur
       )
-
-      // Then
-      expect(call).to.be.equal(undefined)
-    })
-    it("n'autorise pas le conseiller quand aucun de ses jeunes n'est présent", async () => {
-      //Given
-      const utilisateur = unUtilisateurConseiller()
-      const idJeuneDuConseiller = '1'
-      fichierRepository.getFichierMetadata
-        .withArgs(query.idFichier)
-        .resolves(unFichierMetadata({ idsJeunes: [idJeuneDuConseiller] }))
-      jeuneRepository.findAllJeunesByConseiller
-        .withArgs([idJeuneDuConseiller], utilisateur.id)
-        .resolves([])
-
-      // When
-      const call = telechargerFichierQueryHandler.authorize(query, utilisateur)
-
-      // Then
-      await expect(call).to.be.rejectedWith(Unauthorized)
-    })
-    it('autorise un jeune quand il est présent', async () => {
-      //Given
-      const utilisateur = unUtilisateurJeune()
-      fichierRepository.getFichierMetadata
-        .withArgs(query.idFichier)
-        .resolves(unFichierMetadata({ idsJeunes: [utilisateur.id] }))
-
-      // When
-      const call = await telechargerFichierQueryHandler.authorize(
-        query,
-        utilisateur
-      )
-
-      // Then
-      expect(call).to.be.equal(undefined)
-    })
-    it("n'autorise pas le jeune quand il n'est pas présent", async () => {
-      //Given
-      const utilisateur = unUtilisateurJeune()
-      fichierRepository.getFichierMetadata
-        .withArgs(query.idFichier)
-        .resolves(unFichierMetadata({ idsJeunes: [] }))
-
-      // When
-      const call = telechargerFichierQueryHandler.authorize(query, utilisateur)
-
-      // Then
-      await expect(call).to.be.rejectedWith(Unauthorized)
     })
   })
 

@@ -9,7 +9,6 @@ describe('FichierSqlS3Repository', () => {
   DatabaseForTesting.prepare()
   let fichierSqlS3Repository: FichierSqlS3Repository
   let objectStorageClient: StubbedClass<ObjectStorageClient>
-  const fichierImage = unFichierImage()
 
   beforeEach(async () => {
     objectStorageClient = stubClass(ObjectStorageClient)
@@ -17,6 +16,8 @@ describe('FichierSqlS3Repository', () => {
   })
 
   describe('.save(fichier)', () => {
+    const fichierImage = unFichierImage()
+
     it('upload le fichier sur s3 ', async () => {
       // When
       await fichierSqlS3Repository.save(fichierImage)
@@ -38,6 +39,24 @@ describe('FichierSqlS3Repository', () => {
       expect(fichierCree.dateCreation).to.be.deep.equal(
         fichierImage.dateCreation
       )
+    })
+  })
+
+  describe('.delete(idFichier)', () => {
+    it('supprime le fichier sur s3 et les metadonnees de la db', async () => {
+      // Given
+      const fichier = unFichier()
+      await fichierSqlS3Repository.save(fichier)
+
+      // When
+      await fichierSqlS3Repository.delete(fichier.id)
+
+      // Then
+      expect(objectStorageClient.supprimer).to.have.been.calledOnceWith(
+        fichier.id
+      )
+      const fichierTrouve = await FichierSqlModel.findByPk(fichier.id)
+      expect(fichierTrouve).to.be.null()
     })
   })
 

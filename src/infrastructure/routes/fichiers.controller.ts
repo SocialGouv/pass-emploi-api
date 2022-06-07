@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
   ParseUUIDPipe,
   Post,
@@ -13,6 +15,7 @@ import { HttpStatus } from '@nestjs/common/enums/http-status.enum'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ApiConsumes, ApiOAuth2, ApiTags } from '@nestjs/swagger'
+import { SupprimerFichierCommandHandler } from 'src/application/commands/supprimer-fichier.command.handler'
 import { TelechargerFichierQueryHandler } from 'src/application/queries/telecharger-fichier.query.handler'
 import {
   TeleverserFichierCommand,
@@ -23,6 +26,7 @@ import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { OidcQueryToken } from '../decorators/skip-oidc-auth.decorator'
+import { handleFailure } from './failure.handler'
 import { TeleverserFichierPayload } from './validation/fichiers.inputs'
 
 @Controller('fichiers')
@@ -31,7 +35,8 @@ import { TeleverserFichierPayload } from './validation/fichiers.inputs'
 export class FilesController {
   constructor(
     private telechargerFichierQueryHandler: TelechargerFichierQueryHandler,
-    private televerserFichierCommandHandler: TeleverserFichierCommandHandler
+    private televerserFichierCommandHandler: TeleverserFichierCommandHandler,
+    private supprimerFichierCommandHandler: SupprimerFichierCommandHandler
   ) {}
 
   @Get(':idFichier')
@@ -60,7 +65,7 @@ export class FilesController {
   @Post()
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('fichier'))
-  async postFichier(
+  async deleteFichier(
     @UploadedFile() fichier: Express.Multer.File,
     @Body() payload: TeleverserFichierPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
@@ -87,5 +92,22 @@ export class FilesController {
       return result.data
     }
     throw new RuntimeException()
+  }
+
+  @Delete(':idFichier')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async postFichier(
+    @Param('idFichier', new ParseUUIDPipe()) idFichier: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.supprimerFichierCommandHandler.execute(
+      { idFichier },
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+    handleFailure(result)
   }
 }

@@ -13,6 +13,16 @@ export class FichierSqlS3Repository implements Fichier.Repository {
     await FichierSqlModel.creer(fichier)
   }
 
+  async delete(idFichier: string): Promise<void> {
+    await this.objectStorageClient.supprimer(idFichier)
+
+    await FichierSqlModel.destroy({
+      where: {
+        id: idFichier
+      }
+    })
+  }
+
   async getFichierMetadata(
     idFichier: string
   ): Promise<FichierMetadata | undefined> {
