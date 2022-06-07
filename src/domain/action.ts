@@ -51,6 +51,11 @@ export namespace Action {
     JEUNE = 'jeune'
   }
 
+  export enum Tri {
+    DATE_CROISSANTE = 'date_croissante',
+    DATE_DECROISSANTE = 'date_decroissante'
+  }
+
   export class StatutInvalide implements DomainError {
     static CODE = 'StatutActionInvalide'
     readonly code: string = StatutInvalide.CODE
