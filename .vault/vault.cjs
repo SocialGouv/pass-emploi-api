@@ -2,8 +2,8 @@
 const DEFAULT_LOCAL_ENVIRONMENT_FILE = ".environment"
 require("dotenv").config({path: DEFAULT_LOCAL_ENVIRONMENT_FILE})
 const vaultKey = process.env.VAULT_ENV_VAULT_KEY
-const LOCAL_VAULT_ENCRYPTED_FILE = process.env.VAULT_ENV_LOCAL_VAULT_ENCRYPTED_FILE || "./.vault/local.secret"
-const LOCAL_VAULT_DECRYPTED_FILE = process.env.VAULT_ENV_LOCAL_VAULT_DECRYPTED_FILE || "./.vault/local.env"
+const LOCAL_VAULT_DECRYPTED_FILE = process.env.VAULT_ENV_LOCAL_VAULT_DECRYPTED_FILE || "./.vault/local.secret"
+const LOCAL_VAULT_ENCRYPTED_FILE = process.env.VAULT_ENV_LOCAL_VAULT_ENCRYPTED_FILE || "./.vault/local.vault"
 const BEGIN_VAULT_PATTERN = process.env.VAULT_ENV_BEGIN_VAULT_PATTERN || "// VAULT START"
 const END_OF_VAULT_PATTERN = process.env.VAULT_ENV_END_OF_VAULT_PATTERN || "// VAULT END"
 const iv = process.env.VAULT_ENV_CIPHER_IV || "19ea8528d76f4502"
@@ -15,24 +15,24 @@ const yargs = require("yargs")
 const fs = require("fs")
 const crypto = require("crypto")
 
-const options = yargs
-  .usage("Usage: vault <command> [options]")
-  .command("encrypt", "encrypt local.secret into local.env file")
-  .command("decrypt", "decrypt local.env into local.secret and into the vault block part of .environment")
+const args = yargs
+  .usage("Usage: vault <command>")
+  .command("encrypt", "encrypt local.secret into local.vault file")
+  .command("decrypt", "decrypt local.vault into local.secret and into the vault block part of .environment")
   .demandCommand(1, "encrypt or decrypt command missing")
   .help("h")
   .argv
 if (!vaultKey) {
-  console.log("environment variable VAULT_KEY is missing")
+  console.log("environment variable VAULT_ENV_VAULT_KEY is missing")
   process.exit(1)
 }
 
-const key = crypto.createHash("sha256").update(String(vaultKey)).digest("base64").substr(0, 32)
+const key = crypto.createHash("sha256").update(String(vaultKey)).digest("base64").substring(0, 32)
 
-switch (options._[0]) {
+switch (args._[0]) {
   case "encrypt":
-    console.log('encrypt into local.env')
-    encryptLocolSecrets()
+    console.log('encrypt into local.vault')
+    encryptLocalSecrets()
     break
   case "decrypt":
     console.log('decrypt into local.secret and environment file')
@@ -40,12 +40,12 @@ switch (options._[0]) {
     break
 }
 
-function encryptLocolSecrets() {
+function encryptLocalSecrets() {
   const encrypter = crypto.createCipheriv(CIPHER_ALGORITHM, key, iv)
-  const data = fs.readFileSync(LOCAL_VAULT_ENCRYPTED_FILE, TEXT_ENCODING)
+  const data = fs.readFileSync(LOCAL_VAULT_DECRYPTED_FILE, TEXT_ENCODING)
   let encryptedMsg = encrypter.update(data, TEXT_ENCODING, VAULT_ENCODING)
   encryptedMsg += encrypter.final(VAULT_ENCODING)
-  fs.writeFileSync(LOCAL_VAULT_DECRYPTED_FILE, encryptedMsg)
+  fs.writeFileSync(LOCAL_VAULT_ENCRYPTED_FILE, encryptedMsg)
 }
 
 function decryptSecrets() {
@@ -55,11 +55,11 @@ function decryptSecrets() {
 
 
 function decryptIntoLocalSecrets() {
-  const encryptedData = fs.readFileSync(LOCAL_VAULT_DECRYPTED_FILE, TEXT_ENCODING)
+  const encryptedData = fs.readFileSync(LOCAL_VAULT_ENCRYPTED_FILE, TEXT_ENCODING)
   const decrypter = crypto.createDecipheriv(CIPHER_ALGORITHM, key, iv)
   let decryptedData = decrypter.update(encryptedData, VAULT_ENCODING, TEXT_ENCODING)
   decryptedData += decrypter.final(TEXT_ENCODING)
-  fs.writeFileSync(LOCAL_VAULT_ENCRYPTED_FILE, decryptedData)
+  fs.writeFileSync(LOCAL_VAULT_DECRYPTED_FILE, decryptedData)
   return decryptedData
 }
 
