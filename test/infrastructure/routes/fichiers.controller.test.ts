@@ -1,12 +1,21 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import {
+  SupprimerFichierCommand,
+  SupprimerFichierCommandHandler
+} from 'src/application/commands/supprimer-fichier.command.handler'
 import { TelechargerFichierQueryHandler } from 'src/application/queries/telecharger-fichier.query.handler'
+import { MauvaiseCommandeError } from 'src/building-blocks/types/domain-error'
 import * as request from 'supertest'
 import {
   TeleverserFichierCommand,
   TeleverserFichierCommandHandler,
   TeleverserFichierCommandOutput
 } from '../../../src/application/commands/televerser-fichier.command.handler'
-import { success } from '../../../src/building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  success
+} from '../../../src/building-blocks/types/result'
 import {
   unHeaderAuthorization,
   unUtilisateurDecode
@@ -22,17 +31,21 @@ import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-
 describe('FichiersController', () => {
   let telechargerFichierQueryHandler: StubbedClass<TelechargerFichierQueryHandler>
   let televerserFichierCommandHandler: StubbedClass<TeleverserFichierCommandHandler>
+  let supprimerFichierCommandHandler: StubbedClass<SupprimerFichierCommandHandler>
   let app: INestApplication
 
   before(async () => {
     telechargerFichierQueryHandler = stubClass(TelechargerFichierQueryHandler)
     televerserFichierCommandHandler = stubClass(TeleverserFichierCommandHandler)
+    supprimerFichierCommandHandler = stubClass(SupprimerFichierCommandHandler)
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(TelechargerFichierQueryHandler)
       .useValue(telechargerFichierQueryHandler)
       .overrideProvider(TeleverserFichierCommandHandler)
       .useValue(televerserFichierCommandHandler)
+      .overrideProvider(SupprimerFichierCommandHandler)
+      .useValue(supprimerFichierCommandHandler)
       .compile()
     app = testingModule.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
@@ -61,7 +74,7 @@ describe('FichiersController', () => {
         .expect(HttpStatus.TEMPORARY_REDIRECT)
         .expect('Location', url)
     })
-    ensureUserAuthenticationFailsIfInvalid('post', '/fichiers')
+    ensureUserAuthenticationFailsIfInvalid('get', '/fichiers/1')
   })
 
   describe('POST /fichiers', () => {
@@ -103,6 +116,60 @@ describe('FichiersController', () => {
         .expect(HttpStatus.CREATED)
         .expect({ id: idFichier, nom: 'image.jpg' })
     })
+    it('renvoie une erreur 400 quand la validation du fichier echoue', async () => {
+      // Given
+      const utilisateur = unUtilisateurDecode()
+      const image = uneImage()
+      const command: TeleverserFichierCommand = {
+        fichier: {
+          buffer: image.buffer,
+          mimeType: image.mimetype,
+          name: image.originalname,
+          size: image.size
+        },
+        jeunesIds: ['1'],
+        createur: {
+          id: utilisateur.id,
+          type: utilisateur.type
+        }
+      }
+      televerserFichierCommandHandler.execute
+        .withArgs(command, utilisateur)
+        .resolves(failure(new MauvaiseCommandeError('invalide')))
+
+      // When
+      await request(app.getHttpServer())
+        .post('/fichiers')
+        .field({
+          jeunesIds: '1'
+        })
+        .attach('fichier', 'test/fixtures/image.jpg')
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.BAD_REQUEST)
+    })
     ensureUserAuthenticationFailsIfInvalid('post', '/fichiers')
+  })
+
+  describe('DELETE /fichiers/:idFichier', () => {
+    it('renvoie une 204', async () => {
+      // Given
+      const utilisateur = unUtilisateurDecode()
+      const idFichier = '15916d7e-f13a-4158-b7eb-3936aa933a0a'
+      const command: SupprimerFichierCommand = {
+        idFichier
+      }
+      supprimerFichierCommandHandler.execute
+        .withArgs(command, utilisateur)
+        .resolves(emptySuccess())
+
+      // When
+      await request(app.getHttpServer())
+        .delete(`/fichiers/${idFichier}`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.NO_CONTENT)
+    })
+    ensureUserAuthenticationFailsIfInvalid('delete', '/fichiers/1')
   })
 })
