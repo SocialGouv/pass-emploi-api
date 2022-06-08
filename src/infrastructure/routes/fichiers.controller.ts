@@ -91,7 +91,7 @@ export class FilesController {
     if (isSuccess(result)) {
       return result.data
     }
-    throw new RuntimeException()
+    throw handleFailure(result)
   }
 
   @Delete(':idFichier')
@@ -106,8 +106,8 @@ export class FilesController {
     )
 
     if (isSuccess(result)) {
-      return result.data
+      return
     }
-    handleFailure(result)
+    throw new RuntimeException()
   }
 }

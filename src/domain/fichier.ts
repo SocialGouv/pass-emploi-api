@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { Result, success } from '../building-blocks/types/result'
+import { MauvaiseCommandeError } from 'src/building-blocks/types/domain-error'
+import { failure, Result, success } from '../building-blocks/types/result'
 import { DateService } from '../utils/date-service'
 import { IdService } from '../utils/id-service'
 import { Authentification } from './authentification'
@@ -48,6 +49,18 @@ export namespace Fichier {
     ) {}
 
     creer(fichierACreer: Fichier.ACreer): Result<Fichier> {
+      const TAILLE_MAX_FICHIER_EN_BYTES = 5242880
+      const TYPES_AUTORISES = ['application/pdf', 'image/png', 'image/jpeg']
+
+      if (fichierACreer.fichier.size > TAILLE_MAX_FICHIER_EN_BYTES) {
+        return failure(
+          new MauvaiseCommandeError('Taille du fichier trop grande')
+        )
+      }
+      if (!TYPES_AUTORISES.includes(fichierACreer.fichier.mimeType)) {
+        return failure(new MauvaiseCommandeError('Type du fichier non accepté'))
+      }
+
       const fichier: Fichier = {
         id: this.idService.uuid(),
         buffer: fichierACreer.fichier.buffer,
