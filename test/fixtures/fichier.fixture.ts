@@ -17,6 +17,25 @@ export const unFichier = (args: Partial<Fichier> = {}): Fichier => {
   return { ...defaults, ...args }
 }
 
+export const unFichierACreer = (
+  args: Partial<Fichier.ACreer> = {}
+): Fichier.ACreer => {
+  const defaults = {
+    fichier: {
+      buffer: Buffer.alloc(1),
+      mimeType: 'image/jpeg',
+      name: 'fichier-test.jpg',
+      size: 788
+    },
+    jeunesIds: ['1'],
+    createur: {
+      id: '1',
+      type: Authentification.Type.CONSEILLER
+    }
+  }
+  return { ...defaults, ...args }
+}
+
 export const unFichierMetadata = (
   args: Partial<FichierMetadata> = {}
 ): FichierMetadata => {
