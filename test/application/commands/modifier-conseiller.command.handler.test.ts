@@ -16,7 +16,7 @@ import {
   ModifierConseillerCommandHandler
 } from '../../../src/application/commands/modifier-conseiller.command.handler'
 
-describe('ModifierConseillerQueryHandler', () => {
+describe('ModifierConseillerCommandHandler', () => {
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let agencesRepository: StubbedType<Agence.Repository>
   let handler: ModifierConseillerCommandHandler

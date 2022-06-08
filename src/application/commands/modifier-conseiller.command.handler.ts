@@ -29,7 +29,7 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
     @Inject(AgenceRepositoryToken)
     private agencesRepository: Agence.Repository
   ) {
-    super('ModifierConseillerQueryHandler')
+    super('ModifierConseillerCommandHandler')
   }
 
   async handle(command: ModifierConseillerCommand): Promise<Result> {
