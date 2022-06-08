@@ -32,6 +32,7 @@ export namespace Evenement {
     OFFRE_POSTULEE = 'OFFRE_POSTULEE',
     OFFRE_PARTAGEE = 'OFFRE_PARTAGEE',
     MESSAGE_ENVOYE = 'MESSAGE_ENVOYE',
+    MESSAGE_ENVOYE_PJ = 'MESSAGE_ENVOYE_PJ',
     MESSAGE_ENVOYE_MULTIPLE = 'MESSAGE_ENVOYE_MULTIPLE',
     RDV_CREE = 'RDV_CREE',
     RDV_MODIFIE = 'RDV_MODIFIE',
@@ -167,6 +168,10 @@ const evenements = {
     action: 'Postuler'
   },
   [Evenement.Type.MESSAGE_ENVOYE]: { categorie: 'Message', action: 'Envoi' },
+  [Evenement.Type.MESSAGE_ENVOYE_PJ]: {
+    categorie: 'Message',
+    action: 'Envoi PJ'
+  },
   [Evenement.Type.MESSAGE_ENVOYE_MULTIPLE]: {
     categorie: 'Message',
     action: 'Envoi multiple'
