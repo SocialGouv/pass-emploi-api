@@ -2,15 +2,17 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox } from 'sinon'
 import { FichierAuthorizer } from 'src/application/authorizers/authorize-fichier'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
+import { stubClassSandbox } from 'test/utils/types'
 import {
   SupprimerFichierCommand,
   SupprimerFichierCommandHandler
 } from '../../../src/application/commands/supprimer-fichier.command.handler'
 import { emptySuccess } from '../../../src/building-blocks/types/result'
 import { Fichier } from '../../../src/domain/fichier'
-import { expect, StubbedClass, stubClass } from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 
 describe('SupprimerFichierCommandHandler', () => {
+  const sandbox = createSandbox()
   let fichierRepository: StubbedType<Fichier.Repository>
   let fichierAuthorizer: StubbedClass<FichierAuthorizer>
   let supprimerFichierCommandHandler: SupprimerFichierCommandHandler
@@ -20,13 +22,16 @@ describe('SupprimerFichierCommandHandler', () => {
   }
 
   beforeEach(() => {
-    const sandbox = createSandbox()
     fichierRepository = stubInterface(sandbox)
-    fichierAuthorizer = stubClass(FichierAuthorizer)
+    fichierAuthorizer = stubClassSandbox(FichierAuthorizer, sandbox)
     supprimerFichierCommandHandler = new SupprimerFichierCommandHandler(
       fichierRepository,
       fichierAuthorizer
     )
+  })
+
+  afterEach(() => {
+    sandbox.restore()
   })
 
   describe('authorize', () => {
@@ -55,6 +60,9 @@ describe('SupprimerFichierCommandHandler', () => {
       const result = await supprimerFichierCommandHandler.handle(command)
 
       // Then
+      expect(fichierRepository.delete).to.have.been.calledWithExactly(
+        command.idFichier
+      )
       expect(result).to.deep.equal(emptySuccess())
     })
   })

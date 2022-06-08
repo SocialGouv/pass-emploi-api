@@ -3,6 +3,7 @@ import { createSandbox } from 'sinon'
 import { FichierAuthorizer } from 'src/application/authorizers/authorize-fichier'
 import { ObjectStorageClient } from 'src/infrastructure/clients/object-storage.client'
 import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
+import { stubClassSandbox } from 'test/utils/types'
 import {
   TelechargerFichierQuery,
   TelechargerFichierQueryHandler
@@ -10,9 +11,10 @@ import {
 import { success } from '../../../src/building-blocks/types/result'
 import { Fichier } from '../../../src/domain/fichier'
 import { unFichierMetadata } from '../../fixtures/fichier.fixture'
-import { expect, StubbedClass, stubClass } from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 
 describe('TelechargerFichierQueryHandler', () => {
+  const sandbox = createSandbox()
   let fichierRepository: StubbedType<Fichier.Repository>
   let fichierAuthorizer: StubbedClass<FichierAuthorizer>
   let objectStorageClient: StubbedClass<ObjectStorageClient>
@@ -23,15 +25,18 @@ describe('TelechargerFichierQueryHandler', () => {
   }
 
   beforeEach(() => {
-    const sandbox = createSandbox()
     fichierRepository = stubInterface(sandbox)
-    fichierAuthorizer = stubClass(FichierAuthorizer)
-    objectStorageClient = stubClass(ObjectStorageClient)
+    fichierAuthorizer = stubClassSandbox(FichierAuthorizer, sandbox)
+    objectStorageClient = stubClassSandbox(ObjectStorageClient, sandbox)
     telechargerFichierQueryHandler = new TelechargerFichierQueryHandler(
       fichierRepository,
       fichierAuthorizer,
       objectStorageClient
     )
+  })
+
+  afterEach(() => {
+    sandbox.restore()
   })
 
   describe('authorize', () => {

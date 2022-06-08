@@ -1,12 +1,13 @@
 import { MauvaiseCommandeError } from 'src/building-blocks/types/domain-error'
 import { failure, success } from 'src/building-blocks/types/result'
-import { Authentification } from 'src/domain/authentification'
 import { Fichier } from '../../src/domain/fichier'
 import { DateService } from '../../src/utils/date-service'
 import { IdService } from '../../src/utils/id-service'
 import { uneDate } from '../fixtures/date.fixture'
-import { unFichier } from '../fixtures/fichier.fixture'
+import { unFichier, unFichierACreer } from '../fixtures/fichier.fixture'
 import { expect, stubClass } from '../utils'
+
+const fichierACreer = unFichierACreer()
 
 describe('Fichier', () => {
   let fichierFactory: Fichier.Factory
@@ -27,63 +28,37 @@ describe('Fichier', () => {
       const fichier: Fichier = unFichier({ mimeType: 'image/jpeg' })
 
       // When
-      const result = fichierFactory.creer({
-        fichier: {
-          buffer: Buffer.alloc(1),
-          mimeType: 'image/jpeg',
-          name: 'fichier-test.jpg',
-          size: 788
-        },
-        jeunesIds: ['1'],
-        createur: {
-          id: '1',
-          type: Authentification.Type.CONSEILLER
-        }
-      })
+      const result = fichierFactory.creer(fichierACreer)
 
       // Then
       expect(result).to.deep.equal(success(fichier))
     })
     it('retourne une failure quand la taille du fichier est trop grande', () => {
       // When
-      const result = fichierFactory.creer({
-        fichier: {
-          buffer: Buffer.alloc(1),
-          mimeType: 'image/jpeg',
-          name: 'fichier-test.jpg',
-          size: 78909098
-        },
-        jeunesIds: ['1'],
-        createur: {
-          id: '1',
-          type: Authentification.Type.CONSEILLER
-        }
-      })
+      const result = fichierFactory.creer(
+        unFichierACreer({
+          fichier: { ...fichierACreer.fichier, size: 787878787878 }
+        })
+      )
 
       // Then
       expect(result).to.deep.equal(
-        failure(new MauvaiseCommandeError('Taille du fichier trop grande'))
+        failure(
+          new MauvaiseCommandeError('Taille du fichier supérieure à 5 Mo')
+        )
       )
     })
     it('retourne une failure quand le type du fichier est invalide', () => {
       // When
-      const result = fichierFactory.creer({
-        fichier: {
-          buffer: Buffer.alloc(1),
-          mimeType: 'video/mpeg',
-          name: 'fichier-test.jpg',
-          size: 789
-        },
-        jeunesIds: ['1'],
-        createur: {
-          id: '1',
-          type: Authentification.Type.CONSEILLER
-        }
-      })
+      const result = fichierFactory.creer(
+        unFichierACreer({
+          fichier: { ...fichierACreer.fichier, mimeType: 'video/mpeg' }
+        })
+      )
 
       // Then
       expect(result).to.deep.equal(
-        failure(new MauvaiseCommandeError('Type du fichier non accepté'))
+        failure(new MauvaiseCommandeError('Types acceptés : pdf, png, jpg'))
       )
     })
   })
