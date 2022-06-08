@@ -65,7 +65,7 @@ export class FilesController {
   @Post()
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('fichier'))
-  async deleteFichier(
+  async postFichier(
     @UploadedFile() fichier: Express.Multer.File,
     @Body() payload: TeleverserFichierPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
@@ -96,7 +96,7 @@ export class FilesController {
 
   @Delete(':idFichier')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async postFichier(
+  async deleteFichier(
     @Param('idFichier', new ParseUUIDPipe()) idFichier: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {

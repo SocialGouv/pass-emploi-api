@@ -88,5 +88,18 @@ describe('FichierAuthorizer', () => {
       // Then
       await expect(call).to.be.rejectedWith(Unauthorized)
     })
+    it("n'autorise pas quand le fichier n'existe pas", async () => {
+      //Given
+      const utilisateur = unUtilisateurJeune()
+      fichierRepository.getFichierMetadata
+        .withArgs(idFichier)
+        .resolves(undefined)
+
+      // When
+      const call = fichierAuthorizer.authorize(idFichier, utilisateur)
+
+      // Then
+      await expect(call).to.be.rejectedWith(Unauthorized)
+    })
   })
 })

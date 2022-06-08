@@ -49,16 +49,33 @@ export namespace Fichier {
     ) {}
 
     creer(fichierACreer: Fichier.ACreer): Result<Fichier> {
-      const TAILLE_MAX_FICHIER_EN_BYTES = 5242880
-      const TYPES_AUTORISES = ['application/pdf', 'image/png', 'image/jpeg']
+      const TAILLE_MAX_FICHIER_EN_MO = 5
+      const TAILLE_MAX_FICHIER_EN_BYTES = TAILLE_MAX_FICHIER_EN_MO * 1048576
+      const tailleDuFichierTropGrande =
+        fichierACreer.fichier.size > TAILLE_MAX_FICHIER_EN_BYTES
 
-      if (fichierACreer.fichier.size > TAILLE_MAX_FICHIER_EN_BYTES) {
+      const TYPES_AUTORISES = {
+        pdf: 'application/pdf',
+        png: 'image/png',
+        jpg: 'image/jpeg'
+      }
+      const typeDuFichierAccepte = Object.values(TYPES_AUTORISES).includes(
+        fichierACreer.fichier.mimeType
+      )
+
+      if (tailleDuFichierTropGrande) {
         return failure(
-          new MauvaiseCommandeError('Taille du fichier trop grande')
+          new MauvaiseCommandeError(
+            `Taille du fichier supérieure à ${TAILLE_MAX_FICHIER_EN_MO} Mo`
+          )
         )
       }
-      if (!TYPES_AUTORISES.includes(fichierACreer.fichier.mimeType)) {
-        return failure(new MauvaiseCommandeError('Type du fichier non accepté'))
+      if (!typeDuFichierAccepte) {
+        return failure(
+          new MauvaiseCommandeError(
+            `Types acceptés : ${Object.keys(TYPES_AUTORISES).join(', ')}`
+          )
+        )
       }
 
       const fichier: Fichier = {
