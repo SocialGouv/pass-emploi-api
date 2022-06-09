@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { JeuneHomeDemarcheQueryModel } from './query-models/home-jeune.query-models'
+import { JeuneHomeDemarcheQueryModel } from './query-models/home-jeune.query-model'
 import { GetActionsJeunePoleEmploiQueryHandler } from './get-actions-jeune-pole-emploi.query.handler'
 import { GetCampagneQueryModel } from './query-getters/get-campagne.query.getter'
 import { isFailure, Result, success } from '../../building-blocks/types/result'

@@ -17,7 +17,7 @@ import {
   UpdateRendezVousCommandHandler
 } from 'src/application/commands/update-rendez-vous.command.handler'
 import { GetDetailRendezVousQueryHandler } from 'src/application/queries/get-detail-rendez-vous.query.handler.db'
-import { RendezVousConseillerQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
+import { RendezVousConseillerQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
 import {
   MauvaiseCommandeError,
   NonTrouveError

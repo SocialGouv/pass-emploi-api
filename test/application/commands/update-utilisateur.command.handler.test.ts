@@ -21,7 +21,7 @@ import {
   UpdateUtilisateurCommand,
   UpdateUtilisateurCommandHandler
 } from '../../../src/application/commands/update-utilisateur.command.handler'
-import { UtilisateurQueryModel } from '../../../src/application/queries/query-models/authentification.query-models'
+import { UtilisateurQueryModel } from '../../../src/application/queries/query-models/authentification.query-model'
 import {
   failure,
   isFailure,

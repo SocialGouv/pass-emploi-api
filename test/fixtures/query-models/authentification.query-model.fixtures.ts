@@ -1,4 +1,4 @@
-import { UtilisateurQueryModel } from '../../../src/application/queries/query-models/authentification.query-models'
+import { UtilisateurQueryModel } from '../../../src/application/queries/query-models/authentification.query-model'
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
 

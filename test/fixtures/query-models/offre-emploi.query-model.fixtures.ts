@@ -1,4 +1,4 @@
-import { OffresEmploiQueryModel } from '../../../src/application/queries/query-models/offres-emploi.query-models'
+import { OffresEmploiQueryModel } from '../../../src/application/queries/query-models/offres-emploi.query-model'
 
 export const desOffresEmploiQueryModel = (): OffresEmploiQueryModel => ({
   pagination: {

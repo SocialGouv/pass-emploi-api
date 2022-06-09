@@ -1,4 +1,4 @@
-import { OffreImmersionQueryModel } from 'src/application/queries/query-models/offres-immersion.query-models'
+import { OffreImmersionQueryModel } from 'src/application/queries/query-models/offres-immersion.query-model'
 import { OffreImmersion } from '../../src/domain/offre-immersion'
 import { NotifierNouvellesImmersionsCommand } from '../../src/application/commands/notifier-nouvelles-immersions.command.handler'
 

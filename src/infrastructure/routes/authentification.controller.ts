@@ -28,7 +28,7 @@ import {
 import {
   ChatSecretsQueryModel,
   UtilisateurQueryModel
-} from '../../application/queries/query-models/authentification.query-models'
+} from '../../application/queries/query-models/authentification.query-model'
 import {
   NonTrouveError,
   ConseillerNonValide,

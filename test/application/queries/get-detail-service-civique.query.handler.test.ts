@@ -3,7 +3,7 @@ import { SinonSandbox } from 'sinon'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { OffreServiceCivique } from '../../../src/domain/offre-service-civique'
-import { DetailServiceCiviqueQueryModel } from '../../../src/application/queries/query-models/service-civique.query-models'
+import { DetailServiceCiviqueQueryModel } from '../../../src/application/queries/query-models/service-civique.query-model'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import {
   GetDetailOffreServiceCiviqueQuery,

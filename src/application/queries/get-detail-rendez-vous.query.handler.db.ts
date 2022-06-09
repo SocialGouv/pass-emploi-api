@@ -8,7 +8,7 @@ import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-m
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
 import { fromSqlToRendezVousConseillerQueryModel } from './query-mappers/rendez-vous-milo.mappers'
-import { RendezVousConseillerQueryModel } from './query-models/rendez-vous.query-models'
+import { RendezVousConseillerQueryModel } from './query-models/rendez-vous.query-model'
 
 export interface GetDetailRendezVousQuery extends Query {
   idRendezVous: string

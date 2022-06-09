@@ -3,7 +3,7 @@ import {
   OffreEmploiQueryModel,
   OffreEmploiResumeQueryModel,
   OffresEmploiQueryModel
-} from 'src/application/queries/query-models/offres-emploi.query-models'
+} from 'src/application/queries/query-models/offres-emploi.query-model'
 import {
   OffreEmploi,
   Localisation,

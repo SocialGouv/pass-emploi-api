@@ -3,7 +3,7 @@ import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/ren
 import {
   RendezVousConseillerQueryModel,
   RendezVousJeuneQueryModel
-} from '../query-models/rendez-vous.query-models'
+} from '../query-models/rendez-vous.query-model'
 
 export function fromSqlToRendezVousJeuneQueryModel(
   rendezVousSql: RendezVousSqlModel

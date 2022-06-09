@@ -6,7 +6,7 @@ import {
   OffresEmploi,
   OffresEmploiRepositoryToken
 } from '../../domain/offre-emploi'
-import { OffreEmploiQueryModel } from './query-models/offres-emploi.query-models'
+import { OffreEmploiQueryModel } from './query-models/offres-emploi.query-model'
 
 export interface GetDetailOffreEmploiQuery extends Query {
   idOffreEmploi: string
