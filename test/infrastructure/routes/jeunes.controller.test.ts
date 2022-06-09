@@ -1,15 +1,19 @@
-import {
-  HttpException,
-  HttpStatus,
-  INestApplication,
-  ValidationPipe
-} from '@nestjs/common'
+import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { CreateDemarcheCommandHandler } from 'src/application/commands/create-demarche.command.handler'
 import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
 import { TransfererJeunesConseillerCommandHandler } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
+import { UpdateStatutDemarcheCommandHandler } from 'src/application/commands/update-demarche.command.handler'
 import { Core } from 'src/domain/core'
+import { Demarche } from 'src/domain/demarche'
 import { RendezVous } from 'src/domain/rendez-vous'
+import {
+  CreateDemarchePayload,
+  UpdateStatutDemarchePayload
+} from 'src/infrastructure/routes/validation/demarches.inputs'
 import { TransfererConseillerPayload } from 'src/infrastructure/routes/validation/jeunes.inputs'
 import * as request from 'supertest'
+import { uneDate } from 'test/fixtures/date.fixture'
+import { uneDemarche } from 'test/fixtures/demarche.fixture'
 import {
   AddFavoriOffreEmploiCommand,
   AddFavoriOffreEmploiCommandHandler
@@ -20,9 +24,12 @@ import {
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
 import { DeleteJeuneInactifCommandHandler } from '../../../src/application/commands/delete-jeune-inactif.command.handler'
+import { GetActionsByJeuneQueryHandler } from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
 import { GetActionsJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-actions-jeune-pole-emploi.query.handler'
 import { GetConseillersJeuneQueryHandler } from '../../../src/application/queries/get-conseillers-jeune.query.handler.db'
 import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler.db'
+import { GetJeuneHomeActionsQueryHandler } from '../../../src/application/queries/get-jeune-home-actions.query.handler'
+import { GetJeuneHomeDemarchesQueryHandler } from '../../../src/application/queries/get-jeune-home-demarches.query.handler'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune.query.handler.db'
 import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-model'
@@ -64,19 +71,7 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { GetJeuneHomeDemarchesQueryHandler } from '../../../src/application/queries/get-jeune-home-demarches.query.handler'
-import { GetJeuneHomeActionsQueryHandler } from '../../../src/application/queries/get-jeune-home-actions.query.handler'
 import StatutInvalide = Action.StatutInvalide
-import { UpdateStatutDemarcheCommandHandler } from 'src/application/commands/update-demarche.command.handler'
-import { CreateDemarcheCommandHandler } from 'src/application/commands/create-demarche.command.handler'
-import { Demarche } from 'src/domain/demarche'
-import {
-  CreateDemarchePayload,
-  UpdateStatutDemarchePayload
-} from 'src/infrastructure/routes/validation/demarches.inputs'
-import { uneDemarche } from 'test/fixtures/demarche.fixture'
-import { uneDate } from 'test/fixtures/date.fixture'
-import { GetActionsByJeuneQueryHandler } from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -1043,7 +1038,44 @@ describe('JeunesController', () => {
 
   describe('GET /jeunes/:idJeune/actions', () => {
     const idJeune = '1'
-    it('400 quand le paramètre page est au mauvais format', async () => {
+    it('renvoie 206 quand la page est renseignée', async () => {
+      // Given
+      const queryActions = {
+        idJeune: idJeune,
+        page: 1,
+        tri: 'date_croissante',
+        statuts: ['done']
+      }
+      const expectedActions = success({ actions: [], nombreTotal: 0 })
+      getActionsByJeuneQueryHandler.execute.resolves(expectedActions)
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/actions`)
+        .set('authorization', unHeaderAuthorization())
+        .set('x-total-count', expectedActions.data.nombreTotal.toString())
+        .query(queryActions)
+        // Then
+        .expect(HttpStatus.PARTIAL_CONTENT)
+        .expect(expectedActions.data.actions)
+    })
+    it("retourne 200 avec toutes les actions si la page n'est pas renseignée", async () => {
+      // Given
+      const queryActions = {
+        idJeune: idJeune
+      }
+      const expectedActions = success({ actions: [], nombreTotal: 0 })
+      getActionsByJeuneQueryHandler.execute.resolves(expectedActions)
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/actions`)
+        .set('authorization', unHeaderAuthorization())
+        .set('x-total-count', expectedActions.data.nombreTotal.toString())
+        .query(queryActions)
+        // Then
+        .expect(HttpStatus.OK)
+        .expect(expectedActions.data.actions)
+    })
+    it('retourne 400 quand le paramètre page est au mauvais format', async () => {
       // Given
       const queryActions = {
         idJeune: idJeune,
@@ -1057,14 +1089,14 @@ describe('JeunesController', () => {
         // Then
         .expect(HttpStatus.BAD_REQUEST)
     })
-    it('404 quand le numero de page est trop haut', async () => {
+    it('retourne 404 quand une failure non trouvé se produit', async () => {
       // Given
       const queryActions = {
         idJeune: idJeune,
         page: 2
       }
-      getActionsByJeuneQueryHandler.execute.throws(
-        new HttpException('Page non trouvée.', HttpStatus.NOT_FOUND)
+      getActionsByJeuneQueryHandler.execute.resolves(
+        failure(new NonTrouveError('test'))
       )
       // When
       await request(app.getHttpServer())
@@ -1074,7 +1106,7 @@ describe('JeunesController', () => {
         // Then
         .expect(HttpStatus.NOT_FOUND)
     })
-    it('400 quand le paramètre tri est au mauvais format', async () => {
+    it('retourne 400 quand le paramètre tri est au mauvais format', async () => {
       // Given
       const queryActions = {
         tri: 'atchoum'
@@ -1087,7 +1119,7 @@ describe('JeunesController', () => {
         // Then
         .expect(HttpStatus.BAD_REQUEST)
     })
-    it('400 quand le paramètre statuts est au mauvais format', async () => {
+    it('retourne 400 quand le paramètre statuts est au mauvais format', async () => {
       // Given
       const queryActions = {
         statuts: ['à tes souhaits']
@@ -1099,43 +1131,6 @@ describe('JeunesController', () => {
         .query(queryActions)
         // Then
         .expect(HttpStatus.BAD_REQUEST)
-    })
-    it('206 quand tous les paramètres sont renseignés au bon format', async () => {
-      // Given
-      const queryActions = {
-        idJeune: idJeune,
-        page: 1,
-        tri: 'date_croissante',
-        statuts: ['done']
-      }
-      const expectedActions = { actions: [], nombreTotal: 0 }
-      getActionsByJeuneQueryHandler.execute.resolves(expectedActions)
-      // When
-      await request(app.getHttpServer())
-        .get(`/jeunes/${idJeune}/actions`)
-        .set('authorization', unHeaderAuthorization())
-        .set('nombre-total-actions', expectedActions.nombreTotal.toString())
-        .query(queryActions)
-        // Then
-        .expect(HttpStatus.PARTIAL_CONTENT)
-        .expect([])
-    })
-    it("200, retourne toutes les actions si aucun paramètre n'est renseigné", async () => {
-      // Given
-      const queryActions = {
-        idJeune: idJeune
-      }
-      const expectedActions = { actions: [], nombreTotal: 0 }
-      getActionsByJeuneQueryHandler.execute.resolves(expectedActions)
-      // When
-      await request(app.getHttpServer())
-        .get(`/jeunes/${idJeune}/actions`)
-        .set('authorization', unHeaderAuthorization())
-        .set('nombre-total-actions', expectedActions.nombreTotal.toString())
-        .query(queryActions)
-        // Then
-        .expect(HttpStatus.OK)
-        .expect([])
     })
   })
 })
