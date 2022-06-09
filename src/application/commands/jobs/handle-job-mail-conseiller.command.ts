@@ -83,10 +83,10 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
                   }
                 }
               }
-              await this.conseillerRepository.save({
-                ...conseiller,
-                dateVerificationMessages: maintenant
-              })
+              await this.conseillerRepository.updateDateVerificationMessages(
+                conseiller.id,
+                maintenant.toJSDate()
+              )
               stats.succes++
             } catch (e) {
               this.logger.error(

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { Op } from 'sequelize'
 import { Conseiller } from '../../domain/conseiller'
 import { Core } from '../../domain/core'
-import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
-import { DateTime } from 'luxon'
 import { AgenceSqlModel } from '../sequelize/models/agence.sql-model'
+import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 
 @Injectable()
 export class ConseillerSqlRepository implements Conseiller.Repository {
@@ -13,7 +13,10 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
     structure: Core.Structure
   ): Promise<boolean> {
     const conseillerSqlModel = await ConseillerSqlModel.findOne({
-      where: { id: idConseiller, structure }
+      where: {
+        id: idConseiller,
+        structure
+      }
     })
     return !!conseillerSqlModel
   }
@@ -30,7 +33,11 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
     dateVerification: DateTime
   ): Promise<Conseiller[]> {
     const dateAMinuit = dateVerification
-      .set({ hour: 0, minute: 0, second: 0 })
+      .set({
+        hour: 0,
+        minute: 0,
+        second: 0
+      })
       .toJSDate()
     const conseillersSql = await ConseillerSqlModel.findAll({
       where: {
@@ -82,6 +89,18 @@ export class ConseillerSqlRepository implements Conseiller.Repository {
           : null,
       notificationsSonores: conseiller.notificationsSonores
     })
+  }
+
+  async updateDateVerificationMessages(
+    idconseiller: string,
+    dateVerification: Date
+  ): Promise<void> {
+    await ConseillerSqlModel.update(
+      {
+        dateVerificationMessages: dateVerification
+      },
+      { where: { id: idconseiller } }
+    )
   }
 }
 
