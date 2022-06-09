@@ -140,7 +140,9 @@ describe('HandleJobMailConseillerCommandHandler', () => {
       // When
       const result = await handleJobMailConseillerCommandHandler.handle()
       // Then
-      expect(conseillerRepository.save).to.have.callCount(2)
+      expect(
+        conseillerRepository.updateDateVerificationMessages
+      ).to.have.callCount(2)
       if (isSuccess(result)) {
         expect(result.data.succes).to.equal(2)
       }

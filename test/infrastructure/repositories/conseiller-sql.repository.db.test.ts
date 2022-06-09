@@ -1,4 +1,5 @@
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
+import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { expect } from '../../utils'
@@ -110,6 +111,34 @@ describe('ConseillerSqlRepository', () => {
       expect(conseillers.length).to.equal(1)
       expect(conseillers[0].id).to.deep.equal(
         conseillerAvecMessagesNonVerifies.id
+      )
+    })
+  })
+  describe('updateDateVerificationMessages', () => {
+    it('met a jour avec la date', async () => {
+      // Given
+      const dateMaintenant = uneDatetime
+      const dateHier = uneDatetime.minus({ day: 1 })
+
+      const conseillerAvecMessagesNonVerifies = unConseiller({
+        id: '1',
+        dateVerificationMessages: dateHier
+      })
+
+      await conseillerSqlRepository.save(conseillerAvecMessagesNonVerifies)
+
+      // When
+      await conseillerSqlRepository.updateDateVerificationMessages(
+        conseillerAvecMessagesNonVerifies.id,
+        dateMaintenant.toJSDate()
+      )
+
+      // Then
+      const conseilerMisAJour = await ConseillerSqlModel.findByPk(
+        conseillerAvecMessagesNonVerifies.id
+      )
+      expect(conseilerMisAJour?.dateVerificationMessages).to.be.deep.equal(
+        dateMaintenant.toJSDate()
       )
     })
   })
