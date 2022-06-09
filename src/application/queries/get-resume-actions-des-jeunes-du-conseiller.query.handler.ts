@@ -4,7 +4,7 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
-import { ResumeActionsDuJeuneQueryModel } from './query-models/jeunes.query-models'
+import { ResumeActionsDuJeuneQueryModel } from './query-models/jeunes.query-model'
 
 export interface GetResumeActionsDesJeunesDuConseillerQuery extends Query {
   idConseiller: string

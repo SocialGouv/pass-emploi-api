@@ -1,9 +1,9 @@
 import { DateTime, Duration } from 'luxon'
-import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
+import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
 import {
   JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
-} from 'src/application/queries/query-models/jeunes.query-models'
+} from 'src/application/queries/query-models/jeunes.query-model'
 import { Action } from 'src/domain/action'
 import { Jeune } from 'src/domain/jeune'
 import { mapCodeLabelTypeRendezVous } from 'src/domain/rendez-vous'

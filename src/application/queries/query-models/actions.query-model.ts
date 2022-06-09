@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Action } from '../../../domain/action'
-import { JeuneQueryModel } from './jeunes.query-models'
+import { JeuneQueryModel } from './jeunes.query-model'
 import { Demarche } from '../../../domain/demarche'
 
 export class ActionQueryModel {

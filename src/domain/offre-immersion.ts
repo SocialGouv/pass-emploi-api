@@ -2,7 +2,7 @@ import {
   DetailOffreImmersionQueryModel,
   FavoriOffreImmersionIdQueryModel,
   OffreImmersionQueryModel
-} from 'src/application/queries/query-models/offres-immersion.query-models'
+} from 'src/application/queries/query-models/offres-immersion.query-model'
 import { Result } from '../building-blocks/types/result'
 import { Jeune } from './jeune'
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { AgenceQueryModel } from './query-models/agence.query-models'
+import { AgenceQueryModel } from './query-models/agence.query-model'
 import { Core } from '../../domain/core'
 import Structure = Core.Structure
 import { Authentification } from '../../domain/authentification'

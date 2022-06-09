@@ -3,7 +3,7 @@ import { Authentification } from 'src/domain/authentification'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { DetailServiceCiviqueQueryModel } from './query-models/service-civique.query-models'
+import { DetailServiceCiviqueQueryModel } from './query-models/service-civique.query-model'
 import {
   OffreServiceCiviqueRepositoryToken,
   OffreServiceCivique

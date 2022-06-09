@@ -20,8 +20,8 @@ import { GetConseillersJeuneQueryHandler } from '../../../src/application/querie
 import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler.db'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune.query.handler.db'
-import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-models'
-import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-models'
+import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-model'
+import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
 import {
   DomainError,
   DroitsInsuffisants,

@@ -18,7 +18,7 @@ import {
   Notification,
   NotificationRepositoryToken
 } from '../../../domain/notification'
-import { OffresEmploiQueryModel } from '../../queries/query-models/offres-emploi.query-models'
+import { OffresEmploiQueryModel } from '../../queries/query-models/offres-emploi.query-model'
 import { ErreurHttp } from '../../../building-blocks/types/domain-error'
 import { GetOffresEmploiQuery } from '../../queries/get-offres-emploi.query.handler'
 import { Command } from '../../../building-blocks/types/command'

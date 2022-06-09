@@ -22,11 +22,11 @@ import { GetFavorisOffresImmersionJeuneQueryHandler } from 'src/application/quer
 import {
   FavoriOffreEmploiIdQueryModel,
   OffreEmploiResumeQueryModel
-} from 'src/application/queries/query-models/offres-emploi.query-models'
+} from 'src/application/queries/query-models/offres-emploi.query-model'
 import {
   FavoriOffreImmersionIdQueryModel,
   OffreImmersionQueryModel
-} from 'src/application/queries/query-models/offres-immersion.query-models'
+} from 'src/application/queries/query-models/offres-immersion.query-model'
 import {
   AddFavoriOffreEmploiCommand,
   AddFavoriOffreEmploiCommandHandler

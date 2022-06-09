@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { AgenceQueryModel } from './agence.query-models'
+import { AgenceQueryModel } from './agence.query-model'
 
 export class DetailConseillerQueryModel {
   @ApiProperty()

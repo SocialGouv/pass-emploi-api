@@ -5,7 +5,7 @@ import {
   GetOffresImmersionQuery,
   GetOffresImmersionQueryHandler
 } from '../../../src/application/queries/get-offres-immersion.query.handler'
-import { OffreImmersionQueryModel } from '../../../src/application/queries/query-models/offres-immersion.query-models'
+import { OffreImmersionQueryModel } from '../../../src/application/queries/query-models/offres-immersion.query-model'
 import { OffresImmersion } from '../../../src/domain/offre-immersion'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'

@@ -8,7 +8,7 @@ import {
 } from '../../../src/application/queries/get-services-civique.query.handler'
 import { OffreServiceCivique } from '../../../src/domain/offre-service-civique'
 import { DateTime } from 'luxon'
-import { ServiceCiviqueQueryModel } from '../../../src/application/queries/query-models/service-civique.query-models'
+import { ServiceCiviqueQueryModel } from '../../../src/application/queries/query-models/service-civique.query-model'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { offresServicesCiviqueQueryModel } from '../../fixtures/query-models/offre-service-civique.query-model.fixtures'
 

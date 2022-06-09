@@ -11,7 +11,7 @@ import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import {
   FavoriOffreEmploiIdQueryModel,
   OffreEmploiResumeQueryModel
-} from './query-models/offres-emploi.query-models'
+} from './query-models/offres-emploi.query-model'
 
 export interface GetFavorisJeuneQuery extends Query {
   idJeune: Jeune.Id

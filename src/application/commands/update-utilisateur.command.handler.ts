@@ -20,7 +20,7 @@ import { Core } from '../../domain/core'
 import {
   queryModelFromUtilisateur,
   UtilisateurQueryModel
-} from '../queries/query-models/authentification.query-models'
+} from '../queries/query-models/authentification.query-model'
 
 export interface UpdateUtilisateurCommand extends Command {
   idUtilisateurAuth: string

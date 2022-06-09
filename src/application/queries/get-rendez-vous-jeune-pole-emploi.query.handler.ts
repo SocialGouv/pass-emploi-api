@@ -19,7 +19,7 @@ import { buildError } from '../../utils/logger.module'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
 import { fromRendezVousDtoToRendezVousQueryModel } from './query-mappers/rendez-vous-pole-emploi.mappers'
 import { fromPrestationDtoToRendezVousQueryModel } from './query-mappers/rendez-vous-prestation.mappers'
-import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-models'
+import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
 import {
   PrestationDto,
   RendezVousPoleEmploiDto

@@ -5,7 +5,7 @@ import {
 } from 'src/domain/rendez-vous'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
-import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-models'
+import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
 import { PrestationDto } from '../../../infrastructure/clients/dto/pole-emploi.dto'
 
 export function fromPrestationDtoToRendezVousQueryModel(

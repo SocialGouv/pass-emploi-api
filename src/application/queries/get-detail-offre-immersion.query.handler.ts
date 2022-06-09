@@ -5,7 +5,7 @@ import {
   OffresImmersion,
   OffresImmersionRepositoryToken
 } from '../../domain/offre-immersion'
-import { DetailOffreImmersionQueryModel } from './query-models/offres-immersion.query-models'
+import { DetailOffreImmersionQueryModel } from './query-models/offres-immersion.query-model'
 import { Result } from '../../building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Evenement, EvenementService } from 'src/domain/evenement'

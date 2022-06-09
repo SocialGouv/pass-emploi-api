@@ -4,7 +4,7 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
-import { JeuneHomeQueryModel } from './query-models/home-jeune.query-models'
+import { JeuneHomeQueryModel } from './query-models/home-jeune.query-model'
 
 export interface GetHomeJeune extends Query {
   idJeune: string

@@ -10,7 +10,7 @@ import {
   OffreServiceCivique
 } from '../../domain/offre-service-civique'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
-import { ServiceCiviqueQueryModel } from './query-models/service-civique.query-models'
+import { ServiceCiviqueQueryModel } from './query-models/service-civique.query-model'
 
 export interface GetFavorisOffresEngagementJeuneQuery extends Query {
   idJeune: Jeune.Id

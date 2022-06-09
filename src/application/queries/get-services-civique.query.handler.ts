@@ -4,7 +4,7 @@ import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { isFailure, Result, success } from '../../building-blocks/types/result'
-import { ServiceCiviqueQueryModel } from './query-models/service-civique.query-models'
+import { ServiceCiviqueQueryModel } from './query-models/service-civique.query-model'
 import {
   OffreServiceCivique,
   OffreServiceCiviqueRepositoryToken
