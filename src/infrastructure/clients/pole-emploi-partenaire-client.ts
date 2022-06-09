@@ -201,7 +201,10 @@ export class PoleEmploiPartenaireClient {
   ): Promise<AxiosResponse<T>> {
     return firstValueFrom(
       this.httpService.post<T>(`${this.apiUrl}/${suffixUrl}`, body, {
-        headers: { Authorization: `Bearer ${tokenDuJeune}` },
+        headers: {
+          Authorization: `Bearer ${tokenDuJeune}`,
+          'content-type': 'application/json;charset=utf-8'
+        },
         httpsAgent:
           this.configService.get('environment') !== 'prod'
             ? new https.Agent({
