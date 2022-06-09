@@ -28,16 +28,16 @@ import {
   JeuneHomeActionQueryModel,
   JeuneHomeDemarcheQueryModel,
   JeuneHomeQueryModel
-} from 'src/application/queries/query-models/home-jeune.query-models'
+} from 'src/application/queries/query-models/home-jeune.query-model'
 import {
   DetailJeuneQueryModel,
   HistoriqueConseillerJeuneQueryModel
-} from 'src/application/queries/query-models/jeunes.query-models'
+} from 'src/application/queries/query-models/jeunes.query-model'
 import {
   FavoriOffreEmploiIdQueryModel,
   OffreEmploiResumeQueryModel
-} from 'src/application/queries/query-models/offres-emploi.query-models'
-import { RendezVousJeuneQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
+} from 'src/application/queries/query-models/offres-emploi.query-model'
+import { RendezVousJeuneQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
 import { Core } from 'src/domain/core'
 import {
   AddFavoriOffreEmploiCommand,

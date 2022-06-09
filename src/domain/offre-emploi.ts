@@ -3,7 +3,7 @@ import {
   OffreEmploiResumeQueryModel,
   OffreEmploiQueryModel,
   OffresEmploiQueryModel
-} from 'src/application/queries/query-models/offres-emploi.query-models'
+} from 'src/application/queries/query-models/offres-emploi.query-model'
 import { Jeune } from './jeune'
 import { Result } from '../building-blocks/types/result'
 import { DateTime } from 'luxon'

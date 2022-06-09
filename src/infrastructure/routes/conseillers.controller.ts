@@ -31,7 +31,7 @@ import { DeleteSuperviseursCommandHandler } from 'src/application/commands/delet
 import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler.db'
 import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler'
 import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler.db'
-import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
+import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-model'
 import { Authentification } from 'src/domain/authentification'
 import { CreateActionCommandHandler } from '../../application/commands/create-action.command.handler'
 import { CreerJeuneMiloCommandHandler } from '../../application/commands/creer-jeune-milo.command.handler'
@@ -50,9 +50,9 @@ import {
   DetailJeuneQueryModel,
   JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
-} from '../../application/queries/query-models/jeunes.query-models'
+} from '../../application/queries/query-models/jeunes.query-model'
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
-import { RendezVousConseillerFutursEtPassesQueryModel } from '../../application/queries/query-models/rendez-vous.query-models'
+import { RendezVousConseillerFutursEtPassesQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
 import {
   DossierExisteDejaError,
   DroitsInsuffisants,

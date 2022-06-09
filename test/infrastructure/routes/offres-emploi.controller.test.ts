@@ -16,7 +16,7 @@ import { uneOffreEmploiResumeQueryModel } from '../../fixtures/offre-emploi.fixt
 import {
   OffreEmploiQueryModel,
   OffresEmploiQueryModel
-} from '../../../src/application/queries/query-models/offres-emploi.query-models'
+} from '../../../src/application/queries/query-models/offres-emploi.query-model'
 import {
   GetDetailOffreEmploiQuery,
   GetDetailOffreEmploiQueryHandler

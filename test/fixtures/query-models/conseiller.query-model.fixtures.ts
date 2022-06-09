@@ -1,4 +1,4 @@
-import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-models'
+import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-model'
 
 export function detailConseillerQueryModel(
   args: Partial<DetailConseillerQueryModel> = {}

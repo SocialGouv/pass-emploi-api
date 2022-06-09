@@ -3,7 +3,7 @@ import { Situation } from 'src/infrastructure/sequelize/models/situations-milo.s
 import {
   DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel
-} from '../query-models/jeunes.query-models'
+} from '../query-models/jeunes.query-model'
 
 export function fromSqlToDetailJeuneQueryModel(
   jeuneSqlModel: JeuneSqlModel,

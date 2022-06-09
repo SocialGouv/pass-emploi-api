@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { ResumeActionsDuJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-models'
+import { ResumeActionsDuJeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-model'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import {
   GetResumeActionsDesJeunesDuConseillerQuery,

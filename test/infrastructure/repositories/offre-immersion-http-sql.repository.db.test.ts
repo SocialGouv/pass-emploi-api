@@ -23,7 +23,7 @@ import { OffreImmersion } from '../../../src/domain/offre-immersion'
 import {
   FavoriOffreImmersionIdQueryModel,
   OffreImmersionQueryModel
-} from 'src/application/queries/query-models/offres-immersion.query-models'
+} from 'src/application/queries/query-models/offres-immersion.query-model'
 import { TIMEOUT } from 'dns'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
 

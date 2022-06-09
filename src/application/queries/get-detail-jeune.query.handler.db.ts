@@ -11,7 +11,7 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { fromSqlToDetailJeuneQueryModel } from './query-mappers/jeune.mappers'
-import { DetailJeuneQueryModel } from './query-models/jeunes.query-models'
+import { DetailJeuneQueryModel } from './query-models/jeunes.query-model'
 
 export interface GetDetailJeuneQuery extends Query {
   idJeune: string

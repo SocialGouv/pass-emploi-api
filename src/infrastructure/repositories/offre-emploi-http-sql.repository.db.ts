@@ -4,7 +4,7 @@ import {
   OffreEmploiQueryModel,
   OffreEmploiResumeQueryModel,
   OffresEmploiQueryModel
-} from 'src/application/queries/query-models/offres-emploi.query-models'
+} from 'src/application/queries/query-models/offres-emploi.query-model'
 import { OffresEmploi, OffreEmploi } from '../../domain/offre-emploi'
 import { PoleEmploiClient } from '../clients/pole-emploi-client'
 import { FavoriOffreEmploiSqlModel } from '../sequelize/models/favori-offre-emploi.sql-model'

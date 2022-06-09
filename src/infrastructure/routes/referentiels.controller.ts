@@ -1,14 +1,14 @@
 import { Controller, Get, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetTypesRendezVousQueryHandler } from 'src/application/queries/get-types-rendez-vous.query.handler'
-import { TypesRendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-models'
+import { TypesRendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
 import {
   GetCommunesEtDepartementsQuery,
   GetCommunesEtDepartementsQueryHandler
 } from '../../application/queries/get-communes-et-departements.query.handler.db'
 import { CommunesEtDepartementsQueryModel } from '../../application/queries/query-models/communes-et-departements.query-model'
 import { Public } from '../decorators/public.decorator'
-import { AgenceQueryModel } from '../../application/queries/query-models/agence.query-models'
+import { AgenceQueryModel } from '../../application/queries/query-models/agence.query-model'
 import { GetAgencesQueryHandler } from '../../application/queries/get-agences.query.handler'
 import { GetAgencesQueryParams } from './validation/agences.inputs'
 import { Utilisateur } from '../decorators/authenticated.decorator'
@@ -52,7 +52,7 @@ export class ReferentielsController {
     return this.getTypesRendezvousQueryHandler.execute({})
   }
 
-  @Get('types-demarches')
+  @Get('pole-emploi/types-demarches')
   @ApiOAuth2([])
   async getTypesDemarches(
     @Query() query: TypesDemarchesQueryParams,

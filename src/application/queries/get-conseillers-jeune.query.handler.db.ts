@@ -6,7 +6,7 @@ import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/consei
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { TransfertConseillerSqlModel } from '../../infrastructure/sequelize/models/transfert-conseiller.sql-model'
 import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
-import { HistoriqueConseillerJeuneQueryModel } from './query-models/jeunes.query-models'
+import { HistoriqueConseillerJeuneQueryModel } from './query-models/jeunes.query-model'
 
 export interface GetConseillersJeuneQuery extends Query {
   idJeune: string

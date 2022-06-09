@@ -7,7 +7,7 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
-import { JeuneQueryModel } from './query-models/jeunes.query-models'
+import { JeuneQueryModel } from './query-models/jeunes.query-model'
 
 export interface GetJeuneMiloByDossierQuery extends Query {
   idDossier: string

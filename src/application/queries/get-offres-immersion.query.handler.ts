@@ -8,7 +8,7 @@ import {
   OffresImmersion,
   OffresImmersionRepositoryToken
 } from '../../domain/offre-immersion'
-import { OffreImmersionQueryModel } from './query-models/offres-immersion.query-models'
+import { OffreImmersionQueryModel } from './query-models/offres-immersion.query-model'
 
 export interface GetOffresImmersionQuery extends Query {
   rome: string

@@ -1,4 +1,4 @@
-import { OffreEmploiResumeQueryModel } from 'src/application/queries/query-models/offres-emploi.query-models'
+import { OffreEmploiResumeQueryModel } from 'src/application/queries/query-models/offres-emploi.query-model'
 import { OffreEmploi } from '../../src/domain/offre-emploi'
 import { OffreEmploiDto } from '../../src/infrastructure/repositories/offre-emploi-http-sql.repository.db'
 

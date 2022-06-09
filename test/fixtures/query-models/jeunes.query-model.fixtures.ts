@@ -4,7 +4,7 @@ import {
   DetailJeuneQueryModel,
   JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
-} from 'src/application/queries/query-models/jeunes.query-models'
+} from 'src/application/queries/query-models/jeunes.query-model'
 
 export function unResumeActionDUnJeune(
   args: Partial<ResumeActionsDuJeuneQueryModel> = {}

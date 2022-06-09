@@ -7,7 +7,7 @@ import {
   AgenceSqlModel
 } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { Core } from '../../../../src/domain/core'
-import { DetailConseillerQueryModel } from '../../../../src/application/queries/query-models/conseillers.query-models'
+import { DetailConseillerQueryModel } from '../../../../src/application/queries/query-models/conseillers.query-model'
 import Structure = Core.Structure
 
 describe('fromSqlToDetailConseillerQueryModel', () => {

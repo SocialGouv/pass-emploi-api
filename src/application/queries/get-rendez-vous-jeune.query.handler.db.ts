@@ -12,7 +12,7 @@ import { DateService } from '../../utils/date-service'
 import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
-import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-models'
+import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 
 export interface GetRendezVousJeuneQuery extends Query {

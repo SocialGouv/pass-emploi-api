@@ -1,7 +1,7 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import * as request from 'supertest'
 import { GetCommunesEtDepartementsQueryHandler } from '../../../src/application/queries/get-communes-et-departements.query.handler.db'
-import { CommunesEtDepartementsQueryModel } from '../../../src/application/queries/query-models/communes-et-departements.query-model'
+import { CommuneOuDepartementType } from '../../../src/application/queries/query-models/communes-et-departements.query-model'
 import {
   buildTestingModuleForHttpTesting,
   StubbedClass,
@@ -56,13 +56,13 @@ describe('ReferentielsController', () => {
             libelle: 'abcde',
             code: '5',
             codePostal: '78907',
-            type: CommunesEtDepartementsQueryModel.Type.COMMUNE,
+            type: CommuneOuDepartementType.COMMUNE,
             score: 0.3
           },
           {
             libelle: 'abcd',
             code: '4',
-            type: CommunesEtDepartementsQueryModel.Type.DEPARTEMENT,
+            type: CommuneOuDepartementType.DEPARTEMENT,
             score: 0.2
           }
         ])
@@ -101,7 +101,7 @@ describe('ReferentielsController', () => {
             libelle: 'abcde',
             code: '5',
             codePostal: '78907',
-            type: CommunesEtDepartementsQueryModel.Type.COMMUNE,
+            type: CommuneOuDepartementType.COMMUNE,
             score: 0.3
           }
         ])
@@ -220,7 +220,7 @@ describe('ReferentielsController', () => {
       it('rejette', () => {
         // When - Then
         return request(app.getHttpServer())
-          .get('/referentiels/types-demarches')
+          .get('/referentiels/pole-emploi/types-demarches')
           .set('Authorization', 'Bearer ceci-est-un-jwt')
           .expect(HttpStatus.BAD_REQUEST)
       })
@@ -251,7 +251,7 @@ describe('ReferentielsController', () => {
 
           // When - Then
           return request(app.getHttpServer())
-            .get('/referentiels/types-demarches?recherche=salon')
+            .get('/referentiels/pole-emploi/types-demarches?recherche=salon')
             .set('Authorization', 'Bearer ceci-est-un-jwt')
             .expect(HttpStatus.OK)
             .expect(desTypesDemarcheQueryModel)
@@ -260,7 +260,7 @@ describe('ReferentielsController', () => {
     })
     ensureUserAuthenticationFailsIfInvalid(
       'get',
-      '/referentiels/types-demarches'
+      '/referentiels/pole-emploi/types-demarches'
     )
   })
 })

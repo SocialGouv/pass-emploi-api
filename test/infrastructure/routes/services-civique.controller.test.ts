@@ -11,7 +11,7 @@ import {
 import {
   DetailServiceCiviqueQueryModel,
   ServiceCiviqueQueryModel
-} from '../../../src/application/queries/query-models/service-civique.query-models'
+} from '../../../src/application/queries/query-models/service-civique.query-model'
 import {
   ErreurHttp,
   NonTrouveError

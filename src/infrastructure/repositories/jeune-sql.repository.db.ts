@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Op, QueryTypes, Sequelize } from 'sequelize'
-import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-models'
+import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
 import {
   JeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
-} from 'src/application/queries/query-models/jeunes.query-models'
+} from 'src/application/queries/query-models/jeunes.query-model'
 import { Core } from 'src/domain/core'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'

@@ -5,7 +5,7 @@ import {
 } from 'src/domain/rendez-vous'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { TypesRendezVousQueryModel } from './query-models/rendez-vous.query-models'
+import { TypesRendezVousQueryModel } from './query-models/rendez-vous.query-model'
 
 @Injectable()
 export class GetTypesRendezVousQueryHandler extends QueryHandler<

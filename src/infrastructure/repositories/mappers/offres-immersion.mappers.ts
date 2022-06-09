@@ -4,7 +4,7 @@ import {
   FavoriOffreImmersionIdQueryModel,
   LocalisationQueryModel,
   OffreImmersionQueryModel
-} from 'src/application/queries/query-models/offres-immersion.query-models'
+} from 'src/application/queries/query-models/offres-immersion.query-model'
 import { OffreImmersion, OffresImmersion } from 'src/domain/offre-immersion'
 import { FavoriOffreImmersionSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 

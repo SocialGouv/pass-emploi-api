@@ -10,7 +10,7 @@ import {
   OffresEmploi,
   OffresEmploiRepositoryToken
 } from '../../domain/offre-emploi'
-import { OffresEmploiQueryModel } from './query-models/offres-emploi.query-models'
+import { OffresEmploiQueryModel } from './query-models/offres-emploi.query-model'
 import { Result } from '../../building-blocks/types/result'
 
 const DEFAULT_PAGE = 1

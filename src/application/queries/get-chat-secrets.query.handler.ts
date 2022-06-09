@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { ChatSecretsQueryModel } from './query-models/authentification.query-models'
+import { ChatSecretsQueryModel } from './query-models/authentification.query-model'
 import { FirebaseClient } from '../../infrastructure/clients/firebase-client'
 import { ConfigService } from '@nestjs/config'
 

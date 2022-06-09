@@ -12,7 +12,7 @@ import { Result, success } from '../../building-blocks/types/result'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { toDetailJeuneConseillerQueryModel } from './query-mappers/jeune.mappers'
-import { DetailJeuneConseillerQueryModel } from './query-models/jeunes.query-models'
+import { DetailJeuneConseillerQueryModel } from './query-models/jeunes.query-model'
 
 export interface GetJeunesByConseillerQuery extends Query {
   idConseiller: string

@@ -11,7 +11,7 @@ import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import {
   FavoriOffreImmersionIdQueryModel,
   OffreImmersionQueryModel
-} from './query-models/offres-immersion.query-models'
+} from './query-models/offres-immersion.query-model'
 
 export interface GetFavorisOffresImmersionJeuneQuery extends Query {
   idJeune: Jeune.Id

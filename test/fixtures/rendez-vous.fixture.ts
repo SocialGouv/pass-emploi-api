@@ -1,7 +1,7 @@
 import {
   RendezVousConseillerFutursEtPassesQueryModel,
   RendezVousConseillerQueryModel
-} from 'src/application/queries/query-models/rendez-vous.query-models'
+} from 'src/application/queries/query-models/rendez-vous.query-model'
 import {
   RendezVous,
   CodeTypeRendezVous,
