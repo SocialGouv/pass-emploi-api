@@ -165,7 +165,10 @@ export class PoleEmploiPartenaireClient {
     return firstValueFrom(
       this.httpService.get<T>(`${this.apiUrl}/${suffixUrl}`, {
         params,
-        headers: { Authorization: `Bearer ${tokenDuJeune}` },
+        headers: {
+          Authorization: `Bearer ${tokenDuJeune}`,
+          'content-type': 'application/json;charset=utf-8'
+        },
         httpsAgent:
           this.configService.get('environment') !== 'prod'
             ? new https.Agent({
