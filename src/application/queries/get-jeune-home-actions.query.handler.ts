@@ -6,6 +6,7 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Authentification } from '../../domain/authentification'
 import { GetActionsByJeuneQueryHandler } from './get-actions-by-jeune.query.handler.db'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { isSuccess } from 'src/building-blocks/types/result'
 
 export interface GetJeuneHomeActionsQuery extends Query {
   idJeune: string
@@ -27,13 +28,15 @@ export class GetJeuneHomeActionsQueryHandler extends QueryHandler<
   async handle(
     query: GetJeuneHomeActionsQuery
   ): Promise<JeuneHomeActionQueryModel> {
-    const [actionsJeune, campagne] = await Promise.all([
+    const [actionsJeuneResult, campagne] = await Promise.all([
       this.getActionsByJeuneQueryHandler.handle(query),
       this.getCampagneQueryModel.handle(query)
     ])
 
     return {
-      actions: actionsJeune.actions,
+      actions: isSuccess(actionsJeuneResult)
+        ? actionsJeuneResult.data.actions
+        : [],
       campagne: campagne
     }
   }

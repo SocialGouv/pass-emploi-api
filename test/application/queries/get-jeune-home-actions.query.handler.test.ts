@@ -6,6 +6,7 @@ import { GetJeuneHomeActionsQueryHandler } from '../../../src/application/querie
 import { uneActionQueryModelFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
 import { uneCampagneQueryModel } from '../../fixtures/campagne.fixture'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { success } from 'src/building-blocks/types/result'
 
 describe('GetJeuneHomeActionsQueryHandler', () => {
   let getActionsByJeuneQueryHandler: StubbedClass<GetActionsByJeuneQueryHandler>
@@ -33,7 +34,7 @@ describe('GetJeuneHomeActionsQueryHandler', () => {
       // Given
       getActionsByJeuneQueryHandler.handle
         .withArgs({ idJeune: 'idJeune' })
-        .resolves(actionsQueryModel)
+        .resolves(success({ actions: actionsQueryModel, nombreTotal: 1 }))
 
       getCampagneQueryModel.handle
         .withArgs({ idJeune: 'idJeune' })

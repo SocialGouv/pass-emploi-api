@@ -16,6 +16,11 @@ import {
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Response } from 'express'
+import {
+  CreateDemarcheCommand,
+  CreateDemarcheCommandHandler
+} from 'src/application/commands/create-demarche.command.handler'
 import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
 import {
   TransfererJeunesConseillerCommand,
@@ -53,15 +58,19 @@ import {
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../application/commands/delete-favori-offre-emploi.command.handler'
 import { DeleteJeuneInactifCommandHandler } from '../../application/commands/delete-jeune-inactif.command.handler'
-
+import {
+  UpdateStatutDemarcheCommand,
+  UpdateStatutDemarcheCommandHandler
+} from '../../application/commands/update-demarche.command.handler'
 import { UpdateNotificationTokenCommandHandler } from '../../application/commands/update-notification-token.command.handler'
 import {
-  ActionsByJeune,
   GetActionsByJeuneQuery,
   GetActionsByJeuneQueryHandler
 } from '../../application/queries/get-actions-by-jeune.query.handler.db'
 import { GetConseillersJeuneQueryHandler } from '../../application/queries/get-conseillers-jeune.query.handler.db'
 import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
+import { GetJeuneHomeActionsQueryHandler } from '../../application/queries/get-jeune-home-actions.query.handler'
+import { GetJeuneHomeDemarchesQueryHandler } from '../../application/queries/get-jeune-home-demarches.query.handler'
 import { GetRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler.db'
 import {
   ActionQueryModel,
@@ -83,7 +92,12 @@ import {
 import { Action } from '../../domain/action'
 import { Authentification } from '../../domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
+import { handleFailure } from './failure.handler'
 import { CreateActionAvecStatutPayload } from './validation/conseillers.inputs'
+import {
+  CreateDemarchePayload,
+  UpdateStatutDemarchePayload
+} from './validation/demarches.inputs'
 import {
   AddFavoriOffresEmploiPayload,
   GetFavorisOffresEmploiQueryParams
@@ -94,23 +108,8 @@ import {
   PutNotificationTokenInput,
   TransfererConseillerPayload
 } from './validation/jeunes.inputs'
-import { GetJeuneHomeActionsQueryHandler } from '../../application/queries/get-jeune-home-actions.query.handler'
-import { GetJeuneHomeDemarchesQueryHandler } from '../../application/queries/get-jeune-home-demarches.query.handler'
+
 import StatutInvalide = Action.StatutInvalide
-import {
-  CreateDemarchePayload,
-  UpdateStatutDemarchePayload
-} from './validation/demarches.inputs'
-import {
-  UpdateStatutDemarcheCommand,
-  UpdateStatutDemarcheCommandHandler
-} from '../../application/commands/update-demarche.command.handler'
-import { handleFailure } from './failure.handler'
-import {
-  CreateDemarcheCommand,
-  CreateDemarcheCommandHandler
-} from 'src/application/commands/create-demarche.command.handler'
-import { Response } from 'express'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -222,11 +221,11 @@ export class JeunesController {
     isArray: true
   })
   async getActions(
+    @Res() response: Response,
     @Param('idJeune') idJeune: string,
-    @Res() res: Response,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @Query() getActionsByJeuneQueryParams: GetActionsByJeuneQueryParams
-  ): Promise<Response<ActionsByJeune>> {
+  ): Promise<Response<ActionQueryModel[]>> {
     const query: GetActionsByJeuneQuery = {
       idJeune,
       page: getActionsByJeuneQueryParams.page,
@@ -234,25 +233,26 @@ export class JeunesController {
       statuts: getActionsByJeuneQueryParams.statuts
     }
 
-    let result
-    try {
-      result = await this.getActionsByJeuneQueryHandler.execute(
-        query,
-        utilisateur
-      )
-    } catch (e) {
-      throw e
+    const result = await this.getActionsByJeuneQueryHandler.execute(
+      query,
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      const leResultatEstPagine = Boolean(query.page)
+      const statusCode = leResultatEstPagine
+        ? HttpStatus.PARTIAL_CONTENT
+        : HttpStatus.OK
+
+      return response
+        .set({
+          'x-total-count': result.data.nombreTotal
+        })
+        .status(statusCode)
+        .json(result.data.actions)
     }
 
-    let code = HttpStatus.OK
-    if (query.page || query.tri || query.statuts) {
-      code = HttpStatus.PARTIAL_CONTENT
-    }
-
-    return res
-      .set({ 'nombre-total-actions': result.nombreTotal })
-      .status(code)
-      .json(result.actions)
+    throw handleFailure(result)
   }
 
   @Get(':idJeune/home/actions')
