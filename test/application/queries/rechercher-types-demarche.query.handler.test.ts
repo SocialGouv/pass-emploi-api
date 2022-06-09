@@ -20,7 +20,7 @@ describe('RechercherTypesDemarcheQueryHandler', () => {
   })
 
   describe('handle', () => {
-    describe('quand il y a une seule démarche', () => {
+    context('quand il y a une seule démarche', () => {
       describe('sans comment', () => {
         it('retourne une démarche simple', async () => {
           // Given
@@ -95,7 +95,7 @@ describe('RechercherTypesDemarcheQueryHandler', () => {
         })
       })
     })
-    describe('quand il y a une deux démarches avec les memes quoi pourquoi', () => {
+    context('quand il y a deux démarches avec les memes quoi pourquoi', () => {
       describe('avec deux comment', () => {
         it('retourne une démarche avec les deux comment', async () => {
           // Given

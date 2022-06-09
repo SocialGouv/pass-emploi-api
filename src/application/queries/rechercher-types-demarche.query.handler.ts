@@ -5,6 +5,7 @@ import { Authentification } from '../../domain/authentification'
 import { PoleEmploiClient } from '../../infrastructure/clients/pole-emploi-client'
 import { Core } from '../../domain/core'
 import { ForbiddenException, Injectable } from '@nestjs/common'
+import { TypeDemarcheDto } from '../../infrastructure/clients/dto/pole-emploi.dto'
 
 export interface RechercherDemarcheQuery extends Query {
   recherche: string
@@ -42,47 +43,65 @@ export class RechercherTypesDemarcheQueryHandler extends QueryHandler<
     const typesDemarcheQueryModels: TypesDemarcheQueryModel[] = []
 
     for (const demarcheDto of demarchesDto) {
-      const quoiPourquoi = typesDemarcheQueryModels.find(
-        typeDemarche =>
-          typeDemarche.codeQuoi === demarcheDto.codeQuoiTypeDemarche &&
-          typeDemarche.codePourquoi === demarcheDto.codePourQuoiObjectifDemarche
+      const quoiPourquoi = this.trouverLAggregationQuoiPourquoi(
+        typesDemarcheQueryModels,
+        demarcheDto
       )
       if (quoiPourquoi) {
-        if (
-          demarcheDto.codeCommentDemarche &&
-          demarcheDto.libelleCommentDemarche
-        ) {
-          quoiPourquoi.comment.push({
-            code: demarcheDto.codeCommentDemarche,
-            label: demarcheDto.libelleCommentDemarche
-          })
-        } else {
-          quoiPourquoi.commentObligatoire = false
-        }
+        this.ajouterUnCommentAuQuoiPourquoi(demarcheDto, quoiPourquoi)
       } else {
-        const typesDemarcheQueryModel: TypesDemarcheQueryModel = {
-          codeQuoi: demarcheDto.codeQuoiTypeDemarche,
-          codePourquoi: demarcheDto.codePourQuoiObjectifDemarche,
-          libelleQuoi: demarcheDto.libelleQuoiTypeDemarche,
-          libellePourquoi: demarcheDto.libellePourQuoiObjectifDemarche,
-          commentObligatoire: true,
-          comment: []
-        }
-        if (
-          demarcheDto.codeCommentDemarche &&
-          demarcheDto.libelleCommentDemarche
-        ) {
-          typesDemarcheQueryModel.comment.push({
-            code: demarcheDto.codeCommentDemarche,
-            label: demarcheDto.libelleCommentDemarche
-          })
-        } else {
-          typesDemarcheQueryModel.commentObligatoire = false
-        }
-        typesDemarcheQueryModels.push(typesDemarcheQueryModel)
+        this.ajouterUnQuoiPourquoi(demarcheDto, typesDemarcheQueryModels)
       }
     }
     return typesDemarcheQueryModels
+  }
+
+  private trouverLAggregationQuoiPourquoi(
+    typesDemarcheQueryModels: TypesDemarcheQueryModel[],
+    demarcheDto: TypeDemarcheDto
+  ): TypesDemarcheQueryModel | undefined {
+    return typesDemarcheQueryModels.find(
+      typeDemarche =>
+        typeDemarche.codeQuoi === demarcheDto.codeQuoiTypeDemarche &&
+        typeDemarche.codePourquoi === demarcheDto.codePourQuoiObjectifDemarche
+    )
+  }
+
+  private ajouterUnQuoiPourquoi(
+    demarcheDto: TypeDemarcheDto,
+    typesDemarcheQueryModels: TypesDemarcheQueryModel[]
+  ): void {
+    const typesDemarcheQueryModel: TypesDemarcheQueryModel = {
+      codeQuoi: demarcheDto.codeQuoiTypeDemarche,
+      codePourquoi: demarcheDto.codePourQuoiObjectifDemarche,
+      libelleQuoi: demarcheDto.libelleQuoiTypeDemarche,
+      libellePourquoi: demarcheDto.libellePourQuoiObjectifDemarche,
+      commentObligatoire: true,
+      comment: []
+    }
+    if (demarcheDto.codeCommentDemarche && demarcheDto.libelleCommentDemarche) {
+      typesDemarcheQueryModel.comment.push({
+        code: demarcheDto.codeCommentDemarche,
+        label: demarcheDto.libelleCommentDemarche
+      })
+    } else {
+      typesDemarcheQueryModel.commentObligatoire = false
+    }
+    typesDemarcheQueryModels.push(typesDemarcheQueryModel)
+  }
+
+  private ajouterUnCommentAuQuoiPourquoi(
+    demarcheDto: TypeDemarcheDto,
+    quoiPourquoi: TypesDemarcheQueryModel
+  ): void {
+    if (demarcheDto.codeCommentDemarche && demarcheDto.libelleCommentDemarche) {
+      quoiPourquoi.comment.push({
+        code: demarcheDto.codeCommentDemarche,
+        label: demarcheDto.libelleCommentDemarche
+      })
+    } else {
+      quoiPourquoi.commentObligatoire = false
+    }
   }
 
   async monitor(): Promise<void> {
