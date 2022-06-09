@@ -203,7 +203,7 @@ export class PoleEmploiPartenaireClient {
       this.httpService.post<T>(`${this.apiUrl}/${suffixUrl}`, body, {
         headers: {
           Authorization: `Bearer ${tokenDuJeune}`,
-          'content-type': 'application/json;charset=utf-8'
+          'Content-Type': 'application/json;charset=utf-8'
         },
         httpsAgent:
           this.configService.get('environment') !== 'prod'
