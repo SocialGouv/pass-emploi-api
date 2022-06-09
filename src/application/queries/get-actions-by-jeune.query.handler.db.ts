@@ -1,17 +1,20 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
+import { Sequelize, WhereOptions } from 'sequelize'
+import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Action } from '../../domain/action'
+import { fromSqlToActionQueryModel } from '../../infrastructure/repositories/mappers/actions.mappers'
+import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
+import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
 import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { ActionQueryModel } from './query-models/actions.query-model'
-import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
-import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
-import { fromSqlToActionQueryModel } from '../../infrastructure/repositories/mappers/actions.mappers'
-import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
-import { Sequelize } from 'sequelize'
 
+const OFFSET_PAR_DEFAUT = 0
 const LIMITE_NOMBRE_ACTIONS_PAR_PAGE = 10
 
 export interface GetActionsByJeuneQuery extends Query {
@@ -21,7 +24,7 @@ export interface GetActionsByJeuneQuery extends Query {
   statuts?: Action.Statut[]
 }
 
-export interface ActionsByJeune {
+export interface ActionsByJeuneOutput {
   actions: ActionQueryModel[]
   nombreTotal: number
 }
@@ -29,7 +32,7 @@ export interface ActionsByJeune {
 @Injectable()
 export class GetActionsByJeuneQueryHandler extends QueryHandler<
   GetActionsByJeuneQuery,
-  ActionsByJeune
+  Result<ActionsByJeuneOutput>
 > {
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
@@ -39,30 +42,29 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
     super('GetActionsByJeuneQueryHandler')
   }
 
-  async handle(query: GetActionsByJeuneQuery): Promise<ActionsByJeune> {
+  async handle(
+    query: GetActionsByJeuneQuery
+  ): Promise<Result<ActionsByJeuneOutput>> {
+    const filtres = generateWhere(query)
+
     const nombreTotalActionsSql = await ActionSqlModel.count({
-      where: {
-        idJeune: query.idJeune
-      }
+      where: filtres
     })
-    const pageMax =
-      nombreTotalActionsSql === 0
-        ? 1
-        : Math.ceil(nombreTotalActionsSql / LIMITE_NOMBRE_ACTIONS_PAR_PAGE)
-    if (query.page && query.page > pageMax) {
-      throw new HttpException('Page non trouvée.', HttpStatus.NOT_FOUND)
+
+    if (!laPageExiste(nombreTotalActionsSql, query.page)) {
+      return failure(new NonTrouveError('Page', query.page?.toString()))
     }
 
-    const filtres: { idJeune: string; statut?: Action.Statut[] } = {
-      idJeune: query.idJeune
+    const result: ActionsByJeuneOutput = {
+      actions: [],
+      nombreTotal: nombreTotalActionsSql
     }
-    if (query.statuts) {
-      filtres.statut = query.statuts
+    if (nombreTotalActionsSql === 0) {
+      return success(result)
     }
+
     const actionsSqlModel = await ActionSqlModel.findAll({
-      where: {
-        ...filtres
-      },
+      where: filtres,
       order: [
         this.sequelize.literal(
           `CASE WHEN statut = '${Action.Statut.TERMINEE}' THEN 1 ELSE 0 END`
@@ -72,12 +74,8 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
           query.tri ? mapFiltreTriToSql[query.tri] : 'DESC'
         ]
       ],
-      limit: query.page
-        ? LIMITE_NOMBRE_ACTIONS_PAR_PAGE
-        : nombreTotalActionsSql,
-      offset: query.page
-        ? (query.page - 1) * LIMITE_NOMBRE_ACTIONS_PAR_PAGE
-        : 0,
+      limit: generateLimit(nombreTotalActionsSql, query.page),
+      offset: generateOffset(query.page),
       include: [
         {
           model: JeuneSqlModel,
@@ -86,10 +84,10 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
       ]
     })
 
-    return {
+    return success({
       actions: actionsSqlModel.map(fromSqlToActionQueryModel),
       nombreTotal: nombreTotalActionsSql
-    }
+    })
   }
 
   async authorize(
@@ -114,4 +112,30 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
 const mapFiltreTriToSql: Record<Action.Tri, string> = {
   date_croissante: 'ASC',
   date_decroissante: 'DESC'
+}
+
+function generateLimit(nombreTotalActions: number, page?: number): number {
+  return page ? LIMITE_NOMBRE_ACTIONS_PAR_PAGE : nombreTotalActions
+}
+
+function generateOffset(page?: number): number {
+  return page ? (page - 1) * LIMITE_NOMBRE_ACTIONS_PAR_PAGE : OFFSET_PAR_DEFAUT
+}
+
+function laPageExiste(nombreTotalActions: number, page?: number): boolean {
+  if (!page || page === 1) {
+    return true
+  }
+  const pageMax = Math.ceil(nombreTotalActions / LIMITE_NOMBRE_ACTIONS_PAR_PAGE)
+  return page <= pageMax
+}
+
+function generateWhere(query: GetActionsByJeuneQuery): WhereOptions {
+  const filtres: { idJeune: string; statut?: Action.Statut[] } = {
+    idJeune: query.idJeune
+  }
+  if (query.statuts) {
+    filtres.statut = query.statuts
+  }
+  return filtres
 }
