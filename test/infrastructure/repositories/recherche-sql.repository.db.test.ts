@@ -219,50 +219,6 @@ describe('RechercheSqlRepository', () => {
     })
   })
 
-  describe('getRecherches', async () => {
-    // Given
-    const recherche = uneRecherche({
-      idJeune,
-      type: Recherche.Type.OFFRES_IMMERSION,
-      criteres: criteresImmersionNice
-    })
-
-    await rechercheSqlRepository.createRecherche(recherche)
-
-    describe('sans géométrie', () => {
-      it('recupere une recherche sauvegardée sans sa géométrie', async () => {
-        // Given
-        await rechercheSqlRepository.createRecherche(recherche)
-
-        // When
-        const recherches = await rechercheSqlRepository.getRecherches(
-          idJeune,
-          false
-        )
-
-        // Then
-        expect(recherches.length).to.equal(1)
-        expect(recherches[0].id).to.deep.equal(recherche.id)
-        expect(recherches[0].geometrie).to.equal(undefined)
-      })
-    })
-    describe('avec géométrie', () => {
-      it('recupere une recherche sauvegardée avec sa géométrie', async () => {
-        // When
-        const recherches = await rechercheSqlRepository.getRecherches(
-          idJeune,
-          true
-        )
-
-        // Then
-        expect(recherches.length).to.equal(1)
-        expect(recherches[0].geometrie!.coordinates).to.deep.equal(
-          geometrieNice
-        )
-      })
-    })
-  })
-
   describe('findAvantDate', () => {
     it('recupere les recherches avec le bon type et avant un certain jour', async () => {
       // Given

@@ -1,14 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { FindOptions, Op, QueryTypes, Sequelize, WhereOptions } from 'sequelize'
-import { RechercheQueryModel } from '../../application/queries/query-models/recherches.query-model'
+import { Op, QueryTypes, Sequelize, WhereOptions } from 'sequelize'
 import { OffresEmploi } from '../../domain/offre-emploi'
 import { OffresImmersion } from '../../domain/offre-immersion'
 import { Recherche } from '../../domain/recherche'
 import { RechercheSqlModel } from '../sequelize/models/recherche.sql-model'
-import {
-  fromSqlToRecherche,
-  fromSqlToRechercheQueryModel
-} from './mappers/recherches.mappers'
+import { fromSqlToRecherche } from './mappers/recherches.mappers'
 import { DateTime } from 'luxon'
 import { GetOffresEmploiQuery } from '../../application/queries/get-offres-emploi.query.handler'
 import { CommuneSqlModel } from '../sequelize/models/commune.sql-model'
@@ -89,26 +85,6 @@ export class RechercheSqlRepository implements Recherche.Repository {
     })
   }
 
-  async getRecherches(
-    idJeune: string,
-    avecGeometrie?: boolean
-  ): Promise<RechercheQueryModel[]> {
-    const options: FindOptions = {
-      where: {
-        idJeune
-      }
-    }
-
-    if (!avecGeometrie) {
-      options.attributes = {
-        exclude: ['geometrie']
-      }
-    }
-
-    const recherchesSql = await RechercheSqlModel.findAll(options)
-    return recherchesSql.map(fromSqlToRechercheQueryModel)
-  }
-
   async findAvantDate(
     typeRecherches: Recherche.Type[],
     nombreRecherches: number,
@@ -143,21 +119,6 @@ export class RechercheSqlRepository implements Recherche.Repository {
         etat: rechercheSql.etatDerniereRecherche
       }
     })
-  }
-
-  async getRecherche(
-    idRecherche: string
-  ): Promise<RechercheQueryModel | undefined> {
-    const result = await RechercheSqlModel.findOne({
-      where: {
-        id: idRecherche
-      }
-    })
-    if (!result) {
-      return undefined
-    }
-
-    return fromSqlToRechercheQueryModel(result)
   }
 
   async deleteRecherche(idRecherche: string): Promise<void> {

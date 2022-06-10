@@ -19,7 +19,7 @@ import {
   CreateRechercheOffresEmploiPayload,
   CreateRechercheServiceCiviquePayload
 } from '../../../src/infrastructure/routes/validation/recherches.inputs'
-import { GetRecherchesQueryHandler } from '../../../src/application/queries/get-recherches.query.handler'
+import { GetRecherchesQueryHandler } from '../../../src/application/queries/get-recherches.query.handler.db'
 import { RechercheQueryModel } from '../../../src/application/queries/query-models/recherches.query-model'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import {
