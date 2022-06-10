@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Op, Sequelize } from 'sequelize'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
-import { JeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-model'
 import { Core } from 'src/domain/core'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
@@ -17,7 +16,6 @@ import { SequelizeInjectionToken } from '../sequelize/providers'
 import {
   fromSqlToJeune,
   fromSqlToJeuneHomeQueryModel,
-  fromSqlToJeuneQueryModel,
   toSqlJeune
 } from './mappers/jeunes.mappers'
 
@@ -67,23 +65,6 @@ export class JeuneSqlRepository implements Jeune.Repository {
       return undefined
     }
     return fromSqlToJeune(jeuneSqlModel)
-  }
-
-  async getJeuneQueryModelByIdDossier(
-    idDossier: string,
-    idConseiller: string
-  ): Promise<JeuneQueryModel | undefined> {
-    const jeuneSqlModel = await JeuneSqlModel.findOne({
-      where: {
-        idDossier,
-        idConseiller
-      }
-    })
-    if (!jeuneSqlModel) {
-      return undefined
-    }
-
-    return fromSqlToJeuneQueryModel(jeuneSqlModel)
   }
 
   async saveAll(jeunes: Jeune[]): Promise<void> {

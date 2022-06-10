@@ -1,6 +1,5 @@
 import { DateTime, Duration } from 'luxon'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
-import { JeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-model'
 import { Action } from 'src/domain/action'
 import { Jeune } from 'src/domain/jeune'
 import { mapCodeLabelTypeRendezVous } from 'src/domain/rendez-vous'
@@ -11,16 +10,6 @@ import {
 } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../sequelize/types'
-
-export function fromSqlToJeuneQueryModel(
-  jeuneSqlModel: JeuneSqlModel
-): JeuneQueryModel {
-  return {
-    id: jeuneSqlModel.id,
-    firstName: jeuneSqlModel.prenom,
-    lastName: jeuneSqlModel.nom
-  }
-}
 
 export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
   const jeune: Jeune = {
