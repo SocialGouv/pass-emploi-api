@@ -71,7 +71,7 @@ import { GetRecherchesQueryHandler } from './application/queries/get-recherches.
 import { GetAllRendezVousConseillerQueryHandler } from './application/queries/get-rendez-vous-conseiller.query.handler.db'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from './application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { GetRendezVousJeuneQueryHandler } from './application/queries/get-rendez-vous-jeune.query.handler.db'
-import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from './application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
+import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from './application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
 import { GetServicesCiviqueQueryHandler } from './application/queries/get-services-civique.query.handler'
 import { GetTypesRendezVousQueryHandler } from './application/queries/get-types-rendez-vous.query.handler'
 import { TaskService } from './application/task.service'
@@ -356,7 +356,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDetailOffreEmploiQueryHandler,
     GetDetailConseillerQueryHandler,
     GetJeunesByConseillerQueryHandler,
-    GetResumeActionsDesJeunesDuConseillerQueryHandler,
+    GetResumeActionsDesJeunesDuConseillerQueryHandlerDb,
     UpdateNotificationTokenCommandHandler,
     UpdateStatutActionCommandHandler,
     CreateRendezVousCommandHandler,

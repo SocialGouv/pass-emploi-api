@@ -1,9 +1,6 @@
 import { DateTime, Duration } from 'luxon'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
-import {
-  JeuneQueryModel,
-  ResumeActionsDuJeuneQueryModel
-} from 'src/application/queries/query-models/jeunes.query-model'
+import { JeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-model'
 import { Action } from 'src/domain/action'
 import { Jeune } from 'src/domain/jeune'
 import { mapCodeLabelTypeRendezVous } from 'src/domain/rendez-vous'
@@ -14,7 +11,6 @@ import {
 } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../sequelize/types'
-import { ResumeActionsJeuneDto } from '../jeune-sql.repository.db'
 
 export function fromSqlToJeuneQueryModel(
   jeuneSqlModel: JeuneSqlModel
@@ -143,19 +139,4 @@ function toCreator(
     return `${jeuneSqlModel.prenom} ${jeuneSqlModel.nom}`
   }
   return `${jeuneSqlModel.conseiller!.prenom} ${jeuneSqlModel.conseiller!.nom}`
-}
-
-export function toResumeActionsDuJeuneQueryModel(
-  resumeActionsJeuneDto: ResumeActionsJeuneDto
-): ResumeActionsDuJeuneQueryModel {
-  return {
-    jeuneId: resumeActionsJeuneDto.id_jeune,
-    jeuneFirstName: resumeActionsJeuneDto.prenom_jeune,
-    jeuneLastName: resumeActionsJeuneDto.nom_jeune,
-    todoActionsCount: parseInt(resumeActionsJeuneDto.todo_actions_count),
-    doneActionsCount: parseInt(resumeActionsJeuneDto.done_actions_count),
-    inProgressActionsCount: parseInt(
-      resumeActionsJeuneDto.in_progress_actions_count
-    )
-  }
 }
