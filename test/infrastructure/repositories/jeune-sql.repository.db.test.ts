@@ -31,7 +31,6 @@ import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { unJeune, unJeuneSansConseiller } from '../../fixtures/jeune.fixture'
-import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
@@ -370,50 +369,6 @@ describe('JeuneSqlRepository', () => {
         // Then
         expect(result).to.deep.equal([])
       })
-    })
-  })
-
-  describe('getJeuneQueryModelByIdDossier', () => {
-    const idJeune = 'test'
-    const idDossier = '1'
-    const idConseiller = '1'
-    it('retourne un jeune quand le conseiller est le bon', async () => {
-      // Given
-      await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
-      await JeuneSqlModel.creer(
-        unJeuneDto({
-          id: idJeune,
-          idDossier,
-          idConseiller
-        })
-      )
-
-      // When
-      const actual = await jeuneSqlRepository.getJeuneQueryModelByIdDossier(
-        idDossier,
-        idConseiller
-      )
-      // Then
-      expect(actual).to.deep.equal(unJeuneQueryModel({ id: idJeune }))
-    })
-    it("retourne undefined quand le conseiller n'est pas le bon", async () => {
-      // Given
-      await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
-      await JeuneSqlModel.creer(
-        unJeuneDto({
-          id: idJeune,
-          idDossier,
-          idConseiller
-        })
-      )
-
-      // When
-      const actual = await jeuneSqlRepository.getJeuneQueryModelByIdDossier(
-        idDossier,
-        'fake-id-conseiller'
-      )
-      // Then
-      expect(actual).to.equal(undefined)
     })
   })
 

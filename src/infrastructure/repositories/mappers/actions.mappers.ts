@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon'
 import { ActionQueryModel } from 'src/application/queries/query-models/actions.query-model'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
-import { fromSqlToJeuneQueryModel } from './jeunes.mappers'
+import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
+import { JeuneQueryModel } from '../../../application/queries/query-models/jeunes.query-model'
 
 export function fromSqlToActionQueryModelWithJeune(
   actionSqlModel: ActionSqlModel
@@ -28,5 +29,15 @@ export function fromSqlToActionQueryModel(
       .toUTC()
       .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
     status: actionSqlModel.statut
+  }
+}
+
+function fromSqlToJeuneQueryModel(
+  jeuneSqlModel: JeuneSqlModel
+): JeuneQueryModel {
+  return {
+    id: jeuneSqlModel.id,
+    firstName: jeuneSqlModel.prenom,
+    lastName: jeuneSqlModel.nom
   }
 }

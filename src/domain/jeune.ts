@@ -1,6 +1,5 @@
 import { DateTime } from 'luxon'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
-import { JeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-model'
 import { Brand } from '../building-blocks/types/brand'
 import { DateService } from '../utils/date-service'
 import { Conseiller } from './conseiller'
@@ -46,11 +45,6 @@ export namespace Jeune {
     supprimer(idJeune: Jeune.Id): Promise<void>
 
     getHomeQueryModel(idJeune: string): Promise<JeuneHomeQueryModel>
-
-    getJeuneQueryModelByIdDossier(
-      idDossier: string,
-      idConseiller: string
-    ): Promise<JeuneQueryModel | undefined>
 
     saveAll(jeunes: Jeune[]): Promise<void>
 
