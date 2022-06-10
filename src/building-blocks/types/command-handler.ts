@@ -96,10 +96,15 @@ function nettoyerLaCommand<C>(command: C | undefined): C | undefined {
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  if (commandSanitized && commandSanitized.file) {
+  if (commandSanitized && commandSanitized.fichier) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    commandSanitized.file = { ...commandSanitized.file, buffer: undefined }
+    commandSanitized.fichier = {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      ...commandSanitized.fichier,
+      buffer: undefined
+    }
   }
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
