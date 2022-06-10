@@ -913,7 +913,8 @@ describe('JeunesController', () => {
     const idJeune = '1'
     const idDemarche = 'demarche'
     const payload: UpdateStatutDemarchePayload = {
-      statut: Demarche.Statut.REALISEE
+      statut: Demarche.Statut.REALISEE,
+      dateFin: uneDate()
     }
     const demarche = uneDemarche()
     describe("quand c'est en succès", () => {
@@ -924,6 +925,7 @@ describe('JeunesController', () => {
           .withArgs(
             {
               statut: payload.statut,
+              dateFin: uneDate(),
               idJeune,
               idDemarche,
               accessToken: 'coucou'
@@ -949,6 +951,7 @@ describe('JeunesController', () => {
           .withArgs(
             {
               statut: payload.statut,
+              dateFin: uneDate(),
               idJeune,
               idDemarche,
               accessToken: 'coucou'

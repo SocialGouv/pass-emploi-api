@@ -8,6 +8,11 @@ export class UpdateStatutDemarchePayload {
   @IsEnum(Demarche.Statut)
   statut: Demarche.Statut
 
+  @ApiProperty({ type: Date })
+  @Type(() => Date)
+  @IsDate()
+  dateFin: Date
+
   @ApiPropertyOptional({ type: Date })
   @Type(() => Date)
   @IsDate()

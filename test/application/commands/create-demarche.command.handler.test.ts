@@ -36,7 +36,6 @@ describe('CreateDemarcheCommandHandler', () => {
   const demarcheCreee: Demarche.Creee = {
     statut: Demarche.Statut.A_FAIRE,
     dateCreation: uneDatetime,
-    dateDebut: uneDatetime,
     dateFin: uneDatetime,
     pourquoi: 'P01',
     quoi: 'Q38',

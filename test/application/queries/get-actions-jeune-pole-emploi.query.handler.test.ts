@@ -21,6 +21,7 @@ import {
   DemarcheDto,
   DemarcheDtoEtat
 } from '../../../src/infrastructure/clients/dto/pole-emploi.dto'
+import { DateTime } from 'luxon'
 
 describe('GetActionsJeunePoleEmploiQueryHandler', () => {
   let jeunesRepository: StubbedType<Jeune.Repository>
@@ -32,6 +33,7 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
   let sandbox: SinonSandbox
   const stringUTC = '2020-04-06T10:20:00.000Z'
   const idpToken = 'idpToken'
+  const maintenant = new Date('2022-05-09T10:11:00+02:00')
 
   before(() => {
     sandbox = createSandbox()
@@ -39,7 +41,8 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
     jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
     dateService = stubClass(DateService)
-    dateService.nowJs.returns(new Date())
+    dateService.nowJs.returns(maintenant)
+    dateService.now.returns(DateTime.fromJSDate(maintenant))
     dateService.fromISOStringToUTCJSDate.returns(new Date(stringUTC))
     keycloakClient = stubClass(KeycloakClient)
     keycloakClient.exchangeTokenPoleEmploiJeune.resolves(idpToken)
@@ -136,11 +139,11 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
       // Then
       expect(queryModel.statut).to.equal(Demarche.Statut.ANNULEE)
     })
-    it('retourne statut en cours', async () => {
+    it('retourne statut en cours quand la date de début est avant maintenant à midi', async () => {
       // Given
       demarcheDto.etat = DemarcheDtoEtat.EC
-      demarcheDto.dateFin = '2222-04-06T10:20:00+02:00'
-      demarcheDto.dateDebut = '2020-04-06T10:20:00+02:00'
+      demarcheDto.dateFin = '2022-06-09T10:11:00+02:00'
+      demarcheDto.dateDebut = '2022-05-09T08:11:00+02:00'
       // When
       const queryModel = fromDemarcheDtoToDemarche(demarcheDto, dateService)
       // Then
@@ -215,17 +218,42 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
         ])
       })
       describe('quand la modification est possible', () => {
-        it('autorise a faire et en cours', async () => {
-          // Given
-          demarcheDto.etat = DemarcheDtoEtat.AC
-          demarcheDto.droitsDemarche!.modificationDate = true
-          // When
-          const queryModel = fromDemarcheDtoToDemarche(demarcheDto, dateService)
-          // Then
-          expect(queryModel.statutsPossibles).to.deep.equal([
-            Demarche.Statut.A_FAIRE,
-            Demarche.Statut.EN_COURS
-          ])
+        describe('quand la date de fin est dans le futur', () => {
+          it('autorise a faire et en cours', async () => {
+            // Given
+            demarcheDto.etat = DemarcheDtoEtat.AC
+            demarcheDto.droitsDemarche!.modificationDate = true
+            // When
+            const queryModel = fromDemarcheDtoToDemarche(
+              demarcheDto,
+              dateService
+            )
+            // Then
+            expect(queryModel.statutsPossibles).to.deep.equal([
+              Demarche.Statut.A_FAIRE,
+              Demarche.Statut.EN_COURS
+            ])
+          })
+        })
+
+        describe('quand la date de fin est dans le passé', () => {
+          it('autorise seulement à faire', async () => {
+            // Given
+            demarcheDto.etat = DemarcheDtoEtat.AC
+            demarcheDto.droitsDemarche!.modificationDate = true
+            demarcheDto.dateFin = DateTime.fromJSDate(maintenant)
+              .minus({ day: 1 })
+              .toString()
+            // When
+            const queryModel = fromDemarcheDtoToDemarche(
+              demarcheDto,
+              dateService
+            )
+            // Then
+            expect(queryModel.statutsPossibles).to.deep.equal([
+              Demarche.Statut.A_FAIRE
+            ])
+          })
         })
       })
       describe('quand la replanification est possible', () => {

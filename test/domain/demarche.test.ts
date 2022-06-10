@@ -4,6 +4,8 @@ import { DateService } from '../../src/utils/date-service'
 import { uneDate, uneDatetime } from '../fixtures/date.fixture'
 import { uneDemarche } from '../fixtures/demarche.fixture'
 import { expect, StubbedClass, stubClass } from '../utils'
+import { failure, success } from '../../src/building-blocks/types/result'
+import { MauvaiseCommandeError } from '../../src/building-blocks/types/domain-error'
 
 describe('Demarche', () => {
   let demarcheFactory: Demarche.Factory
@@ -17,22 +19,51 @@ describe('Demarche', () => {
 
   describe('mettreAJourLeStatut', () => {
     describe('en cours', () => {
-      it('génère une date de debut et de modification', () => {
-        // Given
-        const demarche = uneDemarche()
+      describe('quand la date de fin est dans le futur', () => {
+        it('génère une date de debut et de modification', () => {
+          // Given
+          const demarche = uneDemarche()
 
-        // When
-        const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
-          demarche.id,
-          Demarche.Statut.EN_COURS
-        )
+          // When
+          const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
+            demarche.id,
+            Demarche.Statut.EN_COURS,
+            uneDatetime.plus({ day: 5 }).toUTC().toJSDate()
+          )
 
-        // Then
-        expect(demarcheModifiee).to.deep.equal({
-          id: demarche.id,
-          statut: Demarche.Statut.EN_COURS,
-          dateModification: uneDatetime,
-          dateDebut: uneDatetime
+          // Then
+          expect(demarcheModifiee).to.deep.equal(
+            success({
+              id: demarche.id,
+              statut: Demarche.Statut.EN_COURS,
+              dateModification: uneDatetime,
+              dateDebut: uneDatetime,
+              dateFin: uneDatetime.plus({ day: 5 }).toUTC()
+            })
+          )
+        })
+      })
+
+      describe('quand la date de fin est dans le passé', () => {
+        it('renvoie une failure', () => {
+          // Given
+          const demarche = uneDemarche()
+
+          // When
+          const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
+            demarche.id,
+            Demarche.Statut.EN_COURS,
+            uneDatetime.minus({ day: 5 }).toJSDate()
+          )
+
+          // Then
+          expect(demarcheModifiee).to.deep.equal(
+            failure(
+              new MauvaiseCommandeError(
+                'Une démarche en cours ne peut pas avoir une date de fin dans le passé'
+              )
+            )
+          )
         })
       })
     })
@@ -47,17 +78,20 @@ describe('Demarche', () => {
           const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
             demarche.id,
             Demarche.Statut.REALISEE,
+            demarche.dateFin,
             demarche.dateDebut
           )
 
           // Then
-          expect(demarcheModifiee).to.deep.equal({
-            id: demarche.id,
-            statut: Demarche.Statut.REALISEE,
-            dateModification: uneDatetime,
-            dateDebut: uneDatetime,
-            dateFin: uneDatetime
-          })
+          expect(demarcheModifiee).to.deep.equal(
+            success({
+              id: demarche.id,
+              statut: Demarche.Statut.REALISEE,
+              dateModification: uneDatetime,
+              dateDebut: uneDatetime,
+              dateFin: uneDatetime
+            })
+          )
         })
       })
       describe('quand la date de debut est dans le passé', () => {
@@ -71,16 +105,19 @@ describe('Demarche', () => {
           const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
             demarche.id,
             Demarche.Statut.REALISEE,
+            demarche.dateFin,
             demarche.dateDebut
           )
 
           // Then
-          expect(demarcheModifiee).to.deep.equal({
-            id: demarche.id,
-            statut: Demarche.Statut.REALISEE,
-            dateModification: uneDatetime,
-            dateFin: uneDatetime
-          })
+          expect(demarcheModifiee).to.deep.equal(
+            success({
+              id: demarche.id,
+              statut: Demarche.Statut.REALISEE,
+              dateModification: uneDatetime,
+              dateFin: uneDatetime
+            })
+          )
         })
       })
       describe("quand il n'y a pas de date de début", () => {
@@ -93,38 +130,45 @@ describe('Demarche', () => {
           const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
             demarche.id,
             Demarche.Statut.REALISEE,
+            demarche.dateFin,
             demarche.dateDebut
           )
 
           // Then
-          expect(demarcheModifiee).to.deep.equal({
-            id: demarche.id,
-            statut: Demarche.Statut.REALISEE,
-            dateModification: uneDatetime,
-            dateFin: uneDatetime,
-            dateDebut: uneDatetime
-          })
+          expect(demarcheModifiee).to.deep.equal(
+            success({
+              id: demarche.id,
+              statut: Demarche.Statut.REALISEE,
+              dateModification: uneDatetime,
+              dateFin: uneDatetime,
+              dateDebut: uneDatetime
+            })
+          )
         })
       })
     })
     describe('à faire', () => {
-      it('met une date de début a null', () => {
+      it('met une date de début a undefined', () => {
         // Given
         const demarche = uneDemarche()
         // When
         const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
           demarche.id,
           Demarche.Statut.A_FAIRE,
+          demarche.dateFin,
           demarche.dateDebut
         )
 
         // Then
-        expect(demarcheModifiee).to.deep.equal({
-          id: demarche.id,
-          statut: Demarche.Statut.A_FAIRE,
-          dateModification: uneDatetime,
-          dateDebut: null
-        })
+        expect(demarcheModifiee).to.deep.equal(
+          success({
+            id: demarche.id,
+            statut: Demarche.Statut.A_FAIRE,
+            dateModification: uneDatetime,
+            dateDebut: undefined,
+            dateFin: DateTime.fromJSDate(demarche.dateFin).toUTC()
+          })
+        )
       })
     })
     describe('annulé', () => {
@@ -135,16 +179,21 @@ describe('Demarche', () => {
         const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
           demarche.id,
           Demarche.Statut.ANNULEE,
+          demarche.dateFin,
           demarche.dateDebut
         )
 
         // Then
-        expect(demarcheModifiee).to.deep.equal({
-          id: demarche.id,
-          statut: Demarche.Statut.ANNULEE,
-          dateModification: uneDatetime,
-          dateAnnulation: uneDatetime
-        })
+        expect(demarcheModifiee).to.deep.equal(
+          success({
+            id: demarche.id,
+            statut: Demarche.Statut.ANNULEE,
+            dateModification: uneDatetime,
+            dateAnnulation: uneDatetime,
+            dateFin: undefined,
+            dateDebut: undefined
+          })
+        )
       })
     })
   })
@@ -158,15 +207,15 @@ describe('Demarche', () => {
       const demarche = demarcheFactory.creerDemarchePerso(description, dateFin)
 
       // Then
-      expect(demarche).to.deep.equal({
+      const demarcheCree: Demarche.Creee = {
         statut: Demarche.Statut.A_FAIRE,
         dateCreation: uneDatetime,
-        dateDebut: DateTime.fromJSDate(dateFin),
         dateFin: DateTime.fromJSDate(dateFin),
         pourquoi: 'P01',
         quoi: 'Q38',
         description
-      })
+      }
+      expect(demarche).to.deep.equal(demarcheCree)
     })
   })
 })

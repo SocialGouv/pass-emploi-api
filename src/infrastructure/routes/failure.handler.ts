@@ -1,11 +1,13 @@
 import {
   BadRequestException,
   ForbiddenException,
+  HttpException,
   NotFoundException
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import {
   DroitsInsuffisants,
+  ErreurHttp,
   JeuneNonLieAuConseillerError,
   JeunePasInactifError,
   MauvaiseCommandeError,
@@ -16,6 +18,11 @@ import { isFailure, Result } from 'src/building-blocks/types/result'
 export function handleFailure(result: Result): void {
   if (isFailure(result)) {
     switch (result.error.code) {
+      case ErreurHttp.CODE:
+        if (result.error instanceof ErreurHttp) {
+          throw new HttpException(result.error.message, result.error.statusCode)
+        }
+        break
       case NonTrouveError.CODE:
         throw new NotFoundException(result.error, result.error.message)
       case MauvaiseCommandeError.CODE:
