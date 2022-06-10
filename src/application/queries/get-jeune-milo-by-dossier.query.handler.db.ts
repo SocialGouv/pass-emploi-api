@@ -1,13 +1,13 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { Core } from 'src/domain/core'
-import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { JeuneQueryModel } from './query-models/jeunes.query-model'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 
 export interface GetJeuneMiloByDossierQuery extends Query {
   idDossier: string
@@ -18,11 +18,7 @@ export class GetJeuneMiloByDossierQueryHandler extends QueryHandler<
   GetJeuneMiloByDossierQuery,
   Result<JeuneQueryModel>
 > {
-  constructor(
-    @Inject(JeunesRepositoryToken)
-    private readonly jeunesRepository: Jeune.Repository,
-    private readonly conseillerAuthorizer: ConseillerAuthorizer
-  ) {
+  constructor(private readonly conseillerAuthorizer: ConseillerAuthorizer) {
     super('GetJeuneMiloByDossierQueryHandler')
   }
 
@@ -30,14 +26,17 @@ export class GetJeuneMiloByDossierQueryHandler extends QueryHandler<
     query: GetJeuneMiloByDossierQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result<JeuneQueryModel>> {
-    const jeune = await this.jeunesRepository.getJeuneQueryModelByIdDossier(
-      query.idDossier,
-      utilisateur.id
-    )
-    if (!jeune) {
+    const jeuneSqlModel = await JeuneSqlModel.findOne({
+      where: {
+        idDossier: query.idDossier,
+        idConseiller: utilisateur.id
+      }
+    })
+    if (!jeuneSqlModel) {
       return failure(new NonTrouveError('Jeune', query.idDossier))
     }
-    return success(jeune)
+
+    return success(fromSqlToJeuneQueryModel(jeuneSqlModel))
   }
 
   async authorize(
@@ -52,5 +51,15 @@ export class GetJeuneMiloByDossierQueryHandler extends QueryHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+}
+
+function fromSqlToJeuneQueryModel(
+  jeuneSqlModel: JeuneSqlModel
+): JeuneQueryModel {
+  return {
+    id: jeuneSqlModel.id,
+    firstName: jeuneSqlModel.prenom,
+    lastName: jeuneSqlModel.nom
   }
 }
