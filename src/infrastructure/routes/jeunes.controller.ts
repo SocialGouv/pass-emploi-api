@@ -340,12 +340,8 @@ export class JeunesController {
     if (isSuccess(result)) {
       return result.data
     }
-
-    if (isFailure(result) && result.error instanceof ErreurHttp) {
-      throw new HttpException(result.error.message, result.error.statusCode)
-    }
-
-    throw new RuntimeException()
+    handleFailure(result)
+    throw new RuntimeException(result.error.message)
   }
 
   @ApiOperation({
