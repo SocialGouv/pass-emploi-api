@@ -6,7 +6,8 @@ import {
   IsInt,
   IsNotEmpty,
   IsOptional,
-  IsString
+  IsString,
+  Min
 } from 'class-validator'
 import { RendezVous } from 'src/domain/rendez-vous'
 import { Action } from '../../../domain/action'
@@ -50,6 +51,7 @@ export class GetActionsByJeuneQueryParams {
   @IsOptional()
   @IsInt()
   @Type(() => Number)
+  @Min(1)
   page?: number
 
   @ApiPropertyOptional({ enum: Action.Tri })
