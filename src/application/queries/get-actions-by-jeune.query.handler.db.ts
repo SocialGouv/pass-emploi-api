@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Sequelize, WhereOptions } from 'sequelize'
+import { Order, Sequelize, WhereOptions } from 'sequelize'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
@@ -42,6 +42,17 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
     super('GetActionsByJeuneQueryHandler')
   }
 
+  mapTriToSqlOrder: Record<Action.Tri, Order> = {
+    date_croissante: [['date_derniere_actualisation', 'ASC']],
+    date_decroissante: [['date_derniere_actualisation', 'DESC']],
+    statut: [
+      this.sequelize.literal(
+        `CASE WHEN statut = '${Action.Statut.TERMINEE}' THEN 1 ELSE 0 END`
+      ),
+      ['date_derniere_actualisation', 'DESC']
+    ]
+  }
+
   async handle(
     query: GetActionsByJeuneQuery
   ): Promise<Result<ActionsByJeuneOutput>> {
@@ -65,15 +76,7 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
 
     const actionsSqlModel = await ActionSqlModel.findAll({
       where: filtres,
-      order: [
-        this.sequelize.literal(
-          `CASE WHEN statut = '${Action.Statut.TERMINEE}' THEN 1 ELSE 0 END`
-        ),
-        [
-          'date_derniere_actualisation',
-          query.tri ? mapFiltreTriToSql[query.tri] : 'DESC'
-        ]
-      ],
+      order: this.mapTriToSqlOrder[query.tri ?? Action.Tri.STATUT],
       limit: generateLimit(nombreTotalActionsSql, query.page),
       offset: generateOffset(query.page),
       include: [
@@ -107,11 +110,6 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
   async monitor(): Promise<void> {
     return
   }
-}
-
-const mapFiltreTriToSql: Record<Action.Tri, string> = {
-  date_croissante: 'ASC',
-  date_decroissante: 'DESC'
 }
 
 function generateLimit(nombreTotalActions: number, page?: number): number {

@@ -53,7 +53,8 @@ export namespace Action {
 
   export enum Tri {
     DATE_CROISSANTE = 'date_croissante',
-    DATE_DECROISSANTE = 'date_decroissante'
+    DATE_DECROISSANTE = 'date_decroissante',
+    STATUT = 'statut'
   }
 
   export class StatutInvalide implements DomainError {
