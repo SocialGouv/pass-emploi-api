@@ -1,29 +1,29 @@
+import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
+import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+import { failure, success } from 'src/building-blocks/types/result'
 import { uneAction } from 'test/fixtures/action.fixture'
-import {
-  unUtilisateurConseiller,
-  unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
-import { uneActionQueryModelFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { Action } from '../../../src/domain/action'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository.db'
+import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import {
   GetActionsByJeuneQuery,
   GetActionsByJeuneQueryHandler
 } from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
-import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
-import { DateTime } from 'luxon'
+import { Action } from '../../../src/domain/action'
+import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository.db'
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository.db'
-import { IdService } from '../../../src/utils/id-service'
 import { DateService } from '../../../src/utils/date-service'
+import { IdService } from '../../../src/utils/id-service'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { uneActionQueryModelFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
-import { failure, success } from 'src/building-blocks/types/result'
-import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 
 describe('GetActionsByJeuneQueryHandler', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -318,7 +318,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
       })
     })
     describe('quand on trie', () => {
-      it('applique le tri par date croissante', async () => {
+      it('applique le tri par date croissante uniquement', async () => {
         // Given
         const actionPasCommencee = uneAction({
           id: '02b3710e-7779-11ec-90d6-0242ac120001',
@@ -350,12 +350,12 @@ describe('GetActionsByJeuneQueryHandler', () => {
             .toUTC()
             .toJSDate()
         })
-        const actionTerminee = uneAction({
+        const actionTermineeRecente = uneAction({
           id: '02b3710e-7779-11ec-90d6-0242ac120004',
           idJeune: jeune.id,
           statut: Action.Statut.TERMINEE,
           dateDerniereActualisation: DateTime.fromISO(
-            '2020-04-08T12:00:00.000Z'
+            '2020-04-03T12:00:00.000Z'
           )
             .toUTC()
             .toJSDate()
@@ -363,7 +363,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
         await actionSqlRepository.save(actionPasCommencee)
         await actionSqlRepository.save(actionEnCours)
         await actionSqlRepository.save(actionCanceled)
-        await actionSqlRepository.save(actionTerminee)
+        await actionSqlRepository.save(actionTermineeRecente)
 
         // When
         const actionsQueryModel = await getActionsByJeuneQueryHandler.handle({
@@ -376,10 +376,10 @@ describe('GetActionsByJeuneQueryHandler', () => {
         expect(actionsQueryModel).to.deep.equal(
           success({
             actions: [
+              uneActionQueryModelFromDomain(actionTermineeRecente),
               uneActionQueryModelFromDomain(actionPasCommencee),
               uneActionQueryModelFromDomain(actionEnCours),
-              uneActionQueryModelFromDomain(actionCanceled),
-              uneActionQueryModelFromDomain(actionTerminee)
+              uneActionQueryModelFromDomain(actionCanceled)
             ],
             nombreTotal: 4
           })
