@@ -243,6 +243,7 @@ describe('AuthentificationSqlRepository', () => {
       expect(utilisateur).to.deep.equal(unConseillerMisAJour)
     })
   })
+
   describe('updateJeunePremiereConnexion', () => {
     beforeEach(async () => {
       // Given
@@ -335,6 +336,27 @@ describe('AuthentificationSqlRepository', () => {
 
         expect(conseiller?.dateCreation).to.deep.equal(dateCreation)
       })
+    })
+  })
+
+  describe('mettreAJourLaVersionDeLApplicationDuJeune', () => {
+    it('met à jour le jeune', async () => {
+      // Given
+      const appVersion = 'test'
+      const conseiller = unConseillerDto()
+      const jeune = unJeuneDto({ idConseiller: conseiller.id })
+      await ConseillerSqlModel.create(conseiller)
+      await JeuneSqlModel.create(jeune)
+
+      // When
+      await authentificationSqlRepository.mettreAJourLaVersionDeLApplicationDuJeune(
+        jeune.id,
+        appVersion
+      )
+
+      // Then
+      const jeuneTrouve = await JeuneSqlModel.findByPk(jeune.id)
+      expect(jeuneTrouve?.appVersion).to.equal(appVersion)
     })
   })
 })

@@ -99,6 +99,12 @@ export class JeuneDto extends Model {
     type: DataType.STRING
   })
   idDossier: string | null
+
+  @Column({
+    field: 'app_version',
+    type: DataType.STRING
+  })
+  appVersion: string | null
 }
 
 @Table({

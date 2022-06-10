@@ -18,7 +18,8 @@ export function unJeuneDto(
     idAuthentification: 'un-id',
     dateDerniereConnexion: null,
     datePremiereConnexion: null,
-    idDossier: '1234'
+    idDossier: '1234',
+    appVersion: null
   }
 
   return { ...defaults, ...args }

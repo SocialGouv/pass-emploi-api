@@ -4,6 +4,7 @@ import {
   Delete,
   ForbiddenException,
   Get,
+  Headers,
   HttpCode,
   HttpException,
   HttpStatus,
@@ -15,7 +16,13 @@ import {
   Res
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  ApiHeader,
+  ApiOAuth2,
+  ApiOperation,
+  ApiResponse,
+  ApiTags
+} from '@nestjs/swagger'
 import { Response } from 'express'
 import {
   CreateDemarcheCommand,
@@ -180,16 +187,22 @@ export class JeunesController {
     throw new HttpException(`Jeune ${idJeune} not found`, HttpStatus.NOT_FOUND)
   }
 
+  @ApiHeader({
+    name: 'x-appversion',
+    required: false
+  })
   @Put(':idJeune/push-notification-token')
   async updateNotificationToken(
     @Param('idJeune') idJeune: string,
     @Body() putNotificationTokenInput: PutNotificationTokenInput,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @Headers('x-appversion') appVersion?: string
   ): Promise<void> {
     const result = await this.updateNotificationTokenCommandHandler.execute(
       {
         idJeune,
-        token: putNotificationTokenInput.registration_token
+        token: putNotificationTokenInput.registration_token,
+        appVersion: appVersion
       },
       utilisateur
     )
