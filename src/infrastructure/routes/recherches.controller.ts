@@ -27,7 +27,7 @@ import { Recherche } from '../../domain/recherche'
 import {
   GetRecherchesQuery,
   GetRecherchesQueryHandler
-} from '../../application/queries/get-recherches.query.handler'
+} from '../../application/queries/get-recherches.query.handler.db'
 import { RechercheQueryModel } from '../../application/queries/query-models/recherches.query-model'
 import { isFailure } from '../../building-blocks/types/result'
 import {
