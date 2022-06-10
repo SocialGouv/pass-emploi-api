@@ -39,8 +39,8 @@ describe('DeleteRechercheCommandHandler', () => {
     describe('quand la recherche existe', () => {
       it('supprime la recherche', async () => {
         // Given
-        rechercheSqlRepository.getRecherche
-          .withArgs(recherche.id)
+        rechercheSqlRepository.existe
+          .withArgs(recherche.id, jeune.id)
           .resolves(true)
 
         const command: DeleteRechercheCommand = {
@@ -60,8 +60,8 @@ describe('DeleteRechercheCommandHandler', () => {
     describe('quand la recherche n"existe pas', () => {
       it('renvoie une failure', async () => {
         // Given
-        rechercheSqlRepository.getRecherche
-          .withArgs(recherche.id)
+        rechercheSqlRepository.existe
+          .withArgs(recherche.id, recherche.idJeune)
           .resolves(false)
 
         const command: DeleteRechercheCommand = {

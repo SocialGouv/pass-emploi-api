@@ -67,7 +67,7 @@ import { GetHomeJeuneHandler } from './application/queries/get-home-jeune.query.
 import { GetJeunesByConseillerQueryHandler } from './application/queries/get-jeunes-by-conseiller.query.handler.db'
 import { GetOffresEmploiQueryHandler } from './application/queries/get-offres-emploi.query.handler'
 import { GetOffresImmersionQueryHandler } from './application/queries/get-offres-immersion.query.handler'
-import { GetRecherchesQueryHandler } from './application/queries/get-recherches.query.handler'
+import { GetRecherchesQueryHandler } from './application/queries/get-recherches.query.handler.db'
 import { GetAllRendezVousConseillerQueryHandler } from './application/queries/get-rendez-vous-conseiller.query.handler.db'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from './application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { GetRendezVousJeuneQueryHandler } from './application/queries/get-rendez-vous-jeune.query.handler.db'

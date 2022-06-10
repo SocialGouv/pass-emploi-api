@@ -1,6 +1,5 @@
 import { GetOffresEmploiQuery } from 'src/application/queries/get-offres-emploi.query.handler'
 import { GetOffresImmersionQuery } from 'src/application/queries/get-offres-immersion.query.handler'
-import { RechercheQueryModel } from '../application/queries/query-models/recherches.query-model'
 import { DateTime } from 'luxon'
 import { GetServicesCiviqueQuery } from 'src/application/queries/get-services-civique.query.handler'
 
@@ -42,17 +41,11 @@ export namespace Recherche {
   export interface Repository {
     createRecherche(recherche: Recherche): Promise<void>
     update(recherche: Recherche): Promise<void>
-
-    getRecherches(
-      idJeune: string,
-      avecGeometrie?: boolean
-    ): Promise<RechercheQueryModel[]>
     findAvantDate(
       typeRecherches: Recherche.Type[],
       nombreRecherches: number,
       date: DateTime
     ): Promise<Recherche[]>
-    getRecherche(idRecherche: string): Promise<RechercheQueryModel | undefined>
     deleteRecherche(idRecherche: string): Promise<void>
     existe(idRecherche: string, idJeune: string): Promise<boolean>
     trouverLesRecherchesImmersions(
