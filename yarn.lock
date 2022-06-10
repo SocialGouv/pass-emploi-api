@@ -3854,7 +3854,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cli-color@npm:^2.0.1":
+"cli-color@npm:^2.0.1, cli-color@npm:^2.0.2":
   version: 2.0.2
   resolution: "cli-color@npm:2.0.2"
   dependencies:
@@ -4520,7 +4520,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:16.0.1, dotenv@npm:^16.0.0":
+"dotenv@npm:16.0.1, dotenv@npm:^16.0.0, dotenv@npm:^16.0.1":
   version: 16.0.1
   resolution: "dotenv@npm:16.0.1"
   checksum: f459ffce07b977b7f15d8cc4ee69cdff77d4dd8c5dc8c85d2d485ee84655352c2415f9dd09d42b5b5985ced3be186130871b34e2f3e2569ebc72fbc2e8096792
@@ -4531,6 +4531,20 @@ __metadata:
   version: 2.0.2
   resolution: "dottie@npm:2.0.2"
   checksum: 046a5818033725a5a12b60270473cd9a19b0e88bd007a0c9a66be36983e53626de949aee9d0290fbfe0275aa31837491adbbbb8bf74ef09f78d21598793d6268
+  languageName: node
+  linkType: hard
+
+"dotvault@npm:^0.0.9":
+  version: 0.0.9
+  resolution: "dotvault@npm:0.0.9"
+  dependencies:
+    cli-color: ^2.0.2
+    dotenv: ^16.0.1
+    joi: ^17.6.0
+    yargs: ^17.5.1
+  bin:
+    dotvault: ./lib/main.cjs
+  checksum: 8e6778950170aa8a757987c992ed0235f51efc9a869457f723282c12a4488cb21346adf8f3759ce03fab2663ae830c5623de0e35b81d0b3000d1e70c263de918
   languageName: node
   linkType: hard
 
@@ -7905,6 +7919,7 @@ __metadata:
     crypto-js: 4.1.1
     dirty-chai: ^2.0.1
     dotenv-cli: ^5.1.0
+    dotvault: ^0.0.9
     elastic-apm-node: 3.35.0
     eslint: ^8.16.0
     eslint-config-prettier: ^8.5.0

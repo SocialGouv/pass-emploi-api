@@ -6,12 +6,12 @@
 
 ### Récupérer les variables d'environnement
 1. Créer un fichier ```.environment``` en copiant le .environment.template
-2. Mettre la valeur VAULT_ENV_VAULT_KEY indiquée sur Dashlane
-3. Exécuter ```vault decrypt```
+2. Mettre la valeur DOTVAULT_KEY indiquée sur Dashlane
+3. Exécuter ```dotvault decrypt```
 
 ### Mettre à jour les variables d'environnement
-1. Mettre à jour les variables désirées dans ```.vault/local.secret```
-2. Exécuter ```vault decrypt```
+1. Mettre à jour les variables désirées dans ```.environment``` entre les balises // BEGIN VAULT et //END VAULT
+2. Exécuter ```dotvault decrypt```
 3. Pousser sur git
 
 ## Lancement
