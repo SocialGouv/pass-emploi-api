@@ -56,7 +56,10 @@ export function toSqlJeune(
   jeune: Jeune
 ): Omit<
   AsSql<JeuneDto>,
-  'idAuthentification' | 'datePremiereConnexion' | 'dateDerniereConnexion'
+  | 'idAuthentification'
+  | 'datePremiereConnexion'
+  | 'dateDerniereConnexion'
+  | 'appVersion'
 > {
   return {
     id: jeune.id,

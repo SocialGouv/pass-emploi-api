@@ -3,6 +3,7 @@ import { CreateDemarcheCommandHandler } from 'src/application/commands/create-de
 import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
 import { TransfererJeunesConseillerCommandHandler } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
 import { UpdateStatutDemarcheCommandHandler } from 'src/application/commands/update-demarche.command.handler'
+import { UpdateNotificationTokenCommandHandler } from 'src/application/commands/update-notification-token.command.handler'
 import { Core } from 'src/domain/core'
 import { Demarche } from 'src/domain/demarche'
 import { RendezVous } from 'src/domain/rendez-vous'
@@ -10,7 +11,10 @@ import {
   CreateDemarchePayload,
   UpdateStatutDemarchePayload
 } from 'src/infrastructure/routes/validation/demarches.inputs'
-import { TransfererConseillerPayload } from 'src/infrastructure/routes/validation/jeunes.inputs'
+import {
+  PutNotificationTokenInput,
+  TransfererConseillerPayload
+} from 'src/infrastructure/routes/validation/jeunes.inputs'
 import * as request from 'supertest'
 import { uneDate } from 'test/fixtures/date.fixture'
 import { uneDemarche } from 'test/fixtures/demarche.fixture'
@@ -90,6 +94,7 @@ describe('JeunesController', () => {
   let updateStatutDemarcheCommandHandler: StubbedClass<UpdateStatutDemarcheCommandHandler>
   let createDemarcheCommandHandler: StubbedClass<CreateDemarcheCommandHandler>
   let getActionsByJeuneQueryHandler: StubbedClass<GetActionsByJeuneQueryHandler>
+  let updateNotificationTokenCommandHandler: StubbedClass<UpdateNotificationTokenCommandHandler>
   let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
@@ -128,6 +133,9 @@ describe('JeunesController', () => {
     )
     createDemarcheCommandHandler = stubClass(CreateDemarcheCommandHandler)
     getActionsByJeuneQueryHandler = stubClass(GetActionsByJeuneQueryHandler)
+    updateNotificationTokenCommandHandler = stubClass(
+      UpdateNotificationTokenCommandHandler
+    )
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
@@ -164,6 +172,8 @@ describe('JeunesController', () => {
       .useValue(createDemarcheCommandHandler)
       .overrideProvider(GetActionsByJeuneQueryHandler)
       .useValue(getActionsByJeuneQueryHandler)
+      .overrideProvider(UpdateNotificationTokenCommandHandler)
+      .useValue(updateNotificationTokenCommandHandler)
       .overrideProvider(JwtService)
       .useValue(jwtService)
       .compile()
@@ -1132,5 +1142,65 @@ describe('JeunesController', () => {
         // Then
         .expect(HttpStatus.BAD_REQUEST)
     })
+  })
+
+  describe('PUT /jeunes/:idJeune/push-notification-token', () => {
+    const idJeune = '1'
+    const payload: PutNotificationTokenInput = {
+      registration_token: 'token'
+    }
+
+    describe("quand c'est en succès", () => {
+      it("met à jour le token et la version de l'app", async () => {
+        // Given
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+        updateNotificationTokenCommandHandler.execute
+          .withArgs(
+            {
+              idJeune,
+              token: payload.registration_token,
+              appVersion: 'coucou'
+            },
+            unUtilisateurDecode()
+          )
+          .resolves(emptySuccess())
+
+        // When
+        await request(app.getHttpServer())
+          .put(`/jeunes/${idJeune}/push-notification-token`)
+          .set('authorization', unHeaderAuthorization())
+          .set('x-appversion', 'coucou')
+          .send(payload)
+          // Then
+          .expect(HttpStatus.OK)
+      })
+      it("met à jour le token sans version de l'app", async () => {
+        // Given
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+        updateNotificationTokenCommandHandler.execute
+          .withArgs(
+            {
+              idJeune,
+              token: payload.registration_token,
+              appVersion: undefined
+            },
+            unUtilisateurDecode()
+          )
+          .resolves(emptySuccess())
+
+        // When
+        await request(app.getHttpServer())
+          .put(`/jeunes/${idJeune}/push-notification-token`)
+          .set('authorization', unHeaderAuthorization())
+          .send(payload)
+          // Then
+          .expect(HttpStatus.OK)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'put',
+      '/jeunes/1/push-notification-token'
+    )
   })
 })

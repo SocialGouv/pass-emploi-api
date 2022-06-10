@@ -1,5 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
+import { Authentification } from 'src/domain/authentification'
 import { Jeune } from 'src/domain/jeune'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import {
@@ -16,17 +17,20 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 describe('UpdateNotificationTokenCommandHandler', () => {
   let updateNotificationTokenCommandHandler: UpdateNotificationTokenCommandHandler
   let jeuneRepository: StubbedType<Jeune.Repository>
+  let utilisateurRepository: StubbedType<Authentification.Repository>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     jeuneRepository = stubInterface(sandbox)
+    utilisateurRepository = stubInterface(sandbox)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     const dateService: StubbedClass<DateService> = stubClass(DateService)
     dateService.now.returns(uneDatetime)
     updateNotificationTokenCommandHandler =
       new UpdateNotificationTokenCommandHandler(
         jeuneRepository,
+        utilisateurRepository,
         jeuneAuthorizer,
         dateService
       )
@@ -57,6 +61,33 @@ describe('UpdateNotificationTokenCommandHandler', () => {
         expect(jeuneRepository.save).to.have.been.calledWithExactly(
           jeuneMisAJour
         )
+        expect(isSuccess(result)).to.equal(true)
+      })
+      it("met à jour la version de l'app", async () => {
+        // Given
+        const command: UpdateNotificationTokenCommand = {
+          idJeune: 'idJeune',
+          token: 'leNouveauToken',
+          appVersion: '1.0.0'
+        }
+        const jeune = unJeune()
+        jeuneRepository.get.withArgs('idJeune').resolves(jeune)
+        utilisateurRepository.mettreAJourLaVersionDeLApplicationDuJeune.resolves()
+
+        // When
+        const result = await updateNotificationTokenCommandHandler.handle(
+          command
+        )
+
+        // Then
+        const jeuneMisAJour: Jeune = {
+          ...jeune,
+          pushNotificationToken: 'leNouveauToken',
+          tokenLastUpdate: uneDatetime
+        }
+        expect(
+          utilisateurRepository.mettreAJourLaVersionDeLApplicationDuJeune
+        ).to.have.been.calledWithExactly(jeuneMisAJour.id, command.appVersion)
         expect(isSuccess(result)).to.equal(true)
       })
     })

@@ -7,7 +7,10 @@ import {
   failure,
   Result
 } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
+import {
+  Authentification,
+  AuthentificationRepositoryToken
+} from '../../domain/authentification'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { DateService } from '../../utils/date-service'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
@@ -15,6 +18,7 @@ import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 export interface UpdateNotificationTokenCommand extends Command {
   idJeune: string
   token: string
+  appVersion?: string
 }
 
 @Injectable()
@@ -24,6 +28,8 @@ export class UpdateNotificationTokenCommandHandler extends CommandHandler<
 > {
   constructor(
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
+    @Inject(AuthentificationRepositoryToken)
+    private utilisateurRepository: Authentification.Repository,
     private jeuneAuthorizer: JeuneAuthorizer,
     private dateService: DateService
   ) {
@@ -42,6 +48,13 @@ export class UpdateNotificationTokenCommandHandler extends CommandHandler<
       this.dateService
     )
     await this.jeuneRepository.save(jeuneMisAJour)
+
+    if (command.appVersion) {
+      this.utilisateurRepository.mettreAJourLaVersionDeLApplicationDuJeune(
+        jeuneMisAJour.id,
+        command.appVersion
+      )
+    }
     return emptySuccess()
   }
 

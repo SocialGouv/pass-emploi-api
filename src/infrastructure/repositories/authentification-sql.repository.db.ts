@@ -152,4 +152,11 @@ export class AuthentificationSqlRepository
     await this.keycloakClient.deleteUserByIdUser(idJeune)
     this.logger.log(`jeune ${idJeune} supprimé de keycloak`)
   }
+
+  async mettreAJourLaVersionDeLApplicationDuJeune(
+    idJeune: string,
+    appVersion: string
+  ): Promise<void> {
+    await JeuneSqlModel.update({ appVersion }, { where: { id: idJeune } })
+  }
 }
