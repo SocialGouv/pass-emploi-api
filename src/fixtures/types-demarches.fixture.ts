@@ -45,5 +45,22 @@ export const desTypeDemarchesDtosMock = (): TypeDemarcheDto[] => [
     estUneAction: false,
     libellePourQuoiObjectifDemarche: 'FAKE-Mes candidatures',
     libelleQuoiTypeDemarche: "Réponse à des offres d'emploi"
+  },
+  {
+    codePourQuoiObjectifDemarche: 'FAKE-P21',
+    codeQuoiTypeDemarche: 'FAKE-Q21',
+    estUneAction: false,
+    libellePourQuoiObjectifDemarche: 'FAKE-Mes candidatures',
+    libelleQuoiTypeDemarche: "Réponse à des offres d'emploi"
+  },
+  {
+    codeCommentDemarche: 'FAKE-C21.02',
+    codePourQuoiObjectifDemarche: 'FAKE-P21',
+    codeQuoiTypeDemarche: 'FAKE-Q21',
+    estUneAction: false,
+    libelleCommentDemarche: 'FAKE-En présentiel',
+    libellePourQuoiObjectifDemarche: 'FAKE-Mes candidatures',
+    libelleQuoiTypeDemarche:
+      'Participation à un salon ou un forum pour rechercher des offres'
   }
 ]
