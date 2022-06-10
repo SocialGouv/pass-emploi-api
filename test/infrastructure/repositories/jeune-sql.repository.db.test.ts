@@ -15,7 +15,6 @@ import {
   unFavoriOffreEngagement,
   unFavoriOffreImmersion
 } from 'test/fixtures/sql-models/favoris.sql-model'
-import { Action } from '../../../src/domain/action'
 import { Core } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune'
 import { Recherche } from '../../../src/domain/recherche'
@@ -32,10 +31,7 @@ import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { unJeune, unJeuneSansConseiller } from '../../fixtures/jeune.fixture'
-import {
-  unJeuneQueryModel,
-  unResumeActionDUnJeune
-} from '../../fixtures/query-models/jeunes.query-model.fixtures'
+import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
@@ -547,65 +543,6 @@ describe('JeuneSqlRepository', () => {
           })
         ).to.deep.equal([])
       })
-    })
-  })
-
-  describe('.getResumeActionsDesJeunesDuConseiller(idConseiller)', () => {
-    it('renvoie les resumés des actions des jeunes du conseiller', async () => {
-      // Given
-      const idConseiller = '1'
-      await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
-      await JeuneSqlModel.creer(
-        unJeuneDto({
-          id: 'ABCDE',
-          idConseiller
-        })
-      )
-      await JeuneSqlModel.creer(
-        unJeuneDto({
-          id: 'FGHIJ',
-          idConseiller
-        })
-      )
-      await ActionSqlModel.creer(
-        uneActionDto({
-          idJeune: 'ABCDE',
-          statut: Action.Statut.PAS_COMMENCEE
-        })
-      )
-      await ActionSqlModel.creer(
-        uneActionDto({
-          idJeune: 'ABCDE',
-          statut: Action.Statut.EN_COURS
-        })
-      )
-      await ActionSqlModel.creer(
-        uneActionDto({
-          idJeune: 'FGHIJ',
-          statut: Action.Statut.TERMINEE
-        })
-      )
-
-      // When
-      const actual =
-        await jeuneSqlRepository.getResumeActionsDesJeunesDuConseiller(
-          idConseiller
-        )
-
-      // Then
-      expect(actual).to.have.deep.members([
-        unResumeActionDUnJeune({
-          jeuneId: 'ABCDE',
-          todoActionsCount: 1,
-          inProgressActionsCount: 1,
-          doneActionsCount: 0
-        }),
-        unResumeActionDUnJeune({
-          jeuneId: 'FGHIJ',
-          todoActionsCount: 0,
-          doneActionsCount: 1
-        })
-      ])
     })
   })
 })

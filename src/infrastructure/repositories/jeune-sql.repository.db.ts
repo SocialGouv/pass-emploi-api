@@ -1,10 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Op, QueryTypes, Sequelize } from 'sequelize'
+import { Op, Sequelize } from 'sequelize'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
-import {
-  JeuneQueryModel,
-  ResumeActionsDuJeuneQueryModel
-} from 'src/application/queries/query-models/jeunes.query-model'
+import { JeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-model'
 import { Core } from 'src/domain/core'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
@@ -21,7 +18,6 @@ import {
   fromSqlToJeune,
   fromSqlToJeuneHomeQueryModel,
   fromSqlToJeuneQueryModel,
-  toResumeActionsDuJeuneQueryModel,
   toSqlJeune
 } from './mappers/jeunes.mappers'
 
@@ -181,33 +177,6 @@ export class JeuneSqlRepository implements Jeune.Repository {
       }
     })
     return fromSqlToJeuneHomeQueryModel(jeuneSqlModel, rdvJeuneSqlModel)
-  }
-
-  async getResumeActionsDesJeunesDuConseiller(
-    idConseiller: string
-  ): Promise<ResumeActionsDuJeuneQueryModel[]> {
-    const resumesActionsParJeune =
-      await this.sequelize.query<ResumeActionsJeuneDto>(
-        `
-            SELECT jeune.id                                                                   as id_jeune,
-                   jeune.prenom                                                               as prenom_jeune,
-                   jeune.nom                                                                  as nom_jeune,
-                   COUNT(CASE WHEN statut = 'in_progress' AND id_jeune = jeune.id THEN 1 END) as in_progress_actions_count,
-                   COUNT(CASE WHEN statut = 'not_started' AND id_jeune = jeune.id THEN 1 END) as todo_actions_count,
-                   COUNT(CASE WHEN statut = 'done' AND id_jeune = jeune.id THEN 1 END)        as done_actions_count
-            FROM action
-                     RIGHT JOIN jeune ON action.id_jeune = jeune.id
-            WHERE id_conseiller = :idConseiller
-            GROUP BY jeune.id,jeune.nom
-            ORDER BY jeune.nom
-        `,
-        {
-          type: QueryTypes.SELECT,
-          replacements: { idConseiller }
-        }
-      )
-
-    return resumesActionsParJeune.map(toResumeActionsDuJeuneQueryModel)
   }
 
   async getJeunesMilo(offset: number, limit: number): Promise<Jeune[]> {

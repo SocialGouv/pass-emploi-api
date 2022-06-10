@@ -44,7 +44,7 @@ import {
 import { GetConseillerByEmailQueryHandler } from '../../application/queries/get-conseiller-by-email.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler.db'
-import { GetResumeActionsDesJeunesDuConseillerQueryHandler } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler'
+import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
 import {
   DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel,
@@ -90,7 +90,7 @@ export class ConseillersController {
     private readonly getDetailConseillerQueryHandler: GetDetailConseillerQueryHandler,
     private readonly getConseillerByEmailQueryHandler: GetConseillerByEmailQueryHandler,
     private readonly getJeunesByConseillerQueryHandler: GetJeunesByConseillerQueryHandler,
-    private readonly getResumeActionsDesJeunesDuConseillerQueryHandler: GetResumeActionsDesJeunesDuConseillerQueryHandler,
+    private readonly getResumeActionsDesJeunesDuConseillerQueryHandler: GetResumeActionsDesJeunesDuConseillerQueryHandlerDb,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly creerJeunePoleEmploiCommandHandler: CreerJeunePoleEmploiCommandHandler,
     private readonly sendNotificationNouveauMessage: SendNotificationNouveauMessageCommandHandler,

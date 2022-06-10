@@ -1,9 +1,6 @@
 import { DateTime } from 'luxon'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
-import {
-  JeuneQueryModel,
-  ResumeActionsDuJeuneQueryModel
-} from 'src/application/queries/query-models/jeunes.query-model'
+import { JeuneQueryModel } from 'src/application/queries/query-models/jeunes.query-model'
 import { Brand } from '../building-blocks/types/brand'
 import { DateService } from '../utils/date-service'
 import { Conseiller } from './conseiller'
@@ -30,25 +27,33 @@ export namespace Jeune {
 
   export interface Repository {
     get(id: string): Promise<Jeune | undefined>
+
     getJeunesMilo(offset: number, limit: number): Promise<Jeune[]>
+
     existe(id: string): Promise<boolean>
+
     getByEmail(email: string): Promise<Jeune | undefined>
+
     getByIdDossier(idDossier: string): Promise<Jeune | undefined>
+
     save(jeune: Jeune): Promise<void>
+
     findAllJeunesByConseiller(
       idsJeunes: string[],
       idConseiller: string
     ): Promise<Jeune[]>
+
     supprimer(idJeune: Jeune.Id): Promise<void>
-    getResumeActionsDesJeunesDuConseiller(
-      idConseiller: string
-    ): Promise<ResumeActionsDuJeuneQueryModel[]>
+
     getHomeQueryModel(idJeune: string): Promise<JeuneHomeQueryModel>
+
     getJeuneQueryModelByIdDossier(
       idDossier: string,
       idConseiller: string
     ): Promise<JeuneQueryModel | undefined>
+
     saveAll(jeunes: Jeune[]): Promise<void>
+
     creerTransferts(
       idConseillerSource: string,
       idConseillerCible: string,
