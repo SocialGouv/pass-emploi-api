@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { Result } from '../building-blocks/types/result'
+import { failure, Result, success } from '../building-blocks/types/result'
 import { DateService } from '../utils/date-service'
+import { MauvaiseCommandeError } from '../building-blocks/types/domain-error'
 
 export const DemarcheRepositoryToken = 'DemarcheRepositoryToken'
 const POURQUOI_DEMARCHE_PERSO = 'P01'
@@ -31,14 +32,14 @@ export namespace Demarche {
     id: string
     dateModification: DateTime
     statut: Demarche.Statut
-    dateDebut?: DateTime | null
+    dateDebut?: DateTime
     dateFin?: DateTime
     dateAnnulation?: DateTime
   }
+
   export interface Creee {
     statut: Demarche.Statut
     dateCreation: DateTime
-    dateDebut: DateTime
     dateFin: DateTime
     pourquoi: string
     quoi: string
@@ -74,10 +75,48 @@ export namespace Demarche {
       demarcheModifiee: Demarche.Modifiee,
       accessToken: string
     ): Promise<Result<Demarche>>
+
     save(
       demarche: Demarche.Creee,
       accessToken: string
     ): Promise<Result<Demarche>>
+  }
+
+  function mettreEnCours(
+    dateFin: Date,
+    maintenant: DateTime,
+    demarcheModifiee: Demarche.Modifiee
+  ): Result<Demarche.Modifiee> {
+    if (dateFin < maintenant.set({ hour: 12 }).toJSDate()) {
+      return failure(
+        new MauvaiseCommandeError(
+          'Une démarche en cours ne peut pas avoir une date de fin dans le passé'
+        )
+      )
+    }
+
+    return success({
+      ...demarcheModifiee,
+      dateDebut: maintenant
+    })
+  }
+
+  function realiser(
+    dateDebut: Date | undefined,
+    maintenant: DateTime,
+    demarcheModifiee: Demarche.Modifiee
+  ): Result<Demarche.Modifiee> {
+    if (dateDebut && dateDebut < maintenant.set({ hour: 12 }).toJSDate()) {
+      return success({
+        ...demarcheModifiee,
+        dateFin: maintenant
+      })
+    }
+    return success({
+      ...demarcheModifiee,
+      dateDebut: maintenant,
+      dateFin: maintenant
+    })
   }
 
   @Injectable()
@@ -87,64 +126,50 @@ export namespace Demarche {
     mettreAJourLeStatut(
       id: string,
       statut: Demarche.Statut,
+      dateFin: Date,
       dateDebut?: Date
-    ): Demarche.Modifiee {
-      const maintenant = this.dateService.now()
+    ): Result<Demarche.Modifiee> {
+      const maintenant = this.dateService.now().set({ hour: 12 })
 
       const demarcheModifiee: Demarche.Modifiee = {
         id,
         statut,
-        dateModification: maintenant
+        dateModification: maintenant,
+        dateFin: DateTime.fromJSDate(dateFin).toUTC()
       }
 
-      if (statut === Demarche.Statut.REALISEE) {
-        if (dateDebut && dateDebut < maintenant.toJSDate()) {
-          return {
+      switch (statut) {
+        case Demarche.Statut.EN_COURS:
+          return mettreEnCours(dateFin, maintenant, demarcheModifiee)
+        case Demarche.Statut.REALISEE:
+          return realiser(dateDebut, maintenant, demarcheModifiee)
+        case Demarche.Statut.A_FAIRE:
+          return success({
             ...demarcheModifiee,
-            dateFin: maintenant
-          }
-        }
-        return {
-          ...demarcheModifiee,
-          dateDebut: maintenant,
-          dateFin: maintenant
-        }
-      }
-
-      if (statut === Demarche.Statut.A_FAIRE) {
-        return {
-          ...demarcheModifiee,
-          dateDebut: null
-        }
-      }
-
-      if (statut === Demarche.Statut.ANNULEE) {
-        return {
-          ...demarcheModifiee,
-          dateAnnulation: maintenant
-        }
-      }
-
-      return {
-        ...demarcheModifiee,
-        dateDebut: maintenant
+            dateDebut: undefined
+          })
+        case Demarche.Statut.ANNULEE:
+          return success({
+            ...demarcheModifiee,
+            dateAnnulation: maintenant,
+            dateDebut: undefined,
+            dateFin: undefined
+          })
       }
     }
 
     creerDemarchePerso(description: string, dateFin: Date): Demarche.Creee {
-      const maintenant = this.dateService.now()
+      const maintenant = this.dateService.now().set({ hour: 12 })
       const dateTimeFin = DateTime.fromJSDate(dateFin)
 
-      const demarche: Demarche.Creee = {
+      return {
         statut: Demarche.Statut.A_FAIRE,
         dateCreation: maintenant,
-        dateDebut: dateTimeFin,
         dateFin: dateTimeFin,
         pourquoi: POURQUOI_DEMARCHE_PERSO,
         quoi: QUOI_DEMARCHE_PERSO,
         description
       }
-      return demarche
     }
   }
 }

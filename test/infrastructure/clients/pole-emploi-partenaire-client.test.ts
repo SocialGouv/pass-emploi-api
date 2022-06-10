@@ -176,14 +176,14 @@ describe('PoleEmploiPartenaireClient', () => {
             id: 'idDemarche',
             statut: Demarche.Statut.A_FAIRE,
             dateModification: uneDatetime,
-            dateDebut: null
+            dateDebut: undefined
           }
           const body = {
             id: demarcheModifiee.id,
             dateModification: '2020-04-06T12:00:00.000',
             origineModificateur: 'INDIVIDU',
             etat: 'AC',
-            dateDebut: null,
+            dateDebut: undefined,
             dateFin: undefined,
             dateAnnulation: undefined
           }
@@ -247,7 +247,6 @@ describe('PoleEmploiPartenaireClient', () => {
     const demarche: Demarche.Creee = {
       statut: Demarche.Statut.A_FAIRE,
       dateCreation: uneDatetime,
-      dateDebut: uneDatetime,
       dateFin: uneDatetime,
       pourquoi: 'test',
       quoi: 'test',
@@ -257,7 +256,6 @@ describe('PoleEmploiPartenaireClient', () => {
       origineCreateur: 'INDIVIDU',
       etat: 'AC',
       dateCreation: '2020-04-06T12:00:00.000',
-      dateDebut: '2020-04-06T12:00:00.000',
       dateFin: '2020-04-06T12:00:00.000',
       pourquoi: 'test',
       quoi: 'test',

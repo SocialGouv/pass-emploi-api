@@ -4,6 +4,7 @@ import {
   DemarcheDto,
   DemarcheDtoEtat
 } from '../../../infrastructure/clients/dto/pole-emploi.dto'
+import { DateTime } from 'luxon'
 
 export function fromDemarcheDtoToDemarche(
   demarcheDto: DemarcheDto,
@@ -31,13 +32,16 @@ export function fromDemarcheDtoToDemarche(
       demarcheDto.dateCreation
     ),
     attributs: buildAttributs(demarcheDto),
-    statutsPossibles: buildStatutsPossibles(demarcheDto),
+    statutsPossibles: buildStatutsPossibles(demarcheDto, dateService.nowJs()),
     modifieParConseiller: demarcheDto.origineModificateur === 'CONSEILLER',
     creeeParConseiller: demarcheDto.origineCreateur === 'CONSEILLER'
   }
 }
 
-function buildStatutsPossibles(demarcheDto: DemarcheDto): Demarche.Statut[] {
+function buildStatutsPossibles(
+  demarcheDto: DemarcheDto,
+  maintenant: Date
+): Demarche.Statut[] {
   const statuts: Demarche.Statut[] = []
 
   if (demarcheDto.droitsDemarche?.annulation) {
@@ -54,7 +58,13 @@ function buildStatutsPossibles(demarcheDto: DemarcheDto): Demarche.Statut[] {
     (demarcheDto.etat === 'RE' && demarcheDto.droitsDemarche?.replanification)
   ) {
     statuts.push(Demarche.Statut.A_FAIRE)
-    statuts.push(Demarche.Statut.EN_COURS)
+
+    const dateFin = DateTime.fromISO(demarcheDto.dateFin)
+      .set({ hour: 12 })
+      .toJSDate()
+    if (dateFin > maintenant) {
+      statuts.push(Demarche.Statut.EN_COURS)
+    }
   }
 
   return statuts
@@ -120,16 +130,16 @@ function buildStatut(
   demarcheDto: DemarcheDto,
   dateService: DateService
 ): Demarche.Statut {
-  const maintenant = dateService.nowJs().getTime()
+  const aujourdhuiAMidi = dateService.now().set({ hour: 12 })
   const debut = demarcheDto.dateDebut
-    ? new Date(demarcheDto.dateDebut).getTime()
+    ? DateTime.fromISO(demarcheDto.dateDebut)
     : undefined
 
   switch (demarcheDto.etat) {
     case DemarcheDtoEtat.AC:
     case DemarcheDtoEtat.AF:
     case DemarcheDtoEtat.EC:
-      if (!debut || debut < maintenant) return Demarche.Statut.EN_COURS
+      if (debut && debut < aujourdhuiAMidi) return Demarche.Statut.EN_COURS
       return Demarche.Statut.A_FAIRE
     case DemarcheDtoEtat.RE:
       return Demarche.Statut.REALISEE

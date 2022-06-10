@@ -1,6 +1,6 @@
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { Result } from '../../building-blocks/types/result'
+import { isFailure, Result } from '../../building-blocks/types/result'
 import { Inject, Injectable } from '@nestjs/common'
 import { Authentification } from '../../domain/authentification'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
@@ -12,6 +12,7 @@ export interface UpdateStatutDemarcheCommand extends Command {
   accessToken: string
   idDemarche: string
   dateDebut?: Date
+  dateFin: Date
   statut: Demarche.Statut
 }
 
@@ -40,15 +41,18 @@ export class UpdateStatutDemarcheCommandHandler extends CommandHandler<
   async handle(
     command: UpdateStatutDemarcheCommand
   ): Promise<Result<Demarche>> {
-    const demarcheMiseAJour = this.demarcheFactory.mettreAJourLeStatut(
+    const result = this.demarcheFactory.mettreAJourLeStatut(
       command.idDemarche,
       command.statut,
+      command.dateFin,
       command.dateDebut
     )
-    return this.demarcheRepository.update(
-      demarcheMiseAJour,
-      command.accessToken
-    )
+
+    if (isFailure(result)) {
+      return result
+    }
+
+    return this.demarcheRepository.update(result.data, command.accessToken)
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

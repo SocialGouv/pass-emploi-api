@@ -13,7 +13,8 @@ import { uneDatetime } from '../../fixtures/date.fixture'
 import {
   emptySuccess,
   failure,
-  isSuccess
+  isSuccess,
+  success
 } from '../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { uneDemarche } from '../../fixtures/demarche.fixture'
@@ -49,7 +50,8 @@ describe('UpdateDemarcheCommandHandler', () => {
         accessToken: 'accessToken',
         dateDebut: demarche.dateDebut,
         idDemarche: demarche.id,
-        statut: Demarche.Statut.EN_COURS
+        statut: Demarche.Statut.EN_COURS,
+        dateFin: uneDatetime.toJSDate()
       }
 
       describe('quand la mise a jour se passe bien', () => {
@@ -59,11 +61,17 @@ describe('UpdateDemarcheCommandHandler', () => {
             id: 'idDemarche',
             statut: Demarche.Statut.EN_COURS,
             dateModification: uneDatetime,
+            dateFin: uneDatetime,
             dateDebut: uneDatetime
           }
           demarcheFactory.mettreAJourLeStatut
-            .withArgs(demarche.id, command.statut, demarche.dateDebut)
-            .returns(demarcheModifiee)
+            .withArgs(
+              command.idDemarche,
+              command.statut,
+              command.dateFin,
+              command.dateDebut
+            )
+            .returns(success(demarcheModifiee))
 
           demarcheRepository.update
             .withArgs(demarcheModifiee, command.accessToken)
@@ -83,11 +91,17 @@ describe('UpdateDemarcheCommandHandler', () => {
             id: 'idDemarche',
             statut: Demarche.Statut.EN_COURS,
             dateModification: uneDatetime,
-            dateDebut: uneDatetime
+            dateDebut: uneDatetime,
+            dateFin: uneDatetime
           }
           demarcheFactory.mettreAJourLeStatut
-            .withArgs(demarche.id, command.statut!, demarche.dateDebut)
-            .returns(demarcheModifiee)
+            .withArgs(
+              command.idDemarche,
+              command.statut!,
+              command.dateFin,
+              command.dateDebut
+            )
+            .returns(success(demarcheModifiee))
 
           const erreurHttp = failure(new ErreurHttp("C'est mauvais", 400))
           demarcheRepository.update
@@ -111,7 +125,8 @@ describe('UpdateDemarcheCommandHandler', () => {
         idJeune: 'idJeune',
         accessToken: 'accessToken',
         idDemarche: demarche.id,
-        statut: demarche.statut
+        statut: demarche.statut,
+        dateFin: demarche.dateFin
       }
 
       // When

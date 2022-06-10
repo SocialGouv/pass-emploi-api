@@ -99,10 +99,9 @@ export class PoleEmploiPartenaireClient {
         }),
         origineModificateur: ORIGINE,
         etat: toEtat(demarcheModifiee.statut),
-        dateDebut:
-          demarcheModifiee.dateDebut === null
-            ? null
-            : demarcheModifiee.dateDebut?.toISO({ includeOffset: false }),
+        dateDebut: demarcheModifiee.dateDebut
+          ? demarcheModifiee.dateDebut?.toISO({ includeOffset: false })
+          : undefined,
         dateFin: demarcheModifiee.dateFin?.toISO({ includeOffset: false }),
         dateAnnulation: demarcheModifiee.dateAnnulation?.toISO({
           includeOffset: false
@@ -135,7 +134,6 @@ export class PoleEmploiPartenaireClient {
         dateCreation: demarche.dateCreation.toISO({
           includeOffset: false
         }),
-        dateDebut: demarche.dateDebut.toISO({ includeOffset: false }),
         dateFin: demarche.dateFin.toISO({ includeOffset: false }),
         pourquoi: demarche.pourquoi,
         quoi: demarche.quoi,

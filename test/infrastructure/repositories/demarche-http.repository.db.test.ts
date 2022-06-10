@@ -69,7 +69,7 @@ describe('DemarcheHttpRepository', () => {
             label: '',
             modifieParConseiller: false,
             sousTitre: undefined,
-            statut: Demarche.Statut.EN_COURS,
+            statut: Demarche.Statut.A_FAIRE,
             statutsPossibles: [],
             titre: ''
           }
@@ -107,7 +107,6 @@ describe('DemarcheHttpRepository', () => {
         const demarche: Demarche.Creee = {
           statut: Demarche.Statut.A_FAIRE,
           dateCreation: uneDatetime,
-          dateDebut: uneDatetime,
           dateFin: uneDatetime,
           pourquoi: 'string',
           quoi: 'string'
@@ -128,16 +127,16 @@ describe('DemarcheHttpRepository', () => {
             codeDemarche: 'eyJxdW9pIjoiIiwicG91cnF1b2kiOiIifQ==',
             contenu: undefined,
             creeeParConseiller: false,
-            dateCreation: undefined,
             dateFin: undefined,
             dateDebut: undefined,
+            dateCreation: undefined,
             dateModification: undefined,
             dateAnnulation: undefined,
             id: 'id-demarche',
             label: '',
             modifieParConseiller: false,
             sousTitre: undefined,
-            statut: Demarche.Statut.EN_COURS,
+            statut: Demarche.Statut.A_FAIRE,
             statutsPossibles: [],
             titre: ''
           }
@@ -150,7 +149,6 @@ describe('DemarcheHttpRepository', () => {
         const demarche: Demarche.Creee = {
           statut: Demarche.Statut.A_FAIRE,
           dateCreation: uneDatetime,
-          dateDebut: uneDatetime,
           dateFin: uneDatetime,
           pourquoi: 'string',
           quoi: 'string'
