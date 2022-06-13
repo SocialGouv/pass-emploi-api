@@ -53,8 +53,9 @@ function buildStatutsPossibles(
   }
 
   if (
-    demarcheDto.etat === 'AC' &&
-    demarcheDto.droitsDemarche?.modificationDate
+    (demarcheDto.etat === 'AC' &&
+      demarcheDto.droitsDemarche?.modificationDate) ||
+    (demarcheDto.etat === 'RE' && demarcheDto.droitsDemarche?.replanification)
   ) {
     statuts.push(Demarche.Statut.A_FAIRE)
 
