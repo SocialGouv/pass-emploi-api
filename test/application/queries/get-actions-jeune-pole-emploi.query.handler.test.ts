@@ -256,20 +256,6 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
           })
         })
       })
-      describe('quand la replanification est possible', () => {
-        it('autorise a faire et en cours', async () => {
-          // Given
-          demarcheDto.etat = DemarcheDtoEtat.RE
-          demarcheDto.droitsDemarche!.replanification = true
-          // When
-          const queryModel = fromDemarcheDtoToDemarche(demarcheDto, dateService)
-          // Then
-          expect(queryModel.statutsPossibles).to.deep.equal([
-            Demarche.Statut.A_FAIRE,
-            Demarche.Statut.EN_COURS
-          ])
-        })
-      })
     })
   })
 
