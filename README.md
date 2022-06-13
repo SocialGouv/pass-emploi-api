@@ -11,7 +11,7 @@
 
 ### Mettre à jour les variables d'environnement
 1. Mettre à jour les variables désirées dans ```.environment``` entre les balises // BEGIN VAULT et //END VAULT
-2. Exécuter ```dotvault decrypt```
+2. Exécuter ```dotvault encrypt```
 3. Pousser sur git
 
 ## Lancement
