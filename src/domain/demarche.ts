@@ -97,7 +97,7 @@ export namespace Demarche {
 
     return success({
       ...demarcheModifiee,
-      dateDebut: maintenant
+      dateDebut: maintenant.set({ hour: 12 })
     })
   }
 
@@ -106,16 +106,17 @@ export namespace Demarche {
     maintenant: DateTime,
     demarcheModifiee: Demarche.Modifiee
   ): Result<Demarche.Modifiee> {
-    if (dateDebut && dateDebut < maintenant.set({ hour: 12 }).toJSDate()) {
+    const maintenantA12Heures = maintenant.set({ hour: 12 })
+    if (dateDebut && dateDebut < maintenantA12Heures.toJSDate()) {
       return success({
         ...demarcheModifiee,
-        dateFin: maintenant
+        dateFin: maintenantA12Heures
       })
     }
     return success({
       ...demarcheModifiee,
-      dateDebut: maintenant,
-      dateFin: maintenant
+      dateDebut: maintenantA12Heures,
+      dateFin: maintenantA12Heures
     })
   }
 
@@ -129,7 +130,7 @@ export namespace Demarche {
       dateFin: Date,
       dateDebut?: Date
     ): Result<Demarche.Modifiee> {
-      const maintenant = this.dateService.now().set({ hour: 12 })
+      const maintenant = this.dateService.now()
 
       const demarcheModifiee: Demarche.Modifiee = {
         id,
