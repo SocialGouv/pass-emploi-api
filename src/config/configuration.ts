@@ -13,13 +13,7 @@ export default () => {
   }
 
   const databaseUrl = process.env.DATABASE_URL as string
-  const {
-    host,
-    port,
-    database,
-    user,
-    password
-  } = parse(databaseUrl)
+  const { host, port, database, user, password } = parse(databaseUrl)
   const configuration = {
     environment: process.env.ENVIRONMENT,
     isWeb: process.env.IS_WEB !== 'false',
@@ -116,7 +110,7 @@ export default () => {
       }
     },
     s3: {
-      endpoint: process.env.S3_ENDPOINT ?? 'https://s3.gra.cloud.ovh.net',
+      endpoint: process.env.S3_ENDPOINT ?? 'https://s3.gra.perf.cloud.ovh.net',
       region: process.env.S3_REGION ?? 'GRA',
       accessKeyId: process.env.S3_ACCESS_KEY_ID,
       secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
