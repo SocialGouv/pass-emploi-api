@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import {
   failure,
   isFailure,
@@ -12,17 +13,13 @@ import {
 } from 'src/domain/offre-emploi'
 import { Recherche, RecherchesRepositoryToken } from 'src/domain/recherche'
 import { DateService } from 'src/utils/date-service'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
-import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune'
-import {
-  Notification,
-  NotificationRepositoryToken
-} from '../../../domain/notification'
-import { OffresEmploiQueryModel } from '../../queries/query-models/offres-emploi.query-model'
-import { ErreurHttp } from '../../../building-blocks/types/domain-error'
-import { GetOffresEmploiQuery } from '../../queries/get-offres-emploi.query.handler'
 import { Command } from '../../../building-blocks/types/command'
-import { ConfigService } from '@nestjs/config'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import { ErreurHttp } from '../../../building-blocks/types/domain-error'
+import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune'
+import { Notification } from '../../../domain/notification'
+import { GetOffresEmploiQuery } from '../../queries/get-offres-emploi.query.handler'
+import { OffresEmploiQueryModel } from '../../queries/query-models/offres-emploi.query-model'
 
 @Injectable()
 export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
@@ -35,8 +32,7 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
     private rechercheRepository: Recherche.Repository,
     @Inject(OffresEmploiRepositoryToken)
     private offresEmploiRepository: OffresEmploi.Repository,
-    @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository,
+    private notificationService: Notification.Service,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     private configuration: ConfigService
@@ -90,16 +86,10 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
             if (resultat.value.data.results.length) {
               const jeune = await this.jeuneRepository.get(recherche.idJeune)
 
-              if (jeune?.pushNotificationToken) {
-                stats.notificationsEnvoyees = stats.notificationsEnvoyees + 1
-
-                const notification = Notification.createNouvelleOffre(
-                  jeune.pushNotificationToken,
-                  recherche.id,
-                  recherche.titre
-                )
-                await this.notificationRepository.send(notification)
-              }
+              await this.notificationService.notifierNouvellesOffres(
+                recherche,
+                jeune
+              )
             }
           }
 
