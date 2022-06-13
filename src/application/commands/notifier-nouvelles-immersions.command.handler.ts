@@ -3,10 +3,7 @@ import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { Result, success } from '../../building-blocks/types/result'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
-import {
-  Notification,
-  NotificationRepositoryToken
-} from '../../domain/notification'
+import { Notification } from '../../domain/notification'
 import { Recherche, RecherchesRepositoryToken } from '../../domain/recherche'
 import { DateService } from '../../utils/date-service'
 import { GetOffresImmersionQuery } from '../queries/get-offres-immersion.query.handler'
@@ -33,8 +30,7 @@ export class NotifierNouvellesImmersionsCommandHandler extends CommandHandler<
     @Inject(RecherchesRepositoryToken)
     private recherchesRepository: Recherche.Repository,
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
-    @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository,
+    private notificationService: Notification.Service,
     private dateService: DateService
   ) {
     super('NotifierNouvellesImmersionsHandler')
@@ -100,15 +96,7 @@ export class NotifierNouvellesImmersionsCommandHandler extends CommandHandler<
 
   async notifier(recherche: Recherche): Promise<void> {
     const jeune = await this.jeuneRepository.get(recherche.idJeune)
-
-    if (jeune?.pushNotificationToken) {
-      const notification = Notification.createNouvelleOffre(
-        jeune.pushNotificationToken,
-        recherche.id,
-        recherche.titre
-      )
-      await this.notificationRepository.send(notification)
-    }
+    await this.notificationService.notifierNouvellesOffres(recherche, jeune)
   }
 
   async authorize(

@@ -1,24 +1,21 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
-import { Recherche, RecherchesRepositoryToken } from '../../../domain/recherche'
-import {
-  Notification,
-  NotificationRepositoryToken
-} from '../../../domain/notification'
-import { DateService } from '../../../utils/date-service'
-import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune'
 import {
   isFailure,
   Result,
   success
 } from '../../../building-blocks/types/result'
+import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune'
+import { Notification } from '../../../domain/notification'
 import {
-  OffreServiceCiviqueRepositoryToken,
-  OffreServiceCivique
+  OffreServiceCivique,
+  OffreServiceCiviqueRepositoryToken
 } from '../../../domain/offre-service-civique'
+import { Recherche, RecherchesRepositoryToken } from '../../../domain/recherche'
+import { DateService } from '../../../utils/date-service'
 import { GetServicesCiviqueQuery } from '../../queries/get-services-civique.query.handler'
-import { DateTime } from 'luxon'
 
 export type HandleJobNotifierNouveauxServicesCiviqueCommand = Command
 
@@ -35,8 +32,7 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
     private rechercheRepository: Recherche.Repository,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
-    @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository,
+    private notificationService: Notification.Service,
     @Inject(OffreServiceCiviqueRepositoryToken)
     private offreEngagementRepository: OffreServiceCivique.Repository,
     private dateService: DateService
@@ -132,14 +128,7 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
       etat: Recherche.Etat.SUCCES
     })
 
-    if (jeune?.pushNotificationToken) {
-      const notification = Notification.createNouvelleOffre(
-        jeune.pushNotificationToken,
-        recherche.id,
-        recherche.titre
-      )
-      await this.notificationRepository.send(notification)
-    }
+    await this.notificationService.notifierNouvellesOffres(recherche, jeune)
   }
 
   async authorize(): Promise<void> {

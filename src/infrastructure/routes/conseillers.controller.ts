@@ -36,7 +36,6 @@ import { Authentification } from 'src/domain/authentification'
 import { CreateActionCommandHandler } from '../../application/commands/create-action.command.handler'
 import { CreerJeuneMiloCommandHandler } from '../../application/commands/creer-jeune-milo.command.handler'
 import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/creer-jeune-pole-emploi.command.handler'
-import { SendNotificationNouveauMessageCommandHandler } from '../../application/commands/send-notification-nouveau-message.command.handler'
 import {
   SendNotificationsNouveauxMessagesCommand,
   SendNotificationsNouveauxMessagesCommandHandler
@@ -93,7 +92,6 @@ export class ConseillersController {
     private readonly getResumeActionsDesJeunesDuConseillerQueryHandler: GetResumeActionsDesJeunesDuConseillerQueryHandlerDb,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly creerJeunePoleEmploiCommandHandler: CreerJeunePoleEmploiCommandHandler,
-    private readonly sendNotificationNouveauMessage: SendNotificationNouveauMessageCommandHandler,
     private readonly sendNotificationsNouveauxMessages: SendNotificationsNouveauxMessagesCommandHandler,
     private readonly getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler,
     private readonly createRendezVousCommandHandler: CreateRendezVousCommandHandler,
@@ -312,35 +310,6 @@ export class ConseillersController {
       },
       utilisateur
     )
-  }
-
-  @ApiOperation({
-    summary: 'Deprecated (Web)',
-    deprecated: true
-  })
-  @Post(':idConseiller/jeunes/:idJeune/notify-message')
-  async postNotificationDeprecated(
-    @Param('idConseiller') idConseiller: string,
-    @Param('idJeune') idJeune: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    const result = await this.sendNotificationNouveauMessage.execute(
-      {
-        idConseiller,
-        idJeune
-      },
-      utilisateur
-    )
-    if (isFailure(result)) {
-      if (
-        result.error.code === NonTrouveError.CODE ||
-        result.error.code === JeuneNonLieAuConseillerError.CODE
-      ) {
-        throw new NotFoundException(result.error)
-      } else {
-        throw new RuntimeException()
-      }
-    }
   }
 
   @ApiOperation({

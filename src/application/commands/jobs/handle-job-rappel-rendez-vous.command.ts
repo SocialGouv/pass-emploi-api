@@ -53,7 +53,7 @@ export class HandleJobRappelRendezVousCommandHandler extends CommandHandler<
           if (!jeune.pushNotificationToken) {
             stats.push({ idJeune: jeune.id, notificationEnvoyee: false })
           } else {
-            const notification = Notification.createRappelRdv(
+            const notification = Notification.creerNotificationRappelRdv(
               jeune.pushNotificationToken,
               command.job.contenu.idRendezVous,
               DateTime.fromJSDate(rendezVous.date),

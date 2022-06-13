@@ -4,10 +4,7 @@ import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
-import {
-  Notification,
-  NotificationRepositoryToken
-} from '../../domain/notification'
+import { Notification } from '../../domain/notification'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 
 export interface SendNotificationsNouveauxMessagesCommand extends Command {
@@ -23,8 +20,7 @@ export class SendNotificationsNouveauxMessagesCommandHandler extends CommandHand
   constructor(
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
-    @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository,
+    private notificationService: Notification.Service,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('SendNotificationsNouveauxMessagesCommandHandler')
@@ -38,21 +34,9 @@ export class SendNotificationsNouveauxMessagesCommandHandler extends CommandHand
       command.idConseiller
     )
 
-    for (const jeune of jeunes) {
-      this.envoyerNotification(jeune)
-    }
+    this.notificationService.notifierLesJeunesDuNouveauMessage(jeunes)
 
     return emptySuccess()
-  }
-
-  private async envoyerNotification(jeune: Jeune): Promise<void> {
-    if (jeune.pushNotificationToken) {
-      const notification = Notification.createNouveauMessage(
-        jeune.pushNotificationToken
-      )
-      await this.notificationRepository.send(notification)
-      this.logger.log(`Notification envoyée pour le jeune ${jeune.id}`)
-    }
   }
 
   async authorize(
