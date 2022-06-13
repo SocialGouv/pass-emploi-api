@@ -8,18 +8,15 @@ import {
 } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
-import {
-  Notification,
-  NotificationRepositoryToken
-} from '../../domain/notification'
+import { Mail, MailServiceToken } from '../../domain/mail'
+import { Notification } from '../../domain/notification'
 import { PlanificateurService } from '../../domain/planificateur'
 import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
 import { IdService } from '../../utils/id-service'
-import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
-import { Mail, MailServiceToken } from '../../domain/mail'
-import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { buildError } from '../../utils/logger.module'
+import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 
 export interface CreateRendezVousCommand extends Command {
   idsJeunes: string[]
@@ -48,8 +45,7 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
-    @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository,
+    private notificationService: Notification.Service,
     @Inject(MailServiceToken)
     private mailService: Mail.Service,
     private conseillerAuthorizer: ConseillerAuthorizer,
@@ -83,7 +79,10 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     )
     await this.rendezVousRepository.save(rendezVous)
 
-    this.notifierLesJeunes(rendezVous)
+    this.notificationService.notifierLesJeunesDuRdv(
+      rendezVous,
+      Notification.Type.NEW_RENDEZVOUS
+    )
     this.planifierLesRappelsDeRendezVous(rendezVous)
     if (rendezVous.invitation) {
       this.envoyerLesInvitationsCalendaires(
@@ -136,22 +135,6 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       )
       this.apmService.captureError(e)
     }
-  }
-
-  private notifierLesJeunes(rendezVous: RendezVous): void {
-    rendezVous.jeunes.forEach(jeune => {
-      if (jeune.pushNotificationToken) {
-        const notification = Notification.createNouveauRdv(
-          jeune.pushNotificationToken,
-          rendezVous.id
-        )
-        this.notificationRepository.send(notification)
-      } else {
-        this.logger.log(
-          `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
-        )
-      }
-    })
   }
 
   async authorize(

@@ -10,15 +10,12 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import {
-  Notification,
-  NotificationRepositoryToken
-} from '../../domain/notification'
+import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
+import { Mail, MailServiceToken } from '../../domain/mail'
+import { Notification } from '../../domain/notification'
 import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
 import { buildError } from '../../utils/logger.module'
 import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
-import { Mail, MailServiceToken } from '../../domain/mail'
-import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 
 export interface DeleteRendezVousCommand extends Command {
   idRendezVous: string
@@ -34,8 +31,7 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     private rendezVousRepository: RendezVous.Repository,
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
-    @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository,
+    private notificationService: Notification.Service,
     private rendezVousAuthorizer: RendezVousAuthorizer,
     private planificateurService: PlanificateurService,
     @Inject(MailServiceToken)
@@ -52,20 +48,9 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     }
     await this.rendezVousRepository.delete(command.idRendezVous)
 
-    await Promise.all(
-      rendezVous.jeunes.map(async jeune => {
-        if (jeune.pushNotificationToken) {
-          const notification = Notification.createRdvSupprime(
-            jeune.pushNotificationToken,
-            rendezVous.date
-          )
-          await this.notificationRepository.send(notification)
-        } else {
-          this.logger.log(
-            `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
-          )
-        }
-      })
+    this.notificationService.notifierLesJeunesDuRdv(
+      rendezVous,
+      Notification.Type.DELETED_RENDEZVOUS
     )
 
     try {

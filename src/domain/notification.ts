@@ -1,5 +1,10 @@
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { DateService } from '../utils/date-service'
+import { Action } from './action'
+import { Jeune } from './jeune'
+import { Recherche } from './recherche'
+import { RendezVous } from './rendez-vous'
 
 export const NotificationRepositoryToken = 'NotificationRepositoryToken'
 
@@ -8,14 +13,20 @@ export namespace Notification {
     send(message: Notification.Message): Promise<void>
   }
 
-  enum Type {
+  export enum Type {
     NEW_ACTION = 'NEW_ACTION',
     NEW_RENDEZVOUS = 'NEW_RENDEZVOUS',
     RAPPEL_RENDEZVOUS = 'RAPPEL_RENDEZVOUS',
     DELETED_RENDEZVOUS = 'DELETED_RENDEZVOUS',
+    UPDATED_RENDEZVOUS = 'UPDATED_RENDEZVOUS',
     NEW_MESSAGE = 'NEW_MESSAGE',
     NOUVELLE_OFFRE = 'NOUVELLE_OFFRE'
   }
+
+  type TypeRdv =
+    | Type.NEW_RENDEZVOUS
+    | Type.DELETED_RENDEZVOUS
+    | Type.UPDATED_RENDEZVOUS
 
   export interface Message {
     token: string
@@ -29,7 +40,7 @@ export namespace Notification {
     }
   }
 
-  export function createNouvelleAction(
+  function creerNotificationNouvelleAction(
     token: string,
     idAction: string
   ): Notification.Message {
@@ -46,7 +57,7 @@ export namespace Notification {
     }
   }
 
-  export function createNouvelleOffre(
+  function creerNotificationNouvelleOffre(
     token: string,
     idRecherche: string,
     titre: string
@@ -64,7 +75,7 @@ export namespace Notification {
     }
   }
 
-  export function createNouveauRdv(
+  function creerNotificationNouveauRdv(
     token: string,
     idRdv: string
   ): Notification.Message {
@@ -80,8 +91,7 @@ export namespace Notification {
       }
     }
   }
-
-  export function createRendezVousMisAJour(
+  function creerNotificationRendezVousMisAJour(
     token: string,
     idRdv: string
   ): Notification.Message {
@@ -92,13 +102,12 @@ export namespace Notification {
         body: 'Votre rendez-vous a été modifié'
       },
       data: {
-        type: Type.NEW_RENDEZVOUS,
+        type: Type.UPDATED_RENDEZVOUS,
         id: idRdv
       }
     }
   }
-
-  export function createRappelRdv(
+  export function creerNotificationRappelRdv(
     token: string,
     idRdv: string,
     dateRdv: DateTime,
@@ -136,8 +145,7 @@ export namespace Notification {
       }
     }
   }
-
-  export function createRdvSupprime(
+  function creerNotificationRdvSupprime(
     token: string,
     date: Date
   ): Notification.Message {
@@ -154,7 +162,9 @@ export namespace Notification {
     }
   }
 
-  export function createNouveauMessage(token: string): Notification.Message {
+  function creerNotificationNouveauMessage(
+    token: string
+  ): Notification.Message {
     return {
       token,
       notification: {
@@ -163,6 +173,117 @@ export namespace Notification {
       },
       data: {
         type: Type.NEW_MESSAGE
+      }
+    }
+  }
+
+  @Injectable()
+  export class Service {
+    private logger: Logger
+
+    constructor(
+      @Inject(NotificationRepositoryToken)
+      private notificationRepository: Notification.Repository
+    ) {
+      this.logger = new Logger('NotificationService')
+    }
+
+    private logMessageSucces(idJeune: string): void {
+      this.logger.log(`Notification envoyée pour le jeune ${idJeune}`)
+    }
+    private logMessageEchec(idJeune: string): void {
+      this.logger.log(
+        `Le jeune ${idJeune} ne s'est jamais connecté sur l'application`
+      )
+    }
+
+    async notifierLesJeunesDuRdv(
+      rendezVous: RendezVous,
+      typeNotification: TypeRdv
+    ): Promise<void[]> {
+      return Promise.all(
+        rendezVous.jeunes.map(async jeune => {
+          if (jeune.pushNotificationToken) {
+            let notification: Notification.Message | undefined
+
+            switch (typeNotification) {
+              case Type.NEW_RENDEZVOUS:
+                notification = creerNotificationNouveauRdv(
+                  jeune.pushNotificationToken,
+                  rendezVous.id
+                )
+                break
+              case Type.UPDATED_RENDEZVOUS:
+                notification = creerNotificationRendezVousMisAJour(
+                  jeune.pushNotificationToken,
+                  rendezVous.id
+                )
+                break
+              case Type.DELETED_RENDEZVOUS:
+                notification = creerNotificationRdvSupprime(
+                  jeune.pushNotificationToken,
+                  rendezVous.date
+                )
+                break
+            }
+            if (notification) {
+              return this.notificationRepository.send(notification)
+            }
+          } else {
+            this.logMessageEchec(jeune.id)
+          }
+        })
+      )
+    }
+
+    async notifierLesJeunesDuNouveauMessage(jeunes: Jeune[]): Promise<void[]> {
+      return Promise.all(
+        jeunes.map(async jeune => {
+          if (jeune.pushNotificationToken) {
+            const notification = creerNotificationNouveauMessage(
+              jeune.pushNotificationToken
+            )
+            const promise = this.notificationRepository.send(notification)
+            this.logMessageSucces(jeune.id)
+            return promise
+          } else {
+            this.logMessageEchec(jeune.id)
+          }
+        })
+      )
+    }
+
+    async notifierNouvelleAction(jeune: Jeune, action: Action): Promise<void> {
+      if (jeune.pushNotificationToken) {
+        const notification = creerNotificationNouvelleAction(
+          jeune.pushNotificationToken,
+          action.id
+        )
+        const promise = this.notificationRepository.send(notification)
+        this.logMessageSucces(jeune.id)
+        return promise
+      } else {
+        this.logMessageEchec(jeune.id)
+      }
+    }
+
+    async notifierNouvellesOffres(
+      recherche: Recherche,
+      jeune?: Jeune
+    ): Promise<void> {
+      if (jeune) {
+        if (jeune.pushNotificationToken) {
+          const notification = creerNotificationNouvelleOffre(
+            jeune.pushNotificationToken,
+            recherche.id,
+            recherche.titre
+          )
+          const promise = this.notificationRepository.send(notification)
+          this.logMessageSucces(jeune.id)
+          return promise
+        } else {
+          this.logMessageEchec(jeune.id)
+        }
       }
     }
   }

@@ -9,10 +9,10 @@ import {
 } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import {
-  Notification,
-  NotificationRepositoryToken
-} from '../../domain/notification'
+import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { Mail, MailServiceToken } from '../../domain/mail'
+import { Notification } from '../../domain/notification'
 import { PlanificateurService } from '../../domain/planificateur'
 import {
   CodeTypeRendezVous,
@@ -20,11 +20,8 @@ import {
   RendezVous,
   RendezVousRepositoryToken
 } from '../../domain/rendez-vous'
-import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
-import { Mail, MailServiceToken } from '../../domain/mail'
-import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { buildError } from '../../utils/logger.module'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
 
 export interface UpdateRendezVousCommand extends Command {
   idRendezVous: string
@@ -48,8 +45,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     private rendezVousRepository: RendezVous.Repository,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
-    @Inject(NotificationRepositoryToken)
-    private notificationRepository: Notification.Repository,
+    private notificationService: Notification.Service,
     @Inject(MailServiceToken)
     private mailClient: Mail.Service,
     @Inject(ConseillersRepositoryToken)
@@ -148,12 +144,18 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       jeune => jeune.id
     )
 
-    const jeunesInchanges: JeuneDuRendezVous[] = jeunesAnciens.filter(
-      jeuneAncien => idsJeunesRdvUpdated.includes(jeuneAncien.id)
-    )
-    const jeunesSupprimes: JeuneDuRendezVous[] = jeunesAnciens.filter(
-      jeuneAncien => !idsJeunesRdvUpdated.includes(jeuneAncien.id)
-    )
+    const rdvMisAJour = {
+      ...rendezVous,
+      jeunes: jeunesAnciens.filter(jeuneAncien =>
+        idsJeunesRdvUpdated.includes(jeuneAncien.id)
+      )
+    }
+    const rdvSupprime = {
+      ...rendezVous,
+      jeunes: jeunesAnciens.filter(
+        jeuneAncien => !idsJeunesRdvUpdated.includes(jeuneAncien.id)
+      )
+    }
 
     const jeunesAjoutes: JeuneDuRendezVous[] = []
     for (const idJeune of idsJeunesRdvUpdated) {
@@ -165,49 +167,24 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
         jeunesAjoutes.push(jeuneAjoute!)
       }
     }
+    const nouveauRdv = {
+      ...rendezVous,
+      jeunesAjoutes
+    }
 
-    jeunesAjoutes.forEach(jeune => {
-      if (jeune.pushNotificationToken) {
-        const notification = Notification.createNouveauRdv(
-          jeune.pushNotificationToken,
-          rendezVous.id
-        )
-        this.notificationRepository.send(notification)
-      } else {
-        this.logger.log(
-          `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
-        )
-      }
-    })
-
-    jeunesSupprimes.forEach(jeune => {
-      if (jeune.pushNotificationToken) {
-        const notification = Notification.createRdvSupprime(
-          jeune.pushNotificationToken,
-          rendezVous.date
-        )
-        this.notificationRepository.send(notification)
-      } else {
-        this.logger.log(
-          `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
-        )
-      }
-    })
-
+    this.notificationService.notifierLesJeunesDuRdv(
+      rdvMisAJour,
+      Notification.Type.UPDATED_RENDEZVOUS
+    )
+    this.notificationService.notifierLesJeunesDuRdv(
+      nouveauRdv,
+      Notification.Type.NEW_RENDEZVOUS
+    )
     if (this.infosRendezVousSontModifies(rendezVous, rendezVousUpdated)) {
-      jeunesInchanges.forEach(jeune => {
-        if (jeune.pushNotificationToken) {
-          const notification = Notification.createRendezVousMisAJour(
-            jeune.pushNotificationToken,
-            rendezVous.id
-          )
-          this.notificationRepository.send(notification)
-        } else {
-          this.logger.log(
-            `Le jeune ${jeune.id} ne s'est jamais connecté sur l'application`
-          )
-        }
-      })
+      this.notificationService.notifierLesJeunesDuRdv(
+        rdvSupprime,
+        Notification.Type.DELETED_RENDEZVOUS
+      )
     }
   }
 

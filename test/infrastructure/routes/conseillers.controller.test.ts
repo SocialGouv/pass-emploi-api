@@ -17,7 +17,6 @@ import {
   CreerJeuneMiloCommand,
   CreerJeuneMiloCommandHandler
 } from '../../../src/application/commands/creer-jeune-milo.command.handler'
-import { SendNotificationNouveauMessageCommandHandler } from '../../../src/application/commands/send-notification-nouveau-message.command.handler'
 import { GetConseillerByEmailQueryHandler } from '../../../src/application/queries/get-conseiller-by-email.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
 import { GetJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-jeunes-by-conseiller.query.handler.db'
@@ -66,7 +65,6 @@ describe('ConseillersController', () => {
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
   let getJeunesByConseillerQueryHandler: StubbedClass<GetJeunesByConseillerQueryHandler>
-  let sendNotificationNouveauMessage: StubbedClass<SendNotificationNouveauMessageCommandHandler>
   let sendNotificationsNouveauxMessages: StubbedClass<SendNotificationsNouveauxMessagesCommandHandler>
   let getDossierMiloJeuneQueryHandler: StubbedClass<GetDossierMiloJeuneQueryHandler>
   let getJeuneMiloByDossierQueryHandler: StubbedClass<GetJeuneMiloByDossierQueryHandler>
@@ -83,9 +81,6 @@ describe('ConseillersController', () => {
       GetConseillerByEmailQueryHandler
     )
     createActionCommandHandler = stubClass(CreateActionCommandHandler)
-    sendNotificationNouveauMessage = stubClass(
-      SendNotificationNouveauMessageCommandHandler
-    )
     sendNotificationsNouveauxMessages = stubClass(
       SendNotificationsNouveauxMessagesCommandHandler
     )
@@ -114,8 +109,6 @@ describe('ConseillersController', () => {
       .useValue(getConseillerByEmailQueryHandler)
       .overrideProvider(CreateActionCommandHandler)
       .useValue(createActionCommandHandler)
-      .overrideProvider(SendNotificationNouveauMessageCommandHandler)
-      .useValue(sendNotificationNouveauMessage)
       .overrideProvider(SendNotificationsNouveauxMessagesCommandHandler)
       .useValue(sendNotificationsNouveauxMessages)
       .overrideProvider(GetDossierMiloJeuneQueryHandler)
@@ -289,81 +282,6 @@ describe('ConseillersController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'post',
       '/conseillers/1/jeunes/ABCDE/action'
-    )
-  })
-
-  describe('POST /conseillers/:idConseiller/jeunes/:idJeune/notify-message', () => {
-    describe('quand tout va bien', () => {
-      it('renvoie void', async () => {
-        // Given
-        sendNotificationNouveauMessage.execute
-          .withArgs({
-            idConseiller: '1',
-            idJeune: 'ABCDE'
-          })
-          .resolves(emptySuccess())
-
-        // When - Then
-        await request(app.getHttpServer())
-          .post('/conseillers/1/jeunes/ABCDE/notify-message')
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.CREATED)
-
-        expect(
-          sendNotificationNouveauMessage.execute
-        ).to.have.been.calledWithExactly(
-          {
-            idJeune: 'ABCDE',
-            idConseiller: '1'
-          },
-          unUtilisateurDecode()
-        )
-      })
-    })
-
-    describe("quand le jeune n'existe pas", () => {
-      it('renvoie 404', async () => {
-        // Given
-        const result = failure(new NonTrouveError('Jeune', 'ZIZOU'))
-        sendNotificationNouveauMessage.execute
-          .withArgs({
-            idConseiller: '1',
-            idJeune: 'ZIZOU'
-          })
-          .resolves(result)
-
-        // When - Then
-        await request(app.getHttpServer())
-          .post('/conseillers/1/jeunes/ZIZOU/notify-message')
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.NOT_FOUND)
-      })
-    })
-
-    describe("quand le conseiller n'est pas lié au jeune", () => {
-      it('renvoie 404', async () => {
-        // Given
-        const result = failure(
-          new JeuneNonLieAuConseillerError('JACQUET', 'ABCDE')
-        )
-        sendNotificationNouveauMessage.execute
-          .withArgs({
-            idConseiller: 'JACQUET',
-            idJeune: 'ABCDE'
-          })
-          .resolves(result)
-
-        // When - Then
-        await request(app.getHttpServer())
-          .post('/conseillers/JACQUET/jeunes/ABCDE/notify-message')
-          .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.NOT_FOUND)
-      })
-    })
-
-    ensureUserAuthenticationFailsIfInvalid(
-      'post',
-      '/conseillers/1/jeunes/ABCDE/notify-message'
     )
   })
 

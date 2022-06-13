@@ -39,7 +39,6 @@ import { HandleNettoyerLesJobsCommandHandler } from './application/commands/jobs
 import { HandleJobRappelRendezVousCommandHandler } from './application/commands/jobs/handle-job-rappel-rendez-vous.command'
 import { HandleJobUpdateMailingListConseillerCommandHandler } from './application/commands/jobs/handle-job-update-mailing-list-conseiller.command'
 import { NotifierNouvellesImmersionsCommandHandler } from './application/commands/notifier-nouvelles-immersions.command.handler'
-import { SendNotificationNouveauMessageCommandHandler } from './application/commands/send-notification-nouveau-message.command.handler'
 import { SendNotificationsNouveauxMessagesCommandHandler } from './application/commands/send-notifications-nouveaux-messages.command.handler'
 import { InitCronsCommandHandler } from './application/commands/tasks/init-crons.command'
 import { SynchronizeJobsCommandHandler } from './application/commands/tasks/synchronize-jobs.command'
@@ -88,7 +87,10 @@ import { EvenementService, EvenementsRepositoryToken } from './domain/evenement'
 import { Fichier, FichierRepositoryToken } from './domain/fichier'
 import { JeunesRepositoryToken } from './domain/jeune'
 import { MiloRepositoryToken } from './domain/milo'
-import { NotificationRepositoryToken } from './domain/notification'
+import {
+  Notification,
+  NotificationRepositoryToken
+} from './domain/notification'
 import { OffresEmploiRepositoryToken } from './domain/offre-emploi'
 import { OffreServiceCiviqueRepositoryToken } from './domain/offre-service-civique'
 import { OffresImmersionRepositoryToken } from './domain/offre-immersion'
@@ -227,6 +229,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Campagne.Factory,
     Demarche.Factory,
     Fichier.Factory,
+    Notification.Service,
     WorkerService,
     TaskService,
     InvitationIcsClient,
@@ -364,7 +367,6 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetAllRendezVousConseillerQueryHandler,
     GetRendezVousJeuneQueryHandler,
     GetRendezVousJeunePoleEmploiQueryHandler,
-    SendNotificationNouveauMessageCommandHandler,
     SendNotificationsNouveauxMessagesCommandHandler,
     DeleteActionCommandHandler,
     CreateRechercheCommandHandler,
