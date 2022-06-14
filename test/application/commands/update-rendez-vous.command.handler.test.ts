@@ -101,7 +101,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         expect(result).to.deep.equal(
           failure(
             new MauvaiseCommandeError(
-              'Le champ presenceConseiller ne peut etre modifé pour un rendez-vous Conseiller'
+              'Le champ presenceConseiller ne peut être modifié pour un rendez-vous Conseiller.'
             )
           )
         )
@@ -297,9 +297,9 @@ describe('UpdateRendezVousCommandHandler', () => {
         // Then
         expect(
           notificationService.notifierLesJeunesDuRdv
-        ).to.have.been.calledOnceWithExactly(
-          { ...rendezVous, jeunes: [jeune] },
-          Notification.Type.NEW_RENDEZVOUS
+        ).not.to.have.been.calledWith(
+          rendezVous,
+          Notification.Type.UPDATED_RENDEZVOUS
         )
         expect(
           planificateurService.supprimerRappelsRendezVous
