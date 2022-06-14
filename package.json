@@ -39,7 +39,7 @@
     "cover:unit": "nyc yarn test:local:unit",
     "cover:db": "nyc --no-clean yarn test:local:db",
     "cover:ci:db": "nyc --no-clean yarn test:ci:db",
-    "test:ci": "yarn cover:unit && yarn cover:ci:db && npm run cover:report",
+    "test:ci": "yarn migration && nyc --reporter=lcovonly mocha 'test/**/*.test.ts' --exit --timeout 10000",
     "cover:report": "nyc report --reporter=lcovonly",
     "watch": "yarn start:pg:db && yarn start:redis:db && nest start --watch | npx pino-pretty",
     "run:with:apm": "yarn start:pg:db && yarn start:redis:db && dotenv -e .environment nest start --watch | npx pino-pretty",
