@@ -197,25 +197,79 @@ describe('Demarche', () => {
       })
     })
   })
-  describe('creerDemarchePerso', () => {
-    it('génère une démarche perso', () => {
-      // Given
-      const description = 'test'
-      const dateFin = uneDate()
+  describe('creerDemarche', () => {
+    context("quand c'est une démarche personnalisée", () => {
+      it('génère une démarche perso', () => {
+        // Given
+        const description = 'test'
+        const dateFin = uneDate()
+        const demarcheACreer: Demarche.ACreer = {
+          description,
+          dateFin
+        }
 
-      // When
-      const demarche = demarcheFactory.creerDemarchePerso(description, dateFin)
+        // When
+        const demarche = demarcheFactory.creerDemarche(demarcheACreer)
 
-      // Then
-      const demarcheCree: Demarche.Creee = {
-        statut: Demarche.Statut.A_FAIRE,
-        dateCreation: uneDatetime,
-        dateFin: DateTime.fromJSDate(dateFin),
-        pourquoi: 'P01',
-        quoi: 'Q38',
-        description
-      }
-      expect(demarche).to.deep.equal(demarcheCree)
+        // Then
+        const demarcheCree: Demarche.Creee = {
+          statut: Demarche.Statut.A_FAIRE,
+          dateCreation: uneDatetime,
+          dateFin: DateTime.fromJSDate(dateFin),
+          pourquoi: 'P01',
+          quoi: 'Q38',
+          description
+        }
+        expect(demarche).to.deep.equal(success(demarcheCree))
+      })
+    })
+    context("quand c'est une démarche du référentiel PE", () => {
+      describe('quand les champs sont invalides', () => {
+        it('rejette', () => {
+          // Given
+          const dateFin = uneDate()
+          const demarcheACreer: Demarche.ACreer = {
+            dateFin,
+            quoi: 'C21',
+            comment: 'B12'
+          }
+
+          // When
+          const demarche = demarcheFactory.creerDemarche(demarcheACreer)
+
+          // Then
+          const erreur = new MauvaiseCommandeError(
+            'Pour créer une démarche du référentiel il faut un quoi et un pourquoi à minima'
+          )
+          expect(demarche).to.deep.equal(failure(erreur))
+        })
+      })
+      describe('quand les champs sont valides', () => {
+        it('génère une démarche', () => {
+          // Given
+          const dateFin = uneDate()
+          const demarcheACreer: Demarche.ACreer = {
+            dateFin,
+            quoi: 'C21',
+            pourquoi: 'A42',
+            comment: 'B12'
+          }
+
+          // When
+          const demarche = demarcheFactory.creerDemarche(demarcheACreer)
+
+          // Then
+          const demarcheCree: Demarche.Creee = {
+            statut: Demarche.Statut.A_FAIRE,
+            dateCreation: uneDatetime,
+            dateFin: DateTime.fromJSDate(dateFin),
+            quoi: 'C21',
+            pourquoi: 'A42',
+            comment: 'B12'
+          }
+          expect(demarche).to.deep.equal(success(demarcheCree))
+        })
+      })
     })
   })
 })
