@@ -87,8 +87,7 @@ describe('Notification', () => {
             body: `Votre rendez-vous du 11/11 est supprimé`
           },
           data: {
-            type: typeNotification,
-            id: rdv.id
+            type: typeNotification
           }
         })
 
