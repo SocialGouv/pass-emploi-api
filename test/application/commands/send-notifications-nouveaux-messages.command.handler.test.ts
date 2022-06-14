@@ -20,7 +20,7 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
   const sandbox: SinonSandbox = createSandbox()
   const jeune1 = unJeune({ id: '1' })
   const jeune2 = unJeune({ id: '2' })
-  const jeuneRepository: StubbedType<Jeune.Repository> = stubInterface(sandbox)
+  let notificationService: StubbedClass<Notification.Service>
   const notificationRepository: StubbedType<Notification.Repository> =
     stubInterface(sandbox)
   const conseillerAuthorizer = stubClass(ConseillerAuthorizer)
@@ -29,7 +29,7 @@ describe('SendNotificationsNouveauxMessagesCommandHandler', () => {
     sendNotificationsNouveauxMessagesCommandHandler =
       new SendNotificationsNouveauxMessagesCommandHandler(
         jeuneRepository,
-        notificationRepository,
+        notificationService,
         conseillerAuthorizer
       )
   })

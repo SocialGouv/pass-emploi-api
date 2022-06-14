@@ -21,11 +21,12 @@ import { PlanificateurService } from 'src/domain/planificateur'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { Mail } from '../../../src/domain/mail'
 import { Conseiller } from '../../../src/domain/conseiller'
+import { stubClassSandbox } from 'test/utils/types'
 
 describe('DeleteRendezVousCommandHandler', () => {
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
-  let notificationRepository: StubbedType<Notification.Repository>
+  let notificationService: StubbedClass<Notification.Service>
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
   let deleteRendezVousCommandHandler: DeleteRendezVousCommandHandler
   let planificateurService: StubbedClass<PlanificateurService>
@@ -38,7 +39,7 @@ describe('DeleteRendezVousCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     rendezVousRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
-    notificationRepository = stubInterface(sandbox)
+    notificationService = stubClassSandbox(Notification.Service, sandbox)
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
     planificateurService = stubClass(PlanificateurService)
     mailService = stubInterface(sandbox)
@@ -47,7 +48,7 @@ describe('DeleteRendezVousCommandHandler', () => {
     deleteRendezVousCommandHandler = new DeleteRendezVousCommandHandler(
       rendezVousRepository,
       conseillerRepository,
-      notificationRepository,
+      notificationService,
       rendezVousAuthorizer,
       planificateurService,
       mailService,
@@ -154,7 +155,7 @@ describe('DeleteRendezVousCommandHandler', () => {
             expect(rendezVousRepository.delete).to.have.been.calledWith(
               rendezVous.id
             )
-            expect(notificationRepository.send).to.have.been.calledWith(
+            expect(notificationService.send).to.have.been.calledWith(
               Notification.createRdvSupprime(
                 rendezVous.jeunes[0].pushNotificationToken,
                 rendezVous.date
@@ -180,7 +181,7 @@ describe('DeleteRendezVousCommandHandler', () => {
             expect(rendezVousRepository.delete).to.have.been.calledWith(
               rendezVous.id
             )
-            expect(notificationRepository.send).not.to.have.been.calledWith(
+            expect(notificationService.send).not.to.have.been.calledWith(
               Notification.createRdvSupprime(
                 jeune.pushNotificationToken,
                 rendezVous.date
@@ -204,7 +205,7 @@ describe('DeleteRendezVousCommandHandler', () => {
           expect(rendezVousRepository.delete).not.to.have.been.calledWith(
             rendezVous.id
           )
-          expect(notificationRepository.send).not.to.have.been.calledWith(
+          expect(notificationService.send).not.to.have.been.calledWith(
             Notification.createRdvSupprime(
               jeune.pushNotificationToken,
               rendezVous.date

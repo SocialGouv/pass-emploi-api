@@ -25,7 +25,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
   describe('handle', () => {
     let rechercheRepository: StubbedType<Recherche.Repository>
     let jeuneRepository: StubbedType<Jeune.Repository>
-    let notificationRepository: StubbedType<Notification.Repository>
+    let notificationService: StubbedClass<Notification.Service>
     let offreEngagementRepository: StubbedType<OffreServiceCivique.Repository>
     let dateService: StubbedClass<DateService>
 
