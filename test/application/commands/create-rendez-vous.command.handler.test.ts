@@ -45,6 +45,7 @@ describe('CreateRendezVousCommandHandler', () => {
     rendezVousRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
     notificationService = stubClassSandbox(Notification.Service, sandbox)
+    notificationService.notifierLesJeunesDuRdv.resolves()
     jeuneRepository = stubInterface(sandbox)
     planificateurService = stubClass(PlanificateurService)
     idService = stubInterface(sandbox)
@@ -85,12 +86,7 @@ describe('CreateRendezVousCommandHandler', () => {
         expect(rendezVousRepository.save).not.to.have.been.calledWith(
           rendezVous.id
         )
-        expect(notificationService.send).not.to.have.been.calledWith(
-          Notification.createNouveauRdv(
-            jeune1.pushNotificationToken,
-            rendezVous.id
-          )
-        )
+        expect(notificationService.notifierLesJeunesDuRdv).to.have.callCount(0)
         expect(mailClient.envoyerMailRendezVous).callCount(0)
         expect(result).to.deep.equal(
           failure(new NonTrouveError('Jeune', jeune2.id))
@@ -116,12 +112,7 @@ describe('CreateRendezVousCommandHandler', () => {
         expect(rendezVousRepository.save).not.to.have.been.calledWith(
           rendezVous.id
         )
-        expect(notificationService.send).not.to.have.been.calledWith(
-          Notification.createNouveauRdv(
-            jeune1.pushNotificationToken,
-            rendezVous.id
-          )
-        )
+        expect(notificationService.notifierLesJeunesDuRdv).to.have.callCount(0)
         expect(mailClient.envoyerMailRendezVous).callCount(0)
         expect(result).to.deep.equal(
           failure(
@@ -167,11 +158,11 @@ describe('CreateRendezVousCommandHandler', () => {
           expect(rendezVousRepository.save).to.have.been.calledWith(
             expectedRendezvous
           )
-          expect(notificationService.send).to.have.been.calledWith(
-            Notification.createNouveauRdv(
-              jeune1.pushNotificationToken,
-              expectedRendezvous.id
-            )
+          expect(
+            notificationService.notifierLesJeunesDuRdv
+          ).to.have.been.calledOnceWithExactly(
+            expectedRendezvous,
+            Notification.Type.NEW_RENDEZVOUS
           )
           expect(mailClient.envoyerMailRendezVous).to.have.been.calledWith(
             jeune1.conseiller,
@@ -212,11 +203,11 @@ describe('CreateRendezVousCommandHandler', () => {
           expect(rendezVousRepository.save).to.have.been.calledWith(
             expectedRendezvous
           )
-          expect(notificationService.send).not.to.have.been.calledWith(
-            Notification.createNouveauRdv(
-              jeune.pushNotificationToken,
-              expectedRendezvous.id
-            )
+          expect(
+            notificationService.notifierLesJeunesDuRdv
+          ).to.have.been.calledOnceWithExactly(
+            expectedRendezvous,
+            Notification.Type.NEW_RENDEZVOUS
           )
           expect(mailClient.envoyerMailRendezVous).to.have.been.calledWith(
             jeune.conseiller,
@@ -259,11 +250,11 @@ describe('CreateRendezVousCommandHandler', () => {
           expect(rendezVousRepository.save).to.have.been.calledWith(
             expectedRendezvous
           )
-          expect(notificationService.send).not.to.have.been.calledWith(
-            Notification.createNouveauRdv(
-              jeune1.pushNotificationToken,
-              expectedRendezvous.id
-            )
+          expect(
+            notificationService.notifierLesJeunesDuRdv
+          ).to.have.been.calledOnceWithExactly(
+            expectedRendezvous,
+            Notification.Type.NEW_RENDEZVOUS
           )
           expect(mailClient.envoyerMailRendezVous).callCount(0)
         })
@@ -301,11 +292,11 @@ describe('CreateRendezVousCommandHandler', () => {
           expect(rendezVousRepository.save).to.have.been.calledWith(
             expectedRendezvous
           )
-          expect(notificationService.send).not.to.have.been.calledWith(
-            Notification.createNouveauRdv(
-              jeune1.pushNotificationToken,
-              expectedRendezvous.id
-            )
+          expect(
+            notificationService.notifierLesJeunesDuRdv
+          ).to.have.been.calledOnceWithExactly(
+            expectedRendezvous,
+            Notification.Type.NEW_RENDEZVOUS
           )
           expect(mailClient.envoyerMailRendezVous).callCount(0)
         })

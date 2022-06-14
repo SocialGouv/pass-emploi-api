@@ -19,7 +19,7 @@ import { OffresEmploiQueryModel } from '../../../../src/application/queries/quer
 import { Jeune } from '../../../../src/domain/jeune'
 import { unJeune } from '../../../fixtures/jeune.fixture'
 import { uneOffreEmploiResumeQueryModel } from '../../../fixtures/offre-emploi.fixture'
-import { createSandbox, expect, stubClass } from '../../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { failure, success } from '../../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import { testConfig } from '../../../utils/module-for-testing'
@@ -54,7 +54,8 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     rechercheRepository = stubInterface(sandbox)
     offresEmploiRepository = stubInterface(sandbox)
-    notificationRepository = stubInterface(sandbox)
+    notificationService = stubClass(Notification.Service)
+    notificationService.notifierNouvellesOffres.resolves()
     jeuneRepository = stubInterface(sandbox)
 
     const dateService = stubClass(DateService)
@@ -65,7 +66,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         dateService,
         rechercheRepository,
         offresEmploiRepository,
-        notificationRepository,
+        notificationService,
         jeuneRepository,
         testConfig()
       )
@@ -222,17 +223,9 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         await notifierNouvellesOffresEmploiCommandHandler.handle()
 
         // Then
-        expect(notificationRepository.send).to.have.been.calledWithExactly({
-          token: 'unToken',
-          notification: {
-            title: 'Boulanger en alternance',
-            body: 'De nouveaux résultats sont disponibles'
-          },
-          data: {
-            type: 'NOUVELLE_OFFRE',
-            id: '219e8ba5-cd88-4027-9828-55e8ca99a236'
-          }
-        })
+        expect(
+          notificationService.notifierNouvellesOffres
+        ).to.have.been.calledOnceWithExactly(recherches[0], unJeune())
       })
       it("met à jour la date de dernière recherche d'une recherche", async () => {
         // Given
@@ -401,25 +394,14 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         expect(rechercheRepository.update).to.have.callCount(2)
         expect(rechercheRepository.update).to.have.been.calledWithExactly(
           uneRecherche({
-            id: '219e8ba5-cd88-4027-9828-55e8ca99a232',
-            type: Recherche.Type.OFFRES_EMPLOI,
-            criteres: criteresRecherche2,
-            idJeune,
+            ...recherches[1],
             dateDerniereRecherche: date
           })
         )
-        expect(notificationRepository.send).to.have.callCount(1)
-        expect(notificationRepository.send).to.have.been.calledWithExactly({
-          token: 'unToken',
-          notification: {
-            title: 'Boulanger en alternance',
-            body: 'De nouveaux résultats sont disponibles'
-          },
-          data: {
-            type: 'NOUVELLE_OFFRE',
-            id: '219e8ba5-cd88-4027-9828-55e8ca99a232'
-          }
-        })
+        expect(notificationService.notifierNouvellesOffres).to.have.callCount(1)
+        expect(
+          notificationService.notifierNouvellesOffres
+        ).to.have.been.calledWithExactly(recherches[1], unJeune())
       })
     })
   })
