@@ -13,7 +13,8 @@ import { uneDatetime } from '../../fixtures/date.fixture'
 import {
   emptySuccess,
   failure,
-  isSuccess
+  isSuccess,
+  success
 } from '../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { uneDemarche } from '../../fixtures/demarche.fixture'
@@ -61,9 +62,15 @@ describe('CreateDemarcheCommandHandler', () => {
     describe('quand la creation se passe bien', () => {
       it('met a jour le statut et renvoie un succès', async () => {
         // Given
-        demarcheFactory.creerDemarchePerso
-          .withArgs(command.description, command.dateFin)
-          .returns(demarcheCreee)
+        demarcheFactory.creerDemarche
+          .withArgs({
+            description: command.description,
+            dateFin: command.dateFin,
+            comment: undefined,
+            quoi: undefined,
+            pourquoi: undefined
+          })
+          .returns(success(demarcheCreee))
 
         demarcheRepository.save
           .withArgs(demarcheCreee, command.accessToken)
@@ -79,9 +86,15 @@ describe('CreateDemarcheCommandHandler', () => {
     describe('quand il y a une erreur lors de la creation', () => {
       it("transmet l'erreur", async () => {
         // Given
-        demarcheFactory.creerDemarchePerso
-          .withArgs(command.description, command.dateFin)
-          .returns(demarcheCreee)
+        demarcheFactory.creerDemarche
+          .withArgs({
+            description: command.description,
+            dateFin: command.dateFin,
+            comment: undefined,
+            quoi: undefined,
+            pourquoi: undefined
+          })
+          .returns(success(demarcheCreee))
 
         const erreurHttp = failure(new ErreurHttp("C'est mauvais", 400))
         demarcheRepository.save

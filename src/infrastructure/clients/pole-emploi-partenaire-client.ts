@@ -137,6 +137,7 @@ export class PoleEmploiPartenaireClient {
         dateFin: demarche.dateFin.toISO({ includeOffset: false }),
         pourquoi: demarche.pourquoi,
         quoi: demarche.quoi,
+        comment: demarche.comment,
         description: demarche.description
       }
       const demarcheDto = await this.post<DemarcheDto>(

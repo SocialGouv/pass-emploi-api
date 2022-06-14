@@ -21,15 +21,28 @@ export class UpdateStatutDemarchePayload {
 }
 
 export class CreateDemarchePayload {
-  @ApiProperty()
-  @IsNotEmpty()
-  @Length(2, 255)
-  description: string
-
   @ApiProperty({ type: Date })
   @Type(() => Date)
   @IsDate()
   dateFin: Date
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNotEmpty()
+  @Length(2, 255)
+  description?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  codeQuoi?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  codePourquoi?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  codeComment?: string
 }
 
 export class TypesDemarchesQueryParams {
