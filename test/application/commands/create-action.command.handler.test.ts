@@ -1,6 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { EvenementService } from 'src/domain/evenement'
+import { stubClassSandbox } from 'test/utils/types'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import {
@@ -24,7 +25,7 @@ describe('CreateActionCommandHandler', () => {
   let action: Action
   let jeune: Required<Omit<Jeune, 'tokenLastUpdate' | 'idDossier'>>
   let actionRepository: StubbedType<Action.Repository>
-  let notificationRepository: StubbedType<Notification.Repository>
+  let notificationService: StubbedClass<Notification.Service>
   let actionFactory: StubbedClass<Action.Factory>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
@@ -38,7 +39,8 @@ describe('CreateActionCommandHandler', () => {
     actionRepository = stubInterface(sandbox)
     const jeuneRepository: StubbedType<Jeune.Repository> =
       stubInterface(sandbox)
-    notificationRepository = stubInterface(sandbox)
+    notificationService = stubClassSandbox(Notification.Service, sandbox)
+    notificationService.notifierNouvelleAction.resolves()
     jeuneRepository.get.withArgs(action.idJeune).resolves(jeune)
     actionFactory = stubClass(Action.Factory)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
@@ -48,7 +50,7 @@ describe('CreateActionCommandHandler', () => {
     createActionCommandHandler = new CreateActionCommandHandler(
       actionRepository,
       jeuneRepository,
-      notificationRepository,
+      notificationService,
       actionFactory,
       jeuneAuthorizer,
       conseillerAuthorizer,
@@ -75,7 +77,7 @@ describe('CreateActionCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(success(action.id))
         expect(actionRepository.save).to.have.been.calledWithExactly(action)
-        expect(notificationRepository.send).to.have.callCount(0)
+        expect(notificationService.notifierNouvelleAction).to.have.callCount(0)
       })
     })
     describe("quand c'est un conseiller", () => {
@@ -97,12 +99,9 @@ describe('CreateActionCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(success(action.id))
         expect(actionRepository.save).to.have.been.calledWithExactly(action)
-        expect(notificationRepository.send).to.have.been.calledWithExactly(
-          Notification.createNouvelleAction(
-            jeune.pushNotificationToken,
-            action.id
-          )
-        )
+        expect(
+          notificationService.notifierNouvelleAction
+        ).to.have.been.calledOnceWithExactly(jeune, action)
       })
     })
   })
