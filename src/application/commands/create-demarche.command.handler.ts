@@ -1,6 +1,6 @@
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { Result } from '../../building-blocks/types/result'
+import { isFailure, Result } from '../../building-blocks/types/result'
 import { Inject, Injectable } from '@nestjs/common'
 import { Authentification } from '../../domain/authentification'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
@@ -10,7 +10,10 @@ import { Demarche, DemarcheRepositoryToken } from '../../domain/demarche'
 export interface CreateDemarcheCommand extends Command {
   idJeune: string
   accessToken: string
-  description: string
+  description?: string
+  codeQuoi?: string
+  codePourquoi?: string
+  codeComment?: string
   dateFin: Date
 }
 
@@ -37,14 +40,20 @@ export class CreateDemarcheCommandHandler extends CommandHandler<
   }
 
   async handle(command: CreateDemarcheCommand): Promise<Result<Demarche>> {
-    const nouvelleDemarchePerso = this.demarcheFactory.creerDemarchePerso(
-      command.description,
-      command.dateFin
-    )
-    return this.demarcheRepository.save(
-      nouvelleDemarchePerso,
-      command.accessToken
-    )
+    const demarcheACreer: Demarche.ACreer = {
+      dateFin: command.dateFin,
+      description: command.description,
+      comment: command.codeComment,
+      quoi: command.codeQuoi,
+      pourquoi: command.codePourquoi
+    }
+    const result = this.demarcheFactory.creerDemarche(demarcheACreer)
+
+    if (isFailure(result)) {
+      return result
+    }
+
+    return this.demarcheRepository.save(result.data, command.accessToken)
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

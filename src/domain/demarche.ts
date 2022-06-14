@@ -37,6 +37,14 @@ export namespace Demarche {
     dateAnnulation?: DateTime
   }
 
+  export interface ACreer {
+    dateFin: Date
+    pourquoi?: string
+    quoi?: string
+    comment?: string
+    description?: string
+  }
+
   export interface Creee {
     statut: Demarche.Statut
     dateCreation: DateTime
@@ -82,44 +90,6 @@ export namespace Demarche {
     ): Promise<Result<Demarche>>
   }
 
-  function mettreEnCours(
-    dateFin: Date,
-    maintenant: DateTime,
-    demarcheModifiee: Demarche.Modifiee
-  ): Result<Demarche.Modifiee> {
-    if (dateFin < maintenant.set({ hour: 12 }).toJSDate()) {
-      return failure(
-        new MauvaiseCommandeError(
-          'Une démarche en cours ne peut pas avoir une date de fin dans le passé'
-        )
-      )
-    }
-
-    return success({
-      ...demarcheModifiee,
-      dateDebut: maintenant.set({ hour: 12 })
-    })
-  }
-
-  function realiser(
-    dateDebut: Date | undefined,
-    maintenant: DateTime,
-    demarcheModifiee: Demarche.Modifiee
-  ): Result<Demarche.Modifiee> {
-    const maintenantA12Heures = maintenant.set({ hour: 12 })
-    if (dateDebut && dateDebut < maintenantA12Heures.toJSDate()) {
-      return success({
-        ...demarcheModifiee,
-        dateFin: maintenantA12Heures
-      })
-    }
-    return success({
-      ...demarcheModifiee,
-      dateDebut: maintenantA12Heures,
-      dateFin: maintenantA12Heures
-    })
-  }
-
   @Injectable()
   export class Factory {
     constructor(private dateService: DateService) {}
@@ -141,9 +111,9 @@ export namespace Demarche {
 
       switch (statut) {
         case Demarche.Statut.EN_COURS:
-          return mettreEnCours(dateFin, maintenant, demarcheModifiee)
+          return this.mettreEnCours(dateFin, maintenant, demarcheModifiee)
         case Demarche.Statut.REALISEE:
-          return realiser(dateDebut, maintenant, demarcheModifiee)
+          return this.realiser(dateDebut, maintenant, demarcheModifiee)
         case Demarche.Statut.A_FAIRE:
           return success({
             ...demarcheModifiee,
@@ -159,18 +129,75 @@ export namespace Demarche {
       }
     }
 
-    creerDemarchePerso(description: string, dateFin: Date): Demarche.Creee {
+    creerDemarche(demarcheACreer: Demarche.ACreer): Result<Demarche.Creee> {
       const maintenant = this.dateService.now().set({ hour: 12 })
-      const dateTimeFin = DateTime.fromJSDate(dateFin)
+      const dateTimeFin = DateTime.fromJSDate(demarcheACreer.dateFin)
 
-      return {
+      if (demarcheACreer.quoi) {
+        if (!demarcheACreer.pourquoi) {
+          return failure(
+            new MauvaiseCommandeError(
+              'Pour créer une démarche du référentiel il faut un quoi et un pourquoi à minima'
+            )
+          )
+        }
+
+        return success({
+          statut: Demarche.Statut.A_FAIRE,
+          dateCreation: maintenant,
+          dateFin: dateTimeFin,
+          pourquoi: demarcheACreer.pourquoi,
+          quoi: demarcheACreer.quoi,
+          comment: demarcheACreer.comment
+        })
+      }
+
+      return success({
         statut: Demarche.Statut.A_FAIRE,
         dateCreation: maintenant,
         dateFin: dateTimeFin,
         pourquoi: POURQUOI_DEMARCHE_PERSO,
         quoi: QUOI_DEMARCHE_PERSO,
-        description
+        description: demarcheACreer.description
+      })
+    }
+
+    private mettreEnCours(
+      dateFin: Date,
+      maintenant: DateTime,
+      demarcheModifiee: Demarche.Modifiee
+    ): Result<Demarche.Modifiee> {
+      if (dateFin < maintenant.set({ hour: 12 }).toJSDate()) {
+        return failure(
+          new MauvaiseCommandeError(
+            'Une démarche en cours ne peut pas avoir une date de fin dans le passé'
+          )
+        )
       }
+
+      return success({
+        ...demarcheModifiee,
+        dateDebut: maintenant.set({ hour: 12 })
+      })
+    }
+
+    private realiser(
+      dateDebut: Date | undefined,
+      maintenant: DateTime,
+      demarcheModifiee: Demarche.Modifiee
+    ): Result<Demarche.Modifiee> {
+      const maintenantA12Heures = maintenant.set({ hour: 12 })
+      if (dateDebut && dateDebut < maintenantA12Heures.toJSDate()) {
+        return success({
+          ...demarcheModifiee,
+          dateFin: maintenantA12Heures
+        })
+      }
+      return success({
+        ...demarcheModifiee,
+        dateDebut: maintenantA12Heures,
+        dateFin: maintenantA12Heures
+      })
     }
   }
 }

@@ -250,6 +250,7 @@ describe('PoleEmploiPartenaireClient', () => {
       dateFin: uneDatetime,
       pourquoi: 'test',
       quoi: 'test',
+      comment: 'comment',
       description: 'test'
     }
     const body = {
@@ -259,6 +260,7 @@ describe('PoleEmploiPartenaireClient', () => {
       dateFin: '2020-04-06T12:00:00.000',
       pourquoi: 'test',
       quoi: 'test',
+      comment: 'comment',
       description: 'test'
     }
     describe('quand tout va bien', () => {

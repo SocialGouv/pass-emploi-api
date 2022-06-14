@@ -115,7 +115,6 @@ import {
   PutNotificationTokenInput,
   TransfererConseillerPayload
 } from './validation/jeunes.inputs'
-
 import StatutInvalide = Action.StatutInvalide
 
 @Controller('jeunes')
@@ -345,7 +344,11 @@ export class JeunesController {
   }
 
   @ApiOperation({
-    summary: 'Crée une démarche'
+    summary: 'Crée une démarche',
+    description: `Permet de créer une démarche personnalisée ou du référentiel PE.
+    Dans le cas d'une démarche personnalisée il faut remplir dateFin et description.
+    Dans le cas d'une démarche du référentiel il faut remplir dateFin, codeQuoi, codePourquoi et optionnellement codeComment.
+    `
   })
   @Post(':idJeune/demarches')
   async createDemarche(
@@ -355,10 +358,9 @@ export class JeunesController {
     @AccessToken() accessToken: string
   ): Promise<DemarcheQueryModel> {
     const command: CreateDemarcheCommand = {
+      ...createDemarchePayload,
       idJeune,
-      accessToken,
-      description: createDemarchePayload.description,
-      dateFin: createDemarchePayload.dateFin
+      accessToken
     }
     const result = await this.createDemarcheCommandHandler.execute(
       command,
@@ -369,10 +371,7 @@ export class JeunesController {
       return result.data
     }
 
-    if (isFailure(result) && result.error instanceof ErreurHttp) {
-      throw new HttpException(result.error.message, result.error.statusCode)
-    }
-
+    handleFailure(result)
     throw new RuntimeException()
   }
 
