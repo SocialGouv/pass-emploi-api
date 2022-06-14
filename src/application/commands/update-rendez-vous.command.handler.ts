@@ -70,7 +70,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     ) {
       return failure(
         new MauvaiseCommandeError(
-          'Le champ presenceConseiller ne peut etre modifé pour un rendez-vous Conseiller'
+          'Le champ presenceConseiller ne peut être modifié pour un rendez-vous Conseiller.'
         )
       )
     }
@@ -169,12 +169,12 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     }
     const nouveauRdv = {
       ...rendezVous,
-      jeunesAjoutes
+      jeunes: jeunesAjoutes
     }
 
     this.notificationService.notifierLesJeunesDuRdv(
-      rdvMisAJour,
-      Notification.Type.UPDATED_RENDEZVOUS
+      rdvSupprime,
+      Notification.Type.DELETED_RENDEZVOUS
     )
     this.notificationService.notifierLesJeunesDuRdv(
       nouveauRdv,
@@ -182,8 +182,8 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     )
     if (this.infosRendezVousSontModifies(rendezVous, rendezVousUpdated)) {
       this.notificationService.notifierLesJeunesDuRdv(
-        rdvSupprime,
-        Notification.Type.DELETED_RENDEZVOUS
+        rdvMisAJour,
+        Notification.Type.UPDATED_RENDEZVOUS
       )
     }
   }
