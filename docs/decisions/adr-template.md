@@ -1,72 +1,72 @@
-# [short title of solved problem and solution]
+# [titre du problème résolu et de sa solution]
 
-* Status: [proposed | rejected | accepted | deprecated | … | superseded by [ADR-0005](0005-example.md)] <!-- optional -->
-* Deciders: [list everyone involved in the decision] <!-- optional -->
-* Date: [YYYY-MM-DD when the decision was last updated] <!-- optional -->
+* Statut: [proposé | rejeté | accepté | déprécié | … | remplacé par [ADR-0005](0005-example.md)] <!-- optionnel -->
+* Décideurs: [liste des personnes impliquées dans la décision] <!-- optionnel -->
+* Date: [YYYY-MM-DD quand la décision a été modifiée pour la dernière fois] <!-- optionnel -->
 
-Technical Story: [description | ticket/issue URL] <!-- optional -->
+Ticket Trello: [description | URL ticket] <!-- optionnel -->
 
-## Context and Problem Statement
+## Contexte et Définition du Problème
 
-[Describe the context and problem statement, e.g., in free form using two to three sentences. You may want to articulate the problem in form of a question.]
+[Décrire le contexte et définir le problème, e.g., en forme libre en utilisant deux ou trois phrases. Le problème peut être présenté sous la forme d'une question.]
 
-## Decision Drivers <!-- optional -->
+## Facteurs de Décision <!-- optionnel -->
 
-* [driver 1, e.g., a force, facing concern, …]
-* [driver 2, e.g., a force, facing concern, …]
-* … <!-- numbers of drivers can vary -->
+* [facteur 1, e.g., un moteur, une douleur, …]
+* [facteur 2, e.g., un moteur, une douleur, …]
+* … <!-- le nombre de facteurs peut varier -->
 
-## Considered Options
+## Solutions Étudiées
 
-* [option 1]
-* [option 2]
-* [option 3]
-* … <!-- numbers of options can vary -->
+* [solution 1]
+* [solution 2]
+* [solution 3]
+* … <!-- le nombre d'options peut varier -->
 
-## Decision Outcome
+## Résultat de la Décision
 
-Chosen option: "[option 1]", because [justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force force | … | comes out best (see below)].
+Solution retenue: "[solution 1]", car [justification. e.g., seule solution qui valide le critère du facteur de décision xxx | qui traite la douleur | … | qui s'en sort le mieux (voir ci-dessous)].
 
-### Positive Consequences <!-- optional -->
+### Impacts Positifs <!-- optionnel -->
 
-* [e.g., improvement of quality attribute satisfaction, follow-up decisions required, …]
+* [e.g., amélioration de la satisfaction de xxx, décisions futures nécessaires, …]
 * …
 
-### Negative Consequences <!-- optional -->
+### Impacts Négatifs <!-- optionnel -->
 
-* [e.g., compromising quality attribute, follow-up decisions required, …]
+* [e.g., compromis fait sur la qualité de xxx, décisions futurs nécessaires, …]
 * …
 
-## Pros and Cons of the Options <!-- optional -->
+## exempleAvantages et Inconvénients des Solutions <!-- optionnel -->
 
-### [option 1]
+### [solution 1]
 
-[example | description | pointer to more information | …] <!-- optional -->
+[exemple | description | lien vers infos complémentaires | …] <!-- optionnel -->
 
-* Good, because [argument a]
-* Good, because [argument b]
-* Bad, because [argument c]
-* … <!-- numbers of pros and cons can vary -->
+* Bien, car [argument a]
+* Bien, car [argument b]
+* Mauvais, car [argument c]
+* … <!-- le nombre d'avantages et inconvénients peut varier -->
 
-### [option 2]
+### [solution 2]
 
-[example | description | pointer to more information | …] <!-- optional -->
+[exemple | description | lien vers infos complémentaires | …] <!-- optionnel -->
 
-* Good, because [argument a]
-* Good, because [argument b]
-* Bad, because [argument c]
-* … <!-- numbers of pros and cons can vary -->
+* Bien, car [argument a]
+* Bien, car [argument b]
+* Mauvais, car [argument c]
+* … <!-- le nombre d'avantages et d'inconvénients peut varier -->
 
-### [option 3]
+### [solution 3]
 
-[example | description | pointer to more information | …] <!-- optional -->
+[exemple | description | lien vers infos complémentaires | …] <!-- optionnel -->
 
-* Good, because [argument a]
-* Good, because [argument b]
-* Bad, because [argument c]
-* … <!-- numbers of pros and cons can vary -->
+* Bien, car [argument a]
+* Bien, car [argument b]
+* Mauvais, car [argument c]
+* … <!-- le nombre d'avantages et inconvénients peut varier -->
 
-## Links <!-- optional -->
+## Liens <!-- optionnel -->
 
-* [Link type] [Link to ADR] <!-- example: Refined by [ADR-0005](0005-example.md) -->
-* … <!-- numbers of links can vary -->
+* [Lien possible] [Lien vers une ADR] <!-- exemple: Amélioré par [ADR-0005](0005-example.md) -->
+* … <!-- le nombre de liens peut varier -->
