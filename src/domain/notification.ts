@@ -40,73 +40,6 @@ export namespace Notification {
     }
   }
 
-  function creerNotificationNouvelleAction(
-    token: string,
-    idAction: string
-  ): Notification.Message {
-    return {
-      token,
-      notification: {
-        title: 'Nouvelle action',
-        body: 'Vous avez une nouvelle action'
-      },
-      data: {
-        type: Type.NEW_ACTION,
-        id: idAction
-      }
-    }
-  }
-
-  function creerNotificationNouvelleOffre(
-    token: string,
-    idRecherche: string,
-    titre: string
-  ): Notification.Message {
-    return {
-      token,
-      notification: {
-        title: titre,
-        body: 'De nouveaux résultats sont disponibles'
-      },
-      data: {
-        type: Type.NOUVELLE_OFFRE,
-        id: idRecherche
-      }
-    }
-  }
-
-  function creerNotificationNouveauRdv(
-    token: string,
-    idRdv: string
-  ): Notification.Message {
-    return {
-      token,
-      notification: {
-        title: 'Nouveau rendez-vous',
-        body: 'Votre conseiller a programmé un nouveau rendez-vous'
-      },
-      data: {
-        type: Type.NEW_RENDEZVOUS,
-        id: idRdv
-      }
-    }
-  }
-  function creerNotificationRendezVousMisAJour(
-    token: string,
-    idRdv: string
-  ): Notification.Message {
-    return {
-      token,
-      notification: {
-        title: 'Rendez-vous modifié',
-        body: 'Votre rendez-vous a été modifié'
-      },
-      data: {
-        type: Type.UPDATED_RENDEZVOUS,
-        id: idRdv
-      }
-    }
-  }
   export function creerNotificationRappelRdv(
     token: string,
     idRdv: string,
@@ -145,37 +78,6 @@ export namespace Notification {
       }
     }
   }
-  function creerNotificationRdvSupprime(
-    token: string,
-    date: Date
-  ): Notification.Message {
-    const formattedDate = DateTime.fromJSDate(date).toFormat('dd/MM')
-    return {
-      token,
-      notification: {
-        title: 'Rendez-vous supprimé',
-        body: `Votre rendez-vous du ${formattedDate} est supprimé`
-      },
-      data: {
-        type: Type.DELETED_RENDEZVOUS
-      }
-    }
-  }
-
-  function creerNotificationNouveauMessage(
-    token: string
-  ): Notification.Message {
-    return {
-      token,
-      notification: {
-        title: 'Nouveau message',
-        body: 'Vous avez un nouveau message'
-      },
-      data: {
-        type: Type.NEW_MESSAGE
-      }
-    }
-  }
 
   @Injectable()
   export class Service {
@@ -208,19 +110,19 @@ export namespace Notification {
 
             switch (typeNotification) {
               case Type.NEW_RENDEZVOUS:
-                notification = creerNotificationNouveauRdv(
+                notification = this.creerNotificationNouveauRdv(
                   jeune.pushNotificationToken,
                   rendezVous.id
                 )
                 break
               case Type.UPDATED_RENDEZVOUS:
-                notification = creerNotificationRendezVousMisAJour(
+                notification = this.creerNotificationRendezVousMisAJour(
                   jeune.pushNotificationToken,
                   rendezVous.id
                 )
                 break
               case Type.DELETED_RENDEZVOUS:
-                notification = creerNotificationRdvSupprime(
+                notification = this.creerNotificationRdvSupprime(
                   jeune.pushNotificationToken,
                   rendezVous.date
                 )
@@ -240,7 +142,7 @@ export namespace Notification {
       return Promise.all(
         jeunes.map(async jeune => {
           if (jeune.pushNotificationToken) {
-            const notification = creerNotificationNouveauMessage(
+            const notification = this.creerNotificationNouveauMessage(
               jeune.pushNotificationToken
             )
             const promise = this.notificationRepository.send(notification)
@@ -255,7 +157,7 @@ export namespace Notification {
 
     async notifierNouvelleAction(jeune: Jeune, action: Action): Promise<void> {
       if (jeune.pushNotificationToken) {
-        const notification = creerNotificationNouvelleAction(
+        const notification = this.creerNotificationNouvelleAction(
           jeune.pushNotificationToken,
           action.id
         )
@@ -273,7 +175,7 @@ export namespace Notification {
     ): Promise<void> {
       if (jeune) {
         if (jeune.pushNotificationToken) {
-          const notification = creerNotificationNouvelleOffre(
+          const notification = this.creerNotificationNouvelleOffre(
             jeune.pushNotificationToken,
             recherche.id,
             recherche.titre
@@ -283,6 +185,102 @@ export namespace Notification {
           return promise
         } else {
           this.logMessageEchec(jeune.id)
+        }
+      }
+    }
+
+    private creerNotificationNouvelleAction(
+      token: string,
+      idAction: string
+    ): Notification.Message {
+      return {
+        token,
+        notification: {
+          title: 'Nouvelle action',
+          body: 'Vous avez une nouvelle action'
+        },
+        data: {
+          type: Type.NEW_ACTION,
+          id: idAction
+        }
+      }
+    }
+    private creerNotificationNouvelleOffre(
+      token: string,
+      idRecherche: string,
+      titre: string
+    ): Notification.Message {
+      return {
+        token,
+        notification: {
+          title: titre,
+          body: 'De nouveaux résultats sont disponibles'
+        },
+        data: {
+          type: Type.NOUVELLE_OFFRE,
+          id: idRecherche
+        }
+      }
+    }
+    private creerNotificationNouveauRdv(
+      token: string,
+      idRdv: string
+    ): Notification.Message {
+      return {
+        token,
+        notification: {
+          title: 'Nouveau rendez-vous',
+          body: 'Votre conseiller a programmé un nouveau rendez-vous'
+        },
+        data: {
+          type: Type.NEW_RENDEZVOUS,
+          id: idRdv
+        }
+      }
+    }
+    private creerNotificationRendezVousMisAJour(
+      token: string,
+      idRdv: string
+    ): Notification.Message {
+      return {
+        token,
+        notification: {
+          title: 'Rendez-vous modifié',
+          body: 'Votre rendez-vous a été modifié'
+        },
+        data: {
+          type: Type.UPDATED_RENDEZVOUS,
+          id: idRdv
+        }
+      }
+    }
+    private creerNotificationRdvSupprime(
+      token: string,
+      date: Date
+    ): Notification.Message {
+      const formattedDate = DateTime.fromJSDate(date).toFormat('dd/MM')
+      return {
+        token,
+        notification: {
+          title: 'Rendez-vous supprimé',
+          body: `Votre rendez-vous du ${formattedDate} est supprimé`
+        },
+        data: {
+          type: Type.DELETED_RENDEZVOUS
+        }
+      }
+    }
+    private creerNotificationNouveauMessage(
+      token: string
+    ): Notification.Message {
+      return {
+        token,
+        notification: {
+          title: 'Nouveau message',
+          body: 'Vous avez un nouveau message'
+        },
+        data: {
+          type: Type.NEW_MESSAGE
         }
       }
     }
