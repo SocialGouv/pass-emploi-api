@@ -42,16 +42,17 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
       const sandbox = createSandbox()
       rechercheRepository = stubInterface(sandbox)
       jeuneRepository = stubInterface(sandbox)
-      notificationRepository = stubInterface(sandbox)
+      notificationService = stubClass(Notification.Service)
       offreEngagementRepository = stubInterface(sandbox)
       dateService = stubClass(DateService)
       dateService.now.returns(now)
+      notificationService.notifierNouvellesOffres.resolves()
 
       handleJobNotifierNouveauxServicesCiviqueCommandHandler =
         new HandleJobNotifierNouveauxServicesCiviqueCommandHandler(
           rechercheRepository,
           jeuneRepository,
-          notificationRepository,
+          notificationService,
           offreEngagementRepository,
           dateService
         )
@@ -153,17 +154,9 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
 
         it('notifie le jeune', async () => {
           // Then
-          expect(notificationRepository.send).to.have.been.calledWithExactly({
-            token: 'unToken',
-            notification: {
-              title: 'Boulanger en alternance',
-              body: 'De nouveaux résultats sont disponibles'
-            },
-            data: {
-              type: 'NOUVELLE_OFFRE',
-              id: '219e8ba5-cd88-4027-9828-55e8ca99a236'
-            }
-          })
+          expect(
+            notificationService.notifierNouvellesOffres
+          ).to.have.been.calledOnceWithExactly(uneRecherche(), unJeune())
         })
 
         it('met à jour la recherche', async () => {

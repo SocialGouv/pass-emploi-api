@@ -40,6 +40,7 @@ describe('DeleteRendezVousCommandHandler', () => {
     rendezVousRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
     notificationService = stubClassSandbox(Notification.Service, sandbox)
+    notificationService.notifierLesJeunesDuRdv.resolves()
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
     planificateurService = stubClass(PlanificateurService)
     mailService = stubInterface(sandbox)
@@ -155,37 +156,11 @@ describe('DeleteRendezVousCommandHandler', () => {
             expect(rendezVousRepository.delete).to.have.been.calledWith(
               rendezVous.id
             )
-            expect(notificationService.send).to.have.been.calledWith(
-              Notification.createRdvSupprime(
-                rendezVous.jeunes[0].pushNotificationToken,
-                rendezVous.date
-              )
-            )
-            expect(result).to.deep.equal(emptySuccess())
-          })
-        })
-        describe('quand le jeune ne s"est jamais connecté sur l"application', () => {
-          it('supprime le rendez-vous sans envoyer de notification au jeune', async () => {
-            // Given
-            rendezVousRepository.get
-              .withArgs(rendezVous.id)
-              .resolves(rendezVous)
-            rendezVous.jeunes[0].pushNotificationToken = undefined
-            const command: DeleteRendezVousCommand = {
-              idRendezVous: rendezVous.id
-            }
-
-            // When
-            const result = await deleteRendezVousCommandHandler.handle(command)
-            // Then
-            expect(rendezVousRepository.delete).to.have.been.calledWith(
-              rendezVous.id
-            )
-            expect(notificationService.send).not.to.have.been.calledWith(
-              Notification.createRdvSupprime(
-                jeune.pushNotificationToken,
-                rendezVous.date
-              )
+            expect(
+              notificationService.notifierLesJeunesDuRdv
+            ).to.have.been.calledOnceWithExactly(
+              rendezVous,
+              Notification.Type.DELETED_RENDEZVOUS
             )
             expect(result).to.deep.equal(emptySuccess())
           })
@@ -205,11 +180,11 @@ describe('DeleteRendezVousCommandHandler', () => {
           expect(rendezVousRepository.delete).not.to.have.been.calledWith(
             rendezVous.id
           )
-          expect(notificationService.send).not.to.have.been.calledWith(
-            Notification.createRdvSupprime(
-              jeune.pushNotificationToken,
-              rendezVous.date
-            )
+          expect(
+            notificationService.notifierLesJeunesDuRdv
+          ).not.to.have.been.calledOnceWithExactly(
+            rendezVous,
+            Notification.Type.DELETED_RENDEZVOUS
           )
           expect(result).to.deep.equal(
             failure(new NonTrouveError('Rendez-Vous', command.idRendezVous))

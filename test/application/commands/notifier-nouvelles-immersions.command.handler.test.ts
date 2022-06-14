@@ -11,7 +11,7 @@ import { Recherche } from '../../../src/domain/recherche'
 import { DateService } from '../../../src/utils/date-service'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
-import { createSandbox, expect } from '../../utils'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { uneNouvelleImmersionCommand } from '../../fixtures/offre-immersion.fixture'
 
 describe('NotifierNouvellesImmersionsCommandHandler', () => {
@@ -21,17 +21,17 @@ describe('NotifierNouvellesImmersionsCommandHandler', () => {
   const recherche = uneRecherche()
   let rechercheRepository: StubbedType<Recherche.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
-  let notificationRepository: StubbedType<Notification.Repository>
+  let notificationService: StubbedClass<Notification.Service>
 
   beforeEach(async () => {
     rechercheRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
-    notificationRepository = stubInterface(sandbox)
+    notificationService = stubClass(Notification.Service)
     notifierNouvellesImmersionsCommandHandler =
       new NotifierNouvellesImmersionsCommandHandler(
         rechercheRepository,
         jeuneRepository,
-        notificationRepository,
+        notificationService,
         new DateService()
       )
   })
@@ -63,27 +63,9 @@ describe('NotifierNouvellesImmersionsCommandHandler', () => {
           await notifierNouvellesImmersionsCommandHandler.handle(command)
 
           // Then
-          expect(notificationRepository.send).to.have.been.calledWithExactly(
-            Notification.createNouvelleOffre(
-              jeune.pushNotificationToken,
-              recherche.id,
-              recherche.titre
-            )
-          )
-        })
-      })
-      describe('quand le jeune n`a pas de token', () => {
-        it('ne notifie pas le jeune', async () => {
-          // Given
-          jeuneRepository.get
-            .withArgs(recherche.idJeune)
-            .resolves({ ...jeune, pushNotificationToken: undefined })
-
-          // When
-          await notifierNouvellesImmersionsCommandHandler.handle(command)
-
-          // Then
-          expect(notificationRepository.send).to.have.callCount(0)
+          expect(
+            notificationService.notifierNouvellesOffres
+          ).to.have.been.calledWithExactly(recherche, jeune)
         })
       })
     })
