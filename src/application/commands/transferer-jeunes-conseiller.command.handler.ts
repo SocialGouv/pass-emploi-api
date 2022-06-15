@@ -80,9 +80,9 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
         firstName: conseillerCible.firstName,
         lastName: conseillerCible.lastName,
         email: conseillerCible.email
-      }
+      },
+      conseillerInitial: mapConseillerInitial(command, jeune)
     }))
-
     await this.chatRepository.transfererChat(
       command.idConseillerCible,
       command.idsJeunes
@@ -109,4 +109,17 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
   async monitor(): Promise<void> {
     return
   }
+}
+
+function mapConseillerInitial(
+  command: TransfererJeunesConseillerCommand,
+  jeune: Jeune
+): Jeune.ConseillerInitial | undefined {
+  if (command.estTemporaire && jeune.conseillerInitial) {
+    return jeune.conseillerInitial
+  }
+  if (command.estTemporaire) {
+    return { id: command.idConseillerSource }
+  }
+  return undefined
 }
