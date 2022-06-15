@@ -21,6 +21,7 @@ export interface TransfererJeunesConseillerCommand extends Command {
   idConseillerSource: string
   idConseillerCible: string
   idsJeunes: string[]
+  estTemporaire: boolean
   structure: Core.Structure
 }
 
