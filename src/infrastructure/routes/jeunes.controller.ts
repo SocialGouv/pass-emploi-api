@@ -579,6 +579,7 @@ export class JeunesController {
         idConseillerSource: transfererConseillerPayload.idConseillerSource,
         idConseillerCible: transfererConseillerPayload.idConseillerCible,
         idsJeunes: transfererConseillerPayload.idsJeune,
+        estTemporaire: Boolean(transfererConseillerPayload.estTemporaire),
         structure: utilisateur.structure
       }
       result = await this.transfererJeunesConseillerCommandHandler.execute(

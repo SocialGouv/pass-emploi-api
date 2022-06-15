@@ -197,7 +197,7 @@ describe('JeunesController', () => {
       idConseillerCible: '2',
       idsJeune: ['1']
     }
-    it('transfere les jeunes', async () => {
+    it('transfere les jeunes de manière permanente', async () => {
       // Given
       transfererJeunesConseillerCommandHandler.execute.resolves(emptySuccess())
 
@@ -215,6 +215,32 @@ describe('JeunesController', () => {
           idConseillerSource: '1',
           idConseillerCible: '2',
           idsJeunes: ['1'],
+          estTemporaire: false,
+          structure: Core.Structure.MILO
+        },
+        unUtilisateurDecode()
+      )
+    })
+
+    it('transfere les jeunes de manière temporaire', async () => {
+      // Given
+      transfererJeunesConseillerCommandHandler.execute.resolves(emptySuccess())
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post('/jeunes/transferer')
+        .set('authorization', unHeaderAuthorization())
+        .send({ ...payload, estTemporaire: true })
+        .expect(HttpStatus.OK)
+
+      expect(
+        transfererJeunesConseillerCommandHandler.execute
+      ).to.have.been.calledWithExactly(
+        {
+          idConseillerSource: '1',
+          idConseillerCible: '2',
+          idsJeunes: ['1'],
+          estTemporaire: true,
           structure: Core.Structure.MILO
         },
         unUtilisateurDecode()
