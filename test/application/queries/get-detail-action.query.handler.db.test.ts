@@ -17,6 +17,7 @@ import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeu
 import { IdService } from '../../../src/utils/id-service'
 import { DateService } from '../../../src/utils/date-service'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
 
 describe('GetDetailActionQueryHandler', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -46,8 +47,10 @@ describe('GetDetailActionQueryHandler', () => {
     beforeEach(async () => {
       const conseillerRepository = new ConseillerSqlRepository()
       await conseillerRepository.save(unConseiller())
+      const firebaseClient = stubClass(FirebaseClient)
       const jeuneRepository = new JeuneSqlRepository(
         databaseForTesting.sequelize,
+        firebaseClient,
         new IdService(),
         new DateService()
       )

@@ -24,6 +24,7 @@ import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneActionQueryModelFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
 
 describe('GetActionsByJeuneQueryHandler', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -55,8 +56,10 @@ describe('GetActionsByJeuneQueryHandler', () => {
     beforeEach(async () => {
       const conseillerRepository = new ConseillerSqlRepository()
       await conseillerRepository.save(unConseiller())
+      const firebaseClient = stubClass(FirebaseClient)
       const jeuneRepository = new JeuneSqlRepository(
         databaseForTesting.sequelize,
+        firebaseClient,
         new IdService(),
         new DateService()
       )

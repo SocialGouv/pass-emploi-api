@@ -13,7 +13,6 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 
@@ -35,8 +34,6 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
     private conseillerRepository: Conseiller.Repository,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
-    @Inject(ChatRepositoryToken)
-    private chatRepository: Chat.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('TransfererJeunesConseillerCommandHandler')
@@ -83,18 +80,12 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       },
       conseillerInitial: mapConseillerInitial(command, jeune)
     }))
-    await this.chatRepository.transfererChat(
+    await this.jeuneRepository.transferAndSaveAll(
+      updatedJeunes,
       command.idConseillerCible,
-      command.idsJeunes
+      command.idConseillerSource,
+      command.estTemporaire
     )
-    await Promise.all([
-      this.jeuneRepository.creerTransferts(
-        command.idConseillerSource,
-        command.idConseillerCible,
-        command.idsJeunes
-      ),
-      this.jeuneRepository.saveAll(updatedJeunes)
-    ])
 
     return emptySuccess()
   }
@@ -115,11 +106,8 @@ function mapConseillerInitial(
   command: TransfererJeunesConseillerCommand,
   jeune: Jeune
 ): Jeune.ConseillerInitial | undefined {
-  if (command.estTemporaire && jeune.conseillerInitial) {
-    return jeune.conseillerInitial
-  }
   if (command.estTemporaire) {
-    return { id: command.idConseillerSource }
+    return jeune.conseillerInitial ?? { id: command.idConseillerSource }
   }
   return undefined
 }

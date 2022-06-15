@@ -10,6 +10,7 @@ export function unJeuneDto(
     prenom: 'John',
     nom: 'Doe',
     idConseiller: '1',
+    idConseillerInitial: undefined,
     dateCreation: new Date('2021-11-11T08:03:30.000Z'),
     pushNotificationToken: 'unToken',
     dateDerniereActualisationToken: null,
