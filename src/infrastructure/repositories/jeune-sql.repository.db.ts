@@ -18,11 +18,13 @@ import {
   fromSqlToJeuneHomeQueryModel,
   toSqlJeune
 } from './mappers/jeunes.mappers'
+import { FirebaseClient } from '../clients/firebase-client'
 
 @Injectable()
 export class JeuneSqlRepository implements Jeune.Repository {
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
+    private firebaseClient: FirebaseClient,
     private idService: IdService,
     private dateService: DateService
   ) {}
@@ -67,10 +69,22 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return fromSqlToJeune(jeuneSqlModel)
   }
 
-  async saveAll(jeunes: Jeune[]): Promise<void> {
-    for (const jeune of jeunes) {
-      await JeuneSqlModel.upsert(toSqlJeune(jeune))
-    }
+  async transferAndSaveAll(
+    jeunes: Jeune[],
+    idConseillerCible: string,
+    idConseillerSource: string,
+    estTemporaire = false
+  ): Promise<void> {
+    const idsJeunes = jeunes.map(jeune => jeune.id)
+    await this.firebaseClient.transfererChat(
+      idConseillerCible,
+      idsJeunes,
+      estTemporaire
+    )
+    await Promise.all([
+      this.creerTransferts(idConseillerSource, idConseillerCible, idsJeunes),
+      this.saveAll(jeunes)
+    ])
   }
 
   async findAllJeunesByConseiller(
@@ -86,25 +100,6 @@ export class JeuneSqlRepository implements Jeune.Repository {
       }
     })
     return jeunesSqlModel.map(fromSqlToJeune)
-  }
-
-  async creerTransferts(
-    idConseillerSource: string,
-    idConseillerCible: string,
-    idsJeunes: string[]
-  ): Promise<void> {
-    const dateTransfert = this.dateService.nowJs()
-    await TransfertConseillerSqlModel.bulkCreate(
-      idsJeunes.map(idJeune => {
-        return {
-          id: this.idService.uuid(),
-          idJeune,
-          idConseillerSource,
-          idConseillerCible,
-          dateTransfert
-        }
-      })
-    )
   }
 
   async save(jeune: Jeune): Promise<void> {
@@ -172,6 +167,31 @@ export class JeuneSqlRepository implements Jeune.Repository {
     })
 
     return jeunesMiloSqlModel.map(fromSqlToJeune)
+  }
+
+  private async saveAll(jeunes: Jeune[]): Promise<void> {
+    for (const jeune of jeunes) {
+      await JeuneSqlModel.upsert(toSqlJeune(jeune))
+    }
+  }
+
+  private async creerTransferts(
+    idConseillerSource: string,
+    idConseillerCible: string,
+    idsJeunes: string[]
+  ): Promise<void> {
+    const dateTransfert = this.dateService.nowJs()
+    await TransfertConseillerSqlModel.bulkCreate(
+      idsJeunes.map(idJeune => {
+        return {
+          id: this.idService.uuid(),
+          idJeune,
+          idConseillerSource,
+          idConseillerCible,
+          dateTransfert
+        }
+      })
+    )
   }
 }
 

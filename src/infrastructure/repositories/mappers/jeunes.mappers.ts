@@ -32,6 +32,11 @@ export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
       email: jeuneSqlModel.conseiller.email || undefined
     }
   }
+  if (jeuneSqlModel.idConseillerInitial) {
+    jeune.conseillerInitial = {
+      id: jeuneSqlModel.idConseillerInitial
+    }
+  }
   return jeune
 }
 
@@ -49,6 +54,7 @@ export function toSqlJeune(
     nom: jeune.lastName,
     prenom: jeune.firstName,
     idConseiller: jeune.conseiller?.id,
+    idConseillerInitial: jeune.conseillerInitial?.id ?? null,
     dateCreation: jeune.creationDate.toJSDate(),
     pushNotificationToken: jeune.pushNotificationToken ?? null,
     dateDerniereActualisationToken: jeune.tokenLastUpdate?.toJSDate() ?? null,

@@ -57,12 +57,11 @@ export namespace Jeune {
 
     getHomeQueryModel(idJeune: string): Promise<JeuneHomeQueryModel>
 
-    saveAll(jeunes: Jeune[]): Promise<void>
-
-    creerTransferts(
-      idConseillerSource: string,
+    transferAndSaveAll(
+      jeunes: Jeune[],
       idConseillerCible: string,
-      idsJeunes: string[]
+      idConseillerSource: string,
+      estTemporaire: boolean
     ): Promise<void>
   }
 

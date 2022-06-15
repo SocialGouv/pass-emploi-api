@@ -6,9 +6,8 @@ import { getMessaging, TokenMessage } from 'firebase-admin/messaging'
 import { Authentification } from '../../domain/authentification'
 import { buildError } from '../../utils/logger.module'
 import { getAPMInstance } from '../monitoring/apm.init'
-import Type = Authentification.Type
-import Timestamp = firestore.Timestamp
 import { ChatCryptoService } from '../../utils/chat-crypto-service'
+import Timestamp = firestore.Timestamp
 
 export interface IFirebaseClient {
   send(tokenMessage: TokenMessage): Promise<void>
@@ -104,18 +103,29 @@ export class FirebaseClient implements IFirebaseClient {
 
   async getToken(utilisateur: Authentification.Utilisateur): Promise<string> {
     const customClaims = {
-      jeuneId: utilisateur.type === Type.JEUNE ? utilisateur.id : null,
-      conseillerId: utilisateur.type === Type.CONSEILLER ? utilisateur.id : null
+      jeuneId:
+        utilisateur.type === Authentification.Type.JEUNE
+          ? utilisateur.id
+          : null,
+      conseillerId:
+        utilisateur.type === Authentification.Type.CONSEILLER
+          ? utilisateur.id
+          : null
     }
     return this.auth.createCustomToken(utilisateur.id, customClaims)
   }
 
   async transfererChat(
     conseillerCibleId: string,
-    jeuneIds: string[]
+    idsJeunes: string[],
+    estTemporaire: boolean
   ): Promise<void> {
-    const messageTransfertChat =
+    let messageTransfertChat =
       'Vous échangez avec votre nouveau conseiller.\nIl a accès à l’historique de vos échanges'
+    if (estTemporaire) {
+      messageTransfertChat =
+        'Vous échangez temporairement avec un nouveau conseiller.\nIl a accès à l’historique de vos échanges'
+    }
     const { encryptedText, iv } =
       this.chatCryptoService.encrypt(messageTransfertChat)
 
@@ -123,7 +133,7 @@ export class FirebaseClient implements IFirebaseClient {
       await this.firestore.runTransaction(async t => {
         const conversations = this.firestore.collection(FIREBASE_CHAT_PATH)
 
-        const jeunesIdsPar10: string[][] = chunk(jeuneIds)
+        const jeunesIdsPar10: string[][] = chunk(idsJeunes)
 
         for (const ids of jeunesIdsPar10) {
           const conversationsCibles = await conversations

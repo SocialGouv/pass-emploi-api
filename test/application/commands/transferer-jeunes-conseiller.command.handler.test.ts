@@ -1,6 +1,5 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { Chat } from 'src/domain/chat'
 import { Core } from 'src/domain/core'
 import { Jeune } from 'src/domain/jeune'
 import { unConseillerDuJeune, unJeune } from 'test/fixtures/jeune.fixture'
@@ -26,21 +25,18 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
   const conseiller = unConseiller()
   let jeuneRepository: StubbedType<Jeune.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
-  let chatRepository: StubbedType<Chat.Repository>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
     jeuneRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
-    chatRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     conseillerRepository.get.withArgs('idConseiller').resolves(conseiller)
     transfererJeunesConseillerCommandHandler =
       new TransfererJeunesConseillerCommandHandler(
         conseillerRepository,
         jeuneRepository,
-        chatRepository,
         conseillerAuthorizer
       )
   })
@@ -96,24 +92,17 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
 
           // Then
           expect(result).to.deep.equal(emptySuccess())
-          expect(
-            jeuneRepository.creerTransferts
-          ).to.have.been.calledWithExactly(
-            command.idConseillerSource,
-            command.idConseillerCible,
-            command.idsJeunes
-          )
-          expect(chatRepository.transfererChat).to.have.been.calledWithExactly(
-            command.idConseillerCible,
-            command.idsJeunes
-          )
 
           jeune1.conseiller = conseillerCible
           jeune2.conseiller = conseillerCible
-          expect(jeuneRepository.saveAll).to.have.been.calledWithExactly([
-            jeune1,
-            jeune2
-          ])
+          expect(
+            jeuneRepository.transferAndSaveAll
+          ).to.have.been.calledWithExactly(
+            [jeune1, jeune2],
+            conseillerCible.id,
+            command.idConseillerSource,
+            command.estTemporaire
+          )
         })
       })
       describe('quand le transfert est temporaire', () => {
@@ -163,9 +152,14 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
 
             jeune1.conseiller = conseillerCible
             jeune1.conseillerInitial = { id: command.idConseillerSource }
-            expect(jeuneRepository.saveAll).to.have.been.calledWithExactly([
-              jeune1
-            ])
+            expect(
+              jeuneRepository.transferAndSaveAll
+            ).to.have.been.calledWithExactly(
+              [jeune1],
+              command.idConseillerCible,
+              command.idConseillerSource,
+              command.estTemporaire
+            )
           })
         })
         describe('quand le jeune est déjà en transfert temporaire ', () => {
@@ -194,9 +188,14 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             expect(result).to.deep.equal(emptySuccess())
 
             jeune1.conseiller = conseillerCible
-            expect(jeuneRepository.saveAll).to.have.been.calledWithExactly([
-              jeune1
-            ])
+            expect(
+              jeuneRepository.transferAndSaveAll
+            ).to.have.been.calledWithExactly(
+              [jeune1],
+              command.idConseillerCible,
+              command.idConseillerSource,
+              command.estTemporaire
+            )
           })
         })
       })

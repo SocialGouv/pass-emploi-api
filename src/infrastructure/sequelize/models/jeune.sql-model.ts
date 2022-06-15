@@ -47,6 +47,12 @@ export class JeuneDto extends Model {
   idConseiller?: string
 
   @Column({
+    field: 'id_conseiller_initial',
+    type: DataType.STRING
+  })
+  idConseillerInitial?: string | null
+
+  @Column({
     field: 'date_creation',
     type: DataType.DATE
   })

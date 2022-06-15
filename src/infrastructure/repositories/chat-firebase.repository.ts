@@ -17,13 +17,6 @@ export class ChatFirebaseRepository implements Chat.Repository {
     return this.firebaseClient.getNombreDeConversationsNonLues(conseillerId)
   }
 
-  async transfererChat(
-    conseillerCibleId: string,
-    jeuneIds: string[]
-  ): Promise<void> {
-    return this.firebaseClient.transfererChat(conseillerCibleId, jeuneIds)
-  }
-
   supprimerChat(idJeune: string): Promise<void> {
     return this.firebaseClient.supprimerChat(idJeune)
   }

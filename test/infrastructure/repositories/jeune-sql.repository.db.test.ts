@@ -30,27 +30,40 @@ import { RechercheSqlModel } from '../../../src/infrastructure/sequelize/models/
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { uneDatetime } from '../../fixtures/date.fixture'
-import { unJeune, unJeuneSansConseiller } from '../../fixtures/jeune.fixture'
+import {
+  unConseillerDuJeune,
+  unJeune,
+  unJeuneSansConseiller
+} from '../../fixtures/jeune.fixture'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { expect } from '../../utils'
+import { expect, StubbedClass, stubClass } from '../../utils'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
 
 describe('JeuneSqlRepository', () => {
+  const uuid = '9e1a7d9f-4038-4631-9aa1-856ee90c7ff8'
   const databaseForTesting = DatabaseForTesting.prepare()
   const rechercheSqlRepository = new RechercheSqlRepository(
     databaseForTesting.sequelize
   )
+  let firebaseClient: StubbedClass<FirebaseClient>
   let jeuneSqlRepository: JeuneSqlRepository
-  let idService: IdService
-  let dateService: DateService
+  let idService: StubbedClass<IdService>
+  let dateService: StubbedClass<DateService>
 
   beforeEach(async () => {
+    firebaseClient = stubClass(FirebaseClient)
+    idService = stubClass(IdService)
+    idService.uuid.returns(uuid)
+    dateService = stubClass(DateService)
+    dateService.nowJs.returns(uneDatetime.toJSDate())
     jeuneSqlRepository = new JeuneSqlRepository(
       databaseForTesting.sequelize,
+      firebaseClient,
       idService,
       dateService
     )
@@ -497,6 +510,129 @@ describe('JeuneSqlRepository', () => {
             where: { idJeune: jeuneDto.id }
           })
         ).to.deep.equal([])
+      })
+    })
+  })
+
+  describe('transferAndSaveAll', () => {
+    beforeEach(async () => {
+      await ConseillerSqlModel.creer(
+        unConseillerDto({ id: 'idConseillerCible' })
+      )
+      await ConseillerSqlModel.creer(
+        unConseillerDto({ id: 'idConseillerSource' })
+      )
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: 'unJeuneATransferer',
+          idConseiller: 'idConseillerSource'
+        })
+      )
+    })
+
+    describe("quand le jeune n'était pas en transfert temporaire", () => {
+      describe('quand le jeune est transféré de manière définitive', () => {
+        it('transfère les chats, crée des transferts, met à jour le jeune avec son conseiller', async () => {
+          // Given
+          const jeuneATransferer: Jeune = unJeune({
+            id: 'unJeuneATransferer',
+            conseiller: unConseillerDuJeune({ id: 'idConseillerCible' }),
+            // FIXME: gérer les fixtures proprement avec les Omit
+            tokenLastUpdate: undefined
+          })
+
+          // When
+          await jeuneSqlRepository.transferAndSaveAll(
+            [jeuneATransferer],
+            'idConseillerCible',
+            'idConseillerSource',
+            true
+          )
+
+          // Then
+          expect(firebaseClient.transfererChat).to.have.been.calledWithExactly(
+            'idConseillerCible',
+            ['unJeuneATransferer'],
+            true
+          )
+
+          const jeune = await jeuneSqlRepository.get('unJeuneATransferer')
+          expect(jeune).to.be.deep.equal(jeuneATransferer)
+          expect(jeune?.conseillerInitial).to.be.undefined()
+
+          const transfertsSql = await TransfertConseillerSqlModel.findAll()
+          expect(transfertsSql).to.have.length(1)
+          expect(transfertsSql[0].idConseillerSource).to.equal(
+            'idConseillerSource'
+          )
+          expect(transfertsSql[0].idConseillerCible).to.equal(
+            'idConseillerCible'
+          )
+          expect(transfertsSql[0].id).to.equal(uuid)
+          expect(transfertsSql[0].dateTransfert).to.deep.equal(
+            uneDatetime.toJSDate()
+          )
+        })
+      })
+      describe('quand le jeune est transféré de manière temporaire', () => {
+        it('met à jour le jeune avec son conseiller et son conseiller initial', async () => {
+          // Given
+          const jeuneATransferer: Jeune = unJeune({
+            id: 'unJeuneATransferer',
+            conseiller: unConseillerDuJeune({ id: 'idConseillerCible' }),
+            conseillerInitial: {
+              id: 'idConseillerSource'
+            },
+            // FIXME: gérer les fixtures proprement avec les Omit
+            tokenLastUpdate: undefined
+          })
+
+          // When
+          await jeuneSqlRepository.transferAndSaveAll(
+            [jeuneATransferer],
+            'idConseillerCible',
+            'idConseillerSource'
+          )
+
+          // Then
+          const jeune = await jeuneSqlRepository.get('unJeuneATransferer')
+          expect(jeune?.conseillerInitial).to.be.deep.equal({
+            id: 'idConseillerSource'
+          })
+        })
+      })
+    })
+
+    describe('quand le jeune était en transfert temporaire', () => {
+      describe('quand le jeune est transféré de manière définitive', () => {
+        it('met le conseiller initial à null', async () => {
+          // Given
+          await JeuneSqlModel.creer(
+            unJeuneDto({
+              id: 'jeune-en-transfert',
+              idConseiller: 'idConseillerSource',
+              idConseillerInitial: 'idConseillerCible'
+            })
+          )
+          const jeuneATransferer: Jeune = unJeune({
+            id: 'jeune-en-transfert',
+            conseiller: unConseillerDuJeune({ id: 'idConseillerCible' }),
+            // FIXME: gérer les fixtures proprement avec les Omit
+            tokenLastUpdate: undefined
+          })
+
+          // When
+          await jeuneSqlRepository.transferAndSaveAll(
+            [jeuneATransferer],
+            'idConseillerCible',
+            'idConseillerSource'
+          )
+
+          // Then
+          const jeune = await jeuneSqlRepository.get('jeune-en-transfert')
+          expect(jeune).to.be.deep.equal(jeuneATransferer)
+          expect(jeune?.conseillerInitial).to.be.undefined()
+        })
       })
     })
   })
