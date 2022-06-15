@@ -82,7 +82,7 @@ export namespace Mail {
         throw new Error(`Le jeune ${jeune.id} n'a pas de conseiller`)
       }
 
-      if (jeune.conseiller.structure === Core.Structure.POLE_EMPLOI) {
+      if (jeune.structure === Core.Structure.POLE_EMPLOI) {
         templateId = parseInt(this.templates.suppressionJeunePE)
       } else {
         templateId = parseInt(this.templates.suppressionJeuneMilo)

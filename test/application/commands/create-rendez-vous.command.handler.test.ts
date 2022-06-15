@@ -146,7 +146,7 @@ describe('CreateRendezVousCommandHandler', () => {
           const expectedRendezvous = RendezVous.createRendezVousConseiller(
             command,
             [jeune1, jeune2],
-            jeune1.conseiller,
+            unConseiller(),
             idService
           )
 
@@ -210,7 +210,7 @@ describe('CreateRendezVousCommandHandler', () => {
             Notification.Type.NEW_RENDEZVOUS
           )
           expect(mailClient.envoyerMailRendezVous).to.have.been.calledWith(
-            jeune.conseiller,
+            unConseiller(),
             expectedRendezvous
           )
         })
