@@ -17,7 +17,7 @@ import { DateService } from '../../../src/utils/date-service'
 import { IdService } from '../../../src/utils/id-service'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
+import { unConseillerDuJeune, unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, stubClass } from '../../utils'
 import Structure = Core.Structure
 
@@ -70,14 +70,14 @@ describe('CreateJeunePoleEmploiCommandHandler', () => {
       const result = await createJeuneCommandHandler.handle(command)
 
       // Then
-      const expectedJeune = {
+      const expectedJeune: Jeune = {
         id: idNouveauJeune,
         firstName: command.firstName,
         lastName: command.lastName,
         email: command.email,
         isActivated: false,
         creationDate: date,
-        conseiller: conseiller,
+        conseiller: unConseillerDuJeune(),
         structure: Core.Structure.POLE_EMPLOI
       }
       expect(result).to.deep.equal(success(expectedJeune))

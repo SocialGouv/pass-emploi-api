@@ -28,7 +28,7 @@ import { IdService } from '../../../src/utils/id-service'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { unJeune } from '../../fixtures/jeune.fixture'
+import { unConseillerDuJeune, unJeune } from '../../fixtures/jeune.fixture'
 
 describe('CreerJeuneMiloCommandHandler', () => {
   let creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
@@ -134,7 +134,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
           creationDate: date,
           isActivated: false,
           email: command.email,
-          conseiller,
+          conseiller: unConseillerDuJeune(),
           structure: Core.Structure.MILO,
           idDossier: command.idDossier
         })
@@ -168,7 +168,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
           isActivated: false,
           creationDate: date,
           email: 'jeune.nom@email.com',
-          conseiller,
+          conseiller: unConseillerDuJeune(),
           structure: Core.Structure.MILO,
           idDossier: command.idDossier
         })

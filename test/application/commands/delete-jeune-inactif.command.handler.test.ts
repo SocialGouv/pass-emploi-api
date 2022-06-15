@@ -23,7 +23,7 @@ import {
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
+import { unConseillerDuJeune, unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect } from '../../utils'
 
 describe('DeleteJeuneInactifCommandHandler', () => {
@@ -46,7 +46,7 @@ describe('DeleteJeuneInactifCommandHandler', () => {
     )
 
     conseiller = unConseiller()
-    jeune = unJeune({ isActivated: false, conseiller })
+    jeune = unJeune({ isActivated: false })
     command = { idConseiller: 'id-conseiller', idJeune: 'id-jeune' }
     conseillerRepository.get.withArgs('id-conseiller').resolves(conseiller)
     jeuneRepository.get.withArgs('id-jeune').resolves(jeune)
@@ -109,7 +109,9 @@ describe('DeleteJeuneInactifCommandHandler', () => {
       // Given
       jeuneRepository.get
         .withArgs('id-jeune')
-        .resolves(unJeune({ conseiller: unConseiller({ id: 'un-autre' }) }))
+        .resolves(
+          unJeune({ conseiller: unConseillerDuJeune({ id: 'un-autre' }) })
+        )
 
       // When
       const result = await commandHandler.handle(command)
@@ -125,7 +127,9 @@ describe('DeleteJeuneInactifCommandHandler', () => {
       // Given
       jeuneRepository.get
         .withArgs('id-jeune')
-        .resolves(unJeune({ isActivated: true, conseiller }))
+        .resolves(
+          unJeune({ isActivated: true, conseiller: unConseillerDuJeune() })
+        )
 
       // When
       const result = await commandHandler.handle(command)

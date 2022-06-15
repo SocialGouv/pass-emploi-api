@@ -14,7 +14,7 @@ import {
   DeleteRendezVousCommandHandler
 } from '../../../src/application/commands/delete-rendez-vous.command.handler'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
+import { unConseillerDuJeune, unJeune } from '../../fixtures/jeune.fixture'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { EvenementService } from 'src/domain/evenement'
 import { PlanificateurService } from 'src/domain/planificateur'
@@ -63,7 +63,7 @@ describe('DeleteRendezVousCommandHandler', () => {
         describe('quand le conseiller qui supprime est différent du créateur', () => {
           it('envoie un email au créateur du rendez-vous', async () => {
             // Given
-            const conseillerSuppression = unConseiller({
+            const conseillerSuppression = unConseillerDuJeune({
               id: 'cons-suppr'
             })
             const conseillerCreateur = unConseiller({
@@ -104,7 +104,7 @@ describe('DeleteRendezVousCommandHandler', () => {
         describe("quand l'invitation est à false", () => {
           it("n'envoie pas d'email au conseiller créateur", async () => {
             // Given
-            const conseillerSuppression = unConseiller({
+            const conseillerSuppression = unConseillerDuJeune({
               id: 'cons-suppr'
             })
             const conseillerCreateur = unConseiller({
