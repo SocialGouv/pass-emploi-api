@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
   ArrayNotEmpty,
   IsArray,
+  IsBoolean,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -36,6 +37,11 @@ export class TransfererConseillerPayload {
   @IsArray()
   @ArrayNotEmpty()
   idsJeune: string[]
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  estTemporaire?: boolean
 }
 
 export class GetRendezVousJeuneQueryParams {
