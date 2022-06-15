@@ -63,8 +63,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
         id: conseiller.id,
         lastName: conseiller.lastName,
         firstName: conseiller.firstName,
-        email: conseiller.email,
-        estTemporaire: false
+        email: conseiller.email
       },
       structure: Core.Structure.POLE_EMPLOI
     }
