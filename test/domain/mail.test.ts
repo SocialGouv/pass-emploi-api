@@ -35,7 +35,7 @@ describe('Mail', () => {
             prenom: jeune.firstName,
             nom: jeune.lastName
           })
-          expect(actual.templateId).to.equal(13)
+          expect(actual.templateId).to.equal(12)
         })
       })
     })

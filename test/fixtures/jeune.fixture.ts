@@ -12,7 +12,7 @@ export const unJeune = (
     firstName: 'John',
     pushNotificationToken: 'unToken',
     isActivated: true,
-    conseiller: unConseiller(),
+    conseiller: unConseillerDuJeune(),
     creationDate: uneDatetime,
     email: 'john.doe@plop.io',
     idDossier: '1234',
@@ -30,7 +30,7 @@ export const unJeuneSansPushNotificationToken = (
   firstName: 'John',
   pushNotificationToken: '',
   isActivated: false,
-  conseiller,
+  conseiller: unConseillerDuJeune(conseiller),
   creationDate: uneDatetime,
   email: 'john.doe@plop.io',
   idDossier: '1234',
@@ -53,5 +53,19 @@ export const unJeuneSansConseiller = (
     structure: Core.Structure.MILO
   }
 
+  return { ...defaults, ...args }
+}
+
+export const unConseillerDuJeune = (
+  args: Partial<Jeune.Conseiller> = {}
+): Jeune.Conseiller => {
+  const conseiller = unConseiller()
+  const defaults = {
+    id: conseiller.id,
+    firstName: conseiller.firstName,
+    lastName: conseiller.lastName,
+    email: conseiller.email,
+    estTemporaire: false
+  }
   return { ...defaults, ...args }
 }

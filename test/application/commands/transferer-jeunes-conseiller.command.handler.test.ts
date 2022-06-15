@@ -3,7 +3,7 @@ import { SinonSandbox } from 'sinon'
 import { Chat } from 'src/domain/chat'
 import { Core } from 'src/domain/core'
 import { Jeune } from 'src/domain/jeune'
-import { unJeune } from 'test/fixtures/jeune.fixture'
+import { unConseillerDuJeune, unJeune } from 'test/fixtures/jeune.fixture'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import {
   TransfererJeunesConseillerCommand,
@@ -20,7 +20,6 @@ import {
 import { Conseiller } from '../../../src/domain/conseiller'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import Structure = Core.Structure
 
 describe('TransfererJeunesConseillerCommandHandler', () => {
   let transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler
@@ -50,6 +49,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
     const command: TransfererJeunesConseillerCommand = {
       idConseillerSource: '40',
       idConseillerCible: '41',
+      estTemporaire: false,
       idsJeunes: ['1', '2'],
       structure: Core.Structure.PASS_EMPLOI
     }
@@ -59,9 +59,8 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
         conseillerRepository.existe
           .withArgs(command.idConseillerSource, command.structure)
           .resolves(true)
-        const conseillerCible = unConseiller({
-          id: command.idConseillerCible,
-          structure: command.structure
+        const conseillerCible = unConseillerDuJeune({
+          id: command.idConseillerCible
         })
         conseillerRepository.get
           .withArgs(command.idConseillerCible)
@@ -73,8 +72,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             id: command.idConseillerSource,
             firstName: 'test',
             lastName: 'test',
-            structure: Structure.PASS_EMPLOI,
-            notificationsSonores: false
+            estTemporaire: false
           }
         })
         const jeune2 = unJeune({
@@ -83,8 +81,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             id: command.idConseillerSource,
             firstName: 'test',
             lastName: 'test',
-            structure: Structure.PASS_EMPLOI,
-            notificationsSonores: false
+            estTemporaire: false
           }
         })
         jeuneRepository.findAllJeunesByConseiller
