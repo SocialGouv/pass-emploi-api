@@ -59,9 +59,7 @@ function fromJeuneSqlToJeuneDuRdv(jeune: JeuneSqlModel): JeuneDuRendezVous {
       id: jeune.conseiller!.id,
       firstName: jeune.conseiller!.prenom,
       lastName: jeune.conseiller!.nom,
-      email: jeune.conseiller!.email ?? undefined,
-      // TODO:
-      estTemporaire: false
+      email: jeune.conseiller!.email ?? undefined
     }
   }
 }

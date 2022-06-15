@@ -14,6 +14,7 @@ export interface Jeune {
   structure: Core.Structure
   isActivated: boolean
   conseiller?: Jeune.Conseiller
+  conseillerInitial?: Jeune.ConseillerInitial
   email?: string
   pushNotificationToken?: string
   tokenLastUpdate?: DateTime
@@ -26,7 +27,10 @@ export namespace Jeune {
     firstName: string
     lastName: string
     email?: string
-    estTemporaire: boolean
+  }
+
+  export interface ConseillerInitial {
+    id: string
   }
 
   export type Id = Brand<string, 'JeuneId'>
