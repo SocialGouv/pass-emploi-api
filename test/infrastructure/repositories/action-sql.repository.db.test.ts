@@ -8,10 +8,11 @@ import { uneAction } from '../../fixtures/action.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
-import { expect } from '../../utils'
+import { expect, stubClass } from '../../utils'
 import { IdService } from 'src/utils/id-service'
 import { DateService } from 'src/utils/date-service'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
 
 describe('ActionSqlRepository', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -26,8 +27,10 @@ describe('ActionSqlRepository', () => {
     actionSqlRepository = new ActionSqlRepository()
     const conseillerRepository = new ConseillerSqlRepository()
     await conseillerRepository.save(unConseiller())
+    const firebaseClient = stubClass(FirebaseClient)
     const jeuneRepository = new JeuneSqlRepository(
       databaseForTesting.sequelize,
+      firebaseClient,
       idService,
       dateService
     )
