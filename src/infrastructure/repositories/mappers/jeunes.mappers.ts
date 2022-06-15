@@ -29,9 +29,7 @@ export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
       id: jeuneSqlModel.conseiller.id,
       firstName: jeuneSqlModel.conseiller.prenom,
       lastName: jeuneSqlModel.conseiller.nom,
-      email: jeuneSqlModel.conseiller.email || undefined,
-      // TODO: SQL
-      estTemporaire: false
+      email: jeuneSqlModel.conseiller.email || undefined
     }
   }
   return jeune

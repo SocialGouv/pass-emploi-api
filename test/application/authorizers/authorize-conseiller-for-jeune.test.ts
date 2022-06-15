@@ -48,8 +48,7 @@ describe('ConseillerForJeuneAuthorizer', () => {
         const unAutreConseiller: Jeune.Conseiller = {
           id: 'un-autre-conseiller',
           lastName: 'Dylan',
-          firstName: 'Bob',
-          estTemporaire: false
+          firstName: 'Bob'
         }
         const jeune = unJeune({ conseiller: unAutreConseiller })
         jeuneRepository.get.withArgs('un-jeune').resolves(jeune)

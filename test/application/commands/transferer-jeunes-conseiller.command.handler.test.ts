@@ -54,63 +54,65 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
       structure: Core.Structure.PASS_EMPLOI
     }
     describe('quand les conseillers et les jeunes correspondent au superviseur', () => {
-      it('retourne un success', async () => {
-        // Given
-        conseillerRepository.existe
-          .withArgs(command.idConseillerSource, command.structure)
-          .resolves(true)
-        const conseillerCible = unConseillerDuJeune({
-          id: command.idConseillerCible
+      describe('quand le transfert est permanent', () => {
+        it('retourne un success', async () => {
+          // Given
+          conseillerRepository.existe
+            .withArgs(command.idConseillerSource, command.structure)
+            .resolves(true)
+          const conseillerCible = unConseillerDuJeune({
+            id: command.idConseillerCible
+          })
+          conseillerRepository.get
+            .withArgs(command.idConseillerCible)
+            .resolves(conseillerCible)
+
+          const jeune1 = unJeune({
+            id: command.idsJeunes[0],
+            conseiller: {
+              id: command.idConseillerSource,
+              firstName: 'test',
+              lastName: 'test'
+            }
+          })
+          const jeune2 = unJeune({
+            id: command.idsJeunes[1],
+            conseiller: {
+              id: command.idConseillerSource,
+              firstName: 'test',
+              lastName: 'test'
+            }
+          })
+          jeuneRepository.findAllJeunesByConseiller
+            .withArgs(command.idsJeunes, command.idConseillerSource)
+            .resolves([jeune1, jeune2])
+
+          // When
+          const result = await transfererJeunesConseillerCommandHandler.handle(
+            command
+          )
+
+          // Then
+          expect(result).to.deep.equal(emptySuccess())
+          expect(
+            jeuneRepository.creerTransferts
+          ).to.have.been.calledWithExactly(
+            command.idConseillerSource,
+            command.idConseillerCible,
+            command.idsJeunes
+          )
+          expect(chatRepository.transfererChat).to.have.been.calledWithExactly(
+            command.idConseillerCible,
+            command.idsJeunes
+          )
+
+          jeune1.conseiller = conseillerCible
+          jeune2.conseiller = conseillerCible
+          expect(jeuneRepository.saveAll).to.have.been.calledWithExactly([
+            jeune1,
+            jeune2
+          ])
         })
-        conseillerRepository.get
-          .withArgs(command.idConseillerCible)
-          .resolves(conseillerCible)
-
-        const jeune1 = unJeune({
-          id: command.idsJeunes[0],
-          conseiller: {
-            id: command.idConseillerSource,
-            firstName: 'test',
-            lastName: 'test',
-            estTemporaire: false
-          }
-        })
-        const jeune2 = unJeune({
-          id: command.idsJeunes[1],
-          conseiller: {
-            id: command.idConseillerSource,
-            firstName: 'test',
-            lastName: 'test',
-            estTemporaire: false
-          }
-        })
-        jeuneRepository.findAllJeunesByConseiller
-          .withArgs(command.idsJeunes, command.idConseillerSource)
-          .resolves([jeune1, jeune2])
-
-        // When
-        const result = await transfererJeunesConseillerCommandHandler.handle(
-          command
-        )
-
-        // Then
-        expect(result).to.deep.equal(emptySuccess())
-        expect(jeuneRepository.creerTransferts).to.have.been.calledWithExactly(
-          command.idConseillerSource,
-          command.idConseillerCible,
-          command.idsJeunes
-        )
-        expect(chatRepository.transfererChat).to.have.been.calledWithExactly(
-          command.idConseillerCible,
-          command.idsJeunes
-        )
-
-        jeune1.conseiller = conseillerCible
-        jeune2.conseiller = conseillerCible
-        expect(jeuneRepository.saveAll).to.have.been.calledWithExactly([
-          jeune1,
-          jeune2
-        ])
       })
     })
     describe("quand le conseiller source n'existe pas", () => {

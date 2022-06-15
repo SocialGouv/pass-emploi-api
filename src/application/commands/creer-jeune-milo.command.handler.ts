@@ -82,8 +82,7 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
         id: conseiller.id,
         lastName: conseiller.lastName,
         firstName: conseiller.firstName,
-        email: conseiller.email,
-        estTemporaire: false
+        email: conseiller.email
       },
       structure: Core.Structure.MILO,
       idDossier: command.idDossier

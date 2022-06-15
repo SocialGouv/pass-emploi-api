@@ -79,7 +79,6 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
         id: conseillerCible.id,
         firstName: conseillerCible.firstName,
         lastName: conseillerCible.lastName,
-        estTemporaire: command.estTemporaire,
         email: conseillerCible.email
       }
     }))
