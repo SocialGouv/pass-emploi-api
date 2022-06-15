@@ -1,13 +1,11 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
-import { Core } from '../../../src/domain/core'
 import { Unauthorized } from '../../../src/domain/erreur'
 import { Jeune } from '../../../src/domain/jeune'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect } from '../../utils'
-import { Conseiller } from '../../../src/domain/conseiller'
 
 describe('ConseillerForJeuneAuthorizer', () => {
   let jeuneRepository: StubbedType<Jeune.Repository>
@@ -47,12 +45,11 @@ describe('ConseillerForJeuneAuthorizer', () => {
         const conseiller = unConseiller()
         const utilisateur = unUtilisateurConseiller({ id: conseiller.id })
 
-        const unAutreConseiller: Conseiller = {
+        const unAutreConseiller: Jeune.Conseiller = {
           id: 'un-autre-conseiller',
           lastName: 'Dylan',
           firstName: 'Bob',
-          structure: Core.Structure.POLE_EMPLOI,
-          notificationsSonores: false
+          estTemporaire: false
         }
         const jeune = unJeune({ conseiller: unAutreConseiller })
         jeuneRepository.get.withArgs('un-jeune').resolves(jeune)

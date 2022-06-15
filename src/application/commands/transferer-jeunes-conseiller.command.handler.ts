@@ -73,9 +73,15 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       )
     }
 
-    const updatedJeunes = jeunes.map(jeune => ({
+    const updatedJeunes: Jeune[] = jeunes.map(jeune => ({
       ...jeune,
-      conseiller: conseillerCible
+      conseiller: {
+        id: conseillerCible.id,
+        firstName: conseillerCible.firstName,
+        lastName: conseillerCible.lastName,
+        estTemporaire: command.estTemporaire,
+        email: conseillerCible.email
+      }
     }))
 
     await this.chatRepository.transfererChat(

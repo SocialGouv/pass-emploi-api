@@ -19,6 +19,7 @@ import { MiloHttpSqlRepository } from '../../../src/infrastructure/repositories/
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { testConfig } from '../../utils/module-for-testing'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
 
 describe('MiloHttpRepository', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -31,7 +32,7 @@ describe('MiloHttpRepository', () => {
   beforeEach(async () => {
     const httpService = new HttpService()
     const conseillerSqlRepository = new ConseillerSqlRepository()
-    await conseillerSqlRepository.save(jeune.conseiller)
+    await conseillerSqlRepository.save(unConseiller())
     const jeuneSqlRepository = new JeuneSqlRepository(
       databaseForTesting.sequelize,
       idService,

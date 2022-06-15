@@ -18,15 +18,13 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
 import { Chat } from '../../../src/domain/chat'
-import { Conseiller } from '../../../src/domain/conseiller'
 import { Jeune } from '../../../src/domain/jeune'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune,
   unUtilisateurSupport
 } from '../../fixtures/authentification.fixture'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
+import { unConseillerDuJeune, unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('DeleteJeuneCommandHandler', () => {
@@ -37,7 +35,6 @@ describe('DeleteJeuneCommandHandler', () => {
   let mailFactory: StubbedClass<Mail.Factory>
   let mailClient: StubbedType<Mail.Service>
   let authentificationRepository: StubbedType<Authentification.Repository>
-  let conseiller: Conseiller
   let jeune: Jeune
   let command: DeleteJeuneCommand
   beforeEach(() => {
@@ -57,10 +54,9 @@ describe('DeleteJeuneCommandHandler', () => {
       mailFactory
     )
 
-    conseiller = unConseiller()
     jeune = unJeune({
       isActivated: false,
-      conseiller
+      conseiller: unConseillerDuJeune()
     })
     command = { idJeune: 'ABCDE' }
     jeuneRepository.get.withArgs('ABCDE').resolves(jeune)

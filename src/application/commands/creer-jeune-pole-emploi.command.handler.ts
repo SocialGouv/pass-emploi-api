@@ -59,7 +59,13 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
       email: lowerCaseEmail,
       isActivated: false,
       creationDate: this.dateService.now(),
-      conseiller,
+      conseiller: {
+        id: conseiller.id,
+        lastName: conseiller.lastName,
+        firstName: conseiller.firstName,
+        email: conseiller.email,
+        estTemporaire: false
+      },
       structure: Core.Structure.POLE_EMPLOI
     }
     await this.jeuneRepository.save(nouveauJeune)

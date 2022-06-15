@@ -2,7 +2,6 @@ import { DateTime } from 'luxon'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
 import { Brand } from '../building-blocks/types/brand'
 import { DateService } from '../utils/date-service'
-import { Conseiller } from './conseiller'
 import { Core } from './core'
 
 export const JeunesRepositoryToken = 'Jeune.Repository'
@@ -14,7 +13,7 @@ export interface Jeune {
   creationDate: DateTime
   structure: Core.Structure
   isActivated: boolean
-  conseiller?: Conseiller
+  conseiller?: Jeune.Conseiller
   email?: string
   pushNotificationToken?: string
   tokenLastUpdate?: DateTime
@@ -22,6 +21,14 @@ export interface Jeune {
 }
 
 export namespace Jeune {
+  export interface Conseiller {
+    id: string
+    firstName: string
+    lastName: string
+    email?: string
+    estTemporaire: boolean
+  }
+
   export type Id = Brand<string, 'JeuneId'>
 
   export interface Repository {
