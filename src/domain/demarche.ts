@@ -133,15 +133,7 @@ export namespace Demarche {
       const maintenant = this.dateService.now().set({ hour: 12 })
       const dateTimeFin = DateTime.fromJSDate(demarcheACreer.dateFin)
 
-      if (demarcheACreer.quoi) {
-        if (!demarcheACreer.pourquoi) {
-          return failure(
-            new MauvaiseCommandeError(
-              'Pour créer une démarche du référentiel il faut un quoi et un pourquoi à minima'
-            )
-          )
-        }
-
+      if (demarcheACreer.quoi && demarcheACreer.pourquoi) {
         return success({
           statut: Demarche.Statut.A_FAIRE,
           dateCreation: maintenant,
@@ -150,16 +142,22 @@ export namespace Demarche {
           quoi: demarcheACreer.quoi,
           comment: demarcheACreer.comment
         })
+      } else if (demarcheACreer.description) {
+        return success({
+          statut: Demarche.Statut.A_FAIRE,
+          dateCreation: maintenant,
+          dateFin: dateTimeFin,
+          pourquoi: POURQUOI_DEMARCHE_PERSO,
+          quoi: QUOI_DEMARCHE_PERSO,
+          description: demarcheACreer.description
+        })
       }
 
-      return success({
-        statut: Demarche.Statut.A_FAIRE,
-        dateCreation: maintenant,
-        dateFin: dateTimeFin,
-        pourquoi: POURQUOI_DEMARCHE_PERSO,
-        quoi: QUOI_DEMARCHE_PERSO,
-        description: demarcheACreer.description
-      })
+      return failure(
+        new MauvaiseCommandeError(
+          'Pour créer une démarche du référentiel il faut un quoi et un pourquoi à minima, ou une description'
+        )
+      )
     }
 
     private mettreEnCours(
