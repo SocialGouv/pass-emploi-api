@@ -239,7 +239,7 @@ describe('Demarche', () => {
 
           // Then
           const erreur = new MauvaiseCommandeError(
-            'Pour créer une démarche du référentiel il faut un quoi et un pourquoi à minima'
+            'Pour créer une démarche du référentiel il faut un quoi et un pourquoi à minima, ou une description'
           )
           expect(demarche).to.deep.equal(failure(erreur))
         })
