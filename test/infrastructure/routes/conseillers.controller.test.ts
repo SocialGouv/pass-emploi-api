@@ -60,6 +60,7 @@ import {
 } from '../../../src/application/commands/modifier-conseiller.command.handler'
 import { uneAgence } from '../../fixtures/agence.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
 
 describe('ConseillersController', () => {
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
@@ -74,6 +75,7 @@ describe('ConseillersController', () => {
   let creerSuperviseursCommandHandler: StubbedClass<CreerSuperviseursCommandHandler>
   let deleteSuperviseursCommandHandler: StubbedClass<DeleteSuperviseursCommandHandler>
   let modifierConseillerCommandHandler: StubbedClass<ModifierConseillerCommandHandler>
+  let recupererJeunesDuConseillerCommandHandler: StubbedClass<RecupererJeunesDuConseillerCommandHandler>
   let app: INestApplication
 
   before(async () => {
@@ -103,6 +105,9 @@ describe('ConseillersController', () => {
     modifierConseillerCommandHandler = stubClass(
       ModifierConseillerCommandHandler
     )
+    recupererJeunesDuConseillerCommandHandler = stubClass(
+      RecupererJeunesDuConseillerCommandHandler
+    )
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(GetConseillerByEmailQueryHandler)
@@ -129,6 +134,8 @@ describe('ConseillersController', () => {
       .useValue(deleteSuperviseursCommandHandler)
       .overrideProvider(ModifierConseillerCommandHandler)
       .useValue(modifierConseillerCommandHandler)
+      .overrideProvider(RecupererJeunesDuConseillerCommandHandler)
+      .useValue(recupererJeunesDuConseillerCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -1069,5 +1076,44 @@ describe('ConseillersController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('put', '/conseillers/2')
+  })
+
+  describe('POST /conseillers/{idConseiller}/recuperer-mes-jeunes', () => {
+    describe('quand le conseiller existe', () => {
+      it('recupere ses jeunes', async () => {
+        // Given
+        const idConseiller = 'test'
+        recupererJeunesDuConseillerCommandHandler.execute
+          .withArgs({ idConseiller }, unUtilisateurDecode())
+          .resolves(emptySuccess())
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post(`/conseillers/${idConseiller}/recuperer-mes-jeunes`)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+      })
+    })
+
+    describe("quand le conseiller n'existe pas", () => {
+      it('renvoie 404', async () => {
+        // Given
+        const idConseiller = 'test'
+        recupererJeunesDuConseillerCommandHandler.execute
+          .withArgs({ idConseiller }, unUtilisateurDecode())
+          .resolves(failure(new NonTrouveError('Conseiller', idConseiller)))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .post(`/conseillers/${idConseiller}/recuperer-mes-jeunes`)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.NOT_FOUND)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'post',
+      '/conseillers/2/recuperer-mes-jeunes'
+    )
   })
 })
