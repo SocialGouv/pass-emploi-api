@@ -53,9 +53,8 @@ function buildStatutsPossibles(
   }
 
   if (
-    (demarcheDto.etat === 'AC' &&
-      demarcheDto.droitsDemarche?.modificationDate) ||
-    (demarcheDto.etat === 'RE' && demarcheDto.droitsDemarche?.replanification)
+    demarcheDto.etat === 'AC' &&
+    demarcheDto.droitsDemarche?.modificationDate
   ) {
     statuts.push(Demarche.Statut.A_FAIRE)
 
@@ -65,6 +64,13 @@ function buildStatutsPossibles(
     if (dateFin > maintenant) {
       statuts.push(Demarche.Statut.EN_COURS)
     }
+  }
+
+  if (
+    demarcheDto.etat === 'RE' &&
+    demarcheDto.droitsDemarche?.replanification
+  ) {
+    statuts.push(Demarche.Statut.A_FAIRE)
   }
 
   return statuts
