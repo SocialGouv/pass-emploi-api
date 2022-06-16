@@ -120,12 +120,7 @@ export class FirebaseClient implements IFirebaseClient {
     idsJeunes: string[],
     estTemporaire: boolean
   ): Promise<void> {
-    let messageTransfertChat =
-      'Vous échangez avec votre nouveau conseiller.\nIl a accès à l’historique de vos échanges'
-    if (estTemporaire) {
-      messageTransfertChat =
-        'Vous échangez temporairement avec un nouveau conseiller.\nIl a accès à l’historique de vos échanges'
-    }
+    const messageTransfertChat = 'Vous échangez avec votre nouveau conseiller.'
     const { encryptedText, iv } =
       this.chatCryptoService.encrypt(messageTransfertChat)
 
@@ -152,7 +147,9 @@ export class FirebaseClient implements IFirebaseClient {
               {
                 sentBy: 'conseiller',
                 conseillerId: conseillerCibleId,
-                type: 'NOUVEAU_CONSEILLER',
+                type: estTemporaire
+                  ? 'NOUVEAU_CONSEILLER_TEMPORAIRE'
+                  : 'NOUVEAU_CONSEILLER',
                 content: encryptedText,
                 iv: iv,
                 creationDate: Timestamp.fromDate(new Date())
