@@ -3616,9 +3616,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bull@npm:4.8.3":
-  version: 4.8.3
-  resolution: "bull@npm:4.8.3"
+"bull@npm:4.8.4":
+  version: 4.8.4
+  resolution: "bull@npm:4.8.4"
   dependencies:
     cron-parser: ^4.2.1
     debuglog: ^1.0.0
@@ -3629,7 +3629,7 @@ __metadata:
     p-timeout: ^3.2.0
     semver: ^7.3.2
     uuid: ^8.3.0
-  checksum: b2b4a42ef08370452e8ec9d715fa1d83e77f25aed3dc7394a20434ef328b978af5905aa92afb381875bf795be4f5db657248c14291bd8bf51c61469955f2dd24
+  checksum: d9e15a38a610b63062d2fb449a6a66fc99db7760e4047f88ad9ed0e8b8b46c4be08e31bcecb5f144f406922602b91d6473bbfa6fe5093d50bc7901feafbd455b
   languageName: node
   linkType: hard
 
@@ -7905,7 +7905,7 @@ __metadata:
     "@types/yargs": ^17.0.10
     "@typescript-eslint/eslint-plugin": ^5.27.1
     "@typescript-eslint/parser": ^5.27.1
-    bull: 4.8.3
+    bull: 4.8.4
     chai: ^4.3.6
     chai-as-promised: ^7.1.1
     class-transformer: 0.5.1
