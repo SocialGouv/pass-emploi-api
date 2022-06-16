@@ -181,6 +181,7 @@ import { FichierAuthorizer } from './application/authorizers/authorize-fichier'
 import { FindAllOffresEmploiQueryGetter } from './application/queries/query-getters/find-all-offres-emploi.query.getter'
 import { FindAllOffresImmersionQueryGetter } from './application/queries/query-getters/find-all-offres-immersion.query.getter'
 import { FindAllOffresServicesCiviqueQueryGetter } from './application/queries/query-getters/find-all-offres-services-civique.query.getter'
+import { RecupererJeunesDuConseillerCommandHandler } from './application/commands/recuperer-jeunes-du-conseiller.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -426,7 +427,9 @@ export function buildQueryCommandsProviders(): Provider[] {
     FichierAuthorizer,
     FindAllOffresEmploiQueryGetter,
     FindAllOffresImmersionQueryGetter,
-    FindAllOffresServicesCiviqueQueryGetter
+    FindAllOffresServicesCiviqueQueryGetter,
+    RecupererJeunesDuConseillerCommandHandler,
+    FichierAuthorizer
   ]
 }
 

@@ -215,6 +215,66 @@ describe('JeuneSqlRepository', () => {
     })
   })
 
+  describe('findAllJeunesByConseillerInitial', () => {
+    const conseiller = unConseiller({ id: 'test' })
+    const conseiller3 = unConseiller({ id: 'test3' })
+    const jeune1Id = '1'
+    const jeune2Id = '2'
+    const jeune3Id = '3'
+
+    beforeEach(async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseillerDto({ id: conseiller.id }))
+      await ConseillerSqlModel.creer(unConseillerDto({ id: conseiller3.id }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: jeune1Id,
+          idConseiller: conseiller3.id,
+          idConseillerInitial: conseiller.id
+        })
+      )
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: jeune2Id,
+          idConseiller: conseiller3.id,
+          idConseillerInitial: conseiller.id
+        })
+      )
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: jeune3Id,
+          idConseiller: conseiller3.id
+        })
+      )
+    })
+
+    describe('quand les jeunes existent', () => {
+      it('retourne la liste des jeunes', async () => {
+        // When
+        const result =
+          await jeuneSqlRepository.findAllJeunesByConseillerInitial(
+            conseiller.id
+          )
+
+        // Then
+        expect(result.length).to.equal(2)
+        expect(result[0].id).to.equal(jeune1Id)
+        expect(result[1].id).to.equal(jeune2Id)
+      })
+    })
+
+    describe("quand aucun jeune n'existe", () => {
+      it('retourne une liste vide', async () => {
+        // When
+        const result =
+          await jeuneSqlRepository.findAllJeunesByConseillerInitial('FAUX_ID')
+
+        // Then
+        expect(result).to.deep.equal([])
+      })
+    })
+  })
+
   describe('existe', () => {
     let jeune: Jeune
 

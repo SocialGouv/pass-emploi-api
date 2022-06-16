@@ -53,6 +53,8 @@ export namespace Jeune {
       idConseiller: string
     ): Promise<Jeune[]>
 
+    findAllJeunesByConseillerInitial(idConseiller: string): Promise<Jeune[]>
+
     supprimer(idJeune: Jeune.Id): Promise<void>
 
     getHomeQueryModel(idJeune: string): Promise<JeuneHomeQueryModel>
@@ -61,7 +63,7 @@ export namespace Jeune {
       jeunes: Jeune[],
       idConseillerCible: string,
       idConseillerSource: string,
-      estTemporaire: boolean
+      estTemporaire?: boolean
     ): Promise<void>
   }
 
@@ -76,4 +78,46 @@ export namespace Jeune {
       tokenLastUpdate: dateService.now()
     }
   }
+
+  export function changerLeConseillerDesJeunes(
+    jeunes: Jeune[],
+    conseillerCible: Conseiller,
+    idConseillerSource?: string,
+    estTemporaire = false
+  ): Jeune[] {
+    return jeunes.map(jeune => ({
+      ...jeune,
+      conseiller: {
+        id: conseillerCible.id,
+        firstName: conseillerCible.firstName,
+        lastName: conseillerCible.lastName,
+        email: conseillerCible.email
+      },
+      conseillerInitial: idConseillerSource
+        ? mapConseillerInitial(
+            jeune,
+            conseillerCible.id,
+            idConseillerSource!,
+            estTemporaire
+          )
+        : undefined
+    }))
+  }
+}
+
+function mapConseillerInitial(
+  jeune: Jeune,
+  idConseillerCible: string,
+  idConseillerSource: string,
+  estTemporaire: boolean
+): Jeune.ConseillerInitial | undefined {
+  if (idConseillerCible === jeune.conseillerInitial?.id) {
+    return undefined
+  }
+
+  if (estTemporaire) {
+    return jeune.conseillerInitial ?? { id: idConseillerSource }
+  }
+
+  return undefined
 }

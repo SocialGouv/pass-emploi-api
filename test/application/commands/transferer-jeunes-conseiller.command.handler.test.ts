@@ -198,6 +198,44 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             )
           })
         })
+        describe('quand le conseiller cible est le meme que le conseiller initial', () => {
+          it('sauvegarde le jeune et supprime son conseiller initial', async () => {
+            // Given
+            const jeune1: Jeune = unJeune({
+              id: command.idsJeunes[0],
+              conseiller: {
+                id: command.idConseillerSource,
+                firstName: 'test',
+                lastName: 'test'
+              },
+              conseillerInitial: {
+                id: command.idConseillerCible
+              }
+            })
+            jeuneRepository.findAllJeunesByConseiller
+              .withArgs(command.idsJeunes, command.idConseillerSource)
+              .resolves([jeune1])
+
+            // When
+            const result =
+              await transfererJeunesConseillerCommandHandler.handle(command)
+
+            // Then
+            expect(result).to.deep.equal(emptySuccess())
+
+            jeune1.conseiller = conseillerCible
+            jeune1.conseillerInitial = undefined
+
+            expect(
+              jeuneRepository.transferAndSaveAll
+            ).to.have.been.calledWithExactly(
+              [jeune1],
+              command.idConseillerCible,
+              command.idConseillerSource,
+              command.estTemporaire
+            )
+          })
+        })
       })
     })
     describe("quand le conseiller source n'existe pas", () => {
