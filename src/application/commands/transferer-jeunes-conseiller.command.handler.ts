@@ -70,16 +70,13 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       )
     }
 
-    const updatedJeunes: Jeune[] = jeunes.map(jeune => ({
-      ...jeune,
-      conseiller: {
-        id: conseillerCible.id,
-        firstName: conseillerCible.firstName,
-        lastName: conseillerCible.lastName,
-        email: conseillerCible.email
-      },
-      conseillerInitial: mapConseillerInitial(command, jeune)
-    }))
+    const updatedJeunes: Jeune[] = Jeune.changerLeConseillerDesJeunes(
+      jeunes,
+      conseillerCible,
+      command.idConseillerSource,
+      command.estTemporaire
+    )
+
     await this.jeuneRepository.transferAndSaveAll(
       updatedJeunes,
       command.idConseillerCible,
@@ -100,14 +97,4 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
   async monitor(): Promise<void> {
     return
   }
-}
-
-function mapConseillerInitial(
-  command: TransfererJeunesConseillerCommand,
-  jeune: Jeune
-): Jeune.ConseillerInitial | undefined {
-  if (command.estTemporaire) {
-    return jeune.conseillerInitial ?? { id: command.idConseillerSource }
-  }
-  return undefined
 }

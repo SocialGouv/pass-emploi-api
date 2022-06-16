@@ -102,6 +102,18 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return jeunesSqlModel.map(fromSqlToJeune)
   }
 
+  async findAllJeunesByConseillerInitial(
+    idConseiller: string
+  ): Promise<Jeune[]> {
+    const jeunesSqlModel = await JeuneSqlModel.findAll({
+      where: {
+        idConseillerInitial: idConseiller
+      },
+      include: [ConseillerSqlModel]
+    })
+    return jeunesSqlModel.map(fromSqlToJeune)
+  }
+
   async save(jeune: Jeune): Promise<void> {
     await JeuneSqlModel.upsert({
       id: jeune.id,

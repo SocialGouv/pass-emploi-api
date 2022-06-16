@@ -80,6 +80,8 @@ import {
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
 import { ModifierConseillerCommandHandler } from '../../application/commands/modifier-conseiller.command.handler'
+import { handleFailure } from './failure.handler'
+import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -100,7 +102,8 @@ export class ConseillersController {
     private readonly creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler,
     private readonly creerSuperviseursCommandHandler: CreerSuperviseursCommandHandler,
     private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler,
-    private readonly modifierConseillerCommandHandler: ModifierConseillerCommandHandler
+    private readonly modifierConseillerCommandHandler: ModifierConseillerCommandHandler,
+    private readonly recupererJeunesDuConseillerCommandHandler: RecupererJeunesDuConseillerCommandHandler
   ) {}
 
   @ApiOperation({
@@ -562,6 +565,29 @@ export class ConseillersController {
       }
       throw new RuntimeException(result.error.message)
     }
+  }
+
+  @ApiOperation({
+    summary:
+      'Réaffecte les jeunes transférés temporairement au conseiller initial',
+    description: 'Autorisé pour un conseiller'
+  })
+  @Post(':idConseiller/recuperer-mes-jeunes')
+  @HttpCode(200)
+  async recupererJeunes(
+    @Param('idConseiller') idConseiller: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.recupererJeunesDuConseillerCommandHandler.execute(
+      {
+        idConseiller: idConseiller
+      },
+      utilisateur
+    )
+    if (isSuccess(result)) {
+      return
+    }
+    throw handleFailure(result)
   }
 }
 
