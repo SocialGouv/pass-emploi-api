@@ -67,7 +67,7 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
-import { unConseillerJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
+import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import {
   buildTestingModuleForHttpTesting,
   expect,
@@ -465,24 +465,19 @@ describe('JeunesController', () => {
     const idJeune = '1'
     it('renvoit le jeune quand il existe', async () => {
       // Given
-      const detailJeuneQueryModel: DetailJeuneQueryModel = {
-        id: idJeune,
-        firstName: 'Kenji',
-        lastName: 'Tavernier',
-        email: 'kenji.tavernier@email.fr',
-        creationDate: 'une_date',
-        isActivated: true,
-        conseiller: unConseillerJeuneQueryModel()
-      }
+      const detailJeuneQueryModel: DetailJeuneQueryModel =
+        unDetailJeuneQueryModel()
       getDetailJeuneQueryHandler.execute.resolves(detailJeuneQueryModel)
 
       // When
+      const expected = { ...detailJeuneQueryModel }
+      delete expected.urlDossier
       await request(app.getHttpServer())
         .get(`/jeunes/${idJeune}`)
         .set('authorization', unHeaderAuthorization())
         // Then
         .expect(HttpStatus.OK)
-        .expect(detailJeuneQueryModel)
+        .expect(expected)
       expect(getDetailJeuneQueryHandler.execute).to.have.been.calledWithExactly(
         {
           idJeune
