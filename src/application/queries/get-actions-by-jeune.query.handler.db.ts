@@ -26,7 +26,14 @@ export interface GetActionsByJeuneQuery extends Query {
 
 export interface ActionsByJeuneOutput {
   actions: ActionQueryModel[]
-  nombreTotal: number
+  metadonnees: {
+    nombreTotal: number
+    nombreEnCours: number
+    nombreTermine: number
+    nombreAnnule: number
+    nombrePasCommence: number
+    nombreElementsParPage: number
+  }
 }
 
 @Injectable()
@@ -42,42 +49,38 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
     super('GetActionsByJeuneQueryHandler')
   }
 
-  mapTriToSqlOrder: Record<Action.Tri, Order> = {
-    date_croissante: [['date_derniere_actualisation', 'ASC']],
-    date_decroissante: [['date_derniere_actualisation', 'DESC']],
-    statut: [
-      this.sequelize.literal(
-        `CASE WHEN statut = '${Action.Statut.TERMINEE}' THEN 1 ELSE 0 END`
-      ),
-      ['date_derniere_actualisation', 'DESC']
-    ]
-  }
-
   async handle(
     query: GetActionsByJeuneQuery
   ): Promise<Result<ActionsByJeuneOutput>> {
     const filtres = generateWhere(query)
 
-    const nombreTotalActionsSql = await ActionSqlModel.count({
+    const nombreTotalActionsFiltrees = await ActionSqlModel.count({
       where: filtres
     })
 
-    if (!laPageExiste(nombreTotalActionsSql, query.page)) {
+    if (!laPageExiste(nombreTotalActionsFiltrees, query.page)) {
       return failure(new NonTrouveError('Page', query.page?.toString()))
     }
 
     const result: ActionsByJeuneOutput = {
       actions: [],
-      nombreTotal: nombreTotalActionsSql
+      metadonnees: {
+        nombreTotal: nombreTotalActionsFiltrees,
+        nombreEnCours: 0,
+        nombreTermine: 0,
+        nombreAnnule: 0,
+        nombrePasCommence: 0,
+        nombreElementsParPage: LIMITE_NOMBRE_ACTIONS_PAR_PAGE
+      }
     }
-    if (nombreTotalActionsSql === 0) {
+    if (nombreTotalActionsFiltrees === 0) {
       return success(result)
     }
 
     const actionsSqlModel = await ActionSqlModel.findAll({
       where: filtres,
-      order: this.mapTriToSqlOrder[query.tri ?? Action.Tri.STATUT],
-      limit: generateLimit(nombreTotalActionsSql, query.page),
+      order: this.trier[query.tri ?? Action.Tri.STATUT],
+      limit: generateLimit(nombreTotalActionsFiltrees, query.page),
       offset: generateOffset(query.page),
       include: [
         {
@@ -89,7 +92,14 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
 
     return success({
       actions: actionsSqlModel.map(fromSqlToActionQueryModel),
-      nombreTotal: nombreTotalActionsSql
+      metadonnees: {
+        nombreTotal: nombreTotalActionsFiltrees,
+        nombreEnCours: 0,
+        nombreTermine: 0,
+        nombreAnnule: 0,
+        nombrePasCommence: 0,
+        nombreElementsParPage: LIMITE_NOMBRE_ACTIONS_PAR_PAGE
+      }
     })
   }
 
@@ -109,6 +119,17 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+
+  trier: Record<Action.Tri, Order> = {
+    date_croissante: [['date_derniere_actualisation', 'ASC']],
+    date_decroissante: [['date_derniere_actualisation', 'DESC']],
+    statut: [
+      this.sequelize.literal(
+        `CASE WHEN statut = '${Action.Statut.TERMINEE}' THEN 1 ELSE 0 END`
+      ),
+      ['date_derniere_actualisation', 'DESC']
+    ]
   }
 }
 
