@@ -72,15 +72,10 @@ export class JeuneSqlRepository implements Jeune.Repository {
   async transferAndSaveAll(
     jeunes: Jeune[],
     idConseillerCible: string,
-    idConseillerSource: string,
-    estTemporaire = false
+    idConseillerSource: string
   ): Promise<void> {
     const idsJeunes = jeunes.map(jeune => jeune.id)
-    await this.firebaseClient.transfererChat(
-      idConseillerCible,
-      idsJeunes,
-      estTemporaire
-    )
+    await this.firebaseClient.transfererChat(idConseillerCible, idsJeunes)
     await Promise.all([
       this.creerTransferts(idConseillerSource, idConseillerCible, idsJeunes),
       this.saveAll(jeunes)
