@@ -72,6 +72,7 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
                  jeune.email,
                  jeune.date_creation,
                  jeune.id_authentification,
+                 jeune.id_conseiller_initial,
                  MAX(evenement_engagement.date_evenement) as date_evenement,
                  conseiller.email                         as email_conseiller_precedent,
                  conseiller.prenom                        as prenom_conseiller_precedent,

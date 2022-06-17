@@ -42,6 +42,7 @@ export function unDetailJeuneQueryModel(
     email: 'john.doe@plop.io',
     creationDate: '2021-11-11T08:03:30.000Z',
     isActivated: true,
+    isReaffectationTemporaire: false,
     conseiller: unConseillerJeuneQueryModel(),
     urlDossier: undefined
   }
@@ -59,6 +60,7 @@ export function unDetailJeuneConseillerQueryModel(
     email: 'john.doe@plop.io',
     creationDate: '2021-11-11T08:03:30.000Z',
     isActivated: true,
+    isReaffectationTemporaire: false,
     situationCourante: undefined
   }
 

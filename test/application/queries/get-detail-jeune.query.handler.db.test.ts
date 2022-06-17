@@ -201,6 +201,44 @@ describe('GetDetailJeuneQueryHandler', () => {
         expect(actual).to.deep.equal(expected)
       })
     })
+    describe('quand il y a eu un transfert temporaire', () => {
+      const idJeune = '1'
+      const idConseiller = '1'
+      beforeEach(async () => {
+        await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
+        await ConseillerSqlModel.creer(unConseillerDto({ id: '41' }))
+      })
+
+      it("retourne un jeune avec l'information de réaffectation temporaire", async () => {
+        // Given
+        await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: idJeune,
+            idConseiller,
+            idConseillerInitial: '41',
+            structure: Core.Structure.PASS_EMPLOI
+          })
+        )
+
+        // When
+        const actual = await getDetailJeuneQueryHandler.handle({ idJeune })
+        // Then
+        const expected = unDetailJeuneQueryModel({
+          id: idJeune,
+          conseiller: {
+            email: unConseillerDto({ id: idConseiller }).email!,
+            nom: unConseillerDto({ id: idConseiller }).nom,
+            prenom: unConseillerDto({ id: idConseiller }).prenom,
+            depuis: new Date(
+              unDetailJeuneQueryModel().creationDate
+            ).toISOString()
+          },
+          isReaffectationTemporaire: true,
+          situations: undefined
+        })
+        expect(actual).to.deep.equal(expected)
+      })
+    })
     describe('quand il y a eu plusieurs transferts', () => {
       const idJeune = '1'
       const idConseiller = '1'
