@@ -1,5 +1,8 @@
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { GetActionsByJeuneQueryHandler } from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
+import {
+  ActionsByJeuneOutput,
+  GetActionsByJeuneQueryHandler
+} from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
 import { GetCampagneQueryModel } from '../../../src/application/queries/query-getters/get-campagne.query.getter'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import { GetJeuneHomeActionsQueryHandler } from '../../../src/application/queries/get-jeune-home-actions.query.handler'
@@ -32,9 +35,20 @@ describe('GetJeuneHomeActionsQueryHandler', () => {
   describe('handle', () => {
     it('appelle les actions et campagne et les retourne', async () => {
       // Given
+      const actionsByJeuneOutput: ActionsByJeuneOutput = {
+        actions: actionsQueryModel,
+        metadonnees: {
+          nombreTotal: 5,
+          nombreEnCours: 2,
+          nombreTermine: 1,
+          nombreAnnule: 1,
+          nombrePasCommence: 1,
+          nombreElementsParPage: 10
+        }
+      }
       getActionsByJeuneQueryHandler.handle
         .withArgs({ idJeune: 'idJeune' })
-        .resolves(success({ actions: actionsQueryModel, nombreTotal: 1 }))
+        .resolves(success(actionsByJeuneOutput))
 
       getCampagneQueryModel.handle
         .withArgs({ idJeune: 'idJeune' })

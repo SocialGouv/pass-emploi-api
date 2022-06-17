@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Order, Sequelize, WhereOptions } from 'sequelize'
+import { Order, QueryTypes, Sequelize, WhereOptions } from 'sequelize'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
@@ -54,9 +54,12 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
   ): Promise<Result<ActionsByJeuneOutput>> {
     const filtres = generateWhere(query)
 
-    const nombreTotalActionsFiltrees = await ActionSqlModel.count({
-      where: filtres
-    })
+    const [nombreTotalActionsFiltrees, statutRawCount] = await Promise.all([
+      ActionSqlModel.count({
+        where: filtres
+      }),
+      this.getCompteParStatut(query)
+    ])
 
     if (!laPageExiste(nombreTotalActionsFiltrees, query.page)) {
       return failure(new NonTrouveError('Page', query.page?.toString()))
@@ -66,10 +69,13 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
       actions: [],
       metadonnees: {
         nombreTotal: nombreTotalActionsFiltrees,
-        nombreEnCours: 0,
-        nombreTermine: 0,
-        nombreAnnule: 0,
-        nombrePasCommence: 0,
+        nombreEnCours: this.getCompte(statutRawCount, Action.Statut.EN_COURS),
+        nombreTermine: this.getCompte(statutRawCount, Action.Statut.TERMINEE),
+        nombreAnnule: this.getCompte(statutRawCount, Action.Statut.ANNULEE),
+        nombrePasCommence: this.getCompte(
+          statutRawCount,
+          Action.Statut.PAS_COMMENCEE
+        ),
         nombreElementsParPage: LIMITE_NOMBRE_ACTIONS_PAR_PAGE
       }
     }
@@ -91,15 +97,8 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
     })
 
     return success({
-      actions: actionsSqlModel.map(fromSqlToActionQueryModel),
-      metadonnees: {
-        nombreTotal: nombreTotalActionsFiltrees,
-        nombreEnCours: 0,
-        nombreTermine: 0,
-        nombreAnnule: 0,
-        nombrePasCommence: 0,
-        nombreElementsParPage: LIMITE_NOMBRE_ACTIONS_PAR_PAGE
-      }
+      ...result,
+      actions: actionsSqlModel.map(fromSqlToActionQueryModel)
     })
   }
 
@@ -119,6 +118,30 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+
+  private getCompteParStatut(
+    query: GetActionsByJeuneQuery
+  ): Promise<RawCount[]> {
+    return this.sequelize.query(
+      `
+        SELECT statut, COUNT(*)
+        FROM action
+        WHERE id_jeune = :idJeune
+        GROUP BY statut;
+      `,
+      {
+        type: QueryTypes.SELECT,
+        replacements: {
+          idJeune: query.idJeune
+        }
+      }
+    ) as unknown as Promise<RawCount[]>
+  }
+
+  private getCompte(statutRawCount: RawCount[], statut: Action.Statut): number {
+    const count = statutRawCount.find(raw => raw.statut === statut)?.count
+    return count ? parseInt(count) : 0
   }
 
   trier: Record<Action.Tri, Order> = {
@@ -157,4 +180,9 @@ function generateWhere(query: GetActionsByJeuneQuery): WhereOptions {
     filtres.statut = query.statuts
   }
   return filtres
+}
+
+interface RawCount {
+  statut: Action.Statut
+  count: string
 }
