@@ -28,7 +28,10 @@ import {
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
 import { DeleteJeuneInactifCommandHandler } from '../../../src/application/commands/delete-jeune-inactif.command.handler'
-import { GetActionsByJeuneQueryHandler } from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
+import {
+  ActionsByJeuneOutput,
+  GetActionsByJeuneQueryHandler
+} from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
 import { GetActionsJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-actions-jeune-pole-emploi.query.handler'
 import { GetConseillersJeuneQueryHandler } from '../../../src/application/queries/get-conseillers-jeune.query.handler.db'
 import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler.db'
@@ -1080,13 +1083,27 @@ describe('JeunesController', () => {
         tri: 'date_croissante',
         statuts: ['done']
       }
-      const expectedActions = success({ actions: [], nombreTotal: 0 })
+      const actionsByJeuneOutput: ActionsByJeuneOutput = {
+        actions: [],
+        metadonnees: {
+          nombreTotal: 0,
+          nombreEnCours: 0,
+          nombreTermine: 0,
+          nombreAnnule: 0,
+          nombrePasCommence: 0,
+          nombreElementsParPage: 10
+        }
+      }
+      const expectedActions = success(actionsByJeuneOutput)
       getActionsByJeuneQueryHandler.execute.resolves(expectedActions)
       // When
       await request(app.getHttpServer())
         .get(`/jeunes/${idJeune}/actions`)
         .set('authorization', unHeaderAuthorization())
-        .set('x-total-count', expectedActions.data.nombreTotal.toString())
+        .set(
+          'x-total-count',
+          expectedActions.data.metadonnees.nombreTotal.toString()
+        )
         .query(queryActions)
         // Then
         .expect(HttpStatus.PARTIAL_CONTENT)
@@ -1097,13 +1114,27 @@ describe('JeunesController', () => {
       const queryActions = {
         idJeune: idJeune
       }
-      const expectedActions = success({ actions: [], nombreTotal: 0 })
+      const actionsByJeuneOutput: ActionsByJeuneOutput = {
+        actions: [],
+        metadonnees: {
+          nombreTotal: 0,
+          nombreEnCours: 0,
+          nombreTermine: 0,
+          nombreAnnule: 0,
+          nombrePasCommence: 0,
+          nombreElementsParPage: 10
+        }
+      }
+      const expectedActions = success(actionsByJeuneOutput)
       getActionsByJeuneQueryHandler.execute.resolves(expectedActions)
       // When
       await request(app.getHttpServer())
         .get(`/jeunes/${idJeune}/actions`)
         .set('authorization', unHeaderAuthorization())
-        .set('x-total-count', expectedActions.data.nombreTotal.toString())
+        .set(
+          'x-total-count',
+          expectedActions.data.metadonnees.nombreTotal.toString()
+        )
         .query(queryActions)
         // Then
         .expect(HttpStatus.OK)
