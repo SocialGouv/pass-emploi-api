@@ -19,6 +19,8 @@ import {
   toDetailOffreImmersionQueryModel,
   toOffreImmersionQueryModel
 } from './mappers/offres-immersion.mappers'
+import { URLSearchParams } from 'url'
+import { PartenaireImmersion } from './dto/immersion.dto'
 
 @Injectable()
 export class OffresImmersionHttpSqlRepository
@@ -84,20 +86,17 @@ export class OffresImmersionHttpSqlRepository
   async findAll(
     criteres: OffresImmersion.Criteres
   ): Promise<Result<OffreImmersionQueryModel[]>> {
-    const payload = {
-      rome: criteres.rome,
-      location: {
-        lat: criteres.lat,
-        lon: criteres.lon
-      },
-      distance_km: criteres.distance
-    }
+    const params = new URLSearchParams()
+    params.append('rome', criteres.rome)
+    params.append('longitude', criteres.lon.toString())
+    params.append('latitude', criteres.lat.toString())
+    params.append('distance_km', criteres.distance.toString())
+    params.append('sortedBy', 'date')
 
     try {
-      const response = await this.immersionClient.post(
-        'search-immersion',
-        payload
-      )
+      const response = await this.immersionClient.get<
+        PartenaireImmersion.DtoV1[]
+      >('v1/immersion-offers', params)
 
       return success(response.data.map(toOffreImmersionQueryModel))
     } catch (e) {
@@ -110,11 +109,12 @@ export class OffresImmersionHttpSqlRepository
       throw e
     }
   }
+
   async get(
     idOffreImmersion: string
   ): Promise<Result<DetailOffreImmersionQueryModel>> {
     try {
-      const response = await this.immersionClient.get(
+      const response = await this.immersionClient.get<PartenaireImmersion.Dto>(
         `/get-immersion-by-id/${idOffreImmersion}`
       )
       return success(toDetailOffreImmersionQueryModel(response.data))

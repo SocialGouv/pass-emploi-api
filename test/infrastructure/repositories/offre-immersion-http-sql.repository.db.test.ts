@@ -26,6 +26,7 @@ import {
 } from 'src/application/queries/query-models/offres-immersion.query-model'
 import { TIMEOUT } from 'dns'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { URLSearchParams } from 'url'
 
 describe('OffresImmersionHttpSqlRepository', () => {
   DatabaseForTesting.prepare()
@@ -56,6 +57,8 @@ describe('OffresImmersionHttpSqlRepository', () => {
           data: [
             {
               id: 'id',
+              rome: 'mon-rome',
+              siret: 'mon-siret',
               romeLabel: 'romeLabel',
               name: 'name',
               nafLabel: 'nafLabel',
@@ -69,9 +72,14 @@ describe('OffresImmersionHttpSqlRepository', () => {
           config: ''
         }
 
-        immersionClient.post
-          .withArgs('search-immersion', query)
-          .resolves(response)
+        const params = new URLSearchParams()
+        params.append('rome', query.rome)
+        params.append('longitude', query.location.lon.toString())
+        params.append('latitude', query.location.lat.toString())
+        params.append('distance_km', query.distance_km.toString())
+        params.append('sortedBy', 'date')
+
+        immersionClient.get.withArgs('v1/immersion-offers').resolves(response)
 
         // When
         const offres = await offresImmersionHttpSqlRepository.findAll({
@@ -82,10 +90,14 @@ describe('OffresImmersionHttpSqlRepository', () => {
         })
 
         // Then
+        expect(immersionClient.get.getCall(0).args).to.be.deep.equal([
+          'v1/immersion-offers',
+          params
+        ])
         expect(offres).to.deep.equal(
           success([
             {
-              id: 'id',
+              id: 'mon-siret-mon-rome',
               metier: 'romeLabel',
               nomEtablissement: 'name',
               secteurActivite: 'nafLabel',
@@ -123,7 +135,7 @@ describe('OffresImmersionHttpSqlRepository', () => {
           config: ''
         }
 
-        immersionClient.post.rejects({ response: badResponse })
+        immersionClient.get.rejects({ response: badResponse })
 
         // When
         const offres = await offresImmersionHttpSqlRepository.findAll({
@@ -153,7 +165,7 @@ describe('OffresImmersionHttpSqlRepository', () => {
 
         const error: Error = new Error(TIMEOUT)
 
-        immersionClient.post.rejects(error)
+        immersionClient.get.rejects(error)
 
         // When
         const call = offresImmersionHttpSqlRepository.findAll({
