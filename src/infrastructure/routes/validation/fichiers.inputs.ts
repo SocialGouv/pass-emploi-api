@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger'
-import { ArrayNotEmpty, IsArray } from 'class-validator'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ArrayNotEmpty, IsArray, IsOptional } from 'class-validator'
 import { Transform } from 'class-transformer'
 import { transformStringToArray } from './utils/transformers'
 
@@ -12,4 +12,8 @@ export class TeleverserFichierPayload {
 
   @ApiProperty({ type: 'string', format: 'binary' })
   fichier: Express.Multer.File
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  nom?: string
 }

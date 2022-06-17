@@ -74,7 +74,7 @@ export class FilesController {
       fichier: {
         buffer: fichier.buffer,
         mimeType: fichier.mimetype,
-        name: fichier.originalname,
+        name: payload.nom ?? fichier.originalname,
         size: fichier.size
       },
       jeunesIds: payload.jeunesIds,
