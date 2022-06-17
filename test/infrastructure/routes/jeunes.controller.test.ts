@@ -1100,10 +1100,6 @@ describe('JeunesController', () => {
       await request(app.getHttpServer())
         .get(`/jeunes/${idJeune}/actions`)
         .set('authorization', unHeaderAuthorization())
-        .set(
-          'x-total-count',
-          expectedActions.data.metadonnees.nombreTotal.toString()
-        )
         .query(queryActions)
         // Then
         .expect(HttpStatus.PARTIAL_CONTENT)
@@ -1117,11 +1113,11 @@ describe('JeunesController', () => {
       const actionsByJeuneOutput: ActionsByJeuneOutput = {
         actions: [],
         metadonnees: {
-          nombreTotal: 0,
-          nombreEnCours: 0,
-          nombreTermine: 0,
-          nombreAnnule: 0,
-          nombrePasCommence: 0,
+          nombreTotal: 1,
+          nombreEnCours: 2,
+          nombreTermine: 3,
+          nombreAnnule: 4,
+          nombrePasCommence: 5,
           nombreElementsParPage: 10
         }
       }
@@ -1131,14 +1127,34 @@ describe('JeunesController', () => {
       await request(app.getHttpServer())
         .get(`/jeunes/${idJeune}/actions`)
         .set('authorization', unHeaderAuthorization())
-        .set(
-          'x-total-count',
-          expectedActions.data.metadonnees.nombreTotal.toString()
-        )
         .query(queryActions)
         // Then
         .expect(HttpStatus.OK)
         .expect(expectedActions.data.actions)
+        .expect(
+          'x-total-count',
+          expectedActions.data.metadonnees.nombreTotal.toString()
+        )
+        .expect(
+          'x-statut-in_progress-count',
+          expectedActions.data.metadonnees.nombreEnCours.toString()
+        )
+        .expect(
+          'x-statut-done-count',
+          expectedActions.data.metadonnees.nombreTermine.toString()
+        )
+        .expect(
+          'x-statut-canceled-count',
+          expectedActions.data.metadonnees.nombreAnnule.toString()
+        )
+        .expect(
+          'x-statut-not_started-count',
+          expectedActions.data.metadonnees.nombrePasCommence.toString()
+        )
+        .expect(
+          'x-page-size',
+          expectedActions.data.metadonnees.nombreElementsParPage.toString()
+        )
     })
     it('retourne 400 quand le paramètre page est au mauvais format', async () => {
       // Given
