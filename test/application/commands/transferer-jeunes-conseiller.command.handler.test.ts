@@ -2,6 +2,7 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { Core } from 'src/domain/core'
 import { Jeune } from 'src/domain/jeune'
+import { FirebaseClient } from 'src/infrastructure/clients/firebase-client'
 import { unConseillerDuJeune, unJeune } from 'test/fixtures/jeune.fixture'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import {
@@ -25,6 +26,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
   const conseiller = unConseiller()
   let jeuneRepository: StubbedType<Jeune.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
+  let firebaseClient: StubbedClass<FirebaseClient>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
 
   beforeEach(async () => {
@@ -32,11 +34,13 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
     jeuneRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
+    firebaseClient = stubClass(FirebaseClient)
     conseillerRepository.get.withArgs('idConseiller').resolves(conseiller)
     transfererJeunesConseillerCommandHandler =
       new TransfererJeunesConseillerCommandHandler(
         conseillerRepository,
         jeuneRepository,
+        firebaseClient,
         conseillerAuthorizer
       )
   })
@@ -103,6 +107,12 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             command.idConseillerSource,
             command.estTemporaire
           )
+          expect(
+            firebaseClient.envoyerMessageTransfertJeune.getCall(0).args
+          ).to.deep.equal([jeune1, conseillerCible.id, command.estTemporaire])
+          expect(
+            firebaseClient.envoyerMessageTransfertJeune.getCall(1).args
+          ).to.deep.equal([jeune2, conseillerCible.id, command.estTemporaire])
         })
       })
       describe('quand le transfert est temporaire', () => {

@@ -35,6 +35,11 @@ export namespace Jeune {
 
   export type Id = Brand<string, 'JeuneId'>
 
+  export enum TypeTransfert {
+    TEMPORAIRE = 'TEMPORAORE',
+    PERMANENT = 'PERMANENT'
+  }
+
   export interface Repository {
     get(id: string): Promise<Jeune | undefined>
 
@@ -79,11 +84,11 @@ export namespace Jeune {
     }
   }
 
-  export function changerLeConseillerDesJeunes(
+  export function transfererLesJeunes(
     jeunes: Jeune[],
     conseillerCible: Conseiller,
-    idConseillerSource?: string,
-    estTemporaire = false
+    idConseillerSource: string,
+    estTemporaire: boolean
   ): Jeune[] {
     return jeunes.map(jeune => ({
       ...jeune,
@@ -93,31 +98,64 @@ export namespace Jeune {
         lastName: conseillerCible.lastName,
         email: conseillerCible.email
       },
-      conseillerInitial: idConseillerSource
-        ? mapConseillerInitial(
-            jeune,
-            conseillerCible.id,
-            idConseillerSource!,
-            estTemporaire
-          )
-        : undefined
+      conseillerInitial: mapConseillerInitial(
+        jeune,
+        idConseillerSource,
+        conseillerCible.id,
+        estTemporaire
+      )
     }))
+  }
+
+  export function recupererLesJeunes(
+    jeunes: Jeune[],
+    conseillerCible: Conseiller
+  ): Jeune[] {
+    return jeunes.map(jeune => ({
+      ...jeune,
+      conseiller: {
+        id: conseillerCible.id,
+        firstName: conseillerCible.firstName,
+        lastName: conseillerCible.lastName,
+        email: conseillerCible.email
+      },
+      conseillerInitial: undefined
+    }))
+  }
+
+  export function separerLesJeunesParConseillerActuel(
+    jeunes: Jeune[]
+  ): Record<string, Jeune[]> {
+    return jeunes.reduce((res, jeuneActuel) => {
+      if (res[jeuneActuel.conseiller!.id]) {
+        res[jeuneActuel.conseiller!.id].push(jeuneActuel)
+      } else {
+        res[jeuneActuel.conseiller!.id] = [jeuneActuel]
+      }
+      return res
+    }, {} as Record<string, Jeune[]>)
+  }
+
+  export function estTemporaire(
+    jeune: Jeune,
+    idConseillerCible: string,
+    estTemporaire: boolean
+  ): boolean {
+    if (!estTemporaire || idConseillerCible === jeune.conseillerInitial?.id) {
+      return false
+    }
+    return true
   }
 }
 
 function mapConseillerInitial(
   jeune: Jeune,
-  idConseillerCible: string,
   idConseillerSource: string,
+  idConseillerCible: string,
   estTemporaire: boolean
 ): Jeune.ConseillerInitial | undefined {
-  if (idConseillerCible === jeune.conseillerInitial?.id) {
-    return undefined
-  }
-
-  if (estTemporaire) {
+  if (Jeune.estTemporaire(jeune, idConseillerCible, estTemporaire)) {
     return jeune.conseillerInitial ?? { id: idConseillerSource }
   }
-
   return undefined
 }

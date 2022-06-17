@@ -8,6 +8,7 @@ import { buildError } from '../../utils/logger.module'
 import { getAPMInstance } from '../monitoring/apm.init'
 import { ChatCryptoService } from '../../utils/chat-crypto-service'
 import Timestamp = firestore.Timestamp
+import { Jeune } from 'src/domain/jeune'
 
 export interface IFirebaseClient {
   send(tokenMessage: TokenMessage): Promise<void>
@@ -117,13 +118,8 @@ export class FirebaseClient implements IFirebaseClient {
 
   async transfererChat(
     conseillerCibleId: string,
-    idsJeunes: string[],
-    estTemporaire: boolean
+    idsJeunes: string[]
   ): Promise<void> {
-    const messageTransfertChat = 'Vous échangez avec votre nouveau conseiller.'
-    const { encryptedText, iv } =
-      this.chatCryptoService.encrypt(messageTransfertChat)
-
     try {
       await this.firestore.runTransaction(async t => {
         const conversations = this.firestore.collection(FIREBASE_CHAT_PATH)
@@ -139,22 +135,6 @@ export class FirebaseClient implements IFirebaseClient {
             t.update(conversations.doc(conversationCible.id), {
               conseillerId: conseillerCibleId
             })
-            t.set(
-              conversations
-                .doc(conversationCible.id)
-                .collection('messages')
-                .doc(),
-              {
-                sentBy: 'conseiller',
-                conseillerId: conseillerCibleId,
-                type: estTemporaire
-                  ? 'NOUVEAU_CONSEILLER_TEMPORAIRE'
-                  : 'NOUVEAU_CONSEILLER',
-                content: encryptedText,
-                iv: iv,
-                creationDate: Timestamp.fromDate(new Date())
-              }
-            )
           }
         }
       })
@@ -165,6 +145,56 @@ export class FirebaseClient implements IFirebaseClient {
       this.logger.error(
         buildError(
           `Echec du transfert du chat des jeunes au conseiller ${conseillerCibleId} :`,
+          e
+        )
+      )
+      throw e
+    }
+  }
+
+  async envoyerMessageTransfertJeune(
+    jeune: Jeune,
+    conseillerCibleId: string,
+    estTemporaire = false
+  ): Promise<void> {
+    const messageTransfertChat = 'Vous échangez avec votre nouveau conseiller.'
+    const { encryptedText, iv } =
+      this.chatCryptoService.encrypt(messageTransfertChat)
+
+    try {
+      await this.firestore.runTransaction(async t => {
+        const conversations = this.firestore.collection(FIREBASE_CHAT_PATH)
+
+        const conversationsCibles = await conversations
+          .where('jeuneId', '==', jeune.id)
+          .get()
+
+        for (const conversationCible of conversationsCibles.docs) {
+          t.set(
+            conversations
+              .doc(conversationCible.id)
+              .collection('messages')
+              .doc(),
+            {
+              sentBy: 'conseiller',
+              conseillerId: conseillerCibleId,
+              type: Jeune.estTemporaire(jeune, conseillerCibleId, estTemporaire)
+                ? 'NOUVEAU_CONSEILLER_TEMPORAIRE'
+                : 'NOUVEAU_CONSEILLER',
+              content: encryptedText,
+              iv: iv,
+              creationDate: Timestamp.fromDate(new Date())
+            }
+          )
+        }
+      })
+      this.logger.log(
+        `Message de transfert du chat des jeunes au conseiller ${conseillerCibleId} envoyé avec succès`
+      )
+    } catch (e) {
+      this.logger.error(
+        buildError(
+          `Echec de l'envoi des messages transfert du chat des jeunes au conseiller ${conseillerCibleId} :`,
           e
         )
       )

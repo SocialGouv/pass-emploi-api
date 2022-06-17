@@ -2,6 +2,7 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { Jeune } from 'src/domain/jeune'
+import { FirebaseClient } from 'src/infrastructure/clients/firebase-client'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import {
@@ -20,6 +21,7 @@ describe('RecupererJeunesDuConseillerCommandHandler', () => {
   let recupererJeunesDuConseillerCommandHandler: RecupererJeunesDuConseillerCommandHandler
   let jeuneRepository: StubbedType<Jeune.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
+  let firebaseClient: StubbedClass<FirebaseClient>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
 
   const conseiller = unConseiller()
@@ -28,11 +30,13 @@ describe('RecupererJeunesDuConseillerCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     jeuneRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
+    firebaseClient = stubClass(FirebaseClient)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     recupererJeunesDuConseillerCommandHandler =
       new RecupererJeunesDuConseillerCommandHandler(
         conseillerRepository,
         jeuneRepository,
+        firebaseClient,
         conseillerAuthorizer
       )
   })
@@ -128,6 +132,16 @@ describe('RecupererJeunesDuConseillerCommandHandler', () => {
           command.idConseiller,
           idConseillerSource2
         ])
+
+        expect(
+          firebaseClient.envoyerMessageTransfertJeune.getCall(0).args
+        ).to.deep.equal([jeune1, command.idConseiller])
+        expect(
+          firebaseClient.envoyerMessageTransfertJeune.getCall(1).args
+        ).to.deep.equal([jeune2, command.idConseiller])
+        expect(
+          firebaseClient.envoyerMessageTransfertJeune.getCall(2).args
+        ).to.deep.equal([jeune3, command.idConseiller])
       })
       it('ne fait rien quand pas de jeunes', async () => {
         // Given
