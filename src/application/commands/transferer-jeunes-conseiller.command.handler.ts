@@ -5,6 +5,7 @@ import {
 } from 'src/building-blocks/types/domain-error'
 import { Core } from 'src/domain/core'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
+import { FirebaseClient } from 'src/infrastructure/clients/firebase-client'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
@@ -34,6 +35,7 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
     private conseillerRepository: Conseiller.Repository,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
+    private firebaseClient: FirebaseClient,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('TransfererJeunesConseillerCommandHandler')
@@ -70,7 +72,7 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       )
     }
 
-    const updatedJeunes: Jeune[] = Jeune.changerLeConseillerDesJeunes(
+    const updatedJeunes: Jeune[] = Jeune.transfererLesJeunes(
       jeunes,
       conseillerCible,
       command.idConseillerSource,
@@ -82,6 +84,14 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       command.idConseillerCible,
       command.idConseillerSource,
       command.estTemporaire
+    )
+
+    jeunes.forEach(jeune =>
+      this.firebaseClient.envoyerMessageTransfertJeune(
+        jeune,
+        command.idConseillerCible,
+        command.estTemporaire
+      )
     )
 
     return emptySuccess()

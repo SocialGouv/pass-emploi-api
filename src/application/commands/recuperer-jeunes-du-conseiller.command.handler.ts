@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
+import { FirebaseClient } from 'src/infrastructure/clients/firebase-client'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
@@ -26,6 +27,7 @@ export class RecupererJeunesDuConseillerCommandHandler extends CommandHandler<
     private conseillerRepository: Conseiller.Repository,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
+    private firebaseClient: FirebaseClient,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('RecupererJeunesDuConseillerCommandHandler')
@@ -43,13 +45,14 @@ export class RecupererJeunesDuConseillerCommandHandler extends CommandHandler<
     )
 
     if (jeunes.length) {
-      const jeunesParConseiller = separerLesJeunesParConseiller(jeunes)
+      const jeunesParConseiller =
+        Jeune.separerLesJeunesParConseillerActuel(jeunes)
 
       await Promise.all(
         Object.values(jeunesParConseiller).map(jeunesDuConseiller => {
           const idConseillerActuel = jeunesDuConseiller[0].conseiller!.id
 
-          const updatedJeunes: Jeune[] = Jeune.changerLeConseillerDesJeunes(
+          const updatedJeunes: Jeune[] = Jeune.recupererLesJeunes(
             jeunesDuConseiller,
             conseiller
           )
@@ -60,6 +63,13 @@ export class RecupererJeunesDuConseillerCommandHandler extends CommandHandler<
             idConseillerActuel
           )
         })
+      )
+
+      jeunes.forEach(jeune =>
+        this.firebaseClient.envoyerMessageTransfertJeune(
+          jeune,
+          command.idConseiller
+        )
       )
     }
 
@@ -76,17 +86,4 @@ export class RecupererJeunesDuConseillerCommandHandler extends CommandHandler<
   async monitor(): Promise<void> {
     return
   }
-}
-
-function separerLesJeunesParConseiller(jeunes: Jeune[]): {
-  [key: string]: Jeune[]
-} {
-  return jeunes.reduce((res, jeuneActuel) => {
-    if (res[jeuneActuel.conseiller!.id]) {
-      res[jeuneActuel.conseiller!.id].push(jeuneActuel)
-    } else {
-      res[jeuneActuel.conseiller!.id] = [jeuneActuel]
-    }
-    return res
-  }, {} as { [key: string]: Jeune[] })
 }
