@@ -258,7 +258,13 @@ export class JeunesController {
 
       return response
         .set({
-          'x-total-count': result.data.metadonnees.nombreTotal
+          'x-total-count': result.data.metadonnees.nombreTotal,
+          'x-statut-in_progress-count': result.data.metadonnees.nombreEnCours,
+          'x-statut-done-count': result.data.metadonnees.nombreTermine,
+          'x-statut-canceled-count': result.data.metadonnees.nombreAnnule,
+          'x-statut-not_started-count':
+            result.data.metadonnees.nombrePasCommence,
+          'x-page-size': result.data.metadonnees.nombreElementsParPage
         })
         .status(statusCode)
         .json(result.data.actions)
