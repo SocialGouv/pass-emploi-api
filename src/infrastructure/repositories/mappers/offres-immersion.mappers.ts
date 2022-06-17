@@ -7,6 +7,7 @@ import {
 } from 'src/application/queries/query-models/offres-immersion.query-model'
 import { OffreImmersion, OffresImmersion } from 'src/domain/offre-immersion'
 import { FavoriOffreImmersionSqlModel } from 'src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
+import { PartenaireImmersion } from '../dto/immersion.dto'
 
 const fromContactMode = {
   UNKNOWN: OffresImmersion.MethodeDeContact.INCONNU,
@@ -36,10 +37,10 @@ export function fromSqlToOffreImmersion(
 }
 
 export function toOffreImmersionQueryModel(
-  offresImmersionDto: OffresImmersion.Partenaire.Dto
+  offresImmersionDto: PartenaireImmersion.DtoV1
 ): OffreImmersionQueryModel {
   return {
-    id: offresImmersionDto.id,
+    id: `${offresImmersionDto.siret}-${offresImmersionDto.rome}`,
     metier: offresImmersionDto.romeLabel,
     nomEtablissement: offresImmersionDto.name,
     secteurActivite: offresImmersionDto.nafLabel,
@@ -48,7 +49,7 @@ export function toOffreImmersionQueryModel(
 }
 
 export function toDetailOffreImmersionQueryModel(
-  offreImmpersionDto: OffresImmersion.Partenaire.Dto
+  offreImmpersionDto: PartenaireImmersion.Dto
 ): DetailOffreImmersionQueryModel {
   return {
     id: offreImmpersionDto.id,
@@ -64,7 +65,7 @@ export function toDetailOffreImmersionQueryModel(
 }
 
 export function buildLocalisation(
-  offreImmpersionDto: OffresImmersion.Partenaire.Dto
+  offreImmpersionDto: PartenaireImmersion.Dto
 ): LocalisationQueryModel | undefined {
   if (!offreImmpersionDto.location) {
     return undefined
@@ -76,7 +77,7 @@ export function buildLocalisation(
 }
 
 export function buildContact(
-  offreImmpersionDto: OffresImmersion.Partenaire.Dto
+  offreImmpersionDto: PartenaireImmersion.Dto
 ): ContactImmersionQueryModel | undefined {
   if (
     !offreImmpersionDto.contactDetails ||

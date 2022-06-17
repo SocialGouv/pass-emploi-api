@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
+import { URLSearchParams } from 'url'
 
 @Injectable()
 export class ImmersionClient {
@@ -17,15 +18,13 @@ export class ImmersionClient {
     this.immersionApiKey = this.configService.get('immersion').apiKey
   }
 
-  async post(suffixUrl: string, payload?: unknown): Promise<AxiosResponse> {
+  async get<T>(
+    suffixUrl: string,
+    params?: URLSearchParams
+  ): Promise<AxiosResponse<T>> {
     return firstValueFrom(
-      this.httpService.post(`${this.apiUrl}/${suffixUrl}`, payload)
-    )
-  }
-
-  async get(suffixUrl: string): Promise<AxiosResponse> {
-    return firstValueFrom(
-      this.httpService.get(`${this.apiUrl}/${suffixUrl}`, {
+      this.httpService.get<T>(`${this.apiUrl}/${suffixUrl}`, {
+        params,
         headers: {
           Authorization: this.immersionApiKey
         }
