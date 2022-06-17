@@ -1,6 +1,6 @@
-import { OffresImmersion } from '../../src/domain/offre-immersion'
+import { PartenaireImmersion } from '../../src/infrastructure/repositories/dto/immersion.dto'
 
-export const offreImmersionDto = (): OffresImmersion.Partenaire.Dto => ({
+export const offreImmersionDto = (): PartenaireImmersion.Dto => ({
   romeLabel: 'rome',
   nafLabel: 'naf',
   id: 'id',
@@ -17,7 +17,7 @@ export const offreImmersionDto = (): OffresImmersion.Partenaire.Dto => ({
   contactId: 'contactId',
   distance_m: 3,
   siret: '123456',
-  contactMode: OffresImmersion.Partenaire.ContactMode.IN_PERSON,
+  contactMode: PartenaireImmersion.ContactMode.IN_PERSON,
   contactDetails: {
     id: '1',
     lastName: 'Tavernier',
