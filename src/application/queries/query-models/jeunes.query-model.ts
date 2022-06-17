@@ -85,6 +85,9 @@ export class DetailJeuneQueryModel {
   isActivated: boolean
 
   @ApiProperty()
+  isReaffectationTemporaire: boolean
+
+  @ApiProperty()
   conseiller: ConseillerJeuneQueryModel
 
   @ApiProperty({ required: false })
@@ -112,6 +115,9 @@ export class DetailJeuneConseillerQueryModel {
 
   @ApiProperty()
   isActivated: boolean
+
+  @ApiProperty()
+  isReaffectationTemporaire: boolean
 
   @ApiProperty({ required: false })
   lastActivity?: string

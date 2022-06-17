@@ -242,6 +242,25 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         ])
       )
     })
+    it("retourne les jeunes d'un conseiller avec l'information de réaffectation temporaire", async () => {
+      // Given
+      await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
+      await ConseillerSqlModel.creer(unConseillerDto({ id: '41' }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({ idConseiller, idConseillerInitial: '41' })
+      )
+
+      // When
+      const actual = await getJeunesByConseillerQueryHandler.handle({
+        idConseiller
+      })
+      // Then
+      expect(actual).to.deep.equal(
+        success([
+          unDetailJeuneConseillerQueryModel({ isReaffectationTemporaire: true })
+        ])
+      )
+    })
   })
 
   describe('authorize', () => {
