@@ -258,7 +258,7 @@ export class JeunesController {
 
       return response
         .set({
-          'x-total-count': result.data.nombreTotal
+          'x-total-count': result.data.metadonnees.nombreTotal
         })
         .status(statusCode)
         .json(result.data.actions)

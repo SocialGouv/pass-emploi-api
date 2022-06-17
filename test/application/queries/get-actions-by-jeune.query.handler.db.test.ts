@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
-import { failure, success } from 'src/building-blocks/types/result'
+import { failure, isSuccess } from 'src/building-blocks/types/result'
 import { uneAction } from 'test/fixtures/action.fixture'
 import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
@@ -68,13 +68,14 @@ describe('GetActionsByJeuneQueryHandler', () => {
 
     describe("quand aucune action n'existe", () => {
       it('retourne un tableau vide et 0 résultat', async () => {
-        const actionsQueryModel = await getActionsByJeuneQueryHandler.handle({
+        const result = await getActionsByJeuneQueryHandler.handle({
           idJeune: jeune.id
         })
         // Then
-        expect(actionsQueryModel).to.deep.equal(
-          success({ actions: [], nombreTotal: 0 })
-        )
+        expect(isSuccess(result)).to.be.true()
+        if (isSuccess(result)) {
+          expect(result.data.actions).to.be.empty()
+        }
       })
     })
     describe('quand il existe uniquement des actions terminées', () => {
@@ -115,21 +116,19 @@ describe('GetActionsByJeuneQueryHandler', () => {
         await actionSqlRepository.save(actionTerminee3)
 
         // When
-        const actionsQueryModel = await getActionsByJeuneQueryHandler.handle({
+        const result = await getActionsByJeuneQueryHandler.handle({
           idJeune: jeune.id
         })
 
         // Then
-        expect(actionsQueryModel).to.deep.equal(
-          success({
-            actions: [
-              uneActionQueryModelFromDomain(actionTerminee2),
-              uneActionQueryModelFromDomain(actionTerminee3),
-              uneActionQueryModelFromDomain(actionTerminee1)
-            ],
-            nombreTotal: 3
-          })
-        )
+        expect(isSuccess(result)).to.be.true()
+        if (isSuccess(result)) {
+          expect(result.data.actions).to.be.deep.equal([
+            uneActionQueryModelFromDomain(actionTerminee2),
+            uneActionQueryModelFromDomain(actionTerminee3),
+            uneActionQueryModelFromDomain(actionTerminee1)
+          ])
+        }
       })
     })
     describe('quand il existe des actions avec des statuts differents', () => {
@@ -170,21 +169,19 @@ describe('GetActionsByJeuneQueryHandler', () => {
         await actionSqlRepository.save(actionEnCours2)
 
         // When
-        const actionsQueryModel = await getActionsByJeuneQueryHandler.handle({
+        const result = await getActionsByJeuneQueryHandler.handle({
           idJeune: jeune.id
         })
 
         // Then
-        expect(actionsQueryModel).to.deep.equal(
-          success({
-            actions: [
-              uneActionQueryModelFromDomain(actionEnCours2),
-              uneActionQueryModelFromDomain(actionPasCommencee),
-              uneActionQueryModelFromDomain(actionEnCours1)
-            ],
-            nombreTotal: 3
-          })
-        )
+        expect(isSuccess(result)).to.be.true()
+        if (isSuccess(result)) {
+          expect(result.data.actions).to.be.deep.equal([
+            uneActionQueryModelFromDomain(actionEnCours2),
+            uneActionQueryModelFromDomain(actionPasCommencee),
+            uneActionQueryModelFromDomain(actionEnCours1)
+          ])
+        }
       })
     })
     describe('quand il existe uniquement des actions pas commencées et en cours', () => {
@@ -236,22 +233,20 @@ describe('GetActionsByJeuneQueryHandler', () => {
         await actionSqlRepository.save(actionTerminee2)
 
         // When
-        const actionsQueryModel = await getActionsByJeuneQueryHandler.handle({
+        const result = await getActionsByJeuneQueryHandler.handle({
           idJeune: jeune.id
         })
 
         // Then
-        expect(actionsQueryModel).to.deep.equal(
-          success({
-            actions: [
-              uneActionQueryModelFromDomain(actionEnCours),
-              uneActionQueryModelFromDomain(actionPasCommencee),
-              uneActionQueryModelFromDomain(actionTerminee2),
-              uneActionQueryModelFromDomain(actionTerminee1)
-            ],
-            nombreTotal: 4
-          })
-        )
+        expect(isSuccess(result)).to.be.true()
+        if (isSuccess(result)) {
+          expect(result.data.actions).to.be.deep.equal([
+            uneActionQueryModelFromDomain(actionEnCours),
+            uneActionQueryModelFromDomain(actionPasCommencee),
+            uneActionQueryModelFromDomain(actionTerminee2),
+            uneActionQueryModelFromDomain(actionTerminee1)
+          ])
+        }
       })
     })
     describe('quand le numéro de page demandé est supérieur à la dernière page', () => {
@@ -268,14 +263,15 @@ describe('GetActionsByJeuneQueryHandler', () => {
     describe("quand il n'existe pas d'actions et qu'on demande la première page", () => {
       it('retourne un tableau vide et 0 résultat', async () => {
         // When
-        const actionsQueryModel = await getActionsByJeuneQueryHandler.handle({
+        const result = await getActionsByJeuneQueryHandler.handle({
           idJeune: jeune.id,
           page: 1
         })
         // Then
-        expect(actionsQueryModel).to.deep.equal(
-          success({ actions: [], nombreTotal: 0 })
-        )
+        expect(isSuccess(result)).to.be.true()
+        if (isSuccess(result)) {
+          expect(result.data.actions).to.be.empty()
+        }
       })
     })
     describe('quand il existe plus de 10 actions', () => {
@@ -307,17 +303,18 @@ describe('GetActionsByJeuneQueryHandler', () => {
         await actionSqlRepository.save(actionPage2)
 
         // When
-        const actionsQueryModel = await getActionsByJeuneQueryHandler.handle({
+        const result = await getActionsByJeuneQueryHandler.handle({
           idJeune: jeune.id,
           page: 2
         })
         // Then
-        expect(actionsQueryModel).to.deep.equal(
-          success({
-            actions: [uneActionQueryModelFromDomain(actionPage2)],
-            nombreTotal: 11
-          })
-        )
+        expect(isSuccess(result)).to.be.true()
+        if (isSuccess(result)) {
+          expect(result.data.actions).to.be.deep.equal([
+            uneActionQueryModelFromDomain(actionPage2)
+          ])
+          expect(result.data.metadonnees.nombreTotal).to.equal(11)
+        }
       })
     })
     describe('quand on trie', () => {
@@ -369,24 +366,22 @@ describe('GetActionsByJeuneQueryHandler', () => {
         await actionSqlRepository.save(actionTermineeRecente)
 
         // When
-        const actionsQueryModel = await getActionsByJeuneQueryHandler.handle({
+        const result = await getActionsByJeuneQueryHandler.handle({
           idJeune: jeune.id,
           page: 1,
           tri: Action.Tri.DATE_CROISSANTE
         })
 
         // Then
-        expect(actionsQueryModel).to.deep.equal(
-          success({
-            actions: [
-              uneActionQueryModelFromDomain(actionTermineeRecente),
-              uneActionQueryModelFromDomain(actionPasCommencee),
-              uneActionQueryModelFromDomain(actionEnCours),
-              uneActionQueryModelFromDomain(actionCanceled)
-            ],
-            nombreTotal: 4
-          })
-        )
+        expect(isSuccess(result)).to.be.true()
+        if (isSuccess(result)) {
+          expect(result.data.actions).to.be.deep.equal([
+            uneActionQueryModelFromDomain(actionTermineeRecente),
+            uneActionQueryModelFromDomain(actionPasCommencee),
+            uneActionQueryModelFromDomain(actionEnCours),
+            uneActionQueryModelFromDomain(actionCanceled)
+          ])
+        }
       })
       it('applique le tri par date décroissante par défaut', async () => {
         // Given
@@ -436,23 +431,21 @@ describe('GetActionsByJeuneQueryHandler', () => {
         await actionSqlRepository.save(actionTerminee)
 
         // When
-        const actionsQueryModel = await getActionsByJeuneQueryHandler.handle({
+        const result = await getActionsByJeuneQueryHandler.handle({
           idJeune: jeune.id,
           page: 1
         })
 
         // Then
-        expect(actionsQueryModel).to.deep.equal(
-          success({
-            actions: [
-              uneActionQueryModelFromDomain(actionCanceled),
-              uneActionQueryModelFromDomain(actionEnCours),
-              uneActionQueryModelFromDomain(actionPasCommencee),
-              uneActionQueryModelFromDomain(actionTerminee)
-            ],
-            nombreTotal: 4
-          })
-        )
+        expect(isSuccess(result)).to.be.true()
+        if (isSuccess(result)) {
+          expect(result.data.actions).to.be.deep.equal([
+            uneActionQueryModelFromDomain(actionCanceled),
+            uneActionQueryModelFromDomain(actionEnCours),
+            uneActionQueryModelFromDomain(actionPasCommencee),
+            uneActionQueryModelFromDomain(actionTerminee)
+          ])
+        }
       })
     })
     describe('quand on filtre', () => {
@@ -504,22 +497,103 @@ describe('GetActionsByJeuneQueryHandler', () => {
         await actionSqlRepository.save(actionTerminee)
 
         // When
-        const actionsQueryModel = await getActionsByJeuneQueryHandler.handle({
+        const result = await getActionsByJeuneQueryHandler.handle({
           idJeune: jeune.id,
           page: 1,
           statuts: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]
         })
 
         // Then
-        expect(actionsQueryModel).to.deep.equal(
-          success({
-            actions: [
-              uneActionQueryModelFromDomain(actionEnCours),
-              uneActionQueryModelFromDomain(actionPasCommencee)
-            ],
-            nombreTotal: 2
+        expect(isSuccess(result)).to.be.true()
+        if (isSuccess(result)) {
+          expect(result.data.actions).to.be.deep.equal([
+            uneActionQueryModelFromDomain(actionEnCours),
+            uneActionQueryModelFromDomain(actionPasCommencee)
+          ])
+          expect(result.data.metadonnees.nombreTotal).to.equal(2)
+        }
+      })
+    })
+
+    context('metadata', () => {
+      describe('quand on a des actions de chaque statut', () => {
+        it('renvoie le compte des actions par statut', async () => {
+          // Given
+          const actionPasCommencee = uneAction({
+            id: '02b3710e-7779-11ec-90d6-0242ac120001',
+            idJeune: jeune.id,
+            statut: Action.Statut.PAS_COMMENCEE,
+            dateDerniereActualisation: DateTime.fromISO(
+              '2020-04-10T12:00:00.000Z'
+            )
+              .toUTC()
+              .toJSDate()
           })
-        )
+          const actionEnCours1 = uneAction({
+            id: '02b3710e-7779-11ec-90d6-0242ac120002',
+            idJeune: jeune.id,
+            statut: Action.Statut.EN_COURS,
+            dateDerniereActualisation: DateTime.fromISO(
+              '2020-04-06T12:00:00.000Z'
+            )
+              .toUTC()
+              .toJSDate()
+          })
+          const actionEnCours2 = uneAction({
+            id: '02b3710e-7779-11ec-90d6-0242ac120003',
+            idJeune: jeune.id,
+            statut: Action.Statut.EN_COURS,
+            dateDerniereActualisation: DateTime.fromISO(
+              '2020-04-06T12:00:00.000Z'
+            )
+              .toUTC()
+              .toJSDate()
+          })
+          const actionTerminee = uneAction({
+            id: '02b3710e-7779-11ec-90d6-0242ac120004',
+            idJeune: jeune.id,
+            statut: Action.Statut.TERMINEE,
+            dateDerniereActualisation: DateTime.fromISO(
+              '2020-04-12T12:00:00.000Z'
+            )
+              .toUTC()
+              .toJSDate()
+          })
+
+          const actionAnnulee = uneAction({
+            id: '02b3710e-7779-11ec-90d6-0242ac120005',
+            idJeune: jeune.id,
+            statut: Action.Statut.ANNULEE,
+            dateDerniereActualisation: DateTime.fromISO(
+              '2020-04-12T12:00:00.000Z'
+            )
+              .toUTC()
+              .toJSDate()
+          })
+          await actionSqlRepository.save(actionPasCommencee)
+          await actionSqlRepository.save(actionEnCours1)
+          await actionSqlRepository.save(actionEnCours2)
+          await actionSqlRepository.save(actionTerminee)
+          await actionSqlRepository.save(actionAnnulee)
+
+          // When
+          const result = await getActionsByJeuneQueryHandler.handle({
+            idJeune: jeune.id
+          })
+
+          // Then
+          expect(isSuccess(result)).to.be.true()
+          if (isSuccess(result)) {
+            expect(result.data.metadonnees).to.deep.equal({
+              nombreTotal: 5,
+              nombreEnCours: 2,
+              nombreTermine: 1,
+              nombreAnnule: 1,
+              nombrePasCommence: 1,
+              nombreElementsParPage: 10
+            })
+          }
+        })
       })
     })
   })
