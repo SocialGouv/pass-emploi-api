@@ -108,7 +108,8 @@ describe('FichiersController', () => {
       await request(app.getHttpServer())
         .post('/fichiers')
         .field({
-          jeunesIds: '1'
+          jeunesIds: '1',
+          nom: 'image.jpg'
         })
         .attach('fichier', 'test/fixtures/image.jpg')
         .set('authorization', unHeaderAuthorization())
