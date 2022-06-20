@@ -6,6 +6,7 @@ import { Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Fichier, FichierRepositoryToken } from '../../domain/fichier'
 import { FichierAuthorizer } from '../authorizers/authorize-fichier'
+import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface TelechargerFichierQuery extends Query {
   idFichier: string
@@ -20,7 +21,8 @@ export class TelechargerFichierQueryHandler extends QueryHandler<
     @Inject(FichierRepositoryToken)
     private fichierRepository: Fichier.Repository,
     private fichierAuthorizer: FichierAuthorizer,
-    private objectStorageClient: ObjectStorageClient
+    private objectStorageClient: ObjectStorageClient,
+    private evenementService: EvenementService
   ) {
     super('TelechargerFichierQueryHandler')
   }
@@ -42,7 +44,10 @@ export class TelechargerFichierQueryHandler extends QueryHandler<
     return success(url)
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creerEvenement(
+      Evenement.Type.PIECE_JOINTE_TELECHARGEE,
+      utilisateur
+    )
   }
 }
