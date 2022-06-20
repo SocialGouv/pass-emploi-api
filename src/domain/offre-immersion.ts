@@ -1,10 +1,8 @@
 import {
   DetailOffreImmersionQueryModel,
-  FavoriOffreImmersionIdQueryModel,
   OffreImmersionQueryModel
 } from 'src/application/queries/query-models/offres-immersion.query-model'
 import { Result } from '../building-blocks/types/result'
-import { Jeune } from './jeune'
 
 export const OffresImmersionRepositoryToken = 'OffresImmersion.Repository'
 
@@ -21,14 +19,6 @@ export namespace OffresImmersion {
 
   export interface Repository {
     findAll(criteres: Criteres): Promise<Result<OffreImmersionQueryModel[]>>
-
-    getFavorisIdsQueryModelsByJeune(
-      id: Jeune.Id
-    ): Promise<FavoriOffreImmersionIdQueryModel[]>
-
-    getFavorisQueryModelsByJeune(
-      id: Jeune.Id
-    ): Promise<OffreImmersionQueryModel[]>
 
     get(
       idOffreImmersion: string

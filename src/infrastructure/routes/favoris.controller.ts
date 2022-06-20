@@ -18,7 +18,7 @@ import {
   AddFavoriOffreImmersionCommandHandler
 } from 'src/application/commands/add-favori-offre-immersion.command.handler'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
-import { GetFavorisOffresImmersionJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-immersion-jeune.query.handler'
+import { GetFavorisOffresImmersionJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
 import {
   FavoriOffreEmploiIdQueryModel,
   OffreEmploiResumeQueryModel
