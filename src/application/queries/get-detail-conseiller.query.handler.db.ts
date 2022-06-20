@@ -7,6 +7,7 @@ import { DetailConseillerQueryModel } from './query-models/conseillers.query-mod
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { fromSqlToDetailConseillerQueryModel } from '../../infrastructure/repositories/mappers/conseillers.mappers'
 import { AgenceSqlModel } from '../../infrastructure/sequelize/models/agence.sql-model'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 
 export interface GetDetailConseillerQuery extends Query {
   idConseiller: string
@@ -30,11 +31,20 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
         include: [AgenceSqlModel]
       }
     )
+
     if (!conseillerSqlModel) {
       return undefined
     }
 
-    return fromSqlToDetailConseillerQueryModel(conseillerSqlModel)
+    const jeuneARecuperer = await JeuneSqlModel.findOne({
+      where: { idConseillerInitial: conseillerSqlModel.id },
+      attributes: ['id']
+    })
+
+    return fromSqlToDetailConseillerQueryModel(
+      conseillerSqlModel,
+      Boolean(Boolean(jeuneARecuperer))
+    )
   }
   async authorize(
     query: GetDetailConseillerQuery,

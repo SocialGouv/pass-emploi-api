@@ -16,6 +16,8 @@ import {
 } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 
 describe('GetConseillerByEmailQueryHandler', () => {
   DatabaseForTesting.prepare()
@@ -62,6 +64,31 @@ describe('GetConseillerByEmailQueryHandler', () => {
             lastName: 'tata',
             email: 'conseiller@email.fr',
             agence: undefined
+          })
+        )
+      )
+    })
+
+    it('retourne un conseiller avec des jeunes à récupérer', async () => {
+      // Given
+      await JeuneSqlModel.creer(
+        unJeuneDto({ idConseillerInitial: conseillerDto.id })
+      )
+      // When
+      const actual = await getConseillerByEmail.handle({
+        emailConseiller: email,
+        structureUtilisateur: Core.Structure.PASS_EMPLOI
+      })
+
+      expect(actual).to.deep.equal(
+        success(
+          detailConseillerQueryModel({
+            id: conseillerDto.id,
+            firstName: 'toto',
+            lastName: 'tata',
+            email: 'conseiller@email.fr',
+            agence: undefined,
+            aDesBeneficiairesARecuperer: true
           })
         )
       )
