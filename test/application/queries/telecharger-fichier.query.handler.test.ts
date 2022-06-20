@@ -2,7 +2,10 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox } from 'sinon'
 import { FichierAuthorizer } from 'src/application/authorizers/authorize-fichier'
 import { ObjectStorageClient } from 'src/infrastructure/clients/object-storage.client'
-import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from 'test/fixtures/authentification.fixture'
 import { stubClassSandbox } from 'test/utils/types'
 import {
   TelechargerFichierQuery,
@@ -12,12 +15,14 @@ import { success } from '../../../src/building-blocks/types/result'
 import { Fichier } from '../../../src/domain/fichier'
 import { unFichierMetadata } from '../../fixtures/fichier.fixture'
 import { expect, StubbedClass } from '../../utils'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
 
 describe('TelechargerFichierQueryHandler', () => {
   const sandbox = createSandbox()
   let fichierRepository: StubbedType<Fichier.Repository>
   let fichierAuthorizer: StubbedClass<FichierAuthorizer>
   let objectStorageClient: StubbedClass<ObjectStorageClient>
+  let evenementService: StubbedClass<EvenementService>
   let telechargerFichierQueryHandler: TelechargerFichierQueryHandler
 
   const query: TelechargerFichierQuery = {
@@ -28,10 +33,12 @@ describe('TelechargerFichierQueryHandler', () => {
     fichierRepository = stubInterface(sandbox)
     fichierAuthorizer = stubClassSandbox(FichierAuthorizer, sandbox)
     objectStorageClient = stubClassSandbox(ObjectStorageClient, sandbox)
+    evenementService = stubClassSandbox(EvenementService, sandbox)
     telechargerFichierQueryHandler = new TelechargerFichierQueryHandler(
       fichierRepository,
       fichierAuthorizer,
-      objectStorageClient
+      objectStorageClient,
+      evenementService
     )
   })
 
@@ -74,6 +81,21 @@ describe('TelechargerFichierQueryHandler', () => {
 
       // Then
       expect(result).to.deep.equal(success(url))
+    })
+  })
+  describe('monitor', () => {
+    it('envoie un évenement de récuperation d’une piece jointe', async () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+
+      // When
+      await telechargerFichierQueryHandler.monitor(utilisateur)
+
+      // Then
+      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
+        Evenement.Type.PIECE_JOINTE_TELECHARGEE,
+        utilisateur
+      )
     })
   })
 })
