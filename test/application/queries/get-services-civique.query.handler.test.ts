@@ -1,4 +1,3 @@
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
@@ -11,20 +10,24 @@ import { DateTime } from 'luxon'
 import { ServiceCiviqueQueryModel } from '../../../src/application/queries/query-models/service-civique.query-model'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { offresServicesCiviqueQueryModel } from '../../fixtures/query-models/offre-service-civique.query-model.fixtures'
+import { FindAllOffresServicesCiviqueQueryGetter } from '../../../src/application/queries/query-getters/find-all-offres-services-civique.query.getter'
+import { success } from '../../../src/building-blocks/types/result'
 
 describe('GetServicesCiviqueQueryHandler', () => {
-  let offresServiceCiviqueRepository: StubbedType<OffreServiceCivique.Repository>
+  let findAllOffresServicesCiviqueQueryGetter: StubbedClass<FindAllOffresServicesCiviqueQueryGetter>
   let getServicesCiviqueQueryHandler: GetServicesCiviqueQueryHandler
   let sandbox: SinonSandbox
   let evenementService: StubbedClass<EvenementService>
 
   before(() => {
     sandbox = createSandbox()
-    offresServiceCiviqueRepository = stubInterface(sandbox)
+    findAllOffresServicesCiviqueQueryGetter = stubClass(
+      FindAllOffresServicesCiviqueQueryGetter
+    )
     evenementService = stubClass(EvenementService)
 
     getServicesCiviqueQueryHandler = new GetServicesCiviqueQueryHandler(
-      offresServiceCiviqueRepository,
+      findAllOffresServicesCiviqueQueryGetter,
       evenementService
     )
   })
@@ -49,14 +52,16 @@ describe('GetServicesCiviqueQueryHandler', () => {
       const serviceCiviqueQueryModels: ServiceCiviqueQueryModel[] =
         offresServicesCiviqueQueryModel()
 
-      offresServiceCiviqueRepository.findAll
+      findAllOffresServicesCiviqueQueryGetter.handle
         .withArgs({
           ...getServicesCiviqueQuery,
           dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
           dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
-          editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE
+          editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE,
+          page: 2,
+          limit: 52
         })
-        .resolves(serviceCiviqueQueryModels)
+        .resolves(success(serviceCiviqueQueryModels))
 
       // When
       const result = await getServicesCiviqueQueryHandler.handle(
@@ -64,8 +69,9 @@ describe('GetServicesCiviqueQueryHandler', () => {
       )
 
       // Then
-      expect(result).to.deep.equal(serviceCiviqueQueryModels)
+      expect(result).to.deep.equal(success(serviceCiviqueQueryModels))
     })
+
     it('retourne des offres avec une page et limite par défaut', async () => {
       // Given
       const getServicesCiviqueQuery: GetServicesCiviqueQuery = {
@@ -78,7 +84,7 @@ describe('GetServicesCiviqueQueryHandler', () => {
       const offreEngagementQueryModels: ServiceCiviqueQueryModel[] =
         offresServicesCiviqueQueryModel()
 
-      offresServiceCiviqueRepository.findAll
+      findAllOffresServicesCiviqueQueryGetter.handle
         .withArgs({
           ...getServicesCiviqueQuery,
           dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
@@ -87,7 +93,7 @@ describe('GetServicesCiviqueQueryHandler', () => {
           page: 1,
           limit: 50
         })
-        .resolves(offreEngagementQueryModels)
+        .resolves(success(offreEngagementQueryModels))
 
       // When
       const result = await getServicesCiviqueQueryHandler.handle(
@@ -95,7 +101,7 @@ describe('GetServicesCiviqueQueryHandler', () => {
       )
 
       // Then
-      expect(result).to.deep.equal(offreEngagementQueryModels)
+      expect(result).to.deep.equal(success(offreEngagementQueryModels))
     })
   })
 
@@ -115,14 +121,16 @@ describe('GetServicesCiviqueQueryHandler', () => {
       const serviceCiviqueQueryModels: ServiceCiviqueQueryModel[] =
         offresServicesCiviqueQueryModel()
 
-      offresServiceCiviqueRepository.findAll
+      findAllOffresServicesCiviqueQueryGetter.handle
         .withArgs({
           ...getServicesCiviqueQuery,
           dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
           dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
-          editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE
+          editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE,
+          page: 2,
+          limit: 52
         })
-        .resolves(serviceCiviqueQueryModels)
+        .resolves(success(serviceCiviqueQueryModels))
 
       // When
       await getServicesCiviqueQueryHandler.monitor(

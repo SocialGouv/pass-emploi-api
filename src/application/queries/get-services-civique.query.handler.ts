@@ -1,15 +1,13 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { isFailure, Result, success } from '../../building-blocks/types/result'
 import { ServiceCiviqueQueryModel } from './query-models/service-civique.query-model'
-import {
-  OffreServiceCivique,
-  OffreServiceCiviqueRepositoryToken
-} from '../../domain/offre-service-civique'
+import { OffreServiceCivique } from '../../domain/offre-service-civique'
 import { DateTime } from 'luxon'
+import { FindAllOffresServicesCiviqueQueryGetter } from './query-getters/find-all-offres-services-civique.query.getter'
 
 const DEFAULT_PAGE = 1
 const DEFAULT_LIMIT = 50
@@ -31,8 +29,7 @@ export class GetServicesCiviqueQueryHandler extends QueryHandler<
   Result<ServiceCiviqueQueryModel[]>
 > {
   constructor(
-    @Inject(OffreServiceCiviqueRepositoryToken)
-    private engagementRepository: OffreServiceCivique.Repository,
+    private findAllOffresServicesCiviqueQueryGetter: FindAllOffresServicesCiviqueQueryGetter,
     private evenementService: EvenementService
   ) {
     super('GetServicesCiviqueQueryHandler')
@@ -56,7 +53,9 @@ export class GetServicesCiviqueQueryHandler extends QueryHandler<
       page: query.page || DEFAULT_PAGE,
       limit: query.limit || DEFAULT_LIMIT
     }
-    const result = await this.engagementRepository.findAll(criteres)
+    const result = await this.findAllOffresServicesCiviqueQueryGetter.handle(
+      criteres
+    )
 
     if (isFailure(result)) {
       return result

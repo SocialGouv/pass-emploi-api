@@ -9,13 +9,11 @@ import {
 } from '../../../building-blocks/types/result'
 import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune'
 import { Notification } from '../../../domain/notification'
-import {
-  OffreServiceCivique,
-  OffreServiceCiviqueRepositoryToken
-} from '../../../domain/offre-service-civique'
+import { OffreServiceCivique } from '../../../domain/offre-service-civique'
 import { Recherche, RecherchesRepositoryToken } from '../../../domain/recherche'
 import { DateService } from '../../../utils/date-service'
 import { GetServicesCiviqueQuery } from '../../queries/get-services-civique.query.handler'
+import { FindAllOffresServicesCiviqueQueryGetter } from '../../queries/query-getters/find-all-offres-services-civique.query.getter'
 
 export type HandleJobNotifierNouveauxServicesCiviqueCommand = Command
 
@@ -33,8 +31,7 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
     private notificationService: Notification.Service,
-    @Inject(OffreServiceCiviqueRepositoryToken)
-    private offreEngagementRepository: OffreServiceCivique.Repository,
+    private findAllOffresServicesCiviqueQueryGetter: FindAllOffresServicesCiviqueQueryGetter,
     private dateService: DateService
   ) {
     super('HandleJobNotifierNouveauxServicesCiviqueCommandHandler')
@@ -50,7 +47,7 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
 
     // On récupère les nouvelles offres depuis hier en considérant que le job tourne une fois par jour
     const hier = maintenant.minus({ day: 1 })
-    const result = await this.offreEngagementRepository.findAll({
+    const result = await this.findAllOffresServicesCiviqueQueryGetter.handle({
       dateDeCreationMinimum: hier,
       page: 1,
       limit: PAGINATION_NOMBRE_D_OFFRES_MAXIMUM,
