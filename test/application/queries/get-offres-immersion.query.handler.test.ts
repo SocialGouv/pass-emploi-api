@@ -1,4 +1,3 @@
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import {
@@ -9,20 +8,24 @@ import { OffreImmersionQueryModel } from '../../../src/application/queries/query
 import { OffresImmersion } from '../../../src/domain/offre-immersion'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { FindAllOffresImmersionQueryGetter } from '../../../src/application/queries/query-getters/find-all-offres-immersion.query.getter'
+import { success } from '../../../src/building-blocks/types/result'
 
 describe('GetOffresImmersionQueryHandler', () => {
-  let offresImmersionRepository: StubbedType<OffresImmersion.Repository>
+  let findAllOffresImmersionQueryGetter: StubbedClass<FindAllOffresImmersionQueryGetter>
   let getOffresImmersionQueryHandler: GetOffresImmersionQueryHandler
   let sandbox: SinonSandbox
   let evenementService: StubbedClass<EvenementService>
 
   before(() => {
     sandbox = createSandbox()
-    offresImmersionRepository = stubInterface(sandbox)
+    findAllOffresImmersionQueryGetter = stubClass(
+      FindAllOffresImmersionQueryGetter
+    )
     evenementService = stubClass(EvenementService)
 
     getOffresImmersionQueryHandler = new GetOffresImmersionQueryHandler(
-      offresImmersionRepository,
+      findAllOffresImmersionQueryGetter,
       evenementService
     )
   })
@@ -56,9 +59,9 @@ describe('GetOffresImmersionQueryHandler', () => {
           lon: getOffresImmersionQuery.lon,
           distance: getOffresImmersionQuery.distance!
         }
-        offresImmersionRepository.findAll
+        findAllOffresImmersionQueryGetter.handle
           .withArgs(criteres)
-          .resolves(offresImmersionQueryModel)
+          .resolves(success(offresImmersionQueryModel))
 
         // When
         const result = await getOffresImmersionQueryHandler.handle(
@@ -66,7 +69,7 @@ describe('GetOffresImmersionQueryHandler', () => {
         )
 
         // Then
-        expect(result).to.deep.equal(offresImmersionQueryModel)
+        expect(result).to.deep.equal(success(offresImmersionQueryModel))
       })
     })
 
@@ -93,9 +96,9 @@ describe('GetOffresImmersionQueryHandler', () => {
           lon: getOffresImmersionQuery.lon,
           distance: 10
         }
-        offresImmersionRepository.findAll
+        findAllOffresImmersionQueryGetter.handle
           .withArgs(criteres)
-          .resolves(offresImmersionQueryModel)
+          .resolves(success(offresImmersionQueryModel))
 
         // When
         const result = await getOffresImmersionQueryHandler.handle(
@@ -103,7 +106,7 @@ describe('GetOffresImmersionQueryHandler', () => {
         )
 
         // Then
-        expect(result).to.deep.equal(offresImmersionQueryModel)
+        expect(result).to.deep.equal(success(offresImmersionQueryModel))
       })
     })
   })
