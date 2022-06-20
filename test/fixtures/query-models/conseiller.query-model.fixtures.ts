@@ -7,7 +7,8 @@ export function detailConseillerQueryModel(
     id: '1',
     firstName: 'Nils',
     lastName: 'Tavernier',
-    notificationsSonores: false
+    notificationsSonores: false,
+    aDesBeneficiairesARecuperer: false
   }
 
   return { ...defaults, ...args }
