@@ -55,12 +55,12 @@ import { GetConseillersJeuneQueryHandler } from './application/queries/get-conse
 import { GetDetailActionQueryHandler } from './application/queries/get-detail-action.query.handler.db'
 import { GetDetailConseillerQueryHandler } from './application/queries/get-detail-conseiller.query.handler.db'
 import { GetDetailJeuneQueryHandler } from './application/queries/get-detail-jeune.query.handler.db'
-import { GetDetailOffreEmploiQueryHandler } from './application/queries/get-detail-offre-emploi.query.handler.db'
+import { GetDetailOffreEmploiQueryHandler } from './application/queries/get-detail-offre-emploi.query.handler'
 import { GetDetailOffreImmersionQueryHandler } from './application/queries/get-detail-offre-immersion.query.handler'
 import { GetDetailRendezVousQueryHandler } from './application/queries/get-detail-rendez-vous.query.handler.db'
 import { GetDetailServiceCiviqueQueryHandler } from './application/queries/get-detail-service-civique.query.handler'
 import { GetDossierMiloJeuneQueryHandler } from './application/queries/get-dossier-milo-jeune.query.handler'
-import { GetFavorisOffresEmploiJeuneQueryHandler } from './application/queries/get-favoris-offres-emploi-jeune.query.handler'
+import { GetFavorisOffresEmploiJeuneQueryHandler } from './application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
 import { GetFavorisOffresImmersionJeuneQueryHandler } from './application/queries/get-favoris-offres-immersion-jeune.query.handler'
 import { GetHomeJeuneHandler } from './application/queries/get-home-jeune.query.handler'
 import { GetJeunesByConseillerQueryHandler } from './application/queries/get-jeunes-by-conseiller.query.handler.db'
@@ -178,6 +178,7 @@ import { FilesController } from './infrastructure/routes/fichiers.controller'
 import { TelechargerFichierQueryHandler } from './application/queries/telecharger-fichier.query.handler'
 import { SupprimerFichierCommandHandler } from './application/commands/supprimer-fichier.command.handler'
 import { FichierAuthorizer } from './application/authorizers/authorize-fichier'
+import { FindAllOffresEmploiQueryGetter } from './application/queries/query-getters/find-all-offres-emploi.query.getter'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -420,7 +421,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     TeleverserFichierCommandHandler,
     TelechargerFichierQueryHandler,
     SupprimerFichierCommandHandler,
-    FichierAuthorizer
+    FichierAuthorizer,
+    FindAllOffresEmploiQueryGetter
   ]
 }
 
