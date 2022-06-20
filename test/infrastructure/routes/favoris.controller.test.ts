@@ -7,7 +7,7 @@ import {
   DeleteFavoriOffreImmersionCommand,
   DeleteFavoriOffreImmersionCommandHandler
 } from 'src/application/commands/delete-favori-offre-immersion.command.handler'
-import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler'
+import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
 import { GetFavorisOffresImmersionJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-immersion-jeune.query.handler'
 import * as request from 'supertest'
 import { uneOffreImmersion } from 'test/fixtures/offre-immersion.fixture'

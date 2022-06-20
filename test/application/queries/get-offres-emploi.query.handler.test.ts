@@ -1,4 +1,3 @@
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
@@ -7,28 +6,24 @@ import {
   GetOffresEmploiQuery,
   GetOffresEmploiQueryHandler
 } from '../../../src/application/queries/get-offres-emploi.query.handler'
-import {
-  Contrat,
-  Duree,
-  Experience,
-  OffresEmploi
-} from '../../../src/domain/offre-emploi'
+import { Contrat, Duree, Experience } from '../../../src/domain/offre-emploi'
 import { desOffresEmploiQueryModel } from '../../fixtures/query-models/offre-emploi.query-model.fixtures'
 import { success } from '../../../src/building-blocks/types/result'
+import { FindAllOffresEmploiQueryGetter } from '../../../src/application/queries/query-getters/find-all-offres-emploi.query.getter'
 
 describe('GetOffresEmploiQueryHandler', () => {
-  let offreEmploiRepo: StubbedType<OffresEmploi.Repository>
+  let findAllOffresEmploi: StubbedClass<FindAllOffresEmploiQueryGetter>
   let getOffresEmploiQueryHandler: GetOffresEmploiQueryHandler
   let sandbox: SinonSandbox
   let evenementService: StubbedClass<EvenementService>
 
   before(() => {
     sandbox = createSandbox()
-    offreEmploiRepo = stubInterface(sandbox)
+    findAllOffresEmploi = stubClass(FindAllOffresEmploiQueryGetter)
     evenementService = stubClass(EvenementService)
 
     getOffresEmploiQueryHandler = new GetOffresEmploiQueryHandler(
-      offreEmploiRepo,
+      findAllOffresEmploi,
       evenementService
     )
   })
@@ -53,8 +48,8 @@ describe('GetOffresEmploiQueryHandler', () => {
           duree: [Duree.tempsPlein]
         }
 
-        offreEmploiRepo.findAll
-          .withArgs(getOffresEmploiQuery)
+        findAllOffresEmploi.handle
+          .withArgs({ ...getOffresEmploiQuery, page: 2, limit: 52 })
           .resolves(success(desOffresEmploiQueryModel()))
 
         // When
@@ -79,7 +74,7 @@ describe('GetOffresEmploiQueryHandler', () => {
           duree: [Duree.tempsPlein]
         }
 
-        offreEmploiRepo.findAll
+        findAllOffresEmploi.handle
           .withArgs({ ...getOffresEmploiQuery, page: 1, limit: 50 })
           .resolves(success(desOffresEmploiQueryModel()))
 

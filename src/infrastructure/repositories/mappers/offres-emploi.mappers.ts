@@ -1,6 +1,5 @@
 import {
   FavoriOffreEmploiIdQueryModel,
-  OffreEmploiQueryModel,
   OffreEmploiResumeQueryModel,
   OffresEmploiQueryModel
 } from 'src/application/queries/query-models/offres-emploi.query-model'
@@ -10,10 +9,7 @@ import {
   Contrat
 } from '../../../domain/offre-emploi'
 import { FavoriOffreEmploiSqlModel } from '../../sequelize/models/favori-offre-emploi.sql-model'
-import {
-  OffresEmploiDto,
-  OffreEmploiDto
-} from '../offre-emploi-http-sql.repository.db'
+import { OffreEmploiDto, OffresEmploiDto } from '../dto/pole-emploi.dto'
 
 export function toOffresEmploiQueryModel(
   page: number,
@@ -44,19 +40,6 @@ export function toOffresEmploiQueryModel(
           }
         })
       : []
-  }
-}
-
-export function toOffreEmploiQueryModel(
-  offreEmploiDto: OffreEmploiDto
-): OffreEmploiQueryModel {
-  return {
-    id: offreEmploiDto.id,
-    urlRedirectPourPostulation:
-      offreEmploiDto.contact?.urlPostulation ||
-      offreEmploiDto.origineOffre?.partenaires?.at(0)?.url ||
-      offreEmploiDto.origineOffre?.urlOrigine,
-    data: offreEmploiDto
   }
 }
 

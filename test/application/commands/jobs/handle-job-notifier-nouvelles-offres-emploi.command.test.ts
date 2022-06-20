@@ -24,11 +24,12 @@ import { failure, success } from '../../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import { testConfig } from '../../../utils/module-for-testing'
 import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from '../../../../src/application/commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
+import { FindAllOffresEmploiQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-emploi.query.getter'
 
 describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
   let notifierNouvellesOffresEmploiCommandHandler: HandleJobNotifierNouvellesOffresEmploiCommandHandler
   let rechercheRepository: StubbedType<Recherche.Repository>
-  let offresEmploiRepository: StubbedType<OffresEmploi.Repository>
+  let findAllOffresEmploiQueryGetter: StubbedClass<FindAllOffresEmploiQueryGetter>
   let notificationService: StubbedClass<Notification.Service>
   let jeuneRepository: StubbedType<Jeune.Repository>
 
@@ -53,7 +54,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     rechercheRepository = stubInterface(sandbox)
-    offresEmploiRepository = stubInterface(sandbox)
+    findAllOffresEmploiQueryGetter = stubClass(FindAllOffresEmploiQueryGetter)
     notificationService = stubClass(Notification.Service)
     notificationService.notifierNouvellesOffres.resolves()
     jeuneRepository = stubInterface(sandbox)
@@ -65,7 +66,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
       new HandleJobNotifierNouvellesOffresEmploiCommandHandler(
         dateService,
         rechercheRepository,
-        offresEmploiRepository,
+        findAllOffresEmploiQueryGetter,
         notificationService,
         jeuneRepository,
         testConfig()
@@ -112,7 +113,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
       })
       it('recupère les nouvelles offres', async () => {
         // Given
-        offresEmploiRepository.findAll.resolves(
+        findAllOffresEmploiQueryGetter.handle.resolves(
           success(offresEmploiQueryModelSansResultats)
         )
 
@@ -120,14 +121,14 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         await notifierNouvellesOffresEmploiCommandHandler.handle()
 
         // Then
-        expect(offresEmploiRepository.findAll).to.have.callCount(2)
+        expect(findAllOffresEmploiQueryGetter.handle).to.have.callCount(2)
         const expectedFirstCall: OffresEmploi.Criteres = {
           page: 1,
           limit: 2,
           q: 'test1',
           minDateCreation: dateDerniereRecherche
         }
-        expect(offresEmploiRepository.findAll).to.have.been.calledWith(
+        expect(findAllOffresEmploiQueryGetter.handle).to.have.been.calledWith(
           expectedFirstCall
         )
         const expectedSecondCall: OffresEmploi.Criteres = {
@@ -136,7 +137,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           q: 'test2',
           minDateCreation: dateDerniereRecherche
         }
-        expect(offresEmploiRepository.findAll).to.have.been.calledWith(
+        expect(findAllOffresEmploiQueryGetter.handle).to.have.been.calledWith(
           expectedSecondCall
         )
       })
@@ -178,7 +179,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           .onSecondCall()
           .resolves([])
 
-        offresEmploiRepository.findAll.resolves(
+        findAllOffresEmploiQueryGetter.handle.resolves(
           success(offresEmploiQueryModelSansResultats)
         )
 
@@ -200,9 +201,9 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           commune: criteres.commune,
           minDateCreation: dateDerniereRecherche
         }
-        expect(offresEmploiRepository.findAll).to.have.been.calledWithExactly(
-          expected
-        )
+        expect(
+          findAllOffresEmploiQueryGetter.handle
+        ).to.have.been.calledWithExactly(expected)
       })
       it('envoie une notification', async () => {
         // Given
@@ -212,7 +213,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           q: criteresRecherche1.q,
           minDateCreation: dateDerniereRecherche
         }
-        offresEmploiRepository.findAll
+        findAllOffresEmploiQueryGetter.handle
           .resolves(success(offresEmploiQueryModelSansResultats))
           .withArgs(criteres)
           .resolves(success(offresEmploiQueryModel))
@@ -237,7 +238,9 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           },
           results: [uneOffreEmploiResumeQueryModel()]
         }
-        offresEmploiRepository.findAll.resolves(success(offresEmploiQueryModel))
+        findAllOffresEmploiQueryGetter.handle.resolves(
+          success(offresEmploiQueryModel)
+        )
 
         // When
         await notifierNouvellesOffresEmploiCommandHandler.handle()
@@ -307,7 +310,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           .onThirdCall()
           .resolves([])
 
-        offresEmploiRepository.findAll.resolves(
+        findAllOffresEmploiQueryGetter.handle.resolves(
           success(offresEmploiQueryModelSansResultats)
         )
 
@@ -315,7 +318,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         await notifierNouvellesOffresEmploiCommandHandler.handle()
 
         // Then
-        expect(offresEmploiRepository.findAll).to.have.callCount(6)
+        expect(findAllOffresEmploiQueryGetter.handle).to.have.callCount(6)
       })
     })
 
@@ -335,7 +338,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         await notifierNouvellesOffresEmploiCommandHandler.handle()
 
         // Then
-        expect(offresEmploiRepository.findAll).to.have.callCount(0)
+        expect(findAllOffresEmploiQueryGetter.handle).to.have.callCount(0)
       })
     })
   })
@@ -378,7 +381,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
       })
       it('envoie les notifs que pour les recherches en succès', async () => {
         // Given
-        offresEmploiRepository.findAll
+        findAllOffresEmploiQueryGetter.handle
           .onFirstCall()
           .resolves(failure(new ErreurHttp('Bad bad request', 400)))
           .onSecondCall()
@@ -390,7 +393,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         await notifierNouvellesOffresEmploiCommandHandler.handle()
 
         // Then
-        expect(offresEmploiRepository.findAll).to.have.callCount(2)
+        expect(findAllOffresEmploiQueryGetter.handle).to.have.callCount(2)
         expect(rechercheRepository.update).to.have.callCount(2)
         expect(rechercheRepository.update).to.have.been.calledWithExactly(
           uneRecherche({
