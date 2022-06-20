@@ -14,7 +14,7 @@ import {
 import {
   GetDetailOffreEmploiQuery,
   GetDetailOffreEmploiQueryHandler
-} from '../../application/queries/get-detail-offre-emploi.query.handler.db'
+} from '../../application/queries/get-detail-offre-emploi.query.handler'
 import {
   GetOffresEmploiQuery,
   GetOffresEmploiQueryHandler

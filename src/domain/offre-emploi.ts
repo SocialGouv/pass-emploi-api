@@ -1,11 +1,3 @@
-import {
-  FavoriOffreEmploiIdQueryModel,
-  OffreEmploiResumeQueryModel,
-  OffreEmploiQueryModel,
-  OffresEmploiQueryModel
-} from 'src/application/queries/query-models/offres-emploi.query-model'
-import { Jeune } from './jeune'
-import { Result } from '../building-blocks/types/result'
 import { DateTime } from 'luxon'
 
 export interface OffreEmploi {
@@ -30,20 +22,6 @@ export namespace OffresEmploi {
   export const DISTANCE_PAR_DEFAUT = 10
 
   export interface Repository {
-    findAll(criteres: Criteres): Promise<Result<OffresEmploiQueryModel>>
-
-    getOffreEmploiQueryModelById(
-      idOffreEmploi: string
-    ): Promise<OffreEmploiQueryModel | undefined>
-
-    getFavorisIdsQueryModelsByJeune(
-      id: Jeune.Id
-    ): Promise<FavoriOffreEmploiIdQueryModel[]>
-
-    getFavorisQueryModelsByJeune(
-      id: Jeune.Id
-    ): Promise<OffreEmploiResumeQueryModel[]>
-
     saveAsFavori(idJeune: string, offreEmploi: OffreEmploi): Promise<void>
 
     getFavori(

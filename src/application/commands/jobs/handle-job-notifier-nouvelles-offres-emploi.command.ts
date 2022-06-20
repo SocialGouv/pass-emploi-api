@@ -7,10 +7,7 @@ import {
   Result,
   success
 } from 'src/building-blocks/types/result'
-import {
-  OffresEmploi,
-  OffresEmploiRepositoryToken
-} from 'src/domain/offre-emploi'
+import { OffresEmploi } from 'src/domain/offre-emploi'
 import { Recherche, RecherchesRepositoryToken } from 'src/domain/recherche'
 import { DateService } from 'src/utils/date-service'
 import { Command } from '../../../building-blocks/types/command'
@@ -20,6 +17,7 @@ import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune'
 import { Notification } from '../../../domain/notification'
 import { GetOffresEmploiQuery } from '../../queries/get-offres-emploi.query.handler'
 import { OffresEmploiQueryModel } from '../../queries/query-models/offres-emploi.query-model'
+import { FindAllOffresEmploiQueryGetter } from '../../queries/query-getters/find-all-offres-emploi.query.getter'
 
 @Injectable()
 export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
@@ -30,8 +28,7 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
     private dateService: DateService,
     @Inject(RecherchesRepositoryToken)
     private rechercheRepository: Recherche.Repository,
-    @Inject(OffresEmploiRepositoryToken)
-    private offresEmploiRepository: OffresEmploi.Repository,
+    private findAllOffresEmploiQueryGetter: FindAllOffresEmploiQueryGetter,
     private notificationService: Notification.Service,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
@@ -153,7 +150,7 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
       limit: 2
     }
 
-    return this.offresEmploiRepository.findAll(criteres)
+    return this.findAllOffresEmploiQueryGetter.handle(criteres)
   }
 
   async authorize(): Promise<void> {

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Query } from '../../building-blocks/types/query'
@@ -7,11 +7,11 @@ import {
   Contrat,
   Duree,
   Experience,
-  OffresEmploi,
-  OffresEmploiRepositoryToken
+  OffresEmploi
 } from '../../domain/offre-emploi'
 import { OffresEmploiQueryModel } from './query-models/offres-emploi.query-model'
 import { Result } from '../../building-blocks/types/result'
+import { FindAllOffresEmploiQueryGetter } from './query-getters/find-all-offres-emploi.query.getter'
 
 const DEFAULT_PAGE = 1
 const DEFAULT_LIMIT = 50
@@ -36,8 +36,7 @@ export class GetOffresEmploiQueryHandler extends QueryHandler<
   Result<OffresEmploiQueryModel>
 > {
   constructor(
-    @Inject(OffresEmploiRepositoryToken)
-    private offresEmploiRepository: OffresEmploi.Repository,
+    private findAllOffresEmploiQueryGetter: FindAllOffresEmploiQueryGetter,
     private evenementService: EvenementService
   ) {
     super('GetOffresEmploiQueryHandler')
@@ -51,7 +50,7 @@ export class GetOffresEmploiQueryHandler extends QueryHandler<
       page: query.page || DEFAULT_PAGE,
       limit: query.limit || DEFAULT_LIMIT
     }
-    return this.offresEmploiRepository.findAll(criteres)
+    return this.findAllOffresEmploiQueryGetter.handle(criteres)
   }
   async authorize(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

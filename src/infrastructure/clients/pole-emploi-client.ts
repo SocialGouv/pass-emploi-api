@@ -5,13 +5,13 @@ import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
 import { DateService } from '../../utils/date-service'
-import {
-  OffreEmploiDto,
-  OffresEmploiDto
-} from '../repositories/offre-emploi-http-sql.repository.db'
 import { ListeTypeDemarchesDto, TypeDemarcheDto } from './dto/pole-emploi.dto'
 import { buildError } from '../../utils/logger.module'
 import { desTypeDemarchesDtosMock } from '../../fixtures/types-demarches.fixture'
+import {
+  OffreEmploiDto,
+  OffresEmploiDto
+} from '../repositories/dto/pole-emploi.dto'
 
 const CODE_UTILISATEUR = 0
 
