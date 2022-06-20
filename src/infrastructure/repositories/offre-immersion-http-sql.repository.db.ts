@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import {
   DetailOffreImmersionQueryModel,
-  FavoriOffreImmersionIdQueryModel,
   OffreImmersionQueryModel
 } from 'src/application/queries/query-models/offres-immersion.query-model'
 import {
@@ -14,7 +13,6 @@ import { OffreImmersion, OffresImmersion } from '../../domain/offre-immersion'
 import { ImmersionClient } from '../clients/immersion-client'
 import { FavoriOffreImmersionSqlModel } from '../sequelize/models/favori-offre-immersion.sql-model'
 import {
-  fromSqlToFavorisOffresImmersionIdsQueryModels,
   fromSqlToOffreImmersion,
   toDetailOffreImmersionQueryModel,
   toOffreImmersionQueryModel
@@ -27,31 +25,6 @@ export class OffresImmersionHttpSqlRepository
   implements OffresImmersion.Repository
 {
   constructor(private immersionClient: ImmersionClient) {}
-
-  async getFavorisIdsQueryModelsByJeune(
-    idJeune: string
-  ): Promise<FavoriOffreImmersionIdQueryModel[]> {
-    const favorisIdsSql = await FavoriOffreImmersionSqlModel.findAll({
-      attributes: ['idOffre'],
-      where: {
-        idJeune
-      }
-    })
-
-    return fromSqlToFavorisOffresImmersionIdsQueryModels(favorisIdsSql)
-  }
-
-  async getFavorisQueryModelsByJeune(
-    idJeune: string
-  ): Promise<OffreImmersionQueryModel[]> {
-    const favorisSql = await FavoriOffreImmersionSqlModel.findAll({
-      where: {
-        idJeune
-      }
-    })
-
-    return favorisSql.map(fromSqlToOffreImmersion)
-  }
 
   async getFavori(
     idJeune: string,
