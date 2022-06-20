@@ -12,7 +12,6 @@ import {
 } from '../../../src/application/queries/query-models/offres-immersion.query-model'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-immersion-http-sql.repository.db'
-import { ImmersionClient } from '../../../src/infrastructure/clients/immersion-client'
 import { GetFavorisOffresImmersionJeuneQueryHandler } from '../../../src/application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
@@ -34,10 +33,7 @@ describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
         idConseiller: 'ZIDANE'
       })
     )
-    const immersionClient = stubClass(ImmersionClient)
-    const offresImmersionRepository = new OffresImmersionHttpSqlRepository(
-      immersionClient
-    )
+    const offresImmersionRepository = new OffresImmersionHttpSqlRepository()
     await offresImmersionRepository.saveAsFavori(idJeune, uneOffreImmersion())
 
     jeuneAuthorizer = stubClass(JeuneAuthorizer)

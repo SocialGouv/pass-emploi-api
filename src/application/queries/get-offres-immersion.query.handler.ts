@@ -1,14 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result } from '../../building-blocks/types/result'
-import {
-  OffresImmersion,
-  OffresImmersionRepositoryToken
-} from '../../domain/offre-immersion'
+import { OffresImmersion } from '../../domain/offre-immersion'
 import { OffreImmersionQueryModel } from './query-models/offres-immersion.query-model'
+import { FindAllOffresImmersionQueryGetter } from './query-getters/find-all-offres-immersion.query.getter'
 
 export interface GetOffresImmersionQuery extends Query {
   rome: string
@@ -23,8 +21,7 @@ export class GetOffresImmersionQueryHandler extends QueryHandler<
   Result<OffreImmersionQueryModel[]>
 > {
   constructor(
-    @Inject(OffresImmersionRepositoryToken)
-    private offresImmersionRepository: OffresImmersion.Repository,
+    private findAllOffresImmersionQueryGetter: FindAllOffresImmersionQueryGetter,
     private evenementService: EvenementService
   ) {
     super('GetOffresImmersionQueryHandler')
@@ -36,7 +33,7 @@ export class GetOffresImmersionQueryHandler extends QueryHandler<
     const distance = query.distance
       ? query.distance
       : OffresImmersion.DISTANCE_PAR_DEFAUT
-    return this.offresImmersionRepository.findAll({
+    return this.findAllOffresImmersionQueryGetter.handle({
       rome: query.rome,
       lat: query.lat,
       lon: query.lon,
