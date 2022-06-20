@@ -19,4 +19,7 @@ export class DetailConseillerQueryModel {
 
   @ApiProperty()
   notificationsSonores: boolean
+
+  @ApiProperty()
+  aDesBeneficiairesARecuperer: boolean
 }

@@ -2,7 +2,8 @@ import { DetailConseillerQueryModel } from 'src/application/queries/query-models
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 
 export function fromSqlToDetailConseillerQueryModel(
-  conseillerSqlModel: ConseillerSqlModel
+  conseillerSqlModel: ConseillerSqlModel,
+  aDesBeneficiairesARecuperer: boolean
 ): DetailConseillerQueryModel {
   const conseiller: DetailConseillerQueryModel = {
     id: conseillerSqlModel.id,
@@ -10,7 +11,8 @@ export function fromSqlToDetailConseillerQueryModel(
     lastName: conseillerSqlModel.nom,
     email: conseillerSqlModel.email ?? undefined,
     agence: conseillerSqlModel.agence ?? undefined,
-    notificationsSonores: conseillerSqlModel.notificationsSonores
+    notificationsSonores: conseillerSqlModel.notificationsSonores,
+    aDesBeneficiairesARecuperer: aDesBeneficiairesARecuperer
   }
   if (conseillerSqlModel.agence) {
     conseiller.agence = {
