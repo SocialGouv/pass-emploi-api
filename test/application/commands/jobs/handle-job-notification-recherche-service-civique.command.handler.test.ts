@@ -20,13 +20,14 @@ import { uneRecherche } from '../../../fixtures/recherche.fixture'
 import { unJeune } from '../../../fixtures/jeune.fixture'
 import { GetServicesCiviqueQuery } from '../../../../src/application/queries/get-services-civique.query.handler'
 import { uneOffreServiceCivique } from '../../../fixtures/offre-service-civique.fixture'
+import { FindAllOffresServicesCiviqueQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-services-civique.query.getter'
 
 describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
   describe('handle', () => {
     let rechercheRepository: StubbedType<Recherche.Repository>
     let jeuneRepository: StubbedType<Jeune.Repository>
     let notificationService: StubbedClass<Notification.Service>
-    let offreEngagementRepository: StubbedType<OffreServiceCivique.Repository>
+    let findAllOffresServicesCiviqueQueryGetter: StubbedClass<FindAllOffresServicesCiviqueQueryGetter>
     let dateService: StubbedClass<DateService>
 
     let handleJobNotifierNouveauxServicesCiviqueCommandHandler: HandleJobNotifierNouveauxServicesCiviqueCommandHandler
@@ -43,7 +44,9 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
       rechercheRepository = stubInterface(sandbox)
       jeuneRepository = stubInterface(sandbox)
       notificationService = stubClass(Notification.Service)
-      offreEngagementRepository = stubInterface(sandbox)
+      findAllOffresServicesCiviqueQueryGetter = stubClass(
+        FindAllOffresServicesCiviqueQueryGetter
+      )
       dateService = stubClass(DateService)
       dateService.now.returns(now)
       notificationService.notifierNouvellesOffres.resolves()
@@ -53,7 +56,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
           rechercheRepository,
           jeuneRepository,
           notificationService,
-          offreEngagementRepository,
+          findAllOffresServicesCiviqueQueryGetter,
           dateService
         )
     })
@@ -61,7 +64,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
     describe("quand il n'y a pas de nouvelles offres depuis hier à 10 heures", () => {
       it('renvoie juste les stats', async () => {
         // Given
-        offreEngagementRepository.findAll
+        findAllOffresServicesCiviqueQueryGetter.handle
           .withArgs({
             dateDeCreationMinimum: hier,
             page: 1,
@@ -87,7 +90,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
 
       beforeEach(() => {
         // Given
-        offreEngagementRepository.findAll
+        findAllOffresServicesCiviqueQueryGetter.handle
           .withArgs({
             dateDeCreationMinimum: hier,
             page: 1,
@@ -174,7 +177,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
         // Given
         const uneOffre = uneOffreServiceCivique()
 
-        offreEngagementRepository.findAll
+        findAllOffresServicesCiviqueQueryGetter.handle
           .withArgs({
             dateDeCreationMinimum: hier,
             page: 1,
@@ -215,7 +218,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
           localisation: undefined
         }
 
-        offreEngagementRepository.findAll
+        findAllOffresServicesCiviqueQueryGetter.handle
           .withArgs({
             dateDeCreationMinimum: hier,
             page: 1,

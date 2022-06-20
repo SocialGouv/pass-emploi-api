@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { URLSearchParams } from 'url'
 import {
   ErreurHttp,
   NonTrouveError
@@ -12,8 +11,7 @@ import { FavoriOffreEngagementSqlModel } from '../sequelize/models/favori-offre-
 import {
   fromSqlToIds,
   fromSqlToOffreServiceCivique,
-  toOffreEngagement,
-  toOffresServicesCivique
+  toOffreEngagement
 } from './mappers/service-civique.mapper'
 
 @Injectable()
@@ -24,30 +22,6 @@ export class OffreServiceCiviqueHttpSqlRepository
 
   constructor(private engagementClient: EngagementClient) {
     this.logger = new Logger('OffreServiceCiviqueHttpSqlRepository')
-  }
-
-  async findAll(
-    criteres: OffreServiceCivique.Criteres
-  ): Promise<Result<OffreServiceCivique[]>> {
-    try {
-      const params =
-        OffreServiceCiviqueHttpSqlRepository.construireLesParams(criteres)
-      const response = await this.engagementClient.get<EngagementDto>(
-        'v0/mission/search',
-        params
-      )
-      return success(toOffresServicesCivique(response.data))
-    } catch (e) {
-      this.logger.error(e)
-      if (e.response?.status >= 400 && e.response?.status < 500) {
-        const erreur = new ErreurHttp(
-          e.response.data?.message,
-          e.response.status
-        )
-        return failure(erreur)
-      }
-      return failure(e)
-    }
   }
 
   async getServiceCiviqueById(
@@ -78,52 +52,6 @@ export class OffreServiceCiviqueHttpSqlRepository
       }
       return failure(e)
     }
-  }
-
-  private static construireLesParams(
-    criteres: OffreServiceCivique.Criteres
-  ): URLSearchParams {
-    const {
-      page,
-      limit,
-      lat,
-      lon,
-      dateDeDebutMaximum,
-      dateDeDebutMinimum,
-      distance,
-      domaine,
-      editeur,
-      dateDeCreationMinimum
-    } = criteres
-    const params = new URLSearchParams()
-    params.append('size', limit.toString())
-    params.append('from', (page * limit - limit).toString())
-
-    if (lat) {
-      params.append('lat', lat.toString())
-    }
-    if (lon) {
-      params.append('lon', lon.toString())
-    }
-    if (dateDeDebutMaximum) {
-      params.append('startAt', `lt:${dateDeDebutMaximum.toUTC().toISO()}`)
-    }
-    if (dateDeDebutMinimum) {
-      params.append('startAt', `gt:${dateDeDebutMinimum.toUTC().toISO()}`)
-    }
-    if (dateDeCreationMinimum) {
-      params.append('createdAt', `gt:${dateDeCreationMinimum.toUTC().toISO()}`)
-    }
-    if (distance) {
-      params.append('distance', `${distance}km`)
-    }
-    if (domaine) {
-      params.append('domain', domaine)
-    }
-
-    params.append('publisher', editeur)
-    params.append('sortBy', 'createdAt')
-    return params
   }
 
   async getFavorisIdsByJeune(idJeune: string): Promise<Core.Id[]> {
