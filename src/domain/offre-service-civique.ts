@@ -29,8 +29,6 @@ export namespace OffreServiceCivique {
   export const DISTANCE_PAR_DEFAUT = 10
 
   export interface Repository {
-    findAll(criteres: Criteres): Promise<Result<OffreServiceCivique[]>>
-
     getServiceCiviqueById(id: string): Promise<Result<OffreServiceCivique>>
 
     getFavorisIdsByJeune(id: Jeune.Id): Promise<Core.Id[]>

@@ -179,6 +179,8 @@ import { TelechargerFichierQueryHandler } from './application/queries/telecharge
 import { SupprimerFichierCommandHandler } from './application/commands/supprimer-fichier.command.handler'
 import { FichierAuthorizer } from './application/authorizers/authorize-fichier'
 import { FindAllOffresEmploiQueryGetter } from './application/queries/query-getters/find-all-offres-emploi.query.getter'
+import { FindAllOffresImmersionQueryGetter } from './application/queries/query-getters/find-all-offres-immersion.query.getter'
+import { FindAllOffresServicesCiviqueQueryGetter } from './application/queries/query-getters/find-all-offres-services-civique.query.getter'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -422,7 +424,9 @@ export function buildQueryCommandsProviders(): Provider[] {
     TelechargerFichierQueryHandler,
     SupprimerFichierCommandHandler,
     FichierAuthorizer,
-    FindAllOffresEmploiQueryGetter
+    FindAllOffresEmploiQueryGetter,
+    FindAllOffresImmersionQueryGetter,
+    FindAllOffresServicesCiviqueQueryGetter
   ]
 }
 
