@@ -4,7 +4,7 @@
 * Décideurs: [liste des personnes impliquées dans la décision] <!-- optionnel -->
 * Date: [YYYY-MM-DD quand la décision a été modifiée pour la dernière fois] <!-- optionnel -->
 
-Ticket Trello: [description | URL ticket] <!-- optionnel -->
+Ticket Trello / Notion : [description | URL ticket] <!-- optionnel -->
 
 ## Contexte et Définition du Problème
 

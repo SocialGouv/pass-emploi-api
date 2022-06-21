@@ -1,0 +1,47 @@
+@startuml
+
+skinparam backgroundColor white
+
+actor "Conseiller ML" as conseiller
+participant "i-Milo" as milo #CBC3E3
+participant "Keycloak i-Milo" as kckMilo 	#CBC3E3
+participant "CEJ" as cej #ADD8E6
+participant "Keycloak CEJ" as kckCej #ADD8E6
+actor "Jeune ML" as jeune
+
+header Page Header
+
+title Flux d'authentification pour un Jeune Milo
+
+autonumber
+group Création du Jeune Milo sur le CEJ
+skinparam sequenceMessageAlign right
+conseiller -> cej : Création du compte CEJ Jeune : infos Jeune
+skinparam sequenceMessageAlign left
+cej -> cej : Check BDD\nJeune non existant
+
+skinparam sequenceMessageAlign center
+cej -> kckMilo :demande création de compte SSO Milo : idDossier
+kckMilo -> kckMilo : Check aucun jeune lié au dossier\nOn lie Jeune ML au compte
+kckMilo -> cej : succès : id-keycloak
+
+skinparam sequenceMessageAlign left
+cej -> cej : Enregistrement BDD\nid-keycloak\ninfos Jeune
+end
+
+note over kckCej, jeune : À ce stade, le compte du jeune\nest inactif. Il est activé à l'étape\nsuivante.
+
+group Connexion du Jeune sur le CEJ
+skinparam sequenceMessageAlign center
+jeune -> cej : Demande de connexion sur l'application
+cej -> kckMilo : Redirection SSO Milo
+jeune -> kckMilo : ID + MDP Milo
+kckMilo -> kckCej : Authentification SSO Milo\nNouvelle session keycloak CEJ : infos Jeune
+note left : Ici, les infos Jeune envoyées sont les\ndernières à jour de i-milo, pour\nun changement d'email par exemple.
+kckCej -> cej : Authent OK : infos utilisateur
+note right : On crée l'utilisateur sur keycloak\nici lors de la première connexion.
+cej -> cej : Get Jeune by ID\nUpdate infos Jeune en BDD
+note right : On synchronise les infos i-milo\navec nos infos Jeune en BDD.
+
+end
+@enduml
