@@ -9,6 +9,10 @@ Voir [CONTRIBUTING.md](docs/CONTRIBUTING.md)
 - [Swagger Staging](https://api.pass-emploi.incubateur.net/documentation/)
 - [Swagger Prod](https://api.pass-emploi.beta.gouv.fr/documentation/)
 
-## Lancer des tasks sur les environnements déployés
+# Flux d'authentification
+
+<img src="docs/diagrammes/authentification-flux.svg">
+
+# Lancer des tasks sur les environnements déployés
 
     scalingo --region ${MA_REGION} -a ${MON_APPLICATION} run yarn tasks
