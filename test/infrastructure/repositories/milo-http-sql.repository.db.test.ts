@@ -7,11 +7,7 @@ import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { uneSituationsMilo } from 'test/fixtures/milo.fixture'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
-import {
-  emptySuccess,
-  failure,
-  success
-} from '../../../src/building-blocks/types/result'
+import { failure, success } from '../../../src/building-blocks/types/result'
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
 import { DossierMiloDto } from '../../../src/infrastructure/repositories/dto/milo.dto'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository.db'
@@ -106,7 +102,22 @@ describe('MiloHttpRepository', () => {
 
   describe('creerJeune', () => {
     describe('quand le jeune est nouveau', () => {
-      it('le créée chez Milo', async () => {
+      it("le crée chez Milo et retourne l'id", async () => {
+        // Given
+        nock('https://milo.com')
+          .post('/compte-jeune/1')
+          .reply(201, 'un-id-keycloak', { 'content-type': 'text/plain' })
+          .isDone()
+
+        // When
+        const dossier = await miloHttpSqlRepository.creerJeune('1')
+
+        // Then
+        expect(dossier).to.deep.equal(
+          success({ idAuthentification: 'un-id-keycloak' })
+        )
+      })
+      it("le crée chez Milo sans retourner l'id", async () => {
         // Given
         nock('https://milo.com').post('/compte-jeune/1').reply(204).isDone()
 
@@ -114,7 +125,9 @@ describe('MiloHttpRepository', () => {
         const dossier = await miloHttpSqlRepository.creerJeune('1')
 
         // Then
-        expect(dossier).to.deep.equal(emptySuccess())
+        expect(dossier).to.deep.equal(
+          success({ idAuthentification: undefined })
+        )
       })
     })
     describe('quand il y a un bad request', () => {
