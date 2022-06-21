@@ -87,9 +87,13 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
     await this.jeuneRepository.supprimer(idJeune)
     await this.chatRepository.supprimerChat(idJeune)
 
-    if (jeune.conseiller) {
+    if (jeune.conseiller?.email) {
       const mail = this.mailFactory.creerMailSuppressionJeune(jeune)
       await this.mailService.envoyer(mail)
+    } else {
+      this.logger.warn(
+        `Email non envoyé au conseiller : ${JSON.stringify(jeune.conseiller)}`
+      )
     }
 
     return emptySuccess()
