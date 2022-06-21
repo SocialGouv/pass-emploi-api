@@ -66,6 +66,13 @@ export namespace Authentification {
 
     save(utilisateur: Utilisateur, dateCreation?: Date): Promise<void>
 
+    saveJeune(
+      utilisateur: Authentification.Utilisateur,
+      idConseiller: string,
+      idDossier?: string,
+      dateCreation?: Date
+    ): Promise<void>
+
     deleteJeuneIdp(idJeune: string): Promise<void>
 
     mettreAJourLaVersionDeLApplicationDuJeune(

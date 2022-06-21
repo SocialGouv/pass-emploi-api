@@ -20,7 +20,7 @@ cej -> cej : Check BDD\nJeune non existant
 
 skinparam sequenceMessageAlign center
 cej -> kckMilo :demande création de compte SSO Milo : idDossier
-kckMilo -[#green]> kckMilo : Check aucun jeune lié au dossier\nOn lie Jeune ML au compte
+kckMilo -[#red]> kckMilo : <color:red>Check aucun jeune lié au dossier\n<color:red>On lie Jeune ML au compte
 kckMilo -> cej : succès : id-keycloak
 
 skinparam sequenceMessageAlign left
@@ -28,7 +28,7 @@ cej -> cej : Enregistrement BDD\nid-keycloak\ninfos Jeune
 end
 
 group Reproduction de l'erreur
-conseiller -> cej : Suppression du compte CEJ Jeune inactif
+note over  cej : Suppression du compte CEJ Jeune\nEffectué par le conseiller ou le support
 cej -> cej : Suppression BDD\ninfos Jeune
 conseiller -> cej : Création du compte CEJ Jeune : infos Jeune
 skinparam sequenceMessageAlign left
@@ -36,8 +36,7 @@ cej -> cej : Check BDD\nJeune non existant
 
 skinparam sequenceMessageAlign center
 cej -> kckMilo : demande création de compte SSO Milo : idDossier
-kckMilo -[#green]> kckMilo : Un compte jeune\nest déjà lié au dossier
-kckMilo -> cej : 400 SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT
-cej -> conseiller : Erreur : ce compte existe déjà
+kckMilo -[#red]> kckMilo :<color:red> Un compte jeune\n<color:red>est déjà lié au dossier
+kckMilo -> cej : Erreur : ce compte existe déjà
 end
 @enduml

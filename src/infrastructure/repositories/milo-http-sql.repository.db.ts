@@ -4,12 +4,7 @@ import { ConfigService } from '@nestjs/config'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { firstValueFrom } from 'rxjs'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
-import {
-  emptySuccess,
-  failure,
-  Result,
-  success
-} from '../../building-blocks/types/result'
+import { failure, Result, success } from '../../building-blocks/types/result'
 import { Milo } from '../../domain/milo'
 import { SituationsMiloSqlModel } from '../sequelize/models/situations-milo.sql-model'
 import { DossierMiloDto } from './dto/milo.dto'
@@ -71,16 +66,18 @@ export class MiloHttpSqlRepository implements Milo.Repository {
     }
   }
 
-  async creerJeune(idDossier: string): Promise<Result> {
+  async creerJeune(
+    idDossier: string
+  ): Promise<Result<{ idAuthentification?: string }>> {
     try {
-      await firstValueFrom(
+      const response = await firstValueFrom(
         this.httpService.post(
           `${this.apiUrl}/compte-jeune/${idDossier}`,
           {},
           { headers: { 'X-Gravitee-Api-Key': `${this.apiKeyCreerJeune}` } }
         )
       )
-      return emptySuccess()
+      return success({ idAuthentification: response.data || undefined })
     } catch (e) {
       this.logger.error(e)
 

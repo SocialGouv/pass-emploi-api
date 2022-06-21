@@ -160,6 +160,16 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       dateDerniereConnexion: this.dateService.nowJs()
     }
 
+    if (!utilisateur.dateDerniereConnexion) {
+      await this.authentificationRepository.updateJeunePremiereConnexion(
+        utilisateurMisAJour.id,
+        utilisateurMisAJour.nom,
+        utilisateurMisAJour.prenom,
+        command.idUtilisateurAuth,
+        this.dateService.nowJs()
+      )
+    }
+
     await this.authentificationRepository.update(utilisateurMisAJour)
     return utilisateurMisAJour
   }

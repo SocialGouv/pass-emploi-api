@@ -39,7 +39,7 @@ jeune -> kckMilo : ID + MDP Milo
 kckMilo -> kckCej : Authentification SSO Milo\nNouvelle session keycloak CEJ : infos Jeune
 note left : Ici, les infos Jeune envoyées sont les\ndernières à jour de i-milo, pour\nun changement d'email par exemple.
 kckCej -> cej : Authent OK : infos utilisateur
-note right : On crée l'utilisateur sur keycloak\nici lors de la première connexion.
+note left : On crée l'utilisateur sur keycloak\nici lors de la première connexion.
 cej -> cej : Get Jeune by ID\nUpdate infos Jeune en BDD
 note right : On synchronise les infos i-milo\navec nos infos Jeune en BDD.
 
