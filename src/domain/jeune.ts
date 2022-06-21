@@ -35,11 +35,6 @@ export namespace Jeune {
 
   export type Id = Brand<string, 'JeuneId'>
 
-  export enum TypeTransfert {
-    TEMPORAIRE = 'TEMPORAORE',
-    PERMANENT = 'PERMANENT'
-  }
-
   export interface Repository {
     get(id: string): Promise<Jeune | undefined>
 
@@ -136,15 +131,8 @@ export namespace Jeune {
     }, {} as Record<string, Jeune[]>)
   }
 
-  export function estTemporaire(
-    jeune: Jeune,
-    idConseillerCible: string,
-    estTemporaire: boolean
-  ): boolean {
-    if (!estTemporaire || idConseillerCible === jeune.conseillerInitial?.id) {
-      return false
-    }
-    return true
+  export function estSuiviTemporairement(jeune: Jeune): boolean {
+    return Boolean(jeune.conseillerInitial)
   }
 }
 
@@ -154,7 +142,10 @@ function mapConseillerInitial(
   idConseillerCible: string,
   estTemporaire: boolean
 ): Jeune.ConseillerInitial | undefined {
-  if (Jeune.estTemporaire(jeune, idConseillerCible, estTemporaire)) {
+  if (idConseillerCible === jeune.conseillerInitial?.id) {
+    return undefined
+  }
+  if (estTemporaire) {
     return jeune.conseillerInitial ?? { id: idConseillerSource }
   }
   return undefined

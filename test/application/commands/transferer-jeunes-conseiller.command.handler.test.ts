@@ -1,8 +1,8 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
+import { Chat } from 'src/domain/chat'
 import { Core } from 'src/domain/core'
 import { Jeune } from 'src/domain/jeune'
-import { FirebaseClient } from 'src/infrastructure/clients/firebase-client'
 import { unConseillerDuJeune, unJeune } from 'test/fixtures/jeune.fixture'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import {
@@ -26,21 +26,21 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
   const conseiller = unConseiller()
   let jeuneRepository: StubbedType<Jeune.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
-  let firebaseClient: StubbedClass<FirebaseClient>
+  let chatRepository: StubbedType<Chat.Repository>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
     jeuneRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
+    chatRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
-    firebaseClient = stubClass(FirebaseClient)
     conseillerRepository.get.withArgs('idConseiller').resolves(conseiller)
     transfererJeunesConseillerCommandHandler =
       new TransfererJeunesConseillerCommandHandler(
         conseillerRepository,
         jeuneRepository,
-        firebaseClient,
+        chatRepository,
         conseillerAuthorizer
       )
   })
@@ -108,11 +108,11 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             command.estTemporaire
           )
           expect(
-            firebaseClient.envoyerMessageTransfertJeune.getCall(0).args
-          ).to.deep.equal([jeune1, conseillerCible.id, command.estTemporaire])
+            chatRepository.envoyerMessageTransfert.getCall(0).args[0]
+          ).to.deep.equal(jeune1)
           expect(
-            firebaseClient.envoyerMessageTransfertJeune.getCall(1).args
-          ).to.deep.equal([jeune2, conseillerCible.id, command.estTemporaire])
+            chatRepository.envoyerMessageTransfert.getCall(1).args[0]
+          ).to.deep.equal(jeune2)
         })
       })
       describe('quand le transfert est temporaire', () => {

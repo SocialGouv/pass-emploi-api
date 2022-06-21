@@ -5,7 +5,6 @@ import {
 } from 'src/building-blocks/types/domain-error'
 import { Core } from 'src/domain/core'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
-import { FirebaseClient } from 'src/infrastructure/clients/firebase-client'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
@@ -16,6 +15,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { Chat, ChatRepositoryToken } from '../../domain/chat'
 
 export interface TransfererJeunesConseillerCommand extends Command {
   idConseillerSource: string
@@ -35,7 +35,8 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
     private conseillerRepository: Conseiller.Repository,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
-    private firebaseClient: FirebaseClient,
+    @Inject(ChatRepositoryToken)
+    private chatRepository: Chat.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('TransfererJeunesConseillerCommandHandler')
@@ -86,12 +87,8 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       command.estTemporaire
     )
 
-    jeunes.forEach(jeune =>
-      this.firebaseClient.envoyerMessageTransfertJeune(
-        jeune,
-        command.idConseillerCible,
-        command.estTemporaire
-      )
+    updatedJeunes.forEach(jeune =>
+      this.chatRepository.envoyerMessageTransfert(jeune)
     )
 
     return emptySuccess()
