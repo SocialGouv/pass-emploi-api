@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
-import { FirebaseClient } from 'src/infrastructure/clients/firebase-client'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
@@ -12,6 +11,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { Chat, ChatRepositoryToken } from '../../domain/chat'
 
 export interface RecupererJeunesDuConseillerCommand extends Command {
   idConseiller: string
@@ -27,7 +27,8 @@ export class RecupererJeunesDuConseillerCommandHandler extends CommandHandler<
     private conseillerRepository: Conseiller.Repository,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
-    private firebaseClient: FirebaseClient,
+    @Inject(ChatRepositoryToken)
+    private chatRepository: Chat.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('RecupererJeunesDuConseillerCommandHandler')
@@ -49,7 +50,7 @@ export class RecupererJeunesDuConseillerCommandHandler extends CommandHandler<
         Jeune.separerLesJeunesParConseillerActuel(jeunes)
 
       await Promise.all(
-        Object.values(jeunesParConseiller).map(jeunesDuConseiller => {
+        Object.values(jeunesParConseiller).map(async jeunesDuConseiller => {
           const idConseillerActuel = jeunesDuConseiller[0].conseiller!.id
 
           const updatedJeunes: Jeune[] = Jeune.recupererLesJeunes(
@@ -57,19 +58,15 @@ export class RecupererJeunesDuConseillerCommandHandler extends CommandHandler<
             conseiller
           )
 
-          return this.jeuneRepository.transferAndSaveAll(
+          await this.jeuneRepository.transferAndSaveAll(
             updatedJeunes,
             command.idConseiller,
             idConseillerActuel
           )
+          updatedJeunes.forEach(jeune =>
+            this.chatRepository.envoyerMessageTransfert(jeune)
+          )
         })
-      )
-
-      jeunes.forEach(jeune =>
-        this.firebaseClient.envoyerMessageTransfertJeune(
-          jeune,
-          command.idConseiller
-        )
       )
     }
 

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { Chat } from '../../domain/chat'
 import { FirebaseClient } from '../clients/firebase-client'
+import { Jeune } from '../../domain/jeune'
 
 @Injectable()
 export class ChatFirebaseRepository implements Chat.Repository {
@@ -19,5 +20,9 @@ export class ChatFirebaseRepository implements Chat.Repository {
 
   supprimerChat(idJeune: string): Promise<void> {
     return this.firebaseClient.supprimerChat(idJeune)
+  }
+
+  envoyerMessageTransfert(jeune: Jeune): Promise<void> {
+    return this.firebaseClient.envoyerMessageTransfertJeune(jeune)
   }
 }

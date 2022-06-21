@@ -1,3 +1,5 @@
+import { Jeune } from './jeune'
+
 export const ChatRepositoryToken = 'ChatRepositoryToken'
 
 export namespace Chat {
@@ -8,5 +10,6 @@ export namespace Chat {
     ): Promise<void>
     getNombreDeConversationsNonLues(conseillerId: string): Promise<number>
     supprimerChat(idJeune: string): Promise<void>
+    envoyerMessageTransfert(jeune: Jeune): Promise<void>
   }
 }
