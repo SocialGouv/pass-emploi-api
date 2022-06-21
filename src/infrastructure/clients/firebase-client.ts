@@ -7,8 +7,8 @@ import { Authentification } from '../../domain/authentification'
 import { buildError } from '../../utils/logger.module'
 import { getAPMInstance } from '../monitoring/apm.init'
 import { ChatCryptoService } from '../../utils/chat-crypto-service'
-import Timestamp = firestore.Timestamp
 import { Jeune } from 'src/domain/jeune'
+import Timestamp = firestore.Timestamp
 
 export interface IFirebaseClient {
   send(tokenMessage: TokenMessage): Promise<void>
@@ -152,11 +152,7 @@ export class FirebaseClient implements IFirebaseClient {
     }
   }
 
-  async envoyerMessageTransfertJeune(
-    jeune: Jeune,
-    conseillerCibleId: string,
-    estTemporaire = false
-  ): Promise<void> {
+  async envoyerMessageTransfertJeune(jeune: Jeune): Promise<void> {
     const messageTransfertChat = 'Vous échangez avec votre nouveau conseiller.'
     const { encryptedText, iv } =
       this.chatCryptoService.encrypt(messageTransfertChat)
@@ -177,8 +173,8 @@ export class FirebaseClient implements IFirebaseClient {
               .doc(),
             {
               sentBy: 'conseiller',
-              conseillerId: conseillerCibleId,
-              type: Jeune.estTemporaire(jeune, conseillerCibleId, estTemporaire)
+              conseillerId: jeune.conseiller?.id,
+              type: Jeune.estSuiviTemporairement(jeune)
                 ? 'NOUVEAU_CONSEILLER_TEMPORAIRE'
                 : 'NOUVEAU_CONSEILLER',
               content: encryptedText,
@@ -189,12 +185,12 @@ export class FirebaseClient implements IFirebaseClient {
         }
       })
       this.logger.log(
-        `Message de transfert du chat des jeunes au conseiller ${conseillerCibleId} envoyé avec succès`
+        `Message de transfert du chat des jeunes au conseiller ${jeune.conseiller?.id} envoyé avec succès`
       )
     } catch (e) {
       this.logger.error(
         buildError(
-          `Echec de l'envoi des messages transfert du chat des jeunes au conseiller ${conseillerCibleId} :`,
+          `Echec de l'envoi des messages transfert du chat des jeunes au conseiller ${jeune.conseiller?.id} :`,
           e
         )
       )

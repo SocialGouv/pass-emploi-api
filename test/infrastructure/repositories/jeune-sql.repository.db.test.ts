@@ -605,15 +605,13 @@ describe('JeuneSqlRepository', () => {
           await jeuneSqlRepository.transferAndSaveAll(
             [jeuneATransferer],
             'idConseillerCible',
-            'idConseillerSource',
-            true
+            'idConseillerSource'
           )
 
           // Then
           expect(firebaseClient.transfererChat).to.have.been.calledWithExactly(
             'idConseillerCible',
-            ['unJeuneATransferer'],
-            true
+            ['unJeuneATransferer']
           )
 
           const jeune = await jeuneSqlRepository.get('unJeuneATransferer')

@@ -1,8 +1,8 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+import { Chat } from 'src/domain/chat'
 import { Jeune } from 'src/domain/jeune'
-import { FirebaseClient } from 'src/infrastructure/clients/firebase-client'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import {
@@ -21,7 +21,7 @@ describe('RecupererJeunesDuConseillerCommandHandler', () => {
   let recupererJeunesDuConseillerCommandHandler: RecupererJeunesDuConseillerCommandHandler
   let jeuneRepository: StubbedType<Jeune.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
-  let firebaseClient: StubbedClass<FirebaseClient>
+  let chatRepository: StubbedType<Chat.Repository>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
 
   const conseiller = unConseiller()
@@ -30,13 +30,13 @@ describe('RecupererJeunesDuConseillerCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     jeuneRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
-    firebaseClient = stubClass(FirebaseClient)
+    chatRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     recupererJeunesDuConseillerCommandHandler =
       new RecupererJeunesDuConseillerCommandHandler(
         conseillerRepository,
         jeuneRepository,
-        firebaseClient,
+        chatRepository,
         conseillerAuthorizer
       )
   })
@@ -134,14 +134,14 @@ describe('RecupererJeunesDuConseillerCommandHandler', () => {
         ])
 
         expect(
-          firebaseClient.envoyerMessageTransfertJeune.getCall(0).args
-        ).to.deep.equal([jeune1, command.idConseiller])
+          chatRepository.envoyerMessageTransfert.getCall(0).args[0]
+        ).to.deep.equal(expectedJeune1)
         expect(
-          firebaseClient.envoyerMessageTransfertJeune.getCall(1).args
-        ).to.deep.equal([jeune2, command.idConseiller])
+          chatRepository.envoyerMessageTransfert.getCall(1).args[0]
+        ).to.deep.equal(expectedJeune3)
         expect(
-          firebaseClient.envoyerMessageTransfertJeune.getCall(2).args
-        ).to.deep.equal([jeune3, command.idConseiller])
+          chatRepository.envoyerMessageTransfert.getCall(2).args[0]
+        ).to.deep.equal(expectedJeune2)
       })
       it('ne fait rien quand pas de jeunes', async () => {
         // Given
