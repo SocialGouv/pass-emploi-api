@@ -10,17 +10,20 @@ Ticket Trello / Notion:
 
 ## Contexte et Définition du Problème
 
-- Découverte du problème
-Citer des tickets support avec capture d'écran
-1. Conseiller ML : Je ne peux pas Recréer un compte CEJ pour un jeune après l'avoir supprimé
-   - pb support : page cej créa jeune : idDossier déjà associé à un compte
-2. Jeune ML : Je n'arrive pas à faire ma première connexion à l'appli si le conseiller a modifié mon email i-milo
-   - pb support : page keycloak jeune : utilisateur non trouvé ? ou compte non existant ?
-Flux authent puml pur chaque problème
+La décision concerne le flux d'authentification schématisé ci-dessous :
 
-- Origine du problème
-1. erreur mal gérée compte jeune déjà associé
-2. source de vérité => mauvais mapping avec l'update
+<img src="../diagrammes/authentification-flux.svg">
+
+### Conseiller ML : Je ne peux pas recréer un deuxième compte CEJ jeune après avoir supprimé le premier inactif
+
+- Cette douleur se traduit sur le support par la remontée de tickets demandant la **double suppression** des infos du Jeune sur le backoffice CEJ et le keycloak i-milo.
+- L'origine du problème vient du mauvais traitement de l'erreur 400 *SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT* retournée par le keycloak i-milo à l'étape *5* du flux d'authentification.
+
+<img src="docs/diagrammes/authentification-erreur-compte-existant.svg">
+
+### Jeune ML : Je n'arrive pas à faire ma première connexion à l'appli si le conseiller a modifié mon email i-milo
+   - pb support : page keycloak jeune : utilisateur non trouvé ? ou compte non existant ?
+   - source de vérité => mauvais mapping avec l'update
 
 ## Résultat de la Décision
 
@@ -33,6 +36,3 @@ Solution retenue:
 * Décharge du support pour les tickets sur la double suppression CEJ / keycloak i-milo
 * Documentation du flux sur une zone d'ombre pour une partie de l'équipe et le support
 
-## Liens
-
-<img src="../diagrammes/authentification-flux.svg">
