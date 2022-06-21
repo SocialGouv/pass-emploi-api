@@ -7,7 +7,10 @@ import {
   Result,
   success
 } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
+import {
+  Authentification,
+  AuthentificationRepositoryToken
+} from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { Core } from '../../domain/core'
@@ -41,6 +44,8 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     private conseillerAuthorizer: ConseillerAuthorizer,
     @Inject(MiloRepositoryToken) private miloRepository: Milo.Repository,
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
+    @Inject(AuthentificationRepositoryToken)
+    private utilisateurRepository: Authentification.Repository,
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     @Inject(ChatRepositoryToken) private chatRepository: Chat.Repository
@@ -71,29 +76,28 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
       return result
     }
 
-    const nouveauJeune: Jeune = {
+    const utilisateur: Authentification.Utilisateur = {
       id: this.idService.uuid(),
-      firstName: command.prenom,
-      lastName: command.nom,
-      creationDate: this.dateService.now(),
-      isActivated: false,
-      email: lowerCaseEmail,
-      conseiller: {
-        id: conseiller.id,
-        lastName: conseiller.lastName,
-        firstName: conseiller.firstName,
-        email: conseiller.email
-      },
+      idAuthentification: result.data.idAuthentification,
+      prenom: command.prenom,
+      nom: command.nom,
       structure: Core.Structure.MILO,
-      idDossier: command.idDossier
+      type: Authentification.Type.JEUNE,
+      email: lowerCaseEmail,
+      roles: []
     }
-    await this.jeuneRepository.save(nouveauJeune)
+    await this.utilisateurRepository.saveJeune(
+      utilisateur,
+      conseiller.id,
+      command.idDossier,
+      this.dateService.now().toJSDate()
+    )
     await this.chatRepository.initializeChatIfNotExists(
-      nouveauJeune.id,
-      nouveauJeune.conseiller!.id
+      utilisateur.id,
+      conseiller.id
     )
 
-    return success({ id: nouveauJeune.id })
+    return success({ id: utilisateur.id })
   }
 
   async authorize(
