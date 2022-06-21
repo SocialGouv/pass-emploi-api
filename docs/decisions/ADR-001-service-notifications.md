@@ -1,5 +1,8 @@
 # [Harmonisation Domaine: Repository Service Factory]
 
+* Statut : mergé
+* Date : 2022-06-15
+
 ## Contexte et définition du problème
 
 Les command handler portent dans certains cas trop de responsabilités. Ces classes devraient être des orchestrateurs de service et ne pas porter de logique métier lorsque celle-ci n'est pas directe (responsabilité du domaine). C'est le cas de l'envoi de notifications pour les manipulations de rendez-vous.
