@@ -37,8 +37,8 @@ describe('DeleteJeuneCommandHandler', () => {
   let authentificationRepository: StubbedType<Authentification.Repository>
   let jeune: Jeune
   let command: DeleteJeuneCommand
+  const sandbox = createSandbox()
   beforeEach(() => {
-    const sandbox = createSandbox()
     jeuneRepository = stubInterface(sandbox)
     chatRepository = stubInterface(sandbox)
     evenementService = stubClass(EvenementService)
@@ -54,16 +54,24 @@ describe('DeleteJeuneCommandHandler', () => {
       mailFactory
     )
 
-    jeune = unJeune({
-      isActivated: false,
-      conseiller: unConseillerDuJeune()
-    })
-    command = { idJeune: 'ABCDE' }
-    jeuneRepository.get.withArgs('ABCDE').resolves(jeune)
     mailFactory.creerMailSuppressionJeune.returns(unMailDto())
   })
 
+  afterEach(() => {
+    sandbox.restore()
+  })
+
   describe('.authorize', () => {
+    beforeEach(async () => {
+      //Given
+      jeune = unJeune({
+        isActivated: false,
+        conseiller: unConseillerDuJeune()
+      })
+      command = { idJeune: 'ABCDE' }
+      jeuneRepository.get.withArgs('ABCDE').resolves(jeune)
+    })
+
     it('autorise le jeune', async () => {
       // Given
       const utilisateur = unUtilisateurJeune()
@@ -130,9 +138,16 @@ describe('DeleteJeuneCommandHandler', () => {
       expect((result as Failure).error).to.be.an.instanceof(NonTrouveError)
     })
 
-    describe('suppression du jeune', () => {
+    describe('suppression du jeune avec conseiller', () => {
       let result: Result
       beforeEach(async () => {
+        //Given
+        jeune = unJeune({
+          isActivated: false,
+          conseiller: unConseillerDuJeune()
+        })
+        command = { idJeune: 'ABCDE' }
+        jeuneRepository.get.withArgs('ABCDE').resolves(jeune)
         // When
         result = await commandHandler.handle(command)
       })
@@ -155,6 +170,79 @@ describe('DeleteJeuneCommandHandler', () => {
           jeune
         )
         expect(mailClient.envoyer).to.have.been.calledWith(unMailDto())
+      })
+
+      it('renvoie un succès', () => {
+        expect(result).to.deep.equal(emptySuccess())
+      })
+    })
+    describe('suppression du jeune avec conseiller sans email', () => {
+      let result: Result
+      beforeEach(async () => {
+        //Given
+        jeune = unJeune({
+          isActivated: false,
+          conseiller: {
+            ...unConseillerDuJeune(),
+            email: undefined
+          }
+        })
+        command = { idJeune: 'ABCDE' }
+        jeuneRepository.get.withArgs('ABCDE').resolves(jeune)
+        // When
+        result = await commandHandler.handle(command)
+      })
+
+      it('supprime le jeune', () => {
+        // Then
+        expect(jeuneRepository.supprimer).to.have.been.calledWith(
+          command.idJeune
+        )
+      })
+
+      it('supprime le chat', () => {
+        expect(chatRepository.supprimerChat).to.have.been.calledWith(
+          command.idJeune
+        )
+      })
+
+      it("n'envoie pas un email au conseiller", () => {
+        expect(mailClient.envoyer).to.not.have.been.called()
+      })
+
+      it('renvoie un succès', () => {
+        expect(result).to.deep.equal(emptySuccess())
+      })
+    })
+    describe('suppression du jeune sans conseiller', () => {
+      let result: Result
+      beforeEach(async () => {
+        //Given
+        jeune = unJeune({
+          isActivated: false,
+          conseiller: undefined
+        })
+        command = { idJeune: 'ABCDE' }
+        jeuneRepository.get.withArgs('ABCDE').resolves(jeune)
+        // When
+        result = await commandHandler.handle(command)
+      })
+
+      it('supprime le jeune', () => {
+        // Then
+        expect(jeuneRepository.supprimer).to.have.been.calledWith(
+          command.idJeune
+        )
+      })
+
+      it('supprime le chat', () => {
+        expect(chatRepository.supprimerChat).to.have.been.calledWith(
+          command.idJeune
+        )
+      })
+
+      it("n'envoie pas un email au conseiller", () => {
+        expect(mailClient.envoyer).to.not.have.been.called()
       })
 
       it('renvoie un succès', () => {
