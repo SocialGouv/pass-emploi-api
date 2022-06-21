@@ -31,7 +31,7 @@
 
 ## Le contexte <a name="le-contexte"></a>
 
-<img src="pass-emploi.svg">
+<img src="diagrammes/pass-emploi.svg">
 
 ### Composants <a name="composants"></a>
 - pass-emploi-auth : Keycloak
@@ -215,4 +215,4 @@ Il est possible de rollback une application Scalingo sur un commit donné (de la
 
 ## Troubleshoot <a name="troubleshoot"></a>
 
-Voir le fichier `troubleshoot.md` du même dossier.
+Voir le fichier `TROUBLESHOOT.md` du même dossier.
