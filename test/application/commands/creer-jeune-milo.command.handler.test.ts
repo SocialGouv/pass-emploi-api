@@ -12,11 +12,7 @@ import {
   EmailExisteDejaError,
   ErreurHttp
 } from '../../../src/building-blocks/types/domain-error'
-import {
-  emptySuccess,
-  failure,
-  success
-} from '../../../src/building-blocks/types/result'
+import { failure, success } from '../../../src/building-blocks/types/result'
 import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
@@ -29,6 +25,7 @@ import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { unConseillerDuJeune, unJeune } from '../../fixtures/jeune.fixture'
+import { Authentification } from '../../../src/domain/authentification'
 
 describe('CreerJeuneMiloCommandHandler', () => {
   let creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
@@ -37,6 +34,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
   const date = DateTime.fromISO('2020-04-06T12:00:00.000Z').toUTC()
   let miloRepository: StubbedType<Milo.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
+  let authentificationRepository: StubbedType<Authentification.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let chatRepository: StubbedType<Chat.Repository>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
@@ -45,13 +43,14 @@ describe('CreerJeuneMiloCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     miloRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
+    authentificationRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
     chatRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     const dateService = stubClass(DateService)
     const idService = stubClass(IdService)
     idService.uuid.returns(idNouveauJeune)
-    dateService.now.returns(date)
+    dateService.nowJs.returns(date.toJSDate())
     conseillerRepository.get.withArgs('idConseiller').resolves(conseiller)
     creerJeuneMiloCommandHandler = new CreerJeuneMiloCommandHandler(
       idService,
@@ -59,6 +58,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
       conseillerAuthorizer,
       miloRepository,
       jeuneRepository,
+      authentificationRepository,
       conseillerRepository,
       chatRepository
     )
@@ -121,23 +121,29 @@ describe('CreerJeuneMiloCommandHandler', () => {
         }
         miloRepository.creerJeune
           .withArgs(command.idDossier)
-          .resolves(emptySuccess())
+          .resolves(success({ idAuthentification: 'mon-sub' }))
 
         // When
         const result = await creerJeuneMiloCommandHandler.handle(command)
 
         // Then
-        expect(jeuneRepository.save).to.have.been.calledWithExactly({
-          id: idNouveauJeune,
-          firstName: command.prenom,
-          lastName: command.nom,
-          creationDate: date,
-          isActivated: false,
-          email: command.email,
-          conseiller: unConseillerDuJeune(),
-          structure: Core.Structure.MILO,
-          idDossier: command.idDossier
-        })
+        expect(
+          authentificationRepository.saveJeune
+        ).to.have.been.calledWithExactly(
+          {
+            id: idNouveauJeune,
+            idAuthentification: 'mon-sub',
+            prenom: command.prenom,
+            nom: command.nom,
+            structure: Core.Structure.MILO,
+            type: Authentification.Type.JEUNE,
+            email: command.email,
+            roles: []
+          },
+          unConseillerDuJeune().id,
+          command.idDossier,
+          date.toJSDate()
+        )
         expect(
           chatRepository.initializeChatIfNotExists
         ).to.have.been.calledWith(idNouveauJeune, conseiller.id)
@@ -155,27 +161,29 @@ describe('CreerJeuneMiloCommandHandler', () => {
         }
         miloRepository.creerJeune
           .withArgs(command.idDossier)
-          .resolves(emptySuccess())
+          .resolves(success({ idAuthentification: 'mon-sub' }))
 
         // When
-        const result = await creerJeuneMiloCommandHandler.handle(command)
+        await creerJeuneMiloCommandHandler.handle(command)
 
         // Then
-        expect(jeuneRepository.save).to.have.been.calledWithExactly({
-          id: idNouveauJeune,
-          firstName: command.prenom,
-          lastName: command.nom,
-          isActivated: false,
-          creationDate: date,
-          email: 'jeune.nom@email.com',
-          conseiller: unConseillerDuJeune(),
-          structure: Core.Structure.MILO,
-          idDossier: command.idDossier
-        })
         expect(
-          chatRepository.initializeChatIfNotExists
-        ).to.have.been.calledWith(idNouveauJeune, conseiller.id)
-        expect(result).to.deep.equal(success({ id: idNouveauJeune }))
+          authentificationRepository.saveJeune
+        ).to.have.been.calledWithExactly(
+          {
+            id: idNouveauJeune,
+            idAuthentification: 'mon-sub',
+            prenom: command.prenom,
+            nom: command.nom,
+            structure: Core.Structure.MILO,
+            type: Authentification.Type.JEUNE,
+            email: 'jeune.nom@email.com',
+            roles: []
+          },
+          unConseillerDuJeune().id,
+          command.idDossier,
+          date.toJSDate()
+        )
       })
     })
 

@@ -24,10 +24,6 @@ export namespace Authentification {
     IMMERSION = 'IMMERSION'
   }
 
-  export const mappedRoles: { [roleKeycloak: string]: Role } = {
-    conseiller_superviseur: Role.SUPERVISEUR
-  }
-
   export interface Utilisateur {
     id: string
     idAuthentification?: string
