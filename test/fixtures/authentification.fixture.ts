@@ -13,8 +13,8 @@ export const unUtilisateurConseiller = (
     type: Authentification.Type.CONSEILLER,
     email: 'nils.tavernier@passemploi.com',
     structure: Core.Structure.MILO,
-    dateDerniereConnexion: null,
-    roles: []
+    roles: [],
+    dateDerniereConnexion: undefined
   }
 
   return {
@@ -35,8 +35,9 @@ export const unUtilisateurJeune = (
     type: Authentification.Type.JEUNE,
     email: 'john.doe@plop.io',
     structure: Core.Structure.MILO,
-    dateDerniereConnexion: null,
-    roles: []
+    roles: [],
+    dateDerniereConnexion: undefined,
+    datePremiereConnexion: undefined
   }
 
   return {
@@ -57,7 +58,6 @@ export const unUtilisateurSupport = (
     type: Authentification.Type.SUPPORT,
     email: 'john.doe@plop.io',
     structure: Core.Structure.PASS_EMPLOI,
-    dateDerniereConnexion: null,
     roles: []
   }
 

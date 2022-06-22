@@ -33,7 +33,8 @@ export namespace Authentification {
     type: Authentification.Type
     roles: Authentification.Role[]
     email?: string
-    dateDerniereConnexion?: Date | null
+    datePremiereConnexion?: Date
+    dateDerniereConnexion?: Date
   }
 
   // TODO : à mettre plutôt dans une classe Utilisateur ?
@@ -51,15 +52,6 @@ export namespace Authentification {
     getJeuneByEmail(email: string): Promise<Utilisateur | undefined>
 
     update(utilisateur: Authentification.Utilisateur): Promise<void>
-
-    updateJeunePremiereConnexion(
-      idJeune: string,
-      nom: string,
-      prenom: string,
-      idUtilisateurAuth: string,
-      datePremiereConnexion: Date,
-      email?: string
-    ): Promise<void>
 
     save(utilisateur: Utilisateur, dateCreation?: Date): Promise<void>
 
@@ -101,8 +93,7 @@ export namespace Authentification {
         email: email,
         type: Type.CONSEILLER,
         structure: structure,
-        roles: [],
-        dateDerniereConnexion: null
+        roles: []
       }
       return success(utilisateur)
     }

@@ -118,12 +118,10 @@ describe('UpdateUtilisateurCommandHandler', () => {
             email: 'new@email.com',
             nom: 'newNom',
             prenom: 'newPrenom',
-            dateDerniereConnexion: uneDate()
+            dateDerniereConnexion: uneDate(),
+            datePremiereConnexion: uneDate()
           })
           expect(isSuccess(result)).equal(true)
-          if (isSuccess(result)) {
-            expect(result.data.email).to.deep.equal('new@email.com')
-          }
         })
       })
       describe('conseiller inconnu', async () => {
@@ -219,7 +217,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
             email: 'new@email.com',
             nom: 'newNom',
             prenom: 'newPrenom',
-            dateDerniereConnexion: uneDate()
+            dateDerniereConnexion: uneDate(),
+            datePremiereConnexion: uneDate()
           })
           expect(isSuccess(result)).equal(true)
           if (isSuccess(result)) {
@@ -468,9 +467,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             )
 
             // Then
-            expect(
-              authentificationRepository.updateJeunePremiereConnexion
-            ).to.have.been.called()
+            expect(authentificationRepository.update).to.have.been.called()
             expect(isSuccess(result)).equal(true)
             if (isSuccess(result)) {
               expect(result.data.email).to.deep.equal('new@email.com')
@@ -481,16 +478,17 @@ describe('UpdateUtilisateurCommandHandler', () => {
       describe('jeune connu par son email', async () => {
         it('retourne le jeune et enregistre le sub + mise à jour date premiere connexion', async () => {
           // Given
+          const utilisateur = unUtilisateurJeune()
+
           const command: UpdateUtilisateurCommand = {
-            idUtilisateurAuth: 'nilstavernier',
-            nom: 'nom',
-            prenom: 'prenom',
-            email: 'ABC@test.com',
+            idUtilisateurAuth: utilisateur.id,
+            nom: utilisateur.nom,
+            prenom: utilisateur.prenom,
+            email: utilisateur.email,
             type: Authentification.Type.JEUNE,
             structure: Core.Structure.MILO
           }
 
-          const utilisateur = unUtilisateurConseiller()
           authentificationRepository.get
             .withArgs(
               command.idUtilisateurAuth,
@@ -499,11 +497,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
             )
             .resolves(undefined)
           authentificationRepository.getJeuneByEmail
-            .withArgs('abc@test.com')
+            .withArgs(command.email)
             .resolves(utilisateur)
-          authentificationRepository.updateJeunePremiereConnexion
-            .withArgs('id-jeune', command.idUtilisateurAuth, uneDate())
-            .resolves()
 
           // When
           const result = await updateUtilisateurCommandHandler.execute(command)
@@ -511,20 +506,25 @@ describe('UpdateUtilisateurCommandHandler', () => {
           // Then
           expect(isSuccess(result)).equal(true)
           if (isSuccess(result)) {
-            const expectedUtilisateur = unUtilisateurQueryModel()
-            expectedUtilisateur.nom = command.nom!
-            expectedUtilisateur.prenom = command.prenom!
-            expect(result.data).to.deep.equal(expectedUtilisateur)
             expect(
-              authentificationRepository.updateJeunePremiereConnexion
-            ).to.have.been.calledWithExactly(
-              utilisateur.id,
-              command.nom,
-              command.prenom,
-              command.idUtilisateurAuth,
-              uneDate(),
-              command.email
-            )
+              authentificationRepository.update
+            ).to.have.been.calledWithExactly({
+              ...utilisateur,
+              email: command.email,
+              nom: command.nom,
+              prenom: command.prenom,
+              dateDerniereConnexion: uneDate(),
+              datePremiereConnexion: uneDate()
+            })
+            expect(result.data).to.deep.equal({
+              email: 'john.doe@plop.io',
+              id: 'ABCDE',
+              nom: 'Doe',
+              prenom: 'John',
+              roles: [],
+              structure: 'MILO',
+              type: 'JEUNE'
+            })
           }
         })
       })

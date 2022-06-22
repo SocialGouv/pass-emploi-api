@@ -49,67 +49,44 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
   async handle(
     command: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
+    const commandeSanitized: UpdateUtilisateurCommand = {
+      ...command,
+      email: command.email?.toLocaleLowerCase()
+    }
     const utilisateurConnu = await this.authentificationRepository.get(
-      command.idUtilisateurAuth,
-      command.structure,
-      command.type
+      commandeSanitized.idUtilisateurAuth,
+      commandeSanitized.structure,
+      commandeSanitized.type
     )
-    command.email = command.email?.toLocaleLowerCase()
-    const estStructurePassEmploi =
-      command.structure === Core.Structure.PASS_EMPLOI
-    const estUnConseiller = command.type === Authentification.Type.CONSEILLER
-    const estUnJeune = command.type === Authentification.Type.JEUNE
-    const estUnJeuneAvecUnEmail = estUnJeune && command.email
 
-    if (utilisateurConnu) {
-      const utilisateurMisAJour = await this.miseAJourdeLUtilisateur(
-        utilisateurConnu,
-        command
-      )
-      return success(queryModelFromUtilisateur(utilisateurMisAJour))
-    } else {
-      if (estStructurePassEmploi) {
+    if (!utilisateurConnu) {
+      if (commandeSanitized.structure === Core.Structure.PASS_EMPLOI) {
         return failure(
-          new NonTrouveError('Utilisateur', command.idUtilisateurAuth)
+          new NonTrouveError('Utilisateur', commandeSanitized.idUtilisateurAuth)
         )
+      }
+      if (commandeSanitized.type === Authentification.Type.CONSEILLER) {
+        return this.creerNouveauConseiller(commandeSanitized)
+      }
+      if (
+        commandeSanitized.type === Authentification.Type.JEUNE &&
+        commandeSanitized.structure === Core.Structure.POLE_EMPLOI
+      ) {
+        return await this.authentifierParEmail(commandeSanitized)
+      }
+      if (
+        commandeSanitized.type === Authentification.Type.JEUNE &&
+        commandeSanitized.structure === Core.Structure.MILO
+      ) {
+        return await this.authentifierParEmail(commandeSanitized)
       }
     }
 
-    // ******************************************
-    // Première connexion
-    // ******************************************
-
-    if (estUnConseiller) {
-      return this.creerNouveauConseiller(command)
-    }
-
-    if (estUnJeuneAvecUnEmail) {
-      const jeuneCreeParConseillerPourPremiereConnexion =
-        await this.authentificationRepository.getJeuneByEmail(command.email!)
-
-      if (jeuneCreeParConseillerPourPremiereConnexion) {
-        jeuneCreeParConseillerPourPremiereConnexion.nom =
-          command.nom ?? jeuneCreeParConseillerPourPremiereConnexion.nom
-        jeuneCreeParConseillerPourPremiereConnexion.prenom =
-          command.prenom ?? jeuneCreeParConseillerPourPremiereConnexion.prenom
-
-        await this.authentificationRepository.updateJeunePremiereConnexion(
-          jeuneCreeParConseillerPourPremiereConnexion.id,
-          jeuneCreeParConseillerPourPremiereConnexion.nom,
-          jeuneCreeParConseillerPourPremiereConnexion.prenom,
-          command.idUtilisateurAuth,
-          this.dateService.nowJs(),
-          command.email
-        )
-        return success(
-          queryModelFromUtilisateur(jeuneCreeParConseillerPourPremiereConnexion)
-        )
-      }
-    }
-
-    return failure(
-      new NonTraitableError('Utilisateur', command.idUtilisateurAuth)
+    const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
+      utilisateurConnu!,
+      commandeSanitized
     )
+    return success(queryModelFromUtilisateur(utilisateurMisAJour))
   }
 
   async authorize(
@@ -121,6 +98,36 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+
+  private async authentifierParEmail(
+    command: UpdateUtilisateurCommand
+  ): Promise<Result<UtilisateurQueryModel>> {
+    if (command.type === Authentification.Type.JEUNE && command.email) {
+      const utilisateurInitial =
+        await this.authentificationRepository.getJeuneByEmail(command.email)
+
+      if (utilisateurInitial) {
+        const maintenant = this.dateService.nowJs()
+        const utilisateurMisAJour: Authentification.Utilisateur = {
+          ...utilisateurInitial,
+          id: utilisateurInitial.id,
+          prenom: command.prenom ?? utilisateurInitial.prenom,
+          nom: command.nom ?? utilisateurInitial.nom,
+          structure: command.structure,
+          type: Authentification.Type.JEUNE,
+          roles: [],
+          email: command.email ?? utilisateurInitial.email,
+          dateDerniereConnexion: maintenant,
+          datePremiereConnexion: maintenant
+        }
+        await this.authentificationRepository.update(utilisateurMisAJour)
+        return success(queryModelFromUtilisateur(utilisateurMisAJour))
+      }
+    }
+    return failure(
+      new NonTraitableError('Utilisateur', command.idUtilisateurAuth)
+    )
   }
 
   private async creerNouveauConseiller(
@@ -138,8 +145,10 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       return result
     }
 
-    const conseillerSso: Authentification.Utilisateur = result.data
-    conseillerSso.dateDerniereConnexion = this.dateService.nowJs()
+    const conseillerSso: Authentification.Utilisateur = {
+      ...result.data,
+      dateDerniereConnexion: this.dateService.nowJs()
+    }
     await this.authentificationRepository.save(
       conseillerSso,
       this.dateService.nowJs()
@@ -148,34 +157,22 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     return success(queryModelFromUtilisateur(conseillerSso))
   }
 
-  private async miseAJourdeLUtilisateur(
+  private async mettreAJourLUtilisateur(
     utilisateur: Authentification.Utilisateur,
     command: UpdateUtilisateurCommand
   ): Promise<Authentification.Utilisateur> {
+    const maintenant = this.dateService.nowJs()
     const utilisateurMisAJour: Authentification.Utilisateur = {
       ...utilisateur,
       email: command.email ?? utilisateur.email,
       idAuthentification: command.idUtilisateurAuth,
       nom: command.nom ?? utilisateur.nom,
       prenom: command.prenom ?? utilisateur.prenom,
-      dateDerniereConnexion: this.dateService.nowJs()
+      dateDerniereConnexion: maintenant,
+      datePremiereConnexion: utilisateur.datePremiereConnexion ?? maintenant
     }
 
-    if (
-      !utilisateur.dateDerniereConnexion &&
-      utilisateur.type === Authentification.Type.JEUNE
-    ) {
-      await this.authentificationRepository.updateJeunePremiereConnexion(
-        utilisateurMisAJour.id,
-        utilisateurMisAJour.nom,
-        utilisateurMisAJour.prenom,
-        command.idUtilisateurAuth,
-        this.dateService.nowJs(),
-        command.email
-      )
-    } else {
-      await this.authentificationRepository.update(utilisateurMisAJour)
-    }
+    await this.authentificationRepository.update(utilisateurMisAJour)
 
     return utilisateurMisAJour
   }
