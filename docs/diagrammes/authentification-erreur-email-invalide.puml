@@ -1,0 +1,33 @@
+@startuml
+
+skinparam backgroundColor white
+
+actor "Conseiller ML" as conseiller
+participant "Keycloak i-Milo" as kckMilo 	#CBC3E3
+participant "CEJ" as cej #ADD8E6
+participant "Keycloak CEJ" as kckCej #ADD8E6
+actor "Jeune ML" as jeune
+
+header Page Header
+
+title Erreur d'email sur la Première Connexion du Jeune Milo au CEJ
+
+autonumber
+
+note over cej  : Le conseiller a créé le compte du Jeune\navec un premier email. Celui-ci est enregistré\nen BDD sur le CEJ.
+note over cej : Le conseiller modifie l'email du Jeune sur i-milo.\nLa modification n'est pas répercutée sur la BDD du CEJ.
+
+group Première connexion du Jeune sur le CEJ
+skinparam sequenceMessageAlign center
+jeune -> cej : Demande de connexion sur l'application
+cej -> kckMilo : Redirection SSO Milo
+jeune -> kckMilo : ID + MDP Milo
+kckMilo -> kckCej : Authentification SSO Milo\nNouvelle session keycloak CEJ : infos Jeune
+note left : Ici, les infos Jeune envoyées sont les\ndernières à jour de i-milo, pour\nun changement d'email par exemple.
+kckCej -> cej : Authent OK : infos utilisateur
+note left #ffcccb : Bien que l'on ait récupéré le nouvel email,\nnous ne répercutons pas les modifications\npour une première connexion.
+cej -> cej : <color:red>Get Jeune by Email\n
+note right #ffcccb : On ne retrouve pas le Jeune car\nl'ancien email sert de référence.
+
+end
+@enduml

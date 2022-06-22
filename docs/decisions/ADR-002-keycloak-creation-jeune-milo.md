@@ -10,7 +10,7 @@ Ticket Trello / Notion:
 
 ## Contexte et Définition du Problème
 
-La décision concerne le flux d'authentification schématisé ci-dessous :
+La décision concerne le flux d'authentification schématisé ci-dessous. Les changements ont été effectués aux étapes *6* et *12* du flux.
 
 <img src="../diagrammes/authentification-flux.svg">
 
@@ -19,17 +19,21 @@ La décision concerne le flux d'authentification schématisé ci-dessous :
 - Cette douleur se traduit sur le support par la remontée de tickets demandant la **double suppression** des infos du Jeune sur le backoffice CEJ et le keycloak i-milo.
 - L'origine du problème vient du mauvais traitement de l'erreur 400 *SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT* retournée par le keycloak i-milo à l'étape *5* du flux d'authentification.
 
-<img src="docs/diagrammes/authentification-erreur-compte-existant.svg">
+<img src="../diagrammes/authentification-erreur-compte-existant.svg">
 
 ### Jeune ML : Je n'arrive pas à faire ma première connexion à l'appli si le conseiller a modifié mon email i-milo
-   - pb support : page keycloak jeune : utilisateur non trouvé ? ou compte non existant ?
-   - source de vérité => mauvais mapping avec l'update
+   - Ce problème se répercute sur le support. Il doit gérer les tickets signalant des problèmes de première connexion du jeune.
+   - Les problèmes de connexion arrivent lorsque le conseiller modifie l'adresse email du jeune avant sa première connexion.
+   - Dans le code, lors de la création du compte jeune, l'id-keycloak n'était pas enregistré, on se basait donc sur l'ancien email pour retrouver le jeune en BDD.
+
+<img src="../diagrammes/authentification-erreur-email-invalide.svg">
+
 
 ## Résultat de la Décision
 
 Solution retenue:
-- Branchement conditionnel pour le traitement de l'erreur "idDossier déjà associé à un compte jeune"
-- Modification de la source de vérité à la première connexion email -> id-keycloak
+- Étape 6 : Branchement conditionnel pour le traitement de l'erreur "idDossier déjà associé à un compte jeune". Nous pouvons désormais distinguer le cas "Le jeune existe chez Milo et chez le CEJ" avec le cas "Le jeune existe chez Milo mais pas chez le CEJ"
+- Étape 12 : Modification de la source de vérité à la première connexion email. Nous enregistrons maintenant l'id-keycloak à la création du jeune et le réutilisons pour retrouver le jeune à la première connexion.
 
 ### Impacts Positifs
 

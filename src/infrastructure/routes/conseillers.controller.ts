@@ -53,7 +53,6 @@ import {
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
 import { RendezVousConseillerFutursEtPassesQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
 import {
-  DossierExisteDejaError,
   DroitsInsuffisants,
   EmailExisteDejaError,
   ErreurHttp,
@@ -469,23 +468,10 @@ export class ConseillersController {
       creerJeuneMiloPayload,
       utilisateur
     )
-
     if (isFailure(result)) {
-      if (result.error.code === ErreurHttp.CODE) {
-        throw new HttpException(
-          result.error.message,
-          (result.error as ErreurHttp).statusCode
-        )
-      }
-      if (
-        result.error.code === EmailExisteDejaError.CODE ||
-        result.error.code === DossierExisteDejaError.CODE
-      ) {
-        throw new HttpException(result.error.message, 409)
-      }
-      throw new RuntimeException(result.error.message)
+      handleFailure(result)
+      throw new RuntimeException()
     }
-
     return result.data
   }
 

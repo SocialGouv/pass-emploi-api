@@ -10,7 +10,8 @@ import {
 import {
   DossierExisteDejaError,
   EmailExisteDejaError,
-  ErreurHttp
+  ErreurHttp,
+  MauvaiseCommandeError
 } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Chat } from '../../../src/domain/chat'
@@ -187,7 +188,66 @@ describe('CreerJeuneMiloCommandHandler', () => {
       })
     })
 
-    describe('quand il existe dans Milo mais pas dans Pass Emploi', () => {
+    describe('quand il existe déjà chez Milo', () => {
+      it("renvoie un succès quand il n'existe pas chez nous", async () => {
+        // Given
+        const command: CreerJeuneMiloCommand = {
+          idDossier: 'idDossier',
+          nom: 'nom',
+          prenom: 'prenom',
+          email: 'email',
+          idConseiller: 'idConseiller'
+        }
+        miloRepository.creerJeune
+          .withArgs(command.idDossier)
+          .resolves(success({ idAuthentification: 'mon-sub' }))
+
+        // When
+        await creerJeuneMiloCommandHandler.handle(command)
+
+        // Then
+        expect(
+          authentificationRepository.saveJeune
+        ).to.have.been.calledWithExactly(
+          {
+            id: idNouveauJeune,
+            idAuthentification: 'mon-sub',
+            prenom: command.prenom,
+            nom: command.nom,
+            structure: Core.Structure.MILO,
+            type: Authentification.Type.JEUNE,
+            email: 'email',
+            roles: []
+          },
+          unConseillerDuJeune().id,
+          command.idDossier,
+          date.toJSDate()
+        )
+      })
+      it('renvoie une erreur quand il existe pas chez nous', async () => {
+        // Given
+        const command: CreerJeuneMiloCommand = {
+          idDossier: 'idDossier',
+          nom: 'nom',
+          prenom: 'prenom',
+          email: 'email',
+          idConseiller: 'idConseiller'
+        }
+        const echec = failure(
+          new MauvaiseCommandeError(
+            'Utilisateur déjà créé, veuillez contacter le support.'
+          )
+        )
+        miloRepository.creerJeune.resolves(echec)
+
+        // When
+        const result = await creerJeuneMiloCommandHandler.handle(command)
+
+        // Then
+        expect(result).to.deep.equal(echec)
+      })
+    })
+    describe('quand Milo casse', () => {
       it('renvoie une erreur', async () => {
         // Given
         const command: CreerJeuneMiloCommand = {
@@ -205,6 +265,14 @@ describe('CreerJeuneMiloCommandHandler', () => {
 
         // Then
         expect(result).to.deep.equal(echec)
+      })
+    })
+
+    describe('quand il existe chez Milo ou bien que ça casse', () => {
+      it('renvoie une erreur', () => {
+        // Given
+        // When
+        // Then
       })
     })
   })

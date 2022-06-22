@@ -22,7 +22,8 @@ import { IdService } from '../../utils/id-service'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import {
   DossierExisteDejaError,
-  EmailExisteDejaError
+  EmailExisteDejaError,
+  MauvaiseCommandeError
 } from '../../building-blocks/types/domain-error'
 
 export interface CreerJeuneMiloCommand extends Command {
@@ -76,6 +77,20 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
       return result
     }
 
+    if (result.data.existeDejaChezMilo && result.data.idAuthentification) {
+      const utilisateur = await this.authentificationRepository.get(
+        result.data.idAuthentification,
+        Core.Structure.MILO,
+        Authentification.Type.JEUNE
+      )
+      if (utilisateur) {
+        return failure(
+          new MauvaiseCommandeError(
+            'Utilisateur déjà créé, veuillez contacter le support.'
+          )
+        )
+      }
+    }
     const utilisateur: Authentification.Utilisateur = {
       id: this.idService.uuid(),
       idAuthentification: result.data.idAuthentification,
