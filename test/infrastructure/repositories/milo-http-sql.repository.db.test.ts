@@ -102,37 +102,70 @@ describe('MiloHttpRepository', () => {
 
   describe('creerJeune', () => {
     describe('quand le jeune est nouveau', () => {
-      it("le crée chez Milo et retourne l'id", async () => {
-        // Given
-        nock('https://milo.com')
-          .post('/compte-jeune/1')
-          .reply(201, 'un-id-keycloak', { 'content-type': 'text/plain' })
-          .isDone()
+      describe("l'api ne retourne pas de sub", () => {
+        it("le crée chez Milo sans retourner l'id", async () => {
+          // Given
+          nock('https://milo.com').post('/compte-jeune/1').reply(204).isDone()
 
-        // When
-        const dossier = await miloHttpSqlRepository.creerJeune('1')
+          // When
+          const dossier = await miloHttpSqlRepository.creerJeune('1')
 
-        // Then
-        expect(dossier).to.deep.equal(
-          success({ idAuthentification: 'un-id-keycloak' })
-        )
+          // Then
+          expect(dossier).to.deep.equal(
+            success({
+              idAuthentification: undefined,
+              existeDejaChezMilo: false
+            })
+          )
+        })
       })
-      it("le crée chez Milo sans retourner l'id", async () => {
-        // Given
-        nock('https://milo.com').post('/compte-jeune/1').reply(204).isDone()
+      describe("l'api retourne un sub", () => {
+        it("le crée chez Milo et retourne l'id", async () => {
+          // Given
+          nock('https://milo.com')
+            .post('/compte-jeune/1')
+            .reply(201, 'un-id-keycloak', { 'content-type': 'text/plain' })
+            .isDone()
 
-        // When
-        const dossier = await miloHttpSqlRepository.creerJeune('1')
+          // When
+          const dossier = await miloHttpSqlRepository.creerJeune('1')
 
-        // Then
-        expect(dossier).to.deep.equal(
-          success({ idAuthentification: undefined })
-        )
+          // Then
+          expect(dossier).to.deep.equal(
+            success({
+              idAuthentification: 'un-id-keycloak',
+              existeDejaChezMilo: false
+            })
+          )
+        })
       })
     })
     describe('quand il y a un bad request', () => {
       describe("quand c'est SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT", () => {
-        describe('que le jeune existe ou pas chez nous', () => {
+        describe('api en prod : quand le jeune existe déjà', () => {
+          it('renvoie un succès avec le sub', async () => {
+            // Given
+            nock('https://milo.com')
+              .post('/compte-jeune/1')
+              .reply(400, {
+                code: 'SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT',
+                'id-keycloak': 'mon-sub'
+              })
+              .isDone()
+
+            // When
+            const dossier = await miloHttpSqlRepository.creerJeune('1')
+
+            // Then
+            expect(dossier).to.deep.equal(
+              success({
+                idAuthentification: 'mon-sub',
+                existeDejaChezMilo: true
+              })
+            )
+          })
+        })
+        describe('api pas en prod : pas de sub', () => {
           it('renvoie un échec', async () => {
             // Given
             nock('https://milo.com')

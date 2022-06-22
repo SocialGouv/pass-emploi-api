@@ -48,7 +48,9 @@ export namespace Milo {
     ): Promise<SituationsDuJeune | undefined>
     creerJeune(
       idDossier: string
-    ): Promise<Result<{ idAuthentification?: string }>>
+    ): Promise<
+      Result<{ idAuthentification?: string; existeDejaChezMilo: boolean }>
+    >
   }
 
   export function trierSituations(situations: Situation[]): Situation[] {

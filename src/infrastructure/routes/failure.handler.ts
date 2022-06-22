@@ -1,12 +1,15 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   HttpException,
   NotFoundException
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import {
+  DossierExisteDejaError,
   DroitsInsuffisants,
+  EmailExisteDejaError,
   ErreurHttp,
   JeuneNonLieAuConseillerError,
   JeunePasInactifError,
@@ -31,6 +34,9 @@ export function handleFailure(result: Result): void {
       case JeunePasInactifError.CODE:
       case JeuneNonLieAuConseillerError.CODE:
         throw new ForbiddenException(result.error, result.error.message)
+      case EmailExisteDejaError.CODE:
+      case DossierExisteDejaError.CODE:
+        throw new ConflictException(result.error.message)
       default:
         throw new RuntimeException(result.error.message)
     }
