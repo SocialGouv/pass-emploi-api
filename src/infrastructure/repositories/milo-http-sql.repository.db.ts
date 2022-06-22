@@ -12,9 +12,9 @@ import { DossierMiloDto } from './dto/milo.dto'
 @Injectable()
 export class MiloHttpSqlRepository implements Milo.Repository {
   private logger: Logger
-  private apiUrl: string
-  private apiKeyRecupererDossier: string
-  private apiKeyCreerJeune: string
+  private readonly apiUrl: string
+  private readonly apiKeyRecupererDossier: string
+  private readonly apiKeyCreerJeune: string
 
   constructor(
     private httpService: HttpService,
@@ -71,7 +71,7 @@ export class MiloHttpSqlRepository implements Milo.Repository {
   ): Promise<Result<{ idAuthentification?: string }>> {
     try {
       const response = await firstValueFrom(
-        this.httpService.post(
+        this.httpService.post<string>(
           `${this.apiUrl}/compte-jeune/${idDossier}`,
           {},
           { headers: { 'X-Gravitee-Api-Key': `${this.apiKeyCreerJeune}` } }

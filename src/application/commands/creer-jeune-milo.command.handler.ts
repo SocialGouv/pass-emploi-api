@@ -45,7 +45,7 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     @Inject(MiloRepositoryToken) private miloRepository: Milo.Repository,
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
     @Inject(AuthentificationRepositoryToken)
-    private utilisateurRepository: Authentification.Repository,
+    private authentificationRepository: Authentification.Repository,
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     @Inject(ChatRepositoryToken) private chatRepository: Chat.Repository
@@ -86,11 +86,11 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
       email: lowerCaseEmail,
       roles: []
     }
-    await this.utilisateurRepository.saveJeune(
+    await this.authentificationRepository.saveJeune(
       utilisateur,
       conseiller.id,
       command.idDossier,
-      this.dateService.now().toJSDate()
+      this.dateService.nowJs()
     )
     await this.chatRepository.initializeChatIfNotExists(
       utilisateur.id,
