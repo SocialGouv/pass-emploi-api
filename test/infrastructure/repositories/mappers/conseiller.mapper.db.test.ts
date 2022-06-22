@@ -9,15 +9,18 @@ import {
 import { Core } from '../../../../src/domain/core'
 import { DetailConseillerQueryModel } from '../../../../src/application/queries/query-models/conseillers.query-model'
 import Structure = Core.Structure
+import { DatabaseForTesting } from '../../../utils/database-for-testing'
 
 describe('fromSqlToDetailConseillerQueryModel', () => {
+  DatabaseForTesting.prepare()
+
   describe('sans agence', () => {
     it('renvoie le query model', async () => {
       // Given
       const sql = await ConseillerSqlModel.create(unConseillerDto())
 
       // When
-      const result = fromSqlToDetailConseillerQueryModel(sql)
+      const result = fromSqlToDetailConseillerQueryModel(sql, false)
 
       // Then
       const expected: DetailConseillerQueryModel = {
@@ -26,7 +29,8 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
         lastName: 'Tavernier',
         email: 'nils.tavernier@passemploi.com',
         agence: undefined,
-        notificationsSonores: false
+        notificationsSonores: false,
+        aDesBeneficiairesARecuperer: false
       }
       expect(result).to.deep.equal(expected)
     })
@@ -42,7 +46,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
       )
 
       // When
-      const result = fromSqlToDetailConseillerQueryModel(sql)
+      const result = fromSqlToDetailConseillerQueryModel(sql, false)
 
       // Then
       const expected: DetailConseillerQueryModel = {
@@ -54,7 +58,8 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
           id: undefined,
           nom: "nom d'agence"
         },
-        notificationsSonores: false
+        notificationsSonores: false,
+        aDesBeneficiairesARecuperer: false
       }
       expect(result).to.deep.equal(expected)
     })
@@ -82,7 +87,7 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
       })
 
       // When
-      const result = fromSqlToDetailConseillerQueryModel(sql!)
+      const result = fromSqlToDetailConseillerQueryModel(sql!, false)
 
       // Then
       const expected: DetailConseillerQueryModel = {
@@ -94,7 +99,8 @@ describe('fromSqlToDetailConseillerQueryModel', () => {
           id: "id d'agence",
           nom: 'Bonjour je suis une agence'
         },
-        notificationsSonores: false
+        notificationsSonores: false,
+        aDesBeneficiairesARecuperer: false
       }
       expect(result).to.deep.equal(expected)
     })

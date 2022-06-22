@@ -14,7 +14,8 @@ export function fromConseillerSqlToUtilisateur(
     email: conseillerSqlModel.email ? conseillerSqlModel.email : undefined,
     structure: conseillerSqlModel.structure,
     type: Authentification.Type.CONSEILLER,
-    dateDerniereConnexion: conseillerSqlModel.dateDerniereConnexion,
+    dateDerniereConnexion:
+      conseillerSqlModel.dateDerniereConnexion ?? undefined,
     roles
   }
 }
@@ -30,7 +31,8 @@ export function fromJeuneSqlToUtilisateur(
     email: jeuneSqlModel.email ? jeuneSqlModel.email : undefined,
     structure: jeuneSqlModel.structure,
     type: Authentification.Type.JEUNE,
-    dateDerniereConnexion: jeuneSqlModel.dateDerniereConnexion,
+    dateDerniereConnexion: jeuneSqlModel.dateDerniereConnexion || undefined,
+    datePremiereConnexion: jeuneSqlModel.datePremiereConnexion || undefined,
     roles: []
   }
 }

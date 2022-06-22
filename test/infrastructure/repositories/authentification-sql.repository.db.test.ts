@@ -185,7 +185,8 @@ describe('AuthentificationSqlRepository', () => {
         prenom: 'nouveauPrenom',
         email: 'nouveauEmail',
         idAuthentification: 'nouvelIdAuthentification',
-        dateDerniereConnexion: uneDate()
+        dateDerniereConnexion: uneDate(),
+        datePremiereConnexion: uneDate()
       }
       await authentificationSqlRepository.update(unJeuneMisAJour)
 
@@ -241,50 +242,6 @@ describe('AuthentificationSqlRepository', () => {
         Authentification.Type.CONSEILLER
       )
       expect(utilisateur).to.deep.equal(unConseillerMisAJour)
-    })
-  })
-
-  describe('updateJeunePremiereConnexion', () => {
-    beforeEach(async () => {
-      // Given
-      await ConseillerSqlModel.creer(
-        unConseillerDto({
-          idAuthentification: 'id-authentification-conseiller',
-          structure: Core.Structure.MILO
-        })
-      )
-      await JeuneSqlModel.creer(
-        unJeuneDto({
-          id: 'id-jeune',
-          email: 'john.doe@plop.io',
-          structure: Core.Structure.MILO
-        })
-      )
-    })
-    it("met à jour l'utilisateur", async () => {
-      // When
-      await authentificationSqlRepository.updateJeunePremiereConnexion(
-        'id-jeune',
-        'nouveauNom',
-        'nouveauPrenom',
-        'id-authentification-jeune',
-        uneDate(),
-        'john.doe@plop.io'
-      )
-
-      // Then
-      const jeuneSql = await JeuneSqlModel.findOne({
-        where: { id: 'id-jeune' }
-      })
-      expect(jeuneSql).not.to.be.equal(null)
-      expect(jeuneSql!.id).to.be.equal('id-jeune')
-      expect(jeuneSql!.nom).to.be.equal('nouveauNom')
-      expect(jeuneSql!.prenom).to.be.equal('nouveauPrenom')
-      expect(jeuneSql!.idAuthentification).to.be.equal(
-        'id-authentification-jeune'
-      )
-      expect(jeuneSql!.datePremiereConnexion).to.be.deep.equal(uneDate())
-      expect(jeuneSql!.dateDerniereConnexion).to.be.deep.equal(uneDate())
     })
   })
 

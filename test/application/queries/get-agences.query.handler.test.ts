@@ -36,7 +36,7 @@ describe('GetAgenceQuery', () => {
           type: Authentification.Type.SUPPORT,
           email: 'john.doe@plop.io',
           structure: Core.Structure.MILO,
-          dateDerniereConnexion: null,
+          dateDerniereConnexion: undefined,
           roles: []
         }
 
