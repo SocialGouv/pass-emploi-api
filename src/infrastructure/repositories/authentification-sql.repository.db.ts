@@ -85,27 +85,6 @@ export class AuthentificationSqlRepository
     return undefined
   }
 
-  async updateJeunePremiereConnexion(
-    idJeune: string,
-    nom: string,
-    prenom: string,
-    idUtilisateurAuth: string,
-    datePremiereConnexion: Date,
-    email?: string
-  ): Promise<void> {
-    await JeuneSqlModel.update(
-      {
-        idAuthentification: idUtilisateurAuth,
-        nom,
-        prenom,
-        datePremiereConnexion,
-        dateDerniereConnexion: datePremiereConnexion,
-        email: email ?? null
-      },
-      { where: { id: idJeune } }
-    )
-  }
-
   async update(utilisateur: Authentification.Utilisateur): Promise<void> {
     if (Authentification.Type.JEUNE === utilisateur.type) {
       await JeuneSqlModel.update(
@@ -114,7 +93,8 @@ export class AuthentificationSqlRepository
           email: utilisateur.email,
           nom: utilisateur.nom,
           prenom: utilisateur.prenom,
-          dateDerniereConnexion: utilisateur.dateDerniereConnexion
+          dateDerniereConnexion: utilisateur.dateDerniereConnexion,
+          datePremiereConnexion: utilisateur.datePremiereConnexion
         },
         { where: { id: utilisateur.id } }
       )
@@ -125,7 +105,8 @@ export class AuthentificationSqlRepository
           email: utilisateur.email,
           nom: utilisateur.nom,
           prenom: utilisateur.prenom,
-          dateDerniereConnexion: utilisateur.dateDerniereConnexion
+          dateDerniereConnexion: utilisateur.dateDerniereConnexion,
+          datePremiereConnexion: utilisateur.datePremiereConnexion
         },
         { where: { id: utilisateur.id } }
       )
