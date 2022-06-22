@@ -469,14 +469,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
 
             // Then
             expect(
-              authentificationRepository.update
-            ).to.have.been.calledWithExactly({
-              ...utilisateur,
-              email: 'new@email.com',
-              nom: 'newNom',
-              prenom: 'newPrenom',
-              dateDerniereConnexion: uneDate()
-            })
+              authentificationRepository.updateJeunePremiereConnexion
+            ).to.have.been.called()
             expect(isSuccess(result)).equal(true)
             if (isSuccess(result)) {
               expect(result.data.email).to.deep.equal('new@email.com')
@@ -528,7 +522,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
               command.nom,
               command.prenom,
               command.idUtilisateurAuth,
-              uneDate()
+              uneDate(),
+              command.email
             )
           }
         })

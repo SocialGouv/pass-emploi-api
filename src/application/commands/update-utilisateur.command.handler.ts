@@ -98,7 +98,8 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
           jeuneCreeParConseillerPourPremiereConnexion.nom,
           jeuneCreeParConseillerPourPremiereConnexion.prenom,
           command.idUtilisateurAuth,
-          this.dateService.nowJs()
+          this.dateService.nowJs(),
+          command.email
         )
         return success(
           queryModelFromUtilisateur(jeuneCreeParConseillerPourPremiereConnexion)
@@ -160,17 +161,22 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       dateDerniereConnexion: this.dateService.nowJs()
     }
 
-    if (!utilisateur.dateDerniereConnexion) {
+    if (
+      !utilisateur.dateDerniereConnexion &&
+      utilisateur.type === Authentification.Type.JEUNE
+    ) {
       await this.authentificationRepository.updateJeunePremiereConnexion(
         utilisateurMisAJour.id,
         utilisateurMisAJour.nom,
         utilisateurMisAJour.prenom,
         command.idUtilisateurAuth,
-        this.dateService.nowJs()
+        this.dateService.nowJs(),
+        command.email
       )
+    } else {
+      await this.authentificationRepository.update(utilisateurMisAJour)
     }
 
-    await this.authentificationRepository.update(utilisateurMisAJour)
     return utilisateurMisAJour
   }
 }
