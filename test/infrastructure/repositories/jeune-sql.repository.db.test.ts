@@ -87,7 +87,8 @@ describe('JeuneSqlRepository', () => {
           idConseiller: conseillerDto.id,
           dateCreation: jeune.creationDate.toJSDate(),
           pushNotificationToken: 'unToken',
-          dateDerniereActualisationToken: uneDatetime.toJSDate()
+          dateDerniereActualisationToken: uneDatetime.toJSDate(),
+          datePremiereConnexion: uneDatetime.toJSDate()
         })
       )
     })
@@ -329,7 +330,8 @@ describe('JeuneSqlRepository', () => {
           idConseiller: undefined,
           dateCreation: jeune.creationDate.toJSDate(),
           pushNotificationToken: 'unToken',
-          dateDerniereActualisationToken: uneDatetime.toJSDate()
+          dateDerniereActualisationToken: uneDatetime.toJSDate(),
+          datePremiereConnexion: uneDatetime.toJSDate()
         })
       )
     })
@@ -367,7 +369,8 @@ describe('JeuneSqlRepository', () => {
           dateCreation: jeune.creationDate.toJSDate(),
           pushNotificationToken: 'unToken',
           dateDerniereActualisationToken: uneDatetime.toJSDate(),
-          idDossier: 'test-id-dossier'
+          idDossier: 'test-id-dossier',
+          datePremiereConnexion: uneDatetime.toJSDate()
         })
       )
     })
