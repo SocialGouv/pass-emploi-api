@@ -19,7 +19,7 @@ export function fromSqlToDetailJeuneQueryModel(
     lastName: jeuneSqlModel.nom,
     email: jeuneSqlModel.email ?? undefined,
     creationDate: jeuneSqlModel.dateCreation.toISOString(),
-    isActivated: Boolean(jeuneSqlModel.idAuthentification),
+    isActivated: Boolean(jeuneSqlModel.datePremiereConnexion),
     isReaffectationTemporaire: Boolean(jeuneSqlModel.idConseillerInitial),
     conseiller: {
       email: jeuneSqlModel.conseiller!.email ?? undefined,
@@ -44,7 +44,7 @@ export function toDetailJeuneConseillerQueryModel(
     lastName: sqlJeune.nom,
     email: sqlJeune.email ?? undefined,
     creationDate: sqlJeune.date_creation.toISOString(),
-    isActivated: Boolean(sqlJeune.id_authentification),
+    isActivated: Boolean(sqlJeune.date_premiere_connexion),
     isReaffectationTemporaire: Boolean(sqlJeune.id_conseiller_initial),
     situationCourante: sqlJeune.situation_courante ?? undefined
   }
@@ -79,4 +79,5 @@ export interface DetailJeuneRawSql {
   nom_conseiller_precedent: string
   prenom_conseiller_precedent: string
   situation_courante: Situation
+  date_premiere_connexion: Date
 }
