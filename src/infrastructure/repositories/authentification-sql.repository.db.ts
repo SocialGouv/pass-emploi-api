@@ -90,7 +90,8 @@ export class AuthentificationSqlRepository
     nom: string,
     prenom: string,
     idUtilisateurAuth: string,
-    datePremiereConnexion: Date
+    datePremiereConnexion: Date,
+    email?: string
   ): Promise<void> {
     await JeuneSqlModel.update(
       {
@@ -98,7 +99,8 @@ export class AuthentificationSqlRepository
         nom,
         prenom,
         datePremiereConnexion,
-        dateDerniereConnexion: datePremiereConnexion
+        dateDerniereConnexion: datePremiereConnexion,
+        email: email ?? null
       },
       { where: { id: idJeune } }
     )
