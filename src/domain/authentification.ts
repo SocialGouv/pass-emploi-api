@@ -57,7 +57,8 @@ export namespace Authentification {
       nom: string,
       prenom: string,
       idUtilisateurAuth: string,
-      datePremiereConnexion: Date
+      datePremiereConnexion: Date,
+      email?: string
     ): Promise<void>
 
     save(utilisateur: Utilisateur, dateCreation?: Date): Promise<void>

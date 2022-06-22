@@ -268,7 +268,8 @@ describe('AuthentificationSqlRepository', () => {
         'nouveauNom',
         'nouveauPrenom',
         'id-authentification-jeune',
-        uneDate()
+        uneDate(),
+        'john.doe@plop.io'
       )
 
       // Then
