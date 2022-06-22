@@ -68,7 +68,9 @@ export class MiloHttpSqlRepository implements Milo.Repository {
 
   async creerJeune(
     idDossier: string
-  ): Promise<Result<{ idAuthentification?: string }>> {
+  ): Promise<
+    Result<{ idAuthentification?: string; existeDejaChezMilo: boolean }>
+  > {
     try {
       const response = await firstValueFrom(
         this.httpService.post<string>(
@@ -77,11 +79,24 @@ export class MiloHttpSqlRepository implements Milo.Repository {
           { headers: { 'X-Gravitee-Api-Key': `${this.apiKeyCreerJeune}` } }
         )
       )
-      return success({ idAuthentification: response.data || undefined })
+      return success({
+        idAuthentification: response.data || undefined,
+        existeDejaChezMilo: false
+      })
     } catch (e) {
       this.logger.error(e)
 
       if (e.response?.status >= 400 && e.response?.status <= 404) {
+        if (
+          e.response.data?.code === 'SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT'
+        ) {
+          if (e.response.data['id-keycloak']) {
+            return success({
+              idAuthentification: e.response.data['id-keycloak'],
+              existeDejaChezMilo: true
+            })
+          }
+        }
         const erreur = new ErreurHttp(
           e.response.data?.message,
           e.response.status
