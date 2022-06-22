@@ -12,13 +12,13 @@ export function unJeuneDto(
     idConseiller: '1',
     idConseillerInitial: undefined,
     dateCreation: new Date('2021-11-11T08:03:30.000Z'),
+    datePremiereConnexion: new Date('2021-11-11T08:03:30.000Z'),
     pushNotificationToken: 'unToken',
     dateDerniereActualisationToken: null,
     email: 'john.doe@plop.io',
     structure: Core.Structure.MILO,
     idAuthentification: 'un-id',
     dateDerniereConnexion: null,
-    datePremiereConnexion: null,
     idDossier: '1234',
     appVersion: null
   }

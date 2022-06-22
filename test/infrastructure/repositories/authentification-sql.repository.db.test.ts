@@ -39,7 +39,8 @@ describe('AuthentificationSqlRepository', () => {
       await JeuneSqlModel.creer(
         unJeuneDto({
           idAuthentification: 'id-authentification-jeune',
-          structure: Core.Structure.MILO
+          structure: Core.Structure.MILO,
+          datePremiereConnexion: uneDate()
         })
       )
     })
@@ -101,7 +102,9 @@ describe('AuthentificationSqlRepository', () => {
         )
 
         // Then
-        expect(utilisateur).to.deep.equal(unUtilisateurJeune())
+        expect(utilisateur).to.deep.equal(
+          unUtilisateurJeune({ datePremiereConnexion: uneDate() })
+        )
       })
 
       it("retourne undefined quand il n'existe pas", async () => {
@@ -131,7 +134,8 @@ describe('AuthentificationSqlRepository', () => {
         unJeuneDto({
           idAuthentification: 'id-authentification-jeune',
           email: 'john.doe@plop.io',
-          structure: Core.Structure.MILO
+          structure: Core.Structure.MILO,
+          datePremiereConnexion: uneDate()
         })
       )
     })
@@ -143,7 +147,9 @@ describe('AuthentificationSqlRepository', () => {
         )
 
         // Then
-        expect(utilisateur).to.deep.equal(unUtilisateurJeune())
+        expect(utilisateur).to.deep.equal(
+          unUtilisateurJeune({ datePremiereConnexion: uneDate() })
+        )
       })
 
       it("retourne undefined quand il n'existe pas", async () => {
