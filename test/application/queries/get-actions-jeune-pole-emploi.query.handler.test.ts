@@ -111,6 +111,11 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
             cle: 'nombre',
             label: 'Nombre',
             valeur: 5
+          },
+          {
+            cle: 'ou',
+            label: 'Ou',
+            valeur: 'pole-emploi.fr'
           }
         ],
         codeDemarche:
@@ -193,6 +198,11 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
           cle: 'contact',
           label: 'Contact',
           valeur: 'contact@contact.contact'
+        },
+        {
+          cle: 'ou',
+          label: 'Ou',
+          valeur: 'pole-emploi.fr'
         }
       ])
     })
