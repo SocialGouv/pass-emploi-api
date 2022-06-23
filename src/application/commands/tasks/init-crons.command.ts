@@ -39,6 +39,9 @@ export class InitCronsCommandHandler extends CommandHandler<Command, void> {
     await this.planificateurService.planifierCron(
       Planificateur.CronJob.RECUPERER_SITUATIONS_JEUNES_MILO
     )
+    await this.planificateurService.planifierCron(
+      Planificateur.CronJob.NETTOYER_LES_PIECES_JOINTES
+    )
     return emptySuccess()
   }
 
