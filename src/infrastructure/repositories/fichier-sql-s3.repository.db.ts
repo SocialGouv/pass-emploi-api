@@ -3,10 +3,14 @@ import { Op } from 'sequelize'
 import { Fichier, FichierMetadata } from '../../domain/fichier'
 import { ObjectStorageClient } from '../clients/object-storage.client'
 import { FichierSqlModel } from '../sequelize/models/fichier.sql-model'
+import { DateService } from '../../utils/date-service'
 
 @Injectable()
 export class FichierSqlS3Repository implements Fichier.Repository {
-  constructor(private objectStorageClient: ObjectStorageClient) {}
+  constructor(
+    private objectStorageClient: ObjectStorageClient,
+    private dateService: DateService
+  ) {}
 
   async save(fichier: Fichier): Promise<void> {
     await this.objectStorageClient.uploader(fichier)
@@ -22,6 +26,33 @@ export class FichierSqlS3Repository implements Fichier.Repository {
         id: idFichier
       }
     })
+  }
+
+  async softDelete(idFichier: string): Promise<void> {
+    await FichierSqlModel.update(
+      {
+        dateSuppression: this.dateService.nowJs()
+      },
+      { where: { id: idFichier } }
+    )
+  }
+
+  async getFichiersASupprimer(): Promise<FichierMetadata[]> {
+    const quatreMoisPlusTot: Date = this.dateService
+      .now()
+      .minus({ months: 4 })
+      .toJSDate()
+    const fichiersSql = await FichierSqlModel.findAll({
+      where: {
+        dateSuppression: {
+          [Op.is]: null
+        },
+        dateCreation: {
+          [Op.lt]: quatreMoisPlusTot
+        }
+      }
+    })
+    return fichiersSql
   }
 
   async getFichierMetadata(
