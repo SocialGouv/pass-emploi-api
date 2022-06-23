@@ -11,11 +11,12 @@ import {
   TelechargerFichierQuery,
   TelechargerFichierQueryHandler
 } from '../../../src/application/queries/telecharger-fichier.query.handler'
-import { success } from '../../../src/building-blocks/types/result'
+import { failure, success } from '../../../src/building-blocks/types/result'
 import { Fichier } from '../../../src/domain/fichier'
 import { unFichierMetadata } from '../../fixtures/fichier.fixture'
 import { expect, StubbedClass } from '../../utils'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import { RessourceIndisponibleError } from 'src/building-blocks/types/domain-error'
 
 describe('TelechargerFichierQueryHandler', () => {
   const sandbox = createSandbox()
@@ -81,6 +82,24 @@ describe('TelechargerFichierQueryHandler', () => {
 
       // Then
       expect(result).to.deep.equal(success(url))
+    })
+    it('retourne une failure quand le fichier est supprimé', async () => {
+      // Given
+      fichierRepository.getFichierMetadata
+        .withArgs(query.idFichier)
+        .resolves(undefined)
+
+      // When
+      const result = await telechargerFichierQueryHandler.handle(query)
+
+      // Then
+      expect(result).to.deep.equal(
+        failure(
+          new RessourceIndisponibleError(
+            "Le fichier test n'est plus disponible"
+          )
+        )
+      )
     })
   })
   describe('monitor', () => {

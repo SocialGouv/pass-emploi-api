@@ -1,3 +1,4 @@
+import { uneDate } from 'test/fixtures/date.fixture'
 import { DatabaseForTesting } from 'test/utils/database-for-testing'
 import { ObjectStorageClient } from '../../../src/infrastructure/clients/object-storage.client'
 import { FichierSqlS3Repository } from '../../../src/infrastructure/repositories/fichier-sql-s3.repository.db'
@@ -61,9 +62,9 @@ describe('FichierSqlS3Repository', () => {
   })
 
   describe('.getFichierMetadata(idFichier)', () => {
+    const fichier = unFichier()
     it('recupere les metadonnées du fichier', async () => {
       // Given
-      const fichier = unFichier()
       await FichierSqlModel.create(fichier)
 
       // When
@@ -76,6 +77,17 @@ describe('FichierSqlS3Repository', () => {
       const result = await fichierSqlS3Repository.getFichierMetadata(
         '640c1e15-f2dc-4944-8d82-bc421a3c92da'
       )
+      // Then
+      expect(result).to.be.undefined()
+    })
+    it('renvoie undefined quand le fichier a une date de suppression', async () => {
+      // Given
+      await FichierSqlModel.upsert({
+        ...fichier,
+        dateSuppression: uneDate()
+      })
+      // When
+      const result = await fichierSqlS3Repository.getFichierMetadata(fichier.id)
       // Then
       expect(result).to.be.undefined()
     })

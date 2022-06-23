@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  GoneException,
   HttpException,
   NotFoundException
 } from '@nestjs/common'
@@ -14,7 +15,8 @@ import {
   JeuneNonLieAuConseillerError,
   JeunePasInactifError,
   MauvaiseCommandeError,
-  NonTrouveError
+  NonTrouveError,
+  RessourceIndisponibleError
 } from 'src/building-blocks/types/domain-error'
 import { isFailure, Result } from 'src/building-blocks/types/result'
 
@@ -30,6 +32,8 @@ export function handleFailure(result: Result): void {
         throw new NotFoundException(result.error, result.error.message)
       case MauvaiseCommandeError.CODE:
         throw new BadRequestException(result.error, result.error.message)
+      case RessourceIndisponibleError.CODE:
+        throw new GoneException(result.error, result.error.message)
       case DroitsInsuffisants.CODE:
       case JeunePasInactifError.CODE:
       case JeuneNonLieAuConseillerError.CODE:

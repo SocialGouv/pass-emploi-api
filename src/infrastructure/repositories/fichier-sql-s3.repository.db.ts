@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { Op } from 'sequelize'
 import { Fichier, FichierMetadata } from '../../domain/fichier'
 import { ObjectStorageClient } from '../clients/object-storage.client'
 import { FichierSqlModel } from '../sequelize/models/fichier.sql-model'
@@ -10,7 +11,7 @@ export class FichierSqlS3Repository implements Fichier.Repository {
   async save(fichier: Fichier): Promise<void> {
     await this.objectStorageClient.uploader(fichier)
 
-    await FichierSqlModel.creer(fichier)
+    await FichierSqlModel.creer({ ...fichier, dateSuppression: null })
   }
 
   async delete(idFichier: string): Promise<void> {
@@ -26,7 +27,14 @@ export class FichierSqlS3Repository implements Fichier.Repository {
   async getFichierMetadata(
     idFichier: string
   ): Promise<FichierMetadata | undefined> {
-    const fichierSql = await FichierSqlModel.findByPk(idFichier)
+    const fichierSql = await FichierSqlModel.findOne({
+      where: {
+        id: idFichier,
+        dateSuppression: {
+          [Op.is]: null
+        }
+      }
+    })
 
     if (fichierSql) {
       return {
