@@ -53,6 +53,16 @@ export class MauvaiseCommandeError implements DomainError {
   }
 }
 
+export class RessourceIndisponibleError implements DomainError {
+  static CODE = 'RESSOURCE_INDISPONIBLE'
+  readonly code: string = RessourceIndisponibleError.CODE
+  readonly message: string
+
+  constructor(message: string) {
+    this.message = message
+  }
+}
+
 export class FavoriNonTrouveError implements DomainError {
   static CODE = 'FAVORI_NON_TROUVE'
   readonly code: string = FavoriNonTrouveError.CODE

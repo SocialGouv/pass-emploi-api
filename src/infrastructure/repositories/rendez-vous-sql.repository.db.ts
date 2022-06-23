@@ -66,6 +66,7 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
       include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }]
     })
 
+    // TODO: WHERE dateSuppression IS NULL ?
     if (!rendezVousSql || rendezVousSql.dateSuppression) {
       return undefined
     }

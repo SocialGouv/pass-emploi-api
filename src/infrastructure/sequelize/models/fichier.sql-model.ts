@@ -51,6 +51,9 @@ export class FichierDto extends Model {
     type: DataType.STRING
   })
   typeCreateur: Authentification.Type
+
+  @Column({ field: 'date_suppression', type: DataType.DATE })
+  dateSuppression: Date | null
 }
 
 @Table({
