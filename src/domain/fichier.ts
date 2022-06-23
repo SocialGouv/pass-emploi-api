@@ -38,8 +38,8 @@ export namespace Fichier {
   export interface Repository {
     save(fichier: Fichier): Promise<void>
     delete(idFichier: string): Promise<void>
-    getFichiersASupprimer(): Promise<FichierMetadata[]>
     softDelete(idFichier: string): Promise<void>
+    getFichiersASupprimer(): Promise<FichierMetadata[]>
     getFichierMetadata(idFichier: string): Promise<FichierMetadata | undefined>
   }
 
