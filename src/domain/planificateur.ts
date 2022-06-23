@@ -28,7 +28,8 @@ export namespace Planificateur {
     MAIL_CONSEILLER_MESSAGES = 'MAIL_CONSEILLER_MESSAGES',
     UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS = 'UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS',
     RECUPERER_SITUATIONS_JEUNES_MILO = 'RECUPERER_SITUATIONS_JEUNES_MILO',
-    NETTOYER_LES_JOBS = 'NETTOYER_LES_JOBS'
+    NETTOYER_LES_JOBS = 'NETTOYER_LES_JOBS',
+    NETTOYER_LES_PIECES_JOINTES = 'NETTOYER_LES_PIECES_JOINTES'
   }
 
   export enum JobEnum {
@@ -116,6 +117,14 @@ export class PlanificateurService {
         const cron: Planificateur.Cron = {
           type: Planificateur.CronJob.RECUPERER_SITUATIONS_JEUNES_MILO,
           expression: '0 0 * * *'
+        }
+        await this.planificateurRepository.createCron(cron)
+        break
+      }
+      case Planificateur.CronJob.NETTOYER_LES_PIECES_JOINTES: {
+        const cron: Planificateur.Cron = {
+          type: Planificateur.CronJob.NETTOYER_LES_PIECES_JOINTES,
+          expression: '0 2 * * *'
         }
         await this.planificateurRepository.createCron(cron)
         break
