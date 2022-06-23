@@ -59,7 +59,7 @@ export class FilesController {
         statusCode: HttpStatus.TEMPORARY_REDIRECT
       }
     }
-    throw new RuntimeException()
+    throw handleFailure(result)
   }
 
   @Post()

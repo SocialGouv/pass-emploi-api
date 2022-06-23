@@ -4,7 +4,10 @@ import {
   SupprimerFichierCommandHandler
 } from 'src/application/commands/supprimer-fichier.command.handler'
 import { TelechargerFichierQueryHandler } from 'src/application/queries/telecharger-fichier.query.handler'
-import { MauvaiseCommandeError } from 'src/building-blocks/types/domain-error'
+import {
+  MauvaiseCommandeError,
+  RessourceIndisponibleError
+} from 'src/building-blocks/types/domain-error'
 import * as request from 'supertest'
 import {
   TeleverserFichierCommand,
@@ -73,6 +76,21 @@ describe('FichiersController', () => {
         // Then
         .expect(HttpStatus.TEMPORARY_REDIRECT)
         .expect('Location', url)
+    })
+    it('retoune 410 quand la ressource est indisponible', async () => {
+      // Given
+      const idFichier = '15916d7e-f13a-4158-b7eb-3936aa933a0a'
+
+      telechargerFichierQueryHandler.execute
+        .withArgs({ idFichier }, unUtilisateurDecode())
+        .resolves(failure(new RessourceIndisponibleError('message')))
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/fichiers/${idFichier}`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.GONE)
     })
     ensureUserAuthenticationFailsIfInvalid('get', '/fichiers/1')
   })
