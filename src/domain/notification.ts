@@ -238,6 +238,7 @@ export namespace Notification {
         }
       }
     }
+    // TODO: Envoyer un type de notification UPDATE et gérer les versions de l'app
     private creerNotificationRendezVousMisAJour(
       token: string,
       idRdv: string
@@ -249,7 +250,7 @@ export namespace Notification {
           body: 'Votre rendez-vous a été modifié'
         },
         data: {
-          type: Type.UPDATED_RENDEZVOUS,
+          type: Type.NEW_RENDEZVOUS,
           id: idRdv
         }
       }

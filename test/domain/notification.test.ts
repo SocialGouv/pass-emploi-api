@@ -61,7 +61,7 @@ describe('Notification', () => {
             body: 'Votre rendez-vous a été modifié'
           },
           data: {
-            type: typeNotification,
+            type: Notification.Type.NEW_RENDEZVOUS,
             id: rdv.id
           }
         })
