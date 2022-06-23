@@ -129,6 +129,14 @@ function buildAttributs(demarcheDto: DemarcheDto): Demarche.Attribut[] {
     })
   }
 
+  if (demarcheDto.ou) {
+    attributs.push({
+      cle: 'ou',
+      valeur: demarcheDto.ou,
+      label: 'Ou'
+    })
+  }
+
   return attributs
 }
 
