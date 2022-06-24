@@ -1,19 +1,31 @@
-import { uneDate } from 'test/fixtures/date.fixture'
+import { DateService } from 'src/utils/date-service'
+import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
 import { DatabaseForTesting } from 'test/utils/database-for-testing'
 import { ObjectStorageClient } from '../../../src/infrastructure/clients/object-storage.client'
 import { FichierSqlS3Repository } from '../../../src/infrastructure/repositories/fichier-sql-s3.repository.db'
 import { FichierSqlModel } from '../../../src/infrastructure/sequelize/models/fichier.sql-model'
-import { unFichier, unFichierImage } from '../../fixtures/fichier.fixture'
+import {
+  unFichier,
+  unFichierImage,
+  unFichierMetadata
+} from '../../fixtures/fichier.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
 
 describe('FichierSqlS3Repository', () => {
   DatabaseForTesting.prepare()
   let fichierSqlS3Repository: FichierSqlS3Repository
   let objectStorageClient: StubbedClass<ObjectStorageClient>
+  const dateService = stubClass(DateService)
+  const maintenant = uneDatetime
 
   beforeEach(async () => {
+    dateService.now.returns(maintenant)
+    dateService.nowJs.returns(maintenant.toJSDate())
     objectStorageClient = stubClass(ObjectStorageClient)
-    fichierSqlS3Repository = new FichierSqlS3Repository(objectStorageClient)
+    fichierSqlS3Repository = new FichierSqlS3Repository(
+      objectStorageClient,
+      dateService
+    )
   })
 
   describe('.save(fichier)', () => {
@@ -90,6 +102,60 @@ describe('FichierSqlS3Repository', () => {
       const result = await fichierSqlS3Repository.getFichierMetadata(fichier.id)
       // Then
       expect(result).to.be.undefined()
+    })
+  })
+
+  describe('.getFichiersASupprimer()', () => {
+    const fichierRecent = unFichierMetadata({
+      dateCreation: maintenant.minus({ months: 2 }).toJSDate()
+    })
+    const fichierOld1 = unFichierMetadata({
+      id: '640c1e15-f2dc-4944-8d82-bc421a3c92dc',
+      dateCreation: maintenant.minus({ months: 4 }).toJSDate()
+    })
+    const fichierOld2 = unFichierMetadata({
+      id: '640c1e15-f2dc-4944-8d82-bc421a3c92de',
+      dateCreation: maintenant.minus({ months: 29 }).toJSDate()
+    })
+
+    it('retourne tableau vide quand aucun fichier à supprimer', async () => {
+      // Given
+      await FichierSqlModel.create({ ...fichierRecent })
+
+      // When
+      const results = await fichierSqlS3Repository.getFichiersASupprimer()
+      // Then
+      expect(results).to.deep.equal([])
+    })
+    it("retourne les ficheirs créés il y'a plus de 4 mois seulement", async () => {
+      // Given
+      await FichierSqlModel.create({ ...fichierRecent })
+      await FichierSqlModel.create({ ...fichierOld1 })
+      await FichierSqlModel.create({ ...fichierOld2 })
+
+      // When
+      const results = await fichierSqlS3Repository.getFichiersASupprimer()
+      // Then
+      expect(results.length).to.equal(2)
+      expect(results[0].id).to.equal(fichierOld1.id)
+      expect(results[1].id).to.equal(fichierOld2.id)
+    })
+  })
+
+  describe('.softDelete(idFichier)', () => {
+    it('met à jour la date de suppression du fichier dans les metadonnees de la db', async () => {
+      // Given
+      const fichier = unFichier()
+      await fichierSqlS3Repository.save(fichier)
+
+      // When
+      await fichierSqlS3Repository.softDelete(fichier.id)
+
+      // Then
+      const fichierTrouve = await FichierSqlModel.findByPk(fichier.id)
+      expect(fichierTrouve?.dateSuppression).to.deep.equal(
+        maintenant.toJSDate()
+      )
     })
   })
 })
