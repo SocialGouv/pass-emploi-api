@@ -42,17 +42,17 @@ export class FichierSqlS3Repository implements Fichier.Repository {
       .now()
       .minus({ months: 4 })
       .toJSDate()
-    const fichiersSql = await FichierSqlModel.findAll({
+
+    return FichierSqlModel.findAll({
       where: {
         dateSuppression: {
           [Op.is]: null
         },
         dateCreation: {
-          [Op.lt]: quatreMoisPlusTot
+          [Op.lte]: quatreMoisPlusTot
         }
       }
     })
-    return fichiersSql
   }
 
   async getFichierMetadata(
