@@ -12,6 +12,7 @@ import { DateService } from '../../src/utils/date-service'
 import { Planificateur } from '../../src/domain/planificateur'
 import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from 'src/application/commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
 import { DatabaseForTesting } from '../utils/database-for-testing'
+import { HandleJobNettoyerPiecesJointesCommandHandler } from 'src/application/commands/jobs/handle-job-nettoyer-pieces-jointes.command'
 
 describe('WorkerService', () => {
   DatabaseForTesting.prepare()
@@ -47,6 +48,9 @@ describe('WorkerService', () => {
       const handleJobRecupererSituationsJeunesMiloCommandHandler = stubClass(
         HandleJobRecupererSituationsJeunesMiloCommandHandler
       )
+      const handleJobNettoyerPiecesJointesCommandHandler = stubClass(
+        HandleJobNettoyerPiecesJointesCommandHandler
+      )
       const workerService = new WorkerService(
         planificateurRepository,
         handlerJobRendezVousCommandHandler,
@@ -55,7 +59,8 @@ describe('WorkerService', () => {
         handleNettoyerLesJobsCommandHandler,
         handleJobUpdateMailingListConseillerCommandHandler,
         handleJobNotifierNouveauxServicesCiviqueCommandHandler,
-        handleJobRecupererSituationsJeunesMiloCommandHandler
+        handleJobRecupererSituationsJeunesMiloCommandHandler,
+        handleJobNettoyerPiecesJointesCommandHandler
       )
 
       workerService.subscribe()
