@@ -39,8 +39,8 @@ export class CreateEvaluationCommandHandler extends CommandHandler<
   async authorize(
     command: CreateEvaluationCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
+  ): Promise<Result> {
+    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
   }
 
   async handle(command: CreateEvaluationCommand): Promise<Result> {

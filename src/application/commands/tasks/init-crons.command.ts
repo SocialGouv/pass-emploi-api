@@ -18,8 +18,7 @@ export class InitCronsCommandHandler extends CommandHandler<Command, void> {
     super('InitCronsCommandHandler')
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async handle(_command: Command): Promise<Result> {
+  async handle(): Promise<Result> {
     await this.planificateurRepository.supprimerLesCrons()
     await this.planificateurService.planifierCron(
       Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI
@@ -45,11 +44,8 @@ export class InitCronsCommandHandler extends CommandHandler<Command, void> {
     return emptySuccess()
   }
 
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: Command
-  ): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {

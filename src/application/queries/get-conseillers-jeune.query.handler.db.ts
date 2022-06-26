@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common'
+import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
@@ -15,7 +17,7 @@ export interface GetConseillersJeuneQuery extends Query {
 @Injectable()
 export class GetConseillersJeuneQueryHandler extends QueryHandler<
   GetConseillersJeuneQuery,
-  HistoriqueConseillerJeuneQueryModel[] | undefined
+  Result<HistoriqueConseillerJeuneQueryModel[]>
 > {
   constructor(
     private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer
@@ -25,7 +27,7 @@ export class GetConseillersJeuneQueryHandler extends QueryHandler<
 
   async handle(
     query: GetConseillersJeuneQuery
-  ): Promise<HistoriqueConseillerJeuneQueryModel[] | undefined> {
+  ): Promise<Result<HistoriqueConseillerJeuneQueryModel[]>> {
     const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune, {
       include: [
         ConseillerSqlModel,
@@ -47,7 +49,7 @@ export class GetConseillersJeuneQueryHandler extends QueryHandler<
       ]
     })
     if (!jeuneSqlModel) {
-      return undefined
+      return failure(new NonTrouveError('Jeune', query.idJeune))
     }
 
     const result: HistoriqueConseillerJeuneQueryModel[] = []
@@ -86,7 +88,7 @@ export class GetConseillersJeuneQueryHandler extends QueryHandler<
       }
     }
 
-    return result
+    return success(result)
   }
 
   private buildHistoriqueConseiller(
@@ -105,8 +107,8 @@ export class GetConseillersJeuneQueryHandler extends QueryHandler<
   async authorize(
     query: GetConseillersJeuneQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.conseillerForJeuneAuthorizer.authorize(
+  ): Promise<Result> {
+    return this.conseillerForJeuneAuthorizer.authorize(
       query.idJeune,
       utilisateur
     )

@@ -232,8 +232,11 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
   async authorize(
     command: UpdateRendezVousCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.rendezVousAuthorizer.authorize(command.idRendezVous, utilisateur)
+  ): Promise<Result> {
+    return this.rendezVousAuthorizer.authorize(
+      command.idRendezVous,
+      utilisateur
+    )
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

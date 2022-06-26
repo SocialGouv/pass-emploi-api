@@ -55,15 +55,15 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
   async authorize(
     command: DeleteJeuneCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     const estLeJeune =
       utilisateur.type === Authentification.Type.JEUNE &&
       command.idJeune === utilisateur.id
     const estDuSupport = utilisateur.type === Authentification.Type.SUPPORT
     if (estLeJeune || estDuSupport) {
-      return
+      return emptySuccess()
     } else {
-      throw new DroitsInsuffisants()
+      return failure(new DroitsInsuffisants())
     }
   }
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Inject, Injectable } from '@nestjs/common'
 import { Result, success } from 'src/building-blocks/types/result'
 import { IdService } from 'src/utils/id-service'
@@ -67,8 +66,8 @@ export class CreateRechercheCommandHandler extends CommandHandler<
   async authorize(
     command: CreateRechercheCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
+  ): Promise<Result> {
+    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
   }
 
   async monitor(

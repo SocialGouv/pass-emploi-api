@@ -28,8 +28,8 @@ export class HandleNettoyerLesJobsCommandHandler extends CommandHandler<
     }
   }
 
-  async authorize(): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {

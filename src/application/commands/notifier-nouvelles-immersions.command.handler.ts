@@ -1,7 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { Result, success } from '../../building-blocks/types/result'
+import {
+  emptySuccess,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { Notification } from '../../domain/notification'
 import { Recherche, RecherchesRepositoryToken } from '../../domain/recherche'
@@ -99,11 +103,8 @@ export class NotifierNouvellesImmersionsCommandHandler extends CommandHandler<
     await this.notificationService.notifierNouvellesOffres(recherche, jeune)
   }
 
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: NotifierNouvellesImmersionsCommand
-  ): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {

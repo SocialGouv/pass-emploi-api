@@ -7,6 +7,7 @@ import { ResumeActionsDuJeuneQueryModel } from './query-models/jeunes.query-mode
 import { QueryTypes, Sequelize } from 'sequelize'
 import { ResumeActionsJeuneDto } from '../../infrastructure/repositories/jeune-sql.repository.db'
 import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
+import { Result } from 'src/building-blocks/types/result'
 
 export interface GetResumeActionsDesJeunesDuConseillerQuery extends Query {
   idConseiller: string
@@ -53,8 +54,8 @@ export class GetResumeActionsDesJeunesDuConseillerQueryHandlerDb extends QueryHa
   async authorize(
     query: GetResumeActionsDesJeunesDuConseillerQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.conseillerAuthorizer.authorize(query.idConseiller, utilisateur)
+  ): Promise<Result> {
+    return this.conseillerAuthorizer.authorize(query.idConseiller, utilisateur)
   }
 
   async monitor(): Promise<void> {

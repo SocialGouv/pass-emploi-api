@@ -10,7 +10,7 @@ import {
   OffresEmploi
 } from '../../domain/offre-emploi'
 import { OffresEmploiQueryModel } from './query-models/offres-emploi.query-model'
-import { Result } from '../../building-blocks/types/result'
+import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { FindAllOffresEmploiQueryGetter } from './query-getters/find-all-offres-emploi.query.getter'
 
 const DEFAULT_PAGE = 1
@@ -52,11 +52,8 @@ export class GetOffresEmploiQueryHandler extends QueryHandler<
     }
     return this.findAllOffresEmploiQueryGetter.handle(criteres)
   }
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _query: GetOffresEmploiQuery
-  ): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(

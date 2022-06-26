@@ -35,8 +35,11 @@ export class CreateDemarcheCommandHandler extends CommandHandler<
   async authorize(
     command: CreateDemarcheCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.jeunePoleEmploiAuthorizer.authorize(command.idJeune, utilisateur)
+  ): Promise<Result> {
+    return this.jeunePoleEmploiAuthorizer.authorize(
+      command.idJeune,
+      utilisateur
+    )
   }
 
   async handle(command: CreateDemarcheCommand): Promise<Result<Demarche>> {

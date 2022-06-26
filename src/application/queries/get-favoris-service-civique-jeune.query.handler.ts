@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Jeune } from 'src/domain/jeune'
 
@@ -46,8 +47,8 @@ export class GetFavorisServiceCiviqueJeuneQueryHandler extends QueryHandler<
   async authorize(
     query: GetFavorisOffresEngagementJeuneQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+  ): Promise<Result> {
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

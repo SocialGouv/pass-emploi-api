@@ -1,6 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { failure, Result, success } from 'src/building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  Result,
+  success
+} from 'src/building-blocks/types/result'
 import { DateService } from 'src/utils/date-service'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
@@ -107,8 +112,8 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
     }
   }
 
-  async authorize(): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {

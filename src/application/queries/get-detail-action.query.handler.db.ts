@@ -7,6 +7,7 @@ import { ActionQueryModel } from './query-models/actions.query-model'
 import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { fromSqlToActionQueryModelWithJeune } from '../../infrastructure/repositories/mappers/actions.mappers'
+import { Result } from 'src/building-blocks/types/result'
 
 export interface GetDetailActionQuery extends Query {
   idAction: string
@@ -40,8 +41,8 @@ export class GetDetailActionQueryHandler extends QueryHandler<
   async authorize(
     query: GetDetailActionQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.actionAuthorizer.authorize(query.idAction, utilisateur)
+  ): Promise<Result> {
+    return this.actionAuthorizer.authorize(query.idAction, utilisateur)
   }
 
   async monitor(): Promise<void> {

@@ -13,6 +13,7 @@ import {
   fromSqlToFavorisOffresEmploiIdsQueryModels,
   toOffreEmploi
 } from '../../infrastructure/repositories/mappers/offres-emploi.mappers'
+import { Result } from 'src/building-blocks/types/result'
 
 export interface GetFavorisJeuneQuery extends Query {
   idJeune: Jeune.Id
@@ -39,8 +40,8 @@ export class GetFavorisOffresEmploiJeuneQueryHandler extends QueryHandler<
   async authorize(
     query: GetFavorisJeuneQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+  ): Promise<Result> {
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

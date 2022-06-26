@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure, Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Unauthorized } from 'src/domain/erreur'
+import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
 
 @Injectable()
 export class JeuneAuthorizer {
@@ -13,7 +14,7 @@ export class JeuneAuthorizer {
   async authorize(
     idJeune: string,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     const jeune = await this.jeuneRepository.existe(idJeune)
 
     if (jeune && utilisateur) {
@@ -21,10 +22,10 @@ export class JeuneAuthorizer {
         utilisateur.type === Authentification.Type.JEUNE &&
         utilisateur.id === idJeune
       ) {
-        return
+        return emptySuccess()
       }
     }
 
-    throw new Unauthorized('Jeune')
+    return failure(new DroitsInsuffisants())
   }
 }

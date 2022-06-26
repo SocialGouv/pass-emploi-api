@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
+  emptySuccess,
   isFailure,
   Result,
   success
@@ -128,8 +129,8 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
     await this.notificationService.notifierNouvellesOffres(recherche, jeune)
   }
 
-  async authorize(): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {

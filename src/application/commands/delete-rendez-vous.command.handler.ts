@@ -89,8 +89,11 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
   async authorize(
     command: DeleteRendezVousCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.rendezVousAuthorizer.authorize(command.idRendezVous, utilisateur)
+  ): Promise<Result> {
+    return this.rendezVousAuthorizer.authorize(
+      command.idRendezVous,
+      utilisateur
+    )
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

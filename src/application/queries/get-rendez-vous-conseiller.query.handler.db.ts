@@ -10,6 +10,7 @@ import { DateService } from '../../utils/date-service'
 import { fromSqlToRendezVousConseillerQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
+import { Result } from 'src/building-blocks/types/result'
 
 export interface GetAllRendezVousConseiller extends Query {
   idConseiller: string
@@ -99,8 +100,8 @@ export class GetAllRendezVousConseillerQueryHandler extends QueryHandler<
   async authorize(
     query: GetAllRendezVousConseiller,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.conseillerAuthorizer.authorize(query.idConseiller, utilisateur)
+  ): Promise<Result> {
+    return this.conseillerAuthorizer.authorize(query.idConseiller, utilisateur)
   }
 
   async monitor(): Promise<void> {

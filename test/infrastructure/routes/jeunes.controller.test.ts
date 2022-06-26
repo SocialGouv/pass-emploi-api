@@ -252,8 +252,8 @@ describe('JeunesController', () => {
 
     it("renvoie un code 403 si l'utilisateur n'est pas superviseur", async () => {
       // Given
-      transfererJeunesConseillerCommandHandler.execute.rejects(
-        new DroitsInsuffisants()
+      transfererJeunesConseillerCommandHandler.execute.resolves(
+        failure(new DroitsInsuffisants())
       )
 
       // When - Then
@@ -323,10 +323,6 @@ describe('JeunesController', () => {
         .set('authorization', unHeaderAuthorization())
         .send(actionPayload)
         .expect(HttpStatus.NOT_FOUND)
-        .expect({
-          message: echec.error.message,
-          statusCode: HttpStatus.NOT_FOUND
-        })
     })
 
     it('renvoie une 400 (Bad Request) quand le statut est incorrect', async () => {
@@ -340,7 +336,8 @@ describe('JeunesController', () => {
         .expect(HttpStatus.BAD_REQUEST)
         .expect({
           message: echec.error.message,
-          statusCode: HttpStatus.BAD_REQUEST
+          statusCode: HttpStatus.BAD_REQUEST,
+          error: 'Bad Request'
         })
     })
 
@@ -470,7 +467,9 @@ describe('JeunesController', () => {
       // Given
       const detailJeuneQueryModel: DetailJeuneQueryModel =
         unDetailJeuneQueryModel()
-      getDetailJeuneQueryHandler.execute.resolves(detailJeuneQueryModel)
+      getDetailJeuneQueryHandler.execute.resolves(
+        success(detailJeuneQueryModel)
+      )
 
       // When
       const expected = { ...detailJeuneQueryModel }
@@ -490,17 +489,16 @@ describe('JeunesController', () => {
     })
     it('renvoie une 404 quand le jeune n"existe pas', async () => {
       // Given
-      getDetailJeuneQueryHandler.execute.resolves(undefined)
-      const expectedResponseJson = {
-        statusCode: HttpStatus.NOT_FOUND,
-        message: `Jeune ${idJeune} not found`
-      }
-      // When
+      getDetailJeuneQueryHandler.execute.resolves(
+        failure(new NonTrouveError('Jeune', idJeune))
+      )
+
+      // When - Then
       await request(app.getHttpServer())
         .get(`/jeunes/${idJeune}`)
         .set('authorization', unHeaderAuthorization())
-        // Then
-        .expect(expectedResponseJson)
+        .expect(HttpStatus.NOT_FOUND)
+
       expect(getDetailJeuneQueryHandler.execute).to.have.been.calledWithExactly(
         {
           idJeune
@@ -515,7 +513,7 @@ describe('JeunesController', () => {
     const idJeune = '1'
     it("renvoie l'historique des conseillers quand il existe", async () => {
       // Given
-      getConseillersJeuneQueryHandler.execute.resolves([])
+      getConseillersJeuneQueryHandler.execute.resolves(success([]))
 
       // When
       await request(app.getHttpServer())
@@ -533,19 +531,18 @@ describe('JeunesController', () => {
         unUtilisateurDecode()
       )
     })
-    it('renvoit une 404 quand le jeune n"existe pas', async () => {
+    it("renvoit une 404 quand le jeune n'existe pas", async () => {
       // Given
-      getConseillersJeuneQueryHandler.execute.resolves(undefined)
-      const expectedResponseJson = {
-        statusCode: HttpStatus.NOT_FOUND,
-        message: `Jeune ${idJeune} not found`
-      }
+      getConseillersJeuneQueryHandler.execute.resolves(
+        failure(new NonTrouveError('Jeune', idJeune))
+      )
+
       // When
       await request(app.getHttpServer())
         .get(`/jeunes/${idJeune}/conseillers`)
         .set('authorization', unHeaderAuthorization())
         // Then
-        .expect(expectedResponseJson)
+        .expect(HttpStatus.NOT_FOUND)
       expect(
         getConseillersJeuneQueryHandler.execute
       ).to.have.been.calledWithExactly(
@@ -616,7 +613,9 @@ describe('JeunesController', () => {
 
     it("renvoie une 403 si l'utilisateur n'a pas les droits", async () => {
       //Given
-      deleteJeuneInactifCommandHandler.execute.rejects(new DroitsInsuffisants())
+      deleteJeuneInactifCommandHandler.execute.resolves(
+        failure(new DroitsInsuffisants())
+      )
 
       //When
       await request(app.getHttpServer())
@@ -699,16 +698,12 @@ describe('JeunesController', () => {
         getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(
           failure(new NonTrouveError('Jeune', '1'))
         )
-        const expectedResponseJson = {
-          statusCode: HttpStatus.NOT_FOUND,
-          message: `Jeune ${idJeune} non trouvé(e)`
-        }
         // When
         await request(app.getHttpServer())
           .get(`/jeunes/${idJeune}/rendezvous`)
           .set('authorization', unHeaderAuthorization())
           // Then
-          .expect(expectedResponseJson)
+          .expect(HttpStatus.NOT_FOUND)
       })
       it('retourne les rdv', async () => {
         // Given
@@ -733,16 +728,12 @@ describe('JeunesController', () => {
         getRendezVousJeuneQueryHandler.execute.resolves(
           failure(new NonTrouveError('Jeune', '1'))
         )
-        const expectedResponseJson = {
-          statusCode: HttpStatus.NOT_FOUND,
-          message: `Jeune ${idJeune} non trouvé(e)`
-        }
         // When
         await request(app.getHttpServer())
           .get(`/jeunes/${idJeune}/rendezvous`)
           .set('authorization', unHeaderAuthorization())
           // Then
-          .expect(expectedResponseJson)
+          .expect(HttpStatus.NOT_FOUND)
       })
       it("retourne tous les rendez-vous si aucune période n'est renseignée", async () => {
         // Given
@@ -824,16 +815,12 @@ describe('JeunesController', () => {
       getActionsPoleEmploiQueryHandler.execute.resolves(
         failure(new NonTrouveError('Jeune', '1'))
       )
-      const expectedResponseJson = {
-        statusCode: HttpStatus.NOT_FOUND,
-        message: `Jeune ${idJeune} non trouvé(e)`
-      }
       // When
       await request(app.getHttpServer())
         .get(`/jeunes/${idJeune}/pole-emploi/actions`)
         .set('authorization', unHeaderAuthorization())
         // Then
-        .expect(expectedResponseJson)
+        .expect(HttpStatus.NOT_FOUND)
     })
     it('retourne les rdv', async () => {
       // Given

@@ -1,8 +1,8 @@
-import { Logger } from '@nestjs/common'
+import { ForbiddenException, Logger } from '@nestjs/common'
 import { Authentification } from 'src/domain/authentification'
 import { LogEvent, LogEventKey } from './log.event'
 import { Query } from './query'
-import { emptySuccess, failure, Result } from './result'
+import { emptySuccess, failure, isFailure, Result } from './result'
 import { getAPMInstance } from '../../infrastructure/monitoring/apm.init'
 import * as APM from 'elastic-apm-node'
 
@@ -28,7 +28,10 @@ export abstract class QueryHandler<Q extends Query | void, QM> {
     utilisateur?: Authentification.Utilisateur
   ): Promise<QM> {
     try {
-      await this.authorize(query, utilisateur)
+      const authorizedResult = await this.authorize(query, utilisateur)
+      if (isFailure(authorizedResult)) {
+        throw new ForbiddenException('Ressource non autorisée')
+      }
 
       const result = await this.handle(query, utilisateur)
 
@@ -51,9 +54,9 @@ export abstract class QueryHandler<Q extends Query | void, QM> {
   ): Promise<QM>
 
   abstract authorize(
-    query: Q,
+    query?: Q,
     utilisateur?: Authentification.Utilisateur
-  ): Promise<void>
+  ): Promise<Result>
 
   abstract monitor(
     utilisateur?: Authentification.Utilisateur,

@@ -57,8 +57,8 @@ export class AddFavoriOffreServiceCiviqueCommandHandler extends CommandHandler<
   async authorize(
     command: AddFavoriServiceCiviqueCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
+  ): Promise<Result> {
+    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

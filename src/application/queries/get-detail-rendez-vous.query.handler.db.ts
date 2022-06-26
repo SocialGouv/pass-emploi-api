@@ -48,8 +48,8 @@ export class GetDetailRendezVousQueryHandler extends QueryHandler<
   async authorize(
     query: GetDetailRendezVousQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.rendezVousAuthorizer.authorize(query.idRendezVous, utilisateur)
+  ): Promise<Result> {
+    return this.rendezVousAuthorizer.authorize(query.idRendezVous, utilisateur)
   }
 
   async monitor(): Promise<void> {

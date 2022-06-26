@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { emptySuccess, Result } from 'src/building-blocks/types/result'
 import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous
@@ -25,11 +26,8 @@ export class GetTypesRendezVousQueryHandler extends QueryHandler<
     })
   }
 
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _query: Query
-  ): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {

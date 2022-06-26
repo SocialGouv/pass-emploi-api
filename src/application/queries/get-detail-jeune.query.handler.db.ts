@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Core } from 'src/domain/core'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -20,7 +22,7 @@ export interface GetDetailJeuneQuery extends Query {
 @Injectable()
 export class GetDetailJeuneQueryHandler extends QueryHandler<
   GetDetailJeuneQuery,
-  DetailJeuneQueryModel | undefined
+  Result<DetailJeuneQueryModel>
 > {
   constructor(
     private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer,
@@ -32,7 +34,7 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
 
   async handle(
     query: GetDetailJeuneQuery
-  ): Promise<DetailJeuneQueryModel | undefined> {
+  ): Promise<Result<DetailJeuneQueryModel>> {
     const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune, {
       include: [
         ConseillerSqlModel,
@@ -46,27 +48,27 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
       ]
     })
     if (!jeuneSqlModel) {
-      return undefined
+      return failure(new NonTrouveError('Jeune', query.idJeune))
     }
 
     let urlDossier
     if (jeuneSqlModel.structure === Core.Structure.MILO) {
       urlDossier = this.configService.get('milo.urlWeb')
     }
-    return fromSqlToDetailJeuneQueryModel(jeuneSqlModel, urlDossier)
+    return success(fromSqlToDetailJeuneQueryModel(jeuneSqlModel, urlDossier))
   }
 
   async authorize(
     query: GetDetailJeuneQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      await this.conseillerForJeuneAuthorizer.authorize(
+      return this.conseillerForJeuneAuthorizer.authorize(
         query.idJeune,
         utilisateur
       )
     } else {
-      await this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+      return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
     }
   }
 

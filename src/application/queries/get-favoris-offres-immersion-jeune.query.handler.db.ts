@@ -13,6 +13,7 @@ import {
   fromSqlToFavorisOffresImmersionIdsQueryModels,
   fromSqlToOffreImmersion
 } from '../../infrastructure/repositories/mappers/offres-immersion.mappers'
+import { Result } from 'src/building-blocks/types/result'
 
 export interface GetFavorisOffresImmersionJeuneQuery extends Query {
   idJeune: Jeune.Id
@@ -39,8 +40,8 @@ export class GetFavorisOffresImmersionJeuneQueryHandler extends QueryHandler<
   async authorize(
     query: GetFavorisOffresImmersionJeuneQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+  ): Promise<Result> {
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

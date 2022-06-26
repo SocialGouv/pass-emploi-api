@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   HttpCode,
   HttpException,
@@ -28,6 +27,7 @@ import {
 } from 'src/application/commands/create-rendez-vous.command.handler'
 import { CreerSuperviseursCommandHandler } from 'src/application/commands/creer-superviseurs.command.handler'
 import { DeleteSuperviseursCommandHandler } from 'src/application/commands/delete-superviseurs.command.handler'
+import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
 import { GetDetailConseillerQueryHandler } from 'src/application/queries/get-detail-conseiller.query.handler.db'
 import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler.db'
@@ -36,6 +36,7 @@ import { Authentification } from 'src/domain/authentification'
 import { CreateActionCommandHandler } from '../../application/commands/create-action.command.handler'
 import { CreerJeuneMiloCommandHandler } from '../../application/commands/creer-jeune-milo.command.handler'
 import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/creer-jeune-pole-emploi.command.handler'
+import { ModifierConseillerCommandHandler } from '../../application/commands/modifier-conseiller.command.handler'
 import {
   SendNotificationsNouveauxMessagesCommand,
   SendNotificationsNouveauxMessagesCommandHandler
@@ -53,7 +54,6 @@ import {
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
 import { RendezVousConseillerFutursEtPassesQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
 import {
-  DroitsInsuffisants,
   EmailExisteDejaError,
   ErreurHttp,
   JeuneNonLieAuConseillerError,
@@ -67,6 +67,7 @@ import {
 import { Action } from '../../domain/action'
 import { Core } from '../../domain/core'
 import { Utilisateur } from '../decorators/authenticated.decorator'
+import { handleFailure } from './failure.handler'
 import {
   CreateActionPayload,
   CreateJeunePoleEmploiPayload,
@@ -78,9 +79,6 @@ import {
   SuperviseursPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
-import { ModifierConseillerCommandHandler } from '../../application/commands/modifier-conseiller.command.handler'
-import { handleFailure } from './failure.handler'
-import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -117,33 +115,19 @@ export class ConseillersController {
     @Query() getConseillerQuery: GetConseillerQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DetailConseillerQueryModel> {
-    let result: Result<DetailConseillerQueryModel>
-    try {
-      result = await this.getConseillerByEmailQueryHandler.execute(
-        {
-          emailConseiller: getConseillerQuery.email,
-          structureUtilisateur: utilisateur.structure
-        },
-        utilisateur
-      )
-    } catch (e) {
-      if (e instanceof DroitsInsuffisants) {
-        throw new ForbiddenException(e)
-      }
-      throw e
-    }
+    const result = await this.getConseillerByEmailQueryHandler.execute(
+      {
+        emailConseiller: getConseillerQuery.email,
+        structureUtilisateur: utilisateur.structure
+      },
+      utilisateur
+    )
 
     if (isSuccess(result)) {
       return result.data
     }
 
-    if (isFailure(result)) {
-      if (result.error instanceof NonTrouveError) {
-        throw new NotFoundException(result.error)
-      }
-    }
-
-    throw new RuntimeException()
+    throw handleFailure(result)
   }
 
   @ApiOperation({
@@ -187,24 +171,16 @@ export class ConseillersController {
     @Param('idConseiller') idConseiller: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DetailJeuneConseillerQueryModel[]> {
-    let result
-    try {
-      result = await this.getJeunesByConseillerQueryHandler.execute(
-        { idConseiller },
-        utilisateur
-      )
-    } catch (erreur) {
-      if (erreur instanceof DroitsInsuffisants) {
-        throw new ForbiddenException(erreur)
-      }
-      if (erreur instanceof NonTrouveError) {
-        throw new NotFoundException(erreur)
-      }
-      throw erreur
-    }
-    if (isSuccess(result)) return result.data
+    const result = await this.getJeunesByConseillerQueryHandler.execute(
+      { idConseiller },
+      utilisateur
+    )
 
-    throw new RuntimeException()
+    if (isSuccess(result)) {
+      return result.data
+    }
+
+    throw handleFailure(result)
   }
 
   @ApiOperation({
@@ -426,33 +402,15 @@ export class ConseillersController {
     @Param('idDossier') idDossier: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<JeuneQueryModel> {
-    let result: Result<JeuneQueryModel>
-    try {
-      result = await this.getJeuneMiloByDossierQueryHandler.execute(
-        { idDossier },
-        utilisateur
-      )
-    } catch (e) {
-      if (e instanceof DroitsInsuffisants) {
-        throw new ForbiddenException(e)
-      }
-      throw e
-    }
+    const result = await this.getJeuneMiloByDossierQueryHandler.execute(
+      { idDossier },
+      utilisateur
+    )
 
-    if (isFailure(result)) {
-      if (result.error.code === NonTrouveError.CODE) {
-        throw new NotFoundException(result.error)
-      }
-      if (result.error.code === ErreurHttp.CODE) {
-        throw new HttpException(
-          result.error.message,
-          (result.error as ErreurHttp).statusCode
-        )
-      }
-      throw new RuntimeException(result.error.message)
+    if (isSuccess(result)) {
+      return result.data
     }
-
-    return result.data
+    throw handleFailure(result)
   }
 
   @ApiOperation({
@@ -468,11 +426,10 @@ export class ConseillersController {
       creerJeuneMiloPayload,
       utilisateur
     )
-    if (isFailure(result)) {
-      handleFailure(result)
-      throw new RuntimeException()
+    if (isSuccess(result)) {
+      return result.data
     }
-    return result.data
+    throw handleFailure(result)
   }
 
   @ApiOperation({
@@ -489,9 +446,7 @@ export class ConseillersController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      throw new RuntimeException(result.error.message)
-    }
+    handleFailure(result)
   }
 
   @ApiOperation({
@@ -509,15 +464,7 @@ export class ConseillersController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      if (result.error.code === ErreurHttp.CODE) {
-        throw new HttpException(
-          result.error.message,
-          (result.error as ErreurHttp).statusCode
-        )
-      }
-      throw new RuntimeException(result.error.message)
-    }
+    handleFailure(result)
   }
 
   @ApiOperation({
@@ -545,12 +492,7 @@ export class ConseillersController {
       },
       utilisateur
     )
-    if (isFailure(result)) {
-      if (result.error.code === NonTrouveError.CODE) {
-        throw new NotFoundException(result.error.message)
-      }
-      throw new RuntimeException(result.error.message)
-    }
+    handleFailure(result)
   }
 
   @ApiOperation({
@@ -570,10 +512,7 @@ export class ConseillersController {
       },
       utilisateur
     )
-    if (isSuccess(result)) {
-      return
-    }
-    throw handleFailure(result)
+    handleFailure(result)
   }
 }
 

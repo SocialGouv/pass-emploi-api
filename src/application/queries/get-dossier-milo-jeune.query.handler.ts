@@ -1,10 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 import { Authentification } from 'src/domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Result } from '../../building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  Result
+} from '../../building-blocks/types/result'
 import { Core } from '../../domain/core'
-import { Unauthorized } from '../../domain/erreur'
 import { Milo, MiloRepositoryToken } from '../../domain/milo'
 import { DossierJeuneMiloQueryModel } from './query-models/milo.query-model'
 
@@ -32,15 +36,14 @@ export class GetDossierMiloJeuneQueryHandler extends QueryHandler<
   async authorize(
     _query: GetDossierMiloJeuneQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     if (
-      !(
-        utilisateur.type === Authentification.Type.CONSEILLER &&
-        utilisateur.structure === Core.Structure.MILO
-      )
+      utilisateur.type !== Authentification.Type.CONSEILLER ||
+      utilisateur.structure !== Core.Structure.MILO
     ) {
-      throw new Unauthorized('DossierMilo')
+      return failure(new DroitsInsuffisants())
     }
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {
