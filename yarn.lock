@@ -7916,7 +7916,7 @@ __metadata:
     openid-client: 5.1.7
     pg: 8.7.3
     pg-connection-string: 2.5.0
-    pino-http: 8.0.1
+    pino-http: 8.1.0
     prettier: ^2.7.1
     redis: ^4.1.0
     reflect-metadata: ^0.1.13
@@ -8681,16 +8681,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino-http@npm:8.0.1":
-  version: 8.0.1
-  resolution: "pino-http@npm:8.0.1"
+"pino-http@npm:8.1.0":
+  version: 8.1.0
+  resolution: "pino-http@npm:8.1.0"
   dependencies:
     fast-url-parser: ^1.1.3
     get-caller-file: ^2.0.5
     pino: ^8.0.0
-    pino-std-serializers: ^5.0.0
+    pino-std-serializers: ^6.0.0
     process-warning: ^2.0.0
-  checksum: e1488a30a0ac85a4ff35f4b2edb2049f72ac565f7dc56d134a94a4b003def3c87c3d8e74e1004f81c8601c0a437de555114afe8f5cf84de30509610ca4ca8ce9
+  checksum: 44c8805836a9228ea2d849ab5880daa16e96dd2ef8ac3ce1f98eccc2bfd9d9e0199925e6dc7c838d7cbcff92e50d2c7f8f2268f7a0f3c70232570edb251e775b
   languageName: node
   linkType: hard
 
@@ -8705,6 +8705,13 @@ __metadata:
   version: 5.3.0
   resolution: "pino-std-serializers@npm:5.3.0"
   checksum: 1c04d953a81b3ce7aa90ec49a43be90d7c4f8b71b7fe8889ed405b4cdcb49844a3c0207bd6355f71941445840978fada9a998fa51307f474a9473e2450b30ae2
+  languageName: node
+  linkType: hard
+
+"pino-std-serializers@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "pino-std-serializers@npm:6.0.0"
+  checksum: d9dc1779b3870cdbe00dc2dff15e3931eb126bb144bc9f746d83a2c1174a28e366ed0abe63379dee2fee474e6018a088bfbb2c4b57c1e206601918f5a61e276f
   languageName: node
   linkType: hard
 
