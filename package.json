@@ -80,7 +80,7 @@
     "openid-client": "5.1.6",
     "pg": "8.7.3",
     "pg-connection-string": "2.5.0",
-    "pino-http": "8.0.1",
+    "pino-http": "8.1.0",
     "remove-accents": "0.4.2",
     "rimraf": "3.0.2",
     "rxjs": "7.5.5",
