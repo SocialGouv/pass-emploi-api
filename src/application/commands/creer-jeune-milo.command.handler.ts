@@ -2,6 +2,13 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
+  DossierExisteDejaError,
+  DroitsInsuffisants,
+  EmailExisteDejaError,
+  MauvaiseCommandeError,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
+import {
   failure,
   isFailure,
   Result,
@@ -14,17 +21,11 @@ import {
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { Core } from '../../domain/core'
-import { NotFound, Unauthorized } from '../../domain/erreur'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { Milo, MiloRepositoryToken } from '../../domain/milo'
 import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
-import {
-  DossierExisteDejaError,
-  EmailExisteDejaError,
-  MauvaiseCommandeError
-} from '../../building-blocks/types/domain-error'
 
 export interface CreerJeuneMiloCommand extends Command {
   idDossier: string
@@ -57,8 +58,9 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
   async handle(command: CreerJeuneMiloCommand): Promise<Result<Core.Id>> {
     const conseiller = await this.conseillerRepository.get(command.idConseiller)
     if (!conseiller) {
-      throw new NotFound(command.idConseiller, 'Conseiller')
+      return failure(new NonTrouveError('Conseiller', command.idConseiller))
     }
+
     const lowerCaseEmail = command.email.toLocaleLowerCase()
     const [jeuneByEmail, jeuneByIdDossier] = await Promise.all([
       this.jeuneRepository.getByEmail(lowerCaseEmail),
@@ -78,12 +80,12 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     }
 
     if (result.data.existeDejaChezMilo && result.data.idAuthentification) {
-      const utilisateur = await this.authentificationRepository.get(
+      const utilisateurMilo = await this.authentificationRepository.get(
         result.data.idAuthentification,
         Core.Structure.MILO,
         Authentification.Type.JEUNE
       )
-      if (utilisateur) {
+      if (utilisateurMilo) {
         return failure(
           new MauvaiseCommandeError(
             'Utilisateur déjà créé, veuillez contacter le support.'
@@ -118,16 +120,19 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
   async authorize(
     command: CreerJeuneMiloCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     if (
       !(
         utilisateur.type === Authentification.Type.CONSEILLER &&
         utilisateur.structure === Core.Structure.MILO
       )
     ) {
-      throw new Unauthorized('CreerJeuneMilo')
+      return failure(new DroitsInsuffisants())
     }
-    await this.conseillerAuthorizer.authorize(command.idConseiller, utilisateur)
+    return this.conseillerAuthorizer.authorize(
+      command.idConseiller,
+      utilisateur
+    )
   }
 
   async monitor(): Promise<void> {

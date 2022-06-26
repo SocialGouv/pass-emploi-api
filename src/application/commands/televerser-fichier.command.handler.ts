@@ -41,8 +41,8 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
   async authorize(
     command: TeleverserFichierCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.authorizeConseillerForJeunes.authorize(
+  ): Promise<Result> {
+    return this.authorizeConseillerForJeunes.authorize(
       command.jeunesIds,
       utilisateur
     )

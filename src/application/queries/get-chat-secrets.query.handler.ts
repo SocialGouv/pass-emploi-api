@@ -5,6 +5,7 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { ChatSecretsQueryModel } from './query-models/authentification.query-model'
 import { FirebaseClient } from '../../infrastructure/clients/firebase-client'
 import { ConfigService } from '@nestjs/config'
+import { emptySuccess, Result } from 'src/building-blocks/types/result'
 
 export interface GetChatSecretsQuery extends Query {
   utilisateur: Authentification.Utilisateur
@@ -36,11 +37,8 @@ export class GetChatSecretsQueryHandler extends QueryHandler<
       : undefined
   }
 
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _query: GetChatSecretsQuery
-  ): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {

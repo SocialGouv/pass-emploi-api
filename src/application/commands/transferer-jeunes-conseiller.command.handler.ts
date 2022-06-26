@@ -97,8 +97,8 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
   async authorize(
     _command: TransfererJeunesConseillerCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.conseillerAuthorizer.authorizeSuperviseur(utilisateur)
+  ): Promise<Result> {
+    return this.conseillerAuthorizer.authorizeSuperviseur(utilisateur)
   }
 
   async monitor(): Promise<void> {

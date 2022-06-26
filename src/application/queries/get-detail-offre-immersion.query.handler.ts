@@ -2,7 +2,12 @@ import { Injectable } from '@nestjs/common'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { DetailOffreImmersionQueryModel } from './query-models/offres-immersion.query-model'
-import { failure, Result, success } from '../../building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { PartenaireImmersion } from '../../infrastructure/repositories/dto/immersion.dto'
@@ -50,11 +55,8 @@ export class GetDetailOffreImmersionQueryHandler extends QueryHandler<
       throw e
     }
   }
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _query: GetDetailOffreImmersionQuery
-  ): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

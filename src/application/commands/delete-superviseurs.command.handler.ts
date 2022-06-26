@@ -32,11 +32,10 @@ export class DeleteSuperviseursCommandHandler extends CommandHandler<
   }
 
   async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _command: DeleteSuperviseursCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.supportAuthorizer.authorize(utilisateur)
+  ): Promise<Result> {
+    return this.supportAuthorizer.authorize(utilisateur)
   }
 
   async monitor(): Promise<void> {

@@ -56,7 +56,7 @@ export class GetConseillerByEmailQueryHandler extends QueryHandler<
   async authorize(
     _query: GetConseillerByEmailQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     return this.conseillerAuthorizer.authorizeSuperviseur(utilisateur)
   }
 

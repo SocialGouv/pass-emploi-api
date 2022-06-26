@@ -1,5 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { isFailure, Result, success } from 'src/building-blocks/types/result'
+import {
+  emptySuccess,
+  isFailure,
+  Result,
+  success
+} from 'src/building-blocks/types/result'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
 import { Milo, MiloRepositoryToken } from 'src/domain/milo'
 import { DateService } from 'src/utils/date-service'
@@ -74,8 +79,8 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends Comman
     return success(stats)
   }
 
-  async authorize(): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {

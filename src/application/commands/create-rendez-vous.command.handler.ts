@@ -140,8 +140,11 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
   async authorize(
     command: CreateRendezVousCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.conseillerAuthorizer.authorize(command.idConseiller, utilisateur)
+  ): Promise<Result> {
+    return this.conseillerAuthorizer.authorize(
+      command.idConseiller,
+      utilisateur
+    )
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

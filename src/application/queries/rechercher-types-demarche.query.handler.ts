@@ -1,11 +1,13 @@
+import { Injectable } from '@nestjs/common'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure, Result } from 'src/building-blocks/types/result'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { TypesDemarcheQueryModel } from './query-models/types-demarche.query-model'
 import { Authentification } from '../../domain/authentification'
-import { PoleEmploiClient } from '../../infrastructure/clients/pole-emploi-client'
 import { Core } from '../../domain/core'
-import { ForbiddenException, Injectable } from '@nestjs/common'
 import { TypeDemarcheDto } from '../../infrastructure/clients/dto/pole-emploi.dto'
+import { PoleEmploiClient } from '../../infrastructure/clients/pole-emploi-client'
+import { TypesDemarcheQueryModel } from './query-models/types-demarche.query-model'
 
 export interface RechercherDemarcheQuery extends Query {
   recherche: string
@@ -23,14 +25,14 @@ export class RechercherTypesDemarcheQueryHandler extends QueryHandler<
   async authorize(
     _query: RechercherDemarcheQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     if (
       utilisateur.type === Authentification.Type.JEUNE &&
       utilisateur.structure === Core.Structure.POLE_EMPLOI
     ) {
-      return
+      return emptySuccess()
     }
-    throw new ForbiddenException()
+    return failure(new DroitsInsuffisants())
   }
 
   async handle(

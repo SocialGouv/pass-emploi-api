@@ -7,6 +7,7 @@ import {
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import {
+  emptySuccess,
   failure,
   isFailure,
   Result,
@@ -72,13 +73,13 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
         commandeSanitized.type === Authentification.Type.JEUNE &&
         commandeSanitized.structure === Core.Structure.POLE_EMPLOI
       ) {
-        return await this.authentifierParEmail(commandeSanitized)
+        return this.authentifierParEmail(commandeSanitized)
       }
       if (
         commandeSanitized.type === Authentification.Type.JEUNE &&
         commandeSanitized.structure === Core.Structure.MILO
       ) {
-        return await this.authentifierParEmail(commandeSanitized)
+        return this.authentifierParEmail(commandeSanitized)
       }
     }
 
@@ -89,11 +90,8 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     return success(queryModelFromUtilisateur(utilisateurMisAJour))
   }
 
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: UpdateUtilisateurCommand
-  ): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {

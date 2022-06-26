@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
-import { emptySuccess, Result } from 'src/building-blocks/types/result'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure, Result } from 'src/building-blocks/types/result'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
-import { Unauthorized } from '../../domain/erreur'
 import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface CreateEvenementCommand extends Command {
@@ -24,24 +24,21 @@ export class CreateEvenementCommandHandler extends CommandHandler<
   constructor(private evenementService: EvenementService) {
     super('CreateEvenementCommandHandler')
   }
-  async handle(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: CreateEvenementCommand
-  ): Promise<Result> {
+  async handle(): Promise<Result> {
     return emptySuccess()
   }
 
   async authorize(
     command: CreateEvenementCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     const memeType = command.emetteur.type === utilisateur.type
     const memeStructure = command.emetteur.structure === utilisateur.structure
     const memeId = command.emetteur.id === utilisateur.id
     if (memeType && memeStructure && memeId) {
-      return
+      return emptySuccess()
     }
-    throw new Unauthorized('évènement')
+    return failure(new DroitsInsuffisants())
   }
 
   async monitor(

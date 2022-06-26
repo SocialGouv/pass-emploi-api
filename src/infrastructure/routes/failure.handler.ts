@@ -19,6 +19,7 @@ import {
   RessourceIndisponibleError
 } from 'src/building-blocks/types/domain-error'
 import { isFailure, Result } from 'src/building-blocks/types/result'
+import { Action } from 'src/domain/action'
 
 export function handleFailure(result: Result): void {
   if (isFailure(result)) {
@@ -29,15 +30,17 @@ export function handleFailure(result: Result): void {
         }
         break
       case NonTrouveError.CODE:
-        throw new NotFoundException(result.error, result.error.message)
+        throw new NotFoundException(result.error.message)
       case MauvaiseCommandeError.CODE:
         throw new BadRequestException(result.error, result.error.message)
       case RessourceIndisponibleError.CODE:
-        throw new GoneException(result.error, result.error.message)
+        throw new GoneException(result.error.message)
+      case Action.StatutInvalide.CODE:
+        throw new BadRequestException(result.error.message)
       case DroitsInsuffisants.CODE:
       case JeunePasInactifError.CODE:
       case JeuneNonLieAuConseillerError.CODE:
-        throw new ForbiddenException(result.error, result.error.message)
+        throw new ForbiddenException(result.error.message)
       case EmailExisteDejaError.CODE:
       case DossierExisteDejaError.CODE:
         throw new ConflictException(result.error.message)

@@ -44,8 +44,8 @@ export class DeleteRechercheCommandHandler extends CommandHandler<
   async authorize(
     command: DeleteRechercheCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.rechercheAuthorizer.authorize(
+  ): Promise<Result> {
+    return this.rechercheAuthorizer.authorize(
       command.idJeune,
       command.idRecherche,
       utilisateur

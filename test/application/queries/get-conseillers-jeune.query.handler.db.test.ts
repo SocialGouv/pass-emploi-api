@@ -1,4 +1,6 @@
 import { SinonSandbox } from 'sinon'
+import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+import { failure, success } from 'src/building-blocks/types/result'
 import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
 import {
   GetConseillersJeuneQuery,
@@ -43,6 +45,17 @@ describe('GetConseillersJeuneQueryHandler', () => {
     const idJeune = '1'
     const idConseiller = '1'
     const query: GetConseillersJeuneQuery = { idJeune }
+    describe("quand le jeune n'existe pas", () => {
+      const idJeune = 'inconnu'
+      it('retourne une failure', async () => {
+        // When
+        const result = await getConseillersJeuneQueryHandler.handle({ idJeune })
+        // Then
+        expect(result).to.deep.equal(
+          failure(new NonTrouveError('Jeune', idJeune))
+        )
+      })
+    })
     describe("quand il n'y a pas eu de transfert", () => {
       it('retourne uniquement le conseiller initial', async () => {
         // Given
@@ -67,7 +80,7 @@ describe('GetConseillersJeuneQueryHandler', () => {
             date: jeuneDto.dateCreation.toISOString()
           }
         ]
-        expect(result).to.be.deep.equal(expectedResult)
+        expect(result).to.be.deep.equal(success(expectedResult))
       })
     })
     describe('quand il y a eu un transfert', () => {
@@ -114,7 +127,7 @@ describe('GetConseillersJeuneQueryHandler', () => {
             date: jeuneDto.dateCreation.toISOString()
           }
         ]
-        expect(result).to.be.deep.equal(expectedResult)
+        expect(result).to.be.deep.equal(success(expectedResult))
       })
     })
     describe('quand il y a eu au moins deux transferts', () => {
@@ -182,7 +195,7 @@ describe('GetConseillersJeuneQueryHandler', () => {
             date: jeuneDto.dateCreation.toISOString()
           }
         ]
-        expect(result).to.be.deep.equal(expectedResult)
+        expect(result).to.be.deep.equal(success(expectedResult))
       })
     })
   })

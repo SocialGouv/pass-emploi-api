@@ -26,8 +26,8 @@ export class SupprimerFichierCommandHandler extends CommandHandler<
   async authorize(
     command: SupprimerFichierCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.fichierAuthorizer.authorize(command.idFichier, utilisateur)
+  ): Promise<Result> {
+    return this.fichierAuthorizer.authorize(command.idFichier, utilisateur)
   }
 
   async handle(command: SupprimerFichierCommand): Promise<Result<void>> {

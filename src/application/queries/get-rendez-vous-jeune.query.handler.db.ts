@@ -60,14 +60,14 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
   async authorize(
     query: GetRendezVousJeuneQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      await this.conseillerForJeuneAuthorizer.authorize(
+      return this.conseillerForJeuneAuthorizer.authorize(
         query.idJeune,
         utilisateur
       )
     } else {
-      await this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+      return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
     }
   }
 

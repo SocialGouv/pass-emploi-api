@@ -49,8 +49,8 @@ export class UpdateStatutActionCommandHandler extends CommandHandler<
   async authorize(
     command: UpdateStatutActionCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.actionAuthorizer.authorize(command.idAction, utilisateur)
+  ): Promise<Result> {
+    return this.actionAuthorizer.authorize(command.idAction, utilisateur)
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

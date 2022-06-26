@@ -8,7 +8,12 @@ import {
   OffreServiceCiviqueRepositoryToken,
   OffreServiceCivique
 } from '../../domain/offre-service-civique'
-import { isFailure, Result, success } from '../../building-blocks/types/result'
+import {
+  emptySuccess,
+  isFailure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 
 export interface GetDetailOffreServiceCiviqueQuery extends Query {
   idOffre: string
@@ -59,18 +64,11 @@ export class GetDetailServiceCiviqueQueryHandler extends QueryHandler<
     return success(offreQueryModel)
   }
 
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _query: GetDetailOffreServiceCiviqueQuery
-  ): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
-  async monitor(
-    utilisateur: Authentification.Utilisateur,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _query: GetDetailOffreServiceCiviqueQuery
-  ): Promise<void> {
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
     await this.evenementService.creerEvenement(
       Evenement.Type.OFFRE_SERVICE_CIVIQUE_AFFICHE,
       utilisateur

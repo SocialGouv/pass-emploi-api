@@ -68,11 +68,11 @@ export class CreateActionCommandHandler extends CommandHandler<
   async authorize(
     command: CreateActionCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.JEUNE) {
-      await this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
+      return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
     } else {
-      await this.conseillerAuthorizer.authorize(
+      return this.conseillerAuthorizer.authorize(
         command.idCreateur,
         utilisateur,
         command.idJeune

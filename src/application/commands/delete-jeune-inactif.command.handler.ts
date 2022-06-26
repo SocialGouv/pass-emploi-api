@@ -40,10 +40,11 @@ export class DeleteJeuneInactifCommandHandler extends CommandHandler<
   async authorize(
     _command: DeleteJeuneInactifCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     if (utilisateur.type !== Authentification.Type.CONSEILLER) {
-      throw new DroitsInsuffisants()
+      return failure(new DroitsInsuffisants())
     }
+    return emptySuccess()
   }
 
   async handle({

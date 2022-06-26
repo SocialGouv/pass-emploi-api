@@ -1,13 +1,13 @@
-import { Command } from '../../building-blocks/types/command'
-import { DateTime } from 'luxon'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { Authentification } from '../../domain/authentification'
-import { failure, Result, success } from '../../building-blocks/types/result'
-import { Unauthorized } from '../../domain/erreur'
 import { Inject } from '@nestjs/common'
-import { Campagne, CampagneRepositoryToken } from '../../domain/campagne'
+import { DateTime } from 'luxon'
+import { Command } from '../../building-blocks/types/command'
+import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { CampagneExisteDejaError } from '../../building-blocks/types/domain-error'
+import { failure, Result, success } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Campagne, CampagneRepositoryToken } from '../../domain/campagne'
 import { Core } from '../../domain/core'
+import { SupportAuthorizer } from '../authorizers/authorize-support'
 
 export interface CreateCampagneCommand extends Command {
   nom: string
@@ -22,7 +22,8 @@ export class CreateCampagneCommandHandler extends CommandHandler<
   constructor(
     @Inject(CampagneRepositoryToken)
     private campagneRepository: Campagne.Repository,
-    private campagneFactory: Campagne.Factory
+    private campagneFactory: Campagne.Factory,
+    private supportAuthorizer: SupportAuthorizer
   ) {
     super('CreateCampagneCommandHandler')
   }
@@ -30,10 +31,8 @@ export class CreateCampagneCommandHandler extends CommandHandler<
   async authorize(
     _command: CreateCampagneCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    if (utilisateur.type !== Authentification.Type.SUPPORT) {
-      throw new Unauthorized(utilisateur.type)
-    }
+  ): Promise<Result> {
+    return this.supportAuthorizer.authorize(utilisateur)
   }
 
   async handle(command: CreateCampagneCommand): Promise<Result<Core.Id>> {

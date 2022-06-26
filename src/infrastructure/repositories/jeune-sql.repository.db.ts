@@ -1,12 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { Op, Sequelize } from 'sequelize'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
 import { Core } from 'src/domain/core'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { Action } from '../../domain/action'
-import { NotFound } from '../../domain/erreur'
 import { Jeune } from '../../domain/jeune'
+import { FirebaseClient } from '../clients/firebase-client'
 import { ActionSqlModel } from '../sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
@@ -18,7 +18,6 @@ import {
   fromSqlToJeuneHomeQueryModel,
   toSqlJeune
 } from './mappers/jeunes.mappers'
-import { FirebaseClient } from '../clients/firebase-client'
 
 @Injectable()
 export class JeuneSqlRepository implements Jeune.Repository {
@@ -144,7 +143,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
       ]
     })
     if (!jeuneSqlModel) {
-      throw new NotFound(idJeune, 'Jeune')
+      throw new NotFoundException("Le jeune n'existe pas")
     }
     const rdvJeuneSqlModel = await RendezVousSqlModel.findAll({
       include: [

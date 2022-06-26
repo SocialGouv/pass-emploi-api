@@ -8,6 +8,7 @@ import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/consei
 import { fromSqlToDetailConseillerQueryModel } from '../../infrastructure/repositories/mappers/conseillers.mappers'
 import { AgenceSqlModel } from '../../infrastructure/sequelize/models/agence.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
+import { Result } from 'src/building-blocks/types/result'
 
 export interface GetDetailConseillerQuery extends Query {
   idConseiller: string
@@ -49,8 +50,8 @@ export class GetDetailConseillerQueryHandler extends QueryHandler<
   async authorize(
     query: GetDetailConseillerQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.conseillerAuthorizer.authorize(query.idConseiller, utilisateur)
+  ): Promise<Result> {
+    return this.conseillerAuthorizer.authorize(query.idConseiller, utilisateur)
   }
 
   async monitor(): Promise<void> {

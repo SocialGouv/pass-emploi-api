@@ -1,16 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Query } from '../../building-blocks/types/query'
-import { Authentification } from '../../domain/authentification'
-import { Unauthorized } from '../../domain/erreur'
-import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
-import { Agence, AgenceRepositoryToken } from '../../domain/agence'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
+import {
+  DroitsInsuffisants,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
+import { Query } from '../../building-blocks/types/query'
 import {
   emptySuccess,
   failure,
   Result
 } from '../../building-blocks/types/result'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import { Agence, AgenceRepositoryToken } from '../../domain/agence'
+import { Authentification } from '../../domain/authentification'
+import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 
 export interface ModifierConseillerCommand extends Query {
   idConseiller: string
@@ -69,14 +71,14 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
   async authorize(
     query: ModifierConseillerCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     if (
       utilisateur.type === Authentification.Type.CONSEILLER &&
       utilisateur.id === query.idConseiller
     ) {
-      return
+      return emptySuccess()
     }
-    throw new Unauthorized('Conseiller')
+    return failure(new DroitsInsuffisants())
   }
 
   async monitor(): Promise<void> {

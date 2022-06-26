@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure, Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Unauthorized } from 'src/domain/erreur'
 
 @Injectable()
 export class SupportAuthorizer {
-  async authorize(utilisateur: Authentification.Utilisateur): Promise<void> {
+  async authorize(utilisateur: Authentification.Utilisateur): Promise<Result> {
     if (utilisateur.type !== Authentification.Type.SUPPORT) {
-      throw new Unauthorized('Support')
+      return failure(new DroitsInsuffisants())
     }
+    return emptySuccess()
   }
 }

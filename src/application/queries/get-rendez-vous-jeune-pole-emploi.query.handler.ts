@@ -140,8 +140,8 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
   async authorize(
     query: GetRendezVousJeunePoleEmploiQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.jeunePoleEmploiAuthorizer.authorize(query.idJeune, utilisateur)
+  ): Promise<Result> {
+    return this.jeunePoleEmploiAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(

@@ -83,14 +83,7 @@ import {
   ActionQueryModel,
   DemarcheQueryModel
 } from '../../application/queries/query-models/actions.query-model'
-import {
-  DroitsInsuffisants,
-  ErreurHttp,
-  FavoriExisteDejaError,
-  JeuneNonLieAuConseillerError,
-  JeunePasInactifError,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
+import { FavoriExisteDejaError } from '../../building-blocks/types/domain-error'
 import {
   isFailure,
   isSuccess,
@@ -115,7 +108,6 @@ import {
   PutNotificationTokenInput,
   TransfererConseillerPayload
 } from './validation/jeunes.inputs'
-import StatutInvalide = Action.StatutInvalide
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -151,17 +143,17 @@ export class JeunesController {
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<DetailJeuneQueryModel | undefined> {
-    const queryModel = await this.getDetailJeuneQueryHandler.execute(
+    const result = await this.getDetailJeuneQueryHandler.execute(
       {
         idJeune
       },
       utilisateur
     )
-    if (queryModel) {
-      return queryModel
-    }
 
-    throw new HttpException(`Jeune ${idJeune} not found`, HttpStatus.NOT_FOUND)
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
   }
 
   @Get(':idJeune/conseillers')
@@ -173,17 +165,16 @@ export class JeunesController {
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<HistoriqueConseillerJeuneQueryModel[]> {
-    const queryModel = await this.getConseillersJeuneQueryHandler.execute(
+    const result = await this.getConseillersJeuneQueryHandler.execute(
       {
         idJeune
       },
       utilisateur
     )
-    if (queryModel) {
-      return queryModel
+    if (isSuccess(result)) {
+      return result.data
     }
-
-    throw new HttpException(`Jeune ${idJeune} not found`, HttpStatus.NOT_FOUND)
+    throw handleFailure(result)
   }
 
   @ApiHeader({
@@ -206,13 +197,7 @@ export class JeunesController {
       utilisateur
     )
 
-    if (isFailure(result) && result.error.code === NonTrouveError.CODE) {
-      throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
-    }
-
-    if (!isSuccess(result)) {
-      throw new RuntimeException()
-    }
+    handleFailure(result)
   }
 
   @ApiOperation({
@@ -306,18 +291,7 @@ export class JeunesController {
     if (isSuccess(result)) {
       return result.data
     }
-    if (isFailure(result)) {
-      if (result.error.code === NonTrouveError.CODE) {
-        throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
-      }
-      if (result.error.code === ErreurHttp.CODE) {
-        throw new HttpException(
-          result.error.message,
-          (result.error as ErreurHttp).statusCode
-        )
-      }
-    }
-    throw new RuntimeException(result.error.message)
+    throw handleFailure(result)
   }
 
   @ApiOperation({
@@ -345,8 +319,7 @@ export class JeunesController {
     if (isSuccess(result)) {
       return result.data
     }
-    handleFailure(result)
-    throw new RuntimeException(result.error.message)
+    throw handleFailure(result)
   }
 
   @ApiOperation({
@@ -376,9 +349,7 @@ export class JeunesController {
     if (isSuccess(result)) {
       return result.data
     }
-
-    handleFailure(result)
-    throw new RuntimeException()
+    throw handleFailure(result)
   }
 
   @ApiOperation({
@@ -405,18 +376,7 @@ export class JeunesController {
     if (isSuccess(result)) {
       return result.data
     }
-    if (isFailure(result)) {
-      if (result.error.code === NonTrouveError.CODE) {
-        throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
-      }
-      if (result.error.code === ErreurHttp.CODE) {
-        throw new HttpException(
-          result.error.message,
-          (result.error as ErreurHttp).statusCode
-        )
-      }
-    }
-    throw new RuntimeException(result.error.message)
+    throw handleFailure(result)
   }
 
   @Get(':idJeune/rendezvous')
@@ -453,18 +413,7 @@ export class JeunesController {
     if (isSuccess(result)) {
       return result.data
     }
-    if (isFailure(result)) {
-      if (result.error.code === NonTrouveError.CODE) {
-        throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
-      }
-      if (result.error.code === ErreurHttp.CODE) {
-        throw new HttpException(
-          result.error.message,
-          (result.error as ErreurHttp).statusCode
-        )
-      }
-    }
-    throw new RuntimeException(result.error.message)
+    throw handleFailure(result)
   }
 
   @Post(':idJeune/action')
@@ -472,7 +421,7 @@ export class JeunesController {
     @Param('idJeune') idJeune: string,
     @Body() createActionPayload: CreateActionAvecStatutPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<{ id: Action.Id }> {
+  ): Promise<Core.Id> {
     const command: CreateActionCommand = {
       contenu: createActionPayload.content,
       idJeune,
@@ -491,17 +440,7 @@ export class JeunesController {
         id: result.data
       }
     }
-
-    if (isFailure(result)) {
-      if (result.error.code === NonTrouveError.CODE) {
-        throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
-      }
-      if (result.error.code === StatutInvalide.CODE) {
-        throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST)
-      }
-    }
-
-    throw new RuntimeException()
+    throw handleFailure(result)
   }
 
   // Deprecated (Mobile App v1.0.0)
@@ -579,25 +518,17 @@ export class JeunesController {
     @Body() transfererConseillerPayload: TransfererConseillerPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    let result: Result
-    try {
-      const command: TransfererJeunesConseillerCommand = {
-        idConseillerSource: transfererConseillerPayload.idConseillerSource,
-        idConseillerCible: transfererConseillerPayload.idConseillerCible,
-        idsJeunes: transfererConseillerPayload.idsJeune,
-        estTemporaire: Boolean(transfererConseillerPayload.estTemporaire),
-        structure: utilisateur.structure
-      }
-      result = await this.transfererJeunesConseillerCommandHandler.execute(
-        command,
-        utilisateur
-      )
-    } catch (e) {
-      if (e instanceof DroitsInsuffisants) {
-        throw new ForbiddenException(e)
-      }
-      throw e
+    const command: TransfererJeunesConseillerCommand = {
+      idConseillerSource: transfererConseillerPayload.idConseillerSource,
+      idConseillerCible: transfererConseillerPayload.idConseillerCible,
+      idsJeunes: transfererConseillerPayload.idsJeune,
+      estTemporaire: Boolean(transfererConseillerPayload.estTemporaire),
+      structure: utilisateur.structure
     }
+    const result = await this.transfererJeunesConseillerCommandHandler.execute(
+      command,
+      utilisateur
+    )
 
     handleFailure(result)
   }
@@ -609,49 +540,32 @@ export class JeunesController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     let result: Result
-    try {
-      switch (utilisateur.type) {
-        case Authentification.Type.CONSEILLER:
-          result = await this.deleteJeuneInactifCommandHandler.execute(
-            {
-              idConseiller: utilisateur.id,
-              idJeune
-            },
-            utilisateur
-          )
-          break
-        case Authentification.Type.JEUNE:
-        case Authentification.Type.SUPPORT:
-          result = await this.deleteJeuneCommandHandler.execute(
-            {
-              idJeune
-            },
-            utilisateur
-          )
-          break
-        default:
-          throw new ForbiddenException(
-            "Vous n'avez pas le droit d'effectuer cette action"
-          )
-      }
-    } catch (e) {
-      if (e instanceof DroitsInsuffisants) {
-        throw new ForbiddenException(e, e.message)
-      }
-      throw e
-    }
 
-    if (isSuccess(result)) return
-
-    switch (result.error.code) {
-      case NonTrouveError.CODE:
-        throw new NotFoundException(result.error, result.error.message)
-      case DroitsInsuffisants.CODE:
-      case JeuneNonLieAuConseillerError.CODE:
-      case JeunePasInactifError.CODE:
-        throw new ForbiddenException(result.error, result.error.message)
+    switch (utilisateur.type) {
+      case Authentification.Type.CONSEILLER:
+        result = await this.deleteJeuneInactifCommandHandler.execute(
+          {
+            idConseiller: utilisateur.id,
+            idJeune
+          },
+          utilisateur
+        )
+        break
+      case Authentification.Type.JEUNE:
+      case Authentification.Type.SUPPORT:
+        result = await this.deleteJeuneCommandHandler.execute(
+          {
+            idJeune
+          },
+          utilisateur
+        )
+        break
       default:
-        throw new RuntimeException()
+        throw new ForbiddenException(
+          "Vous n'avez pas le droit d'effectuer cette action"
+        )
     }
+
+    handleFailure(result)
   }
 }

@@ -31,8 +31,8 @@ export class TelechargerFichierQueryHandler extends QueryHandler<
   async authorize(
     query: TelechargerFichierQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.fichierAuthorizer.authorize(query.idFichier, utilisateur)
+  ): Promise<Result> {
+    return this.fichierAuthorizer.authorize(query.idFichier, utilisateur)
   }
 
   async handle(query: TelechargerFichierQuery): Promise<Result<string>> {
