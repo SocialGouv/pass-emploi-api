@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure, Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Unauthorized } from 'src/domain/erreur'
 import { Recherche, RecherchesRepositoryToken } from '../../domain/recherche'
 
 @Injectable()
@@ -14,7 +15,7 @@ export class RechercheAuthorizer {
     idJeune: string,
     idRecherche: string,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     const rechercheExiste = await this.rechercheRepository.existe(
       idRecherche,
       idJeune
@@ -26,9 +27,9 @@ export class RechercheAuthorizer {
       utilisateur.type === Authentification.Type.JEUNE &&
       utilisateur.id === idJeune
     ) {
-      return
+      return emptySuccess()
     }
 
-    throw new Unauthorized('Recherche')
+    return failure(new DroitsInsuffisants())
   }
 }

@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure, Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Unauthorized } from 'src/domain/erreur'
 import {
   OffresImmersion,
   OffresImmersionRepositoryToken
@@ -17,7 +18,7 @@ export class FavoriOffresImmersionAuthorizer {
     idJeune: string,
     idOffreImmersion: string,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     const favori = await this.offresImmersionRepository.getFavori(
       idJeune,
       idOffreImmersion
@@ -29,9 +30,9 @@ export class FavoriOffresImmersionAuthorizer {
       utilisateur.type === Authentification.Type.JEUNE &&
       utilisateur.id === idJeune
     ) {
-      return
+      return emptySuccess()
     }
 
-    throw new Unauthorized('FavoriOffresImmersion')
+    return failure(new DroitsInsuffisants())
   }
 }

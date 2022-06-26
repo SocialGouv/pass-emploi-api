@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { remove as enleverLesAccents } from 'remove-accents'
 import { QueryTypes, Sequelize } from 'sequelize'
+import { emptySuccess, Result } from 'src/building-blocks/types/result'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { CommuneSqlModel } from '../../infrastructure/sequelize/models/commune.sql-model'
@@ -44,11 +45,8 @@ export class GetCommunesEtDepartementsQueryHandler extends QueryHandler<
 
     return resultats
   }
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _query: GetCommunesEtDepartementsQuery
-  ): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {

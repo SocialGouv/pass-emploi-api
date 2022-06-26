@@ -1,7 +1,15 @@
 import { Logger } from '@nestjs/common'
 import { Authentification } from '../../domain/authentification'
 import { LogEvent, LogEventKey } from './log.event'
-import { Failure, failure, isSuccess, Result, Success, success } from './result'
+import {
+  Failure,
+  failure,
+  isFailure,
+  isSuccess,
+  Result,
+  Success,
+  success
+} from './result'
 import { getAPMInstance } from '../../infrastructure/monitoring/apm.init'
 import * as APM from 'elastic-apm-node'
 
@@ -27,7 +35,10 @@ export abstract class CommandHandler<C, T> {
     utilisateur?: Authentification.Utilisateur
   ): Promise<Result<T>> {
     try {
-      await this.authorize(command, utilisateur)
+      const authorizedResult = await this.authorize(command, utilisateur)
+      if (isFailure(authorizedResult)) {
+        return authorizedResult
+      }
 
       const result = await this.handle(command)
 
@@ -51,7 +62,7 @@ export abstract class CommandHandler<C, T> {
   abstract authorize(
     command?: C,
     utilisateur?: Authentification.Utilisateur
-  ): Promise<void>
+  ): Promise<Result>
 
   abstract monitor(
     utilisateur?: Authentification.Utilisateur,

@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure, Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Unauthorized } from 'src/domain/erreur'
 import { Fichier, FichierRepositoryToken } from 'src/domain/fichier'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
 
@@ -16,14 +17,14 @@ export class FichierAuthorizer {
   async authorize(
     idFichier: string,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     const fichierMetadata = await this.fichierRepository.getFichierMetadata(
       idFichier
     )
     if (fichierMetadata) {
       if (utilisateur.type === Authentification.Type.JEUNE) {
         if (fichierMetadata.idsJeunes.includes(utilisateur.id)) {
-          return
+          return emptySuccess()
         }
       }
       if (utilisateur.type === Authentification.Type.CONSEILLER) {
@@ -34,10 +35,10 @@ export class FichierAuthorizer {
           )
         const leConseillerADesJeunesDansLeFichier = jeunesDuFichier.length > 0
         if (leConseillerADesJeunesDansLeFichier) {
-          return
+          return emptySuccess()
         }
       }
     }
-    throw new Unauthorized('Fichier')
+    return failure(new DroitsInsuffisants())
   }
 }

@@ -6,6 +6,7 @@ import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { RechercheQueryModel } from './query-models/recherches.query-model'
 import { FindOptions } from 'sequelize'
 import { RechercheSqlModel } from '../../infrastructure/sequelize/models/recherche.sql-model'
+import { Result } from 'src/building-blocks/types/result'
 
 export interface GetRecherchesQuery extends Query {
   idJeune: string
@@ -41,8 +42,8 @@ export class GetRecherchesQueryHandler extends QueryHandler<
   async authorize(
     query: GetRecherchesQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+  ): Promise<Result> {
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

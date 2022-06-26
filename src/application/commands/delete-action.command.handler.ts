@@ -43,8 +43,8 @@ export class DeleteActionCommandHandler extends CommandHandler<
   async authorize(
     command: DeleteActionCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.actionAuthorizer.authorize(command.idAction, utilisateur)
+  ): Promise<Result> {
+    return this.actionAuthorizer.authorize(command.idAction, utilisateur)
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

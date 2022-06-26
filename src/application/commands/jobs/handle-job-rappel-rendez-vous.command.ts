@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { Result, success } from 'src/building-blocks/types/result'
+import { emptySuccess, Result, success } from 'src/building-blocks/types/result'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
@@ -71,11 +71,8 @@ export class HandleJobRappelRendezVousCommandHandler extends CommandHandler<
     return success(stats)
   }
 
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: HandleJobRappelRendezVousCommand
-  ): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {

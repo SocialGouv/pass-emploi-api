@@ -1,4 +1,6 @@
 import { SinonSandbox } from 'sinon'
+import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+import { failure, isSuccess, success } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
 import { CategorieSituationMilo, EtatSituationMilo } from 'src/domain/milo'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -51,6 +53,17 @@ describe('GetDetailJeuneQueryHandler', () => {
   })
 
   describe('handle', () => {
+    describe("quand le jeune n'existe pas", () => {
+      const idJeune = 'inconnu'
+      it('retourne une failure', async () => {
+        // When
+        const result = await getDetailJeuneQueryHandler.handle({ idJeune })
+        // Then
+        expect(result).to.deep.equal(
+          failure(new NonTrouveError('Jeune', idJeune))
+        )
+      })
+    })
     describe("quand il n'y a pas eu de transfert", () => {
       const idJeune = '1'
       const idConseiller = '1'
@@ -84,7 +97,7 @@ describe('GetDetailJeuneQueryHandler', () => {
           },
           situations: undefined
         })
-        expect(actual).to.deep.equal(expected)
+        expect(actual).to.deep.equal(success(expected))
       })
       it('retourne un jeune avec ses situations', async () => {
         // Given
@@ -120,7 +133,7 @@ describe('GetDetailJeuneQueryHandler', () => {
           },
           situations: [{ etat: 'EN_COURS', categorie: 'Emploi' }]
         })
-        expect(actual).to.deep.equal(expected)
+        expect(actual).to.deep.equal(success(expected))
       })
       describe("quand c'est un jeune MILO", () => {
         it("retourne l'url MILO quand l'id dossier existe", async () => {
@@ -134,11 +147,14 @@ describe('GetDetailJeuneQueryHandler', () => {
             })
           )
           // When
-          const actual = await getDetailJeuneQueryHandler.handle({ idJeune })
+          const result = await getDetailJeuneQueryHandler.handle({ idJeune })
           // Then
-          expect(actual?.urlDossier).to.equal(
-            'https://milo.com/123/acces-externe'
-          )
+          expect(result._isSuccess).to.be.true()
+          if (isSuccess(result)) {
+            expect(result.data.urlDossier).to.equal(
+              'https://milo.com/123/acces-externe'
+            )
+          }
         })
         it("ne retourne pas d'url MILO quand l'id dossier est inexistant", async () => {
           // Given
@@ -151,9 +167,12 @@ describe('GetDetailJeuneQueryHandler', () => {
             })
           )
           // When
-          const actual = await getDetailJeuneQueryHandler.handle({ idJeune })
+          const result = await getDetailJeuneQueryHandler.handle({ idJeune })
           // Then
-          expect(actual?.urlDossier).to.be.undefined()
+          expect(result._isSuccess).to.be.true()
+          if (isSuccess(result)) {
+            expect(result.data.urlDossier).to.be.undefined()
+          }
         })
       })
     })
@@ -198,7 +217,7 @@ describe('GetDetailJeuneQueryHandler', () => {
           },
           situations: undefined
         })
-        expect(actual).to.deep.equal(expected)
+        expect(actual).to.deep.equal(success(expected))
       })
     })
     describe('quand il y a eu un transfert temporaire', () => {
@@ -236,7 +255,7 @@ describe('GetDetailJeuneQueryHandler', () => {
           isReaffectationTemporaire: true,
           situations: undefined
         })
-        expect(actual).to.deep.equal(expected)
+        expect(actual).to.deep.equal(success(expected))
       })
     })
     describe('quand il y a eu plusieurs transferts', () => {
@@ -294,7 +313,7 @@ describe('GetDetailJeuneQueryHandler', () => {
           },
           situations: undefined
         })
-        expect(actual).to.deep.equal(expected)
+        expect(actual).to.deep.equal(success(expected))
       })
     })
   })

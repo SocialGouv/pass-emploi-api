@@ -61,8 +61,8 @@ export class UpdateNotificationTokenCommandHandler extends CommandHandler<
   async authorize(
     command: UpdateNotificationTokenCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
+  ): Promise<Result> {
+    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

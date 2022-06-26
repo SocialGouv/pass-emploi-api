@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure, Result } from 'src/building-blocks/types/result'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { AgenceQueryModel } from './query-models/agence.query-model'
-import { Core } from '../../domain/core'
-import Structure = Core.Structure
 import { Authentification } from '../../domain/authentification'
-import { Unauthorized } from '../../domain/erreur'
+import { Core } from '../../domain/core'
 import { AgenceSqlModel } from '../../infrastructure/sequelize/models/agence.sql-model'
+import { AgenceQueryModel } from './query-models/agence.query-model'
+import Structure = Core.Structure
 
 export interface GetAgenceQuery extends Query {
   structure: Structure
@@ -35,14 +36,14 @@ export class GetAgencesQueryHandler extends QueryHandler<
   async authorize(
     query: GetAgenceQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     if (
       utilisateur.type === Authentification.Type.CONSEILLER &&
       utilisateur.structure === query.structure
     ) {
-      return
+      return emptySuccess()
     }
-    throw new Unauthorized('Agences')
+    return failure(new DroitsInsuffisants())
   }
 
   async monitor(): Promise<void> {

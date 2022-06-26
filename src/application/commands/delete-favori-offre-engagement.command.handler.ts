@@ -53,8 +53,8 @@ export class DeleteFavoriOffreEngagementCommandHandler extends CommandHandler<
   async authorize(
     command: DeleteFavoriOffreServiceCiviqueCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.favoriOffreEngagementAuthorizer.authorize(
+  ): Promise<Result> {
+    return this.favoriOffreEngagementAuthorizer.authorize(
       command.idJeune,
       command.idOffre,
       utilisateur

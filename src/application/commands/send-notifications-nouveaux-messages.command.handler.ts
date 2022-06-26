@@ -42,8 +42,11 @@ export class SendNotificationsNouveauxMessagesCommandHandler extends CommandHand
   async authorize(
     command: SendNotificationsNouveauxMessagesCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.conseillerAuthorizer.authorize(command.idConseiller, utilisateur)
+  ): Promise<Result> {
+    return this.conseillerAuthorizer.authorize(
+      command.idConseiller,
+      utilisateur
+    )
   }
 
   async monitor(): Promise<void> {

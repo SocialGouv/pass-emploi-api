@@ -27,8 +27,7 @@ export class SynchronizeJobsCommandHandler extends CommandHandler<
     super('SynchronizeJobsTask')
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async handle(_command: Command): Promise<Result> {
+  async handle(): Promise<Result> {
     await this.planificateurRepository.supprimerTousLesJobs()
 
     const rendezVous = await this.rendezVousRepository.getAllAVenir()
@@ -40,11 +39,8 @@ export class SynchronizeJobsCommandHandler extends CommandHandler<
     return emptySuccess()
   }
 
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _command: Command
-  ): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {

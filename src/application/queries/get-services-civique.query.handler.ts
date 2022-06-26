@@ -3,7 +3,12 @@ import { Authentification } from 'src/domain/authentification'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { isFailure, Result, success } from '../../building-blocks/types/result'
+import {
+  emptySuccess,
+  isFailure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import { ServiceCiviqueQueryModel } from './query-models/service-civique.query-model'
 import { OffreServiceCivique } from '../../domain/offre-service-civique'
 import { DateTime } from 'luxon'
@@ -75,18 +80,11 @@ export class GetServicesCiviqueQueryHandler extends QueryHandler<
     return success(offresQueryModel)
   }
 
-  async authorize(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _query: GetServicesCiviqueQuery
-  ): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
-  async monitor(
-    utilisateur: Authentification.Utilisateur,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _query: GetServicesCiviqueQuery
-  ): Promise<void> {
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
     await this.evenementService.creerEvenement(
       Evenement.Type.SERVICE_CIVIQUE_RECHERCHE,
       utilisateur

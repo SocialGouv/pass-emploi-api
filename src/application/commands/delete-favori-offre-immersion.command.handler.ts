@@ -54,8 +54,8 @@ export class DeleteFavoriOffreImmersionCommandHandler extends CommandHandler<
   async authorize(
     command: DeleteFavoriOffreImmersionCommand,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.favoriOffresImmersionAuthorizer.authorize(
+  ): Promise<Result> {
+    return this.favoriOffresImmersionAuthorizer.authorize(
       command.idJeune,
       command.idOffreImmersion,
       utilisateur

@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { emptySuccess, failure, Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Conseiller, ConseillersRepositoryToken } from 'src/domain/conseiller'
 import { Core } from 'src/domain/core'
-import { Unauthorized } from 'src/domain/erreur'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
 import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
 
@@ -18,7 +18,7 @@ export class ConseillerAuthorizer {
     idConseiller: string,
     utilisateur: Authentification.Utilisateur,
     idJeune?: string
-  ): Promise<void> {
+  ): Promise<Result> {
     const conseiller = await this.conseillerRepository.get(idConseiller)
 
     if (
@@ -29,34 +29,34 @@ export class ConseillerAuthorizer {
       if (idJeune) {
         const jeune = await this.jeuneRepository.get(idJeune)
         if (jeune && jeune.conseiller?.id === utilisateur.id) {
-          return
+          return emptySuccess()
         }
       } else {
-        return
+        return emptySuccess()
       }
     }
 
-    throw new Unauthorized('Conseiller')
+    return failure(new DroitsInsuffisants())
   }
 
   async authorizeConseiller(
     utilisateur: Authentification.Utilisateur,
     structure?: Core.Structure
-  ): Promise<void> {
+  ): Promise<Result> {
     const conseiller = await this.conseillerRepository.get(utilisateur.id)
 
     if (!structure || structure === utilisateur.structure) {
       if (conseiller && utilisateur.type === Authentification.Type.CONSEILLER) {
-        return
+        return emptySuccess()
       }
     }
 
-    throw new DroitsInsuffisants()
+    return failure(new DroitsInsuffisants())
   }
 
   async authorizeSuperviseur(
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     const conseiller = await this.conseillerRepository.get(utilisateur.id)
 
     if (
@@ -64,9 +64,9 @@ export class ConseillerAuthorizer {
       utilisateur.type === Authentification.Type.CONSEILLER &&
       Authentification.estSuperviseur(utilisateur)
     ) {
-      return
+      return emptySuccess()
     }
 
-    throw new DroitsInsuffisants()
+    return failure(new DroitsInsuffisants())
   }
 }

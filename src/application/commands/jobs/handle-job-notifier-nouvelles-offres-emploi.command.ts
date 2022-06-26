@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import {
+  emptySuccess,
   failure,
   isFailure,
   isSuccess,
@@ -153,8 +154,8 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
     return this.findAllOffresEmploiQueryGetter.handle(criteres)
   }
 
-  async authorize(): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {

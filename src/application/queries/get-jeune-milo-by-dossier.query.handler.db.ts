@@ -42,7 +42,7 @@ export class GetJeuneMiloByDossierQueryHandler extends QueryHandler<
   async authorize(
     _query: GetJeuneMiloByDossierQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<Result> {
     return this.conseillerAuthorizer.authorizeConseiller(
       utilisateur,
       Core.Structure.MILO

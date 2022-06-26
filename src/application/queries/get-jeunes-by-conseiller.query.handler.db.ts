@@ -2,15 +2,16 @@ import { Inject, Injectable } from '@nestjs/common'
 import { QueryTypes, Sequelize } from 'sequelize'
 import { Authentification } from 'src/domain/authentification'
 import { SequelizeInjectionToken } from 'src/infrastructure/sequelize/providers'
-import {
-  DroitsInsuffisants,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
+import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Result, success } from '../../building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
-import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { toDetailJeuneConseillerQueryModel } from './query-mappers/jeune.mappers'
 import { DetailJeuneConseillerQueryModel } from './query-models/jeunes.query-model'
 
@@ -26,8 +27,7 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
     @Inject(ConseillersRepositoryToken)
-    private readonly conseillersRepository: Conseiller.Repository,
-    private readonly conseillerAuthorizer: ConseillerAuthorizer
+    private readonly conseillersRepository: Conseiller.Repository
   ) {
     super('GetJeunesByConseillerQueryHandler')
   }
@@ -42,19 +42,18 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
   async authorize(
     query: GetJeunesByConseillerQuery,
     utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    await this.conseillerAuthorizer.authorizeConseiller(utilisateur)
-
+  ): Promise<Result> {
     const conseiller = await this.conseillersRepository.get(query.idConseiller)
     if (!conseiller) {
-      throw new NonTrouveError('Conseiller', query.idConseiller)
+      return failure(new DroitsInsuffisants())
     }
     if (
       !utilisateurEstSuperviseurDuConseiller(utilisateur, conseiller) &&
       !utilisateurEstConseiller(utilisateur, conseiller)
     ) {
-      throw new DroitsInsuffisants()
+      return failure(new DroitsInsuffisants())
     }
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {
