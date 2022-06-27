@@ -28,7 +28,7 @@ describe('HandleJobNettoyerPiecesJointesCommandHandler', () => {
 
   it('ne fais rien quand aucun fichier à supprimer', async () => {
     // Given
-    fichierRepository.getFichiersASupprimer.resolves([])
+    fichierRepository.getIdsFichiersBefore.resolves([])
 
     // When
     const result = await handleJobNettoyerPiecesJointesCommandHandler.handle()
@@ -46,7 +46,10 @@ describe('HandleJobNettoyerPiecesJointesCommandHandler', () => {
     const fichierOld1 = unFichierMetadata({ id: 'old1' })
     const fichierOld2 = unFichierMetadata({ id: 'old2' })
 
-    fichierRepository.getFichiersASupprimer.resolves([fichierOld1, fichierOld2])
+    fichierRepository.getIdsFichiersBefore.resolves([
+      fichierOld1.id,
+      fichierOld2.id
+    ])
     fichierRepository.softDelete.withArgs(fichierOld1.id).rejects()
     fichierRepository.softDelete.withArgs(fichierOld2.id).resolves()
 

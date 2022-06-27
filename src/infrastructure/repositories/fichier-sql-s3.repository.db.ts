@@ -37,22 +37,20 @@ export class FichierSqlS3Repository implements Fichier.Repository {
     )
   }
 
-  async getFichiersASupprimer(): Promise<FichierMetadata[]> {
-    const quatreMoisPlusTot: Date = this.dateService
-      .now()
-      .minus({ months: 4 })
-      .toJSDate()
-
-    return FichierSqlModel.findAll({
+  async getIdsFichiersBefore(date: Date): Promise<string[]> {
+    const FichiersIdsSqlModel = await FichierSqlModel.findAll({
+      attributes: ['id'],
       where: {
         dateSuppression: {
           [Op.is]: null
         },
         dateCreation: {
-          [Op.lte]: quatreMoisPlusTot
+          [Op.lte]: date
         }
       }
     })
+
+    return FichiersIdsSqlModel.map(fichierId => fichierId.id)
   }
 
   async getFichierMetadata(
