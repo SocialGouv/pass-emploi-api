@@ -12,6 +12,5 @@ export namespace Agence {
 
   export interface Repository {
     get(id: string, structure: Structure): Promise<Agence | undefined>
-    getStructureOfAgence(id: string): Promise<Structure | undefined>
   }
 }

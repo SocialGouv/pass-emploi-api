@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Result, success } from 'src/building-blocks/types/result'
+import { emptySuccess, Result, success } from 'src/building-blocks/types/result'
 import { Fichier, FichierRepositoryToken } from 'src/domain/fichier'
 import { DateService } from 'src/utils/date-service'
 import { buildError } from 'src/utils/logger.module'
@@ -51,8 +51,8 @@ export class HandleJobNettoyerPiecesJointesCommandHandler extends CommandHandler
     return success(stats)
   }
 
-  async authorize(): Promise<void> {
-    return
+  async authorize(): Promise<Result> {
+    return emptySuccess()
   }
 
   async monitor(): Promise<void> {

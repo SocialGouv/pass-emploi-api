@@ -1,6 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { FavoriOffresImmersionAuthorizer } from '../../../src/application/authorizers/authorize-favori-offres-immersion'
-import { Unauthorized } from '../../../src/domain/erreur'
 import { OffresImmersion } from '../../../src/domain/offre-immersion'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { uneOffreImmersion } from '../../fixtures/offre-immersion.fixture'
@@ -20,7 +21,7 @@ describe('FavoriOffresImmersionAuthorizer', () => {
 
   describe('authorize', () => {
     describe('quand le favori existe et est lié au jeune', () => {
-      it("valide l'autorisation", async () => {
+      it('retourne un success', async () => {
         // Given
         const utilisateur = unUtilisateurJeune()
         const offreImmersion = uneOffreImmersion()
@@ -37,11 +38,11 @@ describe('FavoriOffresImmersionAuthorizer', () => {
         )
 
         // Then
-        expect(result).to.be.equal(undefined)
+        expect(result).to.deep.equal(emptySuccess())
       })
     })
     describe("quand le jeune n'a pas ce favori", () => {
-      it('retourne une erreur', async () => {
+      it('retourne une failure', async () => {
         // Given
         const utilisateur = unUtilisateurJeune()
         const offreImmersion = uneOffreImmersion()
@@ -51,14 +52,14 @@ describe('FavoriOffresImmersionAuthorizer', () => {
           .resolves(undefined)
 
         // When
-        const call = favoriOffresImmersionAuthorizer.authorize(
+        const result = await favoriOffresImmersionAuthorizer.authorize(
           utilisateur.id,
           offreImmersion.id,
           utilisateur
         )
 
         // Then
-        await expect(call).to.be.rejectedWith(Unauthorized)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
   })

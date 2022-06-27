@@ -68,7 +68,7 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
         .resolves(offreEmploi)
 
       // When
-      const result = await addFavoriOffreEmploiCommandHandler.execute(command)
+      const result = await addFavoriOffreEmploiCommandHandler.handle(command)
 
       // Then
       expect(result).to.deep.equal(

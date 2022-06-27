@@ -1,15 +1,16 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { Fichier } from 'src/domain/fichier'
+import { Jeune } from 'src/domain/jeune'
+import { unJeune } from 'test/fixtures/jeune.fixture'
 import { FichierAuthorizer } from '../../../src/application/authorizers/authorize-fichier'
-import { Unauthorized } from '../../../src/domain/erreur'
-import { unFichierMetadata } from '../../fixtures/fichier.fixture'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
+import { unFichierMetadata } from '../../fixtures/fichier.fixture'
 import { createSandbox, expect } from '../../utils'
-import { Jeune } from 'src/domain/jeune'
-import { unJeune } from 'test/fixtures/jeune.fixture'
 
 describe('FichierAuthorizer', () => {
   let fichierRepository: StubbedType<Fichier.Repository>
@@ -40,10 +41,10 @@ describe('FichierAuthorizer', () => {
         .resolves([unJeune()])
 
       // When
-      const call = await fichierAuthorizer.authorize(idFichier, utilisateur)
+      const result = await fichierAuthorizer.authorize(idFichier, utilisateur)
 
       // Then
-      expect(call).to.be.equal(undefined)
+      expect(result).to.deep.equal(emptySuccess())
     })
     it("n'autorise pas le conseiller quand aucun de ses jeunes n'est présent", async () => {
       //Given
@@ -57,10 +58,10 @@ describe('FichierAuthorizer', () => {
         .resolves([])
 
       // When
-      const call = fichierAuthorizer.authorize(idFichier, utilisateur)
+      const result = await fichierAuthorizer.authorize(idFichier, utilisateur)
 
       // Then
-      await expect(call).to.be.rejectedWith(Unauthorized)
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
     it('autorise un jeune quand il est présent', async () => {
       //Given
@@ -70,10 +71,10 @@ describe('FichierAuthorizer', () => {
         .resolves(unFichierMetadata({ idsJeunes: [utilisateur.id] }))
 
       // When
-      const call = await fichierAuthorizer.authorize(idFichier, utilisateur)
+      const result = await fichierAuthorizer.authorize(idFichier, utilisateur)
 
       // Then
-      expect(call).to.be.equal(undefined)
+      expect(result).to.deep.equal(emptySuccess())
     })
     it("n'autorise pas le jeune quand il n'est pas présent", async () => {
       //Given
@@ -83,10 +84,10 @@ describe('FichierAuthorizer', () => {
         .resolves(unFichierMetadata({ idsJeunes: [] }))
 
       // When
-      const call = fichierAuthorizer.authorize(idFichier, utilisateur)
+      const result = await fichierAuthorizer.authorize(idFichier, utilisateur)
 
       // Then
-      await expect(call).to.be.rejectedWith(Unauthorized)
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
     it("n'autorise pas quand le fichier n'existe pas", async () => {
       //Given
@@ -96,10 +97,10 @@ describe('FichierAuthorizer', () => {
         .resolves(undefined)
 
       // When
-      const call = fichierAuthorizer.authorize(idFichier, utilisateur)
+      const result = await fichierAuthorizer.authorize(idFichier, utilisateur)
 
       // Then
-      await expect(call).to.be.rejectedWith(Unauthorized)
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
   })
 })

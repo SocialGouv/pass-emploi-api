@@ -9,24 +9,24 @@ import {
 } from '../../../src/application/commands/creer-jeune-milo.command.handler'
 import {
   DossierExisteDejaError,
+  DroitsInsuffisants,
   EmailExisteDejaError,
   ErreurHttp,
   MauvaiseCommandeError
 } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
+import { Authentification } from '../../../src/domain/authentification'
 import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
-import { Unauthorized } from '../../../src/domain/erreur'
 import { Jeune } from '../../../src/domain/jeune'
 import { Milo } from '../../../src/domain/milo'
 import { DateService } from '../../../src/utils/date-service'
 import { IdService } from '../../../src/utils/id-service'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { unConseillerDuJeune, unJeune } from '../../fixtures/jeune.fixture'
-import { Authentification } from '../../../src/domain/authentification'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('CreerJeuneMiloCommandHandler', () => {
   let creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
@@ -315,10 +315,13 @@ describe('CreerJeuneMiloCommandHandler', () => {
       })
 
       // When
-      const call = creerJeuneMiloCommandHandler.authorize(command, utilisateur)
+      const result = await creerJeuneMiloCommandHandler.authorize(
+        command,
+        utilisateur
+      )
 
       // Then
-      await expect(call).to.be.rejectedWith(Unauthorized)
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
   })
 })

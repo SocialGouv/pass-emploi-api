@@ -1,6 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
-import { Unauthorized } from '../../../src/domain/erreur'
 import { Jeune } from '../../../src/domain/jeune'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
@@ -21,7 +22,7 @@ describe('ConseillerForJeuneAuthorizer', () => {
 
   describe('authorize', () => {
     describe('quand le conseiller du jeune est celui authentifié', () => {
-      it("valide l'autorisation", async () => {
+      it('retourne un success', async () => {
         // Given
         const conseiller = unConseiller()
         const utilisateur = unUtilisateurConseiller({ id: conseiller.id })
@@ -36,11 +37,11 @@ describe('ConseillerForJeuneAuthorizer', () => {
         )
 
         // Then
-        expect(result).to.be.equal(undefined)
+        expect(result).to.deep.equal(emptySuccess())
       })
     })
     describe("quand le conseiller du jeune n'est pas celui authentifié", () => {
-      it('retourne une erreur', async () => {
+      it('retourne une failure', async () => {
         // Given
         const conseiller = unConseiller()
         const utilisateur = unUtilisateurConseiller({ id: conseiller.id })
@@ -54,17 +55,17 @@ describe('ConseillerForJeuneAuthorizer', () => {
         jeuneRepository.get.withArgs('un-jeune').resolves(jeune)
 
         // When
-        const call = conseillerForJeuneAuthorizer.authorize(
+        const result = await conseillerForJeuneAuthorizer.authorize(
           'un-jeune',
           utilisateur
         )
 
         // Then
-        await expect(call).to.be.rejectedWith(Unauthorized)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
     describe("quand le jeune n'existe pas", () => {
-      it('retourne une erreur', async () => {
+      it('retourne une failure', async () => {
         // Given
         const conseiller = unConseiller()
         const utilisateur = unUtilisateurConseiller({ id: conseiller.id })
@@ -72,13 +73,13 @@ describe('ConseillerForJeuneAuthorizer', () => {
         jeuneRepository.get.withArgs('un-jeune').resolves(undefined)
 
         // When
-        const call = conseillerForJeuneAuthorizer.authorize(
+        const result = await conseillerForJeuneAuthorizer.authorize(
           'un-jeune',
           utilisateur
         )
 
         // Then
-        await expect(call).to.be.rejectedWith(Unauthorized)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
   })

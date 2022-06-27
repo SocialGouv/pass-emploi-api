@@ -1,20 +1,22 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { Conseiller } from '../../../src/domain/conseiller'
-import { Agence } from '../../../src/domain/agence'
-import { createSandbox, expect } from '../../utils'
+import {
+  ModifierConseillerCommand,
+  ModifierConseillerCommandHandler
+} from '../../../src/application/commands/modifier-conseiller.command.handler'
+import {
+  DroitsInsuffisants,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
 import { failure, Failure } from '../../../src/building-blocks/types/result'
-import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import { Agence } from '../../../src/domain/agence'
+import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
-import { Unauthorized } from '../../../src/domain/erreur'
+import { createSandbox, expect } from '../../utils'
 import Structure = Core.Structure
-import {
-  ModifierConseillerCommand,
-  ModifierConseillerCommandHandler
-} from '../../../src/application/commands/modifier-conseiller.command.handler'
 
 describe('ModifierConseillerCommandHandler', () => {
   let conseillerRepository: StubbedType<Conseiller.Repository>
@@ -134,13 +136,46 @@ describe('ModifierConseillerCommandHandler', () => {
         })
       })
     })
+
+    describe('Quand on est un conseiller avec le bon id', () => {
+      const command = {
+        idConseiller: 'id qui existe',
+        agence: {
+          id: 'agence qui existe'
+        }
+      }
+
+      beforeEach(() => {
+        agencesRepository.get
+          .withArgs('agence qui existe')
+          .resolves(agenceQuiExiste)
+      })
+
+      describe("et que l'agence et le conseiller ont la même structure", () => {
+        it('on modifie le conseiller', async () => {
+          // When
+          const result = await handler.execute(
+            command,
+            unUtilisateurConseiller({
+              structure: Core.Structure.MILO,
+              id: 'id qui existe'
+            })
+          )
+
+          // Then
+          expect(result).to.deep.equal(
+            failure(new NonTrouveError('Conseiller', 'id qui existe'))
+          )
+        })
+      })
+    })
   })
 
   describe('authorize', () => {
     describe('Quand on est un jeune', () => {
       it('on reçoit une unauthorized', async () => {
         // Given
-        const query = {
+        const command = {
           idConseiller: 'id qui existe',
           agence: {
             id: 'agence qui existe'
@@ -148,10 +183,10 @@ describe('ModifierConseillerCommandHandler', () => {
         }
 
         // When
-        const call = handler.execute(query, unUtilisateurJeune())
+        const result = await handler.execute(command, unUtilisateurJeune())
 
         // Then
-        await expect(call).to.be.rejectedWith(Unauthorized)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
 
@@ -166,62 +201,10 @@ describe('ModifierConseillerCommandHandler', () => {
         }
 
         // When
-        const call = handler.execute(query, unUtilisateurConseiller())
+        const result = await handler.execute(query, unUtilisateurConseiller())
 
         // Then
-        await expect(call).to.be.rejectedWith(Unauthorized)
-      })
-    })
-  })
-
-  describe('Quand on est un conseiller avec le bon id', () => {
-    const query = {
-      idConseiller: 'id qui existe',
-      agence: {
-        id: 'agence qui existe'
-      }
-    }
-
-    beforeEach(() => {
-      agencesRepository.get
-        .withArgs('agence qui existe')
-        .resolves(agenceQuiExiste)
-      agencesRepository.getStructureOfAgence
-        .withArgs('agence qui existe')
-        .resolves(Structure.MILO)
-    })
-
-    describe("et que l'agence et le conseiller ont la même structure", () => {
-      it('on modifie le conseiller', async () => {
-        // When
-        const call = handler.execute(
-          query,
-          unUtilisateurConseiller({
-            structure: Core.Structure.MILO,
-            id: 'id qui existe'
-          })
-        )
-
-        // Then
-        await expect(call).to.not.be.rejected()
-      })
-    })
-
-    describe("et que l'agence et le conseiller n'ont pas la même structure", () => {
-      it('on reçoi un unauthorized', async () => {
-        // When
-        const result = await handler.execute(
-          query,
-          unUtilisateurConseiller({
-            structure: Core.Structure.POLE_EMPLOI,
-            id: 'id qui existe'
-          })
-        )
-
-        // Then
-        expect(result).to.deep.equal(
-          failure(new NonTrouveError('Conseiller', 'id qui existe'))
-        )
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
   })

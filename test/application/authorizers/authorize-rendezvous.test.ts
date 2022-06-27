@@ -1,6 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'
-import { Unauthorized } from '../../../src/domain/erreur'
 import { RendezVous } from '../../../src/domain/rendez-vous'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
@@ -20,7 +21,7 @@ describe('RendezVousAuthorizer', () => {
 
   describe('authorize', () => {
     describe('quand au moins un des jeunes du conseiller qui fait la requête est dans le rendez-vous', () => {
-      it("valide l'autorisation", async () => {
+      it('retourne un success', async () => {
         // Given
         const conseiller = unConseiller()
         const jeune = unJeune(conseiller)
@@ -39,11 +40,11 @@ describe('RendezVousAuthorizer', () => {
         )
 
         // Then
-        expect(result).to.be.equal(undefined)
+        expect(result).to.deep.equal(emptySuccess())
       })
     })
     describe("quand aucun des jeunes du conseiller qui fait la requête n'est dans le rendez-vous", () => {
-      it('rejette', async () => {
+      it('retourne une failure', async () => {
         // Given
         const conseiller = unConseiller()
         const jeune = unJeune(conseiller)
@@ -58,10 +59,13 @@ describe('RendezVousAuthorizer', () => {
         rendezVousRepository.get.withArgs('rdv-id').resolves(rendezVous)
 
         // When
-        const call = rendezVousAuthorizer.authorize('rdv-id', utilisateur)
+        const result = await rendezVousAuthorizer.authorize(
+          'rdv-id',
+          utilisateur
+        )
 
         // Then
-        await expect(call).to.be.rejectedWith(Unauthorized)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
   })
