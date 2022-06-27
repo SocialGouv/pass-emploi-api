@@ -38,17 +38,10 @@ export class CreateRendezVousPayload {
   @IsNotEmpty()
   modality?: string
 
-  @ApiPropertyOptional()
-  @ValidateIf(payload => payload.jeunesIds === undefined)
-  @IsString()
-  @IsNotEmpty()
-  jeuneId?: string
-
-  @ApiPropertyOptional()
-  @ValidateIf(payload => payload.jeuneId === undefined)
+  @ApiProperty()
   @IsArray()
   @ArrayNotEmpty()
-  jeunesIds?: string[]
+  jeunesIds: string[]
 
   @ApiPropertyOptional({ enum: CodeTypeRendezVous })
   @IsOptional()

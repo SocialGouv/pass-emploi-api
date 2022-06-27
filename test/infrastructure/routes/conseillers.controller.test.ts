@@ -363,92 +363,11 @@ describe('ConseillersController', () => {
         before(() => {
           createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
         })
-        it('crée le rendezvous avec jeuneId', async () => {
-          // Given
-          const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
-            jeuneId: '1',
-            comment: '',
-            date: uneDatetime.toJSDate().toISOString(),
-            duration: 30,
-            modality: 'rdv',
-            invitation: true
-          }
-
-          // When - Then
-          await request(app.getHttpServer())
-            .post(`/conseillers/${idConseiller}/rendezvous`)
-            .set('authorization', unHeaderAuthorization())
-            .send(payload)
-            .expect(HttpStatus.CREATED)
-            .expect({ id: 'id-rdv' })
-
-          expect(
-            createRendezVousCommandHandler.execute
-          ).to.have.been.calledWith(
-            {
-              idsJeunes: [payload.jeuneId],
-              commentaire: payload.comment,
-              date: payload.date,
-              duree: payload.duration,
-              modalite: payload.modality,
-              idConseiller: idConseiller,
-              type: undefined,
-              precision: undefined,
-              adresse: undefined,
-              organisme: undefined,
-              presenceConseiller: undefined,
-              invitation: true
-            },
-            unUtilisateurDecode()
-          )
-        })
         it('crée le rendezvous avec jeunesIds', async () => {
           // Given
           const idConseiller = '41'
           const payload: CreateRendezVousPayload = {
             jeunesIds: ['1'],
-            comment: '',
-            date: uneDatetime.toJSDate().toISOString(),
-            duration: 30,
-            modality: 'rdv',
-            invitation: true
-          }
-
-          // When - Then
-          await request(app.getHttpServer())
-            .post(`/conseillers/${idConseiller}/rendezvous`)
-            .set('authorization', unHeaderAuthorization())
-            .send(payload)
-            .expect(HttpStatus.CREATED)
-            .expect({ id: 'id-rdv' })
-
-          expect(
-            createRendezVousCommandHandler.execute
-          ).to.have.been.calledWith(
-            {
-              idsJeunes: payload.jeunesIds,
-              commentaire: payload.comment,
-              date: payload.date,
-              duree: payload.duration,
-              modalite: payload.modality,
-              idConseiller: idConseiller,
-              type: undefined,
-              precision: undefined,
-              adresse: undefined,
-              organisme: undefined,
-              presenceConseiller: undefined,
-              invitation: true
-            },
-            unUtilisateurDecode()
-          )
-        })
-        it('crée le rendezvous avec jeuneId et jeunesIds', async () => {
-          // Given
-          const idConseiller = '41'
-          const payload: CreateRendezVousPayload = {
-            jeuneId: '1',
-            jeunesIds: ['2'],
             comment: '',
             date: uneDatetime.toJSDate().toISOString(),
             duration: 30,

@@ -8,8 +8,10 @@ import { CampagneSqlModel } from '../../../../src/infrastructure/sequelize/model
 import { DateTime } from 'luxon'
 import { ReponseCampagneSqlModel } from '../../../../src/infrastructure/sequelize/models/reponse-campagne.sql-model'
 import { Campagne } from '../../../../src/domain/campagne'
+import { DatabaseForTesting } from 'test/utils/database-for-testing'
 
 describe('GetCampagneQueryModel', () => {
+  DatabaseForTesting.prepare()
   let dateService: StubbedClass<DateService>
   let getCampagneQueryModel: GetCampagneQueryModel
   const maintenant = DateTime.fromISO('2022-05-17T03:24:00')
