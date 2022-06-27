@@ -2,7 +2,6 @@
 
 skinparam backgroundColor white
 
-actor "Conseiller ML" as conseiller
 participant "Keycloak i-Milo" as kckMilo 	#CBC3E3
 participant "CEJ" as cej #ADD8E6
 participant "Keycloak CEJ" as kckCej #ADD8E6
@@ -15,19 +14,34 @@ title Erreur d'email sur la Première Connexion du Jeune Milo au CEJ
 autonumber
 
 note over cej  : Le conseiller a créé le compte du Jeune\navec un premier email. Celui-ci est enregistré\nen BDD sur le CEJ.
-note over cej : Le conseiller modifie l'email du Jeune sur i-milo.\nLa modification n'est pas répercutée sur la BDD du CEJ.
 
-group Première connexion du Jeune sur le CEJ
+group Première connexion normale
 skinparam sequenceMessageAlign center
 jeune -> cej : Demande de connexion sur l'application
 cej -> kckMilo : Redirection SSO Milo
 jeune -> kckMilo : ID + MDP Milo
 kckMilo -> kckCej : Authentification SSO Milo\nNouvelle session keycloak CEJ : infos Jeune
-note left : Ici, les infos Jeune envoyées sont les\ndernières à jour de i-milo, pour\nun changement d'email par exemple.
+note left : Ici, les infos Jeune envoyées sont les\ndernières à jour de i-milo
+kckCej -> cej : Authent OK : infos utilisateur
+note left : On crée l'utilisateur sur keycloak\nici lors de la première connexion.
+cej -> cej : Get Jeune by Email
+note right : On retrouve le jeune grâce à l'email\nrenseigné par le conseiller.
+end
+
+autonumber stop
+note over cej : Supposons maintenant que le jeune ne s'est pas encore connecté.\nLe conseiller modifie l'email du Jeune sur i-milo.\nLa modification n'est pas répercutée sur la BDD du CEJ.
+
+autonumber "<b>bis "
+group Reproduction de l'erreur
+skinparam sequenceMessageAlign center
+jeune -> cej : Demande de connexion sur l'application
+cej -> kckMilo : Redirection SSO Milo
+jeune -> kckMilo : ID + MDP Milo
+kckMilo -> kckCej : Authentification SSO Milo\nNouvelle session keycloak CEJ : infos Jeune
 kckCej -> cej : Authent OK : infos utilisateur
 note left #ffcccb : Bien que l'on ait récupéré le nouvel email,\nnous ne répercutons pas les modifications\npour une première connexion.
 cej -> cej : <color:red>Get Jeune by Email\n
-note right #ffcccb : On ne retrouve pas le Jeune car\nl'ancien email sert de référence.
+note right #ffcccb : L'ancien email  en BDD CEJ ne correspond pas\nà l'email retourné par i-milo.
 
 end
 @enduml

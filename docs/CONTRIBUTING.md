@@ -12,7 +12,8 @@
 3. [L'architecture](#archi)
    1. [Flux des Commands / Queries](#CQS)
    2. [Flux des notifications](#notifications)
-   3. [Tests](#archi-tests)
+   3. [Les jobs et les crons](#jobs-cron)
+   4. [Tests](#archi-tests)
 4. [Développement de l'API](#API-develop)
    1. [Mode watch](#watch)
    2. [Présentation de la CI/CD staging](#cicd)
@@ -26,6 +27,7 @@
    2. [Environnement de staging](#staging)
    3. [Environnement de production](#production)
    4. [Rollback](#rollback)
+   5. [Lancer des tasks sur les environnements déployés](#tasks)
 6. [Style guide](#style-guide) 
 7. [Troubleshoot](#troubleshoot)
 
@@ -92,7 +94,12 @@ L'historique des décisions est consultable dans le dossier ```decisions```
 
 ### Flux des notifications push <a name="notifications"></a>
 [Excalidraw](https://excalidraw.com/#json=ddvUJrWdns_oJ6__GExXs,C0X_JaoaQI5lC0AunVrpBQ)
-    
+
+### Les jobs et les crons <a name="jobs-cron"></a>
+[Excalidraw](https://mattermost.incubateur.net/spie/pl/e3whbqramjfxtmp6d1nht4ddda)
+
+Ne pas oublier, une fois la fonctionnalité merged, de lancer la task yarn `initialiser-les-crons` (à faire en recette et en prod)
+
 ### Tests <a name="archi-tests"></a>
 Le runner de test est mocha, avec chai pour les assertions et sinon pour les mocks/stubs
 - Controllers
@@ -210,7 +217,11 @@ Il est possible de rollback une application Scalingo sur un commit donné (de la
 
     git remote add scalingo git@ssh.${MA_REGION}.scalingo.com:${MON_APPLICATION}.git
     git push --force ${ID_COMMIT}:refs/heads/master
-  
+
+### Lancer des tasks sur les environnements déployés <a name="tasks"></a>
+
+    scalingo --region ${MA_REGION} -a ${MON_APPLICATION} run yarn tasks
+
 ## Style guide <a name="style-guide"></a>
 
 ## Troubleshoot <a name="troubleshoot"></a>

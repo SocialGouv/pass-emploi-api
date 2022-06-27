@@ -20,7 +20,7 @@ cej -> cej : Check BDD\nJeune non existant
 
 skinparam sequenceMessageAlign center
 cej -> kckMilo :demande création de compte SSO Milo : idDossier
-kckMilo -[#red]> kckMilo : <color:red>Check aucun jeune lié au dossier\n<color:red>On lie Jeune ML au compte
+kckMilo -> kckMilo : Check aucun jeune lié au dossier\nMilo lie Jeune ML au compte
 kckMilo -> cej : succès : id-keycloak
 
 skinparam sequenceMessageAlign left
@@ -28,8 +28,10 @@ cej -> cej : Enregistrement BDD\nid-keycloak\ninfos Jeune
 end
 
 group Reproduction de l'erreur
-note over  cej : Suppression du compte CEJ Jeune\nEffectué par le conseiller ou le support
+autonumber stop
+note left cej : Suppression du compte CEJ Jeune\nEffectué par le conseiller ou le support
 cej -> cej : Suppression BDD\ninfos Jeune
+autonumber "<b>bis "
 conseiller -> cej : Création du compte CEJ Jeune : infos Jeune
 skinparam sequenceMessageAlign left
 cej -> cej : Check BDD\nJeune non existant
