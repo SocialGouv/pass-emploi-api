@@ -133,10 +133,7 @@ describe('GetServicesCiviqueQueryHandler', () => {
         .resolves(success(serviceCiviqueQueryModels))
 
       // When
-      await getServicesCiviqueQueryHandler.monitor(
-        unUtilisateurJeune(),
-        getServicesCiviqueQuery
-      )
+      await getServicesCiviqueQueryHandler.monitor(unUtilisateurJeune())
 
       // Then
       expect(evenementService.creerEvenement).to.have.been.calledWith(

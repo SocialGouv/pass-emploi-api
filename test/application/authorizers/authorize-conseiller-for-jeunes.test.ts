@@ -1,13 +1,14 @@
-import { AuthorizeConseillerForJeunes } from '../../../src/application/authorizers/authorize-conseiller-for-jeunes'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { Jeune } from '../../../src/domain/jeune'
 import { createSandbox } from 'sinon'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure } from 'src/building-blocks/types/result'
+import { expect } from 'test/utils'
+import { AuthorizeConseillerForJeunes } from '../../../src/application/authorizers/authorize-conseiller-for-jeunes'
+import { Jeune } from '../../../src/domain/jeune'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
-import { expect } from 'test/utils'
-import { Unauthorized } from '../../../src/domain/erreur'
 import { unJeune } from '../../fixtures/jeune.fixture'
 
 describe('AuthorizeConseillerForJeunes', () => {
@@ -22,17 +23,20 @@ describe('AuthorizeConseillerForJeunes', () => {
   })
 
   describe("quand ce n'est pas un conseiller", () => {
-    it('rejette', () => {
+    it('retourne une failure', async () => {
       // When
-      const call = conseillerAuthorizer.authorize(['1'], unUtilisateurJeune())
+      const result = await conseillerAuthorizer.authorize(
+        ['1'],
+        unUtilisateurJeune()
+      )
 
       // Then
-      expect(call).to.be.rejectedWith(Unauthorized)
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
   })
 
   describe("quand tous les jeunes n'appartiennent pas au conseiller", () => {
-    it('rejette', () => {
+    it('retourne une failure', async () => {
       // Given
       const utilisateur = unUtilisateurConseiller()
       jeuneRepository.findAllJeunesByConseiller
@@ -40,15 +44,15 @@ describe('AuthorizeConseillerForJeunes', () => {
         .resolves([])
 
       // When
-      const call = conseillerAuthorizer.authorize(['1'], utilisateur)
+      const result = await conseillerAuthorizer.authorize(['1'], utilisateur)
 
       // Then
-      expect(call).to.be.rejectedWith(Unauthorized)
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
   })
 
   describe("quand c'est OK", () => {
-    it('accepte', async () => {
+    it('retourne une success', async () => {
       // Given
       const utilisateur = unUtilisateurConseiller()
       jeuneRepository.findAllJeunesByConseiller
@@ -56,10 +60,10 @@ describe('AuthorizeConseillerForJeunes', () => {
         .resolves([unJeune()])
 
       // When
-      const call = conseillerAuthorizer.authorize(['1'], utilisateur)
+      const result = await conseillerAuthorizer.authorize(['1'], utilisateur)
 
       // Then
-      await expect(call).not.to.be.rejected()
+      expect(result).to.deep.equal(emptySuccess())
     })
   })
 })

@@ -71,9 +71,7 @@ describe('AddFavoriOffreImmersionCommandHandler', () => {
         .resolves(offreImmersion)
 
       // When
-      const result = await addFavoriOffreImmersionCommandHandler.execute(
-        command
-      )
+      const result = await addFavoriOffreImmersionCommandHandler.handle(command)
 
       // Then
       expect(result).to.deep.equal(

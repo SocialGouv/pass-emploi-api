@@ -14,36 +14,33 @@ import { uneSituationsMiloDto } from 'test/fixtures/milo.fixture'
 import { unDetailJeuneConseillerQueryModel } from 'test/fixtures/query-models/jeunes.query-model.fixtures'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import { DroitsInsuffisants } from '../../../src/building-blocks/types/domain-error'
 import {
-  DroitsInsuffisants,
-  NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
-import { success } from '../../../src/building-blocks/types/result'
+  emptySuccess,
+  failure,
+  success
+} from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { createSandbox, expect } from '../../utils'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
 
 describe('GetJeunesByConseillerQueryHandler', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
   let conseillersRepository: StubbedType<Conseiller.Repository>
-  let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getJeunesByConseillerQueryHandler: GetJeunesByConseillerQueryHandler
   let sandbox: SinonSandbox
 
   before(() => {
     sandbox = createSandbox()
     conseillersRepository = stubInterface(sandbox)
-    conseillerAuthorizer = stubClass(ConseillerAuthorizer)
 
     getJeunesByConseillerQueryHandler = new GetJeunesByConseillerQueryHandler(
       databaseForTesting.sequelize,
-      conseillersRepository,
-      conseillerAuthorizer
+      conseillersRepository
     )
   })
 
@@ -278,15 +275,12 @@ describe('GetJeunesByConseillerQueryHandler', () => {
           })
         )
         // When
-        const promise = getJeunesByConseillerQueryHandler.authorize(
+        const result = await getJeunesByConseillerQueryHandler.authorize(
           query,
           utilisateur
         )
         // Then
-        expect(
-          conseillerAuthorizer.authorizeConseiller
-        ).to.have.been.calledWithExactly(utilisateur)
-        await expect(promise).to.be.fulfilled()
+        expect(result).to.deep.equal(emptySuccess())
       })
     })
 
@@ -301,18 +295,13 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         )
 
         // When
-        let error
-        try {
-          await getJeunesByConseillerQueryHandler.authorize(
-            { idConseiller: 'un-autre-id' },
-            utilisateur
-          )
-        } catch (e) {
-          error = e
-        }
+        const result = await getJeunesByConseillerQueryHandler.authorize(
+          { idConseiller: 'un-autre-id' },
+          utilisateur
+        )
 
         // Then
-        expect(error).to.be.an.instanceof(NonTrouveError)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
 
@@ -332,15 +321,13 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         )
 
         // When
-        let error
-        try {
-          await getJeunesByConseillerQueryHandler.authorize(query, utilisateur)
-        } catch (e) {
-          error = e
-        }
+        const result = await getJeunesByConseillerQueryHandler.authorize(
+          query,
+          utilisateur
+        )
 
         // Then
-        expect(error).to.be.an.instanceof(DroitsInsuffisants)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
 
@@ -366,13 +353,13 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         )
 
         // When
-        const promise = getJeunesByConseillerQueryHandler.authorize(
+        const result = await getJeunesByConseillerQueryHandler.authorize(
           query,
           utilisateur
         )
 
         // Then
-        await expect(promise).to.be.fulfilled()
+        expect(result).to.deep.equal(emptySuccess())
       })
     })
 
@@ -398,15 +385,13 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         )
 
         // When
-        let error
-        try {
-          await getJeunesByConseillerQueryHandler.authorize(query, utilisateur)
-        } catch (e) {
-          error = e
-        }
+        const result = await getJeunesByConseillerQueryHandler.authorize(
+          query,
+          utilisateur
+        )
 
         // Then
-        expect(error).to.be.an.instanceof(DroitsInsuffisants)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
   })

@@ -1,6 +1,7 @@
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
 import { Core } from '../../../src/domain/core'
-import { Unauthorized } from '../../../src/domain/erreur'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { expect } from '../../utils'
 import Structure = Core.Structure
@@ -15,7 +16,7 @@ describe('JeunePoleEmploiAuthorizer', () => {
   describe('authorize', () => {
     describe('quand le jeune vient de POLE EMPLOI', () => {
       describe('quand le jeune est bien celui connecté', () => {
-        it("valide l'autorisation", async () => {
+        it('retourne un success', async () => {
           // Given
           const utilisateur = unUtilisateurJeune({
             id: 'jeune-id',
@@ -29,54 +30,54 @@ describe('JeunePoleEmploiAuthorizer', () => {
           )
 
           // Then
-          expect(result).to.be.equal(undefined)
+          expect(result).to.deep.equal(emptySuccess())
         })
       })
       describe("quand le jeune n'est pas celui connecté", () => {
-        it('retourne une erreur', async () => {
+        it('retourne une failure', async () => {
           // Given
           const utilisateur = unUtilisateurJeune({ id: 'autre-jeune-id' })
 
           // When
-          const call = jeunePoleEmploiAuthorizer.authorize(
+          const result = await jeunePoleEmploiAuthorizer.authorize(
             'jeune-id',
             utilisateur
           )
 
           // Then
-          await expect(call).to.be.rejectedWith(Unauthorized)
+          expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
         })
       })
     })
     describe('quand le jeune ne vient pas de POLE EMPLOI', () => {
-      it('retourne une erreur', async () => {
+      it('retourne une failure', async () => {
         // Given
         const utilisateur = unUtilisateurJeune({ id: 'autre-jeune-id' })
 
         // When
-        const call = jeunePoleEmploiAuthorizer.authorize(
+        const result = await jeunePoleEmploiAuthorizer.authorize(
           'jeune-id',
           utilisateur
         )
 
         // Then
-        await expect(call).to.be.rejectedWith(Unauthorized)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
 
     describe("quand le jeune n'existe pas", () => {
-      it('retourne une erreur', async () => {
+      it('retourne une failure', async () => {
         // Given
         const utilisateur = unUtilisateurJeune({ id: 'jeune-id' })
 
         // When
-        const call = jeunePoleEmploiAuthorizer.authorize(
+        const result = await jeunePoleEmploiAuthorizer.authorize(
           'jeune-id',
           utilisateur
         )
 
         // Then
-        await expect(call).to.be.rejectedWith(Unauthorized)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
   })

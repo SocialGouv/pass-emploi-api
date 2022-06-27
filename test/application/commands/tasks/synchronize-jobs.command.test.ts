@@ -34,7 +34,7 @@ describe('SynchronizeJobsCommandHandler', () => {
       rendezVousRepository.getAllAVenir.resolves([unRendezVous()])
 
       // WHen
-      await synchronizeJobsCommandHandler.handle({})
+      await synchronizeJobsCommandHandler.handle()
     })
     it('supprime tous les jobs', async () => {
       // Then

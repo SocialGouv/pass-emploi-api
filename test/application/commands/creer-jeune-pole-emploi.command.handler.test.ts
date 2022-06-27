@@ -7,11 +7,13 @@ import {
   CreateJeuneCommand,
   CreerJeunePoleEmploiCommandHandler
 } from '../../../src/application/commands/creer-jeune-pole-emploi.command.handler'
-import { EmailExisteDejaError } from '../../../src/building-blocks/types/domain-error'
+import {
+  DroitsInsuffisants,
+  EmailExisteDejaError
+} from '../../../src/building-blocks/types/domain-error'
 import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
-import { Unauthorized } from '../../../src/domain/erreur'
 import { Jeune } from '../../../src/domain/jeune'
 import { DateService } from '../../../src/utils/date-service'
 import { IdService } from '../../../src/utils/id-service'
@@ -168,10 +170,13 @@ describe('CreateJeunePoleEmploiCommandHandler', () => {
       })
 
       // When
-      const call = createJeuneCommandHandler.authorize(command, utilisateur)
+      const result = await createJeuneCommandHandler.authorize(
+        command,
+        utilisateur
+      )
 
       // Then
-      await expect(call).to.be.rejectedWith(Unauthorized)
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
   })
 })

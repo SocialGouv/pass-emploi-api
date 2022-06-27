@@ -1,7 +1,8 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { Action } from 'src/domain/action'
 import { ActionAuthorizer } from '../../../src/application/authorizers/authorize-action'
-import { Unauthorized } from '../../../src/domain/erreur'
 import { uneAction } from '../../fixtures/action.fixture'
 import {
   unUtilisateurConseiller,
@@ -21,7 +22,7 @@ describe('ActionAuthorizer', () => {
 
   describe('authorize', () => {
     describe("quand c'est un jeune et que l'action est à lui", () => {
-      it("ne retourne pas d'erreur", async () => {
+      it('retourne un success', async () => {
         // Given
         const idAction = 'idAction'
         const utilisateur = unUtilisateurJeune()
@@ -34,11 +35,11 @@ describe('ActionAuthorizer', () => {
         const result = await actionAuthorizer.authorize(idAction, utilisateur)
 
         // Then
-        expect(result).to.equal(undefined)
+        expect(result).to.deep.equal(emptySuccess())
       })
     })
     describe("quand c'est un conseiller et que l'action est à lui", () => {
-      it("ne retourne pas d'erreur", async () => {
+      it('retourne un success', async () => {
         // Given
         const idAction = 'idAction'
         const utilisateur = unUtilisateurConseiller()
@@ -51,11 +52,11 @@ describe('ActionAuthorizer', () => {
         const result = await actionAuthorizer.authorize(idAction, utilisateur)
 
         // Then
-        expect(result).to.equal(undefined)
+        expect(result).to.deep.equal(emptySuccess())
       })
     })
     describe("quand c'est un jeune et que l'action n'est pas à lui", () => {
-      it('retourne une erreur', async () => {
+      it('retourne une failure', async () => {
         // Given
         const idAction = 'idAction'
         const utilisateur = unUtilisateurJeune()
@@ -65,14 +66,14 @@ describe('ActionAuthorizer', () => {
           .resolves(action)
 
         // When
-        const call = actionAuthorizer.authorize(idAction, utilisateur)
+        const result = await actionAuthorizer.authorize(idAction, utilisateur)
 
         // Then
-        await expect(call).to.be.rejectedWith(Unauthorized)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
     describe("quand c'est un conseiller et que l'action n'est pas à lui", () => {
-      it('retourne une erreur', async () => {
+      it('retourne une failure', async () => {
         // Given
         const idAction = 'idAction'
         const utilisateur = unUtilisateurConseiller()
@@ -81,24 +82,24 @@ describe('ActionAuthorizer', () => {
           .resolves({ idConseiller: 'un autre conseiller' })
 
         // When
-        const call = actionAuthorizer.authorize(idAction, utilisateur)
+        const result = await actionAuthorizer.authorize(idAction, utilisateur)
 
         // Then
-        await expect(call).to.be.rejectedWith(Unauthorized)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
     describe("quand l'action n'existe pas", () => {
-      it('retourne une erreur', async () => {
+      it('retourne une failure', async () => {
         // Given
         const idAction = 'idAction'
         const utilisateur = unUtilisateurConseiller()
         actionRepository.get.withArgs(idAction).resolves(undefined)
 
         // When
-        const call = actionAuthorizer.authorize(idAction, utilisateur)
+        const result = await actionAuthorizer.authorize(idAction, utilisateur)
 
         // Then
-        await expect(call).to.be.rejectedWith(Unauthorized)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
   })

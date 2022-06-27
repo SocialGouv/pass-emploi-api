@@ -1,13 +1,14 @@
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import {
   CreateEvenementCommand,
   CreateEvenementCommandHandler
 } from '../../../src/application/commands/create-evenement.command.handler'
-import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { Unauthorized } from '../../../src/domain/erreur'
 
 describe('CreateActionCommandHandler', () => {
   let evenementService: StubbedClass<EvenementService>
@@ -40,7 +41,7 @@ describe('CreateActionCommandHandler', () => {
         )
 
         // Then
-        expect(result).to.be.equal(undefined)
+        expect(result).to.deep.equal(emptySuccess())
       })
     })
     describe("quand l'émetteur n'est pas l'utilisateur", () => {
@@ -57,13 +58,13 @@ describe('CreateActionCommandHandler', () => {
         const utilisateur = unUtilisateurConseiller()
 
         // When
-        const result = createEvenementCommandHandler.authorize(
+        const result = await createEvenementCommandHandler.authorize(
           command,
           utilisateur
         )
 
         // Then
-        await expect(result).to.be.rejectedWith(Unauthorized)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
   })
