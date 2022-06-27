@@ -144,6 +144,10 @@ describe('FavorisController', () => {
           .expect(HttpStatus.OK)
           .expect(JSON.stringify([]))
       })
+      ensureUserAuthenticationFailsIfInvalid(
+        'GET',
+        '/jeunes/ABCDE/favoris/offres-emploi'
+      )
     })
 
     describe('POST /jeunes/:idJeune/favoris/offres-emploi', () => {
@@ -199,7 +203,10 @@ describe('FavorisController', () => {
           // Then
           .expect(HttpStatus.CONFLICT)
       })
-      ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/ABCDE/favori')
+      ensureUserAuthenticationFailsIfInvalid(
+        'POST',
+        '/jeunes/ABCDE/favoris/offres-emploi'
+      )
     })
 
     describe('DELETE /jeunes/:idJeune/favoris/offres-emploi/:idOffreEmploi', () => {
@@ -247,7 +254,7 @@ describe('FavorisController', () => {
           .expect(expectedMessageJson)
       })
       ensureUserAuthenticationFailsIfInvalid(
-        'delete',
+        'DELETE',
         '/jeunes/ABCDE/favoris/offres-emploi/123'
       )
     })
@@ -268,6 +275,10 @@ describe('FavorisController', () => {
           .expect(HttpStatus.OK)
           .expect(JSON.stringify([]))
       })
+      ensureUserAuthenticationFailsIfInvalid(
+        'GET',
+        '/jeunes/ABCDE/favoris/offres-immersion'
+      )
     })
 
     describe('POST /jeunes/:idJeune/favoris/offres-immersion', () => {
@@ -324,7 +335,10 @@ describe('FavorisController', () => {
           // Then
           .expect(HttpStatus.CONFLICT)
       })
-      ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/ABCDE/favori')
+      ensureUserAuthenticationFailsIfInvalid(
+        'POST',
+        '/jeunes/ABCDE/favoris/offres-immersion'
+      )
     })
 
     describe('DELETE /jeunes/:idJeune/favoris/offres-immersion/:idOffreImmersion', () => {

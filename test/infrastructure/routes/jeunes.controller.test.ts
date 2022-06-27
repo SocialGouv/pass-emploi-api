@@ -18,15 +18,7 @@ import {
 import * as request from 'supertest'
 import { uneDate } from 'test/fixtures/date.fixture'
 import { uneDemarche } from 'test/fixtures/demarche.fixture'
-import {
-  AddFavoriOffreEmploiCommand,
-  AddFavoriOffreEmploiCommandHandler
-} from '../../../src/application/commands/add-favori-offre-emploi.command.handler'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
-import {
-  DeleteFavoriOffreEmploiCommand,
-  DeleteFavoriOffreEmploiCommandHandler
-} from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
 import { DeleteJeuneInactifCommandHandler } from '../../../src/application/commands/delete-jeune-inactif.command.handler'
 import {
   ActionsByJeuneOutput,
@@ -45,8 +37,6 @@ import {
   DomainError,
   DroitsInsuffisants,
   ErreurHttp,
-  FavoriExisteDejaError,
-  FavoriNonTrouveError,
   JeuneNonLieAuConseillerError,
   JeunePasInactifError,
   MauvaiseCommandeError,
@@ -60,7 +50,6 @@ import {
 import { Action } from '../../../src/domain/action'
 import { JwtService } from '../../../src/infrastructure/auth/jwt.service'
 import { CreateActionAvecStatutPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
-import { AddFavoriOffresEmploiPayload } from '../../../src/infrastructure/routes/validation/favoris.inputs'
 import {
   unHeaderAuthorization,
   unJwtPayloadValide,
@@ -68,8 +57,6 @@ import {
   unJwtPayloadValideSupport,
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import {
   buildTestingModuleForHttpTesting,
@@ -82,8 +69,6 @@ import StatutInvalide = Action.StatutInvalide
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
-  let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
-  let deleteFavoriOffreEmploiCommandHandler: StubbedClass<DeleteFavoriOffreEmploiCommandHandler>
   let getDetailJeuneQueryHandler: StubbedClass<GetDetailJeuneQueryHandler>
   let getConseillersJeuneQueryHandler: StubbedClass<GetConseillersJeuneQueryHandler>
   let transfererJeunesConseillerCommandHandler: StubbedClass<TransfererJeunesConseillerCommandHandler>
@@ -103,12 +88,6 @@ describe('JeunesController', () => {
 
   before(async () => {
     createActionCommandHandler = stubClass(CreateActionCommandHandler)
-    addFavoriOffreEmploiCommandHandler = stubClass(
-      AddFavoriOffreEmploiCommandHandler
-    )
-    deleteFavoriOffreEmploiCommandHandler = stubClass(
-      DeleteFavoriOffreEmploiCommandHandler
-    )
     getDetailJeuneQueryHandler = stubClass(GetDetailJeuneQueryHandler)
     transfererJeunesConseillerCommandHandler = stubClass(
       TransfererJeunesConseillerCommandHandler
@@ -143,10 +122,6 @@ describe('JeunesController', () => {
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
       .useValue(createActionCommandHandler)
-      .overrideProvider(AddFavoriOffreEmploiCommandHandler)
-      .useValue(addFavoriOffreEmploiCommandHandler)
-      .overrideProvider(DeleteFavoriOffreEmploiCommandHandler)
-      .useValue(deleteFavoriOffreEmploiCommandHandler)
       .overrideProvider(GetDetailJeuneQueryHandler)
       .useValue(getDetailJeuneQueryHandler)
       .overrideProvider(GetRendezVousJeuneQueryHandler)
@@ -356,109 +331,6 @@ describe('JeunesController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/ABCDE/action')
-  })
-
-  describe('POST /jeunes/:idJeune/favori', () => {
-    const offreEmploi = uneOffreEmploi()
-    const command: AddFavoriOffreEmploiCommand = {
-      idJeune: 'ABCDE',
-      offreEmploi: offreEmploi
-    }
-
-    const payload: AddFavoriOffresEmploiPayload = {
-      idOffre: offreEmploi.id,
-      nomEntreprise: offreEmploi.nomEntreprise,
-      duree: offreEmploi.duree,
-      titre: offreEmploi.titre,
-      alternance: offreEmploi.alternance,
-      typeContrat: offreEmploi.typeContrat,
-      localisation: offreEmploi.localisation
-    }
-    it('crée un favori', async () => {
-      // Given
-      addFavoriOffreEmploiCommandHandler.execute
-        .withArgs(command)
-        .resolves(emptySuccess())
-
-      // When
-      await request(app.getHttpServer())
-        .post('/jeunes/ABCDE/favori')
-        .set('authorization', unHeaderAuthorization())
-        .send(payload)
-
-        // Then
-        .expect(HttpStatus.CREATED)
-      expect(
-        addFavoriOffreEmploiCommandHandler.execute
-      ).to.have.been.calledWithExactly(command, unUtilisateurDecode())
-    })
-    it('renvoie une 409 (Conflict) quand l"offre n"existe pas', async () => {
-      // Given
-      addFavoriOffreEmploiCommandHandler.execute
-        .withArgs(command)
-        .resolves(
-          failure(
-            new FavoriExisteDejaError(command.idJeune, command.offreEmploi.id)
-          )
-        )
-
-      // When
-      await request(app.getHttpServer())
-        .post('/jeunes/ABCDE/favori')
-        .set('authorization', unHeaderAuthorization())
-        .send(payload)
-
-        // Then
-        .expect(HttpStatus.CONFLICT)
-    })
-    ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/ABCDE/favori')
-  })
-
-  describe('DELETE /jeunes/:idJeune/favori/:idOffreEmploi', () => {
-    const offreEmploi = uneOffreEmploi()
-    const jeune = unJeune()
-    const command: DeleteFavoriOffreEmploiCommand = {
-      idJeune: jeune.id,
-      idOffreEmploi: offreEmploi.id
-    }
-    it('supprime le favori', async () => {
-      //Given
-      deleteFavoriOffreEmploiCommandHandler.execute
-        .withArgs(command)
-        .resolves(emptySuccess())
-      //When
-      await request(app.getHttpServer())
-        .delete(`/jeunes/${jeune.id}/favori/${offreEmploi.id}`)
-        .set('authorization', unHeaderAuthorization())
-        //Then
-        .expect(HttpStatus.NO_CONTENT)
-      expect(
-        deleteFavoriOffreEmploiCommandHandler.execute
-      ).to.have.be.calledWithExactly(command, unUtilisateurDecode())
-    })
-    it("renvoie une 404(NOT FOUND) si le favori n'existe pas", async () => {
-      //Given
-      deleteFavoriOffreEmploiCommandHandler.execute
-        .withArgs(command)
-        .resolves(
-          failure(
-            new FavoriNonTrouveError(command.idJeune, command.idOffreEmploi)
-          )
-        )
-
-      const expectedMessageJson = {
-        code: 'FAVORI_NON_TROUVE',
-        message: `Le Favori du jeune ${command.idJeune} correspondant à l'offre ${command.idOffreEmploi} n'existe pas`
-      }
-      //When
-      await request(app.getHttpServer())
-        .delete(`/jeunes/${jeune.id}/favori/${offreEmploi.id}`)
-        .set('authorization', unHeaderAuthorization())
-        //Then
-        .expect(HttpStatus.NOT_FOUND)
-        .expect(expectedMessageJson)
-    })
-    ensureUserAuthenticationFailsIfInvalid('delete', '/jeunes/ABCDE/favori/123')
   })
 
   describe('GET /jeunes/:idJeune', () => {
