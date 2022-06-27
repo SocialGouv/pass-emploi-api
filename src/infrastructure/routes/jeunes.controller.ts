@@ -6,16 +6,13 @@ import {
   Get,
   Headers,
   HttpCode,
-  HttpException,
   HttpStatus,
-  NotFoundException,
   Param,
   Post,
   Put,
   Query,
   Res
 } from '@nestjs/common'
-import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import {
   ApiHeader,
   ApiOAuth2,
@@ -35,7 +32,6 @@ import {
 } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
 import { GetActionsJeunePoleEmploiQueryHandler } from 'src/application/queries/get-actions-jeune-pole-emploi.query.handler'
 import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler.db'
-import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from 'src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import {
   JeuneHomeActionQueryModel,
@@ -46,24 +42,12 @@ import {
   DetailJeuneQueryModel,
   HistoriqueConseillerJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-model'
-import {
-  FavoriOffreEmploiIdQueryModel,
-  OffreEmploiResumeQueryModel
-} from 'src/application/queries/query-models/offres-emploi.query-model'
 import { RendezVousJeuneQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
 import { Core } from 'src/domain/core'
-import {
-  AddFavoriOffreEmploiCommand,
-  AddFavoriOffreEmploiCommandHandler
-} from '../../application/commands/add-favori-offre-emploi.command.handler'
 import {
   CreateActionCommand,
   CreateActionCommandHandler
 } from '../../application/commands/create-action.command.handler'
-import {
-  DeleteFavoriOffreEmploiCommand,
-  DeleteFavoriOffreEmploiCommandHandler
-} from '../../application/commands/delete-favori-offre-emploi.command.handler'
 import { DeleteJeuneInactifCommandHandler } from '../../application/commands/delete-jeune-inactif.command.handler'
 import {
   UpdateStatutDemarcheCommand,
@@ -83,12 +67,7 @@ import {
   ActionQueryModel,
   DemarcheQueryModel
 } from '../../application/queries/query-models/actions.query-model'
-import { FavoriExisteDejaError } from '../../building-blocks/types/domain-error'
-import {
-  isFailure,
-  isSuccess,
-  Result
-} from '../../building-blocks/types/result'
+import { isSuccess, Result } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
 import { Authentification } from '../../domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
@@ -98,10 +77,6 @@ import {
   CreateDemarchePayload,
   UpdateStatutDemarchePayload
 } from './validation/demarches.inputs'
-import {
-  AddFavoriOffresEmploiPayload,
-  GetFavorisOffresEmploiQueryParams
-} from './validation/favoris.inputs'
 import {
   GetActionsByJeuneQueryParams,
   GetRendezVousJeuneQueryParams,
@@ -123,9 +98,6 @@ export class JeunesController {
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly getRendezVousJeuneQueryHandler: GetRendezVousJeuneQueryHandler,
     private readonly getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler,
-    private readonly getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
-    private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
-    private readonly deleteFavoriCommandHandler: DeleteFavoriOffreEmploiCommandHandler,
     private readonly transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler,
     private readonly deleteJeuneCommandHandler: DeleteJeuneCommandHandler,
     private readonly deleteJeuneInactifCommandHandler: DeleteJeuneInactifCommandHandler,
@@ -441,75 +413,6 @@ export class JeunesController {
       }
     }
     throw handleFailure(result)
-  }
-
-  // Deprecated (Mobile App v1.0.0)
-  @Get(':idJeune/favoris')
-  async getFavoris(
-    @Param('idJeune') idJeune: string,
-    @Query() getFavorisQuery: GetFavorisOffresEmploiQueryParams,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<OffreEmploiResumeQueryModel[] | FavoriOffreEmploiIdQueryModel[]> {
-    return this.getFavorisOffresEmploiJeuneQueryHandler.execute(
-      {
-        idJeune,
-        detail: Boolean(getFavorisQuery.detail)
-      },
-      utilisateur
-    )
-  }
-
-  // Deprecated (Mobile App v1.0.0)
-  @Post(':idJeune/favori')
-  async postNouveauFavori(
-    @Param('idJeune') idJeune: string,
-    @Body() addFavoriPayload: AddFavoriOffresEmploiPayload,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    const command: AddFavoriOffreEmploiCommand = {
-      idJeune,
-      offreEmploi: {
-        id: addFavoriPayload.idOffre,
-        nomEntreprise: addFavoriPayload.nomEntreprise,
-        duree: addFavoriPayload.duree,
-        titre: addFavoriPayload.titre,
-        alternance: addFavoriPayload.alternance,
-        typeContrat: addFavoriPayload.typeContrat,
-        localisation: addFavoriPayload.localisation
-      }
-    }
-    const result = await this.addFavoriOffreEmploiCommandHandler.execute(
-      command,
-      utilisateur
-    )
-
-    if (isFailure(result)) {
-      if (result.error.code === FavoriExisteDejaError.CODE) {
-        throw new HttpException(result.error.message, HttpStatus.CONFLICT)
-      }
-      throw new RuntimeException(result.error.message)
-    }
-  }
-
-  // Deprecated (Mobile App v1.0.0)
-  @Delete(':idJeune/favori/:idOffreEmploi')
-  @HttpCode(204)
-  async deleteFavori(
-    @Param('idJeune') idJeune: string,
-    @Param('idOffreEmploi') idOffreEmploi: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
-    const command: DeleteFavoriOffreEmploiCommand = {
-      idJeune,
-      idOffreEmploi
-    }
-    const result = await this.deleteFavoriCommandHandler.execute(
-      command,
-      utilisateur
-    )
-    if (isFailure(result)) {
-      throw new NotFoundException(result.error)
-    }
   }
 
   @Post('transferer')
