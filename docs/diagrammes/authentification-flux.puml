@@ -22,7 +22,7 @@ cej -> cej : Check BDD\nJeune non existant
 
 skinparam sequenceMessageAlign center
 cej -> kckMilo :demande création de compte SSO Milo : idDossier
-kckMilo -> kckMilo : Check aucun jeune lié au dossier\nOn lie Jeune ML au compte
+kckMilo -> kckMilo : Check aucun jeune lié au dossier\nMilo lie Jeune ML au compte
 kckMilo -> cej : succès : id-keycloak
 
 skinparam sequenceMessageAlign left
