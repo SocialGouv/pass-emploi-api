@@ -26,20 +26,21 @@ export class HandleJobNettoyerPiecesJointesCommandHandler extends CommandHandler
     }
     const maintenant = this.dateService.now()
 
-    const fichiersASupprimer =
-      await this.fichierRepository.getFichiersASupprimer()
+    const quatreMoisPlusTot: Date = this.dateService
+      .now()
+      .minus({ months: 4 })
+      .toJSDate()
+    const idsFichiersASupprimer =
+      await this.fichierRepository.getIdsFichiersBefore(quatreMoisPlusTot)
 
     await Promise.all(
-      fichiersASupprimer.map(async fichier => {
+      idsFichiersASupprimer.map(async id => {
         try {
-          await this.fichierRepository.softDelete(fichier.id)
+          await this.fichierRepository.softDelete(id)
           stats.fichiersSupprimes++
         } catch (e) {
           this.logger.error(
-            buildError(
-              `Erreur lors de la suppression du fichier ${fichier.id}`,
-              e
-            )
+            buildError(`Erreur lors de la suppression du fichier ${id}`, e)
           )
           stats.erreurs++
         }

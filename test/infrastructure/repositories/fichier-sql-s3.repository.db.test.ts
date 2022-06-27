@@ -17,6 +17,7 @@ describe('FichierSqlS3Repository', () => {
   let objectStorageClient: StubbedClass<ObjectStorageClient>
   const dateService = stubClass(DateService)
   const maintenant = uneDatetime
+  const quatreMoisPlusTot = uneDatetime.minus({ months: 4 })
 
   beforeEach(async () => {
     dateService.now.returns(maintenant)
@@ -123,7 +124,9 @@ describe('FichierSqlS3Repository', () => {
       await FichierSqlModel.create({ ...fichierRecent })
 
       // When
-      const results = await fichierSqlS3Repository.getFichiersASupprimer()
+      const results = await fichierSqlS3Repository.getIdsFichiersBefore(
+        quatreMoisPlusTot.toJSDate()
+      )
       // Then
       expect(results).to.deep.equal([])
     })
@@ -134,11 +137,13 @@ describe('FichierSqlS3Repository', () => {
       await FichierSqlModel.create({ ...fichierOld2 })
 
       // When
-      const results = await fichierSqlS3Repository.getFichiersASupprimer()
+      const results = await fichierSqlS3Repository.getIdsFichiersBefore(
+        quatreMoisPlusTot.toJSDate()
+      )
       // Then
       expect(results.length).to.equal(2)
-      expect(results[0].id).to.equal(fichierOld1.id)
-      expect(results[1].id).to.equal(fichierOld2.id)
+      expect(results[0]).to.equal(fichierOld1.id)
+      expect(results[1]).to.equal(fichierOld2.id)
     })
   })
 

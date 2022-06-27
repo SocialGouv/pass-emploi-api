@@ -39,7 +39,7 @@ export namespace Fichier {
     save(fichier: Fichier): Promise<void>
     delete(idFichier: string): Promise<void>
     softDelete(idFichier: string): Promise<void>
-    getFichiersASupprimer(): Promise<FichierMetadata[]>
+    getIdsFichiersBefore(date: Date): Promise<string[]>
     getFichierMetadata(idFichier: string): Promise<FichierMetadata | undefined>
   }
 
