@@ -11,8 +11,6 @@ Voir [CONTRIBUTING.md](docs/CONTRIBUTING.md)
 
 # Flux d'authentification
 
+Le flux a été revu sur à l'[ADR-002](docs/decisions/ADR-002-keycloak-creation-jeune-milo.md).
+
 <img src="docs/diagrammes/authentification-flux.svg">
-
-# Lancer des tasks sur les environnements déployés
-
-    scalingo --region ${MA_REGION} -a ${MON_APPLICATION} run yarn tasks
