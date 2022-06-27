@@ -1,10 +1,11 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import {
   GetDossierMiloJeuneQuery,
   GetDossierMiloJeuneQueryHandler
 } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
-import { Unauthorized } from '../../../src/domain/erreur'
 import { Milo } from '../../../src/domain/milo'
 import {
   unUtilisateurConseiller,
@@ -61,13 +62,13 @@ describe('GetDossierMiloJeuneQueryHandler', () => {
       }
 
       // When
-      const rejected = await getDossierMiloJeuneQueryHandler.authorize(
+      const result = await getDossierMiloJeuneQueryHandler.authorize(
         query,
         utilisateur
       )
 
       // Then
-      expect(rejected).to.be.equal(undefined)
+      expect(result).to.deep.equal(emptySuccess())
     })
     it("rejette quand c'est un jeune", async () => {
       // Given
@@ -78,13 +79,13 @@ describe('GetDossierMiloJeuneQueryHandler', () => {
       }
 
       // When
-      const rejected = getDossierMiloJeuneQueryHandler.authorize(
+      const result = await getDossierMiloJeuneQueryHandler.authorize(
         query,
         utilisateur
       )
 
       // Then
-      await expect(rejected).to.be.rejectedWith(Unauthorized)
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
   })
 })

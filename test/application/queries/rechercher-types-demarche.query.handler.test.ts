@@ -8,6 +8,8 @@ import {
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { Core } from '../../../src/domain/core'
+import { emptySuccess, failure } from 'src/building-blocks/types/result'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 
 describe('RechercherTypesDemarcheQueryHandler', () => {
   let poleEmploiClient: StubbedClass<PoleEmploiClient>
@@ -197,33 +199,33 @@ describe('RechercherTypesDemarcheQueryHandler', () => {
   describe('authorize', () => {
     it('autorise un jeune pôle emploi', async () => {
       // When
-      const call = rechercherTypesDemarcheQueryHandler.authorize(
+      const result = await rechercherTypesDemarcheQueryHandler.authorize(
         { recherche: '' },
         unUtilisateurJeune({ structure: Core.Structure.POLE_EMPLOI })
       )
 
       // Then
-      await expect(call).not.to.be.rejected()
+      expect(result).to.deep.equal(emptySuccess())
     })
     it('rejette un jeune milo', async () => {
       // When
-      const call = rechercherTypesDemarcheQueryHandler.authorize(
+      const result = await rechercherTypesDemarcheQueryHandler.authorize(
         { recherche: '' },
         unUtilisateurJeune({ structure: Core.Structure.MILO })
       )
 
       // Then
-      await expect(call).to.be.rejected()
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
     it('rejette un conseiller', async () => {
       // When
-      const call = rechercherTypesDemarcheQueryHandler.authorize(
+      const result = await rechercherTypesDemarcheQueryHandler.authorize(
         { recherche: '' },
         unUtilisateurConseiller()
       )
 
       // Then
-      await expect(call).to.be.rejected()
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
   })
 })

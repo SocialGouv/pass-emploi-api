@@ -1,10 +1,11 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { Unauthorized } from '../../../src/domain/erreur'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { createSandbox, expect } from '../../utils'
-import { Recherche } from '../../../src/domain/recherche'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { RechercheAuthorizer } from '../../../src/application/authorizers/authorize-recherche'
+import { Recherche } from '../../../src/domain/recherche'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
+import { createSandbox, expect } from '../../utils'
 
 describe('RechercheAuthorizer', () => {
   let rechercheRepository: StubbedType<Recherche.Repository>
@@ -18,7 +19,7 @@ describe('RechercheAuthorizer', () => {
 
   describe('authorize', () => {
     describe('quand la recherche existe et est liée au jeune', () => {
-      it("valide l'autorisation", async () => {
+      it('retourne un success', async () => {
         // Given
         const utilisateur = unUtilisateurJeune()
         const recherche = uneRecherche()
@@ -35,11 +36,11 @@ describe('RechercheAuthorizer', () => {
         )
 
         // Then
-        expect(result).to.be.equal(undefined)
+        expect(result).to.deep.equal(emptySuccess())
       })
     })
     describe("quand le jeune n'a pas cette recherche", () => {
-      it('retourne une erreur', async () => {
+      it('retourne une failure', async () => {
         // Given
         const utilisateur = unUtilisateurJeune()
         const recherche = uneRecherche()
@@ -49,14 +50,14 @@ describe('RechercheAuthorizer', () => {
           .resolves(false)
 
         // When
-        const call = rechercheAuthorizer.authorize(
+        const result = await rechercheAuthorizer.authorize(
           utilisateur.id,
           recherche.id,
           utilisateur
         )
 
         // Then
-        await expect(call).to.be.rejectedWith(Unauthorized)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
   })

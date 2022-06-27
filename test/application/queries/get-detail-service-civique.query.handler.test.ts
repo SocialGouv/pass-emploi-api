@@ -101,10 +101,7 @@ describe('GetDetailServiceCiviqueQuery', () => {
         .resolves(detailOffreEngagementQueryModel)
 
       // When
-      await getDetailServiceCiviqueQueryHandler.monitor(
-        unUtilisateurJeune(),
-        getServicesCiviqueQuery
-      )
+      await getDetailServiceCiviqueQueryHandler.monitor(unUtilisateurJeune())
 
       // Then
       expect(evenementService.creerEvenement).to.have.been.calledWith(

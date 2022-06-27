@@ -11,6 +11,7 @@ import {
 } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
+  failure,
   Failure,
   isFailure,
   Result
@@ -58,10 +59,10 @@ describe('DeleteJeuneInactifCommandHandler', () => {
       const utilisateur = unUtilisateurConseiller()
 
       // When
-      const promise = commandHandler.authorize(command, utilisateur)
+      const result = await commandHandler.authorize(command, utilisateur)
 
       // Then
-      await expect(promise).not.to.be.rejected()
+      expect(result).to.deep.equal(emptySuccess())
     })
 
     it('interdit un jeune', async () => {
@@ -69,14 +70,10 @@ describe('DeleteJeuneInactifCommandHandler', () => {
       const utilisateur = unUtilisateurJeune()
 
       // When
-      let erreur
-      try {
-        await commandHandler.authorize(command, utilisateur)
-      } catch (e) {
-        erreur = e
-      }
+      const result = await commandHandler.authorize(command, utilisateur)
+
       // Then
-      expect(erreur).to.be.an.instanceof(DroitsInsuffisants)
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
   })
 

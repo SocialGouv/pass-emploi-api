@@ -1,33 +1,34 @@
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { SinonSandbox } from 'sinon'
+import { SupportAuthorizer } from 'src/application/authorizers/authorize-support'
+import { Authentification } from 'src/domain/authentification'
 import {
   CreateCampagneCommand,
   CreateCampagneCommandHandler
 } from '../../../src/application/commands/create-campagne.command'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { CampagneExisteDejaError } from '../../../src/building-blocks/types/domain-error'
+import { failure, success } from '../../../src/building-blocks/types/result'
 import { Campagne } from '../../../src/domain/campagne'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { SinonSandbox } from 'sinon'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { uneCampagne } from '../../fixtures/campagne.fixture'
 import { uneDatetime } from '../../fixtures/date.fixture'
-import { failure, success } from '../../../src/building-blocks/types/result'
-import { CampagneExisteDejaError } from '../../../src/building-blocks/types/domain-error'
-import {
-  unUtilisateurConseiller,
-  unUtilisateurSupport
-} from '../../fixtures/authentification.fixture'
-import { Unauthorized } from '../../../src/domain/erreur'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('CreateCampagneCommandHandler', () => {
   let campagneRepository: StubbedType<Campagne.Repository>
   let campagneFactory: StubbedClass<Campagne.Factory>
   let createCampagneCommandeHandler: CreateCampagneCommandHandler
+  let supportAuthorizer: StubbedClass<SupportAuthorizer>
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     campagneRepository = stubInterface(sandbox)
     campagneFactory = stubClass(Campagne.Factory)
+    supportAuthorizer = stubClass(SupportAuthorizer)
     createCampagneCommandeHandler = new CreateCampagneCommandHandler(
       campagneRepository,
-      campagneFactory
+      campagneFactory,
+      supportAuthorizer
     )
   })
 
@@ -76,31 +77,19 @@ describe('CreateCampagneCommandHandler', () => {
       dateDebut: uneDatetime,
       dateFin: uneDatetime.plus({ week: 2 })
     }
+    const utilisateur: Authentification.Utilisateur = unUtilisateurConseiller()
 
-    describe("quand c'est quelqu'un du support", () => {
-      it('autorise', async () => {
-        // When
-        const call = createCampagneCommandeHandler.authorize(
-          command,
-          unUtilisateurSupport()
-        )
+    it('autorise le support', async () => {
+      // When
+      await createCampagneCommandeHandler.authorize(
+        command,
+        unUtilisateurConseiller()
+      )
 
-        // Then
-        expect(call).to.be.rejectedWith(Unauthorized)
-      })
-    })
-
-    describe("quand c'est quelqu'un qui n'est pas du support", () => {
-      it('rejette', async () => {
-        // When
-        const call = createCampagneCommandeHandler.authorize(
-          command,
-          unUtilisateurConseiller()
-        )
-
-        // Then
-        expect(call).to.be.rejectedWith(Unauthorized)
-      })
+      // Then
+      expect(supportAuthorizer.authorize).to.have.been.calledWithExactly(
+        utilisateur
+      )
     })
   })
 })

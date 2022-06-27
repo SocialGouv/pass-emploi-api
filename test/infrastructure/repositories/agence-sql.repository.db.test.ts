@@ -46,15 +46,5 @@ describe('AgenceSqlRepository', () => {
         nom: 'Bonjour je suis une agence'
       })
     })
-
-    it("getStructureOfAgence retourne la structure de l'agence", async () => {
-      // When
-      const result = await agenceSqlRepository.getStructureOfAgence(
-        'Bonjour je suis un id pe'
-      )
-
-      // Then
-      expect(result).to.deep.equal(Structure.POLE_EMPLOI)
-    })
   })
 })

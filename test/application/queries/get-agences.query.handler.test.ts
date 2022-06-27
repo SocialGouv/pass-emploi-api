@@ -5,9 +5,10 @@ import {
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { expect } from '../../utils'
-import { Unauthorized } from '../../../src/domain/erreur'
 import { Authentification } from '../../../src/domain/authentification'
 import Structure = Core.Structure
+import { emptySuccess, failure } from 'src/building-blocks/types/result'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 
 describe('GetAgenceQuery', () => {
   describe('authorize', () => {
@@ -16,12 +17,12 @@ describe('GetAgenceQuery', () => {
     describe("quand l'utilisateur est un jeune", () => {
       it('doit renvoyer unauthorized', async () => {
         // When
-        const call = handler.authorize(
+        const result = await handler.authorize(
           { structure: Structure.MILO },
           unUtilisateurJeune()
         )
 
-        await expect(call).to.be.rejectedWith(Unauthorized)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
 
@@ -41,34 +42,34 @@ describe('GetAgenceQuery', () => {
         }
 
         // When
-        const call = handler.authorize(
+        const result = await handler.authorize(
           { structure: Structure.MILO },
           jackieLeSupport
         )
 
-        await expect(call).to.be.rejectedWith(Unauthorized)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
 
     describe("quand l'utilisateur est un conseiller", () => {
-      it("doit renvoyer unauthorized si il n'est pas de la même structure", async () => {
+      it("doit renvoyer une failure si il n'est pas de la même structure", async () => {
         // When
-        const call = handler.authorize(
+        const result = await handler.authorize(
           { structure: Structure.MILO },
           unUtilisateurConseiller({ structure: Structure.POLE_EMPLOI })
         )
 
-        await expect(call).to.be.rejectedWith(Unauthorized)
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
 
-      it('doit renvoyer rien si il est de la même structure', async () => {
+      it('doit renvoyer un success si il est de la même structure', async () => {
         // When
-        const call = handler.authorize(
+        const result = await handler.authorize(
           { structure: Structure.MILO },
           unUtilisateurConseiller({ structure: Structure.MILO })
         )
 
-        await expect(call).to.not.be.rejected()
+        expect(result).to.deep.equal(emptySuccess())
       })
     })
   })
