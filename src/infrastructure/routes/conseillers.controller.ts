@@ -325,10 +325,7 @@ export class ConseillersController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<Core.Id> {
     const command: CreateRendezVousCommand = {
-      idsJeunes: buildIdsJeunes(
-        createRendezVousPayload.jeuneId,
-        createRendezVousPayload.jeunesIds
-      ),
+      idsJeunes: createRendezVousPayload.jeunesIds,
       commentaire: createRendezVousPayload.comment,
       date: createRendezVousPayload.date,
       duree: createRendezVousPayload.duration,
@@ -514,16 +511,4 @@ export class ConseillersController {
     )
     handleFailure(result)
   }
-}
-
-// TODO: ENLEVER QUAND LE WEB EST A JOUR
-function buildIdsJeunes(idJeune?: string, idsJeunes?: string[]): string[] {
-  if (idsJeunes) {
-    return idsJeunes
-  }
-  if (idJeune) {
-    return [idJeune]
-  }
-  // cas non atteignable
-  return []
 }
