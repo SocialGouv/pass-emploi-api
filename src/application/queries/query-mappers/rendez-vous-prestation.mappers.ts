@@ -3,7 +3,6 @@ import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous
 } from 'src/domain/rendez-vous'
-import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
 import { PrestationDto } from '../../../infrastructure/clients/dto/pole-emploi.dto'
@@ -12,7 +11,6 @@ export function fromPrestationDtoToRendezVousQueryModel(
   prestation: PrestationDto,
   jeune: Jeune,
   idService: IdService,
-  dateService: DateService,
   lienVisio?: string
 ): RendezVousJeuneQueryModel {
   return {
@@ -23,8 +21,8 @@ export function fromPrestationDtoToRendezVousQueryModel(
       code: CodeTypeRendezVous.PRESTATION,
       label: mapCodeLabelTypeRendezVous[CodeTypeRendezVous.PRESTATION]
     },
-    date: dateService.fromISOStringToUTCJSDate(prestation.session.dateDebut),
-    isLocaleDate: false,
+    date: buildDateSansTimezone(prestation.session.dateDebut),
+    isLocaleDate: true,
     comment: prestation.session.commentaire,
     jeune: { id: jeune.id, nom: jeune.lastName, prenom: jeune.firstName },
     modality: buildModality(prestation),
@@ -84,6 +82,11 @@ function buildAdresse(prestation: PrestationDto): string | undefined {
     .join(' ')
     .trim()
   return adresse || undefined
+}
+
+export function buildDateSansTimezone(dateDebutPrestation: string): Date {
+  const dateSansLaTimeZone = dateDebutPrestation.substring(0, 19)
+  return new Date(dateSansLaTimeZone + 'Z')
 }
 
 function buildDuration(prestation: PrestationDto): number {
