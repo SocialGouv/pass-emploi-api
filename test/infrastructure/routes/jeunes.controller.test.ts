@@ -947,10 +947,10 @@ describe('JeunesController', () => {
         metadonnees: {
           nombreTotal: 0,
           nombreEnCours: 0,
-          nombreTermine: 0,
-          nombreAnnule: 0,
-          nombrePasCommence: 0,
-          nombreElementsParPage: 10
+          nombreTerminees: 0,
+          nombreAnnulees: 0,
+          nombrePasCommencees: 0,
+          nombreActionsParPage: 10
         }
       }
       const expectedActions = success(actionsByJeuneOutput)
@@ -974,10 +974,10 @@ describe('JeunesController', () => {
         metadonnees: {
           nombreTotal: 1,
           nombreEnCours: 2,
-          nombreTermine: 3,
-          nombreAnnule: 4,
-          nombrePasCommence: 5,
-          nombreElementsParPage: 10
+          nombreTerminees: 3,
+          nombreAnnulees: 4,
+          nombrePasCommencees: 5,
+          nombreActionsParPage: 10
         }
       }
       const expectedActions = success(actionsByJeuneOutput)
@@ -1000,19 +1000,19 @@ describe('JeunesController', () => {
         )
         .expect(
           'x-statut-done-count',
-          expectedActions.data.metadonnees.nombreTermine.toString()
+          expectedActions.data.metadonnees.nombreTerminees.toString()
         )
         .expect(
           'x-statut-canceled-count',
-          expectedActions.data.metadonnees.nombreAnnule.toString()
+          expectedActions.data.metadonnees.nombreAnnulees.toString()
         )
         .expect(
           'x-statut-not_started-count',
-          expectedActions.data.metadonnees.nombrePasCommence.toString()
+          expectedActions.data.metadonnees.nombrePasCommencees.toString()
         )
         .expect(
           'x-page-size',
-          expectedActions.data.metadonnees.nombreElementsParPage.toString()
+          expectedActions.data.metadonnees.nombreActionsParPage.toString()
         )
     })
     it('retourne 400 quand le paramètre page est au mauvais format', async () => {

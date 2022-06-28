@@ -184,6 +184,10 @@ export class JeunesController {
     return this.getHomeJeuneHandler.execute({ idJeune }, utilisateur)
   }
 
+  @ApiOperation({
+    summary: 'Deprecated (Mobile)',
+    deprecated: true
+  })
   @Get(':idJeune/actions')
   @ApiResponse({
     type: ActionQueryModel,
@@ -217,11 +221,11 @@ export class JeunesController {
         .set({
           'x-total-count': result.data.metadonnees.nombreTotal,
           'x-statut-in_progress-count': result.data.metadonnees.nombreEnCours,
-          'x-statut-done-count': result.data.metadonnees.nombreTermine,
-          'x-statut-canceled-count': result.data.metadonnees.nombreAnnule,
+          'x-statut-done-count': result.data.metadonnees.nombreTerminees,
+          'x-statut-canceled-count': result.data.metadonnees.nombreAnnulees,
           'x-statut-not_started-count':
-            result.data.metadonnees.nombrePasCommence,
-          'x-page-size': result.data.metadonnees.nombreElementsParPage
+            result.data.metadonnees.nombrePasCommencees,
+          'x-page-size': result.data.metadonnees.nombreActionsParPage
         })
         .status(statusCode)
         .json(result.data.actions)

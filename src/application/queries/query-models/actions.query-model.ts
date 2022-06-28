@@ -35,6 +35,20 @@ export class ActionQueryModel {
   jeune?: JeuneQueryModel
 }
 
+export class ActionsMetadonneesQueryModel {
+  nombreTotal: number
+  nombreEnCours: number
+  nombreTerminees: number
+  nombreAnnulees: number
+  nombrePasCommencees: number
+  nombreActionsParPage: number
+}
+
+export class ListeActionsV2QueryModel {
+  actions: ActionQueryModel[]
+  metadonnees: ActionsMetadonneesQueryModel
+}
+
 export class AttributDemarcheQueryModel {
   @ApiProperty()
   label: string

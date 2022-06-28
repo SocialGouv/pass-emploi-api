@@ -40,10 +40,10 @@ describe('GetJeuneHomeActionsQueryHandler', () => {
         metadonnees: {
           nombreTotal: 5,
           nombreEnCours: 2,
-          nombreTermine: 1,
-          nombreAnnule: 1,
-          nombrePasCommence: 1,
-          nombreElementsParPage: 10
+          nombreTerminees: 1,
+          nombreAnnulees: 1,
+          nombrePasCommencees: 1,
+          nombreActionsParPage: 10
         }
       }
       getActionsByJeuneQueryHandler.handle
