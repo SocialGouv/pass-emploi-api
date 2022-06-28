@@ -693,14 +693,14 @@ describe('JeunesController', () => {
   describe('GET /jeunes/:idJeune/rendez-vous', () => {
     const idJeune = '1'
     describe("quand c'est un jeune pole-emploi", () => {
-      it('renvoie une 404 quand le jeune n"existe pas', async () => {
+      it('throws une NonTrouveError quand le jeune n"existe pas', async () => {
         // Given
         jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
         getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(
           failure(new NonTrouveError('Jeune', '1'))
         )
         const expectedResponseJson = {
-          statusCode: HttpStatus.NOT_FOUND,
+          code: NonTrouveError.CODE,
           message: `Jeune ${idJeune} non trouvé(e)`
         }
         // When
@@ -728,13 +728,13 @@ describe('JeunesController', () => {
       const idJeune = '1'
       const rendezVousJeuneQueryModel: RendezVousJeuneQueryModel[] = []
 
-      it('renvoit une 404 quand le jeune n"existe pas', async () => {
+      it('throws une NonTrouveError quand le jeune n"existe pas', async () => {
         // Given
         getRendezVousJeuneQueryHandler.execute.resolves(
           failure(new NonTrouveError('Jeune', '1'))
         )
         const expectedResponseJson = {
-          statusCode: HttpStatus.NOT_FOUND,
+          code: NonTrouveError.CODE,
           message: `Jeune ${idJeune} non trouvé(e)`
         }
         // When

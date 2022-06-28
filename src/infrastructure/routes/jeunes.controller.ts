@@ -450,21 +450,11 @@ export class JeunesController {
       )
     }
 
-    if (isSuccess(result)) {
-      return result.data
-    }
     if (isFailure(result)) {
-      if (result.error.code === NonTrouveError.CODE) {
-        throw new HttpException(result.error.message, HttpStatus.NOT_FOUND)
-      }
-      if (result.error.code === ErreurHttp.CODE) {
-        throw new HttpException(
-          result.error.message,
-          (result.error as ErreurHttp).statusCode
-        )
-      }
+      handleFailure(result)
+      throw new RuntimeException()
     }
-    throw new RuntimeException(result.error.message)
+    return result.data
   }
 
   @Post(':idJeune/action')
