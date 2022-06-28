@@ -71,3 +71,19 @@ export class GetActionsByJeuneQueryParams {
   @Transform(params => transformStringToArray(params, 'statuts'))
   statuts?: Action.Statut[]
 }
+
+export class GetActionsByJeuneV2QueryParams {
+  @IsInt()
+  @Type(() => Number)
+  @Min(1)
+  page: number
+
+  @IsEnum(Action.Tri)
+  tri: Action.Tri
+
+  @ApiPropertyOptional({ enum: Action.Statut, isArray: true })
+  @IsOptional()
+  @IsEnum(Action.Statut, { each: true })
+  @Transform(params => transformStringToArray(params, 'statuts'))
+  statuts?: Action.Statut[]
+}

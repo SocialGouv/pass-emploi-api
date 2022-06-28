@@ -78,6 +78,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
         }
       })
     })
+
     describe('quand il existe uniquement des actions terminées', () => {
       it('renvoie les actions triées par la plus récente', async () => {
         // Given
@@ -131,6 +132,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
         }
       })
     })
+
     describe('quand il existe des actions avec des statuts differents', () => {
       it('renvoie les actions triées par la plus récente', async () => {
         // Given
@@ -184,6 +186,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
         }
       })
     })
+
     describe('quand il existe uniquement des actions pas commencées et en cours', () => {
       it('renvoie les actions triées par la plus récente avec le statut terminé en dernier', async () => {
         // Given
@@ -249,6 +252,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
         }
       })
     })
+
     describe('quand le numéro de page demandé est supérieur à la dernière page', () => {
       it('renvoie une failure', async () => {
         // When
@@ -260,6 +264,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
         expect(result).to.deep.equal(failure(new NonTrouveError('Page', '2')))
       })
     })
+
     describe("quand il n'existe pas d'actions et qu'on demande la première page", () => {
       it('retourne un tableau vide et 0 résultat', async () => {
         // When
@@ -274,6 +279,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
         }
       })
     })
+
     describe('quand il existe plus de 10 actions', () => {
       it('retourne les actions de la bonne page et le nombre total de résultats', async () => {
         // Given
@@ -317,6 +323,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
         }
       })
     })
+
     describe('quand on trie', () => {
       it('applique le tri par date croissante uniquement', async () => {
         // Given
@@ -448,8 +455,9 @@ describe('GetActionsByJeuneQueryHandler', () => {
         }
       })
     })
+
     describe('quand on filtre', () => {
-      it("applique les filtres de statut d'action et donne le nombre total de résultats filtrés", async () => {
+      it("applique les filtres de statut d'action et donne le nombre total de résultats", async () => {
         // Given
         const actionPasCommencee = uneAction({
           id: '02b3710e-7779-11ec-90d6-0242ac120001',
@@ -510,7 +518,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
             uneActionQueryModelFromDomain(actionEnCours),
             uneActionQueryModelFromDomain(actionPasCommencee)
           ])
-          expect(result.data.metadonnees.nombreTotal).to.equal(2)
+          expect(result.data.metadonnees.nombreTotal).to.equal(4)
         }
       })
     })
@@ -587,10 +595,10 @@ describe('GetActionsByJeuneQueryHandler', () => {
             expect(result.data.metadonnees).to.deep.equal({
               nombreTotal: 5,
               nombreEnCours: 2,
-              nombreTermine: 1,
-              nombreAnnule: 1,
-              nombrePasCommence: 1,
-              nombreElementsParPage: 10
+              nombreTerminees: 1,
+              nombreAnnulees: 1,
+              nombrePasCommencees: 1,
+              nombreActionsParPage: 10
             })
           }
         })
