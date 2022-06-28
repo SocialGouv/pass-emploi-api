@@ -18,7 +18,10 @@ import { PoleEmploiPartenaireClient } from '../../infrastructure/clients/pole-em
 import { buildError } from '../../utils/logger.module'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
 import { fromRendezVousDtoToRendezVousQueryModel } from './query-mappers/rendez-vous-pole-emploi.mappers'
-import { fromPrestationDtoToRendezVousQueryModel } from './query-mappers/rendez-vous-prestation.mappers'
+import {
+  buildDateSansTimezone,
+  fromPrestationDtoToRendezVousQueryModel
+} from './query-mappers/rendez-vous-prestation.mappers'
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
 import {
   PrestationDto,
@@ -78,7 +81,9 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
 
       const rendezVousPrestations = await Promise.all(
         prestations.map(async prestation => {
-          const dateRendezVous = DateTime.fromISO(prestation.session.dateDebut)
+          const dateRendezVous = DateTime.fromJSDate(
+            buildDateSansTimezone(prestation.session.dateDebut)
+          )
           const avecVisio =
             prestation.session.natureAnimation === 'INTERNE' ||
             prestation.session.modalitePremierRendezVous === 'WEBCAM'
@@ -104,13 +109,19 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
             }
           }
 
-          return fromPrestationDtoToRendezVousQueryModel(
-            prestation,
-            jeune,
-            this.idService,
-            this.dateService,
-            lienVisio
-          )
+          // TODO en attente du contract testing
+          try {
+            return fromPrestationDtoToRendezVousQueryModel(
+              prestation,
+              jeune,
+              this.idService,
+              lienVisio
+            )
+          } catch (e) {
+            this.logger.error('Impossible de mapper la prestation.')
+            this.logger.error(prestation)
+            throw e
+          }
         })
       )
       const rendezVousPoleEmploi = rendezVousPoleEmploiDto.map(rendezVous => {
