@@ -69,7 +69,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
   describe('fromPrestationDtoToRendezVousQueryModel', () => {
     const jeune = unJeune()
     const dateString = '2014-03-24T09:00:00+01:00'
-    const dateUTC = new Date('2014-03-24T08:00:00.000Z')
+    const dateUTC = new Date('2014-03-24T09:00:00.000Z')
 
     const prestation: PrestationDto = {
       annule: false,
@@ -93,15 +93,9 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
     }
 
     it('retourne un RendezVousConseillerQueryModel avec le bon modele, la durée en jour et la date en UTC', async () => {
-      dateService.fromISOStringToUTCJSDate.returns(dateUTC)
       // When
       const RendezVousConseillerQueryModel =
-        fromPrestationDtoToRendezVousQueryModel(
-          prestation,
-          jeune,
-          idService,
-          dateService
-        )
+        fromPrestationDtoToRendezVousQueryModel(prestation, jeune, idService)
 
       // Then
       expect(RendezVousConseillerQueryModel).to.deep.equal({
@@ -109,7 +103,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         annule: false,
         idStable: undefined,
         date: dateUTC,
-        isLocaleDate: false,
+        isLocaleDate: true,
         duration: 0,
         id: 'random-id',
         jeune: {
@@ -140,12 +134,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       }
       // When
       const RendezVousConseillerQueryModel =
-        fromPrestationDtoToRendezVousQueryModel(
-          prestation,
-          jeune,
-          idService,
-          dateService
-        )
+        fromPrestationDtoToRendezVousQueryModel(prestation, jeune, idService)
       // Then
       expect(RendezVousConseillerQueryModel.duration).to.equal(90)
     })
@@ -158,7 +147,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           prestation,
           jeune,
           idService,
-          dateService,
           lienVisio
         )
       // Then
@@ -174,12 +162,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       }
       // When
       const RendezVousConseillerQueryModel =
-        fromPrestationDtoToRendezVousQueryModel(
-          prestation,
-          jeune,
-          idService,
-          dateService
-        )
+        fromPrestationDtoToRendezVousQueryModel(prestation, jeune, idService)
       // Then
       expect(RendezVousConseillerQueryModel.adresse).to.equal(
         'ligne1 ligne2 code postal ville'
@@ -192,12 +175,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       }
       // When
       const RendezVousConseillerQueryModel =
-        fromPrestationDtoToRendezVousQueryModel(
-          prestation,
-          jeune,
-          idService,
-          dateService
-        )
+        fromPrestationDtoToRendezVousQueryModel(prestation, jeune, idService)
       // Then
       expect(RendezVousConseillerQueryModel.description).to.equal(
         'theme\ndescriptif'
@@ -210,12 +188,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       }
       // When
       const RendezVousConseillerQueryModel =
-        fromPrestationDtoToRendezVousQueryModel(
-          prestation,
-          jeune,
-          idService,
-          dateService
-        )
+        fromPrestationDtoToRendezVousQueryModel(prestation, jeune, idService)
       // Then
       expect(RendezVousConseillerQueryModel.description).to.equal(
         'sous theme\ndescriptif'
@@ -316,7 +289,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       }
       const jeune = unJeune()
       const datePrestation = '2014-03-24T14:00:00+01:00'
-      const expectedDatePrestation = new Date('2014-03-24T13:00:00.000Z')
+      const expectedDatePrestation = new Date('2014-03-24T14:00:00.000Z')
       const dateRendezVous = '2014-03-24'
       const heureRendezVous = '12:20'
       const expectedDateRendezVous = new Date('2014-03-24T12:20:00.000Z')
@@ -411,7 +384,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
 
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           dateService.now.returns(maintenant)
-          dateService.fromISOStringToUTCJSDate.returns(expectedDatePrestation)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(idpToken, maintenant)
             .resolves({ ...axiosResponse, data: prestations })
@@ -460,7 +432,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                 annule: false,
                 comment: undefined,
                 date: expectedDatePrestation,
-                isLocaleDate: false,
+                isLocaleDate: true,
                 description: "Utiliser Internet dans sa recherche d'emploi",
                 duration: 0,
                 id: 'random-id',
@@ -529,7 +501,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           ]
 
           dateService.now.returns(maintenant)
-          dateService.fromISOStringToUTCJSDate.returns(expectedDatePrestation)
           dateService.isSameDateDay.returns(true)
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getPrestations
@@ -582,7 +553,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                 annule: false,
                 comment: undefined,
                 date: expectedDatePrestation,
-                isLocaleDate: false,
+                isLocaleDate: true,
                 description: undefined,
                 duration: 0,
                 id: 'random-id',
