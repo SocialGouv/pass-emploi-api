@@ -135,6 +135,7 @@ import { EvenementsController } from './infrastructure/routes/evenements.control
 import { FavorisController } from './infrastructure/routes/favoris.controller'
 import { HealthController } from './infrastructure/routes/health.controller'
 import { JeunesController } from './infrastructure/routes/jeunes.controller'
+import { JeunesControllerV2 } from './infrastructure/routes/v2/jeunes.controller.v2'
 import { OffresEmploiController } from './infrastructure/routes/offres-emploi.controller'
 import { OffresImmersionController } from './infrastructure/routes/offres-immersion.controller'
 import { RecherchesController } from './infrastructure/routes/recherches.controller'
@@ -200,6 +201,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
   controllers: [
     ActionsController,
     JeunesController,
+    JeunesControllerV2,
     OffresEmploiController,
     OffresImmersionController,
     ConseillersController,

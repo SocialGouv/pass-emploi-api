@@ -29,10 +29,10 @@ export interface ActionsByJeuneOutput {
   metadonnees: {
     nombreTotal: number
     nombreEnCours: number
-    nombreTermine: number
-    nombreAnnule: number
-    nombrePasCommence: number
-    nombreElementsParPage: number
+    nombreTerminees: number
+    nombreAnnulees: number
+    nombrePasCommencees: number
+    nombreActionsParPage: number
   }
 }
 
@@ -58,7 +58,7 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
       ActionSqlModel.count({
         where: filtres
       }),
-      this.getCompteParStatut(query)
+      this.compterActionsParStatut(query)
     ])
 
     if (!laPageExiste(nombreTotalActionsFiltrees, query.page)) {
@@ -68,15 +68,24 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
     const result: ActionsByJeuneOutput = {
       actions: [],
       metadonnees: {
-        nombreTotal: nombreTotalActionsFiltrees,
-        nombreEnCours: this.getCompte(statutRawCount, Action.Statut.EN_COURS),
-        nombreTermine: this.getCompte(statutRawCount, Action.Statut.TERMINEE),
-        nombreAnnule: this.getCompte(statutRawCount, Action.Statut.ANNULEE),
-        nombrePasCommence: this.getCompte(
+        nombreTotal: this.compterToutesLesActions(statutRawCount),
+        nombreEnCours: this.getCompteDuStatut(
+          statutRawCount,
+          Action.Statut.EN_COURS
+        ),
+        nombreTerminees: this.getCompteDuStatut(
+          statutRawCount,
+          Action.Statut.TERMINEE
+        ),
+        nombreAnnulees: this.getCompteDuStatut(
+          statutRawCount,
+          Action.Statut.ANNULEE
+        ),
+        nombrePasCommencees: this.getCompteDuStatut(
           statutRawCount,
           Action.Statut.PAS_COMMENCEE
         ),
-        nombreElementsParPage: LIMITE_NOMBRE_ACTIONS_PAR_PAGE
+        nombreActionsParPage: LIMITE_NOMBRE_ACTIONS_PAR_PAGE
       }
     }
     if (nombreTotalActionsFiltrees === 0) {
@@ -120,7 +129,7 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
     return
   }
 
-  private getCompteParStatut(
+  private compterActionsParStatut(
     query: GetActionsByJeuneQuery
   ): Promise<RawCount[]> {
     return this.sequelize.query(
@@ -139,7 +148,17 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
     ) as unknown as Promise<RawCount[]>
   }
 
-  private getCompte(statutRawCount: RawCount[], statut: Action.Statut): number {
+  private compterToutesLesActions(statutRawCount: RawCount[]): number {
+    return statutRawCount.reduce(
+      (total, { count }) => total + parseInt(count),
+      0
+    )
+  }
+
+  private getCompteDuStatut(
+    statutRawCount: RawCount[],
+    statut: Action.Statut
+  ): number {
     const count = statutRawCount.find(raw => raw.statut === statut)?.count
     return count ? parseInt(count) : 0
   }
