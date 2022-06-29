@@ -17,6 +17,7 @@ import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-associat
 import { SituationsMiloSqlModel } from './situations-milo.sql-model'
 import { CampagneSqlModel } from './campagne.sql-model'
 import { ReponseCampagneSqlModel } from './reponse-campagne.sql-model'
+import { ArchivageJeuneSqlModel } from './archivage-jeune.sql-model'
 
 export const sqlModels = [
   ConseillerSqlModel,
@@ -37,5 +38,6 @@ export const sqlModels = [
   SituationsMiloSqlModel,
   CampagneSqlModel,
   ReponseCampagneSqlModel,
-  FichierSqlModel
+  FichierSqlModel,
+  ArchivageJeuneSqlModel
 ]

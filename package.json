@@ -67,7 +67,7 @@
     "class-transformer": "0.5.1",
     "class-validator": "0.13.2",
     "compression": "^1.7.4",
-    "crypto-js": "4.1.1",
+    "crypto-js": "^4.1.1",
     "elastic-apm-node": "3.36.0",
     "firebase-admin": "11.0.0",
     "geojson": "^0.5.0",

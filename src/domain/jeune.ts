@@ -2,7 +2,6 @@ import { DateTime } from 'luxon'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
 import { Brand } from '../building-blocks/types/brand'
 import { DateService } from '../utils/date-service'
-import { ArchivageJeune } from './archivage-jeune'
 import { Core } from './core'
 
 export const JeunesRepositoryToken = 'Jeune.Repository'
@@ -66,10 +65,6 @@ export namespace Jeune {
       idConseillerSource: string,
       estTemporaire?: boolean
     ): Promise<void>
-
-    getDonnesDArchivage(
-      idJeune: string
-    ): Promise<ArchivageJeune.DonneesArchivees>
   }
 
   export function updateToken(

@@ -5,7 +5,7 @@ import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune
 import { TransfererJeunesConseillerCommandHandler } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
 import { UpdateStatutDemarcheCommandHandler } from 'src/application/commands/update-demarche.command.handler'
 import { UpdateNotificationTokenCommandHandler } from 'src/application/commands/update-notification-token.command.handler'
-import { ArchivageJeune } from 'src/domain/archivage-jeune'
+import { ArchiveJeune } from 'src/domain/archive-jeune'
 import { Core } from 'src/domain/core'
 import { Demarche } from 'src/domain/demarche'
 import { RendezVous } from 'src/domain/rendez-vous'
@@ -559,14 +559,14 @@ describe('JeunesController', () => {
       await request(app.getHttpServer())
         .post(`/jeunes/id-jeune/archiver`)
         .set('authorization', unHeaderAuthorization())
-        .send({ motif: ArchivageJeune.Motif.AUTRE })
+        .send({ motif: ArchiveJeune.MotifSuppression.AUTRE })
         //Then
         .expect(HttpStatus.NO_CONTENT)
 
       expect(archiverJeuneCommandHandler.execute).to.have.be.calledWithExactly(
         {
           idJeune: 'id-jeune',
-          motif: ArchivageJeune.Motif.AUTRE
+          motif: ArchiveJeune.MotifSuppression.AUTRE
         },
         unUtilisateurDecode()
       )
@@ -582,7 +582,7 @@ describe('JeunesController', () => {
       await request(app.getHttpServer())
         .post(`/jeunes/id-jeune/archiver`)
         .set('authorization', unHeaderAuthorization())
-        .send({ motif: ArchivageJeune.Motif.AUTRE })
+        .send({ motif: ArchiveJeune.MotifSuppression.AUTRE })
         //Then
         .expect(HttpStatus.FORBIDDEN)
     })

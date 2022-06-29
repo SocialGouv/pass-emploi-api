@@ -8,7 +8,14 @@ import { buildError } from '../../utils/logger.module'
 import { getAPMInstance } from '../monitoring/apm.init'
 import { ChatCryptoService } from '../../utils/chat-crypto-service'
 import { Jeune } from 'src/domain/jeune'
-import Timestamp = firestore.Timestamp
+import { ArchiveJeune } from '../../domain/archive-jeune'
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Utf8 = require('crypto-js/enc-utf8')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const AES = require('crypto-js/aes')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Base64 = require('crypto-js/enc-base64')
 
 export interface IFirebaseClient {
   send(tokenMessage: TokenMessage): Promise<void>
@@ -179,7 +186,7 @@ export class FirebaseClient implements IFirebaseClient {
                 : 'NOUVEAU_CONSEILLER',
               content: encryptedText,
               iv: iv,
-              creationDate: Timestamp.fromDate(new Date())
+              creationDate: firestore.Timestamp.fromDate(new Date())
             }
           )
         }
@@ -211,14 +218,31 @@ export class FirebaseClient implements IFirebaseClient {
     }
   }
 
-  async getChat(idJeune: string): Promise<Array<Record<string, string>>> {
+  async getChat(idJeune: string): Promise<ArchiveJeune.Message[]> {
     const collection = this.firestore.collection(FIREBASE_CHAT_PATH)
     const chats = await collection.where('jeuneId', '==', idJeune).get()
 
     if (!chats.empty) {
-      return chats.docs.map(doc => doc.data())
+      const messagesChiffres = await chats.docs[0].ref
+        .collection('messages')
+        .get()
+      const key = Utf8.parse(this.configService.get('firebase').encryptionKey)
+      return messagesChiffres.docs.map(message => {
+        const messageFirebase = message.data()
+        const contenu = AES.decrypt(messageFirebase.content, key, {
+          iv: Base64.parse(messageFirebase.iv)
+        }).toString(Utf8)
+        return {
+          contenu,
+          date: new Date(
+            parseInt(messageFirebase.creationDate._seconds) * 1000
+          ).toISOString(),
+          envoyePar: messageFirebase.sentBy,
+          type: messageFirebase.type
+        }
+      })
     }
-    return []
+    throw new Error()
   }
 }
 

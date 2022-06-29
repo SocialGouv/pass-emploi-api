@@ -8,13 +8,14 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  Min
+  Min,
+  ValidateIf
 } from 'class-validator'
 import { RendezVous } from 'src/domain/rendez-vous'
 import { Action } from '../../../domain/action'
 import { Transform, Type } from 'class-transformer'
 import { transformStringToArray } from './utils/transformers'
-import { ArchivageJeune } from 'src/domain/archivage-jeune'
+import { ArchiveJeune } from 'src/domain/archive-jeune'
 
 export class PutNotificationTokenInput {
   @ApiProperty()
@@ -24,11 +25,18 @@ export class PutNotificationTokenInput {
 }
 
 export class ArchiverJeunePayload {
-  @ApiProperty({ enum: ArchivageJeune.Motif })
+  @ApiProperty({ enum: ArchiveJeune.MotifSuppression })
   @IsString()
   @IsNotEmpty()
-  @IsEnum(ArchivageJeune.Motif)
-  motif: ArchivageJeune.Motif
+  @IsEnum(ArchiveJeune.MotifSuppression)
+  motif: ArchiveJeune.MotifSuppression
+
+  @ApiPropertyOptional()
+  @ValidateIf(payload => payload.motif === ArchiveJeune.MotifSuppression.AUTRE)
+  @IsNotEmpty()
+  @IsOptional()
+  @IsString()
+  commentaire?: string
 }
 
 export class TransfererConseillerPayload {
