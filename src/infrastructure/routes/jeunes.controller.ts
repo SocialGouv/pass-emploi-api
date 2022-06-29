@@ -21,6 +21,7 @@ import {
   ApiTags
 } from '@nestjs/swagger'
 import { Response } from 'express'
+import { ArchiverJeuneCommandHandler } from 'src/application/commands/archiver-jeune.command.handler'
 import {
   CreateDemarcheCommand,
   CreateDemarcheCommandHandler
@@ -78,6 +79,7 @@ import {
   UpdateStatutDemarchePayload
 } from './validation/demarches.inputs'
 import {
+  ArchiverJeunePayload,
   GetActionsByJeuneQueryParams,
   GetRendezVousJeuneQueryParams,
   PutNotificationTokenInput,
@@ -100,6 +102,7 @@ export class JeunesController {
     private readonly getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler,
     private readonly transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler,
     private readonly deleteJeuneCommandHandler: DeleteJeuneCommandHandler,
+    private readonly archiverJeuneCommandHandler: ArchiverJeuneCommandHandler,
     private readonly deleteJeuneInactifCommandHandler: DeleteJeuneInactifCommandHandler,
     private readonly getActionsPoleEmploiQueryHandler: GetActionsJeunePoleEmploiQueryHandler,
     private readonly getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler,
@@ -459,7 +462,6 @@ export class JeunesController {
         )
         break
       case Authentification.Type.JEUNE:
-      case Authentification.Type.SUPPORT:
         result = await this.deleteJeuneCommandHandler.execute(
           {
             idJeune
@@ -472,6 +474,24 @@ export class JeunesController {
           "Vous n'avez pas le droit d'effectuer cette action"
         )
     }
+
+    handleFailure(result)
+  }
+
+  @Post(':idJeune/archiver')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async archiverJeune(
+    @Param('idJeune') idJeune: string,
+    @Body() archiverJeunePayload: ArchiverJeunePayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.archiverJeuneCommandHandler.execute(
+      {
+        idJeune,
+        motif: archiverJeunePayload.motif
+      },
+      utilisateur
+    )
 
     handleFailure(result)
   }

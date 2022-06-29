@@ -1,9 +1,11 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { ArchiverJeuneCommandHandler } from 'src/application/commands/archiver-jeune.command.handler'
 import { CreateDemarcheCommandHandler } from 'src/application/commands/create-demarche.command.handler'
 import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
 import { TransfererJeunesConseillerCommandHandler } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
 import { UpdateStatutDemarcheCommandHandler } from 'src/application/commands/update-demarche.command.handler'
 import { UpdateNotificationTokenCommandHandler } from 'src/application/commands/update-notification-token.command.handler'
+import { ArchivageJeune } from 'src/domain/archivage-jeune'
 import { Core } from 'src/domain/core'
 import { Demarche } from 'src/domain/demarche'
 import { RendezVous } from 'src/domain/rendez-vous'
@@ -54,7 +56,6 @@ import {
   unHeaderAuthorization,
   unJwtPayloadValide,
   unJwtPayloadValideJeunePE,
-  unJwtPayloadValideSupport,
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
@@ -83,6 +84,7 @@ describe('JeunesController', () => {
   let createDemarcheCommandHandler: StubbedClass<CreateDemarcheCommandHandler>
   let getActionsByJeuneQueryHandler: StubbedClass<GetActionsByJeuneQueryHandler>
   let updateNotificationTokenCommandHandler: StubbedClass<UpdateNotificationTokenCommandHandler>
+  let archiverJeuneCommandHandler: StubbedClass<ArchiverJeuneCommandHandler>
   let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
@@ -118,6 +120,7 @@ describe('JeunesController', () => {
     updateNotificationTokenCommandHandler = stubClass(
       UpdateNotificationTokenCommandHandler
     )
+    archiverJeuneCommandHandler = stubClass(ArchiverJeuneCommandHandler)
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
@@ -152,6 +155,8 @@ describe('JeunesController', () => {
       .useValue(getActionsByJeuneQueryHandler)
       .overrideProvider(UpdateNotificationTokenCommandHandler)
       .useValue(updateNotificationTokenCommandHandler)
+      .overrideProvider(ArchiverJeuneCommandHandler)
+      .useValue(archiverJeuneCommandHandler)
       .overrideProvider(JwtService)
       .useValue(jwtService)
       .compile()
@@ -466,22 +471,6 @@ describe('JeunesController', () => {
         idJeune: 'id-jeune'
       })
     })
-    it("supprime le jeune quand t'es au support", async () => {
-      //Given
-      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideSupport())
-      deleteJeuneCommandHandler.execute.resolves(emptySuccess())
-
-      //When
-      await request(app.getHttpServer())
-        .delete(`/jeunes/id-jeune`)
-        .set('authorization', unHeaderAuthorization())
-        //Then
-        .expect(HttpStatus.NO_CONTENT)
-
-      expect(deleteJeuneCommandHandler.execute).to.have.be.calledWith({
-        idJeune: 'id-jeune'
-      })
-    })
 
     it("renvoie une 403 si l'utilisateur n'a pas les droits", async () => {
       //Given
@@ -559,6 +548,59 @@ describe('JeunesController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('delete', '/jeunes/whatever')
+  })
+
+  describe('POST /jeunes/:idJeune/archiver', () => {
+    it("archive le jeune quand t'es conseiller", async () => {
+      //Given
+      archiverJeuneCommandHandler.execute.resolves(emptySuccess())
+
+      //When
+      await request(app.getHttpServer())
+        .post(`/jeunes/id-jeune/archiver`)
+        .set('authorization', unHeaderAuthorization())
+        .send({ motif: ArchivageJeune.Motif.AUTRE })
+        //Then
+        .expect(HttpStatus.NO_CONTENT)
+
+      expect(archiverJeuneCommandHandler.execute).to.have.be.calledWithExactly(
+        {
+          idJeune: 'id-jeune',
+          motif: ArchivageJeune.Motif.AUTRE
+        },
+        unUtilisateurDecode()
+      )
+    })
+
+    it("renvoie une 403 si l'utilisateur n'a pas les droits", async () => {
+      //Given
+      archiverJeuneCommandHandler.execute.resolves(
+        failure(new DroitsInsuffisants())
+      )
+
+      //When
+      await request(app.getHttpServer())
+        .post(`/jeunes/id-jeune/archiver`)
+        .set('authorization', unHeaderAuthorization())
+        .send({ motif: ArchivageJeune.Motif.AUTRE })
+        //Then
+        .expect(HttpStatus.FORBIDDEN)
+    })
+
+    it('renvoie une 400 si motif non fourni', async () => {
+      //Given
+      archiverJeuneCommandHandler.execute.resolves(emptySuccess())
+
+      //When
+      await request(app.getHttpServer())
+        .post(`/jeunes/id-jeune/archiver`)
+        .set('authorization', unHeaderAuthorization())
+        .send({})
+        //Then
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/whatever/archiver')
   })
 
   describe('GET /jeunes/:idJeune/rendez-vous', () => {

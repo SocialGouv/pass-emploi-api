@@ -14,12 +14,21 @@ import { RendezVous } from 'src/domain/rendez-vous'
 import { Action } from '../../../domain/action'
 import { Transform, Type } from 'class-transformer'
 import { transformStringToArray } from './utils/transformers'
+import { ArchivageJeune } from 'src/domain/archivage-jeune'
 
 export class PutNotificationTokenInput {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   registration_token: string
+}
+
+export class ArchiverJeunePayload {
+  @ApiProperty({ enum: ArchivageJeune.Motif })
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(ArchivageJeune.Motif)
+  motif: ArchivageJeune.Motif
 }
 
 export class TransfererConseillerPayload {

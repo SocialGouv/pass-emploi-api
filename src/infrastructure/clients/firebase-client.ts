@@ -210,6 +210,16 @@ export class FirebaseClient implements IFirebaseClient {
       }
     }
   }
+
+  async getChat(idJeune: string): Promise<Array<Record<string, string>>> {
+    const collection = this.firestore.collection(FIREBASE_CHAT_PATH)
+    const chats = await collection.where('jeuneId', '==', idJeune).get()
+
+    if (!chats.empty) {
+      return chats.docs.map(doc => doc.data())
+    }
+    return []
+  }
 }
 
 function chunk(tableau: string[]): string[][] {

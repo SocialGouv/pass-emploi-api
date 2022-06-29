@@ -184,6 +184,7 @@ import { FindAllOffresImmersionQueryGetter } from './application/queries/query-g
 import { FindAllOffresServicesCiviqueQueryGetter } from './application/queries/query-getters/find-all-offres-services-civique.query.getter'
 import { RecupererJeunesDuConseillerCommandHandler } from './application/commands/recuperer-jeunes-du-conseiller.command.handler'
 import { HandleJobNettoyerPiecesJointesCommandHandler } from './application/commands/jobs/handle-job-nettoyer-pieces-jointes.command'
+import { ArchiverJeuneCommandHandler } from './application/commands/archiver-jeune.command.handler'
 import { GetMotifsSuppressionJeuneQueryHandler } from './application/queries/get-motifs-suppression-jeune-query-handler'
 import { RateLimiterService } from './utils/rate-limiter.service'
 
@@ -437,7 +438,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     RecupererJeunesDuConseillerCommandHandler,
     FichierAuthorizer,
     HandleJobNettoyerPiecesJointesCommandHandler,
-    GetMotifsSuppressionJeuneQueryHandler
+    GetMotifsSuppressionJeuneQueryHandler,
+    ArchiverJeuneCommandHandler
   ]
 }
 
