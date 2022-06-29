@@ -184,6 +184,7 @@ import { FindAllOffresImmersionQueryGetter } from './application/queries/query-g
 import { FindAllOffresServicesCiviqueQueryGetter } from './application/queries/query-getters/find-all-offres-services-civique.query.getter'
 import { RecupererJeunesDuConseillerCommandHandler } from './application/commands/recuperer-jeunes-du-conseiller.command.handler'
 import { HandleJobNettoyerPiecesJointesCommandHandler } from './application/commands/jobs/handle-job-nettoyer-pieces-jointes.command'
+import { ArchiverJeuneCommandHandler } from './application/commands/archiver-jeune.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -433,7 +434,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     FindAllOffresServicesCiviqueQueryGetter,
     RecupererJeunesDuConseillerCommandHandler,
     FichierAuthorizer,
-    HandleJobNettoyerPiecesJointesCommandHandler
+    HandleJobNettoyerPiecesJointesCommandHandler,
+    ArchiverJeuneCommandHandler
   ]
 }
 

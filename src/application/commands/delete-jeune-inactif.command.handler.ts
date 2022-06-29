@@ -65,10 +65,9 @@ export class DeleteJeuneInactifCommandHandler extends CommandHandler<
 
     if (jeune.isActivated) return failure(new JeunePasInactifError(jeune.id))
 
-    await Promise.all([
-      this.jeuneRepository.supprimer(idJeune),
-      this.chatRepository.supprimerChat(idJeune)
-    ])
+    await this.jeuneRepository.supprimer(idJeune)
+    await this.chatRepository.supprimerChat(idJeune)
+
     return emptySuccess()
   }
 
