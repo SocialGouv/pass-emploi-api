@@ -185,6 +185,8 @@ import { FindAllOffresServicesCiviqueQueryGetter } from './application/queries/q
 import { RecupererJeunesDuConseillerCommandHandler } from './application/commands/recuperer-jeunes-du-conseiller.command.handler'
 import { HandleJobNettoyerPiecesJointesCommandHandler } from './application/commands/jobs/handle-job-nettoyer-pieces-jointes.command'
 import { ArchiverJeuneCommandHandler } from './application/commands/archiver-jeune.command.handler'
+import { ArchivageJeunesRepositoryToken } from './domain/archivage-jeune'
+import { ArchivageJeuneSqlRepositoryDb } from './infrastructure/repositories/archivage-jeune-sql.repository.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -329,6 +331,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: FichierRepositoryToken,
       useClass: FichierSqlS3Repository
+    },
+    {
+      provide: ArchivageJeunesRepositoryToken,
+      useClass: ArchivageJeuneSqlRepositoryDb
     },
     ...databaseProviders
   ],

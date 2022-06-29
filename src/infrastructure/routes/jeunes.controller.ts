@@ -488,7 +488,8 @@ export class JeunesController {
     const result = await this.archiverJeuneCommandHandler.execute(
       {
         idJeune,
-        motif: archiverJeunePayload.motif
+        motif: archiverJeunePayload.motif,
+        commentaire: archiverJeunePayload.commentaire
       },
       utilisateur
     )

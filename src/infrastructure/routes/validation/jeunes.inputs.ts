@@ -8,7 +8,8 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  Min
+  Min,
+  ValidateIf
 } from 'class-validator'
 import { RendezVous } from 'src/domain/rendez-vous'
 import { Action } from '../../../domain/action'
@@ -29,6 +30,13 @@ export class ArchiverJeunePayload {
   @IsNotEmpty()
   @IsEnum(ArchivageJeune.Motif)
   motif: ArchivageJeune.Motif
+
+  @ApiPropertyOptional()
+  @ValidateIf(payload => payload.motif === ArchivageJeune.Motif.AUTRE)
+  @IsNotEmpty()
+  @IsOptional()
+  @IsString()
+  commentaire?: string
 }
 
 export class TransfererConseillerPayload {
