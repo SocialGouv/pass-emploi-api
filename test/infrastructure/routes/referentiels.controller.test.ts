@@ -10,14 +10,23 @@ import {
 import { GetAgencesQueryHandler } from '../../../src/application/queries/get-agences.query.handler'
 import { Core } from '../../../src/domain/core'
 import { RechercherTypesDemarcheQueryHandler } from '../../../src/application/queries/rechercher-types-demarche.query.handler'
-import { unUtilisateurDecode } from '../../fixtures/authentification.fixture'
+import {
+  unHeaderAuthorization,
+  unUtilisateurDecode
+} from '../../fixtures/authentification.fixture'
 import { TypesDemarcheQueryModel } from '../../../src/application/queries/query-models/types-demarche.query-model'
 import Structure = Core.Structure
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import {
+  GetMotifsSuppressionJeuneQueryHandler,
+  MotifsSuppressionJeuneQueryModel
+} from '../../../src/application/queries/get-motifs-suppression-jeune-query-handler'
+import { success } from '../../../src/building-blocks/types/result'
 
 let getCommunesEtDepartementsQueryHandler: StubbedClass<GetCommunesEtDepartementsQueryHandler>
 let getAgencesQueryHandler: StubbedClass<GetAgencesQueryHandler>
 let rechercherTypesDemarcheQueryHandler: StubbedClass<RechercherTypesDemarcheQueryHandler>
+let getMotifsSuppressionCommandHandler: StubbedClass<GetMotifsSuppressionJeuneQueryHandler>
 
 describe('ReferentielsController', () => {
   getCommunesEtDepartementsQueryHandler = stubClass(
@@ -27,7 +36,11 @@ describe('ReferentielsController', () => {
   rechercherTypesDemarcheQueryHandler = stubClass(
     RechercherTypesDemarcheQueryHandler
   )
+  getMotifsSuppressionCommandHandler = stubClass(
+    GetMotifsSuppressionJeuneQueryHandler
+  )
   let app: INestApplication
+
   before(async () => {
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(GetCommunesEtDepartementsQueryHandler)
@@ -36,6 +49,8 @@ describe('ReferentielsController', () => {
       .useValue(getAgencesQueryHandler)
       .overrideProvider(RechercherTypesDemarcheQueryHandler)
       .useValue(rechercherTypesDemarcheQueryHandler)
+      .overrideProvider(GetMotifsSuppressionJeuneQueryHandler)
+      .useValue(GetMotifsSuppressionJeuneQueryHandler)
       .compile()
     app = testingModule.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
@@ -262,5 +277,24 @@ describe('ReferentielsController', () => {
       'get',
       '/referentiels/pole-emploi/types-demarches'
     )
+  })
+
+  describe('GET /referentiels/motifs-suppression-jeune', () => {
+    it('renvoie les motifs de suppression d’un compte jeune', () => {
+      // Given
+      getMotifsSuppressionCommandHandler.execute.resolves()
+
+      // When - Then
+      return request(app.getHttpServer())
+        .get('/referentiels/motifs-suppression-jeune')
+        .set('authorization', unHeaderAuthorization())
+        .expect([
+          'Sortie positive du CEJ',
+          'Radiation du CEJ',
+          "Recréation d'un compte jeune",
+          'Autre'
+        ])
+        .expect(HttpStatus.OK)
+    })
   })
 })
