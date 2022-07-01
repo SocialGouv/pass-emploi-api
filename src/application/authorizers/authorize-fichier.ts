@@ -1,5 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import {
+  DroitsInsuffisants,
+  RessourceIndisponibleError
+} from 'src/building-blocks/types/domain-error'
 import { emptySuccess, failure, Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Fichier, FichierRepositoryToken } from 'src/domain/fichier'
@@ -38,7 +41,12 @@ export class FichierAuthorizer {
           return emptySuccess()
         }
       }
+      return failure(new DroitsInsuffisants())
     }
-    return failure(new DroitsInsuffisants())
+    return failure(
+      new RessourceIndisponibleError(
+        `Le fichier ${idFichier} n'est plus disponible`
+      )
+    )
   }
 }
