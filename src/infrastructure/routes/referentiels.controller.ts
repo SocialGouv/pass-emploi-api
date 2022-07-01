@@ -16,6 +16,12 @@ import { Authentification } from '../../domain/authentification'
 import { TypesDemarcheQueryModel } from '../../application/queries/query-models/types-demarche.query-model'
 import { RechercherTypesDemarcheQueryHandler } from '../../application/queries/rechercher-types-demarche.query.handler'
 import { TypesDemarchesQueryParams } from './validation/demarches.inputs'
+import {
+  GetMotifsSuppressionJeuneQueryHandler,
+  MotifsSuppressionJeuneQueryModel
+} from '../../application/queries/get-motifs-suppression-jeune-query-handler'
+import { isSuccess } from '../../building-blocks/types/result'
+import { handleFailure } from './failure.handler'
 
 @Controller('referentiels')
 @ApiTags('Referentiels')
@@ -24,7 +30,8 @@ export class ReferentielsController {
     private readonly getCommunesEtDepartementsQueryHandler: GetCommunesEtDepartementsQueryHandler,
     private readonly getTypesRendezvousQueryHandler: GetTypesRendezVousQueryHandler,
     private readonly rechercherTypesDemarcheQueryHandler: RechercherTypesDemarcheQueryHandler,
-    private readonly getAgencesQueryHandler: GetAgencesQueryHandler
+    private readonly getAgencesQueryHandler: GetAgencesQueryHandler,
+    private readonly getMotifsSuppressionJeuneQueryHandler: GetMotifsSuppressionJeuneQueryHandler
   ) {}
 
   @Get('communes-et-departements')
@@ -72,5 +79,22 @@ export class ReferentielsController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<AgenceQueryModel[]> {
     return this.getAgencesQueryHandler.execute(structure, utilisateur)
+  }
+
+  @Get('motifs-suppression-jeune')
+  @ApiOAuth2([])
+  @ApiResponse({
+    isArray: true
+  })
+  async getMotifsSuppressionJeune(
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<MotifsSuppressionJeuneQueryModel> {
+    const result = await this.getMotifsSuppressionJeuneQueryHandler.execute(
+      utilisateur
+    )
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
   }
 }
