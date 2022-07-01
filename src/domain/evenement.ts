@@ -17,6 +17,7 @@ export namespace Evenement {
     MESSAGE_ENVOYE = 'MESSAGE_ENVOYE',
     MESSAGE_ENVOYE_MULTIPLE = 'MESSAGE_ENVOYE_MULTIPLE',
     MESSAGE_ENVOYE_PJ = 'MESSAGE_ENVOYE_PJ',
+    MESSAGE_ENVOYE_MULTIPLE_PJ = 'MESSAGE_ENVOYE_MULTIPLE_PJ',
     OFFRE_ALTERNANCE_AFFICHEE = 'OFFRE_ALTERNANCE_AFFICHEE',
     OFFRE_ALTERNANCE_PARTAGEE = 'OFFRE_ALTERNANCE_PARTAGEE',
     OFFRE_ALTERNANCE_POSTULEE = 'OFFRE_ALTERNANCE_POSTULEE',
@@ -183,13 +184,17 @@ const evenements = {
     action: 'Postuler'
   },
   [Evenement.Type.MESSAGE_ENVOYE]: { categorie: 'Message', action: 'Envoi' },
-  [Evenement.Type.MESSAGE_ENVOYE_PJ]: {
-    categorie: 'Message',
-    action: 'Envoi PJ'
-  },
   [Evenement.Type.MESSAGE_ENVOYE_MULTIPLE]: {
     categorie: 'Message',
     action: 'Envoi multiple'
+  },
+  [Evenement.Type.MESSAGE_ENVOYE_MULTIPLE_PJ]: {
+    categorie: 'Message',
+    action: 'Envoi multiple PJ'
+  },
+  [Evenement.Type.MESSAGE_ENVOYE_PJ]: {
+    categorie: 'Message',
+    action: 'Envoi PJ'
   },
   [Evenement.Type.RDV_CREE]: { categorie: 'Rendez-vous', action: 'Création' },
   [Evenement.Type.RDV_MODIFIE]: {
