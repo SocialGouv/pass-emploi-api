@@ -2,12 +2,11 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Query } from 'src/building-blocks/types/query'
 import { QueryHandler } from 'src/building-blocks/types/query-handler'
 import { ObjectStorageClient } from 'src/infrastructure/clients/object-storage.client'
-import { failure, Result, success } from '../../building-blocks/types/result'
+import { Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { Evenement, EvenementService } from '../../domain/evenement'
 import { Fichier, FichierRepositoryToken } from '../../domain/fichier'
 import { FichierAuthorizer } from '../authorizers/authorize-fichier'
-import { Evenement, EvenementService } from '../../domain/evenement'
-import { RessourceIndisponibleError } from 'src/building-blocks/types/domain-error'
 
 export interface TelechargerFichierQuery extends Query {
   idFichier: string
@@ -36,17 +35,9 @@ export class TelechargerFichierQueryHandler extends QueryHandler<
   }
 
   async handle(query: TelechargerFichierQuery): Promise<Result<string>> {
-    const fichierMetadata = await this.fichierRepository.getFichierMetadata(
+    const fichierMetadata = (await this.fichierRepository.getFichierMetadata(
       query.idFichier
-    )
-
-    if (!fichierMetadata) {
-      return failure(
-        new RessourceIndisponibleError(
-          `Le fichier ${query.idFichier} n'est plus disponible`
-        )
-      )
-    }
+    ))!
 
     const url = await this.objectStorageClient.getUrlPresignee(fichierMetadata)
 

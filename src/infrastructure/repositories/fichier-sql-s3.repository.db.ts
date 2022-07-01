@@ -29,6 +29,8 @@ export class FichierSqlS3Repository implements Fichier.Repository {
   }
 
   async softDelete(idFichier: string): Promise<void> {
+    await this.objectStorageClient.supprimer(idFichier)
+
     await FichierSqlModel.update(
       {
         dateSuppression: this.dateService.nowJs()

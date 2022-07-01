@@ -157,6 +157,9 @@ describe('FichierSqlS3Repository', () => {
       await fichierSqlS3Repository.softDelete(fichier.id)
 
       // Then
+      expect(objectStorageClient.supprimer).to.have.been.calledOnceWith(
+        fichier.id
+      )
       const fichierTrouve = await FichierSqlModel.findByPk(fichier.id)
       expect(fichierTrouve?.dateSuppression).to.deep.equal(
         maintenant.toJSDate()
