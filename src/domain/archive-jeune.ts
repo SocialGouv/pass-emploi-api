@@ -7,29 +7,8 @@ import { Recherche } from './recherche'
 export const ArchivageJeunesRepositoryToken = 'ArchivageJeune.Repository'
 
 export interface ArchiveJeune {
-  rendezVous: Array<{
-    titre: string
-    sousTitre: string
-    commentaire?: string
-    modalite?: string
-    date: Date
-    duree: number
-    type: CodeTypeRendezVous
-    precision?: string
-    adresse?: string
-    organisme?: string
-    presenceConseiller: boolean
-    invitation?: boolean
-  }>
-  actions: Array<{
-    statut: string
-    contenu: string
-    commentaire: string
-    dateCreation: Date
-    dateActualisation: Date
-    dateLimite?: Date
-    creePar: 'JEUNE' | 'CONSEILLER'
-  }>
+  rendezVous: ArchiveJeune.RendezVous[]
+  actions: ArchiveJeune.Action[]
   favoris: {
     offresEmploi: OffreEmploi[]
     offresImmersions: OffreImmersion[]
@@ -64,6 +43,31 @@ export namespace ArchiveJeune {
     motif: MotifSuppression
     commentaire?: string
     dateArchivage: Date
+  }
+
+  export interface RendezVous {
+    titre: string
+    sousTitre: string
+    commentaire?: string
+    modalite?: string
+    date: Date
+    duree: number
+    type: CodeTypeRendezVous
+    precision?: string
+    adresse?: string
+    organisme?: string
+    presenceConseiller: boolean
+    invitation?: boolean
+  }
+
+  export interface Action {
+    statut: string
+    contenu: string
+    commentaire: string
+    dateCreation: Date
+    dateActualisation: Date
+    dateLimite?: Date
+    creePar: 'JEUNE' | 'CONSEILLER'
   }
 
   export interface Message {

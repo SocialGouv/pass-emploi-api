@@ -17,7 +17,7 @@ import { ArchivageJeuneSqlModel } from '../sequelize/models/archivage-jeune.sql-
 import { FirebaseClient } from '../clients/firebase-client'
 
 @Injectable()
-export class ArchivageJeuneSqlRepositoryDb implements ArchiveJeune.Repository {
+export class ArchiveJeuneSqlRepositoryDb implements ArchiveJeune.Repository {
   constructor(private firebaseClient: FirebaseClient) {}
 
   async archiver(metadonnees: ArchiveJeune.Metadonnees): Promise<void> {
@@ -63,17 +63,17 @@ export class ArchivageJeuneSqlRepositoryDb implements ArchiveJeune.Repository {
       return undefined
     }
 
+    return this.mapToArchiveJeune(jeuneSqlModel, metadonnes, messages)
+  }
+
+  private mapToArchiveJeune(
+    jeuneSqlModel: JeuneSqlModel,
+    metadonnes: ArchiveJeune.Metadonnees,
+    messages: ArchiveJeune.Message[]
+  ): ArchiveJeune {
     return {
-      actions: jeuneSqlModel.actions.map(actionSql => ({
-        commentaire: actionSql.commentaire || '',
-        contenu: actionSql.contenu || '',
-        statut: actionSql.statut || '',
-        dateCreation: actionSql.dateCreation,
-        creePar:
-          actionSql.idCreateur === metadonnes.idJeune ? 'JEUNE' : 'CONSEILLER',
-        dateActualisation: actionSql.dateDerniereActualisation,
-        dateLimite: actionSql.dateLimite || undefined
-      })),
+      rendezVous: jeuneSqlModel.rdv.map(this.toRendezVousArchive),
+      actions: this.fromActionSqlToActionArchive(jeuneSqlModel, metadonnes),
       favoris: {
         offresEmploi: jeuneSqlModel.favorisOffreEmploi.map(toOffreEmploi),
         offresImmersions: jeuneSqlModel.favorisOffreImmersion.map(
@@ -83,21 +83,6 @@ export class ArchivageJeuneSqlRepositoryDb implements ArchiveJeune.Repository {
           fromSqlToOffreServiceCivique
         )
       },
-      rendezVous: jeuneSqlModel.rdv.map(rdvSql => ({
-        id: rdvSql.id,
-        titre: rdvSql.titre,
-        sousTitre: rdvSql.sousTitre,
-        commentaire: rdvSql.commentaire || undefined,
-        modalite: rdvSql.modalite || undefined,
-        date: rdvSql.date,
-        duree: rdvSql.duree,
-        type: rdvSql.type,
-        precision: rdvSql.precision || undefined,
-        adresse: rdvSql.adresse || undefined,
-        organisme: rdvSql.organisme || undefined,
-        presenceConseiller: Boolean(rdvSql.presenceConseiller),
-        invitation: Boolean(rdvSql.invitation)
-      })),
       recherches: jeuneSqlModel.recherches.map(fromSqlToRecherche),
       dernierConseiller: {
         nom: jeuneSqlModel.conseiller?.nom || '',
@@ -110,5 +95,40 @@ export class ArchivageJeuneSqlRepositoryDb implements ArchiveJeune.Repository {
       })),
       messages
     }
+  }
+
+  private toRendezVousArchive(
+    rdvSql: RendezVousSqlModel
+  ): ArchiveJeune.RendezVous {
+    return {
+      titre: rdvSql.titre,
+      sousTitre: rdvSql.sousTitre,
+      commentaire: rdvSql.commentaire || undefined,
+      modalite: rdvSql.modalite || undefined,
+      date: rdvSql.date,
+      duree: rdvSql.duree,
+      type: rdvSql.type,
+      precision: rdvSql.precision || undefined,
+      adresse: rdvSql.adresse || undefined,
+      organisme: rdvSql.organisme || undefined,
+      presenceConseiller: Boolean(rdvSql.presenceConseiller),
+      invitation: Boolean(rdvSql.invitation)
+    }
+  }
+
+  private fromActionSqlToActionArchive(
+    jeuneSqlModel: JeuneSqlModel,
+    metadonnes: ArchiveJeune.Metadonnees
+  ): ArchiveJeune.Action[] {
+    return jeuneSqlModel.actions.map(actionSql => ({
+      commentaire: actionSql.commentaire || '',
+      contenu: actionSql.contenu || '',
+      statut: actionSql.statut || '',
+      dateCreation: actionSql.dateCreation,
+      creePar:
+        actionSql.idCreateur === metadonnes.idJeune ? 'JEUNE' : 'CONSEILLER',
+      dateActualisation: actionSql.dateDerniereActualisation,
+      dateLimite: actionSql.dateLimite || undefined
+    }))
   }
 }
