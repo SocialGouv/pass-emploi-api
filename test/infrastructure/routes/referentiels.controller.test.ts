@@ -15,13 +15,14 @@ import {
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
 import { TypesDemarcheQueryModel } from '../../../src/application/queries/query-models/types-demarche.query-model'
-import Structure = Core.Structure
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import {
   GetMotifsSuppressionJeuneQueryHandler,
-  MotifsSuppressionJeuneQueryModel
+  MotifsSuppressionJeuneQueryModel,
+  TypesMotifsSuppressionJeune
 } from '../../../src/application/queries/get-motifs-suppression-jeune-query-handler'
 import { success } from '../../../src/building-blocks/types/result'
+import Structure = Core.Structure
 
 let getCommunesEtDepartementsQueryHandler: StubbedClass<GetCommunesEtDepartementsQueryHandler>
 let getAgencesQueryHandler: StubbedClass<GetAgencesQueryHandler>
@@ -50,7 +51,7 @@ describe('ReferentielsController', () => {
       .overrideProvider(RechercherTypesDemarcheQueryHandler)
       .useValue(rechercherTypesDemarcheQueryHandler)
       .overrideProvider(GetMotifsSuppressionJeuneQueryHandler)
-      .useValue(GetMotifsSuppressionJeuneQueryHandler)
+      .useValue(getMotifsSuppressionCommandHandler)
       .compile()
     app = testingModule.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
@@ -282,7 +283,14 @@ describe('ReferentielsController', () => {
   describe('GET /referentiels/motifs-suppression-jeune', () => {
     it('renvoie les motifs de suppression d’un compte jeune', () => {
       // Given
-      getMotifsSuppressionCommandHandler.execute.resolves()
+      const motifs: MotifsSuppressionJeuneQueryModel = [
+        TypesMotifsSuppressionJeune.SORTIE_POSITIVE_DU_CEJ,
+        TypesMotifsSuppressionJeune.RADIATION_DU_CEJ,
+        TypesMotifsSuppressionJeune.RECREATION_D_UN_COMPTE_JEUNE,
+        TypesMotifsSuppressionJeune.AUTRE
+      ]
+
+      getMotifsSuppressionCommandHandler.execute.resolves(success(motifs))
 
       // When - Then
       return request(app.getHttpServer())
