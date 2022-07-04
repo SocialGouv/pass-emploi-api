@@ -77,7 +77,7 @@
     "jose": "^4.8.1",
     "luxon": "2.4.0",
     "nestjs-pino": "2.6.0",
-    "openid-client": "5.1.7",
+    "openid-client": "5.1.8",
     "pg": "8.7.3",
     "pg-connection-string": "2.5.0",
     "pino-http": "8.1.1",
