@@ -226,23 +226,30 @@ export class FirebaseClient implements IFirebaseClient {
       const messagesChiffres = await chats.docs[0].ref
         .collection('messages')
         .get()
-      const key = Utf8.parse(this.configService.get('firebase').encryptionKey)
-      return messagesChiffres.docs.map(message => {
-        const messageFirebase = message.data()
-        const contenu = AES.decrypt(messageFirebase.content, key, {
-          iv: Base64.parse(messageFirebase.iv)
-        }).toString(Utf8)
-        return {
-          contenu,
-          date: new Date(
-            parseInt(messageFirebase.creationDate._seconds) * 1000
-          ).toISOString(),
-          envoyePar: messageFirebase.sentBy,
-          type: messageFirebase.type
-        }
-      })
+      return messagesChiffres.docs.map(this.fromMessageChiffreToMessageArchive)
     }
     throw new Error()
+  }
+
+  private fromMessageChiffreToMessageArchive(
+    message: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>
+  ): ArchiveJeune.Message {
+    const messageFirebase = message.data()
+    const key = Utf8.parse(this.configService.get('firebase').encryptionKey)
+
+    const contenu = AES.decrypt(messageFirebase.content, key, {
+      iv: Base64.parse(messageFirebase.iv)
+    }).toString(Utf8)
+    const date = new Date(
+      parseInt(messageFirebase.creationDate._seconds) * 1000
+    ).toISOString()
+
+    return {
+      contenu,
+      date,
+      envoyePar: messageFirebase.sentBy,
+      type: messageFirebase.type
+    }
   }
 }
 
