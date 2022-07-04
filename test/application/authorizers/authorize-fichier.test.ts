@@ -1,8 +1,5 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import {
-  DroitsInsuffisants,
-  RessourceIndisponibleError
-} from 'src/building-blocks/types/domain-error'
+import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { Fichier } from 'src/domain/fichier'
 import { Jeune } from 'src/domain/jeune'
@@ -92,7 +89,7 @@ describe('FichierAuthorizer', () => {
       // Then
       expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
-    it("retourne Ressource Indisponible quand le fichier n'existe pas", async () => {
+    it("retourne Droits Insuffisants quand le fichier n'existe pas", async () => {
       //Given
       const utilisateur = unUtilisateurJeune()
       fichierRepository.getFichierMetadata
@@ -103,13 +100,7 @@ describe('FichierAuthorizer', () => {
       const result = await fichierAuthorizer.authorize(idFichier, utilisateur)
 
       // Then
-      expect(result).to.deep.equal(
-        failure(
-          new RessourceIndisponibleError(
-            `Le fichier ${idFichier} n'est plus disponible`
-          )
-        )
-      )
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
   })
 })

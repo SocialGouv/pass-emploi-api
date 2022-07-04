@@ -13,6 +13,7 @@ export interface FichierMetadata {
   dateCreation: Date
   idCreateur: string
   typeCreateur: Authentification.Type
+  dateSuppression?: Date
 }
 export interface Fichier extends FichierMetadata {
   buffer: Buffer

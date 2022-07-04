@@ -93,7 +93,7 @@ describe('FichierSqlS3Repository', () => {
       // Then
       expect(result).to.be.undefined()
     })
-    it('renvoie undefined quand le fichier a une date de suppression', async () => {
+    it('renvoie les metadonnees avec une date de suppression quand elle existe', async () => {
       // Given
       await FichierSqlModel.upsert({
         ...fichier,
@@ -102,7 +102,7 @@ describe('FichierSqlS3Repository', () => {
       // When
       const result = await fichierSqlS3Repository.getFichierMetadata(fichier.id)
       // Then
-      expect(result).to.be.undefined()
+      expect(result?.dateSuppression).to.deep.equal(uneDate())
     })
   })
 
