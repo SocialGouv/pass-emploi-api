@@ -29,11 +29,7 @@ export class GetMotifsSuppressionJeuneQueryHandler extends QueryHandler<
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _query: Query
   ): Promise<Result<MotifsSuppressionJeuneQueryModel>> {
-    return success(
-      Object.values(TypesMotifsSuppressionJeune).map(motif => {
-        return motif
-      })
-    )
+    return success(Object.values(TypesMotifsSuppressionJeune))
   }
 
   async authorize(): Promise<Result> {
