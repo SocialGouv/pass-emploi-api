@@ -84,6 +84,7 @@ export class ReferentielsController {
   @Get('motifs-suppression-jeune')
   @ApiOAuth2([])
   @ApiResponse({
+    type: String,
     isArray: true
   })
   async getMotifsSuppressionJeune(
