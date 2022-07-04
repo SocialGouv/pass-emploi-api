@@ -84,6 +84,7 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
             if (resultat.value.data.results.length) {
               const jeune = await this.jeuneRepository.get(recherche.idJeune)
 
+              stats.notificationsEnvoyees = stats.notificationsEnvoyees + 1
               await this.notificationService.notifierNouvellesOffres(
                 recherche,
                 jeune
