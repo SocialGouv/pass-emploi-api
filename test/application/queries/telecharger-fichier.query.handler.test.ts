@@ -83,11 +83,13 @@ describe('TelechargerFichierQueryHandler', () => {
       // Then
       expect(result).to.deep.equal(success(url))
     })
-    xit('retourne une failure quand le fichier est supprimé', async () => {
+    it('retourne une failure quand le fichier a une date de suppression', async () => {
       // Given
+      const fichierMetadata = unFichierMetadata({ dateSuppression: new Date() })
+
       fichierRepository.getFichierMetadata
         .withArgs(query.idFichier)
-        .resolves(undefined)
+        .resolves(fichierMetadata)
 
       // When
       const result = await telechargerFichierQueryHandler.handle(query)

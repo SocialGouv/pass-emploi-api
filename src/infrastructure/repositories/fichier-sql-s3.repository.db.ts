@@ -60,10 +60,7 @@ export class FichierSqlS3Repository implements Fichier.Repository {
   ): Promise<FichierMetadata | undefined> {
     const fichierSql = await FichierSqlModel.findOne({
       where: {
-        id: idFichier,
-        dateSuppression: {
-          [Op.is]: null
-        }
+        id: idFichier
       }
     })
 
@@ -75,7 +72,8 @@ export class FichierSqlS3Repository implements Fichier.Repository {
         idsJeunes: fichierSql.idsJeunes,
         dateCreation: fichierSql.dateCreation,
         idCreateur: fichierSql.idCreateur,
-        typeCreateur: fichierSql.typeCreateur
+        typeCreateur: fichierSql.typeCreateur,
+        dateSuppression: fichierSql.dateSuppression ?? undefined
       }
     }
     return undefined
