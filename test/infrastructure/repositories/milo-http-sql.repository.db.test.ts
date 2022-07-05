@@ -12,6 +12,7 @@ import { ConseillerSqlRepository } from '../../../src/infrastructure/repositorie
 import { DossierMiloDto } from '../../../src/infrastructure/repositories/dto/milo.dto'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository.db'
 import { MiloHttpSqlRepository } from '../../../src/infrastructure/repositories/milo-http-sql.repository.db'
+import { RateLimiterService } from '../../../src/utils/rate-limiter.service'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { testConfig } from '../../utils/module-for-testing'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
@@ -42,7 +43,8 @@ describe('MiloHttpRepository', () => {
 
     miloHttpSqlRepository = new MiloHttpSqlRepository(
       httpService,
-      configService
+      configService,
+      new RateLimiterService()
     )
   })
 

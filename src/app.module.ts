@@ -185,6 +185,7 @@ import { FindAllOffresServicesCiviqueQueryGetter } from './application/queries/q
 import { RecupererJeunesDuConseillerCommandHandler } from './application/commands/recuperer-jeunes-du-conseiller.command.handler'
 import { HandleJobNettoyerPiecesJointesCommandHandler } from './application/commands/jobs/handle-job-nettoyer-pieces-jointes.command'
 import { GetMotifsSuppressionJeuneQueryHandler } from './application/queries/get-motifs-suppression-jeune-query-handler'
+import { RateLimiterService } from './utils/rate-limiter.service'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -226,6 +227,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     IdService,
     DateService,
     ChatCryptoService,
+    RateLimiterService,
     PoleEmploiClient,
     ImmersionClient,
     EngagementClient,
