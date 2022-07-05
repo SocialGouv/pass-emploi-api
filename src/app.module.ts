@@ -102,6 +102,7 @@ import {
 import { RecherchesRepositoryToken } from './domain/recherche'
 import { RendezVousRepositoryToken } from './domain/rendez-vous'
 import { SuperviseursRepositoryToken } from './domain/superviseur'
+import { SupportNotificationServiceToken } from './domain/support-notification'
 import { ApiKeyAuthGuard } from './infrastructure/auth/api-key.auth-guard'
 import { JwtService } from './infrastructure/auth/jwt.service'
 import { OidcAuthGuard } from './infrastructure/auth/oidc.auth-guard'
@@ -112,6 +113,7 @@ import { KeycloakClient } from './infrastructure/clients/keycloak-client'
 import { MailSendinblueService } from './infrastructure/clients/mail-sendinblue.service'
 import { ObjectStorageClient } from './infrastructure/clients/object-storage.client'
 import { PoleEmploiClient } from './infrastructure/clients/pole-emploi-client'
+import { SupportNotificationMattermostService } from './infrastructure/clients/support-notification-mattermost.service'
 import { ActionSqlRepository } from './infrastructure/repositories/action-sql.repository.db'
 import { AuthentificationSqlRepository } from './infrastructure/repositories/authentification-sql.repository.db'
 import { ChatFirebaseRepository } from './infrastructure/repositories/chat-firebase.repository'
@@ -340,6 +342,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: ArchiveJeuneRepositoryToken,
       useClass: ArchiveJeuneSqlRepository
+    },
+    {
+      provide: SupportNotificationServiceToken,
+      useClass: SupportNotificationMattermostService
     },
     ...databaseProviders
   ],
