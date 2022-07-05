@@ -68,7 +68,11 @@ import {
   ActionQueryModel,
   DemarcheQueryModel
 } from '../../application/queries/query-models/actions.query-model'
-import { isSuccess, Result } from '../../building-blocks/types/result'
+import {
+  isFailure,
+  isSuccess,
+  Result
+} from '../../building-blocks/types/result'
 import { Action } from '../../domain/action'
 import { Authentification } from '../../domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
@@ -494,6 +498,8 @@ export class JeunesController {
       utilisateur
     )
 
-    handleFailure(result)
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
   }
 }

@@ -51,6 +51,10 @@ export class ArchiveJeuneSqlRepositoryDb implements ArchiveJeune.Repository {
           model: TransfertConseillerSqlModel,
           include: [
             {
+              as: 'conseillerSource',
+              model: ConseillerSqlModel
+            },
+            {
               as: 'conseillerCible',
               model: ConseillerSqlModel
             }
@@ -89,8 +93,14 @@ export class ArchiveJeuneSqlRepositoryDb implements ArchiveJeune.Repository {
         prenom: jeuneSqlModel.conseiller?.prenom || ''
       },
       historiqueConseillers: jeuneSqlModel.transferts.map(transfertSql => ({
-        nom: transfertSql.conseillerCible.nom,
-        prenom: transfertSql.conseillerCible.prenom,
+        conseillerSource: {
+          prenom: transfertSql.conseillerSource.prenom,
+          nom: transfertSql.conseillerSource.nom
+        },
+        conseillerCible: {
+          prenom: transfertSql.conseillerCible.prenom,
+          nom: transfertSql.conseillerCible.nom
+        },
         dateDeTransfert: transfertSql.dateTransfert
       })),
       messages

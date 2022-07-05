@@ -20,8 +20,14 @@ export interface ArchiveJeune {
     prenom: string
   }
   historiqueConseillers: Array<{
-    nom: string
-    prenom: string
+    conseillerSource: {
+      nom: string
+      prenom: string
+    }
+    conseillerCible: {
+      nom: string
+      prenom: string
+    }
     dateDeTransfert: Date
   }>
   messages: ArchiveJeune.Message[]

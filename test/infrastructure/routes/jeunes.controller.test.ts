@@ -551,25 +551,23 @@ describe('JeunesController', () => {
   })
 
   describe('POST /jeunes/:idJeune/archiver', () => {
-    it("archive le jeune quand t'es conseiller", async () => {
+    it('archive le jeune', async () => {
       //Given
-      archiverJeuneCommandHandler.execute.resolves(emptySuccess())
+      archiverJeuneCommandHandler.execute
+        .withArgs({
+          idJeune: 'id-jeune',
+          motif: ArchiveJeune.MotifSuppression.RADIATION_DU_CEJ,
+          commentaire: undefined
+        })
+        .resolves(emptySuccess())
 
       //When
       await request(app.getHttpServer())
         .post(`/jeunes/id-jeune/archiver`)
         .set('authorization', unHeaderAuthorization())
-        .send({ motif: ArchiveJeune.MotifSuppression.AUTRE })
+        .send({ motif: ArchiveJeune.MotifSuppression.RADIATION_DU_CEJ })
         //Then
         .expect(HttpStatus.NO_CONTENT)
-
-      expect(archiverJeuneCommandHandler.execute).to.have.be.calledWithExactly(
-        {
-          idJeune: 'id-jeune',
-          motif: ArchiveJeune.MotifSuppression.AUTRE
-        },
-        unUtilisateurDecode()
-      )
     })
 
     it("renvoie une 403 si l'utilisateur n'a pas les droits", async () => {
