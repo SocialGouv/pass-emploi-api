@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Milo } from '../../domain/milo'
+import { RateLimiterService } from '../../utils/rate-limiter.service'
 import { SituationsMiloSqlModel } from '../sequelize/models/situations-milo.sql-model'
 import { DossierMiloDto } from './dto/milo.dto'
 
@@ -18,7 +19,8 @@ export class MiloHttpSqlRepository implements Milo.Repository {
 
   constructor(
     private httpService: HttpService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private rateLimiterService: RateLimiterService
   ) {
     this.logger = new Logger('MiloHttpRepository')
     this.apiUrl = this.configService.get('milo').url
@@ -29,6 +31,7 @@ export class MiloHttpSqlRepository implements Milo.Repository {
 
   async getDossier(idDossier: string): Promise<Result<Milo.Dossier>> {
     try {
+      await this.rateLimiterService.getDossierMilo.attendreLaProchaineDisponibilite()
       const dossierDto = await firstValueFrom(
         this.httpService.get<DossierMiloDto>(
           `${this.apiUrl}/dossiers/${idDossier}`,

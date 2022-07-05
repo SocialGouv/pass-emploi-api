@@ -3478,6 +3478,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bluebird@npm:2.9.24":
+  version: 2.9.24
+  resolution: "bluebird@npm:2.9.24"
+  checksum: 329644c9d83d4a8e2a8617e13a7ded529d1fbd1c08cfb2feab2be3485fb264cf3266e91f2ceab35cbb8b39fea05aad10c0706673686864f0faca6df426fc1de7
+  languageName: node
+  linkType: hard
+
 "bluebird@npm:^3.7.2":
   version: 3.7.2
   resolution: "bluebird@npm:3.7.2"
@@ -7934,6 +7941,7 @@ __metadata:
     source-map-support: ^0.5.21
     supertest: ^6.2.3
     swagger-ui-express: 4.4.0
+    tokenbucket: ^0.3.2
     ts-loader: ^9.3.0
     ts-node: 10.8.2
     tsconfig-paths: ^4.0.0
@@ -9116,6 +9124,13 @@ __metadata:
   dependencies:
     redis-errors: ^1.0.0
   checksum: 89290ae530332f2ae37577647fa18208d10308a1a6ba750b9d9a093e7398f5e5253f19855b64c98757f7129cccce958e4af2573fdc33bad41405f87f1943459a
+  languageName: node
+  linkType: hard
+
+"redis@npm:^0.12.1":
+  version: 0.12.1
+  resolution: "redis@npm:0.12.1"
+  checksum: 89b7eee75e7f00a4e8c146265030227a936aa80f296d7ba44b1102807f5ece059a413209c6d4b7acbd4423d0d0f7e4c82afdcead23b41cc9702a722895f08c86
   languageName: node
   linkType: hard
 
@@ -10303,6 +10318,16 @@ __metadata:
   version: 1.0.1
   resolution: "toidentifier@npm:1.0.1"
   checksum: 952c29e2a85d7123239b5cfdd889a0dde47ab0497f0913d70588f19c53f7e0b5327c95f4651e413c74b785147f9637b17410ac8c846d5d4a20a5a33eb6dc3a45
+  languageName: node
+  linkType: hard
+
+"tokenbucket@npm:^0.3.2":
+  version: 0.3.2
+  resolution: "tokenbucket@npm:0.3.2"
+  dependencies:
+    bluebird: 2.9.24
+    redis: ^0.12.1
+  checksum: 7b221fb3aac5c5bf55a9d4bf73d1a1bb24d308d3265c3ffe384b3ee3cfb42b665accda856dfde71ef00634f508f31695819d1b63d72ee21384a86939bc8cb4d5
   languageName: node
   linkType: hard
 
