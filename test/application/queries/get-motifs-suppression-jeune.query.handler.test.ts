@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { success } from '../../../src/building-blocks/types/result'
-import { GetMotifsSuppressionJeuneQueryHandler } from '../../../src/application/queries/get-motifs-suppression-jeune-query-handler'
+import { GetMotifsSuppressionJeuneQueryHandler } from '../../../src/application/queries/get-motifs-suppression-jeune.query.handler'
 import { SinonSandbox } from 'sinon'
 import { createSandbox } from '../../utils'
 import { unUtilisateurQueryModel } from '../../fixtures/query-models/authentification.query-model.fixtures'

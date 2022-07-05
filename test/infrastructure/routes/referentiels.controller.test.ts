@@ -18,11 +18,11 @@ import { TypesDemarcheQueryModel } from '../../../src/application/queries/query-
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import {
   GetMotifsSuppressionJeuneQueryHandler,
-  MotifsSuppressionJeuneQueryModel,
-  TypesMotifsSuppressionJeune
-} from '../../../src/application/queries/get-motifs-suppression-jeune-query-handler'
+  MotifsSuppressionJeuneQueryModel
+} from '../../../src/application/queries/get-motifs-suppression-jeune.query.handler'
 import { success } from '../../../src/building-blocks/types/result'
 import Structure = Core.Structure
+import { ArchiveJeune } from '../../../src/domain/archive-jeune'
 
 let getCommunesEtDepartementsQueryHandler: StubbedClass<GetCommunesEtDepartementsQueryHandler>
 let getAgencesQueryHandler: StubbedClass<GetAgencesQueryHandler>
@@ -284,10 +284,10 @@ describe('ReferentielsController', () => {
     it('renvoie les motifs de suppression d’un compte jeune', () => {
       // Given
       const motifs: MotifsSuppressionJeuneQueryModel = [
-        TypesMotifsSuppressionJeune.SORTIE_POSITIVE_DU_CEJ,
-        TypesMotifsSuppressionJeune.RADIATION_DU_CEJ,
-        TypesMotifsSuppressionJeune.RECREATION_D_UN_COMPTE_JEUNE,
-        TypesMotifsSuppressionJeune.AUTRE
+        ArchiveJeune.MotifSuppression.SORTIE_POSITIVE_DU_CEJ,
+        ArchiveJeune.MotifSuppression.RADIATION_DU_CEJ,
+        ArchiveJeune.MotifSuppression.RECREATION_D_UN_COMPTE_JEUNE,
+        ArchiveJeune.MotifSuppression.AUTRE
       ]
 
       getMotifsSuppressionCommandHandler.execute.resolves(success(motifs))

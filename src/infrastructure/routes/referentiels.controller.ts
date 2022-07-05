@@ -19,7 +19,7 @@ import { TypesDemarchesQueryParams } from './validation/demarches.inputs'
 import {
   GetMotifsSuppressionJeuneQueryHandler,
   MotifsSuppressionJeuneQueryModel
-} from '../../application/queries/get-motifs-suppression-jeune-query-handler'
+} from '../../application/queries/get-motifs-suppression-jeune.query.handler'
 import { isSuccess } from '../../building-blocks/types/result'
 import { handleFailure } from './failure.handler'
 

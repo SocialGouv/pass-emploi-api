@@ -37,7 +37,7 @@ module.exports = {
       email: {
         field: 'email',
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       dateArchivage: {
         field: 'date_archivage',

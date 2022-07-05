@@ -550,7 +550,7 @@ describe('JeunesController', () => {
     ensureUserAuthenticationFailsIfInvalid('delete', '/jeunes/whatever')
   })
 
-  describe('POST /jeunes/:idJeune/archiver', () => {
+  describe.only('POST /jeunes/:idJeune/archiver', () => {
     it('archive le jeune', async () => {
       //Given
       archiverJeuneCommandHandler.execute
@@ -580,7 +580,7 @@ describe('JeunesController', () => {
       await request(app.getHttpServer())
         .post(`/jeunes/id-jeune/archiver`)
         .set('authorization', unHeaderAuthorization())
-        .send({ motif: ArchiveJeune.MotifSuppression.AUTRE })
+        .send({ motif: ArchiveJeune.MotifSuppression.SORTIE_POSITIVE_DU_CEJ })
         //Then
         .expect(HttpStatus.FORBIDDEN)
     })
@@ -596,6 +596,35 @@ describe('JeunesController', () => {
         .send({})
         //Then
         .expect(HttpStatus.BAD_REQUEST)
+    })
+
+    it('renvoie une 400 si motif Autre sans commentaire', async () => {
+      //Given
+      archiverJeuneCommandHandler.execute.resolves(emptySuccess())
+
+      //When
+      await request(app.getHttpServer())
+        .post(`/jeunes/id-jeune/archiver`)
+        .set('authorization', unHeaderAuthorization())
+        .send({ motif: ArchiveJeune.MotifSuppression.AUTRE })
+        //Then
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+
+    it('renvoie une 204 si motif Autre sans commentaire', async () => {
+      //Given
+      archiverJeuneCommandHandler.execute.resolves(emptySuccess())
+
+      //When
+      await request(app.getHttpServer())
+        .post(`/jeunes/id-jeune/archiver`)
+        .set('authorization', unHeaderAuthorization())
+        .send({
+          motif: ArchiveJeune.MotifSuppression.AUTRE,
+          commentaire: 'test'
+        })
+        //Then
+        .expect(HttpStatus.NO_CONTENT)
     })
 
     ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/whatever/archiver')

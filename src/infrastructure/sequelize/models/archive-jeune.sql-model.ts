@@ -8,7 +8,7 @@ import {
 } from 'sequelize-typescript'
 import { ArchiveJeune } from 'src/domain/archive-jeune'
 
-export class ArchivageJeuneDto extends Model {
+export class ArchiveJeuneDto extends Model {
   @PrimaryKey
   @AutoIncrement
   @Column({ field: 'id', type: DataType.INTEGER })
@@ -64,4 +64,4 @@ export class ArchivageJeuneDto extends Model {
   timestamps: false,
   tableName: 'archive_jeune'
 })
-export class ArchivageJeuneSqlModel extends ArchivageJeuneDto {}
+export class ArchiveJeuneSqlModel extends ArchiveJeuneDto {}

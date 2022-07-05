@@ -13,16 +13,16 @@ import { fromSqlToOffreImmersion } from './mappers/offres-immersion.mappers'
 import { fromSqlToOffreServiceCivique } from './mappers/service-civique.mapper'
 import { fromSqlToRecherche } from './mappers/recherches.mappers'
 import { TransfertConseillerSqlModel } from '../sequelize/models/transfert-conseiller.sql-model'
-import { ArchivageJeuneSqlModel } from '../sequelize/models/archivage-jeune.sql-model'
+import { ArchiveJeuneSqlModel } from '../sequelize/models/archive-jeune.sql-model'
 import { FirebaseClient } from '../clients/firebase-client'
 
 @Injectable()
-export class ArchiveJeuneSqlRepositoryDb implements ArchiveJeune.Repository {
+export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
   constructor(private firebaseClient: FirebaseClient) {}
 
   async archiver(metadonnees: ArchiveJeune.Metadonnees): Promise<void> {
     const archive = await this.construire(metadonnees)
-    await ArchivageJeuneSqlModel.create({
+    await ArchiveJeuneSqlModel.create({
       idJeune: metadonnees.idJeune,
       email: metadonnees.email,
       prenom: metadonnees.prenomJeune,
