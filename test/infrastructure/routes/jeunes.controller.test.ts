@@ -550,7 +550,7 @@ describe('JeunesController', () => {
     ensureUserAuthenticationFailsIfInvalid('delete', '/jeunes/whatever')
   })
 
-  describe.only('POST /jeunes/:idJeune/archiver', () => {
+  describe('POST /jeunes/:idJeune/archiver', () => {
     it('archive le jeune', async () => {
       //Given
       archiverJeuneCommandHandler.execute
