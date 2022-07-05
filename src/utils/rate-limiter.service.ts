@@ -1,20 +1,30 @@
 import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const TokenBucket = require('tokenbucket')
-const dixAppelsParSeconde: RateLimiter.Options = {
-  size: 10,
-  interval: 1000,
-  tokensToAddPerInterval: 10
-}
 
 @Injectable()
 export class RateLimiterService {
   public readonly getDossierMilo: RateLimiter
 
-  constructor() {
-    this.getDossierMilo = new RateLimiter(dixAppelsParSeconde)
+  constructor(private configService: ConfigService) {
+    this.getDossierMilo = this.buildGetDossierMilo()
+  }
+
+  private buildGetDossierMilo(): RateLimiter {
+    return new RateLimiter({
+      size: parseInt(
+        this.configService.get('rateLimiter.getDossierMilo.limit')!
+      ),
+      interval: parseInt(
+        this.configService.get('rateLimiter.getDossierMilo.interval')!
+      ),
+      tokensToAddPerInterval: parseInt(
+        this.configService.get('rateLimiter.getDossierMilo.limit')!
+      )
+    })
   }
 }
 

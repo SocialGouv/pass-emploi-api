@@ -90,6 +90,12 @@ export const configurationSchema = Joi.object({
     bucket: Joi.string().required(),
     bucket_prefix_pieces_jointes: Joi.string().required()
   }),
+  rateLimiter: Joi.object({
+    getDossierMilo: Joi.object({
+      limit: Joi.number().required(),
+      interval: Joi.number().required()
+    })
+  }),
   task: Joi.string(),
   jobs: Joi.object({
     notificationRecherches: Joi.object({

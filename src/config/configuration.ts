@@ -117,6 +117,12 @@ export default () => {
       bucket: process.env.S3_BUCKET,
       bucket_prefix_pieces_jointes: process.env.S3_BUCKET_PREFIX_PJ ?? 'pj/'
     },
+    rateLimiter: {
+      getDossierMilo: {
+        limit: process.env.RATE_LIMITER_GET_DOSSIER_MILO_LIMIT ?? '8',
+        interval: process.env.RATE_LIMITER_GET_DOSSIER_MILO_INTERVAL ?? '1000'
+      }
+    },
     task: process.env.TASK,
     jobs: {
       notificationRecherches: {
