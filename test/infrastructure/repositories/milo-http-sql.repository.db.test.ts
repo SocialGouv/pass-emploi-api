@@ -22,8 +22,9 @@ import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-cli
 
 describe('MiloHttpRepository', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
-  let miloHttpSqlRepository: MiloHttpSqlRepository
   const configService = testConfig()
+  const rateLimiterService = new RateLimiterService(configService)
+  let miloHttpSqlRepository: MiloHttpSqlRepository
   const jeune = unJeune({ email: 'john@doe.io' })
   let idService: IdService
   let dateService: DateService
@@ -44,7 +45,7 @@ describe('MiloHttpRepository', () => {
     miloHttpSqlRepository = new MiloHttpSqlRepository(
       httpService,
       configService,
-      new RateLimiterService()
+      rateLimiterService
     )
   })
 
