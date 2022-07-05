@@ -6,15 +6,9 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { Injectable } from '@nestjs/common'
+import { ArchiveJeune } from '../../domain/archive-jeune'
 
-export enum TypesMotifsSuppressionJeune {
-  SORTIE_POSITIVE_DU_CEJ = 'Sortie positive du CEJ',
-  RADIATION_DU_CEJ = 'Radiation du CEJ',
-  RECREATION_D_UN_COMPTE_JEUNE = "Recréation d'un compte jeune",
-  AUTRE = 'Autre'
-}
-
-export type MotifsSuppressionJeuneQueryModel = TypesMotifsSuppressionJeune[]
+export type MotifsSuppressionJeuneQueryModel = ArchiveJeune.MotifSuppression[]
 
 @Injectable()
 export class GetMotifsSuppressionJeuneQueryHandler extends QueryHandler<
@@ -29,7 +23,7 @@ export class GetMotifsSuppressionJeuneQueryHandler extends QueryHandler<
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _query: Query
   ): Promise<Result<MotifsSuppressionJeuneQueryModel>> {
-    return success(Object.values(TypesMotifsSuppressionJeune))
+    return success(Object.values(ArchiveJeune.MotifSuppression))
   }
 
   async authorize(): Promise<Result> {

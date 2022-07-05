@@ -1,4 +1,4 @@
-import { ArchiveJeuneSqlRepositoryDb } from '../../../src/infrastructure/repositories/archive-jeune-sql.repository.db'
+import { ArchiveJeuneSqlRepository } from '../../../src/infrastructure/repositories/archive-jeune-sql.repository.db'
 import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
@@ -7,7 +7,7 @@ import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { ArchiveJeune } from '../../../src/domain/archive-jeune'
-import { ArchivageJeuneSqlModel } from '../../../src/infrastructure/sequelize/models/archivage-jeune.sql-model'
+import { ArchiveJeuneSqlModel } from '../../../src/infrastructure/sequelize/models/archive-jeune.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import {
   TransfertConseillerDto,
@@ -36,9 +36,9 @@ import { RechercheSqlRepository } from '../../../src/infrastructure/repositories
 describe('ArchiveJeuneSqlRepositoryDb', () => {
   describe('archiver', () => {
     const database = DatabaseForTesting.prepare()
-    let archiveJeuneSqlRepositoryDb: ArchiveJeuneSqlRepositoryDb
+    let archiveJeuneSqlRepositoryDb: ArchiveJeuneSqlRepository
     let firebaseClient: StubbedClass<FirebaseClient>
-    let archivageJeuneSqlModel: ArchivageJeuneSqlModel | null
+    let archivageJeuneSqlModel: ArchiveJeuneSqlModel | null
     let metadonnees: ArchiveJeune.Metadonnees
     const premierConseillerDto = unConseillerDto({
       id: '1169709f-ca18-40d2-844a-c8b3a5df5af6',
@@ -63,7 +63,7 @@ describe('ArchiveJeuneSqlRepositoryDb', () => {
 
     beforeEach(async () => {
       firebaseClient = stubClass(FirebaseClient)
-      archiveJeuneSqlRepositoryDb = new ArchiveJeuneSqlRepositoryDb(
+      archiveJeuneSqlRepositoryDb = new ArchiveJeuneSqlRepository(
         firebaseClient
       )
 
@@ -131,7 +131,7 @@ describe('ArchiveJeuneSqlRepositoryDb', () => {
       await archiveJeuneSqlRepositoryDb.archiver(metadonnees)
 
       // When
-      archivageJeuneSqlModel = await ArchivageJeuneSqlModel.findOne({
+      archivageJeuneSqlModel = await ArchiveJeuneSqlModel.findOne({
         where: { idJeune: jeuneDto.id }
       })
     })

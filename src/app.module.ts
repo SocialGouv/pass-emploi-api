@@ -186,8 +186,8 @@ import { RecupererJeunesDuConseillerCommandHandler } from './application/command
 import { HandleJobNettoyerPiecesJointesCommandHandler } from './application/commands/jobs/handle-job-nettoyer-pieces-jointes.command'
 import { ArchiverJeuneCommandHandler } from './application/commands/archiver-jeune.command.handler'
 import { ArchivageJeunesRepositoryToken } from './domain/archive-jeune'
-import { ArchiveJeuneSqlRepositoryDb } from './infrastructure/repositories/archive-jeune-sql.repository.db'
-import { GetMotifsSuppressionJeuneQueryHandler } from './application/queries/get-motifs-suppression-jeune-query-handler'
+import { ArchiveJeuneSqlRepository } from './infrastructure/repositories/archive-jeune-sql.repository.db'
+import { GetMotifsSuppressionJeuneQueryHandler } from './application/queries/get-motifs-suppression-jeune.query.handler'
 import { RateLimiterService } from './utils/rate-limiter.service'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
@@ -337,7 +337,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: ArchivageJeunesRepositoryToken,
-      useClass: ArchiveJeuneSqlRepositoryDb
+      useClass: ArchiveJeuneSqlRepository
     },
     ...databaseProviders
   ],

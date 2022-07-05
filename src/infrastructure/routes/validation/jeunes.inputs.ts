@@ -34,7 +34,6 @@ export class ArchiverJeunePayload {
   @ApiPropertyOptional()
   @ValidateIf(payload => payload.motif === ArchiveJeune.MotifSuppression.AUTRE)
   @IsNotEmpty()
-  @IsOptional()
   @IsString()
   commentaire?: string
 }

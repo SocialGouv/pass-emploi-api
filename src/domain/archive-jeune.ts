@@ -4,7 +4,7 @@ import { OffreServiceCivique } from './offre-service-civique'
 import { OffreEmploi } from './offre-emploi'
 import { Recherche } from './recherche'
 
-export const ArchivageJeunesRepositoryToken = 'ArchivageJeune.Repository'
+export const ArchivageJeunesRepositoryToken = 'ArchiveJeune.Repository'
 
 export interface ArchiveJeune {
   rendezVous: ArchiveJeune.RendezVous[]
