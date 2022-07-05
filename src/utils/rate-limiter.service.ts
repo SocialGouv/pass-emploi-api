@@ -14,7 +14,7 @@ export class RateLimiterService {
   }
 
   private buildGetDossierMilo(): RateLimiter {
-    return new RateLimiter({
+    const options: RateLimiter.Options = {
       size: parseInt(
         this.configService.get('rateLimiter.getDossierMilo.limit')!
       ),
@@ -24,7 +24,8 @@ export class RateLimiterService {
       tokensToAddPerInterval: parseInt(
         this.configService.get('rateLimiter.getDossierMilo.limit')!
       )
-    })
+    }
+    return new RateLimiter(options)
   }
 }
 
