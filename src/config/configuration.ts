@@ -119,8 +119,8 @@ export default () => {
     },
     rateLimiter: {
       getDossierMilo: {
-        limit: process.env.RATE_LIMITER_GET_DOSSIER_MILO_LIMIT ?? '8',
-        interval: process.env.RATE_LIMITER_GET_DOSSIER_MILO_INTERVAL ?? '1000'
+        limit: process.env.RATE_LIMITER_GET_DOSSIER_MILO_LIMIT ?? '10',
+        interval: process.env.RATE_LIMITER_GET_DOSSIER_MILO_INTERVAL ?? '1500'
       }
     },
     task: process.env.TASK,
