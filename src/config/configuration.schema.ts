@@ -97,6 +97,7 @@ export const configurationSchema = Joi.object({
       interval: Joi.number().required()
     })
   }),
+  mattermost: Joi.object({ jobWebhookUrl: Joi.string().uri().required() }),
   task: Joi.string(),
   jobs: Joi.object({
     notificationRecherches: Joi.object({

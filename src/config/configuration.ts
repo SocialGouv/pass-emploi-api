@@ -125,6 +125,9 @@ export default () => {
         interval: process.env.RATE_LIMITER_GET_DOSSIER_MILO_INTERVAL ?? '1500'
       }
     },
+    mattermost: {
+      jobWebhookUrl: process.env.MATTERMOST_JOBs_WEBHOOK_URL
+    },
     task: process.env.TASK,
     jobs: {
       notificationRecherches: {
