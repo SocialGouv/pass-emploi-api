@@ -226,7 +226,9 @@ export class FirebaseClient implements IFirebaseClient {
       const messagesChiffres = await chats.docs[0].ref
         .collection('messages')
         .get()
-      return messagesChiffres.docs.map(this.fromMessageChiffreToMessageArchive)
+      return messagesChiffres.docs.map(
+        this.fromMessageChiffreToMessageArchive.bind(this)
+      )
     }
     throw new Error()
   }

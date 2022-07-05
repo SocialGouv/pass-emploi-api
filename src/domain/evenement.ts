@@ -12,6 +12,7 @@ export namespace Evenement {
     ACTION_MODIFIEE = 'ACTION_MODIFIEE',
     ACTION_SUPPRIMEE = 'ACTION_SUPPRIMEE',
     COMPTE_SUPPRIME = 'COMPTE_SUPPRIME',
+    COMPTE_ARCHIVE = 'COMPTE_ARCHIVE',
     DEMARCHE_CREEE = 'DEMARCHE_CREEE',
     DEMARCHE_MODIFIEE = 'DEMARCHE_MODIFIEE',
     MESSAGE_ENVOYE = 'MESSAGE_ENVOYE',
@@ -86,6 +87,10 @@ const evenements = {
   [Evenement.Type.COMPTE_SUPPRIME]: {
     categorie: 'Compte',
     action: 'Suppression'
+  },
+  [Evenement.Type.COMPTE_ARCHIVE]: {
+    categorie: 'Compte',
+    action: 'Archivage'
   },
   [Evenement.Type.DEMARCHE_CREEE]: {
     categorie: 'Demarche',

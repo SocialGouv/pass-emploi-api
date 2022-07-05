@@ -1,10 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
 import {
-  ArchiveJeune,
-  ArchivageJeunesRepositoryToken
+  ArchivageJeunesRepositoryToken,
+  ArchiveJeune
 } from 'src/domain/archive-jeune'
 import { Evenement, EvenementService } from 'src/domain/evenement'
-import { Mail, MailServiceToken } from 'src/domain/mail'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   emptySuccess,
@@ -44,9 +43,6 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
     @Inject(AuthentificationRepositoryToken)
     private readonly authentificationRepository: Authentification.Repository,
     private evenementService: EvenementService,
-    @Inject(MailServiceToken)
-    private readonly mailService: Mail.Service,
-    private mailFactory: Mail.Factory,
     private authorizeConseillerForJeune: ConseillerForJeuneAuthorizer,
     private dateService: DateService
   ) {
@@ -81,29 +77,16 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
     }
     await this.archivageJeuneRepository.archiver(metadonneesArchive)
 
-    if (false) {
-      await this.authentificationRepository.deleteJeuneIdp(command.idJeune)
-      await this.jeuneRepository.supprimer(command.idJeune)
-      await this.chatRepository.supprimerChat(command.idJeune)
-
-      if (jeune!.conseiller?.email) {
-        const mail = this.mailFactory.creerMailSuppressionJeune(jeune!)
-        await this.mailService.envoyer(mail)
-      } else {
-        this.logger.warn(
-          `Email non envoyé au conseiller : ${JSON.stringify(
-            jeune!.conseiller
-          )}`
-        )
-      }
-    }
+    await this.authentificationRepository.deleteJeuneIdp(command.idJeune)
+    await this.jeuneRepository.supprimer(command.idJeune)
+    await this.chatRepository.supprimerChat(command.idJeune)
 
     return emptySuccess()
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
     await this.evenementService.creerEvenement(
-      Evenement.Type.COMPTE_SUPPRIME,
+      Evenement.Type.COMPTE_ARCHIVE,
       utilisateur
     )
   }
