@@ -12,7 +12,7 @@ import {
   Query
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { ApiOAuth2, ApiTags } from '@nestjs/swagger'
+import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   AddFavoriOffreImmersionCommand,
   AddFavoriOffreImmersionCommandHandler
@@ -60,6 +60,8 @@ import {
   GetFavorisServicesCiviqueQueryParams
 } from './validation/favoris.inputs'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../application/queries/get-favoris-service-civique-jeune.query.handler'
+import { ServiceCiviqueQueryModel } from 'src/application/queries/query-models/service-civique.query-model'
+import { Core } from 'src/domain/core'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -77,6 +79,14 @@ export class FavorisController {
     private readonly deleteFavoriOffreEngagementCommandHandler: DeleteFavoriOffreEngagementCommandHandler
   ) {}
 
+  @ApiOperation({
+    summary: "Récupère les favoris d'offres d'emploi",
+    description: 'Autorisé pour un jeune'
+  })
+  @ApiResponse({
+    type: OffreEmploiResumeQueryModel,
+    isArray: true
+  })
   @Get('favoris/offres-emploi')
   async getFavorisOffresEmploi(
     @Param('idJeune') idJeune: string,
@@ -89,6 +99,14 @@ export class FavorisController {
     )
   }
 
+  @ApiOperation({
+    summary: "Récupère les favoris d'offres d'immersion",
+    description: 'Autorisé pour un jeune'
+  })
+  @ApiResponse({
+    type: OffreImmersionQueryModel,
+    isArray: true
+  })
   @Get('favoris/offres-immersion')
   async getFavorisOffresImmersion(
     @Param('idJeune') idJeune: string,
@@ -101,12 +119,20 @@ export class FavorisController {
     )
   }
 
+  @ApiOperation({
+    summary: "Récupère les favoris d'offres de service civique",
+    description: 'Autorisé pour un jeune'
+  })
+  @ApiResponse({
+    type: ServiceCiviqueQueryModel,
+    isArray: true
+  })
   @Get('favoris/services-civique')
   async getFavorisServicesCivique(
     @Param('idJeune') idJeune: string,
     @Query() getFavorisQuery: GetFavorisServicesCiviqueQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<OffreImmersionQueryModel[] | FavoriOffreImmersionIdQueryModel[]> {
+  ): Promise<ServiceCiviqueQueryModel[] | Core.Id[]> {
     return this.getFavorisServiceCiviqueJeuneQueryHandler.execute(
       { idJeune, detail: Boolean(getFavorisQuery.detail) },
       utilisateur
