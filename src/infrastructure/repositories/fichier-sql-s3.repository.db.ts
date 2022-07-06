@@ -40,7 +40,7 @@ export class FichierSqlS3Repository implements Fichier.Repository {
   }
 
   async getIdsFichiersBefore(date: Date): Promise<string[]> {
-    const FichiersIdsSqlModel = await FichierSqlModel.findAll({
+    const fichiersSql = await FichierSqlModel.findAll({
       attributes: ['id'],
       where: {
         dateSuppression: {
@@ -52,7 +52,7 @@ export class FichierSqlS3Repository implements Fichier.Repository {
       }
     })
 
-    return FichiersIdsSqlModel.map(fichierId => fichierId.id)
+    return fichiersSql.map(fichier => fichier.id)
   }
 
   async getFichierMetadata(

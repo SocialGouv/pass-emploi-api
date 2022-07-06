@@ -12,6 +12,8 @@ import { InitCronsCommandHandler } from './commands/tasks/init-crons.command'
 import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
 import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
 import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from './commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
+import { HandleJobNettoyerPiecesJointesCommandHandler } from './commands/jobs/handle-job-nettoyer-pieces-jointes.command'
+import { HandleJobNettoyerArchivesJeunesCommandHandler } from './commands/jobs/handle-job-nettoyer-les-archives-jeune.command'
 
 export enum Task {
   DUMMY_JOB = 'DUMMY_JOB',
@@ -22,7 +24,9 @@ export enum Task {
   INITIALISER_LES_CRON = 'INITIALISER_LES_CRON',
   NETTOYER_LES_JOBS = 'NETTOYER_LES_JOBS',
   METTRE_A_JOUR_MAILING_LIST_CONSEILLER = 'METTRE_A_JOUR_MAILING_LIST_CONSEILLER',
-  RECUPERER_SITUATIONS_JEUNES_MILO = 'RECUPERER_SITUATIONS_JEUNES_MILO'
+  RECUPERER_SITUATIONS_JEUNES_MILO = 'RECUPERER_SITUATIONS_JEUNES_MILO',
+  NETTOYER_LES_PIECES_JOINTES = 'NETTOYER_LES_PIECES_JOINTES',
+  NETTOYER_LES_ARCHIVES_JEUNES = 'NETTOYER_LES_ARCHIVES_JEUNES'
 }
 
 @Injectable()
@@ -39,7 +43,9 @@ export class TaskService {
     private handleNettoyerLesJobsCommandHandler: HandleNettoyerLesJobsCommandHandler,
     private handleJobUpdateMailingListConseillerCommandHandler: HandleJobUpdateMailingListConseillerCommandHandler,
     private handleJobNotifierNouveauxServicesCiviqueCommandHandler: HandleJobNotifierNouveauxServicesCiviqueCommandHandler,
-    private handleJobRecupererSituationsJeunesMiloCommandHandler: HandleJobRecupererSituationsJeunesMiloCommandHandler
+    private handleJobRecupererSituationsJeunesMiloCommandHandler: HandleJobRecupererSituationsJeunesMiloCommandHandler,
+    private handleJobNettoyerPiecesJointesCommandHandler: HandleJobNettoyerPiecesJointesCommandHandler,
+    private handleJobNettoyerArchivesJeunesCommandHandler: HandleJobNettoyerArchivesJeunesCommandHandler
   ) {}
 
   async handle(task: Task | undefined): Promise<void> {
@@ -77,6 +83,12 @@ export class TaskService {
           break
         case Task.RECUPERER_SITUATIONS_JEUNES_MILO:
           await this.handleJobRecupererSituationsJeunesMiloCommandHandler.execute()
+          break
+        case Task.NETTOYER_LES_PIECES_JOINTES:
+          await this.handleJobNettoyerPiecesJointesCommandHandler.execute()
+          break
+        case Task.NETTOYER_LES_ARCHIVES_JEUNES:
+          await this.handleJobNettoyerArchivesJeunesCommandHandler.execute()
           break
         default:
           this.logger.log(
