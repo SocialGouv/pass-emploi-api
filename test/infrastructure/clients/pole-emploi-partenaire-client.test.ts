@@ -144,7 +144,7 @@ describe('PoleEmploiPartenaireClient', () => {
           const body = {
             id: demarcheModifiee.id,
             dateModification: '2020-04-06T12:00:00.000',
-            origineModificateur: 'INDIVIDU',
+            origineModification: 'INDIVIDU',
             etat: 'AC',
             dateDebut: '2020-04-06T12:00:00.000',
             dateFin: undefined,
@@ -181,7 +181,7 @@ describe('PoleEmploiPartenaireClient', () => {
           const body = {
             id: demarcheModifiee.id,
             dateModification: '2020-04-06T12:00:00.000',
-            origineModificateur: 'INDIVIDU',
+            origineModification: 'INDIVIDU',
             etat: 'AC',
             dateDebut: undefined,
             dateFin: undefined,
@@ -219,7 +219,7 @@ describe('PoleEmploiPartenaireClient', () => {
         const body = {
           id: demarcheModifiee.id,
           dateModification: '2020-04-06T12:00:00.000',
-          origineModificateur: 'INDIVIDU',
+          origineModification: 'INDIVIDU',
           etat: 'AC',
           dateDebut: '2020-04-06T12:00:00.000',
           dateFin: undefined,

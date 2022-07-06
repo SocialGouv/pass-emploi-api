@@ -97,7 +97,7 @@ export class PoleEmploiPartenaireClient {
         dateModification: demarcheModifiee.dateModification.toISO({
           includeOffset: false
         }),
-        origineModificateur: ORIGINE,
+        origineModification: ORIGINE,
         etat: toEtat(demarcheModifiee.statut),
         dateDebut: demarcheModifiee.dateDebut
           ? demarcheModifiee.dateDebut?.toISO({ includeOffset: false })
