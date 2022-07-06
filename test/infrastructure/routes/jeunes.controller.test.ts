@@ -611,7 +611,7 @@ describe('JeunesController', () => {
         .expect(HttpStatus.BAD_REQUEST)
     })
 
-    it('renvoie une 204 si motif Autre sans commentaire', async () => {
+    it('renvoie une 204 si motif Autre avec commentaire', async () => {
       //Given
       archiverJeuneCommandHandler.execute.resolves(emptySuccess())
 

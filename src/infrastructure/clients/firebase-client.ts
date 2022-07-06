@@ -230,7 +230,7 @@ export class FirebaseClient implements IFirebaseClient {
         this.fromMessageChiffreToMessageArchive.bind(this)
       )
     }
-    throw new Error()
+    return []
   }
 
   private fromMessageChiffreToMessageArchive(

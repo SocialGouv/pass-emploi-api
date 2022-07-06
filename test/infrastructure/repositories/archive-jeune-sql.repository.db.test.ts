@@ -61,8 +61,9 @@ describe('ArchiveJeuneSqlRepositoryDb', () => {
       database.sequelize
     )
 
-    beforeEach(async () => {
+    before(async () => {
       firebaseClient = stubClass(FirebaseClient)
+      firebaseClient.getChat.resolves([])
       archiveJeuneSqlRepositoryDb = new ArchiveJeuneSqlRepository(
         firebaseClient
       )
@@ -270,6 +271,11 @@ describe('ArchiveJeuneSqlRepositoryDb', () => {
           type: 'OFFRES_IMMERSION'
         }
       ])
+    })
+
+    it('sauvegarde les messages', () => {
+      // Then
+      expect(archivageJeuneSqlModel!.donnees.messages).to.deep.equal([])
     })
   })
 })
