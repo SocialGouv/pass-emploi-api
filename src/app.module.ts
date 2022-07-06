@@ -189,6 +189,7 @@ import { ArchivageJeunesRepositoryToken } from './domain/archive-jeune'
 import { ArchiveJeuneSqlRepository } from './infrastructure/repositories/archive-jeune-sql.repository.db'
 import { GetMotifsSuppressionJeuneQueryHandler } from './application/queries/get-motifs-suppression-jeune.query.handler'
 import { RateLimiterService } from './utils/rate-limiter.service'
+import { HandleJobNettoyerArchivesJeunesCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-archives-jeune.command'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -445,7 +446,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     FichierAuthorizer,
     HandleJobNettoyerPiecesJointesCommandHandler,
     ArchiverJeuneCommandHandler,
-    GetMotifsSuppressionJeuneQueryHandler
+    GetMotifsSuppressionJeuneQueryHandler,
+    HandleJobNettoyerArchivesJeunesCommandHandler
   ]
 }
 

@@ -84,5 +84,7 @@ export namespace ArchiveJeune {
 
   export interface Repository {
     archiver(metadonnes: ArchiveJeune.Metadonnees): Promise<void>
+    getIdsArchivesBefore(date: Date): Promise<number[]>
+    delete(idArchive: number): Promise<void>
   }
 }

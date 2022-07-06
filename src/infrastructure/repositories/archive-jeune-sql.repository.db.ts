@@ -1,20 +1,21 @@
-import { ArchiveJeune } from '../../domain/archive-jeune'
 import { Injectable } from '@nestjs/common'
-import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
-import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
-import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
+import { Op } from 'sequelize'
+import { ArchiveJeune } from '../../domain/archive-jeune'
+import { FirebaseClient } from '../clients/firebase-client'
 import { ActionSqlModel } from '../sequelize/models/action.sql-model'
+import { ArchiveJeuneSqlModel } from '../sequelize/models/archive-jeune.sql-model'
+import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { FavoriOffreEmploiSqlModel } from '../sequelize/models/favori-offre-emploi.sql-model'
-import { FavoriOffreImmersionSqlModel } from '../sequelize/models/favori-offre-immersion.sql-model'
 import { FavoriOffreEngagementSqlModel } from '../sequelize/models/favori-offre-engagement.sql-model'
+import { FavoriOffreImmersionSqlModel } from '../sequelize/models/favori-offre-immersion.sql-model'
+import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { RechercheSqlModel } from '../sequelize/models/recherche.sql-model'
+import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
+import { TransfertConseillerSqlModel } from '../sequelize/models/transfert-conseiller.sql-model'
 import { toOffreEmploi } from './mappers/offres-emploi.mappers'
 import { fromSqlToOffreImmersion } from './mappers/offres-immersion.mappers'
-import { fromSqlToOffreServiceCivique } from './mappers/service-civique.mapper'
 import { fromSqlToRecherche } from './mappers/recherches.mappers'
-import { TransfertConseillerSqlModel } from '../sequelize/models/transfert-conseiller.sql-model'
-import { ArchiveJeuneSqlModel } from '../sequelize/models/archive-jeune.sql-model'
-import { FirebaseClient } from '../clients/firebase-client'
+import { fromSqlToOffreServiceCivique } from './mappers/service-civique.mapper'
 
 @Injectable()
 export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
@@ -32,6 +33,27 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
       dateArchivage: metadonnees.dateArchivage,
       donnees: archive
     })
+  }
+
+  async delete(idArchive: number): Promise<void> {
+    await ArchiveJeuneSqlModel.destroy({
+      where: {
+        id: idArchive
+      }
+    })
+  }
+
+  async getIdsArchivesBefore(date: Date): Promise<number[]> {
+    const archivesSql = await ArchiveJeuneSqlModel.findAll({
+      attributes: ['id'],
+      where: {
+        dateArchivage: {
+          [Op.lte]: date
+        }
+      }
+    })
+
+    return archivesSql.map(archive => archive.id)
   }
 
   private async construire(
