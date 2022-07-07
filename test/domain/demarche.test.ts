@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon'
+import { DateObjectUnits, DateTime } from 'luxon'
 import { Demarche } from '../../src/domain/demarche'
 import { DateService } from '../../src/utils/date-service'
 import { uneDate, uneDatetime } from '../fixtures/date.fixture'
@@ -6,6 +6,13 @@ import { uneDemarche } from '../fixtures/demarche.fixture'
 import { expect, StubbedClass, stubClass } from '../utils'
 import { failure, success } from '../../src/building-blocks/types/result'
 import { MauvaiseCommandeError } from '../../src/building-blocks/types/domain-error'
+
+const parametreHeureAMidi: DateObjectUnits = {
+  hour: 12,
+  minute: 0,
+  second: 0,
+  millisecond: 0
+}
 
 describe('Demarche', () => {
   let demarcheFactory: Demarche.Factory
@@ -215,7 +222,7 @@ describe('Demarche', () => {
         const demarcheCree: Demarche.Creee = {
           statut: Demarche.Statut.A_FAIRE,
           dateCreation: uneDatetime,
-          dateFin: DateTime.fromJSDate(dateFin),
+          dateFin: DateTime.fromJSDate(dateFin).set(parametreHeureAMidi),
           pourquoi: 'P01',
           quoi: 'Q38',
           description
@@ -262,7 +269,7 @@ describe('Demarche', () => {
           const demarcheCree: Demarche.Creee = {
             statut: Demarche.Statut.A_FAIRE,
             dateCreation: uneDatetime,
-            dateFin: DateTime.fromJSDate(dateFin),
+            dateFin: DateTime.fromJSDate(dateFin).set(parametreHeureAMidi),
             quoi: 'C21',
             pourquoi: 'A42',
             comment: 'B12'

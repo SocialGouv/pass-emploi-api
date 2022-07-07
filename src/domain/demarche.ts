@@ -130,8 +130,10 @@ export namespace Demarche {
     }
 
     creerDemarche(demarcheACreer: Demarche.ACreer): Result<Demarche.Creee> {
-      const maintenant = this.dateService.now().set({ hour: 12 })
-      const dateTimeFin = DateTime.fromJSDate(demarcheACreer.dateFin)
+      const maintenant = setHoursTo12h00(this.dateService.now())
+      const dateTimeFin = setHoursTo12h00(
+        DateTime.fromJSDate(demarcheACreer.dateFin)
+      )
 
       if (demarcheACreer.quoi && demarcheACreer.pourquoi) {
         return success({
@@ -165,7 +167,7 @@ export namespace Demarche {
       maintenant: DateTime,
       demarcheModifiee: Demarche.Modifiee
     ): Result<Demarche.Modifiee> {
-      if (dateFin < maintenant.set({ hour: 12 }).toJSDate()) {
+      if (dateFin < setHoursTo12h00(maintenant).toJSDate()) {
         return failure(
           new MauvaiseCommandeError(
             'Une démarche en cours ne peut pas avoir une date de fin dans le passé'
@@ -175,7 +177,7 @@ export namespace Demarche {
 
       return success({
         ...demarcheModifiee,
-        dateDebut: maintenant.set({ hour: 12 })
+        dateDebut: setHoursTo12h00(maintenant)
       })
     }
 
@@ -184,7 +186,7 @@ export namespace Demarche {
       maintenant: DateTime,
       demarcheModifiee: Demarche.Modifiee
     ): Result<Demarche.Modifiee> {
-      const maintenantA12Heures = maintenant.set({ hour: 12 })
+      const maintenantA12Heures = setHoursTo12h00(maintenant)
       if (dateDebut && dateDebut < maintenantA12Heures.toJSDate()) {
         return success({
           ...demarcheModifiee,
@@ -198,4 +200,8 @@ export namespace Demarche {
       })
     }
   }
+}
+
+function setHoursTo12h00(date: DateTime): DateTime {
+  return date.set({ hour: 12, minute: 0, second: 0, millisecond: 0 })
 }
