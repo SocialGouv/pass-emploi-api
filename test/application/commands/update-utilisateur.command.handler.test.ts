@@ -10,7 +10,8 @@ import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import {
   unUtilisateurConseiller,
-  unUtilisateurJeune
+  unUtilisateurJeune,
+  unUtilisateurJeunePasConnecte
 } from 'test/fixtures/authentification.fixture'
 import { uneDate } from 'test/fixtures/date.fixture'
 import {
@@ -478,13 +479,13 @@ describe('UpdateUtilisateurCommandHandler', () => {
       describe('jeune connu par son email', async () => {
         it('retourne le jeune et enregistre le sub + mise à jour date premiere connexion', async () => {
           // Given
-          const utilisateur = unUtilisateurJeune()
+          const utilisateur = unUtilisateurJeunePasConnecte()
 
           const command: UpdateUtilisateurCommand = {
-            idUtilisateurAuth: utilisateur.id,
-            nom: utilisateur.nom,
-            prenom: utilisateur.prenom,
-            email: utilisateur.email,
+            idUtilisateurAuth: 'Id connection',
+            nom: 'nom jeune',
+            prenom: 'prenom jeune',
+            email: 'email jeune',
             type: Authentification.Type.JEUNE,
             structure: Core.Structure.MILO
           }
@@ -513,14 +514,15 @@ describe('UpdateUtilisateurCommandHandler', () => {
               email: command.email,
               nom: command.nom,
               prenom: command.prenom,
+              idAuthentification: command.idUtilisateurAuth,
               dateDerniereConnexion: uneDate(),
               datePremiereConnexion: uneDate()
             })
             expect(result.data).to.deep.equal({
-              email: 'john.doe@plop.io',
+              email: 'email jeune',
               id: 'ABCDE',
-              nom: 'Doe',
-              prenom: 'John',
+              nom: 'nom jeune',
+              prenom: 'prenom jeune',
               roles: [],
               structure: 'MILO',
               type: 'JEUNE'
