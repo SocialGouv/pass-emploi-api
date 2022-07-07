@@ -34,7 +34,7 @@ describe('DeleteJeuneCommandHandler', () => {
   let commandHandler: DeleteJeuneCommandHandler
   let evenementService: StubbedClass<EvenementService>
   let mailFactory: StubbedClass<Mail.Factory>
-  let mailClient: StubbedType<Mail.Service>
+  let mailService: StubbedType<Mail.Service>
   let authentificationRepository: StubbedType<Authentification.Repository>
   let jeune: Jeune
   let command: DeleteJeuneCommand
@@ -44,14 +44,14 @@ describe('DeleteJeuneCommandHandler', () => {
     chatRepository = stubInterface(sandbox)
     evenementService = stubClass(EvenementService)
     authentificationRepository = stubInterface(sandbox)
-    mailClient = stubInterface(sandbox)
+    mailService = stubInterface(sandbox)
     mailFactory = stubClass(Mail.Factory)
     commandHandler = new DeleteJeuneCommandHandler(
       jeuneRepository,
       chatRepository,
       authentificationRepository,
       evenementService,
-      mailClient,
+      mailService,
       mailFactory
     )
 
@@ -162,7 +162,7 @@ describe('DeleteJeuneCommandHandler', () => {
         expect(mailFactory.creerMailSuppressionJeune).to.have.been.calledWith(
           jeune
         )
-        expect(mailClient.envoyer).to.have.been.calledWith(unMailDto())
+        expect(mailService.envoyer).to.have.been.calledWith(unMailDto())
       })
 
       it('renvoie un succès', () => {
@@ -200,7 +200,7 @@ describe('DeleteJeuneCommandHandler', () => {
       })
 
       it("n'envoie pas un email au conseiller", () => {
-        expect(mailClient.envoyer).to.not.have.been.called()
+        expect(mailService.envoyer).to.not.have.been.called()
       })
 
       it('renvoie un succès', () => {
@@ -235,7 +235,7 @@ describe('DeleteJeuneCommandHandler', () => {
       })
 
       it("n'envoie pas un email au conseiller", () => {
-        expect(mailClient.envoyer).to.not.have.been.called()
+        expect(mailService.envoyer).to.not.have.been.called()
       })
 
       it('renvoie un succès', () => {
