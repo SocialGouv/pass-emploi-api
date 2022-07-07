@@ -47,6 +47,28 @@ export const unUtilisateurJeune = (
   }
 }
 
+export const unUtilisateurJeunePasConnecte = (
+  args: Partial<Authentification.Utilisateur> = {}
+): Authentification.Utilisateur => {
+  const defaults: Authentification.Utilisateur = {
+    id: 'ABCDE',
+    nom: 'Doe',
+    prenom: 'John',
+    type: Authentification.Type.JEUNE,
+    email: 'john.doe@plop.io',
+    structure: Core.Structure.MILO,
+    roles: [],
+    dateDerniereConnexion: undefined,
+    datePremiereConnexion: undefined
+  }
+
+  return {
+    ...defaults,
+    ...args,
+    type: Authentification.Type.JEUNE
+  }
+}
+
 export const unUtilisateurSupport = (
   args: Partial<Authentification.Utilisateur> = {}
 ): Authentification.Utilisateur => {

@@ -117,7 +117,8 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
           roles: [],
           email: command.email ?? utilisateurInitial.email,
           dateDerniereConnexion: maintenant,
-          datePremiereConnexion: maintenant
+          datePremiereConnexion: maintenant,
+          idAuthentification: command.idUtilisateurAuth
         }
         await this.authentificationRepository.update(utilisateurMisAJour)
         return success(queryModelFromUtilisateur(utilisateurMisAJour))
