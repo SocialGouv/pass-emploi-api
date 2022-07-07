@@ -4,6 +4,7 @@ import { Conseiller } from './conseiller'
 import { Core } from './core'
 import { Jeune } from './jeune'
 import { RendezVous } from './rendez-vous'
+import { ArchiveJeune } from './archive-jeune'
 
 export const MailServiceToken = 'MailServiceToken'
 export const MailRepositoryToken = 'MailRepositoryToken'
@@ -34,6 +35,8 @@ export namespace Mail {
   }
 
   export interface Service {
+    envoyer(data: MailDataDto): Promise<void>
+
     envoyerMailConversationsNonLues(
       conseiller: Conseiller,
       nombreDeConversationNonLues: number
@@ -45,7 +48,11 @@ export namespace Mail {
       operation: RendezVous.Operation
     ): Promise<void>
 
-    envoyer(data: MailDataDto): Promise<void>
+    envoyerEmailJeuneSuppressionDeSonCompte(
+      jeune: Jeune,
+      motif: ArchiveJeune.MotifSuppression,
+      commentaire?: string
+    ): Promise<void>
 
     mettreAJourMailingList(
       contacts: Contact[],

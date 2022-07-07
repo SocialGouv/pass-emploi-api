@@ -75,7 +75,8 @@ export const configurationSchema = Joi.object({
       rappelRendezvous: Joi.number().required(),
       rendezVousSupprime: Joi.number().required(),
       suppressionJeuneMilo: Joi.number().required(),
-      suppressionJeunePE: Joi.number().required()
+      suppressionJeunePE: Joi.number().required(),
+      compteJeuneSupprimePourJeune: Joi.number().required()
     }),
     mailingLists: Joi.object({
       poleEmploi: Joi.number().required(),

@@ -21,6 +21,7 @@ import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { DateService } from '../../utils/date-service'
+import { Mail, MailServiceToken } from '../../domain/mail'
 
 export interface ArchiverJeuneCommand {
   idJeune: Jeune.Id
@@ -44,7 +45,9 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
     private readonly authentificationRepository: Authentification.Repository,
     private evenementService: EvenementService,
     private authorizeConseillerForJeune: ConseillerForJeuneAuthorizer,
-    private dateService: DateService
+    private dateService: DateService,
+    @Inject(MailServiceToken)
+    private readonly mailService: Mail.Service
   ) {
     super('ArchiverJeuneCommandHandler')
   }
@@ -80,6 +83,12 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
     await this.authentificationRepository.deleteJeuneIdp(command.idJeune)
     await this.jeuneRepository.supprimer(command.idJeune)
     await this.chatRepository.supprimerChat(command.idJeune)
+
+    await this.mailService.envoyerEmailJeuneSuppressionDeSonCompte(
+      jeune,
+      command.motif,
+      command.commentaire
+    )
 
     return emptySuccess()
   }

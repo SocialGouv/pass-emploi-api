@@ -11,6 +11,8 @@ import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitat
 import { MailDataDto } from '../../../src/domain/mail'
 import { RendezVous } from '../../../src/domain/rendez-vous'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { ArchiveJeune } from '../../../src/domain/archive-jeune'
 
 describe('MailSendinblueService', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -66,6 +68,48 @@ describe('MailSendinblueService', () => {
         // Then
         expect(scope.isDone()).to.equal(true)
       })
+    })
+  })
+  describe('envoyerEmailJeuneSuppressionDeSonCompte', () => {
+    it('envoie un email avec les bons paramètres', async () => {
+      // Given
+      const jeune = unJeune()
+      const command = {
+        jeune,
+        motif: ArchiveJeune.MotifSuppression.RADIATION_DU_CEJ,
+        commentaireMotif: undefined
+      }
+      const mailDataDtoAttendu: MailDataDto = {
+        to: [
+          {
+            email: jeune.email,
+            name: `${jeune.firstName} ${jeune.lastName}`
+          }
+        ],
+        templateId: parseInt(
+          config.get('sendinblue').templates.compteJeuneSupprimePourJeune
+        ),
+        params: {
+          prenom: jeune.firstName,
+          nom: jeune.lastName,
+          motif: command.motif,
+          commentaireMotif: ''
+        }
+      }
+      const scope = nock(config.get('sendinblue').url)
+        .post('/v3/smtp/email', JSON.stringify(mailDataDtoAttendu))
+        .reply(200)
+
+      // When
+      await mailSendinblueService.envoyerEmailJeuneSuppressionDeSonCompte(
+        jeune,
+        command.motif,
+        command.commentaireMotif
+      )
+
+      // Then
+      // FIXME : ne marche pas :/ ce serait bien de tester uniquement le param et pas tester toute la méthode envoyée vu qu'elle est déjà testée séparément
+      expect(scope.isDone()).to.equal(true)
     })
   })
   describe('creerContenuMailRendezVous', () => {

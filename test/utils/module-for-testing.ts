@@ -66,7 +66,8 @@ export const testConfig = (): ConfigService => {
       templates: {
         conversationsNonLues: '200',
         nouveauRendezvous: '300',
-        rappelRendezvous: '400'
+        rappelRendezvous: '400',
+        compteJeuneSupprimePourJeune: '500'
       }
     },
     serviceCivique: {

@@ -9,6 +9,8 @@ import {
   RendezVous
 } from '../../domain/rendez-vous'
 import { InvitationIcsClient } from './invitation-ics.client'
+import { Jeune } from '../../domain/jeune'
+import { ArchiveJeune } from '../../domain/archive-jeune'
 
 export type ICS = string
 
@@ -21,6 +23,7 @@ export class MailSendinblueService implements Mail.Service {
     nouveauRendezvous: string
     rappelRendezvous: string
     rendezVousSupprime: string
+    compteJeuneSupprimePourJeune: string
   }
   private frontendUrl: string
 
@@ -33,6 +36,18 @@ export class MailSendinblueService implements Mail.Service {
     this.apiKey = this.configService.get('sendinblue').apiKey
     this.templates = this.configService.get('sendinblue').templates
     this.frontendUrl = this.configService.get('frontEndUrl') ?? ''
+  }
+
+  async envoyer(data: MailDataDto): Promise<void> {
+    await firstValueFrom(
+      this.httpService.post(`${this.sendinblueUrl}/v3/smtp/email`, data, {
+        headers: {
+          'api-key': `${this.apiKey}`,
+          accept: 'application/json',
+          'content-type': 'application/json'
+        }
+      })
+    )
   }
 
   async envoyerMailConversationsNonLues(
@@ -82,6 +97,63 @@ export class MailSendinblueService implements Mail.Service {
     await this.envoyer(mailDatadto)
   }
 
+  async envoyerEmailJeuneSuppressionDeSonCompte(
+    jeune: Jeune,
+    motif: ArchiveJeune.MotifSuppression,
+    commentaire?: string
+  ): Promise<void> {
+    const mailDataDto: MailDataDto = {
+      to: [
+        {
+          email: jeune.email!,
+          name: `${jeune.firstName} ${jeune.lastName}`
+        }
+      ],
+      templateId: parseInt(this.templates.compteJeuneSupprimePourJeune),
+      params: {
+        prenom: jeune.firstName,
+        nom: jeune.lastName,
+        motif,
+        commentaireMotif: commentaire ?? ''
+      }
+    }
+    await this.envoyer(mailDataDto)
+  }
+
+  async mettreAJourMailingList(
+    contacts: Mail.Contact[],
+    mailingListId: number
+  ): Promise<void> {
+    const contactsDTO: Sendinblue.Contact[] = contacts.map(contact => ({
+      email: contact.email,
+      attributes: {
+        nom: contact.nom,
+        prenom: contact.prenom
+      }
+    }))
+    const payload = {
+      listIds: [mailingListId],
+      emailBlacklist: false,
+      smsBlacklist: false,
+      updateExistingContacts: true,
+      emptyContactsAttributes: false,
+      jsonBody: contactsDTO
+    }
+    await firstValueFrom(
+      this.httpService.post(
+        `${this.sendinblueUrl}/v3/contacts/import`,
+        payload,
+        {
+          headers: {
+            'api-key': `${this.apiKey}`,
+            accept: 'application/json',
+            'content-type': 'application/json'
+          }
+        }
+      )
+    )
+  }
+
   creerContenuMailRendezVous(
     conseiller: Conseiller,
     rendezVous: RendezVous,
@@ -126,63 +198,6 @@ export class MailSendinblueService implements Mail.Service {
       }
     }
   }
-
-  async envoyer(data: MailDataDto): Promise<void> {
-    await firstValueFrom(
-      this.httpService.post(`${this.sendinblueUrl}/v3/smtp/email`, data, {
-        headers: {
-          'api-key': `${this.apiKey}`,
-          accept: 'application/json',
-          'content-type': 'application/json'
-        }
-      })
-    )
-  }
-
-  async mettreAJourMailingList(
-    contacts: Mail.Contact[],
-    mailingListId: number
-  ): Promise<void> {
-    const contactsDTO: Sendinblue.Contact[] = contacts.map(contact => ({
-      email: contact.email,
-      attributes: {
-        nom: contact.nom,
-        prenom: contact.prenom
-      }
-    }))
-    const payload = {
-      listIds: [mailingListId],
-      emailBlacklist: false,
-      smsBlacklist: false,
-      updateExistingContacts: true,
-      emptyContactsAttributes: false,
-      jsonBody: contactsDTO
-    }
-    await firstValueFrom(
-      this.httpService.post(
-        `${this.sendinblueUrl}/v3/contacts/import`,
-        payload,
-        {
-          headers: {
-            'api-key': `${this.apiKey}`,
-            accept: 'application/json',
-            'content-type': 'application/json'
-          }
-        }
-      )
-    )
-  }
-}
-
-export function formaterDateRendezVous(rendezVousDate: Date): string {
-  const dateOptions: Intl.DateTimeFormatOptions = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'Europe/Paris'
-  }
-  return rendezVousDate.toLocaleString('fr-FR', dateOptions)
 }
 
 export namespace Sendinblue {
@@ -195,6 +210,17 @@ export namespace Sendinblue {
     nom: string
     prenom: string
   }
+}
+
+export function formaterDateRendezVous(rendezVousDate: Date): string {
+  const dateOptions: Intl.DateTimeFormatOptions = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'Europe/Paris'
+  }
+  return rendezVousDate.toLocaleString('fr-FR', dateOptions)
 }
 
 export function formaterHeureRendezVous(rendezVousDate: Date): string {

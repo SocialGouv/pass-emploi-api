@@ -14,6 +14,7 @@ import { createSandbox } from 'sinon'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
+import { Mail } from '../../../src/domain/mail'
 
 describe('ArchiverJeuneCommandHandler', () => {
   let archiverJeuneCommandHandler: ArchiverJeuneCommandHandler
@@ -24,6 +25,8 @@ describe('ArchiverJeuneCommandHandler', () => {
   let evenementService: StubbedClass<EvenementService>
   let authorizeConseillerForJeune: StubbedClass<ConseillerForJeuneAuthorizer>
   let dateService: StubbedClass<DateService>
+  let mailService: StubbedType<Mail.Service>
+
   const maintenant = new Date('2022-03-01T03:24:00Z')
 
   beforeEach(() => {
@@ -36,6 +39,7 @@ describe('ArchiverJeuneCommandHandler', () => {
     authorizeConseillerForJeune = stubClass(ConseillerForJeuneAuthorizer)
     dateService = stubClass(DateService)
     dateService.nowJs.returns(maintenant)
+    mailService = stubInterface(sandbox)
     archiverJeuneCommandHandler = new ArchiverJeuneCommandHandler(
       jeuneRepository,
       archivageJeuneRepository,
@@ -43,7 +47,8 @@ describe('ArchiverJeuneCommandHandler', () => {
       authentificationRepository,
       evenementService,
       authorizeConseillerForJeune,
-      dateService
+      dateService,
+      mailService
     )
   })
 
@@ -113,6 +118,12 @@ describe('ArchiverJeuneCommandHandler', () => {
         expect(chatRepository.supprimerChat).to.have.been.calledWithExactly(
           'idJeune'
         )
+      })
+
+      it('envoie un email au jeune', () => {
+        expect(
+          mailService.envoyerEmailJeuneSuppressionDeSonCompte
+        ).to.have.been.calledWith(jeune, command.motif, command.commentaire)
       })
     })
   })

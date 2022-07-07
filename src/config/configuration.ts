@@ -102,7 +102,9 @@ export default () => {
         suppressionJeuneMilo:
           process.env.SENDINBLUE_SUPPRESSION_JEUNE_MILO_ID ?? '14',
         suppressionJeunePE:
-          process.env.SENDINBLUE_SUPPRESSION_JEUNE_PE_ID ?? '17'
+          process.env.SENDINBLUE_SUPPRESSION_JEUNE_PE_ID ?? '17',
+        compteJeuneSupprimePourJeune:
+          process.env.SENDINBLUE_COMPTE_JEUNE_SUPPRIME_POUR_JEUNE_ID ?? '51'
       },
       mailingLists: {
         poleEmploi: process.env.SENDINBLUE_POLE_EMPLOI_MAILING_LIST_ID ?? 7,
