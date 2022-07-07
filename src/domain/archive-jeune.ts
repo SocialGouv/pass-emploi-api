@@ -63,7 +63,6 @@ export namespace ArchiveJeune {
     adresse?: string
     organisme?: string
     presenceConseiller: boolean
-    invitation?: boolean
   }
 
   export interface Action {

@@ -121,8 +121,7 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
       precision: rdvSql.precision || undefined,
       adresse: rdvSql.adresse || undefined,
       organisme: rdvSql.organisme || undefined,
-      presenceConseiller: Boolean(rdvSql.presenceConseiller),
-      invitation: Boolean(rdvSql.invitation)
+      presenceConseiller: Boolean(rdvSql.presenceConseiller)
     }
   }
 

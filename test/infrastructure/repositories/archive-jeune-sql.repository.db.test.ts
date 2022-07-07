@@ -200,7 +200,6 @@ describe('ArchiveJeuneSqlRepositoryDb', () => {
           commentaire: 'commentaire',
           date: '2021-11-11T08:03:30.000Z',
           duree: 30,
-          invitation: false,
           modalite: 'modalite',
           presenceConseiller: true,
           sousTitre: 'sous titre',
