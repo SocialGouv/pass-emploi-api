@@ -33,19 +33,17 @@ export class HandleJobNettoyerPiecesJointesCommandHandler extends CommandHandler
     const idsFichiersASupprimer =
       await this.fichierRepository.getIdsFichiersBefore(quatreMoisPlusTot)
 
-    await Promise.all(
-      idsFichiersASupprimer.map(async id => {
-        try {
-          await this.fichierRepository.softDelete(id)
-          stats.fichiersSupprimes++
-        } catch (e) {
-          this.logger.error(
-            buildError(`Erreur lors de la suppression du fichier ${id}`, e)
-          )
-          stats.erreurs++
-        }
-      })
-    )
+    for (const id of idsFichiersASupprimer) {
+      try {
+        await this.fichierRepository.softDelete(id)
+        stats.fichiersSupprimes++
+      } catch (e) {
+        this.logger.error(
+          buildError(`Erreur lors de la suppression du fichier ${id}`, e)
+        )
+        stats.erreurs++
+      }
+    }
 
     stats.tempsDExecution = maintenant.diffNow().milliseconds * -1
     return success(stats)
