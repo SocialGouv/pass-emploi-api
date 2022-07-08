@@ -16,7 +16,7 @@ export class HandleJobNettoyerArchivesJeunesCommandHandler extends CommandHandle
 > {
   constructor(
     @Inject(ArchivageJeunesRepositoryToken)
-    private readonly archivageJeuneRepository: ArchiveJeune.Repository,
+    private readonly archiveJeuneRepository: ArchiveJeune.Repository,
     private dateService: DateService
   ) {
     super('HandleJobNettoyerArchivesJeunesCommandHandler')
@@ -35,21 +35,19 @@ export class HandleJobNettoyerArchivesJeunesCommandHandler extends CommandHandle
       .toJSDate()
 
     const idsArchivesASupprimer =
-      await this.archivageJeuneRepository.getIdsArchivesBefore(deuxAnsPlusTot)
+      await this.archiveJeuneRepository.getIdsArchivesBefore(deuxAnsPlusTot)
 
-    await Promise.all(
-      idsArchivesASupprimer.map(async id => {
-        try {
-          await this.archivageJeuneRepository.delete(id)
-          stats.archivesSupprimees++
-        } catch (e) {
-          this.logger.error(
-            buildError(`Erreur lors de la suppression de l'archive ${id}`, e)
-          )
-          stats.erreurs++
-        }
-      })
-    )
+    for (const id of idsArchivesASupprimer) {
+      try {
+        await this.archiveJeuneRepository.delete(id)
+        stats.archivesSupprimees++
+      } catch (e) {
+        this.logger.error(
+          buildError(`Erreur lors de la suppression de l'archive ${id}`, e)
+        )
+        stats.erreurs++
+      }
+    }
 
     stats.tempsDExecution = maintenant.diffNow().milliseconds * -1
     return success(stats)

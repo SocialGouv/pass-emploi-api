@@ -81,7 +81,11 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
   async createCron(cron: Planificateur.Cron): Promise<void> {
     await this.queue.add(cron, {
       jobId: cron.type,
-      repeat: { cron: cron.expression, tz: CRON_TIMEZONE }
+      repeat: {
+        cron: cron.expression,
+        tz: CRON_TIMEZONE,
+        startDate: cron.startDate
+      }
     })
   }
 

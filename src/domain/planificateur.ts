@@ -57,6 +57,7 @@ export namespace Planificateur {
   export interface Cron {
     type: CronJob
     expression: string
+    startDate?: Date
   }
 
   export interface Handler<T> {
@@ -125,7 +126,17 @@ export class PlanificateurService {
       case Planificateur.CronJob.NETTOYER_LES_PIECES_JOINTES: {
         const cron: Planificateur.Cron = {
           type: Planificateur.CronJob.NETTOYER_LES_PIECES_JOINTES,
-          expression: '0 2 * * *'
+          expression: '0 2 * * *',
+          startDate: new Date('2022-10-01')
+        }
+        await this.planificateurRepository.createCron(cron)
+        break
+      }
+      case Planificateur.CronJob.NETTOYER_LES_ARCHIVES_JEUNES: {
+        const cron: Planificateur.Cron = {
+          type: Planificateur.CronJob.NETTOYER_LES_ARCHIVES_JEUNES,
+          expression: '0 3 * * *',
+          startDate: new Date('2024-07-08')
         }
         await this.planificateurRepository.createCron(cron)
         break
