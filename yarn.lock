@@ -2035,25 +2035,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/swagger@npm:5.2.1":
-  version: 5.2.1
-  resolution: "@nestjs/swagger@npm:5.2.1"
+"@nestjs/swagger@npm:6.0.0":
+  version: 6.0.0
+  resolution: "@nestjs/swagger@npm:6.0.0"
   dependencies:
     "@nestjs/mapped-types": 1.0.1
+    js-yaml: 4.1.0
     lodash: 4.17.21
     path-to-regexp: 3.2.0
+    swagger-ui-dist: 4.12.0
   peerDependencies:
-    "@nestjs/common": ^8.0.0
-    "@nestjs/core": ^8.0.0
-    fastify-swagger: "*"
+    "@fastify/static": ^6.0.0
+    "@nestjs/common": ^9.0.0
+    "@nestjs/core": ^9.0.0
     reflect-metadata: ^0.1.12
-    swagger-ui-express: "*"
   peerDependenciesMeta:
-    fastify-swagger:
+    "@fastify/static":
       optional: true
-    swagger-ui-express:
-      optional: true
-  checksum: 70e204c6068a0aebcd5c3486599e83cfc34e6d1823a580e1d1ed60f80f01c50ed2be9765b76d171b28eaf3b1f7f237f388c1daf86041634a3289e84c7219af5d
+  checksum: 259cfe017d6b36312c067452fc925ccb949f400ada17b975181a9f41409a82e82daa3dda1721ddbcebeb21e2346b966a367617f90613565e6f724d9d43353e3c
   languageName: node
   linkType: hard
 
@@ -7960,7 +7959,7 @@ __metadata:
     "@nestjs/core": 8.4.7
     "@nestjs/platform-express": 8.4.7
     "@nestjs/schematics": ^9.0.0
-    "@nestjs/swagger": 5.2.1
+    "@nestjs/swagger": 6.0.0
     "@nestjs/terminus": 8.1.1
     "@nestjs/testing": ^8.4.7
     "@salesforce/ts-sinon": ^1.3.21
@@ -10224,10 +10223,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swagger-ui-dist@npm:>=4.11.0":
-  version: 4.11.1
-  resolution: "swagger-ui-dist@npm:4.11.1"
-  checksum: 678f677f2620f58d868d3f97832d9a9a9402e88f3d513da5749273d78c527cd8825db5d275f6046badf981ddb977b6c8737a384c575bdc8de2a67605ff11822b
+"swagger-ui-dist@npm:4.12.0, swagger-ui-dist@npm:>=4.11.0":
+  version: 4.12.0
+  resolution: "swagger-ui-dist@npm:4.12.0"
+  checksum: 24d1ac0590dd09f77fa6fa237620a5fef41e3a14614f15dfbac5e3dc6891b4a6083aa6ae8325fcec7ac35ed8b783541c9d15ba3ec813639ea751d84cae3846a7
   languageName: node
   linkType: hard
 
