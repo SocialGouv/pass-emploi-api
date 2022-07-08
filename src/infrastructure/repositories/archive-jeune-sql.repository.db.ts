@@ -23,13 +23,14 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
 
   async archiver(metadonnees: ArchiveJeune.Metadonnees): Promise<void> {
     const archive = await this.construire(metadonnees)
+
     await ArchiveJeuneSqlModel.create({
       idJeune: metadonnees.idJeune,
-      email: metadonnees.email,
+      email: metadonnees.email ?? null,
       prenom: metadonnees.prenomJeune,
       nom: metadonnees.nomJeune,
       motif: metadonnees.motif,
-      commentaire: metadonnees.commentaire,
+      commentaire: metadonnees.commentaire ?? null,
       dateArchivage: metadonnees.dateArchivage,
       donnees: archive
     })
@@ -98,33 +99,36 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
     messages: ArchiveJeune.Message[]
   ): ArchiveJeune {
     return {
-      rendezVous: jeuneSqlModel.rdv.map(this.toRendezVousArchive),
+      rendezVous: jeuneSqlModel.rdv?.map(this.toRendezVousArchive) ?? [],
       actions: this.fromActionSqlToActionArchive(jeuneSqlModel, metadonnes),
       favoris: {
-        offresEmploi: jeuneSqlModel.favorisOffreEmploi.map(toOffreEmploi),
-        offresImmersions: jeuneSqlModel.favorisOffreImmersion.map(
-          fromSqlToOffreImmersion
-        ),
-        offresServiceCivique: jeuneSqlModel.favorisOffreEngagement.map(
-          fromSqlToOffreServiceCivique
-        )
+        offresEmploi:
+          jeuneSqlModel.favorisOffreEmploi?.map(toOffreEmploi) ?? [],
+        offresImmersions:
+          jeuneSqlModel.favorisOffreImmersion?.map(fromSqlToOffreImmersion) ??
+          [],
+        offresServiceCivique:
+          jeuneSqlModel.favorisOffreEngagement?.map(
+            fromSqlToOffreServiceCivique
+          ) ?? []
       },
-      recherches: jeuneSqlModel.recherches.map(fromSqlToRecherche),
+      recherches: jeuneSqlModel.recherches?.map(fromSqlToRecherche) ?? [],
       dernierConseiller: {
         nom: jeuneSqlModel.conseiller?.nom || '',
         prenom: jeuneSqlModel.conseiller?.prenom || ''
       },
-      historiqueConseillers: jeuneSqlModel.transferts.map(transfertSql => ({
-        conseillerSource: {
-          prenom: transfertSql.conseillerSource.prenom,
-          nom: transfertSql.conseillerSource.nom
-        },
-        conseillerCible: {
-          prenom: transfertSql.conseillerCible.prenom,
-          nom: transfertSql.conseillerCible.nom
-        },
-        dateDeTransfert: transfertSql.dateTransfert
-      })),
+      historiqueConseillers:
+        jeuneSqlModel.transferts?.map(transfertSql => ({
+          conseillerSource: {
+            prenom: transfertSql.conseillerSource.prenom,
+            nom: transfertSql.conseillerSource.nom
+          },
+          conseillerCible: {
+            prenom: transfertSql.conseillerCible.prenom,
+            nom: transfertSql.conseillerCible.nom
+          },
+          dateDeTransfert: transfertSql.dateTransfert
+        })) ?? [],
       messages
     }
   }
@@ -151,15 +155,17 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
     jeuneSqlModel: JeuneSqlModel,
     metadonnes: ArchiveJeune.Metadonnees
   ): ArchiveJeune.Action[] {
-    return jeuneSqlModel.actions.map(actionSql => ({
-      commentaire: actionSql.commentaire || '',
-      contenu: actionSql.contenu || '',
-      statut: actionSql.statut || '',
-      dateCreation: actionSql.dateCreation,
-      creePar:
-        actionSql.idCreateur === metadonnes.idJeune ? 'JEUNE' : 'CONSEILLER',
-      dateActualisation: actionSql.dateDerniereActualisation,
-      dateLimite: actionSql.dateLimite || undefined
-    }))
+    return (
+      jeuneSqlModel.actions?.map(actionSql => ({
+        commentaire: actionSql.commentaire || '',
+        contenu: actionSql.contenu || '',
+        statut: actionSql.statut || '',
+        dateCreation: actionSql.dateCreation,
+        creePar:
+          actionSql.idCreateur === metadonnes.idJeune ? 'JEUNE' : 'CONSEILLER',
+        dateActualisation: actionSql.dateDerniereActualisation,
+        dateLimite: actionSql.dateLimite || undefined
+      })) ?? []
+    )
   }
 }
