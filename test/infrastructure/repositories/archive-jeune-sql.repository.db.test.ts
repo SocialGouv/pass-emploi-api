@@ -1,57 +1,62 @@
-import { ArchiveJeuneSqlRepository } from '../../../src/infrastructure/repositories/archive-jeune-sql.repository.db'
+import { uneArchiveJeuneMetadonnees } from 'test/fixtures/archiveJeune.fixture'
+import { uneDatetime } from 'test/fixtures/date.fixture'
+import { Action } from '../../../src/domain/action'
+import { ArchiveJeune } from '../../../src/domain/archive-jeune'
+import { Recherche } from '../../../src/domain/recherche'
+import { EngagementClient } from '../../../src/infrastructure/clients/engagement-client'
 import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
+import { ArchiveJeuneSqlRepository } from '../../../src/infrastructure/repositories/archive-jeune-sql.repository.db'
+import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-emploi-http-sql.repository.db'
+import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-immersion-http-sql.repository.db'
+import { OffreServiceCiviqueHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-service-civique-http.repository.db'
+import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/recherche-sql.repository.db'
+import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
+import { ArchiveJeuneSqlModel } from '../../../src/infrastructure/sequelize/models/archive-jeune.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { ArchiveJeune } from '../../../src/domain/archive-jeune'
-import { ArchiveJeuneSqlModel } from '../../../src/infrastructure/sequelize/models/archive-jeune.sql-model'
-import { AsSql } from '../../../src/infrastructure/sequelize/types'
+import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
+import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import {
   TransfertConseillerDto,
   TransfertConseillerSqlModel
 } from '../../../src/infrastructure/sequelize/models/transfert-conseiller.sql-model'
-import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
-import { Action } from '../../../src/domain/action'
-import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
-import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
+import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
-import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-emploi-http-sql.repository.db'
 import { uneOffreImmersion } from '../../fixtures/offre-immersion.fixture'
-import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-immersion-http-sql.repository.db'
 import { uneOffreServiceCivique } from '../../fixtures/offre-service-civique.fixture'
-import { OffreServiceCiviqueHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-service-civique-http.repository.db'
-import { EngagementClient } from '../../../src/infrastructure/clients/engagement-client'
 import {
   criteresImmersionNice,
   uneRecherche
 } from '../../fixtures/recherche.fixture'
-import { Recherche } from '../../../src/domain/recherche'
-import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/recherche-sql.repository.db'
+import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
+import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
+import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
+import { expect, stubClass } from '../../utils'
+import { DatabaseForTesting } from '../../utils/database-for-testing'
 
-describe('ArchiveJeuneSqlRepositoryDb', () => {
+describe('ArchiveJeuneSqlRepository', () => {
+  const database = DatabaseForTesting.prepare()
+  const firebaseClient = stubClass(FirebaseClient)
+  firebaseClient.getChat.resolves([])
+  const archiveJeuneSqlRepository = new ArchiveJeuneSqlRepository(
+    firebaseClient
+  )
+  const premierConseillerDto = unConseillerDto({
+    id: '1169709f-ca18-40d2-844a-c8b3a5df5af6',
+    prenom: 'Bob',
+    nom: 'Lenon'
+  })
+  const secondConseillerDto = unConseillerDto({
+    id: '361cfcd4-d18c-4530-b4b8-c16d488aff0c'
+  })
+  const jeuneDto = unJeuneDto({
+    idConseiller: secondConseillerDto.id
+  })
+
   describe('archiver', () => {
-    const database = DatabaseForTesting.prepare()
-    let archiveJeuneSqlRepositoryDb: ArchiveJeuneSqlRepository
-    let firebaseClient: StubbedClass<FirebaseClient>
-    let archivageJeuneSqlModel: ArchiveJeuneSqlModel | null
+    let archiveJeuneSql: ArchiveJeuneSqlModel | null
     let metadonnees: ArchiveJeune.Metadonnees
-    const premierConseillerDto = unConseillerDto({
-      id: '1169709f-ca18-40d2-844a-c8b3a5df5af6',
-      prenom: 'Bob',
-      nom: 'Lenon'
-    })
-    const secondConseillerDto = unConseillerDto({
-      id: '361cfcd4-d18c-4530-b4b8-c16d488aff0c'
-    })
-    const jeuneDto = unJeuneDto({
-      idConseiller: secondConseillerDto.id
-    })
-
     const offresEmploiHttpSqlRepository = new OffresEmploiHttpSqlRepository()
     const offresImmersionRepository = new OffresImmersionHttpSqlRepository()
     const engagementClient: EngagementClient = stubClass(EngagementClient)
@@ -62,16 +67,10 @@ describe('ArchiveJeuneSqlRepositoryDb', () => {
     )
 
     before(async () => {
-      firebaseClient = stubClass(FirebaseClient)
-      firebaseClient.getChat.resolves([])
-      archiveJeuneSqlRepositoryDb = new ArchiveJeuneSqlRepository(
-        firebaseClient
-      )
-
       // Given
-      await ConseillerSqlModel.creer(premierConseillerDto)
-      await ConseillerSqlModel.creer(secondConseillerDto)
-      await JeuneSqlModel.creer(jeuneDto)
+      await ConseillerSqlModel.upsert(premierConseillerDto)
+      await ConseillerSqlModel.upsert(secondConseillerDto)
+      await JeuneSqlModel.upsert(jeuneDto)
 
       const unTransfertDto: AsSql<TransfertConseillerDto> = {
         id: '070fa845-7316-496e-b96c-b69c2a1f4ce8',
@@ -129,32 +128,30 @@ describe('ArchiveJeuneSqlRepositoryDb', () => {
         email: jeuneDto.email!,
         dateArchivage: new Date('2022-07-05T09:23:00Z')
       }
-      await archiveJeuneSqlRepositoryDb.archiver(metadonnees)
+      await archiveJeuneSqlRepository.archiver(metadonnees)
 
       // When
-      archivageJeuneSqlModel = await ArchiveJeuneSqlModel.findOne({
+      archiveJeuneSql = await ArchiveJeuneSqlModel.findOne({
         where: { idJeune: jeuneDto.id }
       })
     })
 
     it('crée une archive avec les métadonnées', () => {
       // Then
-      expect(archivageJeuneSqlModel!.idJeune).to.equal(jeuneDto.id)
-      expect(archivageJeuneSqlModel!.nom).to.equal(jeuneDto.nom)
-      expect(archivageJeuneSqlModel!.prenom).to.equal(jeuneDto.prenom)
-      expect(archivageJeuneSqlModel!.email).to.equal(jeuneDto.email)
-      expect(archivageJeuneSqlModel!.dateArchivage).to.deep.equal(
+      expect(archiveJeuneSql!.idJeune).to.equal(jeuneDto.id)
+      expect(archiveJeuneSql!.nom).to.equal(jeuneDto.nom)
+      expect(archiveJeuneSql!.prenom).to.equal(jeuneDto.prenom)
+      expect(archiveJeuneSql!.email).to.equal(jeuneDto.email)
+      expect(archiveJeuneSql!.dateArchivage).to.deep.equal(
         metadonnees.dateArchivage
       )
-      expect(archivageJeuneSqlModel!.motif).to.equal(metadonnees.motif)
-      expect(archivageJeuneSqlModel!.commentaire).to.equal(
-        metadonnees.commentaire
-      )
+      expect(archiveJeuneSql!.motif).to.equal(metadonnees.motif)
+      expect(archiveJeuneSql!.commentaire).to.equal(metadonnees.commentaire)
     })
 
     it('sauvegarde le dernier conseiller', () => {
       // Then
-      expect(archivageJeuneSqlModel!.donnees.dernierConseiller).to.deep.equal({
+      expect(archiveJeuneSql!.donnees.dernierConseiller).to.deep.equal({
         nom: 'Tavernier',
         prenom: 'Nils'
       })
@@ -162,9 +159,7 @@ describe('ArchiveJeuneSqlRepositoryDb', () => {
 
     it("génère l'historique des conseillers", () => {
       // Then
-      expect(
-        archivageJeuneSqlModel!.donnees.historiqueConseillers
-      ).to.deep.equal([
+      expect(archiveJeuneSql!.donnees.historiqueConseillers).to.deep.equal([
         {
           conseillerCible: {
             nom: 'Tavernier',
@@ -181,7 +176,7 @@ describe('ArchiveJeuneSqlRepositoryDb', () => {
 
     it('sauvegarde les actions', () => {
       // Then
-      expect(archivageJeuneSqlModel!.donnees.actions).to.deep.equal([
+      expect(archiveJeuneSql!.donnees.actions).to.deep.equal([
         {
           commentaire: "Commentaire de l'action",
           contenu: "Contenu de l'action",
@@ -195,7 +190,7 @@ describe('ArchiveJeuneSqlRepositoryDb', () => {
 
     it('sauvegarde les rendez vous', () => {
       // Then
-      expect(archivageJeuneSqlModel!.donnees.rendezVous).to.deep.equal([
+      expect(archiveJeuneSql!.donnees.rendezVous).to.deep.equal([
         {
           commentaire: 'commentaire',
           date: '2021-11-11T08:03:30.000Z',
@@ -211,7 +206,7 @@ describe('ArchiveJeuneSqlRepositoryDb', () => {
 
     it('sauvegarde les favoris', () => {
       // Then
-      expect(archivageJeuneSqlModel!.donnees.favoris).to.deep.equal({
+      expect(archiveJeuneSql!.donnees.favoris).to.deep.equal({
         offresEmploi: [
           {
             alternance: false,
@@ -251,7 +246,7 @@ describe('ArchiveJeuneSqlRepositoryDb', () => {
 
     it('sauvegarde les recherches', () => {
       // Then
-      expect(archivageJeuneSqlModel!.donnees.recherches).to.deep.equal([
+      expect(archiveJeuneSql!.donnees.recherches).to.deep.equal([
         {
           criteres: {
             distance: 15,
@@ -274,7 +269,79 @@ describe('ArchiveJeuneSqlRepositoryDb', () => {
 
     it('sauvegarde les messages', () => {
       // Then
-      expect(archivageJeuneSqlModel!.donnees.messages).to.deep.equal([])
+      expect(archiveJeuneSql!.donnees.messages).to.deep.equal([])
+    })
+  })
+
+  describe('.delete(idArchive)', () => {
+    beforeEach(async () => {
+      await ConseillerSqlModel.upsert(secondConseillerDto)
+      await JeuneSqlModel.upsert(jeuneDto)
+      await archiveJeuneSqlRepository.archiver(
+        uneArchiveJeuneMetadonnees({ idJeune: jeuneDto.id })
+      )
+    })
+    it("supprime l'archive de la db", async () => {
+      // Given
+      const archive = await ArchiveJeuneSqlModel.findOne({
+        where: { idJeune: jeuneDto.id }
+      })
+
+      // When
+      await archiveJeuneSqlRepository.delete(archive!.id)
+      const archiveTrouvee = await ArchiveJeuneSqlModel.findByPk(archive!.id)
+
+      // Then
+      expect(archive).not.to.be.null()
+      expect(archiveTrouvee).to.be.null()
+    })
+  })
+
+  describe('.getIdsArchivesBefore()', () => {
+    const maintenant = uneDatetime
+    const deuxAnsPlusTot = uneDatetime.minus({ years: 2 }).toJSDate()
+
+    const archiveRecente = uneArchiveJeuneMetadonnees({
+      idJeune: jeuneDto.id,
+      dateArchivage: maintenant.minus({ years: 1 }).toJSDate()
+    })
+    const archiveOld1 = uneArchiveJeuneMetadonnees({
+      idJeune: jeuneDto.id,
+      dateArchivage: maintenant.minus({ years: 2 }).toJSDate()
+    })
+    const archiveOld2 = uneArchiveJeuneMetadonnees({
+      idJeune: jeuneDto.id,
+      dateArchivage: maintenant.minus({ years: 4 }).toJSDate()
+    })
+
+    beforeEach(async () => {
+      await ConseillerSqlModel.upsert(secondConseillerDto)
+      await JeuneSqlModel.upsert(jeuneDto)
+    })
+
+    it('retourne tableau vide quand aucune archive à supprimer', async () => {
+      // Given
+      await archiveJeuneSqlRepository.archiver(archiveRecente)
+
+      // When
+      const results = await archiveJeuneSqlRepository.getIdsArchivesBefore(
+        deuxAnsPlusTot
+      )
+      // Then
+      expect(results).to.deep.equal([])
+    })
+    it("retourne les archives créées il y'a plus de 2 ans seulement", async () => {
+      // Given
+      await archiveJeuneSqlRepository.archiver(archiveRecente)
+      await archiveJeuneSqlRepository.archiver(archiveOld1)
+      await archiveJeuneSqlRepository.archiver(archiveOld2)
+
+      // When
+      const results = await archiveJeuneSqlRepository.getIdsArchivesBefore(
+        deuxAnsPlusTot
+      )
+      // Then
+      expect(results.length).to.equal(2)
     })
   })
 })

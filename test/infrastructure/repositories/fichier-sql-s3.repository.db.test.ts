@@ -106,7 +106,7 @@ describe('FichierSqlS3Repository', () => {
     })
   })
 
-  describe('.getFichiersASupprimer()', () => {
+  describe('.getIdsFichiersBefore()', () => {
     const fichierRecent = unFichierMetadata({
       dateCreation: maintenant.minus({ months: 2 }).toJSDate()
     })
