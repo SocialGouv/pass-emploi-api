@@ -58,7 +58,7 @@
     "@aws-sdk/s3-request-presigner": "^3.121.0",
     "@nestjs/axios": "0.0.8",
     "@nestjs/common": "9.0.1",
-    "@nestjs/config": "2.1.0",
+    "@nestjs/config": "2.2.0",
     "@nestjs/core": "9.0.1",
     "@nestjs/platform-express": "9.0.1",
     "@nestjs/swagger": "6.0.0",
