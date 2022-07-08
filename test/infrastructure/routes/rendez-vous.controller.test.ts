@@ -97,19 +97,13 @@ describe('RendezvousController', () => {
         .expect(HttpStatus.NOT_FOUND)
         .expect(expectedMessageJson)
     })
-    it('renvoie une 400(BAD REQUEST) si l"id du rendez-vous n"est pas un UUID', async () => {
-      const expectedMessageJson = {
-        statusCode: 400,
-        message: 'Validation failed (uuid  is expected)',
-        error: 'Bad Request'
-      }
+    it("renvoie une 400(BAD REQUEST) si l'id du rendez-vous n'est pas un UUID", async () => {
       //When
       await request(app.getHttpServer())
         .delete(`/rendezvous/12`)
         .set('authorization', unHeaderAuthorization())
         //Then
         .expect(HttpStatus.BAD_REQUEST)
-        .expect(expectedMessageJson)
     })
     ensureUserAuthenticationFailsIfInvalid('delete', '/rendezvous/123')
   })
