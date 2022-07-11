@@ -5,6 +5,7 @@ import { DateService } from '../utils/date-service'
 import { MauvaiseCommandeError } from '../building-blocks/types/domain-error'
 
 export const DemarcheRepositoryToken = 'DemarcheRepositoryToken'
+
 const POURQUOI_DEMARCHE_PERSO = 'P01'
 const QUOI_DEMARCHE_PERSO = 'Q38'
 
