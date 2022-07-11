@@ -60,16 +60,12 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
   private async construire(
     metadonnes: ArchiveJeune.Metadonnees
   ): Promise<ArchiveJeune | undefined> {
-    const messages = await this.firebaseClient.getChat(metadonnes.idJeune)
-    const jeuneSqlModel = await JeuneSqlModel.findByPk(metadonnes.idJeune, {
+    const idJeune = metadonnes.idJeune
+
+    const messages = await this.firebaseClient.getChat(idJeune)
+    const jeuneSqlModel = await JeuneSqlModel.findByPk(idJeune, {
       include: [
         ConseillerSqlModel,
-        RendezVousSqlModel,
-        ActionSqlModel,
-        FavoriOffreEmploiSqlModel,
-        FavoriOffreImmersionSqlModel,
-        FavoriOffreEngagementSqlModel,
-        RechercheSqlModel,
         {
           model: TransfertConseillerSqlModel,
           include: [
@@ -90,29 +86,71 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
       return undefined
     }
 
-    return this.mapToArchiveJeune(jeuneSqlModel, metadonnes, messages)
+    const rdv = await RendezVousSqlModel.findAll({
+      include: [
+        {
+          model: JeuneSqlModel,
+          where: { id: idJeune },
+          include: [ConseillerSqlModel]
+        }
+      ],
+      where: {
+        dateSuppression: {
+          [Op.is]: null
+        }
+      }
+    })
+    const actions = await ActionSqlModel.findAll({
+      where: { idJeune }
+    })
+    const favorisOffreEmploi = await FavoriOffreEmploiSqlModel.findAll({
+      where: { idJeune }
+    })
+    const favorisOffreImmersion = await FavoriOffreImmersionSqlModel.findAll({
+      where: { idJeune }
+    })
+    const favorisOffreEngagement = await FavoriOffreEngagementSqlModel.findAll({
+      where: { idJeune }
+    })
+    const recherches = await RechercheSqlModel.findAll({
+      where: { idJeune }
+    })
+
+    return this.mapToArchiveJeune(
+      jeuneSqlModel,
+      metadonnes,
+      rdv,
+      actions,
+      favorisOffreEmploi,
+      favorisOffreImmersion,
+      favorisOffreEngagement,
+      recherches,
+      messages
+    )
   }
 
   private mapToArchiveJeune(
     jeuneSqlModel: JeuneSqlModel,
     metadonnes: ArchiveJeune.Metadonnees,
+    rdv: RendezVousSqlModel[],
+    actions: ActionSqlModel[],
+    favorisOffreEmploi: FavoriOffreEmploiSqlModel[],
+    favorisOffreImmersion: FavoriOffreImmersionSqlModel[],
+    favorisOffreEngagement: FavoriOffreEngagementSqlModel[],
+    recherches: RechercheSqlModel[],
     messages: ArchiveJeune.Message[]
   ): ArchiveJeune {
     return {
-      rendezVous: jeuneSqlModel.rdv?.map(this.toRendezVousArchive) ?? [],
-      actions: this.fromActionSqlToActionArchive(jeuneSqlModel, metadonnes),
+      rendezVous: rdv.map(this.toRendezVousArchive),
+      actions: this.fromActionSqlToActionArchive(actions, metadonnes),
       favoris: {
-        offresEmploi:
-          jeuneSqlModel.favorisOffreEmploi?.map(toOffreEmploi) ?? [],
-        offresImmersions:
-          jeuneSqlModel.favorisOffreImmersion?.map(fromSqlToOffreImmersion) ??
-          [],
-        offresServiceCivique:
-          jeuneSqlModel.favorisOffreEngagement?.map(
-            fromSqlToOffreServiceCivique
-          ) ?? []
+        offresEmploi: favorisOffreEmploi.map(toOffreEmploi),
+        offresImmersions: favorisOffreImmersion.map(fromSqlToOffreImmersion),
+        offresServiceCivique: favorisOffreEngagement.map(
+          fromSqlToOffreServiceCivique
+        )
       },
-      recherches: jeuneSqlModel.recherches?.map(fromSqlToRecherche) ?? [],
+      recherches: recherches.map(fromSqlToRecherche),
       dernierConseiller: {
         nom: jeuneSqlModel.conseiller?.nom || '',
         prenom: jeuneSqlModel.conseiller?.prenom || ''
@@ -152,20 +190,18 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
   }
 
   private fromActionSqlToActionArchive(
-    jeuneSqlModel: JeuneSqlModel,
+    actions: ActionSqlModel[],
     metadonnes: ArchiveJeune.Metadonnees
   ): ArchiveJeune.Action[] {
-    return (
-      jeuneSqlModel.actions?.map(actionSql => ({
-        commentaire: actionSql.commentaire || '',
-        contenu: actionSql.contenu || '',
-        statut: actionSql.statut || '',
-        dateCreation: actionSql.dateCreation,
-        creePar:
-          actionSql.idCreateur === metadonnes.idJeune ? 'JEUNE' : 'CONSEILLER',
-        dateActualisation: actionSql.dateDerniereActualisation,
-        dateLimite: actionSql.dateLimite || undefined
-      })) ?? []
-    )
+    return actions.map(actionSql => ({
+      commentaire: actionSql.commentaire || '',
+      contenu: actionSql.contenu || '',
+      statut: actionSql.statut || '',
+      dateCreation: actionSql.dateCreation,
+      creePar:
+        actionSql.idCreateur === metadonnes.idJeune ? 'JEUNE' : 'CONSEILLER',
+      dateActualisation: actionSql.dateDerniereActualisation,
+      dateLimite: actionSql.dateLimite || undefined
+    }))
   }
 }
