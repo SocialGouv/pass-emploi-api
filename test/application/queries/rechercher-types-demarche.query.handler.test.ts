@@ -23,6 +23,53 @@ describe('RechercherTypesDemarcheQueryHandler', () => {
 
   describe('handle', () => {
     context('quand il y a une seule démarche', () => {
+      describe('le codeComment est filtré', () => {
+        it('retourne un tableau vide', async () => {
+          // Given
+          const uneDemarcheDto: TypeDemarcheDto = {
+            codePourQuoiObjectifDemarche: 'plop',
+            codeQuoiTypeDemarche: 'Q14',
+            codeCommentDemarche: 'C01.01',
+            estUneAction: false,
+            libellePourQuoiObjectifDemarche: 'plop',
+            libelleQuoiTypeDemarche: 'plop'
+          }
+          poleEmploiClient.rechercherTypesDemarches
+            .withArgs('salon')
+            .resolves([uneDemarcheDto])
+
+          // When
+          const demarches = await rechercherTypesDemarcheQueryHandler.handle({
+            recherche: 'salon'
+          })
+
+          // Then
+          expect(demarches).to.be.deep.equal([])
+        })
+      })
+      describe('le codeQuoi est filtré', () => {
+        it('retourne un tableau vide', async () => {
+          // Given
+          const uneDemarcheDto: TypeDemarcheDto = {
+            codePourQuoiObjectifDemarche: 'plop',
+            codeQuoiTypeDemarche: 'Q41',
+            estUneAction: false,
+            libellePourQuoiObjectifDemarche: 'plop',
+            libelleQuoiTypeDemarche: 'plop'
+          }
+          poleEmploiClient.rechercherTypesDemarches
+            .withArgs('salon')
+            .resolves([uneDemarcheDto])
+
+          // When
+          const demarches = await rechercherTypesDemarcheQueryHandler.handle({
+            recherche: 'salon'
+          })
+
+          // Then
+          expect(demarches).to.be.deep.equal([])
+        })
+      })
       describe('sans comment', () => {
         it('retourne une démarche simple', async () => {
           // Given
