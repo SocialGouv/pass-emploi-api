@@ -48,7 +48,7 @@ export namespace Mail {
       operation: RendezVous.Operation
     ): Promise<void>
 
-    envoyerEmailJeuneSuppressionDeSonCompte(
+    envoyerEmailJeuneArchive(
       jeune: Jeune,
       motif: ArchiveJeune.MotifSuppression,
       commentaire?: string

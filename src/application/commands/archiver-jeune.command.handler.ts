@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import {
-  ArchivageJeunesRepositoryToken,
+  ArchiveJeuneRepositoryToken,
   ArchiveJeune
 } from 'src/domain/archive-jeune'
 import { Evenement, EvenementService } from 'src/domain/evenement'
@@ -37,8 +37,8 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
   constructor(
     @Inject(JeunesRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository,
-    @Inject(ArchivageJeunesRepositoryToken)
-    private readonly archivageJeuneRepository: ArchiveJeune.Repository,
+    @Inject(ArchiveJeuneRepositoryToken)
+    private readonly archiveJeuneRepository: ArchiveJeune.Repository,
     @Inject(ChatRepositoryToken)
     private readonly chatRepository: Chat.Repository,
     @Inject(AuthentificationRepositoryToken)
@@ -78,13 +78,13 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
       commentaire: command.commentaire,
       dateArchivage: this.dateService.nowJs()
     }
-    await this.archivageJeuneRepository.archiver(metadonneesArchive)
+    await this.archiveJeuneRepository.archiver(metadonneesArchive)
 
     await this.authentificationRepository.deleteJeuneIdp(command.idJeune)
     await this.jeuneRepository.supprimer(command.idJeune)
     await this.chatRepository.supprimerChat(command.idJeune)
 
-    await this.mailService.envoyerEmailJeuneSuppressionDeSonCompte(
+    await this.mailService.envoyerEmailJeuneArchive(
       jeune,
       command.motif,
       command.commentaire

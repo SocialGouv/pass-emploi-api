@@ -67,7 +67,7 @@ export const testConfig = (): ConfigService => {
         conversationsNonLues: '200',
         nouveauRendezvous: '300',
         rappelRendezvous: '400',
-        compteJeuneSupprimePourJeune: '500'
+        compteJeuneArchive: '500'
       }
     },
     serviceCivique: {
