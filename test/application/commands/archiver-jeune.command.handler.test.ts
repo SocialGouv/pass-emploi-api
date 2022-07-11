@@ -121,9 +121,11 @@ describe('ArchiverJeuneCommandHandler', () => {
       })
 
       it('envoie un email au jeune', () => {
-        expect(
-          mailService.envoyerEmailJeuneSuppressionDeSonCompte
-        ).to.have.been.calledWith(jeune, command.motif, command.commentaire)
+        expect(mailService.envoyerEmailJeuneArchive).to.have.been.calledWith(
+          jeune,
+          command.motif,
+          command.commentaire
+        )
       })
     })
   })

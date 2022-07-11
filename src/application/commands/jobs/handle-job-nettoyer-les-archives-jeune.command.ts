@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { emptySuccess, Result, success } from 'src/building-blocks/types/result'
 import {
-  ArchivageJeunesRepositoryToken,
+  ArchiveJeuneRepositoryToken,
   ArchiveJeune
 } from 'src/domain/archive-jeune'
 import { DateService } from 'src/utils/date-service'
@@ -15,7 +15,7 @@ export class HandleJobNettoyerArchivesJeunesCommandHandler extends CommandHandle
   Stats
 > {
   constructor(
-    @Inject(ArchivageJeunesRepositoryToken)
+    @Inject(ArchiveJeuneRepositoryToken)
     private readonly archiveJeuneRepository: ArchiveJeune.Repository,
     private dateService: DateService
   ) {

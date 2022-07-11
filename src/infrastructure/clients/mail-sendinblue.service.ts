@@ -23,7 +23,7 @@ export class MailSendinblueService implements Mail.Service {
     nouveauRendezvous: string
     rappelRendezvous: string
     rendezVousSupprime: string
-    compteJeuneSupprimePourJeune: string
+    compteJeuneArchive: string
   }
   private frontendUrl: string
 
@@ -97,7 +97,7 @@ export class MailSendinblueService implements Mail.Service {
     await this.envoyer(mailDatadto)
   }
 
-  async envoyerEmailJeuneSuppressionDeSonCompte(
+  async envoyerEmailJeuneArchive(
     jeune: Jeune,
     motif: ArchiveJeune.MotifSuppression,
     commentaire?: string
@@ -109,7 +109,7 @@ export class MailSendinblueService implements Mail.Service {
           name: `${jeune.firstName} ${jeune.lastName}`
         }
       ],
-      templateId: parseInt(this.templates.compteJeuneSupprimePourJeune),
+      templateId: parseInt(this.templates.compteJeuneArchive),
       params: {
         prenom: jeune.firstName,
         nom: jeune.lastName,

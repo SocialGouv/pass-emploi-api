@@ -70,7 +70,7 @@ describe('MailSendinblueService', () => {
       })
     })
   })
-  describe('envoyerEmailJeuneSuppressionDeSonCompte', () => {
+  describe('envoyerEmailJeuneArchive', () => {
     it('envoie un email avec les bons paramètres', async () => {
       // Given
       const jeune = unJeune()
@@ -87,7 +87,7 @@ describe('MailSendinblueService', () => {
           }
         ],
         templateId: parseInt(
-          config.get('sendinblue').templates.compteJeuneSupprimePourJeune
+          config.get('sendinblue').templates.compteJeuneArchive
         ),
         params: {
           prenom: jeune.firstName,
@@ -101,7 +101,7 @@ describe('MailSendinblueService', () => {
         .reply(200)
 
       // When
-      await mailSendinblueService.envoyerEmailJeuneSuppressionDeSonCompte(
+      await mailSendinblueService.envoyerEmailJeuneArchive(
         jeune,
         command.motif,
         command.commentaireMotif
