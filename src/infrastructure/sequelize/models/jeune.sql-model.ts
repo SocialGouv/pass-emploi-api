@@ -18,10 +18,6 @@ import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-associat
 import { RendezVousSqlModel } from './rendez-vous.sql-model'
 import { SituationsMiloSqlModel } from './situations-milo.sql-model'
 import { TransfertConseillerSqlModel } from './transfert-conseiller.sql-model'
-import { FavoriOffreEmploiSqlModel } from './favori-offre-emploi.sql-model'
-import { FavoriOffreImmersionSqlModel } from './favori-offre-immersion.sql-model'
-import { FavoriOffreEngagementSqlModel } from './favori-offre-engagement.sql-model'
-import { RechercheSqlModel } from './recherche.sql-model'
 
 export class JeuneDto extends Model {
   @PrimaryKey
@@ -139,18 +135,6 @@ export class JeuneSqlModel extends JeuneDto {
 
   @HasOne(() => SituationsMiloSqlModel)
   situations?: SituationsMiloSqlModel
-
-  @HasMany(() => FavoriOffreEmploiSqlModel)
-  favorisOffreEmploi!: FavoriOffreEmploiSqlModel[]
-
-  @HasMany(() => FavoriOffreImmersionSqlModel)
-  favorisOffreImmersion!: FavoriOffreImmersionSqlModel[]
-
-  @HasMany(() => FavoriOffreEngagementSqlModel)
-  favorisOffreEngagement!: FavoriOffreEngagementSqlModel[]
-
-  @HasMany(() => RechercheSqlModel)
-  recherches!: RechercheSqlModel[]
 
   static async creer(jeuneDto: AsSql<JeuneDto>): Promise<JeuneSqlModel> {
     return JeuneSqlModel.create(jeuneDto)
