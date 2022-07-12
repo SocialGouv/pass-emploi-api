@@ -77,7 +77,7 @@ describe('MailSendinblueService', () => {
       const command = {
         jeune,
         motif: ArchiveJeune.MotifSuppression.RADIATION_DU_CEJ,
-        commentaireMotif: undefined
+        commentaireMotif: 'test'
       }
       const mailDataDtoAttendu: MailDataDto = {
         to: [
@@ -93,7 +93,7 @@ describe('MailSendinblueService', () => {
           prenom: jeune.firstName,
           nom: jeune.lastName,
           motif: command.motif,
-          commentaireMotif: ''
+          commentaireMotif: 'test'
         }
       }
       const scope = nock(config.get('sendinblue').url)
