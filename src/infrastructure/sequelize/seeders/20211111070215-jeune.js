@@ -2,14 +2,14 @@ module.exports = {
   async up(queryInterface) {
     return queryInterface.bulkInsert('jeune', [
       {
-        id: '1',
+        id: 'bobby',
         prenom: 'Kenji',
         nom: 'Lefameux',
         id_conseiller: '41',
         date_creation: '2021-09-24T10:00:00.000Z',
         email: 'kenji.lefameux@passemploi.com',
         structure: 'PASS_EMPLOI',
-        id_authentification: '1'
+        id_authentification: 'bobby'
       },
       {
         id: '2',

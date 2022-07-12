@@ -85,23 +85,23 @@ module.exports = {
     await queryInterface.bulkInsert('rendez_vous_jeune_association', [
       {
         id_rendez_vous: '20C8CA73-FD8B-4194-8D3C-80B6C9949DEB',
-        id_jeune: '1'
+        id_jeune: 'bobby'
       },
       {
         id_rendez_vous: '77A9A9C5-A26A-4664-B07B-1356B6642D01',
-        id_jeune: '1'
+        id_jeune: 'bobby'
       },
       {
         id_rendez_vous: '89092e0a-1111-411b-ac32-4e8cb18498e3',
-        id_jeune: '1'
+        id_jeune: 'bobby'
       },
       {
         id_rendez_vous: '89092e0a-1111-411b-ac32-4e8cb18498e4',
-        id_jeune: '1'
+        id_jeune: 'bobby'
       },
       {
         id_rendez_vous: '89092e0a-1111-411b-ac32-4e8cb18498e5',
-        id_jeune: '1'
+        id_jeune: 'bobby'
       },
       {
         id_rendez_vous: '89092e0a-1111-411b-ac32-4e8cb18498e6',
