@@ -114,7 +114,7 @@ export class MailSendinblueService implements Mail.Service {
         prenom: jeune.firstName,
         nom: jeune.lastName,
         motif,
-        commentaireMotif: commentaire ?? ''
+        commentaireMotif: commentaire
       }
     }
     await this.envoyer(mailDataDto)
