@@ -126,7 +126,7 @@ export default () => {
       }
     },
     mattermost: {
-      jobWebhookUrl: process.env.MATTERMOST_JOBs_WEBHOOK_URL
+      jobWebhookUrl: process.env.MATTERMOST_JOBS_WEBHOOK_URL
     },
     task: process.env.TASK,
     jobs: {

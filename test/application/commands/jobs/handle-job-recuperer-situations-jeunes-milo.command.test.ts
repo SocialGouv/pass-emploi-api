@@ -6,6 +6,7 @@ import { failure, isSuccess, success } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
 import { Jeune } from 'src/domain/jeune'
 import { Milo } from 'src/domain/milo'
+import { NotificationSupport } from 'src/domain/notification-support'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { unDossierMilo } from 'test/fixtures/milo.fixture'
@@ -16,6 +17,7 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
   let handleJobRecupererSituationsJeunesMiloCommandHandler: HandleJobRecupererSituationsJeunesMiloCommandHandler
   let miloRepository: StubbedType<Milo.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
+  let notificationSupportService: StubbedType<NotificationSupport.Service>
   let dateSevice: StubbedClass<DateService>
 
   const jeune1 = unJeune({
@@ -33,6 +35,7 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     miloRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
+    notificationSupportService = stubInterface(sandbox)
     dateSevice = stubClass(DateService)
     dateSevice.now.returns(uneDatetime)
 
@@ -40,6 +43,7 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
       new HandleJobRecupererSituationsJeunesMiloCommandHandler(
         miloRepository,
         jeuneRepository,
+        notificationSupportService,
         dateSevice
       )
   })
