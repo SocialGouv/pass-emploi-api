@@ -139,19 +139,27 @@ export class MailSendinblueService implements Mail.Service {
       emptyContactsAttributes: false,
       jsonBody: contactsDTO
     }
-    await firstValueFrom(
-      this.httpService.post(
-        `${this.sendinblueUrl}/v3/contacts/import`,
-        payload,
-        {
-          headers: {
-            'api-key': `${this.apiKey}`,
-            accept: 'application/json',
-            'content-type': 'application/json'
+    try {
+      await firstValueFrom(
+        this.httpService.post(
+          `${this.sendinblueUrl}/v3/contacts/import`,
+          payload,
+          {
+            headers: {
+              'api-key': `${this.apiKey}`,
+              accept: 'application/json',
+              'content-type': 'application/json'
+            }
           }
-        }
+        )
       )
-    )
+    } catch (e) {
+      if (e.name === 'AxiosError') {
+        e.config.data = 'REDACTED'
+        e.config.headers['api-key'] = 'REDACTED'
+      }
+      throw e
+    }
   }
 
   creerContenuMailRendezVous(

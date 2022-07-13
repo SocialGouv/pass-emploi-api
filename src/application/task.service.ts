@@ -3,30 +3,14 @@ import {
   Planificateur,
   PlanificateurRepositoryToken
 } from '../domain/planificateur'
-import { HandleJobUpdateMailingListConseillerCommandHandler } from './commands/jobs/handle-job-update-mailing-list-conseiller.command'
-import { SynchronizeJobsCommandHandler } from './commands/tasks/synchronize-jobs.command'
-import JobEnum = Planificateur.JobEnum
-import { HandleJobMailConseillerCommandHandler } from './commands/jobs/handle-job-mail-conseiller.command'
-import { HandleNettoyerLesJobsCommandHandler } from './commands/jobs/handle-job-nettoyer-les-jobs.command'
+import { ExecuteCronJobAsapCommandHandler } from './commands/tasks/execute-cronjob-asap.command'
 import { InitCronsCommandHandler } from './commands/tasks/init-crons.command'
-import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
-import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
-import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from './commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
-import { HandleJobNettoyerPiecesJointesCommandHandler } from './commands/jobs/handle-job-nettoyer-pieces-jointes.command'
-import { HandleJobNettoyerArchivesJeunesCommandHandler } from './commands/jobs/handle-job-nettoyer-les-archives-jeune.command'
+import { SynchronizeJobsCommandHandler } from './commands/tasks/synchronize-jobs.command'
 
 export enum Task {
   DUMMY_JOB = 'DUMMY_JOB',
   INIT_ALL_JOBS = 'INIT_ALL_JOBS',
-  RECHERCHER_LES_NOUVELLES_OFFRES = 'RECHERCHER_LES_NOUVELLES_OFFRES',
-  RECHERCHER_LES_NOUVELLES_OFFRES_SERVICES_CIVIQUE = 'RECHERCHER_LES_NOUVELLES_OFFRES_SERVICES_CIVIQUE',
-  ENVOYER_MAIL_CONSEILLER_MESSAGES = 'ENVOYER_MAIL_CONSEILLER_MESSAGES',
-  INITIALISER_LES_CRON = 'INITIALISER_LES_CRON',
-  NETTOYER_LES_JOBS = 'NETTOYER_LES_JOBS',
-  METTRE_A_JOUR_MAILING_LIST_CONSEILLER = 'METTRE_A_JOUR_MAILING_LIST_CONSEILLER',
-  RECUPERER_SITUATIONS_JEUNES_MILO = 'RECUPERER_SITUATIONS_JEUNES_MILO',
-  NETTOYER_LES_PIECES_JOINTES = 'NETTOYER_LES_PIECES_JOINTES',
-  NETTOYER_LES_ARCHIVES_JEUNES = 'NETTOYER_LES_ARCHIVES_JEUNES'
+  INITIALISER_LES_CRON = 'INITIALISER_LES_CRON'
 }
 
 @Injectable()
@@ -37,65 +21,41 @@ export class TaskService {
     @Inject(PlanificateurRepositoryToken)
     private planificateurRepository: Planificateur.Repository,
     private synchronizeJobsCommandHandler: SynchronizeJobsCommandHandler,
-    private notifierNouvellesOffresEmploiCommandHandler: HandleJobNotifierNouvellesOffresEmploiCommandHandler,
-    private handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler,
     private initCronsCommandHandler: InitCronsCommandHandler,
-    private handleNettoyerLesJobsCommandHandler: HandleNettoyerLesJobsCommandHandler,
-    private handleJobUpdateMailingListConseillerCommandHandler: HandleJobUpdateMailingListConseillerCommandHandler,
-    private handleJobNotifierNouveauxServicesCiviqueCommandHandler: HandleJobNotifierNouveauxServicesCiviqueCommandHandler,
-    private handleJobRecupererSituationsJeunesMiloCommandHandler: HandleJobRecupererSituationsJeunesMiloCommandHandler,
-    private handleJobNettoyerPiecesJointesCommandHandler: HandleJobNettoyerPiecesJointesCommandHandler,
-    private handleJobNettoyerArchivesJeunesCommandHandler: HandleJobNettoyerArchivesJeunesCommandHandler
+    private executeCronJobCommandHandler: ExecuteCronJobAsapCommandHandler
   ) {}
 
-  async handle(task: Task | undefined): Promise<void> {
+  async handle(task: Task): Promise<void> {
     this.logger.log(task)
+    const isCronJob = task in Planificateur.CronJob
     try {
-      switch (task) {
-        case Task.DUMMY_JOB:
-          const job: Planificateur.Job = {
-            date: new Date(),
-            type: JobEnum.FAKE,
-            contenu: { message: 'dummy job' }
-          }
-          await this.planificateurRepository.createJob(job)
-          break
-        case Task.INIT_ALL_JOBS:
-          await this.synchronizeJobsCommandHandler.execute()
-          break
-        case Task.RECHERCHER_LES_NOUVELLES_OFFRES:
-          await this.notifierNouvellesOffresEmploiCommandHandler.execute()
-          break
-        case Task.ENVOYER_MAIL_CONSEILLER_MESSAGES:
-          await this.handleJobMailConseillerCommandHandler.execute()
-          break
-        case Task.INITIALISER_LES_CRON:
-          await this.initCronsCommandHandler.execute()
-          break
-        case Task.NETTOYER_LES_JOBS:
-          await this.handleNettoyerLesJobsCommandHandler.execute()
-          break
-        case Task.METTRE_A_JOUR_MAILING_LIST_CONSEILLER:
-          await this.handleJobUpdateMailingListConseillerCommandHandler.execute()
-          break
-        case Task.RECHERCHER_LES_NOUVELLES_OFFRES_SERVICES_CIVIQUE:
-          await this.handleJobNotifierNouveauxServicesCiviqueCommandHandler.execute()
-          break
-        case Task.RECUPERER_SITUATIONS_JEUNES_MILO:
-          await this.handleJobRecupererSituationsJeunesMiloCommandHandler.execute()
-          break
-        case Task.NETTOYER_LES_PIECES_JOINTES:
-          await this.handleJobNettoyerPiecesJointesCommandHandler.execute()
-          break
-        case Task.NETTOYER_LES_ARCHIVES_JEUNES:
-          await this.handleJobNettoyerArchivesJeunesCommandHandler.execute()
-          break
-        default:
-          this.logger.log(
-            `Tache ${task} non connue, voici les tâches possibles : ${Object.values(
-              Task
-            )}`
-          )
+      if (isCronJob) {
+        await this.executeCronJobCommandHandler.execute({
+          jobType: task as unknown as Planificateur.CronJob
+        })
+      } else {
+        switch (task) {
+          case Task.DUMMY_JOB:
+            const job: Planificateur.Job = {
+              date: new Date(),
+              type: Planificateur.JobEnum.FAKE,
+              contenu: { message: 'dummy job' }
+            }
+            await this.planificateurRepository.createJob(job)
+            break
+          case Task.INIT_ALL_JOBS:
+            await this.synchronizeJobsCommandHandler.execute()
+            break
+          case Task.INITIALISER_LES_CRON:
+            await this.initCronsCommandHandler.execute()
+            break
+          default:
+            this.logger.log(
+              `Tache ${task} non connue, voici les tâches possibles : ${Object.values(
+                Task
+              )}`
+            )
+        }
       }
     } catch (e) {
       this.logger.error(e)
