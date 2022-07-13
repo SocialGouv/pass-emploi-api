@@ -60,6 +60,11 @@ export class TransfererConseillerPayload {
   estTemporaire?: boolean
 }
 
+export class UpdateJeunePreferencesPayload {
+  @IsBoolean()
+  partageFavoris: boolean
+}
+
 export class GetRendezVousJeuneQueryParams {
   @ApiProperty({ required: false, enum: RendezVous.Periode })
   @IsOptional()

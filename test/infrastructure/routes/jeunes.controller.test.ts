@@ -15,7 +15,8 @@ import {
 } from 'src/infrastructure/routes/validation/demarches.inputs'
 import {
   PutNotificationTokenInput,
-  TransfererConseillerPayload
+  TransfererConseillerPayload,
+  UpdateJeunePreferencesPayload
 } from 'src/infrastructure/routes/validation/jeunes.inputs'
 import * as request from 'supertest'
 import { uneDate } from 'test/fixtures/date.fixture'
@@ -33,7 +34,10 @@ import { GetJeuneHomeActionsQueryHandler } from '../../../src/application/querie
 import { GetJeuneHomeDemarchesQueryHandler } from '../../../src/application/queries/get-jeune-home-demarches.query.handler'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune.query.handler.db'
-import { DetailJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-model'
+import {
+  DetailJeuneQueryModel,
+  PreferencesJeuneQueryModel
+} from '../../../src/application/queries/query-models/jeunes.query-model'
 import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
 import {
   DomainError,
@@ -66,6 +70,8 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { UpdateJeunePreferencesCommandHandler } from '../../../src/application/commands/update-preferences-jeune.command.handler'
+import { GetPreferencesJeuneQueryHandler } from '../../../src/application/queries/get-preferences-jeune.handler.db'
 import StatutInvalide = Action.StatutInvalide
 
 describe('JeunesController', () => {
@@ -85,6 +91,8 @@ describe('JeunesController', () => {
   let getActionsByJeuneQueryHandler: StubbedClass<GetActionsByJeuneQueryHandler>
   let updateNotificationTokenCommandHandler: StubbedClass<UpdateNotificationTokenCommandHandler>
   let archiverJeuneCommandHandler: StubbedClass<ArchiverJeuneCommandHandler>
+  let updateJeunePreferencesCommandHandler: StubbedClass<UpdateJeunePreferencesCommandHandler>
+  let getPreferencesJeuneQueryHandler: StubbedClass<GetPreferencesJeuneQueryHandler>
   let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
@@ -121,6 +129,11 @@ describe('JeunesController', () => {
       UpdateNotificationTokenCommandHandler
     )
     archiverJeuneCommandHandler = stubClass(ArchiverJeuneCommandHandler)
+    updateJeunePreferencesCommandHandler = stubClass(
+      UpdateJeunePreferencesCommandHandler
+    )
+
+    getPreferencesJeuneQueryHandler = stubClass(GetPreferencesJeuneQueryHandler)
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
@@ -157,6 +170,10 @@ describe('JeunesController', () => {
       .useValue(updateNotificationTokenCommandHandler)
       .overrideProvider(ArchiverJeuneCommandHandler)
       .useValue(archiverJeuneCommandHandler)
+      .overrideProvider(UpdateJeunePreferencesCommandHandler)
+      .useValue(updateJeunePreferencesCommandHandler)
+      .overrideProvider(GetPreferencesJeuneQueryHandler)
+      .useValue(getPreferencesJeuneQueryHandler)
       .overrideProvider(JwtService)
       .useValue(jwtService)
       .compile()
@@ -1201,5 +1218,78 @@ describe('JeunesController', () => {
       'put',
       '/jeunes/1/push-notification-token'
     )
+  })
+
+  describe('PUT /jeunes/:idJeune/preferences', () => {
+    const idJeune = '1'
+    const payload: UpdateJeunePreferencesPayload = {
+      partageFavoris: false
+    }
+
+    describe("quand c'est en succès", () => {
+      it('met à jour les préférences', async () => {
+        // Given
+        updateJeunePreferencesCommandHandler.execute
+          .withArgs(
+            {
+              idJeune,
+              partageFavoris: false
+            },
+            unUtilisateurDecode()
+          )
+          .resolves(emptySuccess())
+
+        // When
+        await request(app.getHttpServer())
+          .put(`/jeunes/${idJeune}/preferences`)
+          .set('authorization', unHeaderAuthorization())
+          .send(payload)
+          // Then
+          .expect(HttpStatus.OK)
+
+        expect(
+          updateJeunePreferencesCommandHandler.execute
+        ).to.have.been.calledWithExactly(
+          {
+            idJeune,
+            partageFavoris: false
+          },
+          unUtilisateurDecode()
+        )
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('put', '/jeunes/1/preferences')
+  })
+
+  describe('GET /jeunes/:idJeune/preferences', () => {
+    const idJeune = '1'
+
+    describe("quand c'est en succès", () => {
+      it('renvoie les préférences', async () => {
+        // Given
+        const queryModel: PreferencesJeuneQueryModel = {
+          partageFavoris: true
+        }
+        getPreferencesJeuneQueryHandler.execute
+          .withArgs(
+            {
+              idJeune
+            },
+            unUtilisateurDecode()
+          )
+          .resolves(success(queryModel))
+
+        // When
+        await request(app.getHttpServer())
+          .get(`/jeunes/${idJeune}/preferences`)
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect(HttpStatus.OK)
+          .expect(queryModel)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/preferences')
   })
 })

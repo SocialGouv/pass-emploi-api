@@ -20,7 +20,8 @@ export function unJeuneDto(
     idAuthentification: 'un-id',
     dateDerniereConnexion: null,
     idDossier: '1234',
-    appVersion: null
+    appVersion: null,
+    partageFavoris: true
   }
 
   return { ...defaults, ...args }

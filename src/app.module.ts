@@ -86,7 +86,7 @@ import { ChatRepositoryToken } from './domain/chat'
 import { ConseillersRepositoryToken } from './domain/conseiller'
 import { EvenementService, EvenementsRepositoryToken } from './domain/evenement'
 import { Fichier, FichierRepositoryToken } from './domain/fichier'
-import { JeunesRepositoryToken } from './domain/jeune'
+import { Jeune, JeunesRepositoryToken } from './domain/jeune'
 import { MiloRepositoryToken } from './domain/milo'
 import {
   Notification,
@@ -194,6 +194,8 @@ import { ArchiveJeuneSqlRepository } from './infrastructure/repositories/archive
 import { GetMotifsSuppressionJeuneQueryHandler } from './application/queries/get-motifs-suppression-jeune.query.handler'
 import { RateLimiterService } from './utils/rate-limiter.service'
 import { HandleJobNettoyerArchivesJeunesCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-archives-jeune.command'
+import { UpdateJeunePreferencesCommandHandler } from './application/commands/update-preferences-jeune.command.handler'
+import { GetPreferencesJeuneQueryHandler } from './application/queries/get-preferences-jeune.handler.db'
 import { GetRendezVousConseillerPaginesQueryHandler } from './application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
@@ -248,6 +250,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Authentification.Factory,
     Campagne.Factory,
     Demarche.Factory,
+    Jeune.Factory,
     Fichier.Factory,
     Notification.Service,
     WorkerService,
@@ -459,6 +462,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetMotifsSuppressionJeuneQueryHandler,
     HandleJobNettoyerArchivesJeunesCommandHandler,
     ExecuteCronJobAsapCommandHandler,
+    UpdateJeunePreferencesCommandHandler,
+    GetPreferencesJeuneQueryHandler,
     GetRendezVousConseillerPaginesQueryHandler
   ]
 }

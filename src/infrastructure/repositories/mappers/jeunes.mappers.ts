@@ -22,7 +22,10 @@ export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
     tokenLastUpdate: getTokenLastUpdate(jeuneSqlModel),
     structure: jeuneSqlModel.structure,
     email: jeuneSqlModel.email ?? undefined,
-    idDossier: jeuneSqlModel.idDossier ?? undefined
+    idDossier: jeuneSqlModel.idDossier ?? undefined,
+    preferences: {
+      partageFavoris: jeuneSqlModel.partageFavoris
+    }
   }
   if (jeuneSqlModel.conseiller) {
     jeune.conseiller = {
@@ -60,7 +63,8 @@ export function toSqlJeune(
     dateDerniereActualisationToken: jeune.tokenLastUpdate?.toJSDate() ?? null,
     email: jeune.email ?? null,
     structure: jeune.structure,
-    idDossier: jeune.idDossier ?? null
+    idDossier: jeune.idDossier ?? null,
+    partageFavoris: jeune.preferences.partageFavoris
   }
 }
 

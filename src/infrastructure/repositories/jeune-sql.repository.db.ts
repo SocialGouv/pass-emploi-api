@@ -103,6 +103,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
       where: {
         idConseillerInitial: idConseiller
       },
+      order: [['id', 'ASC']],
       include: [ConseillerSqlModel]
     })
     return jeunesSqlModel.map(fromSqlToJeune)
@@ -119,7 +120,8 @@ export class JeuneSqlRepository implements Jeune.Repository {
       dateDerniereActualisationToken: jeune.tokenLastUpdate?.toJSDate() ?? null,
       email: jeune.email ?? null,
       structure: jeune.structure,
-      idDossier: jeune.idDossier ?? null
+      idDossier: jeune.idDossier ?? null,
+      partageFavoris: jeune.preferences.partageFavoris
     })
   }
 

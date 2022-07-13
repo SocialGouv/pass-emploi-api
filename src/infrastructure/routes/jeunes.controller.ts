@@ -41,7 +41,8 @@ import {
 } from 'src/application/queries/query-models/home-jeune.query-model'
 import {
   DetailJeuneQueryModel,
-  HistoriqueConseillerJeuneQueryModel
+  HistoriqueConseillerJeuneQueryModel,
+  PreferencesJeuneQueryModel
 } from 'src/application/queries/query-models/jeunes.query-model'
 import { RendezVousJeuneQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
 import { Core } from 'src/domain/core'
@@ -83,8 +84,14 @@ import {
   GetActionsByJeuneQueryParams,
   GetRendezVousJeuneQueryParams,
   PutNotificationTokenInput,
-  TransfererConseillerPayload
+  TransfererConseillerPayload,
+  UpdateJeunePreferencesPayload
 } from './validation/jeunes.inputs'
+import { UpdateJeunePreferencesCommandHandler } from '../../application/commands/update-preferences-jeune.command.handler'
+import {
+  GetPreferencesJeuneQuery,
+  GetPreferencesJeuneQueryHandler
+} from '../../application/queries/get-preferences-jeune.handler.db'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -107,7 +114,9 @@ export class JeunesController {
     private readonly getActionsPoleEmploiQueryHandler: GetActionsJeunePoleEmploiQueryHandler,
     private readonly getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler,
     private readonly updateStatutDemarcheCommandHandler: UpdateStatutDemarcheCommandHandler,
-    private readonly createDemarcheCommandHandler: CreateDemarcheCommandHandler
+    private readonly createDemarcheCommandHandler: CreateDemarcheCommandHandler,
+    private readonly updateJeunePreferencesCommandHandler: UpdateJeunePreferencesCommandHandler,
+    private readonly getPreferencesJeuneQueryHandler: GetPreferencesJeuneQueryHandler
   ) {}
 
   @Get(':idJeune')
@@ -493,7 +502,49 @@ export class JeunesController {
       },
       utilisateur
     )
-
     handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary: 'Modifie les préférences de partage des informations du jeune'
+  })
+  @Put(':idJeune/preferences')
+  async udpateJeunePreferences(
+    @Param('idJeune') idJeune: string,
+    @Body() updateJeunePreferencesPayload: UpdateJeunePreferencesPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command = {
+      idJeune,
+      partageFavoris: updateJeunePreferencesPayload.partageFavoris
+    }
+    const result = await this.updateJeunePreferencesCommandHandler.execute(
+      command,
+      utilisateur
+    )
+    handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary: 'Récupère les préférences de partage des informations du jeune'
+  })
+  @Get(':idJeune/preferences')
+  async getPreferencesJeune(
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<PreferencesJeuneQueryModel> {
+    const query: GetPreferencesJeuneQuery = {
+      idJeune
+    }
+    const result = await this.getPreferencesJeuneQueryHandler.execute(
+      query,
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+
+    throw handleFailure(result)
   }
 }

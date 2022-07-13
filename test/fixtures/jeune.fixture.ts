@@ -16,7 +16,10 @@ export const unJeune = (
     creationDate: uneDatetime,
     email: 'john.doe@plop.io',
     idDossier: '1234',
-    structure: Core.Structure.MILO
+    structure: Core.Structure.MILO,
+    preferences: {
+      partageFavoris: true
+    }
   }
 
   return { ...defaults, ...args }
@@ -34,7 +37,10 @@ export const unJeuneSansPushNotificationToken = (
   creationDate: uneDatetime,
   email: 'john.doe@plop.io',
   idDossier: '1234',
-  structure: Core.Structure.MILO
+  structure: Core.Structure.MILO,
+  preferences: {
+    partageFavoris: true
+  }
 })
 
 export const unJeuneSansConseiller = (
@@ -50,7 +56,10 @@ export const unJeuneSansConseiller = (
     tokenLastUpdate: uneDatetime,
     email: 'john.doe@plop.io',
     idDossier: '1234',
-    structure: Core.Structure.MILO
+    structure: Core.Structure.MILO,
+    preferences: {
+      partageFavoris: true
+    }
   }
 
   return { ...defaults, ...args }

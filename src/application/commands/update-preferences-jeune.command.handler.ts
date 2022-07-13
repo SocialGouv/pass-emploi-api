@@ -1,0 +1,62 @@
+import { Command } from '../../building-blocks/types/command'
+import { Inject, Injectable } from '@nestjs/common'
+import { CommandHandler } from '../../building-blocks/types/command-handler'
+import {
+  emptySuccess,
+  failure,
+  Result
+} from '../../building-blocks/types/result'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import { Authentification } from '../../domain/authentification'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { Evenement, EvenementService } from '../../domain/evenement'
+
+export interface UpdateJeunePreferencesCommand extends Command {
+  idJeune: string
+  partageFavoris: boolean
+}
+
+@Injectable()
+export class UpdateJeunePreferencesCommandHandler extends CommandHandler<
+  UpdateJeunePreferencesCommand,
+  void
+> {
+  constructor(
+    @Inject(JeunesRepositoryToken)
+    private readonly jeuneRepository: Jeune.Repository,
+    private readonly jeuneAuthorizer: JeuneAuthorizer,
+    private readonly evenementService: EvenementService
+  ) {
+    super('UpdateJeunePreferencesCommandHandler')
+  }
+
+  async handle(command: UpdateJeunePreferencesCommand): Promise<Result> {
+    const jeune = await this.jeuneRepository.get(command.idJeune)
+    if (!jeune) {
+      return failure(new NonTrouveError('Jeune', command.idJeune))
+    }
+    const jeuneAJour: Jeune = {
+      ...jeune,
+      preferences: {
+        partageFavoris: command.partageFavoris
+      }
+    }
+    await this.jeuneRepository.save(jeuneAJour)
+    return emptySuccess()
+  }
+
+  async authorize(
+    command: UpdateJeunePreferencesCommand,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<Result> {
+    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
+  }
+
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creerEvenement(
+      Evenement.Type.PREFERENCES_MISES_A_JOUR,
+      utilisateur
+    )
+  }
+}
