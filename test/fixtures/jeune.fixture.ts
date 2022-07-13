@@ -24,7 +24,7 @@ export const unJeune = (
 
 export const unJeuneSansPushNotificationToken = (
   conseiller = unConseiller()
-): Required<Omit<Jeune, 'tokenLastUpdate' | 'conseillerInitial'>> => ({
+): Omit<Jeune, 'tokenLastUpdate' | 'conseillerInitial'> => ({
   id: 'ABCDE',
   lastName: 'Doe',
   firstName: 'John',
@@ -39,7 +39,7 @@ export const unJeuneSansPushNotificationToken = (
 
 export const unJeuneSansConseiller = (
   args: Partial<Omit<Jeune, 'conseiller' | 'conseillerInitial'>> = {}
-): Required<Omit<Jeune, 'conseiller' | 'conseillerInitial'>> => {
+): Omit<Jeune, 'conseiller' | 'conseillerInitial'> => {
   const defaults = {
     id: 'ABCDE',
     lastName: 'Doe',
