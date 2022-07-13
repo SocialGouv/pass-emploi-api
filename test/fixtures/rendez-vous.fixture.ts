@@ -38,7 +38,7 @@ export const unRendezVous = (args: Partial<RendezVous> = {}): RendezVous => {
 
 export const unJeuneDuRendezVous = (
   args: Partial<JeuneDuRendezVous> = {}
-): Required<JeuneDuRendezVous> => {
+): JeuneDuRendezVous => {
   const defaults = {
     id: 'ABCDE',
     firstName: 'John',
