@@ -72,7 +72,7 @@ describe('UpdateNotificationTokenCommandHandler', () => {
         }
         const jeune = unJeune()
         jeuneRepository.get.withArgs('idJeune').resolves(jeune)
-        utilisateurRepository.mettreAJourLaVersionDeLApplicationDuJeune.resolves()
+        utilisateurRepository.updateJeune.resolves()
 
         // When
         const result = await updateNotificationTokenCommandHandler.handle(
@@ -86,8 +86,11 @@ describe('UpdateNotificationTokenCommandHandler', () => {
           tokenLastUpdate: uneDatetime
         }
         expect(
-          utilisateurRepository.mettreAJourLaVersionDeLApplicationDuJeune
-        ).to.have.been.calledWithExactly(jeuneMisAJour.id, command.appVersion)
+          utilisateurRepository.updateJeune
+        ).to.have.been.calledWithExactly({
+          id: jeuneMisAJour.id,
+          appVersion: command.appVersion
+        })
         expect(isSuccess(result)).to.equal(true)
       })
     })

@@ -35,6 +35,7 @@ export namespace Authentification {
     email?: string
     datePremiereConnexion?: Date
     dateDerniereConnexion?: Date
+    appVersion?: string
   }
 
   // TODO : à mettre plutôt dans une classe Utilisateur ?
@@ -55,19 +56,11 @@ export namespace Authentification {
 
     save(utilisateur: Utilisateur, dateCreation?: Date): Promise<void>
 
-    saveJeune(
-      utilisateur: Authentification.Utilisateur,
-      idConseiller: string,
-      idDossier?: string,
-      dateCreation?: Date
+    updateJeune(
+      utilisateur: Partial<Authentification.Utilisateur>
     ): Promise<void>
 
     deleteJeuneIdp(idJeune: string): Promise<void>
-
-    mettreAJourLaVersionDeLApplicationDuJeune(
-      idJeune: string,
-      appVersion: string
-    ): Promise<void>
   }
 
   @Injectable()

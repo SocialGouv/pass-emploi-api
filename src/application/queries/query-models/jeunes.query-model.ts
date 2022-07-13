@@ -148,3 +148,8 @@ export class ResumeActionsDuJeuneQueryModel {
   @ApiProperty()
   inProgressActionsCount: number
 }
+
+export class PreferencesJeuneQueryModel {
+  @ApiProperty()
+  partageFavoris: boolean
+}

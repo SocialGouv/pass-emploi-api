@@ -43,8 +43,7 @@ describe('CreateJeunePoleEmploiCommandHandler', () => {
       conseillerRepository,
       chatRepository,
       conseillerAuthorizer,
-      idService,
-      dateService
+      new Jeune.Factory(dateService, idService)
     )
   })
 
@@ -80,7 +79,11 @@ describe('CreateJeunePoleEmploiCommandHandler', () => {
         isActivated: false,
         creationDate: date,
         conseiller: unConseillerDuJeune(),
-        structure: Core.Structure.POLE_EMPLOI
+        structure: Core.Structure.POLE_EMPLOI,
+        idDossier: undefined,
+        preferences: {
+          partageFavoris: true
+        }
       }
       expect(result).to.deep.equal(success(expectedJeune))
       expect(chatRepository.initializeChatIfNotExists).to.have.been.calledWith(

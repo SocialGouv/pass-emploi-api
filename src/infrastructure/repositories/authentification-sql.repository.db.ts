@@ -131,34 +131,20 @@ export class AuthentificationSqlRepository
     }
   }
 
-  async saveJeune(
-    utilisateur: Authentification.Utilisateur,
-    idConseiller: string,
-    idDossier?: string,
-    dateCreation?: Date
+  async updateJeune(
+    utilisateur: Partial<Authentification.Utilisateur>
   ): Promise<void> {
-    await JeuneSqlModel.upsert({
-      id: utilisateur.id,
-      nom: utilisateur.nom,
-      prenom: utilisateur.prenom,
-      idConseiller: idConseiller,
-      email: utilisateur.email ?? null,
-      structure: utilisateur.structure,
-      idAuthentification: utilisateur.idAuthentification,
-      idDossier: idDossier ?? null,
-      dateCreation: dateCreation ?? null
-    })
+    await JeuneSqlModel.update(
+      {
+        idAuthentification: utilisateur.idAuthentification,
+        appVersion: utilisateur.appVersion
+      },
+      { where: { id: utilisateur.id } }
+    )
   }
 
   async deleteJeuneIdp(idJeune: string): Promise<void> {
     await this.keycloakClient.deleteUserByIdUser(idJeune)
     this.logger.log(`jeune ${idJeune} supprimé de keycloak`)
-  }
-
-  async mettreAJourLaVersionDeLApplicationDuJeune(
-    idJeune: string,
-    appVersion: string
-  ): Promise<void> {
-    await JeuneSqlModel.update({ appVersion }, { where: { id: idJeune } })
   }
 }

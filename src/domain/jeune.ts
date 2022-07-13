@@ -3,6 +3,8 @@ import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-j
 import { Brand } from '../building-blocks/types/brand'
 import { DateService } from '../utils/date-service'
 import { Core } from './core'
+import { Injectable } from '@nestjs/common'
+import { IdService } from '../utils/id-service'
 
 export const JeunesRepositoryToken = 'Jeune.Repository'
 
@@ -19,6 +21,7 @@ export interface Jeune {
   pushNotificationToken?: string
   tokenLastUpdate?: DateTime
   idDossier?: string
+  preferences: Jeune.Preferences
 }
 
 export namespace Jeune {
@@ -31,6 +34,10 @@ export namespace Jeune {
 
   export interface ConseillerInitial {
     id: string
+  }
+
+  export interface Preferences {
+    partageFavoris: boolean
   }
 
   export type Id = Brand<string, 'JeuneId'>
@@ -65,6 +72,47 @@ export namespace Jeune {
       idConseillerSource: string,
       estTemporaire?: boolean
     ): Promise<void>
+  }
+
+  @Injectable()
+  export class Factory {
+    constructor(
+      private dateService: DateService,
+      private idService: IdService
+    ) {}
+
+    creer(jeuneACreer: Factory.ACreer): Jeune {
+      return {
+        id: this.idService.uuid(),
+        firstName: jeuneACreer.prenom,
+        lastName: jeuneACreer.nom,
+        email: jeuneACreer.email,
+        isActivated: false,
+        creationDate: this.dateService.now(),
+        conseiller: {
+          id: jeuneACreer.conseiller.id,
+          lastName: jeuneACreer.conseiller.lastName,
+          firstName: jeuneACreer.conseiller.firstName,
+          email: jeuneACreer.conseiller.email
+        },
+        structure: jeuneACreer.structure,
+        preferences: {
+          partageFavoris: true
+        },
+        idDossier: jeuneACreer.idDossier
+      }
+    }
+  }
+
+  export namespace Factory {
+    export interface ACreer {
+      prenom: string
+      nom: string
+      email: string
+      conseiller: Conseiller
+      structure: Core.Structure
+      idDossier?: string
+    }
   }
 
   export function updateToken(

@@ -47,6 +47,7 @@ export namespace Evenement {
     RDV_LISTE = 'RDV_LISTE',
     RDV_MODIFIE = 'RDV_MODIFIE',
     RDV_SUPPRIME = 'RDV_SUPPRIME',
+    PREFERENCES_MISES_A_JOUR = 'PREFERENCES_MISES_A_JOUR',
     RECHERCHE_ALTERNANCE_SAUVEGARDEE = 'RECHERCHE_ALTERNANCE_SAUVEGARDEE',
     RECHERCHE_IMMERSION_SAUVEGARDEE = 'RECHERCHE_IMMERSION_SAUVEGARDEE',
     RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE = 'RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE',
@@ -268,6 +269,10 @@ const evenements = {
   [Evenement.Type.PIECE_JOINTE_TELECHARGEE]: {
     categorie: 'Message',
     action: 'Téléchargement PJ'
+  },
+  [Evenement.Type.PREFERENCES_MISES_A_JOUR]: {
+    categorie: 'Préférences',
+    action: 'Mise à jour'
   }
 }
 

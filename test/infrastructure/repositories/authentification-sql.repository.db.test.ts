@@ -303,24 +303,24 @@ describe('AuthentificationSqlRepository', () => {
     })
   })
 
-  describe('mettreAJourLaVersionDeLApplicationDuJeune', () => {
+  describe('updateJeune', () => {
     it('met à jour le jeune', async () => {
       // Given
-      const appVersion = 'test'
       const conseiller = unConseillerDto()
       const jeune = unJeuneDto({ idConseiller: conseiller.id })
       await ConseillerSqlModel.create(conseiller)
       await JeuneSqlModel.create(jeune)
 
       // When
-      await authentificationSqlRepository.mettreAJourLaVersionDeLApplicationDuJeune(
-        jeune.id,
-        appVersion
-      )
+      await authentificationSqlRepository.updateJeune({
+        id: jeune.id,
+        idAuthentification: 'un-nouveau-id',
+        appVersion: '1.8.0'
+      })
 
       // Then
       const jeuneTrouve = await JeuneSqlModel.findByPk(jeune.id)
-      expect(jeuneTrouve?.appVersion).to.equal(appVersion)
+      expect(jeuneTrouve?.idAuthentification).to.equal('un-nouveau-id')
     })
   })
 })

@@ -23,8 +23,6 @@ import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { Core } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
 import { Milo, MiloRepositoryToken } from '../../domain/milo'
-import { DateService } from '../../utils/date-service'
-import { IdService } from '../../utils/id-service'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 
 export interface CreerJeuneMiloCommand extends Command {
@@ -41,8 +39,6 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
   Core.Id
 > {
   constructor(
-    private idService: IdService,
-    private dateService: DateService,
     private conseillerAuthorizer: ConseillerAuthorizer,
     @Inject(MiloRepositoryToken) private miloRepository: Milo.Repository,
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
@@ -50,7 +46,8 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     private authentificationRepository: Authentification.Repository,
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
-    @Inject(ChatRepositoryToken) private chatRepository: Chat.Repository
+    @Inject(ChatRepositoryToken) private chatRepository: Chat.Repository,
+    private jeuneFactory: Jeune.Factory
   ) {
     super('CreerJeuneMiloCommandHandler')
   }
@@ -93,28 +90,23 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
         )
       }
     }
-    const utilisateur: Authentification.Utilisateur = {
-      id: this.idService.uuid(),
-      idAuthentification: result.data.idAuthentification,
-      prenom: command.prenom,
-      nom: command.nom,
-      structure: Core.Structure.MILO,
-      type: Authentification.Type.JEUNE,
-      email: lowerCaseEmail,
-      roles: []
-    }
-    await this.authentificationRepository.saveJeune(
-      utilisateur,
-      conseiller.id,
-      command.idDossier,
-      this.dateService.nowJs()
+    const nouveauJeune = await this.creerLeJeune(
+      command,
+      lowerCaseEmail,
+      conseiller
     )
+
+    const utilisateur: Partial<Authentification.Utilisateur> = {
+      id: nouveauJeune.id,
+      idAuthentification: result.data.idAuthentification
+    }
+    await this.authentificationRepository.updateJeune(utilisateur)
     await this.chatRepository.initializeChatIfNotExists(
-      utilisateur.id,
+      nouveauJeune.id,
       conseiller.id
     )
 
-    return success({ id: utilisateur.id })
+    return success({ id: nouveauJeune.id })
   }
 
   async authorize(
@@ -137,5 +129,23 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+
+  private async creerLeJeune(
+    command: CreerJeuneMiloCommand,
+    lowerCaseEmail: string,
+    conseiller: Conseiller
+  ): Promise<Jeune> {
+    const jeuneACreer: Jeune.Factory.ACreer = {
+      nom: command.nom,
+      prenom: command.prenom,
+      email: lowerCaseEmail,
+      structure: Core.Structure.MILO,
+      conseiller,
+      idDossier: command.idDossier
+    }
+    const nouveauJeune = this.jeuneFactory.creer(jeuneACreer)
+    await this.jeuneRepository.save(nouveauJeune)
+    return nouveauJeune
   }
 }

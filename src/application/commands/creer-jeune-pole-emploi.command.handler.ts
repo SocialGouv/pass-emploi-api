@@ -12,8 +12,6 @@ import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { Core } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
-import { DateService } from '../../utils/date-service'
-import { IdService } from '../../utils/id-service'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 
 export interface CreateJeuneCommand extends Command {
@@ -36,8 +34,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
     @Inject(ChatRepositoryToken)
     private chatRepository: Chat.Repository,
     private conseillerAuthorizer: ConseillerAuthorizer,
-    private idService: IdService,
-    private dateService: DateService
+    private jeuneFactory: Jeune.Factory
   ) {
     super('CreerJeunePoleEmploiCommandHandler')
   }
@@ -54,13 +51,10 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
       return failure(new EmailExisteDejaError(lowerCaseEmail))
     }
 
-    const nouveauJeune: Jeune = {
-      id: this.idService.uuid(),
-      firstName: command.firstName,
-      lastName: command.lastName,
+    const jeuneACreer: Jeune.Factory.ACreer = {
+      prenom: command.firstName,
+      nom: command.lastName,
       email: lowerCaseEmail,
-      isActivated: false,
-      creationDate: this.dateService.now(),
       conseiller: {
         id: conseiller.id,
         lastName: conseiller.lastName,
@@ -69,6 +63,7 @@ export class CreerJeunePoleEmploiCommandHandler extends CommandHandler<
       },
       structure: Core.Structure.POLE_EMPLOI
     }
+    const nouveauJeune = this.jeuneFactory.creer(jeuneACreer)
     await this.jeuneRepository.save(nouveauJeune)
     await this.chatRepository.initializeChatIfNotExists(
       nouveauJeune.id,

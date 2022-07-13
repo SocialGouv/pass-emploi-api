@@ -3,7 +3,10 @@ import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import { Jeune } from '../../../src/domain/jeune'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
 import { createSandbox, expect } from '../../utils'
 
 describe('JeuneAuthorizer', () => {
@@ -43,6 +46,20 @@ describe('JeuneAuthorizer', () => {
 
         // Then
         expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+      })
+      describe('quand un conseiller est connecté', () => {
+        it('retourne une failure', async () => {
+          // Given
+          const utilisateur = unUtilisateurConseiller({ id: 'id' })
+
+          jeuneRepository.existe.withArgs('id').resolves(true)
+
+          // When
+          const result = await jeuneAuthorizer.authorize('id', utilisateur)
+
+          // Then
+          expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
+        })
       })
     })
 

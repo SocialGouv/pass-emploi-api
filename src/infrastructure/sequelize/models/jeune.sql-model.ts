@@ -111,6 +111,12 @@ export class JeuneDto extends Model {
     type: DataType.STRING
   })
   appVersion: string | null
+
+  @Column({
+    field: 'preferences_partage_favoris',
+    type: DataType.BOOLEAN
+  })
+  partageFavoris: boolean
 }
 
 @Table({

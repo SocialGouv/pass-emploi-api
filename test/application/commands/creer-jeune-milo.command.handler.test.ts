@@ -14,7 +14,11 @@ import {
   ErreurHttp,
   MauvaiseCommandeError
 } from '../../../src/building-blocks/types/domain-error'
-import { failure, success } from '../../../src/building-blocks/types/result'
+import {
+  failure,
+  isSuccess,
+  success
+} from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
 import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller'
@@ -25,7 +29,7 @@ import { DateService } from '../../../src/utils/date-service'
 import { IdService } from '../../../src/utils/id-service'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { unConseillerDuJeune, unJeune } from '../../fixtures/jeune.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('CreerJeuneMiloCommandHandler', () => {
@@ -51,17 +55,16 @@ describe('CreerJeuneMiloCommandHandler', () => {
     const dateService = stubClass(DateService)
     const idService = stubClass(IdService)
     idService.uuid.returns(idNouveauJeune)
-    dateService.nowJs.returns(date.toJSDate())
+    dateService.now.returns(date)
     conseillerRepository.get.withArgs('idConseiller').resolves(conseiller)
     creerJeuneMiloCommandHandler = new CreerJeuneMiloCommandHandler(
-      idService,
-      dateService,
       conseillerAuthorizer,
       miloRepository,
       jeuneRepository,
       authentificationRepository,
       conseillerRepository,
-      chatRepository
+      chatRepository,
+      new Jeune.Factory(dateService, idService)
     )
   })
 
@@ -128,23 +131,32 @@ describe('CreerJeuneMiloCommandHandler', () => {
         const result = await creerJeuneMiloCommandHandler.handle(command)
 
         // Then
-        expect(
-          authentificationRepository.saveJeune
-        ).to.have.been.calledWithExactly(
-          {
-            id: idNouveauJeune,
-            idAuthentification: 'mon-sub',
-            prenom: command.prenom,
-            nom: command.nom,
-            structure: Core.Structure.MILO,
-            type: Authentification.Type.JEUNE,
-            email: command.email,
-            roles: []
+        const expextedJeune: Jeune = {
+          id: 'DFKAL',
+          firstName: 'prenom',
+          lastName: 'nom',
+          email: 'email',
+          isActivated: false,
+          creationDate: date,
+          conseiller: {
+            id: '1',
+            lastName: 'Tavernier',
+            firstName: 'Nils',
+            email: 'nils.tavernier@passemploi.com'
           },
-          unConseillerDuJeune().id,
-          command.idDossier,
-          date.toJSDate()
+          structure: Core.Structure.MILO,
+          preferences: { partageFavoris: true },
+          idDossier: 'idDossier'
+        }
+        expect(jeuneRepository.save).to.have.been.calledWithExactly(
+          expextedJeune
         )
+        expect(
+          authentificationRepository.updateJeune
+        ).to.have.been.calledWithExactly({
+          id: idNouveauJeune,
+          idAuthentification: 'mon-sub'
+        })
         expect(
           chatRepository.initializeChatIfNotExists
         ).to.have.been.calledWith(idNouveauJeune, conseiller.id)
@@ -168,23 +180,24 @@ describe('CreerJeuneMiloCommandHandler', () => {
         await creerJeuneMiloCommandHandler.handle(command)
 
         // Then
-        expect(
-          authentificationRepository.saveJeune
-        ).to.have.been.calledWithExactly(
-          {
-            id: idNouveauJeune,
-            idAuthentification: 'mon-sub',
-            prenom: command.prenom,
-            nom: command.nom,
-            structure: Core.Structure.MILO,
-            type: Authentification.Type.JEUNE,
-            email: 'jeune.nom@email.com',
-            roles: []
+        const expected: Jeune = {
+          id: 'DFKAL',
+          firstName: 'prenom',
+          lastName: 'nom',
+          email: 'jeune.nom@email.com',
+          isActivated: false,
+          creationDate: date,
+          conseiller: {
+            id: '1',
+            lastName: 'Tavernier',
+            firstName: 'Nils',
+            email: 'nils.tavernier@passemploi.com'
           },
-          unConseillerDuJeune().id,
-          command.idDossier,
-          date.toJSDate()
-        )
+          structure: Core.Structure.MILO,
+          preferences: { partageFavoris: true },
+          idDossier: 'idDossier'
+        }
+        expect(jeuneRepository.save).to.have.been.calledWithExactly(expected)
       })
     })
 
@@ -203,26 +216,10 @@ describe('CreerJeuneMiloCommandHandler', () => {
           .resolves(success({ idAuthentification: 'mon-sub' }))
 
         // When
-        await creerJeuneMiloCommandHandler.handle(command)
+        const result = await creerJeuneMiloCommandHandler.handle(command)
 
         // Then
-        expect(
-          authentificationRepository.saveJeune
-        ).to.have.been.calledWithExactly(
-          {
-            id: idNouveauJeune,
-            idAuthentification: 'mon-sub',
-            prenom: command.prenom,
-            nom: command.nom,
-            structure: Core.Structure.MILO,
-            type: Authentification.Type.JEUNE,
-            email: 'email',
-            roles: []
-          },
-          unConseillerDuJeune().id,
-          command.idDossier,
-          date.toJSDate()
-        )
+        expect(isSuccess(result)).to.be.true()
       })
       it('renvoie une erreur quand il existe pas chez nous', async () => {
         // Given

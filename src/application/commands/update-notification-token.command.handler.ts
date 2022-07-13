@@ -50,10 +50,10 @@ export class UpdateNotificationTokenCommandHandler extends CommandHandler<
     await this.jeuneRepository.save(jeuneMisAJour)
 
     if (command.appVersion) {
-      this.utilisateurRepository.mettreAJourLaVersionDeLApplicationDuJeune(
-        jeuneMisAJour.id,
-        command.appVersion
-      )
+      this.utilisateurRepository.updateJeune({
+        id: jeuneMisAJour.id,
+        appVersion: command.appVersion
+      })
     }
     return emptySuccess()
   }
