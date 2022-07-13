@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common'
 import * as APM from 'elastic-apm-node'
 import { Authentification } from '../../domain/authentification'
-import { SupportNotification } from '../../domain/support-notification'
+import { NotificationSupport } from '../../domain/notification-support'
 import { getAPMInstance } from '../../infrastructure/monitoring/apm.init'
 import { LogEvent, LogEventKey } from './log.event'
 import {
@@ -24,16 +24,16 @@ export abstract class CommandHandler<C, T> {
   protected logger: Logger
   protected apmService: APM.Agent
   private commandName: string
-  private supportNotificationService: SupportNotification.Service | undefined
+  private NotificationSupportService: NotificationSupport.Service | undefined
 
   constructor(
     commandName: string,
-    supportNotificationService?: SupportNotification.Service
+    NotificationSupportService?: NotificationSupport.Service
   ) {
     this.commandName = commandName
     this.logger = new Logger(commandName)
     this.apmService = getAPMInstance()
-    this.supportNotificationService = supportNotificationService
+    this.NotificationSupportService = NotificationSupportService
   }
 
   async execute(
@@ -55,12 +55,12 @@ export abstract class CommandHandler<C, T> {
         })
       }
       this.logAfter(result, command, utilisateur)
-      await this.notifyAfter(result, command, utilisateur)
+      await this.notifyAfter(result as Result)
 
       return result
     } catch (e) {
       this.logAfter(failure(e), command, utilisateur)
-      await this.notifyAfter(failure(e), command, utilisateur)
+      await this.notifyAfter(failure(e))
       throw e
     }
   }
@@ -77,40 +77,29 @@ export abstract class CommandHandler<C, T> {
     command?: C
   ): Promise<void>
 
-  protected buildLogEvent(
-    result: Result<T>,
-    command?: C,
-    utilisateur?: Authentification.Utilisateur
-  ): LogEvent {
-    const resultPourLog = construireResultPourLog(result)
-    const commandSanitized = nettoyerLaCommand(command)
-
-    return new LogEvent(LogEventKey.COMMAND_EVENT, {
-      handler: this.commandName,
-      command: commandSanitized,
-      result: resultPourLog,
-      utilisateur
-    })
-  }
-
   protected logAfter(
     result: Result<T>,
     command?: C,
     utilisateur?: Authentification.Utilisateur
   ): void {
-    const event = this.buildLogEvent(result, command, utilisateur)
+    const resultPourLog = construireResultPourLog(result)
+    const commandSanitized = nettoyerLaCommand(command)
+
+    const event = new LogEvent(LogEventKey.COMMAND_EVENT, {
+      handler: this.commandName,
+      command: commandSanitized,
+      result: resultPourLog,
+      utilisateur
+    })
     this.logger.log(event)
   }
 
-  protected async notifyAfter(
-    result: Result<T>,
-    command?: C,
-    utilisateur?: Authentification.Utilisateur
-  ): Promise<void> {
-    const event = this.buildLogEvent(result, command, utilisateur)
-    await this.supportNotificationService?.envoyerJobResultat(
-      JSON.stringify(event)
-    )
+  protected async notifyAfter(result: Result): Promise<void> {
+    const event = {
+      job: this.commandName,
+      result
+    }
+    await this.NotificationSupportService?.notifierResultatJob(event)
   }
 }
 

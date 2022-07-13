@@ -1,0 +1,14 @@
+import { Result } from 'src/building-blocks/types/result'
+
+export const NotificationSupportServiceToken = 'NotificationSupport.Service'
+
+export interface InfosJob {
+  job: string
+  result: Result
+}
+
+export namespace NotificationSupport {
+  export interface Service {
+    notifierResultatJob(infosJob: InfosJob): Promise<void>
+  }
+}

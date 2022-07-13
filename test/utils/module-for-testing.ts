@@ -84,6 +84,9 @@ export const testConfig = (): ConfigService => {
     },
     passEmploiContactEmail: 'pass.emploi.contact@gmail.com',
     frontEndUrl: 'http://frontend.com',
+    mattermost: {
+      jobWebhookUrl: 'https://mattermost.incubateur.net/hooks/xxx'
+    },
     jobs: {
       notificationRecherches: {
         nombreDeRequetesEnParallele: '5'
