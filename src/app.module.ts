@@ -139,6 +139,7 @@ import { FavorisController } from './infrastructure/routes/favoris.controller'
 import { HealthController } from './infrastructure/routes/health.controller'
 import { JeunesController } from './infrastructure/routes/jeunes.controller'
 import { JeunesControllerV2 } from './infrastructure/routes/v2/jeunes.controller.v2'
+import { ConseillersControllerV2 } from './infrastructure/routes/v2/conseillers.controller.v2'
 import { OffresEmploiController } from './infrastructure/routes/offres-emploi.controller'
 import { OffresImmersionController } from './infrastructure/routes/offres-immersion.controller'
 import { RecherchesController } from './infrastructure/routes/recherches.controller'
@@ -193,6 +194,7 @@ import { ArchiveJeuneSqlRepository } from './infrastructure/repositories/archive
 import { GetMotifsSuppressionJeuneQueryHandler } from './application/queries/get-motifs-suppression-jeune.query.handler'
 import { RateLimiterService } from './utils/rate-limiter.service'
 import { HandleJobNettoyerArchivesJeunesCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-archives-jeune.command'
+import { GetRendezVousConseillerPaginesQueryHandler } from './application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -214,6 +216,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     OffresEmploiController,
     OffresImmersionController,
     ConseillersController,
+    ConseillersControllerV2,
     HealthController,
     RendezVousController,
     AuthentificationController,
@@ -455,7 +458,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     ArchiverJeuneCommandHandler,
     GetMotifsSuppressionJeuneQueryHandler,
     HandleJobNettoyerArchivesJeunesCommandHandler,
-    ExecuteCronJobAsapCommandHandler
+    ExecuteCronJobAsapCommandHandler,
+    GetRendezVousConseillerPaginesQueryHandler
   ]
 }
 
