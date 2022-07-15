@@ -4,6 +4,7 @@ import {
   ArrayNotEmpty,
   IsArray,
   IsBoolean,
+  IsDateString,
   IsEmail,
   IsEnum,
   IsIn,
@@ -15,9 +16,10 @@ import {
   ValidateNested
 } from 'class-validator'
 import { Core } from 'src/domain/core'
+import { RendezVous } from 'src/domain/rendez-vous'
 import { Action } from '../../../domain/action'
-import { transformStringToBoolean } from './utils/transformers'
 import { AgenceInput } from './agences.inputs'
+import { transformStringToBoolean } from './utils/transformers'
 
 export class GetConseillerQueryParams {
   @ApiProperty()
@@ -138,6 +140,31 @@ export class GetRendezVousConseillerQueryParams {
   @IsIn([true, false])
   @Transform(params => transformStringToBoolean(params, 'presenceConseiller'))
   presenceConseiller?: boolean
+}
+
+export class GetRendezVousConseillerV2QueryParams {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  @IsIn([true, false])
+  @Transform(params => transformStringToBoolean(params, 'presenceConseiller'))
+  presenceConseiller?: boolean
+
+  @IsOptional()
+  @IsEnum(RendezVous.Tri)
+  tri?: RendezVous.Tri
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @IsDateString()
+  dateDebut?: Date
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @IsDateString()
+  dateFin?: Date
 }
 
 export class DetailConseillerPayload {
