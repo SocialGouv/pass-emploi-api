@@ -3,19 +3,19 @@ import * as request from 'supertest'
 import {
   ActionsByJeuneOutput,
   GetActionsByJeuneQueryHandler
-} from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
-import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
-import { failure, success } from '../../../src/building-blocks/types/result'
-import { JwtService } from '../../../src/infrastructure/auth/jwt.service'
+} from '../../../../src/application/queries/get-actions-by-jeune.query.handler.db'
+import { NonTrouveError } from '../../../../src/building-blocks/types/domain-error'
+import { failure, success } from '../../../../src/building-blocks/types/result'
+import { JwtService } from '../../../../src/infrastructure/auth/jwt.service'
 import {
   unHeaderAuthorization,
   unJwtPayloadValide
-} from '../../fixtures/authentification.fixture'
+} from '../../../fixtures/authentification.fixture'
 import {
   buildTestingModuleForHttpTesting,
   StubbedClass,
   stubClass
-} from '../../utils'
+} from '../../../utils'
 
 describe('JeunesController v2', () => {
   let getActionsByJeuneQueryHandler: StubbedClass<GetActionsByJeuneQueryHandler>
