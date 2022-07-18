@@ -107,7 +107,7 @@ export class RechercherTypesDemarcheQueryHandler extends QueryHandler<
   }
 
   private laDemarcheEstVisible(demarcheDto: TypeDemarcheDto): boolean {
-    const codeCommentDemarchesCachees = [
+    const codeCommentDemarchesCachees = new Set([
       'C01.01',
       'C01.02',
       'C02.01',
@@ -132,17 +132,13 @@ export class RechercherTypesDemarcheQueryHandler extends QueryHandler<
       'C39.01',
       'C39.02',
       'C39.03'
-    ]
-    const codeQuoiDemarchesCachees = ['Q36', 'Q41']
+    ])
+    const codeQuoiDemarchesCachees = new Set(['Q36', 'Q41'])
 
     return (
-      !codeQuoiDemarchesCachees.some(
-        code => code === demarcheDto.codeQuoiTypeDemarche
-      ) &&
+      !codeQuoiDemarchesCachees.has(demarcheDto.codeQuoiTypeDemarche) &&
       (demarcheDto.codeCommentDemarche
-        ? !codeCommentDemarchesCachees.some(
-            code => code === demarcheDto.codeCommentDemarche
-          )
+        ? !codeCommentDemarchesCachees.has(demarcheDto.codeCommentDemarche)
         : true)
     )
   }
