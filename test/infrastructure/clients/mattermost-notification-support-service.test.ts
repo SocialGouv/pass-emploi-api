@@ -1,7 +1,8 @@
 import { HttpService } from '@nestjs/axios'
 import { expect } from 'chai'
 import * as nock from 'nock'
-import { Result, success } from 'src/building-blocks/types/result'
+import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+import { failure, Result, success } from 'src/building-blocks/types/result'
 import { NotificationSupportMattermostService } from 'src/infrastructure/clients/mattermost-notification-support.service'
 import { testConfig } from '../../utils/module-for-testing'
 
@@ -24,21 +25,37 @@ describe('NotificationSupportMattermostService', () => {
         job: 'handleJob',
         result: success({ unChamp: 'present' }) as unknown as Result
       }
-      const body = {
-        username: 'CEJ Lama',
-        text: '{"username":"CEJ Lama","text":"### Résultat du job _handleJob_\\n| Statut | :white_check_mark: |\\n    |:------------------------|:-------------|\\n    | unChamp | present |"}'
-      }
+      const stringBody =
+        '{"username":"CEJ Lama","text":"### Résultat du job _handleJob_\\n| Statut | :white_check_mark: |\\n    |:------------------------|:-------------|\\n    | unChamp | present |"}'
 
-      nock(configService.get('mattermost').jobWebhookUrl)
-        .post('/get-immersion-by-id/plop', body)
+      const scope = nock(configService.get('mattermost').jobWebhookUrl)
+        .post('', stringBody)
         .reply(200)
-        .isDone()
 
       // When
-      const call = await service.notifierResultatJob(infosJob)
+      await service.notifierResultatJob(infosJob)
 
       // Then
-      expect(call).to.be.fulfilled()
+      expect(scope.isDone()).to.equal(true)
+    })
+    it("envoie une notif d'erreur quand le result est error", async () => {
+      // Given
+      const infosJob = {
+        job: 'handleJob',
+        result: failure(new NonTrouveError('test', '1')) as unknown as Result
+      }
+      const stringBody =
+        '{"username":"CEJ Lama","text":"### Résultat du job _handleJob_\\n| Statut | :x: |\\n    |:------------------|:----|\\n    | code | NON_TROUVE |\\n| message | test 1 non trouvé(e) |"}'
+
+      const scope = nock(configService.get('mattermost').jobWebhookUrl)
+        .post('', stringBody)
+        .reply(200)
+
+      // When
+      await service.notifierResultatJob(infosJob)
+
+      // Then
+      expect(scope.isDone()).to.equal(true)
     })
   })
 })
