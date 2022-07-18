@@ -10,6 +10,7 @@ import { Chat } from '../../../../src/domain/chat'
 import { Conseiller } from '../../../../src/domain/conseiller'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { Mail } from '../../../../src/domain/mail'
+import { NotificationSupport } from 'src/domain/notification-support'
 
 describe('HandleJobMailConseillerCommandHandler', () => {
   let handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler
@@ -17,12 +18,14 @@ describe('HandleJobMailConseillerCommandHandler', () => {
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let mailClient: StubbedType<Mail.Service>
   let dateService: StubbedClass<DateService>
+  let notificationSupportService: StubbedType<NotificationSupport.Service>
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     chatRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
     mailClient = stubInterface(sandbox)
+    notificationSupportService = stubInterface(sandbox)
 
     dateService = stubClass(DateService)
     dateService.now.returns(uneDatetime)
@@ -33,7 +36,8 @@ describe('HandleJobMailConseillerCommandHandler', () => {
         conseillerRepository,
         mailClient,
         dateService,
-        testConfig()
+        testConfig(),
+        notificationSupportService
       )
   })
 

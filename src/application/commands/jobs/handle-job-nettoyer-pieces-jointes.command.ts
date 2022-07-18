@@ -1,6 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { emptySuccess, Result, success } from 'src/building-blocks/types/result'
 import { Fichier, FichierRepositoryToken } from 'src/domain/fichier'
+import {
+  NotificationSupport,
+  NotificationSupportServiceToken
+} from 'src/domain/notification-support'
 import { DateService } from 'src/utils/date-service'
 import { buildError } from 'src/utils/logger.module'
 import { Command } from '../../../building-blocks/types/command'
@@ -14,9 +18,14 @@ export class HandleJobNettoyerPiecesJointesCommandHandler extends CommandHandler
   constructor(
     @Inject(FichierRepositoryToken)
     private fichierRepository: Fichier.Repository,
-    private dateService: DateService
+    private dateService: DateService,
+    @Inject(NotificationSupportServiceToken)
+    notificationSupportService: NotificationSupport.Service
   ) {
-    super('HandleJobNettoyerPiecesJointesCommandHandler')
+    super(
+      'HandleJobNettoyerPiecesJointesCommandHandler',
+      notificationSupportService
+    )
   }
 
   async handle(): Promise<Result<Stats>> {

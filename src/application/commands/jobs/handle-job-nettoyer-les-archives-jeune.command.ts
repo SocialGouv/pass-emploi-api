@@ -4,6 +4,10 @@ import {
   ArchiveJeuneRepositoryToken,
   ArchiveJeune
 } from 'src/domain/archive-jeune'
+import {
+  NotificationSupport,
+  NotificationSupportServiceToken
+} from 'src/domain/notification-support'
 import { DateService } from 'src/utils/date-service'
 import { buildError } from 'src/utils/logger.module'
 import { Command } from '../../../building-blocks/types/command'
@@ -17,9 +21,14 @@ export class HandleJobNettoyerArchivesJeunesCommandHandler extends CommandHandle
   constructor(
     @Inject(ArchiveJeuneRepositoryToken)
     private readonly archiveJeuneRepository: ArchiveJeune.Repository,
-    private dateService: DateService
+    private dateService: DateService,
+    @Inject(NotificationSupportServiceToken)
+    notificationSupportService: NotificationSupport.Service
   ) {
-    super('HandleJobNettoyerArchivesJeunesCommandHandler')
+    super(
+      'HandleJobNettoyerArchivesJeunesCommandHandler',
+      notificationSupportService
+    )
   }
 
   async handle(): Promise<Result<Stats>> {
