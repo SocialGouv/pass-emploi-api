@@ -4,8 +4,9 @@ import {
   ArrayNotEmpty,
   IsArray,
   IsBoolean,
-  IsDateString,
+  IsDate,
   IsEmail,
+  IsEmpty,
   IsEnum,
   IsIn,
   IsNotEmpty,
@@ -13,6 +14,7 @@ import {
   IsNotIn,
   IsOptional,
   IsString,
+  ValidateIf,
   ValidateNested
 } from 'class-validator'
 import { Core } from 'src/domain/core'
@@ -155,15 +157,24 @@ export class GetRendezVousConseillerV2QueryParams {
   tri?: RendezVous.Tri
 
   @IsOptional()
-  @IsString()
   @IsNotEmpty()
-  @IsDateString()
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
   dateDebut?: Date
 
   @IsOptional()
-  @IsString()
   @IsNotEmpty()
-  @IsDateString()
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
+  @ValidateIf(payload => {
+    if (payload.dateFin && payload.dateDebut) {
+      return payload.dateFin.getTime() < payload.dateDebut.getTime()
+    }
+    return false
+  })
+  @IsEmpty({
+    message: 'dateFin should be greater than dateDebut'
+  })
   dateFin?: Date
 }
 
