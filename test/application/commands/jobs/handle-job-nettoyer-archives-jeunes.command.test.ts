@@ -3,6 +3,7 @@ import { SinonSandbox } from 'sinon'
 import { HandleJobNettoyerArchivesJeunesCommandHandler } from 'src/application/commands/jobs/handle-job-nettoyer-les-archives-jeune.command'
 import { isSuccess } from 'src/building-blocks/types/result'
 import { ArchiveJeune } from 'src/domain/archive-jeune'
+import { NotificationSupport } from 'src/domain/notification-support'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { unFichierMetadata } from 'test/fixtures/fichier.fixture'
 import { DateService } from '../../../../src/utils/date-service'
@@ -12,17 +13,20 @@ describe('HandleJobNettoyerArchivesJeunesCommandHandler', () => {
   let handleJobNettoyerArchivesJeunesCommandHandler: HandleJobNettoyerArchivesJeunesCommandHandler
   let archiveJeuneRepository: StubbedType<ArchiveJeune.Repository>
   let dateSevice: StubbedClass<DateService>
+  let notificationSupportService: StubbedType<NotificationSupport.Service>
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     archiveJeuneRepository = stubInterface(sandbox)
     dateSevice = stubClass(DateService)
     dateSevice.now.returns(uneDatetime)
+    notificationSupportService = stubInterface(sandbox)
 
     handleJobNettoyerArchivesJeunesCommandHandler =
       new HandleJobNettoyerArchivesJeunesCommandHandler(
         archiveJeuneRepository,
-        dateSevice
+        dateSevice,
+        notificationSupportService
       )
   })
 

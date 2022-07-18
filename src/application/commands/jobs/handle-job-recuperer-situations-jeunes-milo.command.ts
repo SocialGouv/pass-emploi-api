@@ -26,12 +26,12 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends Comman
     @Inject(MiloRepositoryToken) private miloRepository: Milo.Repository,
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
     @Inject(NotificationSupportServiceToken)
-    NotificationSupportService: NotificationSupport.Service,
+    notificationSupportService: NotificationSupport.Service,
     private dateService: DateService
   ) {
     super(
       'HandleJobRecupererSituationsJeunesMiloCommandHandler',
-      NotificationSupportService
+      notificationSupportService
     )
   }
 

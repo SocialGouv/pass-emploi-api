@@ -21,6 +21,7 @@ import { unJeune } from '../../../fixtures/jeune.fixture'
 import { GetServicesCiviqueQuery } from '../../../../src/application/queries/get-services-civique.query.handler'
 import { uneOffreServiceCivique } from '../../../fixtures/offre-service-civique.fixture'
 import { FindAllOffresServicesCiviqueQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-services-civique.query.getter'
+import { NotificationSupport } from 'src/domain/notification-support'
 
 describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
   describe('handle', () => {
@@ -29,6 +30,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
     let notificationService: StubbedClass<Notification.Service>
     let findAllOffresServicesCiviqueQueryGetter: StubbedClass<FindAllOffresServicesCiviqueQueryGetter>
     let dateService: StubbedClass<DateService>
+    let notificationSupportService: StubbedType<NotificationSupport.Service>
 
     let handleJobNotifierNouveauxServicesCiviqueCommandHandler: HandleJobNotifierNouveauxServicesCiviqueCommandHandler
 
@@ -50,6 +52,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
       dateService = stubClass(DateService)
       dateService.now.returns(now)
       notificationService.notifierNouvellesOffres.resolves()
+      notificationSupportService = stubInterface(sandbox)
 
       handleJobNotifierNouveauxServicesCiviqueCommandHandler =
         new HandleJobNotifierNouveauxServicesCiviqueCommandHandler(
@@ -57,7 +60,8 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
           jeuneRepository,
           notificationService,
           findAllOffresServicesCiviqueQueryGetter,
-          dateService
+          dateService,
+          notificationSupportService
         )
     })
 
