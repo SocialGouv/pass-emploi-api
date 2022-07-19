@@ -32,7 +32,8 @@ export namespace Planificateur {
     RECUPERER_SITUATIONS_JEUNES_MILO = 'RECUPERER_SITUATIONS_JEUNES_MILO',
     NETTOYER_LES_JOBS = 'NETTOYER_LES_JOBS',
     NETTOYER_LES_PIECES_JOINTES = 'NETTOYER_LES_PIECES_JOINTES',
-    NETTOYER_LES_ARCHIVES_JEUNES = 'NETTOYER_LES_ARCHIVES_JEUNES'
+    NETTOYER_LES_ARCHIVES_JEUNES = 'NETTOYER_LES_ARCHIVES_JEUNES',
+    NOTIFIER_RENDEZVOUS_PE = 'NOTIFIER_RENDEZVOUS_PE'
   }
 
   export enum JobEnum {
@@ -144,6 +145,14 @@ export class PlanificateurService {
           type: Planificateur.CronJob.NETTOYER_LES_ARCHIVES_JEUNES,
           expression: '0 3 * * *',
           startDate: new Date('2024-07-08')
+        }
+        await this.planificateurRepository.createCron(cron)
+        break
+      }
+      case Planificateur.CronJob.NOTIFIER_RENDEZVOUS_PE: {
+        const cron: Planificateur.Cron = {
+          type: Planificateur.CronJob.NOTIFIER_RENDEZVOUS_PE,
+          expression: '0 */2 * * *'
         }
         await this.planificateurRepository.createCron(cron)
         break

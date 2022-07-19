@@ -123,6 +123,11 @@ export default () => {
       getDossierMilo: {
         limit: process.env.RATE_LIMITER_GET_DOSSIER_MILO_LIMIT ?? '10',
         interval: process.env.RATE_LIMITER_GET_DOSSIER_MILO_INTERVAL ?? '1500'
+      },
+      getNotificationsPE: {
+        limit: process.env.RATE_LIMITER_GET_NOTIFICATIONS_PE_LIMIT ?? '3',
+        interval:
+          process.env.RATE_LIMITER_GET_NOTIFICATIONS_PE_INTERVAL ?? '1100'
       }
     },
     mattermost: {

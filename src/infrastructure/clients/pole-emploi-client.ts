@@ -9,9 +9,11 @@ import { ListeTypeDemarchesDto, TypeDemarcheDto } from './dto/pole-emploi.dto'
 import { buildError } from '../../utils/logger.module'
 import { desTypeDemarchesDtosMock } from '../../fixtures/types-demarches.fixture'
 import {
+  NotificationsPartenairesDto,
   OffreEmploiDto,
   OffresEmploiDto
 } from '../repositories/dto/pole-emploi.dto'
+import { RateLimiterService } from 'src/utils/rate-limiter.service'
 
 const CODE_UTILISATEUR = 0
 
@@ -28,7 +30,8 @@ export class PoleEmploiClient {
   constructor(
     private httpService: HttpService,
     private configService: ConfigService,
-    private dateService: DateService
+    private dateService: DateService,
+    private rateLimiterService: RateLimiterService
   ) {
     this.logger = new Logger('PoleEmploiClient')
     this.inMemoryToken = { token: undefined, tokenDate: undefined }
@@ -47,6 +50,23 @@ export class PoleEmploiClient {
 
   async getOffresEmploi(params?: unknown): Promise<OffresEmploiDto> {
     const response = await this.get('offresdemploi/v2/offres/search', params)
+    return response.data
+  }
+
+  async getNotificationsRDV(
+    idsJeunesPE: string[],
+    dateHierISO: string,
+    dateDuJourISO: string
+  ): Promise<NotificationsPartenairesDto> {
+    await this.rateLimiterService.getNotificationsPE.attendreLaProchaineDisponibilite()
+    const response = await this.post(
+      'listernotificationspartenaires/v1/notifications/partenaires',
+      {
+        listeIdExterneDE: idsJeunesPE,
+        dateDebutCreation: dateHierISO,
+        dateFinCreation: dateDuJourISO
+      }
+    )
     return response.data
   }
 
@@ -87,6 +107,21 @@ export class PoleEmploiClient {
       this.httpService.get(`${this.apiUrl}/${suffixUrl}`, {
         params,
         headers: { Authorization: `Bearer ${token}` }
+      })
+    )
+  }
+
+  private async post(
+    suffixUrl: string,
+    body?: unknown
+  ): Promise<AxiosResponse> {
+    const token = await this.getToken()
+    return firstValueFrom(
+      this.httpService.post(`${this.apiUrl}/${suffixUrl}`, body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       })
     )
   }

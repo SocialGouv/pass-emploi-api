@@ -3,10 +3,14 @@ import { DateTime } from 'luxon'
 import * as nock from 'nock'
 import { PoleEmploiClient } from 'src/infrastructure/clients/pole-emploi-client'
 import { DateService } from 'src/utils/date-service'
+import { RateLimiterService } from 'src/utils/rate-limiter.service'
 import { expect, stubClass } from 'test/utils'
-import { testConfig } from '../../utils/module-for-testing'
-import { uneOffreEmploiDto } from '../../fixtures/offre-emploi.fixture'
+import {
+  notificationsRDVPEDto,
+  uneOffreEmploiDto
+} from '../../fixtures/offre-emploi.fixture'
 import { desTypesDemarchesDto } from '../../fixtures/pole-emploi.dto.fixture'
+import { testConfig } from '../../utils/module-for-testing'
 
 describe('PoleEmploiClient', () => {
   let poleEmploiClient: PoleEmploiClient
@@ -14,6 +18,7 @@ describe('PoleEmploiClient', () => {
     '2020-04-06T12:00:00.000Z'
   ).toUTC()
   const configService = testConfig()
+  const rateLimiterService = new RateLimiterService(configService)
 
   beforeEach(() => {
     const httpService = new HttpService()
@@ -24,7 +29,8 @@ describe('PoleEmploiClient', () => {
     poleEmploiClient = new PoleEmploiClient(
       httpService,
       configService,
-      dateService
+      dateService,
+      rateLimiterService
     )
   })
   describe('getToken', () => {
@@ -133,7 +139,7 @@ describe('PoleEmploiClient', () => {
     })
   })
   describe('getOffreEmploi', () => {
-    it('récupère l"offre quand elle existe', async () => {
+    it("récupère l'offre quand elle existe", async () => {
       // Given
       const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
         minutes: 20
@@ -153,6 +159,41 @@ describe('PoleEmploiClient', () => {
 
       // Then
       expect(offreEmploi).to.deep.equal(uneOffreEmploiDto())
+    })
+  })
+  describe('getNotificationsRDV', () => {
+    it('récupère les notifications', async () => {
+      // Given
+      const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+        minutes: 20
+      })
+      poleEmploiClient.inMemoryToken = {
+        token: 'test-token',
+        tokenDate: uneDatetimeDeMoinsDe25Minutes
+      }
+      const body = {
+        listeIdExterneDE: [],
+        dateDebutCreation: '2020-10-09',
+        dateFinCreation: '2020-10-10'
+      }
+
+      nock('https://api.emploi-store.fr/partenaire')
+        .post(
+          '/listernotificationspartenaires/v1/notifications/partenaires',
+          body
+        )
+        .reply(200, notificationsRDVPEDto())
+        .isDone()
+
+      // When
+      const offreEmploi = await poleEmploiClient.getNotificationsRDV(
+        [],
+        '2020-10-09',
+        '2020-10-10'
+      )
+
+      // Then
+      expect(offreEmploi).to.deep.equal(notificationsRDVPEDto())
     })
   })
   describe('rechercherTypesDemarches', () => {

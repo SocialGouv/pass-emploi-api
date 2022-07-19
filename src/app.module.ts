@@ -215,6 +215,7 @@ import { FichierSuppressionAuthorizer } from './application/authorizers/authoriz
 import { ModifierJeuneDuConseillerCommandHandler } from './application/commands/modifier-jeune-du-conseiller.command.handler'
 import { CommentaireActionSqlRepositoryDb } from './infrastructure/repositories/commentaire-action-sql.repository.db'
 import { GetCommentairesActionQueryHandler } from './application/queries/get-commentaires-action.query.handler.db'
+import { HandleJobNotifierRendezVousPECommandHandler } from './application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
 import { GetJeuneHomeSuiviQueryHandler } from './application/queries/get-jeune-home-suivi.query.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
@@ -495,13 +496,14 @@ export function buildQueryCommandsProviders(): Provider[] {
     ExecuteCronJobAsapCommandHandler,
     UpdateJeunePreferencesCommandHandler,
     GetPreferencesJeuneQueryHandler,
-    GetRendezVousConseillerPaginesQueryHandler,
     GetMetadonneesFavorisJeuneQueryHandler,
     ModifierJeuneDuConseillerCommandHandler,
     GetFavorisJeunePourConseillerQueryHandler,
     AddCommentaireActionCommandHandler,
     GetCommentairesActionQueryHandler,
-    GetJeuneHomeSuiviQueryHandler
+    GetJeuneHomeSuiviQueryHandler,
+    GetRendezVousConseillerPaginesQueryHandler,
+    HandleJobNotifierRendezVousPECommandHandler
   ]
 }
 

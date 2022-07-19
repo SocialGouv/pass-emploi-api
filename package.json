@@ -54,7 +54,8 @@
     "tasks:mettre-a-jour-mailing-list-conseiller": "IS_WEB=false IS_WORKER=false TASK=UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS node dist/main",
     "tasks:recuperer-les-situations-milo": "IS_WEB=false IS_WORKER=false TASK=RECUPERER_SITUATIONS_JEUNES_MILO node dist/main",
     "tasks:nettoyer-les-pieces-jointes": "IS_WEB=false IS_WORKER=false TASK=NETTOYER_LES_PIECES_JOINTES node dist/main",
-    "tasks:nettoyer-les-archives-jeunes": "IS_WEB=false IS_WORKER=false TASK=NETTOYER_LES_ARCHIVES_JEUNES node dist/main"
+    "tasks:nettoyer-les-archives-jeunes": "IS_WEB=false IS_WORKER=false TASK=NETTOYER_LES_ARCHIVES_JEUNES node dist/main",
+    "tasks:notifier-rendez-vous-pe": "IS_WEB=false IS_WORKER=false TASK=NOTIFIER_RENDEZVOUS_PE node dist/main"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.137.0",

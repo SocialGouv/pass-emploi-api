@@ -24,7 +24,7 @@ export namespace Notification {
     DETAIL_ACTION = 'DETAIL_ACTION'
   }
 
-  type TypeRdv =
+  export type TypeRdv =
     | Type.NEW_RENDEZVOUS
     | Type.DELETED_RENDEZVOUS
     | Type.UPDATED_RENDEZVOUS
