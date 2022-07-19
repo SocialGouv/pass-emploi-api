@@ -4158,17 +4158,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cookie@npm:0.5.0":
+"cookie@npm:0.5.0, cookie@npm:^0.5.0":
   version: 0.5.0
   resolution: "cookie@npm:0.5.0"
   checksum: 1f4bd2ca5765f8c9689a7e8954183f5332139eb72b6ff783d8947032ec1fdf43109852c178e21a953a30c0dd42257828185be01b49d1eb1a67fd054ca588a180
-  languageName: node
-  linkType: hard
-
-"cookie@npm:^0.4.0":
-  version: 0.4.2
-  resolution: "cookie@npm:0.4.2"
-  checksum: a00833c998bedf8e787b4c342defe5fa419abd96b32f4464f718b91022586b8f1bafbddd499288e75c037642493c83083da426c6a9080d309e3bd90fd11baa9b
   languageName: node
   linkType: hard
 
@@ -4569,9 +4562,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"elastic-apm-node@npm:3.36.0":
-  version: 3.36.0
-  resolution: "elastic-apm-node@npm:3.36.0"
+"elastic-apm-node@npm:3.37.0":
+  version: 3.37.0
+  resolution: "elastic-apm-node@npm:3.37.0"
   dependencies:
     "@elastic/ecs-pino-format": ^1.2.0
     "@opentelemetry/api": ^1.1.0
@@ -4579,7 +4572,7 @@ __metadata:
     async-cache: ^1.1.0
     async-value-promise: ^1.1.1
     basic-auth: ^2.0.1
-    cookie: ^0.4.0
+    cookie: ^0.5.0
     core-util-is: ^1.0.2
     elastic-apm-http-client: 11.0.1
     end-of-stream: ^1.4.4
@@ -4605,7 +4598,7 @@ __metadata:
     sql-summary: ^1.0.1
     traverse: ^0.6.6
     unicode-byte-truncate: ^1.0.0
-  checksum: 1e86195425e0fe80eaaf2f1be2b9637a2a02e23d817c94e7c0f55ea04dd8e9780f0de1c0dca47323f1cb184e3fdb9c0b6b607c7efb21df06c5f7f1ca44ccc5ea
+  checksum: 9ec7a44950b71cab33af2e6c77315f1c82a81e86094da3654cb52c796d8ab6407c180e6570265eb3c163e027814996e27351e877a97e7036e05cfb3cfd5a105f
   languageName: node
   linkType: hard
 
@@ -7893,7 +7886,7 @@ __metadata:
     dirty-chai: ^2.0.1
     dotenv-cli: ^6.0.0
     dotvault: ^0.0.9
-    elastic-apm-node: 3.36.0
+    elastic-apm-node: 3.37.0
     eslint: ^8.19.0
     eslint-config-prettier: ^8.5.0
     eslint-plugin-chai-friendly: ^0.7.2
