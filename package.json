@@ -71,7 +71,7 @@
     "class-validator": "0.13.2",
     "compression": "^1.7.4",
     "crypto-js": "^4.1.1",
-    "elastic-apm-node": "3.36.0",
+    "elastic-apm-node": "3.37.0",
     "firebase-admin": "11.0.0",
     "geojson": "^0.5.0",
     "helmet": "^5.1.0",
