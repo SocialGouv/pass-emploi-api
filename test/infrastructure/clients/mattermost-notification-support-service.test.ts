@@ -45,7 +45,7 @@ describe('NotificationSupportMattermostService', () => {
         result: failure(new NonTrouveError('test', '1')) as unknown as Result
       }
       const stringBody =
-        '{"username":"CEJ Lama","text":"### Résultat du job _handleJob_\\n| Statut | :x: |\\n    |:------------------|:----|\\n    | code | NON_TROUVE |\\n| message | test 1 non trouvé(e) |"}'
+        '{"username":"CEJ Lama","text":"### Résultat du job _handleJob_\\n| Statut | :x: |\\n    |:------------------|:----|\\n    | code | \\"NON_TROUVE\\" |\\n| message | \\"test 1 non trouvé(e)\\" |"}'
 
       const scope = nock(configService.get('mattermost').jobWebhookUrl)
         .post('', stringBody)

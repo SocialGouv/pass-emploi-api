@@ -46,7 +46,7 @@ function construireMessage(infosJob: InfosJob): string {
     |:------------------|:----|
     ${Object.entries(infosJob.result.error)
       .map(entry => {
-        return `| ${entry[0]} | ${entry[1]} |`
+        return `| ${entry[0]} | ${JSON.stringify(entry[1])} |`
       })
       .join('\n')}`
   }
