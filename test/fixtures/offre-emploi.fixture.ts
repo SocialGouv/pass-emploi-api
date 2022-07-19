@@ -1,6 +1,10 @@
 import { OffreEmploiResumeQueryModel } from 'src/application/queries/query-models/offres-emploi.query-model'
 import { OffreEmploi } from '../../src/domain/offre-emploi'
-import { OffreEmploiDto } from '../../src/infrastructure/repositories/dto/pole-emploi.dto'
+import {
+  NotificationsPartenairesDto,
+  OffreEmploiDto,
+  TypeRDVPE
+} from '../../src/infrastructure/repositories/dto/pole-emploi.dto'
 
 export const uneOffreEmploi = (): OffreEmploi => ({
   id: '123DXPM',
@@ -53,3 +57,22 @@ export const uneOffreEmploiResumeQueryModel =
     },
     alternance: false
   })
+
+export const notificationsRDVPEDto = (): NotificationsPartenairesDto => ({
+  listeNotificationsPartenaires: [
+    {
+      idExterneDE: 'string',
+      notifications: [
+        {
+          idNotification: 'string',
+          codeNotification: 'string',
+          message: 'string',
+          typeMouvementRDV: TypeRDVPE.CREA,
+          typeRDV: 'string',
+          dateCreation: 'string',
+          idMetier: 'string'
+        }
+      ]
+    }
+  ]
+})

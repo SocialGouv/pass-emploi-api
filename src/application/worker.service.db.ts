@@ -19,6 +19,7 @@ import { HandleJobRappelActionCommandHandler } from './commands/jobs/handle-job-
 import { HandleJobRappelRendezVousCommandHandler } from './commands/jobs/handle-job-rappel-rendez-vous.command'
 import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from './commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
 import { HandleJobUpdateMailingListConseillerCommandHandler } from './commands/jobs/handle-job-update-mailing-list-conseiller.command'
+import { HandleJobNotifierRendezVousPECommandHandler } from './commands/jobs/handle-job-notifier-rendez-vous-pe.command'
 
 @Injectable()
 export class WorkerService {
@@ -38,7 +39,8 @@ export class WorkerService {
     private handleJobNotifierNouveauxServicesCiviqueCommandHandler: HandleJobNotifierNouveauxServicesCiviqueCommandHandler,
     private handleJobRecupererSituationsJeunesMiloCommandHandler: HandleJobRecupererSituationsJeunesMiloCommandHandler,
     private handleJobNettoyerPiecesJointesCommandHandler: HandleJobNettoyerPiecesJointesCommandHandler,
-    private handleJobNettoyerArchivesJeunesCommandHandler: HandleJobNettoyerArchivesJeunesCommandHandler
+    private handleJobNettoyerArchivesJeunesCommandHandler: HandleJobNettoyerArchivesJeunesCommandHandler,
+    private handleJobNotifierRendezVousPECommandHandler: HandleJobNotifierRendezVousPECommandHandler
   ) {
     this.apmService = getAPMInstance()
     this.workerTrackingService = getWorkerTrackingServiceInstance()
@@ -96,6 +98,9 @@ export class WorkerService {
           break
         case Planificateur.CronJob.NETTOYER_LES_ARCHIVES_JEUNES:
           await this.handleJobNettoyerArchivesJeunesCommandHandler.execute()
+          break
+        case Planificateur.CronJob.NOTIFIER_RENDEZVOUS_PE:
+          await this.handleJobNotifierRendezVousPECommandHandler.execute()
           break
         case Planificateur.JobEnum.FAKE:
           this.logger.log({

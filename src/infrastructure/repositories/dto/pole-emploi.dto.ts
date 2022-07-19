@@ -24,3 +24,23 @@ export interface OffreEmploiDto {
 export interface OffresEmploiDto {
   resultats: OffreEmploiDto[]
 }
+
+export enum TypeRDVPE {
+  CREA = 'CREA',
+  MODIF = 'MODIF',
+  SUPP = 'SUPP'
+}
+export interface NotificationsPartenairesDto {
+  listeNotificationsPartenaires: Array<{
+    idExterneDE: string
+    notifications: Array<{
+      idNotification: string
+      codeNotification: string
+      message: string
+      typeMouvementRDV: TypeRDVPE
+      typeRDV: string
+      dateCreation: string
+      idMetier?: string
+    }>
+  }>
+}

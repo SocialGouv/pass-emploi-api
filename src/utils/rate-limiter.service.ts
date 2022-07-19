@@ -8,9 +8,11 @@ const TokenBucket = require('tokenbucket')
 @Injectable()
 export class RateLimiterService {
   public readonly getDossierMilo: RateLimiter
+  public readonly getNotificationsPE: RateLimiter
 
   constructor(private configService: ConfigService) {
     this.getDossierMilo = this.buildGetDossierMilo()
+    this.getNotificationsPE = this.buildGetNotificationsPE()
   }
 
   private buildGetDossierMilo(): RateLimiter {
@@ -23,6 +25,21 @@ export class RateLimiterService {
       ),
       tokensToAddPerInterval: parseInt(
         this.configService.get('rateLimiter.getDossierMilo.limit')!
+      )
+    }
+    return new RateLimiter(options)
+  }
+
+  private buildGetNotificationsPE(): RateLimiter {
+    const options: RateLimiter.Options = {
+      size: parseInt(
+        this.configService.get('rateLimiter.getNotificationsPE.limit')!
+      ),
+      interval: parseInt(
+        this.configService.get('rateLimiter.getNotificationsPE.interval')!
+      ),
+      tokensToAddPerInterval: parseInt(
+        this.configService.get('rateLimiter.getNotificationsPE.limit')!
       )
     }
     return new RateLimiter(options)

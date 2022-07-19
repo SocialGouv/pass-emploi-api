@@ -95,6 +95,10 @@ export const configurationSchema = Joi.object({
     getDossierMilo: Joi.object({
       limit: Joi.number().required(),
       interval: Joi.number().required()
+    }),
+    getNotificationsPE: Joi.object({
+      limit: Joi.number().required(),
+      interval: Joi.number().required()
     })
   }),
   mattermost: Joi.object({ jobWebhookUrl: Joi.string().uri().required() }),
