@@ -134,7 +134,7 @@ describe('ConseillersControllerV2', () => {
         unUtilisateurDecode()
       )
     })
-    it('renvoie 400 quand dateFin inferieure à dateDebut', async () => {
+    it('renvoie 206 quand dateFin inferieure à dateDebut', async () => {
       // Given
       getRendezVousConseillerPaginesQueryHandler.execute
         .withArgs(
@@ -155,7 +155,20 @@ describe('ConseillersControllerV2', () => {
           `/v2/conseillers/41/rendezvous?dateDebut=${dateStringPlusRecente}&dateFin=${dateString}`
         )
         .set('authorization', unHeaderAuthorization())
-        .expect(HttpStatus.BAD_REQUEST)
+        .expect(HttpStatus.PARTIAL_CONTENT)
+
+      expect(
+        getRendezVousConseillerPaginesQueryHandler.execute
+      ).to.have.been.calledWithExactly(
+        {
+          idConseiller: '41',
+          tri: undefined,
+          dateDebut: new Date(dateStringPlusRecente),
+          dateFin: new Date(dateString),
+          presenceConseiller: undefined
+        },
+        unUtilisateurDecode()
+      )
     })
   })
 })

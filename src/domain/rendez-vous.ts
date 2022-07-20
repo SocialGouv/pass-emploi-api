@@ -100,11 +100,6 @@ export namespace RendezVous {
     getAllAVenir(): Promise<RendezVous[]>
   }
 
-  export enum Tri {
-    DATE_CROISSANTE = 'date_croissante',
-    DATE_DECROISSANTE = 'date_decroissante'
-  }
-
   export enum Periode {
     PASSES = 'PASSES',
     FUTURS = 'FUTURS'

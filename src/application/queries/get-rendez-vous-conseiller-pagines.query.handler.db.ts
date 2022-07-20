@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Op, Order, Sequelize } from 'sequelize'
 import { Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { RendezVous } from 'src/domain/rendez-vous'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
@@ -12,9 +11,15 @@ import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { fromSqlToRendezVousConseillerQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { RendezVousConseillerQueryModel } from './query-models/rendez-vous.query-model'
 
+const NOMBRE_RDV_MAX = 100
+
+export enum TriRendezVous {
+  DATE_CROISSANTE = 'date_croissante',
+  DATE_DECROISSANTE = 'date_decroissante'
+}
 export interface GetRendezVousConseillerPaginesQuery extends Query {
   idConseiller: string
-  tri?: RendezVous.Tri
+  tri?: TriRendezVous
   dateDebut?: Date
   dateFin?: Date
   presenceConseiller?: boolean
@@ -40,27 +45,6 @@ export class GetRendezVousConseillerPaginesQueryHandler extends QueryHandler<
       presenceConseillerCondition.presenceConseiller = query.presenceConseiller
     }
 
-    let dateCondition
-    if (query.dateDebut === undefined && query.dateFin === undefined) {
-      dateCondition = {}
-    } else {
-      let dateDebutCondition
-      if (query.dateDebut !== undefined) {
-        dateDebutCondition = {
-          [Op.gte]: query.dateDebut
-        }
-      }
-
-      let dateFinCondition
-      if (query.dateFin !== undefined) {
-        dateFinCondition = {
-          [Op.lte]: query.dateFin
-        }
-      }
-
-      dateCondition = { date: { ...dateDebutCondition, ...dateFinCondition } }
-    }
-
     const rendezVousSql = await RendezVousSqlModel.findAll({
       include: [{ model: JeuneSqlModel }],
       replacements: { id_conseiller: query.idConseiller },
@@ -76,10 +60,11 @@ export class GetRendezVousConseillerPaginesQueryHandler extends QueryHandler<
         dateSuppression: {
           [Op.is]: null
         },
-        ...dateCondition,
+        ...generateDateCondition(query.dateDebut, query.dateFin),
         ...presenceConseillerCondition
       },
-      order: mapTriToOrder[query.tri ?? RendezVous.Tri.DATE_CROISSANTE]
+      order: mapTriToOrder[query.tri ?? TriRendezVous.DATE_CROISSANTE],
+      limit: NOMBRE_RDV_MAX
     })
 
     return success(rendezVousSql.map(fromSqlToRendezVousConseillerQueryModel))
@@ -97,7 +82,28 @@ export class GetRendezVousConseillerPaginesQueryHandler extends QueryHandler<
   }
 }
 
-const mapTriToOrder: Record<RendezVous.Tri, Order> = {
+const mapTriToOrder: Record<TriRendezVous, Order> = {
   date_croissante: [['date', 'ASC']],
   date_decroissante: [['date', 'DESC']]
+}
+
+function generateDateCondition(
+  dateDebut?: Date,
+  dateFin?: Date
+): { date?: Record<string, string> } {
+  let dateCondition = undefined
+
+  if (dateDebut !== undefined) {
+    dateCondition = {
+      [Op.gte]: dateDebut
+    }
+  }
+  if (dateFin !== undefined) {
+    dateCondition = {
+      ...dateCondition,
+      [Op.lte]: dateFin
+    }
+  }
+
+  return dateCondition ? { date: dateCondition } : {}
 }

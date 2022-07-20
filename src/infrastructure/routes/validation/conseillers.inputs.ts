@@ -6,7 +6,6 @@ import {
   IsBoolean,
   IsDate,
   IsEmail,
-  IsEmpty,
   IsEnum,
   IsIn,
   IsNotEmpty,
@@ -14,11 +13,10 @@ import {
   IsNotIn,
   IsOptional,
   IsString,
-  ValidateIf,
   ValidateNested
 } from 'class-validator'
+import { TriRendezVous } from 'src/application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
 import { Core } from 'src/domain/core'
-import { RendezVous } from 'src/domain/rendez-vous'
 import { Action } from '../../../domain/action'
 import { AgenceInput } from './agences.inputs'
 import { transformStringToBoolean } from './utils/transformers'
@@ -153,8 +151,8 @@ export class GetRendezVousConseillerV2QueryParams {
   presenceConseiller?: boolean
 
   @IsOptional()
-  @IsEnum(RendezVous.Tri)
-  tri?: RendezVous.Tri
+  @IsEnum(TriRendezVous)
+  tri?: TriRendezVous
 
   @IsOptional()
   @IsNotEmpty()
@@ -166,15 +164,6 @@ export class GetRendezVousConseillerV2QueryParams {
   @IsNotEmpty()
   @IsDate()
   @Transform(({ value }) => new Date(value))
-  @ValidateIf(payload => {
-    if (payload.dateFin && payload.dateDebut) {
-      return payload.dateFin.getTime() < payload.dateDebut.getTime()
-    }
-    return false
-  })
-  @IsEmpty({
-    message: 'dateFin should be greater than dateDebut'
-  })
   dateFin?: Date
 }
 
