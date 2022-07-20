@@ -5,19 +5,24 @@ import {
   PlanificateurRepositoryToken
 } from '../domain/planificateur'
 import { getAPMInstance } from '../infrastructure/monitoring/apm.init'
+import {
+  getWorkerTrackingServiceInstance,
+  WorkerTrackingService
+} from '../infrastructure/monitoring/worker.tracking.service'
 import { HandleJobMailConseillerCommandHandler } from './commands/jobs/handle-job-mail-conseiller.command'
-import { HandleJobRappelRendezVousCommandHandler } from './commands/jobs/handle-job-rappel-rendez-vous.command'
-import { HandleNettoyerLesJobsCommandHandler } from './commands/jobs/handle-job-nettoyer-les-jobs.command'
-import { HandleJobUpdateMailingListConseillerCommandHandler } from './commands/jobs/handle-job-update-mailing-list-conseiller.command'
-import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
-import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
-import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from './commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
-import { HandleJobNettoyerPiecesJointesCommandHandler } from './commands/jobs/handle-job-nettoyer-pieces-jointes.command'
 import { HandleJobNettoyerArchivesJeunesCommandHandler } from './commands/jobs/handle-job-nettoyer-les-archives-jeune.command'
+import { HandleNettoyerLesJobsCommandHandler } from './commands/jobs/handle-job-nettoyer-les-jobs.command'
+import { HandleJobNettoyerPiecesJointesCommandHandler } from './commands/jobs/handle-job-nettoyer-pieces-jointes.command'
+import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
+import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
+import { HandleJobRappelRendezVousCommandHandler } from './commands/jobs/handle-job-rappel-rendez-vous.command'
+import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from './commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
+import { HandleJobUpdateMailingListConseillerCommandHandler } from './commands/jobs/handle-job-update-mailing-list-conseiller.command'
 
 @Injectable()
 export class WorkerService {
   private apmService: apm.Agent
+  private workerTrackingService: WorkerTrackingService
   private readonly logger: Logger = new Logger('WorkerService')
 
   constructor(
@@ -34,6 +39,7 @@ export class WorkerService {
     private handleJobNettoyerArchivesJeunesCommandHandler: HandleJobNettoyerArchivesJeunesCommandHandler
   ) {
     this.apmService = getAPMInstance()
+    this.workerTrackingService = getWorkerTrackingServiceInstance()
   }
 
   subscribe(): void {
@@ -41,10 +47,9 @@ export class WorkerService {
   }
 
   async handler(job: Planificateur.Job<unknown>): Promise<void> {
-    const transaction = this.apmService.startTransaction(
-      `JOB-${job.type}`,
-      'worker'
-    )
+    const jobName = `JOB-${job.type}`
+    this.workerTrackingService.startJobTracking(jobName)
+    const transaction = this.apmService.startTransaction(jobName, 'worker')
     const startTime = new Date().getMilliseconds()
     let success = true
     this.logger.log({
