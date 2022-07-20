@@ -7902,7 +7902,7 @@ __metadata:
     lint-staged: ^13.0.3
     luxon: 3.0.1
     mocha: ^10.0.0
-    nestjs-pino: 2.6.0
+    nestjs-pino: 3.1.0
     nock: ^13.2.8
     nyc: ^15.1.0
     openid-client: 5.1.8
@@ -7935,13 +7935,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"nestjs-pino@npm:2.6.0":
-  version: 2.6.0
-  resolution: "nestjs-pino@npm:2.6.0"
+"nestjs-pino@npm:3.1.0":
+  version: 3.1.0
+  resolution: "nestjs-pino@npm:3.1.0"
   peerDependencies:
-    "@nestjs/common": ^8.0.0
-    pino-http: ^6.4.0 || ^7.0.0
-  checksum: b274e607e24d924a95b0b55902b5631725d894b4951fbbe3a7f70fd6f7ae78a4217dd3c1a579b1ccd5e825f42bf19cfbfba3ae559b0ee069b57248fb7127a055
+    "@nestjs/common": ^8.0.0 || ^9.0.0
+    pino-http: ^6.4.0 || ^7.0.0 || ^8.0.0
+  checksum: 06c1bf99aec091669eedbfc04ce433fa249e16921d4ae87b77025e4f3929a122d95a1e9d5aabcbcc03727113e56bc509c678bfd2ad71cf18626bd88baf8515bf
   languageName: node
   linkType: hard
 
