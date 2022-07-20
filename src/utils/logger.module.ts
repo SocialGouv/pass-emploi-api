@@ -6,6 +6,7 @@ import { MixinFn } from 'pino'
 import { ReqId } from 'pino-http'
 import * as uuid from 'uuid'
 import { getAPMInstance } from '../infrastructure/monitoring/apm.init'
+import { getWorkerTrackingServiceInstance } from '../infrastructure/monitoring/worker.tracking.service'
 
 export const configureLoggerModule = (): DynamicModule =>
   LoggerModule.forRoot({
@@ -27,8 +28,14 @@ export const configureLoggerModule = (): DynamicModule =>
           'req.headers["x-api-key"]'
         ],
         mixin: (): (() => MixinFn) => {
-          const currentTraceIds = getAPMInstance().currentTraceIds
-          /* eslint-disable @typescript-eslint/ban-ts-comment */
+          let currentTraceIds = getAPMInstance().currentTraceIds
+          const apmEstDesactive = Object.keys(currentTraceIds).length === 0
+          if (apmEstDesactive) {
+            // @ts-ignore
+            currentTraceIds =
+              getWorkerTrackingServiceInstance().getCurrentJobTracking()
+                ?.currentTraceIds
+          }
           // @ts-ignore
           return !Object.keys(currentTraceIds).length ? {} : { currentTraceIds }
         },
