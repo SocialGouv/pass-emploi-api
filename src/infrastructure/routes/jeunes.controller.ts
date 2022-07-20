@@ -324,8 +324,14 @@ export class JeunesController {
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
   ): Promise<DemarcheQueryModel> {
+    let description = createDemarchePayload.description
+    if (description && description?.length > 200) {
+      description = description?.substring(0, 199)
+    }
+
     const command: CreateDemarcheCommand = {
       ...createDemarchePayload,
+      description,
       idJeune,
       accessToken
     }
