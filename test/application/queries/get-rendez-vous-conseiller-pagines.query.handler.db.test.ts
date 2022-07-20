@@ -1,6 +1,8 @@
-import { GetRendezVousConseillerPaginesQueryHandler } from 'src/application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
+import {
+  GetRendezVousConseillerPaginesQueryHandler,
+  TriRendezVous
+} from 'src/application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
 import { isSuccess } from 'src/building-blocks/types/result'
-import { RendezVous } from 'src/domain/rendez-vous'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -198,7 +200,7 @@ describe('GetRendezVousConseillerPaginesQueryHandler', () => {
       const result = await getRendezVousConseillerPaginesQueryHandler.handle({
         idConseiller: jeune1.conseiller.id,
         presenceConseiller: true,
-        tri: RendezVous.Tri.DATE_DECROISSANTE
+        tri: TriRendezVous.DATE_DECROISSANTE
       })
       // Then
       expect(result._isSuccess).to.be.true()
