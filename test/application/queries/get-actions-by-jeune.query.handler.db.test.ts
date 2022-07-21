@@ -331,9 +331,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
           id: '02b3710e-7779-11ec-90d6-0242ac120001',
           idJeune: jeune.id,
           statut: Action.Statut.PAS_COMMENCEE,
-          dateDerniereActualisation: DateTime.fromISO(
-            '2020-04-05T12:00:00.000Z'
-          )
+          dateCreation: DateTime.fromISO('2020-04-05T12:00:00.000Z')
             .toUTC()
             .toJSDate()
         })
@@ -341,9 +339,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
           id: '02b3710e-7779-11ec-90d6-0242ac120002',
           idJeune: jeune.id,
           statut: Action.Statut.EN_COURS,
-          dateDerniereActualisation: DateTime.fromISO(
-            '2020-04-06T12:00:00.000Z'
-          )
+          dateCreation: DateTime.fromISO('2020-04-06T12:00:00.000Z')
             .toUTC()
             .toJSDate()
         })
@@ -351,9 +347,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
           id: '02b3710e-7779-11ec-90d6-0242ac120003',
           idJeune: jeune.id,
           statut: Action.Statut.ANNULEE,
-          dateDerniereActualisation: DateTime.fromISO(
-            '2020-04-07T12:00:00.000Z'
-          )
+          dateCreation: DateTime.fromISO('2020-04-07T12:00:00.000Z')
             .toUTC()
             .toJSDate()
         })
@@ -361,9 +355,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
           id: '02b3710e-7779-11ec-90d6-0242ac120004',
           idJeune: jeune.id,
           statut: Action.Statut.TERMINEE,
-          dateDerniereActualisation: DateTime.fromISO(
-            '2020-04-03T12:00:00.000Z'
-          )
+          dateCreation: DateTime.fromISO('2020-04-03T12:00:00.000Z')
             .toUTC()
             .toJSDate()
         })
