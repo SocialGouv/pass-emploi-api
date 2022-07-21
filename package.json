@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "engines": {
     "npm": "8.15.0",
-    "yarn": "3.2.1",
+    "yarn": "3.2.2",
     "node": "16.15.0"
   },
   "bin": {
@@ -156,5 +156,5 @@
   "lint-staged": {
     "*.ts": "yarn lint:fix"
   },
-  "packageManager": "yarn@3.2.1"
+  "packageManager": "yarn@3.2.2"
 }
