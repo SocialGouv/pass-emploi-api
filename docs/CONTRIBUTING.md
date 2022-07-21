@@ -205,15 +205,18 @@ Pour plus d'informations sur les review apps, vous pouvez voir [la doc scalingo]
 L'environnement de prod front correspond à l'application scalingo back `pa-back-prod`.
 
 Cette application est branchée sur la branche `master` du repo.
-À chaque nouveau commit sur cette branche, un déploiement automatique sera lancé sur l'application.
+Le déploiement automatique est désactivé : il faut alors aller sur scalingo et suivre les étapes suivantes `pa-back-prod > Deploy > Manual deployments > Trigger deployment`
 
-Il est également possible de déployer manuellement en allant sur `pa-back-prod > Deploy > Manual deployments > Trigger deployment`
+Les review apps ne sont pas activées sur la prod.
 
-Les review apps ne sont pas activés sur la prod.
+#### Processus de release
+1. Tagger la version sur le commit de develop que l'on veut déployer
+2. Faire une MR de develop vers master et merger
+3. Aller sur scalingo et déployer la version de master
 
 ### Rollback <a name="rollback"></a>
 
-Il est possible de rollback une application Scalingo sur un commit donné (de la branche rattachée à l'application).
+Il est possible de rollback une application Scalingo sur un tag donné (de la branche rattachée à l'application).
 
     git remote add scalingo git@ssh.${MA_REGION}.scalingo.com:${MON_APPLICATION}.git
     git push --force ${ID_COMMIT}:refs/heads/master
