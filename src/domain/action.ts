@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { Brand } from '../building-blocks/types/brand'
 import { DomainError } from '../building-blocks/types/domain-error'
 import { Result, success } from '../building-blocks/types/result'
@@ -17,6 +18,8 @@ export interface Action {
   dateDerniereActualisation: Date
   idJeune: Jeune.Id
   createur: Action.Createur
+  dateEcheance: Date
+  rappel: boolean
 }
 
 export namespace Action {
@@ -81,6 +84,8 @@ export namespace Action {
         statut?: Action.Statut
         commentaire?: string
         typeCreateur: Action.TypeCreateur
+        dateEcheance?: Date
+        rappel?: boolean
       },
       jeune: Jeune
     ): Result<Action> {
@@ -109,10 +114,14 @@ export namespace Action {
         contenu: data.contenu,
         commentaire: data.commentaire ?? '',
         idJeune: data.idJeune,
-        statut: statut,
+        statut,
         createur,
         dateCreation: now,
-        dateDerniereActualisation: now
+        dateDerniereActualisation: now,
+        rappel: data.rappel === undefined ? true : data.rappel,
+        dateEcheance: data.dateEcheance
+          ? data.dateEcheance
+          : buildDateEcheance(statut, now)
       }
       return success(action)
     }
@@ -126,4 +135,16 @@ export namespace Action {
       })
     }
   }
+}
+
+function buildDateEcheance(
+  statutAction: Action.Statut,
+  maintenant: Date
+): Date {
+  const statutsDone = [Action.Statut.ANNULEE, Action.Statut.TERMINEE]
+
+  if (statutsDone.includes(statutAction)) {
+    return maintenant
+  }
+  return DateTime.fromJSDate(maintenant).plus({ months: 3 }).toJSDate()
 }

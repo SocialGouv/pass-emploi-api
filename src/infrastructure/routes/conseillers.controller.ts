@@ -68,8 +68,8 @@ import { Action } from '../../domain/action'
 import { Core } from '../../domain/core'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
+import { CreateActionPayload } from './validation/actions.inputs'
 import {
-  CreateActionPayload,
   CreateJeunePoleEmploiPayload,
   CreerJeuneMiloPayload,
   DetailConseillerPayload,
@@ -246,7 +246,7 @@ export class ConseillersController {
   }
 
   @ApiOperation({
-    summary: 'Crée une action Autorisé pour un jeune',
+    summary: 'Crée une action',
     description: 'Autorisé pour un conseiller du jeune'
   })
   @Post(':idConseiller/jeunes/:idJeune/action')
@@ -262,7 +262,8 @@ export class ConseillersController {
         idJeune,
         idCreateur: idConseiller,
         typeCreateur: Action.TypeCreateur.CONSEILLER,
-        commentaire: createActionPayload.comment
+        commentaire: createActionPayload.comment,
+        dateEcheance: createActionPayload.dateEcheance
       },
       utilisateur
     )

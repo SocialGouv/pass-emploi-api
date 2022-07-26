@@ -10,14 +10,12 @@ import {
   IsIn,
   IsNotEmpty,
   IsNotEmptyObject,
-  IsNotIn,
   IsOptional,
   IsString,
   ValidateNested
 } from 'class-validator'
 import { TriRendezVous } from 'src/application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
 import { Core } from 'src/domain/core'
-import { Action } from '../../../domain/action'
 import { AgenceInput } from './agences.inputs'
 import { transformStringToBoolean } from './utils/transformers'
 
@@ -27,27 +25,6 @@ export class GetConseillerQueryParams {
   @IsNotEmpty()
   @IsEmail()
   email: string
-}
-
-export class CreateActionPayload {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  content: string
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  comment?: string
-}
-
-export class CreateActionAvecStatutPayload extends CreateActionPayload {
-  @ApiProperty({ enum: Action.Statut })
-  @IsString()
-  @IsEnum(Action.Statut)
-  @IsNotIn([Action.Statut.ANNULEE])
-  @IsOptional()
-  status?: Action.Statut
 }
 
 export class CreateJeunePoleEmploiPayload {

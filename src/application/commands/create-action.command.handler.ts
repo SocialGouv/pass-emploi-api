@@ -23,6 +23,8 @@ export interface CreateActionCommand extends Command {
   typeCreateur: Action.TypeCreateur
   statut?: Action.Statut
   commentaire?: string
+  dateEcheance?: Date
+  rappel?: boolean
 }
 
 @Injectable()
