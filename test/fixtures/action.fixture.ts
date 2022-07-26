@@ -1,5 +1,5 @@
 import { Action } from '../../src/domain/action'
-import { uneDatetime } from './date.fixture'
+import { uneDate, uneDatetime } from './date.fixture'
 
 export const uneAction = (args: Partial<Action> = {}): Action => {
   const now = uneDatetime.toJSDate()
@@ -16,7 +16,9 @@ export const uneAction = (args: Partial<Action> = {}): Action => {
       type: Action.TypeCreateur.CONSEILLER,
       prenom: 'Nils',
       nom: 'Tavernier'
-    }
+    },
+    dateEcheance: uneDate(),
+    rappel: true
   }
 
   return { ...defaults, ...args }

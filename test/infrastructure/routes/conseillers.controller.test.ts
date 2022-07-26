@@ -10,7 +10,7 @@ import { Action } from 'src/domain/action'
 import { CodeTypeRendezVous } from 'src/domain/rendez-vous'
 import { CreateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
 import * as request from 'supertest'
-import { uneDatetime } from 'test/fixtures/date.fixture'
+import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
 import { unRendezVousConseillerFutursEtPassesQueryModel } from 'test/fixtures/rendez-vous.fixture'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
 import {
@@ -34,10 +34,7 @@ import {
   success
 } from '../../../src/building-blocks/types/result'
 import { Core } from '../../../src/domain/core'
-import {
-  CreateActionPayload,
-  EnvoyerNotificationsPayload
-} from '../../../src/infrastructure/routes/validation/conseillers.inputs'
+import { EnvoyerNotificationsPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
 import {
   unHeaderAuthorization,
   unUtilisateurDecode
@@ -62,6 +59,7 @@ import { uneAgence } from '../../fixtures/agence.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
 import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler'
+import { CreateActionPayload } from 'src/infrastructure/routes/validation/actions.inputs'
 
 describe('ConseillersController', () => {
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
@@ -299,7 +297,7 @@ describe('ConseillersController', () => {
   })
 
   describe('POST /conseillers/:idConseiller/jeunes/:idJeune/action', () => {
-    it("renvoie l'id de l'action créée", async () => {
+    it("renvoie l'id de l'action créée sans dateEcheance", async () => {
       // Given
       const actionPayload: CreateActionPayload = {
         content: "Ceci est un contenu d'action",
@@ -322,7 +320,38 @@ describe('ConseillersController', () => {
           contenu: "Ceci est un contenu d'action",
           idCreateur: '1',
           typeCreateur: Action.TypeCreateur.CONSEILLER,
-          commentaire: 'Ceci est un commentaire'
+          commentaire: 'Ceci est un commentaire',
+          dateEcheance: undefined
+        },
+        unUtilisateurDecode()
+      )
+    })
+    it("renvoie l'id de l'action créée avec dateEcheance", async () => {
+      // Given
+      const actionPayload: CreateActionPayload = {
+        content: "Ceci est un contenu d'action",
+        comment: 'Ceci est un commentaire',
+        dateEcheance: uneDate()
+      }
+      const idAction = '15916d7e-f13a-4158-b7eb-3936aa937a0a'
+      createActionCommandHandler.execute.resolves(success(idAction))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post('/conseillers/1/jeunes/ABCDE/action')
+        .set('authorization', unHeaderAuthorization())
+        .send(actionPayload)
+        .expect(HttpStatus.CREATED)
+        .expect({ id: idAction })
+
+      expect(createActionCommandHandler.execute).to.have.been.calledWithExactly(
+        {
+          idJeune: 'ABCDE',
+          contenu: "Ceci est un contenu d'action",
+          idCreateur: '1',
+          typeCreateur: Action.TypeCreateur.CONSEILLER,
+          commentaire: 'Ceci est un commentaire',
+          dateEcheance: uneDate()
         },
         unUtilisateurDecode()
       )

@@ -74,7 +74,6 @@ import { Action } from '../../domain/action'
 import { Authentification } from '../../domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
-import { CreateActionAvecStatutPayload } from './validation/conseillers.inputs'
 import {
   CreateDemarchePayload,
   UpdateStatutDemarchePayload
@@ -92,6 +91,7 @@ import {
   GetPreferencesJeuneQuery,
   GetPreferencesJeuneQueryHandler
 } from '../../application/queries/get-preferences-jeune.handler.db'
+import { CreateActionParLeJeunePayload } from './validation/actions.inputs'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -413,7 +413,7 @@ export class JeunesController {
   @Post(':idJeune/action')
   async postNouvelleAction(
     @Param('idJeune') idJeune: string,
-    @Body() createActionPayload: CreateActionAvecStatutPayload,
+    @Body() createActionPayload: CreateActionParLeJeunePayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<Core.Id> {
     const command: CreateActionCommand = {
@@ -422,7 +422,9 @@ export class JeunesController {
       idCreateur: idJeune,
       typeCreateur: Action.TypeCreateur.JEUNE,
       commentaire: createActionPayload.comment,
-      statut: createActionPayload.status
+      statut: createActionPayload.status,
+      dateEcheance: createActionPayload.dateEcheance,
+      rappel: createActionPayload.rappel
     }
     const result = await this.createActionCommandHandler.execute(
       command,

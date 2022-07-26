@@ -55,7 +55,6 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action'
 import { JwtService } from '../../../src/infrastructure/auth/jwt.service'
-import { CreateActionAvecStatutPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
 import {
   unHeaderAuthorization,
   unJwtPayloadValide,
@@ -73,6 +72,7 @@ import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-
 import { UpdateJeunePreferencesCommandHandler } from '../../../src/application/commands/update-preferences-jeune.command.handler'
 import { GetPreferencesJeuneQueryHandler } from '../../../src/application/queries/get-preferences-jeune.handler.db'
 import StatutInvalide = Action.StatutInvalide
+import { CreateActionParLeJeunePayload } from 'src/infrastructure/routes/validation/actions.inputs'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -279,12 +279,12 @@ describe('JeunesController', () => {
   })
 
   describe('POST /jeunes/:idJeune/action', () => {
-    const actionPayload: CreateActionAvecStatutPayload = {
+    const actionPayload: CreateActionParLeJeunePayload = {
       content: "Ceci est un contenu d'action",
       comment: 'Ceci est un commentaire',
       status: Action.Statut.EN_COURS
     }
-    it("renvoie l'id de l'action créée", async () => {
+    it("renvoie l'id de l'action créée sans dateEcheance ni rappel", async () => {
       // Given
       const idAction = 'a40a178e-9562-416f-ad9d-42dfbc663a8a'
       createActionCommandHandler.execute.resolves(success(idAction))
@@ -305,7 +305,42 @@ describe('JeunesController', () => {
           idCreateur: 'ABCDE',
           typeCreateur: Action.TypeCreateur.JEUNE,
           statut: Action.Statut.EN_COURS,
-          commentaire: 'Ceci est un commentaire'
+          commentaire: 'Ceci est un commentaire',
+          dateEcheance: undefined,
+          rappel: undefined
+        },
+        unUtilisateurDecode()
+      )
+    })
+    it("renvoie l'id de l'action créée avec dateEcheance et rappel", async () => {
+      // Given
+      const payloadAvecEcheance: CreateActionParLeJeunePayload = {
+        ...actionPayload,
+        dateEcheance: uneDate(),
+        rappel: false
+      }
+      const idAction = 'a40a178e-9562-416f-ad9d-42dfbc663a8a'
+      createActionCommandHandler.execute.resolves(success(idAction))
+
+      // When
+      await request(app.getHttpServer())
+        .post('/jeunes/ABCDE/action')
+        .set('authorization', unHeaderAuthorization())
+        .send(payloadAvecEcheance)
+
+        // Then
+        .expect(HttpStatus.CREATED)
+        .expect({ id: idAction })
+      expect(createActionCommandHandler.execute).to.have.been.calledWithExactly(
+        {
+          idJeune: 'ABCDE',
+          contenu: "Ceci est un contenu d'action",
+          idCreateur: 'ABCDE',
+          typeCreateur: Action.TypeCreateur.JEUNE,
+          statut: Action.Statut.EN_COURS,
+          commentaire: 'Ceci est un commentaire',
+          dateEcheance: uneDate(),
+          rappel: false
         },
         unUtilisateurDecode()
       )
@@ -339,7 +374,7 @@ describe('JeunesController', () => {
     })
 
     it('renvoie une 400 (Bad Request) quand le statut est égal à "annulée"', async () => {
-      const actionPayloadWithCanceledStatus: CreateActionAvecStatutPayload = {
+      const actionPayloadWithCanceledStatus: CreateActionParLeJeunePayload = {
         content: "Ceci est un contenu d'action",
         comment: 'Ceci est un commentaire',
         status: Action.Statut.ANNULEE

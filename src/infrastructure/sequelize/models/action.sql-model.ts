@@ -51,8 +51,11 @@ export class ActionDto extends Model {
   @Column({ field: 'date_derniere_actualisation', type: DataType.DATE })
   dateDerniereActualisation!: Date
 
-  @Column({ field: 'date_limite', type: DataType.DATE })
-  dateLimite!: Date | null
+  @Column({ field: 'date_echeance', type: DataType.DATE })
+  dateEcheance: Date
+
+  @Column({ field: 'rappel', type: DataType.BOOLEAN })
+  rappel: boolean
 }
 
 @Table({ timestamps: false, tableName: 'action' })

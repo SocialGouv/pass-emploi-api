@@ -71,7 +71,7 @@ export namespace ArchiveJeune {
     commentaire: string
     dateCreation: Date
     dateActualisation: Date
-    dateLimite?: Date
+    dateEcheance: Date
     creePar: 'JEUNE' | 'CONSEILLER'
   }
 

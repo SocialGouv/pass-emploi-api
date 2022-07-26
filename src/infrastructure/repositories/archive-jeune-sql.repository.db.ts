@@ -201,7 +201,7 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
       creePar:
         actionSql.idCreateur === metadonnes.idJeune ? 'JEUNE' : 'CONSEILLER',
       dateActualisation: actionSql.dateDerniereActualisation,
-      dateLimite: actionSql.dateLimite || undefined
+      dateEcheance: actionSql.dateEcheance
     }))
   }
 }
