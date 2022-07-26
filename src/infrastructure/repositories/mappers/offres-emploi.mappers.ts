@@ -57,8 +57,7 @@ export function toFavoriOffreEmploiSqlModel(
     nomLocalisation: offreEmploi.localisation?.nom || null,
     codePostalLocalisation: offreEmploi.localisation?.codePostal || null,
     communeLocalisation: offreEmploi.localisation?.commune || null,
-    isAlternance:
-      offreEmploi.alternance !== null ? offreEmploi.alternance : null
+    isAlternance: offreEmploi.alternance
   }
 }
 
