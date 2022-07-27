@@ -61,6 +61,7 @@ import {
 import { uneAgence } from '../../fixtures/agence.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
+import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler'
 
 describe('ConseillersController', () => {
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
@@ -76,6 +77,7 @@ describe('ConseillersController', () => {
   let deleteSuperviseursCommandHandler: StubbedClass<DeleteSuperviseursCommandHandler>
   let modifierConseillerCommandHandler: StubbedClass<ModifierConseillerCommandHandler>
   let recupererJeunesDuConseillerCommandHandler: StubbedClass<RecupererJeunesDuConseillerCommandHandler>
+  let getMetadonneesFavorisJeuneQueryHandler: StubbedClass<GetMetadonneesFavorisJeuneQueryHandler>
   let app: INestApplication
 
   before(async () => {
@@ -108,6 +110,9 @@ describe('ConseillersController', () => {
     recupererJeunesDuConseillerCommandHandler = stubClass(
       RecupererJeunesDuConseillerCommandHandler
     )
+    getMetadonneesFavorisJeuneQueryHandler = stubClass(
+      GetMetadonneesFavorisJeuneQueryHandler
+    )
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(GetConseillerByEmailQueryHandler)
@@ -136,6 +141,8 @@ describe('ConseillersController', () => {
       .useValue(modifierConseillerCommandHandler)
       .overrideProvider(RecupererJeunesDuConseillerCommandHandler)
       .useValue(recupererJeunesDuConseillerCommandHandler)
+      .overrideProvider(GetMetadonneesFavorisJeuneQueryHandler)
+      .useValue(getMetadonneesFavorisJeuneQueryHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -256,6 +263,39 @@ describe('ConseillersController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('get', '/conseillers/1/jeunes')
+  })
+
+  describe('GET /conseillers/:idConseiller/jeunes/:idJeune/metadonnees', () => {
+    it('renvoie les metadonnées du jeune', async () => {
+      // Given
+      const idConseiller = 'poi-id-conseiller'
+      const idJeune = 'poi-id-jeune'
+
+      const expectedResponse = {
+        favoris: {
+          autoriseLePartage: true,
+          offres: {
+            total: 0,
+            nombreOffresAlternance: 0,
+            nombreOffresEmploi: 0,
+            nombreOffresImmersion: 0,
+            nombreOffresServiceCivique: 0
+          }
+        }
+      }
+      getMetadonneesFavorisJeuneQueryHandler.execute.resolves(
+        success(expectedResponse)
+      )
+
+      // When- Then
+      await request(app.getHttpServer())
+        .get(
+          '/conseillers/' + idConseiller + '/jeunes/' + idJeune + '/metadonnees'
+        )
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect(expectedResponse)
+    })
   })
 
   describe('POST /conseillers/:idConseiller/jeunes/:idJeune/action', () => {

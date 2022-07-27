@@ -9,28 +9,42 @@ import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models
 import { OffreServiceCiviqueHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-service-civique-http.repository.db'
 import { EngagementClient } from '../../../src/infrastructure/clients/engagement-client'
 import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-emploi-http-sql.repository.db'
+import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
+import { success } from '../../../src/building-blocks/types/result'
 
 describe('MetadonneesFavorisJeuneQueryHandler', () => {
   DatabaseForTesting.prepare()
   let getMetadonneesFavorisJeuneQueryHandler: GetMetadonneesFavorisJeuneQueryHandler
   let serviceCiviqueClient: StubbedClass<EngagementClient>
+  let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
 
   beforeEach(async () => {
-    getMetadonneesFavorisJeuneQueryHandler =
-      new GetMetadonneesFavorisJeuneQueryHandler()
-
     serviceCiviqueClient = stubClass(EngagementClient)
+    conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
+
+    getMetadonneesFavorisJeuneQueryHandler =
+      new GetMetadonneesFavorisJeuneQueryHandler(conseillerForJeuneAuthorizer)
   })
 
   describe('handle', () => {
-    it("récupère le nombre d'offres immersion", async () => {
+    const idJeune = 'poi-id-jeune'
+    const partageFavorisJeune = true
+
+    beforeEach(async () => {
       // Given
       const conseillerDto = unConseillerDto({ id: 'poi-id-conseiller' })
       await ConseillerSqlModel.creer(conseillerDto)
 
-      const jeuneDto = unJeuneDto({ idConseiller: conseillerDto.id })
+      const jeuneDto = unJeuneDto({
+        id: idJeune,
+        idConseiller: conseillerDto.id,
+        partageFavoris: partageFavorisJeune
+      })
       await JeuneSqlModel.creer(jeuneDto)
+    })
 
+    it("récupère le nombre d'offres immersion et l'autorisation de partage", async () => {
+      // Given
       const uneOffreImmersion = {
         id: 'poi-id-offre',
         metier: 'poi-metier',
@@ -39,29 +53,33 @@ describe('MetadonneesFavorisJeuneQueryHandler', () => {
         ville: 'poi-ville'
       }
       const offreImmersionRepository = new OffresImmersionHttpSqlRepository()
-      await offreImmersionRepository.saveAsFavori(
-        jeuneDto.id,
-        uneOffreImmersion
-      )
+      await offreImmersionRepository.saveAsFavori(idJeune, uneOffreImmersion)
 
       const query = {
-        idJeune: jeuneDto.id
+        idJeune: idJeune
+      }
+      const expectedMetadonnees = {
+        favoris: {
+          autoriseLePartage: partageFavorisJeune,
+          offres: {
+            total: 1,
+            nombreOffresAlternance: 0,
+            nombreOffresEmploi: 0,
+            nombreOffresImmersion: 1,
+            nombreOffresServiceCivique: 0
+          }
+        }
       }
 
       // When
-      const result = await getMetadonneesFavorisJeuneQueryHandler.handle(query)
+      const actual = await getMetadonneesFavorisJeuneQueryHandler.handle(query)
 
       // Then
-      expect(result.nombreOffresImmersion).to.equal(1)
+
+      expect(actual).to.deep.equal(success(expectedMetadonnees))
     })
-    it("récupère le nombre d'offres service civique", async () => {
+    it("récupère le nombre d'offres service civique et l'autorisation de partage", async () => {
       // Given
-      const conseillerDto = unConseillerDto({ id: 'poi-id-conseiller' })
-      await ConseillerSqlModel.creer(conseillerDto)
-
-      const jeuneDto = unJeuneDto({ idConseiller: conseillerDto.id })
-      await JeuneSqlModel.creer(jeuneDto)
-
       const uneOffreServiceCivique = {
         id: 'poi-id-offre',
         domaine: 'poi-domaine',
@@ -70,28 +88,34 @@ describe('MetadonneesFavorisJeuneQueryHandler', () => {
       const offreServiceCiviqueRepository =
         new OffreServiceCiviqueHttpSqlRepository(serviceCiviqueClient)
       await offreServiceCiviqueRepository.saveAsFavori(
-        jeuneDto.id,
+        idJeune,
         uneOffreServiceCivique
       )
 
       const query = {
-        idJeune: jeuneDto.id
+        idJeune: idJeune
+      }
+      const expectedMetadonnees = {
+        favoris: {
+          autoriseLePartage: partageFavorisJeune,
+          offres: {
+            total: 1,
+            nombreOffresAlternance: 0,
+            nombreOffresEmploi: 0,
+            nombreOffresImmersion: 0,
+            nombreOffresServiceCivique: 1
+          }
+        }
       }
 
       // When
       const result = await getMetadonneesFavorisJeuneQueryHandler.handle(query)
 
       // Then
-      expect(result.nombreOffresServiceCivique).to.equal(1)
+      expect(result).to.deep.equal(success(expectedMetadonnees))
     })
-    it("récupère le nombre d'offres alternance", async () => {
+    it("récupère le nombre d'offres alternance et l'autorisation de partage", async () => {
       // Given
-      const conseillerDto = unConseillerDto({ id: 'poi-id-conseiller' })
-      await ConseillerSqlModel.creer(conseillerDto)
-
-      const jeuneDto = unJeuneDto({ idConseiller: conseillerDto.id })
-      await JeuneSqlModel.creer(jeuneDto)
-
       const uneOffreAlternance = {
         id: 'poi-id-offre',
         titre: 'poi-titre',
@@ -99,43 +123,60 @@ describe('MetadonneesFavorisJeuneQueryHandler', () => {
         alternance: true
       }
       const offreEmploiRepository = new OffresEmploiHttpSqlRepository()
-      await offreEmploiRepository.saveAsFavori(jeuneDto.id, uneOffreAlternance)
+      await offreEmploiRepository.saveAsFavori(idJeune, uneOffreAlternance)
 
       const query = {
-        idJeune: jeuneDto.id
+        idJeune: idJeune
       }
-
+      const expectedMetadonnees = {
+        favoris: {
+          autoriseLePartage: partageFavorisJeune,
+          offres: {
+            total: 1,
+            nombreOffresAlternance: 1,
+            nombreOffresEmploi: 0,
+            nombreOffresImmersion: 0,
+            nombreOffresServiceCivique: 0
+          }
+        }
+      }
       // When
       const result = await getMetadonneesFavorisJeuneQueryHandler.handle(query)
 
       // Then
-      expect(result.nombreOffresAlternance).to.equal(1)
+      expect(result).to.deep.equal(success(expectedMetadonnees))
     })
-    it("récupère le nombre d'offres emploi", async () => {
+    it("récupère le nombre d'offres emploi et l'autorisation de partage", async () => {
       // Given
-      const conseillerDto = unConseillerDto({ id: 'poi-id-conseiller' })
-      await ConseillerSqlModel.creer(conseillerDto)
-
-      const jeuneDto = unJeuneDto({ idConseiller: conseillerDto.id })
-      await JeuneSqlModel.creer(jeuneDto)
-
       const uneOffreEmploi = {
         id: 'poi-id-offre',
         titre: 'poi-titre',
         typeContrat: 'poi-type-contrat'
       }
       const offreEmploiRepository = new OffresEmploiHttpSqlRepository()
-      await offreEmploiRepository.saveAsFavori(jeuneDto.id, uneOffreEmploi)
+      await offreEmploiRepository.saveAsFavori(idJeune, uneOffreEmploi)
 
       const query = {
-        idJeune: jeuneDto.id
+        idJeune: idJeune
+      }
+      const expectedMetadonnees = {
+        favoris: {
+          autoriseLePartage: partageFavorisJeune,
+          offres: {
+            total: 1,
+            nombreOffresAlternance: 0,
+            nombreOffresEmploi: 1,
+            nombreOffresImmersion: 0,
+            nombreOffresServiceCivique: 0
+          }
+        }
       }
 
       // When
       const result = await getMetadonneesFavorisJeuneQueryHandler.handle(query)
 
       // Then
-      expect(result.nombreOffresEmploi).to.equal(1)
+      expect(result).to.deep.equal(success(expectedMetadonnees))
     })
   })
 })
