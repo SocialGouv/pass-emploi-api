@@ -66,7 +66,8 @@ describe('ActionsController', () => {
           firstName: 'Damien'
         },
         creatorType: 'conseiller',
-        creator: 'Nils Tavernier'
+        creator: 'Nils Tavernier',
+        dateEcheance: '2021-11-11T10:03:30.000Z'
       }
       await request(app.getHttpServer())
         .get(`/actions/${idAction}`)

@@ -33,6 +33,9 @@ export class ActionQueryModel {
     required: false
   })
   jeune?: JeuneQueryModel
+
+  @ApiProperty()
+  dateEcheance: string
 }
 
 export class ActionsMetadonneesQueryModel {

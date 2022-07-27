@@ -103,7 +103,8 @@ export function fromSqlToJeuneHomeQueryModel(
         actionSql.dateDerniereActualisation
       ).toFormat('EEE, d MMM yyyy HH:mm:ss z'),
       creatorType: actionSql.typeCreateur,
-      creator: toCreator(actionSql, jeuneSqlModel)
+      creator: toCreator(actionSql, jeuneSqlModel),
+      dateEcheance: actionSql.dateEcheance.toISOString()
     })),
     rendezvous:
       rdvJeuneSqlModel?.map(rendezVousSql => ({
