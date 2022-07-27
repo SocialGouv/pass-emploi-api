@@ -19,7 +19,8 @@ export const uneActionQueryModelFromDomain = (
     .toUTC()
     .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
   creator: 'Nils Tavernier',
-  creatorType: Action.TypeCreateur.CONSEILLER
+  creatorType: Action.TypeCreateur.CONSEILLER,
+  dateEcheance: action.dateEcheance.toISOString()
 })
 
 export const uneActionQueryModelWithJeuneFromDomain = (
@@ -50,7 +51,8 @@ export function uneActionQueryModel(
       lastName: 'Saez'
     },
     creatorType: Action.TypeCreateur.CONSEILLER,
-    creator: 'Nils Tavernier'
+    creator: 'Nils Tavernier',
+    dateEcheance: '2021-11-11T10:03:30.000Z'
   }
 
   return { ...defaults, ...args }
