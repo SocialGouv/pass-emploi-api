@@ -2,7 +2,6 @@ import * as uuid from 'uuid'
 import { Action } from '../../../src/domain/action'
 import { ActionDto } from '../../../src/infrastructure/sequelize/models/action.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
-import { uneDate } from '../date.fixture'
 
 export function uneActionDto(
   args: Partial<AsSql<ActionDto>> = {}
@@ -23,7 +22,7 @@ export function uneActionDto(
     },
     estVisibleParConseiller: true,
     statut: Action.Statut.PAS_COMMENCEE,
-    dateEcheance: uneDate(),
+    dateEcheance: new Date('2021-11-11T08:03:30.000Z'),
     rappel: true
   }
 
