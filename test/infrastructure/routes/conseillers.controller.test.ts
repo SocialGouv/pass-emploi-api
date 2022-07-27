@@ -5,10 +5,14 @@ import {
   CreerSuperviseursCommandHandler
 } from 'src/application/commands/creer-superviseurs.command.handler'
 import { DeleteSuperviseursCommandHandler } from 'src/application/commands/delete-superviseurs.command.handler'
+import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
+import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { GetAllRendezVousConseillerQueryHandler } from 'src/application/queries/get-rendez-vous-conseiller.query.handler.db'
 import { Action } from 'src/domain/action'
 import { CodeTypeRendezVous } from 'src/domain/rendez-vous'
+import { CreateActionPayload } from 'src/infrastructure/routes/validation/actions.inputs'
 import { CreateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
+import { DateService } from 'src/utils/date-service'
 import * as request from 'supertest'
 import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
 import { unRendezVousConseillerFutursEtPassesQueryModel } from 'test/fixtures/rendez-vous.fixture'
@@ -17,9 +21,15 @@ import {
   CreerJeuneMiloCommand,
   CreerJeuneMiloCommandHandler
 } from '../../../src/application/commands/creer-jeune-milo.command.handler'
+import {
+  ModifierConseillerCommand,
+  ModifierConseillerCommandHandler
+} from '../../../src/application/commands/modifier-conseiller.command.handler'
+import { SendNotificationsNouveauxMessagesCommandHandler } from '../../../src/application/commands/send-notifications-nouveaux-messages.command.handler'
 import { GetConseillerByEmailQueryHandler } from '../../../src/application/queries/get-conseiller-by-email.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
 import { GetJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-jeunes-by-conseiller.query.handler.db'
+import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler'
 import {
   DossierExisteDejaError,
   DroitsInsuffisants,
@@ -35,10 +45,12 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { Core } from '../../../src/domain/core'
 import { EnvoyerNotificationsPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
+import { uneAgence } from '../../fixtures/agence.fixture'
 import {
   unHeaderAuthorization,
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unDossierMilo } from '../../fixtures/milo.fixture'
 import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
@@ -49,17 +61,6 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { SendNotificationsNouveauxMessagesCommandHandler } from '../../../src/application/commands/send-notifications-nouveaux-messages.command.handler'
-import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler.db'
-import {
-  ModifierConseillerCommand,
-  ModifierConseillerCommandHandler
-} from '../../../src/application/commands/modifier-conseiller.command.handler'
-import { uneAgence } from '../../fixtures/agence.fixture'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
-import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler'
-import { CreateActionPayload } from 'src/infrastructure/routes/validation/actions.inputs'
 
 describe('ConseillersController', () => {
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
@@ -77,6 +78,9 @@ describe('ConseillersController', () => {
   let recupererJeunesDuConseillerCommandHandler: StubbedClass<RecupererJeunesDuConseillerCommandHandler>
   let getMetadonneesFavorisJeuneQueryHandler: StubbedClass<GetMetadonneesFavorisJeuneQueryHandler>
   let app: INestApplication
+
+  let dateService: StubbedClass<DateService>
+  const now = uneDatetime.set({ second: 59, millisecond: 0 })
 
   before(async () => {
     getConseillerByEmailQueryHandler = stubClass(
@@ -112,6 +116,9 @@ describe('ConseillersController', () => {
       GetMetadonneesFavorisJeuneQueryHandler
     )
 
+    dateService = stubClass(DateService)
+    dateService.now.returns(now)
+
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(GetConseillerByEmailQueryHandler)
       .useValue(getConseillerByEmailQueryHandler)
@@ -141,6 +148,8 @@ describe('ConseillersController', () => {
       .useValue(recupererJeunesDuConseillerCommandHandler)
       .overrideProvider(GetMetadonneesFavorisJeuneQueryHandler)
       .useValue(getMetadonneesFavorisJeuneQueryHandler)
+      .overrideProvider(DateService)
+      .useValue(dateService)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -297,6 +306,8 @@ describe('ConseillersController', () => {
   })
 
   describe('POST /conseillers/:idConseiller/jeunes/:idJeune/action', () => {
+    const nowJsPlus3Mois = now.plus({ months: 3 }).toJSDate()
+
     it("renvoie l'id de l'action créée sans dateEcheance", async () => {
       // Given
       const actionPayload: CreateActionPayload = {
@@ -321,7 +332,7 @@ describe('ConseillersController', () => {
           idCreateur: '1',
           typeCreateur: Action.TypeCreateur.CONSEILLER,
           commentaire: 'Ceci est un commentaire',
-          dateEcheance: undefined
+          dateEcheance: nowJsPlus3Mois
         },
         unUtilisateurDecode()
       )

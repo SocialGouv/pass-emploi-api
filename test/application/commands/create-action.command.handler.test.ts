@@ -69,7 +69,8 @@ describe('CreateActionCommandHandler', () => {
         idCreateur: action.id,
         typeCreateur: Action.TypeCreateur.JEUNE,
         statut: action.statut,
-        commentaire: action.commentaire
+        commentaire: action.commentaire,
+        dateEcheance: action.dateEcheance
       }
 
       // When
@@ -90,7 +91,8 @@ describe('CreateActionCommandHandler', () => {
           idCreateur: action.id,
           typeCreateur: Action.TypeCreateur.JEUNE,
           statut: action.statut,
-          commentaire: action.commentaire
+          commentaire: action.commentaire,
+          dateEcheance: action.dateEcheance
         }
 
         // When
@@ -112,7 +114,8 @@ describe('CreateActionCommandHandler', () => {
           idCreateur: action.id,
           typeCreateur: Action.TypeCreateur.CONSEILLER,
           statut: action.statut,
-          commentaire: action.commentaire
+          commentaire: action.commentaire,
+          dateEcheance: action.dateEcheance
         }
 
         // When
@@ -138,7 +141,8 @@ describe('CreateActionCommandHandler', () => {
           idCreateur: action.id,
           typeCreateur: Action.TypeCreateur.JEUNE,
           statut: action.statut,
-          commentaire: action.commentaire
+          commentaire: action.commentaire,
+          dateEcheance: action.dateEcheance
         }
 
         const utilisateur: Authentification.Utilisateur = unUtilisateurJeune()
@@ -165,7 +169,8 @@ describe('CreateActionCommandHandler', () => {
           idCreateur: utilisateur.id,
           typeCreateur: Action.TypeCreateur.CONSEILLER,
           statut: action.statut,
-          commentaire: action.commentaire
+          commentaire: action.commentaire,
+          dateEcheance: action.dateEcheance
         }
 
         // When

@@ -183,7 +183,7 @@ describe('ArchiveJeuneSqlRepository', () => {
           creePar: 'CONSEILLER',
           dateActualisation: '2021-11-11T08:03:30.000Z',
           dateCreation: '2021-11-11T08:03:30.000Z',
-          dateEcheance: '2022-03-01T03:24:00.000Z',
+          dateEcheance: '2021-11-11T08:03:30.000Z',
           statut: 'in_progress'
         }
       ])

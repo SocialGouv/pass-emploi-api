@@ -33,7 +33,10 @@ import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-j
 import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler.db'
 import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-model'
 import { Authentification } from 'src/domain/authentification'
-import { CreateActionCommandHandler } from '../../application/commands/create-action.command.handler'
+import {
+  CreateActionCommand,
+  CreateActionCommandHandler
+} from '../../application/commands/create-action.command.handler'
 import { CreerJeuneMiloCommandHandler } from '../../application/commands/creer-jeune-milo.command.handler'
 import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/creer-jeune-pole-emploi.command.handler'
 import { ModifierConseillerCommandHandler } from '../../application/commands/modifier-conseiller.command.handler'
@@ -83,12 +86,14 @@ import {
   GetMetadonneesFavorisJeuneQueryHandler,
   MetadonneesFavorisJeuneQueryModel
 } from '../../application/queries/get-metadonnees-favoris-jeune.query.handler'
+import { DateService } from 'src/utils/date-service'
 
 @Controller('conseillers')
 @ApiOAuth2([])
 @ApiTags('Conseillers')
 export class ConseillersController {
   constructor(
+    private readonly dateService: DateService,
     private readonly getDetailConseillerQueryHandler: GetDetailConseillerQueryHandler,
     private readonly getConseillerByEmailQueryHandler: GetConseillerByEmailQueryHandler,
     private readonly getJeunesByConseillerQueryHandler: GetJeunesByConseillerQueryHandler,
@@ -256,28 +261,27 @@ export class ConseillersController {
     @Body() createActionPayload: CreateActionPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<{ id: Action.Id }> {
+    const command: CreateActionCommand = {
+      contenu: createActionPayload.content,
+      idJeune,
+      idCreateur: idConseiller,
+      typeCreateur: Action.TypeCreateur.CONSEILLER,
+      commentaire: createActionPayload.comment,
+      dateEcheance:
+        createActionPayload.dateEcheance ?? this.buildDateEcheanceV1()
+    }
+
     const result = await this.createActionCommandHandler.execute(
-      {
-        contenu: createActionPayload.content,
-        idJeune,
-        idCreateur: idConseiller,
-        typeCreateur: Action.TypeCreateur.CONSEILLER,
-        commentaire: createActionPayload.comment,
-        dateEcheance: createActionPayload.dateEcheance
-      },
+      command,
       utilisateur
     )
-
-    if (isFailure(result) && result.error.code === NonTrouveError.CODE) {
-      throw new NotFoundException(result.error)
-    }
 
     if (isSuccess(result)) {
       return {
         id: result.data
       }
     }
-    throw new RuntimeException()
+    throw handleFailure(result)
   }
 
   @ApiOperation({
@@ -539,5 +543,10 @@ export class ConseillersController {
       utilisateur
     )
     handleFailure(result)
+  }
+
+  private buildDateEcheanceV1(): Date {
+    const now = this.dateService.now().set({ second: 59, millisecond: 0 })
+    return now.plus({ months: 3 }).toJSDate()
   }
 }
