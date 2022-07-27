@@ -29,7 +29,6 @@ import { SendNotificationsNouveauxMessagesCommandHandler } from '../../../src/ap
 import { GetConseillerByEmailQueryHandler } from '../../../src/application/queries/get-conseiller-by-email.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
 import { GetJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-jeunes-by-conseiller.query.handler.db'
-import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler'
 import {
   DossierExisteDejaError,
   DroitsInsuffisants,
@@ -61,6 +60,7 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 
 describe('ConseillersController', () => {
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
@@ -287,6 +287,13 @@ describe('ConseillersController', () => {
             nombreOffresEmploi: 0,
             nombreOffresImmersion: 0,
             nombreOffresServiceCivique: 0
+          },
+          recherches: {
+            total: 0,
+            nombreRecherchesOffresAlternance: 0,
+            nombreRecherchesOffresEmploi: 0,
+            nombreRecherchesOffresImmersion: 0,
+            nombreRecherchesOffresServiceCivique: 0
           }
         }
       }

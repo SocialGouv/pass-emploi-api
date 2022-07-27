@@ -85,7 +85,7 @@ import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
 import {
   GetMetadonneesFavorisJeuneQueryHandler,
   MetadonneesFavorisJeuneQueryModel
-} from '../../application/queries/get-metadonnees-favoris-jeune.query.handler'
+} from '../../application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 import { DateService } from 'src/utils/date-service'
 
 @Controller('conseillers')
