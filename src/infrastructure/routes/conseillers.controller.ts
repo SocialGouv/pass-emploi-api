@@ -79,6 +79,10 @@ import {
   SuperviseursPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
+import {
+  GetMetadonneesFavorisJeuneQueryHandler,
+  MetadonneesFavorisJeuneQueryModel
+} from '../../application/queries/get-metadonnees-favoris-jeune.query.handler'
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -100,7 +104,8 @@ export class ConseillersController {
     private readonly creerSuperviseursCommandHandler: CreerSuperviseursCommandHandler,
     private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler,
     private readonly modifierConseillerCommandHandler: ModifierConseillerCommandHandler,
-    private readonly recupererJeunesDuConseillerCommandHandler: RecupererJeunesDuConseillerCommandHandler
+    private readonly recupererJeunesDuConseillerCommandHandler: RecupererJeunesDuConseillerCommandHandler,
+    private readonly getMetadonneesFavorisJeuneQueryHandler: GetMetadonneesFavorisJeuneQueryHandler
   ) {}
 
   @ApiOperation({
@@ -215,6 +220,29 @@ export class ConseillersController {
     }
 
     throw new RuntimeException()
+  }
+
+  @ApiOperation({
+    summary: 'Récupère les métadonnées du jeune',
+    description: 'Autorisé pour un conseiller du jeune'
+  })
+  @Get(':idConseiller/jeunes/:idJeune/metadonnees')
+  async getMetadonneesFavorisJeune(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    @Param('idConseiller') idConseiller: string,
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<MetadonneesFavorisJeuneQueryModel> {
+    const result = await this.getMetadonneesFavorisJeuneQueryHandler.execute(
+      { idJeune },
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
   }
 
   @ApiOperation({
