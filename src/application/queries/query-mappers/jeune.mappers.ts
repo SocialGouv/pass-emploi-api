@@ -19,6 +19,7 @@ export function fromSqlToDetailJeuneQueryModel(
     lastName: jeuneSqlModel.nom,
     email: jeuneSqlModel.email ?? undefined,
     creationDate: jeuneSqlModel.dateCreation.toISOString(),
+    datePremiereConnexion: jeuneSqlModel.datePremiereConnexion?.toISOString(),
     isActivated: Boolean(jeuneSqlModel.datePremiereConnexion),
     isReaffectationTemporaire: Boolean(jeuneSqlModel.idConseillerInitial),
     conseiller: {

@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Jeune } from 'src/domain/jeune'
 
 class SituationQueryModel {
@@ -80,6 +80,9 @@ export class DetailJeuneQueryModel {
 
   @ApiProperty()
   creationDate: string
+
+  @ApiPropertyOptional()
+  datePremiereConnexion?: string
 
   @ApiProperty()
   isActivated: boolean
