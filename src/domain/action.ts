@@ -56,6 +56,8 @@ export namespace Action {
   export enum Tri {
     DATE_CROISSANTE = 'date_croissante',
     DATE_DECROISSANTE = 'date_decroissante',
+    DATE_ECHEANCE_CROISSANTE = 'date_echeance_croissante',
+    DATE_ECHEANCE_DECROISSANTE = 'date_echeance_decroissante',
     STATUT = 'statut'
   }
 
