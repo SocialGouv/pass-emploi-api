@@ -80,49 +80,51 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
         responseRendezVous?.data ?? []
 
       const rendezVousPrestations = await Promise.all(
-        prestations.map(async prestation => {
-          const dateRendezVous = DateTime.fromJSDate(
-            buildDateSansTimezone(prestation.session.dateDebut)
-          )
-          const avecVisio =
-            prestation.session.natureAnimation === 'INTERNE' ||
-            prestation.session.modalitePremierRendezVous === 'WEBCAM'
-          let lienVisio = undefined
-
-          const laVisioEstDisponible =
-            avecVisio &&
-            prestation.identifiantStable &&
-            this.dateService.isSameDateDay(dateRendezVous, maintenant)
-
-          if (laVisioEstDisponible) {
-            try {
-              const responseLienVisio =
-                await this.poleEmploiPartenaireClient.getLienVisio(
-                  idpToken,
-                  prestation.identifiantStable!
-                )
-              lienVisio = responseLienVisio?.data
-            } catch (e) {
-              this.logger.error(
-                buildError('Impossible de récupérer le lien de la visio', e)
-              )
-            }
-          }
-
-          // TODO en attente du contract testing
-          try {
-            return fromPrestationDtoToRendezVousQueryModel(
-              prestation,
-              jeune,
-              this.idService,
-              lienVisio
+        prestations
+          .filter(prestation => !prestation.annule)
+          .map(async prestation => {
+            const dateRendezVous = DateTime.fromJSDate(
+              buildDateSansTimezone(prestation.session.dateDebut)
             )
-          } catch (e) {
-            this.logger.error('Impossible de mapper la prestation.')
-            this.logger.error(prestation)
-            throw e
-          }
-        })
+            const avecVisio =
+              prestation.session.natureAnimation === 'INTERNE' ||
+              prestation.session.modalitePremierRendezVous === 'WEBCAM'
+            let lienVisio = undefined
+
+            const laVisioEstDisponible =
+              avecVisio &&
+              prestation.identifiantStable &&
+              this.dateService.isSameDateDay(dateRendezVous, maintenant)
+
+            if (laVisioEstDisponible) {
+              try {
+                const responseLienVisio =
+                  await this.poleEmploiPartenaireClient.getLienVisio(
+                    idpToken,
+                    prestation.identifiantStable!
+                  )
+                lienVisio = responseLienVisio?.data
+              } catch (e) {
+                this.logger.error(
+                  buildError('Impossible de récupérer le lien de la visio', e)
+                )
+              }
+            }
+
+            // TODO en attente du contract testing
+            try {
+              return fromPrestationDtoToRendezVousQueryModel(
+                prestation,
+                jeune,
+                this.idService,
+                lienVisio
+              )
+            } catch (e) {
+              this.logger.error('Impossible de mapper la prestation.')
+              this.logger.error(prestation)
+              throw e
+            }
+          })
       )
       const rendezVousPoleEmploi = rendezVousPoleEmploiDto.map(rendezVous => {
         return fromRendezVousDtoToRendezVousQueryModel(

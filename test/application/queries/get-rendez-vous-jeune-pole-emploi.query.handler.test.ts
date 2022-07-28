@@ -386,10 +386,14 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           dateService.now.returns(maintenant)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(idpToken, maintenant)
-            .resolves({ ...axiosResponse, data: prestations })
-          poleEmploiPartenaireClient.getRendezVous
-            .withArgs(idpToken)
-            .resolves({ ...axiosResponse, data: rendezVous })
+            .resolves({
+              ...axiosResponse,
+              data: prestations
+            })
+          poleEmploiPartenaireClient.getRendezVous.withArgs(idpToken).resolves({
+            ...axiosResponse,
+            data: rendezVous
+          })
 
           // When
           const result = await getRendezVousJeunePoleEmploiQueryHandler.handle(
@@ -505,13 +509,20 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(idpToken, maintenant)
-            .resolves({ ...axiosResponse, data: prestations })
+            .resolves({
+              ...axiosResponse,
+              data: prestations
+            })
           poleEmploiPartenaireClient.getLienVisio
             .withArgs(idpToken, idVisio)
-            .resolves({ ...axiosResponse, data: 'lienvisio.com' })
-          poleEmploiPartenaireClient.getRendezVous
-            .withArgs(idpToken)
-            .resolves({ ...axiosResponse, data: rendezVous })
+            .resolves({
+              ...axiosResponse,
+              data: 'lienvisio.com'
+            })
+          poleEmploiPartenaireClient.getRendezVous.withArgs(idpToken).resolves({
+            ...axiosResponse,
+            data: rendezVous
+          })
 
           // When
           const result = await getRendezVousJeunePoleEmploiQueryHandler.handle(
@@ -622,13 +633,17 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(idpToken, maintenant)
-            .resolves({ ...axiosResponse, data: prestations })
+            .resolves({
+              ...axiosResponse,
+              data: prestations
+            })
           poleEmploiPartenaireClient.getLienVisio
             .withArgs(idpToken, idVisio)
             .rejects()
-          poleEmploiPartenaireClient.getRendezVous
-            .withArgs(idpToken)
-            .resolves({ ...axiosResponse, data: rendezVous })
+          poleEmploiPartenaireClient.getRendezVous.withArgs(idpToken).resolves({
+            ...axiosResponse,
+            data: rendezVous
+          })
 
           // When
           const result = await getRendezVousJeunePoleEmploiQueryHandler.handle(
@@ -643,6 +658,53 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           )
           expect(result._isSuccess).to.equal(true)
           if (result._isSuccess) expect(result.data.length).to.equal(3)
+        })
+      })
+      describe('quand le rendez est annulé', () => {
+        it('retire de la liste des rdv les rdv annulés', async () => {
+          // Given
+          const prestations: PrestationDto[] = [
+            {
+              annule: true,
+              datefin: '',
+              session: {
+                natureAnimation: 'INTERNE',
+                modalitePremierRendezVous: 'WEBCAM',
+                dateDebut: datePrestation,
+                dateFinPrevue: '',
+                dateLimite: '',
+                duree: {
+                  unite: 'JOUR',
+                  valeur: 1.0
+                },
+                enAgence: true
+              }
+            }
+          ]
+
+          dateService.now.returns(maintenant)
+          dateService.isSameDateDay.returns(true)
+          jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+          poleEmploiPartenaireClient.getPrestations
+            .withArgs(idpToken, maintenant)
+            .resolves({
+              ...axiosResponse,
+              data: prestations
+            })
+          poleEmploiPartenaireClient.getRendezVous.withArgs(idpToken).resolves({
+            ...axiosResponse,
+            data: []
+          })
+
+          // When
+          const result = await getRendezVousJeunePoleEmploiQueryHandler.handle(
+            query
+          )
+          // Then
+          expect(result).to.deep.equal({
+            _isSuccess: true,
+            data: []
+          })
         })
       })
       describe('quand une erreur se produit', () => {
