@@ -197,8 +197,9 @@ import { HandleJobNettoyerArchivesJeunesCommandHandler } from './application/com
 import { UpdateJeunePreferencesCommandHandler } from './application/commands/update-preferences-jeune.command.handler'
 import { GetPreferencesJeuneQueryHandler } from './application/queries/get-preferences-jeune.handler.db'
 import { GetRendezVousConseillerPaginesQueryHandler } from './application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
-import { GetMetadonneesFavorisJeuneQueryHandler } from './application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 import { ConseillerForJeuneAvecPartageAuthorizer } from './application/authorizers/authorize-conseiller-for-jeune-avec-partage'
+import { GetFavorisJeunePourConseillerQueryHandler } from './application/queries/get-favoris-jeune-pour-conseiller.query.handler'
+import { GetMetadonneesFavorisJeuneQueryHandler } from './application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -468,7 +469,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     UpdateJeunePreferencesCommandHandler,
     GetPreferencesJeuneQueryHandler,
     GetRendezVousConseillerPaginesQueryHandler,
-    GetMetadonneesFavorisJeuneQueryHandler
+    GetMetadonneesFavorisJeuneQueryHandler,
+    GetFavorisJeunePourConseillerQueryHandler
   ]
 }
 
