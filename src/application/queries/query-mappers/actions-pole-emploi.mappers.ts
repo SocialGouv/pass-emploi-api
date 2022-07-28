@@ -5,6 +5,7 @@ import {
   DemarcheDtoEtat
 } from '../../../infrastructure/clients/dto/pole-emploi.dto'
 import { DateTime } from 'luxon'
+import { Logger } from '@nestjs/common'
 
 export function fromDemarcheDtoToDemarche(
   demarcheDto: DemarcheDto,
@@ -159,5 +160,10 @@ function buildStatut(
       return Demarche.Statut.REALISEE
     case DemarcheDtoEtat.AN:
       return Demarche.Statut.ANNULEE
+    default:
+      const logger = new Logger('ActionPoleEmploiMappers.buildStatut')
+      logger.error('Une démarche a un statut inconnu')
+      logger.error(demarcheDto)
+      return Demarche.Statut.REALISEE
   }
 }
