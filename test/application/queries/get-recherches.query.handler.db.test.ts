@@ -14,19 +14,21 @@ import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { uneDatetime } from '../../fixtures/date.fixture'
-import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
+import { ConseillerForJeuneAvecPartageAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune-avec-partage'
 
 describe('GetRecherchesQueryHandler', () => {
   const database = DatabaseForTesting.prepare()
   let getRecherchesQueryHandler: GetRecherchesQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
+  let conseillerForJeuneAvecPartageAuthorizer: StubbedClass<ConseillerForJeuneAvecPartageAuthorizer>
 
   before(async () => {
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
-    conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
+    conseillerForJeuneAvecPartageAuthorizer = stubClass(
+      ConseillerForJeuneAvecPartageAuthorizer
+    )
     getRecherchesQueryHandler = new GetRecherchesQueryHandler(
-      conseillerForJeuneAuthorizer,
+      conseillerForJeuneAvecPartageAuthorizer,
       jeuneAuthorizer
     )
   })
