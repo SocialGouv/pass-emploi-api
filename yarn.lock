@@ -7908,7 +7908,7 @@ __metadata:
     openid-client: 5.1.8
     pg: 8.7.3
     pg-connection-string: 2.5.0
-    pino-http: 8.1.1
+    pino-http: 8.2.0
     prettier: ^2.7.1
     redis: ^4.2.0
     reflect-metadata: ^0.1.13
@@ -8674,16 +8674,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino-http@npm:8.1.1":
-  version: 8.1.1
-  resolution: "pino-http@npm:8.1.1"
+"pino-http@npm:8.2.0":
+  version: 8.2.0
+  resolution: "pino-http@npm:8.2.0"
   dependencies:
     fast-url-parser: ^1.1.3
     get-caller-file: ^2.0.5
     pino: ^8.0.0
     pino-std-serializers: ^6.0.0
     process-warning: ^2.0.0
-  checksum: 40e39c9779be77a56cd47beba1c5a83cae95713e65b28f851f5e42fb6c41fd5d6ab0a54a6d2534dfa76685f6420831ea67fd477c6af74d2b2476d72d6756e77d
+  checksum: 4dc138f2cd038237d5661c7aa7e96e7a4713d125d79061eccbc399d39fe73bdc132fa279a2b2644288087ac235d4ff6d9c67a5ee431262098bc0f73d702506a7
   languageName: node
   linkType: hard
 
