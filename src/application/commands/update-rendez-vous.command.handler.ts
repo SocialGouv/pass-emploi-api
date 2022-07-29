@@ -211,8 +211,8 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       rendezVousUpdated.date.getTime() !== rendezVous.date.getTime()
     if (laDateAEteModifiee) {
       try {
-        await this.planificateurService.supprimerRappelsRendezVous(
-          rendezVousUpdated
+        await this.planificateurService.supprimerRappelsParId(
+          rendezVousUpdated.id
         )
         await this.planificateurService.planifierRappelsRendezVous(
           rendezVousUpdated

@@ -473,7 +473,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
               session: {
                 natureAnimation: 'INTERNE',
                 modalitePremierRendezVous: 'WEBCAM',
-                dateDebut: datePrestation,
+                dateDebut: '2020-04-06T10:00:00+01:00',
                 dateFinPrevue: '',
                 dateLimite: '',
                 duree: {
@@ -487,7 +487,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           const rendezVous: RendezVousPoleEmploiDto[] = [
             {
               theme: 'theme',
-              date: dateRendezVous,
+              date: '2020-04-06',
               heure: heureRendezVous,
               duree: 23,
               modaliteContact: 'VISIO',
@@ -505,7 +505,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           ]
 
           dateService.now.returns(maintenant)
-          dateService.isSameDateDay.returns(true)
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(idpToken, maintenant)
@@ -533,8 +532,36 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
             _isSuccess: true,
             data: [
               {
+                idStable: idVisio,
+                adresse: undefined,
+                agencePE: true,
+                annule: false,
+                comment: undefined,
+                date: new Date('2020-04-06T10:00:00.000Z'),
+                isLocaleDate: true,
+                description: undefined,
+                duration: 0,
+                id: 'random-id',
+                jeune: {
+                  id: 'ABCDE',
+                  nom: 'Doe',
+                  prenom: 'John'
+                },
+                lienVisio: 'lienvisio.com',
+                modality: 'par visio',
+                organisme: undefined,
+                telephone: undefined,
+                theme: undefined,
+                title: '',
+                type: {
+                  code: 'PRESTATION',
+                  label: 'Prestation'
+                },
+                visio: true
+              },
+              {
                 agencePE: false,
-                date: expectedDateRendezVous,
+                date: new Date('2020-04-06T12:20:00.000Z'),
                 duration: 23,
                 id: 'random-id',
                 jeune: {
@@ -556,34 +583,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
                 isLocaleDate: true,
                 visio: true,
                 lienVisio: 'lien'
-              },
-              {
-                idStable: idVisio,
-                adresse: undefined,
-                agencePE: true,
-                annule: false,
-                comment: undefined,
-                date: expectedDatePrestation,
-                isLocaleDate: true,
-                description: undefined,
-                duration: 0,
-                id: 'random-id',
-                jeune: {
-                  id: 'ABCDE',
-                  nom: 'Doe',
-                  prenom: 'John'
-                },
-                lienVisio: 'lienvisio.com',
-                modality: 'par visio',
-                organisme: undefined,
-                telephone: undefined,
-                theme: undefined,
-                title: '',
-                type: {
-                  code: 'PRESTATION',
-                  label: 'Prestation'
-                },
-                visio: true
               }
             ]
           })
@@ -597,7 +596,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
               session: {
                 natureAnimation: 'INTERNE',
                 modalitePremierRendezVous: 'WEBCAM',
-                dateDebut: datePrestation,
+                dateDebut: '2020-04-06T10:00:00+01:00',
                 dateFinPrevue: '',
                 dateLimite: '',
                 duree: {
@@ -629,7 +628,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           ]
 
           dateService.now.returns(maintenant)
-          dateService.isSameDateDay.returns(true)
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(idpToken, maintenant)
@@ -683,7 +681,6 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
           ]
 
           dateService.now.returns(maintenant)
-          dateService.isSameDateDay.returns(true)
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(idpToken, maintenant)

@@ -54,7 +54,7 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     )
 
     try {
-      await this.planificateurService.supprimerRappelsRendezVous(rendezVous)
+      await this.planificateurService.supprimerRappelsParId(rendezVous.id)
     } catch (e) {
       this.logger.error(
         buildError(

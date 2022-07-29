@@ -37,6 +37,7 @@ export class DeleteActionCommandHandler extends CommandHandler<
     }
     await this.actionRepository.delete(command.idAction)
     this.logger.log(`L'action ${command.idAction} a été supprimée`)
+
     return emptySuccess()
   }
 

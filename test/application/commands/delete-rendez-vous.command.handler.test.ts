@@ -88,7 +88,7 @@ describe('DeleteRendezVousCommandHandler', () => {
             conseillerRepository.get
               .withArgs(conseillerCreateur.id)
               .resolves(conseillerCreateur)
-            planificateurService.supprimerRappelsRendezVous.resolves()
+            planificateurService.supprimerRappelsParId.resolves()
 
             // When
             await deleteRendezVousCommandHandler.handle(command)
@@ -129,7 +129,7 @@ describe('DeleteRendezVousCommandHandler', () => {
             conseillerRepository.get
               .withArgs(conseillerCreateur.id)
               .resolves(conseillerCreateur)
-            planificateurService.supprimerRappelsRendezVous.resolves()
+            planificateurService.supprimerRappelsParId.resolves()
 
             // When
             await deleteRendezVousCommandHandler.handle(command)

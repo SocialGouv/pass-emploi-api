@@ -371,7 +371,7 @@ describe('ConseillersController', () => {
           typeCreateur: Action.TypeCreateur.CONSEILLER,
           commentaire: 'Ceci est un commentaire',
           dateEcheance: uneDate(),
-          rappel: undefined
+          rappel: true
         },
         unUtilisateurDecode()
       )

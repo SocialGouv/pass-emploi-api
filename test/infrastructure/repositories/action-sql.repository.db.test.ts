@@ -8,23 +8,28 @@ import { uneAction } from '../../fixtures/action.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
-import { expect, stubClass } from '../../utils'
+import { expect, StubbedClass, stubClass } from '../../utils'
 import { IdService } from 'src/utils/id-service'
 import { DateService } from 'src/utils/date-service'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
+import { uneDatetime } from '../../fixtures/date.fixture'
+
+const nowAtMidnight = uneDatetime.startOf('day')
 
 describe('ActionSqlRepository', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
   let jeune: Jeune
   let actionSqlRepository: ActionSqlRepository
   let idService: IdService
-  let dateService: DateService
+  let dateService: StubbedClass<DateService>
 
   beforeEach(async () => {
     jeune = unJeune()
+    dateService = stubClass(DateService)
+    dateService.nowAtMidnight.returns(nowAtMidnight)
 
-    actionSqlRepository = new ActionSqlRepository()
+    actionSqlRepository = new ActionSqlRepository(dateService)
     const conseillerRepository = new ConseillerSqlRepository()
     await conseillerRepository.save(unConseiller())
     const firebaseClient = stubClass(FirebaseClient)
@@ -106,6 +111,70 @@ describe('ActionSqlRepository', () => {
       expect(actual).to.deep.equal(
         ActionSqlRepository.actionFromSqlModel(actionDto)
       )
+    })
+
+    describe("Quand l'action n'existe pas", () => {
+      it('renvoie undefined', async () => {
+        // When
+        const actual = await actionSqlRepository.get(
+          '184d8c6c-666c-4a33-88bd-ec44fb62f162'
+        )
+
+        // Then
+        expect(actual).to.equal(undefined)
+      })
+    })
+  })
+
+  describe('.findAllActionsARappeler()', () => {
+    it('récupère les actions qui arrivent à échance dans + 3 jours avec un rappel et pas de statut terminé ou annulé', async () => {
+      // Given
+      const actionARappeler = uneActionDto({
+        id: 'c723bfa8-0ac4-4d29-b0b6-68bdb3dec21c',
+        statut: Action.Statut.EN_COURS,
+        dateEcheance: nowAtMidnight.plus({ day: 5 }).toJSDate(),
+        rappel: true
+      })
+      await ActionSqlModel.creer(actionARappeler)
+
+      const actionTerminee = uneActionDto({
+        id: 'c723bfa8-0ac4-4d29-b0b6-68bdb3dec21d',
+        statut: Action.Statut.TERMINEE,
+        dateEcheance: nowAtMidnight.plus({ day: 5 }).toJSDate(),
+        rappel: true
+      })
+      await ActionSqlModel.creer(actionTerminee)
+
+      const actionAnnulee = uneActionDto({
+        id: 'c723bfa8-0ac4-4d29-b0b6-68bdb3dec21e',
+        statut: Action.Statut.ANNULEE,
+        dateEcheance: nowAtMidnight.plus({ day: 5 }).toJSDate(),
+        rappel: true
+      })
+      await ActionSqlModel.creer(actionAnnulee)
+
+      const actionSansRappel = uneActionDto({
+        id: 'c723bfa8-0ac4-4d29-b0b6-68bdb3dec21f',
+        statut: Action.Statut.EN_COURS,
+        dateEcheance: nowAtMidnight.plus({ day: 5 }).toJSDate(),
+        rappel: false
+      })
+      await ActionSqlModel.creer(actionSansRappel)
+
+      const demain = uneActionDto({
+        id: 'c723bfa8-0ac4-4d29-b0b6-68bdb3dec22a',
+        statut: Action.Statut.EN_COURS,
+        dateEcheance: nowAtMidnight.plus({ day: 1 }).toJSDate(),
+        rappel: true
+      })
+      await ActionSqlModel.creer(demain)
+
+      // When
+      const actual = await actionSqlRepository.findAllActionsARappeler()
+
+      // Then
+      expect(actual).to.have.length(1)
+      expect(actual[0].id).to.equal(actionARappeler.id)
     })
 
     describe("Quand l'action n'existe pas", () => {

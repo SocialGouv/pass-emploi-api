@@ -10,7 +10,7 @@ describe('DateService', () => {
       const date1 = DateTime.fromISO('2020-04-06T12:00:00.000Z').toUTC()
       const date2 = DateTime.fromISO('2020-04-06T17:03:12.000Z').toUTC()
 
-      expect(dateService.isSameDateDay(date1, date2)).to.equal(true)
+      expect(DateService.isSameDateDay(date1, date2)).to.equal(true)
     })
   })
 

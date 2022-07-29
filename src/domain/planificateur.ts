@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
+import { Action } from './action'
 import { DateService } from '../utils/date-service'
 import { RendezVous } from './rendez-vous'
 
@@ -35,11 +36,16 @@ export namespace Planificateur {
 
   export enum JobEnum {
     RENDEZVOUS = 'RENDEZVOUS',
+    RAPPEL_ACTION = 'RAPPEL_ACTION',
     FAKE = 'FAKE'
   }
 
   export interface JobRendezVous {
     idRendezVous: string
+  }
+
+  export interface JobRappelAction {
+    idAction: string
   }
 
   export interface JobFake {
@@ -160,8 +166,12 @@ export class PlanificateurService {
     }
   }
 
-  async supprimerRappelsRendezVous(rendezVous: RendezVous): Promise<void> {
-    await this.planificateurRepository.supprimerJobsSelonPattern(rendezVous.id)
+  async planifierRappelAction(action: Action): Promise<void> {
+    await this.creerJobRappelAction(action, 3)
+  }
+
+  async supprimerRappelsParId(id: string): Promise<void> {
+    await this.planificateurRepository.supprimerJobsSelonPattern(id)
   }
 
   private async creerJobRendezVous(
@@ -175,6 +185,22 @@ export class PlanificateurService {
         .toJSDate(),
       type: Planificateur.JobEnum.RENDEZVOUS,
       contenu: { idRendezVous: rendezVous.id }
+    }
+    await this.planificateurRepository.createJob(job, jobId)
+  }
+
+  private async creerJobRappelAction(
+    action: Action,
+    days: number
+  ): Promise<void> {
+    const jobId = `action:${action.id}:${days}`
+
+    const job: Planificateur.Job<Planificateur.JobRappelAction> = {
+      date: DateTime.fromJSDate(action.dateEcheance)
+        .minus({ days: days })
+        .toJSDate(),
+      type: Planificateur.JobEnum.RAPPEL_ACTION,
+      contenu: { idAction: action.id }
     }
     await this.planificateurRepository.createJob(job, jobId)
   }

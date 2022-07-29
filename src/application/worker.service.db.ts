@@ -15,6 +15,7 @@ import { HandleNettoyerLesJobsCommandHandler } from './commands/jobs/handle-job-
 import { HandleJobNettoyerPiecesJointesCommandHandler } from './commands/jobs/handle-job-nettoyer-pieces-jointes.command'
 import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
 import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
+import { HandleJobRappelActionCommandHandler } from './commands/jobs/handle-job-rappel-action.command'
 import { HandleJobRappelRendezVousCommandHandler } from './commands/jobs/handle-job-rappel-rendez-vous.command'
 import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from './commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
 import { HandleJobUpdateMailingListConseillerCommandHandler } from './commands/jobs/handle-job-update-mailing-list-conseiller.command'
@@ -29,6 +30,7 @@ export class WorkerService {
     @Inject(PlanificateurRepositoryToken)
     private planificateurRepository: Planificateur.Repository,
     private handlerJobRendezVousCommandHandler: HandleJobRappelRendezVousCommandHandler,
+    private handlerJobRappelActionCommandHandler: HandleJobRappelActionCommandHandler,
     private handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler,
     private handleJobNotifierNouvellesOffresEmploiCommandHandler: HandleJobNotifierNouvellesOffresEmploiCommandHandler,
     private handleNettoyerLesJobsCommandHandler: HandleNettoyerLesJobsCommandHandler,
@@ -61,6 +63,11 @@ export class WorkerService {
         case Planificateur.JobEnum.RENDEZVOUS:
           await this.handlerJobRendezVousCommandHandler.execute({
             job: job as Planificateur.Job<Planificateur.JobRendezVous>
+          })
+          break
+        case Planificateur.JobEnum.RAPPEL_ACTION:
+          await this.handlerJobRappelActionCommandHandler.execute({
+            job: job as Planificateur.Job<Planificateur.JobRappelAction>
           })
           break
         case Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES:

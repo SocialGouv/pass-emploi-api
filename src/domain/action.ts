@@ -5,6 +5,7 @@ import { Result, success } from '../building-blocks/types/result'
 import { DateService } from '../utils/date-service'
 import { IdService } from '../utils/id-service'
 import { Jeune } from './jeune'
+import { DateTime } from 'luxon'
 
 export const ActionsRepositoryToken = 'ActionsRepositoryToken'
 
@@ -27,11 +28,16 @@ export namespace Action {
 
   export interface Repository {
     save(action: Action): Promise<void>
+
     get(id: Action.Id): Promise<Action | undefined>
+
     getConseillerEtJeune(
       id: Action.Id
     ): Promise<{ idConseiller: string; idJeune: string } | undefined>
+
     delete(id: Action.Id): Promise<void>
+
+    findAllActionsARappeler(): Promise<Action[]>
   }
 
   export interface Createur {
@@ -132,6 +138,31 @@ export namespace Action {
         statut,
         dateDerniereActualisation: now
       })
+    }
+
+    doitPlanifierUneNotificationDeRappel(action: Action): boolean {
+      const dateEcheanceDansStrictementPlusDe3Jours =
+        this.dateService.now().plus({ days: 3 }).startOf('day') <
+        DateTime.fromJSDate(action.dateEcheance).startOf('day')
+      return (
+        action.rappel &&
+        action?.statut !== Action.Statut.ANNULEE &&
+        action?.statut !== Action.Statut.TERMINEE &&
+        dateEcheanceDansStrictementPlusDe3Jours
+      )
+    }
+
+    doitEnvoyerUneNotificationDeRappel(action: Action): boolean {
+      const dateEcheanceDans3Jours = DateService.isSameDateDay(
+        this.dateService.now().plus({ days: 3 }),
+        DateTime.fromJSDate(action.dateEcheance)
+      )
+      return (
+        action.rappel &&
+        action?.statut !== Action.Statut.ANNULEE &&
+        action?.statut !== Action.Statut.TERMINEE &&
+        dateEcheanceDans3Jours
+      )
     }
   }
 }
