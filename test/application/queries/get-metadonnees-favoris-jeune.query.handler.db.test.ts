@@ -32,8 +32,6 @@ describe('MetadonneesFavorisJeuneQueryHandler', () => {
 
   describe('handle', () => {
     const idJeune = 'poi-id-jeune'
-    const partageFavorisJeune = true
-
     beforeEach(async () => {
       // Given
       const conseillerDto = unConseillerDto({ id: 'poi-id-conseiller' })
@@ -42,7 +40,7 @@ describe('MetadonneesFavorisJeuneQueryHandler', () => {
       const jeuneDto = unJeuneDto({
         id: idJeune,
         idConseiller: conseillerDto.id,
-        partageFavoris: partageFavorisJeune
+        partageFavoris: true
       })
       await JeuneSqlModel.creer(jeuneDto)
     })
@@ -64,7 +62,7 @@ describe('MetadonneesFavorisJeuneQueryHandler', () => {
         }
         const expectedMetadonnees = {
           favoris: {
-            autoriseLePartage: partageFavorisJeune,
+            autoriseLePartage: true,
             offres: {
               total: 1,
               nombreOffresAlternance: 0,
@@ -110,7 +108,7 @@ describe('MetadonneesFavorisJeuneQueryHandler', () => {
         }
         const expectedMetadonnees = {
           favoris: {
-            autoriseLePartage: partageFavorisJeune,
+            autoriseLePartage: true,
             offres: {
               total: 1,
               nombreOffresAlternance: 0,
@@ -152,7 +150,7 @@ describe('MetadonneesFavorisJeuneQueryHandler', () => {
         }
         const expectedMetadonnees = {
           favoris: {
-            autoriseLePartage: partageFavorisJeune,
+            autoriseLePartage: true,
             offres: {
               total: 1,
               nombreOffresAlternance: 1,
@@ -192,7 +190,7 @@ describe('MetadonneesFavorisJeuneQueryHandler', () => {
         }
         const expectedMetadonnees = {
           favoris: {
-            autoriseLePartage: partageFavorisJeune,
+            autoriseLePartage: true,
             offres: {
               total: 1,
               nombreOffresAlternance: 0,
@@ -269,7 +267,7 @@ describe('MetadonneesFavorisJeuneQueryHandler', () => {
         }
         const expectedMetadonnees = {
           favoris: {
-            autoriseLePartage: partageFavorisJeune,
+            autoriseLePartage: true,
             offres: {
               total: 0,
               nombreOffresAlternance: 0,

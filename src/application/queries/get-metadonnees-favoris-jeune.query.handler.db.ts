@@ -10,6 +10,7 @@ import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-m
 import { Injectable } from '@nestjs/common'
 import { RechercheSqlModel } from '../../infrastructure/sequelize/models/recherche.sql-model'
 import { Recherche } from '../../domain/recherche'
+import { Op } from 'sequelize'
 
 export interface GetMetadonneesFavorisJeuneQuery {
   idJeune: string
@@ -63,29 +64,34 @@ export class GetMetadonneesFavorisJeuneQueryHandler extends QueryHandler<
   async handle(
     query: GetMetadonneesFavorisJeuneQuery
   ): Promise<Result<MetadonneesFavorisJeuneQueryModel>> {
-    const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune, {
-      attributes: ['preferences_partage_favoris']
-    })
+    const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune)
+
     if (!jeuneSqlModel) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
 
-    const autoriseLePartage = jeuneSqlModel.getDataValue(
-      'preferences_partage_favoris'
-    )
-
-    let offres!: MetadonneesFavorisOffresJeuneQueryModel
-    await Promise.all([
+    const [
+      nombreOffresEmplois,
+      nombreOffresAlternance,
+      nombreOffresImmersions,
+      nombreOffresServiceCivique,
+      nombreRecherchesOffresEmplois,
+      nombreRecherchesOffresAlternance,
+      nombreRecherchesOffresImmersions,
+      nombreRecherchesOffresServiceCivique
+    ] = await Promise.all([
       FavoriOffreEmploiSqlModel.count({
         where: {
           idJeune: query.idJeune,
-          is_alternance: null
+          isAlternance: {
+            [Op.not]: true
+          }
         }
       }),
       FavoriOffreEmploiSqlModel.count({
         where: {
           idJeune: query.idJeune,
-          is_alternance: true
+          isAlternance: true
         }
       }),
       FavoriOffreImmersionSqlModel.count({
@@ -97,19 +103,7 @@ export class GetMetadonneesFavorisJeuneQueryHandler extends QueryHandler<
         where: {
           idJeune: query.idJeune
         }
-      })
-    ]).then((comptes: number[]) => {
-      offres = {
-        total: comptes.reduce((total, compte) => total + compte, 0),
-        nombreOffresEmploi: comptes[0],
-        nombreOffresAlternance: comptes[1],
-        nombreOffresImmersion: comptes[2],
-        nombreOffresServiceCivique: comptes[3]
-      }
-    })
-
-    let recherches!: MetadonneesFavorisRecherchesJeuneQueryModel
-    await Promise.all([
+      }),
       RechercheSqlModel.count({
         where: { idJeune: query.idJeune, type: Recherche.Type.OFFRES_EMPLOI }
       }),
@@ -128,21 +122,34 @@ export class GetMetadonneesFavorisJeuneQueryHandler extends QueryHandler<
           type: Recherche.Type.OFFRES_SERVICES_CIVIQUE
         }
       })
-    ]).then((comptes: number[]) => {
-      recherches = {
-        total: comptes.reduce((total, compte) => total + compte, 0),
-        nombreRecherchesOffresEmploi: comptes[0],
-        nombreRecherchesOffresAlternance: comptes[1],
-        nombreRecherchesOffresImmersion: comptes[2],
-        nombreRecherchesOffresServiceCivique: comptes[3]
-      }
-    })
+    ])
 
     return success({
       favoris: {
-        autoriseLePartage,
-        offres,
-        recherches
+        autoriseLePartage: jeuneSqlModel.partageFavoris,
+        offres: {
+          total:
+            nombreOffresEmplois +
+            nombreOffresAlternance +
+            nombreOffresImmersions +
+            nombreOffresServiceCivique,
+          nombreOffresEmploi: nombreOffresEmplois,
+          nombreOffresAlternance: nombreOffresAlternance,
+          nombreOffresImmersion: nombreOffresImmersions,
+          nombreOffresServiceCivique: nombreOffresServiceCivique
+        },
+        recherches: {
+          total:
+            nombreRecherchesOffresEmplois +
+            nombreRecherchesOffresAlternance +
+            nombreRecherchesOffresImmersions +
+            nombreRecherchesOffresServiceCivique,
+          nombreRecherchesOffresEmploi: nombreRecherchesOffresEmplois,
+          nombreRecherchesOffresAlternance: nombreRecherchesOffresAlternance,
+          nombreRecherchesOffresImmersion: nombreRecherchesOffresImmersions,
+          nombreRecherchesOffresServiceCivique:
+            nombreRecherchesOffresServiceCivique
+        }
       }
     })
   }
