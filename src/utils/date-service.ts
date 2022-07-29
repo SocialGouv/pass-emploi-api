@@ -11,14 +11,20 @@ export class DateService {
     return new Date()
   }
 
+  nowAtMidnight(): DateTime {
+    const now: DateTime = DateTime.now()
+    now.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+    return now
+  }
+
   nowAtMidnightJs(): Date {
     const now: Date = new Date()
     now.setHours(0, 0, 0, 0)
     return now
   }
 
-  isSameDateDay(date1: DateTime, date2: DateTime): boolean {
-    return date1.startOf('day').equals(date2.startOf('day'))
+  static isSameDateDay(date1: DateTime, date2: DateTime): boolean {
+    return date1.toUTC().startOf('day').equals(date2.toUTC().startOf('day'))
   }
 
   fromISOStringToUTCJSDate(stringISO: string): Date {

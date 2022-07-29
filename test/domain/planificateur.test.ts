@@ -8,6 +8,7 @@ import { RendezVous } from '../../src/domain/rendez-vous'
 import { DateService } from '../../src/utils/date-service'
 import { unRendezVous } from '../fixtures/rendez-vous.fixture'
 import { createSandbox, expect, stubClass } from '../utils'
+import { uneAction } from '../fixtures/action.fixture'
 
 describe('Planificateur', () => {
   describe('Service', () => {
@@ -110,6 +111,30 @@ describe('Planificateur', () => {
             `rdv:${rendezVous.id}:7`
           )
         })
+      })
+    })
+    describe('planifierRappelAction', () => {
+      it('génère un job pour un rappel sept jours avant le rendez vous', async () => {
+        // Given
+        const action = uneAction()
+
+        // When
+        await planificateurService.planifierRappelAction(action)
+
+        // Then
+        const job: Planificateur.Job<Planificateur.JobRappelAction> = {
+          date: DateTime.fromJSDate(action.dateEcheance)
+            .minus({ days: 3 })
+            .toJSDate(),
+          type: Planificateur.JobEnum.RAPPEL_ACTION,
+          contenu: { idAction: action.id }
+        }
+        expect(
+          planificateurRepository.createJob
+        ).to.have.been.calledWithExactly(
+          job,
+          'action:721e2108-60f5-4a75-b102-04fe6a40e899:3'
+        )
       })
     })
   })

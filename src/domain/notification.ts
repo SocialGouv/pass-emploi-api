@@ -20,7 +20,8 @@ export namespace Notification {
     DELETED_RENDEZVOUS = 'DELETED_RENDEZVOUS',
     UPDATED_RENDEZVOUS = 'UPDATED_RENDEZVOUS',
     NEW_MESSAGE = 'NEW_MESSAGE',
-    NOUVELLE_OFFRE = 'NOUVELLE_OFFRE'
+    NOUVELLE_OFFRE = 'NOUVELLE_OFFRE',
+    DETAIL_ACTION = 'DETAIL_ACTION'
   }
 
   type TypeRdv =
@@ -75,6 +76,23 @@ export namespace Notification {
       data: {
         type: Type.RAPPEL_RENDEZVOUS,
         id: idRdv
+      }
+    }
+  }
+
+  export function creerNotificationRappelAction(
+    token: string,
+    idAction: string
+  ): Notification.Message | undefined {
+    return {
+      token,
+      notification: {
+        title: 'Rappel action',
+        body: 'Une action arrive à écheance dans 3 jours'
+      },
+      data: {
+        type: Type.DETAIL_ACTION,
+        id: idAction
       }
     }
   }

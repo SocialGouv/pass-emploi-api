@@ -94,7 +94,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
             const laVisioEstDisponible =
               avecVisio &&
               prestation.identifiantStable &&
-              this.dateService.isSameDateDay(dateRendezVous, maintenant)
+              DateService.isSameDateDay(dateRendezVous, maintenant)
 
             if (laVisioEstDisponible) {
               try {

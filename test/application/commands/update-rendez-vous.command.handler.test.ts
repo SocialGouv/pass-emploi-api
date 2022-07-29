@@ -302,8 +302,8 @@ describe('UpdateRendezVousCommandHandler', () => {
           Notification.Type.UPDATED_RENDEZVOUS
         )
         expect(
-          planificateurService.supprimerRappelsRendezVous
-        ).not.to.have.been.calledWith(rendezVousUpdated)
+          planificateurService.supprimerRappelsParId
+        ).not.to.have.been.calledWith(rendezVousUpdated.id)
         expect(
           planificateurService.planifierRappelsRendezVous
         ).not.to.have.been.calledWith(rendezVousUpdated)
@@ -332,8 +332,8 @@ describe('UpdateRendezVousCommandHandler', () => {
           Notification.Type.UPDATED_RENDEZVOUS
         )
         expect(
-          planificateurService.supprimerRappelsRendezVous
-        ).to.have.been.calledWith(rendezVousUpdated)
+          planificateurService.supprimerRappelsParId
+        ).to.have.been.calledWith(rendezVousUpdated.id)
         expect(
           planificateurService.planifierRappelsRendezVous
         ).to.have.been.calledWith(rendezVousUpdated)

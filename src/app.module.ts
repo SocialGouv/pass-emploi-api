@@ -200,6 +200,7 @@ import { GetRendezVousConseillerPaginesQueryHandler } from './application/querie
 import { ConseillerForJeuneAvecPartageAuthorizer } from './application/authorizers/authorize-conseiller-for-jeune-avec-partage'
 import { GetFavorisJeunePourConseillerQueryHandler } from './application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
 import { GetMetadonneesFavorisJeuneQueryHandler } from './application/queries/get-metadonnees-favoris-jeune.query.handler.db'
+import { HandleJobRappelActionCommandHandler } from './application/commands/jobs/handle-job-rappel-action.command'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -416,6 +417,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateEvenementCommandHandler,
     GetChatSecretsQueryHandler,
     HandleJobRappelRendezVousCommandHandler,
+    HandleJobRappelActionCommandHandler,
     HandleJobMailConseillerCommandHandler,
     SynchronizeJobsCommandHandler,
     GetConseillerByEmailQueryHandler,

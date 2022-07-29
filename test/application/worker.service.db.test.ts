@@ -14,6 +14,7 @@ import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from 'src/applic
 import { DatabaseForTesting } from '../utils/database-for-testing'
 import { HandleJobNettoyerPiecesJointesCommandHandler } from 'src/application/commands/jobs/handle-job-nettoyer-pieces-jointes.command'
 import { HandleJobNettoyerArchivesJeunesCommandHandler } from 'src/application/commands/jobs/handle-job-nettoyer-les-archives-jeune.command'
+import { HandleJobRappelActionCommandHandler } from 'src/application/commands/jobs/handle-job-rappel-action.command'
 
 describe('WorkerService', () => {
   DatabaseForTesting.prepare()
@@ -30,6 +31,9 @@ describe('WorkerService', () => {
 
       const handlerJobRendezVousCommandHandler = stubClass(
         HandleJobRappelRendezVousCommandHandler
+      )
+      const handlerJobRappelActionCommandHandler = stubClass(
+        HandleJobRappelActionCommandHandler
       )
       const handleJobMailConseillerCommandHandler = stubClass(
         HandleJobMailConseillerCommandHandler
@@ -58,6 +62,7 @@ describe('WorkerService', () => {
       const workerService = new WorkerService(
         planificateurRepository,
         handlerJobRendezVousCommandHandler,
+        handlerJobRappelActionCommandHandler,
         handleJobMailConseillerCommandHandler,
         notifierNouvellesOffresEmploiCommandHandler,
         handleNettoyerLesJobsCommandHandler,

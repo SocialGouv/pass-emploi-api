@@ -1,5 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Evenement, EvenementService } from 'src/domain/evenement'
+import { PlanificateurService } from 'src/domain/planificateur'
+import { buildError } from 'src/utils/logger.module'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
@@ -41,7 +43,8 @@ export class CreateActionCommandHandler extends CommandHandler<
     private readonly actionFactory: Action.Factory,
     private readonly jeuneAuthorizer: JeuneAuthorizer,
     private readonly conseillerAuthorizer: ConseillerAuthorizer,
-    private evenementService: EvenementService
+    private evenementService: EvenementService,
+    private planificateurService: PlanificateurService
   ) {
     super('CreateActionCommandHandler')
   }
@@ -59,6 +62,10 @@ export class CreateActionCommandHandler extends CommandHandler<
 
     const action = result.data
     await this.actionRepository.save(action)
+
+    if (this.actionFactory.doitPlanifierUneNotificationDeRappel(action)) {
+      await this.planifierRappelAction(action)
+    }
 
     if (command.typeCreateur !== Action.TypeCreateur.JEUNE) {
       await this.notificationService.notifierNouvelleAction(jeune, action)
@@ -87,5 +94,19 @@ export class CreateActionCommandHandler extends CommandHandler<
       Evenement.Type.ACTION_CREEE,
       utilisateur
     )
+  }
+
+  private async planifierRappelAction(action: Action): Promise<void> {
+    try {
+      await this.planificateurService.planifierRappelAction(action)
+    } catch (e) {
+      this.logger.error(
+        buildError(
+          `La planification de la notification de l'action ${action.id} a échoué`,
+          e
+        )
+      )
+      this.apmService.captureError(e)
+    }
   }
 }

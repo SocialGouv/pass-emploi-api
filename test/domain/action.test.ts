@@ -20,6 +20,7 @@ describe('Action', () => {
       idService.uuid.returns(id)
       dateService = stubClass(DateService)
       dateService.nowJs.returns(nowJs)
+      dateService.now.returns(uneDatetime)
       actionFactory = new Action.Factory(idService, dateService)
     })
 
@@ -225,6 +226,180 @@ describe('Action', () => {
 
           // Then
           expect(actual).to.deep.equal({ _isSuccess: true, data: action })
+        })
+      })
+    })
+    describe('doitPlanifierUneNotificationDeRappel', () => {
+      describe('quand il faut planifier un rappel', () => {
+        it('renvoie vrai', () => {
+          // Given
+          const action: Action = uneAction({
+            rappel: true,
+            statut: Action.Statut.PAS_COMMENCEE,
+            dateEcheance: uneDatetime.plus({ day: 4 }).toJSDate()
+          })
+
+          // When
+          const result =
+            actionFactory.doitPlanifierUneNotificationDeRappel(action)
+
+          // Then
+          expect(result).to.be.true()
+        })
+      })
+      describe('quand le statut est annulé', () => {
+        it('renvoie faux', () => {
+          // Given
+          const action: Action = uneAction({
+            rappel: true,
+            statut: Action.Statut.ANNULEE,
+            dateEcheance: uneDatetime.plus({ day: 4 }).toJSDate()
+          })
+
+          // When
+          const result =
+            actionFactory.doitPlanifierUneNotificationDeRappel(action)
+
+          // Then
+          expect(result).to.be.false()
+        })
+      })
+      describe('quand le statut est terminé', () => {
+        it('renvoie faux', () => {
+          // Given
+          const action: Action = uneAction({
+            rappel: true,
+            statut: Action.Statut.TERMINEE,
+            dateEcheance: uneDatetime.plus({ day: 4 }).toJSDate()
+          })
+
+          // When
+          const result =
+            actionFactory.doitPlanifierUneNotificationDeRappel(action)
+
+          // Then
+          expect(result).to.be.false()
+        })
+      })
+      describe("quand l'action est sans rappel", () => {
+        it('renvoie faux', () => {
+          // Given
+          const action: Action = uneAction({
+            rappel: false,
+            statut: Action.Statut.PAS_COMMENCEE,
+            dateEcheance: uneDatetime.plus({ day: 4 }).toJSDate()
+          })
+
+          // When
+          const result =
+            actionFactory.doitPlanifierUneNotificationDeRappel(action)
+
+          // Then
+          expect(result).to.be.false()
+        })
+      })
+      describe("quand la date d'échéance de l'action est dans moins de 4 jours", () => {
+        it('renvoie faux', () => {
+          // Given
+          const action: Action = uneAction({
+            rappel: false,
+            statut: Action.Statut.PAS_COMMENCEE,
+            dateEcheance: uneDatetime.plus({ day: 2 }).toJSDate()
+          })
+
+          // When
+          const result =
+            actionFactory.doitPlanifierUneNotificationDeRappel(action)
+
+          // Then
+          expect(result).to.be.false()
+        })
+      })
+    })
+    describe('doitEnvoyerUneNotificationDeRappel', () => {
+      describe('quand il faut envoyer un rappel', () => {
+        it('renvoie vrai', () => {
+          // Given
+          const action: Action = uneAction({
+            rappel: true,
+            statut: Action.Statut.PAS_COMMENCEE,
+            dateEcheance: uneDatetime.plus({ day: 3 }).toJSDate()
+          })
+
+          // When
+          const result =
+            actionFactory.doitEnvoyerUneNotificationDeRappel(action)
+
+          // Then
+          expect(result).to.be.true()
+        })
+      })
+      describe('quand le statut est annulé', () => {
+        it('renvoie faux', () => {
+          // Given
+          const action: Action = uneAction({
+            rappel: true,
+            statut: Action.Statut.ANNULEE,
+            dateEcheance: uneDatetime.plus({ day: 3 }).toJSDate()
+          })
+
+          // When
+          const result =
+            actionFactory.doitEnvoyerUneNotificationDeRappel(action)
+
+          // Then
+          expect(result).to.be.false()
+        })
+      })
+      describe('quand le statut est terminé', () => {
+        it('renvoie faux', () => {
+          // Given
+          const action: Action = uneAction({
+            rappel: true,
+            statut: Action.Statut.TERMINEE,
+            dateEcheance: uneDatetime.plus({ day: 3 }).toJSDate()
+          })
+
+          // When
+          const result =
+            actionFactory.doitEnvoyerUneNotificationDeRappel(action)
+
+          // Then
+          expect(result).to.be.false()
+        })
+      })
+      describe("quand l'action est sans rappel", () => {
+        it('renvoie faux', () => {
+          // Given
+          const action: Action = uneAction({
+            rappel: false,
+            statut: Action.Statut.PAS_COMMENCEE,
+            dateEcheance: uneDatetime.plus({ day: 4 }).toJSDate()
+          })
+
+          // When
+          const result =
+            actionFactory.doitEnvoyerUneNotificationDeRappel(action)
+
+          // Then
+          expect(result).to.be.false()
+        })
+      })
+      describe("quand la date d'échéance de l'action est dans moins de 3 jours", () => {
+        it('renvoie faux', () => {
+          // Given
+          const action: Action = uneAction({
+            rappel: false,
+            statut: Action.Statut.PAS_COMMENCEE,
+            dateEcheance: uneDatetime.plus({ day: 2 }).toJSDate()
+          })
+
+          // When
+          const result =
+            actionFactory.doitEnvoyerUneNotificationDeRappel(action)
+
+          // Then
+          expect(result).to.be.false()
         })
       })
     })

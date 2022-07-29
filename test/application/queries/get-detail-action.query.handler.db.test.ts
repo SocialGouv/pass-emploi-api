@@ -30,7 +30,7 @@ describe('GetDetailActionQueryHandler', () => {
   before(() => {
     sandbox = createSandbox()
     actionAuthorizer = stubClass(ActionAuthorizer)
-    actionSqlRepository = new ActionSqlRepository()
+    actionSqlRepository = new ActionSqlRepository(new DateService())
 
     getDetailActionQueryHandler = new GetDetailActionQueryHandler(
       actionAuthorizer

@@ -2,6 +2,7 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { EvenementService } from 'src/domain/evenement'
+import { PlanificateurService } from 'src/domain/planificateur'
 import { stubClassSandbox } from 'test/utils/types'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
@@ -33,6 +34,7 @@ describe('CreateActionCommandHandler', () => {
   let createActionCommandHandler: CreateActionCommandHandler
   let evenementService: StubbedClass<EvenementService>
   let jeuneRepository: StubbedType<Jeune.Repository>
+  let planificateurService: StubbedClass<PlanificateurService>
 
   beforeEach(async () => {
     action = uneAction()
@@ -47,6 +49,8 @@ describe('CreateActionCommandHandler', () => {
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     evenementService = stubClass(EvenementService)
+    planificateurService = stubClass(PlanificateurService)
+    planificateurService.planifierRappelAction.resolves()
 
     createActionCommandHandler = new CreateActionCommandHandler(
       actionRepository,
@@ -55,7 +59,8 @@ describe('CreateActionCommandHandler', () => {
       actionFactory,
       jeuneAuthorizer,
       conseillerAuthorizer,
-      evenementService
+      evenementService,
+      planificateurService
     )
   })
   describe('handle', () => {
@@ -127,6 +132,62 @@ describe('CreateActionCommandHandler', () => {
         expect(
           notificationService.notifierNouvelleAction
         ).to.have.been.calledOnceWithExactly(jeune, action)
+      })
+    })
+    describe('rappel', () => {
+      describe('quand il faut planifier un rappel', () => {
+        it('planifie un rappel', async () => {
+          // Given
+          actionFactory.buildAction.returns(success(action))
+          actionFactory.doitPlanifierUneNotificationDeRappel
+            .withArgs(action)
+            .returns(true)
+          const command: CreateActionCommand = {
+            idJeune: action.idJeune,
+            contenu: action.contenu,
+            idCreateur: action.id,
+            typeCreateur: Action.TypeCreateur.JEUNE,
+            statut: action.statut,
+            commentaire: action.commentaire,
+            dateEcheance: action.dateEcheance,
+            rappel: action.rappel
+          }
+
+          // When
+          await createActionCommandHandler.handle(command)
+
+          // Then
+          expect(
+            planificateurService.planifierRappelAction
+          ).to.have.been.calledOnceWithExactly(action)
+        })
+      })
+      describe('quand il ne faut pas  planifier un rappel', () => {
+        it('ne planifie pas de rappel', async () => {
+          // Given
+          actionFactory.buildAction.returns(success(action))
+          actionFactory.doitPlanifierUneNotificationDeRappel
+            .withArgs(action)
+            .returns(false)
+          const command: CreateActionCommand = {
+            idJeune: action.idJeune,
+            contenu: action.contenu,
+            idCreateur: action.id,
+            typeCreateur: Action.TypeCreateur.JEUNE,
+            statut: action.statut,
+            commentaire: action.commentaire,
+            dateEcheance: action.dateEcheance,
+            rappel: action.rappel
+          }
+
+          // When
+          await createActionCommandHandler.handle(command)
+
+          // Then
+          expect(
+            planificateurService.planifierRappelAction
+          ).not.to.have.been.called()
+        })
       })
     })
   })
