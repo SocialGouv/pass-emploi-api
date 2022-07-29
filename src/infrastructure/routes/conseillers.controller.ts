@@ -233,6 +233,9 @@ export class ConseillersController {
   })
   @Get(':idConseiller/jeunes/:idJeune/metadonnees')
   async getMetadonneesFavorisJeune(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    @Param('idConseiller') idConseiller: string,
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<MetadonneesFavorisJeuneQueryModel> {
