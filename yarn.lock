@@ -194,7 +194,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-s3@npm:^3.121.0":
+"@aws-sdk/client-s3@npm:^3.137.0":
   version: 3.137.0
   resolution: "@aws-sdk/client-s3@npm:3.137.0"
   dependencies:
@@ -829,7 +829,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/s3-request-presigner@npm:^3.121.0":
+"@aws-sdk/s3-request-presigner@npm:^3.137.0":
   version: 3.137.0
   resolution: "@aws-sdk/s3-request-presigner@npm:3.137.0"
   dependencies:
@@ -1966,7 +1966,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/schematics@npm:^9.0.0":
+"@nestjs/schematics@npm:^9.0.0, @nestjs/schematics@npm:^9.0.1":
   version: 9.0.1
   resolution: "@nestjs/schematics@npm:9.0.1"
   dependencies:
@@ -2017,7 +2017,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/testing@npm:^9.0.0":
+"@nestjs/testing@npm:^9.0.7":
   version: 9.0.7
   resolution: "@nestjs/testing@npm:9.0.7"
   dependencies:
@@ -2393,7 +2393,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/bull@npm:^3.15.8":
+"@types/bull@npm:^3.15.9":
   version: 3.15.9
   resolution: "@types/bull@npm:3.15.9"
   dependencies:
@@ -2527,7 +2527,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/geojson@npm:^7946.0.8":
+"@types/geojson@npm:^7946.0.10":
   version: 7946.0.10
   resolution: "@types/geojson@npm:7946.0.10"
   checksum: 12c407c2dc93ecb26c08af533ee732f1506a9b29456616ba7ba1d525df96206c28ddf44a528f6a5415d7d22893e9d967420940a9c095ee5e539c1eba5fefc1f4
@@ -2721,7 +2721,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/sinon@npm:*, @types/sinon@npm:^10.0.12":
+"@types/sinon@npm:*, @types/sinon@npm:^10.0.13":
   version: 10.0.13
   resolution: "@types/sinon@npm:10.0.13"
   dependencies:
@@ -2786,7 +2786,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:^5.30.5":
+"@typescript-eslint/eslint-plugin@npm:^5.31.0":
   version: 5.31.0
   resolution: "@typescript-eslint/eslint-plugin@npm:5.31.0"
   dependencies:
@@ -2809,7 +2809,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:^5.30.5":
+"@typescript-eslint/parser@npm:^5.31.0":
   version: 5.31.0
   resolution: "@typescript-eslint/parser@npm:5.31.0"
   dependencies:
@@ -4940,7 +4940,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-mocha@npm:^10.0.5":
+"eslint-plugin-mocha@npm:^10.1.0":
   version: 10.1.0
   resolution: "eslint-plugin-mocha@npm:10.1.0"
   dependencies:
@@ -5012,7 +5012,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^8.19.0":
+"eslint@npm:^8.21.0":
   version: 8.21.0
   resolution: "eslint@npm:8.21.0"
   dependencies:
@@ -6134,7 +6134,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"helmet@npm:^5.1.0":
+"helmet@npm:^5.1.1":
   version: 5.1.1
   resolution: "helmet@npm:5.1.1"
   checksum: b72ba26cc431804ad3b8ecdc18db95409a492cbb7a7e825efc27fc502b9433fec39fc083f2aad4fe7ed1a89a4287560b59f4435f9689eebbae6a2b61a1ec1b7d
@@ -6262,7 +6262,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ics@npm:^2.35.0":
+"ics@npm:^2.37.0":
   version: 2.37.0
   resolution: "ics@npm:2.37.0"
   dependencies:
@@ -7965,39 +7965,39 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "nest-pass-emploi-api@workspace:."
   dependencies:
-    "@aws-sdk/client-s3": ^3.121.0
-    "@aws-sdk/s3-request-presigner": ^3.121.0
+    "@aws-sdk/client-s3": ^3.137.0
+    "@aws-sdk/s3-request-presigner": ^3.137.0
     "@nestjs/axios": 0.1.0
     "@nestjs/cli": ^9.0.0
     "@nestjs/common": 9.0.7
     "@nestjs/config": 2.2.0
     "@nestjs/core": 9.0.7
     "@nestjs/platform-express": 9.0.7
-    "@nestjs/schematics": ^9.0.0
+    "@nestjs/schematics": ^9.0.1
     "@nestjs/swagger": 6.0.4
     "@nestjs/terminus": 9.1.0
-    "@nestjs/testing": ^9.0.0
+    "@nestjs/testing": ^9.0.7
     "@salesforce/ts-sinon": ^1.3.21
-    "@types/bull": ^3.15.8
+    "@types/bull": ^3.15.9
     "@types/chai": ^4.3.1
     "@types/chai-as-promised": ^7.1.5
     "@types/compression": ^1.7.2
     "@types/crypto-js": 4.1.1
     "@types/dirty-chai": ^2.0.2
     "@types/express": ^4.17.13
-    "@types/geojson": ^7946.0.8
+    "@types/geojson": ^7946.0.10
     "@types/luxon": ^3.0.0
     "@types/mocha": ^9.1.1
     "@types/multer": ^1.4.7
     "@types/node": ^17.0.45
     "@types/pino-multi-stream": ^5.1.3
-    "@types/sinon": ^10.0.12
+    "@types/sinon": ^10.0.13
     "@types/sinon-chai": ^3.2.8
     "@types/supertest": ^2.0.12
     "@types/uuid": ^8.3.4
     "@types/yargs": ^17.0.10
-    "@typescript-eslint/eslint-plugin": ^5.30.5
-    "@typescript-eslint/parser": ^5.30.5
+    "@typescript-eslint/eslint-plugin": ^5.31.0
+    "@typescript-eslint/parser": ^5.31.0
     bull: 4.8.5
     chai: ^4.3.6
     chai-as-promised: ^7.1.1
@@ -8009,23 +8009,23 @@ __metadata:
     dotenv-cli: ^6.0.0
     dotvault: ^0.0.9
     elastic-apm-node: 3.37.0
-    eslint: ^8.19.0
+    eslint: ^8.21.0
     eslint-config-prettier: ^8.5.0
     eslint-plugin-chai-friendly: ^0.7.2
-    eslint-plugin-mocha: ^10.0.5
+    eslint-plugin-mocha: ^10.1.0
     eslint-plugin-prettier: ^4.2.1
     firebase-admin: 11.0.1
     geojson: ^0.5.0
-    helmet: ^5.1.0
+    helmet: ^5.1.1
     husky: ^8.0.1
-    ics: ^2.35.0
+    ics: ^2.37.0
     joi: ^17.6.0
     jose: ^4.8.3
     lint-staged: ^13.0.3
     luxon: 3.0.1
     mocha: ^10.0.0
     nestjs-pino: 3.1.1
-    nock: ^13.2.8
+    nock: ^13.2.9
     nyc: ^15.1.0
     openid-client: 5.1.8
     pg: 8.7.3
@@ -8107,7 +8107,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nock@npm:^13.2.8":
+"nock@npm:^13.2.9":
   version: 13.2.9
   resolution: "nock@npm:13.2.9"
   dependencies:
