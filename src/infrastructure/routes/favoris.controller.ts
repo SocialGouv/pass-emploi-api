@@ -62,12 +62,15 @@ import {
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../application/queries/get-favoris-service-civique-jeune.query.handler'
 import { ServiceCiviqueQueryModel } from 'src/application/queries/query-models/service-civique.query-model'
 import { Core } from 'src/domain/core'
+import { FavorisQueryModel } from '../../application/queries/query-models/favoris.query-model'
+import { GetFavorisJeunePourConseillerQueryHandler } from '../../application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
 @ApiTags('Favoris')
 export class FavorisController {
   constructor(
+    private readonly getFavorisJeunePourConseillerQueryHandler: GetFavorisJeunePourConseillerQueryHandler,
     private readonly getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
     private readonly getFavorisOffresImmersionJeuneQueryHandler: GetFavorisOffresImmersionJeuneQueryHandler,
     private readonly getFavorisServiceCiviqueJeuneQueryHandler: GetFavorisServiceCiviqueJeuneQueryHandler,
@@ -78,6 +81,25 @@ export class FavorisController {
     private readonly deleteFavoriOffreImmersionCommandHandler: DeleteFavoriOffreImmersionCommandHandler,
     private readonly deleteFavoriOffreEngagementCommandHandler: DeleteFavoriOffreEngagementCommandHandler
   ) {}
+
+  @ApiOperation({
+    summary: "Récupère tous les favoris d'un jeune",
+    description: 'Autorisé pour le conseiller du jeune'
+  })
+  @ApiResponse({
+    type: FavorisQueryModel,
+    isArray: true
+  })
+  @Get('favoris')
+  async getFavorisDuJeune(
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<FavorisQueryModel[]> {
+    return this.getFavorisJeunePourConseillerQueryHandler.execute(
+      { idJeune },
+      utilisateur
+    )
+  }
 
   @ApiOperation({
     summary: "Récupère les favoris d'offres d'emploi",
