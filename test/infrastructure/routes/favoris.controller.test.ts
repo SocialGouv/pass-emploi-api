@@ -55,6 +55,7 @@ import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-
 import { OffreServiceCivique } from '../../../src/domain/offre-service-civique'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../../src/application/queries/get-favoris-service-civique-jeune.query.handler'
 import { uneOffreServiceCivique } from '../../fixtures/offre-service-civique.fixture'
+import { GetFavorisJeunePourConseillerQueryHandler } from '../../../src/application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
 
 describe('FavorisController', () => {
   let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
@@ -66,6 +67,7 @@ describe('FavorisController', () => {
   let addFavoriOffreEngagementCommandHandler: StubbedClass<AddFavoriOffreServiceCiviqueCommandHandler>
   let deleteFavoriOffreEngagementCommandHandler: StubbedClass<DeleteFavoriOffreEngagementCommandHandler>
   let getFavorisServiceCiviqueJeuneQueryHandler: StubbedClass<GetFavorisServiceCiviqueJeuneQueryHandler>
+  let getFavorisJeunePourConseillerQueryHandler: StubbedClass<GetFavorisJeunePourConseillerQueryHandler>
   let app: INestApplication
 
   before(async () => {
@@ -98,6 +100,9 @@ describe('FavorisController', () => {
     getFavorisServiceCiviqueJeuneQueryHandler = stubClass(
       GetFavorisServiceCiviqueJeuneQueryHandler
     )
+    getFavorisJeunePourConseillerQueryHandler = stubClass(
+      GetFavorisJeunePourConseillerQueryHandler
+    )
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(AddFavoriOffreEmploiCommandHandler)
@@ -118,6 +123,8 @@ describe('FavorisController', () => {
       .useValue(deleteFavoriOffreEngagementCommandHandler)
       .overrideProvider(GetFavorisServiceCiviqueJeuneQueryHandler)
       .useValue(getFavorisServiceCiviqueJeuneQueryHandler)
+      .overrideProvider(GetFavorisJeunePourConseillerQueryHandler)
+      .useValue(getFavorisJeunePourConseillerQueryHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -127,6 +134,25 @@ describe('FavorisController', () => {
 
   after(async () => {
     await app.close()
+  })
+
+  describe('Favoris pour Conseiller', () => {
+    describe('GET /jeunes/:idJeune/favoris', () => {
+      it('Renvoie la liste des favoris du jeune', async () => {
+        // Given
+        getFavorisJeunePourConseillerQueryHandler.execute
+          .withArgs({ idJeune: '1' }, unUtilisateurDecode())
+          .resolves([])
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/jeunes/1/favoris')
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(JSON.stringify([]))
+      })
+      ensureUserAuthenticationFailsIfInvalid('GET', '/jeunes/ABCDE/favoris')
+    })
   })
 
   describe(' Favoris Offres Emploi', () => {

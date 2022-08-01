@@ -198,7 +198,7 @@ import { UpdateJeunePreferencesCommandHandler } from './application/commands/upd
 import { GetPreferencesJeuneQueryHandler } from './application/queries/get-preferences-jeune.handler.db'
 import { GetRendezVousConseillerPaginesQueryHandler } from './application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
 import { ConseillerForJeuneAvecPartageAuthorizer } from './application/authorizers/authorize-conseiller-for-jeune-avec-partage'
-import { GetFavorisJeunePourConseillerQueryHandler } from './application/queries/get-favoris-jeune-pour-conseiller.query.handler'
+import { GetFavorisJeunePourConseillerQueryHandler } from './application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
 import { GetMetadonneesFavorisJeuneQueryHandler } from './application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
