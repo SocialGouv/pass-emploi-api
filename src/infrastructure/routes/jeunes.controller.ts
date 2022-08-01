@@ -167,18 +167,24 @@ export class JeunesController {
     name: 'x-appversion',
     required: false
   })
+  @ApiHeader({
+    name: 'x-installationid',
+    required: false
+  })
   @Put(':idJeune/push-notification-token')
   async updateNotificationToken(
     @Param('idJeune') idJeune: string,
     @Body() putNotificationTokenInput: PutNotificationTokenInput,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @Headers('x-appversion') appVersion?: string
+    @Headers('x-appversion') appVersion?: string,
+    @Headers('x-installationid') installationId?: string
   ): Promise<void> {
     const result = await this.updateNotificationTokenCommandHandler.execute(
       {
         idJeune,
         token: putNotificationTokenInput.registration_token,
-        appVersion: appVersion
+        appVersion,
+        installationId
       },
       utilisateur
     )

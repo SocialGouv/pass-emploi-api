@@ -304,10 +304,12 @@ describe('AuthentificationSqlRepository', () => {
   })
 
   describe('updateJeune', () => {
-    it('met à jour le jeune', async () => {
+    let jeune
+    let jeuneTrouve: JeuneSqlModel | null
+    beforeEach(async () => {
       // Given
       const conseiller = unConseillerDto()
-      const jeune = unJeuneDto({ idConseiller: conseiller.id })
+      jeune = unJeuneDto({ idConseiller: conseiller.id })
       await ConseillerSqlModel.create(conseiller)
       await JeuneSqlModel.create(jeune)
 
@@ -315,12 +317,22 @@ describe('AuthentificationSqlRepository', () => {
       await authentificationSqlRepository.updateJeune({
         id: jeune.id,
         idAuthentification: 'un-nouveau-id',
-        appVersion: '1.8.0'
+        appVersion: '1.8.0',
+        installationId: 'xxx-xx-xxx'
       })
-
+      jeuneTrouve = await JeuneSqlModel.findByPk(jeune.id)
+    })
+    it("met à jour l'id jeune", async () => {
       // Then
-      const jeuneTrouve = await JeuneSqlModel.findByPk(jeune.id)
       expect(jeuneTrouve?.idAuthentification).to.equal('un-nouveau-id')
+    })
+    it("met à jour l'app version", async () => {
+      // Then
+      expect(jeuneTrouve?.appVersion).to.equal('1.8.0')
+    })
+    it("met à jour l'installation id", async () => {
+      // Then
+      expect(jeuneTrouve?.installationId).to.equal('xxx-xx-xxx')
     })
   })
 })

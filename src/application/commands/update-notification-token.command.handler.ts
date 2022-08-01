@@ -19,6 +19,7 @@ export interface UpdateNotificationTokenCommand extends Command {
   idJeune: string
   token: string
   appVersion?: string
+  installationId?: string
 }
 
 @Injectable()
@@ -52,7 +53,8 @@ export class UpdateNotificationTokenCommandHandler extends CommandHandler<
     if (command.appVersion) {
       this.utilisateurRepository.updateJeune({
         id: jeuneMisAJour.id,
-        appVersion: command.appVersion
+        appVersion: command.appVersion,
+        installationId: command.installationId
       })
     }
     return emptySuccess()
