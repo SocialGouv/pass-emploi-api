@@ -1308,7 +1308,7 @@ describe('JeunesController', () => {
     }
 
     describe("quand c'est en succès", () => {
-      it("met à jour le token et la version de l'app", async () => {
+      it("met à jour le token, la version de l'app et l'installation id", async () => {
         // Given
         jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
         updateNotificationTokenCommandHandler.execute
@@ -1316,7 +1316,8 @@ describe('JeunesController', () => {
             {
               idJeune,
               token: payload.registration_token,
-              appVersion: 'coucou'
+              appVersion: 'coucou',
+              installationId: 'xxx-xx-xxx'
             },
             unUtilisateurDecode()
           )
@@ -1327,6 +1328,7 @@ describe('JeunesController', () => {
           .put(`/jeunes/${idJeune}/push-notification-token`)
           .set('authorization', unHeaderAuthorization())
           .set('x-appversion', 'coucou')
+          .set('x-installationid', 'xxx-xx-xxx')
           .send(payload)
           // Then
           .expect(HttpStatus.OK)
@@ -1339,7 +1341,8 @@ describe('JeunesController', () => {
             {
               idJeune,
               token: payload.registration_token,
-              appVersion: undefined
+              appVersion: undefined,
+              installationId: undefined
             },
             unUtilisateurDecode()
           )

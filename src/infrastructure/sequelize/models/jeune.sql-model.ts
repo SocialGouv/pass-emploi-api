@@ -113,6 +113,12 @@ export class JeuneDto extends Model {
   appVersion: string | null
 
   @Column({
+    field: 'installation_id',
+    type: DataType.STRING
+  })
+  installationId: string | null
+
+  @Column({
     field: 'preferences_partage_favoris',
     type: DataType.BOOLEAN
   })

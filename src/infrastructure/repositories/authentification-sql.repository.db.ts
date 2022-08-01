@@ -137,7 +137,8 @@ export class AuthentificationSqlRepository
     await JeuneSqlModel.update(
       {
         idAuthentification: utilisateur.idAuthentification,
-        appVersion: utilisateur.appVersion
+        appVersion: utilisateur.appVersion,
+        installationId: utilisateur.installationId
       },
       { where: { id: utilisateur.id } }
     )

@@ -21,6 +21,7 @@ export function unJeuneDto(
     dateDerniereConnexion: null,
     idDossier: '1234',
     appVersion: null,
+    installationId: null,
     partageFavoris: true
   }
 

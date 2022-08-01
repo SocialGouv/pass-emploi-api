@@ -89,7 +89,40 @@ describe('UpdateNotificationTokenCommandHandler', () => {
           utilisateurRepository.updateJeune
         ).to.have.been.calledWithExactly({
           id: jeuneMisAJour.id,
-          appVersion: command.appVersion
+          appVersion: command.appVersion,
+          installationId: undefined
+        })
+        expect(isSuccess(result)).to.equal(true)
+      })
+      it("met à jour l'installation id de l'app", async () => {
+        // Given
+        const command: UpdateNotificationTokenCommand = {
+          idJeune: 'idJeune',
+          token: 'leNouveauToken',
+          appVersion: '1.0.0',
+          installationId: 'xxx-xx-xxx'
+        }
+        const jeune = unJeune()
+        jeuneRepository.get.withArgs('idJeune').resolves(jeune)
+        utilisateurRepository.updateJeune.resolves()
+
+        // When
+        const result = await updateNotificationTokenCommandHandler.handle(
+          command
+        )
+
+        // Then
+        const jeuneMisAJour: Jeune = {
+          ...jeune,
+          pushNotificationToken: 'leNouveauToken',
+          tokenLastUpdate: uneDatetime
+        }
+        expect(
+          utilisateurRepository.updateJeune
+        ).to.have.been.calledWithExactly({
+          id: jeuneMisAJour.id,
+          appVersion: command.appVersion,
+          installationId: command.installationId
         })
         expect(isSuccess(result)).to.equal(true)
       })

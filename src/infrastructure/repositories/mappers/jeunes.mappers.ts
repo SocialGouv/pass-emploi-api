@@ -51,6 +51,7 @@ export function toSqlJeune(
   | 'datePremiereConnexion'
   | 'dateDerniereConnexion'
   | 'appVersion'
+  | 'installationId'
 > {
   return {
     id: jeune.id,
