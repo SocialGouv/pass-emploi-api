@@ -318,7 +318,7 @@ describe('JeunesController', () => {
           statut: Action.Statut.EN_COURS,
           commentaire: 'Ceci est un commentaire',
           dateEcheance: nowJsPlus3Mois,
-          rappel: undefined
+          rappel: false
         },
         unUtilisateurDecode()
       )
@@ -349,7 +349,7 @@ describe('JeunesController', () => {
           statut: Action.Statut.EN_COURS,
           commentaire: 'Ceci est un commentaire',
           dateEcheance: nowJsPlus3Mois,
-          rappel: undefined
+          rappel: false
         },
         unUtilisateurDecode()
       )
@@ -381,7 +381,7 @@ describe('JeunesController', () => {
           statut: Action.Statut.TERMINEE,
           commentaire: 'Ceci est un commentaire',
           dateEcheance: now.toJSDate(),
-          rappel: undefined
+          rappel: false
         },
         unUtilisateurDecode()
       )

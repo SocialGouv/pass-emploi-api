@@ -339,7 +339,8 @@ describe('ConseillersController', () => {
           idCreateur: '1',
           typeCreateur: Action.TypeCreateur.CONSEILLER,
           commentaire: 'Ceci est un commentaire',
-          dateEcheance: nowJsPlus3Mois
+          dateEcheance: nowJsPlus3Mois,
+          rappel: false
         },
         unUtilisateurDecode()
       )
@@ -369,7 +370,8 @@ describe('ConseillersController', () => {
           idCreateur: '1',
           typeCreateur: Action.TypeCreateur.CONSEILLER,
           commentaire: 'Ceci est un commentaire',
-          dateEcheance: uneDate()
+          dateEcheance: uneDate(),
+          rappel: undefined
         },
         unUtilisateurDecode()
       )
