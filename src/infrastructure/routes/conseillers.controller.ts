@@ -267,6 +267,7 @@ export class ConseillersController {
       idCreateur: idConseiller,
       typeCreateur: Action.TypeCreateur.CONSEILLER,
       commentaire: createActionPayload.comment,
+      rappel: createActionPayload.dateEcheance ? undefined : false,
       dateEcheance:
         createActionPayload.dateEcheance ?? this.buildDateEcheanceV1()
     }

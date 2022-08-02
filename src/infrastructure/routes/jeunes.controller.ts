@@ -422,7 +422,9 @@ export class JeunesController {
       dateEcheance:
         createActionPayload.dateEcheance ??
         this.buildDateEcheanceV1(createActionPayload.status),
-      rappel: createActionPayload.rappel
+      rappel: createActionPayload.dateEcheance
+        ? createActionPayload.rappel
+        : false
     }
     const result = await this.createActionCommandHandler.execute(
       command,
