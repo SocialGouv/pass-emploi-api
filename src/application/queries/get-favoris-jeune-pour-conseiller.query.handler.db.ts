@@ -38,24 +38,27 @@ export class GetFavorisJeunePourConseillerQueryHandler extends QueryHandler<
   async handle(
     query: GetFavorisJeunePourConseillerQuery
   ): Promise<FavorisQueryModel[]> {
-    const listeFavorisOffresEmploi: FavoriOffreEmploiSqlModel[] =
-      await FavoriOffreEmploiSqlModel.findAll({
+    const [
+      listeFavorisOffresEmploi,
+      listeFavorisOffresImmersion,
+      listeFavorisOffresServiceCivique
+    ] = await Promise.all([
+      FavoriOffreEmploiSqlModel.findAll({
+        where: {
+          idJeune: query.idJeune
+        }
+      }),
+      FavoriOffreImmersionSqlModel.findAll({
+        where: {
+          idJeune: query.idJeune
+        }
+      }),
+      FavoriOffreEngagementSqlModel.findAll({
         where: {
           idJeune: query.idJeune
         }
       })
-    const listeFavorisOffresImmersion: FavoriOffreImmersionSqlModel[] =
-      await FavoriOffreImmersionSqlModel.findAll({
-        where: {
-          idJeune: query.idJeune
-        }
-      })
-    const listeFavorisOffresServiceCivique: FavoriOffreEngagementSqlModel[] =
-      await FavoriOffreEngagementSqlModel.findAll({
-        where: {
-          idJeune: query.idJeune
-        }
-      })
+    ])
     return listeFavorisOffresEmploi
       .map(fromOffreEmploiSqlToFavorisQueryModel)
       .concat(
@@ -68,16 +71,21 @@ export class GetFavorisJeunePourConseillerQueryHandler extends QueryHandler<
           fromOffreServiceCiviqueSqlToFavorisQueryModel
         )
       )
-      .sort((favori1, favori2) => {
-        if (favori1.titre >= favori2.titre) {
-          return 1
-        } else {
-          return 0
-        }
-      })
+      .sort(comparerTitreDeFavoris)
   }
 
   async monitor(): Promise<void> {
     return
+  }
+}
+
+function comparerTitreDeFavoris(
+  favori1: FavorisQueryModel,
+  favori2: FavorisQueryModel
+): number {
+  if (favori1.titre >= favori2.titre) {
+    return 1
+  } else {
+    return 0
   }
 }
