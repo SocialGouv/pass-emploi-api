@@ -1085,38 +1085,6 @@ describe('JeunesController', () => {
           // Then
           .expect(HttpStatus.CREATED)
       })
-      it('limite la taille de la description à 200 caracteres', async () => {
-        // Given
-        const description255caracteres =
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mauris ante, aliquet dapibus tempus eget, volutpat sed nisi. Donec non feugiat sem, vel cursus dui. Suspendisse vitae felis enim. Nam semper pharetra turpis, non hendrerit enim integer.'
-        const description200caracteres =
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mauris ante, aliquet dapibus tempus eget, volutpat sed nisi. Donec non feugiat sem, vel cursus dui. Suspendisse vitae felis enim.'
-        const payloadAvecUneDescriptionTropLongue: CreateDemarchePayload = {
-          ...payload,
-          description: description255caracteres
-        }
-        createDemarcheCommandHandler.execute.resolves(success(demarche))
-
-        // When
-        await request(app.getHttpServer())
-          .post(`/jeunes/${idJeune}/demarches`)
-          .set('authorization', unHeaderAuthorization())
-          .send(payloadAvecUneDescriptionTropLongue)
-          // Then
-          .expect(HttpStatus.CREATED)
-
-        expect(
-          createDemarcheCommandHandler.execute
-        ).to.have.been.calledWithExactly(
-          {
-            idJeune,
-            accessToken: 'coucou',
-            description: description200caracteres,
-            dateFin: payloadAvecUneDescriptionTropLongue.dateFin
-          },
-          unUtilisateurDecode()
-        )
-      })
     })
     describe("quand c'est en échec", () => {
       it('renvoie une erreur HTTP', async () => {
