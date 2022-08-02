@@ -11,11 +11,13 @@ import { FavoriOffreImmersionSqlModel } from '../../infrastructure/sequelize/mod
 import { FavoriOffreEngagementSqlModel } from '../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import { Authentification } from '../../domain/authentification'
 import { ConseillerForJeuneAvecPartageAuthorizer } from '../authorizers/authorize-conseiller-for-jeune-avec-partage'
+import { Injectable } from '@nestjs/common'
 
 interface GetFavorisJeunePourConseillerQuery {
   idJeune: string
 }
 
+@Injectable()
 export class GetFavorisJeunePourConseillerQueryHandler extends QueryHandler<
   GetFavorisJeunePourConseillerQuery,
   FavorisQueryModel[]
