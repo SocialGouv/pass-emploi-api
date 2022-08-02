@@ -1,0 +1,160 @@
+import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { failure, Result, success } from '../../building-blocks/types/result'
+import { FavoriOffreImmersionSqlModel } from '../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
+import { FavoriOffreEngagementSqlModel } from '../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
+import { FavoriOffreEmploiSqlModel } from '../../infrastructure/sequelize/models/favori-offre-emploi.sql-model'
+import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
+import { Authentification } from '../../domain/authentification'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
+import { Injectable } from '@nestjs/common'
+import { RechercheSqlModel } from '../../infrastructure/sequelize/models/recherche.sql-model'
+import { Recherche } from '../../domain/recherche'
+import { Op } from 'sequelize'
+
+export interface GetMetadonneesFavorisJeuneQuery {
+  idJeune: string
+}
+
+interface MetadonneesFavorisOffresJeuneQueryModel {
+  total: number
+  nombreOffresImmersion: number
+  nombreOffresServiceCivique: number
+  nombreOffresAlternance: number
+  nombreOffresEmploi: number
+}
+
+interface MetadonneesFavorisRecherchesJeuneQueryModel {
+  total: number
+  nombreRecherchesOffresImmersion: number
+  nombreRecherchesOffresServiceCivique: number
+  nombreRecherchesOffresAlternance: number
+  nombreRecherchesOffresEmploi: number
+}
+
+export interface MetadonneesFavorisJeuneQueryModel {
+  favoris: {
+    autoriseLePartage: boolean
+    offres: MetadonneesFavorisOffresJeuneQueryModel
+    recherches: MetadonneesFavorisRecherchesJeuneQueryModel
+  }
+}
+
+@Injectable()
+export class GetMetadonneesFavorisJeuneQueryHandler extends QueryHandler<
+  GetMetadonneesFavorisJeuneQuery,
+  Result<MetadonneesFavorisJeuneQueryModel>
+> {
+  constructor(
+    private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer
+  ) {
+    super('GetMetadonneesFavorisJeuneQueryHandler')
+  }
+
+  async authorize(
+    query: GetMetadonneesFavorisJeuneQuery,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<Result> {
+    return this.conseillerForJeuneAuthorizer.authorize(
+      query.idJeune,
+      utilisateur
+    )
+  }
+
+  async handle(
+    query: GetMetadonneesFavorisJeuneQuery
+  ): Promise<Result<MetadonneesFavorisJeuneQueryModel>> {
+    const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune)
+
+    if (!jeuneSqlModel) {
+      return failure(new NonTrouveError('Jeune', query.idJeune))
+    }
+
+    const [
+      nombreOffresEmplois,
+      nombreOffresAlternance,
+      nombreOffresImmersions,
+      nombreOffresServiceCivique,
+      nombreRecherchesOffresEmplois,
+      nombreRecherchesOffresAlternance,
+      nombreRecherchesOffresImmersions,
+      nombreRecherchesOffresServiceCivique
+    ] = await Promise.all([
+      FavoriOffreEmploiSqlModel.count({
+        where: {
+          idJeune: query.idJeune,
+          isAlternance: {
+            [Op.not]: true
+          }
+        }
+      }),
+      FavoriOffreEmploiSqlModel.count({
+        where: {
+          idJeune: query.idJeune,
+          isAlternance: true
+        }
+      }),
+      FavoriOffreImmersionSqlModel.count({
+        where: {
+          idJeune: query.idJeune
+        }
+      }),
+      FavoriOffreEngagementSqlModel.count({
+        where: {
+          idJeune: query.idJeune
+        }
+      }),
+      RechercheSqlModel.count({
+        where: { idJeune: query.idJeune, type: Recherche.Type.OFFRES_EMPLOI }
+      }),
+      RechercheSqlModel.count({
+        where: {
+          idJeune: query.idJeune,
+          type: Recherche.Type.OFFRES_ALTERNANCE
+        }
+      }),
+      RechercheSqlModel.count({
+        where: { idJeune: query.idJeune, type: Recherche.Type.OFFRES_IMMERSION }
+      }),
+      RechercheSqlModel.count({
+        where: {
+          idJeune: query.idJeune,
+          type: Recherche.Type.OFFRES_SERVICES_CIVIQUE
+        }
+      })
+    ])
+
+    return success({
+      favoris: {
+        autoriseLePartage: jeuneSqlModel.partageFavoris,
+        offres: {
+          total:
+            nombreOffresEmplois +
+            nombreOffresAlternance +
+            nombreOffresImmersions +
+            nombreOffresServiceCivique,
+          nombreOffresEmploi: nombreOffresEmplois,
+          nombreOffresAlternance: nombreOffresAlternance,
+          nombreOffresImmersion: nombreOffresImmersions,
+          nombreOffresServiceCivique: nombreOffresServiceCivique
+        },
+        recherches: {
+          total:
+            nombreRecherchesOffresEmplois +
+            nombreRecherchesOffresAlternance +
+            nombreRecherchesOffresImmersions +
+            nombreRecherchesOffresServiceCivique,
+          nombreRecherchesOffresEmploi: nombreRecherchesOffresEmplois,
+          nombreRecherchesOffresAlternance: nombreRecherchesOffresAlternance,
+          nombreRecherchesOffresImmersion: nombreRecherchesOffresImmersions,
+          nombreRecherchesOffresServiceCivique:
+            nombreRecherchesOffresServiceCivique
+        }
+      }
+    })
+  }
+
+  async monitor(): Promise<void> {
+    return
+  }
+}

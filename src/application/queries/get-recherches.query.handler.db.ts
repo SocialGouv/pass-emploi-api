@@ -7,6 +7,7 @@ import { RechercheQueryModel } from './query-models/recherches.query-model'
 import { FindOptions } from 'sequelize'
 import { RechercheSqlModel } from '../../infrastructure/sequelize/models/recherche.sql-model'
 import { Result } from 'src/building-blocks/types/result'
+import { ConseillerForJeuneAvecPartageAuthorizer } from '../authorizers/authorize-conseiller-for-jeune-avec-partage'
 
 export interface GetRecherchesQuery extends Query {
   idJeune: string
@@ -18,7 +19,10 @@ export class GetRecherchesQueryHandler extends QueryHandler<
   GetRecherchesQuery,
   RechercheQueryModel[]
 > {
-  constructor(private jeuneAuthorizer: JeuneAuthorizer) {
+  constructor(
+    private conseillerForJeuneAvecPartageAuthorizer: ConseillerForJeuneAvecPartageAuthorizer,
+    private jeuneAuthorizer: JeuneAuthorizer
+  ) {
     super('GetRecherchesQueryHandler')
   }
 
@@ -43,7 +47,14 @@ export class GetRecherchesQueryHandler extends QueryHandler<
     query: GetRecherchesQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      return this.conseillerForJeuneAvecPartageAuthorizer.authorize(
+        query.idJeune,
+        utilisateur
+      )
+    } else {
+      return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    }
   }
 
   async monitor(): Promise<void> {

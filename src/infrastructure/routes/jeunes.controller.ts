@@ -46,6 +46,7 @@ import {
 } from 'src/application/queries/query-models/jeunes.query-model'
 import { RendezVousJeuneQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
 import { Core } from 'src/domain/core'
+import { DateService } from 'src/utils/date-service'
 import {
   CreateActionCommand,
   CreateActionCommandHandler
@@ -56,6 +57,7 @@ import {
   UpdateStatutDemarcheCommandHandler
 } from '../../application/commands/update-demarche.command.handler'
 import { UpdateNotificationTokenCommandHandler } from '../../application/commands/update-notification-token.command.handler'
+import { UpdateJeunePreferencesCommandHandler } from '../../application/commands/update-preferences-jeune.command.handler'
 import {
   GetActionsByJeuneQuery,
   GetActionsByJeuneQueryHandler
@@ -64,6 +66,10 @@ import { GetConseillersJeuneQueryHandler } from '../../application/queries/get-c
 import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
 import { GetJeuneHomeActionsQueryHandler } from '../../application/queries/get-jeune-home-actions.query.handler'
 import { GetJeuneHomeDemarchesQueryHandler } from '../../application/queries/get-jeune-home-demarches.query.handler'
+import {
+  GetPreferencesJeuneQuery,
+  GetPreferencesJeuneQueryHandler
+} from '../../application/queries/get-preferences-jeune.handler.db'
 import { GetRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler.db'
 import {
   ActionQueryModel,
@@ -74,7 +80,7 @@ import { Action } from '../../domain/action'
 import { Authentification } from '../../domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
-import { CreateActionAvecStatutPayload } from './validation/conseillers.inputs'
+import { CreateActionParLeJeunePayload } from './validation/actions.inputs'
 import {
   CreateDemarchePayload,
   UpdateStatutDemarchePayload
@@ -87,17 +93,13 @@ import {
   TransfererConseillerPayload,
   UpdateJeunePreferencesPayload
 } from './validation/jeunes.inputs'
-import { UpdateJeunePreferencesCommandHandler } from '../../application/commands/update-preferences-jeune.command.handler'
-import {
-  GetPreferencesJeuneQuery,
-  GetPreferencesJeuneQueryHandler
-} from '../../application/queries/get-preferences-jeune.handler.db'
 
 @Controller('jeunes')
 @ApiOAuth2([])
 @ApiTags('Jeunes')
 export class JeunesController {
   constructor(
+    private readonly dateService: DateService,
     private readonly getDetailJeuneQueryHandler: GetDetailJeuneQueryHandler,
     private readonly updateNotificationTokenCommandHandler: UpdateNotificationTokenCommandHandler,
     private readonly getHomeJeuneHandler: GetHomeJeuneHandler,
@@ -324,14 +326,8 @@ export class JeunesController {
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
   ): Promise<DemarcheQueryModel> {
-    let description = createDemarchePayload.description
-    if (description && description?.length > 200) {
-      description = description?.substring(0, 199)
-    }
-
     const command: CreateDemarcheCommand = {
       ...createDemarchePayload,
-      description,
       idJeune,
       accessToken
     }
@@ -413,7 +409,7 @@ export class JeunesController {
   @Post(':idJeune/action')
   async postNouvelleAction(
     @Param('idJeune') idJeune: string,
-    @Body() createActionPayload: CreateActionAvecStatutPayload,
+    @Body() createActionPayload: CreateActionParLeJeunePayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<Core.Id> {
     const command: CreateActionCommand = {
@@ -422,7 +418,11 @@ export class JeunesController {
       idCreateur: idJeune,
       typeCreateur: Action.TypeCreateur.JEUNE,
       commentaire: createActionPayload.comment,
-      statut: createActionPayload.status
+      statut: createActionPayload.status,
+      dateEcheance:
+        createActionPayload.dateEcheance ??
+        this.buildDateEcheanceV1(createActionPayload.status),
+      rappel: createActionPayload.rappel
     }
     const result = await this.createActionCommandHandler.execute(
       command,
@@ -552,5 +552,17 @@ export class JeunesController {
     }
 
     throw handleFailure(result)
+  }
+
+  private buildDateEcheanceV1(statutAction?: Action.Statut): Date {
+    const statutsDone = [Action.Statut.ANNULEE, Action.Statut.TERMINEE]
+
+    const now = this.dateService.now().set({ second: 59, millisecond: 0 })
+    const nowJs = now.toJSDate()
+
+    if (statutAction && statutsDone.includes(statutAction)) {
+      return nowJs
+    }
+    return now.plus({ months: 3 }).toJSDate()
   }
 }

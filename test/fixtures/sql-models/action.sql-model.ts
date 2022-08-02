@@ -22,7 +22,8 @@ export function uneActionDto(
     },
     estVisibleParConseiller: true,
     statut: Action.Statut.PAS_COMMENCEE,
-    dateLimite: null
+    dateEcheance: new Date('2021-11-11T08:03:30.000Z'),
+    rappel: true
   }
 
   return { ...defaults, ...args }

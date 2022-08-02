@@ -166,6 +166,8 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
   trier: Record<Action.Tri, Order> = {
     date_croissante: [['date_creation', 'ASC']],
     date_decroissante: [['date_creation', 'DESC']],
+    date_echeance_croissante: [['date_echeance', 'ASC']],
+    date_echeance_decroissante: [['date_echeance', 'DESC']],
     statut: [
       this.sequelize.literal(
         `CASE WHEN statut = '${Action.Statut.TERMINEE}' THEN 1 ELSE 0 END`

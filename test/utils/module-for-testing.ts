@@ -6,6 +6,7 @@ import { TerminusModule } from '@nestjs/terminus'
 import { Test, TestingModuleBuilder } from '@nestjs/testing'
 import { messaging } from 'firebase-admin'
 import { JWTPayload } from 'jose'
+import { DateService } from 'src/utils/date-service'
 import {
   buildModuleMetadata,
   buildQueryCommandsProviders
@@ -119,6 +120,10 @@ const stubProviders = (): Provider[] => {
     {
       provide: ConfigService,
       useValue: testConfig()
+    },
+    {
+      provide: DateService,
+      useClass: DateService
     }
   ]
   const queryCommandsProviders = buildQueryCommandsProviders().map(

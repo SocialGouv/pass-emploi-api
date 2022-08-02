@@ -17,6 +17,8 @@ export interface Action {
   dateDerniereActualisation: Date
   idJeune: Jeune.Id
   createur: Action.Createur
+  dateEcheance: Date
+  rappel: boolean
 }
 
 export namespace Action {
@@ -54,6 +56,8 @@ export namespace Action {
   export enum Tri {
     DATE_CROISSANTE = 'date_croissante',
     DATE_DECROISSANTE = 'date_decroissante',
+    DATE_ECHEANCE_CROISSANTE = 'date_echeance_croissante',
+    DATE_ECHEANCE_DECROISSANTE = 'date_echeance_decroissante',
     STATUT = 'statut'
   }
 
@@ -81,6 +85,8 @@ export namespace Action {
         statut?: Action.Statut
         commentaire?: string
         typeCreateur: Action.TypeCreateur
+        dateEcheance: Date
+        rappel?: boolean
       },
       jeune: Jeune
     ): Result<Action> {
@@ -109,10 +115,12 @@ export namespace Action {
         contenu: data.contenu,
         commentaire: data.commentaire ?? '',
         idJeune: data.idJeune,
-        statut: statut,
+        statut,
         createur,
         dateCreation: now,
-        dateDerniereActualisation: now
+        dateDerniereActualisation: now,
+        rappel: data.rappel === undefined ? true : data.rappel,
+        dateEcheance: data.dateEcheance
       }
       return success(action)
     }

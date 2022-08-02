@@ -16,7 +16,9 @@ export const uneAction = (args: Partial<Action> = {}): Action => {
       type: Action.TypeCreateur.CONSEILLER,
       prenom: 'Nils',
       nom: 'Tavernier'
-    }
+    },
+    dateEcheance: new Date('2020-02-02'),
+    rappel: true
   }
 
   return { ...defaults, ...args }

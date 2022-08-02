@@ -59,7 +59,9 @@ export class ActionSqlRepository implements Action.Repository {
         nom: sqlModel.createur.nom,
         prenom: sqlModel.createur.prenom,
         type: sqlModel.typeCreateur
-      }
+      },
+      dateEcheance: sqlModel.dateEcheance,
+      rappel: sqlModel.rappel
     }
   }
 
@@ -80,7 +82,8 @@ export class ActionSqlRepository implements Action.Repository {
       },
       typeCreateur: action.createur.type,
       estVisibleParConseiller: true,
-      dateLimite: null
+      dateEcheance: action.dateEcheance,
+      rappel: action.rappel
     }
   }
 }

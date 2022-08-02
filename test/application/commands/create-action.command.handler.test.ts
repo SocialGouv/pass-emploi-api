@@ -1,5 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
+import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { EvenementService } from 'src/domain/evenement'
 import { stubClassSandbox } from 'test/utils/types'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
@@ -8,7 +9,7 @@ import {
   CreateActionCommand,
   CreateActionCommandHandler
 } from '../../../src/application/commands/create-action.command.handler'
-import { success } from '../../../src/building-blocks/types/result'
+import { failure, success } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action'
 import { Authentification } from '../../../src/domain/authentification'
 import { Jeune } from '../../../src/domain/jeune'
@@ -31,14 +32,14 @@ describe('CreateActionCommandHandler', () => {
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let createActionCommandHandler: CreateActionCommandHandler
   let evenementService: StubbedClass<EvenementService>
+  let jeuneRepository: StubbedType<Jeune.Repository>
 
   beforeEach(async () => {
     action = uneAction()
     jeune = unJeune()
     const sandbox: SinonSandbox = createSandbox()
     actionRepository = stubInterface(sandbox)
-    const jeuneRepository: StubbedType<Jeune.Repository> =
-      stubInterface(sandbox)
+    jeuneRepository = stubInterface(sandbox)
     notificationService = stubClassSandbox(Notification.Service, sandbox)
     notificationService.notifierNouvelleAction.resolves()
     jeuneRepository.get.withArgs(action.idJeune).resolves(jeune)
@@ -58,6 +59,28 @@ describe('CreateActionCommandHandler', () => {
     )
   })
   describe('handle', () => {
+    it("renvoie une failure quand le jeune n'est pas trouvé", async () => {
+      // Given
+      jeuneRepository.get.withArgs(action.idJeune).resolves(undefined)
+
+      const command: CreateActionCommand = {
+        idJeune: action.idJeune,
+        contenu: action.contenu,
+        idCreateur: action.id,
+        typeCreateur: Action.TypeCreateur.JEUNE,
+        statut: action.statut,
+        commentaire: action.commentaire,
+        dateEcheance: action.dateEcheance
+      }
+
+      // When
+      const result = await createActionCommandHandler.handle(command)
+
+      // Then
+      expect(result).to.deep.equal(
+        failure(new NonTrouveError('Jeune', command.idJeune))
+      )
+    })
     describe("quand c'est un jeune", () => {
       it("crée une action et n'envoie pas de notification", async () => {
         // Given
@@ -68,7 +91,8 @@ describe('CreateActionCommandHandler', () => {
           idCreateur: action.id,
           typeCreateur: Action.TypeCreateur.JEUNE,
           statut: action.statut,
-          commentaire: action.commentaire
+          commentaire: action.commentaire,
+          dateEcheance: action.dateEcheance
         }
 
         // When
@@ -90,7 +114,8 @@ describe('CreateActionCommandHandler', () => {
           idCreateur: action.id,
           typeCreateur: Action.TypeCreateur.CONSEILLER,
           statut: action.statut,
-          commentaire: action.commentaire
+          commentaire: action.commentaire,
+          dateEcheance: action.dateEcheance
         }
 
         // When
@@ -116,7 +141,8 @@ describe('CreateActionCommandHandler', () => {
           idCreateur: action.id,
           typeCreateur: Action.TypeCreateur.JEUNE,
           statut: action.statut,
-          commentaire: action.commentaire
+          commentaire: action.commentaire,
+          dateEcheance: action.dateEcheance
         }
 
         const utilisateur: Authentification.Utilisateur = unUtilisateurJeune()
@@ -143,7 +169,8 @@ describe('CreateActionCommandHandler', () => {
           idCreateur: utilisateur.id,
           typeCreateur: Action.TypeCreateur.CONSEILLER,
           statut: action.statut,
-          commentaire: action.commentaire
+          commentaire: action.commentaire,
+          dateEcheance: action.dateEcheance
         }
 
         // When

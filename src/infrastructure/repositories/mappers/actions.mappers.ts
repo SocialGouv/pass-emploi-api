@@ -28,7 +28,8 @@ export function fromSqlToActionQueryModel(
     lastUpdate: DateTime.fromJSDate(actionSqlModel.dateDerniereActualisation)
       .toUTC()
       .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
-    status: actionSqlModel.statut
+    status: actionSqlModel.statut,
+    dateEcheance: actionSqlModel.dateEcheance.toISOString()
   }
 }
 

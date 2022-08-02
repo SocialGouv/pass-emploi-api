@@ -9,6 +9,7 @@ import { ArchiveJeune } from 'src/domain/archive-jeune'
 import { Core } from 'src/domain/core'
 import { Demarche } from 'src/domain/demarche'
 import { RendezVous } from 'src/domain/rendez-vous'
+import { CreateActionParLeJeunePayload } from 'src/infrastructure/routes/validation/actions.inputs'
 import {
   CreateDemarchePayload,
   UpdateStatutDemarchePayload
@@ -18,11 +19,13 @@ import {
   TransfererConseillerPayload,
   UpdateJeunePreferencesPayload
 } from 'src/infrastructure/routes/validation/jeunes.inputs'
+import { DateService } from 'src/utils/date-service'
 import * as request from 'supertest'
-import { uneDate } from 'test/fixtures/date.fixture'
+import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
 import { uneDemarche } from 'test/fixtures/demarche.fixture'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
 import { DeleteJeuneInactifCommandHandler } from '../../../src/application/commands/delete-jeune-inactif.command.handler'
+import { UpdateJeunePreferencesCommandHandler } from '../../../src/application/commands/update-preferences-jeune.command.handler'
 import {
   ActionsByJeuneOutput,
   GetActionsByJeuneQueryHandler
@@ -32,6 +35,7 @@ import { GetConseillersJeuneQueryHandler } from '../../../src/application/querie
 import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler.db'
 import { GetJeuneHomeActionsQueryHandler } from '../../../src/application/queries/get-jeune-home-actions.query.handler'
 import { GetJeuneHomeDemarchesQueryHandler } from '../../../src/application/queries/get-jeune-home-demarches.query.handler'
+import { GetPreferencesJeuneQueryHandler } from '../../../src/application/queries/get-preferences-jeune.handler.db'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune.query.handler.db'
 import {
@@ -55,7 +59,6 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action'
 import { JwtService } from '../../../src/infrastructure/auth/jwt.service'
-import { CreateActionAvecStatutPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
 import {
   unHeaderAuthorization,
   unJwtPayloadValide,
@@ -70,8 +73,6 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { UpdateJeunePreferencesCommandHandler } from '../../../src/application/commands/update-preferences-jeune.command.handler'
-import { GetPreferencesJeuneQueryHandler } from '../../../src/application/queries/get-preferences-jeune.handler.db'
 import StatutInvalide = Action.StatutInvalide
 
 describe('JeunesController', () => {
@@ -95,6 +96,9 @@ describe('JeunesController', () => {
   let getPreferencesJeuneQueryHandler: StubbedClass<GetPreferencesJeuneQueryHandler>
   let jwtService: StubbedClass<JwtService>
   let app: INestApplication
+
+  let dateService: StubbedClass<DateService>
+  const now = uneDatetime.set({ second: 59, millisecond: 0 })
 
   before(async () => {
     createActionCommandHandler = stubClass(CreateActionCommandHandler)
@@ -134,6 +138,9 @@ describe('JeunesController', () => {
     )
 
     getPreferencesJeuneQueryHandler = stubClass(GetPreferencesJeuneQueryHandler)
+
+    dateService = stubClass(DateService)
+    dateService.now.returns(now)
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateActionCommandHandler)
@@ -176,6 +183,8 @@ describe('JeunesController', () => {
       .useValue(getPreferencesJeuneQueryHandler)
       .overrideProvider(JwtService)
       .useValue(jwtService)
+      .overrideProvider(DateService)
+      .useValue(dateService)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -279,12 +288,14 @@ describe('JeunesController', () => {
   })
 
   describe('POST /jeunes/:idJeune/action', () => {
-    const actionPayload: CreateActionAvecStatutPayload = {
+    const nowJsPlus3Mois = now.plus({ months: 3 }).toJSDate()
+
+    const actionPayload: CreateActionParLeJeunePayload = {
       content: "Ceci est un contenu d'action",
       comment: 'Ceci est un commentaire',
       status: Action.Statut.EN_COURS
     }
-    it("renvoie l'id de l'action créée", async () => {
+    it("renvoie l'id de l'action créée avec echeance par defaut", async () => {
       // Given
       const idAction = 'a40a178e-9562-416f-ad9d-42dfbc663a8a'
       createActionCommandHandler.execute.resolves(success(idAction))
@@ -305,7 +316,105 @@ describe('JeunesController', () => {
           idCreateur: 'ABCDE',
           typeCreateur: Action.TypeCreateur.JEUNE,
           statut: Action.Statut.EN_COURS,
-          commentaire: 'Ceci est un commentaire'
+          commentaire: 'Ceci est un commentaire',
+          dateEcheance: nowJsPlus3Mois,
+          rappel: undefined
+        },
+        unUtilisateurDecode()
+      )
+    })
+    it("renvoie l'id de l'action créée avec echeance par defaut sans statut", async () => {
+      // Given
+      const idAction = 'a40a178e-9562-416f-ad9d-42dfbc663a8a'
+      createActionCommandHandler.execute.resolves(success(idAction))
+
+      // When
+      await request(app.getHttpServer())
+        .post('/jeunes/ABCDE/action')
+        .set('authorization', unHeaderAuthorization())
+        .send({
+          content: "Ceci est un contenu d'action",
+          comment: 'Ceci est un commentaire'
+        })
+
+        // Then
+        .expect(HttpStatus.CREATED)
+        .expect({ id: idAction })
+      expect(createActionCommandHandler.execute).to.have.been.calledWithExactly(
+        {
+          idJeune: 'ABCDE',
+          contenu: "Ceci est un contenu d'action",
+          idCreateur: 'ABCDE',
+          typeCreateur: Action.TypeCreateur.JEUNE,
+          statut: Action.Statut.EN_COURS,
+          commentaire: 'Ceci est un commentaire',
+          dateEcheance: nowJsPlus3Mois,
+          rappel: undefined
+        },
+        unUtilisateurDecode()
+      )
+    })
+    it("renvoie l'id de l'action créée avec echeance par defaut et statut done", async () => {
+      // Given
+      const idAction = 'a40a178e-9562-416f-ad9d-42dfbc663a8a'
+      createActionCommandHandler.execute.resolves(success(idAction))
+
+      // When
+      await request(app.getHttpServer())
+        .post('/jeunes/ABCDE/action')
+        .set('authorization', unHeaderAuthorization())
+        .send({
+          content: "Ceci est un contenu d'action",
+          comment: 'Ceci est un commentaire',
+          status: Action.Statut.TERMINEE
+        })
+
+        // Then
+        .expect(HttpStatus.CREATED)
+        .expect({ id: idAction })
+      expect(createActionCommandHandler.execute).to.have.been.calledWithExactly(
+        {
+          idJeune: 'ABCDE',
+          contenu: "Ceci est un contenu d'action",
+          idCreateur: 'ABCDE',
+          typeCreateur: Action.TypeCreateur.JEUNE,
+          statut: Action.Statut.TERMINEE,
+          commentaire: 'Ceci est un commentaire',
+          dateEcheance: now.toJSDate(),
+          rappel: undefined
+        },
+        unUtilisateurDecode()
+      )
+    })
+    it("renvoie l'id de l'action créée avec echeance et rappel", async () => {
+      // Given
+      const payloadAvecEcheance: CreateActionParLeJeunePayload = {
+        ...actionPayload,
+        dateEcheance: uneDate(),
+        rappel: false
+      }
+      const idAction = 'a40a178e-9562-416f-ad9d-42dfbc663a8a'
+      createActionCommandHandler.execute.resolves(success(idAction))
+
+      // When
+      await request(app.getHttpServer())
+        .post('/jeunes/ABCDE/action')
+        .set('authorization', unHeaderAuthorization())
+        .send(payloadAvecEcheance)
+
+        // Then
+        .expect(HttpStatus.CREATED)
+        .expect({ id: idAction })
+      expect(createActionCommandHandler.execute).to.have.been.calledWithExactly(
+        {
+          idJeune: 'ABCDE',
+          contenu: "Ceci est un contenu d'action",
+          idCreateur: 'ABCDE',
+          typeCreateur: Action.TypeCreateur.JEUNE,
+          statut: Action.Statut.EN_COURS,
+          commentaire: 'Ceci est un commentaire',
+          dateEcheance: uneDate(),
+          rappel: false
         },
         unUtilisateurDecode()
       )
@@ -339,7 +448,7 @@ describe('JeunesController', () => {
     })
 
     it('renvoie une 400 (Bad Request) quand le statut est égal à "annulée"', async () => {
-      const actionPayloadWithCanceledStatus: CreateActionAvecStatutPayload = {
+      const actionPayloadWithCanceledStatus: CreateActionParLeJeunePayload = {
         content: "Ceci est un contenu d'action",
         comment: 'Ceci est un commentaire',
         status: Action.Statut.ANNULEE
@@ -975,38 +1084,6 @@ describe('JeunesController', () => {
           .send(payload)
           // Then
           .expect(HttpStatus.CREATED)
-      })
-      it('limite la taille de la description à 200 caracteres', async () => {
-        // Given
-        const description255caracteres =
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mauris ante, aliquet dapibus tempus eget, volutpat sed nisi. Donec non feugiat sem, vel cursus dui. Suspendisse vitae felis enim. Nam semper pharetra turpis, non hendrerit enim integer.'
-        const description200caracteres =
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mauris ante, aliquet dapibus tempus eget, volutpat sed nisi. Donec non feugiat sem, vel cursus dui. Suspendisse vitae felis enim.'
-        const payloadAvecUneDescriptionTropLongue: CreateDemarchePayload = {
-          ...payload,
-          description: description255caracteres
-        }
-        createDemarcheCommandHandler.execute.resolves(success(demarche))
-
-        // When
-        await request(app.getHttpServer())
-          .post(`/jeunes/${idJeune}/demarches`)
-          .set('authorization', unHeaderAuthorization())
-          .send(payloadAvecUneDescriptionTropLongue)
-          // Then
-          .expect(HttpStatus.CREATED)
-
-        expect(
-          createDemarcheCommandHandler.execute
-        ).to.have.been.calledWithExactly(
-          {
-            idJeune,
-            accessToken: 'coucou',
-            description: description200caracteres,
-            dateFin: payloadAvecUneDescriptionTropLongue.dateFin
-          },
-          unUtilisateurDecode()
-        )
       })
     })
     describe("quand c'est en échec", () => {

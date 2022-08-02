@@ -5,18 +5,27 @@ import {
   CreerSuperviseursCommandHandler
 } from 'src/application/commands/creer-superviseurs.command.handler'
 import { DeleteSuperviseursCommandHandler } from 'src/application/commands/delete-superviseurs.command.handler'
+import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
+import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { GetAllRendezVousConseillerQueryHandler } from 'src/application/queries/get-rendez-vous-conseiller.query.handler.db'
 import { Action } from 'src/domain/action'
 import { CodeTypeRendezVous } from 'src/domain/rendez-vous'
+import { CreateActionPayload } from 'src/infrastructure/routes/validation/actions.inputs'
 import { CreateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
+import { DateService } from 'src/utils/date-service'
 import * as request from 'supertest'
-import { uneDatetime } from 'test/fixtures/date.fixture'
+import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
 import { unRendezVousConseillerFutursEtPassesQueryModel } from 'test/fixtures/rendez-vous.fixture'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
 import {
   CreerJeuneMiloCommand,
   CreerJeuneMiloCommandHandler
 } from '../../../src/application/commands/creer-jeune-milo.command.handler'
+import {
+  ModifierConseillerCommand,
+  ModifierConseillerCommandHandler
+} from '../../../src/application/commands/modifier-conseiller.command.handler'
+import { SendNotificationsNouveauxMessagesCommandHandler } from '../../../src/application/commands/send-notifications-nouveaux-messages.command.handler'
 import { GetConseillerByEmailQueryHandler } from '../../../src/application/queries/get-conseiller-by-email.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
 import { GetJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-jeunes-by-conseiller.query.handler.db'
@@ -34,14 +43,13 @@ import {
   success
 } from '../../../src/building-blocks/types/result'
 import { Core } from '../../../src/domain/core'
-import {
-  CreateActionPayload,
-  EnvoyerNotificationsPayload
-} from '../../../src/infrastructure/routes/validation/conseillers.inputs'
+import { EnvoyerNotificationsPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
+import { uneAgence } from '../../fixtures/agence.fixture'
 import {
   unHeaderAuthorization,
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unDossierMilo } from '../../fixtures/milo.fixture'
 import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
@@ -52,15 +60,7 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { SendNotificationsNouveauxMessagesCommandHandler } from '../../../src/application/commands/send-notifications-nouveaux-messages.command.handler'
-import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler.db'
-import {
-  ModifierConseillerCommand,
-  ModifierConseillerCommandHandler
-} from '../../../src/application/commands/modifier-conseiller.command.handler'
-import { uneAgence } from '../../fixtures/agence.fixture'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
+import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 
 describe('ConseillersController', () => {
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
@@ -76,7 +76,11 @@ describe('ConseillersController', () => {
   let deleteSuperviseursCommandHandler: StubbedClass<DeleteSuperviseursCommandHandler>
   let modifierConseillerCommandHandler: StubbedClass<ModifierConseillerCommandHandler>
   let recupererJeunesDuConseillerCommandHandler: StubbedClass<RecupererJeunesDuConseillerCommandHandler>
+  let getMetadonneesFavorisJeuneQueryHandler: StubbedClass<GetMetadonneesFavorisJeuneQueryHandler>
   let app: INestApplication
+
+  let dateService: StubbedClass<DateService>
+  const now = uneDatetime.set({ second: 59, millisecond: 0 })
 
   before(async () => {
     getConseillerByEmailQueryHandler = stubClass(
@@ -108,6 +112,12 @@ describe('ConseillersController', () => {
     recupererJeunesDuConseillerCommandHandler = stubClass(
       RecupererJeunesDuConseillerCommandHandler
     )
+    getMetadonneesFavorisJeuneQueryHandler = stubClass(
+      GetMetadonneesFavorisJeuneQueryHandler
+    )
+
+    dateService = stubClass(DateService)
+    dateService.now.returns(now)
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(GetConseillerByEmailQueryHandler)
@@ -136,6 +146,10 @@ describe('ConseillersController', () => {
       .useValue(modifierConseillerCommandHandler)
       .overrideProvider(RecupererJeunesDuConseillerCommandHandler)
       .useValue(recupererJeunesDuConseillerCommandHandler)
+      .overrideProvider(GetMetadonneesFavorisJeuneQueryHandler)
+      .useValue(getMetadonneesFavorisJeuneQueryHandler)
+      .overrideProvider(DateService)
+      .useValue(dateService)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -258,8 +272,50 @@ describe('ConseillersController', () => {
     ensureUserAuthenticationFailsIfInvalid('get', '/conseillers/1/jeunes')
   })
 
+  describe('GET /conseillers/:idConseiller/jeunes/:idJeune/metadonnees', () => {
+    it('renvoie les metadonnées du jeune', async () => {
+      // Given
+      const idConseiller = 'poi-id-conseiller'
+      const idJeune = 'poi-id-jeune'
+
+      const expectedResponse = {
+        favoris: {
+          autoriseLePartage: true,
+          offres: {
+            total: 0,
+            nombreOffresAlternance: 0,
+            nombreOffresEmploi: 0,
+            nombreOffresImmersion: 0,
+            nombreOffresServiceCivique: 0
+          },
+          recherches: {
+            total: 0,
+            nombreRecherchesOffresAlternance: 0,
+            nombreRecherchesOffresEmploi: 0,
+            nombreRecherchesOffresImmersion: 0,
+            nombreRecherchesOffresServiceCivique: 0
+          }
+        }
+      }
+      getMetadonneesFavorisJeuneQueryHandler.execute.resolves(
+        success(expectedResponse)
+      )
+
+      // When- Then
+      await request(app.getHttpServer())
+        .get(
+          '/conseillers/' + idConseiller + '/jeunes/' + idJeune + '/metadonnees'
+        )
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect(expectedResponse)
+    })
+  })
+
   describe('POST /conseillers/:idConseiller/jeunes/:idJeune/action', () => {
-    it("renvoie l'id de l'action créée", async () => {
+    const nowJsPlus3Mois = now.plus({ months: 3 }).toJSDate()
+
+    it("renvoie l'id de l'action créée sans dateEcheance", async () => {
       // Given
       const actionPayload: CreateActionPayload = {
         content: "Ceci est un contenu d'action",
@@ -282,7 +338,38 @@ describe('ConseillersController', () => {
           contenu: "Ceci est un contenu d'action",
           idCreateur: '1',
           typeCreateur: Action.TypeCreateur.CONSEILLER,
-          commentaire: 'Ceci est un commentaire'
+          commentaire: 'Ceci est un commentaire',
+          dateEcheance: nowJsPlus3Mois
+        },
+        unUtilisateurDecode()
+      )
+    })
+    it("renvoie l'id de l'action créée avec dateEcheance", async () => {
+      // Given
+      const actionPayload: CreateActionPayload = {
+        content: "Ceci est un contenu d'action",
+        comment: 'Ceci est un commentaire',
+        dateEcheance: uneDate()
+      }
+      const idAction = '15916d7e-f13a-4158-b7eb-3936aa937a0a'
+      createActionCommandHandler.execute.resolves(success(idAction))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post('/conseillers/1/jeunes/ABCDE/action')
+        .set('authorization', unHeaderAuthorization())
+        .send(actionPayload)
+        .expect(HttpStatus.CREATED)
+        .expect({ id: idAction })
+
+      expect(createActionCommandHandler.execute).to.have.been.calledWithExactly(
+        {
+          idJeune: 'ABCDE',
+          contenu: "Ceci est un contenu d'action",
+          idCreateur: '1',
+          typeCreateur: Action.TypeCreateur.CONSEILLER,
+          commentaire: 'Ceci est un commentaire',
+          dateEcheance: uneDate()
         },
         unUtilisateurDecode()
       )
