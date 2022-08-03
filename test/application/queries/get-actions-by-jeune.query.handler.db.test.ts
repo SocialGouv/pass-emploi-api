@@ -12,7 +12,7 @@ import {
 import { Action } from '../../../src/domain/action'
 import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository.db'
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
-import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository.db'
+import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
 import { DateService } from '../../../src/utils/date-service'
 import { IdService } from '../../../src/utils/id-service'
 import {

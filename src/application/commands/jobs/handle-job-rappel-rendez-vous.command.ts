@@ -50,11 +50,11 @@ export class HandleJobRappelRendezVousCommandHandler extends CommandHandler<
     if (rendezVous) {
       await Promise.all(
         rendezVous.jeunes.map(async jeune => {
-          if (!jeune.pushNotificationToken) {
+          if (!jeune?.configuration?.pushNotificationToken) {
             stats.push({ idJeune: jeune.id, notificationEnvoyee: false })
           } else {
             const notification = Notification.creerNotificationRappelRdv(
-              jeune.pushNotificationToken,
+              jeune.configuration.pushNotificationToken,
               command.job.contenu.idRendezVous,
               DateTime.fromJSDate(rendezVous.date),
               this.dateService

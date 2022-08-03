@@ -3,7 +3,7 @@ import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 

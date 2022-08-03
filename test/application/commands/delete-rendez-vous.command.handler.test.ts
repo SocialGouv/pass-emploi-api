@@ -14,7 +14,11 @@ import {
   DeleteRendezVousCommandHandler
 } from '../../../src/application/commands/delete-rendez-vous.command.handler'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
-import { unConseillerDuJeune, unJeune } from '../../fixtures/jeune.fixture'
+import {
+  unConseillerDuJeune,
+  uneConfiguration,
+  unJeune
+} from '../../fixtures/jeune.fixture'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { EvenementService } from 'src/domain/evenement'
 import { PlanificateurService } from 'src/domain/planificateur'
@@ -32,7 +36,7 @@ describe('DeleteRendezVousCommandHandler', () => {
   let planificateurService: StubbedClass<PlanificateurService>
   let mailService: StubbedType<Mail.Service>
   let evenementService: StubbedClass<EvenementService>
-  const jeune = unJeune()
+  const jeune = unJeune({ configuration: uneConfiguration() })
   const rendezVous = unRendezVous({ jeunes: [jeune] })
 
   beforeEach(async () => {
@@ -141,7 +145,6 @@ describe('DeleteRendezVousCommandHandler', () => {
         describe("quand le jeune s'est déjà connecté au moins une fois sur l'application", () => {
           it('supprime le rendez-vous et envoie une notification au jeune', async () => {
             // Given
-            rendezVous.jeunes[0].pushNotificationToken = 'token'
             rendezVousRepository.get
               .withArgs(rendezVous.id)
               .resolves(rendezVous)

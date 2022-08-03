@@ -9,7 +9,7 @@ import {
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { Campagne, CampagneRepositoryToken } from '../../domain/campagne'
 import { Inject } from '@nestjs/common'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 
 export interface CreateEvaluationCommand extends Command {
   idCampagne: string

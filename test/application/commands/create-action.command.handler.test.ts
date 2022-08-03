@@ -13,7 +13,7 @@ import {
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action'
 import { Authentification } from '../../../src/domain/authentification'
-import { Jeune } from '../../../src/domain/jeune'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 import { Notification } from '../../../src/domain/notification'
 import { uneAction } from '../../fixtures/action.fixture'
 import {

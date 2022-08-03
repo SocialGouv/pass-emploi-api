@@ -2,7 +2,7 @@ import {
   UpdateJeunePreferencesCommand,
   UpdateJeunePreferencesCommandHandler
 } from '../../../src/application/commands/update-preferences-jeune.command.handler'
-import { Jeune } from '../../../src/domain/jeune'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { expect, StubbedClass, stubClass } from '../../utils'

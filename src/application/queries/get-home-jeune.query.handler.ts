@@ -3,7 +3,7 @@ import { Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { JeuneHomeQueryModel } from './query-models/home-jeune.query-model'
 

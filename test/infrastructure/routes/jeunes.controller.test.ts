@@ -4,7 +4,7 @@ import { CreateDemarcheCommandHandler } from 'src/application/commands/create-de
 import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
 import { TransfererJeunesConseillerCommandHandler } from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
 import { UpdateStatutDemarcheCommandHandler } from 'src/application/commands/update-demarche.command.handler'
-import { UpdateNotificationTokenCommandHandler } from 'src/application/commands/update-notification-token.command.handler'
+import { UpdateJeuneConfigurationApplicationCommandHandler } from 'src/application/commands/update-jeune-configuration-application.command.handler'
 import { ArchiveJeune } from 'src/domain/archive-jeune'
 import { Core } from 'src/domain/core'
 import { Demarche } from 'src/domain/demarche'
@@ -90,7 +90,7 @@ describe('JeunesController', () => {
   let updateStatutDemarcheCommandHandler: StubbedClass<UpdateStatutDemarcheCommandHandler>
   let createDemarcheCommandHandler: StubbedClass<CreateDemarcheCommandHandler>
   let getActionsByJeuneQueryHandler: StubbedClass<GetActionsByJeuneQueryHandler>
-  let updateNotificationTokenCommandHandler: StubbedClass<UpdateNotificationTokenCommandHandler>
+  let updateJeuneConfigurationApplicationCommandHandler: StubbedClass<UpdateJeuneConfigurationApplicationCommandHandler>
   let archiverJeuneCommandHandler: StubbedClass<ArchiverJeuneCommandHandler>
   let updateJeunePreferencesCommandHandler: StubbedClass<UpdateJeunePreferencesCommandHandler>
   let getPreferencesJeuneQueryHandler: StubbedClass<GetPreferencesJeuneQueryHandler>
@@ -129,8 +129,8 @@ describe('JeunesController', () => {
     )
     createDemarcheCommandHandler = stubClass(CreateDemarcheCommandHandler)
     getActionsByJeuneQueryHandler = stubClass(GetActionsByJeuneQueryHandler)
-    updateNotificationTokenCommandHandler = stubClass(
-      UpdateNotificationTokenCommandHandler
+    updateJeuneConfigurationApplicationCommandHandler = stubClass(
+      UpdateJeuneConfigurationApplicationCommandHandler
     )
     archiverJeuneCommandHandler = stubClass(ArchiverJeuneCommandHandler)
     updateJeunePreferencesCommandHandler = stubClass(
@@ -173,8 +173,8 @@ describe('JeunesController', () => {
       .useValue(createDemarcheCommandHandler)
       .overrideProvider(GetActionsByJeuneQueryHandler)
       .useValue(getActionsByJeuneQueryHandler)
-      .overrideProvider(UpdateNotificationTokenCommandHandler)
-      .useValue(updateNotificationTokenCommandHandler)
+      .overrideProvider(UpdateJeuneConfigurationApplicationCommandHandler)
+      .useValue(updateJeuneConfigurationApplicationCommandHandler)
       .overrideProvider(ArchiverJeuneCommandHandler)
       .useValue(archiverJeuneCommandHandler)
       .overrideProvider(UpdateJeunePreferencesCommandHandler)
@@ -1269,6 +1269,69 @@ describe('JeunesController', () => {
     })
   })
 
+  describe('PUT /jeunes/:idJeune/configuration-application', () => {
+    const idJeune = '1'
+    const payload: PutNotificationTokenInput = {
+      registration_token: 'token'
+    }
+
+    describe("quand c'est en succès", () => {
+      it("met à jour le token, la version de l'app et l'installation id", async () => {
+        // Given
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+        updateJeuneConfigurationApplicationCommandHandler.execute
+          .withArgs(
+            {
+              idJeune,
+              pushNotificationToken: payload.registration_token,
+              appVersion: 'coucou',
+              installationId: 'xxx-xx-xxx'
+            },
+            unUtilisateurDecode()
+          )
+          .resolves(emptySuccess())
+
+        // When
+        await request(app.getHttpServer())
+          .put(`/jeunes/${idJeune}/configuration-application`)
+          .set('authorization', unHeaderAuthorization())
+          .set('x-appversion', 'coucou')
+          .set('x-installationid', 'xxx-xx-xxx')
+          .send(payload)
+          // Then
+          .expect(HttpStatus.OK)
+      })
+      it("met à jour le token sans version de l'app", async () => {
+        // Given
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+        updateJeuneConfigurationApplicationCommandHandler.execute
+          .withArgs(
+            {
+              idJeune,
+              pushNotificationToken: payload.registration_token,
+              appVersion: undefined,
+              installationId: undefined
+            },
+            unUtilisateurDecode()
+          )
+          .resolves(emptySuccess())
+
+        // When
+        await request(app.getHttpServer())
+          .put(`/jeunes/${idJeune}/configuration-application`)
+          .set('authorization', unHeaderAuthorization())
+          .send(payload)
+          // Then
+          .expect(HttpStatus.OK)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'put',
+      '/jeunes/1/configuration-application'
+    )
+  })
+
   describe('PUT /jeunes/:idJeune/push-notification-token', () => {
     const idJeune = '1'
     const payload: PutNotificationTokenInput = {
@@ -1279,11 +1342,11 @@ describe('JeunesController', () => {
       it("met à jour le token, la version de l'app et l'installation id", async () => {
         // Given
         jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
-        updateNotificationTokenCommandHandler.execute
+        updateJeuneConfigurationApplicationCommandHandler.execute
           .withArgs(
             {
               idJeune,
-              token: payload.registration_token,
+              pushNotificationToken: payload.registration_token,
               appVersion: 'coucou',
               installationId: 'xxx-xx-xxx'
             },
@@ -1304,11 +1367,11 @@ describe('JeunesController', () => {
       it("met à jour le token sans version de l'app", async () => {
         // Given
         jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
-        updateNotificationTokenCommandHandler.execute
+        updateJeuneConfigurationApplicationCommandHandler.execute
           .withArgs(
             {
               idJeune,
-              token: payload.registration_token,
+              pushNotificationToken: payload.registration_token,
               appVersion: undefined,
               installationId: undefined
             },

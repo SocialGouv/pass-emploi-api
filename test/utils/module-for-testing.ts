@@ -161,7 +161,7 @@ export class FakeJwtService implements IJwtService {
 
 class FakeFirebaseClient implements IFirebaseClient {
   getToken(_utilisateur: Authentification.Utilisateur): Promise<string> {
-    return Promise.resolve('un-token-firebase')
+    return Promise.resolve('un-pushNotificationToken-firebase')
   }
 
   initializeChatIfNotExists(

@@ -1,4 +1,4 @@
-import { Jeune } from 'src/domain/jeune'
+import { Jeune } from 'src/domain/jeune/jeune'
 import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous

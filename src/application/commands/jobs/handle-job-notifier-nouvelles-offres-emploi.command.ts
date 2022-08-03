@@ -14,7 +14,10 @@ import { DateService } from 'src/utils/date-service'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import { ErreurHttp } from '../../../building-blocks/types/domain-error'
-import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune'
+import {
+  Jeune,
+  JeuneConfigurationApplicationRepositoryToken
+} from '../../../domain/jeune/jeune'
 import { Notification } from '../../../domain/notification'
 import { GetOffresEmploiQuery } from '../../queries/get-offres-emploi.query.handler'
 import { OffresEmploiQueryModel } from '../../queries/query-models/offres-emploi.query-model'
@@ -35,8 +38,8 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
     private rechercheRepository: Recherche.Repository,
     private findAllOffresEmploiQueryGetter: FindAllOffresEmploiQueryGetter,
     private notificationService: Notification.Service,
-    @Inject(JeunesRepositoryToken)
-    private jeuneRepository: Jeune.Repository,
+    @Inject(JeuneConfigurationApplicationRepositoryToken)
+    private jeuneConfigurationApplicationRepository: Jeune.ConfigurationApplication.Repository,
     private configuration: ConfigService,
     @Inject(NotificationSupportServiceToken)
     notificationSupportService: NotificationSupport.Service
@@ -91,12 +94,15 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
             stats.succes = stats.succes + 1
 
             if (resultat.value.data.results.length) {
-              const jeune = await this.jeuneRepository.get(recherche.idJeune)
+              const configuration =
+                await this.jeuneConfigurationApplicationRepository.get(
+                  recherche.idJeune
+                )
 
               stats.notificationsEnvoyees = stats.notificationsEnvoyees + 1
               await this.notificationService.notifierNouvellesOffres(
                 recherche,
-                jeune
+                configuration
               )
             }
           }

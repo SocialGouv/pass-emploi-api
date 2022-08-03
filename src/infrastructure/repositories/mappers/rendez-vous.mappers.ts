@@ -5,6 +5,7 @@ import {
 } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from 'src/infrastructure/sequelize/types'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
+import { toConfigurationApplication } from './jeunes.mappers'
 
 export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
   return {
@@ -54,12 +55,12 @@ function fromJeuneSqlToJeuneDuRdv(jeune: JeuneSqlModel): JeuneDuRendezVous {
     firstName: jeune.prenom,
     lastName: jeune.nom,
     email: jeune.email ?? undefined,
-    pushNotificationToken: jeune.pushNotificationToken ?? undefined,
     conseiller: {
       id: jeune.conseiller!.id,
       firstName: jeune.conseiller!.prenom,
       lastName: jeune.conseiller!.nom,
       email: jeune.conseiller!.email ?? undefined
-    }
+    },
+    configuration: toConfigurationApplication(jeune)
   }
 }

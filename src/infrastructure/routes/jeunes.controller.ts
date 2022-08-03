@@ -56,7 +56,7 @@ import {
   UpdateStatutDemarcheCommand,
   UpdateStatutDemarcheCommandHandler
 } from '../../application/commands/update-demarche.command.handler'
-import { UpdateNotificationTokenCommandHandler } from '../../application/commands/update-notification-token.command.handler'
+import { UpdateJeuneConfigurationApplicationCommandHandler } from '../../application/commands/update-jeune-configuration-application.command.handler'
 import { UpdateJeunePreferencesCommandHandler } from '../../application/commands/update-preferences-jeune.command.handler'
 import {
   GetActionsByJeuneQuery,
@@ -101,7 +101,7 @@ export class JeunesController {
   constructor(
     private readonly dateService: DateService,
     private readonly getDetailJeuneQueryHandler: GetDetailJeuneQueryHandler,
-    private readonly updateNotificationTokenCommandHandler: UpdateNotificationTokenCommandHandler,
+    private readonly updateJeuneConfigurationApplicationCommandHandler: UpdateJeuneConfigurationApplicationCommandHandler,
     private readonly getHomeJeuneHandler: GetHomeJeuneHandler,
     private readonly getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
     private readonly getJeuneHomeActionsQueryHandler: GetJeuneHomeActionsQueryHandler,
@@ -163,6 +163,10 @@ export class JeunesController {
     throw handleFailure(result)
   }
 
+  @ApiOperation({
+    summary: 'Deprecated (Mobile V1.8)',
+    deprecated: true
+  })
   @ApiHeader({
     name: 'x-appversion',
     required: false
@@ -179,15 +183,46 @@ export class JeunesController {
     @Headers('x-appversion') appVersion?: string,
     @Headers('x-installationid') installationId?: string
   ): Promise<void> {
-    const result = await this.updateNotificationTokenCommandHandler.execute(
-      {
-        idJeune,
-        token: putNotificationTokenInput.registration_token,
-        appVersion,
-        installationId
-      },
-      utilisateur
-    )
+    const result =
+      await this.updateJeuneConfigurationApplicationCommandHandler.execute(
+        {
+          idJeune,
+          pushNotificationToken: putNotificationTokenInput.registration_token,
+          appVersion,
+          installationId
+        },
+        utilisateur
+      )
+
+    handleFailure(result)
+  }
+
+  @ApiHeader({
+    name: 'x-appversion',
+    required: false
+  })
+  @ApiHeader({
+    name: 'x-installationid',
+    required: false
+  })
+  @Put(':idJeune/configuration-application')
+  async updateConfiguration(
+    @Param('idJeune') idJeune: string,
+    @Body() putNotificationTokenInput: PutNotificationTokenInput,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @Headers('x-appversion') appVersion?: string,
+    @Headers('x-installationid') installationId?: string
+  ): Promise<void> {
+    const result =
+      await this.updateJeuneConfigurationApplicationCommandHandler.execute(
+        {
+          idJeune,
+          pushNotificationToken: putNotificationTokenInput.registration_token,
+          appVersion,
+          installationId
+        },
+        utilisateur
+      )
 
     handleFailure(result)
   }

@@ -2,7 +2,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { DateService } from '../utils/date-service'
 import { Action } from './action'
-import { Jeune } from './jeune'
+import { Jeune } from './jeune/jeune'
 import { Recherche } from './recherche'
 import { RendezVous } from './rendez-vous'
 
@@ -123,25 +123,25 @@ export namespace Notification {
     ): Promise<void[]> {
       return Promise.all(
         rendezVous.jeunes.map(async jeune => {
-          if (jeune.pushNotificationToken) {
+          if (jeune.configuration?.pushNotificationToken) {
             let notification: Notification.Message | undefined
 
             switch (typeNotification) {
               case Type.NEW_RENDEZVOUS:
                 notification = this.creerNotificationNouveauRdv(
-                  jeune.pushNotificationToken,
+                  jeune.configuration.pushNotificationToken,
                   rendezVous.id
                 )
                 break
               case Type.UPDATED_RENDEZVOUS:
                 notification = this.creerNotificationRendezVousMisAJour(
-                  jeune.pushNotificationToken,
+                  jeune.configuration.pushNotificationToken,
                   rendezVous.id
                 )
                 break
               case Type.DELETED_RENDEZVOUS:
                 notification = this.creerNotificationRdvSupprime(
-                  jeune.pushNotificationToken,
+                  jeune.configuration.pushNotificationToken,
                   rendezVous.date
                 )
                 break
@@ -159,9 +159,9 @@ export namespace Notification {
     async notifierLesJeunesDuNouveauMessage(jeunes: Jeune[]): Promise<void[]> {
       return Promise.all(
         jeunes.map(async jeune => {
-          if (jeune.pushNotificationToken) {
+          if (jeune.configuration?.pushNotificationToken) {
             const notification = this.creerNotificationNouveauMessage(
-              jeune.pushNotificationToken
+              jeune.configuration?.pushNotificationToken
             )
             const promise = this.notificationRepository.send(notification)
             this.logMessageSucces(jeune.id)
@@ -174,9 +174,9 @@ export namespace Notification {
     }
 
     async notifierNouvelleAction(jeune: Jeune, action: Action): Promise<void> {
-      if (jeune.pushNotificationToken) {
+      if (jeune.configuration?.pushNotificationToken) {
         const notification = this.creerNotificationNouvelleAction(
-          jeune.pushNotificationToken,
+          jeune.configuration?.pushNotificationToken,
           action.id
         )
         const promise = this.notificationRepository.send(notification)
@@ -189,20 +189,20 @@ export namespace Notification {
 
     async notifierNouvellesOffres(
       recherche: Recherche,
-      jeune?: Jeune
+      configurationApplication?: Jeune.ConfigurationApplication
     ): Promise<void> {
-      if (jeune) {
-        if (jeune.pushNotificationToken) {
+      if (configurationApplication) {
+        if (configurationApplication.pushNotificationToken) {
           const notification = this.creerNotificationNouvelleOffre(
-            jeune.pushNotificationToken,
+            configurationApplication.pushNotificationToken,
             recherche.id,
             recherche.titre
           )
           const promise = this.notificationRepository.send(notification)
-          this.logMessageSucces(jeune.id)
+          this.logMessageSucces(configurationApplication.idJeune)
           return promise
         } else {
-          this.logMessageEchec(jeune.id)
+          this.logMessageEchec(configurationApplication.idJeune)
         }
       }
     }

@@ -9,7 +9,7 @@ import {
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { Notification } from '../../domain/notification'
 import { PlanificateurService } from '../../domain/planificateur'
@@ -58,7 +58,9 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
   async handle(command: CreateRendezVousCommand): Promise<Result<string>> {
     const jeunes: Jeune[] = []
     for (const idJeune of command.idsJeunes) {
-      const jeune = await this.jeuneRepository.get(idJeune)
+      const jeune = await this.jeuneRepository.get(idJeune, {
+        avecConfiguration: true
+      })
       if (!jeune) {
         return failure(new NonTrouveError('Jeune', idJeune))
       }

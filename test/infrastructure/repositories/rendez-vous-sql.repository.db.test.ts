@@ -17,6 +17,7 @@ import { JeuneDuRendezVous, RendezVous } from '../../../src/domain/rendez-vous'
 import { Core } from '../../../src/domain/core'
 import Structure = Core.Structure
 import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { uneConfiguration } from '../../fixtures/jeune.fixture'
 
 describe('RendezVousRepositorySql', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -113,7 +114,10 @@ describe('RendezVousRepositorySql', () => {
       describe('quand il y a un jeune en plus', () => {
         it('met à jour les informations du rdv en ajoutant une association quand on rajoute un jeune', async () => {
           // Given
-          const nouveauJeune = unJeuneDuRendezVous({ id: 'nouveauJeune' })
+          const nouveauJeune = unJeuneDuRendezVous({
+            id: 'nouveauJeune',
+            configuration: uneConfiguration({ idJeune: 'nouveauJeune' })
+          })
           await JeuneSqlModel.creer(unJeuneDto({ id: nouveauJeune.id }))
           const rendezVousAvecUnJeuneDePlus: RendezVous = {
             ...unRendezVousTest,

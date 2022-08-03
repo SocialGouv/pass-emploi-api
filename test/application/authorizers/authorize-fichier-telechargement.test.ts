@@ -2,7 +2,7 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { Fichier } from 'src/domain/fichier'
-import { Jeune } from 'src/domain/jeune'
+import { Jeune } from 'src/domain/jeune/jeune'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { FichierTelechargementAuthorizer } from '../../../src/application/authorizers/authorize-fichier-telechargement'
 import {

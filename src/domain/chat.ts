@@ -1,4 +1,4 @@
-import { Jeune } from './jeune'
+import { Jeune } from './jeune/jeune'
 
 export const ChatRepositoryToken = 'ChatRepositoryToken'
 

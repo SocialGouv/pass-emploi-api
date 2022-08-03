@@ -21,7 +21,7 @@ import {
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { Core } from '../../domain/core'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Milo, MiloRepositoryToken } from '../../domain/milo'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 

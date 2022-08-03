@@ -13,7 +13,7 @@ import {
 } from '../../building-blocks/types/result'
 import { Action, ActionsRepositoryToken } from '../../domain/action'
 import { Authentification } from '../../domain/authentification'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
@@ -50,7 +50,9 @@ export class CreateActionCommandHandler extends CommandHandler<
   }
 
   async handle(command: CreateActionCommand): Promise<Result<string>> {
-    const jeune = await this.jeuneRepository.get(command.idJeune)
+    const jeune = await this.jeuneRepository.get(command.idJeune, {
+      avecConfiguration: true
+    })
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', command.idJeune))
     }

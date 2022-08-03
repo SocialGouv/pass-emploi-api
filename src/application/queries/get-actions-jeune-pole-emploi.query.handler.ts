@@ -5,7 +5,7 @@ import {
 } from 'src/building-blocks/types/domain-error'
 import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
+import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune/jeune'
 import { DateService } from 'src/utils/date-service'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'

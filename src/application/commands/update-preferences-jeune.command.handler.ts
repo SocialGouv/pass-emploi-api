@@ -8,7 +8,7 @@ import {
 } from '../../building-blocks/types/result'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Authentification } from '../../domain/authentification'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { Evenement, EvenementService } from '../../domain/evenement'
 

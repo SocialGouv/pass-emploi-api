@@ -1,22 +1,22 @@
 import { Core } from '../../src/domain/core'
-import { Jeune } from '../../src/domain/jeune'
+import { Jeune } from '../../src/domain/jeune/jeune'
 import { unConseiller } from './conseiller.fixture'
-import { uneDatetime } from './date.fixture'
+import { uneDate, uneDatetime } from './date.fixture'
 
 export const unJeune = (
   args: Partial<Jeune> = {}
-): Required<Omit<Jeune, 'tokenLastUpdate' | 'conseillerInitial'>> => {
+): Required<Omit<Jeune, 'conseillerInitial' | 'configuration'>> => {
   const defaults = {
     id: 'ABCDE',
     lastName: 'Doe',
     firstName: 'John',
-    pushNotificationToken: 'unToken',
     isActivated: true,
     conseiller: unConseillerDuJeune(),
     creationDate: uneDatetime,
     email: 'john.doe@plop.io',
     idDossier: '1234',
     structure: Core.Structure.MILO,
+    configuration: uneConfiguration(),
     preferences: {
       partageFavoris: true
     }
@@ -27,17 +27,19 @@ export const unJeune = (
 
 export const unJeuneSansPushNotificationToken = (
   conseiller = unConseiller()
-): Omit<Jeune, 'tokenLastUpdate' | 'conseillerInitial'> => ({
+): Omit<Jeune, 'conseillerInitial'> => ({
   id: 'ABCDE',
   lastName: 'Doe',
   firstName: 'John',
-  pushNotificationToken: '',
   isActivated: false,
   conseiller: unConseillerDuJeune(conseiller),
   creationDate: uneDatetime,
   email: 'john.doe@plop.io',
   idDossier: '1234',
   structure: Core.Structure.MILO,
+  configuration: {
+    idJeune: 'ABCDE'
+  },
   preferences: {
     partageFavoris: true
   }
@@ -46,14 +48,12 @@ export const unJeuneSansPushNotificationToken = (
 export const unJeuneSansConseiller = (
   args: Partial<Omit<Jeune, 'conseiller' | 'conseillerInitial'>> = {}
 ): Omit<Jeune, 'conseiller' | 'conseillerInitial'> => {
-  const defaults = {
+  const defaults: Omit<Jeune, 'conseiller' | 'conseillerInitial'> = {
     id: 'ABCDE',
     lastName: 'Doe',
     firstName: 'John',
-    pushNotificationToken: 'unToken',
     isActivated: true,
     creationDate: uneDatetime,
-    tokenLastUpdate: uneDatetime,
     email: 'john.doe@plop.io',
     idDossier: '1234',
     structure: Core.Structure.MILO,
@@ -74,6 +74,19 @@ export const unConseillerDuJeune = (
     firstName: conseiller.firstName,
     lastName: conseiller.lastName,
     email: conseiller.email
+  }
+  return { ...defaults, ...args }
+}
+
+export const uneConfiguration = (
+  args: Partial<Jeune.ConfigurationApplication> = {}
+): Jeune.ConfigurationApplication => {
+  const defaults: Jeune.ConfigurationApplication = {
+    idJeune: 'ABCDE',
+    pushNotificationToken: 'token',
+    dateDerniereActualisationToken: uneDate(),
+    installationId: '123456',
+    appVersion: '1.8.1'
   }
   return { ...defaults, ...args }
 }

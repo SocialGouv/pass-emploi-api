@@ -7,7 +7,7 @@ import { Authentification } from '../../domain/authentification'
 import { buildError } from '../../utils/logger.module'
 import { getAPMInstance } from '../monitoring/apm.init'
 import { ChatCryptoService } from '../../utils/chat-crypto-service'
-import { Jeune } from 'src/domain/jeune'
+import { Jeune } from 'src/domain/jeune/jeune'
 import { ArchiveJeune } from '../../domain/archive-jeune'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires

@@ -3,7 +3,7 @@ import { emptySuccess, failure, Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Conseiller, ConseillersRepositoryToken } from 'src/domain/conseiller'
 import { Core } from 'src/domain/core'
-import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
+import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune/jeune'
 import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
 
 @Injectable()

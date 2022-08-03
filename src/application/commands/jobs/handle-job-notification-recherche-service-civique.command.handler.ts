@@ -12,7 +12,10 @@ import {
   Result,
   success
 } from '../../../building-blocks/types/result'
-import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune'
+import {
+  Jeune,
+  JeuneConfigurationApplicationRepositoryToken
+} from '../../../domain/jeune/jeune'
 import { Notification } from '../../../domain/notification'
 import { OffreServiceCivique } from '../../../domain/offre-service-civique'
 import { Recherche, RecherchesRepositoryToken } from '../../../domain/recherche'
@@ -33,8 +36,8 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
   constructor(
     @Inject(RecherchesRepositoryToken)
     private rechercheRepository: Recherche.Repository,
-    @Inject(JeunesRepositoryToken)
-    private jeuneRepository: Jeune.Repository,
+    @Inject(JeuneConfigurationApplicationRepositoryToken)
+    private jeuneConfigurationApplicationRepository: Jeune.ConfigurationApplication.Repository,
     private notificationService: Notification.Service,
     private findAllOffresServicesCiviqueQueryGetter: FindAllOffresServicesCiviqueQueryGetter,
     private dateService: DateService,
@@ -127,7 +130,8 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
     recherche: Recherche,
     date: DateTime
   ): Promise<void> {
-    const jeune = await this.jeuneRepository.get(recherche.idJeune)
+    const configuration =
+      await this.jeuneConfigurationApplicationRepository.get(recherche.idJeune)
 
     await this.rechercheRepository.update({
       ...recherche,
@@ -135,7 +139,10 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
       etat: Recherche.Etat.SUCCES
     })
 
-    await this.notificationService.notifierNouvellesOffres(recherche, jeune)
+    await this.notificationService.notifierNouvellesOffres(
+      recherche,
+      configuration
+    )
   }
 
   async authorize(): Promise<Result> {

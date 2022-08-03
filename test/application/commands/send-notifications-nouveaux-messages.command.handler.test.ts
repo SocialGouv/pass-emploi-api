@@ -1,5 +1,5 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { Jeune } from 'src/domain/jeune'
+import { Jeune } from 'src/domain/jeune/jeune'
 import { stubClassSandbox } from 'test/utils/types'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import {

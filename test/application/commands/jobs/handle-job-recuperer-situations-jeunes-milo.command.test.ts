@@ -4,7 +4,7 @@ import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from 'src/applic
 import { ErreurHttp } from 'src/building-blocks/types/domain-error'
 import { failure, isSuccess, success } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
-import { Jeune } from 'src/domain/jeune'
+import { Jeune } from 'src/domain/jeune/jeune'
 import { Milo } from 'src/domain/milo'
 import { NotificationSupport } from 'src/domain/notification-support'
 import { uneDatetime } from 'test/fixtures/date.fixture'

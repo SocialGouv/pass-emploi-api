@@ -9,7 +9,7 @@ import {
   RendezVous
 } from '../../domain/rendez-vous'
 import { InvitationIcsClient } from './invitation-ics.client'
-import { Jeune } from '../../domain/jeune'
+import { Jeune } from '../../domain/jeune/jeune'
 import { ArchiveJeune } from '../../domain/archive-jeune'
 
 export type ICS = string

@@ -8,7 +8,7 @@ import {
   mapCodeLabelTypeRendezVous,
   JeuneDuRendezVous
 } from '../../src/domain/rendez-vous'
-import { unConseillerDuJeune } from './jeune.fixture'
+import { unConseillerDuJeune, uneConfiguration } from './jeune.fixture'
 
 export const unRendezVous = (args: Partial<RendezVous> = {}): RendezVous => {
   const defaults: RendezVous = {
@@ -39,12 +39,12 @@ export const unRendezVous = (args: Partial<RendezVous> = {}): RendezVous => {
 export const unJeuneDuRendezVous = (
   args: Partial<JeuneDuRendezVous> = {}
 ): JeuneDuRendezVous => {
-  const defaults = {
+  const defaults: JeuneDuRendezVous = {
     id: 'ABCDE',
     firstName: 'John',
     lastName: 'Doe',
     conseiller: unConseillerDuJeune(),
-    pushNotificationToken: 'unToken',
+    configuration: uneConfiguration(),
     email: 'john.doe@plop.io'
   }
 

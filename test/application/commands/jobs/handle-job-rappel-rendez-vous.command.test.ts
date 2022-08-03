@@ -60,13 +60,12 @@ describe('HandlerJobRendezVousCommandHandler', () => {
     })
   })
 
-  describe("quand le jeune n'a pas de token", () => {
+  describe("quand le jeune n'a pas de pushNotificationToken", () => {
     it("n'envoie pas de notification", async () => {
       // Given
       const unRendezVousSansToken: RendezVous = {
         ...unRendezVous()
       }
-      unRendezVousSansToken.jeunes[0].pushNotificationToken = undefined
       rendezVousRepository.get
         .withArgs(command.job.contenu.idRendezVous)
         .resolves(unRendezVousSansToken)
@@ -82,20 +81,20 @@ describe('HandlerJobRendezVousCommandHandler', () => {
   describe('quand le rendez-vous est demain', () => {
     it('envoie une notification pour demain', async () => {
       // Given
-      const unRendezVousSansToken: RendezVous = {
+      const rendezVous: RendezVous = {
         ...unRendezVous(),
         date: today.plus({ day: 1 }).toJSDate()
       }
       rendezVousRepository.get
         .withArgs(command.job.contenu.idRendezVous)
-        .resolves(unRendezVousSansToken)
+        .resolves(rendezVous)
 
       // When
       await handlerJobRendezVousCommandHandler.handle(command)
 
       // Then
       expect(notificationRepository.send).to.have.been.calledWith({
-        token: 'unToken',
+        token: 'token',
         notification: {
           title: 'Rappel rendez-vous',
           body: 'Vous avez un rendez-vous demain'
@@ -110,20 +109,20 @@ describe('HandlerJobRendezVousCommandHandler', () => {
   describe('quand le rendez-vous est dans 7 jours', () => {
     it('envoie une notification pour la semaine prochaine', async () => {
       // Given
-      const unRendezVousSansToken: RendezVous = {
+      const rendezVous: RendezVous = {
         ...unRendezVous(),
         date: today.plus({ day: 7 }).toJSDate()
       }
       rendezVousRepository.get
         .withArgs(command.job.contenu.idRendezVous)
-        .resolves(unRendezVousSansToken)
+        .resolves(rendezVous)
 
       // When
       await handlerJobRendezVousCommandHandler.handle(command)
 
       // Then
       expect(notificationRepository.send).to.have.been.calledWithExactly({
-        token: 'unToken',
+        token: 'token',
         notification: {
           title: 'Rappel rendez-vous',
           body: 'Vous avez un rendez-vous dans une semaine'

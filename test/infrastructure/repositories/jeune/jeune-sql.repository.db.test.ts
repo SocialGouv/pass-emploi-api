@@ -15,34 +15,34 @@ import {
   unFavoriOffreEngagement,
   unFavoriOffreImmersion
 } from 'test/fixtures/sql-models/favoris.sql-model'
-import { Core } from '../../../src/domain/core'
-import { Jeune } from '../../../src/domain/jeune'
-import { Recherche } from '../../../src/domain/recherche'
-import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune-sql.repository.db'
-import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/recherche-sql.repository.db'
-import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { FavoriOffreEmploiSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
-import { FavoriOffreEngagementSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
-import { FavoriOffreImmersionSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { RechercheSqlModel } from '../../../src/infrastructure/sequelize/models/recherche.sql-model'
-import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { AsSql } from '../../../src/infrastructure/sequelize/types'
-import { uneDatetime } from '../../fixtures/date.fixture'
+import { Core } from '../../../../src/domain/core'
+import { Jeune } from '../../../../src/domain/jeune/jeune'
+import { Recherche } from '../../../../src/domain/recherche'
+import { JeuneSqlRepository } from '../../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
+import { RechercheSqlRepository } from '../../../../src/infrastructure/repositories/recherche-sql.repository.db'
+import { ActionSqlModel } from '../../../../src/infrastructure/sequelize/models/action.sql-model'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { FavoriOffreEmploiSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
+import { FavoriOffreEngagementSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
+import { FavoriOffreImmersionSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { RechercheSqlModel } from '../../../../src/infrastructure/sequelize/models/recherche.sql-model'
+import { RendezVousSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { AsSql } from '../../../../src/infrastructure/sequelize/types'
+import { uneDatetime } from '../../../fixtures/date.fixture'
 import {
   unConseillerDuJeune,
   unJeune,
   unJeuneSansConseiller
-} from '../../fixtures/jeune.fixture'
-import { uneRecherche } from '../../fixtures/recherche.fixture'
-import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
-import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
+} from '../../../fixtures/jeune.fixture'
+import { uneRecherche } from '../../../fixtures/recherche.fixture'
+import { uneActionDto } from '../../../fixtures/sql-models/action.sql-model'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
+import { expect, StubbedClass, stubClass } from '../../../utils'
+import { DatabaseForTesting } from '../../../utils/database-for-testing'
+import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
 
 describe('JeuneSqlRepository', () => {
   const uuid = '9e1a7d9f-4038-4631-9aa1-856ee90c7ff8'
@@ -74,10 +74,7 @@ describe('JeuneSqlRepository', () => {
 
     beforeEach(async () => {
       // Given
-      jeune = {
-        ...unJeune(),
-        tokenLastUpdate: uneDatetime
-      }
+      jeune = unJeune({ configuration: undefined })
       const conseillerDto = unConseillerDto({
         structure: Core.Structure.POLE_EMPLOI
       })
@@ -86,8 +83,6 @@ describe('JeuneSqlRepository', () => {
         unJeuneDto({
           idConseiller: conseillerDto.id,
           dateCreation: jeune.creationDate.toJSDate(),
-          pushNotificationToken: 'unToken',
-          dateDerniereActualisationToken: uneDatetime.toJSDate(),
           datePremiereConnexion: uneDatetime.toJSDate()
         })
       )
@@ -281,10 +276,7 @@ describe('JeuneSqlRepository', () => {
 
     beforeEach(async () => {
       // Given
-      jeune = {
-        ...unJeune(),
-        tokenLastUpdate: uneDatetime
-      }
+      jeune = unJeune()
       const conseillerDto = unConseillerDto({
         structure: Core.Structure.POLE_EMPLOI
       })
@@ -324,14 +316,11 @@ describe('JeuneSqlRepository', () => {
 
     beforeEach(async () => {
       // Given
-      jeune = unJeuneSansConseiller()
+      jeune = { ...unJeuneSansConseiller(), configuration: undefined }
       await JeuneSqlModel.creer(
         unJeuneDto({
           idConseiller: undefined,
-          dateCreation: jeune.creationDate.toJSDate(),
-          pushNotificationToken: 'unToken',
-          dateDerniereActualisationToken: uneDatetime.toJSDate(),
-          datePremiereConnexion: uneDatetime.toJSDate()
+          dateCreation: jeune.creationDate.toJSDate()
         })
       )
     })
@@ -362,7 +351,11 @@ describe('JeuneSqlRepository', () => {
 
     beforeEach(async () => {
       // Given
-      jeune = { ...unJeuneSansConseiller(), idDossier: 'test-id-dossier' }
+      jeune = {
+        ...unJeuneSansConseiller(),
+        idDossier: 'test-id-dossier',
+        configuration: undefined
+      }
       await JeuneSqlModel.creer(
         unJeuneDto({
           idConseiller: undefined,
@@ -600,8 +593,7 @@ describe('JeuneSqlRepository', () => {
           const jeuneATransferer: Jeune = unJeune({
             id: 'unJeuneATransferer',
             conseiller: unConseillerDuJeune({ id: 'idConseillerCible' }),
-            // FIXME: gérer les fixtures proprement avec les Omit
-            tokenLastUpdate: undefined
+            configuration: undefined
           })
 
           // When
@@ -643,9 +635,7 @@ describe('JeuneSqlRepository', () => {
             conseiller: unConseillerDuJeune({ id: 'idConseillerCible' }),
             conseillerInitial: {
               id: 'idConseillerSource'
-            },
-            // FIXME: gérer les fixtures proprement avec les Omit
-            tokenLastUpdate: undefined
+            }
           })
 
           // When
@@ -678,8 +668,7 @@ describe('JeuneSqlRepository', () => {
           const jeuneATransferer: Jeune = unJeune({
             id: 'jeune-en-transfert',
             conseiller: unConseillerDuJeune({ id: 'idConseillerCible' }),
-            // FIXME: gérer les fixtures proprement avec les Omit
-            tokenLastUpdate: undefined
+            configuration: undefined
           })
 
           // When
