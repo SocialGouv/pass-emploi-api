@@ -2,7 +2,7 @@ import {
   ArchiverJeuneCommand,
   ArchiverJeuneCommandHandler
 } from '../../../src/application/commands/archiver-jeune.command.handler'
-import { Jeune } from '../../../src/domain/jeune'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { ArchiveJeune } from '../../../src/domain/archive-jeune'
 import { Chat } from '../../../src/domain/chat'

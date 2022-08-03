@@ -3,7 +3,7 @@ import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 import { emptySuccess, failure, Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Fichier, FichierRepositoryToken } from 'src/domain/fichier'
-import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
+import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune/jeune'
 
 @Injectable()
 export class FichierTelechargementAuthorizer {

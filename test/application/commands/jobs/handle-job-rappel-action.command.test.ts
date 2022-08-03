@@ -3,7 +3,7 @@ import {
   HandleJobRappelActionCommandHandler
 } from '../../../../src/application/commands/jobs/handle-job-rappel-action.command'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { Jeune } from '../../../../src/domain/jeune'
+import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { Notification } from '../../../../src/domain/notification'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { createSandbox } from 'sinon'
@@ -11,7 +11,7 @@ import { Planificateur } from '../../../../src/domain/planificateur'
 import { Action } from '../../../../src/domain/action'
 import { uneDatetime } from '../../../fixtures/date.fixture'
 import { uneAction } from '../../../fixtures/action.fixture'
-import { unJeune } from '../../../fixtures/jeune.fixture'
+import { uneConfiguration } from '../../../fixtures/jeune.fixture'
 import {
   emptySuccess,
   failure,
@@ -22,20 +22,20 @@ import { PasDeRappelError } from '../../../../src/building-blocks/types/domain-e
 describe('HandleJobRappelActionCommandHandler', () => {
   let handleJobRappelActionCommandHandler: HandleJobRappelActionCommandHandler
   let actionRepository: StubbedType<Action.Repository>
-  let jeuneRepository: StubbedType<Jeune.Repository>
+  let jeuneConfigurationApplicationRepository: StubbedType<Jeune.ConfigurationApplication.Repository>
   let notificationRepository: StubbedType<Notification.Repository>
   let actionFactory: StubbedClass<Action.Factory>
 
   beforeEach(() => {
     const sandbox = createSandbox()
     actionRepository = stubInterface(sandbox)
-    jeuneRepository = stubInterface(sandbox)
+    jeuneConfigurationApplicationRepository = stubInterface(sandbox)
     notificationRepository = stubInterface(sandbox)
     actionFactory = stubClass(Action.Factory)
     handleJobRappelActionCommandHandler =
       new HandleJobRappelActionCommandHandler(
         actionRepository,
-        jeuneRepository,
+        jeuneConfigurationApplicationRepository,
         notificationRepository,
         actionFactory
       )
@@ -61,7 +61,9 @@ describe('HandleJobRappelActionCommandHandler', () => {
           actionFactory.doitEnvoyerUneNotificationDeRappel
             .withArgs(action)
             .returns(emptySuccess())
-          jeuneRepository.get.withArgs(action.idJeune).resolves(unJeune())
+          jeuneConfigurationApplicationRepository.get
+            .withArgs(action.idJeune)
+            .resolves(uneConfiguration())
 
           // When
           const result = await handleJobRappelActionCommandHandler.handle(
@@ -77,7 +79,7 @@ describe('HandleJobRappelActionCommandHandler', () => {
             })
           )
           expect(notificationRepository.send).to.have.been.calledWithExactly({
-            token: unJeune().pushNotificationToken,
+            token: uneConfiguration().pushNotificationToken,
             notification: {
               title: 'Rappel action',
               body: 'Une action arrive à écheance dans 3 jours'
@@ -96,11 +98,12 @@ describe('HandleJobRappelActionCommandHandler', () => {
           actionFactory.doitEnvoyerUneNotificationDeRappel
             .withArgs(action)
             .returns(emptySuccess())
-          jeuneRepository.get.withArgs(action.idJeune).resolves(
-            unJeune({
+          jeuneConfigurationApplicationRepository.get
+            .withArgs(action.idJeune)
+            .resolves({
+              idJeune: action.idJeune,
               pushNotificationToken: undefined
             })
-          )
 
           // When
           const result = await handleJobRappelActionCommandHandler.handle(

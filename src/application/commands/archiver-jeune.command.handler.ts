@@ -17,7 +17,7 @@ import {
 
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { DateService } from '../../utils/date-service'

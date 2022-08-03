@@ -20,7 +20,7 @@ import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Mail } from '../../../src/domain/mail'
-import { Jeune } from 'src/domain/jeune'
+import { Jeune } from 'src/domain/jeune/jeune'
 
 describe('UpdateRendezVousCommandHandler', () => {
   let rendezVousRepository: StubbedType<RendezVous.Repository>

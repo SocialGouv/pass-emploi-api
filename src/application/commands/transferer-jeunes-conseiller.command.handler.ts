@@ -4,7 +4,7 @@ import {
   NonTrouveError
 } from 'src/building-blocks/types/domain-error'
 import { Core } from 'src/domain/core'
-import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
+import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune/jeune'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {

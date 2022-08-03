@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Result } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
-import { Jeune } from 'src/domain/jeune'
+import { Jeune } from 'src/domain/jeune/jeune'
 
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'

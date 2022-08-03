@@ -5,7 +5,7 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { ResumeActionsDuJeuneQueryModel } from './query-models/jeunes.query-model'
 import { QueryTypes, Sequelize } from 'sequelize'
-import { ResumeActionsJeuneDto } from '../../infrastructure/repositories/jeune-sql.repository.db'
+import { ResumeActionsJeuneDto } from '../../infrastructure/repositories/jeune/jeune-sql.repository.db'
 import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
 import { Result } from 'src/building-blocks/types/result'
 

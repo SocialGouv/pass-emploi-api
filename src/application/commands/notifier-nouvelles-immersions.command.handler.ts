@@ -6,7 +6,10 @@ import {
   Result,
   success
 } from '../../building-blocks/types/result'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import {
+  Jeune,
+  JeuneConfigurationApplicationRepositoryToken
+} from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification'
 import { Recherche, RecherchesRepositoryToken } from '../../domain/recherche'
 import { DateService } from '../../utils/date-service'
@@ -33,7 +36,8 @@ export class NotifierNouvellesImmersionsCommandHandler extends CommandHandler<
   constructor(
     @Inject(RecherchesRepositoryToken)
     private recherchesRepository: Recherche.Repository,
-    @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
+    @Inject(JeuneConfigurationApplicationRepositoryToken)
+    private jeuneConfigurationApplicationRepository: Jeune.ConfigurationApplication.Repository,
     private notificationService: Notification.Service,
     private dateService: DateService
   ) {
@@ -99,8 +103,12 @@ export class NotifierNouvellesImmersionsCommandHandler extends CommandHandler<
   }
 
   async notifier(recherche: Recherche): Promise<void> {
-    const jeune = await this.jeuneRepository.get(recherche.idJeune)
-    await this.notificationService.notifierNouvellesOffres(recherche, jeune)
+    const configuration =
+      await this.jeuneConfigurationApplicationRepository.get(recherche.idJeune)
+    await this.notificationService.notifierNouvellesOffres(
+      recherche,
+      configuration
+    )
   }
 
   async authorize(): Promise<Result> {

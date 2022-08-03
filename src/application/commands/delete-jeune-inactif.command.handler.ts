@@ -14,7 +14,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 
 export interface DeleteJeuneInactifCommand {
   idConseiller: string

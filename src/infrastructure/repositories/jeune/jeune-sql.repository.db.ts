@@ -4,20 +4,20 @@ import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-j
 import { Core } from 'src/domain/core'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
-import { Action } from '../../domain/action'
-import { Jeune } from '../../domain/jeune'
-import { FirebaseClient } from '../clients/firebase-client'
-import { ActionSqlModel } from '../sequelize/models/action.sql-model'
-import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
-import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
-import { TransfertConseillerSqlModel } from '../sequelize/models/transfert-conseiller.sql-model'
-import { SequelizeInjectionToken } from '../sequelize/providers'
+import { Action } from '../../../domain/action'
+import { Jeune } from '../../../domain/jeune/jeune'
+import { FirebaseClient } from '../../clients/firebase-client'
+import { ActionSqlModel } from '../../sequelize/models/action.sql-model'
+import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
+import { RendezVousSqlModel } from '../../sequelize/models/rendez-vous.sql-model'
+import { TransfertConseillerSqlModel } from '../../sequelize/models/transfert-conseiller.sql-model'
+import { SequelizeInjectionToken } from '../../sequelize/providers'
 import {
   fromSqlToJeune,
   fromSqlToJeuneHomeQueryModel,
   toSqlJeune
-} from './mappers/jeunes.mappers'
+} from '../mappers/jeunes.mappers'
 
 @Injectable()
 export class JeuneSqlRepository implements Jeune.Repository {
@@ -28,14 +28,17 @@ export class JeuneSqlRepository implements Jeune.Repository {
     private dateService: DateService
   ) {}
 
-  async get(id: string): Promise<Jeune | undefined> {
+  async get(
+    id: string,
+    attributs?: { avecConfiguration: boolean }
+  ): Promise<Jeune | undefined> {
     const jeuneSqlModel = await JeuneSqlModel.findByPk(id, {
       include: [ConseillerSqlModel]
     })
     if (!jeuneSqlModel) {
       return undefined
     }
-    return fromSqlToJeune(jeuneSqlModel)
+    return fromSqlToJeune(jeuneSqlModel, attributs)
   }
 
   async existe(id: string): Promise<boolean> {
@@ -93,7 +96,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
         idConseiller
       }
     })
-    return jeunesSqlModel.map(fromSqlToJeune)
+    return jeunesSqlModel.map(jeuneSqlModel => fromSqlToJeune(jeuneSqlModel))
   }
 
   async findAllJeunesByConseillerInitial(
@@ -106,7 +109,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
       order: [['id', 'ASC']],
       include: [ConseillerSqlModel]
     })
-    return jeunesSqlModel.map(fromSqlToJeune)
+    return jeunesSqlModel.map(jeuneSqlModel => fromSqlToJeune(jeuneSqlModel))
   }
 
   async save(jeune: Jeune): Promise<void> {
@@ -115,9 +118,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
       nom: jeune.lastName,
       prenom: jeune.firstName,
       idConseiller: jeune.conseiller!.id,
-      pushNotificationToken: jeune.pushNotificationToken ?? null,
       dateCreation: jeune.creationDate.toJSDate(),
-      dateDerniereActualisationToken: jeune.tokenLastUpdate?.toJSDate() ?? null,
       email: jeune.email ?? null,
       structure: jeune.structure,
       idDossier: jeune.idDossier ?? null,
@@ -174,7 +175,9 @@ export class JeuneSqlRepository implements Jeune.Repository {
       limit
     })
 
-    return jeunesMiloSqlModel.map(fromSqlToJeune)
+    return jeunesMiloSqlModel.map(jeuneSqlModel =>
+      fromSqlToJeune(jeuneSqlModel)
+    )
   }
 
   private async saveAll(jeunes: Jeune[]): Promise<void> {

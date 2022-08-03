@@ -16,7 +16,7 @@ import {
 import { uneRecherche } from 'test/fixtures/recherche.fixture'
 import { GetOffresEmploiQuery } from '../../../../src/application/queries/get-offres-emploi.query.handler'
 import { OffresEmploiQueryModel } from '../../../../src/application/queries/query-models/offres-emploi.query-model'
-import { Jeune } from '../../../../src/domain/jeune'
+import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { unJeune } from '../../../fixtures/jeune.fixture'
 import { uneOffreEmploiResumeQueryModel } from '../../../fixtures/offre-emploi.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'

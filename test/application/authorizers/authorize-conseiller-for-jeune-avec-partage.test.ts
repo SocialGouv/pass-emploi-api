@@ -1,7 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
-import { Jeune } from '../../../src/domain/jeune'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'

@@ -7,7 +7,7 @@ import {
 import { failure, Result, success } from 'src/building-blocks/types/result'
 import { Authentification } from 'src/domain/authentification'
 import { Evenement, EvenementService } from 'src/domain/evenement'
-import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
+import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune/jeune'
 import { RendezVous } from 'src/domain/rendez-vous'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'

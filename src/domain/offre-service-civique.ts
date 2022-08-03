@@ -1,7 +1,7 @@
 import { Result } from '../building-blocks/types/result'
 import { DateTime } from 'luxon'
 import { Core } from './core'
-import { Jeune } from './jeune'
+import { Jeune } from './jeune/jeune'
 
 export const OffreServiceCiviqueRepositoryToken =
   'OffreServiceCivique.Repository'

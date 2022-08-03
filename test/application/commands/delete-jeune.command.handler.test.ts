@@ -19,7 +19,7 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
 import { Chat } from '../../../src/domain/chat'
-import { Jeune } from '../../../src/domain/jeune'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune,

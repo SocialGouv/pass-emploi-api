@@ -19,7 +19,7 @@ import {
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Core } from '../../domain/core'
 
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 
 export interface DeleteJeuneCommand {
   idJeune: Jeune.Id

@@ -2,7 +2,7 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { Chat } from 'src/domain/chat'
 import { Core } from 'src/domain/core'
-import { Jeune } from 'src/domain/jeune'
+import { Jeune } from 'src/domain/jeune/jeune'
 import { unConseillerDuJeune, unJeune } from 'test/fixtures/jeune.fixture'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import {

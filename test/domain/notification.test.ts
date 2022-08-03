@@ -1,6 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { uneAction } from 'test/fixtures/action.fixture'
 import {
+  uneConfiguration,
   unJeune,
   unJeuneSansPushNotificationToken
 } from 'test/fixtures/jeune.fixture'
@@ -9,6 +10,7 @@ import { uneRecherche } from 'test/fixtures/recherche.fixture'
 import { unRendezVous } from 'test/fixtures/rendez-vous.fixture'
 import { Notification } from '../../src/domain/notification'
 import { createSandbox, expect } from '../utils'
+import { Jeune } from '../../src/domain/jeune/jeune'
 
 describe('Notification', () => {
   describe('Service', () => {
@@ -22,14 +24,14 @@ describe('Notification', () => {
     })
 
     describe('notifierLesJeunesDuRdv', () => {
-      it('notifie les jeunes avec token du nouveau rdv', async () => {
+      it('notifie les jeunes avec pushNotificationToken du nouveau rdv', async () => {
         // Given
         const rdv = unRendezVous({
           jeunes: [unJeune(), unJeuneSansPushNotificationToken()]
         })
         const typeNotification = Notification.Type.NEW_RENDEZVOUS
         const expectedNotification = uneNotification({
-          token: rdv.jeunes[0].pushNotificationToken,
+          token: rdv.jeunes[0].configuration?.pushNotificationToken,
           notification: {
             title: 'Nouveau rendez-vous',
             body: 'Votre conseiller a programmé un nouveau rendez-vous'
@@ -48,14 +50,14 @@ describe('Notification', () => {
           expectedNotification
         )
       })
-      it('notifie les jeunes avec token du rdv modifié', async () => {
+      it('notifie les jeunes avec pushNotificationToken du rdv modifié', async () => {
         // Given
         const rdv = unRendezVous({
           jeunes: [unJeune(), unJeuneSansPushNotificationToken()]
         })
         const typeNotification = Notification.Type.UPDATED_RENDEZVOUS
         const expectedNotification = uneNotification({
-          token: rdv.jeunes[0].pushNotificationToken,
+          token: rdv.jeunes[0].configuration?.pushNotificationToken,
           notification: {
             title: 'Rendez-vous modifié',
             body: 'Votre rendez-vous a été modifié'
@@ -74,14 +76,14 @@ describe('Notification', () => {
           expectedNotification
         )
       })
-      it('notifie les jeunes avec token du rdv supprimé', async () => {
+      it('notifie les jeunes avec pushNotificationToken du rdv supprimé', async () => {
         // Given
         const rdv = unRendezVous({
           jeunes: [unJeune(), unJeuneSansPushNotificationToken()]
         })
         const typeNotification = Notification.Type.DELETED_RENDEZVOUS
         const expectedNotification = uneNotification({
-          token: rdv.jeunes[0].pushNotificationToken,
+          token: rdv.jeunes[0].configuration?.pushNotificationToken,
           notification: {
             title: 'Rendez-vous supprimé',
             body: `Votre rendez-vous du 11/11 est supprimé`
@@ -101,11 +103,11 @@ describe('Notification', () => {
       })
     })
     describe('notifierLesJeunesDuNouveauMessage', () => {
-      it('notifie les jeunes avec token', async () => {
+      it('notifie les jeunes avec pushNotificationToken', async () => {
         // Given
-        const jeunes = [unJeune(), unJeuneSansPushNotificationToken()]
+        const jeunes: Jeune[] = [unJeune(), unJeuneSansPushNotificationToken()]
         const expectedNotification = uneNotification({
-          token: jeunes[0].pushNotificationToken
+          token: jeunes[0].configuration!.pushNotificationToken
         })
 
         // When
@@ -118,12 +120,12 @@ describe('Notification', () => {
       })
     })
     describe('notifierNouvelleAction', () => {
-      it('notifie les jeunes avec token', async () => {
+      it('notifie les jeunes avec pushNotificationToken', async () => {
         // Given
-        const jeune = unJeune()
+        const jeune: Jeune = unJeune()
         const action = uneAction()
         const expectedNotification = uneNotification({
-          token: jeune.pushNotificationToken,
+          token: jeune.configuration?.pushNotificationToken,
           notification: {
             title: 'Nouvelle action',
             body: 'Vous avez une nouvelle action'
@@ -144,12 +146,12 @@ describe('Notification', () => {
       })
     })
     describe('notifierNouvellesOffres', () => {
-      it('notifie les jeunes avec token', async () => {
+      it('notifie les jeunes avec pushNotificationToken', async () => {
         // Given
-        const jeune = unJeune()
+        const configuration = uneConfiguration()
         const recherche = uneRecherche()
         const expectedNotification = uneNotification({
-          token: jeune.pushNotificationToken,
+          token: configuration.pushNotificationToken,
           notification: {
             title: recherche.titre,
             body: 'De nouveaux résultats sont disponibles'
@@ -161,7 +163,10 @@ describe('Notification', () => {
         })
 
         // When
-        await notificationService.notifierNouvellesOffres(recherche, jeune)
+        await notificationService.notifierNouvellesOffres(
+          recherche,
+          configuration
+        )
 
         // Then
         expect(notificationRepository.send).to.have.been.calledOnceWithExactly(

@@ -5,7 +5,7 @@ import {
   NotifierNouvellesImmersionsCommandHandler
 } from '../../../src/application/commands/notifier-nouvelles-immersions.command.handler'
 import { GetOffresImmersionQuery } from '../../../src/application/queries/get-offres-immersion.query.handler'
-import { Jeune } from '../../../src/domain/jeune'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 import { Notification } from '../../../src/domain/notification'
 import { Recherche } from '../../../src/domain/recherche'
 import { DateService } from '../../../src/utils/date-service'
@@ -54,7 +54,7 @@ describe('NotifierNouvellesImmersionsCommandHandler', () => {
           .withArgs(criteres, 100, 0)
           .resolves([recherche])
       })
-      describe('quand le jeune a un token', () => {
+      describe('quand le jeune a un pushNotificationToken', () => {
         it('notifie le jeune', async () => {
           // Given
           jeuneRepository.get.withArgs(recherche.idJeune).resolves(jeune)

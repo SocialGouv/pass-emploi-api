@@ -12,7 +12,7 @@ import {
 } from '../building-blocks/types/result'
 import { DateService } from '../utils/date-service'
 import { IdService } from '../utils/id-service'
-import { Jeune } from './jeune'
+import { Jeune } from './jeune/jeune'
 import { DateTime } from 'luxon'
 
 export const ActionsRepositoryToken = 'ActionsRepositoryToken'

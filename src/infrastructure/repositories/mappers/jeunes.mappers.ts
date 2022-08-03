@@ -1,7 +1,7 @@
 import { DateTime, Duration } from 'luxon'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
 import { Action } from 'src/domain/action'
-import { Jeune } from 'src/domain/jeune'
+import { Jeune } from 'src/domain/jeune/jeune'
 import { mapCodeLabelTypeRendezVous } from 'src/domain/rendez-vous'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
 import {
@@ -11,18 +11,22 @@ import {
 import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../sequelize/types'
 
-export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
+export function fromSqlToJeune(
+  jeuneSqlModel: JeuneSqlModel,
+  attributs?: { avecConfiguration: boolean }
+): Jeune {
   const jeune: Jeune = {
     id: jeuneSqlModel.id,
     firstName: jeuneSqlModel.prenom,
     lastName: jeuneSqlModel.nom,
     creationDate: DateTime.fromJSDate(jeuneSqlModel.dateCreation).toUTC(),
     isActivated: Boolean(jeuneSqlModel.datePremiereConnexion),
-    pushNotificationToken: jeuneSqlModel.pushNotificationToken ?? undefined,
-    tokenLastUpdate: getTokenLastUpdate(jeuneSqlModel),
     structure: jeuneSqlModel.structure,
     email: jeuneSqlModel.email ?? undefined,
     idDossier: jeuneSqlModel.idDossier ?? undefined,
+    configuration: attributs?.avecConfiguration
+      ? toConfigurationApplication(jeuneSqlModel)
+      : undefined,
     preferences: {
       partageFavoris: jeuneSqlModel.partageFavoris
     }
@@ -52,6 +56,8 @@ export function toSqlJeune(
   | 'dateDerniereConnexion'
   | 'appVersion'
   | 'installationId'
+  | 'pushNotificationToken'
+  | 'dateDerniereActualisationToken'
 > {
   return {
     id: jeune.id,
@@ -60,21 +66,11 @@ export function toSqlJeune(
     idConseiller: jeune.conseiller?.id,
     idConseillerInitial: jeune.conseillerInitial?.id ?? null,
     dateCreation: jeune.creationDate.toJSDate(),
-    pushNotificationToken: jeune.pushNotificationToken ?? null,
-    dateDerniereActualisationToken: jeune.tokenLastUpdate?.toJSDate() ?? null,
     email: jeune.email ?? null,
     structure: jeune.structure,
     idDossier: jeune.idDossier ?? null,
     partageFavoris: jeune.preferences.partageFavoris
   }
-}
-
-function getTokenLastUpdate(
-  jeuneSqlModel: JeuneSqlModel
-): DateTime | undefined {
-  return jeuneSqlModel.dateDerniereActualisationToken
-    ? DateTime.fromJSDate(jeuneSqlModel.dateDerniereActualisationToken).toUTC()
-    : undefined
 }
 
 export function fromSqlToJeuneHomeQueryModel(
@@ -141,4 +137,17 @@ function toCreator(
     return `${jeuneSqlModel.prenom} ${jeuneSqlModel.nom}`
   }
   return `${jeuneSqlModel.conseiller!.prenom} ${jeuneSqlModel.conseiller!.nom}`
+}
+
+export function toConfigurationApplication(
+  jeuneSqlModel: JeuneSqlModel
+): Jeune.ConfigurationApplication {
+  return {
+    idJeune: jeuneSqlModel.id,
+    appVersion: jeuneSqlModel.appVersion ?? undefined,
+    installationId: jeuneSqlModel.installationId ?? undefined,
+    dateDerniereActualisationToken:
+      jeuneSqlModel.dateDerniereActualisationToken ?? undefined,
+    pushNotificationToken: jeuneSqlModel.pushNotificationToken ?? undefined
+  }
 }

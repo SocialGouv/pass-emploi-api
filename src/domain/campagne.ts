@@ -7,7 +7,7 @@ import {
   NonTrouveError,
   ReponsesCampagneInvalide
 } from '../building-blocks/types/domain-error'
-import { Jeune } from './jeune'
+import { Jeune } from './jeune/jeune'
 import { DateService } from '../utils/date-service'
 
 export const CampagneRepositoryToken = 'Campagne.Repository'

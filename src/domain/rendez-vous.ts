@@ -1,5 +1,5 @@
 import { IdService } from '../utils/id-service'
-import { Jeune } from './jeune'
+import { Jeune } from './jeune/jeune'
 import { Conseiller } from './conseiller'
 
 export const RendezVousRepositoryToken = 'RendezVous.Repository'
@@ -39,12 +39,7 @@ export interface Createur {
 
 export type JeuneDuRendezVous = Pick<
   Jeune,
-  | 'id'
-  | 'firstName'
-  | 'lastName'
-  | 'conseiller'
-  | 'pushNotificationToken'
-  | 'email'
+  'id' | 'firstName' | 'lastName' | 'conseiller' | 'email' | 'configuration'
 >
 
 export interface RendezVous {

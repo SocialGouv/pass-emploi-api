@@ -136,9 +136,7 @@ export class AuthentificationSqlRepository
   ): Promise<void> {
     await JeuneSqlModel.update(
       {
-        idAuthentification: utilisateur.idAuthentification,
-        appVersion: utilisateur.appVersion,
-        installationId: utilisateur.installationId
+        idAuthentification: utilisateur.idAuthentification
       },
       { where: { id: utilisateur.id } }
     )

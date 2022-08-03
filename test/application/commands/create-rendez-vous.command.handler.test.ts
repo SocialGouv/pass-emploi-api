@@ -7,13 +7,12 @@ import { SinonSandbox } from 'sinon'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { RendezVous } from '../../../src/domain/rendez-vous'
 import { Notification } from '../../../src/domain/notification'
-import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
+import { uneConfiguration, unJeune } from '../../fixtures/jeune.fixture'
 import {
   JeuneNonLieAuConseillerError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
-import { Jeune } from '../../../src/domain/jeune'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 import {
   CreateRendezVousCommand,
   CreateRendezVousCommandHandler
@@ -24,6 +23,7 @@ import { Mail } from '../../../src/domain/mail'
 import { Conseiller } from 'src/domain/conseiller'
 import { unConseiller } from 'test/fixtures/conseiller.fixture'
 import { stubClassSandbox } from 'test/utils/types'
+import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 
 describe('CreateRendezVousCommandHandler', () => {
   let rendezVousRepository: StubbedType<RendezVous.Repository>
@@ -36,8 +36,14 @@ describe('CreateRendezVousCommandHandler', () => {
   let createRendezVousCommandHandler: CreateRendezVousCommandHandler
   let evenementService: StubbedClass<EvenementService>
   let mailClient: StubbedType<Mail.Service>
-  const jeune1 = unJeune({ id: 'jeune-1' })
-  const jeune2 = unJeune({ id: 'jeune-2' })
+  const jeune1 = unJeune({
+    id: 'jeune-1',
+    configuration: uneConfiguration({ idJeune: 'jeune-1' })
+  })
+  const jeune2 = unJeune({
+    id: 'jeune-2',
+    configuration: uneConfiguration({ idJeune: 'jeune-2' })
+  })
   const rendezVous = unRendezVous({ jeunes: [jeune1] })
 
   beforeEach(async () => {
@@ -176,7 +182,12 @@ describe('CreateRendezVousCommandHandler', () => {
       describe("quand un jeune ne s'est jamais connecté sur l'application", () => {
         it('crée un rendez-vous et envoie un mail au conseiller sans envoyer de notifications au jeune', async () => {
           // Given
-          const jeune = unJeune({ pushNotificationToken: undefined })
+          const jeune = unJeune({
+            configuration: {
+              idJeune: unJeune().id,
+              pushNotificationToken: undefined
+            }
+          })
           jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
           const command: CreateRendezVousCommand = {
             idsJeunes: [jeune.id],
@@ -219,7 +230,7 @@ describe('CreateRendezVousCommandHandler', () => {
         it('crée un rendez-vous sans envoyer un mail au conseiller', async () => {
           // Given
           jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
-          rendezVous.jeunes[0].pushNotificationToken = undefined
+          rendezVous.jeunes[0].configuration!.pushNotificationToken = undefined
 
           const command: CreateRendezVousCommand = {
             idsJeunes: [jeune1.id],
@@ -263,7 +274,7 @@ describe('CreateRendezVousCommandHandler', () => {
         it('crée un rendez-vous sans envoyer un mail au conseiller', async () => {
           // Given
           jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
-          rendezVous.jeunes[0].pushNotificationToken = undefined
+          rendezVous.jeunes[0].configuration!.pushNotificationToken = undefined
 
           const command: CreateRendezVousCommand = {
             idsJeunes: [jeune1.id],
@@ -305,7 +316,8 @@ describe('CreateRendezVousCommandHandler', () => {
         it('renvoie un succès', async () => {
           // Given
           jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
-          rendezVous.jeunes[0].pushNotificationToken = undefined
+          rendezVous.jeunes[0].configuration!.pushNotificationToken = undefined
+
           const command: CreateRendezVousCommand = {
             idsJeunes: [jeune1.id],
             idConseiller: jeune1.conseiller.id,

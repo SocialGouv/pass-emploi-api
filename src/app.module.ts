@@ -44,7 +44,7 @@ import { ExecuteCronJobAsapCommandHandler } from './application/commands/tasks/e
 import { InitCronsCommandHandler } from './application/commands/tasks/init-crons.command'
 import { SynchronizeJobsCommandHandler } from './application/commands/tasks/synchronize-jobs.command'
 import { TransfererJeunesConseillerCommandHandler } from './application/commands/transferer-jeunes-conseiller.command.handler'
-import { UpdateNotificationTokenCommandHandler } from './application/commands/update-notification-token.command.handler'
+import { UpdateJeuneConfigurationApplicationCommandHandler } from './application/commands/update-jeune-configuration-application.command.handler'
 import { UpdateStatutActionCommandHandler } from './application/commands/update-statut-action.command.handler'
 import { UpdateUtilisateurCommandHandler } from './application/commands/update-utilisateur.command.handler'
 import { TeleverserFichierCommandHandler } from './application/commands/televerser-fichier.command.handler'
@@ -86,7 +86,11 @@ import { ChatRepositoryToken } from './domain/chat'
 import { ConseillersRepositoryToken } from './domain/conseiller'
 import { EvenementService, EvenementsRepositoryToken } from './domain/evenement'
 import { Fichier, FichierRepositoryToken } from './domain/fichier'
-import { Jeune, JeunesRepositoryToken } from './domain/jeune'
+import {
+  Jeune,
+  JeuneConfigurationApplicationRepositoryToken,
+  JeunesRepositoryToken
+} from './domain/jeune/jeune'
 import { MiloRepositoryToken } from './domain/milo'
 import {
   Notification,
@@ -120,7 +124,8 @@ import { ChatFirebaseRepository } from './infrastructure/repositories/chat-fireb
 import { ConseillerSqlRepository } from './infrastructure/repositories/conseiller-sql.repository.db'
 import { EvenementHttpSqlRepository } from './infrastructure/repositories/evenement-http-sql.repository.db'
 import { FichierSqlS3Repository } from './infrastructure/repositories/fichier-sql-s3.repository.db'
-import { JeuneSqlRepository } from './infrastructure/repositories/jeune-sql.repository.db'
+import { JeuneConfigurationApplicationSqlRepository } from './infrastructure/repositories/jeune/jeune-configuration-application-sql.repository.db'
+import { JeuneSqlRepository } from './infrastructure/repositories/jeune/jeune-sql.repository.db'
 import { MailSqlRepository } from './infrastructure/repositories/mail-sql.repository.db'
 import { MiloHttpSqlRepository } from './infrastructure/repositories/milo-http-sql.repository.db'
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
@@ -256,6 +261,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Campagne.Factory,
     Demarche.Factory,
     Jeune.Factory,
+    Jeune.ConfigurationApplication.Factory,
     Fichier.Factory,
     Notification.Service,
     WorkerService,
@@ -358,6 +364,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       provide: NotificationSupportServiceToken,
       useClass: NotificationSupportMattermostService
     },
+    {
+      provide: JeuneConfigurationApplicationRepositoryToken,
+      useClass: JeuneConfigurationApplicationSqlRepository
+    },
     ...databaseProviders
   ],
   exports: [...databaseProviders]
@@ -397,7 +407,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDetailConseillerQueryHandler,
     GetJeunesByConseillerQueryHandler,
     GetResumeActionsDesJeunesDuConseillerQueryHandlerDb,
-    UpdateNotificationTokenCommandHandler,
+    UpdateJeuneConfigurationApplicationCommandHandler,
     UpdateStatutActionCommandHandler,
     CreateRendezVousCommandHandler,
     DeleteRendezVousCommandHandler,

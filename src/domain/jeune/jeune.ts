@@ -1,12 +1,15 @@
 import { DateTime } from 'luxon'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
-import { Brand } from '../building-blocks/types/brand'
-import { DateService } from '../utils/date-service'
-import { Core } from './core'
+import { Brand } from '../../building-blocks/types/brand'
+import { DateService } from '../../utils/date-service'
+import { Core } from '../core'
 import { Injectable } from '@nestjs/common'
-import { IdService } from '../utils/id-service'
+import { IdService } from '../../utils/id-service'
+import * as _ConfigurationApplication from './configuration-application'
 
 export const JeunesRepositoryToken = 'Jeune.Repository'
+export const JeuneConfigurationApplicationRepositoryToken =
+  'Jeune.ConfigurationApplication.Repository'
 
 export interface Jeune {
   id: string
@@ -18,13 +21,16 @@ export interface Jeune {
   conseiller?: Jeune.Conseiller
   conseillerInitial?: Jeune.ConseillerInitial
   email?: string
-  pushNotificationToken?: string
-  tokenLastUpdate?: DateTime
   idDossier?: string
+  configuration?: Jeune.ConfigurationApplication
   preferences: Jeune.Preferences
 }
 
 export namespace Jeune {
+  // FIXME: le linter ne comprend pas cette technique 🤷‍️
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  export import ConfigurationApplication = _ConfigurationApplication.ConfigurationApplication
+
   export interface Conseiller {
     id: string
     firstName: string
@@ -43,7 +49,10 @@ export namespace Jeune {
   export type Id = Brand<string, 'JeuneId'>
 
   export interface Repository {
-    get(id: string): Promise<Jeune | undefined>
+    get(
+      id: string,
+      attributs?: { avecConfiguration: boolean }
+    ): Promise<Jeune | undefined>
 
     getJeunesMilo(offset: number, limit: number): Promise<Jeune[]>
 
@@ -112,18 +121,6 @@ export namespace Jeune {
       conseiller: Conseiller
       structure: Core.Structure
       idDossier?: string
-    }
-  }
-
-  export function updateToken(
-    jeune: Jeune,
-    newToken: string,
-    dateService: DateService
-  ): Jeune {
-    return {
-      ...jeune,
-      pushNotificationToken: newToken,
-      tokenLastUpdate: dateService.now()
     }
   }
 

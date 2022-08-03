@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
 import { Action } from '../../../src/domain/action'
-import { Jeune } from '../../../src/domain/jeune'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 import { uneAction } from '../action.fixture'
 import { unJeune } from '../jeune.fixture'
 

@@ -316,23 +316,13 @@ describe('AuthentificationSqlRepository', () => {
       // When
       await authentificationSqlRepository.updateJeune({
         id: jeune.id,
-        idAuthentification: 'un-nouveau-id',
-        appVersion: '1.8.0',
-        installationId: 'xxx-xx-xxx'
+        idAuthentification: 'un-nouveau-id'
       })
       jeuneTrouve = await JeuneSqlModel.findByPk(jeune.id)
     })
     it("met à jour l'id jeune", async () => {
       // Then
       expect(jeuneTrouve?.idAuthentification).to.equal('un-nouveau-id')
-    })
-    it("met à jour l'app version", async () => {
-      // Then
-      expect(jeuneTrouve?.appVersion).to.equal('1.8.0')
-    })
-    it("met à jour l'installation id", async () => {
-      // Then
-      expect(jeuneTrouve?.installationId).to.equal('xxx-xx-xxx')
     })
   })
 })

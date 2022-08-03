@@ -10,7 +10,7 @@ import {
 } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { failure } from '../../../src/building-blocks/types/result'
-import { Jeune } from '../../../src/domain/jeune'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 import { KeycloakClient } from '../../../src/infrastructure/clients/keycloak-client'
 import { PoleEmploiPartenaireClient } from '../../../src/infrastructure/clients/pole-emploi-partenaire-client'
 import { DateService } from '../../../src/utils/date-service'

@@ -5,7 +5,7 @@ import { DroitsInsuffisants } from '../../../src/building-blocks/types/domain-er
 import { Authentification } from '../../../src/domain/authentification'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
-import { Jeune } from '../../../src/domain/jeune'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune

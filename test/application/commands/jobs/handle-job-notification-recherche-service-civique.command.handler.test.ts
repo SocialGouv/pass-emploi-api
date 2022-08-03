@@ -10,7 +10,7 @@ import {
 } from '../../../../src/building-blocks/types/result'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Recherche } from '../../../../src/domain/recherche'
-import { Jeune } from '../../../../src/domain/jeune'
+import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { Notification } from '../../../../src/domain/notification'
 import { OffreServiceCivique } from '../../../../src/domain/offre-service-civique'
 import { createSandbox } from 'sinon'

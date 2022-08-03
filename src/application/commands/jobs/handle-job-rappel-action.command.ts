@@ -6,7 +6,10 @@ import {
   success
 } from 'src/building-blocks/types/result'
 import { Action, ActionsRepositoryToken } from 'src/domain/action'
-import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
+import {
+  Jeune,
+  JeuneConfigurationApplicationRepositoryToken
+} from 'src/domain/jeune/jeune'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
@@ -34,8 +37,8 @@ export class HandleJobRappelActionCommandHandler extends CommandHandler<
   constructor(
     @Inject(ActionsRepositoryToken)
     private actionRepository: Action.Repository,
-    @Inject(JeunesRepositoryToken)
-    private jeuneRepository: Jeune.Repository,
+    @Inject(JeuneConfigurationApplicationRepositoryToken)
+    private jeuneConfigurationApplicationRepository: Jeune.ConfigurationApplication.Repository,
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,
     private actionFactory: Action.Factory
@@ -59,12 +62,13 @@ export class HandleJobRappelActionCommandHandler extends CommandHandler<
         this.actionFactory.doitEnvoyerUneNotificationDeRappel(action)
 
       if (isSuccess(result)) {
-        const jeune = await this.jeuneRepository.get(action.idJeune)
-        stats.idJeune = jeune?.id
+        const configuration =
+          await this.jeuneConfigurationApplicationRepository.get(action.idJeune)
+        stats.idJeune = configuration?.idJeune
 
-        if (jeune && jeune.pushNotificationToken) {
+        if (configuration && configuration.pushNotificationToken) {
           const notification = Notification.creerNotificationRappelAction(
-            jeune.pushNotificationToken,
+            configuration.pushNotificationToken,
             command.job.contenu.idAction
           )
           if (notification) {
