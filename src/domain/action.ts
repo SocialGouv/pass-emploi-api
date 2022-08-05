@@ -116,6 +116,10 @@ export namespace Action {
         }
       }
 
+      const dateEcheanceA9Heures30 = DateTime.fromJSDate(data.dateEcheance)
+        .plus({ hour: 9, minute: 30 })
+        .toJSDate()
+
       const action: Action = {
         id: this.idService.uuid(),
         contenu: data.contenu,
@@ -126,7 +130,7 @@ export namespace Action {
         dateCreation: now,
         dateDerniereActualisation: now,
         rappel: data.rappel === undefined ? true : data.rappel,
-        dateEcheance: data.dateEcheance
+        dateEcheance: dateEcheanceA9Heures30
       }
       return success(action)
     }
