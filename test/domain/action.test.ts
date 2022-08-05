@@ -6,6 +6,7 @@ import { IdService } from '../../src/utils/id-service'
 import { uneAction } from '../fixtures/action.fixture'
 import { expect, StubbedClass, stubClass } from '../utils'
 import { unJeune } from '../fixtures/jeune.fixture'
+import { DateTime } from 'luxon'
 
 describe('Action', () => {
   describe('Factory', () => {
@@ -46,7 +47,13 @@ describe('Action', () => {
       })
     })
     describe('buildAction', () => {
-      const dateEcheance = new Date('2020-02-02')
+      const dateEcheance = DateTime.fromISO(
+        '2020-02-02T00:00:00.000Z'
+      ).toJSDate()
+
+      const dateEcheanceA9h30 = DateTime.fromISO(
+        '2020-02-02T09:30:00.000Z'
+      ).toJSDate()
       describe('Quand le statut est present', () => {
         describe('quand le conseiller est le créateur', () => {
           it('crée une action avec le statut fourni', async () => {
@@ -73,7 +80,7 @@ describe('Action', () => {
                 nom: jeune.conseiller.lastName,
                 type: Action.TypeCreateur.CONSEILLER
               },
-              dateEcheance,
+              dateEcheance: dateEcheanceA9h30,
               rappel: true
             })
 
@@ -85,7 +92,7 @@ describe('Action', () => {
                 statut,
                 commentaire,
                 typeCreateur,
-                dateEcheance
+                dateEcheance: dateEcheance
               },
               jeune
             )
@@ -122,7 +129,7 @@ describe('Action', () => {
                 nom: jeune.lastName,
                 type: Action.TypeCreateur.JEUNE
               },
-              dateEcheance,
+              dateEcheance: dateEcheanceA9h30,
               rappel: true
             })
 
@@ -167,7 +174,7 @@ describe('Action', () => {
                 nom: jeune.lastName,
                 type: Action.TypeCreateur.JEUNE
               },
-              dateEcheance,
+              dateEcheance: dateEcheanceA9h30,
               rappel
             })
 
@@ -214,7 +221,7 @@ describe('Action', () => {
               nom: jeune.lastName,
               type: Action.TypeCreateur.JEUNE
             },
-            dateEcheance,
+            dateEcheance: dateEcheanceA9h30,
             rappel: true
           })
 
