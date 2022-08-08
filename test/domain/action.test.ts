@@ -1,5 +1,5 @@
 import { uneDatetime } from 'test/fixtures/date.fixture'
-import { isSuccess } from '../../src/building-blocks/types/result'
+import { isFailure, isSuccess } from '../../src/building-blocks/types/result'
 import { Action } from '../../src/domain/action'
 import { DateService } from '../../src/utils/date-service'
 import { IdService } from '../../src/utils/id-service'
@@ -338,7 +338,7 @@ describe('Action', () => {
             actionFactory.doitEnvoyerUneNotificationDeRappel(action)
 
           // Then
-          expect(result).to.be.true()
+          expect(isSuccess(result)).to.be.true()
         })
       })
       describe('quand le statut est annulé', () => {
@@ -355,7 +355,7 @@ describe('Action', () => {
             actionFactory.doitEnvoyerUneNotificationDeRappel(action)
 
           // Then
-          expect(result).to.be.false()
+          expect(isFailure(result)).to.be.true()
         })
       })
       describe('quand le statut est terminé', () => {
@@ -372,7 +372,7 @@ describe('Action', () => {
             actionFactory.doitEnvoyerUneNotificationDeRappel(action)
 
           // Then
-          expect(result).to.be.false()
+          expect(isFailure(result)).to.be.true()
         })
       })
       describe("quand l'action est sans rappel", () => {
@@ -389,7 +389,7 @@ describe('Action', () => {
             actionFactory.doitEnvoyerUneNotificationDeRappel(action)
 
           // Then
-          expect(result).to.be.false()
+          expect(isFailure(result)).to.be.true()
         })
       })
       describe("quand la date d'échéance de l'action est dans moins de 3 jours", () => {
@@ -406,7 +406,7 @@ describe('Action', () => {
             actionFactory.doitEnvoyerUneNotificationDeRappel(action)
 
           // Then
-          expect(result).to.be.false()
+          expect(isFailure(result)).to.be.true()
         })
       })
     })

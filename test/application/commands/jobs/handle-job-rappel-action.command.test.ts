@@ -12,7 +12,12 @@ import { Action } from '../../../../src/domain/action'
 import { uneDatetime } from '../../../fixtures/date.fixture'
 import { uneAction } from '../../../fixtures/action.fixture'
 import { unJeune } from '../../../fixtures/jeune.fixture'
-import { success } from '../../../../src/building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  success
+} from '../../../../src/building-blocks/types/result'
+import { PasDeRappelError } from '../../../../src/building-blocks/types/domain-error'
 
 describe('HandleJobRappelActionCommandHandler', () => {
   let handleJobRappelActionCommandHandler: HandleJobRappelActionCommandHandler
@@ -55,7 +60,7 @@ describe('HandleJobRappelActionCommandHandler', () => {
           actionRepository.get.withArgs(action.id).resolves(action)
           actionFactory.doitEnvoyerUneNotificationDeRappel
             .withArgs(action)
-            .returns(true)
+            .returns(emptySuccess())
           jeuneRepository.get.withArgs(action.idJeune).resolves(unJeune())
 
           // When
@@ -90,7 +95,7 @@ describe('HandleJobRappelActionCommandHandler', () => {
           actionRepository.get.withArgs(action.id).resolves(action)
           actionFactory.doitEnvoyerUneNotificationDeRappel
             .withArgs(action)
-            .returns(true)
+            .returns(emptySuccess())
           jeuneRepository.get.withArgs(action.idJeune).resolves(
             unJeune({
               pushNotificationToken: undefined
@@ -120,7 +125,14 @@ describe('HandleJobRappelActionCommandHandler', () => {
         actionRepository.get.withArgs(action.id).resolves(action)
         actionFactory.doitEnvoyerUneNotificationDeRappel
           .withArgs(action)
-          .returns(false)
+          .returns(
+            failure(
+              new PasDeRappelError(
+                action.id,
+                `l'action n'arrive pas à échéance dans 3 jours`
+              )
+            )
+          )
 
         // When
         const result = await handleJobRappelActionCommandHandler.handle(command)
@@ -128,7 +140,10 @@ describe('HandleJobRappelActionCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(
           success({
-            notificationEnvoyee: false
+            idAction: '721e2108-60f5-4a75-b102-04fe6a40e899',
+            notificationEnvoyee: false,
+            raison:
+              "Pas de rappel à envoyer pour l'action 721e2108-60f5-4a75-b102-04fe6a40e899 car l'action n'arrive pas à échéance dans 3 jours"
           })
         )
         expect(notificationRepository.send).not.to.have.been.called()

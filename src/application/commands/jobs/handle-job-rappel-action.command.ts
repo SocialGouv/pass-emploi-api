@@ -1,5 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { emptySuccess, Result, success } from 'src/building-blocks/types/result'
+import {
+  emptySuccess,
+  isSuccess,
+  Result,
+  success
+} from 'src/building-blocks/types/result'
 import { Action, ActionsRepositoryToken } from 'src/domain/action'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
 import { Command } from '../../../building-blocks/types/command'
@@ -18,6 +23,7 @@ export interface HandleJobRappelActionCommandResult {
   idAction?: string
   idJeune?: string
   notificationEnvoyee: boolean
+  raison?: string
 }
 
 @Injectable()
@@ -46,26 +52,28 @@ export class HandleJobRappelActionCommandHandler extends CommandHandler<
       notificationEnvoyee: false
     }
 
-    if (
-      action &&
-      this.actionFactory.doitEnvoyerUneNotificationDeRappel(action)
-    ) {
-      const jeune = await this.jeuneRepository.get(action.idJeune)
+    if (action) {
+      stats.idAction = action.id
 
-      if (jeune && jeune.pushNotificationToken) {
-        const notification = Notification.creerNotificationRappelAction(
-          jeune.pushNotificationToken,
-          command.job.contenu.idAction
-        )
-        if (notification) {
-          await this.notificationRepository.send(notification)
-        }
-        stats.idAction = action.id
-        stats.idJeune = jeune.id
-        stats.notificationEnvoyee = true
-      } else {
-        stats.idAction = action.id
+      const result =
+        this.actionFactory.doitEnvoyerUneNotificationDeRappel(action)
+
+      if (isSuccess(result)) {
+        const jeune = await this.jeuneRepository.get(action.idJeune)
         stats.idJeune = jeune?.id
+
+        if (jeune && jeune.pushNotificationToken) {
+          const notification = Notification.creerNotificationRappelAction(
+            jeune.pushNotificationToken,
+            command.job.contenu.idAction
+          )
+          if (notification) {
+            await this.notificationRepository.send(notification)
+          }
+          stats.notificationEnvoyee = true
+        }
+      } else {
+        stats.raison = result.error.message
       }
     }
 

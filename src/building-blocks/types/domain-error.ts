@@ -191,3 +191,13 @@ export class CampagneExisteDejaError implements DomainError {
     this.message = `Une campagne sur ces dates ou avec le même nom existe déjà`
   }
 }
+
+export class PasDeRappelError implements DomainError {
+  static CODE = 'PAS_DE_RAPPEL'
+  readonly code: string = PasDeRappelError.CODE
+  readonly message: string
+
+  constructor(idAction: string, raison: string) {
+    this.message = `Pas de rappel à envoyer pour l'action ${idAction} car ${raison}`
+  }
+}

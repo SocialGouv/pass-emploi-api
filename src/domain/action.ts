@@ -1,7 +1,15 @@
 import { Injectable } from '@nestjs/common'
 import { Brand } from '../building-blocks/types/brand'
-import { DomainError } from '../building-blocks/types/domain-error'
-import { Result, success } from '../building-blocks/types/result'
+import {
+  DomainError,
+  PasDeRappelError
+} from '../building-blocks/types/domain-error'
+import {
+  emptySuccess,
+  failure,
+  Result,
+  success
+} from '../building-blocks/types/result'
 import { DateService } from '../utils/date-service'
 import { IdService } from '../utils/id-service'
 import { Jeune } from './jeune'
@@ -156,17 +164,30 @@ export namespace Action {
       )
     }
 
-    doitEnvoyerUneNotificationDeRappel(action: Action): boolean {
+    doitEnvoyerUneNotificationDeRappel(action: Action): Result {
       const dateEcheanceDans3Jours = DateService.isSameDateDay(
         this.dateService.now().plus({ days: 3 }),
         DateTime.fromJSDate(action.dateEcheance)
       )
-      return (
-        action.rappel &&
-        action?.statut !== Action.Statut.ANNULEE &&
-        action?.statut !== Action.Statut.TERMINEE &&
-        dateEcheanceDans3Jours
-      )
+      const actionPasTerminee =
+        action.statut !== Action.Statut.ANNULEE &&
+        action.statut !== Action.Statut.TERMINEE
+      const doitEnvoyerUnRappel =
+        action.rappel && actionPasTerminee && dateEcheanceDans3Jours
+
+      if (doitEnvoyerUnRappel) {
+        return emptySuccess()
+      } else {
+        let raison: string
+        if (!dateEcheanceDans3Jours) {
+          raison = `l'action n'arrive pas à échéance dans 3 jours`
+        } else if (!action.rappel) {
+          raison = `le rappel est désactivé`
+        } else {
+          raison = `le statut est ${action.statut}`
+        }
+        return failure(new PasDeRappelError(action.id, raison))
+      }
     }
   }
 }
