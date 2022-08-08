@@ -1,7 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
-import { emptySuccess, Result } from '../../../building-blocks/types/result'
+import {
+  emptySuccess,
+  isSuccess,
+  Result
+} from '../../../building-blocks/types/result'
 import {
   Planificateur,
   PlanificateurRepositoryToken,
@@ -53,7 +57,9 @@ export class SynchronizeJobsCommandHandler extends CommandHandler<
 
     this.logger.log('Création des jobs rappels actions')
     for (const action of actions) {
-      if (this.actionFactory.doitEnvoyerUneNotificationDeRappel(action))
+      if (
+        isSuccess(this.actionFactory.doitEnvoyerUneNotificationDeRappel(action))
+      )
         await this.planificateurService.planifierRappelAction(action)
     }
   }

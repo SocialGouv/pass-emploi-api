@@ -11,6 +11,7 @@ import { Action } from '../../../../src/domain/action'
 import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { uneAction } from '../../../fixtures/action.fixture'
+import { emptySuccess } from '../../../../src/building-blocks/types/result'
 
 describe('SynchronizeJobsCommandHandler', () => {
   DatabaseForTesting.prepare()
@@ -45,7 +46,7 @@ describe('SynchronizeJobsCommandHandler', () => {
       actionRepository.findAllActionsARappeler.resolves([uneAction()])
       actionFactory.doitEnvoyerUneNotificationDeRappel
         .withArgs(uneAction())
-        .returns(true)
+        .returns(emptySuccess())
 
       // WHen
       await synchronizeJobsCommandHandler.handle()
