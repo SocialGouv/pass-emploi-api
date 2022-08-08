@@ -1,7 +1,5 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox } from 'sinon'
-import { FichierAuthorizer } from 'src/application/authorizers/authorize-fichier'
-import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
 import { stubClassSandbox } from 'test/utils/types'
 import {
   SupprimerFichierCommand,
@@ -10,11 +8,12 @@ import {
 import { emptySuccess } from '../../../src/building-blocks/types/result'
 import { Fichier } from '../../../src/domain/fichier'
 import { expect, StubbedClass } from '../../utils'
+import { FichierSuppressionAuthorizer } from '../../../src/application/authorizers/authorize-fichier-suppression'
 
 describe('SupprimerFichierCommandHandler', () => {
   const sandbox = createSandbox()
   let fichierRepository: StubbedType<Fichier.Repository>
-  let fichierAuthorizer: StubbedClass<FichierAuthorizer>
+  let fichierSuppressionAuthorizer: StubbedClass<FichierSuppressionAuthorizer>
   let supprimerFichierCommandHandler: SupprimerFichierCommandHandler
 
   const command: SupprimerFichierCommand = {
@@ -23,32 +22,18 @@ describe('SupprimerFichierCommandHandler', () => {
 
   beforeEach(() => {
     fichierRepository = stubInterface(sandbox)
-    fichierAuthorizer = stubClassSandbox(FichierAuthorizer, sandbox)
+    fichierSuppressionAuthorizer = stubClassSandbox(
+      FichierSuppressionAuthorizer,
+      sandbox
+    )
     supprimerFichierCommandHandler = new SupprimerFichierCommandHandler(
       fichierRepository,
-      fichierAuthorizer
+      fichierSuppressionAuthorizer
     )
   })
 
   afterEach(() => {
     sandbox.restore()
-  })
-
-  describe('authorize', () => {
-    it("valide que l'utilisateur est bien autorisé à supprimer le fichier", async () => {
-      // Given
-      const utilisateur = unUtilisateurConseiller()
-      const idFichier = '1'
-
-      // When
-      await supprimerFichierCommandHandler.authorize({ idFichier }, utilisateur)
-
-      // Then
-      expect(fichierAuthorizer.authorize).to.have.been.calledWithExactly(
-        idFichier,
-        utilisateur
-      )
-    })
   })
 
   describe('handle', () => {

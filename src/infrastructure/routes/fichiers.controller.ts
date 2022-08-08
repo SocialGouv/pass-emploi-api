@@ -12,7 +12,6 @@ import {
   UseInterceptors
 } from '@nestjs/common'
 import { HttpStatus } from '@nestjs/common/enums/http-status.enum'
-import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ApiConsumes, ApiOAuth2, ApiTags } from '@nestjs/swagger'
 import { SupprimerFichierCommandHandler } from 'src/application/commands/supprimer-fichier.command.handler'
@@ -108,6 +107,6 @@ export class FilesController {
     if (isSuccess(result)) {
       return
     }
-    throw new RuntimeException()
+    throw handleFailure(result)
   }
 }

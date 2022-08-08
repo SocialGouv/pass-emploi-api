@@ -182,7 +182,7 @@ import { RechercherTypesDemarcheQueryHandler } from './application/queries/reche
 import { FilesController } from './infrastructure/routes/fichiers.controller'
 import { TelechargerFichierQueryHandler } from './application/queries/telecharger-fichier.query.handler'
 import { SupprimerFichierCommandHandler } from './application/commands/supprimer-fichier.command.handler'
-import { FichierAuthorizer } from './application/authorizers/authorize-fichier'
+import { FichierTelechargementAuthorizer } from './application/authorizers/authorize-fichier-telechargement'
 import { FindAllOffresEmploiQueryGetter } from './application/queries/query-getters/find-all-offres-emploi.query.getter'
 import { FindAllOffresImmersionQueryGetter } from './application/queries/query-getters/find-all-offres-immersion.query.getter'
 import { FindAllOffresServicesCiviqueQueryGetter } from './application/queries/query-getters/find-all-offres-services-civique.query.getter'
@@ -201,6 +201,7 @@ import { ConseillerForJeuneAvecPartageAuthorizer } from './application/authorize
 import { GetFavorisJeunePourConseillerQueryHandler } from './application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
 import { GetMetadonneesFavorisJeuneQueryHandler } from './application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 import { HandleJobRappelActionCommandHandler } from './application/commands/jobs/handle-job-rappel-action.command'
+import { FichierSuppressionAuthorizer } from './application/authorizers/authorize-fichier-suppression'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -457,12 +458,12 @@ export function buildQueryCommandsProviders(): Provider[] {
     TeleverserFichierCommandHandler,
     TelechargerFichierQueryHandler,
     SupprimerFichierCommandHandler,
-    FichierAuthorizer,
+    FichierTelechargementAuthorizer,
     FindAllOffresEmploiQueryGetter,
     FindAllOffresImmersionQueryGetter,
     FindAllOffresServicesCiviqueQueryGetter,
     RecupererJeunesDuConseillerCommandHandler,
-    FichierAuthorizer,
+    FichierSuppressionAuthorizer,
     HandleJobNettoyerPiecesJointesCommandHandler,
     ArchiverJeuneCommandHandler,
     GetMotifsSuppressionJeuneQueryHandler,

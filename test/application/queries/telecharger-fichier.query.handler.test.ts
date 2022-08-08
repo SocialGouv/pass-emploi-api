@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox } from 'sinon'
-import { FichierAuthorizer } from 'src/application/authorizers/authorize-fichier'
+import { FichierTelechargementAuthorizer } from 'src/application/authorizers/authorize-fichier-telechargement'
 import { ObjectStorageClient } from 'src/infrastructure/clients/object-storage.client'
 import {
   unUtilisateurConseiller,
@@ -21,7 +21,7 @@ import { RessourceIndisponibleError } from 'src/building-blocks/types/domain-err
 describe('TelechargerFichierQueryHandler', () => {
   const sandbox = createSandbox()
   let fichierRepository: StubbedType<Fichier.Repository>
-  let fichierAuthorizer: StubbedClass<FichierAuthorizer>
+  let fichierAuthorizer: StubbedClass<FichierTelechargementAuthorizer>
   let objectStorageClient: StubbedClass<ObjectStorageClient>
   let evenementService: StubbedClass<EvenementService>
   let telechargerFichierQueryHandler: TelechargerFichierQueryHandler
@@ -32,7 +32,10 @@ describe('TelechargerFichierQueryHandler', () => {
 
   beforeEach(() => {
     fichierRepository = stubInterface(sandbox)
-    fichierAuthorizer = stubClassSandbox(FichierAuthorizer, sandbox)
+    fichierAuthorizer = stubClassSandbox(
+      FichierTelechargementAuthorizer,
+      sandbox
+    )
     objectStorageClient = stubClassSandbox(ObjectStorageClient, sandbox)
     evenementService = stubClassSandbox(EvenementService, sandbox)
     telechargerFichierQueryHandler = new TelechargerFichierQueryHandler(

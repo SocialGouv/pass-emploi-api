@@ -4,7 +4,7 @@ import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { Fichier } from 'src/domain/fichier'
 import { Jeune } from 'src/domain/jeune'
 import { unJeune } from 'test/fixtures/jeune.fixture'
-import { FichierAuthorizer } from '../../../src/application/authorizers/authorize-fichier'
+import { FichierTelechargementAuthorizer } from '../../../src/application/authorizers/authorize-fichier-telechargement'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
@@ -12,16 +12,16 @@ import {
 import { unFichierMetadata } from '../../fixtures/fichier.fixture'
 import { createSandbox, expect } from '../../utils'
 
-describe('FichierAuthorizer', () => {
+describe('FichierTelechargementAuthorizer', () => {
   let fichierRepository: StubbedType<Fichier.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
-  let fichierAuthorizer: FichierAuthorizer
+  let fichierTelechargementAuthorizer: FichierTelechargementAuthorizer
 
   beforeEach(() => {
     const sandbox = createSandbox()
     fichierRepository = stubInterface(sandbox)
     jeuneRepository = stubInterface(sandbox)
-    fichierAuthorizer = new FichierAuthorizer(
+    fichierTelechargementAuthorizer = new FichierTelechargementAuthorizer(
       fichierRepository,
       jeuneRepository
     )
@@ -41,7 +41,10 @@ describe('FichierAuthorizer', () => {
         .resolves([unJeune()])
 
       // When
-      const result = await fichierAuthorizer.authorize(idFichier, utilisateur)
+      const result = await fichierTelechargementAuthorizer.authorize(
+        idFichier,
+        utilisateur
+      )
 
       // Then
       expect(result).to.deep.equal(emptySuccess())
@@ -58,7 +61,10 @@ describe('FichierAuthorizer', () => {
         .resolves([])
 
       // When
-      const result = await fichierAuthorizer.authorize(idFichier, utilisateur)
+      const result = await fichierTelechargementAuthorizer.authorize(
+        idFichier,
+        utilisateur
+      )
 
       // Then
       expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
@@ -71,7 +77,10 @@ describe('FichierAuthorizer', () => {
         .resolves(unFichierMetadata({ idsJeunes: [utilisateur.id] }))
 
       // When
-      const result = await fichierAuthorizer.authorize(idFichier, utilisateur)
+      const result = await fichierTelechargementAuthorizer.authorize(
+        idFichier,
+        utilisateur
+      )
 
       // Then
       expect(result).to.deep.equal(emptySuccess())
@@ -84,7 +93,10 @@ describe('FichierAuthorizer', () => {
         .resolves(unFichierMetadata({ idsJeunes: [] }))
 
       // When
-      const result = await fichierAuthorizer.authorize(idFichier, utilisateur)
+      const result = await fichierTelechargementAuthorizer.authorize(
+        idFichier,
+        utilisateur
+      )
 
       // Then
       expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
@@ -97,7 +109,10 @@ describe('FichierAuthorizer', () => {
         .resolves(undefined)
 
       // When
-      const result = await fichierAuthorizer.authorize(idFichier, utilisateur)
+      const result = await fichierTelechargementAuthorizer.authorize(
+        idFichier,
+        utilisateur
+      )
 
       // Then
       expect(result).to.deep.equal(failure(new DroitsInsuffisants()))

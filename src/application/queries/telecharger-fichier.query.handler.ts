@@ -7,7 +7,7 @@ import { failure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Fichier, FichierRepositoryToken } from '../../domain/fichier'
-import { FichierAuthorizer } from '../authorizers/authorize-fichier'
+import { FichierTelechargementAuthorizer } from '../authorizers/authorize-fichier-telechargement'
 
 export interface TelechargerFichierQuery extends Query {
   idFichier: string
@@ -21,7 +21,7 @@ export class TelechargerFichierQueryHandler extends QueryHandler<
   constructor(
     @Inject(FichierRepositoryToken)
     private fichierRepository: Fichier.Repository,
-    private fichierAuthorizer: FichierAuthorizer,
+    private fichierTelechargementAuthorizer: FichierTelechargementAuthorizer,
     private objectStorageClient: ObjectStorageClient,
     private evenementService: EvenementService
   ) {
@@ -32,7 +32,10 @@ export class TelechargerFichierQueryHandler extends QueryHandler<
     query: TelechargerFichierQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.fichierAuthorizer.authorize(query.idFichier, utilisateur)
+    return this.fichierTelechargementAuthorizer.authorize(
+      query.idFichier,
+      utilisateur
+    )
   }
 
   async handle(query: TelechargerFichierQuery): Promise<Result<string>> {
