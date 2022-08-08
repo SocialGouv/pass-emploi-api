@@ -5,6 +5,7 @@ import {
 } from 'src/application/commands/supprimer-fichier.command.handler'
 import { TelechargerFichierQueryHandler } from 'src/application/queries/telecharger-fichier.query.handler'
 import {
+  DroitsInsuffisants,
   MauvaiseCommandeError,
   RessourceIndisponibleError
 } from 'src/building-blocks/types/domain-error'
@@ -188,6 +189,24 @@ describe('FichiersController', () => {
         .set('authorization', unHeaderAuthorization())
         // Then
         .expect(HttpStatus.NO_CONTENT)
+    })
+    it("renvoie une erreur 403 quand l'utilisateur n'est pas autorisé", async () => {
+      // Given
+      const utilisateur = unUtilisateurDecode()
+      const idFichier = '15916d7e-f13a-4158-b7eb-3936aa933a0a'
+      const command: SupprimerFichierCommand = {
+        idFichier
+      }
+      supprimerFichierCommandHandler.execute
+        .withArgs(command, utilisateur)
+        .resolves(failure(new DroitsInsuffisants()))
+
+      // When
+      await request(app.getHttpServer())
+        .delete(`/fichiers/${idFichier}`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.FORBIDDEN)
     })
     ensureUserAuthenticationFailsIfInvalid('delete', '/fichiers/1')
   })

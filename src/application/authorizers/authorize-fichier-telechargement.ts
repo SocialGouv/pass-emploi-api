@@ -6,7 +6,7 @@ import { Fichier, FichierRepositoryToken } from 'src/domain/fichier'
 import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune'
 
 @Injectable()
-export class FichierAuthorizer {
+export class FichierTelechargementAuthorizer {
   constructor(
     @Inject(FichierRepositoryToken)
     private fichierRepository: Fichier.Repository,
