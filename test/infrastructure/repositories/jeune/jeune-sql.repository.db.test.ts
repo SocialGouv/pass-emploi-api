@@ -139,14 +139,14 @@ describe('JeuneSqlRepository', () => {
         await jeuneSqlRepository.save(
           unJeune({
             id: idJeune,
-            idDossier
+            idPartenaire: idDossier
           })
         )
 
         // Then
         const jeune = await JeuneSqlModel.findByPk(idJeune)
         expect(jeune?.id).to.equal(idJeune)
-        expect(jeune?.idDossier).to.equal(idDossier)
+        expect(jeune?.idPartenaire).to.equal(idDossier)
       })
     })
   })
@@ -353,7 +353,7 @@ describe('JeuneSqlRepository', () => {
       // Given
       jeune = {
         ...unJeuneSansConseiller(),
-        idDossier: 'test-id-dossier',
+        idPartenaire: 'test-id-dossier',
         configuration: undefined
       }
       await JeuneSqlModel.creer(
@@ -362,7 +362,7 @@ describe('JeuneSqlRepository', () => {
           dateCreation: jeune.creationDate.toJSDate(),
           pushNotificationToken: 'unToken',
           dateDerniereActualisationToken: uneDatetime.toJSDate(),
-          idDossier: 'test-id-dossier',
+          idPartenaire: 'test-id-dossier',
           datePremiereConnexion: uneDatetime.toJSDate()
         })
       )
@@ -403,19 +403,19 @@ describe('JeuneSqlRepository', () => {
           id: 'jeune-pas-milo',
           idConseiller: undefined,
           structure: Core.Structure.POLE_EMPLOI,
-          idDossier: undefined
+          idPartenaire: undefined
         }),
         unJeuneDto({
           id: 'jeune-sans-id-dossier',
           idConseiller: undefined,
           structure: Core.Structure.MILO,
-          idDossier: undefined
+          idPartenaire: undefined
         }),
         unJeuneDto({
           id: idJeuneTest,
           idConseiller: undefined,
           structure: Core.Structure.MILO,
-          idDossier: 'test-id-dossier'
+          idPartenaire: 'test-id-dossier'
         })
       ])
     })

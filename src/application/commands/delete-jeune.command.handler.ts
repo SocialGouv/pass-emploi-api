@@ -28,7 +28,7 @@ export interface DeleteJeuneCommand {
     lastName: string
     structure: Core.Structure
     email?: string
-    idDossier?: string
+    idPartenaire?: string
   }
 }
 
@@ -80,7 +80,7 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
       lastName: jeune.lastName,
       structure: jeune.structure,
       email: jeune.email,
-      idDossier: jeune.idDossier
+      idPartenaire: jeune.idPartenaire
     }
 
     await this.authentificationRepository.deleteJeuneIdp(idJeune)

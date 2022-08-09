@@ -135,44 +135,70 @@ describe('GetDetailJeuneQueryHandler', () => {
         })
         expect(actual).to.deep.equal(success(expected))
       })
-      describe("quand c'est un jeune MILO", () => {
-        it("retourne l'url MILO quand l'id dossier existe", async () => {
-          // Given
-          await JeuneSqlModel.creer(
-            unJeuneDto({
-              id: idJeune,
-              idConseiller,
-              structure: Core.Structure.MILO,
-              idDossier: '123'
-            })
-          )
-          // When
-          const result = await getDetailJeuneQueryHandler.handle({ idJeune })
-          // Then
-          expect(result._isSuccess).to.be.true()
-          if (isSuccess(result)) {
-            expect(result.data.urlDossier).to.equal(
-              'https://milo.com/123/acces-externe'
+      describe('quand il y a un id externe', () => {
+        describe('pour un Jeune MILO', () => {
+          it("retourne l'url MILO", async () => {
+            // Given
+            await JeuneSqlModel.creer(
+              unJeuneDto({
+                id: idJeune,
+                idConseiller,
+                structure: Core.Structure.MILO,
+                idPartenaire: '123'
+              })
             )
-          }
+            // When
+            const result = await getDetailJeuneQueryHandler.handle({ idJeune })
+            // Then
+            expect(result._isSuccess).to.be.true()
+            if (isSuccess(result)) {
+              expect(result.data.urlDossier).to.equal(
+                'https://milo.com/123/acces-externe'
+              )
+            }
+          })
         })
-        it("ne retourne pas d'url MILO quand l'id dossier est inexistant", async () => {
-          // Given
-          await JeuneSqlModel.creer(
-            unJeuneDto({
-              id: idJeune,
-              idConseiller,
-              structure: Core.Structure.MILO,
-              idDossier: undefined
-            })
-          )
-          // When
-          const result = await getDetailJeuneQueryHandler.handle({ idJeune })
-          // Then
-          expect(result._isSuccess).to.be.true()
-          if (isSuccess(result)) {
-            expect(result.data.urlDossier).to.be.undefined()
-          }
+        describe('pour un Jeune PE', () => {
+          it("retourne l'id externe", async () => {
+            // Given
+            await JeuneSqlModel.creer(
+              unJeuneDto({
+                id: idJeune,
+                idConseiller,
+                structure: Core.Structure.POLE_EMPLOI,
+                idPartenaire: '123'
+              })
+            )
+            // When
+            const result = await getDetailJeuneQueryHandler.handle({ idJeune })
+            // Then
+            expect(result._isSuccess).to.be.true()
+            if (isSuccess(result)) {
+              expect(result.data.idPartenaire).to.equal('123')
+            }
+          })
+        })
+      })
+      describe("quand il n'y a pas d'id externe", () => {
+        describe('pour un Jeune MILO', () => {
+          it("ne retourne pas d'url MILO", async () => {
+            // Given
+            await JeuneSqlModel.creer(
+              unJeuneDto({
+                id: idJeune,
+                idConseiller,
+                structure: Core.Structure.MILO,
+                idPartenaire: undefined
+              })
+            )
+            // When
+            const result = await getDetailJeuneQueryHandler.handle({ idJeune })
+            // Then
+            expect(result._isSuccess).to.be.true()
+            if (isSuccess(result)) {
+              expect(result.data.urlDossier).to.be.undefined()
+            }
+          })
         })
       })
     })

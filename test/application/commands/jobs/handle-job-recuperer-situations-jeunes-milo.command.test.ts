@@ -23,12 +23,12 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
   const jeune1 = unJeune({
     id: 'jeune1',
     structure: Core.Structure.MILO,
-    idDossier: '1'
+    idPartenaire: '1'
   })
   const jeune2 = unJeune({
     id: 'jeune2',
     structure: Core.Structure.MILO,
-    idDossier: '2'
+    idPartenaire: '2'
   })
 
   beforeEach(() => {
@@ -73,10 +73,10 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
       jeuneRepository.getJeunesMilo.withArgs(0, 100).resolves([jeune1, jeune2])
       jeuneRepository.getJeunesMilo.withArgs(100, 100).resolves([])
       miloRepository.getDossier
-        .withArgs(jeune1.idDossier)
-        .resolves(success(unDossierMilo({ id: jeune1.idDossier })))
+        .withArgs(jeune1.idPartenaire)
+        .resolves(success(unDossierMilo({ id: jeune1.idPartenaire })))
       miloRepository.getDossier
-        .withArgs(jeune2.idDossier)
+        .withArgs(jeune2.idPartenaire)
         .resolves(failure(new ErreurHttp('', 0)))
 
       // When
@@ -106,8 +106,8 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
         .resolves([undefined, jeune1])
       jeuneRepository.getJeunesMilo.withArgs(100, 100).resolves([])
       miloRepository.getDossier
-        .withArgs(jeune1.idDossier)
-        .resolves(success(unDossierMilo({ id: jeune1.idDossier })))
+        .withArgs(jeune1.idPartenaire)
+        .resolves(success(unDossierMilo({ id: jeune1.idPartenaire })))
 
       // When
       const result =
@@ -139,10 +139,10 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
       jeuneRepository.getJeunesMilo.withArgs(100, 100).resolves([jeune2])
       jeuneRepository.getJeunesMilo.withArgs(200, 100).resolves([])
       miloRepository.getDossier
-        .withArgs(jeune1.idDossier)
-        .resolves(success(unDossierMilo({ id: jeune1.idDossier })))
+        .withArgs(jeune1.idPartenaire)
+        .resolves(success(unDossierMilo({ id: jeune1.idPartenaire })))
       miloRepository.getDossier
-        .withArgs(jeune2.idDossier)
+        .withArgs(jeune2.idPartenaire)
         .resolves(failure(new ErreurHttp('', 0)))
 
       // When

@@ -29,9 +29,10 @@ export function fromSqlToDetailJeuneQueryModel(
       depuis: depuis.toISOString()
     },
     situations: jeuneSqlModel.situations?.situations,
+    idPartenaire: jeuneSqlModel.idPartenaire ?? undefined,
     urlDossier:
-      baseUrlDossier && jeuneSqlModel.idDossier
-        ? `${baseUrlDossier}/${jeuneSqlModel.idDossier}/acces-externe`
+      baseUrlDossier && jeuneSqlModel.idPartenaire
+        ? `${baseUrlDossier}/${jeuneSqlModel.idPartenaire}/acces-externe`
         : undefined
   }
 }

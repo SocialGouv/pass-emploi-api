@@ -55,7 +55,9 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends Comman
 
       const promises = await Promise.allSettled(
         jeunes.map(async jeune => {
-          const dossier = await this.miloRepository.getDossier(jeune.idDossier!)
+          const dossier = await this.miloRepository.getDossier(
+            jeune.idPartenaire!
+          )
 
           if (isFailure(dossier)) {
             stats.dossiersNonTrouves++
