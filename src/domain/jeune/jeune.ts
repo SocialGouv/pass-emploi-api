@@ -48,6 +48,16 @@ export namespace Jeune {
 
   export type Id = Brand<string, 'JeuneId'>
 
+  export function mettreAJourIdPartenaire(
+    jeune: Jeune,
+    idPartenaire: string
+  ): Jeune {
+    return {
+      ...jeune,
+      idPartenaire
+    }
+  }
+
   export interface Repository {
     get(
       id: string,
