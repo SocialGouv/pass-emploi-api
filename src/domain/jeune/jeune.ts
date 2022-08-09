@@ -21,7 +21,7 @@ export interface Jeune {
   conseiller?: Jeune.Conseiller
   conseillerInitial?: Jeune.ConseillerInitial
   email?: string
-  idDossier?: string
+  idPartenaire?: string
   configuration?: Jeune.ConfigurationApplication
   preferences: Jeune.Preferences
 }
@@ -60,7 +60,7 @@ export namespace Jeune {
 
     getByEmail(email: string): Promise<Jeune | undefined>
 
-    getByIdDossier(idDossier: string): Promise<Jeune | undefined>
+    getByIdDossier(idPartenaire: string): Promise<Jeune | undefined>
 
     save(jeune: Jeune): Promise<void>
 
@@ -108,7 +108,7 @@ export namespace Jeune {
         preferences: {
           partageFavoris: true
         },
-        idDossier: jeuneACreer.idDossier
+        idPartenaire: jeuneACreer.idPartenaire
       }
     }
   }
@@ -120,7 +120,7 @@ export namespace Jeune {
       email: string
       conseiller: Conseiller
       structure: Core.Structure
-      idDossier?: string
+      idPartenaire?: string
     }
   }
 

@@ -20,7 +20,7 @@ export function unJeuneDto(
     structure: Core.Structure.MILO,
     idAuthentification: 'un-id',
     dateDerniereConnexion: null,
-    idDossier: '1234',
+    idPartenaire: '1234',
     appVersion: '1.8.1',
     installationId: '123456',
     partageFavoris: true

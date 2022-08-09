@@ -14,7 +14,7 @@ export const unJeune = (
     conseiller: unConseillerDuJeune(),
     creationDate: uneDatetime,
     email: 'john.doe@plop.io',
-    idDossier: '1234',
+    idPartenaire: '1234',
     structure: Core.Structure.MILO,
     configuration: uneConfiguration(),
     preferences: {
@@ -35,7 +35,7 @@ export const unJeuneSansPushNotificationToken = (
   conseiller: unConseillerDuJeune(conseiller),
   creationDate: uneDatetime,
   email: 'john.doe@plop.io',
-  idDossier: '1234',
+  idPartenaire: '1234',
   structure: Core.Structure.MILO,
   configuration: {
     idJeune: 'ABCDE'
@@ -55,7 +55,7 @@ export const unJeuneSansConseiller = (
     isActivated: true,
     creationDate: uneDatetime,
     email: 'john.doe@plop.io',
-    idDossier: '1234',
+    idPartenaire: '1234',
     structure: Core.Structure.MILO,
     preferences: {
       partageFavoris: true

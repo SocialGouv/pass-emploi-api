@@ -23,7 +23,7 @@ export function fromSqlToJeune(
     isActivated: Boolean(jeuneSqlModel.datePremiereConnexion),
     structure: jeuneSqlModel.structure,
     email: jeuneSqlModel.email ?? undefined,
-    idDossier: jeuneSqlModel.idDossier ?? undefined,
+    idPartenaire: jeuneSqlModel.idPartenaire ?? undefined,
     configuration: attributs?.avecConfiguration
       ? toConfigurationApplication(jeuneSqlModel)
       : undefined,
@@ -68,7 +68,7 @@ export function toSqlJeune(
     dateCreation: jeune.creationDate.toJSDate(),
     email: jeune.email ?? null,
     structure: jeune.structure,
-    idDossier: jeune.idDossier ?? null,
+    idPartenaire: jeune.idPartenaire ?? null,
     partageFavoris: jeune.preferences.partageFavoris
   }
 }

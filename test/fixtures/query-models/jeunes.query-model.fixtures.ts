@@ -45,7 +45,8 @@ export function unDetailJeuneQueryModel(
     isActivated: true,
     isReaffectationTemporaire: false,
     conseiller: unConseillerJeuneQueryModel(),
-    urlDossier: undefined
+    urlDossier: undefined,
+    idPartenaire: '1234'
   }
 
   return { ...defaults, ...args }

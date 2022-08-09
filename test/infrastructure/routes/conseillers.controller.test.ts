@@ -809,7 +809,7 @@ describe('ConseillersController', () => {
       it('renvoie 201', async () => {
         // Given
         const command: CreerJeuneMiloCommand = {
-          idDossier: 'idDossier',
+          idPartenaire: 'idDossier',
           nom: 'nom',
           prenom: 'prenom',
           email: 'email',
@@ -835,7 +835,7 @@ describe('ConseillersController', () => {
         // Given
         // Given
         const command: CreerJeuneMiloCommand = {
-          idDossier: 'ID400',
+          idPartenaire: 'ID400',
           nom: 'nom',
           prenom: 'prenom',
           email: 'email',
@@ -858,7 +858,7 @@ describe('ConseillersController', () => {
       it('renvoie 409', async () => {
         // Given
         const command: CreerJeuneMiloCommand = {
-          idDossier: 'ID409',
+          idPartenaire: 'ID409',
           nom: 'nom',
           prenom: 'prenom',
           email: 'email',
@@ -882,7 +882,7 @@ describe('ConseillersController', () => {
       it('renvoie 409', async () => {
         // Given
         const command: CreerJeuneMiloCommand = {
-          idDossier: 'ID409',
+          idPartenaire: 'ID409',
           nom: 'nom',
           prenom: 'prenom',
           email: 'email',

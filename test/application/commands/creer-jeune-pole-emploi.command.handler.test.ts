@@ -80,7 +80,7 @@ describe('CreateJeunePoleEmploiCommandHandler', () => {
         creationDate: date,
         conseiller: unConseillerDuJeune(),
         structure: Core.Structure.POLE_EMPLOI,
-        idDossier: undefined,
+        idPartenaire: undefined,
         preferences: {
           partageFavoris: true
         }

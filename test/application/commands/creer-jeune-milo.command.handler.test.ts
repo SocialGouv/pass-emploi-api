@@ -73,7 +73,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
       it('renvoie une erreur', async () => {
         // Given
         const command: CreerJeuneMiloCommand = {
-          idDossier: 'idDossier',
+          idPartenaire: 'idDossier',
           nom: 'nom',
           prenom: 'prenom',
           email: 'email',
@@ -94,14 +94,14 @@ describe('CreerJeuneMiloCommandHandler', () => {
       it('renvoie une erreur', async () => {
         // Given
         const command: CreerJeuneMiloCommand = {
-          idDossier: 'idDossier',
+          idPartenaire: 'idDossier',
           nom: 'nom',
           prenom: 'prenom',
           email: 'email',
           idConseiller: 'idConseiller'
         }
         jeuneRepository.getByIdDossier
-          .withArgs(command.idDossier)
+          .withArgs(command.idPartenaire)
           .resolves(unJeune())
 
         // When
@@ -109,7 +109,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
 
         // Then
         expect(result).to.deep.equal(
-          failure(new DossierExisteDejaError(command.idDossier))
+          failure(new DossierExisteDejaError(command.idPartenaire))
         )
       })
     })
@@ -117,14 +117,14 @@ describe('CreerJeuneMiloCommandHandler', () => {
       it('crée un jeune et initialise le chat si besoin', async () => {
         // Given
         const command: CreerJeuneMiloCommand = {
-          idDossier: 'idDossier',
+          idPartenaire: 'idDossier',
           nom: 'nom',
           prenom: 'prenom',
           email: 'email',
           idConseiller: 'idConseiller'
         }
         miloRepository.creerJeune
-          .withArgs(command.idDossier)
+          .withArgs(command.idPartenaire)
           .resolves(success({ idAuthentification: 'mon-sub' }))
 
         // When
@@ -146,7 +146,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
           },
           structure: Core.Structure.MILO,
           preferences: { partageFavoris: true },
-          idDossier: 'idDossier'
+          idPartenaire: 'idDossier'
         }
         expect(jeuneRepository.save).to.have.been.calledWithExactly(
           expextedJeune
@@ -166,14 +166,14 @@ describe('CreerJeuneMiloCommandHandler', () => {
       it("minusculise l'email", async () => {
         // Given
         const command: CreerJeuneMiloCommand = {
-          idDossier: 'idDossier',
+          idPartenaire: 'idDossier',
           nom: 'nom',
           prenom: 'prenom',
           email: 'Jeune.Nom@Email.Com',
           idConseiller: 'idConseiller'
         }
         miloRepository.creerJeune
-          .withArgs(command.idDossier)
+          .withArgs(command.idPartenaire)
           .resolves(success({ idAuthentification: 'mon-sub' }))
 
         // When
@@ -195,7 +195,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
           },
           structure: Core.Structure.MILO,
           preferences: { partageFavoris: true },
-          idDossier: 'idDossier'
+          idPartenaire: 'idDossier'
         }
         expect(jeuneRepository.save).to.have.been.calledWithExactly(expected)
       })
@@ -205,14 +205,14 @@ describe('CreerJeuneMiloCommandHandler', () => {
       it("renvoie un succès quand il n'existe pas chez nous", async () => {
         // Given
         const command: CreerJeuneMiloCommand = {
-          idDossier: 'idDossier',
+          idPartenaire: 'idDossier',
           nom: 'nom',
           prenom: 'prenom',
           email: 'email',
           idConseiller: 'idConseiller'
         }
         miloRepository.creerJeune
-          .withArgs(command.idDossier)
+          .withArgs(command.idPartenaire)
           .resolves(success({ idAuthentification: 'mon-sub' }))
 
         // When
@@ -224,7 +224,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
       it('renvoie une erreur quand il existe pas chez nous', async () => {
         // Given
         const command: CreerJeuneMiloCommand = {
-          idDossier: 'idDossier',
+          idPartenaire: 'idDossier',
           nom: 'nom',
           prenom: 'prenom',
           email: 'email',
@@ -248,7 +248,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
       it('renvoie une erreur', async () => {
         // Given
         const command: CreerJeuneMiloCommand = {
-          idDossier: 'idDossier',
+          idPartenaire: 'idDossier',
           nom: 'nom',
           prenom: 'prenom',
           email: 'email',
@@ -278,7 +278,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
     it('authorise un conseiller milo', async () => {
       // Given
       const command: CreerJeuneMiloCommand = {
-        idDossier: 'idDossier',
+        idPartenaire: 'idDossier',
         nom: 'nom',
         prenom: 'prenom',
         email: 'email',
@@ -300,7 +300,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
     it('rejette un conseiller pole emploi', async () => {
       // Given
       const command: CreerJeuneMiloCommand = {
-        idDossier: 'idDossier',
+        idPartenaire: 'idDossier',
         nom: 'nom',
         prenom: 'prenom',
         email: 'email',

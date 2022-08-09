@@ -98,6 +98,9 @@ export class DetailJeuneQueryModel {
 
   @ApiProperty({ required: false })
   urlDossier?: string
+
+  @ApiProperty({ required: false })
+  idPartenaire?: string
 }
 
 export class DetailJeuneConseillerQueryModel {

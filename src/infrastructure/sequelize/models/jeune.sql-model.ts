@@ -101,10 +101,10 @@ export class JeuneDto extends Model {
   dateDerniereConnexion: Date | null
 
   @Column({
-    field: 'id_dossier',
+    field: 'id_partenaire',
     type: DataType.STRING
   })
-  idDossier: string | null
+  idPartenaire: string | null
 
   @Column({
     field: 'app_version',

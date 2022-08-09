@@ -206,7 +206,7 @@ describe('AuthentificationSqlRepository', () => {
     })
     it("conserve l'id dossier d'un jeune MILO", async () => {
       const jeuneAvant = await JeuneSqlModel.findByPk(unJeune.id)
-      expect(jeuneAvant?.idDossier).to.deep.equal(unJeune.idDossier)
+      expect(jeuneAvant?.idPartenaire).to.deep.equal(unJeune.idPartenaire)
 
       // When
       const unJeuneMisAJour: Authentification.Utilisateur = {
@@ -224,7 +224,7 @@ describe('AuthentificationSqlRepository', () => {
 
       // Then
       const jeune = await JeuneSqlModel.findByPk(unJeune.id)
-      expect(jeune?.idDossier).to.deep.equal(unJeune.idDossier)
+      expect(jeune?.idPartenaire).to.deep.equal(unJeune.idPartenaire)
     })
     it("met à jour l'utilisateur de type CONSEILLER", async () => {
       // When

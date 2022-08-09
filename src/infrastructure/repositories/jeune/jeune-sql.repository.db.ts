@@ -61,9 +61,9 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return fromSqlToJeune(jeuneSqlModel)
   }
 
-  async getByIdDossier(idDossier: string): Promise<Jeune | undefined> {
+  async getByIdDossier(idPartenaire: string): Promise<Jeune | undefined> {
     const jeuneSqlModel = await JeuneSqlModel.findOne({
-      where: { idDossier }
+      where: { idPartenaire }
     })
     if (!jeuneSqlModel) {
       return undefined
@@ -121,7 +121,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
       dateCreation: jeune.creationDate.toJSDate(),
       email: jeune.email ?? null,
       structure: jeune.structure,
-      idDossier: jeune.idDossier ?? null,
+      idPartenaire: jeune.idPartenaire ?? null,
       partageFavoris: jeune.preferences.partageFavoris
     })
   }
@@ -168,7 +168,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
     const jeunesMiloSqlModel = await JeuneSqlModel.findAll({
       where: {
         structure: Core.Structure.MILO,
-        idDossier: { [Op.ne]: null }
+        idPartenaire: { [Op.ne]: null }
       },
       order: [['id', 'ASC']],
       offset,

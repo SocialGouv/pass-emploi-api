@@ -39,7 +39,7 @@ describe('GetJeuneMiloByDossierQueryHandler', () => {
         await JeuneSqlModel.creer(
           unJeuneDto({
             id: 'test',
-            idDossier: '1',
+            idPartenaire: '1',
             idConseiller: '1'
           })
         )
@@ -67,7 +67,7 @@ describe('GetJeuneMiloByDossierQueryHandler', () => {
         await JeuneSqlModel.creer(
           unJeuneDto({
             id: 'test',
-            idDossier: '1',
+            idPartenaire: '1',
             idConseiller: unAutreConseiller.id
           })
         )

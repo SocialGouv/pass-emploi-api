@@ -26,7 +26,7 @@ import { Milo, MiloRepositoryToken } from '../../domain/milo'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 
 export interface CreerJeuneMiloCommand extends Command {
-  idDossier: string
+  idPartenaire: string
   nom: string
   prenom: string
   email: string
@@ -61,16 +61,16 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
     const lowerCaseEmail = command.email.toLocaleLowerCase()
     const [jeuneByEmail, jeuneByIdDossier] = await Promise.all([
       this.jeuneRepository.getByEmail(lowerCaseEmail),
-      this.jeuneRepository.getByIdDossier(command.idDossier)
+      this.jeuneRepository.getByIdDossier(command.idPartenaire)
     ])
     if (jeuneByEmail) {
       return failure(new EmailExisteDejaError(lowerCaseEmail))
     }
     if (jeuneByIdDossier) {
-      return failure(new DossierExisteDejaError(command.idDossier))
+      return failure(new DossierExisteDejaError(command.idPartenaire))
     }
 
-    const result = await this.miloRepository.creerJeune(command.idDossier)
+    const result = await this.miloRepository.creerJeune(command.idPartenaire)
 
     if (isFailure(result)) {
       return result
@@ -142,7 +142,7 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
       email: lowerCaseEmail,
       structure: Core.Structure.MILO,
       conseiller,
-      idDossier: command.idDossier
+      idPartenaire: command.idPartenaire
     }
     const nouveauJeune = this.jeuneFactory.creer(jeuneACreer)
     await this.jeuneRepository.save(nouveauJeune)

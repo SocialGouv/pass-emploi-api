@@ -37,7 +37,10 @@ import {
   CreateActionCommand,
   CreateActionCommandHandler
 } from '../../application/commands/create-action.command.handler'
-import { CreerJeuneMiloCommandHandler } from '../../application/commands/creer-jeune-milo.command.handler'
+import {
+  CreerJeuneMiloCommand,
+  CreerJeuneMiloCommandHandler
+} from '../../application/commands/creer-jeune-milo.command.handler'
 import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/creer-jeune-pole-emploi.command.handler'
 import { ModifierConseillerCommandHandler } from '../../application/commands/modifier-conseiller.command.handler'
 import {
@@ -453,8 +456,12 @@ export class ConseillersController {
     @Body() creerJeuneMiloPayload: CreerJeuneMiloPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<Core.Id> {
+    const command: CreerJeuneMiloCommand = {
+      ...creerJeuneMiloPayload,
+      idPartenaire: creerJeuneMiloPayload.idDossier
+    }
     const result = await this.creerJeuneMiloCommandHandler.execute(
-      creerJeuneMiloPayload,
+      command,
       utilisateur
     )
     if (isSuccess(result)) {
