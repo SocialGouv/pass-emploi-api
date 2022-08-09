@@ -82,6 +82,7 @@ import {
   EnvoyerNotificationsPayload,
   GetConseillerQueryParams,
   GetRendezVousConseillerQueryParams,
+  PutJeuneDuConseillerPayload,
   SuperviseursPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
@@ -90,6 +91,7 @@ import {
   MetadonneesFavorisJeuneQueryModel
 } from '../../application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 import { DateService } from 'src/utils/date-service'
+import { ModifierJeuneDuConseillerCommandHandler } from '../../application/commands/modifier-jeune-du-conseiller.command.handler'
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -113,7 +115,8 @@ export class ConseillersController {
     private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler,
     private readonly modifierConseillerCommandHandler: ModifierConseillerCommandHandler,
     private readonly recupererJeunesDuConseillerCommandHandler: RecupererJeunesDuConseillerCommandHandler,
-    private readonly getMetadonneesFavorisJeuneQueryHandler: GetMetadonneesFavorisJeuneQueryHandler
+    private readonly getMetadonneesFavorisJeuneQueryHandler: GetMetadonneesFavorisJeuneQueryHandler,
+    private readonly modifierJeuneDuConseillerCommandHandler: ModifierJeuneDuConseillerCommandHandler
   ) {}
 
   @ApiOperation({
@@ -457,7 +460,10 @@ export class ConseillersController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<Core.Id> {
     const command: CreerJeuneMiloCommand = {
-      ...creerJeuneMiloPayload,
+      idConseiller: creerJeuneMiloPayload.idConseiller,
+      email: creerJeuneMiloPayload.email,
+      nom: creerJeuneMiloPayload.nom,
+      prenom: creerJeuneMiloPayload.prenom,
       idPartenaire: creerJeuneMiloPayload.idDossier
     }
     const result = await this.creerJeuneMiloCommandHandler.execute(
@@ -551,6 +557,32 @@ export class ConseillersController {
       utilisateur
     )
     handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary: "Permet de modifier l'idPartenaire d'un jeune PE",
+    description: 'Autorisé pour un conseiller Pole Emploi et Pass emploi'
+  })
+  @Put(':idConseiller/jeunes/:idJeune')
+  @ApiBody({
+    type: PutJeuneDuConseillerPayload
+  })
+  async modiferJeuneDuConseiller(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    @Param('idConseiller') idConseiller: string,
+    @Param('idJeune') idJeune: string,
+    @Body() putJeuneDuConseillerPayload: PutJeuneDuConseillerPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.modifierJeuneDuConseillerCommandHandler.execute(
+      {
+        idPartenaire: putJeuneDuConseillerPayload.idPartenaire,
+        idJeune
+      },
+      utilisateur
+    )
+    return handleFailure(result)
   }
 
   private buildDateEcheanceV1(): Date {

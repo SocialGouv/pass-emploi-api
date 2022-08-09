@@ -207,6 +207,7 @@ import { GetFavorisJeunePourConseillerQueryHandler } from './application/queries
 import { GetMetadonneesFavorisJeuneQueryHandler } from './application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 import { HandleJobRappelActionCommandHandler } from './application/commands/jobs/handle-job-rappel-action.command'
 import { FichierSuppressionAuthorizer } from './application/authorizers/authorize-fichier-suppression'
+import { ModifierJeuneDuConseillerCommandHandler } from './application/commands/modifier-jeune-du-conseiller.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -483,7 +484,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetPreferencesJeuneQueryHandler,
     GetRendezVousConseillerPaginesQueryHandler,
     GetMetadonneesFavorisJeuneQueryHandler,
-    GetFavorisJeunePourConseillerQueryHandler
+    GetFavorisJeunePourConseillerQueryHandler,
+    ModifierJeuneDuConseillerCommandHandler
   ]
 }
 

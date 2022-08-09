@@ -28,7 +28,7 @@ export class GetJeuneMiloByDossierQueryHandler extends QueryHandler<
   ): Promise<Result<JeuneQueryModel>> {
     const jeuneSqlModel = await JeuneSqlModel.findOne({
       where: {
-        idDossier: query.idDossier,
+        idPartenaire: query.idDossier,
         idConseiller: utilisateur.id
       }
     })

@@ -12,6 +12,7 @@ import {
   IsNotEmptyObject,
   IsOptional,
   IsString,
+  Length,
   ValidateNested
 } from 'class-validator'
 import { TriRendezVous } from 'src/application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
@@ -158,4 +159,12 @@ export class DetailConseillerPayload {
   @IsBoolean()
   @IsOptional()
   notificationsSonores?: boolean
+}
+
+export class PutJeuneDuConseillerPayload {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @Length(1, 10)
+  idPartenaire: string
 }

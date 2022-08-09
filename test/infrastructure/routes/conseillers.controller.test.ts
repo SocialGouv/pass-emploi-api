@@ -43,7 +43,10 @@ import {
   success
 } from '../../../src/building-blocks/types/result'
 import { Core } from '../../../src/domain/core'
-import { EnvoyerNotificationsPayload } from '../../../src/infrastructure/routes/validation/conseillers.inputs'
+import {
+  CreerJeuneMiloPayload,
+  EnvoyerNotificationsPayload
+} from '../../../src/infrastructure/routes/validation/conseillers.inputs'
 import { uneAgence } from '../../fixtures/agence.fixture'
 import {
   unHeaderAuthorization,
@@ -61,6 +64,11 @@ import {
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler.db'
+import {
+  ModifierJeuneDuConseillerCommand,
+  ModifierJeuneDuConseillerCommandHandler
+} from '../../../src/application/commands/modifier-jeune-du-conseiller.command.handler'
+import { unJeune } from '../../fixtures/jeune.fixture'
 
 describe('ConseillersController', () => {
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
@@ -77,6 +85,7 @@ describe('ConseillersController', () => {
   let modifierConseillerCommandHandler: StubbedClass<ModifierConseillerCommandHandler>
   let recupererJeunesDuConseillerCommandHandler: StubbedClass<RecupererJeunesDuConseillerCommandHandler>
   let getMetadonneesFavorisJeuneQueryHandler: StubbedClass<GetMetadonneesFavorisJeuneQueryHandler>
+  let modifierJeuneDuConseillerCommandHandler: StubbedClass<ModifierJeuneDuConseillerCommandHandler>
   let app: INestApplication
 
   let dateService: StubbedClass<DateService>
@@ -115,6 +124,9 @@ describe('ConseillersController', () => {
     getMetadonneesFavorisJeuneQueryHandler = stubClass(
       GetMetadonneesFavorisJeuneQueryHandler
     )
+    modifierJeuneDuConseillerCommandHandler = stubClass(
+      ModifierJeuneDuConseillerCommandHandler
+    )
 
     dateService = stubClass(DateService)
     dateService.now.returns(now)
@@ -148,6 +160,8 @@ describe('ConseillersController', () => {
       .useValue(recupererJeunesDuConseillerCommandHandler)
       .overrideProvider(GetMetadonneesFavorisJeuneQueryHandler)
       .useValue(getMetadonneesFavorisJeuneQueryHandler)
+      .overrideProvider(ModifierJeuneDuConseillerCommandHandler)
+      .useValue(modifierJeuneDuConseillerCommandHandler)
       .overrideProvider(DateService)
       .useValue(dateService)
       .compile()
@@ -270,6 +284,73 @@ describe('ConseillersController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('get', '/conseillers/1/jeunes')
+  })
+
+  describe('PUT /conseillers/{idConseiller}/jeunes/{idJeune}', () => {
+    const conseiller = unConseiller()
+    const jeune = unJeune()
+
+    describe('quand le payload est valide', () => {
+      it('met à jour le jeune', async () => {
+        // Given
+        const command: ModifierJeuneDuConseillerCommand = {
+          idJeune: jeune.id,
+          idPartenaire: 'le-id-part'
+        }
+
+        modifierJeuneDuConseillerCommandHandler.execute
+          .withArgs(command, unUtilisateurDecode())
+          .resolves(emptySuccess())
+
+        // When - Then
+        await request(app.getHttpServer())
+          .put(`/conseillers/${conseiller.id}/jeunes/${jeune.id}`)
+          .send({
+            idPartenaire: 'le-id-part'
+          })
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+      })
+    })
+
+    describe('quand le payload est invalide', () => {
+      it('renvoie 400', async () => {
+        // Given
+        // When - Then
+        await request(app.getHttpServer())
+          .put(`/conseillers/${conseiller.id}/jeunes/${jeune.id}`)
+          .send({
+            idPartenaire: 'le-id-part-trop-long'
+          })
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    describe('quand la commande est en erreur', () => {
+      it('renvoie le code idoine', async () => {
+        // Given
+        const command: ModifierJeuneDuConseillerCommand = {
+          idJeune: jeune.id,
+          idPartenaire: 'le-id-part'
+        }
+
+        modifierJeuneDuConseillerCommandHandler.execute
+          .withArgs(command, unUtilisateurDecode())
+          .resolves(failure(new NonTrouveError('Jeune', '21')))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .put(`/conseillers/${conseiller.id}/jeunes/${jeune.id}`)
+          .send({
+            idPartenaire: 'le-id-part'
+          })
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.NOT_FOUND)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('put', '/conseillers/2/jeunes/21')
   })
 
   describe('GET /conseillers/:idConseiller/jeunes/:idJeune/metadonnees', () => {
@@ -816,6 +897,14 @@ describe('ConseillersController', () => {
           idConseiller: 'idConseiller'
         }
 
+        const payload: CreerJeuneMiloPayload = {
+          idDossier: 'idDossier',
+          nom: 'nom',
+          prenom: 'prenom',
+          email: 'email',
+          idConseiller: 'idConseiller'
+        }
+
         creerJeuneMiloCommandHandler.execute
           .withArgs(command, unUtilisateurDecode())
           .resolves(success({ id: 'idJeune' }))
@@ -823,7 +912,7 @@ describe('ConseillersController', () => {
         // When - Then
         await request(app.getHttpServer())
           .post('/conseillers/milo/jeunes')
-          .send(command)
+          .send(payload)
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.CREATED)
           .expect({ id: 'idJeune' })
@@ -832,7 +921,6 @@ describe('ConseillersController', () => {
 
     describe('quand le jeune est déjà chez nous', () => {
       it('renvoie 400', async () => {
-        // Given
         // Given
         const command: CreerJeuneMiloCommand = {
           idPartenaire: 'ID400',
@@ -848,7 +936,7 @@ describe('ConseillersController', () => {
         // When - Then
         await request(app.getHttpServer())
           .post('/conseillers/milo/jeunes')
-          .send(command)
+          .send({ ...command, idDossier: command.idPartenaire })
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.BAD_REQUEST)
       })
@@ -872,7 +960,7 @@ describe('ConseillersController', () => {
         // When - Then
         await request(app.getHttpServer())
           .post('/conseillers/milo/jeunes')
-          .send(command)
+          .send({ ...command, idDossier: command.idPartenaire })
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.CONFLICT)
       })
@@ -896,7 +984,7 @@ describe('ConseillersController', () => {
         // When - Then
         await request(app.getHttpServer())
           .post('/conseillers/milo/jeunes')
-          .send(command)
+          .send({ ...command, idDossier: command.idPartenaire })
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.CONFLICT)
       })
