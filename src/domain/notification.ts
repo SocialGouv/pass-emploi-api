@@ -187,6 +187,25 @@ export namespace Notification {
       }
     }
 
+    async notifierNouveauCommentaireAction(
+      idAction: Action.Id,
+      configurationApplication?: Jeune.ConfigurationApplication
+    ): Promise<void> {
+      if (configurationApplication) {
+        if (configurationApplication.pushNotificationToken) {
+          const notification = this.creerNotificationNouveauCommentaire(
+            configurationApplication.pushNotificationToken,
+            idAction
+          )
+          const promise = this.notificationRepository.send(notification)
+          this.logMessageSucces(configurationApplication.idJeune)
+          return promise
+        } else {
+          this.logMessageEchec(configurationApplication.idJeune)
+        }
+      }
+    }
+
     async notifierNouvellesOffres(
       recherche: Recherche,
       configurationApplication?: Jeune.ConfigurationApplication
@@ -300,6 +319,22 @@ export namespace Notification {
         },
         data: {
           type: Type.NEW_MESSAGE
+        }
+      }
+    }
+    private creerNotificationNouveauCommentaire(
+      token: string,
+      idAction: string
+    ): Notification.Message {
+      return {
+        token,
+        notification: {
+          title: 'Action mise à jour',
+          body: 'Un commentaire a été ajouté par votre conseiller'
+        },
+        data: {
+          type: Type.DETAIL_ACTION,
+          id: idAction
         }
       }
     }

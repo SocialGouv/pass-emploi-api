@@ -9,6 +9,7 @@ import {
   NotFoundException,
   Param,
   ParseUUIDPipe,
+  Post,
   Put
 } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -26,7 +27,15 @@ import { ActionQueryModel } from '../../application/queries/query-models/actions
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { isFailure } from '../../building-blocks/types/result'
 import { Utilisateur } from '../decorators/authenticated.decorator'
-import { UpdateStatutActionPayload } from './validation/actions.inputs'
+import {
+  AddCommentaireActionPayload,
+  UpdateStatutActionPayload
+} from './validation/actions.inputs'
+import {
+  AddCommentaireActionCommand,
+  AddCommentaireActionCommandHandler
+} from '../../application/commands/add-commentaire-action.command.handler'
+import { handleFailure } from './failure.handler'
 
 @Controller('actions')
 @ApiOAuth2([])
@@ -35,7 +44,8 @@ export class ActionsController {
   constructor(
     private readonly getDetailActionQueryHandler: GetDetailActionQueryHandler,
     private readonly updateStatutActionCommandHandler: UpdateStatutActionCommandHandler,
-    private readonly deleteActionCommandHandler: DeleteActionCommandHandler
+    private readonly deleteActionCommandHandler: DeleteActionCommandHandler,
+    private readonly addCommentaireActionCommandHandler: AddCommentaireActionCommandHandler
   ) {}
 
   @ApiOperation({
@@ -113,6 +123,32 @@ export class ActionsController {
     )
     if (isFailure(result)) {
       throw new NotFoundException(result.error)
+    }
+  }
+
+  @ApiOperation({
+    summary: 'Ajoute un commentaire à une action',
+    description: 'Autorisé pour un jeune et son conseiller'
+  })
+  @Post(':idAction/commentaires')
+  async addCommentaireAction(
+    @Param('idAction', new ParseUUIDPipe()) idAction: string,
+    @Body() addCommentaireActionPayload: AddCommentaireActionPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: AddCommentaireActionCommand = {
+      idAction,
+      commentaire: addCommentaireActionPayload.commentaire,
+      createur: utilisateur
+    }
+
+    const result = await this.addCommentaireActionCommandHandler.execute(
+      command,
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      handleFailure(result)
     }
   }
 }
