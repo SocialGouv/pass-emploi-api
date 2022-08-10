@@ -63,6 +63,9 @@ export class ActionSqlModel extends ActionDto {
   @BelongsTo(() => JeuneSqlModel)
   jeune!: JeuneSqlModel
 
+  /*@HasMany(() => CommentaireSqlModel)
+  commentaires!: CommentaireSqlModel[]*/
+
   static async creer(actionDto: AsSql<ActionDto>): Promise<void> {
     await ActionSqlModel.create(actionDto)
   }

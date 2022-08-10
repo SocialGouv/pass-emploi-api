@@ -18,6 +18,13 @@ export class UpdateStatutActionPayload {
   status: Action.Statut
 }
 
+export class AddCommentaireActionPayload {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  commentaire: string
+}
+
 export class CreateActionPayload {
   @ApiProperty()
   @IsString()

@@ -84,7 +84,8 @@ export class ActionSqlRepository implements Action.Repository {
         type: sqlModel.typeCreateur
       },
       dateEcheance: sqlModel.dateEcheance,
-      rappel: sqlModel.rappel
+      rappel: sqlModel.rappel,
+      commentaires: []
     }
   }
 
@@ -107,6 +108,24 @@ export class ActionSqlRepository implements Action.Repository {
       estVisibleParConseiller: true,
       dateEcheance: action.dateEcheance,
       rappel: action.rappel
+      //commentaires: action.commentaires.map(sqlModelFromCommentaire)
     }
   }
 }
+
+/*function sqlModelFromCommentaire(
+  commentaire: Action.Commentaire
+): AsSql<CommentaireDto> {
+  return {
+    id: commentaire.id,
+    idAction: commentaire.idAction,
+    date: commentaire.date,
+    createur: {
+      id: commentaire.createur.id,
+      nom: commentaire.createur.nom,
+      prenom: commentaire.createur.prenom,
+      type: commentaire.createur.type
+    },
+    commentaire: commentaire.commentaire
+  }
+}*/

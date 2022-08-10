@@ -18,7 +18,8 @@ export const uneAction = (args: Partial<Action> = {}): Action => {
       nom: 'Tavernier'
     },
     dateEcheance: new Date('2020-02-02'),
-    rappel: true
+    rappel: true,
+    commentaires: []
   }
 
   return { ...defaults, ...args }

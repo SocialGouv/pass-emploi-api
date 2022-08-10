@@ -206,6 +206,7 @@ import { ConseillerForJeuneAvecPartageAuthorizer } from './application/authorize
 import { GetFavorisJeunePourConseillerQueryHandler } from './application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
 import { GetMetadonneesFavorisJeuneQueryHandler } from './application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 import { HandleJobRappelActionCommandHandler } from './application/commands/jobs/handle-job-rappel-action.command'
+import { AddCommentaireActionCommandHandler } from './application/commands/add-commentaire-action.command.handler'
 import { FichierSuppressionAuthorizer } from './application/authorizers/authorize-fichier-suppression'
 import { ModifierJeuneDuConseillerCommandHandler } from './application/commands/modifier-jeune-du-conseiller.command.handler'
 
@@ -484,8 +485,9 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetPreferencesJeuneQueryHandler,
     GetRendezVousConseillerPaginesQueryHandler,
     GetMetadonneesFavorisJeuneQueryHandler,
+    ModifierJeuneDuConseillerCommandHandler,
     GetFavorisJeunePourConseillerQueryHandler,
-    ModifierJeuneDuConseillerCommandHandler
+    AddCommentaireActionCommandHandler
   ]
 }
 

@@ -145,6 +145,56 @@ describe('Notification', () => {
         )
       })
     })
+    describe('notifierNouveauCommentaireAction', () => {
+      describe('quand le jeune a un token', () => {
+        it('notifie', async () => {
+          // Given
+          const idAction = '4718eca6-bbb5-47fb-91bc-78e87294fd0f'
+          const configurationApplication = uneConfiguration()
+          const expectedNotification = uneNotification({
+            token: configurationApplication.pushNotificationToken,
+            notification: {
+              title: 'Action mise à jour',
+              body: 'Un commentaire a été ajouté par votre conseiller'
+            },
+            data: {
+              type: Notification.Type.DETAIL_ACTION,
+              id: idAction
+            }
+          })
+
+          // When
+          await notificationService.notifierNouveauCommentaireAction(
+            idAction,
+            configurationApplication
+          )
+
+          // Then
+          expect(
+            notificationRepository.send
+          ).to.have.been.calledOnceWithExactly(expectedNotification)
+        })
+      })
+
+      describe("quand le jeune n'a pas de token", () => {
+        it('ne notifie pas', async () => {
+          // Given
+          const idAction = '4718eca6-bbb5-47fb-91bc-78e87294fd0f'
+          const configurationApplication = uneConfiguration({
+            pushNotificationToken: undefined
+          })
+
+          // When
+          await notificationService.notifierNouveauCommentaireAction(
+            idAction,
+            configurationApplication
+          )
+
+          // Then
+          expect(notificationRepository.send).not.to.have.been.called()
+        })
+      })
+    })
     describe('notifierNouvellesOffres', () => {
       it('notifie les jeunes avec pushNotificationToken', async () => {
         // Given
