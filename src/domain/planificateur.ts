@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { Action } from './action'
+import { Action } from './action/action'
 import { DateService } from '../utils/date-service'
 import { RendezVous } from './rendez-vous'
 

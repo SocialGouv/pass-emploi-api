@@ -8,7 +8,7 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { uneAction } from '../../fixtures/action.fixture'
-import { Action } from '../../../src/domain/action'
+import { Action } from '../../../src/domain/action/action'
 import {
   unUtilisateurDecode,
   unUtilisateurJeune
@@ -18,29 +18,36 @@ import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { uneConfiguration } from '../../fixtures/jeune.fixture'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { Notification } from '../../../src/domain/notification'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import TypeCreateur = Action.TypeCreateur
 
 describe('AddCommentaireActionCommandHandler', () => {
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
-  let actionFactory: StubbedClass<Action.Factory>
+  let commentaireActionFactory: StubbedClass<Action.Commentaire.Factory>
   let actionRepository: StubbedType<Action.Repository>
+  let commentaireActionRepository: StubbedType<Action.Commentaire.Repository>
   let jeuneConfigurationApplicationRepository: StubbedType<Jeune.ConfigurationApplication.Repository>
   let notificationService: StubbedClass<Notification.Service>
+  let evenementService: StubbedClass<EvenementService>
   let addCommentaireActionCommandHandler: AddCommentaireActionCommandHandler
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
     actionAuthorizer = stubClass(ActionAuthorizer)
-    actionFactory = stubClass(Action.Factory)
+    commentaireActionFactory = stubClass(Action.Commentaire.Factory)
     actionRepository = stubInterface(sandbox)
+    commentaireActionRepository = stubInterface(sandbox)
     jeuneConfigurationApplicationRepository = stubInterface(sandbox)
     notificationService = stubClass(Notification.Service)
+    evenementService = stubClass(EvenementService)
     addCommentaireActionCommandHandler = new AddCommentaireActionCommandHandler(
       actionAuthorizer,
       actionRepository,
-      actionFactory,
+      commentaireActionRepository,
+      commentaireActionFactory,
       jeuneConfigurationApplicationRepository,
-      notificationService
+      notificationService,
+      evenementService
     )
   })
 
@@ -50,6 +57,7 @@ describe('AddCommentaireActionCommandHandler', () => {
     const commentaire = 'poi-commentaire'
     const commentaireAction: Action.Commentaire = {
       id: 'poi-id-commentaire',
+      idAction,
       date: uneDate(),
       createur: {
         id: 'poi-id-createur',
@@ -59,46 +67,38 @@ describe('AddCommentaireActionCommandHandler', () => {
       },
       message: commentaire
     }
-    let actionApresAjoutCommentaire: Action
 
-    beforeEach(async () => {
-      // Given
-      const actionInitiale = uneAction({
-        id: idAction,
-        commentaires: []
-      })
-      actionRepository.get.withArgs(idAction).returns(actionInitiale)
-
-      actionApresAjoutCommentaire = uneAction({
-        id: idAction,
-        commentaires: [commentaireAction]
-      })
-
-      const createurAction: Action.Createur = {
-        id: utilisateur.id,
-        type: Action.TypeCreateur.CONSEILLER,
-        nom: utilisateur.nom,
-        prenom: utilisateur.prenom
-      }
-
-      const command: AddCommentaireActionCommand = {
-        idAction,
-        commentaire,
-        createur: utilisateur
-      }
-
-      actionFactory.ajouterCommentaire
-        .withArgs(actionInitiale, command.commentaire, createurAction)
-        .returns(actionApresAjoutCommentaire)
-
-      // When
-      await addCommentaireActionCommandHandler.handle(command)
-    })
     describe("quand l'action existe", () => {
       it("ajoute un commentaire à l'action", async () => {
+        // Given
+        const actionInitiale = uneAction({
+          id: idAction
+        })
+        actionRepository.get.withArgs(idAction).returns(actionInitiale)
+
+        const createurAction: Action.Createur = {
+          id: utilisateur.id,
+          type: Action.TypeCreateur.CONSEILLER,
+          nom: utilisateur.nom,
+          prenom: utilisateur.prenom
+        }
+
+        const command: AddCommentaireActionCommand = {
+          idAction,
+          commentaire,
+          createur: utilisateur
+        }
+
+        commentaireActionFactory.build
+          .withArgs(actionInitiale, command.commentaire, createurAction)
+          .returns(commentaireAction)
+
+        // When
+
+        await addCommentaireActionCommandHandler.handle(command)
         // Then
-        expect(actionRepository.save).to.have.been.calledWithExactly(
-          actionApresAjoutCommentaire
+        expect(commentaireActionRepository.save).to.have.been.calledWithExactly(
+          commentaireAction
         )
       })
     })
@@ -130,8 +130,7 @@ describe('AddCommentaireActionCommandHandler', () => {
     it('notifie quand le commentaire vient du conseiller', async () => {
       // Given
       const actionConseiller = uneAction({
-        id: idAction,
-        commentaires: []
+        id: idAction
       })
       actionRepository.get.withArgs(idAction).returns(actionConseiller)
 
@@ -167,8 +166,7 @@ describe('AddCommentaireActionCommandHandler', () => {
           nom: 'poi-nom',
           prenom: 'poi-prenom',
           type: TypeCreateur.JEUNE
-        },
-        commentaires: []
+        }
       })
       actionRepository.get.withArgs(idAction).returns(actionJeune)
 
@@ -200,8 +198,16 @@ describe('AddCommentaireActionCommandHandler', () => {
   describe('monitor', () => {
     it("enregistre un évènement d'engagement de type Commentaire Action", async () => {
       // Given
+      const utilisateur = unUtilisateurDecode()
+
       // When
+      await addCommentaireActionCommandHandler.monitor(utilisateur)
+
       // Then
+      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
+        Evenement.Type.ACTION_COMMENTEE,
+        utilisateur
+      )
     })
   })
 })

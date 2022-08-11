@@ -18,6 +18,7 @@ import { SituationsMiloSqlModel } from './situations-milo.sql-model'
 import { CampagneSqlModel } from './campagne.sql-model'
 import { ReponseCampagneSqlModel } from './reponse-campagne.sql-model'
 import { ArchiveJeuneSqlModel } from './archive-jeune.sql-model'
+import { CommentaireSqlModel } from './commentaire.sql-model'
 
 export const sqlModels = [
   ConseillerSqlModel,
@@ -39,5 +40,6 @@ export const sqlModels = [
   CampagneSqlModel,
   ReponseCampagneSqlModel,
   FichierSqlModel,
-  ArchiveJeuneSqlModel
+  ArchiveJeuneSqlModel,
+  CommentaireSqlModel
 ]

@@ -15,7 +15,7 @@ import {
   RendezVous,
   RendezVousRepositoryToken
 } from '../../../domain/rendez-vous'
-import { Action, ActionsRepositoryToken } from '../../../domain/action'
+import { Action, ActionsRepositoryToken } from '../../../domain/action/action'
 
 @Injectable()
 export class SynchronizeJobsCommandHandler extends CommandHandler<

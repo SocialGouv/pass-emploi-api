@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 import { emptySuccess, failure, Result } from 'src/building-blocks/types/result'
-import { Action, ActionsRepositoryToken } from 'src/domain/action'
+import { Action, ActionsRepositoryToken } from 'src/domain/action/action'
 import { Authentification } from 'src/domain/authentification'
 
 @Injectable()

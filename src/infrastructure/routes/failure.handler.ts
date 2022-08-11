@@ -19,7 +19,7 @@ import {
   RessourceIndisponibleError
 } from 'src/building-blocks/types/domain-error'
 import { isFailure, Result } from 'src/building-blocks/types/result'
-import { Action } from 'src/domain/action'
+import { Action } from 'src/domain/action/action'
 
 export function handleFailure(result: Result): void {
   if (isFailure(result)) {

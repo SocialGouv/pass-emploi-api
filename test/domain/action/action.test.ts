@@ -1,11 +1,11 @@
-import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
-import { isFailure, isSuccess } from '../../src/building-blocks/types/result'
-import { Action } from '../../src/domain/action'
-import { DateService } from '../../src/utils/date-service'
-import { IdService } from '../../src/utils/id-service'
-import { uneAction } from '../fixtures/action.fixture'
-import { expect, StubbedClass, stubClass } from '../utils'
-import { unJeune } from '../fixtures/jeune.fixture'
+import { uneDatetime } from 'test/fixtures/date.fixture'
+import { isFailure, isSuccess } from '../../../src/building-blocks/types/result'
+import { Action } from '../../../src/domain/action/action'
+import { DateService } from '../../../src/utils/date-service'
+import { IdService } from '../../../src/utils/id-service'
+import { uneAction } from '../../fixtures/action.fixture'
+import { expect, StubbedClass, stubClass } from '../../utils'
+import { unJeune } from '../../fixtures/jeune.fixture'
 import { DateTime } from 'luxon'
 
 describe('Action', () => {
@@ -408,47 +408,6 @@ describe('Action', () => {
           // Then
           expect(isFailure(result)).to.be.true()
         })
-      })
-    })
-    describe('ajouterCommentaire', () => {
-      it("ajoute un commentaire à l'action avec sa date et un id", () => {
-        // Given
-        const jeune = unJeune()
-        const actionInitiale: Action = uneAction()
-        const createur: Action.Createur = {
-          id: jeune.id,
-          prenom: jeune.firstName,
-          nom: jeune.lastName,
-          type: Action.TypeCreateur.JEUNE
-        }
-
-        dateService.nowJs.returns(uneDate())
-        idService.uuid.returns('47435ec2-7063-43c2-b157-7896ae240a43')
-
-        // When
-        const result = actionFactory.ajouterCommentaire(
-          actionInitiale,
-          'Il faut faire cette action',
-          createur
-        )
-
-        // Then
-        const nouveauCommentaire: Action.Commentaire = {
-          id: '47435ec2-7063-43c2-b157-7896ae240a43',
-          createur: {
-            id: jeune.id,
-            prenom: jeune.firstName,
-            nom: jeune.lastName,
-            type: Action.TypeCreateur.JEUNE
-          },
-          message: 'Il faut faire cette action',
-          date: uneDate()
-        }
-        const expected: Action = {
-          ...actionInitiale,
-          commentaires: [nouveauCommentaire]
-        }
-        expect(result).to.deep.equal(expected)
       })
     })
   })

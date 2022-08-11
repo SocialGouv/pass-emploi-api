@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { DateService } from '../utils/date-service'
-import { Action } from './action'
+import { Action } from './action/action'
 import { Jeune } from './jeune/jeune'
 import { Recherche } from './recherche'
 import { RendezVous } from './rendez-vous'

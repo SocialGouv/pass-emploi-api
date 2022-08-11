@@ -1,21 +1,24 @@
 import { Injectable } from '@nestjs/common'
-import { Brand } from '../building-blocks/types/brand'
+import { Brand } from '../../building-blocks/types/brand'
 import {
   DomainError,
   PasDeRappelError
-} from '../building-blocks/types/domain-error'
+} from '../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
   Result,
   success
-} from '../building-blocks/types/result'
-import { DateService } from '../utils/date-service'
-import { IdService } from '../utils/id-service'
-import { Jeune } from './jeune/jeune'
+} from '../../building-blocks/types/result'
+import { DateService } from '../../utils/date-service'
+import { IdService } from '../../utils/id-service'
+import { Jeune } from '../jeune/jeune'
 import { DateTime } from 'luxon'
+import * as _Commentaire from './commentaire'
 
 export const ActionsRepositoryToken = 'ActionsRepositoryToken'
+export const CommentaireActionRepositoryToken =
+  'CommentaireActionRepositoryToken'
 
 export interface Action {
   id: Action.Id
@@ -28,10 +31,13 @@ export interface Action {
   createur: Action.Createur
   dateEcheance: Date
   rappel: boolean
-  commentaires: Action.Commentaire[]
 }
 
 export namespace Action {
+  // FIXME: le linter ne comprend pas cette technique 🤷‍️
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  export import Commentaire = _Commentaire.Commentaire
+
   export type Id = Brand<string, 'IdAction'>
   export type IdCreateur = string | Jeune.Id
 
@@ -54,13 +60,6 @@ export namespace Action {
     nom: string
     id: string
     type: Action.TypeCreateur
-  }
-
-  export interface Commentaire {
-    id: string
-    date: Date
-    createur: Action.Createur
-    message: string
   }
 
   export enum Statut {
@@ -146,8 +145,7 @@ export namespace Action {
         dateCreation: now,
         dateDerniereActualisation: now,
         rappel: data.rappel === undefined ? true : data.rappel,
-        dateEcheance: dateEcheanceA9Heures30,
-        commentaires: []
+        dateEcheance: dateEcheanceA9Heures30
       }
       return success(action)
     }
@@ -159,23 +157,6 @@ export namespace Action {
         statut,
         dateDerniereActualisation: now
       })
-    }
-
-    ajouterCommentaire(
-      action: Action,
-      message: string,
-      createur: Createur
-    ): Action {
-      const commentaire: Action.Commentaire = {
-        id: this.idService.uuid(),
-        date: this.dateService.nowJs(),
-        createur,
-        message
-      }
-      return {
-        ...action,
-        commentaires: action.commentaires.concat(commentaire)
-      }
     }
 
     doitPlanifierUneNotificationDeRappel(action: Action): boolean {

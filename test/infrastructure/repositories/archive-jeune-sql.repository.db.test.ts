@@ -1,6 +1,6 @@
 import { uneArchiveJeuneMetadonnees } from 'test/fixtures/archiveJeune.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
-import { Action } from '../../../src/domain/action'
+import { Action } from '../../../src/domain/action/action'
 import { ArchiveJeune } from '../../../src/domain/archive-jeune'
 import { Recherche } from '../../../src/domain/recherche'
 import { EngagementClient } from '../../../src/infrastructure/clients/engagement-client'

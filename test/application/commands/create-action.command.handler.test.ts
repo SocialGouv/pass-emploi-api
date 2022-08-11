@@ -11,7 +11,7 @@ import {
   CreateActionCommandHandler
 } from '../../../src/application/commands/create-action.command.handler'
 import { failure, success } from '../../../src/building-blocks/types/result'
-import { Action } from '../../../src/domain/action'
+import { Action } from '../../../src/domain/action/action'
 import { Authentification } from '../../../src/domain/authentification'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { Notification } from '../../../src/domain/notification'

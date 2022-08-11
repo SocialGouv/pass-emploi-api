@@ -8,7 +8,7 @@ import { DeleteSuperviseursCommandHandler } from 'src/application/commands/delet
 import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/commands/recuperer-jeunes-du-conseiller.command.handler'
 import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { GetAllRendezVousConseillerQueryHandler } from 'src/application/queries/get-rendez-vous-conseiller.query.handler.db'
-import { Action } from 'src/domain/action'
+import { Action } from 'src/domain/action/action'
 import { CodeTypeRendezVous } from 'src/domain/rendez-vous'
 import { CreateActionPayload } from 'src/infrastructure/routes/validation/actions.inputs'
 import { CreateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'

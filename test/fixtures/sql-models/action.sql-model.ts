@@ -1,5 +1,5 @@
 import * as uuid from 'uuid'
-import { Action } from '../../../src/domain/action'
+import { Action } from '../../../src/domain/action/action'
 import { ActionDto } from '../../../src/infrastructure/sequelize/models/action.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 

@@ -8,13 +8,18 @@ import { Command } from '../../building-blocks/types/command'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { ActionAuthorizer } from '../authorizers/authorize-action'
 import { Authentification } from '../../domain/authentification'
-import { Action, ActionsRepositoryToken } from '../../domain/action'
+import {
+  Action,
+  ActionsRepositoryToken,
+  CommentaireActionRepositoryToken
+} from '../../domain/action/action'
 import { Inject } from '@nestjs/common'
 import {
   Jeune,
   JeuneConfigurationApplicationRepositoryToken
 } from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification'
+import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface AddCommentaireActionCommand extends Command {
   idAction: string
@@ -30,10 +35,13 @@ export class AddCommentaireActionCommandHandler extends CommandHandler<
     private actionAuthorizer: ActionAuthorizer,
     @Inject(ActionsRepositoryToken)
     private actionRepository: Action.Repository,
-    private actionFactory: Action.Factory,
+    @Inject(CommentaireActionRepositoryToken)
+    private commentaireActionRepository: Action.Commentaire.Repository,
+    private commentaireActionFactory: Action.Commentaire.Factory,
     @Inject(JeuneConfigurationApplicationRepositoryToken)
     private jeuneConfigurationApplicationRepository: Jeune.ConfigurationApplication.Repository,
-    private notificationService: Notification.Service
+    private notificationService: Notification.Service,
+    private evenementService: EvenementService
   ) {
     super('AddCommentaireActionCommandHandler')
   }
@@ -52,17 +60,24 @@ export class AddCommentaireActionCommandHandler extends CommandHandler<
       return failure(new NonTrouveError('Action', command.idAction))
     }
 
-    const actionAvecCommentaire = this.actionFactory.ajouterCommentaire(
+    const commentaire = this.commentaireActionFactory.build(
       action,
       command.commentaire,
       this.buildCreateur(command)
     )
-    await this.actionRepository.save(actionAvecCommentaire)
+    await this.commentaireActionRepository.save(commentaire)
 
     if (command.createur.type !== Authentification.Type.JEUNE) {
       await this.notifier(action)
     }
     return emptySuccess()
+  }
+
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creerEvenement(
+      Evenement.Type.ACTION_COMMENTEE,
+      utilisateur
+    )
   }
 
   private async notifier(action: Action): Promise<void> {
@@ -87,9 +102,5 @@ export class AddCommentaireActionCommandHandler extends CommandHandler<
     return typeUtilisateur === Authentification.Type.JEUNE
       ? Action.TypeCreateur.JEUNE
       : Action.TypeCreateur.CONSEILLER
-  }
-
-  async monitor(): Promise<void> {
-    return
   }
 }

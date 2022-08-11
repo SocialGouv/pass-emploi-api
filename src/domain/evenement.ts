@@ -11,6 +11,7 @@ export namespace Evenement {
     ACTION_LISTE = 'ACTION_LISTE',
     ACTION_MODIFIEE = 'ACTION_MODIFIEE',
     ACTION_SUPPRIMEE = 'ACTION_SUPPRIMEE',
+    ACTION_COMMENTEE = 'ACTION_COMMENTEE',
     COMPTE_SUPPRIME = 'COMPTE_SUPPRIME',
     COMPTE_ARCHIVE = 'COMPTE_ARCHIVE',
     DEMARCHE_CREEE = 'DEMARCHE_CREEE',
@@ -84,6 +85,10 @@ const evenements = {
   [Evenement.Type.ACTION_SUPPRIMEE]: {
     categorie: 'Action',
     action: 'Suppression'
+  },
+  [Evenement.Type.ACTION_COMMENTEE]: {
+    categorie: 'Commentaire Action',
+    action: 'Création'
   },
   [Evenement.Type.COMPTE_SUPPRIME]: {
     categorie: 'Compte',

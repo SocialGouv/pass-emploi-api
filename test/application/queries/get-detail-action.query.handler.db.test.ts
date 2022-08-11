@@ -8,7 +8,7 @@ import {
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { uneActionQueryModelWithJeuneFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { Action } from '../../../src/domain/action'
+import { Action } from '../../../src/domain/action/action'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository.db'
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'

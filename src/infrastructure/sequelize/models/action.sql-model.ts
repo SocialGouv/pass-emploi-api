@@ -3,13 +3,15 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
-import { Action } from '../../../domain/action'
+import { Action } from '../../../domain/action/action'
 import { AsSql } from '../types'
 import { JeuneSqlModel } from './jeune.sql-model'
+import { CommentaireSqlModel } from './commentaire.sql-model'
 
 export class ActionDto extends Model {
   @PrimaryKey
@@ -63,8 +65,8 @@ export class ActionSqlModel extends ActionDto {
   @BelongsTo(() => JeuneSqlModel)
   jeune!: JeuneSqlModel
 
-  /*@HasMany(() => CommentaireSqlModel)
-  commentaires!: CommentaireSqlModel[]*/
+  @HasMany(() => CommentaireSqlModel)
+  commentaires!: CommentaireSqlModel[]
 
   static async creer(actionDto: AsSql<ActionDto>): Promise<void> {
     await ActionSqlModel.create(actionDto)

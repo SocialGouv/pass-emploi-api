@@ -9,7 +9,7 @@ import {
   isFailure,
   Result
 } from '../../building-blocks/types/result'
-import { Action, ActionsRepositoryToken } from '../../domain/action'
+import { Action, ActionsRepositoryToken } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
 import { ActionAuthorizer } from '../authorizers/authorize-action'
 
