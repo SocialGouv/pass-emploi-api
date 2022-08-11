@@ -70,7 +70,7 @@ import {
   isSuccess,
   Result
 } from '../../building-blocks/types/result'
-import { Action } from '../../domain/action'
+import { Action } from '../../domain/action/action'
 import { Core } from '../../domain/core'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'

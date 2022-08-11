@@ -9,7 +9,7 @@ import {
   IsOptional,
   IsString
 } from 'class-validator'
-import { Action } from '../../../domain/action'
+import { Action } from '../../../domain/action/action'
 
 export class UpdateStatutActionPayload {
   @ApiProperty({ enum: Action.Statut })

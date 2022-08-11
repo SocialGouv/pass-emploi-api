@@ -76,7 +76,7 @@ import {
   DemarcheQueryModel
 } from '../../application/queries/query-models/actions.query-model'
 import { isSuccess, Result } from '../../building-blocks/types/result'
-import { Action } from '../../domain/action'
+import { Action } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'

@@ -1,6 +1,6 @@
 import { DateTime, Duration } from 'luxon'
 import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
-import { Action } from 'src/domain/action'
+import { Action } from 'src/domain/action/action'
 import { Jeune } from 'src/domain/jeune/jeune'
 import { mapCodeLabelTypeRendezVous } from 'src/domain/rendez-vous'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'

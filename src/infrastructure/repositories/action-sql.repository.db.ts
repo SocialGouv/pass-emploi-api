@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { Action } from '../../domain/action'
+import { Action } from '../../domain/action/action'
 import { ActionDto, ActionSqlModel } from '../sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { AsSql } from '../sequelize/types'
@@ -68,7 +68,7 @@ export class ActionSqlRepository implements Action.Repository {
     })
   }
 
-  static actionFromSqlModel(sqlModel: AsSql<ActionDto>): Action {
+  static actionFromSqlModel(sqlModel: AsSql<ActionSqlModel>): Action {
     return {
       id: sqlModel.id,
       statut: sqlModel.statut,
@@ -84,8 +84,7 @@ export class ActionSqlRepository implements Action.Repository {
         type: sqlModel.typeCreateur
       },
       dateEcheance: sqlModel.dateEcheance,
-      rappel: sqlModel.rappel,
-      commentaires: []
+      rappel: sqlModel.rappel
     }
   }
 
@@ -108,24 +107,6 @@ export class ActionSqlRepository implements Action.Repository {
       estVisibleParConseiller: true,
       dateEcheance: action.dateEcheance,
       rappel: action.rappel
-      //commentaires: action.commentaires.map(sqlModelFromCommentaire)
     }
   }
 }
-
-/*function sqlModelFromCommentaire(
-  commentaire: Action.Commentaire
-): AsSql<CommentaireDto> {
-  return {
-    id: commentaire.id,
-    idAction: commentaire.idAction,
-    date: commentaire.date,
-    createur: {
-      id: commentaire.createur.id,
-      nom: commentaire.createur.nom,
-      prenom: commentaire.createur.prenom,
-      type: commentaire.createur.type
-    },
-    commentaire: commentaire.commentaire
-  }
-}*/

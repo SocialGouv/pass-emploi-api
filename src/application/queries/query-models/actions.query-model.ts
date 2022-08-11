@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { Action } from '../../../domain/action'
+import { Action } from '../../../domain/action/action'
 import { JeuneQueryModel } from './jeunes.query-model'
 import { Demarche } from '../../../domain/demarche'
 

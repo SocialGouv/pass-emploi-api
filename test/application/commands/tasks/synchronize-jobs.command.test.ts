@@ -7,7 +7,7 @@ import {
   PlanificateurService
 } from '../../../../src/domain/planificateur'
 import { RendezVous } from '../../../../src/domain/rendez-vous'
-import { Action } from '../../../../src/domain/action'
+import { Action } from '../../../../src/domain/action/action'
 import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { uneAction } from '../../../fixtures/action.fixture'

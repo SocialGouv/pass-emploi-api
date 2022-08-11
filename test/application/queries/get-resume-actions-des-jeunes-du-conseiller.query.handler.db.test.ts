@@ -13,7 +13,7 @@ import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeun
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
-import { Action } from '../../../src/domain/action'
+import { Action } from '../../../src/domain/action/action'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
 
 describe('GetResumeActionsDesJeunesDuConseillerQueryHandler', () => {

@@ -1,4 +1,4 @@
-import { Action } from '../../src/domain/action'
+import { Action } from '../../src/domain/action/action'
 import { uneDatetime } from './date.fixture'
 
 export const uneAction = (args: Partial<Action> = {}): Action => {
@@ -18,8 +18,7 @@ export const uneAction = (args: Partial<Action> = {}): Action => {
       nom: 'Tavernier'
     },
     dateEcheance: new Date('2020-02-02'),
-    rappel: true,
-    commentaires: []
+    rappel: true
   }
 
   return { ...defaults, ...args }

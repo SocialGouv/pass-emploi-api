@@ -12,7 +12,7 @@ import {
   ValidateIf
 } from 'class-validator'
 import { RendezVous } from 'src/domain/rendez-vous'
-import { Action } from '../../../domain/action'
+import { Action } from '../../../domain/action/action'
 import { Transform, Type } from 'class-transformer'
 import { transformStringToArray } from './utils/transformers'
 import { ArchiveJeune } from 'src/domain/archive-jeune'

@@ -12,7 +12,7 @@ import {
   failure,
   success
 } from '../../../src/building-blocks/types/result'
-import { Action } from '../../../src/domain/action'
+import { Action } from '../../../src/domain/action/action'
 import { uneAction } from '../../fixtures/action.fixture'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'

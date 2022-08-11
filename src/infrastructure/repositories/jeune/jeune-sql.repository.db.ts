@@ -4,7 +4,7 @@ import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-j
 import { Core } from 'src/domain/core'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
-import { Action } from '../../../domain/action'
+import { Action } from '../../../domain/action/action'
 import { Jeune } from '../../../domain/jeune/jeune'
 import { FirebaseClient } from '../../clients/firebase-client'
 import { ActionSqlModel } from '../../sequelize/models/action.sql-model'

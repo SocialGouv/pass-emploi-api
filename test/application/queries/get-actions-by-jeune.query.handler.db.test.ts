@@ -9,7 +9,7 @@ import {
   GetActionsByJeuneQuery,
   GetActionsByJeuneQueryHandler
 } from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
-import { Action } from '../../../src/domain/action'
+import { Action } from '../../../src/domain/action/action'
 import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository.db'
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'

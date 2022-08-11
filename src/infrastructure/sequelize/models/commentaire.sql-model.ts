@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -6,15 +7,15 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
-import { Action } from '../../../domain/action'
-import { JeuneSqlModel } from './jeune.sql-model'
+import { Action } from '../../../domain/action/action'
+import { ActionSqlModel } from './action.sql-model'
 
 export class CommentaireDto extends Model {
   @PrimaryKey
   @Column({ field: 'id', type: DataType.STRING })
   id!: string
 
-  @ForeignKey(() => JeuneSqlModel)
+  @ForeignKey(() => ActionSqlModel)
   @Column({ field: 'id_action', type: DataType.UUID })
   idAction!: string
 
@@ -29,9 +30,12 @@ export class CommentaireDto extends Model {
     type: Action.TypeCreateur
   }
 
-  @Column({ field: 'commentaire', type: DataType.STRING })
-  commentaire!: string
+  @Column({ field: 'message', type: DataType.STRING })
+  message!: string
 }
 
-@Table({ timestamps: false, tableName: 'commentaire' })
-export class CommentaireSqlModel extends CommentaireDto {}
+@Table({ timestamps: false, tableName: 'commentaire_action' })
+export class CommentaireSqlModel extends CommentaireDto {
+  @BelongsTo(() => ActionSqlModel)
+  action!: ActionSqlModel
+}

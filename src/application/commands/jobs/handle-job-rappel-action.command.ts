@@ -5,7 +5,7 @@ import {
   Result,
   success
 } from 'src/building-blocks/types/result'
-import { Action, ActionsRepositoryToken } from 'src/domain/action'
+import { Action, ActionsRepositoryToken } from 'src/domain/action/action'
 import {
   Jeune,
   JeuneConfigurationApplicationRepositoryToken

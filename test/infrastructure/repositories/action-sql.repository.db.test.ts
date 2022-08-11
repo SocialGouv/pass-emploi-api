@@ -1,4 +1,4 @@
-import { Action } from '../../../src/domain/action'
+import { Action } from '../../../src/domain/action/action'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository.db'
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
@@ -108,9 +108,24 @@ describe('ActionSqlRepository', () => {
       const actual = await actionSqlRepository.get(idAction)
 
       // Then
-      expect(actual).to.deep.equal(
-        ActionSqlRepository.actionFromSqlModel(actionDto)
-      )
+      const attendu: Action = {
+        id: 'c723bfa8-0ac4-4d29-b0b6-68bdb3dec21c',
+        statut: Action.Statut.EN_COURS,
+        idJeune: 'ABCDE',
+        commentaire: "Commentaire de l'action",
+        contenu: "Contenu de l'action",
+        dateCreation: new Date('2021-11-11T08:03:30.000Z'),
+        dateDerniereActualisation: new Date('2021-11-11T08:03:30.000Z'),
+        createur: {
+          id: '1',
+          nom: 'Tavernier',
+          prenom: 'Nils',
+          type: Action.TypeCreateur.CONSEILLER
+        },
+        dateEcheance: new Date('2021-11-11T08:03:30.000Z'),
+        rappel: true
+      }
+      expect(actual).to.deep.equal(attendu)
     })
 
     describe("Quand l'action n'existe pas", () => {

@@ -77,7 +77,11 @@ import { GetTypesRendezVousQueryHandler } from './application/queries/get-types-
 import { TaskService } from './application/task.service'
 import { WorkerService } from './application/worker.service.db'
 import configuration from './config/configuration'
-import { Action, ActionsRepositoryToken } from './domain/action'
+import {
+  Action,
+  ActionsRepositoryToken,
+  CommentaireActionRepositoryToken
+} from './domain/action/action'
 import {
   Authentification,
   AuthentificationRepositoryToken
@@ -209,6 +213,7 @@ import { HandleJobRappelActionCommandHandler } from './application/commands/jobs
 import { AddCommentaireActionCommandHandler } from './application/commands/add-commentaire-action.command.handler'
 import { FichierSuppressionAuthorizer } from './application/authorizers/authorize-fichier-suppression'
 import { ModifierJeuneDuConseillerCommandHandler } from './application/commands/modifier-jeune-du-conseiller.command.handler'
+import { CommentaireActionSqlRepositoryDb } from './infrastructure/repositories/commentaire-action-sql.repository.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -258,6 +263,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     PoleEmploiPartenaireClient,
     ObjectStorageClient,
     Action.Factory,
+    Action.Commentaire.Factory,
     Mail.Factory,
     Authentification.Factory,
     Campagne.Factory,
@@ -369,6 +375,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: JeuneConfigurationApplicationRepositoryToken,
       useClass: JeuneConfigurationApplicationSqlRepository
+    },
+    {
+      provide: CommentaireActionRepositoryToken,
+      useClass: CommentaireActionSqlRepositoryDb
     },
     ...databaseProviders
   ],
