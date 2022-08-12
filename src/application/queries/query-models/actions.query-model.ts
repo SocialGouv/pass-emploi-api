@@ -3,6 +3,20 @@ import { Action } from '../../../domain/action/action'
 import { JeuneQueryModel } from './jeunes.query-model'
 import { Demarche } from '../../../domain/demarche'
 
+class CreateurQueryModel implements Action.Createur {
+  @ApiProperty()
+  prenom: string
+
+  @ApiProperty()
+  nom: string
+
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
+  type: Action.TypeCreateur
+}
+
 export class ActionQueryModel {
   @ApiProperty()
   id: string
@@ -36,6 +50,20 @@ export class ActionQueryModel {
 
   @ApiProperty()
   dateEcheance: string
+}
+
+export class CommentaireActionQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
+  date: Date
+
+  @ApiProperty()
+  createur: CreateurQueryModel
+
+  @ApiProperty()
+  message: string
 }
 
 export class ActionsMetadonneesQueryModel {

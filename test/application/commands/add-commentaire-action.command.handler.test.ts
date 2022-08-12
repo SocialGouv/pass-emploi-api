@@ -1,4 +1,3 @@
-import { uneDate } from '../../fixtures/date.fixture'
 import {
   AddCommentaireActionCommand,
   AddCommentaireActionCommandHandler
@@ -7,7 +6,7 @@ import { ActionAuthorizer } from '../../../src/application/authorizers/authorize
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { uneAction } from '../../fixtures/action.fixture'
+import { unCommentaire, uneAction } from '../../fixtures/action.fixture'
 import { Action } from '../../../src/domain/action/action'
 import {
   unUtilisateurDecode,
@@ -55,18 +54,9 @@ describe('AddCommentaireActionCommandHandler', () => {
     const utilisateur = unUtilisateurDecode()
     const idAction = '13c11b33-751c-4e1b-a49d-1b5a473ba159'
     const commentaire = 'poi-commentaire'
-    const commentaireAction: Action.Commentaire = {
-      id: 'poi-id-commentaire',
-      idAction,
-      date: uneDate(),
-      createur: {
-        id: 'poi-id-createur',
-        nom: 'poi-nom',
-        prenom: 'poi-prenom',
-        type: Action.TypeCreateur.CONSEILLER
-      },
+    const commentaireAction: Action.Commentaire = unCommentaire({
       message: commentaire
-    }
+    })
 
     describe("quand l'action existe", () => {
       it("ajoute un commentaire à l'action", async () => {
