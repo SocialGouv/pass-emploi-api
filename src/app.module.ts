@@ -214,6 +214,7 @@ import { AddCommentaireActionCommandHandler } from './application/commands/add-c
 import { FichierSuppressionAuthorizer } from './application/authorizers/authorize-fichier-suppression'
 import { ModifierJeuneDuConseillerCommandHandler } from './application/commands/modifier-jeune-du-conseiller.command.handler'
 import { CommentaireActionSqlRepositoryDb } from './infrastructure/repositories/commentaire-action-sql.repository.db'
+import { GetCommentairesActionQueryHandler } from './application/queries/get-commentaires-action.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -497,7 +498,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetMetadonneesFavorisJeuneQueryHandler,
     ModifierJeuneDuConseillerCommandHandler,
     GetFavorisJeunePourConseillerQueryHandler,
-    AddCommentaireActionCommandHandler
+    AddCommentaireActionCommandHandler,
+    GetCommentairesActionQueryHandler
   ]
 }
 

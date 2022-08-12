@@ -8,7 +8,8 @@ import {
 } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
-  failure
+  failure,
+  success
 } from '../../../src/building-blocks/types/result'
 import { uneAction } from '../../fixtures/action.fixture'
 import {
@@ -24,10 +25,16 @@ import {
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { AddCommentaireActionCommandHandler } from '../../../src/application/commands/add-commentaire-action.command.handler'
+import { GetCommentairesActionQueryHandler } from '../../../src/application/queries/get-commentaires-action.query.handler.db'
+import { CommentaireActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { Action } from 'src/domain/action/action'
+import { uneDate } from '../../fixtures/date.fixture'
 
 let getDetailActionQueryHandler: StubbedClass<GetDetailActionQueryHandler>
 let deleteActionCommandHandler: StubbedClass<DeleteActionCommandHandler>
 let addCommentaireActionCommandHandler: StubbedClass<AddCommentaireActionCommandHandler>
+let getCommentaireActionCommandHandler: StubbedClass<GetCommentairesActionQueryHandler>
 
 describe('ActionsController', () => {
   let app: INestApplication
@@ -37,6 +44,9 @@ describe('ActionsController', () => {
     addCommentaireActionCommandHandler = stubClass(
       AddCommentaireActionCommandHandler
     )
+    getCommentaireActionCommandHandler = stubClass(
+      GetCommentairesActionQueryHandler
+    )
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(GetDetailActionQueryHandler)
@@ -45,6 +55,8 @@ describe('ActionsController', () => {
       .useValue(deleteActionCommandHandler)
       .overrideProvider(AddCommentaireActionCommandHandler)
       .useValue(addCommentaireActionCommandHandler)
+      .overrideProvider(GetCommentairesActionQueryHandler)
+      .useValue(getCommentaireActionCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -193,6 +205,52 @@ describe('ActionsController', () => {
         'post',
         '/actions/123/commentaires'
       )
+    })
+    describe('GET /actions/:idAction/commentaires', () => {
+      it("récupère les commentaires d'une action", async () => {
+        // Given
+        const idAction = '13c11b33-751c-4e1b-a49d-1b5a473ba159'
+        const conseiller = unConseiller()
+        const commentaireQueryModel: CommentaireActionQueryModel = {
+          id: '99dc0cc1-84ef-4979-aa5c-4477ddeb26bd',
+          message: "Qu'en est-il de cette action ?",
+          date: uneDate(),
+          createur: {
+            id: conseiller.id,
+            prenom: conseiller.firstName,
+            nom: conseiller.lastName,
+            type: Action.TypeCreateur.CONSEILLER
+          }
+        }
+
+        const utilisateur = unUtilisateurDecode()
+        getCommentaireActionCommandHandler.execute
+          .withArgs({ idAction }, utilisateur)
+          .resolves(success([commentaireQueryModel]))
+
+        // When
+        await request(app.getHttpServer())
+          .get(`/actions/${idAction}/commentaires`)
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect(HttpStatus.OK)
+          .expect([{ ...commentaireQueryModel, date: uneDate().toISOString() }])
+      })
+      it("retourne une erreur non autorisée pour un utilisateur n'ayant pas les droits", async () => {
+        // Given
+        getCommentaireActionCommandHandler.execute.resolves(
+          failure(new DroitsInsuffisants())
+        )
+
+        // When
+        await request(app.getHttpServer())
+          .get(`/actions/13c11b33-751c-4e1b-a49d-1b5a473ba159/commentaires`)
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect(HttpStatus.FORBIDDEN)
+      })
+
+      ensureUserAuthenticationFailsIfInvalid('get', '/actions/123/commentaires')
     })
   })
 })

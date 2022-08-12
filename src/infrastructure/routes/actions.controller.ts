@@ -23,7 +23,10 @@ import {
   GetDetailActionQuery,
   GetDetailActionQueryHandler
 } from '../../application/queries/get-detail-action.query.handler.db'
-import { ActionQueryModel } from '../../application/queries/query-models/actions.query-model'
+import {
+  ActionQueryModel,
+  CommentaireActionQueryModel
+} from '../../application/queries/query-models/actions.query-model'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { isFailure } from '../../building-blocks/types/result'
 import { Utilisateur } from '../decorators/authenticated.decorator'
@@ -36,6 +39,7 @@ import {
   AddCommentaireActionCommandHandler
 } from '../../application/commands/add-commentaire-action.command.handler'
 import { handleFailure } from './failure.handler'
+import { GetCommentairesActionQueryHandler } from '../../application/queries/get-commentaires-action.query.handler.db'
 
 @Controller('actions')
 @ApiOAuth2([])
@@ -45,7 +49,8 @@ export class ActionsController {
     private readonly getDetailActionQueryHandler: GetDetailActionQueryHandler,
     private readonly updateStatutActionCommandHandler: UpdateStatutActionCommandHandler,
     private readonly deleteActionCommandHandler: DeleteActionCommandHandler,
-    private readonly addCommentaireActionCommandHandler: AddCommentaireActionCommandHandler
+    private readonly addCommentaireActionCommandHandler: AddCommentaireActionCommandHandler,
+    private readonly getCommentairesActionQueryHandler: GetCommentairesActionQueryHandler
   ) {}
 
   @ApiOperation({
@@ -150,5 +155,25 @@ export class ActionsController {
     if (isFailure(result)) {
       handleFailure(result)
     }
+  }
+
+  @ApiOperation({
+    summary: "Récupère les commentaires d'une action",
+    description: 'Autorisé pour un jeune et son conseiller'
+  })
+  @Get(':idAction/commentaires')
+  async getCommentairesAction(
+    @Param('idAction', new ParseUUIDPipe()) idAction: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<CommentaireActionQueryModel[]> {
+    const result = await this.getCommentairesActionQueryHandler.execute(
+      { idAction },
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
+    return result.data
   }
 }
