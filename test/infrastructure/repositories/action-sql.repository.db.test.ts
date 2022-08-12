@@ -112,7 +112,7 @@ describe('ActionSqlRepository', () => {
         id: 'c723bfa8-0ac4-4d29-b0b6-68bdb3dec21c',
         statut: Action.Statut.EN_COURS,
         idJeune: 'ABCDE',
-        commentaire: "Commentaire de l'action",
+        description: "Commentaire de l'action",
         contenu: "Contenu de l'action",
         dateCreation: new Date('2021-11-11T08:03:30.000Z'),
         dateDerniereActualisation: new Date('2021-11-11T08:03:30.000Z'),

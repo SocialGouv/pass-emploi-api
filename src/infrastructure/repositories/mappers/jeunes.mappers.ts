@@ -94,7 +94,7 @@ export function fromSqlToJeuneHomeQueryModel(
       ),
       content: actionSql.contenu,
       status: actionSql.statut,
-      comment: actionSql.commentaire,
+      comment: actionSql.description,
       isDone: actionSql.statut === Action.Statut.TERMINEE,
       lastUpdate: DateTime.fromJSDate(
         actionSql.dateDerniereActualisation

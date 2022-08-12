@@ -8,7 +8,7 @@ export const uneAction = (args: Partial<Action> = {}): Action => {
     statut: Action.Statut.PAS_COMMENCEE,
     idJeune: 'ABCDE',
     contenu: "Contenu de l'action",
-    commentaire: "Commentaire de l'action",
+    description: "Commentaire de l'action",
     dateDerniereActualisation: now,
     dateCreation: now,
     createur: {

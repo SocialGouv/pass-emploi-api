@@ -74,7 +74,7 @@ describe('CreateActionCommandHandler', () => {
         idCreateur: action.id,
         typeCreateur: Action.TypeCreateur.JEUNE,
         statut: action.statut,
-        commentaire: action.commentaire,
+        commentaire: action.description,
         dateEcheance: action.dateEcheance
       }
 
@@ -96,7 +96,7 @@ describe('CreateActionCommandHandler', () => {
           idCreateur: action.id,
           typeCreateur: Action.TypeCreateur.JEUNE,
           statut: action.statut,
-          commentaire: action.commentaire,
+          commentaire: action.description,
           dateEcheance: action.dateEcheance
         }
 
@@ -119,7 +119,7 @@ describe('CreateActionCommandHandler', () => {
           idCreateur: action.id,
           typeCreateur: Action.TypeCreateur.CONSEILLER,
           statut: action.statut,
-          commentaire: action.commentaire,
+          commentaire: action.description,
           dateEcheance: action.dateEcheance
         }
 
@@ -148,7 +148,7 @@ describe('CreateActionCommandHandler', () => {
             idCreateur: action.id,
             typeCreateur: Action.TypeCreateur.JEUNE,
             statut: action.statut,
-            commentaire: action.commentaire,
+            commentaire: action.description,
             dateEcheance: action.dateEcheance,
             rappel: action.rappel
           }
@@ -175,7 +175,7 @@ describe('CreateActionCommandHandler', () => {
             idCreateur: action.id,
             typeCreateur: Action.TypeCreateur.JEUNE,
             statut: action.statut,
-            commentaire: action.commentaire,
+            commentaire: action.description,
             dateEcheance: action.dateEcheance,
             rappel: action.rappel
           }
@@ -202,7 +202,7 @@ describe('CreateActionCommandHandler', () => {
           idCreateur: action.id,
           typeCreateur: Action.TypeCreateur.JEUNE,
           statut: action.statut,
-          commentaire: action.commentaire,
+          commentaire: action.description,
           dateEcheance: action.dateEcheance
         }
 
@@ -230,7 +230,7 @@ describe('CreateActionCommandHandler', () => {
           idCreateur: utilisateur.id,
           typeCreateur: Action.TypeCreateur.CONSEILLER,
           statut: action.statut,
-          commentaire: action.commentaire,
+          commentaire: action.description,
           dateEcheance: action.dateEcheance
         }
 

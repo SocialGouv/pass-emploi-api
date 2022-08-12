@@ -10,7 +10,7 @@ export const uneActionQueryModelFromDomain = (
 ): ActionQueryModel => ({
   id: action.id,
   content: action.contenu,
-  comment: action.commentaire,
+  comment: action.description,
   status: action.statut,
   creationDate: DateTime.fromJSDate(action.dateCreation)
     .toUTC()

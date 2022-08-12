@@ -24,7 +24,7 @@ export interface Action {
   id: Action.Id
   statut: Action.Statut
   contenu: string
-  commentaire: string
+  description: string
   dateCreation: Date
   dateDerniereActualisation: Date
   idJeune: Jeune.Id
@@ -138,7 +138,7 @@ export namespace Action {
       const action: Action = {
         id: this.idService.uuid(),
         contenu: data.contenu,
-        commentaire: data.commentaire ?? '',
+        description: data.commentaire ?? '',
         idJeune: data.idJeune,
         statut,
         createur,

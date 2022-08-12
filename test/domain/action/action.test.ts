@@ -71,7 +71,7 @@ describe('Action', () => {
               dateCreation: nowJs,
               dateDerniereActualisation: nowJs,
               contenu,
-              commentaire,
+              description: commentaire,
               idJeune,
               statut,
               createur: {
@@ -120,7 +120,7 @@ describe('Action', () => {
               dateCreation: nowJs,
               dateDerniereActualisation: nowJs,
               contenu,
-              commentaire,
+              description: commentaire,
               idJeune,
               statut,
               createur: {
@@ -165,7 +165,7 @@ describe('Action', () => {
               dateCreation: nowJs,
               dateDerniereActualisation: nowJs,
               contenu,
-              commentaire,
+              description: commentaire,
               idJeune,
               statut,
               createur: {
@@ -212,7 +212,7 @@ describe('Action', () => {
             dateCreation: nowJs,
             dateDerniereActualisation: nowJs,
             contenu,
-            commentaire,
+            description: commentaire,
             idJeune,
             statut: Action.Statut.PAS_COMMENCEE,
             createur: {
