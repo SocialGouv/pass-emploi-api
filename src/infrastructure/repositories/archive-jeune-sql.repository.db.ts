@@ -194,7 +194,7 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
     metadonnes: ArchiveJeune.Metadonnees
   ): ArchiveJeune.Action[] {
     return actions.map(actionSql => ({
-      commentaire: actionSql.commentaire || '',
+      commentaire: actionSql.description || '',
       contenu: actionSql.contenu || '',
       statut: actionSql.statut || '',
       dateCreation: actionSql.dateCreation,

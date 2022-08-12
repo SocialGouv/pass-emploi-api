@@ -18,7 +18,7 @@ export function fromSqlToActionQueryModel(
 ): ActionQueryModel {
   return {
     id: actionSqlModel.id,
-    comment: actionSqlModel.commentaire || '',
+    comment: actionSqlModel.description || '',
     content: actionSqlModel.contenu,
     creationDate: DateTime.fromJSDate(actionSqlModel.dateCreation)
       .toUTC()

@@ -73,7 +73,7 @@ export class ActionSqlRepository implements Action.Repository {
       id: sqlModel.id,
       statut: sqlModel.statut,
       idJeune: sqlModel.idJeune,
-      commentaire: sqlModel.commentaire,
+      description: sqlModel.description,
       contenu: sqlModel.contenu,
       dateCreation: sqlModel.dateCreation,
       dateDerniereActualisation: sqlModel.dateDerniereActualisation,
@@ -92,7 +92,7 @@ export class ActionSqlRepository implements Action.Repository {
     return {
       id: action.id,
       statut: action.statut,
-      commentaire: action.commentaire,
+      description: action.description,
       contenu: action.contenu,
       dateCreation: action.dateCreation,
       dateDerniereActualisation: action.dateDerniereActualisation,

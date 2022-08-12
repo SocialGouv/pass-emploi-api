@@ -38,8 +38,8 @@ export class ActionDto extends Model {
   @Column({ field: 'contenu', type: DataType.STRING(1024) })
   contenu!: string
 
-  @Column({ field: 'commentaire', type: DataType.STRING(2048) })
-  commentaire!: string
+  @Column({ field: 'description', type: DataType.STRING(2048) })
+  description!: string
 
   @Column({ field: 'statut', type: DataType.STRING })
   statut!: Action.Statut
