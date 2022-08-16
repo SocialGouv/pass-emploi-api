@@ -15,12 +15,12 @@ export class NotificationSupportMattermostService
   implements NotificationSupport.Service
 {
   constructor(
-    private confiService: ConfigService,
+    private configService: ConfigService,
     private httpService: HttpService
   ) {}
 
   async notifierResultatJob(infosJob: InfosJob): Promise<void> {
-    const webhookUrl = this.confiService.get('mattermost.jobWebhookUrl')
+    const webhookUrl = this.configService.get('mattermost.jobWebhookUrl')
 
     const payload = {
       username: BOT_USERNAME,
@@ -37,6 +37,7 @@ function construireMessage(infosJob: InfosJob): string {
     tableau = `| Statut | :white_check_mark: |
     |:------------------------|:-------------|
     ${Object.entries(infosJob.result.data!)
+      .filter(entry => entry[0].substring(0, 5) !== 'liste')
       .map(entry => {
         return `| ${entry[0]} | ${entry[1]} |`
       })
@@ -45,6 +46,7 @@ function construireMessage(infosJob: InfosJob): string {
     tableau = `| Statut | :x: |
     |:------------------|:----|
     ${Object.entries(infosJob.result.error)
+      .filter(entry => entry[0].substring(0, 5) !== 'liste')
       .map(entry => {
         return `| ${entry[0]} | ${entry[1]} |`
       })
