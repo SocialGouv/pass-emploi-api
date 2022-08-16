@@ -18,6 +18,7 @@ import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/consei
 import { DateTime } from 'luxon'
 import { ActionQueryModel } from './query-models/actions.query-model'
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
+import { Action } from '../../domain/action/action'
 
 const NUMERO_DU_JOUR_SAMEDI = 6
 
@@ -41,14 +42,15 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
     const { dateDebut, dateFin } = this.recupererLesDatesDeLaPeriode(
       query.maintenant
     )
-
-    const [actions, rendezVous] = await Promise.all([
+    const [actions, rendezVous, actionsEnRetard] = await Promise.all([
       this.recupererLesActions(query, dateDebut, dateFin),
-      this.recupererLesRendezVous(query, dateDebut, dateFin)
+      this.recupererLesRendezVous(query, dateDebut, dateFin),
+      this.recupererLeNombreDactionsEnRetard(query)
     ])
     return success({
       actions,
-      rendezVous
+      rendezVous,
+      actionsEnRetard
     })
   }
 
@@ -119,5 +121,21 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
     })
 
     return actionsSqlModel.map(fromSqlToActionQueryModel)
+  }
+
+  private async recupererLeNombreDactionsEnRetard(
+    query: GetJeuneHomeSuiviQuery
+  ): Promise<number> {
+    return await ActionSqlModel.count({
+      where: {
+        idJeune: query.idJeune,
+        dateEcheance: {
+          [Op.lt]: query.maintenant
+        },
+        statut: {
+          [Op.notIn]: [Action.Statut.ANNULEE, Action.Statut.TERMINEE]
+        }
+      }
+    })
   }
 }
