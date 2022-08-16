@@ -4,6 +4,8 @@ import Bull, * as QueueBull from 'bull'
 import { DateTime } from 'luxon'
 import { Planificateur } from '../../domain/planificateur'
 import { DateService } from '../../utils/date-service'
+import { buildError } from '../../utils/logger.module'
+import { NettoyageJobsStats } from '../../domain/notification-support'
 
 const CRON_TIMEZONE = 'Europe/Paris'
 
@@ -100,14 +102,27 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     }
   }
 
-  async supprimerLesAnciensJobs(): Promise<void> {
+  async supprimerLesAnciensJobs(): Promise<NettoyageJobsStats> {
+    const stats: NettoyageJobsStats = { jobsNettoyes: 0, erreurs: 0 }
     const ilYA7Jours = this.dateService.now().minus({ day: 7 }).toMillis()
     const jobs = await this.queue.getCompleted()
     for (const job of jobs) {
       if (job.timestamp < ilYA7Jours) {
-        await this.queue.removeJobs(job.id.toString())
+        try {
+          await this.queue.removeJobs(job.id.toString())
+          stats.jobsNettoyes++
+        } catch (e) {
+          this.logger.error(
+            buildError(
+              `Erreur lors de la suppression du job ${job.name} d'id ${job.id}`,
+              e
+            )
+          )
+          stats.erreurs++
+        }
       }
     }
+    return stats
   }
 
   async supprimerJobsSelonPattern(pattern: string): Promise<void> {
