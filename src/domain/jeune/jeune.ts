@@ -64,7 +64,7 @@ export namespace Jeune {
       attributs?: { avecConfiguration: boolean }
     ): Promise<Jeune | undefined>
 
-    getJeunesMilo(offset: number, limit: number): Promise<Jeune[]>
+    getJeunesMiloAvecIdDossier(offset: number, limit: number): Promise<Jeune[]>
 
     existe(id: string): Promise<boolean>
 

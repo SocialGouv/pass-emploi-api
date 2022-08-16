@@ -18,7 +18,7 @@ import {
   Jeune,
   JeuneConfigurationApplicationRepositoryToken
 } from '../../domain/jeune/jeune'
-import { Notification } from '../../domain/notification'
+import { Notification } from '../../domain/notification/notification'
 import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface AddCommentaireActionCommand extends Command {

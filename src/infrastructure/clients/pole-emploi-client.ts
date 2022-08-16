@@ -11,9 +11,11 @@ import { desTypeDemarchesDtosMock } from '../../fixtures/types-demarches.fixture
 import {
   NotificationsPartenairesDto,
   OffreEmploiDto,
-  OffresEmploiDto
+  OffresEmploiDto,
+  TypeRDVPE
 } from '../repositories/dto/pole-emploi.dto'
 import { RateLimiterService } from 'src/utils/rate-limiter.service'
+import { Notification } from '../../domain/notification/notification'
 
 const CODE_UTILISATEUR = 0
 
@@ -53,13 +55,13 @@ export class PoleEmploiClient {
     return response.data
   }
 
-  async getNotificationsRDV(
+  async getNotificationsRendezVous(
     idsJeunesPE: string[],
     dateHierISO: string,
     dateDuJourISO: string
-  ): Promise<NotificationsPartenairesDto> {
+  ): Promise<Notification.PoleEmploi[]> {
     await this.rateLimiterService.getNotificationsPE.attendreLaProchaineDisponibilite()
-    const response = await this.post(
+    const response = await this.post<NotificationsPartenairesDto>(
       'listernotificationspartenaires/v1/notifications/partenaires',
       {
         listeIdExterneDE: idsJeunesPE,
@@ -67,7 +69,21 @@ export class PoleEmploiClient {
         dateFinCreation: dateDuJourISO
       }
     )
-    return response.data
+    return response.data.listeNotificationsPartenaires.map(notificationsDto => {
+      return {
+        idExterneDE: notificationsDto.idExterneDE,
+        notifications: notificationsDto.notifications.map(notificationDto => {
+          return {
+            ...notificationDto,
+            dateCreation: DateTime.fromFormat(
+              notificationDto.dateCreation.replace('CEST', '+02:00'),
+              'EEE MMM d HH:mm:ss Z yyyy'
+            ),
+            typeMouvementRDV: mapTypeRDVPE[notificationDto.typeMouvementRDV]
+          }
+        })
+      }
+    })
   }
 
   async rechercherTypesDemarches(
@@ -111,13 +127,13 @@ export class PoleEmploiClient {
     )
   }
 
-  private async post(
+  private async post<T>(
     suffixUrl: string,
     body?: unknown
-  ): Promise<AxiosResponse> {
+  ): Promise<AxiosResponse<T>> {
     const token = await this.getToken()
     return firstValueFrom(
-      this.httpService.post(`${this.apiUrl}/${suffixUrl}`, body, {
+      this.httpService.post<T>(`${this.apiUrl}/${suffixUrl}`, body, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -170,4 +186,10 @@ export class PoleEmploiClient {
 
     return token
   }
+}
+
+const mapTypeRDVPE: Record<TypeRDVPE, Notification.TypeRdv> = {
+  CREA: Notification.Type.NEW_RENDEZVOUS,
+  MODIF: Notification.Type.UPDATED_RENDEZVOUS,
+  SUPP: Notification.Type.DELETED_RENDEZVOUS
 }

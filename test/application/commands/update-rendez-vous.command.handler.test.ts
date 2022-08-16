@@ -11,7 +11,7 @@ import {
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
-import { Notification } from '../../../src/domain/notification'
+import { Notification } from '../../../src/domain/notification/notification'
 import { PlanificateurService } from '../../../src/domain/planificateur'
 import { RendezVous } from '../../../src/domain/rendez-vous'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'

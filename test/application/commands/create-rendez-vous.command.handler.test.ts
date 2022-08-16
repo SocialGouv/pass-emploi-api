@@ -6,7 +6,7 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { RendezVous } from '../../../src/domain/rendez-vous'
-import { Notification } from '../../../src/domain/notification'
+import { Notification } from '../../../src/domain/notification/notification'
 import { uneConfiguration, unJeune } from '../../fixtures/jeune.fixture'
 import {
   JeuneNonLieAuConseillerError,

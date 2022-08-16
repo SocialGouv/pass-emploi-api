@@ -4,7 +4,7 @@ import {
 } from '../../../../src/application/commands/jobs/handle-job-rappel-action.command'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
-import { Notification } from '../../../../src/domain/notification'
+import { Notification } from '../../../../src/domain/notification/notification'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { createSandbox } from 'sinon'
 import { Planificateur } from '../../../../src/domain/planificateur'

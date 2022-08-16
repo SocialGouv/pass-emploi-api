@@ -164,7 +164,10 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return fromSqlToJeuneHomeQueryModel(jeuneSqlModel, rdvJeuneSqlModel)
   }
 
-  async getJeunesMilo(offset: number, limit: number): Promise<Jeune[]> {
+  async getJeunesMiloAvecIdDossier(
+    offset: number,
+    limit: number
+  ): Promise<Jeune[]> {
     const jeunesMiloSqlModel = await JeuneSqlModel.findAll({
       where: {
         structure: Core.Structure.MILO,

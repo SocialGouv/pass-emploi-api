@@ -30,6 +30,7 @@ export enum TypeRDVPE {
   MODIF = 'MODIF',
   SUPP = 'SUPP'
 }
+
 export interface NotificationsPartenairesDto {
   listeNotificationsPartenaires: Array<{
     idExterneDE: string

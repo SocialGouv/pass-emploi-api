@@ -8,7 +8,7 @@ import {
 import { uneNotification } from 'test/fixtures/notification.fixture'
 import { uneRecherche } from 'test/fixtures/recherche.fixture'
 import { unRendezVous } from 'test/fixtures/rendez-vous.fixture'
-import { Notification } from '../../src/domain/notification'
+import { Notification } from '../../src/domain/notification/notification'
 import { createSandbox, expect } from '../utils'
 import { Jeune } from '../../src/domain/jeune/jeune'
 

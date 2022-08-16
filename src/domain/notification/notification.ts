@@ -1,14 +1,19 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { DateService } from '../utils/date-service'
-import { Action } from './action/action'
-import { Jeune } from './jeune/jeune'
-import { Recherche } from './recherche'
-import { RendezVous } from './rendez-vous'
+import { DateService } from '../../utils/date-service'
+import { Action } from '../action/action'
+import { Jeune } from '../jeune/jeune'
+import { Recherche } from '../recherche'
+import { RendezVous } from '../rendez-vous'
+import * as _PoleEmploi from './pole-emploi'
 
 export const NotificationRepositoryToken = 'NotificationRepositoryToken'
 
 export namespace Notification {
+  // FIXME: le linter ne comprend pas cette technique 🤷‍️
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  export import PoleEmploi = _PoleEmploi.PoleEmploi
+
   export interface Repository {
     send(message: Notification.Message): Promise<void>
   }
@@ -88,7 +93,7 @@ export namespace Notification {
       token,
       notification: {
         title: 'Rappel action',
-        body: 'Une action arrive à écheance dans 3 jours'
+        body: 'Une action arrive à échéance dans 3 jours'
       },
       data: {
         type: Type.DETAIL_ACTION,
@@ -111,6 +116,7 @@ export namespace Notification {
     private logMessageSucces(idJeune: string): void {
       this.logger.log(`Notification envoyée pour le jeune ${idJeune}`)
     }
+
     private logMessageEchec(idJeune: string): void {
       this.logger.log(
         `Le jeune ${idJeune} ne s'est jamais connecté sur l'application`
@@ -124,28 +130,11 @@ export namespace Notification {
       return Promise.all(
         rendezVous.jeunes.map(async jeune => {
           if (jeune.configuration?.pushNotificationToken) {
-            let notification: Notification.Message | undefined
-
-            switch (typeNotification) {
-              case Type.NEW_RENDEZVOUS:
-                notification = this.creerNotificationNouveauRdv(
-                  jeune.configuration.pushNotificationToken,
-                  rendezVous.id
-                )
-                break
-              case Type.UPDATED_RENDEZVOUS:
-                notification = this.creerNotificationRendezVousMisAJour(
-                  jeune.configuration.pushNotificationToken,
-                  rendezVous.id
-                )
-                break
-              case Type.DELETED_RENDEZVOUS:
-                notification = this.creerNotificationRdvSupprime(
-                  jeune.configuration.pushNotificationToken,
-                  rendezVous.date
-                )
-                break
-            }
+            const notification = this.creerNotificationRendezVous(
+              typeNotification,
+              rendezVous,
+              jeune.configuration.pushNotificationToken
+            )
             if (notification) {
               return this.notificationRepository.send(notification)
             }
@@ -154,6 +143,68 @@ export namespace Notification {
           }
         })
       )
+    }
+
+    private creerNotificationRendezVous(
+      typeNotification: Notification.Type,
+      rendezVous: RendezVous,
+      token: string
+    ): Notification.Message | undefined {
+      let notification: Notification.Message | undefined
+
+      switch (typeNotification) {
+        case Type.NEW_RENDEZVOUS:
+          notification = this.creerNotificationNouveauRdv(token, rendezVous.id)
+          break
+        case Type.UPDATED_RENDEZVOUS:
+          notification = this.creerNotificationRendezVousMisAJour(
+            token,
+            rendezVous.id
+          )
+          break
+        case Type.DELETED_RENDEZVOUS:
+          notification = this.creerNotificationRdvSupprime(
+            token,
+            rendezVous.date
+          )
+          break
+      }
+
+      return notification
+    }
+
+    public notifierUnRendezVousPoleEmploi(
+      typeNotification: Notification.Type,
+      token: string,
+      message: string,
+      idRendezVous?: string
+    ): Notification.Message | undefined {
+      let notification: Notification.Message | undefined
+
+      switch (typeNotification) {
+        case Type.NEW_RENDEZVOUS:
+          notification = this.creerNotificationNouveauRdv(
+            token,
+            idRendezVous!,
+            message
+          )
+          break
+        case Type.UPDATED_RENDEZVOUS:
+          notification = this.creerNotificationRendezVousMisAJour(
+            token,
+            idRendezVous!,
+            message
+          )
+          break
+        case Type.DELETED_RENDEZVOUS:
+          notification = this.creerNotificationRdvSupprimePoleEmploi(
+            token,
+            message
+          )
+          break
+      }
+
+      return notification
     }
 
     async notifierLesJeunesDuNouveauMessage(jeunes: Jeune[]): Promise<void[]> {
@@ -242,6 +293,7 @@ export namespace Notification {
         }
       }
     }
+
     private creerNotificationNouvelleOffre(
       token: string,
       idRecherche: string,
@@ -259,15 +311,17 @@ export namespace Notification {
         }
       }
     }
+
     private creerNotificationNouveauRdv(
       token: string,
-      idRdv: string
+      idRdv: string,
+      message?: string
     ): Notification.Message {
       return {
         token,
         notification: {
           title: 'Nouveau rendez-vous',
-          body: 'Votre conseiller a programmé un nouveau rendez-vous'
+          body: message ?? 'Votre conseiller a programmé un nouveau rendez-vous'
         },
         data: {
           type: Type.NEW_RENDEZVOUS,
@@ -275,16 +329,18 @@ export namespace Notification {
         }
       }
     }
+
     // TODO: Envoyer un type de notification UPDATE et gérer les versions de l'app
     private creerNotificationRendezVousMisAJour(
       token: string,
-      idRdv: string
+      idRdv: string,
+      message?: string
     ): Notification.Message {
       return {
         token,
         notification: {
           title: 'Rendez-vous modifié',
-          body: 'Votre rendez-vous a été modifié'
+          body: message ?? 'Votre rendez-vous a été modifié'
         },
         data: {
           type: Type.NEW_RENDEZVOUS,
@@ -292,6 +348,7 @@ export namespace Notification {
         }
       }
     }
+
     private creerNotificationRdvSupprime(
       token: string,
       date: Date
@@ -308,6 +365,23 @@ export namespace Notification {
         }
       }
     }
+
+    private creerNotificationRdvSupprimePoleEmploi(
+      token: string,
+      message: string
+    ): Notification.Message {
+      return {
+        token,
+        notification: {
+          title: 'Rendez-vous supprimé',
+          body: message
+        },
+        data: {
+          type: Type.DELETED_RENDEZVOUS
+        }
+      }
+    }
+
     private creerNotificationNouveauMessage(
       token: string
     ): Notification.Message {
@@ -322,6 +396,7 @@ export namespace Notification {
         }
       }
     }
+
     private creerNotificationNouveauCommentaire(
       token: string,
       idAction: string

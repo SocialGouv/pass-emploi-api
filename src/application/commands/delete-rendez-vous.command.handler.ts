@@ -12,7 +12,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { Mail, MailServiceToken } from '../../domain/mail'
-import { Notification } from '../../domain/notification'
+import { Notification } from '../../domain/notification/notification'
 import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
 import { buildError } from '../../utils/logger.module'
 import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'

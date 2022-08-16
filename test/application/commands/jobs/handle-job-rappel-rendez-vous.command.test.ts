@@ -7,7 +7,7 @@ import {
 } from '../../../../src/application/commands/jobs/handle-job-rappel-rendez-vous.command'
 import { Planificateur } from '../../../../src/domain/planificateur'
 import { RendezVous } from '../../../../src/domain/rendez-vous'
-import { Notification } from '../../../../src/domain/notification'
+import { Notification } from '../../../../src/domain/notification/notification'
 import { DateService } from '../../../../src/utils/date-service'
 import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'

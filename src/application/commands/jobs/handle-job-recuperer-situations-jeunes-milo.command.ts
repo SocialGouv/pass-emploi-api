@@ -48,7 +48,7 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends Comman
     let jeunes: Jeune[] = []
 
     do {
-      jeunes = await this.jeuneRepository.getJeunesMilo(
+      jeunes = await this.jeuneRepository.getJeunesMiloAvecIdDossier(
         offset,
         PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM
       )

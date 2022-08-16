@@ -11,6 +11,7 @@ import {
 } from '../../fixtures/offre-emploi.fixture'
 import { desTypesDemarchesDto } from '../../fixtures/pole-emploi.dto.fixture'
 import { testConfig } from '../../utils/module-for-testing'
+import { uneNotificationPoleEmploi } from '../../fixtures/notification.fixture'
 
 describe('PoleEmploiClient', () => {
   let poleEmploiClient: PoleEmploiClient
@@ -161,7 +162,7 @@ describe('PoleEmploiClient', () => {
       expect(offreEmploi).to.deep.equal(uneOffreEmploiDto())
     })
   })
-  describe('getNotificationsRDV', () => {
+  describe('getNotificationsRendezVous', () => {
     it('récupère les notifications', async () => {
       // Given
       const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
@@ -186,14 +187,17 @@ describe('PoleEmploiClient', () => {
         .isDone()
 
       // When
-      const offreEmploi = await poleEmploiClient.getNotificationsRDV(
-        [],
-        '2020-10-09',
-        '2020-10-10'
-      )
+      const notificationsRendezVous =
+        await poleEmploiClient.getNotificationsRendezVous(
+          [],
+          '2020-10-09',
+          '2020-10-10'
+        )
 
       // Then
-      expect(offreEmploi).to.deep.equal(notificationsRDVPEDto())
+      expect(notificationsRendezVous).to.deep.equal([
+        uneNotificationPoleEmploi()
+      ])
     })
   })
   describe('rechercherTypesDemarches', () => {

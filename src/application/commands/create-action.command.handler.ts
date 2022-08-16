@@ -14,7 +14,7 @@ import {
 import { Action, ActionsRepositoryToken } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
-import { Notification } from '../../domain/notification'
+import { Notification } from '../../domain/notification/notification'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 

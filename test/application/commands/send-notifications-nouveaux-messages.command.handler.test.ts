@@ -6,7 +6,7 @@ import {
   SendNotificationsNouveauxMessagesCommand,
   SendNotificationsNouveauxMessagesCommandHandler
 } from '../../../src/application/commands/send-notifications-nouveaux-messages.command.handler'
-import { Notification } from '../../../src/domain/notification'
+import { Notification } from '../../../src/domain/notification/notification'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
