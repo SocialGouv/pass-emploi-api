@@ -1,6 +1,6 @@
 import { GetJeuneHomeSuiviQueryHandler } from 'src/application/queries/get-jeune-home-suivi.query.db'
 import { JeuneHomeSuiviQueryModel } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
-import { success } from 'src/building-blocks/types/result'
+import { Result, success } from 'src/building-blocks/types/result'
 import {
   ActionDto,
   ActionSqlModel
@@ -18,6 +18,7 @@ import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
 import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
+import { Action } from 'src/domain/action/action'
 
 describe('GetJeuneHomeSuiviQueryHandler', () => {
   DatabaseForTesting.prepare()
@@ -62,24 +63,30 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
             dateEcheance: vendrediEnHuit.dateEcheance.toISOString()
           })
         ],
+        actionsEnRetard: 2,
         rendezVous: []
       }
       expect(result).to.deep.equal(success(expected))
     })
 
     describe('actions', () => {
-      it('doit retourner la liste des actions triées chronologiquement', async () => {
-        const [demain, apresDemain] = await createActions([
+      let demain: AsSql<ActionDto>
+      let apresDemain: AsSql<ActionDto>
+      let result: Result<JeuneHomeSuiviQueryModel>
+
+      beforeEach(async () => {
+        ;[demain, apresDemain] = await createActions([
           '2022-08-13T12:00:00Z',
           '2022-08-14T12:00:00Z'
         ])
 
         // When
-        const result = await handler.handle({
+        result = await handler.handle({
           idJeune: 'ABCDE',
           maintenant: aujourdhuiVendredi
         })
-
+      })
+      it('doit retourner la liste des actions triées chronologiquement', async () => {
         // Then
         const expected: JeuneHomeSuiviQueryModel = {
           actions: [
@@ -92,7 +99,8 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
               dateEcheance: apresDemain.dateEcheance.toISOString()
             })
           ],
-          rendezVous: []
+          rendezVous: [],
+          actionsEnRetard: 0
         }
         expect(result).to.deep.equal(success(expected))
       })
@@ -128,6 +136,7 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
         // Then
         const expected: JeuneHomeSuiviQueryModel = {
           actions: [],
+          actionsEnRetard: 0,
           rendezVous: [
             unRendezVousQueryModel({
               id: unRendezVousDtoPourDemain.id,
@@ -142,15 +151,38 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
         expect(result).to.deep.equal(success(expected))
       })
     })
+    describe('actionsEnRetard', () => {
+      let result: Result<JeuneHomeSuiviQueryModel>
+
+      beforeEach(async () => {
+        const hier = '2022-08-11T12:00:00Z'
+        const dansUneSemaine = '2022-08-19T12:00:00Z'
+        await createActions([hier], Action.Statut.TERMINEE)
+        await createActions([hier], Action.Statut.ANNULEE)
+        await createActions([hier, dansUneSemaine], Action.Statut.PAS_COMMENCEE)
+
+        // When
+        result = await handler.handle({
+          idJeune: 'ABCDE',
+          maintenant: aujourdhuiVendredi
+        })
+      })
+      it("retourne le compte d'actions en retard", async () => {
+        // Then
+        expect(result._isSuccess && result.data.actionsEnRetard).to.equal(1)
+      })
+    })
   })
 })
 
 async function createActions(
-  dates: string[]
+  dates: string[],
+  statut?: Action.Statut
 ): Promise<Array<AsSql<ActionDto>>> {
   const dtos = dates.map(date => {
     return uneActionDto({
-      dateEcheance: new Date(date)
+      dateEcheance: new Date(date),
+      statut: statut ?? Action.Statut.PAS_COMMENCEE
     })
   })
   await ActionSqlModel.bulkCreate(dtos)
