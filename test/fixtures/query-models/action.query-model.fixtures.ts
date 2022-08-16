@@ -57,3 +57,21 @@ export function uneActionQueryModel(
 
   return { ...defaults, ...args }
 }
+
+export function uneActionQueryModelSansJeune(
+  args: Partial<ActionQueryModel> = {}
+): ActionQueryModel {
+  const defaults: ActionQueryModel = {
+    comment: "Commentaire de l'action",
+    content: "Contenu de l'action",
+    creationDate: 'Thu, 11 Nov 2021 08:03:30 UTC',
+    creator: 'Nils Tavernier',
+    creatorType: Action.TypeCreateur.CONSEILLER,
+    dateEcheance: '2021-11-11T08:03:30.000Z',
+    id: 'd2e48a82-c664-455a-b3a5-bb0465a72022',
+    lastUpdate: 'Thu, 11 Nov 2021 08:03:30 UTC',
+    status: Action.Statut.PAS_COMMENCEE
+  }
+
+  return { ...defaults, ...args }
+}
