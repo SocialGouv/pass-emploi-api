@@ -19,7 +19,7 @@ import { DateTime } from 'luxon'
 
 export interface GetJeuneHomeSuiviQuery extends Query {
   idJeune: string
-  maintenant: Date
+  maintenant: string
 }
 
 @Injectable()
@@ -35,7 +35,11 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
     query: GetJeuneHomeSuiviQuery
   ): Promise<Result<JeuneHomeSuiviQueryModel>> {
     const samediWeekday = 6
-    let dateDebut = DateTime.fromJSDate(query.maintenant).toUTC().startOf('day')
+
+    let dateDebut = DateTime.fromISO(query.maintenant, {
+      setZone: true
+    }).startOf('day')
+
     while (dateDebut.weekday !== samediWeekday) {
       dateDebut = dateDebut.minus({ day: 1 })
     }
