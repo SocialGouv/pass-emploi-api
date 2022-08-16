@@ -15,11 +15,11 @@ import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez
 import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
+import { DateTime } from 'luxon'
 
 export interface GetJeuneHomeSuiviQuery extends Query {
   idJeune: string
-  dateDebut: Date
-  dateFin: Date
+  maintenant: Date
 }
 
 @Injectable()
@@ -34,12 +34,15 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
   async handle(
     query: GetJeuneHomeSuiviQuery
   ): Promise<Result<JeuneHomeSuiviQueryModel>> {
+    const dateDebut = query.maintenant
+    const dateFin = DateTime.fromJSDate(dateDebut).plus({ day: 14 })
+
     const actionsSqlModel = await ActionSqlModel.findAll({
       where: {
         idJeune: query.idJeune,
         dateEcheance: {
-          [Op.gte]: query.dateDebut,
-          [Op.lte]: query.dateFin
+          [Op.gte]: dateDebut,
+          [Op.lte]: dateFin
         }
       },
       order: [['dateEcheance', 'ASC']]
@@ -55,8 +58,8 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
       ],
       where: {
         date: {
-          [Op.gte]: query.dateDebut,
-          [Op.lte]: query.dateFin
+          [Op.gte]: dateDebut,
+          [Op.lte]: dateFin
         }
       },
       order: [['date', 'ASC']]

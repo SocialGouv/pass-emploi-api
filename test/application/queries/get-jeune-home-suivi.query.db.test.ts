@@ -18,10 +18,10 @@ import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.
 describe('GetJeuneHomeSuiviQueryHandler', () => {
   DatabaseForTesting.prepare()
   let handler: GetJeuneHomeSuiviQueryHandler
-  const hier = new Date('2022-08-14T12:00:00Z')
-  const aujourdhui = new Date('2022-08-15T12:00:00Z')
-  const demain = new Date('2022-08-16T12:00:00Z')
-  const apresDemain = new Date('2022-08-17T12:00:00Z')
+  const hier = new Date('2022-08-11T12:00:00Z')
+  const aujourdhuiVendredi = new Date('2022-08-12T12:00:00Z')
+  const demain = new Date('2022-08-13T12:00:00Z')
+  const apresDemain = new Date('2022-08-14T12:00:00Z')
   const jeuneDto = unJeuneDto()
 
   beforeEach(async () => {
@@ -52,8 +52,7 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
         // When
         const result = await handler.handle({
           idJeune: 'ABCDE',
-          dateDebut: aujourdhui,
-          dateFin: apresDemain
+          maintenant: aujourdhuiVendredi
         })
 
         // Then
@@ -66,26 +65,6 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
             uneActionQueryModelSansJeune({
               id: uneActionDtoPourApresDemain.id,
               dateEcheance: apresDemain.toISOString()
-            })
-          ],
-          rendezVous: []
-        }
-        expect(result).to.deep.equal(success(expected))
-      })
-      it('retourne uniquement les actions filtrées sur la dates données', async () => {
-        // When
-        const result = await handler.handle({
-          idJeune: 'ABCDE',
-          dateDebut: aujourdhui,
-          dateFin: demain
-        })
-
-        // Then
-        const expected: JeuneHomeSuiviQueryModel = {
-          actions: [
-            uneActionQueryModelSansJeune({
-              id: uneActionDtoPourDemain.id,
-              dateEcheance: demain.toISOString()
             })
           ],
           rendezVous: []
@@ -126,8 +105,7 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
         // When
         const result = await handler.handle({
           idJeune: 'ABCDE',
-          dateDebut: aujourdhui,
-          dateFin: apresDemain
+          maintenant: aujourdhuiVendredi
         })
 
         // Then
