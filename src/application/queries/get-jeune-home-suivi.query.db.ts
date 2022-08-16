@@ -16,6 +16,10 @@ import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { DateTime } from 'luxon'
+import { ActionQueryModel } from './query-models/actions.query-model'
+import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
+
+const NUMERO_DU_JOUR_SAMEDI = 6
 
 export interface GetJeuneHomeSuiviQuery extends Query {
   idJeune: string
@@ -34,29 +38,50 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
   async handle(
     query: GetJeuneHomeSuiviQuery
   ): Promise<Result<JeuneHomeSuiviQueryModel>> {
-    const samediWeekday = 6
+    const { dateDebut, dateFin } = this.recupererLesDatesDeLaPeriode(
+      query.maintenant
+    )
 
-    let dateDebut = DateTime.fromISO(query.maintenant, {
+    const [actions, rendezVous] = await Promise.all([
+      this.recupererLesActions(query, dateDebut, dateFin),
+      this.recupererLesRendezVous(query, dateDebut, dateFin)
+    ])
+    return success({
+      actions,
+      rendezVous
+    })
+  }
+
+  async authorize(
+    _query: GetJeuneHomeSuiviQuery,
+    _utilisateur: Authentification.Utilisateur
+  ): Promise<Result> {
+    return emptySuccess()
+  }
+
+  async monitor(): Promise<void> {
+    return
+  }
+
+  private recupererLesDatesDeLaPeriode(maintenant: string): {
+    dateDebut: DateTime
+    dateFin: DateTime
+  } {
+    let dateDebut = DateTime.fromISO(maintenant, {
       setZone: true
     }).startOf('day')
-
-    while (dateDebut.weekday !== samediWeekday) {
+    while (dateDebut.weekday !== NUMERO_DU_JOUR_SAMEDI) {
       dateDebut = dateDebut.minus({ day: 1 })
     }
-
     const dateFin = dateDebut.plus({ day: 14 })
+    return { dateDebut, dateFin }
+  }
 
-    const actionsSqlModel = await ActionSqlModel.findAll({
-      where: {
-        idJeune: query.idJeune,
-        dateEcheance: {
-          [Op.gte]: dateDebut.toJSDate(),
-          [Op.lt]: dateFin.toJSDate()
-        }
-      },
-      order: [['dateEcheance', 'ASC']]
-    })
-
+  private async recupererLesRendezVous(
+    query: GetJeuneHomeSuiviQuery,
+    dateDebut: DateTime,
+    dateFin: DateTime
+  ): Promise<RendezVousJeuneQueryModel[]> {
     const rendezVousSqlModel = await RendezVousSqlModel.findAll({
       include: [
         {
@@ -74,20 +99,25 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
       order: [['date', 'ASC']]
     })
 
-    return success({
-      actions: actionsSqlModel.map(fromSqlToActionQueryModel),
-      rendezVous: rendezVousSqlModel.map(fromSqlToRendezVousJeuneQueryModel)
+    return rendezVousSqlModel.map(fromSqlToRendezVousJeuneQueryModel)
+  }
+
+  private async recupererLesActions(
+    query: GetJeuneHomeSuiviQuery,
+    dateDebut: DateTime,
+    dateFin: DateTime
+  ): Promise<ActionQueryModel[]> {
+    const actionsSqlModel = await ActionSqlModel.findAll({
+      where: {
+        idJeune: query.idJeune,
+        dateEcheance: {
+          [Op.gte]: dateDebut.toJSDate(),
+          [Op.lt]: dateFin.toJSDate()
+        }
+      },
+      order: [['dateEcheance', 'ASC']]
     })
-  }
 
-  async authorize(
-    _query: GetJeuneHomeSuiviQuery,
-    _utilisateur: Authentification.Utilisateur
-  ): Promise<Result> {
-    return emptySuccess()
-  }
-
-  async monitor(): Promise<void> {
-    return
+    return actionsSqlModel.map(fromSqlToActionQueryModel)
   }
 }
