@@ -34,15 +34,20 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
   async handle(
     query: GetJeuneHomeSuiviQuery
   ): Promise<Result<JeuneHomeSuiviQueryModel>> {
-    const dateDebut = query.maintenant
-    const dateFin = DateTime.fromJSDate(dateDebut).plus({ day: 14 })
+    const samediWeekday = 6
+    let dateDebut = DateTime.fromJSDate(query.maintenant).toUTC().startOf('day')
+    while (dateDebut.weekday !== samediWeekday) {
+      dateDebut = dateDebut.minus({ day: 1 })
+    }
+
+    const dateFin = dateDebut.plus({ day: 14 })
 
     const actionsSqlModel = await ActionSqlModel.findAll({
       where: {
         idJeune: query.idJeune,
         dateEcheance: {
-          [Op.gte]: dateDebut,
-          [Op.lte]: dateFin
+          [Op.gte]: dateDebut.toJSDate(),
+          [Op.lt]: dateFin.toJSDate()
         }
       },
       order: [['dateEcheance', 'ASC']]
@@ -58,8 +63,8 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
       ],
       where: {
         date: {
-          [Op.gte]: dateDebut,
-          [Op.lte]: dateFin
+          [Op.gte]: dateDebut.toJSDate(),
+          [Op.lte]: dateFin.toJSDate()
         }
       },
       order: [['date', 'ASC']]
