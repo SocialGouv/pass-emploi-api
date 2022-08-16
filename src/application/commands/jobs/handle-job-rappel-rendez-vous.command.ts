@@ -6,7 +6,7 @@ import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
   Notification,
   NotificationRepositoryToken
-} from '../../../domain/notification'
+} from '../../../domain/notification/notification'
 import { Planificateur } from '../../../domain/planificateur'
 import {
   RendezVous,

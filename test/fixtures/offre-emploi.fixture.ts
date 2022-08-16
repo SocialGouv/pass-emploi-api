@@ -64,13 +64,14 @@ export const notificationsRDVPEDto = (): NotificationsPartenairesDto => ({
       idExterneDE: 'string',
       notifications: [
         {
-          idNotification: 'string',
-          codeNotification: 'string',
-          message: 'string',
-          typeMouvementRDV: TypeRDVPE.CREA,
-          typeRDV: 'string',
-          dateCreation: 'string',
-          idMetier: 'string'
+          message:
+            'Un nouveau rendez-vous est positionn√© au 18/08/2022 16:30.',
+          typeRDV: 'PRESTATIONS',
+          idMetier: '92dc7deb-3580-4e5c-af1c-23e9af0ecd07',
+          dateCreation: 'Fri Aug 12 13:58:50 CEST 2022',
+          idNotification: 'b1d84a42ba884b35881e118132825992',
+          codeNotification: 'INSC_RDV_PRESTA',
+          typeMouvementRDV: TypeRDVPE.CREA
         }
       ]
     }

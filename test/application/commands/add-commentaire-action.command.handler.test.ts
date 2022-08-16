@@ -16,7 +16,7 @@ import { failure } from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { uneConfiguration } from '../../fixtures/jeune.fixture'
 import { Jeune } from '../../../src/domain/jeune/jeune'
-import { Notification } from '../../../src/domain/notification'
+import { Notification } from '../../../src/domain/notification/notification'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import TypeCreateur = Action.TypeCreateur
 

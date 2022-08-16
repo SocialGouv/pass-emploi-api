@@ -99,7 +99,7 @@ import { MiloRepositoryToken } from './domain/milo'
 import {
   Notification,
   NotificationRepositoryToken
-} from './domain/notification'
+} from './domain/notification/notification'
 import { OffresEmploiRepositoryToken } from './domain/offre-emploi'
 import { OffreServiceCiviqueRepositoryToken } from './domain/offre-service-civique'
 import { OffresImmersionRepositoryToken } from './domain/offre-immersion'

@@ -3,17 +3,13 @@ import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
 import { isSuccess } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
-import {
-  NotificationsPartenairesDto,
-  TypeRDVPE
-} from 'src/infrastructure/repositories/dto/pole-emploi.dto'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { DatabaseForTesting } from 'test/utils/database-for-testing'
 import { HandleJobNotifierRendezVousPECommandHandler } from '../../../../src/application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
-import { Notification } from '../../../../src/domain/notification'
+import { Notification } from '../../../../src/domain/notification/notification'
 import { NotificationSupport } from '../../../../src/domain/notification-support'
 import { PoleEmploiClient } from '../../../../src/infrastructure/clients/pole-emploi-client'
 import { DateService } from '../../../../src/utils/date-service'
@@ -65,62 +61,56 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
       // Given
       const dateHier = '2020-04-05'
       const dateAujourdhui = '2020-04-06'
-      const notificationsPartenairesPE: NotificationsPartenairesDto = {
-        listeNotificationsPartenaires: [
-          {
-            idExterneDE: jeune.idAuthentification,
-            notifications: [
-              {
-                idNotification: '33e3e6b9cfdf486fbf28fda1d4d362f6',
-                codeNotification: 'AGENDA_NOUVEAU_RDV',
-                message:
-                  'Prochain RDV le 14/02/2022 à 14:30. Voir mon rendez-vous.',
-                typeMouvementRDV: TypeRDVPE.CREA,
-                typeRDV: 'CONVOCATIONS',
-                dateCreation: maintenant.minus({ hour: 1 }).toISO(),
-                idMetier: 'idMetier1'
-              },
-              {
-                idNotification: '34e3e6b9cfdf486fbf28fda1d4d362f6',
-                codeNotification: 'AGENDA_NOUVEAU_RDV',
-                message:
-                  'Prochain RDV le 14/02/2022 à 14:30. Voir mon rendez-vous.',
-                typeMouvementRDV: TypeRDVPE.SUPP,
-                typeRDV: 'CONVOCATIONS',
-                dateCreation: maintenant.minus({ hour: 3 }).toISO(),
-                idMetier: 'idMetier1'
-              },
-              {
-                idNotification: '35e3e6b9cfdf486fbf28fda1d4d362f6',
-                codeNotification: 'AGENDA_NOUVEAU_RDV',
-                message:
-                  'Prochain RDV le 14/02/2022 à 14:30. Voir mon rendez-vous.',
-                typeMouvementRDV: TypeRDVPE.SUPP,
-                typeRDV: 'CONVOCATIONS',
-                dateCreation: maintenant.plus({ hour: 1 }).toISO(),
-                idMetier: 'idMetier1'
-              }
-            ]
-          }
-        ]
-      }
-      poleEmploiClient.getNotificationsRDV
+      const notificationsPoleEmploi: Notification.PoleEmploi[] = [
+        {
+          idExterneDE: jeune.idAuthentification,
+          notifications: [
+            {
+              idNotification: '33e3e6b9cfdf486fbf28fda1d4d362f6',
+              codeNotification: 'AGENDA_NOUVEAU_RDV',
+              message:
+                'Prochain RDV le 14/02/2022 à 14:30. Voir mon rendez-vous.',
+              typeMouvementRDV: Notification.Type.NEW_RENDEZVOUS,
+              typeRDV: 'CONVOCATIONS',
+              dateCreation: maintenant.minus({ hour: 1 }),
+              idMetier: 'idMetier1'
+            },
+            {
+              idNotification: '34e3e6b9cfdf486fbf28fda1d4d362f6',
+              codeNotification: 'AGENDA_NOUVEAU_RDV',
+              message: 'Le rendez-vous du 06/09/2022 09:30 a été supprimé',
+              typeMouvementRDV: Notification.Type.DELETED_RENDEZVOUS,
+              typeRDV: 'CONVOCATIONS',
+              dateCreation: maintenant.minus({ hour: 3 }),
+              idMetier: 'idMetier1'
+            },
+            {
+              idNotification: '35e3e6b9cfdf486fbf28fda1d4d362f6',
+              codeNotification: 'AGENDA_NOUVEAU_RDV',
+              message: 'Le rendez-vous du 14/02/2022 09:30 a été supprimé',
+              typeMouvementRDV: Notification.Type.DELETED_RENDEZVOUS,
+              typeRDV: 'CONVOCATIONS',
+              dateCreation: maintenant.plus({ hour: 1 }),
+              idMetier: 'idMetier1'
+            }
+          ]
+        }
+      ]
+      poleEmploiClient.getNotificationsRendezVous
         .withArgs([jeune.idAuthentification], dateHier, dateAujourdhui)
-        .resolves(notificationsPartenairesPE)
+        .resolves(notificationsPoleEmploi)
 
       // When
       const result = await handleJobNotifierRendezVousPECommandHandler.handle()
 
       // Then
       expect(
-        notificationService.notifierLeJeuneDuRDV
+        notificationService.notifierUnRendezVousPoleEmploi
       ).to.have.been.calledOnceWithExactly(
-        jeune.id,
         Notification.Type.NEW_RENDEZVOUS,
-        'idMetier1',
-        undefined,
+        jeune.pushNotificationToken,
         'Prochain RDV le 14/02/2022 à 14:30. Voir mon rendez-vous.',
-        jeune.pushNotificationToken
+        'idMetier1'
       )
 
       expect(result._isSuccess).to.equal(true)
@@ -138,55 +128,50 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
 
       const dateHier = '2020-04-05'
       const dateAujourdhui = '2020-04-06'
-      const notificationsPartenairesPE: NotificationsPartenairesDto = {
-        listeNotificationsPartenaires: [
-          {
-            idExterneDE: jeune.idAuthentification,
-            notifications: [
-              {
-                idNotification: '33e3e6b9cfdf486fbf28fda1d4d362f6',
-                codeNotification: 'AGENDA_NOUVEAU_RDV',
-                message:
-                  'Prochain RDV le 14/02/2022 à 14:30. Voir mon rendez-vous.',
-                typeMouvementRDV: TypeRDVPE.CREA,
-                typeRDV: 'CONVOCATIONS',
-                dateCreation: dateMinuit.minus({ hour: 1 }).toISO(),
-                idMetier: 'idMetier1'
-              },
-              {
-                idNotification: '34e3e6b9cfdf486fbf28fda1d4d362f6',
-                codeNotification: 'AGENDA_NOUVEAU_RDV',
-                message:
-                  'Prochain RDV le 14/02/2022 à 14:30. Voir mon rendez-vous.',
-                typeMouvementRDV: TypeRDVPE.SUPP,
-                typeRDV: 'CONVOCATIONS',
-                dateCreation: dateMinuit.minus({ minutes: 20 }).toISO()
-              },
-              {
-                idNotification: '34e3e6b9cfdf486fbf28fda1d4d362f6',
-                codeNotification: 'AGENDA_NOUVEAU_RDV',
-                message:
-                  'Prochain RDV le 14/02/2022 à 14:30. Voir mon rendez-vous.',
-                typeMouvementRDV: TypeRDVPE.SUPP,
-                typeRDV: 'CONVOCATIONS',
-                dateCreation: dateMinuit.minus({ hour: 3 }).toISO(),
-                idMetier: 'idMetier3'
-              },
-              {
-                idNotification: '35e3e6b9cfdf486fbf28fda1d4d362f6',
-                codeNotification: 'AGENDA_NOUVEAU_RDV',
-                message:
-                  'Prochain RDV le 14/02/2022 à 14:30. Voir mon rendez-vous.',
-                typeMouvementRDV: TypeRDVPE.SUPP,
-                typeRDV: 'CONVOCATIONS',
-                dateCreation: dateMinuit.plus({ hour: 1 }).toISO(),
-                idMetier: 'idMetier4'
-              }
-            ]
-          }
-        ]
-      }
-      poleEmploiClient.getNotificationsRDV
+      const notificationsPartenairesPE: Notification.PoleEmploi[] = [
+        {
+          idExterneDE: jeune.idAuthentification,
+          notifications: [
+            {
+              idNotification: '33e3e6b9cfdf486fbf28fda1d4d362f6',
+              codeNotification: 'AGENDA_NOUVEAU_RDV',
+              message:
+                'Prochain RDV le 14/02/2022 à 14:30. Voir mon rendez-vous.',
+              typeMouvementRDV: Notification.Type.NEW_RENDEZVOUS,
+              typeRDV: 'CONVOCATIONS',
+              dateCreation: dateMinuit.minus({ hour: 1 }),
+              idMetier: 'idMetier1'
+            },
+            {
+              idNotification: '34e3e6b9cfdf486fbf28fda1d4d362f6',
+              codeNotification: 'AGENDA_NOUVEAU_RDV',
+              message: 'Le rendez-vous du 06/09/2022 11:30 a été supprimé',
+              typeMouvementRDV: Notification.Type.DELETED_RENDEZVOUS,
+              typeRDV: 'CONVOCATIONS',
+              dateCreation: dateMinuit.minus({ minutes: 20 })
+            },
+            {
+              idNotification: '34e3e6b9cfdf486fbf28fda1d4d362f6',
+              codeNotification: 'AGENDA_NOUVEAU_RDV',
+              message: 'Le rendez-vous du 06/09/2022 09:30 a été supprimé',
+              typeMouvementRDV: Notification.Type.DELETED_RENDEZVOUS,
+              typeRDV: 'CONVOCATIONS',
+              dateCreation: dateMinuit.minus({ hour: 3 }),
+              idMetier: 'idMetier3'
+            },
+            {
+              idNotification: '35e3e6b9cfdf486fbf28fda1d4d362f6',
+              codeNotification: 'AGENDA_NOUVEAU_RDV',
+              message: 'Le rendez-vous du 06/09/2022 08:30 a été supprimé',
+              typeMouvementRDV: Notification.Type.DELETED_RENDEZVOUS,
+              typeRDV: 'CONVOCATIONS',
+              dateCreation: dateMinuit.plus({ hour: 1 }),
+              idMetier: 'idMetier4'
+            }
+          ]
+        }
+      ]
+      poleEmploiClient.getNotificationsRendezVous
         .withArgs([jeune.idAuthentification], dateHier, dateAujourdhui)
         .resolves(notificationsPartenairesPE)
 
@@ -195,27 +180,23 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
 
       // Then
       expect(
-        notificationService.notifierLeJeuneDuRDV
+        notificationService.notifierUnRendezVousPoleEmploi
       ).to.have.been.calledTwice()
       expect(
-        notificationService.notifierLeJeuneDuRDV.getCall(0).args
+        notificationService.notifierUnRendezVousPoleEmploi.getCall(0).args
       ).to.deep.equal([
-        jeune.id,
         Notification.Type.NEW_RENDEZVOUS,
-        'idMetier1',
-        undefined,
+        jeune.pushNotificationToken,
         'Prochain RDV le 14/02/2022 à 14:30. Voir mon rendez-vous.',
-        jeune.pushNotificationToken
+        'idMetier1'
       ])
       expect(
-        notificationService.notifierLeJeuneDuRDV.getCall(1).args
+        notificationService.notifierUnRendezVousPoleEmploi.getCall(1).args
       ).to.deep.equal([
-        jeune.id,
         Notification.Type.DELETED_RENDEZVOUS,
-        undefined,
-        undefined,
-        'Prochain RDV le 14/02/2022 à 14:30. Voir mon rendez-vous.',
-        jeune.pushNotificationToken
+        jeune.pushNotificationToken,
+        'Le rendez-vous du 06/09/2022 11:30 a été supprimé',
+        undefined
       ])
       expect(result._isSuccess).to.equal(true)
       if (isSuccess(result)) {
@@ -229,7 +210,7 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
       // Given
       const dateHier = '2020-04-05'
       const dateAujourdhui = '2020-04-06'
-      poleEmploiClient.getNotificationsRDV
+      poleEmploiClient.getNotificationsRendezVous
         .withArgs([jeune.idAuthentification], dateHier, dateAujourdhui)
         .rejects()
 
@@ -237,7 +218,9 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
       const result = await handleJobNotifierRendezVousPECommandHandler.handle()
 
       // Then
-      expect(notificationService.notifierLeJeuneDuRDV).not.to.have.been.called()
+      expect(
+        notificationService.notifierUnRendezVousPoleEmploi
+      ).not.to.have.been.called()
 
       expect(result._isSuccess).to.equal(true)
       if (isSuccess(result)) {

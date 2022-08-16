@@ -9,12 +9,11 @@ import {
 } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
 import { PoleEmploiClient } from 'src/infrastructure/clients/pole-emploi-client'
-import { TypeRDVPE } from 'src/infrastructure/repositories/dto/pole-emploi.dto'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { DateService } from 'src/utils/date-service'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
-import { Notification } from '../../../domain/notification'
+import { Notification } from '../../../domain/notification/notification'
 import {
   NotificationSupport,
   NotificationSupportServiceToken
@@ -67,32 +66,30 @@ export class HandleJobNotifierRendezVousPECommandHandler extends CommandHandler<
         const idsPE = jeunesUtilisateursPE.map(jeune => jeune.idPE)
 
         try {
-          const notificationsRDVPE =
-            await this.poleEmploiClient.getNotificationsRDV(
+          const notifications =
+            await this.poleEmploiClient.getNotificationsRendezVous(
               idsPE,
               hier,
               aujourdhui
             )
 
-          for (const notificationsJeune of notificationsRDVPE.listeNotificationsPartenaires) {
+          for (const notificationsParJeune of notifications) {
             const jeuneANotifier = jeunesUtilisateursPE.find(
-              jeune => jeune.idPE === notificationsJeune.idExterneDE
+              jeune => jeune.idPE === notificationsParJeune.idExterneDE
             )!
 
-            for (const detailNotification of notificationsJeune.notifications) {
+            for (const detailNotification of notificationsParJeune.notifications) {
               if (
                 estUneNotificationDeMoinsDeDeuxHeures(
                   detailNotification.dateCreation,
                   maintenant
                 )
               ) {
-                await this.notificationService.notifierLeJeuneDuRDV(
-                  jeuneANotifier.id,
-                  mapTypeRDVPE[detailNotification.typeMouvementRDV],
-                  detailNotification.idMetier,
-                  undefined,
+                await this.notificationService.notifierUnRendezVousPoleEmploi(
+                  detailNotification.typeMouvementRDV,
+                  jeuneANotifier.pushNotificationToken,
                   detailNotification.message,
-                  jeuneANotifier.pushNotificationToken
+                  detailNotification.idMetier
                 )
                 stats.nombreNotificationsEnvoyees++
               }
@@ -123,21 +120,14 @@ export class HandleJobNotifierRendezVousPECommandHandler extends CommandHandler<
 }
 
 function estUneNotificationDeMoinsDeDeuxHeures(
-  dateCreationNotif: string,
+  dateNotification: DateTime,
   maintenant: DateTime
 ): boolean {
   const deuxHeuresPlusTot = maintenant.minus({ hour: 2 })
-  const dateNotification = DateTime.fromISO(dateCreationNotif)
   return (
     dateNotification.startOf('hour') <= maintenant.startOf('hour') &&
     dateNotification.startOf('hour') >= deuxHeuresPlusTot.startOf('hour')
   )
-}
-
-const mapTypeRDVPE: Record<TypeRDVPE, Notification.TypeRdv> = {
-  CREA: Notification.Type.NEW_RENDEZVOUS,
-  MODIF: Notification.Type.UPDATED_RENDEZVOUS,
-  SUPP: Notification.Type.DELETED_RENDEZVOUS
 }
 
 interface Stats {

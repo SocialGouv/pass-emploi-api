@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { Notification } from 'src/domain/notification'
+import { Notification } from 'src/domain/notification/notification'
 import {
   Contrat,
   Duree,

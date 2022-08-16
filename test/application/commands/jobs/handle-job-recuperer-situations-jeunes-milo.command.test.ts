@@ -51,7 +51,7 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
   describe("quand aucun jeune n'existe", () => {
     it('ne fais rien', async () => {
       // Given
-      jeuneRepository.getJeunesMilo.withArgs(0, 100).resolves([])
+      jeuneRepository.getJeunesMiloAvecIdDossier.withArgs(0, 100).resolves([])
 
       // When
       const result =
@@ -70,8 +70,10 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
   describe('quand il existe moins de 100 jeunes', () => {
     it('recupere et sauvegarde les situations', async () => {
       // Given
-      jeuneRepository.getJeunesMilo.withArgs(0, 100).resolves([jeune1, jeune2])
-      jeuneRepository.getJeunesMilo.withArgs(100, 100).resolves([])
+      jeuneRepository.getJeunesMiloAvecIdDossier
+        .withArgs(0, 100)
+        .resolves([jeune1, jeune2])
+      jeuneRepository.getJeunesMiloAvecIdDossier.withArgs(100, 100).resolves([])
       miloRepository.getDossier
         .withArgs(jeune1.idPartenaire)
         .resolves(success(unDossierMilo({ id: jeune1.idPartenaire })))
@@ -101,10 +103,10 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
     })
     it("ne s'arrete pas pas quand une erreur se produit", async () => {
       // Given
-      jeuneRepository.getJeunesMilo
+      jeuneRepository.getJeunesMiloAvecIdDossier
         .withArgs(0, 100)
         .resolves([undefined, jeune1])
-      jeuneRepository.getJeunesMilo.withArgs(100, 100).resolves([])
+      jeuneRepository.getJeunesMiloAvecIdDossier.withArgs(100, 100).resolves([])
       miloRepository.getDossier
         .withArgs(jeune1.idPartenaire)
         .resolves(success(unDossierMilo({ id: jeune1.idPartenaire })))
@@ -135,9 +137,13 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
   describe('quand il existe plus de 100 jeunes', () => {
     it('recupere et sauvegarde les situations', async () => {
       // Given
-      jeuneRepository.getJeunesMilo.withArgs(0, 100).resolves([jeune1])
-      jeuneRepository.getJeunesMilo.withArgs(100, 100).resolves([jeune2])
-      jeuneRepository.getJeunesMilo.withArgs(200, 100).resolves([])
+      jeuneRepository.getJeunesMiloAvecIdDossier
+        .withArgs(0, 100)
+        .resolves([jeune1])
+      jeuneRepository.getJeunesMiloAvecIdDossier
+        .withArgs(100, 100)
+        .resolves([jeune2])
+      jeuneRepository.getJeunesMiloAvecIdDossier.withArgs(200, 100).resolves([])
       miloRepository.getDossier
         .withArgs(jeune1.idPartenaire)
         .resolves(success(unDossierMilo({ id: jeune1.idPartenaire })))

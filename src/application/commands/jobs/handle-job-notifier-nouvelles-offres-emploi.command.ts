@@ -18,7 +18,7 @@ import {
   Jeune,
   JeuneConfigurationApplicationRepositoryToken
 } from '../../../domain/jeune/jeune'
-import { Notification } from '../../../domain/notification'
+import { Notification } from '../../../domain/notification/notification'
 import { GetOffresEmploiQuery } from '../../queries/get-offres-emploi.query.handler'
 import { OffresEmploiQueryModel } from '../../queries/query-models/offres-emploi.query-model'
 import { FindAllOffresEmploiQueryGetter } from '../../queries/query-getters/find-all-offres-emploi.query.getter'

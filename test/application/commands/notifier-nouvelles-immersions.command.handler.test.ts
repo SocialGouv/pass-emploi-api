@@ -6,7 +6,7 @@ import {
 } from '../../../src/application/commands/notifier-nouvelles-immersions.command.handler'
 import { GetOffresImmersionQuery } from '../../../src/application/queries/get-offres-immersion.query.handler'
 import { Jeune } from '../../../src/domain/jeune/jeune'
-import { Notification } from '../../../src/domain/notification'
+import { Notification } from '../../../src/domain/notification/notification'
 import { Recherche } from '../../../src/domain/recherche'
 import { DateService } from '../../../src/utils/date-service'
 import { unJeune } from '../../fixtures/jeune.fixture'

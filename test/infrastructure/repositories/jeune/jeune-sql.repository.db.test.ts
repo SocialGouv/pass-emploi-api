@@ -423,7 +423,10 @@ describe('JeuneSqlRepository', () => {
     describe('quand un jeune Milo existe avec id dossier', () => {
       it('retourne les jeunes', async () => {
         // When
-        const result = await jeuneSqlRepository.getJeunesMilo(0, 10)
+        const result = await jeuneSqlRepository.getJeunesMiloAvecIdDossier(
+          0,
+          10
+        )
 
         // Then
         expect(result.length).to.equal(1)
@@ -433,7 +436,7 @@ describe('JeuneSqlRepository', () => {
     describe('quand la pagination atteint la limite', () => {
       it('retourne liste vide', async () => {
         // When
-        const result = await jeuneSqlRepository.getJeunesMilo(1, 1)
+        const result = await jeuneSqlRepository.getJeunesMiloAvecIdDossier(1, 1)
 
         // Then
         expect(result).to.deep.equal([])

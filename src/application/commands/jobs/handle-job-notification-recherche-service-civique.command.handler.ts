@@ -16,7 +16,7 @@ import {
   Jeune,
   JeuneConfigurationApplicationRepositoryToken
 } from '../../../domain/jeune/jeune'
-import { Notification } from '../../../domain/notification'
+import { Notification } from '../../../domain/notification/notification'
 import { OffreServiceCivique } from '../../../domain/offre-service-civique'
 import { Recherche, RecherchesRepositoryToken } from '../../../domain/recherche'
 import { DateService } from '../../../utils/date-service'

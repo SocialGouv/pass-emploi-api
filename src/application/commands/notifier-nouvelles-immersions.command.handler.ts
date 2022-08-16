@@ -10,7 +10,7 @@ import {
   Jeune,
   JeuneConfigurationApplicationRepositoryToken
 } from '../../domain/jeune/jeune'
-import { Notification } from '../../domain/notification'
+import { Notification } from '../../domain/notification/notification'
 import { Recherche, RecherchesRepositoryToken } from '../../domain/recherche'
 import { DateService } from '../../utils/date-service'
 import { GetOffresImmersionQuery } from '../queries/get-offres-immersion.query.handler'
