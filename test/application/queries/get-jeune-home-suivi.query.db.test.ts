@@ -1,7 +1,10 @@
 import { GetJeuneHomeSuiviQueryHandler } from 'src/application/queries/get-jeune-home-suivi.query.db'
 import { JeuneHomeSuiviQueryModel } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
 import { success } from 'src/building-blocks/types/result'
-import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
+import {
+  ActionDto,
+  ActionSqlModel
+} from 'src/infrastructure/sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { uneActionQueryModelSansJeune } from 'test/fixtures/query-models/action.query-model.fixtures'
@@ -14,6 +17,7 @@ import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
 import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
+import { AsSql } from '../../../src/infrastructure/sequelize/types'
 
 describe('GetJeuneHomeSuiviQueryHandler', () => {
   DatabaseForTesting.prepare()
@@ -31,31 +35,14 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
 
   describe('handle', () => {
     it("doit retourner les événements bornés entre samedi dernier minuit et samedi en huit minuit, d'après la locale utilisateur", async () => {
-      const vendrediDernier = new Date('2022-08-12T23:59:00-07:00')
-      const samediDernier = new Date('2022-08-13T00:00:00-07:00')
       const aujourdhuiLundi = '2022-08-15T00:00:00-07:00'
-      const vendrediEnHuit = new Date('2022-08-26T23:59:00-07:00')
-      const samediEnHuit = new Date('2022-08-27T00:00:00-07:00')
-
-      const uneActionDtoVendrediDernier = uneActionDto({
-        dateEcheance: vendrediDernier
-      })
-      const uneActionDtoSamediDernier = uneActionDto({
-        dateEcheance: samediDernier
-      })
-      const uneActionDtoPourVendrediEnHuit = uneActionDto({
-        dateEcheance: vendrediEnHuit
-      })
-      const uneActionDtoPourSamediEnHuit = uneActionDto({
-        dateEcheance: samediEnHuit
-      })
-
-      await ActionSqlModel.bulkCreate([
-        uneActionDtoVendrediDernier,
-        uneActionDtoSamediDernier,
-        uneActionDtoPourVendrediEnHuit,
-        uneActionDtoPourSamediEnHuit
-      ])
+      const [_vendrediDernier, samediDernier, vendrediEnHuit, _samediEnHuit] =
+        await createActions([
+          '2022-08-12T23:59:00-07:00',
+          '2022-08-13T00:00:00-07:00',
+          '2022-08-26T23:59:00-07:00',
+          '2022-08-27T00:00:00-07:00'
+        ])
 
       // When
       const result = await handler.handle({
@@ -67,12 +54,12 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
       const expected: JeuneHomeSuiviQueryModel = {
         actions: [
           uneActionQueryModelSansJeune({
-            id: uneActionDtoSamediDernier.id,
-            dateEcheance: samediDernier.toISOString()
+            id: samediDernier.id,
+            dateEcheance: samediDernier.dateEcheance.toISOString()
           }),
           uneActionQueryModelSansJeune({
-            id: uneActionDtoPourVendrediEnHuit.id,
-            dateEcheance: vendrediEnHuit.toISOString()
+            id: vendrediEnHuit.id,
+            dateEcheance: vendrediEnHuit.dateEcheance.toISOString()
           })
         ],
         rendezVous: []
@@ -81,19 +68,12 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
     })
 
     describe('actions', () => {
-      const uneActionDtoPourDemain = uneActionDto({
-        dateEcheance: demain
-      })
-      const uneActionDtoPourApresDemain = uneActionDto({
-        dateEcheance: apresDemain
-      })
-
-      beforeEach(async () => {
-        // Given
-        await ActionSqlModel.creer(uneActionDtoPourApresDemain)
-        await ActionSqlModel.creer(uneActionDtoPourDemain)
-      })
       it('doit retourner la liste des actions triées chronologiquement', async () => {
+        const [demain, apresDemain] = await createActions([
+          '2022-08-13T12:00:00Z',
+          '2022-08-14T12:00:00Z'
+        ])
+
         // When
         const result = await handler.handle({
           idJeune: 'ABCDE',
@@ -104,12 +84,12 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
         const expected: JeuneHomeSuiviQueryModel = {
           actions: [
             uneActionQueryModelSansJeune({
-              id: uneActionDtoPourDemain.id,
-              dateEcheance: demain.toISOString()
+              id: demain.id,
+              dateEcheance: demain.dateEcheance.toISOString()
             }),
             uneActionQueryModelSansJeune({
-              id: uneActionDtoPourApresDemain.id,
-              dateEcheance: apresDemain.toISOString()
+              id: apresDemain.id,
+              dateEcheance: apresDemain.dateEcheance.toISOString()
             })
           ],
           rendezVous: []
@@ -164,3 +144,15 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
     })
   })
 })
+
+async function createActions(
+  dates: string[]
+): Promise<Array<AsSql<ActionDto>>> {
+  const dtos = dates.map(date => {
+    return uneActionDto({
+      dateEcheance: new Date(date)
+    })
+  })
+  await ActionSqlModel.bulkCreate(dtos)
+  return dtos
+}
