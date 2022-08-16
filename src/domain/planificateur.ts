@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import { Action } from './action/action'
 import { DateService } from '../utils/date-service'
 import { RendezVous } from './rendez-vous'
+import { NettoyageJobsStats } from './notification-support'
 
 export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 
@@ -18,7 +19,7 @@ export namespace Planificateur {
 
     supprimerLesCrons(): Promise<void>
 
-    supprimerLesAnciensJobs(): Promise<void>
+    supprimerLesAnciensJobs(): Promise<NettoyageJobsStats>
 
     supprimerJobsSelonPattern(pattern: string): Promise<void>
   }

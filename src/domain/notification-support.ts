@@ -7,6 +7,12 @@ export interface InfosJob {
   result: Result
 }
 
+export interface NettoyageJobsStats {
+  jobsNettoyes: number
+  erreurs: number
+  tempsDExecution?: number
+}
+
 export namespace NotificationSupport {
   export interface Service {
     notifierResultatJob(infosJob: InfosJob): Promise<void>
