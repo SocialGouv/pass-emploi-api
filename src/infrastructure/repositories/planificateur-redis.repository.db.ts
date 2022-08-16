@@ -103,22 +103,35 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
   }
 
   async supprimerLesAnciensJobs(): Promise<NettoyageJobsStats> {
-    const stats: NettoyageJobsStats = { jobsNettoyes: 0, erreurs: 0 }
+    const stats: NettoyageJobsStats = {
+      listeJobsNettoyes: [],
+      nbJobsNettoyes: 0,
+      listeErreurs: [],
+      nbErreurs: 0
+    }
     const ilYA7Jours = this.dateService.now().minus({ day: 7 }).toMillis()
     const jobs = await this.queue.getCompleted()
     for (const job of jobs) {
       if (job.timestamp < ilYA7Jours) {
         try {
           await this.queue.removeJobs(job.id.toString())
-          stats.jobsNettoyes++
+          stats.listeJobsNettoyes.push({
+            id: job.id.toString(),
+            type: job.data.type
+          })
+          stats.nbJobsNettoyes++
         } catch (e) {
           this.logger.error(
             buildError(
-              `Erreur lors de la suppression du job ${job.name} d'id ${job.id}`,
+              `Erreur lors de la suppression du job de type ${job.data.type} et d'id ${job.id}`,
               e
             )
           )
-          stats.erreurs++
+          stats.listeErreurs.push({
+            id: job.id.toString(),
+            type: job.data.type
+          })
+          stats.nbErreurs++
         }
       }
     }

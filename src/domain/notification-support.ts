@@ -8,8 +8,10 @@ export interface InfosJob {
 }
 
 export interface NettoyageJobsStats {
-  jobsNettoyes: number
-  erreurs: number
+  nbJobsNettoyes: number
+  listeJobsNettoyes: Array<{ id: string; type: string }>
+  nbErreurs: number
+  listeErreurs: Array<{ id: string; type: string }>
   tempsDExecution?: number
 }
 
