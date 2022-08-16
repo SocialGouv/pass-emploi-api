@@ -18,7 +18,7 @@ import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.
 describe('GetJeuneHomeSuiviQueryHandler', () => {
   DatabaseForTesting.prepare()
   let handler: GetJeuneHomeSuiviQueryHandler
-  const aujourdhuiVendredi = new Date('2022-08-12T12:00:00Z')
+  const aujourdhuiVendredi = '2022-08-12T12:00:00Z'
   const demain = new Date('2022-08-13T12:00:00Z')
   const apresDemain = new Date('2022-08-14T12:00:00Z')
   const jeuneDto = unJeuneDto()
@@ -30,12 +30,12 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
   })
 
   describe('handle', () => {
-    it('doit retourner les événements bornés entre samedi dernier minuit et samedi en huit minuit', async () => {
-      const vendrediDernier = new Date('2022-08-12T12:00:00Z')
-      const samediDernier = new Date('2022-08-13T12:00:00Z')
-      const aujourdhuiLundi = new Date('2022-08-15T12:00:00Z')
-      const vendrediEnHuit = new Date('2022-08-26T23:00:00Z')
-      const samediEnHuit = new Date('2022-08-27T00:00:00Z')
+    it("doit retourner les événements bornés entre samedi dernier minuit et samedi en huit minuit, d'après la locale utilisateur", async () => {
+      const vendrediDernier = new Date('2022-08-12T23:59:00-07:00')
+      const samediDernier = new Date('2022-08-13T00:00:00-07:00')
+      const aujourdhuiLundi = '2022-08-15T00:00:00-07:00'
+      const vendrediEnHuit = new Date('2022-08-26T23:59:00-07:00')
+      const samediEnHuit = new Date('2022-08-27T00:00:00-07:00')
 
       const uneActionDtoVendrediDernier = uneActionDto({
         dateEcheance: vendrediDernier
@@ -132,7 +132,6 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
           unRendezVousDtoPourApresDemain
         ])
         await RendezVousJeuneAssociationSqlModel.bulkCreate([
-
           { idJeune: jeuneDto.id, idRendezVous: unRendezVousDtoPourDemain.id },
           {
             idJeune: jeuneDto.id,
