@@ -10,6 +10,10 @@ import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { DatabaseForTesting } from 'test/utils/database-for-testing'
 import { expect } from '../../utils'
+import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
+import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
+import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
 
 describe('GetJeuneHomeSuiviQueryHandler', () => {
   DatabaseForTesting.prepare()
@@ -18,9 +22,12 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
   const aujourdhui = new Date('2022-08-15T12:00:00Z')
   const demain = new Date('2022-08-16T12:00:00Z')
   const apresDemain = new Date('2022-08-17T12:00:00Z')
+  const jeuneDto = unJeuneDto()
 
-  beforeEach(() => {
+  beforeEach(async () => {
     handler = new GetJeuneHomeSuiviQueryHandler()
+    await ConseillerSqlModel.creer(unConseillerDto())
+    await JeuneSqlModel.creer(jeuneDto)
   })
 
   describe('handle', () => {
@@ -37,8 +44,6 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
 
       beforeEach(async () => {
         // Given
-        await ConseillerSqlModel.creer(unConseillerDto())
-        await JeuneSqlModel.creer(unJeuneDto())
         await ActionSqlModel.creer(uneActionDtoQuiDateDHier)
         await ActionSqlModel.creer(uneActionDtoPourApresDemain)
         await ActionSqlModel.creer(uneActionDtoPourDemain)
@@ -62,7 +67,8 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
               id: uneActionDtoPourApresDemain.id,
               dateEcheance: apresDemain.toISOString()
             })
-          ]
+          ],
+          rendezVous: []
         }
         expect(result).to.deep.equal(success(expected))
       })
@@ -80,6 +86,61 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
             uneActionQueryModelSansJeune({
               id: uneActionDtoPourDemain.id,
               dateEcheance: demain.toISOString()
+            })
+          ],
+          rendezVous: []
+        }
+        expect(result).to.deep.equal(success(expected))
+      })
+    })
+    describe('rendez-vous', () => {
+      it('renvoie les rendez-vous triés par date', async () => {
+        // Given
+        const unRendezVousDtoQuiDateDHier = unRendezVousDto({
+          date: hier
+        })
+        const unRendezVousDtoPourDemain = unRendezVousDto({
+          date: demain
+        })
+        const unRendezVousDtoPourApresDemain = unRendezVousDto({
+          date: apresDemain
+        })
+
+        await RendezVousSqlModel.bulkCreate([
+          unRendezVousDtoQuiDateDHier,
+          unRendezVousDtoPourDemain,
+          unRendezVousDtoPourApresDemain
+        ])
+        await RendezVousJeuneAssociationSqlModel.bulkCreate([
+          {
+            idJeune: jeuneDto.id,
+            idRendezVous: unRendezVousDtoQuiDateDHier.id
+          },
+          { idJeune: jeuneDto.id, idRendezVous: unRendezVousDtoPourDemain.id },
+          {
+            idJeune: jeuneDto.id,
+            idRendezVous: unRendezVousDtoPourApresDemain.id
+          }
+        ])
+
+        // When
+        const result = await handler.handle({
+          idJeune: 'ABCDE',
+          dateDebut: aujourdhui,
+          dateFin: apresDemain
+        })
+
+        // Then
+        const expected: JeuneHomeSuiviQueryModel = {
+          actions: [],
+          rendezVous: [
+            unRendezVousQueryModel({
+              id: unRendezVousDtoPourDemain.id,
+              date: unRendezVousDtoPourDemain.date
+            }),
+            unRendezVousQueryModel({
+              id: unRendezVousDtoPourApresDemain.id,
+              date: unRendezVousDtoPourApresDemain.date
             })
           ]
         }

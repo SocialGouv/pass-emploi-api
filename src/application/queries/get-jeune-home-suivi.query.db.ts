@@ -11,6 +11,10 @@ import { Authentification } from '../../domain/authentification'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
 import { fromSqlToActionQueryModel } from 'src/infrastructure/repositories/mappers/actions.mappers'
 import { Op } from 'sequelize'
+import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
+import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
+import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 
 export interface GetJeuneHomeSuiviQuery extends Query {
   idJeune: string
@@ -41,7 +45,27 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
       order: [['dateEcheance', 'ASC']]
     })
 
-    return success({ actions: actionsSqlModel.map(fromSqlToActionQueryModel) })
+    const rendezVousSqlModel = await RendezVousSqlModel.findAll({
+      include: [
+        {
+          model: JeuneSqlModel,
+          where: { id: query.idJeune },
+          include: [ConseillerSqlModel]
+        }
+      ],
+      where: {
+        date: {
+          [Op.gte]: query.dateDebut,
+          [Op.lte]: query.dateFin
+        }
+      },
+      order: [['date', 'ASC']]
+    })
+
+    return success({
+      actions: actionsSqlModel.map(fromSqlToActionQueryModel),
+      rendezVous: rendezVousSqlModel.map(fromSqlToRendezVousJeuneQueryModel)
+    })
   }
 
   async authorize(
