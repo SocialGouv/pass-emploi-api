@@ -1,6 +1,6 @@
 import { GetJeuneHomeSuiviQueryHandler } from 'src/application/queries/get-jeune-home-suivi.query.db'
 import { JeuneHomeSuiviQueryModel } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
-import { Result, success } from 'src/building-blocks/types/result'
+import { emptySuccess, Result, success } from 'src/building-blocks/types/result'
 import {
   ActionDto,
   ActionSqlModel
@@ -12,24 +12,29 @@ import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { DatabaseForTesting } from 'test/utils/database-for-testing'
-import { expect } from '../../utils'
+import { expect, StubbedClass, stubClass } from '../../utils'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
 import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { Action } from 'src/domain/action/action'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 
 describe('GetJeuneHomeSuiviQueryHandler', () => {
   DatabaseForTesting.prepare()
   let handler: GetJeuneHomeSuiviQueryHandler
+  let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   const aujourdhuiVendredi = '2022-08-12T12:00:00Z'
   const demain = new Date('2022-08-13T12:00:00Z')
   const apresDemain = new Date('2022-08-14T12:00:00Z')
   const jeuneDto = unJeuneDto()
 
   beforeEach(async () => {
-    handler = new GetJeuneHomeSuiviQueryHandler()
+    jeuneAuthorizer = stubClass(JeuneAuthorizer)
+    handler = new GetJeuneHomeSuiviQueryHandler(jeuneAuthorizer)
     await ConseillerSqlModel.creer(unConseillerDto())
     await JeuneSqlModel.creer(jeuneDto)
   })
@@ -171,6 +176,25 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
         // Then
         expect(result._isSuccess && result.data.actionsEnRetard).to.equal(1)
       })
+    })
+  })
+
+  describe('authorize', () => {
+    it('autorise un jeune', async () => {
+      // Given
+      const jeune = unJeune()
+      jeuneAuthorizer.authorize
+        .withArgs(jeune.id, unUtilisateurJeune({ id: jeune.id }))
+        .resolves(emptySuccess())
+
+      // When
+      const result = await handler.authorize(
+        { idJeune: jeune.id, maintenant: aujourdhuiVendredi },
+        unUtilisateurJeune()
+      )
+
+      // Then
+      expect(result).to.deep.equal(emptySuccess())
     })
   })
 })
