@@ -37,7 +37,7 @@ function construireMessage(infosJob: InfosJob): string {
     tableau = `| Statut | :white_check_mark: |
     |:------------------------|:-------------|
     ${Object.entries(infosJob.result.data!)
-      .filter(entry => entry[0].substring(0, 5) !== 'liste')
+      .filter(entry => !isArrayOrObject(entry[1]))
       .map(entry => {
         return `| ${entry[0]} | ${entry[1]} |`
       })
@@ -46,7 +46,7 @@ function construireMessage(infosJob: InfosJob): string {
     tableau = `| Statut | :x: |
     |:------------------|:----|
     ${Object.entries(infosJob.result.error)
-      .filter(entry => entry[0].substring(0, 5) !== 'liste')
+      .filter(entry => !isArrayOrObject(entry[1]))
       .map(entry => {
         return `| ${entry[0]} | ${entry[1]} |`
       })
@@ -54,4 +54,8 @@ function construireMessage(infosJob: InfosJob): string {
   }
 
   return `### Résultat du job _${infosJob.job}_\n${tableau}`
+}
+
+function isArrayOrObject(entry: unknown): boolean {
+  return typeof entry === 'object' || Array.isArray(entry)
 }
