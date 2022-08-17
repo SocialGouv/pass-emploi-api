@@ -224,5 +224,38 @@ describe('Notification', () => {
         )
       })
     })
+    describe('notifierUnRendezVousPoleEmploi', () => {
+      it('notifie un jeune', async () => {
+        // Given
+        const typeNotification = Notification.Type.NEW_RENDEZVOUS
+        const token = 'poi-token'
+        const message = 'Votre conseiller a programmé un nouveau rendez-vous'
+        const idRendezVous = 'poi-id-rdv'
+
+        // When
+        await notificationService.notifierUnRendezVousPoleEmploi(
+          typeNotification,
+          token,
+          message,
+          idRendezVous
+        )
+
+        // Then
+        const expectedNotification = uneNotification({
+          token: token,
+          notification: {
+            title: 'Nouveau rendez-vous',
+            body: 'Votre conseiller a programmé un nouveau rendez-vous'
+          },
+          data: {
+            type: typeNotification,
+            id: idRendezVous
+          }
+        })
+        expect(notificationRepository.send).to.have.been.calledOnceWithExactly(
+          expectedNotification
+        )
+      })
+    })
   })
 })

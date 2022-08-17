@@ -178,7 +178,7 @@ export namespace Notification {
       token: string,
       message: string,
       idRendezVous?: string
-    ): Notification.Message | undefined {
+    ): void {
       let notification: Notification.Message | undefined
 
       switch (typeNotification) {
@@ -204,7 +204,9 @@ export namespace Notification {
           break
       }
 
-      return notification
+      if (notification) {
+        this.notificationRepository.send(notification)
+      }
     }
 
     async notifierLesJeunesDuNouveauMessage(jeunes: Jeune[]): Promise<void[]> {
