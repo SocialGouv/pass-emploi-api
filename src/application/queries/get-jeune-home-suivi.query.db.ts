@@ -1,10 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { JeuneHomeSuiviQueryModel } from './query-models/home-jeune-suivi.query-model'
-import {
-  emptySuccess,
-  Result,
-  success
-} from '../../building-blocks/types/result'
+import { Result, success } from '../../building-blocks/types/result'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Authentification } from '../../domain/authentification'
@@ -19,6 +15,7 @@ import { DateTime } from 'luxon'
 import { ActionQueryModel } from './query-models/actions.query-model'
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
 import { Action } from '../../domain/action/action'
+import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 
 const NUMERO_DU_JOUR_SAMEDI = 6
 
@@ -32,19 +29,20 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
   GetJeuneHomeSuiviQuery,
   Result<JeuneHomeSuiviQueryModel>
 > {
-  constructor() {
+  constructor(private jeuneAuthorizer: JeuneAuthorizer) {
     super('GetJeuneHomeSuiviQueryHandler')
   }
 
   async handle(
     query: GetJeuneHomeSuiviQuery
   ): Promise<Result<JeuneHomeSuiviQueryModel>> {
-    const { dateDebut, dateFin } = this.recupererLesDatesDeLaPeriode(
-      query.maintenant
-    )
+    const { samediDernier, vendrediEnHuit } =
+      this.recupererLesDatesEntreSamediDernierEtDeuxSemainesPlusTard(
+        query.maintenant
+      )
     const [actions, rendezVous, actionsEnRetard] = await Promise.all([
-      this.recupererLesActions(query, dateDebut, dateFin),
-      this.recupererLesRendezVous(query, dateDebut, dateFin),
+      this.recupererLesActions(query, samediDernier, vendrediEnHuit),
+      this.recupererLesRendezVous(query, samediDernier, vendrediEnHuit),
       this.recupererLeNombreDactionsEnRetard(query)
     ])
     return success({
@@ -55,19 +53,21 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
   }
 
   async authorize(
-    _query: GetJeuneHomeSuiviQuery,
-    _utilisateur: Authentification.Utilisateur
+    query: GetJeuneHomeSuiviQuery,
+    utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return emptySuccess()
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {
     return
   }
 
-  private recupererLesDatesDeLaPeriode(maintenant: string): {
-    dateDebut: DateTime
-    dateFin: DateTime
+  private recupererLesDatesEntreSamediDernierEtDeuxSemainesPlusTard(
+    maintenant: string
+  ): {
+    samediDernier: DateTime
+    vendrediEnHuit: DateTime
   } {
     let dateDebut = DateTime.fromISO(maintenant, {
       setZone: true
@@ -75,8 +75,8 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
     while (dateDebut.weekday !== NUMERO_DU_JOUR_SAMEDI) {
       dateDebut = dateDebut.minus({ day: 1 })
     }
-    const dateFin = dateDebut.plus({ day: 14 })
-    return { dateDebut, dateFin }
+    const vendrediEnHuit = dateDebut.plus({ day: 14 })
+    return { samediDernier: dateDebut, vendrediEnHuit }
   }
 
   private async recupererLesRendezVous(
@@ -126,7 +126,7 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
   private async recupererLeNombreDactionsEnRetard(
     query: GetJeuneHomeSuiviQuery
   ): Promise<number> {
-    return await ActionSqlModel.count({
+    return ActionSqlModel.count({
       where: {
         idJeune: query.idJeune,
         dateEcheance: {

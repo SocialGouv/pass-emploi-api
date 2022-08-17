@@ -104,7 +104,7 @@ describe('JeunesController', () => {
   let dateService: StubbedClass<DateService>
   const now = uneDatetime.set({ second: 59, millisecond: 0 })
 
-  before(async () => {
+  beforeEach(async () => {
     createActionCommandHandler = stubClass(CreateActionCommandHandler)
     getDetailJeuneQueryHandler = stubClass(GetDetailJeuneQueryHandler)
     transfererJeunesConseillerCommandHandler = stubClass(
@@ -351,7 +351,7 @@ describe('JeunesController', () => {
           contenu: "Ceci est un contenu d'action",
           idCreateur: 'ABCDE',
           typeCreateur: Action.TypeCreateur.JEUNE,
-          statut: Action.Statut.EN_COURS,
+          statut: undefined,
           commentaire: 'Ceci est un commentaire',
           dateEcheance: nowJsPlus3Mois,
           rappel: false
@@ -894,17 +894,26 @@ describe('JeunesController', () => {
         // Then
         .expect(HttpStatus.NOT_FOUND)
     })
-    it('retourne les rdv', async () => {
+    it('retourne les démarches', async () => {
       // Given
+      const demarche = uneDemarche()
       jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
-      getActionsPoleEmploiQueryHandler.execute.resolves(success([]))
+      getActionsPoleEmploiQueryHandler.execute.resolves(success([demarche]))
 
       // When
       await request(app.getHttpServer())
         .get(`/jeunes/${idJeune}/pole-emploi/actions`)
         .set('authorization', unHeaderAuthorization())
         // Then
-        .expect([])
+        .expect([
+          {
+            ...demarche,
+            dateCreation: demarche.dateCreation?.toISOString(),
+            dateDebut: demarche.dateDebut?.toISOString(),
+            dateFin: demarche.dateFin?.toISOString(),
+            dateModification: demarche.dateModification?.toISOString()
+          }
+        ])
     })
     ensureUserAuthenticationFailsIfInvalid(
       'get',
