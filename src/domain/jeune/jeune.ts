@@ -6,10 +6,12 @@ import { Core } from '../core'
 import { Injectable } from '@nestjs/common'
 import { IdService } from '../../utils/id-service'
 import * as _ConfigurationApplication from './configuration-application'
+import * as _PoleEmploi from './pole-emploi'
 
 export const JeunesRepositoryToken = 'Jeune.Repository'
 export const JeuneConfigurationApplicationRepositoryToken =
   'Jeune.ConfigurationApplication.Repository'
+export const JeunePoleEmploiRepositoryToken = 'Jeune.PoleEmploi.Repository'
 
 export interface Jeune {
   id: string
@@ -30,6 +32,8 @@ export namespace Jeune {
   // FIXME: le linter ne comprend pas cette technique 🤷‍️
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import ConfigurationApplication = _ConfigurationApplication.ConfigurationApplication
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  export import PoleEmploi = _PoleEmploi.PoleEmploi
 
   export interface Conseiller {
     id: string

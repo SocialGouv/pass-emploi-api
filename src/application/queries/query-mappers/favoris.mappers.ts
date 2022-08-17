@@ -1,6 +1,6 @@
 import { FavoriOffreEmploiSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-emploi.sql-model'
 import { FavorisQueryModel } from '../query-models/favoris.query-model'
-import { Favori } from '../../../domain/Favori'
+import { Favori } from '../../../domain/favori'
 import { FavoriOffreImmersionSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { FavoriOffreEngagementSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 

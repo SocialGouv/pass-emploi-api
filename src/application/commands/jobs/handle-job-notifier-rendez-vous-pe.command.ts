@@ -1,15 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { Op } from 'sequelize'
 import {
   emptySuccess,
   failure,
   Result,
   success
 } from 'src/building-blocks/types/result'
-import { Core } from 'src/domain/core'
 import { PoleEmploiClient } from 'src/infrastructure/clients/pole-emploi-client'
-import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { DateService } from 'src/utils/date-service'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
@@ -18,6 +15,10 @@ import {
   NotificationSupport,
   NotificationSupportServiceToken
 } from '../../../domain/notification-support'
+import {
+  Jeune,
+  JeunePoleEmploiRepositoryToken
+} from '../../../domain/jeune/jeune'
 
 const NOMBRE_JEUNES_EN_PARALLELE = 20
 
@@ -31,7 +32,9 @@ export class HandleJobNotifierRendezVousPECommandHandler extends CommandHandler<
     private notificationService: Notification.Service,
     private dateService: DateService,
     @Inject(NotificationSupportServiceToken)
-    notificationSupportService: NotificationSupport.Service
+    notificationSupportService: NotificationSupport.Service,
+    @Inject(JeunePoleEmploiRepositoryToken)
+    private jeunePoleEmploiRepository: Jeune.PoleEmploi.Repository
   ) {
     super(
       'HandleJobNotifierRendezVousPECommandHandler',
@@ -44,7 +47,7 @@ export class HandleJobNotifierRendezVousPECommandHandler extends CommandHandler<
     const aujourdhui = maintenant.toISODate()
     const hier = maintenant.minus({ days: 1 }).toISODate()
 
-    const stats: Stats = {
+    let stats: Stats = {
       jeunesPEAvecToken: 0,
       nombreJeunesTraites: 0,
       nombreNotificationsEnvoyees: 0,
@@ -53,46 +56,37 @@ export class HandleJobNotifierRendezVousPECommandHandler extends CommandHandler<
 
     try {
       let offset = 0
-      let jeunesUtilisateursPE: UtilisateurJeunePE[] = []
+      let jeunesPoleEmploi: Jeune.PoleEmploi[] = []
 
       do {
-        jeunesUtilisateursPE = await findJeunesPEAvecPushToken(
+        jeunesPoleEmploi = await this.jeunePoleEmploiRepository.findAll(
           offset,
           NOMBRE_JEUNES_EN_PARALLELE
         )
-        stats.jeunesPEAvecToken += jeunesUtilisateursPE.length
+        stats.jeunesPEAvecToken += jeunesPoleEmploi.length
         offset += NOMBRE_JEUNES_EN_PARALLELE
-
-        const idsPE = jeunesUtilisateursPE.map(jeune => jeune.idPE)
 
         try {
           const notifications =
             await this.poleEmploiClient.getNotificationsRendezVous(
-              idsPE,
+              jeunesPoleEmploi.map(jeune => jeune.idAuthentification),
               hier,
               aujourdhui
             )
 
           for (const notificationsParJeune of notifications) {
-            const jeuneANotifier = jeunesUtilisateursPE.find(
-              jeune => jeune.idPE === notificationsParJeune.idExterneDE
+            const jeuneANotifier = jeunesPoleEmploi.find(
+              jeune =>
+                jeune.idAuthentification === notificationsParJeune.idExterneDE
             )!
 
             for (const detailNotification of notificationsParJeune.notifications) {
-              if (
-                estUneNotificationDeMoinsDeDeuxHeures(
-                  detailNotification.dateCreation,
-                  maintenant
-                )
-              ) {
-                await this.notificationService.notifierUnRendezVousPoleEmploi(
-                  detailNotification.typeMouvementRDV,
-                  jeuneANotifier.pushNotificationToken,
-                  detailNotification.message,
-                  detailNotification.idMetier
-                )
-                stats.nombreNotificationsEnvoyees++
-              }
+              stats = await this.envoyerLesNotificationsDesDeuxDernieresHeures(
+                detailNotification,
+                maintenant,
+                jeuneANotifier,
+                stats
+              )
             }
             stats.nombreJeunesTraites++
           }
@@ -100,7 +94,7 @@ export class HandleJobNotifierRendezVousPECommandHandler extends CommandHandler<
           stats.erreurs++
           this.logger.error(e)
         }
-      } while (jeunesUtilisateursPE.length === NOMBRE_JEUNES_EN_PARALLELE)
+      } while (jeunesPoleEmploi.length === NOMBRE_JEUNES_EN_PARALLELE)
       stats.tempsDExecution = maintenant.diffNow().milliseconds * -1
       return success(stats)
     } catch (e) {
@@ -116,6 +110,32 @@ export class HandleJobNotifierRendezVousPECommandHandler extends CommandHandler<
 
   async monitor(): Promise<void> {
     return
+  }
+
+  private async envoyerLesNotificationsDesDeuxDernieresHeures(
+    detailNotification: Notification.PoleEmploi.Notification,
+    maintenant: DateTime,
+    jeuneANotifier: Jeune.PoleEmploi,
+    stats: Stats
+  ): Promise<Stats> {
+    if (
+      estUneNotificationDeMoinsDeDeuxHeures(
+        detailNotification.dateCreation,
+        maintenant
+      )
+    ) {
+      await this.notificationService.notifierUnRendezVousPoleEmploi(
+        detailNotification.typeMouvementRDV,
+        jeuneANotifier.pushNotificationToken,
+        detailNotification.message,
+        detailNotification.idMetier
+      )
+      return {
+        ...stats,
+        nombreNotificationsEnvoyees: stats.nombreNotificationsEnvoyees + 1
+      }
+    }
+    return { ...stats }
   }
 }
 
@@ -136,34 +156,4 @@ interface Stats {
   nombreNotificationsEnvoyees: number
   erreurs: number
   tempsDExecution?: number
-}
-
-async function findJeunesPEAvecPushToken(
-  offset: number,
-  limit: number
-): Promise<UtilisateurJeunePE[]> {
-  const jeunesSqlModel = await JeuneSqlModel.findAll({
-    where: {
-      structure: Core.Structure.POLE_EMPLOI,
-      pushNotificationToken: { [Op.ne]: null },
-      idAuthentification: { [Op.ne]: null }
-    },
-    order: [['id', 'ASC']],
-    offset,
-    limit
-  })
-
-  return jeunesSqlModel.map(jeuneSql => {
-    return {
-      id: jeuneSql.id,
-      idPE: jeuneSql.idAuthentification,
-      pushNotificationToken: jeuneSql.pushNotificationToken!
-    }
-  })
-}
-
-interface UtilisateurJeunePE {
-  id: string
-  idPE: string
-  pushNotificationToken: string
 }

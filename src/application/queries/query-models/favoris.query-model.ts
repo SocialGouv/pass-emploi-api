@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { Favori } from '../../../domain/Favori'
+import { Favori } from '../../../domain/favori'
 
 export class FavorisQueryModel {
   @ApiProperty()
