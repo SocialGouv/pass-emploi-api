@@ -93,6 +93,7 @@ import { Fichier, FichierRepositoryToken } from './domain/fichier'
 import {
   Jeune,
   JeuneConfigurationApplicationRepositoryToken,
+  JeunePoleEmploiRepositoryToken,
   JeunesRepositoryToken
 } from './domain/jeune/jeune'
 import { MiloRepositoryToken } from './domain/milo'
@@ -217,6 +218,7 @@ import { CommentaireActionSqlRepositoryDb } from './infrastructure/repositories/
 import { GetCommentairesActionQueryHandler } from './application/queries/get-commentaires-action.query.handler.db'
 import { HandleJobNotifierRendezVousPECommandHandler } from './application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
 import { GetJeuneHomeSuiviQueryHandler } from './application/queries/get-jeune-home-suivi.query.db'
+import { JeunePoleEmploiSqlRepository } from './infrastructure/repositories/jeune/jeune-pole-emploi-sql.repository.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -382,6 +384,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: CommentaireActionRepositoryToken,
       useClass: CommentaireActionSqlRepositoryDb
+    },
+    {
+      provide: JeunePoleEmploiRepositoryToken,
+      useClass: JeunePoleEmploiSqlRepository
     },
     ...databaseProviders
   ],
