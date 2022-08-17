@@ -82,7 +82,7 @@ describe('HandleJobRappelActionCommandHandler', () => {
             token: uneConfiguration().pushNotificationToken,
             notification: {
               title: 'Rappel action',
-              body: 'Une action arrive à écheance dans 3 jours'
+              body: 'Une action arrive à échéance dans 3 jours'
             },
             data: {
               type: 'DETAIL_ACTION',
