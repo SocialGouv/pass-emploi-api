@@ -5,6 +5,7 @@ import {
   IsBoolean,
   IsEnum,
   IsInt,
+  IsISO8601,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -107,4 +108,10 @@ export class GetActionsByJeuneV2QueryParams {
   @IsEnum(Action.Statut, { each: true })
   @Transform(params => transformStringToArray(params, 'statuts'))
   statuts?: Action.Statut[]
+}
+
+export class GetJeuneHomeSuiviQueryParams {
+  @ApiProperty()
+  @IsISO8601({ strict: true })
+  maintenant: string
 }

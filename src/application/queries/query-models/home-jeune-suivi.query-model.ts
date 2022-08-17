@@ -6,3 +6,8 @@ export class JeuneHomeSuiviQueryModel {
   rendezVous: RendezVousJeuneQueryModel[]
   actionsEnRetard: number
 }
+
+export class JeuneHomeEvenementsQueryModel {
+  actions: ActionQueryModel[]
+  rendezVous: RendezVousJeuneQueryModel[]
+}

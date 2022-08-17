@@ -73,6 +73,9 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { GetJeuneHomeSuiviQueryHandler } from '../../../src/application/queries/get-jeune-home-suivi.query.db'
+import { JeuneHomeSuiviQueryModel } from '../../../src/application/queries/query-models/home-jeune-suivi.query-model'
+import { uneActionQueryModelSansJeune } from '../../fixtures/query-models/action.query-model.fixtures'
 import StatutInvalide = Action.StatutInvalide
 
 describe('JeunesController', () => {
@@ -86,6 +89,7 @@ describe('JeunesController', () => {
   let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
   let getActionsPoleEmploiQueryHandler: StubbedClass<GetActionsJeunePoleEmploiQueryHandler>
   let getJeuneHomeDemarchesQueryHandler: StubbedClass<GetJeuneHomeDemarchesQueryHandler>
+  let getJeuneHomeSuiviQueryHandler: StubbedClass<GetJeuneHomeSuiviQueryHandler>
   let getJeuneHomeActionsQueryHandler: StubbedClass<GetJeuneHomeActionsQueryHandler>
   let updateStatutDemarcheCommandHandler: StubbedClass<UpdateStatutDemarcheCommandHandler>
   let createDemarcheCommandHandler: StubbedClass<CreateDemarcheCommandHandler>
@@ -121,6 +125,7 @@ describe('JeunesController', () => {
     jwtService = stubClass(JwtService)
     getRendezVousJeuneQueryHandler = stubClass(GetRendezVousJeuneQueryHandler)
     getJeuneHomeActionsQueryHandler = stubClass(GetJeuneHomeActionsQueryHandler)
+    getJeuneHomeSuiviQueryHandler = stubClass(GetJeuneHomeSuiviQueryHandler)
     getJeuneHomeDemarchesQueryHandler = stubClass(
       GetJeuneHomeDemarchesQueryHandler
     )
@@ -157,8 +162,6 @@ describe('JeunesController', () => {
       .useValue(deleteJeuneCommandHandler)
       .overrideProvider(GetConseillersJeuneQueryHandler)
       .useValue(getConseillersJeuneQueryHandler)
-      .overrideProvider(GetRendezVousJeuneQueryHandler)
-      .useValue(getRendezVousJeuneQueryHandler)
       .overrideProvider(GetRendezVousJeunePoleEmploiQueryHandler)
       .useValue(getRendezVousJeunePoleEmploiQueryHandler)
       .overrideProvider(GetActionsJeunePoleEmploiQueryHandler)
@@ -167,6 +170,8 @@ describe('JeunesController', () => {
       .useValue(getJeuneHomeActionsQueryHandler)
       .overrideProvider(GetJeuneHomeDemarchesQueryHandler)
       .useValue(getJeuneHomeDemarchesQueryHandler)
+      .overrideProvider(GetJeuneHomeSuiviQueryHandler)
+      .useValue(getJeuneHomeSuiviQueryHandler)
       .overrideProvider(UpdateStatutDemarcheCommandHandler)
       .useValue(updateStatutDemarcheCommandHandler)
       .overrideProvider(CreateDemarcheCommandHandler)
@@ -931,6 +936,77 @@ describe('JeunesController', () => {
         .expect({ actions: [] })
     })
     ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/home/actions')
+  })
+
+  describe('GET /jeunes/:idJeune/home/agenda', () => {
+    const idJeune = '1'
+    const maintenant = '2022-08-17T12:00:30+02:00'
+    const queryModel: JeuneHomeSuiviQueryModel = {
+      actions: [uneActionQueryModelSansJeune(), uneActionQueryModelSansJeune()],
+      rendezVous: [],
+      actionsEnRetard: 8
+    }
+    it('retourne la home agenda du jeune quand tout se passe bien', async () => {
+      // Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+      getJeuneHomeSuiviQueryHandler.execute
+        .withArgs(
+          {
+            idJeune,
+            maintenant
+          },
+          unUtilisateurDecode()
+        )
+        .resolves(success(queryModel))
+
+      // When
+      await request(app.getHttpServer())
+        .get(
+          `/jeunes/${idJeune}/home/agenda?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00`
+        )
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect({
+          actions: queryModel.actions,
+          rendezVous: queryModel.rendezVous
+        })
+        .expect(
+          'x-nombre-actions-en-retard',
+          queryModel.actionsEnRetard.toString()
+        )
+    })
+    it("rejette quand la date n'est pas au bon format", async () => {
+      // Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/home/agenda?maintenant=30122022`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+    it('rejette quand la query est en erreur', async () => {
+      // Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+      getJeuneHomeSuiviQueryHandler.execute.resolves(
+        failure(new NonTrouveError(''))
+      )
+
+      // When
+      await request(app.getHttpServer())
+        .get(
+          `/jeunes/${idJeune}/home/agenda?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00`
+        )
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.NOT_FOUND)
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/jeunes/1/home/agenda?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00'
+    )
   })
 
   describe('GET /jeunes/:idJeune/home/demarches', () => {
