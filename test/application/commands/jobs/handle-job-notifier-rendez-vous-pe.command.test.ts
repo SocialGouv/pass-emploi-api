@@ -1,9 +1,11 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
-import { isSuccess } from 'src/building-blocks/types/result'
 import { DatabaseForTesting } from 'test/utils/database-for-testing'
-import { HandleJobNotifierRendezVousPECommandHandler } from '../../../../src/application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
+import {
+  HandleJobNotifierRendezVousPECommandHandler,
+  Stats
+} from '../../../../src/application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
 import { Notification } from '../../../../src/domain/notification/notification'
 import { NotificationSupport } from '../../../../src/domain/notification-support'
 import { PoleEmploiClient } from '../../../../src/infrastructure/clients/pole-emploi-client'
@@ -118,14 +120,17 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
         'idMetier1'
       )
 
-      expect(result._isSuccess).to.equal(true)
-      if (isSuccess(result)) {
-        expect(result.data.jeunesPEAvecToken).to.equal(1)
-        expect(result.data.nombreJeunesTraites).to.equal(1)
-        expect(result.data.nombreNotificationsEnvoyees).to.equal(1)
-        expect(result.data.erreurs).to.equal(0)
+      const stats: Stats = {
+        jeunesPEAvecToken: 1,
+        nombreJeunesTraites: 1,
+        nombreNotificationsEnvoyees: 1,
+        erreurs: 0
       }
+      expect(result._isSuccess && result.data)
+        .excluding('tempsDExecution')
+        .to.deep.equal(stats)
     })
+
     it('traite les notifications PE à minuit', async () => {
       // Given
       const dateMinuit = DateTime.fromISO('2020-04-06T00:30:00.000Z').toUTC()
@@ -207,13 +212,16 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
         'Le rendez-vous du 06/09/2022 11:30 a été supprimé',
         undefined
       ])
-      expect(result._isSuccess).to.equal(true)
-      if (isSuccess(result)) {
-        expect(result.data.jeunesPEAvecToken).to.equal(1)
-        expect(result.data.nombreJeunesTraites).to.equal(1)
-        expect(result.data.nombreNotificationsEnvoyees).to.equal(2)
-        expect(result.data.erreurs).to.equal(0)
+
+      const stats: Stats = {
+        jeunesPEAvecToken: 1,
+        nombreJeunesTraites: 1,
+        nombreNotificationsEnvoyees: 2,
+        erreurs: 0
       }
+      expect(result._isSuccess && result.data)
+        .excluding('tempsDExecution')
+        .to.deep.equal(stats)
     })
     it("catch l'erreur d'appel api", async () => {
       // Given
@@ -235,13 +243,15 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
         notificationService.notifierUnRendezVousPoleEmploi
       ).not.to.have.been.called()
 
-      expect(result._isSuccess).to.equal(true)
-      if (isSuccess(result)) {
-        expect(result.data.jeunesPEAvecToken).to.equal(1)
-        expect(result.data.nombreJeunesTraites).to.equal(0)
-        expect(result.data.nombreNotificationsEnvoyees).to.equal(0)
-        expect(result.data.erreurs).to.equal(1)
+      const stats: Stats = {
+        jeunesPEAvecToken: 1,
+        nombreJeunesTraites: 0,
+        nombreNotificationsEnvoyees: 0,
+        erreurs: 1
       }
+      expect(result._isSuccess && result.data)
+        .excluding('tempsDExecution')
+        .to.deep.equal(stats)
     })
   })
 })

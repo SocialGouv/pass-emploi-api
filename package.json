@@ -122,6 +122,7 @@
     "@typescript-eslint/parser": "^5.31.0",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
+    "chai-exclude": "^2.1.0",
     "dirty-chai": "^2.0.1",
     "dotenv-cli": "^6.0.0",
     "dotvault": "^0.0.9",
