@@ -2,11 +2,6 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
 import { isSuccess } from 'src/building-blocks/types/result'
-import { Core } from 'src/domain/core'
-import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
-import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
-import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { DatabaseForTesting } from 'test/utils/database-for-testing'
 import { HandleJobNotifierRendezVousPECommandHandler } from '../../../../src/application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
 import { Notification } from '../../../../src/domain/notification/notification'
@@ -15,6 +10,8 @@ import { PoleEmploiClient } from '../../../../src/infrastructure/clients/pole-em
 import { DateService } from '../../../../src/utils/date-service'
 import { uneDatetime } from '../../../fixtures/date.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
+import { Jeune } from '../../../../src/domain/jeune/jeune'
+import { unJeune } from '../../../fixtures/jeune.fixture'
 
 describe('HandleJobNotifierRendezVousPECommandHandler', () => {
   let sandbox: SinonSandbox
@@ -23,33 +20,37 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
   let dateService: StubbedClass<DateService>
   let notificationService: StubbedClass<Notification.Service>
   let notificationSupportService: StubbedType<NotificationSupport.Service>
+  let jeunePoleEmploiRepository: StubbedType<Jeune.PoleEmploi.Repository>
+
   const maintenant = uneDatetime
-  const idConseiller = 'test'
-  const jeune = unJeuneDto({
-    idConseiller,
-    structure: Core.Structure.POLE_EMPLOI
-  })
+
+  const jeune: Jeune = unJeune()
+  const jeunePoleEmploi: Jeune.PoleEmploi = {
+    id: jeune.id,
+    idAuthentification: 'idAuthentification',
+    pushNotificationToken: jeune.configuration!.pushNotificationToken!
+  }
 
   beforeEach(async () => {
     DatabaseForTesting.prepare()
     sandbox = createSandbox()
     poleEmploiClient = stubClass(PoleEmploiClient)
     dateService = stubClass(DateService)
+    jeunePoleEmploiRepository = stubInterface(sandbox)
     notificationService = stubClass(Notification.Service)
     notificationSupportService = stubInterface(sandbox)
 
     dateService.now.returns(maintenant)
+    jeunePoleEmploiRepository.findAll.resolves([jeunePoleEmploi])
 
     handleJobNotifierRendezVousPECommandHandler =
       new HandleJobNotifierRendezVousPECommandHandler(
         poleEmploiClient,
         notificationService,
         dateService,
-        notificationSupportService
+        notificationSupportService,
+        jeunePoleEmploiRepository
       )
-
-    await ConseillerSqlModel.upsert(unConseillerDto({ id: idConseiller }))
-    await JeuneSqlModel.upsert(jeune)
   })
 
   afterEach(() => {
@@ -63,7 +64,7 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
       const dateAujourdhui = '2020-04-06'
       const notificationsPoleEmploi: Notification.PoleEmploi[] = [
         {
-          idExterneDE: jeune.idAuthentification,
+          idExterneDE: jeunePoleEmploi.idAuthentification,
           notifications: [
             {
               idNotification: '33e3e6b9cfdf486fbf28fda1d4d362f6',
@@ -97,7 +98,11 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
         }
       ]
       poleEmploiClient.getNotificationsRendezVous
-        .withArgs([jeune.idAuthentification], dateHier, dateAujourdhui)
+        .withArgs(
+          [jeunePoleEmploi.idAuthentification],
+          dateHier,
+          dateAujourdhui
+        )
         .resolves(notificationsPoleEmploi)
 
       // When
@@ -108,7 +113,7 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
         notificationService.notifierUnRendezVousPoleEmploi
       ).to.have.been.calledOnceWithExactly(
         Notification.Type.NEW_RENDEZVOUS,
-        jeune.pushNotificationToken,
+        jeunePoleEmploi.pushNotificationToken,
         'Prochain RDV le 14/02/2022 à 14:30. Voir mon rendez-vous.',
         'idMetier1'
       )
@@ -130,7 +135,7 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
       const dateAujourdhui = '2020-04-06'
       const notificationsPartenairesPE: Notification.PoleEmploi[] = [
         {
-          idExterneDE: jeune.idAuthentification,
+          idExterneDE: jeunePoleEmploi.idAuthentification,
           notifications: [
             {
               idNotification: '33e3e6b9cfdf486fbf28fda1d4d362f6',
@@ -172,7 +177,11 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
         }
       ]
       poleEmploiClient.getNotificationsRendezVous
-        .withArgs([jeune.idAuthentification], dateHier, dateAujourdhui)
+        .withArgs(
+          [jeunePoleEmploi.idAuthentification],
+          dateHier,
+          dateAujourdhui
+        )
         .resolves(notificationsPartenairesPE)
 
       // When
@@ -186,7 +195,7 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
         notificationService.notifierUnRendezVousPoleEmploi.getCall(0).args
       ).to.deep.equal([
         Notification.Type.NEW_RENDEZVOUS,
-        jeune.pushNotificationToken,
+        jeunePoleEmploi.pushNotificationToken,
         'Prochain RDV le 14/02/2022 à 14:30. Voir mon rendez-vous.',
         'idMetier1'
       ])
@@ -194,7 +203,7 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
         notificationService.notifierUnRendezVousPoleEmploi.getCall(1).args
       ).to.deep.equal([
         Notification.Type.DELETED_RENDEZVOUS,
-        jeune.pushNotificationToken,
+        jeunePoleEmploi.pushNotificationToken,
         'Le rendez-vous du 06/09/2022 11:30 a été supprimé',
         undefined
       ])
@@ -211,7 +220,11 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
       const dateHier = '2020-04-05'
       const dateAujourdhui = '2020-04-06'
       poleEmploiClient.getNotificationsRendezVous
-        .withArgs([jeune.idAuthentification], dateHier, dateAujourdhui)
+        .withArgs(
+          [jeunePoleEmploi.idAuthentification],
+          dateHier,
+          dateAujourdhui
+        )
         .rejects()
 
       // When
