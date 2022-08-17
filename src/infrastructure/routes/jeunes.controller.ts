@@ -75,7 +75,11 @@ import {
   ActionQueryModel,
   DemarcheQueryModel
 } from '../../application/queries/query-models/actions.query-model'
-import { isSuccess, Result } from '../../building-blocks/types/result'
+import {
+  isFailure,
+  isSuccess,
+  Result
+} from '../../building-blocks/types/result'
 import { Action } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
 import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
@@ -88,11 +92,14 @@ import {
 import {
   ArchiverJeunePayload,
   GetActionsByJeuneQueryParams,
+  GetJeuneHomeSuiviQueryParams,
   GetRendezVousJeuneQueryParams,
   PutNotificationTokenInput,
   TransfererConseillerPayload,
   UpdateJeunePreferencesPayload
 } from './validation/jeunes.inputs'
+import { JeuneHomeEvenementsQueryModel } from '../../application/queries/query-models/home-jeune-suivi.query-model'
+import { GetJeuneHomeSuiviQueryHandler } from '../../application/queries/get-jeune-home-suivi.query.db'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -105,6 +112,7 @@ export class JeunesController {
     private readonly getHomeJeuneHandler: GetHomeJeuneHandler,
     private readonly getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
     private readonly getJeuneHomeActionsQueryHandler: GetJeuneHomeActionsQueryHandler,
+    private readonly getJeuneHomeSuiviQueryHandler: GetJeuneHomeSuiviQueryHandler,
     private readonly getJeuneHomeDemarchesQueryHandler: GetJeuneHomeDemarchesQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly getRendezVousJeuneQueryHandler: GetRendezVousJeuneQueryHandler,
@@ -301,6 +309,36 @@ export class JeunesController {
       { idJeune },
       utilisateur
     )
+  }
+
+  @Get(':idJeune/home/agenda')
+  @ApiResponse({
+    type: JeuneHomeEvenementsQueryModel
+  })
+  async getHomeAgenda(
+    @Res() response: Response,
+    @Param('idJeune') idJeune: string,
+    @Query() queryParams: GetJeuneHomeSuiviQueryParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<Response<JeuneHomeEvenementsQueryModel>> {
+    const result = await this.getJeuneHomeSuiviQueryHandler.execute(
+      { idJeune, maintenant: queryParams.maintenant },
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
+
+    return response
+      .set({
+        'x-nombre-actions-en-retard': result.data.actionsEnRetard
+      })
+      .status(HttpStatus.OK)
+      .json({
+        actions: result.data.actions,
+        rendezVous: result.data.rendezVous
+      })
   }
 
   @Get(':idJeune/home/demarches')
