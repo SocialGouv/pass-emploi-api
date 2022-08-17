@@ -9,6 +9,7 @@ import { ListeTypeDemarchesDto, TypeDemarcheDto } from './dto/pole-emploi.dto'
 import { buildError } from '../../utils/logger.module'
 import { desTypeDemarchesDtosMock } from '../../fixtures/types-demarches.fixture'
 import {
+  NotificationDto,
   NotificationsPartenairesDto,
   OffreEmploiDto,
   OffresEmploiDto,
@@ -72,16 +73,9 @@ export class PoleEmploiClient {
     return response.data.listeNotificationsPartenaires.map(notificationsDto => {
       return {
         idExterneDE: notificationsDto.idExterneDE,
-        notifications: notificationsDto.notifications.map(notificationDto => {
-          return {
-            ...notificationDto,
-            dateCreation: DateTime.fromFormat(
-              notificationDto.dateCreation.replace('CEST', '+02:00'),
-              'EEE MMM d HH:mm:ss Z yyyy'
-            ),
-            typeMouvementRDV: mapTypeRDVPE[notificationDto.typeMouvementRDV]
-          }
-        })
+        notifications: notificationsDto.notifications.map(
+          this.toNotificationPoleEmploi.bind(this)
+        )
       }
     })
   }
@@ -185,6 +179,33 @@ export class PoleEmploiClient {
     )
 
     return token
+  }
+
+  private toNotificationPoleEmploi(
+    notificationDto: NotificationDto
+  ): Notification.PoleEmploi.Notification {
+    try {
+      const dateCreation = DateTime.fromFormat(
+        notificationDto.dateCreation.replace('CEST', '+02:00'),
+        'EEE MMM d HH:mm:ss Z yyyy'
+      )
+      return {
+        ...notificationDto,
+        dateCreation,
+        typeMouvementRDV: mapTypeRDVPE[notificationDto.typeMouvementRDV]
+      }
+    } catch (e) {
+      this.logger.error(
+        'Impossible de mapper la notification PE',
+        notificationDto,
+        e
+      )
+      return {
+        ...notificationDto,
+        dateCreation: this.dateService.now().minus({ day: 1 }),
+        typeMouvementRDV: mapTypeRDVPE[notificationDto.typeMouvementRDV]
+      }
+    }
   }
 }
 

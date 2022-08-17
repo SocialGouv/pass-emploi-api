@@ -3,7 +3,11 @@ import { DateTime } from 'luxon'
 
 export interface PoleEmploi {
   idExterneDE: string
-  notifications: Array<{
+  notifications: PoleEmploi.Notification[]
+}
+
+export namespace PoleEmploi {
+  export interface Notification {
     idNotification: string
     codeNotification: string
     message: string
@@ -11,5 +15,5 @@ export interface PoleEmploi {
     typeRDV: string
     dateCreation: DateTime
     idMetier?: string
-  }>
+  }
 }

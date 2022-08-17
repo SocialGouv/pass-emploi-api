@@ -31,17 +31,19 @@ export enum TypeRDVPE {
   SUPP = 'SUPP'
 }
 
+export interface NotificationDto {
+  idNotification: string
+  codeNotification: string
+  message: string
+  typeMouvementRDV: TypeRDVPE
+  typeRDV: string
+  dateCreation: string
+  idMetier?: string
+}
+
 export interface NotificationsPartenairesDto {
   listeNotificationsPartenaires: Array<{
     idExterneDE: string
-    notifications: Array<{
-      idNotification: string
-      codeNotification: string
-      message: string
-      typeMouvementRDV: TypeRDVPE
-      typeRDV: string
-      dateCreation: string
-      idMetier?: string
-    }>
+    notifications: NotificationDto[]
   }>
 }
