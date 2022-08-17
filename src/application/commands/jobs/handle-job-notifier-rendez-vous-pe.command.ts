@@ -150,7 +150,7 @@ function estUneNotificationDeMoinsDeDeuxHeures(
   )
 }
 
-interface Stats {
+export interface Stats {
   jeunesPEAvecToken: number
   nombreJeunesTraites: number
   nombreNotificationsEnvoyees: number
