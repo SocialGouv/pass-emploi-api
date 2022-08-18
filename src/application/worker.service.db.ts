@@ -87,9 +87,6 @@ export class WorkerService {
         case Planificateur.CronJob.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS:
           await this.handleJobUpdateMailingListConseillerCommandHandler.execute()
           break
-        case Planificateur.CronJob.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS:
-          await this.handleJobUpdateMailingListConseillerCommandHandler.execute()
-          break
         case Planificateur.CronJob.RECUPERER_SITUATIONS_JEUNES_MILO:
           await this.handleJobRecupererSituationsJeunesMiloCommandHandler.execute()
           break
