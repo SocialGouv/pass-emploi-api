@@ -49,6 +49,16 @@ module.exports = {
         date_creation: '2021-11-24T10:00:00.000Z',
         email: 'jeune.milo.passemploi@gmail.com',
         structure: 'MILO'
+      },
+      {
+        id: 'hermione',
+        prenom: 'Hermione',
+        nom: 'Granger',
+        id_conseiller: '41',
+        date_creation: '2021-11-24T10:00:00.000Z',
+        email: 'hermione.granger@hogwart.co.uk',
+        structure: 'PASS_EMPLOI',
+        id_authentification: 'hermione'
       }
     ])
   },

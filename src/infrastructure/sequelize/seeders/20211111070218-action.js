@@ -108,6 +108,61 @@ module.exports = {
           prenom: '',
           id: '42'
         })
+      },
+      {
+        id: '71f62564-49e4-4adf-a0d6-7afa3ffdf94d',
+        contenu: 'Suivre une formation',
+        description: 'Consulter le catalogue des formations',
+        statut: 'done',
+        date_creation: '2023-09-24Z10:00:00.000',
+        date_echeance: '2023-12-24Z10:00:00.000',
+        date_derniere_actualisation: '2023-09-25Z10:00:00.000',
+        id_jeune: 'hermione',
+        est_visible_par_conseiller: true,
+        id_createur: '41',
+        type_createur: 'conseiller',
+        createur: JSON.stringify({
+          nom: 'Doe',
+          prenom: 'John',
+          id: '41'
+        })
+      },
+      {
+        id: '393a0c1c-b344-4bde-8a5a-75d2918f9172',
+        contenu: 'Suivre une formation',
+        description: 'Consulter le catalogue des formations',
+        statut: 'not_started',
+        date_creation: '2023-09-24Z10:00:00.000',
+        date_echeance: '2023-12-24Z10:00:00.000',
+        date_derniere_actualisation: '2023-09-25Z10:00:00.000',
+        id_jeune: 'hermione',
+        est_visible_par_conseiller: true,
+        id_createur: '41',
+        type_createur: 'jeune',
+        createur: JSON.stringify({
+          nom: 'Granger',
+          prenom: 'Hermione',
+          id: 'hermione'
+        })
+      }
+      ,
+      {
+        id: 'a61ec7c5-affe-4bf4-8207-61528f7e3739',
+        contenu: 'Suivre une formation',
+        description: 'Consulter le catalogue des formations',
+        statut: 'not_started',
+        date_creation: '2021-09-24Z10:00:00.000',
+        date_echeance: '2021-12-24Z10:00:00.000',
+        date_derniere_actualisation: '2023-09-25Z10:00:00.000',
+        id_jeune: 'hermione',
+        est_visible_par_conseiller: true,
+        id_createur: '41',
+        type_createur: 'jeune',
+        createur: JSON.stringify({
+          nom: 'Granger',
+          prenom: 'Hermione',
+          id: 'hermione'
+        })
       }
     ])
   },
