@@ -1,9 +1,5 @@
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import {
-  emptySuccess,
-  failure,
-  Result
-} from '../../building-blocks/types/result'
+import { failure, Result, success } from '../../building-blocks/types/result'
 import { Command } from '../../building-blocks/types/command'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { ActionAuthorizer } from '../authorizers/authorize-action'
@@ -29,7 +25,7 @@ export interface AddCommentaireActionCommand extends Command {
 
 export class AddCommentaireActionCommandHandler extends CommandHandler<
   AddCommentaireActionCommand,
-  void
+  Action.Commentaire
 > {
   constructor(
     private actionAuthorizer: ActionAuthorizer,
@@ -53,7 +49,9 @@ export class AddCommentaireActionCommandHandler extends CommandHandler<
     return this.actionAuthorizer.authorize(command.idAction, utilisateur)
   }
 
-  async handle(command: AddCommentaireActionCommand): Promise<Result> {
+  async handle(
+    command: AddCommentaireActionCommand
+  ): Promise<Result<Action.Commentaire>> {
     const action = await this.actionRepository.get(command.idAction)
 
     if (!action) {
@@ -70,7 +68,7 @@ export class AddCommentaireActionCommandHandler extends CommandHandler<
     if (command.createur.type !== Authentification.Type.JEUNE) {
       await this.notifier(action)
     }
-    return emptySuccess()
+    return success(commentaire)
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

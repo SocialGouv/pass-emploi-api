@@ -11,7 +11,7 @@ import {
   failure,
   success
 } from '../../../src/building-blocks/types/result'
-import { uneAction } from '../../fixtures/action.fixture'
+import { unCommentaire, uneAction } from '../../fixtures/action.fixture'
 import {
   unHeaderAuthorization,
   unUtilisateurDecode
@@ -157,6 +157,7 @@ describe('ActionsController', () => {
         // Given
         const idAction = '13c11b33-751c-4e1b-a49d-1b5a473ba159'
         const commentaire = 'poi-commentaire'
+        const commentaireCree = unCommentaire()
 
         const utilisateur = unUtilisateurDecode()
         addCommentaireActionCommandHandler.execute
@@ -164,7 +165,7 @@ describe('ActionsController', () => {
             { idAction, commentaire, createur: utilisateur },
             utilisateur
           )
-          .resolves(emptySuccess())
+          .resolves(success(commentaireCree))
 
         // When
         await request(app.getHttpServer())
@@ -175,6 +176,10 @@ describe('ActionsController', () => {
           .set('authorization', unHeaderAuthorization())
           // Then
           .expect(HttpStatus.CREATED)
+          .expect({
+            ...commentaireCree,
+            date: commentaireCree.date.toISOString()
+          })
 
         expect(
           addCommentaireActionCommandHandler.execute

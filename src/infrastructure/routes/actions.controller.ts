@@ -140,7 +140,7 @@ export class ActionsController {
     @Param('idAction', new ParseUUIDPipe()) idAction: string,
     @Body() addCommentaireActionPayload: AddCommentaireActionPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<CommentaireActionQueryModel> {
     const command: AddCommentaireActionCommand = {
       idAction,
       commentaire: addCommentaireActionPayload.commentaire,
@@ -153,8 +153,10 @@ export class ActionsController {
     )
 
     if (isFailure(result)) {
-      handleFailure(result)
+      throw handleFailure(result)
     }
+
+    return result.data
   }
 
   @ApiOperation({
