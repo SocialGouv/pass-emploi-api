@@ -184,8 +184,12 @@ export class RendezVousConseillerFutursEtPassesQueryModel {
   })
   passes: RendezVousConseillerQueryModel[]
 }
-
-export type TypesRendezVousQueryModel = TypeRendezVous[]
+export class TypeRendezVousQueryModel implements TypeRendezVous {
+  @ApiProperty()
+  code: CodeTypeRendezVous
+  @ApiProperty()
+  label: string
+}
 
 function descriptionTypeRdv(): string | undefined {
   return Object.values(CodeTypeRendezVous)

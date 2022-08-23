@@ -1,33 +1,37 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { GetTypesQualificationsQueryHandler } from 'src/application/queries/get-types-qualifications.query.handler'
+import { TypeQualificationQueryModel } from 'src/application/queries/query-models/actions.query-model'
+import { Action } from 'src/domain/action/action'
 import * as request from 'supertest'
+import { GetAgencesQueryHandler } from '../../../src/application/queries/get-agences.query.handler'
 import { GetCommunesEtDepartementsQueryHandler } from '../../../src/application/queries/get-communes-et-departements.query.handler.db'
+import {
+  GetMotifsSuppressionJeuneQueryHandler,
+  MotifsSuppressionJeuneQueryModel
+} from '../../../src/application/queries/get-motifs-suppression-jeune.query.handler'
 import { CommuneOuDepartementType } from '../../../src/application/queries/query-models/communes-et-departements.query-model'
+import { TypesDemarcheQueryModel } from '../../../src/application/queries/query-models/types-demarche.query-model'
+import { RechercherTypesDemarcheQueryHandler } from '../../../src/application/queries/rechercher-types-demarche.query.handler'
+import { success } from '../../../src/building-blocks/types/result'
+import { ArchiveJeune } from '../../../src/domain/archive-jeune'
+import { Core } from '../../../src/domain/core'
+import {
+  unHeaderAuthorization,
+  unUtilisateurDecode
+} from '../../fixtures/authentification.fixture'
 import {
   buildTestingModuleForHttpTesting,
   StubbedClass,
   stubClass
 } from '../../utils'
-import { GetAgencesQueryHandler } from '../../../src/application/queries/get-agences.query.handler'
-import { Core } from '../../../src/domain/core'
-import { RechercherTypesDemarcheQueryHandler } from '../../../src/application/queries/rechercher-types-demarche.query.handler'
-import {
-  unHeaderAuthorization,
-  unUtilisateurDecode
-} from '../../fixtures/authentification.fixture'
-import { TypesDemarcheQueryModel } from '../../../src/application/queries/query-models/types-demarche.query-model'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import {
-  GetMotifsSuppressionJeuneQueryHandler,
-  MotifsSuppressionJeuneQueryModel
-} from '../../../src/application/queries/get-motifs-suppression-jeune.query.handler'
-import { success } from '../../../src/building-blocks/types/result'
 import Structure = Core.Structure
-import { ArchiveJeune } from '../../../src/domain/archive-jeune'
 
 let getCommunesEtDepartementsQueryHandler: StubbedClass<GetCommunesEtDepartementsQueryHandler>
 let getAgencesQueryHandler: StubbedClass<GetAgencesQueryHandler>
 let rechercherTypesDemarcheQueryHandler: StubbedClass<RechercherTypesDemarcheQueryHandler>
 let getMotifsSuppressionCommandHandler: StubbedClass<GetMotifsSuppressionJeuneQueryHandler>
+let getTypesQualificationsQueryHandler: StubbedClass<GetTypesQualificationsQueryHandler>
 
 describe('ReferentielsController', () => {
   getCommunesEtDepartementsQueryHandler = stubClass(
@@ -39,6 +43,9 @@ describe('ReferentielsController', () => {
   )
   getMotifsSuppressionCommandHandler = stubClass(
     GetMotifsSuppressionJeuneQueryHandler
+  )
+  getTypesQualificationsQueryHandler = stubClass(
+    GetTypesQualificationsQueryHandler
   )
   let app: INestApplication
 
@@ -52,6 +59,8 @@ describe('ReferentielsController', () => {
       .useValue(rechercherTypesDemarcheQueryHandler)
       .overrideProvider(GetMotifsSuppressionJeuneQueryHandler)
       .useValue(getMotifsSuppressionCommandHandler)
+      .overrideProvider(GetTypesQualificationsQueryHandler)
+      .useValue(getTypesQualificationsQueryHandler)
       .compile()
     app = testingModule.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
@@ -305,4 +314,28 @@ describe('ReferentielsController', () => {
         .expect(HttpStatus.OK)
     })
   })
+
+  describe('GET /qualifications-actions/types', () => {
+    it('renvoie les types de qualifications des actions', () => {
+      // Given
+      const types: TypeQualificationQueryModel[] = [
+        { code: Action.CodeQualification.SANTE, label: 'aa', heures: 0 }
+      ]
+
+      getTypesQualificationsQueryHandler.execute.resolves(types)
+
+      // When - Then
+      return request(app.getHttpServer())
+        .get('/referentiels/qualifications-actions/types')
+        .set('authorization', unHeaderAuthorization())
+        .expect([
+          { code: Action.CodeQualification.SANTE, label: 'aa', heures: 0 }
+        ])
+        .expect(HttpStatus.OK)
+    })
+  })
+  ensureUserAuthenticationFailsIfInvalid(
+    'get',
+    '/referentiels/qualifications-actions/types'
+  )
 })

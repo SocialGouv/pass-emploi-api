@@ -219,6 +219,7 @@ import { GetCommentairesActionQueryHandler } from './application/queries/get-com
 import { HandleJobNotifierRendezVousPECommandHandler } from './application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
 import { GetJeuneHomeSuiviQueryHandler } from './application/queries/get-jeune-home-suivi.query.db'
 import { JeunePoleEmploiSqlRepository } from './infrastructure/repositories/jeune/jeune-pole-emploi-sql.repository.db'
+import { GetTypesQualificationsQueryHandler } from './application/queries/get-types-qualifications.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -509,7 +510,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetCommentairesActionQueryHandler,
     GetJeuneHomeSuiviQueryHandler,
     GetRendezVousConseillerPaginesQueryHandler,
-    HandleJobNotifierRendezVousPECommandHandler
+    HandleJobNotifierRendezVousPECommandHandler,
+    GetTypesQualificationsQueryHandler
   ]
 }
 

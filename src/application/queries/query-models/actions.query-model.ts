@@ -140,3 +140,12 @@ export class DemarcheQueryModel implements Demarche {
   @ApiProperty({ isArray: true, enum: Demarche.Statut })
   statutsPossibles: Demarche.Statut[]
 }
+
+export class TypeQualificationQueryModel implements Action.TypeQualification {
+  @ApiProperty()
+  code: Action.CodeQualification
+  @ApiProperty()
+  label: string
+  @ApiProperty()
+  heures: number
+}

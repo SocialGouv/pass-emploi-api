@@ -41,6 +41,69 @@ export namespace Action {
   export type Id = Brand<string, 'IdAction'>
   export type IdCreateur = string | Jeune.Id
 
+  export enum CodeQualification {
+    SANTE = 'SANTE',
+    PROJET_PROFESSIONNEL = 'PROJET_PROFESSIONNEL',
+    LOGEMENT = 'LOGEMENT',
+    CITOYENNETE = 'CITOYENNETE',
+    EMPLOI = 'EMPLOI',
+    CULTURE_SPORT_LOISIRS = 'CULTURE_SPORT_LOISIRS',
+    FORMATION = 'FORMATION',
+    NON_QUALIFIABLE = 'NON_QUALIFIABLE'
+  }
+
+  export const mapCodeTypeQualification: Record<
+    CodeQualification,
+    TypeQualification
+  > = {
+    SANTE: {
+      code: CodeQualification.SANTE,
+      label: 'CEJ - Démarches personnelles santé',
+      heures: 2
+    },
+    PROJET_PROFESSIONNEL: {
+      code: CodeQualification.PROJET_PROFESSIONNEL,
+      label: 'CEJ - Démarches personnelles projet professionnel',
+      heures: 2
+    },
+    LOGEMENT: {
+      code: CodeQualification.LOGEMENT,
+      label: 'CEJ - Démarches personnelles logement',
+      heures: 2
+    },
+    CITOYENNETE: {
+      code: CodeQualification.CITOYENNETE,
+      label: 'CEJ - Démarches personnelles citoyenneté',
+      heures: 2
+    },
+    EMPLOI: {
+      code: CodeQualification.EMPLOI,
+      label: 'CEJ - Démarches personnelles emploi',
+      heures: 3
+    },
+    CULTURE_SPORT_LOISIRS: {
+      code: CodeQualification.CULTURE_SPORT_LOISIRS,
+      label: 'CEJ - Démarches personnelles loisir, sport, culture',
+      heures: 2
+    },
+    FORMATION: {
+      code: CodeQualification.FORMATION,
+      label: 'CEJ - Démarches personnelles formation',
+      heures: 3
+    },
+    NON_QUALIFIABLE: {
+      code: CodeQualification.NON_QUALIFIABLE,
+      label: 'Non qualifiable',
+      heures: 0
+    }
+  }
+
+  export interface TypeQualification {
+    code: CodeQualification
+    label: string
+    heures: number
+  }
+
   export interface Repository {
     save(action: Action): Promise<void>
 

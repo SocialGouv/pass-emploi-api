@@ -6,21 +6,18 @@ import {
 } from 'src/domain/rendez-vous'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { TypesRendezVousQueryModel } from './query-models/rendez-vous.query-model'
+import { TypeRendezVousQueryModel } from './query-models/rendez-vous.query-model'
 
 @Injectable()
 export class GetTypesRendezVousQueryHandler extends QueryHandler<
   Query,
-  TypesRendezVousQueryModel
+  TypeRendezVousQueryModel[]
 > {
   constructor() {
     super('GetTypesRendezvousQueryHandler')
   }
 
-  async handle(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _query: Query
-  ): Promise<TypesRendezVousQueryModel> {
+  async handle(_query: Query): Promise<TypeRendezVousQueryModel[]> {
     return Object.values(CodeTypeRendezVous).map(code => {
       return { code, label: mapCodeLabelTypeRendezVous[code] }
     })
