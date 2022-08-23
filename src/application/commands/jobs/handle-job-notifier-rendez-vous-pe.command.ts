@@ -43,7 +43,7 @@ export class HandleJobNotifierRendezVousPECommandHandler extends CommandHandler<
   }
 
   async handle(): Promise<Result<Stats>> {
-    const maintenant = this.dateService.now()
+    const maintenant = this.dateService.now().toUTC()
     const aujourdhui = maintenant.toISODate()
     const hier = maintenant.minus({ days: 1 }).toISODate()
 
