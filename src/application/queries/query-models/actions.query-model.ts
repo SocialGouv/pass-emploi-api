@@ -50,6 +50,9 @@ export class ActionQueryModel {
 
   @ApiProperty()
   dateEcheance: string
+
+  @ApiProperty({ required: false })
+  dateFinReelle?: string
 }
 
 export class CommentaireActionQueryModel {
