@@ -44,6 +44,7 @@ module.exports = {
         statut: 'done',
         date_creation: '2023-09-24Z10:00:00.000',
         date_echeance: '2023-12-24Z10:00:00.000',
+        date_fin_reelle: '2023-12-24Z10:00:00.000',
         date_derniere_actualisation: '2023-09-25Z10:00:00.000',
         id_jeune: 'bobby',
         est_visible_par_conseiller: true,
@@ -98,6 +99,7 @@ module.exports = {
         statut: 'done',
         date_creation: '2023-09-24Z10:00:00.000',
         date_echeance: '2023-12-24Z10:00:00.000',
+        date_fin_reelle: '2023-12-24Z10:00:00.000',
         date_derniere_actualisation: '2023-09-25Z10:00:00.000',
         id_jeune: '4',
         est_visible_par_conseiller: true,
@@ -116,6 +118,7 @@ module.exports = {
         statut: 'done',
         date_creation: '2023-09-24Z10:00:00.000',
         date_echeance: '2023-12-24Z10:00:00.000',
+        date_fin_reelle: '2023-12-24Z10:00:00.000',
         date_derniere_actualisation: '2023-09-25Z10:00:00.000',
         id_jeune: 'hermione',
         est_visible_par_conseiller: true,
@@ -144,8 +147,7 @@ module.exports = {
           prenom: 'Hermione',
           id: 'hermione'
         })
-      }
-      ,
+      },
       {
         id: 'a61ec7c5-affe-4bf4-8207-61528f7e3739',
         contenu: 'Suivre une formation',

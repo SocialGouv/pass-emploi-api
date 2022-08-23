@@ -84,6 +84,7 @@ export class ActionSqlRepository implements Action.Repository {
         type: sqlModel.typeCreateur
       },
       dateEcheance: sqlModel.dateEcheance,
+      dateFinReelle: sqlModel.dateFinReelle ?? undefined,
       rappel: sqlModel.rappel
     }
   }
@@ -106,6 +107,7 @@ export class ActionSqlRepository implements Action.Repository {
       typeCreateur: action.createur.type,
       estVisibleParConseiller: true,
       dateEcheance: action.dateEcheance,
+      dateFinReelle: action.dateFinReelle ?? null,
       rappel: action.rappel
     }
   }

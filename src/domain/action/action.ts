@@ -30,6 +30,7 @@ export interface Action {
   idJeune: Jeune.Id
   createur: Action.Createur
   dateEcheance: Date
+  dateFinReelle?: Date
   rappel: boolean
 }
 
@@ -208,16 +209,26 @@ export namespace Action {
         dateCreation: now,
         dateDerniereActualisation: now,
         rappel: data.rappel === undefined ? true : data.rappel,
-        dateEcheance: dateEcheanceA9Heures30
+        dateEcheance: dateEcheanceA9Heures30,
+        dateFinReelle: statut === Action.Statut.TERMINEE ? now : undefined
       }
       return success(action)
     }
 
     updateStatut(action: Action, statut: Action.Statut): Result<Action> {
       const now = this.dateService.nowJs()
+
+      let dateFinReelle = action.dateFinReelle
+      if (statut === Action.Statut.TERMINEE) {
+        dateFinReelle = now
+      } else if (action.statut === Action.Statut.TERMINEE) {
+        dateFinReelle = undefined
+      }
+
       return success({
         ...action,
         statut,
+        dateFinReelle,
         dateDerniereActualisation: now
       })
     }

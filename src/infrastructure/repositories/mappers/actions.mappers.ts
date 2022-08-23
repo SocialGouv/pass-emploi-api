@@ -29,7 +29,8 @@ export function fromSqlToActionQueryModel(
       .toUTC()
       .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
     status: actionSqlModel.statut,
-    dateEcheance: actionSqlModel.dateEcheance.toISOString()
+    dateEcheance: actionSqlModel.dateEcheance.toISOString(),
+    dateFinReelle: actionSqlModel.dateFinReelle?.toISOString()
   }
 }
 
