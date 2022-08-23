@@ -143,10 +143,9 @@ function estUneNotificationDeMoinsDeDeuxHeures(
   dateNotification: DateTime,
   maintenant: DateTime
 ): boolean {
-  const deuxHeuresPlusTot = maintenant.minus({ hour: 2 })
   return (
-    dateNotification.startOf('hour') <= maintenant.startOf('hour') &&
-    dateNotification.startOf('hour') >= deuxHeuresPlusTot.startOf('hour')
+    maintenant.diff(dateNotification).as('minute') <= 120 &&
+    dateNotification < maintenant
   )
 }
 
