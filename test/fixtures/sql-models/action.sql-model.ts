@@ -24,7 +24,9 @@ export function uneActionDto(
     statut: Action.Statut.PAS_COMMENCEE,
     dateEcheance: new Date('2021-11-11T08:03:30.000Z'),
     dateFinReelle: null,
-    rappel: true
+    rappel: true,
+    heuresQualifiees: null,
+    codeQualification: null
   }
 
   return { ...defaults, ...args }

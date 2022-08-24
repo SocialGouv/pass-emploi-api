@@ -15,8 +15,8 @@ export class GetTypesQualificationsQueryHandler extends QueryHandler<
   }
 
   async handle(_query: Query): Promise<TypeQualificationQueryModel[]> {
-    return Object.values(Action.CodeQualification).map(code => {
-      return Action.mapCodeTypeQualification[code]
+    return Object.values(Action.Qualification.Code).map(code => {
+      return Action.Qualification.mapCodeTypeQualification[code]
     })
   }
 

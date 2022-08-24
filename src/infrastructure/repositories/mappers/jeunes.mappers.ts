@@ -10,6 +10,7 @@ import {
 } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../sequelize/types'
+import { buildEtat } from './actions.mappers'
 
 export function fromSqlToJeune(
   jeuneSqlModel: JeuneSqlModel,
@@ -102,7 +103,8 @@ export function fromSqlToJeuneHomeQueryModel(
       creatorType: actionSql.typeCreateur,
       creator: toCreator(actionSql, jeuneSqlModel),
       dateEcheance: actionSql.dateEcheance.toISOString(),
-      dateFinReelle: actionSql.dateFinReelle?.toISOString()
+      dateFinReelle: actionSql.dateFinReelle?.toISOString(),
+      etat: buildEtat(actionSql)
     })),
     rendezvous:
       rdvJeuneSqlModel?.map(rendezVousSql => ({

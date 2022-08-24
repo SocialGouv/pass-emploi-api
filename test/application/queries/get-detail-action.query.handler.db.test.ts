@@ -1,12 +1,15 @@
 import { SinonSandbox } from 'sinon'
-import { uneAction } from 'test/fixtures/action.fixture'
+import { uneAction, uneActionQualifiee } from 'test/fixtures/action.fixture'
 import { ActionAuthorizer } from '../../../src/application/authorizers/authorize-action'
 import {
   GetDetailActionQuery,
   GetDetailActionQueryHandler
 } from '../../../src/application/queries/get-detail-action.query.handler.db'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { uneActionQueryModelWithJeuneFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
+import {
+  uneActionQueryModelFromDomain,
+  uneActionQueryModelTermineeAvecQualification
+} from '../../fixtures/query-models/action.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { Action } from '../../../src/domain/action/action'
 import { unJeune } from '../../fixtures/jeune.fixture'
@@ -55,22 +58,99 @@ describe('GetDetailActionQueryHandler', () => {
         new DateService()
       )
       await jeuneRepository.save(jeune)
-
-      action = uneAction({ idJeune: jeune.id })
-      await actionSqlRepository.save(action)
     })
 
     describe("quand l'action existe", () => {
-      it('retourne le query model', async () => {
-        // When
-        const actionQueryModel = await getDetailActionQueryHandler.handle({
-          idAction: action.id
-        })
+      describe("quand l'action est qualifiée", () => {
+        it('retourne le query model avec le bon état', async () => {
+          // Given
+          action = uneActionQualifiee({
+            idJeune: jeune.id,
+            statut: Action.Statut.TERMINEE
+          })
+          await actionSqlRepository.save(action)
 
-        // Then
-        expect(actionQueryModel).to.deep.equal(
-          uneActionQueryModelWithJeuneFromDomain(action, jeune)
-        )
+          // When
+          const actionQueryModel = await getDetailActionQueryHandler.handle({
+            idAction: action.id
+          })
+
+          // Then
+          expect(actionQueryModel).to.deep.equal(
+            uneActionQueryModelTermineeAvecQualification(action)
+          )
+        })
+      })
+      describe("quand l'action est non terminée", () => {
+        it('retourne le query model avec le bon état', async () => {
+          // Given
+          action = uneAction({
+            idJeune: jeune.id,
+            statut: Action.Statut.EN_COURS
+          })
+          await actionSqlRepository.save(action)
+
+          // When
+          const actionQueryModel = await getDetailActionQueryHandler.handle({
+            idAction: action.id
+          })
+
+          // Then
+          expect(actionQueryModel).to.deep.equal({
+            ...uneActionQueryModelFromDomain(action),
+            jeune: {
+              id: action.idJeune,
+              firstName: jeune.firstName,
+              lastName: jeune.lastName
+            },
+            qualification: undefined
+          })
+        })
+      })
+      describe("quand l'action est terminée et non qualifiable", () => {
+        it('retourne le query model avec le bon état', async () => {
+          // Given
+          action = uneAction({
+            idJeune: jeune.id,
+            statut: Action.Statut.TERMINEE,
+            qualification: {
+              code: Action.Qualification.Code.NON_QUALIFIABLE,
+              heures: 0
+            }
+          })
+          await actionSqlRepository.save(action)
+
+          // When
+          const actionQueryModel = await getDetailActionQueryHandler.handle({
+            idAction: action.id
+          })
+
+          // Then
+          expect(actionQueryModel?.etat).to.deep.equal(
+            Action.Qualification.Etat.NON_QUALIFIABLE
+          )
+        })
+      })
+      describe("quand l'action est à qualifier", () => {
+        it('retourne le query model avec le bon état', async () => {
+          // Given
+          action = uneAction({
+            idJeune: jeune.id,
+            statut: Action.Statut.TERMINEE,
+            qualification: undefined
+          })
+          await actionSqlRepository.save(action)
+
+          // When
+          const actionQueryModel = await getDetailActionQueryHandler.handle({
+            idAction: action.id
+          })
+
+          // Then
+          expect(actionQueryModel?.etat).to.deep.equal(
+            Action.Qualification.Etat.A_QUALIFIER
+          )
+        })
       })
     })
 

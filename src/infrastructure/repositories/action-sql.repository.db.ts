@@ -5,6 +5,7 @@ import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { AsSql } from '../sequelize/types'
 import { Op } from 'sequelize'
 import { DateService } from '../../utils/date-service'
+import { buildQualification } from './mappers/actions.mappers'
 
 @Injectable()
 export class ActionSqlRepository implements Action.Repository {
@@ -68,7 +69,7 @@ export class ActionSqlRepository implements Action.Repository {
     })
   }
 
-  static actionFromSqlModel(sqlModel: AsSql<ActionSqlModel>): Action {
+  static actionFromSqlModel(sqlModel: ActionSqlModel): Action {
     return {
       id: sqlModel.id,
       statut: sqlModel.statut,
@@ -85,7 +86,8 @@ export class ActionSqlRepository implements Action.Repository {
       },
       dateEcheance: sqlModel.dateEcheance,
       dateFinReelle: sqlModel.dateFinReelle ?? undefined,
-      rappel: sqlModel.rappel
+      rappel: sqlModel.rappel,
+      qualification: buildQualification(sqlModel)
     }
   }
 
@@ -108,7 +110,9 @@ export class ActionSqlRepository implements Action.Repository {
       estVisibleParConseiller: true,
       dateEcheance: action.dateEcheance,
       dateFinReelle: action.dateFinReelle ?? null,
-      rappel: action.rappel
+      rappel: action.rappel,
+      codeQualification: action.qualification?.code ?? null,
+      heuresQualifiees: action.qualification?.heures ?? null
     }
   }
 }

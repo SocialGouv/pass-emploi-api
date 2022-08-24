@@ -19,7 +19,20 @@ export const uneAction = (args: Partial<Action> = {}): Action => {
     },
     dateEcheance: new Date('2020-02-02'),
     dateFinReelle: undefined,
-    rappel: true
+    rappel: true,
+    qualification: undefined
+  }
+
+  return { ...defaults, ...args }
+}
+
+export const uneActionQualifiee = (args: Partial<Action> = {}): Action => {
+  const defaults: Action = {
+    ...uneAction(),
+    qualification: {
+      code: Action.Qualification.Code.SANTE,
+      heures: 3
+    }
   }
 
   return { ...defaults, ...args }

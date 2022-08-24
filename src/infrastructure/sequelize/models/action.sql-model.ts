@@ -61,6 +61,12 @@ export class ActionDto extends Model {
 
   @Column({ field: 'date_fin_reelle', type: DataType.DATE })
   dateFinReelle: Date | null
+
+  @Column({ field: 'qualification_code', type: DataType.STRING })
+  codeQualification?: Action.Qualification.Code | null
+
+  @Column({ field: 'qualification_heures', type: DataType.INTEGER })
+  heuresQualifiees?: number | null
 }
 
 @Table({ timestamps: false, tableName: 'action' })

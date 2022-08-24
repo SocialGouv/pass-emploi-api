@@ -1,8 +1,12 @@
 import { DateTime } from 'luxon'
-import { ActionQueryModel } from 'src/application/queries/query-models/actions.query-model'
+import {
+  ActionQueryModel,
+  QualificationActionQueryModel
+} from 'src/application/queries/query-models/actions.query-model'
 import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 import { JeuneQueryModel } from '../../../application/queries/query-models/jeunes.query-model'
+import { Action } from '../../../domain/action/action'
 
 export function fromSqlToActionQueryModelWithJeune(
   actionSqlModel: ActionSqlModel
@@ -30,7 +34,9 @@ export function fromSqlToActionQueryModel(
       .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
     status: actionSqlModel.statut,
     dateEcheance: actionSqlModel.dateEcheance.toISOString(),
-    dateFinReelle: actionSqlModel.dateFinReelle?.toISOString()
+    dateFinReelle: actionSqlModel.dateFinReelle?.toISOString(),
+    etat: buildEtat(actionSqlModel),
+    qualification: buildQualificationQueryModel(actionSqlModel)
   }
 }
 
@@ -41,5 +47,54 @@ function fromSqlToJeuneQueryModel(
     id: jeuneSqlModel.id,
     firstName: jeuneSqlModel.prenom,
     lastName: jeuneSqlModel.nom
+  }
+}
+
+export function buildEtat(
+  actionSqlModel: ActionSqlModel
+): Action.Qualification.Etat {
+  if (actionSqlModel.statut === Action.Statut.TERMINEE) {
+    if (actionSqlModel.codeQualification) {
+      if (
+        actionSqlModel.codeQualification !==
+        Action.Qualification.Code.NON_QUALIFIABLE
+      ) {
+        return Action.Qualification.Etat.QUALIFEE
+      }
+    } else {
+      return Action.Qualification.Etat.A_QUALIFIER
+    }
+  }
+  return Action.Qualification.Etat.NON_QUALIFIABLE
+}
+
+export function buildQualification(
+  actionSqlModel: ActionSqlModel
+): Action.Qualification | undefined {
+  if (actionSqlModel.codeQualification) {
+    return {
+      heures: actionSqlModel.heuresQualifiees!,
+      code: actionSqlModel.codeQualification
+    }
+  } else {
+    return undefined
+  }
+}
+
+export function buildQualificationQueryModel(
+  actionSqlModel: ActionSqlModel
+): QualificationActionQueryModel | undefined {
+  if (actionSqlModel.codeQualification) {
+    const type =
+      Action.Qualification.mapCodeTypeQualification[
+        actionSqlModel.codeQualification
+      ]
+    return {
+      heures: type.heures,
+      code: actionSqlModel.codeQualification,
+      libelle: type.label
+    }
+  } else {
+    return undefined
   }
 }

@@ -91,7 +91,8 @@ describe('ActionsController', () => {
           },
           creatorType: 'conseiller',
           creator: 'Nils Tavernier',
-          dateEcheance: '2021-11-11T10:03:30.000Z'
+          dateEcheance: '2021-11-11T10:03:30.000Z',
+          etat: 'NON_QUALIFIABLE'
         }
         await request(app.getHttpServer())
           .get(`/actions/${idAction}`)

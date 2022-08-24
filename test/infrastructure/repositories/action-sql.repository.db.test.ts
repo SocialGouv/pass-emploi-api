@@ -101,7 +101,9 @@ describe('ActionSqlRepository', () => {
         id: idAction,
         statut: Action.Statut.EN_COURS,
         idJeune: jeune.id,
-        dateFinReelle: new Date('2021-11-10T08:03:30.000Z')
+        dateFinReelle: new Date('2021-11-10T08:03:30.000Z'),
+        codeQualification: Action.Qualification.Code.SANTE,
+        heuresQualifiees: 2
       })
       await ActionSqlModel.creer(actionDto)
 
@@ -125,7 +127,11 @@ describe('ActionSqlRepository', () => {
         },
         dateEcheance: new Date('2021-11-11T08:03:30.000Z'),
         dateFinReelle: new Date('2021-11-10T08:03:30.000Z'),
-        rappel: true
+        rappel: true,
+        qualification: {
+          code: Action.Qualification.Code.SANTE,
+          heures: 2
+        }
       }
       expect(actual).to.deep.equal(attendu)
     })
