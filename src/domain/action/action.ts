@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { Brand } from '../../building-blocks/types/brand'
 import {
   DomainError,
+  MauvaiseCommandeError,
   PasDeRappelError
 } from '../../building-blocks/types/domain-error'
 import {
@@ -97,6 +98,10 @@ export namespace Action {
     }
   }
 
+  export function estQualifiee(action: Action): boolean {
+    return Boolean(action.qualification?.code)
+  }
+
   @Injectable()
   export class Factory {
     constructor(
@@ -161,8 +166,15 @@ export namespace Action {
     }
 
     updateStatut(action: Action, statut: Action.Statut): Result<Action> {
-      const maintenant = this.dateService.nowJs()
+      if (Action.estQualifiee(action)) {
+        return failure(
+          new MauvaiseCommandeError(
+            "Vous ne pouvez pas changer le statut d'une action qualifée"
+          )
+        )
+      }
 
+      const maintenant = this.dateService.nowJs()
       return success({
         ...action,
         statut,
