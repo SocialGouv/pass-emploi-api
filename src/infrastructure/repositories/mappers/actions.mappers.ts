@@ -53,17 +53,11 @@ function fromSqlToJeuneQueryModel(
 export function buildEtat(
   actionSqlModel: ActionSqlModel
 ): Action.Qualification.Etat {
+  if (actionSqlModel.codeQualification) {
+    return Action.Qualification.Etat.QUALIFEE
+  }
   if (actionSqlModel.statut === Action.Statut.TERMINEE) {
-    if (actionSqlModel.codeQualification) {
-      if (
-        actionSqlModel.codeQualification !==
-        Action.Qualification.Code.NON_QUALIFIABLE
-      ) {
-        return Action.Qualification.Etat.QUALIFEE
-      }
-    } else {
-      return Action.Qualification.Etat.A_QUALIFIER
-    }
+    return Action.Qualification.Etat.A_QUALIFIER
   }
   return Action.Qualification.Etat.NON_QUALIFIABLE
 }

@@ -40,7 +40,8 @@ export class JeunesControllerV2 {
       idJeune,
       page: getActionsByJeuneQueryParams.page,
       tri: getActionsByJeuneQueryParams.tri,
-      statuts: getActionsByJeuneQueryParams.statuts
+      statuts: getActionsByJeuneQueryParams.statuts,
+      etats: getActionsByJeuneQueryParams.etats
     }
 
     const result = await this.getActionsByJeuneQueryHandler.execute(

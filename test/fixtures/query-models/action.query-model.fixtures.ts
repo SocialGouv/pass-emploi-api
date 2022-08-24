@@ -1,5 +1,8 @@
 import { DateTime } from 'luxon'
-import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
+import {
+  ActionQueryModel,
+  QualificationActionQueryModel
+} from '../../../src/application/queries/query-models/actions.query-model'
 import { Action } from '../../../src/domain/action/action'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { uneAction } from '../action.fixture'
@@ -7,7 +10,8 @@ import { unJeune } from '../jeune.fixture'
 
 export const uneActionQueryModelFromDomain = (
   action: Action = uneAction(),
-  etat: Action.Qualification.Etat = Action.Qualification.Etat.NON_QUALIFIABLE
+  etat: Action.Qualification.Etat = Action.Qualification.Etat.NON_QUALIFIABLE,
+  qualification: QualificationActionQueryModel | undefined = undefined
 ): ActionQueryModel => ({
   id: action.id,
   content: action.contenu,
@@ -24,7 +28,7 @@ export const uneActionQueryModelFromDomain = (
   dateEcheance: action.dateEcheance.toISOString(),
   dateFinReelle: undefined,
   etat,
-  qualification: undefined
+  qualification
 })
 
 export const uneActionQueryModelTermineeAvecQualification = (
