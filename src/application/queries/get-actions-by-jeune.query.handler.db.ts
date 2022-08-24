@@ -22,6 +22,7 @@ export interface GetActionsByJeuneQuery extends Query {
   page?: number
   tri?: Action.Tri
   statuts?: Action.Statut[]
+  etats?: Action.Qualification.Etat[]
 }
 
 export interface ActionsByJeuneOutput {
@@ -107,7 +108,9 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
 
     return success({
       ...result,
-      actions: actionsSqlModel.map(fromSqlToActionQueryModel)
+      actions: actionsSqlModel
+        .map(fromSqlToActionQueryModel)
+        .filter(action => filtrerParEtat(query, action))
     })
   }
 
@@ -194,13 +197,24 @@ function laPageExiste(nombreTotalActions: number, page?: number): boolean {
 }
 
 function generateWhere(query: GetActionsByJeuneQuery): WhereOptions {
-  const filtres: { idJeune: string; statut?: Action.Statut[] } = {
+  const filtres: {
+    idJeune: string
+    statut?: Action.Statut[]
+    etats?: Action.Qualification.Etat[]
+  } = {
     idJeune: query.idJeune
   }
   if (query.statuts) {
     filtres.statut = query.statuts
   }
   return filtres
+}
+
+function filtrerParEtat(
+  query: GetActionsByJeuneQuery,
+  actionQueryModel: ActionQueryModel
+): boolean {
+  return !query.etats?.length || query.etats.includes(actionQueryModel.etat)
 }
 
 interface RawCount {

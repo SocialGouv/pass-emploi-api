@@ -25,6 +25,8 @@ import { uneActionQueryModelFromDomain } from '../../fixtures/query-models/actio
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
+import { before } from 'mocha'
+import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
 
 describe('GetActionsByJeuneQueryHandler', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -470,69 +472,201 @@ describe('GetActionsByJeuneQueryHandler', () => {
     })
 
     describe('quand on filtre', () => {
-      it("applique les filtres de statut d'action et donne le nombre total de résultats", async () => {
-        // Given
-        const actionPasCommencee = uneAction({
-          id: '02b3710e-7779-11ec-90d6-0242ac120001',
-          idJeune: jeune.id,
-          statut: Action.Statut.PAS_COMMENCEE,
-          dateDerniereActualisation: DateTime.fromISO(
-            '2020-04-05T12:00:00.000Z'
-          )
-            .toUTC()
-            .toJSDate()
-        })
-        const actionEnCours = uneAction({
-          id: '02b3710e-7779-11ec-90d6-0242ac120002',
-          idJeune: jeune.id,
-          statut: Action.Statut.EN_COURS,
-          dateDerniereActualisation: DateTime.fromISO(
-            '2020-04-06T12:00:00.000Z'
-          )
-            .toUTC()
-            .toJSDate()
-        })
-        const actionCanceled = uneAction({
-          id: '02b3710e-7779-11ec-90d6-0242ac120003',
-          idJeune: jeune.id,
-          statut: Action.Statut.ANNULEE,
-          dateDerniereActualisation: DateTime.fromISO(
-            '2020-04-07T12:00:00.000Z'
-          )
-            .toUTC()
-            .toJSDate()
-        })
-        const actionTerminee = uneAction({
-          id: '02b3710e-7779-11ec-90d6-0242ac120004',
-          idJeune: jeune.id,
-          statut: Action.Statut.TERMINEE,
-          dateDerniereActualisation: DateTime.fromISO(
-            '2020-04-08T12:00:00.000Z'
-          )
-            .toUTC()
-            .toJSDate()
-        })
-        await actionSqlRepository.save(actionPasCommencee)
-        await actionSqlRepository.save(actionEnCours)
-        await actionSqlRepository.save(actionCanceled)
-        await actionSqlRepository.save(actionTerminee)
+      describe('statut', () => {
+        it("applique les filtres de statut d'action et donne le nombre total de résultats", async () => {
+          // Given
+          const actionPasCommencee = uneAction({
+            id: '02b3710e-7779-11ec-90d6-0242ac120001',
+            idJeune: jeune.id,
+            statut: Action.Statut.PAS_COMMENCEE,
+            dateDerniereActualisation: DateTime.fromISO(
+              '2020-04-05T12:00:00.000Z'
+            )
+              .toUTC()
+              .toJSDate()
+          })
+          const actionEnCours = uneAction({
+            id: '02b3710e-7779-11ec-90d6-0242ac120002',
+            idJeune: jeune.id,
+            statut: Action.Statut.EN_COURS,
+            dateDerniereActualisation: DateTime.fromISO(
+              '2020-04-06T12:00:00.000Z'
+            )
+              .toUTC()
+              .toJSDate()
+          })
+          const actionCanceled = uneAction({
+            id: '02b3710e-7779-11ec-90d6-0242ac120003',
+            idJeune: jeune.id,
+            statut: Action.Statut.ANNULEE,
+            dateDerniereActualisation: DateTime.fromISO(
+              '2020-04-07T12:00:00.000Z'
+            )
+              .toUTC()
+              .toJSDate()
+          })
+          const actionTerminee = uneAction({
+            id: '02b3710e-7779-11ec-90d6-0242ac120004',
+            idJeune: jeune.id,
+            statut: Action.Statut.TERMINEE,
+            dateDerniereActualisation: DateTime.fromISO(
+              '2020-04-08T12:00:00.000Z'
+            )
+              .toUTC()
+              .toJSDate()
+          })
+          await actionSqlRepository.save(actionPasCommencee)
+          await actionSqlRepository.save(actionEnCours)
+          await actionSqlRepository.save(actionCanceled)
+          await actionSqlRepository.save(actionTerminee)
 
-        // When
-        const result = await getActionsByJeuneQueryHandler.handle({
-          idJeune: jeune.id,
-          page: 1,
-          statuts: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]
-        })
+          // When
+          const result = await getActionsByJeuneQueryHandler.handle({
+            idJeune: jeune.id,
+            page: 1,
+            statuts: [Action.Statut.EN_COURS, Action.Statut.PAS_COMMENCEE]
+          })
 
-        // Then
-        expect(isSuccess(result)).to.be.true()
-        if (isSuccess(result)) {
-          expect(result.data.actions).to.be.deep.equal([
-            uneActionQueryModelFromDomain(actionEnCours),
-            uneActionQueryModelFromDomain(actionPasCommencee)
+          // Then
+          expect(isSuccess(result)).to.be.true()
+          if (isSuccess(result)) {
+            expect(result.data.actions).to.be.deep.equal([
+              uneActionQueryModelFromDomain(actionEnCours),
+              uneActionQueryModelFromDomain(actionPasCommencee)
+            ])
+            expect(result.data.metadonnees.nombreTotal).to.equal(4)
+          }
+        })
+      })
+      describe('etat', () => {
+        let actionNonQualifiable: Action
+        let actionAQualifier: Action
+        let actionQualifiee: Action
+
+        let actionQMNonQualifiable: ActionQueryModel
+        let actionQMAQualifier: ActionQueryModel
+        let actionQMQualifiee: ActionQueryModel
+
+        beforeEach(async () => {
+          // Given
+          actionNonQualifiable = uneAction({
+            id: '02b3710e-7779-11ec-90d6-0242ac120001',
+            idJeune: jeune.id,
+            statut: Action.Statut.PAS_COMMENCEE,
+            dateDerniereActualisation: DateTime.fromISO(
+              '2020-04-05T12:00:00.000Z'
+            )
+              .toUTC()
+              .toJSDate()
+          })
+          actionAQualifier = uneAction({
+            id: '02b3710e-7779-11ec-90d6-0242ac120002',
+            idJeune: jeune.id,
+            statut: Action.Statut.TERMINEE,
+            qualification: undefined,
+            dateDerniereActualisation: DateTime.fromISO(
+              '2020-04-06T12:00:00.000Z'
+            )
+              .toUTC()
+              .toJSDate()
+          })
+          actionQualifiee = uneAction({
+            id: '02b3710e-7779-11ec-90d6-0242ac120003',
+            idJeune: jeune.id,
+            statut: Action.Statut.TERMINEE,
+            qualification: {
+              code: Action.Qualification.Code.SANTE,
+              heures: 2
+            },
+            dateDerniereActualisation: DateTime.fromISO(
+              '2020-04-07T12:00:00.000Z'
+            )
+              .toUTC()
+              .toJSDate()
+          })
+
+          actionQMNonQualifiable = uneActionQueryModelFromDomain(
+            actionNonQualifiable,
+            Action.Qualification.Etat.NON_QUALIFIABLE
+          )
+          actionQMQualifiee = uneActionQueryModelFromDomain(
+            actionQualifiee,
+            Action.Qualification.Etat.QUALIFEE,
+            {
+              code: Action.Qualification.Code.SANTE,
+              heures: 2,
+              libelle: 'Santé'
+            }
+          )
+          actionQMAQualifier = uneActionQueryModelFromDomain(
+            actionAQualifier,
+            Action.Qualification.Etat.A_QUALIFIER
+          )
+
+          await actionSqlRepository.save(actionNonQualifiable)
+          await actionSqlRepository.save(actionAQualifier)
+          await actionSqlRepository.save(actionQualifiee)
+        })
+        it('filtre les non qualifiables', async () => {
+          // When
+          const result = await getActionsByJeuneQueryHandler.handle({
+            idJeune: jeune.id,
+            page: 1,
+            etats: [Action.Qualification.Etat.NON_QUALIFIABLE]
+          })
+
+          // Then
+          expect(isSuccess(result) && result.data.actions).to.deep.equal([
+            actionQMNonQualifiable
           ])
-          expect(result.data.metadonnees.nombreTotal).to.equal(4)
-        }
+        })
+        it('filtre les qualifiées', async () => {
+          // When
+          const result = await getActionsByJeuneQueryHandler.handle({
+            idJeune: jeune.id,
+            page: 1,
+            etats: [Action.Qualification.Etat.QUALIFEE]
+          })
+
+          // Then
+          expect(isSuccess(result) && result.data.actions).to.deep.equal([
+            actionQMQualifiee
+          ])
+        })
+        it('filtre les à qualifier', async () => {
+          // When
+          const result = await getActionsByJeuneQueryHandler.handle({
+            idJeune: jeune.id,
+            page: 1,
+            etats: [Action.Qualification.Etat.A_QUALIFIER]
+          })
+
+          // Then
+          expect(isSuccess(result) && result.data.actions).to.deep.equal([
+            actionQMAQualifier
+          ])
+        })
+        it('filtre tout', async () => {
+          // When
+          const result = await getActionsByJeuneQueryHandler.handle({
+            idJeune: jeune.id,
+            page: 1,
+            etats: [
+              Action.Qualification.Etat.A_QUALIFIER,
+              Action.Qualification.Etat.QUALIFEE,
+              Action.Qualification.Etat.NON_QUALIFIABLE
+            ]
+          })
+
+          // Then
+          expect(
+            isSuccess(result) && result.data.actions
+          ).to.deep.include.members([
+            actionQMNonQualifiable,
+            actionQMQualifiee,
+            actionQMAQualifier
+          ])
+        })
       })
     })
 

@@ -107,30 +107,6 @@ describe('GetDetailActionQueryHandler', () => {
           })
         })
       })
-      describe("quand l'action est terminée et non qualifiable", () => {
-        it('retourne le query model avec le bon état', async () => {
-          // Given
-          action = uneAction({
-            idJeune: jeune.id,
-            statut: Action.Statut.TERMINEE,
-            qualification: {
-              code: Action.Qualification.Code.NON_QUALIFIABLE,
-              heures: 0
-            }
-          })
-          await actionSqlRepository.save(action)
-
-          // When
-          const actionQueryModel = await getDetailActionQueryHandler.handle({
-            idAction: action.id
-          })
-
-          // Then
-          expect(actionQueryModel?.etat).to.deep.equal(
-            Action.Qualification.Etat.NON_QUALIFIABLE
-          )
-        })
-      })
       describe("quand l'action est à qualifier", () => {
         it('retourne le query model avec le bon état', async () => {
           // Given
