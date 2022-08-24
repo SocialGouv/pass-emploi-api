@@ -26,42 +26,42 @@ describe('GetTypesQualificationsQueryHandler', () => {
       // Then
       expect(result).to.deep.equal([
         {
-          code: Action.CodeQualification.SANTE,
+          code: Action.Qualification.Code.SANTE,
           label: 'Santé',
           heures: 2
         },
         {
-          code: Action.CodeQualification.PROJET_PROFESSIONNEL,
+          code: Action.Qualification.Code.PROJET_PROFESSIONNEL,
           label: 'Projet Professionnel',
           heures: 2
         },
         {
-          code: Action.CodeQualification.LOGEMENT,
+          code: Action.Qualification.Code.LOGEMENT,
           label: 'Logement',
           heures: 2
         },
         {
-          code: Action.CodeQualification.CITOYENNETE,
+          code: Action.Qualification.Code.CITOYENNETE,
           label: 'Citoyenneté',
           heures: 2
         },
         {
-          code: Action.CodeQualification.EMPLOI,
+          code: Action.Qualification.Code.EMPLOI,
           label: 'Emploi',
           heures: 3
         },
         {
-          code: Action.CodeQualification.CULTURE_SPORT_LOISIRS,
+          code: Action.Qualification.Code.CULTURE_SPORT_LOISIRS,
           label: 'Loisir, sport, culture',
           heures: 2
         },
         {
-          code: Action.CodeQualification.FORMATION,
+          code: Action.Qualification.Code.FORMATION,
           label: 'Formation',
           heures: 3
         },
         {
-          code: Action.CodeQualification.NON_QUALIFIABLE,
+          code: Action.Qualification.Code.NON_QUALIFIABLE,
           label: 'Non qualifiable en Situation Non Professionnelle',
           heures: 0
         }

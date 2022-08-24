@@ -15,6 +15,7 @@ import { IdService } from '../../utils/id-service'
 import { Jeune } from '../jeune/jeune'
 import { DateTime } from 'luxon'
 import * as _Commentaire from './commentaire'
+import * as _Qualification from './qualification'
 
 export const ActionsRepositoryToken = 'ActionsRepositoryToken'
 export const CommentaireActionRepositoryToken =
@@ -32,78 +33,18 @@ export interface Action {
   dateEcheance: Date
   dateFinReelle?: Date
   rappel: boolean
+  qualification?: Action.Qualification
 }
 
 export namespace Action {
   // FIXME: le linter ne comprend pas cette technique 🤷‍️
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import Commentaire = _Commentaire.Commentaire
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  export import Qualification = _Qualification.Qualification
 
   export type Id = Brand<string, 'IdAction'>
   export type IdCreateur = string | Jeune.Id
-
-  export enum CodeQualification {
-    SANTE = 'SANTE',
-    PROJET_PROFESSIONNEL = 'PROJET_PROFESSIONNEL',
-    LOGEMENT = 'LOGEMENT',
-    CITOYENNETE = 'CITOYENNETE',
-    EMPLOI = 'EMPLOI',
-    CULTURE_SPORT_LOISIRS = 'CULTURE_SPORT_LOISIRS',
-    FORMATION = 'FORMATION',
-    NON_QUALIFIABLE = 'NON_QUALIFIABLE'
-  }
-
-  export const mapCodeTypeQualification: Record<
-    CodeQualification,
-    TypeQualification
-  > = {
-    SANTE: {
-      code: CodeQualification.SANTE,
-      label: 'Santé',
-      heures: 2
-    },
-    PROJET_PROFESSIONNEL: {
-      code: CodeQualification.PROJET_PROFESSIONNEL,
-      label: 'Projet Professionnel',
-      heures: 2
-    },
-    LOGEMENT: {
-      code: CodeQualification.LOGEMENT,
-      label: 'Logement',
-      heures: 2
-    },
-    CITOYENNETE: {
-      code: CodeQualification.CITOYENNETE,
-      label: 'Citoyenneté',
-      heures: 2
-    },
-    EMPLOI: {
-      code: CodeQualification.EMPLOI,
-      label: 'Emploi',
-      heures: 3
-    },
-    CULTURE_SPORT_LOISIRS: {
-      code: CodeQualification.CULTURE_SPORT_LOISIRS,
-      label: 'Loisir, sport, culture',
-      heures: 2
-    },
-    FORMATION: {
-      code: CodeQualification.FORMATION,
-      label: 'Formation',
-      heures: 3
-    },
-    NON_QUALIFIABLE: {
-      code: CodeQualification.NON_QUALIFIABLE,
-      label: 'Non qualifiable en Situation Non Professionnelle',
-      heures: 0
-    }
-  }
-
-  export interface TypeQualification {
-    code: CodeQualification
-    label: string
-    heures: number
-  }
 
   export interface Repository {
     save(action: Action): Promise<void>
@@ -211,7 +152,10 @@ export namespace Action {
         rappel: data.rappel === undefined ? true : data.rappel,
         dateEcheance: dateEcheanceA9Heures30,
         dateFinReelle:
-          statut === Action.Statut.TERMINEE ? dateEcheanceA9Heures30 : undefined
+          statut === Action.Statut.TERMINEE
+            ? dateEcheanceA9Heures30
+            : undefined,
+        qualification: undefined
       }
       return success(action)
     }

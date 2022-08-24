@@ -319,7 +319,7 @@ describe('ReferentielsController', () => {
     it('renvoie les types de qualifications des actions', () => {
       // Given
       const types: TypeQualificationQueryModel[] = [
-        { code: Action.CodeQualification.SANTE, label: 'aa', heures: 0 }
+        { code: Action.Qualification.Code.SANTE, label: 'aa', heures: 0 }
       ]
 
       getTypesQualificationsQueryHandler.execute.resolves(types)
@@ -329,7 +329,7 @@ describe('ReferentielsController', () => {
         .get('/referentiels/qualifications-actions/types')
         .set('authorization', unHeaderAuthorization())
         .expect([
-          { code: Action.CodeQualification.SANTE, label: 'aa', heures: 0 }
+          { code: Action.Qualification.Code.SANTE, label: 'aa', heures: 0 }
         ])
         .expect(HttpStatus.OK)
     })

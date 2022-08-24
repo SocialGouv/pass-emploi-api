@@ -125,9 +125,18 @@ describe('GetActionsByJeuneQueryHandler', () => {
         expect(isSuccess(result)).to.be.true()
         if (isSuccess(result)) {
           expect(result.data.actions).to.be.deep.equal([
-            uneActionQueryModelFromDomain(actionTerminee2),
-            uneActionQueryModelFromDomain(actionTerminee3),
-            uneActionQueryModelFromDomain(actionTerminee1)
+            uneActionQueryModelFromDomain(
+              actionTerminee2,
+              Action.Qualification.Etat.A_QUALIFIER
+            ),
+            uneActionQueryModelFromDomain(
+              actionTerminee3,
+              Action.Qualification.Etat.A_QUALIFIER
+            ),
+            uneActionQueryModelFromDomain(
+              actionTerminee1,
+              Action.Qualification.Etat.A_QUALIFIER
+            )
           ])
         }
       })
@@ -246,8 +255,14 @@ describe('GetActionsByJeuneQueryHandler', () => {
           expect(result.data.actions).to.be.deep.equal([
             uneActionQueryModelFromDomain(actionEnCours),
             uneActionQueryModelFromDomain(actionPasCommencee),
-            uneActionQueryModelFromDomain(actionTerminee2),
-            uneActionQueryModelFromDomain(actionTerminee1)
+            uneActionQueryModelFromDomain(
+              actionTerminee2,
+              Action.Qualification.Etat.A_QUALIFIER
+            ),
+            uneActionQueryModelFromDomain(
+              actionTerminee1,
+              Action.Qualification.Etat.A_QUALIFIER
+            )
           ])
         }
       })
@@ -375,7 +390,10 @@ describe('GetActionsByJeuneQueryHandler', () => {
         expect(isSuccess(result)).to.be.true()
         if (isSuccess(result)) {
           expect(result.data.actions).to.be.deep.equal([
-            uneActionQueryModelFromDomain(actionTermineeRecente),
+            uneActionQueryModelFromDomain(
+              actionTermineeRecente,
+              Action.Qualification.Etat.A_QUALIFIER
+            ),
             uneActionQueryModelFromDomain(actionPasCommencee),
             uneActionQueryModelFromDomain(actionEnCours),
             uneActionQueryModelFromDomain(actionCanceled)
@@ -442,7 +460,10 @@ describe('GetActionsByJeuneQueryHandler', () => {
             uneActionQueryModelFromDomain(actionCanceled),
             uneActionQueryModelFromDomain(actionEnCours),
             uneActionQueryModelFromDomain(actionPasCommencee),
-            uneActionQueryModelFromDomain(actionTerminee)
+            uneActionQueryModelFromDomain(
+              actionTerminee,
+              Action.Qualification.Etat.A_QUALIFIER
+            )
           ])
         }
       })

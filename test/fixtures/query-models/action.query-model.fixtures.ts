@@ -6,7 +6,8 @@ import { uneAction } from '../action.fixture'
 import { unJeune } from '../jeune.fixture'
 
 export const uneActionQueryModelFromDomain = (
-  action: Action = uneAction()
+  action: Action = uneAction(),
+  etat: Action.Qualification.Etat = Action.Qualification.Etat.NON_QUALIFIABLE
 ): ActionQueryModel => ({
   id: action.id,
   content: action.contenu,
@@ -21,18 +22,27 @@ export const uneActionQueryModelFromDomain = (
   creator: 'Nils Tavernier',
   creatorType: Action.TypeCreateur.CONSEILLER,
   dateEcheance: action.dateEcheance.toISOString(),
-  dateFinReelle: undefined
+  dateFinReelle: undefined,
+  etat,
+  qualification: undefined
 })
 
-export const uneActionQueryModelWithJeuneFromDomain = (
+export const uneActionQueryModelTermineeAvecQualification = (
   action: Action = uneAction(),
   jeune: Jeune = unJeune()
 ): ActionQueryModel => ({
   ...uneActionQueryModelFromDomain(action),
+  status: Action.Statut.TERMINEE,
   jeune: {
     id: action.idJeune,
     firstName: jeune.firstName,
     lastName: jeune.lastName
+  },
+  etat: Action.Qualification.Etat.QUALIFEE,
+  qualification: {
+    heures: 2,
+    libelle: 'Santé',
+    code: Action.Qualification.Code.SANTE
   }
 })
 
@@ -53,7 +63,8 @@ export function uneActionQueryModel(
     },
     creatorType: Action.TypeCreateur.CONSEILLER,
     creator: 'Nils Tavernier',
-    dateEcheance: '2021-11-11T10:03:30.000Z'
+    dateEcheance: '2021-11-11T10:03:30.000Z',
+    etat: Action.Qualification.Etat.NON_QUALIFIABLE
   }
 
   return { ...defaults, ...args }
@@ -72,7 +83,9 @@ export function uneActionQueryModelSansJeune(
     dateFinReelle: undefined,
     id: 'd2e48a82-c664-455a-b3a5-bb0465a72022',
     lastUpdate: 'Thu, 11 Nov 2021 08:03:30 UTC',
-    status: Action.Statut.PAS_COMMENCEE
+    status: Action.Statut.PAS_COMMENCEE,
+    etat: Action.Qualification.Etat.NON_QUALIFIABLE,
+    qualification: undefined
   }
 
   return { ...defaults, ...args }

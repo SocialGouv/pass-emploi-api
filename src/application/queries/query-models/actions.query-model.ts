@@ -17,6 +17,17 @@ class CreateurQueryModel implements Action.Createur {
   type: Action.TypeCreateur
 }
 
+export class QualificationActionQueryModel {
+  @ApiProperty()
+  code: Action.Qualification.Code
+
+  @ApiProperty()
+  libelle: string
+
+  @ApiProperty()
+  heures: number
+}
+
 export class ActionQueryModel {
   @ApiProperty()
   id: string
@@ -53,6 +64,12 @@ export class ActionQueryModel {
 
   @ApiProperty({ required: false })
   dateFinReelle?: string
+
+  @ApiProperty()
+  etat: Action.Qualification.Etat
+
+  @ApiProperty({ required: false })
+  qualification?: QualificationActionQueryModel
 }
 
 export class CommentaireActionQueryModel {
@@ -144,9 +161,11 @@ export class DemarcheQueryModel implements Demarche {
   statutsPossibles: Demarche.Statut[]
 }
 
-export class TypeQualificationQueryModel implements Action.TypeQualification {
+export class TypeQualificationQueryModel
+  implements Action.Qualification.TypeQualification
+{
   @ApiProperty()
-  code: Action.CodeQualification
+  code: Action.Qualification.Code
   @ApiProperty()
   label: string
   @ApiProperty()
