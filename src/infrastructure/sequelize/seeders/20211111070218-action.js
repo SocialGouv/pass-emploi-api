@@ -113,6 +113,47 @@ module.exports = {
       },
       {
         id: '71f62564-49e4-4adf-a0d6-7afa3ffdf94d',
+        contenu: 'Suivre une formation Qualifiée',
+        description: 'Consulter le catalogue des formations',
+        statut: 'done',
+        date_creation: '2023-09-24Z10:00:00.000',
+        date_echeance: '2023-12-24Z10:00:00.000',
+        date_fin_reelle: '2023-12-24Z10:00:00.000',
+        date_derniere_actualisation: '2023-09-25Z10:00:00.000',
+        id_jeune: 'hermione',
+        est_visible_par_conseiller: true,
+        id_createur: '41',
+        type_createur: 'conseiller',
+        createur: JSON.stringify({
+          nom: 'Doe',
+          prenom: 'John',
+          id: '41'
+        }),
+        qualification_code: 'SANTE',
+        qualification_heures: 2
+      },
+      {
+        id: '7919e571-004c-4e9b-b076-f8d285c3be20',
+        contenu: 'Suivre une formation Non Qualifiable',
+        description: 'Consulter le catalogue des formations',
+        statut: 'done',
+        date_creation: '2023-09-24Z10:00:00.000',
+        date_echeance: '2023-12-24Z10:00:00.000',
+        date_fin_reelle: '2023-12-24Z10:00:00.000',
+        date_derniere_actualisation: '2023-09-25Z10:00:00.000',
+        id_jeune: 'hermione',
+        est_visible_par_conseiller: true,
+        id_createur: '41',
+        type_createur: 'conseiller',
+        createur: JSON.stringify({
+          nom: 'Doe',
+          prenom: 'John',
+          id: '41'
+        }),
+        qualification_code: 'NON_QUALIFIABLE'
+      },
+      {
+        id: '2ba225cb-c38d-4831-9c1c-5b65ccd5eccd',
         contenu: 'Suivre une formation',
         description: 'Consulter le catalogue des formations',
         statut: 'done',
