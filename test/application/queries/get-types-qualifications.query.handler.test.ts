@@ -61,7 +61,7 @@ describe('GetTypesQualificationsQueryHandler', () => {
           heures: 3
         },
         {
-          code: Action.Qualification.Code.NON_QUALIFIABLE,
+          code: Action.Qualification.Code.NON_SNP,
           label: 'Non qualifiable en Situation Non Professionnelle',
           heures: 0
         }

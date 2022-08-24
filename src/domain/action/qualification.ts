@@ -12,7 +12,7 @@ export namespace Qualification {
     EMPLOI = 'EMPLOI',
     CULTURE_SPORT_LOISIRS = 'CULTURE_SPORT_LOISIRS',
     FORMATION = 'FORMATION',
-    NON_QUALIFIABLE = 'NON_QUALIFIABLE'
+    NON_SNP = 'NON_SNP'
   }
 
   export enum Etat {
@@ -57,8 +57,8 @@ export namespace Qualification {
       label: 'Formation',
       heures: 3
     },
-    NON_QUALIFIABLE: {
-      code: Code.NON_QUALIFIABLE,
+    NON_SNP: {
+      code: Code.NON_SNP,
       label: 'Non qualifiable en Situation Non Professionnelle',
       heures: 0
     }
