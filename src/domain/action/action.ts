@@ -59,42 +59,42 @@ export namespace Action {
   > = {
     SANTE: {
       code: CodeQualification.SANTE,
-      label: 'CEJ - Démarches personnelles santé',
+      label: 'Santé',
       heures: 2
     },
     PROJET_PROFESSIONNEL: {
       code: CodeQualification.PROJET_PROFESSIONNEL,
-      label: 'CEJ - Démarches personnelles projet professionnel',
+      label: 'Projet Professionnel',
       heures: 2
     },
     LOGEMENT: {
       code: CodeQualification.LOGEMENT,
-      label: 'CEJ - Démarches personnelles logement',
+      label: 'Logement',
       heures: 2
     },
     CITOYENNETE: {
       code: CodeQualification.CITOYENNETE,
-      label: 'CEJ - Démarches personnelles citoyenneté',
+      label: 'Citoyenneté',
       heures: 2
     },
     EMPLOI: {
       code: CodeQualification.EMPLOI,
-      label: 'CEJ - Démarches personnelles emploi',
+      label: 'Emploi',
       heures: 3
     },
     CULTURE_SPORT_LOISIRS: {
       code: CodeQualification.CULTURE_SPORT_LOISIRS,
-      label: 'CEJ - Démarches personnelles loisir, sport, culture',
+      label: 'Loisir, sport, culture',
       heures: 2
     },
     FORMATION: {
       code: CodeQualification.FORMATION,
-      label: 'CEJ - Démarches personnelles formation',
+      label: 'Formation',
       heures: 3
     },
     NON_QUALIFIABLE: {
       code: CodeQualification.NON_QUALIFIABLE,
-      label: 'Non qualifiable',
+      label: 'Non qualifiable en Situation Non Professionnelle',
       heures: 0
     }
   }
@@ -210,26 +210,24 @@ export namespace Action {
         dateDerniereActualisation: now,
         rappel: data.rappel === undefined ? true : data.rappel,
         dateEcheance: dateEcheanceA9Heures30,
-        dateFinReelle: statut === Action.Statut.TERMINEE ? now : undefined
+        dateFinReelle:
+          statut === Action.Statut.TERMINEE ? dateEcheanceA9Heures30 : undefined
       }
       return success(action)
     }
 
     updateStatut(action: Action, statut: Action.Statut): Result<Action> {
-      const now = this.dateService.nowJs()
-
-      let dateFinReelle = action.dateFinReelle
-      if (statut === Action.Statut.TERMINEE) {
-        dateFinReelle = now
-      } else if (action.statut === Action.Statut.TERMINEE) {
-        dateFinReelle = undefined
-      }
+      const maintenant = this.dateService.nowJs()
 
       return success({
         ...action,
         statut,
-        dateFinReelle,
-        dateDerniereActualisation: now
+        dateFinReelle: this.mettreAJourLaDateDeFinReelle(
+          action,
+          statut,
+          maintenant
+        ),
+        dateDerniereActualisation: maintenant
       })
     }
 
@@ -269,6 +267,24 @@ export namespace Action {
         }
         return failure(new PasDeRappelError(action.id, raison))
       }
+    }
+
+    private mettreAJourLaDateDeFinReelle(
+      action: Action,
+      statut: Action.Statut,
+      maintenant: Date
+    ): Date | undefined {
+      let dateFinReelle = action.dateFinReelle
+      const nouveauStatutTermine = statut === Action.Statut.TERMINEE
+      const ancienStatutTermine =
+        !nouveauStatutTermine && action.statut === Action.Statut.TERMINEE
+      if (nouveauStatutTermine) {
+        dateFinReelle = maintenant
+      }
+      if (ancienStatutTermine) {
+        dateFinReelle = undefined
+      }
+      return dateFinReelle
     }
   }
 }

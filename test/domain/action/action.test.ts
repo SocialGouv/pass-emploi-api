@@ -42,6 +42,29 @@ describe('Action', () => {
           if (isSuccess(resultAction)) {
             expect(resultAction.data.statut).to.equal(enCours)
             expect(resultAction.data.dateDerniereActualisation).to.equal(nowJs)
+            expect(resultAction.data.dateFinReelle).to.be.undefined()
+          }
+        })
+      })
+
+      describe("quand l'action passe en terminée", () => {
+        it('met à jour la date de fin', () => {
+          // Given
+          const action = uneAction({
+            statut: Action.Statut.EN_COURS
+          })
+
+          // When
+          const resultAction = actionFactory.updateStatut(
+            action,
+            Action.Statut.TERMINEE
+          )
+
+          // Then
+          expect(isSuccess(resultAction)).to.equal(true)
+          if (isSuccess(resultAction)) {
+            expect(resultAction.data.statut).to.equal(Action.Statut.TERMINEE)
+            expect(resultAction.data.dateFinReelle).to.deep.equal(nowJs)
           }
         })
       })
@@ -81,6 +104,7 @@ describe('Action', () => {
                 type: Action.TypeCreateur.CONSEILLER
               },
               dateEcheance: dateEcheanceA9h30,
+              dateFinReelle: undefined,
               rappel: true
             })
 
@@ -98,9 +122,8 @@ describe('Action', () => {
             )
 
             // Then
-            expect(actual).to.deep.equal({
-              _isSuccess: true,
-              data: expectedAction
+            expect(actual._isSuccess && actual.data).to.deep.equal({
+              ...expectedAction
             })
           })
         })
@@ -110,7 +133,7 @@ describe('Action', () => {
             const contenu = 'test'
             const idJeune = '1'
             const commentaire = 'test'
-            const statut = Action.Statut.TERMINEE
+            const statut = Action.Statut.PAS_COMMENCEE
             const typeCreateur = Action.TypeCreateur.JEUNE
 
             const jeune = unJeune()
@@ -147,14 +170,14 @@ describe('Action', () => {
             )
 
             // Then
-            expect(actual).to.deep.equal({ _isSuccess: true, data: action })
+            expect(isSuccess(actual) && actual.data).to.deep.equal(action)
           })
           it('crée une action avec rappel fournis', async () => {
             // Given
             const contenu = 'test'
             const idJeune = '1'
             const commentaire = 'test'
-            const statut = Action.Statut.TERMINEE
+            const statut = Action.Statut.EN_COURS
             const typeCreateur = Action.TypeCreateur.JEUNE
             const rappel = false
 
@@ -193,7 +216,101 @@ describe('Action', () => {
             )
 
             // Then
-            expect(actual).to.deep.equal({ _isSuccess: true, data: action })
+            expect(isSuccess(actual) && actual.data).to.deep.equal(action)
+          })
+        })
+        describe("quand l'action est créé Terminée", () => {
+          it('crée une action avec une date de fin réelle', async () => {
+            // Given
+            const contenu = 'test'
+            const idJeune = '1'
+            const commentaire = 'test'
+            const statut = Action.Statut.TERMINEE
+            const typeCreateur = Action.TypeCreateur.JEUNE
+
+            const jeune = unJeune()
+
+            const action: Action = uneAction({
+              id,
+              dateCreation: nowJs,
+              dateDerniereActualisation: nowJs,
+              contenu,
+              description: commentaire,
+              idJeune,
+              statut,
+              createur: {
+                id: jeune.id,
+                prenom: jeune.firstName,
+                nom: jeune.lastName,
+                type: Action.TypeCreateur.JEUNE
+              },
+              dateEcheance: dateEcheanceA9h30,
+              dateFinReelle: dateEcheanceA9h30,
+              rappel: true
+            })
+
+            // When
+            const actual = actionFactory.buildAction(
+              {
+                contenu,
+                idJeune,
+                statut,
+                commentaire,
+                typeCreateur,
+                dateEcheance
+              },
+              jeune
+            )
+
+            // Then
+            expect(isSuccess(actual) && actual.data).to.deep.equal(action)
+          })
+          it('crée une action avec rappel fournis', async () => {
+            // Given
+            const contenu = 'test'
+            const idJeune = '1'
+            const commentaire = 'test'
+            const statut = Action.Statut.TERMINEE
+            const typeCreateur = Action.TypeCreateur.JEUNE
+            const rappel = false
+
+            const jeune = unJeune()
+
+            const action: Action = uneAction({
+              id,
+              dateCreation: nowJs,
+              dateDerniereActualisation: nowJs,
+              contenu,
+              description: commentaire,
+              idJeune,
+              statut,
+              createur: {
+                id: jeune.id,
+                prenom: jeune.firstName,
+                nom: jeune.lastName,
+                type: Action.TypeCreateur.JEUNE
+              },
+              dateEcheance: dateEcheanceA9h30,
+              dateFinReelle: dateEcheanceA9h30,
+              rappel
+            })
+
+            // When
+            const actual = actionFactory.buildAction(
+              {
+                contenu,
+                idJeune,
+                statut,
+                commentaire,
+                typeCreateur,
+                dateEcheance,
+                rappel
+              },
+              jeune
+            )
+
+            // Then
+            expect(isSuccess(actual) && actual.data).to.deep.equal(action)
           })
         })
       })

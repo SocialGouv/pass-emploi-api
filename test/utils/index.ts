@@ -25,3 +25,7 @@ export { buildTestingModuleForHttpTesting }
 
 const instanceMock: StubbedType<apm.Agent> = stubInterface(createSandbox())
 setAPMInstance(instanceMock)
+
+export function enleverLesUndefined<T>(objet: T): T {
+  return JSON.parse(JSON.stringify(objet))
+}

@@ -27,42 +27,42 @@ describe('GetTypesQualificationsQueryHandler', () => {
       expect(result).to.deep.equal([
         {
           code: Action.CodeQualification.SANTE,
-          label: 'CEJ - Démarches personnelles santé',
+          label: 'Santé',
           heures: 2
         },
         {
           code: Action.CodeQualification.PROJET_PROFESSIONNEL,
-          label: 'CEJ - Démarches personnelles projet professionnel',
+          label: 'Projet Professionnel',
           heures: 2
         },
         {
           code: Action.CodeQualification.LOGEMENT,
-          label: 'CEJ - Démarches personnelles logement',
+          label: 'Logement',
           heures: 2
         },
         {
           code: Action.CodeQualification.CITOYENNETE,
-          label: 'CEJ - Démarches personnelles citoyenneté',
+          label: 'Citoyenneté',
           heures: 2
         },
         {
           code: Action.CodeQualification.EMPLOI,
-          label: 'CEJ - Démarches personnelles emploi',
+          label: 'Emploi',
           heures: 3
         },
         {
           code: Action.CodeQualification.CULTURE_SPORT_LOISIRS,
-          label: 'CEJ - Démarches personnelles loisir, sport, culture',
+          label: 'Loisir, sport, culture',
           heures: 2
         },
         {
           code: Action.CodeQualification.FORMATION,
-          label: 'CEJ - Démarches personnelles formation',
+          label: 'Formation',
           heures: 3
         },
         {
           code: Action.CodeQualification.NON_QUALIFIABLE,
-          label: 'Non qualifiable',
+          label: 'Non qualifiable en Situation Non Professionnelle',
           heures: 0
         }
       ])
