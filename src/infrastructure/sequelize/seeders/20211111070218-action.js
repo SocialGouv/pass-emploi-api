@@ -150,7 +150,7 @@ module.exports = {
           prenom: 'John',
           id: '41'
         }),
-        qualification_code: 'NON_QUALIFIABLE'
+        qualification_code: 'NON_SNP'
       },
       {
         id: '2ba225cb-c38d-4831-9c1c-5b65ccd5eccd',
