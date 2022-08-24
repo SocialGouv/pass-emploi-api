@@ -1,5 +1,9 @@
 import { uneDatetime } from 'test/fixtures/date.fixture'
-import { isFailure, isSuccess } from '../../../src/building-blocks/types/result'
+import {
+  failure,
+  isFailure,
+  isSuccess
+} from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action/action'
 import { DateService } from '../../../src/utils/date-service'
 import { IdService } from '../../../src/utils/id-service'
@@ -7,6 +11,7 @@ import { uneAction } from '../../fixtures/action.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { DateTime } from 'luxon'
+import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
 
 describe('Action', () => {
   describe('Factory', () => {
@@ -66,6 +71,34 @@ describe('Action', () => {
             expect(resultAction.data.statut).to.equal(Action.Statut.TERMINEE)
             expect(resultAction.data.dateFinReelle).to.deep.equal(nowJs)
           }
+        })
+      })
+
+      describe("quand l'action est qualifiée", () => {
+        it('rejette', () => {
+          // Given
+          const action = uneAction({
+            statut: Action.Statut.TERMINEE,
+            qualification: {
+              code: Action.Qualification.Code.EMPLOI,
+              heures: 3
+            }
+          })
+
+          // When
+          const result = actionFactory.updateStatut(
+            action,
+            Action.Statut.EN_COURS
+          )
+
+          // Then
+          expect(result).to.deep.equal(
+            failure(
+              new MauvaiseCommandeError(
+                "Vous ne pouvez pas changer le statut d'une action qualifée"
+              )
+            )
+          )
         })
       })
     })
