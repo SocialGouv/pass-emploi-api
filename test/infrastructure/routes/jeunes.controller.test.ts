@@ -68,6 +68,7 @@ import {
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import {
   buildTestingModuleForHttpTesting,
+  enleverLesUndefined,
   expect,
   StubbedClass,
   stubClass
@@ -951,7 +952,10 @@ describe('JeunesController', () => {
     const idJeune = '1'
     const maintenant = '2022-08-17T12:00:30+02:00'
     const queryModel: JeuneHomeSuiviQueryModel = {
-      actions: [uneActionQueryModelSansJeune(), uneActionQueryModelSansJeune()],
+      actions: [
+        enleverLesUndefined(uneActionQueryModelSansJeune()),
+        enleverLesUndefined(uneActionQueryModelSansJeune())
+      ],
       rendezVous: [],
       actionsEnRetard: 8
     }

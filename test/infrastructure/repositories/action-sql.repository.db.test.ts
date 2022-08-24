@@ -100,7 +100,8 @@ describe('ActionSqlRepository', () => {
       const actionDto = uneActionDto({
         id: idAction,
         statut: Action.Statut.EN_COURS,
-        idJeune: jeune.id
+        idJeune: jeune.id,
+        dateFinReelle: new Date('2021-11-10T08:03:30.000Z')
       })
       await ActionSqlModel.creer(actionDto)
 
@@ -123,6 +124,7 @@ describe('ActionSqlRepository', () => {
           type: Action.TypeCreateur.CONSEILLER
         },
         dateEcheance: new Date('2021-11-11T08:03:30.000Z'),
+        dateFinReelle: new Date('2021-11-10T08:03:30.000Z'),
         rappel: true
       }
       expect(actual).to.deep.equal(attendu)
