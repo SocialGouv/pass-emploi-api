@@ -104,7 +104,8 @@ export namespace Action {
 
   export function qualifier(
     action: Action,
-    codeQualification: Action.Qualification.Code
+    codeQualification: Action.Qualification.Code,
+    dateFinReelle?: Date
   ): Result<Action> {
     if (estQualifiee(action)) {
       return failure(new MauvaiseCommandeError('Action déjà qualifiée'))
@@ -114,6 +115,7 @@ export namespace Action {
 
     return success({
       ...action,
+      dateFinReelle: dateFinReelle ?? action.dateFinReelle,
       qualification: {
         code: codeQualification,
         heures
