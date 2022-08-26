@@ -11,7 +11,11 @@ import {
   isFailure,
   Result
 } from '../../building-blocks/types/result'
-import { Action, ActionsRepositoryToken } from '../../domain/action/action'
+import {
+  Action,
+  ActionMiloRepositoryToken,
+  ActionsRepositoryToken
+} from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
 import { ActionAuthorizer } from '../authorizers/authorize-action'
 
@@ -29,6 +33,8 @@ export class QualifierActionCommandHandler extends CommandHandler<
   constructor(
     @Inject(ActionsRepositoryToken)
     private readonly actionRepository: Action.Repository,
+    @Inject(ActionMiloRepositoryToken)
+    private readonly actionMiloRepository: Action.Milo.Repository,
     private readonly actionAuthorizer: ActionAuthorizer
   ) {
     super('QualifierActionCommandHandler')
@@ -50,6 +56,9 @@ export class QualifierActionCommandHandler extends CommandHandler<
       return result
     }
 
+    if (result.data.qualification.code !== Action.Qualification.Code.NON_SNP) {
+      await this.actionMiloRepository.save(result.data)
+    }
     await this.actionRepository.save(result.data)
 
     return emptySuccess()

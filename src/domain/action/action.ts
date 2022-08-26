@@ -17,10 +17,12 @@ import { Jeune } from '../jeune/jeune'
 import { DateTime } from 'luxon'
 import * as _Commentaire from './commentaire'
 import * as _Qualification from './qualification'
+import * as _Milo from './milo'
 
 export const ActionsRepositoryToken = 'ActionsRepositoryToken'
 export const CommentaireActionRepositoryToken =
   'CommentaireActionRepositoryToken'
+export const ActionMiloRepositoryToken = 'ActionMiloRepositoryToken'
 
 export interface Action {
   id: Action.Id
@@ -43,9 +45,16 @@ export namespace Action {
   export import Commentaire = _Commentaire.Commentaire
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import Qualification = _Qualification.Qualification
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  export import Milo = _Milo.Milo
 
   export type Id = Brand<string, 'IdAction'>
   export type IdCreateur = string | Jeune.Id
+
+  export interface Qualifiee extends Action {
+    dateFinReelle: Date
+    qualification: Action.Qualification
+  }
 
   export interface Repository {
     save(action: Action): Promise<void>
@@ -110,7 +119,7 @@ export namespace Action {
     action: Action,
     codeQualification: Action.Qualification.Code,
     dateFinReelle?: Date
-  ): Result<Action> {
+  ): Result<Action.Qualifiee> {
     if (!estTerminee(action)) {
       return failure(new MauvaiseCommandeError("L'action n'est pas terminée"))
     }
@@ -122,7 +131,7 @@ export namespace Action {
 
     return success({
       ...action,
-      dateFinReelle: dateFinReelle ?? action.dateFinReelle,
+      dateFinReelle: dateFinReelle ?? action.dateFinReelle!,
       qualification: {
         code: codeQualification,
         heures
