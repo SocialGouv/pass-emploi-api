@@ -21,8 +21,9 @@ import { ActionAuthorizer } from '../authorizers/authorize-action'
 
 export interface QualifierActionCommand extends Command {
   idAction: string
-  dateFinReelle?: Date
   codeQualification: Action.Qualification.Code
+  utilisateur: Authentification.Utilisateur
+  dateFinReelle?: Date
 }
 
 @Injectable()
@@ -46,20 +47,29 @@ export class QualifierActionCommandHandler extends CommandHandler<
       return failure(new NonTrouveError('Action', command.idAction))
     }
 
-    const result = Action.qualifier(
+    const actionQualifiee = Action.qualifier(
       action,
       command.codeQualification,
       command.dateFinReelle
     )
 
-    if (isFailure(result)) {
-      return result
+    if (isFailure(actionQualifiee)) {
+      return actionQualifiee
     }
 
-    if (result.data.qualification.code !== Action.Qualification.Code.NON_SNP) {
-      await this.actionMiloRepository.save(result.data)
+    if (
+      actionQualifiee.data.qualification.code !==
+      Action.Qualification.Code.NON_SNP
+    ) {
+      const snpCree = await this.actionMiloRepository.save(
+        actionQualifiee.data,
+        command.utilisateur
+      )
+      if (isFailure(snpCree)) {
+        return snpCree
+      }
     }
-    await this.actionRepository.save(result.data)
+    await this.actionRepository.save(actionQualifiee.data)
 
     return emptySuccess()
   }

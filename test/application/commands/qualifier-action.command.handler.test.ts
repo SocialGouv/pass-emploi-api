@@ -6,7 +6,10 @@ import {
   QualifierActionCommand,
   QualifierActionCommandHandler
 } from '../../../src/application/commands/qualifier-action.command.handler'
-import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure
@@ -39,69 +42,105 @@ describe('QualifierActionCommandHandler', () => {
 
   describe('handle', () => {
     describe("Quand l'action existe", () => {
-      it('qualifie, sauvegarde une action terminée et save une SNP', async () => {
-        // Given
-        const idAction = '35399853-f224-4910-8d02-44fb1ac85606'
-        const actionTerminee = uneAction({
-          id: idAction,
-          statut: Action.Statut.TERMINEE,
-          dateFinReelle: uneDate()
+      describe("quand c'est une SNP", () => {
+        describe('quand la création de SNP a fonctionné', () => {
+          it('qualifie, sauvegarde une action terminée, et crée la SNP', async () => {
+            // Given
+            const idAction = '35399853-f224-4910-8d02-44fb1ac85606'
+            const actionTerminee = uneAction({
+              id: idAction,
+              statut: Action.Statut.TERMINEE,
+              dateFinReelle: uneDate()
+            })
+            const actionQualifiee: Action = {
+              ...actionTerminee,
+              qualification: {
+                code: Action.Qualification.Code.SANTE,
+                heures: 2
+              }
+            }
+            actionRepository.get.withArgs(idAction).resolves(actionTerminee)
+            actionMiloRepository.save.resolves(emptySuccess())
+
+            // When
+            const command: QualifierActionCommand = {
+              idAction: idAction,
+              utilisateur: unUtilisateurConseiller(),
+              codeQualification: Action.Qualification.Code.SANTE
+            }
+            const result = await qualifierActionCommandHandler.handle(command)
+
+            // Then
+            expect(actionRepository.save).to.have.been.calledWithExactly(
+              actionQualifiee
+            )
+            expect(actionMiloRepository.save).to.have.been.calledWithExactly(
+              actionQualifiee,
+              unUtilisateurConseiller()
+            )
+            expect(result).to.deep.equal(emptySuccess())
+          })
         })
-        const actionQualifiee: Action = {
-          ...actionTerminee,
-          qualification: {
-            code: Action.Qualification.Code.SANTE,
-            heures: 2
-          }
-        }
-        actionRepository.get.withArgs(idAction).resolves(actionTerminee)
+        describe('quand la création de SNP a échoué', () => {
+          it("ne sauvegarde pas l'action et rejette", async () => {
+            // Given
+            const idAction = '35399853-f224-4910-8d02-44fb1ac85606'
+            const actionTerminee = uneAction({
+              id: idAction,
+              statut: Action.Statut.TERMINEE,
+              dateFinReelle: uneDate()
+            })
+            actionRepository.get.withArgs(idAction).resolves(actionTerminee)
+            actionMiloRepository.save.resolves(
+              failure(new ErreurHttp('KO', 500))
+            )
 
-        // When
-        const command: QualifierActionCommand = {
-          idAction: idAction,
-          codeQualification: Action.Qualification.Code.SANTE
-        }
-        const result = await qualifierActionCommandHandler.handle(command)
+            // When
+            const command: QualifierActionCommand = {
+              idAction: idAction,
+              utilisateur: unUtilisateurConseiller(),
+              codeQualification: Action.Qualification.Code.SANTE
+            }
+            const result = await qualifierActionCommandHandler.handle(command)
 
-        // Then
-        expect(actionRepository.save).to.have.been.calledWithExactly(
-          actionQualifiee
-        )
-        expect(actionMiloRepository.save).to.have.been.calledWithExactly(
-          actionQualifiee
-        )
-        expect(result).to.deep.equal(emptySuccess())
+            // Then
+            expect(result).to.deep.equal(failure(new ErreurHttp('KO', 500)))
+          })
+        })
       })
-      it('qualifie, sauvegarde une action terminée et ne save pas une NON SNP', async () => {
-        // Given
-        const idAction = '35399853-f224-4910-8d02-44fb1ac85606'
-        const actionTerminee = uneAction({
-          id: idAction,
-          statut: Action.Statut.TERMINEE,
-          dateFinReelle: uneDate()
-        })
-        const actionQualifiee: Action = {
-          ...actionTerminee,
-          qualification: {
-            code: Action.Qualification.Code.NON_SNP,
-            heures: 0
+      describe("quand ce n'est pas une SNP", () => {
+        it('qualifie, sauvegarde une action terminée', async () => {
+          // Given
+          const idAction = '35399853-f224-4910-8d02-44fb1ac85606'
+          const actionTerminee = uneAction({
+            id: idAction,
+            statut: Action.Statut.TERMINEE,
+            dateFinReelle: uneDate()
+          })
+          const actionQualifiee: Action = {
+            ...actionTerminee,
+            qualification: {
+              code: Action.Qualification.Code.NON_SNP,
+              heures: 0
+            }
           }
-        }
-        actionRepository.get.withArgs(idAction).resolves(actionTerminee)
+          actionRepository.get.withArgs(idAction).resolves(actionTerminee)
 
-        // When
-        const command: QualifierActionCommand = {
-          idAction: idAction,
-          codeQualification: Action.Qualification.Code.NON_SNP
-        }
-        const result = await qualifierActionCommandHandler.handle(command)
+          // When
+          const command: QualifierActionCommand = {
+            idAction: idAction,
+            utilisateur: unUtilisateurConseiller(),
+            codeQualification: Action.Qualification.Code.NON_SNP
+          }
+          const result = await qualifierActionCommandHandler.handle(command)
 
-        // Then
-        expect(actionRepository.save).to.have.been.calledWithExactly(
-          actionQualifiee
-        )
-        expect(actionMiloRepository.save).not.to.have.been.called()
-        expect(result).to.deep.equal(emptySuccess())
+          // Then
+          expect(actionRepository.save).to.have.been.calledWithExactly(
+            actionQualifiee
+          )
+          expect(actionMiloRepository.save).not.to.have.been.called()
+          expect(result).to.deep.equal(emptySuccess())
+        })
       })
       it("rejette quand la qualification n'est pas possible", async () => {
         // Given
@@ -115,6 +154,7 @@ describe('QualifierActionCommandHandler', () => {
         // When
         const command: QualifierActionCommand = {
           idAction: idAction,
+          utilisateur: unUtilisateurConseiller(),
           codeQualification: Action.Qualification.Code.SANTE
         }
         const result = await qualifierActionCommandHandler.handle(command)
@@ -134,6 +174,7 @@ describe('QualifierActionCommandHandler', () => {
         // When
         const result = await qualifierActionCommandHandler.handle({
           idAction,
+          utilisateur: unUtilisateurConseiller(),
           codeQualification: Action.Qualification.Code.CITOYENNETE
         })
 
@@ -150,6 +191,7 @@ describe('QualifierActionCommandHandler', () => {
       // Given
       const command: QualifierActionCommand = {
         idAction: 'idAction',
+        utilisateur: unUtilisateurConseiller(),
         codeQualification: Action.Qualification.Code.SANTE
       }
 
@@ -166,12 +208,13 @@ describe('QualifierActionCommandHandler', () => {
     })
     it('rejette un jeune', async () => {
       // Given
+      const utilisateur = unUtilisateurJeune()
+
       const command: QualifierActionCommand = {
         idAction: 'idAction',
+        utilisateur,
         codeQualification: Action.Qualification.Code.SANTE
       }
-
-      const utilisateur = unUtilisateurJeune()
 
       // When
       const result = await qualifierActionCommandHandler.authorize(
