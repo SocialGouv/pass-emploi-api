@@ -1,4 +1,4 @@
-import { uneDatetime } from 'test/fixtures/date.fixture'
+import { uneAutreDate, uneDate, uneDatetime } from 'test/fixtures/date.fixture'
 import {
   failure,
   isFailure,
@@ -563,52 +563,66 @@ describe('Action', () => {
     })
   })
   describe('qualifier', () => {
+    const dateFinReelle = uneDate()
+
     it("renvoie l'action qualifiée NON_SNP", () => {
       // Given
-      const action: Action = uneAction()
+      const actionTerminee: Action = uneAction({
+        dateFinReelle,
+        statut: Action.Statut.TERMINEE
+      })
 
       // When
       const actionQualifiee = Action.qualifier(
-        action,
+        actionTerminee,
         Action.Qualification.Code.NON_SNP
       )
 
-      const expectedAction: Action = uneAction({
+      const expectedAction: Action = {
+        ...actionTerminee,
         qualification: { code: Action.Qualification.Code.NON_SNP, heures: 0 }
-      })
+      }
 
       // Then
       expect(actionQualifiee).to.deep.equal(success(expectedAction))
     })
     it("renvoie l'action qualifiée SANTE", () => {
       // Given
-      const action: Action = uneAction()
-
+      const nouvelleDateFinReelle = uneAutreDate()
+      const actionTerminee: Action = uneAction({
+        dateFinReelle,
+        statut: Action.Statut.TERMINEE
+      })
       // When
       const actionQualifiee = Action.qualifier(
-        action,
-        Action.Qualification.Code.SANTE
+        actionTerminee,
+        Action.Qualification.Code.SANTE,
+        nouvelleDateFinReelle
       )
 
-      const expectedAction: Action = uneAction({
-        qualification: { code: Action.Qualification.Code.SANTE, heures: 2 }
-      })
-
       // Then
+      const expectedAction: Action = {
+        ...actionTerminee,
+        qualification: { code: Action.Qualification.Code.SANTE, heures: 2 },
+        dateFinReelle: nouvelleDateFinReelle
+      }
       expect(actionQualifiee).to.deep.equal(success(expectedAction))
     })
-
     it("rejette quand l'action est déjà qualifée", () => {
       // Given
-      const action: Action = uneAction({
+      const actionTerminee: Action = uneAction({
+        dateFinReelle,
+        statut: Action.Statut.TERMINEE,
         qualification: {
           code: Action.Qualification.Code.EMPLOI,
           heures: 2
         }
       })
-
       // When
-      const result = Action.qualifier(action, Action.Qualification.Code.SANTE)
+      const result = Action.qualifier(
+        actionTerminee,
+        Action.Qualification.Code.SANTE
+      )
 
       // Then
       expect(result).to.deep.equal(
