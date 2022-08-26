@@ -106,11 +106,14 @@ export namespace Action {
     action: Action,
     codeQualification: Action.Qualification.Code
   ): Action {
+    const { heures } =
+      Action.Qualification.mapCodeTypeQualification[codeQualification]
+
     return {
       ...action,
       qualification: {
         code: codeQualification,
-        heures: 0
+        heures
       }
     }
   }

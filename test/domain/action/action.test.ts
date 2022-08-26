@@ -579,5 +579,22 @@ describe('Action', () => {
       // Then
       expect(actionQualifiee).to.deep.equal(expectedAction)
     })
+    it("renvoie l'action qualifiée SANTE", () => {
+      // Given
+      const action: Action = uneAction()
+
+      // When
+      const actionQualifiee = Action.qualifier(
+        action,
+        Action.Qualification.Code.SANTE
+      )
+
+      const expectedAction: Action = uneAction({
+        qualification: { code: Action.Qualification.Code.SANTE, heures: 2 }
+      })
+
+      // Then
+      expect(actionQualifiee).to.deep.equal(expectedAction)
+    })
   })
 })
