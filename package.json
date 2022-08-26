@@ -75,7 +75,7 @@
     "elastic-apm-node": "3.38.0",
     "firebase-admin": "11.0.1",
     "geojson": "^0.5.0",
-    "helmet": "^5.1.1",
+    "helmet": "^6.0.0",
     "ics": "^2.37.0",
     "joi": "^17.6.0",
     "jose": "^4.8.3",
