@@ -2,7 +2,8 @@ import { uneDatetime } from 'test/fixtures/date.fixture'
 import {
   failure,
   isFailure,
-  isSuccess
+  isSuccess,
+  success
 } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action/action'
 import { DateService } from '../../../src/utils/date-service'
@@ -577,7 +578,7 @@ describe('Action', () => {
       })
 
       // Then
-      expect(actionQualifiee).to.deep.equal(expectedAction)
+      expect(actionQualifiee).to.deep.equal(success(expectedAction))
     })
     it("renvoie l'action qualifiée SANTE", () => {
       // Given
@@ -594,7 +595,25 @@ describe('Action', () => {
       })
 
       // Then
-      expect(actionQualifiee).to.deep.equal(expectedAction)
+      expect(actionQualifiee).to.deep.equal(success(expectedAction))
+    })
+
+    it("rejette quand l'action est déjà qualifée", () => {
+      // Given
+      const action: Action = uneAction({
+        qualification: {
+          code: Action.Qualification.Code.EMPLOI,
+          heures: 2
+        }
+      })
+
+      // When
+      const result = Action.qualifier(action, Action.Qualification.Code.SANTE)
+
+      // Then
+      expect(result).to.deep.equal(
+        failure(new MauvaiseCommandeError('Action déjà qualifiée'))
+      )
     })
   })
 })

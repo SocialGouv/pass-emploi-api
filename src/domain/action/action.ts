@@ -105,17 +105,20 @@ export namespace Action {
   export function qualifier(
     action: Action,
     codeQualification: Action.Qualification.Code
-  ): Action {
-    const { heures } =
-      Action.Qualification.mapCodeTypeQualification[codeQualification]
+  ): Result<Action> {
+    if (estQualifiee(action)) {
+      return failure(new MauvaiseCommandeError('Action déjà qualifiée'))
+    }
 
-    return {
+    const { heures } = Qualification.mapCodeTypeQualification[codeQualification]
+
+    return success({
       ...action,
       qualification: {
         code: codeQualification,
         heures
       }
-    }
+    })
   }
 
   @Injectable()
