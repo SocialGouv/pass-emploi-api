@@ -37,6 +37,7 @@ export namespace Authentification {
     dateDerniereConnexion?: Date
     appVersion?: string
     installationId?: string
+    username?: string
   }
 
   // TODO : à mettre plutôt dans une classe Utilisateur ?

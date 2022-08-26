@@ -168,6 +168,7 @@ export const unUtilisateurDecode = (): Authentification.Utilisateur => ({
   email: 'conseiller.milo.passemploi@gmail.com',
   nom: 'Durant',
   prenom: 'Albert',
+  username: 'a.durant',
   type: Authentification.Type.CONSEILLER,
   structure: Core.Structure.MILO,
   roles: []
