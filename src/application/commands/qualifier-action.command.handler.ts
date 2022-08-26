@@ -5,7 +5,12 @@ import {
   DroitsInsuffisants,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
-import { failure, Result, success } from '../../building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  isFailure,
+  Result
+} from '../../building-blocks/types/result'
 import { Action, ActionsRepositoryToken } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
 import { ActionAuthorizer } from '../authorizers/authorize-action'
@@ -19,7 +24,7 @@ export interface QualifierActionCommand extends Command {
 @Injectable()
 export class QualifierActionCommandHandler extends CommandHandler<
   QualifierActionCommand,
-  string
+  void
 > {
   constructor(
     @Inject(ActionsRepositoryToken)
@@ -29,13 +34,25 @@ export class QualifierActionCommandHandler extends CommandHandler<
     super('QualifierActionCommandHandler')
   }
 
-  async handle(command: QualifierActionCommand): Promise<Result<string>> {
+  async handle(command: QualifierActionCommand): Promise<Result<void>> {
     const action = await this.actionRepository.get(command.idAction)
     if (!action) {
       return failure(new NonTrouveError('Action', command.idAction))
     }
 
-    return success(action.id)
+    const result = Action.qualifier(
+      action,
+      command.codeQualification,
+      command.dateFinReelle
+    )
+
+    if (isFailure(result)) {
+      return result
+    }
+
+    await this.actionRepository.save(result.data)
+
+    return emptySuccess()
   }
 
   async authorize(
