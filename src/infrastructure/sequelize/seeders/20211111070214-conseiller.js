@@ -34,6 +34,14 @@ module.exports = {
         structure: 'POLE_EMPLOI',
         id_authentification: 'e04bb080-5805-402e-a527-0f9d2ee0840f',
         notifications_sonores: false
+      },
+      {
+        id: 'b9ceb634-57a4-486e-bada-85cf82f1ad20',
+        prenom: 'Claire',
+        nom: 'Dupond',
+        structure: 'MILO',
+        id_authentification: 'cdace196-2930-4cf0-b9c2-17344a0d7178',
+        notifications_sonores: false
       }
     ])
   },

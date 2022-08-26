@@ -51,7 +51,7 @@ export const testConfig = (): ConfigService => {
     milo: {
       url: 'https://milo.com',
       urlWeb: 'https://milo.com',
-      apiKeyRecupererDossier: 'apiKeyRecupererDossier',
+      apiKeyDossier: 'apiKeyRecupererDossier',
       apiKeyCreerJeune: 'apiKeyCreerJeune'
     },
     redis: {

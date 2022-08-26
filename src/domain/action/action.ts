@@ -51,8 +51,11 @@ export namespace Action {
   export type Id = Brand<string, 'IdAction'>
   export type IdCreateur = string | Jeune.Id
 
-  export interface Qualifiee extends Action {
+  export interface Terminee extends Action {
     dateFinReelle: Date
+  }
+
+  export interface Qualifiee extends Terminee {
     qualification: Action.Qualification
   }
 
@@ -112,7 +115,9 @@ export namespace Action {
   }
 
   export function estTerminee(action: Action): boolean {
-    return action.statut === Statut.TERMINEE && Boolean(action.dateFinReelle)
+    return (
+      action.statut === Statut.TERMINEE && action.dateFinReelle !== undefined
+    )
   }
 
   export function qualifier(

@@ -26,13 +26,38 @@ export const uneAction = (args: Partial<Action> = {}): Action => {
   return { ...defaults, ...args }
 }
 
-export const uneActionQualifiee = (args: Partial<Action> = {}): Action => {
-  const defaults: Action = {
+export const uneActionTerminee = (
+  args: Partial<Action> = {}
+): Action.Terminee => {
+  const defaults: Action.Terminee = {
     ...uneAction(),
+    dateFinReelle: uneDate(),
+    statut: Action.Statut.TERMINEE
+  }
+
+  return { ...defaults, ...args }
+}
+
+export const uneActionQualifiee = (
+  args: Partial<Action> = {}
+): Action.Qualifiee => {
+  const defaults: Action.Qualifiee = {
+    ...uneAction(),
+    dateFinReelle: uneDate(),
     qualification: {
       code: Action.Qualification.Code.SANTE,
       heures: 3
     }
+  }
+
+  return { ...defaults, ...args }
+}
+
+export const uneActionMilo = (args: Partial<Action> = {}): Action.Milo => {
+  const defaults: Action.Milo = {
+    ...uneActionQualifiee(),
+    idDossier: 'idDossier',
+    loginConseiller: 'loginConseiller'
   }
 
   return { ...defaults, ...args }
