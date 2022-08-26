@@ -94,6 +94,7 @@ export class OidcAuthGuard implements CanActivate {
       prenom: payload.given_name as string,
       type: payload.userType as Authentification.Type,
       structure: payload.userStructure as Core.Structure,
+      username: (payload.preferred_username as string) ?? undefined,
       roles: getRoles(payload.userRoles as Authentification.Role[] | undefined)
     }
   }
