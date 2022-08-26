@@ -102,6 +102,19 @@ export namespace Action {
     return Boolean(action.qualification?.code)
   }
 
+  export function qualifier(
+    action: Action,
+    codeQualification: Action.Qualification.Code
+  ): Action {
+    return {
+      ...action,
+      qualification: {
+        code: codeQualification,
+        heures: 0
+      }
+    }
+  }
+
   @Injectable()
   export class Factory {
     constructor(

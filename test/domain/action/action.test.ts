@@ -561,4 +561,23 @@ describe('Action', () => {
       })
     })
   })
+  describe('qualifier', () => {
+    it("renvoie l'action qualifiée NON_SNP", () => {
+      // Given
+      const action: Action = uneAction()
+
+      // When
+      const actionQualifiee = Action.qualifier(
+        action,
+        Action.Qualification.Code.NON_SNP
+      )
+
+      const expectedAction: Action = uneAction({
+        qualification: { code: Action.Qualification.Code.NON_SNP, heures: 0 }
+      })
+
+      // Then
+      expect(actionQualifiee).to.deep.equal(expectedAction)
+    })
+  })
 })
