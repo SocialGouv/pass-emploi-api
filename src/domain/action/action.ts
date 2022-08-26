@@ -102,11 +102,18 @@ export namespace Action {
     return Boolean(action.qualification?.code)
   }
 
+  export function estTerminee(action: Action): boolean {
+    return action.statut === Statut.TERMINEE && Boolean(action.dateFinReelle)
+  }
+
   export function qualifier(
     action: Action,
     codeQualification: Action.Qualification.Code,
     dateFinReelle?: Date
   ): Result<Action> {
+    if (!estTerminee(action)) {
+      return failure(new MauvaiseCommandeError("L'action n'est pas terminée"))
+    }
     if (estQualifiee(action)) {
       return failure(new MauvaiseCommandeError('Action déjà qualifiée'))
     }

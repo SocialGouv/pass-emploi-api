@@ -608,7 +608,7 @@ describe('Action', () => {
       }
       expect(actionQualifiee).to.deep.equal(success(expectedAction))
     })
-    it("rejette quand l'action est déjà qualifée", () => {
+    it("rejette quand l'action est déjà qualifiée", () => {
       // Given
       const actionTerminee: Action = uneAction({
         dateFinReelle,
@@ -627,6 +627,22 @@ describe('Action', () => {
       // Then
       expect(result).to.deep.equal(
         failure(new MauvaiseCommandeError('Action déjà qualifiée'))
+      )
+    })
+    it("rejette quand l'action n'est pas terminée", () => {
+      // Given
+      const actionEnCours: Action = uneAction({
+        statut: Action.Statut.EN_COURS
+      })
+      // When
+      const result = Action.qualifier(
+        actionEnCours,
+        Action.Qualification.Code.SANTE
+      )
+
+      // Then
+      expect(result).to.deep.equal(
+        failure(new MauvaiseCommandeError("L'action n'est pas terminée"))
       )
     })
   })
