@@ -21,22 +21,25 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('QualifierActionCommandHandler', () => {
   let actionRepository: StubbedType<Action.Repository>
+  let actionMiloRepository: StubbedType<Action.Milo.Repository>
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
   let qualifierActionCommandHandler: QualifierActionCommandHandler
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     actionRepository = stubInterface(sandbox)
+    actionMiloRepository = stubInterface(sandbox)
     actionAuthorizer = stubClass(ActionAuthorizer)
     qualifierActionCommandHandler = new QualifierActionCommandHandler(
       actionRepository,
+      actionMiloRepository,
       actionAuthorizer
     )
   })
 
   describe('handle', () => {
     describe("Quand l'action existe", () => {
-      it('qualifie et sauvegarde une action terminée', async () => {
+      it('qualifie, sauvegarde une action terminée et save une SNP', async () => {
         // Given
         const idAction = '35399853-f224-4910-8d02-44fb1ac85606'
         const actionTerminee = uneAction({
@@ -64,6 +67,40 @@ describe('QualifierActionCommandHandler', () => {
         expect(actionRepository.save).to.have.been.calledWithExactly(
           actionQualifiee
         )
+        expect(actionMiloRepository.save).to.have.been.calledWithExactly(
+          actionQualifiee
+        )
+        expect(result).to.deep.equal(emptySuccess())
+      })
+      it('qualifie, sauvegarde une action terminée et ne save pas une NON SNP', async () => {
+        // Given
+        const idAction = '35399853-f224-4910-8d02-44fb1ac85606'
+        const actionTerminee = uneAction({
+          id: idAction,
+          statut: Action.Statut.TERMINEE,
+          dateFinReelle: uneDate()
+        })
+        const actionQualifiee: Action = {
+          ...actionTerminee,
+          qualification: {
+            code: Action.Qualification.Code.NON_SNP,
+            heures: 0
+          }
+        }
+        actionRepository.get.withArgs(idAction).resolves(actionTerminee)
+
+        // When
+        const command: QualifierActionCommand = {
+          idAction: idAction,
+          codeQualification: Action.Qualification.Code.NON_SNP
+        }
+        const result = await qualifierActionCommandHandler.handle(command)
+
+        // Then
+        expect(actionRepository.save).to.have.been.calledWithExactly(
+          actionQualifiee
+        )
+        expect(actionMiloRepository.save).not.to.have.been.called()
         expect(result).to.deep.equal(emptySuccess())
       })
       it("rejette quand la qualification n'est pas possible", async () => {
