@@ -32,6 +32,7 @@ import { isFailure } from '../../building-blocks/types/result'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import {
   AddCommentaireActionPayload,
+  QualifierActionPayload,
   UpdateStatutActionPayload
 } from './validation/actions.inputs'
 import {
@@ -40,6 +41,10 @@ import {
 } from '../../application/commands/add-commentaire-action.command.handler'
 import { handleFailure } from './failure.handler'
 import { GetCommentairesActionQueryHandler } from '../../application/queries/get-commentaires-action.query.handler.db'
+import {
+  QualifierActionCommand,
+  QualifierActionCommandHandler
+} from '../../application/commands/qualifier-action.command.handler'
 
 @Controller('actions')
 @ApiOAuth2([])
@@ -50,7 +55,8 @@ export class ActionsController {
     private readonly updateStatutActionCommandHandler: UpdateStatutActionCommandHandler,
     private readonly deleteActionCommandHandler: DeleteActionCommandHandler,
     private readonly addCommentaireActionCommandHandler: AddCommentaireActionCommandHandler,
-    private readonly getCommentairesActionQueryHandler: GetCommentairesActionQueryHandler
+    private readonly getCommentairesActionQueryHandler: GetCommentairesActionQueryHandler,
+    private readonly qualifierActionCommandHandler: QualifierActionCommandHandler
   ) {}
 
   @ApiOperation({
@@ -176,6 +182,35 @@ export class ActionsController {
     if (isFailure(result)) {
       throw handleFailure(result)
     }
+    return result.data
+  }
+
+  @ApiOperation({
+    summary: 'Ajoute un commentaire à une action',
+    description: 'Autorisé pour un jeune et son conseiller'
+  })
+  @Post(':idAction/qualifier')
+  async qualifierAction(
+    @Param('idAction', new ParseUUIDPipe()) idAction: string,
+    @Body() qualifierActionPayload: QualifierActionPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: QualifierActionCommand = {
+      idAction,
+      codeQualification: qualifierActionPayload.codeQualification,
+      dateFinReelle: qualifierActionPayload.dateFinReelle,
+      utilisateur
+    }
+
+    const result = await this.qualifierActionCommandHandler.execute(
+      command,
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
+
     return result.data
   }
 }

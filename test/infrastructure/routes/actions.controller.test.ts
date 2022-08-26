@@ -30,11 +30,16 @@ import { CommentaireActionQueryModel } from '../../../src/application/queries/qu
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { Action } from 'src/domain/action/action'
 import { uneDate } from '../../fixtures/date.fixture'
+import {
+  QualifierActionCommand,
+  QualifierActionCommandHandler
+} from '../../../src/application/commands/qualifier-action.command.handler'
 
 let getDetailActionQueryHandler: StubbedClass<GetDetailActionQueryHandler>
 let deleteActionCommandHandler: StubbedClass<DeleteActionCommandHandler>
 let addCommentaireActionCommandHandler: StubbedClass<AddCommentaireActionCommandHandler>
 let getCommentaireActionCommandHandler: StubbedClass<GetCommentairesActionQueryHandler>
+let qualifierActionCommandHandler: StubbedClass<QualifierActionCommandHandler>
 
 describe('ActionsController', () => {
   let app: INestApplication
@@ -47,6 +52,7 @@ describe('ActionsController', () => {
     getCommentaireActionCommandHandler = stubClass(
       GetCommentairesActionQueryHandler
     )
+    qualifierActionCommandHandler = stubClass(QualifierActionCommandHandler)
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(GetDetailActionQueryHandler)
@@ -57,6 +63,8 @@ describe('ActionsController', () => {
       .useValue(addCommentaireActionCommandHandler)
       .overrideProvider(GetCommentairesActionQueryHandler)
       .useValue(getCommentaireActionCommandHandler)
+      .overrideProvider(QualifierActionCommandHandler)
+      .useValue(qualifierActionCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -258,5 +266,64 @@ describe('ActionsController', () => {
 
       ensureUserAuthenticationFailsIfInvalid('get', '/actions/123/commentaires')
     })
+  })
+
+  describe('POST /actions/:idAction/qualifier', () => {
+    it("qualifie l'action", async () => {
+      // Given
+      const utilisateur = unUtilisateurDecode()
+
+      const command: QualifierActionCommand = {
+        idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
+        utilisateur,
+        dateFinReelle: uneDate(),
+        codeQualification: Action.Qualification.Code.EMPLOI
+      }
+
+      qualifierActionCommandHandler.execute
+        .withArgs(command, utilisateur)
+        .resolves(emptySuccess())
+
+      // When
+      await request(app.getHttpServer())
+        .post(`/actions/${command.idAction}/qualifier`)
+        .send({ ...command, dateFinReelle: uneDate().toISOString() })
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.CREATED)
+
+      expect(
+        qualifierActionCommandHandler.execute
+      ).to.have.been.calledWithExactly(command, utilisateur)
+    })
+    it("retourne une erreur non autorisée pour un utilisateur n'ayant pas les droits", async () => {
+      // Given
+      const utilisateur = unUtilisateurDecode()
+
+      const command: QualifierActionCommand = {
+        idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
+        utilisateur,
+        dateFinReelle: uneDate(),
+        codeQualification: Action.Qualification.Code.EMPLOI
+      }
+
+      qualifierActionCommandHandler.execute
+        .withArgs(command, utilisateur)
+        .resolves(failure(new DroitsInsuffisants()))
+
+      // When
+      await request(app.getHttpServer())
+        .post(`/actions/${command.idAction}/qualifier`)
+        .send({ ...command, dateFinReelle: uneDate().toISOString() })
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.FORBIDDEN)
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('post', '/actions/123/qualifier')
   })
 })

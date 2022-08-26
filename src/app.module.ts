@@ -79,6 +79,7 @@ import { WorkerService } from './application/worker.service.db'
 import configuration from './config/configuration'
 import {
   Action,
+  ActionMiloRepositoryToken,
   ActionsRepositoryToken,
   CommentaireActionRepositoryToken
 } from './domain/action/action'
@@ -220,6 +221,8 @@ import { HandleJobNotifierRendezVousPECommandHandler } from './application/comma
 import { GetJeuneHomeSuiviQueryHandler } from './application/queries/get-jeune-home-suivi.query.db'
 import { JeunePoleEmploiSqlRepository } from './infrastructure/repositories/jeune/jeune-pole-emploi-sql.repository.db'
 import { GetTypesQualificationsQueryHandler } from './application/queries/get-types-qualifications.query.handler'
+import { ActionMiloHttpRepository } from './infrastructure/repositories/action/action-milo-http-sql.repository.db'
+import { QualifierActionCommandHandler } from './application/commands/qualifier-action.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -390,6 +393,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       provide: JeunePoleEmploiRepositoryToken,
       useClass: JeunePoleEmploiSqlRepository
     },
+    {
+      provide: ActionMiloRepositoryToken,
+      useClass: ActionMiloHttpRepository
+    },
     ...databaseProviders
   ],
   exports: [...databaseProviders]
@@ -511,7 +518,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetJeuneHomeSuiviQueryHandler,
     GetRendezVousConseillerPaginesQueryHandler,
     HandleJobNotifierRendezVousPECommandHandler,
-    GetTypesQualificationsQueryHandler
+    GetTypesQualificationsQueryHandler,
+    QualifierActionCommandHandler
   ]
 }
 

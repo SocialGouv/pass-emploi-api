@@ -14,7 +14,7 @@ import { DossierMiloDto } from './dto/milo.dto'
 export class MiloHttpSqlRepository implements Milo.Repository {
   private logger: Logger
   private readonly apiUrl: string
-  private readonly apiKeyRecupererDossier: string
+  private readonly apiKeyDossier: string
   private readonly apiKeyCreerJeune: string
 
   constructor(
@@ -24,8 +24,7 @@ export class MiloHttpSqlRepository implements Milo.Repository {
   ) {
     this.logger = new Logger('MiloHttpRepository')
     this.apiUrl = this.configService.get('milo').url
-    this.apiKeyRecupererDossier =
-      this.configService.get('milo').apiKeyRecupererDossier
+    this.apiKeyDossier = this.configService.get('milo').apiKeyDossier
     this.apiKeyCreerJeune = this.configService.get('milo').apiKeyCreerJeune
   }
 
@@ -36,7 +35,7 @@ export class MiloHttpSqlRepository implements Milo.Repository {
         this.httpService.get<DossierMiloDto>(
           `${this.apiUrl}/dossiers/${idDossier}`,
           {
-            headers: { 'X-Gravitee-Api-Key': `${this.apiKeyRecupererDossier}` }
+            headers: { 'X-Gravitee-Api-Key': `${this.apiKeyDossier}` }
           }
         )
       )

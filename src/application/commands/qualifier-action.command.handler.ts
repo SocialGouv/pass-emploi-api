@@ -18,6 +18,7 @@ import {
 } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
 import { ActionAuthorizer } from '../authorizers/authorize-action'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 
 export interface QualifierActionCommand extends Command {
   idAction: string
@@ -36,40 +37,61 @@ export class QualifierActionCommandHandler extends CommandHandler<
     private readonly actionRepository: Action.Repository,
     @Inject(ActionMiloRepositoryToken)
     private readonly actionMiloRepository: Action.Milo.Repository,
-    private readonly actionAuthorizer: ActionAuthorizer
+    private readonly actionAuthorizer: ActionAuthorizer,
+    @Inject(JeunesRepositoryToken)
+    private readonly jeuneRepository: Jeune.Repository
   ) {
     super('QualifierActionCommandHandler')
   }
 
-  async handle(command: QualifierActionCommand): Promise<Result<void>> {
+  async handle(command: QualifierActionCommand): Promise<Result> {
     const action = await this.actionRepository.get(command.idAction)
     if (!action) {
       return failure(new NonTrouveError('Action', command.idAction))
     }
 
-    const actionQualifiee = Action.qualifier(
+    const qualifierActionResult = Action.qualifier(
       action,
       command.codeQualification,
       command.dateFinReelle
     )
 
-    if (isFailure(actionQualifiee)) {
-      return actionQualifiee
+    if (isFailure(qualifierActionResult)) {
+      return qualifierActionResult
     }
 
-    if (
-      actionQualifiee.data.qualification.code !==
+    const estUneSituationNonProfessionnelle =
+      qualifierActionResult.data.qualification.code !==
       Action.Qualification.Code.NON_SNP
-    ) {
-      const snpCree = await this.actionMiloRepository.save(
-        actionQualifiee.data,
+
+    if (estUneSituationNonProfessionnelle) {
+      const jeune = await this.jeuneRepository.get(
+        qualifierActionResult.data.idJeune
+      )
+      if (!jeune) {
+        return failure(
+          new NonTrouveError('Jeune', qualifierActionResult.data.idJeune)
+        )
+      }
+
+      const creerActionMiloResult = Action.Milo.creer(
+        qualifierActionResult.data,
+        jeune,
         command.utilisateur
       )
-      if (isFailure(snpCree)) {
-        return snpCree
+
+      if (isFailure(creerActionMiloResult)) {
+        return creerActionMiloResult
+      }
+
+      const creerSNPResult = await this.actionMiloRepository.save(
+        creerActionMiloResult.data
+      )
+      if (isFailure(creerSNPResult)) {
+        return creerSNPResult
       }
     }
-    await this.actionRepository.save(actionQualifiee.data)
+    await this.actionRepository.save(qualifierActionResult.data)
 
     return emptySuccess()
   }

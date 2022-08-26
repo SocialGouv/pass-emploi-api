@@ -54,7 +54,7 @@ export default () => {
     },
     milo: {
       url: process.env.MILO_API_URL,
-      apiKeyRecupererDossier: process.env.MILO_DOSSIER_API_KEY,
+      apiKeyDossier: process.env.MILO_DOSSIER_API_KEY,
       apiKeyCreerJeune: process.env.MILO_JEUNE_API_KEY,
       urlWeb: process.env.MILO_WEB_URL
     },

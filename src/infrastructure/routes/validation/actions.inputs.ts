@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
 import {
   IsBoolean,
@@ -23,6 +23,19 @@ export class AddCommentaireActionPayload {
   @IsString()
   @IsNotEmpty()
   commentaire: string
+}
+
+export class QualifierActionPayload {
+  @ApiProperty({ enum: Action.Qualification.Code })
+  @IsString()
+  @IsEnum(Action.Qualification.Code)
+  codeQualification: Action.Qualification.Code
+
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @IsDate()
+  @IsOptional()
+  @Transform(({ value }) => new Date(value))
+  dateFinReelle: Date
 }
 
 export class CreateActionPayload {

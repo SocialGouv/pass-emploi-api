@@ -15,28 +15,41 @@ import {
   failure
 } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action/action'
-import { uneAction } from '../../fixtures/action.fixture'
+import { uneAction, uneActionTerminee } from '../../fixtures/action.fixture'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { Jeune } from '../../../src/domain/jeune/jeune'
+import { unJeune } from '../../fixtures/jeune.fixture'
 
 describe('QualifierActionCommandHandler', () => {
   let actionRepository: StubbedType<Action.Repository>
   let actionMiloRepository: StubbedType<Action.Milo.Repository>
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
+  let jeuneRepository: StubbedType<Jeune.Repository>
   let qualifierActionCommandHandler: QualifierActionCommandHandler
+
+  const idAction = '35399853-f224-4910-8d02-44fb1ac85606'
+  const utilisateurConseiller = unUtilisateurConseiller({ username: 'j.doe' })
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     actionRepository = stubInterface(sandbox)
     actionMiloRepository = stubInterface(sandbox)
     actionAuthorizer = stubClass(ActionAuthorizer)
+    jeuneRepository = stubInterface(sandbox)
+
+    jeuneRepository.get
+      .withArgs('ABCDE')
+      .resolves(unJeune({ idPartenaire: 'idDossier' }))
+
     qualifierActionCommandHandler = new QualifierActionCommandHandler(
       actionRepository,
       actionMiloRepository,
-      actionAuthorizer
+      actionAuthorizer,
+      jeuneRepository
     )
   })
 
@@ -46,18 +59,20 @@ describe('QualifierActionCommandHandler', () => {
         describe('quand la création de SNP a fonctionné', () => {
           it('qualifie, sauvegarde une action terminée, et crée la SNP', async () => {
             // Given
-            const idAction = '35399853-f224-4910-8d02-44fb1ac85606'
-            const actionTerminee = uneAction({
-              id: idAction,
-              statut: Action.Statut.TERMINEE,
-              dateFinReelle: uneDate()
+            const actionTerminee: Action.Terminee = uneActionTerminee({
+              id: idAction
             })
-            const actionQualifiee: Action = {
+            const actionQualifiee: Action.Qualifiee = {
               ...actionTerminee,
               qualification: {
                 code: Action.Qualification.Code.SANTE,
                 heures: 2
               }
+            }
+            const actionMilo: Action.Milo = {
+              ...actionQualifiee,
+              idDossier: 'idDossier',
+              loginConseiller: 'j.doe'
             }
             actionRepository.get.withArgs(idAction).resolves(actionTerminee)
             actionMiloRepository.save.resolves(emptySuccess())
@@ -65,7 +80,7 @@ describe('QualifierActionCommandHandler', () => {
             // When
             const command: QualifierActionCommand = {
               idAction: idAction,
-              utilisateur: unUtilisateurConseiller(),
+              utilisateur: utilisateurConseiller,
               codeQualification: Action.Qualification.Code.SANTE
             }
             const result = await qualifierActionCommandHandler.handle(command)
@@ -75,8 +90,7 @@ describe('QualifierActionCommandHandler', () => {
               actionQualifiee
             )
             expect(actionMiloRepository.save).to.have.been.calledWithExactly(
-              actionQualifiee,
-              unUtilisateurConseiller()
+              actionMilo
             )
             expect(result).to.deep.equal(emptySuccess())
           })
@@ -84,7 +98,6 @@ describe('QualifierActionCommandHandler', () => {
         describe('quand la création de SNP a échoué', () => {
           it("ne sauvegarde pas l'action et rejette", async () => {
             // Given
-            const idAction = '35399853-f224-4910-8d02-44fb1ac85606'
             const actionTerminee = uneAction({
               id: idAction,
               statut: Action.Statut.TERMINEE,
@@ -98,7 +111,7 @@ describe('QualifierActionCommandHandler', () => {
             // When
             const command: QualifierActionCommand = {
               idAction: idAction,
-              utilisateur: unUtilisateurConseiller(),
+              utilisateur: utilisateurConseiller,
               codeQualification: Action.Qualification.Code.SANTE
             }
             const result = await qualifierActionCommandHandler.handle(command)
@@ -111,7 +124,6 @@ describe('QualifierActionCommandHandler', () => {
       describe("quand ce n'est pas une SNP", () => {
         it('qualifie, sauvegarde une action terminée', async () => {
           // Given
-          const idAction = '35399853-f224-4910-8d02-44fb1ac85606'
           const actionTerminee = uneAction({
             id: idAction,
             statut: Action.Statut.TERMINEE,
@@ -129,7 +141,7 @@ describe('QualifierActionCommandHandler', () => {
           // When
           const command: QualifierActionCommand = {
             idAction: idAction,
-            utilisateur: unUtilisateurConseiller(),
+            utilisateur: utilisateurConseiller,
             codeQualification: Action.Qualification.Code.NON_SNP
           }
           const result = await qualifierActionCommandHandler.handle(command)
@@ -144,7 +156,6 @@ describe('QualifierActionCommandHandler', () => {
       })
       it("rejette quand la qualification n'est pas possible", async () => {
         // Given
-        const idAction = '35399853-f224-4910-8d02-44fb1ac85606'
         const actionEnCours = uneAction({
           id: idAction,
           statut: Action.Statut.EN_COURS
@@ -154,7 +165,7 @@ describe('QualifierActionCommandHandler', () => {
         // When
         const command: QualifierActionCommand = {
           idAction: idAction,
-          utilisateur: unUtilisateurConseiller(),
+          utilisateur: utilisateurConseiller,
           codeQualification: Action.Qualification.Code.SANTE
         }
         const result = await qualifierActionCommandHandler.handle(command)
@@ -174,7 +185,7 @@ describe('QualifierActionCommandHandler', () => {
         // When
         const result = await qualifierActionCommandHandler.handle({
           idAction,
-          utilisateur: unUtilisateurConseiller(),
+          utilisateur: utilisateurConseiller,
           codeQualification: Action.Qualification.Code.CITOYENNETE
         })
 
@@ -191,11 +202,11 @@ describe('QualifierActionCommandHandler', () => {
       // Given
       const command: QualifierActionCommand = {
         idAction: 'idAction',
-        utilisateur: unUtilisateurConseiller(),
+        utilisateur: utilisateurConseiller,
         codeQualification: Action.Qualification.Code.SANTE
       }
 
-      const utilisateur = unUtilisateurConseiller()
+      const utilisateur = utilisateurConseiller
 
       // When
       await qualifierActionCommandHandler.authorize(command, utilisateur)
