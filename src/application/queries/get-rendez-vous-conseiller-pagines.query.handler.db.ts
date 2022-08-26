@@ -11,7 +11,7 @@ import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { fromSqlToRendezVousConseillerQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { RendezVousConseillerQueryModel } from './query-models/rendez-vous.query-model'
 
-const NOMBRE_RDV_MAX = 100
+const NOMBRE_RDV_MAX = 200
 
 export enum TriRendezVous {
   DATE_CROISSANTE = 'date_croissante',
