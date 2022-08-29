@@ -37,6 +37,7 @@ export interface Action {
   dateFinReelle?: Date
   rappel: boolean
   qualification?: Action.Qualification
+  commentaires?: Action.Commentaire[]
 }
 
 export namespace Action {
@@ -62,7 +63,10 @@ export namespace Action {
   export interface Repository {
     save(action: Action): Promise<void>
 
-    get(id: Action.Id): Promise<Action | undefined>
+    get(
+      id: Action.Id,
+      attributs?: { avecCommentaires: boolean }
+    ): Promise<Action | undefined>
 
     getConseillerEtJeune(
       id: Action.Id
