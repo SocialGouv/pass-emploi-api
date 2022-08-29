@@ -4,7 +4,7 @@ import { ActionSqlRepository } from '../../../src/infrastructure/repositories/ac
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
-import { uneAction } from '../../fixtures/action.fixture'
+import { unCommentaire, uneAction } from '../../fixtures/action.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
@@ -14,6 +14,7 @@ import { DateService } from 'src/utils/date-service'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
 import { uneDatetime } from '../../fixtures/date.fixture'
+import { CommentaireSqlModel } from '../../../src/infrastructure/sequelize/models/commentaire.sql-model'
 
 const nowAtMidnight = uneDatetime.startOf('day')
 
@@ -93,8 +94,8 @@ describe('ActionSqlRepository', () => {
     })
   })
 
-  describe('.get(id)', () => {
-    it("récupère l'action", async () => {
+  describe('.get(id, attributs)', () => {
+    it("récupère l'action sans les commentaires", async () => {
       // Given
       const idAction = 'c723bfa8-0ac4-4d29-b0b6-68bdb3dec21c'
       const actionDto = uneActionDto({
@@ -136,6 +137,53 @@ describe('ActionSqlRepository', () => {
       expect(actual).to.deep.equal(attendu)
     })
 
+    it("récupère l'action avec les commentaires", async () => {
+      // Given
+      const idAction = 'c723bfa8-0ac4-4d29-b0b6-68bdb3dec21c'
+      const actionDto = uneActionDto({
+        id: idAction,
+        statut: Action.Statut.EN_COURS,
+        idJeune: jeune.id,
+        dateFinReelle: new Date('2021-11-10T08:03:30.000Z'),
+        codeQualification: Action.Qualification.Code.SANTE,
+        heuresQualifiees: 2
+      })
+      await ActionSqlModel.creer(actionDto)
+
+      const commentaireDto = unCommentaire({ idAction })
+      await CommentaireSqlModel.create(commentaireDto)
+
+      // When
+      const actual = await actionSqlRepository.get(idAction, {
+        avecCommentaires: true
+      })
+
+      // Then
+      const attendu: Action = {
+        id: 'c723bfa8-0ac4-4d29-b0b6-68bdb3dec21c',
+        statut: Action.Statut.EN_COURS,
+        idJeune: 'ABCDE',
+        description: "Commentaire de l'action",
+        contenu: "Contenu de l'action",
+        dateCreation: new Date('2021-11-11T08:03:30.000Z'),
+        dateDerniereActualisation: new Date('2021-11-11T08:03:30.000Z'),
+        createur: {
+          id: '1',
+          nom: 'Tavernier',
+          prenom: 'Nils',
+          type: Action.TypeCreateur.CONSEILLER
+        },
+        dateEcheance: new Date('2021-11-11T08:03:30.000Z'),
+        dateFinReelle: new Date('2021-11-10T08:03:30.000Z'),
+        rappel: true,
+        qualification: {
+          code: Action.Qualification.Code.SANTE,
+          heures: 2
+        },
+        commentaires: [commentaireDto]
+      }
+      expect(actual).to.deep.equal(attendu)
+    })
     describe("Quand l'action n'existe pas", () => {
       it('renvoie undefined', async () => {
         // When
@@ -248,7 +296,7 @@ describe('ActionSqlRepository', () => {
   })
 
   describe('.delete(id)', () => {
-    it("supprime l'action", async () => {
+    it("supprime l'action et les commentaires associés", async () => {
       // Given
       const idAction = 'c723bfa8-0ac4-4d29-b0b6-68bdb3dec21c'
       const actionDto = uneActionDto({
@@ -258,12 +306,21 @@ describe('ActionSqlRepository', () => {
       })
       await ActionSqlModel.creer(actionDto)
 
+      const idCommentaire = '1603e22a-27b4-11ed-a261-0242ac120002'
+      const commentaireDto = unCommentaire({ id: idCommentaire, idAction })
+      await CommentaireSqlModel.create(commentaireDto)
+
       // When
       await actionSqlRepository.delete(idAction)
 
       // Then
-      const actual = await ActionSqlModel.findByPk(idAction)
-      expect(actual).to.be.equal(null)
+      const actualAction = await ActionSqlModel.findByPk(idAction)
+      expect(actualAction).to.be.equal(null)
+
+      const actualCommentaire = await CommentaireSqlModel.findByPk(
+        idCommentaire
+      )
+      expect(actualCommentaire).to.be.equal(null)
     })
 
     describe("Quand l'action n'existe pas", () => {

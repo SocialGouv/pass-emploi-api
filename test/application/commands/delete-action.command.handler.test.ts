@@ -7,13 +7,16 @@ import {
   DeleteActionCommand,
   DeleteActionCommandHandler
 } from '../../../src/application/commands/delete-action.command.handler'
-import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import {
+  MauvaiseCommandeError,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure
 } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action/action'
-import { uneAction } from '../../fixtures/action.fixture'
+import { unCommentaire, uneAction } from '../../fixtures/action.fixture'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
@@ -40,13 +43,33 @@ describe('DeleteActionCommandHandler', () => {
 
   describe('handle', () => {
     describe("Quand l'action existe", () => {
-      it("supprime l'action", async () => {
+      it("renvoie une erreur quand l'action a un commentaire", async () => {
+        // Given
+        const actionAvecCommentaire = uneAction({
+          commentaires: [unCommentaire()]
+        })
+        actionRepository.get.withArgs(action.id).resolves(actionAvecCommentaire)
+        const command: DeleteActionCommand = {
+          idAction: actionAvecCommentaire.id
+        }
+        // When
+        const result = await deleteActionCommandHandler.handle(command)
+
+        // Then
+        expect(result).to.deep.equal(
+          failure(
+            new MauvaiseCommandeError(
+              'Impossible de supprimer une action avec un commentaire.'
+            )
+          )
+        )
+      })
+      it("supprime l'action sans commentaire", async () => {
         // Given
         actionRepository.get.withArgs(action.id).resolves(action)
         const command: DeleteActionCommand = {
           idAction: action.id
         }
-
         // When
         const result = await deleteActionCommandHandler.handle(command)
 

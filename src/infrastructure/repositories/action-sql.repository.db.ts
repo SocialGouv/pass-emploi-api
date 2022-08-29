@@ -6,6 +6,7 @@ import { AsSql } from '../sequelize/types'
 import { Op } from 'sequelize'
 import { DateService } from '../../utils/date-service'
 import { buildQualification } from './mappers/actions.mappers'
+import { CommentaireSqlModel } from '../sequelize/models/commentaire.sql-model'
 
 @Injectable()
 export class ActionSqlRepository implements Action.Repository {
@@ -17,8 +18,23 @@ export class ActionSqlRepository implements Action.Repository {
     )
   }
 
-  async get(id: Action.Id): Promise<Action | undefined> {
-    const sqlModel = await ActionSqlModel.findByPk(id)
+  async get(
+    id: Action.Id,
+    attributs?: { avecCommentaires: boolean }
+  ): Promise<Action | undefined> {
+    let options
+    if (attributs) {
+      options = attributs.avecCommentaires
+        ? {
+            include: [
+              {
+                model: CommentaireSqlModel
+              }
+            ]
+          }
+        : {}
+    }
+    const sqlModel = await ActionSqlModel.findByPk(id, options)
     if (!sqlModel) return undefined
     return ActionSqlRepository.actionFromSqlModel(sqlModel)
   }
@@ -70,7 +86,7 @@ export class ActionSqlRepository implements Action.Repository {
   }
 
   static actionFromSqlModel(sqlModel: ActionSqlModel): Action {
-    return {
+    const action: Action = {
       id: sqlModel.id,
       statut: sqlModel.statut,
       idJeune: sqlModel.idJeune,
@@ -89,6 +105,12 @@ export class ActionSqlRepository implements Action.Repository {
       rappel: sqlModel.rappel,
       qualification: buildQualification(sqlModel)
     }
+    if (sqlModel.commentaires) {
+      action.commentaires = sqlModel.commentaires.map(commentaireSql =>
+        commentaireSql.get()
+      )
+    }
+    return action
   }
 
   static sqlModelFromAction(action: Action): AsSql<ActionDto> {

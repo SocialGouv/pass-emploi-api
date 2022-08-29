@@ -67,7 +67,7 @@ export const unCommentaire = (
   args: Partial<Action.Commentaire> = {}
 ): Action.Commentaire => {
   const defaults: Action.Commentaire = {
-    id: 'poi-id-commentaire',
+    id: '1603e22a-27b4-11ed-a261-0242ac120002',
     idAction: '721e2108-60f5-4a75-b102-04fe6a40e899',
     date: uneDate(),
     createur: {

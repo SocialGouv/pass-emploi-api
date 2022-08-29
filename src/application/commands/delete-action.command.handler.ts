@@ -2,7 +2,10 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import {
+  MauvaiseCommandeError,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -31,10 +34,21 @@ export class DeleteActionCommandHandler extends CommandHandler<
   }
 
   async handle(command: DeleteActionCommand): Promise<Result<void>> {
-    const action = await this.actionRepository.get(command.idAction)
+    const action = await this.actionRepository.get(command.idAction, {
+      avecCommentaires: true
+    })
     if (!action) {
       return failure(new NonTrouveError('Action', command.idAction))
     }
+
+    if (action.commentaires?.length) {
+      return failure(
+        new MauvaiseCommandeError(
+          'Impossible de supprimer une action avec un commentaire.'
+        )
+      )
+    }
+
     await this.actionRepository.delete(command.idAction)
     this.logger.log(`L'action ${command.idAction} a été supprimée`)
 
