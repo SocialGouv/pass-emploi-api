@@ -7434,10 +7434,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"luxon@npm:3.0.2":
-  version: 3.0.2
-  resolution: "luxon@npm:3.0.2"
-  checksum: 39a29b225cb951530cfec0a18b336841c427edd29af0a26649179b892a5bb9c9134012c0d985a3a3a7667612c84db0a54fa353ca152c80033d5acb78a7ba80da
+"luxon@npm:3.0.3":
+  version: 3.0.3
+  resolution: "luxon@npm:3.0.3"
+  checksum: 67d143f102f520761c4202086579a5cf30b230ea299da27cacb31e9f9d372cadef90f14cbe7e2621b70825b267fe00128b8176ed8b7172b48f77a403a662d5aa
   languageName: node
   linkType: hard
 
@@ -8041,7 +8041,7 @@ __metadata:
     joi: ^17.6.0
     jose: ^4.8.3
     lint-staged: ^13.0.3
-    luxon: 3.0.2
+    luxon: 3.0.3
     mocha: ^10.0.0
     nestjs-pino: 3.1.1
     nock: ^13.2.9
