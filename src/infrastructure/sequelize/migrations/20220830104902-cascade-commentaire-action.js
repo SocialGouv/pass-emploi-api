@@ -2,24 +2,43 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.changeColumn('commentaire_action', 'id_action', {
-      type: Sequelize.UUID,
-      references: {
-        model: 'action',
-        key: 'id'
-      },
-      onDelete: 'CASCADE'
+    await queryInterface.sequelize.transaction(async transaction => {
+      await queryInterface.removeConstraint(
+        'commentaire_action',
+        'commentaire_action_id_action_fkey',
+        { transaction }
+      )
+      await queryInterface.addConstraint('commentaire_action', {
+        type: 'foreign key',
+        fields: ['id_action'],
+        name: 'commentaire_action_id_action_fkey',
+        references: {
+          table: 'action',
+          field: 'id'
+        },
+        onDelete: 'CASCADE',
+        transaction
+      })
     })
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.changeColumn('commentaire_action', 'id_action', {
-      type: Sequelize.UUID,
-      references: {
-        model: 'action',
-        key: 'id'
-      },
-      onDelete: 'NO ACTION'
+    await queryInterface.sequelize.transaction(async transaction => {
+      await queryInterface.removeConstraint(
+        'commentaire_action',
+        'commentaire_action_id_action_fkey',
+        { transaction }
+      )
+      await queryInterface.addConstraint('commentaire_action', {
+        type: 'foreign key',
+        fields: ['id_action'],
+        name: 'commentaire_action_id_action_fkey',
+        references: {
+          table: 'action',
+          field: 'id'
+        },
+        transaction
+      })
     })
   }
 }

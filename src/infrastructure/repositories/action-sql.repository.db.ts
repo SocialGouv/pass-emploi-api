@@ -22,9 +22,9 @@ export class ActionSqlRepository implements Action.Repository {
     id: Action.Id,
     attributs?: { avecCommentaires: boolean }
   ): Promise<Action | undefined> {
-    let options
-    if (attributs) {
-      options = attributs.avecCommentaires
+    const sqlModel = await ActionSqlModel.findByPk(
+      id,
+      attributs?.avecCommentaires
         ? {
             include: [
               {
@@ -33,8 +33,7 @@ export class ActionSqlRepository implements Action.Repository {
             ]
           }
         : {}
-    }
-    const sqlModel = await ActionSqlModel.findByPk(id, options)
+    )
     if (!sqlModel) return undefined
     return ActionSqlRepository.actionFromSqlModel(sqlModel)
   }

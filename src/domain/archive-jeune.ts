@@ -68,11 +68,16 @@ export namespace ArchiveJeune {
   export interface Action {
     statut: string
     contenu: string
-    commentaire: string
+    description: string
     dateCreation: Date
     dateActualisation: Date
     dateEcheance?: Date
     creePar: 'JEUNE' | 'CONSEILLER'
+    commentaires: Array<{
+      date: Date
+      message: string
+      creePar: 'JEUNE' | 'CONSEILLER'
+    }>
   }
 
   export interface Message {
