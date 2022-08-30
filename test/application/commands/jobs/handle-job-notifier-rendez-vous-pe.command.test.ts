@@ -1,7 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
-import { DatabaseForTesting } from 'test/utils/database-for-testing'
 import {
   HandleJobNotifierRendezVousPECommandHandler,
   Stats
@@ -34,7 +33,6 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
   }
 
   beforeEach(async () => {
-    DatabaseForTesting.prepare()
     sandbox = createSandbox()
     poleEmploiClient = stubClass(PoleEmploiClient)
     dateService = stubClass(DateService)

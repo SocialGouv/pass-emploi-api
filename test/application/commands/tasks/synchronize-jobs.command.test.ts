@@ -1,6 +1,5 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { DatabaseForTesting } from 'test/utils/database-for-testing'
 import { SynchronizeJobsCommandHandler } from '../../../../src/application/commands/tasks/synchronize-jobs.command'
 import {
   Planificateur,
@@ -14,7 +13,6 @@ import { uneAction } from '../../../fixtures/action.fixture'
 import { emptySuccess } from '../../../../src/building-blocks/types/result'
 
 describe('SynchronizeJobsCommandHandler', () => {
-  DatabaseForTesting.prepare()
   let synchronizeJobsCommandHandler: SynchronizeJobsCommandHandler
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let actionRepository: StubbedType<Action.Repository>
