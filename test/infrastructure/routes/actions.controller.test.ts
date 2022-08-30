@@ -146,15 +146,10 @@ describe('ActionsController', () => {
         )
 
         // When - Then
-        const actionJson = {
-          code: 'NON_TROUVE',
-          message: 'Action 721e2108-60f5-4a75-b102-04fe6a40e899 non trouvé(e)'
-        }
         await request(app.getHttpServer())
           .delete(`/actions/${idAction}`)
           .set('authorization', unHeaderAuthorization())
           .expect(HttpStatus.NOT_FOUND)
-          .expect(actionJson)
       })
 
       it("renvoie un code 404 (Not Found) si l'action possède un commentaire", async () => {
@@ -168,15 +163,10 @@ describe('ActionsController', () => {
         )
 
         // When - Then
-        const actionJson = {
-          code: 'MAUVAISE_COMMANDE',
-          message: 'Impossible de supprimer une action avec un commentaire.'
-        }
         await request(app.getHttpServer())
           .delete(`/actions/${idAction}`)
           .set('authorization', unHeaderAuthorization())
-          .expect(HttpStatus.NOT_FOUND)
-          .expect(actionJson)
+          .expect(HttpStatus.BAD_REQUEST)
       })
 
       ensureUserAuthenticationFailsIfInvalid('delete', '/actions/123')
