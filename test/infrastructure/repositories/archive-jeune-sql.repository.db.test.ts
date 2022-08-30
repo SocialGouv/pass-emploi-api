@@ -34,6 +34,8 @@ import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { expect, stubClass } from '../../utils'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { unCommentaire } from '../../fixtures/action.fixture'
+import { CommentaireSqlModel } from '../../../src/infrastructure/sequelize/models/commentaire.sql-model'
 
 describe('ArchiveJeuneSqlRepository', () => {
   const database = DatabaseForTesting.prepare()
@@ -81,12 +83,16 @@ describe('ArchiveJeuneSqlRepository', () => {
       }
       await TransfertConseillerSqlModel.creer(unTransfertDto)
 
+      const idAction = 'ac4f4b46-672b-4155-9fad-fa4746740e9e'
       const actionDto = uneActionDto({
-        id: 'ac4f4b46-672b-4155-9fad-fa4746740e9e',
+        id: idAction,
         statut: Action.Statut.EN_COURS,
         idJeune: jeuneDto.id
       })
       await ActionSqlModel.creer(actionDto)
+
+      const commentaireDto = unCommentaire({ idAction })
+      await CommentaireSqlModel.create(commentaireDto)
 
       const unRendezVous = unRendezVousDto({
         id: '6c242fa0-804f-11ec-a8a3-0242ac120002'
@@ -178,13 +184,20 @@ describe('ArchiveJeuneSqlRepository', () => {
       // Then
       expect(archiveJeuneSql!.donnees.actions).to.deep.equal([
         {
-          commentaire: "Commentaire de l'action",
+          description: "Description de l'action",
           contenu: "Contenu de l'action",
           creePar: 'CONSEILLER',
           dateActualisation: '2021-11-11T08:03:30.000Z',
           dateCreation: '2021-11-11T08:03:30.000Z',
           dateEcheance: '2021-11-11T08:03:30.000Z',
-          statut: 'in_progress'
+          statut: 'in_progress',
+          commentaires: [
+            {
+              date: unCommentaire().date.toISOString(),
+              message: unCommentaire().message,
+              creePar: 'CONSEILLER'
+            }
+          ]
         }
       ])
     })

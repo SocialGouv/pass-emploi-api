@@ -79,7 +79,7 @@ export function uneActionQueryModelSansJeune(
   args: Partial<ActionQueryModel> = {}
 ): ActionQueryModel {
   const defaults: ActionQueryModel = {
-    comment: "Commentaire de l'action",
+    comment: "Description de l'action",
     content: "Contenu de l'action",
     creationDate: 'Thu, 11 Nov 2021 08:03:30 UTC',
     creator: 'Nils Tavernier',

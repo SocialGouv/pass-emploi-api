@@ -16,6 +16,8 @@ import { toOffreEmploi } from './mappers/offres-emploi.mappers'
 import { fromSqlToOffreImmersion } from './mappers/offres-immersion.mappers'
 import { fromSqlToRecherche } from './mappers/recherches.mappers'
 import { fromSqlToOffreServiceCivique } from './mappers/service-civique.mapper'
+import { Action } from '../../domain/action/action'
+import { CommentaireSqlModel } from '../sequelize/models/commentaire.sql-model'
 
 @Injectable()
 export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
@@ -101,6 +103,11 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
       }
     })
     const actions = await ActionSqlModel.findAll({
+      include: [
+        {
+          model: CommentaireSqlModel
+        }
+      ],
       where: { idJeune }
     })
     const favorisOffreEmploi = await FavoriOffreEmploiSqlModel.findAll({
@@ -193,15 +200,27 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
     actions: ActionSqlModel[],
     metadonnes: ArchiveJeune.Metadonnees
   ): ArchiveJeune.Action[] {
-    return actions.map(actionSql => ({
-      commentaire: actionSql.description || '',
-      contenu: actionSql.contenu || '',
-      statut: actionSql.statut || '',
-      dateCreation: actionSql.dateCreation,
-      creePar:
-        actionSql.idCreateur === metadonnes.idJeune ? 'JEUNE' : 'CONSEILLER',
-      dateActualisation: actionSql.dateDerniereActualisation,
-      dateEcheance: actionSql.dateEcheance ?? undefined
-    }))
+    return actions.map(
+      (actionSql): ArchiveJeune.Action => ({
+        description: actionSql.description || '',
+        contenu: actionSql.contenu || '',
+        statut: actionSql.statut || '',
+        dateCreation: actionSql.dateCreation,
+        creePar:
+          actionSql.idCreateur === metadonnes.idJeune ? 'JEUNE' : 'CONSEILLER',
+        dateActualisation: actionSql.dateDerniereActualisation,
+        dateEcheance: actionSql.dateEcheance ?? undefined,
+        commentaires: actionSql.commentaires.map(commentaireSql => {
+          return {
+            date: commentaireSql.date,
+            message: commentaireSql.message,
+            creePar:
+              commentaireSql.createur.type === Action.TypeCreateur.JEUNE
+                ? 'JEUNE'
+                : 'CONSEILLER'
+          }
+        })
+      })
+    )
   }
 }
