@@ -73,7 +73,7 @@ export namespace ArchiveJeune {
     dateActualisation: Date
     dateEcheance?: Date
     creePar: 'JEUNE' | 'CONSEILLER'
-    commentaires: Array<{
+    commentaires?: Array<{
       date: Date
       message: string
       creePar: 'JEUNE' | 'CONSEILLER'

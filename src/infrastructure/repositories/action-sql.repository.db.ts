@@ -3,7 +3,7 @@ import { Action } from '../../domain/action/action'
 import { ActionDto, ActionSqlModel } from '../sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
 import { AsSql } from '../sequelize/types'
-import { Op } from 'sequelize'
+import { FindOptions, Op } from 'sequelize'
 import { DateService } from '../../utils/date-service'
 import { buildQualification } from './mappers/actions.mappers'
 import { CommentaireSqlModel } from '../sequelize/models/commentaire.sql-model'
@@ -20,19 +20,11 @@ export class ActionSqlRepository implements Action.Repository {
 
   async get(
     id: Action.Id,
-    attributs?: { avecCommentaires: boolean }
+    options?: { avecCommentaires: boolean }
   ): Promise<Action | undefined> {
     const sqlModel = await ActionSqlModel.findByPk(
       id,
-      attributs?.avecCommentaires
-        ? {
-            include: [
-              {
-                model: CommentaireSqlModel
-              }
-            ]
-          }
-        : {}
+      generateGetOptions(options)
     )
     if (!sqlModel) return undefined
     return ActionSqlRepository.actionFromSqlModel(sqlModel)
@@ -136,4 +128,19 @@ export class ActionSqlRepository implements Action.Repository {
       heuresQualifiees: action.qualification?.heures ?? null
     }
   }
+}
+
+function generateGetOptions(attributs?: {
+  avecCommentaires: boolean
+}): Omit<FindOptions, 'where'> {
+  const getOptions: Omit<FindOptions, 'where'> = {}
+
+  if (attributs?.avecCommentaires) {
+    getOptions.include = [
+      {
+        model: CommentaireSqlModel
+      }
+    ]
+  }
+  return getOptions
 }

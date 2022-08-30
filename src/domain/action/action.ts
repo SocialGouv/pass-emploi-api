@@ -65,7 +65,7 @@ export namespace Action {
 
     get(
       id: Action.Id,
-      attributs?: { avecCommentaires: boolean }
+      options?: { avecCommentaires: boolean }
     ): Promise<Action | undefined>
 
     getConseillerEtJeune(

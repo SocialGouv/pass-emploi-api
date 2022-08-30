@@ -6,7 +6,6 @@ import {
   HttpCode,
   HttpException,
   HttpStatus,
-  NotFoundException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -133,7 +132,7 @@ export class ActionsController {
       utilisateur
     )
     if (isFailure(result)) {
-      throw new NotFoundException(result.error)
+      throw handleFailure(result)
     }
   }
 
