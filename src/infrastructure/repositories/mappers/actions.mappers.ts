@@ -54,7 +54,7 @@ export function buildEtat(
   actionSqlModel: ActionSqlModel
 ): Action.Qualification.Etat {
   if (actionSqlModel.codeQualification) {
-    return Action.Qualification.Etat.QUALIFEE
+    return Action.Qualification.Etat.QUALIFIEE
   }
   if (actionSqlModel.statut === Action.Statut.TERMINEE) {
     return Action.Qualification.Etat.A_QUALIFIER
