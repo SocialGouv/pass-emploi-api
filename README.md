@@ -11,6 +11,7 @@ Voir [CONTRIBUTING.md](docs/CONTRIBUTING.md)
 
 # Flux d'authentification
 
-Le flux a été revu sur à l'[ADR-002](docs/decisions/ADR-002-keycloak-creation-jeune-milo.md).
+Le flux Milo a été revu sur à l'[ADR-002](docs/decisions/ADR-002-keycloak-creation-jeune-milo.md).
 
-<img src="docs/diagrammes/authentification-flux.svg">
+<img src="docs/diagrammes/authentification-flux-milo.svg">
+<img src="docs/diagrammes/authentification-flux-pe.svg">

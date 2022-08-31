@@ -1,0 +1,37 @@
+@startuml authentification-flux-pe
+
+skinparam backgroundColor white
+
+actor "Conseiller PE" as conseiller
+participant "Keycloak PE" as kckPE 	#CBC3E3
+participant "CEJ" as cej #ADD8E6
+participant "Keycloak CEJ" as kckCej #ADD8E6
+actor "Jeune PE" as jeune
+
+header Page Header
+
+title Flux d'authentification pour un Jeune PE
+
+autonumber
+group Création du Jeune PE sur le CEJ
+skinparam sequenceMessageAlign right
+conseiller -> cej : Création du compte CEJ Jeune : infos Jeune
+skinparam sequenceMessageAlign left
+cej -> cej : Check BDD\nJeune (email) non existant\n Enregistrement BDD si OK
+end
+
+note over kckCej, jeune : À ce stade, le compte du jeune\nest inactif. Il est activé à l'étape\nsuivante.
+
+group Connexion du Jeune sur le CEJ
+skinparam sequenceMessageAlign center
+jeune -> cej : Demande de connexion sur l'application
+cej -> kckPE : Redirection SSO PE
+jeune -> kckPE : Email + MDP PE
+kckPE -> kckCej : Authentification SSO PE\nNouvelle session keycloak CEJ : infos Jeune + idAuth PE
+note left : Ici, les infos Jeune envoyées sont les\ndernières à jour de PE.
+kckCej -> cej : Authent OK : infos utilisateur
+cej -> cej : Get Jeune by idAuth \n(by email si première connexion)\nUpdate infos Jeune en BDD
+note right : On synchronise les infos PE\navec nos infos Jeune en BDD.
+
+end
+@enduml
