@@ -50,35 +50,38 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
   async handle(
     command: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
-    const commandeSanitized: UpdateUtilisateurCommand = {
+    const commandSanitized: UpdateUtilisateurCommand = {
       ...command,
       email: command.email?.toLocaleLowerCase()
     }
-    const utilisateurConnu = await this.authentificationRepository.get(
-      commandeSanitized.idUtilisateurAuth,
-      commandeSanitized.structure,
-      commandeSanitized.type
-    )
-
-    if (!utilisateurConnu) {
-      if (commandeSanitized.structure === Core.Structure.PASS_EMPLOI) {
-        return failure(
-          new NonTrouveError('Utilisateur', commandeSanitized.idUtilisateurAuth)
-        )
+    if (commandSanitized.type === Authentification.Type.CONSEILLER) {
+      if (commandSanitized.structure === Core.Structure.PASS_EMPLOI) {
+        return this.authentificationConseillerPassEmploi(commandSanitized)
       }
-      if (commandeSanitized.type === Authentification.Type.CONSEILLER) {
-        return this.creerNouveauConseiller(commandeSanitized)
+      if (commandSanitized.structure === Core.Structure.POLE_EMPLOI) {
+        return this.authentificationConseillerPoleEmploi(commandSanitized)
       }
-      if (commandeSanitized.type === Authentification.Type.JEUNE) {
-        return this.authentifierJeuneParEmail(commandeSanitized)
+      if (commandSanitized.structure === Core.Structure.MILO) {
+        return this.authentificationConseillerMilo(commandSanitized)
       }
     }
-
-    const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
-      utilisateurConnu!,
-      commandeSanitized
+    if (commandSanitized.type === Authentification.Type.JEUNE) {
+      if (commandSanitized.structure === Core.Structure.PASS_EMPLOI) {
+        return this.authentificationJeunePassEmploi(commandSanitized)
+      }
+      if (commandSanitized.structure === Core.Structure.POLE_EMPLOI) {
+        return this.authentificationJeunePoleEmploi(commandSanitized)
+      }
+      if (commandSanitized.structure === Core.Structure.MILO) {
+        return this.authentificationJeuneMilo(commandSanitized)
+      }
+    }
+    return failure(
+      new NonTraitableError(
+        "Type et structure de l'utilisateur non pris en charge.",
+        command.idUtilisateurAuth
+      )
     )
-    return success(queryModelFromUtilisateur(utilisateurMisAJour))
   }
 
   async authorize(): Promise<Result> {
@@ -138,16 +141,16 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       return result
     }
 
-    const conseillerSso: Authentification.Utilisateur = {
+    const utilisateurConseiller: Authentification.Utilisateur = {
       ...result.data,
       dateDerniereConnexion: this.dateService.nowJs()
     }
     await this.authentificationRepository.save(
-      conseillerSso,
+      utilisateurConseiller,
       this.dateService.nowJs()
     )
 
-    return success(queryModelFromUtilisateur(conseillerSso))
+    return success(queryModelFromUtilisateur(utilisateurConseiller))
   }
 
   private async mettreAJourLUtilisateur(
@@ -168,5 +171,125 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     await this.authentificationRepository.update(utilisateurMisAJour)
 
     return utilisateurMisAJour
+  }
+
+  private async authentificationConseillerPassEmploi(
+    commandSanitized: UpdateUtilisateurCommand
+  ): Promise<Result<UtilisateurQueryModel>> {
+    const utilisateurTrouve = await this.authentificationRepository.get(
+      commandSanitized.idUtilisateurAuth,
+      commandSanitized.structure,
+      commandSanitized.type
+    )
+    if (!utilisateurTrouve) {
+      return failure(
+        new NonTrouveError('Utilisateur', commandSanitized.idUtilisateurAuth)
+      )
+    } else {
+      const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
+        utilisateurTrouve,
+        commandSanitized
+      )
+      return success(queryModelFromUtilisateur(utilisateurMisAJour))
+    }
+  }
+  private async authentificationJeuneMilo(
+    commandSanitized: UpdateUtilisateurCommand
+  ): Promise<Result<UtilisateurQueryModel>> {
+    const utilisateurTrouve = await this.authentificationRepository.get(
+      commandSanitized.idUtilisateurAuth,
+      commandSanitized.structure,
+      commandSanitized.type
+    )
+    if (!utilisateurTrouve) {
+      return failure(
+        new NonTraitableError('Utilisateur', commandSanitized.idUtilisateurAuth)
+      )
+    } else {
+      const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
+        utilisateurTrouve,
+        commandSanitized
+      )
+      return success(queryModelFromUtilisateur(utilisateurMisAJour))
+    }
+  }
+
+  private async authentificationJeunePoleEmploi(
+    commandSanitized: UpdateUtilisateurCommand
+  ): Promise<Result<UtilisateurQueryModel>> {
+    const utilisateurTrouve = await this.authentificationRepository.get(
+      commandSanitized.idUtilisateurAuth,
+      commandSanitized.structure,
+      commandSanitized.type
+    )
+    if (!utilisateurTrouve) {
+      return this.authentifierJeuneParEmail(commandSanitized)
+    } else {
+      const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
+        utilisateurTrouve,
+        commandSanitized
+      )
+
+      return success(queryModelFromUtilisateur(utilisateurMisAJour))
+    }
+  }
+
+  private async authentificationJeunePassEmploi(
+    commandSanitized: UpdateUtilisateurCommand
+  ): Promise<Result<UtilisateurQueryModel>> {
+    const utilisateurTrouve = await this.authentificationRepository.get(
+      commandSanitized.idUtilisateurAuth,
+      commandSanitized.structure,
+      commandSanitized.type
+    )
+    if (!utilisateurTrouve) {
+      return failure(
+        new NonTrouveError('Utilisateur', commandSanitized.idUtilisateurAuth)
+      )
+    } else {
+      const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
+        utilisateurTrouve,
+        commandSanitized
+      )
+      return success(queryModelFromUtilisateur(utilisateurMisAJour))
+    }
+  }
+
+  private async authentificationConseillerMilo(
+    commandSanitized: UpdateUtilisateurCommand
+  ): Promise<Result<UtilisateurQueryModel>> {
+    const utilisateurTrouve = await this.authentificationRepository.get(
+      commandSanitized.idUtilisateurAuth,
+      commandSanitized.structure,
+      commandSanitized.type
+    )
+    if (!utilisateurTrouve) {
+      return this.creerNouveauConseiller(commandSanitized)
+    } else {
+      const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
+        utilisateurTrouve,
+        commandSanitized
+      )
+      return success(queryModelFromUtilisateur(utilisateurMisAJour))
+    }
+  }
+
+  private async authentificationConseillerPoleEmploi(
+    commandSanitized: UpdateUtilisateurCommand
+  ): Promise<Result<UtilisateurQueryModel>> {
+    const utilisateurTrouve = await this.authentificationRepository.get(
+      commandSanitized.idUtilisateurAuth,
+      commandSanitized.structure,
+      commandSanitized.type
+    )
+    if (!utilisateurTrouve) {
+      return this.creerNouveauConseiller(commandSanitized)
+    } else {
+      const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
+        utilisateurTrouve,
+        commandSanitized
+      )
+      return success(queryModelFromUtilisateur(utilisateurMisAJour))
+    }
   }
 }
