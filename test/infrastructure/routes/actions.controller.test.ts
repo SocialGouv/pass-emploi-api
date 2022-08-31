@@ -295,7 +295,13 @@ describe('ActionsController', () => {
 
       qualifierActionCommandHandler.execute
         .withArgs(command, utilisateur)
-        .resolves(emptySuccess())
+        .resolves(
+          success({
+            code: Action.Qualification.Code.EMPLOI,
+            heures: 3,
+            libelle: 'Emploi'
+          })
+        )
 
       // When
       await request(app.getHttpServer())

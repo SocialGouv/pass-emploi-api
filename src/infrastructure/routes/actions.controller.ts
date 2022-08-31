@@ -24,7 +24,8 @@ import {
 } from '../../application/queries/get-detail-action.query.handler.db'
 import {
   ActionQueryModel,
-  CommentaireActionQueryModel
+  CommentaireActionQueryModel,
+  QualificationActionQueryModel
 } from '../../application/queries/query-models/actions.query-model'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { isFailure } from '../../building-blocks/types/result'
@@ -193,7 +194,7 @@ export class ActionsController {
     @Param('idAction', new ParseUUIDPipe()) idAction: string,
     @Body() qualifierActionPayload: QualifierActionPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<QualificationActionQueryModel> {
     const command: QualifierActionCommand = {
       idAction,
       codeQualification: qualifierActionPayload.codeQualification,

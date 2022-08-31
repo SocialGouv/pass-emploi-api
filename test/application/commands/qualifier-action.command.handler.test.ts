@@ -12,7 +12,8 @@ import {
 } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
-  failure
+  failure,
+  success
 } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action/action'
 import { uneAction, uneActionTerminee } from '../../fixtures/action.fixture'
@@ -92,7 +93,13 @@ describe('QualifierActionCommandHandler', () => {
             expect(actionMiloRepository.save).to.have.been.calledWithExactly(
               actionMilo
             )
-            expect(result).to.deep.equal(emptySuccess())
+            expect(result).to.deep.equal(
+              success({
+                code: 'SANTE',
+                heures: 2,
+                libelle: 'Santé'
+              })
+            )
           })
         })
         describe('quand la création de SNP a échoué', () => {
@@ -151,7 +158,13 @@ describe('QualifierActionCommandHandler', () => {
             actionQualifiee
           )
           expect(actionMiloRepository.save).not.to.have.been.called()
-          expect(result).to.deep.equal(emptySuccess())
+          expect(result).to.deep.equal(
+            success({
+              code: 'NON_SNP',
+              heures: 0,
+              libelle: 'Action non qualifiée en Situation Non Professionnelle'
+            })
+          )
         })
       })
       it("rejette quand la qualification n'est pas possible", async () => {
