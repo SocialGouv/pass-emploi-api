@@ -1,13 +1,13 @@
-@startuml
+@startuml authentification-flux-milo
 
 skinparam backgroundColor white
 
-actor "Conseiller ML" as conseiller
+actor "Conseiller Milo" as conseiller
 participant "i-Milo" as milo #CBC3E3
 participant "Keycloak i-Milo" as kckMilo 	#CBC3E3
 participant "CEJ" as cej #ADD8E6
 participant "Keycloak CEJ" as kckCej #ADD8E6
-actor "Jeune ML" as jeune
+actor "Jeune Milo" as jeune
 
 header Page Header
 
@@ -21,9 +21,9 @@ skinparam sequenceMessageAlign left
 cej -> cej : Check BDD\nJeune non existant
 
 skinparam sequenceMessageAlign center
-cej -> kckMilo :demande création de compte SSO Milo : idDossier
+cej -> milo :demande création de compte SSO Milo : idDossier
 kckMilo -> kckMilo : Check aucun jeune lié au dossier\nMilo lie Jeune ML au compte
-kckMilo -> cej : succès : id-keycloak
+milo -> cej : succès : id-keycloak = idAuth
 
 skinparam sequenceMessageAlign left
 cej -> cej : Enregistrement BDD\nid-keycloak\ninfos Jeune
@@ -40,7 +40,7 @@ kckMilo -> kckCej : Authentification SSO Milo\nNouvelle session keycloak CEJ : i
 note left : Ici, les infos Jeune envoyées sont les\ndernières à jour de i-milo, pour\nun changement d'email par exemple.
 kckCej -> cej : Authent OK : infos utilisateur
 note left : On crée l'utilisateur sur keycloak\nici lors de la première connexion.
-cej -> cej : Get Jeune by ID\nUpdate infos Jeune en BDD
+cej -> cej : Get Jeune by idAuth\nUpdate infos Jeune en BDD
 note right : On synchronise les infos i-milo\navec nos infos Jeune en BDD.
 
 end
