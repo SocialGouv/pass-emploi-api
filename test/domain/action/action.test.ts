@@ -8,7 +8,7 @@ import {
 import { Action } from '../../../src/domain/action/action'
 import { DateService } from '../../../src/utils/date-service'
 import { IdService } from '../../../src/utils/id-service'
-import { uneAction } from '../../fixtures/action.fixture'
+import { uneAction, uneActionTerminee } from '../../fixtures/action.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { DateTime } from 'luxon'
@@ -643,6 +643,27 @@ describe('Action', () => {
       // Then
       expect(result).to.deep.equal(
         failure(new MauvaiseCommandeError("L'action n'est pas terminée"))
+      )
+    })
+    it('rejette quand la date de fin réelle est antécédente à la date de création', () => {
+      // Given
+      const actionTerminee: Action = uneActionTerminee({
+        dateCreation: new Date('2022-08-01')
+      })
+      // When
+      const result = Action.qualifier(
+        actionTerminee,
+        Action.Qualification.Code.SANTE,
+        new Date('2022-07-01')
+      )
+
+      // Then
+      expect(result).to.deep.equal(
+        failure(
+          new MauvaiseCommandeError(
+            'La date de fin doit être postérieure à la date de création'
+          )
+        )
       )
     })
   })

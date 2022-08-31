@@ -136,11 +136,20 @@ export namespace Action {
       return failure(new MauvaiseCommandeError('Action déjà qualifiée'))
     }
 
+    const dateFinReelleMiseAJour = dateFinReelle ?? action.dateFinReelle!
+    if (action.dateCreation > dateFinReelleMiseAJour) {
+      return failure(
+        new MauvaiseCommandeError(
+          'La date de fin doit être postérieure à la date de création'
+        )
+      )
+    }
+
     const { heures } = Qualification.mapCodeTypeQualification[codeQualification]
 
     return success({
       ...action,
-      dateFinReelle: dateFinReelle ?? action.dateFinReelle!,
+      dateFinReelle: dateFinReelleMiseAJour,
       qualification: {
         code: codeQualification,
         heures
