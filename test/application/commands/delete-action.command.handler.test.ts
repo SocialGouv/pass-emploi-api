@@ -16,7 +16,11 @@ import {
   failure
 } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action/action'
-import { unCommentaire, uneAction } from '../../fixtures/action.fixture'
+import {
+  unCommentaire,
+  uneAction,
+  uneActionTerminee
+} from '../../fixtures/action.fixture'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
@@ -60,6 +64,25 @@ describe('DeleteActionCommandHandler', () => {
           failure(
             new MauvaiseCommandeError(
               'Impossible de supprimer une action avec un commentaire.'
+            )
+          )
+        )
+      })
+      it("renvoie une erreur quand l'action est terminée", async () => {
+        // Given
+        const actionTerminee = uneActionTerminee()
+        actionRepository.get.withArgs(action.id).resolves(actionTerminee)
+        const command: DeleteActionCommand = {
+          idAction: actionTerminee.id
+        }
+        // When
+        const result = await deleteActionCommandHandler.handle(command)
+
+        // Then
+        expect(result).to.deep.equal(
+          failure(
+            new MauvaiseCommandeError(
+              'Impossible de supprimer une action terminée.'
             )
           )
         )

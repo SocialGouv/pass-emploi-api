@@ -49,6 +49,14 @@ export class DeleteActionCommandHandler extends CommandHandler<
       )
     }
 
+    if (Action.estTerminee(action)) {
+      return failure(
+        new MauvaiseCommandeError(
+          'Impossible de supprimer une action terminée.'
+        )
+      )
+    }
+
     await this.actionRepository.delete(command.idAction)
     this.logger.log(`L'action ${command.idAction} a été supprimée`)
 
