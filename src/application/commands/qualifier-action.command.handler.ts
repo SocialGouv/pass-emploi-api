@@ -6,10 +6,10 @@ import {
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import {
-  emptySuccess,
   failure,
   isFailure,
-  Result
+  Result,
+  success
 } from '../../building-blocks/types/result'
 import {
   Action,
@@ -19,6 +19,7 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { ActionAuthorizer } from '../authorizers/authorize-action'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { QualificationActionQueryModel } from '../queries/query-models/actions.query-model'
 
 export interface QualifierActionCommand extends Command {
   idAction: string
@@ -30,7 +31,7 @@ export interface QualifierActionCommand extends Command {
 @Injectable()
 export class QualifierActionCommandHandler extends CommandHandler<
   QualifierActionCommand,
-  void
+  QualificationActionQueryModel
 > {
   constructor(
     @Inject(ActionsRepositoryToken)
@@ -44,7 +45,9 @@ export class QualifierActionCommandHandler extends CommandHandler<
     super('QualifierActionCommandHandler')
   }
 
-  async handle(command: QualifierActionCommand): Promise<Result> {
+  async handle(
+    command: QualifierActionCommand
+  ): Promise<Result<QualificationActionQueryModel>> {
     const action = await this.actionRepository.get(command.idAction)
     if (!action) {
       return failure(new NonTrouveError('Action', command.idAction))
@@ -93,7 +96,16 @@ export class QualifierActionCommandHandler extends CommandHandler<
     }
     await this.actionRepository.save(qualifierActionResult.data)
 
-    return emptySuccess()
+    const typeQualification =
+      Action.Qualification.mapCodeTypeQualification[
+        qualifierActionResult.data.qualification.code
+      ]
+
+    return success({
+      code: qualifierActionResult.data.qualification.code,
+      libelle: typeQualification.label,
+      heures: typeQualification.heures
+    })
   }
 
   async authorize(
