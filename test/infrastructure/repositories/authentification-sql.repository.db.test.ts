@@ -121,7 +121,7 @@ describe('AuthentificationSqlRepository', () => {
     })
   })
 
-  describe('getJeuneByEmail', () => {
+  describe('getJeuneByEmailEtStructure', () => {
     beforeEach(async () => {
       // Given
       await ConseillerSqlModel.creer(
@@ -142,24 +142,39 @@ describe('AuthentificationSqlRepository', () => {
     describe("quand c'est un jeune connu par son email", () => {
       it("retourne l'utilisateur quand il existe", async () => {
         // When
-        const utilisateur = await authentificationSqlRepository.getJeuneByEmail(
-          'john.doe@plop.io'
-        )
+        const utilisateur =
+          await authentificationSqlRepository.getJeuneByEmailEtStructure(
+            'john.doe@plop.io',
+            Core.Structure.MILO
+          )
 
         // Then
         expect(utilisateur).to.deep.equal(
           unUtilisateurJeune({ datePremiereConnexion: uneDate() })
         )
       })
-
-      it("retourne undefined quand il n'existe pas", async () => {
+      it("retourne undefined quand l'email existe mais avec la mauvaise structure", async () => {
         // When
-        const utilisateur = await authentificationSqlRepository.getJeuneByEmail(
-          'email@passemploi.com'
-        )
+        const utilisateur =
+          await authentificationSqlRepository.getJeuneByEmailEtStructure(
+            'john.doe@plop.io',
+            Core.Structure.POLE_EMPLOI
+          )
 
         // Then
-        expect(utilisateur).to.deep.equal(undefined)
+        expect(utilisateur).to.be.undefined()
+      })
+
+      it("retourne undefined quand l'email n'existe pas", async () => {
+        // When
+        const utilisateur =
+          await authentificationSqlRepository.getJeuneByEmailEtStructure(
+            'email@passemploi.com',
+            Core.Structure.MILO
+          )
+
+        // Then
+        expect(utilisateur).to.be.undefined()
       })
     })
   })

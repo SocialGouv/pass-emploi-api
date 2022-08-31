@@ -69,17 +69,8 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
       if (commandeSanitized.type === Authentification.Type.CONSEILLER) {
         return this.creerNouveauConseiller(commandeSanitized)
       }
-      if (
-        commandeSanitized.type === Authentification.Type.JEUNE &&
-        commandeSanitized.structure === Core.Structure.POLE_EMPLOI
-      ) {
-        return this.authentifierParEmail(commandeSanitized)
-      }
-      if (
-        commandeSanitized.type === Authentification.Type.JEUNE &&
-        commandeSanitized.structure === Core.Structure.MILO
-      ) {
-        return this.authentifierParEmail(commandeSanitized)
+      if (commandeSanitized.type === Authentification.Type.JEUNE) {
+        return this.authentifierJeuneParEmail(commandeSanitized)
       }
     }
 
@@ -98,12 +89,15 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     return
   }
 
-  private async authentifierParEmail(
+  private async authentifierJeuneParEmail(
     command: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
-    if (command.type === Authentification.Type.JEUNE && command.email) {
+    if (command.email) {
       const utilisateurInitial =
-        await this.authentificationRepository.getJeuneByEmail(command.email)
+        await this.authentificationRepository.getJeuneByEmailEtStructure(
+          command.email,
+          command.structure
+        )
 
       if (utilisateurInitial) {
         const maintenant = this.dateService.nowJs()

@@ -52,7 +52,10 @@ export namespace Authentification {
       type: Authentification.Type
     ): Promise<Utilisateur | undefined>
 
-    getJeuneByEmail(email: string): Promise<Utilisateur | undefined>
+    getJeuneByEmailEtStructure(
+      email: string,
+      structure: Core.Structure
+    ): Promise<Utilisateur | undefined>
 
     update(utilisateur: Authentification.Utilisateur): Promise<void>
 
