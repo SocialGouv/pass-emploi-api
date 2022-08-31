@@ -479,7 +479,9 @@ describe('UpdateUtilisateurCommandHandler', () => {
       describe('jeune connu par son email et sa structure', async () => {
         it('retourne le jeune et enregistre le sub + mise à jour date premiere connexion', async () => {
           // Given
-          const utilisateur = unUtilisateurJeunePasConnecte()
+          const utilisateur = unUtilisateurJeunePasConnecte({
+            structure: Core.Structure.POLE_EMPLOI
+          })
 
           const command: UpdateUtilisateurCommand = {
             idUtilisateurAuth: 'Id connection',
@@ -487,7 +489,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
             prenom: 'prenom jeune',
             email: 'email jeune',
             type: Authentification.Type.JEUNE,
-            structure: Core.Structure.MILO
+            structure: Core.Structure.POLE_EMPLOI
           }
 
           authentificationRepository.get
@@ -524,7 +526,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
               nom: 'nom jeune',
               prenom: 'prenom jeune',
               roles: [],
-              structure: 'MILO',
+              structure: 'POLE_EMPLOI',
               type: 'JEUNE'
             })
           }
