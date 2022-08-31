@@ -1,15 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { Op } from 'sequelize'
 import { Authentification } from 'src/domain/authentification'
 import { Core } from '../../domain/core'
+import { KeycloakClient } from '../clients/keycloak-client'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../sequelize/models/jeune.sql-model'
+import { SuperviseurSqlModel } from '../sequelize/models/superviseur.sql-model'
 import {
   fromConseillerSqlToUtilisateur,
   fromJeuneSqlToUtilisateur
 } from './mappers/authentification.mappers'
-import { SuperviseurSqlModel } from '../sequelize/models/superviseur.sql-model'
-import { KeycloakClient } from '../clients/keycloak-client'
 
 @Injectable()
 export class AuthentificationSqlRepository
@@ -66,15 +65,14 @@ export class AuthentificationSqlRepository
     return undefined
   }
 
-  async getJeuneByEmail(
-    email: string
+  async getJeuneByEmailEtStructure(
+    email: string,
+    structure: Core.Structure
   ): Promise<Authentification.Utilisateur | undefined> {
     const jeuneSqlModel = await JeuneSqlModel.findOne({
       where: {
         email: email,
-        structure: {
-          [Op.or]: [Core.Structure.MILO, Core.Structure.POLE_EMPLOI]
-        }
+        structure
       }
     })
 

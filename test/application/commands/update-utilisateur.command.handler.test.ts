@@ -476,7 +476,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
           })
         })
       })
-      describe('jeune connu par son email', async () => {
+      describe('jeune connu par son email et sa structure', async () => {
         it('retourne le jeune et enregistre le sub + mise à jour date premiere connexion', async () => {
           // Given
           const utilisateur = unUtilisateurJeunePasConnecte()
@@ -497,8 +497,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
               command.type
             )
             .resolves(undefined)
-          authentificationRepository.getJeuneByEmail
-            .withArgs(command.email)
+          authentificationRepository.getJeuneByEmailEtStructure
+            .withArgs(command.email, command.structure)
             .resolves(utilisateur)
 
           // When
@@ -530,7 +530,7 @@ describe('UpdateUtilisateurCommandHandler', () => {
           }
         })
       })
-      describe('jeune non connu par son email', async () => {
+      describe('jeune non connu par son email ou sa strucutre', async () => {
         it('retourne une failure', async () => {
           // Given
           const command: UpdateUtilisateurCommand = {
@@ -547,8 +547,8 @@ describe('UpdateUtilisateurCommandHandler', () => {
               command.type
             )
             .resolves(undefined)
-          authentificationRepository.getJeuneByEmail
-            .withArgs(command.email)
+          authentificationRepository.getJeuneByEmailEtStructure
+            .withArgs(command.email, command.structure)
             .resolves(undefined)
 
           // When
