@@ -18,7 +18,7 @@ export namespace Qualification {
   export enum Etat {
     A_QUALIFIER = 'A_QUALIFIER',
     NON_QUALIFIABLE = 'NON_QUALIFIABLE',
-    QUALIFEE = 'QUALIFEE'
+    QUALIFIEE = 'QUALIFIEE'
   }
 
   export const mapCodeTypeQualification: Record<Code, TypeQualification> = {

@@ -43,7 +43,7 @@ export const uneActionQueryModelTermineeAvecQualification = (
     lastName: jeune.lastName
   },
   dateFinReelle: action.dateFinReelle?.toISOString(),
-  etat: Action.Qualification.Etat.QUALIFEE,
+  etat: Action.Qualification.Etat.QUALIFIEE,
   qualification: {
     heures: 2,
     libelle: 'Santé',

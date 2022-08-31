@@ -591,7 +591,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
           )
           actionQMQualifiee = uneActionQueryModelFromDomain(
             actionQualifiee,
-            Action.Qualification.Etat.QUALIFEE,
+            Action.Qualification.Etat.QUALIFIEE,
             {
               code: Action.Qualification.Code.SANTE,
               heures: 2,
@@ -625,7 +625,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
           const result = await getActionsByJeuneQueryHandler.handle({
             idJeune: jeune.id,
             page: 1,
-            etats: [Action.Qualification.Etat.QUALIFEE]
+            etats: [Action.Qualification.Etat.QUALIFIEE]
           })
 
           // Then
@@ -653,7 +653,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
             page: 1,
             etats: [
               Action.Qualification.Etat.A_QUALIFIER,
-              Action.Qualification.Etat.QUALIFEE,
+              Action.Qualification.Etat.QUALIFIEE,
               Action.Qualification.Etat.NON_QUALIFIABLE
             ]
           })
