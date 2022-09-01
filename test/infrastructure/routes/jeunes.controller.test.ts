@@ -957,7 +957,11 @@ describe('JeunesController', () => {
         enleverLesUndefined(uneActionQueryModelSansJeune())
       ],
       rendezVous: [],
-      actionsEnRetard: 8
+      metadata: {
+        actionsEnRetard: 2,
+        dateDeFin: new Date(maintenant),
+        dateDeDebut: new Date(maintenant)
+      }
     }
     it('retourne la home agenda du jeune quand tout se passe bien', async () => {
       // Given
@@ -981,12 +985,13 @@ describe('JeunesController', () => {
         // Then
         .expect({
           actions: queryModel.actions,
-          rendezVous: queryModel.rendezVous
+          rendezVous: queryModel.rendezVous,
+          metadata: {
+            actionsEnRetard: 2,
+            dateDeFin: '2022-08-17T10:00:30.000Z',
+            dateDeDebut: '2022-08-17T10:00:30.000Z'
+          }
         })
-        .expect(
-          'x-nombre-actions-en-retard',
-          queryModel.actionsEnRetard.toString()
-        )
     })
     it("rejette quand la date n'est pas au bon format", async () => {
       // Given
