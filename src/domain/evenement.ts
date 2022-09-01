@@ -9,17 +9,18 @@ export namespace Evenement {
     ACTION_CREEE = 'ACTION_CREEE',
     ACTION_DETAIL = 'ACTION_DETAIL',
     ACTION_LISTE = 'ACTION_LISTE',
-    ACTION_MODIFIEE = 'ACTION_MODIFIEE',
+    ACTION_STATUT_MODIFIE = 'ACTION_STATUT_MODIFIE',
     ACTION_SUPPRIMEE = 'ACTION_SUPPRIMEE',
     ACTION_COMMENTEE = 'ACTION_COMMENTEE',
+    ACTION_QUALIFIEE_SNP = 'ACTION_QUALIFIEE_SNP',
+    ACTION_QUALIFIEE_NON_SNP = 'ACTION_QUALIFIEE_NON_SNP',
     COMPTE_SUPPRIME = 'COMPTE_SUPPRIME',
     COMPTE_ARCHIVE = 'COMPTE_ARCHIVE',
-    DEMARCHE_CREEE = 'DEMARCHE_CREEE',
-    DEMARCHE_MODIFIEE = 'DEMARCHE_MODIFIEE',
     MESSAGE_ENVOYE = 'MESSAGE_ENVOYE',
     MESSAGE_ENVOYE_MULTIPLE = 'MESSAGE_ENVOYE_MULTIPLE',
     MESSAGE_ENVOYE_PJ = 'MESSAGE_ENVOYE_PJ',
     MESSAGE_ENVOYE_MULTIPLE_PJ = 'MESSAGE_ENVOYE_MULTIPLE_PJ',
+    MESSAGE_OFFRE_PARTAGEE = 'MESSAGE_OFFRE_PARTAGEE',
     OFFRE_ALTERNANCE_AFFICHEE = 'OFFRE_ALTERNANCE_AFFICHEE',
     OFFRE_ALTERNANCE_PARTAGEE = 'OFFRE_ALTERNANCE_PARTAGEE',
     OFFRE_ALTERNANCE_POSTULEE = 'OFFRE_ALTERNANCE_POSTULEE',
@@ -78,17 +79,29 @@ const evenements = {
     action: 'Consultation',
     nom: 'Liste'
   },
-  [Evenement.Type.ACTION_MODIFIEE]: {
+  [Evenement.Type.ACTION_STATUT_MODIFIE]: {
     categorie: 'Action',
-    action: 'Modification'
+    action: 'Modification',
+    nom: 'Statut'
   },
   [Evenement.Type.ACTION_SUPPRIMEE]: {
     categorie: 'Action',
     action: 'Suppression'
   },
   [Evenement.Type.ACTION_COMMENTEE]: {
-    categorie: 'Commentaire Action',
-    action: 'Création'
+    categorie: 'Action',
+    action: 'Commentaire',
+    nom: 'Ajout'
+  },
+  [Evenement.Type.ACTION_QUALIFIEE_SNP]: {
+    categorie: 'Action',
+    action: 'Qualifier',
+    nom: 'SNP'
+  },
+  [Evenement.Type.ACTION_QUALIFIEE_NON_SNP]: {
+    categorie: 'Action',
+    action: 'Qualifier',
+    nom: 'Non SNP'
   },
   [Evenement.Type.COMPTE_SUPPRIME]: {
     categorie: 'Compte',
@@ -97,14 +110,6 @@ const evenements = {
   [Evenement.Type.COMPTE_ARCHIVE]: {
     categorie: 'Compte',
     action: 'Archivage'
-  },
-  [Evenement.Type.DEMARCHE_CREEE]: {
-    categorie: 'Demarche',
-    action: 'Création'
-  },
-  [Evenement.Type.DEMARCHE_MODIFIEE]: {
-    categorie: 'Demarche',
-    action: 'Modification'
   },
   [Evenement.Type.OFFRE_EMPLOI_AFFICHEE]: {
     categorie: 'Offre',
@@ -206,6 +211,11 @@ const evenements = {
   [Evenement.Type.MESSAGE_ENVOYE_PJ]: {
     categorie: 'Message',
     action: 'Envoi PJ'
+  },
+  [Evenement.Type.MESSAGE_OFFRE_PARTAGEE]: {
+    categorie: 'Message',
+    action: 'Partager',
+    nom: 'Offre'
   },
   [Evenement.Type.RDV_CREE]: { categorie: 'Rendez-vous', action: 'Création' },
   [Evenement.Type.RDV_MODIFIE]: {

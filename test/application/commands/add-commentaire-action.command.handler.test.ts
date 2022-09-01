@@ -186,7 +186,7 @@ describe('AddCommentaireActionCommandHandler', () => {
   })
 
   describe('monitor', () => {
-    it("enregistre un évènement d'engagement de type Commentaire Action", async () => {
+    it("enregistre un évènement d'engagement de type Action Ajout Commentaire", async () => {
       // Given
       const utilisateur = unUtilisateurDecode()
 

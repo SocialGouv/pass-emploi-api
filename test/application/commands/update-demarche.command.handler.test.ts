@@ -146,7 +146,7 @@ describe('UpdateDemarcheCommandHandler', () => {
 
       // Then
       expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
-        Evenement.Type.DEMARCHE_MODIFIEE,
+        Evenement.Type.ACTION_STATUT_MODIFIE,
         utilisateur
       )
     })
