@@ -1,6 +1,11 @@
 import { GetJeuneHomeSuiviQueryHandler } from 'src/application/queries/get-jeune-home-suivi.query.db'
 import { JeuneHomeSuiviQueryModel } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
-import { emptySuccess, Result, success } from 'src/building-blocks/types/result'
+import {
+  emptySuccess,
+  isSuccess,
+  Result,
+  success
+} from 'src/building-blocks/types/result'
 import {
   ActionDto,
   ActionSqlModel
@@ -22,6 +27,8 @@ import { Action } from 'src/domain/action/action'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
+import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
 
 describe('GetJeuneHomeSuiviQueryHandler', () => {
   DatabaseForTesting.prepare()
@@ -68,8 +75,12 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
             dateEcheance: vendrediEnHuit.dateEcheance.toISOString()
           })
         ],
-        actionsEnRetard: 2,
-        rendezVous: []
+        rendezVous: [],
+        metadata: {
+          actionsEnRetard: 2,
+          dateDeDebut: samediDernier.dateEcheance,
+          dateDeFin: new Date('2022-08-27T07:00:00.000Z')
+        }
       }
       expect(result).to.deep.equal(success(expected))
     })
@@ -93,21 +104,19 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
       })
       it('doit retourner la liste des actions triées chronologiquement', async () => {
         // Then
-        const expected: JeuneHomeSuiviQueryModel = {
-          actions: [
-            uneActionQueryModelSansJeune({
-              id: demain.id,
-              dateEcheance: demain.dateEcheance.toISOString()
-            }),
-            uneActionQueryModelSansJeune({
-              id: apresDemain.id,
-              dateEcheance: apresDemain.dateEcheance.toISOString()
-            })
-          ],
-          rendezVous: [],
-          actionsEnRetard: 0
-        }
-        expect(result).to.deep.equal(success(expected))
+        const actionsQM: ActionQueryModel[] = [
+          uneActionQueryModelSansJeune({
+            id: demain.id,
+            dateEcheance: demain.dateEcheance.toISOString()
+          }),
+          uneActionQueryModelSansJeune({
+            id: apresDemain.id,
+            dateEcheance: apresDemain.dateEcheance.toISOString()
+          })
+        ]
+        expect(isSuccess(result) && result.data.actions).to.deep.equal(
+          actionsQM
+        )
       })
     })
     describe('rendez-vous', () => {
@@ -139,24 +148,22 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
         })
 
         // Then
-        const expected: JeuneHomeSuiviQueryModel = {
-          actions: [],
-          actionsEnRetard: 0,
-          rendezVous: [
-            unRendezVousQueryModel({
-              id: unRendezVousDtoPourDemain.id,
-              date: unRendezVousDtoPourDemain.date
-            }),
-            unRendezVousQueryModel({
-              id: unRendezVousDtoPourApresDemain.id,
-              date: unRendezVousDtoPourApresDemain.date
-            })
-          ]
-        }
-        expect(result).to.deep.equal(success(expected))
+        const expected: RendezVousJeuneQueryModel[] = [
+          unRendezVousQueryModel({
+            id: unRendezVousDtoPourDemain.id,
+            date: unRendezVousDtoPourDemain.date
+          }),
+          unRendezVousQueryModel({
+            id: unRendezVousDtoPourApresDemain.id,
+            date: unRendezVousDtoPourApresDemain.date
+          })
+        ]
+        expect(isSuccess(result) && result.data.rendezVous).to.deep.equal(
+          expected
+        )
       })
     })
-    describe('actionsEnRetard', () => {
+    describe('metadata', () => {
       let result: Result<JeuneHomeSuiviQueryModel>
 
       beforeEach(async () => {
@@ -172,9 +179,13 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
           maintenant: aujourdhuiVendredi
         })
       })
-      it("retourne le compte d'actions en retard", async () => {
+      it("retourne le compte d'actions en retard et les dates", async () => {
         // Then
-        expect(result._isSuccess && result.data.actionsEnRetard).to.equal(1)
+        expect(result._isSuccess && result.data.metadata).to.deep.equal({
+          actionsEnRetard: 1,
+          dateDeDebut: new Date('2022-08-06T00:00:00.000Z'),
+          dateDeFin: new Date('2022-08-20T00:00:00.000Z')
+        })
       })
     })
   })

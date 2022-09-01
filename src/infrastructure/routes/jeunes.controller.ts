@@ -316,11 +316,10 @@ export class JeunesController {
     type: JeuneHomeEvenementsQueryModel
   })
   async getHomeAgenda(
-    @Res() response: Response,
     @Param('idJeune') idJeune: string,
     @Query() queryParams: GetJeuneHomeSuiviQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<Response<JeuneHomeEvenementsQueryModel>> {
+  ): Promise<JeuneHomeEvenementsQueryModel> {
     const result = await this.getJeuneHomeSuiviQueryHandler.execute(
       { idJeune, maintenant: queryParams.maintenant },
       utilisateur
@@ -330,15 +329,7 @@ export class JeunesController {
       throw handleFailure(result)
     }
 
-    return response
-      .set({
-        'x-nombre-actions-en-retard': result.data.actionsEnRetard
-      })
-      .status(HttpStatus.OK)
-      .json({
-        actions: result.data.actions,
-        rendezVous: result.data.rendezVous
-      })
+    return result.data
   }
 
   @Get(':idJeune/home/demarches')

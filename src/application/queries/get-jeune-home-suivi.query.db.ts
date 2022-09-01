@@ -48,7 +48,11 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
     return success({
       actions,
       rendezVous,
-      actionsEnRetard
+      metadata: {
+        actionsEnRetard: actionsEnRetard,
+        dateDeDebut: samediDernier.toJSDate(),
+        dateDeFin: vendrediEnHuit.toJSDate()
+      }
     })
   }
 
