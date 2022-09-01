@@ -19,17 +19,20 @@ import { Action } from '../../../src/domain/action/action'
 import { uneAction, uneActionTerminee } from '../../fixtures/action.fixture'
 import {
   unUtilisateurConseiller,
+  unUtilisateurDecode,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { unJeune } from '../../fixtures/jeune.fixture'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
 
 describe('QualifierActionCommandHandler', () => {
   let actionRepository: StubbedType<Action.Repository>
   let actionMiloRepository: StubbedType<Action.Milo.Repository>
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
   let jeuneRepository: StubbedType<Jeune.Repository>
+  let evenementService: StubbedClass<EvenementService>
   let qualifierActionCommandHandler: QualifierActionCommandHandler
 
   const idAction = '35399853-f224-4910-8d02-44fb1ac85606'
@@ -41,6 +44,7 @@ describe('QualifierActionCommandHandler', () => {
     actionMiloRepository = stubInterface(sandbox)
     actionAuthorizer = stubClass(ActionAuthorizer)
     jeuneRepository = stubInterface(sandbox)
+    evenementService = stubClass(EvenementService)
 
     jeuneRepository.get
       .withArgs('ABCDE')
@@ -50,7 +54,8 @@ describe('QualifierActionCommandHandler', () => {
       actionRepository,
       actionMiloRepository,
       actionAuthorizer,
-      jeuneRepository
+      jeuneRepository,
+      evenementService
     )
   })
 
@@ -249,6 +254,44 @@ describe('QualifierActionCommandHandler', () => {
       // Then
       expect(actionAuthorizer.authorize).not.to.have.been.called()
       expect(result._isSuccess).to.be.false()
+    })
+  })
+
+  describe('monitor', () => {
+    it("monitore la qualification de l'action en SNP", async () => {
+      // Given
+      const utilisateur = unUtilisateurDecode()
+      const command: QualifierActionCommand = {
+        idAction: idAction,
+        utilisateur: utilisateurConseiller,
+        codeQualification: Action.Qualification.Code.SANTE
+      }
+      // When
+      await qualifierActionCommandHandler.monitor(utilisateur, command)
+
+      // Then
+      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
+        Evenement.Type.ACTION_QUALIFIEE_SNP,
+        utilisateur
+      )
+    })
+    it("monitore la qualification de l'action en NON SNP", async () => {
+      // Given
+      const utilisateur = unUtilisateurDecode()
+      const command: QualifierActionCommand = {
+        idAction: idAction,
+        utilisateur: utilisateurConseiller,
+        codeQualification: Action.Qualification.Code.NON_SNP
+      }
+
+      // When
+      await qualifierActionCommandHandler.monitor(utilisateur, command)
+
+      // Then
+      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
+        Evenement.Type.ACTION_QUALIFIEE_NON_SNP,
+        utilisateur
+      )
     })
   })
 })

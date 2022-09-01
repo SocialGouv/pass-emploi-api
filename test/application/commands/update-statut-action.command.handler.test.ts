@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { EvenementService } from 'src/domain/evenement'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { ActionAuthorizer } from '../../../src/application/authorizers/authorize-action'
 import {
   UpdateStatutActionCommand,
@@ -14,7 +14,10 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { Action } from '../../../src/domain/action/action'
 import { uneAction } from '../../fixtures/action.fixture'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import {
+  unUtilisateurDecode,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('UpdateStatutActionCommandHandler', () => {
@@ -103,6 +106,22 @@ describe('UpdateStatutActionCommandHandler', () => {
       // Then
       expect(actionAuthorizer.authorize).to.have.been.calledWithExactly(
         command.idAction,
+        utilisateur
+      )
+    })
+  })
+
+  describe('monitor', () => {
+    it('monitore la modification de la démarche', async () => {
+      // Given
+      const utilisateur = unUtilisateurDecode()
+
+      // When
+      await updateStatutActionCommandHandler.monitor(utilisateur)
+
+      // Then
+      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
+        Evenement.Type.ACTION_STATUT_MODIFIE,
         utilisateur
       )
     })

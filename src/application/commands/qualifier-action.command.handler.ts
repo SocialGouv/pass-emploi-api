@@ -20,6 +20,7 @@ import { Authentification } from '../../domain/authentification'
 import { ActionAuthorizer } from '../authorizers/authorize-action'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { QualificationActionQueryModel } from '../queries/query-models/actions.query-model'
+import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface QualifierActionCommand extends Command {
   idAction: string
@@ -40,7 +41,8 @@ export class QualifierActionCommandHandler extends CommandHandler<
     private readonly actionMiloRepository: Action.Milo.Repository,
     private readonly actionAuthorizer: ActionAuthorizer,
     @Inject(JeunesRepositoryToken)
-    private readonly jeuneRepository: Jeune.Repository
+    private readonly jeuneRepository: Jeune.Repository,
+    private readonly evenementService: EvenementService
   ) {
     super('QualifierActionCommandHandler')
   }
@@ -118,7 +120,20 @@ export class QualifierActionCommandHandler extends CommandHandler<
     return failure(new DroitsInsuffisants())
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    command: QualifierActionCommand
+  ): Promise<void> {
+    if (command.codeQualification === Action.Qualification.Code.NON_SNP) {
+      await this.evenementService.creerEvenement(
+        Evenement.Type.ACTION_QUALIFIEE_NON_SNP,
+        utilisateur
+      )
+    } else {
+      await this.evenementService.creerEvenement(
+        Evenement.Type.ACTION_QUALIFIEE_SNP,
+        utilisateur
+      )
+    }
   }
 }

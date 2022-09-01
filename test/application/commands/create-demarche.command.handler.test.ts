@@ -129,7 +129,7 @@ describe('CreateDemarcheCommandHandler', () => {
 
       // Then
       expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
-        Evenement.Type.DEMARCHE_CREEE,
+        Evenement.Type.ACTION_CREEE,
         utilisateur
       )
     })
