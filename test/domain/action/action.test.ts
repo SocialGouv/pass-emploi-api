@@ -666,5 +666,20 @@ describe('Action', () => {
         )
       )
     })
+    it('accepte quand la date de fin réelle est le même jour que la date de création', () => {
+      // Given
+      const actionTerminee: Action = uneActionTerminee({
+        dateCreation: new Date('2022-08-01T10:00:00.000Z')
+      })
+      // When
+      const result = Action.qualifier(
+        actionTerminee,
+        Action.Qualification.Code.SANTE,
+        new Date('2022-08-01T05:00:00.000+02:00')
+      )
+
+      // Then
+      expect(isSuccess(result)).to.be.true()
+    })
   })
 })

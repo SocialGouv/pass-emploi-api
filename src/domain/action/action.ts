@@ -137,7 +137,10 @@ export namespace Action {
     }
 
     const dateFinReelleMiseAJour = dateFinReelle ?? action.dateFinReelle!
-    if (action.dateCreation > dateFinReelleMiseAJour) {
+    if (
+      DateTime.fromJSDate(action.dateCreation).toUTC().startOf('day') >
+      DateTime.fromJSDate(dateFinReelleMiseAJour).toUTC().startOf('day')
+    ) {
       return failure(
         new MauvaiseCommandeError(
           'La date de fin doit être postérieure à la date de création'
