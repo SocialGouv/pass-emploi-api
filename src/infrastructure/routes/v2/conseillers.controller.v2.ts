@@ -10,11 +10,11 @@ import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   GetRendezVousConseillerPaginesQuery,
   GetRendezVousConseillerPaginesQueryHandler
-} from 'src/application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
-import { RendezVousConseillerQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
-import { isSuccess } from 'src/building-blocks/types/result'
-import { Authentification } from 'src/domain/authentification'
-import { Utilisateur } from 'src/infrastructure/decorators/authenticated.decorator'
+} from '../../../application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
+import { RendezVousConseillerQueryModel } from '../../../application/queries/query-models/rendez-vous.query-model'
+import { isSuccess } from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
+import { Utilisateur } from '../../decorators/authenticated.decorator'
 import { handleFailure } from '../failure.handler'
 import { GetRendezVousConseillerV2QueryParams } from '../validation/conseillers.inputs'
 

@@ -1,10 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { emptySuccess, Result, success } from 'src/building-blocks/types/result'
+import {
+  emptySuccess,
+  Result,
+  success
+} from '../../../building-blocks/types/result'
 import {
   NotificationSupport,
   NotificationSupportServiceToken
-} from 'src/domain/notification-support'
+} from '../../../domain/notification-support'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import { Core } from '../../../domain/core'

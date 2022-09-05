@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Authentification } from 'src/domain/authentification'
+import { Authentification } from '../../domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
@@ -10,7 +10,7 @@ import { DateService } from '../../utils/date-service'
 import { fromSqlToRendezVousConseillerQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
-import { Result } from 'src/building-blocks/types/result'
+import { Result } from '../../building-blocks/types/result'
 
 export interface GetAllRendezVousConseiller extends Query {
   idConseiller: string

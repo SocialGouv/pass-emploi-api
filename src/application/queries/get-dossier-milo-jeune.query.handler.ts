@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
-import { Authentification } from 'src/domain/authentification'
+import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
+import { Authentification } from '../../domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import {

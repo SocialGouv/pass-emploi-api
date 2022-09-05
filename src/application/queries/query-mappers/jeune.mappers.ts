@@ -1,9 +1,9 @@
-import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
-import { Situation } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
+import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import {
   DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel
 } from '../query-models/jeunes.query-model'
+import { Situation } from '../../../infrastructure/sequelize/models/situations-milo.sql-model'
 
 export function fromSqlToDetailJeuneQueryModel(
   jeuneSqlModel: JeuneSqlModel,

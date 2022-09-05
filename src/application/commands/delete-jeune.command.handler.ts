@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Evenement, EvenementService } from 'src/domain/evenement'
-import { Mail, MailServiceToken } from 'src/domain/mail'
+import { Evenement, EvenementService } from '../../domain/evenement'
+import { Mail, MailServiceToken } from '../../domain/mail'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   DroitsInsuffisants,

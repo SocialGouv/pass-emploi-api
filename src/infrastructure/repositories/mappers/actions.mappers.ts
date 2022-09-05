@@ -2,8 +2,8 @@ import { DateTime } from 'luxon'
 import {
   ActionQueryModel,
   QualificationActionQueryModel
-} from 'src/application/queries/query-models/actions.query-model'
-import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
+} from '../../../application/queries/query-models/actions.query-model'
+import { ActionSqlModel } from '../../sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 import { JeuneQueryModel } from '../../../application/queries/query-models/jeunes.query-model'
 import { Action } from '../../../domain/action/action'

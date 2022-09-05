@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios'
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
-import { isFailure, isSuccess } from 'src/building-blocks/types/result'
+import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import {
   NotificationSupport,
   InfosJob

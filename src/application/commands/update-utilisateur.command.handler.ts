@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { DateService } from 'src/utils/date-service'
+import { DateService } from '../../utils/date-service'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {

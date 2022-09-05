@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common'
-import { Authentification } from 'src/domain/authentification'
+import { Authentification } from '../../domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { ChatSecretsQueryModel } from './query-models/authentification.query-model'
 import { FirebaseClient } from '../../infrastructure/clients/firebase-client'
 import { ConfigService } from '@nestjs/config'
-import { emptySuccess, Result } from 'src/building-blocks/types/result'
+import { emptySuccess, Result } from '../../building-blocks/types/result'
 
 export interface GetChatSecretsQuery extends Query {
   utilisateur: Authentification.Utilisateur

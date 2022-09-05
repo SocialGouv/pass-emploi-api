@@ -10,7 +10,7 @@ import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   OffreEmploiQueryModel,
   OffresEmploiQueryModel
-} from 'src/application/queries/query-models/offres-emploi.query-model'
+} from '../../application/queries/query-models/offres-emploi.query-model'
 import {
   GetDetailOffreEmploiQuery,
   GetDetailOffreEmploiQueryHandler

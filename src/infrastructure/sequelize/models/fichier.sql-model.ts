@@ -5,7 +5,7 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
-import { Authentification } from 'src/domain/authentification'
+import { Authentification } from '../../../domain/authentification'
 import { AsSql } from '../types'
 
 export class FichierDto extends Model {

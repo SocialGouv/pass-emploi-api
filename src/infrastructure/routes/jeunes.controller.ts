@@ -21,32 +21,32 @@ import {
   ApiTags
 } from '@nestjs/swagger'
 import { Response } from 'express'
-import { ArchiverJeuneCommandHandler } from 'src/application/commands/archiver-jeune.command.handler'
+import { ArchiverJeuneCommandHandler } from '../../application/commands/archiver-jeune.command.handler'
 import {
   CreateDemarcheCommand,
   CreateDemarcheCommandHandler
-} from 'src/application/commands/create-demarche.command.handler'
-import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
+} from '../../application/commands/create-demarche.command.handler'
+import { DeleteJeuneCommandHandler } from '../../application/commands/delete-jeune.command.handler'
 import {
   TransfererJeunesConseillerCommand,
   TransfererJeunesConseillerCommandHandler
-} from 'src/application/commands/transferer-jeunes-conseiller.command.handler'
-import { GetActionsJeunePoleEmploiQueryHandler } from 'src/application/queries/get-actions-jeune-pole-emploi.query.handler'
-import { GetDetailJeuneQueryHandler } from 'src/application/queries/get-detail-jeune.query.handler.db'
-import { GetRendezVousJeunePoleEmploiQueryHandler } from 'src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
+} from '../../application/commands/transferer-jeunes-conseiller.command.handler'
+import { GetActionsJeunePoleEmploiQueryHandler } from '../../application/queries/get-actions-jeune-pole-emploi.query.handler'
+import { GetDetailJeuneQueryHandler } from '../../application/queries/get-detail-jeune.query.handler.db'
+import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import {
   JeuneHomeActionQueryModel,
   JeuneHomeDemarcheQueryModel,
   JeuneHomeQueryModel
-} from 'src/application/queries/query-models/home-jeune.query-model'
+} from '../../application/queries/query-models/home-jeune.query-model'
 import {
   DetailJeuneQueryModel,
   HistoriqueConseillerJeuneQueryModel,
   PreferencesJeuneQueryModel
-} from 'src/application/queries/query-models/jeunes.query-model'
-import { RendezVousJeuneQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
-import { Core } from 'src/domain/core'
-import { DateService } from 'src/utils/date-service'
+} from '../../application/queries/query-models/jeunes.query-model'
+import { RendezVousJeuneQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
+import { Core } from '../../domain/core'
+import { DateService } from '../../utils/date-service'
 import {
   CreateActionCommand,
   CreateActionCommandHandler

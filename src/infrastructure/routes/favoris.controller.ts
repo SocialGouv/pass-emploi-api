@@ -16,17 +16,17 @@ import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   AddFavoriOffreImmersionCommand,
   AddFavoriOffreImmersionCommandHandler
-} from 'src/application/commands/add-favori-offre-immersion.command.handler'
-import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
-import { GetFavorisOffresImmersionJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
+} from '../../application/commands/add-favori-offre-immersion.command.handler'
+import { GetFavorisOffresEmploiJeuneQueryHandler } from '../../application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
+import { GetFavorisOffresImmersionJeuneQueryHandler } from '../../application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
 import {
   FavoriOffreEmploiIdQueryModel,
   OffreEmploiResumeQueryModel
-} from 'src/application/queries/query-models/offres-emploi.query-model'
+} from '../../application/queries/query-models/offres-emploi.query-model'
 import {
   FavoriOffreImmersionIdQueryModel,
   OffreImmersionQueryModel
-} from 'src/application/queries/query-models/offres-immersion.query-model'
+} from '../../application/queries/query-models/offres-immersion.query-model'
 import {
   AddFavoriOffreEmploiCommand,
   AddFavoriOffreEmploiCommandHandler
@@ -60,8 +60,8 @@ import {
   GetFavorisServicesCiviqueQueryParams
 } from './validation/favoris.inputs'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../application/queries/get-favoris-service-civique-jeune.query.handler'
-import { ServiceCiviqueQueryModel } from 'src/application/queries/query-models/service-civique.query-model'
-import { Core } from 'src/domain/core'
+import { ServiceCiviqueQueryModel } from '../../application/queries/query-models/service-civique.query-model'
+import { Core } from '../../domain/core'
 import { FavorisQueryModel } from '../../application/queries/query-models/favoris.query-model'
 import { GetFavorisJeunePourConseillerQueryHandler } from '../../application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
 

@@ -4,12 +4,12 @@ import {
   isSuccess,
   Result,
   success
-} from 'src/building-blocks/types/result'
-import { Action, ActionsRepositoryToken } from 'src/domain/action/action'
+} from '../../../building-blocks/types/result'
+import { Action, ActionsRepositoryToken } from '../../../domain/action/action'
 import {
   Jeune,
   JeuneConfigurationApplicationRepositoryToken
-} from 'src/domain/jeune/jeune'
+} from '../../../domain/jeune/jeune'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {

@@ -15,7 +15,7 @@ import {
   OffresEmploiDto,
   TypeRDVPE
 } from '../repositories/dto/pole-emploi.dto'
-import { RateLimiterService } from 'src/utils/rate-limiter.service'
+import { RateLimiterService } from '../../utils/rate-limiter.service'
 import { Notification } from '../../domain/notification/notification'
 
 const CODE_UTILISATEUR = 0

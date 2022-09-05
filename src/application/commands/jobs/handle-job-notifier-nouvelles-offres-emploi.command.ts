@@ -7,10 +7,10 @@ import {
   isSuccess,
   Result,
   success
-} from 'src/building-blocks/types/result'
-import { OffresEmploi } from 'src/domain/offre-emploi'
-import { Recherche, RecherchesRepositoryToken } from 'src/domain/recherche'
-import { DateService } from 'src/utils/date-service'
+} from '../../../building-blocks/types/result'
+import { OffresEmploi } from '../../../domain/offre-emploi'
+import { Recherche, RecherchesRepositoryToken } from '../../../domain/recherche'
+import { DateService } from '../../../utils/date-service'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import { ErreurHttp } from '../../../building-blocks/types/domain-error'
@@ -25,7 +25,7 @@ import { FindAllOffresEmploiQueryGetter } from '../../queries/query-getters/find
 import {
   NotificationSupport,
   NotificationSupportServiceToken
-} from 'src/domain/notification-support'
+} from '../../../domain/notification-support'
 
 @Injectable()
 export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<

@@ -1,11 +1,11 @@
-import { Jeune } from 'src/domain/jeune/jeune'
+import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
+import { PrestationDto } from '../../../infrastructure/clients/dto/pole-emploi.dto'
 import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous
-} from 'src/domain/rendez-vous'
-import { IdService } from 'src/utils/id-service'
-import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
-import { PrestationDto } from '../../../infrastructure/clients/dto/pole-emploi.dto'
+} from '../../../domain/rendez-vous'
+import { Jeune } from '../../../domain/jeune/jeune'
+import { IdService } from '../../../utils/id-service'
 
 export function fromPrestationDtoToRendezVousQueryModel(
   prestation: PrestationDto,

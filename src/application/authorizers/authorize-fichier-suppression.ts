@@ -1,8 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
-import { emptySuccess, failure, Result } from 'src/building-blocks/types/result'
-import { Authentification } from 'src/domain/authentification'
-import { Fichier, FichierRepositoryToken } from 'src/domain/fichier'
+import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
+import {
+  emptySuccess,
+  failure,
+  Result
+} from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Fichier, FichierRepositoryToken } from '../../domain/fichier'
 
 @Injectable()
 export class FichierSuppressionAuthorizer {

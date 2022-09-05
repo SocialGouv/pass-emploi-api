@@ -14,8 +14,8 @@ import {
 import { HttpStatus } from '@nestjs/common/enums/http-status.enum'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ApiConsumes, ApiOAuth2, ApiTags } from '@nestjs/swagger'
-import { SupprimerFichierCommandHandler } from 'src/application/commands/supprimer-fichier.command.handler'
-import { TelechargerFichierQueryHandler } from 'src/application/queries/telecharger-fichier.query.handler'
+import { SupprimerFichierCommandHandler } from '../../application/commands/supprimer-fichier.command.handler'
+import { TelechargerFichierQueryHandler } from '../../application/queries/telecharger-fichier.query.handler'
 import {
   TeleverserFichierCommand,
   TeleverserFichierCommandHandler,

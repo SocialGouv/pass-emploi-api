@@ -2,8 +2,8 @@ import { Inject, Injectable } from '@nestjs/common'
 import {
   ArchiveJeuneRepositoryToken,
   ArchiveJeune
-} from 'src/domain/archive-jeune'
-import { Evenement, EvenementService } from 'src/domain/evenement'
+} from '../../domain/archive-jeune'
+import { Evenement, EvenementService } from '../../domain/evenement'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   emptySuccess,

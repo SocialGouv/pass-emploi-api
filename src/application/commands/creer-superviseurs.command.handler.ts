@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Authentification } from 'src/domain/authentification'
+import { Authentification } from '../../domain/authentification'
 import {
   Superviseur,
   SuperviseursRepositoryToken
-} from 'src/domain/superviseur'
+} from '../../domain/superviseur'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { emptySuccess, Result } from '../../building-blocks/types/result'

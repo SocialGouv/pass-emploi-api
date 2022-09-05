@@ -2,11 +2,11 @@ import { Inject, Injectable } from '@nestjs/common'
 import {
   ErreurHttp,
   NonTrouveError
-} from 'src/building-blocks/types/domain-error'
-import { failure, Result, success } from 'src/building-blocks/types/result'
-import { Authentification } from 'src/domain/authentification'
-import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune/jeune'
-import { DateService } from 'src/utils/date-service'
+} from '../../building-blocks/types/domain-error'
+import { failure, Result, success } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { DateService } from '../../utils/date-service'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'

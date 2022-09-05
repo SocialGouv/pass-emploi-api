@@ -4,7 +4,7 @@ import {
   failure,
   Result,
   success
-} from 'src/building-blocks/types/result'
+} from '../../../building-blocks/types/result'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {

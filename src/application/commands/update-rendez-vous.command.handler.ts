@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Core } from 'src/domain/core'
-import { Evenement, EvenementService } from 'src/domain/evenement'
+import { Core } from '../../domain/core'
+import { Evenement, EvenementService } from '../../domain/evenement'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {

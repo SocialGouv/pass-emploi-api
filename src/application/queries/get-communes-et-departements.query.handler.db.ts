@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { remove as enleverLesAccents } from 'remove-accents'
 import { QueryTypes, Sequelize } from 'sequelize'
-import { emptySuccess, Result } from 'src/building-blocks/types/result'
+import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { CommuneSqlModel } from '../../infrastructure/sequelize/models/commune.sql-model'

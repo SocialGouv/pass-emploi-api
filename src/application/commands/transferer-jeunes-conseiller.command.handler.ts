@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common'
 import {
   MauvaiseCommandeError,
   NonTrouveError
-} from 'src/building-blocks/types/domain-error'
-import { Core } from 'src/domain/core'
-import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune/jeune'
+} from '../../building-blocks/types/domain-error'
+import { Core } from '../../domain/core'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {

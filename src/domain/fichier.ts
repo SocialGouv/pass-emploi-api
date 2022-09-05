@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { MauvaiseCommandeError } from 'src/building-blocks/types/domain-error'
+import { MauvaiseCommandeError } from '../building-blocks/types/domain-error'
 import { failure, Result, success } from '../building-blocks/types/result'
 import { DateService } from '../utils/date-service'
 import { IdService } from '../utils/id-service'

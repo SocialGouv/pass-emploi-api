@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { Authentification } from 'src/domain/authentification'
+import { Authentification } from '../../domain/authentification'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'

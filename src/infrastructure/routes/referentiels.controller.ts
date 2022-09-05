@@ -1,9 +1,9 @@
 import { Controller, Get, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { GetTypesQualificationsQueryHandler } from 'src/application/queries/get-types-qualifications.query.handler'
-import { GetTypesRendezVousQueryHandler } from 'src/application/queries/get-types-rendez-vous.query.handler'
-import { TypeQualificationQueryModel } from 'src/application/queries/query-models/actions.query-model'
-import { TypeRendezVousQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
+import { GetTypesQualificationsQueryHandler } from '../../application/queries/get-types-qualifications.query.handler'
+import { GetTypesRendezVousQueryHandler } from '../../application/queries/get-types-rendez-vous.query.handler'
+import { TypeQualificationQueryModel } from '../../application/queries/query-models/actions.query-model'
+import { TypeRendezVousQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
 import { GetAgencesQueryHandler } from '../../application/queries/get-agences.query.handler'
 import {
   GetCommunesEtDepartementsQuery,

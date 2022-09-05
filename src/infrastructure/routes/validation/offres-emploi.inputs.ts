@@ -9,7 +9,7 @@ import {
   IsBoolean,
   IsNumber
 } from 'class-validator'
-import { Contrat, Duree, Experience } from 'src/domain/offre-emploi'
+import { Contrat, Duree, Experience } from '../../../domain/offre-emploi'
 import {
   transformStringToInteger,
   transformStringToBoolean,

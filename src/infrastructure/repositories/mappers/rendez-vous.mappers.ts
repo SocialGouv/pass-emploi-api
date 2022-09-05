@@ -1,11 +1,11 @@
-import { JeuneDuRendezVous, RendezVous } from 'src/domain/rendez-vous'
+import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
+import { toConfigurationApplication } from './jeunes.mappers'
 import {
   RendezVousDto,
   RendezVousSqlModel
-} from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { AsSql } from 'src/infrastructure/sequelize/types'
-import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
-import { toConfigurationApplication } from './jeunes.mappers'
+} from '../../sequelize/models/rendez-vous.sql-model'
+import { AsSql } from '../../sequelize/types'
+import { JeuneDuRendezVous, RendezVous } from '../../../domain/rendez-vous'
 
 export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
   return {

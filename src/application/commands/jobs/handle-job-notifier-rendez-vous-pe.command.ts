@@ -5,9 +5,9 @@ import {
   failure,
   Result,
   success
-} from 'src/building-blocks/types/result'
-import { PoleEmploiClient } from 'src/infrastructure/clients/pole-emploi-client'
-import { DateService } from 'src/utils/date-service'
+} from '../../../building-blocks/types/result'
+import { PoleEmploiClient } from '../../../infrastructure/clients/pole-emploi-client'
+import { DateService } from '../../../utils/date-service'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import { Notification } from '../../../domain/notification/notification'

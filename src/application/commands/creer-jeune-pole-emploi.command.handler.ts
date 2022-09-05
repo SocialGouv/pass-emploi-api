@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {

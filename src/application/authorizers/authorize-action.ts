@@ -1,8 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
-import { emptySuccess, failure, Result } from 'src/building-blocks/types/result'
-import { Action, ActionsRepositoryToken } from 'src/domain/action/action'
-import { Authentification } from 'src/domain/authentification'
+import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
+import {
+  emptySuccess,
+  failure,
+  Result
+} from '../../building-blocks/types/result'
+import { Action, ActionsRepositoryToken } from '../../domain/action/action'
+import { Authentification } from '../../domain/authentification'
 
 @Injectable()
 export class ActionAuthorizer {

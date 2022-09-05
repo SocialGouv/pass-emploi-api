@@ -6,7 +6,7 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
-import { CodeTypeRendezVous } from 'src/domain/rendez-vous'
+import { CodeTypeRendezVous } from '../../../domain/rendez-vous'
 import { JeuneSqlModel } from './jeune.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-association.model'
 

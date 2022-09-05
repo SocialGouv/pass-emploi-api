@@ -1,7 +1,7 @@
-import { GetOffresEmploiQuery } from 'src/application/queries/get-offres-emploi.query.handler'
-import { GetOffresImmersionQuery } from 'src/application/queries/get-offres-immersion.query.handler'
+import { GetOffresEmploiQuery } from '../application/queries/get-offres-emploi.query.handler'
+import { GetOffresImmersionQuery } from '../application/queries/get-offres-immersion.query.handler'
 import { DateTime } from 'luxon'
-import { GetServicesCiviqueQuery } from 'src/application/queries/get-services-civique.query.handler'
+import { GetServicesCiviqueQuery } from '../application/queries/get-services-civique.query.handler'
 
 export const RecherchesRepositoryToken = 'RecherchesRepositoryToken'
 
