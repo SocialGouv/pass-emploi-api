@@ -46,7 +46,7 @@ describe('MiloHttpSqlRepository', () => {
         // Given
         nock('https://milo.com')
           .post('/dossiers/idDossier/situation', {
-            dateDebut: '2020-04-06',
+            dateDebut: '2022-03-01',
             dateFinReelle: '2022-03-01',
             commentaire: "Contenu de l'action - Commentaire de l'action",
             mesure: 'SANTE',

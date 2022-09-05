@@ -198,6 +198,7 @@ export class ActionsController {
     const command: QualifierActionCommand = {
       idAction,
       codeQualification: qualifierActionPayload.codeQualification,
+      dateDebut: qualifierActionPayload.dateDebut,
       dateFinReelle: qualifierActionPayload.dateFinReelle,
       utilisateur
     }

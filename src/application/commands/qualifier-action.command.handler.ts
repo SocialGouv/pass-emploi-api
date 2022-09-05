@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   DroitsInsuffisants,
@@ -21,11 +20,13 @@ import { ActionAuthorizer } from '../authorizers/authorize-action'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { QualificationActionQueryModel } from '../queries/query-models/actions.query-model'
 import { Evenement, EvenementService } from '../../domain/evenement'
+import { Command } from '../../building-blocks/types/command'
 
 export interface QualifierActionCommand extends Command {
   idAction: string
   codeQualification: Action.Qualification.Code
   utilisateur: Authentification.Utilisateur
+  dateDebut?: Date
   dateFinReelle?: Date
 }
 
@@ -58,6 +59,7 @@ export class QualifierActionCommandHandler extends CommandHandler<
     const qualifierActionResult = Action.qualifier(
       action,
       command.codeQualification,
+      command.dateDebut,
       command.dateFinReelle
     )
 
