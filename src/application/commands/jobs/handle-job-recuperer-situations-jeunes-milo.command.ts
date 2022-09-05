@@ -4,10 +4,10 @@ import {
   isFailure,
   Result,
   success
-} from 'src/building-blocks/types/result'
-import { Jeune, JeunesRepositoryToken } from 'src/domain/jeune/jeune'
-import { Milo, MiloRepositoryToken } from 'src/domain/milo'
-import { DateService } from 'src/utils/date-service'
+} from '../../../building-blocks/types/result'
+import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
+import { Milo, MiloRepositoryToken } from '../../../domain/milo'
+import { DateService } from '../../../utils/date-service'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {

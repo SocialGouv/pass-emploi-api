@@ -6,7 +6,7 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
-import { Authentification } from 'src/domain/authentification'
+import { Authentification } from '../../../domain/authentification'
 import { Core } from '../../../domain/core'
 
 export class EvenementEngagementDto extends Model {

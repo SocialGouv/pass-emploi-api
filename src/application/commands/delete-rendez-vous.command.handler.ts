@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Evenement, EvenementService } from 'src/domain/evenement'
-import { PlanificateurService } from 'src/domain/planificateur'
+import { Evenement, EvenementService } from '../../domain/evenement'
+import { PlanificateurService } from '../../domain/planificateur'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'

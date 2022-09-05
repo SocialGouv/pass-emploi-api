@@ -17,9 +17,9 @@ import {
   MauvaiseCommandeError,
   NonTrouveError,
   RessourceIndisponibleError
-} from 'src/building-blocks/types/domain-error'
-import { isFailure, Result } from 'src/building-blocks/types/result'
-import { Action } from 'src/domain/action/action'
+} from '../../building-blocks/types/domain-error'
+import { isFailure, Result } from '../../building-blocks/types/result'
+import { Action } from '../../domain/action/action'
 
 export function handleFailure(result: Result): void {
   if (isFailure(result)) {

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common'
-import { Authentification } from 'src/domain/authentification'
+import { Authentification } from '../../domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { RechercheQueryModel } from './query-models/recherches.query-model'
 import { FindOptions } from 'sequelize'
 import { RechercheSqlModel } from '../../infrastructure/sequelize/models/recherche.sql-model'
-import { Result } from 'src/building-blocks/types/result'
+import { Result } from '../../building-blocks/types/result'
 import { ConseillerForJeuneAvecPartageAuthorizer } from '../authorizers/authorize-conseiller-for-jeune-avec-partage'
 
 export interface GetRecherchesQuery extends Query {

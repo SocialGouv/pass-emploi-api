@@ -12,11 +12,11 @@ import {
   Min,
   ValidateIf
 } from 'class-validator'
-import { RendezVous } from 'src/domain/rendez-vous'
+import { RendezVous } from '../../../domain/rendez-vous'
 import { Action } from '../../../domain/action/action'
 import { Transform, Type } from 'class-transformer'
 import { transformStringToArray } from './utils/transformers'
-import { ArchiveJeune } from 'src/domain/archive-jeune'
+import { ArchiveJeune } from '../../../domain/archive-jeune'
 
 export class PutNotificationTokenInput {
   @ApiProperty()

@@ -1,6 +1,6 @@
-import { Authentification } from 'src/domain/authentification'
-import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
+import { Authentification } from '../../../domain/authentification'
+import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 
 export function fromConseillerSqlToUtilisateur(
   conseillerSqlModel: ConseillerSqlModel,

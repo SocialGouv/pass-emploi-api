@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import {
   NotificationSupport,
   NotificationSupportServiceToken
-} from 'src/domain/notification-support'
+} from '../../../domain/notification-support'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {

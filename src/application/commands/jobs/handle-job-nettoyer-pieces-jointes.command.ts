@@ -1,12 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { emptySuccess, Result, success } from 'src/building-blocks/types/result'
-import { Fichier, FichierRepositoryToken } from 'src/domain/fichier'
+import {
+  emptySuccess,
+  Result,
+  success
+} from '../../../building-blocks/types/result'
+import { Fichier, FichierRepositoryToken } from '../../../domain/fichier'
 import {
   NotificationSupport,
   NotificationSupportServiceToken
-} from 'src/domain/notification-support'
-import { DateService } from 'src/utils/date-service'
-import { buildError } from 'src/utils/logger.module'
+} from '../../../domain/notification-support'
+import { DateService } from '../../../utils/date-service'
+import { buildError } from '../../../utils/logger.module'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 

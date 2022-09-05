@@ -1,5 +1,5 @@
-import { DetailConseillerQueryModel } from 'src/application/queries/query-models/conseillers.query-model'
-import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
+import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
+import { DetailConseillerQueryModel } from '../../../application/queries/query-models/conseillers.query-model'
 
 export function fromSqlToDetailConseillerQueryModel(
   conseillerSqlModel: ConseillerSqlModel,

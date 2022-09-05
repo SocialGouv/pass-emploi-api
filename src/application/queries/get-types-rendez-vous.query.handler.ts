@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common'
-import { emptySuccess, Result } from 'src/building-blocks/types/result'
+import { emptySuccess, Result } from '../../building-blocks/types/result'
 import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous
-} from 'src/domain/rendez-vous'
+} from '../../domain/rendez-vous'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { TypeRendezVousQueryModel } from './query-models/rendez-vous.query-model'

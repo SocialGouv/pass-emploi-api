@@ -6,7 +6,7 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Authentification } from '../../domain/authentification'
 import { GetActionsByJeuneQueryHandler } from './get-actions-by-jeune.query.handler.db'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
-import { isSuccess, Result } from 'src/building-blocks/types/result'
+import { isSuccess, Result } from '../../building-blocks/types/result'
 
 export interface GetJeuneHomeActionsQuery extends Query {
   idJeune: string

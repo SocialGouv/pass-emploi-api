@@ -1,4 +1,4 @@
-import { CategorieSituationMilo, EtatSituationMilo } from 'src/domain/milo'
+import { CategorieSituationMilo, EtatSituationMilo } from '../../../domain/milo'
 
 export interface DossierMiloDto {
   idDossier: number

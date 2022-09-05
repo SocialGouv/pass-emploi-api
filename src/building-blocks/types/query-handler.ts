@@ -1,5 +1,5 @@
 import { ForbiddenException, Logger } from '@nestjs/common'
-import { Authentification } from 'src/domain/authentification'
+import { Authentification } from '../../domain/authentification'
 import { LogEvent, LogEventKey } from './log.event'
 import { Query } from './query'
 import { emptySuccess, failure, isFailure, Result } from './result'

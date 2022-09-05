@@ -10,8 +10,8 @@ import { GetOffresEmploiQuery } from '../../application/queries/get-offres-emplo
 import { CommuneSqlModel } from '../sequelize/models/commune.sql-model'
 import { SequelizeInjectionToken } from '../sequelize/providers'
 import { GetOffresImmersionQuery } from '../../application/queries/get-offres-immersion.query.handler'
-import { GetServicesCiviqueQuery } from 'src/application/queries/get-services-civique.query.handler'
-import { OffreServiceCivique } from 'src/domain/offre-service-civique'
+import { GetServicesCiviqueQuery } from '../../application/queries/get-services-civique.query.handler'
+import { OffreServiceCivique } from '../../domain/offre-service-civique'
 
 @Injectable()
 export class RechercheSqlRepository implements Recherche.Repository {

@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Evenement, EvenementService } from 'src/domain/evenement'
+import { Evenement, EvenementService } from '../../domain/evenement'
 import {
   OffreImmersion,
   OffresImmersion,
   OffresImmersionRepositoryToken
-} from 'src/domain/offre-immersion'
+} from '../../domain/offre-immersion'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { FavoriExisteDejaError } from '../../building-blocks/types/domain-error'

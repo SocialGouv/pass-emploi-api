@@ -13,7 +13,7 @@ import {
   IsArray,
   ArrayNotEmpty
 } from 'class-validator'
-import { CodeTypeRendezVous } from 'src/domain/rendez-vous'
+import { CodeTypeRendezVous } from '../../../domain/rendez-vous'
 
 export class CreateRendezVousPayload {
   @ApiPropertyOptional()

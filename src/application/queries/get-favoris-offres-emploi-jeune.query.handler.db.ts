@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { Authentification } from 'src/domain/authentification'
-import { Jeune } from 'src/domain/jeune/jeune'
+import { Authentification } from '../../domain/authentification'
+import { Jeune } from '../../domain/jeune/jeune'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
@@ -13,7 +13,7 @@ import {
   fromSqlToFavorisOffresEmploiIdsQueryModels,
   toOffreEmploi
 } from '../../infrastructure/repositories/mappers/offres-emploi.mappers'
-import { Result } from 'src/building-blocks/types/result'
+import { Result } from '../../building-blocks/types/result'
 
 export interface GetFavorisJeuneQuery extends Query {
   idJeune: Jeune.Id

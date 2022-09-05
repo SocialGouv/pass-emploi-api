@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { Authentification } from 'src/domain/authentification'
-import { Evenement, EvenementService } from 'src/domain/evenement'
+import { Authentification } from '../../domain/authentification'
+import { Evenement, EvenementService } from '../../domain/evenement'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import {

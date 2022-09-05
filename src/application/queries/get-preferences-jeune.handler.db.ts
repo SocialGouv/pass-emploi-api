@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { Result, success } from 'src/building-blocks/types/result'
-import { Authentification } from 'src/domain/authentification'
+import { Result, success } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'

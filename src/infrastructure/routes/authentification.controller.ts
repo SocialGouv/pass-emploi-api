@@ -20,7 +20,7 @@ import {
   ApiSecurity,
   ApiTags
 } from '@nestjs/swagger'
-import { GetChatSecretsQueryHandler } from 'src/application/queries/get-chat-secrets.query.handler'
+import { GetChatSecretsQueryHandler } from '../../application/queries/get-chat-secrets.query.handler'
 import {
   UpdateUtilisateurCommand,
   UpdateUtilisateurCommandHandler

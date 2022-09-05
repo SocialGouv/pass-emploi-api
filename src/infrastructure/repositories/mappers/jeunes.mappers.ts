@@ -1,14 +1,11 @@
 import { DateTime, Duration } from 'luxon'
-import { JeuneHomeQueryModel } from 'src/application/queries/query-models/home-jeune.query-model'
-import { Action } from 'src/domain/action/action'
-import { Jeune } from 'src/domain/jeune/jeune'
-import { mapCodeLabelTypeRendezVous } from 'src/domain/rendez-vous'
-import { ActionSqlModel } from 'src/infrastructure/sequelize/models/action.sql-model'
-import {
-  JeuneDto,
-  JeuneSqlModel
-} from 'src/infrastructure/sequelize/models/jeune.sql-model'
-import { RendezVousSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { JeuneHomeQueryModel } from '../../../application/queries/query-models/home-jeune.query-model'
+import { Action } from '../../../domain/action/action'
+import { Jeune } from '../../../domain/jeune/jeune'
+import { mapCodeLabelTypeRendezVous } from '../../../domain/rendez-vous'
+import { ActionSqlModel } from '../../sequelize/models/action.sql-model'
+import { JeuneDto, JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
+import { RendezVousSqlModel } from '../../sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../sequelize/types'
 import { buildEtat } from './actions.mappers'
 

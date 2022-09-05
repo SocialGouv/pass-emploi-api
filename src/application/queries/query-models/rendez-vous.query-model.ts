@@ -3,7 +3,7 @@ import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous,
   TypeRendezVous
-} from 'src/domain/rendez-vous'
+} from '../../../domain/rendez-vous'
 
 class JeuneQueryModel {
   @ApiProperty()

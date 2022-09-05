@@ -5,12 +5,12 @@ import {
   failure,
   Result,
   success
-} from 'src/building-blocks/types/result'
+} from '../../../building-blocks/types/result'
 import {
   NotificationSupport,
   NotificationSupportServiceToken
-} from 'src/domain/notification-support'
-import { DateService } from 'src/utils/date-service'
+} from '../../../domain/notification-support'
+import { DateService } from '../../../utils/date-service'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import { Chat, ChatRepositoryToken } from '../../../domain/chat'

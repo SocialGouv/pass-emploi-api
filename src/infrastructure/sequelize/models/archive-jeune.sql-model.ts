@@ -6,7 +6,7 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
-import { ArchiveJeune } from 'src/domain/archive-jeune'
+import { ArchiveJeune } from '../../../domain/archive-jeune'
 
 export class ArchiveJeuneDto extends Model {
   @PrimaryKey

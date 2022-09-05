@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
-import { emptySuccess, Result } from 'src/building-blocks/types/result'
-import { Superviseur } from 'src/domain/superviseur'
 import { SuperviseurSqlModel } from '../sequelize/models/superviseur.sql-model'
+import { Superviseur } from '../../domain/superviseur'
+import { emptySuccess, Result } from '../../building-blocks/types/result'
 
 @Injectable()
 export class SuperviseurSqlRepository implements Superviseur.Repository {

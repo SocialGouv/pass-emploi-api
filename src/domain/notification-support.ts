@@ -1,4 +1,4 @@
-import { Result } from 'src/building-blocks/types/result'
+import { Result } from '../building-blocks/types/result'
 
 export const NotificationSupportServiceToken = 'NotificationSupport.Service'
 

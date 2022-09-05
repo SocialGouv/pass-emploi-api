@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
-import { Authentification } from 'src/domain/authentification'
-import { Evenement } from 'src/domain/evenement'
-import { DateService } from 'src/utils/date-service'
+import { Authentification } from '../../domain/authentification'
+import { Evenement } from '../../domain/evenement'
+import { DateService } from '../../utils/date-service'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { EvenementEngagementSqlModel } from '../sequelize/models/evenement-engagement.sql-model'
 

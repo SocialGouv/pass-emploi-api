@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { TypeRendezVous } from 'src/domain/rendez-vous'
+import { TypeRendezVous } from '../../../domain/rendez-vous'
 import { DemarcheQueryModel, ActionQueryModel } from './actions.query-model'
 import { RendezVousBaseQueryModel } from './rendez-vous.query-model'
 import { CampagneQueryModel } from './campagne.query-model'

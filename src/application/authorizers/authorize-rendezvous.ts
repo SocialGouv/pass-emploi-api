@@ -1,8 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
-import { emptySuccess, failure, Result } from 'src/building-blocks/types/result'
-import { Authentification } from 'src/domain/authentification'
-import { RendezVous, RendezVousRepositoryToken } from 'src/domain/rendez-vous'
+import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
+import {
+  emptySuccess,
+  failure,
+  Result
+} from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
 
 @Injectable()
 export class RendezVousAuthorizer {

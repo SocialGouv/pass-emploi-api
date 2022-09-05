@@ -15,14 +15,14 @@ import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   UpdateRendezVousCommand,
   UpdateRendezVousCommandHandler
-} from 'src/application/commands/update-rendez-vous.command.handler'
-import { GetDetailRendezVousQueryHandler } from 'src/application/queries/get-detail-rendez-vous.query.handler.db'
-import { RendezVousConseillerQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
+} from '../../application/commands/update-rendez-vous.command.handler'
+import { GetDetailRendezVousQueryHandler } from '../../application/queries/get-detail-rendez-vous.query.handler.db'
+import { RendezVousConseillerQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
 import {
   MauvaiseCommandeError,
   NonTrouveError
-} from 'src/building-blocks/types/domain-error'
-import { Core } from 'src/domain/core'
+} from '../../building-blocks/types/domain-error'
+import { Core } from '../../domain/core'
 import {
   DeleteRendezVousCommand,
   DeleteRendezVousCommandHandler

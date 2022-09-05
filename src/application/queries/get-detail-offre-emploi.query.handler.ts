@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { emptySuccess, Result } from 'src/building-blocks/types/result'
+import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { PoleEmploiClient } from '../../infrastructure/clients/pole-emploi-client'
