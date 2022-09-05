@@ -1,4 +1,3 @@
-import { uneAutreDate, uneDate, uneDatetime } from 'test/fixtures/date.fixture'
 import {
   failure,
   isFailure,
@@ -13,6 +12,7 @@ import { expect, StubbedClass, stubClass } from '../../utils'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { DateTime } from 'luxon'
 import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
+import { uneAutreDate, uneDate, uneDatetime } from '../../fixtures/date.fixture'
 
 describe('Action', () => {
   describe('Factory', () => {
@@ -578,8 +578,10 @@ describe('Action', () => {
         Action.Qualification.Code.NON_SNP
       )
 
-      const expectedAction: Action = {
+      const expectedAction: Action.Qualifiee = {
         ...actionTerminee,
+        dateDebut: actionTerminee.dateCreation,
+        dateFinReelle,
         qualification: { code: Action.Qualification.Code.NON_SNP, heures: 0 }
       }
 
@@ -597,13 +599,15 @@ describe('Action', () => {
       const actionQualifiee = Action.qualifier(
         actionTerminee,
         Action.Qualification.Code.SANTE,
+        undefined,
         nouvelleDateFinReelle
       )
 
       // Then
-      const expectedAction: Action = {
+      const expectedAction: Action.Qualifiee = {
         ...actionTerminee,
         qualification: { code: Action.Qualification.Code.SANTE, heures: 2 },
+        dateDebut: actionTerminee.dateCreation,
         dateFinReelle: nouvelleDateFinReelle
       }
       expect(actionQualifiee).to.deep.equal(success(expectedAction))
@@ -654,6 +658,7 @@ describe('Action', () => {
       const result = Action.qualifier(
         actionTerminee,
         Action.Qualification.Code.SANTE,
+        undefined,
         new Date('2022-07-01')
       )
 
@@ -675,6 +680,7 @@ describe('Action', () => {
       const result = Action.qualifier(
         actionTerminee,
         Action.Qualification.Code.SANTE,
+        undefined,
         new Date('2022-08-01T05:00:00.000+02:00')
       )
 

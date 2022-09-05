@@ -59,6 +59,9 @@ export class ActionDto extends Model {
   @Column({ field: 'rappel', type: DataType.BOOLEAN })
   rappel: boolean
 
+  @Column({ field: 'date_debut', type: DataType.DATE })
+  dateDebut: Date | null
+
   @Column({ field: 'date_fin_reelle', type: DataType.DATE })
   dateFinReelle: Date | null
 

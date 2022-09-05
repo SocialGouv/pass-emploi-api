@@ -126,6 +126,7 @@ describe('ActionSqlRepository', () => {
           prenom: 'Nils',
           type: Action.TypeCreateur.CONSEILLER
         },
+        dateDebut: undefined,
         dateEcheance: new Date('2021-11-11T08:03:30.000Z'),
         dateFinReelle: new Date('2021-11-10T08:03:30.000Z'),
         rappel: true,
@@ -144,6 +145,7 @@ describe('ActionSqlRepository', () => {
         id: idAction,
         statut: Action.Statut.EN_COURS,
         idJeune: jeune.id,
+        dateDebut: new Date('2021-11-09T08:03:30.000Z'),
         dateFinReelle: new Date('2021-11-10T08:03:30.000Z'),
         codeQualification: Action.Qualification.Code.SANTE,
         heuresQualifiees: 2
@@ -173,6 +175,7 @@ describe('ActionSqlRepository', () => {
           prenom: 'Nils',
           type: Action.TypeCreateur.CONSEILLER
         },
+        dateDebut: new Date('2021-11-09T08:03:30.000Z'),
         dateEcheance: new Date('2021-11-11T08:03:30.000Z'),
         dateFinReelle: new Date('2021-11-10T08:03:30.000Z'),
         rappel: true,

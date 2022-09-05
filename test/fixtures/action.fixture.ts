@@ -18,6 +18,7 @@ export const uneAction = (args: Partial<Action> = {}): Action => {
       nom: 'Tavernier'
     },
     dateEcheance: new Date('2020-02-02'),
+    dateDebut: undefined,
     dateFinReelle: undefined,
     rappel: true,
     qualification: undefined
@@ -43,6 +44,7 @@ export const uneActionQualifiee = (
 ): Action.Qualifiee => {
   const defaults: Action.Qualifiee = {
     ...uneAction(),
+    dateDebut: uneDate(),
     dateFinReelle: uneDate(),
     qualification: {
       code: Action.Qualification.Code.SANTE,

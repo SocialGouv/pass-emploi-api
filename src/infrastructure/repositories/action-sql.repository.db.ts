@@ -91,6 +91,7 @@ export class ActionSqlRepository implements Action.Repository {
         prenom: sqlModel.createur.prenom,
         type: sqlModel.typeCreateur
       },
+      dateDebut: sqlModel.dateDebut ?? undefined,
       dateEcheance: sqlModel.dateEcheance,
       dateFinReelle: sqlModel.dateFinReelle ?? undefined,
       rappel: sqlModel.rappel,
@@ -122,6 +123,7 @@ export class ActionSqlRepository implements Action.Repository {
       typeCreateur: action.createur.type,
       estVisibleParConseiller: true,
       dateEcheance: action.dateEcheance,
+      dateDebut: action.dateDebut ?? null,
       dateFinReelle: action.dateFinReelle ?? null,
       rappel: action.rappel,
       codeQualification: action.qualification?.code ?? null,

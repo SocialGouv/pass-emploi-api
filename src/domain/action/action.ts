@@ -34,6 +34,7 @@ export interface Action {
   idJeune: Jeune.Id
   createur: Action.Createur
   dateEcheance: Date
+  dateDebut?: Date
   dateFinReelle?: Date
   rappel: boolean
   qualification?: Action.Qualification
@@ -57,6 +58,7 @@ export namespace Action {
   }
 
   export interface Qualifiee extends Terminee {
+    dateDebut: Date
     qualification: Action.Qualification
   }
 
@@ -127,6 +129,7 @@ export namespace Action {
   export function qualifier(
     action: Action,
     codeQualification: Action.Qualification.Code,
+    dateDebut?: Date,
     dateFinReelle?: Date
   ): Result<Action.Qualifiee> {
     if (!estTerminee(action)) {
@@ -136,9 +139,11 @@ export namespace Action {
       return failure(new MauvaiseCommandeError('Action déjà qualifiée'))
     }
 
+    const dateDebutReelle = dateDebut ?? action.dateCreation
+
     const dateFinReelleMiseAJour = dateFinReelle ?? action.dateFinReelle!
     if (
-      DateTime.fromJSDate(action.dateCreation).toUTC().startOf('day') >
+      DateTime.fromJSDate(dateDebutReelle).toUTC().startOf('day') >
       DateTime.fromJSDate(dateFinReelleMiseAJour).toUTC().startOf('day')
     ) {
       return failure(
@@ -152,6 +157,7 @@ export namespace Action {
 
     return success({
       ...action,
+      dateDebut: dateDebutReelle,
       dateFinReelle: dateFinReelleMiseAJour,
       qualification: {
         code: codeQualification,
@@ -218,6 +224,7 @@ export namespace Action {
           statut === Action.Statut.TERMINEE
             ? dateEcheanceA9Heures30
             : undefined,
+        dateDebut: undefined,
         qualification: undefined
       }
       return success(action)

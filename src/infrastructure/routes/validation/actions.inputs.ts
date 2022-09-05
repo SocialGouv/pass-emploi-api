@@ -35,7 +35,13 @@ export class QualifierActionPayload {
   @IsDate()
   @IsOptional()
   @Transform(({ value }) => new Date(value))
-  dateFinReelle: Date
+  dateDebut?: Date
+
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @IsDate()
+  @IsOptional()
+  @Transform(({ value }) => new Date(value))
+  dateFinReelle?: Date
 }
 
 export class CreateActionPayload {

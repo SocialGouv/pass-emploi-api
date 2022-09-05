@@ -29,9 +29,7 @@ export class ActionMiloHttpRepository implements Action.Milo.Repository {
   async save(action: Action.Milo): Promise<Result> {
     try {
       const body = {
-        dateDebut: DateTime.fromJSDate(action.dateCreation).toFormat(
-          'yyyy-MM-dd'
-        ),
+        dateDebut: DateTime.fromJSDate(action.dateDebut).toFormat('yyyy-MM-dd'),
         dateFinReelle: DateTime.fromJSDate(action.dateFinReelle).toFormat(
           'yyyy-MM-dd'
         ),

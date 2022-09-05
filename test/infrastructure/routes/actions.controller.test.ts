@@ -289,6 +289,7 @@ describe('ActionsController', () => {
       const command: QualifierActionCommand = {
         idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
         utilisateur,
+        dateDebut: uneDate(),
         dateFinReelle: uneDate(),
         codeQualification: Action.Qualification.Code.EMPLOI
       }
@@ -306,7 +307,11 @@ describe('ActionsController', () => {
       // When
       await request(app.getHttpServer())
         .post(`/actions/${command.idAction}/qualifier`)
-        .send({ ...command, dateFinReelle: uneDate().toISOString() })
+        .send({
+          ...command,
+          dateDebut: uneDate().toISOString(),
+          dateFinReelle: uneDate().toISOString()
+        })
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .set('authorization', unHeaderAuthorization())
@@ -324,7 +329,8 @@ describe('ActionsController', () => {
       const command: QualifierActionCommand = {
         idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
         utilisateur,
-        dateFinReelle: uneDate(),
+        dateDebut: undefined,
+        dateFinReelle: undefined,
         codeQualification: Action.Qualification.Code.EMPLOI
       }
 
@@ -335,7 +341,7 @@ describe('ActionsController', () => {
       // When
       await request(app.getHttpServer())
         .post(`/actions/${command.idAction}/qualifier`)
-        .send({ ...command, dateFinReelle: uneDate().toISOString() })
+        .send({ ...command })
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .set('authorization', unHeaderAuthorization())
