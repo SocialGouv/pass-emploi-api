@@ -44,9 +44,6 @@ export class InitCronsCommandHandler extends CommandHandler<Command, void> {
     await this.planificateurService.planifierCron(
       Planificateur.CronJob.NETTOYER_LES_ARCHIVES_JEUNES
     )
-    await this.planificateurService.planifierCron(
-      Planificateur.CronJob.NOTIFIER_RENDEZVOUS_PE
-    )
     return emptySuccess()
   }
 
