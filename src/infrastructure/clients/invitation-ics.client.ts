@@ -3,6 +3,7 @@ import { QueryTypes, Sequelize } from 'sequelize'
 import { SequelizeInjectionToken } from '../sequelize/providers'
 import { Conseiller } from '../../domain/conseiller'
 import {
+  CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous,
   RendezVous
 } from '../../domain/rendez-vous'
@@ -89,6 +90,12 @@ export class InvitationIcsClient {
         role: 'REQ-PARTICIPANT'
       }))
 
+    const headerTitreEvenement =
+      rendezVous.type === CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER &&
+      jeunesAttendeesAvecEmail[0]?.name
+        ? `[CEJ] ${jeunesAttendeesAvecEmail[0].name} -`
+        : '[CEJ]'
+
     return {
       uid: rendezVous.id,
       sequence: icsSequence,
@@ -100,7 +107,9 @@ export class InvitationIcsClient {
         dateRendezVousUtc.getUTCHours(),
         dateRendezVousUtc.getMinutes()
       ],
-      title: `[CEJ] ${mapCodeLabelTypeRendezVous[rendezVous.type]}`,
+      title: `${headerTitreEvenement} ${
+        mapCodeLabelTypeRendezVous[rendezVous.type]
+      }`,
       description:
         "Création d'un nouveau rendez-vous\n" +
         `Vous avez créé un rendez-vous de type ${
