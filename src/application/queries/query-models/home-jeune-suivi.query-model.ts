@@ -1,4 +1,4 @@
-import { ActionQueryModel } from './actions.query-model'
+import { ActionQueryModel, DemarcheQueryModel } from './actions.query-model'
 import { RendezVousJeuneQueryModel } from './rendez-vous.query-model'
 
 export class JeuneHomeSuiviQueryModel {
@@ -14,4 +14,14 @@ export class JeuneHomeSuiviQueryModel {
 export class JeuneHomeEvenementsQueryModel {
   actions: ActionQueryModel[]
   rendezVous: RendezVousJeuneQueryModel[]
+}
+
+export class JeuneHomeAgendaPoleEmploiQueryModel {
+  demarches: DemarcheQueryModel[]
+  rendezVous: RendezVousJeuneQueryModel[]
+  metadata: {
+    demarchesEnRetard: number
+    dateDeDebut: Date
+    dateDeFin: Date
+  }
 }

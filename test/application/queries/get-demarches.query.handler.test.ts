@@ -1,9 +1,9 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import {
-  GetActionsJeunePoleEmploiQuery,
-  GetActionsJeunePoleEmploiQueryHandler
-} from 'src/application/queries/get-actions-jeune-pole-emploi.query.handler'
+  GetDemarchesQueryHandler,
+  GetDemarchesQuery
+} from 'src/application/queries/get-demarches.query.handler'
 import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { failure } from '../../../src/building-blocks/types/result'
@@ -28,7 +28,7 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
   let dateService: StubbedClass<DateService>
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
   let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
-  let getActionsJeunePoleEmploiQueryHandler: GetActionsJeunePoleEmploiQueryHandler
+  let getDemarchesQueryHandler: GetDemarchesQueryHandler
   let keycloakClient: StubbedClass<KeycloakClient>
   let sandbox: SinonSandbox
   const stringUTC = '2020-04-06T10:20:00.000Z'
@@ -47,14 +47,13 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
     keycloakClient = stubClass(KeycloakClient)
     keycloakClient.exchangeTokenPoleEmploiJeune.resolves(idpToken)
 
-    getActionsJeunePoleEmploiQueryHandler =
-      new GetActionsJeunePoleEmploiQueryHandler(
-        jeunesRepository,
-        poleEmploiPartenaireClient,
-        jeunePoleEmploiAuthorizer,
-        dateService,
-        keycloakClient
-      )
+    getDemarchesQueryHandler = new GetDemarchesQueryHandler(
+      jeunesRepository,
+      poleEmploiPartenaireClient,
+      jeunePoleEmploiAuthorizer,
+      dateService,
+      keycloakClient
+    )
   })
 
   afterEach(() => {
@@ -271,10 +270,6 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
 
   describe('handle', () => {
     describe('quand le jeune existe', () => {
-      const query: GetActionsJeunePoleEmploiQuery = {
-        idJeune: '1',
-        accessToken: 'token'
-      }
       const jeune = unJeune()
 
       const demarcheDtoRetard: DemarcheDto = {
@@ -351,8 +346,13 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
         droitsDemarche: {}
       }
 
-      describe("quand pas d'erreur", () => {
-        it('récupère les demarches Pole Emploi du jeune bien triés', async () => {
+      describe("quand il n'y a pas d'erreur", () => {
+        it('récupère les demarches Pole Emploi du jeune triés par statut et par date de fin', async () => {
+          const query: GetDemarchesQuery = {
+            idJeune: '1',
+            accessToken: 'token',
+            tri: GetDemarchesQuery.Tri.parSatutEtDateFin
+          }
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getDemarches
             .withArgs(idpToken)
@@ -366,9 +366,7 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
             ])
 
           // When
-          const result = await getActionsJeunePoleEmploiQueryHandler.handle(
-            query
-          )
+          const result = await getDemarchesQueryHandler.handle(query)
           // Then
           expect(result).to.deep.equal({
             _isSuccess: true,
@@ -382,19 +380,55 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
             ]
           })
         })
+        it('récupère les demarches Pole Emploi du jeune triés par date de fin', async () => {
+          const query: GetDemarchesQuery = {
+            idJeune: '1',
+            accessToken: 'token',
+            tri: GetDemarchesQuery.Tri.parDateFin
+          }
+          jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
+          poleEmploiPartenaireClient.getDemarches
+            .withArgs(idpToken)
+            .resolves([
+              demarcheDtoAnnulee,
+              demarcheDtoEnCours,
+              demarcheDtoRetard,
+              demarcheDtoRealisee,
+              demarcheDtoAFaireAuMilieu,
+              demarcheDtoEnCoursProche
+            ])
+
+          // When
+          const result = await getDemarchesQueryHandler.handle(query)
+          // Then
+          expect(result).to.deep.equal({
+            _isSuccess: true,
+            data: [
+              fromDemarcheDtoToDemarche(demarcheDtoAnnulee, dateService),
+              fromDemarcheDtoToDemarche(demarcheDtoEnCoursProche, dateService),
+              fromDemarcheDtoToDemarche(demarcheDtoEnCours, dateService),
+              fromDemarcheDtoToDemarche(demarcheDtoRealisee, dateService),
+              fromDemarcheDtoToDemarche(demarcheDtoAFaireAuMilieu, dateService),
+              fromDemarcheDtoToDemarche(demarcheDtoRetard, dateService)
+            ]
+          })
+        })
       })
       describe('quand une erreur se produit', () => {
         it('renvoie une failure quand une erreur client se produit', async () => {
           // Given
+          const query: GetDemarchesQuery = {
+            idJeune: '1',
+            accessToken: 'token',
+            tri: GetDemarchesQuery.Tri.parSatutEtDateFin
+          }
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getDemarches
             .withArgs(idpToken)
             .throws({ response: { data: {} } })
 
           // When
-          const result = await getActionsJeunePoleEmploiQueryHandler.handle(
-            query
-          )
+          const result = await getDemarchesQueryHandler.handle(query)
           // Then
           expect(result._isSuccess).to.equal(false)
           if (!result._isSuccess)
@@ -405,15 +439,16 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
     describe("quand le jeune n'existe pas", () => {
       it('renvoie une failure', async () => {
         // Given
-        const query: GetActionsJeunePoleEmploiQuery = {
+        const query: GetDemarchesQuery = {
           idJeune: '1',
-          accessToken: 'token'
+          accessToken: 'token',
+          tri: GetDemarchesQuery.Tri.parSatutEtDateFin
         }
 
         jeunesRepository.get.withArgs(query.idJeune).resolves(undefined)
 
         // When
-        const result = await getActionsJeunePoleEmploiQueryHandler.handle(query)
+        const result = await getDemarchesQueryHandler.handle(query)
         // Then
         expect(result).to.deep.equal(
           failure(new NonTrouveError('Jeune', query.idJeune))
@@ -425,14 +460,15 @@ describe('GetActionsJeunePoleEmploiQueryHandler', () => {
   describe('authorize', () => {
     it('authorise le jeune', async () => {
       // Given
-      const query: GetActionsJeunePoleEmploiQuery = {
+      const query: GetDemarchesQuery = {
         idJeune: 'ABCDE',
-        accessToken: 'token'
+        accessToken: 'token',
+        tri: GetDemarchesQuery.Tri.parSatutEtDateFin
       }
       const utilisateur = unUtilisateurJeune()
 
       // When
-      await getActionsJeunePoleEmploiQueryHandler.authorize(query, utilisateur)
+      await getDemarchesQueryHandler.authorize(query, utilisateur)
       // Then
       expect(jeunePoleEmploiAuthorizer.authorize).to.have.been.calledWith(
         query.idJeune,

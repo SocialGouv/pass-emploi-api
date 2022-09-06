@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { JeuneHomeDemarcheQueryModel } from './query-models/home-jeune.query-model'
-import { GetActionsJeunePoleEmploiQueryHandler } from './get-actions-jeune-pole-emploi.query.handler'
+import {
+  GetDemarchesQueryHandler,
+  GetDemarchesQuery
+} from './get-demarches.query.handler'
 import { GetCampagneQueryModel } from './query-getters/get-campagne.query.getter'
 import { isFailure, Result, success } from '../../building-blocks/types/result'
 import { Query } from '../../building-blocks/types/query'
@@ -19,7 +22,7 @@ export class GetJeuneHomeDemarchesQueryHandler extends QueryHandler<
   Result<JeuneHomeDemarcheQueryModel>
 > {
   constructor(
-    private getActionsJeunePoleEmploiQueryHandler: GetActionsJeunePoleEmploiQueryHandler,
+    private getActionsJeunePoleEmploiQueryHandler: GetDemarchesQueryHandler,
     private getCampagneQueryModel: GetCampagneQueryModel,
     private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer
   ) {
@@ -30,7 +33,10 @@ export class GetJeuneHomeDemarchesQueryHandler extends QueryHandler<
     query: GetJeuneHomeDemarchesQuery
   ): Promise<Result<JeuneHomeDemarcheQueryModel>> {
     const [demarches, campagne] = await Promise.all([
-      this.getActionsJeunePoleEmploiQueryHandler.handle(query),
+      this.getActionsJeunePoleEmploiQueryHandler.handle({
+        ...query,
+        tri: GetDemarchesQuery.Tri.parSatutEtDateFin
+      }),
       this.getCampagneQueryModel.handle({ idJeune: query.idJeune })
     ])
 

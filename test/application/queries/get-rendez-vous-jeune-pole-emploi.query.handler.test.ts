@@ -274,7 +274,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
         'en agence Pôle emploi'
       )
       expect(RendezVousConseillerQueryModel.conseiller).to.deep.equal({
-        id: 'random-id',
+        id: 'id-inconnu',
         nom: 'Tavernier',
         prenom: 'Nils'
       })

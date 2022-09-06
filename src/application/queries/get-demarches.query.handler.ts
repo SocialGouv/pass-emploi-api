@@ -16,14 +16,15 @@ import { fromDemarcheDtoToDemarche } from './query-mappers/actions-pole-emploi.m
 import { DemarcheQueryModel } from './query-models/actions.query-model'
 import { Demarche } from '../../domain/demarche'
 
-export interface GetActionsJeunePoleEmploiQuery extends Query {
+export interface GetDemarchesQuery extends Query {
   idJeune: string
   accessToken: string
+  tri: TriQuery
 }
 
 @Injectable()
-export class GetActionsJeunePoleEmploiQueryHandler extends QueryHandler<
-  GetActionsJeunePoleEmploiQuery,
+export class GetDemarchesQueryHandler extends QueryHandler<
+  GetDemarchesQuery,
   Result<DemarcheQueryModel[]>
 > {
   constructor(
@@ -34,11 +35,11 @@ export class GetActionsJeunePoleEmploiQueryHandler extends QueryHandler<
     private dateService: DateService,
     private keycloakClient: KeycloakClient
   ) {
-    super('GetActionsJeunePoleEmploiQueryHandler')
+    super('GetDemarchesQueryHandler')
   }
 
   async handle(
-    query: GetActionsJeunePoleEmploiQuery
+    query: GetDemarchesQuery
   ): Promise<Result<DemarcheQueryModel[]>> {
     const jeune = await this.jeuneRepository.get(query.idJeune)
     if (!jeune) {
@@ -57,7 +58,7 @@ export class GetActionsJeunePoleEmploiQueryHandler extends QueryHandler<
         .map(demarcheDto =>
           fromDemarcheDtoToDemarche(demarcheDto, this.dateService)
         )
-        .sort(compareDemarchesByStatutOrDateFin)
+        .sort(query.tri)
 
       return success(demarches)
     } catch (e) {
@@ -72,7 +73,7 @@ export class GetActionsJeunePoleEmploiQueryHandler extends QueryHandler<
   }
 
   async authorize(
-    query: GetActionsJeunePoleEmploiQuery,
+    query: GetDemarchesQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.jeunePoleEmploiAuthorizer.authorize(query.idJeune, utilisateur)
@@ -83,33 +84,38 @@ export class GetActionsJeunePoleEmploiQueryHandler extends QueryHandler<
   }
 }
 
-function compareDemarchesByStatutOrDateFin(
-  demarche1: DemarcheQueryModel,
-  demarche2: DemarcheQueryModel
-): number {
-  return (
-    compareStatuts(demarche1, demarche2) ||
-    compareDatesFin(demarche1, demarche2)
-  )
+export namespace GetDemarchesQuery {
+  export namespace Tri {
+    export function parSatutEtDateFin(
+      demarche1: DemarcheQueryModel,
+      demarche2: DemarcheQueryModel
+    ): number {
+      return parStatut(demarche1, demarche2) || parDateFin(demarche1, demarche2)
+    }
+
+    export function parDateFin(
+      demarche1: DemarcheQueryModel,
+      demarche2: DemarcheQueryModel
+    ): number {
+      return demarche1.dateFin.getTime() - demarche2.dateFin.getTime()
+    }
+
+    function parStatut(
+      demarche1: DemarcheQueryModel,
+      demarche2: DemarcheQueryModel
+    ): number {
+      return statutsOrder[demarche1.statut] - statutsOrder[demarche2.statut]
+    }
+
+    const statutsOrder: { [statut in Demarche.Statut]: number } = {
+      A_FAIRE: 1,
+      EN_COURS: 1,
+      ANNULEE: 2,
+      REALISEE: 2
+    }
+  }
 }
 
-const statutsOrder: { [statut in Demarche.Statut]: number } = {
-  A_FAIRE: 1,
-  EN_COURS: 1,
-  ANNULEE: 2,
-  REALISEE: 2
-}
-
-function compareStatuts(
-  demarche1: DemarcheQueryModel,
-  demarche2: DemarcheQueryModel
-): number {
-  return statutsOrder[demarche1.statut] - statutsOrder[demarche2.statut]
-}
-
-function compareDatesFin(
-  demarche1: DemarcheQueryModel,
-  demarche2: DemarcheQueryModel
-): number {
-  return demarche1.dateFin.getTime() - demarche2.dateFin.getTime()
+interface TriQuery {
+  (demarche1: DemarcheQueryModel, demarche2: DemarcheQueryModel): number
 }

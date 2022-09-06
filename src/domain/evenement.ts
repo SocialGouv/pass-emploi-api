@@ -54,7 +54,8 @@ export namespace Evenement {
     RECHERCHE_IMMERSION_SAUVEGARDEE = 'RECHERCHE_IMMERSION_SAUVEGARDEE',
     RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE = 'RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE',
     RECHERCHE_SERVICE_CIVIQUE_SAUVEGARDEE = 'RECHERCHE_SERVICE_CIVIQUE_SAUVEGARDEE',
-    SERVICE_CIVIQUE_RECHERCHE = 'SERVICE_CIVIQUE_RECHERCHE'
+    SERVICE_CIVIQUE_RECHERCHE = 'SERVICE_CIVIQUE_RECHERCHE',
+    SUIVI_POLE_EMPLOI = 'SUIVI_POLE_EMPLOI'
   }
 
   export interface Repository {
@@ -245,6 +246,11 @@ const evenements = {
     categorie: 'Offre',
     action: 'Recherche',
     nom: 'Service Civique'
+  },
+  [Evenement.Type.SUIVI_POLE_EMPLOI]: {
+    categorie: 'Suivi',
+    action: 'Consulter',
+    nom: 'Pôle emploi'
   },
   [Evenement.Type.OFFRE_SERVICE_CIVIQUE_AFFICHE]: {
     categorie: 'Offre',
