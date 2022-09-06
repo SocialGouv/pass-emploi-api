@@ -162,7 +162,7 @@ import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
 import { configureLoggerModule } from './utils/logger.module'
 import { PoleEmploiPartenaireClient } from './infrastructure/clients/pole-emploi-partenaire-client'
-import { GetActionsJeunePoleEmploiQueryHandler } from './application/queries/get-actions-jeune-pole-emploi.query.handler'
+import { GetDemarchesQueryHandler } from './application/queries/get-demarches.query.handler'
 import { GetJeuneMiloByDossierQueryHandler } from './application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { UpdateRendezVousCommandHandler } from './application/commands/update-rendez-vous.command.handler'
 import { InvitationIcsClient } from './infrastructure/clients/invitation-ics.client'
@@ -223,6 +223,7 @@ import { JeunePoleEmploiSqlRepository } from './infrastructure/repositories/jeun
 import { GetTypesQualificationsQueryHandler } from './application/queries/get-types-qualifications.query.handler'
 import { ActionMiloHttpRepository } from './infrastructure/repositories/action/action-milo-http-sql.repository.db'
 import { QualifierActionCommandHandler } from './application/commands/qualifier-action.command.handler'
+import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from './application/queries/get-jeune-home-suivi-pole-emploi.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -478,7 +479,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     DeleteJeuneCommandHandler,
     DeleteJeuneInactifCommandHandler,
     GetDetailRendezVousQueryHandler,
-    GetActionsJeunePoleEmploiQueryHandler,
+    GetDemarchesQueryHandler,
     GetJeuneMiloByDossierQueryHandler,
     UpdateRendezVousCommandHandler,
     GetConseillersJeuneQueryHandler,
@@ -519,7 +520,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetRendezVousConseillerPaginesQueryHandler,
     HandleJobNotifierRendezVousPECommandHandler,
     GetTypesQualificationsQueryHandler,
-    QualifierActionCommandHandler
+    QualifierActionCommandHandler,
+    GetJeuneHomeAgendaPoleEmploiQueryHandler
   ]
 }
 
