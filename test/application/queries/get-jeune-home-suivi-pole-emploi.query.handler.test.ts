@@ -1,0 +1,196 @@
+import { describe } from 'mocha'
+import { expect, StubbedClass, stubClass } from '../../utils'
+import {
+  GetDemarchesQuery,
+  GetDemarchesQueryHandler
+} from '../../../src/application/queries/get-demarches.query.handler'
+import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
+import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
+import {
+  GetJeuneHomeAgendaPoleEmploiQuery,
+  GetJeuneHomeAgendaPoleEmploiQueryHandler
+} from '../../../src/application/queries/get-jeune-home-suivi-pole-emploi.query.handler'
+import {
+  failure,
+  isSuccess,
+  Result,
+  success
+} from '../../../src/building-blocks/types/result'
+import { uneDemarche } from '../../fixtures/demarche.fixture'
+import { DateTime } from 'luxon'
+import { JeuneHomeAgendaPoleEmploiQueryModel } from '../../../src/application/queries/query-models/home-jeune-suivi.query-model'
+import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
+import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+
+describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
+  let handler: GetJeuneHomeAgendaPoleEmploiQueryHandler
+  let getDemarchesQueryHandler: StubbedClass<GetDemarchesQueryHandler>
+  let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
+  let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
+
+  beforeEach(() => {
+    getDemarchesQueryHandler = stubClass(GetDemarchesQueryHandler)
+    getRendezVousJeunePoleEmploiQueryHandler = stubClass(
+      GetRendezVousJeunePoleEmploiQueryHandler
+    )
+    jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
+
+    handler = new GetJeuneHomeAgendaPoleEmploiQueryHandler(
+      getDemarchesQueryHandler,
+      getRendezVousJeunePoleEmploiQueryHandler,
+      jeunePoleEmploiAuthorizer
+    )
+  })
+
+  describe('handle', () => {
+    const maintenant = DateTime.fromISO('2020-04-06T12:00:00.000Z').toUTC()
+    const dansDeuxSemaines = DateTime.fromISO(
+      '2020-04-20T12:00:00.000Z'
+    ).toUTC()
+    const uneDemarcheDeLaSemaineDerniere = uneDemarche({
+      dateFin: maintenant.minus({ weeks: 1 }).toJSDate()
+    })
+    const uneDemarcheDeLaSemaine = uneDemarche({
+      dateFin: maintenant.plus({ day: 1 }).toJSDate()
+    })
+    const uneDemarcheDeLaSemaineProchaine = uneDemarche({
+      dateFin: maintenant.plus({ weeks: 1 }).toJSDate()
+    })
+    const uneDemarcheDansDeuxSemainesPlusUnJour = uneDemarche({
+      dateFin: maintenant.plus({ weeks: 2, day: 1 }).toJSDate()
+    })
+
+    const unRendezVousHier = unRendezVousQueryModel({
+      date: maintenant.minus({ day: 1 }).toJSDate()
+    })
+
+    const unRendezVousAujourdhui = unRendezVousQueryModel({
+      date: maintenant.toJSDate()
+    })
+
+    const unRendezVousDansDeuxSemainesPlusUnJour = unRendezVousQueryModel({
+      date: maintenant.plus({ weeks: 2, day: 1 }).toJSDate()
+    })
+
+    let result: Result<JeuneHomeAgendaPoleEmploiQueryModel>
+
+    describe('quand les services externes répondent avec Succès', () => {
+      beforeEach(async () => {
+        // Given
+        const query: GetJeuneHomeAgendaPoleEmploiQuery = {
+          idJeune: 'idJeune',
+          maintenant: maintenant.toString(),
+          accessToken: 'accessToken'
+        }
+
+        getDemarchesQueryHandler.handle
+          .withArgs({ ...query, tri: GetDemarchesQuery.Tri.parDateFin })
+          .resolves(
+            success([
+              uneDemarcheDansDeuxSemainesPlusUnJour,
+              uneDemarcheDeLaSemaine,
+              uneDemarcheDeLaSemaineProchaine,
+              uneDemarcheDeLaSemaineDerniere
+            ])
+          )
+
+        getRendezVousJeunePoleEmploiQueryHandler.handle.resolves(
+          success([
+            unRendezVousHier,
+            unRendezVousAujourdhui,
+            unRendezVousDansDeuxSemainesPlusUnJour
+          ])
+        )
+
+        // When
+        result = await handler.handle(query)
+      })
+      it('retourne des démarches filtrées entre maintenant et dans deux semaines', () => {
+        // Then
+        expect(isSuccess(result) && result.data.demarches).to.deep.equal([
+          uneDemarcheDeLaSemaine,
+          uneDemarcheDeLaSemaineProchaine
+        ])
+      })
+
+      it('retourne des rendez vous filtrées entre maintenant et dans deux semaines', () => {
+        // Then
+        expect(isSuccess(result) && result.data.rendezVous).to.deep.equal([
+          unRendezVousAujourdhui
+        ])
+      })
+
+      it('retourne des metadata', () => {
+        // Then
+        expect(isSuccess(result) && result.data.metadata).to.deep.equal({
+          dateDeDebut: maintenant.toJSDate(),
+          dateDeFin: dansDeuxSemaines.toJSDate(),
+          demarchesEnRetard: 1
+        })
+      })
+    })
+
+    describe('quand les démarches sont en échec', () => {
+      it("retourne l'échec", async () => {
+        // Given
+        const query: GetJeuneHomeAgendaPoleEmploiQuery = {
+          idJeune: 'idJeune',
+          maintenant: maintenant.toString(),
+          accessToken: 'accessToken'
+        }
+
+        getDemarchesQueryHandler.handle.resolves(
+          failure(new ErreurHttp('Erreur', 500))
+        )
+
+        // When
+        result = await handler.handle(query)
+
+        // Then
+        expect(result).to.deep.equal(failure(new ErreurHttp('Erreur', 500)))
+      })
+    })
+
+    describe('quand les rendez vous sont en échec', () => {
+      it("retourne l'échec", async () => {
+        // Given
+        const query: GetJeuneHomeAgendaPoleEmploiQuery = {
+          idJeune: 'idJeune',
+          maintenant: maintenant.toString(),
+          accessToken: 'accessToken'
+        }
+
+        getDemarchesQueryHandler.handle.resolves(success([]))
+        getRendezVousJeunePoleEmploiQueryHandler.handle.resolves(
+          failure(new ErreurHttp('Erreur', 418))
+        )
+
+        // When
+        result = await handler.handle(query)
+
+        // Then
+        expect(result).to.deep.equal(failure(new ErreurHttp('Erreur', 418)))
+      })
+    })
+  })
+
+  describe('authorize', () => {
+    it('autorise un jeune PE', () => {
+      // Given
+      const query: GetJeuneHomeAgendaPoleEmploiQuery = {
+        idJeune: 'idJeune',
+        maintenant: DateTime.now().toString(),
+        accessToken: 'accessToken'
+      }
+
+      // When
+      handler.authorize(query, unUtilisateurJeune())
+
+      // Then
+      expect(
+        jeunePoleEmploiAuthorizer.authorize
+      ).to.have.been.calledWithExactly(query.idJeune, unUtilisateurJeune())
+    })
+  })
+})

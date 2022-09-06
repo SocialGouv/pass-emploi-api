@@ -111,7 +111,6 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
               }
             }
 
-            // TODO en attente du contract testing
             try {
               return fromPrestationDtoToRendezVousQueryModel(
                 prestation,

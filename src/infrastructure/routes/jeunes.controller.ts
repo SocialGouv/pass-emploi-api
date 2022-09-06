@@ -31,7 +31,10 @@ import {
   TransfererJeunesConseillerCommand,
   TransfererJeunesConseillerCommandHandler
 } from '../../application/commands/transferer-jeunes-conseiller.command.handler'
-import { GetActionsJeunePoleEmploiQueryHandler } from '../../application/queries/get-actions-jeune-pole-emploi.query.handler'
+import {
+  GetDemarchesQueryHandler,
+  GetDemarchesQuery
+} from '../../application/queries/get-demarches.query.handler'
 import { GetDetailJeuneQueryHandler } from '../../application/queries/get-detail-jeune.query.handler.db'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import {
@@ -98,8 +101,12 @@ import {
   TransfererConseillerPayload,
   UpdateJeunePreferencesPayload
 } from './validation/jeunes.inputs'
-import { JeuneHomeEvenementsQueryModel } from '../../application/queries/query-models/home-jeune-suivi.query-model'
+import {
+  JeuneHomeAgendaPoleEmploiQueryModel,
+  JeuneHomeEvenementsQueryModel
+} from '../../application/queries/query-models/home-jeune-suivi.query-model'
 import { GetJeuneHomeSuiviQueryHandler } from '../../application/queries/get-jeune-home-suivi.query.db'
+import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../application/queries/get-jeune-home-suivi-pole-emploi.query.handler'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -113,6 +120,7 @@ export class JeunesController {
     private readonly getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
     private readonly getJeuneHomeActionsQueryHandler: GetJeuneHomeActionsQueryHandler,
     private readonly getJeuneHomeSuiviQueryHandler: GetJeuneHomeSuiviQueryHandler,
+    private readonly getJeuneHomeAgendaPoleEmploiQueryHandler: GetJeuneHomeAgendaPoleEmploiQueryHandler,
     private readonly getJeuneHomeDemarchesQueryHandler: GetJeuneHomeDemarchesQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
     private readonly getRendezVousJeuneQueryHandler: GetRendezVousJeuneQueryHandler,
@@ -121,7 +129,7 @@ export class JeunesController {
     private readonly deleteJeuneCommandHandler: DeleteJeuneCommandHandler,
     private readonly archiverJeuneCommandHandler: ArchiverJeuneCommandHandler,
     private readonly deleteJeuneInactifCommandHandler: DeleteJeuneInactifCommandHandler,
-    private readonly getActionsPoleEmploiQueryHandler: GetActionsJeunePoleEmploiQueryHandler,
+    private readonly getActionsPoleEmploiQueryHandler: GetDemarchesQueryHandler,
     private readonly getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler,
     private readonly updateStatutDemarcheCommandHandler: UpdateStatutDemarcheCommandHandler,
     private readonly createDemarcheCommandHandler: CreateDemarcheCommandHandler,
@@ -332,6 +340,28 @@ export class JeunesController {
     return result.data
   }
 
+  @Get(':idJeune/home/agenda/pole-emploi')
+  @ApiResponse({
+    type: JeuneHomeAgendaPoleEmploiQueryModel
+  })
+  async getHomeAgendaPoleEmploi(
+    @Param('idJeune') idJeune: string,
+    @Query() queryParams: GetJeuneHomeSuiviQueryParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
+  ): Promise<JeuneHomeAgendaPoleEmploiQueryModel> {
+    const result = await this.getJeuneHomeAgendaPoleEmploiQueryHandler.execute(
+      { idJeune, maintenant: queryParams.maintenant, accessToken },
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
+
+    return result.data
+  }
+
   @Get(':idJeune/home/demarches')
   @ApiResponse({
     type: JeuneHomeDemarcheQueryModel
@@ -429,7 +459,8 @@ export class JeunesController {
     const result = await this.getActionsPoleEmploiQueryHandler.execute(
       {
         idJeune,
-        accessToken
+        accessToken,
+        tri: GetDemarchesQuery.Tri.parSatutEtDateFin
       },
       utilisateur
     )

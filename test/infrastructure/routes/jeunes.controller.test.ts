@@ -30,7 +30,7 @@ import {
   ActionsByJeuneOutput,
   GetActionsByJeuneQueryHandler
 } from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
-import { GetActionsJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-actions-jeune-pole-emploi.query.handler'
+import { GetDemarchesQueryHandler } from '../../../src/application/queries/get-demarches.query.handler'
 import { GetConseillersJeuneQueryHandler } from '../../../src/application/queries/get-conseillers-jeune.query.handler.db'
 import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler.db'
 import { GetJeuneHomeActionsQueryHandler } from '../../../src/application/queries/get-jeune-home-actions.query.handler'
@@ -75,8 +75,12 @@ import {
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { GetJeuneHomeSuiviQueryHandler } from '../../../src/application/queries/get-jeune-home-suivi.query.db'
-import { JeuneHomeSuiviQueryModel } from '../../../src/application/queries/query-models/home-jeune-suivi.query-model'
+import {
+  JeuneHomeAgendaPoleEmploiQueryModel,
+  JeuneHomeSuiviQueryModel
+} from '../../../src/application/queries/query-models/home-jeune-suivi.query-model'
 import { uneActionQueryModelSansJeune } from '../../fixtures/query-models/action.query-model.fixtures'
+import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../../src/application/queries/get-jeune-home-suivi-pole-emploi.query.handler'
 import StatutInvalide = Action.StatutInvalide
 
 describe('JeunesController', () => {
@@ -88,9 +92,10 @@ describe('JeunesController', () => {
   let deleteJeuneCommandHandler: StubbedClass<DeleteJeuneCommandHandler>
   let getRendezVousJeuneQueryHandler: StubbedClass<GetRendezVousJeuneQueryHandler>
   let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
-  let getActionsPoleEmploiQueryHandler: StubbedClass<GetActionsJeunePoleEmploiQueryHandler>
+  let getActionsPoleEmploiQueryHandler: StubbedClass<GetDemarchesQueryHandler>
   let getJeuneHomeDemarchesQueryHandler: StubbedClass<GetJeuneHomeDemarchesQueryHandler>
   let getJeuneHomeSuiviQueryHandler: StubbedClass<GetJeuneHomeSuiviQueryHandler>
+  let getJeuneHomeAgendaPoleEmploiQueryHandler: StubbedClass<GetJeuneHomeAgendaPoleEmploiQueryHandler>
   let getJeuneHomeActionsQueryHandler: StubbedClass<GetJeuneHomeActionsQueryHandler>
   let updateStatutDemarcheCommandHandler: StubbedClass<UpdateStatutDemarcheCommandHandler>
   let createDemarcheCommandHandler: StubbedClass<CreateDemarcheCommandHandler>
@@ -120,13 +125,14 @@ describe('JeunesController', () => {
       GetRendezVousJeunePoleEmploiQueryHandler
     )
     getRendezVousJeuneQueryHandler = stubClass(GetRendezVousJeuneQueryHandler)
-    getActionsPoleEmploiQueryHandler = stubClass(
-      GetActionsJeunePoleEmploiQueryHandler
-    )
+    getActionsPoleEmploiQueryHandler = stubClass(GetDemarchesQueryHandler)
     jwtService = stubClass(JwtService)
     getRendezVousJeuneQueryHandler = stubClass(GetRendezVousJeuneQueryHandler)
     getJeuneHomeActionsQueryHandler = stubClass(GetJeuneHomeActionsQueryHandler)
     getJeuneHomeSuiviQueryHandler = stubClass(GetJeuneHomeSuiviQueryHandler)
+    getJeuneHomeAgendaPoleEmploiQueryHandler = stubClass(
+      GetJeuneHomeAgendaPoleEmploiQueryHandler
+    )
     getJeuneHomeDemarchesQueryHandler = stubClass(
       GetJeuneHomeDemarchesQueryHandler
     )
@@ -165,7 +171,7 @@ describe('JeunesController', () => {
       .useValue(getConseillersJeuneQueryHandler)
       .overrideProvider(GetRendezVousJeunePoleEmploiQueryHandler)
       .useValue(getRendezVousJeunePoleEmploiQueryHandler)
-      .overrideProvider(GetActionsJeunePoleEmploiQueryHandler)
+      .overrideProvider(GetDemarchesQueryHandler)
       .useValue(getActionsPoleEmploiQueryHandler)
       .overrideProvider(GetJeuneHomeActionsQueryHandler)
       .useValue(getJeuneHomeActionsQueryHandler)
@@ -187,6 +193,8 @@ describe('JeunesController', () => {
       .useValue(updateJeunePreferencesCommandHandler)
       .overrideProvider(GetPreferencesJeuneQueryHandler)
       .useValue(getPreferencesJeuneQueryHandler)
+      .overrideProvider(GetJeuneHomeAgendaPoleEmploiQueryHandler)
+      .useValue(getJeuneHomeAgendaPoleEmploiQueryHandler)
       .overrideProvider(JwtService)
       .useValue(jwtService)
       .overrideProvider(DateService)
@@ -1024,6 +1032,86 @@ describe('JeunesController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/jeunes/1/home/agenda?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00'
+    )
+  })
+
+  describe('GET /jeunes/:idJeune/home/agenda/pole-emploi', () => {
+    const idJeune = '1'
+    const maintenant = '2022-08-17T12:00:30+02:00'
+    const queryModel: JeuneHomeAgendaPoleEmploiQueryModel = {
+      demarches: [
+        enleverLesUndefined(uneDemarche()),
+        enleverLesUndefined(uneDemarche())
+      ],
+      rendezVous: [],
+      metadata: {
+        demarchesEnRetard: 2,
+        dateDeFin: new Date(maintenant),
+        dateDeDebut: new Date(maintenant)
+      }
+    }
+    it('retourne la home agenda du jeune quand tout se passe bien', async () => {
+      // Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+      getJeuneHomeAgendaPoleEmploiQueryHandler.execute
+        .withArgs(
+          {
+            idJeune,
+            maintenant,
+            accessToken: 'coucou'
+          },
+          unUtilisateurDecode()
+        )
+        .resolves(success(queryModel))
+
+      // When
+      await request(app.getHttpServer())
+        .get(
+          `/jeunes/${idJeune}/home/agenda/pole-emploi?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00`
+        )
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect({
+          demarches: queryModel.demarches,
+          rendezVous: queryModel.rendezVous,
+          metadata: {
+            demarchesEnRetard: 2,
+            dateDeFin: '2022-08-17T10:00:30.000Z',
+            dateDeDebut: '2022-08-17T10:00:30.000Z'
+          }
+        })
+    })
+    it("rejette quand la date n'est pas au bon format", async () => {
+      // Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/home/agenda/pole-emploi?maintenant=30122022`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+    it('rejette quand la query est en erreur', async () => {
+      // Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+      getJeuneHomeAgendaPoleEmploiQueryHandler.execute.resolves(
+        failure(new NonTrouveError(''))
+      )
+
+      // When
+      await request(app.getHttpServer())
+        .get(
+          `/jeunes/${idJeune}/home/agenda/pole-emploi?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00`
+        )
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.NOT_FOUND)
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/jeunes/1/home/agenda/pole-emploi?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00'
     )
   })
 
