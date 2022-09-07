@@ -102,8 +102,8 @@ import {
   JeuneHomeAgendaPoleEmploiQueryModel,
   JeuneHomeEvenementsQueryModel
 } from '../../application/queries/query-models/home-jeune-suivi.query-model'
-import { GetJeuneHomeSuiviQueryHandler } from '../../application/queries/get-jeune-home-suivi.query.db'
-import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../application/queries/get-jeune-home-suivi-pole-emploi.query.handler'
+import { GetJeuneHomeAgendaQueryHandler } from '../../application/queries/get-jeune-home-agenda.query.db'
+import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -116,7 +116,7 @@ export class JeunesController {
     private readonly getHomeJeuneHandler: GetHomeJeuneHandler,
     private readonly getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
     private readonly getJeuneHomeActionsQueryHandler: GetJeuneHomeActionsQueryHandler,
-    private readonly getJeuneHomeSuiviQueryHandler: GetJeuneHomeSuiviQueryHandler,
+    private readonly getJeuneHomeSuiviQueryHandler: GetJeuneHomeAgendaQueryHandler,
     private readonly getJeuneHomeAgendaPoleEmploiQueryHandler: GetJeuneHomeAgendaPoleEmploiQueryHandler,
     private readonly getJeuneHomeDemarchesQueryHandler: GetJeuneHomeDemarchesQueryHandler,
     private readonly createActionCommandHandler: CreateActionCommandHandler,
