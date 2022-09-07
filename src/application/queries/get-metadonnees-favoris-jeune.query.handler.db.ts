@@ -11,39 +11,16 @@ import { Injectable } from '@nestjs/common'
 import { RechercheSqlModel } from '../../infrastructure/sequelize/models/recherche.sql-model'
 import { Recherche } from '../../domain/recherche'
 import { Op } from 'sequelize'
+import { MetadonneesFavorisQueryModel } from './query-models/favoris.query-model'
 
 export interface GetMetadonneesFavorisJeuneQuery {
   idJeune: string
 }
 
-interface MetadonneesFavorisOffresJeuneQueryModel {
-  total: number
-  nombreOffresImmersion: number
-  nombreOffresServiceCivique: number
-  nombreOffresAlternance: number
-  nombreOffresEmploi: number
-}
-
-interface MetadonneesFavorisRecherchesJeuneQueryModel {
-  total: number
-  nombreRecherchesOffresImmersion: number
-  nombreRecherchesOffresServiceCivique: number
-  nombreRecherchesOffresAlternance: number
-  nombreRecherchesOffresEmploi: number
-}
-
-export interface MetadonneesFavorisJeuneQueryModel {
-  favoris: {
-    autoriseLePartage: boolean
-    offres: MetadonneesFavorisOffresJeuneQueryModel
-    recherches: MetadonneesFavorisRecherchesJeuneQueryModel
-  }
-}
-
 @Injectable()
 export class GetMetadonneesFavorisJeuneQueryHandler extends QueryHandler<
   GetMetadonneesFavorisJeuneQuery,
-  Result<MetadonneesFavorisJeuneQueryModel>
+  Result<MetadonneesFavorisQueryModel>
 > {
   constructor(
     private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer
@@ -63,7 +40,7 @@ export class GetMetadonneesFavorisJeuneQueryHandler extends QueryHandler<
 
   async handle(
     query: GetMetadonneesFavorisJeuneQuery
-  ): Promise<Result<MetadonneesFavorisJeuneQueryModel>> {
+  ): Promise<Result<MetadonneesFavorisQueryModel>> {
     const jeuneSqlModel = await JeuneSqlModel.findByPk(query.idJeune)
 
     if (!jeuneSqlModel) {
