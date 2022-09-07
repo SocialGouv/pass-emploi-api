@@ -31,10 +31,7 @@ import {
   TransfererJeunesConseillerCommand,
   TransfererJeunesConseillerCommandHandler
 } from '../../application/commands/transferer-jeunes-conseiller.command.handler'
-import {
-  GetDemarchesQueryHandler,
-  GetDemarchesQuery
-} from '../../application/queries/get-demarches.query.handler'
+import { GetDemarchesQueryHandler } from '../../application/queries/get-demarches.query.handler'
 import { GetDetailJeuneQueryHandler } from '../../application/queries/get-detail-jeune.query.handler.db'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import {
@@ -129,7 +126,7 @@ export class JeunesController {
     private readonly deleteJeuneCommandHandler: DeleteJeuneCommandHandler,
     private readonly archiverJeuneCommandHandler: ArchiverJeuneCommandHandler,
     private readonly deleteJeuneInactifCommandHandler: DeleteJeuneInactifCommandHandler,
-    private readonly getActionsPoleEmploiQueryHandler: GetDemarchesQueryHandler,
+    private readonly getDemarchesQueryHandler: GetDemarchesQueryHandler,
     private readonly getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler,
     private readonly updateStatutDemarcheCommandHandler: UpdateStatutDemarcheCommandHandler,
     private readonly createDemarcheCommandHandler: CreateDemarcheCommandHandler,
@@ -456,11 +453,10 @@ export class JeunesController {
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
   ): Promise<DemarcheQueryModel[]> {
-    const result = await this.getActionsPoleEmploiQueryHandler.execute(
+    const result = await this.getDemarchesQueryHandler.execute(
       {
         idJeune,
-        accessToken,
-        tri: GetDemarchesQuery.Tri.parSatutEtDateFin
+        accessToken
       },
       utilisateur
     )
