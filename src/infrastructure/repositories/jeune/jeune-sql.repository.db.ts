@@ -96,7 +96,9 @@ export class JeuneSqlRepository implements Jeune.Repository {
         idConseiller
       }
     })
-    return jeunesSqlModel.map(jeuneSqlModel => fromSqlToJeune(jeuneSqlModel))
+    return jeunesSqlModel.map(jeuneSqlModel =>
+      fromSqlToJeune(jeuneSqlModel, { avecConfiguration: true })
+    )
   }
 
   async findAllJeunesByConseillerInitial(
