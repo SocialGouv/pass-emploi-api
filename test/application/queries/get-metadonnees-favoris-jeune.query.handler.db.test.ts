@@ -16,7 +16,7 @@ import { Recherche } from '../../../src/domain/recherche'
 import { IdService } from '../../../src/utils/id-service'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
 
-describe('MetadonneesFavorisJeuneQueryHandler', () => {
+describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
   let getMetadonneesFavorisJeuneQueryHandler: GetMetadonneesFavorisJeuneQueryHandler
   let serviceCiviqueClient: StubbedClass<EngagementClient>
