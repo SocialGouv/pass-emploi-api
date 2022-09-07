@@ -218,12 +218,12 @@ import { ModifierJeuneDuConseillerCommandHandler } from './application/commands/
 import { CommentaireActionSqlRepositoryDb } from './infrastructure/repositories/commentaire-action-sql.repository.db'
 import { GetCommentairesActionQueryHandler } from './application/queries/get-commentaires-action.query.handler.db'
 import { HandleJobNotifierRendezVousPECommandHandler } from './application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
-import { GetJeuneHomeSuiviQueryHandler } from './application/queries/get-jeune-home-suivi.query.db'
+import { GetJeuneHomeAgendaQueryHandler } from './application/queries/get-jeune-home-agenda.query.db'
 import { JeunePoleEmploiSqlRepository } from './infrastructure/repositories/jeune/jeune-pole-emploi-sql.repository.db'
 import { GetTypesQualificationsQueryHandler } from './application/queries/get-types-qualifications.query.handler'
 import { ActionMiloHttpRepository } from './infrastructure/repositories/action/action-milo-http-sql.repository.db'
 import { QualifierActionCommandHandler } from './application/commands/qualifier-action.command.handler'
-import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from './application/queries/get-jeune-home-suivi-pole-emploi.query.handler'
+import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from './application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
 import { GetDemarchesQueryGetter } from './application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 
@@ -518,7 +518,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetFavorisJeunePourConseillerQueryHandler,
     AddCommentaireActionCommandHandler,
     GetCommentairesActionQueryHandler,
-    GetJeuneHomeSuiviQueryHandler,
+    GetJeuneHomeAgendaQueryHandler,
     GetRendezVousConseillerPaginesQueryHandler,
     HandleJobNotifierRendezVousPECommandHandler,
     GetTypesQualificationsQueryHandler,
