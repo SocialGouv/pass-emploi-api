@@ -17,3 +17,30 @@ export class FavorisQueryModel {
   @ApiProperty()
   localisation?: string
 }
+
+class MetadonneesFavorisOffresJeuneQueryModel {
+  total: number
+  nombreOffresImmersion: number
+  nombreOffresServiceCivique: number
+  nombreOffresAlternance: number
+  nombreOffresEmploi: number
+}
+
+class MetadonneesFavorisRecherchesJeuneQueryModel {
+  total: number
+  nombreRecherchesOffresImmersion: number
+  nombreRecherchesOffresServiceCivique: number
+  nombreRecherchesOffresAlternance: number
+  nombreRecherchesOffresEmploi: number
+}
+
+class MetadonneesFavorisJeuneQueryModel {
+  autoriseLePartage: boolean
+  offres: MetadonneesFavorisOffresJeuneQueryModel
+  recherches: MetadonneesFavorisRecherchesJeuneQueryModel
+}
+
+export class MetadonneesFavorisQueryModel {
+  @ApiProperty()
+  favoris: MetadonneesFavorisJeuneQueryModel
+}
