@@ -27,6 +27,14 @@ export class DateService {
     return date1.toUTC().startOf('day').equals(date2.toUTC().startOf('day'))
   }
 
+  static isBetweenDates(
+    dateAComparer: Date,
+    dateMin: Date,
+    dateMax: Date
+  ): boolean {
+    return dateAComparer >= dateMin && dateAComparer <= dateMax
+  }
+
   fromISOStringToUTCJSDate(stringISO: string): Date {
     return DateTime.fromISO(stringISO).toUTC().toJSDate()
   }

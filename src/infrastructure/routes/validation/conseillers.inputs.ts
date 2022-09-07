@@ -168,3 +168,15 @@ export class PutJeuneDuConseillerPayload {
   @Length(1, 10)
   idPartenaire: string
 }
+
+export class GetIndicateursPourConseillerQueryParams {
+  @ApiProperty()
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
+  dateDebut: Date
+
+  @ApiProperty()
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
+  dateFin: Date
+}

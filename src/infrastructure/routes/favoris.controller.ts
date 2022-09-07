@@ -168,14 +168,12 @@ export class FavorisController {
   }
 
   @ApiOperation({
-    summary: 'Récupère les métadonnées du jeune',
+    summary: 'Récupère les métadonnées des favoris du jeune',
     description: 'Autorisé pour un conseiller du jeune'
   })
   @Get('favoris/metadonnees')
   @ApiResponse({ type: MetadonneesFavorisQueryModel })
   async getMetadonneesFavorisJeune(
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<MetadonneesFavorisQueryModel> {
