@@ -5,9 +5,9 @@ import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-e
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { JeuneHomeAgendaPoleEmploiQueryModel } from './query-models/home-jeune-suivi.query-model'
 import { Injectable } from '@nestjs/common'
-import { GetRendezVousJeunePoleEmploiQueryHandler } from './get-rendez-vous-jeune-pole-emploi.query.handler'
 import { DateTime } from 'luxon'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
+import { GetRendezVousJeunePoleEmploiQueryGetter } from './query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 
 export interface GetJeuneHomeAgendaPoleEmploiQuery extends Query {
   idJeune: string
@@ -22,7 +22,7 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
 > {
   constructor(
     private getDemarchesQueryGetter: GetDemarchesQueryGetter,
-    private getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler,
+    private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,
     private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer
   ) {
     super('GetJeuneHomeAgendaPoleEmploiQueryHandler')
@@ -39,7 +39,7 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
         ...query,
         tri: GetDemarchesQueryGetter.Tri.parDateFin
       }),
-      this.getRendezVousJeunePoleEmploiQueryHandler.handle({
+      this.getRendezVousJeunePoleEmploiQueryGetter.handle({
         ...query
       })
     ])
@@ -58,9 +58,9 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
         demarche.dateFin <= dansDeuxSemaines.toJSDate()
     )
     const rendezVous = resultRendezVous.data.filter(
-      rendezVous =>
-        rendezVous.date >= maintenant.toJSDate() &&
-        rendezVous.date <= dansDeuxSemaines.toJSDate()
+      unRendezVous =>
+        unRendezVous.date >= maintenant.toJSDate() &&
+        unRendezVous.date <= dansDeuxSemaines.toJSDate()
     )
     const nombreDeDemarchesEnRetard = resultDemarches.data.filter(
       demarche => demarche.dateFin <= maintenant.toJSDate()
