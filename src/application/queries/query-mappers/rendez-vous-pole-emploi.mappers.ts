@@ -34,7 +34,7 @@ export function fromRendezVousDtoToRendezVousQueryModel(
       rendezVousPoleEmploiDto.nomConseiller &&
       rendezVousPoleEmploiDto.prenomConseiller
         ? {
-            id: 'id-inconnu',
+            id: idService.uuid(),
             nom: rendezVousPoleEmploiDto.nomConseiller,
             prenom: rendezVousPoleEmploiDto.prenomConseiller
           }
