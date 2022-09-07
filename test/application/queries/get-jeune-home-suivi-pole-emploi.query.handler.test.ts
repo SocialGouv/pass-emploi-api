@@ -1,6 +1,5 @@
 import { describe } from 'mocha'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
 import {
   GetJeuneHomeAgendaPoleEmploiQuery,
@@ -19,23 +18,24 @@ import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
+import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 
 describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
   let handler: GetJeuneHomeAgendaPoleEmploiQueryHandler
   let getDemarchesQueryGetter: StubbedClass<GetDemarchesQueryGetter>
-  let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
+  let getRendezVousJeunePoleEmploiQueryGetter: StubbedClass<GetRendezVousJeunePoleEmploiQueryGetter>
   let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
 
   beforeEach(() => {
     getDemarchesQueryGetter = stubClass(GetDemarchesQueryGetter)
-    getRendezVousJeunePoleEmploiQueryHandler = stubClass(
-      GetRendezVousJeunePoleEmploiQueryHandler
+    getRendezVousJeunePoleEmploiQueryGetter = stubClass(
+      GetRendezVousJeunePoleEmploiQueryGetter
     )
     jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
 
     handler = new GetJeuneHomeAgendaPoleEmploiQueryHandler(
       getDemarchesQueryGetter,
-      getRendezVousJeunePoleEmploiQueryHandler,
+      getRendezVousJeunePoleEmploiQueryGetter,
       jeunePoleEmploiAuthorizer
     )
   })
@@ -92,7 +92,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
             ])
           )
 
-        getRendezVousJeunePoleEmploiQueryHandler.handle.resolves(
+        getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
           success([
             unRendezVousHier,
             unRendezVousAujourdhui,
@@ -159,7 +159,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
         }
 
         getDemarchesQueryGetter.handle.resolves(success([]))
-        getRendezVousJeunePoleEmploiQueryHandler.handle.resolves(
+        getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
           failure(new ErreurHttp('Erreur', 418))
         )
 
