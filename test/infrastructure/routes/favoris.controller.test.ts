@@ -33,7 +33,8 @@ import {
 } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
-  failure
+  failure,
+  success
 } from '../../../src/building-blocks/types/result'
 import {
   AddFavoriImmersionPayload,
@@ -56,6 +57,7 @@ import { OffreServiceCivique } from '../../../src/domain/offre-service-civique'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../../src/application/queries/get-favoris-service-civique-jeune.query.handler'
 import { uneOffreServiceCivique } from '../../fixtures/offre-service-civique.fixture'
 import { GetFavorisJeunePourConseillerQueryHandler } from '../../../src/application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
+import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 
 describe('FavorisController', () => {
   let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
@@ -68,6 +70,7 @@ describe('FavorisController', () => {
   let deleteFavoriOffreEngagementCommandHandler: StubbedClass<DeleteFavoriOffreEngagementCommandHandler>
   let getFavorisServiceCiviqueJeuneQueryHandler: StubbedClass<GetFavorisServiceCiviqueJeuneQueryHandler>
   let getFavorisJeunePourConseillerQueryHandler: StubbedClass<GetFavorisJeunePourConseillerQueryHandler>
+  let getMetadonneesFavorisJeuneQueryHandler: StubbedClass<GetMetadonneesFavorisJeuneQueryHandler>
   let app: INestApplication
 
   before(async () => {
@@ -103,6 +106,9 @@ describe('FavorisController', () => {
     getFavorisJeunePourConseillerQueryHandler = stubClass(
       GetFavorisJeunePourConseillerQueryHandler
     )
+    getMetadonneesFavorisJeuneQueryHandler = stubClass(
+      GetMetadonneesFavorisJeuneQueryHandler
+    )
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(AddFavoriOffreEmploiCommandHandler)
@@ -125,6 +131,8 @@ describe('FavorisController', () => {
       .useValue(getFavorisServiceCiviqueJeuneQueryHandler)
       .overrideProvider(GetFavorisJeunePourConseillerQueryHandler)
       .useValue(getFavorisJeunePourConseillerQueryHandler)
+      .overrideProvider(GetMetadonneesFavorisJeuneQueryHandler)
+      .useValue(getMetadonneesFavorisJeuneQueryHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -427,7 +435,7 @@ describe('FavorisController', () => {
 
   describe(' Favoris Services Civique', () => {
     describe('GET /jeunes/:idJeune/favoris/services-civique', () => {
-      it("Renvoie la liste des favoris services civique d'un jeune", async () => {
+      it('Renvoie la liste des favoris services civique d’un jeune', async () => {
         // Given
         getFavorisServiceCiviqueJeuneQueryHandler.execute
           .withArgs({ idJeune: '1', detail: false }, unUtilisateurDecode())
@@ -545,6 +553,45 @@ describe('FavorisController', () => {
         'delete',
         '/jeunes/ABCDE/favoris/services-civique/123'
       )
+    })
+  })
+
+  describe(' Métadonnées favoris pour Conseiller', () => {
+    describe('GET /jeunes/:idJeune/favoris/metadonnees', () => {
+      it('Renvoie les métadonnées des favoris d’un jeune pour un conseiller ', async () => {
+        // Given
+        const idJeune = 'poi-id-jeune'
+
+        const expectedResponse = {
+          favoris: {
+            autoriseLePartage: true,
+            offres: {
+              total: 0,
+              nombreOffresAlternance: 0,
+              nombreOffresEmploi: 0,
+              nombreOffresImmersion: 0,
+              nombreOffresServiceCivique: 0
+            },
+            recherches: {
+              total: 0,
+              nombreRecherchesOffresAlternance: 0,
+              nombreRecherchesOffresEmploi: 0,
+              nombreRecherchesOffresImmersion: 0,
+              nombreRecherchesOffresServiceCivique: 0
+            }
+          }
+        }
+        getMetadonneesFavorisJeuneQueryHandler.execute.resolves(
+          success(expectedResponse)
+        )
+
+        // When- Then
+        await request(app.getHttpServer())
+          .get(`/jeunes/${idJeune}/favoris/metadonnees`)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(expectedResponse)
+      })
     })
   })
 })

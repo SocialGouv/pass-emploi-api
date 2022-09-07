@@ -48,7 +48,7 @@ import {
   DeleteFavoriOffreImmersionCommandHandler
 } from '../../application/commands/delete-favori-offre-immersion.command.handler'
 import { FavoriExisteDejaError } from '../../building-blocks/types/domain-error'
-import { isFailure } from '../../building-blocks/types/result'
+import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import {
@@ -62,8 +62,13 @@ import {
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../application/queries/get-favoris-service-civique-jeune.query.handler'
 import { ServiceCiviqueQueryModel } from '../../application/queries/query-models/service-civique.query-model'
 import { Core } from '../../domain/core'
-import { FavorisQueryModel } from '../../application/queries/query-models/favoris.query-model'
+import {
+  FavorisQueryModel,
+  MetadonneesFavorisQueryModel
+} from '../../application/queries/query-models/favoris.query-model'
 import { GetFavorisJeunePourConseillerQueryHandler } from '../../application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
+import { GetMetadonneesFavorisJeuneQueryHandler } from '../../application/queries/get-metadonnees-favoris-jeune.query.handler.db'
+import { handleFailure } from './failure.handler'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -74,6 +79,7 @@ export class FavorisController {
     private readonly getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler,
     private readonly getFavorisOffresImmersionJeuneQueryHandler: GetFavorisOffresImmersionJeuneQueryHandler,
     private readonly getFavorisServiceCiviqueJeuneQueryHandler: GetFavorisServiceCiviqueJeuneQueryHandler,
+    private readonly getMetadonneesFavorisJeuneQueryHandler: GetMetadonneesFavorisJeuneQueryHandler,
     private readonly addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler,
     private readonly addFavoriOffreImmersionCommandHandler: AddFavoriOffreImmersionCommandHandler,
     private readonly addFavoriOffreEngagementCommandHandler: AddFavoriOffreServiceCiviqueCommandHandler,
@@ -159,6 +165,29 @@ export class FavorisController {
       { idJeune, detail: Boolean(getFavorisQuery.detail) },
       utilisateur
     )
+  }
+
+  @ApiOperation({
+    summary: 'Récupère les métadonnées du jeune',
+    description: 'Autorisé pour un conseiller du jeune'
+  })
+  @Get('favoris/metadonnees')
+  @ApiResponse({ type: MetadonneesFavorisQueryModel })
+  async getMetadonneesFavorisJeune(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<MetadonneesFavorisQueryModel> {
+    const result = await this.getMetadonneesFavorisJeuneQueryHandler.execute(
+      { idJeune },
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
   }
 
   @Post('favoris/offres-emploi')

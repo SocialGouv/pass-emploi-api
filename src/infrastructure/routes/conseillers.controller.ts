@@ -86,12 +86,10 @@ import {
   SuperviseursPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
-import {
-  GetMetadonneesFavorisJeuneQueryHandler,
-  MetadonneesFavorisJeuneQueryModel
-} from '../../application/queries/get-metadonnees-favoris-jeune.query.handler.db'
+import { GetMetadonneesFavorisJeuneQueryHandler } from '../../application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 import { DateService } from '../../utils/date-service'
 import { ModifierJeuneDuConseillerCommandHandler } from '../../application/commands/modifier-jeune-du-conseiller.command.handler'
+import { MetadonneesFavorisQueryModel } from '../../application/queries/query-models/favoris.query-model'
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -234,8 +232,9 @@ export class ConseillersController {
   }
 
   @ApiOperation({
-    summary: 'Récupère les métadonnées du jeune',
-    description: 'Autorisé pour un conseiller du jeune'
+    summary: 'Deprecated (Web) - Récupère les métadonnées du jeune',
+    description: 'Autorisé pour un conseiller du jeune',
+    deprecated: true
   })
   @Get(':idConseiller/jeunes/:idJeune/metadonnees')
   async getMetadonneesFavorisJeune(
@@ -244,7 +243,7 @@ export class ConseillersController {
     @Param('idConseiller') idConseiller: string,
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<MetadonneesFavorisJeuneQueryModel> {
+  ): Promise<MetadonneesFavorisQueryModel> {
     const result = await this.getMetadonneesFavorisJeuneQueryHandler.execute(
       { idJeune },
       utilisateur
