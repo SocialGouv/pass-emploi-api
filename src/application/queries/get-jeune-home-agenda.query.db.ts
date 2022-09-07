@@ -19,22 +19,22 @@ import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 
 const NUMERO_DU_JOUR_SAMEDI = 6
 
-export interface GetJeuneHomeSuiviQuery extends Query {
+export interface GetJeuneHomeAgendaQuery extends Query {
   idJeune: string
   maintenant: string
 }
 
 @Injectable()
-export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
-  GetJeuneHomeSuiviQuery,
+export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
+  GetJeuneHomeAgendaQuery,
   Result<JeuneHomeSuiviQueryModel>
 > {
   constructor(private jeuneAuthorizer: JeuneAuthorizer) {
-    super('GetJeuneHomeSuiviQueryHandler')
+    super('GetJeuneHomeAgendaQueryHandler')
   }
 
   async handle(
-    query: GetJeuneHomeSuiviQuery
+    query: GetJeuneHomeAgendaQuery
   ): Promise<Result<JeuneHomeSuiviQueryModel>> {
     const { samediDernier, vendrediEnHuit } =
       this.recupererLesDatesEntreSamediDernierEtDeuxSemainesPlusTard(
@@ -57,7 +57,7 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
   }
 
   async authorize(
-    query: GetJeuneHomeSuiviQuery,
+    query: GetJeuneHomeAgendaQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
@@ -84,7 +84,7 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
   }
 
   private async recupererLesRendezVous(
-    query: GetJeuneHomeSuiviQuery,
+    query: GetJeuneHomeAgendaQuery,
     dateDebut: DateTime,
     dateFin: DateTime
   ): Promise<RendezVousJeuneQueryModel[]> {
@@ -109,7 +109,7 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
   }
 
   private async recupererLesActions(
-    query: GetJeuneHomeSuiviQuery,
+    query: GetJeuneHomeAgendaQuery,
     dateDebut: DateTime,
     dateFin: DateTime
   ): Promise<ActionQueryModel[]> {
@@ -128,7 +128,7 @@ export class GetJeuneHomeSuiviQueryHandler extends QueryHandler<
   }
 
   private async recupererLeNombreDactionsEnRetard(
-    query: GetJeuneHomeSuiviQuery
+    query: GetJeuneHomeAgendaQuery
   ): Promise<number> {
     return ActionSqlModel.count({
       where: {

@@ -74,13 +74,13 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { GetJeuneHomeSuiviQueryHandler } from '../../../src/application/queries/get-jeune-home-suivi.query.db'
+import { GetJeuneHomeAgendaQueryHandler } from '../../../src/application/queries/get-jeune-home-agenda.query.db'
 import {
   JeuneHomeAgendaPoleEmploiQueryModel,
   JeuneHomeSuiviQueryModel
 } from '../../../src/application/queries/query-models/home-jeune-suivi.query-model'
 import { uneActionQueryModelSansJeune } from '../../fixtures/query-models/action.query-model.fixtures'
-import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../../src/application/queries/get-jeune-home-suivi-pole-emploi.query.handler'
+import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../../src/application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
 import StatutInvalide = Action.StatutInvalide
 
 describe('JeunesController', () => {
@@ -94,7 +94,7 @@ describe('JeunesController', () => {
   let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
   let getActionsPoleEmploiQueryHandler: StubbedClass<GetDemarchesQueryHandler>
   let getJeuneHomeDemarchesQueryHandler: StubbedClass<GetJeuneHomeDemarchesQueryHandler>
-  let getJeuneHomeSuiviQueryHandler: StubbedClass<GetJeuneHomeSuiviQueryHandler>
+  let getJeuneHomeSuiviQueryHandler: StubbedClass<GetJeuneHomeAgendaQueryHandler>
   let getJeuneHomeAgendaPoleEmploiQueryHandler: StubbedClass<GetJeuneHomeAgendaPoleEmploiQueryHandler>
   let getJeuneHomeActionsQueryHandler: StubbedClass<GetJeuneHomeActionsQueryHandler>
   let updateStatutDemarcheCommandHandler: StubbedClass<UpdateStatutDemarcheCommandHandler>
@@ -129,7 +129,7 @@ describe('JeunesController', () => {
     jwtService = stubClass(JwtService)
     getRendezVousJeuneQueryHandler = stubClass(GetRendezVousJeuneQueryHandler)
     getJeuneHomeActionsQueryHandler = stubClass(GetJeuneHomeActionsQueryHandler)
-    getJeuneHomeSuiviQueryHandler = stubClass(GetJeuneHomeSuiviQueryHandler)
+    getJeuneHomeSuiviQueryHandler = stubClass(GetJeuneHomeAgendaQueryHandler)
     getJeuneHomeAgendaPoleEmploiQueryHandler = stubClass(
       GetJeuneHomeAgendaPoleEmploiQueryHandler
     )
@@ -177,7 +177,7 @@ describe('JeunesController', () => {
       .useValue(getJeuneHomeActionsQueryHandler)
       .overrideProvider(GetJeuneHomeDemarchesQueryHandler)
       .useValue(getJeuneHomeDemarchesQueryHandler)
-      .overrideProvider(GetJeuneHomeSuiviQueryHandler)
+      .overrideProvider(GetJeuneHomeAgendaQueryHandler)
       .useValue(getJeuneHomeSuiviQueryHandler)
       .overrideProvider(UpdateStatutDemarcheCommandHandler)
       .useValue(updateStatutDemarcheCommandHandler)

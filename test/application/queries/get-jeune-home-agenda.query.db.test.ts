@@ -1,4 +1,4 @@
-import { GetJeuneHomeSuiviQueryHandler } from 'src/application/queries/get-jeune-home-suivi.query.db'
+import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeune-home-agenda.query.db'
 import { JeuneHomeSuiviQueryModel } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
 import {
   emptySuccess,
@@ -30,9 +30,9 @@ import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
 import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
 
-describe('GetJeuneHomeSuiviQueryHandler', () => {
+describe('GetJeuneHomeAgendaQueryHandler', () => {
   DatabaseForTesting.prepare()
-  let handler: GetJeuneHomeSuiviQueryHandler
+  let handler: GetJeuneHomeAgendaQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   const aujourdhuiVendredi = '2022-08-12T12:00:00Z'
   const demain = new Date('2022-08-13T12:00:00Z')
@@ -41,7 +41,7 @@ describe('GetJeuneHomeSuiviQueryHandler', () => {
 
   beforeEach(async () => {
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
-    handler = new GetJeuneHomeSuiviQueryHandler(jeuneAuthorizer)
+    handler = new GetJeuneHomeAgendaQueryHandler(jeuneAuthorizer)
     await ConseillerSqlModel.creer(unConseillerDto())
     await JeuneSqlModel.creer(jeuneDto)
   })

@@ -4,7 +4,7 @@ import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/
 import {
   GetJeuneHomeAgendaPoleEmploiQuery,
   GetJeuneHomeAgendaPoleEmploiQueryHandler
-} from '../../../src/application/queries/get-jeune-home-suivi-pole-emploi.query.handler'
+} from '../../../src/application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
 import {
   failure,
   isSuccess,
