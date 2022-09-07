@@ -11,7 +11,7 @@ import {
 } from '../../fixtures/offre-emploi.fixture'
 import { desTypesDemarchesDto } from '../../fixtures/pole-emploi.dto.fixture'
 import { testConfig } from '../../utils/module-for-testing'
-import { uneNotificationPoleEmploi } from '../../fixtures/notification.fixture'
+import { desNotificationsDunJeunePoleEmploi } from '../../fixtures/notification.fixture'
 
 describe('PoleEmploiClient', () => {
   let poleEmploiClient: PoleEmploiClient
@@ -196,7 +196,7 @@ describe('PoleEmploiClient', () => {
 
       // Then
       expect(notificationsRendezVous).to.deep.equal([
-        uneNotificationPoleEmploi()
+        desNotificationsDunJeunePoleEmploi()
       ])
     })
   })

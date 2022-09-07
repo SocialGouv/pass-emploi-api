@@ -13,6 +13,8 @@ import { uneDatetime } from '../../../fixtures/date.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { unJeune } from '../../../fixtures/jeune.fixture'
+import { uneNotificationPoleEmploi } from '../../../fixtures/notification.fixture'
+import Type = Notification.Type
 
 describe('HandleJobNotifierRendezVousPECommandHandler', () => {
   let sandbox: SinonSandbox
@@ -122,13 +124,13 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
         jeunesPEAvecToken: 1,
         nombreJeunesTraites: 1,
         nombreNotificationsEnvoyees: 1,
+        nombreNotificationsDoublons: 0,
         erreurs: 0
       }
       expect(result._isSuccess && result.data)
         .excluding('tempsDExecution')
         .to.deep.equal(stats)
     })
-
     it('traite les notifications PE à minuit', async () => {
       // Given
       const dateMinuit = DateTime.fromISO('2020-04-06T00:30:00.000Z').toUTC()
@@ -215,6 +217,7 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
         jeunesPEAvecToken: 1,
         nombreJeunesTraites: 1,
         nombreNotificationsEnvoyees: 2,
+        nombreNotificationsDoublons: 0,
         erreurs: 0
       }
       expect(result._isSuccess && result.data)
@@ -245,11 +248,202 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
         jeunesPEAvecToken: 1,
         nombreJeunesTraites: 0,
         nombreNotificationsEnvoyees: 0,
+        nombreNotificationsDoublons: 0,
         erreurs: 1
       }
       expect(result._isSuccess && result.data)
         .excluding('tempsDExecution')
         .to.deep.equal(stats)
+    })
+
+    describe('filtrage des notifications', () => {
+      const dateMinuit = DateTime.fromISO('2020-04-06T00:30:00.000Z').toUTC()
+      const notificationNouveauRendezVous = uneNotificationPoleEmploi({
+        idMetier: 'idMetier1',
+        typeMouvementRDV: Type.NEW_RENDEZVOUS,
+        dateCreation: dateMinuit.minus({ hour: 1 }),
+        message: "C'est un nouveau rendez-vous"
+      })
+      const notificationRendezVousMisAJour = uneNotificationPoleEmploi({
+        idMetier: 'idMetier1',
+        typeMouvementRDV: Type.UPDATED_RENDEZVOUS,
+        dateCreation: dateMinuit.minus({ hour: 1 }),
+        message: "C'est une mise à jour de rendez-vous"
+      })
+      const notificationRendezVousSupprime = uneNotificationPoleEmploi({
+        idMetier: 'idMetier1',
+        typeMouvementRDV: Type.DELETED_RENDEZVOUS,
+        dateCreation: dateMinuit.minus({ hour: 1 })
+      })
+
+      beforeEach(() => {
+        dateService.now.returns(dateMinuit)
+      })
+
+      describe('quand il y a une création et un update pour un rendez-vous', () => {
+        it("n'envoie que la création", async () => {
+          // Given
+          const notificationsPoleEmploi: Notification.PoleEmploi[] = [
+            {
+              idExterneDE: jeunePoleEmploi.idAuthentification,
+              notifications: [
+                notificationNouveauRendezVous,
+                notificationRendezVousMisAJour
+              ]
+            }
+          ]
+          poleEmploiClient.getNotificationsRendezVous.resolves(
+            notificationsPoleEmploi
+          )
+
+          // When
+          await handleJobNotifierRendezVousPECommandHandler.handle()
+
+          // Then
+          expect(
+            notificationService.notifierUnRendezVousPoleEmploi
+          ).to.have.been.calledOnceWithExactly(
+            notificationNouveauRendezVous.typeMouvementRDV,
+            jeunePoleEmploi.pushNotificationToken,
+            notificationRendezVousMisAJour.message,
+            notificationNouveauRendezVous.idMetier
+          )
+        })
+      })
+      describe('quand il y a une création et un delete pour un rendez-vous', () => {
+        it("n'envoie rien", async () => {
+          // Given
+          const notificationsPoleEmploi: Notification.PoleEmploi[] = [
+            {
+              idExterneDE: jeunePoleEmploi.idAuthentification,
+              notifications: [
+                notificationRendezVousSupprime,
+                notificationNouveauRendezVous
+              ]
+            }
+          ]
+          poleEmploiClient.getNotificationsRendezVous.resolves(
+            notificationsPoleEmploi
+          )
+
+          // When
+          await handleJobNotifierRendezVousPECommandHandler.handle()
+
+          // Then
+          expect(
+            notificationService.notifierUnRendezVousPoleEmploi
+          ).not.to.have.been.called()
+        })
+      })
+      describe('quand il y a une update et un delete pour un rendez-vous', () => {
+        it("n'envoie rien", async () => {
+          // Given
+          const notificationsPoleEmploi: Notification.PoleEmploi[] = [
+            {
+              idExterneDE: jeunePoleEmploi.idAuthentification,
+              notifications: [
+                notificationRendezVousSupprime,
+                notificationRendezVousMisAJour
+              ]
+            }
+          ]
+          poleEmploiClient.getNotificationsRendezVous.resolves(
+            notificationsPoleEmploi
+          )
+
+          // When
+          await handleJobNotifierRendezVousPECommandHandler.handle()
+
+          // Then
+          expect(
+            notificationService.notifierUnRendezVousPoleEmploi
+          ).not.to.have.been.called()
+        })
+      })
+      describe('quand il y a un update', () => {
+        it('envoie une notification de mise à jour', async () => {
+          // Given
+          const notificationsPoleEmploi: Notification.PoleEmploi[] = [
+            {
+              idExterneDE: jeunePoleEmploi.idAuthentification,
+              notifications: [notificationRendezVousMisAJour]
+            }
+          ]
+          poleEmploiClient.getNotificationsRendezVous.resolves(
+            notificationsPoleEmploi
+          )
+
+          // When
+          await handleJobNotifierRendezVousPECommandHandler.handle()
+
+          // Then
+          expect(
+            notificationService.notifierUnRendezVousPoleEmploi
+          ).to.have.been.calledWithExactly(
+            notificationRendezVousMisAJour.typeMouvementRDV,
+            jeunePoleEmploi.pushNotificationToken,
+            notificationRendezVousMisAJour.message,
+            notificationRendezVousMisAJour.idMetier
+          )
+        })
+      })
+      describe('quand il y a deux updates', () => {
+        it('envoie une seule notification de mise à jour', async () => {
+          // Given
+          const notificationsPoleEmploi: Notification.PoleEmploi[] = [
+            {
+              idExterneDE: jeunePoleEmploi.idAuthentification,
+              notifications: [
+                notificationRendezVousMisAJour,
+                notificationRendezVousMisAJour
+              ]
+            }
+          ]
+          poleEmploiClient.getNotificationsRendezVous.resolves(
+            notificationsPoleEmploi
+          )
+
+          // When
+          await handleJobNotifierRendezVousPECommandHandler.handle()
+
+          // Then
+          expect(
+            notificationService.notifierUnRendezVousPoleEmploi
+          ).to.have.been.calledWithExactly(
+            notificationRendezVousMisAJour.typeMouvementRDV,
+            jeunePoleEmploi.pushNotificationToken,
+            notificationRendezVousMisAJour.message,
+            notificationRendezVousMisAJour.idMetier
+          )
+        })
+      })
+      describe('quand il y a un delete', () => {
+        it('envoie une notification de suppression', async () => {
+          // Given
+          const notificationsPoleEmploi: Notification.PoleEmploi[] = [
+            {
+              idExterneDE: jeunePoleEmploi.idAuthentification,
+              notifications: [notificationRendezVousSupprime]
+            }
+          ]
+          poleEmploiClient.getNotificationsRendezVous.resolves(
+            notificationsPoleEmploi
+          )
+
+          // When
+          await handleJobNotifierRendezVousPECommandHandler.handle()
+
+          // Then
+          expect(
+            notificationService.notifierUnRendezVousPoleEmploi
+          ).to.have.been.calledWithExactly(
+            notificationRendezVousSupprime.typeMouvementRDV,
+            jeunePoleEmploi.pushNotificationToken,
+            notificationRendezVousSupprime.message,
+            notificationRendezVousSupprime.idMetier
+          )
+        })
+      })
     })
   })
 })

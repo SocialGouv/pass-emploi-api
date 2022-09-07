@@ -19,6 +19,7 @@ import {
   Jeune,
   JeunePoleEmploiRepositoryToken
 } from '../../../domain/jeune/jeune'
+import Type = Notification.Type
 
 const NOMBRE_JEUNES_EN_PARALLELE = 20
 
@@ -47,10 +48,11 @@ export class HandleJobNotifierRendezVousPECommandHandler extends CommandHandler<
     const aujourdhui = maintenant.toISODate()
     const hier = maintenant.minus({ days: 1 }).toISODate()
 
-    let stats: Stats = {
+    const stats: Stats = {
       jeunesPEAvecToken: 0,
       nombreJeunesTraites: 0,
       nombreNotificationsEnvoyees: 0,
+      nombreNotificationsDoublons: 0,
       erreurs: 0
     }
 
@@ -80,14 +82,37 @@ export class HandleJobNotifierRendezVousPECommandHandler extends CommandHandler<
                 jeune.idAuthentification === notificationsParJeune.idExterneDE
             )!
 
-            for (const detailNotification of notificationsParJeune.notifications) {
-              stats = await this.envoyerLesNotificationsDesDeuxDernieresHeures(
-                detailNotification,
-                maintenant,
-                jeuneANotifier,
-                stats
+            const notificationsDeMoinsDeDeuxHeures: NotificationAEnvoyer[] =
+              notificationsParJeune.notifications
+                .filter(detailNotification =>
+                  estUneNotificationDeMoinsDeDeuxHeures(
+                    detailNotification.dateCreation,
+                    maintenant
+                  )
+                )
+                .map(enNotificationAEnvoyer)
+                .sort(createdPuisUpdatedPuisDeleted)
+
+            const notificationsAEnvoyer =
+              notificationsDeMoinsDeDeuxHeures.reduce(
+                garderUneNotificationParRendezVous,
+                []
               )
+
+            stats.nombreNotificationsDoublons +=
+              notificationsDeMoinsDeDeuxHeures.length -
+              notificationsAEnvoyer.length
+
+            for (const notificationAEnvoyer of notificationsAEnvoyer) {
+              await this.notificationService.notifierUnRendezVousPoleEmploi(
+                notificationAEnvoyer.typeMouvementRDV,
+                jeuneANotifier.pushNotificationToken,
+                notificationAEnvoyer.message,
+                notificationAEnvoyer.idMetier
+              )
+              stats.nombreNotificationsEnvoyees++
             }
+
             stats.nombreJeunesTraites++
           }
         } catch (e) {
@@ -111,32 +136,6 @@ export class HandleJobNotifierRendezVousPECommandHandler extends CommandHandler<
   async monitor(): Promise<void> {
     return
   }
-
-  private async envoyerLesNotificationsDesDeuxDernieresHeures(
-    detailNotification: Notification.PoleEmploi.Notification,
-    maintenant: DateTime,
-    jeuneANotifier: Jeune.PoleEmploi,
-    stats: Stats
-  ): Promise<Stats> {
-    if (
-      estUneNotificationDeMoinsDeDeuxHeures(
-        detailNotification.dateCreation,
-        maintenant
-      )
-    ) {
-      await this.notificationService.notifierUnRendezVousPoleEmploi(
-        detailNotification.typeMouvementRDV,
-        jeuneANotifier.pushNotificationToken,
-        detailNotification.message,
-        detailNotification.idMetier
-      )
-      return {
-        ...stats,
-        nombreNotificationsEnvoyees: stats.nombreNotificationsEnvoyees + 1
-      }
-    }
-    return { ...stats }
-  }
 }
 
 function estUneNotificationDeMoinsDeDeuxHeures(
@@ -149,10 +148,81 @@ function estUneNotificationDeMoinsDeDeuxHeures(
   )
 }
 
+function enNotificationAEnvoyer(
+  detailNotification: Notification.PoleEmploi.Notification
+): NotificationAEnvoyer {
+  return {
+    idMetier: detailNotification.idMetier,
+    message: detailNotification.message,
+    typeMouvementRDV: detailNotification.typeMouvementRDV
+  }
+}
+
+function supprimerLaNotification(
+  notificationsPriorisees: NotificationAEnvoyer[],
+  indexNotificationPrioriseeParRendezVous: number
+): void {
+  notificationsPriorisees.splice(indexNotificationPrioriseeParRendezVous, 1)
+}
+
+function garderUneNotificationParRendezVous(
+  notificationsPriorisees: NotificationAEnvoyer[],
+  notificationAPrioriser: NotificationAEnvoyer
+): NotificationAEnvoyer[] {
+  const indexNotificationPrioriseeParRendezVous =
+    notificationsPriorisees.findIndex(
+      n => n.idMetier === notificationAPrioriser.idMetier
+    )
+
+  const uneNotificationSurCeRendezVousEstPrevue =
+    indexNotificationPrioriseeParRendezVous !== -1
+
+  if (uneNotificationSurCeRendezVousEstPrevue) {
+    if (notificationAPrioriser.typeMouvementRDV === Type.DELETED_RENDEZVOUS) {
+      supprimerLaNotification(
+        notificationsPriorisees,
+        indexNotificationPrioriseeParRendezVous
+      )
+    } else if (
+      notificationAPrioriser.typeMouvementRDV === Type.UPDATED_RENDEZVOUS
+    ) {
+      notificationsPriorisees[indexNotificationPrioriseeParRendezVous].message =
+        notificationAPrioriser.message
+    }
+  } else {
+    notificationsPriorisees.push(notificationAPrioriser)
+  }
+
+  return notificationsPriorisees
+}
+
 export interface Stats {
   jeunesPEAvecToken: number
   nombreJeunesTraites: number
   nombreNotificationsEnvoyees: number
+  nombreNotificationsDoublons: number
   erreurs: number
   tempsDExecution?: number
+}
+
+interface NotificationAEnvoyer {
+  typeMouvementRDV: Notification.TypeRdv
+  message: string
+  idMetier?: string
+}
+
+const ordreTypeRendezVous: { [type in Notification.TypeRdv]: number } = {
+  NEW_RENDEZVOUS: 1,
+  UPDATED_RENDEZVOUS: 2,
+  DELETED_RENDEZVOUS: 3
+}
+
+function createdPuisUpdatedPuisDeleted(
+  notificationAEnvoyer1: NotificationAEnvoyer,
+  notificationAEnvoyer2: NotificationAEnvoyer
+): number {
+  return (
+    ordreTypeRendezVous[notificationAEnvoyer1.typeMouvementRDV] -
+    ordreTypeRendezVous[notificationAEnvoyer2.typeMouvementRDV]
+  )
 }
