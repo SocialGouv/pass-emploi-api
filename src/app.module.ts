@@ -224,6 +224,7 @@ import { GetTypesQualificationsQueryHandler } from './application/queries/get-ty
 import { ActionMiloHttpRepository } from './infrastructure/repositories/action/action-milo-http-sql.repository.db'
 import { QualifierActionCommandHandler } from './application/commands/qualifier-action.command.handler'
 import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from './application/queries/get-jeune-home-suivi-pole-emploi.query.handler'
+import { GetDemarchesQueryGetter } from './application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -521,7 +522,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     HandleJobNotifierRendezVousPECommandHandler,
     GetTypesQualificationsQueryHandler,
     QualifierActionCommandHandler,
-    GetJeuneHomeAgendaPoleEmploiQueryHandler
+    GetJeuneHomeAgendaPoleEmploiQueryHandler,
+    GetDemarchesQueryGetter
   ]
 }
 

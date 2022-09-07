@@ -1,8 +1,4 @@
 import { Query } from '../../building-blocks/types/query'
-import {
-  GetDemarchesQuery,
-  GetDemarchesQueryHandler
-} from './get-demarches.query.handler'
 import { isFailure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
@@ -11,6 +7,7 @@ import { JeuneHomeAgendaPoleEmploiQueryModel } from './query-models/home-jeune-s
 import { Injectable } from '@nestjs/common'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from './get-rendez-vous-jeune-pole-emploi.query.handler'
 import { DateTime } from 'luxon'
+import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
 
 export interface GetJeuneHomeAgendaPoleEmploiQuery extends Query {
   idJeune: string
@@ -24,7 +21,7 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
   Result<JeuneHomeAgendaPoleEmploiQueryModel>
 > {
   constructor(
-    private getDemarchesQueryHandler: GetDemarchesQueryHandler,
+    private getDemarchesQueryGetter: GetDemarchesQueryGetter,
     private getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler,
     private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer
   ) {
@@ -38,9 +35,9 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
     const dansDeuxSemaines = maintenant.plus({ weeks: 2 })
 
     const [resultDemarches, resultRendezVous] = await Promise.all([
-      this.getDemarchesQueryHandler.handle({
+      this.getDemarchesQueryGetter.handle({
         ...query,
-        tri: GetDemarchesQuery.Tri.parDateFin
+        tri: GetDemarchesQueryGetter.Tri.parDateFin
       }),
       this.getRendezVousJeunePoleEmploiQueryHandler.handle({
         ...query
