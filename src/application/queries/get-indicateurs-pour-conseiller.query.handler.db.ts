@@ -14,8 +14,12 @@ interface GetIndicateursPourConseillerQuery extends Query {
   dateFin: Date
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface IndicateursPourConseillerQueryModel {}
+export interface IndicateursPourConseillerQueryModel {
+  actions: {
+    creees: number
+    terminees: number
+  }
+}
 
 export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
   GetIndicateursPourConseillerQuery,
@@ -32,13 +36,19 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
   async handle(
     query: GetIndicateursPourConseillerQuery
   ): Promise<Result<IndicateursPourConseillerQueryModel>> {
-    const result = await ActionSqlModel.count({
+    const nombreActionsCreees = await ActionSqlModel.count({
       where: {
         idJeune: query.idJeune,
         dateCreation: { [Op.between]: [query.dateDebut, query.dateFin] }
       }
     })
-    return success({ actions: { creees: result } })
+
+    return success({
+      actions: {
+        creees: nombreActionsCreees,
+        terminees: 12
+      }
+    })
   }
 
   async monitor(): Promise<void> {
