@@ -1,11 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Authentification } from './authentification'
 import { Result } from '../building-blocks/types/result'
+import { DateService } from '../utils/date-service'
 
 export const EvenementsRepositoryToken = 'EvenementsRepositoryToken'
 
+export interface Evenement {
+  date: Date
+  code: Evenement.Code
+  categorie: string
+  action: string
+  nom?: string
+}
+
 export namespace Evenement {
-  export enum Type {
+  export enum Code {
     ACTION_CREEE = 'ACTION_CREEE',
     ACTION_DETAIL = 'ACTION_DETAIL',
     ACTION_LISTE = 'ACTION_LISTE',
@@ -59,239 +68,237 @@ export namespace Evenement {
   }
 
   export interface Repository {
-    saveEvenement(
+    save(
       utilisateur: Authentification.Utilisateur,
-      categorieEvenement: string,
-      actionEvenement: string,
-      nomEvenement?: string
+      evenement: Evenement
     ): Promise<Result>
   }
 }
 
 const evenements = {
-  [Evenement.Type.ACTION_CREEE]: { categorie: 'Action', action: 'Création' },
-  [Evenement.Type.ACTION_DETAIL]: {
+  [Evenement.Code.ACTION_CREEE]: { categorie: 'Action', action: 'Création' },
+  [Evenement.Code.ACTION_DETAIL]: {
     categorie: 'Action',
     action: 'Consultation',
     nom: 'Détail'
   },
-  [Evenement.Type.ACTION_LISTE]: {
+  [Evenement.Code.ACTION_LISTE]: {
     categorie: 'Action',
     action: 'Consultation',
     nom: 'Liste'
   },
-  [Evenement.Type.ACTION_STATUT_MODIFIE]: {
+  [Evenement.Code.ACTION_STATUT_MODIFIE]: {
     categorie: 'Action',
     action: 'Modification',
     nom: 'Statut'
   },
-  [Evenement.Type.ACTION_SUPPRIMEE]: {
+  [Evenement.Code.ACTION_SUPPRIMEE]: {
     categorie: 'Action',
     action: 'Suppression'
   },
-  [Evenement.Type.ACTION_COMMENTEE]: {
+  [Evenement.Code.ACTION_COMMENTEE]: {
     categorie: 'Action',
     action: 'Commentaire',
     nom: 'Ajout'
   },
-  [Evenement.Type.ACTION_QUALIFIEE_SNP]: {
+  [Evenement.Code.ACTION_QUALIFIEE_SNP]: {
     categorie: 'Action',
     action: 'Qualifier',
     nom: 'SNP'
   },
-  [Evenement.Type.ACTION_QUALIFIEE_NON_SNP]: {
+  [Evenement.Code.ACTION_QUALIFIEE_NON_SNP]: {
     categorie: 'Action',
     action: 'Qualifier',
     nom: 'Non SNP'
   },
-  [Evenement.Type.COMPTE_SUPPRIME]: {
+  [Evenement.Code.COMPTE_SUPPRIME]: {
     categorie: 'Compte',
     action: 'Suppression'
   },
-  [Evenement.Type.COMPTE_ARCHIVE]: {
+  [Evenement.Code.COMPTE_ARCHIVE]: {
     categorie: 'Compte',
     action: 'Archivage'
   },
-  [Evenement.Type.OFFRE_EMPLOI_AFFICHEE]: {
+  [Evenement.Code.OFFRE_EMPLOI_AFFICHEE]: {
     categorie: 'Offre',
     action: 'Détail',
     nom: 'Emploi'
   },
-  [Evenement.Type.OFFRE_EMPLOI_RECHERCHEE]: {
+  [Evenement.Code.OFFRE_EMPLOI_RECHERCHEE]: {
     categorie: 'Offre',
     action: 'Recherche',
     nom: 'Emploi'
   },
-  [Evenement.Type.OFFRE_EMPLOI_SAUVEGARDEE]: {
+  [Evenement.Code.OFFRE_EMPLOI_SAUVEGARDEE]: {
     categorie: 'Offre',
     action: 'Favori',
     nom: 'Emploi'
   },
-  [Evenement.Type.OFFRE_EMPLOI_POSTULEE]: {
+  [Evenement.Code.OFFRE_EMPLOI_POSTULEE]: {
     categorie: 'Offre',
     action: 'Postuler',
     nom: 'Emploi'
   },
-  [Evenement.Type.OFFRE_EMPLOI_PARTAGEE]: {
+  [Evenement.Code.OFFRE_EMPLOI_PARTAGEE]: {
     categorie: 'Offre',
     action: 'Partage',
     nom: 'Emploi'
   },
-  [Evenement.Type.OFFRE_IMMERSION_AFFICHEE]: {
+  [Evenement.Code.OFFRE_IMMERSION_AFFICHEE]: {
     categorie: 'Offre',
     action: 'Détail',
     nom: 'Immersion'
   },
-  [Evenement.Type.OFFRE_IMMERSION_RECHERCHEE]: {
+  [Evenement.Code.OFFRE_IMMERSION_RECHERCHEE]: {
     categorie: 'Offre',
     action: 'Recherche',
     nom: 'Immersion'
   },
-  [Evenement.Type.OFFRE_IMMERSION_SAUVEGARDEE]: {
+  [Evenement.Code.OFFRE_IMMERSION_SAUVEGARDEE]: {
     categorie: 'Offre',
     action: 'Favori',
     nom: 'Immersion'
   },
-  [Evenement.Type.OFFRE_IMMERSION_APPEL]: {
+  [Evenement.Code.OFFRE_IMMERSION_APPEL]: {
     categorie: 'Offre',
     action: 'Appel',
     nom: 'Immersion'
   },
-  [Evenement.Type.OFFRE_IMMERSION_ENVOI_EMAIL]: {
+  [Evenement.Code.OFFRE_IMMERSION_ENVOI_EMAIL]: {
     categorie: 'Offre',
     action: 'Envoi email',
     nom: 'Immersion'
   },
-  [Evenement.Type.OFFRE_IMMERSION_LOCALISATION]: {
+  [Evenement.Code.OFFRE_IMMERSION_LOCALISATION]: {
     categorie: 'Offre',
     action: 'Localiser',
     nom: 'Immersion'
   },
-  [Evenement.Type.OFFRE_ALTERNANCE_AFFICHEE]: {
+  [Evenement.Code.OFFRE_ALTERNANCE_AFFICHEE]: {
     categorie: 'Offre',
     action: 'Détail',
     nom: 'Alternance'
   },
-  [Evenement.Type.OFFRE_ALTERNANCE_RECHERCHEE]: {
+  [Evenement.Code.OFFRE_ALTERNANCE_RECHERCHEE]: {
     categorie: 'Offre',
     action: 'Recherche',
     nom: 'Alternance'
   },
-  [Evenement.Type.OFFRE_ALTERNANCE_SAUVEGARDEE]: {
+  [Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE]: {
     categorie: 'Offre',
     action: 'Favori',
     nom: 'Alternance'
   },
-  [Evenement.Type.OFFRE_ALTERNANCE_POSTULEE]: {
+  [Evenement.Code.OFFRE_ALTERNANCE_POSTULEE]: {
     categorie: 'Offre',
     action: 'Postuler',
     nom: 'Alternance'
   },
-  [Evenement.Type.OFFRE_ALTERNANCE_PARTAGEE]: {
+  [Evenement.Code.OFFRE_ALTERNANCE_PARTAGEE]: {
     categorie: 'Offre',
     action: 'Partage',
     nom: 'Alternance'
   },
-  [Evenement.Type.OFFRE_PARTAGEE]: {
+  [Evenement.Code.OFFRE_PARTAGEE]: {
     categorie: 'Offre',
     action: 'Partager'
   },
-  [Evenement.Type.OFFRE_POSTULEE]: {
+  [Evenement.Code.OFFRE_POSTULEE]: {
     categorie: 'Offre',
     action: 'Postuler'
   },
-  [Evenement.Type.MESSAGE_ENVOYE]: { categorie: 'Message', action: 'Envoi' },
-  [Evenement.Type.MESSAGE_ENVOYE_MULTIPLE]: {
+  [Evenement.Code.MESSAGE_ENVOYE]: { categorie: 'Message', action: 'Envoi' },
+  [Evenement.Code.MESSAGE_ENVOYE_MULTIPLE]: {
     categorie: 'Message',
     action: 'Envoi multiple'
   },
-  [Evenement.Type.MESSAGE_ENVOYE_MULTIPLE_PJ]: {
+  [Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_PJ]: {
     categorie: 'Message',
     action: 'Envoi multiple PJ'
   },
-  [Evenement.Type.MESSAGE_ENVOYE_PJ]: {
+  [Evenement.Code.MESSAGE_ENVOYE_PJ]: {
     categorie: 'Message',
     action: 'Envoi PJ'
   },
-  [Evenement.Type.MESSAGE_OFFRE_PARTAGEE]: {
+  [Evenement.Code.MESSAGE_OFFRE_PARTAGEE]: {
     categorie: 'Message',
     action: 'Partager',
     nom: 'Offre'
   },
-  [Evenement.Type.RDV_CREE]: { categorie: 'Rendez-vous', action: 'Création' },
-  [Evenement.Type.RDV_MODIFIE]: {
+  [Evenement.Code.RDV_CREE]: { categorie: 'Rendez-vous', action: 'Création' },
+  [Evenement.Code.RDV_MODIFIE]: {
     categorie: 'Rendez-vous',
     action: 'Modification'
   },
-  [Evenement.Type.RDV_SUPPRIME]: {
+  [Evenement.Code.RDV_SUPPRIME]: {
     categorie: 'Rendez-vous',
     action: 'Suppression'
   },
-  [Evenement.Type.RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE]: {
+  [Evenement.Code.RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE]: {
     categorie: 'Recherche',
     action: 'Enregistrer',
     nom: 'Emploi'
   },
-  [Evenement.Type.RECHERCHE_ALTERNANCE_SAUVEGARDEE]: {
+  [Evenement.Code.RECHERCHE_ALTERNANCE_SAUVEGARDEE]: {
     categorie: 'Recherche',
     action: 'Enregistrer',
     nom: 'Alternance'
   },
-  [Evenement.Type.RECHERCHE_IMMERSION_SAUVEGARDEE]: {
+  [Evenement.Code.RECHERCHE_IMMERSION_SAUVEGARDEE]: {
     categorie: 'Recherche',
     action: 'Enregistrer',
     nom: 'Immersion'
   },
-  [Evenement.Type.SERVICE_CIVIQUE_RECHERCHE]: {
+  [Evenement.Code.SERVICE_CIVIQUE_RECHERCHE]: {
     categorie: 'Offre',
     action: 'Recherche',
     nom: 'Service Civique'
   },
-  [Evenement.Type.SUIVI_POLE_EMPLOI]: {
+  [Evenement.Code.SUIVI_POLE_EMPLOI]: {
     categorie: 'Suivi',
     action: 'Consulter',
     nom: 'Pôle emploi'
   },
-  [Evenement.Type.OFFRE_SERVICE_CIVIQUE_AFFICHE]: {
+  [Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHE]: {
     categorie: 'Offre',
     action: 'Détail',
     nom: 'Service Civique'
   },
-  [Evenement.Type.OFFRE_SERVICE_CIVIQUE_POSTULEE]: {
+  [Evenement.Code.OFFRE_SERVICE_CIVIQUE_POSTULEE]: {
     categorie: 'Offre',
     action: 'Postuler',
     nom: 'Service Civique'
   },
-  [Evenement.Type.OFFRE_SERVICE_CIVIQUE_PARTAGEE]: {
+  [Evenement.Code.OFFRE_SERVICE_CIVIQUE_PARTAGEE]: {
     categorie: 'Offre',
     action: 'Partager',
     nom: 'Service Civique'
   },
-  [Evenement.Type.OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE]: {
+  [Evenement.Code.OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE]: {
     categorie: 'Offre',
     action: 'Favori',
     nom: 'Service Civique'
   },
-  [Evenement.Type.RECHERCHE_SERVICE_CIVIQUE_SAUVEGARDEE]: {
+  [Evenement.Code.RECHERCHE_SERVICE_CIVIQUE_SAUVEGARDEE]: {
     categorie: 'Recherche',
     action: 'Enregistrer',
     nom: 'Service Civique'
   },
-  [Evenement.Type.RDV_LISTE]: {
+  [Evenement.Code.RDV_LISTE]: {
     categorie: 'Rendez-vous',
     action: 'Consultation',
     nom: 'Liste'
   },
-  [Evenement.Type.RDV_DETAIL]: {
+  [Evenement.Code.RDV_DETAIL]: {
     categorie: 'Rendez-vous',
     action: 'Consultation',
     nom: 'Détail'
   },
-  [Evenement.Type.PIECE_JOINTE_TELECHARGEE]: {
+  [Evenement.Code.PIECE_JOINTE_TELECHARGEE]: {
     categorie: 'Message',
     action: 'Téléchargement PJ'
   },
-  [Evenement.Type.PREFERENCES_MISES_A_JOUR]: {
+  [Evenement.Code.PREFERENCES_MISES_A_JOUR]: {
     categorie: 'Préférences',
     action: 'Mise à jour'
   }
@@ -301,21 +308,21 @@ const evenements = {
 export class EvenementService {
   constructor(
     @Inject(EvenementsRepositoryToken)
-    private evenementRepository: Evenement.Repository
+    private evenementRepository: Evenement.Repository,
+    private dateService: DateService
   ) {}
 
-  async creerEvenement(
-    typeEvenement: Evenement.Type,
+  async creer(
+    code: Evenement.Code,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const evenement: { categorie: string; action: string; nom?: string } =
-      evenements[typeEvenement]
+      evenements[code]
 
-    await this.evenementRepository.saveEvenement(
-      utilisateur,
-      evenement.categorie,
-      evenement.action,
-      evenement.nom
-    )
+    await this.evenementRepository.save(utilisateur, {
+      ...evenement,
+      code,
+      date: this.dateService.nowJs()
+    })
   }
 }

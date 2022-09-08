@@ -128,8 +128,8 @@ describe('CreateDemarcheCommandHandler', () => {
       await createDemarcheCommandHandler.monitor(utilisateur)
 
       // Then
-      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
-        Evenement.Type.ACTION_CREEE,
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.ACTION_CREEE,
         utilisateur
       )
     })

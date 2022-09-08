@@ -104,8 +104,8 @@ describe('GetDetailServiceCiviqueQuery', () => {
       await getDetailServiceCiviqueQueryHandler.monitor(unUtilisateurJeune())
 
       // Then
-      expect(evenementService.creerEvenement).to.have.been.calledWith(
-        Evenement.Type.OFFRE_SERVICE_CIVIQUE_AFFICHE,
+      expect(evenementService.creer).to.have.been.calledWith(
+        Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHE,
         unUtilisateurJeune()
       )
     })

@@ -116,8 +116,8 @@ describe('TelechargerFichierQueryHandler', () => {
       await telechargerFichierQueryHandler.monitor(utilisateur)
 
       // Then
-      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
-        Evenement.Type.PIECE_JOINTE_TELECHARGEE,
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.PIECE_JOINTE_TELECHARGEE,
         utilisateur
       )
     })

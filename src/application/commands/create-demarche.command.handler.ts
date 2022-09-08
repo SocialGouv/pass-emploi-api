@@ -60,9 +60,6 @@ export class CreateDemarcheCommandHandler extends CommandHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.ACTION_CREEE,
-      utilisateur
-    )
+    await this.evenementService.creer(Evenement.Code.ACTION_CREEE, utilisateur)
   }
 }

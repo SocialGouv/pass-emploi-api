@@ -240,9 +240,6 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.RDV_MODIFIE,
-      utilisateur
-    )
+    await this.evenementService.creer(Evenement.Code.RDV_MODIFIE, utilisateur)
   }
 }

@@ -225,8 +225,8 @@ describe('GetRendezVousJeuneQueryHandler', () => {
         // When
         await getRendezVousQueryHandler.monitor(utilisateur, query)
         // Then
-        expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
-          Evenement.Type.RDV_LISTE,
+        expect(evenementService.creer).to.have.been.calledWithExactly(
+          Evenement.Code.RDV_LISTE,
           utilisateur
         )
       })
@@ -240,8 +240,8 @@ describe('GetRendezVousJeuneQueryHandler', () => {
         // When
         await getRendezVousQueryHandler.monitor(utilisateur, query)
         // Then
-        expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
-          Evenement.Type.RDV_LISTE,
+        expect(evenementService.creer).to.have.been.calledWithExactly(
+          Evenement.Code.RDV_LISTE,
           utilisateur
         )
       })
@@ -255,10 +255,8 @@ describe('GetRendezVousJeuneQueryHandler', () => {
         // When
         await getRendezVousQueryHandler.monitor(utilisateur, query)
         // Then
-        expect(
-          evenementService.creerEvenement
-        ).not.to.have.been.calledWithExactly(
-          Evenement.Type.RDV_LISTE,
+        expect(evenementService.creer).not.to.have.been.calledWithExactly(
+          Evenement.Code.RDV_LISTE,
           utilisateur
         )
       })
@@ -274,7 +272,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
         // When
         await getRendezVousQueryHandler.monitor(utilisateur, query)
         // Then
-        expect(evenementService.creerEvenement).not.to.have.been.called()
+        expect(evenementService.creer).not.to.have.been.called()
       })
       it("n'envoie pas un évenement de consultation de la liste des rendez vous futurs", async () => {
         // Given
@@ -286,7 +284,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
         // When
         await getRendezVousQueryHandler.monitor(utilisateur, query)
         // Then
-        expect(evenementService.creerEvenement).not.to.have.been.called()
+        expect(evenementService.creer).not.to.have.been.called()
       })
     })
   })

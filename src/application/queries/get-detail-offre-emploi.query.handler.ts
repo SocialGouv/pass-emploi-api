@@ -42,8 +42,8 @@ export class GetDetailOffreEmploiQueryHandler extends QueryHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.OFFRE_EMPLOI_AFFICHEE,
+    await this.evenementService.creer(
+      Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
       utilisateur
     )
   }
