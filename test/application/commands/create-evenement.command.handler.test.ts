@@ -25,7 +25,7 @@ describe('CreateActionCommandHandler', () => {
       it("autorise l'utilisateur à créer l'évènement", async () => {
         // Given
         const command: CreateEvenementCommand = {
-          type: Evenement.Type.MESSAGE_ENVOYE,
+          type: Evenement.Code.MESSAGE_ENVOYE,
           emetteur: {
             type: Authentification.Type.CONSEILLER,
             structure: Core.Structure.MILO,
@@ -48,7 +48,7 @@ describe('CreateActionCommandHandler', () => {
       it("rejette l'utilisateur", async () => {
         // Given
         const command: CreateEvenementCommand = {
-          type: Evenement.Type.MESSAGE_ENVOYE,
+          type: Evenement.Code.MESSAGE_ENVOYE,
           emetteur: {
             type: Authentification.Type.JEUNE,
             structure: Core.Structure.MILO,
@@ -72,7 +72,7 @@ describe('CreateActionCommandHandler', () => {
     it('appelle le service de monitoring pour créer le bon évènement', async () => {
       // Given
       const command: CreateEvenementCommand = {
-        type: Evenement.Type.MESSAGE_ENVOYE,
+        type: Evenement.Code.MESSAGE_ENVOYE,
         emetteur: {
           type: Authentification.Type.CONSEILLER,
           structure: Core.Structure.MILO,
@@ -85,10 +85,7 @@ describe('CreateActionCommandHandler', () => {
       await createEvenementCommandHandler.monitor(utilisateur, command)
 
       // Then
-      expect(evenementService.creerEvenement).to.be.calledWith(
-        command.type,
-        utilisateur
-      )
+      expect(evenementService.creer).to.be.calledWith(command.type, utilisateur)
     })
   })
 })

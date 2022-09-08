@@ -97,9 +97,6 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.RDV_SUPPRIME,
-      utilisateur
-    )
+    await this.evenementService.creer(Evenement.Code.RDV_SUPPRIME, utilisateur)
   }
 }

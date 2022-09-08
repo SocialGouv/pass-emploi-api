@@ -1,29 +1,24 @@
 import { Injectable } from '@nestjs/common'
 import { Authentification } from '../../domain/authentification'
 import { Evenement } from '../../domain/evenement'
-import { DateService } from '../../utils/date-service'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { EvenementEngagementSqlModel } from '../sequelize/models/evenement-engagement.sql-model'
 
 @Injectable()
 export class EvenementHttpSqlRepository implements Evenement.Repository {
-  constructor(private dateService: DateService) {}
-
-  async saveEvenement(
+  async save(
     utilisateur: Authentification.Utilisateur,
-    categorieEvenement: string,
-    actionEvenement: string,
-    nomEvenement?: string
+    evenement: Evenement
   ): Promise<Result> {
-    const dateEvenement = this.dateService.nowJs()
     await EvenementEngagementSqlModel.create({
-      categorie: categorieEvenement ?? null,
-      action: actionEvenement ?? null,
-      nom: nomEvenement ?? null,
+      code: evenement.code ?? null,
+      categorie: evenement.categorie ?? null,
+      action: evenement.action ?? null,
+      nom: evenement.nom ?? null,
       idUtilisateur: utilisateur.id,
       typeUtilisateur: utilisateur.type,
       structure: utilisateur.structure,
-      dateEvenement: dateEvenement
+      dateEvenement: evenement.date
     })
     return emptySuccess()
   }

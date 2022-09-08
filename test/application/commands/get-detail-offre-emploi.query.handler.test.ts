@@ -137,8 +137,8 @@ describe('GetDetailOffreEmploiQueryHandler', () => {
       await getDetailOffreEmploiQueryHandler.monitor(utilisateur)
 
       // Then
-      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
-        Evenement.Type.OFFRE_EMPLOI_AFFICHEE,
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
         utilisateur
       )
     })

@@ -127,13 +127,13 @@ export class QualifierActionCommandHandler extends CommandHandler<
     command: QualifierActionCommand
   ): Promise<void> {
     if (command.codeQualification === Action.Qualification.Code.NON_SNP) {
-      await this.evenementService.creerEvenement(
-        Evenement.Type.ACTION_QUALIFIEE_NON_SNP,
+      await this.evenementService.creer(
+        Evenement.Code.ACTION_QUALIFIEE_NON_SNP,
         utilisateur
       )
     } else {
-      await this.evenementService.creerEvenement(
-        Evenement.Type.ACTION_QUALIFIEE_SNP,
+      await this.evenementService.creer(
+        Evenement.Code.ACTION_QUALIFIEE_SNP,
         utilisateur
       )
     }

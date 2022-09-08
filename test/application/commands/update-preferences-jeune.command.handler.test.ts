@@ -83,8 +83,8 @@ describe('UpdateJeunePreferencesCommandHandler', () => {
       await updateJeunePreferencesCommandHandler.monitor(utilisateur)
 
       // Then
-      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
-        Evenement.Type.PREFERENCES_MISES_A_JOUR,
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.PREFERENCES_MISES_A_JOUR,
         utilisateur
       )
     })

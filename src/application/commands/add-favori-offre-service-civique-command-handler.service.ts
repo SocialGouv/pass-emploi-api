@@ -62,8 +62,8 @@ export class AddFavoriOffreServiceCiviqueCommandHandler extends CommandHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE,
+    await this.evenementService.creer(
+      Evenement.Code.OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE,
       utilisateur
     )
   }

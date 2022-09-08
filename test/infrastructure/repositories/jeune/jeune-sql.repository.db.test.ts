@@ -9,7 +9,7 @@ import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { uneSituationsMiloDto } from 'test/fixtures/milo.fixture'
 import { unConseiller } from 'test/fixtures/conseiller.fixture'
-import { unEvenementEngagement } from 'test/fixtures/sql-models/evenement-engagement.sql-model'
+import { unEvenementEngagementDto } from 'test/fixtures/sql-models/evenement-engagement.sql-model'
 import {
   unFavoriOffreEmploi,
   unFavoriOffreEngagement,
@@ -488,7 +488,7 @@ describe('JeuneSqlRepository', () => {
         idConseillerCible: conseillerDto.id,
         idConseillerSource: conseillerDto.id
       }
-      const evenementEngagement = unEvenementEngagement({
+      const evenementEngagement = unEvenementEngagementDto({
         idUtilisateur: jeuneDto.id
       })
       const situations = uneSituationsMiloDto({ idJeune: jeuneDto.id })

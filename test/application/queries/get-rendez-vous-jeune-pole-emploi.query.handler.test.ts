@@ -83,8 +83,8 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       await getRendezVousJeunePoleEmploiQueryHandler.monitor(utilisateur, query)
 
       // Then
-      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
-        Evenement.Type.RDV_LISTE,
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.RDV_LISTE,
         utilisateur
       )
     })
@@ -102,8 +102,8 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       await getRendezVousJeunePoleEmploiQueryHandler.monitor(utilisateur, query)
 
       // Then
-      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
-        Evenement.Type.RDV_LISTE,
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.RDV_LISTE,
         utilisateur
       )
     })
@@ -121,7 +121,7 @@ describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {
       await getRendezVousJeunePoleEmploiQueryHandler.monitor(utilisateur, query)
 
       // Then
-      expect(evenementService.creerEvenement).to.have.callCount(0)
+      expect(evenementService.creer).to.have.callCount(0)
     })
   })
 })

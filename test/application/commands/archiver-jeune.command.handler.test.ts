@@ -136,8 +136,8 @@ describe('ArchiverJeuneCommandHandler', () => {
       archiverJeuneCommandHandler.monitor(unUtilisateurConseiller())
 
       // Then
-      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
-        Evenement.Type.COMPTE_ARCHIVE,
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.COMPTE_ARCHIVE,
         unUtilisateurConseiller()
       )
     })

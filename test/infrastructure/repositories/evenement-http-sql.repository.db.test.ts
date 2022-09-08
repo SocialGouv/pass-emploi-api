@@ -1,28 +1,25 @@
 import { Authentification } from '../../../src/domain/authentification'
-import { expect, stubClass } from '../../utils'
+import { expect } from '../../utils'
 import { EvenementHttpSqlRepository } from '../../../src/infrastructure/repositories/evenement-http-sql.repository.db'
-import { DateService } from '../../../src/utils/date-service'
 import { Core } from '../../../src/domain/core'
 import { emptySuccess } from '../../../src/building-blocks/types/result'
 import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { uneDatetime } from 'test/fixtures/date.fixture'
-import Utilisateur = Authentification.Utilisateur
 import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { Evenement } from '../../../src/domain/evenement'
 
 describe('EvenementHttpSqlRepository', () => {
   DatabaseForTesting.prepare()
   let evenementHttpSqlRepository: EvenementHttpSqlRepository
-  const dateService = stubClass(DateService)
-  dateService.nowJs.returns(uneDatetime.toJSDate())
 
   beforeEach(async () => {
-    evenementHttpSqlRepository = new EvenementHttpSqlRepository(dateService)
+    evenementHttpSqlRepository = new EvenementHttpSqlRepository()
   })
 
   describe('saveEvenement', () => {
     it("enregistre l'évènement en base", async () => {
       // Given
-      const utilisateur: Utilisateur = {
+      const utilisateur: Authentification.Utilisateur = {
         id: '1',
         prenom: 'Kevin',
         nom: 'DeBrun',
@@ -33,18 +30,21 @@ describe('EvenementHttpSqlRepository', () => {
       }
       const categorieEvenement = 'Test'
       const actionEvenement = 'Test'
+      const codeEvenement = Evenement.Code.ACTION_STATUT_MODIFIE
 
       // When
-      const result = await evenementHttpSqlRepository.saveEvenement(
-        utilisateur,
-        categorieEvenement,
-        actionEvenement
-      )
+      const result = await evenementHttpSqlRepository.save(utilisateur, {
+        code: codeEvenement,
+        categorie: categorieEvenement,
+        action: actionEvenement,
+        date: uneDatetime.toJSDate()
+      })
 
       // Then
       const resultEvenement = await EvenementEngagementSqlModel.findAll()
 
       expect(resultEvenement.length).to.equal(1)
+      expect(resultEvenement[0].code).to.equal(codeEvenement)
       expect(resultEvenement[0].categorie).to.equal(categorieEvenement)
       expect(resultEvenement[0].idUtilisateur).to.equal(utilisateur.id)
       expect(resultEvenement[0].typeUtilisateur).to.equal(utilisateur.type)

@@ -117,8 +117,8 @@ describe('GetOffresImmersionQueryHandler', () => {
       await getOffresImmersionQueryHandler.monitor(unUtilisateurJeune())
 
       // Then
-      expect(evenementService.creerEvenement).to.have.been.calledWith(
-        Evenement.Type.OFFRE_IMMERSION_RECHERCHEE,
+      expect(evenementService.creer).to.have.been.calledWith(
+        Evenement.Code.OFFRE_IMMERSION_RECHERCHEE,
         unUtilisateurJeune()
       )
     })

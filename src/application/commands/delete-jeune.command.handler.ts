@@ -100,8 +100,8 @@ export class DeleteJeuneCommandHandler extends CommandHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.COMPTE_SUPPRIME,
+    await this.evenementService.creer(
+      Evenement.Code.COMPTE_SUPPRIME,
       utilisateur
     )
   }

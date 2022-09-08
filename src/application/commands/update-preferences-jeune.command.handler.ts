@@ -54,8 +54,8 @@ export class UpdateJeunePreferencesCommandHandler extends CommandHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.PREFERENCES_MISES_A_JOUR,
+    await this.evenementService.creer(
+      Evenement.Code.PREFERENCES_MISES_A_JOUR,
       utilisateur
     )
   }

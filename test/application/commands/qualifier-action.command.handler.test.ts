@@ -273,8 +273,8 @@ describe('QualifierActionCommandHandler', () => {
       await qualifierActionCommandHandler.monitor(utilisateur, command)
 
       // Then
-      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
-        Evenement.Type.ACTION_QUALIFIEE_SNP,
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.ACTION_QUALIFIEE_SNP,
         utilisateur
       )
     })
@@ -291,8 +291,8 @@ describe('QualifierActionCommandHandler', () => {
       await qualifierActionCommandHandler.monitor(utilisateur, command)
 
       // Then
-      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
-        Evenement.Type.ACTION_QUALIFIEE_NON_SNP,
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.ACTION_QUALIFIEE_NON_SNP,
         utilisateur
       )
     })

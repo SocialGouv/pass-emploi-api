@@ -46,10 +46,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
     query: GetRendezVousJeunePoleEmploiQuery
   ): Promise<void> {
     if (query?.periode !== RendezVous.Periode.PASSES) {
-      await this.evenementService.creerEvenement(
-        Evenement.Type.RDV_LISTE,
-        utilisateur
-      )
+      await this.evenementService.creer(Evenement.Code.RDV_LISTE, utilisateur)
     }
   }
 }

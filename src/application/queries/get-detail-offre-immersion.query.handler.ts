@@ -60,8 +60,8 @@ export class GetDetailOffreImmersionQueryHandler extends QueryHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.OFFRE_IMMERSION_AFFICHEE,
+    await this.evenementService.creer(
+      Evenement.Code.OFFRE_IMMERSION_AFFICHEE,
       utilisateur
     )
   }

@@ -27,6 +27,7 @@ import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { createSandbox, expect } from '../../utils'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { unEvenementEngagementDto } from '../../fixtures/sql-models/evenement-engagement.sql-model'
 
 describe('GetJeunesByConseillerQueryHandler', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -70,11 +71,13 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       const dateEvenement = uneDatetime.toJSDate()
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
       await JeuneSqlModel.creer(jeune)
-      await EvenementEngagementSqlModel.create({
-        idUtilisateur: jeune.id,
-        typeUtilisateur: Authentification.Type.JEUNE,
-        dateEvenement
-      })
+      await EvenementEngagementSqlModel.create(
+        unEvenementEngagementDto({
+          idUtilisateur: jeune.id,
+          typeUtilisateur: Authentification.Type.JEUNE,
+          dateEvenement
+        })
+      )
 
       // When
       const actual = await getJeunesByConseillerQueryHandler.handle({
@@ -98,16 +101,20 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       const dateEvenementAncien = uneDatetimeMoinsRecente.toJSDate()
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
       await JeuneSqlModel.creer(jeune)
-      await EvenementEngagementSqlModel.create({
-        idUtilisateur: jeune.id,
-        typeUtilisateur: Authentification.Type.JEUNE,
-        dateEvenement: dateEvenementAncien
-      })
-      await EvenementEngagementSqlModel.create({
-        idUtilisateur: jeune.id,
-        typeUtilisateur: Authentification.Type.JEUNE,
-        dateEvenement: dateEvenementRecent
-      })
+      await EvenementEngagementSqlModel.create(
+        unEvenementEngagementDto({
+          idUtilisateur: jeune.id,
+          typeUtilisateur: Authentification.Type.JEUNE,
+          dateEvenement: dateEvenementAncien
+        })
+      )
+      await EvenementEngagementSqlModel.create(
+        unEvenementEngagementDto({
+          idUtilisateur: jeune.id,
+          typeUtilisateur: Authentification.Type.JEUNE,
+          dateEvenement: dateEvenementRecent
+        })
+      )
 
       // When
       const actual = await getJeunesByConseillerQueryHandler.handle({
@@ -130,11 +137,13 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       const dateEvenement = uneDatetime.toJSDate()
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
       await JeuneSqlModel.creer(jeune)
-      await EvenementEngagementSqlModel.create({
-        idUtilisateur: 'faux-id',
-        typeUtilisateur: Authentification.Type.JEUNE,
-        dateEvenement
-      })
+      await EvenementEngagementSqlModel.create(
+        unEvenementEngagementDto({
+          idUtilisateur: 'faux-id',
+          typeUtilisateur: Authentification.Type.JEUNE,
+          dateEvenement
+        })
+      )
 
       // When
       const actual = await getJeunesByConseillerQueryHandler.handle({
