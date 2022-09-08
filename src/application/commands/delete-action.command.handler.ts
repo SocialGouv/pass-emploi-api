@@ -71,8 +71,8 @@ export class DeleteActionCommandHandler extends CommandHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.ACTION_SUPPRIMEE,
+    await this.evenementService.creer(
+      Evenement.Code.ACTION_SUPPRIMEE,
       utilisateur
     )
   }

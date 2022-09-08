@@ -63,8 +63,8 @@ export class AddFavoriOffreImmersionCommandHandler extends CommandHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.OFFRE_IMMERSION_SAUVEGARDEE,
+    await this.evenementService.creer(
+      Evenement.Code.OFFRE_IMMERSION_SAUVEGARDEE,
       utilisateur
     )
   }

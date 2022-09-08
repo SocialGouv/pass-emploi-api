@@ -120,8 +120,8 @@ describe('UpdateStatutActionCommandHandler', () => {
       await updateStatutActionCommandHandler.monitor(utilisateur)
 
       // Then
-      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
-        Evenement.Type.ACTION_STATUT_MODIFIE,
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.ACTION_STATUT_MODIFIE,
         utilisateur
       )
     })

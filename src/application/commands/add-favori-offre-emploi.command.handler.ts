@@ -67,8 +67,8 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
   ): Promise<void> {
     const evenementType =
       command.offreEmploi.alternance === true
-        ? Evenement.Type.OFFRE_ALTERNANCE_SAUVEGARDEE
-        : Evenement.Type.OFFRE_EMPLOI_SAUVEGARDEE
-    await this.evenementService.creerEvenement(evenementType, utilisateur)
+        ? Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE
+        : Evenement.Code.OFFRE_EMPLOI_SAUVEGARDEE
+    await this.evenementService.creer(evenementType, utilisateur)
   }
 }

@@ -72,8 +72,8 @@ export class AddCommentaireActionCommandHandler extends CommandHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.ACTION_COMMENTEE,
+    await this.evenementService.creer(
+      Evenement.Code.ACTION_COMMENTEE,
       utilisateur
     )
   }

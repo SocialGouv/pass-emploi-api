@@ -22,10 +22,10 @@ export class Emetteur {
 }
 
 export class CreateEvenementPayload {
-  @ApiProperty({ enum: Evenement.Type })
+  @ApiProperty({ enum: Evenement.Code })
   @IsString()
-  @IsEnum(Evenement.Type)
-  type: Evenement.Type
+  @IsEnum(Evenement.Code)
+  type: Evenement.Code
 
   @ApiProperty({ type: Emetteur })
   @ValidateNested()

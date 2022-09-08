@@ -194,8 +194,8 @@ describe('AddCommentaireActionCommandHandler', () => {
       await addCommentaireActionCommandHandler.monitor(utilisateur)
 
       // Then
-      expect(evenementService.creerEvenement).to.have.been.calledWithExactly(
-        Evenement.Type.ACTION_COMMENTEE,
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.ACTION_COMMENTEE,
         utilisateur
       )
     })

@@ -12,7 +12,7 @@ import { Core } from '../../domain/core'
 import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface CreateEvenementCommand extends Command {
-  type: Evenement.Type
+  type: Evenement.Code
   emetteur: {
     id: string
     type: Authentification.Type
@@ -49,6 +49,6 @@ export class CreateEvenementCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur,
     command: CreateEvenementCommand
   ): Promise<void> {
-    await this.evenementService.creerEvenement(command.type, utilisateur)
+    await this.evenementService.creer(command.type, utilisateur)
   }
 }

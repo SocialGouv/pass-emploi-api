@@ -54,8 +54,8 @@ export class UpdateStatutActionCommandHandler extends CommandHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.ACTION_STATUT_MODIFIE,
+    await this.evenementService.creer(
+      Evenement.Code.ACTION_STATUT_MODIFIE,
       utilisateur
     )
   }

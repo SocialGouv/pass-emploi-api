@@ -24,6 +24,9 @@ export class EvenementEngagementDto extends Model {
   @Column({ field: 'nom', type: DataType.STRING })
   nom: string | null
 
+  @Column({ field: 'code', type: DataType.STRING })
+  code: string
+
   @Column({ field: 'id_utilisateur', type: DataType.STRING })
   idUtilisateur: string
 

@@ -57,8 +57,8 @@ export class TelechargerFichierQueryHandler extends QueryHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.PIECE_JOINTE_TELECHARGEE,
+    await this.evenementService.creer(
+      Evenement.Code.PIECE_JOINTE_TELECHARGEE,
       utilisateur
     )
   }

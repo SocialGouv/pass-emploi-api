@@ -62,8 +62,8 @@ export class GetOffresEmploiQueryHandler extends QueryHandler<
   ): Promise<void> {
     const evenementType =
       query.alternance === true
-        ? Evenement.Type.OFFRE_ALTERNANCE_RECHERCHEE
-        : Evenement.Type.OFFRE_EMPLOI_RECHERCHEE
-    await this.evenementService.creerEvenement(evenementType, utilisateur)
+        ? Evenement.Code.OFFRE_ALTERNANCE_RECHERCHEE
+        : Evenement.Code.OFFRE_EMPLOI_RECHERCHEE
+    await this.evenementService.creer(evenementType, utilisateur)
   }
 }

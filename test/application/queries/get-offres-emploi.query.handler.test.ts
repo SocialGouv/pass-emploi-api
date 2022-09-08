@@ -109,8 +109,8 @@ describe('GetOffresEmploiQueryHandler', () => {
         )
 
         // Then
-        expect(evenementService.creerEvenement).to.have.been.calledWith(
-          Evenement.Type.OFFRE_ALTERNANCE_RECHERCHEE,
+        expect(evenementService.creer).to.have.been.calledWith(
+          Evenement.Code.OFFRE_ALTERNANCE_RECHERCHEE,
           unUtilisateurJeune()
         )
       })
@@ -134,8 +134,8 @@ describe('GetOffresEmploiQueryHandler', () => {
         )
 
         // Then
-        expect(evenementService.creerEvenement).to.have.been.calledWith(
-          Evenement.Type.OFFRE_EMPLOI_RECHERCHEE,
+        expect(evenementService.creer).to.have.been.calledWith(
+          Evenement.Code.OFFRE_EMPLOI_RECHERCHEE,
           unUtilisateurJeune()
         )
       })

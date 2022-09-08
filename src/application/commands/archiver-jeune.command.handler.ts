@@ -94,8 +94,8 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creerEvenement(
-      Evenement.Type.COMPTE_ARCHIVE,
+    await this.evenementService.creer(
+      Evenement.Code.COMPTE_ARCHIVE,
       utilisateur
     )
   }
