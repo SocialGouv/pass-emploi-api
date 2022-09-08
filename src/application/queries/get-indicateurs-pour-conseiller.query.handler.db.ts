@@ -8,10 +8,10 @@ import { Query } from '../../building-blocks/types/query'
 import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
 import { Op } from 'sequelize'
 
-interface GetIndicateursPourConseillerQuery extends Query {
+export interface GetIndicateursPourConseillerQuery extends Query {
   idJeune: string
-  dateDebut: Date
-  dateFin: Date
+  dateDebut: string
+  dateFin: string
 }
 
 export interface IndicateursPourConseillerQueryModel {

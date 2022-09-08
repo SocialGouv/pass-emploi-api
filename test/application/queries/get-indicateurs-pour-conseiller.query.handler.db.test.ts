@@ -1,9 +1,9 @@
 import {
-  GetIndicateursPourConseillerQueryHandler,
-  IndicateursPourConseillerQueryModel
+  GetIndicateursPourConseillerQuery,
+  GetIndicateursPourConseillerQueryHandler
 } from '../../../src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { expect } from '../../utils'
-import { success } from '../../../src/building-blocks/types/result'
+import { isSuccess } from '../../../src/building-blocks/types/result'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
@@ -13,6 +13,7 @@ import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { Action } from '../../../src/domain/action/action'
 import Statut = Action.Statut
+import { DateTime } from 'luxon'
 
 describe('GetIndicateursPourConseillerQueryHandler', () => {
   DatabaseForTesting.prepare()
@@ -33,20 +34,23 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
       await JeuneSqlModel.creer(jeuneDto)
     })
 
-    const dateDebut = new Date('2022-03-01T03:24:00')
-    const dateFin = new Date('2022-03-08T03:24:00')
+    const dateDebut = DateTime.fromISO('2022-03-01T03:24:00')
+    const dateFin = DateTime.fromISO('2022-03-08T03:24:00')
 
     it('récupère les actions créées entre une date de début et de fin', async () => {
       // Given
-      const dateCreation = new Date('2022-03-05T03:24:00')
+      const dateCreation = DateTime.fromISO('2022-03-05T03:24:00')
 
-      const query = {
+      const query: GetIndicateursPourConseillerQuery = {
         idJeune,
-        dateDebut,
-        dateFin
+        dateDebut: dateDebut.toString(),
+        dateFin: dateFin.toString()
       }
 
-      const actionDto = uneActionDto({ dateCreation, idJeune })
+      const actionDto = uneActionDto({
+        dateCreation: dateCreation.toJSDate(),
+        idJeune
+      })
       await ActionSqlModel.creer(actionDto)
 
       // When
@@ -55,31 +59,26 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
       )
 
       // Then
-      const indicateurAttendu: IndicateursPourConseillerQueryModel = {
-        actions: {
-          creees: 1,
-          terminees: 0
-        }
-      }
-
-      expect(response).to.deep.equal(success(indicateurAttendu))
+      expect(isSuccess(response) && response.data.actions.creees).to.deep.equal(
+        1
+      )
     })
 
     it('récupère les actions en retard entre une date de début et de fin', async () => {
       // Given
-      const dateCreation = new Date('2022-02-05T03:24:00')
-      const dateEcheance = new Date('2022-03-05T03:24:00')
+      const dateCreation = DateTime.fromISO('2022-03-05T03:24:00')
+      const dateEcheance = dateDebut.minus({ day: 1 })
 
-      const query = {
+      const query: GetIndicateursPourConseillerQuery = {
         idJeune,
-        dateDebut,
-        dateFin
+        dateDebut: dateDebut.toString(),
+        dateFin: dateFin.toString()
       }
 
       const actionDto = uneActionDto({
-        dateCreation,
+        dateCreation: dateCreation.toJSDate(),
         idJeune,
-        dateEcheance,
+        dateEcheance: dateEcheance.toJSDate(),
         statut: Statut.PAS_COMMENCEE
       })
       await ActionSqlModel.creer(actionDto)
@@ -90,14 +89,9 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
       )
 
       // Then
-      const indicateurAttendu: IndicateursPourConseillerQueryModel = {
-        actions: {
-          creees: 0,
-          terminees: 1
-        }
-      }
-
-      expect(response).to.deep.equal(success(indicateurAttendu))
+      expect(isSuccess(response) && response.data.actions.creees).to.deep.equal(
+        12
+      )
     })
   })
 })
