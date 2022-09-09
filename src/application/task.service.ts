@@ -3,7 +3,7 @@ import {
   Planificateur,
   PlanificateurRepositoryToken
 } from '../domain/planificateur'
-import { ExecuteCronJobAsapCommandHandler } from './commands/tasks/execute-cronjob-asap.command'
+import { ExecuteJobAsapCommandHandler } from './commands/tasks/execute-cronjob-asap.command'
 import { InitCronsCommandHandler } from './commands/tasks/init-crons.command'
 import { SynchronizeJobsCommandHandler } from './commands/tasks/synchronize-jobs.command'
 
@@ -22,16 +22,17 @@ export class TaskService {
     private planificateurRepository: Planificateur.Repository,
     private synchronizeJobsCommandHandler: SynchronizeJobsCommandHandler,
     private initCronsCommandHandler: InitCronsCommandHandler,
-    private executeCronJobCommandHandler: ExecuteCronJobAsapCommandHandler
+    private executeJobAsapCommandHandler: ExecuteJobAsapCommandHandler
   ) {}
 
-  async handle(task: Task): Promise<void> {
+  async handle(task: Task, date?: string): Promise<void> {
     this.logger.log(task)
     const isCronJob = task in Planificateur.CronJob
     try {
       if (isCronJob) {
-        await this.executeCronJobCommandHandler.execute({
-          jobType: task as unknown as Planificateur.CronJob
+        await this.executeJobAsapCommandHandler.execute({
+          jobType: task as unknown as Planificateur.CronJob,
+          date
         })
       } else {
         switch (task) {

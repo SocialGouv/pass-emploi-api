@@ -42,8 +42,8 @@ async function bootstrap(): Promise<void> {
     worker.subscribe()
   }
 
-  if (task) {
-    await app.get(TaskService).handle(task)
+  if (task?.name) {
+    await app.get(TaskService).handle(task.name, task.date)
     await app.close()
     process.exit(0)
   }

@@ -10,10 +10,11 @@ import { DateService } from '../../../utils/date-service'
 
 export interface ExecuteCronJobAsapCommand extends Command {
   jobType: Planificateur.CronJob
+  date?: string
 }
 
 @Injectable()
-export class ExecuteCronJobAsapCommandHandler extends CommandHandler<
+export class ExecuteJobAsapCommandHandler extends CommandHandler<
   ExecuteCronJobAsapCommand,
   void
 > {
@@ -27,7 +28,7 @@ export class ExecuteCronJobAsapCommandHandler extends CommandHandler<
 
   async handle(command: ExecuteCronJobAsapCommand): Promise<Result> {
     const job: Planificateur.Job<undefined> = {
-      date: this.dateService.nowJs(),
+      date: command.date ? new Date(command.date) : this.dateService.nowJs(),
       type: command.jobType,
       contenu: undefined
     }
