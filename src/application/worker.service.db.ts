@@ -20,6 +20,7 @@ import { HandleJobRappelRendezVousCommandHandler } from './commands/jobs/handle-
 import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from './commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
 import { HandleJobUpdateMailingListConseillerCommandHandler } from './commands/jobs/handle-job-update-mailing-list-conseiller.command'
 import { HandleJobNotifierRendezVousPECommandHandler } from './commands/jobs/handle-job-notifier-rendez-vous-pe.command'
+import { HandleJobMettreAJourCodesEvenementsCommandHandler } from './commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
 
 @Injectable()
 export class WorkerService {
@@ -40,7 +41,8 @@ export class WorkerService {
     private handleJobRecupererSituationsJeunesMiloCommandHandler: HandleJobRecupererSituationsJeunesMiloCommandHandler,
     private handleJobNettoyerPiecesJointesCommandHandler: HandleJobNettoyerPiecesJointesCommandHandler,
     private handleJobNettoyerArchivesJeunesCommandHandler: HandleJobNettoyerArchivesJeunesCommandHandler,
-    private handleJobNotifierRendezVousPECommandHandler: HandleJobNotifierRendezVousPECommandHandler
+    private handleJobNotifierRendezVousPECommandHandler: HandleJobNotifierRendezVousPECommandHandler,
+    private handleJobMettreAJourCodesEvenementsCommandHandler: HandleJobMettreAJourCodesEvenementsCommandHandler
   ) {
     this.apmService = getAPMInstance()
     this.workerTrackingService = getWorkerTrackingServiceInstance()
@@ -98,6 +100,9 @@ export class WorkerService {
           break
         case Planificateur.CronJob.NOTIFIER_RENDEZVOUS_PE:
           await this.handleJobNotifierRendezVousPECommandHandler.execute()
+          break
+        case Planificateur.CronJob.MAJ_CODES_EVENEMENTS:
+          await this.handleJobMettreAJourCodesEvenementsCommandHandler.execute()
           break
         case Planificateur.JobEnum.FAKE:
           this.logger.log({
