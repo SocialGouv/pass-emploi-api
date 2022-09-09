@@ -128,7 +128,7 @@ import { ActionSqlRepository } from './infrastructure/repositories/action-sql.re
 import { AuthentificationSqlRepository } from './infrastructure/repositories/authentification-sql.repository.db'
 import { ChatFirebaseRepository } from './infrastructure/repositories/chat-firebase.repository'
 import { ConseillerSqlRepository } from './infrastructure/repositories/conseiller-sql.repository.db'
-import { EvenementHttpSqlRepository } from './infrastructure/repositories/evenement-http-sql.repository.db'
+import { EvenementSqlRepository } from './infrastructure/repositories/evenement-http-sql.repository.db'
 import { FichierSqlS3Repository } from './infrastructure/repositories/fichier-sql-s3.repository.db'
 import { JeuneConfigurationApplicationSqlRepository } from './infrastructure/repositories/jeune/jeune-configuration-application-sql.repository.db'
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune/jeune-sql.repository.db'
@@ -342,7 +342,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: EvenementsRepositoryToken,
-      useClass: EvenementHttpSqlRepository
+      useClass: EvenementSqlRepository
     },
     {
       provide: RecherchesRepositoryToken,

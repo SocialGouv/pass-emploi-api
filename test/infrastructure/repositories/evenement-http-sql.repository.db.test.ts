@@ -1,6 +1,6 @@
 import { Authentification } from '../../../src/domain/authentification'
 import { expect } from '../../utils'
-import { EvenementHttpSqlRepository } from '../../../src/infrastructure/repositories/evenement-http-sql.repository.db'
+import { EvenementSqlRepository } from '../../../src/infrastructure/repositories/evenement-http-sql.repository.db'
 import { Core } from '../../../src/domain/core'
 import { emptySuccess } from '../../../src/building-blocks/types/result'
 import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
@@ -10,10 +10,10 @@ import { Evenement } from '../../../src/domain/evenement'
 
 describe('EvenementHttpSqlRepository', () => {
   DatabaseForTesting.prepare()
-  let evenementHttpSqlRepository: EvenementHttpSqlRepository
+  let evenementHttpSqlRepository: EvenementSqlRepository
 
   beforeEach(async () => {
-    evenementHttpSqlRepository = new EvenementHttpSqlRepository()
+    evenementHttpSqlRepository = new EvenementSqlRepository()
   })
 
   describe('saveEvenement', () => {
