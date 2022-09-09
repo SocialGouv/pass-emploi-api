@@ -6,7 +6,7 @@ import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/provi
 import { Sequelize } from 'sequelize'
 
 @Injectable()
-export class HandleJobMettreAJourCodesEvenementsCommand extends CommandHandler<
+export class HandleJobMettreAJourCodesEvenementsCommandHandler extends CommandHandler<
   Command,
   void
 > {
