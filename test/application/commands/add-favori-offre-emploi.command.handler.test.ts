@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { EvenementService } from 'src/domain/evenement'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import {
   AddFavoriOffreEmploiCommand,
@@ -94,6 +94,51 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
         'idJeune',
         utilisateur
       )
+    })
+  })
+
+  describe('monitor', () => {
+    const utilisateur = unUtilisateurJeune()
+
+    describe("quand c'est une alternance", () => {
+      it("créé l'événement idoine", () => {
+        // Given
+        const command: AddFavoriOffreEmploiCommand = {
+          idJeune: jeune.id,
+          offreEmploi: uneOffreEmploi({
+            alternance: true
+          })
+        }
+
+        // When
+        addFavoriOffreEmploiCommandHandler.monitor(utilisateur, command)
+
+        // Then
+        expect(evenementService.creer).to.have.been.calledWithExactly(
+          Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE,
+          utilisateur
+        )
+      })
+    })
+    describe("quand c'est une offre d'emploi", () => {
+      it("créé l'événement idoine", () => {
+        // Given
+        const command: AddFavoriOffreEmploiCommand = {
+          idJeune: jeune.id,
+          offreEmploi: uneOffreEmploi({
+            alternance: false
+          })
+        }
+
+        // When
+        addFavoriOffreEmploiCommandHandler.monitor(utilisateur, command)
+
+        // Then
+        expect(evenementService.creer).to.have.been.calledWithExactly(
+          Evenement.Code.OFFRE_EMPLOI_SAUVEGARDEE,
+          utilisateur
+        )
+      })
     })
   })
 })

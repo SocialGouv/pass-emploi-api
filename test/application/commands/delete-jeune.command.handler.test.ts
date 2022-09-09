@@ -1,5 +1,5 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { EvenementService } from 'src/domain/evenement'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Mail } from 'src/domain/mail'
 import { unMailDto } from 'test/fixtures/mail.fixture'
 import {
@@ -31,7 +31,7 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 describe('DeleteJeuneCommandHandler', () => {
   let jeuneRepository: StubbedType<Jeune.Repository>
   let chatRepository: StubbedType<Chat.Repository>
-  let commandHandler: DeleteJeuneCommandHandler
+  let deleteJeuneCommandHandler: DeleteJeuneCommandHandler
   let evenementService: StubbedClass<EvenementService>
   let mailFactory: StubbedClass<Mail.Factory>
   let mailService: StubbedType<Mail.Service>
@@ -46,7 +46,7 @@ describe('DeleteJeuneCommandHandler', () => {
     authentificationRepository = stubInterface(sandbox)
     mailService = stubInterface(sandbox)
     mailFactory = stubClass(Mail.Factory)
-    commandHandler = new DeleteJeuneCommandHandler(
+    deleteJeuneCommandHandler = new DeleteJeuneCommandHandler(
       jeuneRepository,
       chatRepository,
       authentificationRepository,
@@ -78,7 +78,10 @@ describe('DeleteJeuneCommandHandler', () => {
       const utilisateur = unUtilisateurJeune()
 
       // When
-      const result = await commandHandler.authorize(command, utilisateur)
+      const result = await deleteJeuneCommandHandler.authorize(
+        command,
+        utilisateur
+      )
 
       // Then
       expect(result).to.deep.equal(emptySuccess())
@@ -89,7 +92,10 @@ describe('DeleteJeuneCommandHandler', () => {
       const utilisateur = unUtilisateurSupport()
 
       // When
-      const result = await commandHandler.authorize(command, utilisateur)
+      const result = await deleteJeuneCommandHandler.authorize(
+        command,
+        utilisateur
+      )
 
       // Then
       expect(result).to.deep.equal(emptySuccess())
@@ -100,7 +106,10 @@ describe('DeleteJeuneCommandHandler', () => {
       const utilisateur = unUtilisateurJeune({ id: 'un-autre-id' })
 
       // When
-      const result = await commandHandler.authorize(command, utilisateur)
+      const result = await deleteJeuneCommandHandler.authorize(
+        command,
+        utilisateur
+      )
 
       // Then
       expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
@@ -111,7 +120,10 @@ describe('DeleteJeuneCommandHandler', () => {
       const utilisateur = unUtilisateurConseiller()
 
       // When
-      const result = await commandHandler.authorize(command, utilisateur)
+      const result = await deleteJeuneCommandHandler.authorize(
+        command,
+        utilisateur
+      )
 
       // Then
       expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
@@ -121,7 +133,7 @@ describe('DeleteJeuneCommandHandler', () => {
   describe('.handle', () => {
     it("renvoie une erreur si le jeune n'existe pas", async () => {
       // When
-      const result = await commandHandler.handle({
+      const result = await deleteJeuneCommandHandler.handle({
         ...command,
         idJeune: 'inexistant'
       })
@@ -142,7 +154,7 @@ describe('DeleteJeuneCommandHandler', () => {
         command = { idJeune: 'ABCDE' }
         jeuneRepository.get.withArgs('ABCDE').resolves(jeune)
         // When
-        result = await commandHandler.handle(command)
+        result = await deleteJeuneCommandHandler.handle(command)
       })
 
       it('supprime le jeune', () => {
@@ -183,7 +195,7 @@ describe('DeleteJeuneCommandHandler', () => {
         command = { idJeune: 'ABCDE' }
         jeuneRepository.get.withArgs('ABCDE').resolves(jeune)
         // When
-        result = await commandHandler.handle(command)
+        result = await deleteJeuneCommandHandler.handle(command)
       })
 
       it('supprime le jeune', () => {
@@ -218,7 +230,7 @@ describe('DeleteJeuneCommandHandler', () => {
         command = { idJeune: 'ABCDE' }
         jeuneRepository.get.withArgs('ABCDE').resolves(jeune)
         // When
-        result = await commandHandler.handle(command)
+        result = await deleteJeuneCommandHandler.handle(command)
       })
 
       it('supprime le jeune', () => {
@@ -241,6 +253,21 @@ describe('DeleteJeuneCommandHandler', () => {
       it('renvoie un succès', () => {
         expect(result).to.deep.equal(emptySuccess())
       })
+    })
+  })
+
+  describe('monitor', () => {
+    const utilisateur = unUtilisateurJeune()
+
+    it("créé l'événement idoine", () => {
+      // When
+      deleteJeuneCommandHandler.monitor(utilisateur)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.COMPTE_SUPPRIME,
+        utilisateur
+      )
     })
   })
 })
