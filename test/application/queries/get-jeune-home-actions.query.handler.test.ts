@@ -43,6 +43,9 @@ describe('GetJeuneHomeActionsQueryHandler', () => {
           nombreTerminees: 1,
           nombreAnnulees: 1,
           nombrePasCommencees: 1,
+          nombreNonQualifiables: 4,
+          nombreAQualifier: 1,
+          nombreQualifiees: 0,
           nombreActionsParPage: 10
         }
       }
