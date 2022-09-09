@@ -1,14 +1,14 @@
 import { Authentification } from '../../../src/domain/authentification'
 import { expect } from '../../utils'
-import { EvenementSqlRepository } from '../../../src/infrastructure/repositories/evenement-http-sql.repository.db'
 import { Core } from '../../../src/domain/core'
 import { emptySuccess } from '../../../src/building-blocks/types/result'
 import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { Evenement } from '../../../src/domain/evenement'
+import { EvenementSqlRepository } from '../../../src/infrastructure/repositories/evenement-sql.repository.db'
 
-describe('EvenementHttpSqlRepository', () => {
+describe('EvenementSqlRepository', () => {
   DatabaseForTesting.prepare()
   let evenementHttpSqlRepository: EvenementSqlRepository
 
@@ -33,25 +33,28 @@ describe('EvenementHttpSqlRepository', () => {
       const codeEvenement = Evenement.Code.ACTION_STATUT_MODIFIE
 
       // When
-      const result = await evenementHttpSqlRepository.save(utilisateur, {
+      const result = await evenementHttpSqlRepository.save({
         code: codeEvenement,
         categorie: categorieEvenement,
         action: actionEvenement,
-        date: uneDatetime.toJSDate()
+        date: uneDatetime.toJSDate(),
+        utilisateur
       })
 
       // Then
       const resultEvenement = await EvenementEngagementSqlModel.findAll()
 
       expect(resultEvenement.length).to.equal(1)
-      expect(resultEvenement[0].code).to.equal(codeEvenement)
-      expect(resultEvenement[0].categorie).to.equal(categorieEvenement)
-      expect(resultEvenement[0].idUtilisateur).to.equal(utilisateur.id)
-      expect(resultEvenement[0].typeUtilisateur).to.equal(utilisateur.type)
-      expect(resultEvenement[0].structure).to.equal(utilisateur.structure)
-      expect(resultEvenement[0].dateEvenement).to.deep.equal(
-        uneDatetime.toJSDate()
-      )
+      expect(resultEvenement[0].get()).excluding('id').to.deep.equal({
+        action: actionEvenement,
+        code: codeEvenement,
+        categorie: categorieEvenement,
+        nom: null,
+        idUtilisateur: utilisateur.id,
+        typeUtilisateur: utilisateur.type,
+        structure: utilisateur.structure,
+        dateEvenement: uneDatetime.toJSDate()
+      })
       expect(result).to.deep.equal(emptySuccess())
     })
   })

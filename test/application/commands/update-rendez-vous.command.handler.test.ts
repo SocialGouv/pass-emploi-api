@@ -5,7 +5,7 @@ import {
   UpdateRendezVousCommand,
   UpdateRendezVousCommandHandler
 } from 'src/application/commands/update-rendez-vous.command.handler'
-import { EvenementService } from 'src/domain/evenement'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import {
   MauvaiseCommandeError,
   NonTrouveError
@@ -14,7 +14,10 @@ import { failure, success } from '../../../src/building-blocks/types/result'
 import { Notification } from '../../../src/domain/notification/notification'
 import { PlanificateurService } from '../../../src/domain/planificateur'
 import { RendezVous } from '../../../src/domain/rendez-vous'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
@@ -403,6 +406,21 @@ describe('UpdateRendezVousCommandHandler', () => {
       // Then
       expect(rendezVousAuthorizer.authorize).to.have.been.calledWithExactly(
         command.idRendezVous,
+        utilisateur
+      )
+    })
+  })
+
+  describe('monitor', () => {
+    const utilisateur = unUtilisateurJeune()
+
+    it("créé l'événement idoine", () => {
+      // When
+      updateRendezVousCommandHandler.monitor(utilisateur)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.RDV_MODIFIE,
         utilisateur
       )
     })

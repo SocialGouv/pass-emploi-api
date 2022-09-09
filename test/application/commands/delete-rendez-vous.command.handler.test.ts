@@ -1,5 +1,8 @@
 import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
@@ -20,7 +23,7 @@ import {
   unJeune
 } from '../../fixtures/jeune.fixture'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
-import { EvenementService } from 'src/domain/evenement'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { PlanificateurService } from 'src/domain/planificateur'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { Mail } from '../../../src/domain/mail'
@@ -214,6 +217,21 @@ describe('DeleteRendezVousCommandHandler', () => {
           utilisateur
         )
       })
+    })
+  })
+
+  describe('monitor', () => {
+    const utilisateur = unUtilisateurJeune()
+
+    it("créé l'événement idoine", () => {
+      // When
+      deleteRendezVousCommandHandler.monitor(utilisateur)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.RDV_SUPPRIME,
+        utilisateur
+      )
     })
   })
 })

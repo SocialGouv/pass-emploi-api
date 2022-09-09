@@ -9,7 +9,8 @@ import {
 import { StubbedClass, stubClass } from '../../utils'
 import { ImmersionClient } from '../../../src/infrastructure/clients/immersion-client'
 import { GetDetailOffreImmersionQueryHandler } from 'src/application/queries/get-detail-offre-immersion.query.handler'
-import { EvenementService } from '../../../src/domain/evenement'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 
 describe('GetDetailOffreImmersionQueryHandler', () => {
   let immersionClient: StubbedClass<ImmersionClient>
@@ -161,6 +162,21 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
         // Then
         await expect(offres).to.be.rejectedWith(error)
       })
+    })
+  })
+
+  describe('monitor', () => {
+    const utilisateur = unUtilisateurJeune()
+
+    it("créé l'événement idoine", () => {
+      // When
+      getDetailOffreImmersionQueryHandler.monitor(utilisateur)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.OFFRE_IMMERSION_AFFICHEE,
+        utilisateur
+      )
     })
   })
 })

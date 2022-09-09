@@ -81,11 +81,10 @@ describe('CreateRechercheCommandHandler', () => {
       })
     })
   })
+
   describe('monitor', () => {
-    it("renvoie le bon évènement d'engagement quand la recherche est une offre d'emploi", async () => {
+    it("renvoie le bon évènement d'engagement quand la recherche est une offre d'emploi", () => {
       // Given
-      const idRecherche = 'un-id'
-      idService.uuid.returns(idRecherche)
       const command: CreateRechercheCommand = {
         idJeune: 'ABC123',
         type: Recherche.Type.OFFRES_EMPLOI,
@@ -97,7 +96,7 @@ describe('CreateRechercheCommandHandler', () => {
       const utilisateur = unUtilisateurJeune()
 
       // When
-      await createRechercheCommandHandler.monitor(utilisateur, command)
+      createRechercheCommandHandler.monitor(utilisateur, command)
 
       // Then
       expect(evenementService.creer).to.be.calledWith(
@@ -105,10 +104,8 @@ describe('CreateRechercheCommandHandler', () => {
         utilisateur
       )
     })
-    it("renvoie le bon évènement d'engagement quand la recherche est une offre d'immersion", async () => {
+    it("renvoie le bon évènement d'engagement quand la recherche est une offre d'immersion", () => {
       // Given
-      const idRecherche = 'un-id'
-      idService.uuid.returns(idRecherche)
       const command: CreateRechercheCommand = {
         idJeune: 'ABC123',
         type: Recherche.Type.OFFRES_IMMERSION,
@@ -120,7 +117,7 @@ describe('CreateRechercheCommandHandler', () => {
       const utilisateur = unUtilisateurJeune()
 
       // When
-      await createRechercheCommandHandler.monitor(utilisateur, command)
+      createRechercheCommandHandler.monitor(utilisateur, command)
 
       // Then
       expect(evenementService.creer).to.be.calledWith(
@@ -128,10 +125,8 @@ describe('CreateRechercheCommandHandler', () => {
         utilisateur
       )
     })
-    it("renvoie le bon évènement d'engagement quand la recherche est une offre d'alternance", async () => {
+    it("renvoie le bon évènement d'engagement quand la recherche est une offre d'alternance", () => {
       // Given
-      const idRecherche = 'un-id'
-      idService.uuid.returns(idRecherche)
       const command: CreateRechercheCommand = {
         idJeune: 'ABC123',
         type: Recherche.Type.OFFRES_ALTERNANCE,
@@ -143,11 +138,32 @@ describe('CreateRechercheCommandHandler', () => {
       const utilisateur = unUtilisateurJeune()
 
       // When
-      await createRechercheCommandHandler.monitor(utilisateur, command)
+      createRechercheCommandHandler.monitor(utilisateur, command)
 
       // Then
       expect(evenementService.creer).to.be.calledWith(
         Evenement.Code.RECHERCHE_ALTERNANCE_SAUVEGARDEE,
+        utilisateur
+      )
+    })
+    it("renvoie le bon évènement d'engagement quand la recherche est un service civique", () => {
+      // Given
+      const command: CreateRechercheCommand = {
+        idJeune: 'ABC123',
+        type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+        titre: '',
+        metier: '',
+        localisation: '',
+        criteres: {}
+      }
+      const utilisateur = unUtilisateurJeune()
+
+      // When
+      createRechercheCommandHandler.monitor(utilisateur, command)
+
+      // Then
+      expect(evenementService.creer).to.be.calledWith(
+        Evenement.Code.RECHERCHE_SERVICE_CIVIQUE_SAUVEGARDEE,
         utilisateur
       )
     })
