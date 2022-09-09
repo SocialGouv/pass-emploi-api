@@ -40,7 +40,7 @@ import { HandleJobRappelRendezVousCommandHandler } from './application/commands/
 import { HandleJobUpdateMailingListConseillerCommandHandler } from './application/commands/jobs/handle-job-update-mailing-list-conseiller.command'
 import { NotifierNouvellesImmersionsCommandHandler } from './application/commands/notifier-nouvelles-immersions.command.handler'
 import { SendNotificationsNouveauxMessagesCommandHandler } from './application/commands/send-notifications-nouveaux-messages.command.handler'
-import { ExecuteCronJobAsapCommandHandler } from './application/commands/tasks/execute-cronjob-asap.command'
+import { ExecuteJobAsapCommandHandler } from './application/commands/tasks/execute-cronjob-asap.command'
 import { InitCronsCommandHandler } from './application/commands/tasks/init-crons.command'
 import { SynchronizeJobsCommandHandler } from './application/commands/tasks/synchronize-jobs.command'
 import { TransfererJeunesConseillerCommandHandler } from './application/commands/transferer-jeunes-conseiller.command.handler'
@@ -511,7 +511,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     ArchiverJeuneCommandHandler,
     GetMotifsSuppressionJeuneQueryHandler,
     HandleJobNettoyerArchivesJeunesCommandHandler,
-    ExecuteCronJobAsapCommandHandler,
+    ExecuteJobAsapCommandHandler,
     UpdateJeunePreferencesCommandHandler,
     GetPreferencesJeuneQueryHandler,
     GetMetadonneesFavorisJeuneQueryHandler,

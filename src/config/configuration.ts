@@ -133,7 +133,10 @@ export default () => {
     mattermost: {
       jobWebhookUrl: process.env.MATTERMOST_JOBS_WEBHOOK_URL
     },
-    task: process.env.TASK,
+    task: {
+      name: process.env.TASK_NAME,
+      date: process.env.TASK_DATE
+    },
     jobs: {
       notificationRecherches: {
         nombreDeRequetesEnParallele:

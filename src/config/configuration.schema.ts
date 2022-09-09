@@ -102,7 +102,10 @@ export const configurationSchema = Joi.object({
     })
   }),
   mattermost: Joi.object({ jobWebhookUrl: Joi.string().uri().required() }),
-  task: Joi.string(),
+  task: Joi.object({
+    name: Joi.string(),
+    date: Joi.string().isoDate()
+  }),
   jobs: Joi.object({
     notificationRecherches: Joi.object({
       nombreDeRequetesEnParallele: Joi.number().required()

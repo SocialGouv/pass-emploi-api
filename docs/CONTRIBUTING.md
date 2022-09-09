@@ -225,6 +225,11 @@ Il est possible de rollback une application Scalingo sur un tag donné (de la br
 
     scalingo --region ${MA_REGION} -a ${MON_APPLICATION} run yarn tasks
 
+
+### Planifier le lancement d'un job sur les environnements déployés <a name="tasks"></a>
+
+    scalingo --region ${MA_REGION} -a ${MON_APPLICATION} run IS_WEB=false IS_WORKER=false TASK_NAME=MAJ_CODES_EVENEMENTS TASK_DATE=2022-09-09T12:00:00+02:00 node dist/main
+
 ## Style guide <a name="style-guide"></a>
 
 ## Troubleshoot <a name="troubleshoot"></a>
