@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { EvenementService } from 'src/domain/evenement'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import {
   AddFavoriOffreImmersionCommand,
@@ -14,7 +14,6 @@ import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneOffreImmersion } from '../../fixtures/offre-immersion.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-
 import Utilisateur = Authentification.Utilisateur
 
 describe('AddFavoriOffreImmersionCommandHandler', () => {
@@ -98,6 +97,21 @@ describe('AddFavoriOffreImmersionCommandHandler', () => {
       // Then
       expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
         'idJeune',
+        utilisateur
+      )
+    })
+  })
+
+  describe('monitor', () => {
+    const utilisateur = unUtilisateurJeune()
+
+    it("créé l'événement idoine", () => {
+      // When
+      addFavoriOffreImmersionCommandHandler.monitor(utilisateur)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.OFFRE_IMMERSION_SAUVEGARDEE,
         utilisateur
       )
     })

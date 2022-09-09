@@ -1,7 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
-import { EvenementService } from 'src/domain/evenement'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { PlanificateurService } from 'src/domain/planificateur'
 import { stubClassSandbox } from 'test/utils/types'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
@@ -244,6 +244,21 @@ describe('CreateActionCommandHandler', () => {
           action.idJeune
         )
       })
+    })
+  })
+
+  describe('monitor', () => {
+    const utilisateur = unUtilisateurJeune()
+
+    it("créé l'événement idoine", () => {
+      // When
+      createActionCommandHandler.monitor(utilisateur)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.ACTION_CREEE,
+        utilisateur
+      )
     })
   })
 })

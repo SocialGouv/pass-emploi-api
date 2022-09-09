@@ -34,7 +34,7 @@ import {
 import {
   AddFavoriServiceCiviqueCommand,
   AddFavoriOffreServiceCiviqueCommandHandler
-} from '../../application/commands/add-favori-offre-service-civique-command-handler.service'
+} from '../../application/commands/add-favori-offre-service-civique-command-handler'
 import {
   DeleteFavoriOffreEmploiCommand,
   DeleteFavoriOffreEmploiCommandHandler

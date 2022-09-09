@@ -6,6 +6,7 @@ import { DateService } from '../utils/date-service'
 export const EvenementsRepositoryToken = 'EvenementsRepositoryToken'
 
 export interface Evenement {
+  utilisateur: Authentification.Utilisateur
   date: Date
   code: Evenement.Code
   categorie: string
@@ -68,10 +69,7 @@ export namespace Evenement {
   }
 
   export interface Repository {
-    save(
-      utilisateur: Authentification.Utilisateur,
-      evenement: Evenement
-    ): Promise<Result>
+    save(evenement: Evenement): Promise<Result>
   }
 }
 
@@ -316,11 +314,12 @@ export class EvenementService {
     code: Evenement.Code,
     utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const evenement: { categorie: string; action: string; nom?: string } =
+    const libelles: { categorie: string; action: string; nom?: string } =
       evenements[code]
 
-    await this.evenementRepository.save(utilisateur, {
-      ...evenement,
+    await this.evenementRepository.save({
+      ...libelles,
+      utilisateur,
       code,
       date: this.dateService.nowJs()
     })

@@ -1,7 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { describe } from 'mocha'
 import { SinonSandbox } from 'sinon'
-import { EvenementService } from 'src/domain/evenement'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { ActionAuthorizer } from '../../../src/application/authorizers/authorize-action'
 import {
   DeleteActionCommand,
@@ -136,6 +136,21 @@ describe('DeleteActionCommandHandler', () => {
       // Then
       expect(actionAuthorizer.authorize).to.have.been.calledWithExactly(
         command.idAction,
+        utilisateur
+      )
+    })
+  })
+
+  describe('monitor', () => {
+    const utilisateur = unUtilisateurJeune()
+
+    it("créé l'événement idoine", () => {
+      // When
+      deleteActionCommandHandler.monitor(utilisateur)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.ACTION_SUPPRIMEE,
         utilisateur
       )
     })
