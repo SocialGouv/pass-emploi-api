@@ -9,7 +9,9 @@ import {
   GetActionsByJeuneQuery,
   GetActionsByJeuneQueryHandler
 } from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
+import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
 import { Action } from '../../../src/domain/action/action'
+import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
 import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository.db'
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
@@ -24,9 +26,6 @@ import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneActionQueryModelFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
-import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
-import { before } from 'mocha'
-import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
 
 describe('GetActionsByJeuneQueryHandler', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -672,7 +671,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
 
     context('metadata', () => {
       describe('quand on a des actions de chaque statut', () => {
-        it('renvoie le compte des actions par statut', async () => {
+        it('renvoie le compte des actions par statut et par état', async () => {
           // Given
           const actionPasCommencee = uneAction({
             id: '02b3710e-7779-11ec-90d6-0242ac120001',
@@ -714,7 +713,20 @@ describe('GetActionsByJeuneQueryHandler', () => {
               .toUTC()
               .toJSDate()
           })
-
+          const actionQualifiee = uneAction({
+            id: '199045ac-301d-11ed-a644-9b2ecb31ab40',
+            idJeune: jeune.id,
+            statut: Action.Statut.TERMINEE,
+            dateDerniereActualisation: DateTime.fromISO(
+              '2020-04-12T12:00:00.000Z'
+            )
+              .toUTC()
+              .toJSDate(),
+            qualification: {
+              code: Action.Qualification.Code.CITOYENNETE,
+              heures: 5
+            }
+          })
           const actionAnnulee = uneAction({
             id: '02b3710e-7779-11ec-90d6-0242ac120005',
             idJeune: jeune.id,
@@ -725,10 +737,12 @@ describe('GetActionsByJeuneQueryHandler', () => {
               .toUTC()
               .toJSDate()
           })
+
           await actionSqlRepository.save(actionPasCommencee)
           await actionSqlRepository.save(actionEnCours1)
           await actionSqlRepository.save(actionEnCours2)
           await actionSqlRepository.save(actionTerminee)
+          await actionSqlRepository.save(actionQualifiee)
           await actionSqlRepository.save(actionAnnulee)
 
           // When
@@ -740,11 +754,14 @@ describe('GetActionsByJeuneQueryHandler', () => {
           expect(isSuccess(result)).to.be.true()
           if (isSuccess(result)) {
             expect(result.data.metadonnees).to.deep.equal({
-              nombreTotal: 5,
-              nombreEnCours: 2,
-              nombreTerminees: 1,
-              nombreAnnulees: 1,
+              nombreTotal: 6,
               nombrePasCommencees: 1,
+              nombreEnCours: 2,
+              nombreTerminees: 2,
+              nombreAnnulees: 1,
+              nombreNonQualifiables: 4,
+              nombreAQualifier: 1,
+              nombreQualifiees: 1,
               nombreActionsParPage: 10
             })
           }

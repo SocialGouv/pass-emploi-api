@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Order, QueryTypes, Sequelize, WhereOptions } from 'sequelize'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import { failure, Result, success } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { failure, Result, success } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action/action'
+import { Authentification } from '../../domain/authentification'
 import { fromSqlToActionQueryModel } from '../../infrastructure/repositories/mappers/actions.mappers'
 import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
@@ -29,10 +29,13 @@ export interface ActionsByJeuneOutput {
   actions: ActionQueryModel[]
   metadonnees: {
     nombreTotal: number
+    nombrePasCommencees: number
     nombreEnCours: number
     nombreTerminees: number
     nombreAnnulees: number
-    nombrePasCommencees: number
+    nombreNonQualifiables: number
+    nombreAQualifier: number
+    nombreQualifiees: number
     nombreActionsParPage: number
   }
 }
@@ -59,7 +62,7 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
       ActionSqlModel.count({
         where: filtres
       }),
-      this.compterActionsParStatut(query)
+      this.compterActionsParStatut(query.idJeune)
     ])
 
     if (!laPageExiste(nombreTotalActionsFiltrees, query.page)) {
@@ -70,6 +73,10 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
       actions: [],
       metadonnees: {
         nombreTotal: this.compterToutesLesActions(statutRawCount),
+        nombrePasCommencees: this.getCompteDuStatut(
+          statutRawCount,
+          Action.Statut.PAS_COMMENCEE
+        ),
         nombreEnCours: this.getCompteDuStatut(
           statutRawCount,
           Action.Statut.EN_COURS
@@ -82,10 +89,10 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
           statutRawCount,
           Action.Statut.ANNULEE
         ),
-        nombrePasCommencees: this.getCompteDuStatut(
-          statutRawCount,
-          Action.Statut.PAS_COMMENCEE
-        ),
+        nombreNonQualifiables: 0,
+        nombreAQualifier: 0,
+        nombreQualifiees: 0,
+
         nombreActionsParPage: LIMITE_NOMBRE_ACTIONS_PAR_PAGE
       }
     }
@@ -106,11 +113,36 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
       ]
     })
 
+    let nombreNonQualifiables = 0
+    let nombreAQualifier = 0
+    let nombreQualifiees = 0
+    const actions: ActionQueryModel[] = actionsSqlModel
+      .map(sql => {
+        const queryModel: ActionQueryModel = fromSqlToActionQueryModel(sql)
+        switch (queryModel.etat) {
+          case Action.Qualification.Etat.NON_QUALIFIABLE:
+            nombreNonQualifiables++
+            break
+          case Action.Qualification.Etat.A_QUALIFIER:
+            nombreAQualifier++
+            break
+          case Action.Qualification.Etat.QUALIFIEE:
+            nombreQualifiees++
+            break
+        }
+
+        return queryModel
+      })
+      .filter(action => filtrerParEtat(query, action))
+
     return success({
-      ...result,
-      actions: actionsSqlModel
-        .map(fromSqlToActionQueryModel)
-        .filter(action => filtrerParEtat(query, action))
+      metadonnees: {
+        ...result.metadonnees,
+        nombreNonQualifiables,
+        nombreAQualifier,
+        nombreQualifiees
+      },
+      actions
     })
   }
 
@@ -132,9 +164,7 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
     return
   }
 
-  private compterActionsParStatut(
-    query: GetActionsByJeuneQuery
-  ): Promise<RawCount[]> {
+  private compterActionsParStatut(idJeune: string): Promise<RawCount[]> {
     return this.sequelize.query(
       `
         SELECT statut, COUNT(*)
@@ -145,7 +175,7 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
       {
         type: QueryTypes.SELECT,
         replacements: {
-          idJeune: query.idJeune
+          idJeune
         }
       }
     ) as unknown as Promise<RawCount[]>

@@ -1327,6 +1327,9 @@ describe('JeunesController', () => {
           nombreTerminees: 0,
           nombreAnnulees: 0,
           nombrePasCommencees: 0,
+          nombreNonQualifiables: 0,
+          nombreAQualifier: 0,
+          nombreQualifiees: 0,
           nombreActionsParPage: 10
         }
       }
@@ -1354,6 +1357,9 @@ describe('JeunesController', () => {
           nombreTerminees: 3,
           nombreAnnulees: 4,
           nombrePasCommencees: 5,
+          nombreNonQualifiables: 6,
+          nombreAQualifier: 7,
+          nombreQualifiees: 8,
           nombreActionsParPage: 10
         }
       }

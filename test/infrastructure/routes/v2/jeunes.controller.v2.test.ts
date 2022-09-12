@@ -61,6 +61,9 @@ describe('JeunesController v2', () => {
           nombreTerminees: 3,
           nombreAnnulees: 4,
           nombrePasCommencees: 5,
+          nombreNonQualifiables: 6,
+          nombreAQualifier: 7,
+          nombreQualifiees: 8,
           nombreActionsParPage: 10
         }
       }
