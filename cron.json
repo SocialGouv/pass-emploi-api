@@ -1,0 +1,7 @@
+{
+  "jobs" : [
+    {
+      "command" : "0 2 * * 0-6 yarn dump-restore-db"
+    }
+  ]
+}
