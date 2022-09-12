@@ -10,7 +10,7 @@ module.exports = {
              SET code = '${code}'
              WHERE categorie = '${categorie}'
                AND action = '${action}'
-               AND nom = '${nom}'`,
+               AND nom = '${nom}' AND code IS NULL`,
             { transaction }
           )
         } else {
@@ -19,7 +19,7 @@ module.exports = {
              SET code = '${code}'
              WHERE categorie = '${categorie}'
                AND action = '${action}'
-               and nom is null`,
+               and nom is null AND code IS NULL`,
             { transaction }
           )
         }
