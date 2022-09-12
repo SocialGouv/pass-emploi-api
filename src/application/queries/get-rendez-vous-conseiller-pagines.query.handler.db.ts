@@ -99,6 +99,7 @@ function generateDateCondition(
     }
   }
   if (dateFin !== undefined) {
+    dateFin.setHours(23, 59, 59, 999)
     dateCondition = {
       ...dateCondition,
       [Op.lte]: dateFin
