@@ -15,18 +15,24 @@ import { Action } from '../../../src/domain/action/action'
 import Statut = Action.Statut
 import { DateTime } from 'luxon'
 import { DateService } from '../../../src/utils/date-service'
+import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository.db'
 
 describe('GetIndicateursPourConseillerQueryHandler', () => {
   DatabaseForTesting.prepare()
   let getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler
   let dateService: StubbedClass<DateService>
+  let actionRepository: Action.Repository
   const idConseiller = 'id-conseiller'
   const idJeune = 'id-jeune'
 
   before(async () => {
     dateService = stubClass(DateService)
+    actionRepository = new ActionSqlRepository(dateService)
     getIndicateursPourConseillerQueryHandler =
-      new GetIndicateursPourConseillerQueryHandler(dateService)
+      new GetIndicateursPourConseillerQueryHandler(
+        dateService,
+        actionRepository
+      )
   })
 
   describe('handle', () => {
@@ -40,7 +46,7 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
     const dateDebut = DateTime.fromISO('2022-03-01T03:24:00')
     const dateFin = DateTime.fromISO('2022-03-08T03:24:00')
 
-    it('récupère les actions créées entre une date de début et de fin', async () => {
+    it('récupère le nombre d’actions créées entre deux dates', async () => {
       // Given
       const dateCreation = DateTime.fromISO('2022-03-05T03:24:00')
 
@@ -67,12 +73,11 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
       )
     })
 
-    it('récupère les actions en retard entre une date de début et de fin', async () => {
+    it('récupère le nombre d’actions en retard entre deux dates', async () => {
       // Given
       const dateEcheance = DateTime.fromISO('2022-03-06T03:24:00')
       const dateDuJourApresEcheance = '2022-03-07T03:24:00'
-      dateService.now.returns(DateTime.fromISO(dateDuJourApresEcheance).toUTC())
-      const dateCreation = DateTime.fromISO('2022-03-05T03:24:00')
+      dateService.now.returns(DateTime.fromISO(dateDuJourApresEcheance))
 
       const query: GetIndicateursPourConseillerQuery = {
         idJeune,
@@ -81,7 +86,6 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
       }
 
       const actionDto = uneActionDto({
-        dateCreation: dateCreation.toJSDate(),
         idJeune,
         dateEcheance: dateEcheance.toJSDate(),
         statut: Statut.PAS_COMMENCEE
@@ -94,9 +98,37 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
       )
 
       // Then
-      expect(isSuccess(response) && response.data.actions.creees).to.deep.equal(
-        1
+      expect(
+        isSuccess(response) && response.data.actions.enRetard
+      ).to.deep.equal(1)
+    })
+
+    it('récupère le nombre d’actions terminées entre deux dates', async () => {
+      // Given
+      const dateFinReelle = DateTime.fromISO('2022-03-06T03:24:00')
+
+      const query: GetIndicateursPourConseillerQuery = {
+        idJeune,
+        dateDebut: dateDebut.toString(),
+        dateFin: dateFin.toString()
+      }
+
+      const actionDto = uneActionDto({
+        idJeune,
+        dateFinReelle: dateFinReelle.toJSDate(),
+        statut: Statut.TERMINEE
+      })
+      await ActionSqlModel.creer(actionDto)
+
+      // When
+      const response = await getIndicateursPourConseillerQueryHandler.handle(
+        query
       )
+
+      // Then
+      expect(
+        isSuccess(response) && response.data.actions.terminees
+      ).to.deep.equal(1)
     })
   })
 })

@@ -41,6 +41,26 @@ export interface Action {
   commentaires?: Action.Commentaire[]
 }
 
+export interface NewAction {
+  id: Action.Id
+  statut: Action.Statut
+  contenu: string
+  description: string
+  dateCreation: Date
+  dateTimeCreation: DateTime
+  dateDerniereActualisation: Date
+  idJeune: Jeune.Id
+  createur: Action.Createur
+  dateEcheance: Date
+  dateTimeEcheance: DateTime
+  dateDebut?: Date
+  dateFinReelle?: Date
+  dateTimeFinReelle?: DateTime
+  rappel: boolean
+  qualification?: Action.Qualification
+  commentaires?: Action.Commentaire[]
+}
+
 export namespace Action {
   // FIXME: le linter ne comprend pas cette technique 🤷‍️
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
@@ -77,6 +97,8 @@ export namespace Action {
     delete(id: Action.Id): Promise<void>
 
     findAllActionsARappeler(): Promise<Action[]>
+
+    findAllActionsByIdJeune(idJeune: string): Promise<Action[]>
   }
 
   export interface Createur {

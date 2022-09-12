@@ -5,10 +5,14 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { Query } from '../../building-blocks/types/query'
-import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
-import { Op } from 'sequelize'
 import { DateService } from '../../utils/date-service'
-import { Action } from '../../domain/action/action'
+import {
+  Action,
+  ActionsRepositoryToken,
+  NewAction
+} from '../../domain/action/action'
+import { Inject } from '@nestjs/common'
+import { DateTime } from 'luxon'
 
 export interface GetIndicateursPourConseillerQuery extends Query {
   idJeune: string
@@ -19,6 +23,7 @@ export interface GetIndicateursPourConseillerQuery extends Query {
 export interface IndicateursPourConseillerQueryModel {
   actions: {
     creees: number
+    enRetard: number
     terminees: number
   }
 }
@@ -27,7 +32,11 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
   GetIndicateursPourConseillerQuery,
   Result<IndicateursPourConseillerQueryModel>
 > {
-  constructor(private dateService: DateService) {
+  constructor(
+    private dateService: DateService,
+    @Inject(ActionsRepositoryToken)
+    private actionRepository: Action.Repository
+  ) {
     super('GetIndicateursPourConseillerQueryHandler')
   }
 
@@ -38,30 +47,88 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
   async handle(
     query: GetIndicateursPourConseillerQuery
   ): Promise<Result<IndicateursPourConseillerQueryModel>> {
-    const nombreActionsCreees = await ActionSqlModel.count({
-      where: {
-        idJeune: query.idJeune,
-        dateCreation: { [Op.between]: [query.dateDebut, query.dateFin] }
+    const dateTimeDebut = DateTime.fromISO(query.dateDebut, { setZone: true })
+    const dateTimeFin = DateTime.fromISO(query.dateFin, { setZone: true })
+
+    const actionsDuJeune = await this.actionRepository.findAllActionsByIdJeune(
+      query.idJeune
+    )
+    const actionsDuJeuneDateTime = actionsDuJeune.map(action => {
+      return {
+        ...action,
+        dateTimeCreation: DateTime.fromJSDate(action.dateCreation),
+        dateTimeEcheance: DateTime.fromJSDate(action.dateEcheance),
+        dateTimeFinReelle: action.dateFinReelle
+          ? DateTime.fromJSDate(action.dateFinReelle!)
+          : undefined
       }
     })
 
-    const nombreActionsEnRetard = await ActionSqlModel.count({
-      where: {
-        idJeune: query.idJeune,
-        dateEcheance: { [Op.gt]: this.dateService.now() },
-        statut: { [Op.notIn]: [Action.Statut.ANNULEE, Action.Statut.TERMINEE] }
-      }
-    })
+    const nombreActionsCreees = actionsDuJeuneDateTime.filter(action => {
+      return this.lActionEstCreeeEntreLesDeuxDates(
+        action,
+        dateTimeDebut,
+        dateTimeFin
+      )
+    }).length
+
+    const nombreActionsEnRetard = actionsDuJeuneDateTime.filter(action => {
+      return this.lActionEstEnRetard(action)
+    }).length
+
+    const nombreActionsTerminees = actionsDuJeuneDateTime.filter(action => {
+      return this.lActionEstTermineeEntreLesDeuxDates(
+        action,
+        dateTimeDebut,
+        dateTimeFin
+      )
+    }).length
 
     return success({
       actions: {
         creees: nombreActionsCreees,
-        terminees: nombreActionsEnRetard
+        enRetard: nombreActionsEnRetard,
+        terminees: nombreActionsTerminees
       }
     })
   }
 
   async monitor(): Promise<void> {
     return
+  }
+
+  private lActionEstTermineeEntreLesDeuxDates(
+    action: NewAction,
+    dateTimeDebut: DateTime,
+    dateTimeFin: DateTime
+  ): boolean {
+    return Boolean(
+      action.dateTimeFinReelle ??
+        DateService.isBetweenDates(
+          action.dateTimeFinReelle!,
+          dateTimeDebut,
+          dateTimeFin
+        )
+    )
+  }
+
+  private lActionEstEnRetard(action: NewAction): boolean {
+    return (
+      action.dateTimeEcheance < this.dateService.now() &&
+      action.statut !== Action.Statut.TERMINEE &&
+      action.statut !== Action.Statut.ANNULEE
+    )
+  }
+
+  private lActionEstCreeeEntreLesDeuxDates(
+    action: NewAction,
+    dateTimeDebut: DateTime,
+    dateTimeFin: DateTime
+  ): boolean {
+    return DateService.isBetweenDates(
+      action.dateTimeCreation,
+      dateTimeDebut,
+      dateTimeFin
+    )
   }
 }
