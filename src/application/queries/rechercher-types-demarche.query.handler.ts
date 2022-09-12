@@ -46,6 +46,13 @@ export class RechercherTypesDemarcheQueryHandler extends QueryHandler<
       query.recherche
     )
     const demarchesDtoVisibles = demarchesDto.filter(this.laDemarcheEstVisible)
+    this.logger.log(
+      'nombre de démarches envoyées par PE : ' +
+        demarchesDto.length +
+        '-' +
+        'nombre de démarches visibles : ' +
+        demarchesDtoVisibles.length
+    )
 
     const typesDemarcheQueryModels: TypesDemarcheQueryModel[] = []
     for (const demarcheDtoVisible of demarchesDtoVisibles) {
