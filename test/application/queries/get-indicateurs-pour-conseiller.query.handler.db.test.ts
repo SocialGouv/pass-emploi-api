@@ -2,7 +2,7 @@ import {
   GetIndicateursPourConseillerQuery,
   GetIndicateursPourConseillerQueryHandler
 } from '../../../src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
-import { expect } from '../../utils'
+import { expect, StubbedClass, stubClass } from '../../utils'
 import { isSuccess } from '../../../src/building-blocks/types/result'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
@@ -14,16 +14,19 @@ import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models
 import { Action } from '../../../src/domain/action/action'
 import Statut = Action.Statut
 import { DateTime } from 'luxon'
+import { DateService } from '../../../src/utils/date-service'
 
 describe('GetIndicateursPourConseillerQueryHandler', () => {
   DatabaseForTesting.prepare()
   let getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler
+  let dateService: StubbedClass<DateService>
   const idConseiller = 'id-conseiller'
   const idJeune = 'id-jeune'
 
   before(async () => {
+    dateService = stubClass(DateService)
     getIndicateursPourConseillerQueryHandler =
-      new GetIndicateursPourConseillerQueryHandler()
+      new GetIndicateursPourConseillerQueryHandler(dateService)
   })
 
   describe('handle', () => {
@@ -66,8 +69,10 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
 
     it('récupère les actions en retard entre une date de début et de fin', async () => {
       // Given
+      const dateEcheance = DateTime.fromISO('2022-03-06T03:24:00')
+      const dateDuJourApresEcheance = '2022-03-07T03:24:00'
+      dateService.now.returns(DateTime.fromISO(dateDuJourApresEcheance).toUTC())
       const dateCreation = DateTime.fromISO('2022-03-05T03:24:00')
-      const dateEcheance = dateDebut.minus({ day: 1 })
 
       const query: GetIndicateursPourConseillerQuery = {
         idJeune,
@@ -90,7 +95,7 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
 
       // Then
       expect(isSuccess(response) && response.data.actions.creees).to.deep.equal(
-        12
+        1
       )
     })
   })
