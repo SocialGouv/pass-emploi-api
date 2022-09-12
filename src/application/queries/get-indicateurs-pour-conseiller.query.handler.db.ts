@@ -7,6 +7,8 @@ import {
 import { Query } from '../../building-blocks/types/query'
 import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
 import { Op } from 'sequelize'
+import { DateService } from '../../utils/date-service'
+import { Action } from '../../domain/action/action'
 
 export interface GetIndicateursPourConseillerQuery extends Query {
   idJeune: string
@@ -25,7 +27,7 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
   GetIndicateursPourConseillerQuery,
   Result<IndicateursPourConseillerQueryModel>
 > {
-  constructor() {
+  constructor(private dateService: DateService) {
     super('GetIndicateursPourConseillerQueryHandler')
   }
 
@@ -43,10 +45,18 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
       }
     })
 
+    const nombreActionsEnRetard = await ActionSqlModel.count({
+      where: {
+        idJeune: query.idJeune,
+        dateEcheance: { [Op.gt]: this.dateService.now() },
+        statut: { [Op.notIn]: [Action.Statut.ANNULEE, Action.Statut.TERMINEE] }
+      }
+    })
+
     return success({
       actions: {
         creees: nombreActionsCreees,
-        terminees: 12
+        terminees: nombreActionsEnRetard
       }
     })
   }
