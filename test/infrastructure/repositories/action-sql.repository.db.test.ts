@@ -338,22 +338,4 @@ describe('ActionSqlRepository', () => {
       })
     })
   })
-
-  describe('.findAllActionsByIdJeune(id)', () => {
-    it('récupère toutes les actions par id du jeune', async () => {
-      // Given
-      const idJeune = 'id-jeune'
-      const actionDto = uneActionDto({ idJeune })
-      await ActionSqlModel.creer(actionDto)
-
-      // When
-      const actionsObtenues = await actionSqlRepository.findAllActionsByIdJeune(
-        idJeune
-      )
-
-      // Then
-      const actionsAttendues = [actionDto]
-      expect(actionsObtenues).to.deep.equal(actionsAttendues)
-    })
-  })
 })
