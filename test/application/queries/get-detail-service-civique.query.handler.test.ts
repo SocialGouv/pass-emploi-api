@@ -105,7 +105,7 @@ describe('GetDetailServiceCiviqueQuery', () => {
 
       // Then
       expect(evenementService.creer).to.have.been.calledWith(
-        Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHE,
+        Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHEE,
         unUtilisateurJeune()
       )
     })

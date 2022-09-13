@@ -11,6 +11,10 @@ import { DateTime } from 'luxon'
 import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
+import { EvenementEngagementSqlModel } from '../../infrastructure/sequelize/models/evenement-engagement.sql-model'
+import { Op } from 'sequelize'
+import { Authentification } from '../../domain/authentification'
+import { Evenement } from '../../domain/evenement'
 
 export interface GetIndicateursPourConseillerQuery extends Query {
   idJeune: string
@@ -27,6 +31,14 @@ export interface IndicateursPourConseillerQueryModel {
   }
   rendezVous: {
     planifies: number
+  }
+  offres: {
+    consultees: number
+    partagees: number
+  }
+  favoris: {
+    offresSauvegardees: number
+    recherchesSauvegardees: number
   }
 }
 
@@ -58,6 +70,7 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
         idJeune: query.idJeune
       }
     })
+
     const indicateursActions = this.getIndicateursActions(
       actionsSqlDuJeune,
       dateDebut,
@@ -74,6 +87,7 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
           }
         ]
       })
+
     const nombreRendezVousPlanifies = rendezVousSqlDuJeune.filter(
       rendezVousSql => {
         return this.leRendezVousEntreLesDeuxDates(
@@ -84,11 +98,26 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
       }
     ).length
 
+    const offresEtFavorisEvenementsSql =
+      await EvenementEngagementSqlModel.findAll({
+        where: {
+          typeUtilisateur: Authentification.Type.JEUNE,
+          idUtilisateur: query.idJeune,
+          dateEvenement: { [Op.between]: [dateDebut, dateFin] }
+        }
+      })
+
+    const indicateursOffresEtFavoris = this.getIndicateursOffresEtFavoris(
+      offresEtFavorisEvenementsSql
+    )
+
     return success({
       actions: indicateursActions,
       rendezVous: {
         planifies: nombreRendezVousPlanifies
-      }
+      },
+      offres: indicateursOffresEtFavoris.offres,
+      favoris: indicateursOffresEtFavoris.favoris
     })
   }
 
@@ -148,6 +177,88 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
         }
       )
     return indicateursActionsResult
+  }
+
+  private getIndicateursOffresEtFavoris(
+    evenementsSql: EvenementEngagementSqlModel[]
+  ): {
+    offres: { consultees: number; partagees: number }
+    favoris: { offresSauvegardees: number; recherchesSauvegardees: number }
+  } {
+    const codesOffreConsultee: string[] = [
+      Evenement.Code.OFFRE_ALTERNANCE_AFFICHEE,
+      Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
+      Evenement.Code.OFFRE_IMMERSION_AFFICHEE,
+      Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHEE
+    ]
+    const codesOffrePartagee: string[] = [
+      Evenement.Code.OFFRE_ALTERNANCE_PARTAGEE,
+      Evenement.Code.OFFRE_EMPLOI_PARTAGEE,
+      Evenement.Code.OFFRE_IMMERSION_PARTAGEE,
+      Evenement.Code.OFFRE_SERVICE_CIVIQUE_PARTAGEE
+    ]
+    const codesOffreSauvegardee: string[] = [
+      Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE,
+      Evenement.Code.OFFRE_EMPLOI_SAUVEGARDEE,
+      Evenement.Code.OFFRE_IMMERSION_SAUVEGARDEE,
+      Evenement.Code.OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE
+    ]
+    const codesRechercheSauvegardee: string[] = [
+      Evenement.Code.RECHERCHE_ALTERNANCE_SAUVEGARDEE,
+      Evenement.Code.RECHERCHE_IMMERSION_SAUVEGARDEE,
+      Evenement.Code.RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE,
+      Evenement.Code.RECHERCHE_SERVICE_CIVIQUE_SAUVEGARDEE
+    ]
+
+    const indicateursOffresEtFavorisResult = evenementsSql
+      .map(evenementSql => {
+        return {
+          offres: {
+            consultees: codesOffreConsultee.includes(evenementSql.code) ? 1 : 0,
+            partagees: codesOffrePartagee.includes(evenementSql.code) ? 1 : 0
+          },
+          favoris: {
+            offresSauvegardees: codesOffreSauvegardee.includes(
+              evenementSql.code
+            )
+              ? 1
+              : 0,
+            recherchesSauvegardees: codesRechercheSauvegardee.includes(
+              evenementSql.code
+            )
+              ? 1
+              : 0
+          }
+        }
+      })
+      .reduce(
+        (
+          indicateursOffresEtFavorisAccumulateur,
+          indicateursOffresEtFavoris
+        ) => {
+          indicateursOffresEtFavorisAccumulateur.offres.consultees +=
+            indicateursOffresEtFavoris.offres.consultees
+          indicateursOffresEtFavorisAccumulateur.offres.partagees +=
+            indicateursOffresEtFavoris.offres.partagees
+          indicateursOffresEtFavorisAccumulateur.favoris.offresSauvegardees +=
+            indicateursOffresEtFavoris.favoris.offresSauvegardees
+          indicateursOffresEtFavorisAccumulateur.favoris.recherchesSauvegardees +=
+            indicateursOffresEtFavoris.favoris.recherchesSauvegardees
+          return indicateursOffresEtFavorisAccumulateur
+        },
+        {
+          offres: {
+            consultees: 0,
+            partagees: 0
+          },
+          favoris: {
+            offresSauvegardees: 0,
+            recherchesSauvegardees: 0
+          }
+        }
+      )
+
+    return indicateursOffresEtFavorisResult
   }
 
   async monitor(): Promise<void> {

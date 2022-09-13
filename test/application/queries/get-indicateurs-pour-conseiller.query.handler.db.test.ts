@@ -18,6 +18,10 @@ import { DateService } from '../../../src/utils/date-service'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
+import { unEvenementEngagementDto } from '../../fixtures/sql-models/evenement-engagement.sql-model'
+import { EvenementEngagementSqlModel } from '../../../src/infrastructure/sequelize/models/evenement-engagement.sql-model'
+import { Evenement } from '../../../src/domain/evenement'
+import { Authentification } from '../../../src/domain/authentification'
 
 describe('GetIndicateursPourConseillerQueryHandler', () => {
   DatabaseForTesting.prepare()
@@ -189,6 +193,114 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         // Then
         expect(
           isSuccess(response) && response.data.rendezVous.planifies
+        ).to.deep.equal(1)
+      })
+    })
+    describe('indicateurs offres', () => {
+      it('récupère le nombre d’offres d’emploi consultées', async () => {
+        // Given
+        const query: GetIndicateursPourConseillerQuery = {
+          idJeune,
+          dateDebut: dateDebut.toString(),
+          dateFin: dateFin.toString()
+        }
+        const dateEvenement = new Date('2022-03-05T03:24:00')
+
+        const engagementDto = unEvenementEngagementDto({
+          typeUtilisateur: Authentification.Type.JEUNE,
+          idUtilisateur: idJeune,
+          code: Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
+          dateEvenement
+        })
+        await EvenementEngagementSqlModel.create(engagementDto)
+
+        // When
+        const response = await getIndicateursPourConseillerQueryHandler.handle(
+          query
+        )
+        // Then
+        expect(
+          isSuccess(response) && response.data.offres.consultees
+        ).to.deep.equal(1)
+      })
+      it('récupère le nombre d’offres d’emploi partagées', async () => {
+        // Given
+        const query: GetIndicateursPourConseillerQuery = {
+          idJeune,
+          dateDebut: dateDebut.toString(),
+          dateFin: dateFin.toString()
+        }
+        const dateEvenement = new Date('2022-03-05T03:24:00')
+
+        const engagementDto = unEvenementEngagementDto({
+          typeUtilisateur: Authentification.Type.JEUNE,
+          idUtilisateur: idJeune,
+          code: Evenement.Code.OFFRE_IMMERSION_PARTAGEE,
+          dateEvenement
+        })
+        await EvenementEngagementSqlModel.create(engagementDto)
+
+        // When
+        const response = await getIndicateursPourConseillerQueryHandler.handle(
+          query
+        )
+        // Then
+        expect(
+          isSuccess(response) && response.data.offres.partagees
+        ).to.deep.equal(1)
+      })
+    })
+    describe('indicateurs favoris', () => {
+      it('récupère le nombre d’offres sauvegardée', async () => {
+        // Given
+        const query: GetIndicateursPourConseillerQuery = {
+          idJeune,
+          dateDebut: dateDebut.toString(),
+          dateFin: dateFin.toString()
+        }
+        const dateEvenement = new Date('2022-03-05T03:24:00')
+
+        const engagementDto = unEvenementEngagementDto({
+          typeUtilisateur: Authentification.Type.JEUNE,
+          idUtilisateur: idJeune,
+          code: Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE,
+          dateEvenement
+        })
+        await EvenementEngagementSqlModel.create(engagementDto)
+
+        // When
+        const response = await getIndicateursPourConseillerQueryHandler.handle(
+          query
+        )
+        // Then
+        expect(
+          isSuccess(response) && response.data.favoris.offresSauvegardees
+        ).to.deep.equal(1)
+      })
+      it('récupère le nombre de recherches sauvegardées', async () => {
+        // Given
+        const query: GetIndicateursPourConseillerQuery = {
+          idJeune,
+          dateDebut: dateDebut.toString(),
+          dateFin: dateFin.toString()
+        }
+        const dateEvenement = new Date('2022-03-05T03:24:00')
+
+        const engagementDto = unEvenementEngagementDto({
+          typeUtilisateur: Authentification.Type.JEUNE,
+          idUtilisateur: idJeune,
+          code: Evenement.Code.RECHERCHE_IMMERSION_SAUVEGARDEE,
+          dateEvenement
+        })
+        await EvenementEngagementSqlModel.create(engagementDto)
+
+        // When
+        const response = await getIndicateursPourConseillerQueryHandler.handle(
+          query
+        )
+        // Then
+        expect(
+          isSuccess(response) && response.data.favoris.recherchesSauvegardees
         ).to.deep.equal(1)
       })
     })
