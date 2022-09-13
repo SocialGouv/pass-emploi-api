@@ -42,6 +42,7 @@ export namespace Evenement {
     OFFRE_EMPLOI_RECHERCHEE = 'OFFRE_EMPLOI_RECHERCHEE',
     OFFRE_EMPLOI_SAUVEGARDEE = 'OFFRE_EMPLOI_SAUVEGARDEE',
     OFFRE_IMMERSION_AFFICHEE = 'OFFRE_IMMERSION_AFFICHEE',
+    OFFRE_IMMERSION_PARTAGEE = 'OFFRE_IMMERSION_PARTAGEE',
     OFFRE_IMMERSION_APPEL = 'OFFRE_IMMERSION_APPEL',
     OFFRE_IMMERSION_ENVOI_EMAIL = 'OFFRE_IMMERSION_ENVOI_EMAIL',
     OFFRE_IMMERSION_LOCALISATION = 'OFFRE_IMMERSION_LOCALISATION',
@@ -49,7 +50,7 @@ export namespace Evenement {
     OFFRE_IMMERSION_SAUVEGARDEE = 'OFFRE_IMMERSION_SAUVEGARDEE',
     OFFRE_PARTAGEE = 'OFFRE_PARTAGEE',
     OFFRE_POSTULEE = 'OFFRE_POSTULEE',
-    OFFRE_SERVICE_CIVIQUE_AFFICHE = 'OFFRE_SERVICE_CIVIQUE_AFFICHE',
+    OFFRE_SERVICE_CIVIQUE_AFFICHEE = 'OFFRE_SERVICE_CIVIQUE_AFFICHEE',
     OFFRE_SERVICE_CIVIQUE_PARTAGEE = 'OFFRE_SERVICE_CIVIQUE_PARTAGEE',
     OFFRE_SERVICE_CIVIQUE_POSTULEE = 'OFFRE_SERVICE_CIVIQUE_POSTULEE',
     OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE = 'OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE',
@@ -145,6 +146,11 @@ const evenements = {
   [Evenement.Code.OFFRE_IMMERSION_AFFICHEE]: {
     categorie: 'Offre',
     action: 'Détail',
+    nom: 'Immersion'
+  },
+  [Evenement.Code.OFFRE_IMMERSION_PARTAGEE]: {
+    categorie: 'Offre',
+    action: 'Partage',
     nom: 'Immersion'
   },
   [Evenement.Code.OFFRE_IMMERSION_RECHERCHEE]: {
@@ -257,7 +263,7 @@ const evenements = {
     action: 'Consulter',
     nom: 'Pôle emploi'
   },
-  [Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHE]: {
+  [Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHEE]: {
     categorie: 'Offre',
     action: 'Détail',
     nom: 'Service Civique'
@@ -269,7 +275,7 @@ const evenements = {
   },
   [Evenement.Code.OFFRE_SERVICE_CIVIQUE_PARTAGEE]: {
     categorie: 'Offre',
-    action: 'Partager',
+    action: 'Partage',
     nom: 'Service Civique'
   },
   [Evenement.Code.OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE]: {
