@@ -28,9 +28,9 @@ export class DateService {
   }
 
   static isBetweenDates(
-    dateAComparer: DateTime,
-    dateMin: DateTime,
-    dateMax: DateTime
+    dateAComparer: Date,
+    dateMin: Date,
+    dateMax: Date
   ): boolean {
     return dateAComparer >= dateMin && dateAComparer <= dateMax
   }
