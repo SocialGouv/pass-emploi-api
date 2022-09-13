@@ -15,24 +15,18 @@ import { Action } from '../../../src/domain/action/action'
 import Statut = Action.Statut
 import { DateTime } from 'luxon'
 import { DateService } from '../../../src/utils/date-service'
-import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository.db'
 
 describe('GetIndicateursPourConseillerQueryHandler', () => {
   DatabaseForTesting.prepare()
   let getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler
   let dateService: StubbedClass<DateService>
-  let actionRepository: Action.Repository
   const idConseiller = 'id-conseiller'
   const idJeune = 'id-jeune'
 
   before(async () => {
     dateService = stubClass(DateService)
-    actionRepository = new ActionSqlRepository(dateService)
     getIndicateursPourConseillerQueryHandler =
-      new GetIndicateursPourConseillerQueryHandler(
-        dateService,
-        actionRepository
-      )
+      new GetIndicateursPourConseillerQueryHandler(dateService)
   })
 
   describe('handle', () => {
@@ -77,7 +71,9 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
       // Given
       const dateEcheance = DateTime.fromISO('2022-03-06T03:24:00')
       const dateDuJourApresEcheance = '2022-03-07T03:24:00'
-      dateService.now.returns(DateTime.fromISO(dateDuJourApresEcheance))
+      dateService.nowJs.returns(
+        DateTime.fromISO(dateDuJourApresEcheance).toJSDate()
+      )
 
       const query: GetIndicateursPourConseillerQuery = {
         idJeune,
@@ -128,6 +124,34 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
       // Then
       expect(
         isSuccess(response) && response.data.actions.terminees
+      ).to.deep.equal(1)
+    })
+
+    it('récupère le nombre d’actions à échéance entre deux dates', async () => {
+      // Given
+      const dateEcheance = DateTime.fromISO('2022-03-06T03:24:00')
+
+      const query: GetIndicateursPourConseillerQuery = {
+        idJeune,
+        dateDebut: dateDebut.toString(),
+        dateFin: dateFin.toString()
+      }
+
+      const actionDto = uneActionDto({
+        idJeune,
+        dateEcheance: dateEcheance.toJSDate(),
+        statut: Statut.TERMINEE
+      })
+      await ActionSqlModel.creer(actionDto)
+
+      // When
+      const response = await getIndicateursPourConseillerQueryHandler.handle(
+        query
+      )
+
+      // Then
+      expect(
+        isSuccess(response) && response.data.actions.aEcheance
       ).to.deep.equal(1)
     })
   })
