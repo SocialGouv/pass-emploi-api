@@ -58,6 +58,12 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
         idJeune: query.idJeune
       }
     })
+    const indicateursActions = this.getIndicateursActions(
+      actionsSqlDuJeune,
+      dateDebut,
+      dateFin,
+      maintenant
+    )
 
     const rendezVousSqlDuJeune: RendezVousSqlModel[] =
       await RendezVousSqlModel.findAll({
@@ -68,35 +74,6 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
           }
         ]
       })
-
-    const nombreActionsCreees = actionsSqlDuJeune.filter(actionSql => {
-      return this.lActionEstCreeeEntreLesDeuxDates(
-        actionSql,
-        dateDebut,
-        dateFin
-      )
-    }).length
-
-    const nombreActionsEnRetard = actionsSqlDuJeune.filter(actionSql => {
-      return this.lActionEstEnRetard(actionSql, maintenant)
-    }).length
-
-    const nombreActionsTerminees = actionsSqlDuJeune.filter(actionSql => {
-      return this.lActionEstTermineeEntreLesDeuxDates(
-        actionSql,
-        dateDebut,
-        dateFin
-      )
-    }).length
-
-    const nombreActionsAEcheance = actionsSqlDuJeune.filter(actionSql => {
-      return this.lActionEstAEcheanceEntreLesDeuxDates(
-        actionSql,
-        dateDebut,
-        dateFin
-      )
-    }).length
-
     const nombreRendezVousPlanifies = rendezVousSqlDuJeune.filter(
       rendezVousSql => {
         return this.leRendezVousEntreLesDeuxDates(
@@ -108,16 +85,69 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
     ).length
 
     return success({
-      actions: {
-        creees: nombreActionsCreees,
-        enRetard: nombreActionsEnRetard,
-        terminees: nombreActionsTerminees,
-        aEcheance: nombreActionsAEcheance
-      },
+      actions: indicateursActions,
       rendezVous: {
         planifies: nombreRendezVousPlanifies
       }
     })
+  }
+
+  private getIndicateursActions(
+    actionsSqlDuJeune: ActionSqlModel[],
+    dateDebut: Date,
+    dateFin: Date,
+    maintenant: Date
+  ): {
+    creees: number
+    enRetard: number
+    terminees: number
+    aEcheance: number
+  } {
+    const indicateursActionsResult = actionsSqlDuJeune
+      .map(actionSql => {
+        return {
+          creees: this.lActionEstCreeeEntreLesDeuxDates(
+            actionSql,
+            dateDebut,
+            dateFin
+          )
+            ? 1
+            : 0,
+          enRetard: this.lActionEstEnRetard(actionSql, maintenant) ? 1 : 0,
+          terminees: this.lActionEstTermineeEntreLesDeuxDates(
+            actionSql,
+            dateDebut,
+            dateFin
+          )
+            ? 1
+            : 0,
+          aEcheance: this.lActionEstAEcheanceEntreLesDeuxDates(
+            actionSql,
+            dateDebut,
+            dateFin
+          )
+            ? 1
+            : 0
+        }
+      })
+      .reduce(
+        (indicateursActionsAccumulateur, indicateursAction) => {
+          indicateursActionsAccumulateur.creees += indicateursAction.creees
+          indicateursActionsAccumulateur.enRetard += indicateursAction.enRetard
+          indicateursActionsAccumulateur.terminees +=
+            indicateursAction.terminees
+          indicateursActionsAccumulateur.aEcheance +=
+            indicateursAction.aEcheance
+          return indicateursActionsAccumulateur
+        },
+        {
+          creees: 0,
+          enRetard: 0,
+          terminees: 0,
+          aEcheance: 0
+        }
+      )
+    return indicateursActionsResult
   }
 
   async monitor(): Promise<void> {
