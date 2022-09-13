@@ -9,6 +9,8 @@ import { DateService } from '../../utils/date-service'
 import { Action } from '../../domain/action/action'
 import { DateTime } from 'luxon'
 import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
+import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 
 export interface GetIndicateursPourConseillerQuery extends Query {
   idJeune: string
@@ -22,6 +24,9 @@ export interface IndicateursPourConseillerQueryModel {
     enRetard: number
     terminees: number
     aEcheance: number
+  }
+  rendezVous: {
+    planifies: number
   }
 }
 
@@ -54,6 +59,16 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
       }
     })
 
+    const rendezVousSqlDuJeune: RendezVousSqlModel[] =
+      await RendezVousSqlModel.findAll({
+        include: [
+          {
+            model: JeuneSqlModel,
+            where: { id: query.idJeune }
+          }
+        ]
+      })
+
     const nombreActionsCreees = actionsSqlDuJeune.filter(actionSql => {
       return this.lActionEstCreeeEntreLesDeuxDates(
         actionSql,
@@ -82,12 +97,25 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
       )
     }).length
 
+    const nombreRendezVousPlanifies = rendezVousSqlDuJeune.filter(
+      rendezVousSql => {
+        return this.leRendezVousEntreLesDeuxDates(
+          rendezVousSql,
+          dateDebut,
+          dateFin
+        )
+      }
+    ).length
+
     return success({
       actions: {
         creees: nombreActionsCreees,
         enRetard: nombreActionsEnRetard,
         terminees: nombreActionsTerminees,
         aEcheance: nombreActionsAEcheance
+      },
+      rendezVous: {
+        planifies: nombreRendezVousPlanifies
       }
     })
   }
@@ -140,5 +168,13 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
       dateDebut,
       dateFin
     )
+  }
+
+  private leRendezVousEntreLesDeuxDates(
+    rendezVousSql: RendezVousSqlModel,
+    dateDebut: Date,
+    dateFin: Date
+  ): boolean {
+    return DateService.isBetweenDates(rendezVousSql.date, dateDebut, dateFin)
   }
 }
