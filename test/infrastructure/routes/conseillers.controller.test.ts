@@ -69,6 +69,7 @@ import {
   ModifierJeuneDuConseillerCommandHandler
 } from '../../../src/application/commands/modifier-jeune-du-conseiller.command.handler'
 import { unJeune } from '../../fixtures/jeune.fixture'
+import { GetIndicateursPourConseillerQueryHandler } from '../../../src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 
 describe('ConseillersController', () => {
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
@@ -86,6 +87,7 @@ describe('ConseillersController', () => {
   let recupererJeunesDuConseillerCommandHandler: StubbedClass<RecupererJeunesDuConseillerCommandHandler>
   let getMetadonneesFavorisJeuneQueryHandler: StubbedClass<GetMetadonneesFavorisJeuneQueryHandler>
   let modifierJeuneDuConseillerCommandHandler: StubbedClass<ModifierJeuneDuConseillerCommandHandler>
+  let getIndicateursJeunePourConseillerQueryHandler: StubbedClass<GetIndicateursPourConseillerQueryHandler>
   let app: INestApplication
 
   let dateService: StubbedClass<DateService>
@@ -127,6 +129,9 @@ describe('ConseillersController', () => {
     modifierJeuneDuConseillerCommandHandler = stubClass(
       ModifierJeuneDuConseillerCommandHandler
     )
+    getIndicateursJeunePourConseillerQueryHandler = stubClass(
+      GetIndicateursPourConseillerQueryHandler
+    )
 
     dateService = stubClass(DateService)
     dateService.now.returns(now)
@@ -164,6 +169,8 @@ describe('ConseillersController', () => {
       .useValue(modifierJeuneDuConseillerCommandHandler)
       .overrideProvider(DateService)
       .useValue(dateService)
+      .overrideProvider(GetIndicateursPourConseillerQueryHandler)
+      .useValue(getIndicateursJeunePourConseillerQueryHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -1212,6 +1219,78 @@ describe('ConseillersController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'post',
       '/conseillers/2/recuperer-mes-jeunes'
+    )
+  })
+
+  describe('GET /conseillers/{idConseiller}/jeunes/{idJeune}/indicateurs?dateDebut&dateFin', () => {
+    describe('quand les query params sont valides', () => {
+      it('récupère les indicateurs d’un jeune pour un conseiller ', async () => {
+        // Given
+        const idConseiller = '1'
+        const idJeune = 'id-jeune'
+
+        const dateDebutString = '2022-03-01T03:24:00Z'
+        const dateFinString = '2022-03-08T03:24:00Z'
+
+        const desIndicateursJeunePourConseiller = {
+          actions: {
+            creees: 0,
+            enRetard: 0,
+            terminees: 0,
+            aEcheance: 0
+          },
+          rendezVous: {
+            planifies: 0
+          },
+          offres: {
+            consultees: 0,
+            partagees: 0
+          },
+          favoris: {
+            offresSauvegardees: 0,
+            recherchesSauvegardees: 0
+          }
+        }
+
+        getIndicateursJeunePourConseillerQueryHandler.execute
+          .withArgs(
+            {
+              idJeune,
+              dateDebut: new Date(dateDebutString),
+              dateFin: new Date(dateFinString)
+            },
+            unUtilisateurDecode()
+          )
+          .resolves(success(desIndicateursJeunePourConseiller))
+
+        // When - Then
+
+        await request(app.getHttpServer())
+          .get(
+            `/conseillers/${idConseiller}/jeunes/${idJeune}/indicateurs?dateDebut=${dateDebutString}&dateFin=${dateFinString}`
+          )
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(desIndicateursJeunePourConseiller)
+      })
+    })
+
+    describe('quand le query param n‘est pas une date', () => {
+      it('renvoie 400', async () => {
+        // When - Then
+
+        await request(app.getHttpServer())
+          .get(
+            '/conseillers/1/jeunes/id-jeune/indicateurs?dateDebut=2022--8-01&dateFin=2022-08-10'
+          )
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers/1/jeunes/id-jeune/indicateurs?dateDebut=2022-08-01&dateFin=2022-08-10'
     )
   })
 })

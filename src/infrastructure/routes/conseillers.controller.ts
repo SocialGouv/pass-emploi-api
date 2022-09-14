@@ -81,6 +81,7 @@ import {
   DetailConseillerPayload,
   EnvoyerNotificationsPayload,
   GetConseillerQueryParams,
+  GetIndicateursPourConseillerQueryParams,
   GetRendezVousConseillerQueryParams,
   PutJeuneDuConseillerPayload,
   SuperviseursPayload
@@ -90,6 +91,8 @@ import { GetMetadonneesFavorisJeuneQueryHandler } from '../../application/querie
 import { DateService } from '../../utils/date-service'
 import { ModifierJeuneDuConseillerCommandHandler } from '../../application/commands/modifier-jeune-du-conseiller.command.handler'
 import { MetadonneesFavorisQueryModel } from '../../application/queries/query-models/favoris.query-model'
+import { IndicateursPourConseillerQueryModel } from '../../application/queries/query-models/indicateurs-pour-conseiller.query-model'
+import { GetIndicateursPourConseillerQueryHandler } from '../../application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -114,7 +117,8 @@ export class ConseillersController {
     private readonly modifierConseillerCommandHandler: ModifierConseillerCommandHandler,
     private readonly recupererJeunesDuConseillerCommandHandler: RecupererJeunesDuConseillerCommandHandler,
     private readonly getMetadonneesFavorisJeuneQueryHandler: GetMetadonneesFavorisJeuneQueryHandler,
-    private readonly modifierJeuneDuConseillerCommandHandler: ModifierJeuneDuConseillerCommandHandler
+    private readonly modifierJeuneDuConseillerCommandHandler: ModifierJeuneDuConseillerCommandHandler,
+    private readonly getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler
   ) {}
 
   @ApiOperation({
@@ -582,6 +586,33 @@ export class ConseillersController {
       utilisateur
     )
     return handleFailure(result)
+  }
+  @ApiOperation({
+    summary: 'Récupère les indicateurs d’un jeune pour une période donnée',
+    description: 'Autorisé pour le conseiller du jeune'
+  })
+  @Get(':idConseiller/jeunes/:idJeune/indicateurs')
+  async getIndicateursJeunePourConseiller(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    @Param('idConseiller') idConseiller: string,
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @Query()
+    getIndicateursPourConseillerQueryParams: GetIndicateursPourConseillerQueryParams
+  ): Promise<IndicateursPourConseillerQueryModel> {
+    const result = await this.getIndicateursPourConseillerQueryHandler.execute(
+      {
+        idJeune,
+        dateDebut: getIndicateursPourConseillerQueryParams.dateDebut,
+        dateFin: getIndicateursPourConseillerQueryParams.dateFin
+      },
+      utilisateur
+    )
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
   }
 
   private buildDateEcheanceV1(): Date {

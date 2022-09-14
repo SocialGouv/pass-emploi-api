@@ -1,13 +1,8 @@
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import {
-  emptySuccess,
-  Result,
-  success
-} from '../../building-blocks/types/result'
+import { Result, success } from '../../building-blocks/types/result'
 import { Query } from '../../building-blocks/types/query'
 import { DateService } from '../../utils/date-service'
 import { Action } from '../../domain/action/action'
-import { DateTime } from 'luxon'
 import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
@@ -15,55 +10,40 @@ import { EvenementEngagementSqlModel } from '../../infrastructure/sequelize/mode
 import { Op } from 'sequelize'
 import { Authentification } from '../../domain/authentification'
 import { Evenement } from '../../domain/evenement'
+import { IndicateursPourConseillerQueryModel } from './query-models/indicateurs-pour-conseiller.query-model'
+import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
 
 export interface GetIndicateursPourConseillerQuery extends Query {
   idJeune: string
-  dateDebut: string
-  dateFin: string
-}
-
-export interface IndicateursPourConseillerQueryModel {
-  actions: {
-    creees: number
-    enRetard: number
-    terminees: number
-    aEcheance: number
-  }
-  rendezVous: {
-    planifies: number
-  }
-  offres: {
-    consultees: number
-    partagees: number
-  }
-  favoris: {
-    offresSauvegardees: number
-    recherchesSauvegardees: number
-  }
+  dateDebut: Date
+  dateFin: Date
 }
 
 export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
   GetIndicateursPourConseillerQuery,
   Result<IndicateursPourConseillerQueryModel>
 > {
-  constructor(private dateService: DateService) {
+  constructor(
+    private dateService: DateService,
+    private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer
+  ) {
     super('GetIndicateursPourConseillerQueryHandler')
   }
 
-  async authorize(): Promise<Result> {
-    return emptySuccess()
+  async authorize(
+    query: GetIndicateursPourConseillerQuery,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<Result> {
+    return this.conseillerForJeuneAuthorizer.authorize(
+      query.idJeune,
+      utilisateur
+    )
   }
 
   async handle(
     query: GetIndicateursPourConseillerQuery
   ): Promise<Result<IndicateursPourConseillerQueryModel>> {
     const maintenant = this.dateService.nowJs()
-    const dateDebut = DateTime.fromISO(query.dateDebut, {
-      setZone: true
-    }).toJSDate()
-    const dateFin = DateTime.fromISO(query.dateFin, {
-      setZone: true
-    }).toJSDate()
 
     const actionsSqlDuJeune: ActionSqlModel[] = await ActionSqlModel.findAll({
       where: {
@@ -73,8 +53,8 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
 
     const indicateursActions = this.getIndicateursActions(
       actionsSqlDuJeune,
-      dateDebut,
-      dateFin,
+      query.dateDebut,
+      query.dateFin,
       maintenant
     )
 
@@ -92,8 +72,8 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
       rendezVousSql => {
         return this.leRendezVousEntreLesDeuxDates(
           rendezVousSql,
-          dateDebut,
-          dateFin
+          query.dateDebut,
+          query.dateFin
         )
       }
     ).length
@@ -103,7 +83,7 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
         where: {
           typeUtilisateur: Authentification.Type.JEUNE,
           idUtilisateur: query.idJeune,
-          dateEvenement: { [Op.between]: [dateDebut, dateFin] }
+          dateEvenement: { [Op.between]: [query.dateDebut, query.dateFin] }
         }
       })
 
