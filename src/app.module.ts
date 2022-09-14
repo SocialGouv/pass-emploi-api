@@ -227,6 +227,7 @@ import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from './application/queries/
 import { GetDemarchesQueryGetter } from './application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { HandleJobMettreAJourCodesEvenementsCommandHandler } from './application/commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
+import { GetIndicateursPourConseillerQueryHandler } from './application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -527,7 +528,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetJeuneHomeAgendaPoleEmploiQueryHandler,
     GetDemarchesQueryGetter,
     GetRendezVousJeunePoleEmploiQueryGetter,
-    HandleJobMettreAJourCodesEvenementsCommandHandler
+    HandleJobMettreAJourCodesEvenementsCommandHandler,
+    GetIndicateursPourConseillerQueryHandler
   ]
 }
 
