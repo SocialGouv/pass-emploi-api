@@ -70,7 +70,7 @@ export class GetDetailServiceCiviqueQueryHandler extends QueryHandler<
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
     await this.evenementService.creer(
-      Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHEE,
+      Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHE,
       utilisateur
     )
   }
