@@ -68,7 +68,21 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           dateCreation: dateCreation.toJSDate(),
           idJeune
         })
-        await ActionSqlModel.creer(actionDto)
+
+        const actionAvantDateDebutDto = uneActionDto({
+          dateCreation: dateDebut.minus({ days: 1 }).toJSDate(),
+          idJeune
+        })
+
+        const actionApresDateDebutDto = uneActionDto({
+          dateCreation: dateDebut.minus({ days: 1 }).toJSDate(),
+          idJeune
+        })
+        await ActionSqlModel.bulkCreate([
+          actionDto,
+          actionAvantDateDebutDto,
+          actionApresDateDebutDto
+        ])
 
         // When
         const response = await getIndicateursPourConseillerQueryHandler.handle(
@@ -96,12 +110,21 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           dateFin: dateFin.toJSDate()
         }
 
-        const actionDto = uneActionDto({
+        const actionPasCommenceeDto = uneActionDto({
           idJeune,
           dateEcheance: dateEcheance.toJSDate(),
           statut: Statut.PAS_COMMENCEE
         })
-        await ActionSqlModel.creer(actionDto)
+
+        const actionTermineeDto = uneActionDto({
+          idJeune,
+          dateEcheance: dateEcheance.toJSDate(),
+          statut: Statut.TERMINEE
+        })
+        await ActionSqlModel.bulkCreate([
+          actionPasCommenceeDto,
+          actionTermineeDto
+        ])
 
         // When
         const response = await getIndicateursPourConseillerQueryHandler.handle(
@@ -125,12 +148,21 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           dateFin: dateFin.toJSDate()
         }
 
-        const actionDto = uneActionDto({
+        const actionTermineeDto = uneActionDto({
           idJeune,
           dateFinReelle: dateFinReelle.toJSDate(),
           statut: Statut.TERMINEE
         })
-        await ActionSqlModel.creer(actionDto)
+
+        const actionPasCommenceeDto = uneActionDto({
+          idJeune,
+          statut: Statut.PAS_COMMENCEE
+        })
+
+        await ActionSqlModel.bulkCreate([
+          actionTermineeDto,
+          actionPasCommenceeDto
+        ])
 
         // When
         const response = await getIndicateursPourConseillerQueryHandler.handle(
@@ -154,12 +186,21 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           dateFin: dateFin.toJSDate()
         }
 
-        const actionDto = uneActionDto({
+        const actionAvecEcheanceDto = uneActionDto({
           idJeune,
           dateEcheance: dateEcheance.toJSDate(),
           statut: Statut.TERMINEE
         })
-        await ActionSqlModel.creer(actionDto)
+
+        const actionSansEcheanceSurIntervalleDto = uneActionDto({
+          idJeune,
+          statut: Statut.PAS_COMMENCEE
+        })
+
+        await ActionSqlModel.bulkCreate([
+          actionAvecEcheanceDto,
+          actionSansEcheanceSurIntervalleDto
+        ])
 
         // When
         const response = await getIndicateursPourConseillerQueryHandler.handle(
@@ -174,7 +215,7 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
     })
 
     describe('indicateurs rendez-vous', () => {
-      it('récupère le nombre de rendez-vous planifiés', async () => {
+      it('récupère le nombre de rendez-vous planifiés entre une date de début et date de fin', async () => {
         // Given
         const query: GetIndicateursPourConseillerQuery = {
           idConseiller,
@@ -189,12 +230,28 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           id: idRendezVous,
           date: dateRendezVous
         })
-
-        await RendezVousSqlModel.create(rendezVousDto)
-        await RendezVousJeuneAssociationSqlModel.create({
-          idJeune,
-          idRendezVous
+        const rendezVousAvantDto = unRendezVousDto({
+          date: dateDebut.minus({ days: 1 }).toJSDate()
         })
+
+        const rendezVousApresDto = unRendezVousDto({
+          date: dateFin.plus({ days: 1 }).toJSDate()
+        })
+
+        await RendezVousSqlModel.bulkCreate([
+          rendezVousDto,
+          rendezVousAvantDto,
+          rendezVousApresDto
+        ])
+
+        await RendezVousJeuneAssociationSqlModel.bulkCreate([
+          {
+            idJeune,
+            idRendezVous
+          },
+          { idJeune, idRendezVous: rendezVousAvantDto.id },
+          { idJeune, idRendezVous: rendezVousApresDto.id }
+        ])
 
         // When
         const response = await getIndicateursPourConseillerQueryHandler.handle(
@@ -206,8 +263,67 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           isSuccess(response) && response.data.rendezVous.planifies
         ).to.deep.equal(1)
       })
+
+      it('récupère le nombre de rendez-vous planifiés entre des dates', async () => {
+        // Given
+        const query: GetIndicateursPourConseillerQuery = {
+          idConseiller,
+          idJeune,
+          dateDebut: dateDebut.toJSDate(),
+          dateFin: dateFin.toJSDate()
+        }
+
+        const rendezVousAvantDto = unRendezVousDto({
+          date: dateDebut.minus({ days: 1 }).toJSDate()
+        })
+
+        const rendezVousApresDto = unRendezVousDto({
+          date: dateFin.plus({ days: 1 }).toJSDate()
+        })
+
+        const rendezVousDebutDto = unRendezVousDto({
+          date: dateDebut.toJSDate()
+        })
+        const rendezVousFinDto = unRendezVousDto({
+          date: dateFin.toJSDate()
+        })
+
+        await RendezVousSqlModel.bulkCreate([
+          rendezVousAvantDto,
+          rendezVousApresDto,
+          rendezVousDebutDto,
+          rendezVousFinDto
+        ])
+
+        await RendezVousJeuneAssociationSqlModel.bulkCreate([
+          { idJeune, idRendezVous: rendezVousAvantDto.id },
+          { idJeune, idRendezVous: rendezVousApresDto.id },
+          { idJeune, idRendezVous: rendezVousDebutDto.id },
+          { idJeune, idRendezVous: rendezVousFinDto.id }
+        ])
+
+        // When
+        const response = await getIndicateursPourConseillerQueryHandler.handle(
+          query
+        )
+
+        // Then
+        expect(
+          isSuccess(response) && response.data.rendezVous.planifies
+        ).to.deep.equal(2)
+      })
     })
+
     describe('indicateurs offres', () => {
+      let dateEvenement: Date
+      let dateEvenementAvantDateDebut: Date
+      let dateEvenementApresDateFin: Date
+
+      beforeEach(() => {
+        dateEvenement = new Date('2022-03-05T03:24:00')
+        dateEvenementAvantDateDebut = new Date('2022-02-01T03:24:00')
+        dateEvenementApresDateFin = new Date('2022-03-15T03:24:00')
+      })
       it('récupère le nombre d’offres d’emploi consultées', async () => {
         // Given
         const query: GetIndicateursPourConseillerQuery = {
@@ -216,7 +332,6 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           dateDebut: dateDebut.toJSDate(),
           dateFin: dateFin.toJSDate()
         }
-        const dateEvenement = new Date('2022-03-05T03:24:00')
 
         const engagementDto = unEvenementEngagementDto({
           typeUtilisateur: Authentification.Type.JEUNE,
@@ -224,7 +339,23 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           code: Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
           dateEvenement
         })
-        await EvenementEngagementSqlModel.create(engagementDto)
+        const engagementAvantDateDebutDto = unEvenementEngagementDto({
+          typeUtilisateur: Authentification.Type.JEUNE,
+          idUtilisateur: idJeune,
+          code: Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
+          dateEvenement: dateEvenementAvantDateDebut
+        })
+        const engagementApresDateFinDto = unEvenementEngagementDto({
+          typeUtilisateur: Authentification.Type.JEUNE,
+          idUtilisateur: idJeune,
+          code: Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
+          dateEvenement: dateEvenementApresDateFin
+        })
+        await EvenementEngagementSqlModel.bulkCreate([
+          engagementDto,
+          engagementAvantDateDebutDto,
+          engagementApresDateFinDto
+        ])
 
         // When
         const response = await getIndicateursPourConseillerQueryHandler.handle(
@@ -243,7 +374,6 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           dateDebut: dateDebut.toJSDate(),
           dateFin: dateFin.toJSDate()
         }
-        const dateEvenement = new Date('2022-03-05T03:24:00')
 
         const engagementDto = unEvenementEngagementDto({
           typeUtilisateur: Authentification.Type.JEUNE,
@@ -251,7 +381,24 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           code: Evenement.Code.OFFRE_IMMERSION_PARTAGEE,
           dateEvenement
         })
-        await EvenementEngagementSqlModel.create(engagementDto)
+        const engagementAvantDateDebutDto = unEvenementEngagementDto({
+          typeUtilisateur: Authentification.Type.JEUNE,
+          idUtilisateur: idJeune,
+          code: Evenement.Code.OFFRE_IMMERSION_PARTAGEE,
+          dateEvenement: dateEvenementAvantDateDebut
+        })
+        const engagementApresDateFinDto = unEvenementEngagementDto({
+          typeUtilisateur: Authentification.Type.JEUNE,
+          idUtilisateur: idJeune,
+          code: Evenement.Code.OFFRE_IMMERSION_PARTAGEE,
+          dateEvenement: dateEvenementApresDateFin
+        })
+
+        await EvenementEngagementSqlModel.bulkCreate([
+          engagementDto,
+          engagementAvantDateDebutDto,
+          engagementApresDateFinDto
+        ])
 
         // When
         const response = await getIndicateursPourConseillerQueryHandler.handle(
@@ -263,7 +410,18 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         ).to.deep.equal(1)
       })
     })
+
     describe('indicateurs favoris', () => {
+      let dateEvenement: Date
+      let dateEvenementAvantDateDebut: Date
+      let dateEvenementApresDateFin: Date
+
+      beforeEach(() => {
+        dateEvenement = new Date('2022-03-05T03:24:00')
+        dateEvenementAvantDateDebut = new Date('2022-02-01T03:24:00')
+        dateEvenementApresDateFin = new Date('2022-03-15T03:24:00')
+      })
+
       it('récupère le nombre d’offres sauvegardée', async () => {
         // Given
         const query: GetIndicateursPourConseillerQuery = {
@@ -272,7 +430,6 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           dateDebut: dateDebut.toJSDate(),
           dateFin: dateFin.toJSDate()
         }
-        const dateEvenement = new Date('2022-03-05T03:24:00')
 
         const engagementDto = unEvenementEngagementDto({
           typeUtilisateur: Authentification.Type.JEUNE,
@@ -280,7 +437,23 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           code: Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE,
           dateEvenement
         })
-        await EvenementEngagementSqlModel.create(engagementDto)
+        const engagementAvantDateDebutDto = unEvenementEngagementDto({
+          typeUtilisateur: Authentification.Type.JEUNE,
+          idUtilisateur: idJeune,
+          code: Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE,
+          dateEvenement: dateEvenementAvantDateDebut
+        })
+        const engagementApresDateFinDto = unEvenementEngagementDto({
+          typeUtilisateur: Authentification.Type.JEUNE,
+          idUtilisateur: idJeune,
+          code: Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE,
+          dateEvenement: dateEvenementApresDateFin
+        })
+        await EvenementEngagementSqlModel.bulkCreate([
+          engagementDto,
+          engagementAvantDateDebutDto,
+          engagementApresDateFinDto
+        ])
 
         // When
         const response = await getIndicateursPourConseillerQueryHandler.handle(

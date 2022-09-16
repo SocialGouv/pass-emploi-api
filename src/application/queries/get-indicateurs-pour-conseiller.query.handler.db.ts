@@ -12,6 +12,7 @@ import { Authentification } from '../../domain/authentification'
 import { Evenement } from '../../domain/evenement'
 import { IndicateursPourConseillerQueryModel } from './query-models/indicateurs-pour-conseiller.query-model'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { Injectable } from '@nestjs/common'
 
 export interface GetIndicateursPourConseillerQuery extends Query {
   idConseiller: string
@@ -20,6 +21,7 @@ export interface GetIndicateursPourConseillerQuery extends Query {
   dateFin: Date
 }
 
+@Injectable()
 export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
   GetIndicateursPourConseillerQuery,
   Result<IndicateursPourConseillerQueryModel>
@@ -62,7 +64,10 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
         }
       }),
       RendezVousSqlModel.findAll({
-        where: { dateSuppression: { [Op.is]: null } },
+        where: {
+          dateSuppression: { [Op.is]: null },
+          date: { [Op.between]: [query.dateDebut, query.dateFin] }
+        },
         include: [
           {
             model: JeuneSqlModel,
@@ -86,15 +91,7 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
       maintenant
     )
 
-    const nombreRendezVousPlanifies = rendezVousSqlDuJeune.filter(
-      rendezVousSql => {
-        return this.leRendezVousEstEntreLesDeuxDates(
-          rendezVousSql,
-          query.dateDebut,
-          query.dateFin
-        )
-      }
-    ).length
+    const nombreRendezVousPlanifies = rendezVousSqlDuJeune.length
 
     const indicateursOffresEtFavoris = this.getIndicateursOffresEtFavoris(
       offresEtFavorisEvenementsSql
@@ -291,13 +288,5 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
       dateDebut,
       dateFin
     )
-  }
-
-  private leRendezVousEstEntreLesDeuxDates(
-    rendezVousSql: RendezVousSqlModel,
-    dateDebut: Date,
-    dateFin: Date
-  ): boolean {
-    return DateService.isBetweenDates(rendezVousSql.date, dateDebut, dateFin)
   }
 }
