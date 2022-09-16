@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios'
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
 import { Conseiller } from '../../domain/conseiller'
@@ -26,6 +26,7 @@ export class MailSendinblueService implements Mail.Service {
     compteJeuneArchive: string
   }
   private frontendUrl: string
+  private logger: Logger
 
   constructor(
     private invitationIcsClient: InvitationIcsClient,
@@ -36,18 +37,23 @@ export class MailSendinblueService implements Mail.Service {
     this.apiKey = this.configService.get('sendinblue').apiKey
     this.templates = this.configService.get('sendinblue').templates
     this.frontendUrl = this.configService.get('frontEndUrl') ?? ''
+    this.logger = new Logger('MailSendinblueService')
   }
 
   async envoyer(data: MailDataDto): Promise<void> {
-    await firstValueFrom(
-      this.httpService.post(`${this.sendinblueUrl}/v3/smtp/email`, data, {
-        headers: {
-          'api-key': `${this.apiKey}`,
-          accept: 'application/json',
-          'content-type': 'application/json'
-        }
-      })
-    )
+    try {
+      await firstValueFrom(
+        this.httpService.post(`${this.sendinblueUrl}/v3/smtp/email`, data, {
+          headers: {
+            'api-key': `${this.apiKey}`,
+            accept: 'application/json',
+            'content-type': 'application/json'
+          }
+        })
+      )
+    } catch (e) {
+      this.logger.error(e)
+    }
   }
 
   async envoyerMailConversationsNonLues(
