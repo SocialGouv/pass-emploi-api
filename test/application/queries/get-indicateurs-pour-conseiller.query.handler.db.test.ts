@@ -22,10 +22,12 @@ import { unEvenementEngagementDto } from '../../fixtures/sql-models/evenement-en
 import { EvenementEngagementSqlModel } from '../../../src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { Evenement } from '../../../src/domain/evenement'
 import { Authentification } from '../../../src/domain/authentification'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 
 describe('GetIndicateursPourConseillerQueryHandler', () => {
   DatabaseForTesting.prepare()
   let getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler
+  let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let dateService: StubbedClass<DateService>
   const idConseiller = 'id-conseiller'
   const idJeune = 'id-jeune'
@@ -33,7 +35,10 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
   before(async () => {
     dateService = stubClass(DateService)
     getIndicateursPourConseillerQueryHandler =
-      new GetIndicateursPourConseillerQueryHandler(dateService)
+      new GetIndicateursPourConseillerQueryHandler(
+        dateService,
+        conseillerAuthorizer
+      )
   })
 
   describe('handle', () => {
@@ -53,9 +58,10 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         const dateCreation = DateTime.fromISO('2022-03-05T03:24:00')
 
         const query: GetIndicateursPourConseillerQuery = {
+          idConseiller,
           idJeune,
-          dateDebut: dateDebut.toString(),
-          dateFin: dateFin.toString()
+          dateDebut: dateDebut.toJSDate(),
+          dateFin: dateFin.toJSDate()
         }
 
         const actionDto = uneActionDto({
@@ -84,9 +90,10 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         )
 
         const query: GetIndicateursPourConseillerQuery = {
+          idConseiller,
           idJeune,
-          dateDebut: dateDebut.toString(),
-          dateFin: dateFin.toString()
+          dateDebut: dateDebut.toJSDate(),
+          dateFin: dateFin.toJSDate()
         }
 
         const actionDto = uneActionDto({
@@ -112,9 +119,10 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         const dateFinReelle = DateTime.fromISO('2022-03-06T03:24:00')
 
         const query: GetIndicateursPourConseillerQuery = {
+          idConseiller,
           idJeune,
-          dateDebut: dateDebut.toString(),
-          dateFin: dateFin.toString()
+          dateDebut: dateDebut.toJSDate(),
+          dateFin: dateFin.toJSDate()
         }
 
         const actionDto = uneActionDto({
@@ -140,9 +148,10 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         const dateEcheance = DateTime.fromISO('2022-03-06T03:24:00')
 
         const query: GetIndicateursPourConseillerQuery = {
+          idConseiller,
           idJeune,
-          dateDebut: dateDebut.toString(),
-          dateFin: dateFin.toString()
+          dateDebut: dateDebut.toJSDate(),
+          dateFin: dateFin.toJSDate()
         }
 
         const actionDto = uneActionDto({
@@ -163,13 +172,15 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         ).to.deep.equal(1)
       })
     })
+
     describe('indicateurs rendez-vous', () => {
       it('récupère le nombre de rendez-vous planifiés', async () => {
         // Given
         const query: GetIndicateursPourConseillerQuery = {
+          idConseiller,
           idJeune,
-          dateDebut: dateDebut.toString(),
-          dateFin: dateFin.toString()
+          dateDebut: dateDebut.toJSDate(),
+          dateFin: dateFin.toJSDate()
         }
         const idRendezVous = 'b3b010f2-1d14-45db-bb15-cf1fa361fbdc'
         const dateRendezVous = new Date('2022-03-06T03:24:00')
@@ -200,9 +211,10 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
       it('récupère le nombre d’offres d’emploi consultées', async () => {
         // Given
         const query: GetIndicateursPourConseillerQuery = {
+          idConseiller,
           idJeune,
-          dateDebut: dateDebut.toString(),
-          dateFin: dateFin.toString()
+          dateDebut: dateDebut.toJSDate(),
+          dateFin: dateFin.toJSDate()
         }
         const dateEvenement = new Date('2022-03-05T03:24:00')
 
@@ -226,9 +238,10 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
       it('récupère le nombre d’offres d’emploi partagées', async () => {
         // Given
         const query: GetIndicateursPourConseillerQuery = {
+          idConseiller,
           idJeune,
-          dateDebut: dateDebut.toString(),
-          dateFin: dateFin.toString()
+          dateDebut: dateDebut.toJSDate(),
+          dateFin: dateFin.toJSDate()
         }
         const dateEvenement = new Date('2022-03-05T03:24:00')
 
@@ -254,9 +267,10 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
       it('récupère le nombre d’offres sauvegardée', async () => {
         // Given
         const query: GetIndicateursPourConseillerQuery = {
+          idConseiller,
           idJeune,
-          dateDebut: dateDebut.toString(),
-          dateFin: dateFin.toString()
+          dateDebut: dateDebut.toJSDate(),
+          dateFin: dateFin.toJSDate()
         }
         const dateEvenement = new Date('2022-03-05T03:24:00')
 
@@ -280,9 +294,10 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
       it('récupère le nombre de recherches sauvegardées', async () => {
         // Given
         const query: GetIndicateursPourConseillerQuery = {
+          idConseiller,
           idJeune,
-          dateDebut: dateDebut.toString(),
-          dateFin: dateFin.toString()
+          dateDebut: dateDebut.toJSDate(),
+          dateFin: dateFin.toJSDate()
         }
         const dateEvenement = new Date('2022-03-05T03:24:00')
 

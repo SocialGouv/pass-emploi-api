@@ -11,9 +11,10 @@ import { Op } from 'sequelize'
 import { Authentification } from '../../domain/authentification'
 import { Evenement } from '../../domain/evenement'
 import { IndicateursPourConseillerQueryModel } from './query-models/indicateurs-pour-conseiller.query-model'
-import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
+import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 
 export interface GetIndicateursPourConseillerQuery extends Query {
+  idConseiller: string
   idJeune: string
   dateDebut: Date
   dateFin: Date
@@ -25,7 +26,7 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
 > {
   constructor(
     private dateService: DateService,
-    private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer
+    private conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('GetIndicateursPourConseillerQueryHandler')
   }
@@ -34,10 +35,15 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
     query: GetIndicateursPourConseillerQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerForJeuneAuthorizer.authorize(
-      query.idJeune,
-      utilisateur
+    return this.conseillerAuthorizer.authorize(
+      query.idConseiller,
+      utilisateur,
+      query.idJeune
     )
+  }
+
+  async monitor(): Promise<void> {
+    return
   }
 
   async handle(
@@ -45,11 +51,33 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
   ): Promise<Result<IndicateursPourConseillerQueryModel>> {
     const maintenant = this.dateService.nowJs()
 
-    const actionsSqlDuJeune: ActionSqlModel[] = await ActionSqlModel.findAll({
-      where: {
-        idJeune: query.idJeune
-      }
-    })
+    const [
+      actionsSqlDuJeune,
+      rendezVousSqlDuJeune,
+      offresEtFavorisEvenementsSql
+    ] = await Promise.all([
+      ActionSqlModel.findAll({
+        where: {
+          idJeune: query.idJeune
+        }
+      }),
+      RendezVousSqlModel.findAll({
+        where: { dateSuppression: { [Op.is]: null } },
+        include: [
+          {
+            model: JeuneSqlModel,
+            where: { id: query.idJeune }
+          }
+        ]
+      }),
+      EvenementEngagementSqlModel.findAll({
+        where: {
+          typeUtilisateur: Authentification.Type.JEUNE,
+          idUtilisateur: query.idJeune,
+          dateEvenement: { [Op.between]: [query.dateDebut, query.dateFin] }
+        }
+      })
+    ])
 
     const indicateursActions = this.getIndicateursActions(
       actionsSqlDuJeune,
@@ -58,34 +86,15 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
       maintenant
     )
 
-    const rendezVousSqlDuJeune: RendezVousSqlModel[] =
-      await RendezVousSqlModel.findAll({
-        include: [
-          {
-            model: JeuneSqlModel,
-            where: { id: query.idJeune }
-          }
-        ]
-      })
-
     const nombreRendezVousPlanifies = rendezVousSqlDuJeune.filter(
       rendezVousSql => {
-        return this.leRendezVousEntreLesDeuxDates(
+        return this.leRendezVousEstEntreLesDeuxDates(
           rendezVousSql,
           query.dateDebut,
           query.dateFin
         )
       }
     ).length
-
-    const offresEtFavorisEvenementsSql =
-      await EvenementEngagementSqlModel.findAll({
-        where: {
-          typeUtilisateur: Authentification.Type.JEUNE,
-          idUtilisateur: query.idJeune,
-          dateEvenement: { [Op.between]: [query.dateDebut, query.dateFin] }
-        }
-      })
 
     const indicateursOffresEtFavoris = this.getIndicateursOffresEtFavoris(
       offresEtFavorisEvenementsSql
@@ -112,7 +121,7 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
     terminees: number
     aEcheance: number
   } {
-    const indicateursActionsResult = actionsSqlDuJeune
+    return actionsSqlDuJeune
       .map(actionSql => {
         return {
           creees: this.lActionEstCreeeEntreLesDeuxDates(
@@ -156,7 +165,6 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
           aEcheance: 0
         }
       )
-    return indicateursActionsResult
   }
 
   private getIndicateursOffresEtFavoris(
@@ -169,7 +177,7 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
       Evenement.Code.OFFRE_ALTERNANCE_AFFICHEE,
       Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
       Evenement.Code.OFFRE_IMMERSION_AFFICHEE,
-      Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHEE
+      Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHE
     ]
     const codesOffrePartagee: string[] = [
       Evenement.Code.OFFRE_ALTERNANCE_PARTAGEE,
@@ -190,7 +198,7 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
       Evenement.Code.RECHERCHE_SERVICE_CIVIQUE_SAUVEGARDEE
     ]
 
-    const indicateursOffresEtFavorisResult = evenementsSql
+    return evenementsSql
       .map(evenementSql => {
         return {
           offres: {
@@ -237,12 +245,6 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
           }
         }
       )
-
-    return indicateursOffresEtFavorisResult
-  }
-
-  async monitor(): Promise<void> {
-    return
   }
 
   private lActionEstTermineeEntreLesDeuxDates(
@@ -291,7 +293,7 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
     )
   }
 
-  private leRendezVousEntreLesDeuxDates(
+  private leRendezVousEstEntreLesDeuxDates(
     rendezVousSql: RendezVousSqlModel,
     dateDebut: Date,
     dateFin: Date

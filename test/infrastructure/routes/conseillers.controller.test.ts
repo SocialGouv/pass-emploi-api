@@ -1255,6 +1255,7 @@ describe('ConseillersController', () => {
         getIndicateursJeunePourConseillerQueryHandler.execute
           .withArgs(
             {
+              idConseiller,
               idJeune,
               dateDebut: new Date(dateDebutString),
               dateFin: new Date(dateFinString)

@@ -593,8 +593,6 @@ export class ConseillersController {
   })
   @Get(':idConseiller/jeunes/:idJeune/indicateurs')
   async getIndicateursJeunePourConseiller(
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     @Param('idConseiller') idConseiller: string,
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
@@ -603,6 +601,7 @@ export class ConseillersController {
   ): Promise<IndicateursPourConseillerQueryModel> {
     const result = await this.getIndicateursPourConseillerQueryHandler.execute(
       {
+        idConseiller,
         idJeune,
         dateDebut: getIndicateursPourConseillerQueryParams.dateDebut,
         dateFin: getIndicateursPourConseillerQueryParams.dateFin
