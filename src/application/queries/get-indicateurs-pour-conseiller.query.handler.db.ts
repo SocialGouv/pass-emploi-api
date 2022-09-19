@@ -250,7 +250,7 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
     dateFin: Date
   ): boolean {
     return Boolean(
-      actionSql.dateFinReelle ??
+      actionSql.dateFinReelle &&
         DateService.isBetweenDates(actionSql.dateFinReelle!, dateDebut, dateFin)
     )
   }
