@@ -5,9 +5,10 @@ import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios
 import * as https from 'https'
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
+import { Context, ContextKey } from '../../building-blocks/context'
+import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Demarche } from '../../domain/demarche'
-import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import {
   DemarcheDto,
   PrestationDto,
@@ -25,7 +26,8 @@ export class PoleEmploiPartenaireClient {
 
   constructor(
     private httpService: HttpService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private context: Context
   ) {
     this.logger = new Logger('PoleEmploiPartenaireClient')
     this.apiUrl = this.configService.get('poleEmploiPartenaire').url
@@ -156,12 +158,12 @@ export class PoleEmploiPartenaireClient {
     }
   }
 
-  private get<T>(
+  private async get<T>(
     suffixUrl: string,
     tokenDuJeune: string,
     params?: URLSearchParams
   ): Promise<AxiosResponse<T>> {
-    return firstValueFrom(
+    const res = await firstValueFrom(
       this.httpService.get<T>(`${this.apiUrl}/${suffixUrl}`, {
         params,
         headers: { Authorization: `Bearer ${tokenDuJeune}` },
@@ -173,6 +175,13 @@ export class PoleEmploiPartenaireClient {
             : undefined
       })
     )
+
+    this.context.set(ContextKey.RESULTAT_APPEL_PARTENAIRE, {
+      res: res.data,
+      path: res.request.path
+    } as unknown)
+
+    return res
   }
 
   private put<T>(

@@ -48,6 +48,7 @@ import { UpdateJeuneConfigurationApplicationCommandHandler } from './application
 import { UpdateStatutActionCommandHandler } from './application/commands/update-statut-action.command.handler'
 import { UpdateUtilisateurCommandHandler } from './application/commands/update-utilisateur.command.handler'
 import { TeleverserFichierCommandHandler } from './application/commands/televerser-fichier.command.handler'
+import { Context } from './building-blocks/context'
 import { GetActionsByJeuneQueryHandler } from './application/queries/get-actions-by-jeune.query.handler.db'
 import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
 import { GetCommunesEtDepartementsQueryHandler } from './application/queries/get-communes-et-departements.query.handler.db'
@@ -290,6 +291,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     TaskService,
     InvitationIcsClient,
     KeycloakClient,
+    Context,
     {
       provide: APP_GUARD,
       useClass: OidcAuthGuard

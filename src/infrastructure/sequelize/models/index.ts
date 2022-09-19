@@ -19,6 +19,7 @@ import { CampagneSqlModel } from './campagne.sql-model'
 import { ReponseCampagneSqlModel } from './reponse-campagne.sql-model'
 import { ArchiveJeuneSqlModel } from './archive-jeune.sql-model'
 import { CommentaireSqlModel } from './commentaire.sql-model'
+import { LogApiPartenaireSqlModel } from './log-api-partenaire-sql.model'
 
 export const sqlModels = [
   ConseillerSqlModel,
@@ -41,5 +42,6 @@ export const sqlModels = [
   ReponseCampagneSqlModel,
   FichierSqlModel,
   ArchiveJeuneSqlModel,
-  CommentaireSqlModel
+  CommentaireSqlModel,
+  LogApiPartenaireSqlModel
 ]
