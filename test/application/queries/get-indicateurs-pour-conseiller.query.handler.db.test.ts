@@ -68,20 +68,18 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           dateCreation: dateCreation.toJSDate(),
           idJeune
         })
-
         const actionAvantDateDebutDto = uneActionDto({
           dateCreation: dateDebut.minus({ days: 1 }).toJSDate(),
           idJeune
         })
-
-        const actionApresDateDebutDto = uneActionDto({
-          dateCreation: dateDebut.minus({ days: 1 }).toJSDate(),
+        const actionApresDateFinDto = uneActionDto({
+          dateCreation: dateFin.plus({ days: 1 }).toJSDate(),
           idJeune
         })
         await ActionSqlModel.bulkCreate([
           actionDto,
           actionAvantDateDebutDto,
-          actionApresDateDebutDto
+          actionApresDateFinDto
         ])
 
         // When
@@ -97,11 +95,10 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
 
       it('récupère le nombre d’actions en retard entre deux dates', async () => {
         // Given
-        const dateEcheance = DateTime.fromISO('2022-03-06T03:24:00')
-        const dateDuJourApresEcheance = '2022-03-07T03:24:00'
-        dateService.nowJs.returns(
-          DateTime.fromISO(dateDuJourApresEcheance).toJSDate()
-        )
+        const dateDuJour = DateTime.fromISO('2022-03-07T03:24:00')
+        dateService.nowJs.returns(dateDuJour.toJSDate())
+        const dateEcheanceUnJourAvantDateDuJour = dateDuJour.minus({ days: 1 })
+        const dateEcheanceUnJourApresDateDuJour = dateDuJour.plus({ days: 1 })
 
         const query: GetIndicateursPourConseillerQuery = {
           idConseiller,
@@ -110,19 +107,24 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           dateFin: dateFin.toJSDate()
         }
 
-        const actionPasCommenceeDto = uneActionDto({
+        const actionPasCommenceeEnRetardDto = uneActionDto({
           idJeune,
-          dateEcheance: dateEcheance.toJSDate(),
+          dateEcheance: dateEcheanceUnJourAvantDateDuJour.toJSDate(),
           statut: Statut.PAS_COMMENCEE
         })
-
+        const actionPasCommenceeNonEnRetardDto = uneActionDto({
+          idJeune,
+          dateEcheance: dateEcheanceUnJourApresDateDuJour.toJSDate(),
+          statut: Statut.PAS_COMMENCEE
+        })
         const actionTermineeDto = uneActionDto({
           idJeune,
-          dateEcheance: dateEcheance.toJSDate(),
+          dateEcheance: dateEcheanceUnJourAvantDateDuJour.toJSDate(),
           statut: Statut.TERMINEE
         })
         await ActionSqlModel.bulkCreate([
-          actionPasCommenceeDto,
+          actionPasCommenceeEnRetardDto,
+          actionPasCommenceeNonEnRetardDto,
           actionTermineeDto
         ])
 
@@ -139,7 +141,11 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
 
       it('récupère le nombre d’actions terminées entre deux dates', async () => {
         // Given
-        const dateFinReelle = DateTime.fromISO('2022-03-06T03:24:00')
+        const dateFinReelleDansLaPeriode = DateTime.fromISO(
+          '2022-03-06T03:24:00'
+        )
+        const dateFinReelleUnJourAvantDateDebut = dateDebut.minus({ days: 1 })
+        const dateFinReelleUnJourApresDateFin = dateFin.plus({ days: 1 })
 
         const query: GetIndicateursPourConseillerQuery = {
           idConseiller,
@@ -148,9 +154,19 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           dateFin: dateFin.toJSDate()
         }
 
-        const actionTermineeDto = uneActionDto({
+        const actionTermineeDansLaPeriodeDto = uneActionDto({
           idJeune,
-          dateFinReelle: dateFinReelle.toJSDate(),
+          dateFinReelle: dateFinReelleDansLaPeriode.toJSDate(),
+          statut: Statut.TERMINEE
+        })
+        const actionTermineeAvantLaDateDebutDto = uneActionDto({
+          idJeune,
+          dateFinReelle: dateFinReelleUnJourAvantDateDebut.toJSDate(),
+          statut: Statut.TERMINEE
+        })
+        const actionTermineeApresLaDateFinDto = uneActionDto({
+          idJeune,
+          dateFinReelle: dateFinReelleUnJourApresDateFin.toJSDate(),
           statut: Statut.TERMINEE
         })
 
@@ -160,7 +176,9 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         })
 
         await ActionSqlModel.bulkCreate([
-          actionTermineeDto,
+          actionTermineeDansLaPeriodeDto,
+          actionTermineeAvantLaDateDebutDto,
+          actionTermineeApresLaDateFinDto,
           actionPasCommenceeDto
         ])
 
@@ -215,55 +233,6 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
     })
 
     describe('indicateurs rendez-vous', () => {
-      it('récupère le nombre de rendez-vous planifiés entre une date de début et date de fin', async () => {
-        // Given
-        const query: GetIndicateursPourConseillerQuery = {
-          idConseiller,
-          idJeune,
-          dateDebut: dateDebut.toJSDate(),
-          dateFin: dateFin.toJSDate()
-        }
-        const idRendezVous = 'b3b010f2-1d14-45db-bb15-cf1fa361fbdc'
-        const dateRendezVous = new Date('2022-03-06T03:24:00')
-
-        const rendezVousDto = unRendezVousDto({
-          id: idRendezVous,
-          date: dateRendezVous
-        })
-        const rendezVousAvantDto = unRendezVousDto({
-          date: dateDebut.minus({ days: 1 }).toJSDate()
-        })
-
-        const rendezVousApresDto = unRendezVousDto({
-          date: dateFin.plus({ days: 1 }).toJSDate()
-        })
-
-        await RendezVousSqlModel.bulkCreate([
-          rendezVousDto,
-          rendezVousAvantDto,
-          rendezVousApresDto
-        ])
-
-        await RendezVousJeuneAssociationSqlModel.bulkCreate([
-          {
-            idJeune,
-            idRendezVous
-          },
-          { idJeune, idRendezVous: rendezVousAvantDto.id },
-          { idJeune, idRendezVous: rendezVousApresDto.id }
-        ])
-
-        // When
-        const response = await getIndicateursPourConseillerQueryHandler.handle(
-          query
-        )
-
-        // Then
-        expect(
-          isSuccess(response) && response.data.rendezVous.planifies
-        ).to.deep.equal(1)
-      })
-
       it('récupère le nombre de rendez-vous planifiés entre des dates', async () => {
         // Given
         const query: GetIndicateursPourConseillerQuery = {
@@ -480,7 +449,23 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           code: Evenement.Code.RECHERCHE_IMMERSION_SAUVEGARDEE,
           dateEvenement
         })
-        await EvenementEngagementSqlModel.create(engagementDto)
+        const engagementAvantDateDebutDto = unEvenementEngagementDto({
+          typeUtilisateur: Authentification.Type.JEUNE,
+          idUtilisateur: idJeune,
+          code: Evenement.Code.RECHERCHE_IMMERSION_SAUVEGARDEE,
+          dateEvenement: dateEvenementAvantDateDebut
+        })
+        const engagementApresDateFinDto = unEvenementEngagementDto({
+          typeUtilisateur: Authentification.Type.JEUNE,
+          idUtilisateur: idJeune,
+          code: Evenement.Code.RECHERCHE_IMMERSION_SAUVEGARDEE,
+          dateEvenement: dateEvenementApresDateFin
+        })
+        await EvenementEngagementSqlModel.bulkCreate([
+          engagementDto,
+          engagementAvantDateDebutDto,
+          engagementApresDateFinDto
+        ])
 
         // When
         const response = await getIndicateursPourConseillerQueryHandler.handle(
