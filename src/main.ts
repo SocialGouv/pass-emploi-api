@@ -1,4 +1,7 @@
+import { Context } from './building-blocks/context'
+import { ContextInterceptor } from './infrastructure/middlewares/context.interceptor'
 import { initializeAPMAgent } from './infrastructure/monitoring/apm.init'
+
 initializeAPMAgent()
 
 import * as compression from 'compression'
@@ -23,6 +26,7 @@ async function bootstrap(): Promise<void> {
   const isWeb = appConfig.get('isWeb')
   const task = appConfig.get('task')
   const logger = app.get(Logger)
+  const context = app.get(Context)
   app.useLogger(logger)
 
   if (isWeb) {
@@ -30,6 +34,7 @@ async function bootstrap(): Promise<void> {
     useSwagger(appConfig, app)
     app.use(helmet())
     app.enableCors()
+    app.useGlobalInterceptors(new ContextInterceptor(context))
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
     app.disable('x-powered-by')
     await app.listen(port)
