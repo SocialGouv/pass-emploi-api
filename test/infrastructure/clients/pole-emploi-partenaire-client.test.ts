@@ -5,7 +5,11 @@ import { uneDatetime } from '../../fixtures/date.fixture'
 import { PoleEmploiPartenaireClient } from '../../../src/infrastructure/clients/pole-emploi-partenaire-client'
 import { uneDemarcheDto } from '../../fixtures/demarches-dto.fixtures'
 import { Demarche } from '../../../src/domain/demarche'
-import { failure, isSuccess } from '../../../src/building-blocks/types/result'
+import {
+  failure,
+  isSuccess,
+  success
+} from '../../../src/building-blocks/types/result'
 import { expect, stubClass } from '../../utils'
 import { ErreurHttp } from 'src/building-blocks/types/domain-error'
 import { Context } from 'src/building-blocks/context'
@@ -13,6 +17,7 @@ import { Context } from 'src/building-blocks/context'
 describe('PoleEmploiPartenaireClient', () => {
   let poleEmploiPartenaireClient: PoleEmploiPartenaireClient
   const configService = testConfig()
+  const PARTENAIRE_BASE_URL = 'https://api-r.es-qvr.fr/partenaire'
   const tokenJeune = 'token'
 
   beforeEach(() => {
@@ -27,7 +32,7 @@ describe('PoleEmploiPartenaireClient', () => {
   describe('getPrestations', () => {
     it('fait un appel http get avec les bons paramètres', async () => {
       // Given
-      nock('https://api-r.es-qvr.fr/partenaire')
+      nock(PARTENAIRE_BASE_URL)
         .get(
           '/peconnect-gerer-prestations/v1/rendez-vous?dateRecherche=2020-04-06'
         )
@@ -53,7 +58,7 @@ describe('PoleEmploiPartenaireClient', () => {
       // Given
       const idVisio = '1'
 
-      nock('https://api-r.es-qvr.fr/partenaire')
+      nock(PARTENAIRE_BASE_URL)
         .get('/peconnect-gerer-prestations/v1/lien-visio/rendez-vous/1')
         .reply(200, {
           resultats: []
@@ -75,7 +80,7 @@ describe('PoleEmploiPartenaireClient', () => {
   describe('getRendezVous', () => {
     it('fait un appel http get avec les bons paramètres', async () => {
       // Given
-      nock('https://api-r.es-qvr.fr/partenaire')
+      nock(PARTENAIRE_BASE_URL)
         .get('/peconnect-rendezvousagenda/v1/listerendezvous')
         .reply(200, {
           resultats: []
@@ -97,7 +102,7 @@ describe('PoleEmploiPartenaireClient', () => {
     describe('quand il y a des data', () => {
       it('renvoie les démarches', async () => {
         // Given
-        nock('https://api-r.es-qvr.fr/partenaire')
+        nock(PARTENAIRE_BASE_URL)
           .get('/peconnect-demarches/v1/demarches')
           .reply(200, [uneDemarcheDto()])
           .isDone()
@@ -114,7 +119,7 @@ describe('PoleEmploiPartenaireClient', () => {
     describe('quand il y a no content', () => {
       it('renvoie un tableau vide', async () => {
         // Given
-        nock('https://api-r.es-qvr.fr/partenaire')
+        nock(PARTENAIRE_BASE_URL)
           .get('/peconnect-demarches/v1/demarches')
           .reply(204, '')
           .isDone()
@@ -153,7 +158,7 @@ describe('PoleEmploiPartenaireClient', () => {
             dateAnnulation: undefined
           }
 
-          nock('https://api-r.es-qvr.fr/partenaire')
+          nock(PARTENAIRE_BASE_URL)
             .put('/peconnect-demarches/v1/demarches/idDemarche', body)
             .reply(200, demarcheDto)
             .isDone()
@@ -190,7 +195,7 @@ describe('PoleEmploiPartenaireClient', () => {
             dateAnnulation: undefined
           }
 
-          nock('https://api-r.es-qvr.fr/partenaire')
+          nock(PARTENAIRE_BASE_URL)
             .put('/peconnect-demarches/v1/demarches/idDemarche', body)
             .reply(200, demarcheDto)
             .isDone()
@@ -227,7 +232,7 @@ describe('PoleEmploiPartenaireClient', () => {
           dateFin: undefined,
           dateAnnulation: undefined
         }
-        nock('https://api-r.es-qvr.fr/partenaire')
+        nock(PARTENAIRE_BASE_URL)
           .put('/peconnect-demarches/v1/demarches/idDemarche', body)
           .reply(400, 'un message')
           .isDone()
@@ -268,7 +273,7 @@ describe('PoleEmploiPartenaireClient', () => {
     describe('quand tout va bien', () => {
       it('construit le payload et crée la démarche', async () => {
         // Given
-        nock('https://api-r.es-qvr.fr/partenaire')
+        nock(PARTENAIRE_BASE_URL)
           .post('/peconnect-demarches/v1/demarches', body)
           .reply(200, demarcheDto)
           .isDone()
@@ -289,7 +294,7 @@ describe('PoleEmploiPartenaireClient', () => {
     describe("quand il y' une erreur", () => {
       it('renvoie une failure', async () => {
         // Given
-        nock('https://api-r.es-qvr.fr/partenaire')
+        nock(PARTENAIRE_BASE_URL)
           .post('/peconnect-demarches/v1/demarches', body)
           .reply(400, 'un message')
           .isDone()
@@ -299,6 +304,41 @@ describe('PoleEmploiPartenaireClient', () => {
           demarche,
           tokenJeune
         )
+
+        // Then
+        expect(result).to.deep.equal(failure(new ErreurHttp('un message', 400)))
+      })
+    })
+  })
+
+  describe('getSuggestionsRecherches', () => {
+    describe('quand l’appel api PE retourne un succès', () => {
+      it('retourne les suggestions', async () => {
+        // Given
+        nock(PARTENAIRE_BASE_URL)
+          .get('/peconnect-metiersrecherches/v1/metiersrecherches')
+          .reply(200, [])
+          .isDone()
+
+        // When
+        const result =
+          await poleEmploiPartenaireClient.getSuggestionsRecherches(tokenJeune)
+
+        // Then
+        expect(result).to.deep.equal(success([]))
+      })
+    })
+    describe('quand l’appel api PE échoue', () => {
+      it('retourne une failure', async () => {
+        // Given
+        nock(PARTENAIRE_BASE_URL)
+          .get('/peconnect-metiersrecherches/v1/metiersrecherches')
+          .reply(400, 'un message')
+          .isDone()
+
+        // When
+        const result =
+          await poleEmploiPartenaireClient.getSuggestionsRecherches(tokenJeune)
 
         // Then
         expect(result).to.deep.equal(failure(new ErreurHttp('un message', 400)))

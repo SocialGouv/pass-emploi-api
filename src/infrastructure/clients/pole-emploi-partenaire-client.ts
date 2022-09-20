@@ -17,6 +17,7 @@ import {
   DemarcheDto,
   PrestationDto,
   RendezVousPoleEmploiDto,
+  SuggestionDto,
   toEtat
 } from './dto/pole-emploi.dto'
 
@@ -152,6 +153,25 @@ export class PoleEmploiPartenaireClient {
         body
       )
       return success(demarcheDto.data)
+    } catch (e) {
+      this.logger.error(e)
+      if (e.response?.data && e.response?.status) {
+        const erreur = new ErreurHttp(e.response.data, e.response.status)
+        return failure(erreur)
+      }
+      throw e
+    }
+  }
+
+  async getSuggestionsRecherches(
+    token: string
+  ): Promise<Result<SuggestionDto[]>> {
+    try {
+      const suggestionsPe = await this.get<SuggestionDto[]>(
+        'peconnect-metiersrecherches/v1/metiersrecherches',
+        token
+      )
+      return success(suggestionsPe.data)
     } catch (e) {
       this.logger.error(e)
       if (e.response?.data && e.response?.status) {

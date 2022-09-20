@@ -126,6 +126,73 @@ export interface DemarcheDto {
   }
 }
 
+export interface SuggestionDto {
+  appellation: {
+    libelle: string
+    code: string
+  }
+  contrats: Array<{
+    critereOre: boolean
+    priorite: number
+    type: {
+      code: string
+      libelle: string
+      libelleLong: string
+    }
+  }>
+  dureeExperience: {
+    valeur: number
+    unite: {
+      code: string
+      libelle: string
+    }
+  }
+  dureesHebdo: Array<{
+    critereOre: boolean
+    tempsTravail: {
+      code: string
+      libelle: string
+    }
+  }>
+  mobiliteHabitation: {
+    valeur: number
+    unite: {
+      code: string
+    }
+  }
+  mobilites: Array<{
+    rayon: number
+    lieu: {
+      code: string
+      libelle: string
+      type: {
+        code: string
+        libelle: string
+      }
+    }
+    unite: {
+      code: string
+      libelle: string
+    }
+  }>
+  rome: {
+    libelle: string
+    code: string
+  }
+  salaire: {
+    remuneration: number
+    libelle: string
+    code: string
+  }
+  typologieEmploi: {
+    libelle: string
+    code: string
+  }
+  typeCrefFranchise: boolean
+  typeCrefReprise: boolean
+  typeCrefCreation: boolean
+}
+
 export enum DemarcheDtoEtat {
   AC = 'AC',
   RE = 'RE',
