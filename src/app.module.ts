@@ -205,7 +205,6 @@ import { ArchiveJeuneRepositoryToken } from './domain/archive-jeune'
 import { ArchiveJeuneSqlRepository } from './infrastructure/repositories/archive-jeune-sql.repository.db'
 import { GetMotifsSuppressionJeuneQueryHandler } from './application/queries/get-motifs-suppression-jeune.query.handler'
 import { RateLimiterService } from './utils/rate-limiter.service'
-import { HandleJobNettoyerArchivesJeunesCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-archives-jeune.command'
 import { UpdateJeunePreferencesCommandHandler } from './application/commands/update-preferences-jeune.command.handler'
 import { GetPreferencesJeuneQueryHandler } from './application/queries/get-preferences-jeune.handler.db'
 import { GetRendezVousConseillerPaginesQueryHandler } from './application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
@@ -229,6 +228,7 @@ import { GetDemarchesQueryGetter } from './application/queries/query-getters/pol
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { HandleJobMettreAJourCodesEvenementsCommandHandler } from './application/commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
 import { GetIndicateursPourConseillerQueryHandler } from './application/queries/get-indicateurs-pour-conseiller.query.handler.db'
+import { HandleJobNettoyerLesDonneesCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-donnees.command.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -513,7 +513,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     HandleJobNettoyerPiecesJointesCommandHandler,
     ArchiverJeuneCommandHandler,
     GetMotifsSuppressionJeuneQueryHandler,
-    HandleJobNettoyerArchivesJeunesCommandHandler,
+    HandleJobNettoyerLesDonneesCommandHandler,
     ExecuteJobAsapCommandHandler,
     UpdateJeunePreferencesCommandHandler,
     GetPreferencesJeuneQueryHandler,

@@ -6,8 +6,9 @@ import { PoleEmploiPartenaireClient } from '../../../src/infrastructure/clients/
 import { uneDemarcheDto } from '../../fixtures/demarches-dto.fixtures'
 import { Demarche } from '../../../src/domain/demarche'
 import { failure, isSuccess } from '../../../src/building-blocks/types/result'
-import { expect } from '../../utils'
+import { expect, stubClass } from '../../utils'
 import { ErreurHttp } from 'src/building-blocks/types/domain-error'
+import { Context } from 'src/building-blocks/context'
 
 describe('PoleEmploiPartenaireClient', () => {
   let poleEmploiPartenaireClient: PoleEmploiPartenaireClient
@@ -18,7 +19,8 @@ describe('PoleEmploiPartenaireClient', () => {
     const httpService = new HttpService()
     poleEmploiPartenaireClient = new PoleEmploiPartenaireClient(
       httpService,
-      configService
+      configService,
+      stubClass(Context)
     )
   })
 

@@ -5,7 +5,11 @@ import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios
 import * as https from 'https'
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
-import { Context, ContextKey } from '../../building-blocks/context'
+import {
+  AppelPartenaireResultat,
+  Context,
+  ContextKey
+} from '../../building-blocks/context'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Demarche } from '../../domain/demarche'
@@ -177,9 +181,9 @@ export class PoleEmploiPartenaireClient {
     )
 
     this.context.set(ContextKey.RESULTAT_APPEL_PARTENAIRE, {
-      res: res.data,
+      resultat: res.data,
       path: res.request.path
-    } as unknown)
+    } as AppelPartenaireResultat)
 
     return res
   }

@@ -10,7 +10,6 @@ import {
   WorkerTrackingService
 } from '../infrastructure/monitoring/worker.tracking.service'
 import { HandleJobMailConseillerCommandHandler } from './commands/jobs/handle-job-mail-conseiller.command'
-import { HandleJobNettoyerArchivesJeunesCommandHandler } from './commands/jobs/handle-job-nettoyer-les-archives-jeune.command'
 import { HandleNettoyerLesJobsCommandHandler } from './commands/jobs/handle-job-nettoyer-les-jobs.command'
 import { HandleJobNettoyerPiecesJointesCommandHandler } from './commands/jobs/handle-job-nettoyer-pieces-jointes.command'
 import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
@@ -21,6 +20,7 @@ import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from './commands
 import { HandleJobUpdateMailingListConseillerCommandHandler } from './commands/jobs/handle-job-update-mailing-list-conseiller.command'
 import { HandleJobNotifierRendezVousPECommandHandler } from './commands/jobs/handle-job-notifier-rendez-vous-pe.command'
 import { HandleJobMettreAJourCodesEvenementsCommandHandler } from './commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
+import { HandleJobNettoyerLesDonneesCommandHandler } from './commands/jobs/handle-job-nettoyer-les-donnees.command.db'
 
 @Injectable()
 export class WorkerService {
@@ -40,7 +40,7 @@ export class WorkerService {
     private handleJobNotifierNouveauxServicesCiviqueCommandHandler: HandleJobNotifierNouveauxServicesCiviqueCommandHandler,
     private handleJobRecupererSituationsJeunesMiloCommandHandler: HandleJobRecupererSituationsJeunesMiloCommandHandler,
     private handleJobNettoyerPiecesJointesCommandHandler: HandleJobNettoyerPiecesJointesCommandHandler,
-    private handleJobNettoyerArchivesJeunesCommandHandler: HandleJobNettoyerArchivesJeunesCommandHandler,
+    private handleJobNettoyerLesDonneesCommandHandler: HandleJobNettoyerLesDonneesCommandHandler,
     private handleJobNotifierRendezVousPECommandHandler: HandleJobNotifierRendezVousPECommandHandler,
     private handleJobMettreAJourCodesEvenementsCommandHandler: HandleJobMettreAJourCodesEvenementsCommandHandler
   ) {
@@ -95,8 +95,8 @@ export class WorkerService {
         case Planificateur.CronJob.NETTOYER_LES_PIECES_JOINTES:
           await this.handleJobNettoyerPiecesJointesCommandHandler.execute()
           break
-        case Planificateur.CronJob.NETTOYER_LES_ARCHIVES_JEUNES:
-          await this.handleJobNettoyerArchivesJeunesCommandHandler.execute()
+        case Planificateur.CronJob.NETTOYER_LES_DONNEES:
+          await this.handleJobNettoyerLesDonneesCommandHandler.execute()
           break
         case Planificateur.CronJob.NOTIFIER_RENDEZVOUS_PE:
           await this.handleJobNotifierRendezVousPECommandHandler.execute()
