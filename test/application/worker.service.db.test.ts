@@ -13,10 +13,10 @@ import { Planificateur } from '../../src/domain/planificateur'
 import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from 'src/application/commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
 import { DatabaseForTesting } from '../utils/database-for-testing'
 import { HandleJobNettoyerPiecesJointesCommandHandler } from 'src/application/commands/jobs/handle-job-nettoyer-pieces-jointes.command'
-import { HandleJobNettoyerArchivesJeunesCommandHandler } from 'src/application/commands/jobs/handle-job-nettoyer-les-archives-jeune.command'
 import { HandleJobRappelActionCommandHandler } from 'src/application/commands/jobs/handle-job-rappel-action.command'
 import { HandleJobNotifierRendezVousPECommandHandler } from 'src/application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
 import { HandleJobMettreAJourCodesEvenementsCommandHandler } from '../../src/application/commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
+import { HandleJobNettoyerLesDonneesCommandHandler } from '../../src/application/commands/jobs/handle-job-nettoyer-les-donnees.command.db'
 
 describe('WorkerService', () => {
   DatabaseForTesting.prepare()
@@ -58,8 +58,8 @@ describe('WorkerService', () => {
       const handleJobNettoyerPiecesJointesCommandHandler = stubClass(
         HandleJobNettoyerPiecesJointesCommandHandler
       )
-      const handleJobNettoyerArchivesJeunesCommandHandler = stubClass(
-        HandleJobNettoyerArchivesJeunesCommandHandler
+      const handleJobNettoyerLesDonneesCommandHandler = stubClass(
+        HandleJobNettoyerLesDonneesCommandHandler
       )
       const handleJobNotifierRendezVousPECommandHandler = stubClass(
         HandleJobNotifierRendezVousPECommandHandler
@@ -78,7 +78,7 @@ describe('WorkerService', () => {
         handleJobNotifierNouveauxServicesCiviqueCommandHandler,
         handleJobRecupererSituationsJeunesMiloCommandHandler,
         handleJobNettoyerPiecesJointesCommandHandler,
-        handleJobNettoyerArchivesJeunesCommandHandler,
+        handleJobNettoyerLesDonneesCommandHandler,
         handleJobNotifierRendezVousPECommandHandler,
         handleJobMettreAJourCodesEvenementsCommandHandler
       )

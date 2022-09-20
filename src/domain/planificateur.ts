@@ -32,7 +32,7 @@ export namespace Planificateur {
     RECUPERER_SITUATIONS_JEUNES_MILO = 'RECUPERER_SITUATIONS_JEUNES_MILO',
     NETTOYER_LES_JOBS = 'NETTOYER_LES_JOBS',
     NETTOYER_LES_PIECES_JOINTES = 'NETTOYER_LES_PIECES_JOINTES',
-    NETTOYER_LES_ARCHIVES_JEUNES = 'NETTOYER_LES_ARCHIVES_JEUNES',
+    NETTOYER_LES_DONNEES = 'NETTOYER_LES_DONNEES',
     NOTIFIER_RENDEZVOUS_PE = 'NOTIFIER_RENDEZVOUS_PE',
     MAJ_CODES_EVENEMENTS = 'MAJ_CODES_EVENEMENTS'
   }
@@ -84,34 +84,10 @@ export class PlanificateurService {
 
   async planifierCron(cronJob: Planificateur.CronJob): Promise<void> {
     switch (cronJob) {
-      case Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI: {
+      case Planificateur.CronJob.RECUPERER_SITUATIONS_JEUNES_MILO: {
         const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI,
-          expression: '0 9 * * *'
-        }
-        await this.planificateurRepository.createCron(cron)
-        break
-      }
-      case Planificateur.CronJob.NOUVELLES_OFFRES_SERVICE_CIVIQUE: {
-        const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.NOUVELLES_OFFRES_SERVICE_CIVIQUE,
-          expression: '0 11 * * *'
-        }
-        await this.planificateurRepository.createCron(cron)
-        break
-      }
-      case Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES: {
-        const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES,
-          expression: '0 8 * * 1-5'
-        }
-        await this.planificateurRepository.createCron(cron)
-        break
-      }
-      case Planificateur.CronJob.NETTOYER_LES_JOBS: {
-        const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.NETTOYER_LES_JOBS,
-          expression: '0 4 * * *'
+          type: Planificateur.CronJob.RECUPERER_SITUATIONS_JEUNES_MILO,
+          expression: '0 0 * * *'
         }
         await this.planificateurRepository.createCron(cron)
         break
@@ -120,14 +96,6 @@ export class PlanificateurService {
         const cron: Planificateur.Cron = {
           type: Planificateur.CronJob.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS,
           expression: '0 1 * * *'
-        }
-        await this.planificateurRepository.createCron(cron)
-        break
-      }
-      case Planificateur.CronJob.RECUPERER_SITUATIONS_JEUNES_MILO: {
-        const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.RECUPERER_SITUATIONS_JEUNES_MILO,
-          expression: '0 0 * * *'
         }
         await this.planificateurRepository.createCron(cron)
         break
@@ -141,11 +109,42 @@ export class PlanificateurService {
         await this.planificateurRepository.createCron(cron)
         break
       }
-      case Planificateur.CronJob.NETTOYER_LES_ARCHIVES_JEUNES: {
+      case Planificateur.CronJob.NETTOYER_LES_JOBS: {
         const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.NETTOYER_LES_ARCHIVES_JEUNES,
-          expression: '0 3 * * *',
-          startDate: new Date('2024-07-08')
+          type: Planificateur.CronJob.NETTOYER_LES_JOBS,
+          expression: '0 4 * * *'
+        }
+        await this.planificateurRepository.createCron(cron)
+        break
+      }
+      case Planificateur.CronJob.NETTOYER_LES_DONNEES: {
+        const cron: Planificateur.Cron = {
+          type: Planificateur.CronJob.NETTOYER_LES_DONNEES,
+          expression: '0 5 * * *'
+        }
+        await this.planificateurRepository.createCron(cron)
+        break
+      }
+      case Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES: {
+        const cron: Planificateur.Cron = {
+          type: Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES,
+          expression: '0 8 * * 1-5'
+        }
+        await this.planificateurRepository.createCron(cron)
+        break
+      }
+      case Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI: {
+        const cron: Planificateur.Cron = {
+          type: Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI,
+          expression: '0 9 * * *'
+        }
+        await this.planificateurRepository.createCron(cron)
+        break
+      }
+      case Planificateur.CronJob.NOUVELLES_OFFRES_SERVICE_CIVIQUE: {
+        const cron: Planificateur.Cron = {
+          type: Planificateur.CronJob.NOUVELLES_OFFRES_SERVICE_CIVIQUE,
+          expression: '0 11 * * *'
         }
         await this.planificateurRepository.createCron(cron)
         break

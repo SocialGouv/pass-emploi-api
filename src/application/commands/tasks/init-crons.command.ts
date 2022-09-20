@@ -42,7 +42,7 @@ export class InitCronsCommandHandler extends CommandHandler<Command, void> {
       Planificateur.CronJob.NETTOYER_LES_PIECES_JOINTES
     )
     await this.planificateurService.planifierCron(
-      Planificateur.CronJob.NETTOYER_LES_ARCHIVES_JEUNES
+      Planificateur.CronJob.NETTOYER_LES_DONNEES
     )
     await this.planificateurService.planifierCron(
       Planificateur.CronJob.NOTIFIER_RENDEZVOUS_PE

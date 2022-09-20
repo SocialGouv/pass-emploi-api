@@ -8,6 +8,11 @@ export enum ContextKey {
   RESULTAT_APPEL_PARTENAIRE = 'RESULTAT_APPEL_PARTENAIRE'
 }
 
+export interface AppelPartenaireResultat {
+  path: string
+  resultat: unknown
+}
+
 @Injectable()
 export class Context {
   private asyncLocalStorage: AsyncLocalStorage<ContextData>
