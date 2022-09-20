@@ -14,13 +14,13 @@ import {
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { FavoriNonTrouveError } from '../../../src/building-blocks/types/domain-error'
-import { OffreEmploi, OffresEmploi } from '../../../src/domain/offre-emploi'
+import { Offre } from '../../../src/domain/offre/offre'
 
 describe('DeleteFavoriOffreEmploiCommandHandler', () => {
-  let offresEmploiHttpSqlRepository: StubbedType<OffresEmploi.Repository>
+  let offresEmploiHttpSqlRepository: StubbedType<Offre.Favori.Emploi.Repository>
   let favoriOffresEmploiAuthorizer: StubbedClass<FavoriOffresEmploiAuthorizer>
   let deleteFavoriOffreEmploiCommandHandler: DeleteFavoriOffreEmploiCommandHandler
-  let offreEmploi: OffreEmploi
+  let offreEmploi: Offre.Favori.Emploi
   const jeune = unJeune()
 
   beforeEach(async () => {
@@ -40,7 +40,7 @@ describe('DeleteFavoriOffreEmploiCommandHandler', () => {
     describe('quand le favori existe', () => {
       it('supprime le favori', async () => {
         // Given
-        offresEmploiHttpSqlRepository.getFavori
+        offresEmploiHttpSqlRepository.get
           .withArgs(jeune.id, offreEmploi.id)
           .resolves(offreEmploi)
 
@@ -54,16 +54,17 @@ describe('DeleteFavoriOffreEmploiCommandHandler', () => {
           command
         )
         // Then
-        expect(
-          offresEmploiHttpSqlRepository.deleteFavori
-        ).to.have.been.calledWith(jeune.id, offreEmploi.id)
+        expect(offresEmploiHttpSqlRepository.delete).to.have.been.calledWith(
+          jeune.id,
+          offreEmploi.id
+        )
         expect(result).to.deep.equal(emptySuccess())
       })
     })
     describe('quand le favori n"existe pas', () => {
       it('renvoie une failure', async () => {
         // Given
-        offresEmploiHttpSqlRepository.getFavori
+        offresEmploiHttpSqlRepository.get
           .withArgs(jeune.id, offreEmploi.id)
           .resolves(undefined)
 
@@ -83,7 +84,7 @@ describe('DeleteFavoriOffreEmploiCommandHandler', () => {
           )
         )
         expect(
-          offresEmploiHttpSqlRepository.deleteFavori
+          offresEmploiHttpSqlRepository.delete
         ).not.to.have.been.calledWith(jeune.id, offreEmploi.id)
       })
     })

@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common'
-import { OffreEmploi, OffresEmploi } from '../../domain/offre-emploi'
 import { FavoriOffreEmploiSqlModel } from '../sequelize/models/favori-offre-emploi.sql-model'
 import {
   toFavoriOffreEmploiSqlModel,
   toOffreEmploi
 } from './mappers/offres-emploi.mappers'
+import { Offre } from '../../domain/offre/offre'
 
 @Injectable()
-export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
-  async getFavori(
+export class OffresEmploiHttpSqlRepository
+  implements Offre.Favori.Emploi.Repository
+{
+  async get(
     idJeune: string,
     idOffreEmploi: string
-  ): Promise<OffreEmploi | undefined> {
+  ): Promise<Offre.Favori.Emploi | undefined> {
     const result = await FavoriOffreEmploiSqlModel.findOne({
       where: {
         idJeune: idJeune,
@@ -24,13 +26,13 @@ export class OffresEmploiHttpSqlRepository implements OffresEmploi.Repository {
     return toOffreEmploi(result)
   }
 
-  async saveAsFavori(idJeune: string, offreEmploi: OffreEmploi): Promise<void> {
+  async save(idJeune: string, offreEmploi: Offre.Favori.Emploi): Promise<void> {
     await FavoriOffreEmploiSqlModel.create(
       toFavoriOffreEmploiSqlModel(idJeune, offreEmploi)
     )
   }
 
-  async deleteFavori(idJeune: string, idOffreEmploi: string): Promise<void> {
+  async delete(idJeune: string, idOffreEmploi: string): Promise<void> {
     await FavoriOffreEmploiSqlModel.destroy({
       where: {
         idOffre: idOffreEmploi,

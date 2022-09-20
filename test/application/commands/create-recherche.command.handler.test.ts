@@ -7,7 +7,7 @@ import {
   CreateRechercheCommand,
   CreateRechercheCommandHandler
 } from '../../../src/application/commands/create-recherche.command.handler'
-import { Recherche } from '../../../src/domain/recherche'
+import { Recherche } from '../../../src/domain/offre/recherche/recherche'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
@@ -64,9 +64,7 @@ describe('CreateRechercheCommandHandler', () => {
 
         // Then
         expect(result).to.deep.equal(success({ id: idRecherche }))
-        expect(
-          rechercheRepository.createRecherche
-        ).to.have.been.calledWithExactly({
+        expect(rechercheRepository.save).to.have.been.calledWithExactly({
           id: 'un-id',
           type: 'OFFRES_EMPLOI',
           titre: '',

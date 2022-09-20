@@ -1,19 +1,22 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Authentification } from '../../domain/authentification'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { DetailServiceCiviqueQueryModel } from './query-models/service-civique.query-model'
 import {
-  OffreServiceCiviqueRepositoryToken,
-  OffreServiceCivique
-} from '../../domain/offre-service-civique'
-import {
   emptySuccess,
-  isFailure,
+  failure,
   Result,
   success
 } from '../../building-blocks/types/result'
+import { toOffreEngagement } from '../../infrastructure/repositories/mappers/service-civique.mapper'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
+import { DetailOffreEngagementDto } from '../../infrastructure/repositories/offre-service-civique-http.repository.db'
+import { EngagementClient } from '../../infrastructure/clients/engagement-client'
 
 export interface GetDetailOffreServiceCiviqueQuery extends Query {
   idOffre: string
@@ -25,8 +28,7 @@ export class GetDetailServiceCiviqueQueryHandler extends QueryHandler<
   Result<DetailServiceCiviqueQueryModel>
 > {
   constructor(
-    @Inject(OffreServiceCiviqueRepositoryToken)
-    private offreServiceCiviqueRepository: OffreServiceCivique.Repository,
+    private engagementClient: EngagementClient,
     private evenementService: EvenementService
   ) {
     super('GetDetailServiceCiviqueQueryHandler')
@@ -35,33 +37,28 @@ export class GetDetailServiceCiviqueQueryHandler extends QueryHandler<
   async handle(
     query: GetDetailOffreServiceCiviqueQuery
   ): Promise<Result<DetailServiceCiviqueQueryModel>> {
-    const result =
-      await this.offreServiceCiviqueRepository.getServiceCiviqueById(
-        query.idOffre
-      )
-
-    if (isFailure(result)) {
-      return result
+    try {
+      const response =
+        await this.engagementClient.get<DetailOffreEngagementDto>(
+          `v0/mission/${query.idOffre}`
+        )
+      return success(toOffreEngagement(response.data.data))
+    } catch (e) {
+      this.logger.error(e)
+      if (e.response?.status >= 400 && e.response?.status < 500) {
+        if (e.response?.status == 404) {
+          const erreur = new NonTrouveError('OffreEngagement', query.idOffre)
+          return failure(erreur)
+        } else {
+          const erreur = new ErreurHttp(
+            e.response.data?.message,
+            e.response.status
+          )
+          return failure(erreur)
+        }
+      }
+      return failure(e)
     }
-
-    const offreQueryModel: DetailServiceCiviqueQueryModel = {
-      domaine: result.data.domaine,
-      titre: result.data.titre,
-      ville: result.data.ville,
-      organisation: result.data.organisation,
-      dateDeDebut: result.data.dateDeDebut,
-      dateDeFin: result.data.dateDeFin,
-      description: result.data.description,
-      lienAnnonce: result.data.lienAnnonce,
-      adresseOrganisation: result.data.adresseOrganisation,
-      adresseMission: result.data.adresseMission,
-      urlOrganisation: result.data.urlOrganisation,
-      codeDepartement: result.data.codeDepartement,
-      codePostal: result.data.codePostal,
-      descriptionOrganisation: result.data.descriptionOrganisation
-    }
-
-    return success(offreQueryModel)
   }
 
   async authorize(): Promise<Result> {

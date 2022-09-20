@@ -10,20 +10,17 @@ import {
   emptySuccess,
   failure
 } from '../../../src/building-blocks/types/result'
-import {
-  OffreImmersion,
-  OffresImmersion
-} from '../../../src/domain/offre-immersion'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneOffreImmersion } from '../../fixtures/offre-immersion.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { Offre } from '../../../src/domain/offre/offre'
 
 describe('DeleteFavoriOffreImmersionCommandHandler', () => {
-  let offresImmersionHttpSqlRepository: StubbedType<OffresImmersion.Repository>
+  let offresImmersionHttpSqlRepository: StubbedType<Offre.Favori.Immersion.Repository>
   let favoriOffresImmersionAuthorizer: StubbedClass<FavoriOffresImmersionAuthorizer>
   let deleteFavoriOffreImmersionCommandHandler: DeleteFavoriOffreImmersionCommandHandler
-  let offreImmersion: OffreImmersion
+  let offreImmersion: Offre.Favori.Immersion
   const jeune = unJeune()
 
   beforeEach(async () => {
@@ -43,7 +40,7 @@ describe('DeleteFavoriOffreImmersionCommandHandler', () => {
     describe('quand le favori existe', () => {
       it('supprime le favori', async () => {
         // Given
-        offresImmersionHttpSqlRepository.getFavori
+        offresImmersionHttpSqlRepository.get
           .withArgs(jeune.id, offreImmersion.id)
           .resolves(offreImmersion)
 
@@ -57,16 +54,17 @@ describe('DeleteFavoriOffreImmersionCommandHandler', () => {
           command
         )
         // Then
-        expect(
-          offresImmersionHttpSqlRepository.deleteFavori
-        ).to.have.been.calledWith(jeune.id, offreImmersion.id)
+        expect(offresImmersionHttpSqlRepository.delete).to.have.been.calledWith(
+          jeune.id,
+          offreImmersion.id
+        )
         expect(result).to.deep.equal(emptySuccess())
       })
     })
     describe('quand le favori n"existe pas', () => {
       it('renvoie une failure', async () => {
         // Given
-        offresImmersionHttpSqlRepository.getFavori
+        offresImmersionHttpSqlRepository.get
           .withArgs(jeune.id, offreImmersion.id)
           .resolves(undefined)
 
@@ -86,7 +84,7 @@ describe('DeleteFavoriOffreImmersionCommandHandler', () => {
           )
         )
         expect(
-          offresImmersionHttpSqlRepository.deleteFavori
+          offresImmersionHttpSqlRepository.delete
         ).not.to.have.been.calledWith(jeune.id, offreImmersion.id)
       })
     })

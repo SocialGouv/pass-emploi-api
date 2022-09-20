@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import { DateService } from '../../utils/date-service'
 import { Action } from '../action/action'
 import { Jeune } from '../jeune/jeune'
-import { Recherche } from '../recherche'
+import { Recherche } from '../offre/recherche/recherche'
 import { RendezVous } from '../rendez-vous'
 import * as _PoleEmploi from './pole-emploi'
 

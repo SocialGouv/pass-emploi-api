@@ -1,5 +1,5 @@
 import { RechercheSqlModel } from '../../sequelize/models/recherche.sql-model'
-import { Recherche } from '../../../domain/recherche'
+import { Recherche } from '../../../domain/offre/recherche/recherche'
 import { DateTime } from 'luxon'
 
 export function fromSqlToRecherche(rechercheSql: RechercheSqlModel): Recherche {

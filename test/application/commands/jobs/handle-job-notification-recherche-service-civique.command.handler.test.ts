@@ -9,10 +9,9 @@ import {
   success
 } from '../../../../src/building-blocks/types/result'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { Recherche } from '../../../../src/domain/recherche'
+import { Recherche } from '../../../../src/domain/offre/recherche/recherche'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { Notification } from '../../../../src/domain/notification/notification'
-import { OffreServiceCivique } from '../../../../src/domain/offre-service-civique'
 import { createSandbox } from 'sinon'
 import { DateService } from '../../../../src/utils/date-service'
 import { DateTime } from 'luxon'
@@ -22,6 +21,7 @@ import { GetServicesCiviqueQuery } from '../../../../src/application/queries/get
 import { uneOffreServiceCivique } from '../../../fixtures/offre-service-civique.fixture'
 import { FindAllOffresServicesCiviqueQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-services-civique.query.getter'
 import { NotificationSupport } from 'src/domain/notification-support'
+import { Offre } from '../../../../src/domain/offre/offre'
 
 describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
   describe('handle', () => {
@@ -35,6 +35,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
     let handleJobNotifierNouveauxServicesCiviqueCommandHandler: HandleJobNotifierNouveauxServicesCiviqueCommandHandler
 
     const now = DateTime.fromISO('2020-04-06T12:00:00.000Z').toUTC()
+    const aujourdhuiAMinuit = now.set({ hour: 0, minute: 0, second: 0 })
     const hier = DateTime.fromISO('2020-04-05T12:00:00.000Z').toUTC()
 
     const LIMITE_PAGINATION = 100
@@ -70,10 +71,9 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
         // Given
         findAllOffresServicesCiviqueQueryGetter.handle
           .withArgs({
-            dateDeCreationMinimum: hier,
             page: 1,
             limit: 1000,
-            editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE
+            dateDeCreationMinimum: hier
           })
           .resolves(success([]))
 
@@ -96,10 +96,9 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
         // Given
         findAllOffresServicesCiviqueQueryGetter.handle
           .withArgs({
-            dateDeCreationMinimum: hier,
             page: 1,
             limit: 1000,
-            editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE
+            dateDeCreationMinimum: hier
           })
           .resolves(success([uneOffre]))
       })
@@ -110,10 +109,10 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
             domaine: uneOffre.domaine,
             lat: uneOffre.localisation!.latitude,
             lon: uneOffre.localisation!.longitude,
-            dateDeDebutMinimum: uneOffre.dateDeDebut
+            dateDeDebutMinimum: DateTime.fromISO(uneOffre.dateDeDebut!)
           }
           rechercheRepository.trouverLesRecherchesServicesCiviques
-            .withArgs(criteres, LIMITE_PAGINATION, 0)
+            .withArgs(criteres, LIMITE_PAGINATION, 0, aujourdhuiAMinuit)
             .resolves([])
 
           // When
@@ -136,10 +135,10 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
             domaine: uneOffre.domaine,
             lat: uneOffre.localisation!.latitude,
             lon: uneOffre.localisation!.longitude,
-            dateDeDebutMinimum: uneOffre.dateDeDebut
+            dateDeDebutMinimum: DateTime.fromISO(uneOffre.dateDeDebut!)
           }
           rechercheRepository.trouverLesRecherchesServicesCiviques
-            .withArgs(criteres, LIMITE_PAGINATION, 0)
+            .withArgs(criteres, LIMITE_PAGINATION, 0, aujourdhuiAMinuit)
             .resolves([uneRecherche()])
 
           jeuneRepository.get
@@ -183,10 +182,9 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
 
         findAllOffresServicesCiviqueQueryGetter.handle
           .withArgs({
-            dateDeCreationMinimum: hier,
             page: 1,
             limit: 1000,
-            editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE
+            dateDeCreationMinimum: hier
           })
           .resolves(success([uneOffre]))
 
@@ -194,13 +192,13 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
           domaine: uneOffre.domaine,
           lat: uneOffre.localisation!.latitude,
           lon: uneOffre.localisation!.longitude,
-          dateDeDebutMinimum: uneOffre.dateDeDebut
+          dateDeDebutMinimum: DateTime.fromISO(uneOffre.dateDeDebut!)
         }
         const centRecherches = Array.from({ length: 100 }).fill(uneRecherche())
         rechercheRepository.trouverLesRecherchesServicesCiviques
-          .withArgs(criteres, LIMITE_PAGINATION, 0)
+          .withArgs(criteres, LIMITE_PAGINATION, 0, aujourdhuiAMinuit)
           .resolves(centRecherches)
-          .withArgs(criteres, LIMITE_PAGINATION, 100)
+          .withArgs(criteres, LIMITE_PAGINATION, 100, aujourdhuiAMinuit)
           .resolves([uneRecherche()])
 
         jeuneRepository.get.withArgs(uneRecherche().idJeune).resolves(unJeune())
@@ -217,17 +215,16 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
     describe('quand il y a une offre sans localisation', () => {
       it("passe à l'offre suivante", async () => {
         // Given
-        const uneOffreSansLocalisation: OffreServiceCivique = {
+        const uneOffreSansLocalisation: Offre.Favori.ServiceCivique = {
           ...uneOffreServiceCivique(),
           localisation: undefined
         }
 
         findAllOffresServicesCiviqueQueryGetter.handle
           .withArgs({
-            dateDeCreationMinimum: hier,
             page: 1,
             limit: 1000,
-            editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE
+            dateDeCreationMinimum: hier
           })
           .resolves(success([uneOffreSansLocalisation]))
 

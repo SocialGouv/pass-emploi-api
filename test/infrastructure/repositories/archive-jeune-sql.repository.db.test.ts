@@ -2,8 +2,7 @@ import { uneArchiveJeuneMetadonnees } from 'test/fixtures/archiveJeune.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { Action } from '../../../src/domain/action/action'
 import { ArchiveJeune } from '../../../src/domain/archive-jeune'
-import { Recherche } from '../../../src/domain/recherche'
-import { EngagementClient } from '../../../src/infrastructure/clients/engagement-client'
+import { Recherche } from '../../../src/domain/offre/recherche/recherche'
 import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
 import { ArchiveJeuneSqlRepository } from '../../../src/infrastructure/repositories/archive-jeune-sql.repository.db'
 import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-emploi-http-sql.repository.db'
@@ -61,9 +60,8 @@ describe('ArchiveJeuneSqlRepository', () => {
     let metadonnees: ArchiveJeune.Metadonnees
     const offresEmploiHttpSqlRepository = new OffresEmploiHttpSqlRepository()
     const offresImmersionRepository = new OffresImmersionHttpSqlRepository()
-    const engagementClient: EngagementClient = stubClass(EngagementClient)
     const offreServiceCiviqueHttpSqlRepository =
-      new OffreServiceCiviqueHttpSqlRepository(engagementClient)
+      new OffreServiceCiviqueHttpSqlRepository()
     const rechercheSqlRepository = new RechercheSqlRepository(
       database.sequelize
     )
@@ -103,21 +101,15 @@ describe('ArchiveJeuneSqlRepository', () => {
         idJeune: jeuneDto.id
       })
 
-      await offresEmploiHttpSqlRepository.saveAsFavori(
-        jeuneDto.id,
-        uneOffreEmploi()
-      )
-      await offresImmersionRepository.saveAsFavori(
-        jeuneDto.id,
-        uneOffreImmersion()
-      )
-      await offreServiceCiviqueHttpSqlRepository.saveAsFavori(
+      await offresEmploiHttpSqlRepository.save(jeuneDto.id, uneOffreEmploi())
+      await offresImmersionRepository.save(jeuneDto.id, uneOffreImmersion())
+      await offreServiceCiviqueHttpSqlRepository.save(
         jeuneDto.id,
         uneOffreServiceCivique()
       )
 
       // When
-      await rechercheSqlRepository.createRecherche(
+      await rechercheSqlRepository.save(
         uneRecherche({
           idJeune: jeuneDto.id,
           type: Recherche.Type.OFFRES_IMMERSION,

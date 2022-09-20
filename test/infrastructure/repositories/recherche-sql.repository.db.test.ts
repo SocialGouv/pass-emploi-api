@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { Recherche } from 'src/domain/recherche'
+import { Recherche } from 'src/domain/offre/recherche/recherche'
 import { CommuneSqlModel } from 'src/infrastructure/sequelize/models/commune.sql-model'
 import {
   communeColombes,
@@ -58,7 +58,7 @@ describe('RechercheSqlRepository', () => {
           })
 
           // When
-          await rechercheSqlRepository.createRecherche(recherche)
+          await rechercheSqlRepository.save(recherche)
 
           // Then
           const recherches = await RechercheSqlModel.findAll({ raw: true })
@@ -77,7 +77,7 @@ describe('RechercheSqlRepository', () => {
           })
 
           // When
-          await rechercheSqlRepository.createRecherche(recherche)
+          await rechercheSqlRepository.save(recherche)
 
           // Then
           const recherches = await RechercheSqlModel.findAll({ raw: true })
@@ -102,7 +102,7 @@ describe('RechercheSqlRepository', () => {
           })
 
           // When
-          await rechercheSqlRepository.createRecherche(recherche)
+          await rechercheSqlRepository.save(recherche)
 
           // Then
           const recherches = await RechercheSqlModel.findAll({ raw: true })
@@ -121,7 +121,7 @@ describe('RechercheSqlRepository', () => {
           })
 
           // When
-          await rechercheSqlRepository.createRecherche(recherche)
+          await rechercheSqlRepository.save(recherche)
 
           // Then
           const recherches = await RechercheSqlModel.findAll({ raw: true })
@@ -142,7 +142,7 @@ describe('RechercheSqlRepository', () => {
           const recherche = uneRecherche({ idJeune, criteres: {} })
 
           // When
-          await rechercheSqlRepository.createRecherche(recherche)
+          await rechercheSqlRepository.save(recherche)
 
           // Then
           const recherches = await RechercheSqlModel.findAll({ raw: true })
@@ -160,7 +160,7 @@ describe('RechercheSqlRepository', () => {
           })
 
           // When
-          await rechercheSqlRepository.createRecherche(recherche)
+          await rechercheSqlRepository.save(recherche)
 
           // Then
           const recherches = await RechercheSqlModel.findAll({ raw: true })
@@ -181,7 +181,7 @@ describe('RechercheSqlRepository', () => {
           await CommuneSqlModel.create(communeColombes)
 
           // When
-          await rechercheSqlRepository.createRecherche(recherche)
+          await rechercheSqlRepository.save(recherche)
 
           // Then
           const recherches = await RechercheSqlModel.findAll({ raw: true })
@@ -200,7 +200,7 @@ describe('RechercheSqlRepository', () => {
     it('met à jour une recherche', async () => {
       // Given
       const recherche = uneRecherche({ idJeune })
-      await rechercheSqlRepository.createRecherche(recherche)
+      await rechercheSqlRepository.save(recherche)
       const rechercheMiseAJour: Recherche = {
         ...recherche,
         dateDerniereRecherche: DateTime.fromISO('2022-03-07T10:10:11')
@@ -252,12 +252,10 @@ describe('RechercheSqlRepository', () => {
         dateDerniereRecherche: dateMaintenant
       })
 
-      await rechercheSqlRepository.createRecherche(rechercheBonne)
-      await rechercheSqlRepository.createRecherche(
-        rechercheBonneMaisDejaFaiteAujourdhui
-      )
-      await rechercheSqlRepository.createRecherche(rechercheDuMauvaisType)
-      await rechercheSqlRepository.createRecherche(rechercheRecente)
+      await rechercheSqlRepository.save(rechercheBonne)
+      await rechercheSqlRepository.save(rechercheBonneMaisDejaFaiteAujourdhui)
+      await rechercheSqlRepository.save(rechercheDuMauvaisType)
+      await rechercheSqlRepository.save(rechercheRecente)
 
       // When
       const recherches = await rechercheSqlRepository.findAvantDate(
@@ -304,9 +302,9 @@ describe('RechercheSqlRepository', () => {
           rome: 'boulanger'
         }
       })
-      await rechercheSqlRepository.createRecherche(rechercheCharpentierANice)
-      await rechercheSqlRepository.createRecherche(rechercheBoulangerANice)
-      await rechercheSqlRepository.createRecherche(rechercheBoulangerAParis)
+      await rechercheSqlRepository.save(rechercheCharpentierANice)
+      await rechercheSqlRepository.save(rechercheBoulangerANice)
+      await rechercheSqlRepository.save(rechercheBoulangerAParis)
 
       it('retourne la recherche de charpentier', async () => {
         // When
@@ -333,7 +331,7 @@ describe('RechercheSqlRepository', () => {
         // Given
         const recherchesPaginees = creerDesRecherchesPourLaPagination(idJeune)
         for (const recherche of recherchesPaginees) {
-          await rechercheSqlRepository.createRecherche(recherche)
+          await rechercheSqlRepository.save(recherche)
         }
 
         const criteresASaintJeanCapFerrat: GetOffresImmersionQuery = {
@@ -395,7 +393,7 @@ describe('RechercheSqlRepository', () => {
             }
           })
 
-          await rechercheSqlRepository.createRecherche(recherche)
+          await rechercheSqlRepository.save(recherche)
         })
 
         describe("l'offre a une localisation quelconque", () => {
@@ -453,9 +451,7 @@ describe('RechercheSqlRepository', () => {
             }
           })
 
-          await rechercheSqlRepository.createRecherche(
-            rechercheAParisPetiteCouronne
-          )
+          await rechercheSqlRepository.save(rechercheAParisPetiteCouronne)
         })
         describe("l'offre a localisation non matchante", () => {
           it('ça matche pas', async () => {
@@ -535,7 +531,7 @@ describe('RechercheSqlRepository', () => {
             }
           })
 
-          await rechercheSqlRepository.createRecherche(recherche)
+          await rechercheSqlRepository.save(recherche)
         })
         describe("l'offre a un domaine quelconque", () => {
           it('ça matche', async () => {
@@ -591,7 +587,7 @@ describe('RechercheSqlRepository', () => {
             }
           })
 
-          await rechercheSqlRepository.createRecherche(recherche)
+          await rechercheSqlRepository.save(recherche)
         })
         describe("l'offre a un autre domaine", () => {
           it('ça matche pas', async () => {
@@ -666,13 +662,13 @@ describe('RechercheSqlRepository', () => {
             }
           })
 
-          await rechercheSqlRepository.createRecherche(recherche)
+          await rechercheSqlRepository.save(recherche)
         })
         describe("l'offre a une date de début", () => {
           it('ça matche', async () => {
             // When
             const query: GetServicesCiviqueQuery = {
-              dateDeDebutMinimum: '2022-04-28T10:10:10'
+              dateDeDebutMinimum: DateTime.fromISO('2022-04-28T10:10:10')
             }
             const recherches =
               await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
@@ -718,17 +714,17 @@ describe('RechercheSqlRepository', () => {
             idJeune,
             type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
             criteres: {
-              dateDeDebutMinimum: '2022-05-01T10:10:10'
+              dateDeDebutMinimum: DateTime.fromISO('2022-05-01T10:10:10')
             }
           })
 
-          await rechercheSqlRepository.createRecherche(recherche)
+          await rechercheSqlRepository.save(recherche)
         })
         describe("l'offre a une date de début avant", () => {
           it('ça matche pas', async () => {
             // When
             const query: GetServicesCiviqueQuery = {
-              dateDeDebutMinimum: '2022-04-01T10:10:10'
+              dateDeDebutMinimum: DateTime.fromISO('2022-04-01T10:10:10')
             }
             const recherches =
               await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
@@ -747,7 +743,7 @@ describe('RechercheSqlRepository', () => {
           it('ça matche', async () => {
             // When
             const query: GetServicesCiviqueQuery = {
-              dateDeDebutMinimum: '2022-05-02T10:10:10'
+              dateDeDebutMinimum: DateTime.fromISO('2022-05-02T10:10:10')
             }
             const recherches =
               await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(

@@ -15,11 +15,11 @@ import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { FavorisQueryModel } from '../../../src/application/queries/query-models/favoris.query-model'
-import { Favori } from '../../../src/domain/favori'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { FavoriOffreImmersionSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { FavoriOffreEngagementSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import { ConseillerForJeuneAvecPartageAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune-avec-partage'
+import { Offre } from '../../../src/domain/offre/offre'
 describe('GetFavorisJeunePourConseillerQueryHandler', () => {
   DatabaseForTesting.prepare()
   let conseillerForJeuneAvecPartageAuthorizer: StubbedClass<ConseillerForJeuneAvecPartageAuthorizer>
@@ -88,14 +88,14 @@ describe('GetFavorisJeunePourConseillerQueryHandler', () => {
       const favoriOffreEmploi: FavorisQueryModel = {
         idOffre: 'poi-id-offre-1',
         titre: 'poi-titre-1',
-        type: Favori.TypeOffre.EMPLOI,
+        type: Offre.Favori.Type.EMPLOI,
         organisation: 'poi-entreprise',
         localisation: undefined
       }
       const favoriOffreAlternance: FavorisQueryModel = {
         idOffre: 'poi-id-offre-2',
         titre: 'poi-titre-2',
-        type: Favori.TypeOffre.ALTERNANCE,
+        type: Offre.Favori.Type.ALTERNANCE,
         organisation: 'poi-entreprise',
         localisation: undefined
       }
@@ -135,14 +135,14 @@ describe('GetFavorisJeunePourConseillerQueryHandler', () => {
       const favoriOffreImmersion1: FavorisQueryModel = {
         idOffre: 'poi-id-offre',
         titre: 'poi-metier-2e-dans-la-liste-triee',
-        type: Favori.TypeOffre.IMMERSION,
+        type: Offre.Favori.Type.IMMERSION,
         organisation: 'poi-etablissement',
         localisation: 'marseille'
       }
       const favoriOffreImmersion2: FavorisQueryModel = {
         idOffre: 'poi-id-offre',
         titre: 'poi-metier-1er-dans-la-liste-triee',
-        type: Favori.TypeOffre.IMMERSION,
+        type: Offre.Favori.Type.IMMERSION,
         organisation: 'poi-etablissement',
         localisation: 'marseille'
       }
@@ -169,7 +169,7 @@ describe('GetFavorisJeunePourConseillerQueryHandler', () => {
       const favoriOffreServiceCivique: FavorisQueryModel = {
         idOffre: 'poi-id-offre',
         titre: 'poi-titre',
-        type: Favori.TypeOffre.SERVICE_CIVIQUE,
+        type: Offre.Favori.Type.SERVICE_CIVIQUE,
         organisation: undefined,
         localisation: undefined
       }

@@ -1,8 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Op, QueryTypes, Sequelize, WhereOptions } from 'sequelize'
-import { OffresEmploi } from '../../domain/offre-emploi'
-import { OffresImmersion } from '../../domain/offre-immersion'
-import { Recherche } from '../../domain/recherche'
+import { Recherche } from '../../domain/offre/recherche/recherche'
 import { RechercheSqlModel } from '../sequelize/models/recherche.sql-model'
 import { fromSqlToRecherche } from './mappers/recherches.mappers'
 import { DateTime } from 'luxon'
@@ -11,7 +9,7 @@ import { CommuneSqlModel } from '../sequelize/models/commune.sql-model'
 import { SequelizeInjectionToken } from '../sequelize/providers'
 import { GetOffresImmersionQuery } from '../../application/queries/get-offres-immersion.query.handler'
 import { GetServicesCiviqueQuery } from '../../application/queries/get-services-civique.query.handler'
-import { OffreServiceCivique } from '../../domain/offre-service-civique'
+import { Offre } from '../../domain/offre/offre'
 
 @Injectable()
 export class RechercheSqlRepository implements Recherche.Repository {
@@ -19,7 +17,7 @@ export class RechercheSqlRepository implements Recherche.Repository {
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
   ) {}
 
-  async createRecherche(recherche: Recherche): Promise<void> {
+  async save(recherche: Recherche): Promise<void> {
     await RechercheSqlModel.create({
       id: recherche.id,
       idJeune: recherche.idJeune,
@@ -48,20 +46,20 @@ export class RechercheSqlRepository implements Recherche.Repository {
               code: criteres.commune
             }
           })
-          distance = criteres.rayon ?? OffresEmploi.DISTANCE_PAR_DEFAUT
+          distance = criteres.rayon ?? Offre.Recherche.DISTANCE_PAR_DEFAUT
           longitude = Number(commune?.longitude)
           latitude = Number(commune?.latitude)
         }
         break
       case Recherche.Type.OFFRES_IMMERSION:
         criteres = recherche.criteres as GetOffresImmersionQuery
-        distance = criteres.distance ?? OffresImmersion.DISTANCE_PAR_DEFAUT
+        distance = criteres.distance ?? Offre.Recherche.DISTANCE_PAR_DEFAUT
         longitude = criteres.lon
         latitude = criteres.lat
         break
       case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
         criteres = recherche.criteres as GetServicesCiviqueQuery
-        distance = criteres.distance ?? OffreServiceCivique.DISTANCE_PAR_DEFAUT
+        distance = criteres.distance ?? Offre.Recherche.DISTANCE_PAR_DEFAUT
         longitude = criteres.lon
         latitude = criteres.lat
     }
@@ -121,7 +119,7 @@ export class RechercheSqlRepository implements Recherche.Repository {
     })
   }
 
-  async deleteRecherche(idRecherche: string): Promise<void> {
+  async delete(idRecherche: string): Promise<void> {
     await RechercheSqlModel.destroy({
       where: {
         id: idRecherche
@@ -220,17 +218,15 @@ export class RechercheSqlRepository implements Recherche.Repository {
     query: GetServicesCiviqueQuery,
     limit: number,
     offset: number,
-    date: DateTime
+    dateDerniereRecherche: DateTime
   ): Promise<Recherche[]> {
-    const filtres: WhereOptions = [
+    const filtres: WhereOptions[] = [
       { type: Recherche.Type.OFFRES_SERVICES_CIVIQUE }
     ]
     filtres.push(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       this.construireLeFiltreDomaine(query),
       this.construireLeFiltreDateDeDebut(query),
-      this.construireLeFiltreDepuisLaDerniereRecherche(date),
+      this.construireLeFiltreDepuisLaDerniereRecherche(dateDerniereRecherche),
       this.construireLeFiltreLocalisation(query)
     )
 
@@ -249,7 +245,7 @@ export class RechercheSqlRepository implements Recherche.Repository {
   }
 
   private construireLeFiltreLocalisation(
-    query: GetServicesCiviqueQuery
+    query: Offre.Recherche.ServiceCivique
   ): WhereOptions {
     if (query.lat && query.lon) {
       const point = {
@@ -275,13 +271,16 @@ export class RechercheSqlRepository implements Recherche.Repository {
   }
 
   private construireLeFiltreDateDeDebut(
-    query: GetServicesCiviqueQuery
+    query: Offre.Recherche.ServiceCivique
   ): WhereOptions {
     if (query.dateDeDebutMinimum) {
       return {
         criteres: {
           dateDeDebutMinimum: {
-            [Op.or]: [{ [Op.eq]: null }, { [Op.lte]: query.dateDeDebutMinimum }]
+            [Op.or]: [
+              { [Op.eq]: null },
+              { [Op.lte]: query.dateDeDebutMinimum.toJSDate() }
+            ]
           }
         }
       }

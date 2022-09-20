@@ -6,16 +6,14 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import {
-  OffresEmploi,
-  OffresEmploiRepositoryToken
-} from '../../domain/offre-emploi'
+import { OffresEmploiRepositoryToken } from '../../domain/offre/favori/offre-emploi'
+import { Offre } from '../../domain/offre/offre'
 
 @Injectable()
 export class FavoriOffresEmploiAuthorizer {
   constructor(
     @Inject(OffresEmploiRepositoryToken)
-    private offresEmploiRepository: OffresEmploi.Repository
+    private offresEmploiRepository: Offre.Favori.Emploi.Repository
   ) {}
 
   async authorize(
@@ -23,10 +21,7 @@ export class FavoriOffresEmploiAuthorizer {
     idOffreEmploi: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    const favori = await this.offresEmploiRepository.getFavori(
-      idJeune,
-      idOffreEmploi
-    )
+    const favori = await this.offresEmploiRepository.get(idJeune, idOffreEmploi)
 
     if (
       favori &&

@@ -17,7 +17,7 @@ import {
 } from 'test/fixtures/sql-models/favoris.sql-model'
 import { Core } from '../../../../src/domain/core'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
-import { Recherche } from '../../../../src/domain/recherche'
+import { Recherche } from '../../../../src/domain/offre/recherche/recherche'
 import { JeuneSqlRepository } from '../../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
 import { RechercheSqlRepository } from '../../../../src/infrastructure/repositories/recherche-sql.repository.db'
 import { ActionSqlModel } from '../../../../src/infrastructure/sequelize/models/action.sql-model'
@@ -497,7 +497,7 @@ describe('JeuneSqlRepository', () => {
         await ConseillerSqlModel.creer(conseillerDto)
         await JeuneSqlModel.creer(jeuneDto)
         await ActionSqlModel.creer(actionDto)
-        await rechercheSqlRepository.createRecherche(rechercheEmploi)
+        await rechercheSqlRepository.save(rechercheEmploi)
         await RendezVousSqlModel.create(rendezVousDto)
         await RendezVousJeuneAssociationSqlModel.create({
           idRendezVous: rendezVousDto.id,

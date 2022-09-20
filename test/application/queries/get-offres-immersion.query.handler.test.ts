@@ -5,11 +5,11 @@ import {
   GetOffresImmersionQueryHandler
 } from '../../../src/application/queries/get-offres-immersion.query.handler'
 import { OffreImmersionQueryModel } from '../../../src/application/queries/query-models/offres-immersion.query-model'
-import { OffresImmersion } from '../../../src/domain/offre-immersion'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { FindAllOffresImmersionQueryGetter } from '../../../src/application/queries/query-getters/find-all-offres-immersion.query.getter'
 import { success } from '../../../src/building-blocks/types/result'
+import { Offre } from '../../../src/domain/offre/offre'
 
 describe('GetOffresImmersionQueryHandler', () => {
   let findAllOffresImmersionQueryGetter: StubbedClass<FindAllOffresImmersionQueryGetter>
@@ -53,7 +53,7 @@ describe('GetOffresImmersionQueryHandler', () => {
             ville: 'Paris'
           }
         ]
-        const criteres: OffresImmersion.Criteres = {
+        const criteres: Offre.Recherche.Immersion = {
           rome: getOffresImmersionQuery.rome,
           lat: getOffresImmersionQuery.lat,
           lon: getOffresImmersionQuery.lon,
@@ -90,11 +90,10 @@ describe('GetOffresImmersionQueryHandler', () => {
             ville: 'Paris'
           }
         ]
-        const criteres: OffresImmersion.Criteres = {
+        const criteres: Offre.Recherche.Immersion = {
           rome: getOffresImmersionQuery.rome,
           lat: getOffresImmersionQuery.lat,
-          lon: getOffresImmersionQuery.lon,
-          distance: 10
+          lon: getOffresImmersionQuery.lon
         }
         findAllOffresImmersionQueryGetter.handle
           .withArgs(criteres)

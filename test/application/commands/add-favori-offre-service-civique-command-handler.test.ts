@@ -1,5 +1,4 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { OffreServiceCivique } from '../../../src/domain/offre-service-civique'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
@@ -15,10 +14,11 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { FavoriExisteDejaError } from '../../../src/building-blocks/types/domain-error'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { Offre } from '../../../src/domain/offre/offre'
 
 describe('AddFavoriOffreServiceCiviqueCommandHandler', () => {
   let addFavoriOffreServiceCiviqueCommandHandler: AddFavoriOffreServiceCiviqueCommandHandler
-  let offreServiceCiviqueRepository: StubbedType<OffreServiceCivique.Repository>
+  let offreServiceCiviqueRepository: StubbedType<Offre.Favori.ServiceCivique.Repository>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let evenementService: StubbedClass<EvenementService>
 
@@ -45,7 +45,7 @@ describe('AddFavoriOffreServiceCiviqueCommandHandler', () => {
     describe("quand le favori n'existe pas déjà", () => {
       it('le crée', async () => {
         // Given
-        offreServiceCiviqueRepository.getFavori
+        offreServiceCiviqueRepository.get
           .withArgs(command.idJeune, command.offre.id)
           .resolves(undefined)
 
@@ -57,7 +57,7 @@ describe('AddFavoriOffreServiceCiviqueCommandHandler', () => {
         // Then
         expect(result).to.deep.equal(emptySuccess())
         expect(
-          offreServiceCiviqueRepository.saveAsFavori
+          offreServiceCiviqueRepository.save
         ).to.have.been.calledWithExactly(command.idJeune, command.offre)
       })
     })
@@ -65,7 +65,7 @@ describe('AddFavoriOffreServiceCiviqueCommandHandler', () => {
     describe('quand le favori existe déjà', () => {
       it('rejette', async () => {
         // Given
-        offreServiceCiviqueRepository.getFavori
+        offreServiceCiviqueRepository.get
           .withArgs(command.idJeune, command.offre.id)
           .resolves(uneOffreServiceCivique())
 
@@ -78,9 +78,7 @@ describe('AddFavoriOffreServiceCiviqueCommandHandler', () => {
         expect(result).to.deep.equal(
           failure(new FavoriExisteDejaError(command.idJeune, command.offre.id))
         )
-        expect(
-          offreServiceCiviqueRepository.saveAsFavori
-        ).not.to.have.been.called()
+        expect(offreServiceCiviqueRepository.save).not.to.have.been.called()
       })
     })
   })

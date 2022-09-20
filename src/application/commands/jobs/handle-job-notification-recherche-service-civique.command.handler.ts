@@ -17,10 +17,11 @@ import {
   JeuneConfigurationApplicationRepositoryToken
 } from '../../../domain/jeune/jeune'
 import { Notification } from '../../../domain/notification/notification'
-import { OffreServiceCivique } from '../../../domain/offre-service-civique'
-import { Recherche, RecherchesRepositoryToken } from '../../../domain/recherche'
+import {
+  Recherche,
+  RecherchesRepositoryToken
+} from '../../../domain/offre/recherche/recherche'
 import { DateService } from '../../../utils/date-service'
-import { GetServicesCiviqueQuery } from '../../queries/get-services-civique.query.handler'
 import { FindAllOffresServicesCiviqueQueryGetter } from '../../queries/query-getters/find-all-offres-services-civique.query.getter'
 
 export type HandleJobNotifierNouveauxServicesCiviqueCommand = Command
@@ -61,10 +62,9 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
     // On récupère les nouvelles offres depuis hier en considérant que le job tourne une fois par jour
     const hier = maintenant.minus({ day: 1 })
     const result = await this.findAllOffresServicesCiviqueQueryGetter.handle({
-      dateDeCreationMinimum: hier,
       page: 1,
       limit: PAGINATION_NOMBRE_D_OFFRES_MAXIMUM,
-      editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE
+      dateDeCreationMinimum: hier
     })
 
     if (isFailure(result)) {
@@ -83,13 +83,15 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
       }
 
       while (!toutesLesRecherchesOntEteAnalysees) {
-        const criteres: GetServicesCiviqueQuery = {
+        const depuisMinuit = maintenant.set({ hour: 0, minute: 0, second: 0 })
+        const criteres: Recherche.ServiceCivique = {
           domaine: offre.domaine,
           lat: offre.localisation.latitude,
           lon: offre.localisation.longitude,
           dateDeDebutMinimum: offre.dateDeDebut
+            ? DateTime.fromISO(offre.dateDeDebut)
+            : undefined
         }
-        const depuisMinuit = maintenant.set({ hour: 0, minute: 0, second: 0 })
         const recherches =
           await this.rechercheRepository.trouverLesRecherchesServicesCiviques(
             criteres,

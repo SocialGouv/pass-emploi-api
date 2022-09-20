@@ -1,11 +1,11 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
 import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator'
+import { Offre } from '../../../domain/offre/offre'
 import {
   transformStringToFloat,
   transformStringToInteger
 } from './utils/transformers'
-import { OffreServiceCivique } from '../../../domain/offre-service-civique'
 
 export interface GetServicesCiviqueQuery {
   lat?: number
@@ -52,17 +52,17 @@ export class GetServicesCiviqueQueryParams implements GetServicesCiviqueQuery {
   distance?: number
 
   @ApiPropertyOptional()
-  @IsDateString()
   @IsOptional()
+  @IsDateString()
   dateDeDebutMinimum?: string
 
   @ApiPropertyOptional()
-  @IsDateString()
   @IsOptional()
+  @IsDateString()
   dateDeDebutMaximum?: string
 
   @ApiPropertyOptional({
-    description: Object.values(OffreServiceCivique.Domaine).join(', ')
+    description: Object.values(Offre.ServiceCivique.Domaine).join(', ')
   })
   @IsString()
   @IsOptional()
@@ -87,12 +87,12 @@ export class ServicesCiviqueCriteresBody implements GetServicesCiviqueQuery {
   distance?: number
 
   @ApiPropertyOptional()
-  @IsDateString()
   @IsOptional()
+  @IsDateString()
   dateDeDebutMinimum?: string
 
   @ApiPropertyOptional({
-    description: Object.values(OffreServiceCivique.Domaine).join(', ')
+    description: Object.values(Offre.ServiceCivique.Domaine).join(', ')
   })
   @IsString()
   @IsOptional()

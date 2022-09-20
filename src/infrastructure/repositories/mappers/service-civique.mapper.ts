@@ -4,17 +4,17 @@ import {
   EngagementDto,
   OffreEngagementDto
 } from '../offre-service-civique-http.repository.db'
-import { OffreServiceCivique } from '../../../domain/offre-service-civique'
+import { Offre } from '../../../domain/offre/offre'
 
 export function toOffresServicesCivique(
   servicesCiviqueDto: EngagementDto
-): OffreServiceCivique[] {
+): Offre.Favori.ServiceCivique[] {
   return servicesCiviqueDto.hits.map(toOffreEngagement)
 }
 
 export function toOffreEngagement(
   serviceCiviqueDto: OffreEngagementDto
-): OffreServiceCivique {
+): Offre.Favori.ServiceCivique {
   return {
     id: serviceCiviqueDto.id,
     titre: serviceCiviqueDto.title,
@@ -45,7 +45,7 @@ export function fromSqlToIds(
 
 export function fromSqlToOffreServiceCivique(
   favoriOffreEngagementSqlModel: FavoriOffreEngagementSqlModel
-): OffreServiceCivique {
+): Offre.Favori.ServiceCivique {
   return {
     id: favoriOffreEngagementSqlModel.idOffre,
     domaine: favoriOffreEngagementSqlModel.domaine,

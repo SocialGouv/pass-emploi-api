@@ -9,15 +9,15 @@ import {
 import { FavoriExisteDejaError } from '../../../src/building-blocks/types/domain-error'
 import { failure } from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
-import { OffresImmersion } from '../../../src/domain/offre-immersion'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneOffreImmersion } from '../../fixtures/offre-immersion.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import Utilisateur = Authentification.Utilisateur
+import { Offre } from '../../../src/domain/offre/offre'
 
 describe('AddFavoriOffreImmersionCommandHandler', () => {
-  let offresImmersionRepository: StubbedType<OffresImmersion.Repository>
+  let offresImmersionRepository: StubbedType<Offre.Favori.Immersion.Repository>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let addFavoriOffreImmersionCommandHandler: AddFavoriOffreImmersionCommandHandler
   let evenementService: StubbedClass<EvenementService>
@@ -44,7 +44,7 @@ describe('AddFavoriOffreImmersionCommandHandler', () => {
         idJeune: jeune.id,
         offreImmersion: offreImmersion
       }
-      offresImmersionRepository.getFavori
+      offresImmersionRepository.get
         .withArgs(jeune.id, offreImmersion.id)
         .resolves(undefined)
 
@@ -52,7 +52,7 @@ describe('AddFavoriOffreImmersionCommandHandler', () => {
       await addFavoriOffreImmersionCommandHandler.handle(command)
 
       // Then
-      expect(offresImmersionRepository.saveAsFavori).to.have.been.calledWith(
+      expect(offresImmersionRepository.save).to.have.been.calledWith(
         command.idJeune,
         command.offreImmersion
       )
@@ -65,7 +65,7 @@ describe('AddFavoriOffreImmersionCommandHandler', () => {
         idJeune: jeune.id,
         offreImmersion: offreImmersion
       }
-      offresImmersionRepository.getFavori
+      offresImmersionRepository.get
         .withArgs(jeune.id, offreImmersion.id)
         .resolves(offreImmersion)
 

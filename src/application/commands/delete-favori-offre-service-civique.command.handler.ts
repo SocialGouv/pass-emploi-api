@@ -8,11 +8,9 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import {
-  OffreServiceCiviqueRepositoryToken,
-  OffreServiceCivique
-} from '../../domain/offre-service-civique'
+import { OffreServiceCiviqueRepositoryToken } from '../../domain/offre/favori/offre-service-civique'
 import { FavoriOffreServiceCiviqueAuthorizer } from '../authorizers/authorize-favori-offres-engagement'
+import { Offre } from '../../domain/offre/offre'
 
 export interface DeleteFavoriOffreServiceCiviqueCommand extends Command {
   idOffre: string
@@ -20,13 +18,13 @@ export interface DeleteFavoriOffreServiceCiviqueCommand extends Command {
 }
 
 @Injectable()
-export class DeleteFavoriOffreEngagementCommandHandler extends CommandHandler<
+export class DeleteFavoriOffreServiceCiviqueCommandHandler extends CommandHandler<
   DeleteFavoriOffreServiceCiviqueCommand,
   void
 > {
   constructor(
     @Inject(OffreServiceCiviqueRepositoryToken)
-    private readonly offreServiceCiviqueRepository: OffreServiceCivique.Repository,
+    private readonly offreServiceCiviqueRepository: Offre.Favori.ServiceCivique.Repository,
     private readonly favoriOffreEngagementAuthorizer: FavoriOffreServiceCiviqueAuthorizer
   ) {
     super('DeleteFavoriCommandHandler')
@@ -35,7 +33,7 @@ export class DeleteFavoriOffreEngagementCommandHandler extends CommandHandler<
   async handle(
     command: DeleteFavoriOffreServiceCiviqueCommand
   ): Promise<Result> {
-    const favoriOffre = await this.offreServiceCiviqueRepository.getFavori(
+    const favoriOffre = await this.offreServiceCiviqueRepository.get(
       command.idJeune,
       command.idOffre
     )
@@ -43,7 +41,7 @@ export class DeleteFavoriOffreEngagementCommandHandler extends CommandHandler<
     if (!favoriOffre) {
       return failure(new FavoriNonTrouveError(command.idJeune, command.idOffre))
     }
-    await this.offreServiceCiviqueRepository.deleteFavori(
+    await this.offreServiceCiviqueRepository.delete(
       command.idJeune,
       command.idOffre
     )

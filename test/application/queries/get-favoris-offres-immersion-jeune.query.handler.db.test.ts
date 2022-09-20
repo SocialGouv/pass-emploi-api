@@ -34,7 +34,7 @@ describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
       })
     )
     const offresImmersionRepository = new OffresImmersionHttpSqlRepository()
-    await offresImmersionRepository.saveAsFavori(idJeune, uneOffreImmersion())
+    await offresImmersionRepository.save(idJeune, uneOffreImmersion())
 
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     getFavorisOffresImmersionJeuneQueryHandler =

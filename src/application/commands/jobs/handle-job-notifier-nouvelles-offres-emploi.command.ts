@@ -8,8 +8,7 @@ import {
   Result,
   success
 } from '../../../building-blocks/types/result'
-import { OffresEmploi } from '../../../domain/offre-emploi'
-import { Recherche, RecherchesRepositoryToken } from '../../../domain/recherche'
+import { RecherchesRepositoryToken } from '../../../domain/offre/recherche/recherche'
 import { DateService } from '../../../utils/date-service'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
@@ -26,6 +25,7 @@ import {
   NotificationSupport,
   NotificationSupportServiceToken
 } from '../../../domain/notification-support'
+import { Offre } from '../../../domain/offre/offre'
 
 @Injectable()
 export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
@@ -35,7 +35,7 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
   constructor(
     private dateService: DateService,
     @Inject(RecherchesRepositoryToken)
-    private rechercheRepository: Recherche.Repository,
+    private rechercheRepository: Offre.Recherche.Repository,
     private findAllOffresEmploiQueryGetter: FindAllOffresEmploiQueryGetter,
     private notificationService: Notification.Service,
     @Inject(JeuneConfigurationApplicationRepositoryToken)
@@ -68,7 +68,10 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
     try {
       while (true) {
         const recherches = await this.rechercheRepository.findAvantDate(
-          [Recherche.Type.OFFRES_EMPLOI, Recherche.Type.OFFRES_ALTERNANCE],
+          [
+            Offre.Recherche.Type.OFFRES_EMPLOI,
+            Offre.Recherche.Type.OFFRES_ALTERNANCE
+          ],
           nombreRecherches,
           maintenant
         )
@@ -87,10 +90,10 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
         for (let i = 0; i < recherches.length; i++) {
           const resultat = resultatsRecherches[i]
           const recherche = recherches[i]
-          let etatRecherche: Recherche.Etat = Recherche.Etat.ECHEC
+          let etatRecherche: Offre.Recherche.Etat = Offre.Recherche.Etat.ECHEC
 
           if (resultat.status === 'fulfilled' && isSuccess(resultat.value)) {
-            etatRecherche = Recherche.Etat.SUCCES
+            etatRecherche = Offre.Recherche.Etat.SUCCES
             stats.succes = stats.succes + 1
 
             if (resultat.value.data.results.length) {
@@ -155,12 +158,12 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
   }
 
   private async recupererLesNouvellesOffres(
-    recherche: Recherche
+    recherche: Offre.Recherche
   ): Promise<Result<OffresEmploiQueryModel>> {
     const criteresBasiques = recherche.criteres as
       | GetOffresEmploiQuery
       | undefined
-    const criteres: OffresEmploi.Criteres = {
+    const criteres: GetOffresEmploiQuery = {
       ...criteresBasiques,
       minDateCreation: recherche.dateDerniereRecherche,
       page: 1,

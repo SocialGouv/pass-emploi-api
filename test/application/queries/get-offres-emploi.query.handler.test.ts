@@ -6,10 +6,10 @@ import {
   GetOffresEmploiQuery,
   GetOffresEmploiQueryHandler
 } from '../../../src/application/queries/get-offres-emploi.query.handler'
-import { Contrat, Duree, Experience } from '../../../src/domain/offre-emploi'
 import { desOffresEmploiQueryModel } from '../../fixtures/query-models/offre-emploi.query-model.fixtures'
 import { success } from '../../../src/building-blocks/types/result'
 import { FindAllOffresEmploiQueryGetter } from '../../../src/application/queries/query-getters/find-all-offres-emploi.query.getter'
+import { Offre } from '../../../src/domain/offre/offre'
 
 describe('GetOffresEmploiQueryHandler', () => {
   let findAllOffresEmploi: StubbedClass<FindAllOffresEmploiQueryGetter>
@@ -42,10 +42,10 @@ describe('GetOffresEmploiQueryHandler', () => {
           q: 'boulanger',
           departement: '75',
           alternance: true,
-          experience: [Experience.entreUnEtTroisAns],
+          experience: [Offre.Emploi.Experience.entreUnEtTroisAns],
           debutantAccepte: false,
-          contrat: [Contrat.cdd],
-          duree: [Duree.tempsPlein]
+          contrat: [Offre.Emploi.Contrat.cdd],
+          duree: [Offre.Emploi.Duree.tempsPlein]
         }
 
         findAllOffresEmploi.handle
@@ -68,14 +68,14 @@ describe('GetOffresEmploiQueryHandler', () => {
           q: 'boulanger',
           departement: '75',
           alternance: true,
-          experience: [Experience.entreUnEtTroisAns],
+          experience: [Offre.Emploi.Experience.entreUnEtTroisAns],
           debutantAccepte: false,
-          contrat: [Contrat.cdd],
-          duree: [Duree.tempsPlein]
+          contrat: [Offre.Emploi.Contrat.cdd],
+          duree: [Offre.Emploi.Duree.tempsPlein]
         }
 
         findAllOffresEmploi.handle
-          .withArgs({ ...getOffresEmploiQuery, page: 1, limit: 50 })
+          .withArgs(getOffresEmploiQuery)
           .resolves(success(desOffresEmploiQueryModel()))
 
         // When
@@ -97,9 +97,9 @@ describe('GetOffresEmploiQueryHandler', () => {
           q: 'boulanger',
           departement: '75',
           alternance: true,
-          experience: [Experience.entreUnEtTroisAns],
-          contrat: [Contrat.cdd],
-          duree: [Duree.tempsPlein]
+          experience: [Offre.Emploi.Experience.entreUnEtTroisAns],
+          contrat: [Offre.Emploi.Contrat.cdd],
+          duree: [Offre.Emploi.Duree.tempsPlein]
         }
 
         // When
@@ -122,9 +122,9 @@ describe('GetOffresEmploiQueryHandler', () => {
           q: 'boulanger',
           departement: '75',
           alternance: false,
-          experience: [Experience.entreUnEtTroisAns],
-          contrat: [Contrat.cdd],
-          duree: [Duree.tempsPlein]
+          experience: [Offre.Emploi.Experience.entreUnEtTroisAns],
+          contrat: [Offre.Emploi.Contrat.cdd],
+          duree: [Offre.Emploi.Duree.tempsPlein]
         }
 
         // When

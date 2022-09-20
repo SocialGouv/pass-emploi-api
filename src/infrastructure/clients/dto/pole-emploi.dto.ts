@@ -127,12 +127,12 @@ export interface DemarcheDto {
 }
 
 export interface SuggestionDto {
-  appellation: {
+  appellation?: {
     libelle: string
     code: string
   }
-  contrats: Array<{
-    critereOre: boolean
+  contrats?: Array<{
+    critereOre?: boolean
     priorite: number
     type: {
       code: string
@@ -140,30 +140,34 @@ export interface SuggestionDto {
       libelleLong: string
     }
   }>
-  dureeExperience: {
+  dureeExperience?: {
     valeur: number
     unite: {
       code: string
       libelle: string
     }
   }
-  dureesHebdo: Array<{
-    critereOre: boolean
+  dureesHebdo?: Array<{
+    critereOre?: boolean
     tempsTravail: {
       code: string
       libelle: string
+      max?: number
+      min?: number
     }
   }>
-  mobiliteHabitation: {
+  mobiliteHabitation?: {
     valeur: number
     unite: {
       code: string
     }
   }
-  mobilites: Array<{
+  mobilites?: Array<{
     rayon: number
     lieu: {
       code: string
+      codeDepartement?: string
+      codePostal?: string
       libelle: string
       type: {
         code: string
@@ -175,11 +179,11 @@ export interface SuggestionDto {
       libelle: string
     }
   }>
-  rome: {
+  rome?: {
     libelle: string
     code: string
   }
-  salaire: {
+  salaire?: {
     remuneration: number
     libelle: string
     code: string
@@ -188,9 +192,9 @@ export interface SuggestionDto {
     libelle: string
     code: string
   }
-  typeCrefFranchise: boolean
-  typeCrefReprise: boolean
-  typeCrefCreation: boolean
+  typeCrefFranchise?: boolean
+  typeCrefReprise?: boolean
+  typeCrefCreation?: boolean
 }
 
 export enum DemarcheDtoEtat {

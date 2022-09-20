@@ -1,4 +1,3 @@
-import { OffreServiceCivique } from '../../../../src/domain/offre-service-civique'
 import { DateTime } from 'luxon'
 import {
   uneOffreServiceCivique,
@@ -9,6 +8,8 @@ import { failure, success } from '../../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import { EngagementClient } from '../../../../src/infrastructure/clients/engagement-client'
 import { FindAllOffresServicesCiviqueQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-services-civique.query.getter'
+import { Offre } from '../../../../src/domain/offre/offre'
+import { GetServicesCiviqueQuery } from '../../../../src/application/queries/get-services-civique.query.handler'
 
 describe('FindAllOffresServicesCiviqueQueryGetter', () => {
   let serviceCiviqueClient: StubbedClass<EngagementClient>
@@ -24,15 +25,14 @@ describe('FindAllOffresServicesCiviqueQueryGetter', () => {
     describe('Quand tout va bien', () => {
       it('quand tous les query params sont fournis', async () => {
         // Given
-        const criteres: OffreServiceCivique.Criteres = {
+        const criteres: GetServicesCiviqueQuery = {
           page: 1,
           limit: 50,
           dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
           lat: 48.86899229710103,
           lon: 2.3342718577284205,
           distance: 10,
-          domaine: 'environnement',
-          editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE
+          domaine: 'environnement'
         }
         const params = new URLSearchParams()
         params.append('size', '50')
@@ -42,7 +42,7 @@ describe('FindAllOffresServicesCiviqueQueryGetter', () => {
         params.append('startAt', 'lt:2022-02-17T10:00:00.000Z')
         params.append('distance', '10km')
         params.append('domain', 'environnement')
-        params.append('publisher', OffreServiceCivique.Editeur.SERVICE_CIVIQUE)
+        params.append('publisher', Offre.ServiceCivique.Editeur.SERVICE_CIVIQUE)
         params.append('sortBy', 'createdAt')
 
         serviceCiviqueClient.get.resolves({
@@ -69,15 +69,14 @@ describe('FindAllOffresServicesCiviqueQueryGetter', () => {
       })
       it('avec la deuxième page', async () => {
         // Given
-        const criteres: OffreServiceCivique.Criteres = {
+        const criteres: GetServicesCiviqueQuery = {
           page: 2,
           limit: 63,
-          dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
+          dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
           lat: 48.86899229710103,
           lon: 2.3342718577284205,
           distance: 10,
-          dateDeCreationMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
-          editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE
+          dateDeCreationMinimum: DateTime.fromISO('2022-02-17T10:00:00Z')
         }
         const params = new URLSearchParams()
         params.append('size', '63')
@@ -85,8 +84,8 @@ describe('FindAllOffresServicesCiviqueQueryGetter', () => {
         params.append('lat', '48.86899229710103')
         params.append('lon', '2.3342718577284205')
         params.append('startAt', 'lt:2022-02-17T10:00:00.000Z')
-        params.append('distance', '10')
-        params.append('publisher', OffreServiceCivique.Editeur.SERVICE_CIVIQUE)
+        params.append('distance', '10km')
+        params.append('publisher', Offre.ServiceCivique.Editeur.SERVICE_CIVIQUE)
         params.append('sortBy', 'createdAt')
         params.append('createdAt', 'gt:2022-02-17T10:00:00Z')
 
@@ -116,10 +115,9 @@ describe('FindAllOffresServicesCiviqueQueryGetter', () => {
     describe('Quand il y a une erreur', () => {
       it('renvoie une failure http', async () => {
         // Given
-        const criteres: OffreServiceCivique.Criteres = {
+        const criteres: GetServicesCiviqueQuery = {
           page: 1,
-          limit: 50,
-          editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE
+          limit: 50
         }
 
         serviceCiviqueClient.get.rejects({

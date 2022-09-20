@@ -1,13 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { Notification } from 'src/domain/notification/notification'
-import {
-  Contrat,
-  Duree,
-  Experience,
-  OffresEmploi
-} from 'src/domain/offre-emploi'
-import { Recherche } from 'src/domain/recherche'
+import { Recherche } from 'src/domain/offre/recherche/recherche'
 import { DateService } from 'src/utils/date-service'
 import {
   uneDatetime,
@@ -26,6 +20,7 @@ import { testConfig } from '../../../utils/module-for-testing'
 import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from '../../../../src/application/commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
 import { FindAllOffresEmploiQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-emploi.query.getter'
 import { NotificationSupport } from 'src/domain/notification-support'
+import { Offre } from '../../../../src/domain/offre/offre'
 
 describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
   let notifierNouvellesOffresEmploiCommandHandler: HandleJobNotifierNouvellesOffresEmploiCommandHandler
@@ -126,7 +121,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
 
         // Then
         expect(findAllOffresEmploiQueryGetter.handle).to.have.callCount(2)
-        const expectedFirstCall: OffresEmploi.Criteres = {
+        const expectedFirstCall: GetOffresEmploiQuery = {
           page: 1,
           limit: 2,
           q: 'test1',
@@ -135,7 +130,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         expect(findAllOffresEmploiQueryGetter.handle).to.have.been.calledWith(
           expectedFirstCall
         )
-        const expectedSecondCall: OffresEmploi.Criteres = {
+        const expectedSecondCall: GetOffresEmploiQuery = {
           page: 1,
           limit: 2,
           q: 'test2',
@@ -154,13 +149,20 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           departement: '75',
           alternance: false,
           experience: [
-            Experience.moinsdUnAn,
-            Experience.entreUnEtTroisAns,
-            Experience.plusDeTroisAns
+            Offre.Emploi.Experience.moinsdUnAn,
+            Offre.Emploi.Experience.entreUnEtTroisAns,
+            Offre.Emploi.Experience.plusDeTroisAns
           ],
           debutantAccepte: true,
-          contrat: [Contrat.autre, Contrat.cdi, Contrat.cdd],
-          duree: [Duree.tempsPartiel, Duree.tempsPlein],
+          contrat: [
+            Offre.Emploi.Contrat.autre,
+            Offre.Emploi.Contrat.cdi,
+            Offre.Emploi.Contrat.cdd
+          ],
+          duree: [
+            Offre.Emploi.Duree.tempsPartiel,
+            Offre.Emploi.Duree.tempsPlein
+          ],
           rayon: 100,
           commune: '75015'
         }
@@ -191,7 +193,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         await notifierNouvellesOffresEmploiCommandHandler.handle()
 
         // Then
-        const expected: OffresEmploi.Criteres = {
+        const expected: GetOffresEmploiQuery = {
           page: 1,
           limit: 2,
           q: criteres.q,
@@ -211,7 +213,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
       })
       it('envoie une notification', async () => {
         // Given
-        const criteres: OffresEmploi.Criteres = {
+        const criteres: GetOffresEmploiQuery = {
           page: 1,
           limit: 2,
           q: criteresRecherche1.q,

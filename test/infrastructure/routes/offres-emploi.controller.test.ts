@@ -11,7 +11,6 @@ import {
   GetOffresEmploiQuery,
   GetOffresEmploiQueryHandler
 } from '../../../src/application/queries/get-offres-emploi.query.handler'
-import { Contrat, Duree, Experience } from '../../../src/domain/offre-emploi'
 import { uneOffreEmploiResumeQueryModel } from '../../fixtures/offre-emploi.fixture'
 import {
   OffreEmploiQueryModel,
@@ -24,6 +23,7 @@ import {
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
+import { Offre } from '../../../src/domain/offre/offre'
 
 describe('OffresEmploiController', () => {
   let getOffresEmploiQueryHandler: StubbedClass<GetOffresEmploiQueryHandler>
@@ -60,10 +60,10 @@ describe('OffresEmploiController', () => {
           limit: '50',
           q: 'informatique',
           alternance: 'true',
-          experience: [Experience.moinsdUnAn],
+          experience: [Offre.Emploi.Experience.moinsdUnAn],
           debutantAccepte: 'true',
-          contrat: [Contrat.cdi, Contrat.cdd],
-          duree: [Duree.tempsPartiel],
+          contrat: [Offre.Emploi.Contrat.cdi, Offre.Emploi.Contrat.cdd],
+          duree: [Offre.Emploi.Duree.tempsPartiel],
           rayon: '10',
           commune: '75118'
         }
@@ -73,10 +73,10 @@ describe('OffresEmploiController', () => {
           q: 'informatique',
           departement: undefined,
           alternance: true,
-          experience: [Experience.moinsdUnAn],
+          experience: [Offre.Emploi.Experience.moinsdUnAn],
           debutantAccepte: true,
-          contrat: [Contrat.cdi, Contrat.cdd],
-          duree: [Duree.tempsPartiel],
+          contrat: [Offre.Emploi.Contrat.cdi, Offre.Emploi.Contrat.cdd],
+          duree: [Offre.Emploi.Duree.tempsPartiel],
           rayon: 10,
           commune: '75118'
         }
@@ -114,9 +114,9 @@ describe('OffresEmploiController', () => {
           limit: '50',
           q: 'informatique',
           alternance: 'true',
-          experience: [Experience.moinsdUnAn],
-          contrat: [Contrat.cdi, Contrat.cdd],
-          duree: [Duree.tempsPartiel],
+          experience: [Offre.Emploi.Experience.moinsdUnAn],
+          contrat: [Offre.Emploi.Contrat.cdi, Offre.Emploi.Contrat.cdd],
+          duree: [Offre.Emploi.Duree.tempsPartiel],
           rayon: '10',
           commune: '75118'
         }

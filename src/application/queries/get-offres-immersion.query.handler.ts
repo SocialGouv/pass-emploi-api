@@ -4,7 +4,6 @@ import { Evenement, EvenementService } from '../../domain/evenement'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
-import { OffresImmersion } from '../../domain/offre-immersion'
 import { OffreImmersionQueryModel } from './query-models/offres-immersion.query-model'
 import { FindAllOffresImmersionQueryGetter } from './query-getters/find-all-offres-immersion.query.getter'
 
@@ -30,15 +29,7 @@ export class GetOffresImmersionQueryHandler extends QueryHandler<
   async handle(
     query: GetOffresImmersionQuery
   ): Promise<Result<OffreImmersionQueryModel[]>> {
-    const distance = query.distance
-      ? query.distance
-      : OffresImmersion.DISTANCE_PAR_DEFAUT
-    return this.findAllOffresImmersionQueryGetter.handle({
-      rome: query.rome,
-      lat: query.lat,
-      lon: query.lon,
-      distance
-    })
+    return this.findAllOffresImmersionQueryGetter.handle(query)
   }
   async authorize(): Promise<Result> {
     return emptySuccess()

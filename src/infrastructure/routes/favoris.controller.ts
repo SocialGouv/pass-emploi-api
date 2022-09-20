@@ -41,8 +41,8 @@ import {
 } from '../../application/commands/delete-favori-offre-emploi.command.handler'
 import {
   DeleteFavoriOffreServiceCiviqueCommand,
-  DeleteFavoriOffreEngagementCommandHandler
-} from '../../application/commands/delete-favori-offre-engagement.command.handler'
+  DeleteFavoriOffreServiceCiviqueCommandHandler
+} from '../../application/commands/delete-favori-offre-service-civique.command.handler'
 import {
   DeleteFavoriOffreImmersionCommand,
   DeleteFavoriOffreImmersionCommandHandler
@@ -59,7 +59,7 @@ import {
   GetFavorisOffresImmersionQueryParams,
   GetFavorisServicesCiviqueQueryParams
 } from './validation/favoris.inputs'
-import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../application/queries/get-favoris-service-civique-jeune.query.handler'
+import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../application/queries/get-favoris-service-civique-jeune.query.handler.db'
 import { ServiceCiviqueQueryModel } from '../../application/queries/query-models/service-civique.query-model'
 import { Core } from '../../domain/core'
 import {
@@ -85,7 +85,7 @@ export class FavorisController {
     private readonly addFavoriOffreEngagementCommandHandler: AddFavoriOffreServiceCiviqueCommandHandler,
     private readonly deleteFavoriOffreEmploiCommandHandler: DeleteFavoriOffreEmploiCommandHandler,
     private readonly deleteFavoriOffreImmersionCommandHandler: DeleteFavoriOffreImmersionCommandHandler,
-    private readonly deleteFavoriOffreEngagementCommandHandler: DeleteFavoriOffreEngagementCommandHandler
+    private readonly deleteFavoriOffreEngagementCommandHandler: DeleteFavoriOffreServiceCiviqueCommandHandler
   ) {}
 
   @ApiOperation({

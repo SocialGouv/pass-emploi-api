@@ -1,14 +1,10 @@
-import {
-  OffreEmploi,
-  Localisation,
-  Contrat
-} from '../../../domain/offre-emploi'
 import { FavoriOffreEmploiSqlModel } from '../../sequelize/models/favori-offre-emploi.sql-model'
 import { OffreEmploiDto, OffresEmploiDto } from '../dto/pole-emploi.dto'
 import {
   FavoriOffreEmploiIdQueryModel,
   OffresEmploiQueryModel
 } from '../../../application/queries/query-models/offres-emploi.query-model'
+import { Offre } from '../../../domain/offre/offre'
 
 export function toOffresEmploiQueryModel(
   page: number,
@@ -44,7 +40,7 @@ export function toOffresEmploiQueryModel(
 
 export function toFavoriOffreEmploiSqlModel(
   idJeune: string,
-  offreEmploi: OffreEmploi
+  offreEmploi: Offre.Favori.Emploi
 ): Partial<FavoriOffreEmploiSqlModel> {
   return {
     idJeune: idJeune,
@@ -62,7 +58,7 @@ export function toFavoriOffreEmploiSqlModel(
 
 export function toOffreEmploi(
   favoriOffreEmploiSqlModel: FavoriOffreEmploiSqlModel
-): OffreEmploi {
+): Offre.Favori.Emploi {
   return {
     id: favoriOffreEmploiSqlModel.idOffre,
     alternance:
@@ -79,7 +75,7 @@ export function toOffreEmploi(
 
 export function buildLocalisation(
   favoriOffreEmploiSqlModel: FavoriOffreEmploiSqlModel
-): Localisation {
+): Offre.Favori.Emploi.Localisation {
   return {
     nom: favoriOffreEmploiSqlModel.nomLocalisation || '',
     codePostal: favoriOffreEmploiSqlModel.codePostalLocalisation || '',
@@ -94,12 +90,17 @@ export function fromSqlToFavorisOffresEmploiIdsQueryModels(
     return { id: favori.idOffre }
   })
 }
-export function toPoleEmploiContrat(contratsList: Contrat[]): string[] {
+
+export function toPoleEmploiContrat(
+  contratsList: Offre.Emploi.Contrat[]
+): string[] {
   const contratPoleEmploi = {
     CDI: 'CDI,DIN',
     'CDD-interim-saisonnier': 'CDD,MIS,SAI,DDI',
     autre: 'CCE,FRA,LIB,REP,TTI'
   }
 
-  return contratsList.map((contrat: Contrat) => contratPoleEmploi[contrat])
+  return contratsList.map(
+    (contrat: Offre.Emploi.Contrat) => contratPoleEmploi[contrat]
+  )
 }

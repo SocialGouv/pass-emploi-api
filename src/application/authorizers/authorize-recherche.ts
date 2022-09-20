@@ -6,7 +6,10 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Recherche, RecherchesRepositoryToken } from '../../domain/recherche'
+import {
+  Recherche,
+  RecherchesRepositoryToken
+} from '../../domain/offre/recherche/recherche'
 
 @Injectable()
 export class RechercheAuthorizer {

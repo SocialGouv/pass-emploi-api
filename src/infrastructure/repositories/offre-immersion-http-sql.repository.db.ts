@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common'
-import { OffreImmersion, OffresImmersion } from '../../domain/offre-immersion'
 import { FavoriOffreImmersionSqlModel } from '../sequelize/models/favori-offre-immersion.sql-model'
 import { fromSqlToOffreImmersion } from './mappers/offres-immersion.mappers'
+import { Offre } from '../../domain/offre/offre'
 
 @Injectable()
 export class OffresImmersionHttpSqlRepository
-  implements OffresImmersion.Repository
+  implements Offre.Favori.Immersion.Repository
 {
-  async getFavori(
+  async get(
     idJeune: string,
     idOffreImmersion: string
-  ): Promise<OffreImmersion | undefined> {
+  ): Promise<Offre.Favori.Immersion | undefined> {
     const result = await FavoriOffreImmersionSqlModel.findOne({
       where: {
         idJeune: idJeune,
@@ -23,9 +23,9 @@ export class OffresImmersionHttpSqlRepository
     return fromSqlToOffreImmersion(result)
   }
 
-  async saveAsFavori(
+  async save(
     idJeune: string,
-    offreImmersion: OffreImmersion
+    offreImmersion: Offre.Favori.Immersion
   ): Promise<void> {
     await FavoriOffreImmersionSqlModel.create({
       idOffre: offreImmersion.id,
@@ -37,7 +37,7 @@ export class OffresImmersionHttpSqlRepository
     })
   }
 
-  async deleteFavori(idJeune: string, idOffreImmersion: string): Promise<void> {
+  async delete(idJeune: string, idOffreImmersion: string): Promise<void> {
     await FavoriOffreImmersionSqlModel.destroy({
       where: {
         idOffre: idOffreImmersion,

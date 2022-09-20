@@ -9,21 +9,21 @@ import {
   IsBoolean,
   IsNumber
 } from 'class-validator'
-import { Contrat, Duree, Experience } from '../../../domain/offre-emploi'
 import {
   transformStringToInteger,
   transformStringToBoolean,
   transformStringToArray
 } from './utils/transformers'
+import { Offre } from '../../../domain/offre/offre'
 
 interface FindOffresEmploisQuery {
   q?: string
   departement?: string
   alternance?: boolean
-  experience?: Experience[]
+  experience?: Offre.Emploi.Experience[]
   debutantAccepte?: boolean
-  contrat?: Contrat[]
-  duree?: Duree[]
+  contrat?: Offre.Emploi.Contrat[]
+  duree?: Offre.Emploi.Duree[]
   commune?: string
   rayon?: number
 }
@@ -62,11 +62,11 @@ export class FindOffresEmploiQueryParams implements FindOffresEmploisQuery {
   @Transform(params => transformStringToBoolean(params, 'alternance'))
   alternance?: boolean
 
-  @ApiPropertyOptional({ enum: Experience, isArray: true })
+  @ApiPropertyOptional({ enum: Offre.Emploi.Experience, isArray: true })
   @IsOptional()
-  @IsEnum(Experience, { each: true })
+  @IsEnum(Offre.Emploi.Experience, { each: true })
   @Transform(params => transformStringToArray(params, 'experience'))
-  experience?: Experience[]
+  experience?: Offre.Emploi.Experience[]
 
   @ApiPropertyOptional()
   @IsBoolean()
@@ -75,17 +75,17 @@ export class FindOffresEmploiQueryParams implements FindOffresEmploisQuery {
   @Transform(params => transformStringToBoolean(params, 'debutantAccepte'))
   debutantAccepte?: boolean
 
-  @ApiPropertyOptional({ enum: Contrat, isArray: true })
+  @ApiPropertyOptional({ enum: Offre.Emploi.Contrat, isArray: true })
   @IsOptional()
-  @IsEnum(Contrat, { each: true })
+  @IsEnum(Offre.Emploi.Contrat, { each: true })
   @Transform(params => transformStringToArray(params, 'contrat'))
-  contrat?: Contrat[]
+  contrat?: Offre.Emploi.Contrat[]
 
-  @ApiPropertyOptional({ enum: Duree, isArray: true })
+  @ApiPropertyOptional({ enum: Offre.Emploi.Duree, isArray: true })
   @IsOptional()
-  @IsEnum(Duree, { each: true })
+  @IsEnum(Offre.Emploi.Duree, { each: true })
   @Transform(params => transformStringToArray(params, 'duree'))
-  duree?: Duree[]
+  duree?: Offre.Emploi.Duree[]
 
   @ApiPropertyOptional()
   @IsString()
@@ -119,10 +119,10 @@ export class FindOffresEmploiQueryBody implements FindOffresEmploisQuery {
   @IsIn([true, false])
   alternance?: boolean
 
-  @ApiPropertyOptional({ enum: Experience, isArray: true })
+  @ApiPropertyOptional({ enum: Offre.Emploi.Experience, isArray: true })
   @IsOptional()
-  @IsEnum(Experience, { each: true })
-  experience?: Experience[]
+  @IsEnum(Offre.Emploi.Experience, { each: true })
+  experience?: Offre.Emploi.Experience[]
 
   @ApiPropertyOptional()
   @IsBoolean()
@@ -130,15 +130,15 @@ export class FindOffresEmploiQueryBody implements FindOffresEmploisQuery {
   @IsIn([true, false])
   debutantAccepte?: boolean
 
-  @ApiPropertyOptional({ enum: Contrat, isArray: true })
+  @ApiPropertyOptional({ enum: Offre.Emploi.Contrat, isArray: true })
   @IsOptional()
-  @IsEnum(Contrat, { each: true })
-  contrat?: Contrat[]
+  @IsEnum(Offre.Emploi.Contrat, { each: true })
+  contrat?: Offre.Emploi.Contrat[]
 
-  @ApiPropertyOptional({ enum: Duree, isArray: true })
+  @ApiPropertyOptional({ enum: Offre.Emploi.Duree, isArray: true })
   @IsOptional()
-  @IsEnum(Duree, { each: true })
-  duree?: Duree[]
+  @IsEnum(Offre.Emploi.Duree, { each: true })
+  duree?: Offre.Emploi.Duree[]
 
   @ApiPropertyOptional()
   @IsString()

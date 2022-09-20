@@ -2,13 +2,13 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { FavoriOffresImmersionAuthorizer } from '../../../src/application/authorizers/authorize-favori-offres-immersion'
-import { OffresImmersion } from '../../../src/domain/offre-immersion'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { uneOffreImmersion } from '../../fixtures/offre-immersion.fixture'
 import { createSandbox, expect } from '../../utils'
+import { Offre } from '../../../src/domain/offre/offre'
 
 describe('FavoriOffresImmersionAuthorizer', () => {
-  let offresImmersionRepository: StubbedType<OffresImmersion.Repository>
+  let offresImmersionRepository: StubbedType<Offre.Favori.Immersion.Repository>
   let favoriOffresImmersionAuthorizer: FavoriOffresImmersionAuthorizer
 
   beforeEach(() => {
@@ -26,7 +26,7 @@ describe('FavoriOffresImmersionAuthorizer', () => {
         const utilisateur = unUtilisateurJeune()
         const offreImmersion = uneOffreImmersion()
 
-        offresImmersionRepository.getFavori
+        offresImmersionRepository.get
           .withArgs(utilisateur.id, offreImmersion.id)
           .resolves(offreImmersion)
 
@@ -47,7 +47,7 @@ describe('FavoriOffresImmersionAuthorizer', () => {
         const utilisateur = unUtilisateurJeune()
         const offreImmersion = uneOffreImmersion()
 
-        offresImmersionRepository.getFavori
+        offresImmersionRepository.get
           .withArgs(utilisateur.id, 'une-offre')
           .resolves(undefined)
 

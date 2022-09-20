@@ -1,4 +1,5 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { uneDatetime } from '../../fixtures/date.fixture'
 import {
   buildTestingModuleForHttpTesting,
   expect,
@@ -12,12 +13,10 @@ import {
 } from '../../fixtures/authentification.fixture'
 import * as request from 'supertest'
 import { CreateRechercheCommandHandler } from '../../../src/application/commands/create-recherche.command.handler'
-import { Recherche } from '../../../src/domain/recherche'
-import { Contrat, Duree, Experience } from '../../../src/domain/offre-emploi'
+import { Recherche } from '../../../src/domain/offre/recherche/recherche'
 import {
   CreateRechercheImmersionPayload,
-  CreateRechercheOffresEmploiPayload,
-  CreateRechercheServiceCiviquePayload
+  CreateRechercheOffresEmploiPayload
 } from '../../../src/infrastructure/routes/validation/recherches.inputs'
 import { GetRecherchesQueryHandler } from '../../../src/application/queries/get-recherches.query.handler.db'
 import { RechercheQueryModel } from '../../../src/application/queries/query-models/recherches.query-model'
@@ -32,6 +31,7 @@ import {
 } from '../../../src/application/commands/delete-recherche.command.handler'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import { Offre } from '../../../src/domain/offre/offre'
 
 describe('RecherchesController', () => {
   let createRechercheCommandHandler: StubbedClass<CreateRechercheCommandHandler>
@@ -102,10 +102,10 @@ describe('RecherchesController', () => {
             q: 'informatique',
             alternance: true,
             departement: 'Ile-de-France',
-            experience: [Experience.moinsdUnAn],
+            experience: [Offre.Emploi.Experience.moinsdUnAn],
             debutantAccepte: true,
-            contrat: [Contrat.cdi, Contrat.cdd],
-            duree: [Duree.tempsPartiel],
+            contrat: [Offre.Emploi.Contrat.cdi, Offre.Emploi.Contrat.cdd],
+            duree: [Offre.Emploi.Duree.tempsPartiel],
             rayon: 10,
             commune: '75118'
           }
@@ -132,10 +132,10 @@ describe('RecherchesController', () => {
               q: 'informatique',
               alternance: true,
               departement: 'Ile-de-France',
-              experience: [Experience.moinsdUnAn],
+              experience: [Offre.Emploi.Experience.moinsdUnAn],
               debutantAccepte: true,
-              contrat: [Contrat.cdi, Contrat.cdd],
-              duree: [Duree.tempsPartiel],
+              contrat: [Offre.Emploi.Contrat.cdi, Offre.Emploi.Contrat.cdd],
+              duree: [Offre.Emploi.Duree.tempsPartiel],
               rayon: 10,
               commune: '75118'
             }
@@ -200,7 +200,7 @@ describe('RecherchesController', () => {
     describe('Quand la recherche est un service civique', () => {
       it('crée la recherche avec les critères renseignés', async () => {
         // Given
-        const createRecherchePayload: CreateRechercheServiceCiviquePayload = {
+        const payload = {
           titre: 'Ma recherche',
           localisation: 'Saint Étienne',
           criteres: {
@@ -208,7 +208,7 @@ describe('RecherchesController', () => {
             lat: 12345,
             lon: 67890,
             distance: 30,
-            dateDeDebutMinimum: '1998-07-12T10:12:14.000Z'
+            dateDeDebutMinimum: uneDatetime.toJSDate().toISOString()
           }
         }
 
@@ -216,7 +216,7 @@ describe('RecherchesController', () => {
         await request(app.getHttpServer())
           .post('/jeunes/1/recherches/services-civique')
           .set('authorization', unHeaderAuthorization())
-          .send(createRecherchePayload)
+          .send(payload)
 
           // Then
           .expect(HttpStatus.CREATED)
@@ -234,7 +234,7 @@ describe('RecherchesController', () => {
               lat: 12345,
               lon: 67890,
               distance: 30,
-              dateDeDebutMinimum: '1998-07-12T10:12:14.000Z'
+              dateDeDebutMinimum: uneDatetime.toUTC()
             }
           },
           unUtilisateurDecode()
@@ -259,10 +259,10 @@ describe('RecherchesController', () => {
           criteres: {
             q: 'informatique',
             alternance: true,
-            experience: [Experience.moinsdUnAn],
+            experience: [Offre.Emploi.Experience.moinsdUnAn],
             debutantAccepte: true,
-            contrat: [Contrat.cdi, Contrat.cdd],
-            duree: [Duree.tempsPartiel],
+            contrat: [Offre.Emploi.Contrat.cdi, Offre.Emploi.Contrat.cdd],
+            duree: [Offre.Emploi.Duree.tempsPartiel],
             rayon: 10,
             commune: '75118'
           }
