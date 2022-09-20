@@ -249,9 +249,10 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
     dateDebut: Date,
     dateFin: Date
   ): boolean {
-    return Boolean(
-      actionSql.dateFinReelle &&
-        DateService.isBetweenDates(actionSql.dateFinReelle!, dateDebut, dateFin)
+    return (
+      actionSql.statut === Action.Statut.TERMINEE &&
+      actionSql.dateFinReelle !== null &&
+      DateService.isBetweenDates(actionSql.dateFinReelle, dateDebut, dateFin)
     )
   }
 
