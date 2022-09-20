@@ -7,7 +7,10 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Recherche, RecherchesRepositoryToken } from '../../domain/recherche'
+import {
+  Recherche,
+  RecherchesRepositoryToken
+} from '../../domain/offre/recherche/recherche'
 import { RechercheAuthorizer } from '../authorizers/authorize-recherche'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
 
@@ -37,7 +40,7 @@ export class DeleteRechercheCommandHandler extends CommandHandler<
     if (!rechercheExistante) {
       return failure(new NonTrouveError('Recherche', command.idRecherche))
     }
-    await this.rechercheRepository.deleteRecherche(command.idRecherche)
+    await this.rechercheRepository.delete(command.idRecherche)
     return emptySuccess()
   }
 

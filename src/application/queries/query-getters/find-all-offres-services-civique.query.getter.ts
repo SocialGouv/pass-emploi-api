@@ -1,11 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { failure, Result, success } from '../../../building-blocks/types/result'
 import { URLSearchParams } from 'url'
 import { ErreurHttp } from '../../../building-blocks/types/domain-error'
-import { OffreServiceCivique } from '../../../domain/offre-service-civique'
+import { failure, Result, success } from '../../../building-blocks/types/result'
+import { Offre } from '../../../domain/offre/offre'
+import { EngagementClient } from '../../../infrastructure/clients/engagement-client'
 import { toOffresServicesCivique } from '../../../infrastructure/repositories/mappers/service-civique.mapper'
 import { EngagementDto } from '../../../infrastructure/repositories/offre-service-civique-http.repository.db'
-import { EngagementClient } from '../../../infrastructure/clients/engagement-client'
+import { GetServicesCiviqueQuery } from '../get-services-civique.query.handler'
+
+const DEFAULT_PAGE = 1
+const DEFAULT_LIMIT = 50
 
 @Injectable()
 export class FindAllOffresServicesCiviqueQueryGetter {
@@ -16,10 +20,10 @@ export class FindAllOffresServicesCiviqueQueryGetter {
   }
 
   async handle(
-    criteres: OffreServiceCivique.Criteres
-  ): Promise<Result<OffreServiceCivique[]>> {
+    query: GetServicesCiviqueQuery
+  ): Promise<Result<Offre.Favori.ServiceCivique[]>> {
     try {
-      const params = this.construireLesParams(criteres)
+      const params = this.construireLesParams(query)
       const response = await this.engagementClient.get<EngagementDto>(
         'v0/mission/search',
         params
@@ -39,7 +43,7 @@ export class FindAllOffresServicesCiviqueQueryGetter {
   }
 
   private construireLesParams(
-    criteres: OffreServiceCivique.Criteres
+    criteres: GetServicesCiviqueQuery
   ): URLSearchParams {
     const {
       page,
@@ -50,12 +54,17 @@ export class FindAllOffresServicesCiviqueQueryGetter {
       dateDeDebutMinimum,
       distance,
       domaine,
-      editeur,
       dateDeCreationMinimum
     } = criteres
+    const limiteAvecDefault = limit || DEFAULT_LIMIT
+    const pageAvecDefault = page || DEFAULT_PAGE
+
     const params = new URLSearchParams()
-    params.append('size', limit.toString())
-    params.append('from', (page * limit - limit).toString())
+    params.append('size', limiteAvecDefault.toString())
+    params.append(
+      'from',
+      (pageAvecDefault * limiteAvecDefault - limiteAvecDefault).toString()
+    )
 
     if (lat) {
       params.append('lat', lat.toString())
@@ -79,7 +88,7 @@ export class FindAllOffresServicesCiviqueQueryGetter {
       params.append('domain', domaine)
     }
 
-    params.append('publisher', editeur)
+    params.append('publisher', Offre.ServiceCivique.Editeur.SERVICE_CIVIQUE)
     params.append('sortBy', 'createdAt')
     return params
   }

@@ -5,18 +5,15 @@ import {
   LocalisationQueryModel,
   OffreImmersionQueryModel
 } from '../../../application/queries/query-models/offres-immersion.query-model'
-import {
-  OffreImmersion,
-  OffresImmersion
-} from '../../../domain/offre-immersion'
 import { FavoriOffreImmersionSqlModel } from '../../sequelize/models/favori-offre-immersion.sql-model'
 import { PartenaireImmersion } from '../dto/immersion.dto'
+import { Offre } from '../../../domain/offre/offre'
 
 const fromContactMode = {
-  UNKNOWN: OffresImmersion.MethodeDeContact.INCONNU,
-  EMAIL: OffresImmersion.MethodeDeContact.EMAIL,
-  PHONE: OffresImmersion.MethodeDeContact.TELEPHONE,
-  IN_PERSON: OffresImmersion.MethodeDeContact.PRESENTIEL
+  UNKNOWN: Offre.Immersion.MethodeDeContact.INCONNU,
+  EMAIL: Offre.Immersion.MethodeDeContact.EMAIL,
+  PHONE: Offre.Immersion.MethodeDeContact.TELEPHONE,
+  IN_PERSON: Offre.Immersion.MethodeDeContact.PRESENTIEL
 }
 
 export function fromSqlToFavorisOffresImmersionIdsQueryModels(
@@ -29,7 +26,7 @@ export function fromSqlToFavorisOffresImmersionIdsQueryModels(
 
 export function fromSqlToOffreImmersion(
   offresImmersionFavoriSql: FavoriOffreImmersionSqlModel
-): OffreImmersion {
+): Offre.Favori.Immersion {
   return {
     id: offresImmersionFavoriSql.idOffre,
     metier: offresImmersionFavoriSql.metier,

@@ -7,7 +7,7 @@ import {
   Table
 } from 'sequelize-typescript'
 import { Polygon } from 'geojson'
-import { Recherche } from '../../../domain/recherche'
+import { Recherche } from '../../../domain/offre/recherche/recherche'
 import { GetOffresEmploiQuery } from '../../../application/queries/get-offres-emploi.query.handler'
 import { GetOffresImmersionQuery } from '../../../application/queries/get-offres-immersion.query.handler'
 import { JeuneSqlModel } from './jeune.sql-model'

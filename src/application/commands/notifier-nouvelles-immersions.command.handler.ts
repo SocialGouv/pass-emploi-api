@@ -11,7 +11,10 @@ import {
   JeuneConfigurationApplicationRepositoryToken
 } from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification/notification'
-import { Recherche, RecherchesRepositoryToken } from '../../domain/recherche'
+import {
+  Recherche,
+  RecherchesRepositoryToken
+} from '../../domain/offre/recherche/recherche'
 import { DateService } from '../../utils/date-service'
 import { GetOffresImmersionQuery } from '../queries/get-offres-immersion.query.handler'
 
@@ -56,7 +59,7 @@ export class NotifierNouvellesImmersionsCommandHandler extends CommandHandler<
 
     for (const immersion of command.immersions) {
       if (immersion.location) {
-        const criteres: GetOffresImmersionQuery = {
+        const query: GetOffresImmersionQuery = {
           rome: immersion.rome,
           lat: immersion.location.lat,
           lon: immersion.location.lon
@@ -68,7 +71,7 @@ export class NotifierNouvellesImmersionsCommandHandler extends CommandHandler<
         while (!toutesLesRecherchesOntEteAnalysees) {
           const recherches =
             await this.recherchesRepository.trouverLesRecherchesImmersions(
-              criteres,
+              query,
               LIMITE_PAGINATION,
               offset
             )

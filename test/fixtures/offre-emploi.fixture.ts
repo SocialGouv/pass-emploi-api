@@ -1,15 +1,13 @@
 import { OffreEmploiResumeQueryModel } from 'src/application/queries/query-models/offres-emploi.query-model'
-import { OffreEmploi } from '../../src/domain/offre-emploi'
+import { Emploi } from '../../src/domain/offre/favori/offre-emploi'
 import {
   NotificationsPartenairesDto,
   OffreEmploiDto,
   TypeRDVPE
 } from '../../src/infrastructure/repositories/dto/pole-emploi.dto'
 
-export const uneOffreEmploi = (
-  args: Partial<OffreEmploi> = {}
-): OffreEmploi => {
-  const defaults: OffreEmploi = {
+export const uneOffreEmploi = (args: Partial<Emploi> = {}): Emploi => {
+  const defaults: Emploi = {
     id: '123DXPM',
     titre: 'Technicien / Technicienne en froid et climatisation',
     typeContrat: 'MIS',

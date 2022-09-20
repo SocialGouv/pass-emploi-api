@@ -8,7 +8,7 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { RechercheAuthorizer } from '../../../src/application/authorizers/authorize-recherche'
-import { Recherche } from '../../../src/domain/recherche'
+import { Recherche } from '../../../src/domain/offre/recherche/recherche'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
 import {
   DeleteRechercheCommand,
@@ -51,7 +51,7 @@ describe('DeleteRechercheCommandHandler', () => {
         // When
         const result = await deleteRechercheCommandHandler.handle(command)
         // Then
-        expect(rechercheSqlRepository.deleteRecherche).to.have.been.calledWith(
+        expect(rechercheSqlRepository.delete).to.have.been.calledWith(
           command.idRecherche
         )
         expect(result).to.deep.equal(emptySuccess())
@@ -75,9 +75,9 @@ describe('DeleteRechercheCommandHandler', () => {
         expect(result).to.deep.equal(
           failure(new NonTrouveError('Recherche', command.idRecherche))
         )
-        expect(
-          rechercheSqlRepository.deleteRecherche
-        ).not.to.have.been.calledWith(command.idRecherche)
+        expect(rechercheSqlRepository.delete).not.to.have.been.calledWith(
+          command.idRecherche
+        )
       })
     })
   })

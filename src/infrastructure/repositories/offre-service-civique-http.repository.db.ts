@@ -1,84 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common'
-import {
-  ErreurHttp,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
-import { failure, Result, success } from '../../building-blocks/types/result'
-import { Core } from '../../domain/core'
-import { OffreServiceCivique } from '../../domain/offre-service-civique'
-import { EngagementClient } from '../clients/engagement-client'
+import { Injectable } from '@nestjs/common'
 import { FavoriOffreEngagementSqlModel } from '../sequelize/models/favori-offre-engagement.sql-model'
-import {
-  fromSqlToIds,
-  fromSqlToOffreServiceCivique,
-  toOffreEngagement
-} from './mappers/service-civique.mapper'
+import { fromSqlToOffreServiceCivique } from './mappers/service-civique.mapper'
+import { Offre } from '../../domain/offre/offre'
 
 @Injectable()
 export class OffreServiceCiviqueHttpSqlRepository
-  implements OffreServiceCivique.Repository
+  implements Offre.Favori.ServiceCivique.Repository
 {
-  private logger: Logger
-
-  constructor(private engagementClient: EngagementClient) {
-    this.logger = new Logger('OffreServiceCiviqueHttpSqlRepository')
-  }
-
-  async getServiceCiviqueById(
-    idOffreEngagement: string
-  ): Promise<Result<OffreServiceCivique>> {
-    try {
-      const response =
-        await this.engagementClient.get<DetailOffreEngagementDto>(
-          `v0/mission/${idOffreEngagement}`
-        )
-      return success(toOffreEngagement(response.data.data))
-    } catch (e) {
-      this.logger.error(e)
-      if (e.response?.status >= 400 && e.response?.status < 500) {
-        if (e.response?.status == 404) {
-          const erreur = new NonTrouveError(
-            'OffreEngagement',
-            idOffreEngagement
-          )
-          return failure(erreur)
-        } else {
-          const erreur = new ErreurHttp(
-            e.response.data?.message,
-            e.response.status
-          )
-          return failure(erreur)
-        }
-      }
-      return failure(e)
-    }
-  }
-
-  async getFavorisIdsByJeune(idJeune: string): Promise<Core.Id[]> {
-    const favorisIdsSql = await FavoriOffreEngagementSqlModel.findAll({
-      attributes: ['idOffre'],
-      where: {
-        idJeune
-      }
-    })
-
-    return fromSqlToIds(favorisIdsSql)
-  }
-
-  async getFavorisByJeune(idJeune: string): Promise<OffreServiceCivique[]> {
-    const favorisSql = await FavoriOffreEngagementSqlModel.findAll({
-      where: {
-        idJeune
-      }
-    })
-
-    return favorisSql.map(fromSqlToOffreServiceCivique)
-  }
-
-  async getFavori(
+  async get(
     idJeune: string,
     idOffre: string
-  ): Promise<OffreServiceCivique | undefined> {
+  ): Promise<Offre.Favori.ServiceCivique | undefined> {
     const result = await FavoriOffreEngagementSqlModel.findOne({
       where: {
         idJeune,
@@ -93,9 +25,9 @@ export class OffreServiceCiviqueHttpSqlRepository
     return fromSqlToOffreServiceCivique(result)
   }
 
-  async saveAsFavori(
+  async save(
     idJeune: string,
-    offre: OffreServiceCivique
+    offre: Offre.Favori.ServiceCivique
   ): Promise<void> {
     await FavoriOffreEngagementSqlModel.create({
       idOffre: offre.id,
@@ -108,7 +40,7 @@ export class OffreServiceCiviqueHttpSqlRepository
     })
   }
 
-  async deleteFavori(idJeune: string, idOffre: string): Promise<void> {
+  async delete(idJeune: string, idOffre: string): Promise<void> {
     await FavoriOffreEngagementSqlModel.destroy({
       where: {
         idOffre,

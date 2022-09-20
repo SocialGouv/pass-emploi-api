@@ -10,12 +10,8 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { ServiceCiviqueQueryModel } from './query-models/service-civique.query-model'
-import { OffreServiceCivique } from '../../domain/offre-service-civique'
 import { DateTime } from 'luxon'
 import { FindAllOffresServicesCiviqueQueryGetter } from './query-getters/find-all-offres-services-civique.query.getter'
-
-const DEFAULT_PAGE = 1
-const DEFAULT_LIMIT = 50
 
 export interface GetServicesCiviqueQuery extends Query {
   page?: number
@@ -23,9 +19,10 @@ export interface GetServicesCiviqueQuery extends Query {
   lat?: number
   lon?: number
   distance?: number
-  dateDeDebutMinimum?: string
-  dateDeDebutMaximum?: string
+  dateDeDebutMinimum?: DateTime
+  dateDeDebutMaximum?: DateTime
   domaine?: string
+  dateDeCreationMinimum?: DateTime
 }
 
 @Injectable()
@@ -43,23 +40,8 @@ export class GetServicesCiviqueQueryHandler extends QueryHandler<
   async handle(
     query: GetServicesCiviqueQuery
   ): Promise<Result<ServiceCiviqueQueryModel[]>> {
-    const criteres: OffreServiceCivique.Criteres = {
-      ...query,
-      distance: query.distance
-        ? query.distance
-        : OffreServiceCivique.DISTANCE_PAR_DEFAUT,
-      dateDeDebutMinimum: query.dateDeDebutMinimum
-        ? DateTime.fromISO(query.dateDeDebutMinimum)
-        : undefined,
-      dateDeDebutMaximum: query.dateDeDebutMaximum
-        ? DateTime.fromISO(query.dateDeDebutMaximum)
-        : undefined,
-      editeur: OffreServiceCivique.Editeur.SERVICE_CIVIQUE,
-      page: query.page || DEFAULT_PAGE,
-      limit: query.limit || DEFAULT_LIMIT
-    }
     const result = await this.findAllOffresServicesCiviqueQueryGetter.handle(
-      criteres
+      query
     )
 
     if (isFailure(result)) {

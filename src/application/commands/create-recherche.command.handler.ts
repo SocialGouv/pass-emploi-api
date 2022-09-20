@@ -5,13 +5,13 @@ import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
-import { Recherche, RecherchesRepositoryToken } from '../../domain/recherche'
+import {
+  Recherche,
+  RecherchesRepositoryToken
+} from '../../domain/offre/recherche/recherche'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { DateService } from '../../utils/date-service'
-import { GetOffresEmploiQuery } from '../queries/get-offres-emploi.query.handler'
-import { GetOffresImmersionQuery } from '../queries/get-offres-immersion.query.handler'
-import { GetServicesCiviqueQuery } from '../queries/get-services-civique.query.handler'
 
 export interface CreateRechercheCommand extends Command {
   idJeune: string
@@ -19,10 +19,7 @@ export interface CreateRechercheCommand extends Command {
   titre: string
   metier?: string
   localisation?: string
-  criteres?:
-    | GetOffresEmploiQuery
-    | GetOffresImmersionQuery
-    | GetServicesCiviqueQuery
+  criteres?: Recherche.Immersion | Recherche.Emploi | Recherche.ServiceCivique
 }
 
 @Injectable()
@@ -59,7 +56,7 @@ export class CreateRechercheCommandHandler extends CommandHandler<
       etat: Recherche.Etat.SUCCES
     }
 
-    await this.rechercheRepository.createRecherche(recherche)
+    await this.rechercheRepository.save(recherche)
     return success({ id: idRecherche })
   }
 

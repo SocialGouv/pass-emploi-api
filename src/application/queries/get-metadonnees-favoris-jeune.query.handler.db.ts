@@ -9,7 +9,7 @@ import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { Injectable } from '@nestjs/common'
 import { RechercheSqlModel } from '../../infrastructure/sequelize/models/recherche.sql-model'
-import { Recherche } from '../../domain/recherche'
+import { Recherche } from '../../domain/offre/recherche/recherche'
 import { Op } from 'sequelize'
 import { MetadonneesFavorisQueryModel } from './query-models/favoris.query-model'
 

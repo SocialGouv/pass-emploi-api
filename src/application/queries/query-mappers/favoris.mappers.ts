@@ -1,8 +1,8 @@
 import { FavoriOffreEmploiSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-emploi.sql-model'
 import { FavorisQueryModel } from '../query-models/favoris.query-model'
-import { Favori } from '../../../domain/favori'
 import { FavoriOffreImmersionSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { FavoriOffreEngagementSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
+import { Offre } from '../../../domain/offre/offre'
 
 export function fromOffreEmploiSqlToFavorisQueryModel(
   offre: FavoriOffreEmploiSqlModel
@@ -11,8 +11,8 @@ export function fromOffreEmploiSqlToFavorisQueryModel(
     idOffre: offre.idOffre,
     titre: offre.titre,
     type: offre.isAlternance
-      ? Favori.TypeOffre.ALTERNANCE
-      : Favori.TypeOffre.EMPLOI,
+      ? Offre.Favori.Type.ALTERNANCE
+      : Offre.Favori.Type.EMPLOI,
     organisation: offre.nomEntreprise,
     localisation: offre.nomLocalisation ?? undefined
   }
@@ -24,7 +24,7 @@ export function fromOffreImmersionSqlToFavorisQueryModel(
   return {
     idOffre: offre.idOffre,
     titre: offre.metier,
-    type: Favori.TypeOffre.IMMERSION,
+    type: Offre.Favori.Type.IMMERSION,
     organisation: offre.nomEtablissement,
     localisation: offre.ville
   }
@@ -36,7 +36,7 @@ export function fromOffreServiceCiviqueSqlToFavorisQueryModel(
   return {
     idOffre: offre.idOffre,
     titre: offre.titre,
-    type: Favori.TypeOffre.SERVICE_CIVIQUE,
+    type: Offre.Favori.Type.SERVICE_CIVIQUE,
     organisation: offre.organisation ?? undefined,
     localisation: offre.ville ?? undefined
   }

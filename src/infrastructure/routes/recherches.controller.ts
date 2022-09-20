@@ -23,7 +23,7 @@ import {
   CreateRechercheServiceCiviquePayload,
   GetRecherchesQueryParams
 } from './validation/recherches.inputs'
-import { Recherche } from '../../domain/recherche'
+import { Recherche } from '../../domain/offre/recherche/recherche'
 import {
   GetRecherchesQuery,
   GetRecherchesQueryHandler
@@ -34,6 +34,7 @@ import {
   DeleteRechercheCommand,
   DeleteRechercheCommandHandler
 } from '../../application/commands/delete-recherche.command.handler'
+import { DateTime } from 'luxon'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -87,13 +88,22 @@ export class RecherchesController {
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
+    const dateDeDebutMinimum = createRecherchePayload.criteres
+      .dateDeDebutMinimum
+      ? DateTime.fromISO(
+          createRecherchePayload.criteres.dateDeDebutMinimum
+        ).toUTC()
+      : undefined
     const command: CreateRechercheCommand = {
       metier: undefined,
       idJeune: idJeune,
       type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
       titre: createRecherchePayload.titre,
       localisation: createRecherchePayload.localisation,
-      criteres: createRecherchePayload.criteres
+      criteres: {
+        ...createRecherchePayload.criteres,
+        dateDeDebutMinimum: dateDeDebutMinimum
+      }
     }
     await this.createRechercheCommandHandler.execute(command, utilisateur)
   }

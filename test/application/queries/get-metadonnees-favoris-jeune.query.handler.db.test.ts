@@ -7,23 +7,20 @@ import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { OffreServiceCiviqueHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-service-civique-http.repository.db'
-import { EngagementClient } from '../../../src/infrastructure/clients/engagement-client'
 import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-emploi-http-sql.repository.db'
 import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
 import { success } from '../../../src/building-blocks/types/result'
 import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/recherche-sql.repository.db'
-import { Recherche } from '../../../src/domain/recherche'
+import { Recherche } from '../../../src/domain/offre/recherche/recherche'
 import { IdService } from '../../../src/utils/id-service'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
 
 describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
   let getMetadonneesFavorisJeuneQueryHandler: GetMetadonneesFavorisJeuneQueryHandler
-  let serviceCiviqueClient: StubbedClass<EngagementClient>
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
 
   beforeEach(async () => {
-    serviceCiviqueClient = stubClass(EngagementClient)
     conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
 
     getMetadonneesFavorisJeuneQueryHandler =
@@ -55,7 +52,7 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
           ville: 'poi-ville'
         }
         const offreImmersionRepository = new OffresImmersionHttpSqlRepository()
-        await offreImmersionRepository.saveAsFavori(idJeune, uneOffreImmersion)
+        await offreImmersionRepository.save(idJeune, uneOffreImmersion)
 
         const query = {
           idJeune: idJeune
@@ -97,8 +94,8 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
           titre: 'poi-titre'
         }
         const offreServiceCiviqueRepository =
-          new OffreServiceCiviqueHttpSqlRepository(serviceCiviqueClient)
-        await offreServiceCiviqueRepository.saveAsFavori(
+          new OffreServiceCiviqueHttpSqlRepository()
+        await offreServiceCiviqueRepository.save(
           idJeune,
           uneOffreServiceCivique
         )
@@ -143,7 +140,7 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
           alternance: true
         }
         const offreEmploiRepository = new OffresEmploiHttpSqlRepository()
-        await offreEmploiRepository.saveAsFavori(idJeune, uneOffreAlternance)
+        await offreEmploiRepository.save(idJeune, uneOffreAlternance)
 
         const query = {
           idJeune: idJeune
@@ -183,7 +180,7 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
           typeContrat: 'poi-type-contrat'
         }
         const offreEmploiRepository = new OffresEmploiHttpSqlRepository()
-        await offreEmploiRepository.saveAsFavori(idJeune, uneOffreEmploi)
+        await offreEmploiRepository.save(idJeune, uneOffreEmploi)
 
         const query = {
           idJeune: idJeune
@@ -248,18 +245,10 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
           idJeune
         })
         await Promise.all([
-          recherchesSauvegardeesRepository.createRecherche(
-            rechercheOffreEmploi
-          ),
-          recherchesSauvegardeesRepository.createRecherche(
-            rechercheOffreAlternance
-          ),
-          recherchesSauvegardeesRepository.createRecherche(
-            rechercheOffreImmersion
-          ),
-          recherchesSauvegardeesRepository.createRecherche(
-            rechercheOffreServiceCivique
-          )
+          recherchesSauvegardeesRepository.save(rechercheOffreEmploi),
+          recherchesSauvegardeesRepository.save(rechercheOffreAlternance),
+          recherchesSauvegardeesRepository.save(rechercheOffreImmersion),
+          recherchesSauvegardeesRepository.save(rechercheOffreServiceCivique)
         ])
 
         const query = {

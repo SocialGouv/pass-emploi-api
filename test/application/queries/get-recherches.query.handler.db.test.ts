@@ -7,7 +7,7 @@ import {
   geometrieNice,
   uneRecherche
 } from '../../fixtures/recherche.fixture'
-import { Recherche } from '../../../src/domain/recherche'
+import { Recherche } from '../../../src/domain/offre/recherche/recherche'
 import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/recherche-sql.repository.db'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -57,7 +57,7 @@ describe('GetRecherchesQueryHandler', () => {
       const rechercheSqlRepository = new RechercheSqlRepository(
         database.sequelize
       )
-      await rechercheSqlRepository.createRecherche(recherche)
+      await rechercheSqlRepository.save(recherche)
     })
 
     context('sans géométrie', () => {

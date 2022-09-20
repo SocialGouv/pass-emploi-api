@@ -1,4 +1,4 @@
-import { OffreEmploi } from '../../../src/domain/offre-emploi'
+import { Emploi } from '../../../src/domain/offre/favori/offre-emploi'
 import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-emploi-http-sql.repository.db'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { FavoriOffreEmploiSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
@@ -29,10 +29,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
           })
         )
         // When
-        await offresEmploiHttpSqlRepository.saveAsFavori(
-          'ABCDE',
-          uneOffreEmploi()
-        )
+        await offresEmploiHttpSqlRepository.save('ABCDE', uneOffreEmploi())
 
         // Then
         const offresEmplois = await FavoriOffreEmploiSqlModel.findAll()
@@ -54,7 +51,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
   })
 
   describe('.getFavori', () => {
-    let offreEmploi: OffreEmploi
+    let offreEmploi: Emploi
 
     beforeEach(async () => {
       // Given
@@ -66,13 +63,13 @@ describe('OffresEmploiHttpSqlRepository', () => {
         })
       )
       offreEmploi = uneOffreEmploi()
-      await offresEmploiHttpSqlRepository.saveAsFavori('ABCDE', offreEmploi)
+      await offresEmploiHttpSqlRepository.save('ABCDE', offreEmploi)
     })
 
     describe("quand le favori n'existe pas", () => {
       it('renvoie undefined', async () => {
         // When
-        const favori = await offresEmploiHttpSqlRepository.getFavori(
+        const favori = await offresEmploiHttpSqlRepository.get(
           'ABCDE',
           'UN MAUVAIS ID'
         )
@@ -84,7 +81,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
     describe('quand le favori existe', () => {
       it("renvoie l'offre d'emploi", async () => {
         // When
-        const favori = await offresEmploiHttpSqlRepository.getFavori(
+        const favori = await offresEmploiHttpSqlRepository.get(
           'ABCDE',
           offreEmploi.id
         )
@@ -96,18 +93,18 @@ describe('OffresEmploiHttpSqlRepository', () => {
     describe('quand le favori existe et que la localisation est vide', () => {
       it("renvoie l'offre d'emploi avec des string vide dans la localisation pour ne pas casser le mobile", async () => {
         // Given
-        const offreEmploiSansLocalisation: OffreEmploi = {
+        const offreEmploiSansLocalisation: Emploi = {
           ...uneOffreEmploi(),
           localisation: undefined,
           id: 'une-offre-sans-localisation'
         }
-        await offresEmploiHttpSqlRepository.saveAsFavori(
+        await offresEmploiHttpSqlRepository.save(
           'ABCDE',
           offreEmploiSansLocalisation
         )
 
         // When
-        const favori = await offresEmploiHttpSqlRepository.getFavori(
+        const favori = await offresEmploiHttpSqlRepository.get(
           'ABCDE',
           offreEmploiSansLocalisation.id
         )
@@ -122,7 +119,7 @@ describe('OffresEmploiHttpSqlRepository', () => {
   })
 
   describe('.deleteFavori', () => {
-    let offreEmploi: OffreEmploi
+    let offreEmploi: Emploi
 
     beforeEach(async () => {
       // Given
@@ -138,11 +135,11 @@ describe('OffresEmploiHttpSqlRepository', () => {
     it('supprime le favori', async () => {
       // Given
       offreEmploi = uneOffreEmploi()
-      await offresEmploiHttpSqlRepository.saveAsFavori('ABCDE', offreEmploi)
+      await offresEmploiHttpSqlRepository.save('ABCDE', offreEmploi)
       // When
-      await offresEmploiHttpSqlRepository.deleteFavori('ABCDE', offreEmploi.id)
+      await offresEmploiHttpSqlRepository.delete('ABCDE', offreEmploi.id)
       // Then
-      const actual = await offresEmploiHttpSqlRepository.getFavori(
+      const actual = await offresEmploiHttpSqlRepository.get(
         'ABCDE',
         offreEmploi.id
       )

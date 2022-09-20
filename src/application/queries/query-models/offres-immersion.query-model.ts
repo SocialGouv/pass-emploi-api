@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { OffresImmersion } from '../../../domain/offre-immersion'
+import { Offre } from '../../../domain/offre/offre'
 
 export class ContactImmersionQueryModel {
   @ApiProperty()
@@ -15,7 +15,7 @@ export class ContactImmersionQueryModel {
   @ApiProperty()
   telephone?: string
   @ApiProperty()
-  modeDeContact?: OffresImmersion.MethodeDeContact
+  modeDeContact?: Offre.Immersion.MethodeDeContact
 }
 
 export class LocalisationQueryModel {

@@ -25,8 +25,8 @@ import {
 } from '../../../src/application/commands/delete-favori-offre-emploi.command.handler'
 import {
   DeleteFavoriOffreServiceCiviqueCommand,
-  DeleteFavoriOffreEngagementCommandHandler
-} from '../../../src/application/commands/delete-favori-offre-engagement.command.handler'
+  DeleteFavoriOffreServiceCiviqueCommandHandler
+} from '../../../src/application/commands/delete-favori-offre-service-civique.command.handler'
 import {
   FavoriExisteDejaError,
   FavoriNonTrouveError
@@ -53,11 +53,11 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { OffreServiceCivique } from '../../../src/domain/offre-service-civique'
-import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../../src/application/queries/get-favoris-service-civique-jeune.query.handler'
+import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../../src/application/queries/get-favoris-service-civique-jeune.query.handler.db'
 import { uneOffreServiceCivique } from '../../fixtures/offre-service-civique.fixture'
 import { GetFavorisJeunePourConseillerQueryHandler } from '../../../src/application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
 import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler.db'
+import { Offre } from '../../../src/domain/offre/offre'
 
 describe('FavorisController', () => {
   let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
@@ -67,7 +67,7 @@ describe('FavorisController', () => {
   let deleteFavoriOffreImmersionCommandHandler: StubbedClass<DeleteFavoriOffreImmersionCommandHandler>
   let getFavorisOffresImmersionJeuneQueryHandler: StubbedClass<GetFavorisOffresImmersionJeuneQueryHandler>
   let addFavoriOffreEngagementCommandHandler: StubbedClass<AddFavoriOffreServiceCiviqueCommandHandler>
-  let deleteFavoriOffreEngagementCommandHandler: StubbedClass<DeleteFavoriOffreEngagementCommandHandler>
+  let deleteFavoriOffreEngagementCommandHandler: StubbedClass<DeleteFavoriOffreServiceCiviqueCommandHandler>
   let getFavorisServiceCiviqueJeuneQueryHandler: StubbedClass<GetFavorisServiceCiviqueJeuneQueryHandler>
   let getFavorisJeunePourConseillerQueryHandler: StubbedClass<GetFavorisJeunePourConseillerQueryHandler>
   let getMetadonneesFavorisJeuneQueryHandler: StubbedClass<GetMetadonneesFavorisJeuneQueryHandler>
@@ -98,7 +98,7 @@ describe('FavorisController', () => {
       AddFavoriOffreServiceCiviqueCommandHandler
     )
     deleteFavoriOffreEngagementCommandHandler = stubClass(
-      DeleteFavoriOffreEngagementCommandHandler
+      DeleteFavoriOffreServiceCiviqueCommandHandler
     )
     getFavorisServiceCiviqueJeuneQueryHandler = stubClass(
       GetFavorisServiceCiviqueJeuneQueryHandler
@@ -125,7 +125,7 @@ describe('FavorisController', () => {
       .useValue(getFavorisOffresImmersionJeuneQueryHandler)
       .overrideProvider(AddFavoriOffreServiceCiviqueCommandHandler)
       .useValue(addFavoriOffreEngagementCommandHandler)
-      .overrideProvider(DeleteFavoriOffreEngagementCommandHandler)
+      .overrideProvider(DeleteFavoriOffreServiceCiviqueCommandHandler)
       .useValue(deleteFavoriOffreEngagementCommandHandler)
       .overrideProvider(GetFavorisServiceCiviqueJeuneQueryHandler)
       .useValue(getFavorisServiceCiviqueJeuneQueryHandler)
@@ -451,9 +451,9 @@ describe('FavorisController', () => {
     })
 
     describe('POST /jeunes/:idJeune/favoris/services-civique', () => {
-      const offre: OffreServiceCivique = {
+      const offre: Offre.Favori.ServiceCivique = {
         id: 'unId',
-        domaine: OffreServiceCivique.Domaine.education,
+        domaine: Offre.ServiceCivique.Domaine.education,
         ville: 'Paris',
         titre: 'La best offre',
         organisation: 'FNAC',

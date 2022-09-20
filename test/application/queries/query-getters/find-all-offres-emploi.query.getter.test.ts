@@ -1,9 +1,3 @@
-import {
-  Contrat,
-  Duree,
-  Experience,
-  OffresEmploi
-} from '../../../../src/domain/offre-emploi'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { uneOffreEmploiDto } from '../../../fixtures/offre-emploi.fixture'
 import { isSuccess } from '../../../../src/building-blocks/types/result'
@@ -11,6 +5,8 @@ import { PoleEmploiClient } from '../../../../src/infrastructure/clients/pole-em
 import { DateTime } from 'luxon'
 import { DateService } from '../../../../src/utils/date-service'
 import { FindAllOffresEmploiQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-emploi.query.getter'
+import { Offre } from '../../../../src/domain/offre/offre'
+import { GetOffresEmploiQuery } from '../../../../src/application/queries/get-offres-emploi.query.handler'
 
 describe('FindAllOffresEmploiQueryGetter', () => {
   let findAllOffresEmploiQueryGetter: FindAllOffresEmploiQueryGetter
@@ -29,16 +25,19 @@ describe('FindAllOffresEmploiQueryGetter', () => {
   })
 
   describe('handle', () => {
-    const criteres: OffresEmploi.Criteres = {
+    const criteres: GetOffresEmploiQuery = {
       page: 1,
       limit: 50,
       alternance: true,
-      duree: [Duree.tempsPlein],
-      contrat: [Contrat.cdd, Contrat.autre],
+      duree: [Offre.Emploi.Duree.tempsPlein],
+      contrat: [Offre.Emploi.Contrat.cdd, Offre.Emploi.Contrat.autre],
       commune: 'Paris',
       q: 'mots clés',
       departement: '75',
-      experience: [Experience.entreUnEtTroisAns, Experience.plusDeTroisAns],
+      experience: [
+        Offre.Emploi.Experience.entreUnEtTroisAns,
+        Offre.Emploi.Experience.plusDeTroisAns
+      ],
       debutantAccepte: true,
       rayon: 15
     }
@@ -80,12 +79,15 @@ describe('FindAllOffresEmploiQueryGetter', () => {
       })
       it('quand que quelques query params sont fournis', async () => {
         // Given
-        const criteres: OffresEmploi.Criteres = {
+        const criteres: GetOffresEmploiQuery = {
           page: 1,
           limit: 50,
           alternance: false,
-          duree: [Duree.tempsPlein, Duree.tempsPartiel],
-          contrat: [Contrat.cdd],
+          duree: [
+            Offre.Emploi.Duree.tempsPlein,
+            Offre.Emploi.Duree.tempsPartiel
+          ],
+          contrat: [Offre.Emploi.Contrat.cdd],
           commune: '75118'
         }
 
@@ -106,13 +108,13 @@ describe('FindAllOffresEmploiQueryGetter', () => {
       })
       it('quand il y a une date de création minimum', async () => {
         // When
-        const minDateCreation = maintenant.minus({ day: 1, hour: 2 })
-        const criteres: OffresEmploi.Criteres = {
+        const minDateDeCreation = maintenant.minus({ day: 1, hour: 2 })
+        const criteres: GetOffresEmploiQuery = {
           page: 1,
           limit: 50,
           alternance: false,
           commune: '75118',
-          minDateCreation
+          minDateCreation: minDateDeCreation
         }
         await findAllOffresEmploiQueryGetter.handle(criteres)
         const expectedQueryParams = new URLSearchParams({

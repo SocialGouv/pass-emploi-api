@@ -1,8 +1,6 @@
 import { CodeTypeRendezVous } from './rendez-vous'
-import { OffreImmersion } from './offre-immersion'
-import { OffreServiceCivique } from './offre-service-civique'
-import { OffreEmploi } from './offre-emploi'
-import { Recherche } from './recherche'
+import { Recherche } from './offre/recherche/recherche'
+import { Offre } from './offre/offre'
 
 export const ArchiveJeuneRepositoryToken = 'ArchiveJeune.Repository'
 
@@ -10,9 +8,9 @@ export interface ArchiveJeune {
   rendezVous: ArchiveJeune.RendezVous[]
   actions: ArchiveJeune.Action[]
   favoris: {
-    offresEmploi: OffreEmploi[]
-    offresImmersions: OffreImmersion[]
-    offresServiceCivique: OffreServiceCivique[]
+    offresEmploi: Offre.Favori.Emploi[]
+    offresImmersions: Offre.Favori.Immersion[]
+    offresServiceCivique: Offre.Favori.ServiceCivique[]
   }
   recherches: Recherche[]
   dernierConseiller: {

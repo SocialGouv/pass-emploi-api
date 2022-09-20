@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { OffresEmploi } from '../../../domain/offre-emploi'
 import { failure, Result, success } from '../../../building-blocks/types/result'
 import { OffresEmploiQueryModel } from '../query-models/offres-emploi.query-model'
 import {
@@ -10,6 +9,11 @@ import { ErreurHttp } from '../../../building-blocks/types/domain-error'
 import { PoleEmploiClient } from '../../../infrastructure/clients/pole-emploi-client'
 import { URLSearchParams } from 'url'
 import { DateService } from '../../../utils/date-service'
+import { Offre } from '../../../domain/offre/offre'
+import { GetOffresEmploiQuery } from '../get-offres-emploi.query.handler'
+
+const DEFAULT_PAGE = 1
+const DEFAULT_LIMIT = 50
 
 @Injectable()
 export class FindAllOffresEmploiQueryGetter {
@@ -23,13 +27,13 @@ export class FindAllOffresEmploiQueryGetter {
   }
 
   async handle(
-    query: OffresEmploi.Criteres
+    query: GetOffresEmploiQuery
   ): Promise<Result<OffresEmploiQueryModel>> {
     return this.trouverLesOffres(query)
   }
 
   private async trouverLesOffres(
-    criteres: OffresEmploi.Criteres,
+    criteres: GetOffresEmploiQuery,
     secondesAAttendre?: number
   ): Promise<Result<OffresEmploiQueryModel>> {
     if (secondesAAttendre) {
@@ -39,12 +43,22 @@ export class FindAllOffresEmploiQueryGetter {
     }
 
     try {
-      const params = this.construireLesParams(criteres)
+      const pageAvecDefault = criteres.page || DEFAULT_PAGE
+      const limitAvecDefault = criteres.limit || DEFAULT_LIMIT
+      const params = this.construireLesParams(
+        criteres,
+        pageAvecDefault,
+        limitAvecDefault
+      )
       const offresEmploiDto = await this.poleEmploiClient.getOffresEmploi(
         params
       )
       return success(
-        toOffresEmploiQueryModel(criteres.page, criteres.limit, offresEmploiDto)
+        toOffresEmploiQueryModel(
+          pageAvecDefault,
+          limitAvecDefault,
+          offresEmploiDto
+        )
       )
     } catch (e) {
       this.logger.error(e)
@@ -74,11 +88,11 @@ export class FindAllOffresEmploiQueryGetter {
   }
 
   private construireLesParams(
-    criteres: OffresEmploi.Criteres
+    criteres: Offre.Recherche.Emploi,
+    page: number,
+    limit: number
   ): URLSearchParams {
     const {
-      page,
-      limit,
       q,
       departement,
       alternance,

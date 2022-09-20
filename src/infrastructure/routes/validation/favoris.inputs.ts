@@ -8,8 +8,8 @@ import {
   ValidateNested
 } from 'class-validator'
 import { Transform, Type } from 'class-transformer'
-import { OffreServiceCivique } from '../../../domain/offre-service-civique'
 import { transformStringToBoolean } from './utils/transformers'
+import { Offre } from 'src/domain/offre/offre'
 
 export class LocalisationPayload {
   @ApiProperty()
@@ -98,7 +98,7 @@ export class AddFavoriImmersionPayload {
   ville: string
 }
 
-export class AddFavoriServicesCivique implements OffreServiceCivique {
+export class AddFavoriServicesCivique implements Offre.Favori.ServiceCivique {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()

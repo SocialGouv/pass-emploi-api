@@ -8,11 +8,9 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import {
-  OffresEmploi,
-  OffresEmploiRepositoryToken
-} from '../../domain/offre-emploi'
+import { OffresEmploiRepositoryToken } from '../../domain/offre/favori/offre-emploi'
 import { FavoriOffresEmploiAuthorizer } from '../authorizers/authorize-favori-offres-emploi'
+import { Offre } from '../../domain/offre/offre'
 
 export interface DeleteFavoriOffreEmploiCommand extends Command {
   idOffreEmploi: string
@@ -26,14 +24,14 @@ export class DeleteFavoriOffreEmploiCommandHandler extends CommandHandler<
 > {
   constructor(
     @Inject(OffresEmploiRepositoryToken)
-    private readonly offresEmploiRepository: OffresEmploi.Repository,
+    private readonly offresEmploiRepository: Offre.Favori.Emploi.Repository,
     private readonly favoriOffresEmploiAuthorizer: FavoriOffresEmploiAuthorizer
   ) {
     super('DeleteFavoriCommandHandler')
   }
 
   async handle(command: DeleteFavoriOffreEmploiCommand): Promise<Result<void>> {
-    const favoriOffreEmploi = await this.offresEmploiRepository.getFavori(
+    const favoriOffreEmploi = await this.offresEmploiRepository.get(
       command.idJeune,
       command.idOffreEmploi
     )
@@ -42,7 +40,7 @@ export class DeleteFavoriOffreEmploiCommandHandler extends CommandHandler<
         new FavoriNonTrouveError(command.idJeune, command.idOffreEmploi)
       )
     }
-    await this.offresEmploiRepository.deleteFavori(
+    await this.offresEmploiRepository.delete(
       command.idJeune,
       command.idOffreEmploi
     )

@@ -9,15 +9,15 @@ import {
 import { FavoriExisteDejaError } from '../../../src/building-blocks/types/domain-error'
 import { failure } from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
-import { OffresEmploi } from '../../../src/domain/offre-emploi'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import Utilisateur = Authentification.Utilisateur
+import { Offre } from '../../../src/domain/offre/offre'
 
 describe('AddFavoriOffreEmploiCommandHandler', () => {
-  let offresEmploiRepository: StubbedType<OffresEmploi.Repository>
+  let offresEmploiRepository: StubbedType<Offre.Favori.Emploi.Repository>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let addFavoriOffreEmploiCommandHandler: AddFavoriOffreEmploiCommandHandler
   let evenementService: StubbedClass<EvenementService>
@@ -43,7 +43,7 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
         idJeune: jeune.id,
         offreEmploi: offreEmploi
       }
-      offresEmploiRepository.getFavori
+      offresEmploiRepository.get
         .withArgs(jeune.id, offreEmploi.id)
         .resolves(undefined)
 
@@ -51,7 +51,7 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
       await addFavoriOffreEmploiCommandHandler.handle(command)
 
       // Then
-      expect(offresEmploiRepository.saveAsFavori).to.have.been.calledWith(
+      expect(offresEmploiRepository.save).to.have.been.calledWith(
         command.idJeune,
         command.offreEmploi
       )
@@ -63,7 +63,7 @@ describe('AddFavoriOffreEmploiCommandHandler', () => {
         idJeune: jeune.id,
         offreEmploi: offreEmploi
       }
-      offresEmploiRepository.getFavori
+      offresEmploiRepository.get
         .withArgs(jeune.id, offreEmploi.id)
         .resolves(offreEmploi)
 

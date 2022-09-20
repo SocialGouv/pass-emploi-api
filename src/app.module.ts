@@ -28,7 +28,7 @@ import { CreerJeunePoleEmploiCommandHandler } from './application/commands/creer
 import { CreerSuperviseursCommandHandler } from './application/commands/creer-superviseurs.command.handler'
 import { DeleteActionCommandHandler } from './application/commands/delete-action.command.handler'
 import { DeleteFavoriOffreEmploiCommandHandler } from './application/commands/delete-favori-offre-emploi.command.handler'
-import { DeleteFavoriOffreEngagementCommandHandler } from './application/commands/delete-favori-offre-engagement.command.handler'
+import { DeleteFavoriOffreServiceCiviqueCommandHandler } from './application/commands/delete-favori-offre-service-civique.command.handler'
 import { DeleteFavoriOffreImmersionCommandHandler } from './application/commands/delete-favori-offre-immersion.command.handler'
 import { DeleteJeuneInactifCommandHandler } from './application/commands/delete-jeune-inactif.command.handler'
 import { DeleteRechercheCommandHandler } from './application/commands/delete-recherche.command.handler'
@@ -103,14 +103,14 @@ import {
   Notification,
   NotificationRepositoryToken
 } from './domain/notification/notification'
-import { OffresEmploiRepositoryToken } from './domain/offre-emploi'
-import { OffreServiceCiviqueRepositoryToken } from './domain/offre-service-civique'
-import { OffresImmersionRepositoryToken } from './domain/offre-immersion'
+import { OffresEmploiRepositoryToken } from './domain/offre/favori/offre-emploi'
+import { OffreServiceCiviqueRepositoryToken } from './domain/offre/favori/offre-service-civique'
+import { OffresImmersionRepositoryToken } from './domain/offre/favori/offre-immersion'
 import {
   PlanificateurRepositoryToken,
   PlanificateurService
 } from './domain/planificateur'
-import { RecherchesRepositoryToken } from './domain/recherche'
+import { RecherchesRepositoryToken } from './domain/offre/recherche/recherche'
 import { RendezVousRepositoryToken } from './domain/rendez-vous'
 import { SuperviseursRepositoryToken } from './domain/superviseur'
 import { NotificationSupportServiceToken } from './domain/notification-support'
@@ -176,7 +176,7 @@ import { GetAgencesQueryHandler } from './application/queries/get-agences.query.
 import { ModifierConseillerCommandHandler } from './application/commands/modifier-conseiller.command.handler'
 import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './application/commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
 import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './application/commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
-import { GetFavorisServiceCiviqueJeuneQueryHandler } from './application/queries/get-favoris-service-civique-jeune.query.handler'
+import { GetFavorisServiceCiviqueJeuneQueryHandler } from './application/queries/get-favoris-service-civique-jeune.query.handler.db'
 import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from './application/commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
 import { CampagnesController } from './infrastructure/routes/campagnes.controller'
 import { Campagne, CampagneRepositoryToken } from './domain/campagne'
@@ -481,7 +481,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     NotifierNouvellesImmersionsCommandHandler,
     AddFavoriOffreServiceCiviqueCommandHandler,
     GetFavorisServiceCiviqueJeuneQueryHandler,
-    DeleteFavoriOffreEngagementCommandHandler,
+    DeleteFavoriOffreServiceCiviqueCommandHandler,
     DeleteJeuneCommandHandler,
     DeleteJeuneInactifCommandHandler,
     GetDetailRendezVousQueryHandler,

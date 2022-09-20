@@ -1,4 +1,3 @@
-import { OffreEmploi, OffresEmploi } from '../../../src/domain/offre-emploi'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
@@ -12,10 +11,11 @@ import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-emploi-http-sql.repository.db'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from '../../../src/application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { Offre } from '../../../src/domain/offre/offre'
 
 describe('GetFavorisOffresEmploiJeuneQueryHandler', () => {
   DatabaseForTesting.prepare()
-  let offresEmploiHttpSqlRepository: OffresEmploi.Repository
+  let offresEmploiHttpSqlRepository: Offre.Favori.Emploi.Repository
   let getFavorisOffresEmploiJeuneQueryHandler: GetFavorisOffresEmploiJeuneQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
 
@@ -27,7 +27,7 @@ describe('GetFavorisOffresEmploiJeuneQueryHandler', () => {
   })
 
   describe('quand on veut les id uniquement', () => {
-    let offreEmploi: OffreEmploi
+    let offreEmploi: Offre.Favori.Emploi
 
     beforeEach(async () => {
       // Given
@@ -39,7 +39,7 @@ describe('GetFavorisOffresEmploiJeuneQueryHandler', () => {
         })
       )
       offreEmploi = uneOffreEmploi()
-      await offresEmploiHttpSqlRepository.saveAsFavori('ABCDE', offreEmploi)
+      await offresEmploiHttpSqlRepository.save('ABCDE', offreEmploi)
     })
 
     describe('quand le jeune a des favoris', () => {
@@ -59,7 +59,7 @@ describe('GetFavorisOffresEmploiJeuneQueryHandler', () => {
   })
 
   describe('quand on veut le détail', () => {
-    let offreEmploi: OffreEmploi
+    let offreEmploi: Offre.Favori.Emploi
 
     beforeEach(async () => {
       // Given
@@ -71,7 +71,7 @@ describe('GetFavorisOffresEmploiJeuneQueryHandler', () => {
         })
       )
       offreEmploi = uneOffreEmploi()
-      await offresEmploiHttpSqlRepository.saveAsFavori('ABCDE', offreEmploi)
+      await offresEmploiHttpSqlRepository.save('ABCDE', offreEmploi)
     })
 
     describe('quand le jeune a des favoris', () => {

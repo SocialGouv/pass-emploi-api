@@ -1,10 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Evenement, EvenementService } from '../../domain/evenement'
-import {
-  OffreImmersion,
-  OffresImmersion,
-  OffresImmersionRepositoryToken
-} from '../../domain/offre-immersion'
+import { OffresImmersionRepositoryToken } from '../../domain/offre/favori/offre-immersion'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { FavoriExisteDejaError } from '../../building-blocks/types/domain-error'
@@ -15,10 +11,11 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { Offre } from '../../domain/offre/offre'
 
 export interface AddFavoriOffreImmersionCommand extends Command {
   idJeune: string
-  offreImmersion: OffreImmersion
+  offreImmersion: Offre.Favori.Immersion
 }
 
 @Injectable()
@@ -28,7 +25,7 @@ export class AddFavoriOffreImmersionCommandHandler extends CommandHandler<
 > {
   constructor(
     @Inject(OffresImmersionRepositoryToken)
-    private offresImmersionRepository: OffresImmersion.Repository,
+    private offresImmersionRepository: Offre.Favori.Immersion.Repository,
     private jeuneAuthorizer: JeuneAuthorizer,
     private evenementService: EvenementService
   ) {
@@ -36,7 +33,7 @@ export class AddFavoriOffreImmersionCommandHandler extends CommandHandler<
   }
 
   async handle(command: AddFavoriOffreImmersionCommand): Promise<Result> {
-    const favori = await this.offresImmersionRepository.getFavori(
+    const favori = await this.offresImmersionRepository.get(
       command.idJeune,
       command.offreImmersion.id
     )
@@ -47,7 +44,7 @@ export class AddFavoriOffreImmersionCommandHandler extends CommandHandler<
       )
     }
 
-    await this.offresImmersionRepository.saveAsFavori(
+    await this.offresImmersionRepository.save(
       command.idJeune,
       command.offreImmersion
     )

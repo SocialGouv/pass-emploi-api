@@ -9,16 +9,13 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import {
-  OffreEmploi,
-  OffresEmploi,
-  OffresEmploiRepositoryToken
-} from '../../domain/offre-emploi'
+import { OffresEmploiRepositoryToken } from '../../domain/offre/favori/offre-emploi'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { Offre } from '../../domain/offre/offre'
 
 export interface AddFavoriOffreEmploiCommand extends Command {
   idJeune: string
-  offreEmploi: OffreEmploi
+  offreEmploi: Offre.Favori.Emploi
 }
 
 @Injectable()
@@ -28,7 +25,7 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
 > {
   constructor(
     @Inject(OffresEmploiRepositoryToken)
-    private offresEmploiRepository: OffresEmploi.Repository,
+    private offresEmploiRepository: Offre.Favori.Emploi.Repository,
     private jeuneAuthorizer: JeuneAuthorizer,
     private evenementService: EvenementService
   ) {
@@ -37,7 +34,7 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
 
   async handle(command: AddFavoriOffreEmploiCommand): Promise<Result> {
     if (
-      await this.offresEmploiRepository.getFavori(
+      await this.offresEmploiRepository.get(
         command.idJeune,
         command.offreEmploi.id
       )
@@ -47,10 +44,7 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
       )
     }
 
-    await this.offresEmploiRepository.saveAsFavori(
-      command.idJeune,
-      command.offreEmploi
-    )
+    await this.offresEmploiRepository.save(command.idJeune, command.offreEmploi)
     return emptySuccess()
   }
 

@@ -6,7 +6,7 @@ import { uneOffreImmersion } from '../../fixtures/offre-immersion.fixture'
 import { FavoriOffreImmersionSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { OffreImmersion } from '../../../src/domain/offre-immersion'
+import { Immersion } from '../../../src/domain/offre/favori/offre-immersion'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
 
 describe('OffresImmersionHttpSqlRepository', () => {
@@ -28,7 +28,7 @@ describe('OffresImmersionHttpSqlRepository', () => {
           })
         )
         // When
-        await offresImmersionHttpSqlRepository.saveAsFavori(
+        await offresImmersionHttpSqlRepository.save(
           'ABCDE',
           uneOffreImmersion()
         )
@@ -42,7 +42,7 @@ describe('OffresImmersionHttpSqlRepository', () => {
     })
   })
   describe('.getFavori', () => {
-    let offreImmersion: OffreImmersion
+    let offreImmersion: Immersion
 
     beforeEach(async () => {
       // Given
@@ -54,16 +54,13 @@ describe('OffresImmersionHttpSqlRepository', () => {
         })
       )
       offreImmersion = uneOffreImmersion()
-      await offresImmersionHttpSqlRepository.saveAsFavori(
-        'ABCDE',
-        offreImmersion
-      )
+      await offresImmersionHttpSqlRepository.save('ABCDE', offreImmersion)
     })
 
     describe("quand le favori n'existe pas", () => {
       it('renvoie undefined', async () => {
         // When
-        const favori = await offresImmersionHttpSqlRepository.getFavori(
+        const favori = await offresImmersionHttpSqlRepository.get(
           'ABCDE',
           'UN MAUVAIS ID'
         )
@@ -75,7 +72,7 @@ describe('OffresImmersionHttpSqlRepository', () => {
     describe('quand le favori existe', () => {
       it("renvoie l'offre d'emploi", async () => {
         // When
-        const favori = await offresImmersionHttpSqlRepository.getFavori(
+        const favori = await offresImmersionHttpSqlRepository.get(
           'ABCDE',
           offreImmersion.id
         )
@@ -85,7 +82,7 @@ describe('OffresImmersionHttpSqlRepository', () => {
     })
   })
   describe('.deleteFavori', () => {
-    let offreImmersion: OffreImmersion
+    let offreImmersion: Immersion
 
     beforeEach(async () => {
       // Given
@@ -101,17 +98,11 @@ describe('OffresImmersionHttpSqlRepository', () => {
     it('supprime le favori', async () => {
       // Given
       offreImmersion = uneOffreImmersion()
-      await offresImmersionHttpSqlRepository.saveAsFavori(
-        'ABCDE',
-        offreImmersion
-      )
+      await offresImmersionHttpSqlRepository.save('ABCDE', offreImmersion)
       // When
-      await offresImmersionHttpSqlRepository.deleteFavori(
-        'ABCDE',
-        offreImmersion.id
-      )
+      await offresImmersionHttpSqlRepository.delete('ABCDE', offreImmersion.id)
       // Then
-      const actual = await offresImmersionHttpSqlRepository.getFavori(
+      const actual = await offresImmersionHttpSqlRepository.get(
         'ABCDE',
         offreImmersion.id
       )

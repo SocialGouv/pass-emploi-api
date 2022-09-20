@@ -1,5 +1,5 @@
 import { OffreImmersionQueryModel } from 'src/application/queries/query-models/offres-immersion.query-model'
-import { OffreImmersion } from '../../src/domain/offre-immersion'
+import { Immersion } from '../../src/domain/offre/favori/offre-immersion'
 import { NotifierNouvellesImmersionsCommand } from '../../src/application/commands/notifier-nouvelles-immersions.command.handler'
 
 export const uneNouvelleImmersionCommand =
@@ -16,7 +16,7 @@ export const uneNouvelleImmersionCommand =
     ]
   })
 
-export const uneOffreImmersion = (): OffreImmersion => ({
+export const uneOffreImmersion = (): Immersion => ({
   id: '123ABC',
   nomEtablissement: 'Mécanique du Rhône',
   metier: 'Mécanicien',

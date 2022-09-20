@@ -1,32 +1,28 @@
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { OffreServiceCivique } from '../../../src/domain/offre-service-civique'
-import { DetailServiceCiviqueQueryModel } from '../../../src/application/queries/query-models/service-civique.query-model'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import {
-  GetDetailOffreServiceCiviqueQuery,
-  GetDetailServiceCiviqueQueryHandler
-} from '../../../src/application/queries/get-detail-service-civique.query.handler'
-import { failure } from '../../../src/building-blocks/types/result'
+import { GetDetailServiceCiviqueQueryHandler } from '../../../src/application/queries/get-detail-service-civique.query.handler'
+import { failure, success } from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
-import { unDetailOffreServiceCiviqueQuerymodel } from '../../fixtures/query-models/offre-service-civique.query-model.fixtures'
+import { EngagementClient } from '../../../src/infrastructure/clients/engagement-client'
+import { Offre } from '../../../src/domain/offre/offre'
+import { uneOffreServiceCiviqueDto } from '../../fixtures/offre-service-civique.fixture'
 
 describe('GetDetailServiceCiviqueQuery', () => {
-  let engagementRepository: StubbedType<OffreServiceCivique.Repository>
+  let serviceCiviqueClient: StubbedClass<EngagementClient>
   let getDetailServiceCiviqueQueryHandler: GetDetailServiceCiviqueQueryHandler
   let evenementService: StubbedClass<EvenementService>
   let sandbox: SinonSandbox
 
   before(() => {
     sandbox = createSandbox()
-    engagementRepository = stubInterface(sandbox)
+    serviceCiviqueClient = stubClass(EngagementClient)
     evenementService = stubClass(EvenementService)
 
     getDetailServiceCiviqueQueryHandler =
       new GetDetailServiceCiviqueQueryHandler(
-        engagementRepository,
+        serviceCiviqueClient,
         evenementService
       )
   })
@@ -36,70 +32,82 @@ describe('GetDetailServiceCiviqueQuery', () => {
   })
 
   describe('handle', () => {
-    it('retourne l"offre quand elle existe', async () => {
+    it('quand l"offre existe', async () => {
       // Given
-      const getServicesCiviqueQuery: GetDetailOffreServiceCiviqueQuery = {
-        idOffre: 'ABC123'
-      }
-      const detailServiceCiviqueQueryModel: DetailServiceCiviqueQueryModel =
-        unDetailOffreServiceCiviqueQuerymodel()
-
-      engagementRepository.getServiceCiviqueById
-        .withArgs(getServicesCiviqueQuery.idOffre)
-        .resolves(detailServiceCiviqueQueryModel)
+      const idOffreEngagement = 'unId'
+      serviceCiviqueClient.get.resolves({
+        status: 200,
+        statusText: 'OK',
+        headers: '',
+        config: '',
+        data: {
+          ok: true,
+          data: uneOffreServiceCiviqueDto()
+        }
+      })
 
       // When
-      const result = await getDetailServiceCiviqueQueryHandler.handle(
-        getServicesCiviqueQuery
-      )
+      const result = await getDetailServiceCiviqueQueryHandler.handle({
+        idOffre: idOffreEngagement
+      })
 
       // Then
-      expect(result).to.deep.equal(detailServiceCiviqueQueryModel)
+      expect(serviceCiviqueClient.get).to.have.been.calledWithExactly(
+        'v0/mission/unId'
+      )
+      const offreEngagement: Offre.Favori.ServiceCivique = {
+        titre: 'unTitre',
+        dateDeDebut: '2022-02-17T10:00:00.000Z',
+        dateDeFin: '2022-07-17T10:00:00.000Z',
+        domaine: 'Informatique',
+        ville: 'paris',
+        organisation: 'orga de ouf',
+        lienAnnonce: 'lienoffre.com',
+        urlOrganisation: 'lienorganisation.com',
+        adresseMission: 'adresse mission',
+        adresseOrganisation: 'adresse organistation',
+        codeDepartement: '75',
+        description: 'offre très intéressante',
+        codePostal: '75018',
+        descriptionOrganisation: 'description',
+        id: 'unId',
+        localisation: {
+          longitude: 1.2,
+          latitude: 3.4
+        }
+      }
+      expect(result).to.be.deep.equal(success(offreEngagement))
     })
-    it('retourne une failure quand l"offre n"existe pas', async () => {
-      // Given
-      const getServicesCiviqueQuery: GetDetailOffreServiceCiviqueQuery = {
-        idOffre: 'ABC123'
-      }
 
-      engagementRepository.getServiceCiviqueById
-        .withArgs(getServicesCiviqueQuery.idOffre)
-        .resolves(
-          failure(
-            new NonTrouveError(
-              'OffreEngagement',
-              getServicesCiviqueQuery.idOffre
-            )
-          )
-        )
+    it('quand l"offre n"existe pas', async () => {
+      // Given
+      const idOffreEngagement = 'unFauxId'
+      serviceCiviqueClient.get.rejects({
+        response: {
+          status: 404,
+          data: {
+            message: 'Not Found'
+          }
+        }
+      })
 
       // When
-      const result = await getDetailServiceCiviqueQueryHandler.handle(
-        getServicesCiviqueQuery
-      )
+      const result = await getDetailServiceCiviqueQueryHandler.handle({
+        idOffre: idOffreEngagement
+      })
 
       // Then
+      expect(serviceCiviqueClient.get).to.have.been.calledWithExactly(
+        'v0/mission/unFauxId'
+      )
       expect(result).to.be.deep.equal(
-        failure(
-          new NonTrouveError('OffreEngagement', getServicesCiviqueQuery.idOffre)
-        )
+        failure(new NonTrouveError('OffreEngagement', 'unFauxId'))
       )
     })
   })
 
   describe('monitor', () => {
     it('crée un événement de détail d"une offre service civique', async () => {
-      // Given
-      const getServicesCiviqueQuery: GetDetailOffreServiceCiviqueQuery = {
-        idOffre: 'ABC123'
-      }
-      const detailOffreEngagementQueryModel: DetailServiceCiviqueQueryModel =
-        unDetailOffreServiceCiviqueQuerymodel()
-
-      engagementRepository.getServiceCiviqueById
-        .withArgs(getServicesCiviqueQuery)
-        .resolves(detailOffreEngagementQueryModel)
-
       // When
       await getDetailServiceCiviqueQueryHandler.monitor(unUtilisateurJeune())
 

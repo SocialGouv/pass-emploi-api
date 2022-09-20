@@ -1,7 +1,5 @@
-import { GetOffresEmploiQuery } from '../application/queries/get-offres-emploi.query.handler'
-import { GetOffresImmersionQuery } from '../application/queries/get-offres-immersion.query.handler'
 import { DateTime } from 'luxon'
-import { GetServicesCiviqueQuery } from '../application/queries/get-services-civique.query.handler'
+import { Offre } from '../offre'
 
 export const RecherchesRepositoryToken = 'RecherchesRepositoryToken'
 
@@ -11,10 +9,7 @@ export interface Recherche {
   titre: string
   metier?: string
   localisation?: string
-  criteres?:
-    | GetOffresEmploiQuery
-    | GetOffresImmersionQuery
-    | GetServicesCiviqueQuery
+  criteres?: Recherche.Emploi | Recherche.ServiceCivique | Recherche.Immersion
   idJeune: string
   dateCreation: DateTime
   dateDerniereRecherche: DateTime
@@ -22,6 +17,8 @@ export interface Recherche {
 }
 
 export namespace Recherche {
+  export const DISTANCE_PAR_DEFAUT = 10
+
   export enum Type {
     OFFRES_EMPLOI = 'OFFRES_EMPLOI',
     OFFRES_IMMERSION = 'OFFRES_IMMERSION',
@@ -39,25 +36,61 @@ export namespace Recherche {
   }
 
   export interface Repository {
-    createRecherche(recherche: Recherche): Promise<void>
+    save(recherche: Recherche): Promise<void>
+
     update(recherche: Recherche): Promise<void>
+
     findAvantDate(
       typeRecherches: Recherche.Type[],
       nombreRecherches: number,
       date: DateTime
     ): Promise<Recherche[]>
-    deleteRecherche(idRecherche: string): Promise<void>
+
+    delete(idRecherche: string): Promise<void>
+
     existe(idRecherche: string, idJeune: string): Promise<boolean>
+
     trouverLesRecherchesImmersions(
-      criteres: GetOffresImmersionQuery,
+      criteres: Recherche.Immersion,
       limit: number,
       offset: number
     ): Promise<Recherche[]>
+
     trouverLesRecherchesServicesCiviques(
-      query: GetServicesCiviqueQuery,
+      query: Recherche.ServiceCivique,
       limit: number,
       offset: number,
-      depuis: DateTime
+      dateDerniereRecherche: DateTime
     ): Promise<Recherche[]>
+  }
+
+  export interface Emploi {
+    q?: string
+    departement?: string
+    alternance?: boolean
+    experience?: Offre.Emploi.Experience[]
+    debutantAccepte?: boolean
+    contrat?: Offre.Emploi.Contrat[]
+    duree?: Offre.Emploi.Duree[]
+    rayon?: number
+    commune?: string
+    minDateCreation?: DateTime
+  }
+
+  export interface Immersion {
+    rome: string
+    lat: number
+    lon: number
+    distance?: number
+  }
+
+  export interface ServiceCivique {
+    lat?: number
+    lon?: number
+    distance?: number
+    dateDeDebutMinimum?: DateTime
+    dateDeDebutMaximum?: DateTime
+    domaine?: string
+    dateDeCreationMinimum?: DateTime
   }
 }
