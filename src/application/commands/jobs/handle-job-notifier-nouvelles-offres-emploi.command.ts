@@ -165,7 +165,7 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
       | undefined
     const criteres: GetOffresEmploiQuery = {
       ...criteresBasiques,
-      minDateCreation: recherche.dateDerniereRecherche,
+      minDateCreation: recherche.dateDerniereRecherche.toISO(),
       page: 1,
       limit: 2
     }

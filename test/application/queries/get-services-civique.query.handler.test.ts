@@ -5,7 +5,6 @@ import {
   GetServicesCiviqueQuery,
   GetServicesCiviqueQueryHandler
 } from '../../../src/application/queries/get-services-civique.query.handler'
-import { DateTime } from 'luxon'
 import { ServiceCiviqueQueryModel } from '../../../src/application/queries/query-models/service-civique.query-model'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { offresServicesCiviqueQueryModel } from '../../fixtures/query-models/offre-service-civique.query-model.fixtures'
@@ -44,8 +43,8 @@ describe('GetServicesCiviqueQueryHandler', () => {
         lat: 48.86899229710103,
         lon: 2.3342718577284205,
         distance: 10,
-        dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
-        dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
+        dateDeDebutMaximum: '2022-02-17T10:00:00Z',
+        dateDeDebutMinimum: '2022-02-17T10:00:00Z',
         domaine: 'environnement'
       }
       const serviceCiviqueQueryModels: ServiceCiviqueQueryModel[] =
@@ -54,8 +53,8 @@ describe('GetServicesCiviqueQueryHandler', () => {
       findAllOffresServicesCiviqueQueryGetter.handle
         .withArgs({
           ...getServicesCiviqueQuery,
-          dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
-          dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
+          dateDeDebutMaximum: '2022-02-17T10:00:00Z',
+          dateDeDebutMinimum: '2022-02-17T10:00:00Z',
           page: 2,
           limit: 52
         })
@@ -76,8 +75,8 @@ describe('GetServicesCiviqueQueryHandler', () => {
         lat: 48.86899229710103,
         lon: 2.3342718577284205,
         distance: 10,
-        dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
-        dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z')
+        dateDeDebutMaximum: '2022-02-17T10:00:00Z',
+        dateDeDebutMinimum: '2022-02-17T10:00:00Z'
       }
       const offreEngagementQueryModels: ServiceCiviqueQueryModel[] =
         offresServicesCiviqueQueryModel()
@@ -105,8 +104,8 @@ describe('GetServicesCiviqueQueryHandler', () => {
         lat: 48.86899229710103,
         lon: 2.3342718577284205,
         distance: 10,
-        dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
-        dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
+        dateDeDebutMaximum: '2022-02-17T10:00:00Z',
+        dateDeDebutMinimum: '2022-02-17T10:00:00Z',
         domaine: 'environnement'
       }
       const serviceCiviqueQueryModels: ServiceCiviqueQueryModel[] =
@@ -115,8 +114,8 @@ describe('GetServicesCiviqueQueryHandler', () => {
       findAllOffresServicesCiviqueQueryGetter.handle
         .withArgs({
           ...getServicesCiviqueQuery,
-          dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
-          dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
+          dateDeDebutMaximum: '2022-02-17T10:00:00Z',
+          dateDeDebutMinimum: '2022-02-17T10:00:00Z',
           page: 2,
           limit: 52
         })

@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { FindOffresEmploiQueryParams } from '../../../infrastructure/routes/validation/offres-emploi.inputs'
-import { GetOffresImmersionQueryParams } from '../../../infrastructure/routes/validation/offres-immersion.inputs'
 import { Polygon } from 'geojson'
+import { Offre } from '../../../domain/offre/offre'
 
 export class RechercheQueryModel {
   @ApiProperty()
@@ -15,7 +14,10 @@ export class RechercheQueryModel {
   @ApiProperty()
   localisation?: string
   @ApiProperty()
-  criteres?: FindOffresEmploiQueryParams | GetOffresImmersionQueryParams
+  criteres?:
+    | Offre.Recherche.Emploi
+    | Offre.Recherche.Immersion
+    | Offre.Recherche.ServiceCivique
   @ApiProperty()
   geometrie?: Polygon
 }

@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon'
 import {
   uneOffreServiceCivique,
   uneOffreServiceCiviqueDto
@@ -28,7 +27,7 @@ describe('FindAllOffresServicesCiviqueQueryGetter', () => {
         const criteres: GetServicesCiviqueQuery = {
           page: 1,
           limit: 50,
-          dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
+          dateDeDebutMaximum: '2022-02-17T10:00:00Z',
           lat: 48.86899229710103,
           lon: 2.3342718577284205,
           distance: 10,
@@ -72,11 +71,11 @@ describe('FindAllOffresServicesCiviqueQueryGetter', () => {
         const criteres: GetServicesCiviqueQuery = {
           page: 2,
           limit: 63,
-          dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
+          dateDeDebutMaximum: '2022-02-17T10:00:00Z',
           lat: 48.86899229710103,
           lon: 2.3342718577284205,
           distance: 10,
-          dateDeCreationMinimum: DateTime.fromISO('2022-02-17T10:00:00Z')
+          dateDeCreationMinimum: '2022-02-17T10:00:00Z'
         }
         const params = new URLSearchParams()
         params.append('size', '63')

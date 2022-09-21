@@ -174,4 +174,16 @@ export const unUtilisateurDecode = (): Authentification.Utilisateur => ({
   roles: []
 })
 
+export const unUtilisateurDecodePoleEmploi =
+  (): Authentification.Utilisateur => ({
+    id: 'bcd60403-5f10-4a16-a660-2099d79ebd66',
+    email: 'conseiller.milo.passemploi@gmail.com',
+    nom: 'Durant',
+    prenom: 'Albert',
+    username: 'a.durant',
+    type: Authentification.Type.JEUNE,
+    structure: Core.Structure.POLE_EMPLOI,
+    roles: []
+  })
+
 export const unHeaderAuthorization = (): string => 'bearer coucou'

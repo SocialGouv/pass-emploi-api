@@ -668,7 +668,7 @@ describe('RechercheSqlRepository', () => {
           it('ça matche', async () => {
             // When
             const query: GetServicesCiviqueQuery = {
-              dateDeDebutMinimum: DateTime.fromISO('2022-04-28T10:10:10')
+              dateDeDebutMinimum: '2022-04-28T10:10:10'
             }
             const recherches =
               await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
@@ -714,7 +714,7 @@ describe('RechercheSqlRepository', () => {
             idJeune,
             type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
             criteres: {
-              dateDeDebutMinimum: DateTime.fromISO('2022-05-01T10:10:10')
+              dateDeDebutMinimum: '2022-05-01T10:10:10'
             }
           })
 
@@ -724,7 +724,7 @@ describe('RechercheSqlRepository', () => {
           it('ça matche pas', async () => {
             // When
             const query: GetServicesCiviqueQuery = {
-              dateDeDebutMinimum: DateTime.fromISO('2022-04-01T10:10:10')
+              dateDeDebutMinimum: '2022-04-01T10:10:10'
             }
             const recherches =
               await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(
@@ -743,7 +743,7 @@ describe('RechercheSqlRepository', () => {
           it('ça matche', async () => {
             // When
             const query: GetServicesCiviqueQuery = {
-              dateDeDebutMinimum: DateTime.fromISO('2022-05-02T10:10:10')
+              dateDeDebutMinimum: '2022-05-02T10:10:10'
             }
             const recherches =
               await rechercheSqlRepository.trouverLesRecherchesServicesCiviques(

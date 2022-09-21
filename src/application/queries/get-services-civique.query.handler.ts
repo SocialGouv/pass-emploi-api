@@ -10,7 +10,6 @@ import {
   success
 } from '../../building-blocks/types/result'
 import { ServiceCiviqueQueryModel } from './query-models/service-civique.query-model'
-import { DateTime } from 'luxon'
 import { FindAllOffresServicesCiviqueQueryGetter } from './query-getters/find-all-offres-services-civique.query.getter'
 
 export interface GetServicesCiviqueQuery extends Query {
@@ -19,10 +18,10 @@ export interface GetServicesCiviqueQuery extends Query {
   lat?: number
   lon?: number
   distance?: number
-  dateDeDebutMinimum?: DateTime
-  dateDeDebutMaximum?: DateTime
+  dateDeDebutMinimum?: string
+  dateDeDebutMaximum?: string
   domaine?: string
-  dateDeCreationMinimum?: DateTime
+  dateDeCreationMinimum?: string
 }
 
 @Injectable()

@@ -29,7 +29,6 @@ import {
   offresServicesCiviqueQueryModel,
   unDetailOffreServiceCiviqueQuerymodel
 } from '../../fixtures/query-models/offre-service-civique.query-model.fixtures'
-import { DateTime } from 'luxon'
 
 describe('ServicesCiviqueController', () => {
   let getServicesCiviqueQueryHandler: StubbedClass<GetServicesCiviqueQueryHandler>
@@ -75,8 +74,8 @@ describe('ServicesCiviqueController', () => {
         const expectedQuery: GetServicesCiviqueQuery = {
           page: 1,
           limit: 50,
-          dateDeDebutMaximum: DateTime.fromISO('2022-02-17T10:00:00Z'),
-          dateDeDebutMinimum: DateTime.fromISO('2022-02-17T10:00:00Z'),
+          dateDeDebutMaximum: '2022-02-17T10:00:00Z',
+          dateDeDebutMinimum: '2022-02-17T10:00:00Z',
           lat: 48.86899229710103,
           lon: 2.3342718577284205,
           distance: 10,

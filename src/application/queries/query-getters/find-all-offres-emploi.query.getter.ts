@@ -9,8 +9,8 @@ import { ErreurHttp } from '../../../building-blocks/types/domain-error'
 import { PoleEmploiClient } from '../../../infrastructure/clients/pole-emploi-client'
 import { URLSearchParams } from 'url'
 import { DateService } from '../../../utils/date-service'
-import { Offre } from '../../../domain/offre/offre'
 import { GetOffresEmploiQuery } from '../get-offres-emploi.query.handler'
+import { DateTime } from 'luxon'
 
 const DEFAULT_PAGE = 1
 const DEFAULT_LIMIT = 50
@@ -88,7 +88,7 @@ export class FindAllOffresEmploiQueryGetter {
   }
 
   private construireLesParams(
-    criteres: Offre.Recherche.Emploi,
+    criteres: GetOffresEmploiQuery,
     page: number,
     limit: number
   ): URLSearchParams {
@@ -141,7 +141,7 @@ export class FindAllOffresEmploiQueryGetter {
     if (minDateCreation) {
       params.append(
         'minCreationDate',
-        minDateCreation
+        DateTime.fromISO(minDateCreation)
           .toUTC()
           .set({ millisecond: 0 })
           .toISO({ suppressMilliseconds: true })

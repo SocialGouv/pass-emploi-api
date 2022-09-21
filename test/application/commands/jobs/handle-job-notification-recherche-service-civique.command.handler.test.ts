@@ -36,7 +36,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
 
     const now = DateTime.fromISO('2020-04-06T12:00:00.000Z').toUTC()
     const aujourdhuiAMinuit = now.set({ hour: 0, minute: 0, second: 0 })
-    const hier = DateTime.fromISO('2020-04-05T12:00:00.000Z').toUTC()
+    const hier = DateTime.fromISO('2020-04-05T12:00:00.000Z').toUTC().toISO()
 
     const LIMITE_PAGINATION = 100
 
@@ -109,7 +109,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
             domaine: uneOffre.domaine,
             lat: uneOffre.localisation!.latitude,
             lon: uneOffre.localisation!.longitude,
-            dateDeDebutMinimum: DateTime.fromISO(uneOffre.dateDeDebut!)
+            dateDeDebutMinimum: uneOffre.dateDeDebut
           }
           rechercheRepository.trouverLesRecherchesServicesCiviques
             .withArgs(criteres, LIMITE_PAGINATION, 0, aujourdhuiAMinuit)
@@ -135,7 +135,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
             domaine: uneOffre.domaine,
             lat: uneOffre.localisation!.latitude,
             lon: uneOffre.localisation!.longitude,
-            dateDeDebutMinimum: DateTime.fromISO(uneOffre.dateDeDebut!)
+            dateDeDebutMinimum: uneOffre.dateDeDebut
           }
           rechercheRepository.trouverLesRecherchesServicesCiviques
             .withArgs(criteres, LIMITE_PAGINATION, 0, aujourdhuiAMinuit)
@@ -192,7 +192,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
           domaine: uneOffre.domaine,
           lat: uneOffre.localisation!.latitude,
           lon: uneOffre.localisation!.longitude,
-          dateDeDebutMinimum: DateTime.fromISO(uneOffre.dateDeDebut!)
+          dateDeDebutMinimum: uneOffre.dateDeDebut
         }
         const centRecherches = Array.from({ length: 100 }).fill(uneRecherche())
         rechercheRepository.trouverLesRecherchesServicesCiviques
