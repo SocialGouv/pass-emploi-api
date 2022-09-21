@@ -37,7 +37,7 @@ export class ContextInterceptor implements NestInterceptor {
 
     // Récupération de l'utilisateur avant l'appel de la route. cf: https://docs.nestjs.com/interceptors#interceptors
     const utilisateur = executionContext.switchToHttp().getRequest()
-      .authenticated.utilisateur
+      .authenticated?.utilisateur
     this.context.set(ContextKey.UTILISATEUR, utilisateur)
 
     return next.handle().pipe(
