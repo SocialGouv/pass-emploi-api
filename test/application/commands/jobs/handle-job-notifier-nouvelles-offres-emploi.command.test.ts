@@ -125,7 +125,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           page: 1,
           limit: 2,
           q: 'test1',
-          minDateCreation: dateDerniereRecherche
+          minDateCreation: dateDerniereRecherche.toISO()
         }
         expect(findAllOffresEmploiQueryGetter.handle).to.have.been.calledWith(
           expectedFirstCall
@@ -134,7 +134,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           page: 1,
           limit: 2,
           q: 'test2',
-          minDateCreation: dateDerniereRecherche
+          minDateCreation: dateDerniereRecherche.toISO()
         }
         expect(findAllOffresEmploiQueryGetter.handle).to.have.been.calledWith(
           expectedSecondCall
@@ -205,7 +205,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           duree: criteres.duree,
           rayon: criteres.rayon,
           commune: criteres.commune,
-          minDateCreation: dateDerniereRecherche
+          minDateCreation: dateDerniereRecherche.toISO()
         }
         expect(
           findAllOffresEmploiQueryGetter.handle
@@ -217,7 +217,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
           page: 1,
           limit: 2,
           q: criteresRecherche1.q,
-          minDateCreation: dateDerniereRecherche
+          minDateCreation: dateDerniereRecherche.toISO()
         }
         findAllOffresEmploiQueryGetter.handle
           .resolves(success(offresEmploiQueryModelSansResultats))

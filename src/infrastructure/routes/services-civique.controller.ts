@@ -12,10 +12,7 @@ import {
   GetDetailOffreServiceCiviqueQuery,
   GetDetailServiceCiviqueQueryHandler
 } from '../../application/queries/get-detail-service-civique.query.handler'
-import {
-  GetServicesCiviqueQuery,
-  GetServicesCiviqueQueryHandler
-} from '../../application/queries/get-services-civique.query.handler'
+import { GetServicesCiviqueQueryHandler } from '../../application/queries/get-services-civique.query.handler'
 import {
   DetailServiceCiviqueQueryModel,
   ServiceCiviqueQueryModel
@@ -28,7 +25,6 @@ import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { GetServicesCiviqueQueryParams } from './validation/services-civique.inputs'
-import { DateTime } from 'luxon'
 
 @Controller('services-civique')
 @ApiOAuth2([])
@@ -48,20 +44,8 @@ export class ServicesCiviqueController {
     @Query() findServicesCiviqueQuery: GetServicesCiviqueQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<ServiceCiviqueQueryModel[]> {
-    const dateDeDebutMinimum = findServicesCiviqueQuery.dateDeDebutMinimum
-      ? DateTime.fromISO(findServicesCiviqueQuery.dateDeDebutMinimum)
-      : undefined
-    const dateDeDebutMaximum = findServicesCiviqueQuery.dateDeDebutMaximum
-      ? DateTime.fromISO(findServicesCiviqueQuery.dateDeDebutMaximum)
-      : undefined
-    const query: GetServicesCiviqueQuery = {
-      ...findServicesCiviqueQuery,
-      dateDeDebutMinimum,
-      dateDeDebutMaximum
-    }
-
     const result = await this.getServicesCiviqueQueryHandler.execute(
-      query,
+      findServicesCiviqueQuery,
       utilisateur
     )
 

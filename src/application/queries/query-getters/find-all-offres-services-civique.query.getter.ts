@@ -73,13 +73,13 @@ export class FindAllOffresServicesCiviqueQueryGetter {
       params.append('lon', lon.toString())
     }
     if (dateDeDebutMaximum) {
-      params.append('startAt', `lt:${dateDeDebutMaximum.toUTC().toISO()}`)
+      params.append('startAt', `lt:${dateDeDebutMaximum}`)
     }
     if (dateDeDebutMinimum) {
-      params.append('startAt', `gt:${dateDeDebutMinimum.toUTC().toISO()}`)
+      params.append('startAt', `gt:${dateDeDebutMinimum}`)
     }
     if (dateDeCreationMinimum) {
-      params.append('createdAt', `gt:${dateDeCreationMinimum.toUTC().toISO()}`)
+      params.append('createdAt', `gt:${dateDeCreationMinimum}`)
     }
     if (distance) {
       params.append('distance', `${distance}km`)

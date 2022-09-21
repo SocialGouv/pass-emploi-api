@@ -8,9 +8,8 @@ import {
 } from 'sequelize-typescript'
 import { Polygon } from 'geojson'
 import { Recherche } from '../../../domain/offre/recherche/recherche'
-import { GetOffresEmploiQuery } from '../../../application/queries/get-offres-emploi.query.handler'
-import { GetOffresImmersionQuery } from '../../../application/queries/get-offres-immersion.query.handler'
 import { JeuneSqlModel } from './jeune.sql-model'
+import { Offre } from '../../../domain/offre/offre'
 
 export class RechercheDto extends Model {
   @PrimaryKey
@@ -34,7 +33,11 @@ export class RechercheDto extends Model {
   localisation: string | null
 
   @Column({ field: 'criteres', type: DataType.JSONB })
-  criteres: GetOffresEmploiQuery | GetOffresImmersionQuery | null
+  criteres:
+    | Offre.Recherche.Emploi
+    | Offre.Recherche.Immersion
+    | Offre.Recherche.ServiceCivique
+    | null
 
   @Column({ field: 'date_creation', type: DataType.DATE })
   dateCreation: Date

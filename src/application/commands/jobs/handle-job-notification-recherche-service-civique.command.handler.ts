@@ -64,7 +64,7 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
     const result = await this.findAllOffresServicesCiviqueQueryGetter.handle({
       page: 1,
       limit: PAGINATION_NOMBRE_D_OFFRES_MAXIMUM,
-      dateDeCreationMinimum: hier
+      dateDeCreationMinimum: hier.toISO()
     })
 
     if (isFailure(result)) {
@@ -89,8 +89,6 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
           lat: offre.localisation.latitude,
           lon: offre.localisation.longitude,
           dateDeDebutMinimum: offre.dateDeDebut
-            ? DateTime.fromISO(offre.dateDeDebut)
-            : undefined
         }
         const recherches =
           await this.rechercheRepository.trouverLesRecherchesServicesCiviques(

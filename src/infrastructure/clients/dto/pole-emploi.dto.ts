@@ -163,7 +163,7 @@ export interface SuggestionDto {
     }
   }
   mobilites?: Array<{
-    rayon: number
+    rayon?: number
     lieu: {
       code: string
       codeDepartement?: string
@@ -174,7 +174,7 @@ export interface SuggestionDto {
         libelle: string
       }
     }
-    unite: {
+    unite?: {
       code: string
       libelle: string
     }

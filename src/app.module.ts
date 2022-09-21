@@ -229,6 +229,16 @@ import { GetRendezVousJeunePoleEmploiQueryGetter } from './application/queries/q
 import { HandleJobMettreAJourCodesEvenementsCommandHandler } from './application/commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
 import { GetIndicateursPourConseillerQueryHandler } from './application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { HandleJobNettoyerLesDonneesCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-donnees.command.db'
+import { RafraichirSuggestionPoleEmploiCommandHandler } from './application/commands/rafraichir-suggestion-pole-emploi.command.handler'
+import { Offre } from './domain/offre/offre'
+import { SuggestionPeHttpRepository } from './infrastructure/repositories/offre/recherche/suggestion/suggestion-pe-http.repository'
+import {
+  SuggestionsPoleEmploiRepositoryToken,
+  SuggestionsRepositoryToken
+} from './domain/offre/recherche/suggestion/suggestion'
+import { SuggestionSqlRepository } from './infrastructure/repositories/offre/recherche/suggestion/suggestion-sql.repository.db'
+import { GetSuggestionsQueryHandler } from './application/queries/get-suggestions.query.handler.db'
+import { SuggestionPoleEmploiService } from './domain/offre/recherche/suggestion/pole-emploi.service'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -286,6 +296,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Jeune.Factory,
     Jeune.ConfigurationApplication.Factory,
     Fichier.Factory,
+    Offre.Recherche.Suggestion.Factory,
+    SuggestionPoleEmploiService,
     Notification.Service,
     WorkerService,
     TaskService,
@@ -403,6 +415,14 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: ActionMiloRepositoryToken,
       useClass: ActionMiloHttpRepository
+    },
+    {
+      provide: SuggestionsPoleEmploiRepositoryToken,
+      useClass: SuggestionPeHttpRepository
+    },
+    {
+      provide: SuggestionsRepositoryToken,
+      useClass: SuggestionSqlRepository
     },
     ...databaseProviders
   ],
@@ -531,7 +551,9 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDemarchesQueryGetter,
     GetRendezVousJeunePoleEmploiQueryGetter,
     HandleJobMettreAJourCodesEvenementsCommandHandler,
-    GetIndicateursPourConseillerQueryHandler
+    GetIndicateursPourConseillerQueryHandler,
+    RafraichirSuggestionPoleEmploiCommandHandler,
+    GetSuggestionsQueryHandler
   ]
 }
 

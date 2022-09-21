@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 import { Offre } from '../offre'
+import * as _Suggestion from './suggestion/suggestion'
 
 export const RecherchesRepositoryToken = 'RecherchesRepositoryToken'
 
@@ -17,6 +18,10 @@ export interface Recherche {
 }
 
 export namespace Recherche {
+  // FIXME: le linter ne comprend pas cette technique 🤷‍️
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  export import Suggestion = _Suggestion.Suggestion
+
   export const DISTANCE_PAR_DEFAUT = 10
 
   export enum Type {
@@ -74,7 +79,7 @@ export namespace Recherche {
     duree?: Offre.Emploi.Duree[]
     rayon?: number
     commune?: string
-    minDateCreation?: DateTime
+    minDateCreation?: string
   }
 
   export interface Immersion {
@@ -88,9 +93,9 @@ export namespace Recherche {
     lat?: number
     lon?: number
     distance?: number
-    dateDeDebutMinimum?: DateTime
-    dateDeDebutMaximum?: DateTime
+    dateDeDebutMinimum?: string
+    dateDeDebutMaximum?: string
     domaine?: string
-    dateDeCreationMinimum?: DateTime
+    dateDeCreationMinimum?: string
   }
 }

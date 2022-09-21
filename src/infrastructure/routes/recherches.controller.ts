@@ -15,7 +15,7 @@ import {
   CreateRechercheCommand,
   CreateRechercheCommandHandler
 } from '../../application/commands/create-recherche.command.handler'
-import { Utilisateur } from '../decorators/authenticated.decorator'
+import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
 import {
   CreateRechercheImmersionPayload,
@@ -34,7 +34,11 @@ import {
   DeleteRechercheCommand,
   DeleteRechercheCommandHandler
 } from '../../application/commands/delete-recherche.command.handler'
-import { DateTime } from 'luxon'
+import { RafraichirSuggestionPoleEmploiCommandHandler } from '../../application/commands/rafraichir-suggestion-pole-emploi.command.handler'
+import { handleFailure } from './failure.handler'
+import { Core } from '../../domain/core'
+import { GetSuggestionsQueryHandler } from '../../application/queries/get-suggestions.query.handler.db'
+import { SuggestionQueryModel } from '../../application/queries/query-models/suggestion.query-model'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -43,7 +47,9 @@ export class RecherchesController {
   constructor(
     private readonly createRechercheCommandHandler: CreateRechercheCommandHandler,
     private readonly getRecherchesQueryHandler: GetRecherchesQueryHandler,
-    private readonly deleteRechercheCommandHandler: DeleteRechercheCommandHandler
+    private readonly deleteRechercheCommandHandler: DeleteRechercheCommandHandler,
+    private readonly rafraichirSuggestionPoleEmploiCommandHandler: RafraichirSuggestionPoleEmploiCommandHandler,
+    private readonly getSuggestionsQueryHandler: GetSuggestionsQueryHandler
   ) {}
 
   @Post('recherches/offres-emploi')
@@ -88,22 +94,13 @@ export class RecherchesController {
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const dateDeDebutMinimum = createRecherchePayload.criteres
-      .dateDeDebutMinimum
-      ? DateTime.fromISO(
-          createRecherchePayload.criteres.dateDeDebutMinimum
-        ).toUTC()
-      : undefined
     const command: CreateRechercheCommand = {
       metier: undefined,
       idJeune: idJeune,
       type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
       titre: createRecherchePayload.titre,
       localisation: createRecherchePayload.localisation,
-      criteres: {
-        ...createRecherchePayload.criteres,
-        dateDeDebutMinimum: dateDeDebutMinimum
-      }
+      criteres: createRecherchePayload.criteres
     }
     await this.createRechercheCommandHandler.execute(command, utilisateur)
   }
@@ -144,5 +141,32 @@ export class RecherchesController {
     if (isFailure(result)) {
       throw new NotFoundException(result.error)
     }
+  }
+
+  @Get('recherches/suggestions')
+  @ApiResponse({
+    type: SuggestionQueryModel,
+    isArray: true
+  })
+  async getSuggestions(
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @AccessToken() accessToken: string
+  ): Promise<SuggestionQueryModel[]> {
+    if (utilisateur.structure === Core.Structure.POLE_EMPLOI) {
+      const result =
+        await this.rafraichirSuggestionPoleEmploiCommandHandler.execute(
+          {
+            idJeune,
+            token: accessToken
+          },
+          utilisateur
+        )
+
+      if (isFailure(result)) {
+        throw handleFailure(result)
+      }
+    }
+    return this.getSuggestionsQueryHandler.execute({ idJeune }, utilisateur)
   }
 }

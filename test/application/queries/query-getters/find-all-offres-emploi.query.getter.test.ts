@@ -114,7 +114,7 @@ describe('FindAllOffresEmploiQueryGetter', () => {
           limit: 50,
           alternance: false,
           commune: '75118',
-          minDateCreation: minDateDeCreation
+          minDateCreation: minDateDeCreation.toISO()
         }
         await findAllOffresEmploiQueryGetter.handle(criteres)
         const expectedQueryParams = new URLSearchParams({

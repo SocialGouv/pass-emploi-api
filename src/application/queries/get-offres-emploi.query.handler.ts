@@ -7,7 +7,6 @@ import { OffresEmploiQueryModel } from './query-models/offres-emploi.query-model
 import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { FindAllOffresEmploiQueryGetter } from './query-getters/find-all-offres-emploi.query.getter'
 import { Offre } from '../../domain/offre/offre'
-import { DateTime } from 'luxon'
 
 export interface GetOffresEmploiQuery extends Query {
   page?: number
@@ -21,7 +20,7 @@ export interface GetOffresEmploiQuery extends Query {
   duree?: Offre.Emploi.Duree[]
   rayon?: number
   commune?: string
-  minDateCreation?: DateTime
+  minDateCreation?: string
 }
 
 @Injectable()

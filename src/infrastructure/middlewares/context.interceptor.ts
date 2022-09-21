@@ -5,7 +5,7 @@ import {
   Logger,
   NestInterceptor
 } from '@nestjs/common'
-import { Observable } from 'rxjs'
+import { catchError, Observable } from 'rxjs'
 import { tap } from 'rxjs/operators'
 import {
   AppelPartenaireResultat,
@@ -44,6 +44,10 @@ export class ContextInterceptor implements NestInterceptor {
       tap(data => {
         // Après l'appel de la route, on récupère le contexte et on le persiste
         this.persisterResultatAppelPartenaire(this.context.get(), data)
+      }),
+      catchError(_err => {
+        this.persisterResultatAppelPartenaire(this.context.get(), {})
+        throw _err
       })
     )
   }

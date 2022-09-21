@@ -9,7 +9,10 @@ import {
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import {
   unHeaderAuthorization,
-  unUtilisateurDecode
+  unJwtPayloadValide,
+  unJwtPayloadValideJeunePE,
+  unUtilisateurDecode,
+  unUtilisateurDecodePoleEmploi
 } from '../../fixtures/authentification.fixture'
 import * as request from 'supertest'
 import { CreateRechercheCommandHandler } from '../../../src/application/commands/create-recherche.command.handler'
@@ -30,19 +33,34 @@ import {
   DeleteRechercheCommandHandler
 } from '../../../src/application/commands/delete-recherche.command.handler'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
-import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
 import { Offre } from '../../../src/domain/offre/offre'
+import { RafraichirSuggestionPoleEmploiCommandHandler } from '../../../src/application/commands/rafraichir-suggestion-pole-emploi.command.handler'
+import { JwtService } from '../../../src/infrastructure/auth/jwt.service'
+import { GetSuggestionsQueryHandler } from '../../../src/application/queries/get-suggestions.query.handler.db'
+import { SuggestionQueryModel } from '../../../src/application/queries/query-models/suggestion.query-model'
 
 describe('RecherchesController', () => {
   let createRechercheCommandHandler: StubbedClass<CreateRechercheCommandHandler>
   let getRecherchesQueryHandler: StubbedClass<GetRecherchesQueryHandler>
   let deleteRechercheCommandHandler: StubbedClass<DeleteRechercheCommandHandler>
+  let rafraichirSuggestionPoleEmploiCommandHandler: StubbedClass<RafraichirSuggestionPoleEmploiCommandHandler>
+  let getSuggestionsQueryHandler: StubbedClass<GetSuggestionsQueryHandler>
+  let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
-  before(async () => {
+  beforeEach(async () => {
     createRechercheCommandHandler = stubClass(CreateRechercheCommandHandler)
     getRecherchesQueryHandler = stubClass(GetRecherchesQueryHandler)
     deleteRechercheCommandHandler = stubClass(DeleteRechercheCommandHandler)
+    rafraichirSuggestionPoleEmploiCommandHandler = stubClass(
+      RafraichirSuggestionPoleEmploiCommandHandler
+    )
+    getSuggestionsQueryHandler = stubClass(GetSuggestionsQueryHandler)
+    jwtService = stubClass(JwtService)
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateRechercheCommandHandler)
       .useValue(createRechercheCommandHandler)
@@ -50,6 +68,12 @@ describe('RecherchesController', () => {
       .useValue(getRecherchesQueryHandler)
       .overrideProvider(DeleteRechercheCommandHandler)
       .useValue(deleteRechercheCommandHandler)
+      .overrideProvider(RafraichirSuggestionPoleEmploiCommandHandler)
+      .useValue(rafraichirSuggestionPoleEmploiCommandHandler)
+      .overrideProvider(GetSuggestionsQueryHandler)
+      .useValue(getSuggestionsQueryHandler)
+      .overrideProvider(JwtService)
+      .useValue(jwtService)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -59,6 +83,10 @@ describe('RecherchesController', () => {
 
   after(async () => {
     await app.close()
+  })
+
+  beforeEach(() => {
+    jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
   })
 
   describe('POST /recherches/offres-emploi', () => {
@@ -234,7 +262,7 @@ describe('RecherchesController', () => {
               lat: 12345,
               lon: 67890,
               distance: 30,
-              dateDeDebutMinimum: uneDatetime.toUTC()
+              dateDeDebutMinimum: uneDatetime.toUTC().toISO()
             }
           },
           unUtilisateurDecode()
@@ -332,6 +360,98 @@ describe('RecherchesController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'delete',
       '/jeunes/ABCDE/recherches/123'
+    )
+  })
+
+  describe('GET /recherches/suggestions', () => {
+    const queryModel: SuggestionQueryModel = {
+      id: 'f781ae20-8838-49c7-aa2e-9b224318fb65',
+      titre: 'Petrisseur',
+      type: Offre.Recherche.Type.OFFRES_EMPLOI,
+      metier: 'Boulanger',
+      localisation: 'Lille',
+      dateCreation: uneDatetime.toISO(),
+      dateMiseAJour: uneDatetime.toISO()
+    }
+
+    describe("quand c'est un jeune pole emploi", () => {
+      beforeEach(() => {
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
+      })
+      describe('quand tout va bien', () => {
+        it('rafraichit les suggestions pole emploi et retourne les suggestions', async () => {
+          // Given
+          rafraichirSuggestionPoleEmploiCommandHandler.execute.resolves(
+            emptySuccess()
+          )
+          getSuggestionsQueryHandler.execute
+            .withArgs({ idJeune: '1' }, unUtilisateurDecodePoleEmploi())
+            .resolves([queryModel])
+
+          // When
+          await request(app.getHttpServer())
+            .get('/jeunes/1/recherches/suggestions')
+            .set('authorization', unHeaderAuthorization())
+
+            // Then
+            .expect(HttpStatus.OK)
+            .expect([queryModel])
+          expect(
+            rafraichirSuggestionPoleEmploiCommandHandler.execute
+          ).to.have.been.calledWithExactly(
+            {
+              idJeune: '1',
+              token: 'coucou'
+            },
+            unUtilisateurDecodePoleEmploi()
+          )
+        })
+      })
+      describe('quand PE est down', () => {
+        it('retourne une erreur', async () => {
+          // Given
+          rafraichirSuggestionPoleEmploiCommandHandler.execute.resolves(
+            failure(new ErreurHttp('Erreur', 500))
+          )
+          // When
+          await request(app.getHttpServer())
+            .get('/jeunes/1/recherches/suggestions')
+            .set('authorization', unHeaderAuthorization())
+
+            // Then
+            .expect(HttpStatus.INTERNAL_SERVER_ERROR)
+        })
+      })
+    })
+    describe("quand c'est un jeune autre que pole emploi", () => {
+      beforeEach(() => {
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+      })
+      describe('quand tout va bien', () => {
+        it('ne rafraichit pas les suggestions et renvoie les suggestions', async () => {
+          // Given
+          getSuggestionsQueryHandler.execute
+            .withArgs({ idJeune: '1' }, unUtilisateurDecode())
+            .resolves([queryModel])
+
+          // When
+          await request(app.getHttpServer())
+            .get('/jeunes/1/recherches/suggestions')
+            .set('authorization', unHeaderAuthorization())
+
+            // Then
+            .expect(HttpStatus.OK)
+            .expect([queryModel])
+          expect(
+            rafraichirSuggestionPoleEmploiCommandHandler.execute
+          ).not.to.have.been.called()
+        })
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/jeunes/1/recherches/suggestions'
     )
   })
 })

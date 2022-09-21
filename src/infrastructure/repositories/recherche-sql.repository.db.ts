@@ -277,10 +277,7 @@ export class RechercheSqlRepository implements Recherche.Repository {
       return {
         criteres: {
           dateDeDebutMinimum: {
-            [Op.or]: [
-              { [Op.eq]: null },
-              { [Op.lte]: query.dateDeDebutMinimum.toJSDate() }
-            ]
+            [Op.or]: [{ [Op.eq]: null }, { [Op.lte]: query.dateDeDebutMinimum }]
           }
         }
       }

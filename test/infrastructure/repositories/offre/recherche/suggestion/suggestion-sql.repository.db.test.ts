@@ -1,0 +1,83 @@
+import { DatabaseForTesting } from '../../../../../utils/database-for-testing'
+import { ConseillerSqlModel } from '../../../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { unConseillerDto } from '../../../../../fixtures/sql-models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unJeuneDto } from '../../../../../fixtures/sql-models/jeune.sql-model'
+import { SuggestionSqlRepository } from '../../../../../../src/infrastructure/repositories/offre/recherche/suggestion/suggestion-sql.repository.db'
+import { SuggestionSqlModel } from '../../../../../../src/infrastructure/sequelize/models/suggestion.sql-model'
+import { expect } from '../../../../../utils'
+import { Offre } from '../../../../../../src/domain/offre/offre'
+import { uneDatetime } from '../../../../../fixtures/date.fixture'
+
+describe('SuggestionSqlRepository', () => {
+  DatabaseForTesting.prepare()
+  let suggestionSqlRepository: SuggestionSqlRepository
+  const suggestion: Offre.Recherche.Suggestion = {
+    dateCreation: uneDatetime,
+    dateMiseAJour: uneDatetime,
+    id: 'f781ae20-8838-49c7-aa2e-9b224318fb65',
+    idFonctionnel: 'D1104-COMMUNE-59220-10',
+    idJeune: 'ABCDE',
+    type: Offre.Recherche.Type.OFFRES_EMPLOI,
+    source: Offre.Recherche.Suggestion.Source.POLE_EMPLOI,
+    informations: {
+      titre: 'Petrisseur',
+      localisation: 'Lille',
+      metier: 'Boulanger'
+    },
+    criteres: {
+      q: 'Petrisseur',
+      commune: '59220',
+      rayon: 10,
+      minDateCreation: uneDatetime.toISO()
+    }
+  }
+
+  const jeuneDto = unJeuneDto()
+
+  beforeEach(async () => {
+    await ConseillerSqlModel.creer(unConseillerDto())
+    await JeuneSqlModel.creer(jeuneDto)
+
+    suggestionSqlRepository = new SuggestionSqlRepository()
+  })
+
+  describe('save', () => {
+    it('sauvegarde une suggestion', async () => {
+      // When
+      await suggestionSqlRepository.save(suggestion)
+
+      // Then
+      const suggestions = await SuggestionSqlModel.findAll()
+      expect(suggestions).to.have.length(1)
+      expect(suggestions[0].id).to.equal(suggestion.id)
+    })
+  })
+
+  describe('findAll', () => {
+    it("retourne les suggestions d'un jeune", async () => {
+      // Given
+      await suggestionSqlRepository.save(suggestion)
+
+      // When
+      const suggestions = await suggestionSqlRepository.findAll(jeuneDto.id)
+
+      // Then
+      expect(suggestions).to.deep.equal([suggestion])
+    })
+  })
+
+  describe('delete', () => {
+    it('supprime une suggestion', async () => {
+      // Given
+      await suggestionSqlRepository.save(suggestion)
+
+      // When
+      await suggestionSqlRepository.delete(suggestion.id)
+
+      // Then
+      const suggestions = await suggestionSqlRepository.findAll(jeuneDto.id)
+      expect(suggestions).to.have.length(0)
+    })
+  })
+})
