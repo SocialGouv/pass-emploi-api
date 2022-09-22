@@ -82,7 +82,7 @@ describe('SuggestionPeHttpRepository', () => {
       })
     })
     describe('une suggestion sur un departement', () => {
-      it('retourne une suggestion pour la commune et une pour le département', async () => {
+      it('retourne une suggestion pour le département', async () => {
         // Given
         client.getSuggestionsRecherches.resolves(
           success([uneSuggestionDtoUnDepartement()])
@@ -95,15 +95,15 @@ describe('SuggestionPeHttpRepository', () => {
         const expected: Suggestion.PoleEmploi[] = [
           {
             informations: {
-              localisation: 'NANTES',
+              localisation: 'Nord',
               metier: "Conduite d'engins de déplacement des charges",
               titre: 'Cariste'
             },
             rome: 'N1101',
             localisation: {
-              code: '44300',
-              type: 'COMMUNE',
-              rayon: 10
+              code: '59',
+              type: 'DEPARTEMENT',
+              rayon: undefined
             },
             texteRecherche: 'Cariste'
           }

@@ -290,20 +290,13 @@ export const uneSuggestionDtoUnDepartement = (): SuggestionDto => {
     mobilites: [
       {
         lieu: {
-          code: '44300',
-          codeDepartement: '44',
-          codePostal: '44300',
-          libelle: 'NANTES',
+          code: '59',
           type: {
-            code: '5',
-            libelle: 'Commune'
-          }
-        },
-        unite: {
-          code: 'KM',
-          libelle: 'Kilomètres'
-        },
-        rayon: 10
+            code: '4',
+            libelle: 'Département'
+          },
+          libelle: 'Nord'
+        }
       }
     ],
     appellation: {
