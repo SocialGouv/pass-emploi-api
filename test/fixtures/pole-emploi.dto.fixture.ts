@@ -188,7 +188,7 @@ export const uneSuggestionDtoCommuneAvecUnRayonInconnu = (): SuggestionDto => ({
   typeCrefCreation: false
 })
 
-export const uneSuggestionDtoDeuxCommunes = (): SuggestionDto => {
+export const uneSuggestionDtoUneCommuneAvecRayon = (): SuggestionDto => {
   return {
     rome: {
       code: 'N1101',
@@ -215,18 +215,6 @@ export const uneSuggestionDtoDeuxCommunes = (): SuggestionDto => {
       }
     ],
     mobilites: [
-      {
-        lieu: {
-          code: '59220',
-          codeDepartement: '59',
-          codePostal: '59155',
-          libelle: 'FACHES THUMESNIL',
-          type: {
-            code: '5',
-            libelle: 'Commune'
-          }
-        }
-      },
       {
         lieu: {
           code: '44300',
@@ -273,7 +261,7 @@ export const uneSuggestionDtoDeuxCommunes = (): SuggestionDto => {
   }
 }
 
-export const uneSuggestionDtoUneCommuneEtUnDepartement = (): SuggestionDto => {
+export const uneSuggestionDtoUnDepartement = (): SuggestionDto => {
   return {
     rome: {
       code: 'N1101',
@@ -300,16 +288,6 @@ export const uneSuggestionDtoUneCommuneEtUnDepartement = (): SuggestionDto => {
       }
     ],
     mobilites: [
-      {
-        lieu: {
-          code: '33',
-          libelle: 'Gironde',
-          type: {
-            code: '4',
-            libelle: 'Département'
-          }
-        }
-      },
       {
         lieu: {
           code: '44300',

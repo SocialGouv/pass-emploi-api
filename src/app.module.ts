@@ -230,9 +230,9 @@ import { HandleJobMettreAJourCodesEvenementsCommandHandler } from './application
 import { GetIndicateursPourConseillerQueryHandler } from './application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { HandleJobNettoyerLesDonneesCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-donnees.command.db'
 import { RafraichirSuggestionPoleEmploiCommandHandler } from './application/commands/rafraichir-suggestion-pole-emploi.command.handler'
-import { Offre } from './domain/offre/offre'
 import { SuggestionPeHttpRepository } from './infrastructure/repositories/offre/recherche/suggestion/suggestion-pe-http.repository'
 import {
+  Suggestion,
   SuggestionsPoleEmploiRepositoryToken,
   SuggestionsRepositoryToken
 } from './domain/offre/recherche/suggestion/suggestion'
@@ -296,7 +296,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Jeune.Factory,
     Jeune.ConfigurationApplication.Factory,
     Fichier.Factory,
-    Offre.Recherche.Suggestion.Factory,
+    Suggestion.Factory,
     SuggestionPoleEmploiService,
     Notification.Service,
     WorkerService,

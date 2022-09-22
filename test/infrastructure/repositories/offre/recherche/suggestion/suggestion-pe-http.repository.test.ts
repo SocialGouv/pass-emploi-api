@@ -5,8 +5,8 @@ import { success } from '../../../../../../src/building-blocks/types/result'
 import {
   uneSuggestionDtoCommuneAvecUnRayonInconnu,
   uneSuggestionDtoCommuneSansRayon,
-  uneSuggestionDtoDeuxCommunes,
-  uneSuggestionDtoUneCommuneEtUnDepartement,
+  uneSuggestionDtoUneCommuneAvecRayon,
+  uneSuggestionDtoUnDepartement,
   uneSuggestionDtoUneRegion
 } from '../../../../../fixtures/pole-emploi.dto.fixture'
 import { Suggestion } from '../../../../../../src/domain/offre/recherche/suggestion/suggestion'
@@ -51,11 +51,11 @@ describe('SuggestionPeHttpRepository', () => {
         expect(suggestions).to.deep.equal(success(expected))
       })
     })
-    describe('une suggestion sur deux communes dont une avec rayon', () => {
+    describe('une suggestion sur une commune avec rayon', () => {
       it('retourne une suggestion par commune', async () => {
         // Given
         client.getSuggestionsRecherches.resolves(
-          success([uneSuggestionDtoDeuxCommunes()])
+          success([uneSuggestionDtoUneCommuneAvecRayon()])
         )
 
         // When
@@ -63,20 +63,6 @@ describe('SuggestionPeHttpRepository', () => {
 
         // Then
         const expected: Suggestion.PoleEmploi[] = [
-          {
-            informations: {
-              localisation: 'FACHES THUMESNIL',
-              metier: "Conduite d'engins de déplacement des charges",
-              titre: 'Cariste'
-            },
-            rome: 'N1101',
-            localisation: {
-              code: '59220',
-              type: 'COMMUNE',
-              rayon: undefined
-            },
-            texteRecherche: 'Cariste'
-          },
           {
             informations: {
               localisation: 'NANTES',
@@ -95,11 +81,11 @@ describe('SuggestionPeHttpRepository', () => {
         expect(suggestions).to.deep.equal(success(expected))
       })
     })
-    describe('une suggestion sur une commune et un departement', () => {
+    describe('une suggestion sur un departement', () => {
       it('retourne une suggestion pour la commune et une pour le département', async () => {
         // Given
         client.getSuggestionsRecherches.resolves(
-          success([uneSuggestionDtoUneCommuneEtUnDepartement()])
+          success([uneSuggestionDtoUnDepartement()])
         )
 
         // When
@@ -107,20 +93,6 @@ describe('SuggestionPeHttpRepository', () => {
 
         // Then
         const expected: Suggestion.PoleEmploi[] = [
-          {
-            informations: {
-              localisation: 'Gironde',
-              metier: "Conduite d'engins de déplacement des charges",
-              titre: 'Cariste'
-            },
-            rome: 'N1101',
-            localisation: {
-              code: '33',
-              type: 'DEPARTEMENT',
-              rayon: undefined
-            },
-            texteRecherche: 'Cariste'
-          },
           {
             informations: {
               localisation: 'NANTES',
@@ -153,7 +125,6 @@ describe('SuggestionPeHttpRepository', () => {
         expect(suggestions).to.deep.equal(success([]))
       })
     })
-
     describe("le rayon n'est pas en kilometres", () => {
       it('ne met pas le rayon', async () => {
         // Given

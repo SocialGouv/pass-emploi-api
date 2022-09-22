@@ -27,44 +27,22 @@ export class SuggestionPeHttpRepository
       return suggestionsDtoResult
     }
 
-    const suggestionsAvecMetierEtLocalisation =
-      suggestionsDtoResult.data.filter(
-        suggestion => suggestion.mobilites?.length && suggestion.rome?.code
+    const suggestions = suggestionsDtoResult.data
+      .filter(
+        suggestion =>
+          suggestion.mobilites?.length &&
+          (suggestion.mobilites[0].lieu.type.code ===
+            CODE_TYPE_LIEU_DEPARTEMENT ||
+            suggestion.mobilites[0].lieu.type.code ===
+              CODE_TYPE_LIEU_COMMUNE) &&
+          suggestion.rome?.code &&
+          suggestion.rome.libelle &&
+          suggestion.appellation?.libelle
       )
-
-    const suggestionsDtoParLocalisation =
-      genererUneSuggestionParCommuneEtDepartement(
-        suggestionsAvecMetierEtLocalisation
-      )
-
-    const suggestions = suggestionsDtoParLocalisation.map(
-      toSuggestionPoleEmploi
-    )
+      .map(toSuggestionPoleEmploi)
 
     return success(suggestions)
   }
-}
-
-function genererUneSuggestionParCommuneEtDepartement(
-  suggestionsDtoFiltrees: SuggestionDto[]
-): SuggestionDto[] {
-  const suggestionsDtoParLocalisation: SuggestionDto[] = []
-
-  suggestionsDtoFiltrees.forEach(suggestion => {
-    suggestion
-      .mobilites!.filter(
-        mobilite =>
-          mobilite.lieu.type.code === CODE_TYPE_LIEU_COMMUNE ||
-          mobilite.lieu.type.code === CODE_TYPE_LIEU_DEPARTEMENT
-      )
-      .forEach(mobilite => {
-        suggestionsDtoParLocalisation.push({
-          ...suggestion,
-          mobilites: [mobilite]
-        })
-      })
-  })
-  return suggestionsDtoParLocalisation
 }
 
 function toSuggestionPoleEmploi(
@@ -72,7 +50,7 @@ function toSuggestionPoleEmploi(
 ): Suggestion.PoleEmploi {
   return {
     informations: {
-      titre: suggestion.appellation?.libelle || 'Suggestions de métiers',
+      titre: suggestion.appellation!.libelle,
       metier: suggestion.rome!.libelle,
       localisation: suggestion.mobilites![0].lieu.libelle
     },

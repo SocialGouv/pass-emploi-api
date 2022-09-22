@@ -9,8 +9,10 @@ import { Authentification } from '../../domain/authentification'
 import { Inject, Injectable } from '@nestjs/common'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
 import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
-import { Offre } from '../../domain/offre/offre'
-import { SuggestionsPoleEmploiRepositoryToken } from '../../domain/offre/recherche/suggestion/suggestion'
+import {
+  Suggestion,
+  SuggestionsPoleEmploiRepositoryToken
+} from '../../domain/offre/recherche/suggestion/suggestion'
 import { SuggestionPoleEmploiService } from '../../domain/offre/recherche/suggestion/pole-emploi.service'
 
 export interface RafraichirSuggestionPoleEmploiCommand extends Command {
@@ -25,10 +27,10 @@ export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler
 > {
   constructor(
     private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer,
-    private suggestionFactory: Offre.Recherche.Suggestion.Factory,
+    private suggestionFactory: Suggestion.Factory,
     private suggestionPoleEmploiService: SuggestionPoleEmploiService,
     @Inject(SuggestionsPoleEmploiRepositoryToken)
-    private suggestionPoleEmploiRepository: Offre.Recherche.Suggestion.PoleEmploi.Repository,
+    private suggestionPoleEmploiRepository: Suggestion.PoleEmploi.Repository,
     private keycloakClient: KeycloakClient
   ) {
     super('RafraichirSuggestionPoleEmploiCommandHandler')
