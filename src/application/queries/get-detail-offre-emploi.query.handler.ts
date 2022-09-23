@@ -5,7 +5,6 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { PoleEmploiClient } from '../../infrastructure/clients/pole-emploi-client'
 import { OffreEmploiDto } from '../../infrastructure/repositories/dto/pole-emploi.dto'
 import { OffreEmploiQueryModel } from './query-models/offres-emploi.query-model'
-import { Evenement, EvenementService } from '../../domain/evenement'
 import { Authentification } from '../../domain/authentification'
 
 export interface GetDetailOffreEmploiQuery extends Query {
@@ -17,10 +16,7 @@ export class GetDetailOffreEmploiQueryHandler extends QueryHandler<
   GetDetailOffreEmploiQuery,
   OffreEmploiQueryModel | undefined
 > {
-  constructor(
-    private poleEmploiClient: PoleEmploiClient,
-    private evenementService: EvenementService
-  ) {
+  constructor(private poleEmploiClient: PoleEmploiClient) {
     super('GetDetailOffreEmploiQueryHandler')
   }
 
@@ -41,11 +37,8 @@ export class GetDetailOffreEmploiQueryHandler extends QueryHandler<
     return emptySuccess()
   }
 
-  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creer(
-      Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
-      utilisateur
-    )
+  async monitor(_utilisateur: Authentification.Utilisateur): Promise<void> {
+    return
   }
 }
 

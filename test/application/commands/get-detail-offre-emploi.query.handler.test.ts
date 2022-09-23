@@ -3,20 +3,15 @@ import { expect, StubbedClass, stubClass } from '../../utils'
 import { PoleEmploiClient } from '../../../src/infrastructure/clients/pole-emploi-client'
 import { uneOffreEmploiDto } from '../../fixtures/offre-emploi.fixture'
 import { OffreEmploiQueryModel } from '../../../src/application/queries/query-models/offres-emploi.query-model'
-import { Evenement, EvenementService } from '../../../src/domain/evenement'
-import { unUtilisateurDecode } from '../../fixtures/authentification.fixture'
 
 describe('GetDetailOffreEmploiQueryHandler', () => {
   let getDetailOffreEmploiQueryHandler: GetDetailOffreEmploiQueryHandler
-  let evenementService: StubbedClass<EvenementService>
   let poleEmploiClient: StubbedClass<PoleEmploiClient>
 
   beforeEach(() => {
     poleEmploiClient = stubClass(PoleEmploiClient)
-    evenementService = stubClass(EvenementService)
     getDetailOffreEmploiQueryHandler = new GetDetailOffreEmploiQueryHandler(
-      poleEmploiClient,
-      evenementService
+      poleEmploiClient
     )
   })
 
@@ -125,22 +120,6 @@ describe('GetDetailOffreEmploiQueryHandler', () => {
         // Then
         expect(queryModel).to.be.undefined()
       })
-    })
-  })
-
-  describe('monitor', () => {
-    it('crée l’évènement d’engagement de type OFFRE_EMPLOI_AFFICHEE', async () => {
-      // Given
-      const utilisateur = unUtilisateurDecode()
-
-      // When
-      await getDetailOffreEmploiQueryHandler.monitor(utilisateur)
-
-      // Then
-      expect(evenementService.creer).to.have.been.calledWithExactly(
-        Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
-        utilisateur
-      )
     })
   })
 })
