@@ -15,7 +15,7 @@ export interface Suggestion {
     metier: string
     localisation: string
   }
-  criteres: Recherche.Emploi
+  criteres?: Recherche.Emploi | Recherche.Immersion | Recherche.ServiceCivique
   dateCreation: DateTime
   dateMiseAJour: DateTime
   dateSuppression?: DateTime
@@ -53,34 +53,48 @@ export namespace Suggestion {
     suggestionPoleEmploi: PoleEmploi,
     type: Recherche.Type
   ): string {
-    return `${type}-${suggestionPoleEmploi.rome}-${suggestionPoleEmploi.localisation.type}-${suggestionPoleEmploi.localisation.code}-${suggestionPoleEmploi.localisation.rayon}`
+    const rayon =
+      suggestionPoleEmploi.localisation.rayon ?? Recherche.DISTANCE_PAR_DEFAUT
+    // TODO: faire une clé en objet et la mettre en B64
+    if (type === Recherche.Type.OFFRES_SERVICES_CIVIQUE) {
+      return `${type}-${suggestionPoleEmploi.localisation.type}-${suggestionPoleEmploi.localisation.code}-${rayon}`
+    } else {
+      return `${type}-${suggestionPoleEmploi.codeRome}-${suggestionPoleEmploi.localisation.type}-${suggestionPoleEmploi.localisation.code}-${rayon}`
+    }
   }
 
-  @Injectable()
-  export class Factory {
-    constructor(
-      private idService: IdService,
-      private dateService: DateService
-    ) {}
+  function construireTitreEtMetierSuggestion(
+    suggestionPoleEmploi: Suggestion.PoleEmploi,
+    type: Recherche.Type
+  ): { titre: string; metier: string } {
+    switch (type) {
+      case Recherche.Type.OFFRES_EMPLOI:
+      case Recherche.Type.OFFRES_ALTERNANCE:
+      case Recherche.Type.OFFRES_IMMERSION:
+        return {
+          titre: suggestionPoleEmploi.titreMetier!,
+          metier: suggestionPoleEmploi.categorieMetier!
+        }
+      case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
+        return {
+          titre:
+            suggestionPoleEmploi.titreMetier ??
+            `Recherche de service civique à ${suggestionPoleEmploi.localisation.libelle}`,
+          metier:
+            suggestionPoleEmploi.categorieMetier ??
+            `Service civique à ${suggestionPoleEmploi.localisation.libelle}`
+        }
+    }
+  }
 
-    fromPoleEmploi(
-      suggestionPoleEmploi: PoleEmploi,
-      idJeune: string
-    ): Suggestion {
-      const maintenant = this.dateService.now()
-      return {
-        id: this.idService.uuid(),
-        idJeune,
-        dateCreation: maintenant,
-        dateMiseAJour: maintenant,
-        idFonctionnel: construireIdFonctionnel(
-          suggestionPoleEmploi,
-          Recherche.Type.OFFRES_EMPLOI
-        ),
-        type: Recherche.Type.OFFRES_EMPLOI,
-        source: Suggestion.Source.POLE_EMPLOI,
-        informations: suggestionPoleEmploi.informations,
-        criteres: {
+  function construireLesCriteres(
+    suggestionPoleEmploi: Suggestion.PoleEmploi,
+    type: Recherche.Type
+  ): Recherche.Emploi | Recherche.Immersion | Recherche.ServiceCivique {
+    switch (type) {
+      case Recherche.Type.OFFRES_EMPLOI:
+      case Recherche.Type.OFFRES_ALTERNANCE:
+        return {
           q: suggestionPoleEmploi.texteRecherche,
           commune:
             suggestionPoleEmploi.localisation.type === TypeLocalisation.COMMUNE
@@ -91,8 +105,117 @@ export namespace Suggestion {
             TypeLocalisation.DEPARTEMENT
               ? suggestionPoleEmploi.localisation.code
               : undefined,
-          rayon: suggestionPoleEmploi.localisation.rayon
+          rayon:
+            suggestionPoleEmploi.localisation.rayon ??
+            Recherche.DISTANCE_PAR_DEFAUT
         }
+      case Recherche.Type.OFFRES_IMMERSION:
+        return {
+          rome: suggestionPoleEmploi.codeRome,
+          lat: suggestionPoleEmploi.localisation.lat,
+          lon: suggestionPoleEmploi.localisation.lon,
+          distance:
+            suggestionPoleEmploi.localisation.rayon ??
+            Recherche.DISTANCE_PAR_DEFAUT
+        }
+      case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
+        return {
+          lat: suggestionPoleEmploi.localisation.lat,
+          lon: suggestionPoleEmploi.localisation.lon,
+          domaine: suggestionPoleEmploi.categorieMetier,
+          distance:
+            suggestionPoleEmploi.localisation.rayon ??
+            Recherche.DISTANCE_PAR_DEFAUT
+        }
+    }
+  }
+
+  function suggestionAvecCommuneLatLon(
+    suggestionPoleEmploi: Suggestion.PoleEmploi
+  ): boolean {
+    return Boolean(
+      suggestionPoleEmploi.localisation.type === 'COMMUNE' &&
+        suggestionPoleEmploi.localisation.lat &&
+        suggestionPoleEmploi.localisation.lon
+    )
+  }
+
+  @Injectable()
+  export class Factory {
+    constructor(
+      private idService: IdService,
+      private dateService: DateService
+    ) {}
+
+    buildListeSuggestionsOffresFromPoleEmploi(
+      suggestionsPoleEmploi: PoleEmploi[],
+      idJeune: string
+    ): Suggestion[] {
+      const maintenant = this.dateService.now()
+      const suggestionsEmploi = []
+      const suggestionsImmersion = []
+      const suggestionsServiceCivique = []
+
+      for (const suggestionPoleEmploi of suggestionsPoleEmploi) {
+        if (suggestionPoleEmploi.codeRome) {
+          suggestionsEmploi.push(
+            this.creerSuggestion(
+              suggestionPoleEmploi,
+              Recherche.Type.OFFRES_EMPLOI,
+              idJeune,
+              maintenant
+            )
+          )
+          if (suggestionAvecCommuneLatLon(suggestionPoleEmploi)) {
+            suggestionsImmersion.push(
+              this.creerSuggestion(
+                suggestionPoleEmploi,
+                Recherche.Type.OFFRES_IMMERSION,
+                idJeune,
+                maintenant
+              )
+            )
+          }
+        }
+
+        if (suggestionAvecCommuneLatLon(suggestionPoleEmploi)) {
+          suggestionsServiceCivique.push(
+            this.creerSuggestion(
+              suggestionPoleEmploi,
+              Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+              idJeune,
+              maintenant
+            )
+          )
+        }
+      }
+
+      return [
+        ...suggestionsEmploi,
+        ...suggestionsImmersion,
+        ...suggestionsServiceCivique
+      ]
+    }
+
+    private creerSuggestion(
+      suggestionPoleEmploi: PoleEmploi,
+      type: Recherche.Type,
+      idJeune: string,
+      maintenant: DateTime
+    ): Suggestion {
+      return {
+        id: this.idService.uuid(),
+        idJeune,
+        dateCreation: maintenant,
+        dateMiseAJour: maintenant,
+        idFonctionnel: construireIdFonctionnel(suggestionPoleEmploi, type),
+        type: type,
+        source: Suggestion.Source.POLE_EMPLOI,
+        informations: {
+          ...construireTitreEtMetierSuggestion(suggestionPoleEmploi, type),
+          localisation: suggestionPoleEmploi.localisation.libelle
+        },
+        criteres: construireLesCriteres(suggestionPoleEmploi, type)
       }
     }
   }

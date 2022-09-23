@@ -1,17 +1,17 @@
 import { Result } from '../../../../building-blocks/types/result'
 
 export interface PoleEmploi {
+  titreMetier?: string
+  categorieMetier?: string
+  codeRome?: string
   texteRecherche?: string
-  rome: string
   localisation: {
+    libelle: string
     code: string
     type: 'COMMUNE' | 'DEPARTEMENT'
     rayon?: number
-  }
-  informations: {
-    titre: string
-    metier: string
-    localisation: string
+    lat?: number
+    lon?: number
   }
 }
 

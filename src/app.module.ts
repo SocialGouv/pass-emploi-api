@@ -230,7 +230,7 @@ import { HandleJobMettreAJourCodesEvenementsCommandHandler } from './application
 import { GetIndicateursPourConseillerQueryHandler } from './application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { HandleJobNettoyerLesDonneesCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-donnees.command.db'
 import { RafraichirSuggestionPoleEmploiCommandHandler } from './application/commands/rafraichir-suggestion-pole-emploi.command.handler'
-import { SuggestionPeHttpRepository } from './infrastructure/repositories/offre/recherche/suggestion/suggestion-pe-http.repository'
+import { SuggestionPeHttpRepository } from './infrastructure/repositories/offre/recherche/suggestion/suggestion-pe-http.repository.db'
 import {
   Suggestion,
   SuggestionsPoleEmploiRepositoryToken,

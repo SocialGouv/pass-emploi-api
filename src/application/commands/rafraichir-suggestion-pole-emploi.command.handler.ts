@@ -43,17 +43,18 @@ export class RafraichirSuggestionPoleEmploiCommandHandler extends CommandHandler
       command.token
     )
 
-    const suggestionsPE = await this.suggestionPoleEmploiRepository.findAll(
-      idpToken
-    )
+    const suggestionsPEResult =
+      await this.suggestionPoleEmploiRepository.findAll(idpToken)
 
-    if (isFailure(suggestionsPE)) {
-      return suggestionsPE
+    if (isFailure(suggestionsPEResult)) {
+      return suggestionsPEResult
     }
 
-    const suggestions = suggestionsPE.data.map(suggestion =>
-      this.suggestionFactory.fromPoleEmploi(suggestion, command.idJeune)
-    )
+    const suggestions =
+      this.suggestionFactory.buildListeSuggestionsOffresFromPoleEmploi(
+        suggestionsPEResult.data,
+        command.idJeune
+      )
 
     await this.suggestionPoleEmploiService.rafraichir(
       suggestions,

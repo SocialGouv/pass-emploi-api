@@ -75,41 +75,6 @@ describe('PoleEmploi', () => {
           )
         })
       })
-
-      describe("quand une suggestion pole emploi n'est plus présente", () => {
-        it('la supprime des suggestion existantes', async () => {
-          // Given
-          const suggestionInitiale = uneSuggestion({
-            id: '006775b1-ab1b-47b0-94f3-d1e765ed0717',
-            idJeune: 'ABCDE',
-            idFonctionnel: 'OFFRES_EMPLOI-D1104-COMMUNE-44300-1',
-            source: Recherche.Suggestion.Source.POLE_EMPLOI
-          })
-
-          suggestionRepository.findAll
-            .withArgs('ABCDE')
-            .resolves([suggestionInitiale])
-
-          // When
-          const nouvelleSuggestion = uneSuggestion({
-            idJeune: 'ABCDE',
-            idFonctionnel: 'OFFRES_EMPLOI-D1104-COMMUNE-33100-1',
-            source: Recherche.Suggestion.Source.POLE_EMPLOI
-          })
-          await rechercheSuggestionPEService.rafraichir(
-            [nouvelleSuggestion],
-            'ABCDE'
-          )
-
-          // Then
-          expect(suggestionRepository.save).to.have.been.calledOnceWithExactly(
-            nouvelleSuggestion
-          )
-          expect(
-            suggestionRepository.delete
-          ).to.have.been.calledOnceWithExactly(suggestionInitiale.id)
-        })
-      })
     })
   })
 })

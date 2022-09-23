@@ -20,7 +20,7 @@ export class SuggestionSqlRepository implements Suggestion.Repository {
         source: suggestionSql.source,
         dateCreation: DateTime.fromJSDate(suggestionSql.dateCreation).toUTC(),
         dateMiseAJour: DateTime.fromJSDate(suggestionSql.dateMiseAJour).toUTC(),
-        criteres: suggestionSql.criteres,
+        criteres: suggestionSql.criteres ?? undefined,
         informations: {
           titre: suggestionSql.titre,
           metier: suggestionSql.metier,
