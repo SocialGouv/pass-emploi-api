@@ -1,3 +1,4 @@
+import { Suggestion } from 'src/domain/offre/recherche/suggestion/suggestion'
 import { Offre } from '../../src/domain/offre/offre'
 import { uneDatetime } from './date.fixture'
 
@@ -5,17 +6,16 @@ export const uneSuggestionPE = (
   args: Partial<Offre.Recherche.Suggestion.PoleEmploi> = {}
 ): Offre.Recherche.Suggestion.PoleEmploi => {
   const defaults: Offre.Recherche.Suggestion.PoleEmploi = {
-    informations: {
-      titre: 'Petrisseur',
-      localisation: 'Lille',
-      metier: 'Boulanger'
-    },
-    rome: 'D1104',
+    titreMetier: 'Petrisseur',
+    categorieMetier: 'Boulanger',
+    codeRome: 'D1104',
     texteRecherche: 'Petrisseur',
     localisation: {
+      libelle: 'test',
       code: '59220',
-      type: 'COMMUNE',
-      rayon: 10
+      type: Suggestion.TypeLocalisation.COMMUNE,
+      lat: 1,
+      lon: 1
     }
   }
   return { ...defaults, ...args }
@@ -32,7 +32,7 @@ export const uneSuggestion = (
     idJeune: 'ABCDE',
     dateSuppression: undefined,
     type: Offre.Recherche.Type.OFFRES_EMPLOI,
-    source: Offre.Recherche.Suggestion.Source.POLE_EMPLOI,
+    source: Suggestion.Source.POLE_EMPLOI,
     informations: {
       titre: 'Petrisseur',
       localisation: 'Lille',

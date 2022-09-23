@@ -70,9 +70,9 @@ describe('RafraichirSuggestionPoleEmploiCommandHandler', () => {
           .withArgs('idpToken')
           .resolves(success([uneSuggestionPE()]))
 
-        suggestionFactory.fromPoleEmploi
-          .withArgs(uneSuggestionPE(), 'idJeune')
-          .returns(uneSuggestion())
+        suggestionFactory.buildListeSuggestionsOffresFromPoleEmploi
+          .withArgs([uneSuggestionPE()], 'idJeune')
+          .returns([uneSuggestion()])
 
         // When
         await handler.handle({ idJeune: 'idJeune', token: 'token' })

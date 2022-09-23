@@ -1,7 +1,10 @@
-import { Core } from '../../core'
-
 export const OffreServiceCiviqueRepositoryToken =
   'OffreServiceCivique.Repository'
+
+export interface Localisation {
+  latitude: number
+  longitude: number
+}
 
 export interface ServiceCivique {
   id: string
@@ -19,7 +22,7 @@ export interface ServiceCivique {
   codeDepartement?: string
   codePostal?: string
   descriptionOrganisation?: string
-  localisation?: Core.Localisation
+  localisation?: Localisation
 }
 
 export namespace ServiceCivique {

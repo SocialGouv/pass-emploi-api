@@ -7,6 +7,7 @@ import {
 } from '../../../../../building-blocks/types/result'
 import { Injectable } from '@nestjs/common'
 import { SuggestionDto } from '../../../../clients/dto/pole-emploi.dto'
+import { CommuneSqlModel } from 'src/infrastructure/sequelize/models/commune.sql-model'
 
 const CODE_TYPE_LIEU_DEPARTEMENT = '4'
 const CODE_TYPE_LIEU_COMMUNE = '5'
@@ -27,36 +28,53 @@ export class SuggestionPeHttpRepository
       return suggestionsDtoResult
     }
 
-    const suggestions = suggestionsDtoResult.data
-      .filter(
-        suggestion =>
-          suggestion.mobilites?.length &&
-          (suggestion.mobilites[0].lieu.type.code ===
-            CODE_TYPE_LIEU_DEPARTEMENT ||
-            suggestion.mobilites[0].lieu.type.code ===
-              CODE_TYPE_LIEU_COMMUNE) &&
-          suggestion.rome?.code &&
-          suggestion.rome.libelle &&
-          suggestion.appellation?.libelle
-      )
-      .map(toSuggestionPoleEmploi)
+    const suggestions: Suggestion.PoleEmploi[] = []
+
+    for (const suggestionDto of suggestionsDtoResult.data) {
+      if (laSuggestionAUneCommune(suggestionDto)) {
+        const suggestion = toSuggestionPoleEmploi(suggestionDto)
+
+        const codeCommune = suggestionDto.mobilites![0].lieu.code
+        const commune = await CommuneSqlModel.findOne({
+          where: {
+            code: codeCommune
+          }
+        })
+        suggestion.localisation.lat = Number(commune?.latitude)
+        suggestion.localisation.lon = Number(commune?.longitude)
+        suggestions.push(suggestion)
+      } else if (laSuggestionAUnDepartement(suggestionDto)) {
+        suggestions.push(toSuggestionPoleEmploi(suggestionDto))
+      }
+    }
 
     return success(suggestions)
   }
+}
+
+function laSuggestionAUneCommune(suggestion: SuggestionDto): boolean {
+  return Boolean(
+    suggestion.mobilites?.length &&
+      suggestion.mobilites[0].lieu.type.code === CODE_TYPE_LIEU_COMMUNE
+  )
+}
+function laSuggestionAUnDepartement(suggestion: SuggestionDto): boolean {
+  return Boolean(
+    suggestion.mobilites?.length &&
+      suggestion.mobilites[0].lieu.type.code === CODE_TYPE_LIEU_DEPARTEMENT
+  )
 }
 
 function toSuggestionPoleEmploi(
   suggestion: SuggestionDto
 ): Suggestion.PoleEmploi {
   return {
-    informations: {
-      titre: suggestion.appellation!.libelle,
-      metier: suggestion.rome!.libelle,
-      localisation: suggestion.mobilites![0].lieu.libelle
-    },
+    titreMetier: suggestion.appellation?.libelle,
+    categorieMetier: suggestion.rome?.libelle,
+    codeRome: suggestion.rome?.code,
     texteRecherche: suggestion.appellation?.libelle || suggestion.rome?.libelle,
-    rome: suggestion.rome!.code,
     localisation: {
+      libelle: suggestion.mobilites![0].lieu.libelle,
       code: suggestion.mobilites![0].lieu.code,
       type:
         suggestion.mobilites![0].lieu.type.code === CODE_TYPE_LIEU_COMMUNE

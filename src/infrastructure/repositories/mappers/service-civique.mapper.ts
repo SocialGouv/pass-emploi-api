@@ -5,6 +5,7 @@ import {
   OffreEngagementDto
 } from '../offre-service-civique-http.repository.db'
 import { Offre } from '../../../domain/offre/offre'
+import { Localisation } from 'src/domain/offre/favori/offre-service-civique'
 
 export function toOffresServicesCivique(
   servicesCiviqueDto: EngagementDto
@@ -58,7 +59,7 @@ export function fromSqlToOffreServiceCivique(
 
 function buildLocalisation(
   serviceCiviqueDto: OffreEngagementDto
-): Core.Localisation | undefined {
+): Localisation | undefined {
   if (serviceCiviqueDto.location) {
     return {
       latitude: serviceCiviqueDto.location.lat,

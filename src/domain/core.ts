@@ -8,9 +8,4 @@ export namespace Core {
   export interface Id {
     id: string
   }
-
-  export interface Localisation {
-    latitude: number
-    longitude: number
-  }
 }
