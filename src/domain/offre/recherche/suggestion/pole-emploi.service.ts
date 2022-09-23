@@ -17,37 +17,19 @@ export class SuggestionPoleEmploiService {
       idJeune
     )
 
-    for (const nouvellesSuggestion of nouvellesSuggestions) {
+    for (const nouvelleSuggestion of nouvellesSuggestions) {
       const suggestionExistante = suggestionsActuelles.find(
         suggestion =>
-          suggestion.idFonctionnel === nouvellesSuggestion.idFonctionnel
+          suggestion.idFonctionnel === nouvelleSuggestion.idFonctionnel
       )
 
       if (suggestionExistante) {
         await this.suggestionRepository.save({
           ...suggestionExistante,
-          dateMiseAJour: nouvellesSuggestion.dateMiseAJour
+          dateMiseAJour: nouvelleSuggestion.dateMiseAJour
         })
       } else {
-        await this.suggestionRepository.save(nouvellesSuggestion)
-      }
-
-      const suggestionsASupprimer = suggestionsActuelles.filter(
-        suggestionActuelle => {
-          return (
-            !nouvellesSuggestions.find(
-              nouvelleSuggestion =>
-                nouvelleSuggestion.idFonctionnel ===
-                suggestionActuelle.idFonctionnel
-            ) &&
-            suggestionActuelle.source ===
-              Recherche.Suggestion.Source.POLE_EMPLOI
-          )
-        }
-      )
-
-      for (const suggestion of suggestionsASupprimer) {
-        await this.suggestionRepository.delete(suggestion.id)
+        await this.suggestionRepository.save(nouvelleSuggestion)
       }
     }
   }
