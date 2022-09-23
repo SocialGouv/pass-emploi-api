@@ -113,5 +113,6 @@ export const configurationSchema = Joi.object({
     mailConseillers: Joi.object({
       nombreDeConseillersEnParallele: Joi.number().required()
     })
-  })
+  }),
+  version: Joi.string().required()
 })

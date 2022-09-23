@@ -8,13 +8,16 @@ const secretToken = process.env.APM_SECRET_TOKEN || ''
 const serverUrl = process.env.APM_URL || ''
 const environment = process.env.ENVIRONMENT || 'development'
 const active = process.env.APM_IS_ACTIVE === 'true'
+const serviceVersion = process.env.npm_package_version
 
 const config: APM.AgentConfigOptions = {
   serviceName,
   secretToken,
   serverUrl,
   environment,
-  active
+  active,
+  serviceVersion,
+  logUncaughtExceptions: true
 }
 
 export const initializeAPMAgent = (): void => {

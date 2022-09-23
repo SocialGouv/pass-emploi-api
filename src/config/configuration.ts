@@ -146,7 +146,8 @@ export default () => {
         nombreDeConseillersEnParallele:
           process.env.JOB_NOMBRE_CONSEILLERS_PARALLELE ?? '100'
       }
-    }
+    },
+    version: process.env.npm_package_version ?? '0.0.0'
   }
   return Joi.attempt(configuration, configurationSchema)
 }
