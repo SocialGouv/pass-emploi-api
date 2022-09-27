@@ -4,6 +4,7 @@ export const configurationSchema = Joi.object({
   environment: Joi.string().default('development'),
   isWeb: Joi.boolean().required(),
   isWorker: Joi.boolean().required(),
+  isInMemory: Joi.boolean(),
   port: Joi.number().required(),
   database: Joi.object({
     host: Joi.string().required(),

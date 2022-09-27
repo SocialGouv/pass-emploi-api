@@ -1,6 +1,6 @@
 import { SuggestionDto } from 'src/infrastructure/clients/dto/pole-emploi.dto'
 
-export const suggestionsPE: SuggestionDto[] = [
+export const suggestionsPEInMemory: SuggestionDto[] = [
   {
     appellation: {
       libelle: 'Comédien / Comédienne',
@@ -104,5 +104,90 @@ export const suggestionsPE: SuggestionDto[] = [
       libelle: "Création ou Reprise d'Entreprise ou de Franchiseaire",
       code: 'EF'
     }
+  },
+  {
+    appellation: {
+      libelle: 'Boulanger',
+      code: '26320'
+    },
+    mobilites: [
+      {
+        rayon: 0,
+        lieu: {
+          code: '92035',
+          codeDepartement: '92',
+          codePostal: '92250',
+          libelle: 'LA GARENNE-COLOMBES',
+          type: {
+            code: '5',
+            libelle: 'Commune'
+          }
+        },
+        unite: {
+          code: 'KM',
+          libelle: 'Kilomètres'
+        }
+      }
+    ],
+    rome: {
+      libelle: 'Cuisine',
+      code: 'D2705'
+    },
+    typologieEmploi: {
+      libelle: "Création ou Reprise d'Entreprise ou de Franchiseaire",
+      code: 'EF'
+    }
+  },
+  {
+    rome: { code: 'K1303', libelle: "Assistance auprès d'enfants" },
+    salaire: { code: 'H', libelle: 'Horaire', remuneration: 8.86 },
+    contrats: [
+      {
+        type: {
+          code: 'SAI',
+          libelle: 'Saisonnier',
+          libelleLong: 'Contrat travail saisonnier'
+        },
+        priorite: 5,
+        critereOre: false
+      },
+      {
+        type: {
+          code: 'CDD',
+          libelle: 'CDD',
+          libelleLong: 'Contrat à durée déterminée'
+        },
+        priorite: 2,
+        critereOre: false
+      }
+    ],
+    mobilites: [
+      {
+        lieu: {
+          code: '97608',
+          type: { code: '5', libelle: 'Commune' },
+          libelle: 'DZAOUDZI',
+          codePostal: '97615',
+          codeDepartement: '976'
+        },
+        rayon: 5,
+        unite: { code: 'KM', libelle: 'Kilomètres' }
+      }
+    ],
+    appellation: {
+      code: '10756',
+      libelle:
+        'Agent spécialisé / Agente spécialisée des écoles maternelles -ASEM-'
+    },
+    dureesHebdo: [
+      {
+        critereOre: false,
+        tempsTravail: { code: '2', libelle: 'temps partiel' }
+      }
+    ],
+    dureeExperience: { unite: { code: 'MO', libelle: 'Mois' }, valeur: 36 },
+    typologieEmploi: { code: 'MR', libelle: 'Métier Recherché' },
+    typeCrefCreation: false,
+    mobiliteHabitation: { unite: { code: 'KM' }, valeur: 10 }
   }
 ]

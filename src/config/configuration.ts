@@ -18,6 +18,7 @@ export default () => {
     environment: process.env.ENVIRONMENT,
     isWeb: process.env.IS_WEB !== 'false',
     isWorker: process.env.IS_WORKER === 'true',
+    isInMemory: process.env.IS_IN_MEMORY === 'true',
     port: process.env.PORT ? parseInt(process.env.PORT, 10) : 5000,
     database: {
       host,
