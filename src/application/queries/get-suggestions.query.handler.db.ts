@@ -37,7 +37,7 @@ export class GetSuggestionsQueryHandler extends QueryHandler<
     }))
   }
 
-  async monitor(_utilisateur: Authentification.Utilisateur): Promise<void> {
+  async monitor(): Promise<void> {
     return
   }
 

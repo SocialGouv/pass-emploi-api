@@ -8,9 +8,12 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Put,
   Query
 } from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { CreateRechercheFromSuggestionCommandHandler } from 'src/application/commands/create-recherche-from-suggestion.command.handler'
+import { RefuserSuggestionCommandHandler } from 'src/application/commands/refuser-suggestion.command.handler'
 import {
   CreateRechercheCommand,
   CreateRechercheCommandHandler
@@ -49,7 +52,9 @@ export class RecherchesController {
     private readonly getRecherchesQueryHandler: GetRecherchesQueryHandler,
     private readonly deleteRechercheCommandHandler: DeleteRechercheCommandHandler,
     private readonly rafraichirSuggestionPoleEmploiCommandHandler: RafraichirSuggestionPoleEmploiCommandHandler,
-    private readonly getSuggestionsQueryHandler: GetSuggestionsQueryHandler
+    private readonly getSuggestionsQueryHandler: GetSuggestionsQueryHandler,
+    private readonly createRechercheFromSuggestionCommandHandler: CreateRechercheFromSuggestionCommandHandler,
+    private readonly refuserSuggestionCommandHandler: RefuserSuggestionCommandHandler
   ) {}
 
   @Post('recherches/offres-emploi')
@@ -168,5 +173,44 @@ export class RecherchesController {
       }
     }
     return this.getSuggestionsQueryHandler.execute({ idJeune }, utilisateur)
+  }
+
+  @Post('recherches/suggestions/:idSuggestion/creer-recherche')
+  async postRechercheSuggestion(
+    @Param('idJeune') idJeune: string,
+    @Param('idSuggestion') idSuggestion: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result =
+      await this.createRechercheFromSuggestionCommandHandler.execute(
+        {
+          idJeune,
+          idSuggestion
+        },
+        utilisateur
+      )
+
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
+  }
+
+  @Put('recherches/suggestions/:idSuggestion/refuser')
+  async refuserSuggestion(
+    @Param('idJeune') idJeune: string,
+    @Param('idSuggestion') idSuggestion: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.refuserSuggestionCommandHandler.execute(
+      {
+        idJeune,
+        idSuggestion
+      },
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
   }
 }

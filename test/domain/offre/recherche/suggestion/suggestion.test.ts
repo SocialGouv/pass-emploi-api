@@ -307,4 +307,27 @@ describe('Suggestion', () => {
       expect(equivalentes).to.be.false()
     })
   })
+
+  describe('accepter', () => {
+    it('retourne une suggestion acceptée', () => {
+      const suggestion = uneSuggestion()
+      const acceptee = factory.accepter(suggestion)
+      expect(acceptee).to.deep.equal({
+        ...suggestion,
+        dateCreationRecherche: uneDatetime,
+        idRecherche: unUuid
+      })
+    })
+  })
+
+  describe('refuser', () => {
+    it('retourne une suggestion refusée', () => {
+      const suggestion = uneSuggestion()
+      const refusee = factory.refuser(suggestion)
+      expect(refusee).to.deep.equal({
+        ...suggestion,
+        dateRefus: uneDatetime
+      })
+    })
+  })
 })
