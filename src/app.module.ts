@@ -110,7 +110,10 @@ import {
   PlanificateurRepositoryToken,
   PlanificateurService
 } from './domain/planificateur'
-import { RecherchesRepositoryToken } from './domain/offre/recherche/recherche'
+import {
+  Recherche,
+  RecherchesRepositoryToken
+} from './domain/offre/recherche/recherche'
 import { RendezVousRepositoryToken } from './domain/rendez-vous'
 import { SuperviseursRepositoryToken } from './domain/superviseur'
 import { NotificationSupportServiceToken } from './domain/notification-support'
@@ -239,6 +242,8 @@ import {
 import { SuggestionSqlRepository } from './infrastructure/repositories/offre/recherche/suggestion/suggestion-sql.repository.db'
 import { GetSuggestionsQueryHandler } from './application/queries/get-suggestions.query.handler.db'
 import { SuggestionPoleEmploiService } from './domain/offre/recherche/suggestion/pole-emploi.service'
+import { DeleteSuggestionCommandHandler } from './application/commands/delete-suggestion.command.handler'
+import { CreateRechercheFromSuggestionCommandHandler } from './application/commands/create-recherche-from-suggestion.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -304,6 +309,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     InvitationIcsClient,
     KeycloakClient,
     Context,
+    Recherche.Factory,
     {
       provide: APP_GUARD,
       useClass: OidcAuthGuard
@@ -553,7 +559,9 @@ export function buildQueryCommandsProviders(): Provider[] {
     HandleJobMettreAJourCodesEvenementsCommandHandler,
     GetIndicateursPourConseillerQueryHandler,
     RafraichirSuggestionPoleEmploiCommandHandler,
-    GetSuggestionsQueryHandler
+    GetSuggestionsQueryHandler,
+    DeleteSuggestionCommandHandler,
+    CreateRechercheFromSuggestionCommandHandler
   ]
 }
 

@@ -1,4 +1,6 @@
+import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
+import { IdService } from 'src/utils/id-service'
 import { Offre } from '../offre'
 import * as _Suggestion from './suggestion/suggestion'
 
@@ -97,5 +99,28 @@ export namespace Recherche {
     dateDeDebutMaximum?: string
     domaine?: string
     dateDeCreationMinimum?: string
+  }
+
+  @Injectable()
+  export class Factory {
+    constructor(private idService: IdService) {}
+
+    buildRechercheFromSuggestion(
+      suggestion: Suggestion,
+      dateCreation: DateTime
+    ): Recherche {
+      return {
+        id: this.idService.uuid(),
+        type: suggestion.type,
+        titre: suggestion.informations.titre,
+        metier: suggestion.informations.metier,
+        localisation: suggestion.informations.localisation,
+        criteres: suggestion.criteres,
+        idJeune: suggestion.idJeune,
+        dateCreation: dateCreation,
+        dateDerniereRecherche: dateCreation,
+        etat: Recherche.Etat.SUCCES
+      }
+    }
   }
 }

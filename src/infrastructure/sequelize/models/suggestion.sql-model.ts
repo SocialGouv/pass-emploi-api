@@ -51,6 +51,9 @@ export class SuggestionDto extends Model {
 
   @Column({ field: 'date_suppression', type: DataType.DATE })
   dateSuppression: Date | null
+
+  @Column({ field: 'date_creation_recherche', type: DataType.DATE })
+  dateCreationRecherche: Date | null
 }
 
 @Table({ timestamps: false, tableName: 'suggestion' })

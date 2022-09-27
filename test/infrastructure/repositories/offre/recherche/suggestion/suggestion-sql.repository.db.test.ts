@@ -15,6 +15,8 @@ describe('SuggestionSqlRepository', () => {
   const suggestion: Offre.Recherche.Suggestion = {
     dateCreation: uneDatetime,
     dateMiseAJour: uneDatetime,
+    dateCreationRecherche: undefined,
+    dateSuppression: undefined,
     id: 'f781ae20-8838-49c7-aa2e-9b224318fb65',
     idFonctionnel: 'D1104-COMMUNE-59220-10',
     idJeune: 'ABCDE',
@@ -64,6 +66,37 @@ describe('SuggestionSqlRepository', () => {
 
       // Then
       expect(suggestions).to.deep.equal([suggestion])
+    })
+  })
+
+  describe('findByIdAndIdJeune', () => {
+    it('retourne la suggestion du jeune', async () => {
+      // Given
+      await suggestionSqlRepository.save(suggestion)
+
+      // When
+      const suggestionTrouvee =
+        await suggestionSqlRepository.findByIdAndIdJeune(
+          suggestion.id,
+          jeuneDto.id
+        )
+
+      // Then
+      expect(suggestionTrouvee).to.deep.equal(suggestion)
+    })
+    it("ne retourne pas la suggestion quand elle n'appartient pas au jeune", async () => {
+      // Given
+      await suggestionSqlRepository.save(suggestion)
+
+      // When
+      const suggestionTrouvee =
+        await suggestionSqlRepository.findByIdAndIdJeune(
+          suggestion.id,
+          'un-jeune-inconnu'
+        )
+
+      // Then
+      expect(suggestionTrouvee).to.be.undefined()
     })
   })
 

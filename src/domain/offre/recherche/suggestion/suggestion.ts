@@ -19,6 +19,7 @@ export interface Suggestion {
   dateCreation: DateTime
   dateMiseAJour: DateTime
   dateSuppression?: DateTime
+  dateCreationRecherche?: DateTime
   source: Suggestion.Source
 }
 
@@ -43,6 +44,11 @@ export namespace Suggestion {
 
   export interface Repository {
     findAll(jeuneId: string): Promise<Suggestion[]>
+
+    findByIdAndIdJeune(
+      idSuggestion: string,
+      idJeune: string
+    ): Promise<Suggestion | undefined>
 
     save(suggestion: Suggestion): Promise<void>
 

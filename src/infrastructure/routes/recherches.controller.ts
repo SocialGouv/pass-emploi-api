@@ -39,6 +39,11 @@ import { handleFailure } from './failure.handler'
 import { Core } from '../../domain/core'
 import { GetSuggestionsQueryHandler } from '../../application/queries/get-suggestions.query.handler.db'
 import { SuggestionQueryModel } from '../../application/queries/query-models/suggestion.query-model'
+import { DeleteSuggestionCommandHandler } from 'src/application/commands/delete-suggestion.command.handler'
+import {
+  CreateRechercheFromSuggestionCommandHandler,
+  CreateRechercheFromSuggestionOutput
+} from 'src/application/commands/create-recherche-from-suggestion.command.handler'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -49,7 +54,9 @@ export class RecherchesController {
     private readonly getRecherchesQueryHandler: GetRecherchesQueryHandler,
     private readonly deleteRechercheCommandHandler: DeleteRechercheCommandHandler,
     private readonly rafraichirSuggestionPoleEmploiCommandHandler: RafraichirSuggestionPoleEmploiCommandHandler,
-    private readonly getSuggestionsQueryHandler: GetSuggestionsQueryHandler
+    private readonly getSuggestionsQueryHandler: GetSuggestionsQueryHandler,
+    private readonly createRechercheFromSuggestionCommandHandler: CreateRechercheFromSuggestionCommandHandler,
+    private readonly deleteSuggestionCommandHandler: DeleteSuggestionCommandHandler
   ) {}
 
   @Post('recherches/offres-emploi')
@@ -168,5 +175,53 @@ export class RecherchesController {
       }
     }
     return this.getSuggestionsQueryHandler.execute({ idJeune }, utilisateur)
+  }
+
+  @Post('recherches/suggestions/:idSuggestion/creer-recherche')
+  @ApiResponse({
+    type: SuggestionQueryModel,
+    isArray: true
+  })
+  async postRechercheSuggestion(
+    @Param('idJeune') idJeune: string,
+    @Param('idSuggestion') idSuggestion: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<CreateRechercheFromSuggestionOutput> {
+    const result =
+      await this.createRechercheFromSuggestionCommandHandler.execute(
+        {
+          idJeune,
+          idSuggestion
+        },
+        utilisateur
+      )
+
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
+    return result.data
+  }
+
+  @Delete('recherches/suggestions/:idSuggestion')
+  @ApiResponse({
+    type: SuggestionQueryModel,
+    isArray: true
+  })
+  async deleteSuggestion(
+    @Param('idJeune') idJeune: string,
+    @Param('idSuggestion') idSuggestion: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.deleteSuggestionCommandHandler.execute(
+      {
+        idJeune,
+        idSuggestion
+      },
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
   }
 }
