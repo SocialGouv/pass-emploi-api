@@ -1,5 +1,7 @@
 import { SinonSandbox } from 'sinon'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { GetDetailServiceCiviqueQueryHandler } from '../../../src/application/queries/get-detail-service-civique.query.handler'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
@@ -10,14 +12,19 @@ import { uneOffreServiceCiviqueDto } from '../../fixtures/offre-service-civique.
 describe('GetDetailServiceCiviqueQuery', () => {
   let serviceCiviqueClient: StubbedClass<EngagementClient>
   let getDetailServiceCiviqueQueryHandler: GetDetailServiceCiviqueQueryHandler
+  let evenementService: StubbedClass<EvenementService>
   let sandbox: SinonSandbox
 
   before(() => {
     sandbox = createSandbox()
     serviceCiviqueClient = stubClass(EngagementClient)
+    evenementService = stubClass(EvenementService)
 
     getDetailServiceCiviqueQueryHandler =
-      new GetDetailServiceCiviqueQueryHandler(serviceCiviqueClient)
+      new GetDetailServiceCiviqueQueryHandler(
+        serviceCiviqueClient,
+        evenementService
+      )
   })
 
   afterEach(() => {
@@ -95,6 +102,19 @@ describe('GetDetailServiceCiviqueQuery', () => {
       )
       expect(result).to.be.deep.equal(
         failure(new NonTrouveError('OffreEngagement', 'unFauxId'))
+      )
+    })
+  })
+
+  describe('monitor', () => {
+    it('crée un événement de détail d"une offre service civique', async () => {
+      // When
+      await getDetailServiceCiviqueQueryHandler.monitor(unUtilisateurJeune())
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWith(
+        Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHE,
+        unUtilisateurJeune()
       )
     })
   })

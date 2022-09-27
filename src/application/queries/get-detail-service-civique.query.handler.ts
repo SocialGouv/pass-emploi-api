@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common'
+import { Authentification } from '../../domain/authentification'
+import { Evenement, EvenementService } from '../../domain/evenement'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { DetailServiceCiviqueQueryModel } from './query-models/service-civique.query-model'
@@ -25,7 +27,10 @@ export class GetDetailServiceCiviqueQueryHandler extends QueryHandler<
   GetDetailOffreServiceCiviqueQuery,
   Result<DetailServiceCiviqueQueryModel>
 > {
-  constructor(private engagementClient: EngagementClient) {
+  constructor(
+    private engagementClient: EngagementClient,
+    private evenementService: EvenementService
+  ) {
     super('GetDetailServiceCiviqueQueryHandler')
   }
 
@@ -60,7 +65,10 @@ export class GetDetailServiceCiviqueQueryHandler extends QueryHandler<
     return emptySuccess()
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creer(
+      Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHE,
+      utilisateur
+    )
   }
 }
