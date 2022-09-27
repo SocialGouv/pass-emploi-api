@@ -8,8 +8,6 @@ import {
   Result,
   success
 } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
-import { Evenement, EvenementService } from '../../domain/evenement'
 import { PartenaireImmersion } from '../../infrastructure/repositories/dto/immersion.dto'
 import { toDetailOffreImmersionQueryModel } from '../../infrastructure/repositories/mappers/offres-immersion.mappers'
 import {
@@ -27,10 +25,7 @@ export class GetDetailOffreImmersionQueryHandler extends QueryHandler<
   GetDetailOffreImmersionQuery,
   Result<DetailOffreImmersionQueryModel>
 > {
-  constructor(
-    private immersionClient: ImmersionClient,
-    private evenementService: EvenementService
-  ) {
+  constructor(private immersionClient: ImmersionClient) {
     super('GetDetailOffreImmersionQueryHandler')
   }
 
@@ -55,14 +50,12 @@ export class GetDetailOffreImmersionQueryHandler extends QueryHandler<
       throw e
     }
   }
+
   async authorize(): Promise<Result> {
     return emptySuccess()
   }
 
-  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creer(
-      Evenement.Code.OFFRE_IMMERSION_AFFICHEE,
-      utilisateur
-    )
+  async monitor(): Promise<void> {
+    return
   }
 }
