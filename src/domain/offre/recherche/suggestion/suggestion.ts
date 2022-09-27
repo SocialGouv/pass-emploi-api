@@ -161,49 +161,61 @@ export namespace Suggestion {
       idJeune: string
     ): Suggestion[] {
       const maintenant = this.dateService.now()
-      const suggestionsEmploi = []
-      const suggestionsImmersion = []
-      const suggestionsServiceCivique = []
-
-      for (const suggestionPoleEmploi of suggestionsPoleEmploi) {
-        if (suggestionPoleEmploi.codeRome) {
-          suggestionsEmploi.push(
-            this.creerSuggestion(
-              suggestionPoleEmploi,
-              Recherche.Type.OFFRES_EMPLOI,
-              idJeune,
-              maintenant
-            )
+      const suggestionsEmploi = suggestionsPoleEmploi
+        .filter(this.estUneSuggestionEmploi)
+        .map(suggestionPoleEmploi =>
+          this.creerSuggestion(
+            suggestionPoleEmploi,
+            Recherche.Type.OFFRES_EMPLOI,
+            idJeune,
+            maintenant
           )
-          if (suggestionAvecCommuneLatLon(suggestionPoleEmploi)) {
-            suggestionsImmersion.push(
-              this.creerSuggestion(
-                suggestionPoleEmploi,
-                Recherche.Type.OFFRES_IMMERSION,
-                idJeune,
-                maintenant
-              )
-            )
-          }
-        }
-
-        if (suggestionAvecCommuneLatLon(suggestionPoleEmploi)) {
-          suggestionsServiceCivique.push(
-            this.creerSuggestion(
-              suggestionPoleEmploi,
-              Recherche.Type.OFFRES_SERVICES_CIVIQUE,
-              idJeune,
-              maintenant
-            )
+        )
+      const suggestionsImmersion = suggestionsPoleEmploi
+        .filter(this.estUneSuggestionImmersion)
+        .map(suggestionPoleEmploi =>
+          this.creerSuggestion(
+            suggestionPoleEmploi,
+            Recherche.Type.OFFRES_IMMERSION,
+            idJeune,
+            maintenant
           )
-        }
-      }
+        )
+      const suggestionsServiceCivique = suggestionsPoleEmploi
+        .filter(this.estUneSuggestionServiceCivique)
+        .map(suggestionPoleEmploi =>
+          this.creerSuggestion(
+            suggestionPoleEmploi,
+            Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+            idJeune,
+            maintenant
+          )
+        )
 
       return [
         ...suggestionsEmploi,
         ...suggestionsImmersion,
         ...suggestionsServiceCivique
       ]
+    }
+
+    private estUneSuggestionEmploi(suggestionPoleEmploi: PoleEmploi): boolean {
+      return Boolean(suggestionPoleEmploi.codeRome)
+    }
+
+    private estUneSuggestionImmersion(
+      suggestionPoleEmploi: PoleEmploi
+    ): boolean {
+      return Boolean(
+        suggestionPoleEmploi.codeRome &&
+          suggestionAvecCommuneLatLon(suggestionPoleEmploi)
+      )
+    }
+
+    private estUneSuggestionServiceCivique(
+      suggestionPoleEmploi: PoleEmploi
+    ): boolean {
+      return Boolean(suggestionAvecCommuneLatLon(suggestionPoleEmploi))
     }
 
     private creerSuggestion(

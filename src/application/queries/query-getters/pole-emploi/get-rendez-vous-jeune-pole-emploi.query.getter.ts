@@ -1,31 +1,34 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
-import {
-  PrestationDto,
-  RendezVousPoleEmploiDto
-} from '../../../../infrastructure/clients/dto/pole-emploi.dto'
-import { Jeune, JeunesRepositoryToken } from '../../../../domain/jeune/jeune'
 import { DateTime } from 'luxon'
 import {
-  buildDateSansTimezone,
-  fromPrestationDtoToRendezVousQueryModel
-} from '../../query-mappers/rendez-vous-prestation.mappers'
-import { DateService } from '../../../../utils/date-service'
-import { IdService } from '../../../../utils/id-service'
+  ErreurHttp,
+  NonTrouveError
+} from '../../../../building-blocks/types/domain-error'
 import {
   failure,
   Result,
   success
 } from '../../../../building-blocks/types/result'
-import {
-  ErreurHttp,
-  NonTrouveError
-} from '../../../../building-blocks/types/domain-error'
-import { RendezVousJeuneQueryModel } from '../../query-models/rendez-vous.query-model'
-import { fromRendezVousDtoToRendezVousQueryModel } from '../../query-mappers/rendez-vous-pole-emploi.mappers'
-import { PoleEmploiPartenaireClient } from '../../../../infrastructure/clients/pole-emploi-partenaire-client'
+import { Jeune, JeunesRepositoryToken } from '../../../../domain/jeune/jeune'
 import { RendezVous } from '../../../../domain/rendez-vous'
+import {
+  PrestationDto,
+  RendezVousPoleEmploiDto
+} from '../../../../infrastructure/clients/dto/pole-emploi.dto'
 import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-client'
+import {
+  PoleEmploiPartenaireClient,
+  PoleEmploiPartenaireClientToken
+} from '../../../../infrastructure/clients/pole-emploi-partenaire-client'
+import { DateService } from '../../../../utils/date-service'
+import { IdService } from '../../../../utils/id-service'
 import { buildError } from '../../../../utils/logger.module'
+import { fromRendezVousDtoToRendezVousQueryModel } from '../../query-mappers/rendez-vous-pole-emploi.mappers'
+import {
+  buildDateSansTimezone,
+  fromPrestationDtoToRendezVousQueryModel
+} from '../../query-mappers/rendez-vous-prestation.mappers'
+import { RendezVousJeuneQueryModel } from '../../query-models/rendez-vous.query-model'
 
 export interface Query {
   idJeune: string
@@ -40,6 +43,7 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
   constructor(
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
+    @Inject(PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private dateService: DateService,
     private idService: IdService,

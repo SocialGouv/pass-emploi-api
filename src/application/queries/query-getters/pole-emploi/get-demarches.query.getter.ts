@@ -1,20 +1,23 @@
-import { Jeune, JeunesRepositoryToken } from '../../../../domain/jeune/jeune'
 import { Inject, Injectable, Logger } from '@nestjs/common'
-import { DemarcheQueryModel } from '../../query-models/actions.query-model'
-import { DateService } from '../../../../utils/date-service'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../../../building-blocks/types/domain-error'
 import {
   failure,
   Result,
   success
 } from '../../../../building-blocks/types/result'
-import {
-  ErreurHttp,
-  NonTrouveError
-} from '../../../../building-blocks/types/domain-error'
 import { Demarche } from '../../../../domain/demarche'
-import { PoleEmploiPartenaireClient } from '../../../../infrastructure/clients/pole-emploi-partenaire-client'
+import { Jeune, JeunesRepositoryToken } from '../../../../domain/jeune/jeune'
 import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-client'
+import {
+  PoleEmploiPartenaireClient,
+  PoleEmploiPartenaireClientToken
+} from '../../../../infrastructure/clients/pole-emploi-partenaire-client'
+import { DateService } from '../../../../utils/date-service'
 import { fromDemarcheDtoToDemarche } from '../../query-mappers/actions-pole-emploi.mappers'
+import { DemarcheQueryModel } from '../../query-models/actions.query-model'
 
 export interface Query {
   idJeune: string
@@ -29,6 +32,7 @@ export class GetDemarchesQueryGetter {
   constructor(
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
+    @Inject(PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private dateService: DateService,
     private keycloakClient: KeycloakClient
