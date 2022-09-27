@@ -54,7 +54,17 @@ describe('Suggestion', () => {
             dateCreation: uneDatetime,
             dateMiseAJour: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
-            idFonctionnel: 'OFFRES_EMPLOI-D1104-DEPARTEMENT-59-10',
+            idFonctionnel: Buffer.from(
+              JSON.stringify({
+                typeRecherche: Recherche.Type.OFFRES_EMPLOI,
+                typeLocalisation:
+                  suggestionPESurUnDepartement.localisation.type,
+                codeLocalisation:
+                  suggestionPESurUnDepartement.localisation.code,
+                rayon: Recherche.DISTANCE_PAR_DEFAUT,
+                codeRome: suggestionPESurUnDepartement.codeRome
+              })
+            ).toString('base64'),
             idJeune: 'ABCDE',
             type: Recherche.Type.OFFRES_EMPLOI,
             source: Recherche.Suggestion.Source.POLE_EMPLOI
@@ -91,7 +101,15 @@ describe('Suggestion', () => {
             dateCreation: uneDatetime,
             dateMiseAJour: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
-            idFonctionnel: 'OFFRES_EMPLOI-D1104-COMMUNE-59220-10',
+            idFonctionnel: Buffer.from(
+              JSON.stringify({
+                typeRecherche: Recherche.Type.OFFRES_EMPLOI,
+                typeLocalisation: suggestionPESurUneCommune.localisation.type,
+                codeLocalisation: suggestionPESurUneCommune.localisation.code,
+                rayon: Recherche.DISTANCE_PAR_DEFAUT,
+                codeRome: suggestionPESurUneCommune.codeRome
+              })
+            ).toString('base64'),
             idJeune: 'ABCDE',
             type: Recherche.Type.OFFRES_EMPLOI,
             source: Recherche.Suggestion.Source.POLE_EMPLOI
@@ -111,7 +129,15 @@ describe('Suggestion', () => {
             dateCreation: uneDatetime,
             dateMiseAJour: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
-            idFonctionnel: 'OFFRES_IMMERSION-D1104-COMMUNE-59220-10',
+            idFonctionnel: Buffer.from(
+              JSON.stringify({
+                typeRecherche: Recherche.Type.OFFRES_IMMERSION,
+                typeLocalisation: suggestionPESurUneCommune.localisation.type,
+                codeLocalisation: suggestionPESurUneCommune.localisation.code,
+                rayon: Recherche.DISTANCE_PAR_DEFAUT,
+                codeRome: suggestionPESurUneCommune.codeRome
+              })
+            ).toString('base64'),
             idJeune: 'ABCDE',
             type: Recherche.Type.OFFRES_IMMERSION,
             source: Recherche.Suggestion.Source.POLE_EMPLOI
@@ -131,7 +157,14 @@ describe('Suggestion', () => {
             dateCreation: uneDatetime,
             dateMiseAJour: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
-            idFonctionnel: 'OFFRES_SERVICES_CIVIQUE-COMMUNE-59220-10',
+            idFonctionnel: Buffer.from(
+              JSON.stringify({
+                typeRecherche: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+                typeLocalisation: suggestionPESurUneCommune.localisation.type,
+                codeLocalisation: suggestionPESurUneCommune.localisation.code,
+                rayon: Recherche.DISTANCE_PAR_DEFAUT
+              })
+            ).toString('base64'),
             idJeune: 'ABCDE',
             type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
             source: Recherche.Suggestion.Source.POLE_EMPLOI
@@ -172,7 +205,15 @@ describe('Suggestion', () => {
             dateCreation: uneDatetime,
             dateMiseAJour: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
-            idFonctionnel: 'OFFRES_SERVICES_CIVIQUE-COMMUNE-59220-10',
+            idFonctionnel: Buffer.from(
+              JSON.stringify({
+                typeRecherche: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+                typeLocalisation: suggestionPESurUneCommune.localisation.type,
+                codeLocalisation: suggestionPESurUneCommune.localisation.code,
+                rayon: Recherche.DISTANCE_PAR_DEFAUT,
+                codeRome: suggestionPESurUneCommune.codeRome
+              })
+            ).toString('base64'),
             idJeune: 'ABCDE',
             type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
             source: Recherche.Suggestion.Source.POLE_EMPLOI
@@ -215,7 +256,15 @@ describe('Suggestion', () => {
             dateCreation: uneDatetime,
             dateMiseAJour: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
-            idFonctionnel: 'OFFRES_EMPLOI-D1104-COMMUNE-59220-10',
+            idFonctionnel: Buffer.from(
+              JSON.stringify({
+                typeRecherche: Recherche.Type.OFFRES_EMPLOI,
+                typeLocalisation: suggestionPESurUneCommune.localisation.type,
+                codeLocalisation: suggestionPESurUneCommune.localisation.code,
+                rayon: Recherche.DISTANCE_PAR_DEFAUT,
+                codeRome: suggestionPESurUneCommune.codeRome
+              })
+            ).toString('base64'),
             idJeune: 'ABCDE',
             type: Recherche.Type.OFFRES_EMPLOI,
             source: Recherche.Suggestion.Source.POLE_EMPLOI
