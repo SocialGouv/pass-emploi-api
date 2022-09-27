@@ -13,6 +13,7 @@ import { Suggestion } from '../../../../../../src/domain/offre/recherche/suggest
 import { CommuneSqlModel } from '../../../../../../src/infrastructure/sequelize/models/commune.sql-model'
 import { DatabaseForTesting } from '../../../../../utils/database-for-testing'
 import { uneCommuneDto } from '../../../../../fixtures/sql-models/commune.sql-model'
+import { testConfig } from 'test/utils/module-for-testing'
 
 describe('SuggestionPeHttpRepository', () => {
   let suggestionPeHttpRepository: SuggestionPeHttpRepository
@@ -21,7 +22,11 @@ describe('SuggestionPeHttpRepository', () => {
   beforeEach(() => {
     DatabaseForTesting.prepare()
     client = stubClass(PoleEmploiPartenaireClient)
-    suggestionPeHttpRepository = new SuggestionPeHttpRepository(client)
+    const configService = testConfig()
+    suggestionPeHttpRepository = new SuggestionPeHttpRepository(
+      client,
+      configService
+    )
   })
 
   describe('findAll', () => {

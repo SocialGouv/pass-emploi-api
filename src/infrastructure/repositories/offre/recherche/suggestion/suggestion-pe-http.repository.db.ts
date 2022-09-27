@@ -8,6 +8,8 @@ import {
 import { Injectable } from '@nestjs/common'
 import { SuggestionDto } from '../../../../clients/dto/pole-emploi.dto'
 import { CommuneSqlModel } from 'src/infrastructure/sequelize/models/commune.sql-model'
+import { ConfigService } from '@nestjs/config'
+import { suggestionsPEInMemory } from 'src/infrastructure/repositories/dto/pole-emploi.in-memory.dto'
 
 const CODE_TYPE_LIEU_DEPARTEMENT = '4'
 const CODE_TYPE_LIEU_COMMUNE = '5'
@@ -17,12 +19,19 @@ const CODE_UNITE_RAYON_KM = 'KM'
 export class SuggestionPeHttpRepository
   implements Suggestion.PoleEmploi.Repository
 {
-  constructor(private client: PoleEmploiPartenaireClient) {}
+  private isInMemory?: boolean
+
+  constructor(
+    private client: PoleEmploiPartenaireClient,
+    private config: ConfigService
+  ) {
+    this.isInMemory = this.config.get('isInMemory')
+  }
 
   async findAll(token: string): Promise<Result<Suggestion.PoleEmploi[]>> {
-    const suggestionsDtoResult = await this.client.getSuggestionsRecherches(
-      token
-    )
+    const suggestionsDtoResult = this.isInMemory
+      ? success(suggestionsPEInMemory)
+      : await this.client.getSuggestionsRecherches(token)
 
     if (isFailure(suggestionsDtoResult)) {
       return suggestionsDtoResult

@@ -1,6 +1,6 @@
 import { SuggestionDto } from 'src/infrastructure/clients/dto/pole-emploi.dto'
 
-export const suggestionsPE: SuggestionDto[] = [
+export const suggestionsPEInMemory: SuggestionDto[] = [
   {
     appellation: {
       libelle: 'Comédien / Comédienne',
@@ -100,6 +100,39 @@ export const suggestionsPE: SuggestionDto[] = [
         }
       }
     ],
+    typologieEmploi: {
+      libelle: "Création ou Reprise d'Entreprise ou de Franchiseaire",
+      code: 'EF'
+    }
+  },
+  {
+    appellation: {
+      libelle: 'Boulanger',
+      code: '26320'
+    },
+    mobilites: [
+      {
+        rayon: 0,
+        lieu: {
+          code: '92035',
+          codeDepartement: '92',
+          codePostal: '92250',
+          libelle: 'LA GARENNE-COLOMBES',
+          type: {
+            code: '5',
+            libelle: 'Commune'
+          }
+        },
+        unite: {
+          code: 'KM',
+          libelle: 'Kilomètres'
+        }
+      }
+    ],
+    rome: {
+      libelle: 'Cuisine',
+      code: 'D2705'
+    },
     typologieEmploi: {
       libelle: "Création ou Reprise d'Entreprise ou de Franchiseaire",
       code: 'EF'
