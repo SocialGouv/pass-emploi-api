@@ -37,7 +37,6 @@ export const uneSuggestion = (
       codeRome: 'D1104'
     },
     idJeune: 'ABCDE',
-    dateSuppression: undefined,
     type: Offre.Recherche.Type.OFFRES_EMPLOI,
     source: Suggestion.Source.POLE_EMPLOI,
     informations: {

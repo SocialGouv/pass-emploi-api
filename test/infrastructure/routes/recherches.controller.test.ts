@@ -1,12 +1,32 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
-import { uneDatetime } from '../../fixtures/date.fixture'
+import * as request from 'supertest'
+import { CreateRechercheFromSuggestionCommandHandler } from '../../../src/application/commands/create-recherche-from-suggestion.command.handler'
+import { CreateRechercheCommandHandler } from '../../../src/application/commands/create-recherche.command.handler'
 import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
-import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+  DeleteRechercheCommand,
+  DeleteRechercheCommandHandler
+} from '../../../src/application/commands/delete-recherche.command.handler'
+import { RefuserSuggestionCommandHandler } from '../../../src/application/commands/refuser-suggestion.command.handler'
+import { RafraichirSuggestionPoleEmploiCommandHandler } from '../../../src/application/commands/rafraichir-suggestion-pole-emploi.command.handler'
+import { GetRecherchesQueryHandler } from '../../../src/application/queries/get-recherches.query.handler.db'
+import { GetSuggestionsQueryHandler } from '../../../src/application/queries/get-suggestions.query.handler.db'
+import { RechercheQueryModel } from '../../../src/application/queries/query-models/recherches.query-model'
+import { SuggestionQueryModel } from '../../../src/application/queries/query-models/suggestion.query-model'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
+import {
+  emptySuccess,
+  failure
+} from '../../../src/building-blocks/types/result'
+import { Offre } from '../../../src/domain/offre/offre'
+import { Recherche } from '../../../src/domain/offre/recherche/recherche'
+import { JwtService } from '../../../src/infrastructure/auth/jwt.service'
+import {
+  CreateRechercheImmersionPayload,
+  CreateRechercheOffresEmploiPayload
+} from '../../../src/infrastructure/routes/validation/recherches.inputs'
 import {
   unHeaderAuthorization,
   unJwtPayloadValide,
@@ -14,34 +34,16 @@ import {
   unUtilisateurDecode,
   unUtilisateurDecodePoleEmploi
 } from '../../fixtures/authentification.fixture'
-import * as request from 'supertest'
-import { CreateRechercheCommandHandler } from '../../../src/application/commands/create-recherche.command.handler'
-import { Recherche } from '../../../src/domain/offre/recherche/recherche'
-import {
-  CreateRechercheImmersionPayload,
-  CreateRechercheOffresEmploiPayload
-} from '../../../src/infrastructure/routes/validation/recherches.inputs'
-import { GetRecherchesQueryHandler } from '../../../src/application/queries/get-recherches.query.handler.db'
-import { RechercheQueryModel } from '../../../src/application/queries/query-models/recherches.query-model'
+import { uneDatetime } from '../../fixtures/date.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import {
-  emptySuccess,
-  failure
-} from '../../../src/building-blocks/types/result'
-import {
-  DeleteRechercheCommand,
-  DeleteRechercheCommandHandler
-} from '../../../src/application/commands/delete-recherche.command.handler'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
 import {
-  ErreurHttp,
-  NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
-import { Offre } from '../../../src/domain/offre/offre'
-import { RafraichirSuggestionPoleEmploiCommandHandler } from '../../../src/application/commands/rafraichir-suggestion-pole-emploi.command.handler'
-import { JwtService } from '../../../src/infrastructure/auth/jwt.service'
-import { GetSuggestionsQueryHandler } from '../../../src/application/queries/get-suggestions.query.handler.db'
-import { SuggestionQueryModel } from '../../../src/application/queries/query-models/suggestion.query-model'
+  buildTestingModuleForHttpTesting,
+  expect,
+  StubbedClass,
+  stubClass
+} from '../../utils'
+import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 
 describe('RecherchesController', () => {
   let createRechercheCommandHandler: StubbedClass<CreateRechercheCommandHandler>
@@ -49,6 +51,8 @@ describe('RecherchesController', () => {
   let deleteRechercheCommandHandler: StubbedClass<DeleteRechercheCommandHandler>
   let rafraichirSuggestionPoleEmploiCommandHandler: StubbedClass<RafraichirSuggestionPoleEmploiCommandHandler>
   let getSuggestionsQueryHandler: StubbedClass<GetSuggestionsQueryHandler>
+  let createRechercheFromSuggestionCommandHandler: StubbedClass<CreateRechercheFromSuggestionCommandHandler>
+  let refuserSuggestionCommandHandler: StubbedClass<RefuserSuggestionCommandHandler>
   let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
@@ -56,6 +60,10 @@ describe('RecherchesController', () => {
     createRechercheCommandHandler = stubClass(CreateRechercheCommandHandler)
     getRecherchesQueryHandler = stubClass(GetRecherchesQueryHandler)
     deleteRechercheCommandHandler = stubClass(DeleteRechercheCommandHandler)
+    refuserSuggestionCommandHandler = stubClass(RefuserSuggestionCommandHandler)
+    createRechercheFromSuggestionCommandHandler = stubClass(
+      CreateRechercheFromSuggestionCommandHandler
+    )
     rafraichirSuggestionPoleEmploiCommandHandler = stubClass(
       RafraichirSuggestionPoleEmploiCommandHandler
     )
@@ -72,6 +80,10 @@ describe('RecherchesController', () => {
       .useValue(rafraichirSuggestionPoleEmploiCommandHandler)
       .overrideProvider(GetSuggestionsQueryHandler)
       .useValue(getSuggestionsQueryHandler)
+      .overrideProvider(CreateRechercheFromSuggestionCommandHandler)
+      .useValue(createRechercheFromSuggestionCommandHandler)
+      .overrideProvider(RefuserSuggestionCommandHandler)
+      .useValue(refuserSuggestionCommandHandler)
       .overrideProvider(JwtService)
       .useValue(jwtService)
       .compile()
@@ -452,6 +464,52 @@ describe('RecherchesController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/jeunes/1/recherches/suggestions'
+    )
+  })
+
+  describe('POST /recherches/suggestions/:idSuggestion/creer-recherche', () => {
+    describe('quand la suggestion existe', () => {
+      it('crée la recherche correspondante', async () => {
+        // Given
+        const idSuggestion = 'id-suggestion'
+        createRechercheFromSuggestionCommandHandler.execute.resolves(
+          emptySuccess()
+        )
+
+        // When
+        await request(app.getHttpServer())
+          .post(
+            `/jeunes/1/recherches/suggestions/${idSuggestion}/creer-recherche`
+          )
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect(HttpStatus.CREATED)
+      })
+      ensureUserAuthenticationFailsIfInvalid(
+        'post',
+        '/jeunes/1/recherches/suggestions/123/creer-recherche'
+      )
+    })
+  })
+
+  describe('PUT /recherches/suggestions/:idSuggestion/refuser', () => {
+    describe('quand la suggestion existe', () => {
+      it('supprime la suggestion', async () => {
+        // Given
+        const idSuggestion = 'id-suggestion'
+        refuserSuggestionCommandHandler.execute.resolves(emptySuccess())
+
+        // When
+        await request(app.getHttpServer())
+          .put(`/jeunes/1/recherches/suggestions/${idSuggestion}/refuser`)
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect(HttpStatus.OK)
+      })
+    })
+    ensureUserAuthenticationFailsIfInvalid(
+      'put',
+      '/jeunes/1/recherches/suggestions/123/refuser'
     )
   })
 })

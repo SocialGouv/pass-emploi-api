@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { Offre } from '../offre'
 import * as _Suggestion from './suggestion/suggestion'
@@ -97,5 +98,23 @@ export namespace Recherche {
     dateDeDebutMaximum?: string
     domaine?: string
     dateDeCreationMinimum?: string
+  }
+
+  @Injectable()
+  export class Factory {
+    buildRechercheFromSuggestion(suggestion: Suggestion.Acceptee): Recherche {
+      return {
+        id: suggestion.idRecherche,
+        type: suggestion.type,
+        titre: suggestion.informations.titre,
+        metier: suggestion.informations.metier,
+        localisation: suggestion.informations.localisation,
+        criteres: suggestion.criteres,
+        idJeune: suggestion.idJeune,
+        dateCreation: suggestion.dateCreationRecherche,
+        dateDerniereRecherche: suggestion.dateCreationRecherche,
+        etat: Recherche.Etat.SUCCES
+      }
+    }
   }
 }

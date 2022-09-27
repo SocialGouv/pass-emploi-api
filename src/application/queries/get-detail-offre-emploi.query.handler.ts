@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common'
-import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { PoleEmploiClient } from '../../infrastructure/clients/pole-emploi-client'
 import { OffreEmploiDto } from '../../infrastructure/repositories/dto/pole-emploi.dto'
 import { OffreEmploiQueryModel } from './query-models/offres-emploi.query-model'
-import { Authentification } from '../../domain/authentification'
 
 export interface GetDetailOffreEmploiQuery extends Query {
   idOffreEmploi: string
@@ -37,7 +36,7 @@ export class GetDetailOffreEmploiQueryHandler extends QueryHandler<
     return emptySuccess()
   }
 
-  async monitor(_utilisateur: Authentification.Utilisateur): Promise<void> {
+  async monitor(): Promise<void> {
     return
   }
 }

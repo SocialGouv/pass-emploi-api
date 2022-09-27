@@ -110,7 +110,10 @@ import {
   PlanificateurRepositoryToken,
   PlanificateurService
 } from './domain/planificateur'
-import { RecherchesRepositoryToken } from './domain/offre/recherche/recherche'
+import {
+  Recherche,
+  RecherchesRepositoryToken
+} from './domain/offre/recherche/recherche'
 import { RendezVousRepositoryToken } from './domain/rendez-vous'
 import { SuperviseursRepositoryToken } from './domain/superviseur'
 import { NotificationSupportServiceToken } from './domain/notification-support'
@@ -243,6 +246,9 @@ import {
 import { SuggestionSqlRepository } from './infrastructure/repositories/offre/recherche/suggestion/suggestion-sql.repository.db'
 import { GetSuggestionsQueryHandler } from './application/queries/get-suggestions.query.handler.db'
 import { SuggestionPoleEmploiService } from './domain/offre/recherche/suggestion/pole-emploi.service'
+import { RefuserSuggestionCommandHandler } from './application/commands/refuser-suggestion.command.handler'
+import { CreateRechercheFromSuggestionCommandHandler } from './application/commands/create-recherche-from-suggestion.command.handler'
+import { SuggestionAuthorizer } from './application/authorizers/authorize-suggestion'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -307,6 +313,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     InvitationIcsClient,
     KeycloakClient,
     Context,
+    Recherche.Factory,
     {
       provide: APP_GUARD,
       useClass: OidcAuthGuard
@@ -451,6 +458,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     JeunePoleEmploiAuthorizer,
     RendezVousAuthorizer,
     SupportAuthorizer,
+    SuggestionAuthorizer,
     AuthorizeConseillerForJeunes,
     ConseillerForJeuneAvecPartageAuthorizer,
     FavoriOffreServiceCiviqueAuthorizer,
@@ -563,7 +571,9 @@ export function buildQueryCommandsProviders(): Provider[] {
     HandleJobMettreAJourCodesEvenementsCommandHandler,
     GetIndicateursPourConseillerQueryHandler,
     RafraichirSuggestionPoleEmploiCommandHandler,
-    GetSuggestionsQueryHandler
+    GetSuggestionsQueryHandler,
+    RefuserSuggestionCommandHandler,
+    CreateRechercheFromSuggestionCommandHandler
   ]
 }
 

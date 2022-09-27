@@ -21,8 +21,10 @@ export interface Suggestion {
   criteres?: Recherche.Emploi | Recherche.Immersion | Recherche.ServiceCivique
   dateCreation: DateTime
   dateMiseAJour: DateTime
-  dateSuppression?: DateTime
   source: Suggestion.Source
+  dateCreationRecherche?: DateTime
+  idRecherche?: string
+  dateRefus?: DateTime
 }
 
 export const SuggestionsRepositoryToken = 'SuggestionsRepositoryToken'
@@ -33,6 +35,15 @@ export namespace Suggestion {
   // FIXME: le linter ne comprend pas cette technique 🤷‍️
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import PoleEmploi = _PoleEmploi.PoleEmploi
+
+  export interface Acceptee extends Suggestion {
+    dateCreationRecherche: DateTime
+    idRecherche: string
+  }
+
+  export interface Refusee extends Suggestion {
+    dateRefus: DateTime
+  }
 
   export enum TypeLocalisation {
     DEPARTEMENT = 'DEPARTEMENT',
@@ -54,6 +65,8 @@ export namespace Suggestion {
 
   export interface Repository {
     findAll(jeuneId: string): Promise<Suggestion[]>
+
+    get(idSuggestion: string): Promise<Suggestion | undefined>
 
     save(suggestion: Suggestion): Promise<void>
 
@@ -210,6 +223,20 @@ export namespace Suggestion {
       ]
     }
 
+    accepter(suggestion: Suggestion): Acceptee {
+      return {
+        ...suggestion,
+        dateCreationRecherche: this.dateService.now(),
+        idRecherche: this.idService.uuid()
+      }
+    }
+
+    refuser(suggestion: Suggestion): Refusee {
+      return {
+        ...suggestion,
+        dateRefus: this.dateService.now()
+      }
+    }
     private estUneSuggestionEmploi(suggestionPoleEmploi: PoleEmploi): boolean {
       return Boolean(suggestionPoleEmploi.codeRome)
     }

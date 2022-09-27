@@ -8,6 +8,7 @@ import {
 } from 'sequelize-typescript'
 import { JeuneSqlModel } from './jeune.sql-model'
 import { Recherche } from '../../../domain/offre/recherche/recherche'
+import { RechercheSqlModel } from './recherche.sql-model'
 
 export class SuggestionDto extends Model {
   @PrimaryKey
@@ -49,8 +50,15 @@ export class SuggestionDto extends Model {
   @Column({ field: 'date_mise_a_jour', type: DataType.DATE })
   dateMiseAJour: Date
 
-  @Column({ field: 'date_suppression', type: DataType.DATE })
-  dateSuppression: Date | null
+  @Column({ field: 'date_refus', type: DataType.DATE })
+  dateRefus: Date | null
+
+  @Column({ field: 'date_creation_recherche', type: DataType.DATE })
+  dateCreationRecherche: Date | null
+
+  @ForeignKey(() => RechercheSqlModel)
+  @Column({ field: 'id_recherche', type: DataType.UUID })
+  idRecherche: string | null
 }
 
 @Table({ timestamps: false, tableName: 'suggestion' })
