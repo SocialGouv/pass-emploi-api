@@ -53,14 +53,23 @@ export namespace Suggestion {
     suggestionPoleEmploi: PoleEmploi,
     type: Recherche.Type
   ): string {
-    const rayon =
-      suggestionPoleEmploi.localisation.rayon ?? Recherche.DISTANCE_PAR_DEFAUT
-    // TODO: faire une clé en objet et la mettre en B64
-    if (type === Recherche.Type.OFFRES_SERVICES_CIVIQUE) {
-      return `${type}-${suggestionPoleEmploi.localisation.type}-${suggestionPoleEmploi.localisation.code}-${rayon}`
-    } else {
-      return `${type}-${suggestionPoleEmploi.codeRome}-${suggestionPoleEmploi.localisation.type}-${suggestionPoleEmploi.localisation.code}-${rayon}`
+    const idFonctionnel: {
+      typeRecherche: Recherche.Type
+      codeRome?: string
+      typeLocalisation: string
+      codeLocalisation: string
+      rayon: number
+    } = {
+      typeRecherche: type,
+      typeLocalisation: suggestionPoleEmploi.localisation.type,
+      codeLocalisation: suggestionPoleEmploi.localisation.code,
+      rayon:
+        suggestionPoleEmploi.localisation.rayon ?? Recherche.DISTANCE_PAR_DEFAUT
     }
+    if (type !== Recherche.Type.OFFRES_SERVICES_CIVIQUE) {
+      idFonctionnel.codeRome = suggestionPoleEmploi.codeRome
+    }
+    return Buffer.from(JSON.stringify(idFonctionnel)).toString('base64')
   }
 
   function construireTitreEtMetierSuggestion(
