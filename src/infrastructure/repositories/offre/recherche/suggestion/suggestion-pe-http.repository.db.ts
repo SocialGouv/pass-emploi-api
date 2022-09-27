@@ -1,15 +1,16 @@
-import { Suggestion } from '../../../../../domain/offre/recherche/suggestion/suggestion'
-import { PoleEmploiPartenaireClient } from '../../../../clients/pole-emploi-partenaire-client'
+import { Inject, Injectable } from '@nestjs/common'
+import { CommuneSqlModel } from 'src/infrastructure/sequelize/models/commune.sql-model'
 import {
   isFailure,
   Result,
   success
 } from '../../../../../building-blocks/types/result'
-import { Injectable } from '@nestjs/common'
+import { Suggestion } from '../../../../../domain/offre/recherche/suggestion/suggestion'
 import { SuggestionDto } from '../../../../clients/dto/pole-emploi.dto'
-import { CommuneSqlModel } from 'src/infrastructure/sequelize/models/commune.sql-model'
-import { ConfigService } from '@nestjs/config'
-import { suggestionsPEInMemory } from 'src/infrastructure/repositories/dto/pole-emploi.in-memory.dto'
+import {
+  PoleEmploiPartenaireClient,
+  PoleEmploiPartenaireClientToken
+} from '../../../../clients/pole-emploi-partenaire-client'
 
 const CODE_TYPE_LIEU_DEPARTEMENT = '4'
 const CODE_TYPE_LIEU_COMMUNE = '5'
@@ -19,19 +20,15 @@ const CODE_UNITE_RAYON_KM = 'KM'
 export class SuggestionPeHttpRepository
   implements Suggestion.PoleEmploi.Repository
 {
-  private isInMemory?: boolean
-
   constructor(
-    private client: PoleEmploiPartenaireClient,
-    private config: ConfigService
-  ) {
-    this.isInMemory = this.config.get('isInMemory')
-  }
+    @Inject(PoleEmploiPartenaireClientToken)
+    private client: PoleEmploiPartenaireClient
+  ) {}
 
   async findAll(token: string): Promise<Result<Suggestion.PoleEmploi[]>> {
-    const suggestionsDtoResult = this.isInMemory
-      ? success(suggestionsPEInMemory)
-      : await this.client.getSuggestionsRecherches(token)
+    const suggestionsDtoResult = await this.client.getSuggestionsRecherches(
+      token
+    )
 
     if (isFailure(suggestionsDtoResult)) {
       return suggestionsDtoResult

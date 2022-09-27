@@ -1,19 +1,18 @@
-import { SuggestionPeHttpRepository } from '../../../../../../src/infrastructure/repositories/offre/recherche/suggestion/suggestion-pe-http.repository.db'
-import { PoleEmploiPartenaireClient } from '../../../../../../src/infrastructure/clients/pole-emploi-partenaire-client'
-import { expect, StubbedClass, stubClass } from '../../../../../utils'
 import { success } from '../../../../../../src/building-blocks/types/result'
+import { Suggestion } from '../../../../../../src/domain/offre/recherche/suggestion/suggestion'
+import { PoleEmploiPartenaireClient } from '../../../../../../src/infrastructure/clients/pole-emploi-partenaire-client'
+import { SuggestionPeHttpRepository } from '../../../../../../src/infrastructure/repositories/offre/recherche/suggestion/suggestion-pe-http.repository.db'
+import { CommuneSqlModel } from '../../../../../../src/infrastructure/sequelize/models/commune.sql-model'
 import {
   uneSuggestionDtoCommuneAvecUnRayonInconnu,
   uneSuggestionDtoCommuneSansRayon,
-  uneSuggestionDtoUneCommuneAvecRayon,
   uneSuggestionDtoUnDepartement,
+  uneSuggestionDtoUneCommuneAvecRayon,
   uneSuggestionDtoUneRegion
 } from '../../../../../fixtures/pole-emploi.dto.fixture'
-import { Suggestion } from '../../../../../../src/domain/offre/recherche/suggestion/suggestion'
-import { CommuneSqlModel } from '../../../../../../src/infrastructure/sequelize/models/commune.sql-model'
-import { DatabaseForTesting } from '../../../../../utils/database-for-testing'
 import { uneCommuneDto } from '../../../../../fixtures/sql-models/commune.sql-model'
-import { testConfig } from 'test/utils/module-for-testing'
+import { expect, StubbedClass, stubClass } from '../../../../../utils'
+import { DatabaseForTesting } from '../../../../../utils/database-for-testing'
 
 describe('SuggestionPeHttpRepository', () => {
   let suggestionPeHttpRepository: SuggestionPeHttpRepository
@@ -22,11 +21,7 @@ describe('SuggestionPeHttpRepository', () => {
   beforeEach(() => {
     DatabaseForTesting.prepare()
     client = stubClass(PoleEmploiPartenaireClient)
-    const configService = testConfig()
-    suggestionPeHttpRepository = new SuggestionPeHttpRepository(
-      client,
-      configService
-    )
+    suggestionPeHttpRepository = new SuggestionPeHttpRepository(client)
   })
 
   describe('findAll', () => {

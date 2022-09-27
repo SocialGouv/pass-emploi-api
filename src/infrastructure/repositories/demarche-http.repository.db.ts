@@ -1,15 +1,19 @@
-import { Demarche } from '../../domain/demarche'
-import { isSuccess, Result, success } from '../../building-blocks/types/result'
-import { KeycloakClient } from '../clients/keycloak-client'
-import { PoleEmploiPartenaireClient } from '../clients/pole-emploi-partenaire-client'
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { fromDemarcheDtoToDemarche } from '../../application/queries/query-mappers/actions-pole-emploi.mappers'
+import { isSuccess, Result, success } from '../../building-blocks/types/result'
+import { Demarche } from '../../domain/demarche'
 import { DateService } from '../../utils/date-service'
+import { KeycloakClient } from '../clients/keycloak-client'
+import {
+  PoleEmploiPartenaireClient,
+  PoleEmploiPartenaireClientToken
+} from '../clients/pole-emploi-partenaire-client'
 
 @Injectable()
 export class DemarcheHttpRepositoryDb implements Demarche.Repository {
   constructor(
     private keycloakClient: KeycloakClient,
+    @Inject(PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private dateService: DateService
   ) {}
