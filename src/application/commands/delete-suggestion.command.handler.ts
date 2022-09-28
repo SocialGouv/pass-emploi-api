@@ -56,7 +56,7 @@ export class DeleteSuggestionCommandHandler extends CommandHandler<
     return
   }
 
-  authorize(
+  async authorize(
     query: DeleteSuggestionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {

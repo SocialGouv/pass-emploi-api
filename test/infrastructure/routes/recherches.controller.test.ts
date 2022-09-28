@@ -26,7 +26,8 @@ import { RechercheQueryModel } from '../../../src/application/queries/query-mode
 import { unJeune } from '../../fixtures/jeune.fixture'
 import {
   emptySuccess,
-  failure
+  failure,
+  success
 } from '../../../src/building-blocks/types/result'
 import {
   DeleteRechercheCommand,
@@ -42,6 +43,8 @@ import { RafraichirSuggestionPoleEmploiCommandHandler } from '../../../src/appli
 import { JwtService } from '../../../src/infrastructure/auth/jwt.service'
 import { GetSuggestionsQueryHandler } from '../../../src/application/queries/get-suggestions.query.handler.db'
 import { SuggestionQueryModel } from '../../../src/application/queries/query-models/suggestion.query-model'
+import { CreateRechercheFromSuggestionCommandHandler } from '../../../src/application/commands/create-recherche-from-suggestion.command.handler'
+import { DeleteSuggestionCommandHandler } from '../../../src/application/commands/delete-suggestion.command.handler'
 
 describe('RecherchesController', () => {
   let createRechercheCommandHandler: StubbedClass<CreateRechercheCommandHandler>
@@ -49,6 +52,8 @@ describe('RecherchesController', () => {
   let deleteRechercheCommandHandler: StubbedClass<DeleteRechercheCommandHandler>
   let rafraichirSuggestionPoleEmploiCommandHandler: StubbedClass<RafraichirSuggestionPoleEmploiCommandHandler>
   let getSuggestionsQueryHandler: StubbedClass<GetSuggestionsQueryHandler>
+  let createRechercheFromSuggestionCommandHandler: StubbedClass<CreateRechercheFromSuggestionCommandHandler>
+  let deleteSuggestionCommandHandler: StubbedClass<DeleteSuggestionCommandHandler>
   let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
@@ -56,6 +61,10 @@ describe('RecherchesController', () => {
     createRechercheCommandHandler = stubClass(CreateRechercheCommandHandler)
     getRecherchesQueryHandler = stubClass(GetRecherchesQueryHandler)
     deleteRechercheCommandHandler = stubClass(DeleteRechercheCommandHandler)
+    deleteSuggestionCommandHandler = stubClass(DeleteSuggestionCommandHandler)
+    createRechercheFromSuggestionCommandHandler = stubClass(
+      CreateRechercheFromSuggestionCommandHandler
+    )
     rafraichirSuggestionPoleEmploiCommandHandler = stubClass(
       RafraichirSuggestionPoleEmploiCommandHandler
     )
@@ -72,6 +81,10 @@ describe('RecherchesController', () => {
       .useValue(rafraichirSuggestionPoleEmploiCommandHandler)
       .overrideProvider(GetSuggestionsQueryHandler)
       .useValue(getSuggestionsQueryHandler)
+      .overrideProvider(CreateRechercheFromSuggestionCommandHandler)
+      .useValue(createRechercheFromSuggestionCommandHandler)
+      .overrideProvider(DeleteSuggestionCommandHandler)
+      .useValue(deleteSuggestionCommandHandler)
       .overrideProvider(JwtService)
       .useValue(jwtService)
       .compile()
@@ -452,6 +465,57 @@ describe('RecherchesController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/jeunes/1/recherches/suggestions'
+    )
+  })
+
+  describe('POST /recherches/suggestions/:idSuggestion/creer-recherche', () => {
+    describe('quand la suggestion existe', () => {
+      it('crée la recherche correspondante', async () => {
+        // Given
+        const idSuggestion = 'id-suggestion'
+        const createRechercheOutput = {
+          idRecherche: '345',
+          type: Recherche.Type.OFFRES_EMPLOI
+        }
+        createRechercheFromSuggestionCommandHandler.execute.resolves(
+          success(createRechercheOutput)
+        )
+
+        // When
+        await request(app.getHttpServer())
+          .post(
+            `/jeunes/1/recherches/suggestions/${idSuggestion}/creer-recherche`
+          )
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect(HttpStatus.CREATED)
+          .expect(createRechercheOutput)
+      })
+      ensureUserAuthenticationFailsIfInvalid(
+        'post',
+        '/jeunes/1/recherches/suggestions/123/creer-recherche'
+      )
+    })
+  })
+
+  describe('DELETE /recherches/suggestions/:idSuggestion', () => {
+    describe('quand la suggestion existe', () => {
+      it('supprime la suggestion', async () => {
+        // Given
+        const idSuggestion = 'id-suggestion'
+        deleteSuggestionCommandHandler.execute.resolves(emptySuccess())
+
+        // When
+        await request(app.getHttpServer())
+          .delete(`/jeunes/1/recherches/suggestions/${idSuggestion}`)
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect(HttpStatus.NO_CONTENT)
+      })
+    })
+    ensureUserAuthenticationFailsIfInvalid(
+      'delete',
+      '/jeunes/1/recherches/suggestions/123'
     )
   })
 })

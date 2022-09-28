@@ -14,9 +14,13 @@ import { DateService } from 'src/utils/date-service'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { ApiProperty } from '@nestjs/swagger'
 
-export interface CreateRechercheFromSuggestionOutput {
+export class CreateRechercheFromSuggestionOutput {
+  @ApiProperty()
   idRecherche: string
+
+  @ApiProperty()
   type: Recherche.Type
 }
 export interface CreateRechercheFromSuggestionCommand extends Command {
@@ -72,7 +76,7 @@ export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
     return
   }
 
-  authorize(
+  async authorize(
     query: CreateRechercheFromSuggestionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {

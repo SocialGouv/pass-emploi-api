@@ -178,10 +178,6 @@ export class RecherchesController {
   }
 
   @Post('recherches/suggestions/:idSuggestion/creer-recherche')
-  @ApiResponse({
-    type: SuggestionQueryModel,
-    isArray: true
-  })
   async postRechercheSuggestion(
     @Param('idJeune') idJeune: string,
     @Param('idSuggestion') idSuggestion: string,
@@ -203,10 +199,7 @@ export class RecherchesController {
   }
 
   @Delete('recherches/suggestions/:idSuggestion')
-  @ApiResponse({
-    type: SuggestionQueryModel,
-    isArray: true
-  })
+  @HttpCode(204)
   async deleteSuggestion(
     @Param('idJeune') idJeune: string,
     @Param('idSuggestion') idSuggestion: string,
