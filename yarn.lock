@@ -2635,10 +2635,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/mocha@npm:^9.1.1":
-  version: 9.1.1
-  resolution: "@types/mocha@npm:9.1.1"
-  checksum: 516077c0acd9806dc78317f88aaac0df5aaf0bdc2f63dfdadeabdf0b0137953b6ca65472e6ff7c30bc93ce4e0ae76eae70e8d46764b9a8eae4877a928b6ef49a
+"@types/mocha@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "@types/mocha@npm:10.0.0"
+  checksum: 69e3896a63ec93374e22afd03fdea4c2f31d609d6ea111c8403508ede90da9dc0140c7bb2edff8404114d9d980308e104e4236324bf6afac1410b2cfe35f98c6
   languageName: node
   linkType: hard
 
@@ -8807,7 +8807,7 @@ __metadata:
     "@types/express": ^4.17.13
     "@types/geojson": ^7946.0.10
     "@types/luxon": ^3.0.1
-    "@types/mocha": ^9.1.1
+    "@types/mocha": ^10.0.0
     "@types/multer": ^1.4.7
     "@types/node": ^18.7.15
     "@types/pino-multi-stream": ^5.1.3
