@@ -1,6 +1,7 @@
 import { Suggestion } from 'src/domain/offre/recherche/suggestion/suggestion'
 import { Offre } from '../../src/domain/offre/offre'
 import { uneDatetime } from './date.fixture'
+import { Recherche } from '../../src/domain/offre/recherche/recherche'
 
 export const uneSuggestionPE = (
   args: Partial<Offre.Recherche.Suggestion.PoleEmploi> = {}
@@ -28,7 +29,13 @@ export const uneSuggestion = (
     dateCreation: uneDatetime,
     dateMiseAJour: uneDatetime,
     id: 'f781ae20-8838-49c7-aa2e-9b224318fb65',
-    idFonctionnel: 'D1104-COMMUNE-59220-10',
+    idFonctionnel: {
+      typeRecherche: Recherche.Type.OFFRES_EMPLOI,
+      typeLocalisation: Suggestion.TypeLocalisation.COMMUNE,
+      codeLocalisation: '59220',
+      rayon: Recherche.DISTANCE_PAR_DEFAUT,
+      codeRome: 'D1104'
+    },
     idJeune: 'ABCDE',
     dateSuppression: undefined,
     type: Offre.Recherche.Type.OFFRES_EMPLOI,

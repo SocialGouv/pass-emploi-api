@@ -4,10 +4,13 @@ import { Injectable } from '@nestjs/common'
 import { IdService } from '../../../../utils/id-service'
 import { DateService } from '../../../../utils/date-service'
 import { DateTime } from 'luxon'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import * as isEqual from 'lodash.isequal'
 
 export interface Suggestion {
   id: string
-  idFonctionnel: string
+  idFonctionnel: Suggestion.IdFonctionnel
   idJeune: string
   type: Recherche.Type
   informations: {
@@ -41,6 +44,14 @@ export namespace Suggestion {
     CONSEILLER = 'CONSEILLER'
   }
 
+  export interface IdFonctionnel {
+    typeRecherche: Recherche.Type
+    codeRome: string | null
+    typeLocalisation: Suggestion.TypeLocalisation
+    codeLocalisation: string
+    rayon: number
+  }
+
   export interface Repository {
     findAll(jeuneId: string): Promise<Suggestion[]>
 
@@ -52,24 +63,24 @@ export namespace Suggestion {
   function construireIdFonctionnel(
     suggestionPoleEmploi: PoleEmploi,
     type: Recherche.Type
-  ): string {
-    const idFonctionnel: {
-      typeRecherche: Recherche.Type
-      codeRome?: string
-      typeLocalisation: string
-      codeLocalisation: string
-      rayon: number
-    } = {
+  ): Suggestion.IdFonctionnel {
+    const codeRome = suggestionPoleEmploi.codeRome ?? null
+    return {
       typeRecherche: type,
       typeLocalisation: suggestionPoleEmploi.localisation.type,
       codeLocalisation: suggestionPoleEmploi.localisation.code,
+      codeRome:
+        type !== Recherche.Type.OFFRES_SERVICES_CIVIQUE ? codeRome : null,
       rayon:
         suggestionPoleEmploi.localisation.rayon ?? Recherche.DISTANCE_PAR_DEFAUT
     }
-    if (type !== Recherche.Type.OFFRES_SERVICES_CIVIQUE) {
-      idFonctionnel.codeRome = suggestionPoleEmploi.codeRome
-    }
-    return Buffer.from(JSON.stringify(idFonctionnel)).toString('base64')
+  }
+
+  export function sontEquivalentes(
+    suggestion1: Suggestion,
+    suggestion2: Suggestion
+  ): boolean {
+    return isEqual(suggestion1.idFonctionnel, suggestion2.idFonctionnel)
   }
 
   function construireTitreEtMetierSuggestion(

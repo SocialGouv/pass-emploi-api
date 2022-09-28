@@ -8,6 +8,8 @@ import { SuggestionSqlModel } from '../../../../../../src/infrastructure/sequeli
 import { expect } from '../../../../../utils'
 import { Offre } from '../../../../../../src/domain/offre/offre'
 import { uneDatetime } from '../../../../../fixtures/date.fixture'
+import { Recherche } from '../../../../../../src/domain/offre/recherche/recherche'
+import { Suggestion } from '../../../../../../src/domain/offre/recherche/suggestion/suggestion'
 
 describe('SuggestionSqlRepository', () => {
   DatabaseForTesting.prepare()
@@ -16,7 +18,13 @@ describe('SuggestionSqlRepository', () => {
     dateCreation: uneDatetime,
     dateMiseAJour: uneDatetime,
     id: 'f781ae20-8838-49c7-aa2e-9b224318fb65',
-    idFonctionnel: 'D1104-COMMUNE-59220-10',
+    idFonctionnel: {
+      typeRecherche: Recherche.Type.OFFRES_EMPLOI,
+      typeLocalisation: Suggestion.TypeLocalisation.COMMUNE,
+      codeLocalisation: '59220',
+      rayon: Recherche.DISTANCE_PAR_DEFAUT,
+      codeRome: 'D1104'
+    },
     idJeune: 'ABCDE',
     type: Offre.Recherche.Type.OFFRES_EMPLOI,
     source: Offre.Recherche.Suggestion.Source.POLE_EMPLOI,

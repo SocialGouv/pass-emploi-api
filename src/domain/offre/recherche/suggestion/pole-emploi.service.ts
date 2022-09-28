@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { SuggestionsRepositoryToken } from './suggestion'
+import { Suggestion, SuggestionsRepositoryToken } from './suggestion'
 import { Recherche } from '../recherche'
 
 @Injectable()
@@ -18,9 +18,8 @@ export class SuggestionPoleEmploiService {
     )
 
     for (const nouvelleSuggestion of nouvellesSuggestions) {
-      const suggestionExistante = suggestionsActuelles.find(
-        suggestion =>
-          suggestion.idFonctionnel === nouvelleSuggestion.idFonctionnel
+      const suggestionExistante = suggestionsActuelles.find(suggestion =>
+        Suggestion.sontEquivalentes(suggestion, nouvelleSuggestion)
       )
 
       if (suggestionExistante) {

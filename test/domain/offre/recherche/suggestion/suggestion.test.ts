@@ -3,7 +3,11 @@ import { expect, StubbedClass, stubClass } from '../../../../utils'
 import { IdService } from '../../../../../src/utils/id-service'
 import { DateService } from '../../../../../src/utils/date-service'
 import { uneDatetime } from '../../../../fixtures/date.fixture'
-import { uneSuggestionPE } from '../../../../fixtures/suggestion.fixture'
+import {
+  uneSuggestion,
+  uneSuggestionPE
+} from '../../../../fixtures/suggestion.fixture'
+import { Suggestion } from 'src/domain/offre/recherche/suggestion/suggestion'
 
 describe('Suggestion', () => {
   let factory: Recherche.Suggestion.Factory
@@ -54,17 +58,13 @@ describe('Suggestion', () => {
             dateCreation: uneDatetime,
             dateMiseAJour: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
-            idFonctionnel: Buffer.from(
-              JSON.stringify({
-                typeRecherche: Recherche.Type.OFFRES_EMPLOI,
-                typeLocalisation:
-                  suggestionPESurUnDepartement.localisation.type,
-                codeLocalisation:
-                  suggestionPESurUnDepartement.localisation.code,
-                rayon: Recherche.DISTANCE_PAR_DEFAUT,
-                codeRome: suggestionPESurUnDepartement.codeRome
-              })
-            ).toString('base64'),
+            idFonctionnel: {
+              typeRecherche: Recherche.Type.OFFRES_EMPLOI,
+              typeLocalisation: suggestionPESurUnDepartement.localisation.type,
+              codeLocalisation: suggestionPESurUnDepartement.localisation.code,
+              rayon: Recherche.DISTANCE_PAR_DEFAUT,
+              codeRome: suggestionPESurUnDepartement.codeRome!
+            },
             idJeune: 'ABCDE',
             type: Recherche.Type.OFFRES_EMPLOI,
             source: Recherche.Suggestion.Source.POLE_EMPLOI
@@ -101,15 +101,13 @@ describe('Suggestion', () => {
             dateCreation: uneDatetime,
             dateMiseAJour: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
-            idFonctionnel: Buffer.from(
-              JSON.stringify({
-                typeRecherche: Recherche.Type.OFFRES_EMPLOI,
-                typeLocalisation: suggestionPESurUneCommune.localisation.type,
-                codeLocalisation: suggestionPESurUneCommune.localisation.code,
-                rayon: Recherche.DISTANCE_PAR_DEFAUT,
-                codeRome: suggestionPESurUneCommune.codeRome
-              })
-            ).toString('base64'),
+            idFonctionnel: {
+              typeRecherche: Recherche.Type.OFFRES_EMPLOI,
+              typeLocalisation: suggestionPESurUneCommune.localisation.type,
+              codeLocalisation: suggestionPESurUneCommune.localisation.code,
+              rayon: Recherche.DISTANCE_PAR_DEFAUT,
+              codeRome: suggestionPESurUneCommune.codeRome!
+            },
             idJeune: 'ABCDE',
             type: Recherche.Type.OFFRES_EMPLOI,
             source: Recherche.Suggestion.Source.POLE_EMPLOI
@@ -129,15 +127,13 @@ describe('Suggestion', () => {
             dateCreation: uneDatetime,
             dateMiseAJour: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
-            idFonctionnel: Buffer.from(
-              JSON.stringify({
-                typeRecherche: Recherche.Type.OFFRES_IMMERSION,
-                typeLocalisation: suggestionPESurUneCommune.localisation.type,
-                codeLocalisation: suggestionPESurUneCommune.localisation.code,
-                rayon: Recherche.DISTANCE_PAR_DEFAUT,
-                codeRome: suggestionPESurUneCommune.codeRome
-              })
-            ).toString('base64'),
+            idFonctionnel: {
+              typeRecherche: Recherche.Type.OFFRES_IMMERSION,
+              typeLocalisation: suggestionPESurUneCommune.localisation.type,
+              codeLocalisation: suggestionPESurUneCommune.localisation.code,
+              rayon: Recherche.DISTANCE_PAR_DEFAUT,
+              codeRome: suggestionPESurUneCommune.codeRome!
+            },
             idJeune: 'ABCDE',
             type: Recherche.Type.OFFRES_IMMERSION,
             source: Recherche.Suggestion.Source.POLE_EMPLOI
@@ -157,14 +153,13 @@ describe('Suggestion', () => {
             dateCreation: uneDatetime,
             dateMiseAJour: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
-            idFonctionnel: Buffer.from(
-              JSON.stringify({
-                typeRecherche: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
-                typeLocalisation: suggestionPESurUneCommune.localisation.type,
-                codeLocalisation: suggestionPESurUneCommune.localisation.code,
-                rayon: Recherche.DISTANCE_PAR_DEFAUT
-              })
-            ).toString('base64'),
+            idFonctionnel: {
+              typeRecherche: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+              typeLocalisation: suggestionPESurUneCommune.localisation.type,
+              codeLocalisation: suggestionPESurUneCommune.localisation.code,
+              rayon: Recherche.DISTANCE_PAR_DEFAUT,
+              codeRome: null
+            },
             idJeune: 'ABCDE',
             type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
             source: Recherche.Suggestion.Source.POLE_EMPLOI
@@ -205,15 +200,13 @@ describe('Suggestion', () => {
             dateCreation: uneDatetime,
             dateMiseAJour: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
-            idFonctionnel: Buffer.from(
-              JSON.stringify({
-                typeRecherche: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
-                typeLocalisation: suggestionPESurUneCommune.localisation.type,
-                codeLocalisation: suggestionPESurUneCommune.localisation.code,
-                rayon: Recherche.DISTANCE_PAR_DEFAUT,
-                codeRome: suggestionPESurUneCommune.codeRome
-              })
-            ).toString('base64'),
+            idFonctionnel: {
+              typeRecherche: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+              typeLocalisation: suggestionPESurUneCommune.localisation.type,
+              codeLocalisation: suggestionPESurUneCommune.localisation.code,
+              rayon: Recherche.DISTANCE_PAR_DEFAUT,
+              codeRome: null
+            },
             idJeune: 'ABCDE',
             type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
             source: Recherche.Suggestion.Source.POLE_EMPLOI
@@ -256,15 +249,13 @@ describe('Suggestion', () => {
             dateCreation: uneDatetime,
             dateMiseAJour: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
-            idFonctionnel: Buffer.from(
-              JSON.stringify({
-                typeRecherche: Recherche.Type.OFFRES_EMPLOI,
-                typeLocalisation: suggestionPESurUneCommune.localisation.type,
-                codeLocalisation: suggestionPESurUneCommune.localisation.code,
-                rayon: Recherche.DISTANCE_PAR_DEFAUT,
-                codeRome: suggestionPESurUneCommune.codeRome
-              })
-            ).toString('base64'),
+            idFonctionnel: {
+              typeRecherche: Recherche.Type.OFFRES_EMPLOI,
+              typeLocalisation: suggestionPESurUneCommune.localisation.type,
+              codeLocalisation: suggestionPESurUneCommune.localisation.code,
+              rayon: Recherche.DISTANCE_PAR_DEFAUT,
+              codeRome: suggestionPESurUneCommune.codeRome!
+            },
             idJeune: 'ABCDE',
             type: Recherche.Type.OFFRES_EMPLOI,
             source: Recherche.Suggestion.Source.POLE_EMPLOI
@@ -272,6 +263,48 @@ describe('Suggestion', () => {
         ]
         expect(suggestion).to.deep.equal(expected)
       })
+    })
+  })
+
+  describe('sontEquivalentes', () => {
+    it('retourne vrai quand les champs ont les mêmes valeurs', () => {
+      // Given
+      const suggestion1 = uneSuggestion()
+      const suggestion2 = uneSuggestion()
+
+      // When
+      const equivalentes = Suggestion.sontEquivalentes(suggestion1, suggestion2)
+
+      // Then
+      expect(equivalentes).to.be.true()
+    })
+
+    it('retourne faux quand un des champs est différent', () => {
+      // Given
+      const suggestion1 = uneSuggestion({
+        idFonctionnel: {
+          typeRecherche: Recherche.Type.OFFRES_EMPLOI,
+          typeLocalisation: Suggestion.TypeLocalisation.COMMUNE,
+          codeLocalisation: '59220',
+          rayon: Recherche.DISTANCE_PAR_DEFAUT,
+          codeRome: 'D1104'
+        }
+      })
+      const suggestion2 = uneSuggestion({
+        idFonctionnel: {
+          typeRecherche: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+          typeLocalisation: Suggestion.TypeLocalisation.COMMUNE,
+          codeLocalisation: '59220',
+          rayon: Recherche.DISTANCE_PAR_DEFAUT,
+          codeRome: null
+        }
+      })
+
+      // When
+      const equivalentes = Suggestion.sontEquivalentes(suggestion1, suggestion2)
+
+      // Then
+      expect(equivalentes).to.be.false()
     })
   })
 })
