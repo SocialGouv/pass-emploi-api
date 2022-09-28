@@ -7,6 +7,13 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { DateTime } from 'luxon'
+import { uneSuggestion } from '../../fixtures/suggestion.fixture'
+import {
+  emptySuccess,
+  failure
+} from '../../../src/building-blocks/types/result'
+import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 
 describe('CreateRechercheFromSuggestionCommandHandler', () => {
   let createRechercheFromSuggestionCommandHandler: CreateRechercheFromSuggestionCommandHandler
@@ -54,10 +61,59 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
   })
 
   describe('handle', () => {
-    it('', async () => {
-      // Given
-      // When
-      // Then
+    describe('quand la suggestion du jeune est trouvée', () => {
+      it('met à jour la date de suppression', async () => {
+        // Given
+        const command = { idJeune: 'id-jeune', idSuggestion: 'id-suggestion' }
+        const dateCreationRecherche = DateTime.fromISO(
+          '2022-09-28T14:00:00.000Z'
+        )
+        const suggestionAvantCreate = uneSuggestion({
+          id: command.idSuggestion,
+          idJeune: command.idJeune
+        })
+        const suggestionApresCreate = uneSuggestion({
+          id: command.idSuggestion,
+          idJeune: command.idJeune,
+          dateCreationRecherche
+        })
+        suggestionRepository.findByIdAndIdJeune.resolves(suggestionAvantCreate)
+        dateService.now.returns(dateCreationRecherche)
+
+        // When
+        const result = await createRechercheFromSuggestionCommandHandler.handle(
+          command
+        )
+
+        // Then
+        expect(
+          rechercheFactory.buildRechercheFromSuggestion
+        ).to.have.been.calledWithExactly(
+          suggestionAvantCreate,
+          dateCreationRecherche
+        )
+        expect(suggestionRepository.save).to.have.been.calledWithExactly(
+          suggestionApresCreate
+        )
+        expect(result).to.deep.equal(emptySuccess())
+      })
+    })
+    describe('quand la suggestion du jeune n’est pas trouvée', () => {
+      it('retourne une NonTrouveError', async () => {
+        // Given
+        const command = { idJeune: 'id-jeune', idSuggestion: 'id-suggestion' }
+        suggestionRepository.findByIdAndIdJeune.resolves(undefined)
+
+        // When
+        const result = await createRechercheFromSuggestionCommandHandler.handle(
+          command
+        )
+
+        // Then
+        expect(result).to.deep.equal(
+          failure(new NonTrouveError('Suggestion', command.idSuggestion))
+        )
+      })
     })
   })
 })
