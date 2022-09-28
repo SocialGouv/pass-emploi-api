@@ -174,7 +174,8 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
       Evenement.Code.OFFRE_ALTERNANCE_AFFICHEE,
       Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
       Evenement.Code.OFFRE_IMMERSION_AFFICHEE,
-      Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHE
+      Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHE,
+      Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHEE
     ]
     const codesOffrePartagee: string[] = [
       Evenement.Code.OFFRE_ALTERNANCE_PARTAGEE,
