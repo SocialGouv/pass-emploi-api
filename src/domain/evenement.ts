@@ -51,6 +51,7 @@ export namespace Evenement {
     OFFRE_PARTAGEE = 'OFFRE_PARTAGEE',
     OFFRE_POSTULEE = 'OFFRE_POSTULEE',
     OFFRE_SERVICE_CIVIQUE_AFFICHE = 'OFFRE_SERVICE_CIVIQUE_AFFICHE',
+    OFFRE_SERVICE_CIVIQUE_AFFICHEE = 'OFFRE_SERVICE_CIVIQUE_AFFICHEE',
     OFFRE_SERVICE_CIVIQUE_PARTAGEE = 'OFFRE_SERVICE_CIVIQUE_PARTAGEE',
     OFFRE_SERVICE_CIVIQUE_POSTULEE = 'OFFRE_SERVICE_CIVIQUE_POSTULEE',
     OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE = 'OFFRE_SERVICE_CIVIQUE_SAUVEGARDEE',
@@ -264,6 +265,11 @@ const evenements = {
     nom: 'Pôle emploi'
   },
   [Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHE]: {
+    categorie: 'Offre',
+    action: 'Détail',
+    nom: 'Service Civique'
+  },
+  [Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHEE]: {
     categorie: 'Offre',
     action: 'Détail',
     nom: 'Service Civique'
