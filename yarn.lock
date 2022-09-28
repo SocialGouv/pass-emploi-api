@@ -8849,7 +8849,7 @@ __metadata:
     nestjs-pino: 3.1.1
     nock: ^13.2.9
     nyc: ^15.1.0
-    openid-client: 5.1.9
+    openid-client: 5.1.10
     pg: 8.8.0
     pg-connection-string: 2.5.0
     pino-http: 8.2.0
@@ -9314,15 +9314,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openid-client@npm:5.1.9":
-  version: 5.1.9
-  resolution: "openid-client@npm:5.1.9"
+"openid-client@npm:5.1.10":
+  version: 5.1.10
+  resolution: "openid-client@npm:5.1.10"
   dependencies:
     jose: ^4.1.4
     lru-cache: ^6.0.0
     object-hash: ^2.0.1
     oidc-token-hash: ^5.0.1
-  checksum: 55390a7eceaafdc340a5f2ece576eb4863fcb4cd8840e4a7a1af66bbaf830623b18cf1dd0b8ce472c6f36c6313e78f92db48ca0c10eb8c681a81e5a3d607fc9f
+  checksum: 38a4bf08ea4ee4576043968307cf53f0369df224bd025c1bc348b295152df36c47d2a836dfe1505d15c6b79c05f86aadefad798bd3ea3ccbe90834be01f2245c
   languageName: node
   linkType: hard
 
