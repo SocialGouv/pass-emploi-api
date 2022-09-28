@@ -11,39 +11,36 @@ import {
   Query
 } from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { CreateRechercheFromSuggestionCommandHandler } from 'src/application/commands/create-recherche-from-suggestion.command.handler'
+import { DeleteSuggestionCommandHandler } from 'src/application/commands/delete-suggestion.command.handler'
 import {
   CreateRechercheCommand,
   CreateRechercheCommandHandler
 } from '../../application/commands/create-recherche.command.handler'
-import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
+import {
+  DeleteRechercheCommand,
+  DeleteRechercheCommandHandler
+} from '../../application/commands/delete-recherche.command.handler'
+import { RafraichirSuggestionPoleEmploiCommandHandler } from '../../application/commands/rafraichir-suggestion-pole-emploi.command.handler'
+import {
+  GetRecherchesQuery,
+  GetRecherchesQueryHandler
+} from '../../application/queries/get-recherches.query.handler.db'
+import { GetSuggestionsQueryHandler } from '../../application/queries/get-suggestions.query.handler.db'
+import { RechercheQueryModel } from '../../application/queries/query-models/recherches.query-model'
+import { SuggestionQueryModel } from '../../application/queries/query-models/suggestion.query-model'
+import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { Core } from '../../domain/core'
+import { Recherche } from '../../domain/offre/recherche/recherche'
+import { AccessToken, Utilisateur } from '../decorators/authenticated.decorator'
+import { handleFailure } from './failure.handler'
 import {
   CreateRechercheImmersionPayload,
   CreateRechercheOffresEmploiPayload,
   CreateRechercheServiceCiviquePayload,
   GetRecherchesQueryParams
 } from './validation/recherches.inputs'
-import { Recherche } from '../../domain/offre/recherche/recherche'
-import {
-  GetRecherchesQuery,
-  GetRecherchesQueryHandler
-} from '../../application/queries/get-recherches.query.handler.db'
-import { RechercheQueryModel } from '../../application/queries/query-models/recherches.query-model'
-import { isFailure } from '../../building-blocks/types/result'
-import {
-  DeleteRechercheCommand,
-  DeleteRechercheCommandHandler
-} from '../../application/commands/delete-recherche.command.handler'
-import { RafraichirSuggestionPoleEmploiCommandHandler } from '../../application/commands/rafraichir-suggestion-pole-emploi.command.handler'
-import { handleFailure } from './failure.handler'
-import { Core } from '../../domain/core'
-import { GetSuggestionsQueryHandler } from '../../application/queries/get-suggestions.query.handler.db'
-import { SuggestionQueryModel } from '../../application/queries/query-models/suggestion.query-model'
-import { DeleteSuggestionCommandHandler } from 'src/application/commands/delete-suggestion.command.handler'
-import {
-  CreateRechercheFromSuggestionCommandHandler,
-  CreateRechercheFromSuggestionOutput
-} from 'src/application/commands/create-recherche-from-suggestion.command.handler'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -182,7 +179,7 @@ export class RecherchesController {
     @Param('idJeune') idJeune: string,
     @Param('idSuggestion') idSuggestion: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<CreateRechercheFromSuggestionOutput> {
+  ): Promise<void> {
     const result =
       await this.createRechercheFromSuggestionCommandHandler.execute(
         {
@@ -195,7 +192,6 @@ export class RecherchesController {
     if (isFailure(result)) {
       throw handleFailure(result)
     }
-    return result.data
   }
 
   @Delete('recherches/suggestions/:idSuggestion')

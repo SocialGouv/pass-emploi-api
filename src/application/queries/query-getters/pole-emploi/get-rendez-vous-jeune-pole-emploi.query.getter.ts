@@ -22,7 +22,10 @@ import {
 } from '../../../../building-blocks/types/domain-error'
 import { RendezVousJeuneQueryModel } from '../../query-models/rendez-vous.query-model'
 import { fromRendezVousDtoToRendezVousQueryModel } from '../../query-mappers/rendez-vous-pole-emploi.mappers'
-import { PoleEmploiPartenaireClient } from '../../../../infrastructure/clients/pole-emploi-partenaire-client'
+import {
+  PoleEmploiPartenaire,
+  PoleEmploiPartenaireClient
+} from '../../../../infrastructure/clients/pole-emploi-partenaire-client'
 import { RendezVous } from '../../../../domain/rendez-vous'
 import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-client'
 import { buildError } from '../../../../utils/logger.module'
@@ -40,6 +43,7 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
   constructor(
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
+    @Inject(PoleEmploiPartenaire.PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private dateService: DateService,
     private idService: IdService,

@@ -11,18 +11,13 @@ import {
   SuggestionsRepositoryToken
 } from 'src/domain/offre/recherche/suggestion/suggestion'
 import { DateService } from 'src/utils/date-service'
-import { failure, Result, success } from '../../building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  Result
+} from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
-import { ApiProperty } from '@nestjs/swagger'
-
-export class CreateRechercheFromSuggestionOutput {
-  @ApiProperty()
-  idRecherche: string
-
-  @ApiProperty()
-  type: Recherche.Type
-}
 export interface CreateRechercheFromSuggestionCommand extends Command {
   idJeune: string
   idSuggestion: string
@@ -31,7 +26,7 @@ export interface CreateRechercheFromSuggestionCommand extends Command {
 @Injectable()
 export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
   CreateRechercheFromSuggestionCommand,
-  CreateRechercheFromSuggestionOutput
+  void
 > {
   constructor(
     private jeuneAuthorizer: JeuneAuthorizer,
@@ -47,7 +42,7 @@ export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
 
   async handle(
     command: CreateRechercheFromSuggestionCommand
-  ): Promise<Result<CreateRechercheFromSuggestionOutput>> {
+  ): Promise<Result<void>> {
     const suggestion = await this.suggestionRepository.findByIdAndIdJeune(
       command.idSuggestion,
       command.idJeune
@@ -69,7 +64,7 @@ export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
       dateCreationRecherche: maintenant
     })
 
-    return success({ idRecherche: recherche.id, type: recherche.type })
+    return emptySuccess()
   }
 
   async monitor(_utilisateur: Authentification.Utilisateur): Promise<void> {

@@ -12,7 +12,10 @@ import {
   NonTrouveError
 } from '../../../../building-blocks/types/domain-error'
 import { Demarche } from '../../../../domain/demarche'
-import { PoleEmploiPartenaireClient } from '../../../../infrastructure/clients/pole-emploi-partenaire-client'
+import {
+  PoleEmploiPartenaire,
+  PoleEmploiPartenaireClient
+} from '../../../../infrastructure/clients/pole-emploi-partenaire-client'
 import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-client'
 import { fromDemarcheDtoToDemarche } from '../../query-mappers/actions-pole-emploi.mappers'
 
@@ -29,6 +32,7 @@ export class GetDemarchesQueryGetter {
   constructor(
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
+    @Inject(PoleEmploiPartenaire.PoleEmploiPartenaireClientToken)
     private poleEmploiPartenaireClient: PoleEmploiPartenaireClient,
     private dateService: DateService,
     private keycloakClient: KeycloakClient

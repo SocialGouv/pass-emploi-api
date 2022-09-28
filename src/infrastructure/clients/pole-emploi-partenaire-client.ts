@@ -13,6 +13,7 @@ import {
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Demarche } from '../../domain/demarche'
+import { suggestionsPEInMemory } from '../repositories/dto/pole-emploi.in-memory.dto'
 import {
   DemarcheDto,
   PrestationDto,
@@ -24,8 +25,36 @@ import {
 const ORIGINE = 'INDIVIDU'
 const DEMARCHES_URL = 'peconnect-demarches/v1/demarches'
 
+export namespace PoleEmploiPartenaire {
+  export const PoleEmploiPartenaireClientToken =
+    'PoleEmploiPartenaireClientToken'
+  export interface Client {
+    getDemarches(tokenDuJeune: string): Promise<DemarcheDto[]>
+    getRendezVous(
+      tokenDuJeune: string
+    ): Promise<AxiosResponse<RendezVousPoleEmploiDto[]>>
+    getPrestations(
+      tokenDuJeune: string,
+      dateRechercheRendezVous: DateTime
+    ): Promise<AxiosResponse<PrestationDto[]>>
+    getLienVisio(
+      tokenDuJeune: string,
+      idVisio: string
+    ): Promise<AxiosResponse<string>>
+    updateDemarche(
+      demarcheModifiee: Demarche.Modifiee,
+      token: string
+    ): Promise<Result<DemarcheDto>>
+    createDemarche(
+      demarche: Demarche.Creee,
+      token: string
+    ): Promise<Result<DemarcheDto>>
+    getSuggestionsRecherches(token: string): Promise<Result<SuggestionDto[]>>
+  }
+}
+
 @Injectable()
-export class PoleEmploiPartenaireClient {
+export class PoleEmploiPartenaireClient implements PoleEmploiPartenaire.Client {
   private readonly apiUrl: string
   private logger: Logger
 
@@ -245,5 +274,14 @@ export class PoleEmploiPartenaireClient {
             : undefined
       })
     )
+  }
+}
+
+@Injectable()
+export class PoleEmploiPartenaireInMemoryClient extends PoleEmploiPartenaireClient {
+  async getSuggestionsRecherches(
+    _token: string
+  ): Promise<Result<SuggestionDto[]>> {
+    return success(suggestionsPEInMemory)
   }
 }

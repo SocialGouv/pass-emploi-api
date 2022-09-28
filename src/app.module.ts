@@ -165,7 +165,11 @@ import { databaseProviders } from './infrastructure/sequelize/providers'
 import { DateService } from './utils/date-service'
 import { IdService } from './utils/id-service'
 import { configureLoggerModule } from './utils/logger.module'
-import { PoleEmploiPartenaireClient } from './infrastructure/clients/pole-emploi-partenaire-client'
+import {
+  PoleEmploiPartenaire,
+  PoleEmploiPartenaireClient,
+  PoleEmploiPartenaireInMemoryClient
+} from './infrastructure/clients/pole-emploi-partenaire-client'
 import { GetDemarchesQueryHandler } from './application/queries/get-demarches.query.handler'
 import { GetJeuneMiloByDossierQueryHandler } from './application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { UpdateRendezVousCommandHandler } from './application/commands/update-rendez-vous.command.handler'
@@ -290,7 +294,6 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     PoleEmploiClient,
     ImmersionClient,
     EngagementClient,
-    PoleEmploiPartenaireClient,
     ObjectStorageClient,
     Action.Factory,
     Action.Commentaire.Factory,
@@ -429,6 +432,13 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: SuggestionsRepositoryToken,
       useClass: SuggestionSqlRepository
+    },
+    {
+      provide: PoleEmploiPartenaire.PoleEmploiPartenaireClientToken,
+      useClass:
+        process.env.IS_IN_MEMORY == 'true'
+          ? PoleEmploiPartenaireInMemoryClient
+          : PoleEmploiPartenaireClient
     },
     ...databaseProviders
   ],
