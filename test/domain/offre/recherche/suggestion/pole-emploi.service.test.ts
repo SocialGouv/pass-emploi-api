@@ -6,6 +6,7 @@ import { expect } from '../../../../utils'
 import { uneDatetime } from '../../../../fixtures/date.fixture'
 import { SuggestionPoleEmploiService } from '../../../../../src/domain/offre/recherche/suggestion/pole-emploi.service'
 import Recherche = Offre.Recherche
+import { Suggestion } from '../../../../../src/domain/offre/recherche/suggestion/suggestion'
 
 describe('PoleEmploi', () => {
   describe('Service', () => {
@@ -44,7 +45,13 @@ describe('PoleEmploi', () => {
           // Given
           const suggestionInitiale = uneSuggestion({
             idJeune: 'ABCDE',
-            idFonctionnel: 'OFFRES_EMPLOI-D1104-COMMUNE-44300-1'
+            idFonctionnel: {
+              typeRecherche: Recherche.Type.OFFRES_EMPLOI,
+              typeLocalisation: Suggestion.TypeLocalisation.COMMUNE,
+              codeLocalisation: '44300',
+              rayon: 1,
+              codeRome: 'D1104'
+            }
           })
 
           suggestionRepository.findAll
@@ -54,7 +61,13 @@ describe('PoleEmploi', () => {
           // When
           const nouvelleSuggestion = uneSuggestion({
             idJeune: 'ABCDE',
-            idFonctionnel: 'OFFRES_EMPLOI-D1104-COMMUNE-44300-1',
+            idFonctionnel: {
+              typeRecherche: Recherche.Type.OFFRES_EMPLOI,
+              typeLocalisation: Suggestion.TypeLocalisation.COMMUNE,
+              codeLocalisation: '44300',
+              rayon: 1,
+              codeRome: 'D1104'
+            },
             dateMiseAJour,
             criteres: {
               q: 'Les termes ont ont changé mais pas le code rome'

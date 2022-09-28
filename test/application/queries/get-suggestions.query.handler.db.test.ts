@@ -33,7 +33,9 @@ describe('GetSuggestionsQueryHandler', () => {
       await SuggestionSqlModel.create({
         id: suggestion.id,
         idJeune: suggestion.idJeune,
-        idFonctionnel: suggestion.idFonctionnel,
+        idFonctionnel: Buffer.from(
+          JSON.stringify(suggestion.idFonctionnel)
+        ).toString('base64'),
         type: suggestion.type,
         source: suggestion.source,
         dateCreation: suggestion.dateCreation,

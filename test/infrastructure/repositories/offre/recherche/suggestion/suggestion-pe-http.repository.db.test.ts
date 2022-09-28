@@ -56,7 +56,7 @@ describe('SuggestionPeHttpRepository', () => {
             localisation: {
               libelle: 'FACHES THUMESNIL',
               code: '59220',
-              type: 'COMMUNE',
+              type: Suggestion.TypeLocalisation.COMMUNE,
               rayon: undefined,
               lon: -1.677,
               lat: 48.11
@@ -94,7 +94,7 @@ describe('SuggestionPeHttpRepository', () => {
             localisation: {
               libelle: 'NANTES',
               code: '44300',
-              type: 'COMMUNE',
+              type: Suggestion.TypeLocalisation.COMMUNE,
               rayon: 10,
               lon: -1.677,
               lat: 48.11
@@ -124,7 +124,7 @@ describe('SuggestionPeHttpRepository', () => {
             localisation: {
               libelle: 'Nord',
               code: '59',
-              type: 'DEPARTEMENT',
+              type: Suggestion.TypeLocalisation.DEPARTEMENT,
               rayon: undefined
             }
           }
@@ -166,7 +166,7 @@ describe('SuggestionPeHttpRepository', () => {
             localisation: {
               libelle: 'FACHES THUMESNIL',
               code: '59220',
-              type: 'COMMUNE',
+              type: Suggestion.TypeLocalisation.COMMUNE,
               rayon: undefined,
               lon: -1.677,
               lat: 48.11

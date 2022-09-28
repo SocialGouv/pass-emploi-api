@@ -1,4 +1,5 @@
 import { Result } from '../../../../building-blocks/types/result'
+import { Suggestion } from './suggestion'
 
 export interface PoleEmploi {
   titreMetier?: string
@@ -8,7 +9,7 @@ export interface PoleEmploi {
   localisation: {
     libelle: string
     code: string
-    type: 'COMMUNE' | 'DEPARTEMENT'
+    type: Suggestion.TypeLocalisation
     rayon?: number
     lat?: number
     lon?: number
