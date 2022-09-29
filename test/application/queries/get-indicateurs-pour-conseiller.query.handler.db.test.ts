@@ -347,19 +347,19 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         const engagementDto = unEvenementEngagementDto({
           typeUtilisateur: Authentification.Type.JEUNE,
           idUtilisateur: idJeune,
-          code: Evenement.Code.OFFRE_IMMERSION_PARTAGEE,
+          code: Evenement.Code.MESSAGE_OFFRE_PARTAGEE,
           dateEvenement
         })
         const engagementAvantDateDebutDto = unEvenementEngagementDto({
           typeUtilisateur: Authentification.Type.JEUNE,
           idUtilisateur: idJeune,
-          code: Evenement.Code.OFFRE_IMMERSION_PARTAGEE,
+          code: Evenement.Code.MESSAGE_OFFRE_PARTAGEE,
           dateEvenement: dateEvenementAvantDateDebut
         })
         const engagementApresDateFinDto = unEvenementEngagementDto({
           typeUtilisateur: Authentification.Type.JEUNE,
           idUtilisateur: idJeune,
-          code: Evenement.Code.OFFRE_IMMERSION_PARTAGEE,
+          code: Evenement.Code.MESSAGE_OFFRE_PARTAGEE,
           dateEvenement: dateEvenementApresDateFin
         })
 

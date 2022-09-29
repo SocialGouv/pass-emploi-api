@@ -177,12 +177,6 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
       Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHE,
       Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHEE
     ]
-    const codesOffrePartagee: string[] = [
-      Evenement.Code.OFFRE_ALTERNANCE_PARTAGEE,
-      Evenement.Code.OFFRE_EMPLOI_PARTAGEE,
-      Evenement.Code.OFFRE_IMMERSION_PARTAGEE,
-      Evenement.Code.OFFRE_SERVICE_CIVIQUE_PARTAGEE
-    ]
     const codesOffreSauvegardee: string[] = [
       Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE,
       Evenement.Code.OFFRE_EMPLOI_SAUVEGARDEE,
@@ -201,7 +195,10 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
         return {
           offres: {
             consultees: codesOffreConsultee.includes(evenementSql.code) ? 1 : 0,
-            partagees: codesOffrePartagee.includes(evenementSql.code) ? 1 : 0
+            partagees:
+              evenementSql.code === Evenement.Code.MESSAGE_OFFRE_PARTAGEE
+                ? 1
+                : 0
           },
           favoris: {
             offresSauvegardees: codesOffreSauvegardee.includes(
