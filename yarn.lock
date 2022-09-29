@@ -2616,17 +2616,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash@npm:*":
+"@types/lodash@npm:*, @types/lodash@npm:^4.14.175":
   version: 4.14.186
   resolution: "@types/lodash@npm:4.14.186"
   checksum: ee0c1368a8100bb6efb88335107473a41928fc307ff1ef4ff1278868ccddba9c04c68c36d1ffe3a0392ef4a956e1955f7de3203ec09df4f1655dd1b88485c549
-  languageName: node
-  linkType: hard
-
-"@types/lodash@npm:^4.14.175":
-  version: 4.14.184
-  resolution: "@types/lodash@npm:4.14.184"
-  checksum: 6d9a4d67f7f9d0ec3fd21174f3dd3d00629dc1227eb469450eace53adbc1f7e2330699c28d0fe093e5f0fef0f0e763098be1f779268857213224af082b62be21
   languageName: node
   linkType: hard
 
@@ -3852,9 +3845,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bull@npm:4.9.0, bull@npm:^4.8.5":
-  version: 4.9.0
-  resolution: "bull@npm:4.9.0"
+"bull@npm:4.10.0, bull@npm:^4.8.5":
+  version: 4.10.0
+  resolution: "bull@npm:4.10.0"
   dependencies:
     cron-parser: ^4.2.1
     debuglog: ^1.0.0
@@ -3865,7 +3858,7 @@ __metadata:
     p-timeout: ^3.2.0
     semver: ^7.3.2
     uuid: ^8.3.0
-  checksum: 6f100feb753a9100ab2653f67a525f42de3f4c137bdc1b5659b1154d37fd8371e23834a7b36271b54e13bd3a7ac4e534414ecd8b13e26c73e9fc425a28b70a8e
+  checksum: f5c44ca9662a0ddbee9d91cd3ff60ca9ecdeeb1514c28516101d2f6e51ada8f9624c15a3b332a1fa9a01d514f3158eafbe53fc410cabe873ca5e43a135dc66c5
   languageName: node
   linkType: hard
 
@@ -8842,7 +8835,7 @@ __metadata:
     "@types/yargs": ^17.0.12
     "@typescript-eslint/eslint-plugin": ^5.36.2
     "@typescript-eslint/parser": ^5.36.2
-    bull: 4.9.0
+    bull: 4.10.0
     bull-repl: ^0.28.0
     chai: ^4.3.6
     chai-as-promised: ^7.1.1
