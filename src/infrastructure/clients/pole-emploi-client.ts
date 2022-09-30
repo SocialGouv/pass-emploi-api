@@ -13,6 +13,7 @@ import {
   NotificationsPartenairesDto,
   OffreEmploiDto,
   OffresEmploiDto,
+  OffresEmploiDtoWithTotal,
   TypeRDVPE
 } from '../repositories/dto/pole-emploi.dto'
 import { RateLimiterService } from '../../utils/rate-limiter.service'
@@ -44,16 +45,27 @@ export class PoleEmploiClient {
   async getOffreEmploi(
     idOffreEmploi: string
   ): Promise<OffreEmploiDto | undefined> {
-    const response = await this.get(`offresdemploi/v2/offres/${idOffreEmploi}`)
+    const response = await this.get<OffreEmploiDto>(
+      `offresdemploi/v2/offres/${idOffreEmploi}`
+    )
     if (response.status !== 200) {
       return undefined
     }
     return response.data
   }
 
-  async getOffresEmploi(params?: unknown): Promise<OffresEmploiDto> {
-    const response = await this.get('offresdemploi/v2/offres/search', params)
-    return response.data
+  async getOffresEmploi(
+    params?: URLSearchParams
+  ): Promise<OffresEmploiDtoWithTotal> {
+    const response = await this.get<OffresEmploiDto>(
+      'offresdemploi/v2/offres/search',
+      params
+    )
+    const { resultats } = response.data
+    const contentRange = response.headers['content-range']
+    const contentRangeFormat = new RegExp(/\w+\s\d+-\d+\/(?<total>\d+)/)
+    const total = contentRange.match(contentRangeFormat).groups['total']
+    return { total: parseInt(total, 10), resultats }
   }
 
   async getNotificationsRendezVous(
@@ -111,10 +123,10 @@ export class PoleEmploiClient {
     }
   }
 
-  async get(suffixUrl: string, params?: unknown): Promise<AxiosResponse> {
+  async get<T>(suffixUrl: string, params?: unknown): Promise<AxiosResponse<T>> {
     const token = await this.getToken()
     return firstValueFrom(
-      this.httpService.get(`${this.apiUrl}/${suffixUrl}`, {
+      this.httpService.get<T>(`${this.apiUrl}/${suffixUrl}`, {
         params,
         headers: { Authorization: `Bearer ${token}` }
       })

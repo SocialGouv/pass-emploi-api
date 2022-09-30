@@ -35,7 +35,8 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
   const offresEmploiQueryModelSansResultats: OffresEmploiQueryModel = {
     pagination: {
       page: 1,
-      limit: 50
+      limit: 50,
+      total: 0
     },
     results: []
   }
@@ -43,7 +44,8 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
   const offresEmploiQueryModel: OffresEmploiQueryModel = {
     pagination: {
       page: 1,
-      limit: 50
+      limit: 50,
+      total: 1
     },
     results: [uneOffreEmploiResumeQueryModel()]
   }
@@ -240,7 +242,8 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         const offresEmploiQueryModel: OffresEmploiQueryModel = {
           pagination: {
             page: 1,
-            limit: 50
+            limit: 50,
+            total: 1
           },
           results: [uneOffreEmploiResumeQueryModel()]
         }

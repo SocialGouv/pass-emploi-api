@@ -84,7 +84,8 @@ describe('OffresEmploiController', () => {
         const offresEmploiQueryModel: OffresEmploiQueryModel = {
           pagination: {
             page: 1,
-            limit: 50
+            limit: 50,
+            total: 1
           },
           results: [uneOffreEmploiResumeQueryModel()]
         }

@@ -1,13 +1,15 @@
+import { OffresEmploiQueryModel } from '../../../../src/application/queries/query-models/offres-emploi.query-model'
 import { uneOffreEmploiDto } from '../../../fixtures/offre-emploi.fixture'
 import { toOffresEmploiQueryModel } from '../../../../src/infrastructure/repositories/mappers/offres-emploi.mappers'
 import { expect } from '../../../utils'
 import { desOffresEmploiQueryModel } from '../../../fixtures/query-models/offre-emploi.query-model.fixtures'
-import { OffresEmploiDto } from '../../../../src/infrastructure/repositories/dto/pole-emploi.dto'
+import { OffreEmploiDto } from '../../../../src/infrastructure/repositories/dto/pole-emploi.dto'
 
 describe('OffresEmploiMappers', () => {
   let offreEmploi = uneOffreEmploiDto()
   const page = 1
   const limit = 50
+  const total = 1
   beforeEach(async () => {
     offreEmploi = uneOffreEmploiDto()
   })
@@ -16,13 +18,12 @@ describe('OffresEmploiMappers', () => {
     describe('quand il y a au moins une offre', () => {
       it('renvoie les bonnes informations quand le lieu de travail est renseigné dans l"offre', async () => {
         // Given
-        const offresEmploiDto: OffresEmploiDto = {
-          resultats: [offreEmploi]
-        }
+        const offresEmploiDto = [offreEmploi]
         // When
         const result = await toOffresEmploiQueryModel(
           page,
           limit,
+          total,
           offresEmploiDto
         )
 
@@ -32,19 +33,19 @@ describe('OffresEmploiMappers', () => {
       it('renvoie les bonnes informations le lieu de travail n"est pas renseigné dans l"offre', async () => {
         // Given
         offreEmploi.lieuTravail = undefined
-        const offresEmploiDto: OffresEmploiDto = {
-          resultats: [offreEmploi]
-        }
+        const offresEmploiDto = [offreEmploi]
         // When
         const result = await toOffresEmploiQueryModel(
           page,
           limit,
+          total,
           offresEmploiDto
         )
-        const expectedOffresEmploiQueryModel = {
+        const expectedOffresEmploiQueryModel: OffresEmploiQueryModel = {
           pagination: {
             page,
-            limit
+            limit,
+            total
           },
           results: [
             {
@@ -66,19 +67,19 @@ describe('OffresEmploiMappers', () => {
       it('renvoie les bonnes informations', async () => {
         // Given
         offreEmploi.lieuTravail = undefined
-        const offresEmploiDto: OffresEmploiDto = {
-          resultats: []
-        }
+        const offresEmploiDto: OffreEmploiDto[] = []
         // When
         const result = await toOffresEmploiQueryModel(
           page,
           limit,
+          total,
           offresEmploiDto
         )
-        const expectedOffresEmploiQueryModel = {
+        const expectedOffresEmploiQueryModel: OffresEmploiQueryModel = {
           pagination: {
             page,
-            limit
+            limit,
+            total
           },
           results: []
         }
