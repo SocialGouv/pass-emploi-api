@@ -9,7 +9,10 @@ import {
   Result,
   success
 } from '../../building-blocks/types/result'
-import { ServiceCiviqueQueryModel } from './query-models/service-civique.query-model'
+import {
+  ServiceCiviqueQueryModel,
+  ServicesCiviqueQueryModel
+} from './query-models/service-civique.query-model'
 import { FindAllOffresServicesCiviqueQueryGetter } from './query-getters/find-all-offres-services-civique.query.getter'
 
 export interface GetServicesCiviqueQuery extends Query {
@@ -27,7 +30,7 @@ export interface GetServicesCiviqueQuery extends Query {
 @Injectable()
 export class GetServicesCiviqueQueryHandler extends QueryHandler<
   GetServicesCiviqueQuery,
-  Result<ServiceCiviqueQueryModel[]>
+  Result<ServicesCiviqueQueryModel>
 > {
   constructor(
     private findAllOffresServicesCiviqueQueryGetter: FindAllOffresServicesCiviqueQueryGetter,
@@ -38,7 +41,7 @@ export class GetServicesCiviqueQueryHandler extends QueryHandler<
 
   async handle(
     query: GetServicesCiviqueQuery
-  ): Promise<Result<ServiceCiviqueQueryModel[]>> {
+  ): Promise<Result<ServicesCiviqueQueryModel>> {
     const result = await this.findAllOffresServicesCiviqueQueryGetter.handle(
       query
     )
@@ -47,18 +50,17 @@ export class GetServicesCiviqueQueryHandler extends QueryHandler<
       return result
     }
 
-    const offresQueryModel: ServiceCiviqueQueryModel[] = result.data.map(
-      offre => ({
-        id: offre.id,
-        titre: offre.titre,
-        organisation: offre.organisation,
-        ville: offre.ville,
-        domaine: offre.domaine,
-        dateDeDebut: offre.dateDeDebut
-      })
-    )
+    const { total, results } = result.data
+    const offresQueryModel: ServiceCiviqueQueryModel[] = results.map(offre => ({
+      id: offre.id,
+      titre: offre.titre,
+      organisation: offre.organisation,
+      ville: offre.ville,
+      domaine: offre.domaine,
+      dateDeDebut: offre.dateDeDebut
+    }))
 
-    return success(offresQueryModel)
+    return success({ pagination: { total }, results: offresQueryModel })
   }
 
   async authorize(): Promise<Result> {

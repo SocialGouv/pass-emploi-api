@@ -15,7 +15,8 @@ import {
 import { GetServicesCiviqueQueryHandler } from '../../application/queries/get-services-civique.query.handler'
 import {
   DetailServiceCiviqueQueryModel,
-  ServiceCiviqueQueryModel
+  ServiceCiviqueQueryModel,
+  ServicesCiviqueQueryModel
 } from '../../application/queries/query-models/service-civique.query-model'
 import {
   ErreurHttp,
@@ -24,9 +25,10 @@ import {
 import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
+import { handleFailure } from './failure.handler'
 import { GetServicesCiviqueQueryParams } from './validation/services-civique.inputs'
 
-@Controller('services-civique')
+@Controller()
 @ApiOAuth2([])
 @ApiTags('Services Civique')
 export class ServicesCiviqueController {
@@ -35,34 +37,34 @@ export class ServicesCiviqueController {
     private readonly getDetailServiceCiviqueQueryHandler: GetDetailServiceCiviqueQueryHandler
   ) {}
 
-  @Get()
+  @Get('services-civique')
   @ApiResponse({
     type: ServiceCiviqueQueryModel,
     isArray: true
   })
-  async getServicesCivique(
+  async getServicesCiviqueV1(
     @Query() findServicesCiviqueQuery: GetServicesCiviqueQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<ServiceCiviqueQueryModel[]> {
-    const result = await this.getServicesCiviqueQueryHandler.execute(
+    const { results } = await this.getServicesCivique(
       findServicesCiviqueQuery,
       utilisateur
     )
-
-    if (isFailure(result)) {
-      if (result.error.code === ErreurHttp.CODE) {
-        throw new HttpException(
-          result.error.message,
-          (result.error as ErreurHttp).statusCode
-        )
-      }
-      throw new RuntimeException(result.error.message)
-    }
-
-    return result.data
+    return results
   }
 
-  @Get(':idOffreEngagement')
+  @Get('v2/services-civique')
+  @ApiResponse({
+    type: ServicesCiviqueQueryModel
+  })
+  async getServicesCiviqueV2(
+    @Query() findServicesCiviqueQuery: GetServicesCiviqueQueryParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<ServicesCiviqueQueryModel> {
+    return this.getServicesCivique(findServicesCiviqueQuery, utilisateur)
+  }
+
+  @Get('services-civique/:idOffreEngagement')
   @ApiResponse({
     type: DetailServiceCiviqueQueryModel
   })
@@ -91,6 +93,19 @@ export class ServicesCiviqueController {
       throw new RuntimeException(result.error.message)
     }
 
+    return result.data
+  }
+
+  private async getServicesCivique(
+    findServicesCiviqueQuery: GetServicesCiviqueQueryParams,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<ServicesCiviqueQueryModel> {
+    const result = await this.getServicesCiviqueQueryHandler.execute(
+      findServicesCiviqueQuery,
+      utilisateur
+    )
+
+    if (isFailure(result)) throw handleFailure(result)
     return result.data
   }
 }

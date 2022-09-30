@@ -58,7 +58,12 @@ describe('GetServicesCiviqueQueryHandler', () => {
           page: 2,
           limit: 52
         })
-        .resolves(success(serviceCiviqueQueryModels))
+        .resolves(
+          success({
+            total: serviceCiviqueQueryModels.length,
+            results: serviceCiviqueQueryModels
+          })
+        )
 
       // When
       const result = await getServicesCiviqueQueryHandler.handle(
@@ -83,7 +88,12 @@ describe('GetServicesCiviqueQueryHandler', () => {
 
       findAllOffresServicesCiviqueQueryGetter.handle
         .withArgs(getServicesCiviqueQuery)
-        .resolves(success(offreEngagementQueryModels))
+        .resolves(
+          success({
+            total: offreEngagementQueryModels.length,
+            results: offreEngagementQueryModels
+          })
+        )
 
       // When
       const result = await getServicesCiviqueQueryHandler.handle(
@@ -119,7 +129,12 @@ describe('GetServicesCiviqueQueryHandler', () => {
           page: 2,
           limit: 52
         })
-        .resolves(success(serviceCiviqueQueryModels))
+        .resolves(
+          success({
+            total: serviceCiviqueQueryModels.length,
+            results: serviceCiviqueQueryModels
+          })
+        )
 
       // When
       await getServicesCiviqueQueryHandler.monitor(unUtilisateurJeune())

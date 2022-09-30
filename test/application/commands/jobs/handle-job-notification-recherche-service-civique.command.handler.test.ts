@@ -75,7 +75,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
             limit: 1000,
             dateDeCreationMinimum: hier
           })
-          .resolves(success([]))
+          .resolves(success({ total: 0, results: [] }))
 
         // When
         const result =
@@ -100,7 +100,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
             limit: 1000,
             dateDeCreationMinimum: hier
           })
-          .resolves(success([uneOffre]))
+          .resolves(success({ total: 1, results: [uneOffre] }))
       })
       describe('quand aucune recherche ne correspond', () => {
         it('renvoie juste les stats', async () => {
@@ -186,7 +186,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
             limit: 1000,
             dateDeCreationMinimum: hier
           })
-          .resolves(success([uneOffre]))
+          .resolves(success({ total: 1, results: [uneOffre] }))
 
         const criteres: GetServicesCiviqueQuery = {
           domaine: uneOffre.domaine,
@@ -226,7 +226,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
             limit: 1000,
             dateDeCreationMinimum: hier
           })
-          .resolves(success([uneOffreSansLocalisation]))
+          .resolves(success({ total: 1, results: [uneOffreSansLocalisation] }))
 
         // When
         const result =

@@ -19,16 +19,16 @@ import {
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
 import {
+  offresServicesCiviqueQueryModel,
+  unDetailOffreServiceCiviqueQuerymodel
+} from '../../fixtures/query-models/offre-service-civique.query-model.fixtures'
+import {
   buildTestingModuleForHttpTesting,
   expect,
   StubbedClass,
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import {
-  offresServicesCiviqueQueryModel,
-  unDetailOffreServiceCiviqueQuerymodel
-} from '../../fixtures/query-models/offre-service-civique.query-model.fixtures'
 
 describe('ServicesCiviqueController', () => {
   let getServicesCiviqueQueryHandler: StubbedClass<GetServicesCiviqueQueryHandler>
@@ -59,7 +59,7 @@ describe('ServicesCiviqueController', () => {
 
   describe('GET /services-civique', () => {
     describe('quand tout va bien', () => {
-      it("fait appel à l'API services civique avec les bons paramètres", async () => {
+      it('recherche les services civiques et les renvoie tels quels', async () => {
         // Given
         const findServicesCiviqueQuery = {
           page: '1',
@@ -86,7 +86,10 @@ describe('ServicesCiviqueController', () => {
           offresServicesCiviqueQueryModel()
 
         getServicesCiviqueQueryHandler.execute.resolves(
-          success(serviceCiviqueQueryModels)
+          success({
+            pagination: { total: serviceCiviqueQueryModels.length },
+            results: serviceCiviqueQueryModels
+          })
         )
 
         // When
@@ -96,12 +99,14 @@ describe('ServicesCiviqueController', () => {
           .query(findServicesCiviqueQuery)
           // Then
           .expect(HttpStatus.OK)
+          .expect(serviceCiviqueQueryModels)
 
         expect(getServicesCiviqueQueryHandler.execute).to.have.been.calledWith(
           expectedQuery
         )
       })
     })
+
     describe('quand il y a une failure http', () => {
       it('retourne une erreur http', async () => {
         // Given
@@ -131,6 +136,90 @@ describe('ServicesCiviqueController', () => {
     })
     ensureUserAuthenticationFailsIfInvalid('get', '/services-civique')
   })
+
+  describe('GET /v2/services-civique', () => {
+    describe('quand tout va bien', () => {
+      it('recherche les services civiques et les renvoie avec les info de pagination', async () => {
+        // Given
+        const findServicesCiviqueQuery = {
+          page: '1',
+          limit: '50',
+          dateDeDebutMaximum: '2022-02-17T10:00:00Z',
+          dateDeDebutMinimum: '2022-02-17T10:00:00Z',
+          lat: '48.86899229710103',
+          lon: '2.3342718577284205',
+          distance: '10',
+          domaine: 'environnement'
+        }
+        const expectedQuery: GetServicesCiviqueQuery = {
+          page: 1,
+          limit: 50,
+          dateDeDebutMaximum: '2022-02-17T10:00:00Z',
+          dateDeDebutMinimum: '2022-02-17T10:00:00Z',
+          lat: 48.86899229710103,
+          lon: 2.3342718577284205,
+          distance: 10,
+          domaine: 'environnement'
+        }
+
+        const serviceCiviqueQueryModels: ServiceCiviqueQueryModel[] =
+          offresServicesCiviqueQueryModel()
+
+        getServicesCiviqueQueryHandler.execute.resolves(
+          success({
+            pagination: { total: serviceCiviqueQueryModels.length },
+            results: serviceCiviqueQueryModels
+          })
+        )
+
+        // When
+        await request(app.getHttpServer())
+          .get('/v2/services-civique')
+          .set('authorization', unHeaderAuthorization())
+          .query({ ...findServicesCiviqueQuery, avecDonneesPagination: true })
+          // Then
+          .expect(HttpStatus.OK)
+          .expect({
+            pagination: { total: 1 },
+            results: serviceCiviqueQueryModels
+          })
+
+        expect(getServicesCiviqueQueryHandler.execute).to.have.been.calledWith(
+          expectedQuery
+        )
+      })
+    })
+
+    describe('quand il y a une failure http', () => {
+      it('retourne une erreur http', async () => {
+        // Given
+        const findServicesCiviqueQuery = {
+          page: '1',
+          limit: '50',
+          dateDeDebutMaximum: '2022-02-17T10:00:00Z',
+          dateDeDebutMinimum: '2022-02-17T10:00:00Z',
+          lat: '48.86899229710103',
+          lon: '2.3342718577284205',
+          distance: '10',
+          domaine: 'environnement'
+        }
+
+        getServicesCiviqueQueryHandler.execute.resolves(
+          failure(new ErreurHttp('Bad request', 400))
+        )
+
+        // When
+        await request(app.getHttpServer())
+          .get('/v2/services-civique')
+          .set('authorization', unHeaderAuthorization())
+          .query(findServicesCiviqueQuery)
+          // Then
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+    ensureUserAuthenticationFailsIfInvalid('get', '/v2/services-civique')
+  })
+
   describe('GET /services-civique/:idOffreEngagement', () => {
     const query: GetDetailOffreServiceCiviqueQuery = {
       idOffre: '1'

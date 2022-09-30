@@ -21,7 +21,9 @@ export class FindAllOffresServicesCiviqueQueryGetter {
 
   async handle(
     query: GetServicesCiviqueQuery
-  ): Promise<Result<Offre.Favori.ServiceCivique[]>> {
+  ): Promise<
+    Result<{ total: number; results: Offre.Favori.ServiceCivique[] }>
+  > {
     try {
       const params = this.construireLesParams(query)
       const response = await this.engagementClient.get<EngagementDto>(
