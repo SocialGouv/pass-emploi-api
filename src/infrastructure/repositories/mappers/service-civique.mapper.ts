@@ -7,10 +7,14 @@ import {
 import { Offre } from '../../../domain/offre/offre'
 import { Localisation } from 'src/domain/offre/favori/offre-service-civique'
 
-export function toOffresServicesCivique(
-  servicesCiviqueDto: EngagementDto
-): Offre.Favori.ServiceCivique[] {
-  return servicesCiviqueDto.hits.map(toOffreEngagement)
+export function toOffresServicesCivique(servicesCiviqueDto: EngagementDto): {
+  total: number
+  results: Offre.Favori.ServiceCivique[]
+} {
+  return {
+    total: servicesCiviqueDto.total,
+    results: servicesCiviqueDto.hits.map(toOffreEngagement)
+  }
 }
 
 export function toOffreEngagement(

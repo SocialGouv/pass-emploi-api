@@ -71,9 +71,9 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
       return result
     }
 
-    stats.nombreDeNouvellesOffres = result.data.length
+    stats.nombreDeNouvellesOffres = result.data.results.length
 
-    for (const offre of result.data) {
+    for (const offre of result.data.results) {
       let toutesLesRecherchesOntEteAnalysees = false
       let offset = 0
 
