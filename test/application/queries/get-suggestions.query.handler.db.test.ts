@@ -27,24 +27,67 @@ describe('GetSuggestionsQueryHandler', () => {
   })
 
   describe('handle', () => {
-    it("retourne les suggestions d'un jeune", async () => {
+    it("retourne les suggestions non traitées d'un jeune", async () => {
       // Given
       const suggestion = uneSuggestion()
-      await SuggestionSqlModel.create({
-        id: suggestion.id,
-        idJeune: suggestion.idJeune,
-        idFonctionnel: Buffer.from(
-          JSON.stringify(suggestion.idFonctionnel)
-        ).toString('base64'),
-        type: suggestion.type,
-        source: suggestion.source,
-        dateCreation: suggestion.dateCreation,
-        dateMiseAJour: suggestion.dateMiseAJour,
-        criteres: suggestion.criteres,
-        titre: suggestion.informations.titre,
-        metier: suggestion.informations.metier,
-        localisation: suggestion.informations.localisation
+      const suggestionAcceptee = uneSuggestion({
+        id: 'f781ae20-8838-49c7-aa2e-9b224318fb66',
+        dateCreationRecherche: uneDatetime
       })
+      const suggestionRefusee = uneSuggestion({
+        id: 'f781ae20-8838-49c7-aa2e-9b224318fb67',
+        dateRefus: uneDatetime
+      })
+
+      await SuggestionSqlModel.bulkCreate([
+        {
+          id: suggestion.id,
+          idJeune: suggestion.idJeune,
+          idFonctionnel: Buffer.from(
+            JSON.stringify(suggestion.idFonctionnel)
+          ).toString('base64'),
+          type: suggestion.type,
+          source: suggestion.source,
+          dateCreation: suggestion.dateCreation,
+          dateMiseAJour: suggestion.dateMiseAJour,
+          criteres: suggestion.criteres,
+          titre: suggestion.informations.titre,
+          metier: suggestion.informations.metier,
+          localisation: suggestion.informations.localisation
+        },
+        {
+          id: suggestionAcceptee.id,
+          idJeune: suggestionAcceptee.idJeune,
+          idFonctionnel: Buffer.from(
+            JSON.stringify(suggestionAcceptee.idFonctionnel)
+          ).toString('base64'),
+          type: suggestionAcceptee.type,
+          source: suggestionAcceptee.source,
+          dateCreation: suggestionAcceptee.dateCreation,
+          dateCreationRecherche: suggestionAcceptee.dateCreationRecherche,
+          dateMiseAJour: suggestionAcceptee.dateMiseAJour,
+          criteres: suggestionAcceptee.criteres,
+          titre: suggestionAcceptee.informations.titre,
+          metier: suggestionAcceptee.informations.metier,
+          localisation: suggestionAcceptee.informations.localisation
+        },
+        {
+          id: suggestionRefusee.id,
+          idJeune: suggestionRefusee.idJeune,
+          idFonctionnel: Buffer.from(
+            JSON.stringify(suggestionRefusee.idFonctionnel)
+          ).toString('base64'),
+          type: suggestionRefusee.type,
+          source: suggestionRefusee.source,
+          dateCreation: suggestionRefusee.dateCreation,
+          dateMiseAJour: suggestionRefusee.dateMiseAJour,
+          dateRefus: suggestionRefusee.dateRefus,
+          criteres: suggestionRefusee.criteres,
+          titre: suggestionRefusee.informations.titre,
+          metier: suggestionRefusee.informations.metier,
+          localisation: suggestionRefusee.informations.localisation
+        }
+      ])
 
       // When
       const suggestions = await queryHandler.handle({

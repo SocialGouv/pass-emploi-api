@@ -42,11 +42,7 @@ export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
   async handle(command: CreateRechercheFromSuggestionCommand): Promise<Result> {
     const suggestion = await this.suggestionRepository.get(command.idSuggestion)
 
-    if (
-      !suggestion ||
-      suggestion.dateCreationRecherche ||
-      suggestion.dateRefus
-    ) {
+    if (!suggestion || Suggestion.estTraitee(suggestion)) {
       return failure(new MauvaiseCommandeError('Suggestion déjà traitée'))
     }
 

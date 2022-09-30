@@ -36,15 +36,11 @@ export class RefuserSuggestionCommandHandler extends CommandHandler<
   async handle(command: RefuserSuggestionCommand): Promise<Result<void>> {
     const suggestion = await this.suggestionRepository.get(command.idSuggestion)
 
-    if (
-      !suggestion ||
-      suggestion.dateCreationRecherche ||
-      suggestion.dateRefus
-    ) {
+    if (!suggestion || Suggestion.estTraitee(suggestion)) {
       return failure(new MauvaiseCommandeError('Suggestion déjà traitée'))
     }
 
-    const suggestionRefusee = this.suggestionFactory.refuser(suggestion!)
+    const suggestionRefusee = this.suggestionFactory.refuser(suggestion)
 
     await this.suggestionRepository.save(suggestionRefusee)
 

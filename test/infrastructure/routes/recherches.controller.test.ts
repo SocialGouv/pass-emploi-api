@@ -467,7 +467,7 @@ describe('RecherchesController', () => {
     )
   })
 
-  describe('POST /recherches/suggestions/:idSuggestion/creer-recherche', () => {
+  describe('POST /recherches/suggestions/:idSuggestion/accepter', () => {
     describe('quand la suggestion existe', () => {
       it('crée la recherche correspondante', async () => {
         // Given
@@ -478,21 +478,19 @@ describe('RecherchesController', () => {
 
         // When
         await request(app.getHttpServer())
-          .post(
-            `/jeunes/1/recherches/suggestions/${idSuggestion}/creer-recherche`
-          )
+          .post(`/jeunes/1/recherches/suggestions/${idSuggestion}/accepter`)
           .set('authorization', unHeaderAuthorization())
           // Then
           .expect(HttpStatus.CREATED)
       })
       ensureUserAuthenticationFailsIfInvalid(
         'post',
-        '/jeunes/1/recherches/suggestions/123/creer-recherche'
+        '/jeunes/1/recherches/suggestions/123/accepter'
       )
     })
   })
 
-  describe('PUT /recherches/suggestions/:idSuggestion/refuser', () => {
+  describe('POST /recherches/suggestions/:idSuggestion/refuser', () => {
     describe('quand la suggestion existe', () => {
       it('supprime la suggestion', async () => {
         // Given
@@ -501,14 +499,14 @@ describe('RecherchesController', () => {
 
         // When
         await request(app.getHttpServer())
-          .put(`/jeunes/1/recherches/suggestions/${idSuggestion}/refuser`)
+          .post(`/jeunes/1/recherches/suggestions/${idSuggestion}/refuser`)
           .set('authorization', unHeaderAuthorization())
           // Then
           .expect(HttpStatus.OK)
       })
     })
     ensureUserAuthenticationFailsIfInvalid(
-      'put',
+      'post',
       '/jeunes/1/recherches/suggestions/123/refuser'
     )
   })

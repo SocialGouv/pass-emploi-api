@@ -8,7 +8,6 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
-  Put,
   Query
 } from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -175,8 +174,8 @@ export class RecherchesController {
     return this.getSuggestionsQueryHandler.execute({ idJeune }, utilisateur)
   }
 
-  @Post('recherches/suggestions/:idSuggestion/creer-recherche')
-  async postRechercheSuggestion(
+  @Post('recherches/suggestions/:idSuggestion/accepter')
+  async accepterSuggestion(
     @Param('idJeune') idJeune: string,
     @Param('idSuggestion') idSuggestion: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
@@ -195,7 +194,8 @@ export class RecherchesController {
     }
   }
 
-  @Put('recherches/suggestions/:idSuggestion/refuser')
+  @Post('recherches/suggestions/:idSuggestion/refuser')
+  @HttpCode(200)
   async refuserSuggestion(
     @Param('idJeune') idJeune: string,
     @Param('idSuggestion') idSuggestion: string,
