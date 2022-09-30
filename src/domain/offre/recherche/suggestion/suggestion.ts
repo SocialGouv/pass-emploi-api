@@ -96,6 +96,10 @@ export namespace Suggestion {
     return isEqual(suggestion1.idFonctionnel, suggestion2.idFonctionnel)
   }
 
+  export function estTraitee(suggestion: Suggestion): boolean {
+    return Boolean(suggestion.dateCreationRecherche || suggestion.dateRefus)
+  }
+
   function construireTitreEtMetierSuggestion(
     suggestionPoleEmploi: Suggestion.PoleEmploi,
     type: Recherche.Type

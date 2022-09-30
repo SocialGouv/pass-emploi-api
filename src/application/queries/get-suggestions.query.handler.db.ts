@@ -26,15 +26,17 @@ export class GetSuggestionsQueryHandler extends QueryHandler<
         idJeune: query.idJeune
       }
     })
-    return suggestionsSql.map(suggestionSql => ({
-      id: suggestionSql.id,
-      titre: suggestionSql.titre,
-      type: suggestionSql.type,
-      metier: suggestionSql.metier,
-      localisation: suggestionSql.localisation,
-      dateCreation: suggestionSql.dateCreation.toISOString(),
-      dateMiseAJour: suggestionSql.dateMiseAJour.toISOString()
-    }))
+    return suggestionsSql
+      .filter(suggestionSql => !suggestionSqlEstTraitee(suggestionSql))
+      .map(suggestionSql => ({
+        id: suggestionSql.id,
+        titre: suggestionSql.titre,
+        type: suggestionSql.type,
+        metier: suggestionSql.metier,
+        localisation: suggestionSql.localisation,
+        dateCreation: suggestionSql.dateCreation.toISOString(),
+        dateMiseAJour: suggestionSql.dateMiseAJour.toISOString()
+      }))
   }
 
   async monitor(): Promise<void> {
@@ -47,4 +49,8 @@ export class GetSuggestionsQueryHandler extends QueryHandler<
   ): Promise<Result> {
     return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
+}
+
+function suggestionSqlEstTraitee(suggestionSql: SuggestionSqlModel): boolean {
+  return Boolean(suggestionSql.dateCreationRecherche || suggestionSql.dateRefus)
 }
