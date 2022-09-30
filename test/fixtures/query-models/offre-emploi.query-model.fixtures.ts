@@ -3,7 +3,8 @@ import { OffresEmploiQueryModel } from '../../../src/application/queries/query-m
 export const desOffresEmploiQueryModel = (): OffresEmploiQueryModel => ({
   pagination: {
     page: 1,
-    limit: 50
+    limit: 50,
+    total: 1
   },
   results: [
     {

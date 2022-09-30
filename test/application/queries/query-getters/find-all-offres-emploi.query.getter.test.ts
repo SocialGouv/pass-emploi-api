@@ -145,7 +145,7 @@ describe('FindAllOffresEmploiQueryGetter', () => {
             }
           })
           .onSecondCall()
-          .resolves({ resultats: [uneOffreEmploiDto()] })
+          .resolves({ total: 1, resultats: [uneOffreEmploiDto()] })
 
         // When
         const result = await findAllOffresEmploiQueryGetter.handle(criteres)

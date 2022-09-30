@@ -50,14 +50,15 @@ export class FindAllOffresEmploiQueryGetter {
         pageAvecDefault,
         limitAvecDefault
       )
-      const offresEmploiDto = await this.poleEmploiClient.getOffresEmploi(
+      const { total, resultats } = await this.poleEmploiClient.getOffresEmploi(
         params
       )
       return success(
         toOffresEmploiQueryModel(
           pageAvecDefault,
           limitAvecDefault,
-          offresEmploiDto
+          total,
+          resultats
         )
       )
     } catch (e) {

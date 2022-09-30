@@ -1,5 +1,5 @@
 import { FavoriOffreEmploiSqlModel } from '../../sequelize/models/favori-offre-emploi.sql-model'
-import { OffreEmploiDto, OffresEmploiDto } from '../dto/pole-emploi.dto'
+import { OffreEmploiDto } from '../dto/pole-emploi.dto'
 import {
   FavoriOffreEmploiIdQueryModel,
   OffresEmploiQueryModel
@@ -9,32 +9,32 @@ import { Offre } from '../../../domain/offre/offre'
 export function toOffresEmploiQueryModel(
   page: number,
   limit: number,
-  offresEmploiDto: OffresEmploiDto
+  total: number,
+  offresEmploiDto: OffreEmploiDto[]
 ): OffresEmploiQueryModel {
   return {
     pagination: {
       page,
-      limit
+      limit,
+      total
     },
-    results: offresEmploiDto?.resultats
-      ? offresEmploiDto.resultats.map((result: OffreEmploiDto) => {
-          return {
-            id: result.id,
-            titre: result.intitule,
-            typeContrat: result.typeContrat,
-            alternance: result.alternance,
-            duree: result.dureeTravailLibelleConverti,
-            nomEntreprise: result.entreprise?.nom,
-            localisation: result.lieuTravail
-              ? {
-                  nom: result.lieuTravail.libelle,
-                  codePostal: result.lieuTravail.codePostal,
-                  commune: result.lieuTravail.commune
-                }
-              : undefined
-          }
-        })
-      : []
+    results: offresEmploiDto.map((result: OffreEmploiDto) => {
+      return {
+        id: result.id,
+        titre: result.intitule,
+        typeContrat: result.typeContrat,
+        alternance: result.alternance,
+        duree: result.dureeTravailLibelleConverti,
+        nomEntreprise: result.entreprise?.nom,
+        localisation: result.lieuTravail
+          ? {
+              nom: result.lieuTravail.libelle,
+              codePostal: result.lieuTravail.codePostal,
+              commune: result.lieuTravail.commune
+            }
+          : undefined
+      }
+    })
   }
 }
 

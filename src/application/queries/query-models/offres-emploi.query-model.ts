@@ -54,6 +54,9 @@ class Pagination {
 
   @ApiProperty()
   limit: number
+
+  @ApiProperty()
+  total: number
 }
 
 export class OffresEmploiQueryModel {

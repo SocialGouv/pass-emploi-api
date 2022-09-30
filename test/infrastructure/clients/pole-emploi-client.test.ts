@@ -162,6 +162,38 @@ describe('PoleEmploiClient', () => {
       expect(offreEmploi).to.deep.equal(uneOffreEmploiDto())
     })
   })
+  describe('getOffresEmploi', () => {
+    it('récupère les offres demandées', async () => {
+      // Given
+      const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+        minutes: 20
+      })
+      poleEmploiClient.inMemoryToken = {
+        token: 'test-token',
+        tokenDate: uneDatetimeDeMoinsDe25Minutes
+      }
+
+      nock('https://api.emploi-store.fr/partenaire')
+        .get('/offresdemploi/v2/offres/search?param=value')
+        .reply(
+          200,
+          { resultats: [uneOffreEmploiDto()] },
+          { 'content-range': 'offres 0-149/1811' }
+        )
+        .isDone()
+
+      // When
+      const offreEmploi = await poleEmploiClient.getOffresEmploi(
+        new URLSearchParams({ param: 'value' })
+      )
+
+      // Then
+      expect(offreEmploi).to.deep.equal({
+        total: 1811,
+        resultats: [uneOffreEmploiDto()]
+      })
+    })
+  })
   describe('getNotificationsRendezVous', () => {
     it('récupère les notifications', async () => {
       // Given

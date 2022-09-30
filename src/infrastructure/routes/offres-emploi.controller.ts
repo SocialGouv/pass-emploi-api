@@ -8,10 +8,6 @@ import {
 } from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
-  OffreEmploiQueryModel,
-  OffresEmploiQueryModel
-} from '../../application/queries/query-models/offres-emploi.query-model'
-import {
   GetDetailOffreEmploiQuery,
   GetDetailOffreEmploiQueryHandler
 } from '../../application/queries/get-detail-offre-emploi.query.handler'
@@ -19,12 +15,15 @@ import {
   GetOffresEmploiQuery,
   GetOffresEmploiQueryHandler
 } from '../../application/queries/get-offres-emploi.query.handler'
-import { FindOffresEmploiQueryParams } from './validation/offres-emploi.inputs'
-import { Utilisateur } from '../decorators/authenticated.decorator'
-import { Authentification } from '../../domain/authentification'
+import {
+  OffreEmploiQueryModel,
+  OffresEmploiQueryModel
+} from '../../application/queries/query-models/offres-emploi.query-model'
 import { isFailure } from '../../building-blocks/types/result'
-import { ErreurHttp } from '../../building-blocks/types/domain-error'
-import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
+import { Authentification } from '../../domain/authentification'
+import { Utilisateur } from '../decorators/authenticated.decorator'
+import { handleFailure } from './failure.handler'
+import { FindOffresEmploiQueryParams } from './validation/offres-emploi.inputs'
 
 @Controller('offres-emploi')
 @ApiOAuth2([])
@@ -62,16 +61,7 @@ export class OffresEmploiController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      if (result.error.code === ErreurHttp.CODE) {
-        throw new HttpException(
-          result.error.message,
-          (result.error as ErreurHttp).statusCode
-        )
-      }
-      throw new RuntimeException(result.error.message)
-    }
-
+    if (isFailure(result)) throw handleFailure(result)
     return result.data
   }
 

@@ -25,6 +25,10 @@ export interface OffresEmploiDto {
   resultats: OffreEmploiDto[]
 }
 
+export interface OffresEmploiDtoWithTotal extends OffresEmploiDto {
+  total: number
+}
+
 export enum TypeRDVPE {
   CREA = 'CREA',
   MODIF = 'MODIF',

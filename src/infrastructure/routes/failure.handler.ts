@@ -28,7 +28,7 @@ export function handleFailure(result: Result): void {
         if (result.error instanceof ErreurHttp) {
           throw new HttpException(result.error.message, result.error.statusCode)
         }
-        break
+        throw new RuntimeException(result.error.message)
       case NonTrouveError.CODE:
         throw new NotFoundException(result.error.message)
       case MauvaiseCommandeError.CODE:
