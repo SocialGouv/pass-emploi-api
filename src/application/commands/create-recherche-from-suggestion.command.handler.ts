@@ -13,6 +13,7 @@ import {
 import {
   emptySuccess,
   failure,
+  isFailure,
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
@@ -42,17 +43,21 @@ export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
   async handle(command: CreateRechercheFromSuggestionCommand): Promise<Result> {
     const suggestion = await this.suggestionRepository.get(command.idSuggestion)
 
-    if (!suggestion || Suggestion.estTraitee(suggestion)) {
-      return failure(new MauvaiseCommandeError('Suggestion déjà traitée'))
+    if (!suggestion) {
+      return failure(new MauvaiseCommandeError('Suggestion non trouvée'))
     }
 
-    const suggestionAcceptee = this.suggestionFactory.accepter(suggestion)
+    const suggestionAccepteeResult = this.suggestionFactory.accepter(suggestion)
+    if (isFailure(suggestionAccepteeResult)) {
+      return suggestionAccepteeResult
+    }
 
-    const recherche =
-      this.rechercheFactory.buildRechercheFromSuggestion(suggestionAcceptee)
+    const recherche = this.rechercheFactory.buildRechercheFromSuggestion(
+      suggestionAccepteeResult.data
+    )
 
     await this.rechercheRepository.save(recherche)
-    await this.suggestionRepository.save(suggestionAcceptee)
+    await this.suggestionRepository.save(suggestionAccepteeResult.data)
 
     return emptySuccess()
   }

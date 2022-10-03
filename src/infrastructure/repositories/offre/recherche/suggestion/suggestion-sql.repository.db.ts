@@ -32,7 +32,7 @@ export class SuggestionSqlRepository implements Suggestion.Repository {
       type: suggestion.type,
       source: suggestion.source,
       dateCreation: suggestion.dateCreation,
-      dateMiseAJour: suggestion.dateMiseAJour,
+      dateRafraichissement: suggestion.dateRafraichissement,
       dateRefus: suggestion.dateRefus ?? null,
       dateCreationRecherche: suggestion.dateCreationRecherche ?? null,
       idRecherche: suggestion.idRecherche ?? null,
@@ -62,7 +62,9 @@ function fromSqlToSuggestion(suggestionSql: SuggestionSqlModel): Suggestion {
     type: suggestionSql.type,
     source: suggestionSql.source,
     dateCreation: DateTime.fromJSDate(suggestionSql.dateCreation).toUTC(),
-    dateMiseAJour: DateTime.fromJSDate(suggestionSql.dateMiseAJour).toUTC(),
+    dateRafraichissement: DateTime.fromJSDate(
+      suggestionSql.dateRafraichissement
+    ).toUTC(),
     dateRefus: suggestionSql.dateRefus
       ? DateTime.fromJSDate(suggestionSql.dateRefus).toUTC()
       : undefined,

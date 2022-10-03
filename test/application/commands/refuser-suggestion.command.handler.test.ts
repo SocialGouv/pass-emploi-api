@@ -1,12 +1,11 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { SuggestionAuthorizer } from 'src/application/authorizers/authorize-suggestion'
-import { MauvaiseCommandeError } from 'src/building-blocks/types/domain-error'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { RefuserSuggestionCommandHandler } from '../../../src/application/commands/refuser-suggestion.command.handler'
 import {
   emptySuccess,
-  failure
+  success
 } from '../../../src/building-blocks/types/result'
 import { Suggestion } from '../../../src/domain/offre/recherche/suggestion/suggestion'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
@@ -64,7 +63,7 @@ describe('RefuserSuggestionCommandHandler', () => {
           dateRefus: uneDatetime
         }
         suggestionRepository.get.resolves(suggestion)
-        suggestionFactory.refuser.returns(suggestionRefusee)
+        suggestionFactory.refuser.returns(success(suggestionRefusee))
 
         // When
         const result = await refuserSuggestionCommandHandler.handle(command)
@@ -75,38 +74,6 @@ describe('RefuserSuggestionCommandHandler', () => {
         )
         expect(result).to.deep.equal(emptySuccess())
       })
-    })
-  })
-  describe('quand la suggestion est déjà traitée', () => {
-    it('retourne une failure quand elle a été acceptée', async () => {
-      // Given
-      const command = { idJeune: 'id-jeune', idSuggestion: 'id-suggestion' }
-      suggestionRepository.get.resolves(
-        uneSuggestion({ dateCreationRecherche: uneDatetime })
-      )
-
-      // When
-      const result = await refuserSuggestionCommandHandler.handle(command)
-
-      // Then
-      expect(result).to.deep.equal(
-        failure(new MauvaiseCommandeError('Suggestion déjà traitée'))
-      )
-    })
-    it('retourne une failure quand elle a été refusée', async () => {
-      // Given
-      const command = { idJeune: 'id-jeune', idSuggestion: 'id-suggestion' }
-      suggestionRepository.get.resolves(
-        uneSuggestion({ dateRefus: uneDatetime })
-      )
-
-      // When
-      const result = await refuserSuggestionCommandHandler.handle(command)
-
-      // Then
-      expect(result).to.deep.equal(
-        failure(new MauvaiseCommandeError('Suggestion déjà traitée'))
-      )
     })
   })
 })

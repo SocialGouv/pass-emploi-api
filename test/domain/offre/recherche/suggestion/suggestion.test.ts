@@ -8,6 +8,13 @@ import {
   uneSuggestionPE
 } from '../../../../fixtures/suggestion.fixture'
 import { Suggestion } from 'src/domain/offre/recherche/suggestion/suggestion'
+import {
+  failure,
+  success
+} from '../../../../../src/building-blocks/types/result'
+import { describe } from 'mocha'
+import { DateTime } from 'luxon'
+import { MauvaiseCommandeError } from '../../../../../src/building-blocks/types/domain-error'
 
 describe('Suggestion', () => {
   let factory: Recherche.Suggestion.Factory
@@ -56,7 +63,7 @@ describe('Suggestion', () => {
               metier: 'Boulanger'
             },
             dateCreation: uneDatetime,
-            dateMiseAJour: uneDatetime,
+            dateRafraichissement: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
             idFonctionnel: {
               typeRecherche: Recherche.Type.OFFRES_EMPLOI,
@@ -99,7 +106,7 @@ describe('Suggestion', () => {
               metier: 'Boulanger'
             },
             dateCreation: uneDatetime,
-            dateMiseAJour: uneDatetime,
+            dateRafraichissement: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
             idFonctionnel: {
               typeRecherche: Recherche.Type.OFFRES_EMPLOI,
@@ -125,7 +132,7 @@ describe('Suggestion', () => {
               metier: 'Boulanger'
             },
             dateCreation: uneDatetime,
-            dateMiseAJour: uneDatetime,
+            dateRafraichissement: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
             idFonctionnel: {
               typeRecherche: Recherche.Type.OFFRES_IMMERSION,
@@ -151,7 +158,7 @@ describe('Suggestion', () => {
               metier: 'Boulanger'
             },
             dateCreation: uneDatetime,
-            dateMiseAJour: uneDatetime,
+            dateRafraichissement: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
             idFonctionnel: {
               typeRecherche: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
@@ -198,7 +205,7 @@ describe('Suggestion', () => {
               metier: 'Service civique à test'
             },
             dateCreation: uneDatetime,
-            dateMiseAJour: uneDatetime,
+            dateRafraichissement: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
             idFonctionnel: {
               typeRecherche: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
@@ -247,7 +254,7 @@ describe('Suggestion', () => {
               metier: 'Boulanger'
             },
             dateCreation: uneDatetime,
-            dateMiseAJour: uneDatetime,
+            dateRafraichissement: uneDatetime,
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
             idFonctionnel: {
               typeRecherche: Recherche.Type.OFFRES_EMPLOI,
@@ -309,24 +316,54 @@ describe('Suggestion', () => {
   })
 
   describe('accepter', () => {
-    it('retourne une suggestion acceptée', () => {
-      const suggestion = uneSuggestion()
-      const acceptee = factory.accepter(suggestion)
-      expect(acceptee).to.deep.equal({
-        ...suggestion,
-        dateCreationRecherche: uneDatetime,
-        idRecherche: unUuid
+    describe('quand la suggestion est déjà traitée', () => {
+      it('retourne une failure "Suggestion déjà traitée"', () => {
+        const suggestion = uneSuggestion({
+          dateRefus: DateTime.fromISO('2022-10-03T15:30:00Z')
+        })
+        const acceptee = factory.accepter(suggestion)
+        expect(acceptee).to.deep.equal(
+          failure(new MauvaiseCommandeError('Suggestion déjà traitée'))
+        )
+      })
+    })
+    describe('quand la suggestion n’est pas déjà traitée', () => {
+      it('retourne une suggestion acceptée', () => {
+        const suggestion = uneSuggestion()
+        const acceptee = factory.accepter(suggestion)
+        expect(acceptee).to.deep.equal(
+          success({
+            ...suggestion,
+            dateCreationRecherche: uneDatetime,
+            idRecherche: unUuid
+          })
+        )
       })
     })
   })
 
   describe('refuser', () => {
-    it('retourne une suggestion refusée', () => {
-      const suggestion = uneSuggestion()
-      const refusee = factory.refuser(suggestion)
-      expect(refusee).to.deep.equal({
-        ...suggestion,
-        dateRefus: uneDatetime
+    describe('quand la suggestion est déjà traitée', () => {
+      it('retourne une failure "Suggestion déjà traitée"', () => {
+        const suggestion = uneSuggestion({
+          dateRefus: DateTime.fromISO('2022-10-03T15:30:00Z')
+        })
+        const refusee = factory.refuser(suggestion)
+        expect(refusee).to.deep.equal(
+          failure(new MauvaiseCommandeError('Suggestion déjà traitée'))
+        )
+      })
+    })
+    describe('quand la suggestion n’est pas déjà traitée', () => {
+      it('retourne une suggestion refusée', () => {
+        const suggestion = uneSuggestion()
+        const refusee = factory.refuser(suggestion)
+        expect(refusee).to.deep.equal(
+          success({
+            ...suggestion,
+            dateRefus: uneDatetime
+          })
+        )
       })
     })
   })

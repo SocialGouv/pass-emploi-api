@@ -5,10 +5,9 @@ import { IdService } from 'src/utils/id-service'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { uneRecherche } from 'test/fixtures/recherche.fixture'
 import { CreateRechercheFromSuggestionCommandHandler } from '../../../src/application/commands/create-recherche-from-suggestion.command.handler'
-import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
-  failure
+  success
 } from '../../../src/building-blocks/types/result'
 import { Recherche } from '../../../src/domain/offre/recherche/recherche'
 import { Suggestion } from '../../../src/domain/offre/recherche/suggestion/suggestion'
@@ -100,7 +99,7 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
         })
 
         suggestionRepository.get.resolves(suggestion)
-        suggestionFactory.accepter.returns(suggestionAcceptee)
+        suggestionFactory.accepter.returns(success(suggestionAcceptee))
         rechercheFactory.buildRechercheFromSuggestion.returns(recherche)
 
         // When
@@ -119,42 +118,6 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
           suggestionAcceptee
         )
         expect(result).to.deep.equal(emptySuccess())
-      })
-    })
-    describe('quand la suggestion est déjà traitée', () => {
-      it('retourne une failure quand elle a été acceptée', async () => {
-        // Given
-        const command = { idJeune: 'id-jeune', idSuggestion: 'id-suggestion' }
-        suggestionRepository.get.resolves(
-          uneSuggestion({ dateCreationRecherche: uneDatetime })
-        )
-
-        // When
-        const result = await createRechercheFromSuggestionCommandHandler.handle(
-          command
-        )
-
-        // Then
-        expect(result).to.deep.equal(
-          failure(new MauvaiseCommandeError('Suggestion déjà traitée'))
-        )
-      })
-      it('retourne une failure quand elle a été refusée', async () => {
-        // Given
-        const command = { idJeune: 'id-jeune', idSuggestion: 'id-suggestion' }
-        suggestionRepository.get.resolves(
-          uneSuggestion({ dateRefus: uneDatetime })
-        )
-
-        // When
-        const result = await createRechercheFromSuggestionCommandHandler.handle(
-          command
-        )
-
-        // Then
-        expect(result).to.deep.equal(
-          failure(new MauvaiseCommandeError('Suggestion déjà traitée'))
-        )
       })
     })
   })

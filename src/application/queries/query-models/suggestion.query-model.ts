@@ -15,5 +15,5 @@ export class SuggestionQueryModel {
   @ApiProperty({ type: Date })
   dateCreation: string
   @ApiProperty({ type: Date })
-  dateMiseAJour: string
+  dateRafraichissement: string
 }

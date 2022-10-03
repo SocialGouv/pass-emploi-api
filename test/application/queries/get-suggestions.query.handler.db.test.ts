@@ -49,7 +49,7 @@ describe('GetSuggestionsQueryHandler', () => {
           type: suggestion.type,
           source: suggestion.source,
           dateCreation: suggestion.dateCreation,
-          dateMiseAJour: suggestion.dateMiseAJour,
+          dateRafraichissement: suggestion.dateRafraichissement,
           criteres: suggestion.criteres,
           titre: suggestion.informations.titre,
           metier: suggestion.informations.metier,
@@ -65,7 +65,7 @@ describe('GetSuggestionsQueryHandler', () => {
           source: suggestionAcceptee.source,
           dateCreation: suggestionAcceptee.dateCreation,
           dateCreationRecherche: suggestionAcceptee.dateCreationRecherche,
-          dateMiseAJour: suggestionAcceptee.dateMiseAJour,
+          dateRafraichissement: suggestionAcceptee.dateRafraichissement,
           criteres: suggestionAcceptee.criteres,
           titre: suggestionAcceptee.informations.titre,
           metier: suggestionAcceptee.informations.metier,
@@ -80,7 +80,7 @@ describe('GetSuggestionsQueryHandler', () => {
           type: suggestionRefusee.type,
           source: suggestionRefusee.source,
           dateCreation: suggestionRefusee.dateCreation,
-          dateMiseAJour: suggestionRefusee.dateMiseAJour,
+          dateRafraichissement: suggestionRefusee.dateRafraichissement,
           dateRefus: suggestionRefusee.dateRefus,
           criteres: suggestionRefusee.criteres,
           titre: suggestionRefusee.informations.titre,
@@ -102,7 +102,7 @@ describe('GetSuggestionsQueryHandler', () => {
         metier: 'Boulanger',
         localisation: 'Lille',
         dateCreation: uneDatetime.toISO(),
-        dateMiseAJour: uneDatetime.toISO()
+        dateRafraichissement: uneDatetime.toISO()
       }
       expect(suggestions).to.deep.equal([queryModel])
     })

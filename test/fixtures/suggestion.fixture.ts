@@ -27,7 +27,7 @@ export const uneSuggestion = (
 ): Offre.Recherche.Suggestion => {
   const defaults: Offre.Recherche.Suggestion = {
     dateCreation: uneDatetime,
-    dateMiseAJour: uneDatetime,
+    dateRafraichissement: uneDatetime,
     id: 'f781ae20-8838-49c7-aa2e-9b224318fb65',
     idFonctionnel: {
       typeRecherche: Recherche.Type.OFFRES_EMPLOI,
