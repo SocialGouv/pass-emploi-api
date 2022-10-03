@@ -6,6 +6,7 @@ import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { Injectable } from '@nestjs/common'
 import { SuggestionQueryModel } from './query-models/suggestion.query-model'
 import { SuggestionSqlModel } from '../../infrastructure/sequelize/models/suggestion.sql-model'
+import { Op } from 'sequelize'
 
 export interface GetSuggestionsQuery extends Query {
   idJeune: string
@@ -23,20 +24,24 @@ export class GetSuggestionsQueryHandler extends QueryHandler<
   async handle(query: GetSuggestionsQuery): Promise<SuggestionQueryModel[]> {
     const suggestionsSql = await SuggestionSqlModel.findAll({
       where: {
-        idJeune: query.idJeune
+        idJeune: query.idJeune,
+        dateCreationRecherche: {
+          [Op.eq]: null
+        },
+        dateRefus: {
+          [Op.eq]: null
+        }
       }
     })
-    return suggestionsSql
-      .filter(suggestionSql => !suggestionSqlEstTraitee(suggestionSql))
-      .map(suggestionSql => ({
-        id: suggestionSql.id,
-        titre: suggestionSql.titre,
-        type: suggestionSql.type,
-        metier: suggestionSql.metier,
-        localisation: suggestionSql.localisation,
-        dateCreation: suggestionSql.dateCreation.toISOString(),
-        dateMiseAJour: suggestionSql.dateMiseAJour.toISOString()
-      }))
+    return suggestionsSql.map(suggestionSql => ({
+      id: suggestionSql.id,
+      titre: suggestionSql.titre,
+      type: suggestionSql.type,
+      metier: suggestionSql.metier,
+      localisation: suggestionSql.localisation,
+      dateCreation: suggestionSql.dateCreation.toISOString(),
+      dateRafraichissement: suggestionSql.dateRafraichissement.toISOString()
+    }))
   }
 
   async monitor(): Promise<void> {
@@ -49,8 +54,4 @@ export class GetSuggestionsQueryHandler extends QueryHandler<
   ): Promise<Result> {
     return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
-}
-
-function suggestionSqlEstTraitee(suggestionSql: SuggestionSqlModel): boolean {
-  return Boolean(suggestionSql.dateCreationRecherche || suggestionSql.dateRefus)
 }

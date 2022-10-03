@@ -68,7 +68,7 @@ describe('PoleEmploi', () => {
               rayon: 1,
               codeRome: 'D1104'
             },
-            dateMiseAJour,
+            dateRafraichissement: dateMiseAJour,
             criteres: {
               q: 'Les termes ont ont changé mais pas le code rome'
             }
@@ -81,7 +81,7 @@ describe('PoleEmploi', () => {
           // Then
           const suggestionMiseAJour: Recherche.Suggestion = {
             ...suggestionInitiale,
-            dateMiseAJour
+            dateRafraichissement: dateMiseAJour
           }
           expect(suggestionRepository.save).to.have.been.calledOnceWithExactly(
             suggestionMiseAJour

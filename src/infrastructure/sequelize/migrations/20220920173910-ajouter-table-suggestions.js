@@ -52,7 +52,7 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false
       },
-      dateMiseAJour: {
+      dateRafraichissement: {
         field: 'date_mise_a_jour',
         type: Sequelize.DATE,
         allowNull: false

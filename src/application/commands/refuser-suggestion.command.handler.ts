@@ -9,6 +9,7 @@ import {
 import {
   emptySuccess,
   failure,
+  isFailure,
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
@@ -36,13 +37,16 @@ export class RefuserSuggestionCommandHandler extends CommandHandler<
   async handle(command: RefuserSuggestionCommand): Promise<Result<void>> {
     const suggestion = await this.suggestionRepository.get(command.idSuggestion)
 
-    if (!suggestion || Suggestion.estTraitee(suggestion)) {
-      return failure(new MauvaiseCommandeError('Suggestion déjà traitée'))
+    if (!suggestion) {
+      return failure(new MauvaiseCommandeError('Suggestion non trouvée'))
     }
 
-    const suggestionRefusee = this.suggestionFactory.refuser(suggestion)
+    const suggestionRefuseeResult = this.suggestionFactory.refuser(suggestion)
+    if (isFailure(suggestionRefuseeResult)) {
+      return suggestionRefuseeResult
+    }
 
-    await this.suggestionRepository.save(suggestionRefusee)
+    await this.suggestionRepository.save(suggestionRefuseeResult.data)
 
     return emptySuccess()
   }

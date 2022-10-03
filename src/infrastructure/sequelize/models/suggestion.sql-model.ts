@@ -47,8 +47,8 @@ export class SuggestionDto extends Model {
   @Column({ field: 'date_creation', type: DataType.DATE })
   dateCreation: Date
 
-  @Column({ field: 'date_mise_a_jour', type: DataType.DATE })
-  dateMiseAJour: Date
+  @Column({ field: 'date_rafraichissement', type: DataType.DATE })
+  dateRafraichissement: Date
 
   @Column({ field: 'date_refus', type: DataType.DATE })
   dateRefus: Date | null

@@ -7,6 +7,12 @@ import { DateTime } from 'luxon'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import * as isEqual from 'lodash.isequal'
+import {
+  failure,
+  Result,
+  success
+} from '../../../../building-blocks/types/result'
+import { MauvaiseCommandeError } from '../../../../building-blocks/types/domain-error'
 
 export interface Suggestion {
   id: string
@@ -20,7 +26,7 @@ export interface Suggestion {
   }
   criteres?: Recherche.Emploi | Recherche.Immersion | Recherche.ServiceCivique
   dateCreation: DateTime
-  dateMiseAJour: DateTime
+  dateRafraichissement: DateTime
   source: Suggestion.Source
   dateCreationRecherche?: DateTime
   idRecherche?: string
@@ -227,20 +233,27 @@ export namespace Suggestion {
       ]
     }
 
-    accepter(suggestion: Suggestion): Acceptee {
-      return {
+    accepter(suggestion: Suggestion): Result<Acceptee> {
+      if (estTraitee(suggestion)) {
+        return failure(new MauvaiseCommandeError('Suggestion déjà traitée'))
+      }
+      return success({
         ...suggestion,
         dateCreationRecherche: this.dateService.now(),
         idRecherche: this.idService.uuid()
-      }
+      })
     }
 
-    refuser(suggestion: Suggestion): Refusee {
-      return {
+    refuser(suggestion: Suggestion): Result<Refusee> {
+      if (estTraitee(suggestion)) {
+        return failure(new MauvaiseCommandeError('Suggestion déjà traitée'))
+      }
+      return success({
         ...suggestion,
         dateRefus: this.dateService.now()
-      }
+      })
     }
+
     private estUneSuggestionEmploi(suggestionPoleEmploi: PoleEmploi): boolean {
       return Boolean(suggestionPoleEmploi.codeRome)
     }
@@ -270,7 +283,7 @@ export namespace Suggestion {
         id: this.idService.uuid(),
         idJeune,
         dateCreation: maintenant,
-        dateMiseAJour: maintenant,
+        dateRafraichissement: maintenant,
         idFonctionnel: construireIdFonctionnel(suggestionPoleEmploi, type),
         type: type,
         source: Suggestion.Source.POLE_EMPLOI,

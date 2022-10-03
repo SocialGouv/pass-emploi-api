@@ -383,7 +383,7 @@ describe('RecherchesController', () => {
       metier: 'Boulanger',
       localisation: 'Lille',
       dateCreation: uneDatetime.toISO(),
-      dateMiseAJour: uneDatetime.toISO()
+      dateRafraichissement: uneDatetime.toISO()
     }
 
     describe("quand c'est un jeune pole emploi", () => {

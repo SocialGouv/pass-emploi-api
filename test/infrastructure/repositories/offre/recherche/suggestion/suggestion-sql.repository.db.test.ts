@@ -16,7 +16,7 @@ describe('SuggestionSqlRepository', () => {
   let suggestionSqlRepository: SuggestionSqlRepository
   const suggestion: Offre.Recherche.Suggestion = {
     dateCreation: uneDatetime,
-    dateMiseAJour: uneDatetime,
+    dateRafraichissement: uneDatetime,
     dateCreationRecherche: undefined,
     dateRefus: undefined,
     id: 'f781ae20-8838-49c7-aa2e-9b224318fb65',
