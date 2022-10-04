@@ -24,12 +24,18 @@ import { Public } from '../decorators/public.decorator'
 import { handleFailure } from './failure.handler'
 import { GetAgencesQueryParams } from './validation/agences.inputs'
 import { TypesDemarchesQueryParams } from './validation/demarches.inputs'
+import { MetiersRomeQueryModel } from '../../application/queries/query-models/metiers-rome.query-model'
+import {
+  GetMetiersRomeQuery,
+  GetMetiersRomeQueryHandler
+} from '../../application/queries/get-metiers-rome.query.handler.db'
 
 @Controller('referentiels')
 @ApiTags('Referentiels')
 export class ReferentielsController {
   constructor(
     private readonly getCommunesEtDepartementsQueryHandler: GetCommunesEtDepartementsQueryHandler,
+    private readonly getMetiersRomeQueryHandler: GetMetiersRomeQueryHandler,
     private readonly getTypesRendezvousQueryHandler: GetTypesRendezVousQueryHandler,
     private readonly rechercherTypesDemarcheQueryHandler: RechercherTypesDemarcheQueryHandler,
     private readonly getAgencesQueryHandler: GetAgencesQueryHandler,
@@ -51,6 +57,19 @@ export class ReferentielsController {
     const query: GetCommunesEtDepartementsQuery = { recherche }
     query.villesOnly = villesOnly === 'true'
     return this.getCommunesEtDepartementsQueryHandler.execute(query)
+  }
+
+  @Get('metiers')
+  @Public()
+  @ApiResponse({
+    type: MetiersRomeQueryModel,
+    isArray: true
+  })
+  async getMetiers(
+    @Query('recherche') recherche: string
+  ): Promise<MetiersRomeQueryModel[]> {
+    const query: GetMetiersRomeQuery = { recherche }
+    return this.getMetiersRomeQueryHandler.execute(query)
   }
 
   @Get('types-rendezvous')

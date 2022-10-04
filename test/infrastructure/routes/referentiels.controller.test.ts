@@ -26,12 +26,14 @@ import {
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import Structure = Core.Structure
+import { GetMetiersRomeQueryHandler } from '../../../src/application/queries/get-metiers-rome.query.handler.db'
 
 let getCommunesEtDepartementsQueryHandler: StubbedClass<GetCommunesEtDepartementsQueryHandler>
 let getAgencesQueryHandler: StubbedClass<GetAgencesQueryHandler>
 let rechercherTypesDemarcheQueryHandler: StubbedClass<RechercherTypesDemarcheQueryHandler>
 let getMotifsSuppressionCommandHandler: StubbedClass<GetMotifsSuppressionJeuneQueryHandler>
 let getTypesQualificationsQueryHandler: StubbedClass<GetTypesQualificationsQueryHandler>
+let getMetiersRomeQueryHandler: StubbedClass<GetMetiersRomeQueryHandler>
 
 describe('ReferentielsController', () => {
   getCommunesEtDepartementsQueryHandler = stubClass(
@@ -47,6 +49,9 @@ describe('ReferentielsController', () => {
   getTypesQualificationsQueryHandler = stubClass(
     GetTypesQualificationsQueryHandler
   )
+
+  getMetiersRomeQueryHandler = stubClass(GetMetiersRomeQueryHandler)
+
   let app: INestApplication
 
   before(async () => {
@@ -61,6 +66,8 @@ describe('ReferentielsController', () => {
       .useValue(getMotifsSuppressionCommandHandler)
       .overrideProvider(GetTypesQualificationsQueryHandler)
       .useValue(getTypesQualificationsQueryHandler)
+      .overrideProvider(GetMetiersRomeQueryHandler)
+      .useValue(getMetiersRomeQueryHandler)
       .compile()
     app = testingModule.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
@@ -145,6 +152,34 @@ describe('ReferentielsController', () => {
             libelle: 'abcde',
             score: 0.3,
             type: 'COMMUNE'
+          }
+        ])
+    })
+  })
+
+  describe('GET /referentiels/metiers?recherche=boulanger', () => {
+    it('renvoie les codes rome', () => {
+      // Given
+      getMetiersRomeQueryHandler.execute
+        .withArgs({ recherche: 'boulanger' })
+        .resolves([
+          {
+            libelle: 'Boulanger',
+            code: 'D1104',
+            score: 0.3
+          }
+        ])
+
+      // When - Then
+      return request(app.getHttpServer())
+        .get('/referentiels/metiers?recherche=boulanger')
+        .set('Authorization', 'Bearer ceci-est-un-jwt')
+        .expect(HttpStatus.OK)
+        .expect([
+          {
+            code: 'D1104',
+            libelle: 'Boulanger',
+            score: 0.3
           }
         ])
     })

@@ -21,6 +21,7 @@ import { ArchiveJeuneSqlModel } from './archive-jeune.sql-model'
 import { CommentaireSqlModel } from './commentaire.sql-model'
 import { LogApiPartenaireSqlModel } from './log-api-partenaire-sql.model'
 import { SuggestionSqlModel } from './suggestion.sql-model'
+import { MetierRomeSqlModel } from './metier-rome.sql-model'
 
 export const sqlModels = [
   ConseillerSqlModel,
@@ -45,5 +46,6 @@ export const sqlModels = [
   ArchiveJeuneSqlModel,
   CommentaireSqlModel,
   LogApiPartenaireSqlModel,
-  SuggestionSqlModel
+  SuggestionSqlModel,
+  MetierRomeSqlModel
 ]

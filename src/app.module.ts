@@ -249,6 +249,7 @@ import { SuggestionPoleEmploiService } from './domain/offre/recherche/suggestion
 import { RefuserSuggestionCommandHandler } from './application/commands/refuser-suggestion.command.handler'
 import { CreateRechercheFromSuggestionCommandHandler } from './application/commands/create-recherche-from-suggestion.command.handler'
 import { SuggestionAuthorizer } from './application/authorizers/authorize-suggestion'
+import { GetMetiersRomeQueryHandler } from './application/queries/get-metiers-rome.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -573,7 +574,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     RafraichirSuggestionPoleEmploiCommandHandler,
     GetSuggestionsQueryHandler,
     RefuserSuggestionCommandHandler,
-    CreateRechercheFromSuggestionCommandHandler
+    CreateRechercheFromSuggestionCommandHandler,
+    GetMetiersRomeQueryHandler
   ]
 }
 
