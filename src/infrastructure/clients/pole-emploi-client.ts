@@ -4,10 +4,11 @@ import { ConfigService } from '@nestjs/config'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
-import { DateService } from '../../utils/date-service'
-import { ListeTypeDemarchesDto, TypeDemarcheDto } from './dto/pole-emploi.dto'
-import { buildError } from '../../utils/logger.module'
+import { Notification } from '../../domain/notification/notification'
 import { desTypeDemarchesDtosMock } from '../../fixtures/types-demarches.fixture'
+import { DateService } from '../../utils/date-service'
+import { buildError } from '../../utils/logger.module'
+import { RateLimiterService } from '../../utils/rate-limiter.service'
 import {
   NotificationDto,
   NotificationsPartenairesDto,
@@ -16,8 +17,7 @@ import {
   OffresEmploiDtoWithTotal,
   TypeRDVPE
 } from '../repositories/dto/pole-emploi.dto'
-import { RateLimiterService } from '../../utils/rate-limiter.service'
-import { Notification } from '../../domain/notification/notification'
+import { ListeTypeDemarchesDto, TypeDemarcheDto } from './dto/pole-emploi.dto'
 
 const CODE_UTILISATEUR = 0
 
@@ -62,10 +62,23 @@ export class PoleEmploiClient {
       params
     )
     const { resultats } = response.data
-    const contentRange = response.headers['content-range']
-    const contentRangeFormat = new RegExp(/\w+\s\d+-\d+\/(?<total>\d+)/)
-    const total = contentRange.match(contentRangeFormat).groups['total']
-    return { total: parseInt(total, 10), resultats }
+    let total: number
+    try {
+      const contentRange = response.headers['content-range']
+      const totalGroup = contentRange.split('/')[1] // content-range: offres 0-149/716799
+      total = parseInt(totalGroup, 10)
+    } catch (error) {
+      this.logger.error(
+        buildError(
+          "La récupération du nombre total d'offres d'emploi a échoué",
+          error
+        )
+      )
+
+      total = resultats.length
+    }
+
+    return { total, resultats }
   }
 
   async getNotificationsRendezVous(

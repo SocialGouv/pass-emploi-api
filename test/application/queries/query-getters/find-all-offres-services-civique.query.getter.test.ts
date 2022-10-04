@@ -50,6 +50,7 @@ describe('FindAllOffresServicesCiviqueQueryGetter', () => {
           headers: '',
           config: '',
           data: {
+            total: 1,
             hits: [uneOffreServiceCiviqueDto()]
           }
         })
@@ -64,7 +65,9 @@ describe('FindAllOffresServicesCiviqueQueryGetter', () => {
           'v0/mission/search',
           params
         )
-        expect(result).to.be.deep.equal(success([uneOffreServiceCivique()]))
+        expect(result).to.be.deep.equal(
+          success({ total: 1, results: [uneOffreServiceCivique()] })
+        )
       })
       it('avec la deuxième page', async () => {
         // Given
@@ -94,6 +97,7 @@ describe('FindAllOffresServicesCiviqueQueryGetter', () => {
           headers: '',
           config: '',
           data: {
+            total: 1,
             hits: [uneOffreServiceCiviqueDto()]
           }
         })
@@ -108,7 +112,9 @@ describe('FindAllOffresServicesCiviqueQueryGetter', () => {
           'v0/mission/search',
           params
         )
-        expect(result).to.be.deep.equal(success([uneOffreServiceCivique()]))
+        expect(result).to.be.deep.equal(
+          success({ total: 1, results: [uneOffreServiceCivique()] })
+        )
       })
     })
     describe('Quand il y a une erreur', () => {

@@ -71,7 +71,12 @@ describe('GetServicesCiviqueQueryHandler', () => {
       )
 
       // Then
-      expect(result).to.deep.equal(success(serviceCiviqueQueryModels))
+      expect(result).to.deep.equal(
+        success({
+          pagination: { total: serviceCiviqueQueryModels.length },
+          results: serviceCiviqueQueryModels
+        })
+      )
     })
 
     it('retourne des offres avec une page et limite par défaut', async () => {
@@ -101,7 +106,12 @@ describe('GetServicesCiviqueQueryHandler', () => {
       )
 
       // Then
-      expect(result).to.deep.equal(success(offreEngagementQueryModels))
+      expect(result).to.deep.equal(
+        success({
+          pagination: { total: offreEngagementQueryModels.length },
+          results: offreEngagementQueryModels
+        })
+      )
     })
   })
 
