@@ -16,7 +16,7 @@ import { MauvaiseCommandeError } from '../../../../building-blocks/types/domain-
 
 export interface Suggestion {
   id: string
-  idFonctionnel: Suggestion.IdFonctionnel
+  idFonctionnel?: Suggestion.IdFonctionnel
   idJeune: string
   type: Recherche.Type
   informations: {
@@ -79,22 +79,6 @@ export namespace Suggestion {
     delete(id: string): Promise<void>
   }
 
-  function construireIdFonctionnel(
-    suggestionPoleEmploi: PoleEmploi,
-    type: Recherche.Type
-  ): Suggestion.IdFonctionnel {
-    const codeRome = suggestionPoleEmploi.codeRome ?? null
-    return {
-      typeRecherche: type,
-      typeLocalisation: suggestionPoleEmploi.localisation.type,
-      codeLocalisation: suggestionPoleEmploi.localisation.code,
-      codeRome:
-        type !== Recherche.Type.OFFRES_SERVICES_CIVIQUE ? codeRome : null,
-      rayon:
-        suggestionPoleEmploi.localisation.rayon ?? Recherche.DISTANCE_PAR_DEFAUT
-    }
-  }
-
   export function sontEquivalentes(
     suggestion1: Suggestion,
     suggestion2: Suggestion
@@ -104,83 +88,6 @@ export namespace Suggestion {
 
   export function estTraitee(suggestion: Suggestion): boolean {
     return Boolean(suggestion.dateCreationRecherche || suggestion.dateRefus)
-  }
-
-  function construireTitreEtMetierSuggestion(
-    suggestionPoleEmploi: Suggestion.PoleEmploi,
-    type: Recherche.Type
-  ): { titre: string; metier: string } {
-    switch (type) {
-      case Recherche.Type.OFFRES_EMPLOI:
-      case Recherche.Type.OFFRES_ALTERNANCE:
-      case Recherche.Type.OFFRES_IMMERSION:
-        return {
-          titre: suggestionPoleEmploi.titreMetier!,
-          metier: suggestionPoleEmploi.categorieMetier!
-        }
-      case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
-        return {
-          titre:
-            suggestionPoleEmploi.titreMetier ??
-            `Recherche de service civique à ${suggestionPoleEmploi.localisation.libelle}`,
-          metier:
-            suggestionPoleEmploi.categorieMetier ??
-            `Service civique à ${suggestionPoleEmploi.localisation.libelle}`
-        }
-    }
-  }
-
-  function construireLesCriteres(
-    suggestionPoleEmploi: Suggestion.PoleEmploi,
-    type: Recherche.Type
-  ): Recherche.Emploi | Recherche.Immersion | Recherche.ServiceCivique {
-    switch (type) {
-      case Recherche.Type.OFFRES_EMPLOI:
-      case Recherche.Type.OFFRES_ALTERNANCE:
-        return {
-          q: suggestionPoleEmploi.texteRecherche,
-          commune:
-            suggestionPoleEmploi.localisation.type === TypeLocalisation.COMMUNE
-              ? suggestionPoleEmploi.localisation.code
-              : undefined,
-          departement:
-            suggestionPoleEmploi.localisation.type ===
-            TypeLocalisation.DEPARTEMENT
-              ? suggestionPoleEmploi.localisation.code
-              : undefined,
-          rayon:
-            suggestionPoleEmploi.localisation.rayon ??
-            Recherche.DISTANCE_PAR_DEFAUT
-        }
-      case Recherche.Type.OFFRES_IMMERSION:
-        return {
-          rome: suggestionPoleEmploi.codeRome,
-          lat: suggestionPoleEmploi.localisation.lat,
-          lon: suggestionPoleEmploi.localisation.lon,
-          distance:
-            suggestionPoleEmploi.localisation.rayon ??
-            Recherche.DISTANCE_PAR_DEFAUT
-        }
-      case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
-        return {
-          lat: suggestionPoleEmploi.localisation.lat,
-          lon: suggestionPoleEmploi.localisation.lon,
-          domaine: suggestionPoleEmploi.categorieMetier,
-          distance:
-            suggestionPoleEmploi.localisation.rayon ??
-            Recherche.DISTANCE_PAR_DEFAUT
-        }
-    }
-  }
-
-  function suggestionAvecCommuneLatLon(
-    suggestionPoleEmploi: Suggestion.PoleEmploi
-  ): boolean {
-    return Boolean(
-      suggestionPoleEmploi.localisation.type === 'COMMUNE' &&
-        suggestionPoleEmploi.localisation.lat &&
-        suggestionPoleEmploi.localisation.lon
-    )
   }
 
   @Injectable()
@@ -198,7 +105,7 @@ export namespace Suggestion {
       const suggestionsEmploi = suggestionsPoleEmploi
         .filter(this.estUneSuggestionEmploi)
         .map(suggestionPoleEmploi =>
-          this.creerSuggestion(
+          this.creerSuggestionPoleEmploi(
             suggestionPoleEmploi,
             Recherche.Type.OFFRES_EMPLOI,
             idJeune,
@@ -206,9 +113,9 @@ export namespace Suggestion {
           )
         )
       const suggestionsImmersion = suggestionsPoleEmploi
-        .filter(this.estUneSuggestionImmersion)
+        .filter(this.estUneSuggestionImmersion.bind(this))
         .map(suggestionPoleEmploi =>
-          this.creerSuggestion(
+          this.creerSuggestionPoleEmploi(
             suggestionPoleEmploi,
             Recherche.Type.OFFRES_IMMERSION,
             idJeune,
@@ -216,9 +123,9 @@ export namespace Suggestion {
           )
         )
       const suggestionsServiceCivique = suggestionsPoleEmploi
-        .filter(this.estUneSuggestionServiceCivique)
+        .filter(this.estUneSuggestionServiceCivique.bind(this))
         .map(suggestionPoleEmploi =>
-          this.creerSuggestion(
+          this.creerSuggestionPoleEmploi(
             suggestionPoleEmploi,
             Recherche.Type.OFFRES_SERVICES_CIVIQUE,
             idJeune,
@@ -254,26 +161,38 @@ export namespace Suggestion {
       })
     }
 
-    private estUneSuggestionEmploi(suggestionPoleEmploi: PoleEmploi): boolean {
-      return Boolean(suggestionPoleEmploi.codeRome)
+    creerSuggestionConseiller(
+      type: Recherche.Type,
+      idJeune: string,
+      criteres:
+        | Recherche.Emploi
+        | Recherche.Immersion
+        | Recherche.ServiceCivique,
+      localisation: string,
+      titre?: string,
+      metier?: string
+    ): Suggestion {
+      const metierConstruit =
+        metier ?? this.construireMetierSuggestionConseiller(type)
+
+      return {
+        id: this.idService.uuid(),
+        idJeune,
+        idFonctionnel: undefined,
+        dateCreation: this.dateService.now(),
+        dateRafraichissement: this.dateService.now(),
+        type: type,
+        source: Suggestion.Source.CONSEILLER,
+        informations: {
+          titre: titre ?? `${metierConstruit} à ${localisation}`,
+          metier: metierConstruit,
+          localisation
+        },
+        criteres
+      }
     }
 
-    private estUneSuggestionImmersion(
-      suggestionPoleEmploi: PoleEmploi
-    ): boolean {
-      return Boolean(
-        suggestionPoleEmploi.codeRome &&
-          suggestionAvecCommuneLatLon(suggestionPoleEmploi)
-      )
-    }
-
-    private estUneSuggestionServiceCivique(
-      suggestionPoleEmploi: PoleEmploi
-    ): boolean {
-      return Boolean(suggestionAvecCommuneLatLon(suggestionPoleEmploi))
-    }
-
-    private creerSuggestion(
+    private creerSuggestionPoleEmploi(
       suggestionPoleEmploi: PoleEmploi,
       type: Recherche.Type,
       idJeune: string,
@@ -284,15 +203,147 @@ export namespace Suggestion {
         idJeune,
         dateCreation: maintenant,
         dateRafraichissement: maintenant,
-        idFonctionnel: construireIdFonctionnel(suggestionPoleEmploi, type),
+        idFonctionnel: this.construireIdFonctionnel(suggestionPoleEmploi, type),
         type: type,
         source: Suggestion.Source.POLE_EMPLOI,
         informations: {
-          ...construireTitreEtMetierSuggestion(suggestionPoleEmploi, type),
+          ...this.construireTitreEtMetierSuggestionPoleEmploi(
+            suggestionPoleEmploi,
+            type
+          ),
           localisation: suggestionPoleEmploi.localisation.libelle
         },
-        criteres: construireLesCriteres(suggestionPoleEmploi, type)
+        criteres: this.construireCriteresSuggestionsPoleEmploi(
+          suggestionPoleEmploi,
+          type
+        )
       }
+    }
+
+    private construireIdFonctionnel(
+      suggestionPoleEmploi: PoleEmploi,
+      type: Recherche.Type
+    ): Suggestion.IdFonctionnel {
+      const codeRome = suggestionPoleEmploi.codeRome ?? null
+      return {
+        typeRecherche: type,
+        typeLocalisation: suggestionPoleEmploi.localisation.type,
+        codeLocalisation: suggestionPoleEmploi.localisation.code,
+        codeRome:
+          type !== Recherche.Type.OFFRES_SERVICES_CIVIQUE ? codeRome : null,
+        rayon:
+          suggestionPoleEmploi.localisation.rayon ??
+          Recherche.DISTANCE_PAR_DEFAUT
+      }
+    }
+
+    private construireTitreEtMetierSuggestionPoleEmploi(
+      suggestionPoleEmploi: Suggestion.PoleEmploi,
+      type: Recherche.Type
+    ): { titre: string; metier: string } {
+      switch (type) {
+        case Recherche.Type.OFFRES_EMPLOI:
+        case Recherche.Type.OFFRES_ALTERNANCE:
+        case Recherche.Type.OFFRES_IMMERSION:
+          return {
+            titre: suggestionPoleEmploi.titreMetier!,
+            metier: suggestionPoleEmploi.categorieMetier!
+          }
+        case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
+          return {
+            titre:
+              suggestionPoleEmploi.titreMetier ??
+              `Recherche de service civique à ${suggestionPoleEmploi.localisation.libelle}`,
+            metier:
+              suggestionPoleEmploi.categorieMetier ??
+              `Service civique à ${suggestionPoleEmploi.localisation.libelle}`
+          }
+      }
+    }
+
+    private construireMetierSuggestionConseiller(type: Recherche.Type): string {
+      switch (type) {
+        case Recherche.Type.OFFRES_EMPLOI:
+        case Recherche.Type.OFFRES_ALTERNANCE:
+          return "Recherche d'offre d'emploi"
+        case Recherche.Type.OFFRES_IMMERSION:
+          return "Recherche d'immersion"
+        case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
+          return 'Recherche de service civique'
+      }
+    }
+
+    private construireCriteresSuggestionsPoleEmploi(
+      suggestionPoleEmploi: Suggestion.PoleEmploi,
+      type: Recherche.Type
+    ): Recherche.Emploi | Recherche.Immersion | Recherche.ServiceCivique {
+      switch (type) {
+        case Recherche.Type.OFFRES_EMPLOI:
+        case Recherche.Type.OFFRES_ALTERNANCE:
+          return {
+            q: suggestionPoleEmploi.texteRecherche,
+            commune:
+              suggestionPoleEmploi.localisation.type ===
+              TypeLocalisation.COMMUNE
+                ? suggestionPoleEmploi.localisation.code
+                : undefined,
+            departement:
+              suggestionPoleEmploi.localisation.type ===
+              TypeLocalisation.DEPARTEMENT
+                ? suggestionPoleEmploi.localisation.code
+                : undefined,
+            rayon:
+              suggestionPoleEmploi.localisation.rayon ??
+              Recherche.DISTANCE_PAR_DEFAUT
+          }
+        case Recherche.Type.OFFRES_IMMERSION:
+          return {
+            rome: suggestionPoleEmploi.codeRome,
+            lat: suggestionPoleEmploi.localisation.lat,
+            lon: suggestionPoleEmploi.localisation.lon,
+            distance:
+              suggestionPoleEmploi.localisation.rayon ??
+              Recherche.DISTANCE_PAR_DEFAUT
+          }
+        case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
+          return {
+            lat: suggestionPoleEmploi.localisation.lat,
+            lon: suggestionPoleEmploi.localisation.lon,
+            domaine: suggestionPoleEmploi.categorieMetier,
+            distance:
+              suggestionPoleEmploi.localisation.rayon ??
+              Recherche.DISTANCE_PAR_DEFAUT
+          }
+      }
+    }
+
+    private estUneSuggestionEmploi(suggestionPoleEmploi: PoleEmploi): boolean {
+      return Boolean(suggestionPoleEmploi.codeRome)
+    }
+
+    private estUneSuggestionImmersion(
+      suggestionPoleEmploi: PoleEmploi
+    ): boolean {
+      return Boolean(
+        suggestionPoleEmploi.codeRome &&
+          this.suggestionAvecCommuneLatLon(suggestionPoleEmploi)
+      )
+    }
+
+    private estUneSuggestionServiceCivique(
+      suggestionPoleEmploi: PoleEmploi
+    ): boolean {
+      return Boolean(this.suggestionAvecCommuneLatLon(suggestionPoleEmploi))
+    }
+
+    private suggestionAvecCommuneLatLon(
+      suggestionPoleEmploi: Suggestion.PoleEmploi
+    ): boolean {
+      return Boolean(
+        suggestionPoleEmploi.localisation.type === 'COMMUNE' &&
+          suggestionPoleEmploi.localisation.lat &&
+          suggestionPoleEmploi.localisation.lon
+      )
     }
   }
 }

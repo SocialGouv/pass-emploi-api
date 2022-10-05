@@ -16,7 +16,7 @@ export class SuggestionDto extends Model {
   id: string
 
   @Column({ field: 'id_fonctionnel', type: DataType.STRING })
-  idFonctionnel: string
+  idFonctionnel: string | null
 
   @ForeignKey(() => JeuneSqlModel)
   @Column({ field: 'id_jeune', type: DataType.STRING })

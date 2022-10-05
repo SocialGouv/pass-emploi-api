@@ -17,6 +17,7 @@ import * as request from 'supertest'
 import { uneDatetime, uneDatetimeAvecOffset } from 'test/fixtures/date.fixture'
 import { unRendezVousConseillerFutursEtPassesQueryModel } from 'test/fixtures/rendez-vous.fixture'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
+import { CreateSuggestionConseillerOffreEmploiCommandHandler } from '../../../src/application/commands/create-suggestion-conseiller-offre-emploi.command.handler'
 import {
   CreerJeuneMiloCommand,
   CreerJeuneMiloCommandHandler
@@ -25,10 +26,16 @@ import {
   ModifierConseillerCommand,
   ModifierConseillerCommandHandler
 } from '../../../src/application/commands/modifier-conseiller.command.handler'
+import {
+  ModifierJeuneDuConseillerCommand,
+  ModifierJeuneDuConseillerCommandHandler
+} from '../../../src/application/commands/modifier-jeune-du-conseiller.command.handler'
 import { SendNotificationsNouveauxMessagesCommandHandler } from '../../../src/application/commands/send-notifications-nouveaux-messages.command.handler'
 import { GetConseillerByEmailQueryHandler } from '../../../src/application/queries/get-conseiller-by-email.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
+import { GetIndicateursPourConseillerQueryHandler } from '../../../src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-jeunes-by-conseiller.query.handler.db'
+import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 import {
   DossierExisteDejaError,
   DroitsInsuffisants,
@@ -53,6 +60,7 @@ import {
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
 import { unDossierMilo } from '../../fixtures/milo.fixture'
 import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
@@ -63,13 +71,6 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler.db'
-import {
-  ModifierJeuneDuConseillerCommand,
-  ModifierJeuneDuConseillerCommandHandler
-} from '../../../src/application/commands/modifier-jeune-du-conseiller.command.handler'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { GetIndicateursPourConseillerQueryHandler } from '../../../src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 
 describe('ConseillersController', () => {
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
@@ -88,6 +89,7 @@ describe('ConseillersController', () => {
   let getMetadonneesFavorisJeuneQueryHandler: StubbedClass<GetMetadonneesFavorisJeuneQueryHandler>
   let modifierJeuneDuConseillerCommandHandler: StubbedClass<ModifierJeuneDuConseillerCommandHandler>
   let getIndicateursJeunePourConseillerQueryHandler: StubbedClass<GetIndicateursPourConseillerQueryHandler>
+  let createSuggestionDuConseillerCommandHandler: StubbedClass<CreateSuggestionConseillerOffreEmploiCommandHandler>
   let app: INestApplication
 
   let dateService: StubbedClass<DateService>
@@ -132,7 +134,9 @@ describe('ConseillersController', () => {
     getIndicateursJeunePourConseillerQueryHandler = stubClass(
       GetIndicateursPourConseillerQueryHandler
     )
-
+    createSuggestionDuConseillerCommandHandler = stubClass(
+      CreateSuggestionConseillerOffreEmploiCommandHandler
+    )
     dateService = stubClass(DateService)
     dateService.now.returns(now)
 
@@ -171,6 +175,8 @@ describe('ConseillersController', () => {
       .useValue(dateService)
       .overrideProvider(GetIndicateursPourConseillerQueryHandler)
       .useValue(getIndicateursJeunePourConseillerQueryHandler)
+      .overrideProvider(CreateSuggestionConseillerOffreEmploiCommandHandler)
+      .useValue(createSuggestionDuConseillerCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()

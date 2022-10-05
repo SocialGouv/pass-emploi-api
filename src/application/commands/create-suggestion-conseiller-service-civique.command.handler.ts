@@ -1,0 +1,83 @@
+import { Inject } from '@nestjs/common'
+import { Command } from '../../building-blocks/types/command'
+import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
+import {
+  emptySuccess,
+  failure,
+  Result
+} from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Recherche } from '../../domain/offre/recherche/recherche'
+import { SuggestionsRepositoryToken } from '../../domain/offre/recherche/suggestion/suggestion'
+import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import Suggestion = Recherche.Suggestion
+
+export interface CreateSuggestionConseillerServiceCiviqueCommand
+  extends Command {
+  idConseiller: string
+  idsJeunes: string[]
+  titre?: string
+  metier?: string
+  localisation: string
+  criteres: Recherche.ServiceCivique
+}
+
+export class CreateSuggestionConseillerServiceCiviqueCommandHandler extends CommandHandler<
+  CreateSuggestionConseillerServiceCiviqueCommand,
+  void
+> {
+  constructor(
+    private conseillerAuthorizer: ConseillerAuthorizer,
+    @Inject(SuggestionsRepositoryToken)
+    private suggestionRepository: Suggestion.Repository,
+    private suggestionFactory: Suggestion.Factory,
+    @Inject(JeunesRepositoryToken)
+    private jeuneRepository: Jeune.Repository
+  ) {
+    super('CreateSuggestionDuConseillerCommandHandler')
+  }
+
+  async authorize(
+    command: CreateSuggestionConseillerServiceCiviqueCommand,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<Result> {
+    return this.conseillerAuthorizer.authorize(
+      command.idConseiller,
+      utilisateur
+    )
+  }
+
+  async handle(
+    command: CreateSuggestionConseillerServiceCiviqueCommand
+  ): Promise<Result<void>> {
+    const jeunes = await this.jeuneRepository.findAllJeunesByConseiller(
+      command.idsJeunes,
+      command.idConseiller
+    )
+    if (jeunes.length !== command.idsJeunes.length) {
+      return failure(
+        new MauvaiseCommandeError('La liste des jeunes est incorrecte')
+      )
+    }
+
+    for (const jeune of jeunes) {
+      const suggestion: Suggestion =
+        this.suggestionFactory.creerSuggestionConseiller(
+          Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+          jeune.id,
+          command.criteres,
+          command.localisation,
+          command.titre,
+          command.metier
+        )
+      await this.suggestionRepository.save(suggestion)
+    }
+    return emptySuccess()
+  }
+
+  async monitor(): Promise<void> {
+    return
+  }
+}

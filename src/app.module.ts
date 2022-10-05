@@ -157,7 +157,8 @@ import { JeunesControllerV2 } from './infrastructure/routes/v2/jeunes.controller
 import { ConseillersControllerV2 } from './infrastructure/routes/v2/conseillers.controller.v2'
 import { OffresEmploiController } from './infrastructure/routes/offres-emploi.controller'
 import { OffresImmersionController } from './infrastructure/routes/offres-immersion.controller'
-import { RecherchesController } from './infrastructure/routes/recherches.controller'
+import { RecherchesJeunesController } from './infrastructure/routes/recherches-jeunes.controller'
+import { RecherchesConseillersController } from './infrastructure/routes/recherches-conseillers.controller'
 import { ReferentielsController } from './infrastructure/routes/referentiels.controller'
 import { RendezVousController } from './infrastructure/routes/rendez-vous.controller'
 import { ServicesCiviqueController } from './infrastructure/routes/services-civique.controller'
@@ -250,6 +251,9 @@ import { RefuserSuggestionCommandHandler } from './application/commands/refuser-
 import { CreateRechercheFromSuggestionCommandHandler } from './application/commands/create-recherche-from-suggestion.command.handler'
 import { SuggestionAuthorizer } from './application/authorizers/authorize-suggestion'
 import { GetMetiersRomeQueryHandler } from './application/queries/get-metiers-rome.query.handler.db'
+import { CreateSuggestionConseillerOffreEmploiCommandHandler } from './application/commands/create-suggestion-conseiller-offre-emploi.command.handler'
+import { CreateSuggestionConseillerServiceCiviqueCommandHandler } from './application/commands/create-suggestion-conseiller-service-civique.command.handler'
+import { CreateSuggestionConseillerImmersionCommandHandler } from './application/commands/create-suggestion-conseiller-immersion.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -277,7 +281,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     AuthentificationController,
     ReferentielsController,
     EvenementsController,
-    RecherchesController,
+    RecherchesJeunesController,
+    RecherchesConseillersController,
     FavorisController,
     ServicesCiviqueController,
     CampagnesController,
@@ -575,7 +580,10 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetSuggestionsQueryHandler,
     RefuserSuggestionCommandHandler,
     CreateRechercheFromSuggestionCommandHandler,
-    GetMetiersRomeQueryHandler
+    GetMetiersRomeQueryHandler,
+    CreateSuggestionConseillerOffreEmploiCommandHandler,
+    CreateSuggestionConseillerServiceCiviqueCommandHandler,
+    CreateSuggestionConseillerImmersionCommandHandler
   ]
 }
 

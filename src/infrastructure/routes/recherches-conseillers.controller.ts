@@ -1,0 +1,130 @@
+import { Body, Controller, Param, Post } from '@nestjs/common'
+import { ApiOAuth2, ApiOperation, ApiTags } from '@nestjs/swagger'
+import {
+  CreateSuggestionConseillerImmersionCommand,
+  CreateSuggestionConseillerImmersionCommandHandler
+} from 'src/application/commands/create-suggestion-conseiller-immersion.command.handler'
+import {
+  CreateSuggestionConseillerOffreEmploiCommand,
+  CreateSuggestionConseillerOffreEmploiCommandHandler
+} from 'src/application/commands/create-suggestion-conseiller-offre-emploi.command.handler'
+import {
+  CreateSuggestionConseillerServiceCiviqueCommand,
+  CreateSuggestionConseillerServiceCiviqueCommandHandler
+} from 'src/application/commands/create-suggestion-conseiller-service-civique.command.handler'
+import { isFailure } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Utilisateur } from '../decorators/authenticated.decorator'
+import { handleFailure } from './failure.handler'
+import {
+  CreateSuggestionImmersionsPayload,
+  CreateSuggestionOffresEmploiPayload,
+  CreateSuggestionServicesCiviquePayload
+} from './validation/recherches.inputs'
+
+@Controller('conseillers/:idConseiller')
+@ApiOAuth2([])
+@ApiTags('Recherches')
+export class RecherchesConseillersController {
+  constructor(
+    private readonly createSuggestionConseillerOffreEmploiCommandHandler: CreateSuggestionConseillerOffreEmploiCommandHandler,
+    private readonly createSuggestionConseillerImmersionCommandHandler: CreateSuggestionConseillerImmersionCommandHandler,
+    private readonly createSuggestionConseillerServiceCiviqueCommandHandler: CreateSuggestionConseillerServiceCiviqueCommandHandler
+  ) {}
+
+  @ApiOperation({
+    summary: "Crée une suggestion de recherche d'offre d'emploi",
+    description: 'Autorisé pour le conseiller'
+  })
+  @Post('recherches/suggestions/offres-emploi')
+  async creerSuggestionOffreEmploi(
+    @Body() createSuggestionPayload: CreateSuggestionOffresEmploiPayload,
+    @Param('idConseiller') idConseiller: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: CreateSuggestionConseillerOffreEmploiCommand = {
+      idConseiller,
+      idsJeunes: createSuggestionPayload.idsJeunes,
+      titre: createSuggestionPayload.titre,
+      metier: createSuggestionPayload.metier,
+      localisation: createSuggestionPayload.localisation,
+      criteres: {
+        q: createSuggestionPayload.q,
+        commune: createSuggestionPayload.commune,
+        departement: createSuggestionPayload.departement
+      }
+    }
+    const result =
+      await this.createSuggestionConseillerOffreEmploiCommandHandler.execute(
+        command,
+        utilisateur
+      )
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
+  }
+
+  @ApiOperation({
+    summary: "Crée une suggestion de recherche d'offre d'emploi",
+    description: 'Autorisé pour le conseiller'
+  })
+  @Post('recherches/suggestions/immersions')
+  async creerSuggestionImmersion(
+    @Body() createSuggestionPayload: CreateSuggestionImmersionsPayload,
+    @Param('idConseiller') idConseiller: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: CreateSuggestionConseillerImmersionCommand = {
+      idConseiller,
+      idsJeunes: createSuggestionPayload.idsJeunes,
+      titre: createSuggestionPayload.titre,
+      metier: createSuggestionPayload.metier,
+      localisation: createSuggestionPayload.localisation,
+      criteres: {
+        rome: createSuggestionPayload.rome,
+        lat: createSuggestionPayload.lat,
+        lon: createSuggestionPayload.lon
+      }
+    }
+    const result =
+      await this.createSuggestionConseillerImmersionCommandHandler.execute(
+        command,
+        utilisateur
+      )
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
+  }
+
+  @ApiOperation({
+    summary: 'Crée une suggestion de recherche de service civique',
+    description: 'Autorisé pour le conseiller'
+  })
+  @Post('recherches/suggestions/services-civique')
+  async creerSuggestionServiceCivique(
+    @Body()
+    createSuggestionPayload: CreateSuggestionServicesCiviquePayload,
+    @Param('idConseiller') idConseiller: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: CreateSuggestionConseillerServiceCiviqueCommand = {
+      idConseiller,
+      idsJeunes: createSuggestionPayload.idsJeunes,
+      titre: createSuggestionPayload.titre,
+      metier: createSuggestionPayload.metier,
+      localisation: createSuggestionPayload.localisation,
+      criteres: {
+        lat: createSuggestionPayload.lat,
+        lon: createSuggestionPayload.lon
+      }
+    }
+    const result =
+      await this.createSuggestionConseillerServiceCiviqueCommandHandler.execute(
+        command,
+        utilisateur
+      )
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
+  }
+}

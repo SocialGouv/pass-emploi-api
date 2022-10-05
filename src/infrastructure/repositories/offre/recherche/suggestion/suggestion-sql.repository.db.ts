@@ -26,9 +26,11 @@ export class SuggestionSqlRepository implements Suggestion.Repository {
     await SuggestionSqlModel.upsert({
       id: suggestion.id,
       idJeune: suggestion.idJeune,
-      idFonctionnel: Buffer.from(
-        JSON.stringify(suggestion.idFonctionnel)
-      ).toString('base64'),
+      idFonctionnel: suggestion.idFonctionnel
+        ? Buffer.from(JSON.stringify(suggestion.idFonctionnel)).toString(
+            'base64'
+          )
+        : undefined,
       type: suggestion.type,
       source: suggestion.source,
       dateCreation: suggestion.dateCreation,
@@ -56,9 +58,11 @@ function fromSqlToSuggestion(suggestionSql: SuggestionSqlModel): Suggestion {
   return {
     id: suggestionSql.id,
     idJeune: suggestionSql.idJeune,
-    idFonctionnel: JSON.parse(
-      Buffer.from(suggestionSql.idFonctionnel, 'base64').toString()
-    ),
+    idFonctionnel: suggestionSql.idFonctionnel
+      ? JSON.parse(
+          Buffer.from(suggestionSql.idFonctionnel, 'base64').toString()
+        )
+      : undefined,
     type: suggestionSql.type,
     source: suggestionSql.source,
     dateCreation: DateTime.fromJSDate(suggestionSql.dateCreation),

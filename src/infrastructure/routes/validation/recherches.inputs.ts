@@ -1,11 +1,15 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
+  ArrayNotEmpty,
+  IsArray,
   IsBoolean,
   IsDefined,
   IsIn,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
+  ValidateIf,
   ValidateNested
 } from 'class-validator'
 import { FindOffresEmploiQueryBody } from './offres-emploi.inputs'
@@ -85,4 +89,76 @@ export class GetRecherchesQueryParams {
   @IsIn([true, false])
   @Transform(params => transformStringToBoolean(params, 'avecGeometrie'))
   avecGeometrie?: boolean
+}
+
+class CreateSuggestionBase {
+  @ApiProperty()
+  @IsArray()
+  @ArrayNotEmpty()
+  idsJeunes: string[]
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  titre?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  metier?: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  localisation: string
+}
+
+export class CreateSuggestionOffresEmploiPayload extends CreateSuggestionBase {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  q: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @ValidateIf(payload => !payload.departement)
+  commune?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @ValidateIf(payload => !payload.commune)
+  departement?: string
+}
+
+export class CreateSuggestionImmersionsPayload extends CreateSuggestionBase {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  rome: string
+
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  lat: number
+
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  lon: number
+}
+
+export class CreateSuggestionServicesCiviquePayload extends CreateSuggestionBase {
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  lat: number
+
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  lon: number
 }
