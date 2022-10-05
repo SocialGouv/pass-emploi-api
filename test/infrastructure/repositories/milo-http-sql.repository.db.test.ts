@@ -70,6 +70,7 @@ describe('MiloHttpRepository', () => {
             prenom: 'Olivier',
             codePostal: '65410',
             dateDeNaissance: '1997-05-08',
+            dateFinCEJ: undefined,
             situations: [
               {
                 categorie: "Demandeur d'emploi",

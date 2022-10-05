@@ -4,6 +4,7 @@ import {
   DetailJeuneQueryModel
 } from '../query-models/jeunes.query-model'
 import { Situation } from '../../../infrastructure/sequelize/models/situations-milo.sql-model'
+import { DateService } from 'src/utils/date-service'
 
 export function fromSqlToDetailJeuneQueryModel(
   jeuneSqlModel: JeuneSqlModel,
@@ -19,6 +20,9 @@ export function fromSqlToDetailJeuneQueryModel(
     lastName: jeuneSqlModel.nom,
     email: jeuneSqlModel.email ?? undefined,
     creationDate: jeuneSqlModel.dateCreation.toISOString(),
+    dateFinCEJ: jeuneSqlModel.dateFinCEJ
+      ? DateService.fromJSDateToISOString(jeuneSqlModel.dateFinCEJ)
+      : undefined,
     datePremiereConnexion: jeuneSqlModel.datePremiereConnexion?.toISOString(),
     isActivated: Boolean(jeuneSqlModel.datePremiereConnexion),
     isReaffectationTemporaire: Boolean(jeuneSqlModel.idConseillerInitial),

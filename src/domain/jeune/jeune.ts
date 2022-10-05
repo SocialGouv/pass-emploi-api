@@ -18,6 +18,7 @@ export interface Jeune {
   firstName: string
   lastName: string
   creationDate: DateTime
+  dateFinCEJ?: DateTime
   structure: Core.Structure
   isActivated: boolean
   conseiller?: Jeune.Conseiller
@@ -192,6 +193,16 @@ export namespace Jeune {
 
   export function estSuiviTemporairement(jeune: Jeune): boolean {
     return Boolean(jeune.conseillerInitial)
+  }
+
+  export function mettreAJour(
+    jeune: Jeune,
+    infosJeuneAMettreAJour: Pick<Jeune, 'dateFinCEJ'>
+  ): Jeune {
+    return {
+      ...jeune,
+      dateFinCEJ: infosJeuneAMettreAJour.dateFinCEJ
+    }
   }
 }
 

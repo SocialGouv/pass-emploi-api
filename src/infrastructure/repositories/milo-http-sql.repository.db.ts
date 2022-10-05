@@ -3,6 +3,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { firstValueFrom } from 'rxjs'
+import { DateService } from 'src/utils/date-service'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Milo } from '../../domain/milo'
@@ -47,6 +48,9 @@ export class MiloHttpSqlRepository implements Milo.Repository {
         email: dossierDto.data.mail ?? undefined,
         codePostal: dossierDto.data.adresse?.codePostal ?? '',
         dateDeNaissance: dossierDto.data.dateNaissance,
+        dateFinCEJ: DateService.fromStringToDateTime(
+          dossierDto.data.accompagnementCEJ.dateFinPrevue
+        ),
         situations: dossierDto.data.situations.map(situation => {
           return {
             etat: situation.etat,

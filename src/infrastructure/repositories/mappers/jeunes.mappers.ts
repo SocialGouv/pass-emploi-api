@@ -64,6 +64,7 @@ export function toSqlJeune(
     idConseiller: jeune.conseiller?.id,
     idConseillerInitial: jeune.conseillerInitial?.id ?? null,
     dateCreation: jeune.creationDate.toJSDate(),
+    dateFinCEJ: jeune.dateFinCEJ?.toJSDate() ?? null,
     email: jeune.email ?? null,
     structure: jeune.structure,
     idPartenaire: jeune.idPartenaire ?? null,

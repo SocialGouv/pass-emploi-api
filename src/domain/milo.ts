@@ -1,4 +1,5 @@
 import { Result } from '../building-blocks/types/result'
+import { DateTime } from 'luxon'
 
 export const MiloRepositoryToken = 'Milo.Repository'
 
@@ -38,6 +39,7 @@ export namespace Milo {
     email?: string
     codePostal: string
     situations: Situation[]
+    dateFinCEJ?: DateTime
   }
 
   export interface Repository {

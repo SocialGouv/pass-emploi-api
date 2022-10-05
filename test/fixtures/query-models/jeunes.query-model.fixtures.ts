@@ -46,7 +46,8 @@ export function unDetailJeuneQueryModel(
     isReaffectationTemporaire: false,
     conseiller: unConseillerJeuneQueryModel(),
     urlDossier: undefined,
-    idPartenaire: '1234'
+    idPartenaire: '1234',
+    dateFinCEJ: undefined
   }
 
   return { ...defaults, ...args }

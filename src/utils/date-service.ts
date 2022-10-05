@@ -42,4 +42,10 @@ export class DateService {
   static fromJSDateToISOString(date: Date): string {
     return DateTime.fromJSDate(date).toISO()
   }
+
+  static fromStringToDateTime(
+    dateString?: string | null
+  ): DateTime | undefined {
+    return dateString ? DateTime.fromISO(dateString) : undefined
+  }
 }

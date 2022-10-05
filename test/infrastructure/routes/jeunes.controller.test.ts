@@ -484,10 +484,10 @@ describe('JeunesController', () => {
 
   describe('GET /jeunes/:idJeune', () => {
     const idJeune = '1'
-    it('renvoit le jeune quand il existe', async () => {
+    it('renvoie le jeune quand il existe', async () => {
       // Given
       const detailJeuneQueryModel: DetailJeuneQueryModel =
-        unDetailJeuneQueryModel()
+        unDetailJeuneQueryModel({ dateFinCEJ: uneDatetime().toISO() })
       getDetailJeuneQueryHandler.execute.resolves(
         success(detailJeuneQueryModel)
       )

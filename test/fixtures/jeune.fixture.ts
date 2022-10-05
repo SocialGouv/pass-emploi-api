@@ -5,7 +5,9 @@ import { uneDate, uneDatetime } from './date.fixture'
 
 export const unJeune = (
   args: Partial<Jeune> = {}
-): Required<Omit<Jeune, 'conseillerInitial' | 'configuration'>> => {
+): Required<
+  Omit<Jeune, 'conseillerInitial' | 'configuration' | 'dateFinCEJ'>
+> => {
   const defaults = {
     id: 'ABCDE',
     lastName: 'Doe',
