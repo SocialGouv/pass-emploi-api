@@ -12,7 +12,7 @@ import { uneAction } from '../fixtures/action.fixture'
 
 describe('Planificateur', () => {
   describe('Service', () => {
-    const today = DateTime.fromISO('2020-04-06T12:00:00.000Z').toUTC()
+    const today = DateTime.fromISO('2020-04-06T12:00:00.000Z')
     let planificateurService: PlanificateurService
     let planificateurRepository: StubbedType<Planificateur.Repository>
     let dateService: StubbedType<DateService>
@@ -123,9 +123,7 @@ describe('Planificateur', () => {
 
         // Then
         const job: Planificateur.Job<Planificateur.JobRappelAction> = {
-          date: DateTime.fromJSDate(action.dateEcheance)
-            .minus({ days: 3 })
-            .toJSDate(),
+          date: action.dateEcheance.minus({ days: 3 }).toJSDate(),
           type: Planificateur.JobEnum.RAPPEL_ACTION,
           contenu: { idAction: action.id }
         }

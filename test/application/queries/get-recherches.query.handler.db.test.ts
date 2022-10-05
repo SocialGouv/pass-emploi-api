@@ -49,9 +49,9 @@ describe('GetRecherchesQueryHandler', () => {
         unJeuneDto({
           id: 'idJeune',
           idConseiller: conseillerDto.id,
-          dateCreation: uneDatetime.toJSDate(),
+          dateCreation: uneDatetime().toJSDate(),
           pushNotificationToken: 'unToken',
-          dateDerniereActualisationToken: uneDatetime.toJSDate()
+          dateDerniereActualisationToken: uneDatetime().toJSDate()
         })
       )
       const rechercheSqlRepository = new RechercheSqlRepository(

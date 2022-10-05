@@ -104,6 +104,7 @@ import {
 } from '../../application/queries/query-models/home-jeune-suivi.query-model'
 import { GetJeuneHomeAgendaQueryHandler } from '../../application/queries/get-jeune-home-agenda.query.db'
 import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
+import { DateTime } from 'luxon'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -516,9 +517,9 @@ export class JeunesController {
       typeCreateur: Action.TypeCreateur.JEUNE,
       commentaire: createActionPayload.comment,
       statut: createActionPayload.status,
-      dateEcheance:
-        createActionPayload.dateEcheance ??
-        this.buildDateEcheanceV1(createActionPayload.status),
+      dateEcheance: createActionPayload.dateEcheance
+        ? DateTime.fromISO(createActionPayload.dateEcheance, { setZone: true })
+        : this.buildDateEcheanceV1(createActionPayload.status),
       rappel: createActionPayload.dateEcheance
         ? createActionPayload.rappel
         : false
@@ -653,15 +654,14 @@ export class JeunesController {
     throw handleFailure(result)
   }
 
-  private buildDateEcheanceV1(statutAction?: Action.Statut): Date {
+  private buildDateEcheanceV1(statutAction?: Action.Statut): DateTime {
     const statutsDone = [Action.Statut.ANNULEE, Action.Statut.TERMINEE]
 
     const now = this.dateService.now().set({ second: 59, millisecond: 0 })
-    const nowJs = now.toJSDate()
 
     if (statutAction && statutsDone.includes(statutAction)) {
-      return nowJs
+      return now
     }
-    return now.plus({ months: 3 }).toJSDate()
+    return now.plus({ months: 3 })
   }
 }

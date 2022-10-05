@@ -7,6 +7,7 @@ import { Injectable } from '@nestjs/common'
 import { SuggestionQueryModel } from './query-models/suggestion.query-model'
 import { SuggestionSqlModel } from '../../infrastructure/sequelize/models/suggestion.sql-model'
 import { Op } from 'sequelize'
+import { DateTime } from 'luxon'
 
 export interface GetSuggestionsQuery extends Query {
   idJeune: string
@@ -39,8 +40,10 @@ export class GetSuggestionsQueryHandler extends QueryHandler<
       type: suggestionSql.type,
       metier: suggestionSql.metier,
       localisation: suggestionSql.localisation,
-      dateCreation: suggestionSql.dateCreation.toISOString(),
-      dateRafraichissement: suggestionSql.dateRafraichissement.toISOString()
+      dateCreation: DateTime.fromJSDate(suggestionSql.dateCreation).toISO(),
+      dateRafraichissement: DateTime.fromJSDate(
+        suggestionSql.dateRafraichissement
+      ).toISO()
     }))
   }
 

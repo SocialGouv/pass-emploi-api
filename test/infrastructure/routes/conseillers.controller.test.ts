@@ -14,7 +14,7 @@ import { CreateActionPayload } from 'src/infrastructure/routes/validation/action
 import { CreateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
 import { DateService } from 'src/utils/date-service'
 import * as request from 'supertest'
-import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
+import { uneDatetime, uneDatetimeAvecOffset } from 'test/fixtures/date.fixture'
 import { unRendezVousConseillerFutursEtPassesQueryModel } from 'test/fixtures/rendez-vous.fixture'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
 import {
@@ -91,7 +91,7 @@ describe('ConseillersController', () => {
   let app: INestApplication
 
   let dateService: StubbedClass<DateService>
-  const now = uneDatetime.set({ second: 59, millisecond: 0 })
+  const now = uneDatetime().set({ second: 59, millisecond: 0 })
 
   before(async () => {
     getConseillerByEmailQueryHandler = stubClass(
@@ -401,7 +401,7 @@ describe('ConseillersController', () => {
   })
 
   describe('POST /conseillers/:idConseiller/jeunes/:idJeune/action', () => {
-    const nowJsPlus3Mois = now.plus({ months: 3 }).toJSDate()
+    const nowJsPlus3Mois = now.plus({ months: 3 })
 
     it("renvoie l'id de l'action créée sans dateEcheance", async () => {
       // Given
@@ -438,7 +438,7 @@ describe('ConseillersController', () => {
       const actionPayload: CreateActionPayload = {
         content: "Ceci est un contenu d'action",
         comment: 'Ceci est un commentaire',
-        dateEcheance: uneDate()
+        dateEcheance: uneDatetimeAvecOffset().toISO()
       }
       const idAction = '15916d7e-f13a-4158-b7eb-3936aa937a0a'
       createActionCommandHandler.execute.resolves(success(idAction))
@@ -458,7 +458,7 @@ describe('ConseillersController', () => {
           idCreateur: '1',
           typeCreateur: Action.TypeCreateur.CONSEILLER,
           commentaire: 'Ceci est un commentaire',
-          dateEcheance: uneDate(),
+          dateEcheance: uneDatetimeAvecOffset(),
           rappel: true
         },
         unUtilisateurDecode()
@@ -546,7 +546,7 @@ describe('ConseillersController', () => {
           const payload: CreateRendezVousPayload = {
             jeunesIds: ['1'],
             comment: '',
-            date: uneDatetime.toJSDate().toISOString(),
+            date: uneDatetime().toJSDate().toISOString(),
             duration: 30,
             modality: 'rdv',
             invitation: true
@@ -586,7 +586,7 @@ describe('ConseillersController', () => {
           const payload: CreateRendezVousPayload = {
             jeunesIds: ['1'],
             comment: '',
-            date: uneDatetime.toJSDate().toISOString(),
+            date: uneDatetime().toJSDate().toISOString(),
             duration: 30,
             type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
           }
@@ -605,7 +605,7 @@ describe('ConseillersController', () => {
           const payload: CreateRendezVousPayload = {
             jeunesIds: ['1'],
             comment: '',
-            date: uneDatetime.toJSDate().toISOString(),
+            date: uneDatetime().toJSDate().toISOString(),
             duration: 30
           }
           createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
@@ -623,7 +623,7 @@ describe('ConseillersController', () => {
           const payload: CreateRendezVousPayload = {
             jeunesIds: ['1'],
             comment: '',
-            date: uneDatetime.toJSDate().toISOString(),
+            date: uneDatetime().toJSDate().toISOString(),
             duration: 30,
             type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
             presenceConseiller: true
@@ -643,7 +643,7 @@ describe('ConseillersController', () => {
           const payload: CreateRendezVousPayload = {
             jeunesIds: ['1'],
             comment: '',
-            date: uneDatetime.toJSDate().toISOString(),
+            date: uneDatetime().toJSDate().toISOString(),
             duration: 30,
             presenceConseiller: true
           }
@@ -662,7 +662,7 @@ describe('ConseillersController', () => {
           const payload: CreateRendezVousPayload = {
             jeunesIds: ['1'],
             comment: '',
-            date: uneDatetime.toJSDate().toISOString(),
+            date: uneDatetime().toJSDate().toISOString(),
             duration: 30,
             type: CodeTypeRendezVous.AUTRE,
             precision: 'aa'
@@ -685,7 +685,7 @@ describe('ConseillersController', () => {
           const payload: CreateRendezVousPayload = {
             jeunesIds: ['1'],
             comment: '',
-            date: uneDatetime.toJSDate().toISOString(),
+            date: uneDatetime().toJSDate().toISOString(),
             duration: 30,
             modality: 'rdv',
             invitation: true
@@ -744,7 +744,7 @@ describe('ConseillersController', () => {
         const payload: CreateRendezVousPayload = {
           jeunesIds: ['1'],
           comment: '',
-          date: uneDatetime.toJSDate().toISOString(),
+          date: uneDatetime().toJSDate().toISOString(),
           duration: 30,
           type: 'blabla'
         }
@@ -762,7 +762,7 @@ describe('ConseillersController', () => {
         const payload: CreateRendezVousPayload = {
           jeunesIds: ['1'],
           comment: '',
-          date: uneDatetime.toJSDate().toISOString(),
+          date: uneDatetime().toJSDate().toISOString(),
           duration: 30,
           type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
           presenceConseiller: false
@@ -781,7 +781,7 @@ describe('ConseillersController', () => {
         const payload: CreateRendezVousPayload = {
           jeunesIds: ['1'],
           comment: '',
-          date: uneDatetime.toJSDate().toISOString(),
+          date: uneDatetime().toJSDate().toISOString(),
           duration: 30,
           presenceConseiller: false
         }
@@ -799,7 +799,7 @@ describe('ConseillersController', () => {
         const payload: CreateRendezVousPayload = {
           jeunesIds: ['1'],
           comment: '',
-          date: uneDatetime.toJSDate().toISOString(),
+          date: uneDatetime().toJSDate().toISOString(),
           duration: 30,
           type: CodeTypeRendezVous.AUTRE
         }

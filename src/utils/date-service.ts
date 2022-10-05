@@ -35,7 +35,7 @@ export class DateService {
     return dateAComparer >= dateMin && dateAComparer <= dateMax
   }
 
-  fromISOStringToUTCJSDate(stringISO: string): Date {
-    return DateTime.fromISO(stringISO).toUTC().toJSDate()
+  fromISOStringToJSDate(stringISO: string): Date {
+    return DateTime.fromISO(stringISO).toJSDate()
   }
 }

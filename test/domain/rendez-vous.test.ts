@@ -20,7 +20,7 @@ describe('Rendez-vous', () => {
       idsJeunes: ['1'],
       idConseiller: '41',
       commentaire: '',
-      date: uneDatetime.toJSDate().toISOString(),
+      date: uneDatetime().toJSDate().toISOString(),
       duree: 10
     }
     const conseiller = unConseiller()

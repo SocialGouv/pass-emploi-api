@@ -21,13 +21,14 @@ import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { QualificationActionQueryModel } from '../queries/query-models/actions.query-model'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Command } from '../../building-blocks/types/command'
+import { DateTime } from 'luxon'
 
 export interface QualifierActionCommand extends Command {
   idAction: string
   codeQualification: Action.Qualification.Code
   utilisateur: Authentification.Utilisateur
-  dateDebut?: Date
-  dateFinReelle?: Date
+  dateDebut?: DateTime
+  dateFinReelle?: DateTime
 }
 
 @Injectable()

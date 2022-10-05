@@ -1,8 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { Transform } from 'class-transformer'
 import {
   IsBoolean,
-  IsDate,
+  IsDateString,
   IsEnum,
   IsNotEmpty,
   IsNotIn,
@@ -32,16 +31,14 @@ export class QualifierActionPayload {
   codeQualification: Action.Qualification.Code
 
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
-  @IsDate()
+  @IsDateString()
   @IsOptional()
-  @Transform(({ value }) => new Date(value))
-  dateDebut?: Date
+  dateDebut?: string
 
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
-  @IsDate()
+  @IsDateString()
   @IsOptional()
-  @Transform(({ value }) => new Date(value))
-  dateFinReelle?: Date
+  dateFinReelle?: string
 }
 
 export class CreateActionPayload {
@@ -57,9 +54,8 @@ export class CreateActionPayload {
 
   @IsOptional()
   @IsNotEmpty()
-  @IsDate()
-  @Transform(({ value }) => new Date(value))
-  dateEcheance?: Date
+  @IsDateString()
+  dateEcheance?: string
 }
 
 export class CreateActionParLeJeunePayload extends CreateActionPayload {

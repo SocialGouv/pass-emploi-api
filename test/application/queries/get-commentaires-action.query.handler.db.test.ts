@@ -14,7 +14,7 @@ import { unCommentaire, uneAction } from '../../fixtures/action.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { CommentaireActionSqlRepositoryDb } from '../../../src/infrastructure/repositories/commentaire-action-sql.repository.db'
 import { Action } from 'src/domain/action/action'
-import { uneAutreDate, uneDate } from '../../fixtures/date.fixture'
+import { uneAutreDatetime, uneDatetime } from '../../fixtures/date.fixture'
 import { CommentaireActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
 import { success } from '../../../src/building-blocks/types/result'
 
@@ -76,7 +76,7 @@ describe('GetCommentairesActionQueryHandler', () => {
         unCommentaire({
           id: '15e0cf2e-e082-47f1-8cee-e2aa18fd8918',
           message: 'message 2',
-          date: uneAutreDate(),
+          date: uneAutreDatetime(),
           idAction: action.id
         })
       )
@@ -84,7 +84,7 @@ describe('GetCommentairesActionQueryHandler', () => {
         unCommentaire({
           id: 'fe6c4205-afc2-42d0-931b-edd96a9823a9',
           message: 'message 1',
-          date: uneDate(),
+          date: uneDatetime(),
           idAction: action.id
         })
       )
@@ -99,7 +99,7 @@ describe('GetCommentairesActionQueryHandler', () => {
         {
           id: 'fe6c4205-afc2-42d0-931b-edd96a9823a9',
           message: 'message 1',
-          date: uneDate(),
+          date: uneDatetime().toJSDate(),
           createur: {
             id: 'poi-id-createur',
             nom: 'poi-nom',
@@ -110,7 +110,7 @@ describe('GetCommentairesActionQueryHandler', () => {
         {
           id: '15e0cf2e-e082-47f1-8cee-e2aa18fd8918',
           message: 'message 2',
-          date: uneAutreDate(),
+          date: uneAutreDatetime().toJSDate(),
           createur: {
             id: 'poi-id-createur',
             nom: 'poi-nom',

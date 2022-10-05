@@ -81,8 +81,8 @@ describe('GetCampagneQueryModel', () => {
         // Then
         expect(campagne).to.be.deep.equal({
           id: campagneEnCours.id,
-          dateDebut: campagneEnCours.dateDebut.toUTC().toString(),
-          dateFin: campagneEnCours.dateFin.toUTC().toString(),
+          dateDebut: campagneEnCours.dateDebut.toISO(),
+          dateFin: campagneEnCours.dateFin.toISO(),
           titre: "Votre expérience sur l'application",
           description:
             "Aidez-nous à améliorer l'application en répondant à 2 questions",
@@ -110,8 +110,8 @@ describe('GetCampagneQueryModel', () => {
         // Then
         expect(campagne).to.be.deep.equal({
           id: campagneEnCours.id,
-          dateDebut: campagneEnCours.dateDebut.toUTC().toString(),
-          dateFin: campagneEnCours.dateFin.toUTC().toString(),
+          dateDebut: campagneEnCours.dateDebut.toISO(),
+          dateFin: campagneEnCours.dateFin.toISO(),
           titre: "Votre expérience sur l'application",
           description:
             "Aidez-nous à améliorer l'application en répondant à 2 questions",

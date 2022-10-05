@@ -2,11 +2,12 @@ import { Action } from './action'
 import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
 import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
 
 export interface Commentaire {
   id: string
   idAction: string
-  date: Date
+  date: DateTime
   createur: Action.Createur
   message: string
 }
@@ -31,7 +32,7 @@ export namespace Commentaire {
       return {
         id: this.idService.uuid(),
         idAction: action.id,
-        date: this.dateService.nowJs(),
+        date: this.dateService.now(),
         createur,
         message
       }

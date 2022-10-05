@@ -28,7 +28,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
     notificationSupportService = stubInterface(sandbox)
 
     dateService = stubClass(DateService)
-    dateService.now.returns(uneDatetime)
+    dateService.now.returns(uneDatetime())
 
     handleJobMailConseillerCommandHandler =
       new HandleJobMailConseillerCommandHandler(

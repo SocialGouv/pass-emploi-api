@@ -7,8 +7,8 @@ export const uneCampagne = (args: Partial<Campagne> = {}): Campagne => {
   const defaults: Campagne = {
     id: '721e2108-60f5-4a75-b102-04fe6a40e899',
     nom: 'Premiere campagne',
-    dateDebut: uneDatetime,
-    dateFin: uneDatetime.plus({ week: 2 })
+    dateDebut: uneDatetime(),
+    dateFin: uneDatetime().plus({ week: 2 })
   }
 
   return { ...defaults, ...args }
@@ -30,10 +30,10 @@ export const uneEvaluationIncomplete = (
 ): Campagne.Evaluation => ({
   jeune: {
     id: 'idJeune',
-    dateCreation: uneDatetime,
+    dateCreation: uneDatetime(),
     structure: 'MILO'
   },
-  date: uneDatetime,
+  date: uneDatetime(),
   idCampagne: campagne.id,
   reponses: [
     {
@@ -49,10 +49,10 @@ export const uneEvaluationComplete = (
 ): Campagne.Evaluation => ({
   jeune: {
     id: 'idJeune',
-    dateCreation: uneDatetime,
+    dateCreation: uneDatetime(),
     structure: 'MILO'
   },
-  date: uneDatetime,
+  date: uneDatetime(),
   idCampagne: campagne.id,
   reponses: [
     {

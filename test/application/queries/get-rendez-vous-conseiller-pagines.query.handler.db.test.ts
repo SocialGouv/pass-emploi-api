@@ -26,7 +26,7 @@ describe('GetRendezVousConseillerPaginesQueryHandler', () => {
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getRendezVousConseillerPaginesQueryHandler: GetRendezVousConseillerPaginesQueryHandler
 
-  const maintenant = uneDatetime
+  const maintenant = uneDatetime()
   let unRendezVousPasse: AsSql<RendezVousDto>
   let unRendezVousTresPasse: AsSql<RendezVousDto>
   let unRendezVousFutur: AsSql<RendezVousDto>

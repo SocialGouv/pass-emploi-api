@@ -11,10 +11,10 @@ export function fromSqlToRecherche(rechercheSql: RechercheSqlModel): Recherche {
     localisation: rechercheSql.localisation ?? undefined,
     criteres: rechercheSql.criteres ?? undefined,
     idJeune: rechercheSql.idJeune,
-    dateCreation: DateTime.fromJSDate(rechercheSql.dateCreation).toUTC(),
+    dateCreation: DateTime.fromJSDate(rechercheSql.dateCreation),
     dateDerniereRecherche: DateTime.fromJSDate(
       rechercheSql.dateDerniereRecherche
-    ).toUTC(),
+    ),
     etat: rechercheSql.etatDerniereRecherche
   }
 }

@@ -90,8 +90,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
           dateDerniereActualisation: DateTime.fromISO(
             '2020-04-06T12:00:00.000Z'
           )
-            .toUTC()
-            .toJSDate()
         })
         const actionTerminee2 = uneAction({
           id: '02b3710e-7779-11ec-90d6-0242ac120002',
@@ -100,8 +98,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
           dateDerniereActualisation: DateTime.fromISO(
             '2020-04-12T12:00:00.000Z'
           )
-            .toUTC()
-            .toJSDate()
         })
         const actionTerminee3 = uneAction({
           id: '02b3710e-7779-11ec-90d6-0242ac120003',
@@ -110,8 +106,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
           dateDerniereActualisation: DateTime.fromISO(
             '2020-04-10T12:00:00.000Z'
           )
-            .toUTC()
-            .toJSDate()
         })
         await actionSqlRepository.save(actionTerminee1)
         await actionSqlRepository.save(actionTerminee2)
@@ -153,8 +147,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
           dateDerniereActualisation: DateTime.fromISO(
             '2020-04-10T12:00:00.000Z'
           )
-            .toUTC()
-            .toJSDate()
         })
         const actionEnCours1 = uneAction({
           id: '02b3710e-7779-11ec-90d6-0242ac120002',
@@ -163,8 +155,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
           dateDerniereActualisation: DateTime.fromISO(
             '2020-04-06T12:00:00.000Z'
           )
-            .toUTC()
-            .toJSDate()
         })
         const actionEnCours2 = uneAction({
           id: '02b3710e-7779-11ec-90d6-0242ac120003',
@@ -173,8 +163,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
           dateDerniereActualisation: DateTime.fromISO(
             '2020-04-12T12:00:00.000Z'
           )
-            .toUTC()
-            .toJSDate()
         })
         await actionSqlRepository.save(actionPasCommencee)
         await actionSqlRepository.save(actionEnCours1)
@@ -207,8 +195,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
           dateDerniereActualisation: DateTime.fromISO(
             '2020-04-05T12:00:00.000Z'
           )
-            .toUTC()
-            .toJSDate()
         })
         const actionEnCours = uneAction({
           id: '02b3710e-7779-11ec-90d6-0242ac120002',
@@ -217,8 +203,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
           dateDerniereActualisation: DateTime.fromISO(
             '2020-04-06T12:00:00.000Z'
           )
-            .toUTC()
-            .toJSDate()
         })
         const actionTerminee1 = uneAction({
           id: '02b3710e-7779-11ec-90d6-0242ac120003',
@@ -227,8 +211,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
           dateDerniereActualisation: DateTime.fromISO(
             '2020-04-07T12:00:00.000Z'
           )
-            .toUTC()
-            .toJSDate()
         })
         const actionTerminee2 = uneAction({
           id: '02b3710e-7779-11ec-90d6-0242ac120004',
@@ -237,8 +219,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
           dateDerniereActualisation: DateTime.fromISO(
             '2020-04-08T12:00:00.000Z'
           )
-            .toUTC()
-            .toJSDate()
         })
         await actionSqlRepository.save(actionPasCommencee)
         await actionSqlRepository.save(actionEnCours)
@@ -307,8 +287,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
             dateDerniereActualisation: DateTime.fromISO(
               '2020-04-05T12:00:00.000Z'
             )
-              .toUTC()
-              .toJSDate()
           })
           await actionSqlRepository.save(actionPage1)
         }
@@ -319,8 +297,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
           dateDerniereActualisation: DateTime.fromISO(
             '2020-04-05T12:00:00.000Z'
           )
-            .toUTC()
-            .toJSDate()
         })
         await actionSqlRepository.save(actionPage2)
 
@@ -348,32 +324,24 @@ describe('GetActionsByJeuneQueryHandler', () => {
           idJeune: jeune.id,
           statut: Action.Statut.PAS_COMMENCEE,
           dateCreation: DateTime.fromISO('2020-04-05T12:00:00.000Z')
-            .toUTC()
-            .toJSDate()
         })
         const actionEnCours = uneAction({
           id: '02b3710e-7779-11ec-90d6-0242ac120002',
           idJeune: jeune.id,
           statut: Action.Statut.EN_COURS,
           dateCreation: DateTime.fromISO('2020-04-06T12:00:00.000Z')
-            .toUTC()
-            .toJSDate()
         })
         const actionCanceled = uneAction({
           id: '02b3710e-7779-11ec-90d6-0242ac120003',
           idJeune: jeune.id,
           statut: Action.Statut.ANNULEE,
           dateCreation: DateTime.fromISO('2020-04-07T12:00:00.000Z')
-            .toUTC()
-            .toJSDate()
         })
         const actionTermineeRecente = uneAction({
           id: '02b3710e-7779-11ec-90d6-0242ac120004',
           idJeune: jeune.id,
           statut: Action.Statut.TERMINEE,
           dateCreation: DateTime.fromISO('2020-04-03T12:00:00.000Z')
-            .toUTC()
-            .toJSDate()
         })
         await actionSqlRepository.save(actionPasCommencee)
         await actionSqlRepository.save(actionEnCours)
@@ -410,8 +378,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
           dateDerniereActualisation: DateTime.fromISO(
             '2020-04-05T12:00:00.000Z'
           )
-            .toUTC()
-            .toJSDate()
         })
         const actionEnCours = uneAction({
           id: '02b3710e-7779-11ec-90d6-0242ac120002',
@@ -420,8 +386,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
           dateDerniereActualisation: DateTime.fromISO(
             '2020-04-06T12:00:00.000Z'
           )
-            .toUTC()
-            .toJSDate()
         })
         const actionCanceled = uneAction({
           id: '02b3710e-7779-11ec-90d6-0242ac120003',
@@ -430,8 +394,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
           dateDerniereActualisation: DateTime.fromISO(
             '2020-04-07T12:00:00.000Z'
           )
-            .toUTC()
-            .toJSDate()
         })
         const actionTerminee = uneAction({
           id: '02b3710e-7779-11ec-90d6-0242ac120004',
@@ -440,8 +402,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
           dateDerniereActualisation: DateTime.fromISO(
             '2020-04-08T12:00:00.000Z'
           )
-            .toUTC()
-            .toJSDate()
         })
         await actionSqlRepository.save(actionPasCommencee)
         await actionSqlRepository.save(actionEnCours)
@@ -481,8 +441,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
             dateDerniereActualisation: DateTime.fromISO(
               '2020-04-05T12:00:00.000Z'
             )
-              .toUTC()
-              .toJSDate()
           })
           const actionEnCours = uneAction({
             id: '02b3710e-7779-11ec-90d6-0242ac120002',
@@ -491,8 +449,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
             dateDerniereActualisation: DateTime.fromISO(
               '2020-04-06T12:00:00.000Z'
             )
-              .toUTC()
-              .toJSDate()
           })
           const actionCanceled = uneAction({
             id: '02b3710e-7779-11ec-90d6-0242ac120003',
@@ -501,8 +457,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
             dateDerniereActualisation: DateTime.fromISO(
               '2020-04-07T12:00:00.000Z'
             )
-              .toUTC()
-              .toJSDate()
           })
           const actionTerminee = uneAction({
             id: '02b3710e-7779-11ec-90d6-0242ac120004',
@@ -511,8 +465,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
             dateDerniereActualisation: DateTime.fromISO(
               '2020-04-08T12:00:00.000Z'
             )
-              .toUTC()
-              .toJSDate()
           })
           await actionSqlRepository.save(actionPasCommencee)
           await actionSqlRepository.save(actionEnCours)
@@ -555,8 +507,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
             dateDerniereActualisation: DateTime.fromISO(
               '2020-04-05T12:00:00.000Z'
             )
-              .toUTC()
-              .toJSDate()
           })
           actionAQualifier = uneAction({
             id: '02b3710e-7779-11ec-90d6-0242ac120002',
@@ -566,8 +516,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
             dateDerniereActualisation: DateTime.fromISO(
               '2020-04-06T12:00:00.000Z'
             )
-              .toUTC()
-              .toJSDate()
           })
           actionQualifiee = uneAction({
             id: '02b3710e-7779-11ec-90d6-0242ac120003',
@@ -580,8 +528,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
             dateDerniereActualisation: DateTime.fromISO(
               '2020-04-07T12:00:00.000Z'
             )
-              .toUTC()
-              .toJSDate()
           })
 
           actionQMNonQualifiable = uneActionQueryModelFromDomain(
@@ -680,8 +626,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
             dateDerniereActualisation: DateTime.fromISO(
               '2020-04-10T12:00:00.000Z'
             )
-              .toUTC()
-              .toJSDate()
           })
           const actionEnCours1 = uneAction({
             id: '02b3710e-7779-11ec-90d6-0242ac120002',
@@ -690,8 +634,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
             dateDerniereActualisation: DateTime.fromISO(
               '2020-04-06T12:00:00.000Z'
             )
-              .toUTC()
-              .toJSDate()
           })
           const actionEnCours2 = uneAction({
             id: '02b3710e-7779-11ec-90d6-0242ac120003',
@@ -700,8 +642,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
             dateDerniereActualisation: DateTime.fromISO(
               '2020-04-06T12:00:00.000Z'
             )
-              .toUTC()
-              .toJSDate()
           })
           const actionTerminee = uneAction({
             id: '02b3710e-7779-11ec-90d6-0242ac120004',
@@ -710,8 +650,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
             dateDerniereActualisation: DateTime.fromISO(
               '2020-04-12T12:00:00.000Z'
             )
-              .toUTC()
-              .toJSDate()
           })
           const actionQualifiee = uneAction({
             id: '199045ac-301d-11ed-a644-9b2ecb31ab40',
@@ -719,9 +657,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
             statut: Action.Statut.TERMINEE,
             dateDerniereActualisation: DateTime.fromISO(
               '2020-04-12T12:00:00.000Z'
-            )
-              .toUTC()
-              .toJSDate(),
+            ),
             qualification: {
               code: Action.Qualification.Code.CITOYENNETE,
               heures: 5
@@ -734,8 +670,6 @@ describe('GetActionsByJeuneQueryHandler', () => {
             dateDerniereActualisation: DateTime.fromISO(
               '2020-04-12T12:00:00.000Z'
             )
-              .toUTC()
-              .toJSDate()
           })
 
           await actionSqlRepository.save(actionPasCommencee)

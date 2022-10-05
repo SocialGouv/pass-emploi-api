@@ -39,9 +39,9 @@ describe('RechercheSqlRepository', () => {
       unJeuneDto({
         id: idJeune,
         idConseiller: conseillerDto.id,
-        dateCreation: uneDatetime.toJSDate(),
+        dateCreation: uneDatetime().toJSDate(),
         pushNotificationToken: 'unToken',
-        dateDerniereActualisationToken: uneDatetime.toJSDate()
+        dateDerniereActualisationToken: uneDatetime().toJSDate()
       })
     )
   })
@@ -222,9 +222,9 @@ describe('RechercheSqlRepository', () => {
   describe('findAvantDate', () => {
     it('recupere les recherches avec le bon type et avant un certain jour', async () => {
       // Given
-      const dateMaintenant = uneDatetime
-      const dateHier = uneDatetime.minus({ day: 1 })
-      const dateRechercheAujourdhui = uneDatetime.minus({ minute: 1 })
+      const dateMaintenant = uneDatetime()
+      const dateHier = uneDatetime().minus({ day: 1 })
+      const dateRechercheAujourdhui = uneDatetime().minus({ minute: 1 })
       const limiteRecherches = 2
 
       const rechercheBonne = uneRecherche({
@@ -408,7 +408,7 @@ describe('RechercheSqlRepository', () => {
                 query,
                 100,
                 0,
-                uneDatetime
+                uneDatetime()
               )
 
             // Then
@@ -426,7 +426,7 @@ describe('RechercheSqlRepository', () => {
                 query,
                 100,
                 0,
-                uneDatetime
+                uneDatetime()
               )
 
             // Then
@@ -466,7 +466,7 @@ describe('RechercheSqlRepository', () => {
                 queryAOrleans,
                 100,
                 0,
-                uneDatetime
+                uneDatetime()
               )
 
             // Then
@@ -487,7 +487,7 @@ describe('RechercheSqlRepository', () => {
                 queryANanterre,
                 100,
                 0,
-                uneDatetime
+                uneDatetime()
               )
 
             // Then
@@ -506,7 +506,7 @@ describe('RechercheSqlRepository', () => {
                 querySansLocalisation,
                 100,
                 0,
-                uneDatetime
+                uneDatetime()
               )
 
             // Then
@@ -544,7 +544,7 @@ describe('RechercheSqlRepository', () => {
                 query,
                 100,
                 0,
-                uneDatetime
+                uneDatetime()
               )
 
             // Then
@@ -564,7 +564,7 @@ describe('RechercheSqlRepository', () => {
                 query,
                 100,
                 0,
-                uneDatetime
+                uneDatetime()
               )
 
             // Then
@@ -600,7 +600,7 @@ describe('RechercheSqlRepository', () => {
                 query,
                 100,
                 0,
-                uneDatetime
+                uneDatetime()
               )
 
             // Then
@@ -619,7 +619,7 @@ describe('RechercheSqlRepository', () => {
                 query,
                 100,
                 0,
-                uneDatetime
+                uneDatetime()
               )
 
             // Then
@@ -637,7 +637,7 @@ describe('RechercheSqlRepository', () => {
                 query,
                 100,
                 0,
-                uneDatetime
+                uneDatetime()
               )
 
             // Then
@@ -675,7 +675,7 @@ describe('RechercheSqlRepository', () => {
                 query,
                 100,
                 0,
-                uneDatetime
+                uneDatetime()
               )
 
             // Then
@@ -695,7 +695,7 @@ describe('RechercheSqlRepository', () => {
                 query,
                 100,
                 0,
-                uneDatetime
+                uneDatetime()
               )
 
             // Then
@@ -731,7 +731,7 @@ describe('RechercheSqlRepository', () => {
                 query,
                 100,
                 0,
-                uneDatetime
+                uneDatetime()
               )
 
             // Then
@@ -750,7 +750,7 @@ describe('RechercheSqlRepository', () => {
                 query,
                 100,
                 0,
-                uneDatetime
+                uneDatetime()
               )
 
             // Then
@@ -770,7 +770,7 @@ describe('RechercheSqlRepository', () => {
                 query,
                 100,
                 0,
-                uneDatetime
+                uneDatetime()
               )
 
             // Then
@@ -791,7 +791,7 @@ function creerDesRecherchesPourLaPagination(idJeune: string): Recherche[] {
       uneRecherche({
         id: idService.uuid(),
         idJeune,
-        dateCreation: uneDatetime.plus({ day: i }),
+        dateCreation: uneDatetime().plus({ day: i }),
         type: Recherche.Type.OFFRES_IMMERSION,
         criteres: { ...criteresImmersionNice, rome: 'charpentier' }
       })

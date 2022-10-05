@@ -16,8 +16,8 @@ describe('FichierSqlS3Repository', () => {
   let fichierSqlS3Repository: FichierSqlS3Repository
   let objectStorageClient: StubbedClass<ObjectStorageClient>
   const dateService = stubClass(DateService)
-  const maintenant = uneDatetime
-  const quatreMoisPlusTot = uneDatetime.minus({ months: 4 })
+  const maintenant = uneDatetime()
+  const quatreMoisPlusTot = uneDatetime().minus({ months: 4 })
 
   beforeEach(async () => {
     dateService.now.returns(maintenant)

@@ -286,7 +286,7 @@ describe('AuthentificationSqlRepository', () => {
         // Given
         const utilisateurConseiller = unUtilisateurConseiller()
         const nouvelEmail = 'test@test.com'
-        const dateCreation = uneDatetime.toJSDate()
+        const dateCreation = uneDatetime().toJSDate()
 
         // When
         await authentificationSqlRepository.save(

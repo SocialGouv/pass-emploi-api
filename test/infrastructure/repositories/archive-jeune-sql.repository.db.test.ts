@@ -1,5 +1,5 @@
 import { uneArchiveJeuneMetadonnees } from 'test/fixtures/archiveJeune.fixture'
-import { uneDatetime } from 'test/fixtures/date.fixture'
+import { uneDatetime, uneDatetimeLocale } from 'test/fixtures/date.fixture'
 import { Action } from '../../../src/domain/action/action'
 import { ArchiveJeune } from '../../../src/domain/archive-jeune'
 import { Recherche } from '../../../src/domain/offre/recherche/recherche'
@@ -34,7 +34,10 @@ import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model
 import { expect, stubClass } from '../../utils'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { unCommentaire } from '../../fixtures/action.fixture'
-import { CommentaireSqlModel } from '../../../src/infrastructure/sequelize/models/commentaire.sql-model'
+import {
+  CommentaireDto,
+  CommentaireSqlModel
+} from '../../../src/infrastructure/sequelize/models/commentaire.sql-model'
 
 describe('ArchiveJeuneSqlRepository', () => {
   const database = DatabaseForTesting.prepare()
@@ -66,7 +69,7 @@ describe('ArchiveJeuneSqlRepository', () => {
       database.sequelize
     )
 
-    before(async () => {
+    beforeEach(async () => {
       // Given
       await ConseillerSqlModel.upsert(premierConseillerDto)
       await ConseillerSqlModel.upsert(secondConseillerDto)
@@ -89,7 +92,11 @@ describe('ArchiveJeuneSqlRepository', () => {
       })
       await ActionSqlModel.creer(actionDto)
 
-      const commentaireDto = unCommentaire({ idAction })
+      const commentaire = unCommentaire({ idAction })
+      const commentaireDto: AsSql<CommentaireDto> = {
+        ...commentaire,
+        date: commentaire.date.toJSDate()
+      }
       await CommentaireSqlModel.create(commentaireDto)
 
       const unRendezVous = unRendezVousDto({
@@ -113,7 +120,9 @@ describe('ArchiveJeuneSqlRepository', () => {
         uneRecherche({
           idJeune: jeuneDto.id,
           type: Recherche.Type.OFFRES_IMMERSION,
-          criteres: criteresImmersionNice
+          criteres: criteresImmersionNice,
+          dateCreation: uneDatetimeLocale(),
+          dateDerniereRecherche: uneDatetimeLocale()
         })
       )
 
@@ -185,7 +194,7 @@ describe('ArchiveJeuneSqlRepository', () => {
           statut: 'in_progress',
           commentaires: [
             {
-              date: unCommentaire().date.toISOString(),
+              date: uneDatetime().toUTC().toISO(),
               message: unCommentaire().message,
               creePar: 'CONSEILLER'
             }
@@ -260,8 +269,8 @@ describe('ArchiveJeuneSqlRepository', () => {
             lon: 7.237724249725603,
             rome: 'string'
           },
-          dateCreation: '2019-04-06T12:00:00.000Z',
-          dateDerniereRecherche: '2019-04-06T12:00:00.000Z',
+          dateCreation: uneDatetimeLocale().toISO(),
+          dateDerniereRecherche: uneDatetimeLocale().toISO(),
           etat: 'SUCCES',
           id: '219e8ba5-cd88-4027-9828-55e8ca99a236',
           idJeune: 'ABCDE',
@@ -304,8 +313,8 @@ describe('ArchiveJeuneSqlRepository', () => {
   })
 
   describe('.getIdsArchivesBefore()', () => {
-    const maintenant = uneDatetime
-    const deuxAnsPlusTot = uneDatetime.minus({ years: 2 }).toJSDate()
+    const maintenant = uneDatetime()
+    const deuxAnsPlusTot = uneDatetime().minus({ years: 2 }).toJSDate()
 
     const archiveRecente = uneArchiveJeuneMetadonnees({
       idJeune: jeuneDto.id,

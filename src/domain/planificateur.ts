@@ -206,9 +206,7 @@ export class PlanificateurService {
     const jobId = `action:${action.id}:${days}`
 
     const job: Planificateur.Job<Planificateur.JobRappelAction> = {
-      date: DateTime.fromJSDate(action.dateEcheance)
-        .minus({ days: days })
-        .toJSDate(),
+      date: action.dateEcheance.minus({ days: days }).toJSDate(),
       type: Planificateur.JobEnum.RAPPEL_ACTION,
       contenu: { idAction: action.id }
     }

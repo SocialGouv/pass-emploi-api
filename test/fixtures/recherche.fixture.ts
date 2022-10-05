@@ -27,7 +27,7 @@ export const criteresServiceCiviqueNice: Offre.Recherche.ServiceCivique = {
   lon: 7.237724249725603,
   distance: 15,
   domaine: 'environnement',
-  dateDeDebutMinimum: uneDatetime.toISO()
+  dateDeDebutMinimum: uneDatetime().toISO()
 }
 export const criteresImmersionNice = {
   rome: 'string',

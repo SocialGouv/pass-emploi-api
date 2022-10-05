@@ -248,7 +248,7 @@ describe('RecherchesController', () => {
             lat: 12345,
             lon: 67890,
             distance: 30,
-            dateDeDebutMinimum: uneDatetime.toJSDate().toISOString()
+            dateDeDebutMinimum: uneDatetime().toISO()
           }
         }
 
@@ -274,7 +274,7 @@ describe('RecherchesController', () => {
               lat: 12345,
               lon: 67890,
               distance: 30,
-              dateDeDebutMinimum: uneDatetime.toUTC().toISO()
+              dateDeDebutMinimum: uneDatetime().toISO()
             }
           },
           unUtilisateurDecode()
@@ -382,8 +382,8 @@ describe('RecherchesController', () => {
       type: Offre.Recherche.Type.OFFRES_EMPLOI,
       metier: 'Boulanger',
       localisation: 'Lille',
-      dateCreation: uneDatetime.toISO(),
-      dateRafraichissement: uneDatetime.toISO()
+      dateCreation: uneDatetime().toISO(),
+      dateRafraichissement: uneDatetime().toISO()
     }
 
     describe("quand c'est un jeune pole emploi", () => {

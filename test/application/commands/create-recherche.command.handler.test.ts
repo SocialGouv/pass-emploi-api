@@ -22,7 +22,7 @@ describe('CreateRechercheCommandHandler', () => {
   let createRechercheCommandHandler: CreateRechercheCommandHandler
   let dateService: StubbedClass<DateService>
 
-  const date = uneDatetime
+  const date = uneDatetime()
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()

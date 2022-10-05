@@ -1,4 +1,4 @@
-import { uneDate } from '../../fixtures/date.fixture'
+import { uneDatetime } from '../../fixtures/date.fixture'
 import { Action } from '../../../src/domain/action/action'
 import { CommentaireSqlModel } from '../../../src/infrastructure/sequelize/models/commentaire.sql-model'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
@@ -46,10 +46,10 @@ describe('CommentaireActionSqlRepositoryDb', () => {
       })
       await ActionSqlModel.creer(actionDto)
       const idCommentaire = '8d8c0686-198d-11ed-861d-0242ac120002'
-      const commentaireAction = {
+      const commentaireAction: Action.Commentaire = {
         id: idCommentaire,
         idAction,
-        date: uneDate(),
+        date: uneDatetime(),
         createur: {
           id: '1',
           prenom: 'Nils',
@@ -66,7 +66,10 @@ describe('CommentaireActionSqlRepositoryDb', () => {
       // Then
       const commentairesSql = await CommentaireSqlModel.findAll()
       expect(commentairesSql).to.have.length(1)
-      expect(commentairesSql[0].get()).to.deep.equal(commentaireAction)
+      expect(commentairesSql[0].get()).to.deep.equal({
+        ...commentaireAction,
+        date: commentaireAction.date.toJSDate()
+      })
     })
   })
 })

@@ -30,7 +30,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
   let jeuneRepository: StubbedType<Jeune.Repository>
   let notificationSupportService: StubbedType<NotificationSupport.Service>
 
-  const date = uneDatetime
+  const date = uneDatetime()
 
   const offresEmploiQueryModelSansResultats: OffresEmploiQueryModel = {
     pagination: {

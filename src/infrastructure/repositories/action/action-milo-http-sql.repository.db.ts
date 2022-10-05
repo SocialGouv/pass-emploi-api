@@ -8,7 +8,6 @@ import { Injectable, Logger } from '@nestjs/common'
 import { HttpService } from '@nestjs/axios'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
-import { DateTime } from 'luxon'
 import { ErreurHttp } from '../../../building-blocks/types/domain-error'
 
 @Injectable()
@@ -29,10 +28,8 @@ export class ActionMiloHttpRepository implements Action.Milo.Repository {
   async save(action: Action.Milo): Promise<Result> {
     try {
       const body = {
-        dateDebut: DateTime.fromJSDate(action.dateDebut).toFormat('yyyy-MM-dd'),
-        dateFinReelle: DateTime.fromJSDate(action.dateFinReelle).toFormat(
-          'yyyy-MM-dd'
-        ),
+        dateDebut: action.dateDebut.toFormat('yyyy-MM-dd'),
+        dateFinReelle: action.dateFinReelle.toFormat('yyyy-MM-dd'),
         commentaire: [action.contenu, action.description]
           .join(' - ')
           .slice(0, 255),

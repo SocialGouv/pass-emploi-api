@@ -17,6 +17,7 @@ import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification/notification'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { DateTime } from 'luxon'
 
 export interface CreateActionCommand extends Command {
   idJeune: Jeune.Id
@@ -25,7 +26,7 @@ export interface CreateActionCommand extends Command {
   typeCreateur: Action.TypeCreateur
   statut?: Action.Statut
   commentaire?: string
-  dateEcheance: Date
+  dateEcheance: DateTime
   rappel?: boolean
 }
 

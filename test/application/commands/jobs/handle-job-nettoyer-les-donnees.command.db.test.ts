@@ -18,7 +18,7 @@ describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     dateSevice = stubClass(DateService)
-    dateSevice.now.returns(uneDatetime)
+    dateSevice.now.returns(uneDatetime())
     notificationSupportService = stubInterface(sandbox)
 
     handleJobNettoyerLesDonneesCommandHandler =
@@ -36,7 +36,7 @@ describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
         prenom: 'prenom',
         nom: 'nom',
         motif: 'motif',
-        dateArchivage: uneDatetime.minus({ years: 2, day: 1 }).toJSDate(),
+        dateArchivage: uneDatetime().minus({ years: 2, day: 1 }).toJSDate(),
         donnees: { nom: 'nom' }
       })
 
@@ -45,7 +45,7 @@ describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
         prenom: 'prenom',
         nom: 'nom',
         motif: 'motif',
-        dateArchivage: uneDatetime
+        dateArchivage: uneDatetime()
           .minus({ years: 2 })
           .plus({ day: 1 })
           .toJSDate(),
@@ -67,7 +67,7 @@ describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
       // Given
       await LogApiPartenaireSqlModel.create({
         id: 'a282ae5e-b1f0-4a03-86a3-1870d913da93',
-        date: uneDatetime.minus({ months: 1, day: 1 }).toJSDate(),
+        date: uneDatetime().minus({ months: 1, day: 1 }).toJSDate(),
         idUtilisateur: 'idUtilisateur',
         typeUtilisateur: 'typeUtilisateur',
         pathPartenaire: 'pathASupprimer',
@@ -78,7 +78,7 @@ describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
 
       await LogApiPartenaireSqlModel.create({
         id: '826553e8-7581-44ab-9d76-f04be13f8971',
-        date: uneDatetime.minus({ months: 1 }).plus({ day: 1 }).toJSDate(),
+        date: uneDatetime().minus({ months: 1 }).plus({ day: 1 }).toJSDate(),
         idUtilisateur: 'idUtilisateur',
         typeUtilisateur: 'typeUtilisateur',
         pathPartenaire: 'pathAGarder',

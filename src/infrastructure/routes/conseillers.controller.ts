@@ -93,6 +93,7 @@ import { ModifierJeuneDuConseillerCommandHandler } from '../../application/comma
 import { MetadonneesFavorisQueryModel } from '../../application/queries/query-models/favoris.query-model'
 import { IndicateursPourConseillerQueryModel } from '../../application/queries/query-models/indicateurs-pour-conseiller.query-model'
 import { GetIndicateursPourConseillerQueryHandler } from '../../application/queries/get-indicateurs-pour-conseiller.query.handler.db'
+import { DateTime } from 'luxon'
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -277,8 +278,9 @@ export class ConseillersController {
       typeCreateur: Action.TypeCreateur.CONSEILLER,
       commentaire: createActionPayload.comment,
       rappel: createActionPayload.dateEcheance ? true : false,
-      dateEcheance:
-        createActionPayload.dateEcheance ?? this.buildDateEcheanceV1()
+      dateEcheance: createActionPayload.dateEcheance
+        ? DateTime.fromISO(createActionPayload.dateEcheance, { setZone: true })
+        : this.buildDateEcheanceV1()
     }
 
     const result = await this.createActionCommandHandler.execute(
@@ -587,6 +589,7 @@ export class ConseillersController {
     )
     return handleFailure(result)
   }
+
   @ApiOperation({
     summary: 'Récupère les indicateurs d’un jeune pour une période donnée',
     description: 'Autorisé pour le conseiller du jeune'
@@ -614,8 +617,8 @@ export class ConseillersController {
     throw handleFailure(result)
   }
 
-  private buildDateEcheanceV1(): Date {
+  private buildDateEcheanceV1(): DateTime {
     const now = this.dateService.now().set({ second: 59, millisecond: 0 })
-    return now.plus({ months: 3 }).toJSDate()
+    return now.plus({ months: 3 })
   }
 }

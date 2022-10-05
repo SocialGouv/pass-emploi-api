@@ -15,9 +15,7 @@ import { desNotificationsDunJeunePoleEmploi } from '../../fixtures/notification.
 
 describe('PoleEmploiClient', () => {
   let poleEmploiClient: PoleEmploiClient
-  const uneDatetimeDeMaintenant = DateTime.fromISO(
-    '2020-04-06T12:00:00.000Z'
-  ).toUTC()
+  const uneDatetimeDeMaintenant = DateTime.fromISO('2020-04-06T12:00:00.000Z')
   const configService = testConfig()
   const rateLimiterService = new RateLimiterService(configService)
 

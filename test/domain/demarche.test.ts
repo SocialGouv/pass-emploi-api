@@ -1,7 +1,11 @@
 import { DateObjectUnits, DateTime } from 'luxon'
 import { Demarche } from '../../src/domain/demarche'
 import { DateService } from '../../src/utils/date-service'
-import { uneDate, uneDatetime } from '../fixtures/date.fixture'
+import {
+  uneDate,
+  uneDatetime,
+  uneDatetimeLocale
+} from '../fixtures/date.fixture'
 import { uneDemarche } from '../fixtures/demarche.fixture'
 import { expect, StubbedClass, stubClass } from '../utils'
 import { failure, success } from '../../src/building-blocks/types/result'
@@ -14,13 +18,15 @@ const parametreHeureAMidi: DateObjectUnits = {
   millisecond: 0
 }
 
+const uneDateAMidi = uneDatetimeLocale()
+
 describe('Demarche', () => {
   let demarcheFactory: Demarche.Factory
   let dateService: StubbedClass<DateService>
 
   beforeEach(() => {
     dateService = stubClass(DateService)
-    dateService.now.returns(uneDatetime)
+    dateService.now.returns(uneDatetime())
     demarcheFactory = new Demarche.Factory(dateService)
   })
 
@@ -35,7 +41,7 @@ describe('Demarche', () => {
           const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
             demarche.id,
             Demarche.Statut.EN_COURS,
-            uneDatetime.plus({ day: 5 }).toUTC().toJSDate()
+            uneDatetime().toUTC().plus({ day: 5 }).toJSDate()
           )
 
           // Then
@@ -43,9 +49,9 @@ describe('Demarche', () => {
             success({
               id: demarche.id,
               statut: Demarche.Statut.EN_COURS,
-              dateModification: uneDatetime,
-              dateDebut: uneDatetime,
-              dateFin: uneDatetime.plus({ day: 5 }).toUTC()
+              dateModification: uneDatetime(),
+              dateDebut: uneDateAMidi,
+              dateFin: uneDatetime().plus({ day: 5 })
             })
           )
         })
@@ -60,7 +66,7 @@ describe('Demarche', () => {
           const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
             demarche.id,
             Demarche.Statut.EN_COURS,
-            uneDatetime.minus({ day: 5 }).toJSDate()
+            uneDatetime().minus({ day: 5 }).toJSDate()
           )
 
           // Then
@@ -79,7 +85,7 @@ describe('Demarche', () => {
         it('génère une date de debut et de modification', () => {
           // Given
           const demarche = uneDemarche({
-            dateDebut: uneDatetime.plus({ day: 5 }).toJSDate()
+            dateDebut: uneDatetime().plus({ day: 5 }).toJSDate()
           })
           // When
           const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
@@ -94,9 +100,9 @@ describe('Demarche', () => {
             success({
               id: demarche.id,
               statut: Demarche.Statut.REALISEE,
-              dateModification: uneDatetime,
-              dateDebut: uneDatetime,
-              dateFin: uneDatetime
+              dateModification: uneDatetime(),
+              dateDebut: uneDateAMidi,
+              dateFin: uneDateAMidi
             })
           )
         })
@@ -104,7 +110,9 @@ describe('Demarche', () => {
       describe('quand la date de debut est dans le passé', () => {
         it('génère une date de modification', () => {
           // Given
-          const dateDebutDansLePasse = uneDatetime.minus({ day: 5 }).toJSDate()
+          const dateDebutDansLePasse = uneDatetime()
+            .minus({ day: 5 })
+            .toJSDate()
           const demarche = uneDemarche({
             dateDebut: dateDebutDansLePasse
           })
@@ -121,8 +129,8 @@ describe('Demarche', () => {
             success({
               id: demarche.id,
               statut: Demarche.Statut.REALISEE,
-              dateModification: uneDatetime,
-              dateFin: uneDatetime
+              dateModification: uneDatetime(),
+              dateFin: uneDateAMidi
             })
           )
         })
@@ -146,9 +154,9 @@ describe('Demarche', () => {
             success({
               id: demarche.id,
               statut: Demarche.Statut.REALISEE,
-              dateModification: uneDatetime,
-              dateFin: uneDatetime,
-              dateDebut: uneDatetime
+              dateModification: uneDatetime(),
+              dateFin: uneDateAMidi,
+              dateDebut: uneDateAMidi
             })
           )
         })
@@ -171,9 +179,9 @@ describe('Demarche', () => {
           success({
             id: demarche.id,
             statut: Demarche.Statut.A_FAIRE,
-            dateModification: uneDatetime,
+            dateModification: uneDatetime(),
             dateDebut: undefined,
-            dateFin: DateTime.fromJSDate(demarche.dateFin).toUTC()
+            dateFin: DateTime.fromJSDate(demarche.dateFin)
           })
         )
       })
@@ -195,8 +203,8 @@ describe('Demarche', () => {
           success({
             id: demarche.id,
             statut: Demarche.Statut.ANNULEE,
-            dateModification: uneDatetime,
-            dateAnnulation: uneDatetime,
+            dateModification: uneDatetime(),
+            dateAnnulation: uneDatetime(),
             dateFin: undefined,
             dateDebut: undefined
           })
@@ -221,7 +229,7 @@ describe('Demarche', () => {
         // Then
         const demarcheCree: Demarche.Creee = {
           statut: Demarche.Statut.A_FAIRE,
-          dateCreation: uneDatetime,
+          dateCreation: uneDateAMidi,
           dateFin: DateTime.fromJSDate(dateFin).set(parametreHeureAMidi),
           pourquoi: 'P01',
           quoi: 'Q38',
@@ -268,7 +276,7 @@ describe('Demarche', () => {
           // Then
           const demarcheCree: Demarche.Creee = {
             statut: Demarche.Statut.A_FAIRE,
-            dateCreation: uneDatetime,
+            dateCreation: uneDateAMidi,
             dateFin: DateTime.fromJSDate(dateFin).set(parametreHeureAMidi),
             quoi: 'C21',
             pourquoi: 'A42',

@@ -5,18 +5,18 @@ import { Demarche } from 'src/domain/demarche'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { PoleEmploiPartenaireClient } from 'src/infrastructure/clients/pole-emploi-partenaire-client'
 import { DemarcheHttpRepositoryDb } from 'src/infrastructure/repositories/demarche-http.repository.db'
-import { uneDatetime } from 'test/fixtures/date.fixture'
 import { uneDemarcheDto } from 'test/fixtures/demarches-dto.fixtures'
 import { DateService } from '../../../src/utils/date-service'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { uneDatetime } from '../../fixtures/date.fixture'
 
 describe('DemarcheHttpRepository', () => {
   DatabaseForTesting.prepare()
   let demarcheHttpRepository: DemarcheHttpRepositoryDb
   let keycloakClient: StubbedClass<KeycloakClient>
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
-  const maintenant = DateTime.fromISO('2020-04-06T12:00:00.001Z').toUTC()
+  const maintenant = DateTime.fromISO('2020-04-06T12:00:00.001Z')
 
   beforeEach(async () => {
     const dateService = stubClass(DateService)
@@ -40,9 +40,9 @@ describe('DemarcheHttpRepository', () => {
         const demarche: Demarche.Modifiee = {
           id: 'test',
           statut: Demarche.Statut.A_FAIRE,
-          dateModification: uneDatetime,
-          dateDebut: uneDatetime,
-          dateFin: uneDatetime
+          dateModification: uneDatetime(),
+          dateDebut: uneDatetime(),
+          dateFin: uneDatetime()
         }
 
         poleEmploiPartenaireClient.updateDemarche
@@ -82,9 +82,9 @@ describe('DemarcheHttpRepository', () => {
         const demarche: Demarche.Modifiee = {
           id: 'test',
           statut: Demarche.Statut.A_FAIRE,
-          dateModification: uneDatetime,
-          dateDebut: uneDatetime,
-          dateFin: uneDatetime
+          dateModification: uneDatetime(),
+          dateDebut: uneDatetime(),
+          dateFin: uneDatetime()
         }
 
         poleEmploiPartenaireClient.updateDemarche
@@ -106,8 +106,8 @@ describe('DemarcheHttpRepository', () => {
         // Given
         const demarche: Demarche.Creee = {
           statut: Demarche.Statut.A_FAIRE,
-          dateCreation: uneDatetime,
-          dateFin: uneDatetime,
+          dateCreation: uneDatetime(),
+          dateFin: uneDatetime(),
           pourquoi: 'string',
           quoi: 'string'
         }
@@ -148,8 +148,8 @@ describe('DemarcheHttpRepository', () => {
         // Given
         const demarche: Demarche.Creee = {
           statut: Demarche.Statut.A_FAIRE,
-          dateCreation: uneDatetime,
-          dateFin: uneDatetime,
+          dateCreation: uneDatetime(),
+          dateFin: uneDatetime(),
           pourquoi: 'string',
           quoi: 'string'
         }

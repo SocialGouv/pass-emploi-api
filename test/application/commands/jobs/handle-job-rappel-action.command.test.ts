@@ -46,7 +46,7 @@ describe('HandleJobRappelActionCommandHandler', () => {
     const command: HandleJobRappelActionCommand = {
       job: {
         type: Planificateur.JobEnum.RAPPEL_ACTION,
-        date: uneDatetime.toJSDate(),
+        date: uneDatetime().toJSDate(),
         contenu: {
           idAction: action.id
         }

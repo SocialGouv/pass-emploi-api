@@ -27,7 +27,7 @@ describe('CreateJeunePoleEmploiCommandHandler', () => {
   let createJeuneCommandHandler: CreerJeunePoleEmploiCommandHandler
   const conseiller = unConseiller()
   const idNouveauJeune = 'ae1785ac-71f3-11ec-a0ba-cf33623dcff5'
-  const date = DateTime.fromISO('2020-04-06T12:00:00.000Z').toUTC()
+  const date = DateTime.fromISO('2020-04-06T12:00:00.000Z')
   const sandbox: SinonSandbox = createSandbox()
   const jeuneRepository: StubbedType<Jeune.Repository> = stubInterface(sandbox)
   const conseillerRepository: StubbedType<Conseiller.Repository> =

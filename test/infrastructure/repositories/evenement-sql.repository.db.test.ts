@@ -37,7 +37,7 @@ describe('EvenementSqlRepository', () => {
         code: codeEvenement,
         categorie: categorieEvenement,
         action: actionEvenement,
-        date: uneDatetime.toJSDate(),
+        date: uneDatetime().toJSDate(),
         utilisateur
       })
 
@@ -53,7 +53,7 @@ describe('EvenementSqlRepository', () => {
         idUtilisateur: utilisateur.id,
         typeUtilisateur: utilisateur.type,
         structure: utilisateur.structure,
-        dateEvenement: uneDatetime.toJSDate()
+        dateEvenement: uneDatetime().toJSDate()
       })
       expect(result).to.deep.equal(emptySuccess())
     })

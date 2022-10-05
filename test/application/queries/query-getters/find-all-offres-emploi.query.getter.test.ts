@@ -11,7 +11,7 @@ import { GetOffresEmploiQuery } from '../../../../src/application/queries/get-of
 describe('FindAllOffresEmploiQueryGetter', () => {
   let findAllOffresEmploiQueryGetter: FindAllOffresEmploiQueryGetter
   let poleEmploiClient: StubbedClass<PoleEmploiClient>
-  const maintenant = DateTime.fromISO('2020-04-06T12:00:00.001Z').toUTC()
+  const maintenant = DateTime.fromISO('2020-04-06T12:00:00.001Z')
 
   beforeEach(() => {
     const dateService = stubClass(DateService)

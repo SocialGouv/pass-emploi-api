@@ -1,6 +1,5 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { uneDate } from 'test/fixtures/date.fixture'
 import { ActionAuthorizer } from '../../../src/application/authorizers/authorize-action'
 import {
   QualifierActionCommand,
@@ -26,6 +25,7 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import { uneDatetime } from '../../fixtures/date.fixture'
 
 describe('QualifierActionCommandHandler', () => {
   let actionRepository: StubbedType<Action.Repository>
@@ -114,7 +114,7 @@ describe('QualifierActionCommandHandler', () => {
             const actionTerminee = uneAction({
               id: idAction,
               statut: Action.Statut.TERMINEE,
-              dateFinReelle: uneDate()
+              dateFinReelle: uneDatetime()
             })
             actionRepository.get.withArgs(idAction).resolves(actionTerminee)
             actionMiloRepository.save.resolves(
@@ -140,12 +140,12 @@ describe('QualifierActionCommandHandler', () => {
           const actionTerminee = uneAction({
             id: idAction,
             statut: Action.Statut.TERMINEE,
-            dateFinReelle: uneDate()
+            dateFinReelle: uneDatetime()
           })
           const actionQualifiee: Action.Qualifiee = {
             ...actionTerminee,
             dateDebut: actionTerminee.dateCreation,
-            dateFinReelle: uneDate(),
+            dateFinReelle: uneDatetime(),
             qualification: {
               code: Action.Qualification.Code.NON_SNP,
               heures: 0

@@ -41,7 +41,7 @@ describe('handler', () => {
     dateService = stubClass(DateService)
     dateService.nowJs.returns(maintenant)
     dateService.now.returns(DateTime.fromJSDate(maintenant))
-    dateService.fromISOStringToUTCJSDate.returns(new Date(stringUTC))
+    dateService.fromISOStringToJSDate.returns(new Date(stringUTC))
     keycloakClient = stubClass(KeycloakClient)
     keycloakClient.exchangeTokenPoleEmploiJeune.resolves(idpToken)
 

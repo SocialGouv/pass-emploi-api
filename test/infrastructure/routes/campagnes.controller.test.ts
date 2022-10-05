@@ -54,15 +54,15 @@ describe('CampagnesController', () => {
         // Given
         const createCampagnePayload: CreateCampagnePayload = {
           nom: campagne.nom,
-          dateDebut: campagne.dateDebut.toUTC().toString(),
-          dateFin: campagne.dateFin.toUTC().toString()
+          dateDebut: campagne.dateDebut.toString(),
+          dateFin: campagne.dateFin.toString()
         }
 
         createCampagneCommandHandler.execute
           .withArgs({
             nom: campagne.nom,
-            dateDebut: campagne.dateDebut.toUTC(),
-            dateFin: campagne.dateFin.toUTC()
+            dateDebut: campagne.dateDebut,
+            dateFin: campagne.dateFin
           })
           .resolves(success({ id: campagne.id }))
 

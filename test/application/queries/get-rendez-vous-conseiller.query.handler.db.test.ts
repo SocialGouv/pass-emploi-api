@@ -27,7 +27,7 @@ describe('GetRendezVousConseillerQueryHandler', () => {
   let getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler
   let sandbox: SinonSandbox
 
-  const maintenant = uneDatetime
+  const maintenant = uneDatetime()
   const aujourdhuiMinuit = uneDatetimeMinuit
   let unRendezVousPasse: AsSql<RendezVousDto>
   let unRendezVousTresPasse: AsSql<RendezVousDto>

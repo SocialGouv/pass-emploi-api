@@ -29,6 +29,7 @@ import { unJeune } from '../../fixtures/jeune.fixture'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
 import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
+import { DateTime } from 'luxon'
 
 describe('GetJeuneHomeAgendaQueryHandler', () => {
   DatabaseForTesting.prepare()
@@ -68,11 +69,15 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         actions: [
           uneActionQueryModelSansJeune({
             id: samediDernier.id,
-            dateEcheance: samediDernier.dateEcheance.toISOString()
+            dateEcheance: DateTime.fromJSDate(
+              samediDernier.dateEcheance
+            ).toISO()
           }),
           uneActionQueryModelSansJeune({
             id: vendrediEnHuit.id,
-            dateEcheance: vendrediEnHuit.dateEcheance.toISOString()
+            dateEcheance: DateTime.fromJSDate(
+              vendrediEnHuit.dateEcheance
+            ).toISO()
           })
         ],
         rendezVous: [],
@@ -107,11 +112,11 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         const actionsQM: ActionQueryModel[] = [
           uneActionQueryModelSansJeune({
             id: demain.id,
-            dateEcheance: demain.dateEcheance.toISOString()
+            dateEcheance: DateTime.fromJSDate(demain.dateEcheance).toISO()
           }),
           uneActionQueryModelSansJeune({
             id: apresDemain.id,
-            dateEcheance: apresDemain.dateEcheance.toISOString()
+            dateEcheance: DateTime.fromJSDate(apresDemain.dateEcheance).toISO()
           })
         ]
         expect(isSuccess(result) && result.data.actions).to.deep.equal(
@@ -216,7 +221,7 @@ async function createActions(
 ): Promise<Array<AsSql<ActionDto>>> {
   const dtos = dates.map(date => {
     return uneActionDto({
-      dateEcheance: new Date(date),
+      dateEcheance: DateTime.fromISO(date).toJSDate(),
       statut: statut ?? Action.Statut.PAS_COMMENCEE
     })
   })

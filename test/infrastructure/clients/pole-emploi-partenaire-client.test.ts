@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios'
 import * as nock from 'nock'
 import { testConfig } from '../../utils/module-for-testing'
-import { uneDatetime } from '../../fixtures/date.fixture'
+import { uneDatetime, uneDatetimeLocale } from '../../fixtures/date.fixture'
 import { PoleEmploiPartenaireClient } from '../../../src/infrastructure/clients/pole-emploi-partenaire-client'
 import { uneDemarcheDto } from '../../fixtures/demarches-dto.fixtures'
 import { Demarche } from '../../../src/domain/demarche'
@@ -44,7 +44,7 @@ describe('PoleEmploiPartenaireClient', () => {
       // When
       const response = await poleEmploiPartenaireClient.getPrestations(
         tokenJeune,
-        uneDatetime
+        uneDatetime()
       )
 
       // Then
@@ -145,8 +145,8 @@ describe('PoleEmploiPartenaireClient', () => {
           const demarcheModifiee: Demarche.Modifiee = {
             id: 'idDemarche',
             statut: Demarche.Statut.EN_COURS,
-            dateModification: uneDatetime,
-            dateDebut: uneDatetime
+            dateModification: uneDatetimeLocale(),
+            dateDebut: uneDatetimeLocale()
           }
           const body = {
             id: demarcheModifiee.id,
@@ -182,7 +182,7 @@ describe('PoleEmploiPartenaireClient', () => {
           const demarcheModifiee: Demarche.Modifiee = {
             id: 'idDemarche',
             statut: Demarche.Statut.A_FAIRE,
-            dateModification: uneDatetime,
+            dateModification: uneDatetimeLocale(),
             dateDebut: undefined
           }
           const body = {
@@ -220,8 +220,8 @@ describe('PoleEmploiPartenaireClient', () => {
         const demarcheModifiee: Demarche.Modifiee = {
           id: 'idDemarche',
           statut: Demarche.Statut.EN_COURS,
-          dateModification: uneDatetime,
-          dateDebut: uneDatetime
+          dateModification: uneDatetimeLocale(),
+          dateDebut: uneDatetimeLocale()
         }
         const body = {
           id: demarcheModifiee.id,
@@ -253,8 +253,8 @@ describe('PoleEmploiPartenaireClient', () => {
     const demarcheDto = uneDemarcheDto()
     const demarche: Demarche.Creee = {
       statut: Demarche.Statut.A_FAIRE,
-      dateCreation: uneDatetime,
-      dateFin: uneDatetime,
+      dateCreation: uneDatetimeLocale(),
+      dateFin: uneDatetimeLocale(),
       pourquoi: 'test',
       quoi: 'test',
       comment: 'comment',

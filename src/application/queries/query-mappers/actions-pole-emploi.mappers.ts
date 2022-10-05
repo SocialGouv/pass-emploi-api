@@ -16,22 +16,20 @@ export function fromDemarcheDtoToDemarche(
     codeDemarche: codeEnBase64(demarcheDto),
     contenu: demarcheDto.libelleCourt,
     dateModification: demarcheDto.dateModification
-      ? dateService.fromISOStringToUTCJSDate(demarcheDto.dateModification)
+      ? dateService.fromISOStringToJSDate(demarcheDto.dateModification)
       : undefined,
     statut: buildStatut(demarcheDto, dateService),
-    dateFin: dateService.fromISOStringToUTCJSDate(demarcheDto.dateFin),
+    dateFin: dateService.fromISOStringToJSDate(demarcheDto.dateFin),
     dateDebut: demarcheDto.dateDebut
-      ? dateService.fromISOStringToUTCJSDate(demarcheDto.dateDebut)
+      ? dateService.fromISOStringToJSDate(demarcheDto.dateDebut)
       : undefined,
     dateAnnulation: demarcheDto.dateAnnulation
-      ? dateService.fromISOStringToUTCJSDate(demarcheDto.dateAnnulation)
+      ? dateService.fromISOStringToJSDate(demarcheDto.dateAnnulation)
       : undefined,
     label: demarcheDto.libellePourquoi,
     titre: demarcheDto.libelleQuoi,
     sousTitre: demarcheDto.libelleComment,
-    dateCreation: dateService.fromISOStringToUTCJSDate(
-      demarcheDto.dateCreation
-    ),
+    dateCreation: dateService.fromISOStringToJSDate(demarcheDto.dateCreation),
     attributs: buildAttributs(demarcheDto),
     statutsPossibles: buildStatutsPossibles(demarcheDto, dateService.nowJs()),
     modifieParConseiller: demarcheDto.origineModificateur === 'CONSEILLER',

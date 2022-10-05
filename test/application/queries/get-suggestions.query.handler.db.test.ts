@@ -32,11 +32,11 @@ describe('GetSuggestionsQueryHandler', () => {
       const suggestion = uneSuggestion()
       const suggestionAcceptee = uneSuggestion({
         id: 'f781ae20-8838-49c7-aa2e-9b224318fb66',
-        dateCreationRecherche: uneDatetime
+        dateCreationRecherche: uneDatetime()
       })
       const suggestionRefusee = uneSuggestion({
         id: 'f781ae20-8838-49c7-aa2e-9b224318fb67',
-        dateRefus: uneDatetime
+        dateRefus: uneDatetime()
       })
 
       await SuggestionSqlModel.bulkCreate([
@@ -101,8 +101,8 @@ describe('GetSuggestionsQueryHandler', () => {
         type: Offre.Recherche.Type.OFFRES_EMPLOI,
         metier: 'Boulanger',
         localisation: 'Lille',
-        dateCreation: uneDatetime.toISO(),
-        dateRafraichissement: uneDatetime.toISO()
+        dateCreation: uneDatetime().toISO(),
+        dateRafraichissement: uneDatetime().toISO()
       }
       expect(suggestions).to.deep.equal([queryModel])
     })

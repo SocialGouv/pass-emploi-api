@@ -45,6 +45,7 @@ import {
   QualifierActionCommand,
   QualifierActionCommandHandler
 } from '../../application/commands/qualifier-action.command.handler'
+import { DateTime } from 'luxon'
 
 @Controller('actions')
 @ApiOAuth2([])
@@ -162,7 +163,10 @@ export class ActionsController {
       throw handleFailure(result)
     }
 
-    return result.data
+    return {
+      ...result.data,
+      date: result.data.date.toJSDate()
+    }
   }
 
   @ApiOperation({
@@ -195,11 +199,21 @@ export class ActionsController {
     @Body() qualifierActionPayload: QualifierActionPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<QualificationActionQueryModel> {
+    const dateDebut = qualifierActionPayload.dateDebut
+      ? DateTime.fromISO(qualifierActionPayload.dateDebut, {
+          setZone: true
+        })
+      : undefined
+    const dateFinReelle = qualifierActionPayload.dateFinReelle
+      ? DateTime.fromISO(qualifierActionPayload.dateFinReelle, {
+          setZone: true
+        })
+      : undefined
     const command: QualifierActionCommand = {
       idAction,
       codeQualification: qualifierActionPayload.codeQualification,
-      dateDebut: qualifierActionPayload.dateDebut,
-      dateFinReelle: qualifierActionPayload.dateFinReelle,
+      dateDebut,
+      dateFinReelle,
       utilisateur
     }
 
