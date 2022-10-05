@@ -21,36 +21,41 @@ import {
   ApiResponse,
   ApiTags
 } from '@nestjs/swagger'
-import {
-  CreateRendezVousCommand,
-  CreateRendezVousCommandHandler
-} from '../../application/commands/create-rendez-vous.command.handler'
-import { CreerSuperviseursCommandHandler } from '../../application/commands/creer-superviseurs.command.handler'
-import { DeleteSuperviseursCommandHandler } from '../../application/commands/delete-superviseurs.command.handler'
-import { RecupererJeunesDuConseillerCommandHandler } from '../../application/commands/recuperer-jeunes-du-conseiller.command.handler'
-import { GetDetailConseillerQueryHandler } from '../../application/queries/get-detail-conseiller.query.handler.db'
-import { GetJeuneMiloByDossierQueryHandler } from '../../application/queries/get-jeune-milo-by-dossier.query.handler.db'
-import { GetJeunesByConseillerQueryHandler } from '../../application/queries/get-jeunes-by-conseiller.query.handler.db'
-import { DetailConseillerQueryModel } from '../../application/queries/query-models/conseillers.query-model'
-import { Authentification } from '../../domain/authentification'
+import { DateTime } from 'luxon'
 import {
   CreateActionCommand,
   CreateActionCommandHandler
 } from '../../application/commands/create-action.command.handler'
 import {
+  CreateRendezVousCommand,
+  CreateRendezVousCommandHandler
+} from '../../application/commands/create-rendez-vous.command.handler'
+import {
   CreerJeuneMiloCommand,
   CreerJeuneMiloCommandHandler
 } from '../../application/commands/creer-jeune-milo.command.handler'
 import { CreerJeunePoleEmploiCommandHandler } from '../../application/commands/creer-jeune-pole-emploi.command.handler'
+import { CreerSuperviseursCommandHandler } from '../../application/commands/creer-superviseurs.command.handler'
+import { DeleteSuperviseursCommandHandler } from '../../application/commands/delete-superviseurs.command.handler'
 import { ModifierConseillerCommandHandler } from '../../application/commands/modifier-conseiller.command.handler'
+import { ModifierJeuneDuConseillerCommandHandler } from '../../application/commands/modifier-jeune-du-conseiller.command.handler'
+import { RecupererJeunesDuConseillerCommandHandler } from '../../application/commands/recuperer-jeunes-du-conseiller.command.handler'
 import {
   SendNotificationsNouveauxMessagesCommand,
   SendNotificationsNouveauxMessagesCommandHandler
 } from '../../application/commands/send-notifications-nouveaux-messages.command.handler'
 import { GetConseillerByEmailQueryHandler } from '../../application/queries/get-conseiller-by-email.query.handler.db'
+import { GetDetailConseillerQueryHandler } from '../../application/queries/get-detail-conseiller.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
+import { GetIndicateursPourConseillerQueryHandler } from '../../application/queries/get-indicateurs-pour-conseiller.query.handler.db'
+import { GetJeuneMiloByDossierQueryHandler } from '../../application/queries/get-jeune-milo-by-dossier.query.handler.db'
+import { GetJeunesByConseillerQueryHandler } from '../../application/queries/get-jeunes-by-conseiller.query.handler.db'
+import { GetMetadonneesFavorisJeuneQueryHandler } from '../../application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler.db'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
+import { DetailConseillerQueryModel } from '../../application/queries/query-models/conseillers.query-model'
+import { MetadonneesFavorisQueryModel } from '../../application/queries/query-models/favoris.query-model'
+import { IndicateursPourConseillerQueryModel } from '../../application/queries/query-models/indicateurs-pour-conseiller.query-model'
 import {
   DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel,
@@ -71,7 +76,9 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action/action'
+import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
+import { DateService } from '../../utils/date-service'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
 import { CreateActionPayload } from './validation/actions.inputs'
@@ -87,13 +94,6 @@ import {
   SuperviseursPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
-import { GetMetadonneesFavorisJeuneQueryHandler } from '../../application/queries/get-metadonnees-favoris-jeune.query.handler.db'
-import { DateService } from '../../utils/date-service'
-import { ModifierJeuneDuConseillerCommandHandler } from '../../application/commands/modifier-jeune-du-conseiller.command.handler'
-import { MetadonneesFavorisQueryModel } from '../../application/queries/query-models/favoris.query-model'
-import { IndicateursPourConseillerQueryModel } from '../../application/queries/query-models/indicateurs-pour-conseiller.query-model'
-import { GetIndicateursPourConseillerQueryHandler } from '../../application/queries/get-indicateurs-pour-conseiller.query.handler.db'
-import { DateTime } from 'luxon'
 
 @Controller('conseillers')
 @ApiOAuth2([])

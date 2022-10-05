@@ -46,7 +46,7 @@ import { toRechercheQueryModel } from '../../application/queries/query-mappers/r
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
 @ApiTags('Recherches')
-export class RecherchesController {
+export class RecherchesJeunesController {
   constructor(
     private readonly createRechercheCommandHandler: CreateRechercheCommandHandler,
     private readonly getRecherchesQueryHandler: GetRecherchesQueryHandler,

@@ -21,12 +21,13 @@ describe('Suggestion', () => {
   let idService: StubbedClass<IdService>
   let dateService: StubbedClass<DateService>
   const unUuid = '96b285d5-edd1-4c72-95d3-5f2e3192cd27'
+  const maintenant = uneDatetime()
 
   beforeEach(() => {
     idService = stubClass(IdService)
     idService.uuid.returns(unUuid)
     dateService = stubClass(DateService)
-    dateService.now.returns(uneDatetime())
+    dateService.now.returns(maintenant)
     factory = new Recherche.Suggestion.Factory(idService, dateService)
   })
 
@@ -365,6 +366,114 @@ describe('Suggestion', () => {
           })
         )
       })
+    })
+  })
+
+  describe('creerSuggestionConseiller', () => {
+    const idJeune = '1'
+    const localisation = 'Paris'
+    it('retourne une suggestion offre emploi', () => {
+      // Given
+      const criteres = {
+        q: 'a',
+        commune: '00'
+      }
+
+      const expectedSuggestion: Suggestion = {
+        id: unUuid,
+        idFonctionnel: undefined,
+        idJeune,
+        dateCreation: maintenant,
+        dateRafraichissement: maintenant,
+        type: Recherche.Type.OFFRES_EMPLOI,
+        source: Suggestion.Source.CONSEILLER,
+        informations: {
+          titre: "Recherche d'offre d'emploi à Paris",
+          metier: "Recherche d'offre d'emploi",
+          localisation
+        },
+        criteres
+      }
+
+      // When
+      const suggestion = factory.creerSuggestionConseiller(
+        Recherche.Type.OFFRES_EMPLOI,
+        idJeune,
+        criteres,
+        localisation
+      )
+
+      // Then
+      expect(suggestion).to.deep.equal(expectedSuggestion)
+    })
+    it('retourne une suggestion immersion', () => {
+      // Given
+      const criteres: Recherche.Immersion = {
+        rome: 'D900i',
+        lat: 10,
+        lon: 10
+      }
+
+      const expectedSuggestion: Suggestion = {
+        id: unUuid,
+        idFonctionnel: undefined,
+        idJeune,
+        dateCreation: maintenant,
+        dateRafraichissement: maintenant,
+        type: Recherche.Type.OFFRES_IMMERSION,
+        source: Suggestion.Source.CONSEILLER,
+        informations: {
+          titre: "Recherche d'immersion à Paris",
+          metier: "Recherche d'immersion",
+          localisation
+        },
+        criteres
+      }
+
+      // When
+      const suggestion = factory.creerSuggestionConseiller(
+        Recherche.Type.OFFRES_IMMERSION,
+        idJeune,
+        criteres,
+        localisation
+      )
+
+      // Then
+      expect(suggestion).to.deep.equal(expectedSuggestion)
+    })
+    it('retourne une suggestion service civique', () => {
+      // Given
+      const criteres: Recherche.ServiceCivique = {
+        lat: 10,
+        lon: 10
+      }
+
+      const expectedSuggestion: Suggestion = {
+        id: unUuid,
+        idFonctionnel: undefined,
+        idJeune,
+        dateCreation: maintenant,
+        dateRafraichissement: maintenant,
+        type: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+        source: Suggestion.Source.CONSEILLER,
+        informations: {
+          titre: 'Recherche de service civique à Paris',
+          metier: 'Recherche de service civique',
+          localisation
+        },
+        criteres
+      }
+
+      // When
+      const suggestion = factory.creerSuggestionConseiller(
+        Recherche.Type.OFFRES_SERVICES_CIVIQUE,
+        idJeune,
+        criteres,
+        localisation
+      )
+
+      // Then
+      expect(suggestion).to.deep.equal(expectedSuggestion)
     })
   })
 })
