@@ -101,6 +101,9 @@ export class DetailJeuneQueryModel {
 
   @ApiProperty({ required: false })
   idPartenaire?: string
+
+  @ApiProperty({ required: false })
+  dateFinCEJ?: string
 }
 
 export class DetailJeuneConseillerQueryModel {

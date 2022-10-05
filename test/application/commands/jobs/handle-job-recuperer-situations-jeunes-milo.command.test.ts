@@ -23,12 +23,14 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
   const jeune1 = unJeune({
     id: 'jeune1',
     structure: Core.Structure.MILO,
-    idPartenaire: '1'
+    idPartenaire: '1',
+    dateFinCEJ: undefined
   })
   const jeune2 = unJeune({
     id: 'jeune2',
     structure: Core.Structure.MILO,
-    idPartenaire: '2'
+    idPartenaire: '2',
+    dateFinCEJ: undefined
   })
 
   beforeEach(() => {
@@ -132,10 +134,37 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
         expect(result.data.erreurs).to.equal(1)
       }
     })
+    it('récupère et sauvegarde une date de fin de CEJ quand elle existe ', async () => {
+      // Given
+      jeuneRepository.getJeunesMiloAvecIdDossier
+        .withArgs(0, 100)
+        .resolves([jeune1])
+      jeuneRepository.getJeunesMiloAvecIdDossier.withArgs(100, 100).resolves([])
+
+      miloRepository.getDossier.withArgs(jeune1.idPartenaire).resolves(
+        success(
+          unDossierMilo({
+            id: jeune1.idPartenaire,
+            dateFinCEJ: uneDatetime()
+          })
+        )
+      )
+
+      // When
+      const result =
+        await handleJobRecupererSituationsJeunesMiloCommandHandler.handle()
+
+      // Then
+      expect(result._isSuccess).to.equal(true)
+      expect(jeuneRepository.save).to.have.calledOnceWithExactly({
+        ...jeune1,
+        dateFinCEJ: uneDatetime()
+      })
+    })
   })
 
   describe('quand il existe plus de 100 jeunes', () => {
-    it('recupere et sauvegarde les situations', async () => {
+    it('récupère et sauvegarde les situations', async () => {
       // Given
       jeuneRepository.getJeunesMiloAvecIdDossier
         .withArgs(0, 100)

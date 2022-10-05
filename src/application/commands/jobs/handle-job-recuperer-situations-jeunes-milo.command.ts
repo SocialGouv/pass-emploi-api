@@ -64,6 +64,10 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends Comman
             return
           }
 
+          const dateFinCEJ = dossier.data.dateFinCEJ
+          const jeuneAvecDateFinCEJ = Jeune.mettreAJour(jeune, { dateFinCEJ })
+          await this.jeuneRepository.save(jeuneAvecDateFinCEJ)
+
           const situationsTriees = Milo.trierSituations(dossier.data.situations)
           const situationsDuJeune: Milo.SituationsDuJeune = {
             idJeune: jeune.id,

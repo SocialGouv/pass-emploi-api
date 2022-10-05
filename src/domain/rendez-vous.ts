@@ -140,10 +140,10 @@ export namespace RendezVous {
     }
   }
 
-  export async function mettreAJour(
+  export function mettreAJour(
     rendezVousInitial: RendezVous,
     infosRendezVousAMettreAJour: InfosRendezVousAMettreAJour
-  ): Promise<RendezVous> {
+  ): RendezVous {
     return {
       ...rendezVousInitial,
       commentaire: infosRendezVousAMettreAJour.commentaire,

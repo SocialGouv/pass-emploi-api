@@ -11,7 +11,8 @@ import {
   TransfertConseillerSqlModel
 } from 'src/infrastructure/sequelize/models/transfert-conseiller.sql-model'
 import { AsSql } from 'src/infrastructure/sequelize/types'
-import { uneAutreDate } from 'test/fixtures/date.fixture'
+import { DateService } from 'src/utils/date-service'
+import { uneAutreDate, uneDate } from 'test/fixtures/date.fixture'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { testConfig } from 'test/utils/module-for-testing'
@@ -99,6 +100,38 @@ describe('GetDetailJeuneQueryHandler', () => {
         })
         expect(actual).to.deep.equal(success(expected))
       })
+
+      it('retourne un jeune  avec la date de fin de CEJ du jeune', async () => {
+        // Given
+        await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: idJeune,
+            idConseiller,
+            structure: Core.Structure.MILO,
+            dateFinCEJ: uneDate()
+          })
+        )
+
+        // When
+        const actual = await getDetailJeuneQueryHandler.handle({ idJeune })
+        // Then
+        const expected = unDetailJeuneQueryModel({
+          id: idJeune,
+          conseiller: {
+            email: conseillerDto.email!,
+            nom: conseillerDto.nom,
+            prenom: conseillerDto.prenom,
+            depuis: new Date(
+              unDetailJeuneQueryModel().creationDate
+            ).toISOString()
+          },
+          situations: undefined,
+          dateFinCEJ: DateService.fromJSDateToISOString(uneDate()),
+          urlDossier: 'https://milo.com/1234/acces-externe'
+        })
+        expect(actual).to.deep.equal(success(expected))
+      })
+
       it('retourne un jeune avec ses situations', async () => {
         // Given
         await JeuneSqlModel.creer(

@@ -25,19 +25,19 @@ export class JeuneDto extends Model {
     field: 'id',
     type: DataType.STRING
   })
-  id!: string
+  id: string
 
   @Column({
     field: 'nom',
     type: DataType.STRING
   })
-  nom!: string
+  nom: string
 
   @Column({
     field: 'prenom',
     type: DataType.STRING
   })
-  prenom!: string
+  prenom: string
 
   @ForeignKey(() => ConseillerSqlModel)
   @Column({
@@ -56,19 +56,25 @@ export class JeuneDto extends Model {
     field: 'date_creation',
     type: DataType.DATE
   })
-  dateCreation!: Date
+  dateCreation: Date
 
   @Column({
     field: 'push_notification_token',
     type: DataType.STRING
   })
-  pushNotificationToken!: string | null
+  pushNotificationToken: string | null
 
   @Column({
     field: 'date_derniere_actualisation_token',
     type: DataType.DATE
   })
-  dateDerniereActualisationToken!: Date | null
+  dateDerniereActualisationToken: Date | null
+
+  @Column({
+    field: 'date_fin_cej',
+    type: DataType.DATE
+  })
+  dateFinCEJ: Date | null
 
   @Column({
     field: 'email',
