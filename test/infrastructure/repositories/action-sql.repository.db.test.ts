@@ -14,9 +14,14 @@ import { DateService } from 'src/utils/date-service'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
 import { uneDatetime } from '../../fixtures/date.fixture'
-import { CommentaireSqlModel } from '../../../src/infrastructure/sequelize/models/commentaire.sql-model'
+import {
+  CommentaireDto,
+  CommentaireSqlModel
+} from '../../../src/infrastructure/sequelize/models/commentaire.sql-model'
+import { DateTime } from 'luxon'
+import { AsSql } from '../../../src/infrastructure/sequelize/types'
 
-const nowAtMidnight = uneDatetime.startOf('day')
+const nowAtMidnight = uneDatetime().startOf('day')
 
 describe('ActionSqlRepository', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -63,11 +68,8 @@ describe('ActionSqlRepository', () => {
       await actionSqlRepository.save(actionModifiee)
 
       // Then
-      const actual = await ActionSqlModel.findByPk(idAction)
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      expect(ActionSqlRepository.actionFromSqlModel(actual!)).to.deep.equal(
-        actionModifiee
-      )
+      const actual = await actionSqlRepository.get(idAction)
+      expect(actual).to.deep.equal(actionModifiee)
     })
 
     describe("Quand l'action n'existe pas", () => {
@@ -85,11 +87,8 @@ describe('ActionSqlRepository', () => {
 
         // Then
 
-        const actual = await ActionSqlModel.findByPk(idAction)
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        expect(ActionSqlRepository.actionFromSqlModel(actual!)).to.deep.equal(
-          nouvelleAction
-        )
+        const actual = await actionSqlRepository.get(idAction)
+        expect(actual).to.deep.equal(nouvelleAction)
       })
     })
   })
@@ -118,8 +117,8 @@ describe('ActionSqlRepository', () => {
         idJeune: 'ABCDE',
         description: "Description de l'action",
         contenu: "Contenu de l'action",
-        dateCreation: new Date('2021-11-11T08:03:30.000Z'),
-        dateDerniereActualisation: new Date('2021-11-11T08:03:30.000Z'),
+        dateCreation: DateTime.fromISO('2021-11-11T08:03:30.000Z'),
+        dateDerniereActualisation: DateTime.fromISO('2021-11-11T08:03:30.000Z'),
         createur: {
           id: '1',
           nom: 'Tavernier',
@@ -127,8 +126,8 @@ describe('ActionSqlRepository', () => {
           type: Action.TypeCreateur.CONSEILLER
         },
         dateDebut: undefined,
-        dateEcheance: new Date('2021-11-11T08:03:30.000Z'),
-        dateFinReelle: new Date('2021-11-10T08:03:30.000Z'),
+        dateEcheance: DateTime.fromISO('2021-11-11T08:03:30.000Z'),
+        dateFinReelle: DateTime.fromISO('2021-11-10T08:03:30.000Z'),
         rappel: true,
         qualification: {
           code: Action.Qualification.Code.SANTE,
@@ -145,14 +144,18 @@ describe('ActionSqlRepository', () => {
         id: idAction,
         statut: Action.Statut.EN_COURS,
         idJeune: jeune.id,
-        dateDebut: new Date('2021-11-09T08:03:30.000Z'),
-        dateFinReelle: new Date('2021-11-10T08:03:30.000Z'),
+        dateDebut: DateTime.fromISO('2021-11-09T08:03:30.000Z').toJSDate(),
+        dateFinReelle: DateTime.fromISO('2021-11-10T08:03:30.000Z').toJSDate(),
         codeQualification: Action.Qualification.Code.SANTE,
         heuresQualifiees: 2
       })
       await ActionSqlModel.creer(actionDto)
 
-      const commentaireDto = unCommentaire({ idAction })
+      const commentaire = unCommentaire({ idAction })
+      const commentaireDto: AsSql<CommentaireDto> = {
+        ...commentaire,
+        date: commentaire.date.toJSDate()
+      }
       await CommentaireSqlModel.create(commentaireDto)
 
       // When
@@ -167,23 +170,25 @@ describe('ActionSqlRepository', () => {
         idJeune: 'ABCDE',
         description: "Description de l'action",
         contenu: "Contenu de l'action",
-        dateCreation: new Date('2021-11-11T08:03:30.000Z'),
-        dateDerniereActualisation: new Date('2021-11-11T08:03:30.000Z'),
+        dateCreation: DateTime.fromISO('2021-11-11T08:03:30.000Z'),
+        dateDerniereActualisation: DateTime.fromISO('2021-11-11T08:03:30.000Z'),
         createur: {
-          id: '1',
-          nom: 'Tavernier',
-          prenom: 'Nils',
+          id: actionDto.createur.id,
+          nom: actionDto.createur.nom,
+          prenom: actionDto.createur.prenom,
           type: Action.TypeCreateur.CONSEILLER
         },
-        dateDebut: new Date('2021-11-09T08:03:30.000Z'),
-        dateEcheance: new Date('2021-11-11T08:03:30.000Z'),
-        dateFinReelle: new Date('2021-11-10T08:03:30.000Z'),
+        dateDebut: DateTime.fromISO('2021-11-09T08:03:30.000Z'),
+        dateEcheance: DateTime.fromISO('2021-11-11T08:03:30.000Z'),
+        dateFinReelle: DateTime.fromISO('2021-11-10T08:03:30.000Z'),
         rappel: true,
         qualification: {
           code: Action.Qualification.Code.SANTE,
           heures: 2
         },
-        commentaires: [commentaireDto]
+        commentaires: [
+          { ...commentaireDto, date: DateTime.fromJSDate(commentaireDto.date) }
+        ]
       }
       expect(actual).to.deep.equal(attendu)
     })

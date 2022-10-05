@@ -37,7 +37,7 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
     jeuneRepository = stubInterface(sandbox)
     notificationSupportService = stubInterface(sandbox)
     dateSevice = stubClass(DateService)
-    dateSevice.now.returns(uneDatetime)
+    dateSevice.now.returns(uneDatetime())
 
     handleJobRecupererSituationsJeunesMiloCommandHandler =
       new HandleJobRecupererSituationsJeunesMiloCommandHandler(

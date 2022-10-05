@@ -51,7 +51,7 @@ describe('UpdateDemarcheCommandHandler', () => {
         dateDebut: demarche.dateDebut,
         idDemarche: demarche.id,
         statut: Demarche.Statut.EN_COURS,
-        dateFin: uneDatetime.toJSDate()
+        dateFin: uneDatetime().toJSDate()
       }
 
       describe('quand la mise a jour se passe bien', () => {
@@ -60,9 +60,9 @@ describe('UpdateDemarcheCommandHandler', () => {
           const demarcheModifiee: Demarche.Modifiee = {
             id: 'idDemarche',
             statut: Demarche.Statut.EN_COURS,
-            dateModification: uneDatetime,
-            dateFin: uneDatetime,
-            dateDebut: uneDatetime
+            dateModification: uneDatetime(),
+            dateFin: uneDatetime(),
+            dateDebut: uneDatetime()
           }
           demarcheFactory.mettreAJourLeStatut
             .withArgs(
@@ -90,9 +90,9 @@ describe('UpdateDemarcheCommandHandler', () => {
           const demarcheModifiee: Demarche.Modifiee = {
             id: 'idDemarche',
             statut: Demarche.Statut.EN_COURS,
-            dateModification: uneDatetime,
-            dateDebut: uneDatetime,
-            dateFin: uneDatetime
+            dateModification: uneDatetime(),
+            dateDebut: uneDatetime(),
+            dateFin: uneDatetime()
           }
           demarcheFactory.mettreAJourLeStatut
             .withArgs(

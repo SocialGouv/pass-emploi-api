@@ -54,8 +54,8 @@ export class CampagnesController {
   ): Promise<Core.Id> {
     const command: CreateCampagneCommand = {
       nom: createCampagnePayload.nom,
-      dateDebut: DateTime.fromISO(createCampagnePayload.dateDebut).toUTC(),
-      dateFin: DateTime.fromISO(createCampagnePayload.dateFin).toUTC()
+      dateDebut: DateTime.fromISO(createCampagnePayload.dateDebut),
+      dateFin: DateTime.fromISO(createCampagnePayload.dateFin)
     }
     const result = await this.createCampagneCommandHandler.execute(
       command,

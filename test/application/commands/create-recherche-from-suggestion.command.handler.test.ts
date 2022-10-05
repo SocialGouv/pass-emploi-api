@@ -27,7 +27,7 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
   let rechercheRepository: StubbedType<Recherche.Repository>
 
   const idRecherche = '6fa1e060-ccc4-4d35-89d3-7b14178c7a5b'
-  const dateCreationRecherche = uneDatetime
+  const dateCreationRecherche = uneDatetime()
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()

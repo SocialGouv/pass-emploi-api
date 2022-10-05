@@ -64,7 +64,7 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
       const dateRendezVous = '2014-03-24'
       const heureRendezVous = '12:20'
       const expectedDateRendezVous = new Date('2014-03-24T12:20:00.000Z')
-      const maintenant = uneDatetime
+      const maintenant = uneDatetime()
 
       const axiosResponse = {
         config: undefined,

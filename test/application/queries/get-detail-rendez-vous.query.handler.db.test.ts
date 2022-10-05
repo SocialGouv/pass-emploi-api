@@ -61,7 +61,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
         await JeuneSqlModel.creer(unJeuneDto())
 
         const unRendezVous = unRendezVousDto({
-          date: uneDatetime.toJSDate(),
+          date: uneDatetime().toJSDate(),
           titre: 'UN RENDEZ VOUS'
         })
 
@@ -88,7 +88,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
             nom: 'Tavernier',
             prenom: 'Nils'
           },
-          date: uneDatetime.toJSDate(),
+          date: uneDatetime().toJSDate(),
           duration: 30,
           id: unRendezVous.id,
           jeune: {
@@ -128,7 +128,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
         )
 
         const unRendezVous = unRendezVousDto({
-          date: uneDatetime.toJSDate(),
+          date: uneDatetime().toJSDate(),
           titre: 'UN RENDEZ VOUS'
         })
 
@@ -161,7 +161,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
             nom: 'Tavernier',
             prenom: 'Nils'
           },
-          date: uneDatetime.toJSDate(),
+          date: uneDatetime().toJSDate(),
           duration: 30,
           id: unRendezVous.id,
           jeune: {
@@ -214,11 +214,11 @@ describe('GetDetailRendezVousQueryHandler', () => {
           })
         )
         const unRendezVous = unRendezVousDto({
-          date: uneDatetime.toJSDate(),
+          date: uneDatetime().toJSDate(),
           titre: 'UN RENDEZ VOUS'
         })
         const unAutreRendezVous = unRendezVousDto({
-          date: uneDatetime.toJSDate(),
+          date: uneDatetime().toJSDate(),
           titre: 'UN RENDEZ VOUS'
         })
 
@@ -253,7 +253,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
             nom: 'Tavernier',
             prenom: 'Nils'
           },
-          date: uneDatetime.toJSDate(),
+          date: uneDatetime().toJSDate(),
           duration: 30,
           id: unRendezVous.id,
           jeune: {

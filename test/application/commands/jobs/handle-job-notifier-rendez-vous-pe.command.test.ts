@@ -25,7 +25,7 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
   let notificationSupportService: StubbedType<NotificationSupport.Service>
   let jeunePoleEmploiRepository: StubbedType<Jeune.PoleEmploi.Repository>
 
-  const maintenant = uneDatetime
+  const maintenant = uneDatetime()
 
   const jeune: Jeune = unJeune()
   const jeunePoleEmploi: Jeune.PoleEmploi = {
@@ -133,7 +133,7 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
     })
     it('traite les notifications PE à minuit', async () => {
       // Given
-      const dateMinuit = DateTime.fromISO('2020-04-06T00:30:00.000Z').toUTC()
+      const dateMinuit = DateTime.fromISO('2020-04-06T00:30:00.000')
       dateService.now.returns(dateMinuit)
 
       const dateHier = '2020-04-05'
@@ -257,7 +257,7 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
     })
 
     describe('filtrage des notifications', () => {
-      const dateMinuit = DateTime.fromISO('2020-04-06T00:30:00.000Z').toUTC()
+      const dateMinuit = DateTime.fromISO('2020-04-06T00:30:00.000Z')
       const notificationNouveauRendezVous = uneNotificationPoleEmploi({
         idMetier: 'idMetier1',
         typeMouvementRDV: Type.NEW_RENDEZVOUS,

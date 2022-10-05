@@ -34,9 +34,9 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
 
     let handleJobNotifierNouveauxServicesCiviqueCommandHandler: HandleJobNotifierNouveauxServicesCiviqueCommandHandler
 
-    const now = DateTime.fromISO('2020-04-06T12:00:00.000Z').toUTC()
+    const now = DateTime.fromISO('2020-04-06T12:00:00.000Z')
     const aujourdhuiAMinuit = now.set({ hour: 0, minute: 0, second: 0 })
-    const hier = DateTime.fromISO('2020-04-05T12:00:00.000Z').toUTC().toISO()
+    const hier = DateTime.fromISO('2020-04-05T12:00:00.000Z').toISO()
 
     const LIMITE_PAGINATION = 100
 

@@ -26,27 +26,34 @@ const ORIGINE = 'INDIVIDU'
 const DEMARCHES_URL = 'peconnect-demarches/v1/demarches'
 
 export const PoleEmploiPartenaireClientToken = 'PoleEmploiPartenaireClientToken'
+
 interface PoleEmploiPartenaireClientI {
   getDemarches(tokenDuJeune: string): Promise<DemarcheDto[]>
+
   getRendezVous(
     tokenDuJeune: string
   ): Promise<AxiosResponse<RendezVousPoleEmploiDto[]>>
+
   getPrestations(
     tokenDuJeune: string,
     dateRechercheRendezVous: DateTime
   ): Promise<AxiosResponse<PrestationDto[]>>
+
   getLienVisio(
     tokenDuJeune: string,
     idVisio: string
   ): Promise<AxiosResponse<string>>
+
   updateDemarche(
     demarcheModifiee: Demarche.Modifiee,
     token: string
   ): Promise<Result<DemarcheDto>>
+
   createDemarche(
     demarche: Demarche.Creee,
     token: string
   ): Promise<Result<DemarcheDto>>
+
   getSuggestionsRecherches(token: string): Promise<Result<SuggestionDto[]>>
 }
 

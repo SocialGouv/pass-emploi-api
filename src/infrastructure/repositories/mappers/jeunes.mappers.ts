@@ -17,7 +17,7 @@ export function fromSqlToJeune(
     id: jeuneSqlModel.id,
     firstName: jeuneSqlModel.prenom,
     lastName: jeuneSqlModel.nom,
-    creationDate: DateTime.fromJSDate(jeuneSqlModel.dateCreation).toUTC(),
+    creationDate: DateTime.fromJSDate(jeuneSqlModel.dateCreation),
     isActivated: Boolean(jeuneSqlModel.datePremiereConnexion),
     structure: jeuneSqlModel.structure,
     email: jeuneSqlModel.email ?? undefined,
@@ -110,7 +110,7 @@ export function fromSqlToJeuneHomeQueryModel(
         date: DateTime.fromJSDate(rendezVousSql.date)
           .setZone('Europe/Paris')
           .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
-        dateUtc: DateTime.fromJSDate(rendezVousSql.date).toUTC().toISO(),
+        dateUtc: DateTime.fromJSDate(rendezVousSql.date).toISO(),
         duration: Duration.fromObject({
           minutes: rendezVousSql.duree
         }).toFormat('h:mm:ss'),

@@ -77,9 +77,9 @@ describe('ConseillerSqlRepository', () => {
   describe('findConseillersMessagesNonVerifies', () => {
     it("recupere les conseillers avec des messages non verifies aujourd'hui", async () => {
       // Given
-      const dateMaintenant = uneDatetime
-      const dateHier = uneDatetime.minus({ day: 1 })
-      const dateRechercheAujourdhui = uneDatetime.minus({ minute: 1 })
+      const dateMaintenant = uneDatetime()
+      const dateHier = uneDatetime().minus({ day: 1 })
+      const dateRechercheAujourdhui = uneDatetime().minus({ minute: 1 })
 
       const conseillerAvecMessagesNonVerifies = unConseiller({
         id: '1',
@@ -117,8 +117,8 @@ describe('ConseillerSqlRepository', () => {
   describe('updateDateVerificationMessages', () => {
     it('met a jour avec la date', async () => {
       // Given
-      const dateMaintenant = uneDatetime
-      const dateHier = uneDatetime.minus({ day: 1 })
+      const dateMaintenant = uneDatetime()
+      const dateHier = uneDatetime().minus({ day: 1 })
 
       const conseillerAvecMessagesNonVerifies = unConseiller({
         id: '1',

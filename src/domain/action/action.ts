@@ -29,13 +29,13 @@ export interface Action {
   statut: Action.Statut
   contenu: string
   description: string
-  dateCreation: Date
-  dateDerniereActualisation: Date
+  dateCreation: DateTime
+  dateDerniereActualisation: DateTime
   idJeune: Jeune.Id
   createur: Action.Createur
-  dateEcheance: Date
-  dateDebut?: Date
-  dateFinReelle?: Date
+  dateEcheance: DateTime
+  dateDebut?: DateTime
+  dateFinReelle?: DateTime
   rappel: boolean
   qualification?: Action.Qualification
   commentaires?: Action.Commentaire[]
@@ -54,11 +54,11 @@ export namespace Action {
   export type IdCreateur = string | Jeune.Id
 
   export interface Terminee extends Action {
-    dateFinReelle: Date
+    dateFinReelle: DateTime
   }
 
   export interface Qualifiee extends Terminee {
-    dateDebut: Date
+    dateDebut: DateTime
     qualification: Action.Qualification
   }
 
@@ -129,8 +129,8 @@ export namespace Action {
   export function qualifier(
     action: Action,
     codeQualification: Action.Qualification.Code,
-    dateDebut?: Date,
-    dateFinReelle?: Date
+    dateDebut?: DateTime,
+    dateFinReelle?: DateTime
   ): Result<Action.Qualifiee> {
     if (!estTerminee(action)) {
       return failure(new MauvaiseCommandeError("L'action n'est pas terminée"))
@@ -143,8 +143,8 @@ export namespace Action {
 
     const dateFinReelleMiseAJour = dateFinReelle ?? action.dateFinReelle!
     if (
-      DateTime.fromJSDate(dateDebutReelle).toUTC().startOf('day') >
-      DateTime.fromJSDate(dateFinReelleMiseAJour).toUTC().startOf('day')
+      dateDebutReelle.toUTC().startOf('day') >
+      dateFinReelleMiseAJour.toUTC().startOf('day')
     ) {
       return failure(
         new MauvaiseCommandeError(
@@ -180,14 +180,14 @@ export namespace Action {
         statut?: Action.Statut
         commentaire?: string
         typeCreateur: Action.TypeCreateur
-        dateEcheance: Date
+        dateEcheance: DateTime
         rappel?: boolean
       },
       jeune: Jeune
     ): Result<Action> {
       const statut = data.statut ?? Action.Statut.PAS_COMMENCEE
 
-      const now = this.dateService.nowJs()
+      const now = this.dateService.now()
       let createur: Action.Createur
       if (data.typeCreateur === Action.TypeCreateur.JEUNE) {
         createur = {
@@ -205,9 +205,10 @@ export namespace Action {
         }
       }
 
-      const dateEcheanceA9Heures30 = DateTime.fromJSDate(data.dateEcheance)
-        .plus({ hour: 9, minute: 30 })
-        .toJSDate()
+      const dateEcheanceA9Heures30 = data.dateEcheance.plus({
+        hour: 9,
+        minute: 30
+      })
 
       const action: Action = {
         id: this.idService.uuid(),
@@ -239,7 +240,7 @@ export namespace Action {
         )
       }
 
-      const maintenant = this.dateService.nowJs()
+      const maintenant = this.dateService.now()
       return success({
         ...action,
         statut,
@@ -255,7 +256,7 @@ export namespace Action {
     doitPlanifierUneNotificationDeRappel(action: Action): boolean {
       const dateEcheanceDansStrictementPlusDe3Jours =
         this.dateService.now().plus({ days: 3 }).startOf('day') <
-        DateTime.fromJSDate(action.dateEcheance).startOf('day')
+        action.dateEcheance.startOf('day')
       return (
         action.rappel &&
         action?.statut !== Action.Statut.ANNULEE &&
@@ -267,7 +268,7 @@ export namespace Action {
     doitEnvoyerUneNotificationDeRappel(action: Action): Result {
       const dateEcheanceDans3Jours = DateService.isSameDateDay(
         this.dateService.now().plus({ days: 3 }),
-        DateTime.fromJSDate(action.dateEcheance)
+        action.dateEcheance
       )
       const actionPasTerminee =
         action.statut !== Action.Statut.ANNULEE &&
@@ -293,8 +294,8 @@ export namespace Action {
     private mettreAJourLaDateDeFinReelle(
       action: Action,
       statut: Action.Statut,
-      maintenant: Date
-    ): Date | undefined {
+      maintenant: DateTime
+    ): DateTime | undefined {
       let dateFinReelle = action.dateFinReelle
       const nouveauStatutTermine = statut === Action.Statut.TERMINEE
       const ancienStatutTermine =

@@ -14,7 +14,7 @@ import { unJeune } from '../fixtures/jeune.fixture'
 
 describe('Campagne', () => {
   const idCampagne = '1cd43a45-0dc5-4530-9e02-38a48e352c5f'
-  const maintenant = DateTime.fromISO('2020-04-06T12:00:00.000Z').toUTC()
+  const maintenant = DateTime.fromISO('2020-04-06T12:00:00.000Z')
   const jeune = unJeune()
 
   let campagneFactory: Campagne.Factory

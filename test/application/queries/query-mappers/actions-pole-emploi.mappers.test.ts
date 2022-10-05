@@ -19,7 +19,7 @@ describe('mappers', () => {
       dateService = stubClass(DateService)
       dateService.nowJs.returns(maintenant)
       dateService.now.returns(DateTime.fromJSDate(maintenant))
-      dateService.fromISOStringToUTCJSDate.returns(new Date(stringUTC))
+      dateService.fromISOStringToJSDate.returns(new Date(stringUTC))
 
       demarcheDto = {
         idDemarche: '198916488',

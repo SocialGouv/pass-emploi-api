@@ -61,15 +61,15 @@ function fromSqlToSuggestion(suggestionSql: SuggestionSqlModel): Suggestion {
     ),
     type: suggestionSql.type,
     source: suggestionSql.source,
-    dateCreation: DateTime.fromJSDate(suggestionSql.dateCreation).toUTC(),
+    dateCreation: DateTime.fromJSDate(suggestionSql.dateCreation),
     dateRafraichissement: DateTime.fromJSDate(
       suggestionSql.dateRafraichissement
-    ).toUTC(),
+    ),
     dateRefus: suggestionSql.dateRefus
-      ? DateTime.fromJSDate(suggestionSql.dateRefus).toUTC()
+      ? DateTime.fromJSDate(suggestionSql.dateRefus)
       : undefined,
     dateCreationRecherche: suggestionSql.dateCreationRecherche
-      ? DateTime.fromJSDate(suggestionSql.dateCreationRecherche).toUTC()
+      ? DateTime.fromJSDate(suggestionSql.dateCreationRecherche)
       : undefined,
     criteres: suggestionSql.criteres ?? undefined,
     informations: {

@@ -12,7 +12,7 @@ describe('PoleEmploi', () => {
   describe('Service', () => {
     let rechercheSuggestionPEService: SuggestionPoleEmploiService
     let suggestionRepository: StubbedType<Recherche.Suggestion.Repository>
-    const dateMiseAJour = uneDatetime.plus({ days: 1 })
+    const dateMiseAJour = uneDatetime().plus({ days: 1 })
 
     beforeEach(() => {
       const sandbox = createSandbox()

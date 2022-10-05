@@ -36,7 +36,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
   let creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
   const conseiller = unConseiller()
   const idNouveauJeune = 'DFKAL'
-  const date = DateTime.fromISO('2020-04-06T12:00:00.000Z').toUTC()
+  const date = DateTime.fromISO('2020-04-06T12:00:00.000Z')
   let miloRepository: StubbedType<Milo.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let authentificationRepository: StubbedType<Authentification.Repository>

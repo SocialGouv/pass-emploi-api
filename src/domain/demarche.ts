@@ -107,7 +107,7 @@ export namespace Demarche {
         id,
         statut,
         dateModification: maintenant,
-        dateFin: DateTime.fromJSDate(dateFin).toUTC()
+        dateFin: DateTime.fromJSDate(dateFin)
       }
 
       switch (statut) {

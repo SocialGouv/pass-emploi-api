@@ -37,8 +37,8 @@ describe('JeuneConfigurationApplicationSqlRepository', () => {
           idConseiller: conseillerDto.id,
           dateCreation: jeune.creationDate.toJSDate(),
           pushNotificationToken: 'unToken',
-          dateDerniereActualisationToken: uneDatetime.toJSDate(),
-          datePremiereConnexion: uneDatetime.toJSDate(),
+          dateDerniereActualisationToken: uneDatetime().toJSDate(),
+          datePremiereConnexion: uneDatetime().toJSDate(),
           installationId: 'uneInstallationId',
           appVersion: 'uneAppVersion'
         })
@@ -58,7 +58,7 @@ describe('JeuneConfigurationApplicationSqlRepository', () => {
             pushNotificationToken: 'unToken',
             installationId: 'uneInstallationId',
             appVersion: 'uneAppVersion',
-            dateDerniereActualisationToken: uneDatetime.toJSDate()
+            dateDerniereActualisationToken: uneDatetime().toJSDate()
           }
         expect(result).to.deep.equal(configurationApplicationExpected)
       })
@@ -106,7 +106,7 @@ describe('JeuneConfigurationApplicationSqlRepository', () => {
           pushNotificationToken: 'unToken',
           installationId: 'uneInstallationId',
           appVersion: 'uneAppVersion',
-          dateDerniereActualisationToken: uneDatetime.toJSDate()
+          dateDerniereActualisationToken: uneDatetime().toJSDate()
         }
         await jeuneConfigurationApplicationSqlRepositorySql.save(
           configurationApplication
@@ -134,7 +134,7 @@ describe('JeuneConfigurationApplicationSqlRepository', () => {
           pushNotificationToken: 'unToken',
           installationId: 'uneInstallationId',
           appVersion: undefined,
-          dateDerniereActualisationToken: uneDatetime.toJSDate()
+          dateDerniereActualisationToken: uneDatetime().toJSDate()
         }
         await jeuneConfigurationApplicationSqlRepositorySql.save(
           configurationApplication

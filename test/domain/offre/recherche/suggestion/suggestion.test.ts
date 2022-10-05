@@ -26,7 +26,7 @@ describe('Suggestion', () => {
     idService = stubClass(IdService)
     idService.uuid.returns(unUuid)
     dateService = stubClass(DateService)
-    dateService.now.returns(uneDatetime)
+    dateService.now.returns(uneDatetime())
     factory = new Recherche.Suggestion.Factory(idService, dateService)
   })
 
@@ -62,8 +62,8 @@ describe('Suggestion', () => {
               localisation: 'test',
               metier: 'Boulanger'
             },
-            dateCreation: uneDatetime,
-            dateRafraichissement: uneDatetime,
+            dateCreation: uneDatetime(),
+            dateRafraichissement: uneDatetime(),
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
             idFonctionnel: {
               typeRecherche: Recherche.Type.OFFRES_EMPLOI,
@@ -105,8 +105,8 @@ describe('Suggestion', () => {
               localisation: 'test',
               metier: 'Boulanger'
             },
-            dateCreation: uneDatetime,
-            dateRafraichissement: uneDatetime,
+            dateCreation: uneDatetime(),
+            dateRafraichissement: uneDatetime(),
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
             idFonctionnel: {
               typeRecherche: Recherche.Type.OFFRES_EMPLOI,
@@ -131,8 +131,8 @@ describe('Suggestion', () => {
               localisation: 'test',
               metier: 'Boulanger'
             },
-            dateCreation: uneDatetime,
-            dateRafraichissement: uneDatetime,
+            dateCreation: uneDatetime(),
+            dateRafraichissement: uneDatetime(),
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
             idFonctionnel: {
               typeRecherche: Recherche.Type.OFFRES_IMMERSION,
@@ -157,8 +157,8 @@ describe('Suggestion', () => {
               localisation: 'test',
               metier: 'Boulanger'
             },
-            dateCreation: uneDatetime,
-            dateRafraichissement: uneDatetime,
+            dateCreation: uneDatetime(),
+            dateRafraichissement: uneDatetime(),
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
             idFonctionnel: {
               typeRecherche: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
@@ -204,8 +204,8 @@ describe('Suggestion', () => {
               localisation: 'test',
               metier: 'Service civique à test'
             },
-            dateCreation: uneDatetime,
-            dateRafraichissement: uneDatetime,
+            dateCreation: uneDatetime(),
+            dateRafraichissement: uneDatetime(),
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
             idFonctionnel: {
               typeRecherche: Recherche.Type.OFFRES_SERVICES_CIVIQUE,
@@ -253,8 +253,8 @@ describe('Suggestion', () => {
               localisation: 'test',
               metier: 'Boulanger'
             },
-            dateCreation: uneDatetime,
-            dateRafraichissement: uneDatetime,
+            dateCreation: uneDatetime(),
+            dateRafraichissement: uneDatetime(),
             id: '96b285d5-edd1-4c72-95d3-5f2e3192cd27',
             idFonctionnel: {
               typeRecherche: Recherche.Type.OFFRES_EMPLOI,
@@ -334,7 +334,7 @@ describe('Suggestion', () => {
         expect(acceptee).to.deep.equal(
           success({
             ...suggestion,
-            dateCreationRecherche: uneDatetime,
+            dateCreationRecherche: uneDatetime(),
             idRecherche: unUuid
           })
         )
@@ -361,7 +361,7 @@ describe('Suggestion', () => {
         expect(refusee).to.deep.equal(
           success({
             ...suggestion,
-            dateRefus: uneDatetime
+            dateRefus: uneDatetime()
           })
         )
       })

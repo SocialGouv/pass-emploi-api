@@ -20,14 +20,13 @@ describe('Action', () => {
     let idService: StubbedClass<IdService>
     let dateService: StubbedClass<DateService>
     const id = '26279b34-318a-45e4-a8ad-514a1090462c'
-    const nowJs = uneDatetime.toJSDate()
+    const now = uneDatetime()
 
     beforeEach(() => {
       idService = stubClass(IdService)
       idService.uuid.returns(id)
       dateService = stubClass(DateService)
-      dateService.nowJs.returns(nowJs)
-      dateService.now.returns(uneDatetime)
+      dateService.now.returns(now)
       actionFactory = new Action.Factory(idService, dateService)
     })
 
@@ -47,7 +46,7 @@ describe('Action', () => {
           expect(isSuccess(resultAction)).to.equal(true)
           if (isSuccess(resultAction)) {
             expect(resultAction.data.statut).to.equal(enCours)
-            expect(resultAction.data.dateDerniereActualisation).to.equal(nowJs)
+            expect(resultAction.data.dateDerniereActualisation).to.equal(now)
             expect(resultAction.data.dateFinReelle).to.be.undefined()
           }
         })
@@ -70,7 +69,7 @@ describe('Action', () => {
           expect(isSuccess(resultAction)).to.equal(true)
           if (isSuccess(resultAction)) {
             expect(resultAction.data.statut).to.equal(Action.Statut.TERMINEE)
-            expect(resultAction.data.dateFinReelle).to.deep.equal(nowJs)
+            expect(resultAction.data.dateFinReelle).to.deep.equal(now)
           }
         })
       })
@@ -104,13 +103,9 @@ describe('Action', () => {
       })
     })
     describe('buildAction', () => {
-      const dateEcheance = DateTime.fromISO(
-        '2020-02-02T00:00:00.000Z'
-      ).toJSDate()
+      const dateEcheance = DateTime.fromISO('2020-02-02T00:00:00.000Z')
+      const dateEcheanceA9h30 = DateTime.fromISO('2020-02-02T09:30:00.000Z')
 
-      const dateEcheanceA9h30 = DateTime.fromISO(
-        '2020-02-02T09:30:00.000Z'
-      ).toJSDate()
       describe('Quand le statut est present', () => {
         describe('quand le conseiller est le créateur', () => {
           it('crée une action avec le statut fourni', async () => {
@@ -125,8 +120,8 @@ describe('Action', () => {
 
             const expectedAction: Action = uneAction({
               id,
-              dateCreation: nowJs,
-              dateDerniereActualisation: nowJs,
+              dateCreation: now,
+              dateDerniereActualisation: now,
               contenu,
               description: commentaire,
               idJeune,
@@ -174,8 +169,8 @@ describe('Action', () => {
 
             const action: Action = uneAction({
               id,
-              dateCreation: nowJs,
-              dateDerniereActualisation: nowJs,
+              dateCreation: now,
+              dateDerniereActualisation: now,
               contenu,
               description: commentaire,
               idJeune,
@@ -219,8 +214,8 @@ describe('Action', () => {
 
             const action: Action = uneAction({
               id,
-              dateCreation: nowJs,
-              dateDerniereActualisation: nowJs,
+              dateCreation: now,
+              dateDerniereActualisation: now,
               contenu,
               description: commentaire,
               idJeune,
@@ -266,8 +261,8 @@ describe('Action', () => {
 
             const action: Action = uneAction({
               id,
-              dateCreation: nowJs,
-              dateDerniereActualisation: nowJs,
+              dateCreation: now,
+              dateDerniereActualisation: now,
               contenu,
               description: commentaire,
               idJeune,
@@ -312,8 +307,8 @@ describe('Action', () => {
 
             const action: Action = uneAction({
               id,
-              dateCreation: nowJs,
-              dateDerniereActualisation: nowJs,
+              dateCreation: now,
+              dateDerniereActualisation: now,
               contenu,
               description: commentaire,
               idJeune,
@@ -360,8 +355,8 @@ describe('Action', () => {
 
           const action: Action = uneAction({
             id,
-            dateCreation: nowJs,
-            dateDerniereActualisation: nowJs,
+            dateCreation: now,
+            dateDerniereActualisation: now,
             contenu,
             description: commentaire,
             idJeune,
@@ -394,7 +389,7 @@ describe('Action', () => {
           const action: Action = uneAction({
             rappel: true,
             statut: Action.Statut.PAS_COMMENCEE,
-            dateEcheance: uneDatetime.plus({ day: 4 }).toJSDate()
+            dateEcheance: uneDatetime().plus({ day: 4 })
           })
 
           // When
@@ -411,7 +406,7 @@ describe('Action', () => {
           const action: Action = uneAction({
             rappel: true,
             statut: Action.Statut.ANNULEE,
-            dateEcheance: uneDatetime.plus({ day: 4 }).toJSDate()
+            dateEcheance: uneDatetime().plus({ day: 4 })
           })
 
           // When
@@ -428,7 +423,7 @@ describe('Action', () => {
           const action: Action = uneAction({
             rappel: true,
             statut: Action.Statut.TERMINEE,
-            dateEcheance: uneDatetime.plus({ day: 4 }).toJSDate()
+            dateEcheance: uneDatetime().plus({ day: 4 })
           })
 
           // When
@@ -445,7 +440,7 @@ describe('Action', () => {
           const action: Action = uneAction({
             rappel: false,
             statut: Action.Statut.PAS_COMMENCEE,
-            dateEcheance: uneDatetime.plus({ day: 4 }).toJSDate()
+            dateEcheance: uneDatetime().plus({ day: 4 })
           })
 
           // When
@@ -462,7 +457,7 @@ describe('Action', () => {
           const action: Action = uneAction({
             rappel: false,
             statut: Action.Statut.PAS_COMMENCEE,
-            dateEcheance: uneDatetime.plus({ day: 2 }).toJSDate()
+            dateEcheance: uneDatetime().plus({ day: 2 })
           })
 
           // When
@@ -481,7 +476,7 @@ describe('Action', () => {
           const action: Action = uneAction({
             rappel: true,
             statut: Action.Statut.PAS_COMMENCEE,
-            dateEcheance: uneDatetime.plus({ day: 3 }).toJSDate()
+            dateEcheance: uneDatetime().plus({ day: 3 })
           })
 
           // When
@@ -498,7 +493,7 @@ describe('Action', () => {
           const action: Action = uneAction({
             rappel: true,
             statut: Action.Statut.ANNULEE,
-            dateEcheance: uneDatetime.plus({ day: 3 }).toJSDate()
+            dateEcheance: uneDatetime().plus({ day: 3 })
           })
 
           // When
@@ -515,7 +510,7 @@ describe('Action', () => {
           const action: Action = uneAction({
             rappel: true,
             statut: Action.Statut.TERMINEE,
-            dateEcheance: uneDatetime.plus({ day: 3 }).toJSDate()
+            dateEcheance: uneDatetime().plus({ day: 3 })
           })
 
           // When
@@ -532,7 +527,7 @@ describe('Action', () => {
           const action: Action = uneAction({
             rappel: false,
             statut: Action.Statut.PAS_COMMENCEE,
-            dateEcheance: uneDatetime.plus({ day: 4 }).toJSDate()
+            dateEcheance: uneDatetime().plus({ day: 4 })
           })
 
           // When
@@ -549,7 +544,7 @@ describe('Action', () => {
           const action: Action = uneAction({
             rappel: false,
             statut: Action.Statut.PAS_COMMENCEE,
-            dateEcheance: uneDatetime.plus({ day: 2 }).toJSDate()
+            dateEcheance: uneDatetime().plus({ day: 2 })
           })
 
           // When
@@ -563,7 +558,7 @@ describe('Action', () => {
     })
   })
   describe('qualifier', () => {
-    const dateFinReelle = uneDate()
+    const dateFinReelle = DateTime.fromJSDate(uneDate())
 
     it("renvoie l'action qualifiée NON_SNP", () => {
       // Given
@@ -590,7 +585,7 @@ describe('Action', () => {
     })
     it("renvoie l'action qualifiée SANTE", () => {
       // Given
-      const nouvelleDateFinReelle = uneAutreDate()
+      const nouvelleDateFinReelle = DateTime.fromJSDate(uneAutreDate())
       const actionTerminee: Action = uneAction({
         dateFinReelle,
         statut: Action.Statut.TERMINEE
@@ -652,14 +647,14 @@ describe('Action', () => {
     it('rejette quand la date de fin réelle est antécédente à la date de création', () => {
       // Given
       const actionTerminee: Action = uneActionTerminee({
-        dateCreation: new Date('2022-08-01')
+        dateCreation: DateTime.fromISO('2022-08-01')
       })
       // When
       const result = Action.qualifier(
         actionTerminee,
         Action.Qualification.Code.SANTE,
         undefined,
-        new Date('2022-07-01')
+        DateTime.fromISO('2022-07-01')
       )
 
       // Then
@@ -674,14 +669,14 @@ describe('Action', () => {
     it('accepte quand la date de fin réelle est le même jour que la date de création', () => {
       // Given
       const actionTerminee: Action = uneActionTerminee({
-        dateCreation: new Date('2022-08-01T10:00:00.000Z')
+        dateCreation: DateTime.fromISO('2022-08-01T10:00:00.000Z')
       })
       // When
       const result = Action.qualifier(
         actionTerminee,
         Action.Qualification.Code.SANTE,
         undefined,
-        new Date('2022-08-01T05:00:00.000+02:00')
+        DateTime.fromISO('2022-08-01T05:00:00.000+02:00')
       )
 
       // Then

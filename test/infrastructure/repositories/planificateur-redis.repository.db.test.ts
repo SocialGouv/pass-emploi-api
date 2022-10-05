@@ -21,7 +21,7 @@ describe('PlanificateurRedisRepository', () => {
     })
     await redisClient.connect()
     const dateService = stubClass(DateService)
-    dateService.now.returns(uneDatetime)
+    dateService.now.returns(uneDatetime())
 
     planificateurRedisRepository = new PlanificateurRedisRepository(
       testConfig(),
@@ -43,7 +43,7 @@ describe('PlanificateurRedisRepository', () => {
       it('créée un job', async () => {
         // Given
         const job: Planificateur.Job<Planificateur.JobRendezVous> = {
-          date: uneDatetime.plus({ days: 2 }).toJSDate(),
+          date: uneDatetime().plus({ days: 2 }).toJSDate(),
           type: Planificateur.JobEnum.RENDEZVOUS,
           contenu: {
             idRendezVous: 'id'
@@ -62,7 +62,7 @@ describe('PlanificateurRedisRepository', () => {
       it('créée un job avec id custom', async () => {
         // Given
         const job: Planificateur.Job<Planificateur.JobRendezVous> = {
-          date: uneDatetime.plus({ days: 2 }).toJSDate(),
+          date: uneDatetime().plus({ days: 2 }).toJSDate(),
           type: Planificateur.JobEnum.RENDEZVOUS,
           contenu: {
             idRendezVous: 'id'
@@ -87,7 +87,7 @@ describe('PlanificateurRedisRepository', () => {
       it('supprime les jobs', async () => {
         // Given
         const job: Planificateur.Job<Planificateur.JobRendezVous> = {
-          date: uneDatetime.plus({ days: 2 }).toJSDate(),
+          date: uneDatetime().plus({ days: 2 }).toJSDate(),
           type: Planificateur.JobEnum.RENDEZVOUS,
           contenu: {
             idRendezVous: 'id'
@@ -110,7 +110,7 @@ describe('PlanificateurRedisRepository', () => {
       it('supprime les jobs avec id', async () => {
         // Given
         const job: Planificateur.Job<Planificateur.JobRendezVous> = {
-          date: uneDatetime.plus({ days: 2 }).toJSDate(),
+          date: uneDatetime().plus({ days: 2 }).toJSDate(),
           type: Planificateur.JobEnum.RENDEZVOUS,
           contenu: {
             idRendezVous: 'id'

@@ -1,10 +1,10 @@
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { Action } from '../../../src/domain/action/action'
 import { uneAction } from '../../fixtures/action.fixture'
-import { uneDate } from '../../fixtures/date.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { DateService } from '../../../src/utils/date-service'
 import { IdService } from '../../../src/utils/id-service'
+import { uneDatetime } from '../../fixtures/date.fixture'
 
 describe('Commentaire', () => {
   let commentaireActionFactory: Action.Commentaire.Factory
@@ -32,7 +32,7 @@ describe('Commentaire', () => {
         type: Action.TypeCreateur.JEUNE
       }
 
-      dateService.nowJs.returns(uneDate())
+      dateService.now.returns(uneDatetime())
       idService.uuid.returns('47435ec2-7063-43c2-b157-7896ae240a43')
 
       // When
@@ -53,7 +53,7 @@ describe('Commentaire', () => {
           type: Action.TypeCreateur.JEUNE
         },
         message: 'Il faut faire cette action',
-        date: uneDate()
+        date: uneDatetime()
       }
       expect(result).to.deep.equal(nouveauCommentaire)
     })

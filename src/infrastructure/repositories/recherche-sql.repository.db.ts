@@ -180,8 +180,8 @@ export class RechercheSqlRepository implements Recherche.Repository {
       etat: rechercheSql.etatDerniereRecherche,
       dateDerniereRecherche: DateTime.fromJSDate(
         rechercheSql.dateDerniereRecherche
-      ).toUTC(),
-      dateCreation: DateTime.fromJSDate(rechercheSql.dateCreation).toUTC()
+      ),
+      dateCreation: DateTime.fromJSDate(rechercheSql.dateCreation)
     }))
   }
 

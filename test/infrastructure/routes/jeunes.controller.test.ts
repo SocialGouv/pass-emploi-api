@@ -21,7 +21,11 @@ import {
 } from 'src/infrastructure/routes/validation/jeunes.inputs'
 import { DateService } from 'src/utils/date-service'
 import * as request from 'supertest'
-import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
+import {
+  uneDate,
+  uneDatetime,
+  uneDatetimeAvecOffset
+} from 'test/fixtures/date.fixture'
 import { uneDemarche } from 'test/fixtures/demarche.fixture'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
 import { DeleteJeuneInactifCommandHandler } from '../../../src/application/commands/delete-jeune-inactif.command.handler'
@@ -108,7 +112,7 @@ describe('JeunesController', () => {
   let app: INestApplication
 
   let dateService: StubbedClass<DateService>
-  const now = uneDatetime.set({ second: 59, millisecond: 0 })
+  const now = uneDatetime().set({ second: 59, millisecond: 0 })
 
   beforeEach(async () => {
     createActionCommandHandler = stubClass(CreateActionCommandHandler)
@@ -302,7 +306,7 @@ describe('JeunesController', () => {
   })
 
   describe('POST /jeunes/:idJeune/action', () => {
-    const nowJsPlus3Mois = now.plus({ months: 3 }).toJSDate()
+    const nowJsPlus3Mois = now.plus({ months: 3 })
 
     const actionPayload: CreateActionParLeJeunePayload = {
       content: "Ceci est un contenu d'action",
@@ -394,7 +398,7 @@ describe('JeunesController', () => {
           typeCreateur: Action.TypeCreateur.JEUNE,
           statut: Action.Statut.TERMINEE,
           commentaire: 'Ceci est un commentaire',
-          dateEcheance: now.toJSDate(),
+          dateEcheance: now,
           rappel: false
         },
         unUtilisateurDecode()
@@ -404,7 +408,7 @@ describe('JeunesController', () => {
       // Given
       const payloadAvecEcheance: CreateActionParLeJeunePayload = {
         ...actionPayload,
-        dateEcheance: uneDate(),
+        dateEcheance: uneDatetimeAvecOffset().toISO(),
         rappel: false
       }
       const idAction = 'a40a178e-9562-416f-ad9d-42dfbc663a8a'
@@ -427,7 +431,7 @@ describe('JeunesController', () => {
           typeCreateur: Action.TypeCreateur.JEUNE,
           statut: Action.Statut.EN_COURS,
           commentaire: 'Ceci est un commentaire',
-          dateEcheance: uneDate(),
+          dateEcheance: uneDatetimeAvecOffset(),
           rappel: false
         },
         unUtilisateurDecode()

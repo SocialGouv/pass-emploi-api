@@ -60,7 +60,7 @@ describe('JeuneSqlRepository', () => {
     idService = stubClass(IdService)
     idService.uuid.returns(uuid)
     dateService = stubClass(DateService)
-    dateService.nowJs.returns(uneDatetime.toJSDate())
+    dateService.nowJs.returns(uneDatetime().toJSDate())
     jeuneSqlRepository = new JeuneSqlRepository(
       databaseForTesting.sequelize,
       firebaseClient,
@@ -83,7 +83,7 @@ describe('JeuneSqlRepository', () => {
         unJeuneDto({
           idConseiller: conseillerDto.id,
           dateCreation: jeune.creationDate.toJSDate(),
-          datePremiereConnexion: uneDatetime.toJSDate()
+          datePremiereConnexion: uneDatetime().toJSDate()
         })
       )
     })
@@ -286,7 +286,7 @@ describe('JeuneSqlRepository', () => {
           idConseiller: conseillerDto.id,
           dateCreation: jeune.creationDate.toJSDate(),
           pushNotificationToken: 'unToken',
-          dateDerniereActualisationToken: uneDatetime.toJSDate()
+          dateDerniereActualisationToken: uneDatetime().toJSDate()
         })
       )
     })
@@ -361,9 +361,9 @@ describe('JeuneSqlRepository', () => {
           idConseiller: undefined,
           dateCreation: jeune.creationDate.toJSDate(),
           pushNotificationToken: 'unToken',
-          dateDerniereActualisationToken: uneDatetime.toJSDate(),
+          dateDerniereActualisationToken: uneDatetime().toJSDate(),
           idPartenaire: 'test-id-dossier',
-          datePremiereConnexion: uneDatetime.toJSDate()
+          datePremiereConnexion: uneDatetime().toJSDate()
         })
       )
     })
@@ -626,7 +626,7 @@ describe('JeuneSqlRepository', () => {
           )
           expect(transfertsSql[0].id).to.equal(uuid)
           expect(transfertsSql[0].dateTransfert).to.deep.equal(
-            uneDatetime.toJSDate()
+            uneDatetime().toJSDate()
           )
         })
       })

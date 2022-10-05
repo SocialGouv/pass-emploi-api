@@ -18,7 +18,7 @@ describe('HandlerJobRendezVousCommandHandler', () => {
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let notificationRepository: StubbedType<Notification.Repository>
   let dateSevice: StubbedClass<DateService>
-  const today = DateTime.fromISO('2022-04-06T12:00:00.000Z').toUTC()
+  const today = DateTime.fromISO('2022-04-06T12:00:00.000Z')
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
@@ -41,7 +41,7 @@ describe('HandlerJobRendezVousCommandHandler', () => {
       contenu: {
         idRendezVous: 'idRendezVous'
       },
-      date: uneDatetime.toJSDate()
+      date: uneDatetime().toJSDate()
     }
   }
 

@@ -35,8 +35,8 @@ describe('CreateCampagneCommandHandler', () => {
   describe('handle', () => {
     const command: CreateCampagneCommand = {
       nom: 'unNom',
-      dateDebut: uneDatetime,
-      dateFin: uneDatetime.plus({ week: 2 })
+      dateDebut: uneDatetime(),
+      dateFin: uneDatetime().plus({ week: 2 })
     }
     describe('quand il y a une campagne existante sur ces dates ou ce nom', () => {
       it('rejette', async () => {
@@ -74,8 +74,8 @@ describe('CreateCampagneCommandHandler', () => {
   describe('authorize', () => {
     const command: CreateCampagneCommand = {
       nom: 'unNom',
-      dateDebut: uneDatetime,
-      dateFin: uneDatetime.plus({ week: 2 })
+      dateDebut: uneDatetime(),
+      dateFin: uneDatetime().plus({ week: 2 })
     }
     const utilisateur: Authentification.Utilisateur = unUtilisateurConseiller()
 

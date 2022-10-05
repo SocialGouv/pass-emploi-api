@@ -19,7 +19,7 @@ describe('HandleJobNettoyerPiecesJointesCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     fichierRepository = stubInterface(sandbox)
     dateSevice = stubClass(DateService)
-    dateSevice.now.returns(uneDatetime)
+    dateSevice.now.returns(uneDatetime())
     notificationSupportService = stubInterface(sandbox)
 
     handleJobNettoyerPiecesJointesCommandHandler =

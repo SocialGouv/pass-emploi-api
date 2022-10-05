@@ -24,17 +24,19 @@ export function fromSqlToActionQueryModel(
     id: actionSqlModel.id,
     comment: actionSqlModel.description || '',
     content: actionSqlModel.contenu,
-    creationDate: DateTime.fromJSDate(actionSqlModel.dateCreation)
-      .toUTC()
-      .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
+    creationDate: DateTime.fromJSDate(actionSqlModel.dateCreation).toFormat(
+      'EEE, d MMM yyyy HH:mm:ss z'
+    ),
     creator: `${actionSqlModel.createur.prenom} ${actionSqlModel.createur.nom}`,
     creatorType: actionSqlModel.typeCreateur,
-    lastUpdate: DateTime.fromJSDate(actionSqlModel.dateDerniereActualisation)
-      .toUTC()
-      .toFormat('EEE, d MMM yyyy HH:mm:ss z'),
+    lastUpdate: DateTime.fromJSDate(
+      actionSqlModel.dateDerniereActualisation
+    ).toFormat('EEE, d MMM yyyy HH:mm:ss z'),
     status: actionSqlModel.statut,
-    dateEcheance: actionSqlModel.dateEcheance.toISOString(),
-    dateFinReelle: actionSqlModel.dateFinReelle?.toISOString(),
+    dateEcheance: DateTime.fromJSDate(actionSqlModel.dateEcheance).toISO(),
+    dateFinReelle: actionSqlModel.dateFinReelle
+      ? DateTime.fromJSDate(actionSqlModel.dateFinReelle).toISO()
+      : undefined,
     etat: buildEtat(actionSqlModel),
     qualification: buildQualificationQueryModel(actionSqlModel)
   }

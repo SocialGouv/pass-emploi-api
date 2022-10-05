@@ -7,6 +7,7 @@ import { FindOptions, Op } from 'sequelize'
 import { DateService } from '../../utils/date-service'
 import { buildQualification } from './mappers/actions.mappers'
 import { CommentaireSqlModel } from '../sequelize/models/commentaire.sql-model'
+import { DateTime } from 'luxon'
 
 @Injectable()
 export class ActionSqlRepository implements Action.Repository {
@@ -83,24 +84,34 @@ export class ActionSqlRepository implements Action.Repository {
       idJeune: sqlModel.idJeune,
       description: sqlModel.description,
       contenu: sqlModel.contenu,
-      dateCreation: sqlModel.dateCreation,
-      dateDerniereActualisation: sqlModel.dateDerniereActualisation,
+      dateCreation: DateTime.fromJSDate(sqlModel.dateCreation),
+      dateDerniereActualisation: DateTime.fromJSDate(
+        sqlModel.dateDerniereActualisation
+      ),
       createur: {
         id: sqlModel.createur.id,
         nom: sqlModel.createur.nom,
         prenom: sqlModel.createur.prenom,
         type: sqlModel.typeCreateur
       },
-      dateDebut: sqlModel.dateDebut ?? undefined,
-      dateEcheance: sqlModel.dateEcheance,
-      dateFinReelle: sqlModel.dateFinReelle ?? undefined,
+      dateDebut: sqlModel.dateDebut
+        ? DateTime.fromJSDate(sqlModel.dateDebut)
+        : undefined,
+      dateEcheance: DateTime.fromJSDate(sqlModel.dateEcheance),
+      dateFinReelle: sqlModel.dateFinReelle
+        ? DateTime.fromJSDate(sqlModel.dateFinReelle)
+        : undefined,
       rappel: sqlModel.rappel,
       qualification: buildQualification(sqlModel)
     }
     if (sqlModel.commentaires) {
-      action.commentaires = sqlModel.commentaires.map(commentaireSql =>
-        commentaireSql.get()
-      )
+      action.commentaires = sqlModel.commentaires.map(commentaireSql => ({
+        id: commentaireSql.id,
+        date: DateTime.fromJSDate(commentaireSql.date),
+        idAction: commentaireSql.idAction,
+        createur: commentaireSql.createur,
+        message: commentaireSql.message
+      }))
     }
     return action
   }
@@ -111,8 +122,8 @@ export class ActionSqlRepository implements Action.Repository {
       statut: action.statut,
       description: action.description,
       contenu: action.contenu,
-      dateCreation: action.dateCreation,
-      dateDerniereActualisation: action.dateDerniereActualisation,
+      dateCreation: action.dateCreation.toJSDate(),
+      dateDerniereActualisation: action.dateDerniereActualisation.toJSDate(),
       idJeune: action.idJeune,
       idCreateur: action.createur.id,
       createur: {
@@ -122,9 +133,11 @@ export class ActionSqlRepository implements Action.Repository {
       },
       typeCreateur: action.createur.type,
       estVisibleParConseiller: true,
-      dateEcheance: action.dateEcheance,
-      dateDebut: action.dateDebut ?? null,
-      dateFinReelle: action.dateFinReelle ?? null,
+      dateEcheance: action.dateEcheance.toJSDate(),
+      dateDebut: action.dateDebut ? action.dateDebut.toJSDate() : null,
+      dateFinReelle: action.dateFinReelle
+        ? action.dateFinReelle.toJSDate()
+        : null,
       rappel: action.rappel,
       codeQualification: action.qualification?.code ?? null,
       heuresQualifiees: action.qualification?.heures ?? null

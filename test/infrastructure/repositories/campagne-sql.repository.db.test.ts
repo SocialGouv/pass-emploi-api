@@ -31,12 +31,12 @@ describe('CampagneSqlRepository', () => {
       expect(campagnesSql).to.have.length(1)
       expect(campagnesSql[0].id).to.equal(campagne.id)
       expect(campagnesSql[0].nom).to.equal(campagne.nom)
-      expect(
-        DateTime.fromJSDate(campagnesSql[0].dateFin).toUTC()
-      ).to.deep.equal(campagne.dateFin.toUTC())
-      expect(
-        DateTime.fromJSDate(campagnesSql[0].dateDebut).toUTC()
-      ).to.deep.equal(campagne.dateDebut.toUTC())
+      expect(DateTime.fromJSDate(campagnesSql[0].dateFin)).to.deep.equal(
+        campagne.dateFin
+      )
+      expect(DateTime.fromJSDate(campagnesSql[0].dateDebut)).to.deep.equal(
+        campagne.dateDebut
+      )
     })
   })
 

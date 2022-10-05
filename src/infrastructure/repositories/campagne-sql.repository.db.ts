@@ -28,8 +28,8 @@ export class CampagneSqlRepository implements Campagne.Repository {
       return {
         id: campagneSqlModel.id,
         nom: campagneSqlModel.nom,
-        dateFin: DateTime.fromJSDate(campagneSqlModel.dateFin).toUTC(),
-        dateDebut: DateTime.fromJSDate(campagneSqlModel.dateDebut).toUTC()
+        dateFin: DateTime.fromJSDate(campagneSqlModel.dateFin),
+        dateDebut: DateTime.fromJSDate(campagneSqlModel.dateDebut)
       }
     }
 
@@ -72,8 +72,8 @@ export class CampagneSqlRepository implements Campagne.Repository {
     return {
       id: campagneSqlModel.id,
       nom: campagneSqlModel.nom,
-      dateDebut: DateTime.fromJSDate(campagneSqlModel.dateDebut).toUTC(),
-      dateFin: DateTime.fromJSDate(campagneSqlModel.dateFin).toUTC()
+      dateDebut: DateTime.fromJSDate(campagneSqlModel.dateDebut),
+      dateFin: DateTime.fromJSDate(campagneSqlModel.dateFin)
     }
   }
 }

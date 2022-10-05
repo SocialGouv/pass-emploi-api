@@ -68,7 +68,7 @@ describe('GetJeunesByConseillerQueryHandler', () => {
     it("retourne les jeunes d'un conseiller avec la date d'evenement d'engagement", async () => {
       // Given
       const jeune = unJeuneDto({ idConseiller })
-      const dateEvenement = uneDatetime.toJSDate()
+      const dateEvenement = uneDatetime().toJSDate()
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
       await JeuneSqlModel.creer(jeune)
       await EvenementEngagementSqlModel.create(
@@ -97,7 +97,7 @@ describe('GetJeunesByConseillerQueryHandler', () => {
     it("retourne les jeunes d'un conseiller avec la date du DERNIER evenement d'engagement", async () => {
       // Given
       const jeune = unJeuneDto({ idConseiller })
-      const dateEvenementRecent = uneDatetime.toJSDate()
+      const dateEvenementRecent = uneDatetime().toJSDate()
       const dateEvenementAncien = uneDatetimeMoinsRecente.toJSDate()
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
       await JeuneSqlModel.creer(jeune)
@@ -134,7 +134,7 @@ describe('GetJeunesByConseillerQueryHandler', () => {
     it("retourne les jeunes d'un conseiller sans la date d'evenement d'engagement", async () => {
       // Given
       const jeune = unJeuneDto({ idConseiller })
-      const dateEvenement = uneDatetime.toJSDate()
+      const dateEvenement = uneDatetime().toJSDate()
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
       await JeuneSqlModel.creer(jeune)
       await EvenementEngagementSqlModel.create(
@@ -172,7 +172,7 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         id: idJeune,
         idConseiller: idConseillerCible
       })
-      const dateTransfert = uneDatetime.toJSDate()
+      const dateTransfert = uneDatetime().toJSDate()
       await ConseillerSqlModel.creer(
         unConseillerDto({
           id: idConseillerSource,
@@ -204,7 +204,7 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         idConseillerSource: idDernierConseillerPrecedent,
         idConseillerCible,
         idJeune,
-        dateTransfert: uneDatetime.plus({ week: 1 }).toJSDate()
+        dateTransfert: uneDatetime().plus({ week: 1 }).toJSDate()
       })
 
       // When

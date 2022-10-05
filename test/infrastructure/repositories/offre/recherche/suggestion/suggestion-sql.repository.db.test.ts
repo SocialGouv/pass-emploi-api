@@ -15,8 +15,8 @@ describe('SuggestionSqlRepository', () => {
   DatabaseForTesting.prepare()
   let suggestionSqlRepository: SuggestionSqlRepository
   const suggestion: Offre.Recherche.Suggestion = {
-    dateCreation: uneDatetime,
-    dateRafraichissement: uneDatetime,
+    dateCreation: uneDatetime(),
+    dateRafraichissement: uneDatetime(),
     dateCreationRecherche: undefined,
     dateRefus: undefined,
     id: 'f781ae20-8838-49c7-aa2e-9b224318fb65',
@@ -39,7 +39,7 @@ describe('SuggestionSqlRepository', () => {
       q: 'Petrisseur',
       commune: '59220',
       rayon: 10,
-      minDateCreation: uneDatetime.toISO()
+      minDateCreation: uneDatetime().toISO()
     }
   }
 

@@ -41,10 +41,8 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
   })
 
   describe('handle', () => {
-    const maintenant = DateTime.fromISO('2020-04-06T12:00:00.000Z').toUTC()
-    const dansDeuxSemaines = DateTime.fromISO(
-      '2020-04-20T12:00:00.000Z'
-    ).toUTC()
+    const maintenant = DateTime.fromISO('2020-04-06T12:00:00.000Z')
+    const dansDeuxSemaines = DateTime.fromISO('2020-04-20T12:00:00.000Z')
     const uneDemarcheDeLaSemaineDerniere = uneDemarche({
       dateFin: maintenant.minus({ weeks: 1 }).toJSDate()
     })

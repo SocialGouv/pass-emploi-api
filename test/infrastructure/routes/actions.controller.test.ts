@@ -30,7 +30,7 @@ import { GetCommentairesActionQueryHandler } from '../../../src/application/quer
 import { CommentaireActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { Action } from 'src/domain/action/action'
-import { uneDate } from '../../fixtures/date.fixture'
+import { uneDate, uneDatetimeAvecOffset } from '../../fixtures/date.fixture'
 import {
   QualifierActionCommand,
   QualifierActionCommandHandler
@@ -200,7 +200,7 @@ describe('ActionsController', () => {
           .expect(HttpStatus.CREATED)
           .expect({
             ...commentaireCree,
-            date: commentaireCree.date.toISOString()
+            date: commentaireCree.date.toUTC().toISO()
           })
 
         expect(
@@ -289,8 +289,8 @@ describe('ActionsController', () => {
       const command: QualifierActionCommand = {
         idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
         utilisateur,
-        dateDebut: uneDate(),
-        dateFinReelle: uneDate(),
+        dateDebut: uneDatetimeAvecOffset(),
+        dateFinReelle: uneDatetimeAvecOffset(),
         codeQualification: Action.Qualification.Code.EMPLOI
       }
 
@@ -309,8 +309,8 @@ describe('ActionsController', () => {
         .post(`/actions/${command.idAction}/qualifier`)
         .send({
           ...command,
-          dateDebut: uneDate().toISOString(),
-          dateFinReelle: uneDate().toISOString()
+          dateDebut: uneDatetimeAvecOffset().toISO(),
+          dateFinReelle: uneDatetimeAvecOffset().toISO()
         })
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')

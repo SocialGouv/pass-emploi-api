@@ -26,7 +26,7 @@ describe('UpdateJeuneConfigurationApplicationCommand', () => {
     jeuneConfigurationApplicationRepository = stubInterface(sandbox)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     const dateService: StubbedClass<DateService> = stubClass(DateService)
-    dateService.nowJs.returns(uneDatetime.toJSDate())
+    dateService.nowJs.returns(uneDatetime().toJSDate())
 
     const configurationApplicationFactory =
       new ConfigurationApplication.Factory(dateService)
@@ -66,7 +66,7 @@ describe('UpdateJeuneConfigurationApplicationCommand', () => {
             pushNotificationToken: 'leNouveauToken',
             appVersion: 'uneAppVersion',
             installationId: 'uneInstallationId',
-            dateDerniereActualisationToken: uneDatetime.toJSDate()
+            dateDerniereActualisationToken: uneDatetime().toJSDate()
           }
         expect(
           jeuneConfigurationApplicationRepository.save

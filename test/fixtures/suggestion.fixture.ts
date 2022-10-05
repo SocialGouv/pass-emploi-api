@@ -26,8 +26,8 @@ export const uneSuggestion = (
   args: Partial<Offre.Recherche.Suggestion> = {}
 ): Offre.Recherche.Suggestion => {
   const defaults: Offre.Recherche.Suggestion = {
-    dateCreation: uneDatetime,
-    dateRafraichissement: uneDatetime,
+    dateCreation: uneDatetime(),
+    dateRafraichissement: uneDatetime(),
     id: 'f781ae20-8838-49c7-aa2e-9b224318fb65',
     idFonctionnel: {
       typeRecherche: Recherche.Type.OFFRES_EMPLOI,

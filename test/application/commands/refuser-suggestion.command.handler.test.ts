@@ -58,9 +58,9 @@ describe('RefuserSuggestionCommandHandler', () => {
           id: command.idSuggestion,
           idJeune: command.idJeune
         })
-        const suggestionRefusee = {
+        const suggestionRefusee: Suggestion.Refusee = {
           ...suggestion,
-          dateRefus: uneDatetime
+          dateRefus: uneDatetime()
         }
         suggestionRepository.get.resolves(suggestion)
         suggestionFactory.refuser.returns(success(suggestionRefusee))

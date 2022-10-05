@@ -22,7 +22,7 @@ import { uneConfiguration } from '../../fixtures/jeune.fixture'
 describe('RendezVousRepositorySql', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
   let rendezVousRepositorySql: RendezVousRepositorySql
-  const maintenant = uneDatetime
+  const maintenant = uneDatetime()
   const aujourdhuiMinuit = uneDatetimeMinuit
   let jeune: JeuneDuRendezVous
   let unAutreJeune: JeuneDuRendezVous

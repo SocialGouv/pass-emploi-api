@@ -1,8 +1,9 @@
 import { Action } from '../../src/domain/action/action'
 import { uneDate, uneDatetime } from './date.fixture'
+import { DateTime } from 'luxon'
 
 export const uneAction = (args: Partial<Action> = {}): Action => {
-  const now = uneDatetime.toJSDate()
+  const now = uneDatetime()
   const defaults: Action = {
     id: '721e2108-60f5-4a75-b102-04fe6a40e899',
     statut: Action.Statut.PAS_COMMENCEE,
@@ -17,7 +18,7 @@ export const uneAction = (args: Partial<Action> = {}): Action => {
       prenom: 'Nils',
       nom: 'Tavernier'
     },
-    dateEcheance: new Date('2020-02-02'),
+    dateEcheance: DateTime.fromISO('2020-02-02'),
     dateDebut: undefined,
     dateFinReelle: undefined,
     rappel: true,
@@ -32,7 +33,7 @@ export const uneActionTerminee = (
 ): Action.Terminee => {
   const defaults: Action.Terminee = {
     ...uneAction(),
-    dateFinReelle: uneDate(),
+    dateFinReelle: DateTime.fromJSDate(uneDate()),
     statut: Action.Statut.TERMINEE
   }
 
@@ -44,8 +45,8 @@ export const uneActionQualifiee = (
 ): Action.Qualifiee => {
   const defaults: Action.Qualifiee = {
     ...uneAction(),
-    dateDebut: uneDate(),
-    dateFinReelle: uneDate(),
+    dateDebut: DateTime.fromJSDate(uneDate()),
+    dateFinReelle: DateTime.fromJSDate(uneDate()),
     qualification: {
       code: Action.Qualification.Code.SANTE,
       heures: 3
@@ -71,7 +72,7 @@ export const unCommentaire = (
   const defaults: Action.Commentaire = {
     id: '1603e22a-27b4-11ed-a261-0242ac120002',
     idAction: '721e2108-60f5-4a75-b102-04fe6a40e899',
-    date: uneDate(),
+    date: uneDatetime(),
     createur: {
       id: 'poi-id-createur',
       nom: 'poi-nom',
