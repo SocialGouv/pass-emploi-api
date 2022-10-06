@@ -29,10 +29,15 @@ export class GetMetiersRomeQueryHandler extends QueryHandler<
       `SELECT code, libelle, SIMILARITY(libelle_sanitized, ?) AS "score"
        FROM "referentiel_metier_rome"
        WHERE libelle_sanitized % ?
+          OR code = ?
        ORDER BY "score" DESC
        LIMIT 20;`,
       {
-        replacements: [sanitizedRecherche, sanitizedRecherche],
+        replacements: [
+          sanitizedRecherche,
+          sanitizedRecherche,
+          sanitizedRecherche.toUpperCase()
+        ],
         type: QueryTypes.SELECT
       }
     )
