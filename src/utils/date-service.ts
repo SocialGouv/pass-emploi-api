@@ -38,4 +38,8 @@ export class DateService {
   fromISOStringToJSDate(stringISO: string): Date {
     return DateTime.fromISO(stringISO).toJSDate()
   }
+
+  static fromJSDateToISOString(date: Date): string {
+    return DateTime.fromJSDate(date).toISO()
+  }
 }

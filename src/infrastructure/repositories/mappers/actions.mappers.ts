@@ -7,6 +7,7 @@ import { ActionSqlModel } from '../../sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 import { JeuneQueryModel } from '../../../application/queries/query-models/jeunes.query-model'
 import { Action } from '../../../domain/action/action'
+import { DateService } from '../../../utils/date-service'
 
 export function fromSqlToActionQueryModelWithJeune(
   actionSqlModel: ActionSqlModel
@@ -33,9 +34,11 @@ export function fromSqlToActionQueryModel(
       actionSqlModel.dateDerniereActualisation
     ).toFormat('EEE, d MMM yyyy HH:mm:ss z'),
     status: actionSqlModel.statut,
-    dateEcheance: DateTime.fromJSDate(actionSqlModel.dateEcheance).toISO(),
+    dateEcheance: DateService.fromJSDateToISOString(
+      actionSqlModel.dateEcheance
+    ),
     dateFinReelle: actionSqlModel.dateFinReelle
-      ? DateTime.fromJSDate(actionSqlModel.dateFinReelle).toISO()
+      ? DateService.fromJSDateToISOString(actionSqlModel.dateFinReelle)
       : undefined,
     etat: buildEtat(actionSqlModel),
     qualification: buildQualificationQueryModel(actionSqlModel)
