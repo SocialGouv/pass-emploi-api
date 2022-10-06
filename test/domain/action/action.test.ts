@@ -103,8 +103,8 @@ describe('Action', () => {
       })
     })
     describe('buildAction', () => {
-      const dateEcheance = DateTime.fromISO('2020-02-02T00:00:00.000Z')
-      const dateEcheanceA9h30 = DateTime.fromISO('2020-02-02T09:30:00.000Z')
+      const dateEcheance = DateTime.fromISO('2020-02-02T00:00:00.000')
+      const dateEcheanceA9h30 = DateTime.fromISO('2020-02-02T09:30:00.000')
 
       describe('Quand le statut est present', () => {
         describe('quand le conseiller est le créateur', () => {

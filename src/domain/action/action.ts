@@ -205,7 +205,7 @@ export namespace Action {
         }
       }
 
-      const dateEcheanceA9Heures30 = data.dateEcheance.plus({
+      const dateEcheanceA9Heures30 = data.dateEcheance.set({
         hour: 9,
         minute: 30
       })
