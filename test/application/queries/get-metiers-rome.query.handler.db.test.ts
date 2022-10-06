@@ -42,55 +42,6 @@ describe('GetMetiersRomeQueryHandler', () => {
     })
   })
 
-  it('limite à 5 le nombre de résultats', async () => {
-    //Given
-    const metiers = [
-      unMetierRomeDto({
-        id: 1,
-        code: '1',
-        libelle: '1',
-        libelleSanitized: '1'
-      }),
-      unMetierRomeDto({
-        id: 2,
-        code: '2',
-        libelle: '1',
-        libelleSanitized: '1'
-      }),
-      unMetierRomeDto({
-        id: 3,
-        code: '3',
-        libelle: '1',
-        libelleSanitized: '1'
-      }),
-      unMetierRomeDto({
-        id: 4,
-        code: '4',
-        libelle: '1',
-        libelleSanitized: '1'
-      }),
-      unMetierRomeDto({
-        id: 5,
-        code: '5',
-        libelle: '1',
-        libelleSanitized: '1'
-      }),
-      unMetierRomeDto({
-        id: 6,
-        code: '6',
-        libelle: '1',
-        libelleSanitized: '1'
-      })
-    ]
-    await MetierRomeSqlModel.bulkCreate(metiers)
-    //When
-    const result = await getMetiersRomeQueryHandler.execute({
-      recherche: '1'
-    })
-    //Then
-    expect(result).to.have.lengthOf(5)
-  })
-
   it('ne prend pas en compte la casse', async () => {
     //Given
     const metiers = [

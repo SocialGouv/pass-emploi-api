@@ -30,7 +30,7 @@ export class GetMetiersRomeQueryHandler extends QueryHandler<
        FROM "referentiel_metier_rome"
        WHERE libelle_sanitized % ?
        ORDER BY "score" DESC
-       LIMIT 5;`,
+       LIMIT 20;`,
       {
         replacements: [sanitizedRecherche, sanitizedRecherche],
         type: QueryTypes.SELECT
