@@ -8,7 +8,6 @@ import { DateService } from '../../../utils/date-service'
 import { Op } from 'sequelize'
 import { ReponseCampagneSqlModel } from '../../../infrastructure/sequelize/models/reponse-campagne.sql-model'
 import { Injectable } from '@nestjs/common'
-import { DateTime } from 'luxon'
 
 export interface GetCampagneQuery extends Query {
   idJeune: string
@@ -49,8 +48,8 @@ export class GetCampagneQueryModel {
     if (campagneEnCours && !aReponduAToutesLesQuestions) {
       return {
         id: campagneEnCours.id,
-        dateDebut: DateTime.fromJSDate(campagneEnCours.dateDebut).toISO(),
-        dateFin: DateTime.fromJSDate(campagneEnCours.dateFin).toISO(),
+        dateDebut: DateService.fromJSDateToISOString(campagneEnCours.dateDebut),
+        dateFin: DateService.fromJSDateToISOString(campagneEnCours.dateFin),
         titre: "Votre expérience sur l'application",
         description:
           "Aidez-nous à améliorer l'application en répondant à 2 questions",
