@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Suggestion, SuggestionsRepositoryToken } from './suggestion'
 import { Recherche } from '../recherche'
-import estTraitee = Suggestion.estTraitee
 
 @Injectable()
 export class SuggestionPoleEmploiService {
@@ -14,20 +13,16 @@ export class SuggestionPoleEmploiService {
     nouvellesSuggestions: Recherche.Suggestion[],
     idJeune: string
   ): Promise<void> {
-    const allSuggestions = await this.suggestionRepository.findAll(idJeune)
-    const suggestionsNonTraitees = allSuggestions.filter(
-      suggestion => !estTraitee(suggestion)
-    )
+    const suggestions = await this.suggestionRepository.findAll(idJeune)
 
     for (const nouvelleSuggestion of nouvellesSuggestions) {
-      const suggestionNonTraiteeExistante = suggestionsNonTraitees.find(
-        suggestionNonTraitee =>
-          Suggestion.sontEquivalentes(suggestionNonTraitee, nouvelleSuggestion)
+      const suggestionExistante = suggestions.find(suggestion =>
+        Suggestion.sontEquivalentes(suggestion, nouvelleSuggestion)
       )
 
-      if (suggestionNonTraiteeExistante) {
+      if (suggestionExistante) {
         await this.suggestionRepository.save({
-          ...suggestionNonTraiteeExistante,
+          ...suggestionExistante,
           dateRafraichissement: nouvelleSuggestion.dateRafraichissement
         })
       } else {
