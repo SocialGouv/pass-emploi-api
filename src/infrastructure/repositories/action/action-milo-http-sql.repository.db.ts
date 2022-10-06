@@ -44,6 +44,8 @@ export class ActionMiloHttpRepository implements Action.Milo.Repository {
         )
       )
 
+      this.logger.log(`SNP créée pour le dossier ${action.idDossier}`, body)
+
       return emptySuccess()
     } catch (e) {
       this.logger.error(e)
