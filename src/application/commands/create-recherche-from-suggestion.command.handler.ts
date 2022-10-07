@@ -11,13 +11,14 @@ import {
   SuggestionsRepositoryToken
 } from 'src/domain/offre/recherche/suggestion/suggestion'
 import {
-  emptySuccess,
   failure,
   isFailure,
-  Result
+  Result,
+  success
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { SuggestionAuthorizer } from '../authorizers/authorize-suggestion'
+
 export interface CreateRechercheFromSuggestionCommand extends Command {
   idJeune: string
   idSuggestion: string
@@ -26,7 +27,7 @@ export interface CreateRechercheFromSuggestionCommand extends Command {
 @Injectable()
 export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
   CreateRechercheFromSuggestionCommand,
-  void
+  Recherche
 > {
   constructor(
     private suggestionAuthorizer: SuggestionAuthorizer,
@@ -40,7 +41,9 @@ export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
     super('CreateRechercheFromSuggestionCommandHandler')
   }
 
-  async handle(command: CreateRechercheFromSuggestionCommand): Promise<Result> {
+  async handle(
+    command: CreateRechercheFromSuggestionCommand
+  ): Promise<Result<Recherche>> {
     const suggestion = await this.suggestionRepository.get(command.idSuggestion)
 
     if (!suggestion) {
@@ -59,7 +62,7 @@ export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
     await this.rechercheRepository.save(recherche)
     await this.suggestionRepository.save(suggestionAccepteeResult.data)
 
-    return emptySuccess()
+    return success(recherche)
   }
 
   async monitor(): Promise<void> {
