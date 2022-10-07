@@ -57,10 +57,18 @@ export class PoleEmploiClient {
   async getOffresEmploi(
     params?: URLSearchParams
   ): Promise<OffresEmploiDtoWithTotal> {
-    const response = await this.get<OffresEmploiDto>(
+    const response = await this.get<OffresEmploiDto | undefined>(
       'offresdemploi/v2/offres/search',
       params
     )
+
+    if (!response.data) {
+      return {
+        total: 0,
+        resultats: []
+      }
+    }
+
     const { resultats } = response.data
     let total: number
     try {
