@@ -98,7 +98,7 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       // Given
       const jeune = unJeuneDto({ idConseiller })
       const dateEvenementRecent = uneDatetime().toJSDate()
-      const dateEvenementAncien = uneDatetimeMoinsRecente.toJSDate()
+      const dateEvenementAncien = uneDatetimeMoinsRecente().toJSDate()
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
       await JeuneSqlModel.creer(jeune)
       await EvenementEngagementSqlModel.create(

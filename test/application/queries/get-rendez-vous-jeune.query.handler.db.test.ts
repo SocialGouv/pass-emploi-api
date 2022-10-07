@@ -40,7 +40,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
   let sandbox: SinonSandbox
 
   const maintenant = uneDatetime()
-  const aujourdhuiMinuit = uneDatetimeMinuit
+  const aujourdhuiMinuit = uneDatetimeMinuit()
   let unRendezVousPasse: AsSql<RendezVousDto>
   let unRendezVousTresPasse: AsSql<RendezVousDto>
   let unRendezVousProche: AsSql<RendezVousDto>

@@ -77,7 +77,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
   describe('quand tout va bien', () => {
     describe('quand il y a moins de 5 recherches', () => {
       const idJeune = '1'
-      const dateDerniereRecherche = uneDatetimeMoinsRecente
+      const dateDerniereRecherche = uneDatetimeMoinsRecente()
 
       let criteresRecherche1: GetOffresEmploiQuery
       let criteresRecherche2: GetOffresEmploiQuery
