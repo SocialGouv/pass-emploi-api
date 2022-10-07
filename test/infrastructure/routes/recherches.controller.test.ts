@@ -18,7 +18,8 @@ import {
 } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
-  failure
+  failure,
+  success
 } from '../../../src/building-blocks/types/result'
 import { Offre } from '../../../src/domain/offre/offre'
 import { Recherche } from '../../../src/domain/offre/recherche/recherche'
@@ -472,9 +473,19 @@ describe('RecherchesController', () => {
       it('crée la recherche correspondante', async () => {
         // Given
         const idSuggestion = 'id-suggestion'
+        const recherche = uneRecherche()
         createRechercheFromSuggestionCommandHandler.execute.resolves(
-          emptySuccess()
+          success(recherche)
         )
+
+        const rechercheQueryModel: RechercheQueryModel = {
+          id: recherche.id,
+          titre: recherche.titre,
+          type: recherche.type,
+          metier: recherche.metier,
+          localisation: recherche.localisation,
+          criteres: recherche.criteres
+        }
 
         // When
         await request(app.getHttpServer())
@@ -482,6 +493,7 @@ describe('RecherchesController', () => {
           .set('authorization', unHeaderAuthorization())
           // Then
           .expect(HttpStatus.CREATED)
+          .expect(rechercheQueryModel)
       })
       ensureUserAuthenticationFailsIfInvalid(
         'post',

@@ -41,6 +41,7 @@ import {
   CreateRechercheServiceCiviquePayload,
   GetRecherchesQueryParams
 } from './validation/recherches.inputs'
+import { toRechercheQueryModel } from '../../application/queries/query-mappers/recherche.mapper'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -179,7 +180,7 @@ export class RecherchesController {
     @Param('idJeune') idJeune: string,
     @Param('idSuggestion') idSuggestion: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<void> {
+  ): Promise<RechercheQueryModel> {
     const result =
       await this.createRechercheFromSuggestionCommandHandler.execute(
         {
@@ -192,6 +193,8 @@ export class RecherchesController {
     if (isFailure(result)) {
       throw handleFailure(result)
     }
+
+    return toRechercheQueryModel(result.data)
   }
 
   @Post('recherches/suggestions/:idSuggestion/refuser')

@@ -5,10 +5,7 @@ import { IdService } from 'src/utils/id-service'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { uneRecherche } from 'test/fixtures/recherche.fixture'
 import { CreateRechercheFromSuggestionCommandHandler } from '../../../src/application/commands/create-recherche-from-suggestion.command.handler'
-import {
-  emptySuccess,
-  success
-} from '../../../src/building-blocks/types/result'
+import { success } from '../../../src/building-blocks/types/result'
 import { Recherche } from '../../../src/domain/offre/recherche/recherche'
 import { Suggestion } from '../../../src/domain/offre/recherche/suggestion/suggestion'
 import { DateService } from '../../../src/utils/date-service'
@@ -117,7 +114,7 @@ describe('CreateRechercheFromSuggestionCommandHandler', () => {
         expect(suggestionRepository.save).to.have.been.calledWithExactly(
           suggestionAcceptee
         )
-        expect(result).to.deep.equal(emptySuccess())
+        expect(result).to.deep.equal(success(recherche))
       })
     })
   })
