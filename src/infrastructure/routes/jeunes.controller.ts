@@ -105,6 +105,7 @@ import {
 import { GetJeuneHomeAgendaQueryHandler } from '../../application/queries/get-jeune-home-agenda.query.db'
 import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
 import { DateTime } from 'luxon'
+import { toDemarcheQueryModel } from '../../application/queries/query-mappers/demarche.mappers'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -395,6 +396,12 @@ export class JeunesController {
   ): Promise<DemarcheQueryModel> {
     const command: UpdateStatutDemarcheCommand = {
       ...updateDemarchePayload,
+      dateFin: DateTime.fromISO(updateDemarchePayload.dateFin, {
+        setZone: true
+      }),
+      dateDebut: updateDemarchePayload.dateDebut
+        ? DateTime.fromISO(updateDemarchePayload.dateDebut, { setZone: true })
+        : undefined,
       idJeune,
       idDemarche,
       accessToken
@@ -405,7 +412,7 @@ export class JeunesController {
     )
 
     if (isSuccess(result)) {
-      return result.data
+      return toDemarcheQueryModel(result.data)
     }
     throw handleFailure(result)
   }
@@ -426,6 +433,9 @@ export class JeunesController {
   ): Promise<DemarcheQueryModel> {
     const command: CreateDemarcheCommand = {
       ...createDemarchePayload,
+      dateFin: DateTime.fromISO(createDemarchePayload.dateFin, {
+        setZone: true
+      }),
       idJeune,
       accessToken
     }
@@ -435,7 +445,7 @@ export class JeunesController {
     )
 
     if (isSuccess(result)) {
-      return result.data
+      return toDemarcheQueryModel(result.data)
     }
     throw handleFailure(result)
   }

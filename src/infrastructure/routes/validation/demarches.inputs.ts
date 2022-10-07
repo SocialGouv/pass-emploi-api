@@ -1,6 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { Type } from 'class-transformer'
-import { IsDate, IsEnum, IsNotEmpty, IsOptional, Length } from 'class-validator'
+import {
+  IsDateString,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  Length
+} from 'class-validator'
 import { Demarche } from '../../../domain/demarche'
 
 export class UpdateStatutDemarchePayload {
@@ -9,22 +14,19 @@ export class UpdateStatutDemarchePayload {
   statut: Demarche.Statut
 
   @ApiProperty({ type: Date })
-  @Type(() => Date)
-  @IsDate()
-  dateFin: Date
+  @IsDateString()
+  dateFin: string
 
   @ApiPropertyOptional({ type: Date })
-  @Type(() => Date)
-  @IsDate()
+  @IsDateString()
   @IsOptional()
-  dateDebut?: Date
+  dateDebut?: string
 }
 
 export class CreateDemarchePayload {
   @ApiProperty({ type: Date })
-  @Type(() => Date)
-  @IsDate()
-  dateFin: Date
+  @IsDateString()
+  dateFin: string
 
   @ApiPropertyOptional()
   @IsOptional()

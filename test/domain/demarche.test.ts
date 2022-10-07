@@ -1,11 +1,7 @@
-import { DateObjectUnits, DateTime } from 'luxon'
+import { DateObjectUnits } from 'luxon'
 import { Demarche } from '../../src/domain/demarche'
 import { DateService } from '../../src/utils/date-service'
-import {
-  uneDate,
-  uneDatetime,
-  uneDatetimeLocale
-} from '../fixtures/date.fixture'
+import { uneDatetime, uneDatetimeLocale } from '../fixtures/date.fixture'
 import { uneDemarche } from '../fixtures/demarche.fixture'
 import { expect, StubbedClass, stubClass } from '../utils'
 import { failure, success } from '../../src/building-blocks/types/result'
@@ -41,7 +37,7 @@ describe('Demarche', () => {
           const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
             demarche.id,
             Demarche.Statut.EN_COURS,
-            uneDatetime().toUTC().plus({ day: 5 }).toJSDate()
+            uneDatetime().plus({ day: 5 })
           )
 
           // Then
@@ -66,7 +62,7 @@ describe('Demarche', () => {
           const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
             demarche.id,
             Demarche.Statut.EN_COURS,
-            uneDatetime().minus({ day: 5 }).toJSDate()
+            uneDatetime().minus({ day: 5 })
           )
 
           // Then
@@ -85,7 +81,7 @@ describe('Demarche', () => {
         it('génère une date de debut et de modification', () => {
           // Given
           const demarche = uneDemarche({
-            dateDebut: uneDatetime().plus({ day: 5 }).toJSDate()
+            dateDebut: uneDatetime().plus({ day: 5 })
           })
           // When
           const demarcheModifiee = demarcheFactory.mettreAJourLeStatut(
@@ -110,9 +106,8 @@ describe('Demarche', () => {
       describe('quand la date de debut est dans le passé', () => {
         it('génère une date de modification', () => {
           // Given
-          const dateDebutDansLePasse = uneDatetime()
-            .minus({ day: 5 })
-            .toJSDate()
+          const dateDebutDansLePasse = uneDatetime().minus({ day: 5 })
+
           const demarche = uneDemarche({
             dateDebut: dateDebutDansLePasse
           })
@@ -181,7 +176,7 @@ describe('Demarche', () => {
             statut: Demarche.Statut.A_FAIRE,
             dateModification: uneDatetime(),
             dateDebut: undefined,
-            dateFin: DateTime.fromJSDate(demarche.dateFin)
+            dateFin: demarche.dateFin
           })
         )
       })
@@ -217,7 +212,7 @@ describe('Demarche', () => {
       it('génère une démarche perso', () => {
         // Given
         const description = 'test'
-        const dateFin = uneDate()
+        const dateFin = uneDatetime()
         const demarcheACreer: Demarche.ACreer = {
           description,
           dateFin
@@ -230,7 +225,7 @@ describe('Demarche', () => {
         const demarcheCree: Demarche.Creee = {
           statut: Demarche.Statut.A_FAIRE,
           dateCreation: uneDateAMidi,
-          dateFin: DateTime.fromJSDate(dateFin).set(parametreHeureAMidi),
+          dateFin: dateFin.set(parametreHeureAMidi),
           pourquoi: 'P01',
           quoi: 'Q38',
           description
@@ -242,7 +237,7 @@ describe('Demarche', () => {
       describe('quand les champs sont invalides', () => {
         it('rejette', () => {
           // Given
-          const dateFin = uneDate()
+          const dateFin = uneDatetime()
           const demarcheACreer: Demarche.ACreer = {
             dateFin,
             quoi: 'C21',
@@ -262,7 +257,7 @@ describe('Demarche', () => {
       describe('quand les champs sont valides', () => {
         it('génère une démarche', () => {
           // Given
-          const dateFin = uneDate()
+          const dateFin = uneDatetime()
           const demarcheACreer: Demarche.ACreer = {
             dateFin,
             quoi: 'C21',
@@ -277,7 +272,7 @@ describe('Demarche', () => {
           const demarcheCree: Demarche.Creee = {
             statut: Demarche.Statut.A_FAIRE,
             dateCreation: uneDateAMidi,
-            dateFin: DateTime.fromJSDate(dateFin).set(parametreHeureAMidi),
+            dateFin: dateFin.set(parametreHeureAMidi),
             quoi: 'C21',
             pourquoi: 'A42',
             comment: 'B12'

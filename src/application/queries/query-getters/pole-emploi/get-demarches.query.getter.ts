@@ -18,6 +18,7 @@ import {
 import { DateService } from '../../../../utils/date-service'
 import { fromDemarcheDtoToDemarche } from '../../query-mappers/actions-pole-emploi.mappers'
 import { DemarcheQueryModel } from '../../query-models/actions.query-model'
+import { toDemarcheQueryModel } from '../../query-mappers/demarche.mappers'
 
 export interface Query {
   idJeune: string
@@ -60,7 +61,7 @@ export class GetDemarchesQueryGetter {
         )
         .sort(query.tri)
 
-      return success(demarches)
+      return success(demarches.map(toDemarcheQueryModel))
     } catch (e) {
       this.logger.error(e)
       if (e.response) {
@@ -76,23 +77,20 @@ export class GetDemarchesQueryGetter {
 export namespace GetDemarchesQueryGetter {
   export namespace Tri {
     export function parSatutEtDateFin(
-      demarche1: DemarcheQueryModel,
-      demarche2: DemarcheQueryModel
+      demarche1: Demarche,
+      demarche2: Demarche
     ): number {
       return parStatut(demarche1, demarche2) || parDateFin(demarche1, demarche2)
     }
 
     export function parDateFin(
-      demarche1: DemarcheQueryModel,
-      demarche2: DemarcheQueryModel
+      demarche1: Demarche,
+      demarche2: Demarche
     ): number {
-      return demarche1.dateFin.getTime() - demarche2.dateFin.getTime()
+      return demarche1.dateFin.toMillis() - demarche2.dateFin.toMillis()
     }
 
-    function parStatut(
-      demarche1: DemarcheQueryModel,
-      demarche2: DemarcheQueryModel
-    ): number {
+    function parStatut(demarche1: Demarche, demarche2: Demarche): number {
       return statutsOrder[demarche1.statut] - statutsOrder[demarche2.statut]
     }
 
@@ -105,6 +103,6 @@ export namespace GetDemarchesQueryGetter {
   }
 
   export interface TriQuery {
-    (demarche1: DemarcheQueryModel, demarche2: DemarcheQueryModel): number
+    (demarche1: Demarche, demarche2: Demarche): number
   }
 }

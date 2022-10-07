@@ -11,7 +11,6 @@ import {
   Result,
   success
 } from '../../../src/building-blocks/types/result'
-import { uneDemarche } from '../../fixtures/demarche.fixture'
 import { DateTime } from 'luxon'
 import { JeuneHomeAgendaPoleEmploiQueryModel } from '../../../src/application/queries/query-models/home-jeune-suivi.query-model'
 import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
@@ -19,6 +18,7 @@ import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
+import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 
 describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
   let handler: GetJeuneHomeAgendaPoleEmploiQueryHandler
@@ -43,17 +43,17 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
   describe('handle', () => {
     const maintenant = DateTime.fromISO('2020-04-06T12:00:00.000Z')
     const dansDeuxSemaines = DateTime.fromISO('2020-04-20T12:00:00.000Z')
-    const uneDemarcheDeLaSemaineDerniere = uneDemarche({
-      dateFin: maintenant.minus({ weeks: 1 }).toJSDate()
+    const uneDemarcheDeLaSemaineDerniere = uneDemarcheQueryModel({
+      dateFin: maintenant.minus({ weeks: 1 }).toISO()
     })
-    const uneDemarcheDeLaSemaine = uneDemarche({
-      dateFin: maintenant.plus({ day: 1 }).toJSDate()
+    const uneDemarcheDeLaSemaine = uneDemarcheQueryModel({
+      dateFin: maintenant.plus({ day: 1 }).toISO()
     })
-    const uneDemarcheDeLaSemaineProchaine = uneDemarche({
-      dateFin: maintenant.plus({ weeks: 1 }).toJSDate()
+    const uneDemarcheDeLaSemaineProchaine = uneDemarcheQueryModel({
+      dateFin: maintenant.plus({ weeks: 1 }).toISO()
     })
-    const uneDemarcheDansDeuxSemainesPlusUnJour = uneDemarche({
-      dateFin: maintenant.plus({ weeks: 2, day: 1 }).toJSDate()
+    const uneDemarcheDansDeuxSemainesPlusUnJour = uneDemarcheQueryModel({
+      dateFin: maintenant.plus({ weeks: 2, day: 1 }).toISO()
     })
 
     const unRendezVousHier = unRendezVousQueryModel({

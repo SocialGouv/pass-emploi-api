@@ -6,13 +6,14 @@ import { Authentification } from '../../domain/authentification'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Demarche, DemarcheRepositoryToken } from '../../domain/demarche'
+import { DateTime } from 'luxon'
 
 export interface UpdateStatutDemarcheCommand extends Command {
   idJeune: string
   accessToken: string
   idDemarche: string
-  dateDebut?: Date
-  dateFin: Date
+  dateDebut?: DateTime
+  dateFin: DateTime
   statut: Demarche.Statut
 }
 

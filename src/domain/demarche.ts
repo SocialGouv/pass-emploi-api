@@ -16,11 +16,11 @@ export interface Demarche {
   label: string
   titre: string
   sousTitre?: string
-  dateCreation: Date
-  dateDebut?: Date
-  dateModification?: Date
-  dateAnnulation?: Date
-  dateFin: Date
+  dateCreation: DateTime
+  dateDebut?: DateTime
+  dateModification?: DateTime
+  dateAnnulation?: DateTime
+  dateFin: DateTime
   creeeParConseiller: boolean
   modifieParConseiller: boolean
   attributs: Demarche.Attribut[]
@@ -39,7 +39,7 @@ export namespace Demarche {
   }
 
   export interface ACreer {
-    dateFin: Date
+    dateFin: DateTime
     pourquoi?: string
     quoi?: string
     comment?: string
@@ -98,8 +98,8 @@ export namespace Demarche {
     mettreAJourLeStatut(
       id: string,
       statut: Demarche.Statut,
-      dateFin: Date,
-      dateDebut?: Date
+      dateFin: DateTime,
+      dateDebut?: DateTime
     ): Result<Demarche.Modifiee> {
       const maintenant = this.dateService.now()
 
@@ -107,7 +107,7 @@ export namespace Demarche {
         id,
         statut,
         dateModification: maintenant,
-        dateFin: DateTime.fromJSDate(dateFin)
+        dateFin
       }
 
       switch (statut) {
@@ -132,9 +132,7 @@ export namespace Demarche {
 
     creerDemarche(demarcheACreer: Demarche.ACreer): Result<Demarche.Creee> {
       const maintenant = setHoursTo12h00(this.dateService.now())
-      const dateTimeFin = setHoursTo12h00(
-        DateTime.fromJSDate(demarcheACreer.dateFin)
-      )
+      const dateTimeFin = setHoursTo12h00(demarcheACreer.dateFin)
 
       if (demarcheACreer.quoi && demarcheACreer.pourquoi) {
         return success({
@@ -164,11 +162,11 @@ export namespace Demarche {
     }
 
     private mettreEnCours(
-      dateFin: Date,
+      dateFin: DateTime,
       maintenant: DateTime,
       demarcheModifiee: Demarche.Modifiee
     ): Result<Demarche.Modifiee> {
-      if (dateFin < setHoursTo12h00(maintenant).toJSDate()) {
+      if (dateFin < setHoursTo12h00(maintenant)) {
         return failure(
           new MauvaiseCommandeError(
             'Une démarche en cours ne peut pas avoir une date de fin dans le passé'
@@ -183,12 +181,12 @@ export namespace Demarche {
     }
 
     private realiser(
-      dateDebut: Date | undefined,
+      dateDebut: DateTime | undefined,
       maintenant: DateTime,
       demarcheModifiee: Demarche.Modifiee
     ): Result<Demarche.Modifiee> {
       const maintenantA12Heures = setHoursTo12h00(maintenant)
-      if (dateDebut && dateDebut < maintenantA12Heures.toJSDate()) {
+      if (dateDebut && dateDebut < maintenantA12Heures) {
         return success({
           ...demarcheModifiee,
           dateFin: maintenantA12Heures

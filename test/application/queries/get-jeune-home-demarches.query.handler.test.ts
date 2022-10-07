@@ -3,7 +3,7 @@ import { GetCampagneQueryModel } from '../../../src/application/queries/query-ge
 import { uneCampagneQueryModel } from '../../fixtures/campagne.fixture'
 import { GetJeuneHomeDemarchesQueryHandler } from '../../../src/application/queries/get-jeune-home-demarches.query.handler'
 import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
-import { desDemarches } from '../../fixtures/query-models/demarche.query-model.fixtures'
+import { desDemarchesQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
@@ -16,7 +16,7 @@ describe('GetJeuneHomeDemarchesQueryHandler', () => {
   let getJeuneHomeDemarchesQueryHandler: GetJeuneHomeDemarchesQueryHandler
 
   const campagneQueryModel = uneCampagneQueryModel()
-  const demarchesQueryModel = desDemarches()
+  const demarchesQueryModel = desDemarchesQueryModel()
 
   beforeEach(() => {
     getActionsJeunePoleEmploiQueryGetter = stubClass(GetDemarchesQueryGetter)

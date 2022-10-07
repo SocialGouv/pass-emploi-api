@@ -76,6 +76,7 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
     const maintenant = this.dateService.nowJs()
     const rendezVousSql = await RendezVousSqlModel.findAll({
       include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }],
+      order: [['date', 'DESC']],
       where: {
         date: {
           [Op.gte]: maintenant
