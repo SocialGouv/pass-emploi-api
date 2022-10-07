@@ -13,8 +13,8 @@ export const uneRecherche = (args: Partial<Recherche> = {}): Recherche => {
       commune: '75017',
       query: 'Boulanger'
     },
-    dateCreation: uneDatetimeMoinsRecente,
-    dateDerniereRecherche: uneDatetimeMoinsRecente,
+    dateCreation: uneDatetimeMoinsRecente(),
+    dateDerniereRecherche: uneDatetimeMoinsRecente(),
     idJeune: '1',
     etat: Recherche.Etat.SUCCES
   }

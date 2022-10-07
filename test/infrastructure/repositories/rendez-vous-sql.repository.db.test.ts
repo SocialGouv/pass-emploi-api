@@ -23,7 +23,7 @@ describe('RendezVousRepositorySql', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
   let rendezVousRepositorySql: RendezVousRepositorySql
   const maintenant = uneDatetime()
-  const aujourdhuiMinuit = uneDatetimeMinuit
+  const aujourdhuiMinuit = uneDatetimeMinuit()
   let jeune: JeuneDuRendezVous
   let unAutreJeune: JeuneDuRendezVous
 
