@@ -77,7 +77,7 @@ export class CommentaireActionQueryModel {
   id: string
 
   @ApiProperty()
-  date: Date
+  date: string
 
   @ApiProperty()
   createur: CreateurQueryModel

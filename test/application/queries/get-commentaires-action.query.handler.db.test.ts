@@ -99,7 +99,7 @@ describe('GetCommentairesActionQueryHandler', () => {
         {
           id: 'fe6c4205-afc2-42d0-931b-edd96a9823a9',
           message: 'message 1',
-          date: uneDatetime().toJSDate(),
+          date: uneDatetime().toISO(),
           createur: {
             id: 'poi-id-createur',
             nom: 'poi-nom',
@@ -110,7 +110,7 @@ describe('GetCommentairesActionQueryHandler', () => {
         {
           id: '15e0cf2e-e082-47f1-8cee-e2aa18fd8918',
           message: 'message 2',
-          date: uneAutreDatetime().toJSDate(),
+          date: uneAutreDatetime().toISO(),
           createur: {
             id: 'poi-id-createur',
             nom: 'poi-nom',
