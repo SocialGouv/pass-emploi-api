@@ -6,6 +6,7 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { CommentaireActionQueryModel } from './query-models/actions.query-model'
 import { ActionAuthorizer } from '../authorizers/authorize-action'
 import { CommentaireSqlModel } from '../../infrastructure/sequelize/models/commentaire.sql-model'
+import { DateTime } from 'luxon'
 
 export interface GetCommentairesAction extends Query {
   idAction: string
@@ -34,7 +35,7 @@ export class GetCommentairesActionQueryHandler extends QueryHandler<
       commentairesSql.map(commentaireSql => {
         return {
           id: commentaireSql.id,
-          date: commentaireSql.date,
+          date: DateTime.fromJSDate(commentaireSql.date).toISO(),
           createur: commentaireSql.createur,
           message: commentaireSql.message
         }

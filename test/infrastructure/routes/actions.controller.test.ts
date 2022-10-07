@@ -35,6 +35,7 @@ import {
   QualifierActionCommand,
   QualifierActionCommandHandler
 } from '../../../src/application/commands/qualifier-action.command.handler'
+import { DateService } from '../../../src/utils/date-service'
 
 let getDetailActionQueryHandler: StubbedClass<GetDetailActionQueryHandler>
 let deleteActionCommandHandler: StubbedClass<DeleteActionCommandHandler>
@@ -200,7 +201,7 @@ describe('ActionsController', () => {
           .expect(HttpStatus.CREATED)
           .expect({
             ...commentaireCree,
-            date: commentaireCree.date.toUTC().toISO()
+            date: commentaireCree.date.toISO()
           })
 
         expect(
@@ -241,7 +242,7 @@ describe('ActionsController', () => {
         const commentaireQueryModel: CommentaireActionQueryModel = {
           id: '99dc0cc1-84ef-4979-aa5c-4477ddeb26bd',
           message: "Qu'en est-il de cette action ?",
-          date: uneDate(),
+          date: DateService.fromJSDateToISOString(uneDate()),
           createur: {
             id: conseiller.id,
             prenom: conseiller.firstName,
@@ -261,7 +262,12 @@ describe('ActionsController', () => {
           .set('authorization', unHeaderAuthorization())
           // Then
           .expect(HttpStatus.OK)
-          .expect([{ ...commentaireQueryModel, date: uneDate().toISOString() }])
+          .expect([
+            {
+              ...commentaireQueryModel,
+              date: DateService.fromJSDateToISOString(uneDate())
+            }
+          ])
       })
       it("retourne une erreur non autorisée pour un utilisateur n'ayant pas les droits", async () => {
         // Given

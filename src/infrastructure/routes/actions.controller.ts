@@ -46,6 +46,7 @@ import {
   QualifierActionCommandHandler
 } from '../../application/commands/qualifier-action.command.handler'
 import { DateTime } from 'luxon'
+import { toCommentaireQueryModel } from '../../application/queries/query-mappers/commentaire.mapper'
 
 @Controller('actions')
 @ApiOAuth2([])
@@ -163,10 +164,7 @@ export class ActionsController {
       throw handleFailure(result)
     }
 
-    return {
-      ...result.data,
-      date: result.data.date.toJSDate()
-    }
+    return toCommentaireQueryModel(result.data)
   }
 
   @ApiOperation({
