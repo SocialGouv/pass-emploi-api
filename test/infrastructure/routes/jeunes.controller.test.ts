@@ -21,11 +21,7 @@ import {
 } from 'src/infrastructure/routes/validation/jeunes.inputs'
 import { DateService } from 'src/utils/date-service'
 import * as request from 'supertest'
-import {
-  uneDate,
-  uneDatetime,
-  uneDatetimeAvecOffset
-} from 'test/fixtures/date.fixture'
+import { uneDatetime, uneDatetimeAvecOffset } from 'test/fixtures/date.fixture'
 import { uneDemarche } from 'test/fixtures/demarche.fixture'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
 import { DeleteJeuneInactifCommandHandler } from '../../../src/application/commands/delete-jeune-inactif.command.handler'
@@ -85,6 +81,7 @@ import {
 } from '../../../src/application/queries/query-models/home-jeune-suivi.query-model'
 import { uneActionQueryModelSansJeune } from '../../fixtures/query-models/action.query-model.fixtures'
 import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../../src/application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
+import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 import StatutInvalide = Action.StatutInvalide
 
 describe('JeunesController', () => {
@@ -909,7 +906,7 @@ describe('JeunesController', () => {
     })
     it('retourne les démarches', async () => {
       // Given
-      const demarche = uneDemarche()
+      const demarche = uneDemarcheQueryModel()
       jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
       getActionsPoleEmploiQueryHandler.execute.resolves(success([demarche]))
 
@@ -921,10 +918,10 @@ describe('JeunesController', () => {
         .expect([
           {
             ...demarche,
-            dateCreation: demarche.dateCreation?.toISOString(),
-            dateDebut: demarche.dateDebut?.toISOString(),
-            dateFin: demarche.dateFin?.toISOString(),
-            dateModification: demarche.dateModification?.toISOString()
+            dateCreation: demarche.dateCreation,
+            dateDebut: demarche.dateDebut,
+            dateFin: demarche.dateFin,
+            dateModification: demarche.dateModification
           }
         ])
     })
@@ -1044,8 +1041,8 @@ describe('JeunesController', () => {
     const maintenant = '2022-08-17T12:00:30+02:00'
     const queryModel: JeuneHomeAgendaPoleEmploiQueryModel = {
       demarches: [
-        enleverLesUndefined(uneDemarche()),
-        enleverLesUndefined(uneDemarche())
+        enleverLesUndefined(uneDemarcheQueryModel()),
+        enleverLesUndefined(uneDemarcheQueryModel())
       ],
       rendezVous: [],
       metadata: {
@@ -1178,7 +1175,7 @@ describe('JeunesController', () => {
     const idDemarche = 'demarche'
     const payload: UpdateStatutDemarchePayload = {
       statut: Demarche.Statut.REALISEE,
-      dateFin: uneDate()
+      dateFin: uneDatetimeAvecOffset().toISO()
     }
     const demarche = uneDemarche()
     describe("quand c'est en succès", () => {
@@ -1189,7 +1186,8 @@ describe('JeunesController', () => {
           .withArgs(
             {
               statut: payload.statut,
-              dateFin: uneDate(),
+              dateFin: uneDatetimeAvecOffset(),
+              dateDebut: undefined,
               idJeune,
               idDemarche,
               accessToken: 'coucou'
@@ -1211,18 +1209,9 @@ describe('JeunesController', () => {
       it('renvoie une erreur HTTP', async () => {
         // Given
         jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
-        updateStatutDemarcheCommandHandler.execute
-          .withArgs(
-            {
-              statut: payload.statut,
-              dateFin: uneDate(),
-              idJeune,
-              idDemarche,
-              accessToken: 'coucou'
-            },
-            unUtilisateurDecode()
-          )
-          .resolves(failure(new ErreurHttp("C'est cassé", 400)))
+        updateStatutDemarcheCommandHandler.execute.resolves(
+          failure(new ErreurHttp("C'est cassé", 400))
+        )
 
         // When
         await request(app.getHttpServer())
@@ -1244,7 +1233,7 @@ describe('JeunesController', () => {
     const idJeune = '1'
     const payload: CreateDemarchePayload = {
       description: 'string',
-      dateFin: uneDate()
+      dateFin: uneDatetimeAvecOffset().toISO()
     }
     const demarche = uneDemarche()
     describe("quand c'est en succès", () => {
@@ -1257,7 +1246,7 @@ describe('JeunesController', () => {
               idJeune,
               accessToken: 'coucou',
               description: payload.description,
-              dateFin: payload.dateFin
+              dateFin: uneDatetimeAvecOffset()
             },
             unUtilisateurDecode()
           )
@@ -1282,7 +1271,7 @@ describe('JeunesController', () => {
               idJeune,
               accessToken: 'coucou',
               description: payload.description,
-              dateFin: payload.dateFin
+              dateFin: uneDatetimeAvecOffset()
             },
             unUtilisateurDecode()
           )

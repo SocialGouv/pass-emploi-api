@@ -8,18 +8,17 @@ import { Demarche } from '../../../../src/domain/demarche'
 import { DateTime } from 'luxon'
 import { DateService } from '../../../../src/utils/date-service'
 
-describe('mappers', () => {
+describe('ActionPoleEmploiMapper', () => {
   describe('fromDemarcheDtoToDemarcheQueryModel', () => {
     let demarcheDto: DemarcheDto
     let dateService: StubbedClass<DateService>
-    const stringUTC = '2020-04-06T10:20:00.000Z'
-    const maintenant = new Date('2022-05-09T10:11:00+02:00')
+    const maintenant = DateTime.fromISO('2022-05-09T10:11:00+02:00', {
+      setZone: true
+    })
 
     beforeEach(() => {
       dateService = stubClass(DateService)
-      dateService.nowJs.returns(maintenant)
-      dateService.now.returns(DateTime.fromJSDate(maintenant))
-      dateService.fromISOStringToJSDate.returns(new Date(stringUTC))
+      dateService.now.returns(maintenant)
 
       demarcheDto = {
         idDemarche: '198916488',
@@ -79,10 +78,10 @@ describe('mappers', () => {
         contenu: 'Identification de ses compétences avec pole-emploi.fr',
         creeeParConseiller: true,
         dateAnnulation: undefined,
-        dateCreation: new Date('2020-04-06T10:20:00.000Z'),
-        dateFin: new Date('2020-04-06T10:20:00.000Z'),
-        dateModification: new Date('2020-04-06T10:20:00.000Z'),
-        dateDebut: new Date('2020-04-06T10:20:00.000Z'),
+        dateDebut: DateTime.fromISO('2022-05-09T08:11:00+02:00'),
+        dateFin: DateTime.fromISO('2022-05-10T10:00:00+02:00'),
+        dateCreation: DateTime.fromISO('2022-05-11T11:04:00+02:00'),
+        dateModification: DateTime.fromISO('2021-11-29T11:04:00+01:00'),
         id: '198916488',
         label: 'Mon (nouveau) métier',
         modifieParConseiller: false,
@@ -114,7 +113,7 @@ describe('mappers', () => {
       // Given
       demarcheDto.etat = DemarcheDtoEtat.AF
       demarcheDto.dateDebut = '2222-04-06T10:20:00+02:00'
-      // When
+      // WhenT
       const queryModel = fromDemarcheDtoToDemarche(demarcheDto, dateService)
       // Then
       expect(queryModel.statut).to.equal(Demarche.Statut.A_FAIRE)
@@ -207,9 +206,7 @@ describe('mappers', () => {
             // Given
             demarcheDto.etat = DemarcheDtoEtat.AC
             demarcheDto.droitsDemarche!.modificationDate = true
-            demarcheDto.dateFin = DateTime.fromJSDate(maintenant)
-              .minus({ day: 1 })
-              .toString()
+            demarcheDto.dateFin = maintenant.minus({ day: 1 }).toString()
             // When
             const queryModel = fromDemarcheDtoToDemarche(
               demarcheDto,

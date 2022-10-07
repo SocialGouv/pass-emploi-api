@@ -51,7 +51,7 @@ describe('UpdateDemarcheCommandHandler', () => {
         dateDebut: demarche.dateDebut,
         idDemarche: demarche.id,
         statut: Demarche.Statut.EN_COURS,
-        dateFin: uneDatetime().toJSDate()
+        dateFin: uneDatetime()
       }
 
       describe('quand la mise a jour se passe bien', () => {

@@ -1,4 +1,5 @@
 import { Demarche } from '../../src/domain/demarche'
+import { DateTime } from 'luxon'
 
 export const uneDemarche = (args: Partial<Demarche> = {}): Demarche => {
   const defaults: Demarche = {
@@ -22,10 +23,10 @@ export const uneDemarche = (args: Partial<Demarche> = {}): Demarche => {
     codeDemarche: 'codeDemarche',
     contenu: 'Identification de ses compétences avec pole-emploi.fr',
     creeeParConseiller: true,
-    dateCreation: new Date('2020-04-06T10:20:00.000Z'),
-    dateFin: new Date('2020-04-06T10:20:00.000Z'),
-    dateDebut: new Date('2020-04-06T10:20:00.000Z'),
-    dateModification: new Date('2020-04-06T10:20:00.000Z'),
+    dateCreation: DateTime.fromISO('2020-04-06T10:20:00.000Z'),
+    dateFin: DateTime.fromISO('2020-04-06T10:20:00.000Z'),
+    dateDebut: DateTime.fromISO('2020-04-06T10:20:00.000Z'),
+    dateModification: DateTime.fromISO('2020-04-06T10:20:00.000Z'),
     id: '198916488',
     label: 'Mon (nouveau) métier',
     modifieParConseiller: false,

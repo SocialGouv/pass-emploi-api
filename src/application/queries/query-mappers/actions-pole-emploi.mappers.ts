@@ -11,27 +11,28 @@ export function fromDemarcheDtoToDemarche(
   demarcheDto: DemarcheDto,
   dateService: DateService
 ): Demarche {
+  const aujourdhuiAMidi = dateService.now().set({ hour: 12 })
   return {
     id: demarcheDto.idDemarche,
     codeDemarche: codeEnBase64(demarcheDto),
     contenu: demarcheDto.libelleCourt,
     dateModification: demarcheDto.dateModification
-      ? dateService.fromISOStringToJSDate(demarcheDto.dateModification)
+      ? DateTime.fromISO(demarcheDto.dateModification)
       : undefined,
-    statut: buildStatut(demarcheDto, dateService),
-    dateFin: dateService.fromISOStringToJSDate(demarcheDto.dateFin),
+    statut: buildStatut(demarcheDto, aujourdhuiAMidi),
+    dateFin: DateTime.fromISO(demarcheDto.dateFin),
     dateDebut: demarcheDto.dateDebut
-      ? dateService.fromISOStringToJSDate(demarcheDto.dateDebut)
+      ? DateTime.fromISO(demarcheDto.dateDebut)
       : undefined,
     dateAnnulation: demarcheDto.dateAnnulation
-      ? dateService.fromISOStringToJSDate(demarcheDto.dateAnnulation)
+      ? DateTime.fromISO(demarcheDto.dateAnnulation)
       : undefined,
     label: demarcheDto.libellePourquoi,
     titre: demarcheDto.libelleQuoi,
     sousTitre: demarcheDto.libelleComment,
-    dateCreation: dateService.fromISOStringToJSDate(demarcheDto.dateCreation),
+    dateCreation: DateTime.fromISO(demarcheDto.dateCreation),
     attributs: buildAttributs(demarcheDto),
-    statutsPossibles: buildStatutsPossibles(demarcheDto, dateService.nowJs()),
+    statutsPossibles: buildStatutsPossibles(demarcheDto, aujourdhuiAMidi),
     modifieParConseiller: demarcheDto.origineModificateur === 'CONSEILLER',
     creeeParConseiller: demarcheDto.origineCreateur === 'CONSEILLER'
   }
@@ -39,7 +40,7 @@ export function fromDemarcheDtoToDemarche(
 
 function buildStatutsPossibles(
   demarcheDto: DemarcheDto,
-  maintenant: Date
+  maintenant: DateTime
 ): Demarche.Statut[] {
   const statuts: Demarche.Statut[] = []
 
@@ -57,9 +58,7 @@ function buildStatutsPossibles(
   ) {
     statuts.push(Demarche.Statut.A_FAIRE)
 
-    const dateFin = DateTime.fromISO(demarcheDto.dateFin)
-      .set({ hour: 12 })
-      .toJSDate()
+    const dateFin = DateTime.fromISO(demarcheDto.dateFin).set({ hour: 12 })
     if (dateFin > maintenant) {
       statuts.push(Demarche.Statut.EN_COURS)
     }
@@ -141,9 +140,8 @@ function buildAttributs(demarcheDto: DemarcheDto): Demarche.Attribut[] {
 
 function buildStatut(
   demarcheDto: DemarcheDto,
-  dateService: DateService
+  aujourdhuiAMidi: DateTime
 ): Demarche.Statut {
-  const aujourdhuiAMidi = dateService.now().set({ hour: 12 })
   const debut = demarcheDto.dateDebut
     ? DateTime.fromISO(demarcheDto.dateDebut)
     : undefined

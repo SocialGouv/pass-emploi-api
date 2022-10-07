@@ -54,8 +54,8 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
 
     const demarches = resultDemarches.data.filter(
       demarche =>
-        demarche.dateFin >= maintenant.toJSDate() &&
-        demarche.dateFin <= dansDeuxSemaines.toJSDate()
+        DateTime.fromISO(demarche.dateFin) >= maintenant &&
+        DateTime.fromISO(demarche.dateFin) <= dansDeuxSemaines
     )
     const rendezVous = resultRendezVous.data.filter(
       unRendezVous =>
@@ -63,7 +63,7 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
         unRendezVous.date <= dansDeuxSemaines.toJSDate()
     )
     const nombreDeDemarchesEnRetard = resultDemarches.data.filter(
-      demarche => demarche.dateFin <= maintenant.toJSDate()
+      demarche => DateTime.fromISO(demarche.dateFin) <= maintenant
     ).length
 
     return success({

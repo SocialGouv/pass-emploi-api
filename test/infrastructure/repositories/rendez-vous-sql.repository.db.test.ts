@@ -237,10 +237,10 @@ describe('RendezVousRepositorySql', () => {
 
       // Then
       expect(rendezVous.length).to.equal(2)
+      expect(rendezVous[0].jeunes[0].id).to.equal(jeune.id)
       expect(rendezVous[0].id).to.equal(
         unRendezVousTresFuturPresenceConseillerFalse.id
       )
-      expect(rendezVous[0].jeunes[0].id).to.equal(jeune.id)
       expect(rendezVous[1].id).to.equal(unRendezVousProche.id)
     })
   })

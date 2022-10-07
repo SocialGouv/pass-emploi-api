@@ -111,7 +111,7 @@ export class AttributDemarcheQueryModel {
   cle: string
 }
 
-export class DemarcheQueryModel implements Demarche {
+export class DemarcheQueryModel {
   @ApiProperty()
   id: string
 
@@ -122,10 +122,10 @@ export class DemarcheQueryModel implements Demarche {
   statut: Demarche.Statut
 
   @ApiProperty()
-  dateFin: Date
+  dateFin: string
 
   @ApiProperty({ required: false })
-  dateDebut?: Date
+  dateDebut?: string
 
   @ApiProperty()
   label: string
@@ -137,13 +137,13 @@ export class DemarcheQueryModel implements Demarche {
   sousTitre?: string
 
   @ApiProperty()
-  dateCreation: Date
+  dateCreation: string
 
   @ApiProperty({ required: false })
-  dateModification?: Date
+  dateModification?: string
 
   @ApiProperty({ required: false })
-  dateAnnulation?: Date
+  dateAnnulation?: string
 
   @ApiProperty()
   creeeParConseiller: boolean
