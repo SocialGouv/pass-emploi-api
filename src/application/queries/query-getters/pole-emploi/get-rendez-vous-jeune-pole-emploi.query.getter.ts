@@ -32,8 +32,9 @@ import { RendezVousJeuneQueryModel } from '../../query-models/rendez-vous.query-
 
 export interface Query {
   idJeune: string
-  accessToken: string
   periode?: RendezVous.Periode
+  accessToken: string
+  idpToken?: string
 }
 
 @Injectable()
@@ -63,9 +64,11 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
     }
 
     const maintenant = this.dateService.now()
-    const idpToken = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
-      query.accessToken
-    )
+    const idpToken =
+      query.idpToken ??
+      (await this.keycloakClient.exchangeTokenPoleEmploiJeune(
+        query.accessToken
+      ))
 
     try {
       const [responsePrestations, responseRendezVous] = await Promise.all([
