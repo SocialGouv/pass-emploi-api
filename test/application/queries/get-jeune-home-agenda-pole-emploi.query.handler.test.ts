@@ -19,24 +19,30 @@ import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 
 describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
   let handler: GetJeuneHomeAgendaPoleEmploiQueryHandler
   let getDemarchesQueryGetter: StubbedClass<GetDemarchesQueryGetter>
   let getRendezVousJeunePoleEmploiQueryGetter: StubbedClass<GetRendezVousJeunePoleEmploiQueryGetter>
   let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
+  let keycloakClient: StubbedClass<KeycloakClient>
+  const idpToken = 'id-token'
 
   beforeEach(() => {
     getDemarchesQueryGetter = stubClass(GetDemarchesQueryGetter)
     getRendezVousJeunePoleEmploiQueryGetter = stubClass(
       GetRendezVousJeunePoleEmploiQueryGetter
     )
+    keycloakClient = stubClass(KeycloakClient)
+    keycloakClient.exchangeTokenPoleEmploiJeune.resolves(idpToken)
     jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
 
     handler = new GetJeuneHomeAgendaPoleEmploiQueryHandler(
       getDemarchesQueryGetter,
       getRendezVousJeunePoleEmploiQueryGetter,
-      jeunePoleEmploiAuthorizer
+      jeunePoleEmploiAuthorizer,
+      keycloakClient
     )
   })
 
@@ -80,7 +86,11 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
         }
 
         getDemarchesQueryGetter.handle
-          .withArgs({ ...query, tri: GetDemarchesQueryGetter.Tri.parDateFin })
+          .withArgs({
+            ...query,
+            tri: GetDemarchesQueryGetter.Tri.parDateFin,
+            idpToken
+          })
           .resolves(
             success([
               uneDemarcheDansDeuxSemainesPlusUnJour,
@@ -90,13 +100,18 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
             ])
           )
 
-        getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
-          success([
-            unRendezVousHier,
-            unRendezVousAujourdhui,
-            unRendezVousDansDeuxSemainesPlusUnJour
-          ])
-        )
+        getRendezVousJeunePoleEmploiQueryGetter.handle
+          .withArgs({
+            ...query,
+            idpToken
+          })
+          .resolves(
+            success([
+              unRendezVousHier,
+              unRendezVousAujourdhui,
+              unRendezVousDansDeuxSemainesPlusUnJour
+            ])
+          )
 
         // When
         result = await handler.handle(query)

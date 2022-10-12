@@ -22,8 +22,9 @@ import { toDemarcheQueryModel } from '../../query-mappers/demarche.mappers'
 
 export interface Query {
   idJeune: string
-  accessToken: string
   tri: GetDemarchesQueryGetter.TriQuery
+  accessToken: string
+  idpToken?: string
 }
 
 @Injectable()
@@ -46,9 +47,11 @@ export class GetDemarchesQueryGetter {
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
-    const idpToken = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
-      query.accessToken
-    )
+    const idpToken =
+      query.idpToken ??
+      (await this.keycloakClient.exchangeTokenPoleEmploiJeune(
+        query.accessToken
+      ))
 
     try {
       const demarchesDto = await this.poleEmploiPartenaireClient.getDemarches(

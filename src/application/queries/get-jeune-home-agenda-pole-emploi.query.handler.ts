@@ -8,6 +8,7 @@ import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
+import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 
 export interface GetJeuneHomeAgendaPoleEmploiQuery extends Query {
   idJeune: string
@@ -23,7 +24,8 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
   constructor(
     private getDemarchesQueryGetter: GetDemarchesQueryGetter,
     private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,
-    private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer
+    private jeunePoleEmploiAuthorizer: JeunePoleEmploiAuthorizer,
+    private keycloakClient: KeycloakClient
   ) {
     super('GetJeuneHomeAgendaPoleEmploiQueryHandler')
   }
@@ -34,13 +36,19 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
     const maintenant = DateTime.fromISO(query.maintenant, { setZone: true })
     const dansDeuxSemaines = maintenant.plus({ weeks: 2 })
 
+    const idpToken = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
+      query.accessToken
+    )
+
     const [resultDemarches, resultRendezVous] = await Promise.all([
       this.getDemarchesQueryGetter.handle({
         ...query,
-        tri: GetDemarchesQueryGetter.Tri.parDateFin
+        tri: GetDemarchesQueryGetter.Tri.parDateFin,
+        idpToken
       }),
       this.getRendezVousJeunePoleEmploiQueryGetter.handle({
-        ...query
+        ...query,
+        idpToken
       })
     ])
 
