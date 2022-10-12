@@ -34,6 +34,7 @@ export interface Query {
   idJeune: string
   accessToken: string
   periode?: RendezVous.Periode
+  idpToken?: string
 }
 
 @Injectable()
@@ -63,9 +64,12 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
     }
 
     const maintenant = this.dateService.now()
-    const idpToken = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
-      query.accessToken
-    )
+    let idpToken = query.idpToken ? query.idpToken : ''
+    if (idpToken === '') {
+      idpToken = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
+        query.accessToken
+      )
+    }
 
     try {
       const [responsePrestations, responseRendezVous] = await Promise.all([

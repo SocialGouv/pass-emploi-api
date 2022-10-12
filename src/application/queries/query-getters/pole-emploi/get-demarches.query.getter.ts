@@ -24,6 +24,7 @@ export interface Query {
   idJeune: string
   accessToken: string
   tri: GetDemarchesQueryGetter.TriQuery
+  idpToken?: string
 }
 
 @Injectable()
@@ -46,9 +47,12 @@ export class GetDemarchesQueryGetter {
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
-    const idpToken = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
-      query.accessToken
-    )
+    let idpToken = query.idpToken ? query.idpToken : ''
+    if (idpToken === '') {
+      idpToken = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
+        query.accessToken
+      )
+    }
 
     try {
       const demarchesDto = await this.poleEmploiPartenaireClient.getDemarches(
