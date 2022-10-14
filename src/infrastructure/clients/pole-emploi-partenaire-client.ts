@@ -149,6 +149,8 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
           includeOffset: false
         })
       }
+      this.logger.log(body)
+
       const demarcheDto = await this.put<DemarcheDto>(
         `${DEMARCHES_URL}/${demarcheModifiee.id}`,
         token,
@@ -182,6 +184,8 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
         comment: demarche.comment,
         description: demarche.description
       }
+
+      this.logger.log(body)
       const demarcheDto = await this.post<DemarcheDto>(
         DEMARCHES_URL,
         token,
