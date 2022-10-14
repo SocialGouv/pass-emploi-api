@@ -144,6 +144,7 @@ export class FindAllOffresEmploiQueryGetter {
         'minCreationDate',
         DateTime.fromISO(minDateCreation)
           .set({ millisecond: 0 })
+          .toUTC()
           .toISO({ suppressMilliseconds: true })
       )
       params.append(
@@ -151,6 +152,7 @@ export class FindAllOffresEmploiQueryGetter {
         this.dateService
           .now()
           .set({ millisecond: 0 })
+          .toUTC()
           .toISO({ suppressMilliseconds: true })
       )
     }
