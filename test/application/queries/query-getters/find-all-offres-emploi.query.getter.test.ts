@@ -107,7 +107,7 @@ describe('FindAllOffresEmploiQueryGetter', () => {
         )
       })
       it('quand il y a une date de création minimum', async () => {
-        // When
+        // Given
         const minDateDeCreation = maintenant.minus({ day: 1, hour: 2 })
         const criteres: GetOffresEmploiQuery = {
           page: 1,
@@ -116,19 +116,21 @@ describe('FindAllOffresEmploiQueryGetter', () => {
           commune: '75118',
           minDateCreation: minDateDeCreation.toISO()
         }
+
+        // When
         await findAllOffresEmploiQueryGetter.handle(criteres)
+
+        // Then
         const expectedQueryParams = new URLSearchParams({
           sort: '1',
           range: '0-49',
           commune: '75118',
-          minCreationDate: '2020-04-01T10:00:00Z',
+          minCreationDate: '2020-04-05T10:00:00Z',
           maxCreationDate: '2020-04-06T12:00:00Z'
         })
-
-        // Then
-        expect(poleEmploiClient.getOffresEmploi).to.have.been.calledWithExactly(
-          expectedQueryParams
-        )
+        expect(
+          poleEmploiClient.getOffresEmploi.getCall(0).firstArg.toString()
+        ).to.be.equal(expectedQueryParams.toString())
       })
     })
     describe('quand il y a une 429', () => {
