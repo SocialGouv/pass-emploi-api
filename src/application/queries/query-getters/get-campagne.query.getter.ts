@@ -109,5 +109,28 @@ export const questionsInMemory = (): QuestionCampagneQueryModel[] => [
         libelle: 'Oui, tout à fait'
       }
     ]
+  },
+  {
+    id: 3,
+    libelle: '*Mais quoi',
+    pourquoi: true,
+    options: [
+      {
+        id: 1,
+        libelle: 'Non, pas du tout'
+      },
+      {
+        id: 2,
+        libelle: 'Plutôt non'
+      },
+      {
+        id: 3,
+        libelle: 'Plutôt oui'
+      },
+      {
+        id: 4,
+        libelle: 'Oui, tout à fait'
+      }
+    ]
   }
 ]
