@@ -107,7 +107,7 @@ export namespace Demarche {
         id,
         statut,
         dateModification: maintenant,
-        dateFin
+        dateFin: setHoursTo12h00(dateFin)
       }
 
       switch (statut) {
