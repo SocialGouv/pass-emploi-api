@@ -107,7 +107,7 @@ export namespace Demarche {
         id,
         statut,
         dateModification: maintenant,
-        dateFin: setHoursTo12h00(dateFin)
+        dateFin: setHoursToMidiUTC(dateFin)
       }
 
       switch (statut) {
@@ -131,8 +131,8 @@ export namespace Demarche {
     }
 
     creerDemarche(demarcheACreer: Demarche.ACreer): Result<Demarche.Creee> {
-      const maintenant = setHoursTo12h00(this.dateService.now())
-      const dateTimeFin = setHoursTo12h00(demarcheACreer.dateFin)
+      const maintenant = setHoursToMidiUTC(this.dateService.now())
+      const dateTimeFin = setHoursToMidiUTC(demarcheACreer.dateFin)
 
       if (demarcheACreer.quoi && demarcheACreer.pourquoi) {
         return success({
@@ -166,7 +166,7 @@ export namespace Demarche {
       maintenant: DateTime,
       demarcheModifiee: Demarche.Modifiee
     ): Result<Demarche.Modifiee> {
-      if (dateFin < setHoursTo12h00(maintenant)) {
+      if (dateFin < setHoursToMidiUTC(maintenant)) {
         return failure(
           new MauvaiseCommandeError(
             'Une démarche en cours ne peut pas avoir une date de fin dans le passé'
@@ -176,7 +176,7 @@ export namespace Demarche {
 
       return success({
         ...demarcheModifiee,
-        dateDebut: setHoursTo12h00(maintenant)
+        dateDebut: setHoursToMidiUTC(maintenant)
       })
     }
 
@@ -185,7 +185,7 @@ export namespace Demarche {
       maintenant: DateTime,
       demarcheModifiee: Demarche.Modifiee
     ): Result<Demarche.Modifiee> {
-      const maintenantA12Heures = setHoursTo12h00(maintenant)
+      const maintenantA12Heures = setHoursToMidiUTC(maintenant)
       if (dateDebut && dateDebut < maintenantA12Heures) {
         return success({
           ...demarcheModifiee,
@@ -201,6 +201,6 @@ export namespace Demarche {
   }
 }
 
-function setHoursTo12h00(date: DateTime): DateTime {
-  return date.set({ hour: 12, minute: 0, second: 0, millisecond: 0 })
+function setHoursToMidiUTC(date: DateTime): DateTime {
+  return date.toUTC().set({ hour: 12, minute: 0, second: 0, millisecond: 0 })
 }
