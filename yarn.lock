@@ -5105,9 +5105,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"elastic-apm-node@npm:3.38.0":
-  version: 3.38.0
-  resolution: "elastic-apm-node@npm:3.38.0"
+"elastic-apm-node@npm:3.39.0":
+  version: 3.39.0
+  resolution: "elastic-apm-node@npm:3.39.0"
   dependencies:
     "@elastic/ecs-pino-format": ^1.2.0
     "@opentelemetry/api": ^1.1.0
@@ -5133,7 +5133,7 @@ __metadata:
     original-url: ^1.2.3
     pino: ^6.11.2
     relative-microtime: ^2.0.0
-    require-in-the-middle: ^5.0.3
+    require-in-the-middle: ^5.2.0
     semver: ^6.3.0
     set-cookie-serde: ^1.0.0
     shallow-clone-shim: ^2.0.0
@@ -5141,7 +5141,7 @@ __metadata:
     sql-summary: ^1.0.1
     traverse: ^0.6.6
     unicode-byte-truncate: ^1.0.0
-  checksum: 89ec0999fcb4dcba229867a57cf9d3d2303c9fad6acd57c1e2649de7163f92b73cf64308a4143694cf5c2f3f676c844094d0f20aa706b6728d3e224f470418b6
+  checksum: 2ac74afd1de42cafe3328ea4ffa6dd2b3e5f13014ce8de4ac43ac45b2e23355349abc641d4825ffa53f38ab5427bc49eb4a3565d5786fc5f0124cc4de03ab682
   languageName: node
   linkType: hard
 
@@ -8999,7 +8999,7 @@ __metadata:
     dirty-chai: ^2.0.1
     dotenv-cli: ^6.0.0
     dotvault: ^0.0.9
-    elastic-apm-node: 3.38.0
+    elastic-apm-node: 3.39.0
     eslint: 8.25.0
     eslint-config-prettier: ^8.5.0
     eslint-plugin-chai-friendly: ^0.7.2
@@ -10613,7 +10613,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"require-in-the-middle@npm:^5.0.3":
+"require-in-the-middle@npm:^5.2.0":
   version: 5.2.0
   resolution: "require-in-the-middle@npm:5.2.0"
   dependencies:
