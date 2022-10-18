@@ -4,6 +4,7 @@ echo "dump cej db and restore to another"
 
 #DUMP_RESTORE_DB_SOURCE=
 #DUMP_RESTORE_DB_TARGET=
+#DUMP_RESTORE_DB_FORCE=
 
 if [[ $APP != "pa-back-prod" ]] && [[ $DUMP_RESTORE_DB_FORCE != 'true' ]] ; then
   echo "error: must run only on prod"
@@ -27,7 +28,9 @@ then
   exit 1
 fi
 
-pg_dump --clean --if-exists --format c --dbname "$DUMP_RESTORE_DB_SOURCE" --no-owner --no-privileges --no-comments --schema 'public' --exclude-table 'spatial_ref_sys' --file dump.pgsql
+pg_dump --clean --if-exists --format c --dbname "$DUMP_RESTORE_DB_SOURCE" --no-owner --no-privileges --no-comments --schema 'public' --file dump.pgsql \
+  --exclude-table 'spatial_ref_sys' \
+  --exclude-table 'log_api_partenaire' 
 echo "dump OK"
 
 psql -d ${DUMP_RESTORE_DB_TARGET} \
