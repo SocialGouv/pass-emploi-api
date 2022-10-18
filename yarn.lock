@@ -1597,15 +1597,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@google-cloud/firestore@npm:^6.3.0":
-  version: 6.3.0
-  resolution: "@google-cloud/firestore@npm:6.3.0"
+"@google-cloud/firestore@npm:^6.4.0":
+  version: 6.4.0
+  resolution: "@google-cloud/firestore@npm:6.4.0"
   dependencies:
     fast-deep-equal: ^3.1.1
     functional-red-black-tree: ^1.0.1
     google-gax: ^3.5.1
     protobufjs: ^7.0.0
-  checksum: 50f52dc06746fe3af1e9abb1063244015f968b71387104f65bd752ce6522406fe987291791c40fd40e84a11033c993e7847e5b8619173b7202c70382e55e853b
+  checksum: 7503e56f85c20aad4fa01b5de0b97e5108fe44c87db3423cb53bcdb083e053c6458c7a690820dc7db9ead384ce28da66142c1781d8cc406d4e7056374b29d23d
   languageName: node
   linkType: hard
 
@@ -6060,14 +6060,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-admin@npm:11.1.0":
-  version: 11.1.0
-  resolution: "firebase-admin@npm:11.1.0"
+"firebase-admin@npm:11.2.0":
+  version: 11.2.0
+  resolution: "firebase-admin@npm:11.2.0"
   dependencies:
     "@fastify/busboy": ^1.1.0
     "@firebase/database-compat": ^0.2.6
     "@firebase/database-types": ^0.9.13
-    "@google-cloud/firestore": ^6.3.0
+    "@google-cloud/firestore": ^6.4.0
     "@google-cloud/storage": ^6.5.2
     "@types/node": ">=12.12.47"
     jsonwebtoken: ^8.5.1
@@ -6079,7 +6079,7 @@ __metadata:
       optional: true
     "@google-cloud/storage":
       optional: true
-  checksum: 4a2781e0e81cb925fcb5bcadbf3d085778c8bf1b7718af24f87d44c9cf85ccaea908e95190794d6730ffcd5812a797d9842cabcb035915c33bf7e3f68df46b13
+  checksum: ece89302244146a0f84e41f7182834a8936ac4e47de91110bf2e1ccf1f98004fdc62406a184e125844b0d2b9ea4b51c34277a64343b7d9f2a5812481c1c64b06
   languageName: node
   linkType: hard
 
@@ -9005,7 +9005,7 @@ __metadata:
     eslint-plugin-chai-friendly: ^0.7.2
     eslint-plugin-mocha: ^10.1.0
     eslint-plugin-prettier: ^4.2.1
-    firebase-admin: 11.1.0
+    firebase-admin: 11.2.0
     geojson: ^0.5.0
     helmet: ^6.0.0
     husky: ^8.0.1
