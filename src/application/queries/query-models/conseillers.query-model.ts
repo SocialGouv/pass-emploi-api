@@ -1,5 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { AgenceQueryModel } from './agence.query-model'
+
+class AgenceDuConseillerQueryModel {
+  @ApiProperty({ required: false })
+  id?: string
+
+  @ApiProperty()
+  nom: string
+}
 
 export class DetailConseillerQueryModel {
   @ApiProperty()
@@ -15,7 +22,7 @@ export class DetailConseillerQueryModel {
   email?: string
 
   @ApiProperty({ required: false })
-  agence?: AgenceQueryModel
+  agence?: AgenceDuConseillerQueryModel
 
   @ApiProperty()
   notificationsSonores: boolean

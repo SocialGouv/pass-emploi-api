@@ -194,11 +194,13 @@ describe('ReferentielsController', () => {
           .resolves([
             {
               id: 'jean michel id',
-              nom: 'Agence Batman'
+              nom: 'Agence Batman',
+              codeDepartement: 'aa'
             },
             {
               id: 'el yolo de la muerte',
-              nom: 'Agence des chauves'
+              nom: 'Agence des chauves',
+              codeDepartement: 'aa'
             }
           ])
 
@@ -210,11 +212,13 @@ describe('ReferentielsController', () => {
           .expect([
             {
               id: 'jean michel id',
-              nom: 'Agence Batman'
+              nom: 'Agence Batman',
+              codeDepartement: 'aa'
             },
             {
               id: 'el yolo de la muerte',
-              nom: 'Agence des chauves'
+              nom: 'Agence des chauves',
+              codeDepartement: 'aa'
             }
           ])
       })
@@ -228,11 +232,13 @@ describe('ReferentielsController', () => {
           .resolves([
             {
               id: 'jean michel id',
-              nom: 'Agence Batman'
+              nom: 'Agence Batman',
+              codeDepartement: 'aa'
             },
             {
               id: 'el yolo de la muerte',
-              nom: 'Agence des chauves'
+              nom: 'Agence des chauves',
+              codeDepartement: 'aa'
             }
           ])
 
@@ -244,11 +250,13 @@ describe('ReferentielsController', () => {
           .expect([
             {
               id: 'jean michel id',
-              nom: 'Agence Batman'
+              nom: 'Agence Batman',
+              codeDepartement: 'aa'
             },
             {
               id: 'el yolo de la muerte',
-              nom: 'Agence des chauves'
+              nom: 'Agence des chauves',
+              codeDepartement: 'aa'
             }
           ])
       })
