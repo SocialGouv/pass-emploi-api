@@ -7648,7 +7648,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:^4.1.4, jose@npm:^4.9.2":
+"jose@npm:^4.10.0, jose@npm:^4.9.2":
   version: 4.10.0
   resolution: "jose@npm:4.10.0"
   checksum: c575bf2519b758592b3037cac0da34ff2641e56a050b156fe6ab18c03cd6c22e5338d28d1fe3dd997c9b3c0cc7deda72faca4a93ff41274a587850c6519852d0
@@ -9019,7 +9019,7 @@ __metadata:
     nestjs-pino: 3.1.1
     nock: ^13.2.9
     nyc: ^15.1.0
-    openid-client: 5.1.10
+    openid-client: 5.2.0
     pg: 8.8.0
     pg-connection-string: 2.5.0
     pino-http: 8.2.1
@@ -9484,15 +9484,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openid-client@npm:5.1.10":
-  version: 5.1.10
-  resolution: "openid-client@npm:5.1.10"
+"openid-client@npm:5.2.0":
+  version: 5.2.0
+  resolution: "openid-client@npm:5.2.0"
   dependencies:
-    jose: ^4.1.4
+    jose: ^4.10.0
     lru-cache: ^6.0.0
     object-hash: ^2.0.1
     oidc-token-hash: ^5.0.1
-  checksum: 38a4bf08ea4ee4576043968307cf53f0369df224bd025c1bc348b295152df36c47d2a836dfe1505d15c6b79c05f86aadefad798bd3ea3ccbe90834be01f2245c
+  checksum: 91efc9205b955166f1fc3ecc1d5e00c5224ba4e7e4c621667ca0a224d03b8e3365fbecda6ba4e2e99c4df747326de85f4100a119995b349504896f993982f98a
   languageName: node
   linkType: hard
 
