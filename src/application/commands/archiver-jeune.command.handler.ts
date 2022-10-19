@@ -74,6 +74,7 @@ export class ArchiverJeuneCommandHandler extends CommandHandler<
       email: jeune.email,
       prenomJeune: jeune.firstName,
       nomJeune: jeune.lastName,
+      structure: jeune.structure,
       motif: command.motif,
       commentaire: command.commentaire,
       dateArchivage: this.dateService.nowJs()

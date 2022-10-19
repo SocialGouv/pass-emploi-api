@@ -1,6 +1,7 @@
 import { CodeTypeRendezVous } from './rendez-vous'
 import { Recherche } from './offre/recherche/recherche'
 import { Offre } from './offre/offre'
+import { Core } from './core'
 
 export const ArchiveJeuneRepositoryToken = 'ArchiveJeune.Repository'
 
@@ -33,10 +34,47 @@ export interface ArchiveJeune {
 
 export namespace ArchiveJeune {
   export enum MotifSuppression {
+    // V1
+    SORTIE_POSITIVE_DU_CEJ = 'Sortie positive du CEJ',
+    RADIATION_DU_CEJ = 'Radiation du CEJ',
+    RECREATION_D_UN_COMPTE_JEUNE = "Recréation d'un compte jeune",
+    // V2
+    EMPLOI_DURABLE = 'Emploi durable (plus de 6 mois)',
+    EMPLOI_COURT = 'Emploi court (moins de 6 mois)',
+    CONTRAT_ARRIVE_A_ECHEANCE = 'Contrat arrivé à échéance',
+    LIMITE_AGE = 'Limite d’âge atteinte',
+    DEMANDE_DU_JEUNE = 'Demande du jeune de sortir du dispositif',
+    NON_RESPECT_OU_ABANDON = 'Non respect des engagements ou abandon',
+    DEMENAGEMENT_OU_CHANGEMENT_CONSEILLER = 'Déménagement ou changement de conseiller',
+    AUTRE = 'Autre'
+  }
+  export enum MotifSuppressionV1 {
     SORTIE_POSITIVE_DU_CEJ = 'Sortie positive du CEJ',
     RADIATION_DU_CEJ = 'Radiation du CEJ',
     RECREATION_D_UN_COMPTE_JEUNE = "Recréation d'un compte jeune",
     AUTRE = 'Autre'
+  }
+  export enum MotifSuppressionV2 {
+    EMPLOI_DURABLE = 'Emploi durable (plus de 6 mois)',
+    EMPLOI_COURT = 'Emploi court (moins de 6 mois)',
+    CONTRAT_ARRIVE_A_ECHEANCE = 'Contrat arrivé à échéance',
+    LIMITE_AGE = 'Limite d’âge atteinte',
+    DEMANDE_DU_JEUNE = 'Demande du jeune de sortir du dispositif',
+    NON_RESPECT_OU_ABANDON = 'Non respect des engagements ou abandon',
+    DEMENAGEMENT_OU_CHANGEMENT_CONSEILLER = 'Déménagement ou changement de conseiller',
+    AUTRE = 'Autre'
+  }
+
+  export const mapMotifSuppressionV2Description: Partial<
+    Record<MotifSuppressionV2, string>
+  > = {
+    'Emploi durable (plus de 6 mois)':
+      'CDI, CDD de plus de 6 mois dont alternance, titularisation dans la fonction publique',
+    'Limite d’âge atteinte':
+      "Motif valable uniquement à partir de la fin du premier mois des 26 ans. A noter : dans le cas oû le jeune est considéré en tant que travailleur handicapé, l'âge passe à 30 ans.",
+    'Déménagement ou changement de conseiller':
+      'Uniquement dans le cas où vous ne pouvez pas réaffecter ce jeune. Dans le cas contraire, contactez votre superviseur.',
+    Autre: 'Champ libre'
   }
 
   export interface Metadonnees {
@@ -44,6 +82,7 @@ export namespace ArchiveJeune {
     email?: string
     prenomJeune: string
     nomJeune: string
+    structure: Core.Structure
     motif: MotifSuppression
     commentaire?: string
     dateArchivage: Date

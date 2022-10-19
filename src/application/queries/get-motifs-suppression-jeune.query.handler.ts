@@ -8,7 +8,7 @@ import {
 import { Injectable } from '@nestjs/common'
 import { ArchiveJeune } from '../../domain/archive-jeune'
 
-export type MotifsSuppressionJeuneQueryModel = ArchiveJeune.MotifSuppression[]
+export type MotifsSuppressionJeuneQueryModel = ArchiveJeune.MotifSuppressionV1[]
 
 @Injectable()
 export class GetMotifsSuppressionJeuneQueryHandler extends QueryHandler<
@@ -23,7 +23,7 @@ export class GetMotifsSuppressionJeuneQueryHandler extends QueryHandler<
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _query: Query
   ): Promise<Result<MotifsSuppressionJeuneQueryModel>> {
-    return success(Object.values(ArchiveJeune.MotifSuppression))
+    return success(Object.values(ArchiveJeune.MotifSuppressionV1))
   }
 
   async authorize(): Promise<Result> {

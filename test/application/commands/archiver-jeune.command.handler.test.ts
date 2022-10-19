@@ -15,6 +15,8 @@ import { expect, StubbedClass, stubClass } from '../../utils'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { Mail } from '../../../src/domain/mail'
+import { Core } from '../../../src/domain/core'
+import Structure = Core.Structure
 
 describe('ArchiverJeuneCommandHandler', () => {
   let archiverJeuneCommandHandler: ArchiverJeuneCommandHandler
@@ -93,6 +95,7 @@ describe('ArchiverJeuneCommandHandler', () => {
           email: jeune.email,
           prenomJeune: jeune.firstName,
           nomJeune: jeune.lastName,
+          structure: Structure.MILO,
           motif: command.motif,
           commentaire: command.commentaire,
           dateArchivage: maintenant
@@ -102,7 +105,7 @@ describe('ArchiverJeuneCommandHandler', () => {
         ).to.have.been.calledWithExactly(metadonneesArchive)
       })
 
-      it('supprime sont compte keycloak', () => {
+      it('supprime son compte keycloak', () => {
         expect(
           authentificationRepository.deleteJeuneIdp
         ).to.have.been.calledWithExactly('idJeune')
@@ -114,7 +117,7 @@ describe('ArchiverJeuneCommandHandler', () => {
         )
       })
 
-      it('supprime messages', () => {
+      it('supprime ses messages', () => {
         expect(chatRepository.supprimerChat).to.have.been.calledWithExactly(
           'idJeune'
         )
