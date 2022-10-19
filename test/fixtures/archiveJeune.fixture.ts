@@ -1,5 +1,7 @@
 import { ArchiveJeune } from '../../src/domain/archive-jeune'
 import { uneDate } from './date.fixture'
+import { Core } from '../../src/domain/core'
+import Structure = Core.Structure
 
 export const uneArchiveJeuneMetadonnees = (
   args: Partial<ArchiveJeune.Metadonnees> = {}
@@ -10,6 +12,7 @@ export const uneArchiveJeuneMetadonnees = (
     commentaire: 'Il a loupé un rdv',
     nomJeune: 'test',
     prenomJeune: 'test',
+    structure: Structure.MILO,
     dateArchivage: uneDate()
   }
 

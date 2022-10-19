@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ArchiveJeune } from 'src/domain/archive-jeune'
 import { Jeune } from '../../../domain/jeune/jeune'
 
 class SituationQueryModel {
@@ -161,4 +162,11 @@ export class ResumeActionsDuJeuneQueryModel {
 export class PreferencesJeuneQueryModel {
   @ApiProperty()
   partageFavoris: boolean
+}
+
+export class MotifSuppressionV2QueryModel {
+  @ApiProperty()
+  motif: ArchiveJeune.MotifSuppressionV2
+  @ApiProperty({ required: false })
+  description?: string
 }

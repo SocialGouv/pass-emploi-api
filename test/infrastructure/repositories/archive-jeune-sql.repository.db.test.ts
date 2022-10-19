@@ -132,6 +132,7 @@ describe('ArchiveJeuneSqlRepository', () => {
         commentaire: 'Il a loupé un rdv',
         nomJeune: jeuneDto.nom,
         prenomJeune: jeuneDto.prenom,
+        structure: jeuneDto.structure,
         email: jeuneDto.email!,
         dateArchivage: new Date('2022-07-05T09:23:00Z')
       }

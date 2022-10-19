@@ -1,20 +1,25 @@
 import { Controller, Get, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { GetTypesQualificationsQueryHandler } from '../../application/queries/get-types-qualifications.query.handler'
-import { GetTypesRendezVousQueryHandler } from '../../application/queries/get-types-rendez-vous.query.handler'
-import { TypeQualificationQueryModel } from '../../application/queries/query-models/actions.query-model'
-import { TypeRendezVousQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
 import { GetAgencesQueryHandler } from '../../application/queries/get-agences.query.handler'
 import {
   GetCommunesEtDepartementsQuery,
   GetCommunesEtDepartementsQueryHandler
 } from '../../application/queries/get-communes-et-departements.query.handler.db'
 import {
+  GetMetiersRomeQuery,
+  GetMetiersRomeQueryHandler
+} from '../../application/queries/get-metiers-rome.query.handler.db'
+import {
   GetMotifsSuppressionJeuneQueryHandler,
   MotifsSuppressionJeuneQueryModel
 } from '../../application/queries/get-motifs-suppression-jeune.query.handler'
+import { GetTypesQualificationsQueryHandler } from '../../application/queries/get-types-qualifications.query.handler'
+import { GetTypesRendezVousQueryHandler } from '../../application/queries/get-types-rendez-vous.query.handler'
+import { TypeQualificationQueryModel } from '../../application/queries/query-models/actions.query-model'
 import { AgenceQueryModel } from '../../application/queries/query-models/agence.query-model'
 import { CommunesEtDepartementsQueryModel } from '../../application/queries/query-models/communes-et-departements.query-model'
+import { MetiersRomeQueryModel } from '../../application/queries/query-models/metiers-rome.query-model'
+import { TypeRendezVousQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
 import { TypesDemarcheQueryModel } from '../../application/queries/query-models/types-demarche.query-model'
 import { RechercherTypesDemarcheQueryHandler } from '../../application/queries/rechercher-types-demarche.query.handler'
 import { isSuccess } from '../../building-blocks/types/result'
@@ -24,11 +29,6 @@ import { Public } from '../decorators/public.decorator'
 import { handleFailure } from './failure.handler'
 import { GetAgencesQueryParams } from './validation/agences.inputs'
 import { TypesDemarchesQueryParams } from './validation/demarches.inputs'
-import { MetiersRomeQueryModel } from '../../application/queries/query-models/metiers-rome.query-model'
-import {
-  GetMetiersRomeQuery,
-  GetMetiersRomeQueryHandler
-} from '../../application/queries/get-metiers-rome.query.handler.db'
 
 @Controller('referentiels')
 @ApiTags('Referentiels')
@@ -110,12 +110,8 @@ export class ReferentielsController {
     type: String,
     isArray: true
   })
-  async getMotifsSuppressionJeune(
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<MotifsSuppressionJeuneQueryModel> {
-    const result = await this.getMotifsSuppressionJeuneQueryHandler.execute(
-      utilisateur
-    )
+  async getMotifsSuppressionJeune(): Promise<MotifsSuppressionJeuneQueryModel> {
+    const result = await this.getMotifsSuppressionJeuneQueryHandler.execute({})
     if (isSuccess(result)) {
       return result.data
     }

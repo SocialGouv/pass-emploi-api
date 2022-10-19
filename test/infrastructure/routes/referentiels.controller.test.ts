@@ -328,10 +328,10 @@ describe('ReferentielsController', () => {
     it('renvoie les motifs de suppression d’un compte jeune', () => {
       // Given
       const motifs: MotifsSuppressionJeuneQueryModel = [
-        ArchiveJeune.MotifSuppression.SORTIE_POSITIVE_DU_CEJ,
-        ArchiveJeune.MotifSuppression.RADIATION_DU_CEJ,
-        ArchiveJeune.MotifSuppression.RECREATION_D_UN_COMPTE_JEUNE,
-        ArchiveJeune.MotifSuppression.AUTRE
+        ArchiveJeune.MotifSuppressionV1.SORTIE_POSITIVE_DU_CEJ,
+        ArchiveJeune.MotifSuppressionV1.RADIATION_DU_CEJ,
+        ArchiveJeune.MotifSuppressionV1.RECREATION_D_UN_COMPTE_JEUNE,
+        ArchiveJeune.MotifSuppressionV1.AUTRE
       ]
 
       getMotifsSuppressionCommandHandler.execute.resolves(success(motifs))

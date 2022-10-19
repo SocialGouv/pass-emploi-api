@@ -45,6 +45,12 @@ export class ArchiveJeuneDto extends Model {
   nom: string
 
   @Column({
+    field: 'structure',
+    type: DataType.STRING
+  })
+  structure: string | null
+
+  @Column({
     field: 'email',
     type: DataType.STRING
   })

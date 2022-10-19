@@ -254,6 +254,8 @@ import { GetMetiersRomeQueryHandler } from './application/queries/get-metiers-ro
 import { CreateSuggestionConseillerOffreEmploiCommandHandler } from './application/commands/create-suggestion-conseiller-offre-emploi.command.handler'
 import { CreateSuggestionConseillerServiceCiviqueCommandHandler } from './application/commands/create-suggestion-conseiller-service-civique.command.handler'
 import { CreateSuggestionConseillerImmersionCommandHandler } from './application/commands/create-suggestion-conseiller-immersion.command.handler'
+import { ReferentielsControllerV2 } from './infrastructure/routes/v2/referentiels.controller.v2'
+import { GetMotifsSuppressionJeuneV2QueryHandler } from './application/queries/v2/get-motifs-suppression-jeune-v2.query.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -280,6 +282,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     RendezVousController,
     AuthentificationController,
     ReferentielsController,
+    ReferentielsControllerV2,
     EvenementsController,
     RecherchesJeunesController,
     RecherchesConseillersController,
@@ -557,6 +560,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     HandleJobNettoyerPiecesJointesCommandHandler,
     ArchiverJeuneCommandHandler,
     GetMotifsSuppressionJeuneQueryHandler,
+    GetMotifsSuppressionJeuneV2QueryHandler,
     HandleJobNettoyerLesDonneesCommandHandler,
     ExecuteJobAsapCommandHandler,
     UpdateJeunePreferencesCommandHandler,
