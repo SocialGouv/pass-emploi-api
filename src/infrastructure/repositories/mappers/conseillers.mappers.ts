@@ -10,7 +10,7 @@ export function fromSqlToDetailConseillerQueryModel(
     firstName: conseillerSqlModel.prenom,
     lastName: conseillerSqlModel.nom,
     email: conseillerSqlModel.email ?? undefined,
-    agence: conseillerSqlModel.agence ?? undefined,
+    agence: undefined,
     notificationsSonores: conseillerSqlModel.notificationsSonores,
     aDesBeneficiairesARecuperer: aDesBeneficiairesARecuperer
   }

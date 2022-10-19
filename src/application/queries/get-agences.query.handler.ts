@@ -33,7 +33,11 @@ export class GetAgencesQueryHandler extends QueryHandler<
       }
     })
     return sqlModels.map(sql => {
-      return new AgenceQueryModel(sql.id, sql.nomAgence)
+      return {
+        id: sql.id,
+        nom: sql.nomAgence,
+        codeDepartement: sql.codeDepartement
+      }
     })
   }
 
