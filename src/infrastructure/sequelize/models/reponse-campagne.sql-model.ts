@@ -43,6 +43,12 @@ export class ReponseCampagneDto extends Model {
 
   @Column({ field: 'pourquoi_2', type: DataType.STRING })
   pourquoi2?: string | null
+
+  @Column({ field: 'reponse_3', type: DataType.STRING })
+  reponse3?: string | null
+
+  @Column({ field: 'pourquoi_3', type: DataType.STRING })
+  pourquoi3: string | null
 }
 
 @Table({ timestamps: false, tableName: 'reponse_campagne' })
