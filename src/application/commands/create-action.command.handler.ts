@@ -1,7 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Evenement, EvenementService } from '../../domain/evenement'
-import { PlanificateurService } from '../../domain/planificateur'
-import { buildError } from '../../utils/logger.module'
+import { DateTime } from 'luxon'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
@@ -13,11 +11,13 @@ import {
 } from '../../building-blocks/types/result'
 import { Action, ActionsRepositoryToken } from '../../domain/action/action'
 import { Authentification } from '../../domain/authentification'
+import { Evenement, EvenementService } from '../../domain/evenement'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification/notification'
+import { PlanificateurService } from '../../domain/planificateur'
+import { buildError } from '../../utils/logger.module'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
-import { DateTime } from 'luxon'
 
 export interface CreateActionCommand extends Command {
   idJeune: Jeune.Id
@@ -92,8 +92,19 @@ export class CreateActionCommandHandler extends CommandHandler<
     }
   }
 
-  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creer(Evenement.Code.ACTION_CREEE, utilisateur)
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    command: CreateActionCommand
+  ): Promise<void> {
+    const vientDuReferentiel = Action.TEMPLATES.some(
+      ({ titre }) => titre === command.contenu
+    )
+    await this.evenementService.creer(
+      vientDuReferentiel
+        ? Evenement.Code.ACTION_CREEE_REFERENTIEL
+        : Evenement.Code.ACTION_CREEE,
+      utilisateur
+    )
   }
 
   private async planifierRappelAction(action: Action): Promise<void> {

@@ -48,6 +48,7 @@ import { UpdateJeuneConfigurationApplicationCommandHandler } from './application
 import { UpdateStatutActionCommandHandler } from './application/commands/update-statut-action.command.handler'
 import { UpdateUtilisateurCommandHandler } from './application/commands/update-utilisateur.command.handler'
 import { TeleverserFichierCommandHandler } from './application/commands/televerser-fichier.command.handler'
+import { GetTemplatesActionQueryHandler } from './application/queries/get-templates-action-query-handler.service'
 import { Context } from './building-blocks/context'
 import { GetActionsByJeuneQueryHandler } from './application/queries/get-actions-by-jeune.query.handler.db'
 import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
@@ -587,7 +588,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetMetiersRomeQueryHandler,
     CreateSuggestionConseillerOffreEmploiCommandHandler,
     CreateSuggestionConseillerServiceCiviqueCommandHandler,
-    CreateSuggestionConseillerImmersionCommandHandler
+    CreateSuggestionConseillerImmersionCommandHandler,
+    GetTemplatesActionQueryHandler
   ]
 }
 

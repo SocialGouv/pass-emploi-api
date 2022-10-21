@@ -1,5 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { GetTemplatesActionQueryHandler } from 'src/application/queries/get-templates-action-query-handler.service'
 import { GetAgencesQueryHandler } from '../../application/queries/get-agences.query.handler'
 import {
   GetCommunesEtDepartementsQuery,
@@ -15,7 +16,10 @@ import {
 } from '../../application/queries/get-motifs-suppression-jeune.query.handler'
 import { GetTypesQualificationsQueryHandler } from '../../application/queries/get-types-qualifications.query.handler'
 import { GetTypesRendezVousQueryHandler } from '../../application/queries/get-types-rendez-vous.query.handler'
-import { TypeQualificationQueryModel } from '../../application/queries/query-models/actions.query-model'
+import {
+  TemplateActionQueryModel,
+  TypeQualificationQueryModel
+} from '../../application/queries/query-models/actions.query-model'
 import { AgenceQueryModel } from '../../application/queries/query-models/agence.query-model'
 import { CommunesEtDepartementsQueryModel } from '../../application/queries/query-models/communes-et-departements.query-model'
 import { MetiersRomeQueryModel } from '../../application/queries/query-models/metiers-rome.query-model'
@@ -40,7 +44,8 @@ export class ReferentielsController {
     private readonly rechercherTypesDemarcheQueryHandler: RechercherTypesDemarcheQueryHandler,
     private readonly getAgencesQueryHandler: GetAgencesQueryHandler,
     private readonly getMotifsSuppressionJeuneQueryHandler: GetMotifsSuppressionJeuneQueryHandler,
-    private readonly getTypesQualificationsQueryHandler: GetTypesQualificationsQueryHandler
+    private readonly getTypesQualificationsQueryHandler: GetTypesQualificationsQueryHandler,
+    private readonly getTemplatesActionQueryHandler: GetTemplatesActionQueryHandler
   ) {}
 
   @Get('communes-et-departements')
@@ -128,5 +133,15 @@ export class ReferentielsController {
     TypeQualificationQueryModel[]
   > {
     return this.getTypesQualificationsQueryHandler.execute({})
+  }
+
+  @Get('templates-action')
+  @ApiOAuth2([])
+  @ApiResponse({
+    type: TemplateActionQueryModel,
+    isArray: true
+  })
+  async getTemplatesAction(): Promise<TemplateActionQueryModel[]> {
+    return this.getTemplatesActionQueryHandler.execute({})
   }
 }

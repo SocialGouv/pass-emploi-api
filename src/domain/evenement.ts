@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Authentification } from './authentification'
 import { Result } from '../building-blocks/types/result'
 import { DateService } from '../utils/date-service'
+import { Authentification } from './authentification'
 
 export const EvenementsRepositoryToken = 'EvenementsRepositoryToken'
 
@@ -17,6 +17,7 @@ export interface Evenement {
 export namespace Evenement {
   export enum Code {
     ACTION_CREEE = 'ACTION_CREEE',
+    ACTION_CREEE_REFERENTIEL = 'ACTION_CREEE_REFERENTIEL',
     ACTION_DETAIL = 'ACTION_DETAIL',
     ACTION_LISTE = 'ACTION_LISTE',
     ACTION_STATUT_MODIFIE = 'ACTION_STATUT_MODIFIE',
@@ -75,8 +76,19 @@ export namespace Evenement {
   }
 }
 
-const evenements = {
-  [Evenement.Code.ACTION_CREEE]: { categorie: 'Action', action: 'Création' },
+const evenements: {
+  [key in Evenement.Code]: { categorie: string; action: string; nom?: string }
+} = {
+  [Evenement.Code.ACTION_CREEE]: {
+    categorie: 'Action',
+    action: 'Création',
+    nom: 'Hors référentiel'
+  },
+  [Evenement.Code.ACTION_CREEE_REFERENTIEL]: {
+    categorie: 'Action',
+    action: 'Création',
+    nom: 'Référentiel'
+  },
   [Evenement.Code.ACTION_DETAIL]: {
     categorie: 'Action',
     action: 'Consultation',

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { Brand } from '../../building-blocks/types/brand'
 import {
   DomainError,
@@ -14,10 +15,10 @@ import {
 import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
 import { Jeune } from '../jeune/jeune'
-import { DateTime } from 'luxon'
 import * as _Commentaire from './commentaire'
-import * as _Qualification from './qualification'
 import * as _Milo from './milo'
+import * as _Qualification from './qualification'
+import ACTION_TEMPLATES from './templates'
 
 export const ActionsRepositoryToken = 'ActionsRepositoryToken'
 export const CommentaireActionRepositoryToken =
@@ -42,6 +43,7 @@ export interface Action {
 }
 
 export namespace Action {
+  export const TEMPLATES: Action.Template[] = ACTION_TEMPLATES
   // FIXME: le linter ne comprend pas cette technique 🤷‍️
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import Commentaire = _Commentaire.Commentaire
@@ -84,6 +86,11 @@ export namespace Action {
     nom: string
     id: string
     type: Action.TypeCreateur
+  }
+
+  export interface Template {
+    id: string
+    titre: string
   }
 
   export enum Statut {
