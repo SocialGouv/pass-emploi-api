@@ -52,7 +52,7 @@ export class GetCampagneQueryModel {
         dateFin: DateService.fromJSDateToISOString(campagneEnCours.dateFin),
         titre: "Votre expérience sur l'application",
         description:
-          "Aidez-nous à améliorer l'application en répondant à 2 questions",
+          "Aidez-nous à améliorer l'application en répondant à 3 questions",
         questions: questionsInMemory()
       }
     }
@@ -65,7 +65,7 @@ export const questionsInMemory = (): QuestionCampagneQueryModel[] => [
   {
     id: 1,
     libelle:
-      '*Est-ce que l’application du CEJ vous aide à avoir un bon accompagnement avec votre conseiller ?',
+      '*Est-ce que l’application du CEJ vous aide à vous sentir mieux accompagné par votre conseiller ?',
     pourquoi: true,
     options: [
       {
@@ -90,6 +90,30 @@ export const questionsInMemory = (): QuestionCampagneQueryModel[] => [
     id: 2,
     libelle:
       "*À votre avis, est-ce que l'application vous aide à avancer dans votre projet professionnel ?",
+    pourquoi: true,
+    options: [
+      {
+        id: 1,
+        libelle: 'Non, pas du tout'
+      },
+      {
+        id: 2,
+        libelle: 'Plutôt non'
+      },
+      {
+        id: 3,
+        libelle: 'Plutôt oui'
+      },
+      {
+        id: 4,
+        libelle: 'Oui, tout à fait'
+      }
+    ]
+  },
+  {
+    id: 3,
+    libelle:
+      '*À votre avis, l’application vous permet-elle de devenir plus autonome dans la construction de votre projet ?',
     pourquoi: true,
     options: [
       {
