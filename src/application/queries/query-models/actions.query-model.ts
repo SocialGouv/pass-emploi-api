@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Action } from '../../../domain/action/action'
-import { JeuneQueryModel } from './jeunes.query-model'
 import { Demarche } from '../../../domain/demarche'
+import { JeuneQueryModel } from './jeunes.query-model'
 
 class CreateurQueryModel implements Action.Createur {
   @ApiProperty()
@@ -170,4 +170,11 @@ export class TypeQualificationQueryModel
   label: string
   @ApiProperty()
   heures: number
+}
+
+export class TemplateActionQueryModel implements Action.Template {
+  @ApiProperty()
+  id: string
+  @ApiProperty()
+  titre: string
 }

@@ -1,14 +1,19 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import { GetTypesQualificationsQueryHandler } from 'src/application/queries/get-types-qualifications.query.handler'
-import { TypeQualificationQueryModel } from 'src/application/queries/query-models/actions.query-model'
+import {
+  TemplateActionQueryModel,
+  TypeQualificationQueryModel
+} from 'src/application/queries/query-models/actions.query-model'
 import { Action } from 'src/domain/action/action'
 import * as request from 'supertest'
 import { GetAgencesQueryHandler } from '../../../src/application/queries/get-agences.query.handler'
 import { GetCommunesEtDepartementsQueryHandler } from '../../../src/application/queries/get-communes-et-departements.query.handler.db'
+import { GetMetiersRomeQueryHandler } from '../../../src/application/queries/get-metiers-rome.query.handler.db'
 import {
   GetMotifsSuppressionJeuneQueryHandler,
   MotifsSuppressionJeuneQueryModel
 } from '../../../src/application/queries/get-motifs-suppression-jeune.query.handler'
+import { GetTemplatesActionQueryHandler } from '../../../src/application/queries/get-templates-action-query-handler.service'
 import { CommuneOuDepartementType } from '../../../src/application/queries/query-models/communes-et-departements.query-model'
 import { TypesDemarcheQueryModel } from '../../../src/application/queries/query-models/types-demarche.query-model'
 import { RechercherTypesDemarcheQueryHandler } from '../../../src/application/queries/rechercher-types-demarche.query.handler'
@@ -26,13 +31,13 @@ import {
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import Structure = Core.Structure
-import { GetMetiersRomeQueryHandler } from '../../../src/application/queries/get-metiers-rome.query.handler.db'
 
 let getCommunesEtDepartementsQueryHandler: StubbedClass<GetCommunesEtDepartementsQueryHandler>
 let getAgencesQueryHandler: StubbedClass<GetAgencesQueryHandler>
 let rechercherTypesDemarcheQueryHandler: StubbedClass<RechercherTypesDemarcheQueryHandler>
 let getMotifsSuppressionCommandHandler: StubbedClass<GetMotifsSuppressionJeuneQueryHandler>
 let getTypesQualificationsQueryHandler: StubbedClass<GetTypesQualificationsQueryHandler>
+let getTemplatesActionQueryHandler: StubbedClass<GetTemplatesActionQueryHandler>
 let getMetiersRomeQueryHandler: StubbedClass<GetMetiersRomeQueryHandler>
 
 describe('ReferentielsController', () => {
@@ -49,8 +54,8 @@ describe('ReferentielsController', () => {
   getTypesQualificationsQueryHandler = stubClass(
     GetTypesQualificationsQueryHandler
   )
-
   getMetiersRomeQueryHandler = stubClass(GetMetiersRomeQueryHandler)
+  getTemplatesActionQueryHandler = stubClass(GetTemplatesActionQueryHandler)
 
   let app: INestApplication
 
@@ -68,6 +73,8 @@ describe('ReferentielsController', () => {
       .useValue(getTypesQualificationsQueryHandler)
       .overrideProvider(GetMetiersRomeQueryHandler)
       .useValue(getMetiersRomeQueryHandler)
+      .overrideProvider(GetTemplatesActionQueryHandler)
+      .useValue(getTemplatesActionQueryHandler)
       .compile()
     app = testingModule.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
@@ -376,9 +383,41 @@ describe('ReferentielsController', () => {
         ])
         .expect(HttpStatus.OK)
     })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/referentiels/qualifications-actions/types'
+    )
   })
-  ensureUserAuthenticationFailsIfInvalid(
-    'get',
-    '/referentiels/qualifications-actions/types'
-  )
+
+  describe('GET /templates-action', () => {
+    it("renvoie les templates de création d'action", () => {
+      // Given
+      const templates: TemplateActionQueryModel[] = [
+        {
+          id: 'action-predefinie-1',
+          titre: 'Identifier ses atouts et ses compétences'
+        }
+      ]
+
+      getTemplatesActionQueryHandler.execute.resolves(templates)
+
+      // When - Then
+      return request(app.getHttpServer())
+        .get('/referentiels/templates-action')
+        .set('authorization', unHeaderAuthorization())
+        .expect([
+          {
+            id: 'action-predefinie-1',
+            titre: 'Identifier ses atouts et ses compétences'
+          }
+        ])
+        .expect(HttpStatus.OK)
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/referentiels/templates-action'
+    )
+  })
 })
