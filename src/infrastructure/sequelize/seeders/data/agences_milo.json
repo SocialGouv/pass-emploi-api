@@ -129,7 +129,7 @@
     "id": 19,
     "nom_agence": "971-ML LES ABYMES (siège)",
     "nom_region": "Guadeloupe",
-    "code_departement": 97,
+    "code_departement": 971,
     "structure": "MILO"
   },
   {
@@ -625,8 +625,8 @@
   {
     "id": 90,
     "nom_agence": "Mission Locale de Guyane",
-    "nom_region": "Guyane",
-    "code_departement": 97,
+    "nom_region": "Martinique",
+    "code_departement": 973,
     "structure": "MILO"
   },
   {
@@ -857,7 +857,7 @@
     "id": 123,
     "nom_agence": "Mission locale de mayotte",
     "nom_region": "Mayotte",
-    "code_departement": 97,
+    "code_departement": 976,
     "structure": "MILO"
   },
   {
@@ -1634,7 +1634,7 @@
     "id": 234,
     "nom_agence": "mission locale est",
     "nom_region": "La Réunion",
-    "code_departement": 97,
+    "code_departement": 974,
     "structure": "MILO"
   },
   {
@@ -1956,7 +1956,7 @@
     "id": 280,
     "nom_agence": "Mission locale nord",
     "nom_region": "La Réunion",
-    "code_departement": 97,
+    "code_departement": 974,
     "structure": "MILO"
   },
   {
@@ -1984,7 +1984,7 @@
     "id": 284,
     "nom_agence": "MISSION LOCALE NORD MARTINIQUE",
     "nom_region": "Martinique",
-    "code_departement": 97,
+    "code_departement": 972,
     "structure": "MILO"
   },
   {
@@ -2243,7 +2243,7 @@
     "id": 321,
     "nom_agence": "Mission Locale Sud",
     "nom_region": "La Réunion",
-    "code_departement": 97,
+    "code_departement": 974,
     "structure": "MILO"
   },
   {
@@ -2782,7 +2782,7 @@
     "id": 398,
     "nom_agence": "ml st paul",
     "nom_region": "La Réunion",
-    "code_departement": 97,
+    "code_departement": 974,
     "structure": "MILO"
   },
   {
@@ -3034,14 +3034,14 @@
     "id": 453,
     "nom_agence": "Siège Mission locale du centre",
     "nom_region": "Martinique",
-    "code_departement": 97,
+    "code_departement": 972,
     "structure": "MILO"
   },
   {
     "id": 454,
     "nom_agence": "SIEGE MISSION LOCALE ESPACE SUD",
     "nom_region": "Martinique",
-    "code_departement": 97,
+    "code_departement": 972,
     "structure": "MILO"
   },
   {
