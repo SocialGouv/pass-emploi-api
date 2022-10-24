@@ -122,15 +122,15 @@ export class CreateSuggestionOffresEmploiPayload extends CreateSuggestionBase {
   q: string
 
   @ApiPropertyOptional()
-  @IsOptional()
+  @ValidateIf(payload => !payload.departement || payload.commune?.length === 0)
   @IsString()
-  @ValidateIf(payload => !payload.departement)
+  @IsNotEmpty()
   commune?: string
 
   @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
   @ValidateIf(payload => !payload.commune)
+  @IsString()
+  @IsNotEmpty()
   departement?: string
 }
 

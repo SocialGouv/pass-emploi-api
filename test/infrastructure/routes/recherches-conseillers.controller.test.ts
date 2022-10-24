@@ -80,9 +80,26 @@ describe('RecherchesConseillersController', () => {
     it('retourne un code Bad Request quand la localisation est manquante', async () => {
       // Given
       const suggestionPayload = {
-        idsJeunes: [],
+        idsJeunes: ['1'],
         q: 'Boulanger',
         departement: 'Paris'
+      }
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post(
+          `/conseillers/${idConseiller}/recherches/suggestions/offres-emploi`
+        )
+        .set('authorization', unHeaderAuthorization())
+        .send(suggestionPayload)
+        .expect(HttpStatus.BAD_REQUEST)
+    })
+    it('retourne un code Bad Request quand commune ET département sont manquantes', async () => {
+      // Given
+      const suggestionPayload = {
+        idsJeunes: ['1'],
+        localisation: 'Paris',
+        q: 'Boulanger'
       }
 
       // When - Then
@@ -126,8 +143,8 @@ describe('RecherchesConseillersController', () => {
           titre: undefined,
           criteres: {
             q: 'Boulanger',
-            commune: undefined,
-            departement: 'Paris'
+            departement: 'Paris',
+            commune: undefined
           }
         },
         unUtilisateurDecode()
