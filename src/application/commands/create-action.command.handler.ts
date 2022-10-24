@@ -96,12 +96,12 @@ export class CreateActionCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur,
     command: CreateActionCommand
   ): Promise<void> {
-    const vientDuReferentiel = Action.TEMPLATES.some(
+    const vientDuReferentiel = Action.ACTIONS_PREDEFINIES.some(
       ({ titre }) => titre === command.contenu
     )
     await this.evenementService.creer(
       vientDuReferentiel
-        ? Evenement.Code.ACTION_CREEE_REFERENTIEL
+        ? Evenement.Code.ACTION_PREDEFINIE_CREEE
         : Evenement.Code.ACTION_CREEE,
       utilisateur
     )

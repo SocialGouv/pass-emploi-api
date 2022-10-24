@@ -1,7 +1,7 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import { GetTypesQualificationsQueryHandler } from 'src/application/queries/get-types-qualifications.query.handler'
 import {
-  TemplateActionQueryModel,
+  ActionPredefinieQueryModel,
   TypeQualificationQueryModel
 } from 'src/application/queries/query-models/actions.query-model'
 import { Action } from 'src/domain/action/action'
@@ -13,7 +13,7 @@ import {
   GetMotifsSuppressionJeuneQueryHandler,
   MotifsSuppressionJeuneQueryModel
 } from '../../../src/application/queries/get-motifs-suppression-jeune.query.handler'
-import { GetTemplatesActionQueryHandler } from '../../../src/application/queries/get-templates-action-query-handler.service'
+import { GetActionsPredefiniesQueryHandler } from '../../../src/application/queries/get-actions-predefinies.query.handler'
 import { CommuneOuDepartementType } from '../../../src/application/queries/query-models/communes-et-departements.query-model'
 import { TypesDemarcheQueryModel } from '../../../src/application/queries/query-models/types-demarche.query-model'
 import { RechercherTypesDemarcheQueryHandler } from '../../../src/application/queries/rechercher-types-demarche.query.handler'
@@ -37,7 +37,7 @@ let getAgencesQueryHandler: StubbedClass<GetAgencesQueryHandler>
 let rechercherTypesDemarcheQueryHandler: StubbedClass<RechercherTypesDemarcheQueryHandler>
 let getMotifsSuppressionCommandHandler: StubbedClass<GetMotifsSuppressionJeuneQueryHandler>
 let getTypesQualificationsQueryHandler: StubbedClass<GetTypesQualificationsQueryHandler>
-let getTemplatesActionQueryHandler: StubbedClass<GetTemplatesActionQueryHandler>
+let getActionsPredefiniesQueryHandler: StubbedClass<GetActionsPredefiniesQueryHandler>
 let getMetiersRomeQueryHandler: StubbedClass<GetMetiersRomeQueryHandler>
 
 describe('ReferentielsController', () => {
@@ -55,7 +55,9 @@ describe('ReferentielsController', () => {
     GetTypesQualificationsQueryHandler
   )
   getMetiersRomeQueryHandler = stubClass(GetMetiersRomeQueryHandler)
-  getTemplatesActionQueryHandler = stubClass(GetTemplatesActionQueryHandler)
+  getActionsPredefiniesQueryHandler = stubClass(
+    GetActionsPredefiniesQueryHandler
+  )
 
   let app: INestApplication
 
@@ -73,8 +75,8 @@ describe('ReferentielsController', () => {
       .useValue(getTypesQualificationsQueryHandler)
       .overrideProvider(GetMetiersRomeQueryHandler)
       .useValue(getMetiersRomeQueryHandler)
-      .overrideProvider(GetTemplatesActionQueryHandler)
-      .useValue(getTemplatesActionQueryHandler)
+      .overrideProvider(GetActionsPredefiniesQueryHandler)
+      .useValue(getActionsPredefiniesQueryHandler)
       .compile()
     app = testingModule.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
@@ -390,21 +392,21 @@ describe('ReferentielsController', () => {
     )
   })
 
-  describe('GET /templates-action', () => {
-    it("renvoie les templates de création d'action", () => {
+  describe('GET /actions-predefinies', () => {
+    it('renvoie le référentiel des actions prédéfinies', () => {
       // Given
-      const templates: TemplateActionQueryModel[] = [
+      const actionsPredefinies: ActionPredefinieQueryModel[] = [
         {
           id: 'action-predefinie-1',
           titre: 'Identifier ses atouts et ses compétences'
         }
       ]
 
-      getTemplatesActionQueryHandler.execute.resolves(templates)
+      getActionsPredefiniesQueryHandler.execute.resolves(actionsPredefinies)
 
       // When - Then
       return request(app.getHttpServer())
-        .get('/referentiels/templates-action')
+        .get('/referentiels/actions-predefinies')
         .set('authorization', unHeaderAuthorization())
         .expect([
           {
@@ -417,7 +419,7 @@ describe('ReferentielsController', () => {
 
     ensureUserAuthenticationFailsIfInvalid(
       'get',
-      '/referentiels/templates-action'
+      '/referentiels/actions-predefinies'
     )
   })
 })

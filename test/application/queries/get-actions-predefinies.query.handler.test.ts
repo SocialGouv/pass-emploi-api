@@ -1,15 +1,15 @@
 import { expect } from 'chai'
 import { SinonSandbox } from 'sinon'
-import { GetTemplatesActionQueryHandler } from 'src/application/queries/get-templates-action-query-handler.service'
+import { GetActionsPredefiniesQueryHandler } from 'src/application/queries/get-actions-predefinies.query.handler'
 import { createSandbox } from 'test/utils'
 
-describe('GetTemplatesActionsQueryHandler', () => {
-  let getTemplatesActionsQueryHandler: GetTemplatesActionQueryHandler
+describe('GetActionsPredefiniesQueryHandler', () => {
+  let getActionsPredefiniesQueryHandler: GetActionsPredefiniesQueryHandler
   let sandbox: SinonSandbox
 
   before(() => {
     sandbox = createSandbox()
-    getTemplatesActionsQueryHandler = new GetTemplatesActionQueryHandler()
+    getActionsPredefiniesQueryHandler = new GetActionsPredefiniesQueryHandler()
   })
 
   after(() => {
@@ -19,7 +19,7 @@ describe('GetTemplatesActionsQueryHandler', () => {
   describe('handle', () => {
     it('renvoie la liste des types de qualifications', async () => {
       // Given - When
-      const result = await getTemplatesActionsQueryHandler.handle({})
+      const result = await getActionsPredefiniesQueryHandler.handle({})
 
       // Then
       expect(result).to.deep.equal([

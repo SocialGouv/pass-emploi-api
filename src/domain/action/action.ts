@@ -18,7 +18,7 @@ import { Jeune } from '../jeune/jeune'
 import * as _Commentaire from './commentaire'
 import * as _Milo from './milo'
 import * as _Qualification from './qualification'
-import ACTION_TEMPLATES from './templates'
+import _ACTIONS_PREDEFINIES from './actions-predefinies'
 
 export const ActionsRepositoryToken = 'ActionsRepositoryToken'
 export const CommentaireActionRepositoryToken =
@@ -43,7 +43,8 @@ export interface Action {
 }
 
 export namespace Action {
-  export const TEMPLATES: Action.Template[] = ACTION_TEMPLATES
+  export const ACTIONS_PREDEFINIES: Action.ActionPredefinie[] =
+    _ACTIONS_PREDEFINIES
   // FIXME: le linter ne comprend pas cette technique 🤷‍️
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import Commentaire = _Commentaire.Commentaire
@@ -88,7 +89,7 @@ export namespace Action {
     type: Action.TypeCreateur
   }
 
-  export interface Template {
+  export interface ActionPredefinie {
     id: string
     titre: string
   }
