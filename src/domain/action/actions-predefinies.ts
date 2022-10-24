@@ -1,4 +1,5 @@
-const ACTION_TEMPLATES = [
+// TODO mettre la liste en db si besoin d'être modifiée
+const ACTIONS_PREDEFINIES = [
   {
     id: 'action-predefinie-1',
     titre: 'Identifier ses atouts et ses compétences'
@@ -45,4 +46,5 @@ const ACTION_TEMPLATES = [
     titre: "S'informer pour une mobilité à l'étranger"
   }
 ]
-export default ACTION_TEMPLATES
+
+export default ACTIONS_PREDEFINIES

@@ -3,19 +3,19 @@ import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action/action'
-import { TemplateActionQueryModel } from './query-models/actions.query-model'
+import { ActionPredefinieQueryModel } from './query-models/actions.query-model'
 
 @Injectable()
-export class GetTemplatesActionQueryHandler extends QueryHandler<
+export class GetActionsPredefiniesQueryHandler extends QueryHandler<
   Query,
-  TemplateActionQueryModel[]
+  ActionPredefinieQueryModel[]
 > {
   constructor() {
-    super('GetTemplatesActionsQueryHandler')
+    super('GetActionsPredefiniesQueryHandler')
   }
 
-  async handle(_query: Query): Promise<TemplateActionQueryModel[]> {
-    return Action.TEMPLATES
+  async handle(_query: Query): Promise<ActionPredefinieQueryModel[]> {
+    return Action.ACTIONS_PREDEFINIES
   }
 
   async authorize(): Promise<Result> {

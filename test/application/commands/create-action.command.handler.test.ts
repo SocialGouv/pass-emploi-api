@@ -272,11 +272,11 @@ describe('CreateActionCommandHandler', () => {
       )
     })
 
-    it("créé l'événement idoine si l'action provient du referentiel de templates", () => {
+    it("créé l'événement idoine si l'action provient du referentiel d'actions prédéfinies", () => {
       // Given
       const command: CreateActionCommand = {
         idJeune: action.idJeune,
-        contenu: Action.TEMPLATES[5].titre,
+        contenu: Action.ACTIONS_PREDEFINIES[5].titre,
         idCreateur: utilisateur.id,
         typeCreateur: Action.TypeCreateur.CONSEILLER,
         statut: action.statut,
@@ -289,7 +289,7 @@ describe('CreateActionCommandHandler', () => {
 
       // Then
       expect(evenementService.creer).to.have.been.calledWithExactly(
-        Evenement.Code.ACTION_CREEE_REFERENTIEL,
+        Evenement.Code.ACTION_PREDEFINIE_CREEE,
         utilisateur
       )
     })

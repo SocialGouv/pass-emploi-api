@@ -172,7 +172,7 @@ export class TypeQualificationQueryModel
   heures: number
 }
 
-export class TemplateActionQueryModel implements Action.Template {
+export class ActionPredefinieQueryModel implements Action.ActionPredefinie {
   @ApiProperty()
   id: string
   @ApiProperty()

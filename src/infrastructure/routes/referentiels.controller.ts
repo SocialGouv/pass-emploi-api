@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { GetTemplatesActionQueryHandler } from 'src/application/queries/get-templates-action-query-handler.service'
+import { GetActionsPredefiniesQueryHandler } from 'src/application/queries/get-actions-predefinies.query.handler'
 import { GetAgencesQueryHandler } from '../../application/queries/get-agences.query.handler'
 import {
   GetCommunesEtDepartementsQuery,
@@ -17,7 +17,7 @@ import {
 import { GetTypesQualificationsQueryHandler } from '../../application/queries/get-types-qualifications.query.handler'
 import { GetTypesRendezVousQueryHandler } from '../../application/queries/get-types-rendez-vous.query.handler'
 import {
-  TemplateActionQueryModel,
+  ActionPredefinieQueryModel,
   TypeQualificationQueryModel
 } from '../../application/queries/query-models/actions.query-model'
 import { AgenceQueryModel } from '../../application/queries/query-models/agence.query-model'
@@ -45,7 +45,7 @@ export class ReferentielsController {
     private readonly getAgencesQueryHandler: GetAgencesQueryHandler,
     private readonly getMotifsSuppressionJeuneQueryHandler: GetMotifsSuppressionJeuneQueryHandler,
     private readonly getTypesQualificationsQueryHandler: GetTypesQualificationsQueryHandler,
-    private readonly getTemplatesActionQueryHandler: GetTemplatesActionQueryHandler
+    private readonly getActionsPredefiniesQueryHandler: GetActionsPredefiniesQueryHandler
   ) {}
 
   @Get('communes-et-departements')
@@ -135,13 +135,13 @@ export class ReferentielsController {
     return this.getTypesQualificationsQueryHandler.execute({})
   }
 
-  @Get('templates-action')
+  @Get('actions-predefinies')
   @ApiOAuth2([])
   @ApiResponse({
-    type: TemplateActionQueryModel,
+    type: ActionPredefinieQueryModel,
     isArray: true
   })
-  async getTemplatesAction(): Promise<TemplateActionQueryModel[]> {
-    return this.getTemplatesActionQueryHandler.execute({})
+  async getActionsPredefinies(): Promise<ActionPredefinieQueryModel[]> {
+    return this.getActionsPredefiniesQueryHandler.execute({})
   }
 }
