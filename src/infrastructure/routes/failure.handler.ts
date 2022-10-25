@@ -8,6 +8,8 @@ import {
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import {
+  CampagneExisteDejaError,
+  CampagneNonActive,
   DossierExisteDejaError,
   DroitsInsuffisants,
   EmailExisteDejaError,
@@ -16,6 +18,7 @@ import {
   JeunePasInactifError,
   MauvaiseCommandeError,
   NonTrouveError,
+  ReponsesCampagneInvalide,
   RessourceIndisponibleError
 } from '../../building-blocks/types/domain-error'
 import { isFailure, Result } from '../../building-blocks/types/result'
@@ -32,6 +35,9 @@ export function handleFailure(result: Result): void {
       case NonTrouveError.CODE:
         throw new NotFoundException(result.error.message)
       case MauvaiseCommandeError.CODE:
+      case ReponsesCampagneInvalide.CODE:
+      case CampagneNonActive.CODE:
+      case CampagneExisteDejaError.CODE:
         throw new BadRequestException(result.error, result.error.message)
       case RessourceIndisponibleError.CODE:
         throw new GoneException(result.error.message)

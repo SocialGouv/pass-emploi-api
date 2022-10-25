@@ -1,38 +1,24 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  NotFoundException,
-  Param,
-  ParseArrayPipe,
-  Post
-} from '@nestjs/common'
+import { Body, Controller, Param, ParseArrayPipe, Post } from '@nestjs/common'
 import { ApiBody, ApiOAuth2, ApiOperation, ApiTags } from '@nestjs/swagger'
-import { Utilisateur } from '../decorators/authenticated.decorator'
-import { Authentification } from '../../domain/authentification'
-import {
-  CreateCampagnePayload,
-  ReponseCampagnePayload
-} from './validation/campagnes.inputs'
+import { ValidateNested } from 'class-validator'
+import { DateTime } from 'luxon'
 import {
   CreateCampagneCommand,
   CreateCampagneCommandHandler
 } from '../../application/commands/create-campagne.command'
-import { DateTime } from 'luxon'
-import { isFailure, isSuccess } from '../../building-blocks/types/result'
-import {
-  CampagneExisteDejaError,
-  CampagneNonActive,
-  NonTrouveError,
-  ReponsesCampagneInvalide
-} from '../../building-blocks/types/domain-error'
-import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
-import { Core } from '../../domain/core'
 import {
   CreateEvaluationCommand,
   CreateEvaluationCommandHandler
 } from '../../application/commands/create-evaluation.command'
-import { ValidateNested } from 'class-validator'
+import { isSuccess } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Core } from '../../domain/core'
+import { Utilisateur } from '../decorators/authenticated.decorator'
+import { handleFailure } from './failure.handler'
+import {
+  CreateCampagnePayload,
+  ReponseCampagnePayload
+} from './validation/campagnes.inputs'
 
 @Controller()
 @ApiOAuth2([])
@@ -62,18 +48,11 @@ export class CampagnesController {
       utilisateur
     )
 
-    if (
-      isFailure(result) &&
-      result.error.code === CampagneExisteDejaError.CODE
-    ) {
-      throw new BadRequestException(result.error)
-    }
-
     if (isSuccess(result)) {
       return result.data
     }
 
-    throw new RuntimeException()
+    throw handleFailure(result)
   }
 
   @ApiOperation({
@@ -103,24 +82,10 @@ export class CampagnesController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      switch (result.error.code) {
-        case ReponsesCampagneInvalide.CODE:
-        case CampagneNonActive.CODE:
-          throw new BadRequestException(result.error)
-
-        case NonTrouveError.CODE:
-          throw new NotFoundException(result.error)
-
-        default:
-          throw new RuntimeException()
-      }
-    }
-
     if (isSuccess(result)) {
       return result.data
     }
 
-    throw new RuntimeException()
+    throw handleFailure(result)
   }
 }
