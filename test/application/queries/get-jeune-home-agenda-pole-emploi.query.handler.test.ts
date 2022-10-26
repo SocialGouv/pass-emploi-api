@@ -20,6 +20,7 @@ import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { Demarche } from '../../../src/domain/demarche'
 
 describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
   let handler: GetJeuneHomeAgendaPoleEmploiQueryHandler
@@ -77,66 +78,311 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
     let result: Result<JeuneHomeAgendaPoleEmploiQueryModel>
 
     describe('quand les services externes répondent avec Succès', () => {
-      beforeEach(async () => {
-        // Given
-        const query: GetJeuneHomeAgendaPoleEmploiQuery = {
-          idJeune: 'idJeune',
-          maintenant: maintenant,
-          accessToken: 'accessToken'
-        }
+      describe('mapping et filtres', () => {
+        beforeEach(async () => {
+          // Given
+          const query: GetJeuneHomeAgendaPoleEmploiQuery = {
+            idJeune: 'idJeune',
+            maintenant: maintenant,
+            accessToken: 'accessToken'
+          }
 
-        getDemarchesQueryGetter.handle
-          .withArgs({
-            ...query,
-            tri: GetDemarchesQueryGetter.Tri.parDateFin,
-            idpToken
+          getDemarchesQueryGetter.handle
+            .withArgs({
+              ...query,
+              tri: GetDemarchesQueryGetter.Tri.parDateFin,
+              idpToken
+            })
+            .resolves(
+              success([
+                uneDemarcheDansDeuxSemainesPlusUnJour,
+                uneDemarcheDeLaSemaine,
+                uneDemarcheDeLaSemaineProchaine,
+                uneDemarcheDeLaSemaineDerniere
+              ])
+            )
+
+          getRendezVousJeunePoleEmploiQueryGetter.handle
+            .withArgs({
+              ...query,
+              idpToken
+            })
+            .resolves(
+              success([
+                unRendezVousHier,
+                unRendezVousAujourdhui,
+                unRendezVousDansDeuxSemainesPlusUnJour
+              ])
+            )
+
+          // When
+          result = await handler.handle(query)
+        })
+        it('retourne des démarches filtrées entre maintenant et dans deux semaines', () => {
+          // Then
+          expect(isSuccess(result) && result.data.demarches).to.deep.equal([
+            uneDemarcheDeLaSemaine,
+            uneDemarcheDeLaSemaineProchaine
+          ])
+        })
+
+        it('retourne des rendez vous filtrées entre maintenant et dans deux semaines', () => {
+          // Then
+          expect(isSuccess(result) && result.data.rendezVous).to.deep.equal([
+            unRendezVousAujourdhui
+          ])
+        })
+
+        it('retourne des metadata', () => {
+          // Then
+          expect(isSuccess(result) && result.data.metadata).to.deep.equal({
+            dateDeDebut: maintenant.toJSDate(),
+            dateDeFin: dansDeuxSemaines.toJSDate(),
+            demarchesEnRetard: 0
           })
-          .resolves(
-            success([
-              uneDemarcheDansDeuxSemainesPlusUnJour,
-              uneDemarcheDeLaSemaine,
-              uneDemarcheDeLaSemaineProchaine,
-              uneDemarcheDeLaSemaineDerniere
-            ])
-          )
+        })
+      })
 
-        getRendezVousJeunePoleEmploiQueryGetter.handle
-          .withArgs({
-            ...query,
-            idpToken
+      describe('demarches en retard', () => {
+        describe('quand la démarche est en cours', () => {
+          describe('quand la date de fin de la démarche est passée', () => {
+            it('compte une démarche en retard', async () => {
+              // Given
+              const query: GetJeuneHomeAgendaPoleEmploiQuery = {
+                idJeune: 'idJeune',
+                maintenant: maintenant,
+                accessToken: 'accessToken'
+              }
+
+              const demarche = uneDemarcheQueryModel({
+                dateFin: maintenant.minus({ day: 1 }).toISO(),
+                statut: Demarche.Statut.EN_COURS
+              })
+
+              getDemarchesQueryGetter.handle.resolves(success([demarche]))
+
+              getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
+                success([])
+              )
+
+              // When
+              result = await handler.handle(query)
+
+              // Then
+              expect(
+                isSuccess(result) && result.data.metadata.demarchesEnRetard
+              ).to.equal(1)
+            })
           })
-          .resolves(
-            success([
-              unRendezVousHier,
-              unRendezVousAujourdhui,
-              unRendezVousDansDeuxSemainesPlusUnJour
-            ])
-          )
+          describe('quand la date de fin de la démarche est future', () => {
+            it('compte 0 démarche en retard', async () => {
+              // Given
+              const query: GetJeuneHomeAgendaPoleEmploiQuery = {
+                idJeune: 'idJeune',
+                maintenant: maintenant,
+                accessToken: 'accessToken'
+              }
 
-        // When
-        result = await handler.handle(query)
-      })
-      it('retourne des démarches filtrées entre maintenant et dans deux semaines', () => {
-        // Then
-        expect(isSuccess(result) && result.data.demarches).to.deep.equal([
-          uneDemarcheDeLaSemaine,
-          uneDemarcheDeLaSemaineProchaine
-        ])
-      })
+              const demarche = uneDemarcheQueryModel({
+                dateFin: maintenant.plus({ day: 1 }).toISO(),
+                statut: Demarche.Statut.EN_COURS
+              })
 
-      it('retourne des rendez vous filtrées entre maintenant et dans deux semaines', () => {
-        // Then
-        expect(isSuccess(result) && result.data.rendezVous).to.deep.equal([
-          unRendezVousAujourdhui
-        ])
-      })
+              getDemarchesQueryGetter.handle.resolves(success([demarche]))
 
-      it('retourne des metadata', () => {
-        // Then
-        expect(isSuccess(result) && result.data.metadata).to.deep.equal({
-          dateDeDebut: maintenant.toJSDate(),
-          dateDeFin: dansDeuxSemaines.toJSDate(),
-          demarchesEnRetard: 1
+              getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
+                success([])
+              )
+
+              // When
+              result = await handler.handle(query)
+
+              // Then
+              expect(
+                isSuccess(result) && result.data.metadata.demarchesEnRetard
+              ).to.equal(0)
+            })
+          })
+        })
+        describe('quand la démarche est à faire', () => {
+          describe('quand la date de fin de la démarche est passée', () => {
+            it('compte une démarche en retard', async () => {
+              // Given
+              const query: GetJeuneHomeAgendaPoleEmploiQuery = {
+                idJeune: 'idJeune',
+                maintenant: maintenant,
+                accessToken: 'accessToken'
+              }
+
+              const demarche = uneDemarcheQueryModel({
+                dateFin: maintenant.minus({ day: 1 }).toISO(),
+                statut: Demarche.Statut.A_FAIRE
+              })
+
+              getDemarchesQueryGetter.handle.resolves(success([demarche]))
+
+              getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
+                success([])
+              )
+
+              // When
+              result = await handler.handle(query)
+
+              // Then
+              expect(
+                isSuccess(result) && result.data.metadata.demarchesEnRetard
+              ).to.equal(1)
+            })
+          })
+          describe('quand la date de fin de la démarche est future', () => {
+            it('compte 0 démarche en retard', async () => {
+              // Given
+              const query: GetJeuneHomeAgendaPoleEmploiQuery = {
+                idJeune: 'idJeune',
+                maintenant: maintenant,
+                accessToken: 'accessToken'
+              }
+
+              const demarche = uneDemarcheQueryModel({
+                dateFin: maintenant.plus({ day: 1 }).toISO(),
+                statut: Demarche.Statut.A_FAIRE
+              })
+
+              getDemarchesQueryGetter.handle.resolves(success([demarche]))
+
+              getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
+                success([])
+              )
+
+              // When
+              result = await handler.handle(query)
+
+              // Then
+              expect(
+                isSuccess(result) && result.data.metadata.demarchesEnRetard
+              ).to.equal(0)
+            })
+          })
+        })
+        describe('quand la démarche est réalisée', () => {
+          describe('quand la date de fin de la démarche est passée', () => {
+            it('compte 0 démarche en retard', async () => {
+              // Given
+              const query: GetJeuneHomeAgendaPoleEmploiQuery = {
+                idJeune: 'idJeune',
+                maintenant: maintenant,
+                accessToken: 'accessToken'
+              }
+
+              const demarche = uneDemarcheQueryModel({
+                dateFin: maintenant.minus({ day: 1 }).toISO(),
+                statut: Demarche.Statut.REALISEE
+              })
+
+              getDemarchesQueryGetter.handle.resolves(success([demarche]))
+
+              getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
+                success([])
+              )
+
+              // When
+              result = await handler.handle(query)
+
+              // Then
+              expect(
+                isSuccess(result) && result.data.metadata.demarchesEnRetard
+              ).to.equal(0)
+            })
+          })
+          describe('quand la date de fin de la démarche est future', () => {
+            it('compte 0 démarche en retard', async () => {
+              // Given
+              const query: GetJeuneHomeAgendaPoleEmploiQuery = {
+                idJeune: 'idJeune',
+                maintenant: maintenant,
+                accessToken: 'accessToken'
+              }
+
+              const demarche = uneDemarcheQueryModel({
+                dateFin: maintenant.plus({ day: 1 }).toISO(),
+                statut: Demarche.Statut.REALISEE
+              })
+
+              getDemarchesQueryGetter.handle.resolves(success([demarche]))
+
+              getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
+                success([])
+              )
+
+              // When
+              result = await handler.handle(query)
+
+              // Then
+              expect(
+                isSuccess(result) && result.data.metadata.demarchesEnRetard
+              ).to.equal(0)
+            })
+          })
+        })
+        describe('quand la démarche est annulée', () => {
+          describe('quand la date de fin de la démarche est passée', () => {
+            it('compte 0 démarche en retard', async () => {
+              // Given
+              const query: GetJeuneHomeAgendaPoleEmploiQuery = {
+                idJeune: 'idJeune',
+                maintenant: maintenant,
+                accessToken: 'accessToken'
+              }
+
+              const demarche = uneDemarcheQueryModel({
+                dateFin: maintenant.minus({ day: 1 }).toISO(),
+                statut: Demarche.Statut.ANNULEE
+              })
+
+              getDemarchesQueryGetter.handle.resolves(success([demarche]))
+
+              getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
+                success([])
+              )
+
+              // When
+              result = await handler.handle(query)
+
+              // Then
+              expect(
+                isSuccess(result) && result.data.metadata.demarchesEnRetard
+              ).to.equal(0)
+            })
+          })
+          describe('quand la date de fin de la démarche est future', () => {
+            it('compte 0 démarche en retard', async () => {
+              // Given
+              const query: GetJeuneHomeAgendaPoleEmploiQuery = {
+                idJeune: 'idJeune',
+                maintenant: maintenant,
+                accessToken: 'accessToken'
+              }
+
+              const demarche = uneDemarcheQueryModel({
+                dateFin: maintenant.plus({ day: 1 }).toISO(),
+                statut: Demarche.Statut.ANNULEE
+              })
+
+              getDemarchesQueryGetter.handle.resolves(success([demarche]))
+
+              getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
+                success([])
+              )
+
+              // When
+              result = await handler.handle(query)
+
+              // Then
+              expect(
+                isSuccess(result) && result.data.metadata.demarchesEnRetard
+              ).to.equal(0)
+            })
+          })
         })
       })
     })
