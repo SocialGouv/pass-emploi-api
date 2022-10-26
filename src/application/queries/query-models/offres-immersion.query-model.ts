@@ -48,7 +48,8 @@ export class DetailOffreImmersionQueryModel extends OffreImmersionQueryModel {
   @ApiProperty()
   adresse: string
   @ApiProperty({
-    required: false
+    required: false,
+    type: LocalisationQueryModel
   })
   localisation?: LocalisationQueryModel
   @ApiProperty({

@@ -85,8 +85,7 @@ export class OffresImmersionController {
 
   @Get(':idOffreImmersion')
   @ApiResponse({
-    type: DetailOffreImmersionQueryModel,
-    isArray: true
+    type: DetailOffreImmersionQueryModel
   })
   async getDetailOffreImmersion(
     @Param('idOffreImmersion') idOffreImmersion: string,

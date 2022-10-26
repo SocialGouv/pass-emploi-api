@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 
-export class LocalisationQueryModel {
+export class LocalisationOffresEmploiQueryModel {
   @ApiProperty({ required: false })
   nom?: string
 
@@ -39,7 +39,7 @@ export class OffreEmploiResumeQueryModel {
   nomEntreprise?: string
 
   @ApiProperty({ required: false })
-  localisation?: LocalisationQueryModel
+  localisation?: LocalisationOffresEmploiQueryModel
 
   @ApiProperty({ required: false })
   alternance?: boolean
