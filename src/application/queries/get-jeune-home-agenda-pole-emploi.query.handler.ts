@@ -9,6 +9,7 @@ import { DateTime } from 'luxon'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
+import { Demarche } from '../../domain/demarche'
 
 export interface GetJeuneHomeAgendaPoleEmploiQuery extends Query {
   idJeune: string
@@ -70,7 +71,10 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
         unRendezVous.date <= dansDeuxSemaines.toJSDate()
     )
     const nombreDeDemarchesEnRetard = resultDemarches.data.filter(
-      demarche => DateTime.fromISO(demarche.dateFin) <= query.maintenant
+      demarche =>
+        DateTime.fromISO(demarche.dateFin) <= query.maintenant &&
+        demarche.statut !== Demarche.Statut.REALISEE &&
+        demarche.statut !== Demarche.Statut.ANNULEE
     ).length
 
     return success({

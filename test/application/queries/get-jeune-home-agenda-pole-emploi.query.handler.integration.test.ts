@@ -100,7 +100,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
       const maintenant = DateTime.fromISO('2020-04-06T12:00:00.000Z')
       const query: GetJeuneHomeAgendaPoleEmploiQuery = {
         idJeune: 'idJeune',
-        maintenant: maintenant.toString(),
+        maintenant: maintenant,
         accessToken: 'accessToken'
       }
 
