@@ -13,7 +13,7 @@ import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 export interface GetJeuneHomeAgendaPoleEmploiQuery extends Query {
   idJeune: string
   accessToken: string
-  maintenant: string
+  maintenant: DateTime
 }
 
 @Injectable()
@@ -33,8 +33,7 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
   async handle(
     query: GetJeuneHomeAgendaPoleEmploiQuery
   ): Promise<Result<JeuneHomeAgendaPoleEmploiQueryModel>> {
-    const maintenant = DateTime.fromISO(query.maintenant, { setZone: true })
-    const dansDeuxSemaines = maintenant.plus({ weeks: 2 })
+    const dansDeuxSemaines = query.maintenant.plus({ weeks: 2 })
 
     const idpToken = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
       query.accessToken
@@ -62,23 +61,23 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
 
     const demarches = resultDemarches.data.filter(
       demarche =>
-        DateTime.fromISO(demarche.dateFin) >= maintenant &&
+        DateTime.fromISO(demarche.dateFin) >= query.maintenant &&
         DateTime.fromISO(demarche.dateFin) <= dansDeuxSemaines
     )
     const rendezVous = resultRendezVous.data.filter(
       unRendezVous =>
-        unRendezVous.date >= maintenant.toJSDate() &&
+        unRendezVous.date >= query.maintenant.toJSDate() &&
         unRendezVous.date <= dansDeuxSemaines.toJSDate()
     )
     const nombreDeDemarchesEnRetard = resultDemarches.data.filter(
-      demarche => DateTime.fromISO(demarche.dateFin) <= maintenant
+      demarche => DateTime.fromISO(demarche.dateFin) <= query.maintenant
     ).length
 
     return success({
       demarches,
       rendezVous,
       metadata: {
-        dateDeDebut: maintenant.toJSDate(),
+        dateDeDebut: query.maintenant.toJSDate(),
         dateDeFin: dansDeuxSemaines.toJSDate(),
         demarchesEnRetard: nombreDeDemarchesEnRetard
       }

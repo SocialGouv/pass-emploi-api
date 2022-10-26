@@ -81,7 +81,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
         // Given
         const query: GetJeuneHomeAgendaPoleEmploiQuery = {
           idJeune: 'idJeune',
-          maintenant: maintenant.toString(),
+          maintenant: maintenant,
           accessToken: 'accessToken'
         }
 
@@ -146,7 +146,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
         // Given
         const query: GetJeuneHomeAgendaPoleEmploiQuery = {
           idJeune: 'idJeune',
-          maintenant: maintenant.toString(),
+          maintenant: maintenant,
           accessToken: 'accessToken'
         }
 
@@ -167,7 +167,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
         // Given
         const query: GetJeuneHomeAgendaPoleEmploiQuery = {
           idJeune: 'idJeune',
-          maintenant: maintenant.toString(),
+          maintenant: maintenant,
           accessToken: 'accessToken'
         }
 
@@ -190,7 +190,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
       // Given
       const query: GetJeuneHomeAgendaPoleEmploiQuery = {
         idJeune: 'idJeune',
-        maintenant: DateTime.now().toString(),
+        maintenant: DateTime.now(),
         accessToken: 'accessToken'
       }
 
