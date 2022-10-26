@@ -9038,7 +9038,7 @@ __metadata:
     rimraf: 3.0.2
     rxjs: 7.5.7
     sequelize: 6.25.3
-    sequelize-cli: 6.5.1
+    sequelize-cli: 6.5.2
     sequelize-typescript: 2.1.5
     sinon: ^14.0.0
     sinon-chai: ^3.7.0
@@ -10917,9 +10917,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sequelize-cli@npm:6.5.1":
-  version: 6.5.1
-  resolution: "sequelize-cli@npm:6.5.1"
+"sequelize-cli@npm:6.5.2":
+  version: 6.5.2
+  resolution: "sequelize-cli@npm:6.5.2"
   dependencies:
     cli-color: ^2.0.3
     fs-extra: ^9.1.0
@@ -10931,7 +10931,7 @@ __metadata:
   bin:
     sequelize: lib/sequelize
     sequelize-cli: lib/sequelize
-  checksum: 1a44d0402fa8674245a0e45208015180849158fa51e6acf118410bb8ceacdbb9b840c11cd343095117d6a8d7b12246d8c351bdf7286ac63166d8135ed964c64f
+  checksum: 54889569b7dc73c1b46d2f15590bad77ee4886411fa538217081351d5a052cf22bae9680c99af58efdc2cafd6644c56dbb3b9811c65329f78760b9ab496edc3f
   languageName: node
   linkType: hard
 
