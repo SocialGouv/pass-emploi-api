@@ -83,6 +83,7 @@ import { uneActionQueryModelSansJeune } from '../../fixtures/query-models/action
 import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../../src/application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
 import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 import StatutInvalide = Action.StatutInvalide
+import { DateTime } from 'luxon'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -1058,7 +1059,7 @@ describe('JeunesController', () => {
         .withArgs(
           {
             idJeune,
-            maintenant,
+            maintenant: DateTime.fromISO(maintenant, { setZone: true }),
             accessToken: 'coucou'
           },
           unUtilisateurDecode()

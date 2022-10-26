@@ -349,8 +349,11 @@ export class JeunesController {
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
   ): Promise<JeuneHomeAgendaPoleEmploiQueryModel> {
+    const maintenant = DateTime.fromISO(queryParams.maintenant, {
+      setZone: true
+    })
     const result = await this.getJeuneHomeAgendaPoleEmploiQueryHandler.execute(
-      { idJeune, maintenant: queryParams.maintenant, accessToken },
+      { idJeune, maintenant, accessToken },
       utilisateur
     )
 
