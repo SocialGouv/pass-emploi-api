@@ -40,6 +40,7 @@ describe('JeuneConfigurationApplicationSqlRepository', () => {
           dateDerniereActualisationToken: uneDatetime().toJSDate(),
           datePremiereConnexion: uneDatetime().toJSDate(),
           installationId: 'uneInstallationId',
+          instanceId: 'uneInstanceId',
           appVersion: 'uneAppVersion'
         })
       )
@@ -57,6 +58,7 @@ describe('JeuneConfigurationApplicationSqlRepository', () => {
             idJeune: jeune.id,
             pushNotificationToken: 'unToken',
             installationId: 'uneInstallationId',
+            instanceId: 'uneInstanceId',
             appVersion: 'uneAppVersion',
             dateDerniereActualisationToken: uneDatetime().toJSDate()
           }
@@ -105,6 +107,7 @@ describe('JeuneConfigurationApplicationSqlRepository', () => {
           idJeune,
           pushNotificationToken: 'unToken',
           installationId: 'uneInstallationId',
+          instanceId: 'yyy-yy-yyy',
           appVersion: 'uneAppVersion',
           dateDerniereActualisationToken: uneDatetime().toJSDate()
         }
@@ -120,6 +123,7 @@ describe('JeuneConfigurationApplicationSqlRepository', () => {
         expect(result?.installationId).to.equal(
           configurationApplication.installationId
         )
+        expect(result?.instanceId).to.equal(configurationApplication.instanceId)
         expect(result?.appVersion).to.equal(configurationApplication.appVersion)
         expect(result?.dateDerniereActualisationToken).to.deep.equal(
           configurationApplication.dateDerniereActualisationToken

@@ -8,6 +8,7 @@ export const uneJeuneConfigurationApplication = (
     idJeune: 'ABCDE',
     pushNotificationToken: 'unToken',
     installationId: 'uneInstallationId',
+    instanceId: 'uneInstanceId',
     appVersion: 'uneAppVersion',
     dateDerniereActualisationToken: uneDatetime().toJSDate()
   }

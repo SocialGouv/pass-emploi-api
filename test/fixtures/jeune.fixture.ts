@@ -88,6 +88,7 @@ export const uneConfiguration = (
     pushNotificationToken: 'token',
     dateDerniereActualisationToken: uneDate(),
     installationId: '123456',
+    instanceId: 'abcdef',
     appVersion: '1.8.1'
   }
   return { ...defaults, ...args }

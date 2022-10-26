@@ -7,6 +7,7 @@ export interface ConfigurationApplication {
   dateDerniereActualisationToken?: Date
   appVersion?: string
   installationId?: string
+  instanceId?: string
 }
 
 export namespace ConfigurationApplication {
@@ -28,6 +29,7 @@ export namespace ConfigurationApplication {
         pushNotificationToken: nouvelleConfiguration.pushNotificationToken,
         dateDerniereActualisationToken: this.dateService.nowJs(),
         installationId: nouvelleConfiguration.installationId,
+        instanceId: nouvelleConfiguration.instanceId,
         appVersion: nouvelleConfiguration.appVersion
       }
     }

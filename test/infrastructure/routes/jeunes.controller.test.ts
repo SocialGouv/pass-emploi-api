@@ -1457,7 +1457,7 @@ describe('JeunesController', () => {
     }
 
     describe("quand c'est en succès", () => {
-      it("met à jour le token, la version de l'app et l'installation id", async () => {
+      it("met à jour le token, la version de l'app, l'installation id et l'instance id", async () => {
         // Given
         jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
         updateJeuneConfigurationApplicationCommandHandler.execute
@@ -1466,7 +1466,8 @@ describe('JeunesController', () => {
               idJeune,
               pushNotificationToken: payload.registration_token,
               appVersion: 'coucou',
-              installationId: 'xxx-xx-xxx'
+              installationId: 'xxx-xx-xxx',
+              instanceId: 'yyy-yy-yyy'
             },
             unUtilisateurDecode()
           )
@@ -1478,6 +1479,7 @@ describe('JeunesController', () => {
           .set('authorization', unHeaderAuthorization())
           .set('x-appversion', 'coucou')
           .set('x-installationid', 'xxx-xx-xxx')
+          .set('x-instanceid', 'yyy-yy-yyy')
           .send(payload)
           // Then
           .expect(HttpStatus.OK)
@@ -1491,7 +1493,8 @@ describe('JeunesController', () => {
               idJeune,
               pushNotificationToken: payload.registration_token,
               appVersion: undefined,
-              installationId: undefined
+              installationId: undefined,
+              instanceId: undefined
             },
             unUtilisateurDecode()
           )
@@ -1529,7 +1532,8 @@ describe('JeunesController', () => {
               idJeune,
               pushNotificationToken: payload.registration_token,
               appVersion: 'coucou',
-              installationId: 'xxx-xx-xxx'
+              installationId: 'xxx-xx-xxx',
+              instanceId: 'yyy-yy-yyy'
             },
             unUtilisateurDecode()
           )
@@ -1541,6 +1545,8 @@ describe('JeunesController', () => {
           .set('authorization', unHeaderAuthorization())
           .set('x-appversion', 'coucou')
           .set('x-installationid', 'xxx-xx-xxx')
+          .set('x-instanceid', 'yyy-yy-yyy')
+
           .send(payload)
           // Then
           .expect(HttpStatus.OK)
@@ -1554,7 +1560,8 @@ describe('JeunesController', () => {
               idJeune,
               pushNotificationToken: payload.registration_token,
               appVersion: undefined,
-              installationId: undefined
+              installationId: undefined,
+              instanceId: undefined
             },
             unUtilisateurDecode()
           )

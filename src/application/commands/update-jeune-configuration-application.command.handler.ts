@@ -21,6 +21,7 @@ export interface UpdateJeuneConfigurationApplicationCommand extends Command {
   pushNotificationToken: string
   appVersion?: string
   installationId?: string
+  instanceId?: string
 }
 
 @Injectable()
