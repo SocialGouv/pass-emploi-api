@@ -120,7 +120,7 @@ describe('DemarcheHttpRepository', () => {
           dateCreation: uneDatetime().toISO(),
           dateFin: uneDatetime().toISO(),
           dateModification: uneDatetime().toISO(),
-          pourquoi: 'string',
+          pourQuoi: 'string',
           quoi: 'string'
         })
 

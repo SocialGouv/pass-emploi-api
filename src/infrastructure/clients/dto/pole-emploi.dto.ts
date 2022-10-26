@@ -104,7 +104,7 @@ export interface DemarcheDto {
     | 'RECHERCHE_ENREGISTREE'
     | 'SUGGESTION'
     | 'PASS_EMPLOI'
-  pourquoi: string
+  pourQuoi: string
   libellePourquoi: string
   quoi: string
   libelleQuoi: string
@@ -118,12 +118,14 @@ export interface DemarcheDto {
   metier?: string
   nombre?: number
   contact?: string
+  description2?: string
   droitsDemarche?: {
     annulation?: boolean
     realisation?: boolean
     replanification?: boolean
     modificationDate?: boolean
   }
+  type?: string
 }
 
 export interface SuggestionDto {

@@ -1,0 +1,1851 @@
+import { INestApplication, ValidationPipe } from '@nestjs/common'
+import { DateService } from 'src/utils/date-service'
+import * as request from 'supertest'
+import { uneDatetime, uneDatetimeLocale } from 'test/fixtures/date.fixture'
+import { JwtService } from '../../src/infrastructure/auth/jwt.service'
+import {
+  buildTestingModuleForHttpTesting,
+  StubbedClass,
+  stubClass
+} from '../utils'
+import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../src/application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
+import {
+  unHeaderAuthorization,
+  unJwtPayloadValide
+} from '../fixtures/authentification.fixture'
+import { unJeune } from '../fixtures/jeune.fixture'
+import { GetDemarchesQueryGetter } from '../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
+import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
+import { JeunePoleEmploiAuthorizer } from '../../src/application/authorizers/authorize-jeune-pole-emploi'
+import { KeycloakClient } from '../../src/infrastructure/clients/keycloak-client'
+import { createSandbox } from 'sinon'
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { Jeune } from '../../src/domain/jeune/jeune'
+import { PoleEmploiPartenaireClient } from '../../src/infrastructure/clients/pole-emploi-partenaire-client'
+import { IdService } from '../../src/utils/id-service'
+import { emptySuccess } from '../../src/building-blocks/types/result'
+import {
+  DemarcheDto,
+  DemarcheDtoEtat,
+  RendezVousPoleEmploiDto
+} from '../../src/infrastructure/clients/dto/pole-emploi.dto'
+import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
+import { DateTime } from 'luxon'
+
+describe('JeunesControllerE2E', () => {
+  let getJeuneHomeAgendaPoleEmploiQueryHandler: GetJeuneHomeAgendaPoleEmploiQueryHandler
+  let jeunePoleEmploiAuthorizer: StubbedClass<JeunePoleEmploiAuthorizer>
+  let keycloakClient: StubbedClass<KeycloakClient>
+  let jeuneRepository: StubbedType<Jeune.Repository>
+  let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
+  let jwtService: StubbedClass<JwtService>
+  let app: INestApplication
+
+  let dateService: StubbedClass<DateService>
+  const maintenant = DateTime.fromISO('2022-10-26T12:00:00.000Z')
+
+  let idService: StubbedClass<IdService>
+
+  beforeEach(async () => {
+    // Given
+    dateService = stubClass(DateService)
+    dateService.now.returns(maintenant)
+    jwtService = stubClass(JwtService)
+    idService = stubClass(IdService)
+    idService.uuid.returns('9903de8a-76fc-44c0-b049-480d7ec2ee10')
+
+    jeunePoleEmploiAuthorizer = stubClass(JeunePoleEmploiAuthorizer)
+    keycloakClient = stubClass(KeycloakClient)
+    jeuneRepository = stubInterface(createSandbox())
+    poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
+
+    const getDemarchesQueryGetter = new GetDemarchesQueryGetter(
+      jeuneRepository,
+      poleEmploiPartenaireClient,
+      dateService,
+      keycloakClient
+    )
+    const getRendezVousJeunePoleEmploiQueryGetter =
+      new GetRendezVousJeunePoleEmploiQueryGetter(
+        jeuneRepository,
+        poleEmploiPartenaireClient,
+        dateService,
+        idService,
+        keycloakClient
+      )
+
+    getJeuneHomeAgendaPoleEmploiQueryHandler =
+      new GetJeuneHomeAgendaPoleEmploiQueryHandler(
+        getDemarchesQueryGetter,
+        getRendezVousJeunePoleEmploiQueryGetter,
+        jeunePoleEmploiAuthorizer,
+        keycloakClient
+      )
+
+    const testingModule = await buildTestingModuleForHttpTesting()
+      .overrideProvider(GetJeuneHomeAgendaPoleEmploiQueryHandler)
+      .useValue(getJeuneHomeAgendaPoleEmploiQueryHandler)
+      .overrideProvider(JwtService)
+      .useValue(jwtService)
+      .overrideProvider(DateService)
+      .useValue(dateService)
+      .compile()
+
+    app = testingModule.createNestApplication()
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
+    await app.init()
+  })
+
+  beforeEach(() => {
+    jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+  })
+
+  after(async () => {
+    await app.close()
+  })
+
+  describe('GET /jeunes/:idJeune/home/agenda/pole-emploi', () => {
+    const jeune = unJeune()
+
+    it('retourne la home agenda du jeune', async () => {
+      // Given
+      jeunePoleEmploiAuthorizer.authorize.resolves(emptySuccess())
+      keycloakClient.exchangeTokenPoleEmploiJeune.resolves('idpToken')
+      jeuneRepository.get.resolves(jeune)
+
+      poleEmploiPartenaireClient.getDemarches.resolves(demarchesPoleEmploi)
+      poleEmploiPartenaireClient.getRendezVous.resolves(rendezVousPoleEmploi)
+
+      // When
+      await request(app.getHttpServer())
+        .get(
+          `/jeunes/${jeune.id}/home/agenda/pole-emploi?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00`
+        )
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(expected)
+    })
+  })
+})
+
+const rendezVousPoleEmploi: AxiosResponse<RendezVousPoleEmploiDto[]> = {
+  config: undefined,
+  headers: undefined,
+  request: undefined,
+  status: 200,
+  statusText: '',
+  data: [
+    {
+      date: '2022-10-26',
+      duree: 30,
+      heure: '14:00',
+      agence: 'Pôle Emploi Ales avene',
+      adresse: {
+        ligne4: '29 CHEMIN des deux Mas',
+        ligne5: 'Piste OASIS 4',
+        bureauDistributeur: '30100'
+      },
+      typeRDV: 'CONVOCATION',
+      modaliteContact: 'TELEPHONE'
+    }
+  ]
+}
+
+const demarchesPoleEmploi: DemarcheDto[] = [
+  {
+    ou: 'Pôle emploi',
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q11',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C11.02',
+    dateFin: '2022-10-24T17:54:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-10-24T17:54:00+02:00',
+    idDemarche: '244025740',
+    libelleLong:
+      'Préparation de ses candidatures (CV, lettre de motivation, book) en créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+    libelleQuoi:
+      'Préparation de ses candidatures (CV, lettre de motivation, book)',
+    dateCreation: '2022-10-24T17:54:00+02:00',
+    description2: 'CV PETITJEAN Brandon 2',
+    libelleCourt:
+      'Préparation CV ou lettre de motivation :  CV PETITJEAN Brandon 2',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libelleComment:
+      'En créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'INDIVIDU',
+    origineDemarche: 'CV'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q11',
+    type: 'demarcheExtDetailleOut',
+    metier: 'CV à mettre à jour',
+    comment: 'C11.02',
+    dateFin: '2022-10-24T00:00:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-10-24T00:00:00+02:00',
+    idDemarche: '242490963',
+    libelleLong:
+      'Préparation de ses candidatures (CV, lettre de motivation, book) en créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+    libelleQuoi:
+      'Préparation de ses candidatures (CV, lettre de motivation, book)',
+    dateCreation: '2022-10-18T11:12:00+02:00',
+    libelleCourt: 'Préparation CV ou lettre de motivation CV à mettre à jour',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libelleComment:
+      'En créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-10-24T17:44:00+02:00',
+    origineModificateur: 'INDIVIDU'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q15',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C15.06',
+    dateFin: '2022-10-24T12:00:00+02:00',
+    pourQuoi: 'P03',
+    idDemarche: '242481248',
+    libelleLong: 'Candidatures spontanées',
+    libelleQuoi: 'Candidatures spontanées',
+    dateCreation: '2022-10-18T10:57:00+02:00',
+    libelleCourt: 'Candidatures spontanées',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libelleComment: 'Moyen à définir',
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-10-24T17:24:00+02:00',
+    origineModificateur: 'INDIVIDU'
+  },
+  {
+    ou: 'RELANCE',
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q12',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C12.03',
+    dateFin: '2022-10-21T12:00:00+02:00',
+    pourQuoi: 'P03',
+    idDemarche: '242480988',
+    libelleLong:
+      "Recherche d'offres d'emploi ou d'entreprises avec une agence d'intérim",
+    libelleQuoi: "Recherche d'offres d'emploi ou d'entreprises",
+    dateCreation: '2022-10-18T10:57:00+02:00',
+    libelleCourt: "Inscription en agence d'intérim",
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libelleComment: "Avec une agence d'intérim",
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-10-21T14:54:00+02:00',
+    origineModificateur: 'INDIVIDU'
+  },
+  {
+    ou: 'IMT (Information Marché du Travail) ',
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q37',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C37.04',
+    dateFin: '2022-10-24T00:00:00+02:00',
+    pourQuoi: 'P02',
+    dateDebut: '2022-10-24T00:00:00+02:00',
+    idDemarche: '242480697',
+    libelleLong: "Initiation à l'informatique ou à Internet par un autre moyen",
+    libelleQuoi: "Initiation à l'informatique ou à Internet",
+    dateCreation: '2022-10-18T10:56:00+02:00',
+    libelleCourt:
+      "Initiation à l'informatique avec IMT (Information Marché du Travail) ",
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libelleComment: 'Par un autre moyen',
+    libellePourquoi: 'Ma formation professionnelle',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-10-24T17:24:00+02:00',
+    origineModificateur: 'INDIVIDU'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q36',
+    type: 'demarcheExtDetailleOut',
+    contact: 'ENTRETIEN INDIVIDUEL PHYSIQUE',
+    dateFin: '2022-10-18T00:00:00+02:00',
+    pourQuoi: 'P06',
+    dateDebut: '2022-10-18T00:00:00+02:00',
+    idDemarche: '242511564',
+    libelleLong: 'Entretien de suivi personnalisé',
+    libelleQuoi: 'Vous avez eu un',
+    dateCreation: '2022-10-18T00:00:00+02:00',
+    description2: 'Entretien de suivi personnalisé',
+    libelleCourt: 'Entretien de suivi personnalisé',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes entretiens avec un conseiller',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'ENTRETIEN'
+  },
+  {
+    ou: 'Pôle emploi',
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q14',
+    type: 'demarcheExtDetailleOut',
+    dateFin: '2022-10-17T16:45:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-10-17T16:45:00+02:00',
+    organisme: 'JSC FRANCE',
+    idDemarche: '242312573',
+    libelleLong: "Réponse à des offres d'emploi",
+    libelleQuoi: "Réponse à des offres d'emploi",
+    dateCreation: '2022-10-17T16:45:00+02:00',
+    libelleCourt: "Réponse à l'offre de JSC FRANCE",
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'INDIVIDU',
+    origineDemarche: 'CANDIDATURE'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q16',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C16.03',
+    dateFin: '2022-10-17T12:00:00+02:00',
+    pourQuoi: 'P03',
+    idDemarche: '241013377',
+    libelleLong:
+      'Réalisation du suivi de ses candidatures et relance des recruteurs',
+    libelleQuoi:
+      'Réalisation du suivi de ses candidatures et relance des recruteurs',
+    dateCreation: '2022-10-12T09:18:00+02:00',
+    libelleCourt: 'Suivi et relance des candidatures',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libelleComment: 'Moyen à définir',
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-10-17T12:05:00+02:00',
+    origineModificateur: 'INDIVIDU'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q16',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C16.02',
+    dateFin: '2022-10-17T12:00:00+02:00',
+    pourQuoi: 'P03',
+    idDemarche: '241013268',
+    libelleLong:
+      'Réalisation du suivi de ses candidatures et relance des recruteurs par un autre moyen',
+    libelleQuoi:
+      'Réalisation du suivi de ses candidatures et relance des recruteurs',
+    dateCreation: '2022-10-12T09:18:00+02:00',
+    description2: "Relance agence d'interim",
+    libelleCourt: 'Suivi et relance des candidatures',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libelleComment: 'Par un autre moyen',
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-10-17T12:06:00+02:00',
+    origineModificateur: 'INDIVIDU'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q14',
+    type: 'demarcheExtDetailleOut',
+    metier: 'Multiservice, conducteur de ligne...',
+    dateFin: '2022-10-17T12:00:00+02:00',
+    pourQuoi: 'P03',
+    idDemarche: '241013000',
+    libelleLong: "Réponse à des offres d'emploi",
+    libelleQuoi: "Réponse à des offres d'emploi",
+    dateCreation: '2022-10-12T09:17:00+02:00',
+    libelleCourt: 'Réponse à offres',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-10-17T17:01:00+02:00',
+    origineModificateur: 'INDIVIDU'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q36',
+    type: 'demarcheExtDetailleOut',
+    contact: 'ENTRETIEN INDIVIDUEL TELEPHONI',
+    dateFin: '2022-10-12T00:00:00+02:00',
+    pourQuoi: 'P06',
+    dateDebut: '2022-10-12T00:00:00+02:00',
+    idDemarche: '241015344',
+    libelleLong: 'Entretien de suivi personnalisé',
+    libelleQuoi: 'Vous avez eu un',
+    dateCreation: '2022-10-12T00:00:00+02:00',
+    description2: 'Entretien de suivi personnalisé',
+    libelleCourt: 'Entretien de suivi personnalisé',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes entretiens avec un conseiller',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'ENTRETIEN'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q20',
+    type: 'demarcheExtDetailleOut',
+    metier: 'SCH France',
+    comment: 'C20.02',
+    dateFin: '2022-10-07T12:00:00+02:00',
+    pourQuoi: 'P04',
+    idDemarche: '239281229',
+    libelleLong:
+      'Relance des recruteurs suite à ses entretiens par un autre moyen',
+    libelleQuoi: 'Relance des recruteurs suite à ses entretiens',
+    dateCreation: '2022-10-05T11:25:00+02:00',
+    libelleCourt: "Relance suite entretiens d'embauche",
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libelleComment: 'Par un autre moyen',
+    libellePourquoi: "Mes entretiens d'embauche",
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-10-07T17:48:00+02:00',
+    origineModificateur: 'INDIVIDU'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q14',
+    type: 'demarcheExtDetailleOut',
+    metier: 'maintenance',
+    dateFin: '2022-10-08T00:00:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-10-08T00:00:00+02:00',
+    idDemarche: '239280172',
+    libelleLong: "Réponse à des offres d'emploi",
+    libelleQuoi: "Réponse à des offres d'emploi",
+    dateCreation: '2022-10-05T11:24:00+02:00',
+    libelleCourt: 'Réponse à offres',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-10-08T18:19:00+02:00',
+    origineModificateur: 'INDIVIDU'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q18',
+    type: 'demarcheExtDetailleOut',
+    metier: 'Opérateur de production',
+    comment: 'C18.03',
+    dateFin: '2022-09-29T00:00:00+02:00',
+    pourQuoi: 'P04',
+    dateDebut: '2022-09-29T00:00:00+02:00',
+    idDemarche: '239271986',
+    libelleLong: "Réalisation d'entretiens d'embauche par un autre moyen",
+    libelleQuoi: "Réalisation d'entretiens d'embauche",
+    dateCreation: '2022-10-05T11:11:00+02:00',
+    description2: 'SCH France',
+    libelleCourt: "Entretiens d'embauche",
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libelleComment: 'Par un autre moyen',
+    libellePourquoi: "Mes entretiens d'embauche",
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q36',
+    type: 'demarcheExtDetailleOut',
+    contact: 'ENTRETIEN INDIVIDUEL TELEPHONI',
+    dateFin: '2022-10-05T00:00:00+02:00',
+    pourQuoi: 'P06',
+    dateDebut: '2022-10-05T00:00:00+02:00',
+    idDemarche: '239302125',
+    libelleLong: 'Entretien de suivi personnalisé',
+    libelleQuoi: 'Vous avez eu un',
+    dateCreation: '2022-10-05T00:00:00+02:00',
+    description2: 'Entretien de suivi personnalisé',
+    libelleCourt: 'Entretien de suivi personnalisé',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes entretiens avec un conseiller',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'ENTRETIEN'
+  },
+  {
+    ou: 'Pôle emploi',
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q14',
+    type: 'demarcheExtDetailleOut',
+    dateFin: '2022-10-01T16:56:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-10-01T16:56:00+02:00',
+    organisme: 'INTERACTION',
+    idDemarche: '238409862',
+    libelleLong: "Réponse à des offres d'emploi",
+    libelleQuoi: "Réponse à des offres d'emploi",
+    dateCreation: '2022-10-01T16:56:00+02:00',
+    libelleCourt: "Réponse à l'offre de INTERACTION",
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'INDIVIDU',
+    origineDemarche: 'CANDIDATURE'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q14',
+    type: 'demarcheExtDetailleOut',
+    dateFin: '2022-09-29T00:00:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-09-29T00:00:00+02:00',
+    idDemarche: '236589109',
+    libelleLong: "Réponse à des offres d'emploi",
+    libelleQuoi: "Réponse à des offres d'emploi",
+    dateCreation: '2022-09-26T10:39:00+02:00',
+    libelleCourt: 'Réponse à offres',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-10-01T17:00:00+02:00',
+    origineModificateur: 'INDIVIDU'
+  },
+  {
+    ou: 'La bonne boîte',
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q15',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C15.04',
+    dateFin: '2022-09-29T00:00:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-09-29T00:00:00+02:00',
+    idDemarche: '236588899',
+    libelleLong: 'Candidatures spontanées par un autre moyen',
+    libelleQuoi: 'Candidatures spontanées',
+    dateCreation: '2022-09-26T10:39:00+02:00',
+    libelleCourt: 'Candidature spontanée avec La bonne boîte',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libelleComment: 'Par un autre moyen',
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-10-01T16:51:00+02:00',
+    origineModificateur: 'INDIVIDU'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q36',
+    type: 'demarcheExtDetailleOut',
+    contact: 'ENTRETIEN INDIVIDUEL TELEPHONI',
+    dateFin: '2022-09-26T00:00:00+02:00',
+    pourQuoi: 'P06',
+    dateDebut: '2022-09-26T00:00:00+02:00',
+    idDemarche: '236591033',
+    libelleLong: 'Entretien de suivi personnalisé',
+    libelleQuoi: 'Vous avez eu un',
+    dateCreation: '2022-09-26T00:00:00+02:00',
+    description2: 'Entretien de suivi personnalisé',
+    libelleCourt: 'Entretien de suivi personnalisé',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes entretiens avec un conseiller',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'ENTRETIEN'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q36',
+    type: 'demarcheExtDetailleOut',
+    contact: 'ENTRETIEN INDIVIDUEL TELEPHONI',
+    dateFin: '2022-09-26T00:00:00+02:00',
+    pourQuoi: 'P06',
+    dateDebut: '2022-09-26T00:00:00+02:00',
+    idDemarche: '236591788',
+    libelleLong: 'Entretien de suivi personnalisé',
+    libelleQuoi: 'Vous avez eu un',
+    dateCreation: '2022-09-26T00:00:00+02:00',
+    description2: 'Entretien de suivi personnalisé',
+    libelleCourt: 'Entretien de suivi personnalisé',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes entretiens avec un conseiller',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'ENTRETIEN'
+  },
+  {
+    ou: 'IMT',
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q37',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C37.04',
+    dateFin: '2022-09-26T00:00:00+02:00',
+    pourQuoi: 'P02',
+    dateDebut: '2022-09-26T00:00:00+02:00',
+    idDemarche: '235559023',
+    libelleLong: "Initiation à l'informatique ou à Internet par un autre moyen",
+    libelleQuoi: "Initiation à l'informatique ou à Internet",
+    dateCreation: '2022-09-21T11:08:00+02:00',
+    libelleCourt: "Initiation à l'informatique avec IMT",
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libelleComment: 'Par un autre moyen',
+    libellePourquoi: 'Ma formation professionnelle',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-09-26T10:15:00+02:00',
+    origineModificateur: 'CONSEILLER'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q15',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C15.04',
+    dateFin: '2022-09-26T00:00:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-09-26T00:00:00+02:00',
+    idDemarche: '235558780',
+    libelleLong: 'Candidatures spontanées par un autre moyen',
+    libelleQuoi: 'Candidatures spontanées',
+    dateCreation: '2022-09-21T11:07:00+02:00',
+    libelleCourt: 'Candidature spontanée',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libelleComment: 'Par un autre moyen',
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-09-26T10:01:00+02:00',
+    origineModificateur: 'CONSEILLER'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q14',
+    type: 'demarcheExtDetailleOut',
+    dateFin: '2022-09-26T00:00:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-09-26T00:00:00+02:00',
+    organisme: 'La bonne boîte',
+    idDemarche: '235558534',
+    libelleLong: "Réponse à des offres d'emploi",
+    libelleQuoi: "Réponse à des offres d'emploi",
+    dateCreation: '2022-09-21T11:07:00+02:00',
+    libelleCourt: "Réponse à l'offre de La bonne boîte",
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-09-26T10:02:00+02:00',
+    origineModificateur: 'CONSEILLER'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q12',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C12.03',
+    dateFin: '2022-10-04T12:00:00+02:00',
+    pourQuoi: 'P03',
+    organisme: 'Inscription ',
+    idDemarche: '235557761',
+    libelleLong:
+      "Recherche d'offres d'emploi ou d'entreprises avec une agence d'intérim",
+    libelleQuoi: "Recherche d'offres d'emploi ou d'entreprises",
+    dateCreation: '2022-09-21T11:06:00+02:00',
+    libelleCourt: 'Inscription Inscription ',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libelleComment: "Avec une agence d'intérim",
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-10-04T21:22:00+02:00',
+    origineModificateur: 'INDIVIDU'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q36',
+    type: 'demarcheExtDetailleOut',
+    contact: 'ENTRETIEN INDIVIDUEL TELEPHONI',
+    dateFin: '2022-09-21T00:00:00+02:00',
+    pourQuoi: 'P06',
+    dateDebut: '2022-09-21T00:00:00+02:00',
+    idDemarche: '235570753',
+    libelleLong: 'Entretien de suivi personnalisé',
+    libelleQuoi: 'Vous avez eu un',
+    dateCreation: '2022-09-21T00:00:00+02:00',
+    description2: 'Entretien de suivi personnalisé',
+    libelleCourt: 'Entretien de suivi personnalisé',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes entretiens avec un conseiller',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'ENTRETIEN'
+  },
+  {
+    ou: 'Pôle emploi',
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q14',
+    type: 'demarcheExtDetailleOut',
+    dateFin: '2022-09-15T01:36:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-09-15T01:36:00+02:00',
+    organisme: "NCH FRANCE -UN NOUVEAU CONCEPT POUR L'HA",
+    idDemarche: '233397945',
+    libelleLong: "Réponse à des offres d'emploi",
+    libelleQuoi: "Réponse à des offres d'emploi",
+    dateCreation: '2022-09-15T01:36:00+02:00',
+    libelleCourt: "Réponse à l'offre de (recruteur non diffusé)",
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'INDIVIDU',
+    origineDemarche: 'CANDIDATURE'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q07',
+    type: 'demarcheExtDetailleOut',
+    dateFin: '2022-09-15T00:00:00+02:00',
+    pourQuoi: 'P02',
+    dateDebut: '2022-09-15T00:00:00+02:00',
+    idDemarche: '233177656',
+    libelleLong: "Montage d'un dossier d’inscription à une formation",
+    libelleQuoi: "Montage d'un dossier d’inscription à une formation",
+    dateCreation: '2022-09-14T10:56:00+02:00',
+    description2: 'Permis B',
+    libelleCourt: 'Montage dossier formation Permis B',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libellePourquoi: 'Ma formation professionnelle',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-09-21T10:31:00+02:00',
+    origineModificateur: 'CONSEILLER'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q15',
+    type: 'demarcheExtDetailleOut',
+    metier: 'ELS',
+    comment: 'C15.04',
+    dateFin: '2022-09-21T00:00:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-09-21T00:00:00+02:00',
+    idDemarche: '233177122',
+    libelleLong: 'Candidatures spontanées par un autre moyen',
+    libelleQuoi: 'Candidatures spontanées',
+    dateCreation: '2022-09-14T10:55:00+02:00',
+    libelleCourt: 'Candidature spontanée',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libelleComment: 'Par un autre moyen',
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-09-21T10:43:00+02:00',
+    origineModificateur: 'CONSEILLER'
+  },
+  {
+    ou: 'ELS',
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q17',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C17.04',
+    dateFin: '2022-09-12T00:00:00+02:00',
+    pourQuoi: 'P04',
+    dateDebut: '2022-09-12T00:00:00+02:00',
+    idDemarche: '233176863',
+    libelleLong: "Préparation des entretiens d'embauche par un autre moyen",
+    libelleQuoi: "Préparation des entretiens d'embauche",
+    dateCreation: '2022-09-14T10:55:00+02:00',
+    libelleCourt: "Préparation entretiens d'embauche avec ELS",
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libelleComment: 'Par un autre moyen',
+    libellePourquoi: "Mes entretiens d'embauche",
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q18',
+    type: 'demarcheExtDetailleOut',
+    metier: 'ELS',
+    comment: 'C18.03',
+    dateFin: '2022-09-13T00:00:00+02:00',
+    pourQuoi: 'P04',
+    dateDebut: '2022-09-13T00:00:00+02:00',
+    organisme: 'Leaderprice',
+    idDemarche: '233176610',
+    libelleLong: "Réalisation d'entretiens d'embauche par un autre moyen",
+    libelleQuoi: "Réalisation d'entretiens d'embauche",
+    dateCreation: '2022-09-14T10:54:00+02:00',
+    libelleCourt: "Entretiens d'embauche dans l'entreprise Leaderprice",
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libelleComment: 'Par un autre moyen',
+    libellePourquoi: "Mes entretiens d'embauche",
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q22',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C22.01',
+    dateFin: '2022-10-24T00:00:00+02:00',
+    pourQuoi: 'P05',
+    dateDebut: '2022-10-24T00:00:00+02:00',
+    idDemarche: '233178461',
+    libelleLong:
+      "Recherches pour créer ou reprendre une entreprise en participant à un atelier, une prestation, une réunion d'information",
+    libelleQuoi: 'Recherches pour créer ou reprendre une entreprise',
+    dateCreation: '2022-09-14T00:00:00+02:00',
+    libelleCourt: "Atelier M'imaginer Créateur d'entreprise",
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libelleComment:
+      "En participant à un atelier, une prestation, une réunion d'information",
+    libellePourquoi: "Ma création ou reprise d'entreprise",
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'ACTION',
+    dateModification: '2022-10-25T01:19:00+02:00',
+    origineModificateur: 'CONSEILLER'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q36',
+    type: 'demarcheExtDetailleOut',
+    contact: 'ENTRETIEN INDIVIDUEL PHYSIQUE',
+    dateFin: '2022-09-14T00:00:00+02:00',
+    pourQuoi: 'P06',
+    dateDebut: '2022-09-14T00:00:00+02:00',
+    idDemarche: '233181828',
+    libelleLong: 'Entretien de suivi personnalisé',
+    libelleQuoi: 'Vous avez eu un',
+    dateCreation: '2022-09-14T00:00:00+02:00',
+    description2: 'Entretien de suivi personnalisé',
+    libelleCourt: 'Entretien de suivi personnalisé',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes entretiens avec un conseiller',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'ENTRETIEN'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q36',
+    type: 'demarcheExtDetailleOut',
+    contact: 'ECHANGE COURRIEL',
+    dateFin: '2022-09-08T00:00:00+02:00',
+    pourQuoi: 'P06',
+    dateDebut: '2022-09-08T00:00:00+02:00',
+    idDemarche: '232024015',
+    libelleLong: 'Echange(s) courriel(s)',
+    libelleQuoi: 'Vous avez eu un',
+    dateCreation: '2022-09-08T00:00:00+02:00',
+    description2: 'Echange(s) courriel(s)',
+    libelleCourt: 'Echange(s) courriel(s)',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes entretiens avec un conseiller',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'ENTRETIEN'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q36',
+    type: 'demarcheExtDetailleOut',
+    contact: 'ECHANGE COURRIEL',
+    dateFin: '2022-08-26T00:00:00+02:00',
+    pourQuoi: 'P06',
+    dateDebut: '2022-08-26T00:00:00+02:00',
+    idDemarche: '228846449',
+    libelleLong: 'Echange(s) courriel(s)',
+    libelleQuoi: 'Vous avez eu un',
+    dateCreation: '2022-08-26T00:00:00+02:00',
+    description2: 'Echange(s) courriel(s)',
+    libelleCourt: 'Echange(s) courriel(s)',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes entretiens avec un conseiller',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'ENTRETIEN'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q36',
+    type: 'demarcheExtDetailleOut',
+    contact: 'ECHANGE COURRIEL',
+    dateFin: '2022-08-24T00:00:00+02:00',
+    pourQuoi: 'P06',
+    dateDebut: '2022-08-24T00:00:00+02:00',
+    idDemarche: '228243492',
+    libelleLong: 'Echange(s) courriel(s)',
+    libelleQuoi: 'Vous avez eu un',
+    dateCreation: '2022-08-24T00:00:00+02:00',
+    description2: 'Echange(s) courriel(s)',
+    libelleCourt: 'Echange(s) courriel(s)',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes entretiens avec un conseiller',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'ENTRETIEN'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q38',
+    type: 'demarcheExtDetailleOut',
+    dateFin: '2022-08-23T00:00:00+02:00',
+    pourQuoi: 'P01',
+    dateDebut: '2022-08-23T00:00:00+02:00',
+    idDemarche: '228120488',
+    description: 'Rectification du CV réalisé.',
+    libelleLong: 'Action issue de l’application CEJ',
+    libelleQuoi: 'Action issue de l’application CEJ',
+    dateCreation: '2022-08-23T14:00:00+02:00',
+    libelleCourt: 'Action issue de l’application CEJ',
+    droitsDemarche: {
+      annulation: true,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mon (nouveau) métier',
+    origineCreateur: 'INDIVIDU',
+    origineDemarche: 'PASS_EMPLOI',
+    dateModification: '2022-08-24T08:39:00+02:00',
+    origineModificateur: 'CONSEILLER'
+  },
+  {
+    ou: 'Pôle emploi',
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q11',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C11.02',
+    dateFin: '2022-08-20T14:48:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-08-20T14:48:00+02:00',
+    idDemarche: '227640907',
+    libelleLong:
+      'Préparation de ses candidatures (CV, lettre de motivation, book) en créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+    libelleQuoi:
+      'Préparation de ses candidatures (CV, lettre de motivation, book)',
+    dateCreation: '2022-08-20T14:48:00+02:00',
+    description2: 'CV PETITJEAN Brandon ELS',
+    libelleCourt:
+      'Préparation CV ou lettre de motivation :  CV PETITJEAN Brandon ELS',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libelleComment:
+      'En créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'INDIVIDU',
+    origineDemarche: 'CV'
+  },
+  {
+    ou: 'Pôle emploi',
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q11',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C11.02',
+    dateFin: '2022-08-20T14:48:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-08-20T14:48:00+02:00',
+    idDemarche: '227640908',
+    libelleLong:
+      'Préparation de ses candidatures (CV, lettre de motivation, book) en créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+    libelleQuoi:
+      'Préparation de ses candidatures (CV, lettre de motivation, book)',
+    dateCreation: '2022-08-20T14:48:00+02:00',
+    description2: 'CV PETITJEAN Brandon',
+    libelleCourt:
+      'Préparation CV ou lettre de motivation :  CV PETITJEAN Brandon',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libelleComment:
+      'En créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'INDIVIDU',
+    origineDemarche: 'CV'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q38',
+    type: 'demarcheExtDetailleOut',
+    dateFin: '2022-08-20T00:00:00+02:00',
+    pourQuoi: 'P01',
+    dateDebut: '2022-08-20T00:00:00+02:00',
+    idDemarche: '227643152',
+    description: ' Avancement PIX',
+    libelleLong: 'Action issue de l’application CEJ',
+    libelleQuoi: 'Action issue de l’application CEJ',
+    dateCreation: '2022-08-20T14:00:00+02:00',
+    libelleCourt: 'Action issue de l’application CEJ',
+    droitsDemarche: {
+      annulation: true,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mon (nouveau) métier',
+    origineCreateur: 'INDIVIDU',
+    origineDemarche: 'PASS_EMPLOI',
+    dateModification: '2022-08-24T08:39:00+02:00',
+    origineModificateur: 'CONSEILLER'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q38',
+    type: 'demarcheExtDetailleOut',
+    dateFin: '2022-08-21T00:00:00+02:00',
+    pourQuoi: 'P01',
+    dateDebut: '2022-08-21T00:00:00+02:00',
+    idDemarche: '227644340',
+    description: 'Recherche sur les site donner lors de la réunion.',
+    libelleLong: 'Action issue de l’application CEJ',
+    libelleQuoi: 'Action issue de l’application CEJ',
+    dateCreation: '2022-08-20T14:00:00+02:00',
+    libelleCourt: 'Action issue de l’application CEJ',
+    droitsDemarche: {
+      annulation: true,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mon (nouveau) métier',
+    origineCreateur: 'INDIVIDU',
+    origineDemarche: 'PASS_EMPLOI',
+    dateModification: '2022-08-24T08:39:00+02:00',
+    origineModificateur: 'CONSEILLER'
+  },
+  {
+    ou: 'Pôle emploi',
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q11',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C11.02',
+    dateFin: '2022-08-18T08:18:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-08-18T08:18:00+02:00',
+    idDemarche: '227217531',
+    libelleLong:
+      'Préparation de ses candidatures (CV, lettre de motivation, book) en créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+    libelleQuoi:
+      'Préparation de ses candidatures (CV, lettre de motivation, book)',
+    dateCreation: '2022-08-18T08:18:00+02:00',
+    description2: 'CV PETITJEAN Brandon ELS',
+    libelleCourt:
+      'Préparation CV ou lettre de motivation :  CV PETITJEAN Brandon ELS',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libelleComment:
+      'En créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'INDIVIDU',
+    origineDemarche: 'CV'
+  },
+  {
+    ou: 'Pôle emploi',
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q11',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C11.02',
+    dateFin: '2022-08-18T08:18:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-08-18T08:18:00+02:00',
+    idDemarche: '227217530',
+    libelleLong:
+      'Préparation de ses candidatures (CV, lettre de motivation, book) en créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+    libelleQuoi:
+      'Préparation de ses candidatures (CV, lettre de motivation, book)',
+    dateCreation: '2022-08-18T08:18:00+02:00',
+    description2: 'CV PETITJEAN Brandon',
+    libelleCourt:
+      'Préparation CV ou lettre de motivation :  CV PETITJEAN Brandon',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libelleComment:
+      'En créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'INDIVIDU',
+    origineDemarche: 'CV'
+  },
+  {
+    etat: DemarcheDtoEtat.AC,
+    quoi: 'Q08',
+    type: 'demarcheExtDetailleOut',
+    dateFin: '2022-03-15T00:00:00+01:00',
+    pourQuoi: 'P02',
+    dateDebut: '2022-09-15T00:00:00+02:00',
+    organisme: 'CER Daumet',
+    idDemarche: '231256883',
+    libelleLong: 'Participation à une formation',
+    libelleQuoi: 'Participation à une formation',
+    dateCreation: '2022-08-18T00:00:00+02:00',
+    description2: 'Formation',
+    libelleCourt:
+      'Formation conduite auto Permis de conduire categorie B avec CER Daumet',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libellePourquoi: 'Ma formation professionnelle',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'ACTION',
+    dateModification: '2022-09-28T16:30:00+02:00',
+    origineModificateur: 'CONSEILLER'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q36',
+    type: 'demarcheExtDetailleOut',
+    contact: 'ENTRETIEN COLLECTIF PHYSIQUE',
+    dateFin: '2022-08-18T00:00:00+02:00',
+    pourQuoi: 'P06',
+    dateDebut: '2022-08-18T00:00:00+02:00',
+    idDemarche: '227279713',
+    libelleLong: 'Entretien de suivi personnalisé',
+    libelleQuoi: 'Vous avez eu un',
+    dateCreation: '2022-08-18T00:00:00+02:00',
+    description2: 'Entretien de suivi personnalisé',
+    libelleCourt: 'Entretien de suivi personnalisé',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes entretiens avec un conseiller',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'ENTRETIEN'
+  },
+  {
+    ou: 'Pôle emploi',
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q11',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C11.02',
+    dateFin: '2022-08-17T15:44:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-08-17T15:44:00+02:00',
+    idDemarche: '227135475',
+    libelleLong:
+      'Préparation de ses candidatures (CV, lettre de motivation, book) en créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+    libelleQuoi:
+      'Préparation de ses candidatures (CV, lettre de motivation, book)',
+    dateCreation: '2022-08-17T15:44:00+02:00',
+    description2: 'CV PETITJEAN Brandon ELS',
+    libelleCourt:
+      'Préparation CV ou lettre de motivation :  CV PETITJEAN Brandon ELS',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libelleComment:
+      'En créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'INDIVIDU',
+    origineDemarche: 'CV'
+  },
+  {
+    ou: 'Pôle emploi',
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q11',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C11.02',
+    dateFin: '2022-08-17T15:39:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-08-17T15:39:00+02:00',
+    idDemarche: '227135474',
+    libelleLong:
+      'Préparation de ses candidatures (CV, lettre de motivation, book) en créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+    libelleQuoi:
+      'Préparation de ses candidatures (CV, lettre de motivation, book)',
+    dateCreation: '2022-08-17T15:39:00+02:00',
+    description2: 'CV PETITJEAN Brandon',
+    libelleCourt:
+      'Préparation CV ou lettre de motivation :  CV PETITJEAN Brandon',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libelleComment:
+      'En créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'INDIVIDU',
+    origineDemarche: 'CV'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q14',
+    type: 'demarcheExtDetailleOut',
+    dateFin: '2022-08-22T00:00:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-08-22T00:00:00+02:00',
+    organisme: 'Multi-service',
+    idDemarche: '227112152',
+    libelleLong: "Réponse à des offres d'emploi",
+    libelleQuoi: "Réponse à des offres d'emploi",
+    dateCreation: '2022-08-17T14:52:00+02:00',
+    libelleCourt: "Réponse à l'offre de Multi-service",
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-09-14T10:38:00+02:00',
+    origineModificateur: 'CONSEILLER'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q14',
+    type: 'demarcheExtDetailleOut',
+    dateFin: '2022-08-22T00:00:00+02:00',
+    pourQuoi: 'P03',
+    dateDebut: '2022-08-22T00:00:00+02:00',
+    organisme: 'ELS',
+    idDemarche: '227111709',
+    libelleLong: "Réponse à des offres d'emploi",
+    libelleQuoi: "Réponse à des offres d'emploi",
+    dateCreation: '2022-08-17T14:51:00+02:00',
+    libelleCourt: "Réponse à l'offre de ELS",
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: true,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes candidatures',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'JRE_CONSEILLER',
+    dateModification: '2022-09-14T10:38:00+02:00',
+    origineModificateur: 'CONSEILLER'
+  },
+  {
+    etat: DemarcheDtoEtat.AN,
+    quoi: 'Q22',
+    type: 'demarcheExtDetailleOut',
+    comment: 'C22.01',
+    dateFin: '2022-09-02T00:00:00+02:00',
+    pourQuoi: 'P05',
+    dateDebut: '2022-09-02T00:00:00+02:00',
+    idDemarche: '227110524',
+    libelleLong:
+      "Recherches pour créer ou reprendre une entreprise en participant à un atelier, une prestation, une réunion d'information",
+    libelleQuoi: 'Recherches pour créer ou reprendre une entreprise',
+    dateCreation: '2022-08-17T00:00:00+02:00',
+    libelleCourt: "Atelier M'imaginer Créateur d'entreprise",
+    dateAnnulation: '2022-09-02T00:00:00+02:00',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libelleComment:
+      "En participant à un atelier, une prestation, une réunion d'information",
+    libellePourquoi: "Ma création ou reprise d'entreprise",
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'ACTION',
+    dateModification: '2022-09-06T01:28:00+02:00',
+    origineModificateur: 'CONSEILLER'
+  },
+  {
+    etat: DemarcheDtoEtat.RE,
+    quoi: 'Q36',
+    type: 'demarcheExtDetailleOut',
+    contact: 'ENTRETIEN INDIVIDUEL TELEPHONI',
+    dateFin: '2022-08-17T00:00:00+02:00',
+    pourQuoi: 'P06',
+    dateDebut: '2022-08-17T00:00:00+02:00',
+    idDemarche: '227119093',
+    libelleLong: 'Entretien de suivi personnalisé',
+    libelleQuoi: 'Vous avez eu un',
+    dateCreation: '2022-08-17T00:00:00+02:00',
+    description2: 'Entretien de suivi personnalisé',
+    libelleCourt: 'Entretien de suivi personnalisé',
+    droitsDemarche: {
+      annulation: false,
+      realisation: false,
+      replanification: false,
+      modificationDate: false
+    },
+    libellePourquoi: 'Mes entretiens avec un conseiller',
+    origineCreateur: 'CONSEILLER',
+    origineDemarche: 'ENTRETIEN'
+  }
+]
+
+const expected = {
+  metadata: {
+    dateDeFin: '2022-11-09T12:05:12.000Z',
+    dateDeDebut: '2022-10-26T12:05:12.000Z',
+    demarchesEnRetard: 1
+  },
+  demarches: [
+    {
+      id: '231256883',
+      label: 'Ma formation professionnelle',
+      titre: 'Participation à une formation',
+      statut: 'EN_COURS',
+      contenu:
+        'Formation conduite auto Permis de conduire categorie B avec CER Daumet',
+      dateFin: '2022-03-14T23:00:00.000+00:00',
+      attributs: [
+        {
+          cle: 'organisme',
+          label: 'Nom de l’organisme',
+          valeur: 'CER Daumet'
+        }
+      ],
+      dateDebut: '2022-09-14T22:00:00.000+00:00',
+      codeDemarche: 'eyJxdW9pIjoiUTA4In0=',
+      dateCreation: '2022-08-17T22:00:00.000+00:00',
+      dateModification: '2022-09-28T14:30:00.000+00:00',
+      statutsPossibles: [],
+      creeeParConseiller: true,
+      modifieParConseiller: true
+    },
+    {
+      id: '227119093',
+      label: 'Mes entretiens avec un conseiller',
+      titre: 'Vous avez eu un',
+      statut: 'REALISEE',
+      contenu: 'Entretien de suivi personnalisé',
+      dateFin: '2022-08-16T22:00:00.000+00:00',
+      attributs: [
+        {
+          cle: 'contact',
+          label: 'Contact',
+          valeur: 'ENTRETIEN INDIVIDUEL TELEPHONI'
+        }
+      ],
+      dateDebut: '2022-08-16T22:00:00.000+00:00',
+      codeDemarche: 'eyJxdW9pIjoiUTM2In0=',
+      dateCreation: '2022-08-16T22:00:00.000+00:00',
+      statutsPossibles: [],
+      creeeParConseiller: true,
+      modifieParConseiller: false
+    },
+    {
+      id: '227135474',
+      label: 'Mes candidatures',
+      titre: 'Préparation de ses candidatures (CV, lettre de motivation, book)',
+      statut: 'REALISEE',
+      contenu: 'Préparation CV ou lettre de motivation :  CV PETITJEAN Brandon',
+      dateFin: '2022-08-17T13:39:00.000+00:00',
+      attributs: [
+        {
+          cle: 'ou',
+          label: 'Ou',
+          valeur: 'Pôle emploi'
+        }
+      ],
+      dateDebut: '2022-08-17T13:39:00.000+00:00',
+      sousTitre:
+        'En créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+      codeDemarche: 'eyJxdW9pIjoiUTExIiwiY29tbWVudCI6IkMxMS4wMiJ9',
+      dateCreation: '2022-08-17T13:39:00.000+00:00',
+      statutsPossibles: [],
+      creeeParConseiller: false,
+      modifieParConseiller: false
+    },
+    {
+      id: '227135475',
+      label: 'Mes candidatures',
+      titre: 'Préparation de ses candidatures (CV, lettre de motivation, book)',
+      statut: 'REALISEE',
+      contenu:
+        'Préparation CV ou lettre de motivation :  CV PETITJEAN Brandon ELS',
+      dateFin: '2022-08-17T13:44:00.000+00:00',
+      attributs: [
+        {
+          cle: 'ou',
+          label: 'Ou',
+          valeur: 'Pôle emploi'
+        }
+      ],
+      dateDebut: '2022-08-17T13:44:00.000+00:00',
+      sousTitre:
+        'En créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+      codeDemarche: 'eyJxdW9pIjoiUTExIiwiY29tbWVudCI6IkMxMS4wMiJ9',
+      dateCreation: '2022-08-17T13:44:00.000+00:00',
+      statutsPossibles: [],
+      creeeParConseiller: false,
+      modifieParConseiller: false
+    },
+    {
+      id: '227279713',
+      label: 'Mes entretiens avec un conseiller',
+      titre: 'Vous avez eu un',
+      statut: 'REALISEE',
+      contenu: 'Entretien de suivi personnalisé',
+      dateFin: '2022-08-17T22:00:00.000+00:00',
+      attributs: [
+        {
+          cle: 'contact',
+          label: 'Contact',
+          valeur: 'ENTRETIEN COLLECTIF PHYSIQUE'
+        }
+      ],
+      dateDebut: '2022-08-17T22:00:00.000+00:00',
+      codeDemarche: 'eyJxdW9pIjoiUTM2In0=',
+      dateCreation: '2022-08-17T22:00:00.000+00:00',
+      statutsPossibles: [],
+      creeeParConseiller: true,
+      modifieParConseiller: false
+    },
+    {
+      id: '227217531',
+      label: 'Mes candidatures',
+      titre: 'Préparation de ses candidatures (CV, lettre de motivation, book)',
+      statut: 'REALISEE',
+      contenu:
+        'Préparation CV ou lettre de motivation :  CV PETITJEAN Brandon ELS',
+      dateFin: '2022-08-18T06:18:00.000+00:00',
+      attributs: [
+        {
+          cle: 'ou',
+          label: 'Ou',
+          valeur: 'Pôle emploi'
+        }
+      ],
+      dateDebut: '2022-08-18T06:18:00.000+00:00',
+      sousTitre:
+        'En créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+      codeDemarche: 'eyJxdW9pIjoiUTExIiwiY29tbWVudCI6IkMxMS4wMiJ9',
+      dateCreation: '2022-08-18T06:18:00.000+00:00',
+      statutsPossibles: [],
+      creeeParConseiller: false,
+      modifieParConseiller: false
+    },
+    {
+      id: '227217530',
+      label: 'Mes candidatures',
+      titre: 'Préparation de ses candidatures (CV, lettre de motivation, book)',
+      statut: 'REALISEE',
+      contenu: 'Préparation CV ou lettre de motivation :  CV PETITJEAN Brandon',
+      dateFin: '2022-08-18T06:18:00.000+00:00',
+      attributs: [
+        {
+          cle: 'ou',
+          label: 'Ou',
+          valeur: 'Pôle emploi'
+        }
+      ],
+      dateDebut: '2022-08-18T06:18:00.000+00:00',
+      sousTitre:
+        'En créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+      codeDemarche: 'eyJxdW9pIjoiUTExIiwiY29tbWVudCI6IkMxMS4wMiJ9',
+      dateCreation: '2022-08-18T06:18:00.000+00:00',
+      statutsPossibles: [],
+      creeeParConseiller: false,
+      modifieParConseiller: false
+    },
+    {
+      id: '227643152',
+      label: 'Mon (nouveau) métier',
+      titre: 'Action issue de l’application CEJ',
+      statut: 'REALISEE',
+      contenu: 'Action issue de l’application CEJ',
+      dateFin: '2022-08-19T22:00:00.000+00:00',
+      attributs: [
+        {
+          cle: 'description',
+          label: 'Description',
+          valeur: ' Avancement PIX'
+        }
+      ],
+      dateDebut: '2022-08-19T22:00:00.000+00:00',
+      codeDemarche: 'eyJxdW9pIjoiUTM4In0=',
+      dateCreation: '2022-08-20T12:00:00.000+00:00',
+      dateModification: '2022-08-24T06:39:00.000+00:00',
+      statutsPossibles: ['ANNULEE', 'A_FAIRE'],
+      creeeParConseiller: false,
+      modifieParConseiller: true
+    },
+    {
+      id: '227640907',
+      label: 'Mes candidatures',
+      titre: 'Préparation de ses candidatures (CV, lettre de motivation, book)',
+      statut: 'REALISEE',
+      contenu:
+        'Préparation CV ou lettre de motivation :  CV PETITJEAN Brandon ELS',
+      dateFin: '2022-08-20T12:48:00.000+00:00',
+      attributs: [
+        {
+          cle: 'ou',
+          label: 'Ou',
+          valeur: 'Pôle emploi'
+        }
+      ],
+      dateDebut: '2022-08-20T12:48:00.000+00:00',
+      sousTitre:
+        'En créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+      codeDemarche: 'eyJxdW9pIjoiUTExIiwiY29tbWVudCI6IkMxMS4wMiJ9',
+      dateCreation: '2022-08-20T12:48:00.000+00:00',
+      statutsPossibles: [],
+      creeeParConseiller: false,
+      modifieParConseiller: false
+    },
+    {
+      id: '227640908',
+      label: 'Mes candidatures',
+      titre: 'Préparation de ses candidatures (CV, lettre de motivation, book)',
+      statut: 'REALISEE',
+      contenu: 'Préparation CV ou lettre de motivation :  CV PETITJEAN Brandon',
+      dateFin: '2022-08-20T12:48:00.000+00:00',
+      attributs: [
+        {
+          cle: 'ou',
+          label: 'Ou',
+          valeur: 'Pôle emploi'
+        }
+      ],
+      dateDebut: '2022-08-20T12:48:00.000+00:00',
+      sousTitre:
+        'En créant ou en mettant à jour mon CV et ou ma lettre de motivation',
+      codeDemarche: 'eyJxdW9pIjoiUTExIiwiY29tbWVudCI6IkMxMS4wMiJ9',
+      dateCreation: '2022-08-20T12:48:00.000+00:00',
+      statutsPossibles: [],
+      creeeParConseiller: false,
+      modifieParConseiller: false
+    },
+    {
+      id: '227644340',
+      label: 'Mon (nouveau) métier',
+      titre: 'Action issue de l’application CEJ',
+      statut: 'REALISEE',
+      contenu: 'Action issue de l’application CEJ',
+      dateFin: '2022-08-20T22:00:00.000+00:00',
+      attributs: [
+        {
+          cle: 'description',
+          label: 'Description',
+          valeur: 'Recherche sur les site donner lors de la réunion.'
+        }
+      ],
+      dateDebut: '2022-08-20T22:00:00.000+00:00',
+      codeDemarche: 'eyJxdW9pIjoiUTM4In0=',
+      dateCreation: '2022-08-20T12:00:00.000+00:00',
+      dateModification: '2022-08-24T06:39:00.000+00:00',
+      statutsPossibles: ['ANNULEE', 'A_FAIRE'],
+      creeeParConseiller: false,
+      modifieParConseiller: true
+    },
+    {
+      id: '227112152',
+      label: 'Mes candidatures',
+      titre: "Réponse à des offres d'emploi",
+      statut: 'REALISEE',
+      contenu: "Réponse à l'offre de Multi-service",
+      dateFin: '2022-08-21T22:00:00.000+00:00',
+      attributs: [
+        {
+          cle: 'organisme',
+          label: 'Nom de l’organisme',
+          valeur: 'Multi-service'
+        }
+      ],
+      dateDebut: '2022-08-21T22:00:00.000+00:00',
+      codeDemarche: 'eyJxdW9pIjoiUTE0In0=',
+      dateCreation: '2022-08-17T12:52:00.000+00:00',
+      dateModification: '2022-09-14T08:38:00.000+00:00',
+      statutsPossibles: ['A_FAIRE'],
+      creeeParConseiller: true,
+      modifieParConseiller: true
+    },
+    {
+      id: '227111709',
+      label: 'Mes candidatures',
+      titre: "Réponse à des offres d'emploi",
+      statut: 'REALISEE',
+      contenu: "Réponse à l'offre de ELS",
+      dateFin: '2022-08-21T22:00:00.000+00:00',
+      attributs: [
+        {
+          cle: 'organisme',
+          label: 'Nom de l’organisme',
+          valeur: 'ELS'
+        }
+      ],
+      dateDebut: '2022-08-21T22:00:00.000+00:00',
+      codeDemarche: 'eyJxdW9pIjoiUTE0In0=',
+      dateCreation: '2022-08-17T12:51:00.000+00:00',
+      dateModification: '2022-09-14T08:38:00.000+00:00',
+      statutsPossibles: ['A_FAIRE'],
+      creeeParConseiller: true,
+      modifieParConseiller: true
+    },
+    {
+      id: '228120488',
+      label: 'Mon (nouveau) métier',
+      titre: 'Action issue de l’application CEJ',
+      statut: 'REALISEE',
+      contenu: 'Action issue de l’application CEJ',
+      dateFin: '2022-08-22T22:00:00.000+00:00',
+      attributs: [
+        {
+          cle: 'description',
+          label: 'Description',
+          valeur: 'Rectification du CV réalisé.'
+        }
+      ],
+      dateDebut: '2022-08-22T22:00:00.000+00:00',
+      codeDemarche: 'eyJxdW9pIjoiUTM4In0=',
+      dateCreation: '2022-08-23T12:00:00.000+00:00',
+      dateModification: '2022-08-24T06:39:00.000+00:00',
+      statutsPossibles: ['ANNULEE', 'A_FAIRE'],
+      creeeParConseiller: false,
+      modifieParConseiller: true
+    },
+    {
+      id: '228243492',
+      label: 'Mes entretiens avec un conseiller',
+      titre: 'Vous avez eu un',
+      statut: 'REALISEE',
+      contenu: 'Echange(s) courriel(s)',
+      dateFin: '2022-08-23T22:00:00.000+00:00',
+      attributs: [
+        {
+          cle: 'contact',
+          label: 'Contact',
+          valeur: 'ECHANGE COURRIEL'
+        }
+      ],
+      dateDebut: '2022-08-23T22:00:00.000+00:00',
+      codeDemarche: 'eyJxdW9pIjoiUTM2In0=',
+      dateCreation: '2022-08-23T22:00:00.000+00:00',
+      statutsPossibles: [],
+      creeeParConseiller: true,
+      modifieParConseiller: false
+    },
+    {
+      id: '228846449',
+      label: 'Mes entretiens avec un conseiller',
+      titre: 'Vous avez eu un',
+      statut: 'REALISEE',
+      contenu: 'Echange(s) courriel(s)',
+      dateFin: '2022-08-25T22:00:00.000+00:00',
+      attributs: [
+        {
+          cle: 'contact',
+          label: 'Contact',
+          valeur: 'ECHANGE COURRIEL'
+        }
+      ],
+      dateDebut: '2022-08-25T22:00:00.000+00:00',
+      codeDemarche: 'eyJxdW9pIjoiUTM2In0=',
+      dateCreation: '2022-08-25T22:00:00.000+00:00',
+      statutsPossibles: [],
+      creeeParConseiller: true,
+      modifieParConseiller: false
+    }
+  ],
+  rendezVous: [
+    {
+      id: '876b93cf-1fad-47c6-80fd-aecab26bbc3d',
+      date: '2022-10-26T14:00:00.000Z',
+      type: {
+        code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
+        label: 'Entretien individuel conseiller'
+      },
+      jeune: {
+        id: 'd0507c05-a4da-4b2f-8de7-b3a14a0fe8a0',
+        nom: 'PETITJEAN',
+        prenom: 'BRANDON'
+      },
+      title: '',
+      visio: false,
+      adresse: '29 CHEMIN des deux Mas Piste OASIS 4',
+      agencePE: false,
+      duration: 30,
+      modality: 'par téléphone',
+      isLocaleDate: true,
+      presenceConseiller: true
+    }
+  ]
+}
