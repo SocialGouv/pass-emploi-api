@@ -30,15 +30,18 @@ export const PoleEmploiPartenaireClientToken = 'PoleEmploiPartenaireClientToken'
 interface PoleEmploiPartenaireClientI {
   getDemarches(tokenDuJeune: string): Promise<DemarcheDto[]>
 
+  // TODO : ne pas renvoyer de axios réponse
   getRendezVous(
     tokenDuJeune: string
   ): Promise<AxiosResponse<RendezVousPoleEmploiDto[]>>
 
+  // TODO : ne pas renvoyer de axios réponse
   getPrestations(
     tokenDuJeune: string,
     dateRechercheRendezVous: DateTime
   ): Promise<AxiosResponse<PrestationDto[]>>
 
+  // TODO : ne pas renvoyer de axios réponse
   getLienVisio(
     tokenDuJeune: string,
     idVisio: string

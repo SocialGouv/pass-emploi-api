@@ -29,7 +29,7 @@ describe('ActionPoleEmploiMapper', () => {
         dateModification: '2021-11-29T11:04:00+01:00',
         origineCreateur: 'CONSEILLER',
         origineDemarche: 'PASS_EMPLOI',
-        pourquoi: 'P01',
+        pourQuoi: 'P01',
         libellePourquoi: 'Mon (nouveau) métier',
         quoi: 'Q01',
         libelleQuoi: 'Identification de ses points forts et de ses compétences',

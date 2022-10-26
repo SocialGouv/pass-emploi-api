@@ -14,7 +14,7 @@ export const uneDemarcheDto = (
     dateModification: '2022-03-02T12:20:00+02:00',
     origineCreateur: 'INDIVIDU',
     origineDemarche: 'PASS_EMPLOI',
-    pourquoi: 'P18',
+    pourQuoi: 'P18',
     libellePourquoi: 'pourquoi',
     quoi: 'Q20',
     libelleQuoi: 'quoi',

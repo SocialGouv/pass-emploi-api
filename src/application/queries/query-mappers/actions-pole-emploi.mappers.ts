@@ -77,7 +77,7 @@ function buildStatutsPossibles(
 function codeEnBase64(demarcheDto: DemarcheDto): string {
   const code: Demarche.Code = {
     quoi: demarcheDto.quoi,
-    pourquoi: demarcheDto.pourquoi,
+    pourquoi: demarcheDto.pourQuoi,
     comment: demarcheDto.comment
   }
 
