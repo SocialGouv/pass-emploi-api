@@ -190,13 +190,18 @@ export class JeunesController {
     name: 'x-installationid',
     required: false
   })
+  @ApiHeader({
+    name: 'x-instanceid',
+    required: false
+  })
   @Put(':idJeune/push-notification-token')
   async updateNotificationToken(
     @Param('idJeune') idJeune: string,
     @Body() putNotificationTokenInput: PutNotificationTokenInput,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @Headers('x-appversion') appVersion?: string,
-    @Headers('x-installationid') installationId?: string
+    @Headers('x-installationid') installationId?: string,
+    @Headers('x-instanceid') instanceId?: string
   ): Promise<void> {
     const result =
       await this.updateJeuneConfigurationApplicationCommandHandler.execute(
@@ -204,7 +209,8 @@ export class JeunesController {
           idJeune,
           pushNotificationToken: putNotificationTokenInput.registration_token,
           appVersion,
-          installationId
+          installationId,
+          instanceId
         },
         utilisateur
       )
@@ -220,13 +226,18 @@ export class JeunesController {
     name: 'x-installationid',
     required: false
   })
+  @ApiHeader({
+    name: 'x-instanceid',
+    required: false
+  })
   @Put(':idJeune/configuration-application')
   async updateConfiguration(
     @Param('idJeune') idJeune: string,
     @Body() putNotificationTokenInput: PutNotificationTokenInput,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @Headers('x-appversion') appVersion?: string,
-    @Headers('x-installationid') installationId?: string
+    @Headers('x-installationid') installationId?: string,
+    @Headers('x-instanceid') instanceId?: string
   ): Promise<void> {
     const result =
       await this.updateJeuneConfigurationApplicationCommandHandler.execute(
@@ -234,7 +245,8 @@ export class JeunesController {
           idJeune,
           pushNotificationToken: putNotificationTokenInput.registration_token,
           appVersion,
-          installationId
+          installationId,
+          instanceId
         },
         utilisateur
       )

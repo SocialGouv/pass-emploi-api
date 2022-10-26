@@ -54,6 +54,7 @@ export function toSqlJeune(
   | 'dateDerniereConnexion'
   | 'appVersion'
   | 'installationId'
+  | 'instanceId'
   | 'pushNotificationToken'
   | 'dateDerniereActualisationToken'
 > {
@@ -147,6 +148,7 @@ export function toConfigurationApplication(
     idJeune: jeuneSqlModel.id,
     appVersion: jeuneSqlModel.appVersion ?? undefined,
     installationId: jeuneSqlModel.installationId ?? undefined,
+    instanceId: jeuneSqlModel.instanceId ?? undefined,
     dateDerniereActualisationToken:
       jeuneSqlModel.dateDerniereActualisationToken ?? undefined,
     pushNotificationToken: jeuneSqlModel.pushNotificationToken ?? undefined

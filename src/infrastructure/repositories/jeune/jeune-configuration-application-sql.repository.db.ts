@@ -18,6 +18,7 @@ export class JeuneConfigurationApplicationSqlRepository
       idJeune: jeuneSqlModel.id,
       appVersion: jeuneSqlModel.appVersion ?? undefined,
       installationId: jeuneSqlModel.installationId ?? undefined,
+      instanceId: jeuneSqlModel.instanceId ?? undefined,
       pushNotificationToken: jeuneSqlModel.pushNotificationToken ?? undefined,
       dateDerniereActualisationToken:
         jeuneSqlModel.dateDerniereActualisationToken ?? undefined
@@ -35,7 +36,8 @@ export class JeuneConfigurationApplicationSqlRepository
           configurationApplication.pushNotificationToken ?? null,
         dateDerniereActualisationToken:
           configurationApplication.dateDerniereActualisationToken,
-        installationId: configurationApplication.installationId ?? null
+        installationId: configurationApplication.installationId ?? null,
+        instanceId: configurationApplication.instanceId ?? null
       },
       { where: { id: configurationApplication.idJeune } }
     )
