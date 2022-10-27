@@ -3,7 +3,7 @@ import { SinonSandbox } from 'sinon'
 import { Chat } from 'src/domain/chat'
 import { Core } from 'src/domain/core'
 import { Jeune } from 'src/domain/jeune/jeune'
-import { unConseillerDuJeune, unJeune } from 'test/fixtures/jeune.fixture'
+import { unJeune } from 'test/fixtures/jeune.fixture'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import {
   TransfererJeunesConseillerCommand,
@@ -23,7 +23,36 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
 describe('TransfererJeunesConseillerCommandHandler', () => {
   let transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler
-  const conseiller = unConseiller()
+  const conseillerSource = unConseiller({
+    id: 'idConseillerSource',
+    agence: {
+      id: '1',
+      nom: 'Pôle emploi PARIS'
+    }
+  })
+
+  const conseillerCible = unConseiller({
+    id: 'idConseillerCible',
+    agence: {
+      id: '1',
+      nom: 'Pôle emploi PARIS'
+    }
+  })
+
+  const conseillerCibleDuJeune: Jeune.Conseiller = {
+    id: conseillerCible.id,
+    firstName: conseillerCible.firstName,
+    lastName: conseillerCible.lastName,
+    email: conseillerCible.email
+  }
+
+  const conseillerSourceDuJeune: Jeune.Conseiller = {
+    id: conseillerSource.id,
+    firstName: conseillerSource.firstName,
+    lastName: conseillerSource.lastName,
+    email: conseillerSource.email
+  }
+
   let jeuneRepository: StubbedType<Jeune.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let chatRepository: StubbedType<Chat.Repository>
@@ -33,9 +62,15 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     jeuneRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
+    conseillerRepository.get
+      .withArgs(conseillerSource.id)
+      .resolves(conseillerSource)
+    conseillerRepository.get
+      .withArgs(conseillerCible.id)
+      .resolves(conseillerCible)
+
     chatRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
-    conseillerRepository.get.withArgs('idConseiller').resolves(conseiller)
     transfererJeunesConseillerCommandHandler =
       new TransfererJeunesConseillerCommandHandler(
         conseillerRepository,
@@ -47,42 +82,25 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
 
   describe('handle', () => {
     const command: TransfererJeunesConseillerCommand = {
-      idConseillerSource: '40',
-      idConseillerCible: '41',
+      idConseillerSource: conseillerSource.id,
+      idConseillerCible: conseillerCible.id,
       estTemporaire: false,
       idsJeunes: ['1', '2'],
       structure: Core.Structure.PASS_EMPLOI
     }
+
     describe('quand les conseillers et les jeunes correspondent au superviseur', () => {
       describe('quand le transfert est permanent', () => {
         it('sauvegarde les transferts et le jeune avec son nouveau conseiller', async () => {
           // Given
-          conseillerRepository.existe
-            .withArgs(command.idConseillerSource, command.structure)
-            .resolves(true)
-          const conseillerCible = unConseillerDuJeune({
-            id: command.idConseillerCible
-          })
-          conseillerRepository.get
-            .withArgs(command.idConseillerCible)
-            .resolves(conseillerCible)
-
           const jeune1 = unJeune({
             id: command.idsJeunes[0],
-            conseiller: {
-              id: command.idConseillerSource,
-              firstName: 'test',
-              lastName: 'test'
-            },
+            conseiller: conseillerSourceDuJeune,
             conseillerInitial: undefined
           })
           const jeune2 = unJeune({
             id: command.idsJeunes[1],
-            conseiller: {
-              id: command.idConseillerSource,
-              firstName: 'test',
-              lastName: 'test'
-            },
+            conseiller: conseillerSourceDuJeune,
             conseillerInitial: undefined
           })
           jeuneRepository.findAllJeunesByConseiller
@@ -95,77 +113,72 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
           )
 
           // Then
+          const jeune1ApresTransfert: Jeune = {
+            ...jeune1,
+            conseiller: conseillerCibleDuJeune
+          }
+          const jeune2ApresTransfert: Jeune = {
+            ...jeune2,
+            conseiller: conseillerCibleDuJeune
+          }
           expect(result).to.deep.equal(emptySuccess())
-
-          jeune1.conseiller = conseillerCible
-          jeune2.conseiller = conseillerCible
           expect(
             jeuneRepository.transferAndSaveAll
           ).to.have.been.calledWithExactly(
-            [jeune1, jeune2],
+            [jeune1ApresTransfert, jeune2ApresTransfert],
             conseillerCible.id,
             command.idConseillerSource,
             command.estTemporaire
           )
           expect(
             chatRepository.envoyerMessageTransfert.getCall(0).args[0]
-          ).to.deep.equal(jeune1)
+          ).to.deep.equal(jeune1ApresTransfert)
           expect(
             chatRepository.envoyerMessageTransfert.getCall(1).args[0]
-          ).to.deep.equal(jeune2)
+          ).to.deep.equal(jeune2ApresTransfert)
         })
       })
-      describe('quand le transfert est temporaire', () => {
-        let command: TransfererJeunesConseillerCommand
-        let conseillerCible: Jeune.Conseiller
-        beforeEach(() => {
-          command = {
-            idConseillerSource: '40',
-            idConseillerCible: '41',
-            estTemporaire: true,
-            idsJeunes: ['1'],
-            structure: Core.Structure.PASS_EMPLOI
-          }
 
-          conseillerRepository.existe
-            .withArgs(command.idConseillerSource, command.structure)
-            .resolves(true)
-          conseillerCible = unConseillerDuJeune({
-            id: command.idConseillerCible
-          })
-          conseillerRepository.get
-            .withArgs(command.idConseillerCible)
-            .resolves(conseillerCible)
-        })
+      describe('quand le transfert est temporaire', () => {
+        const command: TransfererJeunesConseillerCommand = {
+          idConseillerSource: conseillerSource.id,
+          idConseillerCible: conseillerCible.id,
+          estTemporaire: true,
+          idsJeunes: ['1'],
+          structure: Core.Structure.PASS_EMPLOI
+        }
 
         describe("quand le jeune n'était pas en transfert temporaire", () => {
           it('sauvegarde les transferts et le jeune son nouveau conseiller avec le conseiller initial', async () => {
             // Given
-            const jeune1: Jeune = unJeune({
+            const jeune: Jeune = unJeune({
               id: command.idsJeunes[0],
               conseiller: {
-                id: command.idConseillerSource,
-                firstName: 'test',
-                lastName: 'test'
+                id: conseillerSource.id,
+                firstName: conseillerSource.firstName,
+                lastName: conseillerSource.lastName
               }
             })
+
             jeuneRepository.findAllJeunesByConseiller
               .withArgs(command.idsJeunes, command.idConseillerSource)
-              .resolves([jeune1])
+              .resolves([jeune])
 
             // When
             const result =
               await transfererJeunesConseillerCommandHandler.handle(command)
 
             // Then
+            const jeuneApresTransfert: Jeune = {
+              ...jeune,
+              conseiller: conseillerCibleDuJeune,
+              conseillerInitial: { id: conseillerSourceDuJeune.id }
+            }
             expect(result).to.deep.equal(emptySuccess())
-
-            jeune1.conseiller = conseillerCible
-            jeune1.conseillerInitial = { id: command.idConseillerSource }
             expect(
               jeuneRepository.transferAndSaveAll
             ).to.have.been.calledWithExactly(
-              [jeune1],
+              [jeuneApresTransfert],
               command.idConseillerCible,
               command.idConseillerSource,
               command.estTemporaire
@@ -175,33 +188,36 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
         describe('quand le jeune est déjà en transfert temporaire ', () => {
           it('sauvegarde le jeune avec le nouveau conseiller et conserve le conseiller initial', async () => {
             // Given
-            const jeune1: Jeune = unJeune({
+            const jeune: Jeune = unJeune({
               id: command.idsJeunes[0],
               conseiller: {
-                id: command.idConseillerSource,
-                firstName: 'test',
-                lastName: 'test'
+                id: conseillerSource.id,
+                firstName: conseillerSource.firstName,
+                lastName: conseillerSource.lastName
               },
               conseillerInitial: {
                 id: '42'
               }
             })
+
             jeuneRepository.findAllJeunesByConseiller
               .withArgs(command.idsJeunes, command.idConseillerSource)
-              .resolves([jeune1])
+              .resolves([jeune])
 
             // When
             const result =
               await transfererJeunesConseillerCommandHandler.handle(command)
 
             // Then
+            const jeuneApresTransfert: Jeune = {
+              ...jeune,
+              conseiller: conseillerCibleDuJeune
+            }
             expect(result).to.deep.equal(emptySuccess())
-
-            jeune1.conseiller = conseillerCible
             expect(
               jeuneRepository.transferAndSaveAll
             ).to.have.been.calledWithExactly(
-              [jeune1],
+              [jeuneApresTransfert],
               command.idConseillerCible,
               command.idConseillerSource,
               command.estTemporaire
@@ -211,35 +227,37 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
         describe('quand le conseiller cible est le meme que le conseiller initial', () => {
           it('sauvegarde le jeune et supprime son conseiller initial', async () => {
             // Given
-            const jeune1: Jeune = unJeune({
+            const jeune: Jeune = unJeune({
               id: command.idsJeunes[0],
               conseiller: {
-                id: command.idConseillerSource,
-                firstName: 'test',
-                lastName: 'test'
+                id: conseillerSource.id,
+                firstName: conseillerSource.firstName,
+                lastName: conseillerSource.lastName
               },
               conseillerInitial: {
                 id: command.idConseillerCible
               }
             })
+
             jeuneRepository.findAllJeunesByConseiller
               .withArgs(command.idsJeunes, command.idConseillerSource)
-              .resolves([jeune1])
+              .resolves([jeune])
 
             // When
             const result =
               await transfererJeunesConseillerCommandHandler.handle(command)
 
             // Then
+            const jeuneApresTransfert: Jeune = {
+              ...jeune,
+              conseiller: conseillerCibleDuJeune,
+              conseillerInitial: undefined
+            }
             expect(result).to.deep.equal(emptySuccess())
-
-            jeune1.conseiller = conseillerCible
-            jeune1.conseillerInitial = undefined
-
             expect(
               jeuneRepository.transferAndSaveAll
             ).to.have.been.calledWithExactly(
-              [jeune1],
+              [jeuneApresTransfert],
               command.idConseillerCible,
               command.idConseillerSource,
               command.estTemporaire
@@ -251,9 +269,9 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
     describe("quand le conseiller source n'existe pas", () => {
       it('retourne une failure', async () => {
         // Given
-        conseillerRepository.existe
-          .withArgs(command.idConseillerSource, command.structure)
-          .resolves(false)
+        conseillerRepository.get
+          .withArgs(command.idConseillerSource)
+          .resolves(undefined)
 
         // When
         const result = await transfererJeunesConseillerCommandHandler.handle(
@@ -269,9 +287,6 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
     describe("quand le conseiller cible n'existe pas", () => {
       it('retourne une failure', async () => {
         // Given
-        conseillerRepository.existe
-          .withArgs(command.idConseillerSource, command.structure)
-          .resolves(true)
         conseillerRepository.get
           .withArgs(command.idConseillerCible)
           .resolves(undefined)
@@ -290,17 +305,6 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
     describe("quand un des jeunes n'existe pas ou n'est pas suivi par le conseiller source", () => {
       it('retourne une failure', async () => {
         // Given
-        conseillerRepository.existe
-          .withArgs(command.idConseillerSource, command.structure)
-          .resolves(true)
-        const conseillerCible = unConseiller({
-          id: command.idConseillerCible,
-          structure: command.structure
-        })
-        conseillerRepository.get
-          .withArgs(command.idConseillerCible)
-          .resolves(conseillerCible)
-
         jeuneRepository.findAllJeunesByConseiller
           .withArgs(command.idsJeunes, command.idConseillerSource)
           .resolves([unJeune()])

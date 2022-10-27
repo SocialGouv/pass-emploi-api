@@ -45,10 +45,7 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
   async handle(command: TransfererJeunesConseillerCommand): Promise<Result> {
     const [conseillerSourceExiste, conseillerCible, jeunes] = await Promise.all(
       [
-        this.conseillerRepository.existe(
-          command.idConseillerSource,
-          command.structure
-        ),
+        this.conseillerRepository.get(command.idConseillerSource),
         this.conseillerRepository.get(command.idConseillerCible),
         this.jeuneRepository.findAllJeunesByConseiller(
           command.idsJeunes,
@@ -73,7 +70,7 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       )
     }
 
-    const updatedJeunes: Jeune[] = Jeune.transfererLesJeunes(
+    const updatedJeunes: Jeune[] = Jeune.changerDeConseiller(
       jeunes,
       conseillerCible,
       command.idConseillerSource,
