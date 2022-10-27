@@ -1,3061 +1,3208 @@
 [
   {
     "id": 1,
-    "nom_agence": "Mission Locale des pays d'Epernay",
+    "nom_agence": "51 - Mission Locale Des Pays D'Epernay",
     "nom_region": "Grand Est",
     "code_departement": 51,
     "structure": "MILO"
   },
   {
     "id": 2,
-    "nom_agence": "Mission Locale Nord Ardèche",
+    "nom_agence": "7 - Mission Locale Nord Ardèche",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 7,
     "structure": "MILO"
   },
   {
     "id": 3,
-    "nom_agence": "Mission Locale Fontaine",
+    "nom_agence": "38 - Mission Locale Fontaine",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 38,
     "structure": "MILO"
   },
   {
     "id": 4,
-    "nom_agence": "Mission Locale Than",
+    "nom_agence": "68 - Mission Locale Than",
     "nom_region": "Grand Est",
     "code_departement": 68,
     "structure": "MILO"
   },
   {
     "id": 5,
-    "nom_agence": "Mission Locale Péronne",
+    "nom_agence": "80 - Mission Locale Péronne",
     "nom_region": "Hauts-de-France",
     "code_departement": 80,
     "structure": "MILO"
   },
   {
     "id": 6,
-    "nom_agence": "Mission Locale jeunes Bugey Plaine de l'Ain",
+    "nom_agence": "1 - Mission Locale Jeunes Bugey Plaine De L'Ain",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 1,
     "structure": "MILO"
   },
   {
     "id": 7,
-    "nom_agence": "1-Mission Locale du Grand Angoumois",
+    "nom_agence": "16 - Mission Locale Du Grand Angoumois",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 16,
     "structure": "MILO"
   },
   {
     "id": 8,
-    "nom_agence": "13-ML AUBAGNE",
+    "nom_agence": "13 - Mission Locale Aubagne",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 13,
     "structure": "MILO"
   },
   {
     "id": 9,
-    "nom_agence": "18-MISSION LOCALE DE BOURGES MEHUN SUR YEVRE ET ST FLORENT SUR CHER",
+    "nom_agence": "18 - Mission Locale De Bourges Mehun Sur Yevre Et St Florent Sur Cher",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 18,
     "structure": "MILO"
   },
   {
     "id": 10,
-    "nom_agence": "2B-ML RURALE DE HAUTE CORSE",
+    "nom_agence": "20 - Mission Locale Rurale De Haute Corse",
     "nom_region": "Corse",
     "code_departement": 20,
     "structure": "MILO"
   },
   {
     "id": 11,
-    "nom_agence": "30-ML BAGNOLS SUR CEZE",
+    "nom_agence": "30 - Mission Locale Bagnols Sur Ceze",
     "nom_region": "Occitanie",
     "code_departement": 30,
     "structure": "MILO"
   },
   {
     "id": 12,
-    "nom_agence": "31-ML TOULOUSE",
+    "nom_agence": "31 - Mission Locale Toulouse",
     "nom_region": "Occitanie",
     "code_departement": 31,
     "structure": "MILO"
   },
   {
     "id": 13,
-    "nom_agence": "34- MLJ du Coeur d'Hérault",
+    "nom_agence": "34 - Mission Locale Jeunes Du Coeur D'Hérault",
     "nom_region": "Occitanie",
     "code_departement": 34,
     "structure": "MILO"
   },
   {
     "id": 14,
-    "nom_agence": "34-Mission Locale des Jeunes de Montpellier Méditerranée Métropole",
+    "nom_agence": "34 - Mission Locale Des Jeunes De Montpellier Méditerranée Métropole",
     "nom_region": "Occitanie",
     "code_departement": 34,
     "structure": "MILO"
   },
   {
     "id": 15,
-    "nom_agence": "54-Mission Locale du Val de Lorraine",
+    "nom_agence": "54 - Mission Locale Du Val De Lorraine",
     "nom_region": "Grand Est",
     "code_departement": 54,
     "structure": "MILO"
   },
   {
     "id": 16,
-    "nom_agence": "62-ML AGGLOMERATION HENIN CARVIN",
+    "nom_agence": "62 - Mission Locale Agglomeration Henin Carvin",
     "nom_region": "Hauts-de-France",
     "code_departement": 62,
     "structure": "MILO"
   },
   {
     "id": 17,
-    "nom_agence": "72-ML SARTHE NORD",
+    "nom_agence": "72 - Mission Locale Sarthe Nord",
     "nom_region": "Pays de la Loire",
     "code_departement": 72,
     "structure": "MILO"
   },
   {
     "id": 18,
-    "nom_agence": "78-ML SAINT QUENTIN EN YVELINES",
+    "nom_agence": "78 - Mission Locale Saint Quentin En Yvelines",
     "nom_region": "Île-de-France",
     "code_departement": 78,
     "structure": "MILO"
   },
   {
     "id": 19,
-    "nom_agence": "971-ML LES ABYMES (siège)",
+    "nom_agence": "97 - Mission Locale Les Abymes (Siège)",
     "nom_region": "Guadeloupe",
     "code_departement": 971,
     "structure": "MILO"
   },
   {
     "id": 20,
-    "nom_agence": "ADEFI - MISSION LOCALE",
+    "nom_agence": "62 - Mission Locale - Adefi",
     "nom_region": "Hauts-de-France",
     "code_departement": 62,
     "structure": "MILO"
   },
   {
     "id": 21,
-    "nom_agence": "AGIRE Mission Locale Le Creusot / Montceau",
+    "nom_agence": "71 - Mission Locale Le Creusot / Montceau - Agire",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 71,
     "structure": "MILO"
   },
   {
     "id": 22,
-    "nom_agence": "AIFP Mission Locale Plaine Centrale du Val de Marne",
+    "nom_agence": "94 - Mission Locale Plaine Centrale Du Val De Marne - Afip",
     "nom_region": "Île-de-France",
     "code_departement": 94,
     "structure": "MILO"
   },
   {
     "id": 23,
-    "nom_agence": "AILE SUD BOURGOGNE",
+    "nom_agence": "71 - Mission Locale Aile Sud Bourgogne",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 71,
     "structure": "MILO"
   },
   {
     "id": 24,
-    "nom_agence": "Antenne de BLAYE",
+    "nom_agence": "33 - Mission Locale De Blaye",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 33,
     "structure": "MILO"
   },
   {
     "id": 25,
-    "nom_agence": "Antenne de Tarbes",
+    "nom_agence": "65 - Mission Locale De Tarbes",
     "nom_region": "Occitanie",
     "code_departement": 65,
     "structure": "MILO"
   },
   {
     "id": 26,
-    "nom_agence": "Antenne de Villiers",
+    "nom_agence": "94 - Mission Locale De Villiers",
     "nom_region": "Île-de-France",
     "code_departement": 94,
     "structure": "MILO"
   },
   {
     "id": 27,
-    "nom_agence": "Antenne SEVRAN",
+    "nom_agence": "93 - Mission Locale De Sevran",
     "nom_region": "Île-de-France",
     "code_departement": 93,
     "structure": "MILO"
   },
   {
     "id": 28,
-    "nom_agence": "AVEC",
+    "nom_agence": "95 - Mission Locale De Cergy Pontoise Avec",
     "nom_region": "Île-de-France",
     "code_departement": 95,
     "structure": "MILO"
   },
   {
     "id": 29,
-    "nom_agence": "DYNAMIQUE EMPLOI",
+    "nom_agence": "91 - Mission Locale Plie - Maison De L'Emploi Et De La Formation (Mdef) De Grand Paris Sud /",
     "nom_region": "Île-de-France",
     "code_departement": 91,
     "structure": "MILO"
   },
   {
     "id": 30,
-    "nom_agence": "EMPLOI VALLEE SUD GRAND PARIS",
+    "nom_agence": "92 - Mission Locale Emploi Vallée Sud Grand Paris",
     "nom_region": "Île-de-France",
     "code_departement": 92,
     "structure": "MILO"
   },
   {
     "id": 31,
-    "nom_agence": "ESPACE 2M - ML ROANNE",
+    "nom_agence": "42 - Mission Locale Roanne - Espace 2M",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 42,
     "structure": "MILO"
   },
   {
     "id": 32,
-    "nom_agence": "GIP Maison de l'Emploi Rueil Suresnes - Mission Locale",
+    "nom_agence": "92 - Mission Locale - Gip Maison De L'Emploi Rueil Suresnes",
     "nom_region": "Île-de-France",
     "code_departement": 92,
     "structure": "MILO"
   },
   {
     "id": 33,
-    "nom_agence": "IDEIS MISSION LOCALE DU PAYS DE MONTBELIARD",
+    "nom_agence": "25 - Mission Locale Du Pays De Montbeliard - Ideis",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 25,
     "structure": "MILO"
   },
   {
     "id": 34,
-    "nom_agence": "LA FABRIQUE DEFI",
+    "nom_agence": "62 - Mission Locale Du Calaisis - La Fabrique Defi",
     "nom_region": "Hauts-de-France",
     "code_departement": 62,
     "structure": "MILO"
   },
   {
     "id": 35,
-    "nom_agence": "La Mission locale d'Argentan",
+    "nom_agence": "61 - La Mission Locale D'Argentan",
     "nom_region": "Normandie",
     "code_departement": 61,
     "structure": "MILO"
   },
   {
     "id": 36,
-    "nom_agence": "Maison de l'emploi du Bocage Bressuirais / ML",
+    "nom_agence": "79 - Mission Locale - Maison De L'Emploi Du Bocage Bressuirais",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 79,
     "structure": "MILO"
   },
   {
     "id": 37,
-    "nom_agence": "Maison de l'Emploi et de la Formation du Pays Chaunois - Service Mission Locale",
+    "nom_agence": "2 - Mission Locale - Maison De L'Emploi Et De La Formation Du Pays Chaunois",
     "nom_region": "Hauts-de-France",
     "code_departement": 2,
     "structure": "MILO"
   },
   {
     "id": 38,
-    "nom_agence": "MAISON DE L'EMPLOI ET DE LA FORMATION DU PAYS DU GRAND BEAUVAISIS - Service Mission Locale",
+    "nom_agence": "60 - Mission Locale - Maison De L'Emploi Et De La Formation Du Pays Du Grand Beauvaisis",
     "nom_region": "Hauts-de-France",
     "code_departement": 60,
     "structure": "MILO"
   },
   {
     "id": 39,
-    "nom_agence": "Maison de l'Emploi et de la Formation du Pays du Grand Laonnois",
+    "nom_agence": "2 - Mission Locale - Maison De L'Emploi Et De La Formation Du Pays Du Grand Laonnois",
     "nom_region": "Hauts-de-France",
     "code_departement": 2,
     "structure": "MILO"
   },
   {
     "id": 40,
-    "nom_agence": "Maison de l'Emploi et de la Formation du Saint Quentinois - Service Mission Locale",
+    "nom_agence": "2 - Mission Locale - Maison De L'Emploi Et De La Formation Du Saint Quentinois",
     "nom_region": "Hauts-de-France",
     "code_departement": 2,
     "structure": "MILO"
   },
   {
     "id": 41,
-    "nom_agence": "Maison de l'Emploi et de la Formation du Sud-Ouest de l'Oise - Service Mission Locale",
+    "nom_agence": "60 - Mission Locale - Maison De L'Emploi Et De La Formation Du Sud-Ouest De L'Oise",
     "nom_region": "Hauts-de-France",
     "code_departement": 60,
     "structure": "MILO"
   },
   {
     "id": 42,
-    "nom_agence": "Maison de l'Emploi et de la Formation du Thouarsais - Service Mission Locale",
+    "nom_agence": "79 - Mission Locale - Maison De L'Emploi Et De La Formation Du Thouarsais",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 79,
     "structure": "MILO"
   },
   {
     "id": 43,
-    "nom_agence": "MDEE Parthenay-Gâtine",
+    "nom_agence": "79 - Mdee Parthenay-Gâtine",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 79,
     "structure": "MILO"
   },
   {
     "id": 44,
-    "nom_agence": "MENDE",
+    "nom_agence": "48 - Mission Locale - Mende",
     "nom_region": "Occitanie",
     "code_departement": 48,
     "structure": "MILO"
   },
   {
     "id": 45,
-    "nom_agence": "MISSION INTERCOMMUNALE INSERTION JEUNES EPINAY SUR SEINE SAINT-OUEN VILLETANEUSE L'ILE-SAINT-DENIS",
+    "nom_agence": "93 - Mission Locale - Miij Epinay Sur Seine Saint-Ouen Villetaneuse L'Ile-Saint-Denis",
     "nom_region": "Île-de-France",
     "code_departement": 93,
     "structure": "MILO"
   },
   {
     "id": 46,
-    "nom_agence": "Mission Intercommunale pour l'Emploi des Jeunes",
+    "nom_agence": "93 - Mission Locale - Mission Intercommunale Pour L'Emploi Des Jeunes",
     "nom_region": "Île-de-France",
     "code_departement": 93,
     "structure": "MILO"
   },
   {
     "id": 47,
-    "nom_agence": "Mission Intercommunale Vers l'Emploi",
+    "nom_agence": "91 - Mission Locale - Mission Intercommunale Vers L'Emploi (Mive)",
     "nom_region": "Île-de-France",
     "code_departement": 91,
     "structure": "MILO"
   },
   {
     "id": 48,
-    "nom_agence": "Mission Jeunes 05",
+    "nom_agence": "5 - Mission Locale Jeunes Hautes Alpes 05",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 5,
     "structure": "MILO"
   },
   {
     "id": 49,
-    "nom_agence": "MISSION LOCALE  DU CHINONAIS",
+    "nom_agence": "37 - Mission Locale  Du Chinonais",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 37,
     "structure": "MILO"
   },
   {
     "id": 50,
-    "nom_agence": "Mission Locale - Siège administratif",
+    "nom_agence": "76 - Mission Locale De L'Agglomération Rouennaise",
     "nom_region": "Normandie",
     "code_departement": 76,
     "structure": "MILO"
   },
   {
     "id": 51,
-    "nom_agence": "Mission Locale (siège)",
+    "nom_agence": "17 - Mission Locale (Siège)",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 17,
     "structure": "MILO"
   },
   {
     "id": 52,
-    "nom_agence": "Mission Locale Agglomération et Territoire du Valentinois",
+    "nom_agence": "26 - Mission Locale Agglomération Et Territoire Du Valentinois",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 26,
     "structure": "MILO"
   },
   {
     "id": 53,
-    "nom_agence": "Mission Locale Angevine",
+    "nom_agence": "49 - Mission Locale Angevine",
     "nom_region": "Pays de la Loire",
     "code_departement": 49,
     "structure": "MILO"
   },
   {
     "id": 54,
-    "nom_agence": "Mission Locale Arc Charente",
+    "nom_agence": "16 - Mission Locale Arc Charente",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 16,
     "structure": "MILO"
   },
   {
     "id": 55,
-    "nom_agence": "Mission Locale Ardeche Méridionale",
+    "nom_agence": "7 - Mission Locale Ardeche Méridionale",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 7,
     "structure": "MILO"
   },
   {
     "id": 56,
-    "nom_agence": "MISSION LOCALE ARMENTIERES - VALLEE DE LA LYS",
+    "nom_agence": "59 - Mission Locale Armentieres - Vallee De La Lys",
     "nom_region": "Hauts-de-France",
     "code_departement": 59,
     "structure": "MILO"
   },
   {
     "id": 57,
-    "nom_agence": "Mission Locale arrondissement AURILLAC",
+    "nom_agence": "15 - Mission Locale Arrondissement Aurillac",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 15,
     "structure": "MILO"
   },
   {
     "id": 58,
-    "nom_agence": "MISSION LOCALE AVENIR JEUNES PAYS BASQUE",
+    "nom_agence": "64 - Mission Locale Avenir Jeunes Pays Basque",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 64,
     "structure": "MILO"
   },
   {
     "id": 59,
-    "nom_agence": "Mission Locale Bassin de Saint-Dié et Hautes Vosges",
+    "nom_agence": "88 - Mission Locale Bassin De Saint-Dié Et Hautes Vosges",
     "nom_region": "Grand Est",
     "code_departement": 88,
     "structure": "MILO"
   },
   {
     "id": 60,
-    "nom_agence": "Mission Locale Bassin Thiernois",
+    "nom_agence": "63 - Mission Locale Bassin Thiernois",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 63,
     "structure": "MILO"
   },
   {
     "id": 61,
-    "nom_agence": "MISSION LOCALE BASTIA",
+    "nom_agence": "20 - Mission Locale Bastia",
     "nom_region": "Corse",
     "code_departement": 20,
     "structure": "MILO"
   },
   {
     "id": 62,
-    "nom_agence": "MISSION LOCALE BEARN ADOUR",
+    "nom_agence": "64 - Mission Locale Bearn Adour",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 64,
     "structure": "MILO"
   },
   {
     "id": 63,
-    "nom_agence": "Mission Locale Bordeaux Avenir Jeunes",
+    "nom_agence": "33 - Mission Locale Bordeaux Avenir Jeunes",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 33,
     "structure": "MILO"
   },
   {
     "id": 64,
-    "nom_agence": "Mission Locale Bourgogne Nivernaise",
+    "nom_agence": "58 - Mission Locale Bourgogne Nivernaise",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 58,
     "structure": "MILO"
   },
   {
     "id": 65,
-    "nom_agence": "Mission Locale Bron Décines Meyzieu",
+    "nom_agence": "69 - Mission Locale Bron Décines Meyzieu",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 69,
     "structure": "MILO"
   },
   {
     "id": 66,
-    "nom_agence": "MISSION LOCALE CAEN LA MER CALVADOS CENTRE",
+    "nom_agence": "14 - Mission Locale Caen La Mer Calvados Centre",
     "nom_region": "Normandie",
     "code_departement": 14,
     "structure": "MILO"
   },
   {
     "id": 67,
-    "nom_agence": "MISSION LOCALE CAUX SEINE AUSTREBERTHE",
+    "nom_agence": "76 - Mission Locale Caux Seine Austreberthe",
     "nom_region": "Normandie",
     "code_departement": 76,
     "structure": "MILO"
   },
   {
     "id": 68,
-    "nom_agence": "Mission Locale Centre Ardèche",
+    "nom_agence": "7 - Mission Locale Centre Ardèche",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 7,
     "structure": "MILO"
   },
   {
     "id": 69,
-    "nom_agence": "Mission Locale Centre Ouest Bretagne",
+    "nom_agence": "29 - Mission Locale Centre Ouest Bretagne",
     "nom_region": "Bretagne",
     "code_departement": 29,
     "structure": "MILO"
   },
   {
     "id": 70,
-    "nom_agence": "MISSION LOCALE CHABLAIS",
+    "nom_agence": "74 - Mission Locale Chablais",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 74,
     "structure": "MILO"
   },
   {
     "id": 71,
-    "nom_agence": "MISSION LOCALE CHER SUD",
+    "nom_agence": "18 - Mission Locale Cher Sud",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 18,
     "structure": "MILO"
   },
   {
     "id": 72,
-    "nom_agence": "MISSION LOCALE COEUR DE PICARDIE",
+    "nom_agence": "60 - Mission Locale Coeur De Picardie",
     "nom_region": "Hauts-de-France",
     "code_departement": 60,
     "structure": "MILO"
   },
   {
     "id": 73,
-    "nom_agence": "MISSION LOCALE COLMAR CENTRE ALSACE",
+    "nom_agence": "68 - Mission Locale Colmar Centre Alsace",
     "nom_region": "Grand Est",
     "code_departement": 68,
     "structure": "MILO"
   },
   {
     "id": 74,
-    "nom_agence": "mission locale colombes",
+    "nom_agence": "92 - Mission Locale Colombes",
     "nom_region": "Île-de-France",
     "code_departement": 92,
     "structure": "MILO"
   },
   {
     "id": 75,
-    "nom_agence": "MISSION LOCALE CORAIL",
+    "nom_agence": "83 - Mission Locale Corail",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 83,
     "structure": "MILO"
   },
   {
     "id": 76,
-    "nom_agence": "MISSION LOCALE COURNON",
+    "nom_agence": "63 - Mission Locale Cournon",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 63,
     "structure": "MILO"
   },
   {
     "id": 77,
-    "nom_agence": "MISSION LOCALE D'AJACCIO",
+    "nom_agence": "20 - Mission Locale D'Ajaccio",
     "nom_region": "Corse",
     "code_departement": 20,
     "structure": "MILO"
   },
   {
     "id": 78,
-    "nom_agence": "MISSION LOCALE D'ALSACE DU NORD",
+    "nom_agence": "67 - Mission Locale D'Alsace Du Nord",
     "nom_region": "Grand Est",
     "code_departement": 67,
     "structure": "MILO"
   },
   {
     "id": 79,
-    "nom_agence": "MISSION LOCALE D'ARCACHON",
+    "nom_agence": "33 - La Mission Locale Du Bassin D'Arcachon Et Du Val De L'Eyre",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 33,
     "structure": "MILO"
   },
   {
     "id": 80,
-    "nom_agence": "MISSION LOCALE D'AUBERVILLIERS",
+    "nom_agence": "93 - Mission Locale D'Aubervilliers",
     "nom_region": "Île-de-France",
     "code_departement": 93,
     "structure": "MILO"
   },
   {
     "id": 81,
-    "nom_agence": "Mission Locale d'Héricourt",
+    "nom_agence": "70 - Mission Locale D'Héricourt",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 70,
     "structure": "MILO"
   },
   {
     "id": 82,
-    "nom_agence": "mission locale d'insertion du centre herault",
+    "nom_agence": "34 - Mission Locale D'Insertion Du Centre Herault",
     "nom_region": "Occitanie",
     "code_departement": 34,
     "structure": "MILO"
   },
   {
     "id": 83,
-    "nom_agence": "Mission Locale d'Insertion du Poitou",
+    "nom_agence": "86 - Mission Locale D'Insertion Du Poitou",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 86,
     "structure": "MILO"
   },
   {
     "id": 84,
-    "nom_agence": "Mission Locale de Baie de Seine",
+    "nom_agence": "14 - Mission Locale De Baie De Seine",
     "nom_region": "Normandie",
     "code_departement": 14,
     "structure": "MILO"
   },
   {
     "id": 85,
-    "nom_agence": "Mission Locale de Chaumont",
+    "nom_agence": "52 - Mission Locale De Chaumont",
     "nom_region": "Grand Est",
     "code_departement": 52,
     "structure": "MILO"
   },
   {
     "id": 86,
-    "nom_agence": "Mission Locale de Clichy",
+    "nom_agence": "92 - Mission Locale De Clichy",
     "nom_region": "Île-de-France",
     "code_departement": 92,
     "structure": "MILO"
   },
   {
     "id": 87,
-    "nom_agence": "Mission Locale de Dole-Revermont",
+    "nom_agence": "39 - Mission Locale De Dole-Revermont",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 39,
     "structure": "MILO"
   },
   {
     "id": 88,
-    "nom_agence": "MISSION LOCALE DE FLANDRE INTERIEURE",
+    "nom_agence": "59 - Mission Locale De Flandre Interieure",
     "nom_region": "Hauts-de-France",
     "code_departement": 59,
     "structure": "MILO"
   },
   {
     "id": 89,
-    "nom_agence": "Mission Locale de Grenoble",
+    "nom_agence": "38 - Mission Locale De Grenoble",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 38,
     "structure": "MILO"
   },
   {
     "id": 90,
-    "nom_agence": "Mission Locale de Guyane",
-    "nom_region": "Martinique",
+    "nom_agence": "97 - Mission Locale De Guyane",
+    "nom_region": "Guyane",
     "code_departement": 973,
     "structure": "MILO"
   },
   {
     "id": 91,
-    "nom_agence": "Mission Locale de haute-saintonge",
+    "nom_agence": "17 - Mission Locale De Saintonge",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 17,
     "structure": "MILO"
   },
   {
     "id": 92,
-    "nom_agence": "MISSION LOCALE DE L'AGENAIS DE L'ALBRET ET DU CONFLUENT",
+    "nom_agence": "47 - Mission Locale De L'Agenais De L'Albret Et Du Confluent",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 47,
     "structure": "MILO"
   },
   {
     "id": 93,
-    "nom_agence": "MISSION LOCALE DE L'AGGLOMERATION DE LENS-LIEVIN",
+    "nom_agence": "62 - Mission Locale De L'Agglomeration De Lens-Lievin",
     "nom_region": "Hauts-de-France",
     "code_departement": 62,
     "structure": "MILO"
   },
   {
     "id": 94,
-    "nom_agence": "MISSION LOCALE DE L'AGGLOMERATION DE LIMOGES",
+    "nom_agence": "87 - Mission Locale De L'Agglomeration De Limoges",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 87,
     "structure": "MILO"
   },
   {
     "id": 95,
-    "nom_agence": "MISSION LOCALE DE L'AGGLOMERATION DUNKERQUOISE",
+    "nom_agence": "59 - Mission Locale De L'Agglomeration Dunkerquoise",
     "nom_region": "Hauts-de-France",
     "code_departement": 59,
     "structure": "MILO"
   },
   {
     "id": 96,
-    "nom_agence": "Mission Locale de l'Agglomération Mancelle",
+    "nom_agence": "72 - Mission Locale De L'Agglomération Mancelle",
     "nom_region": "Pays de la Loire",
     "code_departement": 72,
     "structure": "MILO"
   },
   {
     "id": 97,
-    "nom_agence": "Mission Locale de l'agglomération nazairienne",
+    "nom_agence": "44 - Mission Locale De L'Agglomération Nazairienne",
     "nom_region": "Pays de la Loire",
     "code_departement": 44,
     "structure": "MILO"
   },
   {
     "id": 98,
-    "nom_agence": "Mission Locale de l'Agglomération Royan Atlantique",
+    "nom_agence": "17 - Mission Locale De L'Agglomération Royan Atlantique",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 17,
     "structure": "MILO"
   },
   {
     "id": 99,
-    "nom_agence": "MISSION LOCALE DE L'AIGLE",
+    "nom_agence": "61 - Mission Locale De L'Aigle",
     "nom_region": "Normandie",
     "code_departement": 61,
     "structure": "MILO"
   },
   {
     "id": 100,
-    "nom_agence": "MISSION LOCALE DE L'ARRONDISSEMENT D'ISSOUDUN",
+    "nom_agence": "36 - Mission Locale De L'Arrondissement D'Issoudun",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 36,
     "structure": "MILO"
   },
   {
     "id": 101,
-    "nom_agence": "Mission Locale de l'arrondissement de Beaune",
+    "nom_agence": "21 - Mission Locale De L'Arrondissement De Beaune",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 21,
     "structure": "MILO"
   },
   {
     "id": 102,
-    "nom_agence": "MISSION LOCALE DE L'ARRONDISSEMENT DE CHARTRES",
+    "nom_agence": "28 - Mission Locale De L'Arrondissement De Chartres",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 28,
     "structure": "MILO"
   },
   {
     "id": 103,
-    "nom_agence": "Mission Locale de l'arrondissement de Château-Thierry",
+    "nom_agence": "2 - Mission Locale De L'Arrondissement De Château-Thierry",
     "nom_region": "Hauts-de-France",
     "code_departement": 2,
     "structure": "MILO"
   },
   {
     "id": 104,
-    "nom_agence": "MISSION LOCALE DE L'ARRONDISSEMENT DE DIJON",
+    "nom_agence": "21 - Mission Locale De L'Arrondissement De Dijon",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 21,
     "structure": "MILO"
   },
   {
     "id": 105,
-    "nom_agence": "Mission locale de l'arrondissement de langres",
+    "nom_agence": "52 - Mission Locale De L'Arrondissement De Langres",
     "nom_region": "Grand Est",
     "code_departement": 52,
     "structure": "MILO"
   },
   {
     "id": 106,
-    "nom_agence": "MISSION LOCALE DE L'ARRONDISSEMENT DE SAINT-OMER",
+    "nom_agence": "62 - Mission Locale De L'Arrondissement De Saint-Omer",
     "nom_region": "Hauts-de-France",
     "code_departement": 62,
     "structure": "MILO"
   },
   {
     "id": 107,
-    "nom_agence": "MISSION LOCALE DE L'ARTOIS",
+    "nom_agence": "62 - Mission Locale De L'Artois",
     "nom_region": "Hauts-de-France",
     "code_departement": 62,
     "structure": "MILO"
   },
   {
     "id": 108,
-    "nom_agence": "Mission Locale de l'Autunois",
+    "nom_agence": "71 - Mission Locale De L'Autunois",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 71,
     "structure": "MILO"
   },
   {
     "id": 109,
-    "nom_agence": "MISSION LOCALE DE L'AUXERROIS",
+    "nom_agence": "89 - Mission Locale De L'Auxerrois",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 89,
     "structure": "MILO"
   },
   {
     "id": 110,
-    "nom_agence": "Mission Locale de l'Orléanais",
+    "nom_agence": "45 - Mission Locale De L'Orléanais",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 45,
     "structure": "MILO"
   },
   {
     "id": 111,
-    "nom_agence": "Mission Locale de la Bièvre",
+    "nom_agence": "38 - Mission Locale De La Bièvre",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 38,
     "structure": "MILO"
   },
   {
     "id": 112,
-    "nom_agence": "Mission Locale de La Ciotat",
+    "nom_agence": "13 - Mission Locale De La Ciotat",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 13,
     "structure": "MILO"
   },
   {
     "id": 113,
-    "nom_agence": "MISSION LOCALE DE LA MARNE AUX BOIS",
+    "nom_agence": "93 - Mission Locale De La Marne Aux Bois",
     "nom_region": "Île-de-France",
     "code_departement": 93,
     "structure": "MILO"
   },
   {
     "id": 114,
-    "nom_agence": "Mission Locale de la Mayenne",
+    "nom_agence": "53 - Mission Locale De La Mayenne",
     "nom_region": "Pays de la Loire",
     "code_departement": 53,
     "structure": "MILO"
   },
   {
     "id": 115,
-    "nom_agence": "MISSION LOCALE DE LA PICARDIE MARITIME",
+    "nom_agence": "80 - Mission Locale De La Picardie Maritime",
     "nom_region": "Hauts-de-France",
     "code_departement": 80,
     "structure": "MILO"
   },
   {
     "id": 116,
-    "nom_agence": "MISSION LOCALE DE LA PLAINE DES VOSGES",
+    "nom_agence": "88 - Mission Locale De La Plaine Des Vosges",
     "nom_region": "Grand Est",
     "code_departement": 88,
     "structure": "MILO"
   },
   {
     "id": 117,
-    "nom_agence": "Mission Locale de la Presqu'île Guérandaise",
+    "nom_agence": "44 - Mission Locale De La Presqu'Île Guérandaise",
     "nom_region": "Pays de la Loire",
     "code_departement": 44,
     "structure": "MILO"
   },
   {
     "id": 118,
-    "nom_agence": "MISSION LOCALE DE LA VALLEE DE L'OISE",
+    "nom_agence": "60 - Mission Locale De La Vallee De L'Oise",
     "nom_region": "Hauts-de-France",
     "code_departement": 60,
     "structure": "MILO"
   },
   {
     "id": 119,
-    "nom_agence": "MISSION LOCALE DE LILLE",
+    "nom_agence": "59 - Mission Locale De Lille",
     "nom_region": "Hauts-de-France",
     "code_departement": 59,
     "structure": "MILO"
   },
   {
     "id": 120,
-    "nom_agence": "Mission Locale de Lure / Luxeuil-les-Bains / Champagney",
+    "nom_agence": "70 - Mission Locale De Lure / Luxeuil-Les-Bains / Champagney",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 70,
     "structure": "MILO"
   },
   {
     "id": 121,
-    "nom_agence": "Mission Locale de Lyon",
+    "nom_agence": "69 - Mission Locale De Lyon",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 69,
     "structure": "MILO"
   },
   {
     "id": 122,
-    "nom_agence": "Mission Locale de Marseille",
+    "nom_agence": "13 - Mission Locale De Marseille",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 13,
     "structure": "MILO"
   },
   {
     "id": 123,
-    "nom_agence": "Mission locale de mayotte",
+    "nom_agence": "97 - Mission Locale De Mayotte",
     "nom_region": "Mayotte",
     "code_departement": 976,
     "structure": "MILO"
   },
   {
     "id": 124,
-    "nom_agence": "Mission Locale de Montargis - Gien",
+    "nom_agence": "45 - Mission Locale De Montargis - Gien",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 45,
     "structure": "MILO"
   },
   {
     "id": 125,
-    "nom_agence": "MISSION LOCALE DE MOSELLE CENTRE (Siège)",
+    "nom_agence": "57 - Mission Locale De Moselle Centre (Siège)",
     "nom_region": "Grand Est",
     "code_departement": 57,
     "structure": "MILO"
   },
   {
     "id": 126,
-    "nom_agence": "Mission Locale de Moulins et sa Région",
+    "nom_agence": "3 - Mission Locale De Moulins Et Sa Région",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 3,
     "structure": "MILO"
   },
   {
     "id": 127,
-    "nom_agence": "Mission Locale de Mulhouse SEMAPHORE MULHOUSE SUD ALSACE",
+    "nom_agence": "68 - Mission Locale De Mulhouse Semaphore Mulhouse Sud Alsace",
     "nom_region": "Grand Est",
     "code_departement": 68,
     "structure": "MILO"
   },
   {
     "id": 128,
-    "nom_agence": "Mission Locale de Nanterre (Siège)",
+    "nom_agence": "92 - Mission Locale De Nanterre (Siège)",
     "nom_region": "Île-de-France",
     "code_departement": 92,
     "structure": "MILO"
   },
   {
     "id": 129,
-    "nom_agence": "Mission Locale de Pithiviers",
+    "nom_agence": "45 - Mission Locale De Pithiviers",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 45,
     "structure": "MILO"
   },
   {
     "id": 130,
-    "nom_agence": "Mission Locale de Ploërmel",
+    "nom_agence": "56 - Mission Locale De Ploërmel",
     "nom_region": "Bretagne",
     "code_departement": 56,
     "structure": "MILO"
   },
   {
     "id": 131,
-    "nom_agence": "MISSION LOCALE DE SAINT DIZIER",
+    "nom_agence": "52 - Mission Locale De Saint Dizier",
     "nom_region": "Grand Est",
     "code_departement": 52,
     "structure": "MILO"
   },
   {
     "id": 132,
-    "nom_agence": "MISSION LOCALE DE SCHILTIGHEIM",
+    "nom_agence": "67 - Mission Locale De Schiltigheim",
     "nom_region": "Grand Est",
     "code_departement": 67,
     "structure": "MILO"
   },
   {
     "id": 133,
-    "nom_agence": "Mission Locale de Sélestat",
+    "nom_agence": "67 - Mission Locale De Sélestat",
     "nom_region": "Grand Est",
     "code_departement": 67,
     "structure": "MILO"
   },
   {
     "id": 134,
-    "nom_agence": "Mission Locale de Sénart",
+    "nom_agence": "77 - Mission Locale De Sénart",
     "nom_region": "Île-de-France",
     "code_departement": 77,
     "structure": "MILO"
   },
   {
     "id": 135,
-    "nom_agence": "MISSION LOCALE DE TOURAINE",
+    "nom_agence": "37 - Mission Locale De Touraine",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 37,
     "structure": "MILO"
   },
   {
     "id": 136,
-    "nom_agence": "Mission Locale de Troyes",
+    "nom_agence": "10 - Mission Locale De Troyes",
     "nom_region": "Grand Est",
     "code_departement": 10,
     "structure": "MILO"
   },
   {
     "id": 137,
-    "nom_agence": "Mission Locale de Tulle centre Corrèze",
+    "nom_agence": "19 - Mission Locale De Tulle Centre Corrèze",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 19,
     "structure": "MILO"
   },
   {
     "id": 138,
-    "nom_agence": "mission locale de Vaulx en Velin",
+    "nom_agence": "69 - Mission Locale De Vaulx En Velin",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 69,
     "structure": "MILO"
   },
   {
     "id": 139,
-    "nom_agence": "MISSION LOCALE DE VENISSIEUX",
+    "nom_agence": "69 - Mission Locale De Venissieux",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 69,
     "structure": "MILO"
   },
   {
     "id": 140,
-    "nom_agence": "Mission Locale Départementale de l'Aveyron",
+    "nom_agence": "12 - Mission Locale Départementale De L'Aveyron",
     "nom_region": "Occitanie",
     "code_departement": 12,
     "structure": "MILO"
   },
   {
     "id": 141,
-    "nom_agence": "MISSION LOCALE DES 2 RIVES",
+    "nom_agence": "33 - Mission Locale Des 2 Rives",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 33,
     "structure": "MILO"
   },
   {
     "id": 142,
-    "nom_agence": "MISSION LOCALE DES ALPES DE HAUTE PROVENCE",
+    "nom_agence": "4 - Mission Locale Des Alpes De Haute Provence",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 4,
     "structure": "MILO"
   },
   {
     "id": 143,
-    "nom_agence": "Mission Locale des Boucles de la Marne",
+    "nom_agence": "77 - Mission Locale Des Boucles De La Marne",
     "nom_region": "Île-de-France",
     "code_departement": 77,
     "structure": "MILO"
   },
   {
     "id": 144,
-    "nom_agence": "MISSION LOCALE DES GRAVES",
+    "nom_agence": "33 - Mission Locale Des Graves",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 33,
     "structure": "MILO"
   },
   {
     "id": 145,
-    "nom_agence": "Mission Locale des Hautes-Terres et du Nord Ouest Cantal",
+    "nom_agence": "15 - Mission Locale Des Hautes-Terres Et Du Nord Ouest Cantal",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 15,
     "structure": "MILO"
   },
   {
     "id": 146,
-    "nom_agence": "MISSION LOCALE DES HAUTS DE GARONNE",
+    "nom_agence": "33 - Mission Locale Des Hauts De Garonne",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 33,
     "structure": "MILO"
   },
   {
     "id": 147,
-    "nom_agence": "MISSION LOCALE DES JEUNES DU BOCAGE",
+    "nom_agence": "61 - Mission Locale Des Jeunes Du Bocage",
     "nom_region": "Normandie",
     "code_departement": 61,
     "structure": "MILO"
   },
   {
     "id": 148,
-    "nom_agence": "MISSION LOCALE DES LANDES",
+    "nom_agence": "40 - Mission Locale Des Landes",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 40,
     "structure": "MILO"
   },
   {
     "id": 149,
-    "nom_agence": "MISSION LOCALE DES PAYS DE BRIEY",
+    "nom_agence": "54 - Mission Locale Des Pays De Briey",
     "nom_region": "Grand Est",
     "code_departement": 54,
     "structure": "MILO"
   },
   {
     "id": 150,
-    "nom_agence": "MISSION LOCALE DES RIVES DE L'AA ET DE LA COLME",
+    "nom_agence": "59 - Mission Locale Des Rives De L'Aa Et De La Colme",
     "nom_region": "Hauts-de-France",
     "code_departement": 59,
     "structure": "MILO"
   },
   {
     "id": 151,
-    "nom_agence": "MISSION LOCALE DES ULIS",
+    "nom_agence": "91 - Mission Locale Des Ulis",
     "nom_region": "Île-de-France",
     "code_departement": 91,
     "structure": "MILO"
   },
   {
     "id": 152,
-    "nom_agence": "mission locale des villes du nord du bois",
+    "nom_agence": "94 - Mission Locale Des Villes Du Nord Du Bois",
     "nom_region": "Île-de-France",
     "code_departement": 94,
     "structure": "MILO"
   },
   {
     "id": 153,
-    "nom_agence": "MISSION LOCALE DIEPPE COTE D'ALBATRE",
+    "nom_agence": "76 - Mission Locale Dieppe Cote D'Albatre",
     "nom_region": "Normandie",
     "code_departement": 76,
     "structure": "MILO"
   },
   {
     "id": 154,
-    "nom_agence": "MISSION LOCALE DRACENIE COEUR DU VAR",
+    "nom_agence": "83 - Mission Locale Dracenie Coeur Du Var",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 83,
     "structure": "MILO"
   },
   {
     "id": 155,
-    "nom_agence": "Mission Locale du bassin d'emploi d'Epinal",
+    "nom_agence": "88 - Mission Locale Du Bassin D'Emploi D'Epinal",
     "nom_region": "Grand Est",
     "code_departement": 88,
     "structure": "MILO"
   },
   {
     "id": 156,
-    "nom_agence": "Mission Locale du Bassin d'emploi de Besançon",
+    "nom_agence": "25 - Mission Locale Du Bassin D'Emploi De Besançon",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 25,
     "structure": "MILO"
   },
   {
     "id": 157,
-    "nom_agence": "MISSION LOCALE DU BASSIN D'EMPLOI DE BRIOUDE",
+    "nom_agence": "43 - Mission Locale Du Bassin D'Emploi De Brioude",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 43,
     "structure": "MILO"
   },
   {
     "id": 158,
-    "nom_agence": "Mission Locale du bassin d'emploi de Charleville-Mézières",
+    "nom_agence": "8 - Mission Locale Du Bassin D'Emploi De Charleville-Mézières",
     "nom_region": "Grand Est",
     "code_departement": 8,
     "structure": "MILO"
   },
   {
     "id": 159,
-    "nom_agence": "mission locale du bassin d'emploi de fougères",
+    "nom_agence": "35 - Mission Locale Du Bassin D'Emploi De Fougères",
     "nom_region": "Bretagne",
     "code_departement": 35,
     "structure": "MILO"
   },
   {
     "id": 160,
-    "nom_agence": "Mission Locale du Bassin d'emploi de Vesoul",
+    "nom_agence": "70 - Mission Locale Du Bassin D'Emploi De Vesoul",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 70,
     "structure": "MILO"
   },
   {
     "id": 161,
-    "nom_agence": "Mission Locale du Bassin d'Emploi du Soissonnais",
+    "nom_agence": "2 - Mission Locale Du Bassin D'Emploi Du Soissonnais",
     "nom_region": "Hauts-de-France",
     "code_departement": 2,
     "structure": "MILO"
   },
   {
     "id": 162,
-    "nom_agence": "MISSION LOCALE DU BASSIN D'EMPLOI GRANVILLAIS",
+    "nom_agence": "50 - Mission Locale Du Bassin D'Emploi Granvillais",
     "nom_region": "Normandie",
     "code_departement": 50,
     "structure": "MILO"
   },
   {
     "id": 163,
-    "nom_agence": "MISSION LOCALE DU BASSIN DE LONGWY",
+    "nom_agence": "54 - Mission Locale Du Bassin De Longwy",
     "nom_region": "Grand Est",
     "code_departement": 54,
     "structure": "MILO"
   },
   {
     "id": 164,
-    "nom_agence": "MISSION LOCALE DU BASSIN DE SARREGUEMINES",
+    "nom_agence": "57 - Mission Locale Du Bassin De Sarreguemines",
     "nom_region": "Grand Est",
     "code_departement": 57,
     "structure": "MILO"
   },
   {
     "id": 165,
-    "nom_agence": "Mission Locale du Bassin Graylois",
+    "nom_agence": "70 - Mission Locale Du Bassin Graylois",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 70,
     "structure": "MILO"
   },
   {
     "id": 166,
-    "nom_agence": "MISSION LOCALE DU BASSIN HOUILLER",
+    "nom_agence": "57 - Mission Locale Du Bassin Houiller",
     "nom_region": "Grand Est",
     "code_departement": 57,
     "structure": "MILO"
   },
   {
     "id": 167,
-    "nom_agence": "MISSION LOCALE DU BERGERACOIS",
+    "nom_agence": "24 - Mission Locale Du Bergeracois",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 24,
     "structure": "MILO"
   },
   {
     "id": 168,
-    "nom_agence": "MISSION LOCALE DU BESSIN AU VIROIS",
+    "nom_agence": "14 - Mission Locale Du Bocage Au Bessin",
     "nom_region": "Normandie",
     "code_departement": 14,
     "structure": "MILO"
   },
   {
     "id": 169,
-    "nom_agence": "Mission Locale du Biterrois",
+    "nom_agence": "34 - Mission Locale Du Biterrois",
     "nom_region": "Occitanie",
     "code_departement": 34,
     "structure": "MILO"
   },
   {
     "id": 170,
-    "nom_agence": "Mission Locale du Blaisois",
+    "nom_agence": "41 - Mission Locale Du Blaisois",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 41,
     "structure": "MILO"
   },
   {
     "id": 171,
-    "nom_agence": "MISSION LOCALE DU CAMBRESIS",
+    "nom_agence": "59 - Mission Locale Du Cambresis",
     "nom_region": "Hauts-de-France",
     "code_departement": 59,
     "structure": "MILO"
   },
   {
     "id": 172,
-    "nom_agence": "MISSION LOCALE DU CENTRE MANCHE",
+    "nom_agence": "50 - Mission Locale Du Centre Manche",
     "nom_region": "Normandie",
     "code_departement": 50,
     "structure": "MILO"
   },
   {
     "id": 173,
-    "nom_agence": "MISSION LOCALE du CHALONNAIS",
+    "nom_agence": "71 - Mission Locale Du Chalonnais",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 71,
     "structure": "MILO"
   },
   {
     "id": 174,
-    "nom_agence": "Mission Locale du Charolais",
+    "nom_agence": "71 - Mission Locale Du Charolais",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 71,
     "structure": "MILO"
   },
   {
     "id": 175,
-    "nom_agence": "Mission Locale du Choletais",
+    "nom_agence": "49 - Mission Locale Du Choletais",
     "nom_region": "Pays de la Loire",
     "code_departement": 49,
     "structure": "MILO"
   },
   {
     "id": 176,
-    "nom_agence": "Mission Locale du Clermontois",
+    "nom_agence": "60 - Mission Locale Du Clermontois",
     "nom_region": "Hauts-de-France",
     "code_departement": 60,
     "structure": "MILO"
   },
   {
     "id": 177,
-    "nom_agence": "Mission Locale du Comtat Venaissin",
+    "nom_agence": "84 - Mission Locale Du Comtat Venaissin",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 84,
     "structure": "MILO"
   },
   {
     "id": 178,
-    "nom_agence": "MISSION LOCALE DU COTENTIN",
+    "nom_agence": "50 - Mission Locale Du Cotentin",
     "nom_region": "Normandie",
     "code_departement": 50,
     "structure": "MILO"
   },
   {
     "id": 179,
-    "nom_agence": "Mission Locale du Coudon au Gapeau",
+    "nom_agence": "83 - Mission Locale Du Coudon Au Gapeau",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 83,
     "structure": "MILO"
   },
   {
     "id": 180,
-    "nom_agence": "MISSION LOCALE DU DOUAISIS",
+    "nom_agence": "59 - Mission Locale Du Douaisis",
     "nom_region": "Hauts-de-France",
     "code_departement": 59,
     "structure": "MILO"
   },
   {
     "id": 181,
-    "nom_agence": "MISSION LOCALE DU DROUAIS",
+    "nom_agence": "28 - Mission Locale Du Drouais",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 28,
     "structure": "MILO"
   },
   {
     "id": 182,
-    "nom_agence": "MISSION LOCALE DU FOREZ",
+    "nom_agence": "42 - Mission Locale Du Forez",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 42,
     "structure": "MILO"
   },
   {
     "id": 183,
-    "nom_agence": "Mission Locale du Genevois Haut Savoyard",
+    "nom_agence": "74 - Mission Locale Du Genevois Haut Savoyard",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 74,
     "structure": "MILO"
   },
   {
     "id": 184,
-    "nom_agence": "Mission Locale du Golfe de St Tropez",
+    "nom_agence": "83 - Mission Locale Du Golfe De St Tropez",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 83,
     "structure": "MILO"
   },
   {
     "id": 185,
-    "nom_agence": "MISSION LOCALE DU GRAND NANCY",
+    "nom_agence": "54 - Mission Locale Du Grand Nancy",
     "nom_region": "Grand Est",
     "code_departement": 54,
     "structure": "MILO"
   },
   {
     "id": 186,
-    "nom_agence": "MISSION LOCALE DU GRAND PERIGUEUX",
+    "nom_agence": "24 - Mission Locale Du Grand Perigueux",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 24,
     "structure": "MILO"
   },
   {
     "id": 187,
-    "nom_agence": "MISSION LOCALE DU HAUT BOCAGE",
+    "nom_agence": "85 - Mission Locale Du Haut Bocage",
     "nom_region": "Pays de la Loire",
     "code_departement": 85,
     "structure": "MILO"
   },
   {
     "id": 188,
-    "nom_agence": "MISSION LOCALE DU HAUT PERIGORD",
+    "nom_agence": "24 - Mission Locale Du Haut Perigord",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 24,
     "structure": "MILO"
   },
   {
     "id": 189,
-    "nom_agence": "Mission Locale du Haut Vaucluse",
+    "nom_agence": "84 - Mission Locale Du Haut Vaucluse",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 84,
     "structure": "MILO"
   },
   {
     "id": 190,
-    "nom_agence": "MISSION LOCALE DU LIBOURNAIS",
+    "nom_agence": "33 - Mission Locale Du Libournais",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 33,
     "structure": "MILO"
   },
   {
     "id": 191,
-    "nom_agence": "mission locale du livradois-forez",
+    "nom_agence": "63 - Mission Locale Du Livradois-Forez",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 63,
     "structure": "MILO"
   },
   {
     "id": 192,
-    "nom_agence": "Mission Locale du Lot",
+    "nom_agence": "46 - Mission Locale Du Lot",
     "nom_region": "Occitanie",
     "code_departement": 46,
     "structure": "MILO"
   },
   {
     "id": 193,
-    "nom_agence": "Mission Locale du Luberon",
+    "nom_agence": "84 - Mission Locale Du Luberon",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 84,
     "structure": "MILO"
   },
   {
     "id": 194,
-    "nom_agence": "MISSION LOCALE DU LUNEVILLOIS",
+    "nom_agence": "54 - Mission Locale Du Lunevillois",
     "nom_region": "Grand Est",
     "code_departement": 54,
     "structure": "MILO"
   },
   {
     "id": 195,
-    "nom_agence": "Mission Locale du Mantois",
+    "nom_agence": "78 - Mission Locale Du Mantois",
     "nom_region": "Île-de-France",
     "code_departement": 78,
     "structure": "MILO"
   },
   {
     "id": 196,
-    "nom_agence": "MISSION LOCALE DU MEDOC",
+    "nom_agence": "33 - Mission Locale Du Medoc",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 33,
     "structure": "MILO"
   },
   {
     "id": 197,
-    "nom_agence": "Mission Locale du Migennois et du Jovinien",
+    "nom_agence": "89 - Mission Locale Du Migennois Et Du Jovinien",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 89,
     "structure": "MILO"
   },
   {
     "id": 198,
-    "nom_agence": "Mission Locale du Nord Meusien",
+    "nom_agence": "55 - Mission Locale Du Nord Meusien",
     "nom_region": "Grand Est",
     "code_departement": 55,
     "structure": "MILO"
   },
   {
     "id": 199,
-    "nom_agence": "Mission Locale du Nord Mosellan",
+    "nom_agence": "57 - Mission Locale Du Nord Mosellan",
     "nom_region": "Grand Est",
     "code_departement": 57,
     "structure": "MILO"
   },
   {
     "id": 200,
-    "nom_agence": "Mission Locale du Nord Ouest Aubois",
+    "nom_agence": "10 - Mission Locale Du Nord Ouest Aubois",
     "nom_region": "Grand Est",
     "code_departement": 10,
     "structure": "MILO"
   },
   {
     "id": 201,
-    "nom_agence": "Mission locale du nord-est 77",
+    "nom_agence": "77 - Mission Locale Du Nord-Est 77",
     "nom_region": "Île-de-France",
     "code_departement": 77,
     "structure": "MILO"
   },
   {
     "id": 202,
-    "nom_agence": "MISSION LOCALE DU PAYS BOULONNAIS",
+    "nom_agence": "62 - Mission Locale Du Pays Boulonnais",
     "nom_region": "Hauts-de-France",
     "code_departement": 62,
     "structure": "MILO"
   },
   {
     "id": 203,
-    "nom_agence": "MISSION LOCALE DU PAYS COMPIEGNOIS ET DU PAYS DES SOURCES",
+    "nom_agence": "60 - Mission Locale Du Pays Compiegnois Et Du Pays Des Sources",
     "nom_region": "Hauts-de-France",
     "code_departement": 60,
     "structure": "MILO"
   },
   {
     "id": 204,
-    "nom_agence": "Mission Locale du Pays d' Ancenis",
+    "nom_agence": "44 - Mission Locale Du Pays D' Ancenis",
     "nom_region": "Pays de la Loire",
     "code_departement": 44,
     "structure": "MILO"
   },
   {
     "id": 205,
-    "nom_agence": "MISSION LOCALE DU PAYS D'ALENCON",
+    "nom_agence": "61 - Mission Locale Du Pays D'Alencon",
     "nom_region": "Normandie",
     "code_departement": 61,
     "structure": "MILO"
   },
   {
     "id": 206,
-    "nom_agence": "Mission Locale du Pays de Brest",
+    "nom_agence": "29 - Mission Locale Du Pays De Brest",
     "nom_region": "Bretagne",
     "code_departement": 29,
     "structure": "MILO"
   },
   {
     "id": 207,
-    "nom_agence": "Mission Locale du Pays de Caux Vallée de Seine",
+    "nom_agence": "76 - Mission Locale Du Pays De Caux Vallée De Seine",
     "nom_region": "Normandie",
     "code_departement": 76,
     "structure": "MILO"
   },
   {
     "id": 208,
-    "nom_agence": "Mission Locale du Pays de Cornouaille",
+    "nom_agence": "29 - Mission Locale Du Pays De Cornouaille",
     "nom_region": "Bretagne",
     "code_departement": 29,
     "structure": "MILO"
   },
   {
     "id": 209,
-    "nom_agence": "MISSION LOCALE DU PAYS DE COUTANCES",
+    "nom_agence": "50 - Mission Locale Du Pays De Coutances",
     "nom_region": "Normandie",
     "code_departement": 50,
     "structure": "MILO"
   },
   {
     "id": 210,
-    "nom_agence": "Mission Locale du Pays de Remiremont et de ses Vallées",
+    "nom_agence": "88 - Mission Locale Du Pays De Remiremont Et De Ses Vallées",
     "nom_region": "Grand Est",
     "code_departement": 88,
     "structure": "MILO"
   },
   {
     "id": 211,
-    "nom_agence": "Mission Locale du Pays de Retz",
+    "nom_agence": "44 - Mission Locale Du Pays De Retz",
     "nom_region": "Pays de la Loire",
     "code_departement": 44,
     "structure": "MILO"
   },
   {
     "id": 212,
-    "nom_agence": "MISSION LOCALE DU PAYS DE SAVERNE PLAINE ET PLATEAU",
+    "nom_agence": "67 - Mission Locale Du Pays De Saverne Plaine Et Plateau",
     "nom_region": "Grand Est",
     "code_departement": 67,
     "structure": "MILO"
   },
   {
     "id": 213,
-    "nom_agence": "Mission Locale du Pays de Vannes",
+    "nom_agence": "56 - Mission Locale Du Pays De Vannes",
     "nom_region": "Bretagne",
     "code_departement": 56,
     "structure": "MILO"
   },
   {
     "id": 214,
-    "nom_agence": "Mission Locale du Pays Messin",
+    "nom_agence": "57 - Mission Locale Du Pays Messin",
     "nom_region": "Grand Est",
     "code_departement": 57,
     "structure": "MILO"
   },
   {
     "id": 215,
-    "nom_agence": "Mission Locale du pays Nevers sud Nivernais",
+    "nom_agence": "58 - Mission Locale Du Pays Nevers Sud Nivernais",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 58,
     "structure": "MILO"
   },
   {
     "id": 216,
-    "nom_agence": "mission locale du pays salonais",
+    "nom_agence": "13 - Mission Locale Du Pays Salonais",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 13,
     "structure": "MILO"
   },
   {
     "id": 217,
-    "nom_agence": "MISSION LOCALE DU PAYS VILLENEUVOIS",
+    "nom_agence": "47 - Mission Locale Du Pays Villeneuvois",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 47,
     "structure": "MILO"
   },
   {
     "id": 218,
-    "nom_agence": "Mission Locale du Pays Yonnais",
+    "nom_agence": "85 - Mission Locale Du Pays Yonnais",
     "nom_region": "Pays de la Loire",
     "code_departement": 85,
     "structure": "MILO"
   },
   {
     "id": 219,
-    "nom_agence": "MISSION LOCALE DU PERIGORD NOIR",
+    "nom_agence": "24 - Mission Locale Du Perigord Noir",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 24,
     "structure": "MILO"
   },
   {
     "id": 220,
-    "nom_agence": "Mission Locale du Provinois",
+    "nom_agence": "77 - Mission Locale Du Provinois",
     "nom_region": "Île-de-France",
     "code_departement": 77,
     "structure": "MILO"
   },
   {
     "id": 221,
-    "nom_agence": "Mission Locale du Saumurois",
+    "nom_agence": "49 - Mission Locale Du Saumurois",
     "nom_region": "Pays de la Loire",
     "code_departement": 49,
     "structure": "MILO"
   },
   {
     "id": 222,
-    "nom_agence": "Mission Locale du Segreen",
+    "nom_agence": "49 - Mission Locale Du Segreen",
     "nom_region": "Pays de la Loire",
     "code_departement": 49,
     "structure": "MILO"
   },
   {
     "id": 223,
-    "nom_agence": "MISSION LOCALE DU SUD MANCHE",
+    "nom_agence": "50 - Mission Locale Du Sud Manche",
     "nom_region": "Normandie",
     "code_departement": 50,
     "structure": "MILO"
   },
   {
     "id": 224,
-    "nom_agence": "MISSION LOCALE DU SUD MEUSIEN",
+    "nom_agence": "55 - Mission Locale Du Sud Meusien",
     "nom_region": "Grand Est",
     "code_departement": 55,
     "structure": "MILO"
   },
   {
     "id": 225,
-    "nom_agence": "MISSION LOCALE DU SUD MOSELLAN",
+    "nom_agence": "57 - Mission Locale Du Sud Mosellan",
     "nom_region": "Grand Est",
     "code_departement": 57,
     "structure": "MILO"
   },
   {
     "id": 226,
-    "nom_agence": "MISSION LOCALE DU TARN & GARONNE",
+    "nom_agence": "82 - Mission Locale Du Tarn & Garonne",
     "nom_region": "Occitanie",
     "code_departement": 82,
     "structure": "MILO"
   },
   {
     "id": 227,
-    "nom_agence": "MISSION LOCALE DU TERRITOIRE DE BELFORT",
+    "nom_agence": "90 - Mission Locale Du Territoire De Belfort",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 90,
     "structure": "MILO"
   },
   {
     "id": 228,
-    "nom_agence": "Mission Locale du Velay",
+    "nom_agence": "43 - Mission Locale Du Velay",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 43,
     "structure": "MILO"
   },
   {
     "id": 229,
-    "nom_agence": "MISSION LOCALE DU VENDOMOIS",
+    "nom_agence": "41 - Mission Locale Du Vendomois",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 41,
     "structure": "MILO"
   },
   {
     "id": 230,
-    "nom_agence": "Mission Locale du Vignoble Nantais",
+    "nom_agence": "44 - Mission Locale Du Vignoble Nantais",
     "nom_region": "Pays de la Loire",
     "code_departement": 44,
     "structure": "MILO"
   },
   {
     "id": 231,
-    "nom_agence": "MISSION LOCALE ELBEUF",
+    "nom_agence": "76 - Mission Locale Elbeuf",
     "nom_region": "Normandie",
     "code_departement": 76,
     "structure": "MILO"
   },
   {
     "id": 232,
-    "nom_agence": "MISSION LOCALE EN PAYS D'ARTOIS",
+    "nom_agence": "62 - Mission Locale En Pays D'Artois",
     "nom_region": "Hauts-de-France",
     "code_departement": 62,
     "structure": "MILO"
   },
   {
     "id": 233,
-    "nom_agence": "Mission Locale Espace Jeunes de Vichy et sa Région",
+    "nom_agence": "3 - Mission Locale Espace Jeunes De Vichy Et Sa Région",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 3,
     "structure": "MILO"
   },
   {
     "id": 234,
-    "nom_agence": "mission locale est",
+    "nom_agence": "97 - Mission Locale Est",
     "nom_region": "La Réunion",
     "code_departement": 974,
     "structure": "MILO"
   },
   {
     "id": 235,
-    "nom_agence": "Mission Locale EST 06",
+    "nom_agence": "6 - Mission Locale Est 06",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 6,
     "structure": "MILO"
   },
   {
     "id": 236,
-    "nom_agence": "Mission Locale Est Etang de Berre",
+    "nom_agence": "13 - Mission Locale Est Etang De Berre",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 13,
     "structure": "MILO"
   },
   {
     "id": 237,
-    "nom_agence": "Mission Locale Est-VAR",
+    "nom_agence": "83 - Mission Locale Est-Var",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 83,
     "structure": "MILO"
   },
   {
     "id": 238,
-    "nom_agence": "Mission Locale Gagny/Villemomble/les Pavillons-sous-Bois",
+    "nom_agence": "93 - Mission Locale Gagny/Villemomble/Les Pavillons-Sous-Bois",
     "nom_region": "Île-de-France",
     "code_departement": 93,
     "structure": "MILO"
   },
   {
     "id": 239,
-    "nom_agence": "MISSION LOCALE GIER PILAT",
+    "nom_agence": "42 - Mission Locale Gier Pilat",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 42,
     "structure": "MILO"
   },
   {
     "id": 240,
-    "nom_agence": "Mission Locale Grésivaudan-Alpes-Métropole",
+    "nom_agence": "38 - Mission Locale Grésivaudan-Alpes-Métropole",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 38,
     "structure": "MILO"
   },
   {
     "id": 241,
-    "nom_agence": "Mission Locale Haut-Doubs",
+    "nom_agence": "25 - Mission Locale Haut-Doubs",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 25,
     "structure": "MILO"
   },
   {
     "id": 242,
-    "nom_agence": "Mission Locale Haute-Garonne",
+    "nom_agence": "31 - Mission Locale Haute-Garonne",
     "nom_region": "Occitanie",
     "code_departement": 31,
     "structure": "MILO"
   },
   {
     "id": 243,
-    "nom_agence": "Mission Locale Indre Sud",
+    "nom_agence": "36 - Mission Locale Indre Sud",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 36,
     "structure": "MILO"
   },
   {
     "id": 244,
-    "nom_agence": "Mission Locale INNOVAM",
+    "nom_agence": "94 - Mission Locale Innovam",
     "nom_region": "Île-de-France",
     "code_departement": 94,
     "structure": "MILO"
   },
   {
     "id": 245,
-    "nom_agence": "Mission Locale Insertion Formation Emploi du Grand Amiénois",
+    "nom_agence": "80 - Mission Locale Insertion Formation Emploi Du Grand Amiénois",
     "nom_region": "Hauts-de-France",
     "code_departement": 80,
     "structure": "MILO"
   },
   {
     "id": 246,
-    "nom_agence": "Mission Locale Intercommunale de Sartrouville",
+    "nom_agence": "78 - Mission Locale Intercommunale De Sartrouville",
     "nom_region": "Île-de-France",
     "code_departement": 78,
     "structure": "MILO"
   },
   {
     "id": 247,
-    "nom_agence": "MISSION LOCALE INTERCOMMUNALE DE VERSAILLES",
+    "nom_agence": "78 - Mission Locale Intercommunale De Versailles",
     "nom_region": "Île-de-France",
     "code_departement": 78,
     "structure": "MILO"
   },
   {
     "id": 248,
-    "nom_agence": "mission locale intercommunale des mureaux",
+    "nom_agence": "78 - Mission Locale Intercommunale Des Mureaux",
     "nom_region": "Île-de-France",
     "code_departement": 78,
     "structure": "MILO"
   },
   {
     "id": 249,
-    "nom_agence": "Mission Locale Jeune Ariege",
+    "nom_agence": "9 - Mission Locale Jeune Ariege",
     "nom_region": "Occitanie",
     "code_departement": 9,
     "structure": "MILO"
   },
   {
     "id": 250,
-    "nom_agence": "Mission Locale Jeunes",
+    "nom_agence": "38 - Mission Locale Jeunes",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 38,
     "structure": "MILO"
   },
   {
     "id": 251,
-    "nom_agence": "Mission Locale Jeunes Albertville-Tarentaise",
+    "nom_agence": "73 - Mission Locale Jeunes Albertville-Tarentaise",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 73,
     "structure": "MILO"
   },
   {
     "id": 252,
-    "nom_agence": "Mission Locale Jeunes Bresse Dombes Côtière",
+    "nom_agence": "1 - Mission Locale Jeunes Bresse Dombes Côtière",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 1,
     "structure": "MILO"
   },
   {
     "id": 253,
-    "nom_agence": "MISSION LOCALE JEUNES DE CHATEAUROUX",
+    "nom_agence": "36 - Mission Locale Jeunes De Chateauroux",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 36,
     "structure": "MILO"
   },
   {
     "id": 254,
-    "nom_agence": "Mission Locale Jeunes des Pyrénées Orientales",
+    "nom_agence": "66 - Mission Locale Jeunes Des Pyrénées Orientales",
     "nom_region": "Occitanie",
     "code_departement": 66,
     "structure": "MILO"
   },
   {
     "id": 255,
-    "nom_agence": "Mission Locale Jeunes des Territoires de Mourenx Oloron Orthez",
+    "nom_agence": "64 - Mission Locale Jeunes Des Territoires De Mourenx Oloron Orthez",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 64,
     "structure": "MILO"
   },
   {
     "id": 256,
-    "nom_agence": "Mission Locale Jeunes du Bassin Annécien",
+    "nom_agence": "74 - Mission Locale Jeunes Du Bassin Annécien",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 74,
     "structure": "MILO"
   },
   {
     "id": 257,
-    "nom_agence": "mission locale jeunes du bassin chamberien",
+    "nom_agence": "73 - Mission Locale Jeunes Du Bassin Chamberien",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 73,
     "structure": "MILO"
   },
   {
     "id": 258,
-    "nom_agence": "Mission Locale Jeunes du Grand Narbonne",
+    "nom_agence": "11 - Mission Locale Jeunes Du Grand Narbonne",
     "nom_region": "Occitanie",
     "code_departement": 11,
     "structure": "MILO"
   },
   {
     "id": 259,
-    "nom_agence": "MISSION LOCALE JEUNES DU PAYS DE VIERZON",
+    "nom_agence": "18 - Mission Locale Jeunes Du Pays De Vierzon",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 18,
     "structure": "MILO"
   },
   {
     "id": 260,
-    "nom_agence": "MISSION LOCALE JEUNES DU VALENCIENNOIS",
+    "nom_agence": "59 - Mission Locale Jeunes Du Valenciennois",
     "nom_region": "Hauts-de-France",
     "code_departement": 59,
     "structure": "MILO"
   },
   {
     "id": 261,
-    "nom_agence": "Mission Locale Jeunes Faucigny Mont-Blanc",
+    "nom_agence": "74 - Mission Locale Jeunes Faucigny Mont-Blanc",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 74,
     "structure": "MILO"
   },
   {
     "id": 262,
-    "nom_agence": "Mission Locale Jeunes Grand Avignon",
+    "nom_agence": "84 - Mission Locale Jeunes Grand Avignon",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 84,
     "structure": "MILO"
   },
   {
     "id": 263,
-    "nom_agence": "Mission Locale Jeunes Ondaine et Haut Pilat",
+    "nom_agence": "42 - Mission Locale Jeunes Ondaine Et Haut Pilat",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 42,
     "structure": "MILO"
   },
   {
     "id": 264,
-    "nom_agence": "MISSION LOCALE JEUNES PAYS DE MAURIENNE",
+    "nom_agence": "73 - Mission Locale Jeunes Pays De Maurienne",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 73,
     "structure": "MILO"
   },
   {
     "id": 265,
-    "nom_agence": "Mission Locale Jeunes Saint-Marcellin Vercors Isère",
+    "nom_agence": "38 - Mission Locale Jeunes Saint-Marcellin Vercors Isère",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 38,
     "structure": "MILO"
   },
   {
     "id": 266,
-    "nom_agence": "MISSION LOCALE LISIEUX NORMANDIE",
+    "nom_agence": "14 - Mission Locale Lisieux Normandie",
     "nom_region": "Normandie",
     "code_departement": 14,
     "structure": "MILO"
   },
   {
     "id": 267,
-    "nom_agence": "MISSION LOCALE LOIRE TOURAINE",
+    "nom_agence": "37 - Mission Locale Loire Touraine",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 37,
     "structure": "MILO"
   },
   {
     "id": 268,
-    "nom_agence": "MISSION LOCALE LOUVIERS-VAL DE REUIL-ANDELLE",
+    "nom_agence": "27 - Mission Locale Louviers-Val De Reuil-Andelle",
     "nom_region": "Normandie",
     "code_departement": 27,
     "structure": "MILO"
   },
   {
     "id": 269,
-    "nom_agence": "MISSION LOCALE LYS-TOURCOING",
+    "nom_agence": "59 - Mission Locale Lys-Tourcoing",
     "nom_region": "Hauts-de-France",
     "code_departement": 59,
     "structure": "MILO"
   },
   {
     "id": 270,
-    "nom_agence": "Mission Locale Maisons Alfort Charenton St Maur St Maurice",
+    "nom_agence": "94 - Mission Locale Maisons Alfort Charenton St Maur St Maurice",
     "nom_region": "Île-de-France",
     "code_departement": 94,
     "structure": "MILO"
   },
   {
     "id": 271,
-    "nom_agence": "Mission Locale Métropole Est",
+    "nom_agence": "59 - Mission Locale Métropole Est",
     "nom_region": "Hauts-de-France",
     "code_departement": 59,
     "structure": "MILO"
   },
   {
     "id": 272,
-    "nom_agence": "MISSION LOCALE METROPOLE NORD-OUEST",
+    "nom_agence": "59 - Mission Locale Metropole Nord-Ouest",
     "nom_region": "Hauts-de-France",
     "code_departement": 59,
     "structure": "MILO"
   },
   {
     "id": 273,
-    "nom_agence": "Mission locale Métropole Sud",
+    "nom_agence": "59 - Mission Locale Métropole Sud",
     "nom_region": "Hauts-de-France",
     "code_departement": 59,
     "structure": "MILO"
   },
   {
     "id": 274,
-    "nom_agence": "MISSION LOCALE MOLSHEIM",
+    "nom_agence": "67 - Mission Locale Molsheim",
     "nom_region": "Grand Est",
     "code_departement": 67,
     "structure": "MILO"
   },
   {
     "id": 275,
-    "nom_agence": "MISSION LOCALE MONTREUIL - CÃ”TE D'OPALE",
+    "nom_agence": "62 - Mission Locale De Montreuil - Côte D'Opale",
     "nom_region": "Hauts-de-France",
     "code_departement": 62,
     "structure": "MILO"
   },
   {
     "id": 276,
-    "nom_agence": "MISSION LOCALE MORLAIX",
+    "nom_agence": "29 - Mission Locale Morlaix",
     "nom_region": "Bretagne",
     "code_departement": 29,
     "structure": "MILO"
   },
   {
     "id": 277,
-    "nom_agence": "Mission Locale Moyenne Garonne",
+    "nom_agence": "47 - Mission Locale Moyenne Garonne",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 47,
     "structure": "MILO"
   },
   {
     "id": 278,
-    "nom_agence": "Mission Locale Nice Côte d'Azur",
+    "nom_agence": "6 - Mission Locale Nice Côte D'Azur",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 6,
     "structure": "MILO"
   },
   {
     "id": 279,
-    "nom_agence": "MISSION LOCALE NIVERNAIS MORVAN",
+    "nom_agence": "58 - Mission Locale Nivernais Morvan",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 58,
     "structure": "MILO"
   },
   {
     "id": 280,
-    "nom_agence": "Mission locale nord",
+    "nom_agence": "97 - Mission Locale Nord",
     "nom_region": "La Réunion",
     "code_departement": 974,
     "structure": "MILO"
   },
   {
     "id": 281,
-    "nom_agence": "Mission Locale Nord Atlantique",
+    "nom_agence": "44 - Mission Locale Nord Atlantique",
     "nom_region": "Pays de la Loire",
     "code_departement": 44,
     "structure": "MILO"
   },
   {
     "id": 282,
-    "nom_agence": "Mission Locale Nord Essonne",
+    "nom_agence": "91 - Mission Locale Nord Essonne",
     "nom_region": "Île-de-France",
     "code_departement": 91,
     "structure": "MILO"
   },
   {
     "id": 283,
-    "nom_agence": "MISSION LOCALE NORD ISERE",
+    "nom_agence": "38 - Mission Locale Nord Isere",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 38,
     "structure": "MILO"
   },
   {
     "id": 284,
-    "nom_agence": "MISSION LOCALE NORD MARTINIQUE",
+    "nom_agence": "97 - Mission Locale Nord Martinique",
     "nom_region": "Martinique",
     "code_departement": 972,
     "structure": "MILO"
   },
   {
     "id": 285,
-    "nom_agence": "Mission Locale Nord Val d'Oise",
+    "nom_agence": "95 - Mission Locale Nord Val D'Oise",
     "nom_region": "Île-de-France",
     "code_departement": 95,
     "structure": "MILO"
   },
   {
     "id": 286,
-    "nom_agence": "Mission Locale Nord Vienne",
+    "nom_agence": "86 - Mission Locale Nord Vienne",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 86,
     "structure": "MILO"
   },
   {
     "id": 287,
-    "nom_agence": "Mission Locale Nyons",
+    "nom_agence": "26 - Mission Locale Nyons",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 26,
     "structure": "MILO"
   },
   {
     "id": 288,
-    "nom_agence": "MISSION LOCALE OUEST ET SUD EURE ET LOIR",
+    "nom_agence": "28 - Mission Locale Ouest Et Sud Eure Et Loir",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 28,
     "structure": "MILO"
   },
   {
     "id": 289,
-    "nom_agence": "mission locale ouest eure",
+    "nom_agence": "27 - Mission Locale Ouest Eure",
     "nom_region": "Normandie",
     "code_departement": 27,
     "structure": "MILO"
   },
   {
     "id": 290,
-    "nom_agence": "mission locale ouest haut var",
+    "nom_agence": "83 - Mission Locale Ouest Haut Var",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 83,
     "structure": "MILO"
   },
   {
     "id": 291,
-    "nom_agence": "Mission locale Paris-Vallée de la Marne",
+    "nom_agence": "77 - Mission Locale Paris-Vallée De La Marne",
     "nom_region": "Île-de-France",
     "code_departement": 77,
     "structure": "MILO"
   },
   {
     "id": 292,
-    "nom_agence": "MISSION LOCALE PAYS D'EVREUX ET EURE SUD",
+    "nom_agence": "27 - Mission Locale Pays D'Evreux Et Eure Sud",
     "nom_region": "Normandie",
     "code_departement": 27,
     "structure": "MILO"
   },
   {
     "id": 293,
-    "nom_agence": "Mission Locale Pays de Martigues Côte Bleue",
+    "nom_agence": "13 - Mission Locale Pays De Martigues Côte Bleue",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 13,
     "structure": "MILO"
   },
   {
     "id": 294,
-    "nom_agence": "Mission Locale Pays de Saint-Malo",
+    "nom_agence": "35 - Mission Locale Pays De Saint-Malo",
     "nom_region": "Bretagne",
     "code_departement": 35,
     "structure": "MILO"
   },
   {
     "id": 295,
-    "nom_agence": "Mission locale Plateau Nord Val de Saône",
+    "nom_agence": "69 - Mission Locale Plateau Nord Val De Saône",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 69,
     "structure": "MILO"
   },
   {
     "id": 296,
-    "nom_agence": "MISSION LOCALE PORTO-VECCHIO SUD CORSE",
+    "nom_agence": "20 - Mission Locale Porto-Vecchio Sud Corse",
     "nom_region": "Corse",
     "code_departement": 20,
     "structure": "MILO"
   },
   {
     "id": 297,
-    "nom_agence": "MISSION LOCALE POUR L'EMPLOI",
+    "nom_agence": "67 - Mission Locale Pour L'Emploi De Strasbourg",
     "nom_region": "Grand Est",
     "code_departement": 67,
     "structure": "MILO"
   },
   {
     "id": 298,
-    "nom_agence": "mission locale pour l'emploi des jeunes de bondy",
+    "nom_agence": "93 - Mission Locale Pour L'Emploi Des Jeunes De Bondy",
     "nom_region": "Île-de-France",
     "code_departement": 93,
     "structure": "MILO"
   },
   {
     "id": 299,
-    "nom_agence": "Mission locale pour l'emploi du gers",
+    "nom_agence": "32 - Mission Locale Pour L'Emploi Du Gers",
     "nom_region": "Occitanie",
     "code_departement": 32,
     "structure": "MILO"
   },
   {
     "id": 300,
-    "nom_agence": "Mission Locale pour l'Emploi en Thiérache",
+    "nom_agence": "2 - Mission Locale Pour L'Emploi En Thiérache",
     "nom_region": "Hauts-de-France",
     "code_departement": 2,
     "structure": "MILO"
   },
   {
     "id": 301,
-    "nom_agence": "MISSION LOCALE POUR L'INSERTION SOCIALE ET PROFESSIONNELLE DES JEUNES DE LA BRESSE LOUHANNAISE",
+    "nom_agence": "71 - Mission Locale Pour L'Insertion Sociale Et Professionnelle Des Jeunes De La Bresse Louhannaise",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 71,
     "structure": "MILO"
   },
   {
     "id": 302,
-    "nom_agence": "MISSION LOCALE POUR LES JEUNES PAU PYRENEES",
+    "nom_agence": "64 - Mission Locale Pour Les Jeunes Pau Pyrenees",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 64,
     "structure": "MILO"
   },
   {
     "id": 303,
-    "nom_agence": "Mission Locale Réseaux pour l'emploi pays de Lorient",
+    "nom_agence": "56 - Mission Locale Réseaux Pour L'Emploi Pays De Lorient",
     "nom_region": "Bretagne",
     "code_departement": 56,
     "structure": "MILO"
   },
   {
     "id": 304,
-    "nom_agence": "Mission Locale Rhône Sud",
+    "nom_agence": "69 - Mission Locale Rhône Sud",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 69,
     "structure": "MILO"
   },
   {
     "id": 305,
-    "nom_agence": "Mission Locale Rhône Sud-Est",
+    "nom_agence": "69 - Mission Locale Rhône Sud-Est",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 69,
     "structure": "MILO"
   },
   {
     "id": 306,
-    "nom_agence": "MISSION LOCALE RIBERACOIS VALLEE DE L'ISLE",
+    "nom_agence": "24 - Mission Locale Riberacois Vallee De L'Isle",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 24,
     "structure": "MILO"
   },
   {
     "id": 307,
-    "nom_agence": "Mission Locale Riom Limagne Combrailles",
+    "nom_agence": "63 - Mission Locale Riom Limagne Combrailles",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 63,
     "structure": "MILO"
   },
   {
     "id": 308,
-    "nom_agence": "MISSION LOCALE ROUBAIX LYS LEZ LANNOY",
+    "nom_agence": "59 - Mission Locale Roubaix Lys Lez Lannoy",
     "nom_region": "Hauts-de-France",
     "code_departement": 59,
     "structure": "MILO"
   },
   {
     "id": 309,
-    "nom_agence": "Mission Locale Rurale de la Haute Vienne",
+    "nom_agence": "87 - Mission Locale Rurale De La Haute Vienne",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 87,
     "structure": "MILO"
   },
   {
     "id": 310,
-    "nom_agence": "MISSION LOCALE RURALE DES MARCHES DE BOURGOGNE",
+    "nom_agence": "21 - Mission Locale Rurale Des Marches De Bourgogne",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 21,
     "structure": "MILO"
   },
   {
     "id": 311,
-    "nom_agence": "MISSION LOCALE RURALE DU GRAND PLATEAU PICARD",
+    "nom_agence": "60 - Mission Locale Rurale Du Grand Plateau Picard",
     "nom_region": "Hauts-de-France",
     "code_departement": 60,
     "structure": "MILO"
   },
   {
     "id": 312,
-    "nom_agence": "Mission Locale Rurale du Talou",
+    "nom_agence": "76 - Mission Locale Rurale Du Talou",
     "nom_region": "Normandie",
     "code_departement": 76,
     "structure": "MILO"
   },
   {
     "id": 313,
-    "nom_agence": "Mission Locale Rurale du Tonnerrois et de l'Avallonnais",
+    "nom_agence": "89 - Mission Locale Rurale Du Tonnerrois Et De L'Avallonnais",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 89,
     "structure": "MILO"
   },
   {
     "id": 314,
-    "nom_agence": "mission locale rurale nord ouest rhone",
+    "nom_agence": "69 - Mission Locale Rurale Nord Ouest Rhone",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 69,
     "structure": "MILO"
   },
   {
     "id": 315,
-    "nom_agence": "Mission Locale Saint Etienne et Couronne Stéphanoise",
+    "nom_agence": "42 - Mission Locale Saint Etienne Et Couronne Stéphanoise",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 42,
     "structure": "MILO"
   },
   {
     "id": 316,
-    "nom_agence": "Mission Locale Saint-Denis / Pierrefitte",
+    "nom_agence": "93 - Mission Locale Saint-Denis / Pierrefitte",
     "nom_region": "Île-de-France",
     "code_departement": 93,
     "structure": "MILO"
   },
   {
     "id": 317,
-    "nom_agence": "Mission Locale Saintes",
+    "nom_agence": "17 - Mission Locale Saintes",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 17,
     "structure": "MILO"
   },
   {
     "id": 318,
-    "nom_agence": "MISSION LOCALE SANCERRE-SOLOGNE",
+    "nom_agence": "18 - Mission Locale Sancerre-Sologne",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 18,
     "structure": "MILO"
   },
   {
     "id": 319,
-    "nom_agence": "Mission Locale Sarthe et Loir",
+    "nom_agence": "72 - Mission Locale Sarthe Et Loir",
     "nom_region": "Pays de la Loire",
     "code_departement": 72,
     "structure": "MILO"
   },
   {
     "id": 320,
-    "nom_agence": "mission locale sedan",
+    "nom_agence": "8 - Mission Locale Sedan",
     "nom_region": "Grand Est",
     "code_departement": 8,
     "structure": "MILO"
   },
   {
     "id": 321,
-    "nom_agence": "Mission Locale Sud",
+    "nom_agence": "97 - Mission Locale Sud - Le Tampon",
     "nom_region": "La Réunion",
     "code_departement": 974,
     "structure": "MILO"
   },
   {
     "id": 322,
-    "nom_agence": "Mission Locale Sud Ardennes",
+    "nom_agence": "8 - Mission Locale Sud Ardennes",
     "nom_region": "Grand Est",
     "code_departement": 8,
     "structure": "MILO"
   },
   {
     "id": 323,
-    "nom_agence": "Mission Locale sud Essonne",
+    "nom_agence": "91 - Mission Locale Sud Essonne",
     "nom_region": "Île-de-France",
     "code_departement": 91,
     "structure": "MILO"
   },
   {
     "id": 324,
-    "nom_agence": "MISSION LOCALE SUD GIRONDE",
+    "nom_agence": "33 - Mission Locale Sud Gironde",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 33,
     "structure": "MILO"
   },
   {
     "id": 325,
-    "nom_agence": "Mission Locale Sud Isère",
+    "nom_agence": "38 - Mission Locale Sud Isère",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 38,
     "structure": "MILO"
   },
   {
     "id": 326,
-    "nom_agence": "MISSION LOCALE SUD JURA",
+    "nom_agence": "39 - Mission Locale Sud Jura",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 39,
     "structure": "MILO"
   },
   {
     "id": 327,
-    "nom_agence": "MISSION LOCALE SUD OUEST LYONNAIS",
+    "nom_agence": "69 - Mission Locale Sud Ouest Lyonnais",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 69,
     "structure": "MILO"
   },
   {
     "id": 328,
-    "nom_agence": "MISSION LOCALE SUD VENDEE FLC",
+    "nom_agence": "85 - Mission Locale Sud Vendee Flc",
     "nom_region": "Pays de la Loire",
     "code_departement": 85,
     "structure": "MILO"
   },
   {
     "id": 329,
-    "nom_agence": "Mission Locale Tarn Sud",
+    "nom_agence": "81 - Mission Locale Tarn Sud",
     "nom_region": "Occitanie",
     "code_departement": 81,
     "structure": "MILO"
   },
   {
     "id": 330,
-    "nom_agence": "MISSION LOCALE TECHNOWEST",
+    "nom_agence": "33 - Mission Locale Technowest",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 33,
     "structure": "MILO"
   },
   {
     "id": 331,
-    "nom_agence": "Mission Locale Terres de Lorraine",
+    "nom_agence": "54 - Mission Locale Terres De Lorraine",
     "nom_region": "Grand Est",
     "code_departement": 54,
     "structure": "MILO"
   },
   {
     "id": 332,
-    "nom_agence": "Mission Locale Ussel",
+    "nom_agence": "19 - Mission Locale Ussel",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 19,
     "structure": "MILO"
   },
   {
     "id": 333,
-    "nom_agence": "Mission Locale Val d'Yerres - Val de Seine",
+    "nom_agence": "91 - Mission Locale Val D'Yerres - Val De Seine",
     "nom_region": "Île-de-France",
     "code_departement": 91,
     "structure": "MILO"
   },
   {
     "id": 334,
-    "nom_agence": "MISSION LOCALE VAL DE MARQUE",
+    "nom_agence": "59 - Mission Locale Val De Marque",
     "nom_region": "Hauts-de-France",
     "code_departement": 59,
     "structure": "MILO"
   },
   {
     "id": 335,
-    "nom_agence": "MISSION LOCALE VENDEE ATLANTIQUE",
+    "nom_agence": "85 - Mission Locale Vendee Atlantique",
     "nom_region": "Pays de la Loire",
     "code_departement": 85,
     "structure": "MILO"
   },
   {
     "id": 336,
-    "nom_agence": "Mission Locale Vernon Seine Vexin",
+    "nom_agence": "27 - Mission Locale Vernon Seine Vexin",
     "nom_region": "Normandie",
     "code_departement": 27,
     "structure": "MILO"
   },
   {
     "id": 337,
-    "nom_agence": "Mission Locale VILLEFRANCHE BEAUJOLAIS",
+    "nom_agence": "69 - Mission Locale Villefranche Beaujolais",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 69,
     "structure": "MILO"
   },
   {
     "id": 338,
-    "nom_agence": "Mission Locale Villeurbanne",
+    "nom_agence": "69 - Mission Locale Villeurbanne",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 69,
     "structure": "MILO"
   },
   {
     "id": 339,
-    "nom_agence": "MISSION LOCALE WATTRELOS-LEERS",
+    "nom_agence": "59 - Mission Locale Wattrelos-Leers",
     "nom_region": "Hauts-de-France",
     "code_departement": 59,
     "structure": "MILO"
   },
   {
     "id": 340,
-    "nom_agence": "MISSION LOCALE YSSINGEAUX",
+    "nom_agence": "43 - Mission Locale Yssingeaux",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 43,
     "structure": "MILO"
   },
   {
     "id": 341,
-    "nom_agence": "MJTN",
+    "nom_agence": "81 - Mission Locale - Mission Jeunes Tarn Nord (Mjtn)",
     "nom_region": "Occitanie",
     "code_departement": 81,
     "structure": "MILO"
   },
   {
     "id": 342,
-    "nom_agence": "ml aix en provence",
+    "nom_agence": "13 - Mission Locale Aix En Provence",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 13,
     "structure": "MILO"
   },
   {
     "id": 343,
-    "nom_agence": "ml antipolis",
+    "nom_agence": "6 - Mission Locale Antipolis",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 6,
     "structure": "MILO"
   },
   {
     "id": 344,
-    "nom_agence": "ml arles",
+    "nom_agence": "13 - Mission Locale Du Delta - Arles",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 13,
     "structure": "MILO"
   },
   {
     "id": 345,
-    "nom_agence": "ML ASI Siège Vizille",
+    "nom_agence": "38 - Mission Locale Asi Siège Vizille",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 38,
     "structure": "MILO"
   },
   {
     "id": 346,
-    "nom_agence": "ML ASNIERES-SUR-SEINE/VILLENEUVE-LA-GARENNE",
+    "nom_agence": "92 - Mission Locale Asnieres-Sur-Seine/Villeneuve-La-Garenne",
     "nom_region": "Île-de-France",
     "code_departement": 92,
     "structure": "MILO"
   },
   {
     "id": 347,
-    "nom_agence": "ml aulnay sous bois",
+    "nom_agence": "93 - Mission Locale Aulnay Sous Bois",
     "nom_region": "Île-de-France",
     "code_departement": 93,
     "structure": "MILO"
   },
   {
     "id": 348,
-    "nom_agence": "ml auray",
+    "nom_agence": "56 - Mission Locale Auray",
     "nom_region": "Bretagne",
     "code_departement": 56,
     "structure": "MILO"
   },
   {
     "id": 349,
-    "nom_agence": "ML bassin Chellois",
+    "nom_agence": "77 - Mission Locale Bassin Chellois",
     "nom_region": "Île-de-France",
     "code_departement": 77,
     "structure": "MILO"
   },
   {
     "id": 350,
-    "nom_agence": "ML Bièvre Val de Marne",
+    "nom_agence": "94 - Mission Locale Bièvre Val De Marne",
     "nom_region": "Île-de-France",
     "code_departement": 94,
     "structure": "MILO"
   },
   {
     "id": 351,
-    "nom_agence": "ML BRETIGNY SUR ORGE",
+    "nom_agence": "91 - Mission Locale Bretigny Sur Orge",
     "nom_region": "Île-de-France",
     "code_departement": 91,
     "structure": "MILO"
   },
   {
     "id": 352,
-    "nom_agence": "ml brive la gaillarde",
+    "nom_agence": "19 - Mission Locale Brive La Gaillarde",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 19,
     "structure": "MILO"
   },
   {
     "id": 353,
-    "nom_agence": "ml chalons en champagne/ste menehould",
+    "nom_agence": "51 - Mission Locale Chalons En Champagne/Ste Menehould",
     "nom_region": "Grand Est",
     "code_departement": 51,
     "structure": "MILO"
   },
   {
     "id": 354,
-    "nom_agence": "ML Civray",
+    "nom_agence": "86 - Mission Locale Civray",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 86,
     "structure": "MILO"
   },
   {
     "id": 355,
-    "nom_agence": "ML CLERMONT métropole et volcans",
+    "nom_agence": "63 - Mission Locale Clermont Métropole Et Volcans",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 63,
     "structure": "MILO"
   },
   {
     "id": 356,
-    "nom_agence": "ml cote des bar",
+    "nom_agence": "10 - Mission Locale Cote Des Bar",
     "nom_region": "Grand Est",
     "code_departement": 10,
     "structure": "MILO"
   },
   {
     "id": 357,
-    "nom_agence": "ML CREUSE",
+    "nom_agence": "23 - Mission Locale Creuse",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 23,
     "structure": "MILO"
   },
   {
     "id": 358,
-    "nom_agence": "ml de la seine et du loing",
+    "nom_agence": "77 - Mission Locale De La Seine Et Du Loing",
     "nom_region": "Île-de-France",
     "code_departement": 77,
     "structure": "MILO"
   },
   {
     "id": 359,
-    "nom_agence": "ML de Loches",
+    "nom_agence": "37 - Mission Locale De Loches",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 37,
     "structure": "MILO"
   },
   {
     "id": 360,
-    "nom_agence": "ML DHUYS",
+    "nom_agence": "93 - Mission Locale Dhuys",
     "nom_region": "Île-de-France",
     "code_departement": 93,
     "structure": "MILO"
   },
   {
     "id": 361,
-    "nom_agence": "ml dinan",
+    "nom_agence": "22 - Mission Locale Dinan",
     "nom_region": "Bretagne",
     "code_departement": 22,
     "structure": "MILO"
   },
   {
     "id": 362,
-    "nom_agence": "ml du pays de grasse",
+    "nom_agence": "6 - Mission Locale Du Pays De Grasse",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 6,
     "structure": "MILO"
   },
   {
     "id": 363,
-    "nom_agence": "ml du plateau briard",
+    "nom_agence": "94 - Mission Locale Du Plateau Briard",
     "nom_region": "Île-de-France",
     "code_departement": 94,
     "structure": "MILO"
   },
   {
     "id": 364,
-    "nom_agence": "ML du Plateau de Brie",
+    "nom_agence": "77 - Mission Locale Du Plateau De Brie",
     "nom_region": "Île-de-France",
     "code_departement": 77,
     "structure": "MILO"
   },
   {
     "id": 365,
-    "nom_agence": "ml franconville",
+    "nom_agence": "95 - Mission Locale Franconville",
     "nom_region": "Île-de-France",
     "code_departement": 95,
     "structure": "MILO"
   },
   {
     "id": 366,
-    "nom_agence": "ml gennevilliers",
+    "nom_agence": "92 - Mission Locale Gennevilliers",
     "nom_region": "Île-de-France",
     "code_departement": 92,
     "structure": "MILO"
   },
   {
     "id": 367,
-    "nom_agence": "ml grigny",
+    "nom_agence": "91 - Mission Locale Grigny",
     "nom_region": "Île-de-France",
     "code_departement": 91,
     "structure": "MILO"
   },
   {
     "id": 368,
-    "nom_agence": "ml intercommunale de rambouillet",
+    "nom_agence": "78 - Mission Locale Intercommunale De Rambouillet",
     "nom_region": "Île-de-France",
     "code_departement": 78,
     "structure": "MILO"
   },
   {
     "id": 369,
-    "nom_agence": "ML Isère Rhodanienne",
+    "nom_agence": "38 - Mission Locale Isère Rhodanienne",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 38,
     "structure": "MILO"
   },
   {
     "id": 370,
-    "nom_agence": "ML ISSOIRE",
+    "nom_agence": "63 - Mission Locale Issoire",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 63,
     "structure": "MILO"
   },
   {
     "id": 371,
-    "nom_agence": "ml jeunes nimes metropole",
+    "nom_agence": "30 - Mission Locale Jeunes Nimes Metropole",
     "nom_region": "Occitanie",
     "code_departement": 30,
     "structure": "MILO"
   },
   {
     "id": 372,
-    "nom_agence": "ml la rochelle -re- pays d'aunis",
+    "nom_agence": "17 - Mission Locale La Rochelle -Re- Pays D'Aunis",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 17,
     "structure": "MILO"
   },
   {
     "id": 373,
-    "nom_agence": "ml la seyne sur mer",
+    "nom_agence": "83 - Mission Locale La Seyne Sur Mer",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 83,
     "structure": "MILO"
   },
   {
     "id": 374,
-    "nom_agence": "ML LE HAVRE ESTUAIRE LITTORAL",
+    "nom_agence": "76 - Mission Locale Le Havre Estuaire Littoral",
     "nom_region": "Normandie",
     "code_departement": 76,
     "structure": "MILO"
   },
   {
     "id": 375,
-    "nom_agence": "ml le perreux sur marne",
+    "nom_agence": "94 - Mission Locale Le Perreux Sur Marne",
     "nom_region": "Île-de-France",
     "code_departement": 94,
     "structure": "MILO"
   },
   {
     "id": 376,
-    "nom_agence": "ML LYR",
+    "nom_agence": "93 - Mission Locale Lyr",
     "nom_region": "Île-de-France",
     "code_departement": 93,
     "structure": "MILO"
   },
   {
     "id": 377,
-    "nom_agence": "ml melun",
+    "nom_agence": "77 - Mission Locale Melun",
     "nom_region": "Île-de-France",
     "code_departement": 77,
     "structure": "MILO"
   },
   {
     "id": 378,
-    "nom_agence": "ML MONTEREAU FAULT YONNE",
+    "nom_agence": "77 - Mission Locale Montereau Fault Yonne",
     "nom_region": "Île-de-France",
     "code_departement": 77,
     "structure": "MILO"
   },
   {
     "id": 379,
-    "nom_agence": "ML MONTLUCON",
+    "nom_agence": "3 - Mission Locale Montlucon",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 3,
     "structure": "MILO"
   },
   {
     "id": 380,
-    "nom_agence": "ml nantes",
+    "nom_agence": "44 - Mission Locale Nantes",
     "nom_region": "Pays de la Loire",
     "code_departement": 44,
     "structure": "MILO"
   },
   {
     "id": 381,
-    "nom_agence": "ML Nord Ardèche",
+    "nom_agence": "7 - Mission Locale Nord Ardèche",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 7,
     "structure": "MILO"
   },
   {
     "id": 382,
-    "nom_agence": "ML Nord-Ardennes",
+    "nom_agence": "8 - Mission Locale Nord-Ardennes",
     "nom_region": "Grand Est",
     "code_departement": 8,
     "structure": "MILO"
   },
   {
     "id": 383,
-    "nom_agence": "ml Orly Choisy Villeneuve Ablon",
+    "nom_agence": "94 - Mission Locale Orly Choisy Villeneuve Ablon",
     "nom_region": "Île-de-France",
     "code_departement": 94,
     "structure": "MILO"
   },
   {
     "id": 384,
-    "nom_agence": "ML Ouest Côtes d'Armor",
+    "nom_agence": "22 - Mission Locale Ouest Côtes D'Armor",
     "nom_region": "Bretagne",
     "code_departement": 22,
     "structure": "MILO"
   },
   {
     "id": 385,
-    "nom_agence": "ml petite camargue heraultaise",
+    "nom_agence": "34 - Mission Locale Petite Camargue Heraultaise",
     "nom_region": "Occitanie",
     "code_departement": 34,
     "structure": "MILO"
   },
   {
     "id": 386,
-    "nom_agence": "ml poissy",
+    "nom_agence": "78 - Mission Locale Poissy",
     "nom_region": "Île-de-France",
     "code_departement": 78,
     "structure": "MILO"
   },
   {
     "id": 387,
-    "nom_agence": "ML PONTIVY",
+    "nom_agence": "56 - Mission Locale Pontivy",
     "nom_region": "Bretagne",
     "code_departement": 56,
     "structure": "MILO"
   },
   {
     "id": 388,
-    "nom_agence": "ML REDON",
+    "nom_agence": "35 - Mission Locale Redon",
     "nom_region": "Bretagne",
     "code_departement": 35,
     "structure": "MILO"
   },
   {
     "id": 389,
-    "nom_agence": "ml reims",
+    "nom_agence": "51 - Mission Locale Reims",
     "nom_region": "Grand Est",
     "code_departement": 51,
     "structure": "MILO"
   },
   {
     "id": 390,
-    "nom_agence": "ml rives de seine",
+    "nom_agence": "92 - Mission Locale Rives De Seine",
     "nom_region": "Île-de-France",
     "code_departement": 92,
     "structure": "MILO"
   },
   {
     "id": 391,
-    "nom_agence": "ML Romans Royans Vercors",
+    "nom_agence": "26 - Mission Locale Romans Royans Vercors",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 26,
     "structure": "MILO"
   },
   {
     "id": 392,
-    "nom_agence": "ml rurale du nord marnais",
+    "nom_agence": "51 - Mission Locale Rurale Du Nord Marnais",
     "nom_region": "Grand Est",
     "code_departement": 51,
     "structure": "MILO"
   },
   {
     "id": 393,
-    "nom_agence": "ml sainte genevieve des bois",
+    "nom_agence": "91 - Mission Locale Sainte Genevieve Des Bois",
     "nom_region": "Île-de-France",
     "code_departement": 91,
     "structure": "MILO"
   },
   {
     "id": 394,
-    "nom_agence": "ML SEINOISE",
+    "nom_agence": "95 - Mission Locale Seinoise",
     "nom_region": "Île-de-France",
     "code_departement": 95,
     "structure": "MILO"
   },
   {
     "id": 395,
-    "nom_agence": "ml st brieuc",
+    "nom_agence": "22 - Mission Locale St Brieuc",
     "nom_region": "Bretagne",
     "code_departement": 22,
     "structure": "MILO"
   },
   {
     "id": 396,
-    "nom_agence": "ml st germain en laye et communes environnantes",
+    "nom_agence": "78 - Mission Locale St Germain En Laye Et Communes Environnantes",
     "nom_region": "Île-de-France",
     "code_departement": 78,
     "structure": "MILO"
   },
   {
     "id": 397,
-    "nom_agence": "ml st gildas des bois",
+    "nom_agence": "44 - Mission Locale St Gildas Des Bois",
     "nom_region": "Pays de la Loire",
     "code_departement": 44,
     "structure": "MILO"
   },
   {
     "id": 398,
-    "nom_agence": "ml st paul",
+    "nom_agence": "97 - Mission Locale St Paul",
     "nom_region": "La Réunion",
     "code_departement": 974,
     "structure": "MILO"
   },
   {
     "id": 399,
-    "nom_agence": "ML Sud 79",
+    "nom_agence": "79 - Mission Locale Sud 79",
     "nom_region": "Nouvelle-Aquitaine",
     "code_departement": 79,
     "structure": "MILO"
   },
   {
     "id": 400,
-    "nom_agence": "ML Sud 93",
+    "nom_agence": "93 - Mission Locale Sud 93",
     "nom_region": "Île-de-France",
     "code_departement": 93,
     "structure": "MILO"
   },
   {
     "id": 401,
-    "nom_agence": "ML TASSIN LA DEMI LUNE",
+    "nom_agence": "69 - Mission Locale Tassin La Demi Lune",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 69,
     "structure": "MILO"
   },
   {
     "id": 402,
-    "nom_agence": "ML TAVERNY",
+    "nom_agence": "95 - Mission Locale Taverny",
     "nom_region": "Île-de-France",
     "code_departement": 95,
     "structure": "MILO"
   },
   {
     "id": 403,
-    "nom_agence": "ml toulon",
+    "nom_agence": "83 - Mission Locale Toulon",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 83,
     "structure": "MILO"
   },
   {
     "id": 404,
-    "nom_agence": "ml val-d'oise est (MLVOE)",
+    "nom_agence": "95 - Mission Locale Val-D'Oise Est (Mission Localevoe)",
     "nom_region": "Île-de-France",
     "code_departement": 95,
     "structure": "MILO"
   },
   {
     "id": 405,
-    "nom_agence": "ml vauvert",
+    "nom_agence": "30 - Mission Locale Vauvert",
     "nom_region": "Occitanie",
     "code_departement": 30,
     "structure": "MILO"
   },
   {
     "id": 406,
-    "nom_agence": "ml villeneuve st georges",
+    "nom_agence": "94 - Mission Locale Villeneuve St Georges",
     "nom_region": "Île-de-France",
     "code_departement": 94,
     "structure": "MILO"
   },
   {
     "id": 407,
-    "nom_agence": "ml vitacité",
+    "nom_agence": "91 - Mission Locale Vitacité",
     "nom_region": "Île-de-France",
     "code_departement": 91,
     "structure": "MILO"
   },
   {
     "id": 408,
-    "nom_agence": "ml vitre",
+    "nom_agence": "35 - Mission Locale Porte De Bretagne - Pays De Vitre",
     "nom_region": "Bretagne",
     "code_departement": 35,
     "structure": "MILO"
   },
   {
     "id": 409,
-    "nom_agence": "ml vitry le francois",
+    "nom_agence": "51 - Mission Locale Vitry Le Francois",
     "nom_region": "Grand Est",
     "code_departement": 51,
     "structure": "MILO"
   },
   {
     "id": 410,
-    "nom_agence": "ml vitry-sur-seine",
+    "nom_agence": "94 - Mission Locale Vitry-Sur-Seine",
     "nom_region": "Île-de-France",
     "code_departement": 94,
     "structure": "MILO"
   },
   {
     "id": 411,
-    "nom_agence": "ML Voiron",
+    "nom_agence": "38 - Mission Locale Voiron",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 38,
     "structure": "MILO"
   },
   {
     "id": 412,
-    "nom_agence": "ml-bobigny",
+    "nom_agence": "93 - Mission Locale-Bobigny",
     "nom_region": "Île-de-France",
     "code_departement": 93,
     "structure": "MILO"
   },
   {
     "id": 413,
-    "nom_agence": "MLAB Siège",
+    "nom_agence": "95 - Mission Locale Argenteuil Bezons",
     "nom_region": "Île-de-France",
     "code_departement": 95,
     "structure": "MILO"
   },
   {
     "id": 414,
-    "nom_agence": "MLEJ Senlis",
+    "nom_agence": "60 - Mission Locale Pour L'Emploi Des Jeunes Sud Oise",
     "nom_region": "Hauts-de-France",
     "code_departement": 60,
     "structure": "MILO"
   },
   {
     "id": 415,
-    "nom_agence": "MLGC ANTENNE de SAINT MATHIEU DE TREVIERS",
+    "nom_agence": "34 - Mission Locale Garrigue Et Cévennes",
     "nom_region": "Occitanie",
     "code_departement": 34,
     "structure": "MILO"
   },
   {
     "id": 416,
-    "nom_agence": "MLI La Courneuve",
+    "nom_agence": "93 - Mission Locale Intercommunale La Courneuve",
     "nom_region": "Île-de-France",
     "code_departement": 93,
     "structure": "MILO"
   },
   {
     "id": 417,
-    "nom_agence": "MLIJ du bassin de Thau",
+    "nom_agence": "34 - Mission Locale Insertion Jeunes Du Bassin De Thau",
     "nom_region": "Occitanie",
     "code_departement": 34,
     "structure": "MILO"
   },
   {
     "id": 418,
-    "nom_agence": "MLJ ALES PAYS CEVENNES",
+    "nom_agence": "30 - Mission Locale Jeunes Alès Pays Cévennes",
     "nom_region": "Occitanie",
     "code_departement": 30,
     "structure": "MILO"
   },
   {
     "id": 419,
-    "nom_agence": "MLJ Beaucaire Rhône et Argence - siège Beaucaire",
+    "nom_agence": "30 - Mission Locale Jeunes Beaucaire Rhône Et Argence - Siège Beaucaire",
     "nom_region": "Occitanie",
     "code_departement": 30,
     "structure": "MILO"
   },
   {
     "id": 420,
-    "nom_agence": "MLOA - Site de Carcassonne",
+    "nom_agence": "11 - Mission Locale Ouest Audois (Mloa)",
     "nom_region": "Occitanie",
     "code_departement": 11,
     "structure": "MILO"
   },
   {
     "id": 421,
-    "nom_agence": "MLOBG Oyonnax",
+    "nom_agence": "1 - Mission Locale Oyonnax Bellegarde Et Gex",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 1,
     "structure": "MILO"
   },
   {
     "id": 422,
-    "nom_agence": "Mission Locale Paris",
+    "nom_agence": "75 - Mission Locale Paris",
     "nom_region": "Île-de-France",
     "code_departement": 75,
     "structure": "MILO"
   },
   {
     "id": 442,
-    "nom_agence": "MLPP SIEGE",
+    "nom_agence": "26 - Mission Locale Portes De Provence",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 26,
     "structure": "MILO"
   },
   {
     "id": 443,
-    "nom_agence": "MLS3F SAINT-LOUIS",
+    "nom_agence": "68 - Mission Locale Saint-Louis Altkirch",
     "nom_region": "Grand Est",
     "code_departement": 68,
     "structure": "MILO"
   },
   {
     "id": 444,
-    "nom_agence": "PEIPS MISSION LOCALE DU SENONAIS",
+    "nom_agence": "89 - Mission Locale Du Senonais - Peips",
     "nom_region": "Bourgogne-Franche-Comté",
     "code_departement": 89,
     "structure": "MILO"
   },
   {
     "id": 445,
-    "nom_agence": "REUSSIR EN SAMBRE AVESNOIS",
+    "nom_agence": "59 - Mission Locale - Reussir En Sambre Avesnois",
     "nom_region": "Hauts-de-France",
     "code_departement": 59,
     "structure": "MILO"
   },
   {
     "id": 446,
-    "nom_agence": "ROMORANTIN",
+    "nom_agence": "41 - Mission Locale Du Romorantinais",
     "nom_region": "Centre-Val de Loire",
     "code_departement": 41,
     "structure": "MILO"
   },
   {
     "id": 447,
-    "nom_agence": "Seine Ouest Entreprise et Emploi",
+    "nom_agence": "92 - Mission Locale - Seine Ouest Entreprise Et Emploi",
     "nom_region": "Île-de-France",
     "code_departement": 92,
     "structure": "MILO"
   },
   {
     "id": 448,
-    "nom_agence": "SIEGE",
+    "nom_agence": "13 - Mission Locale - Siège Provence Alpes Côte D'Azur",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 13,
     "structure": "MILO"
   },
   {
     "id": 449,
-    "nom_agence": "Siège",
+    "nom_agence": "26 - Mission Locale - Siège Auvergne Rhône Alpes",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 26,
     "structure": "MILO"
   },
   {
     "id": 450,
-    "nom_agence": "SIEGE  ML DE LA BRIE ET DES MORINS",
+    "nom_agence": "77 - Mission Locale Des Portes De La Brie",
     "nom_region": "Île-de-France",
     "code_departement": 77,
     "structure": "MILO"
   },
   {
     "id": 451,
-    "nom_agence": "Siège Administratif",
+    "nom_agence": "6 - Mission Locale - Siège Administratif Provence Alpes Côte D'Azur",
     "nom_region": "Provence-Alpes-Côte d'Azur",
     "code_departement": 6,
     "structure": "MILO"
   },
   {
     "id": 452,
-    "nom_agence": "Siège Mission Locale de La Plaine de France",
+    "nom_agence": "77 - Mission Locale De La Plaine De France",
     "nom_region": "Île-de-France",
     "code_departement": 77,
     "structure": "MILO"
   },
   {
     "id": 453,
-    "nom_agence": "Siège Mission locale du centre",
+    "nom_agence": "97 - Mission Locale Du Centre Martinique",
     "nom_region": "Martinique",
     "code_departement": 972,
     "structure": "MILO"
   },
   {
     "id": 454,
-    "nom_agence": "SIEGE MISSION LOCALE ESPACE SUD",
+    "nom_agence": "97 - Mission Locale Espace Sud",
     "nom_region": "Martinique",
     "code_departement": 972,
     "structure": "MILO"
   },
   {
     "id": 455,
-    "nom_agence": "Siège MLJ - Aix-les-Bains",
+    "nom_agence": "73 - Mission Locale Jeunes - Aix-Les-Bains",
     "nom_region": "Auvergne-Rhône-Alpes",
     "code_departement": 73,
     "structure": "MILO"
   },
   {
     "id": 456,
-    "nom_agence": "We Ker",
+    "nom_agence": "35 - Mission Locale - We Ker",
     "nom_region": "Bretagne",
     "code_departement": 35,
+    "structure": "MILO"
+  },
+  {
+    "id": 1351,
+    "nom_agence": "95 - Mission Locale Vallée De Montmorency",
+    "nom_region": "Île-de-France",
+    "code_departement": 95,
+    "structure": "MILO"
+  },
+  {
+    "id": 1352,
+    "nom_agence": "56 - Mission Locale Centre Bretagne",
+    "nom_region": "Bretagne",
+    "code_departement": 56,
+    "structure": "MILO"
+  },
+  {
+    "id": 1353,
+    "nom_agence": "97 - Mission Locale Saint-Pierre",
+    "nom_region": "La Réunion",
+    "code_departement": 974,
+    "structure": "MILO"
+  },
+  {
+    "id": 1354,
+    "nom_agence": "77 - Mission Locale De La Brie Et Des Morins",
+    "nom_region": "Île-de-France",
+    "code_departement": 77,
+    "structure": "MILO"
+  },
+  {
+    "id": 1355,
+    "nom_agence": "91 - Mission Locale Du Val D'Orge",
+    "nom_region": "Île-de-France",
+    "code_departement": 91,
+    "structure": "MILO"
+  },
+  {
+    "id": 1356,
+    "nom_agence": "13 - Mission Locale Ouest Provence",
+    "nom_region": "Provence-Alpes-Côte d'Azur",
+    "code_departement": 13,
+    "structure": "MILO"
+  },
+  {
+    "id": 1357,
+    "nom_agence": "38 - Mission Locale Isère-Drac-Vercors",
+    "nom_region": "Auvergne-Rhône-Alpes",
+    "code_departement": 38,
+    "structure": "MILO"
+  },
+  {
+    "id": 1358,
+    "nom_agence": "33 - Mission Locale De La Haute Gironde",
+    "nom_region": "Nouvelle-Aquitaine",
+    "code_departement": 33,
+    "structure": "MILO"
+  },
+  {
+    "id": 1359,
+    "nom_agence": "26 - Mission Locale Vallée De La Drôme",
+    "nom_region": "Auvergne-Rhône-Alpes",
+    "code_departement": 26,
+    "structure": "MILO"
+  },
+  {
+    "id": 1360,
+    "nom_agence": "95 - Mission Locale Val D'Oise Est - Sarcelles",
+    "nom_region": "Île-de-France",
+    "code_departement": 95,
+    "structure": "MILO"
+  },
+  {
+    "id": 1361,
+    "nom_agence": "10 - Mission Locale De La Côte Des Bar",
+    "nom_region": "Grand Est",
+    "code_departement": 10,
+    "structure": "MILO"
+  },
+  {
+    "id": 1362,
+    "nom_agence": "65 - Mission Locale De Bagnères De Bigorre",
+    "nom_region": "Hautes-Pyrénées",
+    "code_departement": 65,
+    "structure": "MILO"
+  },
+  {
+    "id": 1363,
+    "nom_agence": "59 - Mission Locale Entreprendre Ensemble",
+    "nom_region": "Hauts-de-France",
+    "code_departement": 59,
+    "structure": "MILO"
+  },
+  {
+    "id": 1364,
+    "nom_agence": "69 - Mission Locale Saint Martin D'Hères",
+    "nom_region": "Auvergne-Rhône-Alpes",
+    "code_departement": 69,
+    "structure": "MILO"
+  },
+  {
+    "id": 1365,
+    "nom_agence": "59 - Mission Locale Jeunes Du Valenciennois",
+    "nom_region": "Hauts-de-France",
+    "code_departement": 59,
+    "structure": "MILO"
+  },
+  {
+    "id": 1366,
+    "nom_agence": "94 - Mission Locale Des Bords De Marne",
+    "nom_region": "Île-de-France",
+    "code_departement": 94,
+    "structure": "MILO"
+  },
+  {
+    "id": 1367,
+    "nom_agence": "17 - Mission Locale Rochefort Marennes Oléron",
+    "nom_region": "Nouvelle-Aquitaine",
+    "code_departement": 17,
+    "structure": "MILO"
+  },
+  {
+    "id": 1368,
+    "nom_agence": "13 - Mission Locale Du Pays D'Aix",
+    "nom_region": "Provence-Alpes-Côte d'Azur",
+    "code_departement": 13,
+    "structure": "MILO"
+  },
+  {
+    "id": 1369,
+    "nom_agence": "65 - Mission Locale Des Hautes-Pyrénées",
+    "nom_region": "Hautes-Pyrénées",
+    "code_departement": 65,
+    "structure": "MILO"
+  },
+  {
+    "id": 1370,
+    "nom_agence": "93 - Mission Locale Intercommunale Pour L'Emploi Des Jeunes 493",
+    "nom_region": "Île-de-France",
+    "code_departement": 93,
+    "structure": "MILO"
+  },
+  {
+    "id": 1371,
+    "nom_agence": "62 - Mission Locale Du Pays De Saint-Omer",
+    "nom_region": "Hauts-de-France",
+    "code_departement": 62,
     "structure": "MILO"
   }
 ]
