@@ -140,7 +140,7 @@ export namespace Jeune {
     }
   }
 
-  export function transfererLesJeunes(
+  export function changerDeConseiller(
     jeunes: Jeune[],
     conseillerCible: Conseiller,
     idConseillerSource: string,
