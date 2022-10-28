@@ -237,11 +237,20 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
             : undefined
       })
     )
-
-    this.context.set(ContextKey.RESULTAT_APPEL_PARTENAIRE, {
+    let resultatsAppelPartenaire: AppelPartenaireResultat[] = this.context.get<
+      AppelPartenaireResultat[]
+    >(ContextKey.RESULTATS_APPEL_PARTENAIRE) as AppelPartenaireResultat[]
+    if (!resultatsAppelPartenaire) {
+      resultatsAppelPartenaire = []
+    }
+    resultatsAppelPartenaire.push({
       resultat: res.data,
       path: res.request.path
     } as AppelPartenaireResultat)
+    this.context.set(
+      ContextKey.RESULTATS_APPEL_PARTENAIRE,
+      resultatsAppelPartenaire
+    )
 
     return res
   }
