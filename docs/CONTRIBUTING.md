@@ -9,6 +9,7 @@
    3. [Mettre à jour les variables d'environnement](#push-variables-environnement)
    4. [Mettre à jour les dépendances](#dépendances)
    5. [Base de données, seeding et migrations](#database)
+   6. [Création d'un compte jeune de recette](#jeune)
 3. [L'architecture](#archi)
    1. [Flux des Commands / Queries](#CQS)
    2. [Flux des notifications](#notifications)
@@ -84,6 +85,24 @@ npx sequelize-cli migration:generate --name nom-de-la-migration
 ```bash
     npx sequelize-cli db:migrate:undo
 ```
+
+### Création d'un compte jeune de recette <a name="jeune"></a>
+
+xxx = staging | prod
+
+1. Créer une entrée jeune en base de données (pa-back-xxx)
+   - structure : PASS_EMPLOI
+   - type : JEUNE
+   - date_creation : maintenant
+   - id_conseiller : sur staging -> "41" Nils conseiller standard ou "1" MALEK MALEK superviseur
+   - id et id_authentification : identiques (nom d'utilisateur à la connexion)
+   - email : une consultée pour les fonctionnalités avec envoi d'email
+2. Créer une entrée Keycloak (pa-auth-xxx)
+   - Récupérer les identifiants de connexion admin sur les variables d'environnement (staging : pa-auth-staging, prod : Dashlane)
+   - Se connecter au Keycloak
+   - Users -> Add User -> rentrer les informations
+   - Sélectionner l'utilisateur créé -> Attributes -> Add -> id_user : <ton id_authentification>
+   - Credentials -> Reset Password -> Temporary Off
 
 ## L'architecture <a name="archi"></a>
 
