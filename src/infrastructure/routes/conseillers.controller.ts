@@ -7,7 +7,6 @@ import {
   HttpCode,
   HttpException,
   HttpStatus,
-  NotFoundException,
   Param,
   Post,
   Put,
@@ -66,9 +65,7 @@ import { DossierJeuneMiloQueryModel } from '../../application/queries/query-mode
 import { RendezVousConseillerFutursEtPassesQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
 import {
   EmailExisteDejaError,
-  ErreurHttp,
-  JeuneNonLieAuConseillerError,
-  NonTrouveError
+  ErreurHttp
 } from '../../building-blocks/types/domain-error'
 import {
   isFailure,
@@ -376,6 +373,7 @@ export class ConseillersController {
       duree: createRendezVousPayload.duration,
       idConseiller: idConseiller,
       modalite: createRendezVousPayload.modality,
+      titre: createRendezVousPayload.titre,
       type: createRendezVousPayload.type,
       precision: createRendezVousPayload.precision,
       adresse: createRendezVousPayload.adresse,
@@ -387,19 +385,10 @@ export class ConseillersController {
     const result: Result<string> =
       await this.createRendezVousCommandHandler.execute(command, utilisateur)
 
-    if (isFailure(result)) {
-      switch (result.error.code) {
-        case JeuneNonLieAuConseillerError.CODE:
-          throw new BadRequestException(result.error)
-        case NonTrouveError.CODE:
-          throw new NotFoundException(result.error)
-      }
-    }
-
     if (isSuccess(result)) {
       return { id: result.data }
     }
-    throw new RuntimeException()
+    throw handleFailure(result)
   }
 
   @ApiOperation({

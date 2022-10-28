@@ -59,6 +59,7 @@ export interface RendezVous {
   invitation?: boolean
   icsSequence?: number
   createur: Createur
+  idAgence?: string
 }
 
 export interface InfosRendezVousACreer {
@@ -68,6 +69,7 @@ export interface InfosRendezVousACreer {
   date: string
   duree: number
   modalite?: string
+  titre?: string
   type?: string
   precision?: string
   adresse?: string
@@ -106,6 +108,14 @@ export namespace RendezVous {
     SUPPRESSION = 'SUPPRESSION'
   }
 
+  export function estUnTypeAnimationCollective(type?: string): boolean {
+    return (
+      Boolean(type) &&
+      (type === CodeTypeRendezVous.ATELIER ||
+        type === CodeTypeRendezVous.INFORMATION_COLLECTIVE)
+    )
+  }
+
   export function createRendezVousConseiller(
     infosRendezVousACreer: InfosRendezVousACreer,
     jeunes: Jeune[],
@@ -119,8 +129,8 @@ export namespace RendezVous {
       date: new Date(infosRendezVousACreer.date),
       modalite: infosRendezVousACreer.modalite,
       jeunes: jeunes,
-      sousTitre: `avec ${jeunes[0].conseiller!.firstName}`,
-      titre: 'Rendez-vous conseiller',
+      titre: infosRendezVousACreer.titre ?? 'Rendez-vous conseiller',
+      sousTitre: `avec ${conseiller.firstName}`,
       type: infosRendezVousACreer.type
         ? (infosRendezVousACreer.type as CodeTypeRendezVous)
         : CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
@@ -136,7 +146,10 @@ export namespace RendezVous {
         id: conseiller.id,
         nom: conseiller.lastName,
         prenom: conseiller.firstName
-      }
+      },
+      idAgence: estUnTypeAnimationCollective(infosRendezVousACreer.type)
+        ? conseiller.agence?.id
+        : undefined
     }
   }
 
