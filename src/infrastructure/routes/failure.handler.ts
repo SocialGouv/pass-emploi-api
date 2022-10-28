@@ -10,10 +10,12 @@ import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.excepti
 import {
   CampagneExisteDejaError,
   CampagneNonActive,
+  ConseillerSansAgenceError,
   DossierExisteDejaError,
   DroitsInsuffisants,
   EmailExisteDejaError,
   ErreurHttp,
+  JeuneNonLieALAgenceError,
   JeuneNonLieAuConseillerError,
   JeunePasInactifError,
   MauvaiseCommandeError,
@@ -38,6 +40,8 @@ export function handleFailure(result: Result): void {
       case ReponsesCampagneInvalide.CODE:
       case CampagneNonActive.CODE:
       case CampagneExisteDejaError.CODE:
+      case JeuneNonLieALAgenceError.CODE:
+      case ConseillerSansAgenceError.CODE:
         throw new BadRequestException(result.error, result.error.message)
       case RessourceIndisponibleError.CODE:
         throw new GoneException(result.error.message)
