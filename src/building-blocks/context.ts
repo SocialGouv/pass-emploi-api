@@ -5,7 +5,7 @@ export type ContextData = Map<ContextKey, unknown>
 
 export enum ContextKey {
   UTILISATEUR = 'UTILISATEUR',
-  RESULTAT_APPEL_PARTENAIRE = 'RESULTAT_APPEL_PARTENAIRE'
+  RESULTATS_APPEL_PARTENAIRE = 'RESULTATS_APPEL_PARTENAIRE'
 }
 
 export interface AppelPartenaireResultat {
@@ -25,8 +25,8 @@ export class Context {
     this.asyncLocalStorage.enterWith(new Map<ContextKey, unknown>())
   }
 
-  get(): ContextData {
-    return this.asyncLocalStorage.getStore() as ContextData
+  get<T>(key: ContextKey): T {
+    return this.asyncLocalStorage.getStore()?.get(key) as T
   }
 
   set(key: ContextKey, value: unknown): void {

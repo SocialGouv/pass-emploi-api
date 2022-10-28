@@ -10,7 +10,6 @@ import { tap } from 'rxjs/operators'
 import {
   AppelPartenaireResultat,
   Context,
-  ContextData,
   ContextKey
 } from '../../building-blocks/context'
 import { Authentification } from '../../domain/authentification'
@@ -43,40 +42,50 @@ export class ContextInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(data => {
         // Après l'appel de la route, on récupère le contexte et on le persiste
-        this.persisterResultatAppelPartenaire(this.context.get(), data)
+        this.persisterResultatsAppelPartenaire(data)
       }),
       catchError(_err => {
-        this.persisterResultatAppelPartenaire(this.context.get(), {})
+        this.persisterResultatsAppelPartenaire({})
         throw _err
       })
     )
   }
 
-  private persisterResultatAppelPartenaire(
-    currentContext: ContextData,
-    data: unknown
-  ): void {
-    const persisterResultat = currentContext.get(
-      ContextKey.RESULTAT_APPEL_PARTENAIRE
+  private persisterResultatsAppelPartenaire(data: unknown): void {
+    const persisterResultats = this.context.get<AppelPartenaireResultat[]>(
+      ContextKey.RESULTATS_APPEL_PARTENAIRE
     )
-    if (persisterResultat) {
-      const utilisateur = currentContext.get(
+    if (persisterResultats && persisterResultats.length > 0) {
+      const utilisateur = this.context.get<Authentification.Utilisateur>(
         ContextKey.UTILISATEUR
-      )! as Authentification.Utilisateur
-      const res = persisterResultat as AppelPartenaireResultat
-      LogApiPartenaireSqlModel.create({
-        id: uuid.v4(),
-        date: new Date(),
-        idUtilisateur: utilisateur.id,
-        typeUtilisateur: utilisateur.type,
-        pathPartenaire: res.path,
-        resultatPartenaire: res.resultat,
-        resultat: data,
-        transactionId: this.apmService.currentTraceIds['transaction.id']
-      }).catch(e => {
-        getAPMInstance().captureError(e)
-        this.logger.error(e)
+      )!
+      persisterResultats.forEach(persisterResultat => {
+        this.persisterResultatAppelPartenaire(
+          persisterResultat,
+          utilisateur,
+          data
+        )
       })
     }
+  }
+
+  private persisterResultatAppelPartenaire(
+    appelPartenaireResultat: AppelPartenaireResultat,
+    utilisateur: Authentification.Utilisateur,
+    data: unknown
+  ): void {
+    LogApiPartenaireSqlModel.create({
+      id: uuid.v4(),
+      date: new Date(),
+      idUtilisateur: utilisateur.id,
+      typeUtilisateur: utilisateur.type,
+      pathPartenaire: appelPartenaireResultat.path,
+      resultatPartenaire: appelPartenaireResultat.resultat,
+      resultat: data,
+      transactionId: this.apmService.currentTraceIds['transaction.id']
+    }).catch(e => {
+      getAPMInstance().captureError(e)
+      this.logger.error(e)
+    })
   }
 }
