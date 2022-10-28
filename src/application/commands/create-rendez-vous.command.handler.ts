@@ -3,6 +3,8 @@ import { Evenement, EvenementService } from '../../domain/evenement'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
+  ConseillerSansAgenceError,
+  JeuneNonLieALAgenceError,
   JeuneNonLieAuConseillerError,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
@@ -25,6 +27,7 @@ export interface CreateRendezVousCommand extends Command {
   date: string
   duree: number
   modalite?: string
+  titre?: string
   type?: string
   precision?: string
   adresse?: string
@@ -56,7 +59,14 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
   }
 
   async handle(command: CreateRendezVousCommand): Promise<Result<string>> {
+    const conseiller = await this.conseillerRepository.get(command.idConseiller)
+    const idAgence = conseiller!.agence?.id
+    if (RendezVous.estUnTypeAnimationCollective(command.type) && !idAgence) {
+      return failure(new ConseillerSansAgenceError(command.idConseiller))
+    }
+
     const jeunes: Jeune[] = []
+
     for (const idJeune of command.idsJeunes) {
       const jeune = await this.jeuneRepository.get(idJeune, {
         avecConfiguration: true
@@ -64,7 +74,11 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       if (!jeune) {
         return failure(new NonTrouveError('Jeune', idJeune))
       }
-      if (jeune.conseiller?.id !== command.idConseiller) {
+      if (RendezVous.estUnTypeAnimationCollective(command.type)) {
+        if (jeune.conseiller?.idAgence !== idAgence) {
+          return failure(new JeuneNonLieALAgenceError(jeune.id, idAgence!))
+        }
+      } else if (jeune.conseiller?.id !== command.idConseiller) {
         return failure(
           new JeuneNonLieAuConseillerError(command.idConseiller, jeune.id)
         )
@@ -72,7 +86,6 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       jeunes.push(jeune)
     }
 
-    const conseiller = await this.conseillerRepository.get(command.idConseiller)
     const rendezVous = RendezVous.createRendezVousConseiller(
       command,
       jeunes,

@@ -5,10 +5,12 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { failure, success } from '../../../src/building-blocks/types/result'
-import { RendezVous } from '../../../src/domain/rendez-vous'
+import { CodeTypeRendezVous, RendezVous } from '../../../src/domain/rendez-vous'
 import { Notification } from '../../../src/domain/notification/notification'
 import { uneConfiguration, unJeune } from '../../fixtures/jeune.fixture'
 import {
+  ConseillerSansAgenceError,
+  JeuneNonLieALAgenceError,
   JeuneNonLieAuConseillerError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
@@ -72,6 +74,87 @@ describe('CreateRendezVousCommandHandler', () => {
   })
 
   describe('handle', () => {
+    describe('RendezVous de type animation collective', () => {
+      it('renvoie une failure quand le conseiller est sans agence', async () => {
+        // Given
+        const command: CreateRendezVousCommand = {
+          idsJeunes: [],
+          idConseiller: 'FAKE_CONSEILLER',
+          commentaire: rendezVous.commentaire,
+          date: rendezVous.date.toDateString(),
+          duree: rendezVous.duree,
+          type: CodeTypeRendezVous.ATELIER
+        }
+        conseillerRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(unConseiller({ agence: { id: undefined } }))
+
+        // When
+        const result = await createRendezVousCommandHandler.handle(command)
+        // Then
+        expect(result).to.deep.equal(
+          failure(new ConseillerSansAgenceError(command.idConseiller))
+        )
+      })
+      it("renvoie une failure quand un des jeunes n'a pas la meme agence que le conseiller", async () => {
+        // Given
+        const command: CreateRendezVousCommand = {
+          idsJeunes: [jeune1.id],
+          idConseiller: 'FAKE_CONSEILLER',
+          commentaire: rendezVous.commentaire,
+          date: rendezVous.date.toDateString(),
+          duree: rendezVous.duree,
+          type: CodeTypeRendezVous.ATELIER
+        }
+        conseillerRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(unConseiller({ agence: { id: 'test' } }))
+        jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
+
+        // When
+        const result = await createRendezVousCommandHandler.handle(command)
+        // Then
+        expect(result).to.deep.equal(
+          failure(new JeuneNonLieALAgenceError(jeune1.id, 'test'))
+        )
+      })
+      it('renvoie un succes quand les jeunes ont la meme agence que le conseiller', async () => {
+        // Given
+        const jeune = unJeune()
+        jeune.conseiller.idAgence = 'test'
+
+        const conseiller = unConseiller({
+          id: 'un-autre-conseiller',
+          agence: { id: 'test' }
+        })
+
+        const command: CreateRendezVousCommand = {
+          idsJeunes: [jeune.id],
+          idConseiller: conseiller.id,
+          commentaire: rendezVous.commentaire,
+          date: rendezVous.date.toDateString(),
+          duree: rendezVous.duree,
+          type: CodeTypeRendezVous.ATELIER
+        }
+        conseillerRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(conseiller)
+        jeuneRepository.get.withArgs(jeune.id).resolves(jeune)
+
+        const expectedRendezvous = RendezVous.createRendezVousConseiller(
+          command,
+          [jeune],
+          unConseiller(),
+          idService
+        )
+
+        // When
+        const result = await createRendezVousCommandHandler.handle(command)
+
+        // Then
+        expect(result).to.deep.equal(success(expectedRendezvous.id))
+      })
+    })
     describe("quand un des jeunes n'existe pas", () => {
       it('renvoie une failure', async () => {
         // Given
@@ -83,6 +166,9 @@ describe('CreateRendezVousCommandHandler', () => {
           duree: rendezVous.duree,
           modalite: 'tel'
         }
+        conseillerRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(jeune1.conseiller)
         jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
         jeuneRepository.get.withArgs(jeune2.id).resolves(undefined)
 
@@ -109,6 +195,9 @@ describe('CreateRendezVousCommandHandler', () => {
           date: rendezVous.date.toDateString(),
           duree: rendezVous.duree
         }
+        conseillerRepository.get
+          .withArgs(command.idConseiller)
+          .resolves(jeune1.conseiller)
         jeuneRepository.get.withArgs(jeune1.id).resolves(jeune1)
         jeuneRepository.get.withArgs(jeune2.id).resolves(jeune2)
 
