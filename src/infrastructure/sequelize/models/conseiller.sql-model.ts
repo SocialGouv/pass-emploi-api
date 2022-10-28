@@ -74,7 +74,7 @@ export class ConseillerDto extends Model {
     field: 'id_agence',
     type: DataType.STRING
   })
-  idAgence?: string
+  idAgence?: string | null
 
   @Column({
     field: 'nom_manuel_agence',
