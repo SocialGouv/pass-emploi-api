@@ -34,7 +34,8 @@ export function fromSqlToJeune(
       id: jeuneSqlModel.conseiller.id,
       firstName: jeuneSqlModel.conseiller.prenom,
       lastName: jeuneSqlModel.conseiller.nom,
-      email: jeuneSqlModel.conseiller.email || undefined
+      email: jeuneSqlModel.conseiller.email || undefined,
+      idAgence: jeuneSqlModel.conseiller.idAgence || undefined
     }
   }
   if (jeuneSqlModel.idConseillerInitial) {
