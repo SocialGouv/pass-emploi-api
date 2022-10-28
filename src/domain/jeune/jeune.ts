@@ -41,6 +41,7 @@ export namespace Jeune {
     firstName: string
     lastName: string
     email?: string
+    idAgence?: string
   }
 
   export interface ConseillerInitial {

@@ -2,24 +2,26 @@ import {
   BelongsToMany,
   Column,
   DataType,
+  ForeignKey,
   Model,
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
 import { CodeTypeRendezVous } from '../../../domain/rendez-vous'
+import { AgenceSqlModel } from './agence.sql-model'
 import { JeuneSqlModel } from './jeune.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-association.model'
 
 export class RendezVousDto extends Model {
   @PrimaryKey
   @Column({ field: 'id', type: DataType.STRING })
-  id!: string
+  id: string
 
   @Column({ field: 'titre', type: DataType.STRING })
-  titre!: string
+  titre: string
 
   @Column({ field: 'sous_titre', type: DataType.STRING })
-  sousTitre!: string
+  sousTitre: string
 
   @Column({ field: 'commentaire', type: DataType.STRING })
   commentaire: string | null
@@ -28,13 +30,16 @@ export class RendezVousDto extends Model {
   modalite: string | null
 
   @Column({ field: 'date', type: DataType.DATE })
-  date!: Date
+  date: Date
 
   @Column({ field: 'duree', type: DataType.INTEGER })
-  duree!: number
+  duree: number
 
   @Column({ field: 'date_suppression', type: DataType.DATE })
   dateSuppression: Date | null
+
+  @Column({ field: 'date_cloture', type: DataType.DATE })
+  dateCloture: Date | null
 
   @Column({ field: 'type', type: DataType.STRING })
   type: CodeTypeRendezVous
@@ -63,10 +68,17 @@ export class RendezVousDto extends Model {
     nom: string
     prenom: string
   }
+
+  @ForeignKey(() => AgenceSqlModel)
+  @Column({
+    field: 'id_agence',
+    type: DataType.STRING
+  })
+  idAgence: string | null
 }
 
 @Table({ timestamps: false, tableName: 'rendez_vous' })
 export class RendezVousSqlModel extends RendezVousDto {
   @BelongsToMany(() => JeuneSqlModel, () => RendezVousJeuneAssociationSqlModel)
-  jeunes!: JeuneSqlModel[]
+  jeunes: JeuneSqlModel[]
 }
