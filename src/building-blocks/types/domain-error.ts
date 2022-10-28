@@ -93,6 +93,26 @@ export class JeuneNonLieAuConseillerError implements DomainError {
   }
 }
 
+export class JeuneNonLieALAgenceError implements DomainError {
+  static CODE = 'JEUNE_NON_LIE_A_L_AGENCE'
+  readonly code: string = JeuneNonLieALAgenceError.CODE
+  readonly message: string
+
+  constructor(idJeune: string, idAgence: string) {
+    this.message = `Le jeune ${idJeune} n'est pas lié à l'agence ${idAgence}`
+  }
+}
+
+export class ConseillerSansAgenceError implements DomainError {
+  static CODE = 'CONSEILLER_SANS_AGENCE'
+  readonly code: string = ConseillerSansAgenceError.CODE
+  readonly message: string
+
+  constructor(idConseiller: string) {
+    this.message = `Le conseiller ${idConseiller} n'a pas renseigné son agence`
+  }
+}
+
 export class JeunePasInactifError implements DomainError {
   static CODE = 'JEUNE_PAS_INACTIF'
   readonly code: string = JeunePasInactifError.CODE
