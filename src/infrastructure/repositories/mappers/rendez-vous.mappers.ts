@@ -17,6 +17,7 @@ export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
     date: rendezVous.date,
     commentaire: rendezVous.commentaire ?? null,
     dateSuppression: null,
+    dateCloture: null,
     type: rendezVous.type,
     precision: rendezVous.precision ?? null,
     adresse: rendezVous.adresse ?? null,
@@ -24,7 +25,8 @@ export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
     presenceConseiller: rendezVous.presenceConseiller,
     invitation: rendezVous.invitation ?? null,
     icsSequence: rendezVous.icsSequence ?? null,
-    createur: rendezVous.createur
+    createur: rendezVous.createur,
+    idAgence: rendezVous.idAgence ?? null
   }
 }
 
