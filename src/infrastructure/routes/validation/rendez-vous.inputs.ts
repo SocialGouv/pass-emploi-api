@@ -1,19 +1,19 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
+  ArrayNotEmpty,
+  Equals,
+  IsArray,
   IsBoolean,
   IsDateString,
   IsEnum,
   IsIn,
-  Equals,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
-  ValidateIf,
-  IsArray,
-  ArrayNotEmpty
+  ValidateIf
 } from 'class-validator'
-import { CodeTypeRendezVous } from '../../../domain/rendez-vous'
+import { CodeTypeRendezVous, RendezVous } from '../../../domain/rendez-vous'
 
 export class CreateRendezVousPayload {
   @ApiPropertyOptional()
@@ -38,16 +38,27 @@ export class CreateRendezVousPayload {
   @IsNotEmpty()
   modality?: string
 
-  @ApiProperty()
-  @IsArray()
-  @ArrayNotEmpty()
-  jeunesIds: string[]
-
   @ApiPropertyOptional({ enum: CodeTypeRendezVous })
   @IsOptional()
   @IsString()
   @IsEnum(CodeTypeRendezVous)
   type?: string
+
+  @ApiProperty()
+  @IsArray()
+  @ValidateIf(payload => !RendezVous.estUnTypeAnimationCollective(payload.type))
+  @ArrayNotEmpty()
+  jeunesIds: string[]
+
+  @ApiPropertyOptional()
+  @ValidateIf(
+    payload =>
+      payload.titre !== undefined ||
+      RendezVous.estUnTypeAnimationCollective(payload.type)
+  )
+  @IsString()
+  @IsNotEmpty()
+  titre?: string
 
   @ApiPropertyOptional()
   @ValidateIf(payload => payload.type === CodeTypeRendezVous.AUTRE)

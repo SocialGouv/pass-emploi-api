@@ -74,7 +74,10 @@ describe('JeuneSqlRepository', () => {
 
     beforeEach(async () => {
       // Given
-      jeune = unJeune({ configuration: undefined })
+      jeune = unJeune({
+        configuration: undefined,
+        conseiller: unConseillerDuJeune({ idAgence: undefined })
+      })
       const conseillerDto = unConseillerDto({
         structure: Core.Structure.POLE_EMPLOI
       })
@@ -595,7 +598,10 @@ describe('JeuneSqlRepository', () => {
           // Given
           const jeuneATransferer: Jeune = unJeune({
             id: 'unJeuneATransferer',
-            conseiller: unConseillerDuJeune({ id: 'idConseillerCible' }),
+            conseiller: unConseillerDuJeune({
+              id: 'idConseillerCible',
+              idAgence: undefined
+            }),
             configuration: undefined
           })
 
@@ -670,7 +676,10 @@ describe('JeuneSqlRepository', () => {
           )
           const jeuneATransferer: Jeune = unJeune({
             id: 'jeune-en-transfert',
-            conseiller: unConseillerDuJeune({ id: 'idConseillerCible' }),
+            conseiller: unConseillerDuJeune({
+              id: 'idConseillerCible',
+              idAgence: undefined
+            }),
             configuration: undefined
           })
 

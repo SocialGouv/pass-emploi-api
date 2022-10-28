@@ -531,6 +531,7 @@ describe('ConseillersController', () => {
               idConseiller: idConseiller,
               type: undefined,
               precision: undefined,
+              titre: undefined,
               adresse: undefined,
               organisme: undefined,
               presenceConseiller: undefined,
@@ -538,6 +539,50 @@ describe('ConseillersController', () => {
             },
             unUtilisateurDecode()
           )
+        })
+        it("crée le rendezvous sans jeunesIds quand c'est une animation collective", async () => {
+          // Given
+          const idConseiller = '41'
+          const payload: CreateRendezVousPayload = {
+            jeunesIds: [],
+            comment: '',
+            titre: 'aa',
+            date: uneDatetime().toJSDate().toISOString(),
+            duration: 30,
+            modality: 'rdv',
+            invitation: true,
+            type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
+          }
+
+          // When - Then
+          await request(app.getHttpServer())
+            .post(`/conseillers/${idConseiller}/rendezvous`)
+            .set('authorization', unHeaderAuthorization())
+            .send(payload)
+            .expect(HttpStatus.CREATED)
+            .expect({ id: 'id-rdv' })
+        })
+        it("crée le rendezvous avec jeunesIds quand c'est une animation collective", async () => {
+          // Given
+          const idConseiller = '41'
+          const payload: CreateRendezVousPayload = {
+            jeunesIds: ['1'],
+            comment: '',
+            titre: 'aa',
+            date: uneDatetime().toJSDate().toISOString(),
+            duration: 30,
+            modality: 'rdv',
+            invitation: true,
+            type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
+          }
+
+          // When - Then
+          await request(app.getHttpServer())
+            .post(`/conseillers/${idConseiller}/rendezvous`)
+            .set('authorization', unHeaderAuthorization())
+            .send(payload)
+            .expect(HttpStatus.CREATED)
+            .expect({ id: 'id-rdv' })
         })
         it('retourne une 200 quand presenceConseiller est undefined pour le type ENTRETIEN_CONSEILLER', async () => {
           // Given
@@ -638,7 +683,7 @@ describe('ConseillersController', () => {
         })
       })
       describe('quand la commande est en echec', () => {
-        it('retourne une 400 quand une failure JeuneNonLieAuConseiller est renvoyée', async () => {
+        it('retourne une 403 quand une failure JeuneNonLieAuConseiller est renvoyée', async () => {
           // Given
           const idConseiller = '41'
           const payload: CreateRendezVousPayload = {
@@ -658,19 +703,22 @@ describe('ConseillersController', () => {
             .post(`/conseillers/${idConseiller}/rendezvous`)
             .set('authorization', unHeaderAuthorization())
             .send(payload)
-            .expect(HttpStatus.BAD_REQUEST)
+            .expect(HttpStatus.FORBIDDEN)
         })
       })
     })
-    describe('quand le payload est pas bon', () => {
-      it("retourne une 400 quand la date n'est pas une dateString", async () => {
+    describe("quand le payload n'est pas bon", () => {
+      it('retourne une 400 les jeunes sont vide pour une rdv autre que animation collective', async () => {
         // Given
         const idConseiller = '41'
         const payload: CreateRendezVousPayload = {
-          jeunesIds: ['1'],
+          jeunesIds: [],
           comment: '',
-          date: '',
-          duration: 30
+          titre: 'aa',
+          date: uneDatetime().toJSDate().toISOString(),
+          duration: 30,
+          modality: 'rdv',
+          invitation: true
         }
 
         // When - Then
