@@ -5,6 +5,7 @@ import {
 } from '../../../src/application/commands/modifier-conseiller.command.handler'
 import {
   DroitsInsuffisants,
+  MauvaiseCommandeError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 import { failure, Failure } from '../../../src/building-blocks/types/result'
@@ -16,6 +17,7 @@ import {
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { createSandbox, expect } from '../../utils'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
 import Structure = Core.Structure
 
 describe('ModifierConseillerCommandHandler', () => {
@@ -103,68 +105,99 @@ describe('ModifierConseillerCommandHandler', () => {
       })
     })
 
-    describe("Quand le conseiller et l'agence existent", () => {
-      it('le conseiller est bien modifié', async function () {
+    describe('Quand le conseiller et l‘agence existent', () => {
+      let command: ModifierConseillerCommand
+      const idConseiller = 'id-conseiller'
+      beforeEach(() => {
         // Given
-        const command: ModifierConseillerCommand = {
-          idConseiller: 'id-conseiller',
+        command = {
+          idConseiller,
           agence: {
             id: 'id-agence'
           },
           notificationsSonores: true
         }
-        conseillerRepository.get
-          .withArgs('id-conseiller')
-          .resolves(conseillerQuiExiste)
-        agencesRepository.get.withArgs('id-agence').resolves(agenceQuiExiste)
-
-        // When
-        const result = await handler.handle(command)
-
-        // Then
-        expect(result._isSuccess).to.equal(true)
-        expect(conseillerRepository.save).to.have.been.calledWithExactly({
-          id: 'id qui existe',
-          firstName: 'Jean michel',
-          lastName: 'Conseiller',
-          structure: 'MILO',
-          email: 'mail@mail.mail',
-          dateVerificationMessages: undefined,
-          agence: { id: 'id-agence' },
-          nomAgenceManuel: undefined,
-          notificationsSonores: true
-        })
       })
-    })
+      describe('quand le conseiller vient de Pôle Emploi', () => {
+        it('modifie le conseiller', async () => {
+          // Given
+          const conseillerPE = unConseiller({
+            id: idConseiller,
+            structure: Structure.POLE_EMPLOI
+          })
 
-    describe('Quand on est un conseiller avec le bon id', () => {
-      const command = {
-        idConseiller: 'id qui existe',
-        agence: {
-          id: 'agence qui existe'
-        }
-      }
+          conseillerRepository.get
+            .withArgs('id-conseiller')
+            .resolves(conseillerPE)
+          agencesRepository.get.withArgs('id-agence').resolves(agenceQuiExiste)
 
-      beforeEach(() => {
-        agencesRepository.get
-          .withArgs('agence qui existe')
-          .resolves(agenceQuiExiste)
-      })
-
-      describe("et que l'agence et le conseiller ont la même structure", () => {
-        it('on modifie le conseiller', async () => {
           // When
-          const result = await handler.execute(
-            command,
-            unUtilisateurConseiller({
-              structure: Core.Structure.MILO,
-              id: 'id qui existe'
-            })
-          )
+          const result = await handler.handle(command)
 
           // Then
-          expect(result).to.deep.equal(
-            failure(new NonTrouveError('Conseiller', 'id qui existe'))
+          const conseillerPEmaj = unConseiller({
+            id: idConseiller,
+            structure: Structure.POLE_EMPLOI,
+            notificationsSonores: true
+          })
+          expect(result._isSuccess).to.equal(true)
+          expect(conseillerRepository.save).to.have.been.calledWithExactly(
+            conseillerPEmaj
+          )
+        })
+      })
+      describe('quand le conseiller vient de Mission Locale', () => {
+        it('modifie le conseiller avec une agence du référentiel', async () => {
+          // Given
+          const conseillerMilo = unConseiller({
+            id: idConseiller,
+            structure: Structure.MILO
+          })
+
+          conseillerRepository.get
+            .withArgs('id-conseiller')
+            .resolves(conseillerMilo)
+          agencesRepository.get.withArgs('id-agence').resolves(agenceQuiExiste)
+
+          // When
+          const result = await handler.handle(command)
+
+          // Then
+          const conseillerMiloMaj = unConseiller({
+            id: idConseiller,
+            structure: Structure.MILO,
+            agence: { id: 'id-agence' },
+            notificationsSonores: true
+          })
+          expect(result._isSuccess).to.equal(true)
+          expect(conseillerRepository.save).to.have.been.calledWithExactly(
+            conseillerMiloMaj
+          )
+        })
+        it('échoue pour une agence hors référentiel', async () => {
+          // Given
+          const conseillerMilo = unConseiller({
+            id: idConseiller,
+            structure: Structure.MILO
+          })
+          command = {
+            idConseiller,
+            agence: {
+              nom: 'nom-agence'
+            },
+            notificationsSonores: true
+          }
+
+          conseillerRepository.get
+            .withArgs('id-conseiller')
+            .resolves(conseillerMilo)
+
+          // When
+          const result = await handler.handle(command)
+
+          // Then
+          expect((result as Failure).error).to.be.instanceOf(
+            MauvaiseCommandeError
           )
         })
       })
