@@ -86,7 +86,7 @@
     "joi": "^17.6.0",
     "jose": "^4.9.2",
     "lodash.isequal": "^4.5.0",
-    "luxon": "3.0.4",
+    "luxon": "3.1.0",
     "nestjs-pino": "3.1.1",
     "openid-client": "5.2.1",
     "pg": "8.8.0",
