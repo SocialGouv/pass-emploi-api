@@ -17,7 +17,8 @@ export interface Evenement {
 export namespace Evenement {
   export enum Code {
     ACTION_CREEE = 'ACTION_CREEE',
-    ACTION_PREDEFINIE_CREEE = 'ACTION_PREDEFINIE_CREEE',
+    ACTION_CREEE_HORS_REFERENTIEL = 'ACTION_CREEE_HORS_REFERENTIEL',
+    ACTION_CREEE_REFERENTIEL = 'ACTION_CREEE_REFERENTIEL',
     ACTION_DETAIL = 'ACTION_DETAIL',
     ACTION_LISTE = 'ACTION_LISTE',
     ACTION_STATUT_MODIFIE = 'ACTION_STATUT_MODIFIE',
@@ -81,10 +82,14 @@ const evenements: {
 } = {
   [Evenement.Code.ACTION_CREEE]: {
     categorie: 'Action',
+    action: 'Création'
+  },
+  [Evenement.Code.ACTION_CREEE_HORS_REFERENTIEL]: {
+    categorie: 'Action',
     action: 'Création',
     nom: 'Hors référentiel'
   },
-  [Evenement.Code.ACTION_PREDEFINIE_CREEE]: {
+  [Evenement.Code.ACTION_CREEE_REFERENTIEL]: {
     categorie: 'Action',
     action: 'Création',
     nom: 'Référentiel'
