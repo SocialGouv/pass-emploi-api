@@ -101,8 +101,8 @@ export class CreateActionCommandHandler extends CommandHandler<
     )
     await this.evenementService.creer(
       vientDuReferentiel
-        ? Evenement.Code.ACTION_PREDEFINIE_CREEE
-        : Evenement.Code.ACTION_CREEE,
+        ? Evenement.Code.ACTION_CREEE_REFERENTIEL
+        : Evenement.Code.ACTION_CREEE_HORS_REFERENTIEL,
       utilisateur
     )
   }
