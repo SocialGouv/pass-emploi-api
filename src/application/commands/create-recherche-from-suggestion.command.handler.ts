@@ -18,6 +18,7 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { SuggestionAuthorizer } from '../authorizers/authorize-suggestion'
+import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface CreateRechercheFromSuggestionCommand extends Command {
   idJeune: string
@@ -36,7 +37,8 @@ export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
     @Inject(RecherchesRepositoryToken)
     private rechercheRepository: Recherche.Repository,
     private rechercheFactory: Recherche.Factory,
-    private suggestionFactory: Suggestion.Factory
+    private suggestionFactory: Suggestion.Factory,
+    private evenementService: EvenementService
   ) {
     super('CreateRechercheFromSuggestionCommandHandler')
   }
@@ -65,8 +67,42 @@ export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
     return success(recherche)
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    command: CreateRechercheFromSuggestionCommand
+  ): Promise<void> {
+    const suggestion = await this.suggestionRepository.get(command.idSuggestion)
+
+    if (!suggestion) {
+      throw failure(new MauvaiseCommandeError('Suggestion non trouvée'))
+    }
+
+    switch (suggestion.type) {
+      case Recherche.Type.OFFRES_EMPLOI:
+        this.evenementService.creer(
+          Evenement.Code.SUGGESTION_EMPLOI_ACCEPTEE,
+          utilisateur
+        )
+        break
+      case Recherche.Type.OFFRES_ALTERNANCE:
+        this.evenementService.creer(
+          Evenement.Code.SUGGESTION_ALTERNANCE_ACCEPTEE,
+          utilisateur
+        )
+        break
+      case Recherche.Type.OFFRES_IMMERSION:
+        this.evenementService.creer(
+          Evenement.Code.SUGGESTION_IMMERSION_ACCEPTEE,
+          utilisateur
+        )
+        break
+      case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
+        this.evenementService.creer(
+          Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_ACCEPTEE,
+          utilisateur
+        )
+        break
+    }
   }
 
   async authorize(

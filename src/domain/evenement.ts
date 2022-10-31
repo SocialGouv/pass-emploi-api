@@ -69,6 +69,10 @@ export namespace Evenement {
     RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE = 'RECHERCHE_OFFRE_EMPLOI_SAUVEGARDEE',
     RECHERCHE_SERVICE_CIVIQUE_SAUVEGARDEE = 'RECHERCHE_SERVICE_CIVIQUE_SAUVEGARDEE',
     SERVICE_CIVIQUE_RECHERCHE = 'SERVICE_CIVIQUE_RECHERCHE',
+    SUGGESTION_EMPLOI_ACCEPTEE = 'SUGGESTION_EMPLOI_ACCEPTEE',
+    SUGGESTION_ALTERNANCE_ACCEPTEE = 'SUGGESTION_ALTERNANCE_ACCEPTEE',
+    SUGGESTION_IMMERSION_ACCEPTEE = 'SUGGESTION_IMMERSION_ACCEPTEE',
+    SUGGESTION_SERVICE_CIVIQUE_ACCEPTEE = 'SUGGESTION_SERVICE_CIVIQUE_ACCEPTEE',
     SUIVI_POLE_EMPLOI = 'SUIVI_POLE_EMPLOI'
   }
 
@@ -328,6 +332,26 @@ const evenements: {
   [Evenement.Code.PREFERENCES_MISES_A_JOUR]: {
     categorie: 'Préférences',
     action: 'Mise à jour'
+  },
+  [Evenement.Code.SUGGESTION_EMPLOI_ACCEPTEE]: {
+    categorie: 'Recherche',
+    action: 'Accepter',
+    nom: 'Emploi'
+  },
+  [Evenement.Code.SUGGESTION_ALTERNANCE_ACCEPTEE]: {
+    categorie: 'Recherche',
+    action: 'Accepter',
+    nom: 'Alternance'
+  },
+  [Evenement.Code.SUGGESTION_IMMERSION_ACCEPTEE]: {
+    categorie: 'Recherche',
+    action: 'Accepter',
+    nom: 'Immersion'
+  },
+  [Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_ACCEPTEE]: {
+    categorie: 'Recherche',
+    action: 'Accepter',
+    nom: 'Service Civique'
   }
 }
 
