@@ -22,6 +22,8 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { Core } from '../../../src/domain/core'
+import Structure = Core.Structure
 
 describe('CreateActionCommandHandler', () => {
   let action: Action
@@ -248,10 +250,9 @@ describe('CreateActionCommandHandler', () => {
   })
 
   describe('monitor', () => {
-    const utilisateur = unUtilisateurJeune()
-
     it("créé l'événement idoine", () => {
       // Given
+      const utilisateur = unUtilisateurConseiller({ structure: Structure.MILO })
       const command: CreateActionCommand = {
         idJeune: action.idJeune,
         contenu: 'whatever',
@@ -267,13 +268,15 @@ describe('CreateActionCommandHandler', () => {
 
       // Then
       expect(evenementService.creer).to.have.been.calledWithExactly(
-        Evenement.Code.ACTION_CREEE,
+        Evenement.Code.ACTION_CREEE_HORS_REFERENTIEL,
         utilisateur
       )
     })
-
-    it("créé l'événement idoine si l'action provient du referentiel d'actions prédéfinies", () => {
+    it("créé l'événement idoine si Pôle emploi et l'action provient du referentiel d'actions prédéfinies", () => {
       // Given
+      const utilisateur = unUtilisateurConseiller({
+        structure: Structure.POLE_EMPLOI
+      })
       const command: CreateActionCommand = {
         idJeune: action.idJeune,
         contenu: Action.ACTIONS_PREDEFINIES[5].titre,
@@ -289,7 +292,7 @@ describe('CreateActionCommandHandler', () => {
 
       // Then
       expect(evenementService.creer).to.have.been.calledWithExactly(
-        Evenement.Code.ACTION_PREDEFINIE_CREEE,
+        Evenement.Code.ACTION_CREEE_REFERENTIEL,
         utilisateur
       )
     })
