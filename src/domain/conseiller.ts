@@ -1,6 +1,10 @@
 import { DateTime } from 'luxon'
 import { Core } from './core'
 import { Agence } from './agence'
+import { Injectable } from '@nestjs/common'
+import { failure, Result, success } from '../building-blocks/types/result'
+import Structure = Core.Structure
+import { DroitsInsuffisants } from '../building-blocks/types/domain-error'
 
 export interface Conseiller {
   id: string
@@ -37,18 +41,27 @@ export namespace Conseiller {
     ): Promise<void>
   }
 
-  export function mettreAJour(
-    conseiller: Conseiller,
-    infosDeMiseAJour: InfoDeMiseAJour
-  ): Conseiller {
-    return {
-      ...conseiller,
-      agence: infosDeMiseAJour.agence,
-      notificationsSonores: Boolean(infosDeMiseAJour.notificationsSonores)
+  @Injectable()
+  export class Factory {
+    mettreAJour(
+      conseiller: Conseiller,
+      infosDeMiseAJour: InfosDeMiseAJour
+    ): Result<Conseiller> {
+      const conseilleMiloARenseigneUneAgenceManuelle =
+        conseiller.structure === Structure.MILO && !infosDeMiseAJour.agence?.id
+
+      if (conseilleMiloARenseigneUneAgenceManuelle) {
+        return failure(new DroitsInsuffisants())
+      }
+      return success({
+        ...conseiller,
+        agence: infosDeMiseAJour.agence,
+        notificationsSonores: Boolean(infosDeMiseAJour.notificationsSonores)
+      })
     }
   }
 
-  export interface InfoDeMiseAJour {
+  export interface InfosDeMiseAJour {
     agence?: Agence
     notificationsSonores?: boolean
   }
