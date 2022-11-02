@@ -90,7 +90,7 @@ import {
   AuthentificationRepositoryToken
 } from './domain/authentification'
 import { ChatRepositoryToken } from './domain/chat'
-import { ConseillersRepositoryToken } from './domain/conseiller'
+import { Conseiller, ConseillersRepositoryToken } from './domain/conseiller'
 import { EvenementService, EvenementsRepositoryToken } from './domain/evenement'
 import { Fichier, FichierRepositoryToken } from './domain/fichier'
 import {
@@ -311,6 +311,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Mail.Factory,
     Authentification.Factory,
     Campagne.Factory,
+    Conseiller.Factory,
     Demarche.Factory,
     Jeune.Factory,
     Jeune.ConfigurationApplication.Factory,
