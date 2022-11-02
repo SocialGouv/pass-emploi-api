@@ -5,10 +5,13 @@ import {
 } from '../../../src/application/commands/modifier-conseiller.command.handler'
 import {
   DroitsInsuffisants,
-  MauvaiseCommandeError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
-import { failure, Failure } from '../../../src/building-blocks/types/result'
+import {
+  failure,
+  Failure,
+  success
+} from '../../../src/building-blocks/types/result'
 import { Agence } from '../../../src/domain/agence'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Core } from '../../../src/domain/core'
@@ -16,14 +19,15 @@ import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
-import { createSandbox, expect } from '../../utils'
+import { createSandbox, expect, stubClass } from '../../utils'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import Structure = Core.Structure
 
 describe('ModifierConseillerCommandHandler', () => {
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let agencesRepository: StubbedType<Agence.Repository>
-  let handler: ModifierConseillerCommandHandler
+  let conseillerFactory: StubbedType<Conseiller.Factory>
+  let modifierConseillerCommandHandler: ModifierConseillerCommandHandler
 
   const conseillerQuiExiste: Conseiller = {
     id: 'id qui existe',
@@ -46,10 +50,12 @@ describe('ModifierConseillerCommandHandler', () => {
     const sandbox = createSandbox()
     conseillerRepository = stubInterface(sandbox)
     agencesRepository = stubInterface(sandbox)
+    conseillerFactory = stubClass(Conseiller.Factory)
 
-    handler = new ModifierConseillerCommandHandler(
+    modifierConseillerCommandHandler = new ModifierConseillerCommandHandler(
       conseillerRepository,
-      agencesRepository
+      agencesRepository,
+      conseillerFactory
     )
   })
 
@@ -66,7 +72,7 @@ describe('ModifierConseillerCommandHandler', () => {
           .resolves(undefined)
 
         // Given
-        const result = await handler.handle(query)
+        const result = await modifierConseillerCommandHandler.handle(query)
 
         // Then
         expect(result._isSuccess).to.equal(false)
@@ -95,7 +101,7 @@ describe('ModifierConseillerCommandHandler', () => {
           .resolves(undefined)
 
         // Given
-        const result = await handler.handle(query)
+        const result = await modifierConseillerCommandHandler.handle(query)
 
         // Then
         expect(result._isSuccess).to.equal(false)
@@ -125,21 +131,24 @@ describe('ModifierConseillerCommandHandler', () => {
             id: idConseiller,
             structure: Structure.POLE_EMPLOI
           })
+          const conseillerPEmaj = unConseiller({
+            id: idConseiller,
+            structure: Structure.POLE_EMPLOI,
+            agence: { id: 'id-agence' },
+            notificationsSonores: true
+          })
 
           conseillerRepository.get
             .withArgs('id-conseiller')
             .resolves(conseillerPE)
           agencesRepository.get.withArgs('id-agence').resolves(agenceQuiExiste)
+          conseillerFactory.mettreAJour.returns(success(conseillerPEmaj))
 
           // When
-          const result = await handler.handle(command)
+          const result = await modifierConseillerCommandHandler.handle(command)
 
           // Then
-          const conseillerPEmaj = unConseiller({
-            id: idConseiller,
-            structure: Structure.POLE_EMPLOI,
-            notificationsSonores: true
-          })
+
           expect(result._isSuccess).to.equal(true)
           expect(conseillerRepository.save).to.have.been.calledWithExactly(
             conseillerPEmaj
@@ -153,22 +162,23 @@ describe('ModifierConseillerCommandHandler', () => {
             id: idConseiller,
             structure: Structure.MILO
           })
-
-          conseillerRepository.get
-            .withArgs('id-conseiller')
-            .resolves(conseillerMilo)
-          agencesRepository.get.withArgs('id-agence').resolves(agenceQuiExiste)
-
-          // When
-          const result = await handler.handle(command)
-
-          // Then
           const conseillerMiloMaj = unConseiller({
             id: idConseiller,
             structure: Structure.MILO,
             agence: { id: 'id-agence' },
             notificationsSonores: true
           })
+
+          conseillerRepository.get
+            .withArgs('id-conseiller')
+            .resolves(conseillerMilo)
+          agencesRepository.get.withArgs('id-agence').resolves(agenceQuiExiste)
+          conseillerFactory.mettreAJour.returns(success(conseillerMiloMaj))
+
+          // When
+          const result = await modifierConseillerCommandHandler.handle(command)
+
+          // Then
           expect(result._isSuccess).to.equal(true)
           expect(conseillerRepository.save).to.have.been.calledWithExactly(
             conseillerMiloMaj
@@ -191,14 +201,15 @@ describe('ModifierConseillerCommandHandler', () => {
           conseillerRepository.get
             .withArgs('id-conseiller')
             .resolves(conseillerMilo)
+          conseillerFactory.mettreAJour.returns(
+            failure(new DroitsInsuffisants())
+          )
 
           // When
-          const result = await handler.handle(command)
+          const result = await modifierConseillerCommandHandler.handle(command)
 
           // Then
-          expect((result as Failure).error).to.be.instanceOf(
-            MauvaiseCommandeError
-          )
+          expect((result as Failure).error).to.be.instanceOf(DroitsInsuffisants)
         })
       })
     })
@@ -216,7 +227,10 @@ describe('ModifierConseillerCommandHandler', () => {
         }
 
         // When
-        const result = await handler.execute(command, unUtilisateurJeune())
+        const result = await modifierConseillerCommandHandler.execute(
+          command,
+          unUtilisateurJeune()
+        )
 
         // Then
         expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
@@ -234,7 +248,10 @@ describe('ModifierConseillerCommandHandler', () => {
         }
 
         // When
-        const result = await handler.execute(query, unUtilisateurConseiller())
+        const result = await modifierConseillerCommandHandler.execute(
+          query,
+          unUtilisateurConseiller()
+        )
 
         // Then
         expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
