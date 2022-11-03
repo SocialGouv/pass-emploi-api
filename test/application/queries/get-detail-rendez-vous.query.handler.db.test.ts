@@ -91,11 +91,6 @@ describe('GetDetailRendezVousQueryHandler', () => {
           date: uneDatetime().toJSDate(),
           duration: 30,
           id: unRendezVous.id,
-          jeune: {
-            id: 'ABCDE',
-            nom: 'Doe',
-            prenom: 'John'
-          },
           jeunes: [
             {
               id: 'ABCDE',
@@ -164,11 +159,6 @@ describe('GetDetailRendezVousQueryHandler', () => {
           date: uneDatetime().toJSDate(),
           duration: 30,
           id: unRendezVous.id,
-          jeune: {
-            id: 'ABCDE',
-            nom: 'Doe',
-            prenom: 'John'
-          },
           jeunes: [
             {
               id: 'ABCDE',
@@ -256,11 +246,6 @@ describe('GetDetailRendezVousQueryHandler', () => {
           date: uneDatetime().toJSDate(),
           duration: 30,
           id: unRendezVous.id,
-          jeune: {
-            id: 'jeune-1',
-            nom: 'Doe',
-            prenom: 'John'
-          },
           jeunes: [
             {
               id: 'jeune-1',

@@ -257,6 +257,9 @@ import { CreateSuggestionConseillerServiceCiviqueCommandHandler } from './applic
 import { CreateSuggestionConseillerImmersionCommandHandler } from './application/commands/create-suggestion-conseiller-immersion.command.handler'
 import { ReferentielsControllerV2 } from './infrastructure/routes/v2/referentiels.controller.v2'
 import { GetMotifsSuppressionJeuneV2QueryHandler } from './application/queries/v2/get-motifs-suppression-jeune-v2.query.handler'
+import { GetAnimationsCollectivesQueryHandler } from './application/queries/get-animations-collectives.query.handler.db'
+import { EtablissementsController } from './infrastructure/routes/etablissements.controller'
+import { ConseillerEtablissementAuthorizer } from './application/authorizers/authorize-conseiller-etablissement'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -290,7 +293,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     FavorisController,
     ServicesCiviqueController,
     CampagnesController,
-    FilesController
+    FilesController,
+    EtablissementsController
   ],
   providers: [
     ...buildQueryCommandsProviders(),
@@ -473,6 +477,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     AuthorizeConseillerForJeunes,
     ConseillerForJeuneAvecPartageAuthorizer,
     FavoriOffreServiceCiviqueAuthorizer,
+    ConseillerEtablissementAuthorizer,
     GetDetailActionQueryHandler,
     GetDetailJeuneQueryHandler,
     GetActionsByJeuneQueryHandler,
@@ -590,7 +595,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateSuggestionConseillerOffreEmploiCommandHandler,
     CreateSuggestionConseillerServiceCiviqueCommandHandler,
     CreateSuggestionConseillerImmersionCommandHandler,
-    GetActionsPredefiniesQueryHandler
+    GetActionsPredefiniesQueryHandler,
+    GetAnimationsCollectivesQueryHandler
   ]
 }
 
