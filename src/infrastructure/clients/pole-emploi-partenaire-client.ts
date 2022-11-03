@@ -137,20 +137,14 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     try {
       const body = {
         id: demarcheModifiee.id,
-        dateModification: demarcheModifiee.dateModification.toUTC().toISO({
-          includeOffset: false
-        }),
+        dateModification: demarcheModifiee.dateModification.toUTC().toISO(),
         origineModification: ORIGINE,
         etat: toEtat(demarcheModifiee.statut),
         dateDebut: demarcheModifiee.dateDebut
-          ? demarcheModifiee.dateDebut?.toUTC().toISO({ includeOffset: false })
+          ? demarcheModifiee.dateDebut?.toUTC().toISO()
           : undefined,
-        dateFin: demarcheModifiee.dateFin
-          ?.toUTC()
-          .toISO({ includeOffset: false }),
-        dateAnnulation: demarcheModifiee.dateAnnulation?.toUTC().toISO({
-          includeOffset: false
-        })
+        dateFin: demarcheModifiee.dateFin?.toUTC().toISO(),
+        dateAnnulation: demarcheModifiee.dateAnnulation?.toUTC().toISO()
       }
       const demarcheDto = await this.put<DemarcheDto>(
         `${DEMARCHES_URL}/${demarcheModifiee.id}`,
@@ -176,10 +170,8 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
       const body = {
         origineCreateur: ORIGINE,
         etat: toEtat(demarche.statut),
-        dateCreation: demarche.dateCreation.toUTC().toISO({
-          includeOffset: false
-        }),
-        dateFin: demarche.dateFin.toUTC().toISO({ includeOffset: false }),
+        dateCreation: demarche.dateCreation.toUTC().toISO(),
+        dateFin: demarche.dateFin.toUTC().toISO(),
         pourquoi: demarche.pourquoi,
         quoi: demarche.quoi,
         comment: demarche.comment,

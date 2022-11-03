@@ -150,10 +150,10 @@ describe('PoleEmploiPartenaireClient', () => {
           }
           const body = {
             id: demarcheModifiee.id,
-            dateModification: '2020-04-06T12:00:00.000',
+            dateModification: '2020-04-06T12:00:00.000Z',
             origineModification: 'INDIVIDU',
             etat: 'AC',
-            dateDebut: '2020-04-06T12:00:00.000',
+            dateDebut: '2020-04-06T12:00:00.000Z',
             dateFin: undefined,
             dateAnnulation: undefined
           }
@@ -187,7 +187,7 @@ describe('PoleEmploiPartenaireClient', () => {
           }
           const body = {
             id: demarcheModifiee.id,
-            dateModification: '2020-04-06T12:00:00.000',
+            dateModification: '2020-04-06T12:00:00.000Z',
             origineModification: 'INDIVIDU',
             etat: 'AC',
             dateDebut: undefined,
@@ -225,10 +225,10 @@ describe('PoleEmploiPartenaireClient', () => {
         }
         const body = {
           id: demarcheModifiee.id,
-          dateModification: '2020-04-06T12:00:00.000',
+          dateModification: '2020-04-06T12:00:00.000Z',
           origineModification: 'INDIVIDU',
           etat: 'AC',
-          dateDebut: '2020-04-06T12:00:00.000',
+          dateDebut: '2020-04-06T12:00:00.000Z',
           dateFin: undefined,
           dateAnnulation: undefined
         }
@@ -263,8 +263,8 @@ describe('PoleEmploiPartenaireClient', () => {
     const body = {
       origineCreateur: 'INDIVIDU',
       etat: 'AC',
-      dateCreation: '2020-04-06T12:00:00.000',
-      dateFin: '2020-04-06T12:00:00.000',
+      dateCreation: '2020-04-06T12:00:00.000Z',
+      dateFin: '2020-04-06T12:00:00.000Z',
       pourquoi: 'test',
       quoi: 'test',
       comment: 'comment',
