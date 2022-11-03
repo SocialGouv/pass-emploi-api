@@ -92,8 +92,11 @@ export interface InfosRendezVousAMettreAJour {
 export namespace RendezVous {
   export interface Repository {
     save(rendezVous: RendezVous): Promise<void>
+
     get(id: string): Promise<RendezVous | undefined>
+
     delete(idRendezVous: string): Promise<void>
+
     getAllAVenir(): Promise<RendezVous[]>
   }
 
@@ -167,6 +170,14 @@ export namespace RendezVous {
       adresse: infosRendezVousAMettreAJour.adresse,
       organisme: infosRendezVousAMettreAJour.organisme,
       presenceConseiller: infosRendezVousAMettreAJour.presenceConseiller
+    }
+  }
+
+  export namespace AnimationCollective {
+    export enum Statut {
+      A_VENIR = 'A_VENIR',
+      A_CLOTURER = 'A_CLOTURER',
+      CLORUREE = 'CLORUREE'
     }
   }
 }
