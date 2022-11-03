@@ -13,7 +13,7 @@ import {
   ErreurHttp,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
-import { DetailOffreEngagementDto } from '../../infrastructure/repositories/offre-service-civique-http.repository.db'
+import { DetailOffreEngagementDto } from '../../infrastructure/repositories/offre/offre-service-civique-http.repository.db'
 import { EngagementClient } from '../../infrastructure/clients/engagement-client'
 
 export interface GetDetailOffreServiceCiviqueQuery extends Query {

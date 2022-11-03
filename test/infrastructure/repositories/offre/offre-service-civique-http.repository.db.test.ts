@@ -1,14 +1,14 @@
 import {
   JeuneDto,
   JeuneSqlModel
-} from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { AsSql } from '../../../src/infrastructure/sequelize/types'
-import { uneOffreServiceCivique } from '../../fixtures/offre-service-civique.fixture'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { expect } from '../../utils'
-import { OffreServiceCiviqueHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-service-civique-http.repository.db'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
-import { Offre } from '../../../src/domain/offre/offre'
+} from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { AsSql } from '../../../../src/infrastructure/sequelize/types'
+import { uneOffreServiceCivique } from '../../../fixtures/offre-service-civique.fixture'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { expect } from '../../../utils'
+import { OffreServiceCiviqueHttpSqlRepository } from '../../../../src/infrastructure/repositories/offre/offre-service-civique-http.repository.db'
+import { DatabaseForTesting } from '../../../utils/database-for-testing'
+import { Offre } from '../../../../src/domain/offre/offre'
 
 describe('OffreServiceCiviqueHttpSqlRepository', () => {
   DatabaseForTesting.prepare()

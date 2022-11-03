@@ -3,7 +3,7 @@ import { FavoriOffreEngagementSqlModel } from '../../sequelize/models/favori-off
 import {
   EngagementDto,
   OffreEngagementDto
-} from '../offre-service-civique-http.repository.db'
+} from '../offre/offre-service-civique-http.repository.db'
 import { Offre } from '../../../domain/offre/offre'
 import { Localisation } from 'src/domain/offre/favori/offre-service-civique'
 

@@ -12,7 +12,7 @@ import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Recherche } from '../../domain/offre/recherche/recherche'
 import { SuggestionsRepositoryToken } from '../../domain/offre/recherche/suggestion/suggestion'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
-import Suggestion = Recherche.Suggestion
+import { Suggestion } from 'src/domain/offre/recherche/suggestion/suggestion'
 
 export interface CreateSuggestionConseillerImmersionCommand extends Command {
   idConseiller: string
