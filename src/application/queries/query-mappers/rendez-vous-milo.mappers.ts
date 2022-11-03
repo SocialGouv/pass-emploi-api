@@ -49,12 +49,6 @@ export function fromSqlToRendezVousConseillerQueryModel(
     modality: rendezVousSql.modalite ?? '',
     duration: rendezVousSql.duree,
     title: rendezVousSql.titre ?? '',
-    // TODO: ENLEVER QUAND LE WEB EST A JOUR
-    jeune: {
-      id: rendezVousSql.jeunes[0].id,
-      nom: rendezVousSql.jeunes[0].nom,
-      prenom: rendezVousSql.jeunes[0].prenom
-    },
     jeunes: rendezVousSql.jeunes.map(jeune => ({
       id: jeune.id,
       prenom: jeune.prenom,
