@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous,
+  RendezVous,
   TypeRendezVous
 } from '../../../domain/rendez-vous'
 
@@ -15,6 +16,7 @@ class JeuneQueryModel {
   @ApiProperty()
   prenom: string
 }
+
 class ConseillerQueryModel {
   @ApiProperty()
   id: string
@@ -158,9 +160,6 @@ export class RendezVousConseillerQueryModel
   presenceConseiller?: boolean
 
   @ApiProperty()
-  jeune: JeuneQueryModel
-
-  @ApiProperty()
   jeunes: JeuneQueryModel[]
 
   @ApiProperty({ required: false })
@@ -169,6 +168,11 @@ export class RendezVousConseillerQueryModel
     nom: string
     prenom: string
   }
+}
+
+export class AnimationCollectiveQueryModel extends RendezVousConseillerQueryModel {
+  @ApiProperty()
+  statut: RendezVous.AnimationCollective.Statut
 }
 
 export class RendezVousConseillerFutursEtPassesQueryModel {
@@ -184,6 +188,7 @@ export class RendezVousConseillerFutursEtPassesQueryModel {
   })
   passes: RendezVousConseillerQueryModel[]
 }
+
 export class TypeRendezVousQueryModel implements TypeRendezVous {
   @ApiProperty()
   code: CodeTypeRendezVous
