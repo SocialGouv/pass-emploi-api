@@ -1,13 +1,13 @@
 import { expect } from 'chai'
-import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-immersion-http-sql.repository.db'
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { uneOffreImmersion } from '../../fixtures/offre-immersion.fixture'
-import { FavoriOffreImmersionSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { Immersion } from '../../../src/domain/offre/favori/offre-immersion'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { OffresImmersionHttpSqlRepository } from '../../../../src/infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { uneOffreImmersion } from '../../../fixtures/offre-immersion.fixture'
+import { FavoriOffreImmersionSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { Immersion } from '../../../../src/domain/offre/favori/offre-immersion'
+import { DatabaseForTesting } from '../../../utils/database-for-testing'
 
 describe('OffresImmersionHttpSqlRepository', () => {
   DatabaseForTesting.prepare()

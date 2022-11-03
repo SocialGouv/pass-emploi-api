@@ -14,6 +14,8 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { SuggestionAuthorizer } from '../authorizers/authorize-suggestion'
+import { Recherche } from '../../domain/offre/recherche/recherche'
+import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface RefuserSuggestionCommand extends Command {
   idJeune: string
@@ -29,7 +31,8 @@ export class RefuserSuggestionCommandHandler extends CommandHandler<
     private suggestionAuthorizer: SuggestionAuthorizer,
     @Inject(SuggestionsRepositoryToken)
     private suggestionRepository: Suggestion.Repository,
-    private suggestionFactory: Suggestion.Factory
+    private suggestionFactory: Suggestion.Factory,
+    private evenementService: EvenementService
   ) {
     super('DeleteSuggestionCommandHandler')
   }
@@ -51,8 +54,42 @@ export class RefuserSuggestionCommandHandler extends CommandHandler<
     return emptySuccess()
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    command: RefuserSuggestionCommand
+  ): Promise<void> {
+    const suggestion = await this.suggestionRepository.get(command.idSuggestion)
+
+    if (!suggestion) {
+      throw failure(new MauvaiseCommandeError('Suggestion non trouvée'))
+    }
+
+    switch (suggestion.type) {
+      case Recherche.Type.OFFRES_EMPLOI:
+        await this.evenementService.creer(
+          Evenement.Code.SUGGESTION_EMPLOI_REFUSEE,
+          utilisateur
+        )
+        break
+      case Recherche.Type.OFFRES_ALTERNANCE:
+        await this.evenementService.creer(
+          Evenement.Code.SUGGESTION_ALTERNANCE_REFUSEE,
+          utilisateur
+        )
+        break
+      case Recherche.Type.OFFRES_IMMERSION:
+        await this.evenementService.creer(
+          Evenement.Code.SUGGESTION_IMMERSION_REFUSEE,
+          utilisateur
+        )
+        break
+      case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
+        await this.evenementService.creer(
+          Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_REFUSEE,
+          utilisateur
+        )
+        break
+    }
   }
 
   async authorize(

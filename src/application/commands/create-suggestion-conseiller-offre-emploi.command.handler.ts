@@ -10,9 +10,11 @@ import {
 import { Authentification } from '../../domain/authentification'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Recherche } from '../../domain/offre/recherche/recherche'
-import { SuggestionsRepositoryToken } from '../../domain/offre/recherche/suggestion/suggestion'
+import {
+  Suggestion,
+  SuggestionsRepositoryToken
+} from '../../domain/offre/recherche/suggestion/suggestion'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
-import Suggestion = Recherche.Suggestion
 
 export interface CreateSuggestionConseillerOffreEmploiCommand extends Command {
   idConseiller: string

@@ -79,25 +79,25 @@ export class CreateRechercheFromSuggestionCommandHandler extends CommandHandler<
 
     switch (suggestion.type) {
       case Recherche.Type.OFFRES_EMPLOI:
-        this.evenementService.creer(
+        await this.evenementService.creer(
           Evenement.Code.SUGGESTION_EMPLOI_ACCEPTEE,
           utilisateur
         )
         break
       case Recherche.Type.OFFRES_ALTERNANCE:
-        this.evenementService.creer(
+        await this.evenementService.creer(
           Evenement.Code.SUGGESTION_ALTERNANCE_ACCEPTEE,
           utilisateur
         )
         break
       case Recherche.Type.OFFRES_IMMERSION:
-        this.evenementService.creer(
+        await this.evenementService.creer(
           Evenement.Code.SUGGESTION_IMMERSION_ACCEPTEE,
           utilisateur
         )
         break
       case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
-        this.evenementService.creer(
+        await this.evenementService.creer(
           Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_ACCEPTEE,
           utilisateur
         )

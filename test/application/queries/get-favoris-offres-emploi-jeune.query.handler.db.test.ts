@@ -8,7 +8,7 @@ import {
 } from '../../fixtures/offre-emploi.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
-import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-emploi-http-sql.repository.db'
+import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre/offre-emploi-http-sql.repository.db'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from '../../../src/application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import { Offre } from '../../../src/domain/offre/offre'

@@ -2,32 +2,43 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { SuggestionAuthorizer } from 'src/application/authorizers/authorize-suggestion'
 import { uneDatetime } from 'test/fixtures/date.fixture'
-import { RefuserSuggestionCommandHandler } from '../../../src/application/commands/refuser-suggestion.command.handler'
+import {
+  RefuserSuggestionCommand,
+  RefuserSuggestionCommandHandler
+} from '../../../src/application/commands/refuser-suggestion.command.handler'
 import {
   emptySuccess,
   success
 } from '../../../src/building-blocks/types/result'
 import { Suggestion } from '../../../src/domain/offre/recherche/suggestion/suggestion'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import {
+  unUtilisateurDecode,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
 import { uneSuggestion } from '../../fixtures/suggestion.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import { Offre } from '../../../src/domain/offre/offre'
 
 describe('RefuserSuggestionCommandHandler', () => {
   let refuserSuggestionCommandHandler: RefuserSuggestionCommandHandler
   let suggestionAuthorizer: StubbedClass<SuggestionAuthorizer>
   let suggestionRepository: StubbedType<Suggestion.Repository>
   let suggestionFactory: StubbedClass<Suggestion.Factory>
+  let evenementService: StubbedClass<EvenementService>
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     suggestionAuthorizer = stubClass(SuggestionAuthorizer)
     suggestionRepository = stubInterface(sandbox)
     suggestionFactory = stubClass(Suggestion.Factory)
+    evenementService = stubClass(EvenementService)
 
     refuserSuggestionCommandHandler = new RefuserSuggestionCommandHandler(
       suggestionAuthorizer,
       suggestionRepository,
-      suggestionFactory
+      suggestionFactory,
+      evenementService
     )
   })
   describe('authorize', () => {
@@ -73,6 +84,117 @@ describe('RefuserSuggestionCommandHandler', () => {
           suggestionRefusee
         )
         expect(result).to.deep.equal(emptySuccess())
+      })
+    })
+  })
+
+  describe('monitor', () => {
+    describe('suggestion offre emploi', () => {
+      it('enregistre l‘évènement', async () => {
+        // Given
+        const command: RefuserSuggestionCommand = {
+          idJeune: 'id-jeune',
+          idSuggestion: 'id-suggestion'
+        }
+        const suggestion = uneSuggestion({
+          id: command.idSuggestion,
+          idJeune: command.idJeune,
+          type: Offre.Recherche.Type.OFFRES_EMPLOI
+        })
+        suggestionRepository.get.resolves(suggestion)
+
+        // When
+        await refuserSuggestionCommandHandler.monitor(
+          unUtilisateurDecode(),
+          command
+        )
+
+        // Then
+        expect(evenementService.creer).to.have.been.calledWithExactly(
+          Evenement.Code.SUGGESTION_EMPLOI_REFUSEE,
+          unUtilisateurDecode()
+        )
+      })
+    })
+    describe('suggestion offre alternance', () => {
+      it('enregistre l‘évènement', async () => {
+        // Given
+        const command: RefuserSuggestionCommand = {
+          idJeune: 'id-jeune',
+          idSuggestion: 'id-suggestion'
+        }
+        const suggestion = uneSuggestion({
+          id: command.idSuggestion,
+          idJeune: command.idJeune,
+          type: Offre.Recherche.Type.OFFRES_ALTERNANCE
+        })
+        suggestionRepository.get.resolves(suggestion)
+
+        // When
+        await refuserSuggestionCommandHandler.monitor(
+          unUtilisateurDecode(),
+          command
+        )
+
+        // Then
+        expect(evenementService.creer).to.have.been.calledWithExactly(
+          Evenement.Code.SUGGESTION_ALTERNANCE_REFUSEE,
+          unUtilisateurDecode()
+        )
+      })
+    })
+    describe('suggestion offre immersion', () => {
+      it('enregistre l‘évènement', async () => {
+        // Given
+        const command: RefuserSuggestionCommand = {
+          idJeune: 'id-jeune',
+          idSuggestion: 'id-suggestion'
+        }
+        const suggestion = uneSuggestion({
+          id: command.idSuggestion,
+          idJeune: command.idJeune,
+          type: Offre.Recherche.Type.OFFRES_IMMERSION
+        })
+        suggestionRepository.get.resolves(suggestion)
+
+        // When
+        await refuserSuggestionCommandHandler.monitor(
+          unUtilisateurDecode(),
+          command
+        )
+
+        // Then
+        expect(evenementService.creer).to.have.been.calledWithExactly(
+          Evenement.Code.SUGGESTION_IMMERSION_REFUSEE,
+          unUtilisateurDecode()
+        )
+      })
+    })
+    describe('suggestion offre service civique', () => {
+      it('enregistre l‘évènement', async () => {
+        // Given
+        const command: RefuserSuggestionCommand = {
+          idJeune: 'id-jeune',
+          idSuggestion: 'id-suggestion'
+        }
+        const suggestion = uneSuggestion({
+          id: command.idSuggestion,
+          idJeune: command.idJeune,
+          type: Offre.Recherche.Type.OFFRES_SERVICES_CIVIQUE
+        })
+        suggestionRepository.get.resolves(suggestion)
+
+        // When
+        await refuserSuggestionCommandHandler.monitor(
+          unUtilisateurDecode(),
+          command
+        )
+
+        // Then
+        expect(evenementService.creer).to.have.been.calledWithExactly(
+          Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_REFUSEE,
+          unUtilisateurDecode()
+        )
       })
     })
   })

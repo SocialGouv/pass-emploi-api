@@ -11,18 +11,18 @@ import {
   geometrieNice,
   uneRecherche
 } from 'test/fixtures/recherche.fixture'
-import { GetOffresImmersionQuery } from '../../../src/application/queries/get-offres-immersion.query.handler'
-import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/recherche-sql.repository.db'
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { RechercheSqlModel } from '../../../src/infrastructure/sequelize/models/recherche.sql-model'
-import { IdService } from '../../../src/utils/id-service'
-import { uneDatetime } from '../../fixtures/date.fixture'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { expect } from '../../utils'
-import { GetServicesCiviqueQuery } from '../../../src/application/queries/get-services-civique.query.handler'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { GetOffresImmersionQuery } from '../../../../../src/application/queries/get-offres-immersion.query.handler'
+import { RechercheSqlRepository } from '../../../../../src/infrastructure/repositories/offre/recherche/recherche-sql.repository.db'
+import { ConseillerSqlModel } from '../../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { RechercheSqlModel } from '../../../../../src/infrastructure/sequelize/models/recherche.sql-model'
+import { IdService } from '../../../../../src/utils/id-service'
+import { uneDatetime } from '../../../../fixtures/date.fixture'
+import { unConseillerDto } from '../../../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../../../fixtures/sql-models/jeune.sql-model'
+import { expect } from '../../../../utils'
+import { GetServicesCiviqueQuery } from '../../../../../src/application/queries/get-services-civique.query.handler'
+import { DatabaseForTesting } from '../../../../utils/database-for-testing'
 
 describe('RechercheSqlRepository', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -44,6 +44,21 @@ describe('RechercheSqlRepository', () => {
         dateDerniereActualisationToken: uneDatetime().toJSDate()
       })
     )
+  })
+
+  describe('get', () => {
+    it('retourne la recherche', async () => {
+      // Given
+      const unUuid = 'd2d1ae28-5b85-11ed-9b6a-0242ac120002'
+      const recherche = uneRecherche({ id: unUuid, idJeune })
+      await rechercheSqlRepository.save(recherche)
+
+      // When
+      const result = await rechercheSqlRepository.get(unUuid)
+
+      // Then
+      expect(result).to.deep.equal(recherche)
+    })
   })
 
   describe('createRecherche', () => {

@@ -5,7 +5,7 @@ import { failure, Result, success } from '../../../building-blocks/types/result'
 import { Offre } from '../../../domain/offre/offre'
 import { EngagementClient } from '../../../infrastructure/clients/engagement-client'
 import { toOffresServicesCivique } from '../../../infrastructure/repositories/mappers/service-civique.mapper'
-import { EngagementDto } from '../../../infrastructure/repositories/offre-service-civique-http.repository.db'
+import { EngagementDto } from '../../../infrastructure/repositories/offre/offre-service-civique-http.repository.db'
 import { GetServicesCiviqueQuery } from '../get-services-civique.query.handler'
 
 const DEFAULT_PAGE = 1
