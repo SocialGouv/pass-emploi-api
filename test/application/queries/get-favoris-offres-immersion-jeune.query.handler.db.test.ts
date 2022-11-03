@@ -11,7 +11,7 @@ import {
   OffreImmersionQueryModel
 } from '../../../src/application/queries/query-models/offres-immersion.query-model'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-immersion-http-sql.repository.db'
+import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
 import { GetFavorisOffresImmersionJeuneQueryHandler } from '../../../src/application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'

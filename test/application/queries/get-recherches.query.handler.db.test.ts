@@ -8,7 +8,7 @@ import {
   uneRecherche
 } from '../../fixtures/recherche.fixture'
 import { Recherche } from '../../../src/domain/offre/recherche/recherche'
-import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/recherche-sql.repository.db'
+import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/offre/recherche/recherche-sql.repository.db'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'

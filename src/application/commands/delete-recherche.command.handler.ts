@@ -12,7 +12,11 @@ import {
   RecherchesRepositoryToken
 } from '../../domain/offre/recherche/recherche'
 import { RechercheAuthorizer } from '../authorizers/authorize-recherche'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import {
+  MauvaiseCommandeError,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
+import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface DeleteRechercheCommand extends Command {
   idJeune: string
@@ -27,7 +31,8 @@ export class DeleteRechercheCommandHandler extends CommandHandler<
   constructor(
     @Inject(RecherchesRepositoryToken)
     private readonly rechercheRepository: Recherche.Repository,
-    private readonly rechercheAuthorizer: RechercheAuthorizer
+    private readonly rechercheAuthorizer: RechercheAuthorizer,
+    private readonly evenementService: EvenementService
   ) {
     super('DeleteRechercheCommandHandler')
   }
@@ -55,7 +60,41 @@ export class DeleteRechercheCommandHandler extends CommandHandler<
     )
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    command: DeleteRechercheCommand
+  ): Promise<void> {
+    const recherche = await this.rechercheRepository.get(command.idRecherche)
+
+    if (!recherche) {
+      throw failure(new MauvaiseCommandeError('Recherche non trouvée'))
+    }
+
+    switch (recherche.type) {
+      case Recherche.Type.OFFRES_EMPLOI:
+        await this.evenementService.creer(
+          Evenement.Code.RECHERCHE_EMPLOI_SUPPRIMEE,
+          utilisateur
+        )
+        break
+      case Recherche.Type.OFFRES_ALTERNANCE:
+        await this.evenementService.creer(
+          Evenement.Code.RECHERCHE_ALTERNANCE_SUPPRIMEE,
+          utilisateur
+        )
+        break
+      case Recherche.Type.OFFRES_IMMERSION:
+        await this.evenementService.creer(
+          Evenement.Code.RECHERCHE_IMMERSION_SUPPRIMEE,
+          utilisateur
+        )
+        break
+      case Recherche.Type.OFFRES_SERVICES_CIVIQUE:
+        await this.evenementService.creer(
+          Evenement.Code.RECHERCHE_SERVICE_CIVIQUE_SUPPRIMEE,
+          utilisateur
+        )
+        break
+    }
   }
 }

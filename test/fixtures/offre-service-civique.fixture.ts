@@ -1,4 +1,4 @@
-import { OffreEngagementDto } from '../../src/infrastructure/repositories/offre-service-civique-http.repository.db'
+import { OffreEngagementDto } from '../../src/infrastructure/repositories/offre/offre-service-civique-http.repository.db'
 import { Offre } from '../../src/domain/offre/offre'
 
 export const uneOffreServiceCivique = (): Offre.Favori.ServiceCivique => ({

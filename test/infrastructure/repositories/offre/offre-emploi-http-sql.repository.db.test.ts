@@ -1,13 +1,13 @@
-import { Emploi } from '../../../src/domain/offre/favori/offre-emploi'
-import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre-emploi-http-sql.repository.db'
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { FavoriOffreEmploiSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { expect } from '../../utils'
-import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { Emploi } from '../../../../src/domain/offre/favori/offre-emploi'
+import { OffresEmploiHttpSqlRepository } from '../../../../src/infrastructure/repositories/offre/offre-emploi-http-sql.repository.db'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { FavoriOffreEmploiSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { expect } from '../../../utils'
+import { uneOffreEmploi } from '../../../fixtures/offre-emploi.fixture'
+import { DatabaseForTesting } from '../../../utils/database-for-testing'
 
 describe('OffresEmploiHttpSqlRepository', () => {
   DatabaseForTesting.prepare()

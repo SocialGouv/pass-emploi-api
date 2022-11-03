@@ -1,21 +1,29 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Op, QueryTypes, Sequelize, WhereOptions } from 'sequelize'
-import { Recherche } from '../../domain/offre/recherche/recherche'
-import { RechercheSqlModel } from '../sequelize/models/recherche.sql-model'
-import { fromSqlToRecherche } from './mappers/recherches.mappers'
+import { Recherche } from '../../../../domain/offre/recherche/recherche'
+import { RechercheSqlModel } from '../../../sequelize/models/recherche.sql-model'
+import { fromSqlToRecherche } from '../../mappers/recherches.mappers'
 import { DateTime } from 'luxon'
-import { GetOffresEmploiQuery } from '../../application/queries/get-offres-emploi.query.handler'
-import { CommuneSqlModel } from '../sequelize/models/commune.sql-model'
-import { SequelizeInjectionToken } from '../sequelize/providers'
-import { GetOffresImmersionQuery } from '../../application/queries/get-offres-immersion.query.handler'
-import { GetServicesCiviqueQuery } from '../../application/queries/get-services-civique.query.handler'
-import { Offre } from '../../domain/offre/offre'
+import { GetOffresEmploiQuery } from '../../../../application/queries/get-offres-emploi.query.handler'
+import { CommuneSqlModel } from '../../../sequelize/models/commune.sql-model'
+import { SequelizeInjectionToken } from '../../../sequelize/providers'
+import { GetOffresImmersionQuery } from '../../../../application/queries/get-offres-immersion.query.handler'
+import { GetServicesCiviqueQuery } from '../../../../application/queries/get-services-civique.query.handler'
+import { Offre } from '../../../../domain/offre/offre'
 
 @Injectable()
 export class RechercheSqlRepository implements Recherche.Repository {
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
   ) {}
+
+  async get(id: string): Promise<Recherche | undefined> {
+    const rechercheSql = await RechercheSqlModel.findByPk(id)
+    if (!rechercheSql) {
+      return undefined
+    }
+    return fromSqlToRecherche(rechercheSql)
+  }
 
   async save(recherche: Recherche): Promise<void> {
     await RechercheSqlModel.create({

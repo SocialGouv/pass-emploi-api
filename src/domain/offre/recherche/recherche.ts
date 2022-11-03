@@ -42,6 +42,8 @@ export namespace Recherche {
   }
 
   export interface Repository {
+    get(idRecherche: string): Promise<Recherche | undefined>
+
     save(recherche: Recherche): Promise<void>
 
     update(recherche: Recherche): Promise<void>
