@@ -169,4 +169,12 @@ export namespace RendezVous {
       presenceConseiller: infosRendezVousAMettreAJour.presenceConseiller
     }
   }
+
+  export namespace AnimationCollective {
+    export enum Statut {
+      A_VENIR = 'A_VENIR',
+      A_CLOTURER = 'A_CLOTURER',
+      CLOTUREE = 'CLOTUREE'
+    }
+  }
 }
