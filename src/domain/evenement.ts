@@ -73,6 +73,14 @@ export namespace Evenement {
     SUGGESTION_ALTERNANCE_ACCEPTEE = 'SUGGESTION_ALTERNANCE_ACCEPTEE',
     SUGGESTION_IMMERSION_ACCEPTEE = 'SUGGESTION_IMMERSION_ACCEPTEE',
     SUGGESTION_SERVICE_CIVIQUE_ACCEPTEE = 'SUGGESTION_SERVICE_CIVIQUE_ACCEPTEE',
+    SUGGESTION_EMPLOI_REFUSEE = 'SUGGESTION_EMPLOI_REFUSEE',
+    SUGGESTION_ALTERNANCE_REFUSEE = 'SUGGESTION_ALTERNANCE_REFUSEE',
+    SUGGESTION_IMMERSION_REFUSEE = 'SUGGESTION_IMMERSION_REFUSEE',
+    SUGGESTION_SERVICE_CIVIQUE_REFUSEE = 'SUGGESTION_SERVICE_CIVIQUE_REFUSEE',
+    RECHERCHE_EMPLOI_SUPPRIMEE = 'RECHERCHE_EMPLOI_SUPPRIMEE',
+    RECHERCHE_ALTERNANCE_SUPPRIMEE = 'RECHERCHE_ALTERNANCE_SUPPRIMEE',
+    RECHERCHE_IMMERSION_SUPPRIMEE = 'RECHERCHE_IMMERSION_SUPPRIMEE',
+    RECHERCHE_SERVICE_CIVIQUE_SUPPRIMEE = 'RECHERCHE_SERVICE_CIVIQUE_SUPPRIMEE',
     SUIVI_POLE_EMPLOI = 'SUIVI_POLE_EMPLOI'
   }
 
@@ -351,6 +359,46 @@ const evenements: {
   [Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_ACCEPTEE]: {
     categorie: 'Recherche',
     action: 'Accepter',
+    nom: 'Service Civique'
+  },
+  [Evenement.Code.SUGGESTION_EMPLOI_REFUSEE]: {
+    categorie: 'Recherche',
+    action: 'Refuser',
+    nom: 'Emploi'
+  },
+  [Evenement.Code.SUGGESTION_ALTERNANCE_REFUSEE]: {
+    categorie: 'Recherche',
+    action: 'Refuser',
+    nom: 'Alternance'
+  },
+  [Evenement.Code.SUGGESTION_IMMERSION_REFUSEE]: {
+    categorie: 'Recherche',
+    action: 'Refuser',
+    nom: 'Immersion'
+  },
+  [Evenement.Code.SUGGESTION_SERVICE_CIVIQUE_REFUSEE]: {
+    categorie: 'Recherche',
+    action: 'Refuser',
+    nom: 'Service Civique'
+  },
+  [Evenement.Code.RECHERCHE_EMPLOI_SUPPRIMEE]: {
+    categorie: 'Recherche',
+    action: 'Supprimer',
+    nom: 'Emploi'
+  },
+  [Evenement.Code.RECHERCHE_ALTERNANCE_SUPPRIMEE]: {
+    categorie: 'Recherche',
+    action: 'Supprimer',
+    nom: 'Alternance'
+  },
+  [Evenement.Code.RECHERCHE_IMMERSION_SUPPRIMEE]: {
+    categorie: 'Recherche',
+    action: 'Supprimer',
+    nom: 'Immersion'
+  },
+  [Evenement.Code.RECHERCHE_SERVICE_CIVIQUE_SUPPRIMEE]: {
+    categorie: 'Recherche',
+    action: 'Supprimer',
     nom: 'Service Civique'
   }
 }

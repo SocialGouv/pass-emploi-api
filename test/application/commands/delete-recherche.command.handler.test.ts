@@ -1,4 +1,7 @@
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import {
+  unUtilisateurDecode,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
@@ -15,10 +18,13 @@ import {
   DeleteRechercheCommandHandler
 } from '../../../src/application/commands/delete-recherche.command.handler'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import { Offre } from '../../../src/domain/offre/offre'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
 
 describe('DeleteRechercheCommandHandler', () => {
   let rechercheSqlRepository: StubbedType<Recherche.Repository>
   let rechercheAuthorizer: StubbedClass<RechercheAuthorizer>
+  let evenementService: StubbedClass<EvenementService>
   let deleteRechercheCommandHandler: DeleteRechercheCommandHandler
   let recherche: Recherche
   const jeune = unJeune()
@@ -28,10 +34,12 @@ describe('DeleteRechercheCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     rechercheSqlRepository = stubInterface(sandbox)
     rechercheAuthorizer = stubClass(RechercheAuthorizer)
+    evenementService = stubClass(EvenementService)
 
     deleteRechercheCommandHandler = new DeleteRechercheCommandHandler(
       rechercheSqlRepository,
-      rechercheAuthorizer
+      rechercheAuthorizer,
+      evenementService
     )
   })
 
@@ -101,6 +109,117 @@ describe('DeleteRechercheCommandHandler', () => {
         command.idRecherche,
         utilisateur
       )
+    })
+  })
+
+  describe('monitor', () => {
+    describe('recherche offre emploi', () => {
+      it('enregistre l‘évènement', async () => {
+        // Given
+        const command: DeleteRechercheCommand = {
+          idJeune: 'id-jeune',
+          idRecherche: 'id-recherche'
+        }
+        const recherche = uneRecherche({
+          id: command.idRecherche,
+          idJeune: command.idJeune,
+          type: Offre.Recherche.Type.OFFRES_EMPLOI
+        })
+        rechercheSqlRepository.get.resolves(recherche)
+
+        // When
+        await deleteRechercheCommandHandler.monitor(
+          unUtilisateurDecode(),
+          command
+        )
+
+        // Then
+        expect(evenementService.creer).to.have.been.calledWithExactly(
+          Evenement.Code.RECHERCHE_EMPLOI_SUPPRIMEE,
+          unUtilisateurDecode()
+        )
+      })
+    })
+    describe('recherche offre alternance', () => {
+      it('enregistre l‘évènement', async () => {
+        // Given
+        const command: DeleteRechercheCommand = {
+          idJeune: 'id-jeune',
+          idRecherche: 'id-recherche'
+        }
+        const recherche = uneRecherche({
+          id: command.idRecherche,
+          idJeune: command.idJeune,
+          type: Offre.Recherche.Type.OFFRES_ALTERNANCE
+        })
+        rechercheSqlRepository.get.resolves(recherche)
+
+        // When
+        await deleteRechercheCommandHandler.monitor(
+          unUtilisateurDecode(),
+          command
+        )
+
+        // Then
+        expect(evenementService.creer).to.have.been.calledWithExactly(
+          Evenement.Code.RECHERCHE_ALTERNANCE_SUPPRIMEE,
+          unUtilisateurDecode()
+        )
+      })
+    })
+    describe('recherche offre immersion', () => {
+      it('enregistre l‘évènement', async () => {
+        // Given
+        const command: DeleteRechercheCommand = {
+          idJeune: 'id-jeune',
+          idRecherche: 'id-recherche'
+        }
+        const recherche = uneRecherche({
+          id: command.idRecherche,
+          idJeune: command.idJeune,
+          type: Offre.Recherche.Type.OFFRES_IMMERSION
+        })
+        rechercheSqlRepository.get.resolves(recherche)
+
+        // When
+        await deleteRechercheCommandHandler.monitor(
+          unUtilisateurDecode(),
+          command
+        )
+
+        // Then
+        expect(evenementService.creer).to.have.been.calledWithExactly(
+          Evenement.Code.RECHERCHE_IMMERSION_SUPPRIMEE,
+          unUtilisateurDecode()
+        )
+      })
+    })
+    describe('recherche offre service civique', () => {
+      it('enregistre l‘évènement', async () => {
+        // Given
+        const command: DeleteRechercheCommand = {
+          idJeune: 'id-jeune',
+          idRecherche: 'id-recherche'
+        }
+        const recherche = uneRecherche({
+          id: command.idRecherche,
+          idJeune: command.idJeune,
+          type: Offre.Recherche.Type.OFFRES_SERVICES_CIVIQUE
+        })
+        rechercheSqlRepository.get.resolves(recherche)
+
+        // When
+        await deleteRechercheCommandHandler.monitor(
+          unUtilisateurDecode(),
+          command
+        )
+
+        // Then
+        expect(evenementService.creer).to.have.been.calledWithExactly(
+          Evenement.Code.RECHERCHE_SERVICE_CIVIQUE_SUPPRIMEE,
+          unUtilisateurDecode()
+        )
+      })
     })
   })
 })

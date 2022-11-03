@@ -6,7 +6,6 @@ import { createSandbox, SinonSandbox } from 'sinon'
 import { Authentification } from '../../../src/domain/authentification'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { Recherche } from '../../../src/domain/offre/recherche/recherche'
-import Suggestion = Recherche.Suggestion
 import {
   CreateSuggestionConseillerImmersionCommand,
   CreateSuggestionConseillerImmersionCommandHandler
@@ -16,6 +15,7 @@ import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { uneSuggestion } from '../../fixtures/suggestion.fixture'
+import { Suggestion } from '../../../src/domain/offre/recherche/suggestion/suggestion'
 
 describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
   let createSuggestionDuConseillerImmersionCommandHandler: CreateSuggestionConseillerImmersionCommandHandler

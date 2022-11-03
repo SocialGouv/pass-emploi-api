@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
-import { FavoriOffreEngagementSqlModel } from '../sequelize/models/favori-offre-engagement.sql-model'
-import { fromSqlToOffreServiceCivique } from './mappers/service-civique.mapper'
-import { Offre } from '../../domain/offre/offre'
+import { FavoriOffreEngagementSqlModel } from '../../sequelize/models/favori-offre-engagement.sql-model'
+import { fromSqlToOffreServiceCivique } from '../mappers/service-civique.mapper'
+import { Offre } from '../../../domain/offre/offre'
 
 @Injectable()
 export class OffreServiceCiviqueHttpSqlRepository

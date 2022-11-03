@@ -13,7 +13,7 @@ import {
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { Action } from '../../../src/domain/action/action'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action-sql.repository.db'
+import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action/action-sql.repository.db'
 import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'

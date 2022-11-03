@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { Action } from '../../domain/action/action'
-import { CommentaireSqlModel } from '../sequelize/models/commentaire.sql-model'
+import { Action } from '../../../domain/action/action'
+import { CommentaireSqlModel } from '../../sequelize/models/commentaire.sql-model'
 
 @Injectable()
 export class CommentaireActionSqlRepositoryDb
