@@ -10,7 +10,10 @@ import {
   Context,
   ContextKey
 } from '../../building-blocks/context'
-import { ErreurHttp } from '../../building-blocks/types/domain-error'
+import {
+  ErreurHttp,
+  TokenJeuneInvalide
+} from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Demarche } from '../../domain/demarche'
 import { suggestionsPEInMemory } from '../repositories/dto/pole-emploi.in-memory.dto'
@@ -212,6 +215,13 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
       return success(suggestionsPe.data)
     } catch (e) {
       this.logger.error(e)
+      if (
+        e.code === 'ERR_BAD_REQUEST' &&
+        e.response.status === HttpStatus.FORBIDDEN
+      ) {
+        const erreur = new TokenJeuneInvalide()
+        return failure(erreur)
+      }
       if (e.response?.data && e.response?.status) {
         const erreur = new ErreurHttp(e.response.data, e.response.status)
         return failure(erreur)

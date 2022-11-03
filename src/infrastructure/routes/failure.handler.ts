@@ -4,7 +4,8 @@ import {
   ForbiddenException,
   GoneException,
   HttpException,
-  NotFoundException
+  NotFoundException,
+  UnauthorizedException
 } from '@nestjs/common'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import {
@@ -21,7 +22,8 @@ import {
   MauvaiseCommandeError,
   NonTrouveError,
   ReponsesCampagneInvalide,
-  RessourceIndisponibleError
+  RessourceIndisponibleError,
+  TokenJeuneInvalide
 } from '../../building-blocks/types/domain-error'
 import { isFailure, Result } from '../../building-blocks/types/result'
 import { Action } from '../../domain/action/action'
@@ -34,6 +36,12 @@ export function handleFailure(result: Result): void {
           throw new HttpException(result.error.message, result.error.statusCode)
         }
         throw new RuntimeException(result.error.message)
+      case TokenJeuneInvalide.CODE:
+        throw new UnauthorizedException({
+          statusCode: 401,
+          message: 'Unauthorized',
+          code: 'token_pole_emploi_expired'
+        })
       case NonTrouveError.CODE:
         throw new NotFoundException(result.error.message)
       case MauvaiseCommandeError.CODE:

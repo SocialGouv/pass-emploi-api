@@ -202,6 +202,12 @@ export class ErreurHttp implements DomainError {
   }
 }
 
+export class TokenJeuneInvalide implements DomainError {
+  static CODE = 'TOKEN_JEUNE_INVALIDE'
+  readonly code: string = TokenJeuneInvalide.CODE
+  readonly message: string = 'token_pole_emploi_expired'
+}
+
 export class CampagneExisteDejaError implements DomainError {
   static CODE = 'CAMPAGNE_EXISTE_DEJA'
   readonly code: string = CampagneExisteDejaError.CODE
