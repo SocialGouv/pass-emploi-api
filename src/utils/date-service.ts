@@ -48,4 +48,12 @@ export class DateService {
   ): DateTime | undefined {
     return dateString ? DateTime.fromISO(dateString) : undefined
   }
+
+  static fromStringToLocaleDateTime(
+    dateString?: string | null
+  ): DateTime | undefined {
+    return dateString
+      ? DateTime.fromISO(dateString, { setZone: true })
+      : undefined
+  }
 }
