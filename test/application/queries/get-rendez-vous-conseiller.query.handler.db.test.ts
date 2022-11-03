@@ -127,11 +127,9 @@ describe('GetRendezVousConseillerQueryHandler', () => {
       // Then
       expect(rendezVous.passes.length).to.equal(2)
       expect(rendezVous.passes[0].id).to.equal(unRendezVousPasse.id)
-      expect(rendezVous.passes[0].jeune.id).to.equal(jeune1.id)
       expect(rendezVous.passes[0].jeunes[0].id).to.equal(jeune1.id)
       expect(rendezVous.passes[0].jeunes[1].id).to.equal(jeune2.id)
       expect(rendezVous.passes[1].id).to.equal(unRendezVousTresPasse.id)
-      expect(rendezVous.passes[1].jeune.id).to.equal(jeune1.id)
       expect(rendezVous.passes[1].jeunes[0].id).to.equal(jeune1.id)
       expect(rendezVous.passes[1].jeunes[1].id).to.equal(jeune2.id)
     })
