@@ -160,7 +160,9 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
         jeune => jeune.id === idJeune
       )
       if (estUnNouveauJeune) {
-        const jeuneAjoute = await this.jeuneRepository.get(idJeune)
+        const jeuneAjoute = await this.jeuneRepository.get(idJeune, {
+          avecConfiguration: true
+        })
         jeunesAjoutes.push(jeuneAjoute!)
       }
     }
