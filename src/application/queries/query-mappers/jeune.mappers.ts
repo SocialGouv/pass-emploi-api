@@ -72,10 +72,13 @@ export function toDetailJeuneConseillerQueryModel(
   return jeuneQueryModel
 }
 
-export interface DetailJeuneRawSql {
+export interface JeuneRawSql {
   id: string
   prenom: string
   nom: string
+}
+
+export interface DetailJeuneRawSql extends JeuneRawSql {
   email: string
   date_creation: Date
   id_authentification: string
