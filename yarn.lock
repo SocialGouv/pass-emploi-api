@@ -9057,7 +9057,7 @@ __metadata:
     remove-accents: 0.4.3
     rimraf: 3.0.2
     rxjs: 7.5.7
-    sequelize: 6.25.3
+    sequelize: 6.25.4
     sequelize-cli: 6.5.2
     sequelize-typescript: 2.1.5
     sinon: ^14.0.0
@@ -10972,9 +10972,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sequelize@npm:6.25.3":
-  version: 6.25.3
-  resolution: "sequelize@npm:6.25.3"
+"sequelize@npm:6.25.4":
+  version: 6.25.4
+  resolution: "sequelize@npm:6.25.4"
   dependencies:
     "@types/debug": ^4.1.7
     "@types/validator": ^13.7.1
@@ -11011,7 +11011,7 @@ __metadata:
       optional: true
     tedious:
       optional: true
-  checksum: 0444398d3c525af6421da84d7809dd8e22b1db4a4ad9623fc080d4c67423fdeb9c610caa28908db285403268954144e57cca45db175e85a8780e64dfd2bf493e
+  checksum: 47b606cde6896ad4e80008a173cc84a7a30a15f45e7391ced7f9214545332983cb0e147ce956dd0225dba0d05601ec7fc86f85509a85cd01fd80936738c7266a
   languageName: node
   linkType: hard
 
