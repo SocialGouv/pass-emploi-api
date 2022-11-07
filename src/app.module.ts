@@ -118,6 +118,7 @@ import {
 } from './domain/offre/recherche/recherche'
 import {
   AnimationCollectiveRepositoryToken,
+  HistoriqueRendezVousRepositoryToken,
   RendezVous,
   RendezVousRepositoryToken
 } from './domain/rendez-vous'
@@ -266,6 +267,7 @@ import { GetAnimationsCollectivesQueryHandler } from './application/queries/get-
 import { EtablissementsController } from './infrastructure/routes/etablissements.controller'
 import { ConseillerEtablissementAuthorizer } from './application/authorizers/authorize-conseiller-etablissement'
 import { AnimationCollectiveSqlRepository } from './infrastructure/repositories/rendez-vous/animation-collective-sql.repository.db'
+import { HistoriqueRendezVousRepositorySql } from './infrastructure/repositories/rendez-vous/historique-rendez-vous.repository.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -323,6 +325,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Campagne.Factory,
     Conseiller.Factory,
     Demarche.Factory,
+    RendezVous.Historique.Factory,
     Jeune.Factory,
     Jeune.ConfigurationApplication.Factory,
     Fichier.Factory,
@@ -459,6 +462,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: AnimationCollectiveRepositoryToken,
       useClass: AnimationCollectiveSqlRepository
+    },
+    {
+      provide: HistoriqueRendezVousRepositoryToken,
+      useClass: HistoriqueRendezVousRepositorySql
     },
     {
       provide: PoleEmploiPartenaireClientToken,

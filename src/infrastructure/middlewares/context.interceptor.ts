@@ -13,7 +13,7 @@ import {
   ContextKey
 } from '../../building-blocks/context'
 import { Authentification } from '../../domain/authentification'
-import { LogApiPartenaireSqlModel } from '../sequelize/models/log-api-partenaire-sql.model'
+import { LogApiPartenaireSqlModel } from '../sequelize/models/log-api-partenaire.sql-model'
 import * as uuid from 'uuid'
 import { getAPMInstance } from '../monitoring/apm.init'
 import * as APM from 'elastic-apm-node'

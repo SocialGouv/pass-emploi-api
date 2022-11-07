@@ -92,8 +92,12 @@ export class GetAllRendezVousConseillerQueryHandler extends QueryHandler<
     ])
 
     return {
-      passes: rendezVousPasses.map(fromSqlToRendezVousConseillerQueryModel),
-      futurs: rendezVousFuturs.map(fromSqlToRendezVousConseillerQueryModel)
+      passes: rendezVousPasses.map(rdv =>
+        fromSqlToRendezVousConseillerQueryModel(rdv)
+      ),
+      futurs: rendezVousFuturs.map(rdv =>
+        fromSqlToRendezVousConseillerQueryModel(rdv)
+      )
     }
   }
 
