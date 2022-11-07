@@ -3,7 +3,10 @@ import { Evenement, EvenementService } from '../../domain/evenement'
 import { PlanificateurService } from '../../domain/planificateur'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import {
+  MauvaiseCommandeError,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -45,6 +48,13 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     const rendezVous = await this.rendezVousRepository.get(command.idRendezVous)
     if (!rendezVous) {
       return failure(new NonTrouveError('Rendez-Vous', command.idRendezVous))
+    }
+    if (RendezVous.AnimationCollective.estCloturee(rendezVous)) {
+      return failure(
+        new MauvaiseCommandeError(
+          'Une Animation Collective cloturée ne peut plus etre modifée.'
+        )
+      )
     }
     await this.rendezVousRepository.delete(command.idRendezVous)
 
