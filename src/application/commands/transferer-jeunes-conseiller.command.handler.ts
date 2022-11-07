@@ -16,6 +16,7 @@ import { Authentification } from '../../domain/authentification'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
+import { RendezVous } from '../../domain/rendez-vous'
 
 export interface TransfererJeunesConseillerCommand extends Command {
   idConseillerSource: string
@@ -37,24 +38,23 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
     private jeuneRepository: Jeune.Repository,
     @Inject(ChatRepositoryToken)
     private chatRepository: Chat.Repository,
+    private animationCollectiveService: RendezVous.AnimationCollective.Service,
     private conseillerAuthorizer: ConseillerAuthorizer
   ) {
     super('TransfererJeunesConseillerCommandHandler')
   }
 
   async handle(command: TransfererJeunesConseillerCommand): Promise<Result> {
-    const [conseillerSourceExiste, conseillerCible, jeunes] = await Promise.all(
-      [
-        this.conseillerRepository.get(command.idConseillerSource),
-        this.conseillerRepository.get(command.idConseillerCible),
-        this.jeuneRepository.findAllJeunesByConseiller(
-          command.idsJeunes,
-          command.idConseillerSource
-        )
-      ]
-    )
+    const [conseillerSource, conseillerCible, jeunes] = await Promise.all([
+      this.conseillerRepository.get(command.idConseillerSource),
+      this.conseillerRepository.get(command.idConseillerCible),
+      this.jeuneRepository.findAllJeunesByConseiller(
+        command.idsJeunes,
+        command.idConseillerSource
+      )
+    ])
 
-    if (!conseillerSourceExiste) {
+    if (!conseillerSource) {
       return failure(
         new NonTrouveError('Conseiller', command.idConseillerSource)
       )
@@ -83,6 +83,17 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       command.idConseillerSource,
       command.estTemporaire
     )
+
+    if (
+      conseillerSource.agence?.id &&
+      conseillerCible.agence?.id &&
+      conseillerCible.agence.id !== conseillerSource.agence.id
+    ) {
+      await this.animationCollectiveService.desinscrire(
+        command.idsJeunes,
+        conseillerSource.agence.id
+      )
+    }
 
     updatedJeunes.forEach(jeune =>
       this.chatRepository.envoyerMessageTransfert(jeune)
