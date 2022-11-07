@@ -116,7 +116,11 @@ import {
   Recherche,
   RecherchesRepositoryToken
 } from './domain/offre/recherche/recherche'
-import { RendezVousRepositoryToken } from './domain/rendez-vous'
+import {
+  AnimationCollectiveRepositoryToken,
+  RendezVous,
+  RendezVousRepositoryToken
+} from './domain/rendez-vous'
 import { SuperviseursRepositoryToken } from './domain/superviseur'
 import { NotificationSupportServiceToken } from './domain/notification-support'
 import { ApiKeyAuthGuard } from './infrastructure/auth/api-key.auth-guard'
@@ -146,7 +150,7 @@ import { OffreServiceCiviqueHttpSqlRepository } from './infrastructure/repositor
 import { OffresImmersionHttpSqlRepository } from './infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
 import { PlanificateurRedisRepository } from './infrastructure/repositories/planificateur-redis.repository.db'
 import { RechercheSqlRepository } from './infrastructure/repositories/offre/recherche/recherche-sql.repository.db'
-import { RendezVousRepositorySql } from './infrastructure/repositories/rendez-vous-sql.repository.db'
+import { RendezVousRepositorySql } from './infrastructure/repositories/rendez-vous/rendez-vous-sql.repository.db'
 import { SuperviseurSqlRepository } from './infrastructure/repositories/superviseur-sql.repository.db'
 import { ActionsController } from './infrastructure/routes/actions.controller'
 import { AuthentificationController } from './infrastructure/routes/authentification.controller'
@@ -261,6 +265,7 @@ import { GetMotifsSuppressionJeuneV2QueryHandler } from './application/queries/v
 import { GetAnimationsCollectivesQueryHandler } from './application/queries/get-animations-collectives.query.handler.db'
 import { EtablissementsController } from './infrastructure/routes/etablissements.controller'
 import { ConseillerEtablissementAuthorizer } from './application/authorizers/authorize-conseiller-etablissement'
+import { AnimationCollectiveSqlRepository } from './infrastructure/repositories/rendez-vous/animation-collective-sql.repository.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -324,6 +329,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Suggestion.Factory,
     SuggestionPoleEmploiService,
     Notification.Service,
+    RendezVous.AnimationCollective.Service,
     WorkerService,
     TaskService,
     InvitationIcsClient,
@@ -449,6 +455,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: SuggestionsRepositoryToken,
       useClass: SuggestionSqlRepository
+    },
+    {
+      provide: AnimationCollectiveRepositoryToken,
+      useClass: AnimationCollectiveSqlRepository
     },
     {
       provide: PoleEmploiPartenaireClientToken,
