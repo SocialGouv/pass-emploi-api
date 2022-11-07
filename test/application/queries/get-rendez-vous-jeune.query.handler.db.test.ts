@@ -1,6 +1,6 @@
 import { stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
+import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import {
