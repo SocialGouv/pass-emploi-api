@@ -13,7 +13,7 @@ import {
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Notification } from '../../../src/domain/notification/notification'
 import { PlanificateurService } from '../../../src/domain/planificateur'
-import { RendezVous } from '../../../src/domain/rendez-vous'
+import { CodeTypeRendezVous, RendezVous } from '../../../src/domain/rendez-vous'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
@@ -23,7 +23,8 @@ import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Mail } from '../../../src/domain/mail'
-import { Jeune } from 'src/domain/jeune/jeune'
+import { Jeune } from '../../../src/domain/jeune/jeune'
+import { uneDatetime } from '../../fixtures/date.fixture'
 
 describe('UpdateRendezVousCommandHandler', () => {
   let rendezVousRepository: StubbedType<RendezVous.Repository>
@@ -131,6 +132,37 @@ describe('UpdateRendezVousCommandHandler', () => {
         expect(notificationService.notifierLesJeunesDuRdv).to.have.callCount(0)
         expect(result).to.deep.equal(
           failure(new NonTrouveError('Jeune', idJeuneNonTrouve))
+        )
+      })
+      it('échoue si animation collective cloturée', async () => {
+        // Given
+        const animationCollective = unRendezVous({
+          jeunes: [],
+          type: CodeTypeRendezVous.ATELIER,
+          dateCloture: uneDatetime()
+        })
+
+        const command: UpdateRendezVousCommand = {
+          idsJeunes: ['x'],
+          idRendezVous: animationCollective.id,
+          date: '2021-11-11T08:03:30.000Z',
+          duree: 30,
+          presenceConseiller: false
+        }
+        rendezVousRepository.get
+          .withArgs(command.idRendezVous)
+          .resolves(animationCollective)
+        // When
+        const result = await updateRendezVousCommandHandler.handle(command)
+        // Then
+        expect(rendezVousRepository.save).to.have.callCount(0)
+        expect(notificationService.notifierLesJeunesDuRdv).to.have.callCount(0)
+        expect(result).to.deep.equal(
+          failure(
+            new MauvaiseCommandeError(
+              'Une Animation Collective cloturée ne peut plus etre modifée.'
+            )
+          )
         )
       })
     })

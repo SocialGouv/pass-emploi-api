@@ -1,35 +1,29 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
-  NotFoundException,
   Param,
   ParseUUIDPipe,
   Put
 } from '@nestjs/common'
-import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  DeleteRendezVousCommand,
+  DeleteRendezVousCommandHandler
+} from '../../application/commands/delete-rendez-vous.command.handler'
 import {
   UpdateRendezVousCommand,
   UpdateRendezVousCommandHandler
 } from '../../application/commands/update-rendez-vous.command.handler'
 import { GetDetailRendezVousQueryHandler } from '../../application/queries/get-detail-rendez-vous.query.handler.db'
 import { RendezVousConseillerQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
-import {
-  MauvaiseCommandeError,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
-import { Core } from '../../domain/core'
-import {
-  DeleteRendezVousCommand,
-  DeleteRendezVousCommandHandler
-} from '../../application/commands/delete-rendez-vous.command.handler'
-import { isFailure, isSuccess } from '../../building-blocks/types/result'
+import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { Core } from '../../domain/core'
 import { Utilisateur } from '../decorators/authenticated.decorator'
+import { handleFailure } from './failure.handler'
 import { UpdateRendezVousPayload } from './validation/rendez-vous.inputs'
 
 @Controller('rendezvous')
@@ -59,13 +53,7 @@ export class RendezVousController {
       return result.data
     }
 
-    if (isFailure(result)) {
-      if (result.error instanceof NonTrouveError) {
-        throw new NotFoundException(result.error)
-      }
-    }
-
-    throw new RuntimeException()
+    throw handleFailure(result)
   }
 
   @Delete(':idRendezVous')
@@ -81,9 +69,7 @@ export class RendezVousController {
       command,
       utilisateur
     )
-    if (isFailure(result)) {
-      throw new NotFoundException(result.error)
-    }
+    handleFailure(result)
   }
 
   @Put(':idRendezVous')
@@ -109,17 +95,9 @@ export class RendezVousController {
       utilisateur
     )
 
-    if (isFailure(result)) {
-      switch (result.error.code) {
-        case NonTrouveError.CODE:
-          throw new NotFoundException(result.error)
-        case MauvaiseCommandeError.CODE:
-          throw new BadRequestException(result.error)
-      }
-    }
     if (isSuccess(result)) {
       return result.data
     }
-    throw new RuntimeException()
+    throw handleFailure(result)
   }
 }

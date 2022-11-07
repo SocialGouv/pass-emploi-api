@@ -6,6 +6,7 @@ import {
 } from '../../sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../sequelize/types'
 import { JeuneDuRendezVous, RendezVous } from '../../../domain/rendez-vous'
+import { DateService } from '../../../utils/date-service'
 
 export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
   return {
@@ -47,7 +48,9 @@ export function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
     presenceConseiller: rendezVousSql.presenceConseiller,
     invitation: rendezVousSql.invitation ?? undefined,
     icsSequence: rendezVousSql.icsSequence ?? undefined,
-    createur: rendezVousSql.createur
+    createur: rendezVousSql.createur,
+    dateCloture: DateService.fromJSDateToDateTime(rendezVousSql.dateCloture),
+    idAgence: rendezVousSql.idAgence ?? undefined
   }
 }
 
