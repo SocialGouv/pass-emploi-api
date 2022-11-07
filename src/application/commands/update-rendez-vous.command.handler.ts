@@ -16,6 +16,7 @@ import { Notification } from '../../domain/notification/notification'
 import { PlanificateurService } from '../../domain/planificateur'
 import {
   CodeTypeRendezVous,
+  HistoriqueRendezVousRepositoryToken,
   JeuneDuRendezVous,
   RendezVous,
   RendezVousRepositoryToken
@@ -52,7 +53,10 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     private conseillerRepository: Conseiller.Repository,
     private rendezVousAuthorizer: RendezVousAuthorizer,
     private planificateurService: PlanificateurService,
-    private evenementService: EvenementService
+    private evenementService: EvenementService,
+    private historiqueRendezVousFactory: RendezVous.Historique.Factory,
+    @Inject(HistoriqueRendezVousRepositoryToken)
+    private historiqueRendezVousRepository: RendezVous.Historique.Repository
   ) {
     super('UpdateRendezVousCommandHandler')
   }
@@ -246,7 +250,15 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     )
   }
 
-  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    command: UpdateRendezVousCommand
+  ): Promise<void> {
+    const log = this.historiqueRendezVousFactory.creerLogModification(
+      command.idRendezVous,
+      utilisateur
+    )
+    await this.historiqueRendezVousRepository.save(log)
     await this.evenementService.creer(Evenement.Code.RDV_MODIFIE, utilisateur)
   }
 }

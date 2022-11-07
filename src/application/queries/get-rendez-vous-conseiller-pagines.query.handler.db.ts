@@ -67,7 +67,9 @@ export class GetRendezVousConseillerPaginesQueryHandler extends QueryHandler<
       limit: NOMBRE_RDV_MAX
     })
 
-    return success(rendezVousSql.map(fromSqlToRendezVousConseillerQueryModel))
+    return success(
+      rendezVousSql.map(rdv => fromSqlToRendezVousConseillerQueryModel(rdv))
+    )
   }
 
   async authorize(

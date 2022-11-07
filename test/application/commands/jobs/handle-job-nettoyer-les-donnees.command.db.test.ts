@@ -7,7 +7,7 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { HandleJobNettoyerLesDonneesCommandHandler } from '../../../../src/application/commands/jobs/handle-job-nettoyer-les-donnees.command.db'
 import { DatabaseForTesting } from '../../../utils/database-for-testing'
 import { ArchiveJeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/archive-jeune.sql-model'
-import { LogApiPartenaireSqlModel } from '../../../../src/infrastructure/sequelize/models/log-api-partenaire-sql.model'
+import { LogApiPartenaireSqlModel } from '../../../../src/infrastructure/sequelize/models/log-api-partenaire.sql-model'
 
 describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
   DatabaseForTesting.prepare()
