@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { Conseiller, ConseillersRepositoryToken } from 'src/domain/conseiller'
 import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
 import {
   emptySuccess,
@@ -12,7 +13,9 @@ import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
 export class RendezVousAuthorizer {
   constructor(
     @Inject(RendezVousRepositoryToken)
-    private rendezVousRepository: RendezVous.Repository
+    private rendezVousRepository: RendezVous.Repository,
+    @Inject(ConseillersRepositoryToken)
+    private conseillerRepository: Conseiller.Repository
   ) {}
 
   async authorize(
@@ -24,10 +27,22 @@ export class RendezVousAuthorizer {
     if (
       rendezVous &&
       utilisateur &&
-      utilisateur.type === Authentification.Type.CONSEILLER &&
-      rendezVous.jeunes.find(jeune => utilisateur.id === jeune.conseiller?.id)
+      utilisateur.type === Authentification.Type.CONSEILLER
     ) {
-      return emptySuccess()
+      if (RendezVous.estUnTypeAnimationCollective(rendezVous.type)) {
+        const conseiller = await this.conseillerRepository.get(utilisateur.id)
+        if (
+          conseiller &&
+          rendezVous.idAgence &&
+          rendezVous.idAgence === conseiller?.agence?.id
+        ) {
+          return emptySuccess()
+        }
+      } else if (
+        rendezVous.jeunes.find(jeune => utilisateur.id === jeune.conseiller?.id)
+      ) {
+        return emptySuccess()
+      }
     }
 
     return failure(new DroitsInsuffisants())
