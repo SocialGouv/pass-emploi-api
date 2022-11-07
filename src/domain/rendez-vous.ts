@@ -1,9 +1,12 @@
 import { IdService } from '../utils/id-service'
 import { Jeune } from './jeune/jeune'
 import { Conseiller } from './conseiller'
+import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 
 export const RendezVousRepositoryToken = 'RendezVous.Repository'
+export const AnimationCollectiveRepositoryToken =
+  'AnimationCollective.Repository'
 
 export enum CodeTypeRendezVous {
   ACTIVITE_EXTERIEURES = 'ACTIVITE_EXTERIEURES',
@@ -94,8 +97,11 @@ export interface InfosRendezVousAMettreAJour {
 export namespace RendezVous {
   export interface Repository {
     save(rendezVous: RendezVous): Promise<void>
+
     get(id: string): Promise<RendezVous | undefined>
+
     delete(idRendezVous: string): Promise<void>
+
     getAllAVenir(): Promise<RendezVous[]>
   }
 
@@ -115,6 +121,15 @@ export namespace RendezVous {
       Boolean(type) &&
       (type === CodeTypeRendezVous.ATELIER ||
         type === CodeTypeRendezVous.INFORMATION_COLLECTIVE)
+    )
+  }
+
+  export function estUneAnimationCollective(
+    rendezVous: RendezVous
+  ): rendezVous is AnimationCollective {
+    return (
+      rendezVous.type === CodeTypeRendezVous.ATELIER ||
+      rendezVous.type === CodeTypeRendezVous.INFORMATION_COLLECTIVE
     )
   }
 
@@ -172,6 +187,10 @@ export namespace RendezVous {
     }
   }
 
+  export interface AnimationCollective extends RendezVous {
+    type: CodeTypeRendezVous.ATELIER | CodeTypeRendezVous.INFORMATION_COLLECTIVE
+  }
+
   export namespace AnimationCollective {
     export enum Statut {
       A_VENIR = 'A_VENIR',
@@ -184,6 +203,32 @@ export namespace RendezVous {
         RendezVous.estUnTypeAnimationCollective(rendezVous.type) &&
           rendezVous.dateCloture
       )
+    }
+
+    export interface Repository {
+      getAllAVenir(idEtablissement: string): Promise<AnimationCollective[]>
+      save(animationCollective: AnimationCollective): Promise<void>
+    }
+
+    @Injectable()
+    export class Service {
+      constructor(
+        @Inject(AnimationCollectiveRepositoryToken)
+        private repository: Repository
+      ) {}
+
+      async desinscrire(idsJeunes: string[], idAgence: string): Promise<void> {
+        const animationsCollectives = await this.repository.getAllAVenir(
+          idAgence
+        )
+
+        for (const animationCollective of animationsCollectives) {
+          animationCollective.jeunes = animationCollective.jeunes.filter(
+            jeune => !idsJeunes.includes(jeune.id)
+          )
+          await this.repository.save(animationCollective)
+        }
+      }
     }
   }
 }
