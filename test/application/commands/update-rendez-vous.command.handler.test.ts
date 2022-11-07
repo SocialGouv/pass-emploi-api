@@ -14,17 +14,15 @@ import { failure, success } from '../../../src/building-blocks/types/result'
 import { Notification } from '../../../src/domain/notification/notification'
 import { PlanificateurService } from '../../../src/domain/planificateur'
 import { CodeTypeRendezVous, RendezVous } from '../../../src/domain/rendez-vous'
-import {
-  unUtilisateurConseiller,
-  unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { Conseiller } from '../../../src/domain/conseiller'
 import { Mail } from '../../../src/domain/mail'
 import { Jeune } from '../../../src/domain/jeune/jeune'
-import { uneDatetime } from '../../fixtures/date.fixture'
+import { uneDate, uneDatetime } from '../../fixtures/date.fixture'
+import { Authentification } from '../../../src/domain/authentification'
 
 describe('UpdateRendezVousCommandHandler', () => {
   let rendezVousRepository: StubbedType<RendezVous.Repository>
@@ -35,6 +33,8 @@ describe('UpdateRendezVousCommandHandler', () => {
   let planificateurService: StubbedClass<PlanificateurService>
   let rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
   let evenementService: StubbedClass<EvenementService>
+  let historiqueRendezVousFactory: StubbedClass<RendezVous.Historique.Factory>
+  let historiqueRendezVousRepository: StubbedType<RendezVous.Historique.Repository>
   let updateRendezVousCommandHandler: UpdateRendezVousCommandHandler
   const jeune = unJeune()
   const rendezVous = unRendezVous({ jeunes: [jeune] })
@@ -49,6 +49,8 @@ describe('UpdateRendezVousCommandHandler', () => {
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
     planificateurService = stubClass(PlanificateurService)
     evenementService = stubClass(EvenementService)
+    historiqueRendezVousFactory = stubClass(RendezVous.Historique.Factory)
+    historiqueRendezVousRepository = stubInterface(sandbox)
 
     updateRendezVousCommandHandler = new UpdateRendezVousCommandHandler(
       rendezVousRepository,
@@ -58,7 +60,9 @@ describe('UpdateRendezVousCommandHandler', () => {
       conseillerRepository,
       rendezVousAuthorizer,
       planificateurService,
-      evenementService
+      evenementService,
+      historiqueRendezVousFactory,
+      historiqueRendezVousRepository
     )
   })
 
@@ -444,17 +448,55 @@ describe('UpdateRendezVousCommandHandler', () => {
   })
 
   describe('monitor', () => {
-    const utilisateur = unUtilisateurJeune()
+    let utilisateur: Authentification.Utilisateur
+    let updateCommand: UpdateRendezVousCommand
+    let date: Date
+    // Given
+    beforeEach(() => {
+      utilisateur = unUtilisateurConseiller()
+      date = uneDate()
+      updateCommand = {
+        idRendezVous: rendezVous.id,
+        date: date.toISOString(),
+        duree: 30,
+        presenceConseiller: rendezVous.presenceConseiller
+      }
+    })
 
-    it("créé l'événement idoine", () => {
+    it("créé l'événement idoine", async () => {
       // When
-      updateRendezVousCommandHandler.monitor(utilisateur)
+      await updateRendezVousCommandHandler.monitor(utilisateur, updateCommand)
 
       // Then
       expect(evenementService.creer).to.have.been.calledWithExactly(
         Evenement.Code.RDV_MODIFIE,
         utilisateur
       )
+    })
+
+    it('crée un log de modification de rendez-vous', async () => {
+      // Given
+      const logModification = {
+        id: '37b4ca73-fd8b-4194-8d3c-80b6c9949dea',
+        idRendezVous: rendezVous.id,
+        date,
+        auteur: {
+          id: utilisateur.id,
+          nom: utilisateur.nom,
+          prenom: utilisateur.prenom
+        }
+      }
+      historiqueRendezVousFactory.creerLogModification
+        .withArgs(updateCommand.idRendezVous, utilisateur)
+        .returns(logModification)
+
+      // When
+      await updateRendezVousCommandHandler.monitor(utilisateur, updateCommand)
+
+      // Then
+      expect(
+        historiqueRendezVousRepository.save
+      ).to.have.been.calledWithExactly(logModification)
     })
   })
 })

@@ -2,22 +2,25 @@ import {
   unJeuneDuRendezVous,
   unRendezVous
 } from 'test/fixtures/rendez-vous.fixture'
-import { RendezVousRepositorySql } from '../../../src/infrastructure/repositories/rendez-vous/rendez-vous-sql.repository.db'
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { DateService } from '../../../src/utils/date-service'
-import { uneDatetime, uneDatetimeMinuit } from '../../fixtures/date.fixture'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { expect, stubClass } from '../../utils'
-import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
-import { JeuneDuRendezVous, RendezVous } from '../../../src/domain/rendez-vous'
-import { Core } from '../../../src/domain/core'
+import { RendezVousRepositorySql } from '../../../../src/infrastructure/repositories/rendez-vous/rendez-vous-sql.repository.db'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { RendezVousSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { DateService } from '../../../../src/utils/date-service'
+import { uneDatetime, uneDatetimeMinuit } from '../../../fixtures/date.fixture'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
+import { expect, stubClass } from '../../../utils'
+import { RendezVousJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
+import {
+  JeuneDuRendezVous,
+  RendezVous
+} from '../../../../src/domain/rendez-vous'
+import { Core } from '../../../../src/domain/core'
 import Structure = Core.Structure
-import { DatabaseForTesting } from '../../utils/database-for-testing'
-import { uneConfiguration } from '../../fixtures/jeune.fixture'
+import { DatabaseForTesting } from '../../../utils/database-for-testing'
+import { uneConfiguration } from '../../../fixtures/jeune.fixture'
 
 describe('RendezVousRepositorySql', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
