@@ -3,6 +3,7 @@ import { SinonSandbox } from 'sinon'
 import { Chat } from 'src/domain/chat'
 import { Core } from 'src/domain/core'
 import { Jeune } from 'src/domain/jeune/jeune'
+import { RendezVous } from 'src/domain/rendez-vous'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import {
@@ -57,6 +58,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let chatRepository: StubbedType<Chat.Repository>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
+  let animationCollectiveService: StubbedClass<RendezVous.AnimationCollective.Service>
 
   beforeEach(async () => {
     const sandbox: SinonSandbox = createSandbox()
@@ -71,11 +73,15 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
 
     chatRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
+    animationCollectiveService = stubClass(
+      RendezVous.AnimationCollective.Service
+    )
     transfererJeunesConseillerCommandHandler =
       new TransfererJeunesConseillerCommandHandler(
         conseillerRepository,
         jeuneRepository,
         chatRepository,
+        animationCollectiveService,
         conseillerAuthorizer
       )
   })
@@ -138,7 +144,6 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
           ).to.deep.equal(jeune2ApresTransfert)
         })
       })
-
       describe('quand le transfert est temporaire', () => {
         const command: TransfererJeunesConseillerCommand = {
           idConseillerSource: conseillerSource.id,
@@ -263,6 +268,49 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
               command.estTemporaire
             )
           })
+        })
+      })
+      describe("quand il y a un changement d'agence", () => {
+        it("désinscrit les jeunes des animations collectives de l'ancienne agence", async () => {
+          // Given
+          const conseillerCibleDeNantes = unConseiller({
+            id: 'conseillerCibleDeNantes',
+            agence: {
+              id: '44',
+              nom: 'Pôle emploi NANTES'
+            }
+          })
+          conseillerRepository.get
+            .withArgs(conseillerCibleDeNantes.id)
+            .resolves(conseillerCibleDeNantes)
+
+          const command: TransfererJeunesConseillerCommand = {
+            idConseillerSource: conseillerSource.id,
+            idConseillerCible: conseillerCibleDeNantes.id,
+            estTemporaire: false,
+            idsJeunes: ['1'],
+            structure: Core.Structure.PASS_EMPLOI
+          }
+
+          const jeuneQuiVientANantes = unJeune({
+            id: command.idsJeunes[0],
+            conseiller: conseillerSourceDuJeune,
+            conseillerInitial: undefined
+          })
+          jeuneRepository.findAllJeunesByConseiller
+            .withArgs(command.idsJeunes, command.idConseillerSource)
+            .resolves([jeuneQuiVientANantes])
+
+          // When
+          await transfererJeunesConseillerCommandHandler.handle(command)
+
+          // Then
+          expect(
+            animationCollectiveService.desinscrire
+          ).to.have.been.calledWithExactly(
+            [jeuneQuiVientANantes.id],
+            conseillerSource.agence?.id
+          )
         })
       })
     })
