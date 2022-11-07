@@ -98,7 +98,7 @@
     "sequelize": "6.25.4",
     "sequelize-cli": "6.5.2",
     "sequelize-typescript": "2.1.5",
-    "swagger-ui-express": "4.5.0",
+    "swagger-ui-express": "4.6.0",
     "tokenbucket": "^0.3.2",
     "uuid": "9.0.0"
   },
