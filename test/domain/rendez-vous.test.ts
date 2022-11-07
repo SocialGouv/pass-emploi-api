@@ -7,7 +7,9 @@ import { IdService } from 'src/utils/id-service'
 import { unConseiller } from 'test/fixtures/conseiller.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { unJeune } from 'test/fixtures/jeune.fixture'
-import { expect, stubClass } from '../utils'
+import { createSandbox, expect, stubClass } from '../utils'
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { unRendezVous } from '../fixtures/rendez-vous.fixture'
 
 describe('Rendez-vous', () => {
   const id = '26279b34-318a-45e4-a8ad-514a1090462c'
@@ -76,6 +78,43 @@ describe('Rendez-vous', () => {
 
       it('renvoie un rdv avec agence', async () => {
         expect(rendezVous.idAgence).to.equal('test')
+      })
+    })
+  })
+
+  describe('AnimationCollective.Service', () => {
+    let service: RendezVous.AnimationCollective.Service
+    let repository: StubbedType<RendezVous.AnimationCollective.Repository>
+
+    beforeEach(() => {
+      const sandbox = createSandbox()
+      repository = stubInterface(sandbox)
+      service = new RendezVous.AnimationCollective.Service(repository)
+    })
+
+    describe('desinscrire', () => {
+      it('récupère les animations collectives à venir et désinscrit les jeunes', async () => {
+        // Given
+        const idsJeunes = ['1']
+        const uneAnimationCollectiveInitiale = unRendezVous({
+          type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
+          jeunes: [unJeune({ id: '1' }), unJeune({ id: '2' })]
+        })
+        repository.getAllAVenir
+          .withArgs('nantes')
+          .resolves([uneAnimationCollectiveInitiale])
+
+        // When
+        await service.desinscrire(idsJeunes, 'nantes')
+
+        // Then
+        const uneAnimationCollectiveMiseAJour = unRendezVous({
+          type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
+          jeunes: [unJeune({ id: '2' })]
+        })
+        expect(repository.save).to.have.been.calledWithExactly(
+          uneAnimationCollectiveMiseAJour
+        )
       })
     })
   })
