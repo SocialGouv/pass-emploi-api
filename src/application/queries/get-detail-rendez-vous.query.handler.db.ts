@@ -9,9 +9,11 @@ import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez
 import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
 import { fromSqlToRendezVousConseillerQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { RendezVousConseillerQueryModel } from './query-models/rendez-vous.query-model'
+import { LogModificationRendezVousSqlModel } from '../../infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
 
 export interface GetDetailRendezVousQuery extends Query {
   idRendezVous: string
+  avecHistorique?: boolean
 }
 
 @Injectable()
@@ -42,7 +44,18 @@ export class GetDetailRendezVousQueryHandler extends QueryHandler<
       return failure(new NonTrouveError('RendezVous', query.idRendezVous))
     }
 
-    return success(fromSqlToRendezVousConseillerQueryModel(rendezVousSqlModel))
+    let historiqueSql
+    if (query.avecHistorique) {
+      historiqueSql = await LogModificationRendezVousSqlModel.findAll({
+        where: {
+          idRendezVous: query.idRendezVous
+        },
+        order: [['date', 'DESC']]
+      })
+    }
+    return success(
+      fromSqlToRendezVousConseillerQueryModel(rendezVousSqlModel, historiqueSql)
+    )
   }
 
   async authorize(

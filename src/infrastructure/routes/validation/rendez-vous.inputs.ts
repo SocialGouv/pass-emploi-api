@@ -14,6 +14,8 @@ import {
   ValidateIf
 } from 'class-validator'
 import { CodeTypeRendezVous, RendezVous } from '../../../domain/rendez-vous'
+import { Transform } from 'class-transformer'
+import { transformStringToBoolean } from './utils/transformers'
 
 export class CreateRendezVousPayload {
   @ApiPropertyOptional()
@@ -139,4 +141,12 @@ export class UpdateRendezVousPayload {
   @IsBoolean()
   @IsIn([true, false])
   presenceConseiller: boolean
+}
+
+export class GetDetailRendezVousQueryParams {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Transform(param => transformStringToBoolean(param, 'avecHistorique'))
+  @IsBoolean()
+  avecHistorique: boolean
 }

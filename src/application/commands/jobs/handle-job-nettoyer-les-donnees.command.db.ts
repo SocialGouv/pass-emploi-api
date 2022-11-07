@@ -13,7 +13,7 @@ import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import { Op, WhereOptions } from 'sequelize'
 import { ArchiveJeuneSqlModel } from '../../../infrastructure/sequelize/models/archive-jeune.sql-model'
-import { LogApiPartenaireSqlModel } from '../../../infrastructure/sequelize/models/log-api-partenaire-sql.model'
+import { LogApiPartenaireSqlModel } from '../../../infrastructure/sequelize/models/log-api-partenaire.sql-model'
 import { DateTime } from 'luxon'
 
 @Injectable()
