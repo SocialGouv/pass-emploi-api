@@ -63,46 +63,41 @@ describe('RendezvousController', () => {
       idRendezVous: rendezvous.id
     }
     it('supprime le rendez-vous', async () => {
-      //Given
+      // Given
       deleteRendezVousCommandHandler.execute
         .withArgs(command)
         .resolves(emptySuccess())
-      //When
+      // When
       await request(app.getHttpServer())
         .delete(`/rendezvous/${rendezvous.id}`)
         .set('authorization', unHeaderAuthorization())
-        //Then
+        // Then
         .expect(HttpStatus.NO_CONTENT)
       expect(
         deleteRendezVousCommandHandler.execute
       ).to.have.be.calledWithExactly(command, unUtilisateurDecode())
     })
-    it('renvoie une 404(NOT FOUND) si le rendez-vous n"existe pas', async () => {
-      //Given
+    it('renvoie une 404 si le rendez-vous n"existe pas', async () => {
+      // Given
       deleteRendezVousCommandHandler.execute
         .withArgs(command)
         .resolves(
           failure(new NonTrouveError('Rendez-vous', command.idRendezVous))
         )
 
-      const expectedMessageJson = {
-        code: 'NON_TROUVE',
-        message: `Rendez-vous ${command.idRendezVous} non trouvé(e)`
-      }
-      //When
+      // When
       await request(app.getHttpServer())
         .delete(`/rendezvous/${rendezvous.id}`)
         .set('authorization', unHeaderAuthorization())
-        //Then
+        // Then
         .expect(HttpStatus.NOT_FOUND)
-        .expect(expectedMessageJson)
     })
-    it("renvoie une 400(BAD REQUEST) si l'id du rendez-vous n'est pas un UUID", async () => {
-      //When
+    it("renvoie une 400 si l'id du rendez-vous n'est pas un UUID", async () => {
+      // When
       await request(app.getHttpServer())
         .delete(`/rendezvous/12`)
         .set('authorization', unHeaderAuthorization())
-        //Then
+        // Then
         .expect(HttpStatus.BAD_REQUEST)
     })
     ensureUserAuthenticationFailsIfInvalid('delete', '/rendezvous/123')
@@ -132,11 +127,11 @@ describe('RendezvousController', () => {
       presenceConseiller: true
     }
     it('met à jour le rendez-vous', async () => {
-      //Given
+      // Given
       updateRendezVousCommandHandler.execute.resolves(
         success({ id: rendezvous.id })
       )
-      //When - Then
+      // When - Then
       await request(app.getHttpServer())
         .put(`/rendezvous/${rendezvous.id}`)
         .set('authorization', unHeaderAuthorization())
@@ -147,8 +142,8 @@ describe('RendezvousController', () => {
         updateRendezVousCommandHandler.execute
       ).to.have.be.calledWithExactly(expectedCommand, unUtilisateurDecode())
     })
-    it("renvoie une 404 (NOT FOUND) quand le rendez-vous n'existe pas", async () => {
-      //Given
+    it("renvoie une 404 quand le rendez-vous n'existe pas", async () => {
+      // Given
       updateRendezVousCommandHandler.execute
         .withArgs(expectedCommand)
         .resolves(
@@ -157,24 +152,19 @@ describe('RendezvousController', () => {
           )
         )
 
-      const expectedMessageJson = {
-        code: 'NON_TROUVE',
-        message: `Rendez-vous ${expectedCommand.idRendezVous} non trouvé(e)`
-      }
-      //When - Then
+      // When - Then
       await request(app.getHttpServer())
         .put(`/rendezvous/${rendezvous.id}`)
         .set('authorization', unHeaderAuthorization())
         .send(payload)
         .expect(HttpStatus.NOT_FOUND)
-        .expect(expectedMessageJson)
     })
     it('renvoie une 400 (BAD REQUEST) pour une mauvaise commande', async () => {
       updateRendezVousCommandHandler.execute
         .withArgs(expectedCommand)
         .resolves(failure(new MauvaiseCommandeError('Rendez-vous')))
 
-      //When - Then
+      // When - Then
       await request(app.getHttpServer())
         .put(`/rendezvous/${rendezvous.id}`)
         .set('authorization', unHeaderAuthorization())
@@ -183,7 +173,7 @@ describe('RendezvousController', () => {
     })
     it("renvoie une 400 (BAD REQUEST) quand la date n'est pas au bon format", async () => {
       payload.date = 'aaa'
-      //When - Then
+      // When - Then
       await request(app.getHttpServer())
         .put(`/rendezvous/${rendezvous.id}`)
         .set('authorization', unHeaderAuthorization())
