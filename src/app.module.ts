@@ -49,6 +49,7 @@ import { UpdateStatutActionCommandHandler } from './application/commands/update-
 import { UpdateUtilisateurCommandHandler } from './application/commands/update-utilisateur.command.handler'
 import { TeleverserFichierCommandHandler } from './application/commands/televerser-fichier.command.handler'
 import { GetActionsPredefiniesQueryHandler } from './application/queries/get-actions-predefinies.query.handler'
+import { GetJeunesByEtablissementQueryHandler } from './application/queries/get-jeunes-by-etablissement.query.handler.db'
 import { Context } from './building-blocks/context'
 import { GetActionsByJeuneQueryHandler } from './application/queries/get-actions-by-jeune.query.handler.db'
 import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
@@ -596,7 +597,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateSuggestionConseillerServiceCiviqueCommandHandler,
     CreateSuggestionConseillerImmersionCommandHandler,
     GetActionsPredefiniesQueryHandler,
-    GetAnimationsCollectivesQueryHandler
+    GetAnimationsCollectivesQueryHandler,
+    GetJeunesByEtablissementQueryHandler
   ]
 }
 

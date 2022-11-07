@@ -1,31 +1,38 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { DateTime } from 'luxon'
+import * as request from 'supertest'
+import { GetAnimationsCollectivesQueryHandler } from '../../../src/application/queries/get-animations-collectives.query.handler.db'
+import { GetJeunesByEtablissementQueryHandler } from '../../../src/application/queries/get-jeunes-by-etablissement.query.handler.db'
+import { success } from '../../../src/building-blocks/types/result'
+import {
+  unHeaderAuthorization,
+  unUtilisateurDecode
+} from '../../fixtures/authentification.fixture'
 import {
   buildTestingModuleForHttpTesting,
   StubbedClass,
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import {
-  unHeaderAuthorization,
-  unUtilisateurDecode
-} from '../../fixtures/authentification.fixture'
-import * as request from 'supertest'
-import { GetAnimationsCollectivesQueryHandler } from '../../../src/application/queries/get-animations-collectives.query.handler.db'
-import { DateTime } from 'luxon'
-import { success } from '../../../src/building-blocks/types/result'
 
 describe('EtablissementsController', () => {
   let getAnimationsCollectivesQueryHandler: StubbedClass<GetAnimationsCollectivesQueryHandler>
+  let getJeunesEtablissementQueryHandler: StubbedClass<GetJeunesByEtablissementQueryHandler>
   let app: INestApplication
 
   before(async () => {
     getAnimationsCollectivesQueryHandler = stubClass(
       GetAnimationsCollectivesQueryHandler
     )
+    getJeunesEtablissementQueryHandler = stubClass(
+      GetJeunesByEtablissementQueryHandler
+    )
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(GetAnimationsCollectivesQueryHandler)
       .useValue(getAnimationsCollectivesQueryHandler)
+      .overrideProvider(GetJeunesByEtablissementQueryHandler)
+      .useValue(getJeunesEtablissementQueryHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -69,6 +76,34 @@ describe('EtablissementsController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/etablissements/paris/animations-collectives'
+    )
+  })
+
+  describe('GET etablissements/:id/jeunes', () => {
+    it("renvoie les jeunes de l'établissement", async () => {
+      // Given
+      getJeunesEtablissementQueryHandler.execute
+        .withArgs(
+          {
+            idEtablissement: '75114'
+          },
+          unUtilisateurDecode()
+        )
+        .resolves(success([]))
+
+      // When
+      await request(app.getHttpServer())
+        .get('/etablissements/75114/jeunes')
+        .set('authorization', unHeaderAuthorization())
+
+        // Then
+        .expect(HttpStatus.OK)
+        .expect([])
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/etablissements/75114/jeunes'
     )
   })
 })
