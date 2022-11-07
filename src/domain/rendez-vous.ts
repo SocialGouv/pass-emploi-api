@@ -3,10 +3,14 @@ import { Jeune } from './jeune/jeune'
 import { Conseiller } from './conseiller'
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
+import { Authentification } from './authentification'
+import { DateService } from '../utils/date-service'
 
 export const RendezVousRepositoryToken = 'RendezVous.Repository'
 export const AnimationCollectiveRepositoryToken =
   'AnimationCollective.Repository'
+export const HistoriqueRendezVousRepositoryToken =
+  'RendezVous.Historique.Repository'
 
 export enum CodeTypeRendezVous {
   ACTIVITE_EXTERIEURES = 'ACTIVITE_EXTERIEURES',
@@ -178,6 +182,43 @@ export namespace RendezVous {
     }
   }
 
+  export namespace Historique {
+    export interface LogModification {
+      id: string
+      idRendezVous: string
+      date: Date
+      auteur: {
+        id: string
+        nom: string
+        prenom: string
+      }
+    }
+    export interface Repository {
+      save(logModification: LogModification): Promise<void>
+    }
+    @Injectable()
+    export class Factory {
+      constructor(
+        private readonly idService: IdService,
+        private readonly dateService: DateService
+      ) {}
+      creerLogModification(
+        idRendezVous: string,
+        utilisateur: Authentification.Utilisateur
+      ): LogModification {
+        return {
+          id: this.idService.uuid(),
+          idRendezVous,
+          date: this.dateService.nowJs(),
+          auteur: {
+            id: utilisateur.id,
+            nom: utilisateur.nom,
+            prenom: utilisateur.prenom
+          }
+        }
+      }
+    }
+  }
   export interface AnimationCollective extends RendezVous {
     type: CodeTypeRendezVous.ATELIER | CodeTypeRendezVous.INFORMATION_COLLECTIVE
   }

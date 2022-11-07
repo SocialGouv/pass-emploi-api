@@ -1,7 +1,11 @@
 import { SinonSandbox } from 'sinon'
 import { GetDetailRendezVousQueryHandler } from '../../../src/application/queries/get-detail-rendez-vous.query.handler.db'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { failure, success } from '../../../src/building-blocks/types/result'
+import {
+  failure,
+  isSuccess,
+  success
+} from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -10,13 +14,14 @@ import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeun
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { uneDatetime } from '../../fixtures/date.fixture'
+import { uneDate, uneDatetime } from '../../fixtures/date.fixture'
 import { RendezVousConseillerQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
 import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous'
-import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
+import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { LogModificationRendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
 
 describe('GetDetailRendezVousQueryHandler', () => {
   DatabaseForTesting.prepare()
@@ -154,7 +159,6 @@ describe('GetDetailRendezVousQueryHandler', () => {
         }
         expect(result).to.deep.equal(success(data))
       })
-
       it('retourne le rdv quand il y a plusieurs jeunes participants', async () => {
         // Given
         await ConseillerSqlModel.creer(unConseillerDto())
@@ -227,7 +231,6 @@ describe('GetDetailRendezVousQueryHandler', () => {
         }
         expect(result).to.deep.equal(success(data))
       })
-
       it('retourne le rdv avec les bons jeunes', async () => {
         // Given
         await ConseillerSqlModel.creer(unConseillerDto())
@@ -313,6 +316,55 @@ describe('GetDetailRendezVousQueryHandler', () => {
           }
         }
         expect(result).to.deep.equal(success(data))
+      })
+      it('retourne l‘historique des modification quand il est demandé', async () => {
+        // Given
+        const idConseiller = 'un-id-conseiller'
+        const conseillerDto = unConseillerDto({
+          id: idConseiller,
+          nom: 'Tavernier',
+          prenom: 'Nils'
+        })
+        await ConseillerSqlModel.create(conseillerDto)
+        await JeuneSqlModel.create(unJeuneDto({ idConseiller }))
+
+        const idRendezVous = '20c8ca73-fd8b-4194-8d3c-80b6c9949deb'
+        await RendezVousSqlModel.create(unRendezVousDto({ id: idRendezVous }))
+
+        const date = uneDate()
+        const unLogModifRdvDto = {
+          id: '24c8ca73-fd8b-3488-8d3c-80b6c9949bed',
+          idRendezVous,
+          date,
+          auteur: {
+            id: conseillerDto.id,
+            nom: conseillerDto.nom,
+            prenom: conseillerDto.prenom
+          }
+        }
+        await LogModificationRendezVousSqlModel.create(unLogModifRdvDto)
+
+        // When
+        const result = await getDetailRendezVousQueryHandler.handle({
+          idRendezVous,
+          avecHistorique: true
+        })
+
+        // Then
+        const historiqueAttendu = [
+          {
+            date: date.toISOString(),
+            auteur: {
+              id: conseillerDto.id,
+              nom: conseillerDto.nom,
+              prenom: conseillerDto.prenom
+            }
+          }
+        ]
+
+        expect(isSuccess(result) && result.data.historique).to.deep.equal(
+          historiqueAttendu
+        )
       })
     })
   })

@@ -31,16 +31,21 @@ import {
   UpdateRendezVousCommandHandler
 } from 'src/application/commands/update-rendez-vous.command.handler'
 import { UpdateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
+import { GetDetailRendezVousQueryHandler } from '../../../src/application/queries/get-detail-rendez-vous.query.handler.db'
 
 describe('RendezvousController', () => {
+  let getDetailRendezVousQueryHandler: StubbedClass<GetDetailRendezVousQueryHandler>
   let deleteRendezVousCommandHandler: StubbedClass<DeleteRendezVousCommandHandler>
   let updateRendezVousCommandHandler: StubbedClass<UpdateRendezVousCommandHandler>
   let app: INestApplication
 
   before(async () => {
+    getDetailRendezVousQueryHandler = stubClass(GetDetailRendezVousQueryHandler)
     deleteRendezVousCommandHandler = stubClass(DeleteRendezVousCommandHandler)
     updateRendezVousCommandHandler = stubClass(UpdateRendezVousCommandHandler)
     const testingModule = await buildTestingModuleForHttpTesting()
+      .overrideProvider(GetDetailRendezVousQueryHandler)
+      .useValue(getDetailRendezVousQueryHandler)
       .overrideProvider(DeleteRendezVousCommandHandler)
       .useValue(deleteRendezVousCommandHandler)
       .overrideProvider(UpdateRendezVousCommandHandler)
@@ -56,6 +61,86 @@ describe('RendezvousController', () => {
     await app.close()
   })
 
+  describe('GET rendezvous/:idRendezVous', () => {
+    const jeune = unJeune()
+    const rendezvous = unRendezVous({ jeunes: [jeune] })
+
+    it('récupère le rendez-vous sans l‘historique si aucun paramètre n‘est renseigné', async () => {
+      //Given
+      getDetailRendezVousQueryHandler.execute.resolves(
+        success({
+          id: rendezvous.id,
+          date: rendezvous.date,
+          jeunes: [],
+          type: { code: rendezvous.type, label: '' },
+          title: rendezvous.titre,
+          duration: rendezvous.duree,
+          modality: rendezvous.modalite!,
+          invitation: rendezvous.invitation!
+        })
+      )
+      //When - Then
+      await request(app.getHttpServer())
+        .get(`/rendezvous/${rendezvous.id}`)
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect(res => {
+          return res.body.historique === undefined
+        })
+    })
+    it('récupère le rendez-vous avec l‘historique si le paramètre est à true', async () => {
+      //Given
+      getDetailRendezVousQueryHandler.execute
+        .withArgs({ idRendezVous: rendezvous.id, avecHistorique: true })
+        .resolves(
+          success({
+            id: rendezvous.id,
+            date: rendezvous.date,
+            jeunes: [],
+            type: { code: rendezvous.type, label: '' },
+            title: rendezvous.titre,
+            duration: rendezvous.duree,
+            modality: rendezvous.modalite!,
+            invitation: rendezvous.invitation!,
+            historique: []
+          })
+        )
+      //When - Then
+      await request(app.getHttpServer())
+        .get(`/rendezvous/${rendezvous.id}?avecHistorique=true`)
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect(res => {
+          return res.body.historique.isArray
+        })
+    })
+    it('récupère le rendez-vous sans historique si le paramètre est à false', async () => {
+      //Given
+      getDetailRendezVousQueryHandler.execute
+        .withArgs({ idRendezVous: rendezvous.id, avecHistorique: false })
+        .resolves(
+          success({
+            id: rendezvous.id,
+            date: rendezvous.date,
+            jeunes: [],
+            type: { code: rendezvous.type, label: '' },
+            title: rendezvous.titre,
+            duration: rendezvous.duree,
+            modality: rendezvous.modalite!,
+            invitation: rendezvous.invitation!
+          })
+        )
+      //When - Then
+      await request(app.getHttpServer())
+        .get(`/rendezvous/${rendezvous.id}?avecHistorique=false`)
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect(res => {
+          return res.body.historique === undefined
+        })
+    })
+    ensureUserAuthenticationFailsIfInvalid('GET', '/rendezvous/123')
+  })
   describe('DELETE rendezvous/:idRendezVous', () => {
     const jeune = unJeune()
     const rendezvous = unRendezVous({ jeunes: [jeune] })

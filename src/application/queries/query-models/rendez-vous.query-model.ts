@@ -118,6 +118,14 @@ export class RendezVousJeuneQueryModel implements RendezVousBaseQueryModel {
   }
 }
 
+class LogModificationRendezVousQueryModel {
+  @ApiProperty()
+  date: string
+
+  @ApiProperty()
+  auteur: ConseillerQueryModel
+}
+
 export class RendezVousConseillerQueryModel
   implements RendezVousBaseQueryModel
 {
@@ -168,6 +176,9 @@ export class RendezVousConseillerQueryModel
     nom: string
     prenom: string
   }
+
+  @ApiProperty({ type: LogModificationRendezVousQueryModel, isArray: true })
+  historique?: LogModificationRendezVousQueryModel[]
 }
 
 export class AnimationCollectiveQueryModel extends RendezVousConseillerQueryModel {

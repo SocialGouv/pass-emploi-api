@@ -6,7 +6,8 @@ import {
   HttpCode,
   Param,
   ParseUUIDPipe,
-  Put
+  Put,
+  Query
 } from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
@@ -23,8 +24,11 @@ import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
 import { Utilisateur } from '../decorators/authenticated.decorator'
+import {
+  GetDetailRendezVousQueryParams,
+  UpdateRendezVousPayload
+} from './validation/rendez-vous.inputs'
 import { handleFailure } from './failure.handler'
-import { UpdateRendezVousPayload } from './validation/rendez-vous.inputs'
 
 @Controller('rendezvous')
 @ApiOAuth2([])
@@ -42,10 +46,14 @@ export class RendezVousController {
   })
   async getDetailRendezVous(
     @Param('idRendezVous', new ParseUUIDPipe()) idRendezVous: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
+    @Utilisateur() utilisateur: Authentification.Utilisateur,
+    @Query() getDetailRendezVousQueryParams?: GetDetailRendezVousQueryParams
   ): Promise<RendezVousConseillerQueryModel> {
     const result = await this.getDetailRendezVousQueryHandler.execute(
-      { idRendezVous },
+      {
+        idRendezVous,
+        avecHistorique: getDetailRendezVousQueryParams?.avecHistorique
+      },
       utilisateur
     )
 
