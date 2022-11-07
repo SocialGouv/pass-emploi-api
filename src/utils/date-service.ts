@@ -56,4 +56,8 @@ export class DateService {
       ? DateTime.fromISO(dateString, { setZone: true })
       : undefined
   }
+
+  static fromJSDateToDateTime(jsDate: Date | null): DateTime | undefined {
+    return jsDate ? DateTime.fromJSDate(jsDate) : undefined
+  }
 }

@@ -1,6 +1,7 @@
 import { IdService } from '../utils/id-service'
 import { Jeune } from './jeune/jeune'
 import { Conseiller } from './conseiller'
+import { DateTime } from 'luxon'
 
 export const RendezVousRepositoryToken = 'RendezVous.Repository'
 
@@ -60,6 +61,7 @@ export interface RendezVous {
   icsSequence?: number
   createur: Createur
   idAgence?: string
+  dateCloture?: DateTime
 }
 
 export interface InfosRendezVousACreer {
@@ -175,6 +177,13 @@ export namespace RendezVous {
       A_VENIR = 'A_VENIR',
       A_CLOTURER = 'A_CLOTURER',
       CLOTUREE = 'CLOTUREE'
+    }
+
+    export function estCloturee(rendezVous: RendezVous): boolean {
+      return Boolean(
+        RendezVous.estUnTypeAnimationCollective(rendezVous.type) &&
+          rendezVous.dateCloture
+      )
     }
   }
 }
