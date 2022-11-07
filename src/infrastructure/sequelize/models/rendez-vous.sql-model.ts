@@ -10,7 +10,7 @@ import {
 import { CodeTypeRendezVous } from '../../../domain/rendez-vous'
 import { AgenceSqlModel } from './agence.sql-model'
 import { JeuneSqlModel } from './jeune.sql-model'
-import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-association.model'
+import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-association.sql-model'
 
 export class RendezVousDto extends Model {
   @PrimaryKey

@@ -13,15 +13,16 @@ import { RechercheSqlModel } from './recherche.sql-model'
 import { TransfertConseillerSqlModel } from './transfert-conseiller.sql-model'
 import { SuperviseurSqlModel } from './superviseur.sql-model'
 import { AgenceSqlModel } from './agence.sql-model'
-import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-association.model'
+import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-association.sql-model'
 import { SituationsMiloSqlModel } from './situations-milo.sql-model'
 import { CampagneSqlModel } from './campagne.sql-model'
 import { ReponseCampagneSqlModel } from './reponse-campagne.sql-model'
 import { ArchiveJeuneSqlModel } from './archive-jeune.sql-model'
 import { CommentaireSqlModel } from './commentaire.sql-model'
-import { LogApiPartenaireSqlModel } from './log-api-partenaire-sql.model'
+import { LogApiPartenaireSqlModel } from './log-api-partenaire.sql-model'
 import { SuggestionSqlModel } from './suggestion.sql-model'
 import { MetierRomeSqlModel } from './metier-rome.sql-model'
+import { LogModificationRendezVousSqlModel } from './log-modification-rendez-vous-sql.model'
 
 export const sqlModels = [
   ConseillerSqlModel,
@@ -47,5 +48,6 @@ export const sqlModels = [
   CommentaireSqlModel,
   LogApiPartenaireSqlModel,
   SuggestionSqlModel,
-  MetierRomeSqlModel
+  MetierRomeSqlModel,
+  LogModificationRendezVousSqlModel
 ]

@@ -3,7 +3,7 @@ import {
   TriRendezVous
 } from 'src/application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
 import { isSuccess } from 'src/building-blocks/types/result'
-import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.model'
+import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
