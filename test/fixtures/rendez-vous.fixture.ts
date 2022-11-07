@@ -26,6 +26,8 @@ export const unRendezVous = (args: Partial<RendezVous> = {}): RendezVous => {
     organisme: undefined,
     invitation: undefined,
     icsSequence: undefined,
+    dateCloture: undefined,
+    idAgence: undefined,
     precision: 'Ceci est une précision',
     createur: {
       id: '1',
