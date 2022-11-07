@@ -31,6 +31,7 @@ export class RendezVousAuthorizer {
     ) {
       if (RendezVous.estUnTypeAnimationCollective(rendezVous.type)) {
         const conseiller = await this.conseillerRepository.get(utilisateur.id)
+
         if (
           conseiller &&
           rendezVous.idAgence &&

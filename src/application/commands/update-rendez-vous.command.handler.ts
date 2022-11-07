@@ -64,6 +64,14 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       return failure(new NonTrouveError('RendezVous', command.idRendezVous))
     }
 
+    if (RendezVous.AnimationCollective.estCloturee(rendezVous)) {
+      return failure(
+        new MauvaiseCommandeError(
+          'Une Animation Collective cloturée ne peut plus etre modifée.'
+        )
+      )
+    }
+
     if (
       !command.presenceConseiller &&
       rendezVous.type === CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
