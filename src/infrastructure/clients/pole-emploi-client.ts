@@ -219,9 +219,17 @@ export class PoleEmploiClient {
   ): Notification.PoleEmploi.Notification {
     try {
       const dateCreation = DateTime.fromFormat(
-        notificationDto.dateCreation.replace('CEST', '+02:00'),
+        notificationDto.dateCreation
+          .replace('CEST', '+02:00')
+          .replace('CET', '+01:00'),
         'EEE MMM d HH:mm:ss Z yyyy'
       )
+
+      if (!dateCreation.isValid) {
+        throw new Error(
+          `La date de création de la notification ${notificationDto.idNotification} n'est pas valide`
+        )
+      }
       return {
         ...notificationDto,
         dateCreation,
