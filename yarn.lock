@@ -3907,23 +3907,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bull-repl@npm:^0.28.0":
-  version: 0.28.0
-  resolution: "bull-repl@npm:0.28.0"
+"bull-repl@npm:^0.29.0":
+  version: 0.29.0
+  resolution: "bull-repl@npm:0.29.0"
   dependencies:
     "@moleculer/vorpal": ^1.11.5
-    bull: ^4.8.5
+    bull: ^4.10.1
     chalk: ^4.1.0
     ms: ^2.1.3
-    node-jq: ^2.3.3
+    node-jq: ^2.3.4
     redis-url-plus: ^1.0.0
   bin:
     bull-repl: index.js
-  checksum: 39c7dfbb34ca5ced860836c209ef574f4b5f3630e1609b3fefc2b878522370c2e1e9ed47781d9101c2e19b9f1bc78b88f1b9b7008098072c046774651488089d
+  checksum: 405f73cbcf804754757dca6f0940efc926a2947cc920a6661df2728715cc825cc011e5afd881620d86d520242fdb1ed5a31b1e6de9f82389b855bf5a45c28636
   languageName: node
   linkType: hard
 
-"bull@npm:4.10.1, bull@npm:^4.8.5":
+"bull@npm:4.10.1, bull@npm:^4.10.1":
   version: 4.10.1
   resolution: "bull@npm:4.10.1"
   dependencies:
@@ -9016,7 +9016,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^5.36.2
     "@typescript-eslint/parser": ^5.36.2
     bull: 4.10.1
-    bull-repl: ^0.28.0
+    bull-repl: ^0.29.0
     chai: ^4.3.6
     chai-as-promised: ^7.1.1
     chai-exclude: ^2.1.0
@@ -9207,7 +9207,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-jq@npm:^2.3.3":
+"node-jq@npm:^2.3.4":
   version: 2.3.4
   resolution: "node-jq@npm:2.3.4"
   dependencies:
