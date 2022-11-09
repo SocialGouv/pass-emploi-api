@@ -32,7 +32,7 @@ export class GetDetailRendezVousQueryHandler extends QueryHandler<
         include: [
           {
             model: JeuneSqlModel,
-            required: true
+            required: false
           }
         ]
       }
