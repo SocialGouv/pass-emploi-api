@@ -54,6 +54,49 @@ describe('GetDetailRendezVousQueryHandler', () => {
       })
     })
     describe('quand le rdv existe', () => {
+      it("retourne le rdv quand il n'y a aucun jeune participant", async () => {
+        // Given
+        const unRendezVous = unRendezVousDto({
+          date: uneDatetime().toJSDate(),
+          type: CodeTypeRendezVous.ATELIER,
+          titre: 'UN RENDEZ VOUS'
+        })
+
+        await RendezVousSqlModel.create({
+          ...unRendezVous
+        })
+
+        // When
+        const result = await getDetailRendezVousQueryHandler.handle({
+          idRendezVous: unRendezVous.id
+        })
+
+        // Then
+        const data: RendezVousConseillerQueryModel = {
+          adresse: undefined,
+          comment: 'commentaire',
+          createur: {
+            id: '1',
+            nom: 'Tavernier',
+            prenom: 'Nils'
+          },
+          date: uneDatetime().toJSDate(),
+          duration: 30,
+          id: unRendezVous.id,
+          jeunes: [],
+          modality: 'modalite',
+          organisme: undefined,
+          precision: undefined,
+          presenceConseiller: true,
+          invitation: false,
+          title: 'UN RENDEZ VOUS',
+          type: {
+            code: CodeTypeRendezVous.ATELIER,
+            label: 'Atelier'
+          }
+        }
+        expect(result).to.deep.equal(success(data))
+      })
       it('retourne le rdv quand il y a un jeune participant', async () => {
         // Given
         const jeune = unJeune()
