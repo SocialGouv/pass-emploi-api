@@ -134,7 +134,7 @@ describe('RendezVousRepositorySql', () => {
       })
 
       describe('quand on enlève un jeune du rendez-vous', () => {
-        it('met à jour les informations du rdv en ajoutant une association quand on rajoute un jeune', async () => {
+        it('met à jour les informations du rdv en supprimant une association quand on supprime un jeune', async () => {
           // Given
           const rendezVousAvecUnJeuneDeMoins: RendezVous = {
             ...unRendezVousTest,
