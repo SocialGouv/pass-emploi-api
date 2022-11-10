@@ -85,15 +85,20 @@ describe('Rendez-vous', () => {
   describe('AnimationCollective.Service', () => {
     let service: RendezVous.AnimationCollective.Service
     let repository: StubbedType<RendezVous.AnimationCollective.Repository>
+    let rdvRepository: StubbedType<RendezVous.Repository>
 
     beforeEach(() => {
       const sandbox = createSandbox()
       repository = stubInterface(sandbox)
-      service = new RendezVous.AnimationCollective.Service(repository)
+      rdvRepository = stubInterface(sandbox)
+      service = new RendezVous.AnimationCollective.Service(
+        repository,
+        rdvRepository
+      )
     })
 
     describe('desinscrire', () => {
-      it('récupère les animations collectives à venir et désinscrit les jeunes', async () => {
+      it('récupère les animations collectives à venir et désinscrit les jeunes concernés', async () => {
         // Given
         const idsJeunes = ['1']
         const uneAnimationCollectiveInitiale = unRendezVous({
@@ -112,7 +117,7 @@ describe('Rendez-vous', () => {
           type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
           jeunes: [unJeune({ id: '2' })]
         })
-        expect(repository.save).to.have.been.calledWithExactly(
+        expect(rdvRepository.save).to.have.been.calledWithExactly(
           uneAnimationCollectiveMiseAJour
         )
       })
