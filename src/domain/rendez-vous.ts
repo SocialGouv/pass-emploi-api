@@ -124,15 +124,6 @@ export namespace RendezVous {
     )
   }
 
-  export function estUneAnimationCollective(
-    rendezVous: RendezVous
-  ): rendezVous is AnimationCollective {
-    return (
-      rendezVous.type === CodeTypeRendezVous.ATELIER ||
-      rendezVous.type === CodeTypeRendezVous.INFORMATION_COLLECTIVE
-    )
-  }
-
   export function createRendezVousConseiller(
     infosRendezVousACreer: InfosRendezVousACreer,
     jeunes: Jeune[],
@@ -207,14 +198,15 @@ export namespace RendezVous {
 
     export interface Repository {
       getAllAVenir(idEtablissement: string): Promise<AnimationCollective[]>
-      save(animationCollective: AnimationCollective): Promise<void>
     }
 
     @Injectable()
     export class Service {
       constructor(
         @Inject(AnimationCollectiveRepositoryToken)
-        private repository: Repository
+        private repository: Repository,
+        @Inject(RendezVousRepositoryToken)
+        private rdvRepository: RendezVous.Repository
       ) {}
 
       async desinscrire(idsJeunes: string[], idAgence: string): Promise<void> {
@@ -226,7 +218,7 @@ export namespace RendezVous {
           animationCollective.jeunes = animationCollective.jeunes.filter(
             jeune => !idsJeunes.includes(jeune.id)
           )
-          await this.repository.save(animationCollective)
+          await this.rdvRepository.save(animationCollective)
         }
       }
     }

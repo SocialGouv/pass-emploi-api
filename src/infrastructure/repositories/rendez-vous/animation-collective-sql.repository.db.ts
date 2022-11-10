@@ -5,10 +5,8 @@ import { DateService } from '../../../utils/date-service'
 import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../sequelize/models/rendez-vous.sql-model'
-import { toRendezVous, toRendezVousDto } from '../mappers/rendez-vous.mappers'
-import { RendezVousJeuneAssociationSqlModel } from '../../sequelize/models/rendez-vous-jeune-association.model'
 import { SequelizeInjectionToken } from '../../sequelize/providers'
-import estUneAnimationCollective = RendezVous.estUneAnimationCollective
+import { toRendezVous } from '../mappers/rendez-vous.mappers'
 
 @Injectable()
 export class AnimationCollectiveSqlRepository
@@ -43,36 +41,8 @@ export class AnimationCollectiveSqlRepository
         }
       }
     })
-    return rendezVousSql.map(toRendezVous).filter(estUneAnimationCollective)
-  }
-
-  async save(
-    animationCollective: RendezVous.AnimationCollective
-  ): Promise<void> {
-    const rendezVousDto = toRendezVousDto(animationCollective)
-
-    await this.sequelize.transaction(async transaction => {
-      await RendezVousSqlModel.upsert(rendezVousDto, { transaction })
-      await RendezVousJeuneAssociationSqlModel.destroy({
-        transaction,
-        where: {
-          idRendezVous: animationCollective.id,
-          idJeune: {
-            [Op.notIn]: animationCollective.jeunes.map(jeune => jeune.id)
-          }
-        }
-      })
-      await Promise.all(
-        animationCollective.jeunes.map(jeune =>
-          RendezVousJeuneAssociationSqlModel.upsert(
-            {
-              idJeune: jeune.id,
-              idRendezVous: animationCollective.id
-            },
-            { transaction }
-          )
-        )
-      )
-    })
+    return rendezVousSql.map(
+      rdvSql => toRendezVous(rdvSql) as RendezVous.AnimationCollective
+    )
   }
 }
