@@ -51,7 +51,8 @@ export class RecherchesConseillersController {
       criteres: {
         q: createSuggestionPayload.q,
         commune: createSuggestionPayload.commune,
-        departement: createSuggestionPayload.departement
+        departement: createSuggestionPayload.departement,
+        alternance: createSuggestionPayload.alternance
       }
     }
     const result =

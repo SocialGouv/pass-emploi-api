@@ -117,7 +117,8 @@ describe('RecherchesConseillersController', () => {
         idsJeunes: ['1'],
         localisation: 'paris',
         q: 'Boulanger',
-        departement: 'Paris'
+        departement: 'Paris',
+        alternance: true
       }
 
       createSuggestionDuConseillerCommandHandler.execute.resolves(
@@ -144,7 +145,8 @@ describe('RecherchesConseillersController', () => {
           criteres: {
             q: 'Boulanger',
             departement: 'Paris',
-            commune: undefined
+            commune: undefined,
+            alternance: true
           }
         },
         unUtilisateurDecode()

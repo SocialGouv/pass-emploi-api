@@ -132,6 +132,11 @@ export class CreateSuggestionOffresEmploiPayload extends CreateSuggestionBase {
   @IsString()
   @IsNotEmpty()
   departement?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  alternance?: boolean
 }
 
 export class CreateSuggestionImmersionsPayload extends CreateSuggestionBase {
