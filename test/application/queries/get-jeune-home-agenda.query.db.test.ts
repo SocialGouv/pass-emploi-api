@@ -26,15 +26,21 @@ import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { Action } from 'src/domain/action/action'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
 import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
 import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
 import { DateTime } from 'luxon'
+import { unConseiller } from '../../fixtures/conseiller.fixture'
+import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
 
 describe('GetJeuneHomeAgendaQueryHandler', () => {
   DatabaseForTesting.prepare()
   let handler: GetJeuneHomeAgendaQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
+  let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
   const aujourdhuiVendredi = '2022-08-12T12:00:00Z'
   const demain = new Date('2022-08-13T12:00:00Z')
   const apresDemain = new Date('2022-08-14T12:00:00Z')
@@ -42,7 +48,11 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
 
   beforeEach(async () => {
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
-    handler = new GetJeuneHomeAgendaQueryHandler(jeuneAuthorizer)
+    conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
+    handler = new GetJeuneHomeAgendaQueryHandler(
+      jeuneAuthorizer,
+      conseillerForJeuneAuthorizer
+    )
     await ConseillerSqlModel.creer(unConseillerDto())
     await JeuneSqlModel.creer(jeuneDto)
   })
@@ -207,6 +217,29 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
       const result = await handler.authorize(
         { idJeune: jeune.id, maintenant: aujourdhuiVendredi },
         unUtilisateurJeune()
+      )
+
+      // Then
+      expect(result).to.deep.equal(emptySuccess())
+    })
+    it('autorise le conseiller d‘un jeune', async () => {
+      // Given
+      const conseiller = unConseiller()
+      const jeune = unJeune({
+        conseiller: {
+          id: conseiller.id,
+          firstName: conseiller.firstName,
+          lastName: conseiller.lastName
+        }
+      })
+      conseillerForJeuneAuthorizer.authorize
+        .withArgs(jeune.id, unUtilisateurConseiller({ id: conseiller.id }))
+        .resolves(emptySuccess())
+
+      // When
+      const result = await handler.authorize(
+        { idJeune: jeune.id, maintenant: aujourdhuiVendredi },
+        unUtilisateurConseiller({ id: conseiller.id })
       )
 
       // Then

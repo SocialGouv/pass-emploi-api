@@ -16,6 +16,7 @@ import { ActionQueryModel } from './query-models/actions.query-model'
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
 import { Action } from '../../domain/action/action'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
 
 const NUMERO_DU_JOUR_SAMEDI = 6
 
@@ -29,7 +30,10 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
   GetJeuneHomeAgendaQuery,
   Result<JeuneHomeSuiviQueryModel>
 > {
-  constructor(private jeuneAuthorizer: JeuneAuthorizer) {
+  constructor(
+    private jeuneAuthorizer: JeuneAuthorizer,
+    private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer
+  ) {
     super('GetJeuneHomeAgendaQueryHandler')
   }
 
@@ -60,7 +64,13 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
     query: GetJeuneHomeAgendaQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      return await this.conseillerForJeuneAuthorizer.authorize(
+        query.idJeune,
+        utilisateur
+      )
+    }
+    return await this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {
