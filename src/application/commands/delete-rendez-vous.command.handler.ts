@@ -52,7 +52,7 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     if (RendezVous.AnimationCollective.estCloturee(rendezVous)) {
       return failure(
         new MauvaiseCommandeError(
-          'Une Animation Collective cloturée ne peut plus etre modifée.'
+          'Une Animation Collective cloturée ne peut plus etre supprimée.'
         )
       )
     }
