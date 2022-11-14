@@ -36,7 +36,7 @@ await loadData(bigqueryClient, datasetId, 'SegmentMemberships', membershipsFile)
 
 
 async function fetchJeunesInstanceIdNayantPasReponduAUneCampagneActive(pgClient) {
-    const sql = `select instance_id
+    const sql = `select instance_id, structure
                  from jeune
                  where instance_id is not null
                    and id not in (select id_jeune
@@ -69,9 +69,10 @@ function getPgClient() {
 }
 
 function buildSegmentCampagneNonRepondue(jeune, now) {
+    const segment = jeune.structure === 'POLE_EMPLOI' ? 'CAMPAGNE_NON_REPONDUE_PE' : 'CAMPAGNE_NON_REPONDUE_MILO'
     return {
         instance_id: jeune.instance_id,
         update_time: now,
-        segment_labels: ['CAMPAGNE_NON_REPONDUE']
+        segment_labels: [segment]
     }
 }
