@@ -1,10 +1,10 @@
-import { unConseiller } from '../fixtures/conseiller.fixture'
+import { MauvaiseCommandeError } from '../../src/building-blocks/types/domain-error'
+import { Failure, isFailure } from '../../src/building-blocks/types/result'
 import { Conseiller } from '../../src/domain/conseiller'
 import { Core } from '../../src/domain/core'
-import Structure = Core.Structure
+import { unConseiller } from '../fixtures/conseiller.fixture'
 import { expect } from '../utils'
-import { Failure, isFailure } from '../../src/building-blocks/types/result'
-import { DroitsInsuffisants } from '../../src/building-blocks/types/domain-error'
+import Structure = Core.Structure
 
 describe('Conseiller.Factory', () => {
   let conseillerFactory: Conseiller.Factory
@@ -35,7 +35,7 @@ describe('Conseiller.Factory', () => {
         // Then
         expect(isFailure(result)).to.equal(true)
         expect((result as Failure).error).to.be.an.instanceOf(
-          DroitsInsuffisants
+          MauvaiseCommandeError
         )
       })
     })
