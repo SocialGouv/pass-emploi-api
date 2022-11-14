@@ -89,7 +89,7 @@ describe('DeleteRendezVousCommandHandler', () => {
         expect(result).to.deep.equal(
           failure(
             new MauvaiseCommandeError(
-              'Une Animation Collective cloturée ne peut plus etre modifée.'
+              'Une Animation Collective cloturée ne peut plus etre supprimée.'
             )
           )
         )
