@@ -1,10 +1,10 @@
-import { DateTime } from 'luxon'
-import { Core } from './core'
-import { Agence } from './agence'
 import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
+import { MauvaiseCommandeError } from '../building-blocks/types/domain-error'
 import { failure, Result, success } from '../building-blocks/types/result'
+import { Agence } from './agence'
+import { Core } from './core'
 import Structure = Core.Structure
-import { DroitsInsuffisants } from '../building-blocks/types/domain-error'
 
 export interface Conseiller {
   id: string
@@ -51,7 +51,11 @@ export namespace Conseiller {
         conseiller.structure === Structure.MILO && !infosDeMiseAJour.agence?.id
 
       if (conseilleMiloARenseigneUneAgenceManuelle) {
-        return failure(new DroitsInsuffisants())
+        return failure(
+          new MauvaiseCommandeError(
+            'Un conseiller MILO doit choisir une Agence du référentiel'
+          )
+        )
       }
       return success({
         ...conseiller,

@@ -5,6 +5,7 @@ import {
 } from '../../../src/application/commands/modifier-conseiller.command.handler'
 import {
   DroitsInsuffisants,
+  MauvaiseCommandeError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 import {
@@ -202,14 +203,20 @@ describe('ModifierConseillerCommandHandler', () => {
             .withArgs('id-conseiller')
             .resolves(conseillerMilo)
           conseillerFactory.mettreAJour.returns(
-            failure(new DroitsInsuffisants())
+            failure(
+              new MauvaiseCommandeError(
+                'Un conseiller MILO doit choisir une Agence du référentiel'
+              )
+            )
           )
 
           // When
           const result = await modifierConseillerCommandHandler.handle(command)
 
           // Then
-          expect((result as Failure).error).to.be.instanceOf(DroitsInsuffisants)
+          expect((result as Failure).error).to.be.instanceOf(
+            MauvaiseCommandeError
+          )
         })
       })
     })
