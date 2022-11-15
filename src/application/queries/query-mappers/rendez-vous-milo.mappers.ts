@@ -15,7 +15,7 @@ export function fromSqlToRendezVousJeuneQueryModel(
     isLocaleDate: false,
     modality: rendezVousSql.modalite ?? '',
     duration: rendezVousSql.duree,
-    title: '',
+    title: rendezVousSql.titre ?? '',
     jeune: {
       id: rendezVousSql.jeunes[0].id,
       nom: rendezVousSql.jeunes[0].nom,
