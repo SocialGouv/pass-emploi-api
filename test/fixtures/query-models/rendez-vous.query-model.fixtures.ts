@@ -31,7 +31,7 @@ export function unRendezVousQueryModel(
     organisme: undefined,
     precision: undefined,
     presenceConseiller: true,
-    title: '',
+    title: 'rdv',
     type: {
       code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
       label: 'Entretien individuel conseiller'
