@@ -1,3 +1,4 @@
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import {
   CodeTypeRendezVous,
   InfosRendezVousACreer,
@@ -7,9 +8,13 @@ import { IdService } from 'src/utils/id-service'
 import { unConseiller } from 'test/fixtures/conseiller.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { unJeune } from 'test/fixtures/jeune.fixture'
+import { DateService } from '../../src/utils/date-service'
+import {
+  uneAnimationCollective,
+  unJeuneDuRendezVous,
+  unRendezVous
+} from '../fixtures/rendez-vous.fixture'
 import { createSandbox, expect, stubClass } from '../utils'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { unRendezVous } from '../fixtures/rendez-vous.fixture'
 
 describe('Rendez-vous', () => {
   const id = '26279b34-318a-45e4-a8ad-514a1090462c'
@@ -83,17 +88,22 @@ describe('Rendez-vous', () => {
   })
 
   describe('AnimationCollective.Service', () => {
+    const maintenant = uneDatetime()
     let service: RendezVous.AnimationCollective.Service
     let repository: StubbedType<RendezVous.AnimationCollective.Repository>
     let rdvRepository: StubbedType<RendezVous.Repository>
+    let dateService: StubbedType<DateService>
 
     beforeEach(() => {
       const sandbox = createSandbox()
       repository = stubInterface(sandbox)
       rdvRepository = stubInterface(sandbox)
+      dateService = stubClass(DateService)
+      dateService.now.returns(maintenant)
       service = new RendezVous.AnimationCollective.Service(
         repository,
-        rdvRepository
+        rdvRepository,
+        dateService
       )
     })
 
@@ -120,6 +130,76 @@ describe('Rendez-vous', () => {
         expect(rdvRepository.save).to.have.been.calledWithExactly(
           uneAnimationCollectiveMiseAJour
         )
+      })
+    })
+    describe('estAVenir', () => {
+      it('retourne false quand la date du rdv est dans le passé', async () => {
+        // Given
+        const animationCollective = uneAnimationCollective({
+          date: maintenant.minus({ days: 1 }).toJSDate()
+        })
+
+        // When
+        const aVenir = service.estAVenir(animationCollective)
+
+        // Then
+        expect(aVenir).to.be.false()
+      })
+      it('retourne true quand la date du rdv est dans le futur', async () => {
+        // Given
+        const animationCollective = uneAnimationCollective({
+          date: maintenant.plus({ days: 1 }).toJSDate()
+        })
+
+        // When
+        const aVenir = service.estAVenir(animationCollective)
+
+        // Then
+        expect(aVenir).to.be.true()
+      })
+    })
+  })
+
+  describe('AnimationCollective.Factory', () => {
+    const maintenant = uneDatetime()
+    let factory: RendezVous.AnimationCollective.Factory
+    let dateService: StubbedType<DateService>
+
+    beforeEach(() => {
+      dateService = stubClass(DateService)
+      dateService.now.returns(maintenant)
+      factory = new RendezVous.AnimationCollective.Factory(dateService)
+    })
+
+    describe('cloturer', () => {
+      it('retourne une animation collective cloturée avec les jeunes inscrits', async () => {
+        // Given
+
+        const jeunePresent = unJeuneDuRendezVous({ id: '1' })
+        const jeuneAbsent = unJeuneDuRendezVous({ id: '2' })
+        const idsJeunesPresents = [jeunePresent.id]
+
+        const animationCollective = uneAnimationCollective({
+          date: maintenant.minus({ days: 1 }).toJSDate(),
+          jeunes: [jeuneAbsent, jeunePresent],
+          dateCloture: undefined
+        })
+
+        // When
+        const animationCollectiveCloturee = factory.cloturer(
+          animationCollective,
+          idsJeunesPresents
+        )
+
+        // Then
+        expect(animationCollectiveCloturee).to.deep.equal({
+          ...animationCollective,
+          dateCloture: maintenant,
+          jeunes: [
+            { ...jeuneAbsent, present: false },
+            { ...jeunePresent, present: true }
+          ]
+        })
       })
     })
   })
