@@ -4,9 +4,10 @@ import { CodeTypeRendezVous, RendezVous } from '../../../domain/rendez-vous'
 import { DateService } from '../../../utils/date-service'
 import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
+import { RendezVousJeuneAssociationSqlModel } from '../../sequelize/models/rendez-vous-jeune-association.sql-model'
 import { RendezVousSqlModel } from '../../sequelize/models/rendez-vous.sql-model'
 import { SequelizeInjectionToken } from '../../sequelize/providers'
-import { toRendezVous } from '../mappers/rendez-vous.mappers'
+import { toRendezVous, toRendezVousDto } from '../mappers/rendez-vous.mappers'
 
 @Injectable()
 export class AnimationCollectiveSqlRepository
@@ -44,5 +45,62 @@ export class AnimationCollectiveSqlRepository
     return rendezVousSql.map(
       rdvSql => toRendezVous(rdvSql) as RendezVous.AnimationCollective
     )
+  }
+
+  async get(
+    idEtablissement: string
+  ): Promise<RendezVous.AnimationCollective | undefined> {
+    const rendezVousSql = await RendezVousSqlModel.findOne({
+      include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }],
+      where: {
+        id: idEtablissement,
+        type: {
+          [Op.in]: [
+            CodeTypeRendezVous.INFORMATION_COLLECTIVE,
+            CodeTypeRendezVous.ATELIER
+          ]
+        },
+        dateSuppression: {
+          [Op.is]: null
+        }
+      }
+    })
+
+    if (!rendezVousSql) {
+      return undefined
+    }
+
+    return toRendezVous(rendezVousSql) as RendezVous.AnimationCollective
+  }
+
+  async save(
+    animationCollective: RendezVous.AnimationCollective
+  ): Promise<void> {
+    const animationCollectiveDto = toRendezVousDto(animationCollective)
+
+    await this.sequelize.transaction(async transaction => {
+      await RendezVousSqlModel.upsert(animationCollectiveDto, { transaction })
+      await RendezVousJeuneAssociationSqlModel.destroy({
+        transaction,
+        where: {
+          idRendezVous: animationCollective.id,
+          idJeune: {
+            [Op.notIn]: animationCollective.jeunes.map(jeune => jeune.id)
+          }
+        }
+      })
+      await Promise.all(
+        animationCollective.jeunes.map(jeune =>
+          RendezVousJeuneAssociationSqlModel.upsert(
+            {
+              idJeune: jeune.id,
+              idRendezVous: animationCollective.id,
+              present: jeune.present
+            },
+            { transaction }
+          )
+        )
+      )
+    })
   }
 }

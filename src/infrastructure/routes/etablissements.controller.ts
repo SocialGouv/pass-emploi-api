@@ -1,7 +1,8 @@
-import { Controller, Get, Param, Query } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetAnimationsCollectivesQueryHandler } from 'src/application/queries/get-animations-collectives.query.handler.db'
 import { AnimationCollectiveQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
+import { CloturerAnimationCollectiveCommandHandler } from '../../application/commands/cloturer-animation-collective.command.handler'
 import { GetJeunesByEtablissementQueryHandler } from '../../application/queries/get-jeunes-by-etablissement.query.handler.db'
 import { JeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
 import { isSuccess } from '../../building-blocks/types/result'
@@ -9,13 +10,17 @@ import { Authentification } from '../../domain/authentification'
 import { DateService } from '../../utils/date-service'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
-import { GetAnimationsCollectivesQueryParams } from './validation/etablissements.inputs'
+import {
+  ClotureAnimationCollectivePayload,
+  GetAnimationsCollectivesQueryParams
+} from './validation/etablissements.inputs'
 
 @Controller('etablissements')
 @ApiOAuth2([])
 @ApiTags('Etablissements')
 export class EtablissementsController {
   constructor(
+    private readonly cloturerAnimationCollectiveCommandHandler: CloturerAnimationCollectiveCommandHandler,
     private readonly getAnimationsCollectivesQueryHandler: GetAnimationsCollectivesQueryHandler,
     private readonly getJeunesEtablissementQueryHandler: GetJeunesByEtablissementQueryHandler
   ) {}
@@ -23,7 +28,7 @@ export class EtablissementsController {
   @ApiOperation({
     summary: "Récupère les animations collectives d'un établissement",
     description:
-      "Autorisé pour un conseiller appartenant à l'établissement et ses jeuness"
+      "Autorisé pour un conseiller appartenant à l'établissement et ses jeunes"
   })
   @Get(':idEtablissement/animations-collectives')
   @ApiResponse({
@@ -54,6 +59,28 @@ export class EtablissementsController {
     }
 
     throw handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary: 'Clot une animation collective et inscrit les jeunes',
+    description:
+      "Autorisé pour un conseiller appartenant à l'établissement de l'animation collective"
+  })
+  @Post('animations-collectives/:idAnimationCollective/cloturer')
+  async postCloture(
+    @Param('idAnimationCollective') idAnimationCollective: string,
+    @Body() payload: ClotureAnimationCollectivePayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.cloturerAnimationCollectiveCommandHandler.execute(
+      {
+        idAnimationCollective,
+        idsJeunes: payload.idsJeunes
+      },
+      utilisateur
+    )
+
+    handleFailure(result)
   }
 
   @ApiOperation({
