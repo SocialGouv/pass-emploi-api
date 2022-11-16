@@ -18,7 +18,7 @@ export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
     date: rendezVous.date,
     commentaire: rendezVous.commentaire ?? null,
     dateSuppression: null,
-    dateCloture: null,
+    dateCloture: rendezVous.dateCloture?.toJSDate() ?? null,
     type: rendezVous.type,
     precision: rendezVous.precision ?? null,
     adresse: rendezVous.adresse ?? null,

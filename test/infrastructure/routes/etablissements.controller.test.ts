@@ -1,15 +1,20 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import * as request from 'supertest'
+import { CloturerAnimationCollectiveCommandHandler } from '../../../src/application/commands/cloturer-animation-collective.command.handler'
 import { GetAnimationsCollectivesQueryHandler } from '../../../src/application/queries/get-animations-collectives.query.handler.db'
 import { GetJeunesByEtablissementQueryHandler } from '../../../src/application/queries/get-jeunes-by-etablissement.query.handler.db'
-import { success } from '../../../src/building-blocks/types/result'
+import {
+  emptySuccess,
+  success
+} from '../../../src/building-blocks/types/result'
 import {
   unHeaderAuthorization,
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
 import {
   buildTestingModuleForHttpTesting,
+  expect,
   StubbedClass,
   stubClass
 } from '../../utils'
@@ -18,6 +23,7 @@ import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-
 describe('EtablissementsController', () => {
   let getAnimationsCollectivesQueryHandler: StubbedClass<GetAnimationsCollectivesQueryHandler>
   let getJeunesEtablissementQueryHandler: StubbedClass<GetJeunesByEtablissementQueryHandler>
+  let cloturerAnimationCollectiveCommandHandler: StubbedClass<CloturerAnimationCollectiveCommandHandler>
   let app: INestApplication
 
   before(async () => {
@@ -27,12 +33,17 @@ describe('EtablissementsController', () => {
     getJeunesEtablissementQueryHandler = stubClass(
       GetJeunesByEtablissementQueryHandler
     )
+    cloturerAnimationCollectiveCommandHandler = stubClass(
+      CloturerAnimationCollectiveCommandHandler
+    )
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(GetAnimationsCollectivesQueryHandler)
       .useValue(getAnimationsCollectivesQueryHandler)
       .overrideProvider(GetJeunesByEtablissementQueryHandler)
       .useValue(getJeunesEtablissementQueryHandler)
+      .overrideProvider(CloturerAnimationCollectiveCommandHandler)
+      .useValue(cloturerAnimationCollectiveCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -104,6 +115,39 @@ describe('EtablissementsController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/etablissements/75114/jeunes'
+    )
+  })
+
+  describe('POST animations-collectives/:idAnimationCollective/cloturer', () => {
+    it('cloture une animation collective', async () => {
+      // Given
+      const idsJeunes = ['1']
+      const idAnimationCollective = '15916d7e-f13a-4158-b7eb-3936aa937a0a'
+      cloturerAnimationCollectiveCommandHandler.execute.resolves(emptySuccess())
+
+      // When - Then
+      await request(app.getHttpServer())
+        .post(
+          `/etablissements/animations-collectives/${idAnimationCollective}/cloturer`
+        )
+        .set('authorization', unHeaderAuthorization())
+        .send({ idsJeunes })
+        .expect(HttpStatus.CREATED)
+
+      expect(
+        cloturerAnimationCollectiveCommandHandler.execute
+      ).to.have.been.calledWithExactly(
+        {
+          idAnimationCollective,
+          idsJeunes
+        },
+        unUtilisateurDecode()
+      )
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'post',
+      '/etablissements/animations-collectives/123/cloturer'
     )
   })
 })
