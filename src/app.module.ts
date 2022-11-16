@@ -268,6 +268,7 @@ import { EtablissementsController } from './infrastructure/routes/etablissements
 import { ConseillerEtablissementAuthorizer } from './application/authorizers/authorize-conseiller-etablissement'
 import { AnimationCollectiveSqlRepository } from './infrastructure/repositories/rendez-vous/animation-collective-sql.repository.db'
 import { HistoriqueRendezVousRepositorySql } from './infrastructure/repositories/rendez-vous/historique-rendez-vous.repository.db'
+import { CloturerAnimationCollectiveCommandHandler } from './application/commands/cloturer-animation-collective.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -339,6 +340,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     KeycloakClient,
     Context,
     Recherche.Factory,
+    RendezVous.AnimationCollective.Factory,
     {
       provide: APP_GUARD,
       useClass: OidcAuthGuard
@@ -615,7 +617,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateSuggestionConseillerImmersionCommandHandler,
     GetActionsPredefiniesQueryHandler,
     GetAnimationsCollectivesQueryHandler,
-    GetJeunesByEtablissementQueryHandler
+    GetJeunesByEtablissementQueryHandler,
+    CloturerAnimationCollectiveCommandHandler
   ]
 }
 

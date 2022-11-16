@@ -219,8 +219,13 @@ export namespace RendezVous {
       }
     }
   }
+
+  interface JeuneAnimationCollective extends JeuneDuRendezVous {
+    present?: boolean
+  }
   export interface AnimationCollective extends RendezVous {
     type: CodeTypeRendezVous.ATELIER | CodeTypeRendezVous.INFORMATION_COLLECTIVE
+    jeunes: JeuneAnimationCollective[]
   }
 
   export namespace AnimationCollective {
@@ -238,7 +243,11 @@ export namespace RendezVous {
     }
 
     export interface Repository {
+      get(
+        idAnimationCollective: string
+      ): Promise<AnimationCollective | undefined>
       getAllAVenir(idEtablissement: string): Promise<AnimationCollective[]>
+      save(animationCollective: AnimationCollective): Promise<void>
     }
 
     @Injectable()
@@ -247,7 +256,8 @@ export namespace RendezVous {
         @Inject(AnimationCollectiveRepositoryToken)
         private repository: Repository,
         @Inject(RendezVousRepositoryToken)
-        private rdvRepository: RendezVous.Repository
+        private rdvRepository: RendezVous.Repository,
+        private dateService: DateService
       ) {}
 
       async desinscrire(idsJeunes: string[], idAgence: string): Promise<void> {
@@ -261,6 +271,38 @@ export namespace RendezVous {
           )
           await this.rdvRepository.save(animationCollective)
         }
+      }
+
+      estAVenir(animationCollective: AnimationCollective): boolean {
+        const maintenant = this.dateService.now()
+
+        return Boolean(
+          maintenant <
+            DateService.fromJSDateToDateTime(animationCollective.date)!
+        )
+      }
+    }
+    @Injectable()
+    export class Factory {
+      constructor(private dateService: DateService) {}
+      cloturer(
+        animationCollective: AnimationCollective,
+        idsJeunes: string[]
+      ): AnimationCollective {
+        const maintenant = this.dateService.now()
+        const animationCollectiveCloturee = {
+          ...animationCollective,
+          jeunes: animationCollective.jeunes.map(jeune => {
+            let present = false
+            if (idsJeunes.includes(jeune.id)) {
+              present = true
+            }
+            return { ...jeune, present }
+          }),
+          dateCloture: maintenant
+        }
+
+        return animationCollectiveCloturee
       }
     }
   }
