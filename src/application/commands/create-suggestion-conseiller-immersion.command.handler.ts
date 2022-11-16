@@ -13,6 +13,7 @@ import { Recherche } from '../../domain/offre/recherche/recherche'
 import { SuggestionsRepositoryToken } from '../../domain/offre/recherche/suggestion/suggestion'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { Suggestion } from '../../domain/offre/recherche/suggestion/suggestion'
+import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface CreateSuggestionConseillerImmersionCommand extends Command {
   idConseiller: string
@@ -33,7 +34,8 @@ export class CreateSuggestionConseillerImmersionCommandHandler extends CommandHa
     private suggestionRepository: Suggestion.Repository,
     private suggestionFactory: Suggestion.Factory,
     @Inject(JeunesRepositoryToken)
-    private jeuneRepository: Jeune.Repository
+    private jeuneRepository: Jeune.Repository,
+    private evenementService: EvenementService
   ) {
     super('CreateSuggestionDuConseillerCommandHandler')
   }
@@ -76,7 +78,10 @@ export class CreateSuggestionConseillerImmersionCommandHandler extends CommandHa
     return emptySuccess()
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creer(
+      Evenement.Code.RECHERCHE_IMMERSION_SUGGEREE,
+      utilisateur
+    )
   }
 }

@@ -1,23 +1,33 @@
 import { SinonSandbox } from 'sinon'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { GetDetailServiceCiviqueQueryHandler } from '../../../src/application/queries/get-detail-service-civique.query.handler'
+import { GetDetailOffreServiceCiviqueQueryHandler } from '../../../src/application/queries/get-detail-offre-service-civique.query.handler'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
 import { EngagementClient } from '../../../src/infrastructure/clients/engagement-client'
 import { Offre } from '../../../src/domain/offre/offre'
 import { uneOffreServiceCiviqueDto } from '../../fixtures/offre-service-civique.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
 
 describe('GetDetailServiceCiviqueQuery', () => {
+  let getDetailServiceCiviqueQueryHandler: GetDetailOffreServiceCiviqueQueryHandler
   let serviceCiviqueClient: StubbedClass<EngagementClient>
-  let getDetailServiceCiviqueQueryHandler: GetDetailServiceCiviqueQueryHandler
+  let evenementService: StubbedClass<EvenementService>
   let sandbox: SinonSandbox
 
-  before(() => {
+  beforeEach(() => {
     sandbox = createSandbox()
     serviceCiviqueClient = stubClass(EngagementClient)
+    evenementService = stubClass(EvenementService)
 
     getDetailServiceCiviqueQueryHandler =
-      new GetDetailServiceCiviqueQueryHandler(serviceCiviqueClient)
+      new GetDetailOffreServiceCiviqueQueryHandler(
+        serviceCiviqueClient,
+        evenementService
+      )
   })
 
   afterEach(() => {
@@ -96,6 +106,28 @@ describe('GetDetailServiceCiviqueQuery', () => {
       expect(result).to.be.deep.equal(
         failure(new NonTrouveError('OffreEngagement', 'unFauxId'))
       )
+    })
+  })
+
+  describe('monitor', () => {
+    it('enregistre l‘évènement pour un conseiller', async () => {
+      // Given
+      const utilisateur = unUtilisateurConseiller()
+      // When
+      await getDetailServiceCiviqueQueryHandler.monitor(utilisateur)
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHE,
+        utilisateur
+      )
+    })
+    it('n‘enregistre pas l‘évènement pour un jeune', async () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+      // When
+      await getDetailServiceCiviqueQueryHandler.monitor(utilisateur)
+      // Then
+      expect(evenementService.creer).to.not.have.been.called()
     })
   })
 })

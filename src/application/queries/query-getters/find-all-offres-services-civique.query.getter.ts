@@ -6,7 +6,7 @@ import { Offre } from '../../../domain/offre/offre'
 import { EngagementClient } from '../../../infrastructure/clients/engagement-client'
 import { toOffresServicesCivique } from '../../../infrastructure/repositories/mappers/service-civique.mapper'
 import { EngagementDto } from '../../../infrastructure/repositories/offre/offre-service-civique-http.repository.db'
-import { GetServicesCiviqueQuery } from '../get-services-civique.query.handler'
+import { GetServicesCiviqueQuery } from '../get-offres-services-civique.query.handler'
 
 const DEFAULT_PAGE = 1
 const DEFAULT_LIMIT = 50

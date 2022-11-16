@@ -24,28 +24,33 @@ export const uneOffreEmploi = (args: Partial<Emploi> = {}): Emploi => {
   return { ...defaults, ...args }
 }
 
-export const uneOffreEmploiDto = (): OffreEmploiDto => ({
-  id: '123DXPM',
-  intitule: 'Technicien / Technicienne en froid et climatisation',
-  typeContrat: 'MIS',
-  dureeTravailLibelleConverti: 'Temps plein',
-  entreprise: {
-    nom: 'RH TT INTERIM'
-  },
-  lieuTravail: {
-    libelle: 'libelle',
-    codePostal: '57000',
-    commune: '57463'
-  },
-  contact: {
-    urlPostulation: 'url/postulation'
-  },
-  origineOffre: {
-    urlOrigine: 'url/offre',
-    partenaires: []
-  },
-  alternance: false
-})
+export const uneOffreEmploiDto = (
+  args: Partial<OffreEmploiDto> = {}
+): OffreEmploiDto => {
+  const defaults: OffreEmploiDto = {
+    id: '123DXPM',
+    intitule: 'Technicien / Technicienne en froid et climatisation',
+    typeContrat: 'MIS',
+    dureeTravailLibelleConverti: 'Temps plein',
+    entreprise: {
+      nom: 'RH TT INTERIM'
+    },
+    lieuTravail: {
+      libelle: 'libelle',
+      codePostal: '57000',
+      commune: '57463'
+    },
+    contact: {
+      urlPostulation: 'url/postulation'
+    },
+    origineOffre: {
+      urlOrigine: 'url/offre',
+      partenaires: []
+    },
+    alternance: false
+  }
+  return { ...defaults, ...args }
+}
 
 export const uneOffreEmploiResumeQueryModel =
   (): OffreEmploiResumeQueryModel => ({

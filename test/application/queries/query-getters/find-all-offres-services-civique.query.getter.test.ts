@@ -8,7 +8,7 @@ import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import { EngagementClient } from '../../../../src/infrastructure/clients/engagement-client'
 import { FindAllOffresServicesCiviqueQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-services-civique.query.getter'
 import { Offre } from '../../../../src/domain/offre/offre'
-import { GetServicesCiviqueQuery } from '../../../../src/application/queries/get-services-civique.query.handler'
+import { GetServicesCiviqueQuery } from '../../../../src/application/queries/get-offres-services-civique.query.handler'
 
 describe('FindAllOffresServicesCiviqueQueryGetter', () => {
   let serviceCiviqueClient: StubbedClass<EngagementClient>

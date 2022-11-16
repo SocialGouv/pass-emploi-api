@@ -9,18 +9,25 @@ import {
 import { StubbedClass, stubClass } from '../../utils'
 import { ImmersionClient } from '../../../src/infrastructure/clients/immersion-client'
 import { GetDetailOffreImmersionQueryHandler } from 'src/application/queries/get-detail-offre-immersion.query.handler'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
 
 describe('GetDetailOffreImmersionQueryHandler', () => {
-  let immersionClient: StubbedClass<ImmersionClient>
   let getDetailOffreImmersionQueryHandler: GetDetailOffreImmersionQueryHandler
+  let immersionClient: StubbedClass<ImmersionClient>
+  let evenementService: StubbedClass<EvenementService>
+
+  beforeEach(() => {
+    immersionClient = stubClass(ImmersionClient)
+    evenementService = stubClass(EvenementService)
+    getDetailOffreImmersionQueryHandler =
+      new GetDetailOffreImmersionQueryHandler(immersionClient, evenementService)
+  })
 
   describe('handle', () => {
-    beforeEach(() => {
-      immersionClient = stubClass(ImmersionClient)
-      getDetailOffreImmersionQueryHandler =
-        new GetDetailOffreImmersionQueryHandler(immersionClient)
-    })
-
     describe('quand la requête est correcte', () => {
       it("renvoie le détail d'une offre", async () => {
         // Given
@@ -155,6 +162,28 @@ describe('GetDetailOffreImmersionQueryHandler', () => {
         // Then
         await expect(offres).to.be.rejectedWith(error)
       })
+    })
+  })
+
+  describe('monitor', () => {
+    it('enregistre l‘évènement pour un conseiller', async () => {
+      // Given
+      const utilisateur = unUtilisateurConseiller()
+      // When
+      await getDetailOffreImmersionQueryHandler.monitor(utilisateur)
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.OFFRE_IMMERSION_AFFICHEE,
+        utilisateur
+      )
+    })
+    it('n‘enregistre pas l‘évènement pour un jeune', async () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+      // When
+      await getDetailOffreImmersionQueryHandler.monitor(utilisateur)
+      // Then
+      expect(evenementService.creer).to.not.have.been.called()
     })
   })
 })

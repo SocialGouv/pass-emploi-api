@@ -3,15 +3,23 @@ import { expect, StubbedClass, stubClass } from '../../utils'
 import { PoleEmploiClient } from '../../../src/infrastructure/clients/pole-emploi-client'
 import { uneOffreEmploiDto } from '../../fixtures/offre-emploi.fixture'
 import { OffreEmploiQueryModel } from '../../../src/application/queries/query-models/offres-emploi.query-model'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
 
 describe('GetDetailOffreEmploiQueryHandler', () => {
   let getDetailOffreEmploiQueryHandler: GetDetailOffreEmploiQueryHandler
   let poleEmploiClient: StubbedClass<PoleEmploiClient>
+  let evenementService: StubbedClass<EvenementService>
 
   beforeEach(() => {
     poleEmploiClient = stubClass(PoleEmploiClient)
+    evenementService = stubClass(EvenementService)
     getDetailOffreEmploiQueryHandler = new GetDetailOffreEmploiQueryHandler(
-      poleEmploiClient
+      poleEmploiClient,
+      evenementService
     )
   })
 
@@ -119,6 +127,60 @@ describe('GetDetailOffreEmploiQueryHandler', () => {
 
         // Then
         expect(queryModel).to.be.undefined()
+      })
+    })
+  })
+
+  describe('monitor', () => {
+    describe('quand ‘est un utilisateur conseiller', () => {
+      it('enregistre l‘évènement de consultation du détail d‘une offre emploi', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller()
+        poleEmploiClient.getOffreEmploi.resolves(
+          uneOffreEmploiDto({ alternance: false })
+        )
+
+        // When
+        await getDetailOffreEmploiQueryHandler.monitor(utilisateur, {
+          idOffreEmploi: 'un-id-offre-emploi'
+        })
+
+        // Then
+        expect(evenementService.creer).to.have.been.calledWithExactly(
+          Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
+          utilisateur
+        )
+      })
+      it('enregistre l‘évènement de consultation du détail d‘une offre emploi', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller()
+        poleEmploiClient.getOffreEmploi.resolves(
+          uneOffreEmploiDto({ alternance: true })
+        )
+        // When
+        await getDetailOffreEmploiQueryHandler.monitor(utilisateur, {
+          idOffreEmploi: 'un-id-offre-emploi'
+        })
+
+        // Then
+        expect(evenementService.creer).to.have.been.calledWithExactly(
+          Evenement.Code.OFFRE_ALTERNANCE_AFFICHEE,
+          utilisateur
+        )
+      })
+    })
+    describe('quand c‘est un utilisateur jeune', () => {
+      it('n‘enregistre pas l‘évènement de consultation du détail de l‘offre', async () => {
+        const utilisateur = unUtilisateurJeune()
+        poleEmploiClient.getOffreEmploi.resolves()
+
+        // When
+        await getDetailOffreEmploiQueryHandler.monitor(utilisateur, {
+          idOffreEmploi: 'un-id-offre-emploi'
+        })
+
+        // Then
+        expect(evenementService.creer).to.not.have.been.called()
       })
     })
   })

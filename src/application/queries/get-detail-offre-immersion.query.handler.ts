@@ -15,6 +15,8 @@ import {
   RechercheDetailOffreNonTrouve
 } from '../../building-blocks/types/domain-error'
 import { ImmersionClient } from '../../infrastructure/clients/immersion-client'
+import { Evenement, EvenementService } from '../../domain/evenement'
+import { Authentification } from '../../domain/authentification'
 
 export interface GetDetailOffreImmersionQuery extends Query {
   idOffreImmersion: string
@@ -25,7 +27,10 @@ export class GetDetailOffreImmersionQueryHandler extends QueryHandler<
   GetDetailOffreImmersionQuery,
   Result<DetailOffreImmersionQueryModel>
 > {
-  constructor(private immersionClient: ImmersionClient) {
+  constructor(
+    private immersionClient: ImmersionClient,
+    private evenementService: EvenementService
+  ) {
     super('GetDetailOffreImmersionQueryHandler')
   }
 
@@ -55,7 +60,12 @@ export class GetDetailOffreImmersionQueryHandler extends QueryHandler<
     return emptySuccess()
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      await this.evenementService.creer(
+        Evenement.Code.OFFRE_IMMERSION_AFFICHEE,
+        utilisateur
+      )
+    }
   }
 }

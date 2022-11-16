@@ -3,8 +3,8 @@ import { Evenement, EvenementService } from 'src/domain/evenement'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import {
   GetServicesCiviqueQuery,
-  GetServicesCiviqueQueryHandler
-} from '../../../src/application/queries/get-services-civique.query.handler'
+  GetOffresServicesCiviqueQueryHandler
+} from '../../../src/application/queries/get-offres-services-civique.query.handler'
 import { ServiceCiviqueQueryModel } from '../../../src/application/queries/query-models/service-civique.query-model'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { offresServicesCiviqueQueryModel } from '../../fixtures/query-models/offre-service-civique.query-model.fixtures'
@@ -13,7 +13,7 @@ import { success } from '../../../src/building-blocks/types/result'
 
 describe('GetServicesCiviqueQueryHandler', () => {
   let findAllOffresServicesCiviqueQueryGetter: StubbedClass<FindAllOffresServicesCiviqueQueryGetter>
-  let getServicesCiviqueQueryHandler: GetServicesCiviqueQueryHandler
+  let getServicesCiviqueQueryHandler: GetOffresServicesCiviqueQueryHandler
   let sandbox: SinonSandbox
   let evenementService: StubbedClass<EvenementService>
 
@@ -24,7 +24,7 @@ describe('GetServicesCiviqueQueryHandler', () => {
     )
     evenementService = stubClass(EvenementService)
 
-    getServicesCiviqueQueryHandler = new GetServicesCiviqueQueryHandler(
+    getServicesCiviqueQueryHandler = new GetOffresServicesCiviqueQueryHandler(
       findAllOffresServicesCiviqueQueryGetter,
       evenementService
     )
@@ -151,7 +151,7 @@ describe('GetServicesCiviqueQueryHandler', () => {
 
       // Then
       expect(evenementService.creer).to.have.been.calledWith(
-        Evenement.Code.SERVICE_CIVIQUE_RECHERCHE,
+        Evenement.Code.OFFRE_SERVICE_CIVIQUE_RECHERCHEE,
         unUtilisateurJeune()
       )
     })
