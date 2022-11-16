@@ -148,5 +148,5 @@ export class GetDetailRendezVousQueryParams {
   @IsOptional()
   @Transform(param => transformStringToBoolean(param, 'avecHistorique'))
   @IsBoolean()
-  avecHistorique: boolean
+  avecHistorique?: boolean
 }
