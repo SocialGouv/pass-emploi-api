@@ -1,4 +1,11 @@
-import { IsDateString, IsNotEmpty, IsOptional } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsDateString,
+  IsNotEmpty,
+  IsOptional
+} from 'class-validator'
 
 export class GetAnimationsCollectivesQueryParams {
   @IsOptional()
@@ -10,4 +17,11 @@ export class GetAnimationsCollectivesQueryParams {
   @IsNotEmpty()
   @IsDateString()
   dateFin?: string
+}
+
+export class ClotureAnimationCollectivePayload {
+  @ApiProperty()
+  @IsArray()
+  @ArrayNotEmpty()
+  idsJeunes: string[]
 }

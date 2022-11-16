@@ -24,4 +24,7 @@ export class RendezVousJeuneAssociationSqlModel extends Model {
   @ForeignKey(() => JeuneSqlModel)
   @Column({ field: 'id_jeune', type: DataType.STRING })
   idJeune: string
+
+  @Column({ field: 'present', type: DataType.BOOLEAN })
+  present: boolean | null
 }
