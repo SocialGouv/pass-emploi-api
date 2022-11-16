@@ -10,7 +10,11 @@ import {
   MauvaiseCommandeError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
-import { failure, success } from '../../../src/building-blocks/types/result'
+import {
+  failure,
+  isFailure,
+  success
+} from '../../../src/building-blocks/types/result'
 import { Notification } from '../../../src/domain/notification/notification'
 import { PlanificateurService } from '../../../src/domain/planificateur'
 import { CodeTypeRendezVous, RendezVous } from '../../../src/domain/rendez-vous'
@@ -167,6 +171,28 @@ describe('UpdateRendezVousCommandHandler', () => {
               'Une Animation Collective cloturée ne peut plus etre modifiée.'
             )
           )
+        )
+      })
+      it('échoue si la liste des bénéficiaires est vide pour un type non Animation Collective', async () => {
+        // Given
+        const command: UpdateRendezVousCommand = {
+          idsJeunes: [],
+          idRendezVous: rendezVous.id,
+          date: '2021-11-11T08:03:30.000Z',
+          duree: 30,
+          presenceConseiller: true
+        }
+        rendezVousRepository.get
+          .withArgs(command.idRendezVous)
+          .resolves(rendezVous)
+
+        // When
+        const result = await updateRendezVousCommandHandler.handle(command)
+        // Then
+        expect(rendezVousRepository.save).to.have.callCount(0)
+        expect(notificationService.notifierLesJeunesDuRdv).to.have.callCount(0)
+        expect(isFailure(result) && result.error).to.be.an.instanceof(
+          MauvaiseCommandeError
         )
       })
     })

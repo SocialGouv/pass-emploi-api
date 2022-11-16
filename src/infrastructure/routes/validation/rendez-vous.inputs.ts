@@ -103,7 +103,6 @@ export class UpdateRendezVousPayload {
   @ApiPropertyOptional()
   @IsOptional()
   @IsArray()
-  @ArrayNotEmpty()
   jeunesIds?: string[]
 
   @ApiPropertyOptional()
