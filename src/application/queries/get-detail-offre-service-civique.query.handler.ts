@@ -15,17 +15,22 @@ import {
 } from '../../building-blocks/types/domain-error'
 import { DetailOffreEngagementDto } from '../../infrastructure/repositories/offre/offre-service-civique-http.repository.db'
 import { EngagementClient } from '../../infrastructure/clients/engagement-client'
+import { Authentification } from '../../domain/authentification'
+import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface GetDetailOffreServiceCiviqueQuery extends Query {
   idOffre: string
 }
 
 @Injectable()
-export class GetDetailServiceCiviqueQueryHandler extends QueryHandler<
+export class GetDetailOffreServiceCiviqueQueryHandler extends QueryHandler<
   GetDetailOffreServiceCiviqueQuery,
   Result<DetailServiceCiviqueQueryModel>
 > {
-  constructor(private engagementClient: EngagementClient) {
+  constructor(
+    private engagementClient: EngagementClient,
+    private evenementService: EvenementService
+  ) {
     super('GetDetailServiceCiviqueQueryHandler')
   }
 
@@ -60,7 +65,12 @@ export class GetDetailServiceCiviqueQueryHandler extends QueryHandler<
     return emptySuccess()
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      await this.evenementService.creer(
+        Evenement.Code.OFFRE_SERVICE_CIVIQUE_AFFICHE,
+        utilisateur
+      )
+    }
   }
 }

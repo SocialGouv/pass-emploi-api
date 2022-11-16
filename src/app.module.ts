@@ -61,7 +61,7 @@ import { GetDetailJeuneQueryHandler } from './application/queries/get-detail-jeu
 import { GetDetailOffreEmploiQueryHandler } from './application/queries/get-detail-offre-emploi.query.handler'
 import { GetDetailOffreImmersionQueryHandler } from './application/queries/get-detail-offre-immersion.query.handler'
 import { GetDetailRendezVousQueryHandler } from './application/queries/get-detail-rendez-vous.query.handler.db'
-import { GetDetailServiceCiviqueQueryHandler } from './application/queries/get-detail-service-civique.query.handler'
+import { GetDetailOffreServiceCiviqueQueryHandler } from './application/queries/get-detail-offre-service-civique.query.handler'
 import { GetDossierMiloJeuneQueryHandler } from './application/queries/get-dossier-milo-jeune.query.handler'
 import { GetFavorisOffresEmploiJeuneQueryHandler } from './application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
 import { GetFavorisOffresImmersionJeuneQueryHandler } from './application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
@@ -74,7 +74,7 @@ import { GetAllRendezVousConseillerQueryHandler } from './application/queries/ge
 import { GetRendezVousJeunePoleEmploiQueryHandler } from './application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { GetRendezVousJeuneQueryHandler } from './application/queries/get-rendez-vous-jeune.query.handler.db'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from './application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
-import { GetServicesCiviqueQueryHandler } from './application/queries/get-services-civique.query.handler'
+import { GetOffresServicesCiviqueQueryHandler } from './application/queries/get-offres-services-civique.query.handler'
 import { GetTypesRendezVousQueryHandler } from './application/queries/get-types-rendez-vous.query.handler'
 import { TaskService } from './application/task.service'
 import { WorkerService } from './application/worker.service.db'
@@ -520,8 +520,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     InitCronsCommandHandler,
     HandleJobNotifierNouvellesOffresEmploiCommandHandler,
     HandleJobRecupererSituationsJeunesMiloCommandHandler,
-    GetServicesCiviqueQueryHandler,
-    GetDetailServiceCiviqueQueryHandler,
+    GetOffresServicesCiviqueQueryHandler,
+    GetDetailOffreServiceCiviqueQueryHandler,
     HandleNettoyerLesJobsCommandHandler,
     CreerSuperviseursCommandHandler,
     DeleteSuperviseursCommandHandler,

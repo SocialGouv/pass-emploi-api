@@ -15,6 +15,7 @@ import {
   SuggestionsRepositoryToken
 } from '../../domain/offre/recherche/suggestion/suggestion'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface CreateSuggestionConseillerOffreEmploiCommand extends Command {
   idConseiller: string
@@ -35,7 +36,8 @@ export class CreateSuggestionConseillerOffreEmploiCommandHandler extends Command
     private suggestionRepository: Suggestion.Repository,
     private suggestionFactory: Suggestion.Factory,
     @Inject(JeunesRepositoryToken)
-    private jeuneRepository: Jeune.Repository
+    private jeuneRepository: Jeune.Repository,
+    private evenementService: EvenementService
   ) {
     super('CreateSuggestionDuConseillerCommandHandler')
   }
@@ -86,7 +88,15 @@ export class CreateSuggestionConseillerOffreEmploiCommandHandler extends Command
     return emptySuccess()
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    command: CreateSuggestionConseillerOffreEmploiCommand
+  ): Promise<void> {
+    await this.evenementService.creer(
+      command.criteres.alternance
+        ? Evenement.Code.RECHERCHE_ALTERNANCE_SUGGEREE
+        : Evenement.Code.RECHERCHE_EMPLOI_SUGGEREE,
+      utilisateur
+    )
   }
 }

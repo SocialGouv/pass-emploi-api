@@ -28,7 +28,7 @@ export interface GetServicesCiviqueQuery extends Query {
 }
 
 @Injectable()
-export class GetServicesCiviqueQueryHandler extends QueryHandler<
+export class GetOffresServicesCiviqueQueryHandler extends QueryHandler<
   GetServicesCiviqueQuery,
   Result<ServicesCiviqueQueryModel>
 > {
@@ -69,7 +69,7 @@ export class GetServicesCiviqueQueryHandler extends QueryHandler<
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
     await this.evenementService.creer(
-      Evenement.Code.SERVICE_CIVIQUE_RECHERCHE,
+      Evenement.Code.OFFRE_SERVICE_CIVIQUE_RECHERCHEE,
       utilisateur
     )
   }

@@ -1,13 +1,13 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import {
   GetServicesCiviqueQuery,
-  GetServicesCiviqueQueryHandler
-} from 'src/application/queries/get-services-civique.query.handler'
+  GetOffresServicesCiviqueQueryHandler
+} from 'src/application/queries/get-offres-services-civique.query.handler'
 import * as request from 'supertest'
 import {
   GetDetailOffreServiceCiviqueQuery,
-  GetDetailServiceCiviqueQueryHandler
-} from '../../../src/application/queries/get-detail-service-civique.query.handler'
+  GetDetailOffreServiceCiviqueQueryHandler
+} from '../../../src/application/queries/get-detail-offre-service-civique.query.handler'
 import {
   DetailServiceCiviqueQueryModel,
   ServiceCiviqueQueryModel
@@ -31,20 +31,22 @@ import {
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 
 describe('ServicesCiviqueController', () => {
-  let getServicesCiviqueQueryHandler: StubbedClass<GetServicesCiviqueQueryHandler>
-  let getDetailServiceCiviqueQueryHandler: StubbedClass<GetDetailServiceCiviqueQueryHandler>
+  let getServicesCiviqueQueryHandler: StubbedClass<GetOffresServicesCiviqueQueryHandler>
+  let getDetailServiceCiviqueQueryHandler: StubbedClass<GetDetailOffreServiceCiviqueQueryHandler>
   let app: INestApplication
 
   before(async () => {
-    getServicesCiviqueQueryHandler = stubClass(GetServicesCiviqueQueryHandler)
+    getServicesCiviqueQueryHandler = stubClass(
+      GetOffresServicesCiviqueQueryHandler
+    )
     getDetailServiceCiviqueQueryHandler = stubClass(
-      GetDetailServiceCiviqueQueryHandler
+      GetDetailOffreServiceCiviqueQueryHandler
     )
 
     const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(GetServicesCiviqueQueryHandler)
+      .overrideProvider(GetOffresServicesCiviqueQueryHandler)
       .useValue(getServicesCiviqueQueryHandler)
-      .overrideProvider(GetDetailServiceCiviqueQueryHandler)
+      .overrideProvider(GetDetailOffreServiceCiviqueQueryHandler)
       .useValue(getDetailServiceCiviqueQueryHandler)
       .compile()
 

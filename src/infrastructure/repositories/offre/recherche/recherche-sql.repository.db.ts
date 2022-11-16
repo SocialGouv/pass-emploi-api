@@ -8,7 +8,7 @@ import { GetOffresEmploiQuery } from '../../../../application/queries/get-offres
 import { CommuneSqlModel } from '../../../sequelize/models/commune.sql-model'
 import { SequelizeInjectionToken } from '../../../sequelize/providers'
 import { GetOffresImmersionQuery } from '../../../../application/queries/get-offres-immersion.query.handler'
-import { GetServicesCiviqueQuery } from '../../../../application/queries/get-services-civique.query.handler'
+import { GetServicesCiviqueQuery } from '../../../../application/queries/get-offres-services-civique.query.handler'
 import { Offre } from '../../../../domain/offre/offre'
 
 @Injectable()

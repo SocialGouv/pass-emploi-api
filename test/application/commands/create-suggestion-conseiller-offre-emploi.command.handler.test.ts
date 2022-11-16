@@ -16,6 +16,7 @@ import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { uneSuggestion } from '../../fixtures/suggestion.fixture'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
 
 describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
   let createSuggestionDuConseillerOffreEmploiCommandHandler: CreateSuggestionConseillerOffreEmploiCommandHandler
@@ -23,6 +24,7 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
   let suggestionRepository: StubbedType<Suggestion.Repository>
   let suggestionFactory: StubbedClass<Suggestion.Factory>
   let jeuneRepository: StubbedType<Jeune.Repository>
+  let evenementService: StubbedClass<EvenementService>
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
@@ -30,13 +32,15 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
     suggestionRepository = stubInterface(sandbox)
     suggestionFactory = stubClass(Suggestion.Factory)
     jeuneRepository = stubInterface(sandbox)
+    evenementService = stubClass(EvenementService)
 
     createSuggestionDuConseillerOffreEmploiCommandHandler =
       new CreateSuggestionConseillerOffreEmploiCommandHandler(
         conseillerAuthorizer,
         suggestionRepository,
         suggestionFactory,
-        jeuneRepository
+        jeuneRepository,
+        evenementService
       )
   })
 
@@ -153,6 +157,62 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
           suggestionAttendueJeune
         )
       })
+    })
+  })
+
+  describe('monitor', () => {
+    it('créé un événement suggestion emploi', () => {
+      // Given
+      const utilisateur = unUtilisateurConseiller()
+      const criteres: Recherche.Emploi = {
+        q: 'Petrisseur',
+        commune: '59220'
+      }
+      const command: CreateSuggestionConseillerOffreEmploiCommand = {
+        idConseiller: 'un-id-conseiller',
+        idsJeunes: ['un-id-jeune'],
+        localisation: 'Denain',
+        criteres
+      }
+
+      // When
+      createSuggestionDuConseillerOffreEmploiCommandHandler.monitor(
+        utilisateur,
+        command
+      )
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.RECHERCHE_EMPLOI_SUGGEREE,
+        utilisateur
+      )
+    })
+    it('créé un événement suggestion alternance', () => {
+      // Given
+      const utilisateur = unUtilisateurConseiller()
+      const criteres: Recherche.Emploi = {
+        q: 'Petrisseur',
+        commune: '59220',
+        alternance: true
+      }
+      const command: CreateSuggestionConseillerOffreEmploiCommand = {
+        idConseiller: 'un-id-conseiller',
+        idsJeunes: ['un-id-jeune'],
+        localisation: 'Denain',
+        criteres
+      }
+
+      // When
+      createSuggestionDuConseillerOffreEmploiCommandHandler.monitor(
+        utilisateur,
+        command
+      )
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.RECHERCHE_ALTERNANCE_SUGGEREE,
+        utilisateur
+      )
     })
   })
 })

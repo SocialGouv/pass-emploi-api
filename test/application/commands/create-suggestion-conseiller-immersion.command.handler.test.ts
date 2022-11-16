@@ -16,6 +16,7 @@ import { unJeune } from '../../fixtures/jeune.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { uneSuggestion } from '../../fixtures/suggestion.fixture'
 import { Suggestion } from '../../../src/domain/offre/recherche/suggestion/suggestion'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
 
 describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
   let createSuggestionDuConseillerImmersionCommandHandler: CreateSuggestionConseillerImmersionCommandHandler
@@ -23,6 +24,7 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
   let suggestionRepository: StubbedType<Suggestion.Repository>
   let suggestionFactory: StubbedClass<Suggestion.Factory>
   let jeuneRepository: StubbedType<Jeune.Repository>
+  let evenementService: StubbedClass<EvenementService>
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
@@ -30,13 +32,15 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
     suggestionRepository = stubInterface(sandbox)
     suggestionFactory = stubClass(Suggestion.Factory)
     jeuneRepository = stubInterface(sandbox)
+    evenementService = stubClass(EvenementService)
 
     createSuggestionDuConseillerImmersionCommandHandler =
       new CreateSuggestionConseillerImmersionCommandHandler(
         conseillerAuthorizer,
         suggestionRepository,
         suggestionFactory,
-        jeuneRepository
+        jeuneRepository,
+        evenementService
       )
   })
 
@@ -150,6 +154,22 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
           suggestionAttendueJeune
         )
       })
+    })
+  })
+
+  describe('monitor', () => {
+    it('créé un événement suggestion emploi', () => {
+      // Given
+      const utilisateur = unUtilisateurConseiller()
+
+      // When
+      createSuggestionDuConseillerImmersionCommandHandler.monitor(utilisateur)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.RECHERCHE_IMMERSION_SUGGEREE,
+        utilisateur
+      )
     })
   })
 })

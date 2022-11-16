@@ -10,9 +10,9 @@ import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.excepti
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   GetDetailOffreServiceCiviqueQuery,
-  GetDetailServiceCiviqueQueryHandler
-} from '../../application/queries/get-detail-service-civique.query.handler'
-import { GetServicesCiviqueQueryHandler } from '../../application/queries/get-services-civique.query.handler'
+  GetDetailOffreServiceCiviqueQueryHandler
+} from '../../application/queries/get-detail-offre-service-civique.query.handler'
+import { GetOffresServicesCiviqueQueryHandler } from '../../application/queries/get-offres-services-civique.query.handler'
 import {
   DetailServiceCiviqueQueryModel,
   ServiceCiviqueQueryModel,
@@ -33,8 +33,8 @@ import { GetServicesCiviqueQueryParams } from './validation/services-civique.inp
 @ApiTags('Services Civique')
 export class ServicesCiviqueController {
   constructor(
-    private readonly getServicesCiviqueQueryHandler: GetServicesCiviqueQueryHandler,
-    private readonly getDetailServiceCiviqueQueryHandler: GetDetailServiceCiviqueQueryHandler
+    private readonly getServicesCiviqueQueryHandler: GetOffresServicesCiviqueQueryHandler,
+    private readonly getDetailServiceCiviqueQueryHandler: GetDetailOffreServiceCiviqueQueryHandler
   ) {}
 
   @Get('services-civique')
