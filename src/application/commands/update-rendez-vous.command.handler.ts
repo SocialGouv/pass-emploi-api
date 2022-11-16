@@ -63,7 +63,6 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
 
   async handle(command: UpdateRendezVousCommand): Promise<Result<Core.Id>> {
     const rendezVous = await this.rendezVousRepository.get(command.idRendezVous)
-
     if (!rendezVous) {
       return failure(new NonTrouveError('RendezVous', command.idRendezVous))
     }
@@ -75,7 +74,13 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
         )
       )
     }
-
+    if (!RendezVous.estUnTypeAnimationCollective(rendezVous.type)) {
+      if (command.idsJeunes?.length === 0) {
+        return failure(
+          new MauvaiseCommandeError('Un bénéficiaire minimum est requis.')
+        )
+      }
+    }
     if (
       !command.presenceConseiller &&
       rendezVous.type === CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
