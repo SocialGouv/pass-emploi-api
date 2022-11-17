@@ -5,7 +5,6 @@ import {
 import { Core } from '../../../../src/domain/core'
 import {
   CodeTypeRendezVous,
-  JeuneDuRendezVous,
   RendezVous
 } from '../../../../src/domain/rendez-vous'
 import { AnimationCollectiveSqlRepository } from '../../../../src/infrastructure/repositories/rendez-vous/animation-collective-sql.repository.db'
@@ -30,10 +29,10 @@ describe('AnimationsCollectivesSqlRepository', () => {
   let animationsCollectivesSqlRepository: AnimationCollectiveSqlRepository
   const maintenant = uneDatetime()
   const aujourdhuiMinuit = uneDatetimeMinuit()
-  let jeune: JeuneDuRendezVous
+  const jeune = unJeuneDuRendezVous()
   const unAutreJeune = unJeuneDuRendezVous({
     id: 'un-autre-jeune',
-    firstName: 'test'
+    configuration: uneConfiguration({ idJeune: 'un-autre-jeune' })
   })
 
   beforeEach(async () => {
@@ -51,9 +50,8 @@ describe('AnimationsCollectivesSqlRepository', () => {
         structure: Structure.POLE_EMPLOI
       })
     )
-    jeune = unJeuneDuRendezVous()
-    await JeuneSqlModel.creer(unJeuneDto())
-    await JeuneSqlModel.creer(unJeuneDto({ id: 'un-autre-jeune' }))
+    await JeuneSqlModel.creer(unJeuneDto({ id: jeune.id }))
+    await JeuneSqlModel.creer(unJeuneDto({ id: unAutreJeune.id }))
     await AgenceSqlModel.create(
       unEtablissementDto({
         id: 'une-agence'
@@ -247,7 +245,7 @@ describe('AnimationsCollectivesSqlRepository', () => {
       })
 
       describe('quand on ne change pas le nombre de jeunes', () => {
-        xit('met à jour les informations du animationCollective en ne rajoutant pas une association supplémentaire et en mettant à jour les informations de presence des jeunes', async () => {
+        it('met à jour les informations du animationCollective en ne rajoutant pas une association supplémentaire et en mettant à jour les informations de presence des jeunes', async () => {
           // Given
           const uneAnimationCollectiveModifiee: RendezVous.AnimationCollective =
             {
@@ -297,6 +295,42 @@ describe('AnimationsCollectivesSqlRepository', () => {
         expect(animationCollective?.modalite).to.equal(null)
         expect(animationCollective?.adresse).to.equal(null)
         expect(animationCollective?.organisme).to.equal(null)
+      })
+    })
+  })
+
+  describe('get', () => {
+    const id = '6c242fa0-804f-11ec-a8a3-0242ac120002'
+    describe("quand l'AC n'existe pas", () => {
+      it('retourne undefined', async () => {
+        // When
+        const animationCollective =
+          await animationsCollectivesSqlRepository.get(id)
+        // Then
+        expect(animationCollective).to.equal(undefined)
+      })
+    })
+    describe("quand l'AC existe", () => {
+      it("retourne l'AC", async () => {
+        // Given
+        const animationCollectiveDto = unRendezVousDto({
+          id,
+          type: CodeTypeRendezVous.ATELIER
+        })
+        await RendezVousSqlModel.create(animationCollectiveDto)
+        await RendezVousJeuneAssociationSqlModel.create({
+          idRendezVous: animationCollectiveDto.id,
+          idJeune: jeune.id
+        })
+        // When
+        const animationCollective =
+          await animationsCollectivesSqlRepository.get(id)
+        // Then
+        expect(animationCollective?.id).to.equal(animationCollectiveDto.id)
+        expect(animationCollective?.jeunes[0].id).to.equal(jeune.id)
+        expect(animationCollective?.createur).to.deep.equal(
+          animationCollectiveDto.createur
+        )
       })
     })
   })
