@@ -90,16 +90,17 @@ export class AnimationCollectiveSqlRepository
         }
       })
       await Promise.all(
-        animationCollective.jeunes.map(jeune =>
-          RendezVousJeuneAssociationSqlModel.upsert(
+        animationCollective.jeunes.map(jeune => {
+          const present = jeune.present === undefined ? null : jeune.present
+          return RendezVousJeuneAssociationSqlModel.upsert(
             {
               idJeune: jeune.id,
               idRendezVous: animationCollective.id,
-              present: jeune.present
+              present: present
             },
             { transaction }
           )
-        )
+        })
       )
     })
   }

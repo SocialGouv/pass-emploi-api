@@ -11,7 +11,8 @@ import {
 } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
-  failure
+  failure,
+  success
 } from '../../../src/building-blocks/types/result'
 import { RendezVous } from '../../../src/domain/rendez-vous'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
@@ -22,7 +23,6 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 describe('CloturerAnimationCollectiveCommandHandler', () => {
   let animationCollectiveRepository: StubbedType<RendezVous.AnimationCollective.Repository>
   let rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
-  let animationCollectiveFactory: StubbedClass<RendezVous.AnimationCollective.Factory>
   let animationCollectiveService: StubbedClass<RendezVous.AnimationCollective.Service>
   let cloturerAnimationCollectiveCommandHandler: CloturerAnimationCollectiveCommandHandler
 
@@ -32,9 +32,6 @@ describe('CloturerAnimationCollectiveCommandHandler', () => {
     const sandbox: SinonSandbox = createSandbox()
     animationCollectiveRepository = stubInterface(sandbox)
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
-    animationCollectiveFactory = stubClass(
-      RendezVous.AnimationCollective.Factory
-    )
     animationCollectiveService = stubClass(
       RendezVous.AnimationCollective.Service
     )
@@ -42,114 +39,99 @@ describe('CloturerAnimationCollectiveCommandHandler', () => {
       new CloturerAnimationCollectiveCommandHandler(
         animationCollectiveRepository,
         rendezVousAuthorizer,
-        animationCollectiveFactory,
         animationCollectiveService
       )
   })
 
   describe('handle', () => {
-    it('erreur si animation collective inexistante', async () => {
-      // Given
-      const command: CloturerAnimationCollectiveCommand = {
-        idsJeunes: ['x'],
-        idAnimationCollective: 'test'
-      }
-      animationCollectiveRepository.get
-        .withArgs(command.idAnimationCollective)
-        .resolves(undefined)
-      // When
-      const result = await cloturerAnimationCollectiveCommandHandler.handle(
-        command
-      )
-      // Then
-      expect(animationCollectiveFactory.cloturer).to.have.callCount(0)
-      expect(animationCollectiveRepository.save).to.have.callCount(0)
-      expect(result).to.deep.equal(
-        failure(
-          new NonTrouveError(
-            'Animation Collective',
-            command.idAnimationCollective
+    describe("quand l'animation collective n'existe pas", () => {
+      it('retourne une failure', async () => {
+        // Given
+        const command: CloturerAnimationCollectiveCommand = {
+          idsJeunes: ['x'],
+          idAnimationCollective: 'test'
+        }
+        animationCollectiveRepository.get
+          .withArgs(command.idAnimationCollective)
+          .resolves(undefined)
+        // When
+        const result = await cloturerAnimationCollectiveCommandHandler.handle(
+          command
+        )
+        // Then
+        expect(animationCollectiveService.cloturer).to.have.callCount(0)
+        expect(animationCollectiveRepository.save).to.have.callCount(0)
+        expect(result).to.deep.equal(
+          failure(
+            new NonTrouveError(
+              'Animation Collective',
+              command.idAnimationCollective
+            )
           )
         )
-      )
+      })
     })
-    it('erreur si animation collective à venir', async () => {
-      // Given
-      const command: CloturerAnimationCollectiveCommand = {
-        idsJeunes: ['x'],
-        idAnimationCollective: 'test'
-      }
-      animationCollectiveRepository.get
-        .withArgs(command.idAnimationCollective)
-        .resolves({ ...animationCollective })
-      animationCollectiveService.estAVenir.returns(true)
 
-      // When
-      const result = await cloturerAnimationCollectiveCommandHandler.handle(
-        command
-      )
-      // Then
-      expect(animationCollectiveFactory.cloturer).to.have.callCount(0)
-      expect(animationCollectiveRepository.save).to.have.callCount(0)
-      expect(result).to.deep.equal(
-        failure(new MauvaiseCommandeError('Animation Collective à venir.'))
-      )
-    })
-    it('erreur si animation collective cloturée', async () => {
-      // Given
-      const command: CloturerAnimationCollectiveCommand = {
-        idsJeunes: ['x'],
-        idAnimationCollective: 'test'
-      }
-      animationCollectiveRepository.get
-        .withArgs(command.idAnimationCollective)
-        .resolves({ ...animationCollective, dateCloture: uneDatetime() })
-      animationCollectiveService.estAVenir.returns(false)
+    describe('quand la cloture est impossible', () => {
+      it('renvoie une failure', async () => {
+        // Given
+        const command: CloturerAnimationCollectiveCommand = {
+          idsJeunes: ['x'],
+          idAnimationCollective: 'test'
+        }
+        animationCollectiveRepository.get
+          .withArgs(command.idAnimationCollective)
+          .resolves({ ...animationCollective, dateCloture: uneDatetime() })
 
-      // When
-      const result = await cloturerAnimationCollectiveCommandHandler.handle(
-        command
-      )
-      // Then
-      expect(animationCollectiveFactory.cloturer).to.have.callCount(0)
-      expect(animationCollectiveRepository.save).to.have.callCount(0)
-      expect(result).to.deep.equal(
-        failure(
-          new MauvaiseCommandeError('Animation Collective déjà cloturée.')
+        animationCollectiveService.cloturer.returns(
+          failure(
+            new MauvaiseCommandeError('Animation Collective déjà cloturée.')
+          )
         )
-      )
+
+        // When
+        const result = await cloturerAnimationCollectiveCommandHandler.handle(
+          command
+        )
+        // Then
+        expect(animationCollectiveRepository.save).to.have.callCount(0)
+        expect(result).to.deep.equal(
+          failure(
+            new MauvaiseCommandeError('Animation Collective déjà cloturée.')
+          )
+        )
+      })
     })
-    it('succes', async () => {
-      // Given
-      const command: CloturerAnimationCollectiveCommand = {
-        idsJeunes: ['x'],
-        idAnimationCollective: 'test'
-      }
-      animationCollectiveRepository.get
-        .withArgs(command.idAnimationCollective)
-        .resolves(animationCollective)
-      animationCollectiveService.estAVenir.returns(false)
-      const animationCollectiveCloturee = {
-        ...animationCollective,
-        dateCloture: uneDatetime()
-      }
-      animationCollectiveFactory.cloturer.returns(animationCollectiveCloturee)
-      animationCollectiveRepository.save.resolves()
 
-      // When
-      const result = await cloturerAnimationCollectiveCommandHandler.handle(
-        command
-      )
+    describe('quand la cloture fonctionne', () => {
+      it('renvoie un succès', async () => {
+        // Given
+        const command: CloturerAnimationCollectiveCommand = {
+          idsJeunes: ['x'],
+          idAnimationCollective: 'test'
+        }
+        animationCollectiveRepository.get
+          .withArgs(command.idAnimationCollective)
+          .resolves(animationCollective)
+        const animationCollectiveCloturee = {
+          ...animationCollective,
+          dateCloture: uneDatetime()
+        }
+        animationCollectiveService.cloturer.returns(
+          success(animationCollectiveCloturee)
+        )
 
-      // Then
-      expect(animationCollectiveFactory.cloturer).to.have.calledOnceWithExactly(
-        animationCollective,
-        command.idsJeunes
-      )
-      expect(
-        animationCollectiveRepository.save
-      ).to.have.been.calledOnceWithExactly(animationCollectiveCloturee)
-      expect(result).to.deep.equal(emptySuccess())
+        // When
+        const result = await cloturerAnimationCollectiveCommandHandler.handle(
+          command
+        )
+
+        // Then
+        expect(
+          animationCollectiveRepository.save
+        ).to.have.been.calledOnceWithExactly(animationCollectiveCloturee)
+        expect(result).to.deep.equal(emptySuccess())
+      })
     })
   })
 
