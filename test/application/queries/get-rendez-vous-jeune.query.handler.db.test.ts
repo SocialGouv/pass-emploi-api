@@ -8,7 +8,7 @@ import {
   GetRendezVousJeuneQueryHandler
 } from '../../../src/application/queries/get-rendez-vous-jeune.query.handler.db'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
-import { RendezVous } from '../../../src/domain/rendez-vous'
+import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import {

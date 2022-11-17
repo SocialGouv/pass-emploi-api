@@ -1,4 +1,4 @@
-import { mapCodeLabelTypeRendezVous } from '../../../domain/rendez-vous'
+import { mapCodeLabelTypeRendezVous } from '../../../domain/rendez-vous/rendez-vous'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import {
   RendezVousConseillerQueryModel,

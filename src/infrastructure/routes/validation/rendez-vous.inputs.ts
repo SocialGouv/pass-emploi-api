@@ -13,7 +13,10 @@ import {
   IsString,
   ValidateIf
 } from 'class-validator'
-import { CodeTypeRendezVous, RendezVous } from '../../../domain/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../domain/rendez-vous/rendez-vous'
 import { Transform } from 'class-transformer'
 import { transformStringToBoolean } from './utils/transformers'
 

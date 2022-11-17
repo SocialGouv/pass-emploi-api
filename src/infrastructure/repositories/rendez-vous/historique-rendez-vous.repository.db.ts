@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { RendezVous } from '../../../domain/rendez-vous'
+import { RendezVous } from '../../../domain/rendez-vous/rendez-vous'
 import {
   LogModificationRendezVousDto,
   LogModificationRendezVousSqlModel

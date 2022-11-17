@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { Action } from './action/action'
 import { DateService } from '../utils/date-service'
-import { RendezVous } from './rendez-vous'
+import { RendezVous } from './rendez-vous/rendez-vous'
 import { NettoyageJobsStats } from './notification-support'
 
 export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'

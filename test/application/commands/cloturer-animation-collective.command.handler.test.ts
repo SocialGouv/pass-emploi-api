@@ -14,7 +14,7 @@ import {
   failure,
   success
 } from '../../../src/building-blocks/types/result'
-import { RendezVous } from '../../../src/domain/rendez-vous'
+import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { uneAnimationCollective } from '../../fixtures/rendez-vous.fixture'

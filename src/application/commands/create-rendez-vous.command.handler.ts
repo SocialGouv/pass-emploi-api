@@ -15,7 +15,10 @@ import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { Notification } from '../../domain/notification/notification'
 import { PlanificateurService } from '../../domain/planificateur'
-import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
+import {
+  RendezVous,
+  RendezVousRepositoryToken
+} from '../../domain/rendez-vous/rendez-vous'
 import { IdService } from '../../utils/id-service'
 import { buildError } from '../../utils/logger.module'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'

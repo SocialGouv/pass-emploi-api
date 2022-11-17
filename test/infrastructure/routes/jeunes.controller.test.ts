@@ -8,7 +8,7 @@ import { UpdateJeuneConfigurationApplicationCommandHandler } from 'src/applicati
 import { ArchiveJeune } from 'src/domain/archive-jeune'
 import { Core } from 'src/domain/core'
 import { Demarche } from 'src/domain/demarche'
-import { RendezVous } from 'src/domain/rendez-vous'
+import { RendezVous } from 'src/domain/rendez-vous/rendez-vous'
 import { CreateActionParLeJeunePayload } from 'src/infrastructure/routes/validation/actions.inputs'
 import {
   CreateDemarchePayload,

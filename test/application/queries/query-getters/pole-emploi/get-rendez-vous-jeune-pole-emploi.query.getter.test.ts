@@ -1,7 +1,7 @@
 import { GetRendezVousJeunePoleEmploiQuery } from '../../../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { unJeune } from '../../../../fixtures/jeune.fixture'
 import { uneDatetime } from '../../../../fixtures/date.fixture'
-import { RendezVous } from '../../../../../src/domain/rendez-vous'
+import { RendezVous } from '../../../../../src/domain/rendez-vous/rendez-vous'
 import {
   createSandbox,
   expect,

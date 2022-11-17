@@ -6,7 +6,7 @@ import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous,
   RendezVous
-} from '../../domain/rendez-vous'
+} from '../../domain/rendez-vous/rendez-vous'
 import * as icsService from 'ics'
 import {
   formaterDateRendezVous,

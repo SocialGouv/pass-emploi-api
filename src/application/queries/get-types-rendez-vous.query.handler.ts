@@ -3,7 +3,7 @@ import { emptySuccess, Result } from '../../building-blocks/types/result'
 import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous
-} from '../../domain/rendez-vous'
+} from '../../domain/rendez-vous/rendez-vous'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { TypeRendezVousQueryModel } from './query-models/rendez-vous.query-model'

@@ -117,11 +117,9 @@ import {
   RecherchesRepositoryToken
 } from './domain/offre/recherche/recherche'
 import {
-  AnimationCollectiveRepositoryToken,
-  HistoriqueRendezVousRepositoryToken,
   RendezVous,
   RendezVousRepositoryToken
-} from './domain/rendez-vous'
+} from './domain/rendez-vous/rendez-vous'
 import { SuperviseursRepositoryToken } from './domain/superviseur'
 import { NotificationSupportServiceToken } from './domain/notification-support'
 import { ApiKeyAuthGuard } from './infrastructure/auth/api-key.auth-guard'
@@ -269,6 +267,8 @@ import { AnimationCollectiveSqlRepository } from './infrastructure/repositories/
 import { HistoriqueRendezVousRepositorySql } from './infrastructure/repositories/rendez-vous/historique-rendez-vous.repository.db'
 import { CloturerAnimationCollectiveCommandHandler } from './application/commands/cloturer-animation-collective.command.handler'
 import { GetAnimationsCollectivesQueryHandler } from './application/queries/get-animations-collectives.query.handler.db'
+import { AnimationCollectiveRepositoryToken } from './domain/rendez-vous/animation-collective'
+import { HistoriqueRendezVousRepositoryToken } from './domain/rendez-vous/historique'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [

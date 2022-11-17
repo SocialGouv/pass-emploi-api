@@ -5,7 +5,7 @@ import {
 } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { RendezVous } from '../../../src/domain/rendez-vous'
+import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import Periode = RendezVous.Periode

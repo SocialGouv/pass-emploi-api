@@ -3,7 +3,10 @@ import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { Conseiller } from 'src/domain/conseiller'
 import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'
-import { CodeTypeRendezVous, RendezVous } from '../../../src/domain/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../src/domain/rendez-vous/rendez-vous'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'

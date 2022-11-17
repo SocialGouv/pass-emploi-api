@@ -1,18 +1,11 @@
-import { IdService } from '../utils/id-service'
-import { Jeune } from './jeune/jeune'
-import { Conseiller } from './conseiller'
-import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { Authentification } from './authentification'
-import { DateService } from '../utils/date-service'
-import { failure, Result, success } from '../building-blocks/types/result'
-import { MauvaiseCommandeError } from '../building-blocks/types/domain-error'
+import { IdService } from '../../utils/id-service'
+import { Conseiller } from '../conseiller'
+import { Jeune } from '../jeune/jeune'
+import * as _AnimationCollective from './animation-collective'
+import * as _Historique from './historique'
 
 export const RendezVousRepositoryToken = 'RendezVous.Repository'
-export const AnimationCollectiveRepositoryToken =
-  'AnimationCollective.Repository'
-export const HistoriqueRendezVousRepositoryToken =
-  'RendezVous.Historique.Repository'
 
 export enum CodeTypeRendezVous {
   ACTIVITE_EXTERIEURES = 'ACTIVITE_EXTERIEURES',
@@ -101,6 +94,12 @@ export interface InfosRendezVousAMettreAJour {
 }
 
 export namespace RendezVous {
+  // FIXME: le linter ne comprend pas cette technique 🤷‍️
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  export import Historique = _Historique.Historique
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  export import AnimationCollective = _AnimationCollective.AnimationCollective
+
   export interface Repository {
     save(rendezVous: RendezVous): Promise<void>
 
@@ -181,142 +180,6 @@ export namespace RendezVous {
       adresse: infosRendezVousAMettreAJour.adresse,
       organisme: infosRendezVousAMettreAJour.organisme,
       presenceConseiller: infosRendezVousAMettreAJour.presenceConseiller
-    }
-  }
-
-  export namespace Historique {
-    export interface LogModification {
-      id: string
-      idRendezVous: string
-      date: Date
-      auteur: {
-        id: string
-        nom: string
-        prenom: string
-      }
-    }
-
-    export interface Repository {
-      save(logModification: LogModification): Promise<void>
-    }
-
-    @Injectable()
-    export class Factory {
-      constructor(
-        private readonly idService: IdService,
-        private readonly dateService: DateService
-      ) {}
-
-      creerLogModification(
-        idRendezVous: string,
-        utilisateur: Authentification.Utilisateur
-      ): LogModification {
-        return {
-          id: this.idService.uuid(),
-          idRendezVous,
-          date: this.dateService.nowJs(),
-          auteur: {
-            id: utilisateur.id,
-            nom: utilisateur.nom,
-            prenom: utilisateur.prenom
-          }
-        }
-      }
-    }
-  }
-
-  interface JeuneAnimationCollective extends JeuneDuRendezVous {
-    present?: boolean
-  }
-
-  export interface AnimationCollective extends RendezVous {
-    type: CodeTypeRendezVous.ATELIER | CodeTypeRendezVous.INFORMATION_COLLECTIVE
-    jeunes: JeuneAnimationCollective[]
-  }
-
-  export namespace AnimationCollective {
-    export enum Statut {
-      A_VENIR = 'A_VENIR',
-      A_CLOTURER = 'A_CLOTURER',
-      CLOTUREE = 'CLOTUREE'
-    }
-
-    export function estCloturee(rendezVous: RendezVous): boolean {
-      return Boolean(
-        RendezVous.estUnTypeAnimationCollective(rendezVous.type) &&
-          rendezVous.dateCloture
-      )
-    }
-
-    export interface Repository {
-      get(
-        idAnimationCollective: string
-      ): Promise<AnimationCollective | undefined>
-
-      getAllAVenir(idEtablissement: string): Promise<AnimationCollective[]>
-
-      save(animationCollective: AnimationCollective): Promise<void>
-    }
-
-    @Injectable()
-    export class Service {
-      constructor(
-        @Inject(AnimationCollectiveRepositoryToken)
-        private repository: Repository,
-        @Inject(RendezVousRepositoryToken)
-        private rdvRepository: RendezVous.Repository,
-        private dateService: DateService
-      ) {}
-
-      async desinscrire(idsJeunes: string[], idAgence: string): Promise<void> {
-        const animationsCollectives = await this.repository.getAllAVenir(
-          idAgence
-        )
-
-        for (const animationCollective of animationsCollectives) {
-          animationCollective.jeunes = animationCollective.jeunes.filter(
-            jeune => !idsJeunes.includes(jeune.id)
-          )
-          await this.rdvRepository.save(animationCollective)
-        }
-      }
-
-      cloturer(
-        animationCollective: AnimationCollective,
-        idsJeunesPresents: string[]
-      ): Result<AnimationCollective> {
-        if (this.estAVenir(animationCollective)) {
-          return failure(
-            new MauvaiseCommandeError(
-              "L'animation collective n'est pas encore passée."
-            )
-          )
-        }
-
-        if (RendezVous.AnimationCollective.estCloturee(animationCollective)) {
-          return failure(
-            new MauvaiseCommandeError('Animation Collective déjà cloturée.')
-          )
-        }
-
-        const jeunesAvecPresence = animationCollective.jeunes.map(jeune => {
-          return { ...jeune, present: idsJeunesPresents.includes(jeune.id) }
-        })
-
-        return success({
-          ...animationCollective,
-          jeunes: jeunesAvecPresence,
-          dateCloture: this.dateService.now()
-        })
-      }
-
-      private estAVenir(animationCollective: AnimationCollective): boolean {
-        const maintenant = this.dateService.now()
-
-        return Boolean(
-          maintenant < DateTime.fromJSDate(animationCollective.date)
-        )
-      }
     }
   }
 }
