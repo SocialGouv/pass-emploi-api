@@ -6,7 +6,7 @@ import {
   HandleJobRappelRendezVousCommandHandler
 } from '../../../../src/application/commands/jobs/handle-job-rappel-rendez-vous.command'
 import { Planificateur } from '../../../../src/domain/planificateur'
-import { RendezVous } from '../../../../src/domain/rendez-vous'
+import { RendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
 import { Notification } from '../../../../src/domain/notification/notification'
 import { DateService } from '../../../../src/utils/date-service'
 import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'

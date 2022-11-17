@@ -1,4 +1,4 @@
-import { CodeTypeRendezVous } from 'src/domain/rendez-vous'
+import { CodeTypeRendezVous } from 'src/domain/rendez-vous/rendez-vous'
 import { RendezVousDto } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { IdService } from '../../../src/utils/id-service'

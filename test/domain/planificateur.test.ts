@@ -4,7 +4,7 @@ import {
   Planificateur,
   PlanificateurService
 } from '../../src/domain/planificateur'
-import { RendezVous } from '../../src/domain/rendez-vous'
+import { RendezVous } from '../../src/domain/rendez-vous/rendez-vous'
 import { DateService } from '../../src/utils/date-service'
 import { unRendezVous } from '../fixtures/rendez-vous.fixture'
 import { createSandbox, expect, stubClass } from '../utils'

@@ -16,7 +16,7 @@ import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { uneDate, uneDatetime } from '../../fixtures/date.fixture'
 import { RendezVousConseillerQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
-import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous'
+import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'

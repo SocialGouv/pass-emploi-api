@@ -3,7 +3,7 @@ import { PrestationDto } from '../../../infrastructure/clients/dto/pole-emploi.d
 import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous
-} from '../../../domain/rendez-vous'
+} from '../../../domain/rendez-vous/rendez-vous'
 import { Jeune } from '../../../domain/jeune/jeune'
 import { IdService } from '../../../utils/id-service'
 

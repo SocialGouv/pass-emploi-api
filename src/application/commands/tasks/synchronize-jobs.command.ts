@@ -14,7 +14,7 @@ import {
 import {
   RendezVous,
   RendezVousRepositoryToken
-} from '../../../domain/rendez-vous'
+} from '../../../domain/rendez-vous/rendez-vous'
 import { Action, ActionsRepositoryToken } from '../../../domain/action/action'
 
 @Injectable()

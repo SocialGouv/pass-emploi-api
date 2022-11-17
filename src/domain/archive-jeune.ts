@@ -1,4 +1,4 @@
-import { CodeTypeRendezVous } from './rendez-vous'
+import { CodeTypeRendezVous } from './rendez-vous/rendez-vous'
 import { Recherche } from './offre/recherche/recherche'
 import { Offre } from './offre/offre'
 import { Core } from './core'

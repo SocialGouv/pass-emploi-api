@@ -10,7 +10,10 @@ import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { testConfig } from '../../utils/module-for-testing'
 import { unJeune } from 'test/fixtures/jeune.fixture'
-import { CodeTypeRendezVous, RendezVous } from '../../../src/domain/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../src/domain/rendez-vous/rendez-vous'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
 
 describe('InvitationIcsClient', () => {

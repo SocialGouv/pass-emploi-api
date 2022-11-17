@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { Conseiller } from './conseiller'
 import { Core } from './core'
 import { Jeune } from './jeune/jeune'
-import { RendezVous } from './rendez-vous'
+import { RendezVous } from './rendez-vous/rendez-vous'
 import { ArchiveJeune } from './archive-jeune'
 
 export const MailServiceToken = 'MailServiceToken'
