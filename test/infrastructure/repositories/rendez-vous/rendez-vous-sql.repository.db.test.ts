@@ -16,7 +16,7 @@ import { RendezVousJeuneAssociationSqlModel } from '../../../../src/infrastructu
 import {
   JeuneDuRendezVous,
   RendezVous
-} from '../../../../src/domain/rendez-vous'
+} from '../../../../src/domain/rendez-vous/rendez-vous'
 import { Core } from '../../../../src/domain/core'
 import Structure = Core.Structure
 import { DatabaseForTesting } from '../../../utils/database-for-testing'

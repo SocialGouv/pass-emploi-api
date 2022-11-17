@@ -9,7 +9,7 @@ import { RecupererJeunesDuConseillerCommandHandler } from 'src/application/comma
 import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { GetAllRendezVousConseillerQueryHandler } from 'src/application/queries/get-rendez-vous-conseiller.query.handler.db'
 import { Action } from 'src/domain/action/action'
-import { CodeTypeRendezVous } from 'src/domain/rendez-vous'
+import { CodeTypeRendezVous } from 'src/domain/rendez-vous/rendez-vous'
 import { CreateActionPayload } from 'src/infrastructure/routes/validation/actions.inputs'
 import { CreateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
 import { DateService } from 'src/utils/date-service'

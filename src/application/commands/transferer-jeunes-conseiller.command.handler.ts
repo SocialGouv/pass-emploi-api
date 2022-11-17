@@ -16,7 +16,7 @@ import { Authentification } from '../../domain/authentification'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
-import { RendezVous } from '../../domain/rendez-vous'
+import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 
 export interface TransfererJeunesConseillerCommand extends Command {
   idConseillerSource: string

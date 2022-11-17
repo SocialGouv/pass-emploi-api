@@ -12,7 +12,7 @@ import {
   Min,
   ValidateIf
 } from 'class-validator'
-import { RendezVous } from '../../../domain/rendez-vous'
+import { RendezVous } from '../../../domain/rendez-vous/rendez-vous'
 import { Action } from '../../../domain/action/action'
 import { Transform, Type } from 'class-transformer'
 import { transformStringToArray } from './utils/transformers'

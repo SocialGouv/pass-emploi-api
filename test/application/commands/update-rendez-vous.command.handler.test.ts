@@ -17,7 +17,10 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { Notification } from '../../../src/domain/notification/notification'
 import { PlanificateurService } from '../../../src/domain/planificateur'
-import { CodeTypeRendezVous, RendezVous } from '../../../src/domain/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../src/domain/rendez-vous/rendez-vous'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'

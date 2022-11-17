@@ -5,7 +5,10 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { failure, success } from '../../../src/building-blocks/types/result'
-import { CodeTypeRendezVous, RendezVous } from '../../../src/domain/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../src/domain/rendez-vous/rendez-vous'
 import { Notification } from '../../../src/domain/notification/notification'
 import { uneConfiguration, unJeune } from '../../fixtures/jeune.fixture'
 import {

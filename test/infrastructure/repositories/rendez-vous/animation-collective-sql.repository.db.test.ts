@@ -6,7 +6,7 @@ import { Core } from '../../../../src/domain/core'
 import {
   CodeTypeRendezVous,
   RendezVous
-} from '../../../../src/domain/rendez-vous'
+} from '../../../../src/domain/rendez-vous/rendez-vous'
 import { AnimationCollectiveSqlRepository } from '../../../../src/infrastructure/repositories/rendez-vous/animation-collective-sql.repository.db'
 import { AgenceSqlModel } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
