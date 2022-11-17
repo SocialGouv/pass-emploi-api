@@ -4,7 +4,7 @@ import { DateService } from '../../utils/date-service'
 import { Action } from '../action/action'
 import { Jeune } from '../jeune/jeune'
 import { Recherche } from '../offre/recherche/recherche'
-import { RendezVous } from '../rendez-vous'
+import { RendezVous } from '../rendez-vous/rendez-vous'
 import * as _PoleEmploi from './pole-emploi'
 
 export const NotificationRepositoryToken = 'NotificationRepositoryToken'

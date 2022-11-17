@@ -15,7 +15,7 @@ import { Planificateur } from '../../../domain/planificateur'
 import {
   RendezVous,
   RendezVousRepositoryToken
-} from '../../../domain/rendez-vous'
+} from '../../../domain/rendez-vous/rendez-vous'
 import { DateService } from '../../../utils/date-service'
 
 export interface HandleJobRappelRendezVousCommand extends Command {

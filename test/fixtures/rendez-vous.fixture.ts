@@ -7,7 +7,7 @@ import {
   JeuneDuRendezVous,
   mapCodeLabelTypeRendezVous,
   RendezVous
-} from '../../src/domain/rendez-vous'
+} from '../../src/domain/rendez-vous/rendez-vous'
 import { unConseillerDuJeune, uneConfiguration } from './jeune.fixture'
 
 export const unRendezVous = (args: Partial<RendezVous> = {}): RendezVous => {

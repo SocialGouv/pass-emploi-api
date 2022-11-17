@@ -10,7 +10,10 @@ import {
   emptySuccess,
   failure
 } from '../../../src/building-blocks/types/result'
-import { CodeTypeRendezVous, RendezVous } from '../../../src/domain/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../src/domain/rendez-vous/rendez-vous'
 import { Notification } from '../../../src/domain/notification/notification'
 import {
   DeleteRendezVousCommand,

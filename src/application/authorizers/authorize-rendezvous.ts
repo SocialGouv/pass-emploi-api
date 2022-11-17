@@ -7,7 +7,10 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { RendezVous, RendezVousRepositoryToken } from '../../domain/rendez-vous'
+import {
+  RendezVous,
+  RendezVousRepositoryToken
+} from '../../domain/rendez-vous/rendez-vous'
 
 @Injectable()
 export class RendezVousAuthorizer {

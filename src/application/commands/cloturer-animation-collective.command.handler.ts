@@ -9,10 +9,8 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import {
-  AnimationCollectiveRepositoryToken,
-  RendezVous
-} from '../../domain/rendez-vous'
+import { AnimationCollectiveRepositoryToken } from '../../domain/rendez-vous/animation-collective'
+import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
 
 export interface CloturerAnimationCollectiveCommand extends Command {

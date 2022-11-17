@@ -10,7 +10,7 @@ import {
   success
 } from '../../../../building-blocks/types/result'
 import { Jeune, JeunesRepositoryToken } from '../../../../domain/jeune/jeune'
-import { RendezVous } from '../../../../domain/rendez-vous'
+import { RendezVous } from '../../../../domain/rendez-vous/rendez-vous'
 import {
   PrestationDto,
   RendezVousPoleEmploiDto

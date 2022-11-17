@@ -3,7 +3,7 @@ import {
   CodeTypeRendezVous,
   InfosRendezVousACreer,
   RendezVous
-} from 'src/domain/rendez-vous'
+} from 'src/domain/rendez-vous/rendez-vous'
 import { IdService } from 'src/utils/id-service'
 import { unConseiller } from 'test/fixtures/conseiller.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
@@ -104,7 +104,6 @@ describe('Rendez-vous', () => {
       dateService.now.returns(maintenant)
       service = new RendezVous.AnimationCollective.Service(
         repository,
-        rdvRepository,
         dateService
       )
     })

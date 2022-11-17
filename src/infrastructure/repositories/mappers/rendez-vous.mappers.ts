@@ -5,7 +5,10 @@ import {
   RendezVousSqlModel
 } from '../../sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../sequelize/types'
-import { JeuneDuRendezVous, RendezVous } from '../../../domain/rendez-vous'
+import {
+  JeuneDuRendezVous,
+  RendezVous
+} from '../../../domain/rendez-vous/rendez-vous'
 import { DateService } from '../../../utils/date-service'
 
 export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
