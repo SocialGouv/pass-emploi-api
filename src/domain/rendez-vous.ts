@@ -5,6 +5,8 @@ import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { Authentification } from './authentification'
 import { DateService } from '../utils/date-service'
+import { failure, Result, success } from '../building-blocks/types/result'
+import { MauvaiseCommandeError } from '../building-blocks/types/domain-error'
 
 export const RendezVousRepositoryToken = 'RendezVous.Repository'
 export const AnimationCollectiveRepositoryToken =
@@ -193,15 +195,18 @@ export namespace RendezVous {
         prenom: string
       }
     }
+
     export interface Repository {
       save(logModification: LogModification): Promise<void>
     }
+
     @Injectable()
     export class Factory {
       constructor(
         private readonly idService: IdService,
         private readonly dateService: DateService
       ) {}
+
       creerLogModification(
         idRendezVous: string,
         utilisateur: Authentification.Utilisateur
@@ -223,6 +228,7 @@ export namespace RendezVous {
   interface JeuneAnimationCollective extends JeuneDuRendezVous {
     present?: boolean
   }
+
   export interface AnimationCollective extends RendezVous {
     type: CodeTypeRendezVous.ATELIER | CodeTypeRendezVous.INFORMATION_COLLECTIVE
     jeunes: JeuneAnimationCollective[]
@@ -246,7 +252,9 @@ export namespace RendezVous {
       get(
         idAnimationCollective: string
       ): Promise<AnimationCollective | undefined>
+
       getAllAVenir(idEtablissement: string): Promise<AnimationCollective[]>
+
       save(animationCollective: AnimationCollective): Promise<void>
     }
 
@@ -273,36 +281,41 @@ export namespace RendezVous {
         }
       }
 
-      estAVenir(animationCollective: AnimationCollective): boolean {
+      cloturer(
+        animationCollective: AnimationCollective,
+        idsJeunesPresents: string[]
+      ): Result<AnimationCollective> {
+        if (this.estAVenir(animationCollective)) {
+          return failure(
+            new MauvaiseCommandeError(
+              "L'animation collective n'est pas encore passée."
+            )
+          )
+        }
+
+        if (RendezVous.AnimationCollective.estCloturee(animationCollective)) {
+          return failure(
+            new MauvaiseCommandeError('Animation Collective déjà cloturée.')
+          )
+        }
+
+        const jeunesAvecPresence = animationCollective.jeunes.map(jeune => {
+          return { ...jeune, present: idsJeunesPresents.includes(jeune.id) }
+        })
+
+        return success({
+          ...animationCollective,
+          jeunes: jeunesAvecPresence,
+          dateCloture: this.dateService.now()
+        })
+      }
+
+      private estAVenir(animationCollective: AnimationCollective): boolean {
         const maintenant = this.dateService.now()
 
         return Boolean(
-          maintenant <
-            DateService.fromJSDateToDateTime(animationCollective.date)!
+          maintenant < DateTime.fromJSDate(animationCollective.date)
         )
-      }
-    }
-    @Injectable()
-    export class Factory {
-      constructor(private dateService: DateService) {}
-      cloturer(
-        animationCollective: AnimationCollective,
-        idsJeunes: string[]
-      ): AnimationCollective {
-        const maintenant = this.dateService.now()
-        const animationCollectiveCloturee = {
-          ...animationCollective,
-          jeunes: animationCollective.jeunes.map(jeune => {
-            let present = false
-            if (idsJeunes.includes(jeune.id)) {
-              present = true
-            }
-            return { ...jeune, present }
-          }),
-          dateCloture: maintenant
-        }
-
-        return animationCollectiveCloturee
       }
     }
   }

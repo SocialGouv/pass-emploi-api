@@ -22,7 +22,6 @@ import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
 import { expect, stubClass } from '../../../utils'
 import { DatabaseForTesting } from '../../../utils/database-for-testing'
-import Structure = Core.Structure
 
 describe('AnimationsCollectivesSqlRepository', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -47,7 +46,7 @@ describe('AnimationsCollectivesSqlRepository', () => {
     // Given
     await ConseillerSqlModel.creer(
       unConseillerDto({
-        structure: Structure.POLE_EMPLOI
+        structure: Core.Structure.POLE_EMPLOI
       })
     )
     await JeuneSqlModel.creer(unJeuneDto({ id: jeune.id }))
