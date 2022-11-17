@@ -1,13 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import {
-  MauvaiseCommandeError,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
+  isFailure,
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
@@ -31,7 +29,6 @@ export class CloturerAnimationCollectiveCommandHandler extends CommandHandler<
     @Inject(AnimationCollectiveRepositoryToken)
     private animationCollectiveRepository: RendezVous.AnimationCollective.Repository,
     private rendezVousAuthorizer: RendezVousAuthorizer,
-    private animationCollectiveFactory: RendezVous.AnimationCollective.Factory,
     private animationCollectiveService: RendezVous.AnimationCollective.Service
   ) {
     super('CloturerAnimationCollectiveCommandHandler')
@@ -51,23 +48,16 @@ export class CloturerAnimationCollectiveCommandHandler extends CommandHandler<
       )
     }
 
-    if (this.animationCollectiveService.estAVenir(animationCollective)) {
-      return failure(new MauvaiseCommandeError('Animation Collective à venir.'))
+    const result = this.animationCollectiveService.cloturer(
+      animationCollective,
+      command.idsJeunes
+    )
+
+    if (isFailure(result)) {
+      return result
     }
 
-    if (RendezVous.AnimationCollective.estCloturee(animationCollective)) {
-      return failure(
-        new MauvaiseCommandeError('Animation Collective déjà cloturée.')
-      )
-    }
-
-    const animationCollectiveCloturee =
-      this.animationCollectiveFactory.cloturer(
-        animationCollective,
-        command.idsJeunes
-      )
-
-    await this.animationCollectiveRepository.save(animationCollectiveCloturee)
+    await this.animationCollectiveRepository.save(result.data)
 
     return emptySuccess()
   }

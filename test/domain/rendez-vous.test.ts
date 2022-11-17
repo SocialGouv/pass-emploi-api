@@ -15,6 +15,8 @@ import {
   unRendezVous
 } from '../fixtures/rendez-vous.fixture'
 import { createSandbox, expect, stubClass } from '../utils'
+import { failure, success } from '../../src/building-blocks/types/result'
+import { MauvaiseCommandeError } from '../../src/building-blocks/types/domain-error'
 
 describe('Rendez-vous', () => {
   const id = '26279b34-318a-45e4-a8ad-514a1090462c'
@@ -132,73 +134,110 @@ describe('Rendez-vous', () => {
         )
       })
     })
-    describe('estAVenir', () => {
-      it('retourne false quand la date du rdv est dans le passé', async () => {
-        // Given
-        const animationCollective = uneAnimationCollective({
-          date: maintenant.minus({ days: 1 }).toJSDate()
-        })
-
-        // When
-        const aVenir = service.estAVenir(animationCollective)
-
-        // Then
-        expect(aVenir).to.be.false()
-      })
-      it('retourne true quand la date du rdv est dans le futur', async () => {
-        // Given
-        const animationCollective = uneAnimationCollective({
-          date: maintenant.plus({ days: 1 }).toJSDate()
-        })
-
-        // When
-        const aVenir = service.estAVenir(animationCollective)
-
-        // Then
-        expect(aVenir).to.be.true()
-      })
-    })
-  })
-
-  describe('AnimationCollective.Factory', () => {
-    const maintenant = uneDatetime()
-    let factory: RendezVous.AnimationCollective.Factory
-    let dateService: StubbedType<DateService>
-
-    beforeEach(() => {
-      dateService = stubClass(DateService)
-      dateService.now.returns(maintenant)
-      factory = new RendezVous.AnimationCollective.Factory(dateService)
-    })
 
     describe('cloturer', () => {
-      it('retourne une animation collective cloturée avec les jeunes inscrits', async () => {
-        // Given
+      describe("quand l'animation collective est dans le futur", () => {
+        it('renvoie une erreur', () => {
+          // Given
+          const animationCollective = uneAnimationCollective({
+            date: maintenant.plus({ days: 1 }).toJSDate()
+          })
 
-        const jeunePresent = unJeuneDuRendezVous({ id: '1' })
-        const jeuneAbsent = unJeuneDuRendezVous({ id: '2' })
-        const idsJeunesPresents = [jeunePresent.id]
+          // When
+          const result = service.cloturer(animationCollective, ['jeune-id'])
 
-        const animationCollective = uneAnimationCollective({
-          date: maintenant.minus({ days: 1 }).toJSDate(),
-          jeunes: [jeuneAbsent, jeunePresent],
-          dateCloture: undefined
+          // Then
+          expect(result).to.deep.equal(
+            failure(
+              new MauvaiseCommandeError(
+                "L'animation collective n'est pas encore passée."
+              )
+            )
+          )
         })
+      })
+      describe("quand l'animation collective est déjà cloturée", () => {
+        it('renvoie une erreur', () => {
+          // Given
+          const animationCollective = uneAnimationCollective({
+            date: maintenant.minus({ days: 5 }).toJSDate(),
+            dateCloture: maintenant.minus({ days: 1 })
+          })
 
-        // When
-        const animationCollectiveCloturee = factory.cloturer(
-          animationCollective,
-          idsJeunesPresents
-        )
+          // When
+          const result = service.cloturer(animationCollective, ['jeune-id'])
 
-        // Then
-        expect(animationCollectiveCloturee).to.deep.equal({
-          ...animationCollective,
-          dateCloture: maintenant,
-          jeunes: [
-            { ...jeuneAbsent, present: false },
-            { ...jeunePresent, present: true }
-          ]
+          // Then
+          expect(result).to.deep.equal(
+            failure(
+              new MauvaiseCommandeError('Animation Collective déjà cloturée.')
+            )
+          )
+        })
+      })
+
+      describe('quand la cloture est possible', () => {
+        describe('quand tout le monde est présent', () => {
+          it('retourne une animation collective cloturée avec tous les jeunes inscrits', async () => {
+            // Given
+
+            const jeunePresent = unJeuneDuRendezVous({ id: '1' })
+            const jeune2Present = unJeuneDuRendezVous({ id: '2' })
+            const animationCollective = uneAnimationCollective({
+              date: maintenant.minus({ days: 1 }).toJSDate(),
+              jeunes: [jeune2Present, jeunePresent],
+              dateCloture: undefined
+            })
+
+            // When
+            const animationCollectiveCloturee = service.cloturer(
+              animationCollective,
+              [jeunePresent.id, jeune2Present.id]
+            )
+
+            // Then
+            expect(animationCollectiveCloturee).to.deep.equal(
+              success({
+                ...animationCollective,
+                dateCloture: maintenant,
+                jeunes: [
+                  { ...jeune2Present, present: true },
+                  { ...jeunePresent, present: true }
+                ]
+              })
+            )
+          })
+        })
+        describe('quand un des jeunes est absent', () => {
+          it('retourne une animation collective cloturée avec seulement le jeune inscrit', async () => {
+            // Given
+
+            const jeunePresent = unJeuneDuRendezVous({ id: '1' })
+            const jeuneAbsent = unJeuneDuRendezVous({ id: '2' })
+            const animationCollective = uneAnimationCollective({
+              date: maintenant.minus({ days: 1 }).toJSDate(),
+              jeunes: [jeuneAbsent, jeunePresent],
+              dateCloture: undefined
+            })
+
+            // When
+            const animationCollectiveCloturee = service.cloturer(
+              animationCollective,
+              [jeunePresent.id]
+            )
+
+            // Then
+            expect(animationCollectiveCloturee).to.deep.equal(
+              success({
+                ...animationCollective,
+                dateCloture: maintenant,
+                jeunes: [
+                  { ...jeuneAbsent, present: false },
+                  { ...jeunePresent, present: true }
+                ]
+              })
+            )
+          })
         })
       })
     })
