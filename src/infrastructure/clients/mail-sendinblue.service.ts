@@ -7,7 +7,7 @@ import { Mail, MailDataDto } from '../../domain/mail'
 import {
   mapCodeLabelTypeRendezVous,
   RendezVous
-} from '../../domain/rendez-vous'
+} from '../../domain/rendez-vous/rendez-vous'
 import { InvitationIcsClient } from './invitation-ics.client'
 import { Jeune } from '../../domain/jeune/jeune'
 import { ArchiveJeune } from '../../domain/archive-jeune'

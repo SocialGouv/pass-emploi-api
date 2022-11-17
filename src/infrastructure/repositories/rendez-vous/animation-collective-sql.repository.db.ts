@@ -1,6 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Op, Sequelize } from 'sequelize'
-import { CodeTypeRendezVous, RendezVous } from '../../../domain/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../domain/rendez-vous/rendez-vous'
 import { DateService } from '../../../utils/date-service'
 import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'

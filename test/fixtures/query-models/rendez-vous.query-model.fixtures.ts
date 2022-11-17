@@ -1,4 +1,4 @@
-import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous'
+import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
 import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
 
 export function unRendezVousQueryModel(

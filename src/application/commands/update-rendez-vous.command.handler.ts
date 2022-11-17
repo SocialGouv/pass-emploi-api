@@ -16,13 +16,13 @@ import { Notification } from '../../domain/notification/notification'
 import { PlanificateurService } from '../../domain/planificateur'
 import {
   CodeTypeRendezVous,
-  HistoriqueRendezVousRepositoryToken,
   JeuneDuRendezVous,
   RendezVous,
   RendezVousRepositoryToken
-} from '../../domain/rendez-vous'
+} from '../../domain/rendez-vous/rendez-vous'
 import { buildError } from '../../utils/logger.module'
 import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
+import { HistoriqueRendezVousRepositoryToken } from '../../domain/rendez-vous/historique'
 
 export interface UpdateRendezVousCommand extends Command {
   idRendezVous: string

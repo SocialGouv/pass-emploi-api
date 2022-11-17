@@ -9,7 +9,10 @@ import { unEtablissementDto } from '../../fixtures/sql-models/etablissement.sq-m
 import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { uneDatetime } from '../../fixtures/date.fixture'
-import { CodeTypeRendezVous, RendezVous } from '../../../src/domain/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../src/domain/rendez-vous/rendez-vous'
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { isSuccess, success } from '../../../src/building-blocks/types/result'
 import { DateService } from '../../../src/utils/date-service'

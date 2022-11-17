@@ -5,7 +5,7 @@ import { IdService } from '../../../utils/id-service'
 import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous
-} from '../../../domain/rendez-vous'
+} from '../../../domain/rendez-vous/rendez-vous'
 
 export function fromRendezVousDtoToRendezVousQueryModel(
   rendezVousPoleEmploiDto: RendezVousPoleEmploiDto,
