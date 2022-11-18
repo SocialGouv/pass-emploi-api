@@ -173,7 +173,9 @@ export namespace Suggestion {
       metier?: string
     ): Suggestion {
       const metierConstruit =
-        metier ?? this.construireMetierSuggestionConseiller(type)
+        metier ??
+        (criteres as Recherche.Emploi).q ??
+        this.construireMetierSuggestionConseiller(type)
 
       return {
         id: this.idService.uuid(),

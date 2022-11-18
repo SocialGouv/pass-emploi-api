@@ -157,6 +157,51 @@ describe('CreateSuggestionDuConseillerServiceCiviqueCommandHandler', () => {
           suggestionAttendueJeune
         )
       })
+      it('enregistre la suggestion avec le type alternance', async () => {
+        // Given
+        const idConseiller = 'id-conseiller'
+        const idJeune = 'id-jeune'
+        jeuneRepository.findAllJeunesByConseiller.resolves([
+          unJeune({
+            id: idJeune,
+            conseiller: unConseiller({ id: idConseiller })
+          })
+        ])
+
+        const criteres: Recherche.Emploi = {
+          q: 'Petrisseur',
+          commune: '59220',
+          departement: undefined,
+          alternance: true
+        }
+        const suggestionConseillerCommand = {
+          idConseiller,
+          idsJeunes: [idJeune],
+          localisation: 'Denain',
+          criteres
+        }
+        const suggestionAttendueJeune = uneSuggestion({
+          idJeune,
+          criteres,
+          type: Recherche.Type.OFFRES_ALTERNANCE
+        })
+        suggestionFactory.creerSuggestionConseiller.returns(
+          suggestionAttendueJeune
+        )
+
+        // When
+        await createSuggestionDuConseillerOffreEmploiCommandHandler.handle(
+          suggestionConseillerCommand
+        )
+
+        // Then
+        expect(
+          suggestionFactory.creerSuggestionConseiller
+        ).to.have.been.calledWith(Recherche.Type.OFFRES_ALTERNANCE)
+        expect(suggestionRepository.save).to.have.been.calledWith(
+          suggestionAttendueJeune
+        )
+      })
     })
   })
 

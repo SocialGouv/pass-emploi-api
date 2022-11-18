@@ -73,10 +73,14 @@ export class CreateSuggestionConseillerOffreEmploiCommandHandler extends Command
       )
     }
 
+    const type = command.criteres.alternance
+      ? Recherche.Type.OFFRES_ALTERNANCE
+      : Recherche.Type.OFFRES_EMPLOI
+
     for (const jeune of jeunes) {
       const suggestion: Suggestion =
         this.suggestionFactory.creerSuggestionConseiller(
-          Recherche.Type.OFFRES_EMPLOI,
+          type,
           jeune.id,
           command.criteres,
           command.localisation,

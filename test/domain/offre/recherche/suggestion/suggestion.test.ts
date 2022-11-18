@@ -375,7 +375,6 @@ describe('Suggestion', () => {
     it('retourne une suggestion offre emploi', () => {
       // Given
       const criteres = {
-        q: 'a',
         commune: '00'
       }
 
@@ -406,7 +405,41 @@ describe('Suggestion', () => {
       // Then
       expect(suggestion).to.deep.equal(expectedSuggestion)
     })
-    it('retourne une suggestion immersion', () => {
+    it('retourne une suggestion offre emploi avec q comme metier', () => {
+      // Given
+      const criteres = {
+        q: 'boulanger',
+        commune: '00'
+      }
+
+      const expectedSuggestion: Suggestion = {
+        id: unUuid,
+        idFonctionnel: undefined,
+        idJeune,
+        dateCreation: maintenant,
+        dateRafraichissement: maintenant,
+        type: Recherche.Type.OFFRES_EMPLOI,
+        source: Suggestion.Source.CONSEILLER,
+        informations: {
+          titre: 'boulanger à Paris',
+          metier: 'boulanger',
+          localisation
+        },
+        criteres
+      }
+
+      // When
+      const suggestion = factory.creerSuggestionConseiller(
+        Recherche.Type.OFFRES_EMPLOI,
+        idJeune,
+        criteres,
+        localisation
+      )
+
+      // Then
+      expect(suggestion).to.deep.equal(expectedSuggestion)
+    })
+    it('retourne une suggestion immersion avec un titre', () => {
       // Given
       const criteres: Recherche.Immersion = {
         rome: 'D900i',
@@ -423,8 +456,8 @@ describe('Suggestion', () => {
         type: Recherche.Type.OFFRES_IMMERSION,
         source: Suggestion.Source.CONSEILLER,
         informations: {
-          titre: "Recherche d'immersion à Paris",
-          metier: "Recherche d'immersion",
+          titre: 'boulanger à Paris',
+          metier: 'boulanger',
           localisation
         },
         criteres
@@ -435,7 +468,9 @@ describe('Suggestion', () => {
         Recherche.Type.OFFRES_IMMERSION,
         idJeune,
         criteres,
-        localisation
+        localisation,
+        undefined,
+        'boulanger'
       )
 
       // Then
