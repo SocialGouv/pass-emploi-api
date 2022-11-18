@@ -7,7 +7,8 @@ import * as _Historique from './historique'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import {
   ConseillerSansAgenceError,
-  JeuneNonLieAuConseillerError
+  JeuneNonLieAuConseillerError,
+  MauvaiseCommandeError
 } from '../../building-blocks/types/domain-error'
 import { Injectable } from '@nestjs/common'
 
@@ -135,23 +136,6 @@ export namespace RendezVous {
     )
   }
 
-  export function mettreAJour(
-    rendezVousInitial: RendezVous,
-    infosRendezVousAMettreAJour: InfosRendezVousAMettreAJour
-  ): RendezVous {
-    return {
-      ...rendezVousInitial,
-      commentaire: infosRendezVousAMettreAJour.commentaire,
-      date: new Date(infosRendezVousAMettreAJour.date),
-      duree: infosRendezVousAMettreAJour.duree,
-      modalite: infosRendezVousAMettreAJour.modalite,
-      jeunes: infosRendezVousAMettreAJour.jeunes,
-      adresse: infosRendezVousAMettreAJour.adresse,
-      organisme: infosRendezVousAMettreAJour.organisme,
-      presenceConseiller: infosRendezVousAMettreAJour.presenceConseiller
-    }
-  }
-
   @Injectable()
   export class Factory {
     constructor(private idService: IdService) {}
@@ -204,6 +188,54 @@ export namespace RendezVous {
         idAgence: estUnTypeAnimationCollective(infosRendezVousACreer.type)
           ? conseiller.agence?.id
           : undefined
+      })
+    }
+  }
+
+  @Injectable()
+  export class Service {
+    mettreAJour(
+      rendezVousInitial: RendezVous,
+      infosRendezVousAMettreAJour: InfosRendezVousAMettreAJour
+    ): Result<RendezVous> {
+      if (RendezVous.estUnTypeAnimationCollective(rendezVousInitial.type)) {
+        if (RendezVous.AnimationCollective.estCloturee(rendezVousInitial)) {
+          return failure(
+            new MauvaiseCommandeError(
+              'Une Animation Collective cloturée ne peut plus etre modifiée.'
+            )
+          )
+        }
+      } else {
+        if (infosRendezVousAMettreAJour.jeunes.length === 0) {
+          return failure(
+            new MauvaiseCommandeError('Un bénéficiaire minimum est requis.')
+          )
+        }
+
+        if (
+          !infosRendezVousAMettreAJour.presenceConseiller &&
+          rendezVousInitial.type ===
+            CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
+        ) {
+          return failure(
+            new MauvaiseCommandeError(
+              'Le champ presenceConseiller ne peut être modifié pour un rendez-vous Conseiller.'
+            )
+          )
+        }
+      }
+
+      return success({
+        ...rendezVousInitial,
+        commentaire: infosRendezVousAMettreAJour.commentaire,
+        date: new Date(infosRendezVousAMettreAJour.date),
+        duree: infosRendezVousAMettreAJour.duree,
+        modalite: infosRendezVousAMettreAJour.modalite,
+        jeunes: infosRendezVousAMettreAJour.jeunes,
+        adresse: infosRendezVousAMettreAJour.adresse,
+        organisme: infosRendezVousAMettreAJour.organisme,
+        presenceConseiller: infosRendezVousAMettreAJour.presenceConseiller
       })
     }
   }
