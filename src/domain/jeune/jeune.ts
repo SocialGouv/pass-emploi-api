@@ -70,6 +70,11 @@ export namespace Jeune {
       attributs?: { avecConfiguration: boolean }
     ): Promise<Jeune | undefined>
 
+    findAll(
+      ids: string[],
+      attributs?: { avecConfiguration: boolean }
+    ): Promise<Jeune[]>
+
     getJeunesMiloAvecIdDossier(offset: number, limit: number): Promise<Jeune[]>
 
     existe(id: string): Promise<boolean>

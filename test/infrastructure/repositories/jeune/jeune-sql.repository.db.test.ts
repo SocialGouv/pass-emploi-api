@@ -111,6 +111,46 @@ describe('JeuneSqlRepository', () => {
     })
   })
 
+  describe('findAll', () => {
+    let jeune: Jeune
+
+    beforeEach(async () => {
+      // Given
+      jeune = unJeune({
+        configuration: undefined,
+        conseiller: unConseillerDuJeune({ idAgence: undefined })
+      })
+      const conseillerDto = unConseillerDto({
+        structure: Core.Structure.POLE_EMPLOI
+      })
+      await ConseillerSqlModel.creer(conseillerDto)
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          idConseiller: conseillerDto.id,
+          dateCreation: jeune.creationDate.toJSDate(),
+          datePremiereConnexion: uneDatetime().toJSDate()
+        })
+      )
+    })
+    it('retourne les jeunes', async () => {
+      // When
+      const result = await jeuneSqlRepository.findAll(['ABCDE'])
+
+      // Then
+      expect(result).to.deep.equal([jeune])
+    })
+
+    describe("quand le jeune n'existe pas", () => {
+      it('retourne undefined', async () => {
+        // When
+        const jeune = await jeuneSqlRepository.get('ZIZOU')
+
+        // Then
+        expect(jeune).to.equal(undefined)
+      })
+    })
+  })
+
   describe('save', () => {
     beforeEach(async () => {
       // Given
