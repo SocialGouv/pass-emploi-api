@@ -41,6 +41,23 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return fromSqlToJeune(jeuneSqlModel, attributs)
   }
 
+  async findAll(
+    ids: string[],
+    attributs?: { avecConfiguration: boolean }
+  ): Promise<Jeune[]> {
+    const jeunesSqlModels = await JeuneSqlModel.findAll({
+      where: {
+        id: {
+          [Op.in]: ids
+        }
+      },
+      include: [ConseillerSqlModel]
+    })
+    return jeunesSqlModels.map(jeuneSqlModel =>
+      fromSqlToJeune(jeuneSqlModel, attributs)
+    )
+  }
+
   async existe(id: string): Promise<boolean> {
     const exists = (await this.sequelize.query(
       `select exists(select 1 from jeune where id = :idJeune)`,
