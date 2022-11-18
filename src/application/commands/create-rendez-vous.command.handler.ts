@@ -2,13 +2,13 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import {
-  ConseillerSansAgenceError,
-  JeuneNonLieALAgenceError,
-  JeuneNonLieAuConseillerError,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
-import { failure, Result, success } from '../../building-blocks/types/result'
+  failure,
+  isFailure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
@@ -19,7 +19,6 @@ import {
   RendezVous,
   RendezVousRepositoryToken
 } from '../../domain/rendez-vous/rendez-vous'
-import { IdService } from '../../utils/id-service'
 import { buildError } from '../../utils/logger.module'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 
@@ -45,12 +44,12 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
   string
 > {
   constructor(
-    private idService: IdService,
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
+    private rendezVousFactory: RendezVous.Factory,
     private notificationService: Notification.Service,
     @Inject(MailServiceToken)
     private mailService: Mail.Service,
@@ -63,38 +62,27 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
 
   async handle(command: CreateRendezVousCommand): Promise<Result<string>> {
     const conseiller = await this.conseillerRepository.get(command.idConseiller)
-    const idAgence = conseiller!.agence?.id
-    if (RendezVous.estUnTypeAnimationCollective(command.type) && !idAgence) {
-      return failure(new ConseillerSansAgenceError(command.idConseiller))
+
+    if (!conseiller) {
+      return failure(new NonTrouveError('Conseiller'))
     }
 
-    const jeunes: Jeune[] = []
+    const jeunes = await this.jeuneRepository.findAll(command.idsJeunes, {
+      avecConfiguration: true
+    })
 
-    for (const idJeune of command.idsJeunes) {
-      const jeune = await this.jeuneRepository.get(idJeune, {
-        avecConfiguration: true
-      })
-      if (!jeune) {
-        return failure(new NonTrouveError('Jeune', idJeune))
-      }
-      if (RendezVous.estUnTypeAnimationCollective(command.type)) {
-        if (jeune.conseiller?.idAgence !== idAgence) {
-          return failure(new JeuneNonLieALAgenceError(jeune.id, idAgence!))
-        }
-      } else if (jeune.conseiller?.id !== command.idConseiller) {
-        return failure(
-          new JeuneNonLieAuConseillerError(command.idConseiller, jeune.id)
-        )
-      }
-      jeunes.push(jeune)
+    if (jeunes.length !== command.idsJeunes.length) {
+      return failure(new NonTrouveError('Jeune'))
     }
 
-    const rendezVous = RendezVous.createRendezVousConseiller(
-      command,
-      jeunes,
-      conseiller!,
-      this.idService
-    )
+    const result = this.rendezVousFactory.creer(command, jeunes, conseiller)
+
+    if (isFailure(result)) {
+      return result
+    }
+
+    const rendezVous = result.data
+
     await this.rendezVousRepository.save(rendezVous)
 
     this.notificationService.notifierLesJeunesDuRdv(
