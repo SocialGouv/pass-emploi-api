@@ -4,6 +4,12 @@ import { Conseiller } from '../conseiller'
 import { Jeune } from '../jeune/jeune'
 import * as _AnimationCollective from './animation-collective'
 import * as _Historique from './historique'
+import { failure, Result, success } from '../../building-blocks/types/result'
+import {
+  ConseillerSansAgenceError,
+  JeuneNonLieAuConseillerError
+} from '../../building-blocks/types/domain-error'
+import { Injectable } from '@nestjs/common'
 
 export const RendezVousRepositoryToken = 'RendezVous.Repository'
 
@@ -129,43 +135,6 @@ export namespace RendezVous {
     )
   }
 
-  export function createRendezVousConseiller(
-    infosRendezVousACreer: InfosRendezVousACreer,
-    jeunes: Jeune[],
-    conseiller: Conseiller,
-    idService: IdService
-  ): RendezVous {
-    return {
-      id: idService.uuid(),
-      commentaire: infosRendezVousACreer.commentaire,
-      duree: infosRendezVousACreer.duree,
-      date: new Date(infosRendezVousACreer.date),
-      modalite: infosRendezVousACreer.modalite,
-      jeunes: jeunes,
-      titre: infosRendezVousACreer.titre ?? 'Rendez-vous conseiller',
-      sousTitre: `avec ${conseiller.firstName}`,
-      type: infosRendezVousACreer.type
-        ? (infosRendezVousACreer.type as CodeTypeRendezVous)
-        : CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
-      precision: infosRendezVousACreer.precision,
-      adresse: infosRendezVousACreer.adresse,
-      organisme: infosRendezVousACreer.organisme,
-      invitation: infosRendezVousACreer.invitation,
-      presenceConseiller:
-        infosRendezVousACreer.presenceConseiller === undefined
-          ? true
-          : infosRendezVousACreer.presenceConseiller,
-      createur: {
-        id: conseiller.id,
-        nom: conseiller.lastName,
-        prenom: conseiller.firstName
-      },
-      idAgence: estUnTypeAnimationCollective(infosRendezVousACreer.type)
-        ? conseiller.agence?.id
-        : undefined
-    }
-  }
-
   export function mettreAJour(
     rendezVousInitial: RendezVous,
     infosRendezVousAMettreAJour: InfosRendezVousAMettreAJour
@@ -180,6 +149,62 @@ export namespace RendezVous {
       adresse: infosRendezVousAMettreAJour.adresse,
       organisme: infosRendezVousAMettreAJour.organisme,
       presenceConseiller: infosRendezVousAMettreAJour.presenceConseiller
+    }
+  }
+
+  @Injectable()
+  export class Factory {
+    constructor(private idService: IdService) {}
+
+    creer(
+      infosRendezVousACreer: InfosRendezVousACreer,
+      jeunes: Jeune[],
+      conseiller: Conseiller
+    ): Result<RendezVous> {
+      if (
+        RendezVous.estUnTypeAnimationCollective(infosRendezVousACreer.type) &&
+        !conseiller!.agence?.id
+      ) {
+        return failure(new ConseillerSansAgenceError(conseiller.id))
+      }
+
+      for (const jeune of jeunes) {
+        if (jeune.conseiller?.id !== conseiller.id) {
+          return failure(
+            new JeuneNonLieAuConseillerError(conseiller.id, jeune.id)
+          )
+        }
+      }
+
+      return success({
+        id: this.idService.uuid(),
+        commentaire: infosRendezVousACreer.commentaire,
+        duree: infosRendezVousACreer.duree,
+        date: new Date(infosRendezVousACreer.date),
+        modalite: infosRendezVousACreer.modalite,
+        jeunes: jeunes,
+        titre: infosRendezVousACreer.titre ?? 'Rendez-vous conseiller',
+        sousTitre: `avec ${conseiller.firstName}`,
+        type: infosRendezVousACreer.type
+          ? (infosRendezVousACreer.type as CodeTypeRendezVous)
+          : CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+        precision: infosRendezVousACreer.precision,
+        adresse: infosRendezVousACreer.adresse,
+        organisme: infosRendezVousACreer.organisme,
+        invitation: infosRendezVousACreer.invitation,
+        presenceConseiller:
+          infosRendezVousACreer.presenceConseiller === undefined
+            ? true
+            : infosRendezVousACreer.presenceConseiller,
+        createur: {
+          id: conseiller.id,
+          nom: conseiller.lastName,
+          prenom: conseiller.firstName
+        },
+        idAgence: estUnTypeAnimationCollective(infosRendezVousACreer.type)
+          ? conseiller.agence?.id
+          : undefined
+      })
     }
   }
 }

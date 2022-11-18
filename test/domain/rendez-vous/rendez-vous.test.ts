@@ -7,75 +7,177 @@ import { IdService } from 'src/utils/id-service'
 import { unConseiller } from 'test/fixtures/conseiller.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { unJeune } from 'test/fixtures/jeune.fixture'
-import { expect, stubClass } from '../../utils'
+import { expect, StubbedClass, stubClass } from '../../utils'
+import { failure, isSuccess } from '../../../src/building-blocks/types/result'
+import {
+  ConseillerSansAgenceError,
+  JeuneNonLieAuConseillerError
+} from '../../../src/building-blocks/types/domain-error'
 
 describe('Rendez-vous', () => {
   const id = '26279b34-318a-45e4-a8ad-514a1090462c'
-  const idService = stubClass(IdService)
-  idService.uuid.returns(id)
+  let idService: StubbedClass<IdService>
 
-  describe('createRendezVousConseiller', () => {
-    describe('quand le type est autre que animation collective', () => {
-      // Given
-      const infosRdv: InfosRendezVousACreer = {
-        idsJeunes: ['1'],
-        idConseiller: '41',
-        commentaire: '',
-        date: uneDatetime().toJSDate().toISOString(),
-        duree: 10
-      }
-      const conseiller = unConseiller()
+  describe('Factory', () => {
+    let factory: RendezVous.Factory
 
-      // When
-      const rendezVous = RendezVous.createRendezVousConseiller(
-        infosRdv,
-        [unJeune()],
-        conseiller,
-        idService
-      )
+    beforeEach(() => {
+      idService = stubClass(IdService)
+      idService.uuid.returns(id)
+      factory = new RendezVous.Factory(idService)
+    })
 
-      it('renvoie un rdv avec titre et sousTitre', async () => {
-        expect(rendezVous.sousTitre).to.equal('avec Nils')
-        expect(rendezVous.titre).to.equal('Rendez-vous conseiller')
-      })
-      it('renvoie un rdv avec type par défaut', async () => {
-        expect(rendezVous.type).to.equal(
-          CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
-        )
-      })
-      it('renvoie un rdv avec presenceConseiller par défaut', async () => {
-        expect(rendezVous.presenceConseiller).to.equal(true)
-      })
-      it('renvoie un rdv avec le bon créateur', async () => {
-        expect(rendezVous.createur).to.deep.equal({
-          id: conseiller.id,
-          nom: conseiller.lastName,
-          prenom: conseiller.firstName
+    describe('creer', () => {
+      describe('quand le type est autre que animation collective', () => {
+        it('crée un rdv', async () => {
+          // Given
+          const infosRdv: InfosRendezVousACreer = {
+            idsJeunes: ['1'],
+            idConseiller: '41',
+            commentaire: '',
+            date: uneDatetime().toJSDate().toISOString(),
+            duree: 10
+          }
+          const conseiller = unConseiller()
+
+          // When
+          const result = factory.creer(infosRdv, [unJeune()], conseiller)
+
+          // Then
+          expect(isSuccess(result) && result.data).to.deep.equal({
+            adresse: undefined,
+            commentaire: '',
+            createur: {
+              id: '1',
+              nom: 'Tavernier',
+              prenom: 'Nils'
+            },
+            date: new Date('2020-04-06T12:00:00.000Z'),
+            duree: 10,
+            id: '26279b34-318a-45e4-a8ad-514a1090462c',
+            idAgence: undefined,
+            invitation: undefined,
+            jeunes: [unJeune()],
+            modalite: undefined,
+            organisme: undefined,
+            precision: undefined,
+            presenceConseiller: true,
+            sousTitre: 'avec Nils',
+            titre: 'Rendez-vous conseiller',
+            type: 'ENTRETIEN_INDIVIDUEL_CONSEILLER'
+          })
         })
       })
-    })
-    describe('quand le type est animation collective', () => {
-      // Given
-      const infosRdv: InfosRendezVousACreer = {
-        idsJeunes: ['1'],
-        idConseiller: '41',
-        commentaire: '',
-        date: uneDatetime().toJSDate().toISOString(),
-        duree: 10,
-        type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
-      }
-      const conseiller = unConseiller({ agence: { id: 'test' } })
+      describe('quand le type est animation collective', () => {
+        describe('quand le conseiller a une agence ', () => {
+          it('renvoie un rdv avec agence', async () => {
+            // Given
+            const infosRdv: InfosRendezVousACreer = {
+              idsJeunes: ['1'],
+              idConseiller: '41',
+              commentaire: '',
+              date: uneDatetime().toJSDate().toISOString(),
+              duree: 10,
+              type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
+            }
+            const conseiller = unConseiller({ agence: { id: 'test' } })
+            const unJeuneDuConseiller = unJeune({
+              conseiller: {
+                id: conseiller.id,
+                firstName: conseiller.firstName,
+                lastName: conseiller.lastName,
+                email: conseiller.email,
+                idAgence: 'test'
+              }
+            })
 
-      // When
-      const rendezVous = RendezVous.createRendezVousConseiller(
-        infosRdv,
-        [unJeune()],
-        conseiller,
-        idService
-      )
+            // When
+            const result = factory.creer(
+              infosRdv,
+              [unJeuneDuConseiller],
+              conseiller
+            )
 
-      it('renvoie un rdv avec agence', async () => {
-        expect(rendezVous.idAgence).to.equal('test')
+            // Then
+            expect(isSuccess(result) && result.data.idAgence).to.equal('test')
+          })
+        })
+        describe("quand le conseiller n'a pas d'agence", () => {
+          it('renvoie une failure', async () => {
+            // Given
+            const infosRdv: InfosRendezVousACreer = {
+              idsJeunes: ['1'],
+              idConseiller: '41',
+              commentaire: '',
+              date: uneDatetime().toJSDate().toISOString(),
+              duree: 10,
+              type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
+            }
+            const conseiller = unConseiller({ agence: undefined })
+            const unJeuneDuConseiller = unJeune({
+              conseiller: {
+                id: conseiller.id,
+                firstName: conseiller.firstName,
+                lastName: conseiller.lastName,
+                email: conseiller.email,
+                idAgence: undefined
+              }
+            })
+
+            // When
+            const result = factory.creer(
+              infosRdv,
+              [unJeuneDuConseiller],
+              conseiller
+            )
+
+            // Then
+            expect(result).to.deep.equal(
+              failure(new ConseillerSansAgenceError(conseiller.id))
+            )
+          })
+        })
+      })
+      describe("quand un des jeunes n'appartient pas au conseiller", () => {
+        it('rejette', () => {
+          // Given
+          const infosRdv: InfosRendezVousACreer = {
+            idsJeunes: ['1'],
+            idConseiller: '41',
+            commentaire: '',
+            date: uneDatetime().toJSDate().toISOString(),
+            duree: 10,
+            type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
+          }
+          const conseiller = unConseiller({
+            agence: { id: 'test' }
+          })
+          const unJeuneDunAutreConseiller = unJeune({
+            conseiller: {
+              id: 'un-autre-conseiller',
+              firstName: 'un',
+              lastName: 'autre',
+              email: 'conseiller'
+            }
+          })
+
+          // When
+          const result = factory.creer(
+            infosRdv,
+            [unJeuneDunAutreConseiller],
+            conseiller
+          )
+
+          // Then
+          expect(result).to.deep.equal(
+            failure(
+              new JeuneNonLieAuConseillerError(
+                conseiller.id,
+                unJeuneDunAutreConseiller.id
+              )
+            )
+          )
+        })
       })
     })
   })
