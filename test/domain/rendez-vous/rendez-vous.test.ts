@@ -11,8 +11,13 @@ import { expect, StubbedClass, stubClass } from '../../utils'
 import { failure, isSuccess } from '../../../src/building-blocks/types/result'
 import {
   ConseillerSansAgenceError,
-  JeuneNonLieAuConseillerError
+  JeuneNonLieAuConseillerError,
+  MauvaiseCommandeError
 } from '../../../src/building-blocks/types/domain-error'
+import {
+  unJeuneDuRendezVous,
+  unRendezVous
+} from '../../fixtures/rendez-vous.fixture'
 
 describe('Rendez-vous', () => {
   const id = '26279b34-318a-45e4-a8ad-514a1090462c'
@@ -177,6 +182,119 @@ describe('Rendez-vous', () => {
               )
             )
           )
+        })
+      })
+    })
+  })
+
+  describe('Service', () => {
+    let service: RendezVous.Service
+
+    beforeEach(() => {
+      service = new RendezVous.Service()
+    })
+
+    describe('mettreAJour', () => {
+      describe("quand c'est une animation collective cloturée", () => {
+        it('rejette', () => {
+          // Given
+          const unAtelierCloture = unRendezVous({
+            type: CodeTypeRendezVous.ATELIER,
+            dateCloture: uneDatetime()
+          })
+
+          // When
+          const result = service.mettreAJour(unAtelierCloture, {
+            ...unAtelierCloture,
+            date: '2020-04-06T12:00:00.000Z'
+          })
+
+          // Then
+          expect(result).to.deep.equal(
+            failure(
+              new MauvaiseCommandeError(
+                'Une Animation Collective cloturée ne peut plus etre modifiée.'
+              )
+            )
+          )
+        })
+      })
+      describe("quand c'est un rendez vous classique sans jeune", () => {
+        it('rejette', () => {
+          // Given
+          const rendezVous = unRendezVous({
+            type: CodeTypeRendezVous.AUTRE,
+            jeunes: [unJeune()]
+          })
+
+          // When
+          const result = service.mettreAJour(rendezVous, {
+            ...rendezVous,
+            date: '2020-04-06T12:00:00.000Z',
+            jeunes: []
+          })
+
+          // Then
+          expect(result).to.deep.equal(
+            failure(
+              new MauvaiseCommandeError('Un bénéficiaire minimum est requis.')
+            )
+          )
+        })
+      })
+      describe("quand c'est un entretien individuel conseiller", () => {
+        it('rejette quand on veut modifier la présence conseiller', () => {
+          // Given
+          const rendezVous = unRendezVous({
+            type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+            presenceConseiller: true
+          })
+
+          // When
+          const result = service.mettreAJour(rendezVous, {
+            ...rendezVous,
+            date: '2020-04-06T12:00:00.000Z',
+            presenceConseiller: false
+          })
+
+          // Then
+          expect(result).to.deep.equal(
+            failure(
+              new MauvaiseCommandeError(
+                'Le champ presenceConseiller ne peut être modifié pour un rendez-vous Conseiller.'
+              )
+            )
+          )
+        })
+      })
+      describe('quand tout est bon', () => {
+        it('met à jour le rendez vous', () => {
+          // Given
+          const rendezVous = unRendezVous({
+            type: CodeTypeRendezVous.AUTRE
+          })
+
+          // When
+          const result = service.mettreAJour(rendezVous, {
+            ...rendezVous,
+            date: '2020-04-06T12:00:00.000Z',
+            jeunes: [unJeuneDuRendezVous()],
+            modalite: 'nouveau',
+            adresse: 'nouvelle',
+            organisme: 'nouvel',
+            presenceConseiller: false
+          })
+
+          // Then
+          expect(isSuccess(result) && result.data).to.deep.equal({
+            ...rendezVous,
+            date: new Date('2020-04-06T12:00:00.000Z'),
+            jeunes: [unJeuneDuRendezVous()],
+            modalite: 'nouveau',
+            adresse: 'nouvelle',
+            organisme: 'nouvel',
+            presenceConseiller: false
+          })
         })
       })
     })

@@ -3,11 +3,13 @@ import { Core } from '../../domain/core'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import {
-  MauvaiseCommandeError,
-  NonTrouveError
-} from '../../building-blocks/types/domain-error'
-import { failure, Result, success } from '../../building-blocks/types/result'
+  failure,
+  isFailure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
@@ -15,7 +17,6 @@ import { Mail, MailServiceToken } from '../../domain/mail'
 import { Notification } from '../../domain/notification/notification'
 import { PlanificateurService } from '../../domain/planificateur'
 import {
-  CodeTypeRendezVous,
   JeuneDuRendezVous,
   RendezVous,
   RendezVousRepositoryToken
@@ -26,7 +27,7 @@ import { HistoriqueRendezVousRepositoryToken } from '../../domain/rendez-vous/hi
 
 export interface UpdateRendezVousCommand extends Command {
   idRendezVous: string
-  idsJeunes?: string[]
+  idsJeunes: string[]
   commentaire?: string
   date: string
   duree: number
@@ -46,6 +47,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     private rendezVousRepository: RendezVous.Repository,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
+    private rendezVousService: RendezVous.Service,
     private notificationService: Notification.Service,
     @Inject(MailServiceToken)
     private mailClient: Mail.Service,
@@ -67,46 +69,23 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       return failure(new NonTrouveError('RendezVous', command.idRendezVous))
     }
 
-    if (RendezVous.AnimationCollective.estCloturee(rendezVous)) {
-      return failure(
-        new MauvaiseCommandeError(
-          'Une Animation Collective cloturée ne peut plus etre modifiée.'
-        )
-      )
-    }
-    if (!RendezVous.estUnTypeAnimationCollective(rendezVous.type)) {
-      if (command.idsJeunes?.length === 0) {
-        return failure(
-          new MauvaiseCommandeError('Un bénéficiaire minimum est requis.')
-        )
-      }
-    }
-    if (
-      !command.presenceConseiller &&
-      rendezVous.type === CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
-    ) {
-      return failure(
-        new MauvaiseCommandeError(
-          'Le champ presenceConseiller ne peut être modifié pour un rendez-vous Conseiller.'
-        )
-      )
-    }
-
-    const jeunes: Jeune[] = []
-
-    if (command.idsJeunes) {
-      for (const idJeune of command.idsJeunes) {
-        const jeune = await this.jeuneRepository.get(idJeune)
-        if (!jeune) {
-          return failure(new NonTrouveError('Jeune', idJeune))
-        }
-        jeunes.push(jeune)
-      }
-    }
-    const rendezVousUpdated: RendezVous = RendezVous.mettreAJour(rendezVous, {
-      ...command,
-      jeunes: command.idsJeunes ? jeunes : rendezVous.jeunes
+    const jeunes = await this.jeuneRepository.findAll(command.idsJeunes, {
+      avecConfiguration: true
     })
+
+    if (jeunes.length !== command.idsJeunes?.length) {
+      return failure(new NonTrouveError('Jeune'))
+    }
+
+    const result = this.rendezVousService.mettreAJour(rendezVous, {
+      ...command,
+      jeunes
+    })
+
+    if (isFailure(result)) {
+      return result
+    }
+    const rendezVousUpdated = result.data
     await this.rendezVousRepository.save(rendezVousUpdated)
 
     this.replanifierLesRappelsDeRendezVous(rendezVousUpdated, rendezVous)
