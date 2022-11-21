@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous,
@@ -176,14 +176,17 @@ export class RendezVousConseillerQueryModel
     nom: string
     prenom: string
   }
-
-  @ApiProperty({ type: LogModificationRendezVousQueryModel, isArray: true })
-  historique?: LogModificationRendezVousQueryModel[]
 }
 
-export class AnimationCollectiveQueryModel extends RendezVousConseillerQueryModel {
-  @ApiProperty()
-  statut: RendezVous.AnimationCollective.Statut
+export class RendezVousConseillerDetailQueryModel extends RendezVousConseillerQueryModel {
+  @ApiPropertyOptional()
+  statut?: RendezVous.AnimationCollective.Statut
+
+  @ApiPropertyOptional({
+    type: LogModificationRendezVousQueryModel,
+    isArray: true
+  })
+  historique?: LogModificationRendezVousQueryModel[]
 }
 
 export class RendezVousConseillerFutursEtPassesQueryModel {

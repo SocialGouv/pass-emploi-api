@@ -1,6 +1,10 @@
-import { mapCodeLabelTypeRendezVous } from '../../../domain/rendez-vous/rendez-vous'
+import {
+  mapCodeLabelTypeRendezVous,
+  RendezVous
+} from '../../../domain/rendez-vous/rendez-vous'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import {
+  RendezVousConseillerDetailQueryModel,
   RendezVousConseillerQueryModel,
   RendezVousJeuneQueryModel
 } from '../query-models/rendez-vous.query-model'
@@ -41,10 +45,9 @@ export function fromSqlToRendezVousJeuneQueryModel(
 }
 
 export function fromSqlToRendezVousConseillerQueryModel(
-  rendezVousSql: RendezVousSqlModel,
-  historiqueSql?: LogModificationRendezVousSqlModel[]
+  rendezVousSql: RendezVousSqlModel
 ): RendezVousConseillerQueryModel {
-  const rendezVousConseiller: RendezVousConseillerQueryModel = {
+  return {
     id: rendezVousSql.id,
     comment: rendezVousSql.commentaire ?? undefined,
     date: rendezVousSql.date,
@@ -67,6 +70,21 @@ export function fromSqlToRendezVousConseillerQueryModel(
     invitation: Boolean(rendezVousSql.invitation),
     createur: rendezVousSql.createur
   }
+}
+
+export function fromSqlToRendezVousConseillerDetailQueryModel(
+  rendezVousSql: RendezVousSqlModel,
+  maintenant: Date,
+  historiqueSql?: LogModificationRendezVousSqlModel[]
+): RendezVousConseillerDetailQueryModel {
+  const rendezVousConseiller: RendezVousConseillerDetailQueryModel = {
+    ...fromSqlToRendezVousConseillerQueryModel(rendezVousSql)
+  }
+
+  if (RendezVous.estUnTypeAnimationCollective(rendezVousSql.type)) {
+    rendezVousConseiller.statut = construireStatut(rendezVousSql, maintenant)
+  }
+
   if (historiqueSql) {
     rendezVousConseiller.historique = historiqueSql.map(log => {
       return {
@@ -76,4 +94,18 @@ export function fromSqlToRendezVousConseillerQueryModel(
     })
   }
   return rendezVousConseiller
+}
+
+export function construireStatut(
+  rendezVousSql: RendezVousSqlModel,
+  maintenant: Date
+): RendezVous.AnimationCollective.Statut {
+  if (rendezVousSql.dateCloture === null) {
+    if (rendezVousSql.date <= maintenant) {
+      return RendezVous.AnimationCollective.Statut.A_CLOTURER
+    }
+    return RendezVous.AnimationCollective.Statut.A_VENIR
+  } else {
+    return RendezVous.AnimationCollective.Statut.CLOTUREE
+  }
 }

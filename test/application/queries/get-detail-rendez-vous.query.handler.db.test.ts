@@ -15,25 +15,36 @@ import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { uneDate, uneDatetime } from '../../fixtures/date.fixture'
-import { RendezVousConseillerQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
-import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
+import {
+  RendezVousConseillerDetailQueryModel,
+  RendezVousConseillerQueryModel
+} from '../../../src/application/queries/query-models/rendez-vous.query-model'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../src/domain/rendez-vous/rendez-vous'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { LogModificationRendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
+import { DateService } from '../../../src/utils/date-service'
 
 describe('GetDetailRendezVousQueryHandler', () => {
   DatabaseForTesting.prepare()
   let getDetailRendezVousQueryHandler: GetDetailRendezVousQueryHandler
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
+  let dateService: StubbedClass<DateService>
   let sandbox: SinonSandbox
 
   beforeEach(() => {
     sandbox = createSandbox()
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
+    dateService = stubClass(DateService)
+    dateService.nowJs.returns(uneDate())
     getDetailRendezVousQueryHandler = new GetDetailRendezVousQueryHandler(
-      rendezVousAuthorizer
+      rendezVousAuthorizer,
+      dateService
     )
   })
 
@@ -77,7 +88,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
         })
 
         // Then
-        const data: RendezVousConseillerQueryModel = {
+        const data: RendezVousConseillerDetailQueryModel = {
           adresse: undefined,
           comment: 'commentaire',
           createur: {
@@ -98,7 +109,8 @@ describe('GetDetailRendezVousQueryHandler', () => {
           type: {
             code: CodeTypeRendezVous.ATELIER,
             label: 'Atelier'
-          }
+          },
+          statut: RendezVous.AnimationCollective.Statut.A_CLOTURER
         }
         expect(result).to.deep.equal(success(data))
       })
