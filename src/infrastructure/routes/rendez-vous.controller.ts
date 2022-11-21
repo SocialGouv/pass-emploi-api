@@ -19,7 +19,10 @@ import {
   UpdateRendezVousCommandHandler
 } from '../../application/commands/update-rendez-vous.command.handler'
 import { GetDetailRendezVousQueryHandler } from '../../application/queries/get-detail-rendez-vous.query.handler.db'
-import { RendezVousConseillerQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
+import {
+  RendezVousConseillerDetailQueryModel,
+  RendezVousConseillerQueryModel
+} from '../../application/queries/query-models/rendez-vous.query-model'
 import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
@@ -48,7 +51,7 @@ export class RendezVousController {
     @Param('idRendezVous', new ParseUUIDPipe()) idRendezVous: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @Query() getDetailRendezVousQueryParams?: GetDetailRendezVousQueryParams
-  ): Promise<RendezVousConseillerQueryModel> {
+  ): Promise<RendezVousConseillerDetailQueryModel> {
     const result = await this.getDetailRendezVousQueryHandler.execute(
       {
         idRendezVous,
