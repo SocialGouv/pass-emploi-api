@@ -41,7 +41,10 @@ import {
   HistoriqueConseillerJeuneQueryModel,
   PreferencesJeuneQueryModel
 } from '../../application/queries/query-models/jeunes.query-model'
-import { RendezVousJeuneQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
+import {
+  AnimationCollectiveJeuneQueryModel,
+  RendezVousJeuneQueryModel
+} from '../../application/queries/query-models/rendez-vous.query-model'
 import { Core } from '../../domain/core'
 import { DateService } from '../../utils/date-service'
 import {
@@ -82,6 +85,7 @@ import {
 } from './validation/demarches.inputs'
 import {
   ArchiverJeunePayload,
+  GetAnimationsCollectivesJeuneQueryParams,
   GetJeuneHomeSuiviQueryParams,
   GetRendezVousJeuneQueryParams,
   PutNotificationTokenInput,
@@ -96,6 +100,10 @@ import { GetJeuneHomeAgendaQueryHandler } from '../../application/queries/get-je
 import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
 import { DateTime } from 'luxon'
 import { toDemarcheQueryModel } from '../../application/queries/query-mappers/demarche.mappers'
+import {
+  GetAnimationsCollectivesJeuneQuery,
+  GetAnimationsCollectivesJeuneQueryHandler
+} from '../../application/queries/get-animations-collectives-jeune.query.handler.db'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -123,7 +131,8 @@ export class JeunesController {
     private readonly updateStatutDemarcheCommandHandler: UpdateStatutDemarcheCommandHandler,
     private readonly createDemarcheCommandHandler: CreateDemarcheCommandHandler,
     private readonly updateJeunePreferencesCommandHandler: UpdateJeunePreferencesCommandHandler,
-    private readonly getPreferencesJeuneQueryHandler: GetPreferencesJeuneQueryHandler
+    private readonly getPreferencesJeuneQueryHandler: GetPreferencesJeuneQueryHandler,
+    private readonly getAnimationsCollectivesJeuneQueryHandler: GetAnimationsCollectivesJeuneQueryHandler
   ) {}
 
   @Get(':idJeune')
@@ -529,6 +538,34 @@ export class JeunesController {
       idJeune
     }
     const result = await this.getPreferencesJeuneQueryHandler.execute(
+      query,
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+
+    throw handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary: 'Récupère la liste des animations collectives de l‘agence du jeune'
+  })
+  @Get(':idJeune/animations-collectives')
+  async getAnimationsCollectivesJeune(
+    @Param('idJeune') idJeune: string,
+    @Query() queryParams: GetAnimationsCollectivesJeuneQueryParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<AnimationCollectiveJeuneQueryModel[]> {
+    const maintenant = DateTime.fromISO(queryParams.maintenant, {
+      setZone: true
+    })
+    const query: GetAnimationsCollectivesJeuneQuery = {
+      idJeune,
+      maintenant
+    }
+    const result = await this.getAnimationsCollectivesJeuneQueryHandler.execute(
       query,
       utilisateur
     )

@@ -22,11 +22,6 @@ export function unRendezVousQueryModel(
     id: 'db5c33e3-9fa2-4853-86b3-6cbe9c3cddc9',
     invitation: false,
     isLocaleDate: false,
-    jeune: {
-      id: 'ABCDE',
-      nom: 'Doe',
-      prenom: 'John'
-    },
     modality: 'modalite',
     organisme: undefined,
     precision: undefined,

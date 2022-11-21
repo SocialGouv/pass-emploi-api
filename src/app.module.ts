@@ -269,6 +269,7 @@ import { CloturerAnimationCollectiveCommandHandler } from './application/command
 import { GetAnimationsCollectivesQueryHandler } from './application/queries/get-animations-collectives.query.handler.db'
 import { AnimationCollectiveRepositoryToken } from './domain/rendez-vous/animation-collective'
 import { HistoriqueRendezVousRepositoryToken } from './domain/rendez-vous/historique'
+import { GetAnimationsCollectivesJeuneQueryHandler } from './application/queries/get-animations-collectives-jeune.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -619,7 +620,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetActionsPredefiniesQueryHandler,
     GetAnimationsCollectivesQueryHandler,
     GetJeunesByEtablissementQueryHandler,
-    CloturerAnimationCollectiveCommandHandler
+    CloturerAnimationCollectiveCommandHandler,
+    GetAnimationsCollectivesJeuneQueryHandler
   ]
 }
 

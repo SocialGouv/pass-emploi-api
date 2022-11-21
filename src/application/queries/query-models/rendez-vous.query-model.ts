@@ -104,9 +104,6 @@ export class RendezVousJeuneQueryModel implements RendezVousBaseQueryModel {
   @ApiProperty()
   isLocaleDate: boolean
 
-  @ApiProperty()
-  jeune: JeuneQueryModel
-
   @ApiProperty({ required: false })
   conseiller?: ConseillerQueryModel
 
@@ -195,6 +192,11 @@ export class RendezVousConseillerDetailQueryModel extends RendezVousConseillerQu
     isArray: true
   })
   historique?: LogModificationRendezVousQueryModel[]
+}
+
+export class AnimationCollectiveJeuneQueryModel extends RendezVousJeuneQueryModel {
+  @ApiProperty()
+  estInscrit: boolean
 }
 
 export class RendezVousConseillerFutursEtPassesQueryModel {
