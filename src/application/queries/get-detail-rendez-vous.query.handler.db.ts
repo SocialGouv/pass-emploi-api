@@ -7,9 +7,10 @@ import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
-import { fromSqlToRendezVousConseillerQueryModel } from './query-mappers/rendez-vous-milo.mappers'
-import { RendezVousConseillerQueryModel } from './query-models/rendez-vous.query-model'
+import { fromSqlToRendezVousConseillerDetailQueryModel } from './query-mappers/rendez-vous-milo.mappers'
+import { RendezVousConseillerDetailQueryModel } from './query-models/rendez-vous.query-model'
 import { LogModificationRendezVousSqlModel } from '../../infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
+import { DateService } from '../../utils/date-service'
 
 export interface GetDetailRendezVousQuery extends Query {
   idRendezVous: string
@@ -19,15 +20,18 @@ export interface GetDetailRendezVousQuery extends Query {
 @Injectable()
 export class GetDetailRendezVousQueryHandler extends QueryHandler<
   GetDetailRendezVousQuery,
-  Result<RendezVousConseillerQueryModel>
+  Result<RendezVousConseillerDetailQueryModel>
 > {
-  constructor(private rendezVousAuthorizer: RendezVousAuthorizer) {
+  constructor(
+    private rendezVousAuthorizer: RendezVousAuthorizer,
+    private dateService: DateService
+  ) {
     super('GetDetailRendezVousQueryHandler')
   }
 
   async handle(
     query: GetDetailRendezVousQuery
-  ): Promise<Result<RendezVousConseillerQueryModel>> {
+  ): Promise<Result<RendezVousConseillerDetailQueryModel>> {
     const rendezVousSqlModel = await RendezVousSqlModel.findByPk(
       query.idRendezVous,
       {
@@ -53,8 +57,13 @@ export class GetDetailRendezVousQueryHandler extends QueryHandler<
         order: [['date', 'DESC']]
       })
     }
+    const maintenant = this.dateService.nowJs()
     return success(
-      fromSqlToRendezVousConseillerQueryModel(rendezVousSqlModel, historiqueSql)
+      fromSqlToRendezVousConseillerDetailQueryModel(
+        rendezVousSqlModel,
+        maintenant,
+        historiqueSql
+      )
     )
   }
 
