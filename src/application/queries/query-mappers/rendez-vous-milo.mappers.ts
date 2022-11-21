@@ -3,14 +3,15 @@ import {
   RendezVous
 } from '../../../domain/rendez-vous/rendez-vous'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
+import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import {
+  AnimationCollectiveJeuneQueryModel,
   AnimationCollectiveQueryModel,
   RendezVousConseillerDetailQueryModel,
   RendezVousConseillerQueryModel,
   RendezVousJeuneQueryModel
 } from '../query-models/rendez-vous.query-model'
 import { RendezVousJeuneAssociationSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 
 export function fromSqlToRendezVousJeuneQueryModel(
   rendezVousSql: RendezVousSqlModel
@@ -23,11 +24,6 @@ export function fromSqlToRendezVousJeuneQueryModel(
     modality: rendezVousSql.modalite ?? '',
     duration: rendezVousSql.duree,
     title: rendezVousSql.titre ?? '',
-    jeune: {
-      id: rendezVousSql.jeunes[0].id,
-      nom: rendezVousSql.jeunes[0].nom,
-      prenom: rendezVousSql.jeunes[0].prenom
-    },
     type: {
       code: rendezVousSql.type,
       label: mapCodeLabelTypeRendezVous[rendezVousSql.type]
@@ -43,6 +39,34 @@ export function fromSqlToRendezVousJeuneQueryModel(
       nom: rendezVousSql.jeunes[0].conseiller!.nom,
       prenom: rendezVousSql.jeunes[0].conseiller!.prenom
     }
+  }
+}
+
+export function fromSqlToAnimationCollectiveJeuneQueryModel(
+  rendezVousSql: RendezVousSqlModel,
+  jeuneId: string
+): AnimationCollectiveJeuneQueryModel {
+  return {
+    id: rendezVousSql.id,
+    comment: rendezVousSql.commentaire ?? undefined,
+    date: rendezVousSql.date,
+    isLocaleDate: false,
+    modality: rendezVousSql.modalite ?? '',
+    duration: rendezVousSql.duree,
+    title: rendezVousSql.titre ?? '',
+    estInscrit: Boolean(
+      rendezVousSql.jeunes?.map(jeune => jeune.id).find(id => id === jeuneId)
+    ),
+    type: {
+      code: rendezVousSql.type,
+      label: mapCodeLabelTypeRendezVous[rendezVousSql.type]
+    },
+    precision: rendezVousSql.precision ?? undefined,
+    adresse: rendezVousSql.adresse ?? undefined,
+    organisme: rendezVousSql.organisme ?? undefined,
+    presenceConseiller: rendezVousSql.presenceConseiller,
+    invitation: Boolean(rendezVousSql.invitation),
+    createur: rendezVousSql.createur
   }
 }
 

@@ -144,7 +144,6 @@ describe('GetRendezVousJeuneQueryHandler', () => {
         if (result._isSuccess) {
           expect(result.data.length).to.equal(4)
           expect(result.data[0].id).to.equal(unRendezVousTresPasse.id)
-          expect(result.data[0].jeune.id).to.equal(jeune1.id)
           expect(result.data[1].id).to.equal(unRendezVousPasse.id)
           expect(result.data[2].id).to.equal(unRendezVousProche.id)
           expect(result.data[3].id).to.equal(
@@ -164,7 +163,6 @@ describe('GetRendezVousJeuneQueryHandler', () => {
         if (result._isSuccess) {
           expect(result.data.length).to.equal(2)
           expect(result.data[0].id).to.equal(unRendezVousTresPasse.id)
-          expect(result.data[0].jeune.id).to.equal(jeune2.id)
           expect(result.data[1].id).to.equal(
             unRendezVousTresFuturPresenceConseillerFalse.id
           )
