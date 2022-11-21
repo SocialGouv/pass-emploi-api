@@ -121,3 +121,6 @@ export class GetJeuneHomeSuiviQueryParams {
   @IsISO8601({ strict: true })
   maintenant: string
 }
+
+export type GetAnimationsCollectivesJeuneQueryParams =
+  GetJeuneHomeSuiviQueryParams

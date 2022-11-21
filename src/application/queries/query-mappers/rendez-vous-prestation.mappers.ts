@@ -4,12 +4,10 @@ import {
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous
 } from '../../../domain/rendez-vous/rendez-vous'
-import { Jeune } from '../../../domain/jeune/jeune'
 import { IdService } from '../../../utils/id-service'
 
 export function fromPrestationDtoToRendezVousQueryModel(
   prestation: PrestationDto,
-  jeune: Jeune,
   idService: IdService,
   lienVisio?: string
 ): RendezVousJeuneQueryModel {
@@ -24,7 +22,6 @@ export function fromPrestationDtoToRendezVousQueryModel(
     date: buildDateSansTimezone(prestation.session.dateDebut),
     isLocaleDate: true,
     comment: prestation.session.commentaire,
-    jeune: { id: jeune.id, nom: jeune.lastName, prenom: jeune.firstName },
     modality: buildModality(prestation),
     duration: buildDuration(prestation),
     description: buildDescription(prestation),

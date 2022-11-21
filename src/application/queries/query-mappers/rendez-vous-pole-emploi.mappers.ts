@@ -1,6 +1,5 @@
 import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
 import { RendezVousPoleEmploiDto } from '../../../infrastructure/clients/dto/pole-emploi.dto'
-import { Jeune } from '../../../domain/jeune/jeune'
 import { IdService } from '../../../utils/id-service'
 import {
   CodeTypeRendezVous,
@@ -9,7 +8,6 @@ import {
 
 export function fromRendezVousDtoToRendezVousQueryModel(
   rendezVousPoleEmploiDto: RendezVousPoleEmploiDto,
-  jeune: Jeune,
   idService: IdService
 ): RendezVousJeuneQueryModel {
   return {
@@ -25,7 +23,6 @@ export function fromRendezVousDtoToRendezVousQueryModel(
     date: buildDate(rendezVousPoleEmploiDto),
     isLocaleDate: true,
     comment: rendezVousPoleEmploiDto.commentaire,
-    jeune: { id: jeune.id, nom: jeune.lastName, prenom: jeune.firstName },
     modality: buildModality(rendezVousPoleEmploiDto),
     duration: rendezVousPoleEmploiDto.duree,
     adresse: buildAdresse(rendezVousPoleEmploiDto),

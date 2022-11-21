@@ -84,6 +84,7 @@ import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../../src/applicati
 import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 import StatutInvalide = Action.StatutInvalide
 import { DateTime } from 'luxon'
+import { GetAnimationsCollectivesJeuneQueryHandler } from '../../../src/application/queries/get-animations-collectives-jeune.query.handler.db'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -106,6 +107,7 @@ describe('JeunesController', () => {
   let archiverJeuneCommandHandler: StubbedClass<ArchiverJeuneCommandHandler>
   let updateJeunePreferencesCommandHandler: StubbedClass<UpdateJeunePreferencesCommandHandler>
   let getPreferencesJeuneQueryHandler: StubbedClass<GetPreferencesJeuneQueryHandler>
+  let getAnimationsCollectivesJeuneQueryHandler: StubbedClass<GetAnimationsCollectivesJeuneQueryHandler>
   let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
@@ -150,8 +152,10 @@ describe('JeunesController', () => {
     updateJeunePreferencesCommandHandler = stubClass(
       UpdateJeunePreferencesCommandHandler
     )
-
     getPreferencesJeuneQueryHandler = stubClass(GetPreferencesJeuneQueryHandler)
+    getAnimationsCollectivesJeuneQueryHandler = stubClass(
+      GetAnimationsCollectivesJeuneQueryHandler
+    )
 
     dateService = stubClass(DateService)
     dateService.now.returns(now)
@@ -197,6 +201,8 @@ describe('JeunesController', () => {
       .useValue(getPreferencesJeuneQueryHandler)
       .overrideProvider(GetJeuneHomeAgendaPoleEmploiQueryHandler)
       .useValue(getJeuneHomeAgendaPoleEmploiQueryHandler)
+      .overrideProvider(GetAnimationsCollectivesJeuneQueryHandler)
+      .useValue(getAnimationsCollectivesJeuneQueryHandler)
       .overrideProvider(JwtService)
       .useValue(jwtService)
       .overrideProvider(DateService)
@@ -1655,5 +1661,27 @@ describe('JeunesController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/preferences')
+  })
+
+  describe('GET /jeunes/:idJeune/animations-collectives', () => {
+    const idJeune = '1'
+    it('retourne la home agenda du jeune quand tout se passe bien', async () => {
+      // Given
+      getAnimationsCollectivesJeuneQueryHandler.execute.resolves(success([]))
+
+      // When
+      await request(app.getHttpServer())
+        .get(
+          `/jeunes/${idJeune}/animations-collectives?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00`
+        )
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect([])
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/jeunes/1/animations-collectives?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00'
+    )
   })
 })

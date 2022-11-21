@@ -115,7 +115,6 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
             try {
               return fromPrestationDtoToRendezVousQueryModel(
                 prestation,
-                jeune,
                 this.idService,
                 lienVisio
               )
@@ -129,7 +128,6 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
       const rendezVousPoleEmploi = rendezVousPoleEmploiDto.map(rendezVous => {
         return fromRendezVousDtoToRendezVousQueryModel(
           rendezVous,
-          jeune,
           this.idService
         )
       })

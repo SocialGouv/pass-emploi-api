@@ -175,11 +175,6 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
                 date: expectedDateRendezVous,
                 duration: 23,
                 id: 'random-id',
-                jeune: {
-                  id: 'ABCDE',
-                  nom: 'Doe',
-                  prenom: 'John'
-                },
                 modality: 'en agence Pôle emploi',
                 theme: 'theme',
                 conseiller: undefined,
@@ -207,11 +202,6 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
                 description: "Utiliser Internet dans sa recherche d'emploi",
                 duration: 0,
                 id: 'random-id',
-                jeune: {
-                  id: 'ABCDE',
-                  nom: 'Doe',
-                  prenom: 'John'
-                },
                 lienVisio: undefined,
                 modality: '',
                 organisme: undefined,
@@ -307,11 +297,6 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
                 description: undefined,
                 duration: 0,
                 id: 'random-id',
-                jeune: {
-                  id: 'ABCDE',
-                  nom: 'Doe',
-                  prenom: 'John'
-                },
                 lienVisio: 'lienvisio.com',
                 modality: 'par visio',
                 organisme: undefined,
@@ -329,11 +314,6 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
                 date: new Date('2020-04-06T12:20:00.000Z'),
                 duration: 23,
                 id: 'random-id',
-                jeune: {
-                  id: 'ABCDE',
-                  nom: 'Doe',
-                  prenom: 'John'
-                },
                 modality: 'par visio',
                 theme: 'theme',
                 presenceConseiller: true,
