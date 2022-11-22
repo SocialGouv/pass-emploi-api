@@ -9,6 +9,8 @@ import {
   RendezVousConseillerQueryModel,
   RendezVousJeuneQueryModel
 } from '../query-models/rendez-vous.query-model'
+import { RendezVousJeuneAssociationSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
+import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 
 export function fromSqlToRendezVousJeuneQueryModel(
   rendezVousSql: RendezVousSqlModel
@@ -57,7 +59,8 @@ export function fromSqlToRendezVousConseillerQueryModel(
     jeunes: rendezVousSql.jeunes.map(jeune => ({
       id: jeune.id,
       prenom: jeune.prenom,
-      nom: jeune.nom
+      nom: jeune.nom,
+      futPresent: getPresence(jeune)
     })),
     type: {
       code: rendezVousSql.type,
@@ -115,4 +118,14 @@ export function construireStatut(
   } else {
     return RendezVous.AnimationCollective.Statut.CLOTUREE
   }
+}
+
+// La requête SQL qui récupère les jeunes d'un rendez-vous passe par une table de jointure
+// Dans le résultat de la requête, on peut récupérer les informations supplémentaires de l'association
+// Pour palier au problème de typage, on utilise la technique ci-dessous.
+function getPresence(jeuneSqlModel: JeuneSqlModel): boolean | undefined {
+  const rendezVousJeuneAssociation = jeuneSqlModel.get(
+    RendezVousJeuneAssociationSqlModel.name
+  ) as RendezVousJeuneAssociationSqlModel | undefined
+  return rendezVousJeuneAssociation?.present ?? undefined
 }
