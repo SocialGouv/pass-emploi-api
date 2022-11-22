@@ -15,10 +15,7 @@ import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { uneDate, uneDatetime } from '../../fixtures/date.fixture'
-import {
-  RendezVousConseillerDetailQueryModel,
-  RendezVousConseillerQueryModel
-} from '../../../src/application/queries/query-models/rendez-vous.query-model'
+import { RendezVousConseillerDetailQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
 import {
   CodeTypeRendezVous,
   RendezVous
@@ -106,6 +103,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
           presenceConseiller: true,
           invitation: false,
           title: 'UN RENDEZ VOUS',
+          historique: [],
           type: {
             code: CodeTypeRendezVous.ATELIER,
             label: 'Atelier'
@@ -140,7 +138,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
         })
 
         // Then
-        const data: RendezVousConseillerQueryModel = {
+        const data: RendezVousConseillerDetailQueryModel = {
           adresse: undefined,
           comment: 'commentaire',
           createur: {
@@ -163,6 +161,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
           precision: undefined,
           presenceConseiller: true,
           invitation: false,
+          historique: [],
           title: 'UN RENDEZ VOUS',
           type: {
             code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
@@ -207,7 +206,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
         })
 
         // Then
-        const data: RendezVousConseillerQueryModel = {
+        const data: RendezVousConseillerDetailQueryModel = {
           adresse: undefined,
           comment: 'commentaire',
           createur: {
@@ -236,6 +235,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
           presenceConseiller: true,
           invitation: false,
           title: 'UN RENDEZ VOUS',
+          historique: [],
           type: {
             code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
             label: 'Entretien individuel conseiller'
@@ -293,7 +293,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
         })
 
         // Then
-        const data: RendezVousConseillerQueryModel = {
+        const data: RendezVousConseillerDetailQueryModel = {
           adresse: undefined,
           comment: 'commentaire',
           createur: {
@@ -322,6 +322,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
           presenceConseiller: true,
           invitation: false,
           title: 'UN RENDEZ VOUS',
+          historique: [],
           type: {
             code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
             label: 'Entretien individuel conseiller'
@@ -358,8 +359,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
 
         // When
         const result = await getDetailRendezVousQueryHandler.handle({
-          idRendezVous,
-          avecHistorique: true
+          idRendezVous
         })
 
         // Then
