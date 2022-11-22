@@ -38,7 +38,18 @@ export class GetDetailRendezVousQueryHandler extends QueryHandler<
           {
             model: JeuneSqlModel,
             required: false
+          },
+          {
+            model: LogModificationRendezVousSqlModel,
+            required: false
           }
+        ],
+        order: [
+          [
+            { model: LogModificationRendezVousSqlModel, as: 'logs' },
+            'date',
+            'desc'
+          ]
         ]
       }
     )
@@ -47,18 +58,11 @@ export class GetDetailRendezVousQueryHandler extends QueryHandler<
       return failure(new NonTrouveError('RendezVous', query.idRendezVous))
     }
 
-    const historiqueSql = await LogModificationRendezVousSqlModel.findAll({
-      where: {
-        idRendezVous: query.idRendezVous
-      },
-      order: [['date', 'DESC']]
-    })
     const maintenant = this.dateService.nowJs()
     return success(
       fromSqlToRendezVousConseillerDetailQueryModel(
         rendezVousSqlModel,
-        maintenant,
-        historiqueSql
+        maintenant
       )
     )
   }

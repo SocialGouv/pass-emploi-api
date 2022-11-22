@@ -3,6 +3,7 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   PrimaryKey,
   Table
@@ -11,6 +12,7 @@ import { CodeTypeRendezVous } from '../../../domain/rendez-vous/rendez-vous'
 import { AgenceSqlModel } from './agence.sql-model'
 import { JeuneSqlModel } from './jeune.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-association.sql-model'
+import { LogModificationRendezVousSqlModel } from './log-modification-rendez-vous-sql.model'
 
 export class RendezVousDto extends Model {
   @PrimaryKey
@@ -81,4 +83,7 @@ export class RendezVousDto extends Model {
 export class RendezVousSqlModel extends RendezVousDto {
   @BelongsToMany(() => JeuneSqlModel, () => RendezVousJeuneAssociationSqlModel)
   jeunes: JeuneSqlModel[]
+
+  @HasMany(() => LogModificationRendezVousSqlModel)
+  logs: LogModificationRendezVousSqlModel[]
 }
