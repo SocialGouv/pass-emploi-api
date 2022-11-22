@@ -7,6 +7,7 @@ import * as _Historique from './historique'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import {
   ConseillerSansAgenceError,
+  JeuneNonLieALAgenceError,
   JeuneNonLieAuConseillerError,
   MauvaiseCommandeError
 } from '../../building-blocks/types/domain-error'
@@ -153,7 +154,15 @@ export namespace RendezVous {
       }
 
       for (const jeune of jeunes) {
-        if (jeune.conseiller?.id !== conseiller.id) {
+        if (
+          RendezVous.estUnTypeAnimationCollective(infosRendezVousACreer.type)
+        ) {
+          if (jeune.conseiller?.idAgence !== conseiller.agence?.id) {
+            return failure(
+              new JeuneNonLieALAgenceError(jeune.id, conseiller.agence!.id!)
+            )
+          }
+        } else if (jeune.conseiller?.id !== conseiller.id) {
           return failure(
             new JeuneNonLieAuConseillerError(conseiller.id, jeune.id)
           )
