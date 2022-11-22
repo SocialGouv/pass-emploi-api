@@ -9,7 +9,6 @@ import {
   RendezVousConseillerQueryModel,
   RendezVousJeuneQueryModel
 } from '../query-models/rendez-vous.query-model'
-import { LogModificationRendezVousSqlModel } from '../../../infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
 
 export function fromSqlToRendezVousJeuneQueryModel(
   rendezVousSql: RendezVousSqlModel
@@ -85,12 +84,11 @@ export function fromSqlToAnimationCollectiveQueryModel(
 
 export function fromSqlToRendezVousConseillerDetailQueryModel(
   rendezVousSql: RendezVousSqlModel,
-  maintenant: Date,
-  historiqueSql?: LogModificationRendezVousSqlModel[]
+  maintenant: Date
 ): RendezVousConseillerDetailQueryModel {
   const rendezVousConseiller: RendezVousConseillerDetailQueryModel = {
     ...fromSqlToRendezVousConseillerQueryModel(rendezVousSql),
-    historique: historiqueSql?.map(log => {
+    historique: rendezVousSql.logs?.map(log => {
       return {
         date: log.date.toISOString(),
         auteur: log.auteur
