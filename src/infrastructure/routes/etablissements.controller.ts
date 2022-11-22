@@ -1,7 +1,10 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetAnimationsCollectivesQueryHandler } from 'src/application/queries/get-animations-collectives.query.handler.db'
-import { RendezVousConseillerDetailQueryModel } from 'src/application/queries/query-models/rendez-vous.query-model'
+import {
+  AnimationCollectiveQueryModel,
+  RendezVousConseillerDetailQueryModel
+} from 'src/application/queries/query-models/rendez-vous.query-model'
 import { CloturerAnimationCollectiveCommandHandler } from '../../application/commands/cloturer-animation-collective.command.handler'
 import { GetJeunesByEtablissementQueryHandler } from '../../application/queries/get-jeunes-by-etablissement.query.handler.db'
 import { JeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
@@ -40,7 +43,7 @@ export class EtablissementsController {
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @Query()
     getAnimationsCollectivesQueryParams: GetAnimationsCollectivesQueryParams
-  ): Promise<RendezVousConseillerDetailQueryModel[]> {
+  ): Promise<AnimationCollectiveQueryModel[]> {
     const result = await this.getAnimationsCollectivesQueryHandler.execute(
       {
         idEtablissement,

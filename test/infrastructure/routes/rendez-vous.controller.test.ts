@@ -88,10 +88,10 @@ describe('RendezvousController', () => {
           return res.body.historique === undefined
         })
     })
-    it('récupère le rendez-vous avec l‘historique si le paramètre est à true', async () => {
+    it('récupère le rendez-vous', async () => {
       //Given
       getDetailRendezVousQueryHandler.execute
-        .withArgs({ idRendezVous: rendezvous.id, avecHistorique: true })
+        .withArgs({ idRendezVous: rendezvous.id })
         .resolves(
           success({
             id: rendezvous.id,
@@ -112,31 +112,6 @@ describe('RendezvousController', () => {
         .expect(HttpStatus.OK)
         .expect(res => {
           return res.body.historique.isArray
-        })
-    })
-    it('récupère le rendez-vous sans historique si le paramètre est à false', async () => {
-      //Given
-      getDetailRendezVousQueryHandler.execute
-        .withArgs({ idRendezVous: rendezvous.id, avecHistorique: false })
-        .resolves(
-          success({
-            id: rendezvous.id,
-            date: rendezvous.date,
-            jeunes: [],
-            type: { code: rendezvous.type, label: '' },
-            title: rendezvous.titre,
-            duration: rendezvous.duree,
-            modality: rendezvous.modalite!,
-            invitation: rendezvous.invitation!
-          })
-        )
-      //When - Then
-      await request(app.getHttpServer())
-        .get(`/rendezvous/${rendezvous.id}?avecHistorique=false`)
-        .set('authorization', unHeaderAuthorization())
-        .expect(HttpStatus.OK)
-        .expect(res => {
-          return res.body.historique === undefined
         })
     })
     ensureUserAuthenticationFailsIfInvalid('GET', '/rendezvous/123')
