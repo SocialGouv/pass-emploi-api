@@ -4,13 +4,13 @@ import { failure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
 import { fromSqlToRendezVousConseillerDetailQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { RendezVousConseillerDetailQueryModel } from './query-models/rendez-vous.query-model'
 import { LogModificationRendezVousSqlModel } from '../../infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
 import { DateService } from '../../utils/date-service'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 
 export interface GetDetailRendezVousQuery extends Query {
   idRendezVous: string

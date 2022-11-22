@@ -26,6 +26,7 @@ import { RendezVousAuthorizer } from '../../../src/application/authorizers/autho
 import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { LogModificationRendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
 import { DateService } from '../../../src/utils/date-service'
+import { DateTime } from 'luxon'
 
 describe('GetDetailRendezVousQueryHandler', () => {
   DatabaseForTesting.prepare()
@@ -33,12 +34,13 @@ describe('GetDetailRendezVousQueryHandler', () => {
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
   let dateService: StubbedClass<DateService>
   let sandbox: SinonSandbox
+  const maintenant = uneDate()
 
   beforeEach(() => {
     sandbox = createSandbox()
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
     dateService = stubClass(DateService)
-    dateService.nowJs.returns(uneDate())
+    dateService.nowJs.returns(maintenant)
     getDetailRendezVousQueryHandler = new GetDetailRendezVousQueryHandler(
       rendezVousAuthorizer,
       dateService
@@ -153,7 +155,8 @@ describe('GetDetailRendezVousQueryHandler', () => {
             {
               id: 'ABCDE',
               nom: 'Doe',
-              prenom: 'John'
+              prenom: 'John',
+              futPresent: undefined
             }
           ],
           modality: 'modalite',
@@ -221,12 +224,14 @@ describe('GetDetailRendezVousQueryHandler', () => {
             {
               id: 'ABCDE',
               nom: 'Doe',
-              prenom: 'John'
+              prenom: 'John',
+              futPresent: undefined
             },
             {
               id: 'PLOP',
               nom: 'Doe',
-              prenom: 'John'
+              prenom: 'John',
+              futPresent: undefined
             }
           ],
           modality: 'modalite',
@@ -308,12 +313,14 @@ describe('GetDetailRendezVousQueryHandler', () => {
             {
               id: 'jeune-1',
               nom: 'Doe',
-              prenom: 'John'
+              prenom: 'John',
+              futPresent: undefined
             },
             {
               id: 'jeune-2',
               nom: 'Doe',
-              prenom: 'John'
+              prenom: 'John',
+              futPresent: undefined
             }
           ],
           modality: 'modalite',
@@ -344,7 +351,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
         const idRendezVous = '20c8ca73-fd8b-4194-8d3c-80b6c9949deb'
         await RendezVousSqlModel.create(unRendezVousDto({ id: idRendezVous }))
 
-        const date = uneDate()
+        const date = maintenant
         const unLogModifRdvDto = {
           id: '24c8ca73-fd8b-3488-8d3c-80b6c9949bed',
           idRendezVous,
@@ -377,6 +384,89 @@ describe('GetDetailRendezVousQueryHandler', () => {
         expect(isSuccess(result) && result.data.historique).to.deep.equal(
           historiqueAttendu
         )
+      })
+      it("retourne la présence des jeunes quand c'est une AC cloturée", async () => {
+        // Given
+        await ConseillerSqlModel.creer(unConseillerDto())
+        const jeune1 = await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: 'jeune-1'
+          })
+        )
+        const jeune2 = await JeuneSqlModel.creer(
+          unJeuneDto({
+            id: 'jeune-2'
+          })
+        )
+        const unAtelierCloture = unRendezVousDto({
+          date: DateTime.fromJSDate(maintenant).minus({ days: 2 }).toJSDate(),
+          titre: 'UN ATELIER DE FOU',
+          type: CodeTypeRendezVous.ATELIER,
+          dateCloture: DateTime.fromJSDate(maintenant)
+            .minus({ days: 1 })
+            .toJSDate()
+        })
+
+        await RendezVousSqlModel.create(unAtelierCloture)
+
+        await RendezVousJeuneAssociationSqlModel.bulkCreate([
+          {
+            idJeune: jeune1.id,
+            idRendezVous: unAtelierCloture.id,
+            present: true
+          },
+          {
+            idJeune: jeune2.id,
+            idRendezVous: unAtelierCloture.id,
+            present: false
+          }
+        ])
+
+        // When
+        const result = await getDetailRendezVousQueryHandler.handle({
+          idRendezVous: unAtelierCloture.id
+        })
+
+        // Then
+        const data: RendezVousConseillerDetailQueryModel = {
+          adresse: undefined,
+          comment: 'commentaire',
+          createur: {
+            id: '1',
+            nom: 'Tavernier',
+            prenom: 'Nils'
+          },
+          date: DateTime.fromJSDate(maintenant).minus({ days: 2 }).toJSDate(),
+          duration: 30,
+          id: unAtelierCloture.id,
+          jeunes: [
+            {
+              id: 'jeune-1',
+              nom: 'Doe',
+              prenom: 'John',
+              futPresent: true
+            },
+            {
+              id: 'jeune-2',
+              nom: 'Doe',
+              prenom: 'John',
+              futPresent: false
+            }
+          ],
+          modality: 'modalite',
+          organisme: undefined,
+          precision: undefined,
+          presenceConseiller: true,
+          invitation: false,
+          title: 'UN ATELIER DE FOU',
+          historique: [],
+          statut: RendezVous.AnimationCollective.Statut.CLOTUREE,
+          type: {
+            code: CodeTypeRendezVous.ATELIER,
+            label: 'Atelier'
+          }
+        }
+        expect(result).to.deep.equal(success(data))
       })
     })
   })
