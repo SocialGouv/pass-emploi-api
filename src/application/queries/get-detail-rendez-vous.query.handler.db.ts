@@ -14,7 +14,6 @@ import { DateService } from '../../utils/date-service'
 
 export interface GetDetailRendezVousQuery extends Query {
   idRendezVous: string
-  avecHistorique?: boolean
 }
 
 @Injectable()
@@ -48,15 +47,12 @@ export class GetDetailRendezVousQueryHandler extends QueryHandler<
       return failure(new NonTrouveError('RendezVous', query.idRendezVous))
     }
 
-    let historiqueSql
-    if (query.avecHistorique) {
-      historiqueSql = await LogModificationRendezVousSqlModel.findAll({
-        where: {
-          idRendezVous: query.idRendezVous
-        },
-        order: [['date', 'DESC']]
-      })
-    }
+    const historiqueSql = await LogModificationRendezVousSqlModel.findAll({
+      where: {
+        idRendezVous: query.idRendezVous
+      },
+      order: [['date', 'DESC']]
+    })
     const maintenant = this.dateService.nowJs()
     return success(
       fromSqlToRendezVousConseillerDetailQueryModel(

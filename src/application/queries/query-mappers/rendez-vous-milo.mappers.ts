@@ -4,6 +4,7 @@ import {
 } from '../../../domain/rendez-vous/rendez-vous'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import {
+  AnimationCollectiveQueryModel,
   RendezVousConseillerDetailQueryModel,
   RendezVousConseillerQueryModel,
   RendezVousJeuneQueryModel
@@ -72,27 +73,35 @@ export function fromSqlToRendezVousConseillerQueryModel(
   }
 }
 
+export function fromSqlToAnimationCollectiveQueryModel(
+  rendezVousSql: RendezVousSqlModel,
+  maintenant: Date
+): AnimationCollectiveQueryModel {
+  return {
+    ...fromSqlToRendezVousConseillerQueryModel(rendezVousSql),
+    statut: construireStatut(rendezVousSql, maintenant)
+  }
+}
+
 export function fromSqlToRendezVousConseillerDetailQueryModel(
   rendezVousSql: RendezVousSqlModel,
   maintenant: Date,
   historiqueSql?: LogModificationRendezVousSqlModel[]
 ): RendezVousConseillerDetailQueryModel {
   const rendezVousConseiller: RendezVousConseillerDetailQueryModel = {
-    ...fromSqlToRendezVousConseillerQueryModel(rendezVousSql)
-  }
-
-  if (RendezVous.estUnTypeAnimationCollective(rendezVousSql.type)) {
-    rendezVousConseiller.statut = construireStatut(rendezVousSql, maintenant)
-  }
-
-  if (historiqueSql) {
-    rendezVousConseiller.historique = historiqueSql.map(log => {
+    ...fromSqlToRendezVousConseillerQueryModel(rendezVousSql),
+    historique: historiqueSql?.map(log => {
       return {
         date: log.date.toISOString(),
         auteur: log.auteur
       }
     })
   }
+
+  if (RendezVous.estUnTypeAnimationCollective(rendezVousSql.type)) {
+    rendezVousConseiller.statut = construireStatut(rendezVousSql, maintenant)
+  }
+
   return rendezVousConseiller
 }
 

@@ -9,8 +9,8 @@ import { CodeTypeRendezVous } from '../../domain/rendez-vous/rendez-vous'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { ConseillerEtablissementAuthorizer } from '../authorizers/authorize-conseiller-etablissement'
-import { fromSqlToRendezVousConseillerDetailQueryModel } from './query-mappers/rendez-vous-milo.mappers'
-import { RendezVousConseillerDetailQueryModel } from './query-models/rendez-vous.query-model'
+import { fromSqlToAnimationCollectiveQueryModel } from './query-mappers/rendez-vous-milo.mappers'
+import { AnimationCollectiveQueryModel } from './query-models/rendez-vous.query-model'
 import { DateService } from '../../utils/date-service'
 
 const NOMBRE_ANIMATIONS_COLLECTIVES_MAX = 200
@@ -24,7 +24,7 @@ export interface GetAnimationsCollectivesQuery extends Query {
 @Injectable()
 export class GetAnimationsCollectivesQueryHandler extends QueryHandler<
   GetAnimationsCollectivesQuery,
-  Result<RendezVousConseillerDetailQueryModel[]>
+  Result<AnimationCollectiveQueryModel[]>
 > {
   constructor(
     private conseillerAgenceAuthorizer: ConseillerEtablissementAuthorizer,
@@ -35,7 +35,7 @@ export class GetAnimationsCollectivesQueryHandler extends QueryHandler<
 
   async handle(
     query: GetAnimationsCollectivesQuery
-  ): Promise<Result<RendezVousConseillerDetailQueryModel[]>> {
+  ): Promise<Result<AnimationCollectiveQueryModel[]>> {
     const rdvSql = await RendezVousSqlModel.findAll({
       where: {
         idAgence: query.idEtablissement,
@@ -58,9 +58,7 @@ export class GetAnimationsCollectivesQueryHandler extends QueryHandler<
     const maintenant = this.dateService.nowJs()
 
     return success(
-      rdvSql.map(rdv =>
-        fromSqlToRendezVousConseillerDetailQueryModel(rdv, maintenant)
-      )
+      rdvSql.map(rdv => fromSqlToAnimationCollectiveQueryModel(rdv, maintenant))
     )
   }
 
