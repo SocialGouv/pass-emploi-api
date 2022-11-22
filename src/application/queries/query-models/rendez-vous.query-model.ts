@@ -15,6 +15,9 @@ class JeuneQueryModel {
 
   @ApiProperty()
   prenom: string
+
+  @ApiPropertyOptional()
+  futPresent?: boolean
 }
 
 class ConseillerQueryModel {
