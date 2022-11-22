@@ -11,7 +11,7 @@ import { expect, StubbedClass, stubClass } from '../../utils'
 import { failure, isSuccess } from '../../../src/building-blocks/types/result'
 import {
   ConseillerSansAgenceError,
-  JeuneNonLieAuConseillerError,
+  JeuneNonLieALAgenceError,
   MauvaiseCommandeError
 } from '../../../src/building-blocks/types/domain-error'
 import {
@@ -143,7 +143,7 @@ describe('Rendez-vous', () => {
           })
         })
       })
-      describe("quand un des jeunes n'appartient pas au conseiller", () => {
+      describe("quand un des jeunes n'est pas lié a la bonne agence", () => {
         it('rejette', () => {
           // Given
           const infosRdv: InfosRendezVousACreer = {
@@ -162,7 +162,8 @@ describe('Rendez-vous', () => {
               id: 'un-autre-conseiller',
               firstName: 'un',
               lastName: 'autre',
-              email: 'conseiller'
+              email: 'conseiller',
+              idAgence: 'plop'
             }
           })
 
@@ -176,10 +177,7 @@ describe('Rendez-vous', () => {
           // Then
           expect(result).to.deep.equal(
             failure(
-              new JeuneNonLieAuConseillerError(
-                conseiller.id,
-                unJeuneDunAutreConseiller.id
-              )
+              new JeuneNonLieALAgenceError(unJeuneDunAutreConseiller.id, 'test')
             )
           )
         })
