@@ -9091,7 +9091,7 @@ __metadata:
     prettier: ^2.7.1
     redis: ^4.3.0
     reflect-metadata: ^0.1.13
-    remove-accents: 0.4.3
+    remove-accents: 0.4.4
     rimraf: 3.0.2
     rxjs: 7.5.7
     sequelize: 6.25.8
@@ -10644,10 +10644,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remove-accents@npm:0.4.3":
-  version: 0.4.3
-  resolution: "remove-accents@npm:0.4.3"
-  checksum: ab0e8fb5e20da63735f1956927b64040c62d70f811fcaba0233b0923c9a0532436ddcacb4d7a4a0780f6759372954be2db8287a1be6dafc4a305f4ea23092597
+"remove-accents@npm:0.4.4":
+  version: 0.4.4
+  resolution: "remove-accents@npm:0.4.4"
+  checksum: 0219a20550f8e6d7ebb47993fc08633c9c10b171d573467671641178de7a00b47ffcdbbf3be323a22c45de8903ac869cc4707dfc5aa5f25b7711e0c9b4daf4f4
   languageName: node
   linkType: hard
 
