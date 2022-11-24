@@ -35,6 +35,7 @@ describe('SuggestionSqlRepository', () => {
       localisation: 'Lille',
       metier: 'Boulanger'
     },
+    idRecherche: undefined,
     criteres: {
       q: 'Petrisseur',
       commune: '59220',

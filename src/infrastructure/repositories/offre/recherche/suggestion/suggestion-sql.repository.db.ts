@@ -75,6 +75,7 @@ function fromSqlToSuggestion(suggestionSql: SuggestionSqlModel): Suggestion {
     dateCreationRecherche: suggestionSql.dateCreationRecherche
       ? DateTime.fromJSDate(suggestionSql.dateCreationRecherche)
       : undefined,
+    idRecherche: suggestionSql.idRecherche ?? undefined,
     criteres: suggestionSql.criteres ?? undefined,
     informations: {
       titre: suggestionSql.titre,
