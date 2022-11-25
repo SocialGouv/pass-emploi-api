@@ -26,6 +26,8 @@ export namespace Evenement {
     ACTION_COMMENTEE = 'ACTION_COMMENTEE',
     ACTION_QUALIFIEE_SNP = 'ACTION_QUALIFIEE_SNP',
     ACTION_QUALIFIEE_NON_SNP = 'ACTION_QUALIFIEE_NON_SNP',
+    ANIMATION_COLLECTIVE_AFFICHEE = 'ANIMATION_COLLECTIVE_AFFICHEE',
+    ANIMATION_COLLECTIVE_PARTAGEE = 'ANIMATION_COLLECTIVE_PARTAGEE',
     COMPTE_SUPPRIME = 'COMPTE_SUPPRIME',
     COMPTE_ARCHIVE = 'COMPTE_ARCHIVE',
     MESSAGE_ENVOYE = 'MESSAGE_ENVOYE',
@@ -143,6 +145,16 @@ const evenements: {
     categorie: 'Action',
     action: 'Qualifier',
     nom: 'Non SNP'
+  },
+  [Evenement.Code.ANIMATION_COLLECTIVE_AFFICHEE]: {
+    categorie: 'Rendez-vous',
+    action: 'Consultation',
+    nom: 'Animation collective'
+  },
+  [Evenement.Code.ANIMATION_COLLECTIVE_PARTAGEE]: {
+    categorie: 'Rendez-vous',
+    action: 'Partage',
+    nom: 'Animation collective'
   },
   [Evenement.Code.COMPTE_SUPPRIME]: {
     categorie: 'Compte',
