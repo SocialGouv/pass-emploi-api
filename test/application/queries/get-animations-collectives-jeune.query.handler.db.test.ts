@@ -13,15 +13,15 @@ import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model
 import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
 import { unEtablissementDto } from '../../fixtures/sql-models/etablissement.sq-model'
 import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
-import { DateTime } from 'luxon'
 import { AnimationCollectiveJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { uneAutreDate, uneDate } from '../../fixtures/date.fixture'
+import { uneDatetime } from '../../fixtures/date.fixture'
 
 describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
   DatabaseForTesting.prepare()
   let getAnimationsCollectivesJeuneQueryHandler: GetAnimationsCollectivesJeuneQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
+  const maintenant = uneDatetime()
 
   beforeEach(() => {
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
@@ -34,7 +34,7 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
       // Given
       const query = {
         idJeune: 'un-id-jeune',
-        maintenant: DateTime.fromISO('2022-11-21T16:14:00Z')
+        maintenant
       }
       const utilisateur = unUtilisateurJeune({ id: query.idJeune })
 
@@ -52,8 +52,6 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
     })
   })
   describe('handle', () => {
-    const maintenant = DateTime.fromISO('2022-11-21T16:30:00Z')
-
     describe('quand le jeune est lié à une agence', () => {
       const etablissementDuConseillerDto = unEtablissementDto({
         id: 'agence-du-conseiller'
@@ -70,13 +68,13 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
       })
 
       const acAgenceConseillerDto = unRendezVousDto({
-        date: uneDate(),
+        date: maintenant.plus({ day: 1 }).toJSDate(),
         type: CodeTypeRendezVous.ATELIER,
         idAgence: etablissementDuConseillerDto.id
       })
 
       const acAutreAgenceDto = unRendezVousDto({
-        date: uneAutreDate(),
+        date: maintenant.plus({ day: 2 }).toJSDate(),
         type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
         idAgence: unAutreEtablissementDto.id
       })
@@ -213,12 +211,12 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
         await JeuneSqlModel.creer(jeuneDto)
 
         const animationCollective = unRendezVousDto({
-          date: uneDate(),
+          date: maintenant.plus({ day: 1 }).toJSDate(),
           type: CodeTypeRendezVous.ATELIER,
           idAgence: etablissementDto.id
         })
         const autreAnimationCollective = unRendezVousDto({
-          date: uneAutreDate(),
+          date: maintenant.plus({ day: 2 }).toJSDate(),
           type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
           idAgence: etablissementDto.id
         })
