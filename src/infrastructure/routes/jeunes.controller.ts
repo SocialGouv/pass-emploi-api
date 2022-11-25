@@ -10,8 +10,7 @@ import {
   Param,
   Post,
   Put,
-  Query,
-  Res
+  Query
 } from '@nestjs/common'
 import {
   ApiHeader,
@@ -20,7 +19,6 @@ import {
   ApiResponse,
   ApiTags
 } from '@nestjs/swagger'
-import { Response } from 'express'
 import { ArchiverJeuneCommandHandler } from '../../application/commands/archiver-jeune.command.handler'
 import {
   CreateDemarcheCommand,
@@ -36,8 +34,7 @@ import { GetDetailJeuneQueryHandler } from '../../application/queries/get-detail
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import {
   JeuneHomeActionQueryModel,
-  JeuneHomeDemarcheQueryModel,
-  JeuneHomeQueryModel
+  JeuneHomeDemarcheQueryModel
 } from '../../application/queries/query-models/home-jeune.query-model'
 import {
   DetailJeuneQueryModel,
@@ -58,10 +55,7 @@ import {
 } from '../../application/commands/update-demarche.command.handler'
 import { UpdateJeuneConfigurationApplicationCommandHandler } from '../../application/commands/update-jeune-configuration-application.command.handler'
 import { UpdateJeunePreferencesCommandHandler } from '../../application/commands/update-preferences-jeune.command.handler'
-import {
-  GetActionsByJeuneQuery,
-  GetActionsByJeuneQueryHandler
-} from '../../application/queries/get-actions-by-jeune.query.handler.db'
+import { GetActionsByJeuneQueryHandler } from '../../application/queries/get-actions-by-jeune.query.handler.db'
 import { GetConseillersJeuneQueryHandler } from '../../application/queries/get-conseillers-jeune.query.handler.db'
 import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
 import { GetJeuneHomeActionsQueryHandler } from '../../application/queries/get-jeune-home-actions.query.handler'
@@ -71,10 +65,7 @@ import {
   GetPreferencesJeuneQueryHandler
 } from '../../application/queries/get-preferences-jeune.handler.db'
 import { GetRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler.db'
-import {
-  ActionQueryModel,
-  DemarcheQueryModel
-} from '../../application/queries/query-models/actions.query-model'
+import { DemarcheQueryModel } from '../../application/queries/query-models/actions.query-model'
 import {
   isFailure,
   isSuccess,
@@ -91,7 +82,6 @@ import {
 } from './validation/demarches.inputs'
 import {
   ArchiverJeunePayload,
-  GetActionsByJeuneQueryParams,
   GetJeuneHomeSuiviQueryParams,
   GetRendezVousJeuneQueryParams,
   PutNotificationTokenInput,
@@ -178,46 +168,6 @@ export class JeunesController {
     throw handleFailure(result)
   }
 
-  @ApiOperation({
-    summary: 'Deprecated (Mobile V1.8)',
-    deprecated: true
-  })
-  @ApiHeader({
-    name: 'x-appversion',
-    required: false
-  })
-  @ApiHeader({
-    name: 'x-installationid',
-    required: false
-  })
-  @ApiHeader({
-    name: 'x-instanceid',
-    required: false
-  })
-  @Put(':idJeune/push-notification-token')
-  async updateNotificationToken(
-    @Param('idJeune') idJeune: string,
-    @Body() putNotificationTokenInput: PutNotificationTokenInput,
-    @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @Headers('x-appversion') appVersion?: string,
-    @Headers('x-installationid') installationId?: string,
-    @Headers('x-instanceid') instanceId?: string
-  ): Promise<void> {
-    const result =
-      await this.updateJeuneConfigurationApplicationCommandHandler.execute(
-        {
-          idJeune,
-          pushNotificationToken: putNotificationTokenInput.registration_token,
-          appVersion,
-          installationId,
-          instanceId
-        },
-        utilisateur
-      )
-
-    handleFailure(result)
-  }
-
   @ApiHeader({
     name: 'x-appversion',
     required: false
@@ -252,68 +202,6 @@ export class JeunesController {
       )
 
     handleFailure(result)
-  }
-
-  @ApiOperation({
-    summary: 'Deprecated (Mobile V1.2)',
-    deprecated: true
-  })
-  @Get(':idJeune/home')
-  async getHome(
-    @Param('idJeune') idJeune: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<JeuneHomeQueryModel> {
-    return this.getHomeJeuneHandler.execute({ idJeune }, utilisateur)
-  }
-
-  @ApiOperation({
-    summary: 'Deprecated (Mobile)',
-    deprecated: true
-  })
-  @Get(':idJeune/actions')
-  @ApiResponse({
-    type: ActionQueryModel,
-    isArray: true
-  })
-  async getActions(
-    @Res() response: Response,
-    @Param('idJeune') idJeune: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @Query() getActionsByJeuneQueryParams: GetActionsByJeuneQueryParams
-  ): Promise<Response<ActionQueryModel[]>> {
-    const query: GetActionsByJeuneQuery = {
-      idJeune,
-      page: getActionsByJeuneQueryParams.page,
-      tri: getActionsByJeuneQueryParams.tri,
-      statuts: getActionsByJeuneQueryParams.statuts
-    }
-
-    const result = await this.getActionsByJeuneQueryHandler.execute(
-      query,
-      utilisateur
-    )
-
-    if (isSuccess(result)) {
-      const leResultatEstPagine = Boolean(query.page)
-      const statusCode = leResultatEstPagine
-        ? HttpStatus.PARTIAL_CONTENT
-        : HttpStatus.OK
-
-      return response
-        .set({
-          'x-total-count': result.data.metadonnees.nombreTotal,
-          'x-statut-in_progress-count': result.data.metadonnees.nombreEnCours,
-          'x-statut-done-count': result.data.metadonnees.nombreTerminees,
-          'x-statut-canceled-count': result.data.metadonnees.nombreAnnulees,
-          'x-statut-not_started-count':
-            result.data.metadonnees.nombrePasCommencees,
-          'x-page-size': result.data.metadonnees.nombreActionsParPage
-        })
-        .status(statusCode)
-        .json(result.data.actions)
-    }
-
-    throw handleFailure(result)
   }
 
   @Get(':idJeune/home/actions')
@@ -461,33 +349,6 @@ export class JeunesController {
 
     if (isSuccess(result)) {
       return toDemarcheQueryModel(result.data)
-    }
-    throw handleFailure(result)
-  }
-
-  @ApiOperation({
-    summary: 'Deprecated (Mobile V1.6)',
-    deprecated: true
-  })
-  @Get(':idJeune/pole-emploi/actions')
-  @ApiResponse({
-    type: DemarcheQueryModel,
-    isArray: true
-  })
-  async getActionsPoleEmploi(
-    @Param('idJeune') idJeune: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur,
-    @AccessToken() accessToken: string
-  ): Promise<DemarcheQueryModel[]> {
-    const result = await this.getDemarchesQueryHandler.execute(
-      {
-        idJeune,
-        accessToken
-      },
-      utilisateur
-    )
-    if (isSuccess(result)) {
-      return result.data
     }
     throw handleFailure(result)
   }

@@ -26,10 +26,7 @@ import { uneDemarche } from 'test/fixtures/demarche.fixture'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
 import { DeleteJeuneInactifCommandHandler } from '../../../src/application/commands/delete-jeune-inactif.command.handler'
 import { UpdateJeunePreferencesCommandHandler } from '../../../src/application/commands/update-preferences-jeune.command.handler'
-import {
-  ActionsByJeuneOutput,
-  GetActionsByJeuneQueryHandler
-} from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
+import { GetActionsByJeuneQueryHandler } from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
 import { GetDemarchesQueryHandler } from '../../../src/application/queries/get-demarches.query.handler'
 import { GetConseillersJeuneQueryHandler } from '../../../src/application/queries/get-conseillers-jeune.query.handler.db'
 import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler.db'
@@ -82,7 +79,6 @@ import {
 import { uneActionQueryModelSansJeune } from '../../fixtures/query-models/action.query-model.fixtures'
 import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../../src/application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
 import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
-import StatutInvalide = Action.StatutInvalide
 import { DateTime } from 'luxon'
 
 describe('JeunesController', () => {
@@ -448,7 +444,7 @@ describe('JeunesController', () => {
     })
 
     it('renvoie une 400 (Bad Request) quand le statut est incorrect', async () => {
-      const echec = failure(new StatutInvalide('whatever_status'))
+      const echec = failure(new Action.StatutInvalide('whatever_status'))
       createActionCommandHandler.execute.resolves(echec)
 
       await request(app.getHttpServer())
@@ -890,48 +886,6 @@ describe('JeunesController', () => {
     ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/rendezvous')
   })
 
-  describe('GET /jeunes/:idJeune/pole-emploi/actions', () => {
-    const idJeune = '1'
-    it('renvoit une 404 quand le jeune n"existe pas', async () => {
-      // Given
-      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
-      getActionsPoleEmploiQueryHandler.execute.resolves(
-        failure(new NonTrouveError('Jeune', '1'))
-      )
-      // When
-      await request(app.getHttpServer())
-        .get(`/jeunes/${idJeune}/pole-emploi/actions`)
-        .set('authorization', unHeaderAuthorization())
-        // Then
-        .expect(HttpStatus.NOT_FOUND)
-    })
-    it('retourne les démarches', async () => {
-      // Given
-      const demarche = uneDemarcheQueryModel()
-      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
-      getActionsPoleEmploiQueryHandler.execute.resolves(success([demarche]))
-
-      // When
-      await request(app.getHttpServer())
-        .get(`/jeunes/${idJeune}/pole-emploi/actions`)
-        .set('authorization', unHeaderAuthorization())
-        // Then
-        .expect([
-          {
-            ...demarche,
-            dateCreation: demarche.dateCreation,
-            dateDebut: demarche.dateDebut,
-            dateFin: demarche.dateFin,
-            dateModification: demarche.dateModification
-          }
-        ])
-    })
-    ensureUserAuthenticationFailsIfInvalid(
-      'get',
-      '/jeunes/1/pole-emploi/actions'
-    )
-  })
-
   describe('GET /jeunes/:idJeune/home/actions', () => {
     const idJeune = '1'
     it('retourne la home action du jeune', async () => {
@@ -1303,154 +1257,6 @@ describe('JeunesController', () => {
     ensureUserAuthenticationFailsIfInvalid('post', '/jeunes/1/demarches')
   })
 
-  describe('GET /jeunes/:idJeune/actions', () => {
-    const idJeune = '1'
-    it('renvoie 206 quand la page est renseignée', async () => {
-      // Given
-      const queryActions = {
-        idJeune: idJeune,
-        page: 1,
-        tri: 'date_croissante',
-        statuts: ['done']
-      }
-      const actionsByJeuneOutput: ActionsByJeuneOutput = {
-        actions: [],
-        metadonnees: {
-          nombreTotal: 0,
-          nombreEnCours: 0,
-          nombreTerminees: 0,
-          nombreAnnulees: 0,
-          nombrePasCommencees: 0,
-          nombreNonQualifiables: 0,
-          nombreAQualifier: 0,
-          nombreQualifiees: 0,
-          nombreActionsParPage: 10
-        }
-      }
-      const expectedActions = success(actionsByJeuneOutput)
-      getActionsByJeuneQueryHandler.execute.resolves(expectedActions)
-      // When
-      await request(app.getHttpServer())
-        .get(`/jeunes/${idJeune}/actions`)
-        .set('authorization', unHeaderAuthorization())
-        .query(queryActions)
-        // Then
-        .expect(HttpStatus.PARTIAL_CONTENT)
-        .expect(expectedActions.data.actions)
-    })
-    it("retourne 200 avec toutes les actions si la page n'est pas renseignée", async () => {
-      // Given
-      const queryActions = {
-        idJeune: idJeune
-      }
-      const actionsByJeuneOutput: ActionsByJeuneOutput = {
-        actions: [],
-        metadonnees: {
-          nombreTotal: 1,
-          nombreEnCours: 2,
-          nombreTerminees: 3,
-          nombreAnnulees: 4,
-          nombrePasCommencees: 5,
-          nombreNonQualifiables: 6,
-          nombreAQualifier: 7,
-          nombreQualifiees: 8,
-          nombreActionsParPage: 10
-        }
-      }
-      const expectedActions = success(actionsByJeuneOutput)
-      getActionsByJeuneQueryHandler.execute.resolves(expectedActions)
-      // When
-      await request(app.getHttpServer())
-        .get(`/jeunes/${idJeune}/actions`)
-        .set('authorization', unHeaderAuthorization())
-        .query(queryActions)
-        // Then
-        .expect(HttpStatus.OK)
-        .expect(expectedActions.data.actions)
-        .expect(
-          'x-total-count',
-          expectedActions.data.metadonnees.nombreTotal.toString()
-        )
-        .expect(
-          'x-statut-in_progress-count',
-          expectedActions.data.metadonnees.nombreEnCours.toString()
-        )
-        .expect(
-          'x-statut-done-count',
-          expectedActions.data.metadonnees.nombreTerminees.toString()
-        )
-        .expect(
-          'x-statut-canceled-count',
-          expectedActions.data.metadonnees.nombreAnnulees.toString()
-        )
-        .expect(
-          'x-statut-not_started-count',
-          expectedActions.data.metadonnees.nombrePasCommencees.toString()
-        )
-        .expect(
-          'x-page-size',
-          expectedActions.data.metadonnees.nombreActionsParPage.toString()
-        )
-    })
-    it('retourne 400 quand le paramètre page est au mauvais format', async () => {
-      // Given
-      const queryActions = {
-        idJeune: idJeune,
-        page: 'poi'
-      }
-      // When
-      await request(app.getHttpServer())
-        .get(`/jeunes/${idJeune}/actions`)
-        .set('authorization', unHeaderAuthorization())
-        .query(queryActions)
-        // Then
-        .expect(HttpStatus.BAD_REQUEST)
-    })
-    it('retourne 404 quand une failure non trouvé se produit', async () => {
-      // Given
-      const queryActions = {
-        idJeune: idJeune,
-        page: 2
-      }
-      getActionsByJeuneQueryHandler.execute.resolves(
-        failure(new NonTrouveError('test'))
-      )
-      // When
-      await request(app.getHttpServer())
-        .get(`/jeunes/${idJeune}/actions`)
-        .set('authorization', unHeaderAuthorization())
-        .query(queryActions)
-        // Then
-        .expect(HttpStatus.NOT_FOUND)
-    })
-    it('retourne 400 quand le paramètre tri est au mauvais format', async () => {
-      // Given
-      const queryActions = {
-        tri: 'atchoum'
-      }
-      // When
-      await request(app.getHttpServer())
-        .get(`/jeunes/${idJeune}/actions`)
-        .set('authorization', unHeaderAuthorization())
-        .query(queryActions)
-        // Then
-        .expect(HttpStatus.BAD_REQUEST)
-    })
-    it('retourne 400 quand le paramètre statuts est au mauvais format', async () => {
-      // Given
-      const queryActions = {
-        statuts: ['à tes souhaits']
-      }
-      // When
-      await request(app.getHttpServer())
-        .get(`/jeunes/${idJeune}/actions`)
-        .set('authorization', unHeaderAuthorization())
-        .query(queryActions)
-        // Then
-        .expect(HttpStatus.BAD_REQUEST)
-    })
-  })
-
   describe('PUT /jeunes/:idJeune/configuration-application', () => {
     const idJeune = '1'
     const payload: PutNotificationTokenInput = {
@@ -1514,73 +1320,6 @@ describe('JeunesController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'put',
       '/jeunes/1/configuration-application'
-    )
-  })
-
-  describe('PUT /jeunes/:idJeune/push-notification-token', () => {
-    const idJeune = '1'
-    const payload: PutNotificationTokenInput = {
-      registration_token: 'token'
-    }
-
-    describe("quand c'est en succès", () => {
-      it("met à jour le token, la version de l'app et l'installation id", async () => {
-        // Given
-        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
-        updateJeuneConfigurationApplicationCommandHandler.execute
-          .withArgs(
-            {
-              idJeune,
-              pushNotificationToken: payload.registration_token,
-              appVersion: 'coucou',
-              installationId: 'xxx-xx-xxx',
-              instanceId: 'yyy-yy-yyy'
-            },
-            unUtilisateurDecode()
-          )
-          .resolves(emptySuccess())
-
-        // When
-        await request(app.getHttpServer())
-          .put(`/jeunes/${idJeune}/push-notification-token`)
-          .set('authorization', unHeaderAuthorization())
-          .set('x-appversion', 'coucou')
-          .set('x-installationid', 'xxx-xx-xxx')
-          .set('x-instanceid', 'yyy-yy-yyy')
-
-          .send(payload)
-          // Then
-          .expect(HttpStatus.OK)
-      })
-      it("met à jour le token sans version de l'app", async () => {
-        // Given
-        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
-        updateJeuneConfigurationApplicationCommandHandler.execute
-          .withArgs(
-            {
-              idJeune,
-              pushNotificationToken: payload.registration_token,
-              appVersion: undefined,
-              installationId: undefined,
-              instanceId: undefined
-            },
-            unUtilisateurDecode()
-          )
-          .resolves(emptySuccess())
-
-        // When
-        await request(app.getHttpServer())
-          .put(`/jeunes/${idJeune}/push-notification-token`)
-          .set('authorization', unHeaderAuthorization())
-          .send(payload)
-          // Then
-          .expect(HttpStatus.OK)
-      })
-    })
-
-    ensureUserAuthenticationFailsIfInvalid(
-      'put',
-      '/jeunes/1/push-notification-token'
     )
   })
 
