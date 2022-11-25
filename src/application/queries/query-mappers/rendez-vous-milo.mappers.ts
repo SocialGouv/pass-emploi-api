@@ -5,7 +5,7 @@ import {
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import {
-  AnimationCollectiveJeuneQueryModel,
+  RendezVousJeuneDetailQueryModel,
   AnimationCollectiveQueryModel,
   RendezVousConseillerDetailQueryModel,
   RendezVousConseillerQueryModel,
@@ -42,10 +42,10 @@ export function fromSqlToRendezVousJeuneQueryModel(
   }
 }
 
-export function fromSqlToAnimationCollectiveJeuneQueryModel(
+export function fromSqlToRendezVousDetailJeuneQueryModel(
   rendezVousSql: RendezVousSqlModel,
   jeuneId: string
-): AnimationCollectiveJeuneQueryModel {
+): RendezVousJeuneDetailQueryModel {
   return {
     id: rendezVousSql.id,
     comment: rendezVousSql.commentaire ?? undefined,

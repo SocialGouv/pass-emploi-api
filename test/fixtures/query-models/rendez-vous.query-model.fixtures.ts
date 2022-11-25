@@ -1,5 +1,9 @@
 import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
-import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
+import {
+  RendezVousJeuneDetailQueryModel,
+  RendezVousJeuneQueryModel
+} from '../../../src/application/queries/query-models/rendez-vous.query-model'
+import { uneDate } from '../date.fixture'
 
 export function unRendezVousQueryModel(
   args: Partial<RendezVousJeuneQueryModel> = {}
@@ -31,6 +35,34 @@ export function unRendezVousQueryModel(
       code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
       label: 'Entretien individuel conseiller'
     }
+  }
+
+  return { ...defaults, ...args }
+}
+
+export const unRendezVousJeuneDetailQueryModel = (
+  args: Partial<RendezVousJeuneDetailQueryModel> = {}
+): RendezVousJeuneDetailQueryModel => {
+  const defaults: RendezVousJeuneDetailQueryModel = {
+    id: 'id',
+    title: 'titre',
+    modality: 'en voiture',
+    date: uneDate(),
+    duration: 30,
+    type: { code: CodeTypeRendezVous.ATELIER, label: 'Atelier' },
+    isLocaleDate: false,
+    estInscrit: false,
+    organisme: undefined,
+    precision: undefined,
+    presenceConseiller: true,
+    invitation: false,
+    createur: {
+      id: '1',
+      nom: 'Tavernier',
+      prenom: 'Nils'
+    },
+    comment: 'commentaire',
+    adresse: undefined
   }
 
   return { ...defaults, ...args }

@@ -42,7 +42,7 @@ import {
   PreferencesJeuneQueryModel
 } from '../../application/queries/query-models/jeunes.query-model'
 import {
-  AnimationCollectiveJeuneQueryModel,
+  RendezVousJeuneDetailQueryModel,
   RendezVousJeuneQueryModel
 } from '../../application/queries/query-models/rendez-vous.query-model'
 import { Core } from '../../domain/core'
@@ -104,6 +104,7 @@ import {
   GetAnimationsCollectivesJeuneQuery,
   GetAnimationsCollectivesJeuneQueryHandler
 } from '../../application/queries/get-animations-collectives-jeune.query.handler.db'
+import { GetUnRendezVousJeuneQueryHandler } from '../../application/queries/get-un-rendez-vous-jeune.query.handler.db'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -132,7 +133,8 @@ export class JeunesController {
     private readonly createDemarcheCommandHandler: CreateDemarcheCommandHandler,
     private readonly updateJeunePreferencesCommandHandler: UpdateJeunePreferencesCommandHandler,
     private readonly getPreferencesJeuneQueryHandler: GetPreferencesJeuneQueryHandler,
-    private readonly getAnimationsCollectivesJeuneQueryHandler: GetAnimationsCollectivesJeuneQueryHandler
+    private readonly getAnimationsCollectivesJeuneQueryHandler: GetAnimationsCollectivesJeuneQueryHandler,
+    private readonly getUnRendezVousJeuneQueryHandler: GetUnRendezVousJeuneQueryHandler
   ) {}
 
   @Get(':idJeune')
@@ -399,6 +401,26 @@ export class JeunesController {
     throw handleFailure(result)
   }
 
+  @Get(':idJeune/rendezvous/:idRendezVous')
+  @ApiResponse({
+    type: RendezVousJeuneDetailQueryModel
+  })
+  async getDetailRendezVous(
+    @Param('idJeune') idJeune: string,
+    @Param('idRendezVous') idRendezVous: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<RendezVousJeuneDetailQueryModel> {
+    const result = await this.getUnRendezVousJeuneQueryHandler.execute(
+      { idRendezVous, idJeune },
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
+  }
+
   @Post(':idJeune/action')
   async postNouvelleAction(
     @Param('idJeune') idJeune: string,
@@ -557,7 +579,7 @@ export class JeunesController {
     @Param('idJeune') idJeune: string,
     @Query() queryParams: GetAnimationsCollectivesJeuneQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<AnimationCollectiveJeuneQueryModel[]> {
+  ): Promise<RendezVousJeuneDetailQueryModel[]> {
     const maintenant = DateTime.fromISO(queryParams.maintenant, {
       setZone: true
     })

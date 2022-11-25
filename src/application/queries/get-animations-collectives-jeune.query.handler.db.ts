@@ -1,6 +1,6 @@
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result, success } from '../../building-blocks/types/result'
-import { AnimationCollectiveJeuneQueryModel } from './query-models/rendez-vous.query-model'
+import { RendezVousJeuneDetailQueryModel } from './query-models/rendez-vous.query-model'
 import { Query } from '../../building-blocks/types/query'
 import { Authentification } from '../../domain/authentification'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
@@ -9,7 +9,7 @@ import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez
 import { Op, Sequelize } from 'sequelize'
 import { CodeTypeRendezVous } from '../../domain/rendez-vous/rendez-vous'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
-import { fromSqlToAnimationCollectiveJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
+import { fromSqlToRendezVousDetailJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { Injectable } from '@nestjs/common'
 
 export interface GetAnimationsCollectivesJeuneQuery extends Query {
@@ -20,7 +20,7 @@ export interface GetAnimationsCollectivesJeuneQuery extends Query {
 @Injectable()
 export class GetAnimationsCollectivesJeuneQueryHandler extends QueryHandler<
   GetAnimationsCollectivesJeuneQuery,
-  Result<AnimationCollectiveJeuneQueryModel[]>
+  Result<RendezVousJeuneDetailQueryModel[]>
 > {
   constructor(private jeuneAuthorizer: JeuneAuthorizer) {
     super('GetAnimationsCollectivesJeuneQueryHandlerQueryHandler')
@@ -35,7 +35,7 @@ export class GetAnimationsCollectivesJeuneQueryHandler extends QueryHandler<
 
   async handle(
     query: GetAnimationsCollectivesJeuneQuery
-  ): Promise<Result<AnimationCollectiveJeuneQueryModel[]>> {
+  ): Promise<Result<RendezVousJeuneDetailQueryModel[]>> {
     const rendezVousSql = await RendezVousSqlModel.findAll({
       include: [
         {
@@ -70,10 +70,7 @@ export class GetAnimationsCollectivesJeuneQueryHandler extends QueryHandler<
 
     return success(
       rendezVousSql.map(rdvSql => {
-        return fromSqlToAnimationCollectiveJeuneQueryModel(
-          rdvSql,
-          query.idJeune
-        )
+        return fromSqlToRendezVousDetailJeuneQueryModel(rdvSql, query.idJeune)
       })
     )
   }

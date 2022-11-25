@@ -81,6 +81,8 @@ import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../../src/applicati
 import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 import { DateTime } from 'luxon'
 import { GetAnimationsCollectivesJeuneQueryHandler } from '../../../src/application/queries/get-animations-collectives-jeune.query.handler.db'
+import { GetUnRendezVousJeuneQueryHandler } from '../../../src/application/queries/get-un-rendez-vous-jeune.query.handler.db'
+import { unRendezVousJeuneDetailQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -104,6 +106,7 @@ describe('JeunesController', () => {
   let updateJeunePreferencesCommandHandler: StubbedClass<UpdateJeunePreferencesCommandHandler>
   let getPreferencesJeuneQueryHandler: StubbedClass<GetPreferencesJeuneQueryHandler>
   let getAnimationsCollectivesJeuneQueryHandler: StubbedClass<GetAnimationsCollectivesJeuneQueryHandler>
+  let getUnRendezVousJeuneQueryHandler: StubbedClass<GetUnRendezVousJeuneQueryHandler>
   let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
@@ -152,6 +155,9 @@ describe('JeunesController', () => {
     getAnimationsCollectivesJeuneQueryHandler = stubClass(
       GetAnimationsCollectivesJeuneQueryHandler
     )
+    getUnRendezVousJeuneQueryHandler = stubClass(
+      GetUnRendezVousJeuneQueryHandler
+    )
 
     dateService = stubClass(DateService)
     dateService.now.returns(now)
@@ -199,6 +205,8 @@ describe('JeunesController', () => {
       .useValue(getJeuneHomeAgendaPoleEmploiQueryHandler)
       .overrideProvider(GetAnimationsCollectivesJeuneQueryHandler)
       .useValue(getAnimationsCollectivesJeuneQueryHandler)
+      .overrideProvider(GetUnRendezVousJeuneQueryHandler)
+      .useValue(getUnRendezVousJeuneQueryHandler)
       .overrideProvider(JwtService)
       .useValue(jwtService)
       .overrideProvider(DateService)
@@ -890,6 +898,41 @@ describe('JeunesController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/rendezvous')
+  })
+
+  describe('GET /jeunes/:idJeune/rendez-vous/:idRendezVous', () => {
+    const idJeune = '1'
+    const idRendezVous = '2'
+    const queryModel = unRendezVousJeuneDetailQueryModel()
+
+    it('renvoit une 404 quand le rendez vous n"existe pas', async () => {
+      // Given
+      getUnRendezVousJeuneQueryHandler.execute.resolves(
+        failure(new NonTrouveError('RendezVous', idRendezVous))
+      )
+      // When
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/rendezvous/${idRendezVous}`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.NOT_FOUND)
+    })
+    it('retourne le rendez vous', async () => {
+      // Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+      getUnRendezVousJeuneQueryHandler.execute
+        .withArgs({ idJeune, idRendezVous }, unUtilisateurDecode())
+        .resolves(success(queryModel))
+
+      // When - Then
+      await request(app.getHttpServer())
+        .get(`/jeunes/${idJeune}/rendezvous/${idRendezVous}`)
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect(JSON.stringify(queryModel))
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('get', '/jeunes/1/rendezvous/2')
   })
 
   describe('GET /jeunes/:idJeune/home/actions', () => {

@@ -194,7 +194,7 @@ export class RendezVousConseillerDetailQueryModel extends RendezVousConseillerQu
   historique?: LogModificationRendezVousQueryModel[]
 }
 
-export class AnimationCollectiveJeuneQueryModel extends RendezVousJeuneQueryModel {
+export class RendezVousJeuneDetailQueryModel extends RendezVousJeuneQueryModel {
   @ApiProperty()
   estInscrit: boolean
 }

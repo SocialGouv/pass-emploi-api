@@ -1,6 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Conseiller, ConseillersRepositoryToken } from 'src/domain/conseiller'
-import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
+import {
+  DroitsInsuffisants,
+  NonTrouveError
+} from '../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -11,6 +14,7 @@ import {
   RendezVous,
   RendezVousRepositoryToken
 } from '../../domain/rendez-vous/rendez-vous'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 
 @Injectable()
 export class RendezVousAuthorizer {
@@ -18,7 +22,9 @@ export class RendezVousAuthorizer {
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
     @Inject(ConseillersRepositoryToken)
-    private conseillerRepository: Conseiller.Repository
+    private conseillerRepository: Conseiller.Repository,
+    @Inject(JeunesRepositoryToken)
+    private jeuneRepository: Jeune.Repository
   ) {}
 
   async authorize(
@@ -27,11 +33,11 @@ export class RendezVousAuthorizer {
   ): Promise<Result> {
     const rendezVous = await this.rendezVousRepository.get(idRendezVous)
 
-    if (
-      rendezVous &&
-      utilisateur &&
-      utilisateur.type === Authentification.Type.CONSEILLER
-    ) {
+    if (!rendezVous) {
+      return failure(new NonTrouveError('RendezVous', idRendezVous))
+    }
+
+    if (utilisateur && utilisateur.type === Authentification.Type.CONSEILLER) {
       if (RendezVous.estUnTypeAnimationCollective(rendezVous.type)) {
         const conseiller = await this.conseillerRepository.get(utilisateur.id)
 
@@ -45,6 +51,22 @@ export class RendezVousAuthorizer {
       } else if (
         rendezVous.jeunes.find(jeune => utilisateur.id === jeune.conseiller?.id)
       ) {
+        return emptySuccess()
+      }
+    }
+
+    if (utilisateur.type === Authentification.Type.JEUNE) {
+      if (RendezVous.estUnTypeAnimationCollective(rendezVous.type)) {
+        const jeune = await this.jeuneRepository.get(utilisateur.id)
+
+        if (
+          jeune &&
+          rendezVous.idAgence &&
+          rendezVous.idAgence === jeune.conseiller?.idAgence
+        ) {
+          return emptySuccess()
+        }
+      } else if (rendezVous.jeunes.find(jeune => utilisateur.id === jeune.id)) {
         return emptySuccess()
       }
     }
