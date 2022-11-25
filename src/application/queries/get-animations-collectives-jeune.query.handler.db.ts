@@ -10,12 +10,14 @@ import { Op, Sequelize } from 'sequelize'
 import { CodeTypeRendezVous } from '../../domain/rendez-vous/rendez-vous'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { fromSqlToAnimationCollectiveJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
+import { Injectable } from '@nestjs/common'
 
 export interface GetAnimationsCollectivesJeuneQuery extends Query {
   idJeune: string
   maintenant: DateTime
 }
 
+@Injectable()
 export class GetAnimationsCollectivesJeuneQueryHandler extends QueryHandler<
   GetAnimationsCollectivesJeuneQuery,
   Result<AnimationCollectiveJeuneQueryModel[]>
@@ -55,6 +57,9 @@ export class GetAnimationsCollectivesJeuneQueryHandler extends QueryHandler<
         },
         dateSuppression: {
           [Op.is]: null
+        },
+        date: {
+          [Op.gte]: query.maintenant.toJSDate()
         }
       },
       order: [['date', 'ASC']],
