@@ -13,7 +13,7 @@ import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model
 import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
 import { unEtablissementDto } from '../../fixtures/sql-models/etablissement.sq-model'
 import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
-import { AnimationCollectiveJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
+import { RendezVousJeuneDetailQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { uneDatetime } from '../../fixtures/date.fixture'
 
@@ -120,28 +120,27 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
           )
 
           // Then
-          const expectedAnimationCollective: AnimationCollectiveJeuneQueryModel =
-            {
-              id: acAgenceConseillerDto.id,
-              title: acAgenceConseillerDto.titre,
-              modality: acAgenceConseillerDto.modalite!,
-              date: acAgenceConseillerDto.date,
-              duration: acAgenceConseillerDto.duree,
-              type: { code: acAgenceConseillerDto.type, label: 'Atelier' },
-              isLocaleDate: false,
-              estInscrit: true,
-              organisme: undefined,
-              precision: undefined,
-              presenceConseiller: true,
-              invitation: false,
-              createur: {
-                id: '1',
-                nom: 'Tavernier',
-                prenom: 'Nils'
-              },
-              comment: 'commentaire',
-              adresse: undefined
-            }
+          const expectedAnimationCollective: RendezVousJeuneDetailQueryModel = {
+            id: acAgenceConseillerDto.id,
+            title: acAgenceConseillerDto.titre,
+            modality: acAgenceConseillerDto.modalite!,
+            date: acAgenceConseillerDto.date,
+            duration: acAgenceConseillerDto.duree,
+            type: { code: acAgenceConseillerDto.type, label: 'Atelier' },
+            isLocaleDate: false,
+            estInscrit: true,
+            organisme: undefined,
+            precision: undefined,
+            presenceConseiller: true,
+            invitation: false,
+            createur: {
+              id: '1',
+              nom: 'Tavernier',
+              prenom: 'Nils'
+            },
+            comment: 'commentaire',
+            adresse: undefined
+          }
           expect(isSuccess(result) && result.data).to.deep.equal([
             expectedAnimationCollective
           ])
@@ -161,28 +160,27 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
           )
 
           // Then
-          const expectedAnimationCollective: AnimationCollectiveJeuneQueryModel =
-            {
-              id: acAgenceConseillerDto.id,
-              title: acAgenceConseillerDto.titre,
-              modality: acAgenceConseillerDto.modalite!,
-              date: acAgenceConseillerDto.date,
-              duration: acAgenceConseillerDto.duree,
-              type: { code: acAgenceConseillerDto.type, label: 'Atelier' },
-              isLocaleDate: false,
-              estInscrit: false,
-              organisme: undefined,
-              precision: undefined,
-              presenceConseiller: true,
-              invitation: false,
-              createur: {
-                id: '1',
-                nom: 'Tavernier',
-                prenom: 'Nils'
-              },
-              comment: 'commentaire',
-              adresse: undefined
-            }
+          const expectedAnimationCollective: RendezVousJeuneDetailQueryModel = {
+            id: acAgenceConseillerDto.id,
+            title: acAgenceConseillerDto.titre,
+            modality: acAgenceConseillerDto.modalite!,
+            date: acAgenceConseillerDto.date,
+            duration: acAgenceConseillerDto.duree,
+            type: { code: acAgenceConseillerDto.type, label: 'Atelier' },
+            isLocaleDate: false,
+            estInscrit: false,
+            organisme: undefined,
+            precision: undefined,
+            presenceConseiller: true,
+            invitation: false,
+            createur: {
+              id: '1',
+              nom: 'Tavernier',
+              prenom: 'Nils'
+            },
+            comment: 'commentaire',
+            adresse: undefined
+          }
           expect(isSuccess(result) && result.data).to.deep.equal([
             expectedAnimationCollective
           ])
