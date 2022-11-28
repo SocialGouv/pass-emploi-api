@@ -275,6 +275,7 @@ describe('Rendez-vous', () => {
           // When
           const result = service.mettreAJour(rendezVous, {
             ...rendezVous,
+            titre: 'Nouveau titre',
             date: '2020-04-06T12:00:00.000Z',
             jeunes: [unJeuneDuRendezVous()],
             modalite: 'nouveau',
@@ -288,6 +289,7 @@ describe('Rendez-vous', () => {
             ...rendezVous,
             date: new Date('2020-04-06T12:00:00.000Z'),
             jeunes: [unJeuneDuRendezVous()],
+            titre: 'Nouveau titre',
             modalite: 'nouveau',
             adresse: 'nouvelle',
             organisme: 'nouvel',

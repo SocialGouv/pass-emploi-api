@@ -1,17 +1,17 @@
+import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { IdService } from '../../utils/id-service'
-import { Conseiller } from '../conseiller'
-import { Jeune } from '../jeune/jeune'
-import * as _AnimationCollective from './animation-collective'
-import * as _Historique from './historique'
-import { failure, Result, success } from '../../building-blocks/types/result'
 import {
   ConseillerSansAgenceError,
   JeuneNonLieALAgenceError,
   JeuneNonLieAuConseillerError,
   MauvaiseCommandeError
 } from '../../building-blocks/types/domain-error'
-import { Injectable } from '@nestjs/common'
+import { failure, Result, success } from '../../building-blocks/types/result'
+import { IdService } from '../../utils/id-service'
+import { Conseiller } from '../conseiller'
+import { Jeune } from '../jeune/jeune'
+import * as _AnimationCollective from './animation-collective'
+import * as _Historique from './historique'
 
 export const RendezVousRepositoryToken = 'RendezVous.Repository'
 
@@ -91,6 +91,7 @@ export interface InfosRendezVousACreer {
 }
 
 export interface InfosRendezVousAMettreAJour {
+  titre?: string
   commentaire?: string
   date: string
   duree: number
@@ -102,11 +103,11 @@ export interface InfosRendezVousAMettreAJour {
 }
 
 export namespace RendezVous {
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  export import AnimationCollective = _AnimationCollective.AnimationCollective
   // FIXME: le linter ne comprend pas cette technique 🤷‍️
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import Historique = _Historique.Historique
-  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
-  export import AnimationCollective = _AnimationCollective.AnimationCollective
 
   export interface Repository {
     save(rendezVous: RendezVous): Promise<void>
@@ -237,6 +238,7 @@ export namespace RendezVous {
 
       return success({
         ...rendezVousInitial,
+        titre: infosRendezVousAMettreAJour.titre ?? rendezVousInitial.titre,
         commentaire: infosRendezVousAMettreAJour.commentaire,
         date: new Date(infosRendezVousAMettreAJour.date),
         duree: infosRendezVousAMettreAJour.duree,
