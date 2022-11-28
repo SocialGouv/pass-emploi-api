@@ -86,6 +86,7 @@ export class RendezVousController {
     const command: UpdateRendezVousCommand = {
       idRendezVous: idRendezVous,
       idsJeunes: updateRendezVousPayload.jeunesIds,
+      titre: updateRendezVousPayload.titre,
       commentaire: updateRendezVousPayload.comment,
       date: updateRendezVousPayload.date,
       duree: updateRendezVousPayload.duration,

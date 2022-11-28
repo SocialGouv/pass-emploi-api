@@ -168,6 +168,7 @@ describe('RendezvousController', () => {
     const payload: UpdateRendezVousPayload = {
       jeunesIds: ['1'],
       date: '2021-11-11T08:03:30.000Z',
+      titre: undefined,
       comment: undefined,
       duration: 30,
       modality: undefined,
@@ -178,6 +179,7 @@ describe('RendezvousController', () => {
     const expectedCommand: UpdateRendezVousCommand = {
       idsJeunes: ['1'],
       idRendezVous: rendezvous.id,
+      titre: undefined,
       commentaire: undefined,
       date: '2021-11-11T08:03:30.000Z',
       duree: 30,
