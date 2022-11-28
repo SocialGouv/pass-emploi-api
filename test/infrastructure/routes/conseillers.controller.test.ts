@@ -35,7 +35,6 @@ import { GetConseillerByEmailQueryHandler } from '../../../src/application/queri
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
 import { GetIndicateursPourConseillerQueryHandler } from '../../../src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-jeunes-by-conseiller.query.handler.db'
-import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 import {
   DossierExisteDejaError,
   DroitsInsuffisants,
@@ -86,7 +85,6 @@ describe('ConseillersController', () => {
   let deleteSuperviseursCommandHandler: StubbedClass<DeleteSuperviseursCommandHandler>
   let modifierConseillerCommandHandler: StubbedClass<ModifierConseillerCommandHandler>
   let recupererJeunesDuConseillerCommandHandler: StubbedClass<RecupererJeunesDuConseillerCommandHandler>
-  let getMetadonneesFavorisJeuneQueryHandler: StubbedClass<GetMetadonneesFavorisJeuneQueryHandler>
   let modifierJeuneDuConseillerCommandHandler: StubbedClass<ModifierJeuneDuConseillerCommandHandler>
   let getIndicateursJeunePourConseillerQueryHandler: StubbedClass<GetIndicateursPourConseillerQueryHandler>
   let createSuggestionDuConseillerCommandHandler: StubbedClass<CreateSuggestionConseillerOffreEmploiCommandHandler>
@@ -124,9 +122,6 @@ describe('ConseillersController', () => {
     )
     recupererJeunesDuConseillerCommandHandler = stubClass(
       RecupererJeunesDuConseillerCommandHandler
-    )
-    getMetadonneesFavorisJeuneQueryHandler = stubClass(
-      GetMetadonneesFavorisJeuneQueryHandler
     )
     modifierJeuneDuConseillerCommandHandler = stubClass(
       ModifierJeuneDuConseillerCommandHandler
@@ -167,8 +162,6 @@ describe('ConseillersController', () => {
       .useValue(modifierConseillerCommandHandler)
       .overrideProvider(RecupererJeunesDuConseillerCommandHandler)
       .useValue(recupererJeunesDuConseillerCommandHandler)
-      .overrideProvider(GetMetadonneesFavorisJeuneQueryHandler)
-      .useValue(getMetadonneesFavorisJeuneQueryHandler)
       .overrideProvider(ModifierJeuneDuConseillerCommandHandler)
       .useValue(modifierJeuneDuConseillerCommandHandler)
       .overrideProvider(DateService)
@@ -364,46 +357,6 @@ describe('ConseillersController', () => {
     })
 
     ensureUserAuthenticationFailsIfInvalid('put', '/conseillers/2/jeunes/21')
-  })
-
-  describe('GET /conseillers/:idConseiller/jeunes/:idJeune/metadonnees', () => {
-    it('renvoie les metadonnées du jeune', async () => {
-      // Given
-      const idConseiller = 'poi-id-conseiller'
-      const idJeune = 'poi-id-jeune'
-
-      const expectedResponse = {
-        favoris: {
-          autoriseLePartage: true,
-          offres: {
-            total: 0,
-            nombreOffresAlternance: 0,
-            nombreOffresEmploi: 0,
-            nombreOffresImmersion: 0,
-            nombreOffresServiceCivique: 0
-          },
-          recherches: {
-            total: 0,
-            nombreRecherchesOffresAlternance: 0,
-            nombreRecherchesOffresEmploi: 0,
-            nombreRecherchesOffresImmersion: 0,
-            nombreRecherchesOffresServiceCivique: 0
-          }
-        }
-      }
-      getMetadonneesFavorisJeuneQueryHandler.execute.resolves(
-        success(expectedResponse)
-      )
-
-      // When- Then
-      await request(app.getHttpServer())
-        .get(
-          '/conseillers/' + idConseiller + '/jeunes/' + idJeune + '/metadonnees'
-        )
-        .set('authorization', unHeaderAuthorization())
-        .expect(HttpStatus.OK)
-        .expect(expectedResponse)
-    })
   })
 
   describe('POST /conseillers/:idConseiller/jeunes/:idJeune/action', () => {

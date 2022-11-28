@@ -50,11 +50,9 @@ import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-d
 import { GetIndicateursPourConseillerQueryHandler } from '../../application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { GetJeuneMiloByDossierQueryHandler } from '../../application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from '../../application/queries/get-jeunes-by-conseiller.query.handler.db'
-import { GetMetadonneesFavorisJeuneQueryHandler } from '../../application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler.db'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
 import { DetailConseillerQueryModel } from '../../application/queries/query-models/conseillers.query-model'
-import { MetadonneesFavorisQueryModel } from '../../application/queries/query-models/favoris.query-model'
 import { IndicateursPourConseillerQueryModel } from '../../application/queries/query-models/indicateurs-pour-conseiller.query-model'
 import {
   DetailJeuneConseillerQueryModel,
@@ -117,7 +115,6 @@ export class ConseillersController {
     private readonly deleteSuperviseursCommandHandler: DeleteSuperviseursCommandHandler,
     private readonly modifierConseillerCommandHandler: ModifierConseillerCommandHandler,
     private readonly recupererJeunesDuConseillerCommandHandler: RecupererJeunesDuConseillerCommandHandler,
-    private readonly getMetadonneesFavorisJeuneQueryHandler: GetMetadonneesFavorisJeuneQueryHandler,
     private readonly modifierJeuneDuConseillerCommandHandler: ModifierJeuneDuConseillerCommandHandler,
     private readonly getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler
   ) {}
@@ -234,30 +231,6 @@ export class ConseillersController {
     }
 
     throw new RuntimeException()
-  }
-
-  @ApiOperation({
-    summary: 'Deprecated (Web) - Récupère les métadonnées du jeune',
-    description: 'Autorisé pour un conseiller du jeune',
-    deprecated: true
-  })
-  @Get(':idConseiller/jeunes/:idJeune/metadonnees')
-  async getMetadonneesFavorisJeune(
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    @Param('idConseiller') idConseiller: string,
-    @Param('idJeune') idJeune: string,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<MetadonneesFavorisQueryModel> {
-    const result = await this.getMetadonneesFavorisJeuneQueryHandler.execute(
-      { idJeune },
-      utilisateur
-    )
-
-    if (isSuccess(result)) {
-      return result.data
-    }
-    throw handleFailure(result)
   }
 
   @ApiOperation({
