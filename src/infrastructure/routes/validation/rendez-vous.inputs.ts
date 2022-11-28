@@ -108,6 +108,11 @@ export class UpdateRendezVousPayload {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  titre?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   comment?: string
 
   @ApiProperty()

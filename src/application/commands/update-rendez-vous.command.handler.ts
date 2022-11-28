@@ -28,6 +28,7 @@ import { HistoriqueRendezVousRepositoryToken } from '../../domain/rendez-vous/hi
 export interface UpdateRendezVousCommand extends Command {
   idRendezVous: string
   idsJeunes: string[]
+  titre?: string
   commentaire?: string
   date: string
   duree: number
