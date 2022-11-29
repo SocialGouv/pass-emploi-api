@@ -43,15 +43,15 @@ describe('PlanificateurRedisRepository', () => {
       it('créée un job', async () => {
         // Given
         const job: Planificateur.Job<Planificateur.JobRendezVous> = {
-          date: uneDatetime().plus({ days: 2 }).toJSDate(),
-          type: Planificateur.JobEnum.RENDEZVOUS,
+          dateExecution: uneDatetime().plus({ days: 2 }).toJSDate(),
+          type: Planificateur.JobType.RENDEZVOUS,
           contenu: {
             idRendezVous: 'id'
           }
         }
 
         // When
-        await planificateurRedisRepository.createJob(job)
+        await planificateurRedisRepository.creerJob(job)
 
         // Then
         const redisJob = await redisClient.hGetAll('bull:JobQueue:1')
@@ -62,8 +62,8 @@ describe('PlanificateurRedisRepository', () => {
       it('créée un job avec id custom', async () => {
         // Given
         const job: Planificateur.Job<Planificateur.JobRendezVous> = {
-          date: uneDatetime().plus({ days: 2 }).toJSDate(),
-          type: Planificateur.JobEnum.RENDEZVOUS,
+          dateExecution: uneDatetime().plus({ days: 2 }).toJSDate(),
+          type: Planificateur.JobType.RENDEZVOUS,
           contenu: {
             idRendezVous: 'id'
           }
@@ -71,7 +71,7 @@ describe('PlanificateurRedisRepository', () => {
         const idJob = 'test'
 
         // When
-        await planificateurRedisRepository.createJob(job, idJob)
+        await planificateurRedisRepository.creerJob(job, idJob)
 
         // Then
         const redisJob = await redisClient.hGetAll(`bull:JobQueue:${idJob}`)
@@ -87,16 +87,16 @@ describe('PlanificateurRedisRepository', () => {
       it('supprime les jobs', async () => {
         // Given
         const job: Planificateur.Job<Planificateur.JobRendezVous> = {
-          date: uneDatetime().plus({ days: 2 }).toJSDate(),
-          type: Planificateur.JobEnum.RENDEZVOUS,
+          dateExecution: uneDatetime().plus({ days: 2 }).toJSDate(),
+          type: Planificateur.JobType.RENDEZVOUS,
           contenu: {
             idRendezVous: 'id'
           }
         }
-        await planificateurRedisRepository.createJob(job)
+        await planificateurRedisRepository.creerJob(job)
 
         // When
-        await planificateurRedisRepository.supprimerTousLesJobs()
+        await planificateurRedisRepository.supprimerLesJobs()
 
         // Then
         const redisJob = await redisClient.hGetAll('bull:JobQueue:1')
@@ -110,17 +110,17 @@ describe('PlanificateurRedisRepository', () => {
       it('supprime les jobs avec id', async () => {
         // Given
         const job: Planificateur.Job<Planificateur.JobRendezVous> = {
-          date: uneDatetime().plus({ days: 2 }).toJSDate(),
-          type: Planificateur.JobEnum.RENDEZVOUS,
+          dateExecution: uneDatetime().plus({ days: 2 }).toJSDate(),
+          type: Planificateur.JobType.RENDEZVOUS,
           contenu: {
             idRendezVous: 'id'
           }
         }
         const idJob = 'test'
-        await planificateurRedisRepository.createJob(job, idJob)
+        await planificateurRedisRepository.creerJob(job, idJob)
 
         // When
-        await planificateurRedisRepository.supprimerJobsSelonPattern(idJob)
+        await planificateurRedisRepository.supprimerLesJobsSelonPattern(idJob)
 
         // Then
         const redisJob = await redisClient.hGetAll(`bull:JobQueue:${idJob}`)
@@ -133,13 +133,13 @@ describe('PlanificateurRedisRepository', () => {
     describe('si le redis est accessible', () => {
       it('créée un cron', async () => {
         // Given
-        const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI,
+        const cron: Planificateur.CronJob = {
+          type: Planificateur.JobType.NOUVELLES_OFFRES_EMPLOI,
           expression: '* * * * *'
         }
 
         // When
-        await planificateurRedisRepository.createCron(cron)
+        await planificateurRedisRepository.creerCronJob(cron)
 
         // Then
         const crons =
@@ -155,14 +155,14 @@ describe('PlanificateurRedisRepository', () => {
     describe('si le redis est accessible', () => {
       it('supprime les crons', async () => {
         // Given
-        const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI,
+        const cron: Planificateur.CronJob = {
+          type: Planificateur.JobType.NOUVELLES_OFFRES_EMPLOI,
           expression: '* * * * *'
         }
-        await planificateurRedisRepository.createCron(cron)
+        await planificateurRedisRepository.creerCronJob(cron)
 
         // When
-        await planificateurRedisRepository.supprimerLesCrons()
+        await planificateurRedisRepository.supprimerLesCronJobs()
 
         // Then
         const crons =

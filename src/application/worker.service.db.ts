@@ -66,50 +66,50 @@ export class WorkerService {
     })
     try {
       switch (job.type) {
-        case Planificateur.JobEnum.RENDEZVOUS:
+        case Planificateur.JobType.RENDEZVOUS:
           await this.handlerJobRendezVousCommandHandler.execute({
             job: job as Planificateur.Job<Planificateur.JobRendezVous>
           })
           break
-        case Planificateur.JobEnum.RAPPEL_ACTION:
+        case Planificateur.JobType.RAPPEL_ACTION:
           await this.handlerJobRappelActionCommandHandler.execute({
             job: job as Planificateur.Job<Planificateur.JobRappelAction>
           })
           break
-        case Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES:
+        case Planificateur.JobType.MAIL_CONSEILLER_MESSAGES:
           await this.handleJobMailConseillerCommandHandler.execute()
           break
-        case Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI:
+        case Planificateur.JobType.NOUVELLES_OFFRES_EMPLOI:
           await this.handleJobNotifierNouvellesOffresEmploiCommandHandler.execute()
           break
-        case Planificateur.CronJob.NOUVELLES_OFFRES_SERVICE_CIVIQUE:
+        case Planificateur.JobType.NOUVELLES_OFFRES_SERVICE_CIVIQUE:
           await this.handleJobNotifierNouveauxServicesCiviqueCommandHandler.execute()
           break
-        case Planificateur.CronJob.NETTOYER_LES_JOBS:
+        case Planificateur.JobType.NETTOYER_LES_JOBS:
           await this.handleNettoyerLesJobsCommandHandler.execute()
           break
-        case Planificateur.CronJob.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS:
+        case Planificateur.JobType.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS:
           await this.handleJobUpdateMailingListConseillerCommandHandler.execute()
           break
-        case Planificateur.CronJob.RECUPERER_SITUATIONS_JEUNES_MILO:
+        case Planificateur.JobType.RECUPERER_SITUATIONS_JEUNES_MILO:
           await this.handleJobRecupererSituationsJeunesMiloCommandHandler.execute()
           break
-        case Planificateur.CronJob.NETTOYER_LES_PIECES_JOINTES:
+        case Planificateur.JobType.NETTOYER_LES_PIECES_JOINTES:
           await this.handleJobNettoyerPiecesJointesCommandHandler.execute()
           break
-        case Planificateur.CronJob.NETTOYER_LES_DONNEES:
+        case Planificateur.JobType.NETTOYER_LES_DONNEES:
           await this.handleJobNettoyerLesDonneesCommandHandler.execute()
           break
-        case Planificateur.CronJob.NOTIFIER_RENDEZVOUS_PE:
+        case Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE:
           await this.handleJobNotifierRendezVousPECommandHandler.execute()
           break
-        case Planificateur.CronJob.MAJ_CODES_EVENEMENTS:
+        case Planificateur.JobType.MAJ_CODES_EVENEMENTS:
           await this.handleJobMettreAJourCodesEvenementsCommandHandler.execute()
           break
-        case Planificateur.CronJob.MAJ_AGENCE_AC:
+        case Planificateur.JobType.MAJ_AGENCE_AC:
           await this.handleJobAgenceAnimationCollectiveCommand.execute()
           break
-        case Planificateur.JobEnum.FAKE:
+        case Planificateur.JobType.FAKE:
           this.logger.log({
             job,
             msg: 'executed'

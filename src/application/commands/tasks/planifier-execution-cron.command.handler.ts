@@ -8,14 +8,14 @@ import {
 } from '../../../domain/planificateur'
 import { DateService } from '../../../utils/date-service'
 
-export interface ExecuteCronJobAsapCommand extends Command {
-  jobType: Planificateur.CronJob
-  date?: string
+export interface PlanifierExecutionCronCommand extends Command {
+  jobType: Planificateur.JobType
+  dateExecution?: string
 }
 
 @Injectable()
-export class ExecuteJobAsapCommandHandler extends CommandHandler<
-  ExecuteCronJobAsapCommand,
+export class PlanifierExecutionCronCommandHandler extends CommandHandler<
+  PlanifierExecutionCronCommand,
   void
 > {
   constructor(
@@ -26,13 +26,15 @@ export class ExecuteJobAsapCommandHandler extends CommandHandler<
     super('ExecuteCronJobAsapCommandHandler')
   }
 
-  async handle(command: ExecuteCronJobAsapCommand): Promise<Result> {
+  async handle(command: PlanifierExecutionCronCommand): Promise<Result> {
     const job: Planificateur.Job<undefined> = {
-      date: command.date ? new Date(command.date) : this.dateService.nowJs(),
+      dateExecution: command.dateExecution
+        ? new Date(command.dateExecution)
+        : this.dateService.nowJs(),
       type: command.jobType,
       contenu: undefined
     }
-    await this.planificateurRepository.createJob(job)
+    await this.planificateurRepository.creerJob(job)
     return emptySuccess()
   }
 

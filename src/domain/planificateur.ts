@@ -1,30 +1,33 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { Action } from './action/action'
 import { DateService } from '../utils/date-service'
 import { RendezVous } from './rendez-vous/rendez-vous'
+import { Action } from './action/action'
 import { NettoyageJobsStats } from './notification-support'
 
 export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 
 export namespace Planificateur {
   export interface Repository {
-    createJob<T>(job: Job<T>, jobId?: string): Promise<void>
+    creerJob<T>(job: Job<T>, jobId?: string): Promise<void>
 
-    createCron(cron: Cron): Promise<void>
+    creerCronJob(cronJob: CronJob): Promise<void>
 
     subscribe(callback: Handler<unknown>): Promise<void>
 
-    supprimerTousLesJobs(): Promise<void>
+    supprimerLesJobs(): Promise<void>
 
-    supprimerLesCrons(): Promise<void>
+    supprimerLesCronJobs(): Promise<void>
 
-    supprimerLesAnciensJobs(): Promise<NettoyageJobsStats>
+    supprimerLesJobsPasses(): Promise<NettoyageJobsStats>
 
-    supprimerJobsSelonPattern(pattern: string): Promise<void>
+    supprimerLesJobsSelonPattern(pattern: string): Promise<void>
   }
 
-  export enum CronJob {
+  export enum JobType {
+    RENDEZVOUS = 'RENDEZVOUS',
+    RAPPEL_ACTION = 'RAPPEL_ACTION',
+    FAKE = 'FAKE',
     NOUVELLES_OFFRES_EMPLOI = 'NOUVELLES_OFFRES_EMPLOI',
     NOUVELLES_OFFRES_SERVICE_CIVIQUE = 'NOUVELLES_OFFRES_SERVICE_CIVIQUE',
     MAIL_CONSEILLER_MESSAGES = 'MAIL_CONSEILLER_MESSAGES',
@@ -36,12 +39,6 @@ export namespace Planificateur {
     NOTIFIER_RENDEZVOUS_PE = 'NOTIFIER_RENDEZVOUS_PE',
     MAJ_CODES_EVENEMENTS = 'MAJ_CODES_EVENEMENTS',
     MAJ_AGENCE_AC = 'MAJ_AGENCE_AC'
-  }
-
-  export enum JobEnum {
-    RENDEZVOUS = 'RENDEZVOUS',
-    RAPPEL_ACTION = 'RAPPEL_ACTION',
-    FAKE = 'FAKE'
   }
 
   export interface JobRendezVous {
@@ -56,24 +53,68 @@ export namespace Planificateur {
     message: string
   }
 
-  export type JobType = JobRendezVous | JobFake
+  export type ContenuJob = JobRendezVous | JobFake
 
-  export interface Job<T = JobType> {
-    date: Date
-    type: JobEnum | CronJob
+  export interface Job<T = ContenuJob> {
+    dateExecution: Date
+    type: JobType
     contenu: T
   }
 
-  export interface Cron {
-    type: CronJob
+  export interface CronJob {
+    type: JobType
     expression: string
-    startDate?: Date
+    dateDebutExecution?: Date
   }
 
   export interface Handler<T> {
     (job: Job<T>): Promise<void>
   }
 }
+
+const listeCronJob: Planificateur.CronJob[] = [
+  {
+    type: Planificateur.JobType.RECUPERER_SITUATIONS_JEUNES_MILO,
+    expression: '0 0 * * *'
+  },
+  {
+    type: Planificateur.JobType.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS,
+    expression: '0 1 * * *'
+  },
+  {
+    type: Planificateur.JobType.NETTOYER_LES_PIECES_JOINTES,
+    expression: '0 2 * * *',
+    dateDebutExecution: new Date('2022-10-01')
+  },
+  {
+    type: Planificateur.JobType.NETTOYER_LES_JOBS,
+    expression: '0 4 * * *'
+  },
+  {
+    type: Planificateur.JobType.NETTOYER_LES_DONNEES,
+    expression: '0 5 * * *'
+  },
+  {
+    type: Planificateur.JobType.MAIL_CONSEILLER_MESSAGES,
+    expression: '0 8 * * 1-5'
+  },
+  {
+    type: Planificateur.JobType.NOUVELLES_OFFRES_EMPLOI,
+    expression: '0 9 * * *'
+  },
+  {
+    type: Planificateur.JobType.NOUVELLES_OFFRES_SERVICE_CIVIQUE,
+    expression: '0 11 * * *'
+  },
+  {
+    type: Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE,
+    expression: '0 */2 * * *'
+  },
+  {
+    type: Planificateur.JobType.MAJ_AGENCE_AC,
+    expression: '0 3 * * *'
+  }
+]
 
 @Injectable()
 export class PlanificateurService {
@@ -83,89 +124,10 @@ export class PlanificateurService {
     private dateService: DateService
   ) {}
 
-  async planifierCron(cronJob: Planificateur.CronJob): Promise<void> {
-    switch (cronJob) {
-      case Planificateur.CronJob.RECUPERER_SITUATIONS_JEUNES_MILO: {
-        const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.RECUPERER_SITUATIONS_JEUNES_MILO,
-          expression: '0 0 * * *'
-        }
-        await this.planificateurRepository.createCron(cron)
-        break
-      }
-      case Planificateur.CronJob.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS: {
-        const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS,
-          expression: '0 1 * * *'
-        }
-        await this.planificateurRepository.createCron(cron)
-        break
-      }
-      case Planificateur.CronJob.NETTOYER_LES_PIECES_JOINTES: {
-        const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.NETTOYER_LES_PIECES_JOINTES,
-          expression: '0 2 * * *',
-          startDate: new Date('2022-10-01')
-        }
-        await this.planificateurRepository.createCron(cron)
-        break
-      }
-      case Planificateur.CronJob.MAJ_AGENCE_AC: {
-        const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.MAJ_AGENCE_AC,
-          expression: '0 3 * * *'
-        }
-        await this.planificateurRepository.createCron(cron)
-        break
-      }
-      case Planificateur.CronJob.NETTOYER_LES_JOBS: {
-        const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.NETTOYER_LES_JOBS,
-          expression: '0 4 * * *'
-        }
-        await this.planificateurRepository.createCron(cron)
-        break
-      }
-      case Planificateur.CronJob.NETTOYER_LES_DONNEES: {
-        const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.NETTOYER_LES_DONNEES,
-          expression: '0 5 * * *'
-        }
-        await this.planificateurRepository.createCron(cron)
-        break
-      }
-      case Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES: {
-        const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES,
-          expression: '0 8 * * 1-5'
-        }
-        await this.planificateurRepository.createCron(cron)
-        break
-      }
-      case Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI: {
-        const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI,
-          expression: '0 9 * * *'
-        }
-        await this.planificateurRepository.createCron(cron)
-        break
-      }
-      case Planificateur.CronJob.NOUVELLES_OFFRES_SERVICE_CIVIQUE: {
-        const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.NOUVELLES_OFFRES_SERVICE_CIVIQUE,
-          expression: '0 11 * * *'
-        }
-        await this.planificateurRepository.createCron(cron)
-        break
-      }
-      case Planificateur.CronJob.NOTIFIER_RENDEZVOUS_PE: {
-        const cron: Planificateur.Cron = {
-          type: Planificateur.CronJob.NOTIFIER_RENDEZVOUS_PE,
-          expression: '0 */2 * * *'
-        }
-        await this.planificateurRepository.createCron(cron)
-        break
-      }
+  async planifierCronJob(JobType: Planificateur.JobType): Promise<void> {
+    const cron = listeCronJob.find(cron => cron.type === JobType)
+    if (cron) {
+      await this.planificateurRepository.creerCronJob(cron)
     }
   }
 
@@ -190,7 +152,7 @@ export class PlanificateurService {
   }
 
   async supprimerRappelsParId(id: string): Promise<void> {
-    await this.planificateurRepository.supprimerJobsSelonPattern(id)
+    await this.planificateurRepository.supprimerLesJobsSelonPattern(id)
   }
 
   private async creerJobRendezVous(
@@ -199,13 +161,13 @@ export class PlanificateurService {
   ): Promise<void> {
     const jobId = `rdv:${rendezVous.id}:${days}`
     const job: Planificateur.Job<Planificateur.JobRendezVous> = {
-      date: DateTime.fromJSDate(rendezVous.date)
+      dateExecution: DateTime.fromJSDate(rendezVous.date)
         .minus({ days: days })
         .toJSDate(),
-      type: Planificateur.JobEnum.RENDEZVOUS,
+      type: Planificateur.JobType.RENDEZVOUS,
       contenu: { idRendezVous: rendezVous.id }
     }
-    await this.planificateurRepository.createJob(job, jobId)
+    await this.planificateurRepository.creerJob(job, jobId)
   }
 
   private async creerJobRappelAction(
@@ -215,10 +177,10 @@ export class PlanificateurService {
     const jobId = `action:${action.id}:${days}`
 
     const job: Planificateur.Job<Planificateur.JobRappelAction> = {
-      date: action.dateEcheance.minus({ days: days }).toJSDate(),
-      type: Planificateur.JobEnum.RAPPEL_ACTION,
+      dateExecution: action.dateEcheance.minus({ days: days }).toJSDate(),
+      type: Planificateur.JobType.RAPPEL_ACTION,
       contenu: { idAction: action.id }
     }
-    await this.planificateurRepository.createJob(job, jobId)
+    await this.planificateurRepository.creerJob(job, jobId)
   }
 }

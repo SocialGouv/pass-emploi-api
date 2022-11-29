@@ -51,7 +51,7 @@ describe('SynchronizeJobsCommandHandler', () => {
     })
     it('supprime tous les jobs', async () => {
       // Then
-      expect(planificateurRepository.supprimerTousLesJobs).to.have.callCount(1)
+      expect(planificateurRepository.supprimerLesJobs).to.have.callCount(1)
     })
 
     it('planifie les jobs de rappels de rendez-vous', async () => {
