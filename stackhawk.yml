@@ -10,7 +10,7 @@ app:
 
 # -- Customized Configuration for GraphQL/SOAP/OpenAPI, add here --
   openApiConf:
-    path: /documentation # OR...
+    path: /documentation-json # OR...
 #     filePath: openApi.json
   autoPolicy: true
   autoInputVectors: true
