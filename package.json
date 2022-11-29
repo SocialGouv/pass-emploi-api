@@ -95,7 +95,7 @@
     "remove-accents": "0.4.4",
     "rimraf": "3.0.2",
     "rxjs": "7.5.7",
-    "sequelize": "6.25.8",
+    "sequelize": "6.26.0",
     "sequelize-cli": "6.5.2",
     "sequelize-typescript": "2.1.5",
     "swagger-ui-express": "4.6.0",
