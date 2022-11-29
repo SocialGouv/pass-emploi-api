@@ -39,8 +39,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          yarn: cache
       - name: Install dependencies
-        run: yarn install
+        run: yarn
       - name: Lint project  
         run: yarn lint
       - name: Tests
