@@ -15,9 +15,9 @@ import { DatabaseForTesting } from '../utils/database-for-testing'
 import { HandleJobNettoyerPiecesJointesCommandHandler } from 'src/application/commands/jobs/handle-job-nettoyer-pieces-jointes.command'
 import { HandleJobRappelActionCommandHandler } from 'src/application/commands/jobs/handle-job-rappel-action.command'
 import { HandleJobNotifierRendezVousPECommandHandler } from 'src/application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
-import { HandleJobMettreAJourCodesEvenementsCommandHandler } from '../../src/application/commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
 import { HandleJobNettoyerLesDonneesCommandHandler } from '../../src/application/commands/jobs/handle-job-nettoyer-les-donnees.command.db'
 import { HandleJobAgenceAnimationCollectiveCommandHandler } from '../../src/application/commands/jobs/handle-job-agence-animation-collective.command.db'
+import { HandleJobMettreAJourCodesEvenementsCommandHandler } from '../../src/application/commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
 
 describe('WorkerService', () => {
   DatabaseForTesting.prepare()
@@ -93,11 +93,11 @@ describe('WorkerService', () => {
 
       // When
       const job: Planificateur.Job = {
-        date: new Date(),
-        type: Planificateur.CronJob.NETTOYER_LES_JOBS,
+        dateExecution: new Date(),
+        type: Planificateur.JobType.NETTOYER_LES_JOBS,
         contenu: { message: 'my test dummy job' }
       }
-      await planificateurRepository.createJob(job)
+      await planificateurRepository.creerJob(job)
     })
 
     it('exécute la commande idoine', done => {

@@ -32,6 +32,7 @@ async function bootstrap(): Promise<void> {
   const version = appConfig.get('version')
   logger.log(`L'application du CEJ va démarrer avec la version : ${version}`)
 
+  // revoir les vars d'env, la manière d'execution est très chelou
   if (isWeb) {
     app.use(compression())
     useSwagger(appConfig, app)

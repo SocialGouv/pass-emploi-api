@@ -3,14 +3,14 @@ import {
   Planificateur,
   PlanificateurRepositoryToken
 } from '../domain/planificateur'
-import { ExecuteJobAsapCommandHandler } from './commands/tasks/execute-cronjob-asap.command'
+import { PlanifierExecutionCronCommandHandler } from './commands/tasks/planifier-execution-cron.command.handler'
 import { InitCronsCommandHandler } from './commands/tasks/init-crons.command'
 import { SynchronizeJobsCommandHandler } from './commands/tasks/synchronize-jobs.command'
 
 export enum Task {
   DUMMY_JOB = 'DUMMY_JOB',
-  INIT_ALL_JOBS = 'INIT_ALL_JOBS',
-  INITIALISER_LES_CRON = 'INITIALISER_LES_CRON'
+  INIT_JOBS = 'INIT_JOBS',
+  INIT_CRONS = 'INIT_CRONS'
 }
 
 @Injectable()
@@ -22,32 +22,32 @@ export class TaskService {
     private planificateurRepository: Planificateur.Repository,
     private synchronizeJobsCommandHandler: SynchronizeJobsCommandHandler,
     private initCronsCommandHandler: InitCronsCommandHandler,
-    private executeJobAsapCommandHandler: ExecuteJobAsapCommandHandler
+    private planifierExecutionCronCommandHandler: PlanifierExecutionCronCommandHandler
   ) {}
 
   async handle(task: Task, date?: string): Promise<void> {
     this.logger.log(task)
-    const isCronJob = task in Planificateur.CronJob
+    const isCronJob = task in Planificateur.JobType
     try {
       if (isCronJob) {
-        await this.executeJobAsapCommandHandler.execute({
-          jobType: task as unknown as Planificateur.CronJob,
-          date
+        await this.planifierExecutionCronCommandHandler.execute({
+          jobType: task as unknown as Planificateur.JobType,
+          dateExecution: date
         })
       } else {
         switch (task) {
           case Task.DUMMY_JOB:
             const job: Planificateur.Job = {
-              date: new Date(),
-              type: Planificateur.JobEnum.FAKE,
+              dateExecution: new Date(),
+              type: Planificateur.JobType.FAKE,
               contenu: { message: 'dummy job' }
             }
-            await this.planificateurRepository.createJob(job)
+            await this.planificateurRepository.creerJob(job)
             break
-          case Task.INIT_ALL_JOBS:
+          case Task.INIT_JOBS:
             await this.synchronizeJobsCommandHandler.execute()
             break
-          case Task.INITIALISER_LES_CRON:
+          case Task.INIT_CRONS:
             await this.initCronsCommandHandler.execute()
             break
           default:

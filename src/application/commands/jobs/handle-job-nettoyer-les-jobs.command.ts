@@ -36,7 +36,7 @@ export class HandleNettoyerLesJobsCommandHandler extends CommandHandler<
   async handle(): Promise<Result<NettoyageJobsStats>> {
     try {
       const maintenant = this.dateService.now()
-      const stats = await this.planificateurRepository.supprimerLesAnciensJobs()
+      const stats = await this.planificateurRepository.supprimerLesJobsPasses()
       stats.tempsDExecution = maintenant.diffNow().milliseconds * -1
       return success(stats)
     } catch (e) {

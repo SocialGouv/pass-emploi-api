@@ -19,33 +19,33 @@ export class InitCronsCommandHandler extends CommandHandler<Command, void> {
   }
 
   async handle(): Promise<Result> {
-    await this.planificateurRepository.supprimerLesCrons()
-    await this.planificateurService.planifierCron(
-      Planificateur.CronJob.NOUVELLES_OFFRES_EMPLOI
+    await this.planificateurRepository.supprimerLesCronJobs()
+    await this.planificateurService.planifierCronJob(
+      Planificateur.JobType.NOUVELLES_OFFRES_EMPLOI
     )
-    await this.planificateurService.planifierCron(
-      Planificateur.CronJob.NOUVELLES_OFFRES_SERVICE_CIVIQUE
+    await this.planificateurService.planifierCronJob(
+      Planificateur.JobType.NOUVELLES_OFFRES_SERVICE_CIVIQUE
     )
-    await this.planificateurService.planifierCron(
-      Planificateur.CronJob.MAIL_CONSEILLER_MESSAGES
+    await this.planificateurService.planifierCronJob(
+      Planificateur.JobType.MAIL_CONSEILLER_MESSAGES
     )
-    await this.planificateurService.planifierCron(
-      Planificateur.CronJob.NETTOYER_LES_JOBS
+    await this.planificateurService.planifierCronJob(
+      Planificateur.JobType.NETTOYER_LES_JOBS
     )
-    await this.planificateurService.planifierCron(
-      Planificateur.CronJob.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS
+    await this.planificateurService.planifierCronJob(
+      Planificateur.JobType.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS
     )
-    await this.planificateurService.planifierCron(
-      Planificateur.CronJob.RECUPERER_SITUATIONS_JEUNES_MILO
+    await this.planificateurService.planifierCronJob(
+      Planificateur.JobType.RECUPERER_SITUATIONS_JEUNES_MILO
     )
-    await this.planificateurService.planifierCron(
-      Planificateur.CronJob.NETTOYER_LES_PIECES_JOINTES
+    await this.planificateurService.planifierCronJob(
+      Planificateur.JobType.NETTOYER_LES_PIECES_JOINTES
     )
-    await this.planificateurService.planifierCron(
-      Planificateur.CronJob.NETTOYER_LES_DONNEES
+    await this.planificateurService.planifierCronJob(
+      Planificateur.JobType.NETTOYER_LES_DONNEES
     )
-    await this.planificateurService.planifierCron(
-      Planificateur.CronJob.NOTIFIER_RENDEZVOUS_PE
+    await this.planificateurService.planifierCronJob(
+      Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE
     )
     return emptySuccess()
   }

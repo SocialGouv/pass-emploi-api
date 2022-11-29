@@ -37,11 +37,11 @@ describe('HandlerJobRendezVousCommandHandler', () => {
 
   const command: HandleJobRappelRendezVousCommand = {
     job: {
-      type: Planificateur.JobEnum.RENDEZVOUS,
+      type: Planificateur.JobType.RENDEZVOUS,
       contenu: {
         idRendezVous: 'idRendezVous'
       },
-      date: uneDatetime().toJSDate()
+      dateExecution: uneDatetime().toJSDate()
     }
   }
 

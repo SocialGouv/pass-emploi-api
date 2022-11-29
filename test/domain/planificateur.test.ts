@@ -41,7 +41,7 @@ describe('Planificateur', () => {
           await planificateurService.planifierRappelsRendezVous(rendezVous)
 
           // Then
-          expect(planificateurRepository.createJob).to.have.callCount(0)
+          expect(planificateurRepository.creerJob).to.have.callCount(0)
         })
       })
       describe('quand le rendez vous est à moins de 7 jours et à plus de 1 jour', () => {
@@ -56,13 +56,13 @@ describe('Planificateur', () => {
           await planificateurService.planifierRappelsRendezVous(rendezVous)
 
           // Then
-          expect(planificateurRepository.createJob).to.have.callCount(1)
-          expect(planificateurRepository.createJob).to.have.been.calledWith(
+          expect(planificateurRepository.creerJob).to.have.callCount(1)
+          expect(planificateurRepository.creerJob).to.have.been.calledWith(
             {
               date: DateTime.fromJSDate(rendezVous.date)
                 .minus({ days: 1 })
                 .toJSDate(),
-              type: Planificateur.JobEnum.RENDEZVOUS,
+              type: Planificateur.JobType.RENDEZVOUS,
               contenu: { idRendezVous: rendezVous.id }
             },
             `rdv:${rendezVous.id}:1`
@@ -85,12 +85,12 @@ describe('Planificateur', () => {
 
         it('génère un job pour un rappel un jour avant le rendez vous', async () => {
           // Then
-          expect(planificateurRepository.createJob).to.have.been.calledWith(
+          expect(planificateurRepository.creerJob).to.have.been.calledWith(
             {
               date: DateTime.fromJSDate(rendezVous.date)
                 .minus({ days: 1 })
                 .toJSDate(),
-              type: Planificateur.JobEnum.RENDEZVOUS,
+              type: Planificateur.JobType.RENDEZVOUS,
               contenu: { idRendezVous: rendezVous.id }
             },
             `rdv:${rendezVous.id}:1`
@@ -99,13 +99,13 @@ describe('Planificateur', () => {
 
         it('génère un job pour un rappel sept jours avant le rendez vous', async () => {
           // Then
-          expect(planificateurRepository.createJob).to.have.callCount(2)
-          expect(planificateurRepository.createJob).to.have.been.calledWith(
+          expect(planificateurRepository.creerJob).to.have.callCount(2)
+          expect(planificateurRepository.creerJob).to.have.been.calledWith(
             {
               date: DateTime.fromJSDate(rendezVous.date)
                 .minus({ days: 7 })
                 .toJSDate(),
-              type: Planificateur.JobEnum.RENDEZVOUS,
+              type: Planificateur.JobType.RENDEZVOUS,
               contenu: { idRendezVous: rendezVous.id }
             },
             `rdv:${rendezVous.id}:7`
@@ -123,13 +123,11 @@ describe('Planificateur', () => {
 
         // Then
         const job: Planificateur.Job<Planificateur.JobRappelAction> = {
-          date: action.dateEcheance.minus({ days: 3 }).toJSDate(),
-          type: Planificateur.JobEnum.RAPPEL_ACTION,
+          dateExecution: action.dateEcheance.minus({ days: 3 }).toJSDate(),
+          type: Planificateur.JobType.RAPPEL_ACTION,
           contenu: { idAction: action.id }
         }
-        expect(
-          planificateurRepository.createJob
-        ).to.have.been.calledWithExactly(
+        expect(planificateurRepository.creerJob).to.have.been.calledWithExactly(
           job,
           'action:721e2108-60f5-4a75-b102-04fe6a40e899:3'
         )

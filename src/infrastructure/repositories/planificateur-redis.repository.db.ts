@@ -2,10 +2,10 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import Bull, * as QueueBull from 'bull'
 import { DateTime } from 'luxon'
+import { NettoyageJobsStats } from '../../domain/notification-support'
 import { Planificateur } from '../../domain/planificateur'
 import { DateService } from '../../utils/date-service'
 import { buildError } from '../../utils/logger.module'
-import { NettoyageJobsStats } from '../../domain/notification-support'
 
 const CRON_TIMEZONE = 'Europe/Paris'
 
@@ -44,17 +44,19 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     })
   }
 
-  async createJob<T>(job: Planificateur.Job<T>, jobId?: string): Promise<void> {
+  async creerJob<T>(job: Planificateur.Job<T>, jobId?: string): Promise<void> {
     if (this.isReady) {
       const now = this.dateService.now()
-      const delay = DateTime.fromJSDate(job.date).diff(now).milliseconds
+      const delay = DateTime.fromJSDate(job.dateExecution).diff(
+        now
+      ).milliseconds
       await this.queue.add(job, { delay, jobId })
     } else {
       throw new Error('Redis not ready to accept connection')
     }
   }
 
-  async supprimerTousLesJobs(): Promise<void> {
+  async supprimerLesJobs(): Promise<void> {
     await this.queue.removeJobs('*')
   }
 
@@ -63,8 +65,8 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
       this.logger.log(
         `Execution du job ${jobRedis.id} de type ${jobRedis.data.type}`
       )
-      const job: Planificateur.Job<Planificateur.JobType> = {
-        date: jobRedis.data.date,
+      const job: Planificateur.Job<Planificateur.ContenuJob> = {
+        dateExecution: jobRedis.data.date,
         type: jobRedis.data.type,
         contenu: jobRedis.data.contenu
       }
@@ -80,18 +82,18 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     await this.queue.close()
   }
 
-  async createCron(cron: Planificateur.Cron): Promise<void> {
+  async creerCronJob(cron: Planificateur.CronJob): Promise<void> {
     await this.queue.add(cron, {
       jobId: cron.type,
       repeat: {
         cron: cron.expression,
         tz: CRON_TIMEZONE,
-        startDate: cron.startDate
+        startDate: cron.dateDebutExecution
       }
     })
   }
 
-  async supprimerLesCrons(): Promise<void> {
+  async supprimerLesCronJobs(): Promise<void> {
     const repeatableJobs = await this.queue.getRepeatableJobs()
     for (const job of repeatableJobs) {
       await this.queue.removeRepeatable({
@@ -102,7 +104,7 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     }
   }
 
-  async supprimerLesAnciensJobs(): Promise<NettoyageJobsStats> {
+  async supprimerLesJobsPasses(): Promise<NettoyageJobsStats> {
     const stats: NettoyageJobsStats = {
       listeJobsNettoyes: [],
       nbJobsNettoyes: 0,
@@ -138,7 +140,7 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     return stats
   }
 
-  async supprimerJobsSelonPattern(pattern: string): Promise<void> {
+  async supprimerLesJobsSelonPattern(pattern: string): Promise<void> {
     await this.queue.removeJobs(`*${pattern}*`)
   }
 }

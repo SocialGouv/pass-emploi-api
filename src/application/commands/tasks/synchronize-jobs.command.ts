@@ -36,7 +36,7 @@ export class SynchronizeJobsCommandHandler extends CommandHandler<
   }
 
   async handle(): Promise<Result> {
-    await this.planificateurRepository.supprimerTousLesJobs()
+    await this.planificateurRepository.supprimerLesJobs()
 
     await this.planifierRappelsRdvs()
     await this.planifierRappelsActions()
