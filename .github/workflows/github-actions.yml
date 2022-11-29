@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16.15.0]
+        node-version: [18.12.1]
     services:
       postgres:
         image: postgis/postgis:13-3.2-alpine
