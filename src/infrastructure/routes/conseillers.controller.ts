@@ -79,6 +79,7 @@ import { handleFailure } from './failure.handler'
 import { CreateActionPayload } from './validation/actions.inputs'
 import {
   CreateJeunePoleEmploiPayload,
+  CreateListeDeDiffusionPayload,
   CreerJeuneMiloPayload,
   DetailConseillerPayload,
   EnvoyerNotificationsPayload,
@@ -89,6 +90,10 @@ import {
   SuperviseursPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
+import {
+  CreateListeDeDiffusionCommand,
+  CreateListeDeDiffusionCommandHandler
+} from '../../application/commands/create-liste-de-diffusion.command.handler'
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -113,7 +118,8 @@ export class ConseillersController {
     private readonly modifierConseillerCommandHandler: ModifierConseillerCommandHandler,
     private readonly recupererJeunesDuConseillerCommandHandler: RecupererJeunesDuConseillerCommandHandler,
     private readonly modifierJeuneDuConseillerCommandHandler: ModifierJeuneDuConseillerCommandHandler,
-    private readonly getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler
+    private readonly getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler,
+    private readonly createListeDeDiffusionCommandHandler: CreateListeDeDiffusionCommandHandler
   ) {}
 
   @ApiOperation({
@@ -577,6 +583,31 @@ export class ConseillersController {
       return result.data
     }
     throw handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary: 'Crée une liste de diffusion',
+    description:
+      'Autorisé pour le conseiller avec les bénéficiaires de son portefeuille.'
+  })
+  @Post(':idConseiller/listes-de-diffusion')
+  async getListesDeDiffusion(
+    @Param('idConseiller') idConseiller: string,
+    @Body() payload: CreateListeDeDiffusionPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: CreateListeDeDiffusionCommand = {
+      idConseiller,
+      idsBeneficiaires: payload.idsBeneficiaires
+    }
+    const result = await this.createListeDeDiffusionCommandHandler.execute(
+      command,
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
   }
 
   private buildDateEcheanceV1(): DateTime {
