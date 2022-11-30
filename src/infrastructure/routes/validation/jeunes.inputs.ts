@@ -116,11 +116,8 @@ export class GetActionsByJeuneV2QueryParams {
   etats?: Action.Qualification.Etat[]
 }
 
-export class GetJeuneHomeSuiviQueryParams {
+export class MaintenantQueryParams {
   @ApiProperty()
   @IsISO8601({ strict: true })
   maintenant: string
 }
-
-export type GetAnimationsCollectivesJeuneQueryParams =
-  GetJeuneHomeSuiviQueryParams

@@ -85,9 +85,8 @@ import {
 } from './validation/demarches.inputs'
 import {
   ArchiverJeunePayload,
-  GetAnimationsCollectivesJeuneQueryParams,
-  GetJeuneHomeSuiviQueryParams,
   GetRendezVousJeuneQueryParams,
+  MaintenantQueryParams,
   PutNotificationTokenInput,
   TransfererConseillerPayload,
   UpdateJeunePreferencesPayload
@@ -235,7 +234,7 @@ export class JeunesController {
   })
   async getHomeAgenda(
     @Param('idJeune') idJeune: string,
-    @Query() queryParams: GetJeuneHomeSuiviQueryParams,
+    @Query() queryParams: MaintenantQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<JeuneHomeEvenementsQueryModel> {
     const result = await this.getJeuneHomeSuiviQueryHandler.execute(
@@ -256,7 +255,7 @@ export class JeunesController {
   })
   async getHomeAgendaPoleEmploi(
     @Param('idJeune') idJeune: string,
-    @Query() queryParams: GetJeuneHomeSuiviQueryParams,
+    @Query() queryParams: MaintenantQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string
   ): Promise<JeuneHomeAgendaPoleEmploiQueryModel> {
@@ -577,7 +576,7 @@ export class JeunesController {
   @Get(':idJeune/animations-collectives')
   async getAnimationsCollectivesJeune(
     @Param('idJeune') idJeune: string,
-    @Query() queryParams: GetAnimationsCollectivesJeuneQueryParams,
+    @Query() queryParams: MaintenantQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<RendezVousJeuneDetailQueryModel[]> {
     const maintenant = DateTime.fromISO(queryParams.maintenant, {
