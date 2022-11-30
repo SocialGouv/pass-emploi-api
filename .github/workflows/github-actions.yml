@@ -59,4 +59,19 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  deploy-review-app:
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    steps:
+      - name: Install Scalingo CLI
+        run: |
+          wget -qO- https://cli-dl.scalingo.com/install.sh | bash
+          echo "$HOME/bin" >> $GITHUB_PATH
+      - name: Configure Scalingo CLI
+        run: |
+          scalingo login --api-token ${{ secrets.SCALINGO_API_KEY }}
+      - name: Deploy review app
+        run: |
+          scalingo -a pa-back-staging integration-link-manual-review-app ${{ github.event.pull_request.number }} 
