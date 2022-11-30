@@ -4,10 +4,16 @@ on:
   push:
     branches: [ develop, master ]
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
     strategy:
       matrix:
         node-version: [18.12.1]
