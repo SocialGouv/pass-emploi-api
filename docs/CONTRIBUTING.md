@@ -48,7 +48,7 @@
 ## Configurer l'environnement dev. <a name="config-dev-env"></a>
 
 ### Pré-requis <a name="pré-requis"></a>
-- Node 16.13.2
+- Node 18.12.1
 - Docker et docker-compose
 
 ### Récupérer les variables d'environnement <a name="pull-variables-environnement"></a>
@@ -103,6 +103,7 @@ xxx = staging | prod
    - Users -> Add User -> rentrer les informations
    - Sélectionner l'utilisateur créé -> Attributes -> Add -> id_user : <ton id_authentification>
    - Credentials -> Reset Password -> Temporary Off
+3. Création d'une collection Firebase pour la messagerie
 
 ## L'architecture <a name="archi"></a>
 
