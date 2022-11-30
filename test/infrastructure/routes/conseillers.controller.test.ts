@@ -70,6 +70,10 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import {
+  CreateListeDeDiffusionCommand,
+  CreateListeDeDiffusionCommandHandler
+} from '../../../src/application/commands/create-liste-de-diffusion.command.handler'
 
 describe('ConseillersController', () => {
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
@@ -88,6 +92,7 @@ describe('ConseillersController', () => {
   let modifierJeuneDuConseillerCommandHandler: StubbedClass<ModifierJeuneDuConseillerCommandHandler>
   let getIndicateursJeunePourConseillerQueryHandler: StubbedClass<GetIndicateursPourConseillerQueryHandler>
   let createSuggestionDuConseillerCommandHandler: StubbedClass<CreateSuggestionConseillerOffreEmploiCommandHandler>
+  let createListeDeDiffusionCommandHandler: StubbedClass<CreateListeDeDiffusionCommandHandler>
   let app: INestApplication
 
   let dateService: StubbedClass<DateService>
@@ -132,6 +137,9 @@ describe('ConseillersController', () => {
     createSuggestionDuConseillerCommandHandler = stubClass(
       CreateSuggestionConseillerOffreEmploiCommandHandler
     )
+    createListeDeDiffusionCommandHandler = stubClass(
+      CreateListeDeDiffusionCommandHandler
+    )
     dateService = stubClass(DateService)
     dateService.now.returns(now)
 
@@ -170,6 +178,8 @@ describe('ConseillersController', () => {
       .useValue(getIndicateursJeunePourConseillerQueryHandler)
       .overrideProvider(CreateSuggestionConseillerOffreEmploiCommandHandler)
       .useValue(createSuggestionDuConseillerCommandHandler)
+      .overrideProvider(CreateListeDeDiffusionCommandHandler)
+      .useValue(createListeDeDiffusionCommandHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -1299,6 +1309,73 @@ describe('ConseillersController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/conseillers/1/jeunes/id-jeune/indicateurs?dateDebut=2022-08-01&dateFin=2022-08-10'
+    )
+  })
+
+  describe('POST /conseillers/{idConseiller}/listes-de-diffusion', () => {
+    describe('quand la commande est en succès', () => {
+      it('retourne une 201', async () => {
+        // Given
+        const idConseiller = 'un-id-conseiller'
+        const idsBeneficiaires: string[] = []
+        const command: CreateListeDeDiffusionCommand = {
+          idConseiller,
+          idsBeneficiaires
+        }
+        createListeDeDiffusionCommandHandler.execute
+          .withArgs(command)
+          .resolves(emptySuccess())
+
+        // When
+        await request(app.getHttpServer())
+          .post(`/conseillers/${idConseiller}/listes-de-diffusion`)
+          .set('authorization', unHeaderAuthorization())
+          .send({ idsBeneficiaires })
+          // Then
+          .expect(HttpStatus.CREATED)
+      })
+    })
+    describe('quand la commande retourne échoue en NonTrouve', () => {
+      it('retourne une 404', async () => {
+        // Given
+        const idConseiller = 'un-id-conseiller'
+        const idsBeneficiaires: string[] = []
+        const command: CreateListeDeDiffusionCommand = {
+          idConseiller,
+          idsBeneficiaires
+        }
+        createListeDeDiffusionCommandHandler.execute
+          .withArgs(command)
+          .resolves(failure(new NonTrouveError('Conseiller', idConseiller)))
+
+        // When
+        await request(app.getHttpServer())
+          .post(`/conseillers/${idConseiller}/listes-de-diffusion`)
+          .set('authorization', unHeaderAuthorization())
+          .send({ idsBeneficiaires })
+          // Then
+          .expect(HttpStatus.NOT_FOUND)
+      })
+    })
+    describe('quand le payload est au mauvais format', () => {
+      it('retourne une 400', async () => {
+        // Given
+        const idConseiller = 'un-id-conseiller'
+        const idsBeneficiaires = 'un-payload-du-mauvais-type'
+
+        // When
+        await request(app.getHttpServer())
+          .post(`/conseillers/${idConseiller}/listes-de-diffusion`)
+          .set('authorization', unHeaderAuthorization())
+          .send({ idsBeneficiaires })
+          // Then
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'post',
+      '/conseillers/2/listes-de-diffusion'
     )
   })
 })

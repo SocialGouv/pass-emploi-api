@@ -180,3 +180,9 @@ export class GetIndicateursPourConseillerQueryParams {
   @Transform(({ value }) => new Date(value))
   dateFin: Date
 }
+
+export class CreateListeDeDiffusionPayload {
+  @ApiProperty()
+  @IsArray()
+  idsBeneficiaires: string[]
+}
