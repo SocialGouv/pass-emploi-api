@@ -12,7 +12,7 @@ import {
   EmailExisteDejaError
 } from '../../../src/building-blocks/types/domain-error'
 import { Chat } from '../../../src/domain/chat'
-import { Conseiller } from '../../../src/domain/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { Core } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
 import { DateService } from '../../../src/utils/date-service'

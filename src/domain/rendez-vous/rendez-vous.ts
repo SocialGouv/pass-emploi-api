@@ -8,7 +8,7 @@ import {
 } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { IdService } from '../../utils/id-service'
-import { Conseiller } from '../conseiller'
+import { Conseiller } from '../conseiller/conseiller'
 import { Jeune } from '../jeune/jeune'
 import * as _AnimationCollective from './animation-collective'
 import * as _Historique from './historique'

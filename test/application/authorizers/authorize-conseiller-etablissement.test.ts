@@ -5,7 +5,7 @@ import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { createSandbox, expect } from '../../utils'
 import { ConseillerEtablissementAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-etablissement'
-import { Conseiller } from '../../../src/domain/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 
 describe('ConseillerEtablissementAuthorizer', () => {
   let conseillerRepository: StubbedType<Conseiller.Repository>

@@ -11,7 +11,10 @@ import {
   Result,
   success
 } from '../../building-blocks/types/result'
-import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
+import {
+  Conseiller,
+  ConseillersRepositoryToken
+} from '../../domain/conseiller/conseiller'
 import { toDetailJeuneConseillerQueryModel } from './query-mappers/jeune.mappers'
 import { DetailJeuneConseillerQueryModel } from './query-models/jeunes.query-model'
 

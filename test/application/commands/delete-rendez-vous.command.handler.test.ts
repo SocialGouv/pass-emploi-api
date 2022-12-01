@@ -33,7 +33,7 @@ import { Evenement, EvenementService } from 'src/domain/evenement'
 import { PlanificateurService } from 'src/domain/planificateur'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { Mail } from '../../../src/domain/mail'
-import { Conseiller } from '../../../src/domain/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { stubClassSandbox } from 'test/utils/types'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 

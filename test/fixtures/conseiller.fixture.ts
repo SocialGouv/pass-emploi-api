@@ -1,4 +1,4 @@
-import { Conseiller } from '../../src/domain/conseiller'
+import { Conseiller } from '../../src/domain/conseiller/conseiller'
 import { Core } from '../../src/domain/core'
 
 export const unConseiller = (args: Partial<Conseiller> = {}): Conseiller => {

@@ -4,7 +4,7 @@ import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { expect } from '../../utils'
 import { uneDatetime } from 'test/fixtures/date.fixture'
-import { Conseiller } from '../../../src/domain/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { Core } from '../../../src/domain/core'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
