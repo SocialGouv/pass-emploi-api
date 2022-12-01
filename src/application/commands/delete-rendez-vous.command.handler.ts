@@ -13,7 +13,10 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
+import {
+  Conseiller,
+  ConseillersRepositoryToken
+} from '../../domain/conseiller/conseiller'
 import { Mail, MailServiceToken } from '../../domain/mail'
 import { Notification } from '../../domain/notification/notification'
 import {

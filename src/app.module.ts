@@ -91,7 +91,10 @@ import {
   AuthentificationRepositoryToken
 } from './domain/authentification'
 import { ChatRepositoryToken } from './domain/chat'
-import { Conseiller, ConseillersRepositoryToken } from './domain/conseiller'
+import {
+  Conseiller,
+  ConseillersRepositoryToken
+} from './domain/conseiller/conseiller'
 import { EvenementService, EvenementsRepositoryToken } from './domain/evenement'
 import { Fichier, FichierRepositoryToken } from './domain/fichier'
 import {
@@ -345,6 +348,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     KeycloakClient,
     Context,
     Recherche.Factory,
+    Conseiller.ListeDeDiffusion.Factory,
     {
       provide: APP_GUARD,
       useClass: OidcAuthGuard

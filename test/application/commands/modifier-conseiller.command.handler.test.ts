@@ -14,7 +14,7 @@ import {
   success
 } from '../../../src/building-blocks/types/result'
 import { Agence } from '../../../src/domain/agence'
-import { Conseiller } from '../../../src/domain/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { Core } from '../../../src/domain/core'
 import {
   unUtilisateurConseiller,

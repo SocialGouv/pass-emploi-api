@@ -1,7 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
-import { Conseiller } from 'src/domain/conseiller'
+import { Conseiller } from 'src/domain/conseiller/conseiller'
 import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'
 import {
   CodeTypeRendezVous,

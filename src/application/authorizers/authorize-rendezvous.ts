@@ -1,5 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Conseiller, ConseillersRepositoryToken } from 'src/domain/conseiller'
+import {
+  Conseiller,
+  ConseillersRepositoryToken
+} from 'src/domain/conseiller/conseiller'
 import {
   DroitsInsuffisants,
   NonTrouveError

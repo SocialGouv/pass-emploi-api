@@ -17,7 +17,7 @@ import { Chat, ChatRepositoryToken } from '../../../domain/chat'
 import {
   Conseiller,
   ConseillersRepositoryToken
-} from '../../../domain/conseiller'
+} from '../../../domain/conseiller/conseiller'
 import { Mail, MailServiceToken } from '../../../domain/mail'
 import { buildError } from '../../../utils/logger.module'
 

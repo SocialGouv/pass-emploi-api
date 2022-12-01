@@ -13,7 +13,10 @@ import {
 } from '../../building-blocks/types/result'
 import { Agence, AgenceRepositoryToken } from '../../domain/agence'
 import { Authentification } from '../../domain/authentification'
-import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
+import {
+  Conseiller,
+  ConseillersRepositoryToken
+} from '../../domain/conseiller/conseiller'
 
 export interface ModifierConseillerCommand extends Query {
   idConseiller: string

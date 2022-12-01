@@ -598,6 +598,7 @@ export class ConseillersController {
   ): Promise<void> {
     const command: CreateListeDeDiffusionCommand = {
       idConseiller,
+      titre: payload.titre,
       idsBeneficiaires: payload.idsBeneficiaires
     }
     const result = await this.createListeDeDiffusionCommandHandler.execute(

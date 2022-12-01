@@ -8,6 +8,10 @@ export namespace Chat {
       jeuneId: string,
       conseillerId: string
     ): Promise<void>
+    initializeListeDeDiffusionIfNotExists(
+      idConseiller: string,
+      idListeDeDiffusion: string
+    ): Promise<void>
     getNombreDeConversationsNonLues(conseillerId: string): Promise<number>
     supprimerChat(idJeune: string): Promise<void>
     envoyerMessageTransfert(jeune: Jeune): Promise<void>

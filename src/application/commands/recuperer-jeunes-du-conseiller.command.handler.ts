@@ -9,7 +9,10 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
+import {
+  Conseiller,
+  ConseillersRepositoryToken
+} from '../../domain/conseiller/conseiller'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 

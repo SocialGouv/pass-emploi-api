@@ -1320,6 +1320,7 @@ describe('ConseillersController', () => {
         const idsBeneficiaires: string[] = []
         const command: CreateListeDeDiffusionCommand = {
           idConseiller,
+          titre: '',
           idsBeneficiaires
         }
         createListeDeDiffusionCommandHandler.execute
@@ -1330,7 +1331,7 @@ describe('ConseillersController', () => {
         await request(app.getHttpServer())
           .post(`/conseillers/${idConseiller}/listes-de-diffusion`)
           .set('authorization', unHeaderAuthorization())
-          .send({ idsBeneficiaires })
+          .send({ titre: '', idsBeneficiaires })
           // Then
           .expect(HttpStatus.CREATED)
       })
@@ -1342,6 +1343,7 @@ describe('ConseillersController', () => {
         const idsBeneficiaires: string[] = []
         const command: CreateListeDeDiffusionCommand = {
           idConseiller,
+          titre: '',
           idsBeneficiaires
         }
         createListeDeDiffusionCommandHandler.execute
@@ -1352,7 +1354,7 @@ describe('ConseillersController', () => {
         await request(app.getHttpServer())
           .post(`/conseillers/${idConseiller}/listes-de-diffusion`)
           .set('authorization', unHeaderAuthorization())
-          .send({ idsBeneficiaires })
+          .send({ titre: '', idsBeneficiaires })
           // Then
           .expect(HttpStatus.NOT_FOUND)
       })
@@ -1367,7 +1369,7 @@ describe('ConseillersController', () => {
         await request(app.getHttpServer())
           .post(`/conseillers/${idConseiller}/listes-de-diffusion`)
           .set('authorization', unHeaderAuthorization())
-          .send({ idsBeneficiaires })
+          .send({ titre: '', idsBeneficiaires })
           // Then
           .expect(HttpStatus.BAD_REQUEST)
       })

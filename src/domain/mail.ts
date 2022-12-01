@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { Conseiller } from './conseiller'
+import { Conseiller } from './conseiller/conseiller'
 import { Core } from './core'
 import { Jeune } from './jeune/jeune'
 import { RendezVous } from './rendez-vous/rendez-vous'

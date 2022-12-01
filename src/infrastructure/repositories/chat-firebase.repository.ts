@@ -14,6 +14,13 @@ export class ChatFirebaseRepository implements Chat.Repository {
     await this.firebaseClient.initializeChatIfNotExists(jeuneId, conseillerId)
   }
 
+  async initializeListeDeDiffusionIfNotExists(
+    _idConseiller: string,
+    _idListeDeDiffusion: string
+  ): Promise<void> {
+    return
+  }
+
   async getNombreDeConversationsNonLues(conseillerId: string): Promise<number> {
     return this.firebaseClient.getNombreDeConversationsNonLues(conseillerId)
   }

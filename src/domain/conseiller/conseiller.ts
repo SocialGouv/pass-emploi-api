@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { MauvaiseCommandeError } from '../building-blocks/types/domain-error'
-import { failure, Result, success } from '../building-blocks/types/result'
-import { Agence } from './agence'
-import { Core } from './core'
+import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
+import { failure, Result, success } from '../../building-blocks/types/result'
+import { Agence } from '../agence'
+import { Core } from '../core'
 import Structure = Core.Structure
+import * as _ListeDeDiffusion from './liste-de-diffusion'
 
 export interface Conseiller {
   id: string
@@ -21,6 +22,9 @@ export interface Conseiller {
 export const ConseillersRepositoryToken = 'Conseiller.Repository'
 
 export namespace Conseiller {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  export import ListeDeDiffusion = _ListeDeDiffusion.ListeDeDiffusion
+
   export interface Repository {
     get(id: string): Promise<Conseiller | undefined>
 

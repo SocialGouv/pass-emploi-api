@@ -13,7 +13,10 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
-import { Conseiller, ConseillersRepositoryToken } from '../../domain/conseiller'
+import {
+  Conseiller,
+  ConseillersRepositoryToken
+} from '../../domain/conseiller/conseiller'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 
 export interface DeleteJeuneInactifCommand {

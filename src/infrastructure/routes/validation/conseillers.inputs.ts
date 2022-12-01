@@ -183,6 +183,10 @@ export class GetIndicateursPourConseillerQueryParams {
 
 export class CreateListeDeDiffusionPayload {
   @ApiProperty()
+  @IsString()
+  titre: string
+
+  @ApiProperty()
   @IsArray()
   idsBeneficiaires: string[]
 }

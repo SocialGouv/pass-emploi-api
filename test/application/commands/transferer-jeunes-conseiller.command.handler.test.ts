@@ -18,7 +18,7 @@ import {
   emptySuccess,
   failure
 } from '../../../src/building-blocks/types/result'
-import { Conseiller } from '../../../src/domain/conseiller'
+import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
