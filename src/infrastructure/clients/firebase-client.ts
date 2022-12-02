@@ -29,6 +29,7 @@ export interface IFirebaseClient {
 }
 
 const FIREBASE_CHAT_PATH = 'chat'
+const FIREBASE_GROUP_PATH = 'group'
 
 @Injectable()
 export class FirebaseClient implements IFirebaseClient {
@@ -96,6 +97,26 @@ export class FirebaseClient implements IFirebaseClient {
         conseillerId
       }
       await this.firestore.collection(collectionPath).add(newChat)
+    }
+  }
+
+  async initializeGroupIfNotExists(
+    conseillerId: string,
+    groupeId: string
+  ): Promise<void> {
+    const collectionPath = FIREBASE_GROUP_PATH
+    const chat = await this.firestore
+      .collection(collectionPath)
+      .where('conseillerId', '==', conseillerId)
+      .where('groupeId', '==', groupeId)
+      .get()
+
+    if (chat.empty) {
+      const newGroup = {
+        conseillerId,
+        groupeId
+      }
+      await this.firestore.collection(collectionPath).add(newGroup)
     }
   }
 
