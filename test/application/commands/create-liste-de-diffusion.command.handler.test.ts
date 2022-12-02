@@ -65,6 +65,7 @@ describe('CreateListeDeDiffusionCommandHandler', () => {
     let expectedListeDeDiffusion: Conseiller.ListeDeDiffusion
     const idConseiller = 'un-id-conseiller'
     const idListe = '8154f0f4-7189-11ed-a1eb-0242ac120002'
+    const maintenant = uneDatetime()
 
     beforeEach(() => {
       // Given
@@ -77,8 +78,17 @@ describe('CreateListeDeDiffusionCommandHandler', () => {
         id: idListe,
         idConseiller: command.idConseiller,
         titre: command.titre,
-        dateDeCreation: uneDatetime(),
-        idsBeneficiaires: command.idsBeneficiaires
+        dateDeCreation: maintenant,
+        beneficiaires: [
+          {
+            id: 'un-id-jeune-1',
+            dateAjout: maintenant
+          },
+          {
+            id: 'un-id-jeune-2',
+            dateAjout: maintenant
+          }
+        ]
       }
       listeDeDiffusionFactory.creer.returns(expectedListeDeDiffusion)
     })

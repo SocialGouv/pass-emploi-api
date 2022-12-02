@@ -23,6 +23,8 @@ import { LogApiPartenaireSqlModel } from './log-api-partenaire.sql-model'
 import { SuggestionSqlModel } from './suggestion.sql-model'
 import { MetierRomeSqlModel } from './metier-rome.sql-model'
 import { LogModificationRendezVousSqlModel } from './log-modification-rendez-vous-sql.model'
+import { ListeDeDiffusionSqlModel } from './liste-de-diffusion.sql-model'
+import { ListeDeDiffusionJeuneAssociationSqlModel } from './liste-de-diffusion-jeune-association.sql-model'
 
 export const sqlModels = [
   ConseillerSqlModel,
@@ -49,5 +51,7 @@ export const sqlModels = [
   LogApiPartenaireSqlModel,
   SuggestionSqlModel,
   MetierRomeSqlModel,
-  LogModificationRendezVousSqlModel
+  LogModificationRendezVousSqlModel,
+  ListeDeDiffusionSqlModel,
+  ListeDeDiffusionJeuneAssociationSqlModel
 ]

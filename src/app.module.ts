@@ -275,6 +275,8 @@ import { HistoriqueRendezVousRepositoryToken } from './domain/rendez-vous/histor
 import { GetAnimationsCollectivesJeuneQueryHandler } from './application/queries/get-animations-collectives-jeune.query.handler.db'
 import { GetUnRendezVousJeuneQueryHandler } from './application/queries/get-un-rendez-vous-jeune.query.handler.db'
 import { CreateListeDeDiffusionCommandHandler } from './application/commands/create-liste-de-diffusion.command.handler'
+import { ListeDeDiffusionSqlRepository } from './infrastructure/repositories/conseiller/liste-de-diffusion-sql.repository.db'
+import { ListeDeDiffusionRepositoryToken } from './domain/conseiller/liste-de-diffusion'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -476,6 +478,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     {
       provide: HistoriqueRendezVousRepositoryToken,
       useClass: HistoriqueRendezVousRepositorySql
+    },
+    {
+      provide: ListeDeDiffusionRepositoryToken,
+      useClass: ListeDeDiffusionSqlRepository
     },
     {
       provide: PoleEmploiPartenaireClientToken,
