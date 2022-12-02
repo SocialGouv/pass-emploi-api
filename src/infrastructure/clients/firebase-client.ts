@@ -29,7 +29,7 @@ export interface IFirebaseClient {
 }
 
 const FIREBASE_CHAT_PATH = 'chat'
-const FIREBASE_GROUP_PATH = 'group'
+const FIREBASE_GROUP_PATH = 'groupe'
 
 @Injectable()
 export class FirebaseClient implements IFirebaseClient {

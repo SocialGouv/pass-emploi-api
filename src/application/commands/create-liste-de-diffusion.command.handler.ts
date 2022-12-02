@@ -6,6 +6,7 @@ import { AuthorizeConseillerForJeunes } from '../authorizers/authorize-conseille
 import { Conseiller } from '../../domain/conseiller/conseiller'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Inject, Injectable } from '@nestjs/common'
+import { ListeDeDiffusionRepositoryToken } from '../../domain/conseiller/liste-de-diffusion'
 
 export interface CreateListeDeDiffusionCommand extends Command {
   idConseiller: string
@@ -20,6 +21,7 @@ export class CreateListeDeDiffusionCommandHandler extends CommandHandler<
 > {
   constructor(
     private conseillerForJeunesAuthorizer: AuthorizeConseillerForJeunes,
+    @Inject(ListeDeDiffusionRepositoryToken)
     private listeDeDiffusionRepository: Conseiller.ListeDeDiffusion.Repository,
     private listeDeDiffusionFactory: Conseiller.ListeDeDiffusion.Factory,
     @Inject(ChatRepositoryToken)
