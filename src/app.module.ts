@@ -277,6 +277,7 @@ import { GetUnRendezVousJeuneQueryHandler } from './application/queries/get-un-r
 import { CreateListeDeDiffusionCommandHandler } from './application/commands/create-liste-de-diffusion.command.handler'
 import { ListeDeDiffusionSqlRepository } from './infrastructure/repositories/conseiller/liste-de-diffusion-sql.repository.db'
 import { ListeDeDiffusionRepositoryToken } from './domain/conseiller/liste-de-diffusion'
+import { GetListesDeDiffusionDuConseillerQueryHandler } from './application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -635,7 +636,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     CloturerAnimationCollectiveCommandHandler,
     GetAnimationsCollectivesJeuneQueryHandler,
     GetUnRendezVousJeuneQueryHandler,
-    CreateListeDeDiffusionCommandHandler
+    CreateListeDeDiffusionCommandHandler,
+    GetListesDeDiffusionDuConseillerQueryHandler
   ]
 }
 
