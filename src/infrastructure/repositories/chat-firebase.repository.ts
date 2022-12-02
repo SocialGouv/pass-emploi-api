@@ -15,10 +15,13 @@ export class ChatFirebaseRepository implements Chat.Repository {
   }
 
   async initializeListeDeDiffusionIfNotExists(
-    _idConseiller: string,
-    _idListeDeDiffusion: string
+    idConseiller: string,
+    idListeDeDiffusion: string
   ): Promise<void> {
-    return
+    await this.firebaseClient.initializeGroupIfNotExists(
+      idConseiller,
+      idListeDeDiffusion
+    )
   }
 
   async getNombreDeConversationsNonLues(conseillerId: string): Promise<number> {

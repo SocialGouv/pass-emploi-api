@@ -5,7 +5,7 @@ import { Authentification } from '../../domain/authentification'
 import { AuthorizeConseillerForJeunes } from '../authorizers/authorize-conseiller-for-jeunes'
 import { Conseiller } from '../../domain/conseiller/conseiller'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
-import { Inject } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 
 export interface CreateListeDeDiffusionCommand extends Command {
   idConseiller: string
@@ -13,6 +13,7 @@ export interface CreateListeDeDiffusionCommand extends Command {
   idsBeneficiaires: string[]
 }
 
+@Injectable()
 export class CreateListeDeDiffusionCommandHandler extends CommandHandler<
   CreateListeDeDiffusionCommand,
   void
