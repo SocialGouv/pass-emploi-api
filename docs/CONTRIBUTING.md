@@ -49,7 +49,7 @@
 
 ### Pré-requis <a name="pré-requis"></a>
 - Node 18.12.1
-- Docker et docker-compose
+- Docker et docker compose
 
 ### Récupérer les variables d'environnement <a name="pull-variables-environnement"></a>
 1. Créer un fichier ```.environment``` en copiant le .environment.template
@@ -159,7 +159,7 @@ yarn test
 ```
 - Tests avec l'IDE :
 
-Pour lancer les tests avec votre IDE favori, il est nécessaire de lancer d'abord une base de données via le docker-compose.
+Pour lancer les tests avec votre IDE favori, il est nécessaire de lancer d'abord une base de données via le docker compose.
 
 ```bash
 yarn start:db:test

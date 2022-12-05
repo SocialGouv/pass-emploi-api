@@ -3,7 +3,7 @@
 attempt_counter=0
 max_attempts=20
 
-APIDB_NAME=$(docker-compose ps | grep pgtestdb | cut -f1 -d ' ')
+APIDB_NAME=$(docker compose ps | grep pgtestdb | cut -f1 -d ' ')
 if [[ -z "$APIDB_NAME" ]]; then
   echo local API DB seems not started! >&2
   exit 1
