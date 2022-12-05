@@ -1,7 +1,9 @@
+import {
+  ListeDeDiffusionQueryModel
+} from '../../../src/application/queries/query-models/liste-de-diffusion.query-model'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
 import {
-  GetListesDeDiffusionDuConseillerQueryHandler,
-  ListeDeDiffusionQueryModel
+  GetListesDeDiffusionDuConseillerQueryHandler
 } from '../../../src/application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
 import { expect } from 'test/utils'
 import { ListeDeDiffusionSqlModel } from '../../../src/infrastructure/sequelize/models/liste-de-diffusion.sql-model'
@@ -38,15 +40,7 @@ describe('GetListesDeDiffusionDuConseillerQueryHandler', () => {
   })
 
   describe('handle', () => {
-    it('should return an empty array', async () => {
-      const result = await queryHandler.handle({
-        idConseiller: 'idConseiller'
-      })
-
-      expect(result).to.deep.equal([])
-    })
-
-    it('should return an array of ListeDeDiffusionQueryModel', async () => {
+    it('renvoie les listes de diffusion du conseiller', async () => {
       // Given
       const idAutreConseiller = '5cd8e86b-175a-4980-bad8-c5ce01dc049b'
       await ConseillerSqlModel.creer(unConseillerDto({ id: idAutreConseiller }))
