@@ -40,40 +40,59 @@ export class RendezVousAuthorizer {
       return failure(new NonTrouveError('RendezVous', idRendezVous))
     }
 
-    if (utilisateur && utilisateur.type === Authentification.Type.CONSEILLER) {
-      if (RendezVous.estUnTypeAnimationCollective(rendezVous.type)) {
-        const conseiller = await this.conseillerRepository.get(utilisateur.id)
+    if (!utilisateur) {
+      return failure(new DroitsInsuffisants())
+    }
 
-        if (
-          conseiller &&
-          rendezVous.idAgence &&
-          rendezVous.idAgence === conseiller?.agence?.id
-        ) {
-          return emptySuccess()
-        }
-      } else if (
-        rendezVous.jeunes.find(jeune => utilisateur.id === jeune.conseiller?.id)
+    switch (utilisateur.type) {
+      case Authentification.Type.JEUNE:
+        return this.autoriserUnJeune(rendezVous, utilisateur)
+      case Authentification.Type.CONSEILLER:
+        return this.autoriserUnConseiller(rendezVous, utilisateur)
+      default:
+        return failure(new DroitsInsuffisants())
+    }
+  }
+
+  private async autoriserUnJeune(
+    rendezVous: RendezVous,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<Result> {
+    if (RendezVous.estUnTypeAnimationCollective(rendezVous.type)) {
+      const jeune = await this.jeuneRepository.get(utilisateur.id)
+
+      if (
+        jeune &&
+        rendezVous.idAgence &&
+        rendezVous.idAgence === jeune.conseiller?.idAgence
       ) {
         return emptySuccess()
       }
+    } else if (rendezVous.jeunes.find(jeune => utilisateur.id === jeune.id)) {
+      return emptySuccess()
     }
+    return failure(new DroitsInsuffisants())
+  }
 
-    if (utilisateur.type === Authentification.Type.JEUNE) {
-      if (RendezVous.estUnTypeAnimationCollective(rendezVous.type)) {
-        const jeune = await this.jeuneRepository.get(utilisateur.id)
+  private async autoriserUnConseiller(
+    rendezVous: RendezVous,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<Result> {
+    if (RendezVous.estUnTypeAnimationCollective(rendezVous.type)) {
+      const conseiller = await this.conseillerRepository.get(utilisateur.id)
 
-        if (
-          jeune &&
-          rendezVous.idAgence &&
-          rendezVous.idAgence === jeune.conseiller?.idAgence
-        ) {
-          return emptySuccess()
-        }
-      } else if (rendezVous.jeunes.find(jeune => utilisateur.id === jeune.id)) {
+      if (
+        conseiller &&
+        rendezVous.idAgence &&
+        rendezVous.idAgence === conseiller?.agence?.id
+      ) {
         return emptySuccess()
       }
+    } else if (
+      rendezVous.jeunes.find(jeune => utilisateur.id === jeune.conseiller?.id)
+    ) {
+      return emptySuccess()
     }
-
     return failure(new DroitsInsuffisants())
   }
 }
