@@ -278,6 +278,7 @@ import { CreateListeDeDiffusionCommandHandler } from './application/commands/cre
 import { ListeDeDiffusionSqlRepository } from './infrastructure/repositories/conseiller/liste-de-diffusion-sql.repository.db'
 import { ListeDeDiffusionRepositoryToken } from './domain/conseiller/liste-de-diffusion'
 import { GetListesDeDiffusionDuConseillerQueryHandler } from './application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
+import { ListesDeDiffusionController } from './infrastructure/routes/listes-de-diffusion.controller'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -312,7 +313,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     ServicesCiviqueController,
     CampagnesController,
     FilesController,
-    EtablissementsController
+    EtablissementsController,
+    ListesDeDiffusionController
   ],
   providers: [
     ...buildQueryCommandsProviders(),

@@ -4,10 +4,14 @@ import {
   CreateListeDeDiffusionCommand,
   CreateListeDeDiffusionCommandHandler
 } from '../../../src/application/commands/create-liste-de-diffusion.command.handler'
-import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import {
+  DroitsInsuffisants,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
-  failure
+  failure,
+  success
 } from '../../../src/building-blocks/types/result'
 import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
 import {
@@ -16,19 +20,26 @@ import {
   stubClass
 } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { GetListesDeDiffusionDuConseillerQueryHandler } from '../../../src/application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
 
 describe('ListesDeDiffusionController', () => {
   let createListeDeDiffusionCommandHandler: StubbedClass<CreateListeDeDiffusionCommandHandler>
+  let getListesDeDiffusionQueryHandler: StubbedClass<GetListesDeDiffusionDuConseillerQueryHandler>
   let app: INestApplication
 
   before(async () => {
     createListeDeDiffusionCommandHandler = stubClass(
       CreateListeDeDiffusionCommandHandler
     )
+    getListesDeDiffusionQueryHandler = stubClass(
+      GetListesDeDiffusionDuConseillerQueryHandler
+    )
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateListeDeDiffusionCommandHandler)
       .useValue(createListeDeDiffusionCommandHandler)
+      .overrideProvider(GetListesDeDiffusionDuConseillerQueryHandler)
+      .useValue(getListesDeDiffusionQueryHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -105,6 +116,44 @@ describe('ListesDeDiffusionController', () => {
 
     ensureUserAuthenticationFailsIfInvalid(
       'post',
+      '/conseillers/2/listes-de-diffusion'
+    )
+  })
+
+  describe('GET /conseillers/{idConseiller}/listes-de-diffusion', () => {
+    it('retourne les liste de diffusion quand la query est en succès', async () => {
+      // Given
+      const idConseiller = 'id-conseiller'
+      getListesDeDiffusionQueryHandler.execute.resolves(success([]))
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/conseillers/${idConseiller}/listes-de-diffusion`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.OK)
+        .expect([])
+    })
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers/2/listes-de-diffusion'
+    )
+    it('retourne une 403 quand l‘utilisateur n‘a pas les droits', async () => {
+      // Given
+      const idConseiller = 'id-conseiller'
+      getListesDeDiffusionQueryHandler.execute.resolves(
+        failure(new DroitsInsuffisants())
+      )
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/conseillers/${idConseiller}/listes-de-diffusion`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.FORBIDDEN)
+    })
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
       '/conseillers/2/listes-de-diffusion'
     )
   })
