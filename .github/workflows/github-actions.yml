@@ -2,7 +2,7 @@ name: PR Continuous Integration - API
 
 on:
   push:
-    branches: [ develop, master ]
+    branches: [develop, master]
   pull_request:
     types:
       - opened
@@ -35,7 +35,7 @@ jobs:
         image: redis:7-alpine
         ports:
           - 6767:6379
-      
+
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -48,7 +48,7 @@ jobs:
           yarn: cache
       - name: Install dependencies
         run: yarn
-      - name: Lint project  
+      - name: Lint project
         run: yarn lint
       - name: Tests
         run: yarn test:ci
@@ -63,7 +63,7 @@ jobs:
 
   deploy-review-app:
     runs-on: ubuntu-latest
-    if: ${{ !github.event.pull_request.draft }}
+    if: ${{ (github.event_name == 'pull_request') && (!github.event.pull_request.draft) }}
     steps:
       - name: Install Scalingo CLI
         run: |
@@ -74,4 +74,4 @@ jobs:
           scalingo login --api-token ${{ secrets.SCALINGO_API_KEY }}
       - name: Deploy review app
         run: |
-          scalingo -a pa-back-staging integration-link-manual-review-app ${{ github.event.pull_request.number }} 
+          scalingo -a pa-back-staging integration-link-manual-review-app ${{ github.event.pull_request.number }}
