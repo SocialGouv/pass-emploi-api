@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import { Command } from '../../building-blocks/types/command'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
+  NonTrouveError,
   DroitsInsuffisants,
   EmailExisteDejaError
 } from '../../building-blocks/types/domain-error'
+import { Command } from '../../building-blocks/types/command'
+import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'

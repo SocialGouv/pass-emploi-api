@@ -70,7 +70,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
         utilisateur
       )
     }
-    return await this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {
