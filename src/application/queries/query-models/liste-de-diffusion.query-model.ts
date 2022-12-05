@@ -1,11 +1,29 @@
-export class ListeDeDiffusionQueryModel {
+import { ApiProperty } from '@nestjs/swagger'
+
+class BeneficiaireListeDeDiffusionQueryModel {
+  @ApiProperty()
   id: string
+
+  @ApiProperty()
+  nom: string
+
+  @ApiProperty()
+  prenom: string
+
+  @ApiProperty()
+  estDansLePortefeuille?: boolean
+}
+
+export class ListeDeDiffusionQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
   titre: string
+
+  @ApiProperty()
   dateDeCreation: Date
-  beneficiaires: Array<{
-    id: string
-    nom: string
-    prenom: string
-    estDansLePortefeuille?: boolean
-  }>
+
+  @ApiProperty()
+  beneficiaires: BeneficiaireListeDeDiffusionQueryModel[]
 }

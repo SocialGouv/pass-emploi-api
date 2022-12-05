@@ -7,11 +7,13 @@ import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-m
 import { ListeDeDiffusionSqlModel } from '../../infrastructure/sequelize/models/liste-de-diffusion.sql-model'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { ListeDeDiffusionQueryModel } from './query-models/liste-de-diffusion.query-model'
+import { Injectable } from '@nestjs/common'
 
 export interface GetListesDeDiffusionDuConseillerQuery extends Query {
   idConseiller: string
 }
 
+@Injectable()
 export class GetListesDeDiffusionDuConseillerQueryHandler extends QueryHandler<
   GetListesDeDiffusionDuConseillerQuery,
   Result<ListeDeDiffusionQueryModel[]>
