@@ -1,5 +1,7 @@
-import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
 import { DetailConseillerQueryModel } from '../../../application/queries/query-models/conseillers.query-model'
+import { ListeDeDiffusionQueryModel } from '../../../application/queries/query-models/liste-de-diffusion.query-model'
+import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
+import { ListeDeDiffusionSqlModel } from '../../sequelize/models/liste-de-diffusion.sql-model'
 
 export function fromSqlToDetailConseillerQueryModel(
   conseillerSqlModel: ConseillerSqlModel,
@@ -26,4 +28,21 @@ export function fromSqlToDetailConseillerQueryModel(
     }
   }
   return conseiller
+}
+
+export function fromSqlToListeDeDiffusionQueryModel(
+  listeDeDiffusionSql: ListeDeDiffusionSqlModel
+): ListeDeDiffusionQueryModel {
+  return {
+    id: listeDeDiffusionSql.id,
+    titre: listeDeDiffusionSql.titre,
+    dateDeCreation: listeDeDiffusionSql.dateDeCreation,
+    beneficiaires: listeDeDiffusionSql.jeunes.map(beneficiaire => ({
+      id: beneficiaire.id,
+      nom: beneficiaire.nom,
+      prenom: beneficiaire.prenom,
+      estDansLePortefeuille:
+        beneficiaire.idConseiller === listeDeDiffusionSql.idConseiller
+    }))
+  }
 }
