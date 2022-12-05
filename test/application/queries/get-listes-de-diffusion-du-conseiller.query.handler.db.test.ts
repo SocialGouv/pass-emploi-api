@@ -1,11 +1,9 @@
-import {
-  ListeDeDiffusionQueryModel
-} from '../../../src/application/queries/query-models/liste-de-diffusion.query-model'
+import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import { ListeDeDiffusionQueryModel } from '../../../src/application/queries/query-models/liste-de-diffusion.query-model'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
-import {
-  GetListesDeDiffusionDuConseillerQueryHandler
-} from '../../../src/application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
-import { expect } from 'test/utils'
+import { GetListesDeDiffusionDuConseillerQueryHandler } from '../../../src/application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
+import { expect, StubbedClass, stubClass } from 'test/utils'
 import { ListeDeDiffusionSqlModel } from '../../../src/infrastructure/sequelize/models/liste-de-diffusion.sql-model'
 import {
   uneListeDeDiffusionAssociationDto,
@@ -22,6 +20,7 @@ import { success } from '../../../src/building-blocks/types/result'
 
 describe('GetListesDeDiffusionDuConseillerQueryHandler', () => {
   DatabaseForTesting.prepare()
+  let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let queryHandler: GetListesDeDiffusionDuConseillerQueryHandler
   const jeune: Jeune = unJeune({
     conseiller: unConseillerDuJeune({ idAgence: undefined })
@@ -33,7 +32,10 @@ describe('GetListesDeDiffusionDuConseillerQueryHandler', () => {
   })
 
   beforeEach(async () => {
-    queryHandler = new GetListesDeDiffusionDuConseillerQueryHandler()
+    conseillerAuthorizer = stubClass(ConseillerAuthorizer)
+    queryHandler = new GetListesDeDiffusionDuConseillerQueryHandler(
+      conseillerAuthorizer
+    )
 
     await ConseillerSqlModel.creer(conseillerDto)
     await JeuneSqlModel.creer(jeuneDto)
@@ -105,6 +107,25 @@ describe('GetListesDeDiffusionDuConseillerQueryHandler', () => {
         }
       ]
       expect(result).to.deep.equal(success(attendu))
+    })
+  })
+
+  describe('authorize', () => {
+    it('n’autorise que le conseiller demandé', () => {
+      // Given
+      const idConseiller = 'id-conseiller'
+
+      // When
+      queryHandler.authorize(
+        { idConseiller },
+        unUtilisateurConseiller({ id: idConseiller })
+      )
+
+      // Then
+      expect(conseillerAuthorizer.authorize).to.have.been.calledOnceWithExactly(
+        idConseiller,
+        unUtilisateurConseiller({ id: idConseiller })
+      )
     })
   })
 })
