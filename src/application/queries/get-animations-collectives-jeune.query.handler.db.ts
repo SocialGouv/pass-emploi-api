@@ -30,7 +30,7 @@ export class GetAnimationsCollectivesJeuneQueryHandler extends QueryHandler<
     query: GetAnimationsCollectivesJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return await this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
   }
 
   async handle(

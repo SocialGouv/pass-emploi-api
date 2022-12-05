@@ -34,7 +34,7 @@ export class CreateListeDeDiffusionCommandHandler extends CommandHandler<
     command: CreateListeDeDiffusionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return await this.conseillerForJeunesAuthorizer.authorize(
+    return this.conseillerForJeunesAuthorizer.authorize(
       command.idsBeneficiaires,
       utilisateur
     )

@@ -104,7 +104,7 @@ export class HandleJobNotifierRendezVousPECommandHandler extends CommandHandler<
               notificationsAEnvoyer.length
 
             for (const notificationAEnvoyer of notificationsAEnvoyer) {
-              await this.notificationService.notifierUnRendezVousPoleEmploi(
+              this.notificationService.notifierUnRendezVousPoleEmploi(
                 notificationAEnvoyer.typeMouvementRDV,
                 jeuneANotifier.pushNotificationToken,
                 notificationAEnvoyer.message,
