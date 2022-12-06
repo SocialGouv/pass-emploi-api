@@ -3,9 +3,12 @@ import { expect, StubbedClass, stubClass } from '../../utils'
 import { DateService } from '../../../src/utils/date-service'
 import { IdService } from '../../../src/utils/id-service'
 import { uneDatetime } from '../../fixtures/date.fixture'
+import { uneListeDeDiffusion } from '../../fixtures/liste-de-diffusion.fixture'
+import { unJeune } from '../../fixtures/jeune.fixture'
 
 describe(' ListeDeDiffusion', () => {
   let factory: ListeDeDiffusion.Factory
+  let service: ListeDeDiffusion.Service
   const maintenant = uneDatetime()
 
   beforeEach(() => {
@@ -14,6 +17,7 @@ describe(' ListeDeDiffusion', () => {
     const dateService: StubbedClass<DateService> = stubClass(DateService)
     dateService.now.returns(maintenant)
     factory = new ListeDeDiffusion.Factory(idService, dateService)
+    service = new ListeDeDiffusion.Service(dateService)
   })
 
   describe('creer', () => {
@@ -41,6 +45,78 @@ describe(' ListeDeDiffusion', () => {
         ],
         dateDeCreation: maintenant
       })
+    })
+  })
+
+  describe('mettreAJour', () => {
+    it('met à jour le titre', () => {
+      // Given
+      const listeDeDiffusionInitiale = uneListeDeDiffusion()
+
+      // When
+      const listeDeDiffusionMiseAJour = service.mettreAJour(
+        listeDeDiffusionInitiale,
+        {
+          titre: 'un nouveau titre',
+          idsBeneficiaires: listeDeDiffusionInitiale.beneficiaires.map(
+            beneficiaire => beneficiaire.id
+          )
+        }
+      )
+
+      // Then
+      expect(listeDeDiffusionMiseAJour).to.deep.equal({
+        ...listeDeDiffusionInitiale,
+        titre: 'un nouveau titre'
+      })
+    })
+    it('enlève un bénéficiaire', () => {
+      // Given
+      const listeDeDiffusionInitiale = uneListeDeDiffusion()
+
+      // When
+      const listeDeDiffusionMiseAJour = service.mettreAJour(
+        listeDeDiffusionInitiale,
+        {
+          titre: listeDeDiffusionInitiale.titre,
+          idsBeneficiaires: []
+        }
+      )
+
+      // Then
+      expect(listeDeDiffusionMiseAJour).to.deep.equal({
+        ...listeDeDiffusionInitiale,
+        beneficiaires: []
+      })
+    })
+    it('ajoute un bénéficiaire', () => {
+      // Given
+      const listeDeDiffusionInitiale = uneListeDeDiffusion()
+
+      // When
+      const listeDeDiffusionMiseAJour = service.mettreAJour(
+        listeDeDiffusionInitiale,
+        {
+          titre: listeDeDiffusionInitiale.titre,
+          idsBeneficiaires: [unJeune().id, 'un-autre-id']
+        }
+      )
+
+      // Then
+      const expected: ListeDeDiffusion = {
+        ...listeDeDiffusionInitiale,
+        beneficiaires: [
+          {
+            id: unJeune().id,
+            dateAjout: maintenant
+          },
+          {
+            id: 'un-autre-id',
+            dateAjout: maintenant
+          }
+        ]
+      }
+      expect(listeDeDiffusionMiseAJour).to.deep.equal(expected)
     })
   })
 })

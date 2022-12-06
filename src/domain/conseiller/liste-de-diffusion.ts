@@ -20,6 +20,11 @@ export namespace ListeDeDiffusion {
     idsBeneficiaires: string[]
   }
 
+  interface InfosMiseAJour {
+    titre: string
+    idsBeneficiaires: string[]
+  }
+
   export interface Repository {
     save(listeDeDiffusion: ListeDeDiffusion): Promise<void>
 
@@ -52,6 +57,42 @@ export namespace ListeDeDiffusion {
         titre: infosCreation.titre,
         dateDeCreation: maintenant,
         beneficiaires
+      }
+    }
+  }
+
+  @Injectable()
+  export class Service {
+    constructor(private dateService: DateService) {}
+
+    mettreAJour(
+      listeDeDiffusionInitiale: ListeDeDiffusion,
+      infosMiseAJour: InfosMiseAJour
+    ): ListeDeDiffusion {
+      const maintenant = this.dateService.now()
+
+      const beneficiairesInitiaux: Beneficiaire[] =
+        listeDeDiffusionInitiale.beneficiaires.filter(beneficiaire =>
+          infosMiseAJour.idsBeneficiaires.includes(beneficiaire.id)
+        )
+
+      const nouveauxBeneficiaires: Beneficiaire[] =
+        infosMiseAJour.idsBeneficiaires
+          .filter(
+            id =>
+              !listeDeDiffusionInitiale.beneficiaires.find(
+                beneficiaire => beneficiaire.id === id
+              )
+          )
+          .map(idBeneficiaire => ({
+            id: idBeneficiaire,
+            dateAjout: maintenant
+          }))
+
+      return {
+        ...listeDeDiffusionInitiale,
+        beneficiaires: beneficiairesInitiaux.concat(nouveauxBeneficiaires),
+        titre: infosMiseAJour.titre
       }
     }
   }

@@ -29,16 +29,25 @@ export class ListeDeDiffusionSqlRepository
       }
       await ListeDeDiffusionSqlModel.upsert(listeDeDiffusionDto)
 
-      for (const beneficiaire of listeDeDiffusion.beneficiaires) {
-        await ListeDeDiffusionJeuneAssociationSqlModel.create(
-          {
-            idBeneficiaire: beneficiaire.id,
-            idListe: listeDeDiffusion.id,
-            dateAjout: beneficiaire.dateAjout.toJSDate()
-          },
-          { transaction }
-        )
-      }
+      await ListeDeDiffusionJeuneAssociationSqlModel.destroy({
+        transaction,
+        where: {
+          idListe: listeDeDiffusion.id
+        }
+      })
+
+      await Promise.all(
+        listeDeDiffusion.beneficiaires.map(beneficiaire => {
+          return ListeDeDiffusionJeuneAssociationSqlModel.create(
+            {
+              idBeneficiaire: beneficiaire.id,
+              idListe: listeDeDiffusion.id,
+              dateAjout: beneficiaire.dateAjout.toJSDate()
+            },
+            { transaction }
+          )
+        })
+      )
     })
   }
 

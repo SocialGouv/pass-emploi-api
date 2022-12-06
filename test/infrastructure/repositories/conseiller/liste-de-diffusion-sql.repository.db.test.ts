@@ -8,6 +8,9 @@ import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { uneListeDeDiffusion } from '../../../fixtures/liste-de-diffusion.fixture'
 import { expect } from '../../../utils'
+import { ListeDeDiffusion } from '../../../../src/domain/conseiller/liste-de-diffusion'
+import { uneAutreDatetime, uneDatetime } from '../../../fixtures/date.fixture'
+import { ListeDeDiffusionJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/liste-de-diffusion-jeune-association.sql-model'
 
 describe(' ListeDeDiffusionSqlRepository', () => {
   const database = DatabaseForTesting.prepare()
@@ -16,11 +19,11 @@ describe(' ListeDeDiffusionSqlRepository', () => {
   const jeune: Jeune = unJeune({
     conseiller: unConseillerDuJeune({ idAgence: undefined })
   })
+  const conseillerDto = unConseillerDto({ id: jeune.conseiller!.id })
 
   beforeEach(async () => {
     repository = new ListeDeDiffusionSqlRepository(database.sequelize)
 
-    const conseillerDto = unConseillerDto({ id: jeune.conseiller!.id })
     await ConseillerSqlModel.creer(conseillerDto)
     await JeuneSqlModel.creer(
       unJeuneDto({
@@ -41,6 +44,65 @@ describe(' ListeDeDiffusionSqlRepository', () => {
       // Then
       const actual = await repository.get(nouvelleListeDeDiffusion.id)
       expect(actual).to.deep.equal(nouvelleListeDeDiffusion)
+    })
+    it('met à jour une liste de diffusion', async () => {
+      // Given
+      const unJeuneQuiResteDansLaListe = unJeune()
+      const unJeuneQuiQuitteLaListe = unJeune({
+        id: 'e6c073c4-125f-41ad-aa0b-42eaf91e0659'
+      })
+      const unNouveauJeuneDansLaListe = unJeune({
+        id: '38bcd5e0-574d-44c0-a7d8-7703f52ae2f4'
+      })
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: unJeuneQuiQuitteLaListe.id,
+          idConseiller: conseillerDto.id
+        })
+      )
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: unNouveauJeuneDansLaListe.id,
+          idConseiller: conseillerDto.id
+        })
+      )
+      const nouvelleListeDeDiffusion = uneListeDeDiffusion({
+        beneficiaires: [
+          {
+            id: unJeuneQuiResteDansLaListe.id,
+            dateAjout: uneDatetime()
+          },
+          {
+            id: unJeuneQuiQuitteLaListe.id,
+            dateAjout: uneDatetime()
+          }
+        ]
+      })
+      await repository.save(nouvelleListeDeDiffusion)
+      const listeDeDiffusionAJour: ListeDeDiffusion = {
+        ...nouvelleListeDeDiffusion,
+        titre: 'un nouveau titre',
+        beneficiaires: [
+          {
+            id: unJeuneQuiResteDansLaListe.id,
+            dateAjout: uneDatetime()
+          },
+          {
+            id: unNouveauJeuneDansLaListe.id,
+            dateAjout: uneAutreDatetime()
+          }
+        ]
+      }
+
+      // When
+      await repository.save(listeDeDiffusionAJour)
+
+      // Then
+      const actual = await repository.get(nouvelleListeDeDiffusion.id)
+      expect(actual).to.deep.equal(listeDeDiffusionAJour)
+      const associations =
+        await ListeDeDiffusionJeuneAssociationSqlModel.findAll()
+      expect(associations).to.have.length(2)
     })
   })
 })
