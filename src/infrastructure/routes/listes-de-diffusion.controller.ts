@@ -1,9 +1,20 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put
+} from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   CreateListeDeDiffusionCommand,
   CreateListeDeDiffusionCommandHandler
 } from '../../application/commands/create-liste-de-diffusion.command.handler'
+import { DeleteListeDeDiffusionCommandHandler } from '../../application/commands/delete-liste-de-diffusion.command.handler'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
@@ -26,7 +37,8 @@ export class ListesDeDiffusionController {
   constructor(
     private readonly createListeDeDiffusionCommandHandler: CreateListeDeDiffusionCommandHandler,
     private readonly updateListeDeDiffusionCommandHandler: UpdateListeDeDiffusionCommandHandler,
-    private readonly getListesDeDiffusionQueryHandler: GetListesDeDiffusionDuConseillerQueryHandler
+    private readonly getListesDeDiffusionQueryHandler: GetListesDeDiffusionDuConseillerQueryHandler,
+    private readonly deleteListeDeDiffusionCommendHandler: DeleteListeDeDiffusionCommandHandler
   ) {}
 
   @ApiOperation({
@@ -62,7 +74,6 @@ export class ListesDeDiffusionController {
   })
   @Put('/listes-de-diffusion/:idListeDeDiffusion')
   async putListesDeDiffusion(
-    @Param('idConseiller') _idConseiller: string,
     @Param('idListeDeDiffusion') idListeDeDiffusion: string,
     @Body() payload: UpdateListeDeDiffusionPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
@@ -83,7 +94,7 @@ export class ListesDeDiffusionController {
   }
 
   @ApiOperation({
-    summary: 'récupère les listes de diffusion du conseiller',
+    summary: 'Récupère les listes de diffusion du conseiller',
     description: 'Autorisé pour le conseiller'
   })
   @Get('conseillers/:idConseiller/listes-de-diffusion')
@@ -104,5 +115,25 @@ export class ListesDeDiffusionController {
       return result.data
     }
     throw handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary: 'Supprime une liste de diffusion',
+    description: 'Autorisé pour le conseiller qui a créé la liste'
+  })
+  @Delete('/listes-de-diffusion/:idListeDeDiffusion')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteListeDeDiffusion(
+    @Param('idListeDeDiffusion') idListeDeDiffusion: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.deleteListeDeDiffusionCommendHandler.execute(
+      { idListeDeDiffusion },
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      handleFailure(result)
+    }
   }
 }

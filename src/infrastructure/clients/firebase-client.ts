@@ -239,6 +239,19 @@ export class FirebaseClient implements IFirebaseClient {
     }
   }
 
+  async supprimerGroup(idListe: string): Promise<void> {
+    const collection = this.firestore.collection(FIREBASE_GROUP_PATH)
+    const listeASupprimer = await collection
+      .where('groupeId', '==', idListe)
+      .get()
+
+    if (!listeASupprimer.empty) {
+      for (const liste of listeASupprimer.docs) {
+        await collection.doc(liste.id).delete()
+      }
+    }
+  }
+
   async getChat(idJeune: string): Promise<ArchiveJeune.Message[]> {
     const collection = this.firestore.collection(FIREBASE_CHAT_PATH)
     const chats = await collection.where('jeuneId', '==', idJeune).get()

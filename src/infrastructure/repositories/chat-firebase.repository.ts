@@ -32,6 +32,10 @@ export class ChatFirebaseRepository implements Chat.Repository {
     return this.firebaseClient.supprimerChat(idJeune)
   }
 
+  supprimerListeDeDiffusion(idListe: string): Promise<void> {
+    return this.firebaseClient.supprimerGroup(idListe)
+  }
+
   envoyerMessageTransfert(jeune: Jeune): Promise<void> {
     return this.firebaseClient.envoyerMessageTransfertJeune(jeune)
   }

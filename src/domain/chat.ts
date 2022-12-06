@@ -14,6 +14,7 @@ export namespace Chat {
     ): Promise<void>
     getNombreDeConversationsNonLues(conseillerId: string): Promise<number>
     supprimerChat(idJeune: string): Promise<void>
+    supprimerListeDeDiffusion(idListe: string): Promise<void>
     envoyerMessageTransfert(jeune: Jeune): Promise<void>
   }
 }

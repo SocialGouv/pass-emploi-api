@@ -29,6 +29,8 @@ export namespace ListeDeDiffusion {
     save(listeDeDiffusion: ListeDeDiffusion): Promise<void>
 
     get(id: string): Promise<ListeDeDiffusion | undefined>
+
+    delete(id: string): Promise<void>
   }
 
   export interface Beneficiaire {

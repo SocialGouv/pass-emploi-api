@@ -31,6 +31,7 @@ import { DeleteFavoriOffreEmploiCommandHandler } from './application/commands/de
 import { DeleteFavoriOffreServiceCiviqueCommandHandler } from './application/commands/delete-favori-offre-service-civique.command.handler'
 import { DeleteFavoriOffreImmersionCommandHandler } from './application/commands/delete-favori-offre-immersion.command.handler'
 import { DeleteJeuneInactifCommandHandler } from './application/commands/delete-jeune-inactif.command.handler'
+import { DeleteListeDeDiffusionCommandHandler } from './application/commands/delete-liste-de-diffusion.command.handler'
 import { DeleteRechercheCommandHandler } from './application/commands/delete-recherche.command.handler'
 import { DeleteRendezVousCommandHandler } from './application/commands/delete-rendez-vous.command.handler'
 import { DeleteSuperviseursCommandHandler } from './application/commands/delete-superviseurs.command.handler'
@@ -646,7 +647,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetUnRendezVousJeuneQueryHandler,
     CreateListeDeDiffusionCommandHandler,
     GetListesDeDiffusionDuConseillerQueryHandler,
-    UpdateListeDeDiffusionCommandHandler
+    UpdateListeDeDiffusionCommandHandler,
+    DeleteListeDeDiffusionCommandHandler
   ]
 }
 

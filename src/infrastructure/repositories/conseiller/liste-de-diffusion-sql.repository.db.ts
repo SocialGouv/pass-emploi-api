@@ -64,6 +64,10 @@ export class ListeDeDiffusionSqlRepository
       idConseiller: sqlModel.idConseiller
     }
   }
+
+  async delete(id: string): Promise<void> {
+    await ListeDeDiffusionSqlModel.destroy({ where: { id } })
+  }
 }
 
 // La requête SQL qui récupère les jeunes d'une liste de diffusion passe par une table de jointure

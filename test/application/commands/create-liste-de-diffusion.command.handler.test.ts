@@ -22,9 +22,7 @@ describe('CreateListeDeDiffusionCommandHandler', () => {
 
   beforeEach(() => {
     sandbox = createSandbox()
-    conseillerForJeunesAuthorizer = conseillerForJeunesAuthorizer = stubClass(
-      AuthorizeConseillerForJeunes
-    )
+    conseillerForJeunesAuthorizer = stubClass(AuthorizeConseillerForJeunes)
     listeDeDiffusionRepository = stubInterface(sandbox)
     listeDeDiffusionFactory = stubClass(Conseiller.ListeDeDiffusion.Factory)
     chatRepository = stubInterface(sandbox)
