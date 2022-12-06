@@ -279,6 +279,9 @@ import { ListeDeDiffusionSqlRepository } from './infrastructure/repositories/con
 import { ListeDeDiffusionRepositoryToken } from './domain/conseiller/liste-de-diffusion'
 import { GetListesDeDiffusionDuConseillerQueryHandler } from './application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
 import { ListesDeDiffusionController } from './infrastructure/routes/listes-de-diffusion.controller'
+import { AuthorizeConseillerForJeunesTransferesTemporairement } from './application/authorizers/authorize-conseiller-for-jeunes-transferes'
+import { AuthorizeListeDeDiffusion } from './application/authorizers/authorize-liste-de-diffusion'
+import { UpdateListeDeDiffusionCommandHandler } from './application/commands/update-liste-de-diffusion.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -354,6 +357,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Context,
     Recherche.Factory,
     Conseiller.ListeDeDiffusion.Factory,
+    Conseiller.ListeDeDiffusion.Service,
     {
       provide: APP_GUARD,
       useClass: OidcAuthGuard
@@ -512,9 +516,11 @@ export function buildQueryCommandsProviders(): Provider[] {
     SupportAuthorizer,
     SuggestionAuthorizer,
     AuthorizeConseillerForJeunes,
+    AuthorizeConseillerForJeunesTransferesTemporairement,
     ConseillerForJeuneAvecPartageAuthorizer,
     FavoriOffreServiceCiviqueAuthorizer,
     ConseillerEtablissementAuthorizer,
+    AuthorizeListeDeDiffusion,
     GetDetailActionQueryHandler,
     GetDetailJeuneQueryHandler,
     GetActionsByJeuneQueryHandler,
@@ -639,7 +645,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetAnimationsCollectivesJeuneQueryHandler,
     GetUnRendezVousJeuneQueryHandler,
     CreateListeDeDiffusionCommandHandler,
-    GetListesDeDiffusionDuConseillerQueryHandler
+    GetListesDeDiffusionDuConseillerQueryHandler,
+    UpdateListeDeDiffusionCommandHandler
   ]
 }
 

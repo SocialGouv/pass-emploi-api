@@ -190,3 +190,13 @@ export class CreateListeDeDiffusionPayload {
   @IsArray()
   idsBeneficiaires: string[]
 }
+
+export class UpdateListeDeDiffusionPayload {
+  @ApiProperty()
+  @IsString()
+  titre: string
+
+  @ApiProperty()
+  @IsArray()
+  idsBeneficiaires: string[]
+}

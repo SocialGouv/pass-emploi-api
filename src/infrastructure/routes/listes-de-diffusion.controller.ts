@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   CreateListeDeDiffusionCommand,
@@ -8,9 +8,16 @@ import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
-import { CreateListeDeDiffusionPayload } from './validation/conseillers.inputs'
+import {
+  CreateListeDeDiffusionPayload,
+  UpdateListeDeDiffusionPayload
+} from './validation/conseillers.inputs'
 import { ListeDeDiffusionQueryModel } from '../../application/queries/query-models/liste-de-diffusion.query-model'
 import { GetListesDeDiffusionDuConseillerQueryHandler } from '../../application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
+import {
+  UpdateListeDeDiffusionCommand,
+  UpdateListeDeDiffusionCommandHandler
+} from '../../application/commands/update-liste-de-diffusion.command.handler'
 
 @Controller('conseillers/:idConseiller/listes-de-diffusion')
 @ApiOAuth2([])
@@ -18,6 +25,7 @@ import { GetListesDeDiffusionDuConseillerQueryHandler } from '../../application/
 export class ListesDeDiffusionController {
   constructor(
     private readonly createListeDeDiffusionCommandHandler: CreateListeDeDiffusionCommandHandler,
+    private readonly updateListeDeDiffusionCommandHandler: UpdateListeDeDiffusionCommandHandler,
     private readonly getListesDeDiffusionQueryHandler: GetListesDeDiffusionDuConseillerQueryHandler
   ) {}
 
@@ -38,6 +46,33 @@ export class ListesDeDiffusionController {
       idsBeneficiaires: payload.idsBeneficiaires
     }
     const result = await this.createListeDeDiffusionCommandHandler.execute(
+      command,
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
+  }
+
+  @ApiOperation({
+    summary: 'Modifie une liste de diffusion',
+    description:
+      'Autorisé pour le conseiller avec les bénéficiaires de son portefeuille ou temporairement transférés.'
+  })
+  @Put(':idListeDeDiffusion')
+  async putListesDeDiffusion(
+    @Param('idConseiller') _idConseiller: string,
+    @Param('idListeDeDiffusion') idListeDeDiffusion: string,
+    @Body() payload: UpdateListeDeDiffusionPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const command: UpdateListeDeDiffusionCommand = {
+      id: idListeDeDiffusion,
+      titre: payload.titre,
+      idsBeneficiaires: payload.idsBeneficiaires
+    }
+    const result = await this.updateListeDeDiffusionCommandHandler.execute(
       command,
       utilisateur
     )
