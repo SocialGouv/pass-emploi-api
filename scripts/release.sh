@@ -49,9 +49,11 @@ if [[ $current_branch == "master" ]] && [[ $level == "patch" ]]; then
   upgrade_version_and_tag
 
   git push origin master
-  last_commit_sha=$(git rev-parse HEAD)
+  version_commit_sha=$(git rev-parse HEAD~1)
+  fix_commit_sha=$(git rev-parse HEAD~2)
   git checkout develop
-  git cherry-pick $last_commit_sha
+  git cherry-pick $fix_commit_sha
+  git cherry-pick $version_commit_sha
   git push origin develop
 
   exit 0
