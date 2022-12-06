@@ -1,3 +1,5 @@
+import { Conseiller } from '../../../../src/domain/conseiller/conseiller'
+import { ListeDeDiffusionJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/liste-de-diffusion-jeune-association.sql-model'
 import { DatabaseForTesting } from '../../../utils/database-for-testing'
 import { ListeDeDiffusionSqlRepository } from '../../../../src/infrastructure/repositories/conseiller/liste-de-diffusion-sql.repository.db'
 import { unConseillerDuJeune, unJeune } from '../../../fixtures/jeune.fixture'
@@ -10,12 +12,11 @@ import { uneListeDeDiffusion } from '../../../fixtures/liste-de-diffusion.fixtur
 import { expect } from '../../../utils'
 import { ListeDeDiffusion } from '../../../../src/domain/conseiller/liste-de-diffusion'
 import { uneAutreDatetime, uneDatetime } from '../../../fixtures/date.fixture'
-import { ListeDeDiffusionJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/liste-de-diffusion-jeune-association.sql-model'
 
 describe(' ListeDeDiffusionSqlRepository', () => {
   const database = DatabaseForTesting.prepare()
 
-  let repository: ListeDeDiffusionSqlRepository
+  let repository: Conseiller.ListeDeDiffusion.Repository
   const jeune: Jeune = unJeune({
     conseiller: unConseillerDuJeune({ idAgence: undefined })
   })
@@ -103,6 +104,24 @@ describe(' ListeDeDiffusionSqlRepository', () => {
       const associations =
         await ListeDeDiffusionJeuneAssociationSqlModel.findAll()
       expect(associations).to.have.length(2)
+    })
+  })
+
+  describe('delete', () => {
+    it('supprime une liste de diffusion', async () => {
+      // Given
+      const listeDeDiffusion = uneListeDeDiffusion()
+      await repository.save(listeDeDiffusion)
+
+      // When
+      await repository.delete(listeDeDiffusion.id)
+
+      // Then
+      const actual = await repository.get(listeDeDiffusion.id)
+      expect(actual).to.equal(undefined)
+      const associations =
+        await ListeDeDiffusionJeuneAssociationSqlModel.findAll()
+      expect(associations).to.deep.equal([])
     })
   })
 })
