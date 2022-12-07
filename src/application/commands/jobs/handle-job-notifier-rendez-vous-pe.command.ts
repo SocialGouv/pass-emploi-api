@@ -11,10 +11,7 @@ import { DateService } from '../../../utils/date-service'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import { Notification } from '../../../domain/notification/notification'
-import {
-  NotificationSupport,
-  NotificationSupportServiceToken
-} from '../../../domain/notification-support'
+import { SuiviJobs, SuiviJobsServiceToken } from '../../../domain/suivi-jobs'
 import {
   Jeune,
   JeunePoleEmploiRepositoryToken
@@ -32,15 +29,12 @@ export class HandleJobNotifierRendezVousPECommandHandler extends CommandHandler<
     private poleEmploiClient: PoleEmploiClient,
     private notificationService: Notification.Service,
     private dateService: DateService,
-    @Inject(NotificationSupportServiceToken)
-    notificationSupportService: NotificationSupport.Service,
+    @Inject(SuiviJobsServiceToken)
+    suiviJobsService: SuiviJobs.Service,
     @Inject(JeunePoleEmploiRepositoryToken)
     private jeunePoleEmploiRepository: Jeune.PoleEmploi.Repository
   ) {
-    super(
-      'HandleJobNotifierRendezVousPECommandHandler',
-      notificationSupportService
-    )
+    super('HandleJobNotifierRendezVousPECommandHandler', suiviJobsService)
   }
 
   async handle(): Promise<Result<Stats>> {

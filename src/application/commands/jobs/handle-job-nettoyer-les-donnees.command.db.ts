@@ -1,38 +1,35 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
+import { Op, Sequelize, WhereOptions } from 'sequelize'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
   emptySuccess,
   Result,
   success
 } from '../../../building-blocks/types/result'
-import {
-  NotificationSupport,
-  NotificationSupportServiceToken
-} from '../../../domain/notification-support'
-import { DateService } from '../../../utils/date-service'
-import { Command } from '../../../building-blocks/types/command'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
-import { Op, WhereOptions } from 'sequelize'
+import { JobTypeCommand } from '../../../domain/planificateur'
+import { SuiviJobs, SuiviJobsServiceToken } from '../../../domain/suivi-jobs'
 import { ArchiveJeuneSqlModel } from '../../../infrastructure/sequelize/models/archive-jeune.sql-model'
 import { LogApiPartenaireSqlModel } from '../../../infrastructure/sequelize/models/log-api-partenaire.sql-model'
-import { DateTime } from 'luxon'
+import { SuiviJobsSqlModel } from '../../../infrastructure/sequelize/models/suivi-jobs.sql-model'
+import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
+import { DateService } from '../../../utils/date-service'
 
 @Injectable()
 export class HandleJobNettoyerLesDonneesCommandHandler extends CommandHandler<
-  Command,
+  JobTypeCommand,
   Stats
 > {
   constructor(
     private dateService: DateService,
-    @Inject(NotificationSupportServiceToken)
-    notificationSupportService: NotificationSupport.Service
+    @Inject(SuiviJobsServiceToken)
+    suiviJobsService: SuiviJobs.Service,
+    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
   ) {
-    super(
-      'HandleJobNettoyerLesDonneesCommandHandler',
-      notificationSupportService
-    )
+    super('HandleJobNettoyerLesDonneesCommandHandler', suiviJobsService)
   }
 
-  async handle(): Promise<Result<Stats>> {
+  async handle(command: JobTypeCommand): Promise<Result<Stats>> {
     const maintenant = this.dateService.now()
 
     const nombreArchivesSupprimees = await ArchiveJeuneSqlModel.destroy({
@@ -43,11 +40,22 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends CommandHandler<
       where: dateSuperieureAUnMois(maintenant)
     })
 
-    return success({
+    const stats = {
       tempsDExecution: maintenant.diffNow().milliseconds * -1,
       nombreArchivesSupprimees,
       nombreLogsApiSupprimees
+    }
+
+    await SuiviJobsSqlModel.create({
+      jobType: command.jobType,
+      dateExecution: maintenant.toJSDate(),
+      succes: true,
+      resultat: stats,
+      nbErreurs: 0,
+      tempsExecution: stats.tempsDExecution
     })
+
+    return success(stats)
   }
 
   async authorize(): Promise<Result> {

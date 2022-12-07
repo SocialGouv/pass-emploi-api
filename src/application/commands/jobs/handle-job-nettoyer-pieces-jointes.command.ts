@@ -5,10 +5,7 @@ import {
   success
 } from '../../../building-blocks/types/result'
 import { Fichier, FichierRepositoryToken } from '../../../domain/fichier'
-import {
-  NotificationSupport,
-  NotificationSupportServiceToken
-} from '../../../domain/notification-support'
+import { SuiviJobs, SuiviJobsServiceToken } from '../../../domain/suivi-jobs'
 import { DateService } from '../../../utils/date-service'
 import { buildError } from '../../../utils/logger.module'
 import { Command } from '../../../building-blocks/types/command'
@@ -23,13 +20,10 @@ export class HandleJobNettoyerPiecesJointesCommandHandler extends CommandHandler
     @Inject(FichierRepositoryToken)
     private fichierRepository: Fichier.Repository,
     private dateService: DateService,
-    @Inject(NotificationSupportServiceToken)
-    notificationSupportService: NotificationSupport.Service
+    @Inject(SuiviJobsServiceToken)
+    suiviJobsService: SuiviJobs.Service
   ) {
-    super(
-      'HandleJobNettoyerPiecesJointesCommandHandler',
-      notificationSupportService
-    )
+    super('HandleJobNettoyerPiecesJointesCommandHandler', suiviJobsService)
   }
 
   async handle(): Promise<Result<Stats>> {

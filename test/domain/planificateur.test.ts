@@ -59,7 +59,7 @@ describe('Planificateur', () => {
           expect(planificateurRepository.creerJob).to.have.callCount(1)
           expect(planificateurRepository.creerJob).to.have.been.calledWith(
             {
-              date: DateTime.fromJSDate(rendezVous.date)
+              dateExecution: DateTime.fromJSDate(rendezVous.date)
                 .minus({ days: 1 })
                 .toJSDate(),
               type: Planificateur.JobType.RENDEZVOUS,
@@ -87,7 +87,7 @@ describe('Planificateur', () => {
           // Then
           expect(planificateurRepository.creerJob).to.have.been.calledWith(
             {
-              date: DateTime.fromJSDate(rendezVous.date)
+              dateExecution: DateTime.fromJSDate(rendezVous.date)
                 .minus({ days: 1 })
                 .toJSDate(),
               type: Planificateur.JobType.RENDEZVOUS,
@@ -102,7 +102,7 @@ describe('Planificateur', () => {
           expect(planificateurRepository.creerJob).to.have.callCount(2)
           expect(planificateurRepository.creerJob).to.have.been.calledWith(
             {
-              date: DateTime.fromJSDate(rendezVous.date)
+              dateExecution: DateTime.fromJSDate(rendezVous.date)
                 .minus({ days: 7 })
                 .toJSDate(),
               type: Planificateur.JobType.RENDEZVOUS,

@@ -25,6 +25,7 @@ import { MetierRomeSqlModel } from './metier-rome.sql-model'
 import { LogModificationRendezVousSqlModel } from './log-modification-rendez-vous-sql.model'
 import { ListeDeDiffusionSqlModel } from './liste-de-diffusion.sql-model'
 import { ListeDeDiffusionJeuneAssociationSqlModel } from './liste-de-diffusion-jeune-association.sql-model'
+import { SuiviJobsSqlModel } from './suivi-jobs.sql-model'
 
 export const sqlModels = [
   ConseillerSqlModel,
@@ -49,6 +50,7 @@ export const sqlModels = [
   ArchiveJeuneSqlModel,
   CommentaireSqlModel,
   LogApiPartenaireSqlModel,
+  SuiviJobsSqlModel,
   SuggestionSqlModel,
   MetierRomeSqlModel,
   LogModificationRendezVousSqlModel,

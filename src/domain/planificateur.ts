@@ -3,9 +3,13 @@ import { DateTime } from 'luxon'
 import { DateService } from '../utils/date-service'
 import { RendezVous } from './rendez-vous/rendez-vous'
 import { Action } from './action/action'
-import { NettoyageJobsStats } from './notification-support'
+import { NettoyageJobsStats } from './suivi-jobs'
 
 export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
+
+export interface JobTypeCommand {
+  jobType: Planificateur.JobType
+}
 
 export namespace Planificateur {
   export interface Repository {
@@ -38,7 +42,8 @@ export namespace Planificateur {
     NETTOYER_LES_DONNEES = 'NETTOYER_LES_DONNEES',
     NOTIFIER_RENDEZVOUS_PE = 'NOTIFIER_RENDEZVOUS_PE',
     MAJ_CODES_EVENEMENTS = 'MAJ_CODES_EVENEMENTS',
-    MAJ_AGENCE_AC = 'MAJ_AGENCE_AC'
+    MAJ_AGENCE_AC = 'MAJ_AGENCE_AC',
+    MONITORER_JOBS = 'MONITORER_JOBS'
   }
 
   export interface JobRendezVous {
@@ -72,7 +77,7 @@ export namespace Planificateur {
   }
 }
 
-const listeCronJob: Planificateur.CronJob[] = [
+export const listeCronJobs: Planificateur.CronJob[] = [
   {
     type: Planificateur.JobType.RECUPERER_SITUATIONS_JEUNES_MILO,
     expression: '0 0 * * *'
@@ -113,6 +118,10 @@ const listeCronJob: Planificateur.CronJob[] = [
   {
     type: Planificateur.JobType.MAJ_AGENCE_AC,
     expression: '0 3 * * *'
+  },
+  {
+    type: Planificateur.JobType.MONITORER_JOBS,
+    expression: '45 9 * * *'
   }
 ]
 
@@ -125,7 +134,7 @@ export class PlanificateurService {
   ) {}
 
   async planifierCronJob(JobType: Planificateur.JobType): Promise<void> {
-    const cron = listeCronJob.find(cron => cron.type === JobType)
+    const cron = listeCronJobs.find(cron => cron.type === JobType)
     if (cron) {
       await this.planificateurRepository.creerCronJob(cron)
     }

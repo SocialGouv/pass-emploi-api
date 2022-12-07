@@ -1,6 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { NotificationSupport } from 'src/domain/notification-support'
+import { SuiviJobs } from 'src/domain/suivi-jobs'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { DateService } from '../../../../src/utils/date-service'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
@@ -13,18 +13,18 @@ describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
   DatabaseForTesting.prepare()
   let handleJobNettoyerLesDonneesCommandHandler: HandleJobNettoyerLesDonneesCommandHandler
   let dateSevice: StubbedClass<DateService>
-  let notificationSupportService: StubbedType<NotificationSupport.Service>
+  let suiviJobsService: StubbedType<SuiviJobs.Service>
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     dateSevice = stubClass(DateService)
     dateSevice.now.returns(uneDatetime())
-    notificationSupportService = stubInterface(sandbox)
+    suiviJobsService = stubInterface(sandbox)
 
     handleJobNettoyerLesDonneesCommandHandler =
       new HandleJobNettoyerLesDonneesCommandHandler(
         dateSevice,
-        notificationSupportService
+        suiviJobsService
       )
   })
 

@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common'
 import * as APM from 'elastic-apm-node'
 import { Authentification } from '../../domain/authentification'
-import { NotificationSupport } from '../../domain/notification-support'
+import { SuiviJobs } from '../../domain/suivi-jobs'
 import { getAPMInstance } from '../../infrastructure/monitoring/apm.init'
 import { LogEvent, LogEventKey } from './log.event'
 import {
@@ -24,16 +24,13 @@ export abstract class CommandHandler<C, T> {
   protected logger: Logger
   protected apmService: APM.Agent
   private commandName: string
-  private NotificationSupportService: NotificationSupport.Service | undefined
+  private SuiviJobsService: SuiviJobs.Service | undefined
 
-  constructor(
-    commandName: string,
-    NotificationSupportService?: NotificationSupport.Service
-  ) {
+  constructor(commandName: string, SuiviJobsService?: SuiviJobs.Service) {
     this.commandName = commandName
     this.logger = new Logger(commandName)
     this.apmService = getAPMInstance()
-    this.NotificationSupportService = NotificationSupportService
+    this.SuiviJobsService = SuiviJobsService
   }
 
   async execute(
@@ -96,10 +93,10 @@ export abstract class CommandHandler<C, T> {
 
   protected async notifyAfter(result: Result): Promise<void> {
     const event = {
-      job: this.commandName,
+      jobCommand: this.commandName,
       result
     }
-    await this.NotificationSupportService?.notifierResultatJob(event)
+    await this.SuiviJobsService?.notifierResultatJob(event)
   }
 }
 
