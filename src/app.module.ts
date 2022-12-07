@@ -125,7 +125,7 @@ import {
   RendezVousRepositoryToken
 } from './domain/rendez-vous/rendez-vous'
 import { SuperviseursRepositoryToken } from './domain/superviseur'
-import { NotificationSupportServiceToken } from './domain/notification-support'
+import { SuiviJobsServiceToken } from './domain/suivi-jobs'
 import { ApiKeyAuthGuard } from './infrastructure/auth/api-key.auth-guard'
 import { JwtService } from './infrastructure/auth/jwt.service'
 import { OidcAuthGuard } from './infrastructure/auth/oidc.auth-guard'
@@ -136,7 +136,7 @@ import { KeycloakClient } from './infrastructure/clients/keycloak-client'
 import { MailSendinblueService } from './infrastructure/clients/mail-sendinblue.service'
 import { ObjectStorageClient } from './infrastructure/clients/object-storage.client'
 import { PoleEmploiClient } from './infrastructure/clients/pole-emploi-client'
-import { NotificationSupportMattermostService } from './infrastructure/clients/mattermost-notification-support.service'
+import { SuiviJobsService } from './infrastructure/clients/suivi-jobs.service'
 import { ActionSqlRepository } from './infrastructure/repositories/action/action-sql.repository.db'
 import { AuthentificationSqlRepository } from './infrastructure/repositories/authentification-sql.repository.db'
 import { ChatFirebaseRepository } from './infrastructure/repositories/chat-firebase.repository'
@@ -285,6 +285,7 @@ import { AuthorizeListeDeDiffusion } from './application/authorizers/authorize-l
 import { UpdateListeDeDiffusionCommandHandler } from './application/commands/update-liste-de-diffusion.command.handler'
 import { GetDetailListeDeDiffusionQueryHandler } from './application/queries/get-detail-liste-de-diffusion.query.handler.db'
 import { HandleJobAgenceAnimationCollectiveCommandHandler } from './application/commands/jobs/handle-job-agence-animation-collective.command.db'
+import { MonitorJobsCommandHandler } from './application/commands/jobs/monitor-jobs.command.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -454,8 +455,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       useClass: ArchiveJeuneSqlRepository
     },
     {
-      provide: NotificationSupportServiceToken,
-      useClass: NotificationSupportMattermostService
+      provide: SuiviJobsServiceToken,
+      useClass: SuiviJobsService
     },
     {
       provide: JeuneConfigurationApplicationRepositoryToken,
@@ -652,7 +653,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     UpdateListeDeDiffusionCommandHandler,
     DeleteListeDeDiffusionCommandHandler,
     GetDetailListeDeDiffusionQueryHandler,
-    HandleJobAgenceAnimationCollectiveCommandHandler
+    HandleJobAgenceAnimationCollectiveCommandHandler,
+    MonitorJobsCommandHandler
   ]
 }
 

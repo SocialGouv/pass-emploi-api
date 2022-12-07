@@ -1,9 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import {
-  NotificationSupport,
-  NotificationSupportServiceToken
-} from '../../../domain/notification-support'
+import { SuiviJobs, SuiviJobsServiceToken } from '../../../domain/suivi-jobs'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
@@ -42,12 +39,12 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
     private notificationService: Notification.Service,
     private findAllOffresServicesCiviqueQueryGetter: FindAllOffresServicesCiviqueQueryGetter,
     private dateService: DateService,
-    @Inject(NotificationSupportServiceToken)
-    notificationSupportService: NotificationSupport.Service
+    @Inject(SuiviJobsServiceToken)
+    suiviJobsService: SuiviJobs.Service
   ) {
     super(
       'HandleJobNotifierNouveauxServicesCiviqueCommandHandler',
-      notificationSupportService
+      suiviJobsService
     )
   }
 

@@ -10,10 +10,7 @@ import { Milo, MiloRepositoryToken } from '../../../domain/milo'
 import { DateService } from '../../../utils/date-service'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
-import {
-  NotificationSupport,
-  NotificationSupportServiceToken
-} from '../../../domain/notification-support'
+import { SuiviJobs, SuiviJobsServiceToken } from '../../../domain/suivi-jobs'
 
 const PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM = 100
 
@@ -25,13 +22,13 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends Comman
   constructor(
     @Inject(MiloRepositoryToken) private miloRepository: Milo.Repository,
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
-    @Inject(NotificationSupportServiceToken)
-    notificationSupportService: NotificationSupport.Service,
+    @Inject(SuiviJobsServiceToken)
+    suiviJobsService: SuiviJobs.Service,
     private dateService: DateService
   ) {
     super(
       'HandleJobRecupererSituationsJeunesMiloCommandHandler',
-      notificationSupportService
+      suiviJobsService
     )
   }
 

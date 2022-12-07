@@ -22,6 +22,7 @@ import { HandleJobNotifierRendezVousPECommandHandler } from './commands/jobs/han
 import { HandleJobMettreAJourCodesEvenementsCommandHandler } from './commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
 import { HandleJobNettoyerLesDonneesCommandHandler } from './commands/jobs/handle-job-nettoyer-les-donnees.command.db'
 import { HandleJobAgenceAnimationCollectiveCommandHandler } from './commands/jobs/handle-job-agence-animation-collective.command.db'
+import { MonitorJobsCommandHandler } from './commands/jobs/monitor-jobs.command.db'
 
 @Injectable()
 export class WorkerService {
@@ -44,7 +45,8 @@ export class WorkerService {
     private handleJobNettoyerLesDonneesCommandHandler: HandleJobNettoyerLesDonneesCommandHandler,
     private handleJobNotifierRendezVousPECommandHandler: HandleJobNotifierRendezVousPECommandHandler,
     private handleJobMettreAJourCodesEvenementsCommandHandler: HandleJobMettreAJourCodesEvenementsCommandHandler,
-    private handleJobAgenceAnimationCollectiveCommand: HandleJobAgenceAnimationCollectiveCommandHandler
+    private handleJobAgenceAnimationCollectiveCommand: HandleJobAgenceAnimationCollectiveCommandHandler,
+    private monitorJobsCommandHandler: MonitorJobsCommandHandler
   ) {
     this.apmService = getAPMInstance()
     this.workerTrackingService = getWorkerTrackingServiceInstance()
@@ -98,7 +100,9 @@ export class WorkerService {
           await this.handleJobNettoyerPiecesJointesCommandHandler.execute()
           break
         case Planificateur.JobType.NETTOYER_LES_DONNEES:
-          await this.handleJobNettoyerLesDonneesCommandHandler.execute()
+          await this.handleJobNettoyerLesDonneesCommandHandler.execute({
+            jobType: job.type
+          })
           break
         case Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE:
           await this.handleJobNotifierRendezVousPECommandHandler.execute()
@@ -108,6 +112,9 @@ export class WorkerService {
           break
         case Planificateur.JobType.MAJ_AGENCE_AC:
           await this.handleJobAgenceAnimationCollectiveCommand.execute()
+          break
+        case Planificateur.JobType.MONITORER_JOBS:
+          await this.monitorJobsCommandHandler.execute()
           break
         case Planificateur.JobType.FAKE:
           this.logger.log({

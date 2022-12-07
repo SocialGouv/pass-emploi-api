@@ -13,9 +13,9 @@ import {
 } from '../../../domain/planificateur'
 import {
   NettoyageJobsStats,
-  NotificationSupport,
-  NotificationSupportServiceToken
-} from '../../../domain/notification-support'
+  SuiviJobs,
+  SuiviJobsServiceToken
+} from '../../../domain/suivi-jobs'
 import { DateService } from '../../../utils/date-service'
 
 @Injectable()
@@ -27,10 +27,10 @@ export class HandleNettoyerLesJobsCommandHandler extends CommandHandler<
     @Inject(PlanificateurRepositoryToken)
     private planificateurRepository: Planificateur.Repository,
     private dateService: DateService,
-    @Inject(NotificationSupportServiceToken)
-    notificationSupportService: NotificationSupport.Service
+    @Inject(SuiviJobsServiceToken)
+    suiviJobsService: SuiviJobs.Service
   ) {
-    super('HandleNettoyerLesJobsCommandHandler', notificationSupportService)
+    super('HandleNettoyerLesJobsCommandHandler', suiviJobsService)
   }
 
   async handle(): Promise<Result<NettoyageJobsStats>> {

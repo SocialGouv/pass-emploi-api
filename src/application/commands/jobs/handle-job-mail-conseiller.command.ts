@@ -6,10 +6,7 @@ import {
   Result,
   success
 } from '../../../building-blocks/types/result'
-import {
-  NotificationSupport,
-  NotificationSupportServiceToken
-} from '../../../domain/notification-support'
+import { SuiviJobs, SuiviJobsServiceToken } from '../../../domain/suivi-jobs'
 import { DateService } from '../../../utils/date-service'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
@@ -35,10 +32,10 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
     private mailService: Mail.Service,
     private dateService: DateService,
     private configuration: ConfigService,
-    @Inject(NotificationSupportServiceToken)
-    notificationSupportService: NotificationSupport.Service
+    @Inject(SuiviJobsServiceToken)
+    suiviJobsService: SuiviJobs.Service
   ) {
-    super('HandleJobMailConseillerCommandHandler', notificationSupportService)
+    super('HandleJobMailConseillerCommandHandler', suiviJobsService)
   }
 
   async handle(): Promise<Result<Stats>> {

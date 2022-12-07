@@ -3,19 +3,16 @@ import { expect } from 'chai'
 import * as nock from 'nock'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { failure, Result, success } from 'src/building-blocks/types/result'
-import { NotificationSupportMattermostService } from 'src/infrastructure/clients/mattermost-notification-support.service'
+import { SuiviJobsService } from 'src/infrastructure/clients/suivi-jobs.service'
 import { testConfig } from '../../utils/module-for-testing'
 
-describe('NotificationSupportMattermostService', () => {
-  let service: NotificationSupportMattermostService
+describe('SuiviJobsService', () => {
+  let service: SuiviJobsService
   const configService = testConfig()
 
   beforeEach(() => {
     const httpService = new HttpService()
-    service = new NotificationSupportMattermostService(
-      configService,
-      httpService
-    )
+    service = new SuiviJobsService(configService, httpService)
   })
 
   describe('notifierResultatJob', () => {
