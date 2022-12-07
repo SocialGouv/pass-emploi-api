@@ -294,6 +294,14 @@ describe('ListesDeDiffusionController', () => {
           { id: 'id-benef', nom: 'nom-benef', prenom: 'prenom-benef' }
         ]
       }
+      const listeAttendue = {
+        id: idListe,
+        titre: 'titre-liste',
+        dateDeCreation: uneDate().toISOString(),
+        beneficiaires: [
+          { id: 'id-benef', nom: 'nom-benef', prenom: 'prenom-benef' }
+        ]
+      }
       getDetailListeDeDiffusionQueryHandler.execute.resolves(success(liste))
 
       // When
@@ -302,7 +310,7 @@ describe('ListesDeDiffusionController', () => {
         .set('authorization', unHeaderAuthorization())
         // Then
         .expect(HttpStatus.OK)
-        .expect(liste)
+        .expect(listeAttendue)
     })
     it('retourne une 403 quand l’utilisateur n‘a pas les droits', async () => {
       // Given

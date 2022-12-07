@@ -34,11 +34,13 @@ export class GetListesDeDiffusionDuConseillerQueryHandler extends QueryHandler<
   }: GetListesDeDiffusionDuConseillerQuery): Promise<
     Result<ListeDeDiffusionQueryModel[]>
   > {
-    const listeDeDiffusionSql = await ListeDeDiffusionSqlModel.findAll({
+    const listesDeDiffusionSql = await ListeDeDiffusionSqlModel.findAll({
       where: { idConseiller },
       include: [JeuneSqlModel]
     })
-    return success(listeDeDiffusionSql.map(fromSqlToListeDeDiffusionQueryModel))
+    return success(
+      listesDeDiffusionSql.map(fromSqlToListeDeDiffusionQueryModel)
+    )
   }
 
   async monitor(): Promise<void> {
