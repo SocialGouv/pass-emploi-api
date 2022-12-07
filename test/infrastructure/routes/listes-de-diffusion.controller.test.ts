@@ -27,12 +27,16 @@ import {
   UpdateListeDeDiffusionCommand,
   UpdateListeDeDiffusionCommandHandler
 } from '../../../src/application/commands/update-liste-de-diffusion.command.handler'
+import { GetDetailListeDeDiffusionQueryHandler } from '../../../src/application/queries/get-detail-liste-de-diffusion.query.handler.db'
+import { ListeDeDiffusionQueryModel } from '../../../src/application/queries/query-models/liste-de-diffusion.query-model'
+import { uneDate } from '../../fixtures/date.fixture'
 
 describe('ListesDeDiffusionController', () => {
   let createListeDeDiffusionCommandHandler: StubbedClass<CreateListeDeDiffusionCommandHandler>
   let updateListeDeDiffusionCommandHandler: StubbedClass<UpdateListeDeDiffusionCommandHandler>
   let getListesDeDiffusionQueryHandler: StubbedClass<GetListesDeDiffusionDuConseillerQueryHandler>
   let deleteListeDeDiffusionCommandHandler: StubbedClass<DeleteListeDeDiffusionCommandHandler>
+  let getDetailListeDeDiffusionQueryHandler: StubbedClass<GetDetailListeDeDiffusionQueryHandler>
   let app: INestApplication
 
   before(async () => {
@@ -48,6 +52,9 @@ describe('ListesDeDiffusionController', () => {
     deleteListeDeDiffusionCommandHandler = stubClass(
       DeleteListeDeDiffusionCommandHandler
     )
+    getDetailListeDeDiffusionQueryHandler = stubClass(
+      GetDetailListeDeDiffusionQueryHandler
+    )
 
     const testingModule = await buildTestingModuleForHttpTesting()
       .overrideProvider(CreateListeDeDiffusionCommandHandler)
@@ -58,6 +65,8 @@ describe('ListesDeDiffusionController', () => {
       .useValue(getListesDeDiffusionQueryHandler)
       .overrideProvider(DeleteListeDeDiffusionCommandHandler)
       .useValue(deleteListeDeDiffusionCommandHandler)
+      .overrideProvider(GetDetailListeDeDiffusionQueryHandler)
+      .useValue(getDetailListeDeDiffusionQueryHandler)
       .compile()
 
     app = testingModule.createNestApplication()
@@ -218,7 +227,7 @@ describe('ListesDeDiffusionController', () => {
       'get',
       '/conseillers/2/listes-de-diffusion'
     )
-    it('retourne une 403 quand l‘utilisateur n‘a pas les droits', async () => {
+    it('retourne une 403 quand l’utilisateur n‘a pas les droits', async () => {
       // Given
       const idConseiller = 'id-conseiller'
       getListesDeDiffusionQueryHandler.execute.resolves(
@@ -269,6 +278,49 @@ describe('ListesDeDiffusionController', () => {
 
     ensureUserAuthenticationFailsIfInvalid(
       'delete',
+      '/listes-de-diffusion/idListeDeDiffusion'
+    )
+  })
+
+  describe('GET /listes-de-diffusion/{idListeDeDiffusion}', () => {
+    it('retourne la liste de diffusion quand la query est en succès', async () => {
+      // Given
+      const idListe = 'id-liste'
+      const liste: ListeDeDiffusionQueryModel = {
+        id: idListe,
+        titre: 'titre-liste',
+        dateDeCreation: uneDate(),
+        beneficiaires: [
+          { id: 'id-benef', nom: 'nom-benef', prenom: 'prenom-benef' }
+        ]
+      }
+      getDetailListeDeDiffusionQueryHandler.execute.resolves(success(liste))
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/listes-de-diffusion/${idListe}`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.OK)
+        .expect(liste)
+    })
+    it('retourne une 403 quand l’utilisateur n‘a pas les droits', async () => {
+      // Given
+      const idListe = 'id-liste'
+      getDetailListeDeDiffusionQueryHandler.execute.resolves(
+        failure(new DroitsInsuffisants())
+      )
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/listes-de-diffusion/${idListe}`)
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.FORBIDDEN)
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
       '/listes-de-diffusion/idListeDeDiffusion'
     )
   })

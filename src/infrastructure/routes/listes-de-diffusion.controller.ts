@@ -29,6 +29,7 @@ import {
   UpdateListeDeDiffusionCommand,
   UpdateListeDeDiffusionCommandHandler
 } from '../../application/commands/update-liste-de-diffusion.command.handler'
+import { GetDetailListeDeDiffusionQueryHandler } from '../../application/queries/get-detail-liste-de-diffusion.query.handler.db'
 
 @Controller()
 @ApiOAuth2([])
@@ -38,7 +39,8 @@ export class ListesDeDiffusionController {
     private readonly createListeDeDiffusionCommandHandler: CreateListeDeDiffusionCommandHandler,
     private readonly updateListeDeDiffusionCommandHandler: UpdateListeDeDiffusionCommandHandler,
     private readonly getListesDeDiffusionQueryHandler: GetListesDeDiffusionDuConseillerQueryHandler,
-    private readonly deleteListeDeDiffusionCommendHandler: DeleteListeDeDiffusionCommandHandler
+    private readonly deleteListeDeDiffusionCommandHandler: DeleteListeDeDiffusionCommandHandler,
+    private readonly getDetailListeDeDiffusionQueryHandler: GetDetailListeDeDiffusionQueryHandler
   ) {}
 
   @ApiOperation({
@@ -118,6 +120,26 @@ export class ListesDeDiffusionController {
   }
 
   @ApiOperation({
+    summary: 'Récupère une liste de diffusion',
+    description: 'Autorisé pour le conseiller qui a créé la liste'
+  })
+  @Get('/listes-de-diffusion/:idListeDeDiffusion')
+  async getDetailListeDeDiffusion(
+    @Param('idListeDeDiffusion') idListeDeDiffusion: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<ListeDeDiffusionQueryModel> {
+    const result = await this.getDetailListeDeDiffusionQueryHandler.execute(
+      { idListeDeDiffusion },
+      utilisateur
+    )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
+  }
+
+  @ApiOperation({
     summary: 'Supprime une liste de diffusion',
     description: 'Autorisé pour le conseiller qui a créé la liste'
   })
@@ -127,7 +149,7 @@ export class ListesDeDiffusionController {
     @Param('idListeDeDiffusion') idListeDeDiffusion: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const result = await this.deleteListeDeDiffusionCommendHandler.execute(
+    const result = await this.deleteListeDeDiffusionCommandHandler.execute(
       { idListeDeDiffusion },
       utilisateur
     )
