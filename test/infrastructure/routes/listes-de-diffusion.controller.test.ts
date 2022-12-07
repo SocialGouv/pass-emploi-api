@@ -130,11 +130,10 @@ describe('ListesDeDiffusionController', () => {
     )
   })
 
-  describe('PUT /conseillers/{idConseiller}/listes-de-diffusion/{idListe}', () => {
+  describe('PUT /listes-de-diffusion/{idListe}', () => {
     describe('quand la commande est en succès', () => {
       it('retourne une 200', async () => {
         // Given
-        const idConseiller = 'un-id-conseiller'
         const idsBeneficiaires: string[] = []
         const command: UpdateListeDeDiffusionCommand = {
           id: 'un-id-liste',
@@ -147,7 +146,7 @@ describe('ListesDeDiffusionController', () => {
 
         // When
         await request(app.getHttpServer())
-          .put(`/conseillers/${idConseiller}/listes-de-diffusion/un-id-liste`)
+          .put(`/listes-de-diffusion/un-id-liste`)
           .set('authorization', unHeaderAuthorization())
           .send({ titre: 'un titre', idsBeneficiaires })
           // Then
@@ -157,7 +156,6 @@ describe('ListesDeDiffusionController', () => {
     describe('quand la commande retourne échoue en NonTrouve', () => {
       it('retourne une 404', async () => {
         // Given
-        const idConseiller = 'un-id-conseiller'
         const idsBeneficiaires: string[] = []
         const command: UpdateListeDeDiffusionCommand = {
           id: 'un-id-liste',
@@ -166,11 +164,11 @@ describe('ListesDeDiffusionController', () => {
         }
         updateListeDeDiffusionCommandHandler.execute
           .withArgs(command)
-          .resolves(failure(new NonTrouveError('Conseiller', idConseiller)))
+          .resolves(failure(new NonTrouveError('Conseiller', 'id-conseiller')))
 
         // When
         await request(app.getHttpServer())
-          .put(`/conseillers/${idConseiller}/listes-de-diffusion/un-id-liste`)
+          .put(`/listes-de-diffusion/un-id-liste`)
           .set('authorization', unHeaderAuthorization())
           .send({ titre: 'un titre', idsBeneficiaires })
           // Then
@@ -179,10 +177,9 @@ describe('ListesDeDiffusionController', () => {
     })
     describe('quand le payload est au mauvais format', () => {
       it('retourne une 400', async () => {
-        // Given
         // When
         await request(app.getHttpServer())
-          .put(`/conseillers/un-id-conseiller/listes-de-diffusion/1`)
+          .put(`/listes-de-diffusion/1`)
           .set('authorization', unHeaderAuthorization())
           .send({ titre: '', idsBeneficiaires: 'un-payload-du-mauvais-type' })
           // Then
@@ -190,10 +187,7 @@ describe('ListesDeDiffusionController', () => {
       })
     })
 
-    ensureUserAuthenticationFailsIfInvalid(
-      'put',
-      '/conseillers/2/listes-de-diffusion/1'
-    )
+    ensureUserAuthenticationFailsIfInvalid('put', '/listes-de-diffusion/1')
   })
 
   describe('GET /conseillers/{idConseiller}/listes-de-diffusion', () => {
