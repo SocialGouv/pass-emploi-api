@@ -19,7 +19,7 @@ import {
   UpdateListeDeDiffusionCommandHandler
 } from '../../application/commands/update-liste-de-diffusion.command.handler'
 
-@Controller('conseillers/:idConseiller/listes-de-diffusion')
+@Controller()
 @ApiOAuth2([])
 @ApiTags('Listes de diffusion')
 export class ListesDeDiffusionController {
@@ -34,7 +34,7 @@ export class ListesDeDiffusionController {
     description:
       'Autorisé pour le conseiller avec les bénéficiaires de son portefeuille.'
   })
-  @Post()
+  @Post('conseillers/:idConseiller/listes-de-diffusion')
   async postListesDeDiffusion(
     @Param('idConseiller') idConseiller: string,
     @Body() payload: CreateListeDeDiffusionPayload,
@@ -60,7 +60,7 @@ export class ListesDeDiffusionController {
     description:
       'Autorisé pour le conseiller avec les bénéficiaires de son portefeuille ou temporairement transférés.'
   })
-  @Put(':idListeDeDiffusion')
+  @Put('/listes-de-diffusion/:idListeDeDiffusion')
   async putListesDeDiffusion(
     @Param('idConseiller') _idConseiller: string,
     @Param('idListeDeDiffusion') idListeDeDiffusion: string,
@@ -86,7 +86,7 @@ export class ListesDeDiffusionController {
     summary: 'récupère les listes de diffusion du conseiller',
     description: 'Autorisé pour le conseiller'
   })
-  @Get()
+  @Get('conseillers/:idConseiller/listes-de-diffusion')
   @ApiResponse({
     type: ListeDeDiffusionQueryModel,
     isArray: true
