@@ -283,6 +283,7 @@ import { ListesDeDiffusionController } from './infrastructure/routes/listes-de-d
 import { AuthorizeConseillerForJeunesTransferesTemporairement } from './application/authorizers/authorize-conseiller-for-jeunes-transferes'
 import { AuthorizeListeDeDiffusion } from './application/authorizers/authorize-liste-de-diffusion'
 import { UpdateListeDeDiffusionCommandHandler } from './application/commands/update-liste-de-diffusion.command.handler'
+import { GetDetailListeDeDiffusionQueryHandler } from './application/queries/get-detail-liste-de-diffusion.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -648,7 +649,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateListeDeDiffusionCommandHandler,
     GetListesDeDiffusionDuConseillerQueryHandler,
     UpdateListeDeDiffusionCommandHandler,
-    DeleteListeDeDiffusionCommandHandler
+    DeleteListeDeDiffusionCommandHandler,
+    GetDetailListeDeDiffusionQueryHandler
   ]
 }
 
