@@ -7,7 +7,11 @@ import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/mod
 import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { DateService } from '../../../../src/utils/date-service'
-import { uneDatetime, uneDatetimeMinuit } from '../../../fixtures/date.fixture'
+import {
+  uneDate,
+  uneDatetime,
+  uneDatetimeMinuit
+} from '../../../fixtures/date.fixture'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
@@ -80,6 +84,24 @@ describe('RendezVousRepositorySql', () => {
         expect(rendezVous?.id).to.equal(unRendezVous.id)
         expect(rendezVous?.jeunes[0].id).to.equal(jeune.id)
         expect(rendezVous?.createur).to.deep.equal(unRendezVous.createur)
+      })
+    })
+  })
+
+  describe('getSoftDeleted', () => {
+    describe('quand le rdv est soft deleted', () => {
+      it('retourne le rdv', async () => {
+        // Given
+        const idRdv = '6c242fa0-804f-11ec-a8a3-0242ac120002'
+        const unRendezVous = unRendezVousDto({
+          id: idRdv,
+          dateSuppression: uneDate()
+        })
+        await RendezVousSqlModel.create(unRendezVous)
+        // When
+        const rendezVous = await rendezVousRepositorySql.getSoftDeleted(idRdv)
+        // Then
+        expect(rendezVous?.id).to.equal(unRendezVous.id)
       })
     })
   })

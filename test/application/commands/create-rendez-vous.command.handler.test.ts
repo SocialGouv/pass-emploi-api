@@ -1,11 +1,17 @@
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import { PlanificateurService } from '../../../src/domain/planificateur'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { failure, success } from '../../../src/building-blocks/types/result'
-import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../src/domain/rendez-vous/rendez-vous'
 import { Notification } from '../../../src/domain/notification/notification'
 import { uneConfiguration, unJeune } from '../../fixtures/jeune.fixture'
 import {
@@ -17,7 +23,7 @@ import {
   CreateRendezVousCommand,
   CreateRendezVousCommandHandler
 } from '../../../src/application/commands/create-rendez-vous.command.handler'
-import { EvenementService } from 'src/domain/evenement'
+import { Evenement, EvenementService } from 'src/domain/evenement'
 import { Mail } from '../../../src/domain/mail'
 import { Conseiller } from 'src/domain/conseiller/conseiller'
 import { stubClassSandbox } from 'test/utils/types'
@@ -359,6 +365,53 @@ describe('CreateRendezVousCommandHandler', () => {
       // Then
       expect(conseillerAuthorizer.authorize).to.have.been.calledWithExactly(
         command.idConseiller,
+        utilisateur
+      )
+    })
+  })
+
+  describe('monitor', () => {
+    const utilisateur = unUtilisateurJeune()
+
+    it("créé l'événement idoine quand c'etait un rdv", () => {
+      // Given
+      const command = {
+        idsJeunes: [jeune1.id, jeune2.id],
+        idConseiller: conseiller.id,
+        commentaire: rendezVous.commentaire,
+        date: rendezVous.date.toDateString(),
+        duree: rendezVous.duree,
+        modalite: 'tel'
+      }
+
+      // When
+      createRendezVousCommandHandler.monitor(utilisateur, command)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.RDV_CREE,
+        utilisateur
+      )
+    })
+
+    it("créé l'événement idoine quand c'etait une AC", async () => {
+      // Given
+      const command = {
+        idsJeunes: [jeune1.id, jeune2.id],
+        idConseiller: conseiller.id,
+        commentaire: rendezVous.commentaire,
+        date: rendezVous.date.toDateString(),
+        duree: rendezVous.duree,
+        modalite: 'tel',
+        type: CodeTypeRendezVous.ATELIER
+      }
+
+      // When
+      await createRendezVousCommandHandler.monitor(utilisateur, command)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledWithExactly(
+        Evenement.Code.ANIMATION_COLLECTIVE_CREEE,
         utilisateur
       )
     })
