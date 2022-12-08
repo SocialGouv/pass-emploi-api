@@ -72,6 +72,16 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
     return toRendezVous(rendezVousSql)
   }
 
+  async getSoftDeleted(idRendezVous: string): Promise<RendezVous | undefined> {
+    const rendezVousSql = await RendezVousSqlModel.findByPk(idRendezVous, {
+      include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }]
+    })
+    if (!rendezVousSql) {
+      return undefined
+    }
+    return toRendezVous(rendezVousSql)
+  }
+
   async getAllAVenir(): Promise<RendezVous[]> {
     const maintenant = this.dateService.nowJs()
     const rendezVousSql = await RendezVousSqlModel.findAll({

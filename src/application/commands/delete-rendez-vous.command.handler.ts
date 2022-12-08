@@ -112,7 +112,19 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     )
   }
 
-  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creer(Evenement.Code.RDV_SUPPRIME, utilisateur)
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    command: DeleteRendezVousCommand
+  ): Promise<void> {
+    const rdv = await this.rendezVousRepository.getSoftDeleted(
+      command.idRendezVous
+    )
+
+    const codeEvenement =
+      rdv && RendezVous.estUnTypeAnimationCollective(rdv.type)
+        ? Evenement.Code.ANIMATION_COLLECTIVE_SUPPRIMEE
+        : Evenement.Code.RDV_SUPPRIME
+
+    await this.evenementService.creer(codeEvenement, utilisateur)
   }
 }

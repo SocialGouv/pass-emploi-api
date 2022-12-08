@@ -250,13 +250,43 @@ describe('DeleteRendezVousCommandHandler', () => {
   describe('monitor', () => {
     const utilisateur = unUtilisateurJeune()
 
-    it("créé l'événement idoine", () => {
+    it("créé l'événement idoine quand c'etait un rdv", async () => {
+      // Given
+      const idRendezVous = '20c8ca73-fd8b-4194-8d3c-80b6c9949deb'
+      rendezVousRepository.getSoftDeleted
+        .withArgs(idRendezVous)
+        .resolves(unRendezVous({ id: idRendezVous }))
+
       // When
-      deleteRendezVousCommandHandler.monitor(utilisateur)
+      await deleteRendezVousCommandHandler.monitor(utilisateur, {
+        idRendezVous
+      })
 
       // Then
-      expect(evenementService.creer).to.have.been.calledWithExactly(
+      expect(evenementService.creer).to.have.been.calledOnceWithExactly(
         Evenement.Code.RDV_SUPPRIME,
+        utilisateur
+      )
+    })
+
+    it("créé l'événement idoine quand c'etait une AC", async () => {
+      // Given
+      const idRendezVous = '20c8ca73-fd8b-4194-8d3c-80b6c9949deb'
+      rendezVousRepository.getSoftDeleted.withArgs(idRendezVous).resolves(
+        unRendezVous({
+          id: idRendezVous,
+          type: CodeTypeRendezVous.ATELIER
+        })
+      )
+
+      // When
+      await deleteRendezVousCommandHandler.monitor(utilisateur, {
+        idRendezVous
+      })
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledOnceWithExactly(
+        Evenement.Code.ANIMATION_COLLECTIVE_SUPPRIMEE,
         utilisateur
       )
     })

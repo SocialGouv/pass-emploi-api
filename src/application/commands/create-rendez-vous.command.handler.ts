@@ -156,7 +156,14 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
     )
   }
 
-  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
-    await this.evenementService.creer(Evenement.Code.RDV_CREE, utilisateur)
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    command: CreateRendezVousCommand
+  ): Promise<void> {
+    const codeEvenement = RendezVous.estUnTypeAnimationCollective(command.type)
+      ? Evenement.Code.ANIMATION_COLLECTIVE_CREEE
+      : Evenement.Code.RDV_CREE
+
+    await this.evenementService.creer(codeEvenement, utilisateur)
   }
 }
