@@ -34,7 +34,8 @@ export namespace Planificateur {
     NETTOYER_LES_PIECES_JOINTES = 'NETTOYER_LES_PIECES_JOINTES',
     NETTOYER_LES_DONNEES = 'NETTOYER_LES_DONNEES',
     NOTIFIER_RENDEZVOUS_PE = 'NOTIFIER_RENDEZVOUS_PE',
-    MAJ_CODES_EVENEMENTS = 'MAJ_CODES_EVENEMENTS'
+    MAJ_CODES_EVENEMENTS = 'MAJ_CODES_EVENEMENTS',
+    MAJ_AGENCE_AC = 'MAJ_AGENCE_AC'
   }
 
   export enum JobEnum {
@@ -105,6 +106,14 @@ export class PlanificateurService {
           type: Planificateur.CronJob.NETTOYER_LES_PIECES_JOINTES,
           expression: '0 2 * * *',
           startDate: new Date('2022-10-01')
+        }
+        await this.planificateurRepository.createCron(cron)
+        break
+      }
+      case Planificateur.CronJob.MAJ_AGENCE_AC: {
+        const cron: Planificateur.Cron = {
+          type: Planificateur.CronJob.MAJ_AGENCE_AC,
+          expression: '0 3 * * *'
         }
         await this.planificateurRepository.createCron(cron)
         break
