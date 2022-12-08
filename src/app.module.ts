@@ -284,6 +284,7 @@ import { AuthorizeConseillerForJeunesTransferesTemporairement } from './applicat
 import { AuthorizeListeDeDiffusion } from './application/authorizers/authorize-liste-de-diffusion'
 import { UpdateListeDeDiffusionCommandHandler } from './application/commands/update-liste-de-diffusion.command.handler'
 import { GetDetailListeDeDiffusionQueryHandler } from './application/queries/get-detail-liste-de-diffusion.query.handler.db'
+import { HandleJobAgenceAnimationCollectiveCommandHandler } from './application/commands/jobs/handle-job-agence-animation-collective.command.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -650,7 +651,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetListesDeDiffusionDuConseillerQueryHandler,
     UpdateListeDeDiffusionCommandHandler,
     DeleteListeDeDiffusionCommandHandler,
-    GetDetailListeDeDiffusionQueryHandler
+    GetDetailListeDeDiffusionQueryHandler,
+    HandleJobAgenceAnimationCollectiveCommandHandler
   ]
 }
 

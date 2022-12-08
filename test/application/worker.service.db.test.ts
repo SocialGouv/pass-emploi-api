@@ -17,6 +17,7 @@ import { HandleJobRappelActionCommandHandler } from 'src/application/commands/jo
 import { HandleJobNotifierRendezVousPECommandHandler } from 'src/application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
 import { HandleJobMettreAJourCodesEvenementsCommandHandler } from '../../src/application/commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
 import { HandleJobNettoyerLesDonneesCommandHandler } from '../../src/application/commands/jobs/handle-job-nettoyer-les-donnees.command.db'
+import { HandleJobAgenceAnimationCollectiveCommandHandler } from '../../src/application/commands/jobs/handle-job-agence-animation-collective.command.db'
 
 describe('WorkerService', () => {
   DatabaseForTesting.prepare()
@@ -67,6 +68,10 @@ describe('WorkerService', () => {
       const handleJobMettreAJourCodesEvenementsCommandHandler = stubClass(
         HandleJobMettreAJourCodesEvenementsCommandHandler
       )
+      const handleJobAgenceAnimationCollectiveCommandHandler = stubClass(
+        HandleJobAgenceAnimationCollectiveCommandHandler
+      )
+
       const workerService = new WorkerService(
         planificateurRepository,
         handlerJobRendezVousCommandHandler,
@@ -80,7 +85,8 @@ describe('WorkerService', () => {
         handleJobNettoyerPiecesJointesCommandHandler,
         handleJobNettoyerLesDonneesCommandHandler,
         handleJobNotifierRendezVousPECommandHandler,
-        handleJobMettreAJourCodesEvenementsCommandHandler
+        handleJobMettreAJourCodesEvenementsCommandHandler,
+        handleJobAgenceAnimationCollectiveCommandHandler
       )
 
       workerService.subscribe()
