@@ -81,11 +81,22 @@ export class RendezVousAuthorizer {
     if (RendezVous.estUnTypeAnimationCollective(rendezVous.type)) {
       const conseiller = await this.conseillerRepository.get(utilisateur.id)
 
-      if (
-        conseiller &&
-        rendezVous.idAgence &&
-        rendezVous.idAgence === conseiller?.agence?.id
-      ) {
+      if (!conseiller) {
+        return failure(new DroitsInsuffisants())
+      }
+
+      // RETRO COMPATIBILITÉ : A SUPPRIMER QUAND TOUTES LES ANIMATIONS COLLECTIVES AURONT UN ID AGENCE
+      if (!rendezVous.idAgence) {
+        if (
+          rendezVous.jeunes.find(
+            jeune => utilisateur.id === jeune.conseiller?.id
+          )
+        ) {
+          return emptySuccess()
+        }
+      }
+
+      if (rendezVous.idAgence === conseiller?.agence?.id) {
         return emptySuccess()
       }
     } else if (
