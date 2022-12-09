@@ -114,8 +114,6 @@ export namespace RendezVous {
 
     get(id: string): Promise<RendezVous | undefined>
 
-    getSoftDeleted(id: string): Promise<RendezVous | undefined>
-
     delete(idRendezVous: string): Promise<void>
 
     getAllAVenir(): Promise<RendezVous[]>

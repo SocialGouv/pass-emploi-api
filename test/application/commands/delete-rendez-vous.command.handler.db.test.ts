@@ -18,7 +18,7 @@ import { Notification } from '../../../src/domain/notification/notification'
 import {
   DeleteRendezVousCommand,
   DeleteRendezVousCommandHandler
-} from '../../../src/application/commands/delete-rendez-vous.command.handler'
+} from '../../../src/application/commands/delete-rendez-vous.command.handler.db'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import {
   unConseillerDuJeune,
@@ -35,9 +35,15 @@ import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { Mail } from '../../../src/domain/mail'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { stubClassSandbox } from 'test/utils/types'
-import { uneDatetime } from 'test/fixtures/date.fixture'
+import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
+import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
+import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 
 describe('DeleteRendezVousCommandHandler', () => {
+  DatabaseForTesting.prepare()
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let notificationService: StubbedClass<Notification.Service>
@@ -249,17 +255,35 @@ describe('DeleteRendezVousCommandHandler', () => {
 
   describe('monitor', () => {
     const utilisateur = unUtilisateurJeune()
+    const conseillerDto = unConseillerDto()
+    const unAtelier = unRendezVousDto({
+      type: CodeTypeRendezVous.ATELIER,
+      dateSuppression: uneDate(),
+      createur: {
+        id: conseillerDto.id,
+        nom: conseillerDto.nom,
+        prenom: conseillerDto.prenom
+      }
+    })
+    const unRendezVous = unRendezVousDto({
+      type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+      dateSuppression: uneDate(),
+      createur: {
+        id: conseillerDto.id,
+        nom: conseillerDto.nom,
+        prenom: conseillerDto.prenom
+      }
+    })
+
+    beforeEach(async () => {
+      await ConseillerSqlModel.create(conseillerDto)
+      await RendezVousSqlModel.bulkCreate([unAtelier, unRendezVous])
+    })
 
     it("créé l'événement idoine quand c'etait un rdv", async () => {
-      // Given
-      const idRendezVous = '20c8ca73-fd8b-4194-8d3c-80b6c9949deb'
-      rendezVousRepository.getSoftDeleted
-        .withArgs(idRendezVous)
-        .resolves(unRendezVous({ id: idRendezVous }))
-
       // When
       await deleteRendezVousCommandHandler.monitor(utilisateur, {
-        idRendezVous
+        idRendezVous: unRendezVous.id
       })
 
       // Then
@@ -270,18 +294,9 @@ describe('DeleteRendezVousCommandHandler', () => {
     })
 
     it("créé l'événement idoine quand c'etait une AC", async () => {
-      // Given
-      const idRendezVous = '20c8ca73-fd8b-4194-8d3c-80b6c9949deb'
-      rendezVousRepository.getSoftDeleted.withArgs(idRendezVous).resolves(
-        unRendezVous({
-          id: idRendezVous,
-          type: CodeTypeRendezVous.ATELIER
-        })
-      )
-
       // When
       await deleteRendezVousCommandHandler.monitor(utilisateur, {
-        idRendezVous
+        idRendezVous: unAtelier.id
       })
 
       // Then
