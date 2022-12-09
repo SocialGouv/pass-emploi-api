@@ -25,6 +25,7 @@ import {
 } from '../../domain/rendez-vous/rendez-vous'
 import { buildError } from '../../utils/logger.module'
 import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
+import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 
 export interface DeleteRendezVousCommand extends Command {
   idRendezVous: string
@@ -116,9 +117,9 @@ export class DeleteRendezVousCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur,
     command: DeleteRendezVousCommand
   ): Promise<void> {
-    const rdv = await this.rendezVousRepository.getSoftDeleted(
-      command.idRendezVous
-    )
+    const rdv = await RendezVousSqlModel.findByPk(command.idRendezVous, {
+      attributes: ['type']
+    })
 
     const codeEvenement =
       rdv && RendezVous.estUnTypeAnimationCollective(rdv.type)
