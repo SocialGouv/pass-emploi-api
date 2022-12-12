@@ -5211,9 +5211,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"elastic-apm-http-client@npm:11.0.3":
-  version: 11.0.3
-  resolution: "elastic-apm-http-client@npm:11.0.3"
+"elastic-apm-http-client@npm:11.0.4":
+  version: 11.0.4
+  resolution: "elastic-apm-http-client@npm:11.0.4"
   dependencies:
     agentkeepalive: ^4.2.1
     breadth-filter: ^2.0.0
@@ -5224,13 +5224,13 @@ __metadata:
     readable-stream: ^3.4.0
     semver: ^6.3.0
     stream-chopper: ^3.0.1
-  checksum: 72ce9e99a1e7ad396b67c11e386737e0442263ae401e73eaa77fc86b3df77171bb3c68dd601c3d42c382aaf08380100c78a7ce1ab84543164e0bf311509febff
+  checksum: 2e8d4ea2b3f6ba35295789d2a9315fb31f86b4de196ca4635ae13646105853ee8ebacefd3f7af0bf70c8a0fef2e3d383e5add8c9c30a71fac23804e4826c55c8
   languageName: node
   linkType: hard
 
-"elastic-apm-node@npm:3.40.1":
-  version: 3.40.1
-  resolution: "elastic-apm-node@npm:3.40.1"
+"elastic-apm-node@npm:3.41.0":
+  version: 3.41.0
+  resolution: "elastic-apm-node@npm:3.41.0"
   dependencies:
     "@elastic/ecs-pino-format": ^1.2.0
     "@opentelemetry/api": ^1.1.0
@@ -5240,7 +5240,7 @@ __metadata:
     basic-auth: ^2.0.1
     cookie: ^0.5.0
     core-util-is: ^1.0.2
-    elastic-apm-http-client: 11.0.3
+    elastic-apm-http-client: 11.0.4
     end-of-stream: ^1.4.4
     error-callsites: ^2.0.4
     error-stack-parser: ^2.0.6
@@ -5264,7 +5264,7 @@ __metadata:
     sql-summary: ^1.0.1
     traverse: ^0.6.6
     unicode-byte-truncate: ^1.0.0
-  checksum: f56fc2ff6f084338607bed1e7741e8030471abf2e17bc412c5f491c1f069bb126a79ebf319ad25dcc187481e83bdb0fae3f560e4f33dc7c1e62a88ae969e913f
+  checksum: 375b67602437b6520ca698af278c6262b37693429b9f34efae9ec28dcd7f82cad5db75d4beb5f86003891103753c9e82a130120de0ec450bed1ec43450c8f214
   languageName: node
   linkType: hard
 
@@ -9122,7 +9122,7 @@ __metadata:
     dirty-chai: ^2.0.1
     dotenv-cli: ^6.0.0
     dotvault: ^0.0.9
-    elastic-apm-node: 3.40.1
+    elastic-apm-node: 3.41.0
     eslint: 8.29.0
     eslint-config-prettier: ^8.5.0
     eslint-plugin-chai-friendly: ^0.7.2
