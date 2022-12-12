@@ -1,6 +1,7 @@
 export enum LogEventKey {
   USER_API_CALL = 'userApiCall',
   COMMAND_EVENT = 'commandEvent',
+  JOB_EVENT = 'jobEvent',
   QUERY_EVENT = 'queryEvent'
 }
 

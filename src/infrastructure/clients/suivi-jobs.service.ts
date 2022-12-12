@@ -3,7 +3,17 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
-import { RapportJob24h, ResultatJob, SuiviJobs } from '../../domain/suivi-jobs'
+import {
+  RapportJob24h,
+  ResultatJob,
+  SuiviJob,
+  SuiviJobs
+} from '../../domain/suivi-jobs'
+import {
+  SuiviJobsDto,
+  SuiviJobsSqlModel
+} from '../sequelize/models/suivi-jobs.sql-model'
+import { AsSql } from '../sequelize/types'
 
 const BOT_USERNAME = 'CEJ Lama'
 
@@ -32,6 +42,18 @@ export class SuiviJobsService implements SuiviJobs.Service {
       text: construireRapport(rapportJobs)
     }
     await firstValueFrom(this.httpService.post(webhookUrl, payload))
+  }
+
+  async save(suiviJob: SuiviJob): Promise<void> {
+    const dto: Omit<AsSql<SuiviJobsDto>, 'id'> = {
+      jobType: suiviJob.jobType,
+      dateExecution: suiviJob.dateExecution.toJSDate(),
+      nbErreurs: suiviJob.nbErreurs,
+      succes: suiviJob.succes,
+      resultat: suiviJob.resultat,
+      tempsExecution: suiviJob.tempsExecution
+    }
+    await SuiviJobsSqlModel.create(dto)
   }
 }
 

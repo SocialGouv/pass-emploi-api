@@ -1,30 +1,27 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import {
-  emptySuccess,
-  failure,
-  Result,
-  success
-} from '../../../building-blocks/types/result'
 import { PoleEmploiClient } from '../../../infrastructure/clients/pole-emploi-client'
 import { DateService } from '../../../utils/date-service'
-import { Command } from '../../../building-blocks/types/command'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import { Notification } from '../../../domain/notification/notification'
-import { SuiviJobs, SuiviJobsServiceToken } from '../../../domain/suivi-jobs'
+import {
+  SuiviJob,
+  SuiviJobs,
+  SuiviJobsServiceToken
+} from '../../../domain/suivi-jobs'
 import {
   Jeune,
   JeunePoleEmploiRepositoryToken
 } from '../../../domain/jeune/jeune'
+import { JobHandler } from '../../../building-blocks/types/job-handler'
+import { Job } from '../../../building-blocks/types/job'
+import { Planificateur } from '../../../domain/planificateur'
 import Type = Notification.Type
+import JobType = Planificateur.JobType
 
 const NOMBRE_JEUNES_EN_PARALLELE = 20
 
 @Injectable()
-export class HandleJobNotifierRendezVousPECommandHandler extends CommandHandler<
-  Command,
-  Stats
-> {
+export class HandleJobNotifierRendezVousPECommandHandler extends JobHandler<Job> {
   constructor(
     private poleEmploiClient: PoleEmploiClient,
     private notificationService: Notification.Service,
@@ -34,10 +31,10 @@ export class HandleJobNotifierRendezVousPECommandHandler extends CommandHandler<
     @Inject(JeunePoleEmploiRepositoryToken)
     private jeunePoleEmploiRepository: Jeune.PoleEmploi.Repository
   ) {
-    super('HandleJobNotifierRendezVousPECommandHandler', suiviJobsService)
+    super(JobType.NOTIFIER_RENDEZVOUS_PE, suiviJobsService)
   }
 
-  async handle(): Promise<Result<Stats>> {
+  async handle(): Promise<SuiviJob> {
     const maintenant = this.dateService.now()
     const aujourdhui = maintenant.toISODate()
     const hier = maintenant.minus({ days: 1 }).toISODate()
@@ -114,21 +111,25 @@ export class HandleJobNotifierRendezVousPECommandHandler extends CommandHandler<
           this.logger.error(e)
         }
       } while (jeunesPoleEmploi.length === NOMBRE_JEUNES_EN_PARALLELE)
-      stats.tempsDExecution = maintenant.diffNow().milliseconds * -1
-      return success(stats)
+      return {
+        jobType: this.jobType,
+        nbErreurs: stats.erreurs,
+        succes: true,
+        dateExecution: maintenant,
+        tempsExecution: maintenant.diffNow().milliseconds * -1,
+        resultat: stats
+      }
     } catch (e) {
       this.logger.error("Le job de notifications des RDV PE s'est arrêté")
-      this.logger.log(stats)
-      return failure(e)
+      return {
+        jobType: this.jobType,
+        nbErreurs: stats.erreurs,
+        succes: false,
+        dateExecution: maintenant,
+        tempsExecution: maintenant.diffNow().milliseconds * -1,
+        resultat: stats
+      }
     }
-  }
-
-  async authorize(): Promise<Result> {
-    return emptySuccess()
-  }
-
-  async monitor(): Promise<void> {
-    return
   }
 }
 
@@ -196,7 +197,6 @@ export interface Stats {
   nombreNotificationsEnvoyees: number
   nombreNotificationsDoublons: number
   erreurs: number
-  tempsDExecution?: number
 }
 
 interface NotificationAEnvoyer {

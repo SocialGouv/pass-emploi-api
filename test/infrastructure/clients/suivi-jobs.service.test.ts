@@ -5,6 +5,7 @@ import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { failure, Result, success } from 'src/building-blocks/types/result'
 import { SuiviJobsService } from 'src/infrastructure/clients/suivi-jobs.service'
 import { testConfig } from '../../utils/module-for-testing'
+import { ResultatJob } from '../../../src/domain/suivi-jobs'
 
 describe('SuiviJobsService', () => {
   let service: SuiviJobsService
@@ -18,8 +19,8 @@ describe('SuiviJobsService', () => {
   describe('notifierResultatJob', () => {
     it('envoie une notif de succès quand le result est success', async () => {
       // Given
-      const infosJob = {
-        job: 'handleJob',
+      const infosJob: ResultatJob = {
+        jobCommand: 'handleJob',
         result: success({ unChamp: 'present' }) as unknown as Result
       }
       const stringBody =
@@ -37,8 +38,8 @@ describe('SuiviJobsService', () => {
     })
     it("envoie une notif d'erreur quand le result est error", async () => {
       // Given
-      const infosJob = {
-        job: 'handleJob',
+      const infosJob: ResultatJob = {
+        jobCommand: 'handleJob',
         result: failure(new NonTrouveError('test', '1')) as unknown as Result
       }
       const stringBody =

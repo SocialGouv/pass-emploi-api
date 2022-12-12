@@ -1,12 +1,9 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
-import {
-  HandleJobNotifierRendezVousPECommandHandler,
-  Stats
-} from '../../../../src/application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
+import { HandleJobNotifierRendezVousPECommandHandler } from '../../../../src/application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
 import { Notification } from '../../../../src/domain/notification/notification'
-import { SuiviJobs } from '../../../../src/domain/suivi-jobs'
+import { SuiviJob, SuiviJobs } from '../../../../src/domain/suivi-jobs'
 import { PoleEmploiClient } from '../../../../src/infrastructure/clients/pole-emploi-client'
 import { DateService } from '../../../../src/utils/date-service'
 import { uneDatetime } from '../../../fixtures/date.fixture'
@@ -14,7 +11,9 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { unJeune } from '../../../fixtures/jeune.fixture'
 import { uneNotificationPoleEmploi } from '../../../fixtures/notification.fixture'
+import { Planificateur } from '../../../../src/domain/planificateur'
 import Type = Notification.Type
+import JobType = Planificateur.JobType
 
 describe('HandleJobNotifierRendezVousPECommandHandler', () => {
   let sandbox: SinonSandbox
@@ -120,16 +119,21 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
         'idMetier1'
       )
 
-      const stats: Stats = {
-        jeunesPEAvecToken: 1,
-        nombreJeunesTraites: 1,
-        nombreNotificationsEnvoyees: 1,
-        nombreNotificationsDoublons: 0,
-        erreurs: 0
+      const suiviJob: SuiviJob = {
+        dateExecution: maintenant,
+        jobType: JobType.NOTIFIER_RENDEZVOUS_PE,
+        nbErreurs: 0,
+        resultat: {
+          erreurs: 0,
+          jeunesPEAvecToken: 1,
+          nombreJeunesTraites: 1,
+          nombreNotificationsDoublons: 0,
+          nombreNotificationsEnvoyees: 1
+        },
+        succes: true,
+        tempsExecution: 84658021585
       }
-      expect(result._isSuccess && result.data)
-        .excluding('tempsDExecution')
-        .to.deep.equal(stats)
+      expect(result).excluding('tempsExecution').to.deep.equal(suiviJob)
     })
     it('traite les notifications PE à minuit', async () => {
       // Given
@@ -213,16 +217,21 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
         undefined
       ])
 
-      const stats: Stats = {
-        jeunesPEAvecToken: 1,
-        nombreJeunesTraites: 1,
-        nombreNotificationsEnvoyees: 2,
-        nombreNotificationsDoublons: 0,
-        erreurs: 0
+      const suiviJob: SuiviJob = {
+        dateExecution: dateMinuit,
+        jobType: JobType.NOTIFIER_RENDEZVOUS_PE,
+        nbErreurs: 0,
+        resultat: {
+          jeunesPEAvecToken: 1,
+          nombreJeunesTraites: 1,
+          nombreNotificationsEnvoyees: 2,
+          nombreNotificationsDoublons: 0,
+          erreurs: 0
+        },
+        succes: true,
+        tempsExecution: 84658021585
       }
-      expect(result._isSuccess && result.data)
-        .excluding('tempsDExecution')
-        .to.deep.equal(stats)
+      expect(result).excluding('tempsExecution').to.deep.equal(suiviJob)
     })
     it("catch l'erreur d'appel api", async () => {
       // Given
@@ -244,16 +253,21 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
         notificationService.notifierUnRendezVousPoleEmploi
       ).not.to.have.been.called()
 
-      const stats: Stats = {
-        jeunesPEAvecToken: 1,
-        nombreJeunesTraites: 0,
-        nombreNotificationsEnvoyees: 0,
-        nombreNotificationsDoublons: 0,
-        erreurs: 1
+      const suiviJob: SuiviJob = {
+        dateExecution: maintenant,
+        jobType: JobType.NOTIFIER_RENDEZVOUS_PE,
+        nbErreurs: 1,
+        resultat: {
+          jeunesPEAvecToken: 1,
+          nombreJeunesTraites: 0,
+          nombreNotificationsEnvoyees: 0,
+          nombreNotificationsDoublons: 0,
+          erreurs: 1
+        },
+        succes: true,
+        tempsExecution: 84658021585
       }
-      expect(result._isSuccess && result.data)
-        .excluding('tempsDExecution')
-        .to.deep.equal(stats)
+      expect(result).excluding('tempsExecution').to.deep.equal(suiviJob)
     })
 
     describe('filtrage des notifications', () => {

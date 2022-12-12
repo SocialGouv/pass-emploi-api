@@ -14,8 +14,8 @@ import { CodeTypeRendezVous } from '../../../../src/domain/rendez-vous/rendez-vo
 import { AsSql } from '../../../../src/infrastructure/sequelize/types'
 import { DateService } from '../../../../src/utils/date-service'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { NotificationSupport } from '../../../../src/domain/notification-support'
 import { createSandbox } from 'sinon'
+import { SuiviJobs } from '../../../../src/domain/suivi-jobs'
 
 describe('HandleJobAgenceAnimationCollectiveCommand', () => {
   const database = DatabaseForTesting.prepare()
@@ -28,7 +28,7 @@ describe('HandleJobAgenceAnimationCollectiveCommand', () => {
   const agenceNantes = uneAgenceMiloDTO({ id: '1', nomAgence: 'Nantes' })
 
   beforeEach(async () => {
-    const notificationSupportService: StubbedType<NotificationSupport.Service> =
+    const notificationSupportService: StubbedType<SuiviJobs.Service> =
       stubInterface(createSandbox())
     command = new HandleJobAgenceAnimationCollectiveCommandHandler(
       database.sequelize,

@@ -1,8 +1,18 @@
 import { DateTime } from 'luxon'
 import { Result } from '../building-blocks/types/result'
 import { Planificateur } from './planificateur'
+import JobType = Planificateur.JobType
 
 export const SuiviJobsServiceToken = 'SuiviJobs.Service'
+
+export interface SuiviJob {
+  jobType: JobType
+  dateExecution: DateTime
+  succes: boolean
+  resultat: unknown
+  nbErreurs: number
+  tempsExecution: number
+}
 
 export interface ResultatJob {
   jobCommand: string
@@ -30,5 +40,6 @@ export namespace SuiviJobs {
   export interface Service {
     notifierResultatJob(resultatJob: ResultatJob): Promise<void>
     envoyerRapport(rapportJobs: RapportJob24h[]): Promise<void>
+    save(suiviJob: SuiviJob): Promise<void>
   }
 }
