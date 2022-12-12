@@ -1,35 +1,32 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { Op, Sequelize, WhereOptions } from 'sequelize'
+import { Op, WhereOptions } from 'sequelize'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
   emptySuccess,
   Result,
   success
 } from '../../../building-blocks/types/result'
-import { JobTypeCommand } from '../../../domain/planificateur'
 import { SuiviJobs, SuiviJobsServiceToken } from '../../../domain/suivi-jobs'
 import { ArchiveJeuneSqlModel } from '../../../infrastructure/sequelize/models/archive-jeune.sql-model'
 import { LogApiPartenaireSqlModel } from '../../../infrastructure/sequelize/models/log-api-partenaire.sql-model'
-import { SuiviJobsSqlModel } from '../../../infrastructure/sequelize/models/suivi-jobs.sql-model'
-import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
 import { DateService } from '../../../utils/date-service'
+import { Command } from '../../../building-blocks/types/command'
 
 @Injectable()
 export class HandleJobNettoyerLesDonneesCommandHandler extends CommandHandler<
-  JobTypeCommand,
+  Command,
   Stats
 > {
   constructor(
     private dateService: DateService,
     @Inject(SuiviJobsServiceToken)
-    suiviJobsService: SuiviJobs.Service,
-    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
+    suiviJobsService: SuiviJobs.Service
   ) {
     super('HandleJobNettoyerLesDonneesCommandHandler', suiviJobsService)
   }
 
-  async handle(command: JobTypeCommand): Promise<Result<Stats>> {
+  async handle(): Promise<Result<Stats>> {
     const maintenant = this.dateService.now()
 
     const nombreArchivesSupprimees = await ArchiveJeuneSqlModel.destroy({
@@ -45,15 +42,6 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends CommandHandler<
       nombreArchivesSupprimees,
       nombreLogsApiSupprimees
     }
-
-    await SuiviJobsSqlModel.create({
-      jobType: command.jobType,
-      dateExecution: maintenant.toJSDate(),
-      succes: true,
-      resultat: stats,
-      nbErreurs: 0,
-      tempsExecution: stats.tempsDExecution
-    })
 
     return success(stats)
   }
