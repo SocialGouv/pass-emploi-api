@@ -1,16 +1,15 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
+import { SuiviJob } from 'src/domain/suivi-job'
 import { DateService } from 'src/utils/date-service'
 import { unConseiller } from 'test/fixtures/conseiller.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { testConfig } from 'test/utils/module-for-testing'
 import { HandleJobMailConseillerCommandHandler } from '../../../../src/application/commands/jobs/handle-job-mail-conseiller.command'
-import { isSuccess } from '../../../../src/building-blocks/types/result'
 import { Chat } from '../../../../src/domain/chat'
 import { Conseiller } from '../../../../src/domain/conseiller/conseiller'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { Mail } from '../../../../src/domain/mail'
-import { SuiviJobs } from 'src/domain/suivi-jobs'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 
 describe('HandleJobMailConseillerCommandHandler', () => {
   let handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler
@@ -18,14 +17,14 @@ describe('HandleJobMailConseillerCommandHandler', () => {
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let mailClient: StubbedType<Mail.Service>
   let dateService: StubbedClass<DateService>
-  let suiviJobsService: StubbedType<SuiviJobs.Service>
+  let suiviJobService: StubbedType<SuiviJob.Service>
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     chatRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
     mailClient = stubInterface(sandbox)
-    suiviJobsService = stubInterface(sandbox)
+    suiviJobService = stubInterface(sandbox)
 
     dateService = stubClass(DateService)
     dateService.now.returns(uneDatetime())
@@ -37,7 +36,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
         mailClient,
         dateService,
         testConfig(),
-        suiviJobsService
+        suiviJobService
       )
   })
 
@@ -65,10 +64,8 @@ describe('HandleJobMailConseillerCommandHandler', () => {
       expect(
         mailClient.envoyerMailConversationsNonLues
       ).to.have.been.calledWithExactly(conseillers[0], 1)
-      expect(result._isSuccess).to.equal(true)
-      if (isSuccess(result)) {
-        expect(result.data.mailsEnvoyes).to.equal(1)
-      }
+      expect(result.succes).to.equal(true)
+      expect(result.resultat).to.deep.equal({ succes: 2, mailsEnvoyes: 1 })
     })
     it("envoie pas de mails aux conseillers qui n'ont pas d'email", async () => {
       // Given
@@ -91,10 +88,8 @@ describe('HandleJobMailConseillerCommandHandler', () => {
 
       // Then
       expect(mailClient.envoyerMailConversationsNonLues).to.have.callCount(0)
-      expect(result._isSuccess).to.equal(true)
-      if (isSuccess(result)) {
-        expect(result.data.mailsEnvoyes).to.equal(0)
-      }
+      expect(result.succes).to.equal(true)
+      expect(result.resultat).to.deep.equal({ succes: 2, mailsEnvoyes: 0 })
     })
     it("envoie pas de mails aux conseillers si l'envoi de mail échoue", async () => {
       // Given
@@ -121,10 +116,8 @@ describe('HandleJobMailConseillerCommandHandler', () => {
       const result = await handleJobMailConseillerCommandHandler.handle()
 
       // Then
-      expect(result._isSuccess).to.equal(true)
-      if (isSuccess(result)) {
-        expect(result.data.mailsEnvoyes).to.equal(1)
-      }
+      expect(result.succes).to.equal(true)
+      expect(result.resultat).to.deep.equal({ succes: 2, mailsEnvoyes: 1 })
     })
     it('sauvegarde la nouvelle date de verification des messages pour tous les conseillers', async () => {
       // Given
@@ -147,9 +140,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
       expect(
         conseillerRepository.updateDateVerificationMessages
       ).to.have.callCount(2)
-      if (isSuccess(result)) {
-        expect(result.data.succes).to.equal(2)
-      }
+      expect(result.resultat).to.deep.equal({ succes: 2, mailsEnvoyes: 1 })
     })
   })
 
@@ -173,12 +164,9 @@ describe('HandleJobMailConseillerCommandHandler', () => {
       const result = await handleJobMailConseillerCommandHandler.handle()
 
       // Then
-      expect(result._isSuccess).to.equal(true)
-      if (isSuccess(result)) {
-        expect(result.data.echecs).to.equal(1)
-        expect(result.data.succes).to.equal(1)
-        expect(result.data.mailsEnvoyes).to.equal(1)
-      }
+      expect(result.succes).to.equal(true)
+      expect(result.resultat).to.deep.equal({ succes: 1, mailsEnvoyes: 1 })
+      expect(result.nbErreurs).to.equal(1)
     })
   })
 
@@ -191,7 +179,7 @@ describe('HandleJobMailConseillerCommandHandler', () => {
       const result = await handleJobMailConseillerCommandHandler.handle()
 
       // Then
-      expect(result._isSuccess).to.equal(false)
+      expect(result.succes).to.equal(false)
     })
   })
 })

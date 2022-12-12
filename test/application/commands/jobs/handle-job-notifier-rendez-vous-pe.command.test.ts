@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
 import { HandleJobNotifierRendezVousPECommandHandler } from '../../../../src/application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
 import { Notification } from '../../../../src/domain/notification/notification'
-import { SuiviJob, SuiviJobs } from '../../../../src/domain/suivi-jobs'
+import { SuiviJob } from '../../../../src/domain/suivi-job'
 import { PoleEmploiClient } from '../../../../src/infrastructure/clients/pole-emploi-client'
 import { DateService } from '../../../../src/utils/date-service'
 import { uneDatetime } from '../../../fixtures/date.fixture'
@@ -21,7 +21,7 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
   let poleEmploiClient: StubbedClass<PoleEmploiClient>
   let dateService: StubbedClass<DateService>
   let notificationService: StubbedClass<Notification.Service>
-  let suiviJobsService: StubbedType<SuiviJobs.Service>
+  let suiviJobService: StubbedType<SuiviJob.Service>
   let jeunePoleEmploiRepository: StubbedType<Jeune.PoleEmploi.Repository>
 
   const maintenant = uneDatetime()
@@ -39,7 +39,7 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
     dateService = stubClass(DateService)
     jeunePoleEmploiRepository = stubInterface(sandbox)
     notificationService = stubClass(Notification.Service)
-    suiviJobsService = stubInterface(sandbox)
+    suiviJobService = stubInterface(sandbox)
 
     dateService.now.returns(maintenant)
     jeunePoleEmploiRepository.findAll.resolves([jeunePoleEmploi])
@@ -49,7 +49,7 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
         poleEmploiClient,
         notificationService,
         dateService,
-        suiviJobsService,
+        suiviJobService,
         jeunePoleEmploiRepository
       )
   })

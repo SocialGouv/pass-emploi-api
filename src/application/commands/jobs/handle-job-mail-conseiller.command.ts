@@ -1,28 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import {
-  emptySuccess,
-  failure,
-  Result,
-  success
-} from '../../../building-blocks/types/result'
-import { SuiviJobs, SuiviJobsServiceToken } from '../../../domain/suivi-jobs'
-import { DateService } from '../../../utils/date-service'
-import { Command } from '../../../building-blocks/types/command'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import { Job } from 'bull'
+import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { Chat, ChatRepositoryToken } from '../../../domain/chat'
 import {
   Conseiller,
   ConseillersRepositoryToken
 } from '../../../domain/conseiller/conseiller'
 import { Mail, MailServiceToken } from '../../../domain/mail'
+import { Planificateur } from '../../../domain/planificateur'
+import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
+import { DateService } from '../../../utils/date-service'
 import { buildError } from '../../../utils/logger.module'
 
 @Injectable()
-export class HandleJobMailConseillerCommandHandler extends CommandHandler<
-  Command,
-  Stats
-> {
+export class HandleJobMailConseillerCommandHandler extends JobHandler<Job> {
   constructor(
     @Inject(ChatRepositoryToken)
     private chatRepository: Chat.Repository,
@@ -32,18 +24,19 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
     private mailService: Mail.Service,
     private dateService: DateService,
     private configuration: ConfigService,
-    @Inject(SuiviJobsServiceToken)
-    suiviJobsService: SuiviJobs.Service
+    @Inject(SuiviJobServiceToken)
+    suiviJobService: SuiviJob.Service
   ) {
-    super('HandleJobMailConseillerCommandHandler', suiviJobsService)
+    super(Planificateur.JobType.MAIL_CONSEILLER_MESSAGES, suiviJobService)
   }
 
-  async handle(): Promise<Result<Stats>> {
-    const stats: Stats = {
+  async handle(): Promise<SuiviJob> {
+    const stats = {
       succes: 0,
-      echecs: 0,
       mailsEnvoyes: 0
     }
+    let nbErreurs = 0
+    let succes = false
 
     let conseillers = []
     const maintenant = this.dateService.now()
@@ -100,33 +93,25 @@ export class HandleJobMailConseillerCommandHandler extends CommandHandler<
               this.logger.error(
                 `Echec verification des messages non lus du conseiller ${conseiller.id}`
               )
-              stats.echecs++
+              nbErreurs++
             }
           })
         )
       } while (conseillers.length)
-
-      stats.tempsDExecution = maintenant.diffNow().milliseconds * -1
-      return success(stats)
+      succes = true
     } catch (e) {
       this.logger.error("Le job des mails des messages non lus s'est arrêté")
       this.logger.log(stats)
-      return failure(e)
+      succes = false
+    }
+
+    return {
+      jobType: this.jobType,
+      nbErreurs,
+      succes,
+      dateExecution: maintenant,
+      tempsExecution: maintenant.diffNow().milliseconds * -1,
+      resultat: stats
     }
   }
-
-  async authorize(): Promise<Result> {
-    return emptySuccess()
-  }
-
-  async monitor(): Promise<void> {
-    return
-  }
-}
-
-interface Stats {
-  succes: number
-  echecs: number
-  mailsEnvoyes: number
-  tempsDExecution?: number
 }

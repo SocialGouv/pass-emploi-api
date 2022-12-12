@@ -1,32 +1,25 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { Job } from 'bull'
 import { DateTime } from 'luxon'
 import { Op, WhereOptions } from 'sequelize'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
-import {
-  emptySuccess,
-  Result,
-  success
-} from '../../../building-blocks/types/result'
-import { SuiviJobs, SuiviJobsServiceToken } from '../../../domain/suivi-jobs'
+import { JobHandler } from '../../../building-blocks/types/job-handler'
+import { Planificateur } from '../../../domain/planificateur'
+import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { ArchiveJeuneSqlModel } from '../../../infrastructure/sequelize/models/archive-jeune.sql-model'
 import { LogApiPartenaireSqlModel } from '../../../infrastructure/sequelize/models/log-api-partenaire.sql-model'
 import { DateService } from '../../../utils/date-service'
-import { Command } from '../../../building-blocks/types/command'
 
 @Injectable()
-export class HandleJobNettoyerLesDonneesCommandHandler extends CommandHandler<
-  Command,
-  Stats
-> {
+export class HandleJobNettoyerLesDonneesCommandHandler extends JobHandler<Job> {
   constructor(
     private dateService: DateService,
-    @Inject(SuiviJobsServiceToken)
-    suiviJobsService: SuiviJobs.Service
+    @Inject(SuiviJobServiceToken)
+    suiviJobService: SuiviJob.Service
   ) {
-    super('HandleJobNettoyerLesDonneesCommandHandler', suiviJobsService)
+    super(Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE, suiviJobService)
   }
 
-  async handle(): Promise<Result<Stats>> {
+  async handle(): Promise<SuiviJob> {
     const maintenant = this.dateService.now()
 
     const nombreArchivesSupprimees = await ArchiveJeuneSqlModel.destroy({
@@ -38,27 +31,19 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends CommandHandler<
     })
 
     const stats = {
-      tempsDExecution: maintenant.diffNow().milliseconds * -1,
       nombreArchivesSupprimees,
       nombreLogsApiSupprimees
     }
 
-    return success(stats)
+    return {
+      jobType: this.jobType,
+      nbErreurs: 0,
+      succes: true,
+      dateExecution: maintenant,
+      tempsExecution: maintenant.diffNow().milliseconds * -1,
+      resultat: stats
+    }
   }
-
-  async authorize(): Promise<Result> {
-    return emptySuccess()
-  }
-
-  async monitor(): Promise<void> {
-    return
-  }
-}
-
-interface Stats {
-  nombreArchivesSupprimees: number
-  nombreLogsApiSupprimees: number
-  tempsDExecution?: number
 }
 
 function dateArchivageSuperieureADeuxAns(maintenant: DateTime): WhereOptions {

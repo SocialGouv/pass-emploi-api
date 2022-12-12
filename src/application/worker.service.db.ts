@@ -100,9 +100,7 @@ export class WorkerService {
           await this.handleJobNettoyerPiecesJointesCommandHandler.execute()
           break
         case Planificateur.JobType.NETTOYER_LES_DONNEES:
-          await this.handleJobNettoyerLesDonneesCommandHandler.execute({
-            jobType: job.type
-          })
+          await this.handleJobNettoyerLesDonneesCommandHandler.execute()
           break
         case Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE:
           await this.handleJobNotifierRendezVousPECommandHandler.execute()

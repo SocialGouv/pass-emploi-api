@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import { DateService } from '../utils/date-service'
 import { RendezVous } from './rendez-vous/rendez-vous'
 import { Action } from './action/action'
-import { NettoyageJobsStats } from './suivi-jobs'
+import { NettoyageJobsStats } from './suivi-job'
 
 export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 
@@ -133,10 +133,9 @@ export class PlanificateurService {
     private dateService: DateService
   ) {}
 
-  async planifierCronJob(JobType: Planificateur.JobType): Promise<void> {
-    const cron = listeCronJobs.find(cron => cron.type === JobType)
-    if (cron) {
-      await this.planificateurRepository.creerCronJob(cron)
+  async planifierLesCronJobs(): Promise<void> {
+    for (const cronJob of listeCronJobs) {
+      await this.planificateurRepository.creerCronJob(cronJob)
     }
   }
 

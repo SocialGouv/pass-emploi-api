@@ -8,7 +8,7 @@ import {
 } from 'sequelize-typescript'
 import { Planificateur } from '../../../domain/planificateur'
 
-export class SuiviJobsDto extends Model {
+export class SuiviJobDto extends Model {
   @PrimaryKey
   @AutoIncrement
   @Column({
@@ -56,6 +56,6 @@ export class SuiviJobsDto extends Model {
 
 @Table({
   timestamps: false,
-  tableName: 'suivi_jobs'
+  tableName: 'suivi_job'
 })
-export class SuiviJobsSqlModel extends SuiviJobsDto {}
+export class SuiviJobSqlModel extends SuiviJobDto {}

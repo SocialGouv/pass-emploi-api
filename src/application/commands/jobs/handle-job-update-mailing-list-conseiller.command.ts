@@ -5,7 +5,7 @@ import {
   Result,
   success
 } from '../../../building-blocks/types/result'
-import { SuiviJobs, SuiviJobsServiceToken } from '../../../domain/suivi-jobs'
+import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { Command } from '../../../building-blocks/types/command'
 import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import { Core } from '../../../domain/core'
@@ -30,13 +30,10 @@ export class HandleJobUpdateMailingListConseillerCommandHandler extends CommandH
     private mailRepository: Mail.Repository,
     private configuration: ConfigService,
     private dateService: DateService,
-    @Inject(SuiviJobsServiceToken)
-    suiviJobsService: SuiviJobs.Service
+    @Inject(SuiviJobServiceToken)
+    suiviJobService: SuiviJob.Service
   ) {
-    super(
-      'HandleJobUpdateMailingListConseillerCommandHandler',
-      suiviJobsService
-    )
+    super('HandleJobUpdateMailingListConseillerCommandHandler', suiviJobService)
     this.mailingLists = this.configuration.get('sendinblue').mailingLists
   }
 

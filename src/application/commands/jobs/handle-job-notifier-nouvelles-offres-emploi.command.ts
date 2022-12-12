@@ -21,7 +21,7 @@ import { Notification } from '../../../domain/notification/notification'
 import { GetOffresEmploiQuery } from '../../queries/get-offres-emploi.query.handler'
 import { OffresEmploiQueryModel } from '../../queries/query-models/offres-emploi.query-model'
 import { FindAllOffresEmploiQueryGetter } from '../../queries/query-getters/find-all-offres-emploi.query.getter'
-import { SuiviJobs, SuiviJobsServiceToken } from '../../../domain/suivi-jobs'
+import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { Offre } from '../../../domain/offre/offre'
 
 @Injectable()
@@ -38,12 +38,12 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
     @Inject(JeuneConfigurationApplicationRepositoryToken)
     private jeuneConfigurationApplicationRepository: Jeune.ConfigurationApplication.Repository,
     private configuration: ConfigService,
-    @Inject(SuiviJobsServiceToken)
-    suiviJobsService: SuiviJobs.Service
+    @Inject(SuiviJobServiceToken)
+    suiviJobService: SuiviJob.Service
   ) {
     super(
       'HandleJobNotifierNouvellesOffresEmploiCommandHandler',
-      suiviJobsService
+      suiviJobService
     )
   }
 

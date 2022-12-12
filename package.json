@@ -58,6 +58,7 @@
     "tasks:nettoyer-les-donnees": "IS_WEB=false TASK_NAME=NETTOYER_LES_DONNEES node dist/main",
     "tasks:notifier-rendez-vous-pe": "IS_WEB=false TASK_NAME=NOTIFIER_RENDEZVOUS_PE node dist/main",
     "tasks:maj-agences-ac": "IS_WEB=false TASK_NAME=MAJ_AGENCE_AC node dist/main",
+    "tasks:monitorer-jobs": "IS_WEB=false TASK_NAME=MONITORER_JOBS node dist/main",
     "dump-restore-db": "scripts/db_dump_restore.sh",
     "dump-restore-db:local": "dotenv -e .environment yarn dump-restore-db",
     "release:patch": "scripts/release.sh patch",

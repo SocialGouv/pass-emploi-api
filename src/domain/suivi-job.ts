@@ -3,7 +3,7 @@ import { Result } from '../building-blocks/types/result'
 import { Planificateur } from './planificateur'
 import JobType = Planificateur.JobType
 
-export const SuiviJobsServiceToken = 'SuiviJobs.Service'
+export const SuiviJobServiceToken = 'SuiviJob.Service'
 
 export interface SuiviJob {
   jobType: JobType
@@ -36,7 +36,7 @@ export interface NettoyageJobsStats {
   tempsDExecution?: number
 }
 
-export namespace SuiviJobs {
+export namespace SuiviJob {
   export interface Service {
     notifierResultatJob(resultatJob: ResultatJob): Promise<void>
     envoyerRapport(rapportJobs: RapportJob24h[]): Promise<void>
