@@ -16,7 +16,8 @@ import {
 } from '../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
-  failure
+  failure,
+  Result
 } from '../../../src/building-blocks/types/result'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
@@ -57,6 +58,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
   let jeuneRepository: StubbedType<Jeune.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let chatRepository: StubbedType<Chat.Repository>
+  let listesDeDiffusionRepository: StubbedType<Conseiller.ListeDeDiffusion.Repository>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let animationCollectiveService: StubbedClass<RendezVous.AnimationCollective.Service>
 
@@ -72,6 +74,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
       .resolves(conseillerCible)
 
     chatRepository = stubInterface(sandbox)
+    listesDeDiffusionRepository = stubInterface(sandbox)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     animationCollectiveService = stubClass(
       RendezVous.AnimationCollective.Service
@@ -80,6 +83,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
       new TransfererJeunesConseillerCommandHandler(
         conseillerRepository,
         jeuneRepository,
+        listesDeDiffusionRepository,
         chatRepository,
         animationCollectiveService,
         conseillerAuthorizer
@@ -97,7 +101,10 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
 
     describe('quand les conseillers et les jeunes correspondent au superviseur', () => {
       describe('quand le transfert est permanent', () => {
-        it('sauvegarde les transferts et le jeune avec son nouveau conseiller', async () => {
+        let result: Result
+        let jeune1ApresTransfert: Jeune
+        let jeune2ApresTransfert: Jeune
+        beforeEach(async () => {
           // Given
           const jeune1 = unJeune({
             id: command.idsJeunes[0],
@@ -114,19 +121,23 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             .resolves([jeune1, jeune2])
 
           // When
-          const result = await transfererJeunesConseillerCommandHandler.handle(
+          result = await transfererJeunesConseillerCommandHandler.handle(
             command
           )
 
           // Then
-          const jeune1ApresTransfert: Jeune = {
+          jeune1ApresTransfert = {
             ...jeune1,
             conseiller: conseillerCibleDuJeune
           }
-          const jeune2ApresTransfert: Jeune = {
+          jeune2ApresTransfert = {
             ...jeune2,
             conseiller: conseillerCibleDuJeune
           }
+        })
+
+        it('sauvegarde les transferts et les jeunes avec leur nouveau conseiller', async () => {
+          // Then
           expect(result).to.deep.equal(emptySuccess())
           expect(
             jeuneRepository.transferAndSaveAll
@@ -136,12 +147,25 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             command.idConseillerSource,
             command.estTemporaire
           )
+        })
+
+        it('préviens les jeunes du transfert', async () => {
+          // Then
           expect(
             chatRepository.envoyerMessageTransfert.getCall(0).args[0]
           ).to.deep.equal(jeune1ApresTransfert)
           expect(
             chatRepository.envoyerMessageTransfert.getCall(1).args[0]
           ).to.deep.equal(jeune2ApresTransfert)
+        })
+
+        it('supprime les jeunes des listes de diffusion du conseiller', async () => {
+          expect(
+            listesDeDiffusionRepository.removeBeneficiairesFromAll
+          ).to.have.been.calledOnceWithExactly(
+            command.idConseillerSource,
+            command.idsJeunes
+          )
         })
       })
       describe('quand le transfert est temporaire', () => {
