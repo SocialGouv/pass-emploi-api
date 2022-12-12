@@ -29,11 +29,11 @@ export class AuthorizeConseillerForJeunesTransferesTemporairement {
       const estLeConseiller = jeune.conseiller?.id === utilisateur.id
       const estLeConseillerInitial =
         jeune.conseillerInitial?.id === utilisateur.id
-      if (estLeConseiller || estLeConseillerInitial) {
-        return emptySuccess()
+      if (!(estLeConseiller || estLeConseillerInitial)) {
+        return failure(new DroitsInsuffisants())
       }
     }
 
-    return failure(new DroitsInsuffisants())
+    return emptySuccess()
   }
 }
