@@ -31,6 +31,11 @@ export namespace ListeDeDiffusion {
     get(id: string): Promise<ListeDeDiffusion | undefined>
 
     delete(id: string): Promise<void>
+
+    removeBeneficiairesFromAll(
+      idConseiller: string,
+      idsBeneficiaires: string[]
+    ): Promise<void>
   }
 
   export interface Beneficiaire {

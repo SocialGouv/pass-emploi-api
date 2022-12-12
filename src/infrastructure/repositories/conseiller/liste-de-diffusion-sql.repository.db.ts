@@ -6,7 +6,7 @@ import {
 import { AsSql } from '../../sequelize/types'
 import { Inject } from '@nestjs/common'
 import { SequelizeInjectionToken } from '../../sequelize/providers'
-import { Sequelize } from 'sequelize'
+import { Op, Sequelize } from 'sequelize'
 import { ListeDeDiffusionJeuneAssociationSqlModel } from '../../sequelize/models/liste-de-diffusion-jeune-association.sql-model'
 import { DateTime } from 'luxon'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
@@ -67,6 +67,24 @@ export class ListeDeDiffusionSqlRepository
 
   async delete(id: string): Promise<void> {
     await ListeDeDiffusionSqlModel.destroy({ where: { id } })
+  }
+
+  async removeBeneficiairesFromAll(
+    idConseiller: string,
+    idsBeneficiaires: string[]
+  ): Promise<void> {
+    const listesDuConseillerSql = await ListeDeDiffusionSqlModel.findAll({
+      where: { idConseiller }
+    })
+
+    await ListeDeDiffusionJeuneAssociationSqlModel.destroy({
+      where: {
+        idListe: {
+          [Op.in]: listesDuConseillerSql.map(sqlModel => sqlModel.id)
+        },
+        idBeneficiaire: { [Op.in]: idsBeneficiaires }
+      }
+    })
   }
 }
 

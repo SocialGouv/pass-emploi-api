@@ -3,6 +3,7 @@ import {
   MauvaiseCommandeError,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
+import { ListeDeDiffusionRepositoryToken } from '../../domain/conseiller/liste-de-diffusion'
 import { Core } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Command } from '../../building-blocks/types/command'
@@ -39,6 +40,8 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
     private conseillerRepository: Conseiller.Repository,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
+    @Inject(ListeDeDiffusionRepositoryToken)
+    private listesDiffusionRepository: Conseiller.ListeDeDiffusion.Repository,
     @Inject(ChatRepositoryToken)
     private chatRepository: Chat.Repository,
     private animationCollectiveService: RendezVous.AnimationCollective.Service,
@@ -95,6 +98,13 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       await this.animationCollectiveService.desinscrire(
         command.idsJeunes,
         conseillerSource.agence.id
+      )
+    }
+
+    if (!command.estTemporaire) {
+      await this.listesDiffusionRepository.removeBeneficiairesFromAll(
+        command.idConseillerSource,
+        command.idsJeunes
       )
     }
 

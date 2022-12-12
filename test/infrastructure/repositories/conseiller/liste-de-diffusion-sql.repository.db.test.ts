@@ -1,5 +1,10 @@
 import { Conseiller } from '../../../../src/domain/conseiller/conseiller'
 import { ListeDeDiffusionJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/liste-de-diffusion-jeune-association.sql-model'
+import { ListeDeDiffusionSqlModel } from '../../../../src/infrastructure/sequelize/models/liste-de-diffusion.sql-model'
+import {
+  uneListeDeDiffusionAssociationDto,
+  uneListeDeDiffusionDto
+} from '../../../fixtures/sql-models/liste-de-diffusion-sql.fixture'
 import { DatabaseForTesting } from '../../../utils/database-for-testing'
 import { ListeDeDiffusionSqlRepository } from '../../../../src/infrastructure/repositories/conseiller/liste-de-diffusion-sql.repository.db'
 import { unConseillerDuJeune, unJeune } from '../../../fixtures/jeune.fixture'
@@ -122,6 +127,101 @@ describe(' ListeDeDiffusionSqlRepository', () => {
       const associations =
         await ListeDeDiffusionJeuneAssociationSqlModel.findAll()
       expect(associations).to.deep.equal([])
+    })
+  })
+
+  describe('removeBeneficiairesFromAll', () => {
+    it('supprime les bénéficiaires de toutes les listes de diffusion du conseiller', async () => {
+      // Given
+      await ConseillerSqlModel.bulkCreate([
+        unConseillerDto({ id: 'id-conseiller-1' }),
+        unConseillerDto({ id: 'id-conseiller-2' })
+      ])
+      await JeuneSqlModel.bulkCreate([
+        unJeuneDto({
+          id: 'id-beneficiaire-1',
+          idConseiller: 'id-conseiller-1'
+        }),
+        unJeuneDto({
+          id: 'id-beneficiaire-2',
+          idConseiller: 'id-conseiller-1'
+        }),
+        unJeuneDto({ id: 'id-beneficiaire-3', idConseiller: 'id-conseiller-2' })
+      ])
+      const idListe1 = 'cbcad6b0-484e-4568-971d-c09bf117a9c7'
+      const idListe2 = 'aad98dbd-5630-4b09-99e3-fb4f678fff31'
+      const idListe3 = 'cb2276b2-7ee2-4285-a063-43ea59760d26'
+      await ListeDeDiffusionSqlModel.bulkCreate([
+        uneListeDeDiffusionDto({
+          id: idListe1,
+          idConseiller: 'id-conseiller-1'
+        }),
+        uneListeDeDiffusionDto({
+          id: idListe2,
+          idConseiller: 'id-conseiller-1'
+        }),
+        uneListeDeDiffusionDto({
+          id: idListe3,
+          idConseiller: 'id-conseiller-2'
+        })
+      ])
+      await ListeDeDiffusionJeuneAssociationSqlModel.bulkCreate([
+        uneListeDeDiffusionAssociationDto({
+          idListe: idListe1,
+          idBeneficiaire: 'id-beneficiaire-1'
+        }),
+        uneListeDeDiffusionAssociationDto({
+          idListe: idListe1,
+          idBeneficiaire: 'id-beneficiaire-2'
+        }),
+        uneListeDeDiffusionAssociationDto({
+          idListe: idListe2,
+          idBeneficiaire: 'id-beneficiaire-1'
+        }),
+        uneListeDeDiffusionAssociationDto({
+          idListe: idListe2,
+          idBeneficiaire: 'id-beneficiaire-3'
+        }),
+        uneListeDeDiffusionAssociationDto({
+          idListe: idListe3,
+          idBeneficiaire: 'id-beneficiaire-1'
+        }),
+        uneListeDeDiffusionAssociationDto({
+          idListe: idListe3,
+          idBeneficiaire: 'id-beneficiaire-3'
+        })
+      ])
+
+      // When
+      await repository.removeBeneficiairesFromAll('id-conseiller-1', [
+        'id-beneficiaire-1',
+        'id-beneficiaire-2'
+      ])
+
+      // Then
+      const beneficiairesListe1 = await repository
+        .get(idListe1)
+        .then(liste =>
+          liste?.beneficiaires.map(jeuneDeLaListe => jeuneDeLaListe.id)
+        )
+      expect(beneficiairesListe1).to.deep.equal([])
+
+      const beneficiairesListe2 = await repository
+        .get(idListe2)
+        .then(liste =>
+          liste?.beneficiaires.map(jeuneDeLaListe => jeuneDeLaListe.id)
+        )
+      expect(beneficiairesListe2).to.deep.equal(['id-beneficiaire-3'])
+
+      const beneficiairesListe3 = await repository
+        .get(idListe3)
+        .then(liste =>
+          liste?.beneficiaires.map(jeuneDeLaListe => jeuneDeLaListe.id)
+        )
+      expect(beneficiairesListe3).to.deep.equal([
+        'id-beneficiaire-1',
+        'id-beneficiaire-3'
+      ])
     })
   })
 })
