@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common'
 import * as APM from 'elastic-apm-node'
 import { getAPMInstance } from '../../infrastructure/monitoring/apm.init'
 import { LogEvent, LogEventKey } from './log.event'
-import { SuiviJob, SuiviJobs } from '../../domain/suivi-jobs'
+import { SuiviJob } from '../../domain/suivi-job'
 import { Planificateur } from '../../domain/planificateur'
 import JobType = Planificateur.JobType
 
@@ -13,19 +13,19 @@ export abstract class JobHandler<C> {
   protected logger: Logger
   protected apmService: APM.Agent
   protected jobType: JobType
-  private suiviJobsService: SuiviJobs.Service
+  private suiviJobService: SuiviJob.Service
 
-  constructor(jobType: JobType, suiviJobsService: SuiviJobs.Service) {
+  constructor(jobType: JobType, suiviJobService: SuiviJob.Service) {
     this.jobType = jobType
     this.logger = new Logger(jobType)
-    this.suiviJobsService = suiviJobsService
+    this.suiviJobService = suiviJobService
     this.apmService = getAPMInstance()
   }
 
   async execute(): Promise<SuiviJob> {
     try {
       const result = await this.handle()
-      await this.suiviJobsService.save(result)
+      await this.suiviJobService.save(result)
       this.logAfter(result)
       return result
     } catch (e) {

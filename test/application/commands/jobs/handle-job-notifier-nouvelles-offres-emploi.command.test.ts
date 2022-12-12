@@ -19,7 +19,7 @@ import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
 import { testConfig } from '../../../utils/module-for-testing'
 import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from '../../../../src/application/commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
 import { FindAllOffresEmploiQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-emploi.query.getter'
-import { SuiviJobs } from 'src/domain/suivi-jobs'
+import { SuiviJob } from 'src/domain/suivi-job'
 import { Offre } from '../../../../src/domain/offre/offre'
 
 describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
@@ -28,7 +28,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
   let findAllOffresEmploiQueryGetter: StubbedClass<FindAllOffresEmploiQueryGetter>
   let notificationService: StubbedClass<Notification.Service>
   let jeuneRepository: StubbedType<Jeune.Repository>
-  let suiviJobsService: StubbedType<SuiviJobs.Service>
+  let suiviJobService: StubbedType<SuiviJob.Service>
 
   const date = uneDatetime()
 
@@ -57,7 +57,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
     notificationService = stubClass(Notification.Service)
     notificationService.notifierNouvellesOffres.resolves()
     jeuneRepository = stubInterface(sandbox)
-    suiviJobsService = stubInterface(sandbox)
+    suiviJobService = stubInterface(sandbox)
 
     const dateService = stubClass(DateService)
     dateService.now.returns(date)
@@ -70,7 +70,7 @@ describe('NotifierNouvellesOffresEmploiCommandHandler', () => {
         notificationService,
         jeuneRepository,
         testConfig(),
-        suiviJobsService
+        suiviJobService
       )
   })
 

@@ -3,11 +3,7 @@ import { DateTime } from 'luxon'
 import { PoleEmploiClient } from '../../../infrastructure/clients/pole-emploi-client'
 import { DateService } from '../../../utils/date-service'
 import { Notification } from '../../../domain/notification/notification'
-import {
-  SuiviJob,
-  SuiviJobs,
-  SuiviJobsServiceToken
-} from '../../../domain/suivi-jobs'
+import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import {
   Jeune,
   JeunePoleEmploiRepositoryToken
@@ -26,12 +22,12 @@ export class HandleJobNotifierRendezVousPECommandHandler extends JobHandler<Job>
     private poleEmploiClient: PoleEmploiClient,
     private notificationService: Notification.Service,
     private dateService: DateService,
-    @Inject(SuiviJobsServiceToken)
-    suiviJobsService: SuiviJobs.Service,
+    @Inject(SuiviJobServiceToken)
+    suiviJobService: SuiviJob.Service,
     @Inject(JeunePoleEmploiRepositoryToken)
     private jeunePoleEmploiRepository: Jeune.PoleEmploi.Repository
   ) {
-    super(JobType.NOTIFIER_RENDEZVOUS_PE, suiviJobsService)
+    super(JobType.NOTIFIER_RENDEZVOUS_PE, suiviJobService)
   }
 
   async handle(): Promise<SuiviJob> {

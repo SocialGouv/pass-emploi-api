@@ -11,7 +11,7 @@ import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/provi
 import { DateService } from '../../../utils/date-service'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { CodeTypeRendezVous } from '../../../domain/rendez-vous/rendez-vous'
-import { SuiviJobs, SuiviJobsServiceToken } from '../../../domain/suivi-jobs'
+import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 
 @Injectable()
 export class HandleJobAgenceAnimationCollectiveCommandHandler extends CommandHandler<
@@ -21,8 +21,8 @@ export class HandleJobAgenceAnimationCollectiveCommandHandler extends CommandHan
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
     private dateService: DateService,
-    @Inject(SuiviJobsServiceToken)
-    notificationSupportService: SuiviJobs.Service
+    @Inject(SuiviJobServiceToken)
+    notificationSupportService: SuiviJob.Service
   ) {
     super(
       'HandleJobAgenceAnimationCollectiveCommandHandler',

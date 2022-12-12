@@ -1,13 +1,13 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { RapportJob24h, SuiviJobs } from 'src/domain/suivi-jobs'
+import { RapportJob24h, SuiviJob } from 'src/domain/suivi-job'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { MonitorJobsCommandHandler } from '../../../../src/application/commands/jobs/monitor-jobs.command.db'
 import {
   JobTypeCommand,
   Planificateur
 } from '../../../../src/domain/planificateur'
-import { SuiviJobsSqlModel } from '../../../../src/infrastructure/sequelize/models/suivi-jobs.sql-model'
+import { SuiviJobSqlModel } from '../../../../src/infrastructure/sequelize/models/suivi-job.sql-model'
 import { DateService } from '../../../../src/utils/date-service'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { DatabaseForTesting } from '../../../utils/database-for-testing'
@@ -16,18 +16,18 @@ describe('MonitorJobsCommandHandler', () => {
   DatabaseForTesting.prepare()
   let monitorJobsCommandHandler: MonitorJobsCommandHandler
   let dateSevice: StubbedClass<DateService>
-  let suiviJobsService: StubbedType<SuiviJobs.Service>
+  let suiviJobService: StubbedType<SuiviJob.Service>
   const maintenant = uneDatetime()
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     dateSevice = stubClass(DateService)
     dateSevice.now.returns(maintenant)
-    suiviJobsService = stubInterface(sandbox)
+    suiviJobService = stubInterface(sandbox)
 
     monitorJobsCommandHandler = new MonitorJobsCommandHandler(
       dateSevice,
-      suiviJobsService
+      suiviJobService
     )
   })
 
@@ -38,7 +38,7 @@ describe('MonitorJobsCommandHandler', () => {
         const command: JobTypeCommand = {
           jobType: Planificateur.JobType.NETTOYER_LES_DONNEES
         }
-        await SuiviJobsSqlModel.create({
+        await SuiviJobSqlModel.create({
           jobType: command.jobType,
           dateExecution: maintenant.minus({ hours: 25 }).toJSDate(),
           succes: true,
@@ -46,7 +46,7 @@ describe('MonitorJobsCommandHandler', () => {
           nbErreurs: 0,
           tempsExecution: 99999
         })
-        await SuiviJobsSqlModel.create({
+        await SuiviJobSqlModel.create({
           jobType: command.jobType,
           dateExecution: maintenant.minus({ hours: 5 }).toJSDate(),
           succes: true,
@@ -67,8 +67,9 @@ describe('MonitorJobsCommandHandler', () => {
         await monitorJobsCommandHandler.handle(command)
 
         // Then
-        const rapport: RapportJob24h[] =
-          suiviJobsService.envoyerRapport.getCall(0).args[0] as RapportJob24h[]
+        const rapport: RapportJob24h[] = suiviJobService.envoyerRapport.getCall(
+          0
+        ).args[0] as RapportJob24h[]
 
         const rapportJob = rapport.find(job => job.jobType === command.jobType)
         expect(rapportJob).to.deep.equal(expectedRapportJob)
@@ -91,8 +92,9 @@ describe('MonitorJobsCommandHandler', () => {
         await monitorJobsCommandHandler.handle(command)
 
         // Then
-        const rapport: RapportJob24h[] =
-          suiviJobsService.envoyerRapport.getCall(0).args[0] as RapportJob24h[]
+        const rapport: RapportJob24h[] = suiviJobService.envoyerRapport.getCall(
+          0
+        ).args[0] as RapportJob24h[]
         const rapportJob = rapport.find(job => job.jobType === command.jobType)
         expect(rapportJob).to.deep.equal(expectedRapportJob)
       })
@@ -103,7 +105,7 @@ describe('MonitorJobsCommandHandler', () => {
         const command: JobTypeCommand = {
           jobType: Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE
         }
-        await SuiviJobsSqlModel.create({
+        await SuiviJobSqlModel.create({
           jobType: command.jobType,
           dateExecution: maintenant.minus({ hours: 2 }).toJSDate(),
           succes: true,
@@ -111,7 +113,7 @@ describe('MonitorJobsCommandHandler', () => {
           nbErreurs: 1,
           tempsExecution: 200
         })
-        await SuiviJobsSqlModel.create({
+        await SuiviJobSqlModel.create({
           jobType: command.jobType,
           dateExecution: maintenant.minus({ hours: 4 }).toJSDate(),
           succes: true,
@@ -119,7 +121,7 @@ describe('MonitorJobsCommandHandler', () => {
           nbErreurs: 3,
           tempsExecution: 1000
         })
-        await SuiviJobsSqlModel.create({
+        await SuiviJobSqlModel.create({
           jobType: command.jobType,
           dateExecution: maintenant.minus({ hours: 6 }).toJSDate(),
           succes: false,
@@ -144,8 +146,9 @@ describe('MonitorJobsCommandHandler', () => {
         await monitorJobsCommandHandler.handle(command)
 
         // Then
-        const rapport: RapportJob24h[] =
-          suiviJobsService.envoyerRapport.getCall(0).args[0] as RapportJob24h[]
+        const rapport: RapportJob24h[] = suiviJobService.envoyerRapport.getCall(
+          0
+        ).args[0] as RapportJob24h[]
 
         const rapportJob = rapport.find(job => job.jobType === command.jobType)
         expect(rapportJob).to.deep.equal(expectedRapportJob)

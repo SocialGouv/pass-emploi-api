@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import Bull, * as QueueBull from 'bull'
 import { DateTime } from 'luxon'
 import { Planificateur } from '../../domain/planificateur'
-import { NettoyageJobsStats } from '../../domain/suivi-jobs'
+import { NettoyageJobsStats } from '../../domain/suivi-job'
 import { DateService } from '../../utils/date-service'
 import { buildError } from '../../utils/logger.module'
 

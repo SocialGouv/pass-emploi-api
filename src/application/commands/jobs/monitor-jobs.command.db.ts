@@ -11,10 +11,10 @@ import {
 } from '../../../domain/planificateur'
 import {
   RapportJob24h,
-  SuiviJobs,
-  SuiviJobsServiceToken
-} from '../../../domain/suivi-jobs'
-import { SuiviJobsSqlModel } from '../../../infrastructure/sequelize/models/suivi-jobs.sql-model'
+  SuiviJob,
+  SuiviJobServiceToken
+} from '../../../domain/suivi-job'
+import { SuiviJobSqlModel } from '../../../infrastructure/sequelize/models/suivi-job.sql-model'
 import { DateService } from '../../../utils/date-service'
 
 @Injectable()
@@ -24,8 +24,8 @@ export class MonitorJobsCommandHandler extends CommandHandler<
 > {
   constructor(
     private dateService: DateService,
-    @Inject(SuiviJobsServiceToken)
-    private suiviJobsService: SuiviJobs.Service
+    @Inject(SuiviJobServiceToken)
+    private suiviJobService: SuiviJob.Service
   ) {
     super('MonitorJobsCommandHandler')
   }
@@ -37,7 +37,7 @@ export class MonitorJobsCommandHandler extends CommandHandler<
     const rapportJobs: RapportJob24h[] = []
 
     for (const cron of listeCronJobs) {
-      const suiviDernieres24hSql = await SuiviJobsSqlModel.findAll({
+      const suiviDernieres24hSql = await SuiviJobSqlModel.findAll({
         where: {
           jobType: cron.type,
           dateExecution: {
@@ -74,7 +74,7 @@ export class MonitorJobsCommandHandler extends CommandHandler<
       })
     }
 
-    await this.suiviJobsService.envoyerRapport(rapportJobs)
+    await this.suiviJobService.envoyerRapport(rapportJobs)
 
     return emptySuccess()
   }

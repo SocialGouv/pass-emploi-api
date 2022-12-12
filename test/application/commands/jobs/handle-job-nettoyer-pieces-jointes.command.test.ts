@@ -3,7 +3,7 @@ import { SinonSandbox } from 'sinon'
 import { HandleJobNettoyerPiecesJointesCommandHandler } from 'src/application/commands/jobs/handle-job-nettoyer-pieces-jointes.command'
 import { isSuccess } from 'src/building-blocks/types/result'
 import { Fichier } from 'src/domain/fichier'
-import { SuiviJobs } from 'src/domain/suivi-jobs'
+import { SuiviJob } from 'src/domain/suivi-job'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { unFichierMetadata } from 'test/fixtures/fichier.fixture'
 import { DateService } from '../../../../src/utils/date-service'
@@ -13,20 +13,20 @@ describe('HandleJobNettoyerPiecesJointesCommandHandler', () => {
   let handleJobNettoyerPiecesJointesCommandHandler: HandleJobNettoyerPiecesJointesCommandHandler
   let fichierRepository: StubbedType<Fichier.Repository>
   let dateSevice: StubbedClass<DateService>
-  let suiviJobsService: StubbedType<SuiviJobs.Service>
+  let suiviJobService: StubbedType<SuiviJob.Service>
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     fichierRepository = stubInterface(sandbox)
     dateSevice = stubClass(DateService)
     dateSevice.now.returns(uneDatetime())
-    suiviJobsService = stubInterface(sandbox)
+    suiviJobService = stubInterface(sandbox)
 
     handleJobNettoyerPiecesJointesCommandHandler =
       new HandleJobNettoyerPiecesJointesCommandHandler(
         fichierRepository,
         dateSevice,
-        suiviJobsService
+        suiviJobService
       )
   })
 
