@@ -28,6 +28,9 @@ then
   exit 1
 fi
 
+export PATH=$HOME/bin:$PATH
+dbclient-fetcher psql 13
+
 pg_dump --clean --if-exists --format c --dbname "$DUMP_RESTORE_DB_SOURCE" --no-owner --no-privileges --no-comments --schema 'public' --file dump.pgsql \
   --exclude-table 'spatial_ref_sys' \
   --exclude-table 'log_api_partenaire' 
