@@ -4,7 +4,7 @@ echo "First deploy"
 
 if [[ $APP =~ "pa-back-staging-pr" ]] ; then
   echo "Dump de la DB de staging"
-  dbclient-fetcher psql
+  dbclient-fetcher psql 13
   psql --dbname $DATABASE_URL -c "CREATE extension postgis;"
   psql --dbname $DATABASE_URL -c "CREATE extension postgis_tiger_geocoder CASCADE;"
   psql --dbname $DATABASE_URL -c "CREATE extension postgis_topology;"
