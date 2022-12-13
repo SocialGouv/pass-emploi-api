@@ -1,7 +1,6 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { HandleJobNettoyerPiecesJointesCommandHandler } from 'src/application/commands/jobs/handle-job-nettoyer-pieces-jointes.command'
-import { isSuccess } from 'src/building-blocks/types/result'
 import { Fichier } from 'src/domain/fichier'
 import { SuiviJob } from 'src/domain/suivi-job'
 import { uneDatetime } from 'test/fixtures/date.fixture'
@@ -38,11 +37,9 @@ describe('HandleJobNettoyerPiecesJointesCommandHandler', () => {
     const result = await handleJobNettoyerPiecesJointesCommandHandler.handle()
 
     // Then
-    expect(result._isSuccess).to.equal(true)
-    if (isSuccess(result)) {
-      expect(result.data.fichiersSupprimes).to.equal(0)
-      expect(result.data.erreurs).to.equal(0)
-    }
+    expect(result.succes).to.equal(true)
+    expect(result.resultat).to.deep.equal({ fichiersSupprimes: 0 })
+    expect(result.nbErreurs).to.equal(0)
   })
 
   it("supprime les fichiers et catch l'erreur", async () => {
@@ -62,10 +59,8 @@ describe('HandleJobNettoyerPiecesJointesCommandHandler', () => {
 
     // Then
     expect(fichierRepository.softDelete).to.have.been.calledTwice()
-    expect(result._isSuccess).to.equal(true)
-    if (isSuccess(result)) {
-      expect(result.data.fichiersSupprimes).to.equal(1)
-      expect(result.data.erreurs).to.equal(1)
-    }
+    expect(result.succes).to.equal(true)
+    expect(result.resultat).to.deep.equal({ fichiersSupprimes: 1 })
+    expect(result.nbErreurs).to.equal(1)
   })
 })

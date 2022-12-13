@@ -7,10 +7,6 @@ import { NettoyageJobsStats } from './suivi-job'
 
 export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 
-export interface JobTypeCommand {
-  jobType: Planificateur.JobType
-}
-
 export namespace Planificateur {
   export interface Repository {
     creerJob<T>(job: Job<T>, jobId?: string): Promise<void>

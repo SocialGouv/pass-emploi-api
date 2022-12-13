@@ -1,24 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common'
-import {
-  emptySuccess,
-  isFailure,
-  Result,
-  success
-} from '../../../building-blocks/types/result'
+import { Job } from '../../../building-blocks/types/job'
+import { JobHandler } from '../../../building-blocks/types/job-handler'
+import { isFailure } from '../../../building-blocks/types/result'
 import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
 import { Milo, MiloRepositoryToken } from '../../../domain/milo'
-import { DateService } from '../../../utils/date-service'
-import { Command } from '../../../building-blocks/types/command'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import { Planificateur } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
+import { DateService } from '../../../utils/date-service'
 
 const PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM = 100
 
 @Injectable()
-export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends CommandHandler<
-  Command,
-  Stats
-> {
+export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends JobHandler<Job> {
   constructor(
     @Inject(MiloRepositoryToken) private miloRepository: Milo.Repository,
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
@@ -27,19 +20,27 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends Comman
     private dateService: DateService
   ) {
     super(
-      'HandleJobRecupererSituationsJeunesMiloCommandHandler',
+      Planificateur.JobType.RECUPERER_SITUATIONS_JEUNES_MILO,
       suiviJobService
     )
   }
 
-  async handle(): Promise<Result<Stats>> {
-    const stats: Stats = {
+  async handle(): Promise<SuiviJob> {
+    const stats = {
       jeunesMilo: 0,
       dossiersNonTrouves: 0,
       situationsJeuneSauvegardees: 0,
       erreurs: 0
     }
     const maintenant = this.dateService.now()
+    const suivi: SuiviJob = {
+      jobType: this.jobType,
+      nbErreurs: 0,
+      succes: false,
+      dateExecution: maintenant,
+      tempsExecution: 0,
+      resultat: {}
+    }
 
     let offset = 0
     let jeunes: Jeune[] = []
@@ -87,23 +88,12 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends Comman
       offset += PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM
     } while (jeunes.length)
 
-    stats.tempsDExecution = maintenant.diffNow().milliseconds * -1
-    return success(stats)
+    return {
+      ...suivi,
+      nbErreurs: stats.erreurs,
+      succes: true,
+      tempsExecution: DateService.caculerTempsExecution(maintenant),
+      resultat: stats
+    }
   }
-
-  async authorize(): Promise<Result> {
-    return emptySuccess()
-  }
-
-  async monitor(): Promise<void> {
-    return
-  }
-}
-
-interface Stats {
-  jeunesMilo: number
-  situationsJeuneSauvegardees: number
-  dossiersNonTrouves: number
-  erreurs: number
-  tempsDExecution?: number
 }

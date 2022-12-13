@@ -1,34 +1,29 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { ErreurHttp } from '../../../building-blocks/types/domain-error'
+import { Job } from '../../../building-blocks/types/job'
+import { JobHandler } from '../../../building-blocks/types/job-handler'
 import {
-  emptySuccess,
-  failure,
   isFailure,
   isSuccess,
-  Result,
-  success
+  Result
 } from '../../../building-blocks/types/result'
-import { RecherchesRepositoryToken } from '../../../domain/offre/recherche/recherche'
-import { DateService } from '../../../utils/date-service'
-import { Command } from '../../../building-blocks/types/command'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
-import { ErreurHttp } from '../../../building-blocks/types/domain-error'
 import {
   Jeune,
   JeuneConfigurationApplicationRepositoryToken
 } from '../../../domain/jeune/jeune'
 import { Notification } from '../../../domain/notification/notification'
-import { GetOffresEmploiQuery } from '../../queries/get-offres-emploi.query.handler'
-import { OffresEmploiQueryModel } from '../../queries/query-models/offres-emploi.query-model'
-import { FindAllOffresEmploiQueryGetter } from '../../queries/query-getters/find-all-offres-emploi.query.getter'
-import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { Offre } from '../../../domain/offre/offre'
+import { RecherchesRepositoryToken } from '../../../domain/offre/recherche/recherche'
+import { Planificateur } from '../../../domain/planificateur'
+import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
+import { DateService } from '../../../utils/date-service'
+import { GetOffresEmploiQuery } from '../../queries/get-offres-emploi.query.handler'
+import { FindAllOffresEmploiQueryGetter } from '../../queries/query-getters/find-all-offres-emploi.query.getter'
+import { OffresEmploiQueryModel } from '../../queries/query-models/offres-emploi.query-model'
 
 @Injectable()
-export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends CommandHandler<
-  Command,
-  Stats
-> {
+export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends JobHandler<Job> {
   constructor(
     private dateService: DateService,
     @Inject(RecherchesRepositoryToken)
@@ -41,13 +36,10 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service
   ) {
-    super(
-      'HandleJobNotifierNouvellesOffresEmploiCommandHandler',
-      suiviJobService
-    )
+    super(Planificateur.JobType.NOUVELLES_OFFRES_EMPLOI, suiviJobService)
   }
 
-  async handle(): Promise<Result<Stats>> {
+  async handle(): Promise<SuiviJob> {
     const maintenant = this.dateService.now()
     const nombreRecherches = parseInt(
       this.configuration.get(
@@ -57,9 +49,17 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
     const stats: Stats = {
       nombreDeRecherchesTotal: 0,
       succes: 0,
+      echecs: 0,
       notificationsEnvoyees: 0,
-      429: 0,
-      echecs: 0
+      429: 0
+    }
+    const suivi: SuiviJob = {
+      jobType: this.jobType,
+      nbErreurs: 0,
+      succes: false,
+      dateExecution: maintenant,
+      tempsExecution: 0,
+      resultat: {}
     }
 
     try {
@@ -91,7 +91,7 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
 
           if (resultat.status === 'fulfilled' && isSuccess(resultat.value)) {
             etatRecherche = Offre.Recherche.Etat.SUCCES
-            stats.succes = stats.succes + 1
+            stats.succes++
 
             if (resultat.value.data.results.length) {
               const configuration =
@@ -143,14 +143,23 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
           await new Promise(resolve => setTimeout(resolve, 1000))
         }
       }
-
-      stats.tempsDExecution = maintenant.diffNow().milliseconds * -1
       stats.nombreDeRecherchesTotal = stats.succes + stats.echecs
-      return success(stats)
+      return {
+        ...suivi,
+        nbErreurs: stats.echecs,
+        succes: true,
+        tempsExecution: DateService.caculerTempsExecution(maintenant),
+        resultat: stats
+      }
     } catch (e) {
       this.logger.error("Le job de notifications s'est arrêté")
       this.logger.log(stats)
-      return failure(e)
+      return {
+        ...suivi,
+        nbErreurs: stats.echecs,
+        tempsExecution: DateService.caculerTempsExecution(maintenant),
+        resultat: e
+      }
     }
   }
 
@@ -169,14 +178,6 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends Comman
 
     return this.findAllOffresEmploiQueryGetter.handle(criteres)
   }
-
-  async authorize(): Promise<Result> {
-    return emptySuccess()
-  }
-
-  async monitor(): Promise<void> {
-    return
-  }
 }
 
 interface Stats {
@@ -185,5 +186,4 @@ interface Stats {
   echecs: number
   notificationsEnvoyees: number
   429: number
-  tempsDExecution?: number
 }

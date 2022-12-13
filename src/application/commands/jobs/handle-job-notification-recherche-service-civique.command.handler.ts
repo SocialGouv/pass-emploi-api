@@ -1,14 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { Command } from '../../../building-blocks/types/command'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
-import {
-  emptySuccess,
-  isFailure,
-  Result,
-  success
-} from '../../../building-blocks/types/result'
+import { Job } from '../../../building-blocks/types/job'
+import { JobHandler } from '../../../building-blocks/types/job-handler'
+import { isFailure } from '../../../building-blocks/types/result'
 import {
   Jeune,
   JeuneConfigurationApplicationRepositoryToken
@@ -18,6 +13,8 @@ import {
   Recherche,
   RecherchesRepositoryToken
 } from '../../../domain/offre/recherche/recherche'
+import { Planificateur } from '../../../domain/planificateur'
+import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 import { FindAllOffresServicesCiviqueQueryGetter } from '../../queries/query-getters/find-all-offres-services-civique.query.getter'
 
@@ -27,10 +24,7 @@ const PAGINATION_NOMBRE_DE_RECHERCHES_MAXIMUM = 100
 const PAGINATION_NOMBRE_D_OFFRES_MAXIMUM = 1000
 
 @Injectable()
-export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends CommandHandler<
-  HandleJobNotifierNouveauxServicesCiviqueCommand,
-  Stats
-> {
+export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends JobHandler<Job> {
   constructor(
     @Inject(RecherchesRepositoryToken)
     private rechercheRepository: Recherche.Repository,
@@ -43,18 +37,25 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
     suiviJobService: SuiviJob.Service
   ) {
     super(
-      'HandleJobNotifierNouveauxServicesCiviqueCommandHandler',
+      Planificateur.JobType.NOUVELLES_OFFRES_SERVICE_CIVIQUE,
       suiviJobService
     )
   }
 
-  async handle(): Promise<Result<Stats>> {
-    const stats: Stats = {
+  async handle(): Promise<SuiviJob> {
+    const stats = {
       nombreDeNouvellesOffres: 0,
-      erreurs: 0,
       recherchesCorrespondantes: 0
     }
     const maintenant = this.dateService.now()
+    const suivi: SuiviJob = {
+      jobType: this.jobType,
+      nbErreurs: 0,
+      succes: false,
+      dateExecution: maintenant,
+      tempsExecution: 0,
+      resultat: {}
+    }
 
     // On récupère les nouvelles offres depuis hier en considérant que le job tourne une fois par jour
     const hier = maintenant.minus({ day: 1 })
@@ -65,7 +66,7 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
     })
 
     if (isFailure(result)) {
-      return result
+      return { ...suivi, resultat: result.error }
     }
 
     stats.nombreDeNouvellesOffres = result.data.results.length
@@ -109,7 +110,7 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
 
           promises.forEach(promise => {
             if (promise.status === 'rejected') {
-              stats.erreurs++
+              suivi.nbErreurs++
               this.logger.error(promise.reason)
             }
           })
@@ -118,9 +119,13 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
         offset += PAGINATION_NOMBRE_DE_RECHERCHES_MAXIMUM
       }
     }
-    stats.tempsDExecution = maintenant.diffNow().milliseconds * -1
 
-    return success(stats)
+    return {
+      ...suivi,
+      succes: true,
+      tempsExecution: DateService.caculerTempsExecution(maintenant),
+      resultat: stats
+    }
   }
 
   async notifierEtMettreAJourLaDateDeRecherche(
@@ -141,19 +146,4 @@ export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends Comm
       configuration
     )
   }
-
-  async authorize(): Promise<Result> {
-    return emptySuccess()
-  }
-
-  async monitor(): Promise<void> {
-    return
-  }
-}
-
-export interface Stats {
-  nombreDeNouvellesOffres: number
-  recherchesCorrespondantes: number
-  erreurs: number
-  tempsDExecution?: number
 }

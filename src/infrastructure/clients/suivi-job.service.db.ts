@@ -2,8 +2,7 @@ import { HttpService } from '@nestjs/axios'
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
-import { isFailure, isSuccess } from '../../building-blocks/types/result'
-import { RapportJob24h, ResultatJob, SuiviJob } from '../../domain/suivi-job'
+import { RapportJob24h, SuiviJob } from '../../domain/suivi-job'
 import {
   SuiviJobDto,
   SuiviJobSqlModel
@@ -19,12 +18,12 @@ export class SuiviJobService implements SuiviJob.Service {
     private httpService: HttpService
   ) {}
 
-  async notifierResultatJob(resultatJob: ResultatJob): Promise<void> {
+  async notifierResultatJob(suiviJob: SuiviJob): Promise<void> {
     const webhookUrl = this.configService.get('mattermost.jobWebhookUrl')
 
     const payload = {
       username: BOT_USERNAME,
-      text: construireMessage(resultatJob)
+      text: construireMessage(suiviJob)
     }
     await firstValueFrom(this.httpService.post(webhookUrl, payload))
   }
@@ -54,30 +53,28 @@ export class SuiviJobService implements SuiviJob.Service {
   }
 }
 
-function construireMessage(resultatJob: ResultatJob): string {
-  let tableau = ''
-
-  if (isSuccess(resultatJob.result)) {
-    tableau = `| Statut | :white_check_mark: |
-    |:------------------------|:-------------|
-    ${Object.entries(resultatJob.result.data!)
-      .filter(entry => !isArrayOrObject(entry[1]))
-      .map(entry => {
-        return `| ${entry[0]} | ${entry[1]} |`
-      })
-      .join('\n')}`
-  } else if (isFailure(resultatJob.result)) {
-    tableau = `| Statut | :x: |
-    |:------------------|:----|
-    ${Object.entries(resultatJob.result.error)
-      .filter(entry => !isArrayOrObject(entry[1]))
-      .map(entry => {
-        return `| ${entry[0]} | ${entry[1]} |`
-      })
-      .join('\n')}`
+function construireMessage(suiviJob: SuiviJob): string {
+  const suiviJobStringified = {
+    ...suiviJob,
+    dateExecution: suiviJob.dateExecution.setZone('Europe/Paris').toISO()
   }
+  const data = [
+    ...Object.entries(suiviJobStringified).filter(
+      entry => !isArrayOrObject(entry[1])
+    ),
+    ...Object.entries(suiviJob.resultat as ArrayLike<unknown>)
+  ]
+  const statutIcon = suiviJob.succes ? ':white_check_mark:' : ':x:'
 
-  return `### Résultat du job _${resultatJob.jobCommand}_\n${tableau}`
+  const tableau = `| Statut | ${statutIcon} |
+    |:------------------------|:------------|
+    ${data
+      .map(entry => {
+        return `| ${entry[0]} | ${entry[1]} |`
+      })
+      .join('\n')}`
+
+  return `### Résultat du job _${suiviJob.jobType}_\n${tableau}`
 }
 
 function construireRapport(rapportJobs: RapportJob24h[]): string {
@@ -85,7 +82,12 @@ function construireRapport(rapportJobs: RapportJob24h[]): string {
     ...rapportJob,
     datesExecutions: rapportJob.datesExecutions.map(date =>
       date.setZone('Europe/Paris').toISO()
-    )
+    ),
+    aBienTourne:
+      rapportJob.nbExecutionsAttendues !== rapportJob.nbExecutions
+        ? ':x:'
+        : ':white_check_mark:',
+    pasEnEchec: rapportJob.nbEchecs > 0 ? ':x:' : ':white_check_mark:'
   }))
   const headers = Object.keys(rapportJobsStringified[0])
     .map(header => header)

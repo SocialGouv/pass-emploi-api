@@ -60,4 +60,8 @@ export class DateService {
   static fromJSDateToDateTime(jsDate: Date | null): DateTime | undefined {
     return jsDate ? DateTime.fromJSDate(jsDate) : undefined
   }
+
+  static caculerTempsExecution(maintenant: DateTime): number {
+    return maintenant.diffNow().milliseconds * -1
+  }
 }
