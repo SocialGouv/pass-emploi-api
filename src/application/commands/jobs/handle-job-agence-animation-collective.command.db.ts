@@ -1,36 +1,26 @@
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
-import { Command } from '../../../building-blocks/types/command'
-import {
-  emptySuccess,
-  Result,
-  success
-} from '../../../building-blocks/types/result'
 import { Inject, Injectable } from '@nestjs/common'
 import { Op, Sequelize } from 'sequelize'
-import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
-import { DateService } from '../../../utils/date-service'
-import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
+import { Job } from '../../../building-blocks/types/job'
+import { JobHandler } from '../../../building-blocks/types/job-handler'
+import { Planificateur } from '../../../domain/planificateur'
 import { CodeTypeRendezVous } from '../../../domain/rendez-vous/rendez-vous'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
+import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
+import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
+import { DateService } from '../../../utils/date-service'
 
 @Injectable()
-export class HandleJobAgenceAnimationCollectiveCommandHandler extends CommandHandler<
-  Command,
-  Stats
-> {
+export class HandleJobAgenceAnimationCollectiveCommandHandler extends JobHandler<Job> {
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
     private dateService: DateService,
     @Inject(SuiviJobServiceToken)
     notificationSupportService: SuiviJob.Service
   ) {
-    super(
-      'HandleJobAgenceAnimationCollectiveCommandHandler',
-      notificationSupportService
-    )
+    super(Planificateur.JobType.MAJ_AGENCE_AC, notificationSupportService)
   }
 
-  async handle(): Promise<Result<Stats>> {
+  async handle(): Promise<SuiviJob> {
     const debut = this.dateService.now()
     const nombreTotalAnimationCollectives = await RendezVousSqlModel.count({
       where: {
@@ -92,26 +82,17 @@ export class HandleJobAgenceAnimationCollectiveCommandHandler extends CommandHan
         }
       })
 
-    return success({
-      tempsDExecution: debut.diffNow().milliseconds * -1,
-      nombreTotalAnimationCollectives,
-      nombreAnimationCollectiveSansAgenceAvant,
-      nombreAnimationCollectiveSansAgenceApres
-    })
+    return {
+      jobType: this.jobType,
+      nbErreurs: 0,
+      succes: true,
+      dateExecution: debut,
+      tempsExecution: DateService.caculerTempsExecution(debut),
+      resultat: {
+        nombreTotalAnimationCollectives,
+        nombreAnimationCollectiveSansAgenceAvant,
+        nombreAnimationCollectiveSansAgenceApres
+      }
+    }
   }
-
-  async authorize(): Promise<Result> {
-    return emptySuccess()
-  }
-
-  async monitor(): Promise<void> {
-    return
-  }
-}
-
-export interface Stats {
-  tempsDExecution: number
-  nombreAnimationCollectiveSansAgenceAvant: number
-  nombreAnimationCollectiveSansAgenceApres: number
-  nombreTotalAnimationCollectives: number
 }

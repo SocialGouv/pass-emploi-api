@@ -13,7 +13,7 @@ export abstract class JobHandler<C> {
   protected logger: Logger
   protected apmService: APM.Agent
   protected jobType: JobType
-  private suiviJobService: SuiviJob.Service
+  protected suiviJobService: SuiviJob.Service
 
   constructor(jobType: JobType, suiviJobService: SuiviJob.Service) {
     this.jobType = jobType
@@ -26,6 +26,9 @@ export abstract class JobHandler<C> {
     try {
       const result = await this.handle()
       await this.suiviJobService.save(result)
+      if (result.succes === false) {
+        await this.suiviJobService.notifierResultatJob(result)
+      }
       this.logAfter(result)
       return result
     } catch (e) {

@@ -1,21 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common'
-import {
-  emptySuccess,
-  Result,
-  success
-} from '../../../building-blocks/types/result'
+import { Job } from '../../../building-blocks/types/job'
+import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { Fichier, FichierRepositoryToken } from '../../../domain/fichier'
+import { Planificateur } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 import { buildError } from '../../../utils/logger.module'
-import { Command } from '../../../building-blocks/types/command'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
 
 @Injectable()
-export class HandleJobNettoyerPiecesJointesCommandHandler extends CommandHandler<
-  Command,
-  Stats
-> {
+export class HandleJobNettoyerPiecesJointesCommandHandler extends JobHandler<Job> {
   constructor(
     @Inject(FichierRepositoryToken)
     private fichierRepository: Fichier.Repository,
@@ -23,14 +16,12 @@ export class HandleJobNettoyerPiecesJointesCommandHandler extends CommandHandler
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service
   ) {
-    super('HandleJobNettoyerPiecesJointesCommandHandler', suiviJobService)
+    super(Planificateur.JobType.NETTOYER_LES_PIECES_JOINTES, suiviJobService)
   }
 
-  async handle(): Promise<Result<Stats>> {
-    const stats: Stats = {
-      fichiersSupprimes: 0,
-      erreurs: 0
-    }
+  async handle(): Promise<SuiviJob> {
+    let fichiersSupprimes = 0
+    let nbErreurs = 0
     const maintenant = this.dateService.now()
 
     const quatreMoisPlusTot: Date = this.dateService
@@ -43,30 +34,22 @@ export class HandleJobNettoyerPiecesJointesCommandHandler extends CommandHandler
     for (const id of idsFichiersASupprimer) {
       try {
         await this.fichierRepository.softDelete(id)
-        stats.fichiersSupprimes++
+        fichiersSupprimes++
       } catch (e) {
         this.logger.error(
           buildError(`Erreur lors de la suppression du fichier ${id}`, e)
         )
-        stats.erreurs++
+        nbErreurs++
       }
     }
 
-    stats.tempsDExecution = maintenant.diffNow().milliseconds * -1
-    return success(stats)
+    return {
+      jobType: this.jobType,
+      nbErreurs,
+      succes: true,
+      dateExecution: maintenant,
+      tempsExecution: DateService.caculerTempsExecution(maintenant),
+      resultat: { fichiersSupprimes }
+    }
   }
-
-  async authorize(): Promise<Result> {
-    return emptySuccess()
-  }
-
-  async monitor(): Promise<void> {
-    return
-  }
-}
-
-interface Stats {
-  fichiersSupprimes: number
-  erreurs: number
-  tempsDExecution?: number
 }

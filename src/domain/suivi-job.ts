@@ -1,5 +1,4 @@
 import { DateTime } from 'luxon'
-import { Result } from '../building-blocks/types/result'
 import { Planificateur } from './planificateur'
 import JobType = Planificateur.JobType
 
@@ -12,11 +11,6 @@ export interface SuiviJob {
   resultat: unknown
   nbErreurs: number
   tempsExecution: number
-}
-
-export interface ResultatJob {
-  jobCommand: string
-  result: Result
 }
 
 export interface RapportJob24h {
@@ -38,7 +32,7 @@ export interface NettoyageJobsStats {
 
 export namespace SuiviJob {
   export interface Service {
-    notifierResultatJob(resultatJob: ResultatJob): Promise<void>
+    notifierResultatJob(suiviJob: SuiviJob): Promise<void>
     envoyerRapport(rapportJobs: RapportJob24h[]): Promise<void>
     save(suiviJob: SuiviJob): Promise<void>
   }

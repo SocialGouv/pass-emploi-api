@@ -2,14 +2,9 @@ import { HttpService } from '@nestjs/axios'
 import { expect } from 'chai'
 import * as nock from 'nock'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
-import { failure, Result, success } from 'src/building-blocks/types/result'
 import { SuiviJobService } from 'src/infrastructure/clients/suivi-job.service.db'
 import { Planificateur } from '../../../src/domain/planificateur'
-import {
-  RapportJob24h,
-  ResultatJob,
-  SuiviJob
-} from '../../../src/domain/suivi-job'
+import { RapportJob24h, SuiviJob } from '../../../src/domain/suivi-job'
 import { SuiviJobSqlModel } from '../../../src/infrastructure/sequelize/models/suivi-job.sql-model'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
@@ -55,38 +50,46 @@ describe('SuiviJobService', () => {
   describe('notifierResultatJob', () => {
     it('envoie une notif de succès quand le result est success', async () => {
       // Given
-      const infosJob: ResultatJob = {
-        jobCommand: 'handleJob',
-        result: success({ unChamp: 'present' }) as unknown as Result
+      const suivi: SuiviJob = {
+        jobType: Planificateur.JobType.MAJ_AGENCE_AC,
+        succes: true,
+        dateExecution: uneDatetime(),
+        tempsExecution: 0,
+        nbErreurs: 0,
+        resultat: { unChamp: 'present' }
       }
       const stringBody =
-        '{"username":"CEJ Lama","text":"### Résultat du job _handleJob_\\n| Statut | :white_check_mark: |\\n    |:------------------------|:-------------|\\n    | unChamp | present |"}'
+        '{"username":"CEJ Lama","text":"### Résultat du job _MAJ_AGENCE_AC_\\n| Statut | :white_check_mark: |\\n    |:------------------------|:------------|\\n    | jobType | MAJ_AGENCE_AC |\\n| succes | true |\\n| dateExecution | 2020-04-06T14:00:00.000+02:00 |\\n| tempsExecution | 0 |\\n| nbErreurs | 0 |\\n| unChamp | present |"}'
 
       const scope = nock(configService.get('mattermost').jobWebhookUrl)
         .post('', stringBody)
         .reply(200)
 
       // When
-      await service.notifierResultatJob(infosJob)
+      await service.notifierResultatJob(suivi)
 
       // Then
       expect(scope.isDone()).to.equal(true)
     })
     it("envoie une notif d'erreur quand le result est error", async () => {
       // Given
-      const infosJob: ResultatJob = {
-        jobCommand: 'handleJob',
-        result: failure(new NonTrouveError('test', '1')) as unknown as Result
+      const suivi: SuiviJob = {
+        jobType: Planificateur.JobType.MAJ_AGENCE_AC,
+        succes: false,
+        dateExecution: uneDatetime(),
+        tempsExecution: 0,
+        nbErreurs: 0,
+        resultat: new NonTrouveError('test', '1')
       }
-      const stringBody =
-        '{"username":"CEJ Lama","text":"### Résultat du job _handleJob_\\n| Statut | :x: |\\n    |:------------------|:----|\\n    | code | NON_TROUVE |\\n| message | test 1 non trouvé(e) |"}'
+      const heureParis = uneDatetime().setZone('Europe/Paris').toISO()
+      const stringBody = `{"username":"CEJ Lama","text":"### Résultat du job _MAJ_AGENCE_AC_\\n| Statut | :x: |\\n    |:------------------------|:------------|\\n    | jobType | MAJ_AGENCE_AC |\\n| succes | false |\\n| dateExecution | ${heureParis} |\\n| tempsExecution | 0 |\\n| nbErreurs | 0 |\\n| code | NON_TROUVE |\\n| message | test 1 non trouvé(e) |"}`
 
       const scope = nock(configService.get('mattermost').jobWebhookUrl)
         .post('', stringBody)
         .reply(200)
 
       // When
-      await service.notifierResultatJob(infosJob)
+      await service.notifierResultatJob(suivi)
 
       // Then
       expect(scope.isDone()).to.equal(true)
@@ -106,7 +109,7 @@ describe('SuiviJobService', () => {
         }
       ]
       const heureParis = uneDatetime().setZone('Europe/Paris').toISO()
-      const stringBody = `{"username":"CEJ Lama","text":"### Rapport quotidien des CRONs\\n|jobType|nbExecutionsAttendues|nbExecutions|nbErreurs|nbEchecs|datesExecutions\\n|:---|:---|:---|:---|:---|:---\\n|NETTOYER_LES_DONNEES|3|2|1|0|${heureParis}, ${heureParis}|"}`
+      const stringBody = `{"username":"CEJ Lama","text":"### Rapport quotidien des CRONs\\n|jobType|nbExecutionsAttendues|nbExecutions|nbErreurs|nbEchecs|datesExecutions|aBienTourne|pasEnEchec\\n|:---|:---|:---|:---|:---|:---|:---|:---\\n|NETTOYER_LES_DONNEES|3|2|1|0|${heureParis}, ${heureParis}|:x:|:white_check_mark:|"}`
 
       const scope = nock(configService.get('mattermost').jobWebhookUrl)
         .post('', stringBody)

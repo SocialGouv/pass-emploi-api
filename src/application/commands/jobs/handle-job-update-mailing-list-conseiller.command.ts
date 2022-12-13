@@ -1,26 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import {
-  emptySuccess,
-  Result,
-  success
-} from '../../../building-blocks/types/result'
-import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
-import { Command } from '../../../building-blocks/types/command'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import { Job } from '../../../building-blocks/types/job'
+import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { Core } from '../../../domain/core'
 import {
   Mail,
   MailRepositoryToken,
   MailServiceToken
 } from '../../../domain/mail'
+import { Planificateur } from '../../../domain/planificateur'
+import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 
 @Injectable()
-export class HandleJobUpdateMailingListConseillerCommandHandler extends CommandHandler<
-  Command,
-  Stats
-> {
+export class HandleJobUpdateMailingListConseillerCommandHandler extends JobHandler<Job> {
   private mailingLists: { poleEmploi: string; milo: string }
 
   constructor(
@@ -33,12 +26,23 @@ export class HandleJobUpdateMailingListConseillerCommandHandler extends CommandH
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service
   ) {
-    super('HandleJobUpdateMailingListConseillerCommandHandler', suiviJobService)
+    super(
+      Planificateur.JobType.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS,
+      suiviJobService
+    )
     this.mailingLists = this.configuration.get('sendinblue').mailingLists
   }
 
-  async handle(): Promise<Result<Stats>> {
+  async handle(): Promise<SuiviJob> {
     const maintenant = this.dateService.now()
+    const suivi: SuiviJob = {
+      jobType: this.jobType,
+      nbErreurs: 0,
+      succes: false,
+      dateExecution: maintenant,
+      tempsExecution: 0,
+      resultat: {}
+    }
 
     const contactsMilo =
       await this.mailRepository.findAllContactsConseillerByStructure(
@@ -58,27 +62,16 @@ export class HandleJobUpdateMailingListConseillerCommandHandler extends CommandH
     )
     const conseillersSansEmail =
       await this.mailRepository.countContactsConseillerSansEmail()
-    const stats: Stats = {
+    const stats = {
       conseillersMilo: contactsMilo.length,
       conseillersPoleEmploi: contactsPoleEmploi.length,
-      conseillersSansEmail,
-      tempsDExecution: maintenant.diffNow().milliseconds * -1
+      conseillersSansEmail
     }
-    return success(stats)
+    return {
+      ...suivi,
+      succes: true,
+      tempsExecution: DateService.caculerTempsExecution(maintenant),
+      resultat: stats
+    }
   }
-
-  async authorize(): Promise<Result> {
-    return emptySuccess()
-  }
-
-  async monitor(): Promise<void> {
-    return
-  }
-}
-
-interface Stats {
-  conseillersMilo: number
-  conseillersPoleEmploi: number
-  conseillersSansEmail: number
-  tempsDExecution?: number
 }

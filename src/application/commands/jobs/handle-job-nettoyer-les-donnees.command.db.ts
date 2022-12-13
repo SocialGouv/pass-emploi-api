@@ -16,7 +16,7 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends JobHandler<Job> {
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service
   ) {
-    super(Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE, suiviJobService)
+    super(Planificateur.JobType.NETTOYER_LES_DONNEES, suiviJobService)
   }
 
   async handle(): Promise<SuiviJob> {
@@ -30,18 +30,16 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends JobHandler<Job> {
       where: dateSuperieureAUnMois(maintenant)
     })
 
-    const stats = {
-      nombreArchivesSupprimees,
-      nombreLogsApiSupprimees
-    }
-
     return {
       jobType: this.jobType,
       nbErreurs: 0,
       succes: true,
       dateExecution: maintenant,
-      tempsExecution: maintenant.diffNow().milliseconds * -1,
-      resultat: stats
+      tempsExecution: DateService.caculerTempsExecution(maintenant),
+      resultat: {
+        nombreArchivesSupprimees,
+        nombreLogsApiSupprimees
+      }
     }
   }
 }

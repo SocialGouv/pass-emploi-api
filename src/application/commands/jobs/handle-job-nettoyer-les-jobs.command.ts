@@ -1,28 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common'
-import {
-  emptySuccess,
-  failure,
-  Result,
-  success
-} from '../../../building-blocks/types/result'
-import { Command } from '../../../building-blocks/types/command'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import { Job } from '../../../building-blocks/types/job'
+import { JobHandler } from '../../../building-blocks/types/job-handler'
+import { emptySuccess, Result } from '../../../building-blocks/types/result'
 import {
   Planificateur,
   PlanificateurRepositoryToken
 } from '../../../domain/planificateur'
-import {
-  NettoyageJobsStats,
-  SuiviJob,
-  SuiviJobServiceToken
-} from '../../../domain/suivi-job'
+import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 
 @Injectable()
-export class HandleNettoyerLesJobsCommandHandler extends CommandHandler<
-  Command,
-  NettoyageJobsStats
-> {
+export class HandleNettoyerLesJobsCommandHandler extends JobHandler<Job> {
   constructor(
     @Inject(PlanificateurRepositoryToken)
     private planificateurRepository: Planificateur.Repository,
@@ -30,17 +18,27 @@ export class HandleNettoyerLesJobsCommandHandler extends CommandHandler<
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service
   ) {
-    super('HandleNettoyerLesJobsCommandHandler', suiviJobService)
+    super(Planificateur.JobType.NETTOYER_LES_JOBS, suiviJobService)
   }
 
-  async handle(): Promise<Result<NettoyageJobsStats>> {
+  async handle(): Promise<SuiviJob> {
+    let erreur
+    let stats = {}
+    const maintenant = this.dateService.now()
+
     try {
-      const maintenant = this.dateService.now()
-      const stats = await this.planificateurRepository.supprimerLesJobsPasses()
-      stats.tempsDExecution = maintenant.diffNow().milliseconds * -1
-      return success(stats)
+      stats = await this.planificateurRepository.supprimerLesJobsPasses()
     } catch (e) {
-      return failure(e)
+      erreur = e
+    }
+
+    return {
+      jobType: this.jobType,
+      nbErreurs: 0,
+      succes: erreur ? false : true,
+      dateExecution: maintenant,
+      tempsExecution: DateService.caculerTempsExecution(maintenant),
+      resultat: erreur ?? stats
     }
   }
 

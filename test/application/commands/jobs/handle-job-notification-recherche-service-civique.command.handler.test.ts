@@ -1,27 +1,20 @@
-import { expect, StubbedClass, stubClass } from '../../../utils'
-import {
-  HandleJobNotifierNouveauxServicesCiviqueCommandHandler,
-  Stats
-} from '../../../../src/application/commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
-import {
-  isSuccess,
-  Result,
-  success
-} from '../../../../src/building-blocks/types/result'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { Recherche } from '../../../../src/domain/offre/recherche/recherche'
+import { DateTime } from 'luxon'
+import { createSandbox } from 'sinon'
+import { SuiviJob } from 'src/domain/suivi-job'
+import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from '../../../../src/application/commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
+import { GetServicesCiviqueQuery } from '../../../../src/application/queries/get-offres-services-civique.query.handler'
+import { FindAllOffresServicesCiviqueQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-services-civique.query.getter'
+import { success } from '../../../../src/building-blocks/types/result'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { Notification } from '../../../../src/domain/notification/notification'
-import { createSandbox } from 'sinon'
-import { DateService } from '../../../../src/utils/date-service'
-import { DateTime } from 'luxon'
-import { uneRecherche } from '../../../fixtures/recherche.fixture'
-import { unJeune } from '../../../fixtures/jeune.fixture'
-import { GetServicesCiviqueQuery } from '../../../../src/application/queries/get-offres-services-civique.query.handler'
-import { uneOffreServiceCivique } from '../../../fixtures/offre-service-civique.fixture'
-import { FindAllOffresServicesCiviqueQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-services-civique.query.getter'
-import { SuiviJob } from 'src/domain/suivi-job'
 import { Offre } from '../../../../src/domain/offre/offre'
+import { Recherche } from '../../../../src/domain/offre/recherche/recherche'
+import { DateService } from '../../../../src/utils/date-service'
+import { unJeune } from '../../../fixtures/jeune.fixture'
+import { uneOffreServiceCivique } from '../../../fixtures/offre-service-civique.fixture'
+import { uneRecherche } from '../../../fixtures/recherche.fixture'
+import { expect, StubbedClass, stubClass } from '../../../utils'
 
 describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
   describe('handle', () => {
@@ -39,8 +32,6 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
     const hier = DateTime.fromISO('2020-04-05T12:00:00.000Z').toISO()
 
     const LIMITE_PAGINATION = 100
-
-    let result: Result<Stats>
 
     beforeEach(() => {
       const sandbox = createSandbox()
@@ -82,11 +73,11 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
           await handleJobNotifierNouveauxServicesCiviqueCommandHandler.handle()
 
         // Then
-        expect(isSuccess(result)).to.equal(true)
-
-        if (isSuccess(result)) {
-          expect(result.data.nombreDeNouvellesOffres).to.equal(0)
-        }
+        expect(result.succes).to.equal(true)
+        expect(result.resultat).to.deep.equal({
+          nombreDeNouvellesOffres: 0,
+          recherchesCorrespondantes: 0
+        })
       })
     })
     describe('quand il y a une nouvelle offre depuis hier à 10 heures', () => {
@@ -116,19 +107,19 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
             .resolves([])
 
           // When
-          result =
+          const result =
             await handleJobNotifierNouveauxServicesCiviqueCommandHandler.handle()
 
           // Then
-          expect(isSuccess(result)).to.equal(true)
-
-          if (isSuccess(result)) {
-            expect(result.data.nombreDeNouvellesOffres).to.equal(1)
-            expect(result.data.recherchesCorrespondantes).to.equal(0)
-          }
+          expect(result.succes).to.equal(true)
+          expect(result.resultat).to.deep.equal({
+            nombreDeNouvellesOffres: 1,
+            recherchesCorrespondantes: 0
+          })
         })
       })
       describe('quand une recherche correspond', () => {
+        let result: SuiviJob
         beforeEach(async () => {
           // Given
           const criteres: GetServicesCiviqueQuery = {
@@ -151,11 +142,11 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
         })
         it('renvoie les stats', async () => {
           // Then
-          expect(isSuccess(result)).to.equal(true)
-          if (isSuccess(result)) {
-            expect(result.data.nombreDeNouvellesOffres).to.equal(1)
-            expect(result.data.recherchesCorrespondantes).to.equal(1)
-          }
+          expect(result.succes).to.equal(true)
+          expect(result.resultat).to.deep.equal({
+            nombreDeNouvellesOffres: 1,
+            recherchesCorrespondantes: 1
+          })
         })
 
         it('notifie le jeune', async () => {
@@ -233,7 +224,7 @@ describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
           await handleJobNotifierNouveauxServicesCiviqueCommandHandler.handle()
 
         // Then
-        expect(isSuccess(result)).to.be.true()
+        expect(result.succes).to.be.true()
       })
     })
   })

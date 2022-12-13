@@ -2,7 +2,7 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from 'src/application/commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
 import { ErreurHttp } from 'src/building-blocks/types/domain-error'
-import { failure, isSuccess, success } from 'src/building-blocks/types/result'
+import { failure, success } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
 import { Jeune } from 'src/domain/jeune/jeune'
 import { Milo } from 'src/domain/milo'
@@ -61,11 +61,13 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
 
       // Then
       expect(miloRepository.saveSituationsJeune).to.have.callCount(0)
-      expect(result._isSuccess).to.equal(true)
-      if (isSuccess(result)) {
-        expect(result.data.jeunesMilo).to.equal(0)
-        expect(result.data.situationsJeuneSauvegardees).to.equal(0)
-      }
+      expect(result.succes).to.equal(true)
+      expect(result.resultat).to.deep.equal({
+        jeunesMilo: 0,
+        situationsJeuneSauvegardees: 0,
+        dossiersNonTrouves: 0,
+        erreurs: 0
+      })
     })
   })
 
@@ -96,12 +98,13 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
         situationCourante: undefined,
         situations: []
       })
-      expect(result._isSuccess).to.equal(true)
-      if (isSuccess(result)) {
-        expect(result.data.jeunesMilo).to.equal(2)
-        expect(result.data.dossiersNonTrouves).to.equal(1)
-        expect(result.data.situationsJeuneSauvegardees).to.equal(1)
-      }
+      expect(result.succes).to.equal(true)
+      expect(result.resultat).to.deep.equal({
+        jeunesMilo: 2,
+        dossiersNonTrouves: 1,
+        situationsJeuneSauvegardees: 1,
+        erreurs: 0
+      })
     })
     it("ne s'arrete pas pas quand une erreur se produit", async () => {
       // Given
@@ -126,13 +129,13 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
         situationCourante: undefined,
         situations: []
       })
-      expect(result._isSuccess).to.equal(true)
-      if (isSuccess(result)) {
-        expect(result.data.jeunesMilo).to.equal(2)
-        expect(result.data.dossiersNonTrouves).to.equal(0)
-        expect(result.data.situationsJeuneSauvegardees).to.equal(1)
-        expect(result.data.erreurs).to.equal(1)
-      }
+      expect(result.succes).to.equal(true)
+      expect(result.resultat).to.deep.equal({
+        jeunesMilo: 2,
+        dossiersNonTrouves: 0,
+        situationsJeuneSauvegardees: 1,
+        erreurs: 1
+      })
     })
     it('récupère et sauvegarde une date de fin de CEJ quand elle existe ', async () => {
       // Given
@@ -155,7 +158,7 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
         await handleJobRecupererSituationsJeunesMiloCommandHandler.handle()
 
       // Then
-      expect(result._isSuccess).to.equal(true)
+      expect(result.succes).to.equal(true)
       expect(jeuneRepository.save).to.have.calledOnceWithExactly({
         ...jeune1,
         dateFinCEJ: uneDatetime()
@@ -193,12 +196,13 @@ describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
         situationCourante: undefined,
         situations: []
       })
-      expect(result._isSuccess).to.equal(true)
-      if (isSuccess(result)) {
-        expect(result.data.jeunesMilo).to.equal(2)
-        expect(result.data.dossiersNonTrouves).to.equal(1)
-        expect(result.data.situationsJeuneSauvegardees).to.equal(1)
-      }
+      expect(result.succes).to.equal(true)
+      expect(result.resultat).to.deep.equal({
+        jeunesMilo: 2,
+        dossiersNonTrouves: 1,
+        situationsJeuneSauvegardees: 1,
+        erreurs: 0
+      })
     })
   })
 })

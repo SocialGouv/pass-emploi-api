@@ -2,13 +2,9 @@ import { Inject, Injectable } from '@nestjs/common'
 import { parseExpression } from 'cron-parser'
 import { DateTime } from 'luxon'
 import { Op } from 'sequelize'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
-import { emptySuccess, Result } from '../../../building-blocks/types/result'
-import {
-  JobTypeCommand,
-  listeCronJobs,
-  Planificateur
-} from '../../../domain/planificateur'
+import { Job } from '../../../building-blocks/types/job'
+import { JobHandler } from '../../../building-blocks/types/job-handler'
+import { listeCronJobs, Planificateur } from '../../../domain/planificateur'
 import {
   RapportJob24h,
   SuiviJob,
@@ -18,19 +14,16 @@ import { SuiviJobSqlModel } from '../../../infrastructure/sequelize/models/suivi
 import { DateService } from '../../../utils/date-service'
 
 @Injectable()
-export class MonitorJobsCommandHandler extends CommandHandler<
-  JobTypeCommand,
-  void
-> {
+export class MonitorJobsCommandHandler extends JobHandler<Job> {
   constructor(
     private dateService: DateService,
     @Inject(SuiviJobServiceToken)
-    private suiviJobService: SuiviJob.Service
+    suiviJobService: SuiviJob.Service
   ) {
-    super('MonitorJobsCommandHandler')
+    super(Planificateur.JobType.MONITORER_JOBS, suiviJobService)
   }
 
-  async handle(_command: JobTypeCommand): Promise<Result> {
+  async handle(): Promise<SuiviJob> {
     const maintenant = this.dateService.now()
     const ilYa24h = maintenant.minus({ hours: 24 })
 
@@ -76,15 +69,14 @@ export class MonitorJobsCommandHandler extends CommandHandler<
 
     await this.suiviJobService.envoyerRapport(rapportJobs)
 
-    return emptySuccess()
-  }
-
-  async authorize(): Promise<Result> {
-    return emptySuccess()
-  }
-
-  async monitor(): Promise<void> {
-    return
+    return {
+      jobType: this.jobType,
+      nbErreurs: 0,
+      succes: true,
+      dateExecution: maintenant,
+      tempsExecution: DateService.caculerTempsExecution(maintenant),
+      resultat: {}
+    }
   }
 }
 

@@ -31,6 +31,7 @@ export class HandleJobMailConseillerCommandHandler extends JobHandler<Job> {
   }
 
   async handle(): Promise<SuiviJob> {
+    let erreur = undefined
     const stats = {
       succes: 0,
       mailsEnvoyes: 0
@@ -103,6 +104,7 @@ export class HandleJobMailConseillerCommandHandler extends JobHandler<Job> {
       this.logger.error("Le job des mails des messages non lus s'est arrêté")
       this.logger.log(stats)
       succes = false
+      erreur = e
     }
 
     return {
@@ -110,8 +112,8 @@ export class HandleJobMailConseillerCommandHandler extends JobHandler<Job> {
       nbErreurs,
       succes,
       dateExecution: maintenant,
-      tempsExecution: maintenant.diffNow().milliseconds * -1,
-      resultat: stats
+      tempsExecution: DateService.caculerTempsExecution(maintenant),
+      resultat: erreur ?? stats
     }
   }
 }
