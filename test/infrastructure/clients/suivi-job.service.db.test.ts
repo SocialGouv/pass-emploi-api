@@ -105,7 +105,8 @@ describe('SuiviJobService', () => {
           datesExecutions: [uneDatetime(), uneDatetime()]
         }
       ]
-      const stringBody = `{"username":"CEJ Lama","text":"### Rapport quotidien des CRONs\\n|jobType|nbExecutionsAttendues|nbExecutions|nbErreurs|nbEchecs|datesExecutions\\n|:---|:---|:---|:---|:---|:---\\n|NETTOYER_LES_DONNEES|3|2|1|0|${uneDatetime().toISO()}, ${uneDatetime().toISO()}|"}`
+      const heureParis = uneDatetime().setZone('Europe/Paris').toISO()
+      const stringBody = `{"username":"CEJ Lama","text":"### Rapport quotidien des CRONs\\n|jobType|nbExecutionsAttendues|nbExecutions|nbErreurs|nbEchecs|datesExecutions\\n|:---|:---|:---|:---|:---|:---\\n|NETTOYER_LES_DONNEES|3|2|1|0|${heureParis}, ${heureParis}|"}`
 
       const scope = nock(configService.get('mattermost').jobWebhookUrl)
         .post('', stringBody)

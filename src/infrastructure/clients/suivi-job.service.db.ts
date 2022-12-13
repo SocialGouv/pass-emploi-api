@@ -81,13 +81,19 @@ function construireMessage(resultatJob: ResultatJob): string {
 }
 
 function construireRapport(rapportJobs: RapportJob24h[]): string {
-  const headers = Object.keys(rapportJobs[0])
+  const rapportJobsStringified = rapportJobs.map(rapportJob => ({
+    ...rapportJob,
+    datesExecutions: rapportJob.datesExecutions.map(date =>
+      date.setZone('Europe/Paris').toISO()
+    )
+  }))
+  const headers = Object.keys(rapportJobsStringified[0])
     .map(header => header)
     .join('|')
-  const separator = Object.keys(rapportJobs[0])
+  const separator = Object.keys(rapportJobsStringified[0])
     .map(_h => ':---')
     .join('|')
-  const data = rapportJobs
+  const data = rapportJobsStringified
     .map(job =>
       Object.values(job)
         .map(v => {

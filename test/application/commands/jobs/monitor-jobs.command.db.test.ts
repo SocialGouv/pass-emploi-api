@@ -60,7 +60,7 @@ describe('MonitorJobsCommandHandler', () => {
           nbExecutions: 1,
           nbErreurs: 0,
           nbEchecs: 0,
-          datesExecutions: [maintenant.minus({ hours: 5 })]
+          datesExecutions: [maintenant.minus({ hours: 5 }).setZone()]
         }
 
         // When
