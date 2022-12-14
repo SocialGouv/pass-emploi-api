@@ -35,6 +35,7 @@ import { DeleteListeDeDiffusionCommandHandler } from './application/commands/del
 import { DeleteRechercheCommandHandler } from './application/commands/delete-recherche.command.handler'
 import { DeleteRendezVousCommandHandler } from './application/commands/delete-rendez-vous.command.handler.db'
 import { DeleteSuperviseursCommandHandler } from './application/commands/delete-superviseurs.command.handler'
+import { EnvoyerMessageGroupeCommandHandler } from './application/commands/envoyer-message-groupe.command.handler'
 import { HandleJobMailConseillerCommandHandler } from './application/commands/jobs/handle-job-mail-conseiller.command'
 import { HandleNettoyerLesJobsCommandHandler } from './application/commands/jobs/handle-job-nettoyer-les-jobs.command'
 import { HandleJobRappelRendezVousCommandHandler } from './application/commands/jobs/handle-job-rappel-rendez-vous.command'
@@ -654,7 +655,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     DeleteListeDeDiffusionCommandHandler,
     GetDetailListeDeDiffusionQueryHandler,
     HandleJobAgenceAnimationCollectiveCommandHandler,
-    MonitorJobsCommandHandler
+    MonitorJobsCommandHandler,
+    EnvoyerMessageGroupeCommandHandler
   ]
 }
 
