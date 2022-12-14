@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
-import { Chat } from '../../domain/chat'
-import { FirebaseClient } from '../clients/firebase-client'
+import { Chat, ChatMessage } from '../../domain/chat'
 import { Jeune } from '../../domain/jeune/jeune'
+import { FirebaseClient } from '../clients/firebase-client'
 
 @Injectable()
 export class ChatFirebaseRepository implements Chat.Repository {
@@ -22,6 +22,14 @@ export class ChatFirebaseRepository implements Chat.Repository {
       idConseiller,
       idListeDeDiffusion
     )
+  }
+
+  envoyerMessageBeneficiaire(_idChat: string, _message: ChatMessage): Promise<void> {
+    throw new Error('Not implemented')
+  }
+
+  recupererChat(_idJeune: string): Promise<Chat> {
+    throw new Error('Not implemented')
   }
 
   async getNombreDeConversationsNonLues(conseillerId: string): Promise<number> {
