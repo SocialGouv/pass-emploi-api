@@ -1,0 +1,6 @@
+elasticdump \
+--input=ELASTIC_URL \
+--output=data-migrations/logs-elastic-offset.json \
+--type=data \
+--searchBody=@data-migrations/requete-elastic.json \
+--timeout=15000000
