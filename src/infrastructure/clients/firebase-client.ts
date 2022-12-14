@@ -3,12 +3,16 @@ import { ConfigService } from '@nestjs/config'
 import * as APM from 'elastic-apm-node'
 import admin, { firestore } from 'firebase-admin'
 import { getMessaging, TokenMessage } from 'firebase-admin/messaging'
+import { ArchiveJeune } from '../../domain/archive-jeune'
 import { Authentification } from '../../domain/authentification'
+import { Chat, ChatMessage } from '../../domain/chat'
+import { Jeune } from '../../domain/jeune/jeune'
+import { ChatCryptoService } from '../../utils/chat-crypto-service'
 import { buildError } from '../../utils/logger.module'
 import { getAPMInstance } from '../monitoring/apm.init'
-import { ChatCryptoService } from '../../utils/chat-crypto-service'
-import { Jeune } from '../../domain/jeune/jeune'
-import { ArchiveJeune } from '../../domain/archive-jeune'
+import { DateService } from '../../utils/date-service'
+import Timestamp = firestore.Timestamp
+import { FirebaseChat, FirebaseMessage } from './dto/firebase.dto'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Utf8 = require('crypto-js/enc-utf8')
@@ -31,6 +35,8 @@ export interface IFirebaseClient {
 const FIREBASE_CHAT_PATH = 'chat'
 const FIREBASE_GROUP_PATH = 'groupe'
 
+const SENT_BY_CONSEILLER = 'conseiller'
+
 @Injectable()
 export class FirebaseClient implements IFirebaseClient {
   private messaging
@@ -42,7 +48,8 @@ export class FirebaseClient implements IFirebaseClient {
 
   constructor(
     private configService: ConfigService,
-    private readonly chatCryptoService: ChatCryptoService
+    private readonly chatCryptoService: ChatCryptoService,
+    private dateService: DateService
   ) {
     const firebase = this.configService.get('firebase.key')
     this.app = FirebaseClient.getApp(firebase)
@@ -118,6 +125,46 @@ export class FirebaseClient implements IFirebaseClient {
       }
       await this.firestore.collection(collectionPath).add(newGroup)
     }
+  }
+
+  async recupererChat(idBeneficiaire: string): Promise<Chat | undefined> {
+    const collection = this.firestore.collection(FIREBASE_CHAT_PATH)
+    const chats = await collection.where('jeuneId', '==', idBeneficiaire).get()
+
+    if (!chats.empty) {
+      return { id: chats.docs[0].id }
+    }
+
+    return
+  }
+
+  async envoyerMessage(idChat: string, message: ChatMessage): Promise<void> {
+    const maintenant = this.dateService.now()
+    const collection = this.firestore.collection(FIREBASE_CHAT_PATH)
+    const chat = collection.doc(idChat)
+    const newConseillerMessageCount = (chat as unknown as FirebaseChat)
+      .newConseillerMessageCount
+    const firebaseChat: FirebaseChat = {
+      lastMessageContent: message.message,
+      lastMessageIv: message.iv,
+      lastMessageSentAt: maintenant.toISO(),
+      lastMessageSentBy: SENT_BY_CONSEILLER,
+      newConseillerMessageCount: newConseillerMessageCount + 1
+    }
+    await chat.update(chat.id, firebaseChat)
+    const firebaseMessage: FirebaseMessage = {
+      content: message.message,
+      iv: message.iv,
+      conseillerId: message.idConseiller,
+      sentBy: SENT_BY_CONSEILLER,
+      creationDate: Timestamp.fromMillis(maintenant.toMillis()),
+      type: message.type
+    }
+
+    if (message.infoPieceJointe) {
+      firebaseMessage.piecesJointes = [message.infoPieceJointe]
+    }
+    await chat.collection('messages').add(firebaseMessage)
   }
 
   async getNombreDeConversationsNonLues(conseillerId: string): Promise<number> {
@@ -200,7 +247,7 @@ export class FirebaseClient implements IFirebaseClient {
               .collection('messages')
               .doc(),
             {
-              sentBy: 'conseiller',
+              sentBy: SENT_BY_CONSEILLER,
               conseillerId: jeune.conseiller?.id,
               type: Jeune.estSuiviTemporairement(jeune)
                 ? 'NOUVEAU_CONSEILLER_TEMPORAIRE'

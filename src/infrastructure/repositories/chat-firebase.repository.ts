@@ -24,12 +24,15 @@ export class ChatFirebaseRepository implements Chat.Repository {
     )
   }
 
-  envoyerMessageBeneficiaire(_idChat: string, _message: ChatMessage): Promise<void> {
-    throw new Error('Not implemented')
+  async recupererChat(idJeune: string): Promise<Chat | undefined> {
+    return this.firebaseClient.recupererChat(idJeune)
   }
 
-  recupererChat(_idJeune: string): Promise<Chat> {
-    throw new Error('Not implemented')
+  async envoyerMessageBeneficiaire(
+    idChat: string,
+    message: ChatMessage
+  ): Promise<void> {
+    await this.firebaseClient.envoyerMessage(idChat, message)
   }
 
   async getNombreDeConversationsNonLues(conseillerId: string): Promise<number> {
