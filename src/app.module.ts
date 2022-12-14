@@ -287,6 +287,7 @@ import { UpdateListeDeDiffusionCommandHandler } from './application/commands/upd
 import { GetDetailListeDeDiffusionQueryHandler } from './application/queries/get-detail-liste-de-diffusion.query.handler.db'
 import { HandleJobAgenceAnimationCollectiveCommandHandler } from './application/commands/jobs/handle-job-agence-animation-collective.command.db'
 import { MonitorJobsCommandHandler } from './application/commands/jobs/monitor-jobs.command.db'
+import { MessagesController } from './infrastructure/routes/messages.controller'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -322,7 +323,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     CampagnesController,
     FilesController,
     EtablissementsController,
-    ListesDeDiffusionController
+    ListesDeDiffusionController,
+    MessagesController
   ],
   providers: [
     ...buildQueryCommandsProviders(),
