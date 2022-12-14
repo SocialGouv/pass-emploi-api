@@ -1,0 +1,52 @@
+{
+  "_source": ["msg.event.utilisateur.id", "msg.req.query.maintenant"],
+  "query": {
+    "bool": {
+      "must": [],
+      "filter": [
+        {
+          "bool": {
+            "should": [
+              {
+                "bool": {
+                  "should": [
+                    {
+                      "match_phrase": {
+                        "msg.context": "GetJeuneHomeAgendaQueryHandler"
+                      }
+                    }
+                  ],
+                  "minimum_should_match": 1
+                }
+              },
+              {
+                "bool": {
+                  "should": [
+                    {
+                      "match_phrase": {
+                        "msg.context": "GetJeuneHomeAgendaPoleEmploiQueryHandler"
+                      }
+                    }
+                  ],
+                  "minimum_should_match": 1
+                }
+              }
+            ],
+            "minimum_should_match": 1
+          }
+        },
+        {
+          "range": {
+            "@timestamp": {
+              "format": "strict_date_optional_time",
+              "gte": "2022-11-01T14:09:42.903Z",
+              "lte": "2022-11-01T14:20:42.903Z"
+            }
+          }
+        }
+      ],
+      "should": [],
+      "must_not": []
+    }
+  }
+}
