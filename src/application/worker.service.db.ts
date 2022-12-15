@@ -23,6 +23,7 @@ import { HandleJobMettreAJourCodesEvenementsCommandHandler } from './commands/jo
 import { HandleJobNettoyerLesDonneesCommandHandler } from './commands/jobs/handle-job-nettoyer-les-donnees.command.db'
 import { HandleJobAgenceAnimationCollectiveCommandHandler } from './commands/jobs/handle-job-agence-animation-collective.command.db'
 import { MonitorJobsCommandHandler } from './commands/jobs/monitor-jobs.command.db'
+import { HandleJobMettreAJourLesSegmentsCommandHandler } from './commands/jobs/handle-job-mettre-a-jour-les-segments.command'
 
 @Injectable()
 export class WorkerService {
@@ -46,7 +47,8 @@ export class WorkerService {
     private handleJobNotifierRendezVousPECommandHandler: HandleJobNotifierRendezVousPECommandHandler,
     private handleJobMettreAJourCodesEvenementsCommandHandler: HandleJobMettreAJourCodesEvenementsCommandHandler,
     private handleJobAgenceAnimationCollectiveCommand: HandleJobAgenceAnimationCollectiveCommandHandler,
-    private monitorJobsCommandHandler: MonitorJobsCommandHandler
+    private monitorJobsCommandHandler: MonitorJobsCommandHandler,
+    private handleJobMettreAJourLesSegmentsCommandHandler: HandleJobMettreAJourLesSegmentsCommandHandler
   ) {
     this.apmService = getAPMInstance()
     this.workerTrackingService = getWorkerTrackingServiceInstance()
@@ -113,6 +115,9 @@ export class WorkerService {
           break
         case Planificateur.JobType.MONITORER_JOBS:
           await this.monitorJobsCommandHandler.execute()
+          break
+        case Planificateur.JobType.MAJ_SEGMENTS:
+          await this.handleJobMettreAJourLesSegmentsCommandHandler.execute()
           break
         case Planificateur.JobType.FAKE:
           this.logger.log({

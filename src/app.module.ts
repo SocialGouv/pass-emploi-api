@@ -287,6 +287,8 @@ import { UpdateListeDeDiffusionCommandHandler } from './application/commands/upd
 import { GetDetailListeDeDiffusionQueryHandler } from './application/queries/get-detail-liste-de-diffusion.query.handler.db'
 import { HandleJobAgenceAnimationCollectiveCommandHandler } from './application/commands/jobs/handle-job-agence-animation-collective.command.db'
 import { MonitorJobsCommandHandler } from './application/commands/jobs/monitor-jobs.command.db'
+import { HandleJobMettreAJourLesSegmentsCommandHandler } from './application/commands/jobs/handle-job-mettre-a-jour-les-segments.command'
+import { BigqueryClient } from './infrastructure/clients/bigquery.client'
 import { MessagesController } from './infrastructure/routes/messages.controller'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
@@ -365,6 +367,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Recherche.Factory,
     Conseiller.ListeDeDiffusion.Factory,
     Conseiller.ListeDeDiffusion.Service,
+    BigqueryClient,
     {
       provide: APP_GUARD,
       useClass: OidcAuthGuard
@@ -657,6 +660,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     DeleteListeDeDiffusionCommandHandler,
     GetDetailListeDeDiffusionQueryHandler,
     HandleJobAgenceAnimationCollectiveCommandHandler,
+    MonitorJobsCommandHandler,
+    HandleJobMettreAJourLesSegmentsCommandHandler,
     MonitorJobsCommandHandler,
     EnvoyerMessageGroupeCommandHandler
   ]
