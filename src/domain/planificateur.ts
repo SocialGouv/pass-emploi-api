@@ -38,6 +38,7 @@ export namespace Planificateur {
     NETTOYER_LES_DONNEES = 'NETTOYER_LES_DONNEES',
     NOTIFIER_RENDEZVOUS_PE = 'NOTIFIER_RENDEZVOUS_PE',
     MAJ_CODES_EVENEMENTS = 'MAJ_CODES_EVENEMENTS',
+    MAJ_SEGMENTS = 'MAJ_SEGMENTS',
     MAJ_AGENCE_AC = 'MAJ_AGENCE_AC',
     MONITORER_JOBS = 'MONITORER_JOBS'
   }
@@ -118,6 +119,10 @@ export const listeCronJobs: Planificateur.CronJob[] = [
   {
     type: Planificateur.JobType.MONITORER_JOBS,
     expression: '45 9 * * *'
+  },
+  {
+    type: Planificateur.JobType.MAJ_SEGMENTS,
+    expression: '0 6 * * *'
   }
 ]
 

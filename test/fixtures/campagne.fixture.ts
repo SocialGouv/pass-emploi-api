@@ -1,7 +1,9 @@
 import { Campagne } from '../../src/domain/campagne'
-import { uneDatetime } from './date.fixture'
+import { uneDate, uneDatetime } from './date.fixture'
 import { CampagneQueryModel } from '../../src/application/queries/query-models/campagne.query-model'
 import { questionsInMemory } from '../../src/application/queries/query-getters/get-campagne.query.getter'
+import { ReponseCampagneDto } from '../../src/infrastructure/sequelize/models/reponse-campagne.sql-model'
+import { AsSql } from '../../src/infrastructure/sequelize/types'
 
 export const uneCampagne = (args: Partial<Campagne> = {}): Campagne => {
   const defaults: Campagne = {
@@ -71,3 +73,22 @@ export const uneEvaluationComplete = (
     }
   ]
 })
+
+export const uneEvaluationIncompleteDTO = (
+  idJeune: string,
+  idCampagne: string
+): Omit<AsSql<ReponseCampagneDto>, 'id'> => {
+  return {
+    idJeune,
+    idCampagne,
+    structureJeune: 'MILO',
+    dateReponse: uneDate(),
+    dateCreationJeune: uneDate(),
+    reponse1: 'reponse1',
+    pourquoi1: null,
+    reponse2: 'reponse2',
+    pourquoi2: null,
+    reponse3: 'reponse3',
+    pourquoi3: null
+  }
+}
