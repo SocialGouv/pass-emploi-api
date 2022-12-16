@@ -8,6 +8,8 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
+import { AuthorizeConseillerForJeunes } from '../authorizers/authorize-conseiller-for-jeunes'
+import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface EnvoyerMessageGroupeCommand extends Command {
   idsBeneficiaires: string[]
@@ -28,7 +30,9 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
 > {
   constructor(
     @Inject(ChatRepositoryToken)
-    private chatRepository: Chat.Repository
+    private chatRepository: Chat.Repository,
+    private authorizeConseillerForJeunes: AuthorizeConseillerForJeunes,
+    private evenementService: EvenementService
   ) {
     super('EnvoyerMessageGroupeCommandHandler')
   }
@@ -61,14 +65,31 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
   }
 
   async authorize(
-    _command: EnvoyerMessageGroupeCommand,
-    _utilisateur: Authentification.Utilisateur
+    command: EnvoyerMessageGroupeCommand,
+    utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return emptySuccess()
+    return this.authorizeConseillerForJeunes.authorize(
+      command.idsBeneficiaires,
+      utilisateur
+    )
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(
+    utilisateur: Authentification.Utilisateur,
+    command: EnvoyerMessageGroupeCommand
+  ): Promise<void> {
+    let code: Evenement.Code = Evenement.Code.MESSAGE_ENVOYE
+
+    if (command.idsBeneficiaires.length > 1) {
+      if (command.typeMessage === Chat.TypeMessage.MESSAGE_PJ) {
+        code = Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_PJ
+      } else {
+        code = Evenement.Code.MESSAGE_ENVOYE_MULTIPLE
+      }
+    } else if (command.typeMessage === Chat.TypeMessage.MESSAGE_PJ) {
+      code = Evenement.Code.MESSAGE_ENVOYE_PJ
+    }
+    await this.evenementService.creer(code, utilisateur)
   }
 }
 
