@@ -30,11 +30,12 @@ export class SuiviJobService implements SuiviJob.Service {
 
   async envoyerRapport(rapportJobs: RapportJob24h[]): Promise<void> {
     const webhookUrl = this.configService.get('mattermost.jobWebhookUrl')
+    const logsUrl = this.configService.get('monitoring').dashboardUrl
 
     if (rapportJobs.length) {
       const payload = {
         username: BOT_USERNAME,
-        text: construireRapport(rapportJobs)
+        text: construireRapport(rapportJobs, logsUrl)
       }
       await firstValueFrom(this.httpService.post(webhookUrl, payload))
     }
@@ -77,17 +78,21 @@ function construireMessage(suiviJob: SuiviJob): string {
   return `### Résultat du job _${suiviJob.jobType}_\n${tableau}`
 }
 
-function construireRapport(rapportJobs: RapportJob24h[]): string {
+function construireRapport(
+  rapportJobs: RapportJob24h[],
+  logsUrl: string
+): string {
   const rapportJobsStringified = rapportJobs.map(rapportJob => ({
-    ...rapportJob,
-    datesExecutions: rapportJob.datesExecutions.map(date =>
-      date.setZone('Europe/Paris').toISO()
-    ),
     aBienTourne:
       rapportJob.nbExecutionsAttendues !== rapportJob.nbExecutions
         ? ':x:'
         : ':white_check_mark:',
-    pasEnEchec: rapportJob.nbEchecs > 0 ? ':x:' : ':white_check_mark:'
+    pasEnEchec: rapportJob.nbEchecs > 0 ? ':x:' : ':white_check_mark:',
+    ...rapportJob,
+    datesExecutions: rapportJob.datesExecutions.map(date =>
+      date.setZone('Europe/Paris').toISO()
+    ),
+    logs: `[lien](${logsUrl}/app/discover#/?_g=(time:(from:now-24h%2Fh,to:now))&_a=(query:(language:kuery,query:"${rapportJob.jobType}")))`
   }))
   const headers = Object.keys(rapportJobsStringified[0])
     .map(header => header)

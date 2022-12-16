@@ -134,6 +134,9 @@ export default () => {
     mattermost: {
       jobWebhookUrl: process.env.MATTERMOST_JOBS_WEBHOOK_URL
     },
+    monitoring: {
+      dashboardUrl: process.env.MONITORING_DASHBOARD_URL
+    },
     task: {
       name: process.env.TASK_NAME,
       date: process.env.TASK_DATE

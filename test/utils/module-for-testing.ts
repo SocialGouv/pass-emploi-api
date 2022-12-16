@@ -88,6 +88,9 @@ export const testConfig = (): ConfigService => {
     mattermost: {
       jobWebhookUrl: 'https://mattermost.incubateur.net/hooks/xxx'
     },
+    monitoring: {
+      dashboardUrl: 'https://elastic.com'
+    },
     jobs: {
       notificationRecherches: {
         nombreDeRequetesEnParallele: '5'
