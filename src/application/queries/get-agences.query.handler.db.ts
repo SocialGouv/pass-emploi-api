@@ -12,10 +12,13 @@ import { Core } from '../../domain/core'
 import { AgenceSqlModel } from '../../infrastructure/sequelize/models/agence.sql-model'
 import { AgenceQueryModel } from './query-models/agence.query-model'
 import Structure = Core.Structure
+import { Op } from 'sequelize'
 
 export interface GetAgenceQuery extends Query {
   structure: Structure
 }
+
+const ID_AGENCE_MILO_JDD = '9999'
 
 @Injectable()
 export class GetAgencesQueryHandler extends QueryHandler<
@@ -29,7 +32,10 @@ export class GetAgencesQueryHandler extends QueryHandler<
   async handle(query: GetAgenceQuery): Promise<AgenceQueryModel[]> {
     const sqlModels = await AgenceSqlModel.findAll({
       where: {
-        structure: query.structure
+        structure: query.structure,
+        id: {
+          [Op.not]: ID_AGENCE_MILO_JDD
+        }
       }
     })
     return sqlModels.map(sql => {

@@ -1,4 +1,4 @@
-import { GetAgencesQueryHandler } from '../../../src/application/queries/get-agences.query.handler'
+import { GetAgencesQueryHandler } from '../../../src/application/queries/get-agences.query.handler.db'
 import { Core } from '../../../src/domain/core'
 import {
   unUtilisateurConseiller,
@@ -6,11 +6,14 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { expect } from '../../utils'
 import { Authentification } from '../../../src/domain/authentification'
-import Structure = Core.Structure
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
+import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
+import Structure = Core.Structure
 
-describe('GetAgenceQuery', () => {
+describe('GetAgencesQueryHandler', () => {
+  DatabaseForTesting.prepare()
   describe('authorize', () => {
     const handler = new GetAgencesQueryHandler()
 
@@ -71,6 +74,40 @@ describe('GetAgenceQuery', () => {
 
         expect(result).to.deep.equal(emptySuccess())
       })
+    })
+  })
+  describe('handle', () => {
+    it("renvoie les agences en filtrant l'agence du CEJ", async () => {
+      // Given
+      const handler = new GetAgencesQueryHandler()
+      await AgenceSqlModel.bulkCreate([
+        {
+          id: '9999',
+          nomAgence: 'Agence Du CEJ MILO',
+          nomRegion: 'Pays de la Loire',
+          structure: 'MILO',
+          codeDepartement: 44
+        },
+        {
+          id: '1',
+          nomAgence: 'Agence normale',
+          nomRegion: 'Limousin',
+          structure: 'MILO',
+          codeDepartement: 87
+        }
+      ])
+
+      // When
+      const result = await handler.handle({ structure: Structure.MILO })
+
+      // Then
+      expect(result).to.deep.equal([
+        {
+          id: '1',
+          nom: 'Agence normale',
+          codeDepartement: '87'
+        }
+      ])
     })
   })
 })
