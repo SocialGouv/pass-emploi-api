@@ -3,15 +3,11 @@ import Timestamp = firestore.Timestamp
 import { Chat } from '../../../domain/chat'
 
 export interface FirebaseChat {
-  seenByConseiller?: boolean | undefined
-  flaggedByConseiller?: boolean | undefined
   newConseillerMessageCount: number
-  lastMessageContent?: string | undefined
-  lastMessageSentAt?: string | undefined
-  lastMessageSentBy?: string | undefined
-  lastConseillerReading?: Timestamp | undefined
-  lastJeuneReading?: Timestamp | undefined
-  lastMessageIv?: string | undefined
+  lastMessageContent: string
+  lastMessageSentAt: string
+  lastMessageSentBy: string
+  lastMessageIv: string
 }
 
 export interface FirebaseMessage {
