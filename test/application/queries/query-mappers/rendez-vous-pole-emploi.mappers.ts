@@ -1,4 +1,3 @@
-import { unJeune } from '../../../fixtures/jeune.fixture'
 import { RendezVousPoleEmploiDto } from '../../../../src/infrastructure/clients/dto/pole-emploi.dto'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { fromRendezVousDtoToRendezVousQueryModel } from '../../../../src/application/queries/query-mappers/rendez-vous-pole-emploi.mappers'
@@ -13,7 +12,6 @@ describe('RendezVousPrestationMappers', () => {
   })
 
   describe('fromRendezVousPoleEmploiDtoToRendezVousQueryModel', () => {
-    const jeune = unJeune()
     const dateString = '2020-04-06'
     const heure = '12:20'
     const dateUTC = new Date('2020-04-06T12:20:00.000Z')
@@ -41,7 +39,6 @@ describe('RendezVousPrestationMappers', () => {
       const RendezVousConseillerQueryModel =
         fromRendezVousDtoToRendezVousQueryModel(
           rendezVousPoleEmploiDto,
-          jeune,
           idService
         )
 
@@ -52,11 +49,6 @@ describe('RendezVousPrestationMappers', () => {
         isLocaleDate: true,
         duration: 23,
         id: 'random-id',
-        jeune: {
-          id: 'ABCDE',
-          nom: 'Doe',
-          prenom: 'John'
-        },
         modality: 'par visio',
         theme: 'theme',
         conseiller: undefined,
@@ -81,7 +73,6 @@ describe('RendezVousPrestationMappers', () => {
       const RendezVousConseillerQueryModel =
         fromRendezVousDtoToRendezVousQueryModel(
           rendezVousPoleEmploiDto,
-          jeune,
           idService
         )
       // Then
