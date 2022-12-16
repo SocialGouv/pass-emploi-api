@@ -5,8 +5,6 @@ import {
 } from '../../../src/application/commands/envoyer-message-groupe.command.handler'
 import { Chat } from '../../../src/domain/chat'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { failure } from '../../../src/building-blocks/types/result'
-import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
 import { AuthorizeConseillerForJeunes } from '../../../src/application/authorizers/authorize-conseiller-for-jeunes'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import TypeMessage = Chat.TypeMessage
@@ -30,7 +28,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
   })
 
   describe('handle', () => {
-    describe('quand le message est valide', () => {
+    describe('quand le message est sans PJ', () => {
       it('envoie un message à chaque jeune', async () => {
         // Given
         chatRepository.recupererChat
@@ -44,8 +42,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
           idsBeneficiaires: ['jeune-1', 'jeune-2'],
           message: 'un message',
           iv: '123456',
-          idConseiller: '41',
-          typeMessage: TypeMessage.MESSAGE
+          idConseiller: '41'
         })
 
         // Then
@@ -70,23 +67,53 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
         })
       })
     })
-    describe('quand le message est invalide', () => {
-      it('envoie une erreur', async () => {
+    describe('quand le message est avec PJ', () => {
+      it('envoie un message avec PJ à chaque jeune', async () => {
+        // Given
+        chatRepository.recupererChat
+          .withArgs('jeune-1')
+          .resolves({ id: 'chat-1' })
+          .withArgs('jeune-2')
+          .resolves({ id: 'chat-2' })
+
         // When
-        const result = await envoyerMessageGroupeCommandHandler.handle({
+        await envoyerMessageGroupeCommandHandler.handle({
           idsBeneficiaires: ['jeune-1', 'jeune-2'],
           message: 'un message',
           iv: '123456',
           idConseiller: '41',
-          typeMessage: TypeMessage.MESSAGE_PJ
+          infoPieceJointe: {
+            id: 'id',
+            nom: 'nom'
+          }
         })
 
         // Then
-        expect(result).to.be.deep.equal(
-          failure(
-            new MauvaiseCommandeError('Un message PJ doit avoir des info de PJ')
-          )
-        )
+        expect(chatRepository.envoyerMessageBeneficiaire).to.have.callCount(2)
+        expect(
+          chatRepository.envoyerMessageBeneficiaire
+        ).to.have.been.calledWith('chat-1', {
+          message: 'un message',
+          iv: '123456',
+          idConseiller: '41',
+          type: TypeMessage.MESSAGE_PJ,
+          infoPieceJointe: {
+            id: 'id',
+            nom: 'nom'
+          }
+        })
+        expect(
+          chatRepository.envoyerMessageBeneficiaire
+        ).to.have.been.calledWith('chat-2', {
+          message: 'un message',
+          iv: '123456',
+          idConseiller: '41',
+          type: TypeMessage.MESSAGE_PJ,
+          infoPieceJointe: {
+            id: 'id',
+            nom: 'nom'
+          }
+        })
       })
     })
   })
@@ -98,8 +125,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
         idsBeneficiaires: ['jeune-1', 'jeune-2'],
         message: 'un message',
         iv: '123456',
-        idConseiller: '41',
-        typeMessage: TypeMessage.MESSAGE
+        idConseiller: '41'
       }
       const utilisateur = unUtilisateurConseiller()
 
@@ -124,8 +150,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
             idsBeneficiaires: ['jeune-1'],
             message: 'un message',
             iv: '123456',
-            idConseiller: '41',
-            typeMessage: TypeMessage.MESSAGE
+            idConseiller: '41'
           }
 
           // When
@@ -145,8 +170,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
             idsBeneficiaires: ['jeune-1', 'jeune-2'],
             message: 'un message',
             iv: '123456',
-            idConseiller: '41',
-            typeMessage: TypeMessage.MESSAGE
+            idConseiller: '41'
           }
 
           // When
@@ -169,7 +193,6 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
             message: 'un message',
             iv: '123456',
             idConseiller: '41',
-            typeMessage: TypeMessage.MESSAGE_PJ,
             infoPieceJointe: {
               id: 'id',
               nom: 'nom'
@@ -194,7 +217,6 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
             message: 'un message',
             iv: '123456',
             idConseiller: '41',
-            typeMessage: TypeMessage.MESSAGE_PJ,
             infoPieceJointe: {
               id: 'id',
               nom: 'nom'

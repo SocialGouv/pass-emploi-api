@@ -1,6 +1,5 @@
 import { Jeune } from './jeune/jeune'
-import { failure, Result, success } from '../building-blocks/types/result'
-import { MauvaiseCommandeError } from '../building-blocks/types/domain-error'
+import { Result, success } from '../building-blocks/types/result'
 
 export const ChatRepositoryToken = 'ChatRepositoryToken'
 
@@ -29,7 +28,6 @@ export namespace Chat {
     message: string
     iv: string
     idConseiller: string
-    typeMessage: Chat.TypeMessage
     infoPieceJointe?: {
       id: string
       nom: string
@@ -64,28 +62,13 @@ export namespace Chat {
   }
 
   export function creerMessage(aCreer: MessageACreer): Result<ChatMessage> {
-    if (aCreer.typeMessage === TypeMessage.MESSAGE && aCreer.infoPieceJointe) {
-      return failure(
-        new MauvaiseCommandeError(
-          "Un message simple ne peut pas avoir d'info de PJ"
-        )
-      )
-    }
-
-    if (
-      aCreer.typeMessage === TypeMessage.MESSAGE_PJ &&
-      !aCreer.infoPieceJointe
-    ) {
-      return failure(
-        new MauvaiseCommandeError('Un message PJ doit avoir des info de PJ')
-      )
-    }
-
     return success({
       message: aCreer.message,
       iv: aCreer.iv,
       idConseiller: aCreer.idConseiller,
-      type: aCreer.typeMessage,
+      type: aCreer.infoPieceJointe
+        ? Chat.TypeMessage.MESSAGE_PJ
+        : Chat.TypeMessage.MESSAGE,
       infoPieceJointe: aCreer.infoPieceJointe
     })
   }
