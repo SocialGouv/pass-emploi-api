@@ -1,11 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import {
-  emptySuccess,
-  isFailure,
-  Result
-} from '../../building-blocks/types/result'
+import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { AuthorizeConseillerForJeunes } from '../authorizers/authorize-conseiller-for-jeunes'
@@ -50,10 +46,6 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
 
     const chatMessage = Chat.creerMessage(command)
 
-    if (isFailure(chatMessage)) {
-      return chatMessage
-    }
-
     const chatsExistants: Chat[] = chats.filter(isDefined)
     if (chatsExistants.length !== chats.length) {
       this.logger.error(
@@ -63,12 +55,12 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
 
     await Promise.all(
       chatsExistants.map(({ id: idChat }) =>
-        this.chatRepository.envoyerMessageBeneficiaire(idChat, chatMessage.data)
+        this.chatRepository.envoyerMessageBeneficiaire(idChat, chatMessage)
       )
     )
 
     const jeunes = await this.jeuneRepository.findAllJeunesByConseiller(
-      command.idsBeneficiaires,
+      chatsExistants.map(chat => chat.idBeneficiaire),
       command.idConseiller
     )
 

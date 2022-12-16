@@ -132,7 +132,7 @@ export class FirebaseClient implements IFirebaseClient {
     const chats = await collection.where('jeuneId', '==', idBeneficiaire).get()
 
     if (!chats.empty) {
-      return { id: chats.docs[0].id }
+      return { id: chats.docs[0].id, idBeneficiaire: idBeneficiaire }
     }
 
     return
