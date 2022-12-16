@@ -103,6 +103,7 @@ export const configurationSchema = Joi.object({
     })
   }),
   mattermost: Joi.object({ jobWebhookUrl: Joi.string().uri().required() }),
+  monitoring: Joi.object({ dashboardUrl: Joi.string().uri().required() }),
   task: Joi.object({
     name: Joi.string(),
     date: Joi.string().isoDate()

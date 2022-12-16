@@ -109,7 +109,7 @@ describe('SuiviJobService', () => {
         }
       ]
       const heureParis = uneDatetime().setZone('Europe/Paris').toISO()
-      const stringBody = `{"username":"CEJ Lama","text":"### Rapport quotidien des CRONs\\n|jobType|nbExecutionsAttendues|nbExecutions|nbErreurs|nbEchecs|datesExecutions|aBienTourne|pasEnEchec\\n|:---|:---|:---|:---|:---|:---|:---|:---\\n|NETTOYER_LES_DONNEES|3|2|1|0|${heureParis}, ${heureParis}|:x:|:white_check_mark:|"}`
+      const stringBody = `{\"username\":\"CEJ Lama\",\"text\":\"### Rapport quotidien des CRONs\\n|aBienTourne|pasEnEchec|jobType|nbExecutionsAttendues|nbExecutions|nbErreurs|nbEchecs|datesExecutions|logs\\n|:---|:---|:---|:---|:---|:---|:---|:---|:---\\n|:x:|:white_check_mark:|NETTOYER_LES_DONNEES|3|2|1|0|${heureParis}, ${heureParis}|[lien](https://elastic.com/app/discover#/?_g=(time:(from:now-24h%2Fh,to:now))&_a=(query:(language:kuery,query:\\\"NETTOYER_LES_DONNEES\\\")))|\"}`
 
       const scope = nock(configService.get('mattermost').jobWebhookUrl)
         .post('', stringBody)
