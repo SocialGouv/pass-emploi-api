@@ -45,9 +45,9 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
         // Given
         chatRepository.recupererChat
           .withArgs('jeune-1')
-          .resolves({ id: 'chat-1' })
+          .resolves({ id: 'chat-1', idBeneficiaire: 'jeune-1' })
           .withArgs('jeune-2')
-          .resolves({ id: 'chat-2' })
+          .resolves({ id: 'chat-2', idBeneficiaire: 'jeune-2' })
 
         jeuneRepository.findAllJeunesByConseiller
           .withArgs(['jeune-1', 'jeune-2'], '41')

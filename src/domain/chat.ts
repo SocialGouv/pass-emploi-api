@@ -1,10 +1,10 @@
 import { Jeune } from './jeune/jeune'
-import { Result, success } from '../building-blocks/types/result'
 
 export const ChatRepositoryToken = 'ChatRepositoryToken'
 
 export interface Chat {
   id: string
+  idBeneficiaire: string
 }
 
 export type ChatMessage = {
@@ -61,8 +61,8 @@ export namespace Chat {
     envoyerMessageTransfert(jeune: Jeune): Promise<void>
   }
 
-  export function creerMessage(aCreer: MessageACreer): Result<ChatMessage> {
-    return success({
+  export function creerMessage(aCreer: MessageACreer): ChatMessage {
+    return {
       message: aCreer.message,
       iv: aCreer.iv,
       idConseiller: aCreer.idConseiller,
@@ -70,6 +70,6 @@ export namespace Chat {
         ? Chat.TypeMessage.MESSAGE_PJ
         : Chat.TypeMessage.MESSAGE,
       infoPieceJointe: aCreer.infoPieceJointe
-    })
+    }
   }
 }
