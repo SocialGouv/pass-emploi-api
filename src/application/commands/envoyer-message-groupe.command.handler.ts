@@ -16,7 +16,6 @@ export interface EnvoyerMessageGroupeCommand extends Command {
   message: string
   iv: string
   idConseiller: string
-  typeMessage: Chat.TypeMessage
   infoPieceJointe?: {
     id: string
     nom: string
@@ -81,12 +80,12 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
     let code: Evenement.Code = Evenement.Code.MESSAGE_ENVOYE
 
     if (command.idsBeneficiaires.length > 1) {
-      if (command.typeMessage === Chat.TypeMessage.MESSAGE_PJ) {
+      if (command.infoPieceJointe) {
         code = Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_PJ
       } else {
         code = Evenement.Code.MESSAGE_ENVOYE_MULTIPLE
       }
-    } else if (command.typeMessage === Chat.TypeMessage.MESSAGE_PJ) {
+    } else if (command.infoPieceJointe) {
       code = Evenement.Code.MESSAGE_ENVOYE_PJ
     }
     await this.evenementService.creer(code, utilisateur)
