@@ -290,6 +290,8 @@ import { MonitorJobsCommandHandler } from './application/commands/jobs/monitor-j
 import { HandleJobMettreAJourLesSegmentsCommandHandler } from './application/commands/jobs/handle-job-mettre-a-jour-les-segments.command'
 import { BigqueryClient } from './infrastructure/clients/bigquery.client'
 import { MessagesController } from './infrastructure/routes/messages.controller'
+import { HandleJobGenererJDDCommandHandler } from './application/commands/jobs/handle-job-generer-jdd.handler'
+import { SupportController } from './infrastructure/routes/support.controller'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -326,7 +328,9 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     FilesController,
     EtablissementsController,
     ListesDeDiffusionController,
-    MessagesController
+    MessagesController,
+    ListesDeDiffusionController,
+    SupportController
   ],
   providers: [
     ...buildQueryCommandsProviders(),
@@ -663,7 +667,9 @@ export function buildQueryCommandsProviders(): Provider[] {
     MonitorJobsCommandHandler,
     HandleJobMettreAJourLesSegmentsCommandHandler,
     MonitorJobsCommandHandler,
-    EnvoyerMessageGroupeCommandHandler
+    EnvoyerMessageGroupeCommandHandler,
+    MonitorJobsCommandHandler,
+    HandleJobGenererJDDCommandHandler
   ]
 }
 

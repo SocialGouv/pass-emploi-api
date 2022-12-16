@@ -24,6 +24,7 @@ import { HandleJobNettoyerLesDonneesCommandHandler } from './commands/jobs/handl
 import { HandleJobAgenceAnimationCollectiveCommandHandler } from './commands/jobs/handle-job-agence-animation-collective.command.db'
 import { MonitorJobsCommandHandler } from './commands/jobs/monitor-jobs.command.db'
 import { HandleJobMettreAJourLesSegmentsCommandHandler } from './commands/jobs/handle-job-mettre-a-jour-les-segments.command'
+import { HandleJobGenererJDDCommandHandler } from './commands/jobs/handle-job-generer-jdd.handler'
 
 @Injectable()
 export class WorkerService {
@@ -48,7 +49,8 @@ export class WorkerService {
     private handleJobMettreAJourCodesEvenementsCommandHandler: HandleJobMettreAJourCodesEvenementsCommandHandler,
     private handleJobAgenceAnimationCollectiveCommand: HandleJobAgenceAnimationCollectiveCommandHandler,
     private monitorJobsCommandHandler: MonitorJobsCommandHandler,
-    private handleJobMettreAJourLesSegmentsCommandHandler: HandleJobMettreAJourLesSegmentsCommandHandler
+    private handleJobMettreAJourLesSegmentsCommandHandler: HandleJobMettreAJourLesSegmentsCommandHandler,
+    private handleJobGenererJDDCommandHandler: HandleJobGenererJDDCommandHandler
   ) {
     this.apmService = getAPMInstance()
     this.workerTrackingService = getWorkerTrackingServiceInstance()
@@ -78,6 +80,11 @@ export class WorkerService {
         case Planificateur.JobType.RAPPEL_ACTION:
           await this.handlerJobRappelActionCommandHandler.execute({
             job: job as Planificateur.Job<Planificateur.JobRappelAction>
+          })
+          break
+        case Planificateur.JobType.GENERER_JDD:
+          await this.handleJobGenererJDDCommandHandler.handle({
+            job: job as Planificateur.Job<Planificateur.JobGenererJDD>
           })
           break
         case Planificateur.JobType.MAIL_CONSEILLER_MESSAGES:

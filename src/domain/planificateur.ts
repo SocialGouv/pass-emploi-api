@@ -40,7 +40,8 @@ export namespace Planificateur {
     MAJ_CODES_EVENEMENTS = 'MAJ_CODES_EVENEMENTS',
     MAJ_SEGMENTS = 'MAJ_SEGMENTS',
     MAJ_AGENCE_AC = 'MAJ_AGENCE_AC',
-    MONITORER_JOBS = 'MONITORER_JOBS'
+    MONITORER_JOBS = 'MONITORER_JOBS',
+    GENERER_JDD = 'GENERER_JDD'
   }
 
   export interface JobRendezVous {
@@ -49,6 +50,11 @@ export namespace Planificateur {
 
   export interface JobRappelAction {
     idAction: string
+  }
+
+  export interface JobGenererJDD {
+    idConseiller: string
+    menage: boolean
   }
 
   export interface JobFake {
