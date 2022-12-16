@@ -97,7 +97,7 @@
     "pino-http": "8.2.1",
     "remove-accents": "0.4.4",
     "rimraf": "3.0.2",
-    "rxjs": "7.6.0",
+    "rxjs": "7.8.0",
     "sequelize": "6.27.0",
     "sequelize-cli": "6.5.2",
     "sequelize-typescript": "2.1.5",
