@@ -49,15 +49,17 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
       return chatMessage
     }
 
+    const chatsExistants: Chat[] = chats.filter(isDefined)
+    if (chatsExistants.length !== chats.length) {
+      this.logger.error(
+        'Il manque des chats pour les bénéficiaires du conseiller'
+      )
+    }
+
     await Promise.all(
-      chats
-        .filter(isDefined)
-        .map(({ id: idChat }) =>
-          this.chatRepository.envoyerMessageBeneficiaire(
-            idChat,
-            chatMessage.data
-          )
-        )
+      chatsExistants.map(({ id: idChat }) =>
+        this.chatRepository.envoyerMessageBeneficiaire(idChat, chatMessage.data)
+      )
     )
 
     return emptySuccess()
