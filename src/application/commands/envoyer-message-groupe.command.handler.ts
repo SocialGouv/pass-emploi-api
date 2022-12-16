@@ -10,6 +10,8 @@ import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { AuthorizeConseillerForJeunes } from '../authorizers/authorize-conseiller-for-jeunes'
 import { Evenement, EvenementService } from '../../domain/evenement'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
+import { Notification } from '../../domain/notification/notification'
 
 export interface EnvoyerMessageGroupeCommand extends Command {
   idsBeneficiaires: string[]
@@ -30,8 +32,11 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
   constructor(
     @Inject(ChatRepositoryToken)
     private chatRepository: Chat.Repository,
+    @Inject(JeunesRepositoryToken)
+    private jeuneRepository: Jeune.Repository,
     private authorizeConseillerForJeunes: AuthorizeConseillerForJeunes,
-    private evenementService: EvenementService
+    private evenementService: EvenementService,
+    private notificationService: Notification.Service
   ) {
     super('EnvoyerMessageGroupeCommandHandler')
   }
@@ -61,6 +66,13 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
         this.chatRepository.envoyerMessageBeneficiaire(idChat, chatMessage.data)
       )
     )
+
+    const jeunes = await this.jeuneRepository.findAllJeunesByConseiller(
+      command.idsBeneficiaires,
+      command.idConseiller
+    )
+
+    this.notificationService.notifierLesJeunesDuNouveauMessage(jeunes)
 
     return emptySuccess()
   }
