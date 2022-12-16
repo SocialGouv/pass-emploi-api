@@ -144,14 +144,14 @@ export class FirebaseClient implements IFirebaseClient {
     const chat = collection.doc(idChat)
     const newConseillerMessageCount = (chat as unknown as FirebaseChat)
       .newConseillerMessageCount
-    const firebaseChat: FirebaseChat = {
+    const updatedFirebaseChat: FirebaseChat = {
       lastMessageContent: message.message,
       lastMessageIv: message.iv,
       lastMessageSentAt: maintenant.toISO(),
       lastMessageSentBy: SENT_BY_CONSEILLER,
       newConseillerMessageCount: newConseillerMessageCount + 1
     }
-    await chat.update(chat.id, firebaseChat)
+    await chat.update(chat.id, updatedFirebaseChat)
     const firebaseMessage: FirebaseMessage = {
       content: message.message,
       iv: message.iv,
