@@ -2,7 +2,14 @@ const path = require('path')
 require('dotenv').config({ path: path.join(__dirname, '/../../.environment') })
 
 const { Sequelize } = require('sequelize')
-const sequelize = new Sequelize(process.env.DATABASE_URL)
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  pool: {
+    max: 20,
+    min: 0,
+    acquire: 15000000,
+    idle: 10000
+  }
+})
 
 const lineReader = require('readline').createInterface({
   input: require('fs').createReadStream(
@@ -18,13 +25,50 @@ const timezoneOffsetMap = {
   '+03:00': 'Indian/Mayotte'
 }
 
-lineReader.on('line', async function (line) {
+let bufferUpdate = []
+const bufferSize = 1
+
+lineReader.on('line', function (line) {
   const { _source } = JSON.parse(line)
   const timezone = timezoneOffsetMap[_source.msg.req.query.maintenant.slice(-6)]
 
-  if (timezone && timezone !== 'Europe/Paris') {
-    await sequelize.query(`UPDATE jeune SET timezone = ? WHERE id = ?`, {
-      replacements: [timezone, _source.msg.event.utilisateur.id]
-    })
+  bufferUpdate.push({ id: _source.msg.event.utilisateur.id, timezone })
+  if (bufferUpdate.length >= bufferSize) {
+    const updateSqlString = fromBufferToSqlValues(bufferUpdate)
+    sequelize.query(`
+        UPDATE jeune
+        SET timezone = jeune_updated.timezone
+            FROM (
+                VALUES ${updateSqlString}
+            ) AS jeune_updated(id,timezone)
+        WHERE jeune.id = jeune_updated.id;
+    `)
+    bufferUpdate = []
   }
 })
+
+lineReader.on('close', async function () {
+  viderBuffer(bufferUpdate)
+})
+
+function viderBuffer(buffer) {
+  if (buffer.length > 0) {
+    const updateSqlString = fromBufferToSqlValues(bufferUpdate)
+    sequelize.query(`
+            UPDATE jeune
+            SET timezone = jeune_updated.timezone
+            FROM (
+                VALUES ${updateSqlString}
+            ) AS jeune_updated(id,timezone)
+            WHERE jeune.id = jeune_updated.id;
+        `)
+  }
+}
+
+function fromBufferToSqlValues(buffer) {
+  return buffer
+    .map(({ id, timezone }) => {
+      return `('${id}', '${timezone}')`
+    })
+    .join(',')
+}
