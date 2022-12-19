@@ -22,6 +22,9 @@ import { AsSql } from '../../../infrastructure/sequelize/types'
 import { Qualification } from '../../../domain/action/qualification'
 import { SituationsMiloSqlModel } from '../../../infrastructure/sequelize/models/situations-milo.sql-model'
 import { uneSituationsMiloJdd } from '../../../infrastructure/jdd/situation.jdd'
+import { RechercheSqlModel } from '../../../infrastructure/sequelize/models/recherche.sql-model'
+import { uneRechercheJdd } from '../../../infrastructure/jdd/recherche.jdd'
+import { unFavoriOffreEmploiJdd } from '../../../infrastructure/jdd/favori.jdd'
 import Code = Qualification.Code
 
 export interface HandleJobGenererJDDCommand extends Command {
@@ -74,6 +77,8 @@ export class HandleJobGenererJDDCommandHandler extends JobHandler<HandleJobGener
       for (const jeune of jeunesDuConseiller) {
         await this.onCreeDesActions(conseiller, jeune)
         await this.onCreeUneBonneSituation(jeune)
+        await this.onCreeUneRechercheSauvegardee(jeune)
+        await this.onCreeUnFavori(jeune)
         await this.onInscritLesJeunesAuxRendezVous(jeune, [
           unRendezVousIndividuel,
           unRendezVousAvecPlusieursJeunes,
@@ -171,6 +176,22 @@ export class HandleJobGenererJDDCommandHandler extends JobHandler<HandleJobGener
       idJeune: jeune.id
     })
     await SituationsMiloSqlModel.create(situationJdd)
+  }
+
+  private async onCreeUneRechercheSauvegardee(
+    jeune: JeuneSqlModel
+  ): Promise<void> {
+    const laRecherche = uneRechercheJdd({
+      idJeune: jeune.id
+    })
+    await RechercheSqlModel.create(laRecherche)
+  }
+
+  private async onCreeUnFavori(jeune: JeuneSqlModel): Promise<void> {
+    const leFavori = unFavoriOffreEmploiJdd({
+      idJeune: jeune.id
+    })
+    await FavoriOffreEmploiSqlModel.create(leFavori)
   }
 
   private async onCreeDesRendezVous(
@@ -338,6 +359,22 @@ async function onFaitLeMenage(jeunesIds: string[]): Promise<void> {
   })
 
   await SituationsMiloSqlModel.destroy({
+    where: {
+      idJeune: {
+        [Op.in]: jeunesIds
+      }
+    }
+  })
+
+  await RechercheSqlModel.destroy({
+    where: {
+      idJeune: {
+        [Op.in]: jeunesIds
+      }
+    }
+  })
+
+  await FavoriOffreEmploiSqlModel.destroy({
     where: {
       idJeune: {
         [Op.in]: jeunesIds
