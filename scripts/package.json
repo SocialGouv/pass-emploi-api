@@ -15,7 +15,6 @@
   "dependencies": {
     "@google-cloud/bigquery": "^6.0.3",
     "dotenv": "^16.0.2",
-    "geo-tz": "^7.0.6",
     "json2csv": "^5.0.7",
     "mongodb": "^4.10.0",
     "node-fetch": "^3.1.0",
