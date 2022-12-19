@@ -20,6 +20,8 @@ import { unRendezVousJDD } from '../../../infrastructure/jdd/rendez-vous.jdd'
 import { CodeTypeRendezVous } from '../../../domain/rendez-vous/rendez-vous'
 import { AsSql } from '../../../infrastructure/sequelize/types'
 import { Qualification } from '../../../domain/action/qualification'
+import { SituationsMiloSqlModel } from '../../../infrastructure/sequelize/models/situations-milo.sql-model'
+import { uneSituationsMiloJdd } from '../../../infrastructure/jdd/situation.jdd'
 import Code = Qualification.Code
 
 export interface HandleJobGenererJDDCommand extends Command {
@@ -71,6 +73,7 @@ export class HandleJobGenererJDDCommandHandler extends JobHandler<HandleJobGener
 
       for (const jeune of jeunesDuConseiller) {
         await this.onCreeDesActions(conseiller, jeune)
+        await this.onCreeUneBonneSituation(jeune)
         await this.onInscritLesJeunesAuxRendezVous(jeune, [
           unRendezVousIndividuel,
           unRendezVousAvecPlusieursJeunes,
@@ -163,6 +166,13 @@ export class HandleJobGenererJDDCommandHandler extends JobHandler<HandleJobGener
     ])
   }
 
+  private async onCreeUneBonneSituation(jeune: JeuneSqlModel): Promise<void> {
+    const situationJdd = uneSituationsMiloJdd({
+      idJeune: jeune.id
+    })
+    await SituationsMiloSqlModel.create(situationJdd)
+  }
+
   private async onCreeDesRendezVous(
     conseiller: ConseillerSqlModel
   ): Promise<Array<AsSql<RendezVousDto>>> {
@@ -175,6 +185,7 @@ export class HandleJobGenererJDDCommandHandler extends JobHandler<HandleJobGener
       type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
       presenceConseiller: true,
       commentaire: 'Mon premier rendez-vous',
+      titre: 'Mon premier rendez-vous',
       invitation: false,
       date: this.dateService.now().plus({ days: 2 }).toJSDate()
     })
@@ -188,6 +199,7 @@ export class HandleJobGenererJDDCommandHandler extends JobHandler<HandleJobGener
       type: CodeTypeRendezVous.AUTRE,
       presenceConseiller: true,
       commentaire: 'Mon deuxieme rendez-vous',
+      titre: 'Mon deuxieme rendez-vous',
       invitation: false,
       date: this.dateService.now().minus({ days: 1 }).toJSDate()
     })
@@ -215,6 +227,7 @@ export class HandleJobGenererJDDCommandHandler extends JobHandler<HandleJobGener
       type: CodeTypeRendezVous.ATELIER,
       presenceConseiller: false,
       commentaire: 'Mon AC Close',
+      titre: 'Une AC',
       invitation: false,
       date: this.dateService.now().minus({ days: 1 }).toJSDate(),
       dateCloture: this.dateService.now().toJSDate(),
@@ -229,7 +242,8 @@ export class HandleJobGenererJDDCommandHandler extends JobHandler<HandleJobGener
       },
       type: CodeTypeRendezVous.ATELIER,
       presenceConseiller: false,
-      commentaire: 'Mon AC Close',
+      commentaire: 'Mon AC à clore',
+      titre: 'Mon AC à clore',
       invitation: false,
       date: this.dateService.now().minus({ days: 1 }).toJSDate(),
       dateCloture: null,
@@ -316,6 +330,14 @@ async function onFaitLeMenage(jeunesIds: string[]): Promise<void> {
     }
   })
   await FavoriOffreEmploiSqlModel.destroy({
+    where: {
+      idJeune: {
+        [Op.in]: jeunesIds
+      }
+    }
+  })
+
+  await SituationsMiloSqlModel.destroy({
     where: {
       idJeune: {
         [Op.in]: jeunesIds
