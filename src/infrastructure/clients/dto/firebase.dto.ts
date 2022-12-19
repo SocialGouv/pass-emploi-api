@@ -5,7 +5,7 @@ import { Chat } from '../../../domain/chat'
 export interface FirebaseChat {
   newConseillerMessageCount: number
   lastMessageContent: string
-  lastMessageSentAt: string
+  lastMessageSentAt: Timestamp
   lastMessageSentBy: string
   lastMessageIv: string
 }

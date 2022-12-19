@@ -11,8 +11,9 @@ import { ChatCryptoService } from '../../utils/chat-crypto-service'
 import { buildError } from '../../utils/logger.module'
 import { getAPMInstance } from '../monitoring/apm.init'
 import { DateService } from '../../utils/date-service'
-import Timestamp = firestore.Timestamp
 import { FirebaseChat, FirebaseMessage } from './dto/firebase.dto'
+import Timestamp = firestore.Timestamp
+import UpdateData = firestore.UpdateData
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Utf8 = require('crypto-js/enc-utf8')
@@ -34,7 +35,7 @@ export interface IFirebaseClient {
 
 const FIREBASE_CHAT_PATH = 'chat'
 const FIREBASE_GROUP_PATH = 'groupe'
-
+const FIREBASE_MESSAGES_PATH = 'messages'
 const SENT_BY_CONSEILLER = 'conseiller'
 
 @Injectable()
@@ -142,16 +143,16 @@ export class FirebaseClient implements IFirebaseClient {
     const maintenant = this.dateService.now()
     const collection = this.firestore.collection(FIREBASE_CHAT_PATH)
     const chat = collection.doc(idChat)
-    const newConseillerMessageCount = (chat as unknown as FirebaseChat)
-      .newConseillerMessageCount
-    const updatedFirebaseChat: FirebaseChat = {
+    const newConseillerMessageCount = (
+      (await chat.get()).data() as FirebaseChat
+    ).newConseillerMessageCount
+    const updatedFirebaseChat: UpdateData<FirebaseChat> = {
       lastMessageContent: message.message,
       lastMessageIv: message.iv,
-      lastMessageSentAt: maintenant.toISO(),
+      lastMessageSentAt: Timestamp.fromMillis(maintenant.toMillis()),
       lastMessageSentBy: SENT_BY_CONSEILLER,
       newConseillerMessageCount: newConseillerMessageCount + 1
     }
-    await chat.update(chat.id, updatedFirebaseChat)
     const firebaseMessage: FirebaseMessage = {
       content: message.message,
       iv: message.iv,
@@ -164,7 +165,9 @@ export class FirebaseClient implements IFirebaseClient {
     if (message.infoPieceJointe) {
       firebaseMessage.piecesJointes = [message.infoPieceJointe]
     }
-    await chat.collection('messages').add(firebaseMessage)
+
+    await chat.collection(FIREBASE_MESSAGES_PATH).add(firebaseMessage)
+    await chat.update(updatedFirebaseChat)
   }
 
   async getNombreDeConversationsNonLues(conseillerId: string): Promise<number> {
@@ -244,7 +247,7 @@ export class FirebaseClient implements IFirebaseClient {
           t.set(
             conversations
               .doc(conversationCible.id)
-              .collection('messages')
+              .collection(FIREBASE_MESSAGES_PATH)
               .doc(),
             {
               sentBy: SENT_BY_CONSEILLER,
@@ -305,7 +308,7 @@ export class FirebaseClient implements IFirebaseClient {
 
     if (!chats.empty) {
       const messagesChiffres = await chats.docs[0].ref
-        .collection('messages')
+        .collection(FIREBASE_MESSAGES_PATH)
         .get()
       return messagesChiffres.docs.map(
         this.fromMessageChiffreToMessageArchive.bind(this)
