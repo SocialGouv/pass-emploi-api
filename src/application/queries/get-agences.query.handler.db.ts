@@ -18,7 +18,7 @@ export interface GetAgenceQuery extends Query {
   structure: Structure
 }
 
-const ID_AGENCE_MILO_JDD = '9999'
+export const ID_AGENCE_MILO_JDD = '9999'
 
 @Injectable()
 export class GetAgencesQueryHandler extends QueryHandler<
