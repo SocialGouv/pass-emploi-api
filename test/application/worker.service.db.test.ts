@@ -20,6 +20,7 @@ import { HandleJobAgenceAnimationCollectiveCommandHandler } from '../../src/appl
 import { HandleJobMettreAJourCodesEvenementsCommandHandler } from '../../src/application/commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
 import { MonitorJobsCommandHandler } from '../../src/application/commands/jobs/monitor-jobs.command.db'
 import { HandleJobMettreAJourLesSegmentsCommandHandler } from '../../src/application/commands/jobs/handle-job-mettre-a-jour-les-segments.command'
+import { HandleJobGenererJDDCommandHandler } from '../../src/application/commands/jobs/handle-job-generer-jdd.handler'
 
 describe('WorkerService', () => {
   DatabaseForTesting.prepare()
@@ -78,6 +79,9 @@ describe('WorkerService', () => {
         HandleJobMettreAJourLesSegmentsCommandHandler
       )
       const monitorJobsCommandHandler = stubClass(MonitorJobsCommandHandler)
+      const handleJobGenererJDDCommandHandler = stubClass(
+        HandleJobGenererJDDCommandHandler
+      )
 
       const workerService = new WorkerService(
         planificateurRepository,
@@ -95,7 +99,8 @@ describe('WorkerService', () => {
         handleJobMettreAJourCodesEvenementsCommandHandler,
         handleJobAgenceAnimationCollectiveCommandHandler,
         monitorJobsCommandHandler,
-        handleJobMettreAJourLesSegmentsCommandHandler
+        handleJobMettreAJourLesSegmentsCommandHandler,
+        handleJobGenererJDDCommandHandler
       )
 
       workerService.subscribe()
