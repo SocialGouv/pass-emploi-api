@@ -234,6 +234,7 @@ export class HandleJobGenererJDDCommandHandler extends JobHandler<HandleJobGener
       type: CodeTypeRendezVous.ATELIER,
       presenceConseiller: false,
       commentaire: 'Mon AC',
+      titre: 'Un atelier',
       invitation: false,
       date: this.dateService.now().plus({ days: 4 }).toJSDate(),
       idAgence: '9999'
