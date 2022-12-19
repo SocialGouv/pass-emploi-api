@@ -292,6 +292,7 @@ import { BigqueryClient } from './infrastructure/clients/bigquery.client'
 import { MessagesController } from './infrastructure/routes/messages.controller'
 import { HandleJobGenererJDDCommandHandler } from './application/commands/jobs/handle-job-generer-jdd.handler'
 import { SupportController } from './infrastructure/routes/support.controller'
+import { RefreshJddCommandHandler } from './application/commands/refresh-jdd.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -669,7 +670,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     MonitorJobsCommandHandler,
     EnvoyerMessageGroupeCommandHandler,
     MonitorJobsCommandHandler,
-    HandleJobGenererJDDCommandHandler
+    HandleJobGenererJDDCommandHandler,
+    RefreshJddCommandHandler
   ]
 }
 

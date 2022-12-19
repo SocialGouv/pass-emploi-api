@@ -1,22 +1,14 @@
-import {
-  Body,
-  Controller,
-  ForbiddenException,
-  Inject,
-  Post
-} from '@nestjs/common'
+import { Body, Controller, Post } from '@nestjs/common'
 import { ApiOAuth2, ApiProperty, ApiTags } from '@nestjs/swagger'
-import {
-  Planificateur,
-  PlanificateurRepositoryToken
-} from '../../domain/planificateur'
-import { DateService } from '../../utils/date-service'
 import { IsBoolean, IsString } from 'class-validator'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
-import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
-import { ID_AGENCE_MILO_JDD } from '../../application/queries/get-agences.query.handler.db'
-import { AgenceSqlModel } from '../sequelize/models/agence.sql-model'
+import {
+  RefreshJddCommand,
+  RefreshJddCommandHandler
+} from '../../application/commands/refresh-jdd.command.handler'
+import { isFailure } from '../../building-blocks/types/result'
+import { handleFailure } from './failure.handler'
 
 export class RefreshJDDPayload {
   @ApiProperty()
@@ -32,36 +24,23 @@ export class RefreshJDDPayload {
 @Controller()
 @ApiTags('Support')
 export class SupportController {
-  constructor(
-    private dateService: DateService,
-    @Inject(PlanificateurRepositoryToken)
-    private planificateurRepository: Planificateur.Repository
-  ) {}
+  constructor(private refreshJddCommandHandler: RefreshJddCommandHandler) {}
 
   @Post('jdd')
   async refresh(
     @Body() payload: RefreshJDDPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
-    const conseiller = await ConseillerSqlModel.findByPk(payload.idConseiller, {
-      include: [AgenceSqlModel]
-    })
-    if (
-      (utilisateur.type !== Authentification.Type.SUPPORT &&
-        utilisateur.id !== payload.idConseiller) ||
-      conseiller?.agence?.id !== ID_AGENCE_MILO_JDD
-    ) {
-      throw new ForbiddenException('Non')
+    const command: RefreshJddCommand = {
+      idConseiller: payload.idConseiller,
+      menage: payload.menage
     }
-
-    const job: Planificateur.Job<Planificateur.JobGenererJDD> = {
-      dateExecution: this.dateService.nowJs(),
-      type: Planificateur.JobType.GENERER_JDD,
-      contenu: {
-        idConseiller: payload.idConseiller,
-        menage: payload.menage
-      }
+    const result = await this.refreshJddCommandHandler.execute(
+      command,
+      utilisateur
+    )
+    if (isFailure(result)) {
+      return handleFailure(result)
     }
-    await this.planificateurRepository.creerJob(job)
   }
 }
