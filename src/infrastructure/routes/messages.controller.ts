@@ -25,6 +25,7 @@ export class MessagesController {
         message: payload.message,
         iv: payload.iv,
         idsBeneficiaires: payload.idsBeneficiaires,
+        idsListesDeDiffusion: payload.idsListesDeDiffusion,
         idConseiller: payload.idConseiller,
         infoPieceJointe: payload.infoPieceJointe
       },

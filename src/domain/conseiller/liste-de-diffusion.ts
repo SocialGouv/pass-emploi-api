@@ -30,6 +30,8 @@ export namespace ListeDeDiffusion {
 
     get(id: string): Promise<ListeDeDiffusion | undefined>
 
+    findAll(ids: string[]): Promise<ListeDeDiffusion[]>
+
     delete(id: string): Promise<void>
 
     removeBeneficiairesFromAll(
@@ -41,6 +43,7 @@ export namespace ListeDeDiffusion {
   export interface Beneficiaire {
     id: string
     dateAjout: DateTime
+    estDansLePortefeuille: boolean
   }
 
   @Injectable()
@@ -55,7 +58,8 @@ export namespace ListeDeDiffusion {
       const beneficiaires: Beneficiaire[] = infosCreation.idsBeneficiaires.map(
         idBeneficiaire => ({
           id: idBeneficiaire,
-          dateAjout: maintenant
+          dateAjout: maintenant,
+          estDansLePortefeuille: true
         })
       )
       return {
@@ -93,7 +97,8 @@ export namespace ListeDeDiffusion {
           )
           .map(idBeneficiaire => ({
             id: idBeneficiaire,
-            dateAjout: maintenant
+            dateAjout: maintenant,
+            estDansLePortefeuille: true
           }))
 
       return {

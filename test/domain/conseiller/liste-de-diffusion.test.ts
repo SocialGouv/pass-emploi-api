@@ -40,7 +40,8 @@ describe(' ListeDeDiffusion', () => {
         beneficiaires: [
           {
             id: 'un-id-beneficiaire',
-            dateAjout: maintenant
+            dateAjout: maintenant,
+            estDansLePortefeuille: true
           }
         ],
         dateDeCreation: maintenant
@@ -108,11 +109,13 @@ describe(' ListeDeDiffusion', () => {
         beneficiaires: [
           {
             id: unJeune().id,
-            dateAjout: maintenant
+            dateAjout: maintenant,
+            estDansLePortefeuille: true
           },
           {
             id: 'un-autre-id',
-            dateAjout: maintenant
+            dateAjout: maintenant,
+            estDansLePortefeuille: true
           }
         ]
       }

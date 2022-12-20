@@ -38,7 +38,10 @@ export class FichierTelechargementAuthorizer {
             utilisateur.id
           )
         const leConseillerADesJeunesDansLeFichier = jeunesDuFichier.length > 0
-        if (leConseillerADesJeunesDansLeFichier) {
+        if (
+          leConseillerADesJeunesDansLeFichier ||
+          fichierMetadata.idCreateur === utilisateur.id
+        ) {
           return emptySuccess()
         }
       }

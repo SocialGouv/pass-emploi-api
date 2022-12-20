@@ -49,13 +49,36 @@ describe('FichierTelechargementAuthorizer', () => {
       // Then
       expect(result).to.deep.equal(emptySuccess())
     })
+    it('autorise un conseiller quand il est le créateur', async () => {
+      //Given
+      const utilisateur = unUtilisateurConseiller()
+      fichierRepository.getFichierMetadata.withArgs(idFichier).resolves(
+        unFichierMetadata({
+          idsJeunes: ['autre-id'],
+          idCreateur: utilisateur.id
+        })
+      )
+      jeuneRepository.findAllJeunesByConseiller.resolves([])
+
+      // When
+      const result = await fichierTelechargementAuthorizer.authorize(
+        idFichier,
+        utilisateur
+      )
+
+      // Then
+      expect(result).to.deep.equal(emptySuccess())
+    })
     it("n'autorise pas le conseiller quand aucun de ses jeunes n'est présent", async () => {
       //Given
       const utilisateur = unUtilisateurConseiller()
       const idJeuneDuConseiller = '1'
-      fichierRepository.getFichierMetadata
-        .withArgs(idFichier)
-        .resolves(unFichierMetadata({ idsJeunes: [idJeuneDuConseiller] }))
+      fichierRepository.getFichierMetadata.withArgs(idFichier).resolves(
+        unFichierMetadata({
+          idsJeunes: [idJeuneDuConseiller],
+          idCreateur: 'un-autre-createur'
+        })
+      )
       jeuneRepository.findAllJeunesByConseiller
         .withArgs([idJeuneDuConseiller], utilisateur.id)
         .resolves([])
