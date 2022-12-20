@@ -76,11 +76,13 @@ describe(' ListeDeDiffusionSqlRepository', () => {
         beneficiaires: [
           {
             id: unJeuneQuiResteDansLaListe.id,
-            dateAjout: uneDatetime()
+            dateAjout: uneDatetime(),
+            estDansLePortefeuille: true
           },
           {
             id: unJeuneQuiQuitteLaListe.id,
-            dateAjout: uneDatetime()
+            dateAjout: uneDatetime(),
+            estDansLePortefeuille: true
           }
         ]
       })
@@ -91,11 +93,13 @@ describe(' ListeDeDiffusionSqlRepository', () => {
         beneficiaires: [
           {
             id: unJeuneQuiResteDansLaListe.id,
-            dateAjout: uneDatetime()
+            dateAjout: uneDatetime(),
+            estDansLePortefeuille: true
           },
           {
             id: unNouveauJeuneDansLaListe.id,
-            dateAjout: uneAutreDatetime()
+            dateAjout: uneAutreDatetime(),
+            estDansLePortefeuille: true
           }
         ]
       }

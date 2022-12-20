@@ -5,13 +5,17 @@ import admin, { firestore } from 'firebase-admin'
 import { getMessaging, TokenMessage } from 'firebase-admin/messaging'
 import { ArchiveJeune } from '../../domain/archive-jeune'
 import { Authentification } from '../../domain/authentification'
-import { Chat, ChatMessage } from '../../domain/chat'
+import { Chat, ChatGroupe, ChatMessage, GroupeMessage } from '../../domain/chat'
 import { Jeune } from '../../domain/jeune/jeune'
 import { ChatCryptoService } from '../../utils/chat-crypto-service'
 import { buildError } from '../../utils/logger.module'
 import { getAPMInstance } from '../monitoring/apm.init'
 import { DateService } from '../../utils/date-service'
-import { FirebaseChat, FirebaseMessage } from './dto/firebase.dto'
+import {
+  FirebaseChat,
+  FirebaseGroupeMessage,
+  FirebaseMessage
+} from './dto/firebase.dto'
 import Timestamp = firestore.Timestamp
 import UpdateData = firestore.UpdateData
 
@@ -139,6 +143,21 @@ export class FirebaseClient implements IFirebaseClient {
     return
   }
 
+  async recupererGroupe(
+    idListeDeDiffusion: string
+  ): Promise<ChatGroupe | undefined> {
+    const collection = this.firestore.collection(FIREBASE_GROUP_PATH)
+    const groupes = await collection
+      .where('groupeId', '==', idListeDeDiffusion)
+      .get()
+
+    if (!groupes.empty) {
+      return { id: groupes.docs[0].id }
+    }
+
+    return
+  }
+
   async envoyerMessage(idChat: string, message: ChatMessage): Promise<void> {
     const maintenant = this.dateService.now()
     const collection = this.firestore.collection(FIREBASE_CHAT_PATH)
@@ -168,6 +187,36 @@ export class FirebaseClient implements IFirebaseClient {
 
     await chat.collection(FIREBASE_MESSAGES_PATH).add(firebaseMessage)
     await chat.update(updatedFirebaseChat)
+  }
+
+  async envoyerMessageGroupe(
+    idGroupe: string,
+    message: GroupeMessage
+  ): Promise<void> {
+    const maintenant = this.dateService.now()
+    const collection = this.firestore.collection(FIREBASE_GROUP_PATH)
+    const groupe = collection.doc(idGroupe)
+    const updatedFirebaseChat: UpdateData<FirebaseChat> = {
+      lastMessageContent: message.message,
+      lastMessageIv: message.iv,
+      lastMessageSentAt: Timestamp.fromMillis(maintenant.toMillis())
+    }
+    const firebaseMessage: FirebaseGroupeMessage = {
+      content: message.message,
+      iv: message.iv,
+      conseillerId: message.idConseiller,
+      sentBy: SENT_BY_CONSEILLER,
+      creationDate: Timestamp.fromMillis(maintenant.toMillis()),
+      type: message.type,
+      idsBeneficiaires: message.idsBeneficiaires
+    }
+
+    if (message.infoPieceJointe) {
+      firebaseMessage.piecesJointes = [message.infoPieceJointe]
+    }
+
+    await groupe.collection(FIREBASE_MESSAGES_PATH).add(firebaseMessage)
+    await groupe.update(updatedFirebaseChat)
   }
 
   async getNombreDeConversationsNonLues(conseillerId: string): Promise<number> {

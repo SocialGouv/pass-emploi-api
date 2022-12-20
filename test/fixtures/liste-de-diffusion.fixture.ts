@@ -11,7 +11,13 @@ export const uneListeDeDiffusion = (
     titre: 'Liste de diffusion',
     dateDeCreation: uneDatetime(),
     idConseiller: unConseiller().id,
-    beneficiaires: [{ id: unJeune().id, dateAjout: uneDatetime() }]
+    beneficiaires: [
+      {
+        id: unJeune().id,
+        dateAjout: uneDatetime(),
+        estDansLePortefeuille: true
+      }
+    ]
   }
 
   return { ...defaults, ...args }

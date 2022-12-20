@@ -10,6 +10,8 @@ import { Op, Sequelize } from 'sequelize'
 import { ListeDeDiffusionJeuneAssociationSqlModel } from '../../sequelize/models/liste-de-diffusion-jeune-association.sql-model'
 import { DateTime } from 'luxon'
 import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
+import { ListeDeDiffusion } from '../../../domain/conseiller/liste-de-diffusion'
+import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
 
 export class ListeDeDiffusionSqlRepository
   implements Conseiller.ListeDeDiffusion.Repository
@@ -53,16 +55,18 @@ export class ListeDeDiffusionSqlRepository
 
   async get(id: string): Promise<Conseiller.ListeDeDiffusion | undefined> {
     const sqlModel = await ListeDeDiffusionSqlModel.findByPk(id, {
-      include: [JeuneSqlModel]
+      include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }]
     })
     if (!sqlModel) return undefined
-    return {
-      id: sqlModel.id,
-      titre: sqlModel.titre,
-      dateDeCreation: DateTime.fromJSDate(sqlModel.dateDeCreation),
-      beneficiaires: sqlModel.jeunes.map(getJeuneDeLaListe),
-      idConseiller: sqlModel.idConseiller
-    }
+    return toListeDeDiffusion(sqlModel)
+  }
+
+  async findAll(ids: string[]): Promise<Conseiller.ListeDeDiffusion[]> {
+    const sqlModel = await ListeDeDiffusionSqlModel.findAll({
+      where: { id: { [Op.in]: ids } },
+      include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }]
+    })
+    return sqlModel.map(toListeDeDiffusion)
   }
 
   async delete(id: string): Promise<void> {
@@ -88,18 +92,34 @@ export class ListeDeDiffusionSqlRepository
   }
 }
 
+function toListeDeDiffusion(
+  sqlModel: ListeDeDiffusionSqlModel
+): ListeDeDiffusion {
+  return {
+    id: sqlModel.id,
+    titre: sqlModel.titre,
+    dateDeCreation: DateTime.fromJSDate(sqlModel.dateDeCreation),
+    beneficiaires: sqlModel.jeunes.map(jeuneSqlModel =>
+      getJeuneDeLaListe(jeuneSqlModel, sqlModel.idConseiller)
+    ),
+    idConseiller: sqlModel.idConseiller
+  }
+}
+
 // La requête SQL qui récupère les jeunes d'une liste de diffusion passe par une table de jointure
 // Dans le résultat de la requête, on peut récupérer les informations supplémentaires de l'association
 // Pour palier au problème de typage, on utilise la technique ci-dessous.
 function getJeuneDeLaListe(
-  jeuneSqlModel: JeuneSqlModel
-): Conseiller.ListeDeDiffusion.Beneficiaire {
+  jeuneSqlModel: JeuneSqlModel,
+  idConseiller: string
+): ListeDeDiffusion.Beneficiaire {
   const association = jeuneSqlModel.get(
     ListeDeDiffusionJeuneAssociationSqlModel.name
   ) as ListeDeDiffusionJeuneAssociationSqlModel | undefined
   if (!association) throw new Error('Association non trouvée')
   return {
     id: jeuneSqlModel.id,
-    dateAjout: DateTime.fromJSDate(association.dateAjout)
+    dateAjout: DateTime.fromJSDate(association.dateAjout),
+    estDansLePortefeuille: jeuneSqlModel.conseiller?.id === idConseiller
   }
 }

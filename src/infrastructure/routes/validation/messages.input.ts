@@ -1,11 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import {
-  ArrayNotEmpty,
-  IsArray,
-  IsNotEmpty,
-  IsString,
-  ValidateNested
-} from 'class-validator'
+import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 
 export class InfoPieceJointePayload {
@@ -27,11 +21,15 @@ export class EnvoyerMessagePayload {
   @IsString()
   iv: string
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsArray()
-  @ArrayNotEmpty()
-  @IsNotEmpty({ each: true })
-  idsBeneficiaires: string[]
+  @IsOptional()
+  idsBeneficiaires?: string[]
+
+  @ApiPropertyOptional()
+  @IsArray()
+  @IsOptional()
+  idsListesDeDiffusion?: string[]
 
   @ApiProperty()
   @IsString()

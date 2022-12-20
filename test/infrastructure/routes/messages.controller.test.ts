@@ -43,6 +43,7 @@ describe('MessagesController', () => {
   describe('POST /messages', () => {
     const command: EnvoyerMessageGroupeCommand = {
       idsBeneficiaires: ['jeune-1', 'jeune-2'],
+      idsListesDeDiffusion: undefined,
       message: 'un message',
       iv: '123456',
       idConseiller: '41',

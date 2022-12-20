@@ -1,16 +1,26 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { emptySuccess, Result } from '../../building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  isFailure,
+  Result
+} from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { AuthorizeConseillerForJeunes } from '../authorizers/authorize-conseiller-for-jeunes'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification/notification'
+import { ListeDeDiffusionRepositoryToken } from '../../domain/conseiller/liste-de-diffusion'
+import { Conseiller } from '../../domain/conseiller/conseiller'
+import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
+import { AuthorizeListeDeDiffusion } from '../authorizers/authorize-liste-de-diffusion'
 
 export interface EnvoyerMessageGroupeCommand extends Command {
-  idsBeneficiaires: string[]
+  idsBeneficiaires?: string[]
+  idsListesDeDiffusion?: string[]
   message: string
   iv: string
   idConseiller: string
@@ -30,7 +40,10 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
     private chatRepository: Chat.Repository,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository,
+    @Inject(ListeDeDiffusionRepositoryToken)
+    private listeDeDiffusionRepository: Conseiller.ListeDeDiffusion.Repository,
     private authorizeConseillerForJeunes: AuthorizeConseillerForJeunes,
+    private authorizeListeDeDiffusion: AuthorizeListeDeDiffusion,
     private evenementService: EvenementService,
     private notificationService: Notification.Service
   ) {
@@ -38,14 +51,37 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
   }
 
   async handle(command: EnvoyerMessageGroupeCommand): Promise<Result> {
-    const { idsBeneficiaires } = command
+    const { idsBeneficiaires, idsListesDeDiffusion } = command
+
+    let idsBeneficiaireDeLaListeDeDiffusion: string[] = []
+
+    if (idsListesDeDiffusion) {
+      const listesDeDiffusion = await this.listeDeDiffusionRepository.findAll(
+        idsListesDeDiffusion
+      )
+
+      await this.envoyerLesMessagesAuxListesDeDiffusion(
+        listesDeDiffusion,
+        command
+      )
+
+      idsBeneficiaireDeLaListeDeDiffusion = listesDeDiffusion
+        .map(liste => liste.beneficiaires)
+        .flat()
+        .filter(beneficiaire => beneficiaire.estDansLePortefeuille)
+        .map(beneficiaire => beneficiaire.id)
+        .filter(isUnique)
+    }
+
+    const idsBeneficiairesUniques = idsBeneficiaireDeLaListeDeDiffusion
+      .concat(idsBeneficiaires || [])
+      .filter(isUnique)
 
     const chats = await Promise.all(
-      idsBeneficiaires.map(id => this.chatRepository.recupererChat(id))
+      idsBeneficiairesUniques.map(id => this.chatRepository.recupererChat(id))
     )
 
     const chatMessage = Chat.creerMessage(command)
-
     const chatsExistants: Chat[] = chats.filter(isDefined)
     if (chatsExistants.length !== chats.length) {
       this.logger.error(
@@ -59,24 +95,76 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
       )
     )
 
-    const jeunes = await this.jeuneRepository.findAllJeunesByConseiller(
-      chatsExistants.map(chat => chat.idBeneficiaire),
-      command.idConseiller
-    )
+    const jeunes = await this.jeuneRepository.findAll(idsBeneficiairesUniques, {
+      avecConfiguration: true
+    })
 
     this.notificationService.notifierLesJeunesDuNouveauMessage(jeunes)
 
     return emptySuccess()
   }
 
+  private async envoyerLesMessagesAuxListesDeDiffusion(
+    listesDeDiffusion: Conseiller.ListeDeDiffusion[],
+    command: EnvoyerMessageGroupeCommand
+  ): Promise<void> {
+    await Promise.all(
+      listesDeDiffusion.map(async liste => {
+        const groupe = await this.chatRepository.recupererGroupe(liste.id)
+        if (!groupe) {
+          this.logger.error(
+            'Il manque des chats pour les bénéficiaires du conseiller'
+          )
+        } else {
+          const groupeMessage = Chat.creerMessageGroupe({
+            ...command,
+            idsBeneficiaires: liste.beneficiaires
+              .filter(beneficiaire => beneficiaire.estDansLePortefeuille)
+              .map(beneficiaire => beneficiaire.id)
+          })
+
+          await this.chatRepository.envoyerMessageGroupe(
+            groupe.id,
+            groupeMessage
+          )
+        }
+      })
+    )
+  }
+
   async authorize(
     command: EnvoyerMessageGroupeCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.authorizeConseillerForJeunes.authorize(
-      command.idsBeneficiaires,
-      utilisateur
-    )
+    if (!command.idsBeneficiaires && !command.idsListesDeDiffusion) {
+      return failure(new MauvaiseCommandeError('Aucun destinataire'))
+    }
+
+    let result: Result
+
+    if (command.idsBeneficiaires) {
+      result = await this.authorizeConseillerForJeunes.authorize(
+        command.idsBeneficiaires,
+        utilisateur
+      )
+      if (isFailure(result)) {
+        return result
+      }
+    }
+
+    if (command.idsListesDeDiffusion) {
+      for (const liste of command.idsListesDeDiffusion) {
+        const result = await this.authorizeListeDeDiffusion.authorize(
+          liste,
+          utilisateur
+        )
+        if (isFailure(result)) {
+          return result
+        }
+      }
+    }
+
+    return emptySuccess()
   }
 
   async monitor(
@@ -85,7 +173,7 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
   ): Promise<void> {
     let code: Evenement.Code = Evenement.Code.MESSAGE_ENVOYE
 
-    if (command.idsBeneficiaires.length > 1) {
+    if (command.idsBeneficiaires!.length > 1) {
       if (command.infoPieceJointe) {
         code = Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_PJ
       } else {
@@ -100,4 +188,8 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
 
 function isDefined<T>(argument: T | undefined): argument is T {
   return argument !== undefined
+}
+
+function isUnique(value: string, index: number, self: string[]): boolean {
+  return self.indexOf(value) === index
 }

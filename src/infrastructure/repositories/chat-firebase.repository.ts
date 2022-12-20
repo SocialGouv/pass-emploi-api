@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { Chat, ChatMessage } from '../../domain/chat'
+import { Chat, ChatGroupe, ChatMessage, GroupeMessage } from '../../domain/chat'
 import { Jeune } from '../../domain/jeune/jeune'
 import { FirebaseClient } from '../clients/firebase-client'
 
@@ -28,11 +28,24 @@ export class ChatFirebaseRepository implements Chat.Repository {
     return this.firebaseClient.recupererChat(idJeune)
   }
 
+  async recupererGroupe(
+    idListeDeDiffusion: string
+  ): Promise<ChatGroupe | undefined> {
+    return this.firebaseClient.recupererGroupe(idListeDeDiffusion)
+  }
+
   async envoyerMessageBeneficiaire(
     idChat: string,
     message: ChatMessage
   ): Promise<void> {
     await this.firebaseClient.envoyerMessage(idChat, message)
+  }
+
+  async envoyerMessageGroupe(
+    idChat: string,
+    message: GroupeMessage
+  ): Promise<void> {
+    await this.firebaseClient.envoyerMessageGroupe(idChat, message)
   }
 
   async getNombreDeConversationsNonLues(conseillerId: string): Promise<number> {

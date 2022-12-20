@@ -22,3 +22,7 @@ export interface FirebaseMessage {
     nom: string
   }>
 }
+
+export interface FirebaseGroupeMessage extends FirebaseMessage {
+  idsBeneficiaires: string[]
+}
