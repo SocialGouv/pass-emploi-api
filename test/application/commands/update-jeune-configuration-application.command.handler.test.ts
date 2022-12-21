@@ -49,7 +49,8 @@ describe('UpdateJeuneConfigurationApplicationCommand', () => {
           pushNotificationToken: 'leNouveauToken',
           appVersion: 'uneAppVersion',
           installationId: 'uneInstallationId',
-          instanceId: 'uneInstanceId'
+          instanceId: 'uneInstanceId',
+          timeZone: 'Europe/Paris'
         }
         const jeune = unJeune()
         jeuneRepository.get.withArgs('idJeune').resolves(jeune)
@@ -68,7 +69,8 @@ describe('UpdateJeuneConfigurationApplicationCommand', () => {
             appVersion: 'uneAppVersion',
             installationId: 'uneInstallationId',
             instanceId: 'uneInstanceId',
-            dateDerniereActualisationToken: uneDatetime().toJSDate()
+            dateDerniereActualisationToken: uneDatetime().toJSDate(),
+            timeZone: 'Europe/Paris'
           }
         expect(
           jeuneConfigurationApplicationRepository.save
