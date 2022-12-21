@@ -2,7 +2,7 @@ import { Jeune } from './jeune/jeune'
 
 export const ChatRepositoryToken = 'ChatRepositoryToken'
 
-export interface Chat {
+export interface ChatIndividuel {
   id: string
   idBeneficiaire: string
 }
@@ -11,7 +11,7 @@ export interface ChatGroupe {
   id: string
 }
 
-export interface ChatMessage {
+export interface MessageIndividuel {
   message: string
   iv: string
   idConseiller: string
@@ -22,7 +22,7 @@ export interface ChatMessage {
   }
 }
 
-export interface GroupeMessage extends ChatMessage {
+export interface MessageGroupe extends MessageIndividuel {
   idsBeneficiaires: string[]
 }
 
@@ -57,18 +57,22 @@ export namespace Chat {
       idListeDeDiffusion: string
     ): Promise<void>
 
-    recupererChat(idBeneficiaire: string): Promise<Chat | undefined>
+    recupererConversationIndividuelle(
+      idBeneficiaire: string
+    ): Promise<ChatIndividuel | undefined>
 
-    recupererGroupe(idListeDeDiffusion: string): Promise<ChatGroupe | undefined>
+    recupererConversationGroupe(
+      idListeDeDiffusion: string
+    ): Promise<ChatGroupe | undefined>
 
-    envoyerMessageBeneficiaire(
+    envoyerMessageIndividuel(
       idChat: string,
-      message: ChatMessage
+      message: MessageIndividuel
     ): Promise<void>
 
     envoyerMessageGroupe(
       idGroupe: string,
-      message: GroupeMessage
+      message: MessageGroupe
     ): Promise<void>
 
     getNombreDeConversationsNonLues(conseillerId: string): Promise<number>
@@ -80,7 +84,7 @@ export namespace Chat {
     envoyerMessageTransfert(jeune: Jeune): Promise<void>
   }
 
-  export function creerMessage(aCreer: MessageACreer): ChatMessage {
+  export function creerMessage(aCreer: MessageACreer): MessageIndividuel {
     return {
       message: aCreer.message,
       iv: aCreer.iv,
@@ -94,7 +98,7 @@ export namespace Chat {
 
   export function creerMessageGroupe(
     aCreer: MessageGroupeACreer
-  ): GroupeMessage {
+  ): MessageGroupe {
     return {
       message: aCreer.message,
       iv: aCreer.iv,

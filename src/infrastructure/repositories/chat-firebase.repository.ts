@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common'
-import { Chat, ChatGroupe, ChatMessage, GroupeMessage } from '../../domain/chat'
+import {
+  Chat,
+  ChatIndividuel,
+  ChatGroupe,
+  MessageIndividuel,
+  MessageGroupe
+} from '../../domain/chat'
 import { Jeune } from '../../domain/jeune/jeune'
 import { FirebaseClient } from '../clients/firebase-client'
 
@@ -24,26 +30,28 @@ export class ChatFirebaseRepository implements Chat.Repository {
     )
   }
 
-  async recupererChat(idJeune: string): Promise<Chat | undefined> {
-    return this.firebaseClient.recupererChat(idJeune)
+  async recupererConversationIndividuelle(
+    idJeune: string
+  ): Promise<ChatIndividuel | undefined> {
+    return this.firebaseClient.recupererChatIndividuel(idJeune)
   }
 
-  async recupererGroupe(
+  async recupererConversationGroupe(
     idListeDeDiffusion: string
   ): Promise<ChatGroupe | undefined> {
-    return this.firebaseClient.recupererGroupe(idListeDeDiffusion)
+    return this.firebaseClient.recupererChatGroupe(idListeDeDiffusion)
   }
 
-  async envoyerMessageBeneficiaire(
+  async envoyerMessageIndividuel(
     idChat: string,
-    message: ChatMessage
+    message: MessageIndividuel
   ): Promise<void> {
-    await this.firebaseClient.envoyerMessage(idChat, message)
+    await this.firebaseClient.envoyerMessageIndividuel(idChat, message)
   }
 
   async envoyerMessageGroupe(
     idChat: string,
-    message: GroupeMessage
+    message: MessageGroupe
   ): Promise<void> {
     await this.firebaseClient.envoyerMessageGroupe(idChat, message)
   }

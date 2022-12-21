@@ -8,12 +8,15 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Chat, ChatRepositoryToken } from '../../domain/chat'
+import { Chat, ChatIndividuel, ChatRepositoryToken } from '../../domain/chat'
 import { AuthorizeConseillerForJeunes } from '../authorizers/authorize-conseiller-for-jeunes'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification/notification'
-import { ListeDeDiffusionRepositoryToken } from '../../domain/conseiller/liste-de-diffusion'
+import {
+  ListeDeDiffusionRepositoryToken,
+  ListeDeDiffusion
+} from '../../domain/conseiller/liste-de-diffusion'
 import { Conseiller } from '../../domain/conseiller/conseiller'
 import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
 import { AuthorizeListeDeDiffusion } from '../authorizers/authorize-liste-de-diffusion'
@@ -53,7 +56,7 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
   async handle(command: EnvoyerMessageGroupeCommand): Promise<Result> {
     const { idsBeneficiaires, idsListesDeDiffusion } = command
 
-    let idsBeneficiaireDeLaListeDeDiffusion: string[] = []
+    let idsBeneficiaireDesListesDeDiffusion: string[] = []
 
     if (idsListesDeDiffusion) {
       const listesDeDiffusion = await this.listeDeDiffusionRepository.findAll(
@@ -65,24 +68,22 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
         command
       )
 
-      idsBeneficiaireDeLaListeDeDiffusion = listesDeDiffusion
-        .map(liste => liste.beneficiaires)
-        .flat()
-        .filter(beneficiaire => beneficiaire.estDansLePortefeuille)
-        .map(beneficiaire => beneficiaire.id)
-        .filter(isUnique)
+      idsBeneficiaireDesListesDeDiffusion =
+        getIdsBeneficiaireDesListesDeDiffusion(listesDeDiffusion)
     }
 
-    const idsBeneficiairesUniques = idsBeneficiaireDeLaListeDeDiffusion
+    const idsBeneficiairesUniques = idsBeneficiaireDesListesDeDiffusion
       .concat(idsBeneficiaires || [])
       .filter(isUnique)
 
     const chats = await Promise.all(
-      idsBeneficiairesUniques.map(id => this.chatRepository.recupererChat(id))
+      idsBeneficiairesUniques.map(id =>
+        this.chatRepository.recupererConversationIndividuelle(id)
+      )
     )
 
     const chatMessage = Chat.creerMessage(command)
-    const chatsExistants: Chat[] = chats.filter(isDefined)
+    const chatsExistants: ChatIndividuel[] = chats.filter(isDefined)
     if (chatsExistants.length !== chats.length) {
       this.logger.error(
         'Il manque des chats pour les bénéficiaires du conseiller'
@@ -91,7 +92,7 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
 
     await Promise.all(
       chatsExistants.map(({ id: idChat }) =>
-        this.chatRepository.envoyerMessageBeneficiaire(idChat, chatMessage)
+        this.chatRepository.envoyerMessageIndividuel(idChat, chatMessage)
       )
     )
 
@@ -110,7 +111,9 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
   ): Promise<void> {
     await Promise.all(
       listesDeDiffusion.map(async liste => {
-        const groupe = await this.chatRepository.recupererGroupe(liste.id)
+        const groupe = await this.chatRepository.recupererConversationGroupe(
+          liste.id
+        )
         if (!groupe) {
           this.logger.error(
             'Il manque des chats pour les bénéficiaires du conseiller'
@@ -118,9 +121,9 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
         } else {
           const groupeMessage = Chat.creerMessageGroupe({
             ...command,
-            idsBeneficiaires: liste.beneficiaires
-              .filter(beneficiaire => beneficiaire.estDansLePortefeuille)
-              .map(beneficiaire => beneficiaire.id)
+            idsBeneficiaires: ListeDeDiffusion.getBeneficiairesDuPortefeuille(
+              liste
+            ).map(beneficiaire => beneficiaire.id)
           })
 
           await this.chatRepository.envoyerMessageGroupe(
@@ -153,9 +156,9 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
     }
 
     if (command.idsListesDeDiffusion) {
-      for (const liste of command.idsListesDeDiffusion) {
+      for (const idListe of command.idsListesDeDiffusion) {
         const result = await this.authorizeListeDeDiffusion.authorize(
-          liste,
+          idListe,
           utilisateur
         )
         if (isFailure(result)) {
@@ -184,6 +187,15 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
     }
     await this.evenementService.creer(code, utilisateur)
   }
+}
+
+function getIdsBeneficiaireDesListesDeDiffusion(
+  listesDeDiffusion: Conseiller.ListeDeDiffusion[]
+): string[] {
+  return listesDeDiffusion
+    .map(liste => ListeDeDiffusion.getBeneficiairesDuPortefeuille(liste))
+    .flat()
+    .map(beneficiaire => beneficiaire.id)
 }
 
 function isDefined<T>(argument: T | undefined): argument is T {

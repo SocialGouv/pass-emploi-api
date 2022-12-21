@@ -5,7 +5,12 @@ import admin, { firestore } from 'firebase-admin'
 import { getMessaging, TokenMessage } from 'firebase-admin/messaging'
 import { ArchiveJeune } from '../../domain/archive-jeune'
 import { Authentification } from '../../domain/authentification'
-import { Chat, ChatGroupe, ChatMessage, GroupeMessage } from '../../domain/chat'
+import {
+  ChatGroupe,
+  ChatIndividuel,
+  MessageGroupe,
+  MessageIndividuel
+} from '../../domain/chat'
 import { Jeune } from '../../domain/jeune/jeune'
 import { ChatCryptoService } from '../../utils/chat-crypto-service'
 import { buildError } from '../../utils/logger.module'
@@ -132,7 +137,9 @@ export class FirebaseClient implements IFirebaseClient {
     }
   }
 
-  async recupererChat(idBeneficiaire: string): Promise<Chat | undefined> {
+  async recupererChatIndividuel(
+    idBeneficiaire: string
+  ): Promise<ChatIndividuel | undefined> {
     const collection = this.firestore.collection(FIREBASE_CHAT_PATH)
     const chats = await collection.where('jeuneId', '==', idBeneficiaire).get()
 
@@ -143,7 +150,7 @@ export class FirebaseClient implements IFirebaseClient {
     return
   }
 
-  async recupererGroupe(
+  async recupererChatGroupe(
     idListeDeDiffusion: string
   ): Promise<ChatGroupe | undefined> {
     const collection = this.firestore.collection(FIREBASE_GROUP_PATH)
@@ -158,7 +165,10 @@ export class FirebaseClient implements IFirebaseClient {
     return
   }
 
-  async envoyerMessage(idChat: string, message: ChatMessage): Promise<void> {
+  async envoyerMessageIndividuel(
+    idChat: string,
+    message: MessageIndividuel
+  ): Promise<void> {
     const maintenant = this.dateService.now()
     const collection = this.firestore.collection(FIREBASE_CHAT_PATH)
     const chat = collection.doc(idChat)
@@ -191,7 +201,7 @@ export class FirebaseClient implements IFirebaseClient {
 
   async envoyerMessageGroupe(
     idGroupe: string,
-    message: GroupeMessage
+    message: MessageGroupe
   ): Promise<void> {
     const maintenant = this.dateService.now()
     const collection = this.firestore.collection(FIREBASE_GROUP_PATH)

@@ -80,11 +80,13 @@ describe('CreateListeDeDiffusionCommandHandler', () => {
         beneficiaires: [
           {
             id: 'un-id-jeune-1',
-            dateAjout: maintenant
+            dateAjout: maintenant,
+            estDansLePortefeuille: true
           },
           {
             id: 'un-id-jeune-2',
-            dateAjout: maintenant
+            dateAjout: maintenant,
+            estDansLePortefeuille: true
           }
         ]
       }
