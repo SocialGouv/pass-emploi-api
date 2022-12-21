@@ -1323,7 +1323,8 @@ describe('JeunesController', () => {
               pushNotificationToken: payload.registration_token,
               appVersion: 'coucou',
               installationId: 'xxx-xx-xxx',
-              instanceId: 'yyy-yy-yyy'
+              instanceId: 'yyy-yy-yyy',
+              timeZone: 'Europe/Paris'
             },
             unUtilisateurDecode()
           )
@@ -1336,6 +1337,7 @@ describe('JeunesController', () => {
           .set('x-appversion', 'coucou')
           .set('x-installationid', 'xxx-xx-xxx')
           .set('x-instanceid', 'yyy-yy-yyy')
+          .set('x-timezone', 'Europe/Paris')
           .send(payload)
           // Then
           .expect(HttpStatus.OK)
@@ -1350,7 +1352,8 @@ describe('JeunesController', () => {
               pushNotificationToken: payload.registration_token,
               appVersion: undefined,
               installationId: undefined,
-              instanceId: undefined
+              instanceId: undefined,
+              timeZone: undefined
             },
             unUtilisateurDecode()
           )
