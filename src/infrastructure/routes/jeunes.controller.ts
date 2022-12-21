@@ -190,6 +190,10 @@ export class JeunesController {
     name: 'x-instanceid',
     required: false
   })
+  @ApiHeader({
+    name: 'x-timezone',
+    required: false
+  })
   @Put(':idJeune/configuration-application')
   async updateConfiguration(
     @Param('idJeune') idJeune: string,
@@ -197,7 +201,8 @@ export class JeunesController {
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @Headers('x-appversion') appVersion?: string,
     @Headers('x-installationid') installationId?: string,
-    @Headers('x-instanceid') instanceId?: string
+    @Headers('x-instanceid') instanceId?: string,
+    @Headers('x-timezone') timeZone?: string
   ): Promise<void> {
     const result =
       await this.updateJeuneConfigurationApplicationCommandHandler.execute(
@@ -206,7 +211,8 @@ export class JeunesController {
           pushNotificationToken: putNotificationTokenInput.registration_token,
           appVersion,
           installationId,
-          instanceId
+          instanceId,
+          timeZone
         },
         utilisateur
       )
