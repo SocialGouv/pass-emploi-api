@@ -8,6 +8,7 @@ export interface ConfigurationApplication {
   appVersion?: string
   installationId?: string
   instanceId?: string
+  timeZone?: string
 }
 
 export namespace ConfigurationApplication {
@@ -30,7 +31,8 @@ export namespace ConfigurationApplication {
         dateDerniereActualisationToken: this.dateService.nowJs(),
         installationId: nouvelleConfiguration.installationId,
         instanceId: nouvelleConfiguration.instanceId,
-        appVersion: nouvelleConfiguration.appVersion
+        appVersion: nouvelleConfiguration.appVersion,
+        timeZone: nouvelleConfiguration.timeZone
       }
     }
   }
