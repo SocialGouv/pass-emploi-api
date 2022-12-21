@@ -116,16 +116,6 @@ describe('HandleJobMettreAJourLesSegmentsCommandHandler', () => {
           nbJeunes: 4
         })
       })
-      it('construit le fichier metadata', async () => {
-        // Then
-        const expectedMetadataFile = fs.readFileSync(
-          './test/fixtures/expected-files/metadata.json'
-        )
-        const resultMetadataFile = fs.readFileSync('./tmp/metadata.json')
-        expect(resultMetadataFile.toString()).to.equal(
-          expectedMetadataFile.toString()
-        )
-      })
       it('construit le fichier memberships', async () => {
         // Then
         const expectedMembershipsFile = fs.readFileSync(
