@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator'
+import { IsArray, IsString, ValidateIf, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 
 export class InfoPieceJointePayload {
@@ -22,13 +22,13 @@ export class EnvoyerMessagePayload {
   iv: string
 
   @ApiPropertyOptional()
+  @ValidateIf(dto => !Boolean(dto.idsListesDeDiffusion))
   @IsArray()
-  @IsOptional()
   idsBeneficiaires?: string[]
 
   @ApiPropertyOptional()
+  @ValidateIf(dto => !Boolean(dto.idsBeneficiaires))
   @IsArray()
-  @IsOptional()
   idsListesDeDiffusion?: string[]
 
   @ApiProperty()

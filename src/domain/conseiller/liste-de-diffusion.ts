@@ -46,6 +46,14 @@ export namespace ListeDeDiffusion {
     estDansLePortefeuille: boolean
   }
 
+  export function getBeneficiairesDuPortefeuille(
+    listeDeDiffusion: ListeDeDiffusion
+  ): ListeDeDiffusion.Beneficiaire[] {
+    return listeDeDiffusion.beneficiaires.filter(
+      beneficiaire => beneficiaire.estDansLePortefeuille
+    )
+  }
+
   @Injectable()
   export class Factory {
     constructor(

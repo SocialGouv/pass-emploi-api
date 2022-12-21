@@ -19,7 +19,6 @@ import {
   emptySuccess,
   failure
 } from '../../../src/building-blocks/types/result'
-import TypeMessage = Chat.TypeMessage
 import { DroitsInsuffisants } from '../../../src/building-blocks/types/domain-error'
 
 describe('EnvoyerMessageGroupeCommandHandler', () => {
@@ -59,7 +58,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
 
         beforeEach(async () => {
           // Given
-          chatRepository.recupererChat
+          chatRepository.recupererConversationIndividuelle
             .withArgs('jeune-1')
             .resolves({ id: 'chat-1', idBeneficiaire: 'jeune-1' })
             .withArgs('jeune-2')
@@ -79,23 +78,23 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
         })
         it('envoie un message à chaque jeune', async () => {
           // Then
-          expect(chatRepository.envoyerMessageBeneficiaire).to.have.callCount(2)
+          expect(chatRepository.envoyerMessageIndividuel).to.have.callCount(2)
           expect(
-            chatRepository.envoyerMessageBeneficiaire
+            chatRepository.envoyerMessageIndividuel
           ).to.have.been.calledWith('chat-1', {
             message: 'un message',
             iv: '123456',
             idConseiller: '41',
-            type: TypeMessage.MESSAGE,
+            type: Chat.TypeMessage.MESSAGE,
             infoPieceJointe: undefined
           })
           expect(
-            chatRepository.envoyerMessageBeneficiaire
+            chatRepository.envoyerMessageIndividuel
           ).to.have.been.calledWith('chat-2', {
             message: 'un message',
             iv: '123456',
             idConseiller: '41',
-            type: TypeMessage.MESSAGE,
+            type: Chat.TypeMessage.MESSAGE,
             infoPieceJointe: undefined
           })
         })
@@ -109,7 +108,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
       describe('quand le message est avec PJ', () => {
         it('envoie un message avec PJ à chaque jeune', async () => {
           // Given
-          chatRepository.recupererChat
+          chatRepository.recupererConversationIndividuelle
             .withArgs('jeune-1')
             .resolves({ id: 'chat-1' })
             .withArgs('jeune-2')
@@ -128,26 +127,26 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
           })
 
           // Then
-          expect(chatRepository.envoyerMessageBeneficiaire).to.have.callCount(2)
+          expect(chatRepository.envoyerMessageIndividuel).to.have.callCount(2)
           expect(
-            chatRepository.envoyerMessageBeneficiaire
+            chatRepository.envoyerMessageIndividuel
           ).to.have.been.calledWith('chat-1', {
             message: 'un message',
             iv: '123456',
             idConseiller: '41',
-            type: TypeMessage.MESSAGE_PJ,
+            type: Chat.TypeMessage.MESSAGE_PJ,
             infoPieceJointe: {
               id: 'id',
               nom: 'nom'
             }
           })
           expect(
-            chatRepository.envoyerMessageBeneficiaire
+            chatRepository.envoyerMessageIndividuel
           ).to.have.been.calledWith('chat-2', {
             message: 'un message',
             iv: '123456',
             idConseiller: '41',
-            type: TypeMessage.MESSAGE_PJ,
+            type: Chat.TypeMessage.MESSAGE_PJ,
             infoPieceJointe: {
               id: 'id',
               nom: 'nom'
@@ -187,13 +186,13 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
             .withArgs(['liste-1', 'liste-2'])
             .resolves([listeDeDiffusionUno, listeDeDiffusionDos])
 
-          chatRepository.recupererChat
+          chatRepository.recupererConversationIndividuelle
             .withArgs('jeune-1')
             .resolves({ id: 'chat-1', idBeneficiaire: 'jeune-1' })
             .withArgs('jeune-2')
             .resolves({ id: 'chat-2', idBeneficiaire: 'jeune-2' })
 
-          chatRepository.recupererGroupe
+          chatRepository.recupererConversationGroupe
             .withArgs('liste-1')
             .resolves({ id: 'groupe-1' })
             .withArgs('liste-2')
@@ -213,23 +212,23 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
         })
         it('envoie un message à chaque jeune', async () => {
           // Then
-          expect(chatRepository.envoyerMessageBeneficiaire).to.have.callCount(2)
+          expect(chatRepository.envoyerMessageIndividuel).to.have.callCount(2)
           expect(
-            chatRepository.envoyerMessageBeneficiaire
+            chatRepository.envoyerMessageIndividuel
           ).to.have.been.calledWith('chat-1', {
             message: 'un message',
             iv: '123456',
             idConseiller: '41',
-            type: TypeMessage.MESSAGE,
+            type: Chat.TypeMessage.MESSAGE,
             infoPieceJointe: undefined
           })
           expect(
-            chatRepository.envoyerMessageBeneficiaire
+            chatRepository.envoyerMessageIndividuel
           ).to.have.been.calledWith('chat-2', {
             message: 'un message',
             iv: '123456',
             idConseiller: '41',
-            type: TypeMessage.MESSAGE,
+            type: Chat.TypeMessage.MESSAGE,
             infoPieceJointe: undefined
           })
         })
@@ -247,7 +246,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
               message: 'un message',
               iv: '123456',
               idConseiller: '41',
-              type: TypeMessage.MESSAGE,
+              type: Chat.TypeMessage.MESSAGE,
               infoPieceJointe: undefined,
               idsBeneficiaires: ['jeune-1']
             }
@@ -258,7 +257,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
               message: 'un message',
               iv: '123456',
               idConseiller: '41',
-              type: TypeMessage.MESSAGE,
+              type: Chat.TypeMessage.MESSAGE,
               infoPieceJointe: undefined,
               idsBeneficiaires: ['jeune-2']
             }
@@ -287,7 +286,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
             .withArgs(['liste-1'])
             .resolves([listeDeDiffusionUno])
 
-          chatRepository.recupererChat
+          chatRepository.recupererConversationIndividuelle
             .withArgs('jeune-1')
             .resolves({ id: 'chat-1', idBeneficiaire: 'jeune-1' })
 
@@ -306,14 +305,14 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
         })
         it('envoie un message une seule fois au jeune', async () => {
           // Then
-          expect(chatRepository.envoyerMessageBeneficiaire).to.have.callCount(1)
+          expect(chatRepository.envoyerMessageIndividuel).to.have.callCount(1)
           expect(
-            chatRepository.envoyerMessageBeneficiaire
+            chatRepository.envoyerMessageIndividuel
           ).to.have.been.calledWith('chat-1', {
             message: 'un message',
             iv: '123456',
             idConseiller: '41',
-            type: TypeMessage.MESSAGE,
+            type: Chat.TypeMessage.MESSAGE,
             infoPieceJointe: undefined
           })
         })
@@ -343,7 +342,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
           .withArgs(['liste-1'])
           .resolves([listeDeDiffusionUno])
 
-        chatRepository.recupererChat
+        chatRepository.recupererConversationIndividuelle
           .withArgs('jeune-1')
           .resolves({ id: 'chat-1', idBeneficiaire: 'jeune-1' })
 
@@ -361,7 +360,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
       })
       it("n'envoie pas de message", async () => {
         // Then
-        expect(chatRepository.envoyerMessageBeneficiaire).to.have.callCount(0)
+        expect(chatRepository.envoyerMessageIndividuel).to.have.callCount(0)
       })
       it('ne notifie pas le jeune', async () => {
         // Then
