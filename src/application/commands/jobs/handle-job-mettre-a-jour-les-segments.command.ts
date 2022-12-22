@@ -42,35 +42,44 @@ export class HandleJobMettreAJourLesSegmentsCommandHandler extends JobHandler<Jo
 
   async handle(): Promise<SuiviJob> {
     const nbErreurs = 0
-    let succes = false
     const maintenant = this.dateService.now()
-    this.writeMetadata()
+    try {
+      this.writeMetadata()
 
-    const segments: Map<string, string[]> = new Map<string, string[]>()
-    const nbJeunes = await this.handleSegmentJeunes(segments)
-    const nbCampagnesNonRepondues = await this.handleSegmentCampagneNonRepondue(
-      segments
-    )
+      const segments: Map<string, string[]> = new Map<string, string[]>()
+      const nbJeunes = await this.handleSegmentJeunes(segments)
+      const nbCampagnesNonRepondues =
+        await this.handleSegmentCampagneNonRepondue(segments)
 
-    this.writeMemberships(segments, maintenant)
-    await this.bigqueryClient.loadData(
-      datasetId,
-      'SegmentMetadata',
-      metadataFile
-    )
-    await this.bigqueryClient.loadData(
-      datasetId,
-      'SegmentMemberships',
-      membershipsFile
-    )
-    succes = true
-    return {
-      jobType: this.jobType,
-      nbErreurs,
-      succes,
-      dateExecution: maintenant,
-      tempsExecution: DateService.caculerTempsExecution(maintenant),
-      resultat: { nbJeunes, nbCampagnesNonRepondues }
+      this.writeMemberships(segments, maintenant)
+      await this.bigqueryClient.loadData(
+        datasetId,
+        'SegmentMetadata',
+        metadataFile
+      )
+      await this.bigqueryClient.loadData(
+        datasetId,
+        'SegmentMemberships',
+        membershipsFile
+      )
+      return {
+        jobType: this.jobType,
+        nbErreurs,
+        succes: true,
+        dateExecution: maintenant,
+        tempsExecution: DateService.caculerTempsExecution(maintenant),
+        resultat: { nbJeunes, nbCampagnesNonRepondues }
+      }
+    } catch (e) {
+      this.logger.error(e)
+      return {
+        jobType: this.jobType,
+        nbErreurs,
+        succes: false,
+        dateExecution: maintenant,
+        tempsExecution: DateService.caculerTempsExecution(maintenant),
+        resultat: {}
+      }
     }
   }
 
