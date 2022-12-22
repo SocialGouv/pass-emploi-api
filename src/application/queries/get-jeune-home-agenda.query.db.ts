@@ -18,8 +18,6 @@ import { Action } from '../../domain/action/action'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
 
-const NUMERO_DU_JOUR_SAMEDI = 6
-
 export interface GetJeuneHomeAgendaQuery extends Query {
   idJeune: string
   maintenant: string
@@ -40,13 +38,13 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
   async handle(
     query: GetJeuneHomeAgendaQuery
   ): Promise<Result<JeuneHomeSuiviQueryModel>> {
-    const { samediDernier, vendrediEnHuit } =
-      this.recupererLesDatesEntreSamediDernierEtDeuxSemainesPlusTard(
+    const { lundiDernier, dimancheEnHuit } =
+      this.recupererLesDatesEntreLundiDernierEtDeuxSemainesPlusTard(
         query.maintenant
       )
     const [actions, rendezVous, actionsEnRetard] = await Promise.all([
-      this.recupererLesActions(query, samediDernier, vendrediEnHuit),
-      this.recupererLesRendezVous(query, samediDernier, vendrediEnHuit),
+      this.recupererLesActions(query, lundiDernier, dimancheEnHuit),
+      this.recupererLesRendezVous(query, lundiDernier, dimancheEnHuit),
       this.recupererLeNombreDactionsEnRetard(query)
     ])
     return success({
@@ -54,8 +52,8 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
       rendezVous,
       metadata: {
         actionsEnRetard: actionsEnRetard,
-        dateDeDebut: samediDernier.toJSDate(),
-        dateDeFin: vendrediEnHuit.toJSDate()
+        dateDeDebut: lundiDernier.toJSDate(),
+        dateDeFin: dimancheEnHuit.toJSDate()
       }
     })
   }
@@ -77,20 +75,17 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
     return
   }
 
-  private recupererLesDatesEntreSamediDernierEtDeuxSemainesPlusTard(
+  private recupererLesDatesEntreLundiDernierEtDeuxSemainesPlusTard(
     maintenant: string
   ): {
-    samediDernier: DateTime
-    vendrediEnHuit: DateTime
+    lundiDernier: DateTime
+    dimancheEnHuit: DateTime
   } {
-    let dateDebut = DateTime.fromISO(maintenant, {
+    const dateDebut = DateTime.fromISO(maintenant, {
       setZone: true
-    }).startOf('day')
-    while (dateDebut.weekday !== NUMERO_DU_JOUR_SAMEDI) {
-      dateDebut = dateDebut.minus({ day: 1 })
-    }
-    const vendrediEnHuit = dateDebut.plus({ day: 14 })
-    return { samediDernier: dateDebut, vendrediEnHuit }
+    }).startOf('week')
+    const dimancheEnHuit = dateDebut.plus({ day: 14 })
+    return { lundiDernier: dateDebut, dimancheEnHuit: dimancheEnHuit }
   }
 
   private async recupererLesRendezVous(
