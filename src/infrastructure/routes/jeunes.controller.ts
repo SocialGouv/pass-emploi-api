@@ -190,10 +190,6 @@ export class JeunesController {
     name: 'x-instanceid',
     required: false
   })
-  @ApiHeader({
-    name: 'x-timezone',
-    required: false
-  })
   @Put(':idJeune/configuration-application')
   async updateConfiguration(
     @Param('idJeune') idJeune: string,
