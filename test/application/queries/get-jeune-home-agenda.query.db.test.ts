@@ -41,9 +41,9 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
   let handler: GetJeuneHomeAgendaQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
-  const aujourdhuiVendredi = '2022-08-12T12:00:00Z'
-  const demain = new Date('2022-08-13T12:00:00Z')
-  const apresDemain = new Date('2022-08-14T12:00:00Z')
+  const aujourdhuiDimanche = '2022-08-14T12:00:00Z'
+  const demain = new Date('2022-08-15T12:00:00Z')
+  const apresDemain = new Date('2022-08-16T12:00:00Z')
   const jeuneDto = unJeuneDto()
 
   beforeEach(async () => {
@@ -58,43 +58,41 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
   })
 
   describe('handle', () => {
-    it("doit retourner les événements bornés entre samedi dernier minuit et samedi en huit minuit, d'après la locale utilisateur", async () => {
-      const aujourdhuiLundi = '2022-08-15T00:00:00-07:00'
-      const [_vendrediDernier, samediDernier, vendrediEnHuit, _samediEnHuit] =
+    it("doit retourner les événements bornés entre lundi dernier minuit et lundi en huit minuit, d'après la locale utilisateur", async () => {
+      const aujourdhuiMercredi = '2022-08-17T00:00:00-07:00'
+      const [_dimancheDernier, lundiDernier, dimancheEnHuit, _lundiEnHuit] =
         await createActions([
-          '2022-08-12T23:59:00-07:00',
-          '2022-08-13T00:00:00-07:00',
-          '2022-08-26T23:59:00-07:00',
-          '2022-08-27T00:00:00-07:00'
+          '2022-08-14T23:59:00-07:00',
+          '2022-08-15T00:00:00-07:00',
+          '2022-08-28T23:59:00-07:00',
+          '2022-08-29T00:00:00-07:00'
         ])
 
       // When
       const result = await handler.handle({
         idJeune: 'ABCDE',
-        maintenant: aujourdhuiLundi
+        maintenant: aujourdhuiMercredi
       })
 
       // Then
       const expected: JeuneHomeSuiviQueryModel = {
         actions: [
           uneActionQueryModelSansJeune({
-            id: samediDernier.id,
-            dateEcheance: DateTime.fromJSDate(
-              samediDernier.dateEcheance
-            ).toISO()
+            id: lundiDernier.id,
+            dateEcheance: DateTime.fromJSDate(lundiDernier.dateEcheance).toISO()
           }),
           uneActionQueryModelSansJeune({
-            id: vendrediEnHuit.id,
+            id: dimancheEnHuit.id,
             dateEcheance: DateTime.fromJSDate(
-              vendrediEnHuit.dateEcheance
+              dimancheEnHuit.dateEcheance
             ).toISO()
           })
         ],
         rendezVous: [],
         metadata: {
           actionsEnRetard: 2,
-          dateDeDebut: samediDernier.dateEcheance,
-          dateDeFin: new Date('2022-08-27T07:00:00.000Z')
+          dateDeDebut: lundiDernier.dateEcheance,
+          dateDeFin: new Date('2022-08-29T07:00:00.000Z')
         }
       }
       expect(result).to.deep.equal(success(expected))
@@ -114,7 +112,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         // When
         result = await handler.handle({
           idJeune: 'ABCDE',
-          maintenant: aujourdhuiVendredi
+          maintenant: aujourdhuiDimanche
         })
       })
       it('doit retourner la liste des actions triées chronologiquement', async () => {
@@ -159,7 +157,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         // When
         const result = await handler.handle({
           idJeune: 'ABCDE',
-          maintenant: aujourdhuiVendredi
+          maintenant: aujourdhuiDimanche
         })
 
         // Then
@@ -191,15 +189,15 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         // When
         result = await handler.handle({
           idJeune: 'ABCDE',
-          maintenant: aujourdhuiVendredi
+          maintenant: aujourdhuiDimanche
         })
       })
       it("retourne le compte d'actions en retard et les dates", async () => {
         // Then
         expect(result._isSuccess && result.data.metadata).to.deep.equal({
           actionsEnRetard: 1,
-          dateDeDebut: new Date('2022-08-06T00:00:00.000Z'),
-          dateDeFin: new Date('2022-08-20T00:00:00.000Z')
+          dateDeDebut: new Date('2022-08-08T00:00:00.000Z'),
+          dateDeFin: new Date('2022-08-22T00:00:00.000Z')
         })
       })
     })
@@ -215,7 +213,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
 
       // When
       const result = await handler.authorize(
-        { idJeune: jeune.id, maintenant: aujourdhuiVendredi },
+        { idJeune: jeune.id, maintenant: aujourdhuiDimanche },
         unUtilisateurJeune()
       )
 
@@ -238,7 +236,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
 
       // When
       const result = await handler.authorize(
-        { idJeune: jeune.id, maintenant: aujourdhuiVendredi },
+        { idJeune: jeune.id, maintenant: aujourdhuiDimanche },
         unUtilisateurConseiller({ id: conseiller.id })
       )
 
