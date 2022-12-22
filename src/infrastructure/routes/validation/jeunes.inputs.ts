@@ -9,6 +9,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsTimeZone,
   Min,
   ValidateIf
 } from 'class-validator'
@@ -18,11 +19,17 @@ import { Transform, Type } from 'class-transformer'
 import { transformStringToArray } from './utils/transformers'
 import { ArchiveJeune } from '../../../domain/archive-jeune'
 
-export class PutNotificationTokenInput {
+export class UpdateConfigurationInput {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   registration_token: string
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsTimeZone()
+  @IsOptional()
+  fuseauHoraire?: string
 }
 
 export class ArchiverJeunePayload {

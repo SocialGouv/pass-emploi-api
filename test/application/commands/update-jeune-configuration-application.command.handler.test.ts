@@ -50,7 +50,7 @@ describe('UpdateJeuneConfigurationApplicationCommand', () => {
           appVersion: 'uneAppVersion',
           installationId: 'uneInstallationId',
           instanceId: 'uneInstanceId',
-          timeZone: 'Europe/Paris'
+          fuseauHoraire: 'Europe/Paris'
         }
         const jeune = unJeune()
         jeuneRepository.get.withArgs('idJeune').resolves(jeune)

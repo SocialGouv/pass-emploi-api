@@ -87,7 +87,7 @@ import {
   ArchiverJeunePayload,
   GetRendezVousJeuneQueryParams,
   MaintenantQueryParams,
-  PutNotificationTokenInput,
+  UpdateConfigurationInput,
   TransfererConseillerPayload,
   UpdateJeunePreferencesPayload
 } from './validation/jeunes.inputs'
@@ -197,22 +197,21 @@ export class JeunesController {
   @Put(':idJeune/configuration-application')
   async updateConfiguration(
     @Param('idJeune') idJeune: string,
-    @Body() putNotificationTokenInput: PutNotificationTokenInput,
+    @Body() updateConfigurationInput: UpdateConfigurationInput,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @Headers('x-appversion') appVersion?: string,
     @Headers('x-installationid') installationId?: string,
-    @Headers('x-instanceid') instanceId?: string,
-    @Headers('x-timezone') timeZone?: string
+    @Headers('x-instanceid') instanceId?: string
   ): Promise<void> {
     const result =
       await this.updateJeuneConfigurationApplicationCommandHandler.execute(
         {
           idJeune,
-          pushNotificationToken: putNotificationTokenInput.registration_token,
+          pushNotificationToken: updateConfigurationInput.registration_token,
           appVersion,
           installationId,
           instanceId,
-          timeZone
+          fuseauHoraire: updateConfigurationInput.fuseauHoraire
         },
         utilisateur
       )

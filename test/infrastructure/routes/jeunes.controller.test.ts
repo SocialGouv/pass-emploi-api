@@ -15,7 +15,7 @@ import {
   UpdateStatutDemarchePayload
 } from 'src/infrastructure/routes/validation/demarches.inputs'
 import {
-  PutNotificationTokenInput,
+  UpdateConfigurationInput,
   TransfererConseillerPayload,
   UpdateJeunePreferencesPayload
 } from 'src/infrastructure/routes/validation/jeunes.inputs'
@@ -1308,8 +1308,9 @@ describe('JeunesController', () => {
 
   describe('PUT /jeunes/:idJeune/configuration-application', () => {
     const idJeune = '1'
-    const payload: PutNotificationTokenInput = {
-      registration_token: 'token'
+    const payload: UpdateConfigurationInput = {
+      registration_token: 'token',
+      fuseauHoraire: 'Europe/Paris'
     }
 
     describe("quand c'est en succès", () => {
@@ -1324,7 +1325,7 @@ describe('JeunesController', () => {
               appVersion: 'coucou',
               installationId: 'xxx-xx-xxx',
               instanceId: 'yyy-yy-yyy',
-              timeZone: 'Europe/Paris'
+              fuseauHoraire: 'Europe/Paris'
             },
             unUtilisateurDecode()
           )
@@ -1337,7 +1338,6 @@ describe('JeunesController', () => {
           .set('x-appversion', 'coucou')
           .set('x-installationid', 'xxx-xx-xxx')
           .set('x-instanceid', 'yyy-yy-yyy')
-          .set('x-timezone', 'Europe/Paris')
           .send(payload)
           // Then
           .expect(HttpStatus.OK)
@@ -1353,7 +1353,7 @@ describe('JeunesController', () => {
               appVersion: undefined,
               installationId: undefined,
               instanceId: undefined,
-              timeZone: undefined
+              fuseauHoraire: 'Europe/Paris'
             },
             unUtilisateurDecode()
           )
@@ -1366,6 +1366,26 @@ describe('JeunesController', () => {
           .send(payload)
           // Then
           .expect(HttpStatus.OK)
+      })
+    })
+
+    describe('quand le payload est invalide', () => {
+      it('renvoie une 400', async () => {
+        // Given
+        const payload: UpdateConfigurationInput = {
+          registration_token: 'token',
+          fuseauHoraire: 'Foo/Bar'
+        }
+        // When
+        await request(app.getHttpServer())
+          .put(`/jeunes/${idJeune}/configuration-application`)
+          .set('authorization', unHeaderAuthorization())
+          .set('x-appversion', 'coucou')
+          .set('x-installationid', 'xxx-xx-xxx')
+          .set('x-instanceid', 'yyy-yy-yyy')
+          .send(payload)
+          // Then
+          .expect(HttpStatus.BAD_REQUEST)
       })
     })
 

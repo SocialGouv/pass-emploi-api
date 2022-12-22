@@ -22,7 +22,7 @@ export interface UpdateJeuneConfigurationApplicationCommand extends Command {
   appVersion?: string
   installationId?: string
   instanceId?: string
-  timeZone?: string
+  fuseauHoraire?: string
 }
 
 @Injectable()
