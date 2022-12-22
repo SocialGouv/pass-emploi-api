@@ -25,7 +25,8 @@ export function unJeuneDto(
     appVersion: '1.8.1',
     installationId: '123456',
     instanceId: 'abcdef',
-    partageFavoris: true
+    partageFavoris: true,
+    timezone: 'Europe/Paris'
   }
 
   return { ...defaults, ...args }

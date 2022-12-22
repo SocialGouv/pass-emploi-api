@@ -131,6 +131,12 @@ export class JeuneDto extends Model {
   instanceId: string | null
 
   @Column({
+    field: 'timezone',
+    type: DataType.STRING
+  })
+  timezone: string | null
+
+  @Column({
     field: 'preferences_partage_favoris',
     type: DataType.BOOLEAN
   })

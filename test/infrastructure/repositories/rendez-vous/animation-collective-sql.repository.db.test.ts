@@ -131,7 +131,8 @@ describe('AnimationsCollectivesSqlRepository', () => {
               idJeune: 'ABCDE',
               installationId: '123456',
               instanceId: 'abcdef',
-              pushNotificationToken: 'token'
+              pushNotificationToken: 'token',
+              fuseauHoraire: 'Europe/Paris'
             },
             conseiller: {
               email: 'nils.tavernier@passemploi.com',

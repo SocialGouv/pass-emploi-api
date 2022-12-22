@@ -48,9 +48,20 @@ export class UpdateJeuneConfigurationApplicationCommandHandler extends CommandHa
       return failure(new NonTrouveError(command.idJeune, 'Jeune'))
     }
 
-    const configurationApplication =
-      this.configurationApplicationFactory.mettreAJour(command)
+    let configurationApplication: ConfigurationApplication
 
+    if (!jeune.configuration) {
+      configurationApplication = this.configurationApplicationFactory.creer(
+        jeune.id,
+        command
+      )
+    } else {
+      configurationApplication =
+        this.configurationApplicationFactory.mettreAJour(
+          jeune.configuration,
+          command
+        )
+    }
     await this.jeuneConfigurationApplicationRepository.save(
       configurationApplication
     )

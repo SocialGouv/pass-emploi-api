@@ -58,6 +58,7 @@ export function toSqlJeune(
   | 'instanceId'
   | 'pushNotificationToken'
   | 'dateDerniereActualisationToken'
+  | 'timezone'
 > {
   return {
     id: jeune.id,
@@ -152,6 +153,7 @@ export function toConfigurationApplication(
     instanceId: jeuneSqlModel.instanceId ?? undefined,
     dateDerniereActualisationToken:
       jeuneSqlModel.dateDerniereActualisationToken ?? undefined,
-    pushNotificationToken: jeuneSqlModel.pushNotificationToken ?? undefined
+    pushNotificationToken: jeuneSqlModel.pushNotificationToken ?? undefined,
+    fuseauHoraire: jeuneSqlModel.timezone ?? undefined
   }
 }

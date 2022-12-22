@@ -42,40 +42,96 @@ describe('UpdateJeuneConfigurationApplicationCommand', () => {
 
   describe('handle', () => {
     describe('quand le jeune existe', () => {
-      it("met à jour la configuration de l'application du jeune", async () => {
-        // Given
-        const command: UpdateJeuneConfigurationApplicationCommand = {
-          idJeune: 'idJeune',
-          pushNotificationToken: 'leNouveauToken',
-          appVersion: 'uneAppVersion',
-          installationId: 'uneInstallationId',
-          instanceId: 'uneInstanceId',
-          fuseauHoraire: 'Europe/Paris'
-        }
-        const jeune = unJeune()
-        jeuneRepository.get.withArgs('idJeune').resolves(jeune)
-
-        // When
-        const result =
-          await updateJeuneConfigurationApplicationCommandHandler.handle(
-            command
-          )
-
-        // Then
-        const configurationApplicationMisAJour: Jeune.ConfigurationApplication =
-          {
+      describe("quand c'est une première configuration", () => {
+        it("crée la configuration de l'application du jeune", async () => {
+          // Given
+          const command: UpdateJeuneConfigurationApplicationCommand = {
             idJeune: 'idJeune',
             pushNotificationToken: 'leNouveauToken',
             appVersion: 'uneAppVersion',
             installationId: 'uneInstallationId',
             instanceId: 'uneInstanceId',
-            dateDerniereActualisationToken: uneDatetime().toJSDate(),
-            timeZone: 'Europe/Paris'
+            fuseauHoraire: 'Europe/Paris'
           }
-        expect(
-          jeuneConfigurationApplicationRepository.save
-        ).to.have.been.calledWithExactly(configurationApplicationMisAJour)
-        expect(isSuccess(result)).to.equal(true)
+          const jeune = unJeune({
+            id: 'idJeune',
+            configuration: undefined
+          })
+          jeuneRepository.get.withArgs('idJeune').resolves(jeune)
+
+          // When
+          const result =
+            await updateJeuneConfigurationApplicationCommandHandler.handle(
+              command
+            )
+
+          // Then
+          const configurationApplicationMisAJour: Jeune.ConfigurationApplication =
+            {
+              idJeune: 'idJeune',
+              pushNotificationToken: 'leNouveauToken',
+              appVersion: 'uneAppVersion',
+              installationId: 'uneInstallationId',
+              instanceId: 'uneInstanceId',
+              dateDerniereActualisationToken: uneDatetime().toJSDate(),
+              fuseauHoraire: 'Europe/Paris'
+            }
+          expect(
+            jeuneConfigurationApplicationRepository.save
+          ).to.have.been.calledWithExactly(configurationApplicationMisAJour)
+          expect(isSuccess(result)).to.equal(true)
+        })
+      })
+
+      describe("quand c'est une nouvelle configuration", () => {
+        it("met à jour la configuration de l'application du jeune", async () => {
+          // Given
+          const command: UpdateJeuneConfigurationApplicationCommand = {
+            idJeune: 'idJeune',
+            pushNotificationToken: 'leNouveauToken',
+            appVersion: 'laNouvelleVersion',
+            installationId: 'uneInstallationId',
+            instanceId: 'uneInstanceId',
+            fuseauHoraire: 'Europe/Paris'
+          }
+          const jeune = unJeune({
+            id: 'idJeune',
+            configuration: {
+              idJeune: 'idJeune',
+              pushNotificationToken: 'leToken',
+              appVersion: 'laVersion',
+              installationId: 'uneInstallationId',
+              instanceId: 'uneInstanceId',
+              dateDerniereActualisationToken: uneDatetime()
+                .minus({ day: 1 })
+                .toJSDate(),
+              fuseauHoraire: 'Europe/London'
+            }
+          })
+          jeuneRepository.get.withArgs('idJeune').resolves(jeune)
+
+          // When
+          const result =
+            await updateJeuneConfigurationApplicationCommandHandler.handle(
+              command
+            )
+
+          // Then
+          const configurationApplicationMisAJour: Jeune.ConfigurationApplication =
+            {
+              idJeune: 'idJeune',
+              pushNotificationToken: 'leNouveauToken',
+              appVersion: 'laNouvelleVersion',
+              installationId: 'uneInstallationId',
+              instanceId: 'uneInstanceId',
+              fuseauHoraire: 'Europe/Paris',
+              dateDerniereActualisationToken: uneDatetime().toJSDate()
+            }
+          expect(
+            jeuneConfigurationApplicationRepository.save
+          ).to.have.been.calledWithExactly(configurationApplicationMisAJour)
+          expect(isSuccess(result)).to.equal(true)
+        })
       })
     })
 

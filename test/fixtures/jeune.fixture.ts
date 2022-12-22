@@ -89,7 +89,8 @@ export const uneConfiguration = (
     dateDerniereActualisationToken: uneDate(),
     installationId: '123456',
     instanceId: 'abcdef',
-    appVersion: '1.8.1'
+    appVersion: '1.8.1',
+    fuseauHoraire: 'Europe/Paris'
   }
   return { ...defaults, ...args }
 }

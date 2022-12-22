@@ -37,7 +37,8 @@ export class JeuneConfigurationApplicationSqlRepository
         dateDerniereActualisationToken:
           configurationApplication.dateDerniereActualisationToken,
         installationId: configurationApplication.installationId ?? null,
-        instanceId: configurationApplication.instanceId ?? null
+        instanceId: configurationApplication.instanceId ?? null,
+        timezone: configurationApplication.fuseauHoraire ?? null
       },
       { where: { id: configurationApplication.idJeune } }
     )
