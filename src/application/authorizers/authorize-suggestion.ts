@@ -1,22 +1,22 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
+import {
+  Result,
+  emptySuccess,
+  failure
+} from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
 import {
   Suggestion,
   SuggestionsRepositoryToken
-} from 'src/domain/offre/recherche/suggestion/suggestion'
-import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
-import {
-  emptySuccess,
-  failure,
-  Result
-} from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
+} from '../../domain/offre/recherche/suggestion/suggestion'
 
 @Injectable()
 export class SuggestionAuthorizer {
   constructor(
     @Inject(SuggestionsRepositoryToken)
     private suggestionRepository: Suggestion.Repository
-  ) {}
+  ) { }
 
   async authorize(
     idSuggestion: string,

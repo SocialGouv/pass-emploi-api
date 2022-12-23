@@ -11,8 +11,7 @@ import {
   Query
 } from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { CreateRechercheFromSuggestionCommandHandler } from 'src/application/commands/create-recherche-from-suggestion.command.handler'
-import { RefuserSuggestionCommandHandler } from 'src/application/commands/refuser-suggestion.command.handler'
+import { CreateRechercheFromSuggestionCommandHandler } from '../../application/commands/create-recherche-from-suggestion.command.handler'
 import {
   CreateRechercheCommand,
   CreateRechercheCommandHandler
@@ -22,11 +21,13 @@ import {
   DeleteRechercheCommandHandler
 } from '../../application/commands/delete-recherche.command.handler'
 import { RafraichirSuggestionPoleEmploiCommandHandler } from '../../application/commands/rafraichir-suggestion-pole-emploi.command.handler'
+import { RefuserSuggestionCommandHandler } from '../../application/commands/refuser-suggestion.command.handler'
 import {
   GetRecherchesQuery,
   GetRecherchesQueryHandler
 } from '../../application/queries/get-recherches.query.handler.db'
 import { GetSuggestionsQueryHandler } from '../../application/queries/get-suggestions.query.handler.db'
+import { toRechercheQueryModel } from '../../application/queries/query-mappers/recherche.mapper'
 import { RechercheQueryModel } from '../../application/queries/query-models/recherches.query-model'
 import { SuggestionQueryModel } from '../../application/queries/query-models/suggestion.query-model'
 import { isFailure } from '../../building-blocks/types/result'
@@ -41,7 +42,6 @@ import {
   CreateRechercheServiceCiviquePayload,
   GetRecherchesQueryParams
 } from './validation/recherches.inputs'
-import { toRechercheQueryModel } from '../../application/queries/query-mappers/recherche.mapper'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -55,7 +55,7 @@ export class RecherchesJeunesController {
     private readonly getSuggestionsQueryHandler: GetSuggestionsQueryHandler,
     private readonly createRechercheFromSuggestionCommandHandler: CreateRechercheFromSuggestionCommandHandler,
     private readonly refuserSuggestionCommandHandler: RefuserSuggestionCommandHandler
-  ) {}
+  ) { }
 
   @Post('recherches/offres-emploi')
   async creerRechercheOffresEmplois(

@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { CommuneSqlModel } from 'src/infrastructure/sequelize/models/commune.sql-model'
 import {
-  isFailure,
   Result,
+  isFailure,
   success
 } from '../../../../../building-blocks/types/result'
 import { Suggestion } from '../../../../../domain/offre/recherche/suggestion/suggestion'
+import { CommuneSqlModel } from '../../../../../infrastructure/sequelize/models/commune.sql-model'
 import { SuggestionDto } from '../../../../clients/dto/pole-emploi.dto'
 import {
   PoleEmploiPartenaireClient,
@@ -18,12 +18,11 @@ const CODE_UNITE_RAYON_KM = 'KM'
 
 @Injectable()
 export class SuggestionPeHttpRepository
-  implements Suggestion.PoleEmploi.Repository
-{
+  implements Suggestion.PoleEmploi.Repository {
   constructor(
     @Inject(PoleEmploiPartenaireClientToken)
     private client: PoleEmploiPartenaireClient
-  ) {}
+  ) { }
 
   async findAll(token: string): Promise<Result<Suggestion.PoleEmploi[]>> {
     const suggestionsDtoResult = await this.client.getSuggestionsRecherches(
@@ -61,13 +60,13 @@ export class SuggestionPeHttpRepository
 function laSuggestionAUneCommune(suggestion: SuggestionDto): boolean {
   return Boolean(
     suggestion.mobilites?.length &&
-      suggestion.mobilites[0].lieu.type.code === CODE_TYPE_LIEU_COMMUNE
+    suggestion.mobilites[0].lieu.type.code === CODE_TYPE_LIEU_COMMUNE
   )
 }
 function laSuggestionAUnDepartement(suggestion: SuggestionDto): boolean {
   return Boolean(
     suggestion.mobilites?.length &&
-      suggestion.mobilites[0].lieu.type.code === CODE_TYPE_LIEU_DEPARTEMENT
+    suggestion.mobilites[0].lieu.type.code === CODE_TYPE_LIEU_DEPARTEMENT
   )
 }
 

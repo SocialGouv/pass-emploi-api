@@ -1,24 +1,24 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Command } from 'src/building-blocks/types/command'
-import { CommandHandler } from 'src/building-blocks/types/command-handler'
-import { MauvaiseCommandeError } from 'src/building-blocks/types/domain-error'
+import { Command } from '../../building-blocks/types/command'
+import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
 import {
-  Recherche,
-  RecherchesRepositoryToken
-} from 'src/domain/offre/recherche/recherche'
-import {
-  Suggestion,
-  SuggestionsRepositoryToken
-} from 'src/domain/offre/recherche/suggestion/suggestion'
-import {
+  Result,
   failure,
   isFailure,
-  Result,
   success
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { SuggestionAuthorizer } from '../authorizers/authorize-suggestion'
 import { Evenement, EvenementService } from '../../domain/evenement'
+import {
+  Recherche,
+  RecherchesRepositoryToken
+} from '../../domain/offre/recherche/recherche'
+import {
+  Suggestion,
+  SuggestionsRepositoryToken
+} from '../../domain/offre/recherche/suggestion/suggestion'
+import { SuggestionAuthorizer } from '../authorizers/authorize-suggestion'
 
 export interface CreateRechercheFromSuggestionCommand extends Command {
   idJeune: string

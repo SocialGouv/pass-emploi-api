@@ -1,23 +1,23 @@
 import { Inject, Injectable } from '@nestjs/common'
 import {
-  Conseiller,
-  ConseillersRepositoryToken
-} from 'src/domain/conseiller/conseiller'
-import {
   DroitsInsuffisants,
   NonTrouveError
 } from '../../building-blocks/types/domain-error'
 import {
+  Result,
   emptySuccess,
-  failure,
-  Result
+  failure
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import {
+  Conseiller,
+  ConseillersRepositoryToken
+} from '../../domain/conseiller/conseiller'
+import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import {
   RendezVous,
   RendezVousRepositoryToken
 } from '../../domain/rendez-vous/rendez-vous'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 
 @Injectable()
 export class RendezVousAuthorizer {
@@ -28,7 +28,7 @@ export class RendezVousAuthorizer {
     private conseillerRepository: Conseiller.Repository,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository
-  ) {}
+  ) { }
 
   async authorize(
     idRendezVous: string,

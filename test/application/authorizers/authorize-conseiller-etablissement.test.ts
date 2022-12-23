@@ -1,11 +1,14 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
-import { emptySuccess, failure } from 'src/building-blocks/types/result'
+import { ConseillerEtablissementAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-etablissement'
+import { DroitsInsuffisants } from '../../../src/building-blocks/types/domain-error'
+import {
+  emptySuccess,
+  failure
+} from '../../../src/building-blocks/types/result'
+import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { createSandbox, expect } from '../../utils'
-import { ConseillerEtablissementAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-etablissement'
-import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 
 describe('ConseillerEtablissementAuthorizer', () => {
   let conseillerRepository: StubbedType<Conseiller.Repository>

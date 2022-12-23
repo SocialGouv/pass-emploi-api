@@ -1,22 +1,22 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
+import {
+  Result,
+  emptySuccess,
+  failure
+} from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
 import {
   Conseiller,
   ConseillersRepositoryToken
-} from 'src/domain/conseiller/conseiller'
-import { DroitsInsuffisants } from '../../building-blocks/types/domain-error'
-import {
-  emptySuccess,
-  failure,
-  Result
-} from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
+} from '../../domain/conseiller/conseiller'
 
 @Injectable()
 export class ConseillerEtablissementAuthorizer {
   constructor(
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository
-  ) {}
+  ) { }
 
   async authorize(
     idAgence: string,

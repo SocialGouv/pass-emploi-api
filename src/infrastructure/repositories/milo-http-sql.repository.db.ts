@@ -3,10 +3,10 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { firstValueFrom } from 'rxjs'
-import { DateService } from 'src/utils/date-service'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
-import { failure, Result, success } from '../../building-blocks/types/result'
+import { Result, failure, success } from '../../building-blocks/types/result'
 import { Milo } from '../../domain/milo'
+import { DateService } from '../../utils/date-service'
 import { RateLimiterService } from '../../utils/rate-limiter.service'
 import { SituationsMiloSqlModel } from '../sequelize/models/situations-milo.sql-model'
 import { DossierMiloDto } from './dto/milo.dto'
@@ -134,10 +134,10 @@ export class MiloHttpSqlRepository implements Milo.Repository {
 
     return situationsSql
       ? {
-          idJeune: situationsSql.idJeune,
-          situationCourante: situationsSql.situationCourante ?? undefined,
-          situations: situationsSql.situations
-        }
+        idJeune: situationsSql.idJeune,
+        situationCourante: situationsSql.situationCourante ?? undefined,
+        situations: situationsSql.situations
+      }
       : undefined
   }
 }
