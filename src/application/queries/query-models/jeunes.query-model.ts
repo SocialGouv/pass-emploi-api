@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { ArchiveJeune } from 'src/domain/archive-jeune'
+import { ArchiveJeune } from '../../../domain/archive-jeune'
 import { Jeune } from '../../../domain/jeune/jeune'
 
 class SituationQueryModel {

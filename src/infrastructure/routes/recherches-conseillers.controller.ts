@@ -3,15 +3,15 @@ import { ApiOAuth2, ApiOperation, ApiTags } from '@nestjs/swagger'
 import {
   CreateSuggestionConseillerImmersionCommand,
   CreateSuggestionConseillerImmersionCommandHandler
-} from 'src/application/commands/create-suggestion-conseiller-immersion.command.handler'
+} from '../../application/commands/create-suggestion-conseiller-immersion.command.handler'
 import {
   CreateSuggestionConseillerOffreEmploiCommand,
   CreateSuggestionConseillerOffreEmploiCommandHandler
-} from 'src/application/commands/create-suggestion-conseiller-offre-emploi.command.handler'
+} from '../../application/commands/create-suggestion-conseiller-offre-emploi.command.handler'
 import {
   CreateSuggestionConseillerServiceCiviqueCommand,
   CreateSuggestionConseillerServiceCiviqueCommandHandler
-} from 'src/application/commands/create-suggestion-conseiller-service-civique.command.handler'
+} from '../../application/commands/create-suggestion-conseiller-service-civique.command.handler'
 import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
@@ -30,7 +30,7 @@ export class RecherchesConseillersController {
     private readonly createSuggestionConseillerOffreEmploiCommandHandler: CreateSuggestionConseillerOffreEmploiCommandHandler,
     private readonly createSuggestionConseillerImmersionCommandHandler: CreateSuggestionConseillerImmersionCommandHandler,
     private readonly createSuggestionConseillerServiceCiviqueCommandHandler: CreateSuggestionConseillerServiceCiviqueCommandHandler
-  ) {}
+  ) { }
 
   @ApiOperation({
     summary: "Crée une suggestion de recherche d'offre d'emploi",

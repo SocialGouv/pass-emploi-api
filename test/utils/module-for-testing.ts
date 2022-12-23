@@ -6,7 +6,6 @@ import { TerminusModule } from '@nestjs/terminus'
 import { Test, TestingModuleBuilder } from '@nestjs/testing'
 import { messaging } from 'firebase-admin'
 import { JWTPayload } from 'jose'
-import { DateService } from 'src/utils/date-service'
 import {
   buildModuleMetadata,
   buildQueryCommandsProviders
@@ -21,6 +20,7 @@ import {
   FirebaseClient,
   IFirebaseClient
 } from '../../src/infrastructure/clients/firebase-client'
+import { DateService } from '../../src/utils/date-service'
 import { unJwtPayloadValide } from '../fixtures/authentification.fixture'
 import { FakeController } from '../infrastructure/auth/fake.controller'
 import TokenMessage = messaging.TokenMessage

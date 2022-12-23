@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Offre } from 'src/domain/offre/offre'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { FavoriNonTrouveError } from '../../building-blocks/types/domain-error'
 import {
+  Result,
   emptySuccess,
-  failure,
-  Result
+  failure
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { OffresImmersionRepositoryToken } from '../../domain/offre/favori/offre-immersion'
+import { Offre } from '../../domain/offre/offre'
 import { FavoriOffresImmersionAuthorizer } from '../authorizers/authorize-favori-offres-immersion'
 
 export interface DeleteFavoriOffreImmersionCommand extends Command {

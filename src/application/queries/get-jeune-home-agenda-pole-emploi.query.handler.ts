@@ -1,15 +1,15 @@
-import { Query } from '../../building-blocks/types/query'
-import { isFailure, Result, success } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
-import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
-import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { JeuneHomeAgendaPoleEmploiQueryModel } from './query-models/home-jeune-suivi.query-model'
 import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
+import { Query } from '../../building-blocks/types/query'
+import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { Result, isFailure, success } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Demarche } from '../../domain/demarche'
+import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
+import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
 import { GetDemarchesQueryGetter } from './query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from './query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
-import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
-import { Demarche } from '../../domain/demarche'
+import { JeuneHomeAgendaPoleEmploiQueryModel } from './query-models/home-jeune-suivi.query-model'
 
 export interface GetJeuneHomeAgendaPoleEmploiQuery extends Query {
   idJeune: string

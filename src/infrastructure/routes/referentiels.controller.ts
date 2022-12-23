@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { GetActionsPredefiniesQueryHandler } from 'src/application/queries/get-actions-predefinies.query.handler'
+import { GetActionsPredefiniesQueryHandler } from '../../application/queries/get-actions-predefinies.query.handler'
 import { GetAgencesQueryHandler } from '../../application/queries/get-agences.query.handler.db'
 import {
   GetCommunesEtDepartementsQuery,
@@ -46,7 +46,7 @@ export class ReferentielsController {
     private readonly getMotifsSuppressionJeuneQueryHandler: GetMotifsSuppressionJeuneQueryHandler,
     private readonly getTypesQualificationsQueryHandler: GetTypesQualificationsQueryHandler,
     private readonly getActionsPredefiniesQueryHandler: GetActionsPredefiniesQueryHandler
-  ) {}
+  ) { }
 
   @Get('communes-et-departements')
   @Public()

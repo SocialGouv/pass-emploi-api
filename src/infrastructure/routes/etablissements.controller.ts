@@ -1,13 +1,13 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { GetAnimationsCollectivesQueryHandler } from 'src/application/queries/get-animations-collectives.query.handler.db'
+import { CloturerAnimationCollectiveCommandHandler } from '../../application/commands/cloturer-animation-collective.command.handler'
+import { GetAnimationsCollectivesQueryHandler } from '../../application/queries/get-animations-collectives.query.handler.db'
+import { GetJeunesByEtablissementQueryHandler } from '../../application/queries/get-jeunes-by-etablissement.query.handler.db'
+import { JeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
 import {
   AnimationCollectiveQueryModel,
   RendezVousConseillerDetailQueryModel
-} from 'src/application/queries/query-models/rendez-vous.query-model'
-import { CloturerAnimationCollectiveCommandHandler } from '../../application/commands/cloturer-animation-collective.command.handler'
-import { GetJeunesByEtablissementQueryHandler } from '../../application/queries/get-jeunes-by-etablissement.query.handler.db'
-import { JeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
+} from '../../application/queries/query-models/rendez-vous.query-model'
 import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { DateService } from '../../utils/date-service'
@@ -26,7 +26,7 @@ export class EtablissementsController {
     private readonly cloturerAnimationCollectiveCommandHandler: CloturerAnimationCollectiveCommandHandler,
     private readonly getAnimationsCollectivesQueryHandler: GetAnimationsCollectivesQueryHandler,
     private readonly getJeunesEtablissementQueryHandler: GetJeunesByEtablissementQueryHandler
-  ) {}
+  ) { }
 
   @ApiOperation({
     summary: "Récupère les animations collectives d'un établissement",

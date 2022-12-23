@@ -1,21 +1,21 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Command } from 'src/building-blocks/types/command'
-import { CommandHandler } from 'src/building-blocks/types/command-handler'
-import { MauvaiseCommandeError } from 'src/building-blocks/types/domain-error'
+import { Command } from '../../building-blocks/types/command'
+import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
+import {
+  Result,
+  emptySuccess,
+  failure,
+  isFailure
+} from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Evenement, EvenementService } from '../../domain/evenement'
+import { Recherche } from '../../domain/offre/recherche/recherche'
 import {
   Suggestion,
   SuggestionsRepositoryToken
-} from 'src/domain/offre/recherche/suggestion/suggestion'
-import {
-  emptySuccess,
-  failure,
-  isFailure,
-  Result
-} from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
+} from '../../domain/offre/recherche/suggestion/suggestion'
 import { SuggestionAuthorizer } from '../authorizers/authorize-suggestion'
-import { Recherche } from '../../domain/offre/recherche/recherche'
-import { Evenement, EvenementService } from '../../domain/evenement'
 
 export interface RefuserSuggestionCommand extends Command {
   idJeune: string
