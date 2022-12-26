@@ -73,22 +73,12 @@ export class ListeDeDiffusionSqlRepository
     await ListeDeDiffusionSqlModel.destroy({ where: { id } })
   }
 
-  async removeBeneficiairesFromAll(
-    idConseiller: string,
-    idsBeneficiaires: string[]
-  ): Promise<void> {
-    const listesDuConseillerSql = await ListeDeDiffusionSqlModel.findAll({
-      where: { idConseiller }
+  async findAllByConseiller(idConseiller: string): Promise<ListeDeDiffusion[]> {
+    const sqlModel = await ListeDeDiffusionSqlModel.findAll({
+      where: { idConseiller },
+      include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }]
     })
-
-    await ListeDeDiffusionJeuneAssociationSqlModel.destroy({
-      where: {
-        idListe: {
-          [Op.in]: listesDuConseillerSql.map(sqlModel => sqlModel.id)
-        },
-        idBeneficiaire: { [Op.in]: idsBeneficiaires }
-      }
-    })
+    return sqlModel.map(toListeDeDiffusion)
   }
 }
 
