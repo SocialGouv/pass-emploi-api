@@ -58,7 +58,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
   let jeuneRepository: StubbedType<Jeune.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let chatRepository: StubbedType<Chat.Repository>
-  let listesDeDiffusionRepository: StubbedType<Conseiller.ListeDeDiffusion.Repository>
+  let listesDeDiffusionService: StubbedClass<Conseiller.ListeDeDiffusion.Service>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let animationCollectiveService: StubbedClass<RendezVous.AnimationCollective.Service>
 
@@ -74,7 +74,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
       .resolves(conseillerCible)
 
     chatRepository = stubInterface(sandbox)
-    listesDeDiffusionRepository = stubInterface(sandbox)
+    listesDeDiffusionService = stubClass(Conseiller.ListeDeDiffusion.Service)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     animationCollectiveService = stubClass(
       RendezVous.AnimationCollective.Service
@@ -83,7 +83,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
       new TransfererJeunesConseillerCommandHandler(
         conseillerRepository,
         jeuneRepository,
-        listesDeDiffusionRepository,
+        listesDeDiffusionService,
         chatRepository,
         animationCollectiveService,
         conseillerAuthorizer
@@ -161,7 +161,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
 
         it('supprime les jeunes des listes de diffusion du conseiller', async () => {
           expect(
-            listesDeDiffusionRepository.removeBeneficiairesFromAll
+            listesDeDiffusionService.enleverLesJeunesDuConseiller
           ).to.have.been.calledOnceWithExactly(
             command.idConseillerSource,
             command.idsJeunes

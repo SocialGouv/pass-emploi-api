@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { IdService } from '../../utils/id-service'
 import { DateService } from '../../utils/date-service'
 
@@ -34,10 +34,7 @@ export namespace ListeDeDiffusion {
 
     delete(id: string): Promise<void>
 
-    removeBeneficiairesFromAll(
-      idConseiller: string,
-      idsBeneficiaires: string[]
-    ): Promise<void>
+    findAllByConseiller(idConseiller: string): Promise<ListeDeDiffusion[]>
   }
 
   export interface Beneficiaire {
@@ -82,7 +79,11 @@ export namespace ListeDeDiffusion {
 
   @Injectable()
   export class Service {
-    constructor(private dateService: DateService) {}
+    constructor(
+      private dateService: DateService,
+      @Inject(ListeDeDiffusionRepositoryToken)
+      private repository: Repository
+    ) {}
 
     mettreAJour(
       listeDeDiffusionInitiale: ListeDeDiffusion,
@@ -113,6 +114,30 @@ export namespace ListeDeDiffusion {
         ...listeDeDiffusionInitiale,
         beneficiaires: beneficiairesInitiaux.concat(nouveauxBeneficiaires),
         titre: infosMiseAJour.titre
+      }
+    }
+
+    async enleverLesJeunesDuConseiller(
+      idConseiller: string,
+      idsJeunes: string[]
+    ): Promise<void> {
+      const listesDeDiffusion = await this.repository.findAllByConseiller(
+        idConseiller
+      )
+
+      for (const listeDeDiffusion of listesDeDiffusion) {
+        const listeDeDiffusionSansLesBeneficiaires = {
+          ...listeDeDiffusion,
+          beneficiaires: listeDeDiffusion.beneficiaires.filter(
+            beneficiaire => !idsJeunes.includes(beneficiaire.id)
+          )
+        }
+        if (
+          listeDeDiffusion.beneficiaires.length !==
+          listeDeDiffusionSansLesBeneficiaires.beneficiaires.length
+        ) {
+          await this.repository.save(listeDeDiffusionSansLesBeneficiaires)
+        }
       }
     }
   }

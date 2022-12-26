@@ -5,10 +5,13 @@ import { IdService } from '../../../src/utils/id-service'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { uneListeDeDiffusion } from '../../fixtures/liste-de-diffusion.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { createSandbox } from 'sinon'
 
 describe(' ListeDeDiffusion', () => {
   let factory: ListeDeDiffusion.Factory
   let service: ListeDeDiffusion.Service
+  let repository: StubbedType<ListeDeDiffusion.Repository>
   const maintenant = uneDatetime()
 
   beforeEach(() => {
@@ -17,7 +20,8 @@ describe(' ListeDeDiffusion', () => {
     const dateService: StubbedClass<DateService> = stubClass(DateService)
     dateService.now.returns(maintenant)
     factory = new ListeDeDiffusion.Factory(idService, dateService)
-    service = new ListeDeDiffusion.Service(dateService)
+    repository = stubInterface(createSandbox())
+    service = new ListeDeDiffusion.Service(dateService, repository)
   })
 
   describe('creer', () => {
@@ -120,6 +124,50 @@ describe(' ListeDeDiffusion', () => {
         ]
       }
       expect(listeDeDiffusionMiseAJour).to.deep.equal(expected)
+    })
+  })
+
+  describe('enleverLesJeunesDuConseiller', () => {
+    it("enlève les jeunes des listes de diffusion d'un conseiller", async () => {
+      // Given
+      const listeDeDiffusion = uneListeDeDiffusion({
+        id: 'une-liste-de-diffusion-1',
+        beneficiaires: [
+          {
+            id: 'un-id-beneficiaire-1',
+            dateAjout: maintenant,
+            estDansLePortefeuille: true
+          },
+          {
+            id: 'un-id-beneficiaire-2',
+            dateAjout: maintenant,
+            estDansLePortefeuille: true
+          }
+        ]
+      })
+      repository.findAllByConseiller
+        .withArgs('un-id-conseiller')
+        .resolves([listeDeDiffusion])
+
+      // When
+      await service.enleverLesJeunesDuConseiller('un-id-conseiller', [
+        'un-id-beneficiaire-1'
+      ])
+
+      // Then
+      const listeDeDiffusionSansLeBeneficiaire1 = uneListeDeDiffusion({
+        id: 'une-liste-de-diffusion-1',
+        beneficiaires: [
+          {
+            id: 'un-id-beneficiaire-2',
+            dateAjout: maintenant,
+            estDansLePortefeuille: true
+          }
+        ]
+      })
+      expect(repository.save).to.have.been.calledWith(
+        listeDeDiffusionSansLeBeneficiaire1
+      )
     })
   })
 })
