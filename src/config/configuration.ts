@@ -57,6 +57,7 @@ export default () => {
       url: process.env.MILO_API_URL,
       apiKeyDossier: process.env.MILO_DOSSIER_API_KEY,
       apiKeyCreerJeune: process.env.MILO_JEUNE_API_KEY,
+      apiKeyEvents: process.env.MILO_EVENTS_API_KEY,
       urlWeb: process.env.MILO_WEB_URL
     },
     immersion: {

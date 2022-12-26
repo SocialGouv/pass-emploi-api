@@ -55,7 +55,7 @@ export class RecherchesJeunesController {
     private readonly getSuggestionsQueryHandler: GetSuggestionsQueryHandler,
     private readonly createRechercheFromSuggestionCommandHandler: CreateRechercheFromSuggestionCommandHandler,
     private readonly refuserSuggestionCommandHandler: RefuserSuggestionCommandHandler
-  ) { }
+  ) {}
 
   @Post('recherches/offres-emploi')
   async creerRechercheOffresEmplois(

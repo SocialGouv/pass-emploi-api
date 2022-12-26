@@ -37,7 +37,7 @@ export class HandleNettoyerLesJobsCommandHandler extends JobHandler<Job> {
       nbErreurs: 0,
       succes: erreur ? false : true,
       dateExecution: maintenant,
-      tempsExecution: DateService.caculerTempsExecution(maintenant),
+      tempsExecution: DateService.calculerTempsExecution(maintenant),
       resultat: erreur ?? stats
     }
   }

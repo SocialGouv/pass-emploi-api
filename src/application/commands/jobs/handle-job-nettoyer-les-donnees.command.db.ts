@@ -35,7 +35,7 @@ export class HandleJobNettoyerLesDonneesCommandHandler extends JobHandler<Job> {
       nbErreurs: 0,
       succes: true,
       dateExecution: maintenant,
-      tempsExecution: DateService.caculerTempsExecution(maintenant),
+      tempsExecution: DateService.calculerTempsExecution(maintenant),
       resultat: {
         nombreArchivesSupprimees,
         nombreLogsApiSupprimees

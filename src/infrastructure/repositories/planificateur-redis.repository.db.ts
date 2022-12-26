@@ -143,4 +143,9 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
   async supprimerLesJobsSelonPattern(pattern: string): Promise<void> {
     await this.queue.removeJobs(`*${pattern}*`)
   }
+
+  async estEnCours(jobType: Planificateur.JobType): Promise<boolean> {
+    const activeJobs = await this.queue.getActive()
+    return activeJobs.filter(job => job.data.type === jobType).length > 1
+  }
 }

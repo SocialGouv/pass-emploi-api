@@ -28,7 +28,7 @@ export class RendezVousAuthorizer {
     private conseillerRepository: Conseiller.Repository,
     @Inject(JeunesRepositoryToken)
     private jeuneRepository: Jeune.Repository
-  ) { }
+  ) {}
 
   async authorize(
     idRendezVous: string,

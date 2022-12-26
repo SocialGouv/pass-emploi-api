@@ -67,7 +67,7 @@ export class HandleJobMettreAJourLesSegmentsCommandHandler extends JobHandler<Jo
         nbErreurs,
         succes: true,
         dateExecution: maintenant,
-        tempsExecution: DateService.caculerTempsExecution(maintenant),
+        tempsExecution: DateService.calculerTempsExecution(maintenant),
         resultat: { nbJeunes, nbCampagnesNonRepondues }
       }
     } catch (e) {
@@ -77,7 +77,7 @@ export class HandleJobMettreAJourLesSegmentsCommandHandler extends JobHandler<Jo
         nbErreurs,
         succes: false,
         dateExecution: maintenant,
-        tempsExecution: DateService.caculerTempsExecution(maintenant),
+        tempsExecution: DateService.calculerTempsExecution(maintenant),
         resultat: {}
       }
     }

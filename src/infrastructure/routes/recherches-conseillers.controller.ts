@@ -30,7 +30,7 @@ export class RecherchesConseillersController {
     private readonly createSuggestionConseillerOffreEmploiCommandHandler: CreateSuggestionConseillerOffreEmploiCommandHandler,
     private readonly createSuggestionConseillerImmersionCommandHandler: CreateSuggestionConseillerImmersionCommandHandler,
     private readonly createSuggestionConseillerServiceCiviqueCommandHandler: CreateSuggestionConseillerServiceCiviqueCommandHandler
-  ) { }
+  ) {}
 
   @ApiOperation({
     summary: "Crée une suggestion de recherche d'offre d'emploi",

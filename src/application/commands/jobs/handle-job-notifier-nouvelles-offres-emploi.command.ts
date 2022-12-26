@@ -148,7 +148,7 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends JobHan
         ...suivi,
         nbErreurs: stats.echecs,
         succes: true,
-        tempsExecution: DateService.caculerTempsExecution(maintenant),
+        tempsExecution: DateService.calculerTempsExecution(maintenant),
         resultat: stats
       }
     } catch (e) {
@@ -157,7 +157,7 @@ export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends JobHan
       return {
         ...suivi,
         nbErreurs: stats.echecs,
-        tempsExecution: DateService.caculerTempsExecution(maintenant),
+        tempsExecution: DateService.calculerTempsExecution(maintenant),
         resultat: e
       }
     }

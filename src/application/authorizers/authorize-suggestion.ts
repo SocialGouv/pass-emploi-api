@@ -16,7 +16,7 @@ export class SuggestionAuthorizer {
   constructor(
     @Inject(SuggestionsRepositoryToken)
     private suggestionRepository: Suggestion.Repository
-  ) { }
+  ) {}
 
   async authorize(
     idSuggestion: string,

@@ -92,7 +92,7 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends JobHan
       ...suivi,
       nbErreurs: stats.erreurs,
       succes: true,
-      tempsExecution: DateService.caculerTempsExecution(maintenant),
+      tempsExecution: DateService.calculerTempsExecution(maintenant),
       resultat: stats
     }
   }

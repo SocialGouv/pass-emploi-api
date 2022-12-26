@@ -1,26 +1,27 @@
-import { WorkerService } from '../../src/application/worker.service.db'
-import { expect, StubbedClass, stubClass } from '../utils'
+import { HandleJobNettoyerPiecesJointesCommandHandler } from 'src/application/commands/jobs/handle-job-nettoyer-pieces-jointes.command'
+import { HandleJobNotifierRendezVousPECommandHandler } from 'src/application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
+import { HandleJobRappelActionCommandHandler } from 'src/application/commands/jobs/handle-job-rappel-action.command'
+import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from 'src/application/commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
+import { HandleJobSuivreEvenementsMiloHandler } from 'src/application/commands/jobs/handle-job-suivre-evenements-milo.handler'
+import { HandleJobAgenceAnimationCollectiveCommandHandler } from '../../src/application/commands/jobs/handle-job-agence-animation-collective.command.db'
+import { HandleJobGenererJDDCommandHandler } from '../../src/application/commands/jobs/handle-job-generer-jdd.handler'
 import { HandleJobMailConseillerCommandHandler } from '../../src/application/commands/jobs/handle-job-mail-conseiller.command'
-import { HandleJobRappelRendezVousCommandHandler } from '../../src/application/commands/jobs/handle-job-rappel-rendez-vous.command'
+import { HandleJobMettreAJourCodesEvenementsCommandHandler } from '../../src/application/commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
+import { HandleJobMettreAJourLesSegmentsCommandHandler } from '../../src/application/commands/jobs/handle-job-mettre-a-jour-les-segments.command'
+import { HandleJobNettoyerLesDonneesCommandHandler } from '../../src/application/commands/jobs/handle-job-nettoyer-les-donnees.command.db'
 import { HandleNettoyerLesJobsCommandHandler } from '../../src/application/commands/jobs/handle-job-nettoyer-les-jobs.command'
-import { HandleJobUpdateMailingListConseillerCommandHandler } from '../../src/application/commands/jobs/handle-job-update-mailing-list-conseiller.command'
 import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from '../../src/application/commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
 import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from '../../src/application/commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
-import { PlanificateurRedisRepository } from '../../src/infrastructure/repositories/planificateur-redis.repository.db'
-import { testConfig } from '../utils/module-for-testing'
-import { DateService } from '../../src/utils/date-service'
-import { Planificateur } from '../../src/domain/planificateur'
-import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from 'src/application/commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
-import { DatabaseForTesting } from '../utils/database-for-testing'
-import { HandleJobNettoyerPiecesJointesCommandHandler } from 'src/application/commands/jobs/handle-job-nettoyer-pieces-jointes.command'
-import { HandleJobRappelActionCommandHandler } from 'src/application/commands/jobs/handle-job-rappel-action.command'
-import { HandleJobNotifierRendezVousPECommandHandler } from 'src/application/commands/jobs/handle-job-notifier-rendez-vous-pe.command'
-import { HandleJobNettoyerLesDonneesCommandHandler } from '../../src/application/commands/jobs/handle-job-nettoyer-les-donnees.command.db'
-import { HandleJobAgenceAnimationCollectiveCommandHandler } from '../../src/application/commands/jobs/handle-job-agence-animation-collective.command.db'
-import { HandleJobMettreAJourCodesEvenementsCommandHandler } from '../../src/application/commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
+import { HandleJobRappelRendezVousCommandHandler } from '../../src/application/commands/jobs/handle-job-rappel-rendez-vous.command'
+import { HandleJobUpdateMailingListConseillerCommandHandler } from '../../src/application/commands/jobs/handle-job-update-mailing-list-conseiller.command'
 import { MonitorJobsCommandHandler } from '../../src/application/commands/jobs/monitor-jobs.command.db'
-import { HandleJobMettreAJourLesSegmentsCommandHandler } from '../../src/application/commands/jobs/handle-job-mettre-a-jour-les-segments.command'
-import { HandleJobGenererJDDCommandHandler } from '../../src/application/commands/jobs/handle-job-generer-jdd.handler'
+import { WorkerService } from '../../src/application/worker.service.db'
+import { Planificateur } from '../../src/domain/planificateur'
+import { PlanificateurRedisRepository } from '../../src/infrastructure/repositories/planificateur-redis.repository.db'
+import { DateService } from '../../src/utils/date-service'
+import { StubbedClass, expect, stubClass } from '../utils'
+import { DatabaseForTesting } from '../utils/database-for-testing'
+import { testConfig } from '../utils/module-for-testing'
 
 describe('WorkerService', () => {
   DatabaseForTesting.prepare()
@@ -83,6 +84,10 @@ describe('WorkerService', () => {
         HandleJobGenererJDDCommandHandler
       )
 
+      const handleJobSuivreEvenementsMiloHandler = stubClass(
+        HandleJobSuivreEvenementsMiloHandler
+      )
+
       const workerService = new WorkerService(
         planificateurRepository,
         handlerJobRendezVousCommandHandler,
@@ -100,7 +105,8 @@ describe('WorkerService', () => {
         handleJobAgenceAnimationCollectiveCommandHandler,
         monitorJobsCommandHandler,
         handleJobMettreAJourLesSegmentsCommandHandler,
-        handleJobGenererJDDCommandHandler
+        handleJobGenererJDDCommandHandler,
+        handleJobSuivreEvenementsMiloHandler
       )
 
       workerService.subscribe()
