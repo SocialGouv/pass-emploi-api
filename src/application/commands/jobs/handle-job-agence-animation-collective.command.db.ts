@@ -87,7 +87,7 @@ export class HandleJobAgenceAnimationCollectiveCommandHandler extends JobHandler
       nbErreurs: 0,
       succes: true,
       dateExecution: debut,
-      tempsExecution: DateService.caculerTempsExecution(debut),
+      tempsExecution: DateService.calculerTempsExecution(debut),
       resultat: {
         nombreTotalAnimationCollectives,
         nombreAnimationCollectiveSansAgenceAvant,

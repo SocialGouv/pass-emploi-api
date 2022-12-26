@@ -293,6 +293,9 @@ import { MessagesController } from './infrastructure/routes/messages.controller'
 import { HandleJobGenererJDDCommandHandler } from './application/commands/jobs/handle-job-generer-jdd.handler'
 import { SupportController } from './infrastructure/routes/support.controller'
 import { RefreshJddCommandHandler } from './application/commands/refresh-jdd.command.handler'
+import { HandleJobSuivreEvenementsMiloHandler } from './application/commands/jobs/handle-job-suivre-evenements-milo.handler'
+import { MiloEvenementsHttpRepository } from './infrastructure/repositories/milo-evenements-http.repository'
+import { PartenaireMiloRepositoryToken } from './domain/partenaire/milo'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -506,6 +509,10 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       useClass: ListeDeDiffusionSqlRepository
     },
     {
+      provide: PartenaireMiloRepositoryToken,
+      useClass: MiloEvenementsHttpRepository
+    },
+    {
       provide: PoleEmploiPartenaireClientToken,
       useClass:
         process.env.IS_IN_MEMORY == 'true'
@@ -671,7 +678,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     EnvoyerMessageGroupeCommandHandler,
     MonitorJobsCommandHandler,
     HandleJobGenererJDDCommandHandler,
-    RefreshJddCommandHandler
+    RefreshJddCommandHandler,
+    HandleJobSuivreEvenementsMiloHandler
   ]
 }
 

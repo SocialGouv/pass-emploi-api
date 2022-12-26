@@ -46,7 +46,7 @@ export class ReferentielsController {
     private readonly getMotifsSuppressionJeuneQueryHandler: GetMotifsSuppressionJeuneQueryHandler,
     private readonly getTypesQualificationsQueryHandler: GetTypesQualificationsQueryHandler,
     private readonly getActionsPredefiniesQueryHandler: GetActionsPredefiniesQueryHandler
-  ) { }
+  ) {}
 
   @Get('communes-et-departements')
   @Public()

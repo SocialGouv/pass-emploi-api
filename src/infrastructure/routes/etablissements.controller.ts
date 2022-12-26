@@ -26,7 +26,7 @@ export class EtablissementsController {
     private readonly cloturerAnimationCollectiveCommandHandler: CloturerAnimationCollectiveCommandHandler,
     private readonly getAnimationsCollectivesQueryHandler: GetAnimationsCollectivesQueryHandler,
     private readonly getJeunesEtablissementQueryHandler: GetJeunesByEtablissementQueryHandler
-  ) { }
+  ) {}
 
   @ApiOperation({
     summary: "Récupère les animations collectives d'un établissement",

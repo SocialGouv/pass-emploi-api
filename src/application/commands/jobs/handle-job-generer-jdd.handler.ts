@@ -92,7 +92,7 @@ export class HandleJobGenererJDDCommandHandler extends JobHandler<HandleJobGener
         jobType: this.jobType,
         nbErreurs: 0,
         succes: true,
-        tempsExecution: DateService.caculerTempsExecution(debut),
+        tempsExecution: DateService.calculerTempsExecution(debut),
         resultat: {},
         dateExecution: debut
       }
@@ -102,7 +102,7 @@ export class HandleJobGenererJDDCommandHandler extends JobHandler<HandleJobGener
         jobType: this.jobType,
         nbErreurs: 1,
         succes: false,
-        tempsExecution: DateService.caculerTempsExecution(debut),
+        tempsExecution: DateService.calculerTempsExecution(debut),
         resultat: {},
         dateExecution: debut
       }

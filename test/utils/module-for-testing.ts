@@ -52,7 +52,8 @@ export const testConfig = (): ConfigService => {
       url: 'https://milo.com',
       urlWeb: 'https://milo.com',
       apiKeyDossier: 'apiKeyRecupererDossier',
-      apiKeyCreerJeune: 'apiKeyCreerJeune'
+      apiKeyCreerJeune: 'apiKeyCreerJeune',
+      apiKeyEvents: 'apiKeyEvents'
     },
     redis: {
       // eslint-disable-next-line no-process-env

@@ -9,6 +9,8 @@ import { DateService } from '../../src/utils/date-service'
 import { unRendezVous } from '../fixtures/rendez-vous.fixture'
 import { createSandbox, expect, stubClass } from '../utils'
 import { uneAction } from '../fixtures/action.fixture'
+import { unEvenementMilo } from '../fixtures/partenaire.fixture'
+import JobType = Planificateur.JobType
 
 describe('Planificateur', () => {
   describe('Service', () => {
@@ -130,6 +132,24 @@ describe('Planificateur', () => {
         expect(planificateurRepository.creerJob).to.have.been.calledWithExactly(
           job,
           'action:721e2108-60f5-4a75-b102-04fe6a40e899:3'
+        )
+      })
+    })
+    describe('creerJobEvenementMilo', () => {
+      it('planifie un job maintenant', async () => {
+        // GIVEN
+        const monEvenementMilo = unEvenementMilo()
+        // WHEN
+        await planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant(monEvenementMilo)
+        // THEN
+        const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> = {
+          type: JobType.TRAITER_EVENEMENT_MILO,
+          contenu: monEvenementMilo,
+          dateExecution: today.toJSDate()
+        }
+        expect(planificateurRepository.creerJob).to.have.been.calledWith(
+          job,
+          `event-milo:${monEvenementMilo.id}`
         )
       })
     })

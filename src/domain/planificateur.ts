@@ -1,9 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { DateService } from '../utils/date-service'
-import { RendezVous } from './rendez-vous/rendez-vous'
 import { Action } from './action/action'
+import { RendezVous } from './rendez-vous/rendez-vous'
 import { NettoyageJobsStats } from './suivi-job'
+import { Partenaire } from './partenaire/partenaire'
 
 export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 
@@ -22,6 +23,8 @@ export namespace Planificateur {
     supprimerLesJobsPasses(): Promise<NettoyageJobsStats>
 
     supprimerLesJobsSelonPattern(pattern: string): Promise<void>
+
+    estEnCours(jobType: Planificateur.JobType): Promise<boolean>
   }
 
   export enum JobType {
@@ -41,7 +44,9 @@ export namespace Planificateur {
     MAJ_SEGMENTS = 'MAJ_SEGMENTS',
     MAJ_AGENCE_AC = 'MAJ_AGENCE_AC',
     MONITORER_JOBS = 'MONITORER_JOBS',
-    GENERER_JDD = 'GENERER_JDD'
+    GENERER_JDD = 'GENERER_JDD',
+    SUIVRE_EVENEMENTS_MILO = 'SUIVRE_EVENEMENTS_MILO',
+    TRAITER_EVENEMENT_MILO = 'TRAITER_EVENEMENT_MILO'
   }
 
   export interface JobRendezVous {
@@ -56,6 +61,8 @@ export namespace Planificateur {
     idConseiller: string
     menage: boolean
   }
+
+  export type JobTraiterEvenementMilo = Partenaire.Milo.Evenement
 
   export interface JobFake {
     message: string
@@ -81,6 +88,10 @@ export namespace Planificateur {
 }
 
 export const listeCronJobs: Planificateur.CronJob[] = [
+  {
+    type: Planificateur.JobType.SUIVRE_EVENEMENTS_MILO,
+    expression: '*/15 * * * *'
+  },
   {
     type: Planificateur.JobType.RECUPERER_SITUATIONS_JEUNES_MILO,
     expression: '0 0 * * *'
@@ -168,6 +179,20 @@ export class PlanificateurService {
 
   async supprimerRappelsParId(id: string): Promise<void> {
     await this.planificateurRepository.supprimerLesJobsSelonPattern(id)
+  }
+
+  async creerJobEvenementMiloSiIlNaPasEteCreeAvant(
+    evenementMilo: Partenaire.Milo.Evenement
+  ): Promise<void> {
+    const jobId = `event-milo:${evenementMilo.id}`
+
+    const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> = {
+      type: Planificateur.JobType.TRAITER_EVENEMENT_MILO,
+      contenu: evenementMilo,
+      dateExecution: this.dateService.now().toJSDate()
+    }
+    // Si on créée un job avec un id qui existe déjà, il ne se passe rien
+    await this.planificateurRepository.creerJob(job, jobId)
   }
 
   private async creerJobRendezVous(

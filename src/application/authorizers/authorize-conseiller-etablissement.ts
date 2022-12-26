@@ -16,7 +16,7 @@ export class ConseillerEtablissementAuthorizer {
   constructor(
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository
-  ) { }
+  ) {}
 
   async authorize(
     idAgence: string,

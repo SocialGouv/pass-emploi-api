@@ -39,3 +39,12 @@ export interface DossierMiloDto {
     }
   ]
 }
+
+export interface EvenementMiloDto {
+  identifiant: string
+  idDossier: string
+  type: 'RDV' | 'SESSION' | string
+  action: 'CREATE' | 'UPDATE' | 'DELETE' | string
+  idType: string
+  date: string
+}

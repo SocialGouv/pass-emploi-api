@@ -134,10 +134,10 @@ export class MiloHttpSqlRepository implements Milo.Repository {
 
     return situationsSql
       ? {
-        idJeune: situationsSql.idJeune,
-        situationCourante: situationsSql.situationCourante ?? undefined,
-        situations: situationsSql.situations
-      }
+          idJeune: situationsSql.idJeune,
+          situationCourante: situationsSql.situationCourante ?? undefined,
+          situations: situationsSql.situations
+        }
       : undefined
   }
 }

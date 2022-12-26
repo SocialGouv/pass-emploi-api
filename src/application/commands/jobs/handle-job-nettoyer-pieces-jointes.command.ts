@@ -48,7 +48,7 @@ export class HandleJobNettoyerPiecesJointesCommandHandler extends JobHandler<Job
       nbErreurs,
       succes: true,
       dateExecution: maintenant,
-      tempsExecution: DateService.caculerTempsExecution(maintenant),
+      tempsExecution: DateService.calculerTempsExecution(maintenant),
       resultat: { fichiersSupprimes }
     }
   }

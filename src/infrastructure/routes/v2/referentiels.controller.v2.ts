@@ -10,7 +10,7 @@ import { handleFailure } from '../failure.handler'
 export class ReferentielsControllerV2 {
   constructor(
     private readonly getMotifsSuppressionJeuneV2QueryHandler: GetMotifsSuppressionJeuneV2QueryHandler
-  ) { }
+  ) {}
 
   @Get('motifs-suppression-jeune')
   @ApiOAuth2([])

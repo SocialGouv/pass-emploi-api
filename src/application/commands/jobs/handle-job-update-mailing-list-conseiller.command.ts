@@ -70,7 +70,7 @@ export class HandleJobUpdateMailingListConseillerCommandHandler extends JobHandl
     return {
       ...suivi,
       succes: true,
-      tempsExecution: DateService.caculerTempsExecution(maintenant),
+      tempsExecution: DateService.calculerTempsExecution(maintenant),
       resultat: stats
     }
   }
