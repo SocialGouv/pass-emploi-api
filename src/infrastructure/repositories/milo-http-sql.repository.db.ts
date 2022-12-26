@@ -91,7 +91,7 @@ export class MiloHttpSqlRepository implements Milo.Repository {
       })
     } catch (e) {
       this.logger.error(e)
-      this.logger.error(e.response)
+      this.logger.error(e.response?.data)
 
       if (e.response?.status >= 400 && e.response?.status <= 404) {
         if (
