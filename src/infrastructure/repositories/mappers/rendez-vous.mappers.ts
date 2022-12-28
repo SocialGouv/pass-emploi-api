@@ -14,6 +14,7 @@ import { DateService } from '../../../utils/date-service'
 export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
   return {
     id: rendezVous.id,
+    source: rendezVous.source,
     titre: rendezVous.titre,
     sousTitre: rendezVous.sousTitre,
     modalite: rendezVous.modalite ?? null,
@@ -37,6 +38,7 @@ export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
 export function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
   return {
     id: rendezVousSql.id,
+    source: fromSourceStringToSourceRendezVous(rendezVousSql.source),
     titre: rendezVousSql.titre,
     sousTitre: rendezVousSql.sousTitre,
     modalite: rendezVousSql.modalite ?? undefined,
@@ -70,5 +72,18 @@ function fromJeuneSqlToJeuneDuRdv(jeune: JeuneSqlModel): JeuneDuRendezVous {
       email: jeune.conseiller!.email ?? undefined
     },
     configuration: toConfigurationApplication(jeune)
+  }
+}
+
+function fromSourceStringToSourceRendezVous(
+  sourceString: string
+): RendezVous.Source {
+  switch (sourceString) {
+    case 'PASS_EMPLOI':
+      return RendezVous.Source.PASS_EMPLOI
+    case 'MILO':
+      return RendezVous.Source.MILO
+    default:
+      throw new Error('Type non traité')
   }
 }

@@ -7,8 +7,8 @@ import {
 } from 'src/infrastructure/sequelize/models/transfert-conseiller.sql-model'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
-import { uneSituationsMiloDto } from 'test/fixtures/milo.fixture'
 import { unConseiller } from 'test/fixtures/conseiller.fixture'
+import { uneSituationsMiloDto } from 'test/fixtures/milo.fixture'
 import { unEvenementEngagementDto } from 'test/fixtures/sql-models/evenement-engagement.sql-model'
 import {
   unFavoriOffreEmploi,
@@ -18,6 +18,7 @@ import {
 import { Core } from '../../../../src/domain/core'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { Recherche } from '../../../../src/domain/offre/recherche/recherche'
+import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
 import { JeuneSqlRepository } from '../../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
 import { RechercheSqlRepository } from '../../../../src/infrastructure/repositories/offre/recherche/recherche-sql.repository.db'
 import { ActionSqlModel } from '../../../../src/infrastructure/sequelize/models/action.sql-model'
@@ -40,9 +41,8 @@ import { uneActionDto } from '../../../fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
-import { expect, StubbedClass, stubClass } from '../../../utils'
+import { StubbedClass, expect, stubClass } from '../../../utils'
 import { DatabaseForTesting } from '../../../utils/database-for-testing'
-import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
 
 describe('JeuneSqlRepository', () => {
   const uuid = '9e1a7d9f-4038-4631-9aa1-856ee90c7ff8'
@@ -414,7 +414,7 @@ describe('JeuneSqlRepository', () => {
     describe('quand un jeune existe avec cet id dossier', () => {
       it('retourne le jeune', async () => {
         // When
-        const result = await jeuneSqlRepository.getByIdDossier(
+        const result = await jeuneSqlRepository.getByIdPartenaire(
           'test-id-dossier'
         )
 
@@ -426,7 +426,7 @@ describe('JeuneSqlRepository', () => {
     describe("quand aucun jeune n'existe avec cet email", () => {
       it('retourne undefined', async () => {
         // When
-        const jeune = await jeuneSqlRepository.getByIdDossier(
+        const jeune = await jeuneSqlRepository.getByIdPartenaire(
           'test-id-dossier-inconnu'
         )
 

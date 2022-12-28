@@ -26,7 +26,8 @@ export function unRendezVousDto(
     icsSequence: null,
     dateCloture: null,
     idAgence: null,
-    createur: { id: '1', nom: 'Tavernier', prenom: 'Nils' }
+    createur: { id: '1', nom: 'Tavernier', prenom: 'Nils' },
+    source: 'PASS_EMPLOI'
   }
 
   return { ...defaults, ...args }

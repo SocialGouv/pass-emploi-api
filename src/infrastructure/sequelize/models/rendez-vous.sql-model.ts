@@ -19,6 +19,9 @@ export class RendezVousDto extends Model {
   @Column({ field: 'id', type: DataType.STRING })
   id: string
 
+  @Column({ field: 'source', type: DataType.STRING })
+  source: string
+
   @Column({ field: 'titre', type: DataType.STRING })
   titre: string
 

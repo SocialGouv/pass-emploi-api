@@ -1,6 +1,6 @@
 import {
-  uneAnimationCollective,
-  unJeuneDuRendezVous
+  unJeuneDuRendezVous,
+  uneAnimationCollective
 } from 'test/fixtures/rendez-vous.fixture'
 import { Core } from '../../../../src/domain/core'
 import {
@@ -155,7 +155,8 @@ describe('AnimationsCollectivesSqlRepository', () => {
         icsSequence: undefined,
         createur: uneACAVenir.createur,
         dateCloture: DateService.fromJSDateToDateTime(uneACAVenir.dateCloture),
-        idAgence: uneACAVenir.idAgence!
+        idAgence: uneACAVenir.idAgence!,
+        source: RendezVous.Source.PASS_EMPLOI
       }
       expect(animationCollectives[0]).to.deep.equal(expected)
     })

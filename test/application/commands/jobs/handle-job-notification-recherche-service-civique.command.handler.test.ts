@@ -14,7 +14,7 @@ import { DateService } from '../../../../src/utils/date-service'
 import { unJeune } from '../../../fixtures/jeune.fixture'
 import { uneOffreServiceCivique } from '../../../fixtures/offre-service-civique.fixture'
 import { uneRecherche } from '../../../fixtures/recherche.fixture'
-import { expect, StubbedClass, stubClass } from '../../../utils'
+import { StubbedClass, expect, stubClass } from '../../../utils'
 
 describe('HandleJobNotifierNouveauxServicesCiviqueCommandHandler', () => {
   describe('handle', () => {

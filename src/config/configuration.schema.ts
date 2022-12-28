@@ -41,7 +41,8 @@ export const configurationSchema = Joi.object({
       .description("feature flipping pour ajouter l'url du dossier du jeune"),
     apiKeyDossier: Joi.string().required(),
     apiKeyCreerJeune: Joi.string().required(),
-    apiKeyEvents: Joi.string().required()
+    apiKeyEvents: Joi.string().required(),
+    apiKeyDetailRendezVous: Joi.string().required()
   }),
   immersion: {
     url: Joi.string().uri().required(),

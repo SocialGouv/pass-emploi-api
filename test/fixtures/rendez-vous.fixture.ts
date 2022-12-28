@@ -13,6 +13,7 @@ import { unConseillerDuJeune, uneConfiguration } from './jeune.fixture'
 export const unRendezVous = (args: Partial<RendezVous> = {}): RendezVous => {
   const defaults: RendezVous = {
     id: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb',
+    source: RendezVous.Source.PASS_EMPLOI,
     titre: 'rdv',
     duree: 30,
     modalite: 'modalite',
@@ -43,6 +44,7 @@ export const uneAnimationCollective = (
 ): RendezVous.AnimationCollective => {
   const defaults: RendezVous.AnimationCollective = {
     id: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb',
+    source: RendezVous.Source.PASS_EMPLOI,
     titre: 'rdv',
     duree: 30,
     modalite: 'modalite',

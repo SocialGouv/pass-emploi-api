@@ -9,21 +9,37 @@ export class JeuneConfigurationApplicationSqlRepository
   async get(
     idJeune: string
   ): Promise<Jeune.ConfigurationApplication | undefined> {
-    const jeuneSqlModel = await JeuneSqlModel.findByPk(idJeune)
+    const jeuneSqlModel = await JeuneSqlModel.findByPk(idJeune, {
+      attributes: attributesConfigurationApplication
+    })
     if (!jeuneSqlModel) {
       return undefined
     }
 
-    const configurationApplication: Jeune.ConfigurationApplication = {
+    return toConfigurationApplication(jeuneSqlModel)
+  }
+
+  async getByIdPartenaire(
+    idPartenaire: string
+  ): Promise<Jeune.ConfigurationApplication | undefined> {
+    const jeuneSqlModel = await JeuneSqlModel.findOne({
+      where: { idPartenaire },
+      attributes: attributesConfigurationApplication
+    })
+    if (!jeuneSqlModel) {
+      return undefined
+    }
+
+    return {
       idJeune: jeuneSqlModel.id,
       appVersion: jeuneSqlModel.appVersion ?? undefined,
       installationId: jeuneSqlModel.installationId ?? undefined,
       instanceId: jeuneSqlModel.instanceId ?? undefined,
       pushNotificationToken: jeuneSqlModel.pushNotificationToken ?? undefined,
+      fuseauHoraire: jeuneSqlModel.timezone ?? undefined,
       dateDerniereActualisationToken:
         jeuneSqlModel.dateDerniereActualisationToken ?? undefined
     }
-    return configurationApplication
   }
 
   async save(
@@ -44,3 +60,28 @@ export class JeuneConfigurationApplicationSqlRepository
     )
   }
 }
+
+function toConfigurationApplication(
+  jeuneSqlModel: JeuneSqlModel
+): Jeune.ConfigurationApplication {
+  return {
+    idJeune: jeuneSqlModel.id,
+    appVersion: jeuneSqlModel.appVersion ?? undefined,
+    installationId: jeuneSqlModel.installationId ?? undefined,
+    instanceId: jeuneSqlModel.instanceId ?? undefined,
+    pushNotificationToken: jeuneSqlModel.pushNotificationToken ?? undefined,
+    fuseauHoraire: jeuneSqlModel.timezone ?? undefined,
+    dateDerniereActualisationToken:
+      jeuneSqlModel.dateDerniereActualisationToken ?? undefined
+  }
+}
+
+const attributesConfigurationApplication = [
+  'id',
+  'appVersion',
+  'installationId',
+  'instanceId',
+  'pushNotificationToken',
+  'dateDerniereActualisationToken',
+  'timezone'
+]

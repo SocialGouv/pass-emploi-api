@@ -55,6 +55,7 @@ export type JeuneDuRendezVous = Pick<
 
 export interface RendezVous {
   id: string
+  source: RendezVous.Source
   titre: string
   sousTitre: string
   commentaire?: string
@@ -130,6 +131,11 @@ export namespace RendezVous {
     SUPPRESSION = 'SUPPRESSION'
   }
 
+  export enum Source {
+    PASS_EMPLOI = 'PASS_EMPLOI',
+    MILO = 'MILO'
+  }
+
   export function estUnTypeAnimationCollective(type?: string): boolean {
     return (
       Boolean(type) &&
@@ -172,6 +178,7 @@ export namespace RendezVous {
 
       return success({
         id: this.idService.uuid(),
+        source: Source.PASS_EMPLOI,
         commentaire: infosRendezVousACreer.commentaire,
         duree: infosRendezVousACreer.duree,
         date: new Date(infosRendezVousACreer.date),

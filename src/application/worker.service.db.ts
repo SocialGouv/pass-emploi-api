@@ -26,6 +26,7 @@ import { MonitorJobsCommandHandler } from './commands/jobs/monitor-jobs.command.
 import { HandleJobMettreAJourLesSegmentsCommandHandler } from './commands/jobs/handle-job-mettre-a-jour-les-segments.command'
 import { HandleJobGenererJDDCommandHandler } from './commands/jobs/handle-job-generer-jdd.handler'
 import { HandleJobSuivreEvenementsMiloHandler } from './commands/jobs/handle-job-suivre-evenements-milo.handler'
+import { HandleJobTraiterEvenementMiloHandler } from './commands/jobs/handle-job-traiter-evenement-milo.handler'
 
 @Injectable()
 export class WorkerService {
@@ -52,7 +53,8 @@ export class WorkerService {
     private monitorJobsCommandHandler: MonitorJobsCommandHandler,
     private handleJobMettreAJourLesSegmentsCommandHandler: HandleJobMettreAJourLesSegmentsCommandHandler,
     private handleJobGenererJDDCommandHandler: HandleJobGenererJDDCommandHandler,
-    private handleJobSuivreEvenementsMiloHandler: HandleJobSuivreEvenementsMiloHandler
+    private handleJobSuivreEvenementsMiloHandler: HandleJobSuivreEvenementsMiloHandler,
+    private handleJobTraiterEvenementMiloHandler: HandleJobTraiterEvenementMiloHandler
   ) {
     this.apmService = getAPMInstance()
     this.workerTrackingService = getWorkerTrackingServiceInstance()
@@ -130,6 +132,9 @@ export class WorkerService {
           break
         case Planificateur.JobType.SUIVRE_EVENEMENTS_MILO:
           await this.handleJobSuivreEvenementsMiloHandler.execute()
+          break
+        case Planificateur.JobType.TRAITER_EVENEMENT_MILO:
+          await this.handleJobTraiterEvenementMiloHandler.execute(job)
           break
         case Planificateur.JobType.FAKE:
           this.logger.log({

@@ -296,6 +296,7 @@ import { RefreshJddCommandHandler } from './application/commands/refresh-jdd.com
 import { HandleJobSuivreEvenementsMiloHandler } from './application/commands/jobs/handle-job-suivre-evenements-milo.handler'
 import { MiloEvenementsHttpRepository } from './infrastructure/repositories/milo-evenements-http.repository'
 import { PartenaireMiloRepositoryToken } from './domain/partenaire/milo'
+import { HandleJobTraiterEvenementMiloHandler } from './application/commands/jobs/handle-job-traiter-evenement-milo.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -679,7 +680,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     MonitorJobsCommandHandler,
     HandleJobGenererJDDCommandHandler,
     RefreshJddCommandHandler,
-    HandleJobSuivreEvenementsMiloHandler
+    HandleJobSuivreEvenementsMiloHandler,
+    HandleJobTraiterEvenementMiloHandler
   ]
 }
 

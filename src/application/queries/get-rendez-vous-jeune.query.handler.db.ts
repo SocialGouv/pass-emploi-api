@@ -99,7 +99,8 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
         },
         dateSuppression: {
           [Op.is]: null
-        }
+        },
+        source: RendezVous.Source.PASS_EMPLOI
       },
       order: [['date', 'DESC']],
       limit: 100

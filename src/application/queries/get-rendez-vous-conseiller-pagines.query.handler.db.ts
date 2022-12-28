@@ -10,6 +10,7 @@ import { SequelizeInjectionToken } from '../../infrastructure/sequelize/provider
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { fromSqlToRendezVousConseillerQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { RendezVousConseillerQueryModel } from './query-models/rendez-vous.query-model'
+import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 
 const NOMBRE_RDV_MAX = 200
 
@@ -60,6 +61,7 @@ export class GetRendezVousConseillerPaginesQueryHandler extends QueryHandler<
         dateSuppression: {
           [Op.is]: null
         },
+        source: RendezVous.Source.PASS_EMPLOI,
         ...generateDateCondition(query.dateDebut, query.dateFin),
         ...presenceConseillerCondition
       },

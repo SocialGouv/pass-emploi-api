@@ -48,3 +48,32 @@ export interface EvenementMiloDto {
   idType: string
   date: string
 }
+
+export interface RendezVousMiloDto {
+  id: string
+  dateHeureDebut: string
+  dateHeureFin?: string
+  objet: string
+  conseiller: string
+  idDossier: string
+  commentaire?: string
+  type: string
+  statut:
+    | 'Absent'
+    | 'Annulé'
+    | 'Non précisé'
+    | 'Planifié'
+    | 'Présent'
+    | 'Reporté'
+}
+
+export interface SessionMiloDto {
+  id: string
+  nom: string
+  dateHeureDebut: string
+  dateHeureFin?: string
+  lieu: string
+  commentaire?: string
+  idDossier: string
+  statut: 'Réalisé' | 'Prescrit' | 'Refus tiers' | 'Refus jeune'
+}
