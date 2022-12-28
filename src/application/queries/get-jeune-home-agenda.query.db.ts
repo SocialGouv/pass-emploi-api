@@ -17,6 +17,7 @@ import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-mode
 import { Action } from '../../domain/action/action'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
+import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 
 export interface GetJeuneHomeAgendaQuery extends Query {
   idJeune: string
@@ -105,7 +106,8 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
         date: {
           [Op.gte]: dateDebut.toJSDate(),
           [Op.lte]: dateFin.toJSDate()
-        }
+        },
+        source: RendezVous.Source.PASS_EMPLOI
       },
       order: [['date', 'ASC']]
     })

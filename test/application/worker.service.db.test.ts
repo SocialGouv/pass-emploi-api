@@ -22,6 +22,7 @@ import { DateService } from '../../src/utils/date-service'
 import { StubbedClass, expect, stubClass } from '../utils'
 import { DatabaseForTesting } from '../utils/database-for-testing'
 import { testConfig } from '../utils/module-for-testing'
+import { HandleJobTraiterEvenementMiloHandler } from '../../src/application/commands/jobs/handle-job-traiter-evenement-milo.handler'
 
 describe('WorkerService', () => {
   DatabaseForTesting.prepare()
@@ -88,6 +89,10 @@ describe('WorkerService', () => {
         HandleJobSuivreEvenementsMiloHandler
       )
 
+      const handleJobTraiterEvenementMiloHandler = stubClass(
+        HandleJobTraiterEvenementMiloHandler
+      )
+
       const workerService = new WorkerService(
         planificateurRepository,
         handlerJobRendezVousCommandHandler,
@@ -106,7 +111,8 @@ describe('WorkerService', () => {
         monitorJobsCommandHandler,
         handleJobMettreAJourLesSegmentsCommandHandler,
         handleJobGenererJDDCommandHandler,
-        handleJobSuivreEvenementsMiloHandler
+        handleJobSuivreEvenementsMiloHandler,
+        handleJobTraiterEvenementMiloHandler
       )
 
       workerService.subscribe()

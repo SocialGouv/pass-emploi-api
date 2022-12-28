@@ -30,7 +30,7 @@ import { IdService } from '../../../src/utils/id-service'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
 
 describe('CreerJeuneMiloCommandHandler', () => {
   let creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
@@ -100,7 +100,7 @@ describe('CreerJeuneMiloCommandHandler', () => {
           email: 'email',
           idConseiller: 'idConseiller'
         }
-        jeuneRepository.getByIdDossier
+        jeuneRepository.getByIdPartenaire
           .withArgs(command.idPartenaire)
           .resolves(unJeune())
 

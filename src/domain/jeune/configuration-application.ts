@@ -24,6 +24,10 @@ export namespace ConfigurationApplication {
   export interface Repository {
     get(idJeune: string): Promise<ConfigurationApplication | undefined>
 
+    getByIdPartenaire(
+      idPartenaire: string
+    ): Promise<ConfigurationApplication | undefined>
+
     save(configurationApplication: ConfigurationApplication): Promise<void>
   }
 

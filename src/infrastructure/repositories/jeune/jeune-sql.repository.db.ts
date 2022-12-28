@@ -1,11 +1,11 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { Op, Sequelize } from 'sequelize'
 import { JeuneHomeQueryModel } from '../../../application/queries/query-models/home-jeune.query-model'
+import { Action } from '../../../domain/action/action'
 import { Core } from '../../../domain/core'
+import { Jeune } from '../../../domain/jeune/jeune'
 import { DateService } from '../../../utils/date-service'
 import { IdService } from '../../../utils/id-service'
-import { Action } from '../../../domain/action/action'
-import { Jeune } from '../../../domain/jeune/jeune'
 import { FirebaseClient } from '../../clients/firebase-client'
 import { ActionSqlModel } from '../../sequelize/models/action.sql-model'
 import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
@@ -78,7 +78,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return fromSqlToJeune(jeuneSqlModel)
   }
 
-  async getByIdDossier(idPartenaire: string): Promise<Jeune | undefined> {
+  async getByIdPartenaire(idPartenaire: string): Promise<Jeune | undefined> {
     const jeuneSqlModel = await JeuneSqlModel.findOne({
       where: { idPartenaire }
     })

@@ -9,7 +9,7 @@ import JobType = Planificateur.JobType
 /**
  * Implémente la logique nécessaire à la réalisation du job envoyée au système.
  */
-export abstract class JobHandler<C> {
+export abstract class JobHandler<T> {
   protected logger: Logger
   protected apmService: APM.Agent
   protected jobType: JobType
@@ -22,9 +22,9 @@ export abstract class JobHandler<C> {
     this.apmService = getAPMInstance()
   }
 
-  async execute(): Promise<SuiviJob> {
+  async execute(job?: T): Promise<SuiviJob> {
     try {
-      const result = await this.handle()
+      const result = await this.handle(job)
       await this.suiviJobService.save(result)
       if (result.succes === false) {
         await this.suiviJobService.notifierResultatJob(result)
@@ -38,9 +38,9 @@ export abstract class JobHandler<C> {
     }
   }
 
-  abstract handle(command?: C): Promise<SuiviJob>
+  abstract handle(job?: T): Promise<SuiviJob>
 
-  protected logAfter(result: SuiviJob, command?: C): void {
+  protected logAfter(result: SuiviJob, command?: T): void {
     const event = new LogEvent(LogEventKey.JOB_EVENT, {
       handler: this.jobType,
       command: command,

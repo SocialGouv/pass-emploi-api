@@ -1,12 +1,12 @@
+import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
+import { JeuneHomeQueryModel } from '../../application/queries/query-models/home-jeune.query-model'
 import { Brand } from '../../building-blocks/types/brand'
 import { DateService } from '../../utils/date-service'
-import { Core } from '../core'
-import { Injectable } from '@nestjs/common'
 import { IdService } from '../../utils/id-service'
+import { Core } from '../core'
 import * as _ConfigurationApplication from './configuration-application'
 import * as _PoleEmploi from './pole-emploi'
-import { JeuneHomeQueryModel } from '../../application/queries/query-models/home-jeune.query-model'
 
 export const JeunesRepositoryToken = 'Jeune.Repository'
 export const JeuneConfigurationApplicationRepositoryToken =
@@ -81,7 +81,7 @@ export namespace Jeune {
 
     getByEmail(email: string): Promise<Jeune | undefined>
 
-    getByIdDossier(idPartenaire: string): Promise<Jeune | undefined>
+    getByIdPartenaire(idPartenaire: string): Promise<Jeune | undefined>
 
     save(jeune: Jeune): Promise<void>
 

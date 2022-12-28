@@ -9,6 +9,7 @@ export function unRendezVousJDD(
 ): AsSql<RendezVousDto> {
   const defaults: AsSql<RendezVousDto> = {
     id: uuid.v4(),
+    source: 'PASS_EMPLOI',
     titre: 'rdv',
     duree: 30,
     modalite: 'modalite',

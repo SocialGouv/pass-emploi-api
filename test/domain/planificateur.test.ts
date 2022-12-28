@@ -140,7 +140,9 @@ describe('Planificateur', () => {
         // GIVEN
         const monEvenementMilo = unEvenementMilo()
         // WHEN
-        await planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant(monEvenementMilo)
+        await planificateurService.creerJobEvenementMiloSiIlNaPasEteCreeAvant(
+          monEvenementMilo
+        )
         // THEN
         const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> = {
           type: JobType.TRAITER_EVENEMENT_MILO,

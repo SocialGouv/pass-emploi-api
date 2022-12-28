@@ -11,6 +11,7 @@ import { fromSqlToRendezVousConseillerQueryModel } from './query-mappers/rendez-
 import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { Result } from '../../building-blocks/types/result'
+import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
 
 export interface GetAllRendezVousConseiller extends Query {
   idConseiller: string
@@ -55,6 +56,7 @@ export class GetAllRendezVousConseillerQueryHandler extends QueryHandler<
         date: {
           [Op.lte]: maintenant
         },
+        source: RendezVous.Source.PASS_EMPLOI,
         dateSuppression: {
           [Op.is]: null
         },

@@ -60,7 +60,8 @@ describe('JeuneConfigurationApplicationSqlRepository', () => {
             installationId: 'uneInstallationId',
             instanceId: 'uneInstanceId',
             appVersion: 'uneAppVersion',
-            dateDerniereActualisationToken: uneDatetime().toJSDate()
+            dateDerniereActualisationToken: uneDatetime().toJSDate(),
+            fuseauHoraire: 'Europe/Paris'
           }
         expect(result).to.deep.equal(configurationApplicationExpected)
       })
@@ -156,6 +157,70 @@ describe('JeuneConfigurationApplicationSqlRepository', () => {
         expect(result?.dateDerniereActualisationToken).to.deep.equal(
           configurationApplication.dateDerniereActualisationToken
         )
+      })
+    })
+  })
+
+  describe('getByIdPartenaire', () => {
+    let jeune: Jeune
+
+    beforeEach(async () => {
+      // Given
+      jeune = {
+        ...unJeune()
+      }
+      const conseillerDto = unConseillerDto({
+        structure: Core.Structure.POLE_EMPLOI
+      })
+      await ConseillerSqlModel.creer(conseillerDto)
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          idConseiller: conseillerDto.id,
+          dateCreation: jeune.creationDate.toJSDate(),
+          pushNotificationToken: 'unToken',
+          dateDerniereActualisationToken: uneDatetime().toJSDate(),
+          datePremiereConnexion: uneDatetime().toJSDate(),
+          installationId: 'uneInstallationId',
+          instanceId: 'uneInstanceId',
+          appVersion: 'uneAppVersion',
+          idPartenaire: 'unIdPartenaire',
+          timezone: 'Europe/Paris'
+        })
+      )
+    })
+    describe('quand le jeune existe', () => {
+      it('retourne la configuration application', async () => {
+        // When
+        const result =
+          await jeuneConfigurationApplicationSqlRepositorySql.getByIdPartenaire(
+            'unIdPartenaire'
+          )
+
+        // Then
+        const configurationApplicationExpected: Jeune.ConfigurationApplication =
+          {
+            idJeune: jeune.id,
+            pushNotificationToken: 'unToken',
+            installationId: 'uneInstallationId',
+            instanceId: 'uneInstanceId',
+            appVersion: 'uneAppVersion',
+            dateDerniereActualisationToken: uneDatetime().toJSDate(),
+            fuseauHoraire: 'Europe/Paris'
+          }
+        expect(result).to.deep.equal(configurationApplicationExpected)
+      })
+    })
+
+    describe("quand le jeune n'existe pas", () => {
+      it('retourne undefined', async () => {
+        // When
+        const result =
+          await jeuneConfigurationApplicationSqlRepositorySql.getByIdPartenaire(
+            'ZIZOU'
+          )
+
+        // Then
+        expect(result).to.equal(undefined)
       })
     })
   })

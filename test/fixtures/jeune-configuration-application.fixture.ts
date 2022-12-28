@@ -10,7 +10,8 @@ export const uneJeuneConfigurationApplication = (
     installationId: 'uneInstallationId',
     instanceId: 'uneInstanceId',
     appVersion: 'uneAppVersion',
-    dateDerniereActualisationToken: uneDatetime().toJSDate()
+    dateDerniereActualisationToken: uneDatetime().toJSDate(),
+    fuseauHoraire: 'Europe/Paris'
   }
   return { ...defaults, ...args }
 }

@@ -1,15 +1,19 @@
 import { HttpService } from '@nestjs/axios'
-import { Injectable, Logger } from '@nestjs/common'
+import { HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { Partenaire } from 'src/domain/partenaire/partenaire'
-import {
-  emptySuccess,
-  failure,
-  Result
-} from '../../building-blocks/types/result'
 import { firstValueFrom } from 'rxjs'
-import { EvenementMiloDto } from './dto/milo.dto'
+import { Partenaire } from 'src/domain/partenaire/partenaire'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
+import {
+  Result,
+  emptySuccess,
+  failure
+} from '../../building-blocks/types/result'
+import {
+  EvenementMiloDto,
+  RendezVousMiloDto,
+  SessionMiloDto
+} from './dto/milo.dto'
 
 @Injectable()
 export class MiloEvenementsHttpRepository
@@ -18,6 +22,7 @@ export class MiloEvenementsHttpRepository
   private logger: Logger
   private readonly apiUrl: string
   private readonly apiKeyEvents: string
+  private readonly apiKeyDetailRendezVous: string
 
   constructor(
     private httpService: HttpService,
@@ -26,6 +31,8 @@ export class MiloEvenementsHttpRepository
     this.logger = new Logger('MiloHttpRepository')
     this.apiUrl = this.configService.get('milo').url
     this.apiKeyEvents = this.configService.get('milo').apiKeyEvents
+    this.apiKeyDetailRendezVous =
+      this.configService.get('milo').apiKeyDetailRendezVous
   }
 
   async findAllEvenements(): Promise<Partenaire.Milo.Evenement[]> {
@@ -66,6 +73,73 @@ export class MiloEvenementsHttpRepository
     } catch (e) {
       this.logger.error(e)
       return failure(new ErreurHttp(e.response.data, e.response.status))
+    }
+  }
+
+  async findRendezVousByEvenement(
+    evenement: Partenaire.Milo.Evenement
+  ): Promise<Partenaire.Milo.RendezVous | undefined> {
+    try {
+      if (evenement.objet === Partenaire.Milo.ObjetEvenement.SESSION) {
+        const sessionMilo = await firstValueFrom(
+          this.httpService.get<SessionMiloDto>(
+            `${this.apiUrl}/operateurs/dossiers/${evenement.idPartenaireBeneficiaire}/sessions/${evenement.idObjet}`,
+            {
+              headers: {
+                'X-Gravitee-Api-Key': `${this.apiKeyEvents}`,
+                operateur: 'applicationcej'
+              }
+            }
+          )
+        )
+
+        if (['Refus tiers', 'Refus jeune'].includes(sessionMilo.data.statut)) {
+          return undefined
+        }
+
+        return {
+          id: sessionMilo.data.id,
+          dateHeureDebut: sessionMilo.data.dateHeureDebut,
+          dateHeureFin: sessionMilo.data.dateHeureFin,
+          titre: sessionMilo.data.nom,
+          idPartenaireBeneficiaire: sessionMilo.data.idDossier,
+          commentaire: sessionMilo.data.commentaire,
+          statut: sessionMilo.data.statut,
+          type: undefined
+        }
+      } else {
+        const rendezVousMilo = await firstValueFrom(
+          this.httpService.get<RendezVousMiloDto>(
+            `${this.apiUrl}/operateurs/dossiers/${evenement.idPartenaireBeneficiaire}/rdv/${evenement.idObjet}`,
+            {
+              headers: {
+                'X-Gravitee-Api-Key': `${this.apiKeyEvents}`,
+                operateur: 'applicationcej'
+              }
+            }
+          )
+        )
+
+        if (['Annulé', 'Reporté'].includes(rendezVousMilo.data.statut)) {
+          return undefined
+        }
+
+        return {
+          id: rendezVousMilo.data.id,
+          dateHeureDebut: rendezVousMilo.data.dateHeureDebut,
+          dateHeureFin: rendezVousMilo.data.dateHeureFin,
+          titre: rendezVousMilo.data.objet,
+          idPartenaireBeneficiaire: rendezVousMilo.data.idDossier,
+          commentaire: rendezVousMilo.data.commentaire,
+          type: rendezVousMilo.data.type,
+          statut: rendezVousMilo.data.statut
+        }
+      }
+    } catch (e) {
+      if (e.response?.status === HttpStatus.NOT_FOUND) {
+        return undefined
+      }
+      throw e
     }
   }
 }

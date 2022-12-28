@@ -60,6 +60,7 @@ describe('Rendez-vous', () => {
             date: new Date('2020-04-06T12:00:00.000Z'),
             duree: 10,
             id: '26279b34-318a-45e4-a8ad-514a1090462c',
+            source: RendezVous.Source.PASS_EMPLOI,
             idAgence: undefined,
             invitation: undefined,
             jeunes: [unJeune()],
