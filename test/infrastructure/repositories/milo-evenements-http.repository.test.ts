@@ -20,6 +20,7 @@ import {
 } from '../../../src/infrastructure/repositories/dto/milo.dto'
 import { MiloEvenementsHttpRepository } from '../../../src/infrastructure/repositories/milo-evenements-http.repository'
 import ObjetEvenement = Milo.ObjetEvenement
+import Type = Milo.RendezVous.Type
 
 describe('MiloEvenementsHttpRepository', () => {
   let miloEvenementsHttpRepository: MiloEvenementsHttpRepository
@@ -268,8 +269,9 @@ describe('MiloEvenementsHttpRepository', () => {
             idPartenaireBeneficiaire,
             titre: sessionJson.nom,
             commentaire: sessionJson.commentaire,
-            type: undefined,
-            statut: 'Prescrit'
+            type: Type.SESSION,
+            statut: 'Prescrit',
+            adresse: 'la'
           })
           expect(resultat).to.deep.equal(expected)
         })

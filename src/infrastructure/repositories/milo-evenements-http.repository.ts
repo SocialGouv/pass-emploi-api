@@ -5,9 +5,9 @@ import { firstValueFrom } from 'rxjs'
 import { Partenaire } from 'src/domain/partenaire/partenaire'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
 import {
-  Result,
   emptySuccess,
-  failure
+  failure,
+  Result
 } from '../../building-blocks/types/result'
 import {
   EvenementMiloDto,
@@ -105,7 +105,8 @@ export class MiloEvenementsHttpRepository
           idPartenaireBeneficiaire: sessionMilo.data.idDossier,
           commentaire: sessionMilo.data.commentaire,
           statut: sessionMilo.data.statut,
-          type: undefined
+          type: Partenaire.Milo.RendezVous.Type.SESSION,
+          adresse: sessionMilo.data.lieu
         }
       } else {
         const rendezVousMilo = await firstValueFrom(
@@ -131,7 +132,7 @@ export class MiloEvenementsHttpRepository
           titre: rendezVousMilo.data.objet,
           idPartenaireBeneficiaire: rendezVousMilo.data.idDossier,
           commentaire: rendezVousMilo.data.commentaire,
-          type: rendezVousMilo.data.type,
+          type: Partenaire.Milo.RendezVous.Type.RENDEZ_VOUS,
           statut: rendezVousMilo.data.statut
         }
       }

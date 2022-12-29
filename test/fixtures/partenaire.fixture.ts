@@ -32,14 +32,14 @@ export const unEvenementMiloDto = (
 export const unRendezVousMilo = (
   args: Partial<Partenaire.Milo.RendezVous> = {}
 ): Partenaire.Milo.RendezVous => {
-  const defaults = {
-    id: '25811357',
+  const defaults: Partenaire.Milo.RendezVous = {
+    id: '34',
     dateHeureDebut: '2022-10-06 10:00:00',
     dateHeureFin: '2022-10-06 12:00:00',
     titre: 'Test RDV',
     idPartenaireBeneficiaire: '5045180',
     commentaire: '',
-    type: 'Téléphone',
+    type: Partenaire.Milo.RendezVous.Type.RENDEZ_VOUS,
     statut: 'Planifié'
   }
   return { ...defaults, ...args }

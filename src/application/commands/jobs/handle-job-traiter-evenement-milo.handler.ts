@@ -1,9 +1,6 @@
 import { Inject } from '@nestjs/common'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
-import {
-  Jeune,
-  JeuneConfigurationApplicationRepositoryToken
-} from '../../../domain/jeune/jeune'
+import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
 import { PartenaireMiloRepositoryToken } from '../../../domain/partenaire/milo'
 import { Partenaire } from '../../../domain/partenaire/partenaire'
 import { Planificateur } from '../../../domain/planificateur'
@@ -22,8 +19,8 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,
     private dateService: DateService,
-    @Inject(JeuneConfigurationApplicationRepositoryToken)
-    private configJeuneRepository: Jeune.ConfigurationApplication.Repository,
+    @Inject(JeunesRepositoryToken)
+    private jeuneRepository: Jeune.Repository,
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
     @Inject(PartenaireMiloRepositoryToken)
@@ -46,11 +43,11 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
       return this.buildSuiviJob(debut, Traitement.OBJET_NON_TRAITABLE, true)
     }
 
-    const configJeune = await this.configJeuneRepository.getByIdPartenaire(
+    const jeune = await this.jeuneRepository.getByIdPartenaire(
       job.contenu.idPartenaireBeneficiaire
     )
 
-    if (configJeune === undefined) {
+    if (jeune === undefined) {
       return this.buildSuiviJob(debut, Traitement.JEUNE_INEXISTANT, true)
     }
 
@@ -62,13 +59,29 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
     if (rendezVousMilo === undefined) {
       return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_INEXISTANT, true)
     }
-    const rendezVousPassEmploi =
-      this.rendezVousMiloFactory.creerRendezVousPassEmploi(
-        rendezVousMilo,
-        configJeune
+
+    const rendezVousExistant =
+      await this.rendezVousRepository.getByIdPartenaire(
+        rendezVousMilo.id,
+        rendezVousMilo.type
       )
 
-    await this.rendezVousRepository.save(rendezVousPassEmploi)
+    if (!rendezVousExistant) {
+      const unNouveauRendezVous =
+        this.rendezVousMiloFactory.creerRendezVousPassEmploi(
+          rendezVousMilo,
+          jeune
+        )
+
+      await this.rendezVousRepository.save(unNouveauRendezVous)
+    } else {
+      const unRendezVousMisAJour =
+        await this.rendezVousMiloFactory.mettreAJourRendezVousPassEmploi(
+          rendezVousExistant,
+          rendezVousMilo
+        )
+      await this.rendezVousRepository.save(unRendezVousMisAJour)
+    }
     return this.buildSuiviJob(debut, Traitement.OK, true)
   }
 

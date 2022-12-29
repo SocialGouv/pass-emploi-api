@@ -73,6 +73,7 @@ export interface RendezVous {
   createur: Createur
   idAgence?: string
   dateCloture?: DateTime
+  informationsPartenaire?: RendezVous.InformationsPartenaire
 }
 
 export interface InfosRendezVousACreer {
@@ -115,6 +116,11 @@ export namespace RendezVous {
 
     get(id: string): Promise<RendezVous | undefined>
 
+    getByIdPartenaire(
+      idRendezVousPartenaire: string,
+      typeRendezVousPartenaire: string
+    ): Promise<RendezVous | undefined>
+
     delete(idRendezVous: string): Promise<void>
 
     getAllAVenir(): Promise<RendezVous[]>
@@ -134,6 +140,11 @@ export namespace RendezVous {
   export enum Source {
     PASS_EMPLOI = 'PASS_EMPLOI',
     MILO = 'MILO'
+  }
+
+  export interface InformationsPartenaire {
+    id: string
+    type: string
   }
 
   export function estUnTypeAnimationCollective(type?: string): boolean {

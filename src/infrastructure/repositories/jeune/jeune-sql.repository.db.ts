@@ -78,14 +78,17 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return fromSqlToJeune(jeuneSqlModel)
   }
 
-  async getByIdPartenaire(idPartenaire: string): Promise<Jeune | undefined> {
+  async getByIdPartenaire(
+    idPartenaire: string,
+    attributs?: { avecConfiguration: boolean }
+  ): Promise<Jeune | undefined> {
     const jeuneSqlModel = await JeuneSqlModel.findOne({
       where: { idPartenaire }
     })
     if (!jeuneSqlModel) {
       return undefined
     }
-    return fromSqlToJeune(jeuneSqlModel)
+    return fromSqlToJeune(jeuneSqlModel, attributs)
   }
 
   async transferAndSaveAll(
