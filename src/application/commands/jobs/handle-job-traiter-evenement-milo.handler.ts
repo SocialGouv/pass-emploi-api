@@ -1,8 +1,11 @@
-import { Inject } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
-import { PartenaireMiloRepositoryToken } from '../../../domain/partenaire/milo'
-import { Partenaire } from '../../../domain/partenaire/partenaire'
+import {
+  Milo,
+  MiloRendezVousFactory,
+  PartenaireMiloRepositoryToken
+} from '../../../domain/partenaire/milo'
 import { Planificateur } from '../../../domain/planificateur'
 import {
   RendezVous,
@@ -12,6 +15,7 @@ import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 import { DateTime } from 'luxon'
 
+@Injectable()
 export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
   Planificateur.Job<unknown>
 > {
@@ -24,8 +28,8 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
     @Inject(PartenaireMiloRepositoryToken)
-    private miloEvenementsHttpRepository: Partenaire.Milo.Repository,
-    private rendezVousMiloFactory: Partenaire.Milo.RendezVous.Factory
+    private miloEvenementsHttpRepository: Milo.Repository,
+    private rendezVousMiloFactory: MiloRendezVousFactory
   ) {
     super(Planificateur.JobType.TRAITER_EVENEMENT_MILO, suiviJobService)
   }
@@ -35,16 +39,17 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
   ): Promise<SuiviJob> {
     const debut = this.dateService.now()
 
-    if (job.contenu.type === Partenaire.Milo.TypeEvenement.NON_TRAITABLE) {
+    if (job.contenu.type === Milo.TypeEvenement.NON_TRAITABLE) {
       return this.buildSuiviJob(debut, Traitement.TYPE_NON_TRAITABLE, true)
     }
 
-    if (job.contenu.objet === Partenaire.Milo.ObjetEvenement.NON_TRAITABLE) {
+    if (job.contenu.objet === Milo.ObjetEvenement.NON_TRAITABLE) {
       return this.buildSuiviJob(debut, Traitement.OBJET_NON_TRAITABLE, true)
     }
 
     const jeune = await this.jeuneRepository.getByIdPartenaire(
-      job.contenu.idPartenaireBeneficiaire
+      job.contenu.idPartenaireBeneficiaire,
+      { avecConfiguration: true }
     )
 
     if (jeune === undefined) {

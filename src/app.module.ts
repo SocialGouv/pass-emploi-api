@@ -295,7 +295,10 @@ import { SupportController } from './infrastructure/routes/support.controller'
 import { RefreshJddCommandHandler } from './application/commands/refresh-jdd.command.handler'
 import { HandleJobSuivreEvenementsMiloHandler } from './application/commands/jobs/handle-job-suivre-evenements-milo.handler'
 import { MiloEvenementsHttpRepository } from './infrastructure/repositories/milo-evenements-http.repository'
-import { PartenaireMiloRepositoryToken } from './domain/partenaire/milo'
+import {
+  MiloRendezVousFactory,
+  PartenaireMiloRepositoryToken
+} from './domain/partenaire/milo'
 import { HandleJobTraiterEvenementMiloHandler } from './application/commands/jobs/handle-job-traiter-evenement-milo.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
@@ -376,6 +379,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Recherche.Factory,
     Conseiller.ListeDeDiffusion.Factory,
     Conseiller.ListeDeDiffusion.Service,
+    MiloRendezVousFactory,
     BigqueryClient,
     {
       provide: APP_GUARD,

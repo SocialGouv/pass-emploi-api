@@ -27,6 +27,7 @@ import { HandleJobMettreAJourLesSegmentsCommandHandler } from './commands/jobs/h
 import { HandleJobGenererJDDCommandHandler } from './commands/jobs/handle-job-generer-jdd.handler'
 import { HandleJobSuivreEvenementsMiloHandler } from './commands/jobs/handle-job-suivre-evenements-milo.handler'
 import { HandleJobTraiterEvenementMiloHandler } from './commands/jobs/handle-job-traiter-evenement-milo.handler'
+import { SuiviJob } from '../domain/suivi-job'
 
 @Injectable()
 export class WorkerService {
@@ -74,6 +75,7 @@ export class WorkerService {
       job,
       state: 'started'
     })
+    let suivi: SuiviJob | undefined
     try {
       switch (job.type) {
         case Planificateur.JobType.RENDEZVOUS:
@@ -87,54 +89,61 @@ export class WorkerService {
           })
           break
         case Planificateur.JobType.GENERER_JDD:
-          await this.handleJobGenererJDDCommandHandler.handle({
+          suivi = await this.handleJobGenererJDDCommandHandler.handle({
             job: job as Planificateur.Job<Planificateur.JobGenererJDD>
           })
           break
         case Planificateur.JobType.MAIL_CONSEILLER_MESSAGES:
-          await this.handleJobMailConseillerCommandHandler.execute()
+          suivi = await this.handleJobMailConseillerCommandHandler.execute()
           break
         case Planificateur.JobType.NOUVELLES_OFFRES_EMPLOI:
-          await this.handleJobNotifierNouvellesOffresEmploiCommandHandler.execute()
+          suivi =
+            await this.handleJobNotifierNouvellesOffresEmploiCommandHandler.execute()
           break
         case Planificateur.JobType.NOUVELLES_OFFRES_SERVICE_CIVIQUE:
-          await this.handleJobNotifierNouveauxServicesCiviqueCommandHandler.execute()
+          suivi =
+            await this.handleJobNotifierNouveauxServicesCiviqueCommandHandler.execute()
           break
         case Planificateur.JobType.NETTOYER_LES_JOBS:
-          await this.handleNettoyerLesJobsCommandHandler.execute()
+          suivi = await this.handleNettoyerLesJobsCommandHandler.execute()
           break
         case Planificateur.JobType.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS:
-          await this.handleJobUpdateMailingListConseillerCommandHandler.execute()
+          suivi =
+            await this.handleJobUpdateMailingListConseillerCommandHandler.execute()
           break
         case Planificateur.JobType.RECUPERER_SITUATIONS_JEUNES_MILO:
-          await this.handleJobRecupererSituationsJeunesMiloCommandHandler.execute()
+          suivi =
+            await this.handleJobRecupererSituationsJeunesMiloCommandHandler.execute()
           break
         case Planificateur.JobType.NETTOYER_LES_PIECES_JOINTES:
-          await this.handleJobNettoyerPiecesJointesCommandHandler.execute()
+          suivi =
+            await this.handleJobNettoyerPiecesJointesCommandHandler.execute()
           break
         case Planificateur.JobType.NETTOYER_LES_DONNEES:
-          await this.handleJobNettoyerLesDonneesCommandHandler.execute()
+          suivi = await this.handleJobNettoyerLesDonneesCommandHandler.execute()
           break
         case Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE:
-          await this.handleJobNotifierRendezVousPECommandHandler.execute()
+          suivi =
+            await this.handleJobNotifierRendezVousPECommandHandler.execute()
           break
         case Planificateur.JobType.MAJ_CODES_EVENEMENTS:
           await this.handleJobMettreAJourCodesEvenementsCommandHandler.execute()
           break
         case Planificateur.JobType.MAJ_AGENCE_AC:
-          await this.handleJobAgenceAnimationCollectiveCommand.execute()
+          suivi = await this.handleJobAgenceAnimationCollectiveCommand.execute()
           break
         case Planificateur.JobType.MONITORER_JOBS:
-          await this.monitorJobsCommandHandler.execute()
+          suivi = await this.monitorJobsCommandHandler.execute()
           break
         case Planificateur.JobType.MAJ_SEGMENTS:
-          await this.handleJobMettreAJourLesSegmentsCommandHandler.execute()
+          suivi =
+            await this.handleJobMettreAJourLesSegmentsCommandHandler.execute()
           break
         case Planificateur.JobType.SUIVRE_EVENEMENTS_MILO:
-          await this.handleJobSuivreEvenementsMiloHandler.execute()
+          suivi = await this.handleJobSuivreEvenementsMiloHandler.execute()
           break
         case Planificateur.JobType.TRAITER_EVENEMENT_MILO:
-          await this.handleJobTraiterEvenementMiloHandler.execute(job)
+          suivi = await this.handleJobTraiterEvenementMiloHandler.execute(job)
           break
         case Planificateur.JobType.FAKE:
           this.logger.log({
@@ -163,6 +172,10 @@ export class WorkerService {
         transaction.end('failure')
       } else if (transaction && success) {
         transaction.end('success')
+      }
+      if (suivi?.succes === false || !success) {
+        // On veut passer le job en fail sur le planificateur
+        throw new Error(`${jobName} en échec`)
       }
     }
   }

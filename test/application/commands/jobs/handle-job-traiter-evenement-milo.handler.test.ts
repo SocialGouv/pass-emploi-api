@@ -18,6 +18,7 @@ import {
 import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { unJeune } from '../../../fixtures/jeune.fixture'
+import { MiloRendezVousFactory } from '../../../../src/domain/partenaire/milo'
 
 describe('HandleJobTraiterEvenementMiloHandler', () => {
   let handler: HandleJobTraiterEvenementMiloHandler
@@ -26,7 +27,7 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
   let jeuneRepository: StubbedType<Jeune.Repository>
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let miloEvenementsHttpRepository: StubbedType<Partenaire.Milo.Repository>
-  let rendezVousMiloFactory: StubbedClass<Partenaire.Milo.RendezVous.Factory>
+  let rendezVousMiloFactory: StubbedClass<MiloRendezVousFactory>
 
   const jeune: Jeune = unJeune()
   const idPartenaireBeneficiaire = '123456'
@@ -39,7 +40,7 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
     jeuneRepository = stubInterface(sandbox)
     rendezVousRepository = stubInterface(sandbox)
     miloEvenementsHttpRepository = stubInterface(sandbox)
-    rendezVousMiloFactory = stubClass(Partenaire.Milo.RendezVous.Factory)
+    rendezVousMiloFactory = stubClass(MiloRendezVousFactory)
 
     handler = new HandleJobTraiterEvenementMiloHandler(
       suiviJobService,
