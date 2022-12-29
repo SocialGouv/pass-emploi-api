@@ -33,6 +33,7 @@ import { AsSql } from '../../../../src/infrastructure/sequelize/types'
 import { uneDatetime } from '../../../fixtures/date.fixture'
 import {
   unConseillerDuJeune,
+  uneConfiguration,
   unJeune,
   unJeuneSansConseiller
 } from '../../../fixtures/jeune.fixture'
@@ -389,41 +390,48 @@ describe('JeuneSqlRepository', () => {
     })
   })
 
-  describe('getByIdDossier', () => {
-    let jeune: Jeune
+  describe('getByIdPartenaire', () => {
+    let jeuneAttendu: Jeune
 
     beforeEach(async () => {
       // Given
-      jeune = {
+      jeuneAttendu = {
         ...unJeuneSansConseiller(),
         idPartenaire: 'test-id-dossier',
-        configuration: undefined
+        configuration: uneConfiguration({
+          dateDerniereActualisationToken: uneDatetime().toJSDate()
+        })
       }
       await JeuneSqlModel.creer(
         unJeuneDto({
           idConseiller: undefined,
-          dateCreation: jeune.creationDate.toJSDate(),
-          pushNotificationToken: 'unToken',
+          dateCreation: jeuneAttendu.creationDate.toJSDate(),
+          pushNotificationToken: 'token',
           dateDerniereActualisationToken: uneDatetime().toJSDate(),
           idPartenaire: 'test-id-dossier',
-          datePremiereConnexion: uneDatetime().toJSDate()
+          datePremiereConnexion: uneDatetime().toJSDate(),
+          installationId: '123456',
+          instanceId: 'abcdef',
+          appVersion: '1.8.1',
+          timezone: 'Europe/Paris'
         })
       )
     })
 
-    describe('quand un jeune existe avec cet id dossier', () => {
-      it('retourne le jeune', async () => {
+    describe('quand un jeune existe avec cet id partenaire', () => {
+      it('retourne le jeune avec sa configuration', async () => {
         // When
         const result = await jeuneSqlRepository.getByIdPartenaire(
-          'test-id-dossier'
+          'test-id-dossier',
+          { avecConfiguration: true }
         )
 
         // Then
-        expect(result).to.deep.equal(jeune)
+        expect(result).to.deep.equal(jeuneAttendu)
       })
     })
 
-    describe("quand aucun jeune n'existe avec cet email", () => {
+    describe("quand aucun jeune n'existe avec cet id partenaire", () => {
       it('retourne undefined', async () => {
         // When
         const jeune = await jeuneSqlRepository.getByIdPartenaire(

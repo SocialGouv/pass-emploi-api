@@ -80,6 +80,18 @@ export class RendezVousDto extends Model {
     type: DataType.STRING
   })
   idAgence: string | null
+
+  @Column({
+    field: 'type_partenaire',
+    type: DataType.STRING
+  })
+  typePartenaire: string | null
+
+  @Column({
+    field: 'id_partenaire',
+    type: DataType.STRING
+  })
+  idPartenaire: string | null
 }
 
 @Table({ timestamps: false, tableName: 'rendez_vous' })

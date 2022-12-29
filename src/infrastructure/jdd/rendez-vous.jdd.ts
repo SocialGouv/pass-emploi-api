@@ -26,7 +26,9 @@ export function unRendezVousJDD(
     icsSequence: null,
     dateCloture: null,
     idAgence: null,
-    createur: { id: '1', nom: 'Tavernier', prenom: 'Nils' }
+    createur: { id: '1', nom: 'Tavernier', prenom: 'Nils' },
+    typePartenaire: null,
+    idPartenaire: null
   }
 
   return { ...defaults, ...args }

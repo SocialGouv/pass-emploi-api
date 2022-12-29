@@ -31,7 +31,9 @@ export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
     invitation: rendezVous.invitation ?? null,
     icsSequence: rendezVous.icsSequence ?? null,
     createur: rendezVous.createur,
-    idAgence: rendezVous.idAgence ?? null
+    idAgence: rendezVous.idAgence ?? null,
+    typePartenaire: rendezVous.informationsPartenaire?.type ?? null,
+    idPartenaire: rendezVous.informationsPartenaire?.id ?? null
   }
 }
 
@@ -55,7 +57,20 @@ export function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
     icsSequence: rendezVousSql.icsSequence ?? undefined,
     createur: rendezVousSql.createur,
     dateCloture: DateService.fromJSDateToDateTime(rendezVousSql.dateCloture),
-    idAgence: rendezVousSql.idAgence ?? undefined
+    idAgence: rendezVousSql.idAgence ?? undefined,
+    informationsPartenaire: buildInformationsPartenaire(rendezVousSql)
+  }
+}
+
+function buildInformationsPartenaire(
+  rendezVousSql: RendezVousSqlModel
+): RendezVous.InformationsPartenaire | undefined {
+  if (!rendezVousSql.typePartenaire || !rendezVousSql.idPartenaire) {
+    return undefined
+  }
+  return {
+    type: rendezVousSql.typePartenaire,
+    id: rendezVousSql.idPartenaire
   }
 }
 

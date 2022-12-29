@@ -1,0 +1,242 @@
+import { expect, StubbedClass, stubClass } from '../../utils'
+import { unRendezVousMilo } from '../../fixtures/partenaire.fixture'
+import { Partenaire } from '../../../src/domain/partenaire/partenaire'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../src/domain/rendez-vous/rendez-vous'
+import { IdService } from '../../../src/utils/id-service'
+import { Jeune } from '../../../src/domain/jeune/jeune'
+import {
+  unJeuneDuRendezVous,
+  unRendezVous
+} from '../../fixtures/rendez-vous.fixture'
+import { uneConfiguration, unJeune } from '../../fixtures/jeune.fixture'
+import { Milo } from '../../../src/domain/partenaire/milo'
+import Source = RendezVous.Source
+import Type = Milo.RendezVous.Type
+
+describe('Milo Partenaire', () => {
+  describe('Factory', () => {
+    let idService: StubbedClass<IdService>
+    let rendezVousFactory: Partenaire.Milo.RendezVous.Factory
+
+    let rdvMilo: Partenaire.Milo.RendezVous
+    let rendezVousPassEmploi: RendezVous
+    let jeune: Jeune
+    let uuid: string
+    let dateStringRendezVousDebut: string
+    let dateStringRendezVousFin: string
+    let rendezVousObtenu: RendezVous
+
+    const idJeune = 'id-jeune'
+    const configuration = uneConfiguration({
+      fuseauHoraire: 'America/Guadeloupe'
+    })
+
+    describe('creerRendezVousPassEmploi', () => {
+      beforeEach(() => {
+        // Given
+        idService = stubClass(IdService)
+        rendezVousFactory = new Partenaire.Milo.RendezVous.Factory(idService)
+
+        dateStringRendezVousDebut = '2022-10-06 10:07:00'
+        dateStringRendezVousFin = '2022-10-06 11:43:00'
+        jeune = unJeune({
+          id: idJeune,
+          configuration
+        })
+        uuid = 'de82d1fe-875c-11ed-a1eb-0242ac120002'
+        idService.uuid.returns(uuid)
+      })
+
+      describe('les règles complexes', () => {
+        beforeEach(() => {
+          // Given
+          rdvMilo = unRendezVousMilo({
+            dateHeureDebut: dateStringRendezVousDebut,
+            dateHeureFin: dateStringRendezVousFin
+          })
+
+          // When
+          rendezVousObtenu = rendezVousFactory.creerRendezVousPassEmploi(
+            rdvMilo,
+            jeune
+          )
+        })
+        it('retourne un rendez-vous avec une date timezonée avec le fuseau du jeune', async () => {
+          // Then
+          expect(rendezVousObtenu.date).to.deep.equal(
+            new Date('2022-10-06T14:07:00Z')
+          )
+        })
+        it('retourne un rendez-vous avec une date timezonée Europe/Paris quand le jeune n’a pas de fuseau horaire', async () => {
+          // Given
+          jeune = unJeune({
+            id: idJeune,
+            configuration: uneConfiguration({ fuseauHoraire: undefined })
+          })
+
+          // When
+          rendezVousObtenu = rendezVousFactory.creerRendezVousPassEmploi(
+            rdvMilo,
+            jeune
+          )
+          // Then
+          expect(rendezVousObtenu.date).to.deep.equal(
+            new Date('2022-10-06T08:07:00Z')
+          )
+        })
+        describe('durée', () => {
+          it('retourne la durée en minutes quand la date de fin est renseignée', async () => {
+            // Then
+            expect(rendezVousObtenu.duree).to.deep.equal(96)
+          })
+          it("retourne 0 quand la date de fin n'est pas renseignée", async () => {
+            // Given
+            rdvMilo = unRendezVousMilo({
+              dateHeureFin: undefined
+            })
+            // When
+            rendezVousObtenu = rendezVousFactory.creerRendezVousPassEmploi(
+              rdvMilo,
+              jeune
+            )
+            // Then
+            expect(rendezVousObtenu.duree).to.deep.equal(0)
+          })
+        })
+      })
+      describe("quand c'est un rendez vous individuel", () => {
+        beforeEach(() => {
+          // Given
+          rdvMilo = unRendezVousMilo({
+            dateHeureDebut: dateStringRendezVousDebut,
+            dateHeureFin: dateStringRendezVousFin
+          })
+
+          // When
+          rendezVousObtenu = rendezVousFactory.creerRendezVousPassEmploi(
+            rdvMilo,
+            jeune
+          )
+        })
+        it('retourne un rendez-vous avec le type ENTRETIEN INDIVIDUEL ', async () => {
+          // Then
+          const expected: RendezVous = {
+            id: uuid,
+            source: Source.MILO,
+            titre: rdvMilo.titre,
+            sousTitre: '',
+            date: new Date('2022-10-06T14:07:00Z'),
+            duree: 96,
+            jeunes: [
+              unJeuneDuRendezVous({
+                id: idJeune,
+                configuration
+              })
+            ],
+            type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+            presenceConseiller: true,
+            modalite: rdvMilo.modalite,
+            commentaire: rdvMilo.commentaire,
+            informationsPartenaire: {
+              type: rdvMilo.type,
+              id: rdvMilo.id
+            },
+            createur: { id: '', nom: '', prenom: '' },
+            adresse: undefined
+          }
+          expect(rendezVousObtenu).to.deep.equal(expected)
+        })
+      })
+      describe("quand c'est une session", () => {
+        beforeEach(() => {
+          // Given
+          rdvMilo = unRendezVousMilo({
+            dateHeureDebut: dateStringRendezVousDebut,
+            dateHeureFin: dateStringRendezVousFin,
+            type: Type.SESSION,
+            adresse: 'Route de la plage, 97122 Baie-Mahault'
+          })
+
+          // When
+          rendezVousObtenu = rendezVousFactory.creerRendezVousPassEmploi(
+            rdvMilo,
+            jeune
+          )
+        })
+        it('retourne un rendez-vous avec le type ENTRETIEN INDIVIDUEL ', async () => {
+          // Then
+          const expected: RendezVous = {
+            id: uuid,
+            source: Source.MILO,
+            titre: rdvMilo.titre,
+            sousTitre: '',
+            date: new Date('2022-10-06T14:07:00Z'),
+            duree: 96,
+            jeunes: [
+              unJeuneDuRendezVous({
+                id: idJeune,
+                configuration
+              })
+            ],
+            type: CodeTypeRendezVous.ATELIER,
+            presenceConseiller: false,
+            adresse: rdvMilo.adresse,
+            commentaire: rdvMilo.commentaire,
+            informationsPartenaire: {
+              type: rdvMilo.type,
+              id: rdvMilo.id
+            },
+            createur: { id: '', nom: '', prenom: '' },
+            modalite: undefined
+          }
+          expect(rendezVousObtenu).to.deep.equal(expected)
+        })
+      })
+    })
+    describe('mettreAJourRendezVousPassEmploi', () => {
+      beforeEach(() => {
+        // Given
+        idService = stubClass(IdService)
+        rendezVousFactory = new Partenaire.Milo.RendezVous.Factory(idService)
+        dateStringRendezVousDebut = '2022-10-06 10:07:00'
+        dateStringRendezVousFin = '2022-10-06 11:43:00'
+        jeune = unJeune({
+          id: idJeune,
+          configuration
+        })
+        rendezVousPassEmploi = unRendezVous({
+          id: 'un-id-pass-emploi-quoi',
+          jeunes: [jeune]
+        })
+        uuid = 'de82d1fe-875c-11ed-a1eb-0242ac120002'
+        idService.uuid.returns(uuid)
+        rdvMilo = unRendezVousMilo({
+          dateHeureDebut: dateStringRendezVousDebut,
+          dateHeureFin: dateStringRendezVousFin
+        })
+
+        // When
+        rendezVousObtenu = rendezVousFactory.mettreAJourRendezVousPassEmploi(
+          rendezVousPassEmploi,
+          rdvMilo
+        )
+      })
+      it('retourne un rendez-vous avec le type ENTRETIEN INDIVIDUEL ', async () => {
+        // Then
+        const expected: RendezVous = {
+          ...rendezVousPassEmploi,
+          titre: rdvMilo.titre,
+          date: new Date('2022-10-06T14:07:00Z'),
+          duree: 96,
+          modalite: rdvMilo.modalite,
+          commentaire: rdvMilo.commentaire,
+          adresse: undefined
+        }
+        expect(rendezVousObtenu).to.deep.equal(expected)
+      })
+    })
+  })
+})

@@ -156,7 +156,8 @@ describe('AnimationsCollectivesSqlRepository', () => {
         createur: uneACAVenir.createur,
         dateCloture: DateService.fromJSDateToDateTime(uneACAVenir.dateCloture),
         idAgence: uneACAVenir.idAgence!,
-        source: RendezVous.Source.PASS_EMPLOI
+        source: RendezVous.Source.PASS_EMPLOI,
+        informationsPartenaire: undefined
       }
       expect(animationCollectives[0]).to.deep.equal(expected)
     })
@@ -210,6 +211,7 @@ describe('AnimationsCollectivesSqlRepository', () => {
           const animationCollectiveAvecUnJeuneDePlus: RendezVous.AnimationCollective =
             {
               ...uneAnimationCollectiveTest,
+              informationsPartenaire: undefined,
               jeunes: uneAnimationCollectiveTest.jeunes.concat(nouveauJeune)
             }
           await animationsCollectivesSqlRepository.save(
@@ -229,6 +231,7 @@ describe('AnimationsCollectivesSqlRepository', () => {
           // Given
           const rendezVousAvecUnJeuneDeMoins: RendezVous.AnimationCollective = {
             ...uneAnimationCollectiveTest,
+            informationsPartenaire: undefined,
             jeunes: uneAnimationCollectiveTest.jeunes.filter(
               jeune => jeune.id !== unAutreJeune.id
             )
@@ -275,6 +278,7 @@ describe('AnimationsCollectivesSqlRepository', () => {
           )
           expect(actual).to.deep.equal({
             ...uneAnimationCollectiveModifiee,
+            informationsPartenaire: undefined,
             jeunes: [jeune, unAutreJeune]
           })
         })

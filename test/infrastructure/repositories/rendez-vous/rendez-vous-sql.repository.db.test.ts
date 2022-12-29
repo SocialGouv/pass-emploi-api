@@ -18,9 +18,9 @@ import {
   RendezVous
 } from '../../../../src/domain/rendez-vous/rendez-vous'
 import { Core } from '../../../../src/domain/core'
-import Structure = Core.Structure
 import { DatabaseForTesting } from '../../../utils/database-for-testing'
 import { uneConfiguration } from '../../../fixtures/jeune.fixture'
+import Structure = Core.Structure
 
 describe('RendezVousRepositorySql', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
@@ -90,7 +90,11 @@ describe('RendezVousRepositorySql', () => {
 
     beforeEach(() => {
       //Given
-      unRendezVousTest = unRendezVous({ id, jeunes: [jeune] })
+      unRendezVousTest = unRendezVous({
+        id,
+        jeunes: [jeune],
+        informationsPartenaire: undefined
+      })
     })
 
     describe("quand c'est un rdv inexistant", () => {
@@ -124,7 +128,8 @@ describe('RendezVousRepositorySql', () => {
           await JeuneSqlModel.creer(unJeuneDto({ id: nouveauJeune.id }))
           const rendezVousAvecUnJeuneDePlus: RendezVous = {
             ...unRendezVousTest,
-            jeunes: unRendezVousTest.jeunes.concat(nouveauJeune)
+            jeunes: unRendezVousTest.jeunes.concat(nouveauJeune),
+            informationsPartenaire: undefined
           }
           await rendezVousRepositorySql.save(rendezVousAvecUnJeuneDePlus)
 
@@ -141,6 +146,7 @@ describe('RendezVousRepositorySql', () => {
           // Given
           const rendezVousAvecUnJeuneDeMoins: RendezVous = {
             ...unRendezVousTest,
+            informationsPartenaire: undefined,
             jeunes: unRendezVousTest.jeunes.filter(
               jeune => jeune.id !== unAutreJeune.id
             )
@@ -273,6 +279,46 @@ describe('RendezVousRepositorySql', () => {
           maintenant.toJSDate()
         )
         expect(associations.length).to.equal(0)
+      })
+    })
+  })
+
+  describe('getByIdPartenaire', () => {
+    const idRdvPartenaire = 'PLOP'
+    const typePartenaire = 'RENDEZ_VOUS'
+
+    beforeEach(async () => {
+      // Given
+      await RendezVousSqlModel.create(
+        unRendezVousDto({
+          typePartenaire,
+          idPartenaire: idRdvPartenaire
+        })
+      )
+    })
+    describe("quand le rdv n'existe pas", () => {
+      it('retourne undefined', async () => {
+        // When
+        const rendezVous = await rendezVousRepositorySql.getByIdPartenaire(
+          'un autre id',
+          typePartenaire
+        )
+        // Then
+        expect(rendezVous).to.equal(undefined)
+      })
+    })
+    describe('quand le rdv existe', () => {
+      it('retourne le rendez-vous', async () => {
+        // When
+        const rendezVous = await rendezVousRepositorySql.getByIdPartenaire(
+          idRdvPartenaire,
+          typePartenaire
+        )
+        // Then
+        expect(rendezVous?.informationsPartenaire).to.deep.equal({
+          id: idRdvPartenaire,
+          type: typePartenaire
+        })
       })
     })
   })

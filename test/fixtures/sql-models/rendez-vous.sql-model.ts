@@ -27,7 +27,9 @@ export function unRendezVousDto(
     dateCloture: null,
     idAgence: null,
     createur: { id: '1', nom: 'Tavernier', prenom: 'Nils' },
-    source: 'PASS_EMPLOI'
+    source: 'PASS_EMPLOI',
+    typePartenaire: null,
+    idPartenaire: null
   }
 
   return { ...defaults, ...args }

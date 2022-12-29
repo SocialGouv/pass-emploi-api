@@ -11,23 +11,24 @@ import { RendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
 import { SuiviJob } from '../../../../src/domain/suivi-job'
 import { DateService } from '../../../../src/utils/date-service'
 import { uneDate, uneDatetime } from '../../../fixtures/date.fixture'
-import { uneJeuneConfigurationApplication } from '../../../fixtures/jeune-configuration-application.fixture'
 import {
   unEvenementMilo,
   unRendezVousMilo
 } from '../../../fixtures/partenaire.fixture'
 import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'
 import { expect, StubbedClass, stubClass } from '../../../utils'
+import { unJeune } from '../../../fixtures/jeune.fixture'
 
 describe('HandleJobTraiterEvenementMiloHandler', () => {
   let handler: HandleJobTraiterEvenementMiloHandler
   let suiviJobService: StubbedType<SuiviJob.Service>
   let dateService: StubbedClass<DateService>
-  let configJeuneRepository: StubbedType<Jeune.ConfigurationApplication.Repository>
+  let jeuneRepository: StubbedType<Jeune.Repository>
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let miloEvenementsHttpRepository: StubbedType<Partenaire.Milo.Repository>
   let rendezVousMiloFactory: StubbedClass<Partenaire.Milo.RendezVous.Factory>
 
+  const jeune: Jeune = unJeune()
   const idPartenaireBeneficiaire = '123456'
 
   beforeEach(() => {
@@ -35,7 +36,7 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
     suiviJobService = stubInterface(sandbox)
     dateService = stubClass(DateService)
     dateService.now.returns(uneDatetime())
-    configJeuneRepository = stubInterface(sandbox)
+    jeuneRepository = stubInterface(sandbox)
     rendezVousRepository = stubInterface(sandbox)
     miloEvenementsHttpRepository = stubInterface(sandbox)
     rendezVousMiloFactory = stubClass(Partenaire.Milo.RendezVous.Factory)
@@ -43,7 +44,7 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
     handler = new HandleJobTraiterEvenementMiloHandler(
       suiviJobService,
       dateService,
-      configJeuneRepository,
+      jeuneRepository,
       rendezVousRepository,
       miloEvenementsHttpRepository,
       rendezVousMiloFactory
@@ -53,45 +54,81 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
   describe('handle', () => {
     describe('quand le jeune existe', () => {
       beforeEach(() => {
-        configJeuneRepository.getByIdPartenaire
+        jeuneRepository.getByIdPartenaire
           .withArgs(idPartenaireBeneficiaire)
-          .resolves(uneJeuneConfigurationApplication())
+          .resolves(jeune)
       })
 
       describe('événement de création', () => {
         describe('rendez vous', () => {
           describe('quand le rendez-vous existe chez milo', () => {
-            it('crée le rendez-vous en base de données', async () => {
-              // Given
-              const evenement = unEvenementMilo({
-                idPartenaireBeneficiaire,
-                objet: Partenaire.Milo.ObjetEvenement.RENDEZ_VOUS,
-                type: Partenaire.Milo.TypeEvenement.CREATE
-              })
-              const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
-                {
-                  dateExecution: uneDate(),
-                  type: Planificateur.JobType.TRAITER_EVENEMENT_MILO,
-                  contenu: evenement
-                }
-              const rendezVousMilo: Partenaire.Milo.RendezVous =
-                unRendezVousMilo()
+            const evenement = unEvenementMilo({
+              idPartenaireBeneficiaire,
+              objet: Partenaire.Milo.ObjetEvenement.RENDEZ_VOUS,
+              type: Partenaire.Milo.TypeEvenement.CREATE
+            })
+            const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
+              {
+                dateExecution: uneDate(),
+                type: Planificateur.JobType.TRAITER_EVENEMENT_MILO,
+                contenu: evenement
+              }
+            // Given
+            const rendezVousMilo: Partenaire.Milo.RendezVous =
+              unRendezVousMilo()
+
+            beforeEach(() => {
               miloEvenementsHttpRepository.findRendezVousByEvenement
                 .withArgs(evenement)
                 .resolves(rendezVousMilo)
+            })
+            describe("quand le rendez vous n'existait pas chez nous", () => {
+              it('crée le rendez-vous en base de données', async () => {
+                // Given
+                rendezVousRepository.getByIdPartenaire
+                  .withArgs(evenement.idObjet, evenement.objet)
+                  .resolves(undefined)
 
-              const rendezVous: RendezVous = unRendezVous()
-              rendezVousMiloFactory.creerRendezVousPassEmploi.returns(
-                rendezVous
-              )
+                const rendezVous: RendezVous = unRendezVous()
+                rendezVousMiloFactory.creerRendezVousPassEmploi
+                  .withArgs(rendezVousMilo, jeune)
+                  .returns(rendezVous)
 
-              // When
-              await handler.handle(job)
+                // When
+                await handler.handle(job)
 
-              // Then
-              expect(
-                rendezVousRepository.save
-              ).to.have.been.calledOnceWithExactly(rendezVous)
+                // Then
+                expect(
+                  rendezVousRepository.save
+                ).to.have.been.calledOnceWithExactly(rendezVous)
+              })
+            })
+            describe('quand le rendez vous existait chez nous', () => {
+              it('le met à jour', async () => {
+                // Given
+                const unRendezVousExistant = unRendezVous()
+                rendezVousRepository.getByIdPartenaire
+                  .withArgs(evenement.idObjet, evenement.objet)
+                  .resolves(unRendezVousExistant)
+
+                const rendezVousModifie: RendezVous = unRendezVous({
+                  duree: 120
+                })
+                rendezVousMiloFactory.mettreAJourRendezVousPassEmploi
+                  .withArgs(unRendezVousExistant, rendezVousMilo)
+                  .returns(rendezVousModifie)
+
+                // When
+                await handler.handle(job)
+
+                // Then
+                expect(
+                  rendezVousMiloFactory.creerRendezVousPassEmploi
+                ).not.to.have.been.called()
+                expect(
+                  rendezVousRepository.save
+                ).to.have.been.calledOnceWithExactly(rendezVousModifie)
+              })
             })
           })
           describe('quand le rendez-vous n’existe pas chez milo', () => {
@@ -190,7 +227,7 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
           type: Planificateur.JobType.TRAITER_EVENEMENT_MILO,
           contenu: evenement
         }
-        configJeuneRepository.getByIdPartenaire
+        jeuneRepository.getByIdPartenaire
           .withArgs(idPartenaireBeneficiaire)
           .resolves(undefined)
 

@@ -72,6 +72,24 @@ export class RendezVousRepositorySql implements RendezVous.Repository {
     return toRendezVous(rendezVousSql)
   }
 
+  async getByIdPartenaire(
+    idRendezVousPartenaire: string,
+    typeRendezVousPartenaire: string
+  ): Promise<RendezVous | undefined> {
+    const rendezVousSql = await RendezVousSqlModel.findOne({
+      where: {
+        idPartenaire: idRendezVousPartenaire,
+        typePartenaire: typeRendezVousPartenaire
+      },
+      include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }]
+    })
+
+    if (!rendezVousSql || rendezVousSql.dateSuppression) {
+      return undefined
+    }
+    return toRendezVous(rendezVousSql)
+  }
+
   async getAllAVenir(): Promise<RendezVous[]> {
     const maintenant = this.dateService.nowJs()
     const rendezVousSql = await RendezVousSqlModel.findAll({
