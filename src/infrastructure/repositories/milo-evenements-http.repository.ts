@@ -14,11 +14,10 @@ import {
   RendezVousMiloDto,
   SessionMiloDto
 } from './dto/milo.dto'
+import { Milo } from '../../domain/partenaire/milo'
 
 @Injectable()
-export class MiloEvenementsHttpRepository
-  implements Partenaire.Milo.Repository
-{
+export class MiloEvenementsHttpRepository implements Milo.Repository {
   private logger: Logger
   private readonly apiUrl: string
   private readonly apiKeyEvents: string

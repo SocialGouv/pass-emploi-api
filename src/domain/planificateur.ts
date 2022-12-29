@@ -10,7 +10,7 @@ export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 
 export namespace Planificateur {
   export interface Repository {
-    creerJob<T>(job: Job<T>, jobId?: string): Promise<void>
+    creerJob<T>(job: Job<T>, jobId?: string, params?: JobParams): Promise<void>
 
     creerCronJob(cronJob: CronJob): Promise<void>
 
@@ -25,6 +25,15 @@ export namespace Planificateur {
     supprimerLesJobsSelonPattern(pattern: string): Promise<void>
 
     estEnCours(jobType: Planificateur.JobType): Promise<boolean>
+  }
+
+  export interface JobParams {
+    priority?: number
+    attempts?: number
+    backoff?: {
+      type?: 'fixed' | 'exponential'
+      delay?: number
+    }
   }
 
   export enum JobType {
@@ -192,7 +201,14 @@ export class PlanificateurService {
       dateExecution: this.dateService.now().toJSDate()
     }
     // Si on créée un job avec un id qui existe déjà, il ne se passe rien
-    await this.planificateurRepository.creerJob(job, jobId)
+    await this.planificateurRepository.creerJob(job, jobId, {
+      priority: 2,
+      attempts: 3,
+      backoff: {
+        type: 'fixed',
+        delay: 5 * 60 * 1000
+      }
+    })
   }
 
   private async creerJobRendezVous(

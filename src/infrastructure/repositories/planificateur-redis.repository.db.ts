@@ -44,13 +44,24 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
     })
   }
 
-  async creerJob<T>(job: Planificateur.Job<T>, jobId?: string): Promise<void> {
+  async creerJob<T>(
+    job: Planificateur.Job<T>,
+    jobId?: string,
+    params?: Planificateur.JobParams
+  ): Promise<void> {
     if (this.isReady) {
       const now = this.dateService.now()
       const delay = DateTime.fromJSDate(job.dateExecution).diff(
         now
       ).milliseconds
-      await this.queue.add(job, { delay, jobId })
+      const jobOptions: Bull.JobOptions = {
+        jobId: jobId,
+        delay: delay,
+        attempts: params?.attempts || 1,
+        backoff: params?.backoff?.delay || 0,
+        priority: params?.priority || 0
+      }
+      await this.queue.add(job, jobOptions)
     } else {
       throw new Error('Redis not ready to accept connection')
     }
@@ -70,7 +81,7 @@ export class PlanificateurRedisRepository implements Planificateur.Repository {
         type: jobRedis.data.type,
         contenu: jobRedis.data.contenu
       }
-      await handle(job)
+      return handle(job)
     })
   }
 

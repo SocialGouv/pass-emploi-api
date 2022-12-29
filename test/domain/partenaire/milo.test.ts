@@ -12,14 +12,14 @@ import {
   unRendezVous
 } from '../../fixtures/rendez-vous.fixture'
 import { uneConfiguration, unJeune } from '../../fixtures/jeune.fixture'
-import { Milo } from '../../../src/domain/partenaire/milo'
+import { Milo, MiloRendezVousFactory } from '../../../src/domain/partenaire/milo'
 import Source = RendezVous.Source
 import Type = Milo.RendezVous.Type
 
 describe('Milo Partenaire', () => {
   describe('Factory', () => {
     let idService: StubbedClass<IdService>
-    let rendezVousFactory: Partenaire.Milo.RendezVous.Factory
+    let rendezVousFactory: MiloRendezVousFactory
 
     let rdvMilo: Partenaire.Milo.RendezVous
     let rendezVousPassEmploi: RendezVous
@@ -38,7 +38,7 @@ describe('Milo Partenaire', () => {
       beforeEach(() => {
         // Given
         idService = stubClass(IdService)
-        rendezVousFactory = new Partenaire.Milo.RendezVous.Factory(idService)
+        rendezVousFactory = new MiloRendezVousFactory(idService)
 
         dateStringRendezVousDebut = '2022-10-06 10:07:00'
         dateStringRendezVousFin = '2022-10-06 11:43:00'
@@ -200,7 +200,7 @@ describe('Milo Partenaire', () => {
       beforeEach(() => {
         // Given
         idService = stubClass(IdService)
-        rendezVousFactory = new Partenaire.Milo.RendezVous.Factory(idService)
+        rendezVousFactory = new MiloRendezVousFactory(idService)
         dateStringRendezVousDebut = '2022-10-06 10:07:00'
         dateStringRendezVousFin = '2022-10-06 11:43:00'
         jeune = unJeune({
