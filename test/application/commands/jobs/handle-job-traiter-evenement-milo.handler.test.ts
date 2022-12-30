@@ -59,116 +59,114 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
           .resolves(jeune)
       })
 
-      describe('événement de création', () => {
-        describe('rendez vous', () => {
-          describe('quand le rendez-vous existe chez milo', () => {
+      describe('quand le rendez-vous existe chez milo', () => {
+        const evenement = unEvenementMilo({
+          idPartenaireBeneficiaire,
+          objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
+          type: MiloRendezVous.TypeEvenement.CREATE
+        })
+        const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> = {
+          dateExecution: uneDate(),
+          type: Planificateur.JobType.TRAITER_EVENEMENT_MILO,
+          contenu: evenement
+        }
+        // Given
+        const rendezVousMilo: MiloRendezVous = unRendezVousMilo()
+
+        beforeEach(() => {
+          miloRendezVousRepository.findRendezVousByEvenement
+            .withArgs(evenement)
+            .resolves(rendezVousMilo)
+        })
+        describe("quand le rendez vous n'existait pas chez nous", () => {
+          it('crée le rendez-vous en base de données', async () => {
+            // Given
+            rendezVousRepository.getByIdPartenaire
+              .withArgs(evenement.idObjet, evenement.objet)
+              .resolves(undefined)
+
+            const rendezVous: RendezVous = unRendezVous()
+            rendezVousMiloFactory.creerRendezVousPassEmploi
+              .withArgs(rendezVousMilo, jeune)
+              .returns(rendezVous)
+
+            // When
+            await handler.handle(job)
+
+            // Then
+            expect(
+              rendezVousRepository.save
+            ).to.have.been.calledOnceWithExactly(rendezVous)
+          })
+        })
+        describe('quand le rendez vous existait chez nous', () => {
+          it('le met à jour', async () => {
+            // Given
+            const unRendezVousExistant = unRendezVous()
+            rendezVousRepository.getByIdPartenaire
+              .withArgs(evenement.idObjet, evenement.objet)
+              .resolves(unRendezVousExistant)
+
+            const rendezVousModifie: RendezVous = unRendezVous({
+              duree: 120
+            })
+            rendezVousMiloFactory.mettreAJourRendezVousPassEmploi
+              .withArgs(unRendezVousExistant, rendezVousMilo)
+              .returns(rendezVousModifie)
+
+            // When
+            await handler.handle(job)
+
+            // Then
+            expect(
+              rendezVousMiloFactory.creerRendezVousPassEmploi
+            ).not.to.have.been.called()
+            expect(
+              rendezVousRepository.save
+            ).to.have.been.calledOnceWithExactly(rendezVousModifie)
+          })
+        })
+      })
+      describe('quand le rendez-vous n’existe pas chez milo', () => {
+        describe("quand on ne l'avait pas chez nous", () => {
+          it('on ne fait rien', async () => {
+            // Given
             const evenement = unEvenementMilo({
               idPartenaireBeneficiaire,
               objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
               type: MiloRendezVous.TypeEvenement.CREATE
             })
+
             const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
               {
                 dateExecution: uneDate(),
                 type: Planificateur.JobType.TRAITER_EVENEMENT_MILO,
                 contenu: evenement
               }
-            // Given
-            const rendezVousMilo: MiloRendezVous = unRendezVousMilo()
 
-            beforeEach(() => {
-              miloRendezVousRepository.findRendezVousByEvenement
-                .withArgs(evenement)
-                .resolves(rendezVousMilo)
+            miloRendezVousRepository.findRendezVousByEvenement
+              .withArgs(evenement.idObjet)
+              .resolves(undefined)
+
+            // When
+            const result: SuiviJob = await handler.handle(job)
+
+            // Then
+            expect(result.resultat).to.be.deep.equal({
+              traitement: Traitement.RENDEZ_VOUS_INEXISTANT
             })
-            describe("quand le rendez vous n'existait pas chez nous", () => {
-              it('crée le rendez-vous en base de données', async () => {
-                // Given
-                rendezVousRepository.getByIdPartenaire
-                  .withArgs(evenement.idObjet, evenement.objet)
-                  .resolves(undefined)
-
-                const rendezVous: RendezVous = unRendezVous()
-                rendezVousMiloFactory.creerRendezVousPassEmploi
-                  .withArgs(rendezVousMilo, jeune)
-                  .returns(rendezVous)
-
-                // When
-                await handler.handle(job)
-
-                // Then
-                expect(
-                  rendezVousRepository.save
-                ).to.have.been.calledOnceWithExactly(rendezVous)
-              })
-            })
-            describe('quand le rendez vous existait chez nous', () => {
-              it('le met à jour', async () => {
-                // Given
-                const unRendezVousExistant = unRendezVous()
-                rendezVousRepository.getByIdPartenaire
-                  .withArgs(evenement.idObjet, evenement.objet)
-                  .resolves(unRendezVousExistant)
-
-                const rendezVousModifie: RendezVous = unRendezVous({
-                  duree: 120
-                })
-                rendezVousMiloFactory.mettreAJourRendezVousPassEmploi
-                  .withArgs(unRendezVousExistant, rendezVousMilo)
-                  .returns(rendezVousModifie)
-
-                // When
-                await handler.handle(job)
-
-                // Then
-                expect(
-                  rendezVousMiloFactory.creerRendezVousPassEmploi
-                ).not.to.have.been.called()
-                expect(
-                  rendezVousRepository.save
-                ).to.have.been.calledOnceWithExactly(rendezVousModifie)
-              })
-            })
-          })
-          describe('quand le rendez-vous n’existe pas chez milo', () => {
-            it('on ne fait rien', async () => {
-              // Given
-              const evenement = unEvenementMilo({
-                idPartenaireBeneficiaire,
-                objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
-                type: MiloRendezVous.TypeEvenement.CREATE
-              })
-
-              const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
-                {
-                  dateExecution: uneDate(),
-                  type: Planificateur.JobType.TRAITER_EVENEMENT_MILO,
-                  contenu: evenement
-                }
-
-              miloRendezVousRepository.findRendezVousByEvenement
-                .withArgs(evenement.idObjet)
-                .resolves(undefined)
-
-              // When
-              const result: SuiviJob = await handler.handle(job)
-
-              // Then
-              expect(result.resultat).to.be.deep.equal({
-                traitement: Traitement.RENDEZ_VOUS_INEXISTANT
-              })
-              expect(rendezVousRepository.save).to.not.have.been.called()
-            })
+            expect(rendezVousRepository.save).to.not.have.been.called()
           })
         })
-        describe('objet non traitable', () => {
-          it('ne fait rien', async () => {
+        describe("quand on l'avait chez nous", () => {
+          it('on le supprime', async () => {
             // Given
             const evenement = unEvenementMilo({
               idPartenaireBeneficiaire,
-              objet: MiloRendezVous.ObjetEvenement.NON_TRAITABLE,
+              objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
               type: MiloRendezVous.TypeEvenement.CREATE
             })
+
             const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
               {
                 dateExecution: uneDate(),
@@ -176,17 +174,54 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
                 contenu: evenement
               }
 
+            miloRendezVousRepository.findRendezVousByEvenement
+              .withArgs(evenement.idObjet)
+              .resolves(undefined)
+
+            const unRendezVousExistant = unRendezVous()
+            rendezVousRepository.getByIdPartenaire
+              .withArgs(evenement.idObjet, evenement.objet)
+              .resolves(unRendezVousExistant)
+
             // When
-            const suiviJob = await handler.handle(job)
+            const result: SuiviJob = await handler.handle(job)
 
             // Then
-            expect(rendezVousRepository.save).not.to.have.been.called()
-            expect(suiviJob.resultat).to.be.deep.equal({
-              traitement: Traitement.OBJET_NON_TRAITABLE
+            expect(result.resultat).to.be.deep.equal({
+              traitement: Traitement.RENDEZ_VOUS_SUPPRIME
             })
+            expect(
+              rendezVousRepository.delete
+            ).to.have.been.calledOnceWithExactly(unRendezVousExistant.id)
           })
         })
       })
+      describe('objet non traitable', () => {
+        it('ne fait rien', async () => {
+          // Given
+          const evenement = unEvenementMilo({
+            idPartenaireBeneficiaire,
+            objet: MiloRendezVous.ObjetEvenement.NON_TRAITABLE,
+            type: MiloRendezVous.TypeEvenement.CREATE
+          })
+          const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
+            {
+              dateExecution: uneDate(),
+              type: Planificateur.JobType.TRAITER_EVENEMENT_MILO,
+              contenu: evenement
+            }
+
+          // When
+          const suiviJob = await handler.handle(job)
+
+          // Then
+          expect(rendezVousRepository.save).not.to.have.been.called()
+          expect(suiviJob.resultat).to.be.deep.equal({
+            traitement: Traitement.OBJET_NON_TRAITABLE
+          })
+        })
+      })
+
       describe('événement non traitable', () => {
         it('ne fait rien', async () => {
           // Given

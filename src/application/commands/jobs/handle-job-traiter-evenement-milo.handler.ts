@@ -39,11 +39,11 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
     const debut = this.dateService.now()
 
     if (job.contenu.type === MiloRendezVous.TypeEvenement.NON_TRAITABLE) {
-      return this.buildSuiviJob(debut, Traitement.TYPE_NON_TRAITABLE, true)
+      return this.buildSuiviJob(debut, Traitement.TYPE_NON_TRAITABLE)
     }
 
     if (job.contenu.objet === MiloRendezVous.ObjetEvenement.NON_TRAITABLE) {
-      return this.buildSuiviJob(debut, Traitement.OBJET_NON_TRAITABLE, true)
+      return this.buildSuiviJob(debut, Traitement.OBJET_NON_TRAITABLE)
     }
 
     const jeune = await this.jeuneRepository.getByIdPartenaire(
@@ -52,7 +52,7 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
     )
 
     if (jeune === undefined) {
-      return this.buildSuiviJob(debut, Traitement.JEUNE_INEXISTANT, true)
+      return this.buildSuiviJob(debut, Traitement.JEUNE_INEXISTANT)
     }
 
     const rendezVousMilo =
@@ -60,47 +60,48 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
         job.contenu
       )
 
-    if (rendezVousMilo === undefined) {
-      return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_INEXISTANT, true)
-    }
-
     const rendezVousExistant =
       await this.rendezVousRepository.getByIdPartenaire(
-        rendezVousMilo.id,
-        rendezVousMilo.type
+        job.contenu.idObjet,
+        job.contenu.objet
       )
 
-    if (!rendezVousExistant) {
-      const unNouveauRendezVous =
+    if (!rendezVousMilo) {
+      if (rendezVousExistant) {
+        await this.rendezVousRepository.delete(rendezVousExistant.id)
+        return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_SUPPRIME)
+      } else {
+        return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_INEXISTANT)
+      }
+    }
+
+    if (rendezVousExistant) {
+      const rendezVousMisAJour =
+        this.rendezVousMiloFactory.mettreAJourRendezVousPassEmploi(
+          rendezVousExistant,
+          rendezVousMilo
+        )
+      await this.rendezVousRepository.save(rendezVousMisAJour)
+      return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_MODIFIE)
+    } else {
+      const nouveauRendezVous =
         this.rendezVousMiloFactory.creerRendezVousPassEmploi(
           rendezVousMilo,
           jeune
         )
-
-      await this.rendezVousRepository.save(unNouveauRendezVous)
-    } else {
-      const unRendezVousMisAJour =
-        await this.rendezVousMiloFactory.mettreAJourRendezVousPassEmploi(
-          rendezVousExistant,
-          rendezVousMilo
-        )
-      await this.rendezVousRepository.save(unRendezVousMisAJour)
+      await this.rendezVousRepository.save(nouveauRendezVous)
+      return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_AJOUTE)
     }
-    return this.buildSuiviJob(debut, Traitement.OK, true)
   }
 
-  private buildSuiviJob(
-    debut: DateTime,
-    traitement: Traitement,
-    succes: boolean
-  ): SuiviJob {
+  private buildSuiviJob(debut: DateTime, traitement: Traitement): SuiviJob {
     return {
       jobType: this.jobType,
       dateExecution: debut,
       resultat: {
         traitement
       },
-      succes: succes,
+      succes: true,
       nbErreurs: 0,
       tempsExecution: DateService.calculerTempsExecution(debut)
     }
@@ -108,7 +109,9 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
 }
 
 export enum Traitement {
-  OK = 'OK',
+  RENDEZ_VOUS_SUPPRIME = 'RENDEZ_VOUS_SUPPRIME',
+  RENDEZ_VOUS_AJOUTE = 'RENDEZ_VOUS_AJOUTE',
+  RENDEZ_VOUS_MODIFIE = 'RENDEZ_VOUS_MODIFIE',
   RENDEZ_VOUS_INEXISTANT = 'RENDEZ_VOUS_INEXISTANT',
   JEUNE_INEXISTANT = 'JEUNE_INEXISTANT',
   TYPE_NON_TRAITABLE = 'TYPE_NON_TRAITABLE',
