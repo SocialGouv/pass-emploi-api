@@ -8,13 +8,13 @@ import {
 import { CampagneSqlModel } from '../../../src/infrastructure/sequelize/models/campagne.sql-model'
 import { DateTime } from 'luxon'
 import { ReponseCampagneSqlModel } from '../../../src/infrastructure/sequelize/models/reponse-campagne.sql-model'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('CampagneSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let campagneSqlRepository: CampagneSqlRepository
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
     campagneSqlRepository = new CampagneSqlRepository()
   })
 

@@ -1,6 +1,6 @@
 import { testConfig } from '../../../../utils/module-for-testing'
 import { HttpService } from '@nestjs/axios'
-import { ActionMiloHttpRepository } from '../../../../../src/infrastructure/repositories/partenaire/milo/action-milo-http-sql.repository.db'
+import { ActionMiloHttpRepository } from '../../../../../src/infrastructure/repositories/partenaire/milo/action-milo-http-sql.repository'
 import { expect } from '../../../../utils'
 import { uneActionMilo } from '../../../../fixtures/action.fixture'
 import {

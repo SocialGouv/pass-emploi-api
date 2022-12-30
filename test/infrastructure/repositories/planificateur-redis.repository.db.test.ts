@@ -7,14 +7,14 @@ import { uneDatetime } from '../../fixtures/date.fixture'
 import { expect, stubClass } from '../../utils'
 import { testConfig } from '../../utils/module-for-testing'
 import { RedisClient } from '../../utils/types'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('PlanificateurRedisRepository', () => {
-  DatabaseForTesting.prepare()
   let planificateurRedisRepository: PlanificateurRedisRepository
   let redisClient: RedisClient
 
   beforeEach(async () => {
+    await getDatabase().cleanRedis()
     const redisUrl = testConfig().get('redis').url
     redisClient = createClient({
       url: redisUrl

@@ -10,15 +10,24 @@ import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-cli
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
 import { IdService } from '../../../src/utils/id-service'
 import { DateService } from '../../../src/utils/date-service'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { PreferencesJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-model'
+import { before } from 'mocha'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
 
 describe('GetPreferencesJeuneQueryHandler', () => {
-  const database = DatabaseForTesting.prepare()
+  let database: DatabaseForTesting
+  before(() => {
+    database = getDatabase()
+  })
+
   let getPreferencesJeuneQueryHandler: GetPreferencesJeuneQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await database.cleanPG()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
     getPreferencesJeuneQueryHandler = new GetPreferencesJeuneQueryHandler(

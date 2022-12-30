@@ -19,11 +19,14 @@ import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
 import { IdService } from '../../../src/utils/id-service'
 import { DateService } from '../../../src/utils/date-service'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
 
 describe('GetDetailActionQueryHandler', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let databaseForTesting: DatabaseForTesting
   let actionSqlRepository: Action.Repository
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
   let getDetailActionQueryHandler: GetDetailActionQueryHandler
@@ -31,6 +34,7 @@ describe('GetDetailActionQueryHandler', () => {
   const jeune = unJeune()
 
   before(() => {
+    databaseForTesting = getDatabase()
     sandbox = createSandbox()
     actionAuthorizer = stubClass(ActionAuthorizer)
     actionSqlRepository = new ActionSqlRepository(new DateService())
@@ -38,6 +42,10 @@ describe('GetDetailActionQueryHandler', () => {
     getDetailActionQueryHandler = new GetDetailActionQueryHandler(
       actionAuthorizer
     )
+  })
+
+  beforeEach(async () => {
+    await databaseForTesting.cleanPG()
   })
 
   afterEach(() => {

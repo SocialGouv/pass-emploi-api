@@ -19,10 +19,13 @@ import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
 
 describe('GetRendezVousConseillerPaginesQueryHandler', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let databaseForTesting: DatabaseForTesting
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getRendezVousConseillerPaginesQueryHandler: GetRendezVousConseillerPaginesQueryHandler
 
@@ -35,7 +38,8 @@ describe('GetRendezVousConseillerPaginesQueryHandler', () => {
   const jeune1 = unJeune({ id: 'jeune-1' })
   const jeune2 = unJeune({ id: 'jeune-2' })
 
-  before(() => {
+  before(async () => {
+    databaseForTesting = getDatabase()
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
 
     getRendezVousConseillerPaginesQueryHandler =
@@ -46,6 +50,7 @@ describe('GetRendezVousConseillerPaginesQueryHandler', () => {
   })
 
   beforeEach(async () => {
+    await databaseForTesting.cleanPG()
     // Given
     await ConseillerSqlModel.creer(unConseillerDto())
     await ConseillerSqlModel.creer(unConseillerDto({ id: '2' }))

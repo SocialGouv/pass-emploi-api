@@ -1,4 +1,3 @@
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
 import { HandleJobAgenceAnimationCollectiveCommandHandler } from '../../../../src/application/commands/jobs/handle-job-agence-animation-collective.command.db'
 import { AgenceSqlModel } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { uneAgenceMiloDTO } from '../../../fixtures/sql-models/agence.sql-model'
@@ -16,9 +15,18 @@ import { DateService } from '../../../../src/utils/date-service'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox } from 'sinon'
 import { SuiviJob } from '../../../../src/domain/suivi-job'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../../utils/database-for-testing'
 
 describe('HandleJobAgenceAnimationCollectiveCommand', () => {
-  const database = DatabaseForTesting.prepare()
+  let database: DatabaseForTesting
+
+  before(async () => {
+    database = getDatabase()
+  })
+
   let command: HandleJobAgenceAnimationCollectiveCommandHandler
 
   let atelierAvecAgence: AsSql<RendezVousDto>
@@ -28,6 +36,7 @@ describe('HandleJobAgenceAnimationCollectiveCommand', () => {
   const agenceNantes = uneAgenceMiloDTO({ id: '1', nomAgence: 'Nantes' })
 
   beforeEach(async () => {
+    await database.cleanPG()
     const notificationSupportService: StubbedType<SuiviJob.Service> =
       stubInterface(createSandbox())
     command = new HandleJobAgenceAnimationCollectiveCommandHandler(

@@ -1,7 +1,6 @@
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import { ListeDeDiffusionQueryModel } from '../../../src/application/queries/query-models/liste-de-diffusion.query-model'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { GetListesDeDiffusionDuConseillerQueryHandler } from '../../../src/application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
 import { expect, StubbedClass, stubClass } from 'test/utils'
 import { ListeDeDiffusionSqlModel } from '../../../src/infrastructure/sequelize/models/liste-de-diffusion.sql-model'
@@ -17,9 +16,9 @@ import { Jeune } from '../../../src/domain/jeune/jeune'
 import { unConseillerDuJeune, unJeune } from '../../fixtures/jeune.fixture'
 import { ListeDeDiffusionJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/liste-de-diffusion-jeune-association.sql-model'
 import { success } from '../../../src/building-blocks/types/result'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetListesDeDiffusionDuConseillerQueryHandler', () => {
-  DatabaseForTesting.prepare()
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let queryHandler: GetListesDeDiffusionDuConseillerQueryHandler
   const jeune: Jeune = unJeune({
@@ -32,6 +31,7 @@ describe('GetListesDeDiffusionDuConseillerQueryHandler', () => {
   })
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
     queryHandler = new GetListesDeDiffusionDuConseillerQueryHandler(
       conseillerAuthorizer

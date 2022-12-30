@@ -7,13 +7,13 @@ import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-mod
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { expect } from '../../../utils'
 import { uneOffreEmploi } from '../../../fixtures/offre-emploi.fixture'
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
+import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('OffresEmploiHttpSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let offresEmploiHttpSqlRepository: OffresEmploiHttpSqlRepository
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     offresEmploiHttpSqlRepository = new OffresEmploiHttpSqlRepository()
   })
 

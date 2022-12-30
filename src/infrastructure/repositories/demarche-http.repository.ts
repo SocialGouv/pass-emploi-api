@@ -10,7 +10,7 @@ import {
 } from '../clients/pole-emploi-partenaire-client'
 
 @Injectable()
-export class DemarcheHttpRepositoryDb implements Demarche.Repository {
+export class DemarcheHttpRepository implements Demarche.Repository {
   constructor(
     private keycloakClient: KeycloakClient,
     @Inject(PoleEmploiPartenaireClientToken)

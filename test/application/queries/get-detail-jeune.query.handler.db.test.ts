@@ -27,11 +27,10 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { MiloJeune } from '../../../src/domain/partenaire/milo/milo.jeune'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetDetailJeuneQueryHandler', () => {
-  DatabaseForTesting.prepare()
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let getDetailJeuneQueryHandler: GetDetailJeuneQueryHandler
@@ -47,6 +46,10 @@ describe('GetDetailJeuneQueryHandler', () => {
       jeuneAuthorizer,
       testConfig()
     )
+  })
+
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
   })
 
   afterEach(() => {

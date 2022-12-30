@@ -18,10 +18,14 @@ import { ConseillerAuthorizer } from '../../../src/application/authorizers/autho
 import { GetAllRendezVousConseillerQueryHandler } from '../../../src/application/queries/get-rendez-vous-conseiller.query.handler.db'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
 
 describe('GetRendezVousConseillerQueryHandler', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let databaseForTesting: DatabaseForTesting
+
   let dateService: StubbedClass<DateService>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getAllRendezVousConseillerQueryHandler: GetAllRendezVousConseillerQueryHandler
@@ -37,6 +41,7 @@ describe('GetRendezVousConseillerQueryHandler', () => {
   const jeune2 = unJeune({ id: 'jeune-2' })
 
   before(() => {
+    databaseForTesting = getDatabase()
     sandbox = createSandbox()
     dateService = stubInterface(sandbox)
     dateService.nowJs.returns(maintenant.toJSDate())
@@ -52,6 +57,7 @@ describe('GetRendezVousConseillerQueryHandler', () => {
   })
 
   beforeEach(async () => {
+    await databaseForTesting.cleanPG()
     // Given
     await ConseillerSqlModel.creer(unConseillerDto())
     await ConseillerSqlModel.creer(unConseillerDto({ id: '2' }))

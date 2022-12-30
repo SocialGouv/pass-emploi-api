@@ -14,10 +14,13 @@ import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { Action } from '../../../src/domain/action/action'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
 
 describe('GetResumeActionsDesJeunesDuConseillerQueryHandler', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let databaseForTesting: DatabaseForTesting
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getResumeActionsDesJeunesDuConseillerQueryHandler: GetResumeActionsDesJeunesDuConseillerQueryHandlerDb
   let sandbox: SinonSandbox
@@ -25,12 +28,17 @@ describe('GetResumeActionsDesJeunesDuConseillerQueryHandler', () => {
   before(() => {
     sandbox = createSandbox()
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
+    databaseForTesting = getDatabase()
 
     getResumeActionsDesJeunesDuConseillerQueryHandler =
       new GetResumeActionsDesJeunesDuConseillerQueryHandlerDb(
         databaseForTesting.sequelize,
         conseillerAuthorizer
       )
+  })
+
+  beforeEach(async () => {
+    await databaseForTesting.cleanPG()
   })
 
   afterEach(() => {

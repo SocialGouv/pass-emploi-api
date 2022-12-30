@@ -1,4 +1,4 @@
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { getDatabase } from '../../utils/database-for-testing'
 import {
   unFavoriOffreEmploi,
   unFavoriOffreEngagement,
@@ -20,15 +20,16 @@ import { FavoriOffreImmersionSqlModel } from '../../../src/infrastructure/sequel
 import { FavoriOffreEngagementSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import { ConseillerForJeuneAvecPartageAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune-avec-partage'
 import { Offre } from '../../../src/domain/offre/offre'
+
 describe('GetFavorisJeunePourConseillerQueryHandler', () => {
-  DatabaseForTesting.prepare()
   let conseillerForJeuneAvecPartageAuthorizer: StubbedClass<ConseillerForJeuneAvecPartageAuthorizer>
   let getFavorisJeunePourConseillerQueryHandler: GetFavorisJeunePourConseillerQueryHandler
 
   const idJeune = 'poi-id-jeune'
   const idConseiller = 'poi-id-conseiller'
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
     conseillerForJeuneAvecPartageAuthorizer = stubClass(
       ConseillerForJeuneAvecPartageAuthorizer
     )

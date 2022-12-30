@@ -19,7 +19,7 @@ import {
 import {
   DeleteRendezVousCommand,
   DeleteRendezVousCommandHandler
-} from '../../../src/application/commands/delete-rendez-vous.command.handler.db'
+} from '../../../src/application/commands/delete-rendez-vous.command.handler'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import {
   UpdateRendezVousCommand,

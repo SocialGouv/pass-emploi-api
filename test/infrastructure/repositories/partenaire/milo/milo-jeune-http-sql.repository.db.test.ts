@@ -17,14 +17,17 @@ import { MiloJeuneHttpSqlRepository } from '../../../../../src/infrastructure/re
 import { RateLimiterService } from '../../../../../src/utils/rate-limiter.service'
 import { unJeune } from '../../../../fixtures/jeune.fixture'
 import { testConfig } from '../../../../utils/module-for-testing'
-import { DatabaseForTesting } from '../../../../utils/database-for-testing'
 import { unConseiller } from '../../../../fixtures/conseiller.fixture'
 import { stubClass } from '../../../../utils'
 import { FirebaseClient } from '../../../../../src/infrastructure/clients/firebase-client'
 import { MiloJeune } from '../../../../../src/domain/partenaire/milo/milo.jeune'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../../../utils/database-for-testing'
 
 describe('MiloHttpRepository', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let databaseForTesting: DatabaseForTesting
   const configService = testConfig()
   const rateLimiterService = new RateLimiterService(configService)
   let miloHttpSqlRepository: MiloJeuneHttpSqlRepository
@@ -32,7 +35,12 @@ describe('MiloHttpRepository', () => {
   let idService: IdService
   let dateService: DateService
 
+  before(() => {
+    databaseForTesting = getDatabase()
+  })
+
   beforeEach(async () => {
+    await databaseForTesting.cleanPG()
     const httpService = new HttpService()
     const conseillerSqlRepository = new ConseillerSqlRepository()
     await conseillerSqlRepository.save(unConseiller())

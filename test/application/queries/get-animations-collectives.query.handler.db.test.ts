@@ -1,7 +1,6 @@
 import { GetAnimationsCollectivesQueryHandler } from '../../../src/application/queries/get-animations-collectives.query.handler.db'
 import { ConseillerEtablissementAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-etablissement'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
@@ -16,9 +15,13 @@ import {
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { isSuccess, success } from '../../../src/building-blocks/types/result'
 import { DateService } from '../../../src/utils/date-service'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetAnimationsCollectivesQueryHandler', () => {
-  DatabaseForTesting.prepare()
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
+  })
+
   let getAnimationsCollectivesQueryHandler: GetAnimationsCollectivesQueryHandler
   let conseillerAgenceAuthorizer: StubbedClass<ConseillerEtablissementAuthorizer>
   let dateService: StubbedClass<DateService>

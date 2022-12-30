@@ -26,16 +26,20 @@ import { Core } from '../../../src/domain/core'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { createSandbox, expect } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { unEvenementEngagementDto } from '../../fixtures/sql-models/evenement-engagement.sql-model'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
 
 describe('GetJeunesByConseillerQueryHandler', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let databaseForTesting: DatabaseForTesting
   let conseillersRepository: StubbedType<Conseiller.Repository>
   let getJeunesByConseillerQueryHandler: GetJeunesByConseillerQueryHandler
   let sandbox: SinonSandbox
 
-  before(() => {
+  before(async () => {
+    databaseForTesting = getDatabase()
     sandbox = createSandbox()
     conseillersRepository = stubInterface(sandbox)
 
@@ -43,6 +47,10 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       databaseForTesting.sequelize,
       conseillersRepository
     )
+  })
+
+  beforeEach(async () => {
+    await databaseForTesting.cleanPG()
   })
 
   afterEach(() => {

@@ -1,5 +1,4 @@
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../../src/application/queries/get-favoris-service-civique-jeune.query.handler.db'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
@@ -13,14 +12,14 @@ import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { FavoriOffreEngagementSqlModel } from '../../../src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
 import { unFavoriOffreEngagement } from '../../fixtures/sql-models/favoris.sql-model'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('getDetailServiceCiviqueQueryHandler', () => {
-  DatabaseForTesting.prepare()
-
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let getFavorisServiceCiviqueJeuneQueryHandler: GetFavorisServiceCiviqueJeuneQueryHandler
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     getFavorisServiceCiviqueJeuneQueryHandler =
       new GetFavorisServiceCiviqueJeuneQueryHandler(jeuneAuthorizer)

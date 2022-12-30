@@ -14,14 +14,22 @@ import {
   CodeTypeRendezVous,
   RendezVous
 } from '../../../src/domain/rendez-vous/rendez-vous'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
 
 describe('InvitationIcsClient', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let databaseForTesting: DatabaseForTesting
   let invitationIcsClient: InvitationIcsClient
   const config = testConfig()
 
+  before(() => {
+    databaseForTesting = getDatabase()
+  })
+
   beforeEach(async () => {
+    await databaseForTesting.cleanPG()
     invitationIcsClient = new InvitationIcsClient(
       databaseForTesting.sequelize,
       config

@@ -1,6 +1,5 @@
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler.db'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
@@ -14,13 +13,26 @@ import { RechercheSqlRepository } from '../../../src/infrastructure/repositories
 import { Recherche } from '../../../src/domain/offre/recherche/recherche'
 import { IdService } from '../../../src/utils/id-service'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
 
 describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let databaseForTesting: DatabaseForTesting
   let getMetadonneesFavorisJeuneQueryHandler: GetMetadonneesFavorisJeuneQueryHandler
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
+  let recherchesSauvegardeesRepository: RechercheSqlRepository
+
+  before(() => {
+    databaseForTesting = getDatabase()
+  })
 
   beforeEach(async () => {
+    await databaseForTesting.cleanPG()
+    recherchesSauvegardeesRepository = new RechercheSqlRepository(
+      databaseForTesting.sequelize
+    )
     conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
 
     getMetadonneesFavorisJeuneQueryHandler =
@@ -215,9 +227,6 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
       })
     })
     describe('recherches sauvegardées', () => {
-      const recherchesSauvegardeesRepository = new RechercheSqlRepository(
-        databaseForTesting.sequelize
-      )
       const idService: StubbedClass<IdService> = stubClass(IdService)
       idService.uuid.returns('poi-id-recherche')
 

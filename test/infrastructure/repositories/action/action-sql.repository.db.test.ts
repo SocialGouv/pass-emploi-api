@@ -11,7 +11,6 @@ import { uneActionDto } from '../../../fixtures/sql-models/action.sql-model'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { IdService } from 'src/utils/id-service'
 import { DateService } from 'src/utils/date-service'
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
 import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
 import { uneDatetime } from '../../../fixtures/date.fixture'
 import {
@@ -20,17 +19,26 @@ import {
 } from '../../../../src/infrastructure/sequelize/models/commentaire.sql-model'
 import { DateTime } from 'luxon'
 import { AsSql } from '../../../../src/infrastructure/sequelize/types'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../../utils/database-for-testing'
 
 const nowAtMidnight = uneDatetime().startOf('day')
 
 describe('ActionSqlRepository', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let database: DatabaseForTesting
+  before(async () => {
+    database = getDatabase()
+  })
+
   let jeune: Jeune
   let actionSqlRepository: ActionSqlRepository
   let idService: IdService
   let dateService: StubbedClass<DateService>
 
   beforeEach(async () => {
+    await database.cleanPG()
     jeune = unJeune()
     dateService = stubClass(DateService)
     dateService.nowAtMidnight.returns(nowAtMidnight)
@@ -40,7 +48,7 @@ describe('ActionSqlRepository', () => {
     await conseillerRepository.save(unConseiller())
     const firebaseClient = stubClass(FirebaseClient)
     const jeuneRepository = new JeuneSqlRepository(
-      databaseForTesting.sequelize,
+      database.sequelize,
       firebaseClient,
       idService,
       dateService

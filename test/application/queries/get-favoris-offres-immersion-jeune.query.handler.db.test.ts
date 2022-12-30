@@ -13,18 +13,17 @@ import {
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
 import { GetFavorisOffresImmersionJeuneQueryHandler } from '../../../src/application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
-  DatabaseForTesting.prepare()
-
   const idJeune = 'ABCDE'
   let getFavorisOffresImmersionJeuneQueryHandler: GetFavorisOffresImmersionJeuneQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     // Given
     await ConseillerSqlModel.creer(unConseillerDto({ id: 'ZIDANE' }))
     await JeuneSqlModel.creer(

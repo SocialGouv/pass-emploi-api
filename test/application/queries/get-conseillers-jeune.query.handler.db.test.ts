@@ -20,10 +20,9 @@ import { uneAutreDate } from '../../fixtures/date.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetConseillersJeuneQueryHandler', () => {
-  DatabaseForTesting.prepare()
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
   let getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler
   let sandbox: SinonSandbox
@@ -35,6 +34,10 @@ describe('GetConseillersJeuneQueryHandler', () => {
     getConseillersJeuneQueryHandler = new GetConseillersJeuneQueryHandler(
       conseillerForJeuneAuthorizer
     )
+  })
+
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
   })
 
   afterEach(() => {

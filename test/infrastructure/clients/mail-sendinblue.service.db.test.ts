@@ -10,17 +10,25 @@ import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import { InvitationIcsClient } from '../../../src/infrastructure/clients/invitation-ics.client'
 import { MailDataDto } from '../../../src/domain/mail'
 import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { ArchiveJeune } from '../../../src/domain/archive-jeune'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
 
 describe('MailSendinblueService', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let databaseForTesting: DatabaseForTesting
   let mailSendinblueService: MailSendinblueService
   let invitationIcsClient: InvitationIcsClient
   const config = testConfig()
 
-  beforeEach(() => {
+  before(() => {
+    databaseForTesting = getDatabase()
+  })
+
+  beforeEach(async () => {
+    await databaseForTesting.cleanPG()
     const httpService = new HttpService()
     invitationIcsClient = new InvitationIcsClient(
       databaseForTesting.sequelize,

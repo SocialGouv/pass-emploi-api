@@ -7,15 +7,14 @@ import { Planificateur } from '../../../src/domain/planificateur'
 import { RapportJob24h, SuiviJob } from '../../../src/domain/suivi-job'
 import { SuiviJobSqlModel } from '../../../src/infrastructure/sequelize/models/suivi-job.sql-model'
 import { uneDatetime } from '../../fixtures/date.fixture'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { testConfig } from '../../utils/module-for-testing'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('SuiviJobService', () => {
-  DatabaseForTesting.prepare()
   let service: SuiviJobService
   const configService = testConfig()
-
-  beforeEach(() => {
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
     const httpService = new HttpService()
     service = new SuiviJobService(configService, httpService)
   })

@@ -6,26 +6,34 @@ import { ActionSqlModel } from '../../../../src/infrastructure/sequelize/models/
 import { unJeune } from '../../../fixtures/jeune.fixture'
 import { CommentaireActionSqlRepositoryDb } from '../../../../src/infrastructure/repositories/action/commentaire-action-sql.repository.db'
 import { expect, stubClass } from '../../../utils'
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
 import { unConseiller } from '../../../fixtures/conseiller.fixture'
 import { ConseillerSqlRepository } from '../../../../src/infrastructure/repositories/conseiller-sql.repository.db'
 import { JeuneSqlRepository } from '../../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
 import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
 import { IdService } from '../../../../src/utils/id-service'
 import { DateService } from '../../../../src/utils/date-service'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../../utils/database-for-testing'
 
 describe('CommentaireActionSqlRepositoryDb', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let database: DatabaseForTesting
+  before(() => {
+    database = getDatabase()
+  })
+
   let commentaireActionSqlRepository: CommentaireActionSqlRepositoryDb
   let conseillerRepository: ConseillerSqlRepository
   let jeuneRepository: JeuneSqlRepository
   const jeune = unJeune()
 
   beforeEach(async () => {
+    await database.cleanPG()
     commentaireActionSqlRepository = new CommentaireActionSqlRepositoryDb()
     conseillerRepository = new ConseillerSqlRepository()
     jeuneRepository = new JeuneSqlRepository(
-      databaseForTesting.sequelize,
+      database.sequelize,
       stubClass(FirebaseClient),
       stubClass(IdService),
       stubClass(DateService)

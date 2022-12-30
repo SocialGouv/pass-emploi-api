@@ -28,10 +28,9 @@ import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { stubClassSandbox } from '../../utils/types'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetRendezVousJeuneQueryHandler', () => {
-  DatabaseForTesting.prepare()
   let dateService: StubbedClass<DateService>
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
@@ -48,7 +47,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
   const jeune1 = unJeune({ id: 'jeune-1' })
   const jeune2 = unJeune({ id: 'jeune-2' })
 
-  before(() => {
+  before(async () => {
     sandbox = createSandbox()
     dateService = stubInterface(sandbox)
     dateService.nowJs.returns(maintenant.toJSDate())
@@ -57,7 +56,8 @@ describe('GetRendezVousJeuneQueryHandler', () => {
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
   })
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
     evenementService = stubClassSandbox(EvenementService, sandbox)
 
     getRendezVousQueryHandler = new GetRendezVousJeuneQueryHandler(

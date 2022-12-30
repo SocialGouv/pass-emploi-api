@@ -1,5 +1,4 @@
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { GetCommentairesActionQueryHandler } from '../../../src/application/queries/get-commentaires-action.query.handler.db'
 import { ActionAuthorizer } from '../../../src/application/authorizers/authorize-action'
 import { unUtilisateurDecode } from '../../fixtures/authentification.fixture'
@@ -17,13 +16,22 @@ import { Action } from 'src/domain/action/action'
 import { uneAutreDatetime, uneDatetime } from '../../fixtures/date.fixture'
 import { CommentaireActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
 import { success } from '../../../src/building-blocks/types/result'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
 
 describe('GetCommentairesActionQueryHandler', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let databaseForTesting: DatabaseForTesting
+  before(async () => {
+    databaseForTesting = getDatabase()
+  })
+
   let getCommentairesActionQueryHandler: GetCommentairesActionQueryHandler
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await databaseForTesting.cleanPG()
     actionAuthorizer = stubClass(ActionAuthorizer)
     getCommentairesActionQueryHandler = new GetCommentairesActionQueryHandler(
       actionAuthorizer

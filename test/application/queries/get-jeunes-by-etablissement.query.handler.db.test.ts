@@ -12,19 +12,23 @@ import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeun
 import { unJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { uneAgenceMiloDTO } from '../../fixtures/sql-models/agence.sql-model'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { ConseillerEtablissementAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-etablissement'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
 
 describe('GetJeunesByEtablissementQueryHandler', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let databaseForTesting: DatabaseForTesting
   let conseillersRepository: StubbedType<Conseiller.Repository>
   let conseillerEtablissementAuthorizer: StubbedClass<ConseillerEtablissementAuthorizer>
 
   let getJeunesByEtablissementQueryHandler: GetJeunesByEtablissementQueryHandler
   let sandbox: SinonSandbox
 
-  before(() => {
+  before(async () => {
+    databaseForTesting = getDatabase()
     sandbox = createSandbox()
     conseillersRepository = stubInterface(sandbox)
     conseillerEtablissementAuthorizer = stubClass(
@@ -37,6 +41,10 @@ describe('GetJeunesByEtablissementQueryHandler', () => {
         conseillerEtablissementAuthorizer,
         conseillersRepository
       )
+  })
+
+  beforeEach(async () => {
+    await databaseForTesting.cleanPG()
   })
 
   afterEach(() => {

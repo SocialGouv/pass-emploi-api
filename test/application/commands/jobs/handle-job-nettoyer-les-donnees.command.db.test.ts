@@ -5,17 +5,17 @@ import { uneDatetime } from 'test/fixtures/date.fixture'
 import { DateService } from '../../../../src/utils/date-service'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { HandleJobNettoyerLesDonneesCommandHandler } from '../../../../src/application/commands/jobs/handle-job-nettoyer-les-donnees.command.db'
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
 import { ArchiveJeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/archive-jeune.sql-model'
 import { LogApiPartenaireSqlModel } from '../../../../src/infrastructure/sequelize/models/log-api-partenaire.sql-model'
+import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('HandleJobNettoyerLesDonneesCommandHandler', () => {
-  DatabaseForTesting.prepare()
   let handleJobNettoyerLesDonneesCommandHandler: HandleJobNettoyerLesDonneesCommandHandler
   let dateSevice: StubbedClass<DateService>
   let suiviJobService: StubbedType<SuiviJob.Service>
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
     const sandbox: SinonSandbox = createSandbox()
     dateSevice = stubClass(DateService)
     dateSevice.now.returns(uneDatetime())

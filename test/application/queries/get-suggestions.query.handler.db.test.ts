@@ -1,4 +1,3 @@
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { GetSuggestionsQueryHandler } from '../../../src/application/queries/get-suggestions.query.handler.db'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
@@ -12,13 +11,14 @@ import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeun
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { Offre } from '../../../src/domain/offre/offre'
 import { uneDatetime } from '../../fixtures/date.fixture'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetSuggestionsQueryHandler', () => {
-  DatabaseForTesting.prepare()
   let queryHandler: GetSuggestionsQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     queryHandler = new GetSuggestionsQueryHandler(jeuneAuthorizer)
 

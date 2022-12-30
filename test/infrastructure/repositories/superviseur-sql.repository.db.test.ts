@@ -2,10 +2,9 @@ import { SuperviseurSqlRepository } from 'src/infrastructure/repositories/superv
 import { SuperviseurSqlModel } from 'src/infrastructure/sequelize/models/superviseur.sql-model'
 import { Core } from '../../../src/domain/core'
 import { expect } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('SuperviseurSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let superviseurSqlRepository: SuperviseurSqlRepository
   // Given
   const unSuperviseur1 = {
@@ -23,6 +22,7 @@ describe('SuperviseurSqlRepository', () => {
   const emailLowercase = 'test@test.test'
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     superviseurSqlRepository = new SuperviseurSqlRepository()
   })
 

@@ -15,16 +15,16 @@ import {
   ConseillerSqlModel
 } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetConseillerByEmailQueryHandler', () => {
-  DatabaseForTesting.prepare()
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getConseillerByEmail: GetConseillerByEmailQueryHandler
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
 
     getConseillerByEmail = new GetConseillerByEmailQueryHandler(

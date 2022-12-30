@@ -7,16 +7,16 @@ import { Planificateur } from '../../../../src/domain/planificateur'
 import { SuiviJobSqlModel } from '../../../../src/infrastructure/sequelize/models/suivi-job.sql-model'
 import { DateService } from '../../../../src/utils/date-service'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
+import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('MonitorJobsCommandHandler', () => {
-  DatabaseForTesting.prepare()
   let monitorJobsCommandHandler: MonitorJobsCommandHandler
   let dateSevice: StubbedClass<DateService>
   let suiviJobService: StubbedType<SuiviJob.Service>
   const maintenant = uneDatetime()
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
     const sandbox: SinonSandbox = createSandbox()
     dateSevice = stubClass(DateService)
     dateSevice.now.returns(maintenant)

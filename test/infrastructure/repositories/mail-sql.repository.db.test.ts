@@ -4,13 +4,13 @@ import { MailSqlRepository } from '../../../src/infrastructure/repositories/mail
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { expect } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('MailSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let mailSqlRepository: MailSqlRepository
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     mailSqlRepository = new MailSqlRepository()
   })
 
