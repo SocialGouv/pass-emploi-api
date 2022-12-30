@@ -1,7 +1,7 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import {
-  GetServicesCiviqueQuery,
-  GetOffresServicesCiviqueQueryHandler
+  GetOffresServicesCiviqueQueryHandler,
+  GetServicesCiviqueQuery
 } from 'src/application/queries/get-offres-services-civique.query.handler'
 import * as request from 'supertest'
 import {
@@ -22,13 +22,9 @@ import {
   offresServicesCiviqueQueryModel,
   unDetailOffreServiceCiviqueQuerymodel
 } from '../../fixtures/query-models/offre-service-civique.query-model.fixtures'
-import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('ServicesCiviqueController', () => {
   let getServicesCiviqueQueryHandler: StubbedClass<GetOffresServicesCiviqueQueryHandler>
@@ -36,27 +32,13 @@ describe('ServicesCiviqueController', () => {
   let app: INestApplication
 
   before(async () => {
-    getServicesCiviqueQueryHandler = stubClass(
+    app = await getApplicationWithStubbedDependencies()
+    getServicesCiviqueQueryHandler = app.get(
       GetOffresServicesCiviqueQueryHandler
     )
-    getDetailServiceCiviqueQueryHandler = stubClass(
+    getDetailServiceCiviqueQueryHandler = app.get(
       GetDetailOffreServiceCiviqueQueryHandler
     )
-
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(GetOffresServicesCiviqueQueryHandler)
-      .useValue(getServicesCiviqueQueryHandler)
-      .overrideProvider(GetDetailOffreServiceCiviqueQueryHandler)
-      .useValue(getDetailServiceCiviqueQueryHandler)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
   })
 
   describe('GET /services-civique', () => {

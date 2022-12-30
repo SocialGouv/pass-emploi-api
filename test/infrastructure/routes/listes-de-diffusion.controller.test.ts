@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
 import {
   CreateListeDeDiffusionCommand,
@@ -15,12 +15,7 @@ import {
   success
 } from '../../../src/building-blocks/types/result'
 import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
-import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { GetListesDeDiffusionDuConseillerQueryHandler } from '../../../src/application/queries/get-listes-de-diffusion-du-conseiller.query.handler.db'
 import {
@@ -30,6 +25,7 @@ import {
 import { GetDetailListeDeDiffusionQueryHandler } from '../../../src/application/queries/get-detail-liste-de-diffusion.query.handler.db'
 import { ListeDeDiffusionQueryModel } from '../../../src/application/queries/query-models/liste-de-diffusion.query-model'
 import { uneDate } from '../../fixtures/date.fixture'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('ListesDeDiffusionController', () => {
   let createListeDeDiffusionCommandHandler: StubbedClass<CreateListeDeDiffusionCommandHandler>
@@ -40,42 +36,22 @@ describe('ListesDeDiffusionController', () => {
   let app: INestApplication
 
   before(async () => {
-    createListeDeDiffusionCommandHandler = stubClass(
+    app = await getApplicationWithStubbedDependencies()
+    createListeDeDiffusionCommandHandler = app.get(
       CreateListeDeDiffusionCommandHandler
     )
-    updateListeDeDiffusionCommandHandler = stubClass(
+    updateListeDeDiffusionCommandHandler = app.get(
       UpdateListeDeDiffusionCommandHandler
     )
-    getListesDeDiffusionQueryHandler = stubClass(
+    getListesDeDiffusionQueryHandler = app.get(
       GetListesDeDiffusionDuConseillerQueryHandler
     )
-    deleteListeDeDiffusionCommandHandler = stubClass(
+    deleteListeDeDiffusionCommandHandler = app.get(
       DeleteListeDeDiffusionCommandHandler
     )
-    getDetailListeDeDiffusionQueryHandler = stubClass(
+    getDetailListeDeDiffusionQueryHandler = app.get(
       GetDetailListeDeDiffusionQueryHandler
     )
-
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(CreateListeDeDiffusionCommandHandler)
-      .useValue(createListeDeDiffusionCommandHandler)
-      .overrideProvider(UpdateListeDeDiffusionCommandHandler)
-      .useValue(updateListeDeDiffusionCommandHandler)
-      .overrideProvider(GetListesDeDiffusionDuConseillerQueryHandler)
-      .useValue(getListesDeDiffusionQueryHandler)
-      .overrideProvider(DeleteListeDeDiffusionCommandHandler)
-      .useValue(deleteListeDeDiffusionCommandHandler)
-      .overrideProvider(GetDetailListeDeDiffusionQueryHandler)
-      .useValue(getDetailListeDeDiffusionQueryHandler)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
   })
 
   describe('POST /conseillers/{idConseiller}/listes-de-diffusion', () => {

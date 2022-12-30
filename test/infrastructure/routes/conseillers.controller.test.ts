@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import { CreateRendezVousCommandHandler } from 'src/application/commands/create-rendez-vous.command.handler'
 import {
   CreerSuperviseursCommand,
@@ -12,12 +12,10 @@ import { Action } from 'src/domain/action/action'
 import { CodeTypeRendezVous } from 'src/domain/rendez-vous/rendez-vous'
 import { CreateActionPayload } from 'src/infrastructure/routes/validation/actions.inputs'
 import { CreateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
-import { DateService } from 'src/utils/date-service'
 import * as request from 'supertest'
 import { uneDatetime, uneDatetimeAvecOffset } from 'test/fixtures/date.fixture'
 import { unRendezVousConseillerFutursEtPassesQueryModel } from 'test/fixtures/rendez-vous.fixture'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
-import { CreateSuggestionConseillerOffreEmploiCommandHandler } from '../../../src/application/commands/create-suggestion-conseiller-offre-emploi.command.handler'
 import {
   CreerJeuneMiloCommand,
   CreerJeuneMiloCommandHandler
@@ -63,13 +61,9 @@ import { unJeune } from '../../fixtures/jeune.fixture'
 import { unDossierMilo } from '../../fixtures/milo.fixture'
 import { detailConseillerQueryModel } from '../../fixtures/query-models/conseiller.query-model.fixtures'
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
-import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('ConseillersController', () => {
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
@@ -87,98 +81,41 @@ describe('ConseillersController', () => {
   let recupererJeunesDuConseillerCommandHandler: StubbedClass<RecupererJeunesDuConseillerCommandHandler>
   let modifierJeuneDuConseillerCommandHandler: StubbedClass<ModifierJeuneDuConseillerCommandHandler>
   let getIndicateursJeunePourConseillerQueryHandler: StubbedClass<GetIndicateursPourConseillerQueryHandler>
-  let createSuggestionDuConseillerCommandHandler: StubbedClass<CreateSuggestionConseillerOffreEmploiCommandHandler>
   let app: INestApplication
 
-  let dateService: StubbedClass<DateService>
   const now = uneDatetime().set({ second: 59, millisecond: 0 })
 
   before(async () => {
-    getConseillerByEmailQueryHandler = stubClass(
-      GetConseillerByEmailQueryHandler
-    )
-    createActionCommandHandler = stubClass(CreateActionCommandHandler)
-    sendNotificationsNouveauxMessages = stubClass(
-      SendNotificationsNouveauxMessagesCommandHandler
-    )
-    getDossierMiloJeuneQueryHandler = stubClass(GetDossierMiloJeuneQueryHandler)
-    getJeuneMiloByDossierQueryHandler = stubClass(
-      GetJeuneMiloByDossierQueryHandler
-    )
-    getAllRendezVousConseillerQueryHandler = stubClass(
-      GetAllRendezVousConseillerQueryHandler
-    )
-    createRendezVousCommandHandler = stubClass(CreateRendezVousCommandHandler)
-    creerJeuneMiloCommandHandler = stubClass(CreerJeuneMiloCommandHandler)
-    getJeunesByConseillerQueryHandler = stubClass(
+    app = await getApplicationWithStubbedDependencies()
+    getConseillerByEmailQueryHandler = app.get(GetConseillerByEmailQueryHandler)
+    createActionCommandHandler = app.get(CreateActionCommandHandler)
+    getJeunesByConseillerQueryHandler = app.get(
       GetJeunesByConseillerQueryHandler
     )
-    creerSuperviseursCommandHandler = stubClass(CreerSuperviseursCommandHandler)
-    deleteSuperviseursCommandHandler = stubClass(
-      DeleteSuperviseursCommandHandler
+    sendNotificationsNouveauxMessages = app.get(
+      SendNotificationsNouveauxMessagesCommandHandler
     )
-    modifierConseillerCommandHandler = stubClass(
-      ModifierConseillerCommandHandler
+    getDossierMiloJeuneQueryHandler = app.get(GetDossierMiloJeuneQueryHandler)
+    getJeuneMiloByDossierQueryHandler = app.get(
+      GetJeuneMiloByDossierQueryHandler
     )
-    recupererJeunesDuConseillerCommandHandler = stubClass(
+    getAllRendezVousConseillerQueryHandler = app.get(
+      GetAllRendezVousConseillerQueryHandler
+    )
+    createRendezVousCommandHandler = app.get(CreateRendezVousCommandHandler)
+    creerJeuneMiloCommandHandler = app.get(CreerJeuneMiloCommandHandler)
+    creerSuperviseursCommandHandler = app.get(CreerSuperviseursCommandHandler)
+    deleteSuperviseursCommandHandler = app.get(DeleteSuperviseursCommandHandler)
+    modifierConseillerCommandHandler = app.get(ModifierConseillerCommandHandler)
+    recupererJeunesDuConseillerCommandHandler = app.get(
       RecupererJeunesDuConseillerCommandHandler
     )
-    modifierJeuneDuConseillerCommandHandler = stubClass(
+    modifierJeuneDuConseillerCommandHandler = app.get(
       ModifierJeuneDuConseillerCommandHandler
     )
-    getIndicateursJeunePourConseillerQueryHandler = stubClass(
+    getIndicateursJeunePourConseillerQueryHandler = app.get(
       GetIndicateursPourConseillerQueryHandler
     )
-    createSuggestionDuConseillerCommandHandler = stubClass(
-      CreateSuggestionConseillerOffreEmploiCommandHandler
-    )
-    dateService = stubClass(DateService)
-    dateService.now.returns(now)
-
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(GetConseillerByEmailQueryHandler)
-      .useValue(getConseillerByEmailQueryHandler)
-      .overrideProvider(CreateActionCommandHandler)
-      .useValue(createActionCommandHandler)
-      .overrideProvider(SendNotificationsNouveauxMessagesCommandHandler)
-      .useValue(sendNotificationsNouveauxMessages)
-      .overrideProvider(GetDossierMiloJeuneQueryHandler)
-      .useValue(getDossierMiloJeuneQueryHandler)
-      .overrideProvider(GetJeuneMiloByDossierQueryHandler)
-      .useValue(getJeuneMiloByDossierQueryHandler)
-      .overrideProvider(GetAllRendezVousConseillerQueryHandler)
-      .useValue(getAllRendezVousConseillerQueryHandler)
-      .overrideProvider(CreateRendezVousCommandHandler)
-      .useValue(createRendezVousCommandHandler)
-      .overrideProvider(CreerJeuneMiloCommandHandler)
-      .useValue(creerJeuneMiloCommandHandler)
-      .overrideProvider(GetJeunesByConseillerQueryHandler)
-      .useValue(getJeunesByConseillerQueryHandler)
-      .overrideProvider(CreerSuperviseursCommandHandler)
-      .useValue(creerSuperviseursCommandHandler)
-      .overrideProvider(DeleteSuperviseursCommandHandler)
-      .useValue(deleteSuperviseursCommandHandler)
-      .overrideProvider(ModifierConseillerCommandHandler)
-      .useValue(modifierConseillerCommandHandler)
-      .overrideProvider(RecupererJeunesDuConseillerCommandHandler)
-      .useValue(recupererJeunesDuConseillerCommandHandler)
-      .overrideProvider(ModifierJeuneDuConseillerCommandHandler)
-      .useValue(modifierJeuneDuConseillerCommandHandler)
-      .overrideProvider(DateService)
-      .useValue(dateService)
-      .overrideProvider(GetIndicateursPourConseillerQueryHandler)
-      .useValue(getIndicateursJeunePourConseillerQueryHandler)
-      .overrideProvider(CreateSuggestionConseillerOffreEmploiCommandHandler)
-      .useValue(createSuggestionDuConseillerCommandHandler)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
   })
 
   describe('GET /conseillers?email', () => {
@@ -496,7 +433,7 @@ describe('ConseillersController', () => {
   describe('POST /conseillers/:idConseiller/rendezvous', () => {
     describe('quand le payload est bon', () => {
       describe('quand la commande est en succes', () => {
-        before(() => {
+        beforeEach(() => {
           createRendezVousCommandHandler.execute.resolves(success('id-rdv'))
         })
         it('crée le rendezvous avec jeunesIds', async () => {

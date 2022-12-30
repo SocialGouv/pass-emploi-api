@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
 import { DeleteActionCommandHandler } from '../../../src/application/commands/delete-action.command.handler'
 import { GetDetailActionQueryHandler } from '../../../src/application/queries/get-detail-action.query.handler.db'
@@ -18,12 +18,7 @@ import {
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
 import { uneActionQueryModel } from '../../fixtures/query-models/action.query-model.fixtures'
-import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { AddCommentaireActionCommandHandler } from '../../../src/application/commands/add-commentaire-action.command.handler'
 import { GetCommentairesActionQueryHandler } from '../../../src/application/queries/get-commentaires-action.query.handler.db'
@@ -36,6 +31,7 @@ import {
   QualifierActionCommandHandler
 } from '../../../src/application/commands/qualifier-action.command.handler'
 import { DateService } from '../../../src/utils/date-service'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 let getDetailActionQueryHandler: StubbedClass<GetDetailActionQueryHandler>
 let deleteActionCommandHandler: StubbedClass<DeleteActionCommandHandler>
@@ -45,38 +41,20 @@ let qualifierActionCommandHandler: StubbedClass<QualifierActionCommandHandler>
 
 describe('ActionsController', () => {
   let app: INestApplication
-  beforeEach(async () => {
-    getDetailActionQueryHandler = stubClass(GetDetailActionQueryHandler)
-    deleteActionCommandHandler = stubClass(DeleteActionCommandHandler)
-    addCommentaireActionCommandHandler = stubClass(
+
+  before(async () => {
+    app = await getApplicationWithStubbedDependencies()
+    getDetailActionQueryHandler = app.get(GetDetailActionQueryHandler)
+    deleteActionCommandHandler = app.get(DeleteActionCommandHandler)
+    addCommentaireActionCommandHandler = app.get(
       AddCommentaireActionCommandHandler
     )
-    getCommentaireActionCommandHandler = stubClass(
+    getCommentaireActionCommandHandler = app.get(
       GetCommentairesActionQueryHandler
     )
-    qualifierActionCommandHandler = stubClass(QualifierActionCommandHandler)
-
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(GetDetailActionQueryHandler)
-      .useValue(getDetailActionQueryHandler)
-      .overrideProvider(DeleteActionCommandHandler)
-      .useValue(deleteActionCommandHandler)
-      .overrideProvider(AddCommentaireActionCommandHandler)
-      .useValue(addCommentaireActionCommandHandler)
-      .overrideProvider(GetCommentairesActionQueryHandler)
-      .useValue(getCommentaireActionCommandHandler)
-      .overrideProvider(QualifierActionCommandHandler)
-      .useValue(qualifierActionCommandHandler)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
+    qualifierActionCommandHandler = app.get(QualifierActionCommandHandler)
   })
 
-  afterEach(async () => {
-    await app.close()
-  })
   describe('actions', () => {
     describe('GET /actions/:idAction', () => {
       const idAction = '13c11b33-751c-4e1b-a49d-1b5a473ba159'

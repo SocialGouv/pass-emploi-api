@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
 import {
   NotifierNouvellesImmersionsCommand,
@@ -19,17 +19,13 @@ import {
 } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
-import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import {
   GetDetailOffreImmersionQuery,
   GetDetailOffreImmersionQueryHandler
 } from '../../../src/application/queries/get-detail-offre-immersion.query.handler'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('OffresImmersionController', () => {
   let getOffresImmersionQueryHandler: StubbedClass<GetOffresImmersionQueryHandler>
@@ -38,30 +34,14 @@ describe('OffresImmersionController', () => {
   let app: INestApplication
 
   before(async () => {
-    getOffresImmersionQueryHandler = stubClass(GetOffresImmersionQueryHandler)
-    getDetailOffreImmersionQueryHandler = stubClass(
+    app = await getApplicationWithStubbedDependencies()
+    getOffresImmersionQueryHandler = app.get(GetOffresImmersionQueryHandler)
+    getDetailOffreImmersionQueryHandler = app.get(
       GetDetailOffreImmersionQueryHandler
     )
-    notifierNouvellesImmersionsCommandHandler = stubClass(
+    notifierNouvellesImmersionsCommandHandler = app.get(
       NotifierNouvellesImmersionsCommandHandler
     )
-
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(GetOffresImmersionQueryHandler)
-      .useValue(getOffresImmersionQueryHandler)
-      .overrideProvider(GetDetailOffreImmersionQueryHandler)
-      .useValue(getDetailOffreImmersionQueryHandler)
-      .overrideProvider(NotifierNouvellesImmersionsCommandHandler)
-      .useValue(notifierNouvellesImmersionsCommandHandler)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
   })
 
   describe('GET /offres-immersion', () => {

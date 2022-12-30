@@ -1,10 +1,5 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
-import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { HttpStatus, INestApplication } from '@nestjs/common'
+import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import {
   unHeaderAuthorization,
@@ -32,6 +27,7 @@ import {
 } from 'src/application/commands/update-rendez-vous.command.handler'
 import { UpdateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
 import { GetDetailRendezVousQueryHandler } from '../../../src/application/queries/get-detail-rendez-vous.query.handler.db'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('RendezvousController', () => {
   let getDetailRendezVousQueryHandler: StubbedClass<GetDetailRendezVousQueryHandler>
@@ -40,25 +36,10 @@ describe('RendezvousController', () => {
   let app: INestApplication
 
   before(async () => {
-    getDetailRendezVousQueryHandler = stubClass(GetDetailRendezVousQueryHandler)
-    deleteRendezVousCommandHandler = stubClass(DeleteRendezVousCommandHandler)
-    updateRendezVousCommandHandler = stubClass(UpdateRendezVousCommandHandler)
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(GetDetailRendezVousQueryHandler)
-      .useValue(getDetailRendezVousQueryHandler)
-      .overrideProvider(DeleteRendezVousCommandHandler)
-      .useValue(deleteRendezVousCommandHandler)
-      .overrideProvider(UpdateRendezVousCommandHandler)
-      .useValue(updateRendezVousCommandHandler)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
+    app = await getApplicationWithStubbedDependencies()
+    getDetailRendezVousQueryHandler = app.get(GetDetailRendezVousQueryHandler)
+    deleteRendezVousCommandHandler = app.get(DeleteRendezVousCommandHandler)
+    updateRendezVousCommandHandler = app.get(UpdateRendezVousCommandHandler)
   })
 
   describe('GET rendezvous/:idRendezVous', () => {

@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import {
   AddFavoriOffreImmersionCommand,
   AddFavoriOffreImmersionCommandHandler
@@ -16,8 +16,8 @@ import {
   AddFavoriOffreEmploiCommandHandler
 } from '../../../src/application/commands/add-favori-offre-emploi.command.handler'
 import {
-  AddFavoriServiceCiviqueCommand,
-  AddFavoriOffreServiceCiviqueCommandHandler
+  AddFavoriOffreServiceCiviqueCommandHandler,
+  AddFavoriServiceCiviqueCommand
 } from '../../../src/application/commands/add-favori-offre-service-civique-command-handler'
 import {
   DeleteFavoriOffreEmploiCommand,
@@ -46,18 +46,14 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
-import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../../src/application/queries/get-favoris-service-civique-jeune.query.handler.db'
 import { uneOffreServiceCivique } from '../../fixtures/offre-service-civique.fixture'
 import { GetFavorisJeunePourConseillerQueryHandler } from '../../../src/application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
 import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler.db'
 import { Offre } from '../../../src/domain/offre/offre'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('FavorisController', () => {
   let addFavoriOffreEmploiCommandHandler: StubbedClass<AddFavoriOffreEmploiCommandHandler>
@@ -74,74 +70,40 @@ describe('FavorisController', () => {
   let app: INestApplication
 
   before(async () => {
-    addFavoriOffreEmploiCommandHandler = stubClass(
+    app = await getApplicationWithStubbedDependencies()
+    addFavoriOffreEmploiCommandHandler = app.get(
       AddFavoriOffreEmploiCommandHandler
     )
-    deleteFavoriOffreEmploiCommandHandler = stubClass(
+    deleteFavoriOffreEmploiCommandHandler = app.get(
       DeleteFavoriOffreEmploiCommandHandler
     )
-    getFavorisOffresEmploiJeuneQueryHandler = stubClass(
+    getFavorisOffresEmploiJeuneQueryHandler = app.get(
       GetFavorisOffresEmploiJeuneQueryHandler
     )
-
-    addFavoriOffreImmersionCommandHandler = stubClass(
+    addFavoriOffreImmersionCommandHandler = app.get(
       AddFavoriOffreImmersionCommandHandler
     )
-    deleteFavoriOffreImmersionCommandHandler = stubClass(
+    deleteFavoriOffreImmersionCommandHandler = app.get(
       DeleteFavoriOffreImmersionCommandHandler
     )
-    getFavorisOffresImmersionJeuneQueryHandler = stubClass(
+    getFavorisOffresImmersionJeuneQueryHandler = app.get(
       GetFavorisOffresImmersionJeuneQueryHandler
     )
-
-    addFavoriOffreEngagementCommandHandler = stubClass(
+    addFavoriOffreEngagementCommandHandler = app.get(
       AddFavoriOffreServiceCiviqueCommandHandler
     )
-    deleteFavoriOffreEngagementCommandHandler = stubClass(
+    deleteFavoriOffreEngagementCommandHandler = app.get(
       DeleteFavoriOffreServiceCiviqueCommandHandler
     )
-    getFavorisServiceCiviqueJeuneQueryHandler = stubClass(
+    getFavorisServiceCiviqueJeuneQueryHandler = app.get(
       GetFavorisServiceCiviqueJeuneQueryHandler
     )
-    getFavorisJeunePourConseillerQueryHandler = stubClass(
+    getFavorisJeunePourConseillerQueryHandler = app.get(
       GetFavorisJeunePourConseillerQueryHandler
     )
-    getMetadonneesFavorisJeuneQueryHandler = stubClass(
+    getMetadonneesFavorisJeuneQueryHandler = app.get(
       GetMetadonneesFavorisJeuneQueryHandler
     )
-
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(AddFavoriOffreEmploiCommandHandler)
-      .useValue(addFavoriOffreEmploiCommandHandler)
-      .overrideProvider(DeleteFavoriOffreEmploiCommandHandler)
-      .useValue(deleteFavoriOffreEmploiCommandHandler)
-      .overrideProvider(GetFavorisOffresEmploiJeuneQueryHandler)
-      .useValue(getFavorisOffresEmploiJeuneQueryHandler)
-      .overrideProvider(AddFavoriOffreImmersionCommandHandler)
-      .useValue(addFavoriOffreImmersionCommandHandler)
-      .overrideProvider(DeleteFavoriOffreImmersionCommandHandler)
-      .useValue(deleteFavoriOffreImmersionCommandHandler)
-      .overrideProvider(GetFavorisOffresImmersionJeuneQueryHandler)
-      .useValue(getFavorisOffresImmersionJeuneQueryHandler)
-      .overrideProvider(AddFavoriOffreServiceCiviqueCommandHandler)
-      .useValue(addFavoriOffreEngagementCommandHandler)
-      .overrideProvider(DeleteFavoriOffreServiceCiviqueCommandHandler)
-      .useValue(deleteFavoriOffreEngagementCommandHandler)
-      .overrideProvider(GetFavorisServiceCiviqueJeuneQueryHandler)
-      .useValue(getFavorisServiceCiviqueJeuneQueryHandler)
-      .overrideProvider(GetFavorisJeunePourConseillerQueryHandler)
-      .useValue(getFavorisJeunePourConseillerQueryHandler)
-      .overrideProvider(GetMetadonneesFavorisJeuneQueryHandler)
-      .useValue(getMetadonneesFavorisJeuneQueryHandler)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
   })
 
   describe('Favoris pour Conseiller', () => {

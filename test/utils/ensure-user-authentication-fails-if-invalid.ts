@@ -7,6 +7,7 @@ import {
   buildTestingModuleForHttpTesting,
   FakeJwtService
 } from './module-for-testing'
+import { createSandbox } from 'sinon'
 
 export function ensureUserAuthenticationFailsIfInvalid(
   method: string,
@@ -15,7 +16,8 @@ export function ensureUserAuthenticationFailsIfInvalid(
   describe(`Authentification for ${method} ${path}`, () => {
     let app: INestApplication
     before(async () => {
-      const testingModule = await buildTestingModuleForHttpTesting()
+      const sandbox = createSandbox()
+      const testingModule = await buildTestingModuleForHttpTesting(sandbox)
         .overrideProvider(JwtService)
         .useValue(new FakeJwtService(false))
         .compile()

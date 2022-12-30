@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import {
   SupprimerFichierCommand,
   SupprimerFichierCommandHandler
@@ -25,12 +25,9 @@ import {
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
 import { uneImage } from '../../fixtures/fichier.fixture'
-import {
-  buildTestingModuleForHttpTesting,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('FichiersController', () => {
   let telechargerFichierQueryHandler: StubbedClass<TelechargerFichierQueryHandler>
@@ -39,25 +36,10 @@ describe('FichiersController', () => {
   let app: INestApplication
 
   before(async () => {
-    telechargerFichierQueryHandler = stubClass(TelechargerFichierQueryHandler)
-    televerserFichierCommandHandler = stubClass(TeleverserFichierCommandHandler)
-    supprimerFichierCommandHandler = stubClass(SupprimerFichierCommandHandler)
-
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(TelechargerFichierQueryHandler)
-      .useValue(telechargerFichierQueryHandler)
-      .overrideProvider(TeleverserFichierCommandHandler)
-      .useValue(televerserFichierCommandHandler)
-      .overrideProvider(SupprimerFichierCommandHandler)
-      .useValue(supprimerFichierCommandHandler)
-      .compile()
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
+    app = await getApplicationWithStubbedDependencies()
+    telechargerFichierQueryHandler = app.get(TelechargerFichierQueryHandler)
+    televerserFichierCommandHandler = app.get(TeleverserFichierCommandHandler)
+    supprimerFichierCommandHandler = app.get(SupprimerFichierCommandHandler)
   })
 
   describe('GET /fichiers/:idFichier', () => {

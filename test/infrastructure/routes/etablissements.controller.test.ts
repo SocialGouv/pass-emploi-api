@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import * as request from 'supertest'
 import { CloturerAnimationCollectiveCommandHandler } from '../../../src/application/commands/cloturer-animation-collective.command.handler'
@@ -12,13 +12,9 @@ import {
   unHeaderAuthorization,
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
-import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('EtablissementsController', () => {
   let getAnimationsCollectivesQueryHandler: StubbedClass<GetAnimationsCollectivesQueryHandler>
@@ -27,32 +23,16 @@ describe('EtablissementsController', () => {
   let app: INestApplication
 
   before(async () => {
-    getAnimationsCollectivesQueryHandler = stubClass(
+    app = await getApplicationWithStubbedDependencies()
+    getAnimationsCollectivesQueryHandler = app.get(
       GetAnimationsCollectivesQueryHandler
     )
-    getJeunesEtablissementQueryHandler = stubClass(
+    getJeunesEtablissementQueryHandler = app.get(
       GetJeunesByEtablissementQueryHandler
     )
-    cloturerAnimationCollectiveCommandHandler = stubClass(
+    cloturerAnimationCollectiveCommandHandler = app.get(
       CloturerAnimationCollectiveCommandHandler
     )
-
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(GetAnimationsCollectivesQueryHandler)
-      .useValue(getAnimationsCollectivesQueryHandler)
-      .overrideProvider(GetJeunesByEtablissementQueryHandler)
-      .useValue(getJeunesEtablissementQueryHandler)
-      .overrideProvider(CloturerAnimationCollectiveCommandHandler)
-      .useValue(cloturerAnimationCollectiveCommandHandler)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
   })
 
   describe('GET etablissements/:id/animations-collectives', () => {

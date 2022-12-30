@@ -1,12 +1,7 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
 import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
-import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 import {
   GetOffresEmploiQuery,
   GetOffresEmploiQueryHandler
@@ -24,6 +19,7 @@ import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { Offre } from '../../../src/domain/offre/offre'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('OffresEmploiController', () => {
   let getOffresEmploiQueryHandler: StubbedClass<GetOffresEmploiQueryHandler>
@@ -31,24 +27,9 @@ describe('OffresEmploiController', () => {
   let app: INestApplication
 
   before(async () => {
-    getOffresEmploiQueryHandler = stubClass(GetOffresEmploiQueryHandler)
-    getDetailOffreEmploiQueryHandler = stubClass(
-      GetDetailOffreEmploiQueryHandler
-    )
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(GetOffresEmploiQueryHandler)
-      .useValue(getOffresEmploiQueryHandler)
-      .overrideProvider(GetDetailOffreEmploiQueryHandler)
-      .useValue(getDetailOffreEmploiQueryHandler)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
+    app = await getApplicationWithStubbedDependencies()
+    getOffresEmploiQueryHandler = app.get(GetOffresEmploiQueryHandler)
+    getDetailOffreEmploiQueryHandler = app.get(GetDetailOffreEmploiQueryHandler)
   })
 
   describe('GET /offres-emploi', () => {
