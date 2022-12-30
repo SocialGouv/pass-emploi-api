@@ -16,7 +16,6 @@ import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
 import { Jeune } from '../jeune/jeune'
 import * as _Commentaire from './commentaire'
-import * as _Milo from './milo'
 import * as _Qualification from './qualification'
 import _ACTIONS_PREDEFINIES from './actions-predefinies'
 
@@ -50,8 +49,6 @@ export namespace Action {
   export import Commentaire = _Commentaire.Commentaire
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import Qualification = _Qualification.Qualification
-  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
-  export import Milo = _Milo.Milo
 
   export type Id = Brand<string, 'IdAction'>
   export type IdCreateur = string | Jeune.Id

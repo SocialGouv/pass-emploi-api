@@ -1,32 +1,16 @@
-import { Result } from '../building-blocks/types/result'
 import { DateTime } from 'luxon'
+import { Result } from '../../../building-blocks/types/result'
 
-export const MiloRepositoryToken = 'Milo.Repository'
+export const MiloJeuneRepositoryToken = 'MiloJeuneRepository'
 
-export enum EtatSituationMilo {
-  PREVU = 'PREVU',
-  EN_COURS = 'EN_COURS',
-  TERMINE = 'TERMINE'
-}
-export enum CategorieSituationMilo {
-  EMPLOI = 'Emploi',
-  CONTRAT_EN_ALTERNANCE = 'Contrat en Alternance',
-  FORMATION = 'Formation',
-  IMMERSION_EN_ENTREPRISE = 'Immersion en entreprise',
-  PMSMP = 'Pmsmp',
-  CONTRAT_DE_VOLONTARIAT_BENEVOLAT = 'Contrat de volontariat - bénévolat',
-  SCOLARITE = 'Scolarité',
-  DEMANDEUR_D_EMPLOI = "Demandeur d'emploi"
-}
-
-export namespace Milo {
+export namespace MiloJeune {
   interface Situation {
-    etat: EtatSituationMilo
-    categorie: CategorieSituationMilo
+    etat: EtatSituation
+    categorie: CategorieSituation
     dateFin?: string
   }
 
-  export interface SituationsDuJeune {
+  export interface Situations {
     idJeune: string
     situationCourante?: Situation
     situations: Situation[]
@@ -42,12 +26,26 @@ export namespace Milo {
     dateFinCEJ?: DateTime
   }
 
+  export enum EtatSituation {
+    PREVU = 'PREVU',
+    EN_COURS = 'EN_COURS',
+    TERMINE = 'TERMINE'
+  }
+  export enum CategorieSituation {
+    EMPLOI = 'Emploi',
+    CONTRAT_EN_ALTERNANCE = 'Contrat en Alternance',
+    FORMATION = 'Formation',
+    IMMERSION_EN_ENTREPRISE = 'Immersion en entreprise',
+    PMSMP = 'Pmsmp',
+    CONTRAT_DE_VOLONTARIAT_BENEVOLAT = 'Contrat de volontariat - bénévolat',
+    SCOLARITE = 'Scolarité',
+    DEMANDEUR_D_EMPLOI = "Demandeur d'emploi"
+  }
+
   export interface Repository {
     getDossier(id: string): Promise<Result<Dossier>>
-    saveSituationsJeune(situations: SituationsDuJeune): Promise<void>
-    getSituationsByJeune(
-      idJeune: string
-    ): Promise<SituationsDuJeune | undefined>
+    saveSituationsJeune(situations: Situations): Promise<void>
+    getSituationsByJeune(idJeune: string): Promise<Situations | undefined>
     creerJeune(
       idDossier: string
     ): Promise<
@@ -56,12 +54,12 @@ export namespace Milo {
   }
 
   export function trierSituations(situations: Situation[]): Situation[] {
-    const etatsOrder: { [etat in EtatSituationMilo]: number } = {
+    const etatsOrder: { [etat in EtatSituation]: number } = {
       EN_COURS: 0,
       PREVU: 1,
       TERMINE: 2
     }
-    const categoriesOrder: { [categorie in CategorieSituationMilo]: number } = {
+    const categoriesOrder: { [categorie in CategorieSituation]: number } = {
       Emploi: 0,
       'Contrat en Alternance': 1,
       Formation: 2,
@@ -89,7 +87,7 @@ export namespace Milo {
     situationsTriees: Situation[]
   ): Situation | undefined {
     return situationsTriees.find(
-      situation => situation.etat === EtatSituationMilo.EN_COURS
+      situation => situation.etat === EtatSituation.EN_COURS
     )
   }
 }

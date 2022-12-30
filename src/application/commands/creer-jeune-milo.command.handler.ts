@@ -25,8 +25,11 @@ import {
 } from '../../domain/conseiller/conseiller'
 import { Core } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
-import { Milo, MiloRepositoryToken } from '../../domain/milo'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import {
+  MiloJeune,
+  MiloJeuneRepositoryToken
+} from '../../domain/partenaire/milo/milo.jeune'
 
 export interface CreerJeuneMiloCommand extends Command {
   idPartenaire: string
@@ -43,7 +46,8 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
 > {
   constructor(
     private conseillerAuthorizer: ConseillerAuthorizer,
-    @Inject(MiloRepositoryToken) private miloRepository: Milo.Repository,
+    @Inject(MiloJeuneRepositoryToken)
+    private miloJeuneRepository: MiloJeune.Repository,
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
     @Inject(AuthentificationRepositoryToken)
     private authentificationRepository: Authentification.Repository,
@@ -73,7 +77,9 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
       return failure(new DossierExisteDejaError(command.idPartenaire))
     }
 
-    const result = await this.miloRepository.creerJeune(command.idPartenaire)
+    const result = await this.miloJeuneRepository.creerJeune(
+      command.idPartenaire
+    )
 
     if (isFailure(result)) {
       return result

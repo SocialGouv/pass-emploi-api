@@ -1,8 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Job } from 'bull'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
-import { PartenaireMiloRepositoryToken } from '../../../domain/partenaire/milo'
-import { Partenaire } from '../../../domain/partenaire/partenaire'
 import {
   Planificateur,
   PlanificateurRepositoryToken,
@@ -10,14 +8,18 @@ import {
 } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
+import {
+  MiloRendezVous,
+  MiloRendezVousRepositoryToken
+} from '../../../domain/partenaire/milo/milo.rendez-vous'
 
 @Injectable()
 export class HandleJobSuivreEvenementsMiloHandler extends JobHandler<Job> {
   constructor(
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,
-    @Inject(PartenaireMiloRepositoryToken)
-    private partenaireMiloRepository: Partenaire.Milo.Repository,
+    @Inject(MiloRendezVousRepositoryToken)
+    private partenaireMiloRepository: MiloRendezVous.Repository,
     private dateService: DateService,
     private planificateurService: PlanificateurService,
     @Inject(PlanificateurRepositoryToken)
@@ -43,7 +45,7 @@ export class HandleJobSuivreEvenementsMiloHandler extends JobHandler<Job> {
           tempsExecution: DateService.calculerTempsExecution(debutDuJob)
         }
       }
-      let evenementsMilo: Partenaire.Milo.Evenement[] = []
+      let evenementsMilo: MiloRendezVous.Evenement[] = []
       let nombreEvenementsTraites = 0
       do {
         evenementsMilo = await this.partenaireMiloRepository.findAllEvenements()

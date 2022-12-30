@@ -2,7 +2,6 @@ import { SinonSandbox } from 'sinon'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { failure, isSuccess, success } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
-import { CategorieSituationMilo, EtatSituationMilo } from 'src/domain/milo'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { SituationsMiloSqlModel } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
@@ -29,6 +28,7 @@ import {
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { MiloJeune } from '../../../src/domain/partenaire/milo/milo.jeune'
 
 describe('GetDetailJeuneQueryHandler', () => {
   DatabaseForTesting.prepare()
@@ -145,8 +145,8 @@ describe('GetDetailJeuneQueryHandler', () => {
           idJeune,
           situations: [
             {
-              etat: EtatSituationMilo.EN_COURS,
-              categorie: CategorieSituationMilo.EMPLOI
+              etat: MiloJeune.EtatSituation.EN_COURS,
+              categorie: MiloJeune.CategorieSituation.EMPLOI
             }
           ]
         })

@@ -5,7 +5,6 @@ import {
   Traitement
 } from '../../../../src/application/commands/jobs/handle-job-traiter-evenement-milo.handler'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
-import { Partenaire } from '../../../../src/domain/partenaire/partenaire'
 import { Planificateur } from '../../../../src/domain/planificateur'
 import { RendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
 import { SuiviJob } from '../../../../src/domain/suivi-job'
@@ -18,7 +17,7 @@ import {
 import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { unJeune } from '../../../fixtures/jeune.fixture'
-import { MiloRendezVousFactory } from '../../../../src/domain/partenaire/milo'
+import { MiloRendezVous } from '../../../../src/domain/partenaire/milo/milo.rendez-vous'
 
 describe('HandleJobTraiterEvenementMiloHandler', () => {
   let handler: HandleJobTraiterEvenementMiloHandler
@@ -26,8 +25,8 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
   let dateService: StubbedClass<DateService>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let rendezVousRepository: StubbedType<RendezVous.Repository>
-  let miloEvenementsHttpRepository: StubbedType<Partenaire.Milo.Repository>
-  let rendezVousMiloFactory: StubbedClass<MiloRendezVousFactory>
+  let miloRendezVousRepository: StubbedType<MiloRendezVous.Repository>
+  let rendezVousMiloFactory: StubbedClass<MiloRendezVous.Factory>
 
   const jeune: Jeune = unJeune()
   const idPartenaireBeneficiaire = '123456'
@@ -39,15 +38,15 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
     dateService.now.returns(uneDatetime())
     jeuneRepository = stubInterface(sandbox)
     rendezVousRepository = stubInterface(sandbox)
-    miloEvenementsHttpRepository = stubInterface(sandbox)
-    rendezVousMiloFactory = stubClass(MiloRendezVousFactory)
+    miloRendezVousRepository = stubInterface(sandbox)
+    rendezVousMiloFactory = stubClass(MiloRendezVous.Factory)
 
     handler = new HandleJobTraiterEvenementMiloHandler(
       suiviJobService,
       dateService,
       jeuneRepository,
       rendezVousRepository,
-      miloEvenementsHttpRepository,
+      miloRendezVousRepository,
       rendezVousMiloFactory
     )
   })
@@ -65,8 +64,8 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
           describe('quand le rendez-vous existe chez milo', () => {
             const evenement = unEvenementMilo({
               idPartenaireBeneficiaire,
-              objet: Partenaire.Milo.ObjetEvenement.RENDEZ_VOUS,
-              type: Partenaire.Milo.TypeEvenement.CREATE
+              objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
+              type: MiloRendezVous.TypeEvenement.CREATE
             })
             const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
               {
@@ -75,11 +74,10 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
                 contenu: evenement
               }
             // Given
-            const rendezVousMilo: Partenaire.Milo.RendezVous =
-              unRendezVousMilo()
+            const rendezVousMilo: MiloRendezVous = unRendezVousMilo()
 
             beforeEach(() => {
-              miloEvenementsHttpRepository.findRendezVousByEvenement
+              miloRendezVousRepository.findRendezVousByEvenement
                 .withArgs(evenement)
                 .resolves(rendezVousMilo)
             })
@@ -137,8 +135,8 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
               // Given
               const evenement = unEvenementMilo({
                 idPartenaireBeneficiaire,
-                objet: Partenaire.Milo.ObjetEvenement.RENDEZ_VOUS,
-                type: Partenaire.Milo.TypeEvenement.CREATE
+                objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
+                type: MiloRendezVous.TypeEvenement.CREATE
               })
 
               const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
@@ -148,7 +146,7 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
                   contenu: evenement
                 }
 
-              miloEvenementsHttpRepository.findRendezVousByEvenement
+              miloRendezVousRepository.findRendezVousByEvenement
                 .withArgs(evenement.idObjet)
                 .resolves(undefined)
 
@@ -168,8 +166,8 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
             // Given
             const evenement = unEvenementMilo({
               idPartenaireBeneficiaire,
-              objet: Partenaire.Milo.ObjetEvenement.NON_TRAITABLE,
-              type: Partenaire.Milo.TypeEvenement.CREATE
+              objet: MiloRendezVous.ObjetEvenement.NON_TRAITABLE,
+              type: MiloRendezVous.TypeEvenement.CREATE
             })
             const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
               {
@@ -194,8 +192,8 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
           // Given
           const evenement = unEvenementMilo({
             idPartenaireBeneficiaire,
-            objet: Partenaire.Milo.ObjetEvenement.RENDEZ_VOUS,
-            type: Partenaire.Milo.TypeEvenement.NON_TRAITABLE
+            objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
+            type: MiloRendezVous.TypeEvenement.NON_TRAITABLE
           })
           const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
             {
@@ -220,8 +218,8 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
         // Given
         const evenement = unEvenementMilo({
           idPartenaireBeneficiaire,
-          objet: Partenaire.Milo.ObjetEvenement.RENDEZ_VOUS,
-          type: Partenaire.Milo.TypeEvenement.CREATE
+          objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
+          type: MiloRendezVous.TypeEvenement.CREATE
         })
         const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> = {
           dateExecution: uneDate(),

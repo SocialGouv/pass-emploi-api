@@ -7,28 +7,25 @@ import {
 } from 'test/fixtures/partenaire.fixture'
 import { expect } from 'test/utils'
 import { testConfig } from 'test/utils/module-for-testing'
-import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
+import { ErreurHttp } from '../../../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure
-} from '../../../src/building-blocks/types/result'
-import { Milo } from '../../../src/domain/partenaire/milo'
-import { Partenaire } from '../../../src/domain/partenaire/partenaire'
+} from '../../../../../src/building-blocks/types/result'
 import {
   RendezVousMiloDto,
   SessionMiloDto
-} from '../../../src/infrastructure/repositories/dto/milo.dto'
-import { MiloEvenementsHttpRepository } from '../../../src/infrastructure/repositories/milo-evenements-http.repository'
-import ObjetEvenement = Milo.ObjetEvenement
-import Type = Milo.RendezVous.Type
+} from '../../../../../src/infrastructure/repositories/dto/milo.dto'
+import { MiloRendezVousHttpRepository } from '../../../../../src/infrastructure/repositories/partenaire/milo/milo-rendez-vous-http.repository'
+import { MiloRendezVous } from '../../../../../src/domain/partenaire/milo/milo.rendez-vous'
 
 describe('MiloEvenementsHttpRepository', () => {
-  let miloEvenementsHttpRepository: MiloEvenementsHttpRepository
+  let miloEvenementsHttpRepository: MiloRendezVousHttpRepository
   const configService = testConfig()
 
   beforeEach(async () => {
     const httpService = new HttpService()
-    miloEvenementsHttpRepository = new MiloEvenementsHttpRepository(
+    miloEvenementsHttpRepository = new MiloRendezVousHttpRepository(
       httpService,
       configService
     )
@@ -66,7 +63,7 @@ describe('MiloEvenementsHttpRepository', () => {
         type: 'PLOP'
       })
       const unEvenementMiloInconnue = unEvenementMilo({
-        objet: ObjetEvenement.NON_TRAITABLE
+        objet: MiloRendezVous.ObjetEvenement.NON_TRAITABLE
       })
 
       nock('https://milo.com')
@@ -88,7 +85,7 @@ describe('MiloEvenementsHttpRepository', () => {
     })
   })
   describe('acquitterEvenement', () => {
-    let evenement: Partenaire.Milo.Evenement
+    let evenement: MiloRendezVous.Evenement
 
     beforeEach(() => {
       evenement = unEvenementMilo()
@@ -156,13 +153,13 @@ describe('MiloEvenementsHttpRepository', () => {
             await miloEvenementsHttpRepository.findRendezVousByEvenement(
               unEvenementMilo({
                 idObjet,
-                objet: ObjetEvenement.RENDEZ_VOUS,
+                objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
                 idPartenaireBeneficiaire
               })
             )
 
           // Then
-          const expected: Partenaire.Milo.RendezVous = unRendezVousMilo({
+          const expected: MiloRendezVous = unRendezVousMilo({
             id: idObjet,
             idPartenaireBeneficiaire
           })
@@ -196,7 +193,7 @@ describe('MiloEvenementsHttpRepository', () => {
                 await miloEvenementsHttpRepository.findRendezVousByEvenement(
                   unEvenementMilo({
                     idObjet,
-                    objet: ObjetEvenement.RENDEZ_VOUS,
+                    objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
                     idPartenaireBeneficiaire
                   })
                 )
@@ -222,7 +219,7 @@ describe('MiloEvenementsHttpRepository', () => {
             await miloEvenementsHttpRepository.findRendezVousByEvenement(
               unEvenementMilo({
                 idObjet,
-                objet: ObjetEvenement.RENDEZ_VOUS,
+                objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
                 idPartenaireBeneficiaire
               })
             )
@@ -258,18 +255,18 @@ describe('MiloEvenementsHttpRepository', () => {
             await miloEvenementsHttpRepository.findRendezVousByEvenement(
               unEvenementMilo({
                 idObjet,
-                objet: ObjetEvenement.SESSION,
+                objet: MiloRendezVous.ObjetEvenement.SESSION,
                 idPartenaireBeneficiaire
               })
             )
 
           // Then
-          const expected: Partenaire.Milo.RendezVous = unRendezVousMilo({
+          const expected: MiloRendezVous = unRendezVousMilo({
             id: idObjet,
             idPartenaireBeneficiaire,
             titre: sessionJson.nom,
             commentaire: sessionJson.commentaire,
-            type: Type.SESSION,
+            type: MiloRendezVous.Type.SESSION,
             statut: 'Prescrit',
             adresse: 'la'
           })
@@ -301,7 +298,7 @@ describe('MiloEvenementsHttpRepository', () => {
                 await miloEvenementsHttpRepository.findRendezVousByEvenement(
                   unEvenementMilo({
                     idObjet,
-                    objet: ObjetEvenement.SESSION,
+                    objet: MiloRendezVous.ObjetEvenement.SESSION,
                     idPartenaireBeneficiaire
                   })
                 )
@@ -328,7 +325,7 @@ describe('MiloEvenementsHttpRepository', () => {
             await miloEvenementsHttpRepository.findRendezVousByEvenement(
               unEvenementMilo({
                 idObjet,
-                objet: ObjetEvenement.SESSION,
+                objet: MiloRendezVous.ObjetEvenement.SESSION,
                 idPartenaireBeneficiaire
               })
             )

@@ -1,24 +1,24 @@
-import { Action } from './action'
-import { Authentification } from '../authentification'
-import { failure, Result, success } from '../../building-blocks/types/result'
-import { Jeune } from '../jeune/jeune'
-import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
+import { Action } from '../../action/action'
+import { failure, Result, success } from '../../../building-blocks/types/result'
+import { Jeune } from '../../jeune/jeune'
+import { Authentification } from '../../authentification'
+import { MauvaiseCommandeError } from '../../../building-blocks/types/domain-error'
 
-export interface Milo extends Action.Qualifiee {
+export interface MiloAction extends Action.Qualifiee {
   idDossier: string
   loginConseiller: string
 }
 
-export namespace Milo {
+export namespace MiloAction {
   export interface Repository {
-    save(action: Action.Milo): Promise<Result>
+    save(action: MiloAction): Promise<Result>
   }
 
   export function creer(
     action: Action.Qualifiee,
     jeune: Jeune,
     utilisateur: Authentification.Utilisateur
-  ): Result<Milo> {
+  ): Result<MiloAction> {
     if (!jeune.idPartenaire) {
       return failure(new MauvaiseCommandeError("Le jeune n’a pas d'id dossier"))
     }
@@ -29,7 +29,7 @@ export namespace Milo {
       )
     }
 
-    const data: Milo = {
+    const data: MiloAction = {
       ...action,
       idDossier: jeune.idPartenaire,
       loginConseiller: utilisateur.username

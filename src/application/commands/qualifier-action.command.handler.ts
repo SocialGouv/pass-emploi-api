@@ -22,6 +22,7 @@ import { QualificationActionQueryModel } from '../queries/query-models/actions.q
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Command } from '../../building-blocks/types/command'
 import { DateTime } from 'luxon'
+import { MiloAction } from '../../domain/partenaire/milo/milo.action'
 
 export interface QualifierActionCommand extends Command {
   idAction: string
@@ -40,7 +41,7 @@ export class QualifierActionCommandHandler extends CommandHandler<
     @Inject(ActionsRepositoryToken)
     private readonly actionRepository: Action.Repository,
     @Inject(ActionMiloRepositoryToken)
-    private readonly actionMiloRepository: Action.Milo.Repository,
+    private readonly actionMiloRepository: MiloAction.Repository,
     private readonly actionAuthorizer: ActionAuthorizer,
     @Inject(JeunesRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository,
@@ -82,7 +83,7 @@ export class QualifierActionCommandHandler extends CommandHandler<
         )
       }
 
-      const creerActionMiloResult = Action.Milo.creer(
+      const creerActionMiloResult = MiloAction.creer(
         qualifierActionResult.data,
         jeune,
         command.utilisateur
