@@ -13,7 +13,7 @@ import {
 import { uneConfiguration, unJeune } from '../../../fixtures/jeune.fixture'
 import { MiloRendezVous } from '../../../../src/domain/partenaire/milo/milo.rendez-vous'
 
-describe('Milo Partenaire', () => {
+describe('MiloRendezVous', () => {
   describe('Factory', () => {
     let idService: StubbedClass<IdService>
     let rendezVousFactory: MiloRendezVous.Factory
