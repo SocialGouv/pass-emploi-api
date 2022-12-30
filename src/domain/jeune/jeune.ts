@@ -25,7 +25,7 @@ export interface Jeune {
   conseillerInitial?: Jeune.ConseillerInitial
   email?: string
   idPartenaire?: string
-  configuration?: Jeune.ConfigurationApplication
+  configuration: Jeune.ConfigurationApplication
   preferences: Jeune.Preferences
 }
 
@@ -65,15 +65,9 @@ export namespace Jeune {
   }
 
   export interface Repository {
-    get(
-      id: string,
-      attributs?: { avecConfiguration: boolean }
-    ): Promise<Jeune | undefined>
+    get(id: string): Promise<Jeune | undefined>
 
-    findAll(
-      ids: string[],
-      attributs?: { avecConfiguration: boolean }
-    ): Promise<Jeune[]>
+    findAll(ids: string[]): Promise<Jeune[]>
 
     getJeunesMiloAvecIdDossier(offset: number, limit: number): Promise<Jeune[]>
 
@@ -81,10 +75,7 @@ export namespace Jeune {
 
     getByEmail(email: string): Promise<Jeune | undefined>
 
-    getByIdPartenaire(
-      idPartenaire: string,
-      attributs?: { avecConfiguration: boolean }
-    ): Promise<Jeune | undefined>
+    getByIdPartenaire(idPartenaire: string): Promise<Jeune | undefined>
 
     save(jeune: Jeune): Promise<void>
 
@@ -115,8 +106,9 @@ export namespace Jeune {
     ) {}
 
     creer(jeuneACreer: Factory.ACreer): Jeune {
+      const id = this.idService.uuid()
       return {
-        id: this.idService.uuid(),
+        id: id,
         firstName: jeuneACreer.prenom,
         lastName: jeuneACreer.nom,
         email: jeuneACreer.email,
@@ -132,7 +124,10 @@ export namespace Jeune {
         preferences: {
           partageFavoris: true
         },
-        idPartenaire: jeuneACreer.idPartenaire
+        idPartenaire: jeuneACreer.idPartenaire,
+        configuration: {
+          idJeune: id
+        }
       }
     }
   }

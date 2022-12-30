@@ -28,23 +28,17 @@ export class JeuneSqlRepository implements Jeune.Repository {
     private dateService: DateService
   ) {}
 
-  async get(
-    id: string,
-    attributs?: { avecConfiguration: boolean }
-  ): Promise<Jeune | undefined> {
+  async get(id: string): Promise<Jeune | undefined> {
     const jeuneSqlModel = await JeuneSqlModel.findByPk(id, {
       include: [ConseillerSqlModel]
     })
     if (!jeuneSqlModel) {
       return undefined
     }
-    return fromSqlToJeune(jeuneSqlModel, attributs)
+    return fromSqlToJeune(jeuneSqlModel)
   }
 
-  async findAll(
-    ids: string[],
-    attributs?: { avecConfiguration: boolean }
-  ): Promise<Jeune[]> {
+  async findAll(ids: string[]): Promise<Jeune[]> {
     const jeunesSqlModels = await JeuneSqlModel.findAll({
       where: {
         id: {
@@ -53,9 +47,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
       },
       include: [ConseillerSqlModel]
     })
-    return jeunesSqlModels.map(jeuneSqlModel =>
-      fromSqlToJeune(jeuneSqlModel, attributs)
-    )
+    return jeunesSqlModels.map(fromSqlToJeune)
   }
 
   async existe(id: string): Promise<boolean> {
@@ -78,17 +70,14 @@ export class JeuneSqlRepository implements Jeune.Repository {
     return fromSqlToJeune(jeuneSqlModel)
   }
 
-  async getByIdPartenaire(
-    idPartenaire: string,
-    attributs?: { avecConfiguration: boolean }
-  ): Promise<Jeune | undefined> {
+  async getByIdPartenaire(idPartenaire: string): Promise<Jeune | undefined> {
     const jeuneSqlModel = await JeuneSqlModel.findOne({
       where: { idPartenaire }
     })
     if (!jeuneSqlModel) {
       return undefined
     }
-    return fromSqlToJeune(jeuneSqlModel, attributs)
+    return fromSqlToJeune(jeuneSqlModel)
   }
 
   async transferAndSaveAll(
@@ -116,9 +105,7 @@ export class JeuneSqlRepository implements Jeune.Repository {
         idConseiller
       }
     })
-    return jeunesSqlModel.map(jeuneSqlModel =>
-      fromSqlToJeune(jeuneSqlModel, { avecConfiguration: true })
-    )
+    return jeunesSqlModel.map(fromSqlToJeune)
   }
 
   async findAllJeunesByConseillerInitial(
@@ -145,7 +132,14 @@ export class JeuneSqlRepository implements Jeune.Repository {
       email: jeune.email ?? null,
       structure: jeune.structure,
       idPartenaire: jeune.idPartenaire ?? null,
-      partageFavoris: jeune.preferences.partageFavoris
+      partageFavoris: jeune.preferences.partageFavoris,
+      appVersion: jeune.configuration.appVersion ?? null,
+      pushNotificationToken: jeune.configuration.pushNotificationToken ?? null,
+      dateDerniereActualisationToken:
+        jeune.configuration.dateDerniereActualisationToken,
+      installationId: jeune.configuration.installationId ?? null,
+      instanceId: jeune.configuration.instanceId ?? null,
+      timezone: jeune.configuration.fuseauHoraire ?? null
     })
   }
 

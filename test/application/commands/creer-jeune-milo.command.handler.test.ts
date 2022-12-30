@@ -146,7 +146,10 @@ describe('CreerJeuneMiloCommandHandler', () => {
           },
           structure: Core.Structure.MILO,
           preferences: { partageFavoris: true },
-          idPartenaire: 'idDossier'
+          idPartenaire: 'idDossier',
+          configuration: {
+            idJeune: 'DFKAL'
+          }
         }
         expect(jeuneRepository.save).to.have.been.calledWithExactly(
           expextedJeune
@@ -195,7 +198,10 @@ describe('CreerJeuneMiloCommandHandler', () => {
           },
           structure: Core.Structure.MILO,
           preferences: { partageFavoris: true },
-          idPartenaire: 'idDossier'
+          idPartenaire: 'idDossier',
+          configuration: {
+            idJeune: 'DFKAL'
+          }
         }
         expect(jeuneRepository.save).to.have.been.calledWithExactly(expected)
       })

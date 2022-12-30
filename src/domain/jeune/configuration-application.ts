@@ -35,21 +35,6 @@ export namespace ConfigurationApplication {
   export class Factory {
     constructor(private dateService: DateService) {}
 
-    creer(
-      idJeune: string,
-      aMettreAJour: AMettreAJour
-    ): ConfigurationApplication {
-      return {
-        idJeune: idJeune,
-        pushNotificationToken: aMettreAJour.pushNotificationToken,
-        dateDerniereActualisationToken: this.dateService.nowJs(),
-        installationId: aMettreAJour.installationId,
-        instanceId: aMettreAJour.instanceId,
-        appVersion: aMettreAJour.appVersion,
-        fuseauHoraire: aMettreAJour.fuseauHoraire
-      }
-    }
-
     mettreAJour(
       configuration: ConfigurationApplication,
       aMettreAJour: AMettreAJour

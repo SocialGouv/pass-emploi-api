@@ -65,7 +65,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
             .resolves({ id: 'chat-2', idBeneficiaire: 'jeune-2' })
 
           jeuneRepository.findAll
-            .withArgs(['jeune-1', 'jeune-2'], { avecConfiguration: true })
+            .withArgs(['jeune-1', 'jeune-2'])
             .resolves(jeunes)
 
           // When
@@ -199,7 +199,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
             .resolves({ id: 'groupe-2' })
 
           jeuneRepository.findAll
-            .withArgs(['jeune-1', 'jeune-2'], { avecConfiguration: true })
+            .withArgs(['jeune-1', 'jeune-2'])
             .resolves(jeunes)
 
           // When
@@ -290,9 +290,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
             .withArgs('jeune-1')
             .resolves({ id: 'chat-1', idBeneficiaire: 'jeune-1' })
 
-          jeuneRepository.findAll
-            .withArgs(['jeune-1'], { avecConfiguration: true })
-            .resolves(jeunes)
+          jeuneRepository.findAll.withArgs(['jeune-1']).resolves(jeunes)
 
           // When
           await envoyerMessageGroupeCommandHandler.handle({
@@ -346,9 +344,7 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
           .withArgs('jeune-1')
           .resolves({ id: 'chat-1', idBeneficiaire: 'jeune-1' })
 
-        jeuneRepository.findAll
-          .withArgs([], { avecConfiguration: true })
-          .resolves([])
+        jeuneRepository.findAll.withArgs([]).resolves([])
 
         // When
         await envoyerMessageGroupeCommandHandler.handle({

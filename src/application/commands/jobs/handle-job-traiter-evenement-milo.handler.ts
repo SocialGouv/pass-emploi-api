@@ -47,8 +47,7 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
     }
 
     const jeune = await this.jeuneRepository.getByIdPartenaire(
-      job.contenu.idPartenaireBeneficiaire,
-      { avecConfiguration: true }
+      job.contenu.idPartenaireBeneficiaire
     )
 
     if (jeune === undefined) {

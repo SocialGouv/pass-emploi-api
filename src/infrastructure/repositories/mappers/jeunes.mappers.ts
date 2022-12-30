@@ -9,10 +9,7 @@ import { RendezVousSqlModel } from '../../sequelize/models/rendez-vous.sql-model
 import { AsSql } from '../../sequelize/types'
 import { buildEtat } from './actions.mappers'
 
-export function fromSqlToJeune(
-  jeuneSqlModel: JeuneSqlModel,
-  attributs?: { avecConfiguration: boolean }
-): Jeune {
+export function fromSqlToJeune(jeuneSqlModel: JeuneSqlModel): Jeune {
   const jeune: Jeune = {
     id: jeuneSqlModel.id,
     firstName: jeuneSqlModel.prenom,
@@ -22,9 +19,7 @@ export function fromSqlToJeune(
     structure: jeuneSqlModel.structure,
     email: jeuneSqlModel.email ?? undefined,
     idPartenaire: jeuneSqlModel.idPartenaire ?? undefined,
-    configuration: attributs?.avecConfiguration
-      ? toConfigurationApplication(jeuneSqlModel)
-      : undefined,
+    configuration: toConfigurationApplication(jeuneSqlModel),
     preferences: {
       partageFavoris: jeuneSqlModel.partageFavoris
     }
