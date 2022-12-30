@@ -24,20 +24,20 @@ import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { Core } from '../../../src/domain/core'
 import { Jeune } from '../../../src/domain/jeune/jeune'
-import { Milo } from '../../../src/domain/milo'
 import { DateService } from '../../../src/utils/date-service'
 import { IdService } from '../../../src/utils/id-service'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
+import { MiloJeune } from '../../../src/domain/partenaire/milo/milo.jeune'
 
 describe('CreerJeuneMiloCommandHandler', () => {
   let creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
   const conseiller = unConseiller()
   const idNouveauJeune = 'DFKAL'
   const date = DateTime.fromISO('2020-04-06T12:00:00.000Z')
-  let miloRepository: StubbedType<Milo.Repository>
+  let miloRepository: StubbedType<MiloJeune.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let authentificationRepository: StubbedType<Authentification.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>

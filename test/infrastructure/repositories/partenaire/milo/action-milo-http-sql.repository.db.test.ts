@@ -1,13 +1,13 @@
-import { testConfig } from '../../../utils/module-for-testing'
+import { testConfig } from '../../../../utils/module-for-testing'
 import { HttpService } from '@nestjs/axios'
-import { ActionMiloHttpRepository } from '../../../../src/infrastructure/repositories/action/action-milo-http-sql.repository.db'
-import { expect } from '../../../utils'
-import { uneActionMilo } from '../../../fixtures/action.fixture'
+import { ActionMiloHttpRepository } from '../../../../../src/infrastructure/repositories/partenaire/milo/action-milo-http-sql.repository.db'
+import { expect } from '../../../../utils'
+import { uneActionMilo } from '../../../../fixtures/action.fixture'
 import {
   emptySuccess,
   failure
-} from '../../../../src/building-blocks/types/result'
-import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
+} from '../../../../../src/building-blocks/types/result'
+import { ErreurHttp } from '../../../../../src/building-blocks/types/domain-error'
 import * as nock from 'nock'
 
 describe('MiloHttpSqlRepository', () => {

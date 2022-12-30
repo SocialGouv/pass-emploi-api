@@ -1,17 +1,17 @@
-import { Action } from '../../../domain/action/action'
 import {
   emptySuccess,
   failure,
   Result
-} from '../../../building-blocks/types/result'
+} from '../../../../building-blocks/types/result'
 import { Injectable, Logger } from '@nestjs/common'
 import { HttpService } from '@nestjs/axios'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
-import { ErreurHttp } from '../../../building-blocks/types/domain-error'
+import { ErreurHttp } from '../../../../building-blocks/types/domain-error'
+import { MiloAction } from '../../../../domain/partenaire/milo/milo.action'
 
 @Injectable()
-export class ActionMiloHttpRepository implements Action.Milo.Repository {
+export class ActionMiloHttpRepository implements MiloAction.Repository {
   private logger: Logger
   private readonly apiUrl: string
   private readonly apiKey: string
@@ -25,7 +25,7 @@ export class ActionMiloHttpRepository implements Action.Milo.Repository {
     this.apiKey = this.configService.get('milo').apiKeyDossier
   }
 
-  async save(action: Action.Milo): Promise<Result> {
+  async save(action: MiloAction): Promise<Result> {
     try {
       const body = {
         dateDebut: action.dateDebut.toFormat('yyyy-MM-dd'),

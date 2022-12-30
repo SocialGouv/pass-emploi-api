@@ -1,30 +1,33 @@
 import { HttpService } from '@nestjs/axios'
 import { expect } from 'chai'
 import * as nock from 'nock'
-import { CategorieSituationMilo, EtatSituationMilo } from 'src/domain/milo'
 import { SituationsMiloSqlModel } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { uneSituationsMilo } from 'test/fixtures/milo.fixture'
-import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
-import { failure, success } from '../../../src/building-blocks/types/result'
-import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
-import { DossierMiloDto } from '../../../src/infrastructure/repositories/dto/milo.dto'
-import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
-import { MiloHttpSqlRepository } from '../../../src/infrastructure/repositories/milo-http-sql.repository.db'
-import { RateLimiterService } from '../../../src/utils/rate-limiter.service'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { testConfig } from '../../utils/module-for-testing'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { stubClass } from '../../utils'
-import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
+import { ErreurHttp } from '../../../../../src/building-blocks/types/domain-error'
+import {
+  failure,
+  success
+} from '../../../../../src/building-blocks/types/result'
+import { ConseillerSqlRepository } from '../../../../../src/infrastructure/repositories/conseiller-sql.repository.db'
+import { DossierMiloDto } from '../../../../../src/infrastructure/repositories/dto/milo.dto'
+import { JeuneSqlRepository } from '../../../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
+import { MiloJeuneHttpSqlRepository } from '../../../../../src/infrastructure/repositories/partenaire/milo/milo-jeune-http-sql.repository.db'
+import { RateLimiterService } from '../../../../../src/utils/rate-limiter.service'
+import { unJeune } from '../../../../fixtures/jeune.fixture'
+import { testConfig } from '../../../../utils/module-for-testing'
+import { DatabaseForTesting } from '../../../../utils/database-for-testing'
+import { unConseiller } from '../../../../fixtures/conseiller.fixture'
+import { stubClass } from '../../../../utils'
+import { FirebaseClient } from '../../../../../src/infrastructure/clients/firebase-client'
+import { MiloJeune } from '../../../../../src/domain/partenaire/milo/milo.jeune'
 
 describe('MiloHttpRepository', () => {
   const databaseForTesting = DatabaseForTesting.prepare()
   const configService = testConfig()
   const rateLimiterService = new RateLimiterService(configService)
-  let miloHttpSqlRepository: MiloHttpSqlRepository
+  let miloHttpSqlRepository: MiloJeuneHttpSqlRepository
   const jeune = unJeune({ email: 'john@doe.io' })
   let idService: IdService
   let dateService: DateService
@@ -42,7 +45,7 @@ describe('MiloHttpRepository', () => {
     )
     await jeuneSqlRepository.save(jeune)
 
-    miloHttpSqlRepository = new MiloHttpSqlRepository(
+    miloHttpSqlRepository = new MiloJeuneHttpSqlRepository(
       httpService,
       configService,
       rateLimiterService
@@ -280,9 +283,9 @@ const dossierDto = (): DossierMiloDto => ({
   },
   situations: [
     {
-      etat: EtatSituationMilo.EN_COURS,
+      etat: MiloJeune.EtatSituation.EN_COURS,
       dateFin: null,
-      categorieSituation: CategorieSituationMilo.DEMANDEUR_D_EMPLOI,
+      categorieSituation: MiloJeune.CategorieSituation.DEMANDEUR_D_EMPLOI,
       codeRomeMetierPrepare: null,
       codeRomePremierMetier: 'F1501',
       codeRomeMetierExerce: null

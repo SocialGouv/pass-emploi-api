@@ -3,16 +3,20 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { firstValueFrom } from 'rxjs'
-import { ErreurHttp } from '../../building-blocks/types/domain-error'
-import { Result, failure, success } from '../../building-blocks/types/result'
-import { Milo } from '../../domain/milo'
-import { DateService } from '../../utils/date-service'
-import { RateLimiterService } from '../../utils/rate-limiter.service'
-import { SituationsMiloSqlModel } from '../sequelize/models/situations-milo.sql-model'
-import { DossierMiloDto } from './dto/milo.dto'
+import { ErreurHttp } from '../../../../building-blocks/types/domain-error'
+import {
+  Result,
+  failure,
+  success
+} from '../../../../building-blocks/types/result'
+import { DateService } from '../../../../utils/date-service'
+import { RateLimiterService } from '../../../../utils/rate-limiter.service'
+import { SituationsMiloSqlModel } from '../../../sequelize/models/situations-milo.sql-model'
+import { DossierMiloDto } from '../../dto/milo.dto'
+import { MiloJeune } from '../../../../domain/partenaire/milo/milo.jeune'
 
 @Injectable()
-export class MiloHttpSqlRepository implements Milo.Repository {
+export class MiloJeuneHttpSqlRepository implements MiloJeune.Repository {
   private logger: Logger
   private readonly apiUrl: string
   private readonly apiKeyDossier: string
@@ -29,7 +33,7 @@ export class MiloHttpSqlRepository implements Milo.Repository {
     this.apiKeyCreerJeune = this.configService.get('milo').apiKeyCreerJeune
   }
 
-  async getDossier(idDossier: string): Promise<Result<Milo.Dossier>> {
+  async getDossier(idDossier: string): Promise<Result<MiloJeune.Dossier>> {
     try {
       await this.rateLimiterService.getDossierMilo.attendreLaProchaineDisponibilite()
       const dossierDto = await firstValueFrom(
@@ -114,7 +118,7 @@ export class MiloHttpSqlRepository implements Milo.Repository {
     }
   }
 
-  async saveSituationsJeune(situations: Milo.SituationsDuJeune): Promise<void> {
+  async saveSituationsJeune(situations: MiloJeune.Situations): Promise<void> {
     await SituationsMiloSqlModel.upsert(
       {
         idJeune: situations.idJeune,
@@ -127,7 +131,7 @@ export class MiloHttpSqlRepository implements Milo.Repository {
 
   async getSituationsByJeune(
     idJeune: string
-  ): Promise<Milo.SituationsDuJeune | undefined> {
+  ): Promise<MiloJeune.Situations | undefined> {
     const situationsSql = await SituationsMiloSqlModel.findOne({
       where: { idJeune }
     })

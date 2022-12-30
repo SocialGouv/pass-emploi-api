@@ -1,4 +1,3 @@
-import { unJeune } from '../../../fixtures/jeune.fixture'
 import { PrestationDto } from '../../../../src/infrastructure/clients/dto/pole-emploi.dto'
 import { fromPrestationDtoToRendezVousQueryModel } from '../../../../src/application/queries/query-mappers/rendez-vous-prestation.mappers'
 import { expect, StubbedClass, stubClass } from '../../../utils'
@@ -12,7 +11,6 @@ describe('RendezVousPrestationMappers', () => {
     idService.uuid.returns('random-id')
   })
   describe('fromPrestationDtoToRendezVousQueryModel', () => {
-    const jeune = unJeune()
     const dateString = '2014-03-24T09:00:00+01:00'
     const dateUTC = new Date('2014-03-24T09:00:00.000Z')
 
@@ -40,7 +38,7 @@ describe('RendezVousPrestationMappers', () => {
     it('retourne un RendezVousConseillerQueryModel avec le bon modele, la durée en jour et la date en UTC', async () => {
       // When
       const RendezVousConseillerQueryModel =
-        fromPrestationDtoToRendezVousQueryModel(prestation, jeune, idService)
+        fromPrestationDtoToRendezVousQueryModel(prestation, idService)
 
       // Then
       expect(RendezVousConseillerQueryModel).to.deep.equal({
@@ -79,7 +77,7 @@ describe('RendezVousPrestationMappers', () => {
       }
       // When
       const RendezVousConseillerQueryModel =
-        fromPrestationDtoToRendezVousQueryModel(prestation, jeune, idService)
+        fromPrestationDtoToRendezVousQueryModel(prestation, idService)
       // Then
       expect(RendezVousConseillerQueryModel.duration).to.equal(90)
     })
@@ -90,7 +88,6 @@ describe('RendezVousPrestationMappers', () => {
       const RendezVousConseillerQueryModel =
         fromPrestationDtoToRendezVousQueryModel(
           prestation,
-          jeune,
           idService,
           lienVisio
         )
@@ -107,7 +104,7 @@ describe('RendezVousPrestationMappers', () => {
       }
       // When
       const RendezVousConseillerQueryModel =
-        fromPrestationDtoToRendezVousQueryModel(prestation, jeune, idService)
+        fromPrestationDtoToRendezVousQueryModel(prestation, idService)
       // Then
       expect(RendezVousConseillerQueryModel.adresse).to.equal(
         'ligne1 ligne2 code postal ville'
@@ -120,7 +117,7 @@ describe('RendezVousPrestationMappers', () => {
       }
       // When
       const RendezVousConseillerQueryModel =
-        fromPrestationDtoToRendezVousQueryModel(prestation, jeune, idService)
+        fromPrestationDtoToRendezVousQueryModel(prestation, idService)
       // Then
       expect(RendezVousConseillerQueryModel.description).to.equal(
         'theme\ndescriptif'
@@ -133,7 +130,7 @@ describe('RendezVousPrestationMappers', () => {
       }
       // When
       const RendezVousConseillerQueryModel =
-        fromPrestationDtoToRendezVousQueryModel(prestation, jeune, idService)
+        fromPrestationDtoToRendezVousQueryModel(prestation, idService)
       // Then
       expect(RendezVousConseillerQueryModel.description).to.equal(
         'sous theme\ndescriptif'

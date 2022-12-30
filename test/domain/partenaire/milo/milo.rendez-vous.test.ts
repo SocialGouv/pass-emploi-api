@@ -1,27 +1,24 @@
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { unRendezVousMilo } from '../../fixtures/partenaire.fixture'
-import { Partenaire } from '../../../src/domain/partenaire/partenaire'
+import { expect, StubbedClass, stubClass } from '../../../utils'
+import { unRendezVousMilo } from '../../../fixtures/partenaire.fixture'
 import {
   CodeTypeRendezVous,
   RendezVous
-} from '../../../src/domain/rendez-vous/rendez-vous'
-import { IdService } from '../../../src/utils/id-service'
-import { Jeune } from '../../../src/domain/jeune/jeune'
+} from '../../../../src/domain/rendez-vous/rendez-vous'
+import { IdService } from '../../../../src/utils/id-service'
+import { Jeune } from '../../../../src/domain/jeune/jeune'
 import {
   unJeuneDuRendezVous,
   unRendezVous
-} from '../../fixtures/rendez-vous.fixture'
-import { uneConfiguration, unJeune } from '../../fixtures/jeune.fixture'
-import { Milo, MiloRendezVousFactory } from '../../../src/domain/partenaire/milo'
-import Source = RendezVous.Source
-import Type = Milo.RendezVous.Type
+} from '../../../fixtures/rendez-vous.fixture'
+import { uneConfiguration, unJeune } from '../../../fixtures/jeune.fixture'
+import { MiloRendezVous } from '../../../../src/domain/partenaire/milo/milo.rendez-vous'
 
 describe('Milo Partenaire', () => {
   describe('Factory', () => {
     let idService: StubbedClass<IdService>
-    let rendezVousFactory: MiloRendezVousFactory
+    let rendezVousFactory: MiloRendezVous.Factory
 
-    let rdvMilo: Partenaire.Milo.RendezVous
+    let rdvMilo: MiloRendezVous
     let rendezVousPassEmploi: RendezVous
     let jeune: Jeune
     let uuid: string
@@ -38,7 +35,7 @@ describe('Milo Partenaire', () => {
       beforeEach(() => {
         // Given
         idService = stubClass(IdService)
-        rendezVousFactory = new MiloRendezVousFactory(idService)
+        rendezVousFactory = new MiloRendezVous.Factory(idService)
 
         dateStringRendezVousDebut = '2022-10-06 10:07:00'
         dateStringRendezVousFin = '2022-10-06 11:43:00'
@@ -125,7 +122,7 @@ describe('Milo Partenaire', () => {
           // Then
           const expected: RendezVous = {
             id: uuid,
-            source: Source.MILO,
+            source: RendezVous.Source.MILO,
             titre: rdvMilo.titre,
             sousTitre: '',
             date: new Date('2022-10-06T14:07:00Z'),
@@ -156,7 +153,7 @@ describe('Milo Partenaire', () => {
           rdvMilo = unRendezVousMilo({
             dateHeureDebut: dateStringRendezVousDebut,
             dateHeureFin: dateStringRendezVousFin,
-            type: Type.SESSION,
+            type: MiloRendezVous.Type.SESSION,
             adresse: 'Route de la plage, 97122 Baie-Mahault'
           })
 
@@ -170,7 +167,7 @@ describe('Milo Partenaire', () => {
           // Then
           const expected: RendezVous = {
             id: uuid,
-            source: Source.MILO,
+            source: RendezVous.Source.MILO,
             titre: rdvMilo.titre,
             sousTitre: '',
             date: new Date('2022-10-06T14:07:00Z'),
@@ -200,7 +197,7 @@ describe('Milo Partenaire', () => {
       beforeEach(() => {
         // Given
         idService = stubClass(IdService)
-        rendezVousFactory = new MiloRendezVousFactory(idService)
+        rendezVousFactory = new MiloRendezVous.Factory(idService)
         dateStringRendezVousDebut = '2022-10-06 10:07:00'
         dateStringRendezVousFin = '2022-10-06 11:43:00'
         jeune = unJeune({

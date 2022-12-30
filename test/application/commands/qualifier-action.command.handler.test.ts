@@ -26,10 +26,11 @@ import { Jeune } from '../../../src/domain/jeune/jeune'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { uneDatetime } from '../../fixtures/date.fixture'
+import { MiloAction } from '../../../src/domain/partenaire/milo/milo.action'
 
 describe('QualifierActionCommandHandler', () => {
   let actionRepository: StubbedType<Action.Repository>
-  let actionMiloRepository: StubbedType<Action.Milo.Repository>
+  let actionMiloRepository: StubbedType<MiloAction.Repository>
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let evenementService: StubbedClass<EvenementService>
@@ -76,7 +77,7 @@ describe('QualifierActionCommandHandler', () => {
                 heures: 2
               }
             }
-            const actionMilo: Action.Milo = {
+            const actionMilo: MiloAction = {
               ...actionQualifiee,
               idDossier: 'idDossier',
               loginConseiller: 'j.doe'

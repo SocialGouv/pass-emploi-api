@@ -3,17 +3,21 @@ import { Job } from '../../../building-blocks/types/job'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { isFailure } from '../../../building-blocks/types/result'
 import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
-import { Milo, MiloRepositoryToken } from '../../../domain/milo'
 import { Planificateur } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
+import {
+  MiloJeune,
+  MiloJeuneRepositoryToken
+} from '../../../domain/partenaire/milo/milo.jeune'
 
 const PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM = 100
 
 @Injectable()
 export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends JobHandler<Job> {
   constructor(
-    @Inject(MiloRepositoryToken) private miloRepository: Milo.Repository,
+    @Inject(MiloJeuneRepositoryToken)
+    private miloRepository: MiloJeune.Repository,
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,
@@ -66,10 +70,13 @@ export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends JobHan
           const jeuneAvecDateFinCEJ = Jeune.mettreAJour(jeune, { dateFinCEJ })
           await this.jeuneRepository.save(jeuneAvecDateFinCEJ)
 
-          const situationsTriees = Milo.trierSituations(dossier.data.situations)
-          const situationsDuJeune: Milo.SituationsDuJeune = {
+          const situationsTriees = MiloJeune.trierSituations(
+            dossier.data.situations
+          )
+          const situationsDuJeune: MiloJeune.Situations = {
             idJeune: jeune.id,
-            situationCourante: Milo.trouverSituationCourante(situationsTriees),
+            situationCourante:
+              MiloJeune.trouverSituationCourante(situationsTriees),
             situations: situationsTriees
           }
 

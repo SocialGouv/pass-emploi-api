@@ -6,16 +6,16 @@ import {
   GetDossierMiloJeuneQuery,
   GetDossierMiloJeuneQueryHandler
 } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
-import { Milo } from '../../../src/domain/milo'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { unDossierMilo } from '../../fixtures/milo.fixture'
 import { createSandbox, expect } from '../../utils'
+import { MiloJeune } from '../../../src/domain/partenaire/milo/milo.jeune'
 
 describe('GetDossierMiloJeuneQueryHandler', () => {
-  let miloRepository: StubbedType<Milo.Repository>
+  let miloRepository: StubbedType<MiloJeune.Repository>
   let getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler
   let sandbox: SinonSandbox
 

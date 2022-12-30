@@ -5,17 +5,17 @@ import { ErreurHttp } from 'src/building-blocks/types/domain-error'
 import { failure, success } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
 import { Jeune } from 'src/domain/jeune/jeune'
-import { Milo } from 'src/domain/milo'
 import { SuiviJob } from 'src/domain/suivi-job'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { unJeune } from 'test/fixtures/jeune.fixture'
 import { unDossierMilo } from 'test/fixtures/milo.fixture'
 import { DateService } from '../../../../src/utils/date-service'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
+import { MiloJeune } from '../../../../src/domain/partenaire/milo/milo.jeune'
 
 describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
   let handleJobRecupererSituationsJeunesMiloCommandHandler: HandleJobRecupererSituationsJeunesMiloCommandHandler
-  let miloRepository: StubbedType<Milo.Repository>
+  let miloRepository: StubbedType<MiloJeune.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let suiviJobService: StubbedType<SuiviJob.Service>
   let dateSevice: StubbedClass<DateService>

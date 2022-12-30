@@ -2,22 +2,21 @@ import { HttpService } from '@nestjs/axios'
 import { HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
-import { Partenaire } from 'src/domain/partenaire/partenaire'
-import { ErreurHttp } from '../../building-blocks/types/domain-error'
+import { ErreurHttp } from '../../../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
   Result
-} from '../../building-blocks/types/result'
+} from '../../../../building-blocks/types/result'
 import {
   EvenementMiloDto,
   RendezVousMiloDto,
   SessionMiloDto
-} from './dto/milo.dto'
-import { Milo } from '../../domain/partenaire/milo'
+} from '../../dto/milo.dto'
+import { MiloRendezVous } from '../../../../domain/partenaire/milo/milo.rendez-vous'
 
 @Injectable()
-export class MiloEvenementsHttpRepository implements Milo.Repository {
+export class MiloRendezVousHttpRepository implements MiloRendezVous.Repository {
   private logger: Logger
   private readonly apiUrl: string
   private readonly apiKeyEvents: string
@@ -34,7 +33,7 @@ export class MiloEvenementsHttpRepository implements Milo.Repository {
       this.configService.get('milo').apiKeyDetailRendezVous
   }
 
-  async findAllEvenements(): Promise<Partenaire.Milo.Evenement[]> {
+  async findAllEvenements(): Promise<MiloRendezVous.Evenement[]> {
     const evenements = await firstValueFrom(
       this.httpService.get<EvenementMiloDto[]>(
         `${this.apiUrl}/operateurs/events`,
@@ -56,7 +55,7 @@ export class MiloEvenementsHttpRepository implements Milo.Repository {
   }
 
   async acquitterEvenement(
-    evenement: Partenaire.Milo.Evenement
+    evenement: MiloRendezVous.Evenement
   ): Promise<Result> {
     try {
       await firstValueFrom(
@@ -76,10 +75,10 @@ export class MiloEvenementsHttpRepository implements Milo.Repository {
   }
 
   async findRendezVousByEvenement(
-    evenement: Partenaire.Milo.Evenement
-  ): Promise<Partenaire.Milo.RendezVous | undefined> {
+    evenement: MiloRendezVous.Evenement
+  ): Promise<MiloRendezVous | undefined> {
     try {
-      if (evenement.objet === Partenaire.Milo.ObjetEvenement.SESSION) {
+      if (evenement.objet === MiloRendezVous.ObjetEvenement.SESSION) {
         const sessionMilo = await firstValueFrom(
           this.httpService.get<SessionMiloDto>(
             `${this.apiUrl}/operateurs/dossiers/${evenement.idPartenaireBeneficiaire}/sessions/${evenement.idObjet}`,
@@ -104,7 +103,7 @@ export class MiloEvenementsHttpRepository implements Milo.Repository {
           idPartenaireBeneficiaire: sessionMilo.data.idDossier,
           commentaire: sessionMilo.data.commentaire,
           statut: sessionMilo.data.statut,
-          type: Partenaire.Milo.RendezVous.Type.SESSION,
+          type: MiloRendezVous.Type.SESSION,
           adresse: sessionMilo.data.lieu
         }
       } else {
@@ -131,7 +130,7 @@ export class MiloEvenementsHttpRepository implements Milo.Repository {
           titre: rendezVousMilo.data.objet,
           idPartenaireBeneficiaire: rendezVousMilo.data.idDossier,
           commentaire: rendezVousMilo.data.commentaire,
-          type: Partenaire.Milo.RendezVous.Type.RENDEZ_VOUS,
+          type: MiloRendezVous.Type.RENDEZ_VOUS,
           statut: rendezVousMilo.data.statut
         }
       }
@@ -146,28 +145,28 @@ export class MiloEvenementsHttpRepository implements Milo.Repository {
 
 function typeToObjet(
   type: 'RDV' | 'SESSION' | string
-): Partenaire.Milo.ObjetEvenement {
+): MiloRendezVous.ObjetEvenement {
   switch (type) {
     case 'RDV':
-      return Partenaire.Milo.ObjetEvenement.RENDEZ_VOUS
+      return MiloRendezVous.ObjetEvenement.RENDEZ_VOUS
     case 'SESSION':
-      return Partenaire.Milo.ObjetEvenement.SESSION
+      return MiloRendezVous.ObjetEvenement.SESSION
     default:
-      return Partenaire.Milo.ObjetEvenement.NON_TRAITABLE
+      return MiloRendezVous.ObjetEvenement.NON_TRAITABLE
   }
 }
 
 function actionToType(
   action: 'CREATE' | 'UPDATE' | 'DELETE' | string
-): Partenaire.Milo.TypeEvenement {
+): MiloRendezVous.TypeEvenement {
   switch (action) {
     case 'CREATE':
-      return Partenaire.Milo.TypeEvenement.CREATE
+      return MiloRendezVous.TypeEvenement.CREATE
     case 'UPDATE':
-      return Partenaire.Milo.TypeEvenement.UPDATE
+      return MiloRendezVous.TypeEvenement.UPDATE
     case 'DELETE':
-      return Partenaire.Milo.TypeEvenement.DELETE
+      return MiloRendezVous.TypeEvenement.DELETE
     default:
-      return Partenaire.Milo.TypeEvenement.NON_TRAITABLE
+      return MiloRendezVous.TypeEvenement.NON_TRAITABLE
   }
 }

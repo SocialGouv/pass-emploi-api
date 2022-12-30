@@ -105,7 +105,6 @@ import {
   JeunePoleEmploiRepositoryToken,
   JeunesRepositoryToken
 } from './domain/jeune/jeune'
-import { MiloRepositoryToken } from './domain/milo'
 import {
   Notification,
   NotificationRepositoryToken
@@ -147,7 +146,7 @@ import { FichierSqlS3Repository } from './infrastructure/repositories/fichier-sq
 import { JeuneConfigurationApplicationSqlRepository } from './infrastructure/repositories/jeune/jeune-configuration-application-sql.repository.db'
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune/jeune-sql.repository.db'
 import { MailSqlRepository } from './infrastructure/repositories/mail-sql.repository.db'
-import { MiloHttpSqlRepository } from './infrastructure/repositories/milo-http-sql.repository.db'
+import { MiloJeuneHttpSqlRepository } from './infrastructure/repositories/partenaire/milo/milo-jeune-http-sql.repository.db'
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
 import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre/offre-emploi-http-sql.repository.db'
 import { OffreServiceCiviqueHttpSqlRepository } from './infrastructure/repositories/offre/offre-service-civique-http.repository.db'
@@ -239,7 +238,7 @@ import { HandleJobNotifierRendezVousPECommandHandler } from './application/comma
 import { GetJeuneHomeAgendaQueryHandler } from './application/queries/get-jeune-home-agenda.query.db'
 import { JeunePoleEmploiSqlRepository } from './infrastructure/repositories/jeune/jeune-pole-emploi-sql.repository.db'
 import { GetTypesQualificationsQueryHandler } from './application/queries/get-types-qualifications.query.handler'
-import { ActionMiloHttpRepository } from './infrastructure/repositories/action/action-milo-http-sql.repository.db'
+import { ActionMiloHttpRepository } from './infrastructure/repositories/partenaire/milo/action-milo-http-sql.repository.db'
 import { QualifierActionCommandHandler } from './application/commands/qualifier-action.command.handler'
 import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from './application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
 import { GetDemarchesQueryGetter } from './application/queries/query-getters/pole-emploi/get-demarches.query.getter'
@@ -294,12 +293,13 @@ import { HandleJobGenererJDDCommandHandler } from './application/commands/jobs/h
 import { SupportController } from './infrastructure/routes/support.controller'
 import { RefreshJddCommandHandler } from './application/commands/refresh-jdd.command.handler'
 import { HandleJobSuivreEvenementsMiloHandler } from './application/commands/jobs/handle-job-suivre-evenements-milo.handler'
-import { MiloEvenementsHttpRepository } from './infrastructure/repositories/milo-evenements-http.repository'
-import {
-  MiloRendezVousFactory,
-  PartenaireMiloRepositoryToken
-} from './domain/partenaire/milo'
+import { MiloRendezVousHttpRepository } from './infrastructure/repositories/partenaire/milo/milo-rendez-vous-http.repository'
 import { HandleJobTraiterEvenementMiloHandler } from './application/commands/jobs/handle-job-traiter-evenement-milo.handler'
+import {
+  MiloRendezVous,
+  MiloRendezVousRepositoryToken
+} from './domain/partenaire/milo/milo.rendez-vous'
+import { MiloJeuneRepositoryToken } from './domain/partenaire/milo/milo.jeune'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -379,7 +379,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Recherche.Factory,
     Conseiller.ListeDeDiffusion.Factory,
     Conseiller.ListeDeDiffusion.Service,
-    MiloRendezVousFactory,
+    MiloRendezVous.Factory,
     BigqueryClient,
     {
       provide: APP_GUARD,
@@ -422,8 +422,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       useClass: AuthentificationSqlRepository
     },
     {
-      provide: MiloRepositoryToken,
-      useClass: MiloHttpSqlRepository
+      provide: MiloJeuneRepositoryToken,
+      useClass: MiloJeuneHttpSqlRepository
     },
     {
       provide: OffresImmersionRepositoryToken,
@@ -514,8 +514,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       useClass: ListeDeDiffusionSqlRepository
     },
     {
-      provide: PartenaireMiloRepositoryToken,
-      useClass: MiloEvenementsHttpRepository
+      provide: MiloRendezVousRepositoryToken,
+      useClass: MiloRendezVousHttpRepository
     },
     {
       provide: PoleEmploiPartenaireClientToken,

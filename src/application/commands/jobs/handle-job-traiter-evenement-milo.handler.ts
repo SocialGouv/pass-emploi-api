@@ -1,11 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
-import {
-  Milo,
-  MiloRendezVousFactory,
-  PartenaireMiloRepositoryToken
-} from '../../../domain/partenaire/milo'
 import { Planificateur } from '../../../domain/planificateur'
 import {
   RendezVous,
@@ -14,6 +9,10 @@ import {
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 import { DateTime } from 'luxon'
+import {
+  MiloRendezVous,
+  MiloRendezVousRepositoryToken
+} from '../../../domain/partenaire/milo/milo.rendez-vous'
 
 @Injectable()
 export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
@@ -27,9 +26,9 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
     private jeuneRepository: Jeune.Repository,
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
-    @Inject(PartenaireMiloRepositoryToken)
-    private miloEvenementsHttpRepository: Milo.Repository,
-    private rendezVousMiloFactory: MiloRendezVousFactory
+    @Inject(MiloRendezVousRepositoryToken)
+    private miloRendezVousHttpRepository: MiloRendezVous.Repository,
+    private rendezVousMiloFactory: MiloRendezVous.Factory
   ) {
     super(Planificateur.JobType.TRAITER_EVENEMENT_MILO, suiviJobService)
   }
@@ -39,11 +38,11 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
   ): Promise<SuiviJob> {
     const debut = this.dateService.now()
 
-    if (job.contenu.type === Milo.TypeEvenement.NON_TRAITABLE) {
+    if (job.contenu.type === MiloRendezVous.TypeEvenement.NON_TRAITABLE) {
       return this.buildSuiviJob(debut, Traitement.TYPE_NON_TRAITABLE, true)
     }
 
-    if (job.contenu.objet === Milo.ObjetEvenement.NON_TRAITABLE) {
+    if (job.contenu.objet === MiloRendezVous.ObjetEvenement.NON_TRAITABLE) {
       return this.buildSuiviJob(debut, Traitement.OBJET_NON_TRAITABLE, true)
     }
 
@@ -57,7 +56,7 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
     }
 
     const rendezVousMilo =
-      await this.miloEvenementsHttpRepository.findRendezVousByEvenement(
+      await this.miloRendezVousHttpRepository.findRendezVousByEvenement(
         job.contenu
       )
 
