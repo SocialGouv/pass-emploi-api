@@ -4,9 +4,8 @@ import { SuiviJob } from 'src/domain/suivi-job'
 import { DateService } from 'src/utils/date-service'
 import { uneDatetime } from 'test/fixtures/date.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
-import { HandleJobMettreAJourLesSegmentsCommandHandler } from '../../../../src/application/commands/jobs/handle-job-mettre-a-jour-les-segments.command'
+import { HandleJobMettreAJourLesSegmentsCommandHandler } from '../../../../src/application/commands/jobs/handle-job-mettre-a-jour-les-segments.command.db'
 import { BigqueryClient } from '../../../../src/infrastructure/clients/bigquery.client'
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
 import * as fs from 'fs'
 import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
@@ -20,16 +19,25 @@ import {
 } from '../../../fixtures/campagne.fixture'
 import { ReponseCampagneSqlModel } from '../../../../src/infrastructure/sequelize/models/reponse-campagne.sql-model'
 import { DateTime } from 'luxon'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../../utils/database-for-testing'
 
 describe('HandleJobMettreAJourLesSegmentsCommandHandler', () => {
-  const database = DatabaseForTesting.prepare()
+  let database: DatabaseForTesting
+
+  before(async () => {
+    database = getDatabase()
+  })
 
   let handleJobMettreAJourLesSegmentsCommandHandler: HandleJobMettreAJourLesSegmentsCommandHandler
   let bigqueryClient: StubbedClass<BigqueryClient>
   let dateService: StubbedClass<DateService>
   let suiviJobService: StubbedType<SuiviJob.Service>
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await database.cleanPG()
     const sandbox: SinonSandbox = createSandbox()
     suiviJobService = stubInterface(sandbox)
     dateService = stubClass(DateService)

@@ -23,7 +23,7 @@ import { HandleJobMettreAJourCodesEvenementsCommandHandler } from './commands/jo
 import { HandleJobNettoyerLesDonneesCommandHandler } from './commands/jobs/handle-job-nettoyer-les-donnees.command.db'
 import { HandleJobAgenceAnimationCollectiveCommandHandler } from './commands/jobs/handle-job-agence-animation-collective.command.db'
 import { MonitorJobsCommandHandler } from './commands/jobs/monitor-jobs.command.db'
-import { HandleJobMettreAJourLesSegmentsCommandHandler } from './commands/jobs/handle-job-mettre-a-jour-les-segments.command'
+import { HandleJobMettreAJourLesSegmentsCommandHandler } from './commands/jobs/handle-job-mettre-a-jour-les-segments.command.db'
 import { HandleJobGenererJDDCommandHandler } from './commands/jobs/handle-job-generer-jdd.handler'
 import { HandleJobSuivreEvenementsMiloHandler } from './commands/jobs/handle-job-suivre-evenements-milo.handler'
 import { HandleJobTraiterEvenementMiloHandler } from './commands/jobs/handle-job-traiter-evenement-milo.handler'

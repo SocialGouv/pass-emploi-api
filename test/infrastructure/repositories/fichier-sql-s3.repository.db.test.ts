@@ -1,6 +1,5 @@
 import { DateService } from 'src/utils/date-service'
 import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
-import { DatabaseForTesting } from 'test/utils/database-for-testing'
 import { ObjectStorageClient } from '../../../src/infrastructure/clients/object-storage.client'
 import { FichierSqlS3Repository } from '../../../src/infrastructure/repositories/fichier-sql-s3.repository.db'
 import { FichierSqlModel } from '../../../src/infrastructure/sequelize/models/fichier.sql-model'
@@ -10,9 +9,9 @@ import {
   unFichierMetadata
 } from '../../fixtures/fichier.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('FichierSqlS3Repository', () => {
-  DatabaseForTesting.prepare()
   let fichierSqlS3Repository: FichierSqlS3Repository
   let objectStorageClient: StubbedClass<ObjectStorageClient>
   const dateService = stubClass(DateService)
@@ -20,6 +19,7 @@ describe('FichierSqlS3Repository', () => {
   const quatreMoisPlusTot = uneDatetime().minus({ months: 4 })
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     dateService.now.returns(maintenant)
     dateService.nowJs.returns(maintenant.toJSDate())
     objectStorageClient = stubClass(ObjectStorageClient)

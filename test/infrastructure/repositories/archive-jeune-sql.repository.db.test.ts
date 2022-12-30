@@ -32,15 +32,19 @@ import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { expect, stubClass } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { unCommentaire } from '../../fixtures/action.fixture'
 import {
   CommentaireDto,
   CommentaireSqlModel
 } from '../../../src/infrastructure/sequelize/models/commentaire.sql-model'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
 
 describe('ArchiveJeuneSqlRepository', () => {
-  const database = DatabaseForTesting.prepare()
+  let database: DatabaseForTesting
+  let rechercheSqlRepository: RechercheSqlRepository
   const firebaseClient = stubClass(FirebaseClient)
   firebaseClient.getChat.resolves([])
   const archiveJeuneSqlRepository = new ArchiveJeuneSqlRepository(
@@ -58,6 +62,15 @@ describe('ArchiveJeuneSqlRepository', () => {
     idConseiller: secondConseillerDto.id
   })
 
+  before(async () => {
+    database = getDatabase()
+    rechercheSqlRepository = new RechercheSqlRepository(database.sequelize)
+  })
+
+  beforeEach(async () => {
+    await database.cleanPG()
+  })
+
   describe('archiver', () => {
     let archiveJeuneSql: ArchiveJeuneSqlModel | null
     let metadonnees: ArchiveJeune.Metadonnees
@@ -65,9 +78,6 @@ describe('ArchiveJeuneSqlRepository', () => {
     const offresImmersionRepository = new OffresImmersionHttpSqlRepository()
     const offreServiceCiviqueHttpSqlRepository =
       new OffreServiceCiviqueHttpSqlRepository()
-    const rechercheSqlRepository = new RechercheSqlRepository(
-      database.sequelize
-    )
 
     beforeEach(async () => {
       // Given

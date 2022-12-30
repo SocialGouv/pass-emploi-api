@@ -18,7 +18,7 @@ import { Notification } from '../../../src/domain/notification/notification'
 import {
   DeleteRendezVousCommand,
   DeleteRendezVousCommandHandler
-} from '../../../src/application/commands/delete-rendez-vous.command.handler.db'
+} from '../../../src/application/commands/delete-rendez-vous.command.handler'
 import { unRendezVous } from '../../fixtures/rendez-vous.fixture'
 import {
   unConseillerDuJeune,
@@ -36,14 +36,13 @@ import { Mail } from '../../../src/domain/mail'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { stubClassSandbox } from 'test/utils/types'
 import { uneDate, uneDatetime } from 'test/fixtures/date.fixture'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('DeleteRendezVousCommandHandler', () => {
-  DatabaseForTesting.prepare()
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let notificationService: StubbedClass<Notification.Service>
@@ -276,6 +275,7 @@ describe('DeleteRendezVousCommandHandler', () => {
     })
 
     beforeEach(async () => {
+      await getDatabase().cleanPG()
       await ConseillerSqlModel.create(conseillerDto)
       await RendezVousSqlModel.bulkCreate([unAtelier, unRendezVous])
     })

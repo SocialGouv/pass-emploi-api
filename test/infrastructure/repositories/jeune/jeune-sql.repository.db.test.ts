@@ -42,21 +42,31 @@ import { uneActionDto } from '../../../fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
-import { StubbedClass, expect, stubClass } from '../../../utils'
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
+import { expect, StubbedClass, stubClass } from '../../../utils'
+import { before } from 'mocha'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../../utils/database-for-testing'
 
 describe('JeuneSqlRepository', () => {
   const uuid = '9e1a7d9f-4038-4631-9aa1-856ee90c7ff8'
-  const databaseForTesting = DatabaseForTesting.prepare()
-  const rechercheSqlRepository = new RechercheSqlRepository(
-    databaseForTesting.sequelize
-  )
+  let databaseForTesting: DatabaseForTesting
+  let rechercheSqlRepository: RechercheSqlRepository
   let firebaseClient: StubbedClass<FirebaseClient>
   let jeuneSqlRepository: JeuneSqlRepository
   let idService: StubbedClass<IdService>
   let dateService: StubbedClass<DateService>
 
+  before(() => {
+    databaseForTesting = getDatabase()
+  })
+
   beforeEach(async () => {
+    await databaseForTesting.cleanPG()
+    rechercheSqlRepository = new RechercheSqlRepository(
+      databaseForTesting.sequelize
+    )
     firebaseClient = stubClass(FirebaseClient)
     idService = stubClass(IdService)
     idService.uuid.returns(uuid)

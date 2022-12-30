@@ -22,17 +22,27 @@ import { unConseillerDto } from '../../../../fixtures/sql-models/conseiller.sql-
 import { unJeuneDto } from '../../../../fixtures/sql-models/jeune.sql-model'
 import { expect } from '../../../../utils'
 import { GetServicesCiviqueQuery } from '../../../../../src/application/queries/get-offres-services-civique.query.handler'
-import { DatabaseForTesting } from '../../../../utils/database-for-testing'
+import { before } from 'mocha'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../../../utils/database-for-testing'
 
 describe('RechercheSqlRepository', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
-  const rechercheSqlRepository = new RechercheSqlRepository(
-    databaseForTesting.sequelize
-  )
+  let databaseForTesting: DatabaseForTesting
+  let rechercheSqlRepository: RechercheSqlRepository
 
   const idJeune = 'ABCDE'
 
+  before(() => {
+    databaseForTesting = getDatabase()
+  })
+
   beforeEach(async () => {
+    await databaseForTesting.cleanPG()
+    rechercheSqlRepository = new RechercheSqlRepository(
+      databaseForTesting.sequelize
+    )
     const conseillerDto = unConseillerDto()
     await ConseillerSqlModel.creer(conseillerDto)
     await JeuneSqlModel.creer(

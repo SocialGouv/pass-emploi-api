@@ -1,20 +1,20 @@
 import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'
 import { RendezVousSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
 import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { Core } from '../../../../src/domain/core'
 import { uneDate } from '../../../fixtures/date.fixture'
 import { LogModificationRendezVousSqlModel } from '../../../../src/infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
 import { expect } from '../../../utils'
-import Structure = Core.Structure
 import { HistoriqueRendezVousRepositorySql } from '../../../../src/infrastructure/repositories/rendez-vous/historique-rendez-vous.repository.db'
+import { getDatabase } from '../../../utils/database-for-testing'
+import Structure = Core.Structure
 
 describe('LogModificationRendezVousRepositorySql', () => {
-  DatabaseForTesting.prepare()
   let historiqueRendezVousRepositorySql: HistoriqueRendezVousRepositorySql
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     historiqueRendezVousRepositorySql = new HistoriqueRendezVousRepositorySql()
   })
 

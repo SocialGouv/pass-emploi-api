@@ -5,11 +5,10 @@ import {
   AgenceSqlModel
 } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { Core } from '../../../src/domain/core'
+import { getDatabase } from '../../utils/database-for-testing'
 import Structure = Core.Structure
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 
 describe('AgenceSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let agenceSqlRepository: AgenceSqlRepository
   const agenceMilo: Partial<AgenceDto> = {
     id: 'Bonjour je suis un id milo',
@@ -27,6 +26,7 @@ describe('AgenceSqlRepository', () => {
   }
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     agenceSqlRepository = new AgenceSqlRepository()
     await AgenceSqlModel.create(agenceMilo)
     await AgenceSqlModel.create(agencePE)

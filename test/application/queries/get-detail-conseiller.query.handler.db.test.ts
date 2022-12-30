@@ -9,12 +9,11 @@ import { detailConseillerQueryModel } from '../../fixtures/query-models/conseill
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetDetailConseillerQueryHandler', () => {
-  DatabaseForTesting.prepare()
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getDetailConseillerQueryHandler: GetDetailConseillerQueryHandler
   let sandbox: SinonSandbox
@@ -26,6 +25,10 @@ describe('GetDetailConseillerQueryHandler', () => {
     getDetailConseillerQueryHandler = new GetDetailConseillerQueryHandler(
       conseillerAuthorizer
     )
+  })
+
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
   })
 
   afterEach(() => {

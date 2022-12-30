@@ -16,7 +16,6 @@ import { uneActionQueryModelSansJeune } from 'test/fixtures/query-models/action.
 import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
-import { DatabaseForTesting } from 'test/utils/database-for-testing'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
@@ -35,9 +34,9 @@ import { RendezVousJeuneQueryModel } from '../../../src/application/queries/quer
 import { DateTime } from 'luxon'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetJeuneHomeAgendaQueryHandler', () => {
-  DatabaseForTesting.prepare()
   let handler: GetJeuneHomeAgendaQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
@@ -47,6 +46,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
   const jeuneDto = unJeuneDto()
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
     handler = new GetJeuneHomeAgendaQueryHandler(

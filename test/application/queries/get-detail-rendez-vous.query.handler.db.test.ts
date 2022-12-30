@@ -23,20 +23,20 @@ import {
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { LogModificationRendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
 import { DateService } from '../../../src/utils/date-service'
 import { DateTime } from 'luxon'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetDetailRendezVousQueryHandler', () => {
-  DatabaseForTesting.prepare()
   let getDetailRendezVousQueryHandler: GetDetailRendezVousQueryHandler
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
   let dateService: StubbedClass<DateService>
   let sandbox: SinonSandbox
   const maintenant = uneDate()
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
     sandbox = createSandbox()
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
     dateService = stubClass(DateService)

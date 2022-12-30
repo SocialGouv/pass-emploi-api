@@ -13,14 +13,14 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('AuthentificationSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let authentificationSqlRepository: AuthentificationSqlRepository
   let keycloakClient: StubbedClass<KeycloakClient>
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     keycloakClient = stubClass(KeycloakClient)
     authentificationSqlRepository = new AuthentificationSqlRepository(
       keycloakClient

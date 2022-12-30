@@ -18,19 +18,27 @@ import {
   RendezVous
 } from '../../../../src/domain/rendez-vous/rendez-vous'
 import { Core } from '../../../../src/domain/core'
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
 import { uneConfiguration } from '../../../fixtures/jeune.fixture'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../../utils/database-for-testing'
 import Structure = Core.Structure
 
 describe('RendezVousRepositorySql', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let databaseForTesting: DatabaseForTesting
   let rendezVousRepositorySql: RendezVousRepositorySql
   const maintenant = uneDatetime()
   const aujourdhuiMinuit = uneDatetimeMinuit()
   let jeune: JeuneDuRendezVous
   let unAutreJeune: JeuneDuRendezVous
 
+  before(() => {
+    databaseForTesting = getDatabase()
+  })
+
   beforeEach(async () => {
+    await databaseForTesting.cleanPG()
     const dateService = stubClass(DateService)
     dateService.nowJs.returns(maintenant.toJSDate())
     dateService.nowAtMidnightJs.returns(aujourdhuiMinuit.toJSDate())

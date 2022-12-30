@@ -3,9 +3,13 @@ import { Sequelize } from 'sequelize-typescript'
 import { sqlModels } from '../../src/infrastructure/sequelize/models'
 import { createClient } from 'redis'
 import { testConfig } from './module-for-testing'
+import { RedisClientType as _RedisClientType } from '@redis/client/dist/lib/client'
+
+export let databaseForTesting: DatabaseForTesting | undefined
 
 export class DatabaseForTesting {
   sequelize!: Sequelize
+  redisClient: _RedisClientType
 
   constructor() {
     const { host, port, database, user, password } = parse(
@@ -24,22 +28,30 @@ export class DatabaseForTesting {
     this.sequelize.addModels(sqlModels)
 
     const redisUrl = testConfig().get('redis').url
-    const redisClient = createClient({
+    this.redisClient = createClient({
       url: redisUrl
     })
-    beforeEach(async () => {
-      await this.sequelize.truncate({ cascade: true })
-      await redisClient.connect()
-      await redisClient.flushAll()
-      await redisClient.disconnect()
-    })
-
-    after(async () => {
-      await this.sequelize.close()
-    })
   }
 
-  static prepare(): DatabaseForTesting {
-    return new DatabaseForTesting()
+  cleanPG = async (): Promise<void> => {
+    await this.sequelize.truncate({ cascade: true })
+  }
+
+  cleanRedis = async (): Promise<void> => {
+    await this.redisClient.connect()
+    await this.redisClient.flushAll()
+    await this.redisClient.disconnect()
   }
 }
+
+export function getDatabase(): DatabaseForTesting {
+  if (!databaseForTesting) {
+    databaseForTesting = new DatabaseForTesting()
+  }
+  return databaseForTesting
+}
+
+databaseForTesting = getDatabase()
+
+// eslint-disable-next-line no-console
+console.log('Setting up database for testing')

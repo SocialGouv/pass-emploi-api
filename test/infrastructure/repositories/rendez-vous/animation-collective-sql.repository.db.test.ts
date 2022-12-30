@@ -1,6 +1,6 @@
 import {
-  unJeuneDuRendezVous,
-  uneAnimationCollective
+  uneAnimationCollective,
+  unJeuneDuRendezVous
 } from 'test/fixtures/rendez-vous.fixture'
 import { Core } from '../../../../src/domain/core'
 import {
@@ -21,10 +21,13 @@ import { unEtablissementDto } from '../../../fixtures/sql-models/etablissement.s
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
 import { expect, stubClass } from '../../../utils'
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../../utils/database-for-testing'
 
 describe('AnimationsCollectivesSqlRepository', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let databaseForTesting: DatabaseForTesting
   let animationsCollectivesSqlRepository: AnimationCollectiveSqlRepository
   const maintenant = uneDatetime()
   const aujourdhuiMinuit = uneDatetimeMinuit()
@@ -34,7 +37,13 @@ describe('AnimationsCollectivesSqlRepository', () => {
     configuration: uneConfiguration({ idJeune: 'un-autre-jeune' })
   })
 
+  before(async () => {
+    databaseForTesting = getDatabase()
+  })
+
   beforeEach(async () => {
+    await databaseForTesting.cleanPG()
+
     const dateService = stubClass(DateService)
     dateService.nowJs.returns(maintenant.toJSDate())
     dateService.nowAtMidnightJs.returns(aujourdhuiMinuit.toJSDate())

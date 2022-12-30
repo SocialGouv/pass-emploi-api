@@ -1,6 +1,5 @@
 import { Conseiller } from '../../../../src/domain/conseiller/conseiller'
 import { ListeDeDiffusionJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/liste-de-diffusion-jeune-association.sql-model'
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
 import { ListeDeDiffusionSqlRepository } from '../../../../src/infrastructure/repositories/conseiller/liste-de-diffusion-sql.repository.db'
 import { unConseillerDuJeune, unJeune } from '../../../fixtures/jeune.fixture'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
@@ -12,9 +11,17 @@ import { uneListeDeDiffusion } from '../../../fixtures/liste-de-diffusion.fixtur
 import { expect } from '../../../utils'
 import { ListeDeDiffusion } from '../../../../src/domain/conseiller/liste-de-diffusion'
 import { uneAutreDatetime, uneDatetime } from '../../../fixtures/date.fixture'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../../utils/database-for-testing'
 
 describe(' ListeDeDiffusionSqlRepository', () => {
-  const database = DatabaseForTesting.prepare()
+  let database: DatabaseForTesting
+
+  before(() => {
+    database = getDatabase()
+  })
 
   let repository: Conseiller.ListeDeDiffusion.Repository
   const jeune: Jeune = unJeune({
@@ -23,6 +30,7 @@ describe(' ListeDeDiffusionSqlRepository', () => {
   const conseillerDto = unConseillerDto({ id: jeune.conseiller!.id })
 
   beforeEach(async () => {
+    await database.cleanPG()
     repository = new ListeDeDiffusionSqlRepository(database.sequelize)
 
     await ConseillerSqlModel.creer(conseillerDto)

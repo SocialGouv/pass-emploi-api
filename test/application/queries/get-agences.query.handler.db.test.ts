@@ -8,12 +8,15 @@ import { expect } from '../../utils'
 import { Authentification } from '../../../src/domain/authentification'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
+import { getDatabase } from '../../utils/database-for-testing'
 import Structure = Core.Structure
 
 describe('GetAgencesQueryHandler', () => {
-  DatabaseForTesting.prepare()
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
+  })
+
   describe('authorize', () => {
     const handler = new GetAgencesQueryHandler()
 

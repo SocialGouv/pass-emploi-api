@@ -3,7 +3,6 @@ import { ConseillerAuthorizer } from 'src/application/authorizers/authorize-cons
 import { GetJeuneMiloByDossierQueryHandler } from 'src/application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { unJeuneQueryModel } from 'test/fixtures/query-models/jeunes.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
@@ -11,9 +10,9 @@ import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetJeuneMiloByDossierQueryHandler', () => {
-  DatabaseForTesting.prepare()
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let getJeuneMiloByDossierQueryHandler: GetJeuneMiloByDossierQueryHandler
   let sandbox: SinonSandbox
@@ -25,6 +24,10 @@ describe('GetJeuneMiloByDossierQueryHandler', () => {
     getJeuneMiloByDossierQueryHandler = new GetJeuneMiloByDossierQueryHandler(
       conseillerAuthorizer
     )
+  })
+
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
   })
 
   afterEach(() => {

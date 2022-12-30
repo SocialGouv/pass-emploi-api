@@ -19,15 +19,15 @@ import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { RendezVousJeuneDetailQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetUnRendezVousJeuneQueryHandler', () => {
-  DatabaseForTesting.prepare()
   let getUnRendezVousJeuneQueryHandler: GetUnRendezVousJeuneQueryHandler
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
   const maintenant = uneDatetime()
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
     getUnRendezVousJeuneQueryHandler = new GetUnRendezVousJeuneQueryHandler(
       rendezVousAuthorizer

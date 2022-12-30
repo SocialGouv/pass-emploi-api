@@ -6,13 +6,11 @@ import { expect, StubbedClass, stubClass } from '../../utils'
 import { isSuccess } from '../../../src/building-blocks/types/result'
 import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { Action } from '../../../src/domain/action/action'
-import Statut = Action.Statut
 import { DateTime } from 'luxon'
 import { DateService } from '../../../src/utils/date-service'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
@@ -23,9 +21,10 @@ import { EvenementEngagementSqlModel } from '../../../src/infrastructure/sequeli
 import { Evenement } from '../../../src/domain/evenement'
 import { Authentification } from '../../../src/domain/authentification'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import { getDatabase } from '../../utils/database-for-testing'
+import Statut = Action.Statut
 
 describe('GetIndicateursPourConseillerQueryHandler', () => {
-  DatabaseForTesting.prepare()
   let getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
   let dateService: StubbedClass<DateService>
@@ -39,6 +38,10 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         dateService,
         conseillerAuthorizer
       )
+  })
+
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
   })
 
   describe('handle', () => {

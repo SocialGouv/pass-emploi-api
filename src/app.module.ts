@@ -33,7 +33,7 @@ import { DeleteFavoriOffreImmersionCommandHandler } from './application/commands
 import { DeleteJeuneInactifCommandHandler } from './application/commands/delete-jeune-inactif.command.handler'
 import { DeleteListeDeDiffusionCommandHandler } from './application/commands/delete-liste-de-diffusion.command.handler'
 import { DeleteRechercheCommandHandler } from './application/commands/delete-recherche.command.handler'
-import { DeleteRendezVousCommandHandler } from './application/commands/delete-rendez-vous.command.handler.db'
+import { DeleteRendezVousCommandHandler } from './application/commands/delete-rendez-vous.command.handler'
 import { DeleteSuperviseursCommandHandler } from './application/commands/delete-superviseurs.command.handler'
 import { EnvoyerMessageGroupeCommandHandler } from './application/commands/envoyer-message-groupe.command.handler'
 import { HandleJobMailConseillerCommandHandler } from './application/commands/jobs/handle-job-mail-conseiller.command'
@@ -203,7 +203,7 @@ import { GetJeuneHomeDemarchesQueryHandler } from './application/queries/get-jeu
 import { GetJeuneHomeActionsQueryHandler } from './application/queries/get-jeune-home-actions.query.handler'
 import { GetCampagneQueryModel } from './application/queries/query-getters/get-campagne.query.getter'
 import { CreateEvaluationCommandHandler } from './application/commands/create-evaluation.command'
-import { DemarcheHttpRepositoryDb } from './infrastructure/repositories/demarche-http.repository.db'
+import { DemarcheHttpRepository } from './infrastructure/repositories/demarche-http.repository'
 import { Demarche, DemarcheRepositoryToken } from './domain/demarche'
 import { UpdateStatutDemarcheCommandHandler } from './application/commands/update-demarche.command.handler'
 import { CreateDemarcheCommandHandler } from './application/commands/create-demarche.command.handler'
@@ -238,7 +238,7 @@ import { HandleJobNotifierRendezVousPECommandHandler } from './application/comma
 import { GetJeuneHomeAgendaQueryHandler } from './application/queries/get-jeune-home-agenda.query.db'
 import { JeunePoleEmploiSqlRepository } from './infrastructure/repositories/jeune/jeune-pole-emploi-sql.repository.db'
 import { GetTypesQualificationsQueryHandler } from './application/queries/get-types-qualifications.query.handler'
-import { ActionMiloHttpRepository } from './infrastructure/repositories/partenaire/milo/action-milo-http-sql.repository.db'
+import { ActionMiloHttpRepository } from './infrastructure/repositories/partenaire/milo/action-milo-http-sql.repository'
 import { QualifierActionCommandHandler } from './application/commands/qualifier-action.command.handler'
 import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from './application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
 import { GetDemarchesQueryGetter } from './application/queries/query-getters/pole-emploi/get-demarches.query.getter'
@@ -286,7 +286,7 @@ import { UpdateListeDeDiffusionCommandHandler } from './application/commands/upd
 import { GetDetailListeDeDiffusionQueryHandler } from './application/queries/get-detail-liste-de-diffusion.query.handler.db'
 import { HandleJobAgenceAnimationCollectiveCommandHandler } from './application/commands/jobs/handle-job-agence-animation-collective.command.db'
 import { MonitorJobsCommandHandler } from './application/commands/jobs/monitor-jobs.command.db'
-import { HandleJobMettreAJourLesSegmentsCommandHandler } from './application/commands/jobs/handle-job-mettre-a-jour-les-segments.command'
+import { HandleJobMettreAJourLesSegmentsCommandHandler } from './application/commands/jobs/handle-job-mettre-a-jour-les-segments.command.db'
 import { BigqueryClient } from './infrastructure/clients/bigquery.client'
 import { MessagesController } from './infrastructure/routes/messages.controller'
 import { HandleJobGenererJDDCommandHandler } from './application/commands/jobs/handle-job-generer-jdd.handler'
@@ -463,7 +463,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     },
     {
       provide: DemarcheRepositoryToken,
-      useClass: DemarcheHttpRepositoryDb
+      useClass: DemarcheHttpRepository
     },
     {
       provide: FichierRepositoryToken,

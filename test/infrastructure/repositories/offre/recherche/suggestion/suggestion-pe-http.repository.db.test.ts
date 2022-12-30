@@ -12,14 +12,14 @@ import {
 } from '../../../../../fixtures/pole-emploi.dto.fixture'
 import { uneCommuneDto } from '../../../../../fixtures/sql-models/commune.sql-model'
 import { expect, StubbedClass, stubClass } from '../../../../../utils'
-import { DatabaseForTesting } from '../../../../../utils/database-for-testing'
+import { getDatabase } from '../../../../../utils/database-for-testing'
 
 describe('SuggestionPeHttpRepository', () => {
   let suggestionPeHttpRepository: SuggestionPeHttpRepository
   let client: StubbedClass<PoleEmploiPartenaireClient>
 
-  beforeEach(() => {
-    DatabaseForTesting.prepare()
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
     client = stubClass(PoleEmploiPartenaireClient)
     suggestionPeHttpRepository = new SuggestionPeHttpRepository(client)
   })

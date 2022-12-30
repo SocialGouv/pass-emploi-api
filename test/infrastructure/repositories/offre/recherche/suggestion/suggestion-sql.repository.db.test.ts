@@ -9,10 +9,9 @@ import { Suggestion } from '../../../../../../src/domain/offre/recherche/suggest
 import { unConseillerDto } from '../../../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../../../fixtures/sql-models/jeune.sql-model'
 import { expect } from '../../../../../utils'
-import { DatabaseForTesting } from '../../../../../utils/database-for-testing'
+import { getDatabase } from '../../../../../utils/database-for-testing'
 
 describe('SuggestionSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let suggestionSqlRepository: SuggestionSqlRepository
   const suggestion: Offre.Recherche.Suggestion = {
     dateCreation: uneDatetime(),
@@ -47,6 +46,7 @@ describe('SuggestionSqlRepository', () => {
   const jeuneDto = unJeuneDto()
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     await ConseillerSqlModel.creer(unConseillerDto())
     await JeuneSqlModel.creer(jeuneDto)
 

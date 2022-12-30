@@ -5,14 +5,14 @@ import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/j
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { expect } from '../../../utils'
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
 import { JeunePoleEmploiSqlRepository } from '../../../../src/infrastructure/repositories/jeune/jeune-pole-emploi-sql.repository.db'
+import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('JeunePoleEmploiSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let jeunePoleEmploiSqlRepository: JeunePoleEmploiSqlRepository
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     jeunePoleEmploiSqlRepository = new JeunePoleEmploiSqlRepository()
   })
 

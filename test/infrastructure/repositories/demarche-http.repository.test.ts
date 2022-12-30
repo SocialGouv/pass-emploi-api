@@ -4,16 +4,14 @@ import { failure, isSuccess, success } from 'src/building-blocks/types/result'
 import { Demarche } from 'src/domain/demarche'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { PoleEmploiPartenaireClient } from 'src/infrastructure/clients/pole-emploi-partenaire-client'
-import { DemarcheHttpRepositoryDb } from 'src/infrastructure/repositories/demarche-http.repository.db'
+import { DemarcheHttpRepository } from 'src/infrastructure/repositories/demarche-http.repository'
 import { uneDemarcheDto } from 'test/fixtures/demarches-dto.fixtures'
 import { DateService } from '../../../src/utils/date-service'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { uneDatetime } from '../../fixtures/date.fixture'
 
 describe('DemarcheHttpRepository', () => {
-  DatabaseForTesting.prepare()
-  let demarcheHttpRepository: DemarcheHttpRepositoryDb
+  let demarcheHttpRepository: DemarcheHttpRepository
   let keycloakClient: StubbedClass<KeycloakClient>
   let poleEmploiPartenaireClient: StubbedClass<PoleEmploiPartenaireClient>
   const maintenant = DateTime.fromISO('2020-04-06T12:00:00.000Z')
@@ -26,7 +24,7 @@ describe('DemarcheHttpRepository', () => {
     keycloakClient.exchangeTokenPoleEmploiJeune.resolves('token')
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
 
-    demarcheHttpRepository = new DemarcheHttpRepositoryDb(
+    demarcheHttpRepository = new DemarcheHttpRepository(
       keycloakClient,
       poleEmploiPartenaireClient,
       dateService

@@ -7,13 +7,13 @@ import { uneDatetime } from 'test/fixtures/date.fixture'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { Core } from '../../../src/domain/core'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('ConseillerSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let conseillerSqlRepository: ConseillerSqlRepository
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     conseillerSqlRepository = new ConseillerSqlRepository()
   })
 

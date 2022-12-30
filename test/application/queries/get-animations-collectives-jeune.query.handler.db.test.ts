@@ -4,7 +4,6 @@ import { GetAnimationsCollectivesJeuneQueryHandler } from '../../../src/applicat
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
@@ -16,9 +15,13 @@ import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/age
 import { RendezVousJeuneDetailQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { uneDatetime } from '../../fixtures/date.fixture'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
-  DatabaseForTesting.prepare()
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
+  })
+
   let getAnimationsCollectivesJeuneQueryHandler: GetAnimationsCollectivesJeuneQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   const maintenant = uneDatetime()

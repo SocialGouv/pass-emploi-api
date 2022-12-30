@@ -1,6 +1,5 @@
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import {
   GetDetailListeDeDiffusionQuery,
   GetDetailListeDeDiffusionQueryHandler
@@ -31,13 +30,14 @@ import {
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetDetailListeDeDiffusionQueryHandler', () => {
-  DatabaseForTesting.prepare()
   let listeDiffusionAuthorizer: StubbedClass<AuthorizeListeDeDiffusion>
   let queryHandler: GetDetailListeDeDiffusionQueryHandler
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     listeDiffusionAuthorizer = stubClass(AuthorizeListeDeDiffusion)
     queryHandler = new GetDetailListeDeDiffusionQueryHandler(
       listeDiffusionAuthorizer

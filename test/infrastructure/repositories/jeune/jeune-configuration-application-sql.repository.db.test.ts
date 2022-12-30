@@ -8,14 +8,13 @@ import { unJeune } from '../../../fixtures/jeune.fixture'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { expect } from '../../../utils'
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
+import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('JeuneConfigurationApplicationSqlRepository', () => {
-  DatabaseForTesting.prepare()
-
   let jeuneConfigurationApplicationSqlRepositorySql: JeuneConfigurationApplicationSqlRepository
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     jeuneConfigurationApplicationSqlRepositorySql =
       new JeuneConfigurationApplicationSqlRepository()
   })

@@ -1,16 +1,24 @@
 import { expect } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { GetMetiersRomeQueryHandler } from '../../../src/application/queries/get-metiers-rome.query.handler.db'
 import { MetierRomeSqlModel } from '../../../src/infrastructure/sequelize/models/metier-rome.sql-model'
 import { unMetierRomeDto } from '../../fixtures/sql-models/metier-rome.sql-model'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
 
 describe('GetMetiersRomeQueryHandler', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let databaseForTesting: DatabaseForTesting
   let getMetiersRomeQueryHandler: GetMetiersRomeQueryHandler
   before(() => {
+    databaseForTesting = getDatabase()
     getMetiersRomeQueryHandler = new GetMetiersRomeQueryHandler(
       databaseForTesting.sequelize
     )
+  })
+
+  beforeEach(async () => {
+    await databaseForTesting.cleanPG()
   })
   it('retourne un tableau vide quand la recherche ne match pas', async () => {
     //Given

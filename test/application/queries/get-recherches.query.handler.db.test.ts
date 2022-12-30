@@ -1,7 +1,6 @@
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { GetRecherchesQueryHandler } from '../../../src/application/queries/get-recherches.query.handler.db'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import {
   criteresImmersionNice,
   geometrieNice,
@@ -15,14 +14,24 @@ import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeun
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { ConseillerForJeuneAvecPartageAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune-avec-partage'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
 
 describe('GetRecherchesQueryHandler', () => {
-  const database = DatabaseForTesting.prepare()
+  let database: DatabaseForTesting
+
+  before(async () => {
+    database = getDatabase()
+  })
+
   let getRecherchesQueryHandler: GetRecherchesQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let conseillerForJeuneAvecPartageAuthorizer: StubbedClass<ConseillerForJeuneAvecPartageAuthorizer>
 
-  before(async () => {
+  beforeEach(async () => {
+    await database.cleanPG()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     conseillerForJeuneAvecPartageAuthorizer = stubClass(
       ConseillerForJeuneAvecPartageAuthorizer

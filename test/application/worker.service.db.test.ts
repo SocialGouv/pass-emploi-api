@@ -7,7 +7,7 @@ import { HandleJobAgenceAnimationCollectiveCommandHandler } from '../../src/appl
 import { HandleJobGenererJDDCommandHandler } from '../../src/application/commands/jobs/handle-job-generer-jdd.handler'
 import { HandleJobMailConseillerCommandHandler } from '../../src/application/commands/jobs/handle-job-mail-conseiller.command'
 import { HandleJobMettreAJourCodesEvenementsCommandHandler } from '../../src/application/commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
-import { HandleJobMettreAJourLesSegmentsCommandHandler } from '../../src/application/commands/jobs/handle-job-mettre-a-jour-les-segments.command'
+import { HandleJobMettreAJourLesSegmentsCommandHandler } from '../../src/application/commands/jobs/handle-job-mettre-a-jour-les-segments.command.db'
 import { HandleJobNettoyerLesDonneesCommandHandler } from '../../src/application/commands/jobs/handle-job-nettoyer-les-donnees.command.db'
 import { HandleNettoyerLesJobsCommandHandler } from '../../src/application/commands/jobs/handle-job-nettoyer-les-jobs.command'
 import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from '../../src/application/commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
@@ -19,13 +19,16 @@ import { WorkerService } from '../../src/application/worker.service.db'
 import { Planificateur } from '../../src/domain/planificateur'
 import { PlanificateurRedisRepository } from '../../src/infrastructure/repositories/planificateur-redis.repository.db'
 import { DateService } from '../../src/utils/date-service'
-import { StubbedClass, expect, stubClass } from '../utils'
-import { DatabaseForTesting } from '../utils/database-for-testing'
+import { expect, StubbedClass, stubClass } from '../utils'
 import { testConfig } from '../utils/module-for-testing'
 import { HandleJobTraiterEvenementMiloHandler } from '../../src/application/commands/jobs/handle-job-traiter-evenement-milo.handler'
+import { getDatabase } from '../utils/database-for-testing'
 
 describe('WorkerService', () => {
-  DatabaseForTesting.prepare()
+  beforeEach(async () => {
+    await getDatabase().cleanRedis()
+  })
+
   describe('handler', () => {
     let handleNettoyerLesJobsCommandHandler: StubbedClass<HandleNettoyerLesJobsCommandHandler>
 

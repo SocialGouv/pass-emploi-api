@@ -8,11 +8,13 @@ import {
 } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { Core } from '../../../../src/domain/core'
 import { DetailConseillerQueryModel } from '../../../../src/application/queries/query-models/conseillers.query-model'
+import { getDatabase } from '../../../utils/database-for-testing'
 import Structure = Core.Structure
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
 
 describe('fromSqlToDetailConseillerQueryModel', () => {
-  DatabaseForTesting.prepare()
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
+  })
 
   describe('sans agence', () => {
     it('renvoie le query model', async () => {

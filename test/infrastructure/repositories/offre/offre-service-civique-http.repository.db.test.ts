@@ -7,14 +7,14 @@ import { uneOffreServiceCivique } from '../../../fixtures/offre-service-civique.
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
 import { expect } from '../../../utils'
 import { OffreServiceCiviqueHttpSqlRepository } from '../../../../src/infrastructure/repositories/offre/offre-service-civique-http.repository.db'
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
 import { Offre } from '../../../../src/domain/offre/offre'
+import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('OffreServiceCiviqueHttpSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let offreServiceCiviqueHttpSqlRepository: OffreServiceCiviqueHttpSqlRepository
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     offreServiceCiviqueHttpSqlRepository =
       new OffreServiceCiviqueHttpSqlRepository()
   })

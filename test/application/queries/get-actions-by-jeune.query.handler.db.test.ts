@@ -25,10 +25,13 @@ import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneActionQueryModelFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
+import {
+  DatabaseForTesting,
+  getDatabase
+} from '../../utils/database-for-testing'
 
 describe('GetActionsByJeuneQueryHandler', () => {
-  const databaseForTesting = DatabaseForTesting.prepare()
+  let databaseForTesting: DatabaseForTesting
   let actionSqlRepository: Action.Repository
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
@@ -36,6 +39,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
   let sandbox: SinonSandbox
 
   before(() => {
+    databaseForTesting = getDatabase()
     sandbox = createSandbox()
     conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
@@ -45,6 +49,10 @@ describe('GetActionsByJeuneQueryHandler', () => {
       conseillerForJeuneAuthorizer,
       jeuneAuthorizer
     )
+  })
+
+  beforeEach(async () => {
+    await databaseForTesting.cleanPG()
   })
 
   afterEach(() => {

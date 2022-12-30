@@ -7,13 +7,13 @@ import { FavoriOffreImmersionSqlModel } from '../../../../src/infrastructure/seq
 import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import { Immersion } from '../../../../src/domain/offre/favori/offre-immersion'
-import { DatabaseForTesting } from '../../../utils/database-for-testing'
+import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('OffresImmersionHttpSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let offresImmersionHttpSqlRepository: OffresImmersionHttpSqlRepository
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
     offresImmersionHttpSqlRepository = new OffresImmersionHttpSqlRepository()
   })
   describe('.saveAsFavori', () => {

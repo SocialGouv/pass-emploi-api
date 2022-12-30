@@ -4,15 +4,15 @@ import { Core } from '../../../src/domain/core'
 import { emptySuccess } from '../../../src/building-blocks/types/result'
 import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { uneDatetime } from 'test/fixtures/date.fixture'
-import { DatabaseForTesting } from '../../utils/database-for-testing'
 import { Evenement } from '../../../src/domain/evenement'
 import { EvenementSqlRepository } from '../../../src/infrastructure/repositories/evenement-sql.repository.db'
+import { getDatabase } from '../../utils/database-for-testing'
 
 describe('EvenementSqlRepository', () => {
-  DatabaseForTesting.prepare()
   let evenementHttpSqlRepository: EvenementSqlRepository
 
   beforeEach(async () => {
+    await getDatabase().cleanPG()
     evenementHttpSqlRepository = new EvenementSqlRepository()
   })
 
