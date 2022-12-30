@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
 import { CreateRechercheFromSuggestionCommandHandler } from '../../../src/application/commands/create-recherche-from-suggestion.command.handler'
 import { CreateRechercheCommandHandler } from '../../../src/application/commands/create-recherche.command.handler'
@@ -38,13 +38,9 @@ import {
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { uneRecherche } from '../../fixtures/recherche.fixture'
-import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('RecherchesController', () => {
   let createRechercheCommandHandler: StubbedClass<CreateRechercheCommandHandler>
@@ -57,45 +53,20 @@ describe('RecherchesController', () => {
   let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
-  beforeEach(async () => {
-    createRechercheCommandHandler = stubClass(CreateRechercheCommandHandler)
-    getRecherchesQueryHandler = stubClass(GetRecherchesQueryHandler)
-    deleteRechercheCommandHandler = stubClass(DeleteRechercheCommandHandler)
-    refuserSuggestionCommandHandler = stubClass(RefuserSuggestionCommandHandler)
-    createRechercheFromSuggestionCommandHandler = stubClass(
-      CreateRechercheFromSuggestionCommandHandler
-    )
-    rafraichirSuggestionPoleEmploiCommandHandler = stubClass(
+  before(async () => {
+    app = await getApplicationWithStubbedDependencies()
+    createRechercheCommandHandler = app.get(CreateRechercheCommandHandler)
+    getRecherchesQueryHandler = app.get(GetRecherchesQueryHandler)
+    deleteRechercheCommandHandler = app.get(DeleteRechercheCommandHandler)
+    rafraichirSuggestionPoleEmploiCommandHandler = app.get(
       RafraichirSuggestionPoleEmploiCommandHandler
     )
-    getSuggestionsQueryHandler = stubClass(GetSuggestionsQueryHandler)
-    jwtService = stubClass(JwtService)
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(CreateRechercheCommandHandler)
-      .useValue(createRechercheCommandHandler)
-      .overrideProvider(GetRecherchesQueryHandler)
-      .useValue(getRecherchesQueryHandler)
-      .overrideProvider(DeleteRechercheCommandHandler)
-      .useValue(deleteRechercheCommandHandler)
-      .overrideProvider(RafraichirSuggestionPoleEmploiCommandHandler)
-      .useValue(rafraichirSuggestionPoleEmploiCommandHandler)
-      .overrideProvider(GetSuggestionsQueryHandler)
-      .useValue(getSuggestionsQueryHandler)
-      .overrideProvider(CreateRechercheFromSuggestionCommandHandler)
-      .useValue(createRechercheFromSuggestionCommandHandler)
-      .overrideProvider(RefuserSuggestionCommandHandler)
-      .useValue(refuserSuggestionCommandHandler)
-      .overrideProvider(JwtService)
-      .useValue(jwtService)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
+    getSuggestionsQueryHandler = app.get(GetSuggestionsQueryHandler)
+    createRechercheFromSuggestionCommandHandler = app.get(
+      CreateRechercheFromSuggestionCommandHandler
+    )
+    refuserSuggestionCommandHandler = app.get(RefuserSuggestionCommandHandler)
+    jwtService = app.get(JwtService)
   })
 
   beforeEach(() => {

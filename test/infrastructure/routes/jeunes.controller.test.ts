@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import { ArchiverJeuneCommandHandler } from 'src/application/commands/archiver-jeune.command.handler'
 import { CreateDemarcheCommandHandler } from 'src/application/commands/create-demarche.command.handler'
 import { DeleteJeuneCommandHandler } from 'src/application/commands/delete-jeune.command.handler'
@@ -15,19 +15,16 @@ import {
   UpdateStatutDemarchePayload
 } from 'src/infrastructure/routes/validation/demarches.inputs'
 import {
-  UpdateConfigurationInput,
   TransfererConseillerPayload,
+  UpdateConfigurationInput,
   UpdateJeunePreferencesPayload
 } from 'src/infrastructure/routes/validation/jeunes.inputs'
-import { DateService } from 'src/utils/date-service'
 import * as request from 'supertest'
 import { uneDatetime, uneDatetimeAvecOffset } from 'test/fixtures/date.fixture'
 import { uneDemarche } from 'test/fixtures/demarche.fixture'
 import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
 import { DeleteJeuneInactifCommandHandler } from '../../../src/application/commands/delete-jeune-inactif.command.handler'
 import { UpdateJeunePreferencesCommandHandler } from '../../../src/application/commands/update-preferences-jeune.command.handler'
-import { GetActionsByJeuneQueryHandler } from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
-import { GetDemarchesQueryHandler } from '../../../src/application/queries/get-demarches.query.handler'
 import { GetConseillersJeuneQueryHandler } from '../../../src/application/queries/get-conseillers-jeune.query.handler.db'
 import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get-detail-jeune.query.handler.db'
 import { GetJeuneHomeActionsQueryHandler } from '../../../src/application/queries/get-jeune-home-actions.query.handler'
@@ -63,13 +60,7 @@ import {
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
-import {
-  buildTestingModuleForHttpTesting,
-  enleverLesUndefined,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { enleverLesUndefined, expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { GetJeuneHomeAgendaQueryHandler } from '../../../src/application/queries/get-jeune-home-agenda.query.db'
 import {
@@ -83,6 +74,8 @@ import { DateTime } from 'luxon'
 import { GetAnimationsCollectivesJeuneQueryHandler } from '../../../src/application/queries/get-animations-collectives-jeune.query.handler.db'
 import { GetUnRendezVousJeuneQueryHandler } from '../../../src/application/queries/get-un-rendez-vous-jeune.query.handler.db'
 import { unRendezVousJeuneDetailQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
+import { DateService } from '../../../src/utils/date-service'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -93,14 +86,12 @@ describe('JeunesController', () => {
   let deleteJeuneCommandHandler: StubbedClass<DeleteJeuneCommandHandler>
   let getRendezVousJeuneQueryHandler: StubbedClass<GetRendezVousJeuneQueryHandler>
   let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
-  let getActionsPoleEmploiQueryHandler: StubbedClass<GetDemarchesQueryHandler>
   let getJeuneHomeDemarchesQueryHandler: StubbedClass<GetJeuneHomeDemarchesQueryHandler>
   let getJeuneHomeSuiviQueryHandler: StubbedClass<GetJeuneHomeAgendaQueryHandler>
   let getJeuneHomeAgendaPoleEmploiQueryHandler: StubbedClass<GetJeuneHomeAgendaPoleEmploiQueryHandler>
   let getJeuneHomeActionsQueryHandler: StubbedClass<GetJeuneHomeActionsQueryHandler>
   let updateStatutDemarcheCommandHandler: StubbedClass<UpdateStatutDemarcheCommandHandler>
   let createDemarcheCommandHandler: StubbedClass<CreateDemarcheCommandHandler>
-  let getActionsByJeuneQueryHandler: StubbedClass<GetActionsByJeuneQueryHandler>
   let updateJeuneConfigurationApplicationCommandHandler: StubbedClass<UpdateJeuneConfigurationApplicationCommandHandler>
   let archiverJeuneCommandHandler: StubbedClass<ArchiverJeuneCommandHandler>
   let updateJeunePreferencesCommandHandler: StubbedClass<UpdateJeunePreferencesCommandHandler>
@@ -108,122 +99,56 @@ describe('JeunesController', () => {
   let getAnimationsCollectivesJeuneQueryHandler: StubbedClass<GetAnimationsCollectivesJeuneQueryHandler>
   let getUnRendezVousJeuneQueryHandler: StubbedClass<GetUnRendezVousJeuneQueryHandler>
   let jwtService: StubbedClass<JwtService>
+  let dateService: StubbedClass<DateService>
   let app: INestApplication
 
-  let dateService: StubbedClass<DateService>
   const now = uneDatetime().set({ second: 59, millisecond: 0 })
 
-  beforeEach(async () => {
-    createActionCommandHandler = stubClass(CreateActionCommandHandler)
-    getDetailJeuneQueryHandler = stubClass(GetDetailJeuneQueryHandler)
-    transfererJeunesConseillerCommandHandler = stubClass(
+  before(async () => {
+    app = await getApplicationWithStubbedDependencies()
+    createActionCommandHandler = app.get(CreateActionCommandHandler)
+    getDetailJeuneQueryHandler = app.get(GetDetailJeuneQueryHandler)
+    getConseillersJeuneQueryHandler = app.get(GetConseillersJeuneQueryHandler)
+    transfererJeunesConseillerCommandHandler = app.get(
       TransfererJeunesConseillerCommandHandler
     )
-    deleteJeuneInactifCommandHandler = stubClass(
-      DeleteJeuneInactifCommandHandler
-    )
-    deleteJeuneCommandHandler = stubClass(DeleteJeuneCommandHandler)
-    getConseillersJeuneQueryHandler = stubClass(GetConseillersJeuneQueryHandler)
-    getRendezVousJeunePoleEmploiQueryHandler = stubClass(
+    deleteJeuneInactifCommandHandler = app.get(DeleteJeuneInactifCommandHandler)
+    deleteJeuneCommandHandler = app.get(DeleteJeuneCommandHandler)
+    getRendezVousJeuneQueryHandler = app.get(GetRendezVousJeuneQueryHandler)
+    getRendezVousJeunePoleEmploiQueryHandler = app.get(
       GetRendezVousJeunePoleEmploiQueryHandler
     )
-    getRendezVousJeuneQueryHandler = stubClass(GetRendezVousJeuneQueryHandler)
-    getActionsPoleEmploiQueryHandler = stubClass(GetDemarchesQueryHandler)
-    jwtService = stubClass(JwtService)
-    getRendezVousJeuneQueryHandler = stubClass(GetRendezVousJeuneQueryHandler)
-    getJeuneHomeActionsQueryHandler = stubClass(GetJeuneHomeActionsQueryHandler)
-    getJeuneHomeSuiviQueryHandler = stubClass(GetJeuneHomeAgendaQueryHandler)
-    getJeuneHomeAgendaPoleEmploiQueryHandler = stubClass(
-      GetJeuneHomeAgendaPoleEmploiQueryHandler
-    )
-    getJeuneHomeDemarchesQueryHandler = stubClass(
+    getJeuneHomeDemarchesQueryHandler = app.get(
       GetJeuneHomeDemarchesQueryHandler
     )
-    updateStatutDemarcheCommandHandler = stubClass(
+    getJeuneHomeSuiviQueryHandler = app.get(GetJeuneHomeAgendaQueryHandler)
+    getJeuneHomeAgendaPoleEmploiQueryHandler = app.get(
+      GetJeuneHomeAgendaPoleEmploiQueryHandler
+    )
+    getJeuneHomeActionsQueryHandler = app.get(GetJeuneHomeActionsQueryHandler)
+    updateStatutDemarcheCommandHandler = app.get(
       UpdateStatutDemarcheCommandHandler
     )
-    createDemarcheCommandHandler = stubClass(CreateDemarcheCommandHandler)
-    getActionsByJeuneQueryHandler = stubClass(GetActionsByJeuneQueryHandler)
-    updateJeuneConfigurationApplicationCommandHandler = stubClass(
+    createDemarcheCommandHandler = app.get(CreateDemarcheCommandHandler)
+    updateJeuneConfigurationApplicationCommandHandler = app.get(
       UpdateJeuneConfigurationApplicationCommandHandler
     )
-    archiverJeuneCommandHandler = stubClass(ArchiverJeuneCommandHandler)
-    updateJeunePreferencesCommandHandler = stubClass(
+    archiverJeuneCommandHandler = app.get(ArchiverJeuneCommandHandler)
+    updateJeunePreferencesCommandHandler = app.get(
       UpdateJeunePreferencesCommandHandler
     )
-    getPreferencesJeuneQueryHandler = stubClass(GetPreferencesJeuneQueryHandler)
-    getAnimationsCollectivesJeuneQueryHandler = stubClass(
+    getPreferencesJeuneQueryHandler = app.get(GetPreferencesJeuneQueryHandler)
+    getAnimationsCollectivesJeuneQueryHandler = app.get(
       GetAnimationsCollectivesJeuneQueryHandler
     )
-    getUnRendezVousJeuneQueryHandler = stubClass(
-      GetUnRendezVousJeuneQueryHandler
-    )
-
-    dateService = stubClass(DateService)
+    getUnRendezVousJeuneQueryHandler = app.get(GetUnRendezVousJeuneQueryHandler)
+    jwtService = app.get(JwtService)
+    dateService = app.get(DateService)
     dateService.now.returns(now)
-
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(CreateActionCommandHandler)
-      .useValue(createActionCommandHandler)
-      .overrideProvider(GetDetailJeuneQueryHandler)
-      .useValue(getDetailJeuneQueryHandler)
-      .overrideProvider(GetRendezVousJeuneQueryHandler)
-      .useValue(getRendezVousJeuneQueryHandler)
-      .overrideProvider(TransfererJeunesConseillerCommandHandler)
-      .useValue(transfererJeunesConseillerCommandHandler)
-      .overrideProvider(DeleteJeuneInactifCommandHandler)
-      .useValue(deleteJeuneInactifCommandHandler)
-      .overrideProvider(DeleteJeuneCommandHandler)
-      .useValue(deleteJeuneCommandHandler)
-      .overrideProvider(GetConseillersJeuneQueryHandler)
-      .useValue(getConseillersJeuneQueryHandler)
-      .overrideProvider(GetRendezVousJeunePoleEmploiQueryHandler)
-      .useValue(getRendezVousJeunePoleEmploiQueryHandler)
-      .overrideProvider(GetDemarchesQueryHandler)
-      .useValue(getActionsPoleEmploiQueryHandler)
-      .overrideProvider(GetJeuneHomeActionsQueryHandler)
-      .useValue(getJeuneHomeActionsQueryHandler)
-      .overrideProvider(GetJeuneHomeDemarchesQueryHandler)
-      .useValue(getJeuneHomeDemarchesQueryHandler)
-      .overrideProvider(GetJeuneHomeAgendaQueryHandler)
-      .useValue(getJeuneHomeSuiviQueryHandler)
-      .overrideProvider(UpdateStatutDemarcheCommandHandler)
-      .useValue(updateStatutDemarcheCommandHandler)
-      .overrideProvider(CreateDemarcheCommandHandler)
-      .useValue(createDemarcheCommandHandler)
-      .overrideProvider(GetActionsByJeuneQueryHandler)
-      .useValue(getActionsByJeuneQueryHandler)
-      .overrideProvider(UpdateJeuneConfigurationApplicationCommandHandler)
-      .useValue(updateJeuneConfigurationApplicationCommandHandler)
-      .overrideProvider(ArchiverJeuneCommandHandler)
-      .useValue(archiverJeuneCommandHandler)
-      .overrideProvider(UpdateJeunePreferencesCommandHandler)
-      .useValue(updateJeunePreferencesCommandHandler)
-      .overrideProvider(GetPreferencesJeuneQueryHandler)
-      .useValue(getPreferencesJeuneQueryHandler)
-      .overrideProvider(GetJeuneHomeAgendaPoleEmploiQueryHandler)
-      .useValue(getJeuneHomeAgendaPoleEmploiQueryHandler)
-      .overrideProvider(GetAnimationsCollectivesJeuneQueryHandler)
-      .useValue(getAnimationsCollectivesJeuneQueryHandler)
-      .overrideProvider(GetUnRendezVousJeuneQueryHandler)
-      .useValue(getUnRendezVousJeuneQueryHandler)
-      .overrideProvider(JwtService)
-      .useValue(jwtService)
-      .overrideProvider(DateService)
-      .useValue(dateService)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
   })
 
   beforeEach(() => {
     jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
-  })
-
-  after(async () => {
-    await app.close()
   })
 
   describe('POST /jeunes/transferer', () => {

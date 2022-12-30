@@ -1,5 +1,10 @@
 import { HttpModule } from '@nestjs/axios'
-import { Provider, Type } from '@nestjs/common'
+import {
+  INestApplication,
+  Provider,
+  Type,
+  ValidationPipe
+} from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
 import { TerminusModule } from '@nestjs/terminus'
@@ -23,16 +28,46 @@ import {
 import { DateService } from '../../src/utils/date-service'
 import { unJwtPayloadValide } from '../fixtures/authentification.fixture'
 import { FakeController } from '../infrastructure/auth/fake.controller'
+import { stubClass, stubClassSandbox } from './types'
 import TokenMessage = messaging.TokenMessage
+import { uneDatetime } from '../fixtures/date.fixture'
+import { createSandbox, SinonSandbox } from 'sinon'
 
-export function buildTestingModuleForHttpTesting(): TestingModuleBuilder {
+export function buildTestingModuleForHttpTesting(
+  sandbox: SinonSandbox = createSandbox()
+): TestingModuleBuilder {
   const moduleMetadata = buildModuleMetadata()
   return Test.createTestingModule({
     imports: [HttpModule, ConfigModule.forRoot(), TerminusModule],
-    providers: stubProviders(),
+    providers: stubProviders(sandbox),
     controllers: [...moduleMetadata.controllers!, FakeController]
   })
 }
+
+let applicationForHttpTesting: INestApplication
+let sandbox: SinonSandbox
+
+export const getApplicationWithStubbedDependencies =
+  async (): Promise<INestApplication> => {
+    if (!applicationForHttpTesting) {
+      sandbox = createSandbox()
+      const testingModule = await buildTestingModuleForHttpTesting(sandbox)
+        .overrideProvider(JwtService)
+        .useClass(FakeJwtService)
+        .compile()
+
+      applicationForHttpTesting = testingModule.createNestApplication()
+      applicationForHttpTesting.useGlobalPipes(
+        new ValidationPipe({ whitelist: true })
+      )
+      await applicationForHttpTesting.init()
+    }
+
+    afterEach(() => {
+      sandbox.reset()
+    })
+    return applicationForHttpTesting
+  }
 
 export const testConfig = (): ConfigService => {
   return new ConfigService({
@@ -107,11 +142,15 @@ export const testConfig = (): ConfigService => {
   })
 }
 
-const stubProviders = (): Provider[] => {
+const stubProviders = (sandbox: SinonSandbox): Provider[] => {
+  const dateService = stubClass(DateService)
+  dateService.now.returns(uneDatetime())
+  const jwtService = stubClass(JwtService)
+  jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
   const providers: Provider[] = [
     {
       provide: JwtService,
-      useClass: FakeJwtService
+      useValue: jwtService
     },
     {
       provide: APP_GUARD,
@@ -127,24 +166,18 @@ const stubProviders = (): Provider[] => {
     },
     {
       provide: DateService,
-      useClass: DateService
+      useValue: dateService
     }
   ]
   const queryCommandsProviders = buildQueryCommandsProviders().map(
     (provider: Provider): Provider => {
       return {
         provide: provider as Type,
-        useClass: FakeHandler
+        useValue: stubClassSandbox(provider as Type, sandbox)
       }
     }
   )
   return providers.concat(queryCommandsProviders)
-}
-
-class FakeHandler {
-  execute(): Promise<unknown> {
-    return Promise.resolve(undefined)
-  }
 }
 
 export class FakeJwtService implements IJwtService {

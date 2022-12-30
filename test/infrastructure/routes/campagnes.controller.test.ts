@@ -1,9 +1,5 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
-import {
-  buildTestingModuleForHttpTesting,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { HttpStatus, INestApplication } from '@nestjs/common'
+import { StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { unHeaderAuthorization } from '../../fixtures/authentification.fixture'
 import * as request from 'supertest'
@@ -20,30 +16,18 @@ import {
   ReponsesCampagneInvalide
 } from '../../../src/building-blocks/types/domain-error'
 import { CreateEvaluationCommandHandler } from '../../../src/application/commands/create-evaluation.command'
+import { before } from 'mocha'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('CampagnesController', () => {
   let createCampagneCommandHandler: StubbedClass<CreateCampagneCommandHandler>
   let createEvaluationCommandHandler: StubbedClass<CreateEvaluationCommandHandler>
   let app: INestApplication
 
-  beforeEach(async () => {
-    createCampagneCommandHandler = stubClass(CreateCampagneCommandHandler)
-    createEvaluationCommandHandler = stubClass(CreateEvaluationCommandHandler)
-
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(CreateCampagneCommandHandler)
-      .useValue(createCampagneCommandHandler)
-      .overrideProvider(CreateEvaluationCommandHandler)
-      .useValue(createEvaluationCommandHandler)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
+  before(async () => {
+    app = await getApplicationWithStubbedDependencies()
+    createCampagneCommandHandler = app.get(CreateCampagneCommandHandler)
+    createEvaluationCommandHandler = app.get(CreateEvaluationCommandHandler)
   })
 
   describe('POST /campagnes', () => {

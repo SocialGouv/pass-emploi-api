@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import { GetTypesQualificationsQueryHandler } from 'src/application/queries/get-types-qualifications.query.handler'
 import {
   ActionPredefinieQueryModel,
@@ -24,12 +24,9 @@ import {
   unHeaderAuthorization,
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
-import {
-  buildTestingModuleForHttpTesting,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { StubbedClass, stubClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 import Structure = Core.Structure
 
 let getCommunesEtDepartementsQueryHandler: StubbedClass<GetCommunesEtDepartementsQueryHandler>
@@ -62,29 +59,24 @@ describe('ReferentielsController', () => {
   let app: INestApplication
 
   before(async () => {
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(GetCommunesEtDepartementsQueryHandler)
-      .useValue(getCommunesEtDepartementsQueryHandler)
-      .overrideProvider(GetAgencesQueryHandler)
-      .useValue(getAgencesQueryHandler)
-      .overrideProvider(RechercherTypesDemarcheQueryHandler)
-      .useValue(rechercherTypesDemarcheQueryHandler)
-      .overrideProvider(GetMotifsSuppressionJeuneQueryHandler)
-      .useValue(getMotifsSuppressionCommandHandler)
-      .overrideProvider(GetTypesQualificationsQueryHandler)
-      .useValue(getTypesQualificationsQueryHandler)
-      .overrideProvider(GetMetiersRomeQueryHandler)
-      .useValue(getMetiersRomeQueryHandler)
-      .overrideProvider(GetActionsPredefiniesQueryHandler)
-      .useValue(getActionsPredefiniesQueryHandler)
-      .compile()
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
+    app = await getApplicationWithStubbedDependencies()
+    getCommunesEtDepartementsQueryHandler = app.get(
+      GetCommunesEtDepartementsQueryHandler
+    )
+    getAgencesQueryHandler = app.get(GetAgencesQueryHandler)
+    rechercherTypesDemarcheQueryHandler = app.get(
+      RechercherTypesDemarcheQueryHandler
+    )
+    getMotifsSuppressionCommandHandler = app.get(
+      GetMotifsSuppressionJeuneQueryHandler
+    )
+    getTypesQualificationsQueryHandler = app.get(
+      GetTypesQualificationsQueryHandler
+    )
+    getMetiersRomeQueryHandler = app.get(GetMetiersRomeQueryHandler)
+    getActionsPredefiniesQueryHandler = app.get(
+      GetActionsPredefiniesQueryHandler
+    )
   })
 
   describe('GET /referentiels/communes-et-departements?recherche=abcde', () => {

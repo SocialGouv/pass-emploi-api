@@ -1,10 +1,5 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
-import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { HttpStatus, INestApplication } from '@nestjs/common'
+import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { CreateEvenementCommandHandler } from '../../../src/application/commands/create-evenement.command.handler'
 import { Evenement } from '../../../src/domain/evenement'
@@ -16,26 +11,15 @@ import {
 } from '../../fixtures/authentification.fixture'
 import * as request from 'supertest'
 import { CreateEvenementPayload } from '../../../src/infrastructure/routes/validation/evenements.inputs'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('EvenementsController', () => {
   let createEvenementCommandHandler: StubbedClass<CreateEvenementCommandHandler>
   let app: INestApplication
 
   before(async () => {
-    createEvenementCommandHandler = stubClass(CreateEvenementCommandHandler)
-
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(CreateEvenementCommandHandler)
-      .useValue(createEvenementCommandHandler)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
+    app = await getApplicationWithStubbedDependencies()
+    createEvenementCommandHandler = app.get(CreateEvenementCommandHandler)
   })
 
   describe('POST /evenements', () => {

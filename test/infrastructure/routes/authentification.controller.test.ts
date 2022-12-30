@@ -1,25 +1,21 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
 import {
   UpdateUtilisateurCommand,
   UpdateUtilisateurCommandHandler
 } from '../../../src/application/commands/update-utilisateur.command.handler'
 import {
-  NonTrouveError,
-  ConseillerNonValide
+  ConseillerNonValide,
+  NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
 import { Core } from '../../../src/domain/core'
 import { UpdateUserPayload } from '../../../src/infrastructure/routes/validation/authentification.inputs'
 import { unUtilisateurQueryModel } from '../../fixtures/query-models/authentification.query-model.fixtures'
-import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { expect, StubbedClass, stubClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 let updateUtilisateurCommandHandler: StubbedClass<UpdateUtilisateurCommandHandler>
 
@@ -28,18 +24,8 @@ describe('AuthentificationController', () => {
   let app: INestApplication
 
   before(async () => {
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(UpdateUtilisateurCommandHandler)
-      .useValue(updateUtilisateurCommandHandler)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
+    app = await getApplicationWithStubbedDependencies()
+    updateUtilisateurCommandHandler = app.get(UpdateUtilisateurCommandHandler)
   })
 
   describe('PUT auth/users/:idUtilisateurAuth', () => {

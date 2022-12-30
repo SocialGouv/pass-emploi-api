@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
 import {
   ActionsByJeuneOutput,
@@ -6,42 +6,17 @@ import {
 } from '../../../../src/application/queries/get-actions-by-jeune.query.handler.db'
 import { NonTrouveError } from '../../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../../src/building-blocks/types/result'
-import { JwtService } from '../../../../src/infrastructure/auth/jwt.service'
-import {
-  unHeaderAuthorization,
-  unJwtPayloadValide
-} from '../../../fixtures/authentification.fixture'
-import {
-  buildTestingModuleForHttpTesting,
-  StubbedClass,
-  stubClass
-} from '../../../utils'
+import { unHeaderAuthorization } from '../../../fixtures/authentification.fixture'
+import { StubbedClass } from '../../../utils'
+import { getApplicationWithStubbedDependencies } from '../../../utils/module-for-testing'
 
 describe('JeunesController v2', () => {
   let getActionsByJeuneQueryHandler: StubbedClass<GetActionsByJeuneQueryHandler>
-  let jwtService: StubbedClass<JwtService>
   let app: INestApplication
 
   before(async () => {
-    jwtService = stubClass(JwtService)
-    getActionsByJeuneQueryHandler = stubClass(GetActionsByJeuneQueryHandler)
-
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(GetActionsByJeuneQueryHandler)
-      .useValue(getActionsByJeuneQueryHandler)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  beforeEach(() => {
-    jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
-  })
-
-  after(async () => {
-    await app.close()
+    app = await getApplicationWithStubbedDependencies()
+    getActionsByJeuneQueryHandler = app.get(GetActionsByJeuneQueryHandler)
   })
 
   describe('GET /v2/jeunes/:idJeune/actions', () => {

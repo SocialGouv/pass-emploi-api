@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import { GetRendezVousConseillerPaginesQueryHandler } from 'src/application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
 import * as request from 'supertest'
 import { success } from '../../../../src/building-blocks/types/result'
@@ -6,34 +6,18 @@ import {
   unHeaderAuthorization,
   unUtilisateurDecode
 } from '../../../fixtures/authentification.fixture'
-import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../../utils'
+import { expect, StubbedClass } from '../../../utils'
+import { getApplicationWithStubbedDependencies } from '../../../utils/module-for-testing'
 
 describe('ConseillersControllerV2', () => {
   let app: INestApplication
   let getRendezVousConseillerPaginesQueryHandler: StubbedClass<GetRendezVousConseillerPaginesQueryHandler>
 
   before(async () => {
-    getRendezVousConseillerPaginesQueryHandler = stubClass(
+    app = await getApplicationWithStubbedDependencies()
+    getRendezVousConseillerPaginesQueryHandler = app.get(
       GetRendezVousConseillerPaginesQueryHandler
     )
-
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(GetRendezVousConseillerPaginesQueryHandler)
-      .useValue(getRendezVousConseillerPaginesQueryHandler)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
   })
 
   describe('GET /conseillers/:idConseiller/rendezvous', () => {

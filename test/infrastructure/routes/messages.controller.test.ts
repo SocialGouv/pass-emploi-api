@@ -1,15 +1,10 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
 import {
   unHeaderAuthorization,
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
-import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { emptySuccess } from '../../../src/building-blocks/types/result'
 import {
@@ -17,27 +12,17 @@ import {
   EnvoyerMessageGroupeCommandHandler
 } from '../../../src/application/commands/envoyer-message-groupe.command.handler'
 import { EnvoyerMessagePayload } from '../../../src/infrastructure/routes/validation/messages.input'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
-describe('MessagesController', () => {
+describe('MessagesController', async () => {
   let envoyerMessageGroupeCommandHandler: StubbedClass<EnvoyerMessageGroupeCommandHandler>
   let app: INestApplication
 
   before(async () => {
-    envoyerMessageGroupeCommandHandler = stubClass(
+    app = await getApplicationWithStubbedDependencies()
+    envoyerMessageGroupeCommandHandler = app.get(
       EnvoyerMessageGroupeCommandHandler
     )
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(EnvoyerMessageGroupeCommandHandler)
-      .useValue(envoyerMessageGroupeCommandHandler)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
   })
 
   describe('POST /messages', () => {

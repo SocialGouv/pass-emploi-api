@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import { CreateSuggestionConseillerImmersionCommandHandler } from 'src/application/commands/create-suggestion-conseiller-immersion.command.handler'
 import { CreateSuggestionConseillerServiceCiviqueCommandHandler } from 'src/application/commands/create-suggestion-conseiller-service-civique.command.handler'
 import {
@@ -13,13 +13,9 @@ import {
   unHeaderAuthorization,
   unUtilisateurDecode
 } from '../../fixtures/authentification.fixture'
-import {
-  buildTestingModuleForHttpTesting,
-  expect,
-  StubbedClass,
-  stubClass
-} from '../../utils'
+import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
+import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 const idConseiller = 'id-conseiller'
 
@@ -30,32 +26,16 @@ describe('RecherchesConseillersController', () => {
   let app: INestApplication
 
   before(async () => {
-    createSuggestionDuConseillerCommandHandler = stubClass(
+    app = await getApplicationWithStubbedDependencies()
+    createSuggestionDuConseillerCommandHandler = app.get(
       CreateSuggestionConseillerOffreEmploiCommandHandler
     )
-    createSuggestionConseillerImmersionCommandHandler = stubClass(
+    createSuggestionConseillerImmersionCommandHandler = app.get(
       CreateSuggestionConseillerImmersionCommandHandler
     )
-    createSuggestionConseillerServiceCiviqueCommandHandler = stubClass(
+    createSuggestionConseillerServiceCiviqueCommandHandler = app.get(
       CreateSuggestionConseillerServiceCiviqueCommandHandler
     )
-
-    const testingModule = await buildTestingModuleForHttpTesting()
-      .overrideProvider(CreateSuggestionConseillerOffreEmploiCommandHandler)
-      .useValue(createSuggestionDuConseillerCommandHandler)
-      .overrideProvider(CreateSuggestionConseillerImmersionCommandHandler)
-      .useValue(createSuggestionConseillerImmersionCommandHandler)
-      .overrideProvider(CreateSuggestionConseillerServiceCiviqueCommandHandler)
-      .useValue(createSuggestionConseillerServiceCiviqueCommandHandler)
-      .compile()
-
-    app = testingModule.createNestApplication()
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
-    await app.init()
-  })
-
-  after(async () => {
-    await app.close()
   })
 
   describe('POST /conseillers/:idConseiller/recherches/suggestions/offres-emploi', () => {
