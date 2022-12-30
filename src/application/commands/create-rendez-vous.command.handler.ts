@@ -70,9 +70,7 @@ export class CreateRendezVousCommandHandler extends CommandHandler<
       return failure(new NonTrouveError('Conseiller'))
     }
 
-    const jeunes = await this.jeuneRepository.findAll(command.idsJeunes, {
-      avecConfiguration: true
-    })
+    const jeunes = await this.jeuneRepository.findAll(command.idsJeunes)
 
     if (jeunes.length !== command.idsJeunes.length) {
       return failure(new NonTrouveError('Jeune'))

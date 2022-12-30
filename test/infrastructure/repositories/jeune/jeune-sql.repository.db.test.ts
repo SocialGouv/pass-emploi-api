@@ -76,7 +76,6 @@ describe('JeuneSqlRepository', () => {
     beforeEach(async () => {
       // Given
       jeune = unJeune({
-        configuration: undefined,
         conseiller: unConseillerDuJeune({ idAgence: undefined })
       })
       const conseillerDto = unConseillerDto({
@@ -118,7 +117,6 @@ describe('JeuneSqlRepository', () => {
     beforeEach(async () => {
       // Given
       jeune = unJeune({
-        configuration: undefined,
         conseiller: unConseillerDuJeune({ idAgence: undefined })
       })
       const conseillerDto = unConseillerDto({
@@ -360,7 +358,7 @@ describe('JeuneSqlRepository', () => {
 
     beforeEach(async () => {
       // Given
-      jeune = { ...unJeuneSansConseiller(), configuration: undefined }
+      jeune = { ...unJeuneSansConseiller() }
       await JeuneSqlModel.creer(
         unJeuneDto({
           idConseiller: undefined,
@@ -422,8 +420,7 @@ describe('JeuneSqlRepository', () => {
       it('retourne le jeune avec sa configuration', async () => {
         // When
         const result = await jeuneSqlRepository.getByIdPartenaire(
-          'test-id-dossier',
-          { avecConfiguration: true }
+          'test-id-dossier'
         )
 
         // Then
@@ -650,7 +647,7 @@ describe('JeuneSqlRepository', () => {
               id: 'idConseillerCible',
               idAgence: undefined
             }),
-            configuration: undefined
+            configuration: uneConfiguration({ idJeune: 'unJeuneATransferer' })
           })
 
           // When
@@ -728,7 +725,7 @@ describe('JeuneSqlRepository', () => {
               id: 'idConseillerCible',
               idAgence: undefined
             }),
-            configuration: undefined
+            configuration: uneConfiguration({ idJeune: 'jeune-en-transfert' })
           })
 
           // When

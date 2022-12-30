@@ -5,9 +5,7 @@ import { uneDate, uneDatetime } from './date.fixture'
 
 export const unJeune = (
   args: Partial<Jeune> = {}
-): Required<
-  Omit<Jeune, 'conseillerInitial' | 'configuration' | 'dateFinCEJ'>
-> => {
+): Required<Omit<Jeune, 'conseillerInitial' | 'dateFinCEJ'>> => {
   const defaults = {
     id: 'ABCDE',
     lastName: 'Doe',
@@ -61,7 +59,8 @@ export const unJeuneSansConseiller = (
     structure: Core.Structure.MILO,
     preferences: {
       partageFavoris: true
-    }
+    },
+    configuration: uneConfiguration()
   }
 
   return { ...defaults, ...args }

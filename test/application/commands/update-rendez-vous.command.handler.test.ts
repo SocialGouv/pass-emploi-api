@@ -134,9 +134,7 @@ describe('UpdateRendezVousCommandHandler', () => {
         rendezVousRepository.get
           .withArgs(command.idRendezVous)
           .resolves(rendezVous)
-        jeuneRepository.findAll
-          .withArgs(command.idsJeunes, { avecConfiguration: true })
-          .resolves([jeune])
+        jeuneRepository.findAll.withArgs(command.idsJeunes).resolves([jeune])
 
         rendezVousService.mettreAJour
           .withArgs(rendezVous, { ...command, jeunes: [jeune] })

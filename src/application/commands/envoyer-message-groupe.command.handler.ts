@@ -96,9 +96,7 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
       )
     )
 
-    const jeunes = await this.jeuneRepository.findAll(idsBeneficiairesUniques, {
-      avecConfiguration: true
-    })
+    const jeunes = await this.jeuneRepository.findAll(idsBeneficiairesUniques)
 
     this.notificationService.notifierLesJeunesDuNouveauMessage(jeunes)
 

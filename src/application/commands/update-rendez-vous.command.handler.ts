@@ -73,9 +73,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       return failure(new NonTrouveError('RendezVous', command.idRendezVous))
     }
 
-    const jeunes = await this.jeuneRepository.findAll(command.idsJeunes, {
-      avecConfiguration: true
-    })
+    const jeunes = await this.jeuneRepository.findAll(command.idsJeunes)
 
     if (jeunes.length !== command.idsJeunes?.length) {
       return failure(new NonTrouveError('Jeune'))
@@ -160,9 +158,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
         jeune => jeune.id === idJeune
       )
       if (estUnNouveauJeune) {
-        const jeuneAjoute = await this.jeuneRepository.get(idJeune, {
-          avecConfiguration: true
-        })
+        const jeuneAjoute = await this.jeuneRepository.get(idJeune)
         jeunesAjoutes.push(jeuneAjoute!)
       }
     }

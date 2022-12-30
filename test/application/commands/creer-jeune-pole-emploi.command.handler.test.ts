@@ -83,6 +83,9 @@ describe('CreateJeunePoleEmploiCommandHandler', () => {
         idPartenaire: undefined,
         preferences: {
           partageFavoris: true
+        },
+        configuration: {
+          idJeune: idNouveauJeune
         }
       }
       expect(result).to.deep.equal(success(expectedJeune))

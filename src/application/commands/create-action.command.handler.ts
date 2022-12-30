@@ -51,9 +51,7 @@ export class CreateActionCommandHandler extends CommandHandler<
   }
 
   async handle(command: CreateActionCommand): Promise<Result<string>> {
-    const jeune = await this.jeuneRepository.get(command.idJeune, {
-      avecConfiguration: true
-    })
+    const jeune = await this.jeuneRepository.get(command.idJeune)
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', command.idJeune))
     }
