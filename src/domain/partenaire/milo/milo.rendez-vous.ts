@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { Result } from '../../../building-blocks/types/result'
-import { Jeune } from '../../jeune/jeune'
 import {
   CodeTypeRendezVous,
+  JeuneDuRendezVous,
   RendezVous,
   RendezVous as RendezVousPassEmploi
 } from '../../rendez-vous/rendez-vous'
@@ -71,26 +71,12 @@ export namespace MiloRendezVous {
 
     creerRendezVousPassEmploi(
       rendezVousMilo: MiloRendezVous,
-      jeune: Jeune
+      jeune: JeuneDuRendezVous
     ): RendezVousPassEmploi {
-      const dateTimeDebut = DateTime.fromFormat(
-        rendezVousMilo.dateHeureDebut,
-        MILO_DATE_FORMAT,
-        {
-          zone: jeune.configuration!.fuseauHoraire ?? 'Europe/Paris'
-        }
+      const { dateTimeDebut, duree } = this.getDateEtDuree(
+        rendezVousMilo,
+        jeune
       )
-      let duree = 0
-      if (rendezVousMilo.dateHeureFin) {
-        const dateTimeFin = DateTime.fromFormat(
-          rendezVousMilo.dateHeureFin,
-          MILO_DATE_FORMAT,
-          {
-            zone: jeune.configuration!.fuseauHoraire ?? 'Europe/Paris'
-          }
-        )
-        duree = dateTimeFin.diff(dateTimeDebut, 'minutes').get('minutes')
-      }
       return {
         id: this.idService.uuid(),
         source: Source.MILO,
@@ -129,28 +115,10 @@ export namespace MiloRendezVous {
       rendezVousPassEmploi: RendezVousPassEmploi,
       rendezVousMilo: MiloRendezVous
     ): RendezVousPassEmploi {
-      const dateTimeDebut = DateTime.fromFormat(
-        rendezVousMilo.dateHeureDebut,
-        MILO_DATE_FORMAT,
-        {
-          zone:
-            rendezVousPassEmploi.jeunes[0].configuration!.fuseauHoraire ??
-            'Europe/Paris'
-        }
+      const { dateTimeDebut, duree } = this.getDateEtDuree(
+        rendezVousMilo,
+        rendezVousPassEmploi.jeunes[0]
       )
-      let duree = 0
-      if (rendezVousMilo.dateHeureFin) {
-        const dateTimeFin = DateTime.fromFormat(
-          rendezVousMilo.dateHeureFin!,
-          MILO_DATE_FORMAT,
-          {
-            zone:
-              rendezVousPassEmploi.jeunes[0].configuration!.fuseauHoraire ??
-              'Europe/Paris'
-          }
-        )
-        duree = dateTimeFin.diff(dateTimeDebut, 'minutes').get('minutes')
-      }
       return {
         ...rendezVousPassEmploi,
         titre: rendezVousMilo.titre,
@@ -160,6 +128,34 @@ export namespace MiloRendezVous {
         adresse: rendezVousMilo.adresse,
         modalite: rendezVousMilo.modalite
       }
+    }
+
+    private getDateEtDuree(
+      rendezVousMilo: MiloRendezVous,
+      jeune: JeuneDuRendezVous
+    ): { dateTimeDebut: DateTime; duree: number } {
+      const dateTimeDebut = this.timezonerLaDate(
+        rendezVousMilo.dateHeureDebut,
+        jeune
+      )
+      let duree = 0
+      if (rendezVousMilo.dateHeureFin) {
+        const dateTimeFin = this.timezonerLaDate(
+          rendezVousMilo.dateHeureFin,
+          jeune
+        )
+        duree = dateTimeFin.diff(dateTimeDebut, 'minutes').get('minutes')
+      }
+      return { dateTimeDebut, duree }
+    }
+
+    private timezonerLaDate(
+      dateString: string,
+      jeune: JeuneDuRendezVous
+    ): DateTime {
+      return DateTime.fromFormat(dateString, MILO_DATE_FORMAT, {
+        zone: jeune.configuration!.fuseauHoraire ?? 'Europe/Paris'
+      })
     }
   }
 }
