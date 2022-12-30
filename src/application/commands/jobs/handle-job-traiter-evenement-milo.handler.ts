@@ -66,7 +66,10 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
         job.contenu.objet
       )
 
-    if (!rendezVousMilo) {
+    if (
+      !rendezVousMilo ||
+      job.contenu.type === MiloRendezVous.TypeEvenement.DELETE
+    ) {
       if (rendezVousExistant) {
         await this.rendezVousRepository.delete(rendezVousExistant.id)
         return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_SUPPRIME)
