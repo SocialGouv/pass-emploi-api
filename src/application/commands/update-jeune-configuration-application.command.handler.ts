@@ -43,7 +43,9 @@ export class UpdateJeuneConfigurationApplicationCommandHandler extends CommandHa
   async handle(
     command: UpdateJeuneConfigurationApplicationCommand
   ): Promise<Result> {
-    const jeune = await this.jeuneRepository.get(command.idJeune)
+    const jeune = await this.jeuneRepository.get(command.idJeune, {
+      avecConfiguration: true
+    })
     if (!jeune) {
       return failure(new NonTrouveError(command.idJeune, 'Jeune'))
     }
