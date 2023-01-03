@@ -18,6 +18,7 @@ import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { unJeune } from '../../../fixtures/jeune.fixture'
 import { MiloRendezVous } from '../../../../src/domain/partenaire/milo/milo.rendez-vous'
+import { Notification } from '../../../../src/domain/notification/notification'
 
 describe('HandleJobTraiterEvenementMiloHandler', () => {
   let handler: HandleJobTraiterEvenementMiloHandler
@@ -27,6 +28,7 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let miloRendezVousRepository: StubbedType<MiloRendezVous.Repository>
   let rendezVousMiloFactory: StubbedClass<MiloRendezVous.Factory>
+  let notificationService: StubbedClass<Notification.Service>
 
   const jeune: Jeune = unJeune()
   const idPartenaireBeneficiaire = '123456'
@@ -40,6 +42,7 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
     rendezVousRepository = stubInterface(sandbox)
     miloRendezVousRepository = stubInterface(sandbox)
     rendezVousMiloFactory = stubClass(MiloRendezVous.Factory)
+    notificationService = stubClass(Notification.Service)
 
     handler = new HandleJobTraiterEvenementMiloHandler(
       suiviJobService,
@@ -47,7 +50,8 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
       jeuneRepository,
       rendezVousRepository,
       miloRendezVousRepository,
-      rendezVousMiloFactory
+      rendezVousMiloFactory,
+      notificationService
     )
   })
 
@@ -79,7 +83,7 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
             .resolves(rendezVousMilo)
         })
         describe("quand le rendez vous n'existait pas chez nous", () => {
-          it('crée le rendez-vous en base de données', async () => {
+          it('crée le rendez-vous en base de données et envoie une notif', async () => {
             // Given
             rendezVousRepository.getByIdPartenaire
               .withArgs(evenement.idObjet, evenement.objet)
@@ -97,10 +101,16 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
             expect(
               rendezVousRepository.save
             ).to.have.been.calledOnceWithExactly(rendezVous)
+            expect(
+              notificationService.notifierLesJeunesDuRdv
+            ).to.have.been.calledOnceWithExactly(
+              rendezVous,
+              Notification.Type.NEW_RENDEZVOUS
+            )
           })
         })
         describe('quand le rendez vous existait chez nous', () => {
-          it('le met à jour', async () => {
+          it('le met à jour et envoie une notification', async () => {
             // Given
             const unRendezVousExistant = unRendezVous()
             rendezVousRepository.getByIdPartenaire
@@ -124,6 +134,12 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
             expect(
               rendezVousRepository.save
             ).to.have.been.calledOnceWithExactly(rendezVousModifie)
+            expect(
+              notificationService.notifierLesJeunesDuRdv
+            ).to.have.been.calledOnceWithExactly(
+              rendezVousModifie,
+              Notification.Type.UPDATED_RENDEZVOUS
+            )
           })
         })
       })
@@ -193,6 +209,12 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
             expect(
               rendezVousRepository.delete
             ).to.have.been.calledOnceWithExactly(unRendezVousExistant.id)
+            expect(
+              notificationService.notifierLesJeunesDuRdv
+            ).to.have.been.calledOnceWithExactly(
+              unRendezVousExistant,
+              Notification.Type.DELETED_RENDEZVOUS
+            )
           })
         })
       })

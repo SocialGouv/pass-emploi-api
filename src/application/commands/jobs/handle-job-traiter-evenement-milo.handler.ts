@@ -13,6 +13,7 @@ import {
   MiloRendezVous,
   MiloRendezVousRepositoryToken
 } from '../../../domain/partenaire/milo/milo.rendez-vous'
+import { Notification } from '../../../domain/notification/notification'
 
 @Injectable()
 export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
@@ -28,7 +29,8 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
     private rendezVousRepository: RendezVous.Repository,
     @Inject(MiloRendezVousRepositoryToken)
     private miloRendezVousHttpRepository: MiloRendezVous.Repository,
-    private rendezVousMiloFactory: MiloRendezVous.Factory
+    private rendezVousMiloFactory: MiloRendezVous.Factory,
+    private notificationService: Notification.Service
   ) {
     super(Planificateur.JobType.TRAITER_EVENEMENT_MILO, suiviJobService)
   }
@@ -71,6 +73,10 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
     ) {
       if (rendezVousExistant) {
         await this.rendezVousRepository.delete(rendezVousExistant.id)
+        this.notificationService.notifierLesJeunesDuRdv(
+          rendezVousExistant,
+          Notification.Type.DELETED_RENDEZVOUS
+        )
         return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_SUPPRIME)
       } else {
         return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_INEXISTANT)
@@ -84,6 +90,10 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
           rendezVousMilo
         )
       await this.rendezVousRepository.save(rendezVousMisAJour)
+      this.notificationService.notifierLesJeunesDuRdv(
+        rendezVousMisAJour,
+        Notification.Type.UPDATED_RENDEZVOUS
+      )
       return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_MODIFIE)
     } else {
       const nouveauRendezVous =
@@ -92,6 +102,10 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
           jeune
         )
       await this.rendezVousRepository.save(nouveauRendezVous)
+      this.notificationService.notifierLesJeunesDuRdv(
+        nouveauRendezVous,
+        Notification.Type.NEW_RENDEZVOUS
+      )
       return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_AJOUTE)
     }
   }
