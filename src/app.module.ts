@@ -300,6 +300,7 @@ import {
   MiloRendezVousRepositoryToken
 } from './domain/partenaire/milo/milo.rendez-vous'
 import { MiloJeuneRepositoryToken } from './domain/partenaire/milo/milo.jeune'
+import { HandleJobFakeCommandHandler } from './application/commands/jobs/handle-job-fake.command'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -342,6 +343,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
   ],
   providers: [
     ...buildQueryCommandsProviders(),
+    ...buildJobHandlerProviders(),
     FirebaseClient,
     OidcAuthGuard,
     ApiKeyAuthGuard,
@@ -587,18 +589,12 @@ export function buildQueryCommandsProviders(): Provider[] {
     EvenementService,
     CreateEvenementCommandHandler,
     GetChatSecretsQueryHandler,
-    HandleJobRappelRendezVousCommandHandler,
-    HandleJobRappelActionCommandHandler,
-    HandleJobMailConseillerCommandHandler,
     SynchronizeJobsCommandHandler,
     GetConseillerByEmailQueryHandler,
     TransfererJeunesConseillerCommandHandler,
     InitCronsCommandHandler,
-    HandleJobNotifierNouvellesOffresEmploiCommandHandler,
-    HandleJobRecupererSituationsJeunesMiloCommandHandler,
     GetOffresServicesCiviqueQueryHandler,
     GetDetailOffreServiceCiviqueQueryHandler,
-    HandleNettoyerLesJobsCommandHandler,
     CreerSuperviseursCommandHandler,
     DeleteSuperviseursCommandHandler,
     GetTypesRendezVousQueryHandler,
@@ -614,9 +610,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     UpdateRendezVousCommandHandler,
     GetConseillersJeuneQueryHandler,
     GetAgencesQueryHandler,
-    HandleJobUpdateMailingListConseillerCommandHandler,
     ModifierConseillerCommandHandler,
-    HandleJobNotifierNouveauxServicesCiviqueCommandHandler,
     CreateCampagneCommandHandler,
     GetJeuneHomeDemarchesQueryHandler,
     GetJeuneHomeActionsQueryHandler,
@@ -634,11 +628,9 @@ export function buildQueryCommandsProviders(): Provider[] {
     FindAllOffresServicesCiviqueQueryGetter,
     RecupererJeunesDuConseillerCommandHandler,
     FichierSuppressionAuthorizer,
-    HandleJobNettoyerPiecesJointesCommandHandler,
     ArchiverJeuneCommandHandler,
     GetMotifsSuppressionJeuneQueryHandler,
     GetMotifsSuppressionJeuneV2QueryHandler,
-    HandleJobNettoyerLesDonneesCommandHandler,
     PlanifierExecutionCronCommandHandler,
     UpdateJeunePreferencesCommandHandler,
     GetPreferencesJeuneQueryHandler,
@@ -649,13 +641,11 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetCommentairesActionQueryHandler,
     GetJeuneHomeAgendaQueryHandler,
     GetRendezVousConseillerPaginesQueryHandler,
-    HandleJobNotifierRendezVousPECommandHandler,
     GetTypesQualificationsQueryHandler,
     QualifierActionCommandHandler,
     GetJeuneHomeAgendaPoleEmploiQueryHandler,
     GetDemarchesQueryGetter,
     GetRendezVousJeunePoleEmploiQueryGetter,
-    HandleJobMettreAJourCodesEvenementsCommandHandler,
     GetIndicateursPourConseillerQueryHandler,
     RafraichirSuggestionPoleEmploiCommandHandler,
     GetSuggestionsQueryHandler,
@@ -676,18 +666,36 @@ export function buildQueryCommandsProviders(): Provider[] {
     UpdateListeDeDiffusionCommandHandler,
     DeleteListeDeDiffusionCommandHandler,
     GetDetailListeDeDiffusionQueryHandler,
-    HandleJobAgenceAnimationCollectiveCommandHandler,
-    MonitorJobsCommandHandler,
-    HandleJobMettreAJourLesSegmentsCommandHandler,
-    MonitorJobsCommandHandler,
-    EnvoyerMessageGroupeCommandHandler,
-    MonitorJobsCommandHandler,
-    HandleJobGenererJDDCommandHandler,
     RefreshJddCommandHandler,
-    HandleJobSuivreEvenementsMiloHandler,
-    HandleJobTraiterEvenementMiloHandler
+    EnvoyerMessageGroupeCommandHandler
   ]
 }
+
+export function buildJobHandlerProviders(): Provider[] {
+  return JobHandlerProviders
+}
+
+export const JobHandlerProviders = [
+  HandleNettoyerLesJobsCommandHandler,
+  HandleJobFakeCommandHandler,
+  HandleJobRappelRendezVousCommandHandler,
+  HandleJobRappelActionCommandHandler,
+  HandleJobMailConseillerCommandHandler,
+  HandleJobNotifierNouvellesOffresEmploiCommandHandler,
+  HandleJobRecupererSituationsJeunesMiloCommandHandler,
+  HandleJobAgenceAnimationCollectiveCommandHandler,
+  HandleJobMettreAJourCodesEvenementsCommandHandler,
+  HandleJobNotifierRendezVousPECommandHandler,
+  HandleJobNettoyerPiecesJointesCommandHandler,
+  HandleJobUpdateMailingListConseillerCommandHandler,
+  HandleJobNotifierNouveauxServicesCiviqueCommandHandler,
+  HandleJobNettoyerLesDonneesCommandHandler,
+  HandleJobMettreAJourLesSegmentsCommandHandler,
+  MonitorJobsCommandHandler,
+  HandleJobGenererJDDCommandHandler,
+  HandleJobSuivreEvenementsMiloHandler,
+  HandleJobTraiterEvenementMiloHandler
+]
 
 @Module(buildModuleMetadata())
 export class AppModule {}

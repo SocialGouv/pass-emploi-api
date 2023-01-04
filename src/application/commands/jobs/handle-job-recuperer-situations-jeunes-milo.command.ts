@@ -3,7 +3,7 @@ import { Job } from '../../../building-blocks/types/job'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { isFailure } from '../../../building-blocks/types/result'
 import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
-import { Planificateur } from '../../../domain/planificateur'
+import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 import {
@@ -14,6 +14,7 @@ import {
 const PAGINATION_NOMBRE_DE_JEUNES_MAXIMUM = 100
 
 @Injectable()
+@ProcessJobType(Planificateur.JobType.RECUPERER_SITUATIONS_JEUNES_MILO)
 export class HandleJobRecupererSituationsJeunesMiloCommandHandler extends JobHandler<Job> {
   constructor(
     @Inject(MiloJeuneRepositoryToken)

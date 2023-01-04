@@ -1,55 +1,50 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import {
-  emptySuccess,
-  Result,
-  success
-} from '../../../building-blocks/types/result'
-import { Command } from '../../../building-blocks/types/command'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
-import {
   Notification,
   NotificationRepositoryToken
 } from '../../../domain/notification/notification'
-import { Planificateur } from '../../../domain/planificateur'
+import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
 import {
   RendezVous,
   RendezVousRepositoryToken
 } from '../../../domain/rendez-vous/rendez-vous'
 import { DateService } from '../../../utils/date-service'
+import { JobHandler } from '../../../building-blocks/types/job-handler'
+import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 
-export interface HandleJobRappelRendezVousCommand extends Command {
-  job: Planificateur.Job<Planificateur.JobRendezVous>
-}
-
-export interface HandleJobRappelRendezVousCommandResult {
+interface Stat {
   idJeune: string
   notificationEnvoyee: boolean
 }
 
 @Injectable()
-export class HandleJobRappelRendezVousCommandHandler extends CommandHandler<
-  HandleJobRappelRendezVousCommand,
-  HandleJobRappelRendezVousCommandResult[]
+@ProcessJobType(Planificateur.JobType.RENDEZVOUS)
+export class HandleJobRappelRendezVousCommandHandler extends JobHandler<
+  Planificateur.Job<Planificateur.JobRendezVous>
 > {
   constructor(
+    @Inject(SuiviJobServiceToken)
+    suiviJobService: SuiviJob.Service,
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,
     private dateService: DateService
   ) {
-    super('HandleJobRappelRendezVousCommandHandler')
+    super(Planificateur.JobType.RENDEZVOUS, suiviJobService)
   }
 
   async handle(
-    command: HandleJobRappelRendezVousCommand
-  ): Promise<Result<HandleJobRappelRendezVousCommandResult[]>> {
+    job: Planificateur.Job<Planificateur.JobRendezVous>
+  ): Promise<SuiviJob> {
+    const debut = this.dateService.now()
+
     const rendezVous = await this.rendezVousRepository.get(
-      command.job.contenu.idRendezVous
+      job.contenu.idRendezVous
     )
 
-    const stats: HandleJobRappelRendezVousCommandResult[] = []
+    const stats: Stat[] = []
 
     if (rendezVous) {
       await Promise.all(
@@ -59,7 +54,7 @@ export class HandleJobRappelRendezVousCommandHandler extends CommandHandler<
           } else {
             const notification = Notification.creerNotificationRappelRdv(
               jeune.configuration.pushNotificationToken,
-              command.job.contenu.idRendezVous,
+              job.contenu.idRendezVous,
               DateTime.fromJSDate(rendezVous.date),
               this.dateService
             )
@@ -71,15 +66,13 @@ export class HandleJobRappelRendezVousCommandHandler extends CommandHandler<
         })
       )
     }
-
-    return success(stats)
-  }
-
-  async authorize(): Promise<Result> {
-    return emptySuccess()
-  }
-
-  async monitor(): Promise<void> {
-    return
+    return {
+      jobType: this.jobType,
+      dateExecution: debut,
+      resultat: stats,
+      succes: true,
+      nbErreurs: 0,
+      tempsExecution: DateService.calculerTempsExecution(debut)
+    }
   }
 }

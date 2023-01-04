@@ -10,13 +10,13 @@ import {
 } from '../../../domain/jeune/jeune'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { Job } from '../../../building-blocks/types/job'
-import { Planificateur } from '../../../domain/planificateur'
+import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
 import Type = Notification.Type
-import JobType = Planificateur.JobType
 
 const NOMBRE_JEUNES_EN_PARALLELE = 20
 
 @Injectable()
+@ProcessJobType(Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE)
 export class HandleJobNotifierRendezVousPECommandHandler extends JobHandler<Job> {
   constructor(
     private poleEmploiClient: PoleEmploiClient,
@@ -27,7 +27,7 @@ export class HandleJobNotifierRendezVousPECommandHandler extends JobHandler<Job>
     @Inject(JeunePoleEmploiRepositoryToken)
     private jeunePoleEmploiRepository: Jeune.PoleEmploi.Repository
   ) {
-    super(JobType.NOTIFIER_RENDEZVOUS_PE, suiviJobService)
+    super(Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE, suiviJobService)
   }
 
   async handle(): Promise<SuiviJob> {

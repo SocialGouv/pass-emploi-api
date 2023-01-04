@@ -1,26 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common'
-import {
-  emptySuccess,
-  isSuccess,
-  Result,
-  success
-} from '../../../building-blocks/types/result'
+import { isSuccess } from '../../../building-blocks/types/result'
 import { Action, ActionsRepositoryToken } from '../../../domain/action/action'
 import {
   Jeune,
   JeuneConfigurationApplicationRepositoryToken
 } from '../../../domain/jeune/jeune'
-import { Command } from '../../../building-blocks/types/command'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
   Notification,
   NotificationRepositoryToken
 } from '../../../domain/notification/notification'
-import { Planificateur } from '../../../domain/planificateur'
-
-export interface HandleJobRappelActionCommand extends Command {
-  job: Planificateur.Job<Planificateur.JobRappelAction>
-}
+import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
+import { JobHandler } from '../../../building-blocks/types/job-handler'
+import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
+import { DateService } from '../../../utils/date-service'
 
 export interface HandleJobRappelActionCommandResult {
   idAction?: string
@@ -30,9 +22,9 @@ export interface HandleJobRappelActionCommandResult {
 }
 
 @Injectable()
-export class HandleJobRappelActionCommandHandler extends CommandHandler<
-  HandleJobRappelActionCommand,
-  HandleJobRappelActionCommandResult
+@ProcessJobType(Planificateur.JobType.RAPPEL_ACTION)
+export class HandleJobRappelActionCommandHandler extends JobHandler<
+  Planificateur.Job<Planificateur.JobRappelAction>
 > {
   constructor(
     @Inject(ActionsRepositoryToken)
@@ -41,15 +33,20 @@ export class HandleJobRappelActionCommandHandler extends CommandHandler<
     private jeuneConfigurationApplicationRepository: Jeune.ConfigurationApplication.Repository,
     @Inject(NotificationRepositoryToken)
     private notificationRepository: Notification.Repository,
-    private actionFactory: Action.Factory
+    private actionFactory: Action.Factory,
+    @Inject(SuiviJobServiceToken)
+    suiviJobService: SuiviJob.Service,
+    private dateService: DateService
   ) {
-    super('HandleJobRappelActionCommandHandler')
+    super(Planificateur.JobType.RAPPEL_ACTION, suiviJobService)
   }
 
   async handle(
-    command: HandleJobRappelActionCommand
-  ): Promise<Result<HandleJobRappelActionCommandResult>> {
-    const action = await this.actionRepository.get(command.job.contenu.idAction)
+    job: Planificateur.Job<Planificateur.JobRappelAction>
+  ): Promise<SuiviJob> {
+    const maintenant = this.dateService.now()
+
+    const action = await this.actionRepository.get(job.contenu.idAction)
 
     const stats: HandleJobRappelActionCommandResult = {
       notificationEnvoyee: false
@@ -69,7 +66,7 @@ export class HandleJobRappelActionCommandHandler extends CommandHandler<
         if (configuration && configuration.pushNotificationToken) {
           const notification = Notification.creerNotificationRappelAction(
             configuration.pushNotificationToken,
-            command.job.contenu.idAction
+            job.contenu.idAction
           )
           if (notification) {
             await this.notificationRepository.send(notification)
@@ -80,15 +77,13 @@ export class HandleJobRappelActionCommandHandler extends CommandHandler<
         stats.raison = result.error.message
       }
     }
-
-    return success(stats)
-  }
-
-  async authorize(): Promise<Result> {
-    return emptySuccess()
-  }
-
-  async monitor(): Promise<void> {
-    return
+    return {
+      jobType: this.jobType,
+      nbErreurs: 0,
+      succes: true,
+      dateExecution: maintenant,
+      tempsExecution: DateService.calculerTempsExecution(maintenant),
+      resultat: stats
+    }
   }
 }

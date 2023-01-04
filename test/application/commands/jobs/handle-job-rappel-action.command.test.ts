@@ -1,7 +1,4 @@
-import {
-  HandleJobRappelActionCommand,
-  HandleJobRappelActionCommandHandler
-} from '../../../../src/application/commands/jobs/handle-job-rappel-action.command'
+import { HandleJobRappelActionCommandHandler } from '../../../../src/application/commands/jobs/handle-job-rappel-action.command'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { Notification } from '../../../../src/domain/notification/notification'
@@ -14,10 +11,11 @@ import { uneAction } from '../../../fixtures/action.fixture'
 import { uneConfiguration } from '../../../fixtures/jeune.fixture'
 import {
   emptySuccess,
-  failure,
-  success
+  failure
 } from '../../../../src/building-blocks/types/result'
 import { PasDeRappelError } from '../../../../src/building-blocks/types/domain-error'
+import { DateService } from '../../../../src/utils/date-service'
+import { SuiviJob } from '../../../../src/domain/suivi-job'
 
 describe('HandleJobRappelActionCommandHandler', () => {
   let handleJobRappelActionCommandHandler: HandleJobRappelActionCommandHandler
@@ -25,6 +23,8 @@ describe('HandleJobRappelActionCommandHandler', () => {
   let jeuneConfigurationApplicationRepository: StubbedType<Jeune.ConfigurationApplication.Repository>
   let notificationRepository: StubbedType<Notification.Repository>
   let actionFactory: StubbedClass<Action.Factory>
+  let dateService: StubbedClass<DateService>
+  let suiviJobService: StubbedType<SuiviJob.Service>
 
   beforeEach(() => {
     const sandbox = createSandbox()
@@ -32,24 +32,28 @@ describe('HandleJobRappelActionCommandHandler', () => {
     jeuneConfigurationApplicationRepository = stubInterface(sandbox)
     notificationRepository = stubInterface(sandbox)
     actionFactory = stubClass(Action.Factory)
+    suiviJobService = stubInterface(sandbox)
+    dateService = stubClass(DateService)
+    dateService.now.returns(uneDatetime())
+
     handleJobRappelActionCommandHandler =
       new HandleJobRappelActionCommandHandler(
         actionRepository,
         jeuneConfigurationApplicationRepository,
         notificationRepository,
-        actionFactory
+        actionFactory,
+        suiviJobService,
+        dateService
       )
   })
 
   describe('handle', () => {
     const action = uneAction()
-    const command: HandleJobRappelActionCommand = {
-      job: {
-        type: Planificateur.JobType.RAPPEL_ACTION,
-        dateExecution: uneDatetime().toJSDate(),
-        contenu: {
-          idAction: action.id
-        }
+    const job: Planificateur.Job<Planificateur.JobRappelAction> = {
+      type: Planificateur.JobType.RAPPEL_ACTION,
+      dateExecution: uneDatetime().toJSDate(),
+      contenu: {
+        idAction: action.id
       }
     }
 
@@ -66,18 +70,16 @@ describe('HandleJobRappelActionCommandHandler', () => {
             .resolves(uneConfiguration())
 
           // When
-          const result = await handleJobRappelActionCommandHandler.handle(
-            command
-          )
+          const result = await handleJobRappelActionCommandHandler.handle(job)
 
           // Then
-          expect(result).to.deep.equal(
-            success({
-              idAction: action.id,
-              idJeune: action.idJeune,
-              notificationEnvoyee: true
-            })
-          )
+          expect(result.succes).to.equal(true)
+          expect(result.resultat).to.deep.equal({
+            idAction: action.id,
+            idJeune: action.idJeune,
+            notificationEnvoyee: true
+          })
+
           expect(notificationRepository.send).to.have.been.calledWithExactly({
             token: uneConfiguration().pushNotificationToken,
             notification: {
@@ -106,18 +108,15 @@ describe('HandleJobRappelActionCommandHandler', () => {
             })
 
           // When
-          const result = await handleJobRappelActionCommandHandler.handle(
-            command
-          )
+          const result = await handleJobRappelActionCommandHandler.handle(job)
 
           // Then
-          expect(result).to.deep.equal(
-            success({
-              idAction: action.id,
-              idJeune: action.idJeune,
-              notificationEnvoyee: false
-            })
-          )
+          expect(result.succes).to.equal(true)
+          expect(result.resultat).to.deep.equal({
+            idAction: action.id,
+            idJeune: action.idJeune,
+            notificationEnvoyee: false
+          })
           expect(notificationRepository.send).not.to.have.been.called()
         })
       })
@@ -138,17 +137,16 @@ describe('HandleJobRappelActionCommandHandler', () => {
           )
 
         // When
-        const result = await handleJobRappelActionCommandHandler.handle(command)
+        const result = await handleJobRappelActionCommandHandler.handle(job)
 
         // Then
-        expect(result).to.deep.equal(
-          success({
-            idAction: '721e2108-60f5-4a75-b102-04fe6a40e899',
-            notificationEnvoyee: false,
-            raison:
-              "Pas de rappel à envoyer pour l'action 721e2108-60f5-4a75-b102-04fe6a40e899 car l'action n'arrive pas à échéance dans 3 jours"
-          })
-        )
+        expect(result.succes).to.equal(true)
+        expect(result.resultat).to.deep.equal({
+          idAction: '721e2108-60f5-4a75-b102-04fe6a40e899',
+          notificationEnvoyee: false,
+          raison:
+            "Pas de rappel à envoyer pour l'action 721e2108-60f5-4a75-b102-04fe6a40e899 car l'action n'arrive pas à échéance dans 3 jours"
+        })
         expect(notificationRepository.send).not.to.have.been.called()
       })
     })
@@ -159,14 +157,13 @@ describe('HandleJobRappelActionCommandHandler', () => {
         actionRepository.get.withArgs(action.id).resolves(undefined)
 
         // When
-        const result = await handleJobRappelActionCommandHandler.handle(command)
+        const result = await handleJobRappelActionCommandHandler.handle(job)
 
         // Then
-        expect(result).to.deep.equal(
-          success({
-            notificationEnvoyee: false
-          })
-        )
+        expect(result.succes).to.equal(true)
+        expect(result.resultat).to.deep.equal({
+          notificationEnvoyee: false
+        })
         expect(notificationRepository.send).not.to.have.been.called()
       })
     })

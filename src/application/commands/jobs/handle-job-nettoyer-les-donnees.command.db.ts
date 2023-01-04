@@ -3,13 +3,14 @@ import { Job } from 'bull'
 import { DateTime } from 'luxon'
 import { Op, WhereOptions } from 'sequelize'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
-import { Planificateur } from '../../../domain/planificateur'
+import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { ArchiveJeuneSqlModel } from '../../../infrastructure/sequelize/models/archive-jeune.sql-model'
 import { LogApiPartenaireSqlModel } from '../../../infrastructure/sequelize/models/log-api-partenaire.sql-model'
 import { DateService } from '../../../utils/date-service'
 
 @Injectable()
+@ProcessJobType(Planificateur.JobType.NETTOYER_LES_DONNEES)
 export class HandleJobNettoyerLesDonneesCommandHandler extends JobHandler<Job> {
   constructor(
     private dateService: DateService,

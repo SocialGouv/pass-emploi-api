@@ -2,12 +2,13 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Job } from '../../../building-blocks/types/job'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { Fichier, FichierRepositoryToken } from '../../../domain/fichier'
-import { Planificateur } from '../../../domain/planificateur'
+import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 import { buildError } from '../../../utils/logger.module'
 
 @Injectable()
+@ProcessJobType(Planificateur.JobType.NETTOYER_LES_PIECES_JOINTES)
 export class HandleJobNettoyerPiecesJointesCommandHandler extends JobHandler<Job> {
   constructor(
     @Inject(FichierRepositoryToken)

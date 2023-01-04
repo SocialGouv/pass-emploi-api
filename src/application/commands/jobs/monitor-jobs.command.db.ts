@@ -4,7 +4,11 @@ import { DateTime } from 'luxon'
 import { Op } from 'sequelize'
 import { Job } from '../../../building-blocks/types/job'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
-import { listeCronJobs, Planificateur } from '../../../domain/planificateur'
+import {
+  listeCronJobs,
+  Planificateur,
+  ProcessJobType
+} from '../../../domain/planificateur'
 import {
   RapportJob24h,
   SuiviJob,
@@ -14,6 +18,7 @@ import { SuiviJobSqlModel } from '../../../infrastructure/sequelize/models/suivi
 import { DateService } from '../../../utils/date-service'
 
 @Injectable()
+@ProcessJobType(Planificateur.JobType.MONITORER_JOBS)
 export class MonitorJobsCommandHandler extends JobHandler<Job> {
   constructor(
     private dateService: DateService,

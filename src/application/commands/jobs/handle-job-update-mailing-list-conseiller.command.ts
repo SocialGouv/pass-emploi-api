@@ -8,11 +8,12 @@ import {
   MailRepositoryToken,
   MailServiceToken
 } from '../../../domain/mail'
-import { Planificateur } from '../../../domain/planificateur'
+import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 
 @Injectable()
+@ProcessJobType(Planificateur.JobType.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS)
 export class HandleJobUpdateMailingListConseillerCommandHandler extends JobHandler<Job> {
   private mailingLists: { poleEmploi: string; milo: string }
 

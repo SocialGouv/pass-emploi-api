@@ -4,7 +4,8 @@ import { JobHandler } from '../../../building-blocks/types/job-handler'
 import {
   Planificateur,
   PlanificateurRepositoryToken,
-  PlanificateurService
+  PlanificateurService,
+  ProcessJobType
 } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
@@ -14,6 +15,7 @@ import {
 } from '../../../domain/partenaire/milo/milo.rendez-vous'
 
 @Injectable()
+@ProcessJobType(Planificateur.JobType.SUIVRE_EVENEMENTS_MILO)
 export class HandleJobSuivreEvenementsMiloHandler extends JobHandler<Job> {
   constructor(
     @Inject(SuiviJobServiceToken)

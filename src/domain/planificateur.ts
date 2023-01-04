@@ -240,3 +240,9 @@ export class PlanificateurService {
     await this.planificateurRepository.creerJob(job, jobId)
   }
 }
+
+export function ProcessJobType(type: Planificateur.JobType): ClassDecorator {
+  return function (target) {
+    Reflect.defineMetadata('jobType', type, target)
+  }
+}
