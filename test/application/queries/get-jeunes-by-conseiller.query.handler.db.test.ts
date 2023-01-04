@@ -5,7 +5,6 @@ import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseill
 import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { SituationsMiloSqlModel } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
-import { TransfertConseillerSqlModel } from 'src/infrastructure/sequelize/models/transfert-conseiller.sql-model'
 import {
   uneDatetime,
   uneDatetimeMoinsRecente
@@ -178,9 +177,9 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       const idJeune = '1'
       const jeune = unJeuneDto({
         id: idJeune,
-        idConseiller: idConseillerCible
+        idConseiller: idConseillerCible,
+        idConseillerInitial: idDernierConseillerPrecedent
       })
-      const dateTransfert = uneDatetime().toJSDate()
       await ConseillerSqlModel.creer(
         unConseillerDto({
           id: idConseillerSource,
@@ -200,20 +199,6 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         })
       )
       await JeuneSqlModel.creer(jeune)
-      await TransfertConseillerSqlModel.create({
-        id: '39d6cbf4-8507-11ec-a8a3-0242ac120002',
-        idConseillerSource,
-        idConseillerCible,
-        idJeune,
-        dateTransfert
-      })
-      await TransfertConseillerSqlModel.create({
-        id: '39d6cbf4-8507-11ec-a8a3-0242ac120003',
-        idConseillerSource: idDernierConseillerPrecedent,
-        idConseillerCible,
-        idJeune,
-        dateTransfert: uneDatetime().plus({ week: 1 }).toJSDate()
-      })
 
       // When
       const actual = await getJeunesByConseillerQueryHandler.handle({
@@ -229,7 +214,8 @@ describe('GetJeunesByConseillerQueryHandler', () => {
               email: '43@43.com',
               nom: 'Tavernier',
               prenom: 'Nils'
-            }
+            },
+            isReaffectationTemporaire: true
           }
         ])
       )
@@ -253,25 +239,6 @@ describe('GetJeunesByConseillerQueryHandler', () => {
             id: idJeune,
             situationCourante: situationsDuJeune.situationCourante ?? undefined
           })
-        ])
-      )
-    })
-    it("retourne les jeunes d'un conseiller avec l'information de réaffectation temporaire", async () => {
-      // Given
-      await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
-      await ConseillerSqlModel.creer(unConseillerDto({ id: '41' }))
-      await JeuneSqlModel.creer(
-        unJeuneDto({ idConseiller, idConseillerInitial: '41' })
-      )
-
-      // When
-      const actual = await getJeunesByConseillerQueryHandler.handle({
-        idConseiller
-      })
-      // Then
-      expect(actual).to.deep.equal(
-        success([
-          unDetailJeuneConseillerQueryModel({ isReaffectationTemporaire: true })
         ])
       )
     })
