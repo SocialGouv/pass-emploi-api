@@ -38,7 +38,7 @@ export class ActionMiloHttpRepository implements MiloAction.Repository {
       }
       await firstValueFrom(
         this.httpService.post<string>(
-          `${this.apiUrl}/dossiers/${action.idDossier}/situation`,
+          `${this.apiUrl}/sue/dossiers/${action.idDossier}/situation`,
           body,
           { headers: { 'X-Gravitee-Api-Key': `${this.apiKey}` } }
         )

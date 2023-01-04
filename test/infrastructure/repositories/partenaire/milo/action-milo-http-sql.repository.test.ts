@@ -25,7 +25,7 @@ describe('MiloHttpSqlRepository', () => {
       it('renvoie une failure', async () => {
         // Given
         nock('https://milo.com')
-          .post('/dossiers/idDossier/situation')
+          .post('/sue/dossiers/idDossier/situation')
           .reply(404, {
             message: 'un message'
           })
@@ -45,7 +45,7 @@ describe('MiloHttpSqlRepository', () => {
       it('crée une SNP', async () => {
         // Given
         nock('https://milo.com')
-          .post('/dossiers/idDossier/situation', {
+          .post('/sue/dossiers/idDossier/situation', {
             dateDebut: '2022-03-01',
             dateFinReelle: '2022-03-01',
             commentaire: "Contenu de l'action - Commentaire de l'action",

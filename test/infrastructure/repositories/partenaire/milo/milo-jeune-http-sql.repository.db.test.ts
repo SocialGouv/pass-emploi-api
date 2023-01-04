@@ -65,7 +65,7 @@ describe('MiloHttpRepository', () => {
       it('renvoie le dossier', async () => {
         // Given
         nock('https://milo.com')
-          .get('/dossiers/1')
+          .get('/sue/dossiers/1')
           .reply(200, JSON.stringify(dossierDto()))
           .isDone()
 
@@ -98,7 +98,7 @@ describe('MiloHttpRepository', () => {
       it("renvoie l'erreur", async () => {
         // Given
         nock('https://milo.com')
-          .get('/dossiers/1')
+          .get('/sue/dossiers/1')
           .reply(404, {
             message: 'un message'
           })
@@ -120,7 +120,10 @@ describe('MiloHttpRepository', () => {
       describe("l'api ne retourne pas de sub", () => {
         it("le crée chez Milo sans retourner l'id", async () => {
           // Given
-          nock('https://milo.com').post('/compte-jeune/1').reply(204).isDone()
+          nock('https://milo.com')
+            .post('/sue/compte-jeune/1')
+            .reply(204)
+            .isDone()
 
           // When
           const dossier = await miloHttpSqlRepository.creerJeune('1')
@@ -138,7 +141,7 @@ describe('MiloHttpRepository', () => {
         it("le crée chez Milo et retourne l'id", async () => {
           // Given
           nock('https://milo.com')
-            .post('/compte-jeune/1')
+            .post('/sue/compte-jeune/1')
             .reply(201, 'un-id-keycloak', { 'content-type': 'text/plain' })
             .isDone()
 
@@ -161,7 +164,7 @@ describe('MiloHttpRepository', () => {
           it('renvoie un succès avec le sub', async () => {
             // Given
             nock('https://milo.com')
-              .post('/compte-jeune/1')
+              .post('/sue/compte-jeune/1')
               .reply(400, {
                 code: 'SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT',
                 'id-keycloak': 'mon-sub'
@@ -184,7 +187,7 @@ describe('MiloHttpRepository', () => {
           it('renvoie un échec', async () => {
             // Given
             nock('https://milo.com')
-              .post('/compte-jeune/1')
+              .post('/sue/compte-jeune/1')
               .reply(400, {
                 code: 'SUE_RECORD_ALREADY_ATTACHED_TO_ACCOUNT',
                 message: 'le mail est pas bon john'

@@ -38,7 +38,7 @@ export class MiloJeuneHttpSqlRepository implements MiloJeune.Repository {
       await this.rateLimiterService.getDossierMilo.attendreLaProchaineDisponibilite()
       const dossierDto = await firstValueFrom(
         this.httpService.get<DossierMiloDto>(
-          `${this.apiUrl}/dossiers/${idDossier}`,
+          `${this.apiUrl}/sue/dossiers/${idDossier}`,
           {
             headers: { 'X-Gravitee-Api-Key': `${this.apiKeyDossier}` }
           }
@@ -84,7 +84,7 @@ export class MiloJeuneHttpSqlRepository implements MiloJeune.Repository {
     try {
       const response = await firstValueFrom(
         this.httpService.post<string>(
-          `${this.apiUrl}/compte-jeune/${idDossier}`,
+          `${this.apiUrl}/sue/compte-jeune/${idDossier}`,
           {},
           { headers: { 'X-Gravitee-Api-Key': `${this.apiKeyCreerJeune}` } }
         )
