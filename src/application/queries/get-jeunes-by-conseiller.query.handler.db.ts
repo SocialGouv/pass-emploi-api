@@ -77,26 +77,18 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
                  jeune.id_authentification,
                  jeune.id_conseiller_initial,
                  MAX(evenement_engagement.date_evenement) as date_evenement,
-                 conseiller.email                         as email_conseiller_precedent,
-                 conseiller.prenom                        as prenom_conseiller_precedent,
-                 conseiller.nom                           as nom_conseiller_precedent,
+                 conseiller_initial.email                         as email_conseiller_precedent,
+                 conseiller_initial.prenom                        as prenom_conseiller_precedent,
+                 conseiller_initial.nom                           as nom_conseiller_precedent,
                  situations_milo.situation_courante       as situation_courante
           FROM jeune
                    LEFT JOIN evenement_engagement
                              ON evenement_engagement.id_utilisateur = jeune.id AND
                                 evenement_engagement.type_utilisateur = '${Authentification.Type.JEUNE}'
-                   LEFT JOIN transfert_conseiller
-                             ON transfert_conseiller.id = (SELECT transfert_conseiller.id
-                                                           FROM transfert_conseiller
-                                                           WHERE transfert_conseiller.id_jeune = jeune.id
-                                                             AND transfert_conseiller.id_conseiller_cible = jeune.id_conseiller
-                                                           ORDER BY transfert_conseiller.date_transfert DESC
-                                                           LIMIT 1
-                             )
-                   LEFT JOIN conseiller ON conseiller.id = transfert_conseiller.id_conseiller_source
+                   LEFT JOIN conseiller as conseiller_initial ON conseiller_initial.id = jeune.id_conseiller_initial
                    LEFT JOIN situations_milo ON situations_milo.id_jeune = jeune.id
           WHERE jeune.id_conseiller = :idConseiller
-          GROUP BY jeune.id, transfert_conseiller.id, conseiller.id, jeune.prenom, jeune.nom, situations_milo.situation_courante
+          GROUP BY jeune.id, conseiller_initial.id, conseiller_initial.email, jeune.prenom, jeune.nom, situations_milo.situation_courante
           ORDER BY jeune.prenom ASC, jeune.nom ASC
       `,
       {
