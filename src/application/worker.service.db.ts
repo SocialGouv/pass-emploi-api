@@ -1,33 +1,19 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Inject, Injectable, Logger, Type } from '@nestjs/common'
 import * as apm from 'elastic-apm-node'
 import {
   Planificateur,
-  PlanificateurRepositoryToken
+  PlanificateurRepositoryToken,
+  PlanificateurService
 } from '../domain/planificateur'
 import { getAPMInstance } from '../infrastructure/monitoring/apm.init'
 import {
   getWorkerTrackingServiceInstance,
   WorkerTrackingService
 } from '../infrastructure/monitoring/worker.tracking.service'
-import { HandleJobMailConseillerCommandHandler } from './commands/jobs/handle-job-mail-conseiller.command'
-import { HandleNettoyerLesJobsCommandHandler } from './commands/jobs/handle-job-nettoyer-les-jobs.command'
-import { HandleJobNettoyerPiecesJointesCommandHandler } from './commands/jobs/handle-job-nettoyer-pieces-jointes.command'
-import { HandleJobNotifierNouveauxServicesCiviqueCommandHandler } from './commands/jobs/handle-job-notification-recherche-service-civique.command.handler'
-import { HandleJobNotifierNouvellesOffresEmploiCommandHandler } from './commands/jobs/handle-job-notifier-nouvelles-offres-emploi.command'
-import { HandleJobRappelActionCommandHandler } from './commands/jobs/handle-job-rappel-action.command'
-import { HandleJobRappelRendezVousCommandHandler } from './commands/jobs/handle-job-rappel-rendez-vous.command'
-import { HandleJobRecupererSituationsJeunesMiloCommandHandler } from './commands/jobs/handle-job-recuperer-situations-jeunes-milo.command'
-import { HandleJobUpdateMailingListConseillerCommandHandler } from './commands/jobs/handle-job-update-mailing-list-conseiller.command'
-import { HandleJobNotifierRendezVousPECommandHandler } from './commands/jobs/handle-job-notifier-rendez-vous-pe.command'
-import { HandleJobMettreAJourCodesEvenementsCommandHandler } from './commands/jobs/handle-job-mettre-a-jour-codes-evenements.command'
-import { HandleJobNettoyerLesDonneesCommandHandler } from './commands/jobs/handle-job-nettoyer-les-donnees.command.db'
-import { HandleJobAgenceAnimationCollectiveCommandHandler } from './commands/jobs/handle-job-agence-animation-collective.command.db'
-import { MonitorJobsCommandHandler } from './commands/jobs/monitor-jobs.command.db'
-import { HandleJobMettreAJourLesSegmentsCommandHandler } from './commands/jobs/handle-job-mettre-a-jour-les-segments.command.db'
-import { HandleJobGenererJDDCommandHandler } from './commands/jobs/handle-job-generer-jdd.handler'
-import { HandleJobSuivreEvenementsMiloHandler } from './commands/jobs/handle-job-suivre-evenements-milo.handler'
-import { HandleJobTraiterEvenementMiloHandler } from './commands/jobs/handle-job-traiter-evenement-milo.handler'
 import { SuiviJob } from '../domain/suivi-job'
+import { ModuleRef } from '@nestjs/core'
+import { JobHandler } from '../building-blocks/types/job-handler'
+import { JobHandlerProviders } from '../app.module'
 
 @Injectable()
 export class WorkerService {
@@ -38,24 +24,8 @@ export class WorkerService {
   constructor(
     @Inject(PlanificateurRepositoryToken)
     private planificateurRepository: Planificateur.Repository,
-    private handlerJobRendezVousCommandHandler: HandleJobRappelRendezVousCommandHandler,
-    private handlerJobRappelActionCommandHandler: HandleJobRappelActionCommandHandler,
-    private handleJobMailConseillerCommandHandler: HandleJobMailConseillerCommandHandler,
-    private handleJobNotifierNouvellesOffresEmploiCommandHandler: HandleJobNotifierNouvellesOffresEmploiCommandHandler,
-    private handleNettoyerLesJobsCommandHandler: HandleNettoyerLesJobsCommandHandler,
-    private handleJobUpdateMailingListConseillerCommandHandler: HandleJobUpdateMailingListConseillerCommandHandler,
-    private handleJobNotifierNouveauxServicesCiviqueCommandHandler: HandleJobNotifierNouveauxServicesCiviqueCommandHandler,
-    private handleJobRecupererSituationsJeunesMiloCommandHandler: HandleJobRecupererSituationsJeunesMiloCommandHandler,
-    private handleJobNettoyerPiecesJointesCommandHandler: HandleJobNettoyerPiecesJointesCommandHandler,
-    private handleJobNettoyerLesDonneesCommandHandler: HandleJobNettoyerLesDonneesCommandHandler,
-    private handleJobNotifierRendezVousPECommandHandler: HandleJobNotifierRendezVousPECommandHandler,
-    private handleJobMettreAJourCodesEvenementsCommandHandler: HandleJobMettreAJourCodesEvenementsCommandHandler,
-    private handleJobAgenceAnimationCollectiveCommand: HandleJobAgenceAnimationCollectiveCommandHandler,
-    private monitorJobsCommandHandler: MonitorJobsCommandHandler,
-    private handleJobMettreAJourLesSegmentsCommandHandler: HandleJobMettreAJourLesSegmentsCommandHandler,
-    private handleJobGenererJDDCommandHandler: HandleJobGenererJDDCommandHandler,
-    private handleJobSuivreEvenementsMiloHandler: HandleJobSuivreEvenementsMiloHandler,
-    private handleJobTraiterEvenementMiloHandler: HandleJobTraiterEvenementMiloHandler
+    private planificateurService: PlanificateurService,
+    private moduleRef: ModuleRef
   ) {
     this.apmService = getAPMInstance()
     this.workerTrackingService = getWorkerTrackingServiceInstance()
@@ -77,85 +47,14 @@ export class WorkerService {
     })
     let suivi: SuiviJob | undefined
     try {
-      switch (job.type) {
-        case Planificateur.JobType.RENDEZVOUS:
-          await this.handlerJobRendezVousCommandHandler.execute({
-            job: job as Planificateur.Job<Planificateur.JobRendezVous>
-          })
-          break
-        case Planificateur.JobType.RAPPEL_ACTION:
-          await this.handlerJobRappelActionCommandHandler.execute({
-            job: job as Planificateur.Job<Planificateur.JobRappelAction>
-          })
-          break
-        case Planificateur.JobType.GENERER_JDD:
-          suivi = await this.handleJobGenererJDDCommandHandler.handle({
-            job: job as Planificateur.Job<Planificateur.JobGenererJDD>
-          })
-          break
-        case Planificateur.JobType.MAIL_CONSEILLER_MESSAGES:
-          suivi = await this.handleJobMailConseillerCommandHandler.execute()
-          break
-        case Planificateur.JobType.NOUVELLES_OFFRES_EMPLOI:
-          suivi =
-            await this.handleJobNotifierNouvellesOffresEmploiCommandHandler.execute()
-          break
-        case Planificateur.JobType.NOUVELLES_OFFRES_SERVICE_CIVIQUE:
-          suivi =
-            await this.handleJobNotifierNouveauxServicesCiviqueCommandHandler.execute()
-          break
-        case Planificateur.JobType.NETTOYER_LES_JOBS:
-          suivi = await this.handleNettoyerLesJobsCommandHandler.execute()
-          break
-        case Planificateur.JobType.UPDATE_CONTACTS_CONSEILLER_MAILING_LISTS:
-          suivi =
-            await this.handleJobUpdateMailingListConseillerCommandHandler.execute()
-          break
-        case Planificateur.JobType.RECUPERER_SITUATIONS_JEUNES_MILO:
-          suivi =
-            await this.handleJobRecupererSituationsJeunesMiloCommandHandler.execute()
-          break
-        case Planificateur.JobType.NETTOYER_LES_PIECES_JOINTES:
-          suivi =
-            await this.handleJobNettoyerPiecesJointesCommandHandler.execute()
-          break
-        case Planificateur.JobType.NETTOYER_LES_DONNEES:
-          suivi = await this.handleJobNettoyerLesDonneesCommandHandler.execute()
-          break
-        case Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE:
-          suivi =
-            await this.handleJobNotifierRendezVousPECommandHandler.execute()
-          break
-        case Planificateur.JobType.MAJ_CODES_EVENEMENTS:
-          await this.handleJobMettreAJourCodesEvenementsCommandHandler.execute()
-          break
-        case Planificateur.JobType.MAJ_AGENCE_AC:
-          suivi = await this.handleJobAgenceAnimationCollectiveCommand.execute()
-          break
-        case Planificateur.JobType.MONITORER_JOBS:
-          suivi = await this.monitorJobsCommandHandler.execute()
-          break
-        case Planificateur.JobType.MAJ_SEGMENTS:
-          suivi =
-            await this.handleJobMettreAJourLesSegmentsCommandHandler.execute()
-          break
-        case Planificateur.JobType.SUIVRE_EVENEMENTS_MILO:
-          suivi = await this.handleJobSuivreEvenementsMiloHandler.execute()
-          break
-        case Planificateur.JobType.TRAITER_EVENEMENT_MILO:
-          suivi = await this.handleJobTraiterEvenementMiloHandler.execute(job)
-          break
-        case Planificateur.JobType.FAKE:
-          this.logger.log({
-            job,
-            msg: 'executed'
-          })
-          break
-        default:
-          this.logger.error(
-            `Pas de job handler trouvé pour le type: ${job.type}`
-          )
-          success = false
+      const jobHandlerType = getJobHandlerTypeByJobType(job)
+      if (!jobHandlerType) {
+        this.logger.error(`Pas de job handler trouvé pour le type: ${job.type}`)
+        success = false
+      } else {
+        const jobhandler =
+          this.moduleRef.get<JobHandler<unknown>>(jobHandlerType)
+        suivi = await jobhandler.execute(job)
       }
     } catch (e) {
       success = false
@@ -179,4 +78,12 @@ export class WorkerService {
       }
     }
   }
+}
+
+function getJobHandlerTypeByJobType(
+  job: Planificateur.Job<unknown>
+): Type | undefined {
+  return JobHandlerProviders.find(
+    jobProvider => job.type === Reflect.getMetadata('jobType', jobProvider)
+  )
 }

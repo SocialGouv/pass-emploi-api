@@ -4,12 +4,14 @@ import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { emptySuccess, Result } from '../../../building-blocks/types/result'
 import {
   Planificateur,
-  PlanificateurRepositoryToken
+  PlanificateurRepositoryToken,
+  ProcessJobType
 } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 
 @Injectable()
+@ProcessJobType(Planificateur.JobType.NETTOYER_LES_JOBS)
 export class HandleNettoyerLesJobsCommandHandler extends JobHandler<Job> {
   constructor(
     @Inject(PlanificateurRepositoryToken)

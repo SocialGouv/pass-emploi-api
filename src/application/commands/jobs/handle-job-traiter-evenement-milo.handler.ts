@@ -3,7 +3,8 @@ import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
 import {
   Planificateur,
-  PlanificateurService
+  PlanificateurService,
+  ProcessJobType
 } from '../../../domain/planificateur'
 import {
   RendezVous,
@@ -20,8 +21,9 @@ import { Notification } from '../../../domain/notification/notification'
 import { buildError } from '../../../utils/logger.module'
 
 @Injectable()
+@ProcessJobType(Planificateur.JobType.TRAITER_EVENEMENT_MILO)
 export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
-  Planificateur.Job<unknown>
+  Planificateur.Job<Planificateur.JobTraiterEvenementMilo>
 > {
   constructor(
     @Inject(SuiviJobServiceToken)

@@ -15,7 +15,7 @@ import {
 import { Notification } from '../../../domain/notification/notification'
 import { Offre } from '../../../domain/offre/offre'
 import { RecherchesRepositoryToken } from '../../../domain/offre/recherche/recherche'
-import { Planificateur } from '../../../domain/planificateur'
+import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 import { GetOffresEmploiQuery } from '../../queries/get-offres-emploi.query.handler'
@@ -23,6 +23,7 @@ import { FindAllOffresEmploiQueryGetter } from '../../queries/query-getters/find
 import { OffresEmploiQueryModel } from '../../queries/query-models/offres-emploi.query-model'
 
 @Injectable()
+@ProcessJobType(Planificateur.JobType.NOUVELLES_OFFRES_EMPLOI)
 export class HandleJobNotifierNouvellesOffresEmploiCommandHandler extends JobHandler<Job> {
   constructor(
     private dateService: DateService,

@@ -4,7 +4,7 @@ import { QueryTypes, Sequelize } from 'sequelize'
 import { BigqueryClient } from '../../../infrastructure/clients/bigquery.client'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { Job } from 'bull'
-import { Planificateur } from '../../../domain/planificateur'
+import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 import { createWriteStream } from 'fs'
@@ -29,6 +29,7 @@ enum SEGMENTS {
 }
 
 @Injectable()
+@ProcessJobType(Planificateur.JobType.MAJ_SEGMENTS)
 export class HandleJobMettreAJourLesSegmentsCommandHandler extends JobHandler<Job> {
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,

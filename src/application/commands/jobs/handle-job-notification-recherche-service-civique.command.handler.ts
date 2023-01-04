@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { Command } from '../../../building-blocks/types/command'
 import { Job } from '../../../building-blocks/types/job'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { isFailure } from '../../../building-blocks/types/result'
@@ -13,17 +12,16 @@ import {
   Recherche,
   RecherchesRepositoryToken
 } from '../../../domain/offre/recherche/recherche'
-import { Planificateur } from '../../../domain/planificateur'
+import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 import { FindAllOffresServicesCiviqueQueryGetter } from '../../queries/query-getters/find-all-offres-services-civique.query.getter'
-
-export type HandleJobNotifierNouveauxServicesCiviqueCommand = Command
 
 const PAGINATION_NOMBRE_DE_RECHERCHES_MAXIMUM = 100
 const PAGINATION_NOMBRE_D_OFFRES_MAXIMUM = 1000
 
 @Injectable()
+@ProcessJobType(Planificateur.JobType.NOUVELLES_OFFRES_SERVICE_CIVIQUE)
 export class HandleJobNotifierNouveauxServicesCiviqueCommandHandler extends JobHandler<Job> {
   constructor(
     @Inject(RecherchesRepositoryToken)

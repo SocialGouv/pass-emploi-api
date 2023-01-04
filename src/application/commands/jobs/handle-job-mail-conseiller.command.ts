@@ -8,12 +8,13 @@ import {
   ConseillersRepositoryToken
 } from '../../../domain/conseiller/conseiller'
 import { Mail, MailServiceToken } from '../../../domain/mail'
-import { Planificateur } from '../../../domain/planificateur'
+import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 import { buildError } from '../../../utils/logger.module'
 
 @Injectable()
+@ProcessJobType(Planificateur.JobType.MAIL_CONSEILLER_MESSAGES)
 export class HandleJobMailConseillerCommandHandler extends JobHandler<Job> {
   constructor(
     @Inject(ChatRepositoryToken)

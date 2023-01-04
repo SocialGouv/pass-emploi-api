@@ -1,10 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
-import {
-  HandleJobRappelRendezVousCommand,
-  HandleJobRappelRendezVousCommandHandler
-} from '../../../../src/application/commands/jobs/handle-job-rappel-rendez-vous.command'
+import { HandleJobRappelRendezVousCommandHandler } from '../../../../src/application/commands/jobs/handle-job-rappel-rendez-vous.command'
 import { Planificateur } from '../../../../src/domain/planificateur'
 import { RendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
 import { Notification } from '../../../../src/domain/notification/notification'
@@ -12,48 +9,50 @@ import { DateService } from '../../../../src/utils/date-service'
 import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { uneDatetime } from 'test/fixtures/date.fixture'
+import { SuiviJob } from '../../../../src/domain/suivi-job'
 
 describe('HandlerJobRendezVousCommandHandler', () => {
   let handlerJobRendezVousCommandHandler: HandleJobRappelRendezVousCommandHandler
   let rendezVousRepository: StubbedType<RendezVous.Repository>
   let notificationRepository: StubbedType<Notification.Repository>
   let dateSevice: StubbedClass<DateService>
+  let suiviJobService: StubbedType<SuiviJob.Service>
   const today = DateTime.fromISO('2022-04-06T12:00:00.000Z')
 
   beforeEach(() => {
     const sandbox: SinonSandbox = createSandbox()
     rendezVousRepository = stubInterface(sandbox)
     notificationRepository = stubInterface(sandbox)
+    suiviJobService = stubInterface(sandbox)
     dateSevice = stubClass(DateService)
     dateSevice.now.returns(today)
 
     handlerJobRendezVousCommandHandler =
       new HandleJobRappelRendezVousCommandHandler(
+        suiviJobService,
         rendezVousRepository,
         notificationRepository,
         dateSevice
       )
   })
 
-  const command: HandleJobRappelRendezVousCommand = {
-    job: {
-      type: Planificateur.JobType.RENDEZVOUS,
-      contenu: {
-        idRendezVous: 'idRendezVous'
-      },
-      dateExecution: uneDatetime().toJSDate()
-    }
+  const job: Planificateur.Job<Planificateur.JobRendezVous> = {
+    type: Planificateur.JobType.RENDEZVOUS,
+    contenu: {
+      idRendezVous: 'idRendezVous'
+    },
+    dateExecution: uneDatetime().toJSDate()
   }
 
   describe("quand le rendez-vous n'existe pas", () => {
     it("n'envoie pas de notification", async () => {
       // Given
       rendezVousRepository.get
-        .withArgs(command.job.contenu.idRendezVous)
+        .withArgs(job.contenu.idRendezVous)
         .resolves(undefined)
 
       // When
-      await handlerJobRendezVousCommandHandler.handle(command)
+      await handlerJobRendezVousCommandHandler.handle(job)
 
       // Then
       expect(notificationRepository.send).to.have.callCount(0)
@@ -67,11 +66,11 @@ describe('HandlerJobRendezVousCommandHandler', () => {
         ...unRendezVous()
       }
       rendezVousRepository.get
-        .withArgs(command.job.contenu.idRendezVous)
+        .withArgs(job.contenu.idRendezVous)
         .resolves(unRendezVousSansToken)
 
       // When
-      await handlerJobRendezVousCommandHandler.handle(command)
+      await handlerJobRendezVousCommandHandler.handle(job)
 
       // Then
       expect(notificationRepository.send).to.have.callCount(0)
@@ -86,11 +85,11 @@ describe('HandlerJobRendezVousCommandHandler', () => {
         date: today.plus({ day: 1 }).toJSDate()
       }
       rendezVousRepository.get
-        .withArgs(command.job.contenu.idRendezVous)
+        .withArgs(job.contenu.idRendezVous)
         .resolves(rendezVous)
 
       // When
-      await handlerJobRendezVousCommandHandler.handle(command)
+      await handlerJobRendezVousCommandHandler.handle(job)
 
       // Then
       expect(notificationRepository.send).to.have.been.calledWith({
@@ -114,11 +113,11 @@ describe('HandlerJobRendezVousCommandHandler', () => {
         date: today.plus({ day: 7 }).toJSDate()
       }
       rendezVousRepository.get
-        .withArgs(command.job.contenu.idRendezVous)
+        .withArgs(job.contenu.idRendezVous)
         .resolves(rendezVous)
 
       // When
-      await handlerJobRendezVousCommandHandler.handle(command)
+      await handlerJobRendezVousCommandHandler.handle(job)
 
       // Then
       expect(notificationRepository.send).to.have.been.calledWithExactly({
@@ -142,11 +141,11 @@ describe('HandlerJobRendezVousCommandHandler', () => {
         date: today.plus({ day: 5 }).toJSDate()
       }
       rendezVousRepository.get
-        .withArgs(command.job.contenu.idRendezVous)
+        .withArgs(job.contenu.idRendezVous)
         .resolves(unRendezVousSansToken)
 
       // When
-      await handlerJobRendezVousCommandHandler.handle(command)
+      await handlerJobRendezVousCommandHandler.handle(job)
 
       // Then
       expect(notificationRepository.send).not.to.have.been.called()
@@ -160,11 +159,11 @@ describe('HandlerJobRendezVousCommandHandler', () => {
         date: today.minus({ day: 1 }).toJSDate()
       }
       rendezVousRepository.get
-        .withArgs(command.job.contenu.idRendezVous)
+        .withArgs(job.contenu.idRendezVous)
         .resolves(unRendezVousSansToken)
 
       // When
-      await handlerJobRendezVousCommandHandler.handle(command)
+      await handlerJobRendezVousCommandHandler.handle(job)
 
       // Then
       expect(notificationRepository.send).not.to.have.been.called()

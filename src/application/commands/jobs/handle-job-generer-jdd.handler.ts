@@ -1,4 +1,4 @@
-import { Planificateur } from '../../../domain/planificateur'
+import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { Inject, Injectable } from '@nestjs/common'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
@@ -32,6 +32,7 @@ export interface HandleJobGenererJDDCommand extends Command {
 }
 
 @Injectable()
+@ProcessJobType(Planificateur.JobType.GENERER_JDD)
 export class HandleJobGenererJDDCommandHandler extends JobHandler<HandleJobGenererJDDCommand> {
   constructor(
     @Inject(SuiviJobServiceToken)

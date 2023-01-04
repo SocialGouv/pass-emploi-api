@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Op, Sequelize } from 'sequelize'
 import { Job } from '../../../building-blocks/types/job'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
-import { Planificateur } from '../../../domain/planificateur'
+import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
 import { CodeTypeRendezVous } from '../../../domain/rendez-vous/rendez-vous'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
@@ -10,6 +10,7 @@ import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/provi
 import { DateService } from '../../../utils/date-service'
 
 @Injectable()
+@ProcessJobType(Planificateur.JobType.MAJ_AGENCE_AC)
 export class HandleJobAgenceAnimationCollectiveCommandHandler extends JobHandler<Job> {
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,

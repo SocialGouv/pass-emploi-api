@@ -1,40 +1,44 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { emptySuccess, Result } from '../../../building-blocks/types/result'
-import { Command } from '../../../building-blocks/types/command'
-import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
 import { Sequelize } from 'sequelize'
+import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
+import { JobHandler } from '../../../building-blocks/types/job-handler'
+import { Job } from 'bull'
+import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
+import { DateService } from '../../../utils/date-service'
 
 @Injectable()
-export class HandleJobMettreAJourCodesEvenementsCommandHandler extends CommandHandler<
-  Command,
-  void
-> {
+@ProcessJobType(Planificateur.JobType.MAJ_CODES_EVENEMENTS)
+export class HandleJobMettreAJourCodesEvenementsCommandHandler extends JobHandler<Job> {
   constructor(
-    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
+    @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
+    @Inject(SuiviJobServiceToken) suiviJobService: SuiviJob.Service,
+    private dateService: DateService
   ) {
-    super('HandleJobMettreAJourCodesEvenementsCommand')
+    super(Planificateur.JobType.MAJ_CODES_EVENEMENTS, suiviJobService)
   }
 
-  async handle(): Promise<Result> {
+  async handle(): Promise<SuiviJob> {
+    const maintenant = this.dateService.now()
+
     await this.sequelize.transaction(async transaction => {
       for (const { code, categorie, action, nom } of evenements) {
         if (nom) {
           await this.sequelize.query(
             `UPDATE evenement_engagement
-             SET code = '${code}'
-             WHERE categorie = '${categorie}'
-               AND action = '${action}'
-               AND nom = '${nom}'`,
+                         SET code = '${code}'
+                         WHERE categorie = '${categorie}'
+                           AND action = '${action}'
+                           AND nom = '${nom}'`,
             { transaction }
           )
         } else {
           await this.sequelize.query(
             `UPDATE evenement_engagement
-             SET code = '${code}'
-             WHERE categorie = '${categorie}'
-               AND action = '${action}'
-               and nom is null`,
+                         SET code = '${code}'
+                         WHERE categorie = '${categorie}'
+                           AND action = '${action}'
+                           and nom is null`,
             { transaction }
           )
         }
@@ -42,20 +46,19 @@ export class HandleJobMettreAJourCodesEvenementsCommandHandler extends CommandHa
 
       await this.sequelize.query(
         `UPDATE evenement_engagement
-         SET code = 'INCONNU'
-         WHERE code is null`,
+                 SET code = 'INCONNU'
+                 WHERE code is null`,
         { transaction }
       )
     })
-    return emptySuccess()
-  }
-
-  async authorize(): Promise<Result> {
-    return emptySuccess()
-  }
-
-  async monitor(): Promise<void> {
-    return
+    return {
+      jobType: this.jobType,
+      nbErreurs: 0,
+      succes: true,
+      dateExecution: maintenant,
+      tempsExecution: DateService.calculerTempsExecution(maintenant),
+      resultat: {}
+    }
   }
 }
 
