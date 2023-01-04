@@ -1,7 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
-import { Planificateur } from '../../../domain/planificateur'
+import {
+  Planificateur,
+  PlanificateurService
+} from '../../../domain/planificateur'
 import {
   RendezVous,
   RendezVousRepositoryToken
@@ -14,6 +17,7 @@ import {
   MiloRendezVousRepositoryToken
 } from '../../../domain/partenaire/milo/milo.rendez-vous'
 import { Notification } from '../../../domain/notification/notification'
+import { buildError } from '../../../utils/logger.module'
 
 @Injectable()
 export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
@@ -30,7 +34,8 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
     @Inject(MiloRendezVousRepositoryToken)
     private miloRendezVousHttpRepository: MiloRendezVous.Repository,
     private rendezVousMiloFactory: MiloRendezVous.Factory,
-    private notificationService: Notification.Service
+    private notificationService: Notification.Service,
+    private planificateurService: PlanificateurService
   ) {
     super(Planificateur.JobType.TRAITER_EVENEMENT_MILO, suiviJobService)
   }
@@ -77,6 +82,7 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
           rendezVousExistant,
           Notification.Type.DELETED_RENDEZVOUS
         )
+        this.supprimerLesRappelsDeRendezVous(rendezVousExistant)
         return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_SUPPRIME)
       } else {
         return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_INEXISTANT)
@@ -94,6 +100,10 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
         rendezVousMisAJour,
         Notification.Type.UPDATED_RENDEZVOUS
       )
+      this.replanifierLesRappelsDeRendezVous(
+        rendezVousMisAJour,
+        rendezVousExistant
+      )
       return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_MODIFIE)
     } else {
       const nouveauRendezVous =
@@ -106,6 +116,7 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
         nouveauRendezVous,
         Notification.Type.NEW_RENDEZVOUS
       )
+      this.planifierLesRappelsDeRendezVous(nouveauRendezVous)
       return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_AJOUTE)
     }
   }
@@ -120,6 +131,62 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
       succes: true,
       nbErreurs: 0,
       tempsExecution: DateService.calculerTempsExecution(debut)
+    }
+  }
+
+  private async planifierLesRappelsDeRendezVous(
+    rendezVous: RendezVous
+  ): Promise<void> {
+    try {
+      await this.planificateurService.planifierRappelsRendezVous(rendezVous)
+    } catch (e) {
+      this.logger.error(
+        buildError(
+          `La planification des notifications du rendez-vous ${rendezVous.id} a échoué`,
+          e
+        )
+      )
+      this.apmService.captureError(e)
+    }
+  }
+  private async replanifierLesRappelsDeRendezVous(
+    rendezVousUpdated: RendezVous,
+    rendezVous: RendezVous
+  ): Promise<void> {
+    const laDateAEteModifiee =
+      rendezVousUpdated.date.getTime() !== rendezVous.date.getTime()
+    if (laDateAEteModifiee) {
+      try {
+        await this.planificateurService.supprimerRappelsParId(
+          rendezVousUpdated.id
+        )
+        await this.planificateurService.planifierRappelsRendezVous(
+          rendezVousUpdated
+        )
+      } catch (e) {
+        this.logger.error(
+          buildError(
+            `La replanification des notifications du rendez-vous ${rendezVousUpdated.id} a échoué`,
+            e
+          )
+        )
+        this.apmService.captureError(e)
+      }
+    }
+  }
+  private async supprimerLesRappelsDeRendezVous(
+    rendezVous: RendezVous
+  ): Promise<void> {
+    try {
+      await this.planificateurService.supprimerRappelsParId(rendezVous.id)
+    } catch (e) {
+      this.logger.error(
+        buildError(
+          `La suppression des notifications du rendez-vous ${rendezVous.id} a échoué`,
+          e
+        )
+      )
+      this.apmService.captureError(e)
     }
   }
 }

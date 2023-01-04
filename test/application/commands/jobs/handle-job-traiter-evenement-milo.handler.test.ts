@@ -5,7 +5,10 @@ import {
   Traitement
 } from '../../../../src/application/commands/jobs/handle-job-traiter-evenement-milo.handler'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
-import { Planificateur } from '../../../../src/domain/planificateur'
+import {
+  Planificateur,
+  PlanificateurService
+} from '../../../../src/domain/planificateur'
 import { RendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
 import { SuiviJob } from '../../../../src/domain/suivi-job'
 import { DateService } from '../../../../src/utils/date-service'
@@ -29,6 +32,7 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
   let miloRendezVousRepository: StubbedType<MiloRendezVous.Repository>
   let rendezVousMiloFactory: StubbedClass<MiloRendezVous.Factory>
   let notificationService: StubbedClass<Notification.Service>
+  let planificateurService: StubbedClass<PlanificateurService>
 
   const jeune: Jeune = unJeune()
   const idPartenaireBeneficiaire = '123456'
@@ -43,6 +47,7 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
     miloRendezVousRepository = stubInterface(sandbox)
     rendezVousMiloFactory = stubClass(MiloRendezVous.Factory)
     notificationService = stubClass(Notification.Service)
+    planificateurService = stubClass(PlanificateurService)
 
     handler = new HandleJobTraiterEvenementMiloHandler(
       suiviJobService,
@@ -51,7 +56,8 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
       rendezVousRepository,
       miloRendezVousRepository,
       rendezVousMiloFactory,
-      notificationService
+      notificationService,
+      planificateurService
     )
   })
 
@@ -107,6 +113,9 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
               rendezVous,
               Notification.Type.NEW_RENDEZVOUS
             )
+            expect(
+              planificateurService.planifierRappelsRendezVous
+            ).to.have.been.calledOnceWithExactly(rendezVous)
           })
         })
         describe('quand le rendez vous existait chez nous', () => {
@@ -140,6 +149,50 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
               rendezVousModifie,
               Notification.Type.UPDATED_RENDEZVOUS
             )
+            expect(
+              planificateurService.supprimerRappelsParId
+            ).not.to.have.been.called()
+            expect(
+              planificateurService.planifierRappelsRendezVous
+            ).not.to.have.been.called()
+          })
+          it('le met à jour et replanifie les rappels', async () => {
+            // Given
+            const unRendezVousExistant = unRendezVous()
+            rendezVousRepository.getByIdPartenaire
+              .withArgs(evenement.idObjet, evenement.objet)
+              .resolves(unRendezVousExistant)
+
+            const rendezVousModifie: RendezVous = unRendezVous({
+              date: new Date('2023-10-10'),
+              duree: 120
+            })
+            rendezVousMiloFactory.mettreAJourRendezVousPassEmploi
+              .withArgs(unRendezVousExistant, rendezVousMilo)
+              .returns(rendezVousModifie)
+
+            // When
+            await handler.handle(job)
+
+            // Then
+            expect(
+              rendezVousMiloFactory.creerRendezVousPassEmploi
+            ).not.to.have.been.called()
+            expect(
+              rendezVousRepository.save
+            ).to.have.been.calledOnceWithExactly(rendezVousModifie)
+            expect(
+              notificationService.notifierLesJeunesDuRdv
+            ).to.have.been.calledOnceWithExactly(
+              rendezVousModifie,
+              Notification.Type.UPDATED_RENDEZVOUS
+            )
+            expect(
+              planificateurService.supprimerRappelsParId
+            ).to.have.been.calledOnceWithExactly(unRendezVousExistant.id)
+            expect(
+              planificateurService.planifierRappelsRendezVous
+            ).to.have.been.calledOnceWithExactly(rendezVousModifie)
           })
         })
       })
@@ -215,6 +268,9 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
               unRendezVousExistant,
               Notification.Type.DELETED_RENDEZVOUS
             )
+            expect(
+              planificateurService.supprimerRappelsParId
+            ).to.have.been.calledOnceWithExactly(unRendezVousExistant.id)
           })
         })
       })
