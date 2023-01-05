@@ -1,4 +1,7 @@
-import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../src/domain/rendez-vous/rendez-vous'
 import {
   RendezVousJeuneDetailQueryModel,
   RendezVousJeuneQueryModel
@@ -34,7 +37,8 @@ export function unRendezVousQueryModel(
     type: {
       code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
       label: 'Entretien individuel conseiller'
-    }
+    },
+    source: RendezVous.Source.PASS_EMPLOI
   }
 
   return { ...defaults, ...args }
@@ -62,7 +66,8 @@ export const unRendezVousJeuneDetailQueryModel = (
       prenom: 'Nils'
     },
     comment: 'commentaire',
-    adresse: undefined
+    adresse: undefined,
+    source: RendezVous.Source.PASS_EMPLOI
   }
 
   return { ...defaults, ...args }

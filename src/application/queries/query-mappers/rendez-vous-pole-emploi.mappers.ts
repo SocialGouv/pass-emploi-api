@@ -3,7 +3,8 @@ import { RendezVousPoleEmploiDto } from '../../../infrastructure/clients/dto/pol
 import { IdService } from '../../../utils/id-service'
 import {
   CodeTypeRendezVous,
-  mapCodeLabelTypeRendezVous
+  mapCodeLabelTypeRendezVous,
+  RendezVous
 } from '../../../domain/rendez-vous/rendez-vous'
 
 export function fromRendezVousDtoToRendezVousQueryModel(
@@ -39,7 +40,8 @@ export function fromRendezVousDtoToRendezVousQueryModel(
     theme: rendezVousPoleEmploiDto.theme,
     presenceConseiller: true,
     visio: rendezVousPoleEmploiDto.modaliteContact === 'VISIO',
-    lienVisio: rendezVousPoleEmploiDto.lienVisio
+    lienVisio: rendezVousPoleEmploiDto.lienVisio,
+    source: RendezVous.Source.POLE_EMPLOI
   }
 }
 

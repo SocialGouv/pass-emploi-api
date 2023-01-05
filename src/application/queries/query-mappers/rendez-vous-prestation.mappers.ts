@@ -2,7 +2,8 @@ import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-mod
 import { PrestationDto } from '../../../infrastructure/clients/dto/pole-emploi.dto'
 import {
   CodeTypeRendezVous,
-  mapCodeLabelTypeRendezVous
+  mapCodeLabelTypeRendezVous,
+  RendezVous
 } from '../../../domain/rendez-vous/rendez-vous'
 import { IdService } from '../../../utils/id-service'
 
@@ -34,7 +35,8 @@ export function fromPrestationDtoToRendezVousQueryModel(
     visio:
       prestation.session.natureAnimation === 'INTERNE' ||
       prestation.session.modalitePremierRendezVous === 'WEBCAM',
-    lienVisio
+    lienVisio,
+    source: RendezVous.Source.POLE_EMPLOI
   }
 }
 

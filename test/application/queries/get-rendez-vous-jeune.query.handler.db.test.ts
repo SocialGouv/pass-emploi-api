@@ -29,6 +29,7 @@ import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { stubClassSandbox } from '../../utils/types'
 import { getDatabase } from '../../utils/database-for-testing'
+import { testConfig } from '../../utils/module-for-testing'
 
 describe('GetRendezVousJeuneQueryHandler', () => {
   let dateService: StubbedClass<DateService>
@@ -64,7 +65,8 @@ describe('GetRendezVousJeuneQueryHandler', () => {
       dateService,
       conseillerForJeuneAuthorizer,
       jeuneAuthorizer,
-      evenementService
+      evenementService,
+      testConfig()
     )
   })
 

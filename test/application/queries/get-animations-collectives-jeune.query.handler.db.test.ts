@@ -9,7 +9,10 @@ import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeun
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { isSuccess } from '../../../src/building-blocks/types/result'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../src/domain/rendez-vous/rendez-vous'
 import { unEtablissementDto } from '../../fixtures/sql-models/etablissement.sq-model'
 import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
 import { RendezVousJeuneDetailQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
@@ -142,7 +145,8 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
               prenom: 'Nils'
             },
             comment: 'commentaire',
-            adresse: undefined
+            adresse: undefined,
+            source: RendezVous.Source.PASS_EMPLOI
           }
           expect(isSuccess(result) && result.data).to.deep.equal([
             expectedAnimationCollective
@@ -182,7 +186,8 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
               prenom: 'Nils'
             },
             comment: 'commentaire',
-            adresse: undefined
+            adresse: undefined,
+            source: RendezVous.Source.PASS_EMPLOI
           }
           expect(isSuccess(result) && result.data).to.deep.equal([
             expectedAnimationCollective

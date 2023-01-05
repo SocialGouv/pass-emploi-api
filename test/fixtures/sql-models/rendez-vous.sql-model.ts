@@ -1,4 +1,7 @@
-import { CodeTypeRendezVous } from 'src/domain/rendez-vous/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from 'src/domain/rendez-vous/rendez-vous'
 import { RendezVousDto } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { IdService } from '../../../src/utils/id-service'
@@ -27,7 +30,7 @@ export function unRendezVousDto(
     dateCloture: null,
     idAgence: null,
     createur: { id: '1', nom: 'Tavernier', prenom: 'Nils' },
-    source: 'PASS_EMPLOI',
+    source: RendezVous.Source.PASS_EMPLOI,
     typePartenaire: null,
     idPartenaire: null
   }

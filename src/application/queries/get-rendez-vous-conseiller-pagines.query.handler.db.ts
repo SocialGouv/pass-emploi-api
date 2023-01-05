@@ -10,7 +10,8 @@ import { SequelizeInjectionToken } from '../../infrastructure/sequelize/provider
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { fromSqlToRendezVousConseillerQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { RendezVousConseillerQueryModel } from './query-models/rendez-vous.query-model'
-import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
+import { ConfigService } from '@nestjs/config'
+import { generateSourceRendezVousCondition } from '../../config/feature-flipping'
 
 const NOMBRE_RDV_MAX = 200
 
@@ -18,6 +19,7 @@ export enum TriRendezVous {
   DATE_CROISSANTE = 'date_croissante',
   DATE_DECROISSANTE = 'date_decroissante'
 }
+
 export interface GetRendezVousConseillerPaginesQuery extends Query {
   idConseiller: string
   tri?: TriRendezVous
@@ -33,7 +35,8 @@ export class GetRendezVousConseillerPaginesQueryHandler extends QueryHandler<
 > {
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
-    private conseillerAuthorizer: ConseillerAuthorizer
+    private conseillerAuthorizer: ConseillerAuthorizer,
+    private configuration: ConfigService
   ) {
     super('GetRendezVousConseillerPaginesQueryHandler')
   }
@@ -61,7 +64,7 @@ export class GetRendezVousConseillerPaginesQueryHandler extends QueryHandler<
         dateSuppression: {
           [Op.is]: null
         },
-        source: RendezVous.Source.PASS_EMPLOI,
+        ...generateSourceRendezVousCondition(this.configuration),
         ...generateDateCondition(query.dateDebut, query.dateFin),
         ...presenceConseillerCondition
       },

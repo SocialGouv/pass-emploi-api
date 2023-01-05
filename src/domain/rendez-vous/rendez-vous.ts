@@ -139,7 +139,8 @@ export namespace RendezVous {
 
   export enum Source {
     PASS_EMPLOI = 'PASS_EMPLOI',
-    MILO = 'MILO'
+    MILO = 'MILO',
+    POLE_EMPLOI = 'POLE_EMPLOI'
   }
 
   export interface InformationsPartenaire {

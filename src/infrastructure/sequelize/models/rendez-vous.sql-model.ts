@@ -8,7 +8,10 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
-import { CodeTypeRendezVous } from '../../../domain/rendez-vous/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../domain/rendez-vous/rendez-vous'
 import { AgenceSqlModel } from './agence.sql-model'
 import { JeuneSqlModel } from './jeune.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from './rendez-vous-jeune-association.sql-model'
@@ -20,7 +23,7 @@ export class RendezVousDto extends Model {
   id: string
 
   @Column({ field: 'source', type: DataType.STRING })
-  source: string
+  source: RendezVous.Source
 
   @Column({ field: 'titre', type: DataType.STRING })
   titre: string

@@ -123,7 +123,8 @@ export function fromSqlToJeuneHomeQueryModel(
         precision: rendezVousSql.precision ?? undefined,
         adresse: rendezVousSql.adresse ?? undefined,
         organisme: rendezVousSql.organisme ?? undefined,
-        presenceConseiller: rendezVousSql.presenceConseiller
+        presenceConseiller: rendezVousSql.presenceConseiller,
+        source: rendezVousSql.source
       })) ?? []
   }
 }

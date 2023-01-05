@@ -110,7 +110,8 @@ describe('GetDetailRendezVousQueryHandler', () => {
             code: CodeTypeRendezVous.ATELIER,
             label: 'Atelier'
           },
-          statut: RendezVous.AnimationCollective.Statut.A_CLOTURER
+          statut: RendezVous.AnimationCollective.Statut.A_CLOTURER,
+          source: RendezVous.Source.PASS_EMPLOI
         }
         expect(result).to.deep.equal(success(data))
       })
@@ -169,7 +170,8 @@ describe('GetDetailRendezVousQueryHandler', () => {
           type: {
             code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
             label: 'Entretien individuel conseiller'
-          }
+          },
+          source: RendezVous.Source.PASS_EMPLOI
         }
         expect(result).to.deep.equal(success(data))
       })
@@ -244,7 +246,8 @@ describe('GetDetailRendezVousQueryHandler', () => {
           type: {
             code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
             label: 'Entretien individuel conseiller'
-          }
+          },
+          source: RendezVous.Source.PASS_EMPLOI
         }
         expect(result).to.deep.equal(success(data))
       })
@@ -333,7 +336,8 @@ describe('GetDetailRendezVousQueryHandler', () => {
           type: {
             code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
             label: 'Entretien individuel conseiller'
-          }
+          },
+          source: RendezVous.Source.PASS_EMPLOI
         }
         expect(result).to.deep.equal(success(data))
       })
@@ -464,7 +468,8 @@ describe('GetDetailRendezVousQueryHandler', () => {
           type: {
             code: CodeTypeRendezVous.ATELIER,
             label: 'Atelier'
-          }
+          },
+          source: RendezVous.Source.PASS_EMPLOI
         }
         expect(result).to.deep.equal(success(data))
       })

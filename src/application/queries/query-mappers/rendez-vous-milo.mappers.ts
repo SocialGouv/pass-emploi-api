@@ -38,7 +38,8 @@ export function fromSqlToRendezVousJeuneQueryModel(
       id: rendezVousSql.jeunes[0].conseiller!.id,
       nom: rendezVousSql.jeunes[0].conseiller!.nom,
       prenom: rendezVousSql.jeunes[0].conseiller!.prenom
-    }
+    },
+    source: rendezVousSql.source
   }
 }
 
@@ -66,7 +67,8 @@ export function fromSqlToRendezVousDetailJeuneQueryModel(
     organisme: rendezVousSql.organisme ?? undefined,
     presenceConseiller: rendezVousSql.presenceConseiller,
     invitation: Boolean(rendezVousSql.invitation),
-    createur: rendezVousSql.createur
+    createur: rendezVousSql.createur,
+    source: rendezVousSql.source
   }
 }
 
@@ -95,7 +97,8 @@ export function fromSqlToRendezVousConseillerQueryModel(
     organisme: rendezVousSql.organisme ?? undefined,
     presenceConseiller: rendezVousSql.presenceConseiller,
     invitation: Boolean(rendezVousSql.invitation),
-    createur: rendezVousSql.createur
+    createur: rendezVousSql.createur,
+    source: rendezVousSql.source
   }
 }
 

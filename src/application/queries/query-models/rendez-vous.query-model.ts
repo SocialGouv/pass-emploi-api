@@ -36,6 +36,7 @@ export interface RendezVousBaseQueryModel {
   title: string
   comment?: string
   modality: string
+  source: RendezVous.Source
 }
 
 export class RendezVousJeuneQueryModel implements RendezVousBaseQueryModel {
@@ -116,6 +117,9 @@ export class RendezVousJeuneQueryModel implements RendezVousBaseQueryModel {
     nom: string
     prenom: string
   }
+
+  @ApiProperty({ required: true, enum: RendezVous.Source })
+  source: RendezVous.Source
 }
 
 class LogModificationRendezVousQueryModel {
@@ -176,6 +180,9 @@ export class RendezVousConseillerQueryModel
     nom: string
     prenom: string
   }
+
+  @ApiProperty({ required: true, enum: RendezVous.Source })
+  source: RendezVous.Source
 }
 
 export class AnimationCollectiveQueryModel extends RendezVousConseillerQueryModel {
