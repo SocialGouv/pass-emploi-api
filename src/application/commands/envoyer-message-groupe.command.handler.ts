@@ -69,7 +69,9 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
       )
 
       idsBeneficiaireDesListesDeDiffusion =
-        getIdsBeneficiaireDesListesDeDiffusion(listesDeDiffusion)
+        ListeDeDiffusion.getIdsBeneficiaireDesListesDeDiffusion(
+          listesDeDiffusion
+        )
     }
 
     const idsBeneficiairesUniques = idsBeneficiaireDesListesDeDiffusion
@@ -185,15 +187,6 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
     }
     await this.evenementService.creer(code, utilisateur)
   }
-}
-
-function getIdsBeneficiaireDesListesDeDiffusion(
-  listesDeDiffusion: Conseiller.ListeDeDiffusion[]
-): string[] {
-  return listesDeDiffusion
-    .map(liste => ListeDeDiffusion.getBeneficiairesDuPortefeuille(liste))
-    .flat()
-    .map(beneficiaire => beneficiaire.id)
 }
 
 function isDefined<T>(argument: T | undefined): argument is T {

@@ -8,15 +8,27 @@ import {
 } from '../../../src/application/commands/televerser-fichier.command.handler'
 import { createSandbox } from 'sinon'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { failure, success } from '../../../src/building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  success
+} from '../../../src/building-blocks/types/result'
 import { unFichier } from '../../fixtures/fichier.fixture'
-import { NonTraitableError } from '../../../src/building-blocks/types/domain-error'
+import {
+  DroitsInsuffisants,
+  NonTraitableError
+} from '../../../src/building-blocks/types/domain-error'
 import { Authentification } from 'src/domain/authentification'
+import { AuthorizeListeDeDiffusion } from '../../../src/application/authorizers/authorize-liste-de-diffusion'
+import { Conseiller } from '../../../src/domain/conseiller/conseiller'
+import { uneListeDeDiffusion } from '../../fixtures/liste-de-diffusion.fixture'
 
 describe('TeleverserFichierCommandHandler', () => {
   let fichierRepository: StubbedType<Fichier.Repository>
+  let listeDeDiffusionRepository: StubbedType<Conseiller.ListeDeDiffusion.Repository>
   let fichierFactory: StubbedClass<Fichier.Factory>
   let authorizeConseillerForJeunes: StubbedClass<AuthorizeConseillerForJeunes>
+  let authorizeListeDeDiffusion: StubbedClass<AuthorizeListeDeDiffusion>
   let televerserFichierCommandHandler: TeleverserFichierCommandHandler
 
   const command: TeleverserFichierCommand = {
@@ -36,30 +48,82 @@ describe('TeleverserFichierCommandHandler', () => {
   beforeEach(() => {
     const sandbox = createSandbox()
     fichierRepository = stubInterface(sandbox)
+    listeDeDiffusionRepository = stubInterface(sandbox)
     fichierFactory = stubClass(Fichier.Factory)
     authorizeConseillerForJeunes = stubClass(AuthorizeConseillerForJeunes)
+    authorizeListeDeDiffusion = stubClass(AuthorizeListeDeDiffusion)
     televerserFichierCommandHandler = new TeleverserFichierCommandHandler(
       fichierRepository,
+      listeDeDiffusionRepository,
       fichierFactory,
-      authorizeConseillerForJeunes
+      authorizeConseillerForJeunes,
+      authorizeListeDeDiffusion
     )
   })
 
   describe('authorize', () => {
     it('autorise un conseiller pour ses jeunes', async () => {
+      // Given
+      const utilisateur = unUtilisateurConseiller()
+      authorizeConseillerForJeunes.authorize
+        .withArgs(command.jeunesIds!, utilisateur)
+        .resolves(emptySuccess())
+
       // When
-      await televerserFichierCommandHandler.authorize(
+      const result = await televerserFichierCommandHandler.authorize(
         command,
-        unUtilisateurConseiller()
+        utilisateur
       )
 
       // Then
-      expect(
-        authorizeConseillerForJeunes.authorize
-      ).to.have.been.calledWithExactly(
-        command.jeunesIds,
-        unUtilisateurConseiller()
+      expect(result).to.deep.equal(emptySuccess())
+    })
+    it('autorise un conseiller pour ses listes de diffusion', async () => {
+      // Given
+      const commandAvecListeDeDiffusion = {
+        ...command,
+        jeunesIds: undefined,
+        listesDeDiffusionIds: ['1']
+      }
+      const utilisateur = unUtilisateurConseiller()
+      authorizeListeDeDiffusion.authorize
+        .withArgs('1', utilisateur)
+        .resolves(emptySuccess())
+
+      // When
+      const result = await televerserFichierCommandHandler.authorize(
+        commandAvecListeDeDiffusion,
+        utilisateur
       )
+
+      // Then
+      expect(result).to.deep.equal(emptySuccess())
+    })
+    it('refuse un conseiller pour une liste de diffusion qui ne lui appartient pas', async () => {
+      // Given
+      const commandAvecListeDeDiffusion = {
+        ...command,
+        listesDeDiffusionIds: ['1', '2']
+      }
+      const utilisateur = unUtilisateurConseiller()
+      authorizeConseillerForJeunes.authorize
+        .withArgs(command.jeunesIds!, utilisateur)
+        .resolves(emptySuccess())
+      authorizeListeDeDiffusion.authorize
+        .withArgs('1', utilisateur)
+        .resolves(emptySuccess())
+      authorizeListeDeDiffusion.authorize
+        .withArgs('2', utilisateur)
+        .resolves(failure(new DroitsInsuffisants()))
+
+      // When
+      const result = await televerserFichierCommandHandler.authorize(
+        commandAvecListeDeDiffusion,
+        utilisateur
+      )
+
+      // Then
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
   })
 
@@ -68,7 +132,9 @@ describe('TeleverserFichierCommandHandler', () => {
       it('televerse le fichier et retourne son id', async () => {
         // Given
         const fichier = unFichier()
-        fichierFactory.creer.withArgs(command).returns(success(fichier))
+        fichierFactory.creer
+          .withArgs({ ...command, jeunesIds: command.jeunesIds! })
+          .returns(success(fichier))
 
         // When
         const result = await televerserFichierCommandHandler.handle(command)
@@ -82,13 +148,48 @@ describe('TeleverserFichierCommandHandler', () => {
           })
         )
       })
+      it('televerse le fichier avec jeunes de liste de diffusion et retourne son id', async () => {
+        // Given
+        const commandAvecListeDeDiffusion = {
+          ...command,
+          listesDeDiffusionIds: ['1']
+        }
+        const liste = uneListeDeDiffusion()
+        listeDeDiffusionRepository.findAll.withArgs(['1']).resolves([liste])
+
+        const fichier = unFichier()
+        fichierFactory.creer.returns(success(fichier))
+
+        // When
+        const result = await televerserFichierCommandHandler.handle(
+          commandAvecListeDeDiffusion
+        )
+
+        // Then
+        expect(fichierRepository.save).to.have.been.calledWithExactly(fichier)
+        expect(fichierFactory.creer).to.have.been.calledWithExactly({
+          ...commandAvecListeDeDiffusion,
+          jeunesIds: [
+            liste.beneficiaires[0].id,
+            ...commandAvecListeDeDiffusion.jeunesIds!
+          ]
+        })
+        expect(result).to.deep.equal(
+          success({
+            id: fichier.id,
+            nom: fichier.nom
+          })
+        )
+      })
     })
 
     describe('quand la commande est invalide', () => {
       it('retourne la failure', async () => {
         // Given
         const echec = failure(new NonTraitableError('Fichier', '1'))
-        fichierFactory.creer.withArgs(command).returns(echec)
+        fichierFactory.creer
+          .withArgs({ ...command, jeunesIds: command.jeunesIds! })
+          .returns(echec)
 
         // When
         const result = await televerserFichierCommandHandler.handle(command)

@@ -51,6 +51,15 @@ export namespace ListeDeDiffusion {
     )
   }
 
+  export function getIdsBeneficiaireDesListesDeDiffusion(
+    listesDeDiffusion: ListeDeDiffusion[]
+  ): string[] {
+    return listesDeDiffusion
+      .map(liste => getBeneficiairesDuPortefeuille(liste))
+      .flat()
+      .map(beneficiaire => beneficiaire.id)
+  }
+
   @Injectable()
   export class Factory {
     constructor(
