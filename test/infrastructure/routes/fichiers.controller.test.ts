@@ -92,6 +92,7 @@ describe('FichiersController', () => {
           size: image.size
         },
         jeunesIds: ['1'],
+        listesDeDiffusionIds: undefined,
         createur: {
           id: utilisateur.id,
           type: utilisateur.type
@@ -130,6 +131,7 @@ describe('FichiersController', () => {
           size: image.size
         },
         jeunesIds: ['1'],
+        listesDeDiffusionIds: undefined,
         createur: {
           id: utilisateur.id,
           type: utilisateur.type
