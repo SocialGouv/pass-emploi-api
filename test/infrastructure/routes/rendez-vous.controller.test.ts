@@ -57,7 +57,8 @@ describe('RendezvousController', () => {
           title: rendezvous.titre,
           duration: rendezvous.duree,
           modality: rendezvous.modalite!,
-          invitation: rendezvous.invitation!
+          invitation: rendezvous.invitation!,
+          source: rendezvous.source
         })
       )
       //When - Then
@@ -83,7 +84,8 @@ describe('RendezvousController', () => {
             duration: rendezvous.duree,
             modality: rendezvous.modalite!,
             invitation: rendezvous.invitation!,
-            historique: []
+            historique: [],
+            source: rendezvous.source
           })
         )
       //When - Then

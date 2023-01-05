@@ -1,6 +1,9 @@
 import { AsSql } from '../sequelize/types'
 import { RendezVousDto } from '../sequelize/models/rendez-vous.sql-model'
-import { CodeTypeRendezVous } from '../../domain/rendez-vous/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../domain/rendez-vous/rendez-vous'
 import * as uuid from 'uuid'
 import { DateTime } from 'luxon'
 
@@ -9,7 +12,7 @@ export function unRendezVousJDD(
 ): AsSql<RendezVousDto> {
   const defaults: AsSql<RendezVousDto> = {
     id: uuid.v4(),
-    source: 'PASS_EMPLOI',
+    source: RendezVous.Source.PASS_EMPLOI,
     titre: 'rdv',
     duree: 30,
     modalite: 'modalite',

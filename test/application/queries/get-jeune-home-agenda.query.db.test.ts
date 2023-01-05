@@ -35,6 +35,7 @@ import { DateTime } from 'luxon'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
 import { getDatabase } from '../../utils/database-for-testing'
+import { testConfig } from '../../utils/module-for-testing'
 
 describe('GetJeuneHomeAgendaQueryHandler', () => {
   let handler: GetJeuneHomeAgendaQueryHandler
@@ -51,7 +52,8 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
     conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
     handler = new GetJeuneHomeAgendaQueryHandler(
       jeuneAuthorizer,
-      conseillerForJeuneAuthorizer
+      conseillerForJeuneAuthorizer,
+      testConfig()
     )
     await ConseillerSqlModel.creer(unConseillerDto())
     await JeuneSqlModel.creer(jeuneDto)

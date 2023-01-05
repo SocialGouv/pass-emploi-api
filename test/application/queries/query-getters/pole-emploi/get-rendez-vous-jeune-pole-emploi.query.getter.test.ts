@@ -1,7 +1,10 @@
 import { GetRendezVousJeunePoleEmploiQuery } from '../../../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { unJeune } from '../../../../fixtures/jeune.fixture'
 import { uneDatetime } from '../../../../fixtures/date.fixture'
-import { RendezVous } from '../../../../../src/domain/rendez-vous/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../../../src/domain/rendez-vous/rendez-vous'
 import {
   createSandbox,
   expect,
@@ -12,7 +15,10 @@ import {
   PrestationDto,
   RendezVousPoleEmploiDto
 } from '../../../../../src/infrastructure/clients/dto/pole-emploi.dto'
-import { failure } from '../../../../../src/building-blocks/types/result'
+import {
+  failure,
+  success
+} from '../../../../../src/building-blocks/types/result'
 import { NonTrouveError } from '../../../../../src/building-blocks/types/domain-error'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Jeune } from '../../../../../src/domain/jeune/jeune'
@@ -22,6 +28,7 @@ import { PoleEmploiPartenaireClient } from '../../../../../src/infrastructure/cl
 import { KeycloakClient } from '../../../../../src/infrastructure/clients/keycloak-client'
 import { SinonSandbox } from 'sinon'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
+import { RendezVousJeuneQueryModel } from '../../../../../src/application/queries/query-models/rendez-vous.query-model'
 
 describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
   let jeunesRepository: StubbedType<Jeune.Repository>
@@ -166,56 +173,57 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
 
           // When
           const result = await queryGetter.handle(query)
+
           // Then
-          expect(result).to.deep.equal({
-            _isSuccess: true,
-            data: [
-              {
-                agencePE: true,
-                date: expectedDateRendezVous,
-                duration: 23,
-                id: 'random-id',
-                modality: 'en agence Pôle emploi',
-                theme: 'theme',
-                conseiller: undefined,
-                presenceConseiller: true,
-                comment: 'commentaire',
-                adresse: '12 rue Albert Camus 75018 Paris',
-                title: '',
-                type: {
-                  code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
-                  label: 'Entretien individuel conseiller'
-                },
-                isLocaleDate: true,
-                visio: false,
-                lienVisio: 'lien'
+          const expected: RendezVousJeuneQueryModel[] = [
+            {
+              agencePE: true,
+              date: expectedDateRendezVous,
+              duration: 23,
+              id: 'random-id',
+              modality: 'en agence Pôle emploi',
+              theme: 'theme',
+              conseiller: undefined,
+              presenceConseiller: true,
+              comment: 'commentaire',
+              adresse: '12 rue Albert Camus 75018 Paris',
+              title: '',
+              type: {
+                code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+                label: 'Entretien individuel conseiller'
               },
-              {
-                idStable: undefined,
-                adresse:
-                  '588 BOULEVARD ALBERT CAMUS  69665 VILLEFRANCHE SUR SAONE',
-                agencePE: true,
-                annule: false,
-                comment: undefined,
-                date: expectedDatePrestation,
-                isLocaleDate: true,
-                description: "Utiliser Internet dans sa recherche d'emploi",
-                duration: 0,
-                id: 'random-id',
-                lienVisio: undefined,
-                modality: '',
-                organisme: undefined,
-                telephone: undefined,
-                theme: 'Atelier',
-                title: '',
-                type: {
-                  code: 'PRESTATION',
-                  label: 'Prestation'
-                },
-                visio: false
-              }
-            ]
-          })
+              isLocaleDate: true,
+              visio: false,
+              lienVisio: 'lien',
+              source: RendezVous.Source.POLE_EMPLOI
+            },
+            {
+              idStable: undefined,
+              adresse:
+                '588 BOULEVARD ALBERT CAMUS  69665 VILLEFRANCHE SUR SAONE',
+              agencePE: true,
+              annule: false,
+              comment: undefined,
+              date: expectedDatePrestation,
+              isLocaleDate: true,
+              description: "Utiliser Internet dans sa recherche d'emploi",
+              duration: 0,
+              id: 'random-id',
+              lienVisio: undefined,
+              modality: '',
+              organisme: undefined,
+              telephone: undefined,
+              theme: 'Atelier',
+              title: '',
+              type: {
+                code: CodeTypeRendezVous.PRESTATION,
+                label: 'Prestation'
+              },
+              visio: false,
+              source: RendezVous.Source.POLE_EMPLOI
+            }
+          ]
+          expect(result).to.deep.equal(success(expected))
         })
       })
       describe('quand le lien de la visio prestations est disponible', () => {
@@ -282,55 +290,56 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
 
           // When
           const result = await queryGetter.handle(query)
+
           // Then
-          expect(result).to.deep.equal({
-            _isSuccess: true,
-            data: [
-              {
-                idStable: idVisio,
-                adresse: undefined,
-                agencePE: true,
-                annule: false,
-                comment: undefined,
-                date: new Date('2020-04-06T10:00:00.000Z'),
-                isLocaleDate: true,
-                description: undefined,
-                duration: 0,
-                id: 'random-id',
-                lienVisio: 'lienvisio.com',
-                modality: 'par visio',
-                organisme: undefined,
-                telephone: undefined,
-                theme: undefined,
-                title: '',
-                type: {
-                  code: 'PRESTATION',
-                  label: 'Prestation'
-                },
-                visio: true
+          const expected: RendezVousJeuneQueryModel[] = [
+            {
+              idStable: idVisio,
+              adresse: undefined,
+              agencePE: true,
+              annule: false,
+              comment: undefined,
+              date: new Date('2020-04-06T10:00:00.000Z'),
+              isLocaleDate: true,
+              description: undefined,
+              duration: 0,
+              id: 'random-id',
+              lienVisio: 'lienvisio.com',
+              modality: 'par visio',
+              organisme: undefined,
+              telephone: undefined,
+              theme: undefined,
+              title: '',
+              type: {
+                code: CodeTypeRendezVous.PRESTATION,
+                label: 'Prestation'
               },
-              {
-                agencePE: false,
-                date: new Date('2020-04-06T12:20:00.000Z'),
-                duration: 23,
-                id: 'random-id',
-                modality: 'par visio',
-                theme: 'theme',
-                presenceConseiller: true,
-                conseiller: undefined,
-                comment: 'commentaire',
-                adresse: '12 rue Albert Camus 75018 Paris',
-                title: '',
-                type: {
-                  code: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
-                  label: 'Entretien individuel conseiller'
-                },
-                isLocaleDate: true,
-                visio: true,
-                lienVisio: 'lien'
-              }
-            ]
-          })
+              visio: true,
+              source: RendezVous.Source.POLE_EMPLOI
+            },
+            {
+              agencePE: false,
+              date: new Date('2020-04-06T12:20:00.000Z'),
+              duration: 23,
+              id: 'random-id',
+              modality: 'par visio',
+              theme: 'theme',
+              presenceConseiller: true,
+              conseiller: undefined,
+              comment: 'commentaire',
+              adresse: '12 rue Albert Camus 75018 Paris',
+              title: '',
+              type: {
+                code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+                label: 'Entretien individuel conseiller'
+              },
+              isLocaleDate: true,
+              visio: true,
+              lienVisio: 'lien',
+              source: RendezVous.Source.POLE_EMPLOI
+            }
+          ]
+          expect(result).to.deep.equal(success(expected))
         })
         it('renvoie les prestations et rdv quand une erreur se produit lors de la recuperation de la visio', async () => {
           // Given

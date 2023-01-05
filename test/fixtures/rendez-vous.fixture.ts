@@ -115,7 +115,8 @@ export const unRendezVousConseillerQueryModel = (
           CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
         ]
     },
-    presenceConseiller: true
+    presenceConseiller: true,
+    source: RendezVous.Source.PASS_EMPLOI
   }
   return { ...defaults, ...args }
 }

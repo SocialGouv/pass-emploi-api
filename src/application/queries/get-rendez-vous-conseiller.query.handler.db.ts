@@ -11,7 +11,8 @@ import { fromSqlToRendezVousConseillerQueryModel } from './query-mappers/rendez-
 import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { Result } from '../../building-blocks/types/result'
-import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
+import { generateSourceRendezVousCondition } from '../../config/feature-flipping'
+import { ConfigService } from '@nestjs/config'
 
 export interface GetAllRendezVousConseiller extends Query {
   idConseiller: string
@@ -26,7 +27,8 @@ export class GetAllRendezVousConseillerQueryHandler extends QueryHandler<
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
     private dateService: DateService,
-    private conseillerAuthorizer: ConseillerAuthorizer
+    private conseillerAuthorizer: ConseillerAuthorizer,
+    private configuration: ConfigService
   ) {
     super('GetAllRendezVousConseillerQueryHandler')
   }
@@ -45,6 +47,7 @@ export class GetAllRendezVousConseillerQueryHandler extends QueryHandler<
       include: [{ model: JeuneSqlModel }],
       replacements: { id_conseiller: query.idConseiller },
       where: {
+        ...generateSourceRendezVousCondition(this.configuration),
         id: {
           [Op.in]: this.sequelize.literal(`(
                 SELECT DISTINCT id_rendez_vous
@@ -56,7 +59,6 @@ export class GetAllRendezVousConseillerQueryHandler extends QueryHandler<
         date: {
           [Op.lte]: maintenant
         },
-        source: RendezVous.Source.PASS_EMPLOI,
         dateSuppression: {
           [Op.is]: null
         },

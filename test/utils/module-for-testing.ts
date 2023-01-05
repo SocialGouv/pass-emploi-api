@@ -138,6 +138,9 @@ export const testConfig = (): ConfigService => {
     apiKeys: {
       keycloak: 'ceci-est-une-api-key',
       immersion: 'ceci-est-une-autre-api-key'
+    },
+    features: {
+      rendezVousMilo: true
     }
   })
 }

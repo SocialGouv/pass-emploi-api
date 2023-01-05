@@ -153,7 +153,8 @@ export default () => {
           process.env.JOB_NOMBRE_CONSEILLERS_PARALLELE ?? '100'
       }
     },
-    version: process.env.npm_package_version ?? '0.0.0'
+    version: process.env.npm_package_version ?? '0.0.0',
+    features: { rendezVousMilo: process.env.FEATURE_RDV_MILO === 'true' }
   }
   return Joi.attempt(configuration, configurationSchema)
 }

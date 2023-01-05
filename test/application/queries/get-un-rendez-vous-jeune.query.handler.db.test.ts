@@ -14,7 +14,10 @@ import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { CodeTypeRendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
+import {
+  CodeTypeRendezVous,
+  RendezVous
+} from '../../../src/domain/rendez-vous/rendez-vous'
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { uneDatetime } from '../../fixtures/date.fixture'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
@@ -146,7 +149,8 @@ describe('GetUnRendezVousJeuneQueryHandler', () => {
             prenom: 'Nils'
           },
           comment: 'commentaire',
-          adresse: undefined
+          adresse: undefined,
+          source: RendezVous.Source.PASS_EMPLOI
         }
         expect(isSuccess(result) && result.data).to.deep.equal(expected)
       })
@@ -182,7 +186,8 @@ describe('GetUnRendezVousJeuneQueryHandler', () => {
             prenom: 'Nils'
           },
           comment: 'commentaire',
-          adresse: undefined
+          adresse: undefined,
+          source: RendezVous.Source.PASS_EMPLOI
         }
         expect(isSuccess(result) && result.data).to.deep.equal(expected)
       })

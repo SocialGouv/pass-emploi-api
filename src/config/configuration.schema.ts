@@ -118,5 +118,8 @@ export const configurationSchema = Joi.object({
       nombreDeConseillersEnParallele: Joi.number().required()
     })
   }),
-  version: Joi.string().required()
+  version: Joi.string().required(),
+  features: Joi.object({
+    rendezVousMilo: Joi.boolean()
+  })
 })

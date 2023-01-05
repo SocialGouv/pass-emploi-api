@@ -14,6 +14,8 @@ import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
+import { generateSourceRendezVousCondition } from '../../config/feature-flipping'
+import { ConfigService } from '@nestjs/config'
 
 export interface GetRendezVousJeuneQuery extends Query {
   idJeune: string
@@ -29,7 +31,8 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
     private dateService: DateService,
     private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer,
     private jeuneAuthorizer: JeuneAuthorizer,
-    private evenementService: EvenementService
+    private evenementService: EvenementService,
+    private configuration: ConfigService
   ) {
     super('GetRendezVousJeuneQueryHandler')
   }
@@ -94,13 +97,13 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
         }
       ],
       where: {
+        ...generateSourceRendezVousCondition(this.configuration),
         date: {
           [Op.lt]: maintenant
         },
         dateSuppression: {
           [Op.is]: null
-        },
-        source: RendezVous.Source.PASS_EMPLOI
+        }
       },
       order: [['date', 'DESC']],
       limit: 100
