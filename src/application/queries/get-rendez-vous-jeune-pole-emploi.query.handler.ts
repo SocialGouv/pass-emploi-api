@@ -3,7 +3,7 @@ import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
-import { Query } from '../../building-blocks/types/query'
+import { Cached, Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
 import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
@@ -18,7 +18,7 @@ export interface GetRendezVousJeunePoleEmploiQuery extends Query {
 @Injectable()
 export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
   GetRendezVousJeunePoleEmploiQuery,
-  Result<RendezVousJeuneQueryModel[]>
+  Result<Cached<RendezVousJeuneQueryModel[]>>
 > {
   constructor(
     private getRendezVousJeunePoleEmploiQueryGetter: GetRendezVousJeunePoleEmploiQueryGetter,
@@ -30,7 +30,7 @@ export class GetRendezVousJeunePoleEmploiQueryHandler extends QueryHandler<
 
   async handle(
     query: GetRendezVousJeunePoleEmploiQuery
-  ): Promise<Result<RendezVousJeuneQueryModel[]>> {
+  ): Promise<Result<Cached<RendezVousJeuneQueryModel[]>>> {
     return this.getRendezVousJeunePoleEmploiQueryGetter.handle(query)
   }
 

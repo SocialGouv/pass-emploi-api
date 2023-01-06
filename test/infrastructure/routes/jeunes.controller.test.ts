@@ -76,6 +76,8 @@ import { GetUnRendezVousJeuneQueryHandler } from '../../../src/application/queri
 import { unRendezVousJeuneDetailQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 import { DateService } from '../../../src/utils/date-service'
+import { Cached } from '../../../src/building-blocks/types/query'
+import { JeuneHomeDemarcheQueryModel } from '../../../src/application/queries/query-models/home-jeune.query-model'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -726,7 +728,9 @@ describe('JeunesController', () => {
       it('retourne les rdv', async () => {
         // Given
         jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
-        getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(success([]))
+        getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(
+          success({ queryModel: [] })
+        )
 
         // When
         await request(app.getHttpServer())
@@ -734,6 +738,21 @@ describe('JeunesController', () => {
           .set('authorization', unHeaderAuthorization())
           // Then
           .expect([])
+      })
+      it('renvoie une 500 quand la query est cachée', async () => {
+        // Given
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValideJeunePE())
+        const data: Cached<RendezVousJeuneQueryModel[]> = {
+          queryModel: [],
+          dateDuCache: uneDatetime()
+        }
+        getRendezVousJeunePoleEmploiQueryHandler.execute.resolves(success(data))
+        // When
+        await request(app.getHttpServer())
+          .get(`/jeunes/${idJeune}/rendezvous`)
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect(HttpStatus.INTERNAL_SERVER_ERROR)
       })
     })
 
@@ -992,7 +1011,7 @@ describe('JeunesController', () => {
           },
           unUtilisateurDecode()
         )
-        .resolves(success(queryModel))
+        .resolves(success({ queryModel }))
 
       // When
       await request(app.getHttpServer())
@@ -1039,6 +1058,34 @@ describe('JeunesController', () => {
         .expect(HttpStatus.NOT_FOUND)
     })
 
+    it('rejette quand la query est cachée', async () => {
+      // Given
+      jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+      const data: Cached<JeuneHomeAgendaPoleEmploiQueryModel> = {
+        queryModel: queryModel,
+        dateDuCache: uneDatetime()
+      }
+      getJeuneHomeAgendaPoleEmploiQueryHandler.execute
+        .withArgs(
+          {
+            idJeune,
+            maintenant: DateTime.fromISO(maintenant, { setZone: true }),
+            accessToken: 'coucou'
+          },
+          unUtilisateurDecode()
+        )
+        .resolves(success(data))
+
+      // When
+      await request(app.getHttpServer())
+        .get(
+          `/jeunes/${idJeune}/home/agenda/pole-emploi?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00`
+        )
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.INTERNAL_SERVER_ERROR)
+    })
+
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/jeunes/1/home/agenda/pole-emploi?maintenant=2022-08-17T12%3A00%3A30%2B02%3A00'
@@ -1061,7 +1108,9 @@ describe('JeunesController', () => {
           )
           .resolves(
             success({
-              actions: []
+              queryModel: {
+                actions: []
+              }
             })
           )
 
@@ -1093,6 +1142,34 @@ describe('JeunesController', () => {
           .set('authorization', unHeaderAuthorization())
           // Then
           .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+    describe('quand la query est cachée', () => {
+      it('renvoie une erreur HTTP', async () => {
+        // Given
+        jwtService.verifyTokenAndGetJwt.resolves(unJwtPayloadValide())
+        const data: Cached<JeuneHomeDemarcheQueryModel> = {
+          queryModel: {
+            actions: []
+          },
+          dateDuCache: uneDatetime()
+        }
+        getJeuneHomeDemarchesQueryHandler.execute
+          .withArgs(
+            {
+              idJeune,
+              accessToken: 'coucou'
+            },
+            unUtilisateurDecode()
+          )
+          .resolves(success(data))
+
+        // When
+        await request(app.getHttpServer())
+          .get(`/jeunes/${idJeune}/home/demarches`)
+          .set('authorization', unHeaderAuthorization())
+          // Then
+          .expect(HttpStatus.INTERNAL_SERVER_ERROR)
       })
     })
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { Result } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { Query } from '../../building-blocks/types/query'
+import { Cached, Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
 import { DemarcheQueryModel } from './query-models/actions.query-model'
@@ -15,7 +15,7 @@ export interface GetDemarchesQuery extends Query {
 @Injectable()
 export class GetDemarchesQueryHandler extends QueryHandler<
   GetDemarchesQuery,
-  Result<DemarcheQueryModel[]>
+  Result<Cached<DemarcheQueryModel[]>>
 > {
   constructor(
     private getDemarchesQueryGetter: GetDemarchesQueryGetter,
@@ -26,8 +26,8 @@ export class GetDemarchesQueryHandler extends QueryHandler<
 
   async handle(
     query: GetDemarchesQuery
-  ): Promise<Result<DemarcheQueryModel[]>> {
-    return this.getDemarchesQueryGetter.handle({
+  ): Promise<Result<Cached<DemarcheQueryModel[]>>> {
+    return await this.getDemarchesQueryGetter.handle({
       ...query,
       tri: GetDemarchesQueryGetter.Tri.parSatutEtDateFin
     })

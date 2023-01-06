@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { JeuneHomeDemarcheQueryModel } from './query-models/home-jeune.query-model'
 import { GetCampagneQueryModel } from './query-getters/get-campagne.query.getter'
 import { isFailure, Result, success } from '../../building-blocks/types/result'
-import { Query } from '../../building-blocks/types/query'
+import { Cached, Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
 import { Authentification } from '../../domain/authentification'
@@ -16,7 +16,7 @@ export interface GetJeuneHomeDemarchesQuery extends Query {
 @Injectable()
 export class GetJeuneHomeDemarchesQueryHandler extends QueryHandler<
   GetJeuneHomeDemarchesQuery,
-  Result<JeuneHomeDemarcheQueryModel>
+  Result<Cached<JeuneHomeDemarcheQueryModel>>
 > {
   constructor(
     private getActionsJeunePoleEmploiQueryGetter: GetDemarchesQueryGetter,
@@ -28,7 +28,7 @@ export class GetJeuneHomeDemarchesQueryHandler extends QueryHandler<
 
   async handle(
     query: GetJeuneHomeDemarchesQuery
-  ): Promise<Result<JeuneHomeDemarcheQueryModel>> {
+  ): Promise<Result<Cached<JeuneHomeDemarcheQueryModel>>> {
     const [demarches, campagne] = await Promise.all([
       this.getActionsJeunePoleEmploiQueryGetter.handle({
         ...query,
@@ -41,10 +41,14 @@ export class GetJeuneHomeDemarchesQueryHandler extends QueryHandler<
       return demarches
     }
 
-    return success({
-      actions: demarches.data,
-      campagne: campagne
-    })
+    const data: Cached<JeuneHomeDemarcheQueryModel> = {
+      queryModel: {
+        actions: demarches.data.queryModel,
+        campagne: campagne
+      },
+      dateDuCache: demarches.data.dateDuCache
+    }
+    return success(data)
   }
 
   async authorize(

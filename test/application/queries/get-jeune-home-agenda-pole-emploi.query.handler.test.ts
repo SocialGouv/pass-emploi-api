@@ -21,6 +21,7 @@ import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../src/applicatio
 import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 import { KeycloakClient } from 'src/infrastructure/clients/keycloak-client'
 import { Demarche } from '../../../src/domain/demarche'
+import { Cached } from '../../../src/building-blocks/types/query'
 
 describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
   let handler: GetJeuneHomeAgendaPoleEmploiQueryHandler
@@ -75,7 +76,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
       date: maintenant.plus({ weeks: 2, day: 1 }).toJSDate()
     })
 
-    let result: Result<JeuneHomeAgendaPoleEmploiQueryModel>
+    let result: Result<Cached<JeuneHomeAgendaPoleEmploiQueryModel>>
 
     describe('quand les services externes répondent avec Succès', () => {
       describe('mapping et filtres', () => {
@@ -94,12 +95,14 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
               idpToken
             })
             .resolves(
-              success([
-                uneDemarcheDansDeuxSemainesPlusUnJour,
-                uneDemarcheDeLaSemaine,
-                uneDemarcheDeLaSemaineProchaine,
-                uneDemarcheDeLaSemaineDerniere
-              ])
+              success({
+                queryModel: [
+                  uneDemarcheDansDeuxSemainesPlusUnJour,
+                  uneDemarcheDeLaSemaine,
+                  uneDemarcheDeLaSemaineProchaine,
+                  uneDemarcheDeLaSemaineDerniere
+                ]
+              })
             )
 
           getRendezVousJeunePoleEmploiQueryGetter.handle
@@ -108,11 +111,13 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
               idpToken
             })
             .resolves(
-              success([
-                unRendezVousHier,
-                unRendezVousAujourdhui,
-                unRendezVousDansDeuxSemainesPlusUnJour
-              ])
+              success({
+                queryModel: [
+                  unRendezVousHier,
+                  unRendezVousAujourdhui,
+                  unRendezVousDansDeuxSemainesPlusUnJour
+                ]
+              })
             )
 
           // When
@@ -120,7 +125,9 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
         })
         it('retourne des démarches filtrées entre maintenant et dans deux semaines', () => {
           // Then
-          expect(isSuccess(result) && result.data.demarches).to.deep.equal([
+          expect(
+            isSuccess(result) && result.data.queryModel.demarches
+          ).to.deep.equal([
             uneDemarcheDeLaSemaine,
             uneDemarcheDeLaSemaineProchaine
           ])
@@ -128,14 +135,16 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
 
         it('retourne des rendez vous filtrées entre maintenant et dans deux semaines', () => {
           // Then
-          expect(isSuccess(result) && result.data.rendezVous).to.deep.equal([
-            unRendezVousAujourdhui
-          ])
+          expect(
+            isSuccess(result) && result.data.queryModel.rendezVous
+          ).to.deep.equal([unRendezVousAujourdhui])
         })
 
         it('retourne des metadata', () => {
           // Then
-          expect(isSuccess(result) && result.data.metadata).to.deep.equal({
+          expect(
+            isSuccess(result) && result.data.queryModel.metadata
+          ).to.deep.equal({
             dateDeDebut: maintenant.toJSDate(),
             dateDeFin: dansDeuxSemaines.toJSDate(),
             demarchesEnRetard: 0
@@ -159,10 +168,12 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
                 statut: Demarche.Statut.EN_COURS
               })
 
-              getDemarchesQueryGetter.handle.resolves(success([demarche]))
+              getDemarchesQueryGetter.handle.resolves(
+                success({ queryModel: [demarche] })
+              )
 
               getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
-                success([])
+                success({ queryModel: [] })
               )
 
               // When
@@ -170,7 +181,8 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
 
               // Then
               expect(
-                isSuccess(result) && result.data.metadata.demarchesEnRetard
+                isSuccess(result) &&
+                  result.data.queryModel.metadata.demarchesEnRetard
               ).to.equal(1)
             })
           })
@@ -188,10 +200,12 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
                 statut: Demarche.Statut.EN_COURS
               })
 
-              getDemarchesQueryGetter.handle.resolves(success([demarche]))
+              getDemarchesQueryGetter.handle.resolves(
+                success({ queryModel: [demarche] })
+              )
 
               getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
-                success([])
+                success({ queryModel: [] })
               )
 
               // When
@@ -199,7 +213,8 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
 
               // Then
               expect(
-                isSuccess(result) && result.data.metadata.demarchesEnRetard
+                isSuccess(result) &&
+                  result.data.queryModel.metadata.demarchesEnRetard
               ).to.equal(0)
             })
           })
@@ -219,10 +234,12 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
                 statut: Demarche.Statut.A_FAIRE
               })
 
-              getDemarchesQueryGetter.handle.resolves(success([demarche]))
+              getDemarchesQueryGetter.handle.resolves(
+                success({ queryModel: [demarche] })
+              )
 
               getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
-                success([])
+                success({ queryModel: [] })
               )
 
               // When
@@ -230,7 +247,8 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
 
               // Then
               expect(
-                isSuccess(result) && result.data.metadata.demarchesEnRetard
+                isSuccess(result) &&
+                  result.data.queryModel.metadata.demarchesEnRetard
               ).to.equal(1)
             })
           })
@@ -248,10 +266,12 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
                 statut: Demarche.Statut.A_FAIRE
               })
 
-              getDemarchesQueryGetter.handle.resolves(success([demarche]))
+              getDemarchesQueryGetter.handle.resolves(
+                success({ queryModel: [demarche] })
+              )
 
               getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
-                success([])
+                success({ queryModel: [] })
               )
 
               // When
@@ -259,7 +279,8 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
 
               // Then
               expect(
-                isSuccess(result) && result.data.metadata.demarchesEnRetard
+                isSuccess(result) &&
+                  result.data.queryModel.metadata.demarchesEnRetard
               ).to.equal(0)
             })
           })
@@ -279,10 +300,12 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
                 statut: Demarche.Statut.REALISEE
               })
 
-              getDemarchesQueryGetter.handle.resolves(success([demarche]))
+              getDemarchesQueryGetter.handle.resolves(
+                success({ queryModel: [demarche] })
+              )
 
               getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
-                success([])
+                success({ queryModel: [] })
               )
 
               // When
@@ -290,7 +313,8 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
 
               // Then
               expect(
-                isSuccess(result) && result.data.metadata.demarchesEnRetard
+                isSuccess(result) &&
+                  result.data.queryModel.metadata.demarchesEnRetard
               ).to.equal(0)
             })
           })
@@ -308,10 +332,12 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
                 statut: Demarche.Statut.REALISEE
               })
 
-              getDemarchesQueryGetter.handle.resolves(success([demarche]))
+              getDemarchesQueryGetter.handle.resolves(
+                success({ queryModel: [demarche] })
+              )
 
               getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
-                success([])
+                success({ queryModel: [] })
               )
 
               // When
@@ -319,7 +345,8 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
 
               // Then
               expect(
-                isSuccess(result) && result.data.metadata.demarchesEnRetard
+                isSuccess(result) &&
+                  result.data.queryModel.metadata.demarchesEnRetard
               ).to.equal(0)
             })
           })
@@ -339,10 +366,12 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
                 statut: Demarche.Statut.ANNULEE
               })
 
-              getDemarchesQueryGetter.handle.resolves(success([demarche]))
+              getDemarchesQueryGetter.handle.resolves(
+                success({ queryModel: [demarche] })
+              )
 
               getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
-                success([])
+                success({ queryModel: [] })
               )
 
               // When
@@ -350,7 +379,8 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
 
               // Then
               expect(
-                isSuccess(result) && result.data.metadata.demarchesEnRetard
+                isSuccess(result) &&
+                  result.data.queryModel.metadata.demarchesEnRetard
               ).to.equal(0)
             })
           })
@@ -368,10 +398,12 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
                 statut: Demarche.Statut.ANNULEE
               })
 
-              getDemarchesQueryGetter.handle.resolves(success([demarche]))
+              getDemarchesQueryGetter.handle.resolves(
+                success({ queryModel: [demarche] })
+              )
 
               getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
-                success([])
+                success({ queryModel: [] })
               )
 
               // When
@@ -379,7 +411,8 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
 
               // Then
               expect(
-                isSuccess(result) && result.data.metadata.demarchesEnRetard
+                isSuccess(result) &&
+                  result.data.queryModel.metadata.demarchesEnRetard
               ).to.equal(0)
             })
           })
@@ -417,7 +450,7 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
           accessToken: 'accessToken'
         }
 
-        getDemarchesQueryGetter.handle.resolves(success([]))
+        getDemarchesQueryGetter.handle.resolves(success({ queryModel: [] }))
         getRendezVousJeunePoleEmploiQueryGetter.handle.resolves(
           failure(new ErreurHttp('Erreur', 418))
         )

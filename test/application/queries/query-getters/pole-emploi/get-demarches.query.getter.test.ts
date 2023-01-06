@@ -28,6 +28,10 @@ import { KeycloakClient } from '../../../../../src/infrastructure/clients/keyclo
 import { Jeune } from '../../../../../src/domain/jeune/jeune'
 import { SinonSandbox } from 'sinon'
 import { GetDemarchesQueryGetter } from '../../../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
+import { failureApi } from '../../../../../src/building-blocks/types/result-api'
+import { Cached } from '../../../../../src/building-blocks/types/query'
+import { DemarcheQueryModel } from '../../../../../src/application/queries/query-models/actions.query-model'
+import { Demarche } from '../../../../../src/domain/demarche'
 
 describe('GetDemarchesQueryGetter', () => {
   let jeunesRepository: StubbedType<Jeune.Repository>
@@ -151,30 +155,39 @@ describe('GetDemarchesQueryGetter', () => {
         const result = await getDemarchesQueryGetter.handle(query)
 
         // Then
-        expect(isSuccess(result) && result.data).to.deep.equal([
-          {
-            attributs: [],
-            codeDemarche: 'eyJxdW9pIjoiUTIwIiwicG91cnF1b2kiOiJQMTgifQ==',
-            contenu: undefined,
-            creeeParConseiller: false,
-            dateAnnulation: undefined,
-            dateCreation: DateTime.fromISO(
-              '2022-03-01T09:20:00.000+01:00'
-            ).toISO(),
-            dateDebut: undefined,
-            dateFin: DateTime.fromISO('2022-04-01T10:20:00.000+02:00').toISO(),
-            dateModification: DateTime.fromISO(
-              '2022-03-02T11:20:00.000+01:00'
-            ).toISO(),
-            id: 'id-demarche',
-            label: 'pourquoi',
-            modifieParConseiller: false,
-            sousTitre: undefined,
-            statut: 'A_FAIRE',
-            statutsPossibles: ['ANNULEE', 'REALISEE'],
-            titre: 'quoi'
-          }
-        ])
+        const expected: Cached<DemarcheQueryModel[]> = {
+          queryModel: [
+            {
+              attributs: [],
+              codeDemarche: 'eyJxdW9pIjoiUTIwIiwicG91cnF1b2kiOiJQMTgifQ==',
+              contenu: undefined,
+              creeeParConseiller: false,
+              dateAnnulation: undefined,
+              dateCreation: DateTime.fromISO(
+                '2022-03-01T09:20:00.000+01:00'
+              ).toISO(),
+              dateDebut: undefined,
+              dateFin: DateTime.fromISO(
+                '2022-04-01T10:20:00.000+02:00'
+              ).toISO(),
+              dateModification: DateTime.fromISO(
+                '2022-03-02T11:20:00.000+01:00'
+              ).toISO(),
+              id: 'id-demarche',
+              label: 'pourquoi',
+              modifieParConseiller: false,
+              sousTitre: undefined,
+              statut: Demarche.Statut.A_FAIRE,
+              statutsPossibles: [
+                Demarche.Statut.ANNULEE,
+                Demarche.Statut.REALISEE
+              ],
+              titre: 'quoi'
+            }
+          ],
+          dateDuCache: undefined
+        }
+        expect(result).to.deep.equal(success(expected))
       })
       it('récupère les demarches Pole Emploi du jeune triés par statut et par date de fin', async () => {
         const query = {
@@ -202,7 +215,7 @@ describe('GetDemarchesQueryGetter', () => {
         // Then
         expect(isSuccess(result)).to.be.true()
         if (isSuccess(result)) {
-          const demarches = result.data
+          const demarches = result.data.queryModel
           expect(demarches[0].id).to.equal(demarcheDtoEnCoursProche.idDemarche)
           expect(demarches[1].id).to.equal(demarcheDtoRetard.idDemarche)
           expect(demarches[2].id).to.equal(demarcheDtoAFaireAuMilieu.idDemarche)
@@ -236,7 +249,7 @@ describe('GetDemarchesQueryGetter', () => {
         // Then
         expect(isSuccess(result)).to.be.true()
         if (isSuccess(result)) {
-          const demarches = result.data
+          const demarches = result.data.queryModel
           expect(demarches[0].id).to.equal(demarcheDtoAnnulee.idDemarche)
           expect(demarches[1].id).to.equal(demarcheDtoEnCoursProche.idDemarche)
           expect(demarches[2].id).to.equal(demarcheDtoEnCours.idDemarche)
@@ -257,7 +270,7 @@ describe('GetDemarchesQueryGetter', () => {
         jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
         poleEmploiPartenaireClient.getDemarches
           .withArgs(idpToken)
-          .resolves(failure(new ErreurHttp('erreur', 400)))
+          .resolves(failureApi(new ErreurHttp('erreur', 400)))
 
         // When
         const result = await getDemarchesQueryGetter.handle(query)

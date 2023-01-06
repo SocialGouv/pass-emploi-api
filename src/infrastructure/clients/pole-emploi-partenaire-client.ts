@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios'
-import { HttpStatus, Injectable, Logger } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import * as https from 'https'
@@ -11,7 +11,6 @@ import {
   ContextKey
 } from '../../building-blocks/context'
 import { ErreurHttp } from '../../building-blocks/types/domain-error'
-import { failure, Result, success } from '../../building-blocks/types/result'
 import { Demarche } from '../../domain/demarche'
 import { suggestionsPEInMemory } from '../repositories/dto/pole-emploi.in-memory.dto'
 import {
@@ -24,6 +23,13 @@ import {
 import { LogApiPartenaireSqlModel } from '../sequelize/models/log-api-partenaire.sql-model'
 import { Op } from 'sequelize'
 import { Authentification } from '../../domain/authentification'
+import {
+  failureApi,
+  isSuccessApi,
+  ResultApi,
+  successApi
+} from '../../building-blocks/types/result-api'
+import { failure, Result, success } from '../../building-blocks/types/result'
 
 const ORIGINE = 'INDIVIDU'
 const DEMARCHES_URL = 'peconnect-demarches/v1/demarches'
@@ -31,18 +37,21 @@ const DEMARCHES_URL = 'peconnect-demarches/v1/demarches'
 export const PoleEmploiPartenaireClientToken = 'PoleEmploiPartenaireClientToken'
 
 interface PoleEmploiPartenaireClientI {
-  getDemarches(tokenDuJeune: string): Promise<Result<DemarcheDto[]>>
+  getDemarches(tokenDuJeune: string): Promise<ResultApi<DemarcheDto[]>>
 
   getRendezVous(
     tokenDuJeune: string
-  ): Promise<Result<RendezVousPoleEmploiDto[]>>
+  ): Promise<ResultApi<RendezVousPoleEmploiDto[]>>
 
   getPrestations(
     tokenDuJeune: string,
     dateRechercheRendezVous: DateTime
-  ): Promise<Result<PrestationDto[]>>
+  ): Promise<ResultApi<PrestationDto[]>>
 
-  getLienVisio(tokenDuJeune: string, idVisio: string): Promise<Result<string>>
+  getLienVisio(
+    tokenDuJeune: string,
+    idVisio: string
+  ): Promise<ResultApi<string>>
 
   updateDemarche(
     demarcheModifiee: Demarche.Modifiee,
@@ -54,7 +63,7 @@ interface PoleEmploiPartenaireClientI {
     token: string
   ): Promise<Result<DemarcheDto>>
 
-  getSuggestionsRecherches(token: string): Promise<Result<SuggestionDto[]>>
+  getSuggestionsRecherches(token: string): Promise<ResultApi<SuggestionDto[]>>
 }
 
 @Injectable()
@@ -71,33 +80,32 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     this.apiUrl = this.configService.get('poleEmploiPartenaire').url
   }
 
-  async getDemarches(tokenDuJeune: string): Promise<Result<DemarcheDto[]>> {
+  async getDemarches(tokenDuJeune: string): Promise<ResultApi<DemarcheDto[]>> {
     this.logger.log('recuperation des demarches du jeune')
 
     const response = await this.get<DemarcheDto[]>(DEMARCHES_URL, tokenDuJeune)
 
-    if (response.status === HttpStatus.NO_CONTENT) {
-      return success([])
+    if (isSuccessApi(response) && !response.data) {
+      return successApi([])
     }
 
-    return success(response.data ?? [])
+    return response
   }
 
   async getRendezVous(
     tokenDuJeune: string
-  ): Promise<Result<RendezVousPoleEmploiDto[]>> {
+  ): Promise<ResultApi<RendezVousPoleEmploiDto[]>> {
     this.logger.log('recuperation des rendez-vous du jeune')
-    const dtos = await this.get<RendezVousPoleEmploiDto[]>(
+    return await this.get<RendezVousPoleEmploiDto[]>(
       'peconnect-rendezvousagenda/v1/listerendezvous',
       tokenDuJeune
     )
-    return success(dtos.data || [])
   }
 
   async getPrestations(
     tokenDuJeune: string,
     dateRechercheRendezVous: DateTime
-  ): Promise<Result<PrestationDto[]>> {
+  ): Promise<ResultApi<PrestationDto[]>> {
     this.logger.log(
       `recuperation des prestations du jeune à partir de la date du ${dateRechercheRendezVous.toFormat(
         'yyyy-MM-dd'
@@ -109,27 +117,23 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
       dateRechercheRendezVous.toFormat('yyyy-MM-dd')
     )
 
-    const dtos = await this.get<PrestationDto[]>(
+    return this.get<PrestationDto[]>(
       'peconnect-gerer-prestations/v1/rendez-vous',
       tokenDuJeune,
       params
     )
-
-    return success(dtos.data || [])
   }
 
   async getLienVisio(
     tokenDuJeune: string,
     idVisio: string
-  ): Promise<Result<string>> {
+  ): Promise<ResultApi<string>> {
     this.logger.log('recuperation visio')
 
-    const lienVisio = await this.get<string>(
+    return this.get<string>(
       `peconnect-gerer-prestations/v1/lien-visio/rendez-vous/${idVisio}`,
       tokenDuJeune
     )
-
-    return success(lienVisio.data)
   }
 
   async updateDemarche(
@@ -197,28 +201,18 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
 
   async getSuggestionsRecherches(
     token: string
-  ): Promise<Result<SuggestionDto[]>> {
-    try {
-      const suggestionsPe = await this.get<SuggestionDto[]>(
-        'peconnect-metiersrecherches/v1/metiersrecherches',
-        token
-      )
-      return success(suggestionsPe.data)
-    } catch (e) {
-      this.logger.error(e)
-      if (e.response?.data && e.response?.status) {
-        const erreur = new ErreurHttp(e.response.data, e.response.status)
-        return failure(erreur)
-      }
-      throw e
-    }
+  ): Promise<ResultApi<SuggestionDto[]>> {
+    return this.get<SuggestionDto[]>(
+      'peconnect-metiersrecherches/v1/metiersrecherches',
+      token
+    )
   }
 
   private async get<T>(
     suffixUrl: string,
     tokenDuJeune: string,
     params?: URLSearchParams
-  ): Promise<Result<{ donnees: T; dateCache?: string }>> {
+  ): Promise<ResultApi<T>> {
     try {
       const res = await firstValueFrom(
         this.httpService.get<T>(`${this.apiUrl}/${suffixUrl}`, {
@@ -233,29 +227,19 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
         })
       )
       this.ajouterLeRetourAuContexteNode(res)
-      return success({ donnees: res.data })
+      return success(res.data)
     } catch (e) {
-      if (e.response?.status === 500) {
-        const utilisateur = this.context.get<Authentification.Utilisateur>(
-          ContextKey.UTILISATEUR
-        )
-        const cache = await LogApiPartenaireSqlModel.findOne({
-          where: {
-            pathPartenaire: {
-              [Op.like]: `%${suffixUrl}%`
-            },
-            idUtilisateur: utilisateur.id
-          },
-          order: [['date', 'DESC']]
-        })
+      if (e.response.status === 500) {
+        const cache = await this.recupererLesDernieresDonnees(suffixUrl)
         if (cache) {
-          return success({
-            donnees: cache.resultatPartenaire as T,
-            dateCache: cache.date.toISOString()
-          })
+          return successApi(
+            cache.resultatPartenaire as T,
+            DateTime.fromJSDate(cache.date)
+          )
         }
       }
-      return failure(new ErreurHttp(e.response.data, e.response.status))
+
+      return failureApi(new ErreurHttp(e.response.data, e.response.status))
     }
   }
 
@@ -314,13 +298,30 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
       resultatsAppelPartenaire
     )
   }
+
+  private async recupererLesDernieresDonnees(
+    suffixUrl: string
+  ): Promise<LogApiPartenaireSqlModel | null> {
+    const utilisateur = this.context.get<Authentification.Utilisateur>(
+      ContextKey.UTILISATEUR
+    )
+    return await LogApiPartenaireSqlModel.findOne({
+      where: {
+        pathPartenaire: {
+          [Op.like]: `%${suffixUrl}%`
+        },
+        idUtilisateur: utilisateur.id
+      },
+      order: [['date', 'DESC']]
+    })
+  }
 }
 
 @Injectable()
 export class PoleEmploiPartenaireInMemoryClient extends PoleEmploiPartenaireClient {
   async getSuggestionsRecherches(
     _token: string
-  ): Promise<Result<SuggestionDto[]>> {
+  ): Promise<ResultApi<SuggestionDto[]>> {
     return success(suggestionsPEInMemory)
   }
 }

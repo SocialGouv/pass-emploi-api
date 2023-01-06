@@ -22,6 +22,10 @@ import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { unePrestationDto } from '../../fixtures/pole-emploi-partenaire.fixture'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { Core } from '../../../src/domain/core'
+import {
+  failureApi,
+  successApi
+} from '../../../src/building-blocks/types/result-api'
 
 describe('PoleEmploiPartenaireClient', () => {
   let poleEmploiPartenaireClient: PoleEmploiPartenaireClient
@@ -75,7 +79,7 @@ describe('PoleEmploiPartenaireClient', () => {
           .get(
             '/peconnect-gerer-prestations/v1/rendez-vous?dateRecherche=2020-04-06'
           )
-          .reply(500, { message: 'erreur' })
+          .reply(500, 'erreur')
       })
       describe('quand il y a un cache', () => {
         it('renvoie les prestations du cache', async () => {
@@ -100,7 +104,9 @@ describe('PoleEmploiPartenaireClient', () => {
           )
 
           // Then
-          expect(response).to.deep.equal(success([unePrestationDto()]))
+          expect(response).to.deep.equal(
+            successApi([unePrestationDto()], uneDatetime())
+          )
         })
       })
       describe("quand il n'y a pas de cache", () => {
@@ -126,7 +132,9 @@ describe('PoleEmploiPartenaireClient', () => {
           )
 
           // Then
-          expect(response).to.deep.equal(failure(new ErreurHttp('erreur', 500)))
+          expect(response).to.deep.equal(
+            failureApi(new ErreurHttp('erreur', 500))
+          )
         })
       })
     })
@@ -137,7 +145,7 @@ describe('PoleEmploiPartenaireClient', () => {
           .get(
             '/peconnect-gerer-prestations/v1/rendez-vous?dateRecherche=2020-04-06'
           )
-          .reply(400, { message: 'erreur' })
+          .reply(400, 'erreur')
           .isDone()
 
         // When
@@ -147,7 +155,9 @@ describe('PoleEmploiPartenaireClient', () => {
         )
 
         // Then
-        expect(response).to.deep.equal(failure(new ErreurHttp('erreur', 400)))
+        expect(response).to.deep.equal(
+          failureApi(new ErreurHttp('erreur', 400))
+        )
       })
     })
   })
@@ -223,7 +233,7 @@ describe('PoleEmploiPartenaireClient', () => {
         )
 
         // Then
-        expect(demarcheDtos).to.deep.equal(success([]))
+        expect(demarcheDtos).to.deep.equal(successApi([]))
       })
     })
   })
