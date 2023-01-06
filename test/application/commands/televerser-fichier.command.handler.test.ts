@@ -16,6 +16,7 @@ import {
 import { unFichier } from '../../fixtures/fichier.fixture'
 import {
   DroitsInsuffisants,
+  MauvaiseCommandeError,
   NonTraitableError
 } from '../../../src/building-blocks/types/domain-error'
 import { Authentification } from 'src/domain/authentification'
@@ -184,19 +185,49 @@ describe('TeleverserFichierCommandHandler', () => {
     })
 
     describe('quand la commande est invalide', () => {
-      it('retourne la failure', async () => {
-        // Given
-        const echec = failure(new NonTraitableError('Fichier', '1'))
-        fichierFactory.creer
-          .withArgs({ ...command, jeunesIds: command.jeunesIds! })
-          .returns(echec)
+      describe("quand le fichier n'est pas valide", () => {
+        it('retourne une failure', async () => {
+          // Given
+          const echec = failure(new NonTraitableError('Fichier', '1'))
+          fichierFactory.creer
+            .withArgs({ ...command, jeunesIds: command.jeunesIds! })
+            .returns(echec)
 
-        // When
-        const result = await televerserFichierCommandHandler.handle(command)
+          // When
+          const result = await televerserFichierCommandHandler.handle(command)
 
-        // Then
-        expect(fichierRepository.save).not.to.have.been.called()
-        expect(result).to.deep.equal(echec)
+          // Then
+          expect(fichierRepository.save).not.to.have.been.called()
+          expect(result).to.deep.equal(echec)
+        })
+      })
+      describe("quand il n'y a ni liste de diffusion ni jeunes", () => {
+        it('retourne une failure', async () => {
+          // Given
+          const command: TeleverserFichierCommand = {
+            fichier: {
+              buffer: Buffer.alloc(1),
+              mimeType: 'jpg',
+              name: 'fichier-test.jpg',
+              size: 1000
+            },
+            createur: {
+              id: '1',
+              type: Authentification.Type.CONSEILLER
+            },
+            jeunesIds: [],
+            listesDeDiffusionIds: []
+          }
+          // When
+          const result = await televerserFichierCommandHandler.handle(command)
+
+          // Then
+          expect(result).to.deep.equal(
+            failure(
+              new MauvaiseCommandeError('Aucun jeune ou liste de diffusion')
+            )
+          )
+        })
       })
     })
   })
