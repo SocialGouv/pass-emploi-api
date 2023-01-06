@@ -17,6 +17,7 @@ import { DateService } from '../../../../utils/date-service'
 import { fromDemarcheDtoToDemarche } from '../../query-mappers/actions-pole-emploi.mappers'
 import { DemarcheQueryModel } from '../../query-models/actions.query-model'
 import { toDemarcheQueryModel } from '../../query-mappers/demarche.mappers'
+import { Cached } from '../../../../building-blocks/types/query'
 
 export interface Query {
   idJeune: string
@@ -40,7 +41,7 @@ export class GetDemarchesQueryGetter {
     this.logger = new Logger('GetDemarchesQueryGetter')
   }
 
-  async handle(query: Query): Promise<Result<DemarcheQueryModel[]>> {
+  async handle(query: Query): Promise<Result<Cached<DemarcheQueryModel[]>>> {
     const jeune = await this.jeuneRepository.get(query.idJeune)
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
@@ -65,7 +66,11 @@ export class GetDemarchesQueryGetter {
       )
       .sort(query.tri)
 
-    return success(demarches.map(toDemarcheQueryModel))
+    const data: Cached<DemarcheQueryModel[]> = {
+      queryModel: demarches.map(toDemarcheQueryModel),
+      dateDuCache: demarchesDto.dateCache
+    }
+    return success(data)
   }
 }
 

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { Query } from '../../building-blocks/types/query'
+import { Cached, Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Result, isFailure, success } from '../../building-blocks/types/result'
+import { isFailure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Demarche } from '../../domain/demarche'
 import { KeycloakClient } from '../../infrastructure/clients/keycloak-client'
@@ -20,7 +20,7 @@ export interface GetJeuneHomeAgendaPoleEmploiQuery extends Query {
 @Injectable()
 export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
   GetJeuneHomeAgendaPoleEmploiQuery,
-  Result<JeuneHomeAgendaPoleEmploiQueryModel>
+  Result<Cached<JeuneHomeAgendaPoleEmploiQueryModel>>
 > {
   constructor(
     private getDemarchesQueryGetter: GetDemarchesQueryGetter,
@@ -33,7 +33,7 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
 
   async handle(
     query: GetJeuneHomeAgendaPoleEmploiQuery
-  ): Promise<Result<JeuneHomeAgendaPoleEmploiQueryModel>> {
+  ): Promise<Result<Cached<JeuneHomeAgendaPoleEmploiQueryModel>>> {
     const dansDeuxSemaines = query.maintenant.plus({ weeks: 2 })
 
     const idpToken = await this.keycloakClient.exchangeTokenPoleEmploiJeune(
@@ -60,32 +60,39 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
       return resultRendezVous
     }
 
-    const demarches = resultDemarches.data.filter(
+    const demarches = resultDemarches.data.queryModel.filter(
       demarche =>
         DateTime.fromISO(demarche.dateFin) >= query.maintenant &&
         DateTime.fromISO(demarche.dateFin) <= dansDeuxSemaines
     )
-    const rendezVous = resultRendezVous.data.filter(
+    const rendezVous = resultRendezVous.data.queryModel.filter(
       unRendezVous =>
         unRendezVous.date >= query.maintenant.toJSDate() &&
         unRendezVous.date <= dansDeuxSemaines.toJSDate()
     )
-    const nombreDeDemarchesEnRetard = resultDemarches.data.filter(
+    const nombreDeDemarchesEnRetard = resultDemarches.data.queryModel.filter(
       demarche =>
         DateTime.fromISO(demarche.dateFin) <= query.maintenant &&
         demarche.statut !== Demarche.Statut.REALISEE &&
         demarche.statut !== Demarche.Statut.ANNULEE
     ).length
 
-    return success({
-      demarches,
-      rendezVous,
-      metadata: {
-        dateDeDebut: query.maintenant.toJSDate(),
-        dateDeFin: dansDeuxSemaines.toJSDate(),
-        demarchesEnRetard: nombreDeDemarchesEnRetard
-      }
-    })
+    const data: Cached<JeuneHomeAgendaPoleEmploiQueryModel> = {
+      queryModel: {
+        demarches,
+        rendezVous,
+        metadata: {
+          dateDeDebut: query.maintenant.toJSDate(),
+          dateDeFin: dansDeuxSemaines.toJSDate(),
+          demarchesEnRetard: nombreDeDemarchesEnRetard
+        }
+      },
+      dateDuCache: recupererLaDateLaPlusAncienne(
+        resultDemarches.data.dateDuCache,
+        resultRendezVous.data.dateDuCache
+      )
+    }
+    return success(data)
   }
 
   async authorize(
@@ -98,4 +105,19 @@ export class GetJeuneHomeAgendaPoleEmploiQueryHandler extends QueryHandler<
   async monitor(): Promise<void> {
     return
   }
+}
+
+function recupererLaDateLaPlusAncienne(
+  dateUne: DateTime | undefined,
+  dateDeux: DateTime | undefined
+): DateTime | undefined {
+  if (!dateUne) {
+    return dateDeux
+  }
+
+  if (!dateDeux) {
+    return dateUne
+  }
+
+  return dateUne < dateDeux ? dateUne : dateDeux
 }

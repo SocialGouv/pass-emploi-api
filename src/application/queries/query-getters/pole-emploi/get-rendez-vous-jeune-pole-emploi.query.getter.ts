@@ -22,6 +22,7 @@ import {
   fromPrestationDtoToRendezVousQueryModel
 } from '../../query-mappers/rendez-vous-prestation.mappers'
 import { RendezVousJeuneQueryModel } from '../../query-models/rendez-vous.query-model'
+import { Cached } from '../../../../building-blocks/types/query'
 
 export interface Query {
   idJeune: string
@@ -46,14 +47,18 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
     this.logger = new Logger('GetRendezVousJeunePoleEmploiQueryGetter')
   }
 
-  async handle(query: Query): Promise<Result<RendezVousJeuneQueryModel[]>> {
+  async handle(
+    query: Query
+  ): Promise<Result<Cached<RendezVousJeuneQueryModel[]>>> {
     const jeune = await this.jeuneRepository.get(query.idJeune)
     if (!jeune) {
       return failure(new NonTrouveError('Jeune', query.idJeune))
     }
 
     if (query.periode === RendezVous.Periode.PASSES) {
-      return success([])
+      return success({
+        queryModel: []
+      })
     }
 
     const maintenant = this.dateService.now()
@@ -128,8 +133,30 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
       .concat(rendezVousPoleEmploi)
       .sort(sortRendezVousByDate)
 
-    return success(rendezVousDuJeune)
+    const data: Cached<RendezVousJeuneQueryModel[]> = {
+      queryModel: rendezVousDuJeune,
+      dateDuCache: recupererLaDateLaPlusAncienne(
+        responsePrestations.dateCache,
+        responseRendezVous.dateCache
+      )
+    }
+    return success(data)
   }
+}
+
+function recupererLaDateLaPlusAncienne(
+  dateUne: DateTime | undefined,
+  dateDeux: DateTime | undefined
+): DateTime | undefined {
+  if (!dateUne) {
+    return dateDeux
+  }
+
+  if (!dateDeux) {
+    return dateUne
+  }
+
+  return dateUne < dateDeux ? dateUne : dateDeux
 }
 
 function sortRendezVousByDate(

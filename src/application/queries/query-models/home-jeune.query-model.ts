@@ -111,3 +111,13 @@ export class JeuneHomeDemarcheQueryModel {
   })
   campagne?: CampagneQueryModel
 }
+
+export class JeuneHomeDemarcheQueryModelV2 {
+  @ApiProperty({
+    type: JeuneHomeDemarcheQueryModel
+  })
+  resultat: JeuneHomeDemarcheQueryModel
+
+  @ApiPropertyOptional()
+  dateDerniereMiseAJour?: Date
+}

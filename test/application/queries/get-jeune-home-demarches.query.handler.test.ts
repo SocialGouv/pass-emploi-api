@@ -8,6 +8,8 @@ import { failure, success } from '../../../src/building-blocks/types/result'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
+import { JeuneHomeDemarcheQueryModel } from '../../../src/application/queries/query-models/home-jeune.query-model'
+import { Cached } from '../../../src/building-blocks/types/query'
 
 describe('GetJeuneHomeDemarchesQueryHandler', () => {
   let getActionsJeunePoleEmploiQueryGetter: StubbedClass<GetDemarchesQueryGetter>
@@ -65,7 +67,7 @@ describe('GetJeuneHomeDemarchesQueryHandler', () => {
             accessToken: 'token',
             tri: GetDemarchesQueryGetter.Tri.parSatutEtDateFin
           })
-          .resolves(success(demarchesQueryModel))
+          .resolves(success({ queryModel: demarchesQueryModel }))
 
         getCampagneQueryModel.handle
           .withArgs({ idJeune: 'idJeune' })
@@ -78,12 +80,14 @@ describe('GetJeuneHomeDemarchesQueryHandler', () => {
         })
 
         // Then
-        expect(home).to.deep.equal(
-          success({
+        const data: Cached<JeuneHomeDemarcheQueryModel> = {
+          queryModel: {
             actions: demarchesQueryModel,
             campagne: campagneQueryModel
-          })
-        )
+          },
+          dateDuCache: undefined
+        }
+        expect(home).to.deep.equal(success(data))
       })
     })
   })

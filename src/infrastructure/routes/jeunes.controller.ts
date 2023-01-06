@@ -7,6 +7,7 @@ import {
   Headers,
   HttpCode,
   HttpStatus,
+  InternalServerErrorException,
   Param,
   Post,
   Put,
@@ -87,8 +88,8 @@ import {
   ArchiverJeunePayload,
   GetRendezVousJeuneQueryParams,
   MaintenantQueryParams,
-  UpdateConfigurationInput,
   TransfererConseillerPayload,
+  UpdateConfigurationInput,
   UpdateJeunePreferencesPayload
 } from './validation/jeunes.inputs'
 import {
@@ -254,6 +255,10 @@ export class JeunesController {
   @ApiResponse({
     type: JeuneHomeAgendaPoleEmploiQueryModel
   })
+  @ApiOperation({
+    deprecated: true,
+    description: "Route utilisée par l'app mobile version 2.3.0 et moins"
+  })
   async getHomeAgendaPoleEmploi(
     @Param('idJeune') idJeune: string,
     @Query() queryParams: MaintenantQueryParams,
@@ -272,12 +277,22 @@ export class JeunesController {
       throw handleFailure(result)
     }
 
-    return result.data
+    if (result.data.dateDuCache) {
+      throw new InternalServerErrorException(
+        'Les données de Pôle emploi sont inaccessibles'
+      )
+    }
+
+    return result.data.queryModel
   }
 
   @Get(':idJeune/home/demarches')
   @ApiResponse({
     type: JeuneHomeDemarcheQueryModel
+  })
+  @ApiOperation({
+    deprecated: true,
+    description: "Route utilisée par l'app mobile version 2.3.0 et moins"
   })
   async getHomeDemarches(
     @Param('idJeune') idJeune: string,
@@ -291,10 +306,17 @@ export class JeunesController {
       },
       utilisateur
     )
-    if (isSuccess(result)) {
-      return result.data
+    if (isFailure(result)) {
+      throw handleFailure(result)
     }
-    throw handleFailure(result)
+
+    if (result.data.dateDuCache) {
+      throw new InternalServerErrorException(
+        'Les données de Pôle emploi sont inaccessibles'
+      )
+    }
+
+    return result.data.queryModel
   }
 
   @ApiOperation({
@@ -369,36 +391,50 @@ export class JeunesController {
     type: RendezVousJeuneQueryModel,
     isArray: true
   })
+  @ApiOperation({
+    deprecated: true,
+    description: "Route utilisée par l'app mobile version 2.3.0 et moins"
+  })
   async getRendezVous(
     @Param('idJeune') idJeune: string,
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @AccessToken() accessToken: string,
     @Query() getRendezVousQueryParams?: GetRendezVousJeuneQueryParams
   ): Promise<RendezVousJeuneQueryModel[]> {
-    let result: Result<RendezVousJeuneQueryModel[]>
     if (utilisateur.structure === Core.Structure.POLE_EMPLOI && accessToken) {
-      result = await this.getRendezVousJeunePoleEmploiQueryHandler.execute(
-        {
-          idJeune,
-          accessToken,
-          periode: getRendezVousQueryParams?.periode
-        },
-        utilisateur
-      )
-    } else {
-      result = await this.getRendezVousJeuneQueryHandler.execute(
-        {
-          idJeune,
-          periode: getRendezVousQueryParams?.periode
-        },
-        utilisateur
-      )
-    }
+      const result =
+        await this.getRendezVousJeunePoleEmploiQueryHandler.execute(
+          {
+            idJeune,
+            accessToken,
+            periode: getRendezVousQueryParams?.periode
+          },
+          utilisateur
+        )
+      if (isFailure(result)) {
+        throw handleFailure(result)
+      }
 
-    if (isSuccess(result)) {
-      return result.data
+      if (result.data.dateDuCache) {
+        throw new InternalServerErrorException(
+          'Les données de Pôle emploi sont inaccessibles'
+        )
+      }
+
+      return result.data.queryModel
+    } else {
+      const result = await this.getRendezVousJeuneQueryHandler.execute(
+        {
+          idJeune,
+          periode: getRendezVousQueryParams?.periode
+        },
+        utilisateur
+      )
+      if (isSuccess(result)) {
+        return result.data
+      }
+      throw handleFailure(result)
     }
-    throw handleFailure(result)
   }
 
   @Get(':idJeune/rendezvous/:idRendezVous')
