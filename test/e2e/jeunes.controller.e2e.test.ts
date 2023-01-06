@@ -23,13 +23,12 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Jeune } from '../../src/domain/jeune/jeune'
 import { PoleEmploiPartenaireClient } from '../../src/infrastructure/clients/pole-emploi-partenaire-client'
 import { IdService } from '../../src/utils/id-service'
-import { emptySuccess } from '../../src/building-blocks/types/result'
+import { emptySuccess, success } from '../../src/building-blocks/types/result'
 import {
   DemarcheDto,
   DemarcheDtoEtat,
   RendezVousPoleEmploiDto
 } from '../../src/infrastructure/clients/dto/pole-emploi.dto'
-import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { DateTime } from 'luxon'
 
 describe('JeunesControllerE2E', () => {
@@ -113,8 +112,13 @@ describe('JeunesControllerE2E', () => {
       keycloakClient.exchangeTokenPoleEmploiJeune.resolves('idpToken')
       jeuneRepository.get.resolves(jeune)
 
-      poleEmploiPartenaireClient.getDemarches.resolves(demarchesPoleEmploi)
-      poleEmploiPartenaireClient.getRendezVous.resolves(rendezVousPoleEmploi)
+      poleEmploiPartenaireClient.getDemarches.resolves(
+        success(demarchesPoleEmploi)
+      )
+      poleEmploiPartenaireClient.getRendezVous.resolves(
+        success(rendezVousPoleEmploi)
+      )
+      poleEmploiPartenaireClient.getPrestations.resolves(success([]))
 
       // When
       const result = await request(app.getHttpServer())
@@ -130,28 +134,21 @@ describe('JeunesControllerE2E', () => {
   })
 })
 
-const rendezVousPoleEmploi: AxiosResponse<RendezVousPoleEmploiDto[]> = {
-  config: undefined,
-  headers: undefined,
-  request: undefined,
-  status: 200,
-  statusText: '',
-  data: [
-    {
-      date: '2022-10-26',
-      duree: 30,
-      heure: '14:00',
-      agence: 'Pôle Emploi Ales avene',
-      adresse: {
-        ligne4: '29 CHEMIN des deux Mas',
-        ligne5: 'Piste OASIS 4',
-        bureauDistributeur: '30100'
-      },
-      typeRDV: 'CONVOCATION',
-      modaliteContact: 'TELEPHONE'
-    }
-  ]
-}
+const rendezVousPoleEmploi: RendezVousPoleEmploiDto[] = [
+  {
+    date: '2022-10-26',
+    duree: 30,
+    heure: '14:00',
+    agence: 'Pôle Emploi Ales avene',
+    adresse: {
+      ligne4: '29 CHEMIN des deux Mas',
+      ligne5: 'Piste OASIS 4',
+      bureauDistributeur: '30100'
+    },
+    typeRDV: 'CONVOCATION',
+    modaliteContact: 'TELEPHONE'
+  }
+]
 
 const demarchesPoleEmploi: DemarcheDto[] = [
   {

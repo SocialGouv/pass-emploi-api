@@ -1,20 +1,14 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import {
-  ErreurHttp,
-  NonTrouveError
-} from '../../../../building-blocks/types/domain-error'
+import { NonTrouveError } from '../../../../building-blocks/types/domain-error'
 import {
   failure,
+  isFailure,
   Result,
   success
 } from '../../../../building-blocks/types/result'
 import { Jeune, JeunesRepositoryToken } from '../../../../domain/jeune/jeune'
 import { RendezVous } from '../../../../domain/rendez-vous/rendez-vous'
-import {
-  PrestationDto,
-  RendezVousPoleEmploiDto
-} from '../../../../infrastructure/clients/dto/pole-emploi.dto'
 import { KeycloakClient } from '../../../../infrastructure/clients/keycloak-client'
 import {
   PoleEmploiPartenaireClient,
@@ -22,7 +16,6 @@ import {
 } from '../../../../infrastructure/clients/pole-emploi-partenaire-client'
 import { DateService } from '../../../../utils/date-service'
 import { IdService } from '../../../../utils/id-service'
-import { buildError } from '../../../../utils/logger.module'
 import { fromRendezVousDtoToRendezVousQueryModel } from '../../query-mappers/rendez-vous-pole-emploi.mappers'
 import {
   buildDateSansTimezone,
@@ -70,82 +63,72 @@ export class GetRendezVousJeunePoleEmploiQueryGetter {
         query.accessToken
       ))
 
-    try {
-      const [responsePrestations, responseRendezVous] = await Promise.all([
-        this.poleEmploiPartenaireClient.getPrestations(idpToken, maintenant),
-        this.poleEmploiPartenaireClient.getRendezVous(idpToken)
-      ])
+    const [responsePrestations, responseRendezVous] = await Promise.all([
+      this.poleEmploiPartenaireClient.getPrestations(idpToken, maintenant),
+      this.poleEmploiPartenaireClient.getRendezVous(idpToken)
+    ])
 
-      const prestations: PrestationDto[] = responsePrestations?.data ?? []
-      const rendezVousPoleEmploiDto: RendezVousPoleEmploiDto[] =
-        responseRendezVous?.data ?? []
-
-      const rendezVousPrestations = await Promise.all(
-        prestations
-          .filter(prestation => !prestation.annule)
-          .map(async prestation => {
-            const dateRendezVous = DateTime.fromJSDate(
-              buildDateSansTimezone(prestation.session.dateDebut)
-            )
-            const avecVisio =
-              prestation.session.natureAnimation === 'INTERNE' ||
-              prestation.session.modalitePremierRendezVous === 'WEBCAM'
-            let lienVisio = undefined
-
-            const laVisioEstDisponible =
-              avecVisio &&
-              prestation.identifiantStable &&
-              DateService.isSameDateDay(dateRendezVous, maintenant)
-
-            if (laVisioEstDisponible) {
-              try {
-                const responseLienVisio =
-                  await this.poleEmploiPartenaireClient.getLienVisio(
-                    idpToken,
-                    prestation.identifiantStable!
-                  )
-                lienVisio = responseLienVisio?.data
-              } catch (e) {
-                this.logger.error(
-                  buildError('Impossible de récupérer le lien de la visio', e)
-                )
-              }
-            }
-
-            try {
-              return fromPrestationDtoToRendezVousQueryModel(
-                prestation,
-                this.idService,
-                lienVisio
-              )
-            } catch (e) {
-              this.logger.error('Impossible de mapper la prestation.')
-              this.logger.error(prestation)
-              throw e
-            }
-          })
-      )
-      const rendezVousPoleEmploi = rendezVousPoleEmploiDto.map(rendezVous => {
-        return fromRendezVousDtoToRendezVousQueryModel(
-          rendezVous,
-          this.idService
-        )
-      })
-
-      const rendezVousDuJeune = rendezVousPrestations
-        .concat(rendezVousPoleEmploi)
-        .sort(sortRendezVousByDate)
-
-      return success(rendezVousDuJeune)
-    } catch (e) {
-      this.logger.error(e)
-      if (e.response) {
-        return failure(
-          new ErreurHttp(e.response.data?.message, e.response.status)
-        )
-      }
-      throw e
+    if (isFailure(responsePrestations)) {
+      return responsePrestations
     }
+
+    if (isFailure(responseRendezVous)) {
+      return responseRendezVous
+    }
+
+    const rendezVousPrestations = await Promise.all(
+      responsePrestations.data
+        .filter(prestation => !prestation.annule)
+        .map(async prestation => {
+          const dateRendezVous = DateTime.fromJSDate(
+            buildDateSansTimezone(prestation.session.dateDebut)
+          )
+          const avecVisio =
+            prestation.session.natureAnimation === 'INTERNE' ||
+            prestation.session.modalitePremierRendezVous === 'WEBCAM'
+          let lienVisio = undefined
+
+          const laVisioEstDisponible =
+            avecVisio &&
+            prestation.identifiantStable &&
+            DateService.isSameDateDay(dateRendezVous, maintenant)
+
+          if (laVisioEstDisponible) {
+            const responseLienVisio =
+              await this.poleEmploiPartenaireClient.getLienVisio(
+                idpToken,
+                prestation.identifiantStable!
+              )
+
+            if (isFailure(responseLienVisio)) {
+              this.logger.error(responseLienVisio.error)
+            } else {
+              lienVisio = responseLienVisio.data
+            }
+          }
+
+          try {
+            return fromPrestationDtoToRendezVousQueryModel(
+              prestation,
+              this.idService,
+              lienVisio
+            )
+          } catch (e) {
+            this.logger.error('Impossible de mapper la prestation.')
+            this.logger.error(prestation)
+            throw e
+          }
+        })
+    )
+    const rendezVousPoleEmploi = responseRendezVous.data.map(rendezVous => {
+      return fromRendezVousDtoToRendezVousQueryModel(rendezVous, this.idService)
+    })
+
+    const rendezVousDuJeune = rendezVousPrestations
+      .concat(rendezVousPoleEmploi)
+      .sort(sortRendezVousByDate)
+
+    return success(rendezVousDuJeune)
   }
 }
 

@@ -12,9 +12,13 @@ import {
 } from '../../../../utils'
 import {
   failure,
-  isSuccess
+  isSuccess,
+  success
 } from '../../../../../src/building-blocks/types/result'
-import { NonTrouveError } from '../../../../../src/building-blocks/types/domain-error'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../../../../src/building-blocks/types/domain-error'
 import { before } from 'mocha'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { PoleEmploiPartenaireClient } from '../../../../../src/infrastructure/clients/pole-emploi-partenaire-client'
@@ -141,7 +145,7 @@ describe('GetDemarchesQueryGetter', () => {
         jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
         poleEmploiPartenaireClient.getDemarches
           .withArgs(idpToken)
-          .resolves([demarcheDtoEnCoursProche])
+          .resolves(success([demarcheDtoEnCoursProche]))
 
         // When
         const result = await getDemarchesQueryGetter.handle(query)
@@ -181,14 +185,16 @@ describe('GetDemarchesQueryGetter', () => {
         jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
         poleEmploiPartenaireClient.getDemarches
           .withArgs(idpToken)
-          .resolves([
-            demarcheDtoAnnulee,
-            demarcheDtoEnCours,
-            demarcheDtoRetard,
-            demarcheDtoRealisee,
-            demarcheDtoAFaireAuMilieu,
-            demarcheDtoEnCoursProche
-          ])
+          .resolves(
+            success([
+              demarcheDtoAnnulee,
+              demarcheDtoEnCours,
+              demarcheDtoRetard,
+              demarcheDtoRealisee,
+              demarcheDtoAFaireAuMilieu,
+              demarcheDtoEnCoursProche
+            ])
+          )
 
         // When
         const result = await getDemarchesQueryGetter.handle(query)
@@ -214,14 +220,16 @@ describe('GetDemarchesQueryGetter', () => {
         jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
         poleEmploiPartenaireClient.getDemarches
           .withArgs(idpToken)
-          .resolves([
-            demarcheDtoAnnulee,
-            demarcheDtoEnCours,
-            demarcheDtoRetard,
-            demarcheDtoRealisee,
-            demarcheDtoAFaireAuMilieu,
-            demarcheDtoEnCoursProche
-          ])
+          .resolves(
+            success([
+              demarcheDtoAnnulee,
+              demarcheDtoEnCours,
+              demarcheDtoRetard,
+              demarcheDtoRealisee,
+              demarcheDtoAFaireAuMilieu,
+              demarcheDtoEnCoursProche
+            ])
+          )
 
         // When
         const result = await getDemarchesQueryGetter.handle(query)
@@ -249,14 +257,12 @@ describe('GetDemarchesQueryGetter', () => {
         jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
         poleEmploiPartenaireClient.getDemarches
           .withArgs(idpToken)
-          .throws({ response: { data: {} } })
+          .resolves(failure(new ErreurHttp('erreur', 400)))
 
         // When
         const result = await getDemarchesQueryGetter.handle(query)
         // Then
-        expect(result._isSuccess).to.equal(false)
-        if (!result._isSuccess)
-          expect(result.error.code).to.equal('ERREUR_HTTP')
+        expect(result).to.deep.equal(failure(new ErreurHttp('erreur', 400)))
       })
     })
   })

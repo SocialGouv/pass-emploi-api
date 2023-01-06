@@ -1,10 +1,8 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
-import {
-  ErreurHttp,
-  NonTrouveError
-} from '../../../../building-blocks/types/domain-error'
+import { NonTrouveError } from '../../../../building-blocks/types/domain-error'
 import {
   failure,
+  isFailure,
   Result,
   success
 } from '../../../../building-blocks/types/result'
@@ -53,27 +51,21 @@ export class GetDemarchesQueryGetter {
         query.accessToken
       ))
 
-    try {
-      const demarchesDto = await this.poleEmploiPartenaireClient.getDemarches(
-        idpToken
-      )
+    const demarchesDto = await this.poleEmploiPartenaireClient.getDemarches(
+      idpToken
+    )
 
-      const demarches = demarchesDto
-        .map(demarcheDto =>
-          fromDemarcheDtoToDemarche(demarcheDto, this.dateService)
-        )
-        .sort(query.tri)
-
-      return success(demarches.map(toDemarcheQueryModel))
-    } catch (e) {
-      this.logger.error(e)
-      if (e.response) {
-        return failure(
-          new ErreurHttp(e.response.data?.message, e.response.status)
-        )
-      }
-      throw e
+    if (isFailure(demarchesDto)) {
+      return demarchesDto
     }
+
+    const demarches = demarchesDto.data
+      .map(demarcheDto =>
+        fromDemarcheDtoToDemarche(demarcheDto, this.dateService)
+      )
+      .sort(query.tri)
+
+    return success(demarches.map(toDemarcheQueryModel))
   }
 }
 
