@@ -3,6 +3,7 @@ import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import {
   emptySuccess,
+  failure,
   isFailure,
   Result,
   success
@@ -16,6 +17,7 @@ import {
 import { Fichier, FichierRepositoryToken } from '../../domain/fichier'
 import { AuthorizeConseillerForJeunes } from '../authorizers/authorize-conseiller-for-jeunes'
 import { AuthorizeListeDeDiffusion } from '../authorizers/authorize-liste-de-diffusion'
+import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
 
 export interface TeleverserFichierCommand extends Command {
   fichier: {
@@ -59,7 +61,7 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
   ): Promise<Result> {
     let result: Result
 
-    if (command.jeunesIds) {
+    if (command.jeunesIds?.length) {
       result = await this.authorizeConseillerForJeunes.authorize(
         command.jeunesIds,
         utilisateur
@@ -68,7 +70,7 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
         return result
       }
     }
-    if (command.listesDeDiffusionIds) {
+    if (command.listesDeDiffusionIds?.length) {
       for (const idListe of command.listesDeDiffusionIds) {
         const result = await this.authorizeListeDeDiffusion.authorize(
           idListe,
@@ -87,7 +89,7 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
   ): Promise<Result<TeleverserFichierCommandOutput>> {
     let jeunesIds = []
 
-    if (command.listesDeDiffusionIds) {
+    if (command.listesDeDiffusionIds?.length) {
       const listesDeDiffusion = await this.listeDeDiffusionRepository.findAll(
         command.listesDeDiffusionIds
       )
@@ -100,8 +102,12 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
       jeunesIds = idsBeneficiaireDesListesDeDiffusion
         .concat(command.jeunesIds || [])
         .filter(isUnique)
+    } else if (command.jeunesIds?.length) {
+      jeunesIds = command.jeunesIds
     } else {
-      jeunesIds = command.jeunesIds!
+      return failure(
+        new MauvaiseCommandeError('Aucun jeune ou liste de diffusion')
+      )
     }
 
     const fichierACreer: Fichier.ACreer = { ...command, jeunesIds }
