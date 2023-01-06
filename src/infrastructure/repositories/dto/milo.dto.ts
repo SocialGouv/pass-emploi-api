@@ -42,20 +42,20 @@ export interface DossierMiloDto {
 
 export interface EvenementMiloDto {
   identifiant: string
-  idDossier: string
+  idDossier: number
   type: 'RDV' | 'SESSION' | string
   action: 'CREATE' | 'UPDATE' | 'DELETE' | string
-  idType: string
+  idType: number
   date: string
 }
 
 export interface RendezVousMiloDto {
-  id: string
+  id: number
   dateHeureDebut: string
   dateHeureFin?: string
   objet: string
   conseiller: string
-  idDossier: string
+  idDossier: number
   commentaire?: string
   type: string
   statut:

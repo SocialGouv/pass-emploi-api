@@ -20,10 +20,10 @@ export const unEvenementMiloDto = (
 ): EvenementMiloDto => {
   const defaults: EvenementMiloDto = {
     identifiant: '63569521bdd5161673153f9f',
-    idDossier: '1234567',
+    idDossier: 1234567,
     type: 'RDV',
     action: 'CREATE',
-    idType: '34',
+    idType: 34,
     date: '2022-10-24T08:00:34Z'
   }
   return { ...defaults, ...args }

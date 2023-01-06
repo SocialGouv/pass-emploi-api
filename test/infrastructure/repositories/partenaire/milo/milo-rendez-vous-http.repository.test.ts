@@ -35,7 +35,7 @@ describe('MiloEvenementsHttpRepository', () => {
       // Given
       nock('https://milo.com')
         .get('/operateurs/events')
-        .reply(200, JSON.stringify([unEvenementMiloDto()]))
+        .reply(200, [unEvenementMiloDto()])
         .isDone()
 
       // When
@@ -68,10 +68,7 @@ describe('MiloEvenementsHttpRepository', () => {
 
       nock('https://milo.com')
         .get('/operateurs/events')
-        .reply(
-          200,
-          JSON.stringify([unEvenementMiloDto(), unEvenementInconnuDto])
-        )
+        .reply(200, [unEvenementMiloDto(), unEvenementInconnuDto])
         .isDone()
 
       // When
@@ -123,8 +120,8 @@ describe('MiloEvenementsHttpRepository', () => {
     })
   })
   describe('findRendezVousByEvenement', () => {
-    const idPartenaireBeneficiaire = 'idPartenaireBeneficiaire'
-    const idObjet = 'idObjet'
+    const idPartenaireBeneficiaire = 1234
+    const idObjet = 5678
 
     describe("quand c'est un rendez-vous", () => {
       describe('quand il existe', () => {
@@ -152,16 +149,16 @@ describe('MiloEvenementsHttpRepository', () => {
           const resultat =
             await miloEvenementsHttpRepository.findRendezVousByEvenement(
               unEvenementMilo({
-                idObjet,
+                idObjet: idObjet.toString(),
                 objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
-                idPartenaireBeneficiaire
+                idPartenaireBeneficiaire: idPartenaireBeneficiaire.toString()
               })
             )
 
           // Then
           const expected: MiloRendezVous = unRendezVousMilo({
-            id: idObjet,
-            idPartenaireBeneficiaire
+            id: idObjet.toString(),
+            idPartenaireBeneficiaire: idPartenaireBeneficiaire.toString()
           })
           expect(resultat).to.deep.equal(expected)
         })
@@ -192,9 +189,10 @@ describe('MiloEvenementsHttpRepository', () => {
               const resultat =
                 await miloEvenementsHttpRepository.findRendezVousByEvenement(
                   unEvenementMilo({
-                    idObjet,
+                    idObjet: idObjet.toString(),
                     objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
-                    idPartenaireBeneficiaire
+                    idPartenaireBeneficiaire:
+                      idPartenaireBeneficiaire.toString()
                   })
                 )
 
@@ -218,9 +216,9 @@ describe('MiloEvenementsHttpRepository', () => {
           const resultat =
             await miloEvenementsHttpRepository.findRendezVousByEvenement(
               unEvenementMilo({
-                idObjet,
+                idObjet: idObjet.toString(),
                 objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
-                idPartenaireBeneficiaire
+                idPartenaireBeneficiaire: idPartenaireBeneficiaire.toString()
               })
             )
 
@@ -236,10 +234,10 @@ describe('MiloEvenementsHttpRepository', () => {
           const sessionJson: SessionMiloDto = {
             lieu: 'la',
             nom: 'je suis un titre mais en fait le nom',
-            id: idObjet,
+            id: idObjet.toString(),
             dateHeureDebut: '2022-10-06 10:00:00',
             dateHeureFin: '2022-10-06 12:00:00',
-            idDossier: idPartenaireBeneficiaire,
+            idDossier: idPartenaireBeneficiaire.toString(),
             commentaire: 'un petit commentaire plus ou moins long',
             statut: 'Prescrit'
           }
@@ -254,16 +252,16 @@ describe('MiloEvenementsHttpRepository', () => {
           const resultat =
             await miloEvenementsHttpRepository.findRendezVousByEvenement(
               unEvenementMilo({
-                idObjet,
+                idObjet: idObjet.toString(),
                 objet: MiloRendezVous.ObjetEvenement.SESSION,
-                idPartenaireBeneficiaire
+                idPartenaireBeneficiaire: idPartenaireBeneficiaire.toString()
               })
             )
 
           // Then
           const expected: MiloRendezVous = unRendezVousMilo({
-            id: idObjet,
-            idPartenaireBeneficiaire,
+            id: idObjet.toString(),
+            idPartenaireBeneficiaire: idPartenaireBeneficiaire.toString(),
             titre: sessionJson.nom,
             commentaire: sessionJson.commentaire,
             type: MiloRendezVous.Type.SESSION,
@@ -279,10 +277,10 @@ describe('MiloEvenementsHttpRepository', () => {
               const sessionMiloDto: SessionMiloDto = {
                 lieu: 'la',
                 nom: 'je suis un titre mais en fait le nom',
-                id: idObjet,
+                id: idObjet.toString(),
                 dateHeureDebut: '2022-10-06 10:00:00',
                 dateHeureFin: '2022-10-06 12:00:00',
-                idDossier: idPartenaireBeneficiaire,
+                idDossier: idPartenaireBeneficiaire.toString(),
                 commentaire: 'un petit commentaire plus ou moins long',
                 statut: statut as 'Refus tiers' | 'Refus jeune'
               }
@@ -297,9 +295,10 @@ describe('MiloEvenementsHttpRepository', () => {
               const resultat =
                 await miloEvenementsHttpRepository.findRendezVousByEvenement(
                   unEvenementMilo({
-                    idObjet,
+                    idObjet: idObjet.toString(),
                     objet: MiloRendezVous.ObjetEvenement.SESSION,
-                    idPartenaireBeneficiaire
+                    idPartenaireBeneficiaire:
+                      idPartenaireBeneficiaire.toString()
                   })
                 )
 
@@ -324,9 +323,9 @@ describe('MiloEvenementsHttpRepository', () => {
           const resultat =
             await miloEvenementsHttpRepository.findRendezVousByEvenement(
               unEvenementMilo({
-                idObjet,
+                idObjet: idObjet.toString(),
                 objet: MiloRendezVous.ObjetEvenement.SESSION,
-                idPartenaireBeneficiaire
+                idPartenaireBeneficiaire: idPartenaireBeneficiaire.toString()
               })
             )
 

@@ -48,8 +48,8 @@ export class MiloRendezVousHttpRepository implements MiloRendezVous.Repository {
         date: evenement.date,
         type: actionToType(evenement.action),
         objet: typeToObjet(evenement.type),
-        idObjet: evenement.idType,
-        idPartenaireBeneficiaire: evenement.idDossier
+        idObjet: evenement.idType.toString(),
+        idPartenaireBeneficiaire: evenement.idDossier.toString()
       }
     })
   }
@@ -124,11 +124,11 @@ export class MiloRendezVousHttpRepository implements MiloRendezVous.Repository {
         }
 
         return {
-          id: rendezVousMilo.data.id,
+          id: rendezVousMilo.data.id.toString(),
           dateHeureDebut: rendezVousMilo.data.dateHeureDebut,
           dateHeureFin: rendezVousMilo.data.dateHeureFin,
           titre: rendezVousMilo.data.objet,
-          idPartenaireBeneficiaire: rendezVousMilo.data.idDossier,
+          idPartenaireBeneficiaire: rendezVousMilo.data.idDossier.toString(),
           commentaire: rendezVousMilo.data.commentaire,
           type: MiloRendezVous.Type.RENDEZ_VOUS,
           statut: rendezVousMilo.data.statut
