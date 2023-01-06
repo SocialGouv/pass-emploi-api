@@ -10,46 +10,145 @@ import {
   isSuccess,
   success
 } from '../../../src/building-blocks/types/result'
-import { expect, stubClass } from '../../utils'
+import { expect, StubbedClass, stubClass } from '../../utils'
 import { ErreurHttp } from 'src/building-blocks/types/domain-error'
-import { Context } from 'src/building-blocks/context'
+import { Context, ContextKey } from 'src/building-blocks/context'
+import { getDatabase } from '../../utils/database-for-testing'
+import {
+  LogApiPartenaireDto,
+  LogApiPartenaireSqlModel
+} from '../../../src/infrastructure/sequelize/models/log-api-partenaire.sql-model'
+import { AsSql } from '../../../src/infrastructure/sequelize/types'
+import { unePrestationDto } from '../../fixtures/pole-emploi-partenaire.fixture'
+import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { Core } from '../../../src/domain/core'
 
 describe('PoleEmploiPartenaireClient', () => {
   let poleEmploiPartenaireClient: PoleEmploiPartenaireClient
   const configService = testConfig()
   const PARTENAIRE_BASE_URL = 'https://api-r.es-qvr.fr/partenaire'
   const tokenJeune = 'token'
+  let context: StubbedClass<Context>
+  const utilisateurJeunePE = unUtilisateurJeune({
+    id: 'hermione',
+    structure: Core.Structure.POLE_EMPLOI
+  })
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await getDatabase().cleanPG()
+    context = stubClass(Context)
+    context.get.withArgs(ContextKey.UTILISATEUR).returns(utilisateurJeunePE)
+
     const httpService = new HttpService()
     poleEmploiPartenaireClient = new PoleEmploiPartenaireClient(
       httpService,
       configService,
-      stubClass(Context)
+      context
     )
   })
 
   describe('getPrestations', () => {
-    it('fait un appel http get avec les bons paramètres', async () => {
-      // Given
-      nock(PARTENAIRE_BASE_URL)
-        .get(
-          '/peconnect-gerer-prestations/v1/rendez-vous?dateRecherche=2020-04-06'
+    describe("quand l'api est up", () => {
+      it('renvoie les prestations', async () => {
+        // Given
+        nock(PARTENAIRE_BASE_URL)
+          .get(
+            '/peconnect-gerer-prestations/v1/rendez-vous?dateRecherche=2020-04-06'
+          )
+          .reply(200, [])
+          .isDone()
+
+        // When
+        const response = await poleEmploiPartenaireClient.getPrestations(
+          tokenJeune,
+          uneDatetime()
         )
-        .reply(200, {
-          resultats: []
+
+        // Then
+        expect(response).to.deep.equal(success([]))
+      })
+    })
+    describe("quand l'api est en 500", () => {
+      beforeEach(() => {
+        // Given
+        nock(PARTENAIRE_BASE_URL)
+          .get(
+            '/peconnect-gerer-prestations/v1/rendez-vous?dateRecherche=2020-04-06'
+          )
+          .reply(500, { message: 'erreur' })
+      })
+      describe('quand il y a un cache', () => {
+        it('renvoie les prestations du cache', async () => {
+          // Given
+          const logApiDto: AsSql<LogApiPartenaireDto> = {
+            id: 'd90e397a-dcb3-4a7b-8eac-3dec0aa55dfa',
+            idUtilisateur: 'hermione',
+            typeUtilisateur: 'JEUNE',
+            date: uneDatetime().toJSDate(),
+            pathPartenaire:
+              '/peconnect-gerer-prestations/v1/rendez-vous?dateRecherche=2020-03-06',
+            resultatPartenaire: [unePrestationDto()],
+            resultat: [],
+            transactionId: 'transactionId'
+          }
+          await LogApiPartenaireSqlModel.create(logApiDto)
+
+          // When
+          const response = await poleEmploiPartenaireClient.getPrestations(
+            tokenJeune,
+            uneDatetime()
+          )
+
+          // Then
+          expect(response).to.deep.equal(success([unePrestationDto()]))
         })
-        .isDone()
+      })
+      describe("quand il n'y a pas de cache", () => {
+        it('renvoie la 500', async () => {
+          // Given
+          const logApiDto: AsSql<LogApiPartenaireDto> = {
+            id: 'd90e397a-dcb3-4a7b-8eac-3dec0aa55dfa',
+            idUtilisateur: 'le-cache-de-quelqun-dautre',
+            typeUtilisateur: 'JEUNE',
+            date: uneDatetime().toJSDate(),
+            pathPartenaire:
+              '/peconnect-gerer-prestations/v1/rendez-vous?dateRecherche=2020-03-06',
+            resultatPartenaire: [unePrestationDto()],
+            resultat: [],
+            transactionId: 'transactionId'
+          }
+          await LogApiPartenaireSqlModel.create(logApiDto)
 
-      // When
-      const response = await poleEmploiPartenaireClient.getPrestations(
-        tokenJeune,
-        uneDatetime()
-      )
+          // When
+          const response = await poleEmploiPartenaireClient.getPrestations(
+            tokenJeune,
+            uneDatetime()
+          )
 
-      // Then
-      expect(response.status).to.equal(200)
-      expect(response.data).to.deep.equal({ resultats: [] })
+          // Then
+          expect(response).to.deep.equal(failure(new ErreurHttp('erreur', 500)))
+        })
+      })
+    })
+    describe("quand l'api est en erreur autre que 500", () => {
+      it("renvoie l'erreur", async () => {
+        // Given
+        nock(PARTENAIRE_BASE_URL)
+          .get(
+            '/peconnect-gerer-prestations/v1/rendez-vous?dateRecherche=2020-04-06'
+          )
+          .reply(400, { message: 'erreur' })
+          .isDone()
+
+        // When
+        const response = await poleEmploiPartenaireClient.getPrestations(
+          tokenJeune,
+          uneDatetime()
+        )
+
+        // Then
+        expect(response).to.deep.equal(failure(new ErreurHttp('erreur', 400)))
+      })
     })
   })
 
@@ -60,9 +159,7 @@ describe('PoleEmploiPartenaireClient', () => {
 
       nock(PARTENAIRE_BASE_URL)
         .get('/peconnect-gerer-prestations/v1/lien-visio/rendez-vous/1')
-        .reply(200, {
-          resultats: []
-        })
+        .reply(200, 'https://lien-visio.fr')
         .isDone()
 
       // When
@@ -72,8 +169,7 @@ describe('PoleEmploiPartenaireClient', () => {
       )
 
       // Then
-      expect(response.status).to.equal(200)
-      expect(response.data).to.deep.equal({ resultats: [] })
+      expect(response).to.deep.equal(success('https://lien-visio.fr'))
     })
   })
 
@@ -82,9 +178,7 @@ describe('PoleEmploiPartenaireClient', () => {
       // Given
       nock(PARTENAIRE_BASE_URL)
         .get('/peconnect-rendezvousagenda/v1/listerendezvous')
-        .reply(200, {
-          resultats: []
-        })
+        .reply(200, [])
         .isDone()
 
       // When
@@ -93,8 +187,7 @@ describe('PoleEmploiPartenaireClient', () => {
       )
 
       // Then
-      expect(response.status).to.equal(200)
-      expect(response.data).to.deep.equal({ resultats: [] })
+      expect(response).to.deep.equal(success([]))
     })
   })
 
@@ -113,7 +206,7 @@ describe('PoleEmploiPartenaireClient', () => {
         )
 
         // Then
-        expect(demarcheDtos).to.deep.equal([uneDemarcheDto()])
+        expect(demarcheDtos).to.deep.equal(success([uneDemarcheDto()]))
       })
     })
     describe('quand il y a no content', () => {
@@ -130,7 +223,7 @@ describe('PoleEmploiPartenaireClient', () => {
         )
 
         // Then
-        expect(demarcheDtos).to.deep.equal([])
+        expect(demarcheDtos).to.deep.equal(success([]))
       })
     })
   })

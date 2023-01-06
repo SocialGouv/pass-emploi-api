@@ -19,7 +19,10 @@ import {
   failure,
   success
 } from '../../../../../src/building-blocks/types/result'
-import { NonTrouveError } from '../../../../../src/building-blocks/types/domain-error'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../../../../src/building-blocks/types/domain-error'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { Jeune } from '../../../../../src/domain/jeune/jeune'
 import { DateService } from '../../../../../src/utils/date-service'
@@ -72,15 +75,6 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
       const heureRendezVous = '12:20'
       const expectedDateRendezVous = new Date('2014-03-24T12:20:00.000Z')
       const maintenant = uneDatetime()
-
-      const axiosResponse = {
-        config: undefined,
-        headers: undefined,
-        request: undefined,
-        status: 200,
-        statusText: '',
-        data: {}
-      }
 
       describe('quand periode est PASSES', () => {
         it('renvoie un tableau vide', async () => {
@@ -162,14 +156,10 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
           dateService.now.returns(maintenant)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(idpToken, maintenant)
-            .resolves({
-              ...axiosResponse,
-              data: prestations
-            })
-          poleEmploiPartenaireClient.getRendezVous.withArgs(idpToken).resolves({
-            ...axiosResponse,
-            data: rendezVous
-          })
+            .resolves(success(prestations))
+          poleEmploiPartenaireClient.getRendezVous
+            .withArgs(idpToken)
+            .resolves(success(rendezVous))
 
           // When
           const result = await queryGetter.handle(query)
@@ -273,20 +263,13 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(idpToken, maintenant)
-            .resolves({
-              ...axiosResponse,
-              data: prestations
-            })
+            .resolves(success(prestations))
           poleEmploiPartenaireClient.getLienVisio
             .withArgs(idpToken, idVisio)
-            .resolves({
-              ...axiosResponse,
-              data: 'lienvisio.com'
-            })
-          poleEmploiPartenaireClient.getRendezVous.withArgs(idpToken).resolves({
-            ...axiosResponse,
-            data: rendezVous
-          })
+            .resolves(success('lienvisio.com'))
+          poleEmploiPartenaireClient.getRendezVous
+            .withArgs(idpToken)
+            .resolves(success(rendezVous))
 
           // When
           const result = await queryGetter.handle(query)
@@ -385,17 +368,13 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(idpToken, maintenant)
-            .resolves({
-              ...axiosResponse,
-              data: prestations
-            })
+            .resolves(success(prestations))
           poleEmploiPartenaireClient.getLienVisio
             .withArgs(idpToken, idVisio)
-            .rejects()
-          poleEmploiPartenaireClient.getRendezVous.withArgs(idpToken).resolves({
-            ...axiosResponse,
-            data: rendezVous
-          })
+            .resolves(failure(new ErreurHttp('Erreur', 500)))
+          poleEmploiPartenaireClient.getRendezVous
+            .withArgs(idpToken)
+            .resolves(success(rendezVous))
 
           // When
           const result = await queryGetter.handle(query)
@@ -436,14 +415,10 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
           jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(idpToken, maintenant)
-            .resolves({
-              ...axiosResponse,
-              data: prestations
-            })
-          poleEmploiPartenaireClient.getRendezVous.withArgs(idpToken).resolves({
-            ...axiosResponse,
-            data: []
-          })
+            .resolves(success(prestations))
+          poleEmploiPartenaireClient.getRendezVous
+            .withArgs(idpToken)
+            .resolves(success([]))
 
           // When
           const result = await queryGetter.handle(query)
@@ -461,7 +436,7 @@ describe('GetRendezVousJeunePoleEmploiQueryGetter', () => {
           dateService.now.returns(maintenant)
           poleEmploiPartenaireClient.getPrestations
             .withArgs(idpToken, maintenant)
-            .throws({ response: { data: {} } })
+            .resolves(failure(new ErreurHttp('Erreur', 500)))
 
           // When
           const result = await queryGetter.handle(query)

@@ -16,6 +16,7 @@ import {
 import { GetDemarchesQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-demarches.query.getter'
 import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import { expect, StubbedClass, stubClass } from '../../utils'
+import { success } from '../../../src/building-blocks/types/result'
 
 describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
   let handler: GetJeuneHomeAgendaPoleEmploiQueryHandler
@@ -40,24 +41,10 @@ describe('GetJeuneHomeAgendaPoleEmploiQueryHandler', () => {
     jeunesRepository = stubInterface(sandbox)
     jeunesRepository.get.resolves(unJeune())
     poleEmploiPartenaireClient = stubClass(PoleEmploiPartenaireClient)
-    poleEmploiPartenaireClient.getDemarches.resolves([])
+    poleEmploiPartenaireClient.getDemarches.resolves(success([]))
 
-    const axiosResponse = {
-      config: undefined,
-      headers: undefined,
-      request: undefined,
-      status: 200,
-      statusText: '',
-      data: {}
-    }
-    poleEmploiPartenaireClient.getPrestations.resolves({
-      ...axiosResponse,
-      data: []
-    })
-    poleEmploiPartenaireClient.getRendezVous.resolves({
-      ...axiosResponse,
-      data: []
-    })
+    poleEmploiPartenaireClient.getPrestations.resolves(success([]))
+    poleEmploiPartenaireClient.getRendezVous.resolves(success([]))
 
     dateService = stubClass(DateService)
     dateService.now.returns(maintenant)
