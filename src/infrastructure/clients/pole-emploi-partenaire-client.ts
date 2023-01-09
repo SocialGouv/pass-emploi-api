@@ -232,6 +232,9 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
       if (e.response.status === 500) {
         const cache = await this.recupererLesDernieresDonnees(suffixUrl)
         if (cache) {
+          this.logger.warn(
+            `Utilisation du cache pour ${suffixUrl} avec le log ${cache.id}`
+          )
           return successApi(
             cache.resultatPartenaire as T,
             DateTime.fromJSDate(cache.date)
