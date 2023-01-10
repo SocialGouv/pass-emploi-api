@@ -84,7 +84,7 @@ export class MiloRendezVousHttpRepository implements MiloRendezVous.Repository {
             `${this.apiUrl}/operateurs/dossiers/${evenement.idPartenaireBeneficiaire}/sessions/${evenement.idObjet}`,
             {
               headers: {
-                'X-Gravitee-Api-Key': `${this.apiKeyEvents}`,
+                'X-Gravitee-Api-Key': `${this.apiKeyDetailRendezVous}`,
                 operateur: 'applicationcej'
               }
             }
@@ -112,7 +112,7 @@ export class MiloRendezVousHttpRepository implements MiloRendezVous.Repository {
             `${this.apiUrl}/operateurs/dossiers/${evenement.idPartenaireBeneficiaire}/rdv/${evenement.idObjet}`,
             {
               headers: {
-                'X-Gravitee-Api-Key': `${this.apiKeyEvents}`,
+                'X-Gravitee-Api-Key': `${this.apiKeyDetailRendezVous}`,
                 operateur: 'applicationcej'
               }
             }
