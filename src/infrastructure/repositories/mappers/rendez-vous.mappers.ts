@@ -33,7 +33,8 @@ export function toRendezVousDto(rendezVous: RendezVous): AsSql<RendezVousDto> {
     createur: rendezVous.createur,
     idAgence: rendezVous.idAgence ?? null,
     typePartenaire: rendezVous.informationsPartenaire?.type ?? null,
-    idPartenaire: rendezVous.informationsPartenaire?.id ?? null
+    idPartenaire: rendezVous.informationsPartenaire?.id ?? null,
+    nombreMaxParticipants: rendezVous.nombreMaxParticipants ?? null
   }
 }
 
@@ -58,7 +59,8 @@ export function toRendezVous(rendezVousSql: RendezVousSqlModel): RendezVous {
     createur: rendezVousSql.createur,
     dateCloture: DateService.fromJSDateToDateTime(rendezVousSql.dateCloture),
     idAgence: rendezVousSql.idAgence ?? undefined,
-    informationsPartenaire: buildInformationsPartenaire(rendezVousSql)
+    informationsPartenaire: buildInformationsPartenaire(rendezVousSql),
+    nombreMaxParticipants: rendezVousSql.nombreMaxParticipants ?? undefined
   }
 }
 

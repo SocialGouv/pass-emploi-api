@@ -34,49 +34,8 @@ describe('Rendez-vous', () => {
 
     describe('creer', () => {
       describe('quand le type est autre que animation collective', () => {
-        it('crée un rdv', async () => {
-          // Given
-          const infosRdv: InfosRendezVousACreer = {
-            idsJeunes: ['1'],
-            idConseiller: '41',
-            commentaire: '',
-            date: uneDatetime().toJSDate().toISOString(),
-            duree: 10
-          }
-          const conseiller = unConseiller()
-
-          // When
-          const result = factory.creer(infosRdv, [unJeune()], conseiller)
-
-          // Then
-          expect(isSuccess(result) && result.data).to.deep.equal({
-            adresse: undefined,
-            commentaire: '',
-            createur: {
-              id: '1',
-              nom: 'Tavernier',
-              prenom: 'Nils'
-            },
-            date: new Date('2020-04-06T12:00:00.000Z'),
-            duree: 10,
-            id: '26279b34-318a-45e4-a8ad-514a1090462c',
-            source: RendezVous.Source.PASS_EMPLOI,
-            idAgence: undefined,
-            invitation: undefined,
-            jeunes: [unJeune()],
-            modalite: undefined,
-            organisme: undefined,
-            precision: undefined,
-            presenceConseiller: true,
-            sousTitre: 'avec Nils',
-            titre: 'Rendez-vous conseiller',
-            type: 'ENTRETIEN_INDIVIDUEL_CONSEILLER'
-          })
-        })
-      })
-      describe('quand le type est animation collective', () => {
-        describe('quand le conseiller a une agence ', () => {
-          it('renvoie un rdv avec agence', async () => {
+        describe('quand on renseigne un nombre maximum de participants', () => {
+          it('rejette avec une MauvaiseCommandeError', async () => {
             // Given
             const infosRdv: InfosRendezVousACreer = {
               idsJeunes: ['1'],
@@ -84,28 +43,132 @@ describe('Rendez-vous', () => {
               commentaire: '',
               date: uneDatetime().toJSDate().toISOString(),
               duree: 10,
-              type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
+              type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+              nombreMaxParticipants: 1
             }
-            const conseiller = unConseiller({ agence: { id: 'test' } })
-            const unJeuneDuConseiller = unJeune({
-              conseiller: {
-                id: conseiller.id,
-                firstName: conseiller.firstName,
-                lastName: conseiller.lastName,
-                email: conseiller.email,
-                idAgence: 'test'
-              }
+            const conseiller = unConseiller({
+              agence: { id: 'test' }
             })
 
             // When
             const result = factory.creer(
               infosRdv,
-              [unJeuneDuConseiller],
+              [unJeune({ id: '1' })],
               conseiller
             )
 
             // Then
-            expect(isSuccess(result) && result.data.idAgence).to.equal('test')
+            expect(!result._isSuccess && result.error).to.be.an.instanceOf(
+              MauvaiseCommandeError
+            )
+          })
+        })
+        describe('quand tout est bon', () => {
+          it('crée un rdv', async () => {
+            // Given
+            const infosRdv: InfosRendezVousACreer = {
+              idsJeunes: ['1'],
+              idConseiller: '41',
+              commentaire: '',
+              date: uneDatetime().toJSDate().toISOString(),
+              duree: 10
+            }
+            const conseiller = unConseiller()
+
+            // When
+            const result = factory.creer(infosRdv, [unJeune()], conseiller)
+
+            // Then
+            expect(isSuccess(result) && result.data).to.deep.equal({
+              adresse: undefined,
+              commentaire: '',
+              createur: {
+                id: '1',
+                nom: 'Tavernier',
+                prenom: 'Nils'
+              },
+              date: new Date('2020-04-06T12:00:00.000Z'),
+              duree: 10,
+              id: '26279b34-318a-45e4-a8ad-514a1090462c',
+              source: RendezVous.Source.PASS_EMPLOI,
+              idAgence: undefined,
+              invitation: undefined,
+              jeunes: [unJeune()],
+              modalite: undefined,
+              organisme: undefined,
+              precision: undefined,
+              presenceConseiller: true,
+              sousTitre: 'avec Nils',
+              titre: 'Rendez-vous conseiller',
+              type: 'ENTRETIEN_INDIVIDUEL_CONSEILLER',
+              nombreMaxParticipants: undefined
+            })
+          })
+        })
+      })
+      describe('quand le type est animation collective', () => {
+        describe('quand le conseiller a une agence ', () => {
+          describe('quand le nombre de participants est supérieur à la limite', () => {
+            it('rejette avec une MauvaiseCommandeError', async () => {
+              // Given
+              const infosRdv: InfosRendezVousACreer = {
+                idsJeunes: ['1'],
+                idConseiller: '41',
+                commentaire: '',
+                date: uneDatetime().toJSDate().toISOString(),
+                duree: 10,
+                type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
+                nombreMaxParticipants: 1
+              }
+              const conseiller = unConseiller({
+                agence: { id: 'test' }
+              })
+
+              // When
+              const result = factory.creer(
+                infosRdv,
+                [unJeune(), unJeune()],
+                conseiller
+              )
+
+              // Then
+              expect(!result._isSuccess && result.error).to.be.an.instanceOf(
+                MauvaiseCommandeError
+              )
+            })
+          })
+          describe('quand tout est bon', () => {
+            it('renvoie un rdv avec agence', async () => {
+              // Given
+              const infosRdv: InfosRendezVousACreer = {
+                idsJeunes: ['1'],
+                idConseiller: '41',
+                commentaire: '',
+                date: uneDatetime().toJSDate().toISOString(),
+                duree: 10,
+                type: CodeTypeRendezVous.INFORMATION_COLLECTIVE
+              }
+              const conseiller = unConseiller({ agence: { id: 'test' } })
+              const unJeuneDuConseiller = unJeune({
+                conseiller: {
+                  id: conseiller.id,
+                  firstName: conseiller.firstName,
+                  lastName: conseiller.lastName,
+                  email: conseiller.email,
+                  idAgence: 'test'
+                }
+              })
+
+              // When
+              const result = factory.creer(
+                infosRdv,
+                [unJeuneDuConseiller],
+                conseiller
+              )
+
+              // Then
+              expect(isSuccess(result) && result.data.idAgence).to.equal('test')
+            })
           })
         })
         describe("quand le conseiller n'a pas d'agence", () => {
@@ -194,107 +257,183 @@ describe('Rendez-vous', () => {
     })
 
     describe('mettreAJour', () => {
-      describe("quand c'est une animation collective cloturée", () => {
-        it('rejette', () => {
-          // Given
-          const unAtelierCloture = unRendezVous({
-            type: CodeTypeRendezVous.ATELIER,
-            dateCloture: uneDatetime()
-          })
+      describe('animation collective', () => {
+        describe('quand elle est clôturée', () => {
+          it('rejette', () => {
+            // Given
+            const unAtelierCloture = unRendezVous({
+              type: CodeTypeRendezVous.ATELIER,
+              dateCloture: uneDatetime()
+            })
 
-          // When
-          const result = service.mettreAJour(unAtelierCloture, {
-            ...unAtelierCloture,
-            date: '2020-04-06T12:00:00.000Z'
-          })
+            // When
+            const result = service.mettreAJour(unAtelierCloture, {
+              ...unAtelierCloture,
+              date: '2020-04-06T12:00:00.000Z'
+            })
 
-          // Then
-          expect(result).to.deep.equal(
-            failure(
-              new MauvaiseCommandeError(
-                'Une Animation Collective cloturée ne peut plus etre modifiée.'
+            // Then
+            expect(!result._isSuccess && result.error).to.be.an.instanceOf(
+              MauvaiseCommandeError
+            )
+          })
+        })
+        describe('quand le nombre de participants est supérieur à la limite', () => {
+          it('rejette avec une MauvaiseCommandeError', async () => {
+            // Given
+            const rendezVous = unRendezVous({
+              type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
+              jeunes: [unJeuneDuRendezVous()],
+              nombreMaxParticipants: 1
+            })
+
+            // When
+            const result = service.mettreAJour(rendezVous, {
+              ...rendezVous,
+              date: '2020-04-06T12:00:00.000Z',
+              jeunes: [unJeuneDuRendezVous(), unJeuneDuRendezVous()]
+            })
+
+            // Then
+            expect(!result._isSuccess && result.error).to.be.an.instanceOf(
+              MauvaiseCommandeError
+            )
+          })
+        })
+        describe('quand tout est bon', () => {
+          it('met à jour le rendez vous', () => {
+            // Given
+            const rendezVous = unRendezVous({
+              type: CodeTypeRendezVous.ATELIER
+            })
+
+            // When
+            const result = service.mettreAJour(rendezVous, {
+              ...rendezVous,
+              titre: 'Nouveau titre',
+              date: '2020-04-06T12:00:00.000Z',
+              jeunes: [unJeuneDuRendezVous()],
+              modalite: 'nouveau',
+              adresse: 'nouvelle',
+              organisme: 'nouvel',
+              presenceConseiller: false,
+              nombreMaxParticipants: 12
+            })
+
+            // Then
+            expect(isSuccess(result) && result.data).to.deep.equal({
+              ...rendezVous,
+              date: new Date('2020-04-06T12:00:00.000Z'),
+              jeunes: [unJeuneDuRendezVous()],
+              titre: 'Nouveau titre',
+              modalite: 'nouveau',
+              adresse: 'nouvelle',
+              organisme: 'nouvel',
+              presenceConseiller: false,
+              nombreMaxParticipants: 12
+            })
+          })
+        })
+      })
+      describe('rendez-vous', () => {
+        describe("quand c'est un rendez vous classique sans jeune", () => {
+          it('rejette', () => {
+            // Given
+            const rendezVous = unRendezVous({
+              type: CodeTypeRendezVous.AUTRE,
+              jeunes: [unJeune()]
+            })
+
+            // When
+            const result = service.mettreAJour(rendezVous, {
+              ...rendezVous,
+              date: '2020-04-06T12:00:00.000Z',
+              jeunes: []
+            })
+
+            // Then
+            expect(result).to.deep.equal(
+              failure(
+                new MauvaiseCommandeError('Un bénéficiaire minimum est requis.')
               )
             )
-          )
+          })
         })
-      })
-      describe("quand c'est un rendez vous classique sans jeune", () => {
-        it('rejette', () => {
-          // Given
-          const rendezVous = unRendezVous({
-            type: CodeTypeRendezVous.AUTRE,
-            jeunes: [unJeune()]
-          })
+        describe("quand c'est un entretien individuel conseiller", () => {
+          it('rejette quand on veut modifier la présence conseiller', () => {
+            // Given
+            const rendezVous = unRendezVous({
+              type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+              presenceConseiller: true
+            })
 
-          // When
-          const result = service.mettreAJour(rendezVous, {
-            ...rendezVous,
-            date: '2020-04-06T12:00:00.000Z',
-            jeunes: []
-          })
+            // When
+            const result = service.mettreAJour(rendezVous, {
+              ...rendezVous,
+              date: '2020-04-06T12:00:00.000Z',
+              presenceConseiller: false
+            })
 
-          // Then
-          expect(result).to.deep.equal(
-            failure(
-              new MauvaiseCommandeError('Un bénéficiaire minimum est requis.')
-            )
-          )
-        })
-      })
-      describe("quand c'est un entretien individuel conseiller", () => {
-        it('rejette quand on veut modifier la présence conseiller', () => {
-          // Given
-          const rendezVous = unRendezVous({
-            type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
-            presenceConseiller: true
-          })
-
-          // When
-          const result = service.mettreAJour(rendezVous, {
-            ...rendezVous,
-            date: '2020-04-06T12:00:00.000Z',
-            presenceConseiller: false
-          })
-
-          // Then
-          expect(result).to.deep.equal(
-            failure(
-              new MauvaiseCommandeError(
-                'Le champ presenceConseiller ne peut être modifié pour un rendez-vous Conseiller.'
+            // Then
+            expect(result).to.deep.equal(
+              failure(
+                new MauvaiseCommandeError(
+                  'Le champ presenceConseiller ne peut être modifié pour un rendez-vous Conseiller.'
+                )
               )
             )
-          )
+          })
         })
-      })
-      describe('quand tout est bon', () => {
-        it('met à jour le rendez vous', () => {
-          // Given
-          const rendezVous = unRendezVous({
-            type: CodeTypeRendezVous.AUTRE
-          })
+        describe('quand on renseigne un nombre maximum de participants', () => {
+          it('rejette avec une MauvaiseCommandeError', async () => {
+            // Given
+            const rendezVous = unRendezVous({
+              type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
+            })
 
-          // When
-          const result = service.mettreAJour(rendezVous, {
-            ...rendezVous,
-            titre: 'Nouveau titre',
-            date: '2020-04-06T12:00:00.000Z',
-            jeunes: [unJeuneDuRendezVous()],
-            modalite: 'nouveau',
-            adresse: 'nouvelle',
-            organisme: 'nouvel',
-            presenceConseiller: false
-          })
+            // When
+            const result = service.mettreAJour(rendezVous, {
+              ...rendezVous,
+              date: '2020-04-06T12:00:00.000Z',
+              nombreMaxParticipants: 8
+            })
 
-          // Then
-          expect(isSuccess(result) && result.data).to.deep.equal({
-            ...rendezVous,
-            date: new Date('2020-04-06T12:00:00.000Z'),
-            jeunes: [unJeuneDuRendezVous()],
-            titre: 'Nouveau titre',
-            modalite: 'nouveau',
-            adresse: 'nouvelle',
-            organisme: 'nouvel',
-            presenceConseiller: false
+            // Then
+            expect(!result._isSuccess && result.error).to.be.an.instanceOf(
+              MauvaiseCommandeError
+            )
+          })
+        })
+        describe('quand tout est bon', () => {
+          it('met à jour le rendez vous', () => {
+            // Given
+            const rendezVous = unRendezVous({
+              type: CodeTypeRendezVous.AUTRE
+            })
+
+            // When
+            const result = service.mettreAJour(rendezVous, {
+              ...rendezVous,
+              titre: 'Nouveau titre',
+              date: '2020-04-06T12:00:00.000Z',
+              jeunes: [unJeuneDuRendezVous()],
+              modalite: 'nouveau',
+              adresse: 'nouvelle',
+              organisme: 'nouvel',
+              presenceConseiller: false
+            })
+
+            // Then
+            expect(isSuccess(result) && result.data).to.deep.equal({
+              ...rendezVous,
+              date: new Date('2020-04-06T12:00:00.000Z'),
+              jeunes: [unJeuneDuRendezVous()],
+              titre: 'Nouveau titre',
+              modalite: 'nouveau',
+              adresse: 'nouvelle',
+              organisme: 'nouvel',
+              presenceConseiller: false
+            })
           })
         })
       })

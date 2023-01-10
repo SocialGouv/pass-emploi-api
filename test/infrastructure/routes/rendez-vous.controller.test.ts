@@ -157,7 +157,8 @@ describe('RendezvousController', () => {
       modality: undefined,
       adresse: undefined,
       organisme: undefined,
-      presenceConseiller: true
+      presenceConseiller: true,
+      nombreMaxParticipants: undefined
     }
     const expectedCommand: UpdateRendezVousCommand = {
       idsJeunes: ['1'],
@@ -169,7 +170,8 @@ describe('RendezvousController', () => {
       modalite: undefined,
       adresse: undefined,
       organisme: undefined,
-      presenceConseiller: true
+      presenceConseiller: true,
+      nombreMaxParticipants: undefined
     }
     it('met à jour le rendez-vous', async () => {
       // Given

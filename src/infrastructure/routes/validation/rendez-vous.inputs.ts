@@ -98,6 +98,11 @@ export class CreateRendezVousPayload {
   @IsOptional()
   @IsIn([true, false])
   invitation?: boolean
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  nombreMaxParticipants?: number
 }
 
 export class UpdateRendezVousPayload {
@@ -145,4 +150,9 @@ export class UpdateRendezVousPayload {
   @IsBoolean()
   @IsIn([true, false])
   presenceConseiller: boolean
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  nombreMaxParticipants?: number
 }

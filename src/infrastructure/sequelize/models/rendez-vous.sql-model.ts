@@ -95,6 +95,9 @@ export class RendezVousDto extends Model {
     type: DataType.STRING
   })
   idPartenaire: string | null
+
+  @Column({ field: 'nombre_max_participants', type: DataType.INTEGER })
+  nombreMaxParticipants: number | null
 }
 
 @Table({ timestamps: false, tableName: 'rendez_vous' })

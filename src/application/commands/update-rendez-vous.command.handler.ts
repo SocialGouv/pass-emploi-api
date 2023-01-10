@@ -39,6 +39,7 @@ export interface UpdateRendezVousCommand extends Command {
   adresse?: string
   organisme?: string
   presenceConseiller: boolean
+  nombreMaxParticipants?: number
 }
 
 @Injectable()
@@ -224,7 +225,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     command: UpdateRendezVousCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.rendezVousAuthorizer.authorize(
+    return this.rendezVousAuthorizer.authorizeConseiller(
       command.idRendezVous,
       utilisateur
     )

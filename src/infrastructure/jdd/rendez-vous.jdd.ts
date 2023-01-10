@@ -31,7 +31,8 @@ export function unRendezVousJDD(
     idAgence: null,
     createur: { id: '1', nom: 'Tavernier', prenom: 'Nils' },
     typePartenaire: null,
-    idPartenaire: null
+    idPartenaire: null,
+    nombreMaxParticipants: null
   }
 
   return { ...defaults, ...args }
