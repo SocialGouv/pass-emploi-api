@@ -358,7 +358,8 @@ export class ConseillersController {
       adresse: createRendezVousPayload.adresse,
       organisme: createRendezVousPayload.organisme,
       presenceConseiller: createRendezVousPayload.presenceConseiller,
-      invitation: createRendezVousPayload.invitation
+      invitation: createRendezVousPayload.invitation,
+      nombreMaxParticipants: createRendezVousPayload.nombreMaxParticipants
     }
 
     const result: Result<string> =

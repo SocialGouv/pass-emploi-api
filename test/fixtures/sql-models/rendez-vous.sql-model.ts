@@ -32,7 +32,8 @@ export function unRendezVousDto(
     createur: { id: '1', nom: 'Tavernier', prenom: 'Nils' },
     source: RendezVous.Source.PASS_EMPLOI,
     typePartenaire: null,
-    idPartenaire: null
+    idPartenaire: null,
+    nombreMaxParticipants: null
   }
 
   return { ...defaults, ...args }

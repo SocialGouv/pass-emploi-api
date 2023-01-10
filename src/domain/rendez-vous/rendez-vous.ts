@@ -94,6 +94,7 @@ export interface RendezVous {
   idAgence?: string
   dateCloture?: DateTime
   informationsPartenaire?: RendezVous.InformationsPartenaire
+  nombreMaxParticipants?: number
 }
 
 export interface InfosRendezVousACreer {
@@ -110,6 +111,7 @@ export interface InfosRendezVousACreer {
   organisme?: string
   presenceConseiller?: boolean
   invitation?: boolean
+  nombreMaxParticipants?: number
 }
 
 export interface InfosRendezVousAMettreAJour {
@@ -122,6 +124,7 @@ export interface InfosRendezVousAMettreAJour {
   adresse?: string
   organisme?: string
   presenceConseiller: boolean
+  nombreMaxParticipants?: number
 }
 
 export namespace RendezVous {
@@ -198,11 +201,28 @@ export namespace RendezVous {
         )
       }
 
-      if (
-        RendezVous.estUnTypeAnimationCollective(infosRendezVousACreer.type) &&
-        !conseiller!.agence?.id
-      ) {
-        return failure(new ConseillerSansAgenceError(conseiller.id))
+      if (RendezVous.estUnTypeAnimationCollective(infosRendezVousACreer.type)) {
+        if (
+          infosRendezVousACreer.nombreMaxParticipants &&
+          infosRendezVousACreer.nombreMaxParticipants < jeunes.length
+        ) {
+          return failure(
+            new MauvaiseCommandeError(
+              'Le nombre de participants ne peut excéder la limite renseignée.'
+            )
+          )
+        }
+        if (!conseiller!.agence?.id) {
+          return failure(new ConseillerSansAgenceError(conseiller.id))
+        }
+      } else {
+        if (infosRendezVousACreer.nombreMaxParticipants) {
+          return failure(
+            new MauvaiseCommandeError(
+              'Le champ nombreMaxParticipants ne concerne que les animations collectives.'
+            )
+          )
+        }
       }
 
       for (const jeune of jeunes) {
@@ -249,7 +269,8 @@ export namespace RendezVous {
         },
         idAgence: estUnTypeAnimationCollective(infosRendezVousACreer.type)
           ? conseiller.agence?.id
-          : undefined
+          : undefined,
+        nombreMaxParticipants: infosRendezVousACreer.nombreMaxParticipants
       })
     }
   }
@@ -264,7 +285,18 @@ export namespace RendezVous {
         if (RendezVous.AnimationCollective.estCloturee(rendezVousInitial)) {
           return failure(
             new MauvaiseCommandeError(
-              'Une Animation Collective cloturée ne peut plus etre modifiée.'
+              'Une Animation Collective clôturée ne peut plus être modifiée.'
+            )
+          )
+        }
+        if (
+          infosRendezVousAMettreAJour.nombreMaxParticipants &&
+          infosRendezVousAMettreAJour.nombreMaxParticipants <
+            infosRendezVousAMettreAJour.jeunes.length
+        ) {
+          return failure(
+            new MauvaiseCommandeError(
+              'Le nombre de participants ne peut excéder la limite renseignée.'
             )
           )
         }
@@ -274,7 +306,6 @@ export namespace RendezVous {
             new MauvaiseCommandeError('Un bénéficiaire minimum est requis.')
           )
         }
-
         if (
           !infosRendezVousAMettreAJour.presenceConseiller &&
           rendezVousInitial.type ===
@@ -283,6 +314,13 @@ export namespace RendezVous {
           return failure(
             new MauvaiseCommandeError(
               'Le champ presenceConseiller ne peut être modifié pour un rendez-vous Conseiller.'
+            )
+          )
+        }
+        if (infosRendezVousAMettreAJour.nombreMaxParticipants) {
+          return failure(
+            new MauvaiseCommandeError(
+              'Le champ nombreMaxParticipants ne concerne que les animations collectives.'
             )
           )
         }
@@ -298,7 +336,8 @@ export namespace RendezVous {
         jeunes: infosRendezVousAMettreAJour.jeunes,
         adresse: infosRendezVousAMettreAJour.adresse,
         organisme: infosRendezVousAMettreAJour.organisme,
-        presenceConseiller: infosRendezVousAMettreAJour.presenceConseiller
+        presenceConseiller: infosRendezVousAMettreAJour.presenceConseiller,
+        nombreMaxParticipants: infosRendezVousAMettreAJour.nombreMaxParticipants
       })
     }
   }

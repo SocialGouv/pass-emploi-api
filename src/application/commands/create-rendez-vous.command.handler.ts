@@ -39,6 +39,7 @@ export interface CreateRendezVousCommand extends Command {
   organisme?: string
   presenceConseiller?: boolean
   invitation?: boolean
+  nombreMaxParticipants?: number
 }
 
 @Injectable()

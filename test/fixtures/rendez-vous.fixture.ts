@@ -34,7 +34,8 @@ export const unRendezVous = (args: Partial<RendezVous> = {}): RendezVous => {
       id: '1',
       nom: 'Tavernier',
       prenom: 'Nils'
-    }
+    },
+    nombreMaxParticipants: undefined
   }
   return { ...defaults, ...args }
 }

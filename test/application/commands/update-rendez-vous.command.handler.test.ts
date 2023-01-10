@@ -366,7 +366,7 @@ describe('UpdateRendezVousCommandHandler', () => {
   })
 
   describe('authorize', () => {
-    it('authorise un conseiller', async () => {
+    it('autorise un conseiller', async () => {
       // Given
       const command: UpdateRendezVousCommand = {
         idsJeunes: ['x'],
@@ -382,10 +382,10 @@ describe('UpdateRendezVousCommandHandler', () => {
       await updateRendezVousCommandHandler.authorize(command, utilisateur)
 
       // Then
-      expect(rendezVousAuthorizer.authorize).to.have.been.calledWithExactly(
-        command.idRendezVous,
-        utilisateur
-      )
+      expect(rendezVousAuthorizer.authorize).to.not.have.been.called()
+      expect(
+        rendezVousAuthorizer.authorizeConseiller
+      ).to.have.been.calledWithExactly(command.idRendezVous, utilisateur)
     })
   })
 

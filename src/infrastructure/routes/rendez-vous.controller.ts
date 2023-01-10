@@ -93,7 +93,8 @@ export class RendezVousController {
       modalite: updateRendezVousPayload.modality,
       adresse: updateRendezVousPayload.adresse,
       organisme: updateRendezVousPayload.organisme,
-      presenceConseiller: updateRendezVousPayload.presenceConseiller
+      presenceConseiller: updateRendezVousPayload.presenceConseiller,
+      nombreMaxParticipants: updateRendezVousPayload.nombreMaxParticipants
     }
 
     const result = await this.updateRendezVousCommandHandler.execute(

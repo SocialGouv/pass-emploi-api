@@ -54,6 +54,22 @@ export class RendezVousAuthorizer {
     }
   }
 
+  async authorizeConseiller(
+    idRendezVous: string,
+    utilisateur: Authentification.Utilisateur
+  ): Promise<Result> {
+    const rendezVous = await this.rendezVousRepository.get(idRendezVous)
+
+    if (!rendezVous) {
+      return failure(new NonTrouveError('RendezVous', idRendezVous))
+    }
+
+    if (!utilisateur) {
+      return failure(new DroitsInsuffisants())
+    }
+    return this.autoriserUnConseiller(rendezVous, utilisateur)
+  }
+
   private async autoriserUnJeune(
     rendezVous: RendezVous,
     utilisateur: Authentification.Utilisateur
@@ -78,24 +94,16 @@ export class RendezVousAuthorizer {
     rendezVous: RendezVous,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    if (RendezVous.estUnTypeAnimationCollective(rendezVous.type)) {
+    // RETRO COMPATIBILITÉ : A SUPPRIMER QUAND TOUTES LES ANIMATIONS COLLECTIVES AURONT UN ID AGENCE
+    if (
+      RendezVous.estUnTypeAnimationCollective(rendezVous.type) &&
+      rendezVous.idAgence
+    ) {
       const conseiller = await this.conseillerRepository.get(utilisateur.id)
 
       if (!conseiller) {
         return failure(new DroitsInsuffisants())
       }
-
-      // RETRO COMPATIBILITÉ : A SUPPRIMER QUAND TOUTES LES ANIMATIONS COLLECTIVES AURONT UN ID AGENCE
-      if (!rendezVous.idAgence) {
-        if (
-          rendezVous.jeunes.find(
-            jeune => utilisateur.id === jeune.conseiller?.id
-          )
-        ) {
-          return emptySuccess()
-        }
-      }
-
       if (rendezVous.idAgence === conseiller?.agence?.id) {
         return emptySuccess()
       }
