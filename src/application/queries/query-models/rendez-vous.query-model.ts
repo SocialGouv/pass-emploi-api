@@ -16,7 +16,7 @@ class JeuneQueryModel {
   @ApiProperty()
   prenom: string
 
-  @ApiPropertyOptional()
+  @ApiProperty({ required: false })
   futPresent?: boolean
 }
 
@@ -120,6 +120,9 @@ export class RendezVousJeuneQueryModel implements RendezVousBaseQueryModel {
 
   @ApiProperty({ required: true, enum: RendezVous.Source })
   source: RendezVous.Source
+
+  @ApiProperty({ required: false })
+  futPresent?: boolean
 }
 
 export class RendezVousJeuneQueryModelV2 {

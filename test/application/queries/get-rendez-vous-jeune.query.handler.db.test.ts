@@ -27,9 +27,9 @@ import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { stubClassSandbox } from '../../utils/types'
 import { getDatabase } from '../../utils/database-for-testing'
 import { testConfig } from '../../utils/module-for-testing'
+import { stubClassSandbox } from '../../utils/types'
 
 describe('GetRendezVousJeuneQueryHandler', () => {
   let dateService: StubbedClass<DateService>
@@ -85,6 +85,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
         date: maintenant.minus({ days: 2 }).toJSDate(),
         titre: 'UN RENDEZ VOUS PASSÉ'
       })
+
       unRendezVousTresPasse = unRendezVousDto({
         date: maintenant.minus({ days: 20 }).toJSDate(),
         titre: 'UN RENDEZ VOUS TRES PASSÉ'
@@ -108,11 +109,13 @@ describe('GetRendezVousJeuneQueryHandler', () => {
       await RendezVousJeuneAssociationSqlModel.bulkCreate([
         {
           idJeune: jeune1.id,
-          idRendezVous: unRendezVousPasse.id
+          idRendezVous: unRendezVousPasse.id,
+          present: true
         },
         {
           idJeune: jeune1.id,
-          idRendezVous: unRendezVousTresPasse.id
+          idRendezVous: unRendezVousTresPasse.id,
+          present: false
         },
         {
           idJeune: jeune2.id,
@@ -168,6 +171,24 @@ describe('GetRendezVousJeuneQueryHandler', () => {
           expect(result.data[1].id).to.equal(
             unRendezVousTresFuturPresenceConseillerFalse.id
           )
+        }
+      })
+      it('retourne les rendez-vous avec la présence du jeune', async () => {
+        // When
+        const result = await getRendezVousQueryHandler.handle({
+          idJeune: jeune1.id
+        })
+
+        // Then
+        expect(result._isSuccess).to.equal(true)
+
+        if (result._isSuccess) {
+          expect(result.data[0].id).to.equal(unRendezVousTresPasse.id)
+          expect(result.data[1].id).to.equal(unRendezVousPasse.id)
+          expect(result.data[2].id).to.equal(unRendezVousProche.id)
+          expect(result.data[0].futPresent).to.equal(false)
+          expect(result.data[1].futPresent).to.equal(true)
+          expect(result.data[2].futPresent).to.be.undefined()
         }
       })
     })
