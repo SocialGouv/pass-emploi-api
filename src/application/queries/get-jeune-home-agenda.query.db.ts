@@ -114,7 +114,9 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
       order: [['date', 'ASC']]
     })
 
-    return rendezVousSqlModel.map(fromSqlToRendezVousJeuneQueryModel)
+    return rendezVousSqlModel.map(rdvSql =>
+      fromSqlToRendezVousJeuneQueryModel(rdvSql)
+    )
   }
 
   private async recupererLesActions(

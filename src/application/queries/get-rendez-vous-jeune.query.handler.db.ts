@@ -57,7 +57,11 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
         rendezVousSql = await this.getAllQueryModelsByJeune(query.idJeune)
     }
 
-    return success(rendezVousSql.map(fromSqlToRendezVousJeuneQueryModel))
+    return success(
+      rendezVousSql.map(rdvSql =>
+        fromSqlToRendezVousJeuneQueryModel(rdvSql, query.idJeune)
+      )
+    )
   }
 
   async authorize(

@@ -14,8 +14,11 @@ import {
 import { RendezVousJeuneAssociationSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 
 export function fromSqlToRendezVousJeuneQueryModel(
-  rendezVousSql: RendezVousSqlModel
+  rendezVousSql: RendezVousSqlModel,
+  idJeune?: string
 ): RendezVousJeuneQueryModel {
+  const jeuneSql = rendezVousSql.jeunes.find(jeune => jeune.id === idJeune)
+
   return {
     id: rendezVousSql.id,
     comment: rendezVousSql.commentaire ?? undefined,
@@ -39,7 +42,8 @@ export function fromSqlToRendezVousJeuneQueryModel(
       nom: rendezVousSql.jeunes[0].conseiller!.nom,
       prenom: rendezVousSql.jeunes[0].conseiller!.prenom
     },
-    source: rendezVousSql.source
+    source: rendezVousSql.source,
+    futPresent: jeuneSql ? getPresence(jeuneSql) : undefined
   }
 }
 

@@ -38,7 +38,8 @@ export function unRendezVousQueryModel(
       code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
       label: 'Entretien individuel conseiller'
     },
-    source: RendezVous.Source.PASS_EMPLOI
+    source: RendezVous.Source.PASS_EMPLOI,
+    futPresent: undefined
   }
 
   return { ...defaults, ...args }
