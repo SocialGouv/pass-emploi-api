@@ -175,7 +175,7 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
       nouveauRdv,
       Notification.Type.NEW_RENDEZVOUS
     )
-    if (this.infosRendezVousSontModifies(rendezVous, rendezVousUpdated)) {
+    if (this.doitNotifierDUneMiseAJour(rendezVous, rendezVousUpdated)) {
       this.notificationService.notifierLesJeunesDuRdv(
         rdvMisAJour,
         Notification.Type.UPDATED_RENDEZVOUS
@@ -183,18 +183,14 @@ export class UpdateRendezVousCommandHandler extends CommandHandler<
     }
   }
 
-  private infosRendezVousSontModifies(
+  private doitNotifierDUneMiseAJour(
     rendezVous: RendezVous,
     rendezVousUpdated: RendezVous
   ): boolean {
     return (
-      rendezVous.commentaire !== rendezVousUpdated.commentaire ||
       rendezVous.date.getTime() !== rendezVousUpdated.date.getTime() ||
       rendezVous.duree !== rendezVousUpdated.duree ||
-      rendezVous.modalite !== rendezVousUpdated.modalite ||
-      rendezVous.adresse !== rendezVousUpdated.adresse ||
-      rendezVous.organisme !== rendezVousUpdated.organisme ||
-      rendezVous.presenceConseiller !== rendezVousUpdated.presenceConseiller
+      rendezVous.adresse !== rendezVousUpdated.adresse
     )
   }
 
