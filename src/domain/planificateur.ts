@@ -99,7 +99,7 @@ export namespace Planificateur {
 export const listeCronJobs: Planificateur.CronJob[] = [
   {
     type: Planificateur.JobType.SUIVRE_EVENEMENTS_MILO,
-    expression: '* * * * *'
+    expression: '*/15 * * * *'
   },
   {
     type: Planificateur.JobType.RECUPERER_SITUATIONS_JEUNES_MILO,
