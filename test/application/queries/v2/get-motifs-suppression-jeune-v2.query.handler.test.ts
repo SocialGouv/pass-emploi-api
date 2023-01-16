@@ -49,11 +49,8 @@ describe('GetMotifsSuppressionJeuneV2QueryHandler', () => {
             motif: 'Non respect des engagements ou abandon',
             description: undefined
           },
-          {
-            motif: 'Déménagement ou changement de conseiller',
-            description:
-              'Uniquement dans le cas où vous ne pouvez pas réaffecter ce jeune. Dans le cas contraire, contactez votre superviseur.'
-          },
+          { motif: 'Déménagement', description: undefined },
+          { motif: 'Changement de conseiller', description: undefined },
           { motif: 'Autre', description: 'Champ libre' }
         ])
       )

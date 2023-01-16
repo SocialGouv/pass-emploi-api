@@ -45,7 +45,8 @@ export namespace ArchiveJeune {
     LIMITE_AGE = 'Limite d’âge atteinte',
     DEMANDE_DU_JEUNE = 'Demande du jeune de sortir du dispositif',
     NON_RESPECT_OU_ABANDON = 'Non respect des engagements ou abandon',
-    DEMENAGEMENT_OU_CHANGEMENT_CONSEILLER = 'Déménagement ou changement de conseiller',
+    DEMENAGEMENT = 'Déménagement',
+    CHANGEMENT_CONSEILLER = 'Changement de conseiller',
     AUTRE = 'Autre'
   }
   export enum MotifSuppressionV1 {
@@ -61,7 +62,8 @@ export namespace ArchiveJeune {
     LIMITE_AGE = 'Limite d’âge atteinte',
     DEMANDE_DU_JEUNE = 'Demande du jeune de sortir du dispositif',
     NON_RESPECT_OU_ABANDON = 'Non respect des engagements ou abandon',
-    DEMENAGEMENT_OU_CHANGEMENT_CONSEILLER = 'Déménagement ou changement de conseiller',
+    DEMENAGEMENT = 'Déménagement',
+    CHANGEMENT_CONSEILLER = 'Changement de conseiller',
     AUTRE = 'Autre'
   }
 
@@ -72,8 +74,6 @@ export namespace ArchiveJeune {
       'CDI, CDD de plus de 6 mois dont alternance, titularisation dans la fonction publique',
     'Limite d’âge atteinte':
       "Motif valable uniquement à partir de la fin du premier mois des 26 ans. A noter : dans le cas oû le jeune est considéré en tant que travailleur handicapé, l'âge passe à 30 ans.",
-    'Déménagement ou changement de conseiller':
-      'Uniquement dans le cas où vous ne pouvez pas réaffecter ce jeune. Dans le cas contraire, contactez votre superviseur.',
     Autre: 'Champ libre'
   }
 
