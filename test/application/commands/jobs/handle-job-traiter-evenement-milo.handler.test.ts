@@ -224,7 +224,9 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
 
             // Then
             expect(result.resultat).to.be.deep.equal({
-              traitement: Traitement.RENDEZ_VOUS_INEXISTANT
+              traitement: Traitement.RENDEZ_VOUS_INEXISTANT,
+              idJeune: 'ABCDE',
+              idRendezVous: undefined
             })
             expect(rendezVousRepository.save).to.not.have.been.called()
           })
@@ -259,7 +261,9 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
 
             // Then
             expect(result.resultat).to.be.deep.equal({
-              traitement: Traitement.RENDEZ_VOUS_SUPPRIME
+              traitement: Traitement.RENDEZ_VOUS_SUPPRIME,
+              idJeune: 'ABCDE',
+              idRendezVous: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb'
             })
             expect(
               rendezVousRepository.delete
@@ -297,7 +301,9 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
           // Then
           expect(rendezVousRepository.save).not.to.have.been.called()
           expect(suiviJob.resultat).to.be.deep.equal({
-            traitement: Traitement.OBJET_NON_TRAITABLE
+            traitement: Traitement.OBJET_NON_TRAITABLE,
+            idJeune: undefined,
+            idRendezVous: undefined
           })
         })
       })
@@ -323,7 +329,9 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
           // Then
           expect(rendezVousRepository.save).not.to.have.been.called()
           expect(suiviJob.resultat).to.be.deep.equal({
-            traitement: Traitement.TYPE_NON_TRAITABLE
+            traitement: Traitement.TYPE_NON_TRAITABLE,
+            idJeune: undefined,
+            idRendezVous: undefined
           })
         })
       })
@@ -350,7 +358,9 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
 
         // Then
         expect(result.resultat).to.be.deep.equal({
-          traitement: Traitement.JEUNE_INEXISTANT
+          traitement: Traitement.JEUNE_INEXISTANT,
+          idJeune: undefined,
+          idRendezVous: undefined
         })
         expect(rendezVousRepository.save).to.not.have.been.called()
       })
