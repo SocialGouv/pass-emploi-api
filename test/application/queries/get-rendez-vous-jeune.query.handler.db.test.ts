@@ -39,6 +39,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
   let evenementService: StubbedClass<EvenementService>
   let sandbox: SinonSandbox
 
+  const utilisateurJeune = unUtilisateurJeune()
   const maintenant = uneDatetime()
   const aujourdhuiMinuit = uneDatetimeMinuit()
   let unRendezVousPasse: AsSql<RendezVousDto>
@@ -139,9 +140,12 @@ describe('GetRendezVousJeuneQueryHandler', () => {
     describe('sans periode', () => {
       it('retourne tous les rendez-vous du jeune', async () => {
         // When
-        const result = await getRendezVousQueryHandler.handle({
-          idJeune: jeune1.id
-        })
+        const result = await getRendezVousQueryHandler.handle(
+          {
+            idJeune: jeune1.id
+          },
+          utilisateurJeune
+        )
 
         // Then
         expect(result._isSuccess).to.equal(true)
@@ -158,9 +162,12 @@ describe('GetRendezVousJeuneQueryHandler', () => {
       })
       it('retourne que les rendez-vous qui concernent le jeune', async () => {
         // When
-        const result = await getRendezVousQueryHandler.handle({
-          idJeune: jeune2.id
-        })
+        const result = await getRendezVousQueryHandler.handle(
+          {
+            idJeune: jeune2.id
+          },
+          utilisateurJeune
+        )
 
         // Then
         expect(result._isSuccess).to.equal(true)
@@ -175,9 +182,12 @@ describe('GetRendezVousJeuneQueryHandler', () => {
       })
       it('retourne les rendez-vous avec la présence du jeune', async () => {
         // When
-        const result = await getRendezVousQueryHandler.handle({
-          idJeune: jeune1.id
-        })
+        const result = await getRendezVousQueryHandler.handle(
+          {
+            idJeune: jeune1.id
+          },
+          utilisateurJeune
+        )
 
         // Then
         expect(result._isSuccess).to.equal(true)
@@ -196,10 +206,13 @@ describe('GetRendezVousJeuneQueryHandler', () => {
     describe('periode FUTURS renseignée', () => {
       it('retourne les rendez-vous futurs du jeune', async () => {
         // When
-        const result = await getRendezVousQueryHandler.handle({
-          idJeune: jeune1.id,
-          periode: RendezVous.Periode.FUTURS
-        })
+        const result = await getRendezVousQueryHandler.handle(
+          {
+            idJeune: jeune1.id,
+            periode: RendezVous.Periode.FUTURS
+          },
+          utilisateurJeune
+        )
 
         // Then
         expect(result._isSuccess).to.equal(true)
@@ -217,10 +230,13 @@ describe('GetRendezVousJeuneQueryHandler', () => {
     describe('periode PASSES renseignée', () => {
       it('retourne les rendez-vous passés du jeune', async () => {
         // When
-        const result = await getRendezVousQueryHandler.handle({
-          idJeune: jeune1.id,
-          periode: RendezVous.Periode.PASSES
-        })
+        const result = await getRendezVousQueryHandler.handle(
+          {
+            idJeune: jeune1.id,
+            periode: RendezVous.Periode.PASSES
+          },
+          utilisateurJeune
+        )
 
         // Then
         expect(result._isSuccess).to.equal(true)

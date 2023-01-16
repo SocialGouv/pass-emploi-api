@@ -38,7 +38,8 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
   }
 
   async handle(
-    query: GetRendezVousJeuneQuery
+    query: GetRendezVousJeuneQuery,
+    utilisateur: Authentification.Utilisateur
   ): Promise<Result<RendezVousJeuneQueryModel[]>> {
     let rendezVousSql
 
@@ -59,7 +60,11 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
 
     return success(
       rendezVousSql.map(rdvSql =>
-        fromSqlToRendezVousJeuneQueryModel(rdvSql, query.idJeune)
+        fromSqlToRendezVousJeuneQueryModel(
+          rdvSql,
+          utilisateur.type,
+          query.idJeune
+        )
       )
     )
   }

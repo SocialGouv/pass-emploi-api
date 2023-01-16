@@ -39,7 +39,8 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
   }
 
   async handle(
-    query: GetJeuneHomeAgendaQuery
+    query: GetJeuneHomeAgendaQuery,
+    utilisateur: Authentification.Utilisateur
   ): Promise<Result<JeuneHomeSuiviQueryModel>> {
     const { lundiDernier, dimancheEnHuit } =
       this.recupererLesDatesEntreLundiDernierEtDeuxSemainesPlusTard(
@@ -47,7 +48,12 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
       )
     const [actions, rendezVous, actionsEnRetard] = await Promise.all([
       this.recupererLesActions(query, lundiDernier, dimancheEnHuit),
-      this.recupererLesRendezVous(query, lundiDernier, dimancheEnHuit),
+      this.recupererLesRendezVous(
+        query,
+        lundiDernier,
+        dimancheEnHuit,
+        utilisateur.type
+      ),
       this.recupererLeNombreDactionsEnRetard(query)
     ])
     return success({
@@ -94,7 +100,8 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
   private async recupererLesRendezVous(
     query: GetJeuneHomeAgendaQuery,
     dateDebut: DateTime,
-    dateFin: DateTime
+    dateFin: DateTime,
+    typeUtilisateur: Authentification.Type
   ): Promise<RendezVousJeuneQueryModel[]> {
     const rendezVousSqlModel = await RendezVousSqlModel.findAll({
       include: [
@@ -115,7 +122,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
     })
 
     return rendezVousSqlModel.map(rdvSql =>
-      fromSqlToRendezVousJeuneQueryModel(rdvSql)
+      fromSqlToRendezVousJeuneQueryModel(rdvSql, typeUtilisateur)
     )
   }
 

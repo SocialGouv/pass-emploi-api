@@ -34,7 +34,8 @@ export class GetAnimationsCollectivesJeuneQueryHandler extends QueryHandler<
   }
 
   async handle(
-    query: GetAnimationsCollectivesJeuneQuery
+    query: GetAnimationsCollectivesJeuneQuery,
+    utilisateur: Authentification.Utilisateur
   ): Promise<Result<RendezVousJeuneDetailQueryModel[]>> {
     const rendezVousSql = await RendezVousSqlModel.findAll({
       include: [
@@ -70,7 +71,11 @@ export class GetAnimationsCollectivesJeuneQueryHandler extends QueryHandler<
 
     return success(
       rendezVousSql.map(rdvSql => {
-        return fromSqlToRendezVousDetailJeuneQueryModel(rdvSql, query.idJeune)
+        return fromSqlToRendezVousDetailJeuneQueryModel(
+          rdvSql,
+          query.idJeune,
+          utilisateur.type
+        )
       })
     )
   }

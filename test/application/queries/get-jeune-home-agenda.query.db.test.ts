@@ -38,6 +38,7 @@ import { getDatabase } from '../../utils/database-for-testing'
 import { testConfig } from '../../utils/module-for-testing'
 
 describe('GetJeuneHomeAgendaQueryHandler', () => {
+  const utilisateurJeune = unUtilisateurJeune()
   let handler: GetJeuneHomeAgendaQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
@@ -71,10 +72,13 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         ])
 
       // When
-      const result = await handler.handle({
-        idJeune: 'ABCDE',
-        maintenant: aujourdhuiMercredi
-      })
+      const result = await handler.handle(
+        {
+          idJeune: 'ABCDE',
+          maintenant: aujourdhuiMercredi
+        },
+        utilisateurJeune
+      )
 
       // Then
       const expected: JeuneHomeSuiviQueryModel = {
@@ -112,10 +116,13 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         ])
 
         // When
-        result = await handler.handle({
-          idJeune: 'ABCDE',
-          maintenant: aujourdhuiDimanche
-        })
+        result = await handler.handle(
+          {
+            idJeune: 'ABCDE',
+            maintenant: aujourdhuiDimanche
+          },
+          utilisateurJeune
+        )
       })
       it('doit retourner la liste des actions triées chronologiquement', async () => {
         // Then
@@ -157,10 +164,13 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         ])
 
         // When
-        const result = await handler.handle({
-          idJeune: 'ABCDE',
-          maintenant: aujourdhuiDimanche
-        })
+        const result = await handler.handle(
+          {
+            idJeune: 'ABCDE',
+            maintenant: aujourdhuiDimanche
+          },
+          utilisateurJeune
+        )
 
         // Then
         const expected: RendezVousJeuneQueryModel[] = [
@@ -189,10 +199,13 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
         await createActions([hier, dansUneSemaine], Action.Statut.PAS_COMMENCEE)
 
         // When
-        result = await handler.handle({
-          idJeune: 'ABCDE',
-          maintenant: aujourdhuiDimanche
-        })
+        result = await handler.handle(
+          {
+            idJeune: 'ABCDE',
+            maintenant: aujourdhuiDimanche
+          },
+          utilisateurJeune
+        )
       })
       it("retourne le compte d'actions en retard et les dates", async () => {
         // Then

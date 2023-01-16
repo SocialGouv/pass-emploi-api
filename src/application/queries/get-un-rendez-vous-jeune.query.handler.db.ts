@@ -44,7 +44,8 @@ export class GetUnRendezVousJeuneQueryHandler extends QueryHandler<
   }
 
   async handle(
-    query: GetUnRendezVousJeuneQuery
+    query: GetUnRendezVousJeuneQuery,
+    utilisateur: Authentification.Utilisateur
   ): Promise<Result<RendezVousJeuneDetailQueryModel>> {
     const rendezVousSql = await RendezVousSqlModel.findByPk(
       query.idRendezVous,
@@ -63,7 +64,11 @@ export class GetUnRendezVousJeuneQueryHandler extends QueryHandler<
     }
 
     return success(
-      fromSqlToRendezVousDetailJeuneQueryModel(rendezVousSql, query.idJeune)
+      fromSqlToRendezVousDetailJeuneQueryModel(
+        rendezVousSql,
+        query.idJeune,
+        utilisateur.type
+      )
     )
   }
 

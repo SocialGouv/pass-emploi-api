@@ -13,9 +13,11 @@ import {
   RendezVousJeuneQueryModel
 } from '../query-models/rendez-vous.query-model'
 import { RendezVousJeuneAssociationSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
+import { Authentification } from '../../../domain/authentification'
 
 export function fromSqlToRendezVousJeuneQueryModel(
   rendezVousSql: RendezVousSqlModel,
+  typeUtilisateur: Authentification.Type,
   idJeune?: string
 ): RendezVousJeuneQueryModel {
   const jeuneSql = rendezVousSql.jeunes.find(jeune => jeune.id === idJeune)
@@ -30,7 +32,7 @@ export function fromSqlToRendezVousJeuneQueryModel(
     title: rendezVousSql.titre ?? '',
     type: {
       code: rendezVousSql.type,
-      label: mapCodeLabelTypeRendezVousJeune[rendezVousSql.type]
+      label: getLabelType(rendezVousSql, typeUtilisateur)
     },
     precision: rendezVousSql.precision ?? undefined,
     adresse: rendezVousSql.adresse ?? undefined,
@@ -50,7 +52,8 @@ export function fromSqlToRendezVousJeuneQueryModel(
 
 export function fromSqlToRendezVousDetailJeuneQueryModel(
   rendezVousSql: RendezVousSqlModel,
-  jeuneId: string
+  jeuneId: string,
+  type: Authentification.Type
 ): RendezVousJeuneDetailQueryModel {
   return {
     id: rendezVousSql.id,
@@ -65,7 +68,10 @@ export function fromSqlToRendezVousDetailJeuneQueryModel(
     ),
     type: {
       code: rendezVousSql.type,
-      label: mapCodeLabelTypeRendezVousJeune[rendezVousSql.type]
+      label:
+        type === Authentification.Type.JEUNE
+          ? mapCodeLabelTypeRendezVousJeune[rendezVousSql.type]
+          : mapCodeLabelTypeRendezVous[rendezVousSql.type]
     },
     precision: rendezVousSql.precision ?? undefined,
     adresse: rendezVousSql.adresse ?? undefined,
@@ -160,4 +166,15 @@ function getPresence(jeuneSqlModel: JeuneSqlModel): boolean | undefined {
     RendezVousJeuneAssociationSqlModel.name
   ) as RendezVousJeuneAssociationSqlModel | undefined
   return rendezVousJeuneAssociation?.present ?? undefined
+}
+
+function getLabelType(
+  rendezVousSql: RendezVousSqlModel,
+  typeUtilisateur: Authentification.Type
+): string {
+  if (typeUtilisateur === Authentification.Type.JEUNE) {
+    return mapCodeLabelTypeRendezVousJeune[rendezVousSql.type]
+  } else {
+    return mapCodeLabelTypeRendezVous[rendezVousSql.type]
+  }
 }

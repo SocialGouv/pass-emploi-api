@@ -28,6 +28,7 @@ describe('GetUnRendezVousJeuneQueryHandler', () => {
   let getUnRendezVousJeuneQueryHandler: GetUnRendezVousJeuneQueryHandler
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
   const maintenant = uneDatetime()
+  const utilisateurJeune = unUtilisateurJeune()
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
@@ -124,7 +125,10 @@ describe('GetUnRendezVousJeuneQueryHandler', () => {
         }
 
         // When
-        const result = await getUnRendezVousJeuneQueryHandler.handle(query)
+        const result = await getUnRendezVousJeuneQueryHandler.handle(
+          query,
+          utilisateurJeune
+        )
 
         // Then
         const expected: RendezVousJeuneDetailQueryModel = {
@@ -164,7 +168,10 @@ describe('GetUnRendezVousJeuneQueryHandler', () => {
         }
 
         // When
-        const result = await getUnRendezVousJeuneQueryHandler.handle(query)
+        const result = await getUnRendezVousJeuneQueryHandler.handle(
+          query,
+          utilisateurJeune
+        )
 
         // Then
         const expected: RendezVousJeuneDetailQueryModel = {

@@ -21,6 +21,8 @@ import { uneDatetime } from '../../fixtures/date.fixture'
 import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
+  const utilisateurJeune = unUtilisateurJeune()
+
   beforeEach(async () => {
     await getDatabase().cleanPG()
   })
@@ -122,7 +124,8 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
 
           // When
           const result = await getAnimationsCollectivesJeuneQueryHandler.handle(
-            query
+            query,
+            utilisateurJeune
           )
 
           // Then
@@ -163,7 +166,8 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
 
           // When
           const result = await getAnimationsCollectivesJeuneQueryHandler.handle(
-            query
+            query,
+            utilisateurJeune
           )
 
           // Then
@@ -238,7 +242,8 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
 
         // When
         const result = await getAnimationsCollectivesJeuneQueryHandler.handle(
-          query
+          query,
+          utilisateurJeune
         )
 
         // Then
