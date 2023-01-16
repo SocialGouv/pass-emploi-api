@@ -176,6 +176,13 @@ export namespace RendezVous {
     )
   }
 
+  export function estUnTypeCEJ(type?: string): boolean {
+    return (
+      type !== CodeTypeRendezVous.SESSION_MILO &&
+      type !== CodeTypeRendezVous.RENDEZ_VOUS_MILO
+    )
+  }
+
   @Injectable()
   export class Factory {
     constructor(private idService: IdService) {}
@@ -185,6 +192,12 @@ export namespace RendezVous {
       jeunes: Jeune[],
       conseiller: Conseiller
     ): Result<RendezVous> {
+      if (!estUnTypeCEJ(infosRendezVousACreer.type)) {
+        return failure(
+          new MauvaiseCommandeError('Le type de rendez-vous est invalide')
+        )
+      }
+
       if (
         RendezVous.estUnTypeAnimationCollective(infosRendezVousACreer.type) &&
         !conseiller!.agence?.id
