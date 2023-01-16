@@ -92,9 +92,18 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
           )
         }
         this.supprimerLesRappelsDeRendezVous(rendezVousExistant)
-        return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_SUPPRIME)
+        return this.buildSuiviJob(
+          debut,
+          Traitement.RENDEZ_VOUS_SUPPRIME,
+          jeune.id,
+          rendezVousExistant.id
+        )
       } else {
-        return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_INEXISTANT)
+        return this.buildSuiviJob(
+          debut,
+          Traitement.RENDEZ_VOUS_INEXISTANT,
+          jeune.id
+        )
       }
     }
 
@@ -115,7 +124,12 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
         rendezVousMisAJour,
         rendezVousExistant
       )
-      return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_MODIFIE)
+      return this.buildSuiviJob(
+        debut,
+        Traitement.RENDEZ_VOUS_MODIFIE,
+        jeune.id,
+        rendezVousExistant.id
+      )
     } else {
       const nouveauRendezVous =
         this.rendezVousMiloFactory.creerRendezVousPassEmploi(
@@ -130,16 +144,28 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
         )
       }
       this.planifierLesRappelsDeRendezVous(nouveauRendezVous)
-      return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_AJOUTE)
+      return this.buildSuiviJob(
+        debut,
+        Traitement.RENDEZ_VOUS_AJOUTE,
+        jeune.id,
+        nouveauRendezVous.id
+      )
     }
   }
 
-  private buildSuiviJob(debut: DateTime, traitement: Traitement): SuiviJob {
+  private buildSuiviJob(
+    debut: DateTime,
+    traitement: Traitement,
+    idJeune?: string,
+    idRendezVous?: string
+  ): SuiviJob {
     return {
       jobType: this.jobType,
       dateExecution: debut,
       resultat: {
-        traitement
+        traitement,
+        idJeune,
+        idRendezVous
       },
       succes: true,
       nbErreurs: 0,
@@ -162,6 +188,7 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
       this.apmService.captureError(e)
     }
   }
+
   private async replanifierLesRappelsDeRendezVous(
     rendezVousUpdated: RendezVous,
     rendezVous: RendezVous
@@ -187,6 +214,7 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
       }
     }
   }
+
   private async supprimerLesRappelsDeRendezVous(
     rendezVous: RendezVous
   ): Promise<void> {
