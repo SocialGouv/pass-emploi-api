@@ -13,7 +13,7 @@ import { Job } from '../../../building-blocks/types/job'
 import { Planificateur, ProcessJobType } from '../../../domain/planificateur'
 import Type = Notification.Type
 
-const NOMBRE_JEUNES_EN_PARALLELE = 20
+const NOMBRE_JEUNES_EN_PARALLELE = 100
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.NOTIFIER_RENDEZVOUS_PE)
