@@ -133,7 +133,7 @@ describe('MiloRendezVous', () => {
                 configuration
               })
             ],
-            type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+            type: CodeTypeRendezVous.RENDEZ_VOUS_MILO,
             presenceConseiller: true,
             modalite: rdvMilo.modalite,
             commentaire: rdvMilo.commentaire,
@@ -178,7 +178,7 @@ describe('MiloRendezVous', () => {
                 configuration
               })
             ],
-            type: CodeTypeRendezVous.ATELIER,
+            type: CodeTypeRendezVous.SESSION_MILO,
             presenceConseiller: false,
             adresse: rdvMilo.adresse,
             commentaire: rdvMilo.commentaire,

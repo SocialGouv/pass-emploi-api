@@ -96,8 +96,8 @@ export namespace MiloRendezVous {
         ],
         type:
           rendezVousMilo.type === MiloRendezVous.Type.RENDEZ_VOUS
-            ? CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
-            : CodeTypeRendezVous.ATELIER,
+            ? CodeTypeRendezVous.RENDEZ_VOUS_MILO
+            : CodeTypeRendezVous.SESSION_MILO,
         presenceConseiller:
           rendezVousMilo.type === MiloRendezVous.Type.RENDEZ_VOUS,
         commentaire: rendezVousMilo.commentaire,

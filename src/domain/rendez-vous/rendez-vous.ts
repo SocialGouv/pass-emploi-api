@@ -23,7 +23,9 @@ export enum CodeTypeRendezVous {
   INFORMATION_COLLECTIVE = 'INFORMATION_COLLECTIVE',
   VISITE = 'VISITE',
   PRESTATION = 'PRESTATION',
-  AUTRE = 'AUTRE'
+  AUTRE = 'AUTRE',
+  RENDEZ_VOUS_MILO = 'RENDEZ_VOUS_MILO',
+  SESSION_MILO = 'SESSION_MILO'
 }
 
 export const mapCodeLabelTypeRendezVous: Record<CodeTypeRendezVous, string> = {
@@ -34,7 +36,9 @@ export const mapCodeLabelTypeRendezVous: Record<CodeTypeRendezVous, string> = {
   INFORMATION_COLLECTIVE: 'Information collective',
   VISITE: 'Visite',
   PRESTATION: 'Prestation',
-  AUTRE: 'Autre'
+  AUTRE: 'Autre',
+  RENDEZ_VOUS_MILO: 'Rendez-vous Milo',
+  SESSION_MILO: 'Inscription session Milo'
 }
 
 export interface TypeRendezVous {
