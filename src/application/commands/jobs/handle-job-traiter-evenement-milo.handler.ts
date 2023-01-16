@@ -19,6 +19,7 @@ import {
 } from '../../../domain/partenaire/milo/milo.rendez-vous'
 import { Notification } from '../../../domain/notification/notification'
 import { buildError } from '../../../utils/logger.module'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.TRAITER_EVENEMENT_MILO)
@@ -37,7 +38,8 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
     private miloRendezVousHttpRepository: MiloRendezVous.Repository,
     private rendezVousMiloFactory: MiloRendezVous.Factory,
     private notificationService: Notification.Service,
-    private planificateurService: PlanificateurService
+    private planificateurService: PlanificateurService,
+    private configuration: ConfigService
   ) {
     super(Planificateur.JobType.TRAITER_EVENEMENT_MILO, suiviJobService)
   }
@@ -46,6 +48,9 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
     job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo>
   ): Promise<SuiviJob> {
     const debut = this.dateService.now()
+    const doitNotifier = this.configuration.get(
+      'features.notifierRendezVousMilo'
+    )
 
     if (job.contenu.type === MiloRendezVous.TypeEvenement.NON_TRAITABLE) {
       return this.buildSuiviJob(debut, Traitement.TYPE_NON_TRAITABLE)
@@ -80,10 +85,12 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
     ) {
       if (rendezVousExistant) {
         await this.rendezVousRepository.delete(rendezVousExistant.id)
-        this.notificationService.notifierLesJeunesDuRdv(
-          rendezVousExistant,
-          Notification.Type.DELETED_RENDEZVOUS
-        )
+        if (doitNotifier) {
+          this.notificationService.notifierLesJeunesDuRdv(
+            rendezVousExistant,
+            Notification.Type.DELETED_RENDEZVOUS
+          )
+        }
         this.supprimerLesRappelsDeRendezVous(rendezVousExistant)
         return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_SUPPRIME)
       } else {
@@ -98,10 +105,12 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
           rendezVousMilo
         )
       await this.rendezVousRepository.save(rendezVousMisAJour)
-      this.notificationService.notifierLesJeunesDuRdv(
-        rendezVousMisAJour,
-        Notification.Type.UPDATED_RENDEZVOUS
-      )
+      if (doitNotifier) {
+        this.notificationService.notifierLesJeunesDuRdv(
+          rendezVousMisAJour,
+          Notification.Type.UPDATED_RENDEZVOUS
+        )
+      }
       this.replanifierLesRappelsDeRendezVous(
         rendezVousMisAJour,
         rendezVousExistant
@@ -114,10 +123,12 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
           jeune
         )
       await this.rendezVousRepository.save(nouveauRendezVous)
-      this.notificationService.notifierLesJeunesDuRdv(
-        nouveauRendezVous,
-        Notification.Type.NEW_RENDEZVOUS
-      )
+      if (doitNotifier) {
+        this.notificationService.notifierLesJeunesDuRdv(
+          nouveauRendezVous,
+          Notification.Type.NEW_RENDEZVOUS
+        )
+      }
       this.planifierLesRappelsDeRendezVous(nouveauRendezVous)
       return this.buildSuiviJob(debut, Traitement.RENDEZ_VOUS_AJOUTE)
     }

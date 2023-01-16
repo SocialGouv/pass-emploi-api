@@ -22,6 +22,7 @@ import { expect, StubbedClass, stubClass } from '../../../utils'
 import { unJeune } from '../../../fixtures/jeune.fixture'
 import { MiloRendezVous } from '../../../../src/domain/partenaire/milo/milo.rendez-vous'
 import { Notification } from '../../../../src/domain/notification/notification'
+import { testConfig } from '../../../utils/module-for-testing'
 
 describe('HandleJobTraiterEvenementMiloHandler', () => {
   let handler: HandleJobTraiterEvenementMiloHandler
@@ -57,7 +58,8 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
       miloRendezVousRepository,
       rendezVousMiloFactory,
       notificationService,
-      planificateurService
+      planificateurService,
+      testConfig()
     )
   })
 

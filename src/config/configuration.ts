@@ -154,7 +154,10 @@ export default () => {
       }
     },
     version: process.env.npm_package_version ?? '0.0.0',
-    features: { rendezVousMilo: process.env.FEATURE_RDV_MILO === 'true' }
+    features: {
+      rendezVousMilo: process.env.FEATURE_RDV_MILO === 'true',
+      notifierRendezVousMilo: process.env.FEATURE_NOTIFIER_RDV_MILO === 'true',
+    }
   }
   return Joi.attempt(configuration, configurationSchema)
 }

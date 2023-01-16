@@ -159,7 +159,8 @@ export const testConfig = (): ConfigService => {
       immersion: 'ceci-est-une-autre-api-key'
     },
     features: {
-      rendezVousMilo: true
+      rendezVousMilo: true,
+      notifierRendezVousMilo: true
     },
     oidc: {}
   })
