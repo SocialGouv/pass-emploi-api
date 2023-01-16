@@ -25,7 +25,8 @@ export const configureLoggerModule = (): DynamicModule =>
         redact: [
           'req.headers.authorization',
           'req.headers.cookie',
-          'req.headers["x-api-key"]'
+          'req.headers["x-api-key"]',
+          'err.config.headers["X-Gravitee-Api-Key"]'
         ],
         mixin: (): (() => MixinFn) => {
           let currentTraceIds = getAPMInstance().currentTraceIds
