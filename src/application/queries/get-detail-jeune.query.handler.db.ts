@@ -41,7 +41,6 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
         SituationsMiloSqlModel,
         {
           model: TransfertConseillerSqlModel,
-          separate: true,
           order: [['dateTransfert', 'DESC']],
           limit: 1
         }
