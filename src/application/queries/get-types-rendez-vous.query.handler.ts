@@ -18,9 +18,15 @@ export class GetTypesRendezVousQueryHandler extends QueryHandler<
   }
 
   async handle(_query: Query): Promise<TypeRendezVousQueryModel[]> {
-    return Object.values(CodeTypeRendezVous).map(code => {
-      return { code, label: mapCodeLabelTypeRendezVous[code] }
-    })
+    return Object.values(CodeTypeRendezVous)
+      .filter(
+        code =>
+          code !== CodeTypeRendezVous.RENDEZ_VOUS_MILO &&
+          code !== CodeTypeRendezVous.SESSION_MILO
+      )
+      .map(code => {
+        return { code, label: mapCodeLabelTypeRendezVous[code] }
+      })
   }
 
   async authorize(): Promise<Result> {

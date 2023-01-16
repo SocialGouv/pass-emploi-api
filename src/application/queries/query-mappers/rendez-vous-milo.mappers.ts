@@ -1,14 +1,15 @@
 import {
   mapCodeLabelTypeRendezVous,
+  mapCodeLabelTypeRendezVousJeune,
   RendezVous
 } from '../../../domain/rendez-vous/rendez-vous'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import {
-  RendezVousJeuneDetailQueryModel,
   AnimationCollectiveQueryModel,
   RendezVousConseillerDetailQueryModel,
   RendezVousConseillerQueryModel,
+  RendezVousJeuneDetailQueryModel,
   RendezVousJeuneQueryModel
 } from '../query-models/rendez-vous.query-model'
 import { RendezVousJeuneAssociationSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
@@ -29,7 +30,7 @@ export function fromSqlToRendezVousJeuneQueryModel(
     title: rendezVousSql.titre ?? '',
     type: {
       code: rendezVousSql.type,
-      label: mapCodeLabelTypeRendezVous[rendezVousSql.type]
+      label: mapCodeLabelTypeRendezVousJeune[rendezVousSql.type]
     },
     precision: rendezVousSql.precision ?? undefined,
     adresse: rendezVousSql.adresse ?? undefined,
@@ -64,7 +65,7 @@ export function fromSqlToRendezVousDetailJeuneQueryModel(
     ),
     type: {
       code: rendezVousSql.type,
-      label: mapCodeLabelTypeRendezVous[rendezVousSql.type]
+      label: mapCodeLabelTypeRendezVousJeune[rendezVousSql.type]
     },
     precision: rendezVousSql.precision ?? undefined,
     adresse: rendezVousSql.adresse ?? undefined,

@@ -37,8 +37,24 @@ export const mapCodeLabelTypeRendezVous: Record<CodeTypeRendezVous, string> = {
   VISITE: 'Visite',
   PRESTATION: 'Prestation',
   AUTRE: 'Autre',
-  RENDEZ_VOUS_MILO: 'Rendez-vous Milo',
-  SESSION_MILO: 'Inscription session Milo'
+  RENDEZ_VOUS_MILO: 'Rendez Vous i-Milo',
+  SESSION_MILO: 'Inscription à une session i-Milo'
+}
+
+export const mapCodeLabelTypeRendezVousJeune: Record<
+  CodeTypeRendezVous,
+  string
+> = {
+  ACTIVITE_EXTERIEURES: 'Activités extérieures',
+  ATELIER: 'Atelier',
+  ENTRETIEN_INDIVIDUEL_CONSEILLER: 'Entretien individuel conseiller',
+  ENTRETIEN_PARTENAIRE: 'Entretien par un partenaire',
+  INFORMATION_COLLECTIVE: 'Information collective',
+  VISITE: 'Visite',
+  PRESTATION: 'Prestation',
+  AUTRE: 'Autre',
+  RENDEZ_VOUS_MILO: 'Rendez-vous',
+  SESSION_MILO: 'Animation Collective'
 }
 
 export interface TypeRendezVous {
