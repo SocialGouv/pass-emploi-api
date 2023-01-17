@@ -27,7 +27,7 @@ export class GetDemarchesQueryHandler extends QueryHandler<
   async handle(
     query: GetDemarchesQuery
   ): Promise<Result<Cached<DemarcheQueryModel[]>>> {
-    return await this.getDemarchesQueryGetter.handle({
+    return this.getDemarchesQueryGetter.handle({
       ...query,
       tri: GetDemarchesQueryGetter.Tri.parSatutEtDateFin
     })

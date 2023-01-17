@@ -212,7 +212,7 @@ export namespace RendezVous {
             )
           )
         }
-        if (!conseiller!.agence?.id) {
+        if (!conseiller.agence?.id) {
           return failure(new ConseillerSansAgenceError(conseiller.id))
         }
       } else {

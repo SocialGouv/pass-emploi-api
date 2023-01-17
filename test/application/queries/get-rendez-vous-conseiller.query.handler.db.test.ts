@@ -15,7 +15,7 @@ import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model
 import { stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
-import { GetAllRendezVousConseillerQueryHandler } from '../../../src/application/queries/get-rendez-vous-conseiller.query.handler.db'
+import { GetAllRendezVousConseillerQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import {

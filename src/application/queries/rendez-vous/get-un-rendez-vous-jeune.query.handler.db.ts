@@ -1,17 +1,17 @@
-import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { failure, Result, success } from '../../building-blocks/types/result'
-import { RendezVousJeuneDetailQueryModel } from './query-models/rendez-vous.query-model'
-import { Query } from '../../building-blocks/types/query'
-import { Authentification } from '../../domain/authentification'
-import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
-import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
-import { fromSqlToRendezVousDetailJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
+import { QueryHandler } from '../../../building-blocks/types/query-handler'
+import { failure, Result, success } from '../../../building-blocks/types/result'
+import { RendezVousJeuneDetailQueryModel } from '../query-models/rendez-vous.query-model'
+import { Query } from '../../../building-blocks/types/query'
+import { Authentification } from '../../../domain/authentification'
+import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
+import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
+import { fromSqlToRendezVousDetailJeuneQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
 import { Injectable } from '@nestjs/common'
-import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
+import { RendezVousAuthorizer } from '../../authorizers/authorize-rendezvous'
 import {
   DroitsInsuffisants,
   NonTrouveError
-} from '../../building-blocks/types/domain-error'
+} from '../../../building-blocks/types/domain-error'
 
 export interface GetUnRendezVousJeuneQuery extends Query {
   idRendezVous: string
@@ -37,10 +37,7 @@ export class GetUnRendezVousJeuneQueryHandler extends QueryHandler<
     ) {
       return failure(new DroitsInsuffisants())
     }
-    return await this.rendezVousAuthorizer.authorize(
-      query.idRendezVous,
-      utilisateur
-    )
+    return this.rendezVousAuthorizer.authorize(query.idRendezVous, utilisateur)
   }
 
   async handle(

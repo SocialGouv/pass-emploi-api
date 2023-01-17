@@ -66,7 +66,8 @@ export const uneAnimationCollective = (
       id: '1',
       nom: 'Tavernier',
       prenom: 'Nils'
-    }
+    },
+    nombreMaxParticipants: undefined
   }
   return { ...defaults, ...args }
 }

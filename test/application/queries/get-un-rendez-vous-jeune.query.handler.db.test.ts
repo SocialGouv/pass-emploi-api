@@ -1,7 +1,7 @@
 import {
   GetUnRendezVousJeuneQuery,
   GetUnRendezVousJeuneQueryHandler
-} from '../../../src/application/queries/get-un-rendez-vous-jeune.query.handler.db'
+} from '../../../src/application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
 import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'

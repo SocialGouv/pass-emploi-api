@@ -30,8 +30,8 @@ import { GetDetailJeuneQueryHandler } from '../../../src/application/queries/get
 import { GetJeuneHomeActionsQueryHandler } from '../../../src/application/queries/get-jeune-home-actions.query.handler'
 import { GetJeuneHomeDemarchesQueryHandler } from '../../../src/application/queries/get-jeune-home-demarches.query.handler'
 import { GetPreferencesJeuneQueryHandler } from '../../../src/application/queries/get-preferences-jeune.handler.db'
-import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
-import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/get-rendez-vous-jeune.query.handler.db'
+import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
+import { GetRendezVousJeuneQueryHandler } from '../../../src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
 import {
   DetailJeuneQueryModel,
   PreferencesJeuneQueryModel
@@ -71,8 +71,8 @@ import { uneActionQueryModelSansJeune } from '../../fixtures/query-models/action
 import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../../src/application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
 import { uneDemarcheQueryModel } from '../../fixtures/query-models/demarche.query-model.fixtures'
 import { DateTime } from 'luxon'
-import { GetAnimationsCollectivesJeuneQueryHandler } from '../../../src/application/queries/get-animations-collectives-jeune.query.handler.db'
-import { GetUnRendezVousJeuneQueryHandler } from '../../../src/application/queries/get-un-rendez-vous-jeune.query.handler.db'
+import { GetAnimationsCollectivesJeuneQueryHandler } from '../../../src/application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
+import { GetUnRendezVousJeuneQueryHandler } from '../../../src/application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
 import { unRendezVousJeuneDetailQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 import { DateService } from '../../../src/utils/date-service'

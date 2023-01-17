@@ -166,7 +166,8 @@ describe('AnimationsCollectivesSqlRepository', () => {
         dateCloture: DateService.fromJSDateToDateTime(uneACAVenir.dateCloture),
         idAgence: uneACAVenir.idAgence!,
         source: RendezVous.Source.PASS_EMPLOI,
-        informationsPartenaire: undefined
+        informationsPartenaire: undefined,
+        nombreMaxParticipants: undefined
       }
       expect(animationCollectives[0]).to.deep.equal(expected)
     })

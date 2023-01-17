@@ -1,6 +1,6 @@
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
-import { GetAnimationsCollectivesJeuneQueryHandler } from '../../../src/application/queries/get-animations-collectives-jeune.query.handler.db'
+import { GetAnimationsCollectivesJeuneQueryHandler } from '../../../src/application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'

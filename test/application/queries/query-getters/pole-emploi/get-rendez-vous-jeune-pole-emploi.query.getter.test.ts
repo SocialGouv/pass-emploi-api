@@ -1,4 +1,4 @@
-import { GetRendezVousJeunePoleEmploiQuery } from '../../../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
+import { GetRendezVousJeunePoleEmploiQuery } from '../../../../../src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { unJeune } from '../../../../fixtures/jeune.fixture'
 import { uneDatetime } from '../../../../fixtures/date.fixture'
 import {

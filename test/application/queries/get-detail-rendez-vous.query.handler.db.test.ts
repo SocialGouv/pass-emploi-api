@@ -1,5 +1,5 @@
 import { SinonSandbox } from 'sinon'
-import { GetDetailRendezVousQueryHandler } from '../../../src/application/queries/get-detail-rendez-vous.query.handler.db'
+import { GetDetailRendezVousQueryHandler } from '../../../src/application/queries/rendez-vous/get-detail-rendez-vous.query.handler.db'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import {
   failure,
@@ -490,10 +490,9 @@ describe('GetDetailRendezVousQueryHandler', () => {
       )
 
       // Then
-      expect(rendezVousAuthorizer.authorize).to.have.been.calledWithExactly(
-        'idRdv',
-        utilisateur
-      )
+      expect(
+        rendezVousAuthorizer.authorizeConseiller
+      ).to.have.been.calledWithExactly('idRdv', utilisateur)
     })
   })
 })
