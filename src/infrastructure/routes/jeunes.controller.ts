@@ -105,6 +105,7 @@ import {
   GetAnimationsCollectivesJeuneQueryHandler
 } from '../../application/queries/get-animations-collectives-jeune.query.handler.db'
 import { GetUnRendezVousJeuneQueryHandler } from '../../application/queries/get-un-rendez-vous-jeune.query.handler.db'
+import { IdQueryModel } from '../../application/queries/query-models/common.query-models'
 
 @Controller('jeunes')
 @ApiOAuth2([])
@@ -458,6 +459,9 @@ export class JeunesController {
   }
 
   @Post(':idJeune/action')
+  @ApiResponse({
+    type: IdQueryModel
+  })
   async postNouvelleAction(
     @Param('idJeune') idJeune: string,
     @Body() createActionPayload: CreateActionParLeJeunePayload,
