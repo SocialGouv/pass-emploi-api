@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -9,17 +10,17 @@ import {
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Chat, ChatIndividuel, ChatRepositoryToken } from '../../domain/chat'
-import { AuthorizeConseillerForJeunes } from '../authorizers/authorize-conseiller-for-jeunes'
+import { Conseiller } from '../../domain/conseiller/conseiller'
+import {
+  ListeDeDiffusion,
+  ListeDeDiffusionRepositoryToken
+} from '../../domain/conseiller/liste-de-diffusion'
 import { Evenement, EvenementService } from '../../domain/evenement'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { Notification } from '../../domain/notification/notification'
-import {
-  ListeDeDiffusionRepositoryToken,
-  ListeDeDiffusion
-} from '../../domain/conseiller/liste-de-diffusion'
-import { Conseiller } from '../../domain/conseiller/conseiller'
-import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
+import { AuthorizeConseillerForJeunes } from '../authorizers/authorize-conseiller-for-jeunes'
 import { AuthorizeListeDeDiffusion } from '../authorizers/authorize-liste-de-diffusion'
+import Code = Evenement.Code
 
 export interface EnvoyerMessageGroupeCommand extends Command {
   idsBeneficiaires?: string[]
@@ -174,18 +175,7 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur,
     command: EnvoyerMessageGroupeCommand
   ): Promise<void> {
-    let code: Evenement.Code = Evenement.Code.MESSAGE_ENVOYE
-
-    if (command.idsBeneficiaires!.length > 1) {
-      if (command.infoPieceJointe) {
-        code = Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_PJ
-      } else {
-        code = Evenement.Code.MESSAGE_ENVOYE_MULTIPLE
-      }
-    } else if (command.infoPieceJointe) {
-      code = Evenement.Code.MESSAGE_ENVOYE_PJ
-    }
-    await this.evenementService.creer(code, utilisateur)
+    await this.evenementService.creer(getCodeEvenement(command), utilisateur)
   }
 }
 
@@ -195,4 +185,29 @@ function isDefined<T>(argument: T | undefined): argument is T {
 
 function isUnique(value: string, index: number, self: string[]): boolean {
   return self.indexOf(value) === index
+}
+
+function getCodeEvenement(
+  command: EnvoyerMessageGroupeCommand
+): Evenement.Code {
+  const avecPj = Boolean(command.infoPieceJointe)
+
+  if (command.idsBeneficiaires && command.idsListesDeDiffusion)
+    return avecPj
+      ? Code.MESSAGE_ENVOYE_MULTIPLE_MIXTE_PJ
+      : Code.MESSAGE_ENVOYE_MULTIPLE_MIXTE
+
+  if (command.idsListesDeDiffusion)
+    return avecPj
+      ? Code.MESSAGE_ENVOYE_MULTIPLE_LISTE_PJ
+      : Code.MESSAGE_ENVOYE_MULTIPLE_LISTE
+
+  if (command.idsBeneficiaires && command.idsBeneficiaires.length > 1)
+    return avecPj
+      ? Code.MESSAGE_ENVOYE_MULTIPLE_MANUEL_PJ
+      : Code.MESSAGE_ENVOYE_MULTIPLE_MANUEL
+
+  return avecPj
+    ? Evenement.Code.MESSAGE_ENVOYE_PJ
+    : Evenement.Code.MESSAGE_ENVOYE
 }

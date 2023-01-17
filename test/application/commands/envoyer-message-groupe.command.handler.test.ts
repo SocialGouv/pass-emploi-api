@@ -463,8 +463,9 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
           )
         })
       })
+
       describe('envoyé à plusieurs jeunes', () => {
-        it('sauvegarde un événement MESSAGE_ENVOYE_MULTIPLE', async () => {
+        it('sauvegarde un événement MESSAGE_ENVOYE_MULTIPLE_MANUEL', async () => {
           // Given
           const command: EnvoyerMessageGroupeCommand = {
             idsBeneficiaires: ['jeune-1', 'jeune-2'],
@@ -478,12 +479,56 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
 
           // Then
           expect(evenementService.creer).to.have.been.calledWithExactly(
-            Evenement.Code.MESSAGE_ENVOYE_MULTIPLE,
+            Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_MANUEL,
+            utilisateur
+          )
+        })
+      })
+
+      describe('envoyé à une ou plusieurs listes de diffusion', () => {
+        it('sauvegarde un événement MESSAGE_ENVOYE_MULTIPLE_LISTE', async () => {
+          // Given
+          const command: EnvoyerMessageGroupeCommand = {
+            idsListesDeDiffusion: ['liste-1'],
+            message: 'un message',
+            iv: '123456',
+            idConseiller: '41'
+          }
+
+          // When
+          await envoyerMessageGroupeCommandHandler.monitor(utilisateur, command)
+
+          // Then
+          expect(evenementService.creer).to.have.been.calledWithExactly(
+            Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_LISTE,
+            utilisateur
+          )
+        })
+      })
+
+      describe('envoyé à bénéficiaires et listes de diffusion', () => {
+        it('sauvegarde un événement MESSAGE_ENVOYE_MULTIPLE_MIXTE', async () => {
+          // Given
+          const command: EnvoyerMessageGroupeCommand = {
+            idsBeneficiaires: ['jeune-1'],
+            idsListesDeDiffusion: ['liste-1'],
+            message: 'un message',
+            iv: '123456',
+            idConseiller: '41'
+          }
+
+          // When
+          await envoyerMessageGroupeCommandHandler.monitor(utilisateur, command)
+
+          // Then
+          expect(evenementService.creer).to.have.been.calledWithExactly(
+            Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_MIXTE,
             utilisateur
           )
         })
       })
     })
+
     describe("quand c'est un message avec pièce jointe", () => {
       describe('envoyé à un seul jeune', () => {
         it('sauvegarde un événement MESSAGE_ENVOYE_PJ', async () => {
@@ -509,8 +554,9 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
           )
         })
       })
+
       describe('envoyé à plusieurs jeunes', () => {
-        it('sauvegarde un événement MESSAGE_ENVOYE_MULTIPLE_PJ', async () => {
+        it('sauvegarde un événement MESSAGE_ENVOYE_MULTIPLE_MANUEL_PJ', async () => {
           // Given
           const command: EnvoyerMessageGroupeCommand = {
             idsBeneficiaires: ['jeune-1', 'jeune-2'],
@@ -528,7 +574,58 @@ describe('EnvoyerMessageGroupeCommandHandler', () => {
 
           // Then
           expect(evenementService.creer).to.have.been.calledWithExactly(
-            Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_PJ,
+            Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_MANUEL_PJ,
+            utilisateur
+          )
+        })
+      })
+
+      describe('envoyé à une ou plusieurs listes de diffusion', () => {
+        it('sauvegarde un événement MESSAGE_ENVOYE_MULTIPLE_LISTE_PJ', async () => {
+          // Given
+          const command: EnvoyerMessageGroupeCommand = {
+            idsListesDeDiffusion: ['liste-1'],
+            message: 'un message',
+            iv: '123456',
+            idConseiller: '41',
+            infoPieceJointe: {
+              id: 'id',
+              nom: 'nom'
+            }
+          }
+
+          // When
+          await envoyerMessageGroupeCommandHandler.monitor(utilisateur, command)
+
+          // Then
+          expect(evenementService.creer).to.have.been.calledWithExactly(
+            Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_LISTE_PJ,
+            utilisateur
+          )
+        })
+      })
+
+      describe('envoyé à bénéficiaires et listes de diffusion', () => {
+        it('sauvegarde un événement MESSAGE_ENVOYE_MULTIPLE_MIXTE_PJ', async () => {
+          // Given
+          const command: EnvoyerMessageGroupeCommand = {
+            idsBeneficiaires: ['jeune-1'],
+            idsListesDeDiffusion: ['liste-1'],
+            message: 'un message',
+            iv: '123456',
+            idConseiller: '41',
+            infoPieceJointe: {
+              id: 'id',
+              nom: 'nom'
+            }
+          }
+
+          // When
+          await envoyerMessageGroupeCommandHandler.monitor(utilisateur, command)
+
+          // Then
+          expect(evenementService.creer).to.have.been.calledWithExactly(
+            Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_MIXTE_PJ,
             utilisateur
           )
         })
