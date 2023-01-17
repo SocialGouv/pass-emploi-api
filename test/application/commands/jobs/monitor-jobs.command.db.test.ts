@@ -55,8 +55,7 @@ describe('MonitorJobsCommandHandler', () => {
           nbExecutionsAttendues: 1,
           nbExecutions: 1,
           nbErreurs: 0,
-          nbEchecs: 0,
-          datesExecutions: [maintenant.minus({ hours: 5 }).setZone()]
+          nbEchecs: 0
         }
 
         // When
@@ -79,8 +78,7 @@ describe('MonitorJobsCommandHandler', () => {
           nbExecutionsAttendues: 1,
           nbExecutions: 0,
           nbErreurs: 0,
-          nbEchecs: 0,
-          datesExecutions: []
+          nbEchecs: 0
         }
 
         // When
@@ -128,12 +126,7 @@ describe('MonitorJobsCommandHandler', () => {
           nbExecutionsAttendues: 12,
           nbExecutions: 3,
           nbErreurs: 4,
-          nbEchecs: 1,
-          datesExecutions: [
-            maintenant.minus({ hours: 6 }),
-            maintenant.minus({ hours: 4 }),
-            maintenant.minus({ hours: 2 })
-          ]
+          nbEchecs: 1
         }
 
         // When
