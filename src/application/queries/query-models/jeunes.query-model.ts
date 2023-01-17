@@ -164,9 +164,9 @@ export class PreferencesJeuneQueryModel {
   partageFavoris: boolean
 }
 
-export class MotifSuppressionV2QueryModel {
+export class MotifSuppressionJeuneQueryModel {
   @ApiProperty()
-  motif: ArchiveJeune.MotifSuppressionV2
+  motif: ArchiveJeune.MotifSuppression
   @ApiProperty({ required: false })
   description?: string
 }

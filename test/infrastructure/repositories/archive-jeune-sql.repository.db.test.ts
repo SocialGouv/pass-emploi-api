@@ -138,7 +138,7 @@ describe('ArchiveJeuneSqlRepository', () => {
 
       metadonnees = {
         idJeune: jeuneDto.id,
-        motif: ArchiveJeune.MotifSuppression.RADIATION_DU_CEJ,
+        motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
         commentaire: 'Il a loupé un rdv',
         nomJeune: jeuneDto.nom,
         prenomJeune: jeuneDto.prenom,

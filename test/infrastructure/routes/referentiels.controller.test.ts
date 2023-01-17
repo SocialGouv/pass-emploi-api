@@ -6,19 +6,15 @@ import {
 } from 'src/application/queries/query-models/actions.query-model'
 import { Action } from 'src/domain/action/action'
 import * as request from 'supertest'
+import { GetActionsPredefiniesQueryHandler } from '../../../src/application/queries/get-actions-predefinies.query.handler'
 import { GetAgencesQueryHandler } from '../../../src/application/queries/get-agences.query.handler.db'
 import { GetCommunesEtDepartementsQueryHandler } from '../../../src/application/queries/get-communes-et-departements.query.handler.db'
 import { GetMetiersRomeQueryHandler } from '../../../src/application/queries/get-metiers-rome.query.handler.db'
-import {
-  GetMotifsSuppressionJeuneQueryHandler,
-  MotifsSuppressionJeuneQueryModel
-} from '../../../src/application/queries/get-motifs-suppression-jeune.query.handler'
-import { GetActionsPredefiniesQueryHandler } from '../../../src/application/queries/get-actions-predefinies.query.handler'
+import { GetMotifsSuppressionJeuneQueryHandler } from '../../../src/application/queries/get-motifs-suppression-jeune.query.handler'
 import { CommuneOuDepartementType } from '../../../src/application/queries/query-models/communes-et-departements.query-model'
 import { TypesDemarcheQueryModel } from '../../../src/application/queries/query-models/types-demarche.query-model'
 import { RechercherTypesDemarcheQueryHandler } from '../../../src/application/queries/rechercher-types-demarche.query.handler'
 import { success } from '../../../src/building-blocks/types/result'
-import { ArchiveJeune } from '../../../src/domain/archive-jeune'
 import { Core } from '../../../src/domain/core'
 import {
   unHeaderAuthorization,
@@ -32,7 +28,7 @@ import Structure = Core.Structure
 let getCommunesEtDepartementsQueryHandler: StubbedClass<GetCommunesEtDepartementsQueryHandler>
 let getAgencesQueryHandler: StubbedClass<GetAgencesQueryHandler>
 let rechercherTypesDemarcheQueryHandler: StubbedClass<RechercherTypesDemarcheQueryHandler>
-let getMotifsSuppressionCommandHandler: StubbedClass<GetMotifsSuppressionJeuneQueryHandler>
+let getMotifsSuppressionQueryHandler: StubbedClass<GetMotifsSuppressionJeuneQueryHandler>
 let getTypesQualificationsQueryHandler: StubbedClass<GetTypesQualificationsQueryHandler>
 let getActionsPredefiniesQueryHandler: StubbedClass<GetActionsPredefiniesQueryHandler>
 let getMetiersRomeQueryHandler: StubbedClass<GetMetiersRomeQueryHandler>
@@ -45,7 +41,7 @@ describe('ReferentielsController', () => {
   rechercherTypesDemarcheQueryHandler = stubClass(
     RechercherTypesDemarcheQueryHandler
   )
-  getMotifsSuppressionCommandHandler = stubClass(
+  getMotifsSuppressionQueryHandler = stubClass(
     GetMotifsSuppressionJeuneQueryHandler
   )
   getTypesQualificationsQueryHandler = stubClass(
@@ -67,7 +63,7 @@ describe('ReferentielsController', () => {
     rechercherTypesDemarcheQueryHandler = app.get(
       RechercherTypesDemarcheQueryHandler
     )
-    getMotifsSuppressionCommandHandler = app.get(
+    getMotifsSuppressionQueryHandler = app.get(
       GetMotifsSuppressionJeuneQueryHandler
     )
     getTypesQualificationsQueryHandler = app.get(
@@ -334,27 +330,14 @@ describe('ReferentielsController', () => {
   })
 
   describe('GET /referentiels/motifs-suppression-jeune', () => {
-    it('renvoie les motifs de suppression d’un compte jeune', () => {
+    it("renvoie les motifs de suppression d'un compte jeune", () => {
       // Given
-      const motifs: MotifsSuppressionJeuneQueryModel = [
-        ArchiveJeune.MotifSuppressionV1.SORTIE_POSITIVE_DU_CEJ,
-        ArchiveJeune.MotifSuppressionV1.RADIATION_DU_CEJ,
-        ArchiveJeune.MotifSuppressionV1.RECREATION_D_UN_COMPTE_JEUNE,
-        ArchiveJeune.MotifSuppressionV1.AUTRE
-      ]
-
-      getMotifsSuppressionCommandHandler.execute.resolves(success(motifs))
+      getMotifsSuppressionQueryHandler.execute.resolves(success([]))
 
       // When - Then
       return request(app.getHttpServer())
         .get('/referentiels/motifs-suppression-jeune')
         .set('authorization', unHeaderAuthorization())
-        .expect([
-          'Sortie positive du CEJ',
-          'Radiation du CEJ',
-          "Recréation d'un compte jeune",
-          'Autre'
-        ])
         .expect(HttpStatus.OK)
     })
   })

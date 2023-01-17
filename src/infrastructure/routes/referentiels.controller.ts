@@ -10,10 +10,7 @@ import {
   GetMetiersRomeQuery,
   GetMetiersRomeQueryHandler
 } from '../../application/queries/get-metiers-rome.query.handler.db'
-import {
-  GetMotifsSuppressionJeuneQueryHandler,
-  MotifsSuppressionJeuneQueryModel
-} from '../../application/queries/get-motifs-suppression-jeune.query.handler'
+import { GetMotifsSuppressionJeuneQueryHandler } from '../../application/queries/get-motifs-suppression-jeune.query.handler'
 import { GetTypesQualificationsQueryHandler } from '../../application/queries/get-types-qualifications.query.handler'
 import { GetTypesRendezVousQueryHandler } from '../../application/queries/get-types-rendez-vous.query.handler'
 import {
@@ -22,6 +19,7 @@ import {
 } from '../../application/queries/query-models/actions.query-model'
 import { AgenceQueryModel } from '../../application/queries/query-models/agence.query-model'
 import { CommunesEtDepartementsQueryModel } from '../../application/queries/query-models/communes-et-departements.query-model'
+import { MotifSuppressionJeuneQueryModel } from '../../application/queries/query-models/jeunes.query-model'
 import { MetiersRomeQueryModel } from '../../application/queries/query-models/metiers-rome.query-model'
 import { TypeRendezVousQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
 import { TypesDemarcheQueryModel } from '../../application/queries/query-models/types-demarche.query-model'
@@ -112,10 +110,12 @@ export class ReferentielsController {
   @Get('motifs-suppression-jeune')
   @ApiOAuth2([])
   @ApiResponse({
-    type: String,
+    type: MotifSuppressionJeuneQueryModel,
     isArray: true
   })
-  async getMotifsSuppressionJeune(): Promise<MotifsSuppressionJeuneQueryModel> {
+  async getMotifsSuppressionJeune(): Promise<
+    MotifSuppressionJeuneQueryModel[]
+  > {
     const result = await this.getMotifsSuppressionJeuneQueryHandler.execute({})
     if (isSuccess(result)) {
       return result.data

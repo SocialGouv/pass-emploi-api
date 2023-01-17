@@ -635,7 +635,7 @@ describe('JeunesController', () => {
       archiverJeuneCommandHandler.execute
         .withArgs({
           idJeune: 'id-jeune',
-          motif: ArchiveJeune.MotifSuppression.RADIATION_DU_CEJ,
+          motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
           commentaire: undefined
         })
         .resolves(emptySuccess())
@@ -644,7 +644,9 @@ describe('JeunesController', () => {
       await request(app.getHttpServer())
         .post(`/jeunes/id-jeune/archiver`)
         .set('authorization', unHeaderAuthorization())
-        .send({ motif: ArchiveJeune.MotifSuppression.RADIATION_DU_CEJ })
+        .send({
+          motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE
+        })
         //Then
         .expect(HttpStatus.NO_CONTENT)
     })
@@ -659,7 +661,9 @@ describe('JeunesController', () => {
       await request(app.getHttpServer())
         .post(`/jeunes/id-jeune/archiver`)
         .set('authorization', unHeaderAuthorization())
-        .send({ motif: ArchiveJeune.MotifSuppression.SORTIE_POSITIVE_DU_CEJ })
+        .send({
+          motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE
+        })
         //Then
         .expect(HttpStatus.FORBIDDEN)
     })

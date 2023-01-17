@@ -8,7 +8,7 @@ export const uneArchiveJeuneMetadonnees = (
 ): ArchiveJeune.Metadonnees => {
   const defaults: ArchiveJeune.Metadonnees = {
     idJeune: '1',
-    motif: ArchiveJeune.MotifSuppression.RADIATION_DU_CEJ,
+    motif: ArchiveJeune.MotifSuppression.CONTRAT_ARRIVE_A_ECHEANCE,
     commentaire: 'Il a loupé un rdv',
     nomJeune: 'test',
     prenomJeune: 'test',

@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { MotifSuppressionV2QueryModel } from '../../../application/queries/query-models/jeunes.query-model'
-import { GetMotifsSuppressionJeuneV2QueryHandler } from '../../../application/queries/v2/get-motifs-suppression-jeune-v2.query.handler'
+import { GetMotifsSuppressionJeuneQueryHandler } from '../../../application/queries/get-motifs-suppression-jeune.query.handler'
+import { MotifSuppressionJeuneQueryModel } from '../../../application/queries/query-models/jeunes.query-model'
 import { isSuccess } from '../../../building-blocks/types/result'
 import { handleFailure } from '../failure.handler'
 
@@ -9,19 +9,19 @@ import { handleFailure } from '../failure.handler'
 @ApiTags('Referentiels')
 export class ReferentielsControllerV2 {
   constructor(
-    private readonly getMotifsSuppressionJeuneV2QueryHandler: GetMotifsSuppressionJeuneV2QueryHandler
+    private readonly getMotifsSuppressionJeuneQueryHandler: GetMotifsSuppressionJeuneQueryHandler
   ) {}
 
   @Get('motifs-suppression-jeune')
   @ApiOAuth2([])
   @ApiResponse({
-    type: MotifSuppressionV2QueryModel,
+    type: MotifSuppressionJeuneQueryModel,
     isArray: true
   })
-  async getMotifsSuppressionJeune(): Promise<MotifSuppressionV2QueryModel[]> {
-    const result = await this.getMotifsSuppressionJeuneV2QueryHandler.execute(
-      {}
-    )
+  async getMotifsSuppressionJeune(): Promise<
+    MotifSuppressionJeuneQueryModel[]
+  > {
+    const result = await this.getMotifsSuppressionJeuneQueryHandler.execute({})
     if (isSuccess(result)) {
       return result.data
     }
