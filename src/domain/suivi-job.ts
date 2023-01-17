@@ -19,7 +19,6 @@ export interface RapportJob24h {
   nbExecutions: number
   nbErreurs: number
   nbEchecs: number
-  datesExecutions: DateTime[]
 }
 
 export interface NettoyageJobsStats {

@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { parseExpression } from 'cron-parser'
-import { DateTime } from 'luxon'
 import { Op } from 'sequelize'
 import { Job } from '../../../building-blocks/types/job'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
@@ -58,17 +57,12 @@ export class MonitorJobsCommandHandler extends JobHandler<Job> {
         0
       )
 
-      const datesExecutions = suiviDernieres24hSql.map(suivi =>
-        DateTime.fromJSDate(suivi.dateExecution)
-      )
-
       rapportJobs.push({
         jobType: cron.type,
         nbExecutionsAttendues,
         nbExecutions: suiviDernieres24hSql.length,
         nbErreurs,
-        nbEchecs,
-        datesExecutions
+        nbEchecs
       })
     }
 

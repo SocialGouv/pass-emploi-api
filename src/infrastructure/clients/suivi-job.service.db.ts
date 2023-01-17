@@ -89,9 +89,6 @@ function construireRapport(
         : ':white_check_mark:',
     pasEnEchec: rapportJob.nbEchecs > 0 ? ':x:' : ':white_check_mark:',
     ...rapportJob,
-    datesExecutions: rapportJob.datesExecutions.map(date =>
-      date.setZone('Europe/Paris').toISO()
-    ),
     logs: `[lien](${logsUrl}/app/discover#/?_g=(time:(from:now-24h%2Fh,to:now))&_a=(query:(language:kuery,query:"${rapportJob.jobType}")))`
   }))
   const headers = Object.keys(rapportJobsStringified[0])
