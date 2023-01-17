@@ -132,6 +132,7 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
         }
       ],
       where: {
+        ...generateSourceRendezVousCondition(this.configuration),
         date: {
           [Op.gte]: maintenant
         },
@@ -155,6 +156,7 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
         }
       ],
       where: {
+        ...generateSourceRendezVousCondition(this.configuration),
         dateSuppression: {
           [Op.is]: null
         }
