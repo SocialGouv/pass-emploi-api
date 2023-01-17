@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { createClient } from 'redis'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const TokenBucket = require('tokenbucket')
+import { RedisClientType as _RedisClientType } from '@redis/client/dist/lib/client'
 
 @Injectable()
 export class RateLimiterService {
@@ -12,8 +14,12 @@ export class RateLimiterService {
   public readonly getSessionMilo: RateLimiter
   public readonly getEvenementMilo: RateLimiter
   public readonly getNotificationsPE: RateLimiter
+  private readonly redisClient: _RedisClientType
 
   constructor(private configService: ConfigService) {
+    this.redisClient = createClient({
+      url: configService.get('redis.url')
+    })
     this.getDossierMilo = this.buildGetDossierMilo()
     this.getEvenementMilo = this.buildGetEvenementMilo()
     this.getRendezVousMilo = this.buildGetRendezVousMilo()
@@ -31,7 +37,11 @@ export class RateLimiterService {
       ),
       tokensToAddPerInterval: parseInt(
         this.configService.get('rateLimiter.getDossierMilo.limit')!
-      )
+      ),
+      redis: {
+        bucketName: 'DossierMiloRateLimiter',
+        redisClient: this.redisClient
+      }
     }
     return new RateLimiter(options)
   }
@@ -46,7 +56,11 @@ export class RateLimiterService {
       ),
       tokensToAddPerInterval: parseInt(
         this.configService.get('rateLimiter.getAckEvenementMilo.limit')!
-      )
+      ),
+      redis: {
+        bucketName: 'EvenementMiloRateLimiter',
+        redisClient: this.redisClient
+      }
     }
     return new RateLimiter(options)
   }
@@ -61,7 +75,11 @@ export class RateLimiterService {
       ),
       tokensToAddPerInterval: parseInt(
         this.configService.get('rateLimiter.getRendezVousMilo.limit')!
-      )
+      ),
+      redis: {
+        bucketName: 'RendezVousMiloRateLimiter',
+        redisClient: this.redisClient
+      }
     }
     return new RateLimiter(options)
   }
@@ -76,7 +94,11 @@ export class RateLimiterService {
       ),
       tokensToAddPerInterval: parseInt(
         this.configService.get('rateLimiter.getSessionMilo.limit')!
-      )
+      ),
+      redis: {
+        bucketName: 'SessionMiloRateLimiter',
+        redisClient: this.redisClient
+      }
     }
     return new RateLimiter(options)
   }
@@ -91,7 +113,11 @@ export class RateLimiterService {
       ),
       tokensToAddPerInterval: parseInt(
         this.configService.get('rateLimiter.getNotificationsPE.limit')!
-      )
+      ),
+      redis: {
+        bucketName: 'NotificationPERateLimiter',
+        redisClient: this.redisClient
+      }
     }
     return new RateLimiter(options)
   }
@@ -115,5 +141,9 @@ export namespace RateLimiter {
     size: number
     tokensToAddPerInterval: number
     interval: number
+    redis: {
+      bucketName: string
+      redisClient: _RedisClientType
+    }
   }
 }

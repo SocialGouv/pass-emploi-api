@@ -132,12 +132,12 @@ export default () => {
         interval: process.env.RATE_LIMITER_GET_ACK_EVENEMENT_MILO_INTERVAL ?? '1200'
       },
       getRendezVousMilo: {
-        limit: process.env.RATE_LIMITER_GET_RENDEZ_VOUS_MILO_LIMIT ?? '3',
-        interval: process.env.RATE_LIMITER_GET_RENDEZ_VOUS_MILO_INTERVAL ?? '1000'
+        limit: process.env.RATE_LIMITER_GET_RENDEZ_VOUS_MILO_LIMIT ?? '10',
+        interval: process.env.RATE_LIMITER_GET_RENDEZ_VOUS_MILO_INTERVAL ?? '1200'
       },
       getSessionMilo: {
-        limit: process.env.RATE_LIMITER_GET_SESSION_MILO_LIMIT ?? '3',
-        interval: process.env.RATE_LIMITER_GET_SESSION_MILO_INTERVAL ?? '1000'
+        limit: process.env.RATE_LIMITER_GET_SESSION_MILO_LIMIT ?? '10',
+        interval: process.env.RATE_LIMITER_GET_SESSION_MILO_INTERVAL ?? '1200'
       },
       getNotificationsPE: {
         limit: process.env.RATE_LIMITER_GET_NOTIFICATIONS_PE_LIMIT ?? '3',
