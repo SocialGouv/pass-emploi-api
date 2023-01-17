@@ -36,9 +36,13 @@ export namespace Evenement {
     LISTE_DIFFUSION_MODIFIEE = 'LISTE_DIFFUSION_MODIFIEE',
     LISTE_DIFFUSION_SUPPRIMEE = 'LISTE_DIFFUSION_SUPPRIMEE',
     MESSAGE_ENVOYE = 'MESSAGE_ENVOYE',
-    MESSAGE_ENVOYE_MULTIPLE = 'MESSAGE_ENVOYE_MULTIPLE',
+    MESSAGE_ENVOYE_MULTIPLE_MANUEL = 'MESSAGE_ENVOYE_MULTIPLE_MANUEL',
+    MESSAGE_ENVOYE_MULTIPLE_LISTE = 'MESSAGE_ENVOYE_MULTIPLE_LISTE',
+    MESSAGE_ENVOYE_MULTIPLE_MIXTE = 'MESSAGE_ENVOYE_MULTIPLE_MIXTE',
     MESSAGE_ENVOYE_PJ = 'MESSAGE_ENVOYE_PJ',
-    MESSAGE_ENVOYE_MULTIPLE_PJ = 'MESSAGE_ENVOYE_MULTIPLE_PJ',
+    MESSAGE_ENVOYE_MULTIPLE_MANUEL_PJ = 'MESSAGE_ENVOYE_MULTIPLE_MANUEL_PJ',
+    MESSAGE_ENVOYE_MULTIPLE_LISTE_PJ = 'MESSAGE_ENVOYE_MULTIPLE_LISTE_PJ',
+    MESSAGE_ENVOYE_MULTIPLE_MIXTE_PJ = 'MESSAGE_ENVOYE_MULTIPLE_MIXTE_PJ',
     MESSAGE_OFFRE_PARTAGEE = 'MESSAGE_OFFRE_PARTAGEE',
     OFFRE_ALTERNANCE_AFFICHEE = 'OFFRE_ALTERNANCE_AFFICHEE',
     OFFRE_ALTERNANCE_PARTAGEE = 'OFFRE_ALTERNANCE_PARTAGEE',
@@ -285,13 +289,35 @@ const evenements: {
     action: 'Postuler'
   },
   [Evenement.Code.MESSAGE_ENVOYE]: { categorie: 'Message', action: 'Envoi' },
-  [Evenement.Code.MESSAGE_ENVOYE_MULTIPLE]: {
+  [Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_MANUEL]: {
     categorie: 'Message',
-    action: 'Envoi multiple'
+    action: 'Envoi multiple',
+    nom: 'Manuel'
   },
-  [Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_PJ]: {
+  [Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_LISTE]: {
     categorie: 'Message',
-    action: 'Envoi multiple PJ'
+    action: 'Envoi multiple',
+    nom: 'Liste'
+  },
+  [Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_MIXTE]: {
+    categorie: 'Message',
+    action: 'Envoi multiple',
+    nom: 'Manuel+Liste'
+  },
+  [Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_MANUEL_PJ]: {
+    categorie: 'Message',
+    action: 'Envoi multiple PJ',
+    nom: 'Manuel'
+  },
+  [Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_LISTE_PJ]: {
+    categorie: 'Message',
+    action: 'Envoi multiple PJ',
+    nom: 'Liste'
+  },
+  [Evenement.Code.MESSAGE_ENVOYE_MULTIPLE_MIXTE_PJ]: {
+    categorie: 'Message',
+    action: 'Envoi multiple PJ',
+    nom: 'Manuel+liste'
   },
   [Evenement.Code.MESSAGE_ENVOYE_PJ]: {
     categorie: 'Message',
