@@ -4,7 +4,11 @@ import { AuthorizeListeDeDiffusion } from '../../../src/application/authorizers/
 import { DeleteListeDeDiffusionCommandHandler } from '../../../src/application/commands/delete-liste-de-diffusion.command.handler'
 import { Chat } from '../../../src/domain/chat'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
 import { uneListeDeDiffusion } from '../../fixtures/liste-de-diffusion.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
 
@@ -14,18 +18,21 @@ describe('DeleteListeDeDiffusionCommandHandler', () => {
   let listeDeDiffusionAuthorizer: StubbedClass<AuthorizeListeDeDiffusion>
   let listeDeDiffusionRepository: StubbedType<Conseiller.ListeDeDiffusion.Repository>
   let chatRepository: StubbedType<Chat.Repository>
+  let evenementService: StubbedClass<EvenementService>
 
   beforeEach(() => {
     sandbox = createSandbox()
     listeDeDiffusionAuthorizer = stubClass(AuthorizeListeDeDiffusion)
     listeDeDiffusionRepository = stubInterface(sandbox)
     chatRepository = stubInterface(sandbox)
+    evenementService = stubClass(EvenementService)
 
     deleteListeDeDiffusionCommandHandler =
       new DeleteListeDeDiffusionCommandHandler(
         listeDeDiffusionAuthorizer,
         listeDeDiffusionRepository,
-        chatRepository
+        chatRepository,
+        evenementService
       )
   })
 
@@ -78,6 +85,22 @@ describe('DeleteListeDeDiffusionCommandHandler', () => {
       expect(
         chatRepository.supprimerListeDeDiffusion
       ).to.have.been.calledWithExactly(idListe)
+    })
+  })
+
+  describe('monitor', () => {
+    it("créé l'événement idoine", async () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+
+      // When
+      await deleteListeDeDiffusionCommandHandler.monitor(utilisateur)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledOnceWithExactly(
+        Evenement.Code.LISTE_DIFFUSION_SUPPRIMEE,
+        utilisateur
+      )
     })
   })
 })
