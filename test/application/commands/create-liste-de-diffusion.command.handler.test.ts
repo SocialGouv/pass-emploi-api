@@ -1,16 +1,20 @@
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { createSandbox, SinonSandbox } from 'sinon'
+import { AuthorizeConseillerForJeunes } from '../../../src/application/authorizers/authorize-conseiller-for-jeunes'
 import {
   CreateListeDeDiffusionCommand,
   CreateListeDeDiffusionCommandHandler
 } from '../../../src/application/commands/create-liste-de-diffusion.command.handler'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { AuthorizeConseillerForJeunes } from '../../../src/application/authorizers/authorize-conseiller-for-jeunes'
 import { emptySuccess } from '../../../src/building-blocks/types/result'
-import { uneDatetime } from '../../fixtures/date.fixture'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { createSandbox, SinonSandbox } from 'sinon'
-import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { Chat } from '../../../src/domain/chat'
+import { Conseiller } from '../../../src/domain/conseiller/conseiller'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
+import { uneDatetime } from '../../fixtures/date.fixture'
+import { expect, StubbedClass, stubClass } from '../../utils'
 
 describe('CreateListeDeDiffusionCommandHandler', () => {
   let sandbox: SinonSandbox
@@ -19,6 +23,7 @@ describe('CreateListeDeDiffusionCommandHandler', () => {
   let listeDeDiffusionRepository: StubbedType<Conseiller.ListeDeDiffusion.Repository>
   let listeDeDiffusionFactory: StubbedClass<Conseiller.ListeDeDiffusion.Factory>
   let chatRepository: StubbedType<Chat.Repository>
+  let evenementService: StubbedClass<EvenementService>
 
   beforeEach(() => {
     sandbox = createSandbox()
@@ -26,13 +31,15 @@ describe('CreateListeDeDiffusionCommandHandler', () => {
     listeDeDiffusionRepository = stubInterface(sandbox)
     listeDeDiffusionFactory = stubClass(Conseiller.ListeDeDiffusion.Factory)
     chatRepository = stubInterface(sandbox)
+    evenementService = stubClass(EvenementService)
 
     createListeDeDiffusionCommandHandler =
       new CreateListeDeDiffusionCommandHandler(
         conseillerForJeunesAuthorizer,
         listeDeDiffusionRepository,
         listeDeDiffusionFactory,
-        chatRepository
+        chatRepository,
+        evenementService
       )
   })
 
@@ -111,6 +118,22 @@ describe('CreateListeDeDiffusionCommandHandler', () => {
       expect(
         chatRepository.initializeListeDeDiffusionIfNotExists
       ).to.have.been.calledWithExactly(idConseiller, idListe)
+    })
+  })
+
+  describe('monitor', () => {
+    it("créé l'événement idoine", async () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+
+      // When
+      await createListeDeDiffusionCommandHandler.monitor(utilisateur)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledOnceWithExactly(
+        Evenement.Code.LISTE_DIFFUSION_CREEE,
+        utilisateur
+      )
     })
   })
 })

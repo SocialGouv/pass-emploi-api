@@ -2,6 +2,7 @@ import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { emptySuccess, Result } from '../../building-blocks/types/result'
 import { Command } from '../../building-blocks/types/command'
 import { Authentification } from '../../domain/authentification'
+import { Evenement, EvenementService } from '../../domain/evenement'
 import { AuthorizeConseillerForJeunes } from '../authorizers/authorize-conseiller-for-jeunes'
 import { Conseiller } from '../../domain/conseiller/conseiller'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
@@ -25,7 +26,8 @@ export class CreateListeDeDiffusionCommandHandler extends CommandHandler<
     private listeDeDiffusionRepository: Conseiller.ListeDeDiffusion.Repository,
     private listeDeDiffusionFactory: Conseiller.ListeDeDiffusion.Factory,
     @Inject(ChatRepositoryToken)
-    private chatRepository: Chat.Repository
+    private chatRepository: Chat.Repository,
+    private readonly evenementService: EvenementService
   ) {
     super('CreateListeDeDiffusionCommandHandler')
   }
@@ -51,7 +53,10 @@ export class CreateListeDeDiffusionCommandHandler extends CommandHandler<
     return emptySuccess()
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creer(
+      Evenement.Code.LISTE_DIFFUSION_CREEE,
+      utilisateur
+    )
   }
 }
