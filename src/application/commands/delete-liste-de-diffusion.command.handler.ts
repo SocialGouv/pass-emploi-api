@@ -6,6 +6,7 @@ import { Authentification } from '../../domain/authentification'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { Conseiller } from '../../domain/conseiller/conseiller'
 import { ListeDeDiffusionRepositoryToken } from '../../domain/conseiller/liste-de-diffusion'
+import { Evenement, EvenementService } from '../../domain/evenement'
 import { AuthorizeListeDeDiffusion } from '../authorizers/authorize-liste-de-diffusion'
 
 export interface DeleteListeDeDiffusionCommand extends Command {
@@ -22,7 +23,8 @@ export class DeleteListeDeDiffusionCommandHandler extends CommandHandler<
     @Inject(ListeDeDiffusionRepositoryToken)
     private listeDeDiffusionRepository: Conseiller.ListeDeDiffusion.Repository,
     @Inject(ChatRepositoryToken)
-    private chatRepository: Chat.Repository
+    private chatRepository: Chat.Repository,
+    private readonly evenementService: EvenementService
   ) {
     super('DeleteListeDeDiffusionCommandHandler')
   }
@@ -45,7 +47,10 @@ export class DeleteListeDeDiffusionCommandHandler extends CommandHandler<
     return emptySuccess()
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creer(
+      Evenement.Code.LISTE_DIFFUSION_SUPPRIMEE,
+      utilisateur
+    )
   }
 }
