@@ -34,28 +34,6 @@ export interface ArchiveJeune {
 
 export namespace ArchiveJeune {
   export enum MotifSuppression {
-    // V1
-    SORTIE_POSITIVE_DU_CEJ = 'Sortie positive du CEJ',
-    RADIATION_DU_CEJ = 'Radiation du CEJ',
-    RECREATION_D_UN_COMPTE_JEUNE = "Recréation d'un compte jeune",
-    // V2
-    EMPLOI_DURABLE = 'Emploi durable (plus de 6 mois)',
-    EMPLOI_COURT = 'Emploi court (moins de 6 mois)',
-    CONTRAT_ARRIVE_A_ECHEANCE = 'Contrat arrivé à échéance',
-    LIMITE_AGE = 'Limite d’âge atteinte',
-    DEMANDE_DU_JEUNE = 'Demande du jeune de sortir du dispositif',
-    NON_RESPECT_OU_ABANDON = 'Non respect des engagements ou abandon',
-    DEMENAGEMENT = 'Déménagement',
-    CHANGEMENT_CONSEILLER = 'Changement de conseiller',
-    AUTRE = 'Autre'
-  }
-  export enum MotifSuppressionV1 {
-    SORTIE_POSITIVE_DU_CEJ = 'Sortie positive du CEJ',
-    RADIATION_DU_CEJ = 'Radiation du CEJ',
-    RECREATION_D_UN_COMPTE_JEUNE = "Recréation d'un compte jeune",
-    AUTRE = 'Autre'
-  }
-  export enum MotifSuppressionV2 {
     EMPLOI_DURABLE = 'Emploi durable (plus de 6 mois)',
     EMPLOI_COURT = 'Emploi court (moins de 6 mois)',
     CONTRAT_ARRIVE_A_ECHEANCE = 'Contrat arrivé à échéance',
@@ -67,8 +45,8 @@ export namespace ArchiveJeune {
     AUTRE = 'Autre'
   }
 
-  export const mapMotifSuppressionV2Description: Partial<
-    Record<MotifSuppressionV2, string>
+  export const mapMotifSuppressionDescription: Partial<
+    Record<MotifSuppression, string>
   > = {
     'Emploi durable (plus de 6 mois)':
       'CDI, CDD de plus de 6 mois dont alternance, titularisation dans la fonction publique',

@@ -264,7 +264,6 @@ import { CreateSuggestionConseillerOffreEmploiCommandHandler } from './applicati
 import { CreateSuggestionConseillerServiceCiviqueCommandHandler } from './application/commands/create-suggestion-conseiller-service-civique.command.handler'
 import { CreateSuggestionConseillerImmersionCommandHandler } from './application/commands/create-suggestion-conseiller-immersion.command.handler'
 import { ReferentielsControllerV2 } from './infrastructure/routes/v2/referentiels.controller.v2'
-import { GetMotifsSuppressionJeuneV2QueryHandler } from './application/queries/v2/get-motifs-suppression-jeune-v2.query.handler'
 import { EtablissementsController } from './infrastructure/routes/etablissements.controller'
 import { ConseillerEtablissementAuthorizer } from './application/authorizers/authorize-conseiller-etablissement'
 import { AnimationCollectiveSqlRepository } from './infrastructure/repositories/rendez-vous/animation-collective-sql.repository.db'
@@ -630,7 +629,6 @@ export function buildQueryCommandsProviders(): Provider[] {
     FichierSuppressionAuthorizer,
     ArchiverJeuneCommandHandler,
     GetMotifsSuppressionJeuneQueryHandler,
-    GetMotifsSuppressionJeuneV2QueryHandler,
     PlanifierExecutionCronCommandHandler,
     UpdateJeunePreferencesCommandHandler,
     GetPreferencesJeuneQueryHandler,
