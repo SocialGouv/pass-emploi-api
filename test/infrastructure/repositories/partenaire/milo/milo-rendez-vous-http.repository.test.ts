@@ -18,16 +18,19 @@ import {
 } from '../../../../../src/infrastructure/repositories/dto/milo.dto'
 import { MiloRendezVousHttpRepository } from '../../../../../src/infrastructure/repositories/partenaire/milo/milo-rendez-vous-http.repository'
 import { MiloRendezVous } from '../../../../../src/domain/partenaire/milo/milo.rendez-vous'
+import { RateLimiterService } from '../../../../../src/utils/rate-limiter.service'
 
 describe('MiloEvenementsHttpRepository', () => {
   let miloEvenementsHttpRepository: MiloRendezVousHttpRepository
   const configService = testConfig()
+  const rateLimiterService = new RateLimiterService(configService)
 
   beforeEach(async () => {
     const httpService = new HttpService()
     miloEvenementsHttpRepository = new MiloRendezVousHttpRepository(
       httpService,
-      configService
+      configService,
+      rateLimiterService
     )
   })
   describe('findAllEvenements', () => {

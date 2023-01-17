@@ -14,6 +14,7 @@ import {
   SessionMiloDto
 } from '../../dto/milo.dto'
 import { MiloRendezVous } from '../../../../domain/partenaire/milo/milo.rendez-vous'
+import { RateLimiterService } from '../../../../utils/rate-limiter.service'
 
 @Injectable()
 export class MiloRendezVousHttpRepository implements MiloRendezVous.Repository {
@@ -24,7 +25,8 @@ export class MiloRendezVousHttpRepository implements MiloRendezVous.Repository {
 
   constructor(
     private httpService: HttpService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private rateLimiterService: RateLimiterService
   ) {
     this.logger = new Logger('MiloHttpRepository')
     this.apiUrl = this.configService.get('milo').url
@@ -34,6 +36,7 @@ export class MiloRendezVousHttpRepository implements MiloRendezVous.Repository {
   }
 
   async findAllEvenements(): Promise<MiloRendezVous.Evenement[]> {
+    await this.rateLimiterService.getEvenementMilo.attendreLaProchaineDisponibilite()
     const evenements = await firstValueFrom(
       this.httpService.get<EvenementMiloDto[]>(
         `${this.apiUrl}/operateurs/events`,
@@ -79,6 +82,7 @@ export class MiloRendezVousHttpRepository implements MiloRendezVous.Repository {
   ): Promise<MiloRendezVous | undefined> {
     try {
       if (evenement.objet === MiloRendezVous.ObjetEvenement.SESSION) {
+        await this.rateLimiterService.getSessionMilo.attendreLaProchaineDisponibilite()
         const sessionMilo = await firstValueFrom(
           this.httpService.get<SessionMiloDto>(
             `${this.apiUrl}/operateurs/dossiers/${evenement.idPartenaireBeneficiaire}/sessions/${evenement.idObjet}`,
@@ -107,6 +111,7 @@ export class MiloRendezVousHttpRepository implements MiloRendezVous.Repository {
           adresse: sessionMilo.data.lieu
         }
       } else {
+        await this.rateLimiterService.getRendezVousMilo.attendreLaProchaineDisponibilite()
         const rendezVousMilo = await firstValueFrom(
           this.httpService.get<RendezVousMiloDto>(
             `${this.apiUrl}/operateurs/dossiers/${evenement.idPartenaireBeneficiaire}/rdv/${evenement.idObjet}`,
