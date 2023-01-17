@@ -99,11 +99,7 @@ export const configurationSchema = Joi.object({
       limit: Joi.number().required(),
       interval: Joi.number().required()
     }),
-    getEvenementMilo: Joi.object({
-      limit: Joi.number().required(),
-      interval: Joi.number().required()
-    }),
-    ackEvenementMilo: Joi.object({
+    getAckEvenementMilo: Joi.object({
       limit: Joi.number().required(),
       interval: Joi.number().required()
     }),

@@ -8,16 +8,14 @@ const TokenBucket = require('tokenbucket')
 @Injectable()
 export class RateLimiterService {
   public readonly getDossierMilo: RateLimiter
-  public readonly getEvenementMilo: RateLimiter
   public readonly getRendezVousMilo: RateLimiter
   public readonly getSessionMilo: RateLimiter
-  public readonly ackEvenementMilo: RateLimiter
+  public readonly getEvenementMilo: RateLimiter
   public readonly getNotificationsPE: RateLimiter
 
   constructor(private configService: ConfigService) {
     this.getDossierMilo = this.buildGetDossierMilo()
-    this.getEvenementMilo = this.buildAckEvenementMilo()
-    this.ackEvenementMilo = this.buildGetEvenementMilo()
+    this.getEvenementMilo = this.buildGetEvenementMilo()
     this.getRendezVousMilo = this.buildGetRendezVousMilo()
     this.getSessionMilo = this.buildGetSessionMilo()
     this.getNotificationsPE = this.buildGetNotificationsPE()
@@ -41,28 +39,13 @@ export class RateLimiterService {
   private buildGetEvenementMilo(): RateLimiter {
     const options: RateLimiter.Options = {
       size: parseInt(
-        this.configService.get('rateLimiter.getEvenementMilo.limit')!
+        this.configService.get('rateLimiter.getAckEvenementMilo.limit')!
       ),
       interval: parseInt(
-        this.configService.get('rateLimiter.getEvenementMilo.interval')!
+        this.configService.get('rateLimiter.getAckEvenementMilo.interval')!
       ),
       tokensToAddPerInterval: parseInt(
-        this.configService.get('rateLimiter.getEvenementMilo.limit')!
-      )
-    }
-    return new RateLimiter(options)
-  }
-
-  private buildAckEvenementMilo(): RateLimiter {
-    const options: RateLimiter.Options = {
-      size: parseInt(
-        this.configService.get('rateLimiter.ackEvenementMilo.limit')!
-      ),
-      interval: parseInt(
-        this.configService.get('rateLimiter.ackEvenementMilo.interval')!
-      ),
-      tokensToAddPerInterval: parseInt(
-        this.configService.get('rateLimiter.ackEvenementMilo.limit')!
+        this.configService.get('rateLimiter.getAckEvenementMilo.limit')!
       )
     }
     return new RateLimiter(options)

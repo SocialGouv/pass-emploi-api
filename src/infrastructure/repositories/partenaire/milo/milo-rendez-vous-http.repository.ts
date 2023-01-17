@@ -61,6 +61,7 @@ export class MiloRendezVousHttpRepository implements MiloRendezVous.Repository {
     evenement: MiloRendezVous.Evenement
   ): Promise<Result> {
     try {
+      await this.rateLimiterService.getEvenementMilo.attendreLaProchaineDisponibilite()
       await firstValueFrom(
         this.httpService.post(
           `${this.apiUrl}/operateurs/events/${evenement.id}/ack`,
