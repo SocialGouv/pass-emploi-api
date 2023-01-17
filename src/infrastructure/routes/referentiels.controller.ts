@@ -12,7 +12,7 @@ import {
 } from '../../application/queries/get-metiers-rome.query.handler.db'
 import { GetMotifsSuppressionJeuneQueryHandler } from '../../application/queries/get-motifs-suppression-jeune.query.handler'
 import { GetTypesQualificationsQueryHandler } from '../../application/queries/get-types-qualifications.query.handler'
-import { GetTypesRendezVousQueryHandler } from '../../application/queries/get-types-rendez-vous.query.handler'
+import { GetTypesRendezVousQueryHandler } from '../../application/queries/rendez-vous/get-types-rendez-vous.query.handler'
 import {
   ActionPredefinieQueryModel,
   TypeQualificationQueryModel

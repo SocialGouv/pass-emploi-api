@@ -26,7 +26,7 @@ export class GetDetailListeDeDiffusionQueryHandler extends QueryHandler<
     query: GetDetailListeDeDiffusionQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return await this.listeDiffusionAuthorizer.authorize(
+    return this.listeDiffusionAuthorizer.authorize(
       query.idListeDeDiffusion,
       utilisateur
     )

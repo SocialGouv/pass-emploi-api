@@ -1,4 +1,4 @@
-import { GetAnimationsCollectivesQueryHandler } from '../../../src/application/queries/get-animations-collectives.query.handler.db'
+import { GetAnimationsCollectivesQueryHandler } from '../../../src/application/queries/rendez-vous/get-animations-collectives.query.handler.db'
 import { ConseillerEtablissementAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-etablissement'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'

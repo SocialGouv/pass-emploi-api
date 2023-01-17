@@ -2,7 +2,7 @@ import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/
 import {
   GetRendezVousJeunePoleEmploiQuery,
   GetRendezVousJeunePoleEmploiQueryHandler
-} from '../../../src/application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
+} from '../../../src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'

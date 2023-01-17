@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import { failure, Result, success } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
-import { Query } from '../../building-blocks/types/query'
-import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
-import { RendezVousAuthorizer } from '../authorizers/authorize-rendezvous'
-import { fromSqlToRendezVousConseillerDetailQueryModel } from './query-mappers/rendez-vous-milo.mappers'
-import { RendezVousConseillerDetailQueryModel } from './query-models/rendez-vous.query-model'
-import { LogModificationRendezVousSqlModel } from '../../infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
-import { DateService } from '../../utils/date-service'
-import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
+import { NonTrouveError } from '../../../building-blocks/types/domain-error'
+import { failure, Result, success } from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
+import { Query } from '../../../building-blocks/types/query'
+import { QueryHandler } from '../../../building-blocks/types/query-handler'
+import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
+import { RendezVousAuthorizer } from '../../authorizers/authorize-rendezvous'
+import { fromSqlToRendezVousConseillerDetailQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
+import { RendezVousConseillerDetailQueryModel } from '../query-models/rendez-vous.query-model'
+import { LogModificationRendezVousSqlModel } from '../../../infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
+import { DateService } from '../../../utils/date-service'
+import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 
 export interface GetDetailRendezVousQuery extends Query {
   idRendezVous: string
@@ -71,7 +71,10 @@ export class GetDetailRendezVousQueryHandler extends QueryHandler<
     query: GetDetailRendezVousQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.rendezVousAuthorizer.authorize(query.idRendezVous, utilisateur)
+    return this.rendezVousAuthorizer.authorizeConseiller(
+      query.idRendezVous,
+      utilisateur
+    )
   }
 
   async monitor(): Promise<void> {

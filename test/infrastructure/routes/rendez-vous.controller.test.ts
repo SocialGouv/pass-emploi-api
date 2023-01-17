@@ -26,7 +26,7 @@ import {
   UpdateRendezVousCommandHandler
 } from 'src/application/commands/update-rendez-vous.command.handler'
 import { UpdateRendezVousPayload } from 'src/infrastructure/routes/validation/rendez-vous.inputs'
-import { GetDetailRendezVousQueryHandler } from '../../../src/application/queries/get-detail-rendez-vous.query.handler.db'
+import { GetDetailRendezVousQueryHandler } from '../../../src/application/queries/rendez-vous/get-detail-rendez-vous.query.handler.db'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
 describe('RendezvousController', () => {

@@ -72,7 +72,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      return await this.conseillerForJeuneAuthorizer.authorize(
+      return this.conseillerForJeuneAuthorizer.authorize(
         query.idJeune,
         utilisateur
       )

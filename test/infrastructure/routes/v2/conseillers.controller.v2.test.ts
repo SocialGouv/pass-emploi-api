@@ -1,5 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
-import { GetRendezVousConseillerPaginesQueryHandler } from 'src/application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
+import { GetRendezVousConseillerPaginesQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
 import * as request from 'supertest'
 import { success } from '../../../../src/building-blocks/types/result'
 import {

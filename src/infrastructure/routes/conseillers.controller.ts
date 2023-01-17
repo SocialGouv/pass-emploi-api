@@ -49,7 +49,7 @@ import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-d
 import { GetIndicateursPourConseillerQueryHandler } from '../../application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { GetJeuneMiloByDossierQueryHandler } from '../../application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from '../../application/queries/get-jeunes-by-conseiller.query.handler.db'
-import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/get-rendez-vous-conseiller.query.handler.db'
+import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
 import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
 import { DetailConseillerQueryModel } from '../../application/queries/query-models/conseillers.query-model'
 import { IndicateursPourConseillerQueryModel } from '../../application/queries/query-models/indicateurs-pour-conseiller.query-model'

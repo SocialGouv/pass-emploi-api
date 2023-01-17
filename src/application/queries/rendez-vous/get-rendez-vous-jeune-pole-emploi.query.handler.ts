@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common'
-import { Result } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
-import { Evenement, EvenementService } from '../../domain/evenement'
-import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
-import { Cached, Query } from '../../building-blocks/types/query'
-import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { JeunePoleEmploiAuthorizer } from '../authorizers/authorize-jeune-pole-emploi'
-import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
-import { GetRendezVousJeunePoleEmploiQueryGetter } from './query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
+import { Result } from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
+import { Evenement, EvenementService } from '../../../domain/evenement'
+import { RendezVous } from '../../../domain/rendez-vous/rendez-vous'
+import { Cached, Query } from '../../../building-blocks/types/query'
+import { QueryHandler } from '../../../building-blocks/types/query-handler'
+import { JeunePoleEmploiAuthorizer } from '../../authorizers/authorize-jeune-pole-emploi'
+import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
+import { GetRendezVousJeunePoleEmploiQueryGetter } from '../query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 
 export interface GetRendezVousJeunePoleEmploiQuery extends Query {
   idJeune: string

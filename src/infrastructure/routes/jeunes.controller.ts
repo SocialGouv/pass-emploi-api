@@ -32,7 +32,7 @@ import {
 } from '../../application/commands/transferer-jeunes-conseiller.command.handler'
 import { GetDemarchesQueryHandler } from '../../application/queries/get-demarches.query.handler'
 import { GetDetailJeuneQueryHandler } from '../../application/queries/get-detail-jeune.query.handler.db'
-import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
+import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
 import {
   JeuneHomeActionQueryModel,
   JeuneHomeDemarcheQueryModel
@@ -68,7 +68,7 @@ import {
   GetPreferencesJeuneQuery,
   GetPreferencesJeuneQueryHandler
 } from '../../application/queries/get-preferences-jeune.handler.db'
-import { GetRendezVousJeuneQueryHandler } from '../../application/queries/get-rendez-vous-jeune.query.handler.db'
+import { GetRendezVousJeuneQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
 import { DemarcheQueryModel } from '../../application/queries/query-models/actions.query-model'
 import {
   isFailure,
@@ -103,8 +103,8 @@ import { toDemarcheQueryModel } from '../../application/queries/query-mappers/de
 import {
   GetAnimationsCollectivesJeuneQuery,
   GetAnimationsCollectivesJeuneQueryHandler
-} from '../../application/queries/get-animations-collectives-jeune.query.handler.db'
-import { GetUnRendezVousJeuneQueryHandler } from '../../application/queries/get-un-rendez-vous-jeune.query.handler.db'
+} from '../../application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
+import { GetUnRendezVousJeuneQueryHandler } from '../../application/queries/rendez-vous/get-un-rendez-vous-jeune.query.handler.db'
 import { IdQueryModel } from '../../application/queries/query-models/common.query-models'
 
 @Controller('jeunes')

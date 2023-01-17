@@ -17,7 +17,7 @@ import {
   UpdateRendezVousCommand,
   UpdateRendezVousCommandHandler
 } from '../../application/commands/update-rendez-vous.command.handler'
-import { GetDetailRendezVousQueryHandler } from '../../application/queries/get-detail-rendez-vous.query.handler.db'
+import { GetDetailRendezVousQueryHandler } from '../../application/queries/rendez-vous/get-detail-rendez-vous.query.handler.db'
 import {
   RendezVousConseillerDetailQueryModel,
   RendezVousConseillerQueryModel

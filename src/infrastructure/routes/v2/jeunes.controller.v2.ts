@@ -29,10 +29,10 @@ import { Core } from '../../../domain/core'
 import { JeuneHomeDemarcheQueryModelV2 } from '../../../application/queries/query-models/home-jeune.query-model'
 import { JeuneHomeAgendaPoleEmploiQueryModelV2 } from '../../../application/queries/query-models/home-jeune-suivi.query-model'
 import { DateTime } from 'luxon'
-import { GetRendezVousJeuneQueryHandler } from '../../../application/queries/get-rendez-vous-jeune.query.handler.db'
+import { GetRendezVousJeuneQueryHandler } from '../../../application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
 import { GetJeuneHomeDemarchesQueryHandler } from '../../../application/queries/get-jeune-home-demarches.query.handler'
 import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from '../../../application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
-import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../application/queries/get-rendez-vous-jeune-pole-emploi.query.handler'
+import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
 
 @Controller('v2/jeunes')
 @ApiOAuth2([])

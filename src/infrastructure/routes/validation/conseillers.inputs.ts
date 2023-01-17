@@ -15,7 +15,7 @@ import {
   Length,
   ValidateNested
 } from 'class-validator'
-import { TriRendezVous } from '../../../application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
+import { TriRendezVous } from '../../../application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
 import { Core } from '../../../domain/core'
 import { AgenceInput } from './agences.inputs'
 import { transformStringToBoolean } from './utils/transformers'

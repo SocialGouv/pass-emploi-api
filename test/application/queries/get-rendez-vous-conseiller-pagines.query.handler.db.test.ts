@@ -1,7 +1,7 @@
 import {
   GetRendezVousConseillerPaginesQueryHandler,
   TriRendezVous
-} from 'src/application/queries/get-rendez-vous-conseiller-pagines.query.handler.db'
+} from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
 import { isSuccess } from 'src/building-blocks/types/result'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'

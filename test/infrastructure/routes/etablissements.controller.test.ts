@@ -2,7 +2,7 @@ import { HttpStatus, INestApplication } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import * as request from 'supertest'
 import { CloturerAnimationCollectiveCommandHandler } from '../../../src/application/commands/cloturer-animation-collective.command.handler'
-import { GetAnimationsCollectivesQueryHandler } from '../../../src/application/queries/get-animations-collectives.query.handler.db'
+import { GetAnimationsCollectivesQueryHandler } from '../../../src/application/queries/rendez-vous/get-animations-collectives.query.handler.db'
 import { GetJeunesByEtablissementQueryHandler } from '../../../src/application/queries/get-jeunes-by-etablissement.query.handler.db'
 import {
   emptySuccess,
