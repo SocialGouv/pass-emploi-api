@@ -33,6 +33,7 @@ export namespace Evenement {
     COMPTE_SUPPRIME = 'COMPTE_SUPPRIME',
     COMPTE_ARCHIVE = 'COMPTE_ARCHIVE',
     LISTE_DIFFUSION_CREEE = 'LISTE_DIFFUSION_CREEE',
+    LISTE_DIFFUSION_MODIFIEE = 'LISTE_DIFFUSION_MODIFIEE',
     MESSAGE_ENVOYE = 'MESSAGE_ENVOYE',
     MESSAGE_ENVOYE_MULTIPLE = 'MESSAGE_ENVOYE_MULTIPLE',
     MESSAGE_ENVOYE_PJ = 'MESSAGE_ENVOYE_PJ',
@@ -180,6 +181,10 @@ const evenements: {
   [Evenement.Code.LISTE_DIFFUSION_CREEE]: {
     categorie: 'Liste de diffusion',
     action: 'Création'
+  },
+  [Evenement.Code.LISTE_DIFFUSION_MODIFIEE]: {
+    categorie: 'Liste de diffusion',
+    action: 'Modification'
   },
   [Evenement.Code.OFFRE_EMPLOI_AFFICHEE]: {
     categorie: 'Offre',

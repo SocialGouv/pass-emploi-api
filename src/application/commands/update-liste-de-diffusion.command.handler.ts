@@ -1,17 +1,18 @@
+import { Inject, Injectable } from '@nestjs/common'
+import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
   isFailure,
   Result
 } from '../../building-blocks/types/result'
-import { Command } from '../../building-blocks/types/command'
 import { Authentification } from '../../domain/authentification'
 import { Conseiller } from '../../domain/conseiller/conseiller'
-import { Inject, Injectable } from '@nestjs/common'
 import { ListeDeDiffusionRepositoryToken } from '../../domain/conseiller/liste-de-diffusion'
+import { Evenement, EvenementService } from '../../domain/evenement'
 import { AuthorizeConseillerForJeunesTransferesTemporairement } from '../authorizers/authorize-conseiller-for-jeunes-transferes'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
 import { AuthorizeListeDeDiffusion } from '../authorizers/authorize-liste-de-diffusion'
 
 export interface UpdateListeDeDiffusionCommand extends Command {
@@ -30,7 +31,8 @@ export class UpdateListeDeDiffusionCommandHandler extends CommandHandler<
     private authorizerListe: AuthorizeListeDeDiffusion,
     @Inject(ListeDeDiffusionRepositoryToken)
     private listeDeDiffusionRepository: Conseiller.ListeDeDiffusion.Repository,
-    private listeDeDiffusionService: Conseiller.ListeDeDiffusion.Service
+    private listeDeDiffusionService: Conseiller.ListeDeDiffusion.Service,
+    private readonly evenementService: EvenementService
   ) {
     super('UpdateListeDeDiffusionCommandHandler')
   }
@@ -82,7 +84,10 @@ export class UpdateListeDeDiffusionCommandHandler extends CommandHandler<
     return emptySuccess()
   }
 
-  async monitor(): Promise<void> {
-    return
+  async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {
+    await this.evenementService.creer(
+      Evenement.Code.LISTE_DIFFUSION_MODIFIEE,
+      utilisateur
+    )
   }
 }

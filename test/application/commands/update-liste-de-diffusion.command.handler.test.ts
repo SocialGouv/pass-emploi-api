@@ -1,5 +1,6 @@
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { Evenement, EvenementService } from '../../../src/domain/evenement'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { AuthorizeConseillerForJeunesTransferesTemporairement } from '../../../src/application/authorizers/authorize-conseiller-for-jeunes-transferes'
 import { AuthorizeListeDeDiffusion } from '../../../src/application/authorizers/authorize-liste-de-diffusion'
@@ -8,7 +9,10 @@ import {
   UpdateListeDeDiffusionCommandHandler
 } from '../../../src/application/commands/update-liste-de-diffusion.command.handler'
 import { createSandbox } from 'sinon'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../fixtures/authentification.fixture'
 import {
   emptySuccess,
   failure,
@@ -23,6 +27,7 @@ describe('UpdateListeDeDiffusionCommandHandler', () => {
   let listeDeDiffusionService: StubbedClass<Conseiller.ListeDeDiffusion.Service>
   let authorizerJeunes: StubbedClass<AuthorizeConseillerForJeunesTransferesTemporairement>
   let authorizerListe: StubbedClass<AuthorizeListeDeDiffusion>
+  let evenementService: StubbedClass<EvenementService>
   let handler: UpdateListeDeDiffusionCommandHandler
 
   beforeEach(() => {
@@ -32,11 +37,13 @@ describe('UpdateListeDeDiffusionCommandHandler', () => {
       AuthorizeConseillerForJeunesTransferesTemporairement
     )
     authorizerListe = stubClass(AuthorizeListeDeDiffusion)
+    evenementService = stubClass(EvenementService)
     handler = new UpdateListeDeDiffusionCommandHandler(
       authorizerJeunes,
       authorizerListe,
       listeDeDiffusionRepository,
-      listeDeDiffusionService
+      listeDeDiffusionService,
+      evenementService
     )
   })
 
@@ -114,6 +121,22 @@ describe('UpdateListeDeDiffusionCommandHandler', () => {
 
       // Then
       expect(isSuccess(result)).to.be.true()
+    })
+  })
+
+  describe('monitor', () => {
+    it("créé l'événement idoine", async () => {
+      // Given
+      const utilisateur = unUtilisateurJeune()
+
+      // When
+      await handler.monitor(utilisateur)
+
+      // Then
+      expect(evenementService.creer).to.have.been.calledOnceWithExactly(
+        Evenement.Code.LISTE_DIFFUSION_MODIFIEE,
+        utilisateur
+      )
     })
   })
 })
