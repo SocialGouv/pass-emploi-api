@@ -74,7 +74,7 @@ export class MiloRendezVousHttpRepository implements MiloRendezVous.Repository {
       return emptySuccess()
     } catch (e) {
       this.logger.error(e)
-      return failure(new ErreurHttp(e.response.data, e.response.status))
+      return failure(new ErreurHttp(e.response?.data, e.response.status))
     }
   }
 
