@@ -6,7 +6,13 @@ import {
   JeuneNonLieAuConseillerError,
   MauvaiseCommandeError
 } from '../../building-blocks/types/domain-error'
-import { failure, Result, success } from '../../building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  isFailure,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import { IdService } from '../../utils/id-service'
 import { Conseiller } from '../conseiller/conseiller'
 import { Jeune } from '../jeune/jeune'
@@ -201,11 +207,16 @@ export namespace RendezVous {
     )
   }
 
-  export function estUnTypeCEJ(type?: string): boolean {
-    return (
-      type !== CodeTypeRendezVous.SESSION_MILO &&
-      type !== CodeTypeRendezVous.RENDEZ_VOUS_MILO
-    )
+  function verifierAgenceJeunes(
+    jeunes: JeuneDuRendezVous[],
+    idAgence: string
+  ): Result {
+    for (const jeune of jeunes) {
+      if (jeune.conseiller?.idAgence !== idAgence) {
+        return failure(new JeuneNonLieALAgenceError(jeune.id, idAgence))
+      }
+    }
+    return emptySuccess()
   }
 
   @Injectable()
@@ -217,50 +228,55 @@ export namespace RendezVous {
       jeunes: Jeune[],
       conseiller: Conseiller
     ): Result<RendezVous> {
-      if (!estUnTypeCEJ(infosRendezVousACreer.type)) {
-        return failure(
-          new MauvaiseCommandeError('Le type de rendez-vous est invalide')
-        )
-      }
+      const type = infosRendezVousACreer.type
+        ? (infosRendezVousACreer.type as CodeTypeRendezVous)
+        : CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
+      const categorie = mapCodeCategorieTypeRendezVous[type]
+      let idAgence = undefined
 
-      if (RendezVous.estUnTypeAnimationCollective(infosRendezVousACreer.type)) {
-        if (
-          infosRendezVousACreer.nombreMaxParticipants &&
-          infosRendezVousACreer.nombreMaxParticipants < jeunes.length
-        ) {
+      switch (categorie) {
+        case CategorieRendezVous.MILO:
           return failure(
-            new MauvaiseCommandeError(
-              'Le nombre de participants ne peut excéder la limite renseignée.'
-            )
+            new MauvaiseCommandeError('Le type de rendez-vous est invalide')
           )
-        }
-        if (!conseiller.agence?.id) {
-          return failure(new ConseillerSansAgenceError(conseiller.id))
-        }
-      } else {
-        if (infosRendezVousACreer.nombreMaxParticipants) {
-          return failure(
-            new MauvaiseCommandeError(
-              'Le champ nombreMaxParticipants ne concerne que les animations collectives.'
-            )
-          )
-        }
-      }
-
-      for (const jeune of jeunes) {
-        if (
-          RendezVous.estUnTypeAnimationCollective(infosRendezVousACreer.type)
-        ) {
-          if (jeune.conseiller?.idAgence !== conseiller.agence?.id) {
+        case CategorieRendezVous.CEJ_AC:
+          if (
+            infosRendezVousACreer.nombreMaxParticipants &&
+            infosRendezVousACreer.nombreMaxParticipants < jeunes.length
+          ) {
             return failure(
-              new JeuneNonLieALAgenceError(jeune.id, conseiller.agence!.id!)
+              new MauvaiseCommandeError(
+                'Le nombre de participants ne peut excéder la limite renseignée.'
+              )
             )
           }
-        } else if (jeune.conseiller?.id !== conseiller.id) {
-          return failure(
-            new JeuneNonLieAuConseillerError(conseiller.id, jeune.id)
+          idAgence = conseiller.agence?.id
+          if (!idAgence) {
+            return failure(new ConseillerSansAgenceError(conseiller.id))
+          }
+          const resultVerificationAgence = verifierAgenceJeunes(
+            jeunes,
+            idAgence
           )
-        }
+          if (isFailure(resultVerificationAgence)) {
+            return resultVerificationAgence
+          }
+          break
+        case CategorieRendezVous.CEJ_RDV:
+          if (infosRendezVousACreer.nombreMaxParticipants) {
+            return failure(
+              new MauvaiseCommandeError(
+                'Le champ nombreMaxParticipants ne concerne que les animations collectives.'
+              )
+            )
+          }
+          for (const jeune of jeunes) {
+            if (jeune.conseiller?.id !== conseiller.id) {
+              return failure(
+                new JeuneNonLieAuConseillerError(conseiller.id, jeune.id)
+              )
+            }
+          }
       }
 
       return success({
@@ -273,9 +289,7 @@ export namespace RendezVous {
         jeunes: jeunes,
         titre: infosRendezVousACreer.titre ?? 'Rendez-vous conseiller',
         sousTitre: `avec ${conseiller.firstName}`,
-        type: infosRendezVousACreer.type
-          ? (infosRendezVousACreer.type as CodeTypeRendezVous)
-          : CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+        type,
         precision: infosRendezVousACreer.precision,
         adresse: infosRendezVousACreer.adresse,
         organisme: infosRendezVousACreer.organisme,
@@ -289,9 +303,7 @@ export namespace RendezVous {
           nom: conseiller.lastName,
           prenom: conseiller.firstName
         },
-        idAgence: estUnTypeAnimationCollective(infosRendezVousACreer.type)
-          ? conseiller.agence?.id
-          : undefined,
+        idAgence,
         nombreMaxParticipants: infosRendezVousACreer.nombreMaxParticipants
       })
     }
@@ -303,61 +315,67 @@ export namespace RendezVous {
       rendezVousInitial: RendezVous,
       infosRendezVousAMettreAJour: InfosRendezVousAMettreAJour
     ): Result<RendezVous> {
-      if (RendezVous.estUnTypeAnimationCollective(rendezVousInitial.type)) {
-        if (RendezVous.AnimationCollective.estCloturee(rendezVousInitial)) {
-          return failure(
-            new MauvaiseCommandeError(
-              'Une Animation Collective clôturée ne peut plus être modifiée.'
-            )
-          )
-        }
-        if (
-          infosRendezVousAMettreAJour.nombreMaxParticipants &&
-          infosRendezVousAMettreAJour.nombreMaxParticipants <
-            infosRendezVousAMettreAJour.jeunes.length
-        ) {
-          return failure(
-            new MauvaiseCommandeError(
-              'Le nombre de participants ne peut excéder la limite renseignée.'
-            )
-          )
-        }
-        if (rendezVousInitial.idAgence) {
-          for (const jeune of infosRendezVousAMettreAJour.jeunes) {
-            if (jeune.conseiller?.idAgence !== rendezVousInitial.idAgence) {
-              return failure(
-                new JeuneNonLieALAgenceError(
-                  jeune.id,
-                  rendezVousInitial.idAgence
-                )
+      const categorie = mapCodeCategorieTypeRendezVous[rendezVousInitial.type]
+
+      switch (categorie) {
+        case CategorieRendezVous.CEJ_AC:
+          if (RendezVous.AnimationCollective.estCloturee(rendezVousInitial)) {
+            return failure(
+              new MauvaiseCommandeError(
+                'Une Animation Collective clôturée ne peut plus être modifiée.'
               )
+            )
+          }
+          if (
+            infosRendezVousAMettreAJour.nombreMaxParticipants &&
+            infosRendezVousAMettreAJour.nombreMaxParticipants <
+              infosRendezVousAMettreAJour.jeunes.length
+          ) {
+            return failure(
+              new MauvaiseCommandeError(
+                'Le nombre de participants ne peut excéder la limite renseignée.'
+              )
+            )
+          }
+          if (rendezVousInitial.idAgence) {
+            const resultVerificationAgence = verifierAgenceJeunes(
+              infosRendezVousAMettreAJour.jeunes,
+              rendezVousInitial.idAgence
+            )
+            if (isFailure(resultVerificationAgence)) {
+              return resultVerificationAgence
             }
           }
-        }
-      } else {
-        if (infosRendezVousAMettreAJour.jeunes.length === 0) {
-          return failure(
-            new MauvaiseCommandeError('Un bénéficiaire minimum est requis.')
-          )
-        }
-        if (
-          !infosRendezVousAMettreAJour.presenceConseiller &&
-          rendezVousInitial.type ===
-            CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
-        ) {
-          return failure(
-            new MauvaiseCommandeError(
-              'Le champ presenceConseiller ne peut être modifié pour un rendez-vous Conseiller.'
+          break
+        case CategorieRendezVous.CEJ_RDV:
+          if (infosRendezVousAMettreAJour.jeunes.length === 0) {
+            return failure(
+              new MauvaiseCommandeError('Un bénéficiaire minimum est requis.')
             )
-          )
-        }
-        if (infosRendezVousAMettreAJour.nombreMaxParticipants) {
-          return failure(
-            new MauvaiseCommandeError(
-              'Le champ nombreMaxParticipants ne concerne que les animations collectives.'
+          }
+          if (
+            !infosRendezVousAMettreAJour.presenceConseiller &&
+            rendezVousInitial.type ===
+              CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
+          ) {
+            return failure(
+              new MauvaiseCommandeError(
+                'Le champ presenceConseiller ne peut être modifié pour un rendez-vous Conseiller.'
+              )
             )
+          }
+          if (infosRendezVousAMettreAJour.nombreMaxParticipants) {
+            return failure(
+              new MauvaiseCommandeError(
+                'Le champ nombreMaxParticipants ne concerne que les animations collectives.'
+              )
+            )
+          }
+          break
+        case CategorieRendezVous.MILO:
+          return failure(
+            new MauvaiseCommandeError('Le type de rendez-vous est invalide')
           )
-        }
       }
 
       return success({

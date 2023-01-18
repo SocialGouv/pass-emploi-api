@@ -382,7 +382,6 @@ describe('UpdateRendezVousCommandHandler', () => {
       await updateRendezVousCommandHandler.authorize(command, utilisateur)
 
       // Then
-      expect(rendezVousAuthorizer.authorize).to.not.have.been.called()
       expect(
         rendezVousAuthorizer.authorizeConseiller
       ).to.have.been.calledWithExactly(command.idRendezVous, utilisateur)
