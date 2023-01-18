@@ -6,7 +6,7 @@ import {
 import { IdService } from 'src/utils/id-service'
 import { unConseiller } from 'test/fixtures/conseiller.fixture'
 import { uneDatetime } from 'test/fixtures/date.fixture'
-import { unJeune } from 'test/fixtures/jeune.fixture'
+import { unConseillerDuJeune, unJeune } from 'test/fixtures/jeune.fixture'
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { failure, isSuccess } from '../../../src/building-blocks/types/result'
 import {
@@ -297,6 +297,31 @@ describe('Rendez-vous', () => {
             // Then
             expect(!result._isSuccess && result.error).to.be.an.instanceOf(
               MauvaiseCommandeError
+            )
+          })
+        })
+        describe("quand un des jeunes n'appartient pas à l'agence", () => {
+          it('rejette', () => {
+            // Given
+            const unAtelier = unRendezVous({
+              type: CodeTypeRendezVous.ATELIER,
+              idAgence: '1'
+            })
+
+            // When
+            const result = service.mettreAJour(unAtelier, {
+              ...unAtelier,
+              date: '2020-04-06T12:00:00.000Z',
+              jeunes: [
+                unJeuneDuRendezVous({
+                  conseiller: unConseillerDuJeune({ idAgence: '2' })
+                })
+              ]
+            })
+
+            // Then
+            expect(!result._isSuccess && result.error).to.be.an.instanceOf(
+              JeuneNonLieALAgenceError
             )
           })
         })

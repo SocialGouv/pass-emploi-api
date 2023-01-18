@@ -300,6 +300,18 @@ export namespace RendezVous {
             )
           )
         }
+        if (rendezVousInitial.idAgence) {
+          for (const jeune of infosRendezVousAMettreAJour.jeunes) {
+            if (jeune.conseiller?.idAgence !== rendezVousInitial.idAgence) {
+              return failure(
+                new JeuneNonLieALAgenceError(
+                  jeune.id,
+                  rendezVousInitial.idAgence
+                )
+              )
+            }
+          }
+        }
       } else {
         if (infosRendezVousAMettreAJour.jeunes.length === 0) {
           return failure(
