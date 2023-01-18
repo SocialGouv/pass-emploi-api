@@ -14,6 +14,7 @@ import {
 } from '../../dto/milo.dto'
 import { MiloRendezVous } from '../../../../domain/partenaire/milo/milo.rendez-vous'
 import { RateLimiterService } from '../../../../utils/rate-limiter.service'
+import { ErreurHttp } from '../../../../building-blocks/types/domain-error'
 
 @Injectable()
 export class MiloRendezVousHttpRepository implements MiloRendezVous.Repository {
@@ -73,6 +74,9 @@ export class MiloRendezVousHttpRepository implements MiloRendezVous.Repository {
       return emptySuccess()
     } catch (e) {
       this.logger.error(e)
+      if (e.response) {
+        return failure(new ErreurHttp(e.response.data, e.response.status))
+      }
       return failure(e)
     }
   }
