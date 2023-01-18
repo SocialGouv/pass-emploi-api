@@ -3011,9 +3011,9 @@
   },
   {
     "id": 450,
-    "nom_agence": "77 - Mission Locale Des Portes De La Brie",
+    "nom_agence": "94 - Mission Locale Des Portes De La Brie",
     "nom_region": "Île-de-France",
-    "code_departement": 77,
+    "code_departement": 94,
     "structure": "MILO"
   },
   {
@@ -3151,9 +3151,9 @@
   },
   {
     "id": 1364,
-    "nom_agence": "69 - Mission Locale Saint Martin D'Hères",
+    "nom_agence": "38 - Mission Locale Saint Martin D'Hères",
     "nom_region": "Auvergne-Rhône-Alpes",
-    "code_departement": 69,
+    "code_departement": 38,
     "structure": "MILO"
   },
   {
