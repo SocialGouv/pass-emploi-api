@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { emptySuccess, Result } from '../../../building-blocks/types/result'
 import {
+  CategorieRendezVous,
   CodeTypeRendezVous,
+  mapCodeCategorieTypeRendezVous,
   mapCodeLabelTypeRendezVous
 } from '../../../domain/rendez-vous/rendez-vous'
 import { Query } from '../../../building-blocks/types/query'
@@ -19,14 +21,14 @@ export class GetTypesRendezVousQueryHandler extends QueryHandler<
 
   async handle(_query: Query): Promise<TypeRendezVousQueryModel[]> {
     return Object.values(CodeTypeRendezVous)
-      .filter(
-        code =>
-          code !== CodeTypeRendezVous.RENDEZ_VOUS_MILO &&
-          code !== CodeTypeRendezVous.SESSION_MILO
-      )
       .map(code => {
-        return { code, label: mapCodeLabelTypeRendezVous[code] }
+        return {
+          code,
+          categorie: mapCodeCategorieTypeRendezVous[code],
+          label: mapCodeLabelTypeRendezVous[code]
+        }
       })
+      .filter(type => type.categorie !== CategorieRendezVous.MILO)
   }
 
   async authorize(): Promise<Result> {

@@ -28,6 +28,28 @@ export enum CodeTypeRendezVous {
   SESSION_MILO = 'SESSION_MILO'
 }
 
+export enum CategorieRendezVous {
+  CEJ_RDV = 'CEJ_RDV',
+  CEJ_AC = 'CEJ_AC',
+  MILO = 'MILO'
+}
+
+export const mapCodeCategorieTypeRendezVous: Record<
+  CodeTypeRendezVous,
+  CategorieRendezVous
+> = {
+  ACTIVITE_EXTERIEURES: CategorieRendezVous.CEJ_RDV,
+  ATELIER: CategorieRendezVous.CEJ_AC,
+  ENTRETIEN_INDIVIDUEL_CONSEILLER: CategorieRendezVous.CEJ_RDV,
+  ENTRETIEN_PARTENAIRE: CategorieRendezVous.CEJ_RDV,
+  INFORMATION_COLLECTIVE: CategorieRendezVous.CEJ_AC,
+  VISITE: CategorieRendezVous.CEJ_RDV,
+  PRESTATION: CategorieRendezVous.CEJ_RDV,
+  AUTRE: CategorieRendezVous.CEJ_RDV,
+  RENDEZ_VOUS_MILO: CategorieRendezVous.MILO,
+  SESSION_MILO: CategorieRendezVous.MILO
+}
+
 export const mapCodeLabelTypeRendezVous: Record<CodeTypeRendezVous, string> = {
   ACTIVITE_EXTERIEURES: 'Activités extérieures',
   ATELIER: 'Atelier',
