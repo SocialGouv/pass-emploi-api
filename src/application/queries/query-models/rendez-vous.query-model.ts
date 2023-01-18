@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
+  CategorieRendezVous,
   CodeTypeRendezVous,
   mapCodeLabelTypeRendezVous,
   RendezVous,
@@ -240,6 +241,8 @@ export class RendezVousConseillerFutursEtPassesQueryModel {
 export class TypeRendezVousQueryModel implements TypeRendezVous {
   @ApiProperty()
   code: CodeTypeRendezVous
+  @ApiProperty()
+  categorie: CategorieRendezVous
   @ApiProperty()
   label: string
 }
