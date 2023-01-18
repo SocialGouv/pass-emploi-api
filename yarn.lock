@@ -5243,9 +5243,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"elastic-apm-http-client@npm:11.0.4":
-  version: 11.0.4
-  resolution: "elastic-apm-http-client@npm:11.0.4"
+"elastic-apm-http-client@npm:11.2.0":
+  version: 11.2.0
+  resolution: "elastic-apm-http-client@npm:11.2.0"
   dependencies:
     agentkeepalive: ^4.2.1
     breadth-filter: ^2.0.0
@@ -5256,13 +5256,13 @@ __metadata:
     readable-stream: ^3.4.0
     semver: ^6.3.0
     stream-chopper: ^3.0.1
-  checksum: 2e8d4ea2b3f6ba35295789d2a9315fb31f86b4de196ca4635ae13646105853ee8ebacefd3f7af0bf70c8a0fef2e3d383e5add8c9c30a71fac23804e4826c55c8
+  checksum: 6177e836202a6cfb2d68106aff68cdfa04eb75ad973a7b26a3d2cc985f92c1e747fb78aeb1937fece4f417901e4147848fb40be428ac9be8e909e86aece8e738
   languageName: node
   linkType: hard
 
-"elastic-apm-node@npm:3.41.1":
-  version: 3.41.1
-  resolution: "elastic-apm-node@npm:3.41.1"
+"elastic-apm-node@npm:3.42.0":
+  version: 3.42.0
+  resolution: "elastic-apm-node@npm:3.42.0"
   dependencies:
     "@elastic/ecs-pino-format": ^1.2.0
     "@opentelemetry/api": ^1.1.0
@@ -5272,7 +5272,8 @@ __metadata:
     basic-auth: ^2.0.1
     cookie: ^0.5.0
     core-util-is: ^1.0.2
-    elastic-apm-http-client: 11.0.4
+    debug: ^4.1.1
+    elastic-apm-http-client: 11.2.0
     end-of-stream: ^1.4.4
     error-callsites: ^2.0.4
     error-stack-parser: ^2.0.6
@@ -5282,13 +5283,14 @@ __metadata:
     is-native: ^1.0.1
     lru-cache: ^6.0.0
     measured-reporting: ^1.51.1
+    module-details-from-path: ^1.0.3
     monitor-event-loop-delay: ^1.0.0
     object-filter-sequence: ^1.0.0
     object-identity-map: ^1.0.2
     original-url: ^1.2.3
     pino: ^6.11.2
     relative-microtime: ^2.0.0
-    require-in-the-middle: ^5.2.0
+    resolve: ^1.22.1
     semver: ^6.3.0
     set-cookie-serde: ^1.0.0
     shallow-clone-shim: ^2.0.0
@@ -5296,7 +5298,7 @@ __metadata:
     sql-summary: ^1.0.1
     traverse: ^0.6.6
     unicode-byte-truncate: ^1.0.0
-  checksum: dd594ea7da429fba48e3c127fb8a28d7659bce2b54e1dc81573324ba9dbfe099248c8f7045e7556567c5dd6db42457be30b9c2171abdb604ead4d9ff2a5fd1c5
+  checksum: 1cc75dac631ae3463115a4a760855810d54b4116670ad1dbbcaa910aff1f4a28e07290ee8486c263b0ee80f53261d0140fe92cf2092faf576fff13813d7fd8d4
   languageName: node
   linkType: hard
 
@@ -9195,7 +9197,7 @@ __metadata:
     dirty-chai: ^2.0.1
     dotenv-cli: ^6.0.0
     dotvault: ^0.0.9
-    elastic-apm-node: 3.41.1
+    elastic-apm-node: 3.42.0
     eslint: 8.32.0
     eslint-config-prettier: ^8.5.0
     eslint-plugin-chai-friendly: ^0.7.2
@@ -10781,17 +10783,6 @@ __metadata:
   version: 2.0.2
   resolution: "require-from-string@npm:2.0.2"
   checksum: a03ef6895445f33a4015300c426699bc66b2b044ba7b670aa238610381b56d3f07c686251740d575e22f4c87531ba662d06937508f0f3c0f1ddc04db3130560b
-  languageName: node
-  linkType: hard
-
-"require-in-the-middle@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "require-in-the-middle@npm:5.2.0"
-  dependencies:
-    debug: ^4.1.1
-    module-details-from-path: ^1.0.3
-    resolve: ^1.22.1
-  checksum: 20bfdc0e9794ba10891867b2a7696bd4d189ef9dfd58196c06353ea57408f8cd29baa56a962ce4512de01aa679491f814d73e8d17cfe756cb294ebb4a16c64e0
   languageName: node
   linkType: hard
 
