@@ -134,7 +134,8 @@ export function fromSqlToRendezVousConseillerDetailQueryModel(
         date: log.date.toISOString(),
         auteur: log.auteur
       }
-    })
+    }),
+    nombreMaxParticipants: rendezVousSql.nombreMaxParticipants ?? undefined
   }
 
   if (RendezVous.estUnTypeAnimationCollective(rendezVousSql.type)) {

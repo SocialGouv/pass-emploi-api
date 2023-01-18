@@ -28,6 +28,33 @@ import { DateService } from '../../../src/utils/date-service'
 import { DateTime } from 'luxon'
 import { getDatabase } from '../../utils/database-for-testing'
 
+const queryModel: RendezVousConseillerDetailQueryModel = {
+  adresse: undefined,
+  comment: 'commentaire',
+  createur: {
+    id: '1',
+    nom: 'Tavernier',
+    prenom: 'Nils'
+  },
+  date: uneDatetime().toJSDate(),
+  duration: 30,
+  id: 'fake',
+  jeunes: [],
+  modality: 'modalite',
+  organisme: undefined,
+  precision: undefined,
+  presenceConseiller: true,
+  invitation: false,
+  title: 'UN RENDEZ VOUS',
+  historique: [],
+  type: {
+    code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
+    label: 'Entretien individuel conseiller'
+  },
+  source: RendezVous.Source.PASS_EMPLOI,
+  nombreMaxParticipants: undefined
+}
+
 describe('GetDetailRendezVousQueryHandler', () => {
   let getDetailRendezVousQueryHandler: GetDetailRendezVousQueryHandler
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
@@ -88,34 +115,15 @@ describe('GetDetailRendezVousQueryHandler', () => {
 
         // Then
         const data: RendezVousConseillerDetailQueryModel = {
-          adresse: undefined,
-          comment: 'commentaire',
-          createur: {
-            id: '1',
-            nom: 'Tavernier',
-            prenom: 'Nils'
-          },
-          date: uneDatetime().toJSDate(),
-          duration: 30,
+          ...queryModel,
           id: unRendezVous.id,
-          jeunes: [],
-          modality: 'modalite',
-          organisme: undefined,
-          precision: undefined,
-          presenceConseiller: true,
-          invitation: false,
-          title: 'UN RENDEZ VOUS',
-          historique: [],
-          type: {
-            code: CodeTypeRendezVous.ATELIER,
-            label: 'Atelier'
-          },
-          statut: RendezVous.AnimationCollective.Statut.A_CLOTURER,
-          source: RendezVous.Source.PASS_EMPLOI
+          type: { code: CodeTypeRendezVous.ATELIER, label: 'Atelier' },
+          statut: RendezVous.AnimationCollective.Statut.A_CLOTURER
         }
+
         expect(result).to.deep.equal(success(data))
       })
-      it('retourne le rdv quand il y a un jeune participant', async () => {
+      it('retourne le rdv quand il y a un jeune participant avec nombre max', async () => {
         // Given
         const jeune = unJeune()
         await ConseillerSqlModel.creer(unConseillerDto())
@@ -123,7 +131,8 @@ describe('GetDetailRendezVousQueryHandler', () => {
 
         const unRendezVous = unRendezVousDto({
           date: uneDatetime().toJSDate(),
-          titre: 'UN RENDEZ VOUS'
+          titre: 'UN RENDEZ VOUS',
+          nombreMaxParticipants: 10
         })
 
         await RendezVousSqlModel.create({
@@ -142,15 +151,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
 
         // Then
         const data: RendezVousConseillerDetailQueryModel = {
-          adresse: undefined,
-          comment: 'commentaire',
-          createur: {
-            id: '1',
-            nom: 'Tavernier',
-            prenom: 'Nils'
-          },
-          date: uneDatetime().toJSDate(),
-          duration: 30,
+          ...queryModel,
           id: unRendezVous.id,
           jeunes: [
             {
@@ -160,18 +161,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
               futPresent: undefined
             }
           ],
-          modality: 'modalite',
-          organisme: undefined,
-          precision: undefined,
-          presenceConseiller: true,
-          invitation: false,
-          historique: [],
-          title: 'UN RENDEZ VOUS',
-          type: {
-            code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
-            label: 'Entretien individuel conseiller'
-          },
-          source: RendezVous.Source.PASS_EMPLOI
+          nombreMaxParticipants: 10
         }
         expect(result).to.deep.equal(success(data))
       })
@@ -212,15 +202,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
 
         // Then
         const data: RendezVousConseillerDetailQueryModel = {
-          adresse: undefined,
-          comment: 'commentaire',
-          createur: {
-            id: '1',
-            nom: 'Tavernier',
-            prenom: 'Nils'
-          },
-          date: uneDatetime().toJSDate(),
-          duration: 30,
+          ...queryModel,
           id: unRendezVous.id,
           jeunes: [
             {
@@ -235,19 +217,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
               prenom: 'John',
               futPresent: undefined
             }
-          ],
-          modality: 'modalite',
-          organisme: undefined,
-          precision: undefined,
-          presenceConseiller: true,
-          invitation: false,
-          title: 'UN RENDEZ VOUS',
-          historique: [],
-          type: {
-            code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
-            label: 'Entretien individuel conseiller'
-          },
-          source: RendezVous.Source.PASS_EMPLOI
+          ]
         }
         expect(result).to.deep.equal(success(data))
       })
@@ -302,15 +272,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
 
         // Then
         const data: RendezVousConseillerDetailQueryModel = {
-          adresse: undefined,
-          comment: 'commentaire',
-          createur: {
-            id: '1',
-            nom: 'Tavernier',
-            prenom: 'Nils'
-          },
-          date: uneDatetime().toJSDate(),
-          duration: 30,
+          ...queryModel,
           id: unRendezVous.id,
           jeunes: [
             {
@@ -325,19 +287,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
               prenom: 'John',
               futPresent: undefined
             }
-          ],
-          modality: 'modalite',
-          organisme: undefined,
-          precision: undefined,
-          presenceConseiller: true,
-          invitation: false,
-          title: 'UN RENDEZ VOUS',
-          historique: [],
-          type: {
-            code: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER,
-            label: 'Entretien individuel conseiller'
-          },
-          source: RendezVous.Source.PASS_EMPLOI
+          ]
         }
         expect(result).to.deep.equal(success(data))
       })
@@ -433,16 +383,10 @@ describe('GetDetailRendezVousQueryHandler', () => {
 
         // Then
         const data: RendezVousConseillerDetailQueryModel = {
-          adresse: undefined,
-          comment: 'commentaire',
-          createur: {
-            id: '1',
-            nom: 'Tavernier',
-            prenom: 'Nils'
-          },
-          date: DateTime.fromJSDate(maintenant).minus({ days: 2 }).toJSDate(),
-          duration: 30,
+          ...queryModel,
           id: unAtelierCloture.id,
+          title: 'UN ATELIER DE FOU',
+          date: DateTime.fromJSDate(maintenant).minus({ days: 2 }).toJSDate(),
           jeunes: [
             {
               id: 'jeune-1',
@@ -457,19 +401,11 @@ describe('GetDetailRendezVousQueryHandler', () => {
               futPresent: false
             }
           ],
-          modality: 'modalite',
-          organisme: undefined,
-          precision: undefined,
-          presenceConseiller: true,
-          invitation: false,
-          title: 'UN ATELIER DE FOU',
-          historique: [],
           statut: RendezVous.AnimationCollective.Statut.CLOTUREE,
           type: {
             code: CodeTypeRendezVous.ATELIER,
             label: 'Atelier'
-          },
-          source: RendezVous.Source.PASS_EMPLOI
+          }
         }
         expect(result).to.deep.equal(success(data))
       })

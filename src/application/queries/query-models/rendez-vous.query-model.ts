@@ -213,6 +213,9 @@ export class RendezVousConseillerDetailQueryModel extends RendezVousConseillerQu
     isArray: true
   })
   historique?: LogModificationRendezVousQueryModel[]
+
+  @ApiPropertyOptional()
+  nombreMaxParticipants?: number
 }
 
 export class RendezVousJeuneDetailQueryModel extends RendezVousJeuneQueryModel {
