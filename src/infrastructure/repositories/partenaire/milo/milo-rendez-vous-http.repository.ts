@@ -2,7 +2,6 @@ import { HttpService } from '@nestjs/axios'
 import { HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
-import { ErreurHttp } from '../../../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
@@ -74,7 +73,7 @@ export class MiloRendezVousHttpRepository implements MiloRendezVous.Repository {
       return emptySuccess()
     } catch (e) {
       this.logger.error(e)
-      return failure(new ErreurHttp(e.response?.data, e.response.status))
+      return failure(e)
     }
   }
 
