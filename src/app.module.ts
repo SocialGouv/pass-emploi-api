@@ -300,6 +300,7 @@ import {
 } from './domain/partenaire/milo/milo.rendez-vous'
 import { MiloJeuneRepositoryToken } from './domain/partenaire/milo/milo.jeune'
 import { HandleJobFakeCommandHandler } from './application/commands/jobs/handle-job-fake.command'
+import { MettreAJourLesJeunesCejPeCommandHandler } from './application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -665,7 +666,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     DeleteListeDeDiffusionCommandHandler,
     GetDetailListeDeDiffusionQueryHandler,
     RefreshJddCommandHandler,
-    EnvoyerMessageGroupeCommandHandler
+    EnvoyerMessageGroupeCommandHandler,
+    MettreAJourLesJeunesCejPeCommandHandler
   ]
 }
 
