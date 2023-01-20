@@ -1,5 +1,5 @@
-elasticdump \
---input=ELASTIC_URL \
+npx elasticdump \
+--input=ELASTIC_DUMP_URL \
 --output=data-migrations/logs-elastic-offset.json \
 --type=data \
 --searchBody=@data-migrations/requete-elastic.json \

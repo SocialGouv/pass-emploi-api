@@ -41,7 +41,7 @@ lineReader.on('line', function (line) {
             FROM (
                 VALUES ${updateSqlString}
             ) AS jeune_updated(id,timezone)
-        WHERE jeune.id = jeune_updated.id;
+        WHERE jeune.id = jeune_updated.id AND jeune.timezone IS NULL;
     `)
     bufferUpdate = []
   }
