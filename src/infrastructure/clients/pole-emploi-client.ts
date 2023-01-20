@@ -4,6 +4,14 @@ import { ConfigService } from '@nestjs/config'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { DateTime } from 'luxon'
 import { firstValueFrom } from 'rxjs'
+import { ErreurHttp } from '../../building-blocks/types/domain-error'
+import {
+  failure,
+  isFailure,
+  isSuccess,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import { Notification } from '../../domain/notification/notification'
 import { desTypeDemarchesDtosMock } from '../../fixtures/types-demarches.fixture'
 import { DateService } from '../../utils/date-service'
@@ -44,35 +52,45 @@ export class PoleEmploiClient {
 
   async getOffreEmploi(
     idOffreEmploi: string
-  ): Promise<OffreEmploiDto | undefined> {
-    const response = await this.get<OffreEmploiDto>(
+  ): Promise<Result<OffreEmploiDto | undefined>> {
+    const result = await this.get<OffreEmploiDto | undefined>(
       `offresdemploi/v2/offres/${idOffreEmploi}`
     )
-    if (response.status !== 200) {
-      return undefined
+    if (isSuccess(result)) {
+      return success(result.data.data)
     }
-    return response.data
+    if (result.error instanceof ErreurHttp && result.error.statusCode === 400) {
+      return success(undefined)
+    }
+    return result
   }
 
   async getOffresEmploi(
     params?: URLSearchParams
-  ): Promise<OffresEmploiDtoWithTotal> {
-    const response = await this.get<OffresEmploiDto | undefined>(
+  ): Promise<Result<OffresEmploiDtoWithTotal>> {
+    const result = await this.get<OffresEmploiDto | undefined>(
       'offresdemploi/v2/offres/search',
       params
     )
 
-    if (!response.data) {
-      return {
+    if (isFailure(result)) {
+      return result
+    }
+
+    const response = result.data
+
+    if (!response?.data) {
+      return success({
         total: 0,
         resultats: []
-      }
+      })
     }
 
     const { resultats } = response.data
+
     let total: number
     try {
-      const contentRange = response.headers['content-range']
+      const contentRange = result.data.headers['content-range']
       const totalGroup = contentRange.split('/')[1] // content-range: offres 0-149/716799
       total = parseInt(totalGroup, 10)
     } catch (error) {
@@ -86,7 +104,7 @@ export class PoleEmploiClient {
       total = resultats.length
     }
 
-    return { total, resultats }
+    return success({ total, resultats })
   }
 
   async getNotificationsRendezVous(
@@ -144,7 +162,17 @@ export class PoleEmploiClient {
     }
   }
 
-  async get<T>(suffixUrl: string, params?: unknown): Promise<AxiosResponse<T>> {
+  async get<T>(
+    suffixUrl: string,
+    params?: unknown,
+    secondesAAttendre?: number
+  ): Promise<Result<AxiosResponse<T>>> {
+    if (secondesAAttendre) {
+      await new Promise(resolve =>
+        setTimeout(resolve, secondesAAttendre * 1000)
+      )
+    }
+
     const token = await this.getToken()
     return firstValueFrom(
       this.httpService.get<T>(`${this.apiUrl}/${suffixUrl}`, {
@@ -152,6 +180,34 @@ export class PoleEmploiClient {
         headers: { Authorization: `Bearer ${token}` }
       })
     )
+      .then(res => success(res))
+      .catch(e => {
+        this.logger.error(e)
+
+        const estLePremierRetry = secondesAAttendre === undefined
+        if (
+          e.response?.status === 429 &&
+          estLePremierRetry &&
+          e.response?.headers &&
+          e.response?.headers['retry-after']
+        ) {
+          this.logger.log('Retry de la requête')
+          return this.get<T>(
+            suffixUrl,
+            params,
+            parseInt(e.response?.headers['retry-after'])
+          )
+        }
+
+        if (e.response?.status >= 400 && e.response?.status < 500) {
+          const erreur = new ErreurHttp(
+            e.response.data?.message ?? 'erreur',
+            e.response.status
+          )
+          return failure(erreur)
+        }
+        throw e
+      })
   }
 
   private async post<T>(

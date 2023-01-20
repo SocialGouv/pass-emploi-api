@@ -1,58 +1,44 @@
-import { Injectable, Logger } from '@nestjs/common'
-import { failure, Result, success } from '../../../building-blocks/types/result'
-import { OffresEmploiQueryModel } from '../query-models/offres-emploi.query-model'
+import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
+import { URLSearchParams } from 'url'
+import {
+  isSuccess,
+  Result,
+  success
+} from '../../../building-blocks/types/result'
+import { PoleEmploiClient } from '../../../infrastructure/clients/pole-emploi-client'
 import {
   toOffresEmploiQueryModel,
   toPoleEmploiContrat
 } from '../../../infrastructure/repositories/mappers/offres-emploi.mappers'
-import { ErreurHttp } from '../../../building-blocks/types/domain-error'
-import { PoleEmploiClient } from '../../../infrastructure/clients/pole-emploi-client'
-import { URLSearchParams } from 'url'
 import { DateService } from '../../../utils/date-service'
 import { GetOffresEmploiQuery } from '../get-offres-emploi.query.handler'
-import { DateTime } from 'luxon'
+import { OffresEmploiQueryModel } from '../query-models/offres-emploi.query-model'
 
 const DEFAULT_PAGE = 1
 const DEFAULT_LIMIT = 50
 
 @Injectable()
 export class FindAllOffresEmploiQueryGetter {
-  private logger: Logger
-
   constructor(
     private poleEmploiClient: PoleEmploiClient,
     private dateService: DateService
-  ) {
-    this.logger = new Logger('FindAllOffresEmploiQueryGetter')
-  }
+  ) {}
 
   async handle(
     query: GetOffresEmploiQuery
   ): Promise<Result<OffresEmploiQueryModel>> {
-    return this.trouverLesOffres(query)
-  }
+    const pageAvecDefault = query.page || DEFAULT_PAGE
+    const limitAvecDefault = query.limit || DEFAULT_LIMIT
+    const params = this.construireLesParams(
+      query,
+      pageAvecDefault,
+      limitAvecDefault
+    )
+    const result = await this.poleEmploiClient.getOffresEmploi(params)
 
-  private async trouverLesOffres(
-    criteres: GetOffresEmploiQuery,
-    secondesAAttendre?: number
-  ): Promise<Result<OffresEmploiQueryModel>> {
-    if (secondesAAttendre) {
-      await new Promise(resolve =>
-        setTimeout(resolve, secondesAAttendre * 1000)
-      )
-    }
-
-    try {
-      const pageAvecDefault = criteres.page || DEFAULT_PAGE
-      const limitAvecDefault = criteres.limit || DEFAULT_LIMIT
-      const params = this.construireLesParams(
-        criteres,
-        pageAvecDefault,
-        limitAvecDefault
-      )
-      const { total, resultats } = await this.poleEmploiClient.getOffresEmploi(
-        params
-      )
+    if (isSuccess(result)) {
+      const { total, resultats } = result.data
       return success(
         toOffresEmploiQueryModel(
           pageAvecDefault,
@@ -61,31 +47,8 @@ export class FindAllOffresEmploiQueryGetter {
           resultats
         )
       )
-    } catch (e) {
-      this.logger.error(e)
-      const cestLePremierAppel = !secondesAAttendre
-      if (
-        cestLePremierAppel &&
-        e.response?.status === 429 &&
-        e.response?.headers &&
-        e.response?.headers['retry-after']
-      ) {
-        this.logger.log('Retry de la requête')
-        return this.trouverLesOffres(
-          criteres,
-          parseInt(e.response?.headers['retry-after'])
-        )
-      }
-
-      if (e.response?.status >= 400 && e.response?.status < 500) {
-        const erreur = new ErreurHttp(
-          e.response.data?.message,
-          e.response.status
-        )
-        return failure(erreur)
-      }
-      return failure(e)
     }
+    return result
   }
 
   private construireLesParams(
