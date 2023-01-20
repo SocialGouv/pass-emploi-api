@@ -5,8 +5,7 @@ import {
   UploadedFile,
   UseInterceptors
 } from '@nestjs/common'
-import { ApiConsumes, ApiOAuth2, ApiProperty, ApiTags } from '@nestjs/swagger'
-import { IsBoolean, IsString } from 'class-validator'
+import { ApiConsumes, ApiOAuth2, ApiTags } from '@nestjs/swagger'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { Authentification } from '../../domain/authentification'
 import {
@@ -20,25 +19,22 @@ import {
   MettreAJourLesJeunesCejPeCommandHandler,
   MettreAJourLesJeunesCEJPoleEmploiCommand
 } from '../../application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
-import { TeleverserCsvPayload } from './validation/support.input'
-
-export class RefreshJDDPayload {
-  @ApiProperty()
-  @IsString()
-  idConseiller: string
-
-  @ApiProperty()
-  @IsBoolean()
-  menage: boolean
-}
+import {
+  ChangementAgencePayload,
+  RefreshJDDPayload,
+  TeleverserCsvPayload
+} from './validation/support.input'
+import { ChangerAgenceCommandHandler } from '../../application/commands/changer-agence.command.handler'
+import { ChangementAgenceQueryModel } from '../../application/queries/query-models/changement-agence.query-model'
 
 @ApiOAuth2([])
-@Controller()
+@Controller('support')
 @ApiTags('Support')
 export class SupportController {
   constructor(
     private refreshJddCommandHandler: RefreshJddCommandHandler,
-    private mettreAJourLesJeunesCejPeCommandHandler: MettreAJourLesJeunesCejPeCommandHandler
+    private mettreAJourLesJeunesCejPeCommandHandler: MettreAJourLesJeunesCejPeCommandHandler,
+    private changerAgenceCommandHandler: ChangerAgenceCommandHandler
   ) {}
 
   @Post('jdd')
@@ -77,5 +73,24 @@ export class SupportController {
     if (isFailure(result)) {
       return handleFailure(result)
     }
+  }
+
+  @Post('changement-agence')
+  async postChangementAgence(
+    @Body() payload: ChangementAgencePayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<ChangementAgenceQueryModel[]> {
+    const command: ChangementAgencePayload = {
+      idConseiller: payload.idConseiller,
+      idAgenceCible: payload.idAgenceCible
+    }
+    const result = await this.changerAgenceCommandHandler.execute(
+      command,
+      utilisateur
+    )
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
+    return result.data
   }
 }

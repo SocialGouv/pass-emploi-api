@@ -93,7 +93,7 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       conseillerCible.agence?.id &&
       conseillerCible.agence.id !== conseillerSource.agence.id
     ) {
-      await this.animationCollectiveService.desinscrire(
+      await this.animationCollectiveService.desinscrireDesAnimationsDuneAgence(
         command.idsJeunes,
         conseillerSource.agence.id
       )

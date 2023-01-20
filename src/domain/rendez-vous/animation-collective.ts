@@ -38,7 +38,13 @@ export namespace AnimationCollective {
   export interface Repository {
     get(idAnimationCollective: string): Promise<AnimationCollective | undefined>
 
-    getAllAVenir(idEtablissement: string): Promise<AnimationCollective[]>
+    getAllAVenirParEtablissement(
+      idEtablissement: string
+    ): Promise<AnimationCollective[]>
+
+    getAllNonClosesParEtablissement(
+      idEtablissement: string
+    ): Promise<AnimationCollective[]>
 
     save(animationCollective: AnimationCollective): Promise<void>
   }
@@ -51,15 +57,40 @@ export namespace AnimationCollective {
       private dateService: DateService
     ) {}
 
-    async desinscrire(idsJeunes: string[], idAgence: string): Promise<void> {
-      const animationsCollectives = await this.repository.getAllAVenir(idAgence)
+    async desinscrireDesAnimationsDuneAgence(
+      idsJeunes: string[],
+      idAgence: string
+    ): Promise<void> {
+      const animationsCollectives =
+        await this.repository.getAllAVenirParEtablissement(idAgence)
 
       for (const animationCollective of animationsCollectives) {
-        animationCollective.jeunes = animationCollective.jeunes.filter(
+        await this.desinscrire(animationCollective, idsJeunes)
+      }
+    }
+
+    async desinscrire(
+      animationCollective: AnimationCollective,
+      idsJeunes: string[]
+    ): Promise<void> {
+      const animationCollectiveMiseAJour = {
+        ...animationCollective,
+        jeunes: animationCollective.jeunes.filter(
           jeune => !idsJeunes.includes(jeune.id)
         )
-        await this.repository.save(animationCollective)
       }
+      await this.repository.save(animationCollectiveMiseAJour)
+    }
+
+    async mettreAJourEtablissement(
+      animationCollective: AnimationCollective,
+      idEtablissement: string
+    ): Promise<void> {
+      const animationCollectiveMiseAJour: AnimationCollective = {
+        ...animationCollective,
+        idAgence: idEtablissement
+      }
+      await this.repository.save(animationCollectiveMiseAJour)
     }
 
     cloturer(
