@@ -20,6 +20,7 @@ import {
   MettreAJourLesJeunesCejPeCommandHandler,
   MettreAJourLesJeunesCEJPoleEmploiCommand
 } from '../../application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
+import { TeleverserCsvPayload } from './validation/support.input'
 
 export class RefreshJDDPayload {
   @ApiProperty()
@@ -62,6 +63,7 @@ export class SupportController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('fichier'))
   async postFichierCEJ(
+    @Body() _payload: TeleverserCsvPayload,
     @UploadedFile() fichier: Express.Multer.File,
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<void> {
