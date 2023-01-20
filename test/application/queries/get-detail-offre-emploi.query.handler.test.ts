@@ -8,6 +8,15 @@ import {
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { Evenement, EvenementService } from '../../../src/domain/evenement'
+import {
+  failure,
+  Result,
+  success
+} from '../../../src/building-blocks/types/result'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
 
 describe('GetDetailOffreEmploiQueryHandler', () => {
   let getDetailOffreEmploiQueryHandler: GetDetailOffreEmploiQueryHandler
@@ -29,7 +38,7 @@ describe('GetDetailOffreEmploiQueryHandler', () => {
         // Given
         poleEmploiClient.getOffreEmploi
           .withArgs('id-offre')
-          .resolves(uneOffreEmploiDto())
+          .resolves(success(uneOffreEmploiDto()))
 
         // When
         const queryModel = await getDetailOffreEmploiQueryHandler.handle({
@@ -37,11 +46,11 @@ describe('GetDetailOffreEmploiQueryHandler', () => {
         })
 
         // Then
-        const expectedQueryModel: OffreEmploiQueryModel = {
+        const expectedQueryModel: Result<OffreEmploiQueryModel> = success({
           id: uneOffreEmploiDto().id,
           data: uneOffreEmploiDto(),
           urlRedirectPourPostulation: uneOffreEmploiDto().contact.urlPostulation
-        }
+        })
         expect(queryModel).to.deep.equal(expectedQueryModel)
       })
     })
@@ -49,13 +58,15 @@ describe('GetDetailOffreEmploiQueryHandler', () => {
       it('offre avec une un contact qui a une url de postulation doit renvoyer celle-ci', async () => {
         // Given
         const dto = uneOffreEmploiDto()
-        poleEmploiClient.getOffreEmploi.withArgs('id-offre').resolves({
-          ...dto,
-          contact: {
-            ...dto.contact,
-            urlPostulation: 'url/postulation'
-          }
-        })
+        poleEmploiClient.getOffreEmploi.withArgs('id-offre').resolves(
+          success({
+            ...dto,
+            contact: {
+              ...dto.contact,
+              urlPostulation: 'url/postulation'
+            }
+          })
+        )
 
         // When
         const queryModel = await getDetailOffreEmploiQueryHandler.handle({
@@ -63,24 +74,28 @@ describe('GetDetailOffreEmploiQueryHandler', () => {
         })
 
         // Then
-        expect(queryModel?.urlRedirectPourPostulation).to.equal(
-          'url/postulation'
-        )
+        expect(queryModel._isSuccess).to.be.true()
+        if (queryModel._isSuccess)
+          expect(queryModel.data.urlRedirectPourPostulation).to.equal(
+            'url/postulation'
+          )
       })
       it('offre avec un partenaire qui a une url doit renvoyer celle ci', async () => {
         // Given
         const dto = uneOffreEmploiDto()
-        poleEmploiClient.getOffreEmploi.withArgs('id-offre').resolves({
-          ...dto,
-          contact: {
-            ...dto.contact,
-            urlPostulation: ''
-          },
-          origineOffre: {
-            ...dto.origineOffre,
-            partenaires: [{ url: 'url/partenaire' }]
-          }
-        })
+        poleEmploiClient.getOffreEmploi.withArgs('id-offre').resolves(
+          success({
+            ...dto,
+            contact: {
+              ...dto.contact,
+              urlPostulation: ''
+            },
+            origineOffre: {
+              ...dto.origineOffre,
+              partenaires: [{ url: 'url/partenaire' }]
+            }
+          })
+        )
 
         // When
         const queryModel = await getDetailOffreEmploiQueryHandler.handle({
@@ -88,25 +103,29 @@ describe('GetDetailOffreEmploiQueryHandler', () => {
         })
 
         // Then
-        expect(queryModel?.urlRedirectPourPostulation).to.deep.equal(
-          'url/partenaire'
-        )
+        expect(queryModel._isSuccess).to.be.true()
+        if (queryModel._isSuccess)
+          expect(queryModel.data.urlRedirectPourPostulation).to.deep.equal(
+            'url/partenaire'
+          )
       })
       it("offre sans contact ni partenaire doit renvoyer l'url origine de l'offre", async () => {
         // Given
         const dto = uneOffreEmploiDto()
-        poleEmploiClient.getOffreEmploi.withArgs('id-offre').resolves({
-          ...dto,
-          contact: {
-            ...dto.contact,
-            urlPostulation: ''
-          },
-          origineOffre: {
-            ...dto.origineOffre,
-            partenaires: [],
-            urlOrigine: 'url/offre'
-          }
-        })
+        poleEmploiClient.getOffreEmploi.withArgs('id-offre').resolves(
+          success({
+            ...dto,
+            contact: {
+              ...dto.contact,
+              urlPostulation: ''
+            },
+            origineOffre: {
+              ...dto.origineOffre,
+              partenaires: [],
+              urlOrigine: 'url/offre'
+            }
+          })
+        )
 
         // When
         const queryModel = await getDetailOffreEmploiQueryHandler.handle({
@@ -114,19 +133,44 @@ describe('GetDetailOffreEmploiQueryHandler', () => {
         })
 
         // Then
-        expect(queryModel?.urlRedirectPourPostulation).to.equal('url/offre')
+        expect(queryModel._isSuccess).to.be.true()
+        if (queryModel._isSuccess)
+          expect(queryModel.data.urlRedirectPourPostulation).to.equal(
+            'url/offre'
+          )
       })
     })
 
     describe("quand l'offre n'existe pas", () => {
-      it('retourne undefined', async () => {
+      it('transmet la failure quand le client renvoie une failure', async () => {
+        // Given
+        poleEmploiClient.getOffreEmploi
+          .withArgs('id-offre')
+          .resolves(failure(new ErreurHttp('test', 401)))
+
         // When
         const queryModel = await getDetailOffreEmploiQueryHandler.handle({
           idOffreEmploi: 'id-offre'
         })
 
         // Then
-        expect(queryModel).to.be.undefined()
+        expect(queryModel).to.deep.equal(failure(new ErreurHttp('test', 401)))
+      })
+      it('renvoie une failure NonTrouvé quand le client renvoie un résultat sans contenu', async () => {
+        // Given
+        poleEmploiClient.getOffreEmploi
+          .withArgs('id-offre')
+          .resolves(success(undefined))
+
+        // When
+        const queryModel = await getDetailOffreEmploiQueryHandler.handle({
+          idOffreEmploi: 'id-offre'
+        })
+
+        // Then
+        expect(queryModel).to.deep.equal(
+          failure(new NonTrouveError("Offre d'emploi", 'id-offre'))
+        )
       })
     })
   })
@@ -137,7 +181,7 @@ describe('GetDetailOffreEmploiQueryHandler', () => {
         // Given
         const utilisateur = unUtilisateurConseiller()
         poleEmploiClient.getOffreEmploi.resolves(
-          uneOffreEmploiDto({ alternance: false })
+          success(uneOffreEmploiDto({ alternance: false }))
         )
 
         // When
@@ -155,7 +199,7 @@ describe('GetDetailOffreEmploiQueryHandler', () => {
         // Given
         const utilisateur = unUtilisateurConseiller()
         poleEmploiClient.getOffreEmploi.resolves(
-          uneOffreEmploiDto({ alternance: true })
+          success(uneOffreEmploiDto({ alternance: true }))
         )
         // When
         await getDetailOffreEmploiQueryHandler.monitor(utilisateur, {

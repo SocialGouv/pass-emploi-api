@@ -1,12 +1,19 @@
 import { Injectable } from '@nestjs/common'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { emptySuccess, Result } from '../../building-blocks/types/result'
+import {
+  emptySuccess,
+  failure,
+  isSuccess,
+  Result,
+  success
+} from '../../building-blocks/types/result'
 import { PoleEmploiClient } from '../../infrastructure/clients/pole-emploi-client'
 import { OffreEmploiDto } from '../../infrastructure/repositories/dto/pole-emploi.dto'
 import { OffreEmploiQueryModel } from './query-models/offres-emploi.query-model'
 import { Authentification } from '../../domain/authentification'
 import { Evenement, EvenementService } from '../../domain/evenement'
+import { NonTrouveError } from '../../building-blocks/types/domain-error'
 
 export interface GetDetailOffreEmploiQuery extends Query {
   idOffreEmploi: string
@@ -15,7 +22,7 @@ export interface GetDetailOffreEmploiQuery extends Query {
 @Injectable()
 export class GetDetailOffreEmploiQueryHandler extends QueryHandler<
   GetDetailOffreEmploiQuery,
-  OffreEmploiQueryModel | undefined
+  Result<OffreEmploiQueryModel>
 > {
   constructor(
     private poleEmploiClient: PoleEmploiClient,
@@ -26,15 +33,18 @@ export class GetDetailOffreEmploiQueryHandler extends QueryHandler<
 
   async handle(
     query: GetDetailOffreEmploiQuery
-  ): Promise<OffreEmploiQueryModel | undefined> {
-    const offreEmploiDto = await this.poleEmploiClient.getOffreEmploi(
+  ): Promise<Result<OffreEmploiQueryModel>> {
+    const result = await this.poleEmploiClient.getOffreEmploi(
       query.idOffreEmploi
     )
-    if (offreEmploiDto) {
-      return toOffreEmploiQueryModel(offreEmploiDto)
-    } else {
-      return undefined
+
+    if (isSuccess(result)) {
+      if (result.data) {
+        return success(toOffreEmploiQueryModel(result.data))
+      }
+      return failure(new NonTrouveError("Offre d'emploi", query.idOffreEmploi))
     }
+    return result
   }
 
   async authorize(): Promise<Result> {
@@ -46,12 +56,12 @@ export class GetDetailOffreEmploiQueryHandler extends QueryHandler<
     query: GetDetailOffreEmploiQuery
   ): Promise<void> {
     if (utilisateur.type == Authentification.Type.CONSEILLER) {
-      const offreEmploiDto = await this.poleEmploiClient.getOffreEmploi(
+      const offreEmploiDtoResult = await this.poleEmploiClient.getOffreEmploi(
         query.idOffreEmploi
       )
-      if (offreEmploiDto) {
+      if (isSuccess(offreEmploiDtoResult) && offreEmploiDtoResult.data) {
         await this.evenementService.creer(
-          offreEmploiDto.alternance
+          offreEmploiDtoResult.data.alternance
             ? Evenement.Code.OFFRE_ALTERNANCE_AFFICHEE
             : Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
           utilisateur

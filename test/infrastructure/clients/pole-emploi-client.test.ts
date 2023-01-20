@@ -5,13 +5,19 @@ import { PoleEmploiClient } from 'src/infrastructure/clients/pole-emploi-client'
 import { DateService } from 'src/utils/date-service'
 import { RateLimiterService } from 'src/utils/rate-limiter.service'
 import { expect, stubClass } from 'test/utils'
+import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
+import {
+  failure,
+  isSuccess,
+  success
+} from '../../../src/building-blocks/types/result'
+import { desNotificationsDunJeunePoleEmploi } from '../../fixtures/notification.fixture'
 import {
   notificationsRDVPEDto,
   uneOffreEmploiDto
 } from '../../fixtures/offre-emploi.fixture'
 import { desTypesDemarchesDto } from '../../fixtures/pole-emploi.dto.fixture'
 import { testConfig } from '../../utils/module-for-testing'
-import { desNotificationsDunJeunePoleEmploi } from '../../fixtures/notification.fixture'
 
 describe('PoleEmploiClient', () => {
   let poleEmploiClient: PoleEmploiClient
@@ -112,29 +118,129 @@ describe('PoleEmploiClient', () => {
     })
   })
   describe('get', () => {
-    it('fait un http get avec les bons paramètres', async () => {
-      // Given
-      const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
-        minutes: 20
-      })
-      poleEmploiClient.inMemoryToken = {
-        token: 'test-token',
-        tokenDate: uneDatetimeDeMoinsDe25Minutes
-      }
-
-      nock('https://api.emploi-store.fr/partenaire')
-        .get('/offresdemploi/v2/offres/1')
-        .reply(200, {
-          resultats: []
+    describe("quand l'appel est OK", () => {
+      it('fait un http get avec les bons paramètres et renvoie un succes', async () => {
+        // Given
+        const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+          minutes: 20
         })
-        .isDone()
+        poleEmploiClient.inMemoryToken = {
+          token: 'test-token',
+          tokenDate: uneDatetimeDeMoinsDe25Minutes
+        }
 
-      // When
-      const response = await poleEmploiClient.get('offresdemploi/v2/offres/1')
+        nock('https://api.emploi-store.fr/partenaire')
+          .get('/offresdemploi/v2/offres/1')
+          .reply(200, {
+            resultats: []
+          })
+          .isDone()
 
-      // Then
-      expect(response.status).to.equal(200)
-      expect(response.data).to.deep.equal({ resultats: [] })
+        // When
+        const result = await poleEmploiClient.get('offresdemploi/v2/offres/1')
+
+        // Then
+        expect(result._isSuccess).to.be.true()
+        if (isSuccess(result)) {
+          expect(result.data.status).to.equal(200)
+          expect(result.data.data).to.deep.equal({ resultats: [] })
+        }
+      })
+    })
+    describe("quand l'appel est KO", () => {
+      it('renvoie une failure pour un retour http entre 400 et 500', async () => {
+        // Given
+        const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+          minutes: 20
+        })
+        poleEmploiClient.inMemoryToken = {
+          token: 'test-token',
+          tokenDate: uneDatetimeDeMoinsDe25Minutes
+        }
+
+        nock('https://api.emploi-store.fr/partenaire')
+          .get('/offresdemploi/v2/offres/1')
+          .reply(400)
+          .isDone()
+
+        // When
+        const result = await poleEmploiClient.get('offresdemploi/v2/offres/1')
+
+        // Then
+        expect(result).to.deep.equal(failure(new ErreurHttp('erreur', 400)))
+      })
+      it("quand c'est une 429, retry après le temps qu'il faut", async () => {
+        // Given
+        const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+          minutes: 20
+        })
+        poleEmploiClient.inMemoryToken = {
+          token: 'test-token',
+          tokenDate: uneDatetimeDeMoinsDe25Minutes
+        }
+
+        nock('https://api.emploi-store.fr/partenaire')
+          .defaultReplyHeaders({ 'retry-after': '1' })
+          .get('/offresdemploi/v2/offres/1')
+          .reply(429)
+          .isDone()
+        nock('https://api.emploi-store.fr/partenaire')
+          .get('/offresdemploi/v2/offres/1')
+          .reply(200)
+          .isDone()
+
+        // When
+        const result = await poleEmploiClient.get('offresdemploi/v2/offres/1')
+
+        // Then
+        expect(result._isSuccess).to.be.true()
+      })
+      it("quand c'est une 429, rejette quand ce n'est plus le premier retry", async () => {
+        // Given
+        const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+          minutes: 20
+        })
+        poleEmploiClient.inMemoryToken = {
+          token: 'test-token',
+          tokenDate: uneDatetimeDeMoinsDe25Minutes
+        }
+
+        nock('https://api.emploi-store.fr/partenaire')
+          .defaultReplyHeaders({ 'retry-after': '1' })
+          .get('/offresdemploi/v2/offres/1')
+          .reply(429)
+          .isDone()
+        nock('https://api.emploi-store.fr/partenaire')
+          .defaultReplyHeaders({ 'retry-after': '1' })
+          .get('/offresdemploi/v2/offres/1')
+          .reply(429)
+          .isDone()
+
+        // When
+        const result = await poleEmploiClient.get('offresdemploi/v2/offres/1')
+
+        // Then
+        expect(result).to.deep.equal(failure(new ErreurHttp('erreur', 429)))
+      })
+      it('throw une erreur pour un retour http supérieur à 500', async () => {
+        // Given
+        const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+          minutes: 20
+        })
+        poleEmploiClient.inMemoryToken = {
+          token: 'test-token',
+          tokenDate: uneDatetimeDeMoinsDe25Minutes
+        }
+
+        nock('https://api.emploi-store.fr/partenaire')
+          .get('/offresdemploi/v2/offres/1')
+          .reply(500)
+          .isDone()
+
+        await expect(
+          poleEmploiClient.get('offresdemploi/v2/offres/1')
+        ).to.be.rejected()
+      })
     })
   })
   describe('getOffreEmploi', () => {
@@ -157,7 +263,70 @@ describe('PoleEmploiClient', () => {
       const offreEmploi = await poleEmploiClient.getOffreEmploi('1')
 
       // Then
-      expect(offreEmploi).to.deep.equal(uneOffreEmploiDto())
+      expect(offreEmploi).to.deep.equal(success(uneOffreEmploiDto()))
+    })
+    it("undefiend quand l'offre n'existe pas", async () => {
+      // Given
+      const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+        minutes: 20
+      })
+      poleEmploiClient.inMemoryToken = {
+        token: 'test-token',
+        tokenDate: uneDatetimeDeMoinsDe25Minutes
+      }
+
+      nock('https://api.emploi-store.fr/partenaire')
+        .get('/offresdemploi/v2/offres/1')
+        .reply(400)
+        .isDone()
+
+      // When
+      const offreEmploi = await poleEmploiClient.getOffreEmploi('1')
+
+      // Then
+      expect(offreEmploi).to.deep.equal(success(undefined))
+    })
+    it("undefiend quand l'offre n'existe pas (204)", async () => {
+      // Given
+      const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+        minutes: 20
+      })
+      poleEmploiClient.inMemoryToken = {
+        token: 'test-token',
+        tokenDate: uneDatetimeDeMoinsDe25Minutes
+      }
+
+      nock('https://api.emploi-store.fr/partenaire')
+        .get('/offresdemploi/v2/offres/1')
+        .reply(204)
+        .isDone()
+
+      // When
+      const offreEmploi = await poleEmploiClient.getOffreEmploi('1')
+
+      // Then
+      expect(offreEmploi).to.deep.equal(success(''))
+    })
+    it('failure quand la récupération est en erreur', async () => {
+      // Given
+      const uneDatetimeDeMoinsDe25Minutes = uneDatetimeDeMaintenant.minus({
+        minutes: 20
+      })
+      poleEmploiClient.inMemoryToken = {
+        token: 'test-token',
+        tokenDate: uneDatetimeDeMoinsDe25Minutes
+      }
+
+      nock('https://api.emploi-store.fr/partenaire')
+        .get('/offresdemploi/v2/offres/1')
+        .reply(401)
+        .isDone()
+
+      // When
+      const offreEmploi = await poleEmploiClient.getOffreEmploi('1')
+
+      // Then
+      expect(offreEmploi).to.deep.equal(failure(new ErreurHttp('erreur', 401)))
     })
   })
   describe('getOffresEmploi', () => {
@@ -186,10 +355,12 @@ describe('PoleEmploiClient', () => {
       )
 
       // Then
-      expect(offreEmploi).to.deep.equal({
-        total: 1811,
-        resultats: [uneOffreEmploiDto()]
-      })
+      expect(offreEmploi).to.deep.equal(
+        success({
+          total: 1811,
+          resultats: [uneOffreEmploiDto()]
+        })
+      )
     })
     it('renvoie un tableau vide quand il y a une 204', async () => {
       // Given
@@ -212,10 +383,12 @@ describe('PoleEmploiClient', () => {
       )
 
       // Then
-      expect(offreEmploi).to.deep.equal({
-        total: 0,
-        resultats: []
-      })
+      expect(offreEmploi).to.deep.equal(
+        success({
+          total: 0,
+          resultats: []
+        })
+      )
     })
   })
   describe('getNotificationsRendezVous', () => {

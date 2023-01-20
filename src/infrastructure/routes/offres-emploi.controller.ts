@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpException,
-  HttpStatus,
-  Param,
-  Query
-} from '@nestjs/common'
+import { Controller, Get, Param, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   GetDetailOffreEmploiQuery,
@@ -19,7 +12,7 @@ import {
   OffreEmploiQueryModel,
   OffresEmploiQueryModel
 } from '../../application/queries/query-models/offres-emploi.query-model'
-import { isFailure } from '../../building-blocks/types/result'
+import { isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
@@ -61,8 +54,10 @@ export class OffresEmploiController {
       utilisateur
     )
 
-    if (isFailure(result)) throw handleFailure(result)
-    return result.data
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
   }
 
   @Get(':idOffreEmploi')
@@ -74,16 +69,14 @@ export class OffresEmploiController {
     @Utilisateur() utilisateur: Authentification.Utilisateur
   ): Promise<OffreEmploiQueryModel | undefined> {
     const query: GetDetailOffreEmploiQuery = { idOffreEmploi }
-    const offreEmploiqueryModel =
-      await this.getDetailOffreEmploiQueryHandler.execute(query, utilisateur)
-
-    if (offreEmploiqueryModel) {
-      return offreEmploiqueryModel
-    }
-
-    throw new HttpException(
-      `Offre d'emploi ${idOffreEmploi} not found`,
-      HttpStatus.NOT_FOUND
+    const result = await this.getDetailOffreEmploiQueryHandler.execute(
+      query,
+      utilisateur
     )
+
+    if (isSuccess(result)) {
+      return result.data
+    }
+    throw handleFailure(result)
   }
 }

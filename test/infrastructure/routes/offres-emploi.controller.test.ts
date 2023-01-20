@@ -17,7 +17,10 @@ import {
 } from '../../../src/application/queries/get-detail-offre-emploi.query.handler'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { failure, success } from '../../../src/building-blocks/types/result'
-import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
+import {
+  ErreurHttp,
+  NonTrouveError
+} from '../../../src/building-blocks/types/domain-error'
 import { Offre } from '../../../src/domain/offre/offre'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
@@ -132,7 +135,7 @@ describe('OffresEmploiController', () => {
 
       getDetailOffreEmploiQueryHandler.execute
         .withArgs(query)
-        .resolves(offreEmploiQueryModel)
+        .resolves(success(offreEmploiQueryModel))
 
       // When
       await request(app.getHttpServer())
@@ -146,17 +149,21 @@ describe('OffresEmploiController', () => {
       // Given
       getDetailOffreEmploiQueryHandler.execute
         .withArgs(query)
-        .resolves(undefined)
+        .resolves(
+          failure(new NonTrouveError("Offre d'emploi", query.idOffreEmploi))
+        )
 
       const expectedResponseJson = {
         statusCode: HttpStatus.NOT_FOUND,
-        message: `Offre d'emploi ${query.idOffreEmploi} not found`
+        message: `Offre d'emploi ${query.idOffreEmploi} non trouvé(e)`,
+        error: 'Not Found'
       }
       // When
       await request(app.getHttpServer())
         .get(`/offres-emploi/${query.idOffreEmploi}`)
         .set('authorization', unHeaderAuthorization())
         // Then
+        .expect(HttpStatus.NOT_FOUND)
         .expect(expectedResponseJson)
     })
     ensureUserAuthenticationFailsIfInvalid('get', '/offres-emploi/123')

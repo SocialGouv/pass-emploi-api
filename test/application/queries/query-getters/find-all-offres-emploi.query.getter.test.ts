@@ -1,12 +1,12 @@
-import { expect, StubbedClass, stubClass } from '../../../utils'
-import { uneOffreEmploiDto } from '../../../fixtures/offre-emploi.fixture'
-import { isSuccess } from '../../../../src/building-blocks/types/result'
-import { PoleEmploiClient } from '../../../../src/infrastructure/clients/pole-emploi-client'
 import { DateTime } from 'luxon'
-import { DateService } from '../../../../src/utils/date-service'
-import { FindAllOffresEmploiQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-emploi.query.getter'
-import { Offre } from '../../../../src/domain/offre/offre'
 import { GetOffresEmploiQuery } from '../../../../src/application/queries/get-offres-emploi.query.handler'
+import { FindAllOffresEmploiQueryGetter } from '../../../../src/application/queries/query-getters/find-all-offres-emploi.query.getter'
+import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
+import { failure, success } from '../../../../src/building-blocks/types/result'
+import { Offre } from '../../../../src/domain/offre/offre'
+import { PoleEmploiClient } from '../../../../src/infrastructure/clients/pole-emploi-client'
+import { DateService } from '../../../../src/utils/date-service'
+import { expect, StubbedClass, stubClass } from '../../../utils'
 
 describe('FindAllOffresEmploiQueryGetter', () => {
   let findAllOffresEmploiQueryGetter: FindAllOffresEmploiQueryGetter
@@ -42,20 +42,13 @@ describe('FindAllOffresEmploiQueryGetter', () => {
       rayon: 15
     }
 
-    beforeEach(() => {
-      // Given
-      poleEmploiClient.get.resolves({
-        config: undefined,
-        headers: undefined,
-        request: undefined,
-        status: 0,
-        statusText: '',
-        data: []
-      })
-    })
-
-    describe('fait appel à l"API de Pôle Emploi avec les bons paramètres', () => {
+    describe("fait appel à l'API de Pôle Emploi avec les bons paramètres", () => {
       it('quand tous les query params sont fournis', async () => {
+        // Given
+        poleEmploiClient.getOffresEmploi.resolves(
+          success({ total: 10, resultats: [] })
+        )
+
         // When
         await findAllOffresEmploiQueryGetter.handle(criteres)
         const expectedQueryParams = new URLSearchParams({
@@ -79,6 +72,9 @@ describe('FindAllOffresEmploiQueryGetter', () => {
       })
       it('quand que quelques query params sont fournis', async () => {
         // Given
+        poleEmploiClient.getOffresEmploi.resolves(
+          success({ total: 10, resultats: [] })
+        )
         const criteres: GetOffresEmploiQuery = {
           page: 1,
           limit: 50,
@@ -108,6 +104,9 @@ describe('FindAllOffresEmploiQueryGetter', () => {
       })
       it('quand il y a une date de création minimum', async () => {
         // Given
+        poleEmploiClient.getOffresEmploi.resolves(
+          success({ total: 10, resultats: [] })
+        )
         const minDateDeCreation = maintenant.minus({ day: 1, hour: 2 })
         const criteres: GetOffresEmploiQuery = {
           page: 1,
@@ -133,46 +132,32 @@ describe('FindAllOffresEmploiQueryGetter', () => {
         ).to.be.equal(expectedQueryParams.toString())
       })
     })
-    describe('quand il y a une 429', () => {
-      it("rappelle l'api après le temps qu'il faut", async () => {
+    describe("quand la récupération d'offres est en succès", () => {
+      it('renvoie un succes', async () => {
         // Given
-        poleEmploiClient.getOffresEmploi
-          .onFirstCall()
-          .rejects({
-            response: {
-              status: 429,
-              headers: {
-                'retry-after': 1
-              }
-            }
-          })
-          .onSecondCall()
-          .resolves({ total: 1, resultats: [uneOffreEmploiDto()] })
+        poleEmploiClient.getOffresEmploi.resolves(
+          success({ total: 10, resultats: [] })
+        )
 
         // When
         const result = await findAllOffresEmploiQueryGetter.handle(criteres)
 
         // Then
-        expect(isSuccess(result)).to.be.equal(true)
-        expect(poleEmploiClient.getOffresEmploi).to.have.callCount(2)
+        expect(result._isSuccess).to.be.true()
       })
-      it('rejette après 2 appels en 429', async () => {
+    })
+    describe("quand la récupération d'offres est en erreur", () => {
+      it('renvoie une failure', async () => {
         // Given
-        poleEmploiClient.getOffresEmploi.rejects({
-          response: {
-            status: 429,
-            headers: {
-              'retry-after': 1
-            }
-          }
-        })
+        poleEmploiClient.getOffresEmploi.resolves(
+          failure(new ErreurHttp('erreur', 429))
+        )
 
         // When
         const result = await findAllOffresEmploiQueryGetter.handle(criteres)
 
         // Then
-        expect(isSuccess(result)).to.be.equal(false)
-        expect(poleEmploiClient.getOffresEmploi).to.have.callCount(2)
+        expect(result._isSuccess).to.be.false()
       })
     })
   })
