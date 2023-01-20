@@ -4,8 +4,8 @@ import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Agence } from '../agence'
 import { Core } from '../core'
-import Structure = Core.Structure
 import * as _ListeDeDiffusion from './liste-de-diffusion'
+import Structure = Core.Structure
 
 export interface Conseiller {
   id: string
@@ -45,6 +45,16 @@ export namespace Conseiller {
     ): Promise<void>
   }
 
+  export function changerEtablissement(
+    conseiller: Conseiller,
+    agence: Agence
+  ): Conseiller {
+    return {
+      ...conseiller,
+      agence
+    }
+  }
+
   @Injectable()
   export class Factory {
     mettreAJour(
@@ -61,6 +71,19 @@ export namespace Conseiller {
           )
         )
       }
+
+      if (
+        conseiller.agence?.id &&
+        infosDeMiseAJour.agence?.id &&
+        conseiller.agence.id !== infosDeMiseAJour.agence.id
+      ) {
+        return failure(
+          new MauvaiseCommandeError(
+            'Un conseiller ne peut pas changer d’agence'
+          )
+        )
+      }
+
       return success({
         ...conseiller,
         agence: infosDeMiseAJour.agence,

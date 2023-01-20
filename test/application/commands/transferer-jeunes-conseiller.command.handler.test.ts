@@ -330,7 +330,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
 
           // Then
           expect(
-            animationCollectiveService.desinscrire
+            animationCollectiveService.desinscrireDesAnimationsDuneAgence
           ).to.have.been.calledWithExactly(
             [jeuneQuiVientANantes.id],
             conseillerSource.agence?.id

@@ -118,7 +118,113 @@ describe('AnimationsCollectivesSqlRepository', () => {
 
       // When
       const animationCollectives =
-        await animationsCollectivesSqlRepository.getAllAVenir('une-agence')
+        await animationsCollectivesSqlRepository.getAllAVenirParEtablissement(
+          'une-agence'
+        )
+
+      // Then
+      expect(animationCollectives.length).to.equal(1)
+      const expected: RendezVous.AnimationCollective = {
+        id: uneACAVenir.id,
+        titre: uneACAVenir.titre,
+        sousTitre: uneACAVenir.sousTitre,
+        modalite: uneACAVenir.modalite!,
+        duree: uneACAVenir.duree,
+        date: uneACAVenir.date,
+        commentaire: uneACAVenir.commentaire!,
+        jeunes: [
+          {
+            configuration: {
+              appVersion: '1.8.1',
+              dateDerniereActualisationToken: new Date(
+                jeune.configuration!.dateDerniereActualisationToken!
+              ),
+              idJeune: 'ABCDE',
+              installationId: '123456',
+              instanceId: 'abcdef',
+              pushNotificationToken: 'token',
+              fuseauHoraire: 'Europe/Paris'
+            },
+            conseiller: {
+              email: 'nils.tavernier@passemploi.com',
+              firstName: 'Nils',
+              id: '1',
+              lastName: 'Tavernier'
+            },
+            email: 'john.doe@plop.io',
+            firstName: 'John',
+            id: 'ABCDE',
+            lastName: 'Doe'
+          }
+        ],
+        type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
+        precision: undefined,
+        adresse: undefined,
+        organisme: undefined,
+        presenceConseiller: uneACAVenir.presenceConseiller,
+        invitation: undefined,
+        icsSequence: undefined,
+        createur: uneACAVenir.createur,
+        dateCloture: DateService.fromJSDateToDateTime(uneACAVenir.dateCloture),
+        idAgence: uneACAVenir.idAgence!,
+        source: RendezVous.Source.PASS_EMPLOI,
+        informationsPartenaire: undefined,
+        nombreMaxParticipants: undefined
+      }
+      expect(animationCollectives[0]).to.deep.equal(expected)
+    })
+  })
+
+  describe('getAllNonClosesParEtablissement', () => {
+    it("retourne les animations collectives de l'agence", async () => {
+      // Given
+      const uneACClose = unRendezVousDto({
+        date: maintenant.minus({ days: 2 }).toJSDate(),
+        titre: 'UNE AC Close',
+        type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
+        idAgence: 'une-agence',
+        dateCloture: maintenant.toJSDate()
+      })
+      const uneACAVenir = unRendezVousDto({
+        date: maintenant.plus({ days: 20 }).toJSDate(),
+        titre: 'UNE AC QUI DOIT REMONTER',
+        type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
+        idAgence: 'une-agence'
+      })
+      const uneACAVenirDuneAutreAgence = unRendezVousDto({
+        date: maintenant.plus({ days: 20 }).toJSDate(),
+        titre: "UNE AC D'UNE AUTRE AGENCE",
+        type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
+        idAgence: 'une-autre-agence'
+      })
+      const unRendezVous = unRendezVousDto({
+        date: maintenant.plus({ days: 20 }).toJSDate(),
+        titre: 'UN RENDEZ VOUS INDIVIDUEL',
+        type: CodeTypeRendezVous.ENTRETIEN_INDIVIDUEL_CONSEILLER
+      })
+
+      await RendezVousSqlModel.bulkCreate([
+        uneACClose,
+        uneACAVenir,
+        uneACAVenirDuneAutreAgence,
+        unRendezVous
+      ])
+
+      await RendezVousJeuneAssociationSqlModel.bulkCreate([
+        { idRendezVous: uneACClose.id, idJeune: jeune.id },
+        { idRendezVous: uneACAVenir.id, idJeune: jeune.id },
+        {
+          idRendezVous: uneACAVenirDuneAutreAgence.id,
+          idJeune: jeune.id
+        },
+        { idRendezVous: unRendezVous.id, idJeune: jeune.id }
+      ])
+
+      // When
+      const animationCollectives =
+        await animationsCollectivesSqlRepository.getAllNonClosesParEtablissement(
+          'une-agence'
+        )
 
       // Then
       expect(animationCollectives.length).to.equal(1)
