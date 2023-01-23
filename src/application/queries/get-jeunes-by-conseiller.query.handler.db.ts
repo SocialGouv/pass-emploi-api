@@ -76,15 +76,12 @@ export class GetJeunesByConseillerQueryHandler extends QueryHandler<
                  jeune.date_premiere_connexion,
                  jeune.id_authentification,
                  jeune.id_conseiller_initial,
-                 MAX(evenement_engagement.date_evenement) as date_evenement,
+                 jeune.date_derniere_actualisation_token,
                  conseiller_initial.email                         as email_conseiller_precedent,
                  conseiller_initial.prenom                        as prenom_conseiller_precedent,
                  conseiller_initial.nom                           as nom_conseiller_precedent,
                  situations_milo.situation_courante       as situation_courante
           FROM jeune
-                   LEFT JOIN evenement_engagement
-                             ON evenement_engagement.id_utilisateur = jeune.id AND
-                                evenement_engagement.type_utilisateur = '${Authentification.Type.JEUNE}'
                    LEFT JOIN conseiller as conseiller_initial ON conseiller_initial.id = jeune.id_conseiller_initial
                    LEFT JOIN situations_milo ON situations_milo.id_jeune = jeune.id
           WHERE jeune.id_conseiller = :idConseiller

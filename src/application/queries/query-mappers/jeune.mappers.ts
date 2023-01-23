@@ -54,8 +54,9 @@ export function toDetailJeuneConseillerQueryModel(
     isReaffectationTemporaire: Boolean(sqlJeune.id_conseiller_initial),
     situationCourante: sqlJeune.situation_courante ?? undefined
   }
-  if (sqlJeune.date_evenement) {
-    jeuneQueryModel.lastActivity = sqlJeune.date_evenement.toISOString()
+  if (sqlJeune.date_derniere_actualisation_token) {
+    jeuneQueryModel.lastActivity =
+      sqlJeune.date_derniere_actualisation_token.toISOString()
   }
 
   if (
@@ -82,7 +83,7 @@ export interface DetailJeuneRawSql extends JeuneRawSql {
   email: string
   date_creation: Date
   id_authentification: string
-  date_evenement: Date
+  date_derniere_actualisation_token: Date | null
   id_conseiller_initial: string
   email_conseiller_precedent: string
   nom_conseiller_precedent: string

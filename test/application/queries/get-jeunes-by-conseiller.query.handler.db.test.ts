@@ -2,13 +2,9 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { GetJeunesByConseillerQueryHandler } from 'src/application/queries/get-jeunes-by-conseiller.query.handler.db'
 import { ConseillerSqlModel } from 'src/infrastructure/sequelize/models/conseiller.sql-model'
-import { EvenementEngagementSqlModel } from 'src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { JeuneSqlModel } from 'src/infrastructure/sequelize/models/jeune.sql-model'
 import { SituationsMiloSqlModel } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
-import {
-  uneDatetime,
-  uneDatetimeMoinsRecente
-} from 'test/fixtures/date.fixture'
+import { uneDatetime } from 'test/fixtures/date.fixture'
 import { uneSituationsMiloDto } from 'test/fixtures/milo.fixture'
 import { unDetailJeuneConseillerQueryModel } from 'test/fixtures/query-models/jeunes.query-model.fixtures'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
@@ -25,7 +21,6 @@ import { Core } from '../../../src/domain/core'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { createSandbox, expect } from '../../utils'
-import { unEvenementEngagementDto } from '../../fixtures/sql-models/evenement-engagement.sql-model'
 import {
   DatabaseForTesting,
   getDatabase
@@ -60,8 +55,14 @@ describe('GetJeunesByConseillerQueryHandler', () => {
     const idConseiller = '1'
     it("retourne les jeunes d'un conseiller", async () => {
       // Given
+      const dateEvenement = uneDatetime().toJSDate()
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
-      await JeuneSqlModel.creer(unJeuneDto({ idConseiller }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          idConseiller,
+          dateDerniereActualisationToken: dateEvenement
+        })
+      )
 
       // When
       const actual = await getJeunesByConseillerQueryHandler.handle({
@@ -69,22 +70,22 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       })
       // Then
       expect(actual).to.deep.equal(
-        success([unDetailJeuneConseillerQueryModel()])
+        success([
+          unDetailJeuneConseillerQueryModel({
+            lastActivity: dateEvenement.toISOString()
+          })
+        ])
       )
     })
     it("retourne les jeunes d'un conseiller avec la date d'evenement d'engagement", async () => {
       // Given
-      const jeune = unJeuneDto({ idConseiller })
       const dateEvenement = uneDatetime().toJSDate()
+      const jeune = unJeuneDto({
+        idConseiller,
+        dateDerniereActualisationToken: dateEvenement
+      })
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
       await JeuneSqlModel.creer(jeune)
-      await EvenementEngagementSqlModel.create(
-        unEvenementEngagementDto({
-          idUtilisateur: jeune.id,
-          typeUtilisateur: Authentification.Type.JEUNE,
-          dateEvenement
-        })
-      )
 
       // When
       const actual = await getJeunesByConseillerQueryHandler.handle({
@@ -103,25 +104,13 @@ describe('GetJeunesByConseillerQueryHandler', () => {
     })
     it("retourne les jeunes d'un conseiller avec la date du DERNIER evenement d'engagement", async () => {
       // Given
-      const jeune = unJeuneDto({ idConseiller })
       const dateEvenementRecent = uneDatetime().toJSDate()
-      const dateEvenementAncien = uneDatetimeMoinsRecente().toJSDate()
+      const jeune = unJeuneDto({
+        idConseiller,
+        dateDerniereActualisationToken: dateEvenementRecent
+      })
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
       await JeuneSqlModel.creer(jeune)
-      await EvenementEngagementSqlModel.create(
-        unEvenementEngagementDto({
-          idUtilisateur: jeune.id,
-          typeUtilisateur: Authentification.Type.JEUNE,
-          dateEvenement: dateEvenementAncien
-        })
-      )
-      await EvenementEngagementSqlModel.create(
-        unEvenementEngagementDto({
-          idUtilisateur: jeune.id,
-          typeUtilisateur: Authentification.Type.JEUNE,
-          dateEvenement: dateEvenementRecent
-        })
-      )
 
       // When
       const actual = await getJeunesByConseillerQueryHandler.handle({
@@ -138,30 +127,7 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         ])
       )
     })
-    it("retourne les jeunes d'un conseiller sans la date d'evenement d'engagement", async () => {
-      // Given
-      const jeune = unJeuneDto({ idConseiller })
-      const dateEvenement = uneDatetime().toJSDate()
-      await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
-      await JeuneSqlModel.creer(jeune)
-      await EvenementEngagementSqlModel.create(
-        unEvenementEngagementDto({
-          idUtilisateur: 'faux-id',
-          typeUtilisateur: Authentification.Type.JEUNE,
-          dateEvenement
-        })
-      )
 
-      // When
-      const actual = await getJeunesByConseillerQueryHandler.handle({
-        idConseiller
-      })
-
-      // Then
-      expect(actual).to.deep.equal(
-        success([unDetailJeuneConseillerQueryModel()])
-      )
-    })
     it("retourne tableau vide quand le conseiller n'existe pas", async () => {
       const actual = await getJeunesByConseillerQueryHandler.handle({
         idConseiller: 'id-inexistant'
@@ -175,10 +141,12 @@ describe('GetJeunesByConseillerQueryHandler', () => {
       const idConseillerCible = '2'
       const idDernierConseillerPrecedent = '43'
       const idJeune = '1'
+      const dateEvenement = uneDatetime().toJSDate()
       const jeune = unJeuneDto({
         id: idJeune,
         idConseiller: idConseillerCible,
-        idConseillerInitial: idDernierConseillerPrecedent
+        idConseillerInitial: idDernierConseillerPrecedent,
+        dateDerniereActualisationToken: dateEvenement
       })
       await ConseillerSqlModel.creer(
         unConseillerDto({
@@ -210,6 +178,7 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         success([
           {
             ...unDetailJeuneConseillerQueryModel({ id: idJeune }),
+            lastActivity: dateEvenement.toISOString(),
             conseillerPrecedent: {
               email: '43@43.com',
               nom: 'Tavernier',
@@ -223,9 +192,16 @@ describe('GetJeunesByConseillerQueryHandler', () => {
     it("retourne les jeunes d'un conseiller avec situation courante", async () => {
       // Given
       const idJeune = '1'
+      const dateEvenement = uneDatetime().toJSDate()
       const situationsDuJeune = uneSituationsMiloDto({ idJeune })
       await ConseillerSqlModel.creer(unConseillerDto({ id: idConseiller }))
-      await JeuneSqlModel.creer(unJeuneDto({ id: idJeune, idConseiller }))
+      await JeuneSqlModel.creer(
+        unJeuneDto({
+          id: idJeune,
+          idConseiller,
+          dateDerniereActualisationToken: dateEvenement
+        })
+      )
       await SituationsMiloSqlModel.create(situationsDuJeune)
 
       // When
@@ -237,7 +213,8 @@ describe('GetJeunesByConseillerQueryHandler', () => {
         success([
           unDetailJeuneConseillerQueryModel({
             id: idJeune,
-            situationCourante: situationsDuJeune.situationCourante ?? undefined
+            situationCourante: situationsDuJeune.situationCourante ?? undefined,
+            lastActivity: dateEvenement.toISOString()
           })
         ])
       )
