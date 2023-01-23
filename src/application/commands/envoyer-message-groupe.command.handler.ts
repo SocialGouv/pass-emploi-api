@@ -191,18 +191,24 @@ function getCodeEvenement(
   command: EnvoyerMessageGroupeCommand
 ): Evenement.Code {
   const avecPj = Boolean(command.infoPieceJointe)
+  const auMoinsUnBeneficiaire =
+    command.idsBeneficiaires && command.idsBeneficiaires.length > 0
+  const plusieursBeneficiaires =
+    command.idsBeneficiaires && command.idsBeneficiaires.length > 1
+  const auMoinsUneListe =
+    command.idsListesDeDiffusion && command.idsListesDeDiffusion.length > 0
 
-  if (command.idsBeneficiaires && command.idsListesDeDiffusion)
+  if (auMoinsUnBeneficiaire && auMoinsUneListe)
     return avecPj
       ? Code.MESSAGE_ENVOYE_MULTIPLE_MIXTE_PJ
       : Code.MESSAGE_ENVOYE_MULTIPLE_MIXTE
 
-  if (command.idsListesDeDiffusion)
+  if (auMoinsUneListe)
     return avecPj
       ? Code.MESSAGE_ENVOYE_MULTIPLE_LISTE_PJ
       : Code.MESSAGE_ENVOYE_MULTIPLE_LISTE
 
-  if (command.idsBeneficiaires && command.idsBeneficiaires.length > 1)
+  if (plusieursBeneficiaires)
     return avecPj
       ? Code.MESSAGE_ENVOYE_MULTIPLE_MANUEL_PJ
       : Code.MESSAGE_ENVOYE_MULTIPLE_MANUEL
