@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Op, Sequelize } from 'sequelize'
 import {
-  CodeTypeRendezVous,
-  RendezVous
+  RendezVous,
+  TYPES_ANIMATIONS_COLLECTIVES
 } from '../../../domain/rendez-vous/rendez-vous'
 import { DateService } from '../../../utils/date-service'
 import { ConseillerSqlModel } from '../../sequelize/models/conseiller.sql-model'
@@ -35,10 +35,7 @@ export class AnimationCollectiveSqlRepository
         },
         idAgence: idEtablissement,
         type: {
-          [Op.in]: [
-            CodeTypeRendezVous.INFORMATION_COLLECTIVE,
-            CodeTypeRendezVous.ATELIER
-          ]
+          [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
         },
         dateSuppression: {
           [Op.is]: null
@@ -62,10 +59,7 @@ export class AnimationCollectiveSqlRepository
         },
         idAgence: idEtablissement,
         type: {
-          [Op.in]: [
-            CodeTypeRendezVous.INFORMATION_COLLECTIVE,
-            CodeTypeRendezVous.ATELIER
-          ]
+          [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
         },
         dateSuppression: {
           [Op.is]: null
@@ -85,10 +79,7 @@ export class AnimationCollectiveSqlRepository
       where: {
         id: idEtablissement,
         type: {
-          [Op.in]: [
-            CodeTypeRendezVous.INFORMATION_COLLECTIVE,
-            CodeTypeRendezVous.ATELIER
-          ]
+          [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
         },
         dateSuppression: {
           [Op.is]: null

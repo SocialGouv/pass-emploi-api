@@ -6,13 +6,7 @@ import { unConseiller } from '../fixtures/conseiller.fixture'
 import { expect } from '../utils'
 import Structure = Core.Structure
 
-describe('Conseiller.Factory', () => {
-  let conseillerFactory: Conseiller.Factory
-
-  beforeEach(() => {
-    conseillerFactory = new Conseiller.Factory()
-  })
-
+describe('Conseiller', () => {
   describe('mettreAJour', () => {
     describe('conseiller Mission Locale', () => {
       it('n‘autorise pas la mise à jour d‘une agence hors référentiel', async () => {
@@ -27,7 +21,7 @@ describe('Conseiller.Factory', () => {
           }
         }
         // When
-        const result = conseillerFactory.mettreAJour(
+        const result = Conseiller.mettreAJour(
           conseillerMilo,
           agenceHorsReferentiel
         )

@@ -33,8 +33,7 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
     @Inject(ConseillersRepositoryToken)
     private conseillerRepository: Conseiller.Repository,
     @Inject(AgenceRepositoryToken)
-    private agencesRepository: Agence.Repository,
-    private conseillerFactory: Conseiller.Factory
+    private agencesRepository: Agence.Repository
   ) {
     super('ModifierConseillerCommandHandler')
   }
@@ -63,8 +62,10 @@ export class ModifierConseillerCommandHandler extends CommandHandler<
       agence: command.agence ?? conseillerActuel.agence
     }
 
-    const conseillerResult: Result<Conseiller> =
-      this.conseillerFactory.mettreAJour(conseillerActuel, infosDeMiseAJour)
+    const conseillerResult = Conseiller.mettreAJour(
+      conseillerActuel,
+      infosDeMiseAJour
+    )
 
     if (isFailure(conseillerResult)) {
       return conseillerResult

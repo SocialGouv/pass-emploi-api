@@ -34,6 +34,11 @@ export enum CodeTypeRendezVous {
   SESSION_MILO = 'SESSION_MILO'
 }
 
+export const TYPES_ANIMATIONS_COLLECTIVES = [
+  CodeTypeRendezVous.INFORMATION_COLLECTIVE,
+  CodeTypeRendezVous.ATELIER
+]
+
 export enum CategorieRendezVous {
   CEJ_RDV = 'CEJ_RDV',
   CEJ_AC = 'CEJ_AC',
@@ -202,8 +207,7 @@ export namespace RendezVous {
   export function estUnTypeAnimationCollective(type?: string): boolean {
     return (
       Boolean(type) &&
-      (type === CodeTypeRendezVous.ATELIER ||
-        type === CodeTypeRendezVous.INFORMATION_COLLECTIVE)
+      TYPES_ANIMATIONS_COLLECTIVES.includes(type as CodeTypeRendezVous)
     )
   }
 

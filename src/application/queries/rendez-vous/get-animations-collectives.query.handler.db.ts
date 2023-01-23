@@ -5,13 +5,13 @@ import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
 import { Result, success } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
-import { CodeTypeRendezVous } from '../../../domain/rendez-vous/rendez-vous'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { ConseillerEtablissementAuthorizer } from '../../authorizers/authorize-conseiller-etablissement'
 import { fromSqlToAnimationCollectiveQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
 import { AnimationCollectiveQueryModel } from '../query-models/rendez-vous.query-model'
 import { DateService } from '../../../utils/date-service'
+import { TYPES_ANIMATIONS_COLLECTIVES } from '../../../domain/rendez-vous/rendez-vous'
 
 const NOMBRE_ANIMATIONS_COLLECTIVES_MAX = 200
 
@@ -43,10 +43,7 @@ export class GetAnimationsCollectivesQueryHandler extends QueryHandler<
           [Op.is]: null
         },
         type: {
-          [Op.in]: [
-            CodeTypeRendezVous.INFORMATION_COLLECTIVE,
-            CodeTypeRendezVous.ATELIER
-          ]
+          [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
         },
         ...generateDateCondition(query.dateDebut, query.dateFin)
       },
