@@ -134,6 +134,7 @@ export namespace Action {
   export function qualifier(
     action: Action,
     codeQualification: Action.Qualification.Code,
+    commentairePartenaire?: string,
     dateDebut?: DateTime,
     dateFinReelle?: DateTime
   ): Result<Action.Qualifiee> {
@@ -157,6 +158,16 @@ export namespace Action {
         )
       )
     }
+    if (
+      commentairePartenaire &&
+      codeQualification === Qualification.Code.NON_SNP
+    ) {
+      return failure(
+        new MauvaiseCommandeError(
+          'Aucun commentaire partenaire ne peut être renseigné pour une action non-SNP.'
+        )
+      )
+    }
 
     const { heures } = Qualification.mapCodeTypeQualification[codeQualification]
 
@@ -166,7 +177,8 @@ export namespace Action {
       dateFinReelle: dateFinReelleMiseAJour,
       qualification: {
         code: codeQualification,
-        heures
+        heures,
+        commentairePartenaire
       }
     })
   }

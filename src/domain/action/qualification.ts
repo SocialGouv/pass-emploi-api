@@ -1,6 +1,7 @@
 export interface Qualification {
   code: Qualification.Code
   heures: number
+  commentairePartenaire?: string
 }
 
 export namespace Qualification {

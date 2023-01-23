@@ -169,7 +169,7 @@ export class ActionsController {
 
   @ApiOperation({
     summary: "Récupère les commentaires d'une action",
-    description: 'Autorisé pour un jeune et son conseiller'
+    description: 'Autorisé pour un jeune et son conseiller.'
   })
   @Get(':idAction/commentaires')
   async getCommentairesAction(
@@ -188,8 +188,8 @@ export class ActionsController {
   }
 
   @ApiOperation({
-    summary: 'Ajoute un commentaire à une action',
-    description: 'Autorisé pour un jeune et son conseiller'
+    summary: 'Qualifie une action en SNP / non-SNP',
+    description: 'Autorisé pour un conseiller'
   })
   @Post(':idAction/qualifier')
   async qualifierAction(
@@ -210,6 +210,7 @@ export class ActionsController {
     const command: QualifierActionCommand = {
       idAction,
       codeQualification: qualifierActionPayload.codeQualification,
+      commentairePartenaire: qualifierActionPayload.commentairePartenaire,
       dateDebut,
       dateFinReelle,
       utilisateur
