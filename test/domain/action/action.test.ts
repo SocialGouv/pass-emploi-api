@@ -577,7 +577,11 @@ describe('Action', () => {
         ...actionTerminee,
         dateDebut: actionTerminee.dateCreation,
         dateFinReelle,
-        qualification: { code: Action.Qualification.Code.NON_SNP, heures: 0 }
+        qualification: {
+          code: Action.Qualification.Code.NON_SNP,
+          heures: 0,
+          commentairePartenaire: undefined
+        }
       }
 
       // Then
@@ -594,6 +598,7 @@ describe('Action', () => {
       const actionQualifiee = Action.qualifier(
         actionTerminee,
         Action.Qualification.Code.SANTE,
+        'Un commentaire',
         undefined,
         nouvelleDateFinReelle
       )
@@ -601,7 +606,11 @@ describe('Action', () => {
       // Then
       const expectedAction: Action.Qualifiee = {
         ...actionTerminee,
-        qualification: { code: Action.Qualification.Code.SANTE, heures: 2 },
+        qualification: {
+          code: Action.Qualification.Code.SANTE,
+          heures: 2,
+          commentairePartenaire: 'Un commentaire'
+        },
         dateDebut: actionTerminee.dateCreation,
         dateFinReelle: nouvelleDateFinReelle
       }
@@ -666,6 +675,27 @@ describe('Action', () => {
         )
       )
     })
+    it('rejette quand un commentaire est renseigné pour une action NON_SNP', () => {
+      // Given
+      const actionTerminee: Action = uneActionTerminee()
+      // When
+      const result = Action.qualifier(
+        actionTerminee,
+        Action.Qualification.Code.NON_SNP,
+        'Un commentaire',
+        undefined,
+        DateTime.fromISO('2022-08-01')
+      )
+
+      // Then
+      expect(result).to.deep.equal(
+        failure(
+          new MauvaiseCommandeError(
+            'Aucun commentaire partenaire ne peut être renseigné pour une action non-SNP.'
+          )
+        )
+      )
+    })
     it('accepte quand la date de fin réelle est le même jour que la date de création', () => {
       // Given
       const actionTerminee: Action = uneActionTerminee({
@@ -675,6 +705,7 @@ describe('Action', () => {
       const result = Action.qualifier(
         actionTerminee,
         Action.Qualification.Code.SANTE,
+        'Un commentaire',
         undefined,
         DateTime.fromISO('2022-08-01T05:00:00.000+02:00')
       )

@@ -28,6 +28,7 @@ export interface QualifierActionCommand extends Command {
   idAction: string
   codeQualification: Action.Qualification.Code
   utilisateur: Authentification.Utilisateur
+  commentairePartenaire?: string
   dateDebut?: DateTime
   dateFinReelle?: DateTime
 }
@@ -61,6 +62,7 @@ export class QualifierActionCommandHandler extends CommandHandler<
     const qualifierActionResult = Action.qualifier(
       action,
       command.codeQualification,
+      command.commentairePartenaire,
       command.dateDebut,
       command.dateFinReelle
     )
@@ -109,6 +111,8 @@ export class QualifierActionCommandHandler extends CommandHandler<
 
     return success({
       code: qualifierActionResult.data.qualification.code,
+      commentairePartenaire:
+        qualifierActionResult.data.qualification.commentairePartenaire,
       libelle: typeQualification.label,
       heures: typeQualification.heures
     })
