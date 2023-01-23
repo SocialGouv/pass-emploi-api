@@ -1,4 +1,3 @@
-import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { MauvaiseCommandeError } from '../../building-blocks/types/domain-error'
 import { failure, Result, success } from '../../building-blocks/types/result'
@@ -45,7 +44,7 @@ export namespace Conseiller {
     ): Promise<void>
   }
 
-  export function changerEtablissement(
+  export function modifierEtablissement(
     conseiller: Conseiller,
     agence: Agence
   ): Conseiller {
@@ -55,41 +54,36 @@ export namespace Conseiller {
     }
   }
 
-  @Injectable()
-  export class Factory {
-    mettreAJour(
-      conseiller: Conseiller,
-      infosDeMiseAJour: InfosDeMiseAJour
-    ): Result<Conseiller> {
-      const conseilleMiloARenseigneUneAgenceManuelle =
-        conseiller.structure === Structure.MILO && !infosDeMiseAJour.agence?.id
+  export function mettreAJour(
+    conseiller: Conseiller,
+    infosDeMiseAJour: InfosDeMiseAJour
+  ): Result<Conseiller> {
+    const conseilleMiloARenseigneUneAgenceManuelle =
+      conseiller.structure === Structure.MILO && !infosDeMiseAJour.agence?.id
 
-      if (conseilleMiloARenseigneUneAgenceManuelle) {
-        return failure(
-          new MauvaiseCommandeError(
-            'Un conseiller MILO doit choisir une Agence du référentiel'
-          )
+    if (conseilleMiloARenseigneUneAgenceManuelle) {
+      return failure(
+        new MauvaiseCommandeError(
+          'Un conseiller MILO doit choisir une Agence du référentiel'
         )
-      }
-
-      if (
-        conseiller.agence?.id &&
-        infosDeMiseAJour.agence?.id &&
-        conseiller.agence.id !== infosDeMiseAJour.agence.id
-      ) {
-        return failure(
-          new MauvaiseCommandeError(
-            'Un conseiller ne peut pas changer d’agence'
-          )
-        )
-      }
-
-      return success({
-        ...conseiller,
-        agence: infosDeMiseAJour.agence,
-        notificationsSonores: Boolean(infosDeMiseAJour.notificationsSonores)
-      })
+      )
     }
+
+    if (
+      conseiller.agence?.id &&
+      infosDeMiseAJour.agence?.id &&
+      conseiller.agence.id !== infosDeMiseAJour.agence.id
+    ) {
+      return failure(
+        new MauvaiseCommandeError('Un conseiller ne peut pas changer d’agence')
+      )
+    }
+
+    return success({
+      ...conseiller,
+      agence: infosDeMiseAJour.agence,
+      notificationsSonores: Boolean(infosDeMiseAJour.notificationsSonores)
+    })
   }
 
   export interface InfosDeMiseAJour {

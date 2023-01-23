@@ -362,7 +362,6 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Mail.Factory,
     Authentification.Factory,
     Campagne.Factory,
-    Conseiller.Factory,
     Demarche.Factory,
     RendezVous.Historique.Factory,
     RendezVous.Factory,

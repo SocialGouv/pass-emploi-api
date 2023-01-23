@@ -7,10 +7,10 @@ import { JeuneAuthorizer } from '../../authorizers/authorize-jeune'
 import { DateTime } from 'luxon'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { Op, Sequelize } from 'sequelize'
-import { CodeTypeRendezVous } from '../../../domain/rendez-vous/rendez-vous'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { fromSqlToRendezVousDetailJeuneQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
 import { Injectable } from '@nestjs/common'
+import { TYPES_ANIMATIONS_COLLECTIVES } from '../../../domain/rendez-vous/rendez-vous'
 
 export interface GetAnimationsCollectivesJeuneQuery extends Query {
   idJeune: string
@@ -51,10 +51,7 @@ export class GetAnimationsCollectivesJeuneQueryHandler extends QueryHandler<
           )
         },
         type: {
-          [Op.in]: [
-            CodeTypeRendezVous.INFORMATION_COLLECTIVE,
-            CodeTypeRendezVous.ATELIER
-          ]
+          [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
         },
         dateSuppression: {
           [Op.is]: null

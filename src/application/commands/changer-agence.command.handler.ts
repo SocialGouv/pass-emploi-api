@@ -96,7 +96,7 @@ export class ChangerAgenceCommandHandler extends CommandHandler<
       )
     )
 
-    const conseillerMisAJour = Conseiller.changerEtablissement(
+    const conseillerMisAJour = Conseiller.modifierEtablissement(
       conseiller,
       agence
     )
@@ -111,39 +111,61 @@ export class ChangerAgenceCommandHandler extends CommandHandler<
     agence: Agence
   ): Promise<ChangementAgenceQueryModel | undefined> {
     if (animationCollective.createur.id === conseiller.id) {
-      const autresJeunes = getAutresJeunesDeLAgence(
+      return this.transfererDansUneAutreAgence(
         animationCollective,
-        conseiller
+        conseiller,
+        agence
       )
-      if (autresJeunes.length) {
-        await this.animationCollectiveService.desinscrire(
-          animationCollective,
-          autresJeunes.map(jeune => jeune.id)
-        )
-      }
-      await this.animationCollectiveService.mettreAJourEtablissement(
-        animationCollective,
-        agence.id!
-      )
-      return buildQueryModel(animationCollective, autresJeunes, agence.id)
     } else {
-      const jeunesDuConseillerInscrits = getJeunesDuConseiller(
+      return this.desinscrireLesJeunesDuConseiller(
         animationCollective,
         conseiller
       )
-      if (jeunesDuConseillerInscrits.length) {
-        await this.animationCollectiveService.desinscrire(
-          animationCollective,
-          jeunesDuConseillerInscrits.map(jeune => jeune.id)
-        )
-        return buildQueryModel(animationCollective, jeunesDuConseillerInscrits)
-      }
-      return undefined
     }
   }
 
   async monitor(): Promise<void> {
     return
+  }
+
+  private async desinscrireLesJeunesDuConseiller(
+    animationCollective: AnimationCollective,
+    conseiller: Conseiller
+  ): Promise<ChangementAgenceQueryModel | undefined> {
+    const jeunesDuConseillerInscrits = getJeunesDuConseiller(
+      animationCollective,
+      conseiller
+    )
+    if (jeunesDuConseillerInscrits.length) {
+      await this.animationCollectiveService.desinscrire(
+        animationCollective,
+        jeunesDuConseillerInscrits.map(jeune => jeune.id)
+      )
+      return buildQueryModel(animationCollective, jeunesDuConseillerInscrits)
+    }
+    return undefined
+  }
+
+  private async transfererDansUneAutreAgence(
+    animationCollective: AnimationCollective,
+    conseiller: Conseiller,
+    agence: Agence
+  ): Promise<ChangementAgenceQueryModel> {
+    const autresJeunes = getAutresJeunesDeLAgence(
+      animationCollective,
+      conseiller
+    )
+    if (autresJeunes.length) {
+      await this.animationCollectiveService.desinscrire(
+        animationCollective,
+        autresJeunes.map(jeune => jeune.id)
+      )
+    }
+    await this.animationCollectiveService.mettreAJourEtablissement(
+      animationCollective,
+      agence.id!
+    )
+    return buildQueryModel(animationCollective, autresJeunes, agence.id)
   }
 }
 

@@ -8,11 +8,7 @@ import {
   MauvaiseCommandeError,
   NonTrouveError
 } from '../../../src/building-blocks/types/domain-error'
-import {
-  failure,
-  Failure,
-  success
-} from '../../../src/building-blocks/types/result'
+import { failure, Failure } from '../../../src/building-blocks/types/result'
 import { Agence } from '../../../src/domain/agence'
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { Core } from '../../../src/domain/core'
@@ -20,14 +16,13 @@ import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
-import { createSandbox, expect, stubClass } from '../../utils'
+import { createSandbox, expect } from '../../utils'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import Structure = Core.Structure
 
 describe('ModifierConseillerCommandHandler', () => {
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let agencesRepository: StubbedType<Agence.Repository>
-  let conseillerFactory: StubbedType<Conseiller.Factory>
   let modifierConseillerCommandHandler: ModifierConseillerCommandHandler
 
   const conseillerQuiExiste: Conseiller = {
@@ -51,12 +46,10 @@ describe('ModifierConseillerCommandHandler', () => {
     const sandbox = createSandbox()
     conseillerRepository = stubInterface(sandbox)
     agencesRepository = stubInterface(sandbox)
-    conseillerFactory = stubClass(Conseiller.Factory)
 
     modifierConseillerCommandHandler = new ModifierConseillerCommandHandler(
       conseillerRepository,
-      agencesRepository,
-      conseillerFactory
+      agencesRepository
     )
   })
 
@@ -143,7 +136,6 @@ describe('ModifierConseillerCommandHandler', () => {
             .withArgs('id-conseiller')
             .resolves(conseillerPE)
           agencesRepository.get.withArgs('id-agence').resolves(agenceQuiExiste)
-          conseillerFactory.mettreAJour.returns(success(conseillerPEmaj))
 
           // When
           const result = await modifierConseillerCommandHandler.handle(command)
@@ -174,7 +166,6 @@ describe('ModifierConseillerCommandHandler', () => {
             .withArgs('id-conseiller')
             .resolves(conseillerMilo)
           agencesRepository.get.withArgs('id-agence').resolves(agenceQuiExiste)
-          conseillerFactory.mettreAJour.returns(success(conseillerMiloMaj))
 
           // When
           const result = await modifierConseillerCommandHandler.handle(command)
@@ -202,13 +193,6 @@ describe('ModifierConseillerCommandHandler', () => {
           conseillerRepository.get
             .withArgs('id-conseiller')
             .resolves(conseillerMilo)
-          conseillerFactory.mettreAJour.returns(
-            failure(
-              new MauvaiseCommandeError(
-                'Un conseiller MILO doit choisir une Agence du référentiel'
-              )
-            )
-          )
 
           // When
           const result = await modifierConseillerCommandHandler.handle(command)
