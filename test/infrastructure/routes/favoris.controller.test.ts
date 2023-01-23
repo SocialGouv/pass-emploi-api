@@ -10,7 +10,7 @@ import {
 import { GetFavorisOffresEmploiJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
 import { GetFavorisOffresImmersionJeuneQueryHandler } from 'src/application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
 import * as request from 'supertest'
-import { uneOffreImmersion } from 'test/fixtures/offre-immersion.fixture'
+import { unFavoriOffreImmersion } from 'test/fixtures/offre-immersion.fixture'
 import {
   AddFavoriOffreEmploiCommand,
   AddFavoriOffreEmploiCommandHandler
@@ -278,7 +278,7 @@ describe('FavorisController', () => {
     })
 
     describe('POST /jeunes/:idJeune/favoris/offres-immersion', () => {
-      const offreImmersion = uneOffreImmersion()
+      const offreImmersion = unFavoriOffreImmersion()
       const command: AddFavoriOffreImmersionCommand = {
         idJeune: 'ABCDE',
         offreImmersion: offreImmersion
@@ -338,7 +338,7 @@ describe('FavorisController', () => {
     })
 
     describe('DELETE /jeunes/:idJeune/favoris/offres-immersion/:idOffreImmersion', () => {
-      const offreImmersion = uneOffreImmersion()
+      const offreImmersion = unFavoriOffreImmersion()
       const jeune = unJeune()
       const command: DeleteFavoriOffreImmersionCommand = {
         idJeune: jeune.id,

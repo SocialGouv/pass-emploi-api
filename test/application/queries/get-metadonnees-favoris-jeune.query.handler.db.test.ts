@@ -1,6 +1,6 @@
 import { expect, StubbedClass, stubClass } from '../../utils'
 import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler.db'
-import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
+import { FavorisOffresImmersionSqlRepository } from '../../../src/infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
@@ -63,7 +63,8 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
           secteurActivite: 'poi-secteur-activite',
           ville: 'poi-ville'
         }
-        const offreImmersionRepository = new OffresImmersionHttpSqlRepository()
+        const offreImmersionRepository =
+          new FavorisOffresImmersionSqlRepository()
         await offreImmersionRepository.save(idJeune, uneOffreImmersion)
 
         const query = {

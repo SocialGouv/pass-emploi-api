@@ -14,43 +14,54 @@ import {
 import { RuntimeException } from '@nestjs/core/errors/exceptions/runtime.exception'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
-  AddFavoriOffreImmersionCommand,
-  AddFavoriOffreImmersionCommandHandler
-} from '../../application/commands/add-favori-offre-immersion.command.handler'
-import { GetFavorisOffresEmploiJeuneQueryHandler } from '../../application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
-import { GetFavorisOffresImmersionJeuneQueryHandler } from '../../application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
-import {
-  FavoriOffreEmploiIdQueryModel,
-  OffreEmploiResumeQueryModel
-} from '../../application/queries/query-models/offres-emploi.query-model'
-import {
-  FavoriOffreImmersionIdQueryModel,
-  OffreImmersionQueryModel
-} from '../../application/queries/query-models/offres-immersion.query-model'
-import {
   AddFavoriOffreEmploiCommand,
   AddFavoriOffreEmploiCommandHandler
 } from '../../application/commands/add-favori-offre-emploi.command.handler'
 import {
-  AddFavoriServiceCiviqueCommand,
-  AddFavoriOffreServiceCiviqueCommandHandler
+  AddFavoriOffreImmersionCommand,
+  AddFavoriOffreImmersionCommandHandler
+} from '../../application/commands/add-favori-offre-immersion.command.handler'
+import {
+  AddFavoriOffreServiceCiviqueCommandHandler,
+  AddFavoriServiceCiviqueCommand
 } from '../../application/commands/add-favori-offre-service-civique-command-handler'
 import {
   DeleteFavoriOffreEmploiCommand,
   DeleteFavoriOffreEmploiCommandHandler
 } from '../../application/commands/delete-favori-offre-emploi.command.handler'
 import {
-  DeleteFavoriOffreServiceCiviqueCommand,
-  DeleteFavoriOffreServiceCiviqueCommandHandler
-} from '../../application/commands/delete-favori-offre-service-civique.command.handler'
-import {
   DeleteFavoriOffreImmersionCommand,
   DeleteFavoriOffreImmersionCommandHandler
 } from '../../application/commands/delete-favori-offre-immersion.command.handler'
+import {
+  DeleteFavoriOffreServiceCiviqueCommand,
+  DeleteFavoriOffreServiceCiviqueCommandHandler
+} from '../../application/commands/delete-favori-offre-service-civique.command.handler'
+import { GetFavorisJeunePourConseillerQueryHandler } from '../../application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
+import { GetFavorisOffresEmploiJeuneQueryHandler } from '../../application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
+import { GetFavorisOffresImmersionJeuneQueryHandler } from '../../application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
+import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../application/queries/get-favoris-service-civique-jeune.query.handler.db'
+import { GetMetadonneesFavorisJeuneQueryHandler } from '../../application/queries/get-metadonnees-favoris-jeune.query.handler.db'
+import {
+  FavorisQueryModel,
+  MetadonneesFavorisQueryModel
+} from '../../application/queries/query-models/favoris.query-model'
+import {
+  FavoriOffreEmploiIdQueryModel,
+  OffreEmploiResumeQueryModel
+} from '../../application/queries/query-models/offres-emploi.query-model'
+import {
+  FavoriOffreImmersionIdQueryModel,
+  FavoriOffreImmersionQueryModel,
+  OffreImmersionQueryModel
+} from '../../application/queries/query-models/offres-immersion.query-model'
+import { ServiceCiviqueQueryModel } from '../../application/queries/query-models/service-civique.query-model'
 import { FavoriExisteDejaError } from '../../building-blocks/types/domain-error'
 import { isFailure, isSuccess } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
+import { Core } from '../../domain/core'
 import { Utilisateur } from '../decorators/authenticated.decorator'
+import { handleFailure } from './failure.handler'
 import {
   AddFavoriImmersionPayload,
   AddFavoriOffresEmploiPayload,
@@ -59,16 +70,6 @@ import {
   GetFavorisOffresImmersionQueryParams,
   GetFavorisServicesCiviqueQueryParams
 } from './validation/favoris.inputs'
-import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../application/queries/get-favoris-service-civique-jeune.query.handler.db'
-import { ServiceCiviqueQueryModel } from '../../application/queries/query-models/service-civique.query-model'
-import { Core } from '../../domain/core'
-import {
-  FavorisQueryModel,
-  MetadonneesFavorisQueryModel
-} from '../../application/queries/query-models/favoris.query-model'
-import { GetFavorisJeunePourConseillerQueryHandler } from '../../application/queries/get-favoris-jeune-pour-conseiller.query.handler.db'
-import { GetMetadonneesFavorisJeuneQueryHandler } from '../../application/queries/get-metadonnees-favoris-jeune.query.handler.db'
-import { handleFailure } from './failure.handler'
 
 @Controller('jeunes/:idJeune')
 @ApiOAuth2([])
@@ -140,7 +141,9 @@ export class FavorisController {
     @Param('idJeune') idJeune: string,
     @Query() getFavorisQuery: GetFavorisOffresImmersionQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<OffreImmersionQueryModel[] | FavoriOffreImmersionIdQueryModel[]> {
+  ): Promise<
+    FavoriOffreImmersionQueryModel[] | FavoriOffreImmersionIdQueryModel[]
+  > {
     return this.getFavorisOffresImmersionJeuneQueryHandler.execute(
       { idJeune, detail: Boolean(getFavorisQuery.detail) },
       utilisateur

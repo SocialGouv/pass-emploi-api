@@ -2,12 +2,13 @@ import {
   ContactImmersionQueryModel,
   DetailOffreImmersionQueryModel,
   FavoriOffreImmersionIdQueryModel,
+  FavoriOffreImmersionQueryModel,
   LocalisationQueryModel,
   OffreImmersionQueryModel
 } from '../../../application/queries/query-models/offres-immersion.query-model'
+import { Offre } from '../../../domain/offre/offre'
 import { FavoriOffreImmersionSqlModel } from '../../sequelize/models/favori-offre-immersion.sql-model'
 import { PartenaireImmersion } from '../dto/immersion.dto'
-import { Offre } from '../../../domain/offre/offre'
 
 const fromContactMode = {
   UNKNOWN: Offre.Immersion.MethodeDeContact.INCONNU,
@@ -24,27 +25,40 @@ export function fromSqlToFavorisOffresImmersionIdsQueryModels(
   })
 }
 
-export function fromSqlToOffreImmersion(
-  offresImmersionFavoriSql: FavoriOffreImmersionSqlModel
+export function fromSqlToFavorisOffreImmersion(
+  offreImmersionFavoriSql: FavoriOffreImmersionSqlModel
 ): Offre.Favori.Immersion {
   return {
-    id: offresImmersionFavoriSql.idOffre,
-    metier: offresImmersionFavoriSql.metier,
-    nomEtablissement: offresImmersionFavoriSql.nomEtablissement,
-    secteurActivite: offresImmersionFavoriSql.secteurActivite,
-    ville: offresImmersionFavoriSql.ville
+    id: offreImmersionFavoriSql.idOffre,
+    metier: offreImmersionFavoriSql.metier,
+    nomEtablissement: offreImmersionFavoriSql.nomEtablissement,
+    secteurActivite: offreImmersionFavoriSql.secteurActivite,
+    ville: offreImmersionFavoriSql.ville
+  }
+}
+
+export function fromSqlToFavorisOffreImmersionQueryModel(
+  offreImmersionFavoriSql: FavoriOffreImmersionSqlModel
+): FavoriOffreImmersionQueryModel {
+  return {
+    id: offreImmersionFavoriSql.idOffre,
+    metier: offreImmersionFavoriSql.metier,
+    nomEtablissement: offreImmersionFavoriSql.nomEtablissement,
+    secteurActivite: offreImmersionFavoriSql.secteurActivite,
+    ville: offreImmersionFavoriSql.ville
   }
 }
 
 export function toOffreImmersionQueryModel(
-  offresImmersionDto: PartenaireImmersion.DtoV1
+  offreImmersionDto: PartenaireImmersion.DtoV1
 ): OffreImmersionQueryModel {
   return {
-    id: `${offresImmersionDto.siret}-${offresImmersionDto.rome}`,
-    metier: offresImmersionDto.romeLabel,
-    nomEtablissement: offresImmersionDto.name,
-    secteurActivite: offresImmersionDto.nafLabel,
-    ville: offresImmersionDto.city
+    id: `${offreImmersionDto.siret}-${offreImmersionDto.rome}`,
+    metier: offreImmersionDto.romeLabel,
+    nomEtablissement: offreImmersionDto.name,
+    secteurActivite: offreImmersionDto.nafLabel,
+    ville: offreImmersionDto.city,
+    estVolontaire: offreImmersionDto.voluntaryToImmersion
   }
 }
 

@@ -60,7 +60,8 @@ describe('OffresImmersionController', () => {
             metier: 'Boulanger',
             nomEtablissement: 'Boulangerie',
             secteurActivite: 'Restauration',
-            ville: 'Paris'
+            ville: 'Paris',
+            estVolontaire: true
           }
         ]
 

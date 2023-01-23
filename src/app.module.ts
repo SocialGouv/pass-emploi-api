@@ -111,7 +111,7 @@ import {
 } from './domain/notification/notification'
 import { OffresEmploiRepositoryToken } from './domain/offre/favori/offre-emploi'
 import { OffreServiceCiviqueRepositoryToken } from './domain/offre/favori/offre-service-civique'
-import { OffresImmersionRepositoryToken } from './domain/offre/favori/offre-immersion'
+import { FavorisOffresImmersionRepositoryToken } from './domain/offre/favori/offre-immersion'
 import {
   PlanificateurRepositoryToken,
   PlanificateurService
@@ -150,7 +150,7 @@ import { MiloJeuneHttpSqlRepository } from './infrastructure/repositories/parten
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
 import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre/offre-emploi-http-sql.repository.db'
 import { OffreServiceCiviqueHttpSqlRepository } from './infrastructure/repositories/offre/offre-service-civique-http.repository.db'
-import { OffresImmersionHttpSqlRepository } from './infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
+import { FavorisOffresImmersionSqlRepository } from './infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
 import { PlanificateurRedisRepository } from './infrastructure/repositories/planificateur-redis.repository.db'
 import { RechercheSqlRepository } from './infrastructure/repositories/offre/recherche/recherche-sql.repository.db'
 import { RendezVousRepositorySql } from './infrastructure/repositories/rendez-vous/rendez-vous-sql.repository.db'
@@ -428,8 +428,8 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
       useClass: MiloJeuneHttpSqlRepository
     },
     {
-      provide: OffresImmersionRepositoryToken,
-      useClass: OffresImmersionHttpSqlRepository
+      provide: FavorisOffresImmersionRepositoryToken,
+      useClass: FavorisOffresImmersionSqlRepository
     },
     {
       provide: PlanificateurRepositoryToken,

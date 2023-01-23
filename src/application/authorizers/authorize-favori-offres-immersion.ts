@@ -6,13 +6,13 @@ import {
   Result
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { OffresImmersionRepositoryToken } from '../../domain/offre/favori/offre-immersion'
+import { FavorisOffresImmersionRepositoryToken } from '../../domain/offre/favori/offre-immersion'
 import { Offre } from '../../domain/offre/offre'
 
 @Injectable()
 export class FavoriOffresImmersionAuthorizer {
   constructor(
-    @Inject(OffresImmersionRepositoryToken)
+    @Inject(FavorisOffresImmersionRepositoryToken)
     private offresImmersionRepository: Offre.Favori.Immersion.Repository
   ) {}
 

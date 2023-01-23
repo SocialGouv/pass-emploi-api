@@ -8,7 +8,7 @@ import {
   failure
 } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
-import { OffresImmersionRepositoryToken } from '../../domain/offre/favori/offre-immersion'
+import { FavorisOffresImmersionRepositoryToken } from '../../domain/offre/favori/offre-immersion'
 import { Offre } from '../../domain/offre/offre'
 import { FavoriOffresImmersionAuthorizer } from '../authorizers/authorize-favori-offres-immersion'
 
@@ -23,7 +23,7 @@ export class DeleteFavoriOffreImmersionCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    @Inject(OffresImmersionRepositoryToken)
+    @Inject(FavorisOffresImmersionRepositoryToken)
     private readonly offresImmersionRepository: Offre.Favori.Immersion.Repository,
     private readonly favoriOffresImmersionAuthorizer: FavoriOffresImmersionAuthorizer
   ) {
