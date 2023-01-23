@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common'
-import { Authentification } from '../../domain/authentification'
-import { Jeune } from '../../domain/jeune/jeune'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { Result } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Jeune } from '../../domain/jeune/jeune'
+import {
+  fromSqlToFavorisOffreImmersionQueryModel,
+  fromSqlToFavorisOffresImmersionIdsQueryModels
+} from '../../infrastructure/repositories/mappers/offres-immersion.mappers'
+import { FavoriOffreImmersionSqlModel } from '../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import {
   FavoriOffreImmersionIdQueryModel,
-  OffreImmersionQueryModel
+  FavoriOffreImmersionQueryModel
 } from './query-models/offres-immersion.query-model'
-import { FavoriOffreImmersionSqlModel } from '../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
-import {
-  fromSqlToFavorisOffresImmersionIdsQueryModels,
-  fromSqlToOffreImmersion
-} from '../../infrastructure/repositories/mappers/offres-immersion.mappers'
-import { Result } from '../../building-blocks/types/result'
 
 export interface GetFavorisOffresImmersionJeuneQuery extends Query {
   idJeune: Jeune.Id
@@ -23,7 +23,7 @@ export interface GetFavorisOffresImmersionJeuneQuery extends Query {
 @Injectable()
 export class GetFavorisOffresImmersionJeuneQueryHandler extends QueryHandler<
   GetFavorisOffresImmersionJeuneQuery,
-  OffreImmersionQueryModel[] | FavoriOffreImmersionIdQueryModel[]
+  FavoriOffreImmersionQueryModel[] | FavoriOffreImmersionIdQueryModel[]
 > {
   constructor(private jeuneAuthorizer: JeuneAuthorizer) {
     super('GetFavorisOffresImmersionJeuneQueryHandler')
@@ -31,7 +31,9 @@ export class GetFavorisOffresImmersionJeuneQueryHandler extends QueryHandler<
 
   handle(
     query: GetFavorisOffresImmersionJeuneQuery
-  ): Promise<OffreImmersionQueryModel[] | FavoriOffreImmersionIdQueryModel[]> {
+  ): Promise<
+    FavoriOffreImmersionQueryModel[] | FavoriOffreImmersionIdQueryModel[]
+  > {
     return query.detail
       ? this.getFavorisQueryModelsByJeune(query.idJeune)
       : this.getFavorisIdsQueryModelsByJeune(query.idJeune)
@@ -63,13 +65,13 @@ export class GetFavorisOffresImmersionJeuneQueryHandler extends QueryHandler<
 
   private async getFavorisQueryModelsByJeune(
     idJeune: string
-  ): Promise<OffreImmersionQueryModel[]> {
+  ): Promise<FavoriOffreImmersionQueryModel[]> {
     const favorisSql = await FavoriOffreImmersionSqlModel.findAll({
       where: {
         idJeune
       }
     })
 
-    return favorisSql.map(fromSqlToOffreImmersion)
+    return favorisSql.map(fromSqlToFavorisOffreImmersionQueryModel)
   }
 }

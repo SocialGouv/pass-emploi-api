@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { Op } from 'sequelize'
+import { Action } from '../../domain/action/action'
 import { ArchiveJeune } from '../../domain/archive-jeune'
 import { FirebaseClient } from '../clients/firebase-client'
 import { ActionSqlModel } from '../sequelize/models/action.sql-model'
 import { ArchiveJeuneSqlModel } from '../sequelize/models/archive-jeune.sql-model'
+import { CommentaireSqlModel } from '../sequelize/models/commentaire.sql-model'
 import { ConseillerSqlModel } from '../sequelize/models/conseiller.sql-model'
 import { FavoriOffreEmploiSqlModel } from '../sequelize/models/favori-offre-emploi.sql-model'
 import { FavoriOffreEngagementSqlModel } from '../sequelize/models/favori-offre-engagement.sql-model'
@@ -13,11 +15,9 @@ import { RechercheSqlModel } from '../sequelize/models/recherche.sql-model'
 import { RendezVousSqlModel } from '../sequelize/models/rendez-vous.sql-model'
 import { TransfertConseillerSqlModel } from '../sequelize/models/transfert-conseiller.sql-model'
 import { toOffreEmploi } from './mappers/offres-emploi.mappers'
-import { fromSqlToOffreImmersion } from './mappers/offres-immersion.mappers'
+import { fromSqlToFavorisOffreImmersion } from './mappers/offres-immersion.mappers'
 import { fromSqlToRecherche } from './mappers/recherches.mappers'
 import { fromSqlToOffreServiceCivique } from './mappers/service-civique.mapper'
-import { Action } from '../../domain/action/action'
-import { CommentaireSqlModel } from '../sequelize/models/commentaire.sql-model'
 
 @Injectable()
 export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
@@ -153,7 +153,9 @@ export class ArchiveJeuneSqlRepository implements ArchiveJeune.Repository {
       actions: this.fromActionSqlToActionArchive(actions, metadonnes),
       favoris: {
         offresEmploi: favorisOffreEmploi.map(toOffreEmploi),
-        offresImmersions: favorisOffreImmersion.map(fromSqlToOffreImmersion),
+        offresImmersions: favorisOffreImmersion.map(
+          fromSqlToFavorisOffreImmersion
+        ),
         offresServiceCivique: favorisOffreEngagement.map(
           fromSqlToOffreServiceCivique
         )

@@ -12,7 +12,7 @@ import {
 } from '../../../src/building-blocks/types/result'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { uneOffreImmersion } from '../../fixtures/offre-immersion.fixture'
+import { unFavoriOffreImmersion } from '../../fixtures/offre-immersion.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { Offre } from '../../../src/domain/offre/offre'
 
@@ -24,7 +24,7 @@ describe('DeleteFavoriOffreImmersionCommandHandler', () => {
   const jeune = unJeune()
 
   beforeEach(async () => {
-    offreImmersion = uneOffreImmersion()
+    offreImmersion = unFavoriOffreImmersion()
     const sandbox: SinonSandbox = createSandbox()
     offresImmersionHttpSqlRepository = stubInterface(sandbox)
     favoriOffresImmersionAuthorizer = stubClass(FavoriOffresImmersionAuthorizer)

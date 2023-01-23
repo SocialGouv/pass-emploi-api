@@ -50,7 +50,8 @@ describe('GetOffresImmersionQueryHandler', () => {
             metier: 'Boulanger',
             nomEtablissement: 'Boulangerie',
             secteurActivite: 'Restauration',
-            ville: 'Paris'
+            ville: 'Paris',
+            estVolontaire: false
           }
         ]
         const criteres: Offre.Recherche.Immersion = {
@@ -87,7 +88,8 @@ describe('GetOffresImmersionQueryHandler', () => {
             metier: 'Boulanger',
             nomEtablissement: 'Boulangerie',
             secteurActivite: 'Restauration',
-            ville: 'Paris'
+            ville: 'Paris',
+            estVolontaire: true
           }
         ]
         const criteres: Offre.Recherche.Immersion = {

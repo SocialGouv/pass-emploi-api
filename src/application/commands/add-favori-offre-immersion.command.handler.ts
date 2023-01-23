@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Evenement, EvenementService } from '../../domain/evenement'
-import { OffresImmersionRepositoryToken } from '../../domain/offre/favori/offre-immersion'
+import { FavorisOffresImmersionRepositoryToken } from '../../domain/offre/favori/offre-immersion'
 import { Command } from '../../building-blocks/types/command'
 import { CommandHandler } from '../../building-blocks/types/command-handler'
 import { FavoriExisteDejaError } from '../../building-blocks/types/domain-error'
@@ -24,7 +24,7 @@ export class AddFavoriOffreImmersionCommandHandler extends CommandHandler<
   void
 > {
   constructor(
-    @Inject(OffresImmersionRepositoryToken)
+    @Inject(FavorisOffresImmersionRepositoryToken)
     private offresImmersionRepository: Offre.Favori.Immersion.Repository,
     private jeuneAuthorizer: JeuneAuthorizer,
     private evenementService: EvenementService

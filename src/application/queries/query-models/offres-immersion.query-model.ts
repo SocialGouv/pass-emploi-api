@@ -36,6 +36,21 @@ export class OffreImmersionQueryModel {
   secteurActivite: string
   @ApiProperty()
   ville: string
+  @ApiProperty()
+  estVolontaire: boolean
+}
+
+export class FavoriOffreImmersionQueryModel {
+  @ApiProperty()
+  id: string
+  @ApiProperty()
+  metier: string
+  @ApiProperty()
+  nomEtablissement: string
+  @ApiProperty()
+  secteurActivite: string
+  @ApiProperty()
+  ville: string
 }
 
 export interface FavoriOffreImmersionIdQueryModel {
@@ -43,8 +58,6 @@ export interface FavoriOffreImmersionIdQueryModel {
 }
 
 export class DetailOffreImmersionQueryModel extends OffreImmersionQueryModel {
-  @ApiProperty()
-  estVolontaire: boolean
   @ApiProperty()
   adresse: string
   @ApiProperty({

@@ -3,7 +3,7 @@ import { DroitsInsuffisants } from 'src/building-blocks/types/domain-error'
 import { emptySuccess, failure } from 'src/building-blocks/types/result'
 import { FavoriOffresImmersionAuthorizer } from '../../../src/application/authorizers/authorize-favori-offres-immersion'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { uneOffreImmersion } from '../../fixtures/offre-immersion.fixture'
+import { unFavoriOffreImmersion } from '../../fixtures/offre-immersion.fixture'
 import { createSandbox, expect } from '../../utils'
 import { Offre } from '../../../src/domain/offre/offre'
 
@@ -24,7 +24,7 @@ describe('FavoriOffresImmersionAuthorizer', () => {
       it('retourne un success', async () => {
         // Given
         const utilisateur = unUtilisateurJeune()
-        const offreImmersion = uneOffreImmersion()
+        const offreImmersion = unFavoriOffreImmersion()
 
         offresImmersionRepository.get
           .withArgs(utilisateur.id, offreImmersion.id)
@@ -45,7 +45,7 @@ describe('FavoriOffresImmersionAuthorizer', () => {
       it('retourne une failure', async () => {
         // Given
         const utilisateur = unUtilisateurJeune()
-        const offreImmersion = uneOffreImmersion()
+        const offreImmersion = unFavoriOffreImmersion()
 
         offresImmersionRepository.get
           .withArgs(utilisateur.id, 'une-offre')

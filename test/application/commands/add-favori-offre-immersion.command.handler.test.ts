@@ -11,7 +11,7 @@ import { failure } from '../../../src/building-blocks/types/result'
 import { Authentification } from '../../../src/domain/authentification'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
-import { uneOffreImmersion } from '../../fixtures/offre-immersion.fixture'
+import { unFavoriOffreImmersion } from '../../fixtures/offre-immersion.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import Utilisateur = Authentification.Utilisateur
 import { Offre } from '../../../src/domain/offre/offre'
@@ -39,7 +39,7 @@ describe('AddFavoriOffreImmersionCommandHandler', () => {
   describe('handle', () => {
     it('sauvegarde un favori', async () => {
       // Given
-      const offreImmersion = uneOffreImmersion()
+      const offreImmersion = unFavoriOffreImmersion()
       const command: AddFavoriOffreImmersionCommand = {
         idJeune: jeune.id,
         offreImmersion: offreImmersion
@@ -60,7 +60,7 @@ describe('AddFavoriOffreImmersionCommandHandler', () => {
 
     it('renvoie une failure ExisteDeja quand le jeune a déjà ce favori', async () => {
       // Given
-      const offreImmersion = uneOffreImmersion()
+      const offreImmersion = unFavoriOffreImmersion()
       const command: AddFavoriOffreImmersionCommand = {
         idJeune: jeune.id,
         offreImmersion: offreImmersion
@@ -84,7 +84,7 @@ describe('AddFavoriOffreImmersionCommandHandler', () => {
       // Given
       const command: AddFavoriOffreImmersionCommand = {
         idJeune: 'idJeune',
-        offreImmersion: uneOffreImmersion()
+        offreImmersion: unFavoriOffreImmersion()
       }
       const utilisateur: Utilisateur = unUtilisateurJeune()
 

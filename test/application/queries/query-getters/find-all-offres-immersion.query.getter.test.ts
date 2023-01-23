@@ -41,7 +41,8 @@ describe('', () => {
               romeLabel: 'romeLabel',
               name: 'name',
               nafLabel: 'nafLabel',
-              city: 'city'
+              city: 'city',
+              voluntaryToImmersion: true
             }
           ],
           status: 200,
@@ -80,7 +81,8 @@ describe('', () => {
               metier: 'romeLabel',
               nomEtablissement: 'name',
               secteurActivite: 'nafLabel',
-              ville: 'city'
+              ville: 'city',
+              estVolontaire: true
             }
           ])
         )

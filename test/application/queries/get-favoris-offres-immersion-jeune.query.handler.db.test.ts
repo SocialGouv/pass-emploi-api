@@ -1,20 +1,20 @@
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import {
-  uneOffreImmersion,
-  uneOffreImmersionQueryModel
-} from '../../fixtures/offre-immersion.fixture'
+import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { GetFavorisOffresImmersionJeuneQueryHandler } from '../../../src/application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
 import {
   FavoriOffreImmersionIdQueryModel,
-  OffreImmersionQueryModel
+  FavoriOffreImmersionQueryModel
 } from '../../../src/application/queries/query-models/offres-immersion.query-model'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
-import { GetFavorisOffresImmersionJeuneQueryHandler } from '../../../src/application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { FavorisOffresImmersionSqlRepository } from '../../../src/infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
+import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import {
+  unFavoriOffreImmersion,
+  unFavoriOffreImmersionQueryModel
+} from '../../fixtures/offre-immersion.fixture'
+import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
+import { expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
@@ -32,8 +32,8 @@ describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
         idConseiller: 'ZIDANE'
       })
     )
-    const offresImmersionRepository = new OffresImmersionHttpSqlRepository()
-    await offresImmersionRepository.save(idJeune, uneOffreImmersion())
+    const offresImmersionRepository = new FavorisOffresImmersionSqlRepository()
+    await offresImmersionRepository.save(idJeune, unFavoriOffreImmersion())
 
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     getFavorisOffresImmersionJeuneQueryHandler =
@@ -44,8 +44,8 @@ describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
     describe('avec détail', () => {
       it('recupère tous les favoris immersions du jeune', async () => {
         // Given
-        const expectedResult: OffreImmersionQueryModel[] = [
-          uneOffreImmersionQueryModel()
+        const expectedResult: FavoriOffreImmersionQueryModel[] = [
+          unFavoriOffreImmersionQueryModel()
         ]
 
         // When
@@ -62,7 +62,7 @@ describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
       it('recupère tous les ids des favoris immersions du jeune', async () => {
         // Given
         const expectedResult: FavoriOffreImmersionIdQueryModel[] = [
-          { id: uneOffreImmersionQueryModel().id }
+          { id: unFavoriOffreImmersionQueryModel().id }
         ]
 
         // When

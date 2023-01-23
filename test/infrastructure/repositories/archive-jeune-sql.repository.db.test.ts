@@ -6,7 +6,7 @@ import { Recherche } from '../../../src/domain/offre/recherche/recherche'
 import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
 import { ArchiveJeuneSqlRepository } from '../../../src/infrastructure/repositories/archive-jeune-sql.repository.db'
 import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre/offre-emploi-http-sql.repository.db'
-import { OffresImmersionHttpSqlRepository } from '../../../src/infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
+import { FavorisOffresImmersionSqlRepository } from '../../../src/infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
 import { OffreServiceCiviqueHttpSqlRepository } from '../../../src/infrastructure/repositories/offre/offre-service-civique-http.repository.db'
 import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/offre/recherche/recherche-sql.repository.db'
 import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
@@ -21,7 +21,7 @@ import {
 } from '../../../src/infrastructure/sequelize/models/transfert-conseiller.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import { uneOffreEmploi } from '../../fixtures/offre-emploi.fixture'
-import { uneOffreImmersion } from '../../fixtures/offre-immersion.fixture'
+import { unFavoriOffreImmersion } from '../../fixtures/offre-immersion.fixture'
 import { uneOffreServiceCivique } from '../../fixtures/offre-service-civique.fixture'
 import {
   criteresImmersionNice,
@@ -75,7 +75,7 @@ describe('ArchiveJeuneSqlRepository', () => {
     let archiveJeuneSql: ArchiveJeuneSqlModel | null
     let metadonnees: ArchiveJeune.Metadonnees
     const offresEmploiHttpSqlRepository = new OffresEmploiHttpSqlRepository()
-    const offresImmersionRepository = new OffresImmersionHttpSqlRepository()
+    const offresImmersionRepository = new FavorisOffresImmersionSqlRepository()
     const offreServiceCiviqueHttpSqlRepository =
       new OffreServiceCiviqueHttpSqlRepository()
 
@@ -119,7 +119,10 @@ describe('ArchiveJeuneSqlRepository', () => {
       })
 
       await offresEmploiHttpSqlRepository.save(jeuneDto.id, uneOffreEmploi())
-      await offresImmersionRepository.save(jeuneDto.id, uneOffreImmersion())
+      await offresImmersionRepository.save(
+        jeuneDto.id,
+        unFavoriOffreImmersion()
+      )
       await offreServiceCiviqueHttpSqlRepository.save(
         jeuneDto.id,
         uneOffreServiceCivique()

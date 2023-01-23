@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { FavoriOffreImmersionSqlModel } from '../../sequelize/models/favori-offre-immersion.sql-model'
-import { fromSqlToOffreImmersion } from '../mappers/offres-immersion.mappers'
+import { fromSqlToFavorisOffreImmersion } from '../mappers/offres-immersion.mappers'
 import { Offre } from '../../../domain/offre/offre'
 
 @Injectable()
-export class OffresImmersionHttpSqlRepository
+export class FavorisOffresImmersionSqlRepository
   implements Offre.Favori.Immersion.Repository
 {
   async get(
@@ -20,7 +20,7 @@ export class OffresImmersionHttpSqlRepository
     if (!result) {
       return undefined
     }
-    return fromSqlToOffreImmersion(result)
+    return fromSqlToFavorisOffreImmersion(result)
   }
 
   async save(

@@ -1,4 +1,5 @@
-export const OffresImmersionRepositoryToken = 'OffresImmersion.Repository'
+export const FavorisOffresImmersionRepositoryToken =
+  'Favoris.OffresImmersion.Repository'
 
 export interface Immersion {
   id: string
