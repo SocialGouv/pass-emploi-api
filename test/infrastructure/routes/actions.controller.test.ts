@@ -275,6 +275,7 @@ describe('ActionsController', () => {
         utilisateur,
         dateDebut: uneDatetimeAvecOffset(),
         dateFinReelle: uneDatetimeAvecOffset(),
+        commentairePartenaire: undefined,
         codeQualification: Action.Qualification.Code.EMPLOI
       }
 
@@ -315,6 +316,7 @@ describe('ActionsController', () => {
         utilisateur,
         dateDebut: undefined,
         dateFinReelle: undefined,
+        commentairePartenaire: 'un commentaire valide',
         codeQualification: Action.Qualification.Code.EMPLOI
       }
 
@@ -332,7 +334,34 @@ describe('ActionsController', () => {
         // Then
         .expect(HttpStatus.FORBIDDEN)
     })
+    it('retourne une BAD_REQUEST lorsque le commentaire dépasse les 255 caractères.', async () => {
+      // Given
+      const utilisateur = unUtilisateurDecode()
 
+      const command: QualifierActionCommand = {
+        idAction: '13c11b33-751c-4e1b-a49d-1b5a473ba159',
+        utilisateur,
+        dateDebut: uneDatetimeAvecOffset(),
+        dateFinReelle: uneDatetimeAvecOffset(),
+        commentairePartenaire:
+          "Un commentaire invalide car il dépasse la limite fixée à deux cent cinquante-cinq caractères par l'API-Application Programming Interface- développée par i-milo. Ce commentaire est invalide puisqu'il est d'une longueur de deux cent cinquante-six caractères.",
+        codeQualification: Action.Qualification.Code.EMPLOI
+      }
+
+      // When
+      await request(app.getHttpServer())
+        .post(`/actions/${command.idAction}/qualifier`)
+        .send({
+          ...command,
+          dateDebut: uneDatetimeAvecOffset().toISO(),
+          dateFinReelle: uneDatetimeAvecOffset().toISO()
+        })
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .set('authorization', unHeaderAuthorization())
+        // Then
+        .expect(HttpStatus.BAD_REQUEST)
+    })
     ensureUserAuthenticationFailsIfInvalid('post', '/actions/123/qualifier')
   })
 })

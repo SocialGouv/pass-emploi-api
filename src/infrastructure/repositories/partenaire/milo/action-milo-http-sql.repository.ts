@@ -30,9 +30,7 @@ export class ActionMiloHttpRepository implements MiloAction.Repository {
       const body = {
         dateDebut: action.dateDebut.toFormat('yyyy-MM-dd'),
         dateFinReelle: action.dateFinReelle.toFormat('yyyy-MM-dd'),
-        commentaire: [action.contenu, action.description]
-          .join(' - ')
-          .slice(0, 255),
+        commentaire: action.qualification.commentairePartenaire,
         mesure: action.qualification.code,
         loginConseiller: action.loginConseiller
       }

@@ -69,12 +69,14 @@ describe('QualifierActionCommandHandler', () => {
             const actionTerminee: Action.Terminee = uneActionTerminee({
               id: idAction
             })
+            const commentairePartenaire = 'Un commentaire valide'
             const actionQualifiee: Action.Qualifiee = {
               ...actionTerminee,
               dateDebut: actionTerminee.dateCreation,
               qualification: {
                 code: Action.Qualification.Code.SANTE,
-                heures: 2
+                heures: 2,
+                commentairePartenaire
               }
             }
             const actionMilo: MiloAction = {
@@ -89,7 +91,8 @@ describe('QualifierActionCommandHandler', () => {
             const command: QualifierActionCommand = {
               idAction: idAction,
               utilisateur: utilisateurConseiller,
-              codeQualification: Action.Qualification.Code.SANTE
+              codeQualification: Action.Qualification.Code.SANTE,
+              commentairePartenaire
             }
             const result = await qualifierActionCommandHandler.handle(command)
 
@@ -104,7 +107,8 @@ describe('QualifierActionCommandHandler', () => {
               success({
                 code: 'SANTE',
                 heures: 2,
-                libelle: 'Santé'
+                libelle: 'Santé',
+                commentairePartenaire
               })
             )
           })
@@ -126,7 +130,8 @@ describe('QualifierActionCommandHandler', () => {
             const command: QualifierActionCommand = {
               idAction: idAction,
               utilisateur: utilisateurConseiller,
-              codeQualification: Action.Qualification.Code.SANTE
+              codeQualification: Action.Qualification.Code.SANTE,
+              commentairePartenaire: 'Un commentaire valide'
             }
             const result = await qualifierActionCommandHandler.handle(command)
 
@@ -149,7 +154,8 @@ describe('QualifierActionCommandHandler', () => {
             dateFinReelle: uneDatetime(),
             qualification: {
               code: Action.Qualification.Code.NON_SNP,
-              heures: 0
+              heures: 0,
+              commentairePartenaire: undefined
             }
           }
           actionRepository.get.withArgs(idAction).resolves(actionTerminee)
@@ -171,7 +177,8 @@ describe('QualifierActionCommandHandler', () => {
             success({
               code: 'NON_SNP',
               heures: 0,
-              libelle: 'Action non qualifiée en Situation Non Professionnelle'
+              libelle: 'Action non qualifiée en Situation Non Professionnelle',
+              commentairePartenaire: undefined
             })
           )
         })
