@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Action } from '../../../domain/action/action'
 import { Demarche } from '../../../domain/demarche'
 import { JeuneQueryModel } from './jeunes.query-model'
@@ -26,6 +26,9 @@ export class QualificationActionQueryModel {
 
   @ApiProperty()
   heures: number
+
+  @ApiPropertyOptional()
+  commentairePartenaire?: string
 }
 
 export class ActionQueryModel {

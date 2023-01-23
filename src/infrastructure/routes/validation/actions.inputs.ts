@@ -6,7 +6,8 @@ import {
   IsNotEmpty,
   IsNotIn,
   IsOptional,
-  IsString
+  IsString,
+  MaxLength
 } from 'class-validator'
 import { Action } from '../../../domain/action/action'
 
@@ -29,6 +30,12 @@ export class QualifierActionPayload {
   @IsString()
   @IsEnum(Action.Qualification.Code)
   codeQualification: Action.Qualification.Code
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  @MaxLength(255)
+  commentairePartenaire?: string
 
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @IsDateString()

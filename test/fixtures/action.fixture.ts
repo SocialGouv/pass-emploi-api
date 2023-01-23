@@ -50,7 +50,8 @@ export const uneActionQualifiee = (
     dateFinReelle: DateTime.fromJSDate(uneDate()),
     qualification: {
       code: Action.Qualification.Code.SANTE,
-      heures: 3
+      heures: 3,
+      commentairePartenaire: 'Un commentaire partenaire'
     }
   }
 
