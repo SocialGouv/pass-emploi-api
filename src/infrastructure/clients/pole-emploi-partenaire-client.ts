@@ -229,7 +229,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
       this.ajouterLeRetourAuContexteNode(res)
       return success(res.data)
     } catch (e) {
-      if (e.response.status === 500) {
+      if (!e.response || e.response.status === 500) {
         const cache = await this.recupererLesDernieresDonnees(suffixUrl)
         if (cache) {
           this.logger.warn(
@@ -242,7 +242,10 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
         }
       }
 
-      return failureApi(new ErreurHttp(e.response.data, e.response.status))
+      if (e.response) {
+        return failureApi(new ErreurHttp(e.response.data, e.response.status))
+      }
+      throw e
     }
   }
 
