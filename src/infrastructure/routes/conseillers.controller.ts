@@ -46,7 +46,10 @@ import {
 import { GetConseillerByEmailQueryHandler } from '../../application/queries/get-conseiller-by-email.query.handler.db'
 import { GetDetailConseillerQueryHandler } from '../../application/queries/get-detail-conseiller.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
-import { GetIndicateursPourConseillerQueryHandler } from '../../application/queries/get-indicateurs-pour-conseiller.query.handler.db'
+import {
+  GetIndicateursPourConseillerExclusionQuery,
+  GetIndicateursPourConseillerQueryHandler
+} from '../../application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { GetJeuneMiloByDossierQueryHandler } from '../../application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from '../../application/queries/get-jeunes-by-conseiller.query.handler.db'
 import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
@@ -571,12 +574,19 @@ export class ConseillersController {
     @Query()
     getIndicateursPourConseillerQueryParams: GetIndicateursPourConseillerQueryParams
   ): Promise<IndicateursPourConseillerQueryModel> {
+    let exclure: GetIndicateursPourConseillerExclusionQuery | undefined
+    if (getIndicateursPourConseillerQueryParams.exclureFavoris) {
+      exclure = {
+        favoris: true
+      }
+    }
     const result = await this.getIndicateursPourConseillerQueryHandler.execute(
       {
         idConseiller,
         idJeune,
         dateDebut: getIndicateursPourConseillerQueryParams.dateDebut,
-        dateFin: getIndicateursPourConseillerQueryParams.dateFin
+        dateFin: getIndicateursPourConseillerQueryParams.dateFin,
+        exclure
       },
       utilisateur
     )
@@ -593,9 +603,12 @@ export class ConseillersController {
   })
   @Post(':idConseiller/listes-de-diffusion')
   async getListesDeDiffusion(
-    @Param('idConseiller') idConseiller: string,
-    @Body() payload: CreateListeDeDiffusionPayload,
-    @Utilisateur() utilisateur: Authentification.Utilisateur
+    @Param('idConseiller')
+    idConseiller: string,
+    @Body()
+    payload: CreateListeDeDiffusionPayload,
+    @Utilisateur()
+    utilisateur: Authentification.Utilisateur
   ): Promise<void> {
     const command: CreateListeDeDiffusionCommand = {
       idConseiller,

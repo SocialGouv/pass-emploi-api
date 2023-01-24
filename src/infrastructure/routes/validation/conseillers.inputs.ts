@@ -179,6 +179,13 @@ export class GetIndicateursPourConseillerQueryParams {
   @IsDate()
   @Transform(({ value }) => new Date(value))
   dateFin: Date
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  @IsIn([true, false])
+  @Transform(params => transformStringToBoolean(params, 'exclureFavoris'))
+  exclureFavoris?: boolean
 }
 
 export class CreateListeDeDiffusionPayload {

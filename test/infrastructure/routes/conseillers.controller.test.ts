@@ -1203,7 +1203,8 @@ describe('ConseillersController', () => {
               idConseiller,
               idJeune,
               dateDebut: new Date(dateDebutString),
-              dateFin: new Date(dateFinString)
+              dateFin: new Date(dateFinString),
+              exclure: undefined
             },
             unUtilisateurDecode()
           )

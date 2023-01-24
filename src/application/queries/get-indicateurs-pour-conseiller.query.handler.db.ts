@@ -19,6 +19,11 @@ export interface GetIndicateursPourConseillerQuery extends Query {
   idJeune: string
   dateDebut: Date
   dateFin: Date
+  exclure?: GetIndicateursPourConseillerExclusionQuery
+}
+
+export interface GetIndicateursPourConseillerExclusionQuery {
+  favoris: boolean
 }
 
 @Injectable()
@@ -52,36 +57,16 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
     query: GetIndicateursPourConseillerQuery
   ): Promise<Result<IndicateursPourConseillerQueryModel>> {
     const maintenant = this.dateService.nowJs()
+    const exclureFavoris = query.exclure ? query.exclure.favoris : false
 
     const [
       actionsSqlDuJeune,
       rendezVousSqlDuJeune,
       offresEtFavorisEvenementsSql
     ] = await Promise.all([
-      ActionSqlModel.findAll({
-        where: {
-          idJeune: query.idJeune
-        }
-      }),
-      RendezVousSqlModel.findAll({
-        where: {
-          dateSuppression: { [Op.is]: null },
-          date: { [Op.between]: [query.dateDebut, query.dateFin] }
-        },
-        include: [
-          {
-            model: JeuneSqlModel,
-            where: { id: query.idJeune }
-          }
-        ]
-      }),
-      EvenementEngagementSqlModel.findAll({
-        where: {
-          typeUtilisateur: Authentification.Type.JEUNE,
-          idUtilisateur: query.idJeune,
-          dateEvenement: { [Op.between]: [query.dateDebut, query.dateFin] }
-        }
-      })
+      findAllActions(query),
+      findAllRendezVous(query),
+      exclureFavoris ? Promise.resolve([]) : findAllFavoris(query)
     ])
 
     const indicateursActions = this.getIndicateursActions(
@@ -96,7 +81,6 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
     const indicateursOffresEtFavoris = this.getIndicateursOffresEtFavoris(
       offresEtFavorisEvenementsSql
     )
-
     return success({
       actions: indicateursActions,
       rendezVous: {
@@ -288,4 +272,43 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
       dateFin
     )
   }
+}
+
+function findAllActions(
+  query: GetIndicateursPourConseillerQuery
+): Promise<ActionSqlModel[]> {
+  return ActionSqlModel.findAll({
+    where: {
+      idJeune: query.idJeune
+    }
+  })
+}
+
+function findAllRendezVous(
+  query: GetIndicateursPourConseillerQuery
+): Promise<RendezVousSqlModel[]> {
+  return RendezVousSqlModel.findAll({
+    where: {
+      dateSuppression: { [Op.is]: null },
+      date: { [Op.between]: [query.dateDebut, query.dateFin] }
+    },
+    include: [
+      {
+        model: JeuneSqlModel,
+        where: { id: query.idJeune }
+      }
+    ]
+  })
+}
+
+function findAllFavoris(
+  query: GetIndicateursPourConseillerQuery
+): Promise<EvenementEngagementSqlModel[]> {
+  return EvenementEngagementSqlModel.findAll({
+    where: {
+      typeUtilisateur: Authentification.Type.JEUNE,
+      idUtilisateur: query.idJeune,
+      dateEvenement: { [Op.between]: [query.dateDebut, query.dateFin] }
+    }
+  })
 }
