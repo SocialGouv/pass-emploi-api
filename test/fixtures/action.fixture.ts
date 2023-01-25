@@ -51,7 +51,7 @@ export const uneActionQualifiee = (
     qualification: {
       code: Action.Qualification.Code.SANTE,
       heures: 3,
-      commentairePartenaire: 'Un commentaire partenaire'
+      commentaireQualification: 'Un commentaire'
     }
   }
 

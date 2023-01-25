@@ -531,7 +531,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
             statut: Action.Statut.TERMINEE,
             qualification: {
               code: Action.Qualification.Code.SANTE,
-              heures: 2
+              heures: 2,
+              commentaireQualification: 'Un commentaire'
             },
             dateDerniereActualisation: DateTime.fromISO(
               '2020-04-07T12:00:00.000Z'
@@ -548,7 +549,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
             {
               code: Action.Qualification.Code.SANTE,
               heures: 2,
-              libelle: 'Santé'
+              libelle: 'Santé',
+              commentaireQualification: 'Un commentaire'
             }
           )
           actionQMAQualifier = uneActionQueryModelFromDomain(
@@ -668,7 +670,8 @@ describe('GetActionsByJeuneQueryHandler', () => {
             ),
             qualification: {
               code: Action.Qualification.Code.CITOYENNETE,
-              heures: 5
+              heures: 5,
+              commentaireQualification: 'Un commentaire'
             }
           })
           const actionAnnulee = uneAction({

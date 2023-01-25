@@ -70,6 +70,9 @@ export class ActionDto extends Model {
 
   @Column({ field: 'qualification_heures', type: DataType.INTEGER })
   heuresQualifiees?: number | null
+
+  @Column({ field: 'qualification_commentaire', type: DataType.STRING })
+  commentaireQualification?: string | null
 }
 
 @Table({ timestamps: false, tableName: 'action' })

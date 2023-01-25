@@ -81,7 +81,8 @@ describe('Action', () => {
             statut: Action.Statut.TERMINEE,
             qualification: {
               code: Action.Qualification.Code.EMPLOI,
-              heures: 3
+              heures: 3,
+              commentaireQualification: 'Un commentaire'
             }
           })
 
@@ -570,7 +571,8 @@ describe('Action', () => {
       // When
       const actionQualifiee = Action.qualifier(
         actionTerminee,
-        Action.Qualification.Code.NON_SNP
+        Action.Qualification.Code.NON_SNP,
+        'Un commentaire'
       )
 
       const expectedAction: Action.Qualifiee = {
@@ -580,7 +582,7 @@ describe('Action', () => {
         qualification: {
           code: Action.Qualification.Code.NON_SNP,
           heures: 0,
-          commentairePartenaire: undefined
+          commentaireQualification: 'Un commentaire'
         }
       }
 
@@ -609,7 +611,7 @@ describe('Action', () => {
         qualification: {
           code: Action.Qualification.Code.SANTE,
           heures: 2,
-          commentairePartenaire: 'Un commentaire'
+          commentaireQualification: 'Un commentaire'
         },
         dateDebut: actionTerminee.dateCreation,
         dateFinReelle: nouvelleDateFinReelle
@@ -623,13 +625,15 @@ describe('Action', () => {
         statut: Action.Statut.TERMINEE,
         qualification: {
           code: Action.Qualification.Code.EMPLOI,
-          heures: 2
+          heures: 2,
+          commentaireQualification: 'Un commentaire'
         }
       })
       // When
       const result = Action.qualifier(
         actionTerminee,
-        Action.Qualification.Code.SANTE
+        Action.Qualification.Code.SANTE,
+        'Un commentaire'
       )
 
       // Then
@@ -645,7 +649,8 @@ describe('Action', () => {
       // When
       const result = Action.qualifier(
         actionEnCours,
-        Action.Qualification.Code.SANTE
+        Action.Qualification.Code.SANTE,
+        'Un commentaire'
       )
 
       // Then
@@ -662,7 +667,7 @@ describe('Action', () => {
       const result = Action.qualifier(
         actionTerminee,
         Action.Qualification.Code.SANTE,
-        undefined,
+        'Un commentaire',
         DateTime.fromISO('2022-07-01')
       )
 
@@ -671,27 +676,6 @@ describe('Action', () => {
         failure(
           new MauvaiseCommandeError(
             'La date de fin doit être postérieure à la date de création'
-          )
-        )
-      )
-    })
-    it('rejette quand un commentaire est renseigné pour une action NON_SNP', () => {
-      // Given
-      const actionTerminee: Action = uneActionTerminee()
-      // When
-      const result = Action.qualifier(
-        actionTerminee,
-        Action.Qualification.Code.NON_SNP,
-        'Un commentaire',
-        undefined,
-        DateTime.fromISO('2022-08-01')
-      )
-
-      // Then
-      expect(result).to.deep.equal(
-        failure(
-          new MauvaiseCommandeError(
-            'Aucun commentaire partenaire ne peut être renseigné pour une action non-SNP.'
           )
         )
       )
@@ -712,6 +696,23 @@ describe('Action', () => {
 
       // Then
       expect(isSuccess(result)).to.be.true()
+    })
+    it('rejette quand aucun commentaire n’est renseigné pour une SNP', () => {
+      // Given
+      const actionTerminee: Action = uneActionTerminee()
+      // When
+      const result = Action.qualifier(
+        actionTerminee,
+        Action.Qualification.Code.SANTE,
+        undefined,
+        undefined,
+        DateTime.fromISO('2022-08-01')
+      )
+
+      // Then
+      expect(!result._isSuccess && result.error).to.be.an.instanceOf(
+        MauvaiseCommandeError
+      )
     })
   })
 })
