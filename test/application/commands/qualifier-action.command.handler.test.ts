@@ -69,14 +69,14 @@ describe('QualifierActionCommandHandler', () => {
             const actionTerminee: Action.Terminee = uneActionTerminee({
               id: idAction
             })
-            const commentairePartenaire = 'Un commentaire valide'
+            const commentaireQualification = 'Un commentaire'
             const actionQualifiee: Action.Qualifiee = {
               ...actionTerminee,
               dateDebut: actionTerminee.dateCreation,
               qualification: {
                 code: Action.Qualification.Code.SANTE,
                 heures: 2,
-                commentairePartenaire
+                commentaireQualification
               }
             }
             const actionMilo: MiloAction = {
@@ -92,7 +92,7 @@ describe('QualifierActionCommandHandler', () => {
               idAction: idAction,
               utilisateur: utilisateurConseiller,
               codeQualification: Action.Qualification.Code.SANTE,
-              commentairePartenaire
+              commentaireQualification: commentaireQualification
             }
             const result = await qualifierActionCommandHandler.handle(command)
 
@@ -108,7 +108,7 @@ describe('QualifierActionCommandHandler', () => {
                 code: 'SANTE',
                 heures: 2,
                 libelle: 'Santé',
-                commentairePartenaire
+                commentaireQualification
               })
             )
           })
@@ -131,7 +131,7 @@ describe('QualifierActionCommandHandler', () => {
               idAction: idAction,
               utilisateur: utilisateurConseiller,
               codeQualification: Action.Qualification.Code.SANTE,
-              commentairePartenaire: 'Un commentaire valide'
+              commentaireQualification: 'Un commentaire'
             }
             const result = await qualifierActionCommandHandler.handle(command)
 
@@ -155,7 +155,7 @@ describe('QualifierActionCommandHandler', () => {
             qualification: {
               code: Action.Qualification.Code.NON_SNP,
               heures: 0,
-              commentairePartenaire: undefined
+              commentaireQualification: 'Un commentaire'
             }
           }
           actionRepository.get.withArgs(idAction).resolves(actionTerminee)
@@ -164,7 +164,8 @@ describe('QualifierActionCommandHandler', () => {
           const command: QualifierActionCommand = {
             idAction: idAction,
             utilisateur: utilisateurConseiller,
-            codeQualification: Action.Qualification.Code.NON_SNP
+            codeQualification: Action.Qualification.Code.NON_SNP,
+            commentaireQualification: 'Un commentaire'
           }
           const result = await qualifierActionCommandHandler.handle(command)
 
@@ -178,7 +179,7 @@ describe('QualifierActionCommandHandler', () => {
               code: 'NON_SNP',
               heures: 0,
               libelle: 'Action non qualifiée en Situation Non Professionnelle',
-              commentairePartenaire: undefined
+              commentaireQualification: 'Un commentaire'
             })
           )
         })
@@ -195,7 +196,8 @@ describe('QualifierActionCommandHandler', () => {
         const command: QualifierActionCommand = {
           idAction: idAction,
           utilisateur: utilisateurConseiller,
-          codeQualification: Action.Qualification.Code.SANTE
+          codeQualification: Action.Qualification.Code.SANTE,
+          commentaireQualification: 'Un commentaire'
         }
         const result = await qualifierActionCommandHandler.handle(command)
 
@@ -215,7 +217,8 @@ describe('QualifierActionCommandHandler', () => {
         const result = await qualifierActionCommandHandler.handle({
           idAction,
           utilisateur: utilisateurConseiller,
-          codeQualification: Action.Qualification.Code.CITOYENNETE
+          codeQualification: Action.Qualification.Code.CITOYENNETE,
+          commentaireQualification: 'Un commentaire'
         })
 
         // Then
@@ -232,7 +235,8 @@ describe('QualifierActionCommandHandler', () => {
       const command: QualifierActionCommand = {
         idAction: 'idAction',
         utilisateur: utilisateurConseiller,
-        codeQualification: Action.Qualification.Code.SANTE
+        codeQualification: Action.Qualification.Code.SANTE,
+        commentaireQualification: 'Un commentaire'
       }
 
       const utilisateur = utilisateurConseiller
@@ -253,7 +257,8 @@ describe('QualifierActionCommandHandler', () => {
       const command: QualifierActionCommand = {
         idAction: 'idAction',
         utilisateur,
-        codeQualification: Action.Qualification.Code.SANTE
+        codeQualification: Action.Qualification.Code.SANTE,
+        commentaireQualification: 'Un commentaire'
       }
 
       // When
@@ -275,7 +280,8 @@ describe('QualifierActionCommandHandler', () => {
       const command: QualifierActionCommand = {
         idAction: idAction,
         utilisateur: utilisateurConseiller,
-        codeQualification: Action.Qualification.Code.SANTE
+        codeQualification: Action.Qualification.Code.SANTE,
+        commentaireQualification: 'Un commentaire'
       }
       // When
       await qualifierActionCommandHandler.monitor(utilisateur, command)
@@ -292,7 +298,8 @@ describe('QualifierActionCommandHandler', () => {
       const command: QualifierActionCommand = {
         idAction: idAction,
         utilisateur: utilisateurConseiller,
-        codeQualification: Action.Qualification.Code.NON_SNP
+        codeQualification: Action.Qualification.Code.NON_SNP,
+        commentaireQualification: 'Un commentaire'
       }
 
       // When

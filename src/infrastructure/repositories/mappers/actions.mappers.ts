@@ -73,7 +73,8 @@ export function buildQualification(
   if (actionSqlModel.codeQualification) {
     return {
       heures: actionSqlModel.heuresQualifiees!,
-      code: actionSqlModel.codeQualification
+      code: actionSqlModel.codeQualification,
+      commentaireQualification: actionSqlModel.commentaireQualification ?? ''
     }
   } else {
     return undefined
@@ -91,7 +92,8 @@ export function buildQualificationQueryModel(
     return {
       heures: type.heures,
       code: actionSqlModel.codeQualification,
-      libelle: type.label
+      libelle: type.label,
+      commentaireQualification: actionSqlModel.commentaireQualification ?? ''
     }
   } else {
     return undefined

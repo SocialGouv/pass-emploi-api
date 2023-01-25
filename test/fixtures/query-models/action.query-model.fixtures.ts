@@ -45,7 +45,8 @@ export const uneActionQueryModelTermineeAvecQualification = (
   qualification: {
     heures: 2,
     libelle: 'Santé',
-    code: Action.Qualification.Code.SANTE
+    code: Action.Qualification.Code.SANTE,
+    commentaireQualification: 'Un commentaire'
   }
 })
 

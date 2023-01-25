@@ -210,7 +210,7 @@ export class ActionsController {
     const command: QualifierActionCommand = {
       idAction,
       codeQualification: qualifierActionPayload.codeQualification,
-      commentairePartenaire: qualifierActionPayload.commentairePartenaire,
+      commentaireQualification: qualifierActionPayload.commentaireQualification,
       dateDebut,
       dateFinReelle,
       utilisateur

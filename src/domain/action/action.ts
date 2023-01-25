@@ -134,7 +134,7 @@ export namespace Action {
   export function qualifier(
     action: Action,
     codeQualification: Action.Qualification.Code,
-    commentairePartenaire?: string,
+    commentaireQualification?: string,
     dateDebut?: DateTime,
     dateFinReelle?: DateTime
   ): Result<Action.Qualifiee> {
@@ -159,12 +159,12 @@ export namespace Action {
       )
     }
     if (
-      commentairePartenaire &&
-      codeQualification === Qualification.Code.NON_SNP
+      !commentaireQualification &&
+      codeQualification !== Action.Qualification.Code.NON_SNP
     ) {
       return failure(
         new MauvaiseCommandeError(
-          'Aucun commentaire partenaire ne peut être renseigné pour une action non-SNP.'
+          'Le commentaire de qualification est obligatoire pour une SNP.'
         )
       )
     }
@@ -178,7 +178,7 @@ export namespace Action {
       qualification: {
         code: codeQualification,
         heures,
-        commentairePartenaire
+        commentaireQualification
       }
     })
   }
