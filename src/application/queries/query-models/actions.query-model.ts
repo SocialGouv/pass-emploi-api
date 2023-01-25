@@ -28,7 +28,7 @@ export class QualificationActionQueryModel {
   heures: number
 
   @ApiPropertyOptional()
-  commentairePartenaire?: string
+  commentaireQualification?: string
 }
 
 export class ActionQueryModel {

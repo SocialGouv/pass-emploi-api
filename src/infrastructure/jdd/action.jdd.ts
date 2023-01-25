@@ -30,7 +30,8 @@ export function uneActionJdd(
     dateFinReelle: null,
     rappel: true,
     heuresQualifiees: null,
-    codeQualification: null
+    codeQualification: null,
+    commentaireQualification: null
   }
 
   return { ...defaults, ...args }
