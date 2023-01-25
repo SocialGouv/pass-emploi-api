@@ -102,7 +102,7 @@
     "rimraf": "4.1.2",
     "rxjs": "7.8.0",
     "sequelize": "6.28.0",
-    "sequelize-cli": "6.5.2",
+    "sequelize-cli": "6.6.0",
     "sequelize-typescript": "2.1.5",
     "swagger-ui-express": "4.6.0",
     "tokenbucket": "^0.3.2",
