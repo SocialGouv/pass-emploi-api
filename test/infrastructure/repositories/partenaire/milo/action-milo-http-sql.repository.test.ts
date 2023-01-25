@@ -48,7 +48,7 @@ describe('MiloHttpSqlRepository', () => {
           .post('/sue/dossiers/idDossier/situation', {
             dateDebut: '2022-03-01',
             dateFinReelle: '2022-03-01',
-            commentaire: 'Un commentaire partenaire',
+            commentaire: 'Un commentaire',
             mesure: 'SANTE',
             loginConseiller: 'loginConseiller'
           })

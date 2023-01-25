@@ -31,11 +31,11 @@ export class QualifierActionPayload {
   @IsEnum(Action.Qualification.Code)
   codeQualification: Action.Qualification.Code
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   @MaxLength(255)
-  commentairePartenaire?: string
+  commentaireQualification?: string
 
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @IsDateString()

@@ -111,7 +111,8 @@ describe('ActionSqlRepository', () => {
         idJeune: jeune.id,
         dateFinReelle: new Date('2021-11-10T08:03:30.000Z'),
         codeQualification: Action.Qualification.Code.SANTE,
-        heuresQualifiees: 2
+        heuresQualifiees: 2,
+        commentaireQualification: 'Un commentaire'
       })
       await ActionSqlModel.creer(actionDto)
 
@@ -139,7 +140,8 @@ describe('ActionSqlRepository', () => {
         rappel: true,
         qualification: {
           code: Action.Qualification.Code.SANTE,
-          heures: 2
+          heures: 2,
+          commentaireQualification: 'Un commentaire'
         }
       }
       expect(actual).to.deep.equal(attendu)
@@ -155,7 +157,8 @@ describe('ActionSqlRepository', () => {
         dateDebut: DateTime.fromISO('2021-11-09T08:03:30.000Z').toJSDate(),
         dateFinReelle: DateTime.fromISO('2021-11-10T08:03:30.000Z').toJSDate(),
         codeQualification: Action.Qualification.Code.SANTE,
-        heuresQualifiees: 2
+        heuresQualifiees: 2,
+        commentaireQualification: 'Un commentaire'
       })
       await ActionSqlModel.creer(actionDto)
 
@@ -192,7 +195,8 @@ describe('ActionSqlRepository', () => {
         rappel: true,
         qualification: {
           code: Action.Qualification.Code.SANTE,
-          heures: 2
+          heures: 2,
+          commentaireQualification: 'Un commentaire'
         },
         commentaires: [
           { ...commentaireDto, date: DateTime.fromJSDate(commentaireDto.date) }

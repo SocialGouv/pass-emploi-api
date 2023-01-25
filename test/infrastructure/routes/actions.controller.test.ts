@@ -275,7 +275,7 @@ describe('ActionsController', () => {
         utilisateur,
         dateDebut: uneDatetimeAvecOffset(),
         dateFinReelle: uneDatetimeAvecOffset(),
-        commentairePartenaire: undefined,
+        commentaireQualification: 'Un commentaire valide',
         codeQualification: Action.Qualification.Code.EMPLOI
       }
 
@@ -285,7 +285,8 @@ describe('ActionsController', () => {
           success({
             code: Action.Qualification.Code.EMPLOI,
             heures: 3,
-            libelle: 'Emploi'
+            libelle: 'Emploi',
+            commentaireQualification: 'Un commentaire'
           })
         )
 
@@ -316,7 +317,7 @@ describe('ActionsController', () => {
         utilisateur,
         dateDebut: undefined,
         dateFinReelle: undefined,
-        commentairePartenaire: 'un commentaire valide',
+        commentaireQualification: 'un commentaire valide',
         codeQualification: Action.Qualification.Code.EMPLOI
       }
 
@@ -343,7 +344,7 @@ describe('ActionsController', () => {
         utilisateur,
         dateDebut: uneDatetimeAvecOffset(),
         dateFinReelle: uneDatetimeAvecOffset(),
-        commentairePartenaire:
+        commentaireQualification:
           "Un commentaire invalide car il dépasse la limite fixée à deux cent cinquante-cinq caractères par l'API-Application Programming Interface- développée par i-milo. Ce commentaire est invalide puisqu'il est d'une longueur de deux cent cinquante-six caractères.",
         codeQualification: Action.Qualification.Code.EMPLOI
       }

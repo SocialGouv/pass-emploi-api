@@ -30,7 +30,8 @@ export function uneActionDto(
     dateFinReelle: null,
     rappel: true,
     heuresQualifiees: null,
-    codeQualification: null
+    codeQualification: null,
+    commentaireQualification: null
   }
 
   return { ...defaults, ...args }
