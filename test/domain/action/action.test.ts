@@ -697,22 +697,32 @@ describe('Action', () => {
       // Then
       expect(isSuccess(result)).to.be.true()
     })
-    it('rejette quand aucun commentaire n’est renseigné pour une SNP', () => {
+    it('met une valeur par défaut quand aucun commentaire n’est renseigné pour une SNP', () => {
       // Given
       const actionTerminee: Action = uneActionTerminee()
+
       // When
       const result = Action.qualifier(
         actionTerminee,
         Action.Qualification.Code.SANTE,
         undefined,
         undefined,
-        DateTime.fromISO('2022-08-01')
+        dateFinReelle
       )
 
       // Then
-      expect(!result._isSuccess && result.error).to.be.an.instanceOf(
-        MauvaiseCommandeError
-      )
+      const expectedAction: Action.Qualifiee = {
+        ...actionTerminee,
+        dateDebut: actionTerminee.dateCreation,
+        dateFinReelle,
+        qualification: {
+          code: Action.Qualification.Code.SANTE,
+          heures: 2,
+          commentaireQualification:
+            "Contenu de l'action - Commentaire de l'action"
+        }
+      }
+      expect(result).to.be.deep.equal(success(expectedAction))
     })
   })
 })
