@@ -44,7 +44,10 @@ psql -d ${DUMP_RESTORE_DB_TARGET} \
   -c "CREATE EXTENSION IF NOT EXISTS postgis SCHEMA public;" \
   -c "CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder CASCADE SCHEMA public;" \
   -c "CREATE EXTENSION IF NOT EXISTS postgis_topology SCHEMA topology;" \
-  -c "CREATE EXTENSION IF NOT EXISTS pg_trgm SCHEMA public;" 
+  -c "CREATE EXTENSION IF NOT EXISTS pg_trgm SCHEMA public;" \
+  -c "create index evenement_engagement_type_utilisateur_index on evenement_engagement (type_utilisateur);" \
+  -c "create index evenement_engagement_structure_index on evenement_engagement (structure);" \
+  -c "create index evenement_engagement_date_index on evenement_engagement (date);"
 echo "extensions ok"
 
 pg_restore --clean --if-exists --no-owner --no-privileges --no-comments --dbname "${DUMP_RESTORE_DB_TARGET}" dump.pgsql
