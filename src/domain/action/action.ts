@@ -158,16 +158,6 @@ export namespace Action {
         )
       )
     }
-    if (
-      !commentaireQualification &&
-      codeQualification !== Action.Qualification.Code.NON_SNP
-    ) {
-      return failure(
-        new MauvaiseCommandeError(
-          'Le commentaire de qualification est obligatoire pour une SNP.'
-        )
-      )
-    }
 
     const { heures } = Qualification.mapCodeTypeQualification[codeQualification]
 
@@ -178,7 +168,11 @@ export namespace Action {
       qualification: {
         code: codeQualification,
         heures,
-        commentaireQualification
+        commentaireQualification: buildCommentaireQualification(
+          codeQualification,
+          action,
+          commentaireQualification
+        )
       }
     })
   }
@@ -326,4 +320,19 @@ export namespace Action {
       return dateFinReelle
     }
   }
+}
+
+function buildCommentaireQualification(
+  codeQualification: Action.Qualification.Code,
+  action: Action,
+  commentaireQualification?: string
+): string | undefined {
+  let commentaire = commentaireQualification
+  if (
+    !commentaireQualification &&
+    codeQualification !== Action.Qualification.Code.NON_SNP
+  ) {
+    commentaire = [action.contenu, action.description].join(' - ').slice(0, 255)
+  }
+  return commentaire
 }
