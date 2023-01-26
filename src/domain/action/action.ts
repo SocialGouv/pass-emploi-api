@@ -332,7 +332,7 @@ function buildCommentaireQualification(
     !commentaireQualification &&
     codeQualification !== Action.Qualification.Code.NON_SNP
   ) {
-    commentaire = action.description
+    commentaire = [action.contenu, action.description].join(' - ').slice(0, 255)
   }
   return commentaire
 }
