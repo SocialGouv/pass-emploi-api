@@ -67,6 +67,13 @@ export default () => {
         'https://immersion-facile.beta.gouv.fr/api',
       apiKey: process.env.IMMERSION_API_KEY ?? ''
     },
+    diagoriente: {
+      url:
+        process.env.DIAGORIENTE_API_URL ??
+        'https://api-dev.diagoriente.fr/graphql',
+      clientId: process.env.DIAGORIENTE_CLIENT_ID ?? '',
+      clientSecret: process.env.DIAGORIENTE_CLIENT_SECRET ?? ''
+    },
     serviceCivique: {
       url:
         process.env.SERVICE_CIVIQUE_API_URL ??
