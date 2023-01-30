@@ -1,13 +1,13 @@
-import { JeunePoleEmploiAuthorizer } from '../../../src/application/authorizers/authorize-jeune-pole-emploi'
+import { JeunePoleEmploiAuthorizer } from '../../../../src/application/authorizers/authorize-jeune-pole-emploi'
 import {
   GetRendezVousJeunePoleEmploiQuery,
   GetRendezVousJeunePoleEmploiQueryHandler
-} from '../../../src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
-import { Evenement, EvenementService } from '../../../src/domain/evenement'
-import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
+} from '../../../../src/application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
+import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
+import { expect, StubbedClass, stubClass } from '../../../utils'
+import { RendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
+import { Evenement, EvenementService } from '../../../../src/domain/evenement'
+import { GetRendezVousJeunePoleEmploiQueryGetter } from '../../../../src/application/queries/query-getters/pole-emploi/get-rendez-vous-jeune-pole-emploi.query.getter'
 import Periode = RendezVous.Periode
 
 describe('GetRendezVousJeunePoleEmploiQueryHandler', () => {

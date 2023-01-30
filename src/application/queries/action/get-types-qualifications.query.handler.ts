@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common'
-import { Query } from '../../building-blocks/types/query'
-import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { emptySuccess, Result } from '../../building-blocks/types/result'
-import { Qualification } from '../../domain/action/qualification'
-import { TypeQualificationQueryModel } from './query-models/actions.query-model'
+import { Query } from '../../../building-blocks/types/query'
+import { QueryHandler } from '../../../building-blocks/types/query-handler'
+import { emptySuccess, Result } from '../../../building-blocks/types/result'
+import { Qualification } from '../../../domain/action/qualification'
+import { TypeQualificationQueryModel } from '../query-models/actions.query-model'
 
 @Injectable()
 export class GetTypesQualificationsQueryHandler extends QueryHandler<

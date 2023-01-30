@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common'
-import { Authentification } from '../../domain/authentification'
-import { Query } from '../../building-blocks/types/query'
-import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { ActionAuthorizer } from '../authorizers/authorize-action'
-import { ActionQueryModel } from './query-models/actions.query-model'
-import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
-import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
-import { fromSqlToActionQueryModelWithJeune } from '../../infrastructure/repositories/mappers/actions.mappers'
-import { Result } from '../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
+import { Query } from '../../../building-blocks/types/query'
+import { QueryHandler } from '../../../building-blocks/types/query-handler'
+import { ActionAuthorizer } from '../../authorizers/authorize-action'
+import { ActionQueryModel } from '../query-models/actions.query-model'
+import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.sql-model'
+import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
+import { fromSqlToActionQueryModelWithJeune } from '../../../infrastructure/repositories/mappers/actions.mappers'
+import { Result } from '../../../building-blocks/types/result'
 
 export interface GetDetailActionQuery extends Query {
   idAction: string

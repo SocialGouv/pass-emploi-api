@@ -1,23 +1,23 @@
 import {
   AddCommentaireActionCommand,
   AddCommentaireActionCommandHandler
-} from '../../../src/application/commands/add-commentaire-action.command.handler'
-import { ActionAuthorizer } from '../../../src/application/authorizers/authorize-action'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+} from '../../../../src/application/commands/action/add-commentaire-action.command.handler'
+import { ActionAuthorizer } from '../../../../src/application/authorizers/authorize-action'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { unCommentaire, uneAction } from '../../fixtures/action.fixture'
-import { Action } from '../../../src/domain/action/action'
+import { unCommentaire, uneAction } from '../../../fixtures/action.fixture'
+import { Action } from '../../../../src/domain/action/action'
 import {
   unUtilisateurDecode,
   unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
-import { failure } from '../../../src/building-blocks/types/result'
-import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
-import { uneConfiguration } from '../../fixtures/jeune.fixture'
-import { Jeune } from '../../../src/domain/jeune/jeune'
-import { Notification } from '../../../src/domain/notification/notification'
-import { Evenement, EvenementService } from '../../../src/domain/evenement'
+} from '../../../fixtures/authentification.fixture'
+import { failure } from '../../../../src/building-blocks/types/result'
+import { NonTrouveError } from '../../../../src/building-blocks/types/domain-error'
+import { uneConfiguration } from '../../../fixtures/jeune.fixture'
+import { Jeune } from '../../../../src/domain/jeune/jeune'
+import { Notification } from '../../../../src/domain/notification/notification'
+import { Evenement, EvenementService } from '../../../../src/domain/evenement'
 import TypeCreateur = Action.TypeCreateur
 
 describe('AddCommentaireActionCommandHandler', () => {

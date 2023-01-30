@@ -4,26 +4,26 @@ import {
 } from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
 import { isSuccess } from 'src/building-blocks/types/result'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { ConseillerAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import {
   RendezVousDto,
   RendezVousSqlModel
-} from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { AsSql } from '../../../src/infrastructure/sequelize/types'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { uneDatetime } from '../../fixtures/date.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { expect, StubbedClass, stubClass } from '../../utils'
+} from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { AsSql } from '../../../../src/infrastructure/sequelize/types'
+import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
+import { uneDatetime } from '../../../fixtures/date.fixture'
+import { unJeune } from '../../../fixtures/jeune.fixture'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
+import { expect, StubbedClass, stubClass } from '../../../utils'
 import {
   DatabaseForTesting,
   getDatabase
-} from '../../utils/database-for-testing'
-import { testConfig } from '../../utils/module-for-testing'
+} from '../../../utils/database-for-testing'
+import { testConfig } from '../../../utils/module-for-testing'
 
 describe('GetRendezVousConseillerPaginesQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting

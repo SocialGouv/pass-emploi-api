@@ -1,7 +1,7 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
-import { DeleteActionCommandHandler } from '../../../src/application/commands/delete-action.command.handler'
-import { GetDetailActionQueryHandler } from '../../../src/application/queries/get-detail-action.query.handler.db'
+import { DeleteActionCommandHandler } from '../../../src/application/commands/action/delete-action.command.handler'
+import { GetDetailActionQueryHandler } from '../../../src/application/queries/action/get-detail-action.query.handler.db'
 import {
   DroitsInsuffisants,
   MauvaiseCommandeError,
@@ -20,8 +20,8 @@ import {
 import { uneActionQueryModel } from '../../fixtures/query-models/action.query-model.fixtures'
 import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
-import { AddCommentaireActionCommandHandler } from '../../../src/application/commands/add-commentaire-action.command.handler'
-import { GetCommentairesActionQueryHandler } from '../../../src/application/queries/get-commentaires-action.query.handler.db'
+import { AddCommentaireActionCommandHandler } from '../../../src/application/commands/action/add-commentaire-action.command.handler'
+import { GetCommentairesActionQueryHandler } from '../../../src/application/queries/action/get-commentaires-action.query.handler.db'
 import { CommentaireActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { Action } from 'src/domain/action/action'
@@ -29,7 +29,7 @@ import { uneDate, uneDatetimeAvecOffset } from '../../fixtures/date.fixture'
 import {
   QualifierActionCommand,
   QualifierActionCommandHandler
-} from '../../../src/application/commands/qualifier-action.command.handler'
+} from '../../../src/application/commands/action/qualifier-action.command.handler'
 import { DateService } from '../../../src/utils/date-service'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
