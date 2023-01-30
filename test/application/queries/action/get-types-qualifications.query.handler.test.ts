@@ -1,8 +1,8 @@
 import { expect } from 'chai'
 import { SinonSandbox } from 'sinon'
-import { GetTypesQualificationsQueryHandler } from 'src/application/queries/get-types-qualifications.query.handler'
+import { GetTypesQualificationsQueryHandler } from 'src/application/queries/action/get-types-qualifications.query.handler'
 import { Action } from 'src/domain/action/action'
-import { createSandbox } from '../../utils'
+import { createSandbox } from '../../../utils'
 
 describe('GetTypesQualificationsQueryHandler', () => {
   let getTypesQualificationsQueryHandler: GetTypesQualificationsQueryHandler

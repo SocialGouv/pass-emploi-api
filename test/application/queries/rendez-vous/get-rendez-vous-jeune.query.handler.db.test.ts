@@ -1,35 +1,35 @@
 import { stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { ConseillerForJeuneAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-for-jeune'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
 import {
   GetRendezVousJeuneQuery,
   GetRendezVousJeuneQueryHandler
-} from '../../../src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
-import { Evenement, EvenementService } from '../../../src/domain/evenement'
-import { RendezVous } from '../../../src/domain/rendez-vous/rendez-vous'
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+} from '../../../../src/application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
+import { Evenement, EvenementService } from '../../../../src/domain/evenement'
+import { RendezVous } from '../../../../src/domain/rendez-vous/rendez-vous'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import {
   RendezVousDto,
   RendezVousSqlModel
-} from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { AsSql } from '../../../src/infrastructure/sequelize/types'
-import { DateService } from '../../../src/utils/date-service'
+} from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { AsSql } from '../../../../src/infrastructure/sequelize/types'
+import { DateService } from '../../../../src/utils/date-service'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
-import { uneDatetime, uneDatetimeMinuit } from '../../fixtures/date.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { getDatabase } from '../../utils/database-for-testing'
-import { testConfig } from '../../utils/module-for-testing'
-import { stubClassSandbox } from '../../utils/types'
+} from '../../../fixtures/authentification.fixture'
+import { uneDatetime, uneDatetimeMinuit } from '../../../fixtures/date.fixture'
+import { unJeune } from '../../../fixtures/jeune.fixture'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
+import { getDatabase } from '../../../utils/database-for-testing'
+import { testConfig } from '../../../utils/module-for-testing'
+import { stubClassSandbox } from '../../../utils/types'
 
 describe('GetRendezVousJeuneQueryHandler', () => {
   let dateService: StubbedClass<DateService>

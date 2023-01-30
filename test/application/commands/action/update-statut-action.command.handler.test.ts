@@ -1,24 +1,24 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { Evenement, EvenementService } from 'src/domain/evenement'
-import { ActionAuthorizer } from '../../../src/application/authorizers/authorize-action'
+import { ActionAuthorizer } from '../../../../src/application/authorizers/authorize-action'
 import {
   UpdateStatutActionCommand,
   UpdateStatutActionCommandHandler
-} from '../../../src/application/commands/update-statut-action.command.handler'
-import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
+} from '../../../../src/application/commands/action/update-statut-action.command.handler'
+import { NonTrouveError } from '../../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
   success
-} from '../../../src/building-blocks/types/result'
-import { Action } from '../../../src/domain/action/action'
-import { uneAction } from '../../fixtures/action.fixture'
+} from '../../../../src/building-blocks/types/result'
+import { Action } from '../../../../src/domain/action/action'
+import { uneAction } from '../../../fixtures/action.fixture'
 import {
   unUtilisateurDecode,
   unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+} from '../../../fixtures/authentification.fixture'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 
 describe('UpdateStatutActionCommandHandler', () => {
   let actionRepository: StubbedType<Action.Repository>

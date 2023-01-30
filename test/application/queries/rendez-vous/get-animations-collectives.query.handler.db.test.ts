@@ -1,21 +1,24 @@
-import { GetAnimationsCollectivesQueryHandler } from '../../../src/application/queries/rendez-vous/get-animations-collectives.query.handler.db'
-import { ConseillerEtablissementAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-etablissement'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { unEtablissementDto } from '../../fixtures/sql-models/etablissement.sq-model'
-import { AgenceSqlModel } from '../../../src/infrastructure/sequelize/models/agence.sql-model'
-import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { uneDatetime } from '../../fixtures/date.fixture'
+import { GetAnimationsCollectivesQueryHandler } from '../../../../src/application/queries/rendez-vous/get-animations-collectives.query.handler.db'
+import { ConseillerEtablissementAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-etablissement'
+import { expect, StubbedClass, stubClass } from '../../../utils'
+import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { unEtablissementDto } from '../../../fixtures/sql-models/etablissement.sq-model'
+import { AgenceSqlModel } from '../../../../src/infrastructure/sequelize/models/agence.sql-model'
+import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
+import { uneDatetime } from '../../../fixtures/date.fixture'
 import {
   CodeTypeRendezVous,
   RendezVous
-} from '../../../src/domain/rendez-vous/rendez-vous'
-import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { isSuccess, success } from '../../../src/building-blocks/types/result'
-import { DateService } from '../../../src/utils/date-service'
-import { getDatabase } from '../../utils/database-for-testing'
+} from '../../../../src/domain/rendez-vous/rendez-vous'
+import { RendezVousSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import {
+  isSuccess,
+  success
+} from '../../../../src/building-blocks/types/result'
+import { DateService } from '../../../../src/utils/date-service'
+import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('GetAnimationsCollectivesQueryHandler', () => {
   beforeEach(async () => {

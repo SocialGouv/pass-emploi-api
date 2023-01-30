@@ -4,8 +4,8 @@ import { GetTypesRendezVousQueryHandler } from 'src/application/queries/rendez-v
 import {
   CategorieRendezVous,
   CodeTypeRendezVous
-} from '../../../src/domain/rendez-vous/rendez-vous'
-import { createSandbox } from '../../utils'
+} from '../../../../src/domain/rendez-vous/rendez-vous'
+import { createSandbox } from '../../../utils'
 
 describe('GetTypesRendezVousQueryHandler', () => {
   let getTypesRendezVousQueryHandler: GetTypesRendezVousQueryHandler

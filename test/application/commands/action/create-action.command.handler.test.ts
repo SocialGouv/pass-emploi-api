@@ -4,25 +4,25 @@ import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { Evenement, EvenementService } from 'src/domain/evenement'
 import { PlanificateurService } from 'src/domain/planificateur'
 import { stubClassSandbox } from 'test/utils/types'
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { ConseillerAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
 import {
   CreateActionCommand,
   CreateActionCommandHandler
-} from '../../../src/application/commands/create-action.command.handler'
-import { failure, success } from '../../../src/building-blocks/types/result'
-import { Action } from '../../../src/domain/action/action'
-import { Authentification } from '../../../src/domain/authentification'
-import { Jeune } from '../../../src/domain/jeune/jeune'
-import { Notification } from '../../../src/domain/notification/notification'
-import { uneAction } from '../../fixtures/action.fixture'
+} from '../../../../src/application/commands/action/create-action.command.handler'
+import { failure, success } from '../../../../src/building-blocks/types/result'
+import { Action } from '../../../../src/domain/action/action'
+import { Authentification } from '../../../../src/domain/authentification'
+import { Jeune } from '../../../../src/domain/jeune/jeune'
+import { Notification } from '../../../../src/domain/notification/notification'
+import { uneAction } from '../../../fixtures/action.fixture'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { Core } from '../../../src/domain/core'
+} from '../../../fixtures/authentification.fixture'
+import { unJeune } from '../../../fixtures/jeune.fixture'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
+import { Core } from '../../../../src/domain/core'
 import Structure = Core.Structure
 
 describe('CreateActionCommandHandler', () => {

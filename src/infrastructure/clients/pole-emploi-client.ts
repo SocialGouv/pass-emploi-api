@@ -201,7 +201,7 @@ export class PoleEmploiClient {
 
         if (e.response?.status >= 400 && e.response?.status < 500) {
           const erreur = new ErreurHttp(
-            e.response.data?.message ?? 'erreur',
+            e.response.data?.message ?? 'Erreur API POLE EMPLOI',
             e.response.status
           )
           return failure(erreur)

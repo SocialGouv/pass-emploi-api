@@ -2,27 +2,27 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { describe } from 'mocha'
 import { SinonSandbox } from 'sinon'
 import { Evenement, EvenementService } from 'src/domain/evenement'
-import { ActionAuthorizer } from '../../../src/application/authorizers/authorize-action'
+import { ActionAuthorizer } from '../../../../src/application/authorizers/authorize-action'
 import {
   DeleteActionCommand,
   DeleteActionCommandHandler
-} from '../../../src/application/commands/delete-action.command.handler'
+} from '../../../../src/application/commands/action/delete-action.command.handler'
 import {
   MauvaiseCommandeError,
   NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
+} from '../../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure
-} from '../../../src/building-blocks/types/result'
-import { Action } from '../../../src/domain/action/action'
+} from '../../../../src/building-blocks/types/result'
+import { Action } from '../../../../src/domain/action/action'
 import {
   unCommentaire,
   uneAction,
   uneActionTerminee
-} from '../../fixtures/action.fixture'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+} from '../../../fixtures/action.fixture'
+import { unUtilisateurJeune } from '../../../fixtures/authentification.fixture'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 
 describe('DeleteActionCommandHandler', () => {
   let action: Action

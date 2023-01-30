@@ -1,21 +1,21 @@
-import { CommandHandler } from '../../building-blocks/types/command-handler'
-import { failure, Result, success } from '../../building-blocks/types/result'
-import { Command } from '../../building-blocks/types/command'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import { ActionAuthorizer } from '../authorizers/authorize-action'
-import { Authentification } from '../../domain/authentification'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
+import { failure, Result, success } from '../../../building-blocks/types/result'
+import { Command } from '../../../building-blocks/types/command'
+import { NonTrouveError } from '../../../building-blocks/types/domain-error'
+import { ActionAuthorizer } from '../../authorizers/authorize-action'
+import { Authentification } from '../../../domain/authentification'
 import {
   Action,
   ActionsRepositoryToken,
   CommentaireActionRepositoryToken
-} from '../../domain/action/action'
+} from '../../../domain/action/action'
 import { Inject } from '@nestjs/common'
 import {
   Jeune,
   JeuneConfigurationApplicationRepositoryToken
-} from '../../domain/jeune/jeune'
-import { Notification } from '../../domain/notification/notification'
-import { Evenement, EvenementService } from '../../domain/evenement'
+} from '../../../domain/jeune/jeune'
+import { Notification } from '../../../domain/notification/notification'
+import { Evenement, EvenementService } from '../../../domain/evenement'
 
 export interface AddCommentaireActionCommand extends Command {
   idAction: string
