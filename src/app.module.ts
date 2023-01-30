@@ -132,6 +132,7 @@ import { OidcAuthGuard } from './infrastructure/auth/oidc.auth-guard'
 import { EngagementClient } from './infrastructure/clients/engagement-client'
 import { FirebaseClient } from './infrastructure/clients/firebase-client'
 import { ImmersionClient } from './infrastructure/clients/immersion-client'
+import { DiagorienteClient } from './infrastructure/clients/diagoriente-client'
 import { KeycloakClient } from './infrastructure/clients/keycloak-client'
 import { MailSendinblueService } from './infrastructure/clients/mail-sendinblue.service'
 import { ObjectStorageClient } from './infrastructure/clients/object-storage.client'
@@ -303,6 +304,8 @@ import { HandleJobFakeCommandHandler } from './application/commands/jobs/handle-
 import { MettreAJourLesJeunesCejPeCommandHandler } from './application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
 import { ChangerAgenceCommandHandler } from './application/commands/changer-agence.command.handler'
 import { GetActionsConseillerV2QueryHandler } from './application/queries/action/get-actions-conseiller-v2.query.handler.db'
+import { DiagorienteController } from './infrastructure/routes/diagoriente.controller'
+import { GetDiagorienteUrlQueryHandler } from './application/queries/get-diagoriente-url.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -318,30 +321,37 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     TerminusModule
   ],
   controllers: [
+    // De base
     ActionsController,
     JeunesController,
     JeunesControllerV2,
-    OffresEmploiController,
-    OffresImmersionController,
     ConseillersController,
     ConseillersControllerV2,
-    HealthController,
     RendezVousController,
-    AuthentificationController,
-    ReferentielsController,
-    ReferentielsControllerV2,
-    EvenementsController,
+    EtablissementsController,
+    // Recherche
+    OffresEmploiController,
+    OffresImmersionController,
+    ServicesCiviqueController,
+    FavorisController,
     RecherchesJeunesController,
     RecherchesConseillersController,
-    FavorisController,
-    ServicesCiviqueController,
-    CampagnesController,
-    FilesController,
-    EtablissementsController,
-    ListesDeDiffusionController,
+    DiagorienteController,
+    // Evenements d'engagement
+    EvenementsController,
+    // Messages
     MessagesController,
     ListesDeDiffusionController,
-    SupportController
+    FilesController,
+    // Referentiels
+    ReferentielsController,
+    ReferentielsControllerV2,
+    // Campagnes
+    CampagnesController,
+    // Autre
+    AuthentificationController,
+    SupportController,
+    HealthController
   ],
   providers: [
     ...buildQueryCommandsProviders(),
@@ -384,6 +394,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Conseiller.ListeDeDiffusion.Service,
     RendezVousMilo.Factory,
     BigqueryClient,
+    DiagorienteClient,
     {
       provide: APP_GUARD,
       useClass: OidcAuthGuard
@@ -670,7 +681,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     EnvoyerMessageGroupeCommandHandler,
     MettreAJourLesJeunesCejPeCommandHandler,
     ChangerAgenceCommandHandler,
-    GetActionsConseillerV2QueryHandler
+    GetActionsConseillerV2QueryHandler,
+    GetDiagorienteUrlQueryHandler
   ]
 }
 
