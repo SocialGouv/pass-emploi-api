@@ -37,6 +37,7 @@ export class MiloRendezVousHttpRepository implements MiloRendezVous.Repository {
 
   async findAllEvenements(): Promise<MiloRendezVous.Evenement[]> {
     await this.rateLimiterService.getEvenementMilo.attendreLaProchaineDisponibilite()
+    this.logger.log("Appel de l'api i-milo findAllEvenements")
     const evenements = await firstValueFrom(
       this.httpService.get<EvenementMiloDto[]>(
         `${this.apiUrl}/operateurs/events`,
