@@ -32,8 +32,8 @@ export class QualifierActionPayload {
   codeQualification: Action.Qualification.Code
 
   @ApiPropertyOptional()
-  @IsString()
   @IsOptional()
+  @IsString()
   @MaxLength(255)
   commentaireQualification?: string
 

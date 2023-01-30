@@ -144,8 +144,7 @@ export class ActionSqlRepository implements Action.Repository {
       rappel: action.rappel,
       codeQualification: action.qualification?.code ?? null,
       heuresQualifiees: action.qualification?.heures ?? null,
-      commentaireQualification:
-        action.qualification?.commentaireQualification ?? null
+      commentaireQualification: action.qualification?.commentaire ?? null
     }
   }
 }

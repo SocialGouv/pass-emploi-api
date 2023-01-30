@@ -76,7 +76,7 @@ describe('QualifierActionCommandHandler', () => {
               qualification: {
                 code: Action.Qualification.Code.SANTE,
                 heures: 2,
-                commentaireQualification
+                commentaire: commentaireQualification
               }
             }
             const actionMilo: MiloAction = {
@@ -155,7 +155,7 @@ describe('QualifierActionCommandHandler', () => {
             qualification: {
               code: Action.Qualification.Code.NON_SNP,
               heures: 0,
-              commentaireQualification: 'Un commentaire'
+              commentaire: 'Un commentaire'
             }
           }
           actionRepository.get.withArgs(idAction).resolves(actionTerminee)

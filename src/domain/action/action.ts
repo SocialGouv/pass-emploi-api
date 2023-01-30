@@ -59,7 +59,7 @@ export namespace Action {
 
   export interface Qualifiee extends Terminee {
     dateDebut: DateTime
-    qualification: Action.Qualification
+    qualification: Qualification
   }
 
   export interface Repository {
@@ -133,7 +133,7 @@ export namespace Action {
 
   export function qualifier(
     action: Action,
-    codeQualification: Action.Qualification.Code,
+    codeQualification: Qualification.Code,
     commentaireQualification?: string,
     dateDebut?: DateTime,
     dateFinReelle?: DateTime
@@ -146,12 +146,9 @@ export namespace Action {
     }
 
     const dateDebutReelle = dateDebut ?? action.dateCreation
-
     const dateFinReelleMiseAJour = dateFinReelle ?? action.dateFinReelle!
-    if (
-      dateDebutReelle.toUTC().startOf('day') >
-      dateFinReelleMiseAJour.toUTC().startOf('day')
-    ) {
+
+    if (DateService.isGreater(dateDebutReelle, dateFinReelleMiseAJour)) {
       return failure(
         new MauvaiseCommandeError(
           'La date de fin doit être postérieure à la date de création'
@@ -168,9 +165,9 @@ export namespace Action {
       qualification: {
         code: codeQualification,
         heures,
-        commentaireQualification: buildCommentaireQualification(
-          codeQualification,
+        commentaire: Qualification.buildCommentaire(
           action,
+          codeQualification,
           commentaireQualification
         )
       }
@@ -320,19 +317,4 @@ export namespace Action {
       return dateFinReelle
     }
   }
-}
-
-function buildCommentaireQualification(
-  codeQualification: Action.Qualification.Code,
-  action: Action,
-  commentaireQualification?: string
-): string | undefined {
-  let commentaire = commentaireQualification
-  if (
-    !commentaireQualification &&
-    codeQualification !== Action.Qualification.Code.NON_SNP
-  ) {
-    commentaire = [action.contenu, action.description].join(' - ').slice(0, 255)
-  }
-  return commentaire
 }
