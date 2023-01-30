@@ -169,7 +169,7 @@ export class ActionsController {
 
   @ApiOperation({
     summary: "Récupère les commentaires d'une action",
-    description: 'Autorisé pour un jeune et son conseiller.'
+    description: 'Autorisé pour un jeune et son conseiller'
   })
   @Get(':idAction/commentaires')
   async getCommentairesAction(
@@ -207,6 +207,7 @@ export class ActionsController {
           setZone: true
         })
       : undefined
+
     const command: QualifierActionCommand = {
       idAction,
       codeQualification: qualifierActionPayload.codeQualification,
