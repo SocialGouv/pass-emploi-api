@@ -1,19 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Evenement, EvenementService } from '../../domain/evenement'
-import { Command } from '../../building-blocks/types/command'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { Evenement, EvenementService } from '../../../domain/evenement'
+import { Command } from '../../../building-blocks/types/command'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
   MauvaiseCommandeError,
   NonTrouveError
-} from '../../building-blocks/types/domain-error'
+} from '../../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
   Result
-} from '../../building-blocks/types/result'
-import { Action, ActionsRepositoryToken } from '../../domain/action/action'
-import { Authentification } from '../../domain/authentification'
-import { ActionAuthorizer } from '../authorizers/authorize-action'
+} from '../../../building-blocks/types/result'
+import { Action, ActionsRepositoryToken } from '../../../domain/action/action'
+import { Authentification } from '../../../domain/authentification'
+import { ActionAuthorizer } from '../../authorizers/authorize-action'
 
 export interface DeleteActionCommand extends Command {
   idAction: string

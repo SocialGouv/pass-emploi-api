@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common'
 import { ApiOAuth2, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { GetActionsPredefiniesQueryHandler } from '../../application/queries/get-actions-predefinies.query.handler'
+import { GetActionsPredefiniesQueryHandler } from '../../application/queries/action/get-actions-predefinies.query.handler'
 import { GetAgencesQueryHandler } from '../../application/queries/get-agences.query.handler.db'
 import {
   GetCommunesEtDepartementsQuery,
@@ -11,7 +11,7 @@ import {
   GetMetiersRomeQueryHandler
 } from '../../application/queries/get-metiers-rome.query.handler.db'
 import { GetMotifsSuppressionJeuneQueryHandler } from '../../application/queries/get-motifs-suppression-jeune.query.handler'
-import { GetTypesQualificationsQueryHandler } from '../../application/queries/get-types-qualifications.query.handler'
+import { GetTypesQualificationsQueryHandler } from '../../application/queries/action/get-types-qualifications.query.handler'
 import { GetTypesRendezVousQueryHandler } from '../../application/queries/rendez-vous/get-types-rendez-vous.query.handler'
 import {
   ActionPredefinieQueryModel,

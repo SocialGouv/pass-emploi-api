@@ -6,7 +6,7 @@ import {
 } from 'src/application/queries/query-models/actions.query-model'
 import { Action } from 'src/domain/action/action'
 import * as request from 'supertest'
-import { GetActionsPredefiniesQueryHandler } from '../../../src/application/queries/get-actions-predefinies.query.handler'
+import { GetActionsPredefiniesQueryHandler } from '../../../src/application/queries/action/get-actions-predefinies.query.handler'
 import { GetAgencesQueryHandler } from '../../../src/application/queries/get-agences.query.handler.db'
 import { GetCommunesEtDepartementsQueryHandler } from '../../../src/application/queries/get-communes-et-departements.query.handler.db'
 import { GetMetiersRomeQueryHandler } from '../../../src/application/queries/get-metiers-rome.query.handler.db'

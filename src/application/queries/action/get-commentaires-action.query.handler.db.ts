@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common'
-import { Result, success } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
-import { Query } from '../../building-blocks/types/query'
-import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { CommentaireActionQueryModel } from './query-models/actions.query-model'
-import { ActionAuthorizer } from '../authorizers/authorize-action'
-import { CommentaireSqlModel } from '../../infrastructure/sequelize/models/commentaire.sql-model'
+import { Result, success } from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
+import { Query } from '../../../building-blocks/types/query'
+import { QueryHandler } from '../../../building-blocks/types/query-handler'
+import { CommentaireActionQueryModel } from '../query-models/actions.query-model'
+import { ActionAuthorizer } from '../../authorizers/authorize-action'
+import { CommentaireSqlModel } from '../../../infrastructure/sequelize/models/commentaire.sql-model'
 import { DateTime } from 'luxon'
 
 export interface GetCommentairesAction extends Query {

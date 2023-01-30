@@ -1,32 +1,32 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
-import { ActionAuthorizer } from '../../../src/application/authorizers/authorize-action'
+import { ActionAuthorizer } from '../../../../src/application/authorizers/authorize-action'
 import {
   QualifierActionCommand,
   QualifierActionCommandHandler
-} from '../../../src/application/commands/qualifier-action.command.handler'
+} from '../../../../src/application/commands/action/qualifier-action.command.handler'
 import {
   ErreurHttp,
   NonTrouveError
-} from '../../../src/building-blocks/types/domain-error'
+} from '../../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
   success
-} from '../../../src/building-blocks/types/result'
-import { Action } from '../../../src/domain/action/action'
-import { uneAction, uneActionTerminee } from '../../fixtures/action.fixture'
+} from '../../../../src/building-blocks/types/result'
+import { Action } from '../../../../src/domain/action/action'
+import { uneAction, uneActionTerminee } from '../../../fixtures/action.fixture'
 import {
   unUtilisateurConseiller,
   unUtilisateurDecode,
   unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { Jeune } from '../../../src/domain/jeune/jeune'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { Evenement, EvenementService } from '../../../src/domain/evenement'
-import { uneDatetime } from '../../fixtures/date.fixture'
-import { MiloAction } from '../../../src/domain/partenaire/milo/milo.action'
+} from '../../../fixtures/authentification.fixture'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
+import { Jeune } from '../../../../src/domain/jeune/jeune'
+import { unJeune } from '../../../fixtures/jeune.fixture'
+import { Evenement, EvenementService } from '../../../../src/domain/evenement'
+import { uneDatetime } from '../../../fixtures/date.fixture'
+import { MiloAction } from '../../../../src/domain/partenaire/milo/milo.action'
 
 describe('QualifierActionCommandHandler', () => {
   let actionRepository: StubbedType<Action.Repository>

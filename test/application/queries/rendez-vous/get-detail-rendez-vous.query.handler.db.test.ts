@@ -1,32 +1,32 @@
 import { SinonSandbox } from 'sinon'
-import { GetDetailRendezVousQueryHandler } from '../../../src/application/queries/rendez-vous/get-detail-rendez-vous.query.handler.db'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { GetDetailRendezVousQueryHandler } from '../../../../src/application/queries/rendez-vous/get-detail-rendez-vous.query.handler.db'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import {
   failure,
   isSuccess,
   success
-} from '../../../src/building-blocks/types/result'
-import { NonTrouveError } from '../../../src/building-blocks/types/domain-error'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { uneDate, uneDatetime } from '../../fixtures/date.fixture'
-import { RendezVousConseillerDetailQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
+} from '../../../../src/building-blocks/types/result'
+import { NonTrouveError } from '../../../../src/building-blocks/types/domain-error'
+import { unJeune } from '../../../fixtures/jeune.fixture'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { unRendezVousDto } from '../../../fixtures/sql-models/rendez-vous.sql-model'
+import { RendezVousSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { uneDate, uneDatetime } from '../../../fixtures/date.fixture'
+import { RendezVousConseillerDetailQueryModel } from '../../../../src/application/queries/query-models/rendez-vous.query-model'
 import {
   CodeTypeRendezVous,
   RendezVous
-} from '../../../src/domain/rendez-vous/rendez-vous'
-import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { RendezVousAuthorizer } from '../../../src/application/authorizers/authorize-rendezvous'
-import { LogModificationRendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
-import { DateService } from '../../../src/utils/date-service'
+} from '../../../../src/domain/rendez-vous/rendez-vous'
+import { RendezVousJeuneAssociationSqlModel } from '../../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
+import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
+import { RendezVousAuthorizer } from '../../../../src/application/authorizers/authorize-rendezvous'
+import { LogModificationRendezVousSqlModel } from '../../../../src/infrastructure/sequelize/models/log-modification-rendez-vous-sql.model'
+import { DateService } from '../../../../src/utils/date-service'
 import { DateTime } from 'luxon'
-import { getDatabase } from '../../utils/database-for-testing'
+import { getDatabase } from '../../../utils/database-for-testing'
 
 const queryModel: RendezVousConseillerDetailQueryModel = {
   adresse: undefined,

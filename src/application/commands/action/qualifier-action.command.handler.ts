@@ -1,29 +1,29 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { CommandHandler } from '../../building-blocks/types/command-handler'
+import { CommandHandler } from '../../../building-blocks/types/command-handler'
 import {
   DroitsInsuffisants,
   NonTrouveError
-} from '../../building-blocks/types/domain-error'
+} from '../../../building-blocks/types/domain-error'
 import {
   failure,
   isFailure,
   Result,
   success
-} from '../../building-blocks/types/result'
+} from '../../../building-blocks/types/result'
 import {
   Action,
   ActionMiloRepositoryToken,
   ActionsRepositoryToken
-} from '../../domain/action/action'
-import { Authentification } from '../../domain/authentification'
-import { ActionAuthorizer } from '../authorizers/authorize-action'
-import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
-import { QualificationActionQueryModel } from '../queries/query-models/actions.query-model'
-import { Evenement, EvenementService } from '../../domain/evenement'
-import { Command } from '../../building-blocks/types/command'
+} from '../../../domain/action/action'
+import { Authentification } from '../../../domain/authentification'
+import { ActionAuthorizer } from '../../authorizers/authorize-action'
+import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
+import { QualificationActionQueryModel } from '../../queries/query-models/actions.query-model'
+import { Evenement, EvenementService } from '../../../domain/evenement'
+import { Command } from '../../../building-blocks/types/command'
 import { DateTime } from 'luxon'
-import { MiloAction } from '../../domain/partenaire/milo/milo.action'
-import { Qualification } from '../../domain/action/qualification'
+import { MiloAction } from '../../../domain/partenaire/milo/milo.action'
+import { Qualification } from '../../../domain/action/qualification'
 
 export interface QualifierActionCommand extends Command {
   idAction: string

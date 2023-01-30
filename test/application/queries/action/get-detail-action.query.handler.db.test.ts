@@ -1,29 +1,29 @@
 import { SinonSandbox } from 'sinon'
 import { uneAction, uneActionQualifiee } from 'test/fixtures/action.fixture'
-import { ActionAuthorizer } from '../../../src/application/authorizers/authorize-action'
+import { ActionAuthorizer } from '../../../../src/application/authorizers/authorize-action'
 import {
   GetDetailActionQuery,
   GetDetailActionQueryHandler
-} from '../../../src/application/queries/get-detail-action.query.handler.db'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+} from '../../../../src/application/queries/action/get-detail-action.query.handler.db'
+import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
 import {
   uneActionQueryModelFromDomain,
   uneActionQueryModelTermineeAvecQualification
-} from '../../fixtures/query-models/action.query-model.fixtures'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { Action } from '../../../src/domain/action/action'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action/action-sql.repository.db'
-import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
-import { IdService } from '../../../src/utils/id-service'
-import { DateService } from '../../../src/utils/date-service'
-import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
+} from '../../../fixtures/query-models/action.query-model.fixtures'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
+import { Action } from '../../../../src/domain/action/action'
+import { unJeune } from '../../../fixtures/jeune.fixture'
+import { ActionSqlRepository } from '../../../../src/infrastructure/repositories/action/action-sql.repository.db'
+import { ConseillerSqlRepository } from '../../../../src/infrastructure/repositories/conseiller-sql.repository.db'
+import { unConseiller } from '../../../fixtures/conseiller.fixture'
+import { JeuneSqlRepository } from '../../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
+import { IdService } from '../../../../src/utils/id-service'
+import { DateService } from '../../../../src/utils/date-service'
+import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
 import {
   DatabaseForTesting,
   getDatabase
-} from '../../utils/database-for-testing'
+} from '../../../utils/database-for-testing'
 
 describe('GetDetailActionQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting

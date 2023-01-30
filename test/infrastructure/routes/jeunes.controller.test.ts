@@ -22,7 +22,7 @@ import {
 import * as request from 'supertest'
 import { uneDatetime, uneDatetimeAvecOffset } from 'test/fixtures/date.fixture'
 import { uneDemarche } from 'test/fixtures/demarche.fixture'
-import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
+import { CreateActionCommandHandler } from '../../../src/application/commands/action/create-action.command.handler'
 import { DeleteJeuneInactifCommandHandler } from '../../../src/application/commands/delete-jeune-inactif.command.handler'
 import { UpdateJeunePreferencesCommandHandler } from '../../../src/application/commands/update-preferences-jeune.command.handler'
 import { GetConseillersJeuneQueryHandler } from '../../../src/application/queries/get-conseillers-jeune.query.handler.db'
