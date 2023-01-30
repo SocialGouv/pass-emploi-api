@@ -141,7 +141,7 @@ describe('ActionSqlRepository', () => {
         qualification: {
           code: Action.Qualification.Code.SANTE,
           heures: 2,
-          commentaireQualification: 'Un commentaire'
+          commentaire: 'Un commentaire'
         }
       }
       expect(actual).to.deep.equal(attendu)
@@ -196,7 +196,7 @@ describe('ActionSqlRepository', () => {
         qualification: {
           code: Action.Qualification.Code.SANTE,
           heures: 2,
-          commentaireQualification: 'Un commentaire'
+          commentaire: 'Un commentaire'
         },
         commentaires: [
           { ...commentaireDto, date: DateTime.fromJSDate(commentaireDto.date) }

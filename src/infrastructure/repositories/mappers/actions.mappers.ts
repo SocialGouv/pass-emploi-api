@@ -74,7 +74,7 @@ export function buildQualification(
     return {
       heures: actionSqlModel.heuresQualifiees!,
       code: actionSqlModel.codeQualification,
-      commentaireQualification: actionSqlModel.commentaireQualification ?? ''
+      commentaire: actionSqlModel.commentaireQualification ?? ''
     }
   } else {
     return undefined

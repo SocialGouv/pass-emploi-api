@@ -1,7 +1,9 @@
+import { Action } from './action'
+
 export interface Qualification {
   code: Qualification.Code
   heures: number
-  commentaireQualification?: string
+  commentaire?: string
 }
 
 export namespace Qualification {
@@ -69,5 +71,21 @@ export namespace Qualification {
     code: Code
     label: string
     heures: number
+  }
+
+  export function buildCommentaire(
+    action: Action,
+    codeQualification: Qualification.Code,
+    commentaireQualification?: string
+  ): string | undefined {
+    const estSNP = codeQualification !== Action.Qualification.Code.NON_SNP
+
+    if (!estSNP) {
+      return undefined
+    }
+    if (!commentaireQualification) {
+      return [action.contenu, action.description].join(' - ').slice(0, 255)
+    }
+    return commentaireQualification
   }
 }

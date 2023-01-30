@@ -23,10 +23,11 @@ import { Evenement, EvenementService } from '../../domain/evenement'
 import { Command } from '../../building-blocks/types/command'
 import { DateTime } from 'luxon'
 import { MiloAction } from '../../domain/partenaire/milo/milo.action'
+import { Qualification } from '../../domain/action/qualification'
 
 export interface QualifierActionCommand extends Command {
   idAction: string
-  codeQualification: Action.Qualification.Code
+  codeQualification: Qualification.Code
   utilisateur: Authentification.Utilisateur
   commentaireQualification?: string
   dateDebut?: DateTime
@@ -55,11 +56,12 @@ export class QualifierActionCommandHandler extends CommandHandler<
     command: QualifierActionCommand
   ): Promise<Result<QualificationActionQueryModel>> {
     const action = await this.actionRepository.get(command.idAction)
+
     if (!action) {
       return failure(new NonTrouveError('Action', command.idAction))
     }
 
-    const qualifierActionResult = Action.qualifier(
+    const qualifierResult = Action.qualifier(
       action,
       command.codeQualification,
       command.commentaireQualification,
@@ -67,52 +69,46 @@ export class QualifierActionCommandHandler extends CommandHandler<
       command.dateFinReelle
     )
 
-    if (isFailure(qualifierActionResult)) {
-      return qualifierActionResult
+    if (isFailure(qualifierResult)) {
+      return qualifierResult
     }
 
-    const estUneSituationNonProfessionnelle =
-      qualifierActionResult.data.qualification.code !==
-      Action.Qualification.Code.NON_SNP
+    const actionQualifiee: Action.Qualifiee = qualifierResult.data
 
-    if (estUneSituationNonProfessionnelle) {
-      const jeune = await this.jeuneRepository.get(
-        qualifierActionResult.data.idJeune
-      )
+    const estSNP =
+      actionQualifiee.qualification.code !== Qualification.Code.NON_SNP
+
+    if (estSNP) {
+      const jeune = await this.jeuneRepository.get(actionQualifiee.idJeune)
       if (!jeune) {
-        return failure(
-          new NonTrouveError('Jeune', qualifierActionResult.data.idJeune)
-        )
+        return failure(new NonTrouveError('Jeune', actionQualifiee.idJeune))
       }
 
-      const creerActionMiloResult = MiloAction.creer(
-        qualifierActionResult.data,
+      const actionMiloResult = MiloAction.creer(
+        actionQualifiee,
         jeune,
         command.utilisateur
       )
 
-      if (isFailure(creerActionMiloResult)) {
-        return creerActionMiloResult
+      if (isFailure(actionMiloResult)) {
+        return actionMiloResult
       }
 
-      const creerSNPResult = await this.actionMiloRepository.save(
-        creerActionMiloResult.data
+      const qualificationResult = await this.actionMiloRepository.save(
+        actionMiloResult.data
       )
-      if (isFailure(creerSNPResult)) {
-        return creerSNPResult
+      if (isFailure(qualificationResult)) {
+        return qualificationResult
       }
     }
-    await this.actionRepository.save(qualifierActionResult.data)
+    await this.actionRepository.save(actionQualifiee)
 
     const typeQualification =
-      Action.Qualification.mapCodeTypeQualification[
-        qualifierActionResult.data.qualification.code
-      ]
+      Qualification.mapCodeTypeQualification[actionQualifiee.qualification.code]
 
     return success({
-      code: qualifierActionResult.data.qualification.code,
-      commentaireQualification:
-        qualifierActionResult.data.qualification.commentaireQualification,
+      code: actionQualifiee.qualification.code,
+      commentaireQualification: actionQualifiee.qualification.commentaire,
       libelle: typeQualification.label,
       heures: typeQualification.heures
     })
@@ -132,7 +128,7 @@ export class QualifierActionCommandHandler extends CommandHandler<
     utilisateur: Authentification.Utilisateur,
     command: QualifierActionCommand
   ): Promise<void> {
-    if (command.codeQualification === Action.Qualification.Code.NON_SNP) {
+    if (command.codeQualification === Qualification.Code.NON_SNP) {
       await this.evenementService.creer(
         Evenement.Code.ACTION_QUALIFIEE_NON_SNP,
         utilisateur
