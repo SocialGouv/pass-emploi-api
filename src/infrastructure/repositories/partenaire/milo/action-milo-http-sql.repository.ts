@@ -30,7 +30,7 @@ export class ActionMiloHttpRepository implements MiloAction.Repository {
       const body = {
         dateDebut: action.dateDebut.toFormat('yyyy-MM-dd'),
         dateFinReelle: action.dateFinReelle.toFormat('yyyy-MM-dd'),
-        commentaire: action.qualification.commentaireQualification,
+        commentaire: action.qualification.commentaire,
         mesure: action.qualification.code,
         loginConseiller: action.loginConseiller
       }
@@ -51,8 +51,16 @@ export class ActionMiloHttpRepository implements MiloAction.Repository {
       return emptySuccess()
     } catch (e) {
       this.logger.error(e)
-      const erreur = new ErreurHttp(e.response.data?.message, e.response.status)
-      return failure(erreur)
+
+      // requete aboutie mais le serveur répond avec statut hors 2XX
+      if (e.response) {
+        const erreur = new ErreurHttp(
+          e.response.data?.message ?? 'Erreur API MILO qualification',
+          e.response.status
+        )
+        return failure(erreur)
+      }
+      throw e
     }
   }
 }
