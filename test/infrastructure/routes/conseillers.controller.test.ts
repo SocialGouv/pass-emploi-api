@@ -15,7 +15,7 @@ import { CreateRendezVousPayload } from 'src/infrastructure/routes/validation/re
 import * as request from 'supertest'
 import { uneDatetime, uneDatetimeAvecOffset } from 'test/fixtures/date.fixture'
 import { unRendezVousConseillerFutursEtPassesQueryModel } from 'test/fixtures/rendez-vous.fixture'
-import { CreateActionCommandHandler } from '../../../src/application/commands/create-action.command.handler'
+import { CreateActionCommandHandler } from '../../../src/application/commands/action/create-action.command.handler'
 import {
   CreerJeuneMiloCommand,
   CreerJeuneMiloCommandHandler

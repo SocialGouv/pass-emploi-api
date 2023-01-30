@@ -13,15 +13,15 @@ import {
 } from '@nestjs/common'
 import { ApiOAuth2, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Authentification } from '../../domain/authentification'
-import { DeleteActionCommandHandler } from '../../application/commands/delete-action.command.handler'
+import { DeleteActionCommandHandler } from '../../application/commands/action/delete-action.command.handler'
 import {
   UpdateStatutActionCommand,
   UpdateStatutActionCommandHandler
-} from '../../application/commands/update-statut-action.command.handler'
+} from '../../application/commands/action/update-statut-action.command.handler'
 import {
   GetDetailActionQuery,
   GetDetailActionQueryHandler
-} from '../../application/queries/get-detail-action.query.handler.db'
+} from '../../application/queries/action/get-detail-action.query.handler.db'
 import {
   ActionQueryModel,
   CommentaireActionQueryModel,
@@ -38,13 +38,13 @@ import {
 import {
   AddCommentaireActionCommand,
   AddCommentaireActionCommandHandler
-} from '../../application/commands/add-commentaire-action.command.handler'
+} from '../../application/commands/action/add-commentaire-action.command.handler'
 import { handleFailure } from './failure.handler'
-import { GetCommentairesActionQueryHandler } from '../../application/queries/get-commentaires-action.query.handler.db'
+import { GetCommentairesActionQueryHandler } from '../../application/queries/action/get-commentaires-action.query.handler.db'
 import {
   QualifierActionCommand,
   QualifierActionCommandHandler
-} from '../../application/commands/qualifier-action.command.handler'
+} from '../../application/commands/action/qualifier-action.command.handler'
 import { DateTime } from 'luxon'
 import { toCommentaireQueryModel } from '../../application/queries/query-mappers/commentaire.mapper'
 

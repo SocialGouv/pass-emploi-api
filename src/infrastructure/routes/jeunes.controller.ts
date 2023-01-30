@@ -51,7 +51,7 @@ import { DateService } from '../../utils/date-service'
 import {
   CreateActionCommand,
   CreateActionCommandHandler
-} from '../../application/commands/create-action.command.handler'
+} from '../../application/commands/action/create-action.command.handler'
 import { DeleteJeuneInactifCommandHandler } from '../../application/commands/delete-jeune-inactif.command.handler'
 import {
   UpdateStatutDemarcheCommand,
@@ -59,7 +59,7 @@ import {
 } from '../../application/commands/update-demarche.command.handler'
 import { UpdateJeuneConfigurationApplicationCommandHandler } from '../../application/commands/update-jeune-configuration-application.command.handler'
 import { UpdateJeunePreferencesCommandHandler } from '../../application/commands/update-preferences-jeune.command.handler'
-import { GetActionsByJeuneQueryHandler } from '../../application/queries/get-actions-by-jeune.query.handler.db'
+import { GetActionsByJeuneQueryHandler } from '../../application/queries/action/get-actions-by-jeune.query.handler.db'
 import { GetConseillersJeuneQueryHandler } from '../../application/queries/get-conseillers-jeune.query.handler.db'
 import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
 import { GetJeuneHomeActionsQueryHandler } from '../../application/queries/get-jeune-home-actions.query.handler'

@@ -3,32 +3,32 @@ import { SinonSandbox } from 'sinon'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { failure, isSuccess } from 'src/building-blocks/types/result'
 import { uneAction } from 'test/fixtures/action.fixture'
-import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
-import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { ConseillerForJeuneAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-for-jeune'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
 import {
   GetActionsByJeuneQuery,
   GetActionsByJeuneQueryHandler
-} from '../../../src/application/queries/get-actions-by-jeune.query.handler.db'
-import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
-import { Action } from '../../../src/domain/action/action'
-import { FirebaseClient } from '../../../src/infrastructure/clients/firebase-client'
-import { ActionSqlRepository } from '../../../src/infrastructure/repositories/action/action-sql.repository.db'
-import { ConseillerSqlRepository } from '../../../src/infrastructure/repositories/conseiller-sql.repository.db'
-import { JeuneSqlRepository } from '../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
-import { DateService } from '../../../src/utils/date-service'
-import { IdService } from '../../../src/utils/id-service'
+} from '../../../../src/application/queries/action/get-actions-by-jeune.query.handler.db'
+import { ActionQueryModel } from '../../../../src/application/queries/query-models/actions.query-model'
+import { Action } from '../../../../src/domain/action/action'
+import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
+import { ActionSqlRepository } from '../../../../src/infrastructure/repositories/action/action-sql.repository.db'
+import { ConseillerSqlRepository } from '../../../../src/infrastructure/repositories/conseiller-sql.repository.db'
+import { JeuneSqlRepository } from '../../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
+import { DateService } from '../../../../src/utils/date-service'
+import { IdService } from '../../../../src/utils/id-service'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
-} from '../../fixtures/authentification.fixture'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { unJeune } from '../../fixtures/jeune.fixture'
-import { uneActionQueryModelFromDomain } from '../../fixtures/query-models/action.query-model.fixtures'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+} from '../../../fixtures/authentification.fixture'
+import { unConseiller } from '../../../fixtures/conseiller.fixture'
+import { unJeune } from '../../../fixtures/jeune.fixture'
+import { uneActionQueryModelFromDomain } from '../../../fixtures/query-models/action.query-model.fixtures'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
 import {
   DatabaseForTesting,
   getDatabase
-} from '../../utils/database-for-testing'
+} from '../../../utils/database-for-testing'
 
 describe('GetActionsByJeuneQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
@@ -532,7 +532,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
             qualification: {
               code: Action.Qualification.Code.SANTE,
               heures: 2,
-              commentaireQualification: 'Un commentaire'
+              commentaire: 'Un commentaire'
             },
             dateDerniereActualisation: DateTime.fromISO(
               '2020-04-07T12:00:00.000Z'
@@ -671,7 +671,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
             qualification: {
               code: Action.Qualification.Code.CITOYENNETE,
               heures: 5,
-              commentaireQualification: 'Un commentaire'
+              commentaire: 'Un commentaire'
             }
           })
           const actionAnnulee = uneAction({

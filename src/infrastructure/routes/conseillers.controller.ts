@@ -24,7 +24,7 @@ import { DateTime } from 'luxon'
 import {
   CreateActionCommand,
   CreateActionCommandHandler
-} from '../../application/commands/create-action.command.handler'
+} from '../../application/commands/action/create-action.command.handler'
 import {
   CreateRendezVousCommand,
   CreateRendezVousCommandHandler
