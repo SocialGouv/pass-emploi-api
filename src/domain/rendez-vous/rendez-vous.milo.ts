@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common'
-import { Result } from '../../../building-blocks/types/result'
+import { Result } from '../../building-blocks/types/result'
 import {
   CodeTypeRendezVous,
   JeuneDuRendezVous,
   RendezVous,
   RendezVous as RendezVousPassEmploi
-} from '../../rendez-vous/rendez-vous'
-import { IdService } from '../../../utils/id-service'
+} from './rendez-vous'
+import { IdService } from '../../utils/id-service'
 import { DateTime } from 'luxon'
 import Source = RendezVous.Source
 
@@ -14,20 +14,20 @@ const MILO_DATE_FORMAT = 'yyyy-MM-dd HH:mm:ss'
 
 export const MiloRendezVousRepositoryToken = 'MiloRendezVousRepositoryToken'
 
-export interface MiloRendezVous {
+export interface RendezVousMilo {
   id: string
   dateHeureDebut: string
   dateHeureFin?: string
   titre: string
   idPartenaireBeneficiaire: string
   commentaire?: string
-  type: MiloRendezVous.Type
+  type: RendezVousMilo.Type
   modalite?: string
   adresse?: string
   statut: string
 }
 
-export namespace MiloRendezVous {
+export namespace RendezVousMilo {
   export enum Type {
     RENDEZ_VOUS = 'RENDEZ_VOUS',
     SESSION = 'SESSION'
@@ -49,8 +49,8 @@ export namespace MiloRendezVous {
   export interface Evenement {
     id: string
     idPartenaireBeneficiaire: string
-    objet: MiloRendezVous.ObjetEvenement
-    type: MiloRendezVous.TypeEvenement
+    objet: RendezVousMilo.ObjetEvenement
+    type: RendezVousMilo.TypeEvenement
     idObjet: string
     date: string
   }
@@ -62,7 +62,7 @@ export namespace MiloRendezVous {
 
     findRendezVousByEvenement(
       evenement: Evenement
-    ): Promise<MiloRendezVous | undefined>
+    ): Promise<RendezVousMilo | undefined>
   }
 
   @Injectable()
@@ -70,7 +70,7 @@ export namespace MiloRendezVous {
     constructor(private idService: IdService) {}
 
     creerRendezVousPassEmploi(
-      rendezVousMilo: MiloRendezVous,
+      rendezVousMilo: RendezVousMilo,
       jeune: JeuneDuRendezVous
     ): RendezVousPassEmploi {
       const { dateTimeDebut, duree } = this.getDateEtDuree(
@@ -95,11 +95,11 @@ export namespace MiloRendezVous {
           }
         ],
         type:
-          rendezVousMilo.type === MiloRendezVous.Type.RENDEZ_VOUS
+          rendezVousMilo.type === RendezVousMilo.Type.RENDEZ_VOUS
             ? CodeTypeRendezVous.RENDEZ_VOUS_MILO
             : CodeTypeRendezVous.SESSION_MILO,
         presenceConseiller:
-          rendezVousMilo.type === MiloRendezVous.Type.RENDEZ_VOUS,
+          rendezVousMilo.type === RendezVousMilo.Type.RENDEZ_VOUS,
         commentaire: rendezVousMilo.commentaire,
         adresse: rendezVousMilo.adresse,
         modalite: rendezVousMilo.modalite,
@@ -113,7 +113,7 @@ export namespace MiloRendezVous {
 
     mettreAJourRendezVousPassEmploi(
       rendezVousPassEmploi: RendezVousPassEmploi,
-      rendezVousMilo: MiloRendezVous
+      rendezVousMilo: RendezVousMilo
     ): RendezVousPassEmploi {
       const { dateTimeDebut, duree } = this.getDateEtDuree(
         rendezVousMilo,
@@ -131,7 +131,7 @@ export namespace MiloRendezVous {
     }
 
     private getDateEtDuree(
-      rendezVousMilo: MiloRendezVous,
+      rendezVousMilo: RendezVousMilo,
       jeune: JeuneDuRendezVous
     ): { dateTimeDebut: DateTime; duree: number } {
       const dateTimeDebut = this.timezonerLaDate(
@@ -154,7 +154,7 @@ export namespace MiloRendezVous {
       jeune: JeuneDuRendezVous
     ): DateTime {
       return DateTime.fromFormat(dateString, MILO_DATE_FORMAT, {
-        zone: jeune.configuration!.fuseauHoraire ?? 'Europe/Paris'
+        zone: jeune.configuration.fuseauHoraire ?? 'Europe/Paris'
       })
     }
   }

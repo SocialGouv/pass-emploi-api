@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsBoolean, IsString } from 'class-validator'
-import { ValidateIf } from 'class-validator'
+import { IsBoolean, IsString, ValidateIf } from 'class-validator'
 
 export class TeleverserCsvPayload {
   @ApiProperty({ type: 'string', format: 'binary' })

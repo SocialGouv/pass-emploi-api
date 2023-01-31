@@ -3,7 +3,6 @@ import * as _Immersion from './offre-immersion'
 import * as _ServiceCivique from './offre-service-civique'
 
 export namespace Favori {
-  // FIXME: le linter ne comprend pas cette technique 🤷‍️
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import Emploi = _Emploi.Emploi
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars

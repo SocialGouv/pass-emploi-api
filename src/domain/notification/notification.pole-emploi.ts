@@ -1,12 +1,12 @@
 import { Notification as _Notification } from './notification'
 import { DateTime } from 'luxon'
 
-export interface PoleEmploi {
+export interface NotificationPoleEmploi {
   idExterneDE: string
-  notifications: PoleEmploi.Notification[]
+  notifications: NotificationPoleEmploi.Notification[]
 }
 
-export namespace PoleEmploi {
+export namespace NotificationPoleEmploi {
   export interface Notification {
     idNotification: string
     codeNotification: string

@@ -5,26 +5,23 @@ import { SituationsMiloSqlModel } from 'src/infrastructure/sequelize/models/situ
 import { DateService } from 'src/utils/date-service'
 import { IdService } from 'src/utils/id-service'
 import { uneSituationsMilo } from 'test/fixtures/milo.fixture'
-import { ErreurHttp } from '../../../../../src/building-blocks/types/domain-error'
-import {
-  failure,
-  success
-} from '../../../../../src/building-blocks/types/result'
-import { ConseillerSqlRepository } from '../../../../../src/infrastructure/repositories/conseiller-sql.repository.db'
-import { DossierMiloDto } from '../../../../../src/infrastructure/repositories/dto/milo.dto'
-import { JeuneSqlRepository } from '../../../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
-import { MiloJeuneHttpSqlRepository } from '../../../../../src/infrastructure/repositories/partenaire/milo/milo-jeune-http-sql.repository.db'
-import { RateLimiterService } from '../../../../../src/utils/rate-limiter.service'
-import { unJeune } from '../../../../fixtures/jeune.fixture'
-import { testConfig } from '../../../../utils/module-for-testing'
-import { unConseiller } from '../../../../fixtures/conseiller.fixture'
-import { stubClass } from '../../../../utils'
-import { FirebaseClient } from '../../../../../src/infrastructure/clients/firebase-client'
-import { MiloJeune } from '../../../../../src/domain/partenaire/milo/milo.jeune'
+import { ErreurHttp } from '../../../../src/building-blocks/types/domain-error'
+import { failure, success } from '../../../../src/building-blocks/types/result'
+import { ConseillerSqlRepository } from '../../../../src/infrastructure/repositories/conseiller-sql.repository.db'
+import { DossierMiloDto } from '../../../../src/infrastructure/repositories/dto/milo.dto'
+import { JeuneSqlRepository } from '../../../../src/infrastructure/repositories/jeune/jeune-sql.repository.db'
+import { MiloJeuneHttpSqlRepository } from '../../../../src/infrastructure/repositories/jeune/jeune-milo-http-sql.repository.db'
+import { RateLimiterService } from '../../../../src/utils/rate-limiter.service'
+import { unJeune } from '../../../fixtures/jeune.fixture'
+import { testConfig } from '../../../utils/module-for-testing'
+import { unConseiller } from '../../../fixtures/conseiller.fixture'
+import { stubClass } from '../../../utils'
+import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
+import { JeuneMilo } from '../../../../src/domain/jeune/jeune.milo'
 import {
   DatabaseForTesting,
   getDatabase
-} from '../../../../utils/database-for-testing'
+} from '../../../utils/database-for-testing'
 
 describe('MiloHttpRepository', () => {
   let databaseForTesting: DatabaseForTesting
@@ -294,9 +291,9 @@ const dossierDto = (): DossierMiloDto => ({
   },
   situations: [
     {
-      etat: MiloJeune.EtatSituation.EN_COURS,
+      etat: JeuneMilo.EtatSituation.EN_COURS,
       dateFin: null,
-      categorieSituation: MiloJeune.CategorieSituation.DEMANDEUR_D_EMPLOI,
+      categorieSituation: JeuneMilo.CategorieSituation.DEMANDEUR_D_EMPLOI,
       codeRomeMetierPrepare: null,
       codeRomePremierMetier: 'F1501',
       codeRomeMetierExerce: null

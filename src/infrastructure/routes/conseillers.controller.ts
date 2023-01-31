@@ -545,9 +545,7 @@ export class ConseillersController {
     type: PutJeuneDuConseillerPayload
   })
   async modiferJeuneDuConseiller(
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    @Param('idConseiller') idConseiller: string,
+    @Param('idConseiller') _idConseiller: string,
     @Param('idJeune') idJeune: string,
     @Body() putJeuneDuConseillerPayload: PutJeuneDuConseillerPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur

@@ -6,7 +6,7 @@ import { DateService } from '../../utils/date-service'
 import { IdService } from '../../utils/id-service'
 import { Core } from '../core'
 import * as _ConfigurationApplication from './configuration-application'
-import * as _PoleEmploi from './pole-emploi'
+import * as _PoleEmploi from './jeune.pole-emploi'
 
 export const JeunesRepositoryToken = 'Jeune.Repository'
 export const JeuneConfigurationApplicationRepositoryToken =
@@ -30,11 +30,10 @@ export interface Jeune {
 }
 
 export namespace Jeune {
-  // FIXME: le linter ne comprend pas cette technique 🤷‍️
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import ConfigurationApplication = _ConfigurationApplication.ConfigurationApplication
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
-  export import PoleEmploi = _PoleEmploi.PoleEmploi
+  export import PoleEmploi = _PoleEmploi.JeunePoleEmploi
 
   export interface Conseiller {
     id: string

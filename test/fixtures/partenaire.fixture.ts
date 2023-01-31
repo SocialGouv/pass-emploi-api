@@ -1,14 +1,14 @@
 import { EvenementMiloDto } from 'src/infrastructure/repositories/dto/milo.dto'
-import { MiloRendezVous } from '../../src/domain/partenaire/milo/milo.rendez-vous'
+import { RendezVousMilo } from '../../src/domain/rendez-vous/rendez-vous.milo'
 
 export const unEvenementMilo = (
-  args: Partial<MiloRendezVous.Evenement> = {}
-): MiloRendezVous.Evenement => {
+  args: Partial<RendezVousMilo.Evenement> = {}
+): RendezVousMilo.Evenement => {
   const defaults = {
     id: '63569521bdd5161673153f9f',
     idPartenaireBeneficiaire: '1234567',
-    objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
-    type: MiloRendezVous.TypeEvenement.CREATE,
+    objet: RendezVousMilo.ObjetEvenement.RENDEZ_VOUS,
+    type: RendezVousMilo.TypeEvenement.CREATE,
     idObjet: '34',
     date: '2022-10-24T08:00:34Z'
   }
@@ -30,16 +30,16 @@ export const unEvenementMiloDto = (
 }
 
 export const unRendezVousMilo = (
-  args: Partial<MiloRendezVous> = {}
-): MiloRendezVous => {
-  const defaults: MiloRendezVous = {
+  args: Partial<RendezVousMilo> = {}
+): RendezVousMilo => {
+  const defaults: RendezVousMilo = {
     id: '34',
     dateHeureDebut: '2022-10-06 10:00:00',
     dateHeureFin: '2022-10-06 12:00:00',
     titre: 'Test RDV',
     idPartenaireBeneficiaire: '5045180',
     commentaire: '',
-    type: MiloRendezVous.Type.RENDEZ_VOUS,
+    type: RendezVousMilo.Type.RENDEZ_VOUS,
     statut: 'Planifié'
   }
   return { ...defaults, ...args }

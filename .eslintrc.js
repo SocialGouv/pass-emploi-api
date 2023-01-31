@@ -20,13 +20,13 @@ module.exports = {
   rules: {
     'no-process-env': 'error',
     'no-console': 'error',
-    "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": [
-      "error",
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
       {
-        "argsIgnorePattern": "^_",
-        "varsIgnorePattern": "^_",
-        "caughtErrorsIgnorePattern": "^_"
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_'
       }
     ],
     'no-unused-expressions': 'off',
@@ -40,13 +40,13 @@ module.exports = {
     '@typescript-eslint/semi': [
       'error',
       'never',
-      {beforeStatementContinuationChars: 'always'}
+      { beforeStatementContinuationChars: 'always' }
     ],
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'error',
     '@typescript-eslint/explicit-module-boundary-types': 'error',
     '@typescript-eslint/no-explicit-any': 'error',
-    '@typescript-eslint/array-type': ['error', {default: 'array-simple'}],
+    '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
     '@typescript-eslint/no-non-null-assertion': 'off'
   }
 }

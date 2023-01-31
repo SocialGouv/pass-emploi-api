@@ -8,11 +8,11 @@ import {
   Table
 } from 'sequelize-typescript'
 import { JeuneSqlModel } from './jeune.sql-model'
-import { MiloJeune } from '../../../domain/partenaire/milo/milo.jeune'
+import { JeuneMilo } from '../../../domain/jeune/jeune.milo'
 
 export interface Situation {
-  etat: MiloJeune.EtatSituation
-  categorie: MiloJeune.CategorieSituation
+  etat: JeuneMilo.EtatSituation
+  categorie: JeuneMilo.CategorieSituation
   dateFin?: string
 }
 
