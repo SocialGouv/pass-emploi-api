@@ -26,11 +26,11 @@ import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { unJeune } from '../../../fixtures/jeune.fixture'
 import { Evenement, EvenementService } from '../../../../src/domain/evenement'
 import { uneDatetime } from '../../../fixtures/date.fixture'
-import { MiloAction } from '../../../../src/domain/partenaire/milo/milo.action'
+import { ActionMilo } from '../../../../src/domain/action/action.milo'
 
 describe('QualifierActionCommandHandler', () => {
   let actionRepository: StubbedType<Action.Repository>
-  let actionMiloRepository: StubbedType<MiloAction.Repository>
+  let actionMiloRepository: StubbedType<ActionMilo.Repository>
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let evenementService: StubbedClass<EvenementService>
@@ -79,7 +79,7 @@ describe('QualifierActionCommandHandler', () => {
                 commentaire: commentaireQualification
               }
             }
-            const actionMilo: MiloAction = {
+            const actionMilo: ActionMilo = {
               ...actionQualifiee,
               idDossier: 'idDossier',
               loginConseiller: 'j.doe'
@@ -155,7 +155,7 @@ describe('QualifierActionCommandHandler', () => {
             qualification: {
               code: Action.Qualification.Code.NON_SNP,
               heures: 0,
-              commentaire: 'Un commentaire'
+              commentaire: undefined
             }
           }
           actionRepository.get.withArgs(idAction).resolves(actionTerminee)
@@ -179,7 +179,7 @@ describe('QualifierActionCommandHandler', () => {
               code: 'NON_SNP',
               heures: 0,
               libelle: 'Action non qualifiée en Situation Non Professionnelle',
-              commentaireQualification: 'Un commentaire'
+              commentaireQualification: undefined
             })
           )
         })

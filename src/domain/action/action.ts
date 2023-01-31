@@ -44,7 +44,6 @@ export interface Action {
 export namespace Action {
   export const ACTIONS_PREDEFINIES: Action.ActionPredefinie[] =
     _ACTIONS_PREDEFINIES
-  // FIXME: le linter ne comprend pas cette technique 🤷‍️
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import Commentaire = _Commentaire.Commentaire
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars

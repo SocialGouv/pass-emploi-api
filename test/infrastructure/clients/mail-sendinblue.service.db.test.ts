@@ -116,7 +116,6 @@ describe('MailSendinblueService', () => {
       )
 
       // Then
-      // FIXME : ne marche pas :/ ce serait bien de tester uniquement le param et pas tester toute la méthode envoyée vu qu'elle est déjà testée séparément
       expect(scope.isDone()).to.equal(true)
     })
   })

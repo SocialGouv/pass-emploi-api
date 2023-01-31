@@ -20,7 +20,7 @@ import {
 import { unRendezVous } from '../../../fixtures/rendez-vous.fixture'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { unJeune } from '../../../fixtures/jeune.fixture'
-import { MiloRendezVous } from '../../../../src/domain/partenaire/milo/milo.rendez-vous'
+import { RendezVousMilo } from '../../../../src/domain/rendez-vous/rendez-vous.milo'
 import { Notification } from '../../../../src/domain/notification/notification'
 import { testConfig } from '../../../utils/module-for-testing'
 
@@ -30,8 +30,8 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
   let dateService: StubbedClass<DateService>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let rendezVousRepository: StubbedType<RendezVous.Repository>
-  let miloRendezVousRepository: StubbedType<MiloRendezVous.Repository>
-  let rendezVousMiloFactory: StubbedClass<MiloRendezVous.Factory>
+  let miloRendezVousRepository: StubbedType<RendezVousMilo.Repository>
+  let rendezVousMiloFactory: StubbedClass<RendezVousMilo.Factory>
   let notificationService: StubbedClass<Notification.Service>
   let planificateurService: StubbedClass<PlanificateurService>
 
@@ -46,7 +46,7 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
     jeuneRepository = stubInterface(sandbox)
     rendezVousRepository = stubInterface(sandbox)
     miloRendezVousRepository = stubInterface(sandbox)
-    rendezVousMiloFactory = stubClass(MiloRendezVous.Factory)
+    rendezVousMiloFactory = stubClass(RendezVousMilo.Factory)
     notificationService = stubClass(Notification.Service)
     planificateurService = stubClass(PlanificateurService)
 
@@ -74,8 +74,8 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
       describe('quand le rendez-vous existe chez milo', () => {
         const evenement = unEvenementMilo({
           idPartenaireBeneficiaire,
-          objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
-          type: MiloRendezVous.TypeEvenement.CREATE
+          objet: RendezVousMilo.ObjetEvenement.RENDEZ_VOUS,
+          type: RendezVousMilo.TypeEvenement.CREATE
         })
         const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> = {
           dateExecution: uneDate(),
@@ -83,7 +83,7 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
           contenu: evenement
         }
         // Given
-        const rendezVousMilo: MiloRendezVous = unRendezVousMilo()
+        const rendezVousMilo: RendezVousMilo = unRendezVousMilo()
 
         beforeEach(() => {
           miloRendezVousRepository.findRendezVousByEvenement
@@ -204,8 +204,8 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
             // Given
             const evenement = unEvenementMilo({
               idPartenaireBeneficiaire,
-              objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
-              type: MiloRendezVous.TypeEvenement.CREATE
+              objet: RendezVousMilo.ObjetEvenement.RENDEZ_VOUS,
+              type: RendezVousMilo.TypeEvenement.CREATE
             })
 
             const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
@@ -236,8 +236,8 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
             // Given
             const evenement = unEvenementMilo({
               idPartenaireBeneficiaire,
-              objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
-              type: MiloRendezVous.TypeEvenement.CREATE
+              objet: RendezVousMilo.ObjetEvenement.RENDEZ_VOUS,
+              type: RendezVousMilo.TypeEvenement.CREATE
             })
 
             const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
@@ -285,8 +285,8 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
           // Given
           const evenement = unEvenementMilo({
             idPartenaireBeneficiaire,
-            objet: MiloRendezVous.ObjetEvenement.NON_TRAITABLE,
-            type: MiloRendezVous.TypeEvenement.CREATE
+            objet: RendezVousMilo.ObjetEvenement.NON_TRAITABLE,
+            type: RendezVousMilo.TypeEvenement.CREATE
           })
           const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
             {
@@ -313,8 +313,8 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
           // Given
           const evenement = unEvenementMilo({
             idPartenaireBeneficiaire,
-            objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
-            type: MiloRendezVous.TypeEvenement.NON_TRAITABLE
+            objet: RendezVousMilo.ObjetEvenement.RENDEZ_VOUS,
+            type: RendezVousMilo.TypeEvenement.NON_TRAITABLE
           })
           const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> =
             {
@@ -341,8 +341,8 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
         // Given
         const evenement = unEvenementMilo({
           idPartenaireBeneficiaire,
-          objet: MiloRendezVous.ObjetEvenement.RENDEZ_VOUS,
-          type: MiloRendezVous.TypeEvenement.CREATE
+          objet: RendezVousMilo.ObjetEvenement.RENDEZ_VOUS,
+          type: RendezVousMilo.TypeEvenement.CREATE
         })
         const job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo> = {
           dateExecution: uneDate(),

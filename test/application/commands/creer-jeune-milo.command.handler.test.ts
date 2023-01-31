@@ -30,14 +30,14 @@ import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { StubbedClass, createSandbox, expect, stubClass } from '../../utils'
-import { MiloJeune } from '../../../src/domain/partenaire/milo/milo.jeune'
+import { JeuneMilo } from '../../../src/domain/jeune/jeune.milo'
 
 describe('CreerJeuneMiloCommandHandler', () => {
   let creerJeuneMiloCommandHandler: CreerJeuneMiloCommandHandler
   const conseiller = unConseiller()
   const idNouveauJeune = 'DFKAL'
   const date = DateTime.fromISO('2020-04-06T12:00:00.000Z')
-  let miloRepository: StubbedType<MiloJeune.Repository>
+  let miloRepository: StubbedType<JeuneMilo.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let authentificationRepository: StubbedType<Authentification.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>

@@ -1,5 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
-import { GetTypesQualificationsQueryHandler } from 'src/application/queries/get-types-qualifications.query.handler'
+import { GetTypesQualificationsQueryHandler } from 'src/application/queries/action/get-types-qualifications.query.handler'
 import {
   ActionPredefinieQueryModel,
   TypeQualificationQueryModel

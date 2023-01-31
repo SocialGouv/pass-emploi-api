@@ -1,4 +1,3 @@
-// TODO mettre la liste en db si besoin d'être modifiée
 const ACTIONS_PREDEFINIES = [
   {
     id: 'action-predefinie-1',

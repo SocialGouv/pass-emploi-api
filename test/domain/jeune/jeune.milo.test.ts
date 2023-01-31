@@ -1,54 +1,54 @@
-import { expect } from '../../../utils'
-import { MiloJeune } from '../../../../src/domain/partenaire/milo/milo.jeune'
+import { expect } from '../../utils'
+import { JeuneMilo } from '../../../src/domain/jeune/jeune.milo'
 
 describe('Milo', () => {
   const situationsPrevuEmploi = {
-    etat: MiloJeune.EtatSituation.PREVU,
-    categorie: MiloJeune.CategorieSituation.EMPLOI
+    etat: JeuneMilo.EtatSituation.PREVU,
+    categorie: JeuneMilo.CategorieSituation.EMPLOI
   }
   const situationsPrevuAlternance = {
-    etat: MiloJeune.EtatSituation.PREVU,
-    categorie: MiloJeune.CategorieSituation.CONTRAT_EN_ALTERNANCE
+    etat: JeuneMilo.EtatSituation.PREVU,
+    categorie: JeuneMilo.CategorieSituation.CONTRAT_EN_ALTERNANCE
   }
   const situationsPrevuFormation = {
-    etat: MiloJeune.EtatSituation.PREVU,
-    categorie: MiloJeune.CategorieSituation.FORMATION
+    etat: JeuneMilo.EtatSituation.PREVU,
+    categorie: JeuneMilo.CategorieSituation.FORMATION
   }
   const situationsPrevuImmersion = {
-    etat: MiloJeune.EtatSituation.PREVU,
-    categorie: MiloJeune.CategorieSituation.IMMERSION_EN_ENTREPRISE
+    etat: JeuneMilo.EtatSituation.PREVU,
+    categorie: JeuneMilo.CategorieSituation.IMMERSION_EN_ENTREPRISE
   }
   const situationsPrevuPmsmp = {
-    etat: MiloJeune.EtatSituation.PREVU,
-    categorie: MiloJeune.CategorieSituation.PMSMP
+    etat: JeuneMilo.EtatSituation.PREVU,
+    categorie: JeuneMilo.CategorieSituation.PMSMP
   }
   const situationsPrevuVolontariat = {
-    etat: MiloJeune.EtatSituation.PREVU,
-    categorie: MiloJeune.CategorieSituation.CONTRAT_DE_VOLONTARIAT_BENEVOLAT
+    etat: JeuneMilo.EtatSituation.PREVU,
+    categorie: JeuneMilo.CategorieSituation.CONTRAT_DE_VOLONTARIAT_BENEVOLAT
   }
   const situationsPrevuScolarite = {
-    etat: MiloJeune.EtatSituation.PREVU,
-    categorie: MiloJeune.CategorieSituation.SCOLARITE
+    etat: JeuneMilo.EtatSituation.PREVU,
+    categorie: JeuneMilo.CategorieSituation.SCOLARITE
   }
   const situationsPrevuDemandeur = {
-    etat: MiloJeune.EtatSituation.PREVU,
-    categorie: MiloJeune.CategorieSituation.DEMANDEUR_D_EMPLOI
+    etat: JeuneMilo.EtatSituation.PREVU,
+    categorie: JeuneMilo.CategorieSituation.DEMANDEUR_D_EMPLOI
   }
   const situationsEnCoursEmploi = {
-    etat: MiloJeune.EtatSituation.EN_COURS,
-    categorie: MiloJeune.CategorieSituation.EMPLOI
+    etat: JeuneMilo.EtatSituation.EN_COURS,
+    categorie: JeuneMilo.CategorieSituation.EMPLOI
   }
   const situationsEnCoursScolarite = {
-    etat: MiloJeune.EtatSituation.EN_COURS,
-    categorie: MiloJeune.CategorieSituation.SCOLARITE
+    etat: JeuneMilo.EtatSituation.EN_COURS,
+    categorie: JeuneMilo.CategorieSituation.SCOLARITE
   }
   const situationsEnCoursDemandeur = {
-    etat: MiloJeune.EtatSituation.EN_COURS,
-    categorie: MiloJeune.CategorieSituation.DEMANDEUR_D_EMPLOI
+    etat: JeuneMilo.EtatSituation.EN_COURS,
+    categorie: JeuneMilo.CategorieSituation.DEMANDEUR_D_EMPLOI
   }
   const situationsTermineeEmploi = {
-    etat: MiloJeune.EtatSituation.TERMINE,
-    categorie: MiloJeune.CategorieSituation.EMPLOI
+    etat: JeuneMilo.EtatSituation.TERMINE,
+    categorie: JeuneMilo.CategorieSituation.EMPLOI
   }
 
   // Given
@@ -68,7 +68,7 @@ describe('Milo', () => {
   ]
 
   // When
-  const situationsTriees = MiloJeune.trierSituations(situations)
+  const situationsTriees = JeuneMilo.trierSituations(situations)
 
   describe('trierSituations', () => {
     it('trie les situations par etat et categorie', async () => {
@@ -93,14 +93,14 @@ describe('Milo', () => {
     it('retourne la situation en cours quand elle existe', async () => {
       // When
       const situationCourante =
-        MiloJeune.trouverSituationCourante(situationsTriees)
+        JeuneMilo.trouverSituationCourante(situationsTriees)
 
       // Then
       expect(situationCourante).to.deep.equal(situationsEnCoursEmploi)
     })
     it('ne retourne rien quand aucune situation en cours', async () => {
       // When
-      const situationCourante = MiloJeune.trouverSituationCourante([
+      const situationCourante = JeuneMilo.trouverSituationCourante([
         situationsPrevuScolarite,
         situationsPrevuEmploi,
         situationsTermineeEmploi,

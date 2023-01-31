@@ -13,7 +13,7 @@ export class DatabaseForTesting {
 
   constructor() {
     const { host, port, database, user, password } = parse(
-      // eslint-disable-next-line no-process-env,@typescript-eslint/no-non-null-assertion
+      // eslint-disable-next-line no-process-env
       process.env.DATABASE_URL || 'postgresql://test:test@localhost:56432/test'
     )
     this.sequelize = new Sequelize({

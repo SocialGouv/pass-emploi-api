@@ -146,7 +146,7 @@ import { FichierSqlS3Repository } from './infrastructure/repositories/fichier-sq
 import { JeuneConfigurationApplicationSqlRepository } from './infrastructure/repositories/jeune/jeune-configuration-application-sql.repository.db'
 import { JeuneSqlRepository } from './infrastructure/repositories/jeune/jeune-sql.repository.db'
 import { MailSqlRepository } from './infrastructure/repositories/mail-sql.repository.db'
-import { MiloJeuneHttpSqlRepository } from './infrastructure/repositories/partenaire/milo/milo-jeune-http-sql.repository.db'
+import { MiloJeuneHttpSqlRepository } from './infrastructure/repositories/jeune/jeune-milo-http-sql.repository.db'
 import { NotificationFirebaseRepository } from './infrastructure/repositories/notification-firebase.repository'
 import { OffresEmploiHttpSqlRepository } from './infrastructure/repositories/offre/offre-emploi-http-sql.repository.db'
 import { OffreServiceCiviqueHttpSqlRepository } from './infrastructure/repositories/offre/offre-service-civique-http.repository.db'
@@ -238,7 +238,7 @@ import { HandleJobNotifierRendezVousPECommandHandler } from './application/comma
 import { GetJeuneHomeAgendaQueryHandler } from './application/queries/get-jeune-home-agenda.query.db'
 import { JeunePoleEmploiSqlRepository } from './infrastructure/repositories/jeune/jeune-pole-emploi-sql.repository.db'
 import { GetTypesQualificationsQueryHandler } from './application/queries/action/get-types-qualifications.query.handler'
-import { ActionMiloHttpRepository } from './infrastructure/repositories/partenaire/milo/action-milo-http-sql.repository'
+import { ActionMiloHttpRepository } from './infrastructure/repositories/action/action-milo-http-sql.repository'
 import { QualifierActionCommandHandler } from './application/commands/action/qualifier-action.command.handler'
 import { GetJeuneHomeAgendaPoleEmploiQueryHandler } from './application/queries/get-jeune-home-agenda-pole-emploi.query.handler'
 import { GetDemarchesQueryGetter } from './application/queries/query-getters/pole-emploi/get-demarches.query.getter'
@@ -292,13 +292,13 @@ import { HandleJobGenererJDDCommandHandler } from './application/commands/jobs/h
 import { SupportController } from './infrastructure/routes/support.controller'
 import { RefreshJddCommandHandler } from './application/commands/refresh-jdd.command.handler'
 import { HandleJobSuivreEvenementsMiloHandler } from './application/commands/jobs/handle-job-suivre-evenements-milo.handler'
-import { MiloRendezVousHttpRepository } from './infrastructure/repositories/partenaire/milo/milo-rendez-vous-http.repository'
+import { MiloRendezVousHttpRepository } from './infrastructure/repositories/rendez-vous/rendez-vous-milo-http.repository'
 import { HandleJobTraiterEvenementMiloHandler } from './application/commands/jobs/handle-job-traiter-evenement-milo.handler'
 import {
-  MiloRendezVous,
+  RendezVousMilo,
   MiloRendezVousRepositoryToken
-} from './domain/partenaire/milo/milo.rendez-vous'
-import { MiloJeuneRepositoryToken } from './domain/partenaire/milo/milo.jeune'
+} from './domain/rendez-vous/rendez-vous.milo'
+import { MiloJeuneRepositoryToken } from './domain/jeune/jeune.milo'
 import { HandleJobFakeCommandHandler } from './application/commands/jobs/handle-job-fake.command'
 import { MettreAJourLesJeunesCejPeCommandHandler } from './application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
 import { ChangerAgenceCommandHandler } from './application/commands/changer-agence.command.handler'
@@ -381,7 +381,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     Recherche.Factory,
     Conseiller.ListeDeDiffusion.Factory,
     Conseiller.ListeDeDiffusion.Service,
-    MiloRendezVous.Factory,
+    RendezVousMilo.Factory,
     BigqueryClient,
     {
       provide: APP_GUARD,

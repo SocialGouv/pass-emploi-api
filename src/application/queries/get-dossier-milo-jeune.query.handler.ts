@@ -11,9 +11,9 @@ import {
 import { Core } from '../../domain/core'
 import { DossierJeuneMiloQueryModel } from './query-models/milo.query-model'
 import {
-  MiloJeune,
+  JeuneMilo,
   MiloJeuneRepositoryToken
-} from '../../domain/partenaire/milo/milo.jeune'
+} from '../../domain/jeune/jeune.milo'
 
 export interface GetDossierMiloJeuneQuery extends Query {
   idDossier: string
@@ -26,7 +26,7 @@ export class GetDossierMiloJeuneQueryHandler extends QueryHandler<
 > {
   constructor(
     @Inject(MiloJeuneRepositoryToken)
-    private miloRepository: MiloJeune.Repository
+    private miloRepository: JeuneMilo.Repository
   ) {
     super('GetDossierMiloJeuneQueryHandler')
   }

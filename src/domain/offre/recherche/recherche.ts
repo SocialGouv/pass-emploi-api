@@ -19,7 +19,6 @@ export interface Recherche {
 }
 
 export namespace Recherche {
-  // FIXME: le linter ne comprend pas cette technique 🤷‍️
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import Suggestion = _Suggestion.Suggestion
 

@@ -38,7 +38,6 @@ export const SuggestionsPoleEmploiRepositoryToken =
   'SuggestionsPoleEmploiRepositoryToken'
 
 export namespace Suggestion {
-  // FIXME: le linter ne comprend pas cette technique 🤷‍️
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import PoleEmploi = _PoleEmploi.PoleEmploi
 

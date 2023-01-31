@@ -11,11 +11,11 @@ import { unJeune } from 'test/fixtures/jeune.fixture'
 import { unDossierMilo } from 'test/fixtures/milo.fixture'
 import { DateService } from '../../../../src/utils/date-service'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
-import { MiloJeune } from '../../../../src/domain/partenaire/milo/milo.jeune'
+import { JeuneMilo } from '../../../../src/domain/jeune/jeune.milo'
 
 describe('HandleJobRecupererSituationsJeunesMiloCommandHandler', () => {
   let handleJobRecupererSituationsJeunesMiloCommandHandler: HandleJobRecupererSituationsJeunesMiloCommandHandler
-  let miloRepository: StubbedType<MiloJeune.Repository>
+  let miloRepository: StubbedType<JeuneMilo.Repository>
   let jeuneRepository: StubbedType<Jeune.Repository>
   let suiviJobService: StubbedType<SuiviJob.Service>
   let dateSevice: StubbedClass<DateService>

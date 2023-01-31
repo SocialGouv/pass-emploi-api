@@ -4,7 +4,7 @@ import { DateService } from '../utils/date-service'
 import { Action } from './action/action'
 import { RendezVous } from './rendez-vous/rendez-vous'
 import { NettoyageJobsStats } from './suivi-job'
-import { MiloRendezVous } from './partenaire/milo/milo.rendez-vous'
+import { RendezVousMilo } from './rendez-vous/rendez-vous.milo'
 
 export const PlanificateurRepositoryToken = 'PlanificateurRepositoryToken'
 
@@ -71,7 +71,7 @@ export namespace Planificateur {
     menage: boolean
   }
 
-  export type JobTraiterEvenementMilo = MiloRendezVous.Evenement
+  export type JobTraiterEvenementMilo = RendezVousMilo.Evenement
 
   export interface JobFake {
     message: string
@@ -191,7 +191,7 @@ export class PlanificateurService {
   }
 
   async creerJobEvenementMiloSiIlNaPasEteCreeAvant(
-    evenementMilo: MiloRendezVous.Evenement
+    evenementMilo: RendezVousMilo.Evenement
   ): Promise<void> {
     const jobId = `event-milo:${evenementMilo.id}`
 

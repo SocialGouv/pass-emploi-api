@@ -1,6 +1,6 @@
 import { SituationsMiloDto } from '../sequelize/models/situations-milo.sql-model'
 import { AsSql } from '../sequelize/types'
-import { MiloJeune } from '../../domain/partenaire/milo/milo.jeune'
+import { JeuneMilo } from '../../domain/jeune/jeune.milo'
 
 export const uneSituationsMiloJdd = (
   args: Partial<SituationsMiloDto> = {}
@@ -8,14 +8,14 @@ export const uneSituationsMiloJdd = (
   const defaults = {
     idJeune: 'ABCDE',
     situationCourante: {
-      etat: MiloJeune.EtatSituation.EN_COURS,
-      categorie: MiloJeune.CategorieSituation.CONTRAT_DE_VOLONTARIAT_BENEVOLAT
+      etat: JeuneMilo.EtatSituation.EN_COURS,
+      categorie: JeuneMilo.CategorieSituation.CONTRAT_DE_VOLONTARIAT_BENEVOLAT
     },
     situations: [
       {
-        etat: MiloJeune.EtatSituation.PREVU,
+        etat: JeuneMilo.EtatSituation.PREVU,
         categorie:
-          MiloJeune.CategorieSituation.CONTRAT_DE_VOLONTARIAT_BENEVOLAT,
+          JeuneMilo.CategorieSituation.CONTRAT_DE_VOLONTARIAT_BENEVOLAT,
         dateFin: ''
       }
     ]
