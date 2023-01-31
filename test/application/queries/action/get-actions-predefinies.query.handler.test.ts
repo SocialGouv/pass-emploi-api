@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { SinonSandbox } from 'sinon'
-import { GetActionsPredefiniesQueryHandler } from 'src/application/queries/get-actions-predefinies.query.handler'
 import { createSandbox } from 'test/utils'
+import { GetActionsPredefiniesQueryHandler } from '../../../../src/application/queries/action/get-actions-predefinies.query.handler'
 
 describe('GetActionsPredefiniesQueryHandler', () => {
   let getActionsPredefiniesQueryHandler: GetActionsPredefiniesQueryHandler

@@ -167,7 +167,9 @@ describe('PoleEmploiClient', () => {
         const result = await poleEmploiClient.get('offresdemploi/v2/offres/1')
 
         // Then
-        expect(result).to.deep.equal(failure(new ErreurHttp('erreur', 400)))
+        expect(result).to.deep.equal(
+          failure(new ErreurHttp('Erreur API POLE EMPLOI', 400))
+        )
       })
       it("quand c'est une 429, retry après le temps qu'il faut", async () => {
         // Given
@@ -220,7 +222,9 @@ describe('PoleEmploiClient', () => {
         const result = await poleEmploiClient.get('offresdemploi/v2/offres/1')
 
         // Then
-        expect(result).to.deep.equal(failure(new ErreurHttp('erreur', 429)))
+        expect(result).to.deep.equal(
+          failure(new ErreurHttp('Erreur API POLE EMPLOI', 429))
+        )
       })
       it('throw une erreur pour un retour http supérieur à 500', async () => {
         // Given
@@ -326,7 +330,9 @@ describe('PoleEmploiClient', () => {
       const offreEmploi = await poleEmploiClient.getOffreEmploi('1')
 
       // Then
-      expect(offreEmploi).to.deep.equal(failure(new ErreurHttp('erreur', 401)))
+      expect(offreEmploi).to.deep.equal(
+        failure(new ErreurHttp('Erreur API POLE EMPLOI', 401))
+      )
     })
   })
   describe('getOffresEmploi', () => {

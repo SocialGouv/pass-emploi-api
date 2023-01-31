@@ -10,11 +10,11 @@ import { SuiviJob } from '../../../../src/domain/suivi-job'
 import { DateService } from '../../../../src/utils/date-service'
 import { unEvenementMilo } from '../../../fixtures/partenaire.fixture'
 import { uneDatetime } from '../../../fixtures/date.fixture'
-import { MiloRendezVous } from '../../../../src/domain/partenaire/milo/milo.rendez-vous'
+import { RendezVousMilo } from '../../../../src/domain/rendez-vous/rendez-vous.milo'
 
 describe('HandleJobSuivreEvenementsMiloHandler', () => {
   let handleJobSuivreEvenementsMiloHandler: HandleJobSuivreEvenementsMiloHandler
-  let miloRendezVousRepository: StubbedType<MiloRendezVous.Repository>
+  let miloRendezVousRepository: StubbedType<RendezVousMilo.Repository>
   let suiviJobService: StubbedType<SuiviJob.Service>
   let dateService: StubbedClass<DateService>
   let planificateurService: StubbedClass<PlanificateurService>
@@ -59,8 +59,8 @@ describe('HandleJobSuivreEvenementsMiloHandler', () => {
     })
 
     describe('quand il y a au moins un évènement milo', () => {
-      let eventMilo1: MiloRendezVous.Evenement
-      let eventMilo2: MiloRendezVous.Evenement
+      let eventMilo1: RendezVousMilo.Evenement
+      let eventMilo2: RendezVousMilo.Evenement
 
       beforeEach(() => {
         // Given

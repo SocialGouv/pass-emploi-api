@@ -2,7 +2,6 @@ import * as _Favori from './favori/favori'
 import * as _Recherche from './recherche/recherche'
 
 export namespace Offre {
-  // FIXME: le linter ne comprend pas cette technique 🤷‍️
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import Favori = _Favori.Favori
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars

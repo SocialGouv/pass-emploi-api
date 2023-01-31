@@ -40,7 +40,6 @@ export namespace Authentification {
     username?: string
   }
 
-  // TODO : à mettre plutôt dans une classe Utilisateur ?
   export function estSuperviseur(utilisateur: Utilisateur): boolean {
     return utilisateur.roles.includes(Authentification.Role.SUPERVISEUR)
   }

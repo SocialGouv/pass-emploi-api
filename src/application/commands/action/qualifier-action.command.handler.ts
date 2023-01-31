@@ -22,7 +22,7 @@ import { QualificationActionQueryModel } from '../../queries/query-models/action
 import { Evenement, EvenementService } from '../../../domain/evenement'
 import { Command } from '../../../building-blocks/types/command'
 import { DateTime } from 'luxon'
-import { MiloAction } from '../../../domain/partenaire/milo/milo.action'
+import { ActionMilo } from '../../../domain/action/action.milo'
 import { Qualification } from '../../../domain/action/qualification'
 
 export interface QualifierActionCommand extends Command {
@@ -43,7 +43,7 @@ export class QualifierActionCommandHandler extends CommandHandler<
     @Inject(ActionsRepositoryToken)
     private readonly actionRepository: Action.Repository,
     @Inject(ActionMiloRepositoryToken)
-    private readonly actionMiloRepository: MiloAction.Repository,
+    private readonly actionMiloRepository: ActionMilo.Repository,
     private readonly actionAuthorizer: ActionAuthorizer,
     @Inject(JeunesRepositoryToken)
     private readonly jeuneRepository: Jeune.Repository,
@@ -84,7 +84,7 @@ export class QualifierActionCommandHandler extends CommandHandler<
         return failure(new NonTrouveError('Jeune', actionQualifiee.idJeune))
       }
 
-      const actionMiloResult = MiloAction.creer(
+      const actionMiloResult = ActionMilo.creer(
         actionQualifiee,
         jeune,
         command.utilisateur

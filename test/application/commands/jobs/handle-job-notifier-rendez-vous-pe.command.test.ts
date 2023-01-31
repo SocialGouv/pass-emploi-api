@@ -30,7 +30,7 @@ describe('HandleJobNotifierRendezVousPECommandHandler', () => {
   const jeunePoleEmploi: Jeune.PoleEmploi = {
     id: jeune.id,
     idAuthentification: 'idAuthentification',
-    pushNotificationToken: jeune.configuration!.pushNotificationToken!
+    pushNotificationToken: jeune.configuration.pushNotificationToken!
   }
 
   beforeEach(async () => {

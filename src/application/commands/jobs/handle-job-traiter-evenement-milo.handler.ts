@@ -14,9 +14,9 @@ import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 import { DateTime } from 'luxon'
 import {
-  MiloRendezVous,
+  RendezVousMilo,
   MiloRendezVousRepositoryToken
-} from '../../../domain/partenaire/milo/milo.rendez-vous'
+} from '../../../domain/rendez-vous/rendez-vous.milo'
 import { Notification } from '../../../domain/notification/notification'
 import { buildError } from '../../../utils/logger.module'
 import { ConfigService } from '@nestjs/config'
@@ -35,8 +35,8 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
     @Inject(RendezVousRepositoryToken)
     private rendezVousRepository: RendezVous.Repository,
     @Inject(MiloRendezVousRepositoryToken)
-    private miloRendezVousHttpRepository: MiloRendezVous.Repository,
-    private rendezVousMiloFactory: MiloRendezVous.Factory,
+    private miloRendezVousHttpRepository: RendezVousMilo.Repository,
+    private rendezVousMiloFactory: RendezVousMilo.Factory,
     private notificationService: Notification.Service,
     private planificateurService: PlanificateurService,
     private configuration: ConfigService
@@ -52,11 +52,11 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
       'features.notifierRendezVousMilo'
     )
 
-    if (job.contenu.type === MiloRendezVous.TypeEvenement.NON_TRAITABLE) {
+    if (job.contenu.type === RendezVousMilo.TypeEvenement.NON_TRAITABLE) {
       return this.buildSuiviJob(debut, Traitement.TYPE_NON_TRAITABLE)
     }
 
-    if (job.contenu.objet === MiloRendezVous.ObjetEvenement.NON_TRAITABLE) {
+    if (job.contenu.objet === RendezVousMilo.ObjetEvenement.NON_TRAITABLE) {
       return this.buildSuiviJob(debut, Traitement.OBJET_NON_TRAITABLE)
     }
 
@@ -81,7 +81,7 @@ export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
 
     if (
       !rendezVousMilo ||
-      job.contenu.type === MiloRendezVous.TypeEvenement.DELETE
+      job.contenu.type === RendezVousMilo.TypeEvenement.DELETE
     ) {
       if (rendezVousExistant) {
         await this.rendezVousRepository.delete(rendezVousExistant.id)

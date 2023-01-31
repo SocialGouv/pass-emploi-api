@@ -10,9 +10,9 @@ import {
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
 import {
-  MiloRendezVous,
+  RendezVousMilo,
   MiloRendezVousRepositoryToken
-} from '../../../domain/partenaire/milo/milo.rendez-vous'
+} from '../../../domain/rendez-vous/rendez-vous.milo'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.SUIVRE_EVENEMENTS_MILO)
@@ -21,7 +21,7 @@ export class HandleJobSuivreEvenementsMiloHandler extends JobHandler<Job> {
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,
     @Inject(MiloRendezVousRepositoryToken)
-    private partenaireMiloRepository: MiloRendezVous.Repository,
+    private partenaireMiloRepository: RendezVousMilo.Repository,
     private dateService: DateService,
     private planificateurService: PlanificateurService,
     @Inject(PlanificateurRepositoryToken)
@@ -47,7 +47,7 @@ export class HandleJobSuivreEvenementsMiloHandler extends JobHandler<Job> {
           tempsExecution: DateService.calculerTempsExecution(debutDuJob)
         }
       }
-      let evenementsMilo: MiloRendezVous.Evenement[] = []
+      let evenementsMilo: RendezVousMilo.Evenement[] = []
       let nombreEvenementsTraites = 0
       do {
         evenementsMilo = await this.partenaireMiloRepository.findAllEvenements()

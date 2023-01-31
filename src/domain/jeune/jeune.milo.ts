@@ -1,9 +1,9 @@
 import { DateTime } from 'luxon'
-import { Result } from '../../../building-blocks/types/result'
+import { Result } from '../../building-blocks/types/result'
 
 export const MiloJeuneRepositoryToken = 'MiloJeuneRepository'
 
-export namespace MiloJeune {
+export namespace JeuneMilo {
   interface Situation {
     etat: EtatSituation
     categorie: CategorieSituation

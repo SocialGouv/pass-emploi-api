@@ -82,7 +82,7 @@ describe('Action', () => {
             qualification: {
               code: Action.Qualification.Code.EMPLOI,
               heures: 3,
-              commentaireQualification: 'Un commentaire'
+              commentaire: 'Un commentaire'
             }
           })
 
@@ -582,7 +582,7 @@ describe('Action', () => {
         qualification: {
           code: Action.Qualification.Code.NON_SNP,
           heures: 0,
-          commentaireQualification: 'Un commentaire'
+          commentaire: undefined
         }
       }
 
@@ -611,7 +611,7 @@ describe('Action', () => {
         qualification: {
           code: Action.Qualification.Code.SANTE,
           heures: 2,
-          commentaireQualification: 'Un commentaire'
+          commentaire: 'Un commentaire'
         },
         dateDebut: actionTerminee.dateCreation,
         dateFinReelle: nouvelleDateFinReelle
@@ -626,7 +626,7 @@ describe('Action', () => {
         qualification: {
           code: Action.Qualification.Code.EMPLOI,
           heures: 2,
-          commentaireQualification: 'Un commentaire'
+          commentaire: 'Un commentaire'
         }
       })
       // When
@@ -718,8 +718,7 @@ describe('Action', () => {
         qualification: {
           code: Action.Qualification.Code.SANTE,
           heures: 2,
-          commentaireQualification:
-            "Contenu de l'action - Commentaire de l'action"
+          commentaire: "Contenu de l'action - Commentaire de l'action"
         }
       }
       expect(result).to.be.deep.equal(success(expectedAction))

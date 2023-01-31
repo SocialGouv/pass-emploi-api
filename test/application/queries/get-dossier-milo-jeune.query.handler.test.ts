@@ -12,10 +12,10 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { unDossierMilo } from '../../fixtures/milo.fixture'
 import { createSandbox, expect } from '../../utils'
-import { MiloJeune } from '../../../src/domain/partenaire/milo/milo.jeune'
+import { JeuneMilo } from '../../../src/domain/jeune/jeune.milo'
 
 describe('GetDossierMiloJeuneQueryHandler', () => {
-  let miloRepository: StubbedType<MiloJeune.Repository>
+  let miloRepository: StubbedType<JeuneMilo.Repository>
   let getDossierMiloJeuneQueryHandler: GetDossierMiloJeuneQueryHandler
   let sandbox: SinonSandbox
 
