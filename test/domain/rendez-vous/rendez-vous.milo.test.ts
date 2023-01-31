@@ -1,24 +1,24 @@
-import { expect, StubbedClass, stubClass } from '../../../utils'
-import { unRendezVousMilo } from '../../../fixtures/partenaire.fixture'
+import { expect, StubbedClass, stubClass } from '../../utils'
+import { unRendezVousMilo } from '../../fixtures/partenaire.fixture'
 import {
   CodeTypeRendezVous,
   RendezVous
-} from '../../../../src/domain/rendez-vous/rendez-vous'
-import { IdService } from '../../../../src/utils/id-service'
-import { Jeune } from '../../../../src/domain/jeune/jeune'
+} from '../../../src/domain/rendez-vous/rendez-vous'
+import { IdService } from '../../../src/utils/id-service'
+import { Jeune } from '../../../src/domain/jeune/jeune'
 import {
   unJeuneDuRendezVous,
   unRendezVous
-} from '../../../fixtures/rendez-vous.fixture'
-import { uneConfiguration, unJeune } from '../../../fixtures/jeune.fixture'
-import { MiloRendezVous } from '../../../../src/domain/partenaire/milo/milo.rendez-vous'
+} from '../../fixtures/rendez-vous.fixture'
+import { uneConfiguration, unJeune } from '../../fixtures/jeune.fixture'
+import { RendezVousMilo } from '../../../src/domain/rendez-vous/rendez-vous.milo'
 
 describe('MiloRendezVous', () => {
   describe('Factory', () => {
     let idService: StubbedClass<IdService>
-    let rendezVousFactory: MiloRendezVous.Factory
+    let rendezVousFactory: RendezVousMilo.Factory
 
-    let rdvMilo: MiloRendezVous
+    let rdvMilo: RendezVousMilo
     let rendezVousPassEmploi: RendezVous
     let jeune: Jeune
     let uuid: string
@@ -35,7 +35,7 @@ describe('MiloRendezVous', () => {
       beforeEach(() => {
         // Given
         idService = stubClass(IdService)
-        rendezVousFactory = new MiloRendezVous.Factory(idService)
+        rendezVousFactory = new RendezVousMilo.Factory(idService)
 
         dateStringRendezVousDebut = '2022-10-06 10:07:00'
         dateStringRendezVousFin = '2022-10-06 11:43:00'
@@ -153,7 +153,7 @@ describe('MiloRendezVous', () => {
           rdvMilo = unRendezVousMilo({
             dateHeureDebut: dateStringRendezVousDebut,
             dateHeureFin: dateStringRendezVousFin,
-            type: MiloRendezVous.Type.SESSION,
+            type: RendezVousMilo.Type.SESSION,
             adresse: 'Route de la plage, 97122 Baie-Mahault'
           })
 
@@ -197,7 +197,7 @@ describe('MiloRendezVous', () => {
       beforeEach(() => {
         // Given
         idService = stubClass(IdService)
-        rendezVousFactory = new MiloRendezVous.Factory(idService)
+        rendezVousFactory = new RendezVousMilo.Factory(idService)
         dateStringRendezVousDebut = '2022-10-06 10:07:00'
         dateStringRendezVousFin = '2022-10-06 11:43:00'
         jeune = unJeune({

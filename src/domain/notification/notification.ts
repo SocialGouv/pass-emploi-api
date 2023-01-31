@@ -5,14 +5,13 @@ import { Action } from '../action/action'
 import { Jeune } from '../jeune/jeune'
 import { Recherche } from '../offre/recherche/recherche'
 import { RendezVous } from '../rendez-vous/rendez-vous'
-import * as _PoleEmploi from './pole-emploi'
+import * as _PoleEmploi from './notification.pole-emploi'
 
 export const NotificationRepositoryToken = 'NotificationRepositoryToken'
 
 export namespace Notification {
-  // FIXME: le linter ne comprend pas cette technique 🤷‍️
-  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
-  export import PoleEmploi = _PoleEmploi.PoleEmploi
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  export import PoleEmploi = _PoleEmploi.NotificationPoleEmploi
 
   export interface Repository {
     send(message: Notification.Message): Promise<void>

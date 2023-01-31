@@ -1,7 +1,7 @@
 import { Action } from '../../src/domain/action/action'
 import { uneDate, uneDatetime } from './date.fixture'
 import { DateTime } from 'luxon'
-import { MiloAction } from '../../src/domain/partenaire/milo/milo.action'
+import { ActionMilo } from '../../src/domain/action/action.milo'
 
 export const uneAction = (args: Partial<Action> = {}): Action => {
   const now = uneDatetime()
@@ -51,15 +51,15 @@ export const uneActionQualifiee = (
     qualification: {
       code: Action.Qualification.Code.SANTE,
       heures: 3,
-      commentaireQualification: 'Un commentaire'
+      commentaire: 'Un commentaire'
     }
   }
 
   return { ...defaults, ...args }
 }
 
-export const uneActionMilo = (args: Partial<Action> = {}): MiloAction => {
-  const defaults: MiloAction = {
+export const uneActionMilo = (args: Partial<Action> = {}): ActionMilo => {
+  const defaults: ActionMilo = {
     ...uneActionQualifiee(),
     idDossier: 'idDossier',
     loginConseiller: 'loginConseiller'

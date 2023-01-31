@@ -1,4 +1,4 @@
-import { MiloJeune } from '../../../domain/partenaire/milo/milo.jeune'
+import { JeuneMilo } from '../../../domain/jeune/jeune.milo'
 
 export interface DossierMiloDto {
   idDossier: number
@@ -30,9 +30,9 @@ export interface DossierMiloDto {
   }
   situations: [
     {
-      etat: MiloJeune.EtatSituation
+      etat: JeuneMilo.EtatSituation
       dateFin: string | null
-      categorieSituation: MiloJeune.CategorieSituation
+      categorieSituation: JeuneMilo.CategorieSituation
       codeRomeMetierPrepare: string | null
       codeRomePremierMetier: string
       codeRomeMetierExerce: string | null

@@ -27,7 +27,7 @@ import {
 } from '../../fixtures/authentification.fixture'
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { MiloJeune } from '../../../src/domain/partenaire/milo/milo.jeune'
+import { JeuneMilo } from '../../../src/domain/jeune/jeune.milo'
 import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetDetailJeuneQueryHandler', () => {
@@ -148,8 +148,8 @@ describe('GetDetailJeuneQueryHandler', () => {
           idJeune,
           situations: [
             {
-              etat: MiloJeune.EtatSituation.EN_COURS,
-              categorie: MiloJeune.CategorieSituation.EMPLOI
+              etat: JeuneMilo.EtatSituation.EN_COURS,
+              categorie: JeuneMilo.CategorieSituation.EMPLOI
             }
           ]
         })

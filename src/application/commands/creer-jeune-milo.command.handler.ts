@@ -27,9 +27,9 @@ import { Core } from '../../domain/core'
 import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import {
-  MiloJeune,
+  JeuneMilo,
   MiloJeuneRepositoryToken
-} from '../../domain/partenaire/milo/milo.jeune'
+} from '../../domain/jeune/jeune.milo'
 
 export interface CreerJeuneMiloCommand extends Command {
   idPartenaire: string
@@ -47,7 +47,7 @@ export class CreerJeuneMiloCommandHandler extends CommandHandler<
   constructor(
     private conseillerAuthorizer: ConseillerAuthorizer,
     @Inject(MiloJeuneRepositoryToken)
-    private miloJeuneRepository: MiloJeune.Repository,
+    private miloJeuneRepository: JeuneMilo.Repository,
     @Inject(JeunesRepositoryToken) private jeuneRepository: Jeune.Repository,
     @Inject(AuthentificationRepositoryToken)
     private authentificationRepository: Authentification.Repository,

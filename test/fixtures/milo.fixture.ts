@@ -1,10 +1,10 @@
 import { SituationsMiloDto } from 'src/infrastructure/sequelize/models/situations-milo.sql-model'
 import { AsSql } from 'src/infrastructure/sequelize/types'
-import { MiloJeune } from '../../src/domain/partenaire/milo/milo.jeune'
+import { JeuneMilo } from '../../src/domain/jeune/jeune.milo'
 
 export const unDossierMilo = (
-  args: Partial<MiloJeune.Dossier> = {}
-): MiloJeune.Dossier => {
+  args: Partial<JeuneMilo.Dossier> = {}
+): JeuneMilo.Dossier => {
   const defaults = {
     id: '1',
     nom: 'Dawson',
@@ -18,19 +18,19 @@ export const unDossierMilo = (
 }
 
 export const uneSituationsMilo = (
-  args: Partial<MiloJeune.Situations> = {}
-): MiloJeune.Situations => {
+  args: Partial<JeuneMilo.Situations> = {}
+): JeuneMilo.Situations => {
   const defaults = {
     idJeune: 'ABCDE',
     situationCourante: {
-      etat: MiloJeune.EtatSituation.EN_COURS,
-      categorie: MiloJeune.CategorieSituation.CONTRAT_DE_VOLONTARIAT_BENEVOLAT
+      etat: JeuneMilo.EtatSituation.EN_COURS,
+      categorie: JeuneMilo.CategorieSituation.CONTRAT_DE_VOLONTARIAT_BENEVOLAT
     },
     situations: [
       {
-        etat: MiloJeune.EtatSituation.PREVU,
+        etat: JeuneMilo.EtatSituation.PREVU,
         categorie:
-          MiloJeune.CategorieSituation.CONTRAT_DE_VOLONTARIAT_BENEVOLAT,
+          JeuneMilo.CategorieSituation.CONTRAT_DE_VOLONTARIAT_BENEVOLAT,
         dateFin: ''
       }
     ]
@@ -45,14 +45,14 @@ export const uneSituationsMiloDto = (
     id: 1,
     idJeune: 'ABCDE',
     situationCourante: {
-      etat: MiloJeune.EtatSituation.EN_COURS,
-      categorie: MiloJeune.CategorieSituation.CONTRAT_DE_VOLONTARIAT_BENEVOLAT
+      etat: JeuneMilo.EtatSituation.EN_COURS,
+      categorie: JeuneMilo.CategorieSituation.CONTRAT_DE_VOLONTARIAT_BENEVOLAT
     },
     situations: [
       {
-        etat: MiloJeune.EtatSituation.PREVU,
+        etat: JeuneMilo.EtatSituation.PREVU,
         categorie:
-          MiloJeune.CategorieSituation.CONTRAT_DE_VOLONTARIAT_BENEVOLAT,
+          JeuneMilo.CategorieSituation.CONTRAT_DE_VOLONTARIAT_BENEVOLAT,
         dateFin: ''
       }
     ]
