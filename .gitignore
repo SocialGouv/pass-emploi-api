@@ -47,5 +47,4 @@ lerna-debug.log*
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
-!.yarn/versions
 scripts/.yarn/*
