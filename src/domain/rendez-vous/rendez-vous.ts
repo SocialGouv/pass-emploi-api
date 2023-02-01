@@ -163,7 +163,6 @@ export interface InfosRendezVousAMettreAJour {
 export namespace RendezVous {
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import AnimationCollective = _AnimationCollective.AnimationCollective
-  // FIXME: le linter ne comprend pas cette technique 🤷‍️
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   export import Historique = _Historique.Historique
 
