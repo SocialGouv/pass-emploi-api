@@ -59,10 +59,10 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
         return this.authentificationConseillerPassEmploi(commandSanitized)
       }
       if (commandSanitized.structure === Core.Structure.POLE_EMPLOI) {
-        return this.authentificationConseillerPoleEmploi(commandSanitized)
+        return this.authentificationConseillerSSO(commandSanitized)
       }
       if (commandSanitized.structure === Core.Structure.MILO) {
-        return this.authentificationConseillerMilo(commandSanitized)
+        return this.authentificationConseillerSSO(commandSanitized)
       }
     }
     if (commandSanitized.type === Authentification.Type.JEUNE) {
@@ -255,26 +255,7 @@ export class UpdateUtilisateurCommandHandler extends CommandHandler<
     }
   }
 
-  private async authentificationConseillerMilo(
-    commandSanitized: UpdateUtilisateurCommand
-  ): Promise<Result<UtilisateurQueryModel>> {
-    const utilisateurTrouve = await this.authentificationRepository.get(
-      commandSanitized.idUtilisateurAuth,
-      commandSanitized.structure,
-      commandSanitized.type
-    )
-    if (!utilisateurTrouve) {
-      return this.creerNouveauConseiller(commandSanitized)
-    } else {
-      const utilisateurMisAJour = await this.mettreAJourLUtilisateur(
-        utilisateurTrouve,
-        commandSanitized
-      )
-      return success(queryModelFromUtilisateur(utilisateurMisAJour))
-    }
-  }
-
-  private async authentificationConseillerPoleEmploi(
+  private async authentificationConseillerSSO(
     commandSanitized: UpdateUtilisateurCommand
   ): Promise<Result<UtilisateurQueryModel>> {
     const utilisateurTrouve = await this.authentificationRepository.get(

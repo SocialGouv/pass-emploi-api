@@ -59,10 +59,8 @@ export class TeleverserFichierCommandHandler extends CommandHandler<
     command: TeleverserFichierCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    let result: Result
-
     if (command.jeunesIds?.length) {
-      result = await this.authorizeConseillerForJeunes.authorize(
+      const result = await this.authorizeConseillerForJeunes.authorize(
         command.jeunesIds,
         utilisateur
       )

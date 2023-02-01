@@ -91,9 +91,9 @@ export class HandleJobMettreAJourLesSegmentsCommandHandler extends JobHandler<Jo
                                     from campagne
                                     where date_debut < now()
                                       and date_fin > now()`
-    const campagnesEnCours = (await this.sequelize.query(sqlCampagneEnCours, {
+    const campagnesEnCours = await this.sequelize.query(sqlCampagneEnCours, {
       type: QueryTypes.SELECT
-    })) as object[]
+    })
     if (!campagnesEnCours.length) {
       return []
     }
@@ -105,18 +105,18 @@ export class HandleJobMettreAJourLesSegmentsCommandHandler extends JobHandler<Jo
                                       from reponse_campagne
                                       where id_campagne in
                                             (select id from campagne where date_debut < now() and date_fin > now()))`
-    return (await this.sequelize.query(sql, {
+    return this.sequelize.query(sql, {
       type: QueryTypes.SELECT
-    })) as RawJeune[]
+    })
   }
 
   async fetchJeunes(): Promise<RawJeune[]> {
     const sql = `select instance_id, structure
                      from jeune
                      where instance_id is not null`
-    return (await this.sequelize.query(sql, {
+    return this.sequelize.query(sql, {
       type: QueryTypes.SELECT
-    })) as RawJeune[]
+    })
   }
 
   writeMetadata(): void {

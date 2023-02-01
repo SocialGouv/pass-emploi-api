@@ -144,10 +144,8 @@ export class EnvoyerMessageGroupeCommandHandler extends CommandHandler<
       return failure(new MauvaiseCommandeError('Aucun destinataire'))
     }
 
-    let result: Result
-
     if (command.idsBeneficiaires) {
-      result = await this.authorizeConseillerForJeunes.authorize(
+      const result = await this.authorizeConseillerForJeunes.authorize(
         command.idsBeneficiaires,
         utilisateur
       )

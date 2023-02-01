@@ -5,7 +5,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(
       { isolationLevel: Sequelize.Transaction.SERIALIZABLE },
-      async transaction => {
+      async _transaction => {
         await queryInterface.bulkInsert('referentiel_metier_rome', metiersRome)
       }
     )
@@ -14,7 +14,7 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(
       { isolationLevel: Sequelize.Transaction.SERIALIZABLE },
-      async transaction => {
+      async _transaction => {
         await queryInterface.bulkDelete('referentiel_metier_rome', null, {})
       }
     )

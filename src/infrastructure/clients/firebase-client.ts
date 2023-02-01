@@ -147,7 +147,7 @@ export class FirebaseClient implements IFirebaseClient {
       return { id: chats.docs[0].id, idBeneficiaire: idBeneficiaire }
     }
 
-    return
+    return undefined
   }
 
   async recupererChatGroupe(
@@ -162,7 +162,7 @@ export class FirebaseClient implements IFirebaseClient {
       return { id: groupes.docs[0].id }
     }
 
-    return
+    return undefined
   }
 
   async envoyerMessageIndividuel(

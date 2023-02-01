@@ -96,7 +96,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     tokenDuJeune: string
   ): Promise<ResultApi<RendezVousPoleEmploiDto[]>> {
     this.logger.log('recuperation des rendez-vous du jeune')
-    return await this.get<RendezVousPoleEmploiDto[]>(
+    return this.get<RendezVousPoleEmploiDto[]>(
       'peconnect-rendezvousagenda/v1/listerendezvous',
       tokenDuJeune
     )
@@ -311,7 +311,7 @@ export class PoleEmploiPartenaireClient implements PoleEmploiPartenaireClientI {
     const utilisateur = this.context.get<Authentification.Utilisateur>(
       ContextKey.UTILISATEUR
     )
-    return await LogApiPartenaireSqlModel.findOne({
+    return LogApiPartenaireSqlModel.findOne({
       where: {
         pathPartenaire: {
           [Op.like]: `%${suffixUrl}%`
