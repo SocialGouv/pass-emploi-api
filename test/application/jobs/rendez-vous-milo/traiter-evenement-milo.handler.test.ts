@@ -1,9 +1,9 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { createSandbox } from 'sinon'
 import {
-  HandleJobTraiterEvenementMiloHandler,
+  TraiterEvenementMiloJobHandler,
   Traitement
-} from '../../../../src/application/commands/jobs/handle-job-traiter-evenement-milo.handler'
+} from '../../../../src/application/jobs/rendez-vous-milo/traiter-evenement-milo.handler'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
 import {
   Planificateur,
@@ -24,8 +24,8 @@ import { RendezVousMilo } from '../../../../src/domain/rendez-vous/rendez-vous.m
 import { Notification } from '../../../../src/domain/notification/notification'
 import { testConfig } from '../../../utils/module-for-testing'
 
-describe('HandleJobTraiterEvenementMiloHandler', () => {
-  let handler: HandleJobTraiterEvenementMiloHandler
+describe('TraiterEvenementMiloJobHandler', () => {
+  let handler: TraiterEvenementMiloJobHandler
   let suiviJobService: StubbedType<SuiviJob.Service>
   let dateService: StubbedClass<DateService>
   let jeuneRepository: StubbedType<Jeune.Repository>
@@ -50,7 +50,7 @@ describe('HandleJobTraiterEvenementMiloHandler', () => {
     notificationService = stubClass(Notification.Service)
     planificateurService = stubClass(PlanificateurService)
 
-    handler = new HandleJobTraiterEvenementMiloHandler(
+    handler = new TraiterEvenementMiloJobHandler(
       suiviJobService,
       dateService,
       jeuneRepository,

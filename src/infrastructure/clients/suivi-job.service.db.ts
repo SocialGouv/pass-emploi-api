@@ -26,6 +26,15 @@ export class SuiviJobService implements SuiviJob.Service {
       text: construireMessage(suiviJob)
     }
     await firstValueFrom(this.httpService.post(webhookUrl, payload))
+
+    if (suiviJob.messageDErreur) {
+      await firstValueFrom(
+        this.httpService.post(webhookUrl, {
+          username: BOT_USERNAME,
+          text: '```\n' + suiviJob.messageDErreur + '\n```'
+        })
+      )
+    }
   }
 
   async envoyerRapport(rapportJobs: RapportJob24h[]): Promise<void> {
@@ -59,6 +68,7 @@ function construireMessage(suiviJob: SuiviJob): string {
     ...suiviJob,
     dateExecution: suiviJob.dateExecution.setZone('Europe/Paris').toISO()
   }
+  delete suiviJobStringified.messageDErreur
   const data = [
     ...Object.entries(suiviJobStringified).filter(
       entry => !isArrayOrObject(entry[1])
