@@ -23,7 +23,7 @@ import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.TRAITER_EVENEMENT_MILO)
-export class HandleJobTraiterEvenementMiloHandler extends JobHandler<
+export class TraiterEvenementMiloJobHandler extends JobHandler<
   Planificateur.Job<Planificateur.JobTraiterEvenementMilo>
 > {
   constructor(

@@ -291,9 +291,9 @@ import { MessagesController } from './infrastructure/routes/messages.controller'
 import { HandleJobGenererJDDCommandHandler } from './application/commands/jobs/handle-job-generer-jdd.handler'
 import { SupportController } from './infrastructure/routes/support.controller'
 import { RefreshJddCommandHandler } from './application/commands/refresh-jdd.command.handler'
-import { HandleJobSuivreEvenementsMiloHandler } from './application/commands/jobs/handle-job-suivre-evenements-milo.handler'
+import { SuivreEvenementsMiloCronJobHandler } from './application/cron-jobs/rendez-vous-milo/suivre-file-evenements-milo.handler'
 import { MiloRendezVousHttpRepository } from './infrastructure/repositories/rendez-vous/rendez-vous-milo-http.repository'
-import { HandleJobTraiterEvenementMiloHandler } from './application/commands/jobs/handle-job-traiter-evenement-milo.handler'
+import { TraiterEvenementMiloJobHandler } from './application/jobs/rendez-vous-milo/traiter-evenement-milo.handler'
 import {
   RendezVousMilo,
   MiloRendezVousRepositoryToken
@@ -694,8 +694,8 @@ export const JobHandlerProviders = [
   HandleJobMettreAJourLesSegmentsCommandHandler,
   MonitorJobsCommandHandler,
   HandleJobGenererJDDCommandHandler,
-  HandleJobSuivreEvenementsMiloHandler,
-  HandleJobTraiterEvenementMiloHandler
+  SuivreEvenementsMiloCronJobHandler,
+  TraiterEvenementMiloJobHandler
 ]
 
 @Module(buildModuleMetadata())

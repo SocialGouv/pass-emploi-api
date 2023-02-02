@@ -1,7 +1,7 @@
 import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox, createSandbox } from 'sinon'
 import { StubbedClass, expect, stubClass } from 'test/utils'
-import { HandleJobSuivreEvenementsMiloHandler } from '../../../../src/application/commands/jobs/handle-job-suivre-evenements-milo.handler'
+import { SuivreEvenementsMiloCronJobHandler } from '../../../../src/application/cron-jobs/rendez-vous-milo/suivre-file-evenements-milo.handler'
 import {
   Planificateur,
   PlanificateurService
@@ -12,8 +12,8 @@ import { unEvenementMilo } from '../../../fixtures/partenaire.fixture'
 import { uneDatetime } from '../../../fixtures/date.fixture'
 import { RendezVousMilo } from '../../../../src/domain/rendez-vous/rendez-vous.milo'
 
-describe('HandleJobSuivreEvenementsMiloHandler', () => {
-  let handleJobSuivreEvenementsMiloHandler: HandleJobSuivreEvenementsMiloHandler
+describe('SuivreEvenementsMiloCronJobHandler', () => {
+  let suivreEvenementsMiloHandler: SuivreEvenementsMiloCronJobHandler
   let miloRendezVousRepository: StubbedType<RendezVousMilo.Repository>
   let suiviJobService: StubbedType<SuiviJob.Service>
   let dateService: StubbedClass<DateService>
@@ -29,14 +29,13 @@ describe('HandleJobSuivreEvenementsMiloHandler', () => {
     planificateurService = stubClass(PlanificateurService)
     planificateurRepository = stubInterface(sandbox)
 
-    handleJobSuivreEvenementsMiloHandler =
-      new HandleJobSuivreEvenementsMiloHandler(
-        suiviJobService,
-        miloRendezVousRepository,
-        dateService,
-        planificateurService,
-        planificateurRepository
-      )
+    suivreEvenementsMiloHandler = new SuivreEvenementsMiloCronJobHandler(
+      suiviJobService,
+      miloRendezVousRepository,
+      dateService,
+      planificateurService,
+      planificateurRepository
+    )
   })
   describe('quand un job est déjà en cours', () => {
     it('il ne doit pas récupérer les évènements milo', async () => {
@@ -44,7 +43,7 @@ describe('HandleJobSuivreEvenementsMiloHandler', () => {
       planificateurRepository.estEnCours.resolves(true)
 
       // When
-      await handleJobSuivreEvenementsMiloHandler.handle()
+      await suivreEvenementsMiloHandler.handle()
 
       // Then
       expect(
@@ -74,7 +73,7 @@ describe('HandleJobSuivreEvenementsMiloHandler', () => {
       })
       it('crée un job sur redis pour chaque evenement', async () => {
         // When
-        await handleJobSuivreEvenementsMiloHandler.handle()
+        await suivreEvenementsMiloHandler.handle()
 
         // Then
         expect(
@@ -86,7 +85,7 @@ describe('HandleJobSuivreEvenementsMiloHandler', () => {
       })
       it('acquitte chaque évènement', async () => {
         // When
-        await handleJobSuivreEvenementsMiloHandler.handle()
+        await suivreEvenementsMiloHandler.handle()
 
         // Then
         expect(
@@ -108,7 +107,7 @@ describe('HandleJobSuivreEvenementsMiloHandler', () => {
           .resolves([])
 
         // When
-        await handleJobSuivreEvenementsMiloHandler.handle()
+        await suivreEvenementsMiloHandler.handle()
 
         // Then
         expect(miloRendezVousRepository.findAllEvenements).to.have.callCount(3)
