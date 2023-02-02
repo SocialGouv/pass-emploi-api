@@ -54,7 +54,7 @@ export namespace Planificateur {
     MAJ_AGENCE_AC = 'MAJ_AGENCE_AC',
     MONITORER_JOBS = 'MONITORER_JOBS',
     GENERER_JDD = 'GENERER_JDD',
-    SUIVRE_EVENEMENTS_MILO = 'SUIVRE_EVENEMENTS_MILO',
+    SUIVRE_FILE_EVENEMENTS_MILO = 'SUIVRE_FILE_EVENEMENTS_MILO',
     TRAITER_EVENEMENT_MILO = 'TRAITER_EVENEMENT_MILO'
   }
 
@@ -98,7 +98,7 @@ export namespace Planificateur {
 
 export const listeCronJobs: Planificateur.CronJob[] = [
   {
-    type: Planificateur.JobType.SUIVRE_EVENEMENTS_MILO,
+    type: Planificateur.JobType.SUIVRE_FILE_EVENEMENTS_MILO,
     expression: '*/15 * * * *'
   },
   {

@@ -15,8 +15,8 @@ import {
 } from '../../../domain/rendez-vous/rendez-vous.milo'
 
 @Injectable()
-@ProcessJobType(Planificateur.JobType.SUIVRE_EVENEMENTS_MILO)
-export class HandleJobSuivreEvenementsMiloHandler extends JobHandler<Job> {
+@ProcessJobType(Planificateur.JobType.SUIVRE_FILE_EVENEMENTS_MILO)
+export class SuivreEvenementsMiloCronJobHandler extends JobHandler<Job> {
   constructor(
     @Inject(SuiviJobServiceToken)
     suiviJobService: SuiviJob.Service,
@@ -27,7 +27,7 @@ export class HandleJobSuivreEvenementsMiloHandler extends JobHandler<Job> {
     @Inject(PlanificateurRepositoryToken)
     private planificateurRepository: Planificateur.Repository
   ) {
-    super(Planificateur.JobType.SUIVRE_EVENEMENTS_MILO, suiviJobService)
+    super(Planificateur.JobType.SUIVRE_FILE_EVENEMENTS_MILO, suiviJobService)
   }
 
   async handle(): Promise<SuiviJob> {
@@ -77,7 +77,8 @@ export class HandleJobSuivreEvenementsMiloHandler extends JobHandler<Job> {
         succes: false,
         resultat: {},
         nbErreurs: 1,
-        tempsExecution: DateService.calculerTempsExecution(debutDuJob)
+        tempsExecution: DateService.calculerTempsExecution(debutDuJob),
+        messageDErreur: e.stack ?? e.message
       }
     }
   }

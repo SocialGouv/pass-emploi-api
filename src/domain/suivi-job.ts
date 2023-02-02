@@ -11,6 +11,7 @@ export interface SuiviJob {
   resultat: unknown
   nbErreurs: number
   tempsExecution: number
+  messageDErreur?: string
 }
 
 export interface RapportJob24h {
