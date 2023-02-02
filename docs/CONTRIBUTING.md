@@ -1,36 +1,34 @@
 # pass-emploi-api
 
-1. [Le contexte](#le-contexte)
-   1. [Composants](#composants)
-   2. [Services externes](#services-externes)
-2. [Configurer l'environnement dev.](#config-dev-env)
-   1. [Pré-requis](#pré-requis)
-   2. [Récupérer les variables d'environnement](#pull-variables-environnement)
-   3. [Mettre à jour les variables d'environnement](#push-variables-environnement)
-   4. [Mettre à jour les dépendances](#dépendances)
-   5. [Base de données, seeding et migrations](#database)
-   6. [Création d'un compte jeune de recette](#jeune)
-3. [L'architecture](#archi)
-   1. [Flux des Commands / Queries](#CQS)
-   2. [Flux des notifications](#notifications)
-   3. [Les jobs et les crons](#jobs-cron)
-   4. [Tests](#archi-tests)
-4. [Développement de l'API](#API-develop)
-   1. [Mode watch](#watch)
-   2. [Présentation de la CI/CD staging](#cicd)
-   3. [Tests unitaires et d'intégration automatisés](#unit-integration)
-   4. [Tests fonctionnels et e2e non automatisés](#e2e)
-   5. [Commits](#commits)
-   6. [Pairing & Reviews](#reviews)
-   7. [Rebasing](#rebasing)
-5. [Déploiement de l'API](#API-deploy)
-   1. [Configuration du compte scalingo](#scalingo-user) 
-   2. [Environnement de staging](#staging)
-   3. [Environnement de production](#production)
-   4. [Rollback](#rollback)
-   5. [Lancer des tasks sur les environnements déployés](#tasks)
-6. [Style guide](#style-guide) 
-7. [Troubleshoot](#troubleshoot)
+- [pass-emploi-api](#pass-emploi-api)
+  - [Le contexte ](#le-contexte-)
+    - [Composants ](#composants-)
+    - [Services externes ](#services-externes-)
+    - [Base de données, seeding et migrations ](#base-de-données-seeding-et-migrations-)
+    - [Création d'un compte jeune de recette ](#création-dun-compte-jeune-de-recette-)
+  - [L'architecture ](#larchitecture-)
+    - [Flux des Commands / Queries ](#flux-des-commands--queries-)
+    - [Flux des notifications push ](#flux-des-notifications-push-)
+    - [Les jobs et les crons ](#les-jobs-et-les-crons-)
+    - [Tests ](#tests-)
+  - [Développement de l'API ](#développement-de-lapi-)
+    - [Mode watch ](#mode-watch-)
+    - [Présentation de la CI/CD staging ](#présentation-de-la-cicd-staging-)
+    - [Tests unitaires et d'intégration automatisés ](#tests-unitaires-et-dintégration-automatisés-)
+    - [Tests fonctionnels et e2e non automatisés ](#tests-fonctionnels-et-e2e-non-automatisés-)
+    - [Commits ](#commits-)
+    - [Pairing \& Reviews ](#pairing--reviews-)
+    - [Rebasing ](#rebasing-)
+  - [Déploiement de l'API ](#déploiement-de-lapi-)
+    - [Configuration du compte scalingo ](#configuration-du-compte-scalingo-)
+    - [Environnement de staging ](#environnement-de-staging-)
+    - [Environnement de production ](#environnement-de-production-)
+      - [Processus de release](#processus-de-release)
+    - [Rollback ](#rollback-)
+    - [Lancer des tasks sur les environnements déployés ](#lancer-des-tasks-sur-les-environnements-déployés-)
+    - [Planifier le lancement d'un job sur les environnements déployés ](#planifier-le-lancement-dun-job-sur-les-environnements-déployés-)
+  - [Style guide ](#style-guide-)
+  - [Troubleshoot ](#troubleshoot-)
 
 ## Le contexte <a name="le-contexte"></a>
 
@@ -44,27 +42,6 @@
 - api milo ? a-t-on besoin de quelque chose?
 - firebase ?
 
-
-## Configurer l'environnement dev. <a name="config-dev-env"></a>
-
-### Pré-requis <a name="pré-requis"></a>
-- Node 18.12.1
-- Docker et docker compose
-
-### Récupérer les variables d'environnement <a name="pull-variables-environnement"></a>
-1. Créer un fichier ```.environment``` en copiant le .environment.template
-2. Mettre la valeur DOTVAULT_KEY indiquée sur Dashlane
-3. Exécuter ```dotvault decrypt```
-
-### Mettre à jour les variables d'environnement <a name="push-variables-environnement"></a>
-1. Mettre à jour les variables désirées dans ```.environment``` entre les balises // BEGIN VAULT et //END VAULT
-2. Exécuter ```dotvault encrypt```
-3. Pousser sur git
-
-### Mettre à jour les dépendances <a name="dépendances"></a>
-```bash
-yarn
-```
 
 ### Base de données, seeding et migrations <a name="database"></a>
 - Lancer les seeds :
