@@ -63,9 +63,9 @@
     "tasks:suivre-events-milo": "IS_WEB=false TASK_NAME=SUIVRE_EVENEMENTS_MILO node dist/main",
     "dump-restore-db": "scripts/db_dump_restore.sh",
     "dump-restore-db:local": "dotenv -e .environment yarn dump-restore-db",
-    "release:patch": "scripts/release.sh patch",
-    "release:minor": "scripts/release.sh minor",
-    "release:major": "scripts/release.sh major"
+    "release:patch": "scripts/release_version_only.sh patch",
+    "release:minor": "scripts/release_version_only.sh minor",
+    "release:major": "scripts/release_version_only.sh major"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.218.0",
