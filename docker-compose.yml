@@ -7,7 +7,7 @@ volumes:
 
 services:
   apidb:
-    image: postgis/postgis:13-3.2-alpine
+    image: postgis/postgis:14-3.2-alpine
     container_name: apidb
     ports:
       - "55432:5432"
@@ -27,7 +27,7 @@ services:
     command: ['redis-server', '--appendonly yes']
       
   pgtestdb:
-    image: postgis/postgis:13-3.2-alpine
+    image: postgis/postgis:14-3.2-alpine
     container_name: pgtestdb
     ports:
       - "56432:5432"
