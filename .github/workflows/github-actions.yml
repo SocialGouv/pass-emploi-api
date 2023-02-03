@@ -19,7 +19,7 @@ jobs:
         node-version: [18.12.1]
     services:
       postgres:
-        image: postgis/postgis:13-3.2-alpine
+        image: postgis/postgis:14-3.2-alpine
         env:
           POSTGRES_USER: test
           POSTGRES_PASSWORD: test
