@@ -1,6 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { DateTime } from 'luxon'
 import { JobHandler } from '../../../building-blocks/types/job-handler'
 import { Jeune, JeunesRepositoryToken } from '../../../domain/jeune/jeune'
+import { Notification } from '../../../domain/notification/notification'
 import {
   Planificateur,
   PlanificateurService,
@@ -10,16 +13,13 @@ import {
   RendezVous,
   RendezVousRepositoryToken
 } from '../../../domain/rendez-vous/rendez-vous'
+import {
+  MiloRendezVousRepositoryToken,
+  RendezVousMilo
+} from '../../../domain/rendez-vous/rendez-vous.milo'
 import { SuiviJob, SuiviJobServiceToken } from '../../../domain/suivi-job'
 import { DateService } from '../../../utils/date-service'
-import { DateTime } from 'luxon'
-import {
-  RendezVousMilo,
-  MiloRendezVousRepositoryToken
-} from '../../../domain/rendez-vous/rendez-vous.milo'
-import { Notification } from '../../../domain/notification/notification'
 import { buildError } from '../../../utils/logger.module'
-import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 @ProcessJobType(Planificateur.JobType.TRAITER_EVENEMENT_MILO)
@@ -47,109 +47,213 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
   async handle(
     job: Planificateur.Job<Planificateur.JobTraiterEvenementMilo>
   ): Promise<SuiviJob> {
-    const debut = this.dateService.now()
-    const doitNotifier = this.configuration.get(
+    const maintenant = this.dateService.now()
+    const FT_NOTIFIER_RDV_MILO = this.configuration.get(
       'features.notifierRendezVousMilo'
     )
 
-    if (job.contenu.type === RendezVousMilo.TypeEvenement.NON_TRAITABLE) {
-      return this.buildSuiviJob(debut, Traitement.TYPE_NON_TRAITABLE)
-    }
+    const evenement: RendezVousMilo.Evenement = job.contenu
 
-    if (job.contenu.objet === RendezVousMilo.ObjetEvenement.NON_TRAITABLE) {
-      return this.buildSuiviJob(debut, Traitement.OBJET_NON_TRAITABLE)
+    if (evenement.type === RendezVousMilo.TypeEvenement.NON_TRAITABLE) {
+      return this.buildSuiviJob(maintenant, Traitement.TYPE_NON_TRAITABLE)
+    }
+    if (evenement.objet === RendezVousMilo.ObjetEvenement.NON_TRAITABLE) {
+      return this.buildSuiviJob(maintenant, Traitement.OBJET_NON_TRAITABLE)
     }
 
     const jeune = await this.jeuneRepository.getByIdPartenaire(
-      job.contenu.idPartenaireBeneficiaire
+      evenement.idPartenaireBeneficiaire
     )
-
-    if (jeune === undefined) {
-      return this.buildSuiviJob(debut, Traitement.JEUNE_INEXISTANT)
+    if (!jeune) {
+      return this.buildSuiviJob(maintenant, Traitement.JEUNE_INEXISTANT)
     }
 
-    const rendezVousMilo =
+    const rendezVousMILO =
       await this.miloRendezVousHttpRepository.findRendezVousByEvenement(
-        job.contenu
+        evenement
       )
-
-    const rendezVousExistant =
+    const rendezVousCEJExistant =
       await this.rendezVousRepository.getByIdPartenaire(
-        job.contenu.idObjet,
-        job.contenu.objet
+        evenement.idObjet,
+        evenement.objet
       )
 
-    if (
-      !rendezVousMilo ||
-      job.contenu.type === RendezVousMilo.TypeEvenement.DELETE
-    ) {
-      if (rendezVousExistant) {
-        await this.rendezVousRepository.delete(rendezVousExistant.id)
-        if (doitNotifier) {
-          this.notificationService.notifierLesJeunesDuRdv(
-            rendezVousExistant,
-            Notification.Type.DELETED_RENDEZVOUS
-          )
-        }
-        this.supprimerLesRappelsDeRendezVous(rendezVousExistant)
-        return this.buildSuiviJob(
-          debut,
-          Traitement.RENDEZ_VOUS_SUPPRIME,
-          jeune.id,
-          rendezVousExistant.id
+    switch (evenement.type) {
+      case RendezVousMilo.TypeEvenement.CREATE:
+        return this.createRendezVousMILO(
+          jeune,
+          maintenant,
+          rendezVousMILO,
+          FT_NOTIFIER_RDV_MILO
         )
-      } else {
-        return this.buildSuiviJob(
-          debut,
-          Traitement.RENDEZ_VOUS_INEXISTANT,
-          jeune.id
+      case RendezVousMilo.TypeEvenement.UPDATE:
+        return this.updateRendezVousMILO(
+          jeune,
+          maintenant,
+          rendezVousMILO,
+          rendezVousCEJExistant,
+          FT_NOTIFIER_RDV_MILO
         )
-      }
+      case RendezVousMilo.TypeEvenement.DELETE:
+        return this.deleteRendezVousMILO(
+          jeune,
+          maintenant,
+          rendezVousMILO,
+          rendezVousCEJExistant,
+          FT_NOTIFIER_RDV_MILO
+        )
     }
+  }
 
-    if (rendezVousExistant) {
-      const rendezVousMisAJour =
-        this.rendezVousMiloFactory.mettreAJourRendezVousPassEmploi(
-          rendezVousExistant,
-          rendezVousMilo
-        )
-      await this.rendezVousRepository.save(rendezVousMisAJour)
-      if (doitNotifier) {
-        this.notificationService.notifierLesJeunesDuRdv(
-          rendezVousMisAJour,
-          Notification.Type.UPDATED_RENDEZVOUS
-        )
-      }
-      this.replanifierLesRappelsDeRendezVous(
-        rendezVousMisAJour,
-        rendezVousExistant
+  private async createRendezVousMILO(
+    jeune: Jeune,
+    maintenant: DateTime,
+    rendezVousMILO?: RendezVousMilo,
+    FT_NOTIFIER_RDV_MILO?: boolean
+  ): Promise<SuiviJob> {
+    if (rendezVousMILO && this.isStatutRecuperable(rendezVousMILO)) {
+      const newRendezVousCEJ = this.rendezVousMiloFactory.createRendezVousCEJ(
+        rendezVousMILO,
+        jeune
+      )
+
+      await this.rendezVousRepository.save(newRendezVousCEJ)
+      this.planifierLesRappelsDeRendezVous(newRendezVousCEJ)
+
+      this.notifier(
+        rendezVousMILO,
+        newRendezVousCEJ,
+        maintenant,
+        Notification.Type.NEW_RENDEZVOUS,
+        FT_NOTIFIER_RDV_MILO
       )
       return this.buildSuiviJob(
-        debut,
-        Traitement.RENDEZ_VOUS_MODIFIE,
-        jeune.id,
-        rendezVousExistant.id
-      )
-    } else {
-      const nouveauRendezVous =
-        this.rendezVousMiloFactory.creerRendezVousPassEmploi(
-          rendezVousMilo,
-          jeune
-        )
-      await this.rendezVousRepository.save(nouveauRendezVous)
-      if (doitNotifier) {
-        this.notificationService.notifierLesJeunesDuRdv(
-          nouveauRendezVous,
-          Notification.Type.NEW_RENDEZVOUS
-        )
-      }
-      this.planifierLesRappelsDeRendezVous(nouveauRendezVous)
-      return this.buildSuiviJob(
-        debut,
+        maintenant,
         Traitement.RENDEZ_VOUS_AJOUTE,
         jeune.id,
-        nouveauRendezVous.id
+        newRendezVousCEJ.id
       )
+    }
+    return this.buildSuiviJob(
+      maintenant,
+      Traitement.TRAITEMENT_CREATE_INCONNU,
+      jeune.id
+    )
+  }
+
+  private async updateRendezVousMILO(
+    jeune: Jeune,
+    maintenant: DateTime,
+    rendezVousMILO?: RendezVousMilo,
+    rendezVousCEJExistant?: RendezVous,
+    FT_NOTIFIER_RDV_MILO?: boolean
+  ): Promise<SuiviJob> {
+    if (rendezVousMILO) {
+      if (rendezVousCEJExistant) {
+        if (!this.isStatutRecuperable(rendezVousMILO)) {
+          return this.deleteRendezVousMILO(
+            jeune,
+            maintenant,
+            rendezVousMILO,
+            rendezVousCEJExistant,
+            FT_NOTIFIER_RDV_MILO
+          )
+        }
+
+        const rendezVousCEJUpdated =
+          this.rendezVousMiloFactory.updateRendezVousCEJ(
+            rendezVousCEJExistant,
+            rendezVousMILO
+          )
+        await this.rendezVousRepository.save(rendezVousCEJUpdated)
+        this.replanifierLesRappelsDeRendezVous(
+          rendezVousCEJUpdated,
+          rendezVousCEJExistant
+        )
+
+        this.notifier(
+          rendezVousMILO,
+          rendezVousCEJUpdated,
+          maintenant,
+          Notification.Type.UPDATED_RENDEZVOUS,
+          FT_NOTIFIER_RDV_MILO
+        )
+        return this.buildSuiviJob(
+          maintenant,
+          Traitement.RENDEZ_VOUS_MODIFIE,
+          jeune.id,
+          rendezVousCEJExistant.id
+        )
+      } else {
+        return this.createRendezVousMILO(
+          jeune,
+          maintenant,
+          rendezVousMILO,
+          FT_NOTIFIER_RDV_MILO
+        )
+      }
+    }
+    return this.buildSuiviJob(
+      maintenant,
+      Traitement.TRAITEMENT_UPDATE_INCONNU,
+      jeune.id
+    )
+  }
+
+  private async deleteRendezVousMILO(
+    jeune: Jeune,
+    maintenant: DateTime,
+    rendezVousMILO?: RendezVousMilo,
+    rendezVousCEJExistant?: RendezVous,
+    FT_NOTIFIER_RDV_MILO?: boolean
+  ): Promise<SuiviJob> {
+    if (rendezVousCEJExistant) {
+      await this.rendezVousRepository.delete(rendezVousCEJExistant.id)
+      this.supprimerLesRappelsDeRendezVous(rendezVousCEJExistant)
+
+      if (rendezVousMILO) {
+        this.notifier(
+          rendezVousMILO,
+          rendezVousCEJExistant,
+          maintenant,
+          Notification.Type.DELETED_RENDEZVOUS,
+          FT_NOTIFIER_RDV_MILO
+        )
+      }
+
+      return this.buildSuiviJob(
+        maintenant,
+        Traitement.RENDEZ_VOUS_SUPPRIME,
+        jeune.id,
+        rendezVousCEJExistant.id
+      )
+    }
+    return this.buildSuiviJob(
+      maintenant,
+      Traitement.TRAITEMENT_DELETE_INCONNU,
+      jeune.id
+    )
+  }
+
+  private notifier(
+    rendezVousMILO: RendezVousMilo,
+    rendezVousCEJ: RendezVous,
+    maintenant: DateTime,
+    typeNotification: Notification.TypeRdv,
+    FT_NOTIFIER_RDV_MILO?: boolean
+  ): void {
+    if (FT_NOTIFIER_RDV_MILO) {
+      const estRDVFutur = DateService.isGreater(
+        DateService.fromJSDateToDateTime(rendezVousCEJ.date)!,
+        maintenant
+      )
+
+      if (estRDVFutur && this.isStatutNotifiable(rendezVousMILO)) {
+        this.notificationService.notifierLesJeunesDuRdv(
+          rendezVousCEJ,
+          typeNotification
+        )
+      }
     }
   }
 
@@ -230,6 +334,25 @@ export class TraiterEvenementMiloJobHandler extends JobHandler<
       this.apmService.captureError(e)
     }
   }
+
+  private isStatutRecuperable(rendezVousMILO: RendezVousMilo): boolean {
+    return ![
+      RendezVousMilo.Statut.RDV_ANNULE,
+      RendezVousMilo.Statut.RDV_REPORTE,
+      RendezVousMilo.Statut.SESSION_REFUS_JEUNE,
+      RendezVousMilo.Statut.SESSION_REFUS_TIERS
+    ].includes(rendezVousMILO.statut as RendezVousMilo.Statut)
+  }
+
+  private isStatutNotifiable(rendezVousMILO: RendezVousMilo): boolean {
+    return [
+      RendezVousMilo.Statut.RDV_ABSENT,
+      RendezVousMilo.Statut.RDV_NON_PRECISE,
+      RendezVousMilo.Statut.RDV_PLANIFIE,
+      RendezVousMilo.Statut.RDV_PRESENT,
+      RendezVousMilo.Statut.SESSION_PRESCRIT
+    ].includes(rendezVousMILO.statut as RendezVousMilo.Statut)
+  }
 }
 
 export enum Traitement {
@@ -239,5 +362,8 @@ export enum Traitement {
   RENDEZ_VOUS_INEXISTANT = 'RENDEZ_VOUS_INEXISTANT',
   JEUNE_INEXISTANT = 'JEUNE_INEXISTANT',
   TYPE_NON_TRAITABLE = 'TYPE_NON_TRAITABLE',
-  OBJET_NON_TRAITABLE = 'OBJET_NON_TRAITABLE'
+  OBJET_NON_TRAITABLE = 'OBJET_NON_TRAITABLE',
+  TRAITEMENT_CREATE_INCONNU = 'TRAITEMENT_CREATE_INCONNU',
+  TRAITEMENT_UPDATE_INCONNU = 'TRAITEMENT_UPDATE_INCONNU',
+  TRAITEMENT_DELETE_INCONNU = 'TRAITEMENT_DELETE_INCONNU'
 }

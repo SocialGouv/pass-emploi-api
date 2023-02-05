@@ -165,45 +165,6 @@ describe('MiloEvenementsHttpRepository', () => {
           })
           expect(resultat).to.deep.equal(expected)
         })
-
-        describe('mais est Annulé ou Reporté', () => {
-          for (const statut of ['Annulé', 'Reporté']) {
-            it(`renvoie undefined quand le statut est ${statut}`, async () => {
-              // Given
-              const rendezVousJson: RendezVousMiloDto = {
-                id: idObjet,
-                dateHeureDebut: '2022-10-06 10:00:00',
-                dateHeureFin: '2022-10-06 12:00:00',
-                objet: 'Test RDV',
-                conseiller: 'SIMILO SIMILO',
-                idDossier: idPartenaireBeneficiaire,
-                commentaire: '',
-                type: 'Téléphone',
-                statut: statut as 'Annulé' | 'Reporté'
-              }
-              nock('https://milo.com')
-                .get(
-                  `/operateurs/dossiers/${idPartenaireBeneficiaire}/rdv/${idObjet}`
-                )
-                .reply(200, JSON.stringify(rendezVousJson))
-                .isDone()
-
-              // When
-              const resultat =
-                await miloEvenementsHttpRepository.findRendezVousByEvenement(
-                  unEvenementMilo({
-                    idObjet: idObjet.toString(),
-                    objet: RendezVousMilo.ObjetEvenement.RENDEZ_VOUS,
-                    idPartenaireBeneficiaire:
-                      idPartenaireBeneficiaire.toString()
-                  })
-                )
-
-              // Then
-              expect(resultat).to.be.undefined()
-            })
-          }
-        })
       })
       describe('quand il n’existe pas', () => {
         it('renvoie undefined', async () => {
@@ -272,43 +233,6 @@ describe('MiloEvenementsHttpRepository', () => {
             adresse: 'la'
           })
           expect(resultat).to.deep.equal(expected)
-        })
-        describe('mais est Refus tiers ou Refus jeune', () => {
-          for (const statut of ['Refus tiers', 'Refus jeune']) {
-            it(`renvoie undefined quand le statut est ${statut}`, async () => {
-              // Given
-              const sessionMiloDto: SessionMiloDto = {
-                lieu: 'la',
-                nom: 'je suis un titre mais en fait le nom',
-                id: idObjet.toString(),
-                dateHeureDebut: '2022-10-06 10:00:00',
-                dateHeureFin: '2022-10-06 12:00:00',
-                idDossier: idPartenaireBeneficiaire.toString(),
-                commentaire: 'un petit commentaire plus ou moins long',
-                statut: statut as 'Refus tiers' | 'Refus jeune'
-              }
-              nock('https://milo.com')
-                .get(
-                  `/operateurs/dossiers/${idPartenaireBeneficiaire}/sessions/${idObjet}`
-                )
-                .reply(200, JSON.stringify(sessionMiloDto))
-                .isDone()
-
-              // When
-              const resultat =
-                await miloEvenementsHttpRepository.findRendezVousByEvenement(
-                  unEvenementMilo({
-                    idObjet: idObjet.toString(),
-                    objet: RendezVousMilo.ObjetEvenement.SESSION,
-                    idPartenaireBeneficiaire:
-                      idPartenaireBeneficiaire.toString()
-                  })
-                )
-
-              // Then
-              expect(resultat).to.be.undefined()
-            })
-          }
         })
       })
 

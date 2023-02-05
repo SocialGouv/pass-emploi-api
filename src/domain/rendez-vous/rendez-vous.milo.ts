@@ -28,6 +28,19 @@ export interface RendezVousMilo {
 }
 
 export namespace RendezVousMilo {
+  export enum Statut {
+    RDV_ABSENT = 'Absent',
+    RDV_ANNULE = 'Annulé',
+    RDV_NON_PRECISE = 'Non précisé',
+    RDV_PLANIFIE = 'Planifié',
+    RDV_PRESENT = 'Présent',
+    RDV_REPORTE = 'Reporté',
+    SESSION_REALISE = 'Réalisé',
+    SESSION_PRESCRIT = 'Prescrit',
+    SESSION_REFUS_TIERS = 'Refus tiers',
+    SESSION_REFUS_JEUNE = 'Refus jeune'
+  }
+
   export enum Type {
     RENDEZ_VOUS = 'RENDEZ_VOUS',
     SESSION = 'SESSION'
@@ -69,7 +82,7 @@ export namespace RendezVousMilo {
   export class Factory {
     constructor(private idService: IdService) {}
 
-    creerRendezVousPassEmploi(
+    createRendezVousCEJ(
       rendezVousMilo: RendezVousMilo,
       jeune: JeuneDuRendezVous
     ): RendezVousPassEmploi {
@@ -111,7 +124,7 @@ export namespace RendezVousMilo {
       }
     }
 
-    mettreAJourRendezVousPassEmploi(
+    updateRendezVousCEJ(
       rendezVousPassEmploi: RendezVousPassEmploi,
       rendezVousMilo: RendezVousMilo
     ): RendezVousPassEmploi {
