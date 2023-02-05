@@ -2,19 +2,19 @@ import { HttpService } from '@nestjs/axios'
 import { HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
+import { ErreurHttp } from '../../../building-blocks/types/domain-error'
 import {
   emptySuccess,
   failure,
   Result
 } from '../../../building-blocks/types/result'
+import { RendezVousMilo } from '../../../domain/rendez-vous/rendez-vous.milo'
+import { RateLimiterService } from '../../../utils/rate-limiter.service'
 import {
   EvenementMiloDto,
   RendezVousMiloDto,
   SessionMiloDto
 } from '../dto/milo.dto'
-import { RendezVousMilo } from '../../../domain/rendez-vous/rendez-vous.milo'
-import { RateLimiterService } from '../../../utils/rate-limiter.service'
-import { ErreurHttp } from '../../../building-blocks/types/domain-error'
 
 @Injectable()
 export class MiloRendezVousHttpRepository implements RendezVousMilo.Repository {
@@ -101,10 +101,6 @@ export class MiloRendezVousHttpRepository implements RendezVousMilo.Repository {
           )
         )
 
-        if (['Refus tiers', 'Refus jeune'].includes(sessionMilo.data.statut)) {
-          return undefined
-        }
-
         return {
           id: sessionMilo.data.id,
           dateHeureDebut: sessionMilo.data.dateHeureDebut,
@@ -129,10 +125,6 @@ export class MiloRendezVousHttpRepository implements RendezVousMilo.Repository {
             }
           )
         )
-
-        if (['Annulé', 'Reporté'].includes(rendezVousMilo.data.statut)) {
-          return undefined
-        }
 
         return {
           id: rendezVousMilo.data.id.toString(),

@@ -56,7 +56,7 @@ describe('MiloRendezVous', () => {
           })
 
           // When
-          rendezVousObtenu = rendezVousFactory.creerRendezVousPassEmploi(
+          rendezVousObtenu = rendezVousFactory.createRendezVousCEJ(
             rdvMilo,
             jeune
           )
@@ -75,7 +75,7 @@ describe('MiloRendezVous', () => {
           })
 
           // When
-          rendezVousObtenu = rendezVousFactory.creerRendezVousPassEmploi(
+          rendezVousObtenu = rendezVousFactory.createRendezVousCEJ(
             rdvMilo,
             jeune
           )
@@ -95,7 +95,7 @@ describe('MiloRendezVous', () => {
               dateHeureFin: undefined
             })
             // When
-            rendezVousObtenu = rendezVousFactory.creerRendezVousPassEmploi(
+            rendezVousObtenu = rendezVousFactory.createRendezVousCEJ(
               rdvMilo,
               jeune
             )
@@ -113,7 +113,7 @@ describe('MiloRendezVous', () => {
           })
 
           // When
-          rendezVousObtenu = rendezVousFactory.creerRendezVousPassEmploi(
+          rendezVousObtenu = rendezVousFactory.createRendezVousCEJ(
             rdvMilo,
             jeune
           )
@@ -158,7 +158,7 @@ describe('MiloRendezVous', () => {
           })
 
           // When
-          rendezVousObtenu = rendezVousFactory.creerRendezVousPassEmploi(
+          rendezVousObtenu = rendezVousFactory.createRendezVousCEJ(
             rdvMilo,
             jeune
           )
@@ -216,7 +216,7 @@ describe('MiloRendezVous', () => {
         })
 
         // When
-        rendezVousObtenu = rendezVousFactory.mettreAJourRendezVousPassEmploi(
+        rendezVousObtenu = rendezVousFactory.updateRendezVousCEJ(
           rendezVousPassEmploi,
           rdvMilo
         )
