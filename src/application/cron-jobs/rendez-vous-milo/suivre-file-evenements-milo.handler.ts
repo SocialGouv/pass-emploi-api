@@ -78,7 +78,7 @@ export class SuivreEvenementsMiloCronJobHandler extends JobHandler<Job> {
         resultat: {},
         nbErreurs: 1,
         tempsExecution: DateService.calculerTempsExecution(debutDuJob),
-        messageDErreur: e.stack ?? e.message
+        erreur: e
       }
     }
   }

@@ -79,7 +79,7 @@ describe('SuiviJobService', () => {
         tempsExecution: 0,
         nbErreurs: 0,
         resultat: new NonTrouveError('test', '1'),
-        messageDErreur: "erreur d'e quoi"
+        erreur: { message: "erreur d'e quoi" }
       }
       const heureParis = uneDatetime().setZone('Europe/Paris').toISO()
       const stringBody = `{"username":"CEJ Lama","text":"### Résultat du job _MAJ_AGENCE_AC_\\n| Statut | :x: |\\n    |:------------------------|:------------|\\n    | jobType | MAJ_AGENCE_AC |\\n| succes | false |\\n| dateExecution | ${heureParis} |\\n| tempsExecution | 0 |\\n| nbErreurs | 0 |\\n| code | NON_TROUVE |\\n| message | test 1 non trouvé(e) |"}`
