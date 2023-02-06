@@ -79,7 +79,7 @@
     "@nestjs/config": "2.3.0",
     "@nestjs/core": "9.2.1",
     "@nestjs/platform-express": "9.2.1",
-    "@nestjs/swagger": "6.2.0",
+    "@nestjs/swagger": "6.2.1",
     "@nestjs/terminus": "9.1.4",
     "bull": "4.10.3",
     "class-transformer": "0.5.1",
