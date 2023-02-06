@@ -7012,13 +7012,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ics@npm:^2.41.0":
-  version: 2.41.0
-  resolution: "ics@npm:2.41.0"
+"ics@npm:^3.0.0":
+  version: 3.0.1
+  resolution: "ics@npm:3.0.1"
   dependencies:
     nanoid: ^3.1.23
     yup: ^0.32.9
-  checksum: dabeaa2dc406ffb7163ee90cc71b658d0ad9db797185648a773941e3342cf74152fb8010a29803de605cc1eec238bd5be63dff9f33a41a6a4338bebf0ed06db0
+  checksum: 8ca5ac1a140c68db0a02f047e3514f844870021bad2563c7e959604aa35542d32378e490743cfb5c12e5d214cc802b3fb42ab17933a4fe6ba2b615a96effb36c
   languageName: node
   linkType: hard
 
@@ -9019,7 +9019,7 @@ __metadata:
     geojson: ^0.5.0
     helmet: ^6.0.1
     husky: ^8.0.2
-    ics: ^2.41.0
+    ics: ^3.0.0
     joi: ^17.7.0
     jose: ^4.11.1
     lint-staged: ^13.0.4
