@@ -8,7 +8,7 @@ import { JeuneAuthorizer } from '../../../../src/application/authorizers/authori
 import {
   GetActionsByJeuneQuery,
   GetActionsByJeuneQueryHandler
-} from '../../../../src/application/queries/action/get-actions-by-jeune.query.handler.db'
+} from '../../../../src/application/queries/action/get-actions-par-id-jeune.query.handler.db'
 import { ActionQueryModel } from '../../../../src/application/queries/query-models/actions.query-model'
 import { Action } from '../../../../src/domain/action/action'
 import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'

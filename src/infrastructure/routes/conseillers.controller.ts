@@ -26,6 +26,10 @@ import {
   CreateActionCommandHandler
 } from '../../application/commands/action/create-action.command.handler'
 import {
+  CreateListeDeDiffusionCommand,
+  CreateListeDeDiffusionCommandHandler
+} from '../../application/commands/create-liste-de-diffusion.command.handler'
+import {
   CreateRendezVousCommand,
   CreateRendezVousCommandHandler
 } from '../../application/commands/create-rendez-vous.command.handler'
@@ -52,8 +56,7 @@ import {
 } from '../../application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { GetJeuneMiloByDossierQueryHandler } from '../../application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from '../../application/queries/get-jeunes-by-conseiller.query.handler.db'
-import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
-import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
+import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from '../../application/queries/action/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
 import { DetailConseillerQueryModel } from '../../application/queries/query-models/conseillers.query-model'
 import { IndicateursPourConseillerQueryModel } from '../../application/queries/query-models/indicateurs-pour-conseiller.query-model'
 import {
@@ -64,6 +67,7 @@ import {
 } from '../../application/queries/query-models/jeunes.query-model'
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
 import { RendezVousConseillerFutursEtPassesQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
+import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
 import {
   EmailExisteDejaError,
   ErreurHttp
@@ -93,10 +97,6 @@ import {
   SuperviseursPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
-import {
-  CreateListeDeDiffusionCommand,
-  CreateListeDeDiffusionCommandHandler
-} from '../../application/commands/create-liste-de-diffusion.command.handler'
 
 @Controller('conseillers')
 @ApiOAuth2([])
