@@ -1909,6 +1909,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lukeed/csprng@npm:^1.0.0":
+  version: 1.0.1
+  resolution: "@lukeed/csprng@npm:1.0.1"
+  checksum: fd84d6832775052d6bff3e78b0bc7f4b29b2fafa71b04826b0713f55d9a447a0b273d4eb70d02d89bb879e9d768cd9716da818dafa32ba6f7ecb639cbdc6806d
+  languageName: node
+  linkType: hard
+
 "@moleculer/vorpal@npm:^1.11.5":
   version: 1.11.5
   resolution: "@moleculer/vorpal@npm:1.11.5"
@@ -2015,13 +2022,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/common@npm:9.2.1":
-  version: 9.2.1
-  resolution: "@nestjs/common@npm:9.2.1"
+"@nestjs/common@npm:9.3.5":
+  version: 9.3.5
+  resolution: "@nestjs/common@npm:9.3.5"
   dependencies:
     iterare: 1.2.1
-    tslib: 2.4.1
-    uuid: 9.0.0
+    tslib: 2.5.0
+    uid: 2.0.1
   peerDependencies:
     cache-manager: <=5
     class-transformer: "*"
@@ -2035,7 +2042,7 @@ __metadata:
       optional: true
     class-validator:
       optional: true
-  checksum: 82acae70df519f1f217f5b11354c29e1f3b9e5ddd5f73385bd76705c235507230bb19c6c0eb696938565ce70c33cecb487d539c829d1c8d39121fcf3468b4d55
+  checksum: a5c8ea53616caa891dc1329839e94a093095417dffe67e50c9c626af95ebc8fed34bbce667a38159489fa303ed44994601fde7c47d0aa21d8fa7775bfd2e57c2
   languageName: node
   linkType: hard
 
@@ -2055,17 +2062,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/core@npm:9.2.1":
-  version: 9.2.1
-  resolution: "@nestjs/core@npm:9.2.1"
+"@nestjs/core@npm:9.3.5":
+  version: 9.3.5
+  resolution: "@nestjs/core@npm:9.3.5"
   dependencies:
+    "@node-rs/xxhash": ^1.3.0
     "@nuxtjs/opencollective": 0.3.2
     fast-safe-stringify: 2.1.1
     iterare: 1.2.1
-    object-hash: 3.0.0
     path-to-regexp: 3.2.0
-    tslib: 2.4.1
-    uuid: 9.0.0
+    tslib: 2.5.0
+    uid: 2.0.1
   peerDependencies:
     "@nestjs/common": ^9.0.0
     "@nestjs/microservices": ^9.0.0
@@ -2080,7 +2087,7 @@ __metadata:
       optional: true
     "@nestjs/websockets":
       optional: true
-  checksum: 006edefb175840f7706e3ae755dfd984e112d40fe3ce26bd75ee019652c38b5225c751617efaf6054b07ddb1f7e044f49015520889f0003aa9aab33111d59172
+  checksum: ec6d5656bdfa737d926ff6ddb2d9105a5dffd238a55e99f53221ab19544f83127d13ac6481407b43561f210bc529c3e4b9e53ae2c4f61fb039e17177f25edf73
   languageName: node
   linkType: hard
 
@@ -2101,19 +2108,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/platform-express@npm:9.2.1":
-  version: 9.2.1
-  resolution: "@nestjs/platform-express@npm:9.2.1"
+"@nestjs/platform-express@npm:9.3.5":
+  version: 9.3.5
+  resolution: "@nestjs/platform-express@npm:9.3.5"
   dependencies:
     body-parser: 1.20.1
     cors: 2.8.5
     express: 4.18.2
     multer: 1.4.4-lts.1
-    tslib: 2.4.1
+    tslib: 2.5.0
   peerDependencies:
     "@nestjs/common": ^9.0.0
     "@nestjs/core": ^9.0.0
-  checksum: a20d5471b1dcc56f056af14593d94ed8e155208338359e72519ed052ffdc741c5b27a75726c46277dc8baadd99615b369c6874353e73c95133b90a05b79810e9
+  checksum: bcb03b5fb9baf3d97dc97e8f619e1e34fa066d374e1e2c4f3440474c41740c0e3e3602bb9fdeb3682e4585bc53ee425c9d3264e8e5c76c2a8340487e5d83b14f
   languageName: node
   linkType: hard
 
@@ -2159,9 +2166,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/terminus@npm:9.1.4":
-  version: 9.1.4
-  resolution: "@nestjs/terminus@npm:9.1.4"
+"@nestjs/terminus@npm:9.2.0":
+  version: 9.2.0
+  resolution: "@nestjs/terminus@npm:9.2.0"
   dependencies:
     boxen: 5.1.2
     check-disk-space: 3.3.1
@@ -2207,7 +2214,7 @@ __metadata:
       optional: true
     typeorm:
       optional: true
-  checksum: 35b051951953f001e76fba73e99f74b9fdd42c4b66739b980987dc0aa03a59d64652ed7032a0e6731e71ed5c06af80e59c57915def4d79f3a3c7dbf89d5db9d0
+  checksum: 915fa54cf4a4f887966bf8b5bb99e0a4d75876cfc58e83d2d0f2ebb58c2c7a68808352a7f81de7b4cf3fb1f126a177559ea35a34f40e39de705996eda1c31407
   languageName: node
   linkType: hard
 
@@ -2227,6 +2234,145 @@ __metadata:
     "@nestjs/platform-express":
       optional: true
   checksum: 69fbe0535bbc6b8f90f90a02efb33b390d5aa7ce1f309452b1fcedd9304f7466871842f27d042587fce8532892abe58c769465eca13dde80860e002ffa83570b
+  languageName: node
+  linkType: hard
+
+"@node-rs/xxhash-android-arm-eabi@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@node-rs/xxhash-android-arm-eabi@npm:1.3.0"
+  conditions: os=android & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@node-rs/xxhash-android-arm64@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@node-rs/xxhash-android-arm64@npm:1.3.0"
+  conditions: os=android & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@node-rs/xxhash-darwin-arm64@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@node-rs/xxhash-darwin-arm64@npm:1.3.0"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@node-rs/xxhash-darwin-x64@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@node-rs/xxhash-darwin-x64@npm:1.3.0"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@node-rs/xxhash-freebsd-x64@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@node-rs/xxhash-freebsd-x64@npm:1.3.0"
+  conditions: os=freebsd & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@node-rs/xxhash-linux-arm-gnueabihf@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@node-rs/xxhash-linux-arm-gnueabihf@npm:1.3.0"
+  conditions: os=linux & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@node-rs/xxhash-linux-arm64-gnu@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@node-rs/xxhash-linux-arm64-gnu@npm:1.3.0"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@node-rs/xxhash-linux-arm64-musl@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@node-rs/xxhash-linux-arm64-musl@npm:1.3.0"
+  conditions: os=linux & cpu=arm64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@node-rs/xxhash-linux-x64-gnu@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@node-rs/xxhash-linux-x64-gnu@npm:1.3.0"
+  conditions: os=linux & cpu=x64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@node-rs/xxhash-linux-x64-musl@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@node-rs/xxhash-linux-x64-musl@npm:1.3.0"
+  conditions: os=linux & cpu=x64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@node-rs/xxhash-win32-arm64-msvc@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@node-rs/xxhash-win32-arm64-msvc@npm:1.3.0"
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@node-rs/xxhash-win32-ia32-msvc@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@node-rs/xxhash-win32-ia32-msvc@npm:1.3.0"
+  conditions: os=win32 & cpu=ia32
+  languageName: node
+  linkType: hard
+
+"@node-rs/xxhash-win32-x64-msvc@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@node-rs/xxhash-win32-x64-msvc@npm:1.3.0"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@node-rs/xxhash@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "@node-rs/xxhash@npm:1.3.0"
+  dependencies:
+    "@node-rs/xxhash-android-arm-eabi": 1.3.0
+    "@node-rs/xxhash-android-arm64": 1.3.0
+    "@node-rs/xxhash-darwin-arm64": 1.3.0
+    "@node-rs/xxhash-darwin-x64": 1.3.0
+    "@node-rs/xxhash-freebsd-x64": 1.3.0
+    "@node-rs/xxhash-linux-arm-gnueabihf": 1.3.0
+    "@node-rs/xxhash-linux-arm64-gnu": 1.3.0
+    "@node-rs/xxhash-linux-arm64-musl": 1.3.0
+    "@node-rs/xxhash-linux-x64-gnu": 1.3.0
+    "@node-rs/xxhash-linux-x64-musl": 1.3.0
+    "@node-rs/xxhash-win32-arm64-msvc": 1.3.0
+    "@node-rs/xxhash-win32-ia32-msvc": 1.3.0
+    "@node-rs/xxhash-win32-x64-msvc": 1.3.0
+  dependenciesMeta:
+    "@node-rs/xxhash-android-arm-eabi":
+      optional: true
+    "@node-rs/xxhash-android-arm64":
+      optional: true
+    "@node-rs/xxhash-darwin-arm64":
+      optional: true
+    "@node-rs/xxhash-darwin-x64":
+      optional: true
+    "@node-rs/xxhash-freebsd-x64":
+      optional: true
+    "@node-rs/xxhash-linux-arm-gnueabihf":
+      optional: true
+    "@node-rs/xxhash-linux-arm64-gnu":
+      optional: true
+    "@node-rs/xxhash-linux-arm64-musl":
+      optional: true
+    "@node-rs/xxhash-linux-x64-gnu":
+      optional: true
+    "@node-rs/xxhash-linux-x64-musl":
+      optional: true
+    "@node-rs/xxhash-win32-arm64-msvc":
+      optional: true
+    "@node-rs/xxhash-win32-ia32-msvc":
+      optional: true
+    "@node-rs/xxhash-win32-x64-msvc":
+      optional: true
+  checksum: 1bc505ed48accb817fd5a67ec6efbc350d28ffb5709b0248dcd4b37ffa40f959b84d44eee4e42e722379478961d1aa11eee6e5965b1084c02b26534567118e68
   languageName: node
   linkType: hard
 
@@ -8943,13 +9089,13 @@ __metadata:
     "@google-cloud/bigquery": ^6.0.3
     "@nestjs/axios": 1.0.1
     "@nestjs/cli": ^9.1.5
-    "@nestjs/common": 9.2.1
+    "@nestjs/common": 9.3.5
     "@nestjs/config": 2.3.0
-    "@nestjs/core": 9.2.1
-    "@nestjs/platform-express": 9.2.1
+    "@nestjs/core": 9.3.5
+    "@nestjs/platform-express": 9.3.5
     "@nestjs/schematics": ^9.0.3
     "@nestjs/swagger": 6.2.1
-    "@nestjs/terminus": 9.1.4
+    "@nestjs/terminus": 9.2.0
     "@nestjs/testing": ^9.2.1
     "@salesforce/ts-sinon": ^1.4.2
     "@types/bull": ^4.10.0
@@ -9332,17 +9478,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"object-hash@npm:3.0.0, object-hash@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "object-hash@npm:3.0.0"
-  checksum: 80b4904bb3857c52cc1bfd0b52c0352532ca12ed3b8a6ff06a90cd209dfda1b95cee059a7625eb9da29537027f68ac4619363491eedb2f5d3dddbba97494fd6c
-  languageName: node
-  linkType: hard
-
 "object-hash@npm:^2.0.1":
   version: 2.2.0
   resolution: "object-hash@npm:2.2.0"
   checksum: 55ba841e3adce9c4f1b9b46b41983eda40f854e0d01af2802d3ae18a7085a17168d6b81731d43fdf1d6bcbb3c9f9c56d22c8fea992203ad90a38d7d919bc28f1
+  languageName: node
+  linkType: hard
+
+"object-hash@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "object-hash@npm:3.0.0"
+  checksum: 80b4904bb3857c52cc1bfd0b52c0352532ca12ed3b8a6ff06a90cd209dfda1b95cee059a7625eb9da29537027f68ac4619363491eedb2f5d3dddbba97494fd6c
   languageName: node
   linkType: hard
 
@@ -11995,17 +12141,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:2.5.0, tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.5.0":
+  version: 2.5.0
+  resolution: "tslib@npm:2.5.0"
+  checksum: ae3ed5f9ce29932d049908ebfdf21b3a003a85653a9a140d614da6b767a93ef94f460e52c3d787f0e4f383546981713f165037dc2274df212ea9f8a4541004e1
+  languageName: node
+  linkType: hard
+
 "tslib@npm:^1.11.1, tslib@npm:^1.8.1, tslib@npm:^1.9.0":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: dbe628ef87f66691d5d2959b3e41b9ca0045c3ee3c7c7b906cc1e328b39f199bb1ad9e671c39025bd56122ac57dfbf7385a94843b1cc07c60a4db74795829acd
-  languageName: node
-  linkType: hard
-
-"tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.5.0":
-  version: 2.5.0
-  resolution: "tslib@npm:2.5.0"
-  checksum: ae3ed5f9ce29932d049908ebfdf21b3a003a85653a9a140d614da6b767a93ef94f460e52c3d787f0e4f383546981713f165037dc2274df212ea9f8a4541004e1
   languageName: node
   linkType: hard
 
@@ -12179,6 +12325,15 @@ __metadata:
   bin:
     uglifyjs: bin/uglifyjs
   checksum: 7b3897df38b6fc7d7d9f4dcd658599d81aa2b1fb0d074829dd4e5290f7318dbca1f4af2f45acb833b95b1fe0ed4698662ab61b87e94328eb4c0a0d3435baf924
+  languageName: node
+  linkType: hard
+
+"uid@npm:2.0.1":
+  version: 2.0.1
+  resolution: "uid@npm:2.0.1"
+  dependencies:
+    "@lukeed/csprng": ^1.0.0
+  checksum: 0a3c697d8dd1f3b647afa35c411b11fd8fa2fb6dbd8a49fe109a4aa5214068c2c58781aa6e4516dfd16f0fc524fb7bba0833e9c1dc1ed3f1965b520349be9ad5
   languageName: node
   linkType: hard
 
