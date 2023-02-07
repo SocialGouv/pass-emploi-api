@@ -64,6 +64,10 @@ import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.quer
 import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
+import {
+  GetActionsDuConseillerAQualifierQuery,
+  GetActionsDuConseillerAQualifierQueryHandler
+} from '../../../src/application/queries/action/get-actions-du-conseiller-a-qualifier.query.handler.db'
 
 describe('ConseillersController', () => {
   let getConseillerByEmailQueryHandler: StubbedClass<GetConseillerByEmailQueryHandler>
@@ -81,6 +85,7 @@ describe('ConseillersController', () => {
   let recupererJeunesDuConseillerCommandHandler: StubbedClass<RecupererJeunesDuConseillerCommandHandler>
   let modifierJeuneDuConseillerCommandHandler: StubbedClass<ModifierJeuneDuConseillerCommandHandler>
   let getIndicateursJeunePourConseillerQueryHandler: StubbedClass<GetIndicateursPourConseillerQueryHandler>
+  let getActionsDuConseillerAQualifierQueryHandler: StubbedClass<GetActionsDuConseillerAQualifierQueryHandler>
   let app: INestApplication
 
   const now = uneDatetime().set({ second: 59, millisecond: 0 })
@@ -115,6 +120,9 @@ describe('ConseillersController', () => {
     )
     getIndicateursJeunePourConseillerQueryHandler = app.get(
       GetIndicateursPourConseillerQueryHandler
+    )
+    getActionsDuConseillerAQualifierQueryHandler = app.get(
+      GetActionsDuConseillerAQualifierQueryHandler
     )
   })
 
@@ -1238,6 +1246,54 @@ describe('ConseillersController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/conseillers/1/jeunes/id-jeune/indicateurs?dateDebut=2022-08-01&dateFin=2022-08-10'
+    )
+  })
+
+  describe('GET /conseillers/{idConseiller}/actions/a-qualifier', () => {
+    describe('quand la query est au bon format', () => {
+      it('retourne les actions à qualifier', async () => {
+        // Given
+        const query: GetActionsDuConseillerAQualifierQuery = {
+          idConseiller: 'un-id-conseiller',
+          page: 1,
+          limit: 10
+        }
+        const resultat = {
+          pagination: {
+            page: 1,
+            limit: 10,
+            total: 0
+          },
+          resultats: []
+        }
+
+        getActionsDuConseillerAQualifierQueryHandler.execute
+          .withArgs(query, unUtilisateurDecode())
+          .resolves(success(resultat))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get(`/conseillers/${query.idConseiller}/actions/a-qualifier`)
+          .query({ page: 1, limit: 10 })
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(JSON.stringify(resultat))
+      })
+    })
+
+    describe('quand la query est au mauvais format', () => {
+      it('retourne une erreur 400', async () => {
+        await request(app.getHttpServer())
+          .get(`/conseillers/${'un-id-conseiller'}/actions/a-qualifier`)
+          .query({ page: 'a', limit: 10 })
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers/2/actions/a-qualifier'
     )
   })
 })

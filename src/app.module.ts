@@ -53,7 +53,7 @@ import { TeleverserFichierCommandHandler } from './application/commands/televers
 import { GetActionsPredefiniesQueryHandler } from './application/queries/action/get-actions-predefinies.query.handler'
 import { GetJeunesByEtablissementQueryHandler } from './application/queries/get-jeunes-by-etablissement.query.handler.db'
 import { Context } from './building-blocks/context'
-import { GetActionsByJeuneQueryHandler } from './application/queries/action/get-actions-by-jeune.query.handler.db'
+import { GetActionsByJeuneQueryHandler } from './application/queries/action/get-actions-par-id-jeune.query.handler.db'
 import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
 import { GetCommunesEtDepartementsQueryHandler } from './application/queries/get-communes-et-departements.query.handler.db'
 import { GetConseillerByEmailQueryHandler } from './application/queries/get-conseiller-by-email.query.handler.db'
@@ -302,6 +302,7 @@ import { MiloJeuneRepositoryToken } from './domain/jeune/jeune.milo'
 import { HandleJobFakeCommandHandler } from './application/commands/jobs/handle-job-fake.command'
 import { MettreAJourLesJeunesCejPeCommandHandler } from './application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
 import { ChangerAgenceCommandHandler } from './application/commands/changer-agence.command.handler'
+import { GetActionsDuConseillerAQualifierQueryHandler } from './application/queries/action/get-actions-du-conseiller-a-qualifier.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -668,7 +669,8 @@ export function buildQueryCommandsProviders(): Provider[] {
     RefreshJddCommandHandler,
     EnvoyerMessageGroupeCommandHandler,
     MettreAJourLesJeunesCejPeCommandHandler,
-    ChangerAgenceCommandHandler
+    ChangerAgenceCommandHandler,
+    GetActionsDuConseillerAQualifierQueryHandler
   ]
 }
 

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { PaginationQueryModel } from './commun/pagination.query-model'
 
 export class LocalisationOffresEmploiQueryModel {
   @ApiProperty({ required: false })
@@ -48,22 +49,11 @@ export class OffreEmploiResumeQueryModel {
   duree?: string
 }
 
-class Pagination {
-  @ApiProperty()
-  page: number
-
-  @ApiProperty()
-  limit: number
-
-  @ApiProperty()
-  total: number
-}
-
 export class OffresEmploiQueryModel {
   @ApiProperty({
-    type: Pagination
+    type: PaginationQueryModel
   })
-  pagination: Pagination
+  pagination: PaginationQueryModel
 
   @ApiProperty({
     type: OffreEmploiResumeQueryModel,

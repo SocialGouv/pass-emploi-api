@@ -10,6 +10,7 @@ import {
   IsIn,
   IsNotEmpty,
   IsNotEmptyObject,
+  IsNumber,
   IsOptional,
   IsString,
   Length,
@@ -208,4 +209,18 @@ export class UpdateListeDeDiffusionPayload {
   @ApiProperty()
   @IsArray()
   idsBeneficiaires: string[]
+}
+
+export class GetActionsDuConseillerAQualifierQueryParams {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  page?: number
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  limite?: number
 }

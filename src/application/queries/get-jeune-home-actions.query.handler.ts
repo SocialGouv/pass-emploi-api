@@ -4,7 +4,7 @@ import { GetCampagneQueryModel } from './query-getters/get-campagne.query.getter
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Authentification } from '../../domain/authentification'
-import { GetActionsByJeuneQueryHandler } from './action/get-actions-by-jeune.query.handler.db'
+import { GetActionsByJeuneQueryHandler } from './action/get-actions-par-id-jeune.query.handler.db'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { isSuccess, Result } from '../../building-blocks/types/result'
 

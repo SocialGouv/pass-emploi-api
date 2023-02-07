@@ -3,7 +3,7 @@ import * as request from 'supertest'
 import {
   ActionsByJeuneOutput,
   GetActionsByJeuneQueryHandler
-} from '../../../../src/application/queries/action/get-actions-by-jeune.query.handler.db'
+} from '../../../../src/application/queries/action/get-actions-par-id-jeune.query.handler.db'
 import {
   ErreurHttp,
   NonTrouveError
