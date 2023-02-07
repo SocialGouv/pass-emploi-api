@@ -10,7 +10,7 @@ import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   GetActionsByJeuneQuery,
   GetActionsByJeuneQueryHandler
-} from '../../../application/queries/action/get-actions-by-jeune.query.handler.db'
+} from '../../../application/queries/action/get-actions-par-id-jeune.query.handler.db'
 import { ListeActionsV2QueryModel } from '../../../application/queries/query-models/actions.query-model'
 import { isFailure, isSuccess } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
