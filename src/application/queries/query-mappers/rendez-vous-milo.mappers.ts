@@ -1,10 +1,12 @@
+import { Authentification } from '../../../domain/authentification'
 import {
   mapCodeLabelTypeRendezVous,
   mapCodeLabelTypeRendezVousJeune,
   RendezVous
 } from '../../../domain/rendez-vous/rendez-vous'
-import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
+import { RendezVousJeuneAssociationSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
+import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import {
   AnimationCollectiveQueryModel,
   RendezVousConseillerDetailQueryModel,
@@ -12,8 +14,6 @@ import {
   RendezVousJeuneDetailQueryModel,
   RendezVousJeuneQueryModel
 } from '../query-models/rendez-vous.query-model'
-import { RendezVousJeuneAssociationSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { Authentification } from '../../../domain/authentification'
 
 export function fromSqlToRendezVousJeuneQueryModel(
   rendezVousSql: RendezVousSqlModel,

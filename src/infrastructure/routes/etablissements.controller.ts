@@ -17,7 +17,6 @@ import {
   ClotureAnimationCollectivePayload,
   GetAnimationsCollectivesQueryParams
 } from './validation/etablissements.inputs'
-
 @Controller('etablissements')
 @ApiOAuth2([])
 @ApiTags('Etablissements')

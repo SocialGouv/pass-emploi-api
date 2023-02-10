@@ -36,7 +36,7 @@ export class GetAnimationsCollectivesQueryHandler extends QueryHandler<
   async handle(
     query: GetAnimationsCollectivesQuery
   ): Promise<Result<AnimationCollectiveQueryModel[]>> {
-    const rdvSql = await RendezVousSqlModel.findAll({
+    const animationsCollectivesSql = await RendezVousSqlModel.findAll({
       where: {
         idAgence: query.idEtablissement,
         dateSuppression: {
@@ -53,9 +53,10 @@ export class GetAnimationsCollectivesQueryHandler extends QueryHandler<
     })
 
     const maintenant = this.dateService.nowJs()
-
     return success(
-      rdvSql.map(rdv => fromSqlToAnimationCollectiveQueryModel(rdv, maintenant))
+      animationsCollectivesSql.map(rdv =>
+        fromSqlToAnimationCollectiveQueryModel(rdv, maintenant)
+      )
     )
   }
 

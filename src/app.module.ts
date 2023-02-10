@@ -266,11 +266,13 @@ import { CreateSuggestionConseillerServiceCiviqueCommandHandler } from './applic
 import { CreateSuggestionConseillerImmersionCommandHandler } from './application/commands/create-suggestion-conseiller-immersion.command.handler'
 import { ReferentielsControllerV2 } from './infrastructure/routes/v2/referentiels.controller.v2'
 import { EtablissementsController } from './infrastructure/routes/etablissements.controller'
+import { EtablissementsControllerV2 } from './infrastructure/routes/v2/etablissements.controller.v2'
 import { ConseillerEtablissementAuthorizer } from './application/authorizers/authorize-conseiller-etablissement'
 import { AnimationCollectiveSqlRepository } from './infrastructure/repositories/rendez-vous/animation-collective-sql.repository.db'
 import { HistoriqueRendezVousRepositorySql } from './infrastructure/repositories/rendez-vous/historique-rendez-vous.repository.db'
 import { CloturerAnimationCollectiveCommandHandler } from './application/commands/cloturer-animation-collective.command.handler'
 import { GetAnimationsCollectivesQueryHandler } from './application/queries/rendez-vous/get-animations-collectives.query.handler.db'
+import { GetAnimationsCollectivesV2QueryHandler } from './application/queries/rendez-vous/get-animations-collectives-v2.query.handler.db'
 import { AnimationCollectiveRepositoryToken } from './domain/rendez-vous/animation-collective'
 import { HistoriqueRendezVousRepositoryToken } from './domain/rendez-vous/historique'
 import { GetAnimationsCollectivesJeuneQueryHandler } from './application/queries/rendez-vous/get-animations-collectives-jeune.query.handler.db'
@@ -329,6 +331,7 @@ export const buildModuleMetadata = (): ModuleMetadata => ({
     ConseillersControllerV2,
     RendezVousController,
     EtablissementsController,
+    EtablissementsControllerV2,
     // Recherche
     OffresEmploiController,
     OffresImmersionController,
@@ -668,6 +671,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     CreateSuggestionConseillerImmersionCommandHandler,
     GetActionsPredefiniesQueryHandler,
     GetAnimationsCollectivesQueryHandler,
+    GetAnimationsCollectivesV2QueryHandler,
     GetJeunesByEtablissementQueryHandler,
     CloturerAnimationCollectiveCommandHandler,
     GetAnimationsCollectivesJeuneQueryHandler,
