@@ -64,6 +64,7 @@ describe('EtablissementsController', () => {
         .expect(HttpStatus.OK)
         .expect([])
     })
+
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/etablissements/paris/animations-collectives'

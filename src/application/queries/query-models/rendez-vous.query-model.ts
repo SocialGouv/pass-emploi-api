@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { IsArray } from 'class-validator'
 import {
   CategorieRendezVous,
   CodeTypeRendezVous,
@@ -6,6 +7,7 @@ import {
   RendezVous,
   TypeRendezVous
 } from '../../../domain/rendez-vous/rendez-vous'
+import { PaginationQueryModel } from './common/pagination.query-model'
 
 class JeuneQueryModel {
   @ApiProperty()
@@ -203,6 +205,35 @@ export class RendezVousConseillerQueryModel
 export class AnimationCollectiveQueryModel extends RendezVousConseillerQueryModel {
   @ApiPropertyOptional()
   statut: RendezVous.AnimationCollective.Statut
+}
+
+export class AnimationCollectiveResumeQueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
+  titre: string
+
+  @ApiProperty({
+    format: 'date-time',
+    example: '2018-11-21T06:20:32.232Z'
+  })
+  date: string
+
+  @ApiProperty()
+  nombreInscrits: number
+}
+
+export class GetAnimationCollectiveV2QueryModel {
+  @ApiProperty({ type: PaginationQueryModel })
+  pagination: PaginationQueryModel
+
+  @ApiProperty({
+    type: AnimationCollectiveResumeQueryModel,
+    isArray: true
+  })
+  @IsArray()
+  resultats: AnimationCollectiveResumeQueryModel[]
 }
 
 export class RendezVousConseillerDetailQueryModel extends RendezVousConseillerQueryModel {
