@@ -1,26 +1,35 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import { GetRendezVousConseillerPaginesQueryHandler } from 'src/application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
 import * as request from 'supertest'
+import {
+  GetActionsConseillerV2Query,
+  GetActionsConseillerV2QueryHandler
+} from '../../../../src/application/queries/action/get-actions-conseiller-v2.query.handler.db'
 import { success } from '../../../../src/building-blocks/types/result'
 import {
   unHeaderAuthorization,
   unUtilisateurDecode
 } from '../../../fixtures/authentification.fixture'
 import { expect, StubbedClass } from '../../../utils'
+import { ensureUserAuthenticationFailsIfInvalid } from '../../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../../utils/module-for-testing'
 
 describe('ConseillersControllerV2', () => {
   let app: INestApplication
   let getRendezVousConseillerPaginesQueryHandler: StubbedClass<GetRendezVousConseillerPaginesQueryHandler>
+  let getActionsConseillerQueryHandler: StubbedClass<GetActionsConseillerV2QueryHandler>
 
   before(async () => {
     app = await getApplicationWithStubbedDependencies()
     getRendezVousConseillerPaginesQueryHandler = app.get(
       GetRendezVousConseillerPaginesQueryHandler
     )
+    getActionsConseillerQueryHandler = app.get(
+      GetActionsConseillerV2QueryHandler
+    )
   })
 
-  describe('GET /conseillers/:idConseiller/rendezvous', () => {
+  describe('GET /v2/conseillers/:idConseiller/rendezvous', () => {
     const dateString = '2020-10-10'
     const dateStringPlusRecente = '2022-10-10'
 
@@ -154,5 +163,109 @@ describe('ConseillersControllerV2', () => {
         unUtilisateurDecode()
       )
     })
+  })
+
+  describe('GET /v2/conseillers/{idConseiller}/actions', () => {
+    describe('quand la query est au bon format', () => {
+      it('retourne les actions à qualifier', async () => {
+        // Given
+        const query: GetActionsConseillerV2Query = {
+          idConseiller: 'un-id-conseiller',
+          page: 2,
+          limit: undefined,
+          aQualifier: true
+        }
+        const resultat = {
+          pagination: {
+            page: 1,
+            limit: 10,
+            total: 0
+          },
+          resultats: []
+        }
+
+        getActionsConseillerQueryHandler.execute
+          .withArgs(query, unUtilisateurDecode())
+          .resolves(success(resultat))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get(
+            `/v2/conseillers/${query.idConseiller}/actions?page=2&aQualifier=true`
+          )
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(JSON.stringify(resultat))
+      })
+      it('retourne les actions pas à qualifier', async () => {
+        // Given
+        const query: GetActionsConseillerV2Query = {
+          idConseiller: 'un-id-conseiller',
+          page: 2,
+          limit: undefined,
+          aQualifier: false
+        }
+        const resultat = {
+          pagination: {
+            page: 1,
+            limit: 10,
+            total: 0
+          },
+          resultats: []
+        }
+
+        getActionsConseillerQueryHandler.execute
+          .withArgs(query, unUtilisateurDecode())
+          .resolves(success(resultat))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get(
+            `/v2/conseillers/${query.idConseiller}/actions?page=2&aQualifier=false`
+          )
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(JSON.stringify(resultat))
+      })
+      it('retourne toutes les actions', async () => {
+        // Given
+        const query: GetActionsConseillerV2Query = {
+          idConseiller: 'un-id-conseiller',
+          page: 2,
+          limit: undefined,
+          aQualifier: undefined
+        }
+        const resultat = {
+          pagination: {
+            page: 1,
+            limit: 10,
+            total: 0
+          },
+          resultats: []
+        }
+
+        getActionsConseillerQueryHandler.execute
+          .withArgs(query, unUtilisateurDecode())
+          .resolves(success(resultat))
+
+        // When - Then
+        await request(app.getHttpServer())
+          .get(`/v2/conseillers/${query.idConseiller}/actions?page=2`)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.OK)
+          .expect(JSON.stringify(resultat))
+      })
+    })
+
+    describe('quand la query est au mauvais format', () => {
+      it("retourne une erreur 400 quand page n'est pas un number", async () => {
+        await request(app.getHttpServer())
+          .get(`/v2/conseillers/un-id-conseiller/actions?page=trois`)
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('get', '/v2/conseillers/2/actions')
   })
 })

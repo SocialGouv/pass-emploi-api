@@ -76,7 +76,7 @@ import { GetRecherchesQueryHandler } from './application/queries/get-recherches.
 import { GetAllRendezVousConseillerQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
 import { GetRendezVousJeuneQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-jeune.query.handler.db'
-import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from './application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
+import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from './application/queries/action/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
 import { GetOffresServicesCiviqueQueryHandler } from './application/queries/get-offres-services-civique.query.handler'
 import { GetTypesRendezVousQueryHandler } from './application/queries/rendez-vous/get-types-rendez-vous.query.handler'
 import { TaskService } from './application/task.service'
@@ -302,7 +302,7 @@ import { MiloJeuneRepositoryToken } from './domain/jeune/jeune.milo'
 import { HandleJobFakeCommandHandler } from './application/commands/jobs/handle-job-fake.command'
 import { MettreAJourLesJeunesCejPeCommandHandler } from './application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
 import { ChangerAgenceCommandHandler } from './application/commands/changer-agence.command.handler'
-import { GetActionsDuConseillerAQualifierQueryHandler } from './application/queries/action/get-actions-du-conseiller-a-qualifier.query.handler.db'
+import { GetActionsConseillerV2QueryHandler } from './application/queries/action/get-actions-conseiller-v2.query.handler.db'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
   imports: [
@@ -670,7 +670,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     EnvoyerMessageGroupeCommandHandler,
     MettreAJourLesJeunesCejPeCommandHandler,
     ChangerAgenceCommandHandler,
-    GetActionsDuConseillerAQualifierQueryHandler
+    GetActionsConseillerV2QueryHandler
   ]
 }
 

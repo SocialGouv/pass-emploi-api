@@ -3,12 +3,11 @@ import {
   ActionQueryModel,
   QualificationActionQueryModel
 } from '../../../application/queries/query-models/actions.query-model'
-import { ActionSqlModel } from '../../sequelize/models/action.sql-model'
-import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 import { JeuneQueryModel } from '../../../application/queries/query-models/jeunes.query-model'
 import { Action } from '../../../domain/action/action'
 import { DateService } from '../../../utils/date-service'
-import { ActionAQualifierQueryModel } from '../../../application/queries/query-models/conseillers.query-model'
+import { ActionSqlModel } from '../../sequelize/models/action.sql-model'
+import { JeuneSqlModel } from '../../sequelize/models/jeune.sql-model'
 
 export function fromSqlToActionQueryModelWithJeune(
   actionSqlModel: ActionSqlModel
@@ -43,24 +42,6 @@ export function fromSqlToActionQueryModel(
       : undefined,
     etat: buildEtat(actionSqlModel),
     qualification: buildQualificationQueryModel(actionSqlModel)
-  }
-}
-
-export function fromActionJeuneSqlToActionAQualifierQueryModel(
-  actionJeuneSqlModel: Pick<
-    ActionSqlModel,
-    'id' | 'contenu' | 'jeune' | 'dateFinReelle'
-  >
-): ActionAQualifierQueryModel {
-  return {
-    id: actionJeuneSqlModel.id,
-    titre: actionJeuneSqlModel.contenu,
-    jeune: {
-      id: actionJeuneSqlModel.jeune.id,
-      nom: actionJeuneSqlModel.jeune.nom,
-      prenom: actionJeuneSqlModel.jeune.prenom
-    },
-    dateFinReelle: actionJeuneSqlModel.dateFinReelle!.toDateString()
   }
 }
 

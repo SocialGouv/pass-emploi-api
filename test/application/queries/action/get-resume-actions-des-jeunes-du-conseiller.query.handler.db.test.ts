@@ -1,23 +1,23 @@
 import { SinonSandbox } from 'sinon'
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import { ConseillerAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller'
 import {
   GetResumeActionsDesJeunesDuConseillerQuery,
   GetResumeActionsDesJeunesDuConseillerQueryHandlerDb
-} from '../../../src/application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
-import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
-import { unResumeActionDUnJeune } from '../../fixtures/query-models/jeunes.query-model.fixtures'
-import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
-import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
-import { Action } from '../../../src/domain/action/action'
+} from '../../../../src/application/queries/action/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
+import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
+import { unResumeActionDUnJeune } from '../../../fixtures/query-models/jeunes.query-model.fixtures'
+import { createSandbox, expect, StubbedClass, stubClass } from '../../../utils'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { ActionSqlModel } from '../../../../src/infrastructure/sequelize/models/action.sql-model'
+import { uneActionDto } from '../../../fixtures/sql-models/action.sql-model'
+import { Action } from '../../../../src/domain/action/action'
 import {
   DatabaseForTesting,
   getDatabase
-} from '../../utils/database-for-testing'
+} from '../../../utils/database-for-testing'
 
 describe('GetResumeActionsDesJeunesDuConseillerQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting

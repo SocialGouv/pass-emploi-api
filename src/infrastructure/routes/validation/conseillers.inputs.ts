@@ -211,7 +211,7 @@ export class UpdateListeDeDiffusionPayload {
   idsBeneficiaires: string[]
 }
 
-export class GetActionsDuConseillerAQualifierQueryParams {
+export class GetActionsConseillerV2QueryParams {
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
@@ -222,5 +222,12 @@ export class GetActionsDuConseillerAQualifierQueryParams {
   @IsOptional()
   @IsNumber()
   @Type(() => Number)
-  limite?: number
+  limit?: number
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  @IsIn([true, false])
+  @Transform(params => transformStringToBoolean(params, 'aQualifier'))
+  aQualifier?: boolean
 }

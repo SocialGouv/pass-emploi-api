@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { PaginationQueryModel } from './commun/pagination.query-model'
+import { PaginationQueryModel } from './common/pagination.query-model'
 
 export class LocalisationOffresEmploiQueryModel {
   @ApiProperty({ required: false })

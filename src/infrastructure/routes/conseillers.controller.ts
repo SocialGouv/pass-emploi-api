@@ -26,6 +26,10 @@ import {
   CreateActionCommandHandler
 } from '../../application/commands/action/create-action.command.handler'
 import {
+  CreateListeDeDiffusionCommand,
+  CreateListeDeDiffusionCommandHandler
+} from '../../application/commands/create-liste-de-diffusion.command.handler'
+import {
   CreateRendezVousCommand,
   CreateRendezVousCommandHandler
 } from '../../application/commands/create-rendez-vous.command.handler'
@@ -52,12 +56,8 @@ import {
 } from '../../application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { GetJeuneMiloByDossierQueryHandler } from '../../application/queries/get-jeune-milo-by-dossier.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from '../../application/queries/get-jeunes-by-conseiller.query.handler.db'
-import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
-import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from '../../application/queries/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
-import {
-  DetailConseillerQueryModel,
-  GetActionsDuConseillerAQualifierQueryModel
-} from '../../application/queries/query-models/conseillers.query-model'
+import { GetResumeActionsDesJeunesDuConseillerQueryHandlerDb } from '../../application/queries/action/get-resume-actions-des-jeunes-du-conseiller.query.handler.db'
+import { DetailConseillerQueryModel } from '../../application/queries/query-models/conseillers.query-model'
 import { IndicateursPourConseillerQueryModel } from '../../application/queries/query-models/indicateurs-pour-conseiller.query-model'
 import {
   DetailJeuneConseillerQueryModel,
@@ -67,6 +67,7 @@ import {
 } from '../../application/queries/query-models/jeunes.query-model'
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
 import { RendezVousConseillerFutursEtPassesQueryModel } from '../../application/queries/query-models/rendez-vous.query-model'
+import { GetAllRendezVousConseillerQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-conseiller.query.handler.db'
 import {
   EmailExisteDejaError,
   ErreurHttp
@@ -89,7 +90,6 @@ import {
   CreerJeuneMiloPayload,
   DetailConseillerPayload,
   EnvoyerNotificationsPayload,
-  GetActionsDuConseillerAQualifierQueryParams,
   GetConseillerQueryParams,
   GetIndicateursPourConseillerQueryParams,
   GetRendezVousConseillerQueryParams,
@@ -97,14 +97,6 @@ import {
   SuperviseursPayload
 } from './validation/conseillers.inputs'
 import { CreateRendezVousPayload } from './validation/rendez-vous.inputs'
-import {
-  CreateListeDeDiffusionCommand,
-  CreateListeDeDiffusionCommandHandler
-} from '../../application/commands/create-liste-de-diffusion.command.handler'
-import { GetActionsDuConseillerAQualifierQueryHandler } from '../../application/queries/action/get-actions-du-conseiller-a-qualifier.query.handler.db'
-
-const ACTIONS_DU_CONSEILLER_PAGE_PAR_DEFAUT = 1
-const ACTIONS_DU_CONSEILLER_LIMITE_PAR_DEFAUT = 10
 
 @Controller('conseillers')
 @ApiOAuth2([])
@@ -130,8 +122,7 @@ export class ConseillersController {
     private readonly recupererJeunesDuConseillerCommandHandler: RecupererJeunesDuConseillerCommandHandler,
     private readonly modifierJeuneDuConseillerCommandHandler: ModifierJeuneDuConseillerCommandHandler,
     private readonly getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler,
-    private readonly createListeDeDiffusionCommandHandler: CreateListeDeDiffusionCommandHandler,
-    private readonly getActionsDuConseillerQueryHandler: GetActionsDuConseillerAQualifierQueryHandler
+    private readonly createListeDeDiffusionCommandHandler: CreateListeDeDiffusionCommandHandler
   ) {}
 
   @ApiOperation({
@@ -634,38 +625,6 @@ export class ConseillersController {
     if (isFailure(result)) {
       throw handleFailure(result)
     }
-  }
-
-  @ApiOperation({
-    summary:
-      'Récupère l’ensemble des actions terminées, non qualifiées des jeunes du portefeuille du conseiller.',
-    description: 'Autorisé pour le conseiller.'
-  })
-  @Get(':idConseiller/actions/a-qualifier')
-  async getActionsAQualifier(
-    @Param('idConseiller') idConseiller: string,
-    @Query()
-    getActionsDuConseillerAQualifierQueryParams: GetActionsDuConseillerAQualifierQueryParams,
-    @Utilisateur()
-    utilisateur: Authentification.Utilisateur
-  ): Promise<GetActionsDuConseillerAQualifierQueryModel> {
-    const result: Result<GetActionsDuConseillerAQualifierQueryModel> =
-      await this.getActionsDuConseillerQueryHandler.execute(
-        {
-          idConseiller,
-          page:
-            getActionsDuConseillerAQualifierQueryParams.page ??
-            ACTIONS_DU_CONSEILLER_PAGE_PAR_DEFAUT,
-          limit:
-            getActionsDuConseillerAQualifierQueryParams.limite ??
-            ACTIONS_DU_CONSEILLER_LIMITE_PAR_DEFAUT
-        },
-        utilisateur
-      )
-    if (isFailure(result)) {
-      throw handleFailure(result)
-    }
-    return result.data
   }
 
   private buildDateEcheanceV1(): DateTime {
