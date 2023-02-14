@@ -1,5 +1,4 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsArray, IsISO8601, IsString } from 'class-validator'
 import { PaginationQueryModel } from './common/pagination.query-model'
 
 class AgenceDuConseillerQueryModel {
@@ -44,20 +43,20 @@ class JeuneQueryModel {
   prenom: string
 }
 
-export class ActionV2QueryModel {
+export class ActionResumeV2QueryModel {
   @ApiProperty()
-  @IsString()
   id: string
 
   @ApiProperty()
-  @IsString()
   titre: string
 
   @ApiProperty({ type: JeuneQueryModel })
   jeune: JeuneQueryModel
 
-  @ApiProperty()
-  @IsISO8601()
+  @ApiPropertyOptional({
+    description: 'Toujours présent quand aQualifier=true',
+    format: 'date-time'
+  })
   dateFinReelle?: string
 }
 
@@ -65,7 +64,6 @@ export class GetActionsConseillerV2QueryModel {
   @ApiProperty({ type: PaginationQueryModel })
   pagination: PaginationQueryModel
 
-  @ApiProperty({ type: ActionV2QueryModel })
-  @IsArray()
-  resultats: ActionV2QueryModel[]
+  @ApiProperty({ type: ActionResumeV2QueryModel, isArray: true })
+  resultats: ActionResumeV2QueryModel[]
 }
