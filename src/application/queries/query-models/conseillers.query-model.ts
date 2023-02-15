@@ -32,7 +32,7 @@ export class DetailConseillerQueryModel {
   aDesBeneficiairesARecuperer: boolean
 }
 
-class JeuneQueryModel {
+class JeuneDuConseillerQueryModel {
   @ApiProperty()
   id: string
 
@@ -43,15 +43,15 @@ class JeuneQueryModel {
   prenom: string
 }
 
-export class ActionResumeV2QueryModel {
+class ActionResumeV2QueryModel {
   @ApiProperty()
   id: string
 
   @ApiProperty()
   titre: string
 
-  @ApiProperty({ type: JeuneQueryModel })
-  jeune: JeuneQueryModel
+  @ApiProperty({ type: JeuneDuConseillerQueryModel })
+  jeune: JeuneDuConseillerQueryModel
 
   @ApiPropertyOptional({
     description: 'Toujours présent quand aQualifier=true',

@@ -94,7 +94,7 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
           nom: actionSql.jeune.nom,
           prenom: actionSql.jeune.prenom
         },
-        dateFinReelle: actionSql.dateFinReelle?.toDateString()
+        dateFinReelle: actionSql.dateFinReelle?.toISOString()
       }))
     })
   }
