@@ -162,7 +162,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionNonTermineeDto.dateFinReelle?.toDateString()
+              dateFinReelle: actionNonTermineeDto.dateFinReelle?.toISOString()
             },
             {
               id: actionAQualifier1Dto.id,
@@ -172,7 +172,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier1Dto.dateFinReelle?.toDateString()
+              dateFinReelle: actionAQualifier1Dto.dateFinReelle?.toISOString()
             },
             {
               id: actionAQualifier3Dto.id,
@@ -182,7 +182,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier3Dto.dateFinReelle?.toDateString()
+              dateFinReelle: actionAQualifier3Dto.dateFinReelle?.toISOString()
             }
           ]
         }
@@ -209,7 +209,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toDateString()
+              dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString()
             },
             {
               id: actionQualifieeDto.id,
@@ -219,7 +219,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionQualifieeDto.dateFinReelle?.toDateString()
+              dateFinReelle: actionQualifieeDto.dateFinReelle?.toISOString()
             }
           ]
         }
@@ -249,7 +249,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier1Dto.dateFinReelle?.toDateString()
+              dateFinReelle: actionAQualifier1Dto.dateFinReelle?.toISOString()
             },
             {
               id: actionAQualifier2Dto.id,
@@ -259,7 +259,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toDateString()
+              dateFinReelle: actionAQualifier2Dto.dateFinReelle?.toISOString()
             }
           ]
         }
@@ -286,7 +286,7 @@ describe('GetActionsDuConseillerAQualifierQueryHandler', () => {
                 nom: jeuneDto.nom,
                 prenom: jeuneDto.prenom
               },
-              dateFinReelle: actionAQualifier3Dto.dateFinReelle?.toDateString()
+              dateFinReelle: actionAQualifier3Dto.dateFinReelle?.toISOString()
             }
           ]
         }
