@@ -1,31 +1,35 @@
 import {
   Body,
   Controller,
+  HttpCode,
+  HttpStatus,
+  Param,
   Post,
   UploadedFile,
   UseInterceptors
 } from '@nestjs/common'
-import { ApiConsumes, ApiOAuth2, ApiTags } from '@nestjs/swagger'
-import { Utilisateur } from '../decorators/authenticated.decorator'
-import { Authentification } from '../../domain/authentification'
-import {
-  RefreshJddCommand,
-  RefreshJddCommandHandler
-} from '../../application/commands/refresh-jdd.command.handler'
-import { isFailure } from '../../building-blocks/types/result'
-import { handleFailure } from './failure.handler'
 import { FileInterceptor } from '@nestjs/platform-express'
+import { ApiConsumes, ApiOAuth2, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ChangerAgenceCommandHandler } from '../../application/commands/changer-agence.command.handler'
 import {
   MettreAJourLesJeunesCejPeCommandHandler,
   MettreAJourLesJeunesCEJPoleEmploiCommand
 } from '../../application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
 import {
+  RefreshJddCommand,
+  RefreshJddCommandHandler
+} from '../../application/commands/refresh-jdd.command.handler'
+import { ArchiverJeuneSupportCommandHandler } from '../../application/commands/support/archiver-jeune-support.command.handler'
+import { ChangementAgenceQueryModel } from '../../application/queries/query-models/changement-agence.query-model'
+import { isFailure } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
+import { Utilisateur } from '../decorators/authenticated.decorator'
+import { handleFailure } from './failure.handler'
+import {
   ChangementAgencePayload,
   RefreshJDDPayload,
   TeleverserCsvPayload
 } from './validation/support.input'
-import { ChangerAgenceCommandHandler } from '../../application/commands/changer-agence.command.handler'
-import { ChangementAgenceQueryModel } from '../../application/queries/query-models/changement-agence.query-model'
 
 @ApiOAuth2([])
 @Controller('support')
@@ -34,7 +38,8 @@ export class SupportController {
   constructor(
     private refreshJddCommandHandler: RefreshJddCommandHandler,
     private mettreAJourLesJeunesCejPeCommandHandler: MettreAJourLesJeunesCejPeCommandHandler,
-    private changerAgenceCommandHandler: ChangerAgenceCommandHandler
+    private changerAgenceCommandHandler: ChangerAgenceCommandHandler,
+    private archiverJeuneSupportCommandHandler: ArchiverJeuneSupportCommandHandler
   ) {}
 
   @Post('jdd')
@@ -92,5 +97,25 @@ export class SupportController {
       throw handleFailure(result)
     }
     return result.data
+  }
+
+  @ApiOperation({
+    summary:
+      'Archive le jeune identifié par son ID (ID en base, et pas ID Authentification).',
+    description: 'Autorisé pour le support'
+  })
+  @Post('archiver-jeune/:idJeune')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async archiverJeune(
+    @Param('idJeune') idJeune: string,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.archiverJeuneSupportCommandHandler.execute(
+      {
+        idJeune
+      },
+      utilisateur
+    )
+    handleFailure(result)
   }
 }
