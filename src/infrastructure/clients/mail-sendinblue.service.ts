@@ -105,7 +105,7 @@ export class MailSendinblueService implements Mail.Service {
 
   async envoyerEmailJeuneArchive(
     jeune: Jeune,
-    motif: ArchiveJeune.MotifSuppression,
+    motif: ArchiveJeune.MotifSuppression | ArchiveJeune.MotifSuppressionSupport,
     commentaire?: string
   ): Promise<void> {
     const mailDataDto: MailDataDto = {

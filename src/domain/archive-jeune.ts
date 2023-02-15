@@ -44,6 +44,7 @@ export namespace ArchiveJeune {
     CHANGEMENT_CONSEILLER = 'Changement de conseiller',
     AUTRE = 'Autre'
   }
+  export type MotifSuppressionSupport = 'Support'
 
   export const mapMotifSuppressionDescription: Partial<
     Record<MotifSuppression, string>
@@ -61,7 +62,7 @@ export namespace ArchiveJeune {
     prenomJeune: string
     nomJeune: string
     structure: Core.Structure
-    motif: MotifSuppression
+    motif: MotifSuppression | MotifSuppressionSupport
     commentaire?: string
     dateArchivage: Date
   }
