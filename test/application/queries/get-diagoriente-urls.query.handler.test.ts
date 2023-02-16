@@ -5,7 +5,7 @@ import {
   GetDiagorienteUrlsQuery,
   GetDiagorienteUrlsQueryHandler,
   TypeUrlDiagoriente
-} from '../../../src/application/queries/get-diagoriente-urls.query.handler.db'
+} from '../../../src/application/queries/get-diagoriente-urls.query.handler'
 import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Jeune } from '../../../src/domain/jeune/jeune'
@@ -13,7 +13,7 @@ import { DiagorienteClient } from '../../../src/infrastructure/clients/diagorien
 import { unJeune } from '../../fixtures/jeune.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 
-describe('GetDiagorienteUrlQueryHandler', () => {
+describe('GetDiagorienteUrlsQueryHandler', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let jeunesRepository: StubbedType<Jeune.Repository>
   let diagorienteClient: StubbedClass<DiagorienteClient>

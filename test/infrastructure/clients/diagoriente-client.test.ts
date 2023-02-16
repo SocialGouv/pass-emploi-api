@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios'
 import * as nock from 'nock'
-import { TypeUrlDiagoriente } from '../../../src/application/queries/get-diagoriente-urls.query.handler.db'
+import { TypeUrlDiagoriente } from '../../../src/application/queries/get-diagoriente-urls.query.handler'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { DiagorienteClient } from '../../../src/infrastructure/clients/diagoriente-client'
@@ -63,6 +63,75 @@ describe('DiagorienteClient', () => {
       expect(result).to.deep.equal(
         failure(
           new ErreurHttp("La récupération de l'url Diagoriente a échoué", 429)
+        )
+      )
+    })
+  })
+
+  describe('getMetiersFavoris', () => {
+    it('renvoie les métiers favoris', async () => {
+      // Given
+      const expectedBody =
+        '{"query":"query(\\r\\n  $userByPartnerClientId: String!\\r\\n  $userByPartnerClientSecret: String!\\r\\n  $userByPartnerUserId: String!\\r\\n) {\\r\\n  userByPartner(\\r\\n    clientId: $userByPartnerClientId\\r\\n    clientSecret: $userByPartnerClientSecret\\r\\n    userId: $userByPartnerUserId\\r\\n  ) {\\r\\n    favorites {\\r\\n      id\\r\\n      favorited\\r\\n      tag {\\r\\n        code\\r\\n        title\\r\\n      }\\r\\n    }\\r\\n  }\\r\\n}\\r\\n","variables":{"userByPartnerClientId":"diagoriente-client-id","userByPartnerClientSecret":"diagoriente-client-secret","userByPartnerUserId":"ABCDE"}}'
+
+      nock(apiUrl)
+        .post('/graphql', expectedBody)
+        .reply(200, {
+          userByPartner: {
+            favorites: [
+              {
+                tag: {
+                  code: 'string',
+                  id: 'string',
+                  title: 'string'
+                },
+                id: 'string',
+                favorited: true
+              }
+            ]
+          }
+        })
+
+      // When
+      const result = await diagorienteClient.getMetiersFavoris(jeune.id)
+
+      // Then
+      expect(result).to.deep.equal(
+        success({
+          userByPartner: {
+            favorites: [
+              {
+                tag: {
+                  code: 'string',
+                  id: 'string',
+                  title: 'string'
+                },
+                id: 'string',
+                favorited: true
+              }
+            ]
+          }
+        })
+      )
+    })
+
+    it("renvoie une failure quand l'api est en erreur", async () => {
+      // Given
+      const expectedBody =
+        '{"query":"query(\\r\\n  $userByPartnerClientId: String!\\r\\n  $userByPartnerClientSecret: String!\\r\\n  $userByPartnerUserId: String!\\r\\n) {\\r\\n  userByPartner(\\r\\n    clientId: $userByPartnerClientId\\r\\n    clientSecret: $userByPartnerClientSecret\\r\\n    userId: $userByPartnerUserId\\r\\n  ) {\\r\\n    favorites {\\r\\n      id\\r\\n      favorited\\r\\n      tag {\\r\\n        code\\r\\n        title\\r\\n      }\\r\\n    }\\r\\n  }\\r\\n}\\r\\n","variables":{"userByPartnerClientId":"diagoriente-client-id","userByPartnerClientSecret":"diagoriente-client-secret","userByPartnerUserId":"ABCDE"}}'
+
+      nock(apiUrl).post('/graphql', expectedBody).reply(429)
+
+      // When
+      const result = await diagorienteClient.getMetiersFavoris(jeune.id)
+
+      // Then
+      expect(result).to.deep.equal(
+        failure(
+          new ErreurHttp(
+            'La récupération des métiers favoris Diagoriente a échoué',
+            429
+          )
         )
       )
     })
