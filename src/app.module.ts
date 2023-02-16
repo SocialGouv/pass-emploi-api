@@ -307,7 +307,7 @@ import { MettreAJourLesJeunesCejPeCommandHandler } from './application/commands/
 import { ChangerAgenceCommandHandler } from './application/commands/changer-agence.command.handler'
 import { GetActionsConseillerV2QueryHandler } from './application/queries/action/get-actions-conseiller-v2.query.handler.db'
 import { DiagorienteController } from './infrastructure/routes/diagoriente.controller'
-import { GetDiagorienteUrlQueryHandler } from './application/queries/get-diagoriente-url.query.handler.db'
+import { GetDiagorienteUrlsQueryHandler } from './application/queries/get-diagoriente-urls.query.handler.db'
 import { ArchiverJeuneSupportCommandHandler } from './application/commands/support/archiver-jeune-support.command.handler'
 
 export const buildModuleMetadata = (): ModuleMetadata => ({
@@ -687,7 +687,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     MettreAJourLesJeunesCejPeCommandHandler,
     ChangerAgenceCommandHandler,
     GetActionsConseillerV2QueryHandler,
-    GetDiagorienteUrlQueryHandler,
+    GetDiagorienteUrlsQueryHandler,
     ArchiverJeuneSupportCommandHandler
   ]
 }
