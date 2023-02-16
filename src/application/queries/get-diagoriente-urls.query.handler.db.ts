@@ -14,25 +14,29 @@ import { Jeune, JeunesRepositoryToken } from '../../domain/jeune/jeune'
 import { DiagorienteClient } from '../../infrastructure/clients/diagoriente-client'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 
-export class DiagorienteUrlQueryModel {
+export class DiagorienteUrlsQueryModel {
   @ApiProperty()
-  url: string
+  urlChatbot: string
+  @ApiProperty()
+  urlFavoris: string
+  @ApiProperty()
+  urlRecommandes: string
 }
 
 export enum TypeUrlDiagoriente {
   CHATBOT = 'CHATBOT',
-  FAVORIS = 'FAVORIS'
+  FAVORIS = 'FAVORIS',
+  RECOMMANDES = 'RECOMMANDES'
 }
 
-export interface GetDiagorienteUrlQuery extends Query {
+export interface GetDiagorienteUrlsQuery extends Query {
   idJeune: string
-  typeUrl: TypeUrlDiagoriente
 }
 
 @Injectable()
-export class GetDiagorienteUrlQueryHandler extends QueryHandler<
-  GetDiagorienteUrlQuery,
-  Result<DiagorienteUrlQueryModel>
+export class GetDiagorienteUrlsQueryHandler extends QueryHandler<
+  GetDiagorienteUrlsQuery,
+  Result<DiagorienteUrlsQueryModel>
 > {
   constructor(
     private readonly jeuneAuthorizer: JeuneAuthorizer,
@@ -40,33 +44,54 @@ export class GetDiagorienteUrlQueryHandler extends QueryHandler<
     private readonly jeunesRepository: Jeune.Repository,
     private readonly diagorienteClient: DiagorienteClient
   ) {
-    super('GetUrlOrientationProQueryHandler')
+    super('GetDiagorienteUrlsQueryHandler')
   }
 
   async handle(
-    query: GetDiagorienteUrlQuery
-  ): Promise<Result<DiagorienteUrlQueryModel>> {
+    query: GetDiagorienteUrlsQuery
+  ): Promise<Result<DiagorienteUrlsQueryModel>> {
     const jeune = (await this.jeunesRepository.get(query.idJeune))!
 
     if (!jeune.email) {
       return failure(new MauvaiseCommandeError('Jeune sans email'))
     }
 
-    const result = await this.diagorienteClient.getUrl(query.typeUrl, {
+    const infosJeune = {
       id: jeune.id,
       email: jeune.email,
       prenom: jeune.firstName,
       nom: jeune.lastName
-    })
-
-    if (isFailure(result)) {
-      return result
     }
-    return success({ url: result.data })
+
+    const [resultChatbot, resultFavoris, resultRecommandes] = await Promise.all(
+      [
+        this.diagorienteClient.getUrl(TypeUrlDiagoriente.CHATBOT, infosJeune),
+        this.diagorienteClient.getUrl(TypeUrlDiagoriente.FAVORIS, infosJeune),
+        this.diagorienteClient.getUrl(
+          TypeUrlDiagoriente.RECOMMANDES,
+          infosJeune
+        )
+      ]
+    )
+
+    if (isFailure(resultChatbot)) {
+      return resultChatbot
+    }
+    if (isFailure(resultFavoris)) {
+      return resultFavoris
+    }
+    if (isFailure(resultRecommandes)) {
+      return resultRecommandes
+    }
+    return success({
+      urlChatbot: resultChatbot.data,
+      urlFavoris: resultFavoris.data,
+      urlRecommandes: resultRecommandes.data
+    })
   }
 
   async authorize(
-    query: GetDiagorienteUrlQuery,
+    query: GetDiagorienteUrlsQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)

@@ -2,10 +2,10 @@ import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import {
-  GetDiagorienteUrlQuery,
-  GetDiagorienteUrlQueryHandler,
+  GetDiagorienteUrlsQuery,
+  GetDiagorienteUrlsQueryHandler,
   TypeUrlDiagoriente
-} from '../../../src/application/queries/get-diagoriente-url.query.handler.db'
+} from '../../../src/application/queries/get-diagoriente-urls.query.handler.db'
 import { MauvaiseCommandeError } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { Jeune } from '../../../src/domain/jeune/jeune'
@@ -17,7 +17,7 @@ describe('GetDiagorienteUrlQueryHandler', () => {
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
   let jeunesRepository: StubbedType<Jeune.Repository>
   let diagorienteClient: StubbedClass<DiagorienteClient>
-  let handler: GetDiagorienteUrlQueryHandler
+  let handler: GetDiagorienteUrlsQueryHandler
   let sandbox: SinonSandbox
 
   before(async () => {
@@ -26,7 +26,7 @@ describe('GetDiagorienteUrlQueryHandler', () => {
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
     diagorienteClient = stubClass(DiagorienteClient)
 
-    handler = new GetDiagorienteUrlQueryHandler(
+    handler = new GetDiagorienteUrlsQueryHandler(
       jeuneAuthorizer,
       jeunesRepository,
       diagorienteClient
@@ -41,9 +41,8 @@ describe('GetDiagorienteUrlQueryHandler', () => {
       it('renvoie failure', async () => {
         // Given
         const jeune = unJeune({ email: undefined })
-        const query: GetDiagorienteUrlQuery = {
-          idJeune: 'test',
-          typeUrl: TypeUrlDiagoriente.FAVORIS
+        const query: GetDiagorienteUrlsQuery = {
+          idJeune: 'test'
         }
         jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
 
@@ -58,30 +57,41 @@ describe('GetDiagorienteUrlQueryHandler', () => {
       })
     })
     describe('jeune avec email', () => {
-      it("renvoie l'url diagoriente du CHATBOT", async () => {
+      it('renvoie les urls diagoriente', async () => {
         // Given
         const jeune = unJeune()
-        const query: GetDiagorienteUrlQuery = {
-          idJeune: 'test',
-          typeUrl: TypeUrlDiagoriente.CHATBOT
+        const infosJeune = {
+          id: jeune.id,
+          email: jeune.email,
+          prenom: jeune.firstName,
+          nom: jeune.lastName
+        }
+        const query: GetDiagorienteUrlsQuery = {
+          idJeune: 'test'
         }
         jeunesRepository.get.withArgs(query.idJeune).resolves(jeune)
-        diagorienteClient.getUrl.resolves(success('url'))
+        diagorienteClient.getUrl
+          .withArgs(TypeUrlDiagoriente.CHATBOT, infosJeune)
+          .resolves(success('urlChat'))
+        diagorienteClient.getUrl
+          .withArgs(TypeUrlDiagoriente.FAVORIS, infosJeune)
+          .resolves(success('urlFavoris'))
+        diagorienteClient.getUrl
+          .withArgs(TypeUrlDiagoriente.RECOMMANDES, infosJeune)
+          .resolves(success('urlReco'))
 
         // When
         const result = await handler.handle(query)
 
         // Then
-        expect(diagorienteClient.getUrl).to.have.been.calledOnceWithExactly(
-          query.typeUrl,
-          {
-            id: jeune.id,
-            email: jeune.email,
-            prenom: jeune.firstName,
-            nom: jeune.lastName
-          }
+        expect(diagorienteClient.getUrl).to.have.been.calledThrice()
+        expect(result).to.deep.equal(
+          success({
+            urlChatbot: 'urlChat',
+            urlFavoris: 'urlFavoris',
+            urlRecommandes: 'urlReco'
+          })
         )
-        expect(result).to.deep.equal(success({ url: 'url' }))
       })
     })
   })

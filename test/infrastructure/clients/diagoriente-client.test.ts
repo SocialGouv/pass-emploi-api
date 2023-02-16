@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios'
 import * as nock from 'nock'
-import { TypeUrlDiagoriente } from '../../../src/application/queries/get-diagoriente-url.query.handler.db'
+import { TypeUrlDiagoriente } from '../../../src/application/queries/get-diagoriente-urls.query.handler.db'
 import { ErreurHttp } from '../../../src/building-blocks/types/domain-error'
 import { failure, success } from '../../../src/building-blocks/types/result'
 import { DiagorienteClient } from '../../../src/infrastructure/clients/diagoriente-client'

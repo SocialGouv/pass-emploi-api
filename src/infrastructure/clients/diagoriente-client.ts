@@ -3,13 +3,14 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { firstValueFrom } from 'rxjs'
-import { TypeUrlDiagoriente } from '../../application/queries/get-diagoriente-url.query.handler.db'
+import { TypeUrlDiagoriente } from '../../application/queries/get-diagoriente-urls.query.handler.db'
 import { Result, success } from '../../building-blocks/types/result'
 import { handleAxiosError } from './utils/axios-error-handler'
 
 const mapTypeUrlToRedirect: Record<TypeUrlDiagoriente, string> = {
   CHATBOT: '/centres_interet/chat',
-  FAVORIS: '/metiers/metiers-favoris'
+  FAVORIS: '/metiers/metiers-favoris',
+  RECOMMANDES: '/metiers/metiers-recommandes'
 }
 type UserInfo = {
   id: string
