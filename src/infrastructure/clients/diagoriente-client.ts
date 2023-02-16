@@ -3,7 +3,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces'
 import { firstValueFrom } from 'rxjs'
-import { TypeUrlDiagoriente } from '../../application/queries/get-diagoriente-urls.query.handler.db'
+import { TypeUrlDiagoriente } from '../../application/queries/get-diagoriente-urls.query.handler'
 import { Result, success } from '../../building-blocks/types/result'
 import { handleAxiosError } from './utils/axios-error-handler'
 
@@ -69,9 +69,50 @@ export class DiagorienteClient {
     }
   }
 
+  async getMetiersFavoris(
+    idJeune: string
+  ): Promise<Result<MetiersFavorisDiagorienteDto>> {
+    try {
+      const response = await this.post<MetiersFavorisDiagorienteDto>({
+        query:
+          'query(\r\n  $userByPartnerClientId: String!\r\n  $userByPartnerClientSecret: String!\r\n  $userByPartnerUserId: String!\r\n) {\r\n  userByPartner(\r\n    clientId: $userByPartnerClientId\r\n    clientSecret: $userByPartnerClientSecret\r\n    userId: $userByPartnerUserId\r\n  ) {\r\n    favorites {\r\n      id\r\n      favorited\r\n      tag {\r\n        code\r\n        title\r\n      }\r\n    }\r\n  }\r\n}\r\n',
+        variables: {
+          userByPartnerClientId: this.diagorienteClientId,
+          userByPartnerClientSecret: this.diagorienteClientSecret,
+          userByPartnerUserId: idJeune
+        }
+      })
+
+      return success(response.data)
+    } catch (e) {
+      e.config.data = 'REDACTED'
+      return handleAxiosError(
+        e,
+        this.logger,
+        'La récupération des métiers favoris Diagoriente a échoué'
+      )
+    }
+  }
+
   private async post<T>(body: unknown): Promise<AxiosResponse<T>> {
     return firstValueFrom(
       this.httpService.post<T>(this.apiUrl + '/graphql', body)
     )
+  }
+}
+
+interface MetiersFavorisDiagorienteDto {
+  data: {
+    userByPartner: {
+      favorites: Array<{
+        tag: {
+          code: string
+          id: string
+          title: string
+        }
+        id: string
+        favorited: boolean
+      }>
+    }
   }
 }
