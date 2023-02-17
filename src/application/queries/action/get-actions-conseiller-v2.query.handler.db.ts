@@ -71,7 +71,8 @@ export class GetActionsConseillerV2QueryHandler extends QueryHandler<
         attributes: ['id', 'nom', 'prenom'],
         where: {
           idConseiller: query.idConseiller
-        }
+        },
+        required: true
       },
       attributes: ['id', 'contenu', 'idJeune', 'dateFinReelle'],
       ...whereClause,

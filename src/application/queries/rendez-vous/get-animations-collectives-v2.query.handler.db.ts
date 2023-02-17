@@ -67,9 +67,7 @@ export class GetAnimationsCollectivesV2QueryHandler extends QueryHandler<
             },
             dateSuppression: null,
             [Op.or]: {
-              [Op.ne]: {
-                dateCloture: null
-              },
+              dateCloture: { [Op.ne]: null },
               date: {
                 [Op.gte]: maintenant
               }
@@ -95,8 +93,10 @@ export class GetAnimationsCollectivesV2QueryHandler extends QueryHandler<
       include: [{ model: JeuneSqlModel }],
       order: [['date', 'ASC']],
       limit,
-      offset: (page - 1) * limit
+      offset: (page - 1) * limit,
+      distinct: true
     })
+
     return success({
       pagination: {
         page: page,
