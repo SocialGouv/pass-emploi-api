@@ -14,8 +14,9 @@ Le fichier d'env est chiffré et versionné
 - `yarn watch`
 
 ### METTRE EN PROD develop sur master
-- Depuis le local directement (**non recommandé**) : `yarn release:<level: patch | minor | major>:push`
-- En créeant une PULL REQUEST :
+Depuis le local directement (**non recommandé**) : `yarn release:<level: patch | minor | major>:push`
+
+En créeant une PULL REQUEST :
   1. Se positionner sur la branche `develop`
   2. Faire une nouvelle release `yarn release:<level: patch | minor | major>`
   3. `git push --tags`
@@ -23,7 +24,8 @@ Le fichier d'env est chiffré et versionné
   5. Créer la PR depuis `develop` sur `master`
   6. Valider avec l'equipe et merger la PR sur `master`
   7. (si nécessaire) Rebase `develop` sur `master`
-- Mettre en PROD un **HOTFIX** :
+   
+Mettre en PROD un **HOTFIX** :
   1. Se positionner sur la branche `master`
   2. Nouvelle branche de HOTFIX
   3. Faire une nouvelle release `yarn release:<level: patch | minor | major>`
@@ -32,6 +34,10 @@ Le fichier d'env est chiffré et versionné
   6. Créer la PR depuis la branche de HOTFIX sur `master`
   7. Valider avec l'equipe et merger la PR sur `master`
   8. Rebase `develop` sur `master` pour répliquer le HOTFIX
+
+## DATA MIGRATIONS
+- En PROD : `scalingo -a pa-back-prod run 'DATABASE_URL=${DATABASE_URL} node scripts/data-migrations/<nom_migration.js>'`
+- En LOCAL : `DATABASE_URL=postgresql://<user>:<mdp>@localhost:55432/passemploidb node scripts/data-migrations/<nom_migration.js>`
 
 **EN détail :** voir [le CONTRIBUTING](docs/CONTRIBUTING.md)
 
