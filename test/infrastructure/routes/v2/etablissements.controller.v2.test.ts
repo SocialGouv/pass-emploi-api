@@ -1,23 +1,28 @@
-import { INestApplication, HttpStatus } from '@nestjs/common'
-import { GetAnimationsCollectivesV2QueryHandler } from 'src/application/queries/rendez-vous/get-animations-collectives-v2.query.handler.db'
-import { success } from 'src/building-blocks/types/result'
-import * as request from 'supertest'
+import { GetJeunesEtablissementV2QueryHandler } from '../../../../src/application/queries/get-jeunes-etablissement-v2.query.handler.db'
+import { getApplicationWithStubbedDependencies } from '../../../utils/module-for-testing'
 import {
-  unUtilisateurDecode,
-  unHeaderAuthorization
-} from 'test/fixtures/authentification.fixture'
-import { StubbedClass } from 'test/utils'
-import { ensureUserAuthenticationFailsIfInvalid } from 'test/utils/ensure-user-authentication-fails-if-invalid'
-import { getApplicationWithStubbedDependencies } from 'test/utils/module-for-testing'
+  unHeaderAuthorization,
+  unUtilisateurDecode
+} from '../../../fixtures/authentification.fixture'
+import { GetAnimationsCollectivesV2QueryHandler } from '../../../../src/application/queries/rendez-vous/get-animations-collectives-v2.query.handler.db'
+import { HttpStatus, INestApplication } from '@nestjs/common'
+import { success } from '../../../../src/building-blocks/types/result'
+import { StubbedClass } from '../../../utils'
+import { ensureUserAuthenticationFailsIfInvalid } from '../../../utils/ensure-user-authentication-fails-if-invalid'
+import * as request from 'supertest'
 
 describe('EtablissementsControllerV2', () => {
   let getAnimationsCollectivesQueryHandler: StubbedClass<GetAnimationsCollectivesV2QueryHandler>
+  let getJeunesEtablissementV2QueryHandler: StubbedClass<GetJeunesEtablissementV2QueryHandler>
   let app: INestApplication
 
   before(async () => {
     app = await getApplicationWithStubbedDependencies()
     getAnimationsCollectivesQueryHandler = app.get(
       GetAnimationsCollectivesV2QueryHandler
+    )
+    getJeunesEtablissementV2QueryHandler = app.get(
+      GetJeunesEtablissementV2QueryHandler
     )
   })
 
@@ -74,6 +79,49 @@ describe('EtablissementsControllerV2', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/v2/etablissements/paris/animations-collectives'
+    )
+  })
+
+  describe('GET v2/etablissements/:id/jeunes?q=<string>', () => {
+    it('renvoie une liste de jeunes', async () => {
+      getJeunesEtablissementV2QueryHandler.execute
+        .withArgs({
+          idEtablissement: 'paris',
+          page: 1,
+          limit: undefined,
+          q: 'name'
+        })
+        .resolves(
+          success({
+            pagination: {
+              page: 1,
+              limit: 1,
+              total: 0
+            },
+            resultats: []
+          })
+        )
+
+      // When
+      await request(app.getHttpServer())
+        .get('/v2/etablissements/paris/jeunes?page=1&q=name')
+        .set('authorization', unHeaderAuthorization())
+
+        // Then
+        .expect(HttpStatus.OK)
+        .expect({
+          pagination: {
+            page: 1,
+            limit: 1,
+            total: 0
+          },
+          resultats: []
+        })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/v2/etablissements/paris/jeunes'
     )
   })
 })

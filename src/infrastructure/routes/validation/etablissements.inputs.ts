@@ -7,7 +7,8 @@ import {
   IsOptional,
   IsNumber,
   IsBoolean,
-  IsIn
+  IsIn,
+  IsString
 } from 'class-validator'
 import { transformStringToBoolean } from './utils/transformers'
 
@@ -42,6 +43,24 @@ export class GetAnimationsCollectivesV2QueryParams {
   @IsIn([true, false])
   @Transform(params => transformStringToBoolean(params, 'aClore'))
   aClore?: boolean
+}
+
+export class GetJeunesEtablissementV2QueryParams {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  page?: number
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  limit?: number
+
+  @ApiProperty({ required: true })
+  @IsString()
+  q: string
 }
 
 export class ClotureAnimationCollectivePayload {
