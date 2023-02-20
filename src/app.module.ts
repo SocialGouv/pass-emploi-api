@@ -81,6 +81,7 @@ import { GetOffresServicesCiviqueQueryHandler } from './application/queries/get-
 import { GetTypesRendezVousQueryHandler } from './application/queries/rendez-vous/get-types-rendez-vous.query.handler'
 import { TaskService } from './application/task.service'
 import { WorkerService } from './application/worker.service.db'
+import { GetJeunesEtablissementV2QueryHandler } from './application/queries/get-jeunes-etablissement-v2.query.handler.db'
 import configuration from './config/configuration'
 import {
   Action,
@@ -569,6 +570,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     AuthorizeListeDeDiffusion,
     GetDetailActionQueryHandler,
     GetDetailJeuneQueryHandler,
+    GetJeunesEtablissementV2QueryHandler,
     GetActionsByJeuneQueryHandler,
     CreateActionCommandHandler,
     CreerJeunePoleEmploiCommandHandler,
