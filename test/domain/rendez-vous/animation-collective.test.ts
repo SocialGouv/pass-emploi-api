@@ -46,12 +46,15 @@ describe('AnimationCollective', () => {
           type: CodeTypeRendezVous.INFORMATION_COLLECTIVE,
           jeunes: [unJeune({ id: '1' }), unJeune({ id: '2' })]
         })
-        repository.getAllAVenirParEtablissement
+        repository.getAllByEtablissementAvecSupprimes
           .withArgs('nantes')
           .resolves([uneAnimationCollectiveInitiale])
 
         // When
-        await service.desinscrireDesAnimationsDuneAgence(idsJeunes, 'nantes')
+        await service.desinscrireJeunesDesAnimationsCollectivesDUnEtablissement(
+          idsJeunes,
+          'nantes'
+        )
 
         // Then
         const uneAnimationCollectiveMiseAJour = unRendezVous({

@@ -10,7 +10,10 @@ import {
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ApiConsumes, ApiOAuth2, ApiOperation, ApiTags } from '@nestjs/swagger'
-import { ChangerAgenceCommandHandler } from '../../application/commands/changer-agence.command.handler'
+import {
+  ChangementAgenceQueryModel,
+  UpdateAgenceConseillerCommandHandler
+} from '../../application/commands/support/update-agence-conseiller.command.handler'
 import {
   MettreAJourLesJeunesCejPeCommandHandler,
   MettreAJourLesJeunesCEJPoleEmploiCommand
@@ -20,13 +23,12 @@ import {
   RefreshJddCommandHandler
 } from '../../application/commands/refresh-jdd.command.handler'
 import { ArchiverJeuneSupportCommandHandler } from '../../application/commands/support/archiver-jeune-support.command.handler'
-import { ChangementAgenceQueryModel } from '../../application/queries/query-models/changement-agence.query-model'
 import { isFailure } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Utilisateur } from '../decorators/authenticated.decorator'
 import { handleFailure } from './failure.handler'
 import {
-  ChangementAgencePayload,
+  ChangerAgenceConseillerPayload,
   RefreshJDDPayload,
   TeleverserCsvPayload
 } from './validation/support.input'
@@ -38,7 +40,7 @@ export class SupportController {
   constructor(
     private refreshJddCommandHandler: RefreshJddCommandHandler,
     private mettreAJourLesJeunesCejPeCommandHandler: MettreAJourLesJeunesCejPeCommandHandler,
-    private changerAgenceCommandHandler: ChangerAgenceCommandHandler,
+    private updateAgenceCommandHandler: UpdateAgenceConseillerCommandHandler,
     private archiverJeuneSupportCommandHandler: ArchiverJeuneSupportCommandHandler
   ) {}
 
@@ -80,16 +82,21 @@ export class SupportController {
     }
   }
 
-  @Post('changement-agence')
-  async postChangementAgence(
-    @Body() payload: ChangementAgencePayload,
+  @ApiOperation({
+    summary:
+      'Attribue une nouvelle agence au conseiller identifié par son ID (ID en base, et pas ID Authentification).',
+    description: 'Autorisé pour le support.'
+  })
+  @Post('changer-agence-conseiller')
+  async changerAgenceConseiller(
+    @Body() payload: ChangerAgenceConseillerPayload,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<ChangementAgenceQueryModel[]> {
-    const command: ChangementAgencePayload = {
+  ): Promise<ChangementAgenceQueryModel> {
+    const command: ChangerAgenceConseillerPayload = {
       idConseiller: payload.idConseiller,
-      idAgenceCible: payload.idAgenceCible
+      idNouvelleAgence: payload.idNouvelleAgence
     }
-    const result = await this.changerAgenceCommandHandler.execute(
+    const result = await this.updateAgenceCommandHandler.execute(
       command,
       utilisateur
     )
@@ -102,7 +109,7 @@ export class SupportController {
   @ApiOperation({
     summary:
       'Archive le jeune identifié par son ID (ID en base, et pas ID Authentification).',
-    description: 'Autorisé pour le support'
+    description: 'Autorisé pour le support.'
   })
   @Post('archiver-jeune/:idJeune')
   @HttpCode(HttpStatus.NO_CONTENT)
