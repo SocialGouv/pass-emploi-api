@@ -1,38 +1,42 @@
+import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
+import { createSandbox } from 'sinon'
+import { SupportAuthorizer } from '../../../../src/application/authorizers/authorize-support'
 import {
-  ChangerAgenceCommand,
-  ChangerAgenceCommandHandler
-} from '../../../src/application/commands/changer-agence.command.handler'
-import {
-  unUtilisateurConseiller,
-  unUtilisateurSupport
-} from '../../fixtures/authentification.fixture'
-import { expect, StubbedClass, stubClass } from '../../utils'
+  ChangementAgenceQueryModel,
+  UpdateAgenceConseillerCommand,
+  UpdateAgenceConseillerCommandHandler
+} from '../../../../src/application/commands/support/update-agence-conseiller.command.handler'
+import { DroitsInsuffisants } from '../../../../src/building-blocks/types/domain-error'
 import {
   emptySuccess,
+  failure,
   isFailure,
   Result,
   success
-} from '../../../src/building-blocks/types/result'
-import { StubbedType, stubInterface } from '@salesforce/ts-sinon'
-import { Agence } from '../../../src/domain/agence'
-import { Conseiller } from '../../../src/domain/conseiller/conseiller'
-import { createSandbox } from 'sinon'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { uneAgence } from '../../fixtures/agence.fixture'
-import { AnimationCollective } from '../../../src/domain/rendez-vous/animation-collective'
+} from '../../../../src/building-blocks/types/result'
+import { Agence } from '../../../../src/domain/agence'
+import { Conseiller } from '../../../../src/domain/conseiller/conseiller'
+import { AnimationCollective } from '../../../../src/domain/rendez-vous/animation-collective'
+import { DateService } from '../../../../src/utils/date-service'
+import { uneAgence } from '../../../fixtures/agence.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurSupport
+} from '../../../fixtures/authentification.fixture'
+import { unConseiller } from '../../../fixtures/conseiller.fixture'
 import {
   uneAnimationCollective,
   unJeuneDuRendezVous
-} from '../../fixtures/rendez-vous.fixture'
-import { DateService } from '../../../src/utils/date-service'
-import { ChangementAgenceQueryModel } from '../../../src/application/queries/query-models/changement-agence.query-model'
+} from '../../../fixtures/rendez-vous.fixture'
+import { expect, StubbedClass, stubClass } from '../../../utils'
 
-describe('ChangerAgenceCommandHandler', () => {
-  let changerAgenceCommandHandler: ChangerAgenceCommandHandler
+describe('UpdateAgenceConseillerCommandHandler', () => {
+  let updateAgenceConseillerCommandHandler: UpdateAgenceConseillerCommandHandler
   let agenceRepository: StubbedType<Agence.Repository>
   let conseillerRepository: StubbedType<Conseiller.Repository>
   let animationCollectiveRepository: StubbedType<AnimationCollective.Repository>
   let animationCollectiveService: AnimationCollective.Service
+  let authorizeSupport: StubbedClass<SupportAuthorizer>
   let dateService: StubbedClass<DateService>
 
   const conseiller = unConseiller({
@@ -70,13 +74,13 @@ describe('ChangerAgenceCommandHandler', () => {
     }
   })
 
-  const agenceCible = uneAgence({
-    id: 'idAgenceCible'
+  const nouvelleAgence = uneAgence({
+    id: 'idNouvelleAgence'
   })
 
-  const command: ChangerAgenceCommand = {
+  const command: UpdateAgenceConseillerCommand = {
     idConseiller: conseiller.id,
-    idAgenceCible: 'idAgenceCible'
+    idNouvelleAgence: 'idNouvelleAgence'
   }
 
   beforeEach(async () => {
@@ -85,16 +89,19 @@ describe('ChangerAgenceCommandHandler', () => {
     conseillerRepository = stubInterface(sandbox)
     animationCollectiveRepository = stubInterface(sandbox)
     dateService = stubClass(DateService)
+    authorizeSupport = stubClass(SupportAuthorizer)
     animationCollectiveService = new AnimationCollective.Service(
       animationCollectiveRepository,
       dateService
     )
-    changerAgenceCommandHandler = new ChangerAgenceCommandHandler(
-      conseillerRepository,
-      agenceRepository,
-      animationCollectiveRepository,
-      animationCollectiveService
-    )
+    updateAgenceConseillerCommandHandler =
+      new UpdateAgenceConseillerCommandHandler(
+        conseillerRepository,
+        agenceRepository,
+        animationCollectiveRepository,
+        animationCollectiveService,
+        authorizeSupport
+      )
   })
 
   describe('handle', () => {
@@ -102,10 +109,10 @@ describe('ChangerAgenceCommandHandler', () => {
       it('rejette', async () => {
         // Given
         conseillerRepository.get.withArgs(conseiller.id).resolves(undefined)
-
         // When
-        const result = await changerAgenceCommandHandler.handle(command)
-
+        const result = await updateAgenceConseillerCommandHandler.handle(
+          command
+        )
         // Then
         expect(isFailure(result)).to.equal(true)
       })
@@ -115,11 +122,12 @@ describe('ChangerAgenceCommandHandler', () => {
         // Given
         conseillerRepository.get.withArgs(conseiller.id).resolves(conseiller)
         agenceRepository.get
-          .withArgs(command.idAgenceCible, conseiller.structure)
+          .withArgs(command.idNouvelleAgence, conseiller.structure)
           .resolves(undefined)
-
         // When
-        const result = await changerAgenceCommandHandler.handle(command)
+        const result = await updateAgenceConseillerCommandHandler.handle(
+          command
+        )
 
         // Then
         expect(isFailure(result)).to.equal(true)
@@ -134,9 +142,9 @@ describe('ChangerAgenceCommandHandler', () => {
           .resolves(conseiller.agence)
 
         // When
-        const result = await changerAgenceCommandHandler.handle({
+        const result = await updateAgenceConseillerCommandHandler.handle({
           idConseiller: conseiller.id,
-          idAgenceCible: conseiller.agence!.id!
+          idNouvelleAgence: conseiller.agence!.id!
         })
 
         // Then
@@ -148,29 +156,37 @@ describe('ChangerAgenceCommandHandler', () => {
         // Given
         conseillerRepository.get.withArgs(conseiller.id).resolves(conseiller)
         agenceRepository.get
-          .withArgs(command.idAgenceCible, conseiller.structure)
-          .resolves(agenceCible)
-        animationCollectiveRepository.getAllNonClosesParEtablissement.resolves(
+          .withArgs(command.idNouvelleAgence, conseiller.structure)
+          .resolves(nouvelleAgence)
+        animationCollectiveRepository.getAllByEtablissementAvecSupprimes.resolves(
           []
         )
 
         // When
-        const result = await changerAgenceCommandHandler.handle(command)
+        const result = await updateAgenceConseillerCommandHandler.handle(
+          command
+        )
 
         // Then
         expect(conseillerRepository.save).to.have.been.calledWithExactly({
           ...conseiller,
-          agence: agenceCible
+          agence: nouvelleAgence
         })
-        expect(result).to.deep.equal(success([]))
+        expect(result).to.deep.equal(
+          success({
+            idNouvelleAgence: nouvelleAgence.id,
+            idAncienneAgence: conseiller!.agence!.id,
+            infosTransfertAnimationsCollectives: []
+          })
+        )
       })
     })
     describe('quand le conseiller a au moins un jeune', () => {
       beforeEach(() => {
         conseillerRepository.get.withArgs(conseiller.id).resolves(conseiller)
         agenceRepository.get
-          .withArgs(command.idAgenceCible, conseiller.structure)
-          .resolves(agenceCible)
+          .withArgs(command.idNouvelleAgence, conseiller.structure)
+          .resolves(nouvelleAgence)
       })
       describe("quand il y a des AC non closes dans l'établissement", () => {
         describe("quand le conseiller a créé l'AC", () => {
@@ -184,40 +200,49 @@ describe('ChangerAgenceCommandHandler', () => {
                 prenom: conseiller.firstName
               }
             })
-            let result: Result<ChangementAgenceQueryModel[]>
+            let result: Result<ChangementAgenceQueryModel>
             beforeEach(async () => {
               // Given
-              animationCollectiveRepository.getAllNonClosesParEtablissement
+              animationCollectiveRepository.getAllByEtablissementAvecSupprimes
                 .withArgs(conseiller.agence!.id)
                 .resolves([animationCollective])
 
               // When
-              result = await changerAgenceCommandHandler.handle(command)
+              result = await updateAgenceConseillerCommandHandler.handle(
+                command
+              )
             })
             it("modifie l'agence cible de l'AC", () => {
               expect(
                 animationCollectiveRepository.save
               ).to.have.been.calledWithExactly({
                 ...animationCollective,
-                idAgence: agenceCible.id
+                idAgence: nouvelleAgence.id
               })
             })
             it("modifie l'agence cible du conseiller", () => {
               expect(conseillerRepository.save).to.have.been.calledWithExactly({
                 ...conseiller,
-                agence: agenceCible
+                agence: nouvelleAgence
               })
             })
             it('renvoie un succès', () => {
               // Then
-              const expected: ChangementAgenceQueryModel = {
-                idAncienneAgence: 'id-agence-actuelle',
-                idAnimationCollective: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb',
-                idNouvelleAgence: 'idAgenceCible',
-                jeunesDesinscrits: [],
-                titreAnimationCollective: 'rdv'
-              }
-              expect(result).to.deep.equal(success([expected]))
+              expect(result).to.deep.equal(
+                success({
+                  idNouvelleAgence: nouvelleAgence.id,
+                  idAncienneAgence: conseiller!.agence!.id,
+                  infosTransfertAnimationsCollectives: [
+                    {
+                      idAnimationCollective:
+                        '20c8ca73-fd8b-4194-8d3c-80b6c9949deb',
+                      titreAnimationCollective: 'rdv',
+                      agenceTransferee: 'OUI (le conseiller était créateur)',
+                      jeunesDesinscrits: []
+                    }
+                  ]
+                })
+              )
             })
           })
           describe("quand un des jeunes de l'AC n'est pas au conseiller", () => {
@@ -230,15 +255,17 @@ describe('ChangerAgenceCommandHandler', () => {
                 prenom: conseiller.firstName
               }
             })
-            let result: Result<ChangementAgenceQueryModel[]>
+            let result: Result<ChangementAgenceQueryModel>
             beforeEach(async () => {
               // Given
-              animationCollectiveRepository.getAllNonClosesParEtablissement
+              animationCollectiveRepository.getAllByEtablissementAvecSupprimes
                 .withArgs(conseiller.agence!.id)
                 .resolves([animationCollective])
 
               // When
-              result = await changerAgenceCommandHandler.handle(command)
+              result = await updateAgenceConseillerCommandHandler.handle(
+                command
+              )
             })
             it('désinscrit les autres jeunes', () => {
               expect(
@@ -254,26 +281,33 @@ describe('ChangerAgenceCommandHandler', () => {
                   conseillerRepository.save
                 ).to.have.been.calledWithExactly({
                   ...conseiller,
-                  agence: agenceCible
+                  agence: nouvelleAgence
                 })
               })
             })
             it('renvoie un succès', () => {
               // Then
-              const expected: ChangementAgenceQueryModel = {
-                idAncienneAgence: 'id-agence-actuelle',
-                idAnimationCollective: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb',
-                idNouvelleAgence: 'idAgenceCible',
-                jeunesDesinscrits: [
-                  {
-                    id: 'id-jeune-autre-conseiller',
-                    nom: 'Doe',
-                    prenom: 'John'
-                  }
-                ],
-                titreAnimationCollective: 'rdv'
-              }
-              expect(result).to.deep.equal(success([expected]))
+              expect(result).to.deep.equal(
+                success({
+                  idNouvelleAgence: nouvelleAgence.id,
+                  idAncienneAgence: conseiller!.agence!.id,
+                  infosTransfertAnimationsCollectives: [
+                    {
+                      idAnimationCollective:
+                        '20c8ca73-fd8b-4194-8d3c-80b6c9949deb',
+                      titreAnimationCollective: 'rdv',
+                      agenceTransferee: 'OUI (le conseiller était créateur)',
+                      jeunesDesinscrits: [
+                        {
+                          id: 'id-jeune-autre-conseiller',
+                          nom: 'Doe',
+                          prenom: 'John'
+                        }
+                      ]
+                    }
+                  ]
+                })
+              )
             })
           })
         })
@@ -288,15 +322,15 @@ describe('ChangerAgenceCommandHandler', () => {
               prenom: unAutreConseiller.firstName
             }
           })
-          let result: Result<ChangementAgenceQueryModel[]>
+          let result: Result<ChangementAgenceQueryModel>
           beforeEach(async () => {
             // Given
-            animationCollectiveRepository.getAllNonClosesParEtablissement
+            animationCollectiveRepository.getAllByEtablissementAvecSupprimes
               .withArgs(conseiller.agence!.id)
               .resolves([animationCollective])
 
             // When
-            result = await changerAgenceCommandHandler.handle(command)
+            result = await updateAgenceConseillerCommandHandler.handle(command)
           })
           it('désinscrit ses jeunes', () => {
             expect(
@@ -310,26 +344,34 @@ describe('ChangerAgenceCommandHandler', () => {
             it("modifie l'agence cible du conseiller", () => {
               expect(conseillerRepository.save).to.have.been.calledWithExactly({
                 ...conseiller,
-                agence: agenceCible
+                agence: nouvelleAgence
               })
             })
           })
           it('renvoie un succès', () => {
             // Then
-            const expected: ChangementAgenceQueryModel = {
-              idAncienneAgence: 'id-agence-actuelle',
-              idAnimationCollective: '20c8ca73-fd8b-4194-8d3c-80b6c9949deb',
-              idNouvelleAgence: 'id-agence-actuelle',
-              jeunesDesinscrits: [
-                {
-                  id: 'id-jeune-du-conseiller',
-                  nom: 'Doe',
-                  prenom: 'John'
-                }
-              ],
-              titreAnimationCollective: 'rdv'
-            }
-            expect(result).to.deep.equal(success([expected]))
+            expect(result).to.deep.equal(
+              success({
+                idNouvelleAgence: nouvelleAgence.id,
+                idAncienneAgence: conseiller!.agence!.id,
+                infosTransfertAnimationsCollectives: [
+                  {
+                    idAnimationCollective:
+                      '20c8ca73-fd8b-4194-8d3c-80b6c9949deb',
+                    titreAnimationCollective: 'rdv',
+                    agenceTransferee:
+                      "NON (le conseiller n'était pas le créateur)",
+                    jeunesDesinscrits: [
+                      {
+                        id: 'id-jeune-du-conseiller',
+                        nom: 'Doe',
+                        prenom: 'John'
+                      }
+                    ]
+                  }
+                ]
+              })
+            )
           })
         })
       })
@@ -338,8 +380,12 @@ describe('ChangerAgenceCommandHandler', () => {
 
   describe('authorize', () => {
     it('autorise le support', async () => {
+      // Given
+      authorizeSupport.authorize
+        .withArgs(unUtilisateurSupport())
+        .resolves(emptySuccess())
       // When
-      const result = await changerAgenceCommandHandler.authorize(
+      const result = await updateAgenceConseillerCommandHandler.authorize(
         command,
         unUtilisateurSupport()
       )
@@ -348,14 +394,18 @@ describe('ChangerAgenceCommandHandler', () => {
       expect(result).to.deep.equal(emptySuccess())
     })
     it('rejette les autres', async () => {
+      // Given
+      authorizeSupport.authorize
+        .withArgs(unUtilisateurConseiller())
+        .resolves(failure(new DroitsInsuffisants()))
       // When
-      const result = await changerAgenceCommandHandler.authorize(
+      const result = await updateAgenceConseillerCommandHandler.authorize(
         command,
         unUtilisateurConseiller()
       )
 
       // Then
-      expect(isFailure(result)).to.be.true()
+      expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
     })
   })
 })

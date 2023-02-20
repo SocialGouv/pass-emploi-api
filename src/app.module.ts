@@ -304,7 +304,7 @@ import {
 import { MiloJeuneRepositoryToken } from './domain/jeune/jeune.milo'
 import { HandleJobFakeCommandHandler } from './application/commands/jobs/handle-job-fake.command'
 import { MettreAJourLesJeunesCejPeCommandHandler } from './application/commands/mettre-a-jour-les-jeunes-cej-pe.command.handler'
-import { ChangerAgenceCommandHandler } from './application/commands/changer-agence.command.handler'
+import { UpdateAgenceConseillerCommandHandler } from './application/commands/support/update-agence-conseiller.command.handler'
 import { GetActionsConseillerV2QueryHandler } from './application/queries/action/get-actions-conseiller-v2.query.handler.db'
 import { DiagorienteController } from './infrastructure/routes/diagoriente.controller'
 import { GetDiagorienteUrlsQueryHandler } from './application/queries/get-diagoriente-urls.query.handler'
@@ -686,7 +686,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     RefreshJddCommandHandler,
     EnvoyerMessageGroupeCommandHandler,
     MettreAJourLesJeunesCejPeCommandHandler,
-    ChangerAgenceCommandHandler,
+    UpdateAgenceConseillerCommandHandler,
     GetActionsConseillerV2QueryHandler,
     GetDiagorienteUrlsQueryHandler,
     ArchiverJeuneSupportCommandHandler,

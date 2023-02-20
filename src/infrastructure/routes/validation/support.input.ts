@@ -17,12 +17,12 @@ export class RefreshJDDPayload {
   menage: boolean
 }
 
-export class ChangementAgencePayload {
+export class ChangerAgenceConseillerPayload {
   @ApiProperty()
   @IsString()
   idConseiller: string
 
   @ApiProperty()
   @IsString()
-  idAgenceCible: string
+  idNouvelleAgence: string
 }

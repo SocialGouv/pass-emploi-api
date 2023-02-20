@@ -44,7 +44,7 @@ export namespace Conseiller {
     ): Promise<void>
   }
 
-  export function modifierEtablissement(
+  export function modifierAgence(
     conseiller: Conseiller,
     agence: Agence
   ): Conseiller {

@@ -38,11 +38,11 @@ export namespace AnimationCollective {
   export interface Repository {
     get(idAnimationCollective: string): Promise<AnimationCollective | undefined>
 
-    getAllAVenirParEtablissement(
+    getAllAVenirByEtablissement(
       idEtablissement: string
     ): Promise<AnimationCollective[]>
 
-    getAllNonClosesParEtablissement(
+    getAllByEtablissementAvecSupprimes(
       idEtablissement: string
     ): Promise<AnimationCollective[]>
 
@@ -57,32 +57,35 @@ export namespace AnimationCollective {
       private dateService: DateService
     ) {}
 
-    async desinscrireDesAnimationsDuneAgence(
+    async desinscrireJeunesDesAnimationsCollectivesDUnEtablissement(
       idsJeunes: string[],
       idAgence: string
     ): Promise<void> {
       const animationsCollectives =
-        await this.repository.getAllAVenirParEtablissement(idAgence)
+        await this.repository.getAllByEtablissementAvecSupprimes(idAgence)
 
       for (const animationCollective of animationsCollectives) {
-        await this.desinscrire(animationCollective, idsJeunes)
+        await this.desinscrireJeunesDeLAnimationCollective(
+          animationCollective,
+          idsJeunes
+        )
       }
     }
 
-    async desinscrire(
+    async desinscrireJeunesDeLAnimationCollective(
       animationCollective: AnimationCollective,
       idsJeunes: string[]
     ): Promise<void> {
-      const animationCollectiveMiseAJour = {
+      const updatedAnimationCollective = {
         ...animationCollective,
         jeunes: animationCollective.jeunes.filter(
           jeune => !idsJeunes.includes(jeune.id)
         )
       }
-      await this.repository.save(animationCollectiveMiseAJour)
+      await this.repository.save(updatedAnimationCollective)
     }
 
-    async mettreAJourEtablissement(
+    async updateEtablissement(
       animationCollective: AnimationCollective,
       idEtablissement: string
     ): Promise<void> {
