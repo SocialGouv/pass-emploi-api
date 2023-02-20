@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { JeuneMilo } from '../../../domain/jeune/jeune.milo'
 import { ArchiveJeune } from '../../../domain/archive-jeune'
 import { Jeune } from '../../../domain/jeune/jeune'
 
@@ -22,6 +23,31 @@ export class JeuneQueryModel {
 
   @ApiProperty()
   firstName: string
+}
+
+export class JeuneV2QueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
+  nom: string
+
+  @ApiProperty()
+  prenom: string
+}
+
+export class JeuneMiloResumeQueryModel {
+  @ApiProperty()
+  jeune: JeuneV2QueryModel
+
+  @ApiPropertyOptional({ required: false })
+  situation?: JeuneMilo.CategorieSituation
+
+  @ApiPropertyOptional({
+    format: 'date-time',
+    required: false
+  })
+  dateDerniereActivite?: string
 }
 
 class ConseillerQueryModel {
