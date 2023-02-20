@@ -22,7 +22,7 @@ export class AnimationCollectiveSqlRepository
     private readonly sequelize: Sequelize
   ) {}
 
-  async getAllAVenirParEtablissement(
+  async getAllAVenirByEtablissement(
     idEtablissement: string
   ): Promise<RendezVous.AnimationCollective[]> {
     const maintenant = this.dateService.nowJs()
@@ -47,22 +47,16 @@ export class AnimationCollectiveSqlRepository
     )
   }
 
-  async getAllNonClosesParEtablissement(
+  async getAllByEtablissementAvecSupprimes(
     idEtablissement: string
   ): Promise<RendezVous.AnimationCollective[]> {
     const rendezVousSql = await RendezVousSqlModel.findAll({
       include: [{ model: JeuneSqlModel, include: [ConseillerSqlModel] }],
       order: [['date', 'DESC']],
       where: {
-        dateCloture: {
-          [Op.is]: null
-        },
         idAgence: idEtablissement,
         type: {
           [Op.in]: TYPES_ANIMATIONS_COLLECTIVES
-        },
-        dateSuppression: {
-          [Op.is]: null
         }
       }
     })

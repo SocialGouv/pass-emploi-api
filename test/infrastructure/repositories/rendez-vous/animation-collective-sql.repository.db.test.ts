@@ -72,7 +72,7 @@ describe('AnimationsCollectivesSqlRepository', () => {
     )
   })
 
-  describe('getAllAVenir', () => {
+  describe('getAllAVenirByEtablissement', () => {
     it("retourne les animations collectives de l'agence", async () => {
       // Given
       const uneACPassee = unRendezVousDto({
@@ -118,7 +118,7 @@ describe('AnimationsCollectivesSqlRepository', () => {
 
       // When
       const animationCollectives =
-        await animationsCollectivesSqlRepository.getAllAVenirParEtablissement(
+        await animationsCollectivesSqlRepository.getAllAVenirByEtablissement(
           'une-agence'
         )
 
@@ -175,7 +175,7 @@ describe('AnimationsCollectivesSqlRepository', () => {
     })
   })
 
-  describe('getAllNonClosesParEtablissement', () => {
+  describe('getAllByEtablissementAvecSupprimes', () => {
     it("retourne les animations collectives de l'agence", async () => {
       // Given
       const uneACClose = unRendezVousDto({
@@ -222,12 +222,12 @@ describe('AnimationsCollectivesSqlRepository', () => {
 
       // When
       const animationCollectives =
-        await animationsCollectivesSqlRepository.getAllNonClosesParEtablissement(
+        await animationsCollectivesSqlRepository.getAllByEtablissementAvecSupprimes(
           'une-agence'
         )
 
       // Then
-      expect(animationCollectives.length).to.equal(1)
+      expect(animationCollectives.length).to.equal(2)
       const expected: RendezVous.AnimationCollective = {
         id: uneACAVenir.id,
         titre: uneACAVenir.titre,
@@ -276,6 +276,7 @@ describe('AnimationsCollectivesSqlRepository', () => {
         nombreMaxParticipants: undefined
       }
       expect(animationCollectives[0]).to.deep.equal(expected)
+      expect(animationCollectives[1].id).to.equal(uneACClose.id)
     })
   })
 
