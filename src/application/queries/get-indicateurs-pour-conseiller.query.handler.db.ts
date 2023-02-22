@@ -6,13 +6,13 @@ import { Action } from '../../domain/action/action'
 import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
 import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
-import { EvenementEngagementSqlModel } from '../../infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { Op } from 'sequelize'
 import { Authentification } from '../../domain/authentification'
 import { Evenement } from '../../domain/evenement'
 import { IndicateursPourConseillerQueryModel } from './query-models/indicateurs-pour-conseiller.query-model'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { Injectable } from '@nestjs/common'
+import { EvenementEngagementHebdoSqlModel } from '../../infrastructure/sequelize/models/evenement-engagement-hebdo.sql-model'
 
 export interface GetIndicateursPourConseillerQuery extends Query {
   idConseiller: string
@@ -149,7 +149,7 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
   }
 
   private getIndicateursOffresEtFavoris(
-    evenementsSql: EvenementEngagementSqlModel[]
+    evenementsSql: EvenementEngagementHebdoSqlModel[]
   ): {
     offres: { consultees: number; partagees: number }
     favoris: { offresSauvegardees: number; recherchesSauvegardees: number }
@@ -303,8 +303,8 @@ function findAllRendezVous(
 
 function findAllFavoris(
   query: GetIndicateursPourConseillerQuery
-): Promise<EvenementEngagementSqlModel[]> {
-  return EvenementEngagementSqlModel.findAll({
+): Promise<EvenementEngagementHebdoSqlModel[]> {
+  return EvenementEngagementHebdoSqlModel.findAll({
     where: {
       typeUtilisateur: Authentification.Type.JEUNE,
       idUtilisateur: query.idJeune,
