@@ -31,6 +31,7 @@ import {
 import { SendNotificationsNouveauxMessagesCommandHandler } from '../../../src/application/commands/send-notifications-nouveaux-messages.command.handler'
 import { GetConseillerByEmailQueryHandler } from '../../../src/application/queries/get-conseiller-by-email.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../../src/application/queries/get-dossier-milo-jeune.query.handler'
+import { GetIdentiteJeunesQueryHandler } from '../../../src/application/queries/get-identite-jeunes.query.handler.db'
 import { GetIndicateursPourConseillerQueryHandler } from '../../../src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
 import { GetJeunesByConseillerQueryHandler } from '../../../src/application/queries/get-jeunes-by-conseiller.query.handler.db'
 import {
@@ -81,6 +82,8 @@ describe('ConseillersController', () => {
   let recupererJeunesDuConseillerCommandHandler: StubbedClass<RecupererJeunesDuConseillerCommandHandler>
   let modifierJeuneDuConseillerCommandHandler: StubbedClass<ModifierJeuneDuConseillerCommandHandler>
   let getIndicateursJeunePourConseillerQueryHandler: StubbedClass<GetIndicateursPourConseillerQueryHandler>
+  let getIdentitesJeunesQueryHandler: StubbedClass<GetIdentiteJeunesQueryHandler>
+
   let app: INestApplication
 
   const now = uneDatetime().set({ second: 59, millisecond: 0 })
@@ -116,6 +119,7 @@ describe('ConseillersController', () => {
     getIndicateursJeunePourConseillerQueryHandler = app.get(
       GetIndicateursPourConseillerQueryHandler
     )
+    getIdentitesJeunesQueryHandler = app.get(GetIdentiteJeunesQueryHandler)
   })
 
   describe('GET /conseillers?email', () => {
@@ -1238,6 +1242,50 @@ describe('ConseillersController', () => {
     ensureUserAuthenticationFailsIfInvalid(
       'get',
       '/conseillers/1/jeunes/id-jeune/indicateurs?dateDebut=2022-08-01&dateFin=2022-08-10'
+    )
+  })
+
+  describe('GET /conseillers/{idConseiller}/identites-jeunes&ids', () => {
+    it('récupère l’identité des jeunes du conseiller', async () => {
+      // Given
+      const idConseiller = 'idConseiller'
+      const idsJeunes = ['id-jeune-1', 'id-jeune-2']
+      getIdentitesJeunesQueryHandler.execute
+        .withArgs({ idConseiller, idsJeunes })
+        .resolves(
+          success([
+            { id: 'id-jeune-1', nom: 'Curie', prenom: 'Marie' },
+            { id: 'id-jeune-2', nom: 'Lovelace', prenom: 'Ada' }
+          ])
+        )
+
+      // When
+      await request(app.getHttpServer())
+        .get(`/conseillers/${idConseiller}/identites-jeunes`)
+        .query({ ids: idsJeunes })
+        .set('authorization', unHeaderAuthorization())
+        .expect(HttpStatus.OK)
+        .expect([
+          { id: 'id-jeune-1', nom: 'Curie', prenom: 'Marie' },
+          { id: 'id-jeune-2', nom: 'Lovelace', prenom: 'Ada' }
+        ])
+    })
+
+    describe('quand la requête est invalide', () => {
+      it('renvoie 400', async () => {
+        // Given
+        // When - Then
+        await request(app.getHttpServer())
+          .get('/conseillers/id-conseiller/identites-jeunes')
+          .query({ ids: [] })
+          .set('authorization', unHeaderAuthorization())
+          .expect(HttpStatus.BAD_REQUEST)
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid(
+      'get',
+      '/conseillers/1/identites-jeunes'
     )
   })
 })
