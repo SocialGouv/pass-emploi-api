@@ -19,7 +19,10 @@ import {
 import { TriRendezVous } from '../../../application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
 import { Core } from '../../../domain/core'
 import { AgenceInput } from './agences.inputs'
-import { transformStringToBoolean } from './utils/transformers'
+import {
+  transformStringToArray,
+  transformStringToBoolean
+} from './utils/transformers'
 
 export class GetConseillerQueryParams {
   @ApiProperty()
@@ -237,5 +240,6 @@ export class GetIdentitesJeunesQueryParams {
   @IsArray()
   @ArrayNotEmpty()
   @IsNotEmpty({ each: true })
+  @Transform(params => transformStringToArray(params, 'ids'))
   ids: string[]
 }

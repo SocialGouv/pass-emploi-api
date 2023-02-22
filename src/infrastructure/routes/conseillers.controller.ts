@@ -64,6 +64,7 @@ import {
   DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel,
   JeuneQueryModel,
+  JeuneV2QueryModel,
   ResumeActionsDuJeuneQueryModel
 } from '../../application/queries/query-models/jeunes.query-model'
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
@@ -630,12 +631,16 @@ export class ConseillersController {
     }
   }
 
+  @ApiOperation({
+    summary: 'Récupère nom et prénom de certains jeunes d’un conseiller',
+    description: 'Autorisé pour un conseiller'
+  })
   @Get(':idConseiller/identites-jeunes')
   async getIdentitesJeunes(
     @Param('idConseiller') idConseiller: string,
     @Query() getIdentitesJeunesQueryParams: GetIdentitesJeunesQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ) {
+  ): Promise<JeuneV2QueryModel[]> {
     const query = {
       idConseiller,
       idsJeunes: getIdentitesJeunesQueryParams.ids
