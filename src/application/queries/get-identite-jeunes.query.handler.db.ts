@@ -5,22 +5,17 @@ import { Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
+import { JeuneV2QueryModel } from './query-models/jeunes.query-model'
 
 export interface GetIdentiteJeunesQuery extends Query {
   idConseiller: string
   idsJeunes: string[]
 }
 
-type IdentitesJeunesQueryModel = Array<{
-  id: string
-  nom: string
-  prenom: string
-}>
-
 @Injectable()
 export class GetIdentiteJeunesQueryHandler extends QueryHandler<
   GetIdentiteJeunesQuery,
-  Result<IdentitesJeunesQueryModel>
+  Result<JeuneV2QueryModel[]>
 > {
   constructor(private readonly conseillerAuthorizer: ConseillerAuthorizer) {
     super('GetIdentiteJeunesQueryHandler')
@@ -28,7 +23,7 @@ export class GetIdentiteJeunesQueryHandler extends QueryHandler<
 
   async handle(
     query: GetIdentiteJeunesQuery
-  ): Promise<Result<IdentitesJeunesQueryModel>> {
+  ): Promise<Result<JeuneV2QueryModel[]>> {
     const { idsJeunes, idConseiller } = query
     const sql: JeuneSqlModel[] = await JeuneSqlModel.findAll({
       where: { id: idsJeunes, idConseiller }
