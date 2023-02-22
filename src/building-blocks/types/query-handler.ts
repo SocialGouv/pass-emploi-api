@@ -14,12 +14,12 @@ import * as APM from 'elastic-apm-node'
  */
 export abstract class QueryHandler<Q extends Query | void, QM> {
   protected logger: Logger
-  private queryName: string
+  private queryHandlerName: string
   private apmService: APM.Agent
 
-  constructor(queryName: string) {
-    this.logger = new Logger(queryName)
-    this.queryName = queryName
+  constructor(queryHandlerName: string) {
+    this.logger = new Logger(queryHandlerName)
+    this.queryHandlerName = queryHandlerName
     this.apmService = getAPMInstance()
   }
 
@@ -76,7 +76,7 @@ export abstract class QueryHandler<Q extends Query | void, QM> {
       query.accessToken = '[REDACTED]'
     }
     const event = new LogEvent(LogEventKey.QUERY_EVENT, {
-      handler: this.queryName,
+      handler: this.queryHandlerName,
       query,
       result,
       utilisateur
