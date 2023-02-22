@@ -17,12 +17,12 @@ import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model
 import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
 import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
 import { unEvenementEngagementDto } from '../../fixtures/sql-models/evenement-engagement.sql-model'
-import { EvenementEngagementSqlModel } from '../../../src/infrastructure/sequelize/models/evenement-engagement.sql-model'
 import { Evenement } from '../../../src/domain/evenement'
 import { Authentification } from '../../../src/domain/authentification'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
 import { getDatabase } from '../../utils/database-for-testing'
 import Statut = Action.Statut
+import { EvenementEngagementHebdoSqlModel } from '../../../src/infrastructure/sequelize/models/evenement-engagement-hebdo.sql-model'
 
 describe('GetIndicateursPourConseillerQueryHandler', () => {
   let getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler
@@ -323,7 +323,7 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           code: Evenement.Code.OFFRE_EMPLOI_AFFICHEE,
           dateEvenement: dateEvenementApresDateFin
         })
-        await EvenementEngagementSqlModel.bulkCreate([
+        await EvenementEngagementHebdoSqlModel.bulkCreate([
           engagementDto,
           engagementAvantDateDebutDto,
           engagementApresDateFinDto
@@ -366,7 +366,7 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           dateEvenement: dateEvenementApresDateFin
         })
 
-        await EvenementEngagementSqlModel.bulkCreate([
+        await EvenementEngagementHebdoSqlModel.bulkCreate([
           engagementDto,
           engagementAvantDateDebutDto,
           engagementApresDateFinDto
@@ -421,7 +421,7 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           code: Evenement.Code.OFFRE_ALTERNANCE_SAUVEGARDEE,
           dateEvenement: dateEvenementApresDateFin
         })
-        await EvenementEngagementSqlModel.bulkCreate([
+        await EvenementEngagementHebdoSqlModel.bulkCreate([
           engagementDto,
           engagementAvantDateDebutDto,
           engagementApresDateFinDto
@@ -464,7 +464,7 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
           code: Evenement.Code.RECHERCHE_IMMERSION_SAUVEGARDEE,
           dateEvenement: dateEvenementApresDateFin
         })
-        await EvenementEngagementSqlModel.bulkCreate([
+        await EvenementEngagementHebdoSqlModel.bulkCreate([
           engagementDto,
           engagementAvantDateDebutDto,
           engagementApresDateFinDto

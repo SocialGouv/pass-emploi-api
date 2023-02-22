@@ -27,6 +27,7 @@ import { ListeDeDiffusionSqlModel } from './liste-de-diffusion.sql-model'
 import { ListeDeDiffusionJeuneAssociationSqlModel } from './liste-de-diffusion-jeune-association.sql-model'
 import { SuiviJobSqlModel } from './suivi-job.sql-model'
 import { SuiviPeCejSqlModel } from './suivi-pe-cej.sql-model'
+import { EvenementEngagementHebdoSqlModel } from './evenement-engagement-hebdo.sql-model'
 
 export const sqlModels = [
   ConseillerSqlModel,
@@ -37,6 +38,7 @@ export const sqlModels = [
   CommuneSqlModel,
   DepartementSqlModel,
   EvenementEngagementSqlModel,
+  EvenementEngagementHebdoSqlModel,
   RechercheSqlModel,
   FavoriOffreImmersionSqlModel,
   TransfertConseillerSqlModel,

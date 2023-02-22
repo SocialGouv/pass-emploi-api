@@ -7,6 +7,7 @@ import { uneDatetime } from 'test/fixtures/date.fixture'
 import { Evenement } from '../../../src/domain/evenement'
 import { EvenementSqlRepository } from '../../../src/infrastructure/repositories/evenement-sql.repository.db'
 import { getDatabase } from '../../utils/database-for-testing'
+import { EvenementEngagementHebdoSqlModel } from '../../../src/infrastructure/sequelize/models/evenement-engagement-hebdo.sql-model'
 
 describe('EvenementSqlRepository', () => {
   let evenementHttpSqlRepository: EvenementSqlRepository
@@ -42,10 +43,22 @@ describe('EvenementSqlRepository', () => {
       })
 
       // Then
-      const resultEvenement = await EvenementEngagementSqlModel.findAll()
+      const evenement = await EvenementEngagementSqlModel.findAll()
+      const evenementHebdo = await EvenementEngagementHebdoSqlModel.findAll()
 
-      expect(resultEvenement.length).to.equal(1)
-      expect(resultEvenement[0].get()).excluding('id').to.deep.equal({
+      expect(evenement.length).to.equal(1)
+      expect(evenementHebdo.length).to.equal(1)
+      expect(evenement[0].get()).excluding('id').to.deep.equal({
+        action: actionEvenement,
+        code: codeEvenement,
+        categorie: categorieEvenement,
+        nom: null,
+        idUtilisateur: utilisateur.id,
+        typeUtilisateur: utilisateur.type,
+        structure: utilisateur.structure,
+        dateEvenement: uneDatetime().toJSDate()
+      })
+      expect(evenementHebdo[0].get()).excluding('id').to.deep.equal({
         action: actionEvenement,
         code: codeEvenement,
         categorie: categorieEvenement,
