@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result, success } from '../../building-blocks/types/result'
@@ -16,6 +17,7 @@ type IdentitesJeunesQueryModel = Array<{
   prenom: string
 }>
 
+@Injectable()
 export class GetIdentiteJeunesQueryHandler extends QueryHandler<
   GetIdentiteJeunesQuery,
   Result<IdentitesJeunesQueryModel>

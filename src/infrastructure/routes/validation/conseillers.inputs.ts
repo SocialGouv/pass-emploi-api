@@ -231,3 +231,11 @@ export class GetActionsConseillerV2QueryParams {
   @Transform(params => transformStringToBoolean(params, 'aQualifier'))
   aQualifier?: boolean
 }
+
+export class GetIdentitesJeunesQueryParams {
+  @ApiProperty()
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsNotEmpty({ each: true })
+  ids: string[]
+}

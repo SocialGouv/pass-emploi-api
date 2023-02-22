@@ -50,6 +50,7 @@ import {
 import { GetConseillerByEmailQueryHandler } from '../../application/queries/get-conseiller-by-email.query.handler.db'
 import { GetDetailConseillerQueryHandler } from '../../application/queries/get-detail-conseiller.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
+import { GetIdentiteJeunesQueryHandler } from '../../application/queries/get-identite-jeunes.query.handler.db'
 import {
   GetIndicateursPourConseillerExclusionQuery,
   GetIndicateursPourConseillerQueryHandler
@@ -91,6 +92,7 @@ import {
   DetailConseillerPayload,
   EnvoyerNotificationsPayload,
   GetConseillerQueryParams,
+  GetIdentitesJeunesQueryParams,
   GetIndicateursPourConseillerQueryParams,
   GetRendezVousConseillerQueryParams,
   PutJeuneDuConseillerPayload,
@@ -122,7 +124,8 @@ export class ConseillersController {
     private readonly recupererJeunesDuConseillerCommandHandler: RecupererJeunesDuConseillerCommandHandler,
     private readonly modifierJeuneDuConseillerCommandHandler: ModifierJeuneDuConseillerCommandHandler,
     private readonly getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler,
-    private readonly createListeDeDiffusionCommandHandler: CreateListeDeDiffusionCommandHandler
+    private readonly createListeDeDiffusionCommandHandler: CreateListeDeDiffusionCommandHandler,
+    private readonly getIdentitesJeunesQueryHandler: GetIdentiteJeunesQueryHandler
   ) {}
 
   @ApiOperation({
@@ -625,6 +628,27 @@ export class ConseillersController {
     if (isFailure(result)) {
       throw handleFailure(result)
     }
+  }
+
+  @Get(':idConseiller/identites-jeunes')
+  async getIdentitesJeunes(
+    @Param('idConseiller') idConseiller: string,
+    @Query() getIdentitesJeunesQueryParams: GetIdentitesJeunesQueryParams,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ) {
+    const query = {
+      idConseiller,
+      idsJeunes: getIdentitesJeunesQueryParams.ids
+    }
+    const result = await this.getIdentitesJeunesQueryHandler.execute(
+      query,
+      utilisateur
+    )
+
+    if (isFailure(result)) {
+      throw handleFailure(result)
+    }
+    return result.data
   }
 
   private buildDateEcheanceV1(): DateTime {
