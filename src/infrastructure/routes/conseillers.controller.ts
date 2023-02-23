@@ -50,7 +50,7 @@ import {
 import { GetConseillerByEmailQueryHandler } from '../../application/queries/get-conseiller-by-email.query.handler.db'
 import { GetDetailConseillerQueryHandler } from '../../application/queries/get-detail-conseiller.query.handler.db'
 import { GetDossierMiloJeuneQueryHandler } from '../../application/queries/get-dossier-milo-jeune.query.handler'
-import { GetIdentiteJeunesQueryHandler } from '../../application/queries/get-identite-jeunes.query.handler.db'
+import { GetJeunesIdentitesQueryHandler } from '../../application/queries/get-jeunes-identites.query.handler.db'
 import {
   GetIndicateursPourConseillerExclusionQuery,
   GetIndicateursPourConseillerQueryHandler
@@ -126,7 +126,7 @@ export class ConseillersController {
     private readonly modifierJeuneDuConseillerCommandHandler: ModifierJeuneDuConseillerCommandHandler,
     private readonly getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler,
     private readonly createListeDeDiffusionCommandHandler: CreateListeDeDiffusionCommandHandler,
-    private readonly getIdentitesJeunesQueryHandler: GetIdentiteJeunesQueryHandler
+    private readonly getIdentitesJeunesQueryHandler: GetJeunesIdentitesQueryHandler
   ) {}
 
   @ApiOperation({
@@ -635,7 +635,7 @@ export class ConseillersController {
     summary: 'Récupère nom et prénom de certains jeunes d’un conseiller',
     description: 'Autorisé pour un conseiller'
   })
-  @Get(':idConseiller/identites-jeunes')
+  @Get(':idConseiller/jeunes/identites')
   async getIdentitesJeunes(
     @Param('idConseiller') idConseiller: string,
     @Query() getIdentitesJeunesQueryParams: GetIdentitesJeunesQueryParams,

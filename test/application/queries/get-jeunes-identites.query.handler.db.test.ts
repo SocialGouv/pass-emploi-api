@@ -1,7 +1,7 @@
 import { success } from 'src/building-blocks/types/result'
 import { expect, stubClass } from 'test/utils'
 import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
-import { GetIdentiteJeunesQueryHandler } from '../../../src/application/queries/get-identite-jeunes.query.handler.db'
+import { GetJeunesIdentitesQueryHandler } from '../../../src/application/queries/get-jeunes-identites.query.handler.db'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
@@ -9,12 +9,12 @@ import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
 import { getDatabase } from '../../utils/database-for-testing'
 
-describe('GetIdentiteJeunesQueryHandler', () => {
+describe('GetJeunesIdentitesQueryHandler', () => {
   let conseillerAuthorizer: ConseillerAuthorizer
-  let queryHandler: GetIdentiteJeunesQueryHandler
+  let queryHandler: GetJeunesIdentitesQueryHandler
   before(() => {
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
-    queryHandler = new GetIdentiteJeunesQueryHandler(conseillerAuthorizer)
+    queryHandler = new GetJeunesIdentitesQueryHandler(conseillerAuthorizer)
   })
 
   describe('handle', () => {

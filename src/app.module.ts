@@ -51,7 +51,7 @@ import { UpdateStatutActionCommandHandler } from './application/commands/action/
 import { UpdateUtilisateurCommandHandler } from './application/commands/update-utilisateur.command.handler'
 import { TeleverserFichierCommandHandler } from './application/commands/televerser-fichier.command.handler'
 import { GetActionsPredefiniesQueryHandler } from './application/queries/action/get-actions-predefinies.query.handler'
-import { GetIdentiteJeunesQueryHandler } from './application/queries/get-identite-jeunes.query.handler.db'
+import { GetJeunesIdentitesQueryHandler } from './application/queries/get-jeunes-identites.query.handler.db'
 import { GetJeunesByEtablissementQueryHandler } from './application/queries/get-jeunes-by-etablissement.query.handler.db'
 import { Context } from './building-blocks/context'
 import { GetActionsByJeuneQueryHandler } from './application/queries/action/get-actions-par-id-jeune.query.handler.db'
@@ -694,7 +694,7 @@ export function buildQueryCommandsProviders(): Provider[] {
     GetDiagorienteUrlsQueryHandler,
     ArchiverJeuneSupportCommandHandler,
     GetDiagorienteMetiersFavorisQueryHandler,
-    GetIdentiteJeunesQueryHandler
+    GetJeunesIdentitesQueryHandler
   ]
 }
 
