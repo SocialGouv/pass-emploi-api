@@ -7,25 +7,26 @@ import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-m
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { JeuneV2QueryModel } from './query-models/jeunes.query-model'
 
-export interface GetIdentiteJeunesQuery extends Query {
+export interface GetJeunesIdentitesQuery extends Query {
   idConseiller: string
   idsJeunes: string[]
 }
 
 @Injectable()
-export class GetIdentiteJeunesQueryHandler extends QueryHandler<
-  GetIdentiteJeunesQuery,
+export class GetJeunesIdentitesQueryHandler extends QueryHandler<
+  GetJeunesIdentitesQuery,
   Result<JeuneV2QueryModel[]>
 > {
   constructor(private readonly conseillerAuthorizer: ConseillerAuthorizer) {
-    super('GetIdentiteJeunesQueryHandler')
+    super('GetJeunesIdentitesQueryHandler')
   }
 
   async handle(
-    query: GetIdentiteJeunesQuery
+    query: GetJeunesIdentitesQuery
   ): Promise<Result<JeuneV2QueryModel[]>> {
     const { idsJeunes, idConseiller } = query
     const sql: JeuneSqlModel[] = await JeuneSqlModel.findAll({
+      attributes: ['id', 'nom', 'prenom'],
       where: { id: idsJeunes, idConseiller }
     })
 
@@ -39,7 +40,7 @@ export class GetIdentiteJeunesQueryHandler extends QueryHandler<
   }
 
   async authorize(
-    query: GetIdentiteJeunesQuery,
+    query: GetJeunesIdentitesQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     return this.conseillerAuthorizer.authorize(query.idConseiller, utilisateur)
