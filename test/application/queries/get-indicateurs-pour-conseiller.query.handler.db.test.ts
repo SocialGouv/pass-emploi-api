@@ -23,20 +23,28 @@ import { ConseillerAuthorizer } from '../../../src/application/authorizers/autho
 import { getDatabase } from '../../utils/database-for-testing'
 import Statut = Action.Statut
 import { EvenementEngagementHebdoSqlModel } from '../../../src/infrastructure/sequelize/models/evenement-engagement-hebdo.sql-model'
+import { ConseillerAgenceAuthorizer } from 'src/application/authorizers/authorize-conseiller-agence'
+import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
+import { Core } from 'src/domain/core'
+import { uneDate } from 'test/fixtures/date.fixture'
 
 describe('GetIndicateursPourConseillerQueryHandler', () => {
   let getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
   let dateService: StubbedClass<DateService>
   const idConseiller = 'id-conseiller'
   const idJeune = 'id-jeune'
 
   before(async () => {
     dateService = stubClass(DateService)
+    conseillerAuthorizer = stubClass(ConseillerAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
     getIndicateursPourConseillerQueryHandler =
       new GetIndicateursPourConseillerQueryHandler(
         dateService,
-        conseillerAuthorizer
+        conseillerAuthorizer,
+        conseillerAgenceAuthorizer
       )
   })
 
@@ -478,6 +486,63 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         expect(
           isSuccess(response) && response.data.favoris.recherchesSauvegardees
         ).to.deep.equal(1)
+      })
+    })
+  })
+  describe('authorize', () => {
+    describe("quand c'est un conseiller MILO ou PASS_EMPLOI", () => {
+      it('valide le conseiller', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          structure: Core.Structure.MILO
+        })
+
+        const query: GetIndicateursPourConseillerQuery = {
+          idJeune: 'id-jeune',
+          idConseiller: 'id-conseiller',
+          dateDebut: uneDate(),
+          dateFin: uneDate()
+        }
+
+        // When
+        await getIndicateursPourConseillerQueryHandler.authorize(
+          query,
+          utilisateur
+        )
+
+        // Then
+        expect(
+          conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence
+        ).to.have.been.calledWithExactly('id-jeune', utilisateur)
+      })
+    })
+
+    describe("quand c'est un conseiller POLE EMPLOI", () => {
+      it('valide le conseiller', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          structure: Core.Structure.POLE_EMPLOI
+        })
+
+        const query: GetIndicateursPourConseillerQuery = {
+          idJeune: 'id-jeune',
+          idConseiller: 'id-conseiller',
+          dateDebut: uneDate(),
+          dateFin: uneDate()
+        }
+
+        // When
+        await getIndicateursPourConseillerQueryHandler.authorize(
+          query,
+          utilisateur
+        )
+
+        // Then
+        expect(conseillerAuthorizer.authorize).to.have.been.calledWithExactly(
+          'id-conseiller',
+          utilisateur,
+          'id-jeune'
+        )
       })
     })
   })

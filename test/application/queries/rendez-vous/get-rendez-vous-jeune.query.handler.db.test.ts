@@ -1,7 +1,8 @@
 import { stubInterface } from '@salesforce/ts-sinon'
 import { SinonSandbox } from 'sinon'
+import { ConseillerAgenceAuthorizer } from 'src/application/authorizers/authorize-conseiller-agence'
+import { Core } from 'src/domain/core'
 import { RendezVousJeuneAssociationSqlModel } from 'src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { ConseillerForJeuneAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
 import {
   GetRendezVousJeuneQuery,
@@ -33,8 +34,8 @@ import { stubClassSandbox } from '../../../utils/types'
 
 describe('GetRendezVousJeuneQueryHandler', () => {
   let dateService: StubbedClass<DateService>
-  let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
   let getRendezVousQueryHandler: GetRendezVousJeuneQueryHandler
   let evenementService: StubbedClass<EvenementService>
   let sandbox: SinonSandbox
@@ -54,7 +55,7 @@ describe('GetRendezVousJeuneQueryHandler', () => {
     dateService = stubInterface(sandbox)
     dateService.nowJs.returns(maintenant.toJSDate())
     dateService.nowAtMidnightJs.returns(aujourdhuiMinuit.toJSDate())
-    conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
   })
 
@@ -64,8 +65,8 @@ describe('GetRendezVousJeuneQueryHandler', () => {
 
     getRendezVousQueryHandler = new GetRendezVousJeuneQueryHandler(
       dateService,
-      conseillerForJeuneAuthorizer,
       jeuneAuthorizer,
+      conseillerAgenceAuthorizer,
       evenementService,
       testConfig()
     )
@@ -327,35 +328,44 @@ describe('GetRendezVousJeuneQueryHandler', () => {
   })
 
   describe('authorize', () => {
-    it('autorise un jeune', () => {
+    it('appelle l’authorizer idoine pou un jeune', async () => {
+      // Given
+      const utilisateur = unUtilisateurJeune({
+        structure: Core.Structure.PASS_EMPLOI
+      })
+
       // When
-      getRendezVousQueryHandler.authorize(
+      await getRendezVousQueryHandler.authorize(
         {
           idJeune: jeune1.id
         },
-        unUtilisateurJeune()
+        utilisateur
       )
 
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
         jeune1.id,
-        unUtilisateurJeune()
+        utilisateur
       )
     })
+    it('appelle l’authorizer idoine pour un conseiller', async () => {
+      // Given
+      const conseiller = unUtilisateurConseiller({
+        structure: Core.Structure.MILO
+      })
 
-    it('autorise le conseiller du jeune', () => {
       // When
-      getRendezVousQueryHandler.authorize(
+      await getRendezVousQueryHandler.authorize(
         {
           idJeune: jeune1.id
         },
-        unUtilisateurConseiller()
+        conseiller
       )
 
       // Then
       expect(
-        conseillerForJeuneAuthorizer.authorize
-      ).to.have.been.calledWithExactly(jeune1.id, unUtilisateurConseiller())
+        conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence
+      ).to.have.been.calledWithExactly(jeune1.id, conseiller)
     })
   })
 })

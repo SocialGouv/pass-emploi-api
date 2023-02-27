@@ -1,13 +1,13 @@
 import { SinonSandbox } from 'sinon'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { failure, success } from 'src/building-blocks/types/result'
-import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
+import { ConseillerAgenceAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-agence'
 import {
   GetConseillersJeuneQuery,
   GetConseillersJeuneQueryHandler
 } from '../../../src/application/queries/get-conseillers-jeune.query.handler.db'
-import { GetDetailJeuneQuery } from '../../../src/application/queries/get-detail-jeune.query.handler.db'
 import { HistoriqueConseillerJeuneQueryModel } from '../../../src/application/queries/query-models/jeunes.query-model'
+import { Core } from '../../../src/domain/core'
 import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import {
@@ -15,7 +15,7 @@ import {
   TransfertConseillerSqlModel
 } from '../../../src/infrastructure/sequelize/models/transfert-conseiller.sql-model'
 import { AsSql } from '../../../src/infrastructure/sequelize/types'
-import { unUtilisateurJeune } from '../../fixtures/authentification.fixture'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
 import { uneAutreDate } from '../../fixtures/date.fixture'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
@@ -23,16 +23,16 @@ import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetConseillersJeuneQueryHandler', () => {
-  let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
   let getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler
   let sandbox: SinonSandbox
 
   before(() => {
     sandbox = createSandbox()
-    conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
 
     getConseillersJeuneQueryHandler = new GetConseillersJeuneQueryHandler(
-      conseillerForJeuneAuthorizer
+      conseillerAgenceAuthorizer
     )
   })
 
@@ -204,12 +204,14 @@ describe('GetConseillersJeuneQueryHandler', () => {
   })
 
   describe('authorize', () => {
-    it('valide le jeune', async () => {
+    it('valide le conseiller', async () => {
       // Given
-      const utilisateur = unUtilisateurJeune()
+      const utilisateur = unUtilisateurConseiller({
+        structure: Core.Structure.MILO
+      })
 
-      const query: GetDetailJeuneQuery = {
-        idJeune: utilisateur.id
+      const query = {
+        idJeune: 'id-jeune'
       }
 
       // When
@@ -217,8 +219,8 @@ describe('GetConseillersJeuneQueryHandler', () => {
 
       // Then
       expect(
-        conseillerForJeuneAuthorizer.authorize
-      ).to.have.been.calledWithExactly(utilisateur.id, utilisateur)
+        conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence
+      ).to.have.been.calledWithExactly('id-jeune', utilisateur)
     })
   })
 })

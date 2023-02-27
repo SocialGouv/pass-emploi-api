@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common'
-import { Result, success } from '../../../building-blocks/types/result'
-import { Authentification } from '../../../domain/authentification'
+import { DateTime } from 'luxon'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
-import { CommentaireActionQueryModel } from '../query-models/actions.query-model'
-import { ActionAuthorizer } from '../../authorizers/authorize-action'
+import { Result, success } from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
 import { CommentaireSqlModel } from '../../../infrastructure/sequelize/models/commentaire.sql-model'
-import { DateTime } from 'luxon'
+import { ActionAuthorizer } from '../../authorizers/authorize-action'
+import { ConseillerAgenceAuthorizer } from '../../authorizers/authorize-conseiller-agence'
+import { CommentaireActionQueryModel } from '../query-models/actions.query-model'
 
 export interface GetCommentairesAction extends Query {
   idAction: string
@@ -17,7 +18,10 @@ export class GetCommentairesActionQueryHandler extends QueryHandler<
   GetCommentairesAction,
   Result<CommentaireActionQueryModel[]>
 > {
-  constructor(private actionAuthorizer: ActionAuthorizer) {
+  constructor(
+    private actionAuthorizer: ActionAuthorizer,
+    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer
+  ) {
     super('GetCommentairesActionQueryHandler')
   }
 
@@ -48,6 +52,12 @@ export class GetCommentairesActionQueryHandler extends QueryHandler<
     query: GetCommentairesAction,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
+    if (utilisateur.type === Authentification.Type.CONSEILLER) {
+      return this.conseillerAgenceAuthorizer.authorizeConseillerDeLActionDuJeuneOuSonAgence(
+        query.idAction,
+        utilisateur
+      )
+    }
     return this.actionAuthorizer.authorize(query.idAction, utilisateur)
   }
 

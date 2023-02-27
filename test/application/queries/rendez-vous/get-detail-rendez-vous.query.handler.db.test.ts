@@ -27,6 +27,8 @@ import { LogModificationRendezVousSqlModel } from '../../../../src/infrastructur
 import { DateService } from '../../../../src/utils/date-service'
 import { DateTime } from 'luxon'
 import { getDatabase } from '../../../utils/database-for-testing'
+import { ConseillerAgenceAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-agence'
+import { Core } from '../../../../src/domain/core'
 
 const queryModel: RendezVousConseillerDetailQueryModel = {
   adresse: undefined,
@@ -58,6 +60,7 @@ const queryModel: RendezVousConseillerDetailQueryModel = {
 describe('GetDetailRendezVousQueryHandler', () => {
   let getDetailRendezVousQueryHandler: GetDetailRendezVousQueryHandler
   let rendezVousAuthorizer: StubbedClass<RendezVousAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
   let dateService: StubbedClass<DateService>
   let sandbox: SinonSandbox
   const maintenant = uneDate()
@@ -66,10 +69,12 @@ describe('GetDetailRendezVousQueryHandler', () => {
     await getDatabase().cleanPG()
     sandbox = createSandbox()
     rendezVousAuthorizer = stubClass(RendezVousAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
     dateService = stubClass(DateService)
     dateService.nowJs.returns(maintenant)
     getDetailRendezVousQueryHandler = new GetDetailRendezVousQueryHandler(
       rendezVousAuthorizer,
+      conseillerAgenceAuthorizer,
       dateService
     )
   })
@@ -413,22 +418,27 @@ describe('GetDetailRendezVousQueryHandler', () => {
   })
 
   describe('authorize', () => {
-    it("valide l'autorisation", async () => {
-      // Given
-      const utilisateur = unUtilisateurConseiller({ id: 'idConseiller' })
+    describe('quand c’est un conseiller', () => {
+      it("valide l'autorisation", async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          id: 'idConseiller',
+          structure: Core.Structure.MILO
+        })
 
-      // When
-      await getDetailRendezVousQueryHandler.authorize(
-        {
-          idRendezVous: 'idRdv'
-        },
-        utilisateur
-      )
+        // When
+        await getDetailRendezVousQueryHandler.authorize(
+          {
+            idRendezVous: 'idRdv'
+          },
+          utilisateur
+        )
 
-      // Then
-      expect(
-        rendezVousAuthorizer.authorizeConseiller
-      ).to.have.been.calledWithExactly('idRdv', utilisateur)
+        // Then
+        expect(
+          conseillerAgenceAuthorizer.authorizeConseillerAvecUnJeuneDeLAgenceMILODansLeRendezVous
+        ).to.have.been.calledWithExactly('idRdv', utilisateur)
+      })
     })
   })
 })

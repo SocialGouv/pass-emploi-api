@@ -1,14 +1,16 @@
 import { DateTime } from 'luxon'
 import { SinonSandbox } from 'sinon'
-import { NonTrouveError } from 'src/building-blocks/types/domain-error'
+import {
+  DroitsInsuffisants,
+  NonTrouveError
+} from 'src/building-blocks/types/domain-error'
 import { failure, isSuccess } from 'src/building-blocks/types/result'
 import { uneAction } from 'test/fixtures/action.fixture'
-import { ConseillerForJeuneAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
 import {
-  GetActionsByJeuneQuery,
-  GetActionsByJeuneQueryHandler
-} from '../../../../src/application/queries/action/get-actions-par-id-jeune.query.handler.db'
+  GetActionsJeuneQuery,
+  GetActionsJeuneQueryHandler
+} from '../../../../src/application/queries/action/get-actions-jeune.query.handler.db'
 import { ActionQueryModel } from '../../../../src/application/queries/query-models/actions.query-model'
 import { Action } from '../../../../src/domain/action/action'
 import { FirebaseClient } from '../../../../src/infrastructure/clients/firebase-client'
@@ -19,6 +21,7 @@ import { DateService } from '../../../../src/utils/date-service'
 import { IdService } from '../../../../src/utils/id-service'
 import {
   unUtilisateurConseiller,
+  unUtilisateurDecodePoleEmploi,
   unUtilisateurJeune
 } from '../../../fixtures/authentification.fixture'
 import { unConseiller } from '../../../fixtures/conseiller.fixture'
@@ -29,25 +32,27 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
+import { ConseillerAgenceAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-agence'
+import { Core } from '../../../../src/domain/core'
 
 describe('GetActionsByJeuneQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
   let actionSqlRepository: Action.Repository
-  let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
+  let getActionsByJeuneQueryHandler: GetActionsJeuneQueryHandler
   let sandbox: SinonSandbox
 
   before(() => {
     databaseForTesting = getDatabase()
     sandbox = createSandbox()
-    conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
     actionSqlRepository = new ActionSqlRepository(new DateService())
-    getActionsByJeuneQueryHandler = new GetActionsByJeuneQueryHandler(
+    getActionsByJeuneQueryHandler = new GetActionsJeuneQueryHandler(
       databaseForTesting.sequelize,
-      conseillerForJeuneAuthorizer,
-      jeuneAuthorizer
+      jeuneAuthorizer,
+      conseillerAgenceAuthorizer
     )
   })
 
@@ -716,12 +721,14 @@ describe('GetActionsByJeuneQueryHandler', () => {
   })
 
   describe('authorize', () => {
-    describe("quand c'est un conseiller", () => {
+    describe("quand c'est un conseiller MILO ou PASS_EMPLOI", () => {
       it('valide le conseiller', async () => {
         // Given
-        const utilisateur = unUtilisateurConseiller()
+        const utilisateur = unUtilisateurConseiller({
+          structure: Core.Structure.MILO
+        })
 
-        const query: GetActionsByJeuneQuery = {
+        const query: GetActionsJeuneQuery = {
           idJeune: 'id-jeune'
         }
 
@@ -730,8 +737,28 @@ describe('GetActionsByJeuneQueryHandler', () => {
 
         // Then
         expect(
-          conseillerForJeuneAuthorizer.authorize
+          conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence
         ).to.have.been.calledWithExactly('id-jeune', utilisateur)
+      })
+    })
+
+    describe("quand c'est un utilisateur POLE_EMPLOI", () => {
+      it('rejette', async () => {
+        // Given
+        const utilisateur = unUtilisateurDecodePoleEmploi()
+
+        const query: GetActionsJeuneQuery = {
+          idJeune: 'id-jeune'
+        }
+
+        // When
+        const result = await getActionsByJeuneQueryHandler.authorize(
+          query,
+          utilisateur
+        )
+
+        // Then
+        expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
 
@@ -740,7 +767,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
         // Given
         const utilisateur = unUtilisateurJeune()
 
-        const query: GetActionsByJeuneQuery = {
+        const query: GetActionsJeuneQuery = {
           idJeune: 'id-jeune'
         }
 
@@ -748,7 +775,7 @@ describe('GetActionsByJeuneQueryHandler', () => {
         await getActionsByJeuneQueryHandler.authorize(query, utilisateur)
 
         // Then
-        expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+        expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
           'id-jeune',
           utilisateur
         )
