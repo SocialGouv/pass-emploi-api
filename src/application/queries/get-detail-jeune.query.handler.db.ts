@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
+import { Query } from '../../building-blocks/types/query'
+import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { failure, Result, success } from '../../building-blocks/types/result'
 import { Authentification } from '../../domain/authentification'
 import { Core } from '../../domain/core'
@@ -8,9 +10,7 @@ import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/consei
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { SituationsMiloSqlModel } from '../../infrastructure/sequelize/models/situations-milo.sql-model'
 import { TransfertConseillerSqlModel } from '../../infrastructure/sequelize/models/transfert-conseiller.sql-model'
-import { Query } from '../../building-blocks/types/query'
-import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
+import { ConseillerAgenceAuthorizer } from '../authorizers/authorize-conseiller-agence'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { fromSqlToDetailJeuneQueryModel } from './query-mappers/jeune.mappers'
 import { DetailJeuneQueryModel } from './query-models/jeunes.query-model'
@@ -25,8 +25,8 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
   Result<DetailJeuneQueryModel>
 > {
   constructor(
-    private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer,
     private jeuneAuthorizer: JeuneAuthorizer,
+    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer,
     private configService: ConfigService
   ) {
     super('GetDetailJeuneQueryHandler')
@@ -62,13 +62,12 @@ export class GetDetailJeuneQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      return this.conseillerForJeuneAuthorizer.authorize(
+      return this.conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
         query.idJeune,
         utilisateur
       )
-    } else {
-      return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
     }
+    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

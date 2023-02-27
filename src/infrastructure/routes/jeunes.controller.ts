@@ -30,7 +30,6 @@ import {
   TransfererJeunesConseillerCommand,
   TransfererJeunesConseillerCommandHandler
 } from '../../application/commands/transferer-jeunes-conseiller.command.handler'
-import { GetDemarchesQueryHandler } from '../../application/queries/get-demarches.query.handler'
 import { GetDetailJeuneQueryHandler } from '../../application/queries/get-detail-jeune.query.handler.db'
 import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../application/queries/rendez-vous/get-rendez-vous-jeune-pole-emploi.query.handler'
 import {
@@ -59,9 +58,7 @@ import {
 } from '../../application/commands/update-demarche.command.handler'
 import { UpdateJeuneConfigurationApplicationCommandHandler } from '../../application/commands/update-jeune-configuration-application.command.handler'
 import { UpdateJeunePreferencesCommandHandler } from '../../application/commands/update-preferences-jeune.command.handler'
-import { GetActionsByJeuneQueryHandler } from '../../application/queries/action/get-actions-par-id-jeune.query.handler.db'
 import { GetConseillersJeuneQueryHandler } from '../../application/queries/get-conseillers-jeune.query.handler.db'
-import { GetHomeJeuneHandler } from '../../application/queries/get-home-jeune.query.handler'
 import { GetJeuneHomeActionsQueryHandler } from '../../application/queries/get-jeune-home-actions.query.handler'
 import { GetJeuneHomeDemarchesQueryHandler } from '../../application/queries/get-jeune-home-demarches.query.handler'
 import {
@@ -115,8 +112,6 @@ export class JeunesController {
     private readonly dateService: DateService,
     private readonly getDetailJeuneQueryHandler: GetDetailJeuneQueryHandler,
     private readonly updateJeuneConfigurationApplicationCommandHandler: UpdateJeuneConfigurationApplicationCommandHandler,
-    private readonly getHomeJeuneHandler: GetHomeJeuneHandler,
-    private readonly getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
     private readonly getJeuneHomeActionsQueryHandler: GetJeuneHomeActionsQueryHandler,
     private readonly getJeuneHomeSuiviQueryHandler: GetJeuneHomeAgendaQueryHandler,
     private readonly getJeuneHomeAgendaPoleEmploiQueryHandler: GetJeuneHomeAgendaPoleEmploiQueryHandler,
@@ -128,7 +123,6 @@ export class JeunesController {
     private readonly deleteJeuneCommandHandler: DeleteJeuneCommandHandler,
     private readonly archiverJeuneCommandHandler: ArchiverJeuneCommandHandler,
     private readonly deleteJeuneInactifCommandHandler: DeleteJeuneInactifCommandHandler,
-    private readonly getDemarchesQueryHandler: GetDemarchesQueryHandler,
     private readonly getConseillersJeuneQueryHandler: GetConseillersJeuneQueryHandler,
     private readonly updateStatutDemarcheCommandHandler: UpdateStatutDemarcheCommandHandler,
     private readonly createDemarcheCommandHandler: CreateDemarcheCommandHandler,
