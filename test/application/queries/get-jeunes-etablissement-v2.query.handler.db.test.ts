@@ -195,7 +195,11 @@ describe('GetJeuneEtablissementV2QueryHandler', () => {
             total: 2
           },
           resultats: [
-            mapJeuneMiloResume(jeuneEtablissement1Dto, situationJeune1Dto)
+            mapJeuneMiloResume(
+              jeuneEtablissement1Dto,
+              situationJeune1Dto,
+              conseillerEtablissement1Dto
+            )
           ]
         }
         expect(result._isSuccess && result.data).to.deep.equal(
@@ -208,13 +212,19 @@ describe('GetJeuneEtablissementV2QueryHandler', () => {
 
 function mapJeuneMiloResume(
   jeune: AsSql<JeuneDto>,
-  situation: AsSql<SituationsMiloDto>
+  situation: AsSql<SituationsMiloDto>,
+  referent: AsSql<ConseillerDto>
 ): JeuneMiloResumeQueryModel {
   return {
     jeune: {
       id: jeune.id,
       nom: jeune.nom,
       prenom: jeune.prenom
+    },
+    referent: {
+      id: referent.id,
+      prenom: referent.prenom,
+      nom: referent.nom
     },
     situation: situation.situationCourante?.categorie,
     dateDerniereActivite: jeune.dateDerniereActualisationToken?.toISOString()
