@@ -1,45 +1,45 @@
-import { getDatabase } from '../../../utils/database-for-testing'
+import { ConseillerAgenceAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-agence'
+import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
+import { GetFavorisJeuneQueryHandler } from '../../../../src/application/queries/favoris/get-favoris-jeune.query.handler.db'
+import { FavorisQueryModel } from '../../../../src/application/queries/query-models/favoris.query-model'
+import { Core } from '../../../../src/domain/core'
+import { Offre } from '../../../../src/domain/offre/offre'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { FavoriOffreEmploiSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
+import { FavoriOffreEngagementSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
+import { FavoriOffreImmersionSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
+import {
+  JeuneDto,
+  JeuneSqlModel
+} from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { AsSql } from '../../../../src/infrastructure/sequelize/types'
+import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
 import {
   unFavoriOffreEmploi,
   unFavoriOffreEngagement,
   unFavoriOffreImmersion
 } from '../../../fixtures/sql-models/favoris.sql-model'
-import { FavoriOffreEmploiSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-emploi.sql-model'
-import { expect, StubbedClass, stubClass } from '../../../utils'
-import { GetFavorisJeuneQueryHandler } from '../../../../src/application/queries/favoris/get-favoris-jeune.query.handler.db'
-import {
-  JeuneDto,
-  JeuneSqlModel
-} from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
-import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
-import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { FavorisQueryModel } from '../../../../src/application/queries/query-models/favoris.query-model'
-import { AsSql } from '../../../../src/infrastructure/sequelize/types'
-import { FavoriOffreImmersionSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-immersion.sql-model'
-import { FavoriOffreEngagementSqlModel } from '../../../../src/infrastructure/sequelize/models/favori-offre-engagement.sql-model'
-import { ConseillerForJeuneAvecPartageAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-for-jeune-avec-partage'
-import { Offre } from '../../../../src/domain/offre/offre'
-import { JeuneAuthorizer } from '../../../../src/application/authorizers/authorize-jeune'
+import { expect, StubbedClass, stubClass } from '../../../utils'
+import { getDatabase } from '../../../utils/database-for-testing'
 
 describe('GetFavorisJeunePourConseillerQueryHandler', () => {
-  let conseillerForJeuneAvecPartageAuthorizer: StubbedClass<ConseillerForJeuneAvecPartageAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let getFavorisJeunePourConseillerQueryHandler: GetFavorisJeuneQueryHandler
+  let getFavorisJeuneQueryHandler: GetFavorisJeuneQueryHandler
 
   const idJeune = 'poi-id-jeune'
   const idConseiller = 'poi-id-conseiller'
 
   beforeEach(async () => {
     await getDatabase().cleanPG()
-    conseillerForJeuneAvecPartageAuthorizer = stubClass(
-      ConseillerForJeuneAvecPartageAuthorizer
-    )
+    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
-    getFavorisJeunePourConseillerQueryHandler = new GetFavorisJeuneQueryHandler(
-      conseillerForJeuneAvecPartageAuthorizer,
-      jeuneAuthorizer
+    getFavorisJeuneQueryHandler = new GetFavorisJeuneQueryHandler(
+      jeuneAuthorizer,
+      conseillerAgenceAuthorizer
     )
   })
 
@@ -61,8 +61,9 @@ describe('GetFavorisJeunePourConseillerQueryHandler', () => {
       const query = { idJeune: jeuneDto.id }
 
       // When
-      const listeFavorisObtenue =
-        await getFavorisJeunePourConseillerQueryHandler.handle(query)
+      const listeFavorisObtenue = await getFavorisJeuneQueryHandler.handle(
+        query
+      )
 
       // Then
       expect(listeFavorisObtenue).to.deep.equal([])
@@ -109,8 +110,9 @@ describe('GetFavorisJeunePourConseillerQueryHandler', () => {
 
       const query = { idJeune: jeuneDto.id }
       // When
-      const listeFavorisObtenue =
-        await getFavorisJeunePourConseillerQueryHandler.handle(query)
+      const listeFavorisObtenue = await getFavorisJeuneQueryHandler.handle(
+        query
+      )
 
       // Then
       expect(listeFavorisObtenue).to.deep.equal(listeAttendue)
@@ -159,8 +161,9 @@ describe('GetFavorisJeunePourConseillerQueryHandler', () => {
       const query = { idJeune: jeuneDto.id }
 
       // When
-      const listeFavorisObtenue =
-        await getFavorisJeunePourConseillerQueryHandler.handle(query)
+      const listeFavorisObtenue = await getFavorisJeuneQueryHandler.handle(
+        query
+      )
 
       // Then
       expect(listeFavorisObtenue).to.deep.equal(listeAttendue)
@@ -187,11 +190,35 @@ describe('GetFavorisJeunePourConseillerQueryHandler', () => {
       const query = { idJeune: jeuneDto.id }
 
       // When
-      const listeFavorisObtenue =
-        await getFavorisJeunePourConseillerQueryHandler.handle(query)
+      const listeFavorisObtenue = await getFavorisJeuneQueryHandler.handle(
+        query
+      )
 
       // Then
       expect(listeFavorisObtenue).to.deep.equal(listeAttendue)
+    })
+  })
+
+  describe('authorize', () => {
+    describe("quand c'est un conseiller MILO ou PASS_EMPLOI", () => {
+      it('valide le conseiller', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          structure: Core.Structure.MILO
+        })
+
+        const query = {
+          idJeune: 'id-jeune'
+        }
+
+        // When
+        await getFavorisJeuneQueryHandler.authorize(query, utilisateur)
+
+        // Then
+        expect(
+          conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgenceAvecPartageFavoris
+        ).to.have.been.calledWithExactly('id-jeune', utilisateur)
+      })
     })
   })
 })

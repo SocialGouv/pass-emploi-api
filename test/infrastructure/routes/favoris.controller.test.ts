@@ -51,7 +51,7 @@ import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../../src/application/queries/get-favoris-service-civique-jeune.query.handler.db'
 import { uneOffreServiceCivique } from '../../fixtures/offre-service-civique.fixture'
 import { GetFavorisJeuneQueryHandler } from '../../../src/application/queries/favoris/get-favoris-jeune.query.handler.db'
-import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler.db'
+import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/favoris/get-metadonnees-favoris-jeune.query.handler.db'
 import { Offre } from '../../../src/domain/offre/offre'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
 
