@@ -1,9 +1,9 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
 import {
-  ActionsByJeuneOutput,
-  GetActionsByJeuneQueryHandler
-} from '../../../../src/application/queries/action/get-actions-par-id-jeune.query.handler.db'
+  ActionsJeuneQueryModel,
+  GetActionsJeuneQueryHandler
+} from '../../../../src/application/queries/action/get-actions-jeune.query.handler.db'
 import {
   ErreurHttp,
   NonTrouveError
@@ -33,7 +33,7 @@ import { Cached } from '../../../../src/building-blocks/types/query'
 import { JeuneHomeDemarcheQueryModel } from '../../../../src/application/queries/query-models/home-jeune.query-model'
 
 describe('JeunesController v2', () => {
-  let getActionsByJeuneQueryHandler: StubbedClass<GetActionsByJeuneQueryHandler>
+  let getActionsByJeuneQueryHandler: StubbedClass<GetActionsJeuneQueryHandler>
   let getJeuneHomeAgendaPoleEmploiQueryHandler: StubbedClass<GetJeuneHomeAgendaPoleEmploiQueryHandler>
   let getJeuneHomeDemarchesQueryHandler: StubbedClass<GetJeuneHomeDemarchesQueryHandler>
   let getRendezVousJeunePoleEmploiQueryHandler: StubbedClass<GetRendezVousJeunePoleEmploiQueryHandler>
@@ -43,7 +43,7 @@ describe('JeunesController v2', () => {
 
   before(async () => {
     app = await getApplicationWithStubbedDependencies()
-    getActionsByJeuneQueryHandler = app.get(GetActionsByJeuneQueryHandler)
+    getActionsByJeuneQueryHandler = app.get(GetActionsJeuneQueryHandler)
     getJeuneHomeAgendaPoleEmploiQueryHandler = app.get(
       GetJeuneHomeAgendaPoleEmploiQueryHandler
     )
@@ -66,7 +66,7 @@ describe('JeunesController v2', () => {
         page: 1,
         tri: 'date_croissante'
       }
-      const actionsByJeuneOutput: ActionsByJeuneOutput = {
+      const actionsByJeuneOutput: ActionsJeuneQueryModel = {
         actions: [],
         metadonnees: {
           nombreTotal: 1,

@@ -1,19 +1,21 @@
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { GetRecherchesQueryHandler } from '../../../src/application/queries/get-recherches.query.handler.db'
+import { ConseillerAgenceAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-agence'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
+import { GetRecherchesQueryHandler } from '../../../src/application/queries/get-recherches.query.handler.db'
+import { Core } from '../../../src/domain/core'
+import { Recherche } from '../../../src/domain/offre/recherche/recherche'
+import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/offre/recherche/recherche-sql.repository.db'
+import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { unUtilisateurConseiller } from '../../fixtures/authentification.fixture'
+import { uneDatetime } from '../../fixtures/date.fixture'
 import {
   criteresImmersionNice,
   geometrieNice,
   uneRecherche
 } from '../../fixtures/recherche.fixture'
-import { Recherche } from '../../../src/domain/offre/recherche/recherche'
-import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/offre/recherche/recherche-sql.repository.db'
 import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
 import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { uneDatetime } from '../../fixtures/date.fixture'
-import { ConseillerForJeuneAvecPartageAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune-avec-partage'
+import { expect, StubbedClass, stubClass } from '../../utils'
 import {
   DatabaseForTesting,
   getDatabase
@@ -28,18 +30,39 @@ describe('GetRecherchesQueryHandler', () => {
 
   let getRecherchesQueryHandler: GetRecherchesQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let conseillerForJeuneAvecPartageAuthorizer: StubbedClass<ConseillerForJeuneAvecPartageAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
 
   beforeEach(async () => {
     await database.cleanPG()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
-    conseillerForJeuneAvecPartageAuthorizer = stubClass(
-      ConseillerForJeuneAvecPartageAuthorizer
-    )
+    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
     getRecherchesQueryHandler = new GetRecherchesQueryHandler(
-      conseillerForJeuneAvecPartageAuthorizer,
-      jeuneAuthorizer
+      jeuneAuthorizer,
+      conseillerAgenceAuthorizer
     )
+  })
+
+  describe('authorize', () => {
+    describe("quand c'est un conseiller MILO ou PASS_EMPLOI", () => {
+      it('valide le conseiller', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          structure: Core.Structure.MILO
+        })
+
+        const query = {
+          idJeune: 'id-jeune'
+        }
+
+        // When
+        await getRecherchesQueryHandler.authorize(query, utilisateur)
+
+        // Then
+        expect(
+          conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgenceAvecPartageFavoris
+        ).to.have.been.calledWithExactly('id-jeune', utilisateur)
+      })
+    })
   })
 
   describe('handle', () => {

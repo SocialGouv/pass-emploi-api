@@ -10,14 +10,14 @@ import { fromSqlToActionQueryModel } from '../../../infrastructure/repositories/
 import { ActionSqlModel } from '../../../infrastructure/sequelize/models/action.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { SequelizeInjectionToken } from '../../../infrastructure/sequelize/providers'
-import { ConseillerForJeuneAuthorizer } from '../../authorizers/authorize-conseiller-for-jeune'
+import { ConseillerAgenceAuthorizer } from '../../authorizers/authorize-conseiller-agence'
 import { JeuneAuthorizer } from '../../authorizers/authorize-jeune'
 import { ActionQueryModel } from '../query-models/actions.query-model'
 
 const OFFSET_PAR_DEFAUT = 0
 const LIMITE_NOMBRE_ACTIONS_PAR_PAGE = 10
 
-export interface GetActionsByJeuneQuery extends Query {
+export interface GetActionsJeuneQuery extends Query {
   idJeune: string
   page?: number
   tri?: Action.Tri
@@ -25,7 +25,7 @@ export interface GetActionsByJeuneQuery extends Query {
   etats?: Action.Qualification.Etat[]
 }
 
-export interface ActionsByJeuneOutput {
+export interface ActionsJeuneQueryModel {
   actions: ActionQueryModel[]
   metadonnees: {
     nombreTotal: number
@@ -41,21 +41,21 @@ export interface ActionsByJeuneOutput {
 }
 
 @Injectable()
-export class GetActionsByJeuneQueryHandler extends QueryHandler<
-  GetActionsByJeuneQuery,
-  Result<ActionsByJeuneOutput>
+export class GetActionsJeuneQueryHandler extends QueryHandler<
+  GetActionsJeuneQuery,
+  Result<ActionsJeuneQueryModel>
 > {
   constructor(
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize,
-    private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer,
-    private jeuneAuthorizer: JeuneAuthorizer
+    private jeuneAuthorizer: JeuneAuthorizer,
+    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer
   ) {
-    super('GetActionsByJeuneQueryHandler')
+    super('GetActionsJeuneQueryHandler')
   }
 
   async handle(
-    query: GetActionsByJeuneQuery
-  ): Promise<Result<ActionsByJeuneOutput>> {
+    query: GetActionsJeuneQuery
+  ): Promise<Result<ActionsJeuneQueryModel>> {
     const filtres = generateWhere(query)
 
     const [nombreTotalActionsFiltrees, statutRawCount] = await Promise.all([
@@ -69,7 +69,7 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
       return failure(new NonTrouveError('Page', query.page?.toString()))
     }
 
-    const result: ActionsByJeuneOutput = {
+    const result: ActionsJeuneQueryModel = {
       actions: [],
       metadonnees: {
         nombreTotal: this.compterToutesLesActions(statutRawCount),
@@ -147,17 +147,16 @@ export class GetActionsByJeuneQueryHandler extends QueryHandler<
   }
 
   async authorize(
-    query: GetActionsByJeuneQuery,
+    query: GetActionsJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      return this.conseillerForJeuneAuthorizer.authorize(
+      return this.conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
         query.idJeune,
         utilisateur
       )
-    } else {
-      return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
     }
+    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {
@@ -226,7 +225,7 @@ function laPageExiste(nombreTotalActions: number, page?: number): boolean {
   return page <= pageMax
 }
 
-function generateWhere(query: GetActionsByJeuneQuery): WhereOptions {
+function generateWhere(query: GetActionsJeuneQuery): WhereOptions {
   const filtres: {
     idJeune: string
     statut?: Action.Statut[]
@@ -241,7 +240,7 @@ function generateWhere(query: GetActionsByJeuneQuery): WhereOptions {
 }
 
 function filtrerParEtat(
-  query: GetActionsByJeuneQuery,
+  query: GetActionsJeuneQuery,
   actionQueryModel: ActionQueryModel
 ): boolean {
   return !query.etats?.length || query.etats.includes(actionQueryModel.etat)

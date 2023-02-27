@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { GetJeuneHomeAgendaQueryHandler } from 'src/application/queries/get-jeune-home-agenda.query.db'
 import { JeuneHomeSuiviQueryModel } from 'src/application/queries/query-models/home-jeune-suivi.query-model'
 import {
@@ -6,6 +7,7 @@ import {
   Result,
   success
 } from 'src/building-blocks/types/result'
+import { Action } from 'src/domain/action/action'
 import {
   ActionDto,
   ActionSqlModel
@@ -16,24 +18,22 @@ import { uneActionQueryModelSansJeune } from 'test/fixtures/query-models/action.
 import { uneActionDto } from 'test/fixtures/sql-models/action.sql-model'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
-import { AsSql } from '../../../src/infrastructure/sequelize/types'
-import { Action } from 'src/domain/action/action'
+import { ConseillerAgenceAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-agence'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
-import { unJeune } from '../../fixtures/jeune.fixture'
+import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
+import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
+import { Core } from '../../../src/domain/core'
+import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
+import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { AsSql } from '../../../src/infrastructure/sequelize/types'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
-import { ActionQueryModel } from '../../../src/application/queries/query-models/actions.query-model'
-import { RendezVousJeuneQueryModel } from '../../../src/application/queries/query-models/rendez-vous.query-model'
-import { DateTime } from 'luxon'
-import { unConseiller } from '../../fixtures/conseiller.fixture'
-import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
+import { unJeune } from '../../fixtures/jeune.fixture'
+import { unRendezVousQueryModel } from '../../fixtures/query-models/rendez-vous.query-model.fixtures'
+import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
+import { expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 import { testConfig } from '../../utils/module-for-testing'
 
@@ -41,7 +41,7 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
   const utilisateurJeune = unUtilisateurJeune()
   let handler: GetJeuneHomeAgendaQueryHandler
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
-  let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
   const aujourdhuiDimanche = '2022-08-14T12:00:00Z'
   const demain = new Date('2022-08-15T12:00:00Z')
   const apresDemain = new Date('2022-08-16T12:00:00Z')
@@ -50,10 +50,10 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
   beforeEach(async () => {
     await getDatabase().cleanPG()
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
-    conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
     handler = new GetJeuneHomeAgendaQueryHandler(
       jeuneAuthorizer,
-      conseillerForJeuneAuthorizer,
+      conseillerAgenceAuthorizer,
       testConfig()
     )
     await ConseillerSqlModel.creer(unConseillerDto())
@@ -219,44 +219,42 @@ describe('GetJeuneHomeAgendaQueryHandler', () => {
   })
 
   describe('authorize', () => {
-    it('autorise un jeune', async () => {
-      // Given
-      const jeune = unJeune()
-      jeuneAuthorizer.authorize
-        .withArgs(jeune.id, unUtilisateurJeune({ id: jeune.id }))
-        .resolves(emptySuccess())
+    describe('quand c’est un jeune', () => {
+      it('appelle l’authorizer idoine', async () => {
+        // Given
+        const jeune = unJeune()
+        jeuneAuthorizer.authorizeJeune
+          .withArgs(jeune.id, unUtilisateurJeune({ id: jeune.id }))
+          .resolves(emptySuccess())
 
-      // When
-      const result = await handler.authorize(
-        { idJeune: jeune.id, maintenant: aujourdhuiDimanche },
-        unUtilisateurJeune()
-      )
+        // When
+        const result = await handler.authorize(
+          { idJeune: jeune.id, maintenant: aujourdhuiDimanche },
+          unUtilisateurJeune()
+        )
 
-      // Then
-      expect(result).to.deep.equal(emptySuccess())
-    })
-    it('autorise le conseiller d‘un jeune', async () => {
-      // Given
-      const conseiller = unConseiller()
-      const jeune = unJeune({
-        conseiller: {
-          id: conseiller.id,
-          firstName: conseiller.firstName,
-          lastName: conseiller.lastName
-        }
+        // Then
+        expect(result).to.deep.equal(emptySuccess())
       })
-      conseillerForJeuneAuthorizer.authorize
-        .withArgs(jeune.id, unUtilisateurConseiller({ id: conseiller.id }))
-        .resolves(emptySuccess())
+    })
+    describe('quand c’est un conseiller', () => {
+      it('appelle l’authorizer idoine', async () => {
+        // Given
+        const jeune = unJeune()
+        const utilisateur = unUtilisateurConseiller({
+          structure: Core.Structure.MILO
+        })
 
-      // When
-      const result = await handler.authorize(
-        { idJeune: jeune.id, maintenant: aujourdhuiDimanche },
-        unUtilisateurConseiller({ id: conseiller.id })
-      )
+        const query = { idJeune: jeune.id, maintenant: aujourdhuiDimanche }
 
-      // Then
-      expect(result).to.deep.equal(emptySuccess())
+        // When
+        await handler.authorize(query, utilisateur)
+
+        // Then
+        expect(
+          conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence
+        ).to.have.been.calledWithExactly(jeune.id, utilisateur)
+      })
     })
   })
 })
