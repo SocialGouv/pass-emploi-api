@@ -36,9 +36,23 @@ export class JeuneV2QueryModel {
   prenom: string
 }
 
+export class ConseillerV2QueryModel {
+  @ApiProperty()
+  id: string
+
+  @ApiProperty()
+  nom: string
+
+  @ApiProperty()
+  prenom: string
+}
+
 export class JeuneMiloResumeQueryModel {
   @ApiProperty()
   jeune: JeuneV2QueryModel
+
+  @ApiProperty()
+  referent: ConseillerV2QueryModel
 
   @ApiPropertyOptional({ required: false })
   situation?: JeuneMilo.CategorieSituation
