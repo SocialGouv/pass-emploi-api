@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import { failure, Result, success } from '../../building-blocks/types/result'
-import { Authentification } from '../../domain/authentification'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
+import { failure, Result, success } from '../../building-blocks/types/result'
+import { Authentification } from '../../domain/authentification'
 import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { TransfertConseillerSqlModel } from '../../infrastructure/sequelize/models/transfert-conseiller.sql-model'
-import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
+import { ConseillerAgenceAuthorizer } from '../authorizers/authorize-conseiller-agence'
 import { HistoriqueConseillerJeuneQueryModel } from './query-models/jeunes.query-model'
 
 export interface GetConseillersJeuneQuery extends Query {
@@ -19,9 +19,7 @@ export class GetConseillersJeuneQueryHandler extends QueryHandler<
   GetConseillersJeuneQuery,
   Result<HistoriqueConseillerJeuneQueryModel[]>
 > {
-  constructor(
-    private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer
-  ) {
+  constructor(private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer) {
     super('GetConseillersJeuneQueryHandler')
   }
 
@@ -108,7 +106,7 @@ export class GetConseillersJeuneQueryHandler extends QueryHandler<
     query: GetConseillersJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerForJeuneAuthorizer.authorize(
+    return this.conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
       query.idJeune,
       utilisateur
     )

@@ -1,5 +1,5 @@
 import { GetAnimationsCollectivesQueryHandler } from '../../../../src/application/queries/rendez-vous/get-animations-collectives.query.handler.db'
-import { ConseillerEtablissementAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-etablissement'
+import { ConseillerAgenceAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-agence'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
 import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
@@ -26,7 +26,7 @@ describe('GetAnimationsCollectivesQueryHandler', () => {
   })
 
   let getAnimationsCollectivesQueryHandler: GetAnimationsCollectivesQueryHandler
-  let conseillerAgenceAuthorizer: StubbedClass<ConseillerEtablissementAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
   let dateService: StubbedClass<DateService>
 
   const maintenant = uneDatetime()
@@ -38,7 +38,7 @@ describe('GetAnimationsCollectivesQueryHandler', () => {
   beforeEach(() => {
     dateService = stubClass(DateService)
     dateService.nowJs.returns(maintenant.toJSDate())
-    conseillerAgenceAuthorizer = stubClass(ConseillerEtablissementAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
     getAnimationsCollectivesQueryHandler =
       new GetAnimationsCollectivesQueryHandler(
         conseillerAgenceAuthorizer,
@@ -211,7 +211,7 @@ describe('GetAnimationsCollectivesQueryHandler', () => {
 
       // Then
       expect(
-        conseillerAgenceAuthorizer.authorize
+        conseillerAgenceAuthorizer.authorizeConseillerDeLAgence
       ).to.have.been.calledWithExactly('paris', unUtilisateurConseiller())
     })
   })

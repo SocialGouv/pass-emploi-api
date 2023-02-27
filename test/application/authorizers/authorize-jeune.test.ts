@@ -28,7 +28,10 @@ describe('JeuneAuthorizer', () => {
         jeuneRepository.existe.withArgs('jeune-id').resolves(true)
 
         // When
-        const result = await jeuneAuthorizer.authorize('jeune-id', utilisateur)
+        const result = await jeuneAuthorizer.authorizeJeune(
+          'jeune-id',
+          utilisateur
+        )
 
         // Then
         expect(result).to.deep.equal(emptySuccess())
@@ -42,7 +45,10 @@ describe('JeuneAuthorizer', () => {
         jeuneRepository.existe.withArgs('jeune-id').resolves(true)
 
         // When
-        const result = await jeuneAuthorizer.authorize('jeune-id', utilisateur)
+        const result = await jeuneAuthorizer.authorizeJeune(
+          'jeune-id',
+          utilisateur
+        )
 
         // Then
         expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
@@ -55,7 +61,7 @@ describe('JeuneAuthorizer', () => {
           jeuneRepository.existe.withArgs('id').resolves(true)
 
           // When
-          const result = await jeuneAuthorizer.authorize('id', utilisateur)
+          const result = await jeuneAuthorizer.authorizeJeune('id', utilisateur)
 
           // Then
           expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
@@ -71,7 +77,10 @@ describe('JeuneAuthorizer', () => {
         jeuneRepository.existe.withArgs('jeune-id').resolves(false)
 
         // When
-        const result = await jeuneAuthorizer.authorize('jeune-id', utilisateur)
+        const result = await jeuneAuthorizer.authorizeJeune(
+          'jeune-id',
+          utilisateur
+        )
 
         // Then
         expect(result).to.deep.equal(failure(new DroitsInsuffisants()))

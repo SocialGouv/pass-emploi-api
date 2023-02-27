@@ -52,7 +52,7 @@ export class AddFavoriOffreEmploiCommandHandler extends CommandHandler<
     command: AddFavoriOffreEmploiCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorizeJeune(command.idJeune, utilisateur)
   }
 
   async monitor(
