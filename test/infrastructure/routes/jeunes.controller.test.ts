@@ -145,6 +145,7 @@ describe('JeunesController', () => {
       GetAnimationsCollectivesJeuneQueryHandler
     )
     getUnRendezVousJeuneQueryHandler = app.get(GetUnRendezVousJeuneQueryHandler)
+
     jwtService = app.get(JwtService)
     dateService = app.get(DateService)
     dateService.now.returns(now)
