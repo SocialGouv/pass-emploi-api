@@ -56,7 +56,7 @@ export class AddFavoriOffreImmersionCommandHandler extends CommandHandler<
     command: AddFavoriOffreImmersionCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(command.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorizeJeune(command.idJeune, utilisateur)
   }
 
   async monitor(utilisateur: Authentification.Utilisateur): Promise<void> {

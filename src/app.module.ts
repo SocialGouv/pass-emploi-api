@@ -54,7 +54,7 @@ import { GetActionsPredefiniesQueryHandler } from './application/queries/action/
 import { GetJeunesIdentitesQueryHandler } from './application/queries/get-jeunes-identites.query.handler.db'
 import { GetJeunesByEtablissementQueryHandler } from './application/queries/get-jeunes-by-etablissement.query.handler.db'
 import { Context } from './building-blocks/context'
-import { GetActionsByJeuneQueryHandler } from './application/queries/action/get-actions-par-id-jeune.query.handler.db'
+import { GetActionsJeuneQueryHandler } from './application/queries/action/get-actions-jeune.query.handler.db'
 import { GetChatSecretsQueryHandler } from './application/queries/get-chat-secrets.query.handler'
 import { GetCommunesEtDepartementsQueryHandler } from './application/queries/get-communes-et-departements.query.handler.db'
 import { GetConseillerByEmailQueryHandler } from './application/queries/get-conseiller-by-email.query.handler.db'
@@ -228,9 +228,8 @@ import { RateLimiterService } from './utils/rate-limiter.service'
 import { UpdateJeunePreferencesCommandHandler } from './application/commands/update-preferences-jeune.command.handler'
 import { GetPreferencesJeuneQueryHandler } from './application/queries/get-preferences-jeune.handler.db'
 import { GetRendezVousConseillerPaginesQueryHandler } from './application/queries/rendez-vous/get-rendez-vous-conseiller-pagines.query.handler.db'
-import { ConseillerForJeuneAvecPartageAuthorizer } from './application/authorizers/authorize-conseiller-for-jeune-avec-partage'
 import { GetFavorisJeuneQueryHandler } from './application/queries/favoris/get-favoris-jeune.query.handler.db'
-import { GetMetadonneesFavorisJeuneQueryHandler } from './application/queries/get-metadonnees-favoris-jeune.query.handler.db'
+import { GetMetadonneesFavorisJeuneQueryHandler } from './application/queries/favoris/get-metadonnees-favoris-jeune.query.handler.db'
 import { HandleJobRappelActionCommandHandler } from './application/commands/jobs/handle-job-rappel-action.command'
 import { AddCommentaireActionCommandHandler } from './application/commands/action/add-commentaire-action.command.handler'
 import { FichierSuppressionAuthorizer } from './application/authorizers/authorize-fichier-suppression'
@@ -269,7 +268,7 @@ import { CreateSuggestionConseillerImmersionCommandHandler } from './application
 import { ReferentielsControllerV2 } from './infrastructure/routes/v2/referentiels.controller.v2'
 import { EtablissementsController } from './infrastructure/routes/etablissements.controller'
 import { EtablissementsControllerV2 } from './infrastructure/routes/v2/etablissements.controller.v2'
-import { ConseillerEtablissementAuthorizer } from './application/authorizers/authorize-conseiller-etablissement'
+import { ConseillerAgenceAuthorizer } from './application/authorizers/authorize-conseiller-agence'
 import { AnimationCollectiveSqlRepository } from './infrastructure/repositories/rendez-vous/animation-collective-sql.repository.db'
 import { HistoriqueRendezVousRepositorySql } from './infrastructure/repositories/rendez-vous/historique-rendez-vous.repository.db'
 import { CloturerAnimationCollectiveCommandHandler } from './application/commands/cloturer-animation-collective.command.handler'
@@ -565,14 +564,13 @@ export function buildQueryCommandsProviders(): Provider[] {
     SuggestionAuthorizer,
     AuthorizeConseillerForJeunes,
     AuthorizeConseillerForJeunesTransferesTemporairement,
-    ConseillerForJeuneAvecPartageAuthorizer,
     FavoriOffreServiceCiviqueAuthorizer,
-    ConseillerEtablissementAuthorizer,
+    ConseillerAgenceAuthorizer,
     AuthorizeListeDeDiffusion,
     GetDetailActionQueryHandler,
     GetDetailJeuneQueryHandler,
     GetJeunesEtablissementV2QueryHandler,
-    GetActionsByJeuneQueryHandler,
+    GetActionsJeuneQueryHandler,
     CreateActionCommandHandler,
     CreerJeunePoleEmploiCommandHandler,
     AddFavoriOffreEmploiCommandHandler,

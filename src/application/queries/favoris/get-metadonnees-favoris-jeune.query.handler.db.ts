@@ -1,17 +1,17 @@
-import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { failure, Result, success } from '../../building-blocks/types/result'
-import { FavoriOffreImmersionSqlModel } from '../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
-import { FavoriOffreEngagementSqlModel } from '../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
-import { FavoriOffreEmploiSqlModel } from '../../infrastructure/sequelize/models/favori-offre-emploi.sql-model'
-import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
-import { Authentification } from '../../domain/authentification'
-import { NonTrouveError } from '../../building-blocks/types/domain-error'
-import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { Injectable } from '@nestjs/common'
-import { RechercheSqlModel } from '../../infrastructure/sequelize/models/recherche.sql-model'
-import { Recherche } from '../../domain/offre/recherche/recherche'
 import { Op } from 'sequelize'
-import { MetadonneesFavorisQueryModel } from './query-models/favoris.query-model'
+import { NonTrouveError } from '../../../building-blocks/types/domain-error'
+import { QueryHandler } from '../../../building-blocks/types/query-handler'
+import { failure, Result, success } from '../../../building-blocks/types/result'
+import { Authentification } from '../../../domain/authentification'
+import { Recherche } from '../../../domain/offre/recherche/recherche'
+import { FavoriOffreEmploiSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-emploi.sql-model'
+import { FavoriOffreEngagementSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-engagement.sql-model'
+import { FavoriOffreImmersionSqlModel } from '../../../infrastructure/sequelize/models/favori-offre-immersion.sql-model'
+import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
+import { RechercheSqlModel } from '../../../infrastructure/sequelize/models/recherche.sql-model'
+import { ConseillerAgenceAuthorizer } from '../../authorizers/authorize-conseiller-agence'
+import { MetadonneesFavorisQueryModel } from '../query-models/favoris.query-model'
 
 export interface GetMetadonneesFavorisJeuneQuery {
   idJeune: string
@@ -22,9 +22,7 @@ export class GetMetadonneesFavorisJeuneQueryHandler extends QueryHandler<
   GetMetadonneesFavorisJeuneQuery,
   Result<MetadonneesFavorisQueryModel>
 > {
-  constructor(
-    private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer
-  ) {
+  constructor(private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer) {
     super('GetMetadonneesFavorisJeuneQueryHandler')
   }
 
@@ -32,7 +30,7 @@ export class GetMetadonneesFavorisJeuneQueryHandler extends QueryHandler<
     query: GetMetadonneesFavorisJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerForJeuneAuthorizer.authorize(
+    return this.conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
       query.idJeune,
       utilisateur
     )

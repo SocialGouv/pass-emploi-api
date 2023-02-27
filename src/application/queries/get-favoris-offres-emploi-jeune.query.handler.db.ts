@@ -41,7 +41,7 @@ export class GetFavorisOffresEmploiJeuneQueryHandler extends QueryHandler<
     query: GetFavorisJeuneQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

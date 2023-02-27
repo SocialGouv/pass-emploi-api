@@ -1,18 +1,18 @@
+import { Injectable } from '@nestjs/common'
+import { Op } from 'sequelize'
+import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Result, success } from '../../building-blocks/types/result'
-import { Query } from '../../building-blocks/types/query'
-import { DateService } from '../../utils/date-service'
 import { Action } from '../../domain/action/action'
-import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
-import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
-import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
-import { Op } from 'sequelize'
 import { Authentification } from '../../domain/authentification'
 import { Evenement } from '../../domain/evenement'
-import { IndicateursPourConseillerQueryModel } from './query-models/indicateurs-pour-conseiller.query-model'
-import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
-import { Injectable } from '@nestjs/common'
+import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
 import { EvenementEngagementHebdoSqlModel } from '../../infrastructure/sequelize/models/evenement-engagement-hebdo.sql-model'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
+import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
+import { DateService } from '../../utils/date-service'
+import { ConseillerAgenceAuthorizer } from '../authorizers/authorize-conseiller-agence'
+import { IndicateursPourConseillerQueryModel } from './query-models/indicateurs-pour-conseiller.query-model'
 
 export interface GetIndicateursPourConseillerQuery extends Query {
   idConseiller: string
@@ -33,7 +33,7 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
 > {
   constructor(
     private dateService: DateService,
-    private conseillerAuthorizer: ConseillerAuthorizer
+    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer
   ) {
     super('GetIndicateursPourConseillerQueryHandler')
   }
@@ -42,10 +42,9 @@ export class GetIndicateursPourConseillerQueryHandler extends QueryHandler<
     query: GetIndicateursPourConseillerQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAuthorizer.authorize(
-      query.idConseiller,
-      utilisateur,
-      query.idJeune
+    return this.conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
+      query.idJeune,
+      utilisateur
     )
   }
 

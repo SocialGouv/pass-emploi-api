@@ -1,4 +1,5 @@
 import { SinonSandbox } from 'sinon'
+import { ConseillerAgenceAuthorizer } from 'src/application/authorizers/authorize-conseiller-agence'
 import { NonTrouveError } from 'src/building-blocks/types/domain-error'
 import { failure, isSuccess, success } from 'src/building-blocks/types/result'
 import { Core } from 'src/domain/core'
@@ -15,35 +16,34 @@ import { uneAutreDate, uneDate } from 'test/fixtures/date.fixture'
 import { unConseillerDto } from 'test/fixtures/sql-models/conseiller.sql-model'
 import { unJeuneDto } from 'test/fixtures/sql-models/jeune.sql-model'
 import { testConfig } from 'test/utils/module-for-testing'
-import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../../../src/application/authorizers/authorize-jeune'
 import {
   GetDetailJeuneQuery,
   GetDetailJeuneQueryHandler
 } from '../../../src/application/queries/get-detail-jeune.query.handler.db'
+import { JeuneMilo } from '../../../src/domain/jeune/jeune.milo'
 import {
   unUtilisateurConseiller,
   unUtilisateurJeune
 } from '../../fixtures/authentification.fixture'
 import { unDetailJeuneQueryModel } from '../../fixtures/query-models/jeunes.query-model.fixtures'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
-import { JeuneMilo } from '../../../src/domain/jeune/jeune.milo'
 import { getDatabase } from '../../utils/database-for-testing'
 
 describe('GetDetailJeuneQueryHandler', () => {
-  let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
   let jeuneAuthorizer: StubbedClass<JeuneAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
   let getDetailJeuneQueryHandler: GetDetailJeuneQueryHandler
   let sandbox: SinonSandbox
 
   before(() => {
     sandbox = createSandbox()
-    conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
     jeuneAuthorizer = stubClass(JeuneAuthorizer)
 
     getDetailJeuneQueryHandler = new GetDetailJeuneQueryHandler(
-      conseillerForJeuneAuthorizer,
       jeuneAuthorizer,
+      conseillerAgenceAuthorizer,
       testConfig()
     )
   })
@@ -389,10 +389,12 @@ describe('GetDetailJeuneQueryHandler', () => {
   describe('authorize', () => {
     it("appelle l'authorizer pour le conseiller", async () => {
       // Given
-      const utilisateur = unUtilisateurConseiller()
+      const utilisateur = unUtilisateurConseiller({
+        structure: Core.Structure.MILO
+      })
 
       const query: GetDetailJeuneQuery = {
-        idJeune: utilisateur.id
+        idJeune: 'idJeune'
       }
 
       // When
@@ -400,8 +402,8 @@ describe('GetDetailJeuneQueryHandler', () => {
 
       // Then
       expect(
-        conseillerForJeuneAuthorizer.authorize
-      ).to.have.been.calledWithExactly(utilisateur.id, utilisateur)
+        conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence
+      ).to.have.been.calledWithExactly(query.idJeune, utilisateur)
     })
     it("appelle l'authorizer pour le jeune", async () => {
       // Given
@@ -412,11 +414,11 @@ describe('GetDetailJeuneQueryHandler', () => {
       }
 
       // When
-      await jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+      await jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
 
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
-        utilisateur.id,
+      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
+        query.idJeune,
         utilisateur
       )
     })
