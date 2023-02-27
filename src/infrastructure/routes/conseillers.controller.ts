@@ -64,7 +64,7 @@ import {
   DetailJeuneConseillerQueryModel,
   DetailJeuneQueryModel,
   JeuneQueryModel,
-  JeuneV2QueryModel,
+  IdentiteJeuneQueryModel,
   ResumeActionsDuJeuneQueryModel
 } from '../../application/queries/query-models/jeunes.query-model'
 import { DossierJeuneMiloQueryModel } from '../../application/queries/query-models/milo.query-model'
@@ -640,7 +640,7 @@ export class ConseillersController {
     @Param('idConseiller') idConseiller: string,
     @Query() getIdentitesJeunesQueryParams: GetIdentitesJeunesQueryParams,
     @Utilisateur() utilisateur: Authentification.Utilisateur
-  ): Promise<JeuneV2QueryModel[]> {
+  ): Promise<IdentiteJeuneQueryModel[]> {
     const query = {
       idConseiller,
       idsJeunes: getIdentitesJeunesQueryParams.ids
