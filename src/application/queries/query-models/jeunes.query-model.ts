@@ -3,6 +3,13 @@ import { JeuneMilo } from '../../../domain/jeune/jeune.milo'
 import { ArchiveJeune } from '../../../domain/archive-jeune'
 import { Jeune } from '../../../domain/jeune/jeune'
 
+import {
+  RendezVousJeuneDetailQueryModel,
+  RendezVousJeuneQueryModel
+} from './rendez-vous.query-model'
+import { RechercheQueryModel } from './recherches.query-model'
+import { FavorisQueryModel } from './favoris.query-model'
+
 class SituationQueryModel {
   @ApiProperty()
   etat: string
@@ -151,6 +158,65 @@ export class DetailJeuneQueryModel {
 
   @ApiProperty({ required: false })
   dateFinCEJ?: string
+}
+
+class ResumeSemaineJeune {
+  @ApiProperty()
+  nombreRendezVous: number
+
+  @ApiProperty()
+  nombreActionsDemarchesEnRetard: number
+
+  @ApiProperty()
+  nombreActionsDemarchesARealiser: number
+}
+
+export class AccueilJeuneMiloQueryModel {
+  @ApiProperty({
+    required: false
+  })
+  dateDerniereMiseAJour: string | undefined
+
+  @ApiProperty()
+  cetteSemaine: ResumeSemaineJeune
+
+  @ApiProperty()
+  prochainRendezVous: RendezVousJeuneQueryModel | undefined
+
+  @ApiProperty({
+    required: false
+  })
+  evenementsAVenir: RendezVousJeuneDetailQueryModel[] | undefined
+
+  @ApiProperty()
+  mesAlertes: RechercheQueryModel[]
+
+  @ApiPropertyOptional()
+  mesFavoris: FavorisQueryModel[]
+}
+
+export class AccueilJeunePoleEmploiQueryModel {
+  @ApiProperty({
+    required: false
+  })
+  dateDerniereMiseAJour: string | undefined
+
+  @ApiProperty()
+  cetteSemaine: ResumeSemaineJeune
+
+  @ApiProperty()
+  prochainRendezVous: RendezVousJeuneQueryModel | undefined
+
+  @ApiProperty({
+    required: false
+  })
+  evenementsAVenir: RendezVousJeuneDetailQueryModel[] | undefined
+
+  @ApiProperty()
+  mesAlertes: RechercheQueryModel[]
+
+  @ApiPropertyOptional()
+  mesFavoris: FavorisQueryModel[]
 }
 
 export class DetailJeuneConseillerQueryModel {

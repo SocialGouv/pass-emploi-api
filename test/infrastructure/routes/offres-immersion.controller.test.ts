@@ -23,6 +23,7 @@ import {
   RechercheDetailOffreNonTrouve,
   RechercheOffreInvalide
 } from '../../../src/building-blocks/types/domain-error'
+
 import {
   emptySuccess,
   failure,
