@@ -7,7 +7,7 @@ import { Authentification } from '../../domain/authentification'
 import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
 import { Situation } from '../../infrastructure/sequelize/models/situations-milo.sql-model'
 import { SequelizeInjectionToken } from '../../infrastructure/sequelize/providers'
-import { ConseillerEtablissementAuthorizer } from '../authorizers/authorize-conseiller-etablissement'
+import { ConseillerAgenceAuthorizer } from '../authorizers/authorize-conseiller-agence'
 import { GetJeunesEtablissementV2QueryModel } from './query-models/agence.query-model'
 
 interface JeuneEtablissementRawSql extends JeuneSqlModel {
@@ -38,7 +38,7 @@ export class GetJeunesEtablissementV2QueryHandler extends QueryHandler<
   Result<GetJeunesEtablissementV2QueryModel>
 > {
   constructor(
-    private conseillerAgenceAuthorizer: ConseillerEtablissementAuthorizer,
+    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer,
     @Inject(SequelizeInjectionToken) private readonly sequelize: Sequelize
   ) {
     super('GetJeunesEtablissementV2QueryHandler')
@@ -112,7 +112,7 @@ export class GetJeunesEtablissementV2QueryHandler extends QueryHandler<
     { idEtablissement }: GetJeunesEtablissementV2Query,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAgenceAuthorizer.authorize(
+    return this.conseillerAgenceAuthorizer.authorizeConseillerDeLAgence(
       idEtablissement,
       utilisateur
     )

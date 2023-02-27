@@ -8,9 +8,9 @@ import {
 } from '@nestjs/common'
 import { ApiOAuth2, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
-  GetActionsByJeuneQuery,
-  GetActionsByJeuneQueryHandler
-} from '../../../application/queries/action/get-actions-par-id-jeune.query.handler.db'
+  GetActionsJeuneQuery,
+  GetActionsJeuneQueryHandler
+} from '../../../application/queries/action/get-actions-jeune.query.handler.db'
 import { ListeActionsV2QueryModel } from '../../../application/queries/query-models/actions.query-model'
 import { isFailure, isSuccess } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
@@ -39,7 +39,7 @@ import { GetRendezVousJeunePoleEmploiQueryHandler } from '../../../application/q
 @ApiTags('Jeunes')
 export class JeunesControllerV2 {
   constructor(
-    private readonly getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
+    private readonly getActionsByJeuneQueryHandler: GetActionsJeuneQueryHandler,
     private readonly getRendezVousJeuneQueryHandler: GetRendezVousJeuneQueryHandler,
     private readonly getJeuneHomeDemarchesQueryHandler: GetJeuneHomeDemarchesQueryHandler,
     private readonly getRendezVousJeunePoleEmploiQueryHandler: GetRendezVousJeunePoleEmploiQueryHandler,
@@ -56,7 +56,7 @@ export class JeunesControllerV2 {
     @Utilisateur() utilisateur: Authentification.Utilisateur,
     @Query() getActionsByJeuneQueryParams: GetActionsByJeuneV2QueryParams
   ): Promise<ListeActionsV2QueryModel> {
-    const query: GetActionsByJeuneQuery = {
+    const query: GetActionsJeuneQuery = {
       idJeune,
       page: getActionsByJeuneQueryParams.page,
       tri: getActionsByJeuneQueryParams.tri,

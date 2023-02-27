@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { Op } from 'sequelize'
-import { Result, success } from '../../../building-blocks/types/result'
-import { Authentification } from '../../../domain/authentification'
+import { ConseillerAgenceAuthorizer } from 'src/application/authorizers/authorize-conseiller-agence'
 import { Query } from '../../../building-blocks/types/query'
 import { QueryHandler } from '../../../building-blocks/types/query-handler'
+import { Result, success } from '../../../building-blocks/types/result'
+import { generateSourceRendezVousCondition } from '../../../config/feature-flipping'
+import { Authentification } from '../../../domain/authentification'
 import { Evenement, EvenementService } from '../../../domain/evenement'
 import { RendezVous } from '../../../domain/rendez-vous/rendez-vous'
+import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/conseiller.sql-model'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
 import { DateService } from '../../../utils/date-service'
-import { ConseillerForJeuneAuthorizer } from '../../authorizers/authorize-conseiller-for-jeune'
 import { JeuneAuthorizer } from '../../authorizers/authorize-jeune'
 import { fromSqlToRendezVousJeuneQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
 import { RendezVousJeuneQueryModel } from '../query-models/rendez-vous.query-model'
-import { ConseillerSqlModel } from '../../../infrastructure/sequelize/models/conseiller.sql-model'
-import { generateSourceRendezVousCondition } from '../../../config/feature-flipping'
-import { ConfigService } from '@nestjs/config'
 
 export interface GetRendezVousJeuneQuery extends Query {
   idJeune: string
@@ -29,8 +29,8 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
 > {
   constructor(
     private dateService: DateService,
-    private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer,
     private jeuneAuthorizer: JeuneAuthorizer,
+    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer,
     private evenementService: EvenementService,
     private configuration: ConfigService
   ) {
@@ -74,13 +74,12 @@ export class GetRendezVousJeuneQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      return this.conseillerForJeuneAuthorizer.authorize(
+      return this.conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
         query.idJeune,
         utilisateur
       )
-    } else {
-      return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
     }
+    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
   }
 
   async monitor(
