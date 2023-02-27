@@ -11,9 +11,12 @@ import { ConseillerEtablissementAuthorizer } from '../authorizers/authorize-cons
 import { GetJeunesEtablissementV2QueryModel } from './query-models/agence.query-model'
 
 interface JeuneEtablissementRawSql extends JeuneSqlModel {
-  id: string
-  nom: string
-  prenom: string
+  id_jeune: string
+  nom_jeune: string
+  prenom_jeune: string
+  id_conseiller: string
+  prenom_conseiller: string
+  nom_conseiller: string
   date_derniere_actualisation_token: Date | null
   situation_courante: Situation
   count: string
@@ -49,9 +52,12 @@ export class GetJeunesEtablissementV2QueryHandler extends QueryHandler<
 
     const sqlJeunes: JeuneEtablissementRawSql[] = await this.sequelize.query(
       `SELECT
-            jeune.id,
-            jeune.nom,
-            jeune.prenom,
+            jeune.id as id_jeune,
+            jeune.nom as nom_jeune,
+            jeune.prenom as prenom_jeune,
+            conseiller.id as id_conseiller,
+            conseiller.prenom as prenom_conseiller,
+            conseiller.nom as nom_conseiller,
             jeune.date_derniere_actualisation_token,
             situations_milo.situation_courante,
             SIMILARITY(CONCAT(jeune.nom, ' ', jeune.prenom), ?) AS "score",
@@ -85,9 +91,14 @@ export class GetJeunesEtablissementV2QueryHandler extends QueryHandler<
       resultats: sqlJeunes.map(jeuneSql => {
         return {
           jeune: {
-            id: jeuneSql.id,
-            nom: jeuneSql.nom,
-            prenom: jeuneSql.prenom
+            id: jeuneSql.id_jeune,
+            nom: jeuneSql.nom_jeune,
+            prenom: jeuneSql.prenom_jeune
+          },
+          referent: {
+            id: jeuneSql.id_conseiller,
+            prenom: jeuneSql.prenom_conseiller,
+            nom: jeuneSql.nom_conseiller
           },
           situation: jeuneSql.situation_courante?.categorie,
           dateDerniereActivite:
