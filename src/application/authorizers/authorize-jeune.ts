@@ -15,7 +15,7 @@ export class JeuneAuthorizer {
     private jeuneRepository: Jeune.Repository
   ) {}
 
-  async authorize(
+  async authorizeJeune(
     idJeune: string,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {

@@ -5,7 +5,10 @@ import {
   GetDetailActionQuery,
   GetDetailActionQueryHandler
 } from '../../../../src/application/queries/action/get-detail-action.query.handler.db'
-import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../../fixtures/authentification.fixture'
 import {
   uneActionQueryModelFromDomain,
   uneActionQueryModelTermineeAvecQualification
@@ -24,11 +27,14 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
+import { ConseillerAgenceAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-agence'
+import { Core } from '../../../../src/domain/core'
 
 describe('GetDetailActionQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
   let actionSqlRepository: Action.Repository
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
   let getDetailActionQueryHandler: GetDetailActionQueryHandler
   let sandbox: SinonSandbox
   const jeune = unJeune()
@@ -37,10 +43,12 @@ describe('GetDetailActionQueryHandler', () => {
     databaseForTesting = getDatabase()
     sandbox = createSandbox()
     actionAuthorizer = stubClass(ActionAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
     actionSqlRepository = new ActionSqlRepository(new DateService())
 
     getDetailActionQueryHandler = new GetDetailActionQueryHandler(
-      actionAuthorizer
+      actionAuthorizer,
+      conseillerAgenceAuthorizer
     )
   })
 
@@ -152,22 +160,44 @@ describe('GetDetailActionQueryHandler', () => {
   })
 
   describe('authorize', () => {
-    it('valide le conseiller', async () => {
-      // Given
-      const utilisateur = unUtilisateurConseiller()
+    describe('quand c’est un conseiller', () => {
+      it('valide le conseiller', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          structure: Core.Structure.MILO
+        })
 
-      const query: GetDetailActionQuery = {
-        idAction: 'id-action'
-      }
+        const query: GetDetailActionQuery = {
+          idAction: 'id-action'
+        }
 
-      // When
-      await getDetailActionQueryHandler.authorize(query, utilisateur)
+        // When
+        await getDetailActionQueryHandler.authorize(query, utilisateur)
 
-      // Then
-      expect(actionAuthorizer.authorize).to.have.been.calledWithExactly(
-        'id-action',
-        utilisateur
-      )
+        // Then
+        expect(
+          conseillerAgenceAuthorizer.authorizeConseillerDeLActionDuJeuneOuSonAgence
+        ).to.have.been.calledWithExactly('id-action', utilisateur)
+      })
+    })
+    describe('quand c’est un jeune', () => {
+      it('valide le jeune', async () => {
+        // Given
+        const utilisateur = unUtilisateurJeune()
+
+        const query: GetDetailActionQuery = {
+          idAction: 'id-action'
+        }
+
+        // When
+        await getDetailActionQueryHandler.authorize(query, utilisateur)
+
+        // Then
+        expect(actionAuthorizer.authorize).to.have.been.calledWithExactly(
+          'id-action',
+          utilisateur
+        )
+      })
     })
   })
 })

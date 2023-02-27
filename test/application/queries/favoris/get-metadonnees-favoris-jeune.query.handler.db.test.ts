@@ -1,27 +1,32 @@
-import { expect, StubbedClass, stubClass } from '../../utils'
-import { GetMetadonneesFavorisJeuneQueryHandler } from '../../../src/application/queries/get-metadonnees-favoris-jeune.query.handler.db'
-import { FavorisOffresImmersionSqlRepository } from '../../../src/infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
-import { OffreServiceCiviqueHttpSqlRepository } from '../../../src/infrastructure/repositories/offre/offre-service-civique-http.repository.db'
-import { OffresEmploiHttpSqlRepository } from '../../../src/infrastructure/repositories/offre/offre-emploi-http-sql.repository.db'
-import { ConseillerForJeuneAuthorizer } from '../../../src/application/authorizers/authorize-conseiller-for-jeune'
-import { success } from '../../../src/building-blocks/types/result'
-import { RechercheSqlRepository } from '../../../src/infrastructure/repositories/offre/recherche/recherche-sql.repository.db'
-import { Recherche } from '../../../src/domain/offre/recherche/recherche'
-import { IdService } from '../../../src/utils/id-service'
-import { uneRecherche } from '../../fixtures/recherche.fixture'
+import { ConseillerAgenceAuthorizer } from 'src/application/authorizers/authorize-conseiller-agence'
+import { Core } from 'src/domain/core'
+import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
+import {
+  GetMetadonneesFavorisJeuneQuery,
+  GetMetadonneesFavorisJeuneQueryHandler
+} from '../../../../src/application/queries/favoris/get-metadonnees-favoris-jeune.query.handler.db'
+import { success } from '../../../../src/building-blocks/types/result'
+import { Recherche } from '../../../../src/domain/offre/recherche/recherche'
+import { OffresEmploiHttpSqlRepository } from '../../../../src/infrastructure/repositories/offre/offre-emploi-http-sql.repository.db'
+import { FavorisOffresImmersionSqlRepository } from '../../../../src/infrastructure/repositories/offre/offre-immersion-http-sql.repository.db'
+import { OffreServiceCiviqueHttpSqlRepository } from '../../../../src/infrastructure/repositories/offre/offre-service-civique-http.repository.db'
+import { RechercheSqlRepository } from '../../../../src/infrastructure/repositories/offre/recherche/recherche-sql.repository.db'
+import { ConseillerSqlModel } from '../../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { IdService } from '../../../../src/utils/id-service'
+import { uneRecherche } from '../../../fixtures/recherche.fixture'
+import { unConseillerDto } from '../../../fixtures/sql-models/conseiller.sql-model'
+import { unJeuneDto } from '../../../fixtures/sql-models/jeune.sql-model'
+import { expect, StubbedClass, stubClass } from '../../../utils'
 import {
   DatabaseForTesting,
   getDatabase
-} from '../../utils/database-for-testing'
+} from '../../../utils/database-for-testing'
 
 describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
   let getMetadonneesFavorisJeuneQueryHandler: GetMetadonneesFavorisJeuneQueryHandler
-  let conseillerForJeuneAuthorizer: StubbedClass<ConseillerForJeuneAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
   let recherchesSauvegardeesRepository: RechercheSqlRepository
 
   before(() => {
@@ -33,10 +38,10 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
     recherchesSauvegardeesRepository = new RechercheSqlRepository(
       databaseForTesting.sequelize
     )
-    conseillerForJeuneAuthorizer = stubClass(ConseillerForJeuneAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
 
     getMetadonneesFavorisJeuneQueryHandler =
-      new GetMetadonneesFavorisJeuneQueryHandler(conseillerForJeuneAuthorizer)
+      new GetMetadonneesFavorisJeuneQueryHandler(conseillerAgenceAuthorizer)
   })
 
   describe('handle', () => {
@@ -291,6 +296,29 @@ describe('GetMetadonneesFavorisJeuneQueryHandler', () => {
 
         // Then
         expect(result).to.deep.equal(success(expectedMetadonnees))
+      })
+    })
+    describe('authorize', () => {
+      it("appelle l'authorizer pour le conseiller", async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          structure: Core.Structure.MILO
+        })
+
+        const query: GetMetadonneesFavorisJeuneQuery = {
+          idJeune: 'id-jeune'
+        }
+
+        // When
+        await getMetadonneesFavorisJeuneQueryHandler.authorize(
+          query,
+          utilisateur
+        )
+
+        // Then
+        expect(
+          conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence
+        ).to.have.been.calledWithExactly('id-jeune', utilisateur)
       })
     })
   })

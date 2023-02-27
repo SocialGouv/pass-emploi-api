@@ -1,42 +1,46 @@
+import { DateTime } from 'luxon'
+import { ConseillerAgenceAuthorizer } from 'src/application/authorizers/authorize-conseiller-agence'
+import { Core } from 'src/domain/core'
+import { unUtilisateurConseiller } from 'test/fixtures/authentification.fixture'
+import { uneDate } from 'test/fixtures/date.fixture'
 import {
   GetIndicateursPourConseillerQuery,
   GetIndicateursPourConseillerQueryHandler
 } from '../../../src/application/queries/get-indicateurs-pour-conseiller.query.handler.db'
-import { expect, StubbedClass, stubClass } from '../../utils'
 import { isSuccess } from '../../../src/building-blocks/types/result'
-import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
-import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
-import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
-import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
-import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
-import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
 import { Action } from '../../../src/domain/action/action'
-import { DateTime } from 'luxon'
-import { DateService } from '../../../src/utils/date-service'
-import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
-import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
-import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
-import { unEvenementEngagementDto } from '../../fixtures/sql-models/evenement-engagement.sql-model'
-import { Evenement } from '../../../src/domain/evenement'
 import { Authentification } from '../../../src/domain/authentification'
-import { ConseillerAuthorizer } from '../../../src/application/authorizers/authorize-conseiller'
+import { Evenement } from '../../../src/domain/evenement'
+import { ActionSqlModel } from '../../../src/infrastructure/sequelize/models/action.sql-model'
+import { ConseillerSqlModel } from '../../../src/infrastructure/sequelize/models/conseiller.sql-model'
+import { EvenementEngagementHebdoSqlModel } from '../../../src/infrastructure/sequelize/models/evenement-engagement-hebdo.sql-model'
+import { JeuneSqlModel } from '../../../src/infrastructure/sequelize/models/jeune.sql-model'
+import { RendezVousJeuneAssociationSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous-jeune-association.sql-model'
+import { RendezVousSqlModel } from '../../../src/infrastructure/sequelize/models/rendez-vous.sql-model'
+import { DateService } from '../../../src/utils/date-service'
+import { uneActionDto } from '../../fixtures/sql-models/action.sql-model'
+import { unConseillerDto } from '../../fixtures/sql-models/conseiller.sql-model'
+import { unEvenementEngagementDto } from '../../fixtures/sql-models/evenement-engagement.sql-model'
+import { unJeuneDto } from '../../fixtures/sql-models/jeune.sql-model'
+import { unRendezVousDto } from '../../fixtures/sql-models/rendez-vous.sql-model'
+import { expect, StubbedClass, stubClass } from '../../utils'
 import { getDatabase } from '../../utils/database-for-testing'
 import Statut = Action.Statut
-import { EvenementEngagementHebdoSqlModel } from '../../../src/infrastructure/sequelize/models/evenement-engagement-hebdo.sql-model'
 
 describe('GetIndicateursPourConseillerQueryHandler', () => {
   let getIndicateursPourConseillerQueryHandler: GetIndicateursPourConseillerQueryHandler
-  let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
   let dateService: StubbedClass<DateService>
   const idConseiller = 'id-conseiller'
   const idJeune = 'id-jeune'
 
   before(async () => {
     dateService = stubClass(DateService)
+    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
     getIndicateursPourConseillerQueryHandler =
       new GetIndicateursPourConseillerQueryHandler(
         dateService,
-        conseillerAuthorizer
+        conseillerAgenceAuthorizer
       )
   })
 
@@ -478,6 +482,34 @@ describe('GetIndicateursPourConseillerQueryHandler', () => {
         expect(
           isSuccess(response) && response.data.favoris.recherchesSauvegardees
         ).to.deep.equal(1)
+      })
+    })
+  })
+  describe('authorize', () => {
+    describe("quand c'est un conseiller", () => {
+      it('valide le conseiller', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          structure: Core.Structure.MILO
+        })
+
+        const query: GetIndicateursPourConseillerQuery = {
+          idJeune: 'id-jeune',
+          idConseiller: 'id-conseiller',
+          dateDebut: uneDate(),
+          dateFin: uneDate()
+        }
+
+        // When
+        await getIndicateursPourConseillerQueryHandler.authorize(
+          query,
+          utilisateur
+        )
+
+        // Then
+        expect(
+          conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence
+        ).to.have.been.calledWithExactly('id-jeune', utilisateur)
       })
     })
   })

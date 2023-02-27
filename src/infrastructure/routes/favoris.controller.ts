@@ -41,7 +41,7 @@ import { GetFavorisJeuneQueryHandler } from '../../application/queries/favoris/g
 import { GetFavorisOffresEmploiJeuneQueryHandler } from '../../application/queries/get-favoris-offres-emploi-jeune.query.handler.db'
 import { GetFavorisOffresImmersionJeuneQueryHandler } from '../../application/queries/get-favoris-offres-immersion-jeune.query.handler.db'
 import { GetFavorisServiceCiviqueJeuneQueryHandler } from '../../application/queries/get-favoris-service-civique-jeune.query.handler.db'
-import { GetMetadonneesFavorisJeuneQueryHandler } from '../../application/queries/get-metadonnees-favoris-jeune.query.handler.db'
+import { GetMetadonneesFavorisJeuneQueryHandler } from '../../application/queries/favoris/get-metadonnees-favoris-jeune.query.handler.db'
 import {
   FavorisQueryModel,
   MetadonneesFavorisQueryModel

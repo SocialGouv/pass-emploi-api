@@ -214,7 +214,7 @@ describe('CreateActionCommandHandler', () => {
         await createActionCommandHandler.authorize(command, utilisateur)
 
         // Then
-        expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+        expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
           action.idJeune,
           utilisateur
         )
