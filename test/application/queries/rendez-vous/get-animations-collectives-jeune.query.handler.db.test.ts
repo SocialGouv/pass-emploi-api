@@ -53,7 +53,7 @@ describe('GetAnimationsCollectivesJeuneQueryHandler', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
         query.idJeune,
         utilisateur
       )

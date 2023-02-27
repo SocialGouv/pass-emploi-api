@@ -4,7 +4,7 @@ import { GetCampagneQueryModel } from './query-getters/get-campagne.query.getter
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
 import { Authentification } from '../../domain/authentification'
-import { GetActionsByJeuneQueryHandler } from './action/get-actions-par-id-jeune.query.handler.db'
+import { GetActionsJeuneQueryHandler } from './action/get-actions-jeune.query.handler.db'
 import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
 import { isSuccess, Result } from '../../building-blocks/types/result'
 
@@ -18,7 +18,7 @@ export class GetJeuneHomeActionsQueryHandler extends QueryHandler<
   JeuneHomeActionQueryModel
 > {
   constructor(
-    private getActionsByJeuneQueryHandler: GetActionsByJeuneQueryHandler,
+    private getActionsByJeuneQueryHandler: GetActionsJeuneQueryHandler,
     private getCampagneQueryModel: GetCampagneQueryModel,
     private jeuneAuthorizer: JeuneAuthorizer
   ) {
@@ -45,7 +45,7 @@ export class GetJeuneHomeActionsQueryHandler extends QueryHandler<
     query: GetJeuneHomeActionsQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

@@ -1,24 +1,24 @@
 import { Injectable } from '@nestjs/common'
-import { JeuneHomeSuiviQueryModel } from './query-models/home-jeune-suivi.query-model'
-import { Result, success } from '../../building-blocks/types/result'
+import { ConfigService } from '@nestjs/config'
+import { DateTime } from 'luxon'
+import { Op } from 'sequelize'
 import { Query } from '../../building-blocks/types/query'
 import { QueryHandler } from '../../building-blocks/types/query-handler'
-import { Authentification } from '../../domain/authentification'
-import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
-import { fromSqlToActionQueryModel } from '../../infrastructure/repositories/mappers/actions.mappers'
-import { Op } from 'sequelize'
-import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
-import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
-import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
-import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
-import { DateTime } from 'luxon'
-import { ActionQueryModel } from './query-models/actions.query-model'
-import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
-import { Action } from '../../domain/action/action'
-import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
-import { ConseillerForJeuneAuthorizer } from '../authorizers/authorize-conseiller-for-jeune'
+import { Result, success } from '../../building-blocks/types/result'
 import { generateSourceRendezVousCondition } from '../../config/feature-flipping'
-import { ConfigService } from '@nestjs/config'
+import { Action } from '../../domain/action/action'
+import { Authentification } from '../../domain/authentification'
+import { fromSqlToActionQueryModel } from '../../infrastructure/repositories/mappers/actions.mappers'
+import { ActionSqlModel } from '../../infrastructure/sequelize/models/action.sql-model'
+import { ConseillerSqlModel } from '../../infrastructure/sequelize/models/conseiller.sql-model'
+import { JeuneSqlModel } from '../../infrastructure/sequelize/models/jeune.sql-model'
+import { RendezVousSqlModel } from '../../infrastructure/sequelize/models/rendez-vous.sql-model'
+import { ConseillerAgenceAuthorizer } from '../authorizers/authorize-conseiller-agence'
+import { JeuneAuthorizer } from '../authorizers/authorize-jeune'
+import { fromSqlToRendezVousJeuneQueryModel } from './query-mappers/rendez-vous-milo.mappers'
+import { ActionQueryModel } from './query-models/actions.query-model'
+import { JeuneHomeSuiviQueryModel } from './query-models/home-jeune-suivi.query-model'
+import { RendezVousJeuneQueryModel } from './query-models/rendez-vous.query-model'
 
 export interface GetJeuneHomeAgendaQuery extends Query {
   idJeune: string
@@ -32,7 +32,7 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
 > {
   constructor(
     private jeuneAuthorizer: JeuneAuthorizer,
-    private conseillerForJeuneAuthorizer: ConseillerForJeuneAuthorizer,
+    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer,
     private configuration: ConfigService
   ) {
     super('GetJeuneHomeAgendaQueryHandler')
@@ -72,12 +72,12 @@ export class GetJeuneHomeAgendaQueryHandler extends QueryHandler<
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
     if (utilisateur.type === Authentification.Type.CONSEILLER) {
-      return this.conseillerForJeuneAuthorizer.authorize(
+      return this.conseillerAgenceAuthorizer.authorizeConseillerDuJeuneOuSonAgence(
         query.idJeune,
         utilisateur
       )
     }
-    return this.jeuneAuthorizer.authorize(query.idJeune, utilisateur)
+    return this.jeuneAuthorizer.authorizeJeune(query.idJeune, utilisateur)
   }
 
   async monitor(): Promise<void> {

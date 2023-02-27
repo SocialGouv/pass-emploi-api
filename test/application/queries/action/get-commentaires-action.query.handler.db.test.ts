@@ -1,7 +1,10 @@
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import { GetCommentairesActionQueryHandler } from '../../../../src/application/queries/action/get-commentaires-action.query.handler.db'
 import { ActionAuthorizer } from '../../../../src/application/authorizers/authorize-action'
-import { unUtilisateurDecode } from '../../../fixtures/authentification.fixture'
+import {
+  unUtilisateurConseiller,
+  unUtilisateurJeune
+} from '../../../fixtures/authentification.fixture'
 import { ActionSqlRepository } from '../../../../src/infrastructure/repositories/action/action-sql.repository.db'
 import { DateService } from '../../../../src/utils/date-service'
 import { ConseillerSqlRepository } from '../../../../src/infrastructure/repositories/conseiller-sql.repository.db'
@@ -20,6 +23,9 @@ import {
   DatabaseForTesting,
   getDatabase
 } from '../../../utils/database-for-testing'
+import { ConseillerAgenceAuthorizer } from '../../../../src/application/authorizers/authorize-conseiller-agence'
+import { Core } from '../../../../src/domain/core'
+import { GetDetailActionQuery } from '../../../../src/application/queries/action/get-detail-action.query.handler.db'
 
 describe('GetCommentairesActionQueryHandler', () => {
   let databaseForTesting: DatabaseForTesting
@@ -29,31 +35,57 @@ describe('GetCommentairesActionQueryHandler', () => {
 
   let getCommentairesActionQueryHandler: GetCommentairesActionQueryHandler
   let actionAuthorizer: StubbedClass<ActionAuthorizer>
+  let conseillerAgenceAuthorizer: StubbedClass<ConseillerAgenceAuthorizer>
 
   beforeEach(async () => {
     await databaseForTesting.cleanPG()
     actionAuthorizer = stubClass(ActionAuthorizer)
+    conseillerAgenceAuthorizer = stubClass(ConseillerAgenceAuthorizer)
     getCommentairesActionQueryHandler = new GetCommentairesActionQueryHandler(
-      actionAuthorizer
+      actionAuthorizer,
+      conseillerAgenceAuthorizer
     )
   })
 
   describe('authorize', () => {
-    it("authorize l'accès à une action", () => {
-      // Given
-      const utilisateur = unUtilisateurDecode()
+    describe('quand c’est un conseiller', () => {
+      it('valide le conseiller', async () => {
+        // Given
+        const utilisateur = unUtilisateurConseiller({
+          structure: Core.Structure.MILO
+        })
 
-      // When
-      getCommentairesActionQueryHandler.authorize(
-        { idAction: '721e2108-60f5-4a75-b102-04fe6a40e899' },
-        utilisateur
-      )
+        const query: GetDetailActionQuery = {
+          idAction: 'id-action'
+        }
 
-      // Then
-      expect(actionAuthorizer.authorize).to.have.been.calledWithExactly(
-        '721e2108-60f5-4a75-b102-04fe6a40e899',
-        utilisateur
-      )
+        // When
+        await getCommentairesActionQueryHandler.authorize(query, utilisateur)
+
+        // Then
+        expect(
+          conseillerAgenceAuthorizer.authorizeConseillerDeLActionDuJeuneOuSonAgence
+        ).to.have.been.calledWithExactly('id-action', utilisateur)
+      })
+    })
+    describe('quand c’est un jeune', () => {
+      it('valide le jeune', async () => {
+        // Given
+        const utilisateur = unUtilisateurJeune()
+
+        const query: GetDetailActionQuery = {
+          idAction: 'id-action'
+        }
+
+        // When
+        await getCommentairesActionQueryHandler.authorize(query, utilisateur)
+
+        // Then
+        expect(actionAuthorizer.authorize).to.have.been.calledWithExactly(
+          'id-action',
+          utilisateur
+        )
+      })
     })
   })
 
