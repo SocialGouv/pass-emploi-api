@@ -43,7 +43,7 @@ describe('UpdateJeunePreferencesCommandHandler', () => {
       await updateJeunePreferencesCommandHandler.authorize(command, utilisateur)
 
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
         'idDeJohn',
         utilisateur
       )

@@ -7,7 +7,7 @@ import { Result, success } from '../../../building-blocks/types/result'
 import { Authentification } from '../../../domain/authentification'
 import { JeuneSqlModel } from '../../../infrastructure/sequelize/models/jeune.sql-model'
 import { RendezVousSqlModel } from '../../../infrastructure/sequelize/models/rendez-vous.sql-model'
-import { ConseillerEtablissementAuthorizer } from '../../authorizers/authorize-conseiller-etablissement'
+import { ConseillerAgenceAuthorizer } from '../../authorizers/authorize-conseiller-agence'
 import { fromSqlToAnimationCollectiveQueryModel } from '../query-mappers/rendez-vous-milo.mappers'
 import { AnimationCollectiveQueryModel } from '../query-models/rendez-vous.query-model'
 import { DateService } from '../../../utils/date-service'
@@ -27,7 +27,7 @@ export class GetAnimationsCollectivesQueryHandler extends QueryHandler<
   Result<AnimationCollectiveQueryModel[]>
 > {
   constructor(
-    private conseillerAgenceAuthorizer: ConseillerEtablissementAuthorizer,
+    private conseillerAgenceAuthorizer: ConseillerAgenceAuthorizer,
     private dateService: DateService
   ) {
     super('GetAnimationsCollectivesQueryHandler')
@@ -64,7 +64,7 @@ export class GetAnimationsCollectivesQueryHandler extends QueryHandler<
     query: GetAnimationsCollectivesQuery,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAgenceAuthorizer.authorize(
+    return this.conseillerAgenceAuthorizer.authorizeConseillerDeLAgence(
       query.idEtablissement,
       utilisateur
     )

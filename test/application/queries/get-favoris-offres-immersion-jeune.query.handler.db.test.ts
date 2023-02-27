@@ -89,7 +89,7 @@ describe('GetFavorisOffresImmersionJeuneQueryHandler', () => {
       )
 
       // Then
-      expect(jeuneAuthorizer.authorize).to.have.been.calledWithExactly(
+      expect(jeuneAuthorizer.authorizeJeune).to.have.been.calledWithExactly(
         idJeune,
         unUtilisateurJeune()
       )
