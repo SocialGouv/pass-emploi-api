@@ -456,7 +456,7 @@ describe('GetDetailRendezVousQueryHandler', () => {
 
       // Then
       expect(
-        conseillerAgenceAuthorizer.authorizeConseillerMILOAvecUnJeuneDansLeRendezVous
+        conseillerAgenceAuthorizer.authorizeConseillerAvecUnJeuneDeLAgenceMILODansLeRendezVous
       ).to.have.been.calledWithExactly('idRdv', utilisateur)
     })
   })

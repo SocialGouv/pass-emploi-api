@@ -78,7 +78,7 @@ export class GetDetailRendezVousQueryHandler extends QueryHandler<
         utilisateur.structure
       )
     ) {
-      return this.conseillerAgenceAuthorizer.authorizeConseillerMILOAvecUnJeuneDansLeRendezVous(
+      return this.conseillerAgenceAuthorizer.authorizeConseillerAvecUnJeuneDeLAgenceMILODansLeRendezVous(
         query.idRendezVous,
         utilisateur
       )

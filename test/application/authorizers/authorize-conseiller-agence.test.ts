@@ -39,7 +39,7 @@ describe('ConseillerAgenceAuthorizer', () => {
     )
   })
 
-  describe('.authorizeConseillerDeLAgence', () => {
+  describe('authorizeConseillerDeLAgence', () => {
     describe('quand le conseiller est sur le bonne agence', () => {
       it('retourne un success', async () => {
         // Given
@@ -88,7 +88,7 @@ describe('ConseillerAgenceAuthorizer', () => {
     })
   })
 
-  describe('.authorizeConseillerDuJeuneOuSonAgence', () => {
+  describe('authorizeConseillerDuJeuneOuSonAgence', () => {
     describe('quand aucun conseiller n’a renseigné son agence', () => {
       it('retourne une failure', async () => {
         // Given
@@ -244,46 +244,14 @@ describe('ConseillerAgenceAuthorizer', () => {
     })
   })
 
-  describe('.authorizeConseillerMILOAvecUnJeuneDansLeRendezVous', () => {
-    describe('quand le conseiller utilisateur est dans la même agence que le rendez-vous', () => {
-      it('valide le conseiller', async () => {
-        // Given
-        const conseillerUtilisateur = unConseiller({
-          id: '1',
-          agence: { id: 'id-etablissement' }
-        })
-        conseillerRepository.get
-          .withArgs(conseillerUtilisateur.id)
-          .resolves(conseillerUtilisateur)
-
-        const utilisateur = unUtilisateurConseiller({
-          id: conseillerUtilisateur.id
-        })
-
-        const rendezVous = unRendezVous({
-          jeunes: [],
-          idAgence: conseillerUtilisateur.agence!.id
-        })
-        rendezVousRepository.get.withArgs(rendezVous.id).resolves(rendezVous)
-
-        // When
-        const result =
-          await conseillerAgenceAuthorizer.authorizeConseillerMILOAvecUnJeuneDansLeRendezVous(
-            rendezVous.id,
-            utilisateur
-          )
-
-        // Then
-        expect(result).to.deep.equal(emptySuccess())
-      })
-    })
-    describe('quand le conseiller utilisateur n’est pas conseiller d’un jeune et n’est pas dans la même agence que les conseillers des jeunes du rendez-vous', () => {
+  describe('authorizeSiRendezVousAvecUnJeuneDuMemeEtablissement', () => {
+    describe('quand le conseiller utilisateur n’est dans la même agence qu’aucun des conseillers des jeunes du rendez-vous', () => {
       it('retourne une failure', async () => {
         // Given
         const conseillerUtilisateur = unConseiller({
-          id: 'id-conseiller-pas-dans-le-rdv',
+          id: '1',
           agence: {
-            id: 'id-agence-pas-dans-les-jeunes-du-rdv'
+            id: 'id-etablissement-1'
           }
         })
         conseillerRepository.get
@@ -312,7 +280,7 @@ describe('ConseillerAgenceAuthorizer', () => {
 
         // When
         const result =
-          await conseillerAgenceAuthorizer.authorizeConseillerMILOAvecUnJeuneDansLeRendezVous(
+          await conseillerAgenceAuthorizer.authorizeConseillerAvecUnJeuneDeLAgenceMILODansLeRendezVous(
             rendezVous.id,
             utilisateur
           )
@@ -321,47 +289,13 @@ describe('ConseillerAgenceAuthorizer', () => {
         expect(result).to.deep.equal(failure(new DroitsInsuffisants()))
       })
     })
-    describe('quand le conseiller utilisateur est conseiller d’un des jeunes du rendez-vous', () => {
-      it('valide le conseiller', async () => {
-        // Given
-        const conseillerUtilisateur = unConseiller({
-          id: '1'
-        })
-        conseillerRepository.get
-          .withArgs(conseillerUtilisateur.id)
-          .resolves(conseillerUtilisateur)
-
-        const utilisateur = unUtilisateurConseiller({
-          id: conseillerUtilisateur.id
-        })
-
-        const rendezVous = unRendezVous({
-          jeunes: [
-            unJeuneDuRendezVous({
-              conseiller: conseillerUtilisateur
-            })
-          ]
-        })
-        rendezVousRepository.get.withArgs(rendezVous.id).resolves(rendezVous)
-
-        // When
-        const result =
-          await conseillerAgenceAuthorizer.authorizeConseillerMILOAvecUnJeuneDansLeRendezVous(
-            rendezVous.id,
-            utilisateur
-          )
-
-        // Then
-        expect(result).to.deep.equal(emptySuccess())
-      })
-    })
     describe('quand le conseiller utilisateur partage la même agence avec au moins un des conseillers des jeunes du rendez-vous', () => {
       it('valide le conseiller', async () => {
         // Given
         const conseillerUtilisateur = unConseiller({
-          id: 'id-conseiller-pas-dans-le-rdv',
+          id: '1',
           agence: {
-            id: 'id-agence-dans-le-rdv'
+            id: 'id-etablissement-1'
           }
         })
         conseillerRepository.get
@@ -376,17 +310,21 @@ describe('ConseillerAgenceAuthorizer', () => {
           jeunes: [
             unJeuneDuRendezVous({
               conseiller: unConseillerDuJeune({
-                idAgence: 'id-agence-dans-le-rdv'
+                idAgence: 'id-etablissement-2'
               })
             }),
-            unJeuneDuRendezVous()
+            unJeuneDuRendezVous({
+              conseiller: unConseillerDuJeune({
+                idAgence: 'id-etablissement-1'
+              })
+            })
           ]
         })
         rendezVousRepository.get.withArgs(rendezVous.id).resolves(rendezVous)
 
         // When
         const result =
-          await conseillerAgenceAuthorizer.authorizeConseillerMILOAvecUnJeuneDansLeRendezVous(
+          await conseillerAgenceAuthorizer.authorizeConseillerAvecUnJeuneDeLAgenceMILODansLeRendezVous(
             rendezVous.id,
             utilisateur
           )
