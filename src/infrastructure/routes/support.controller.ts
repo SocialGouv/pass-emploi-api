@@ -30,8 +30,10 @@ import { handleFailure } from './failure.handler'
 import {
   ChangerAgenceConseillerPayload,
   RefreshJDDPayload,
-  TeleverserCsvPayload
-} from './validation/support.input'
+  TeleverserCsvPayload,
+  TransfererJeunesPayload
+} from './validation/support.inputs'
+import { TransfererJeunesConseillerCommandHandler } from '../../application/commands/transferer-jeunes-conseiller.command.handler'
 
 @ApiOAuth2([])
 @Controller('support')
@@ -41,7 +43,8 @@ export class SupportController {
     private refreshJddCommandHandler: RefreshJddCommandHandler,
     private mettreAJourLesJeunesCejPeCommandHandler: MettreAJourLesJeunesCejPeCommandHandler,
     private updateAgenceCommandHandler: UpdateAgenceConseillerCommandHandler,
-    private archiverJeuneSupportCommandHandler: ArchiverJeuneSupportCommandHandler
+    private archiverJeuneSupportCommandHandler: ArchiverJeuneSupportCommandHandler,
+    private transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler
   ) {}
 
   @Post('jdd')
@@ -120,6 +123,30 @@ export class SupportController {
     const result = await this.archiverJeuneSupportCommandHandler.execute(
       {
         idJeune
+      },
+      utilisateur
+    )
+    handleFailure(result)
+  }
+
+  @ApiOperation({
+    summary: 'Transférer les jeunes renseignés d’un conseiller à un autre.',
+    description: 'Autorisé pour le support.'
+  })
+  @Post('transferer-jeunes')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async transfererJeunesSupport(
+    @Body() payload: TransfererJeunesPayload,
+    @Utilisateur() utilisateur: Authentification.Utilisateur
+  ): Promise<void> {
+    const result = await this.transfererJeunesConseillerCommandHandler.execute(
+      {
+        idConseillerSource: payload.idConseillerSource,
+        idConseillerCible: payload.idConseillerCible,
+        idsJeunes: payload.idsJeunes,
+        estTemporaire: false,
+        structure: undefined,
+        provenanceUtilisateur: Authentification.Type.SUPPORT
       },
       utilisateur
     )

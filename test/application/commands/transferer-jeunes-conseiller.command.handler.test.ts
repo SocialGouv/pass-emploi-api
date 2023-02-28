@@ -22,6 +22,9 @@ import {
 import { Conseiller } from '../../../src/domain/conseiller/conseiller'
 import { unConseiller } from '../../fixtures/conseiller.fixture'
 import { createSandbox, expect, StubbedClass, stubClass } from '../../utils'
+import { SupportAuthorizer } from '../../../src/application/authorizers/authorize-support'
+import { Authentification } from '../../../src/domain/authentification'
+import Structure = Core.Structure
 
 describe('TransfererJeunesConseillerCommandHandler', () => {
   let transfererJeunesConseillerCommandHandler: TransfererJeunesConseillerCommandHandler
@@ -60,10 +63,12 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
   let chatRepository: StubbedType<Chat.Repository>
   let listesDeDiffusionService: StubbedClass<Conseiller.ListeDeDiffusion.Service>
   let conseillerAuthorizer: StubbedClass<ConseillerAuthorizer>
+  let supportAuthorizer: StubbedClass<SupportAuthorizer>
   let animationCollectiveService: StubbedClass<RendezVous.AnimationCollective.Service>
+  let sandbox: SinonSandbox
 
   beforeEach(async () => {
-    const sandbox: SinonSandbox = createSandbox()
+    sandbox = createSandbox()
     jeuneRepository = stubInterface(sandbox)
     conseillerRepository = stubInterface(sandbox)
     conseillerRepository.get
@@ -76,6 +81,7 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
     chatRepository = stubInterface(sandbox)
     listesDeDiffusionService = stubClass(Conseiller.ListeDeDiffusion.Service)
     conseillerAuthorizer = stubClass(ConseillerAuthorizer)
+    supportAuthorizer = stubClass(SupportAuthorizer)
     animationCollectiveService = stubClass(
       RendezVous.AnimationCollective.Service
     )
@@ -86,8 +92,13 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
         listesDeDiffusionService,
         chatRepository,
         animationCollectiveService,
-        conseillerAuthorizer
+        conseillerAuthorizer,
+        supportAuthorizer
       )
+  })
+
+  afterEach(() => {
+    sandbox.restore()
   })
 
   describe('handle', () => {
@@ -96,16 +107,22 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
       idConseillerCible: conseillerCible.id,
       estTemporaire: false,
       idsJeunes: ['1', '2'],
-      structure: Core.Structure.PASS_EMPLOI
+      structure: Core.Structure.POLE_EMPLOI,
+      provenanceUtilisateur: Authentification.Type.CONSEILLER
     }
 
-    describe('quand les conseillers et les jeunes correspondent au superviseur', () => {
+    describe('succès', () => {
       describe('quand le transfert est permanent', () => {
         let result: Result
         let jeune1ApresTransfert: Jeune
         let jeune2ApresTransfert: Jeune
         beforeEach(async () => {
           // Given
+          conseillerRepository.get
+            .onFirstCall()
+            .resolves(conseillerSource)
+            .onSecondCall()
+            .resolves(conseillerCible)
           const jeune1 = unJeune({
             id: command.idsJeunes[0],
             conseiller: conseillerSourceDuJeune,
@@ -174,8 +191,17 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
           idConseillerCible: conseillerCible.id,
           estTemporaire: true,
           idsJeunes: ['1'],
-          structure: Core.Structure.PASS_EMPLOI
+          structure: Core.Structure.POLE_EMPLOI,
+          provenanceUtilisateur: Authentification.Type.CONSEILLER
         }
+
+        beforeEach(async () => {
+          conseillerRepository.get
+            .onFirstCall()
+            .resolves(conseillerSource)
+            .onSecondCall()
+            .resolves(conseillerCible)
+        })
 
         describe("quand le jeune n'était pas en transfert temporaire", () => {
           it('sauvegarde les transferts et le jeune son nouveau conseiller avec le conseiller initial', async () => {
@@ -305,6 +331,10 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             }
           })
           conseillerRepository.get
+            .withArgs(conseillerSource.id)
+            .resolves(conseillerSource)
+
+          conseillerRepository.get
             .withArgs(conseillerCibleDeNantes.id)
             .resolves(conseillerCibleDeNantes)
 
@@ -313,7 +343,8 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
             idConseillerCible: conseillerCibleDeNantes.id,
             estTemporaire: false,
             idsJeunes: ['1'],
-            structure: Core.Structure.PASS_EMPLOI
+            structure: Core.Structure.POLE_EMPLOI,
+            provenanceUtilisateur: Authentification.Type.CONSEILLER
           }
 
           const jeuneQuiVientANantes = unJeune({
@@ -338,60 +369,155 @@ describe('TransfererJeunesConseillerCommandHandler', () => {
         })
       })
     })
-    describe("quand le conseiller source n'existe pas", () => {
-      it('retourne une failure', async () => {
-        // Given
-        conseillerRepository.get
-          .withArgs(command.idConseillerSource)
-          .resolves(undefined)
+    describe('échecs', () => {
+      describe('en tant que superviseur', () => {
+        describe('quand ma structure est différente de celles des conseillers source et cible', () => {
+          it('retourne une MauvaiseCommandeError', async () => {
+            // Given
+            const conseillerSource = unConseiller({
+              structure: Structure.MILO
+            })
+            const conseillerCible = unConseiller({ structure: Structure.MILO })
 
-        // When
-        const result = await transfererJeunesConseillerCommandHandler.handle(
-          command
-        )
+            const command: TransfererJeunesConseillerCommand = {
+              idConseillerSource: conseillerSource.id,
+              idConseillerCible: conseillerCible.id,
+              estTemporaire: false,
+              idsJeunes: ['1', '2'],
+              structure: Core.Structure.POLE_EMPLOI,
+              provenanceUtilisateur: Authentification.Type.CONSEILLER
+            }
 
-        // Then
-        expect(result).to.deep.equal(
-          failure(new NonTrouveError('Conseiller', command.idConseillerSource))
-        )
+            conseillerRepository.get
+              .onFirstCall()
+              .resolves(conseillerSource)
+              .onSecondCall()
+              .resolves(conseillerCible)
+
+            jeuneRepository.findAllJeunesByConseiller.resolves([
+              unJeune(),
+              unJeune()
+            ])
+
+            // When
+            const result =
+              await transfererJeunesConseillerCommandHandler.handle(command)
+
+            // Then
+            expect(!result._isSuccess && result.error).to.deep.equal(
+              new MauvaiseCommandeError(
+                'Les informations de structure ne correspondent pas'
+              )
+            )
+          })
+        })
       })
-    })
-    describe("quand le conseiller cible n'existe pas", () => {
-      it('retourne une failure', async () => {
-        // Given
-        conseillerRepository.get
-          .withArgs(command.idConseillerCible)
-          .resolves(undefined)
+      describe('en tant que support', () => {
+        describe('quand la structure des conseillers source et cible est différente', () => {
+          it('retourne une MauvaiseCommandeError', async () => {
+            const conseillerSource = unConseiller({
+              id: '1',
+              structure: Structure.PASS_EMPLOI
+            })
+            const conseillerCible = unConseiller({
+              id: '2',
+              structure: Structure.MILO
+            })
 
-        // When
-        const result = await transfererJeunesConseillerCommandHandler.handle(
-          command
-        )
+            // Given
+            const command: TransfererJeunesConseillerCommand = {
+              idConseillerSource: conseillerSource.id,
+              idConseillerCible: conseillerCible.id,
+              estTemporaire: false,
+              idsJeunes: ['1', '2'],
+              structure: Core.Structure.PASS_EMPLOI,
+              provenanceUtilisateur: Authentification.Type.SUPPORT
+            }
 
-        // Then
-        expect(result).to.deep.equal(
-          failure(new NonTrouveError('Conseiller', command.idConseillerCible))
-        )
+            conseillerRepository.get
+              .onFirstCall()
+              .resolves(conseillerSource)
+              .onSecondCall()
+              .resolves(conseillerCible)
+
+            jeuneRepository.findAllJeunesByConseiller.resolves([
+              unJeune(),
+              unJeune()
+            ])
+
+            // When
+            const result =
+              await transfererJeunesConseillerCommandHandler.handle(command)
+
+            // Then
+            expect(!result._isSuccess && result.error).to.deep.equal(
+              new MauvaiseCommandeError(
+                'Les informations de structure ne correspondent pas'
+              )
+            )
+          })
+        })
       })
-    })
-    describe("quand un des jeunes n'existe pas ou n'est pas suivi par le conseiller source", () => {
-      it('retourne une failure', async () => {
-        // Given
-        jeuneRepository.findAllJeunesByConseiller
-          .withArgs(command.idsJeunes, command.idConseillerSource)
-          .resolves([unJeune()])
+      describe('commun', () => {
+        describe("quand le conseiller source n'existe pas", () => {
+          it('retourne une failure', async () => {
+            // Given
+            conseillerRepository.get
+              .withArgs(command.idConseillerSource)
+              .resolves(undefined)
 
-        // When
-        const result = await transfererJeunesConseillerCommandHandler.handle(
-          command
-        )
+            // When
+            const result =
+              await transfererJeunesConseillerCommandHandler.handle(command)
 
-        // Then
-        expect(result).to.deep.equal(
-          failure(
-            new MauvaiseCommandeError('Liste des jeunes à transférer invalide')
-          )
-        )
+            // Then
+            expect(result).to.deep.equal(
+              failure(
+                new NonTrouveError('Conseiller', command.idConseillerSource)
+              )
+            )
+          })
+        })
+        describe("quand le conseiller cible n'existe pas", () => {
+          it('retourne une failure', async () => {
+            // Given
+            conseillerRepository.get
+              .withArgs(command.idConseillerCible)
+              .resolves(undefined)
+
+            // When
+            const result =
+              await transfererJeunesConseillerCommandHandler.handle(command)
+
+            // Then
+            expect(result).to.deep.equal(
+              failure(
+                new NonTrouveError('Conseiller', command.idConseillerCible)
+              )
+            )
+          })
+        })
+        describe("quand un des jeunes n'existe pas ou n'est pas suivi par le conseiller source", () => {
+          it('retourne une failure', async () => {
+            // Given
+            jeuneRepository.findAllJeunesByConseiller
+              .withArgs(command.idsJeunes, command.idConseillerSource)
+              .resolves([unJeune()])
+
+            // When
+            const result =
+              await transfererJeunesConseillerCommandHandler.handle(command)
+
+            // Then
+            expect(result).to.deep.equal(
+              failure(
+                new MauvaiseCommandeError(
+                  'Liste des jeunes à transférer invalide'
+                )
+              )
+            )
+          })
+        })
       })
     })
   })

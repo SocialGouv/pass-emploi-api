@@ -505,7 +505,8 @@ export class JeunesController {
       idConseillerCible: transfererConseillerPayload.idConseillerCible,
       idsJeunes: transfererConseillerPayload.idsJeune,
       estTemporaire: Boolean(transfererConseillerPayload.estTemporaire),
-      structure: utilisateur.structure
+      structure: utilisateur.structure,
+      provenanceUtilisateur: Authentification.Type.CONSEILLER
     }
     const result = await this.transfererJeunesConseillerCommandHandler.execute(
       command,
