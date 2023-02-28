@@ -20,13 +20,18 @@ import {
 import { ConseillerAuthorizer } from '../authorizers/authorize-conseiller'
 import { Chat, ChatRepositoryToken } from '../../domain/chat'
 import { RendezVous } from '../../domain/rendez-vous/rendez-vous'
+import { SupportAuthorizer } from '../authorizers/authorize-support'
 
 export interface TransfererJeunesConseillerCommand extends Command {
   idConseillerSource: string
   idConseillerCible: string
   idsJeunes: string[]
   estTemporaire: boolean
-  structure: Core.Structure
+  structure?: Core.Structure
+  provenanceUtilisateur: Extract<
+    Authentification.Type,
+    Authentification.Type.SUPPORT | Authentification.Type.CONSEILLER
+  >
 }
 
 @Injectable()
@@ -43,7 +48,8 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
     @Inject(ChatRepositoryToken)
     private chatRepository: Chat.Repository,
     private animationCollectiveService: RendezVous.AnimationCollective.Service,
-    private conseillerAuthorizer: ConseillerAuthorizer
+    private conseillerAuthorizer: ConseillerAuthorizer,
+    private supportAuthorizer: SupportAuthorizer
   ) {
     super('TransfererJeunesConseillerCommandHandler')
   }
@@ -72,6 +78,29 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
       return failure(
         new MauvaiseCommandeError('Liste des jeunes à transférer invalide')
       )
+    }
+
+    if (command.provenanceUtilisateur === Authentification.Type.CONSEILLER) {
+      if (
+        command.structure !== conseillerSource.structure ||
+        command.structure !== conseillerCible.structure
+      ) {
+        return failure(
+          new MauvaiseCommandeError(
+            'Les informations de structure ne correspondent pas'
+          )
+        )
+      }
+    } else if (
+      command.provenanceUtilisateur === Authentification.Type.SUPPORT
+    ) {
+      if (conseillerSource.structure !== conseillerCible.structure) {
+        return failure(
+          new MauvaiseCommandeError(
+            'Les informations de structure ne correspondent pas'
+          )
+        )
+      }
     }
 
     const updatedJeunes: Jeune[] = Jeune.changerDeConseiller(
@@ -114,10 +143,15 @@ export class TransfererJeunesConseillerCommandHandler extends CommandHandler<
   }
 
   async authorize(
-    _command: TransfererJeunesConseillerCommand,
+    command: TransfererJeunesConseillerCommand,
     utilisateur: Authentification.Utilisateur
   ): Promise<Result> {
-    return this.conseillerAuthorizer.authorizeSuperviseur(utilisateur)
+    switch (command.provenanceUtilisateur) {
+      case Authentification.Type.CONSEILLER:
+        return this.conseillerAuthorizer.authorizeSuperviseur(utilisateur)
+      case Authentification.Type.SUPPORT:
+        return this.supportAuthorizer.authorize(utilisateur)
+    }
   }
 
   async monitor(): Promise<void> {

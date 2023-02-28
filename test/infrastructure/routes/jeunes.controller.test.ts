@@ -78,6 +78,7 @@ import { getApplicationWithStubbedDependencies } from '../../utils/module-for-te
 import { DateService } from '../../../src/utils/date-service'
 import { Cached } from '../../../src/building-blocks/types/query'
 import { JeuneHomeDemarcheQueryModel } from '../../../src/application/queries/query-models/home-jeune.query-model'
+import { Authentification } from '../../../src/domain/authentification'
 
 describe('JeunesController', () => {
   let createActionCommandHandler: StubbedClass<CreateActionCommandHandler>
@@ -178,7 +179,8 @@ describe('JeunesController', () => {
           idConseillerCible: '2',
           idsJeunes: ['1'],
           estTemporaire: false,
-          structure: Core.Structure.MILO
+          structure: Core.Structure.MILO,
+          provenanceUtilisateur: Authentification.Type.CONSEILLER
         },
         unUtilisateurDecode()
       )
@@ -203,7 +205,8 @@ describe('JeunesController', () => {
           idConseillerCible: '2',
           idsJeunes: ['1'],
           estTemporaire: true,
-          structure: Core.Structure.MILO
+          structure: Core.Structure.MILO,
+          provenanceUtilisateur: Authentification.Type.CONSEILLER
         },
         unUtilisateurDecode()
       )

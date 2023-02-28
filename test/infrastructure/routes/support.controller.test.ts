@@ -15,10 +15,16 @@ import {
 import { expect, StubbedClass } from '../../utils'
 import { ensureUserAuthenticationFailsIfInvalid } from '../../utils/ensure-user-authentication-fails-if-invalid'
 import { getApplicationWithStubbedDependencies } from '../../utils/module-for-testing'
+import { Authentification } from '../../../src/domain/authentification'
+import {
+  TransfererJeunesConseillerCommand,
+  TransfererJeunesConseillerCommandHandler
+} from '../../../src/application/commands/transferer-jeunes-conseiller.command.handler'
 
 describe('SupportController', () => {
   let archiverJeuneSupportCommandHandler: StubbedClass<ArchiverJeuneSupportCommandHandler>
   let updateAgenceCommandHandler: StubbedClass<UpdateAgenceConseillerCommandHandler>
+  let transfererJeunesConseillerCommandHandler: StubbedClass<TransfererJeunesConseillerCommandHandler>
   let app: INestApplication
 
   before(async () => {
@@ -27,6 +33,9 @@ describe('SupportController', () => {
       ArchiverJeuneSupportCommandHandler
     )
     updateAgenceCommandHandler = app.get(UpdateAgenceConseillerCommandHandler)
+    transfererJeunesConseillerCommandHandler = app.get(
+      TransfererJeunesConseillerCommandHandler
+    )
   })
 
   describe('POST /support/archiver-jeune/:idJeune', () => {
@@ -133,5 +142,42 @@ describe('SupportController', () => {
       'POST',
       '/support/changer-agence-conseiller'
     )
+  })
+
+  describe('POST /support/transferer-jeunes', () => {
+    describe('quand tous les paramètres sont renseignés', () => {
+      it('retourne un succès', async () => {
+        // Given
+        const payload = {
+          idConseillerSource: 'id-conseiller-source',
+          idConseillerCible: 'id-conseiller-cible',
+          idsJeunes: ['1']
+        }
+
+        const command: TransfererJeunesConseillerCommand = {
+          ...payload,
+          estTemporaire: false,
+          structure: undefined,
+          provenanceUtilisateur: Authentification.Type.SUPPORT
+        }
+        transfererJeunesConseillerCommandHandler.execute
+          .withArgs(command)
+          .resolves(emptySuccess())
+
+        // When
+        await request(app.getHttpServer())
+          .post('/support/transferer-jeunes')
+          .set('authorization', unHeaderAuthorization())
+          .send(payload)
+          // Then
+          .expect(HttpStatus.NO_CONTENT)
+
+        expect(
+          transfererJeunesConseillerCommandHandler.execute
+        ).to.have.been.calledOnceWithExactly(command, unUtilisateurDecode())
+      })
+    })
+
+    ensureUserAuthenticationFailsIfInvalid('POST', '/support/transferer-jeunes')
   })
 })

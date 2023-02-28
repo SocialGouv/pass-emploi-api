@@ -13,7 +13,7 @@ import { Core } from '../../../../src/domain/core'
 import { Jeune } from '../../../../src/domain/jeune/jeune'
 import { Mail } from '../../../../src/domain/mail'
 import { DateService } from '../../../../src/utils/date-service'
-import { unUtilisateurConseiller } from '../../../fixtures/authentification.fixture'
+import { unUtilisateurSupport } from '../../../fixtures/authentification.fixture'
 import { unJeune } from '../../../fixtures/jeune.fixture'
 import { expect, StubbedClass, stubClass } from '../../../utils'
 import Structure = Core.Structure
@@ -60,12 +60,12 @@ describe('ArchiverJeuneSupportCommandHandler', () => {
       // When
       archiverJeuneSupportCommandHandler.authorize(
         command,
-        unUtilisateurConseiller()
+        unUtilisateurSupport()
       )
 
       // Then
       expect(authorizeSupport.authorize).to.have.been.calledWithExactly(
-        unUtilisateurConseiller()
+        unUtilisateurSupport()
       )
     })
   })
