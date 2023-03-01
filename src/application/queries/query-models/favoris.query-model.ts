@@ -16,6 +16,12 @@ export class FavorisQueryModel {
 
   @ApiProperty()
   localisation?: string
+
+  @ApiProperty({
+    type: String,
+    isArray: true
+  })
+  tags: string[]
 }
 
 class MetadonneesFavorisOffresJeuneQueryModel {
