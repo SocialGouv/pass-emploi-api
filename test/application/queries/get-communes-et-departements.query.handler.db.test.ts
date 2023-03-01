@@ -53,7 +53,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       })
     })
 
-    it('limite à 5 le nombre de résultats', async () => {
+    it('limite à 7 le nombre de résultats', async () => {
       //Given
       const departements = [
         unDepartementDto({
@@ -85,6 +85,16 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
           id: '6',
           code: '6',
           libelle: '1'
+        }),
+        unDepartementDto({
+          id: '7',
+          code: '7',
+          libelle: '1'
+        }),
+        unDepartementDto({
+          id: '8',
+          code: '8',
+          libelle: '1'
         })
       ]
       await DepartementSqlModel.bulkCreate(departements)
@@ -93,7 +103,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
         recherche: '1'
       })
       //Then
-      expect(result).to.have.lengthOf(5)
+      expect(result).to.have.lengthOf(7)
     })
 
     it('ne prend pas en compte la casse', async () => {
@@ -132,8 +142,8 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       })
     })
 
-    describe('quand il a y a plus de 5 résultats', async () => {
-      it('prend le top 5 par rapport au score de recherche', async () => {
+    describe('quand il a y a plus de 7 résultats', async () => {
+      it('prend les plus pertinents par rapport au score de recherche', async () => {
         //Given
         const departements = [
           unDepartementDto({
@@ -164,7 +174,17 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
           unDepartementDto({
             id: '6',
             code: '6',
-            libelle: 'a fg'
+            libelle: 'a fgg'
+          }),
+          unDepartementDto({
+            id: '7',
+            code: '7',
+            libelle: 'a faeg'
+          }),
+          unDepartementDto({
+            id: '8',
+            code: '8',
+            libelle: 'a faeg'
           })
         ]
         await DepartementSqlModel.bulkCreate(departements)
@@ -292,49 +312,6 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       })
     })
 
-    it('limite à 5 le nombre de résultats', async () => {
-      //Given
-      const communes = [
-        uneCommuneDto({
-          id: '1',
-          code: '1',
-          libelle: '1'
-        }),
-        uneCommuneDto({
-          id: '2',
-          code: '2',
-          libelle: '1'
-        }),
-        uneCommuneDto({
-          id: '3',
-          code: '3',
-          libelle: '1'
-        }),
-        uneCommuneDto({
-          id: '4',
-          code: '4',
-          libelle: '1'
-        }),
-        uneCommuneDto({
-          id: '5',
-          code: '5',
-          libelle: '1'
-        }),
-        uneCommuneDto({
-          id: '6',
-          code: '6',
-          libelle: '1'
-        })
-      ]
-      await CommuneSqlModel.bulkCreate(communes)
-      //When
-      const result = await getCommunesEtDepartementsQueryHandler.execute({
-        recherche: '1'
-      })
-      //Then
-      expect(result).to.have.lengthOf(5)
-    })
-
     it('ne prend pas en compte la casse', async () => {
       //Given
       const departements = [
@@ -371,59 +348,6 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
         score: 1,
         longitude: -1.677425,
         latitude: 48.110198
-      })
-    })
-
-    describe('quand il a y a plus de 5 résultats', async () => {
-      it('fait un tri sur le libelle les plus long', async () => {
-        //Given
-        const communes = [
-          uneCommuneDto({
-            id: '2',
-            code: '2',
-            libelle: 'a b'
-          }),
-          uneCommuneDto({
-            id: '3',
-            code: '3',
-            libelle: 'a c'
-          }),
-          uneCommuneDto({
-            id: '1',
-            code: '1',
-            libelle: 'a'
-          }),
-          uneCommuneDto({
-            id: '4',
-            code: '4',
-            libelle: 'a d'
-          }),
-          uneCommuneDto({
-            id: '5',
-            code: '5',
-            libelle: 'a e'
-          }),
-          uneCommuneDto({
-            id: '6',
-            code: '6',
-            libelle: 'a ef'
-          })
-        ]
-        await CommuneSqlModel.bulkCreate(communes)
-
-        //When
-        const result = await getCommunesEtDepartementsQueryHandler.execute({
-          recherche: 'a'
-        })
-        //Then
-        expect(result).to.have.lengthOf(5)
-        expect(result).to.not.contains.deep.members([
-          {
-            libelle: 'a',
-            code: '1',
-            type: 'COMMUNE'
-          }
-        ])
       })
     })
   })
@@ -473,7 +397,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       ])
     })
 
-    it('limite à 5 le nombre de résultats', async () => {
+    it('limite à 7 le nombre de résultats', async () => {
       //Given
       const communes = [
         uneCommuneDto({
@@ -546,7 +470,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
         recherche: '1'
       })
       //Then
-      expect(result).to.have.lengthOf(5)
+      expect(result).to.have.lengthOf(7)
     })
 
     it('ne prend pas en compte la casse', async () => {
@@ -564,7 +488,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
       expect(result).to.have.lengthOf(2)
     })
 
-    describe('quand il a y a plus que 5 résultats', async () => {
+    describe('quand il a y a plus que 7 résultats', async () => {
       it('fait un tri sur le libelle le plus proche', async () => {
         //Given
         const communes = [
@@ -582,6 +506,16 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
             id: '1',
             code: '1',
             libelle: 'a'
+          }),
+          uneCommuneDto({
+            id: '4',
+            code: '1',
+            libelle: 'adbbd'
+          }),
+          uneCommuneDto({
+            id: '5',
+            code: '1',
+            libelle: 'adddd'
           })
         ]
         await CommuneSqlModel.bulkCreate(communes)
@@ -614,7 +548,7 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
           recherche: 'a'
         })
         //Then
-        expect(result).to.have.lengthOf(5)
+        expect(result).to.have.lengthOf(7)
         expect(result).to.have.deep.members([
           {
             libelle: 'a',
@@ -654,6 +588,18 @@ describe('GetCommunesEtDepartementsQueryHandler', () => {
             code: '4',
             type: 'DEPARTEMENT',
             score: 0.5
+          },
+          {
+            code: '5',
+            libelle: 'a e',
+            score: 0.5,
+            type: 'DEPARTEMENT'
+          },
+          {
+            code: '6',
+            libelle: 'a ef',
+            score: 0.4,
+            type: 'DEPARTEMENT'
           }
         ])
       })

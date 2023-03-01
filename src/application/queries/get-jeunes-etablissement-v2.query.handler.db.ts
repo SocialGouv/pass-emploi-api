@@ -65,7 +65,7 @@ export class GetJeunesEtablissementV2QueryHandler extends QueryHandler<
       FROM "jeune"
       JOIN conseiller ON conseiller.id = jeune.id_conseiller
       LEFT JOIN situations_milo ON situations_milo.id_jeune = jeune.id
-      WHERE SIMILARITY(CONCAT(jeune.nom, ' ', jeune.prenom), ?) > 0 AND conseiller.id_agence = ?
+      WHERE SIMILARITY(CONCAT(jeune.nom, ' ', jeune.prenom), ?) > 0.1 AND conseiller.id_agence = ?
       GROUP BY jeune.id, conseiller.id, situations_milo.id
       ORDER BY "score" DESC
       OFFSET ?

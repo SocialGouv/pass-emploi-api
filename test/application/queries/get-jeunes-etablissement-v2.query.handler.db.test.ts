@@ -117,24 +117,24 @@ describe('GetJeuneEtablissementV2QueryHandler', () => {
 
       jeuneEtablissement1Dto = unJeuneDto({
         id: '1',
-        nom: 'Nom premier jeu',
-        prenom: 'Prenom premier jeu',
+        nom: 'Jean',
+        prenom: 'Dupont',
         idConseiller: '1',
         dateDerniereActualisationToken: uneDate()
       })
 
       jeuneEtablissement2Dto = unJeuneDto({
         id: '2',
-        nom: 'Jeune Nom deuxième',
-        prenom: 'Jeune Prenom deuxième',
+        nom: 'Jeanne',
+        prenom: 'Claude Van Damme',
         idConseiller: '1',
         dateDerniereActualisationToken: uneDate()
       })
 
       jeuneEtablissement3Dto = unJeuneDto({
         id: '3',
-        nom: 'Nom troisième jeune',
-        prenom: 'Prenom troisième jeune',
+        nom: 'Jean',
+        prenom: 'Dupont',
         idConseiller: '2',
         dateDerniereActualisationToken: uneDate()
       })
@@ -179,9 +179,9 @@ describe('GetJeuneEtablissementV2QueryHandler', () => {
         // Given
         const query = {
           idEtablissement: etablissement1Dto.id,
-          page: 2,
+          page: 1,
           limit: 1,
-          q: 'Jeune'
+          q: 'Jean'
         }
 
         // When
@@ -190,7 +190,7 @@ describe('GetJeuneEtablissementV2QueryHandler', () => {
         // Then
         const queryModelAttendu: GetJeunesEtablissementV2QueryModel = {
           pagination: {
-            page: 2,
+            page: 1,
             limit: 1,
             total: 2
           },

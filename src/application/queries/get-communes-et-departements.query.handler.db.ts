@@ -41,7 +41,7 @@ export class GetCommunesEtDepartementsQueryHandler extends QueryHandler<
     resultats.sort((a, b) => {
       return a.score > b.score ? -1 : 1
     })
-    resultats.splice(5, resultats.length)
+    resultats.splice(7, resultats.length)
 
     return resultats
   }
@@ -59,8 +59,8 @@ export class GetCommunesEtDepartementsQueryHandler extends QueryHandler<
     const departements: DepartementSqlModel[] = await this.sequelize.query(
       `SELECT libelle, code, SIMILARITY(libelle, ?) AS "score"
        FROM "departement"
-       WHERE libelle % ?
-       ORDER BY "score" DESC LIMIT 5;`,
+       WHERE SIMILARITY(libelle, ?) > 0.4
+       ORDER BY "score" DESC;`,
       {
         replacements: [recherche, recherche],
         type: QueryTypes.SELECT
@@ -80,8 +80,8 @@ export class GetCommunesEtDepartementsQueryHandler extends QueryHandler<
     const communes: CommuneSqlModel[] = await this.sequelize.query(
       `SELECT libelle, code, code_postal as "codePostal", longitude, latitude, SIMILARITY(libelle, ?) AS "score"
        FROM "commune"
-       WHERE libelle % ?
-       ORDER BY "score" DESC LIMIT 5;`,
+       WHERE SIMILARITY(libelle, ?) > 0.4
+       ORDER BY "score" DESC;`,
       {
         replacements: [recherche, recherche],
         type: QueryTypes.SELECT

@@ -28,10 +28,8 @@ export class GetMetiersRomeQueryHandler extends QueryHandler<
     const metiers: CommuneSqlModel[] = await this.sequelize.query(
       `SELECT code, libelle, SIMILARITY(libelle_sanitized, ?) AS "score"
        FROM "referentiel_metier_rome"
-       WHERE libelle_sanitized % ?
-          OR code = ?
-       ORDER BY "score" DESC
-       LIMIT 20;`,
+       WHERE SIMILARITY(libelle_sanitized, ?) > 0 OR code = ?
+       ORDER BY "score" DESC;`,
       {
         replacements: [
           sanitizedRecherche,
