@@ -11,9 +11,9 @@ export function unFavoriOffreEmploi(
     idJeune: '1',
     idOffre: '',
     titre: '',
-    typeContrat: '',
-    nomEntreprise: '',
-    duree: '',
+    typeContrat: 'aa',
+    nomEntreprise: 'bc',
+    duree: '2 ans',
     isAlternance: null,
     nomLocalisation: null,
     codePostalLocalisation: null,
@@ -31,7 +31,7 @@ export function unFavoriOffreEngagement(
     idJeune: '1',
     idOffre: '',
     titre: '',
-    domaine: '',
+    domaine: 'infra',
     ville: null,
     organisation: null,
     dateDeDebut: null
@@ -47,10 +47,10 @@ export function unFavoriOffreImmersion(
     id: 1,
     idJeune: '1',
     idOffre: '',
-    metier: '',
+    metier: 'boulanger',
     ville: '',
     nomEtablissement: '',
-    secteurActivite: ''
+    secteurActivite: 'patisserie'
   }
 
   return { ...defaults, ...args }
